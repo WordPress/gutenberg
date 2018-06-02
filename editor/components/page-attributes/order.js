@@ -1,21 +1,15 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { withInstanceId } from '@wordpress/components';
-import { compose } from '@wordpress/element';
+import { compose, Fragment } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import PageAttributesCheck from './check';
-import { editPost } from '../../store/actions';
-import { getEditedPostAttribute } from '../../store/selectors';
+import PostTypeSupportCheck from '../post-type-support-check';
 
 export function PageAttributesOrder( { onUpdateOrder, instanceId, order } ) {
 	const setUpdatedOrder = ( event ) => {
@@ -28,7 +22,7 @@ export function PageAttributesOrder( { onUpdateOrder, instanceId, order } ) {
 	const inputId = `editor-page-attributes__order-${ instanceId }`;
 
 	return (
-		<PageAttributesCheck>
+		<Fragment>
 			<label htmlFor={ inputId }>
 				{ __( 'Order' ) }
 			</label>
@@ -39,26 +33,30 @@ export function PageAttributesOrder( { onUpdateOrder, instanceId, order } ) {
 				id={ inputId }
 				size={ 6 }
 			/>
-		</PageAttributesCheck>
+		</Fragment>
 	);
 }
 
-const applyConnect = connect(
-	( state ) => {
+function PageAttributesOrderWithChecks( props ) {
+	return (
+		<PostTypeSupportCheck supportKeys="page-attributes">
+			<PageAttributesOrder { ...props } />
+		</PostTypeSupportCheck>
+	);
+}
+
+export default compose( [
+	withSelect( ( select ) => {
 		return {
-			order: getEditedPostAttribute( state, 'menu_order' ),
+			order: select( 'core/editor' ).getEditedPostAttribute( 'menu_order' ),
 		};
-	},
-	{
+	} ),
+	withDispatch( ( dispatch ) => ( {
 		onUpdateOrder( order ) {
-			return editPost( {
+			dispatch( 'core/editor' ).editPost( {
 				menu_order: order,
 			} );
 		},
-	}
-);
-
-export default compose( [
-	applyConnect,
+	} ) ),
 	withInstanceId,
-] )( PageAttributesOrder );
+] )( PageAttributesOrderWithChecks );

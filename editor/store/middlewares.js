@@ -8,7 +8,6 @@ import { flowRight } from 'lodash';
 /**
  * Internal dependencies
  */
-import { mobileMiddleware } from '../utils/mobile';
 import effects from './effects';
 
 /**
@@ -16,11 +15,10 @@ import effects from './effects';
  *
  * @param {Object} store Store Object.
  *
- * @returns {Object} Update Store Object.
+ * @return {Object} Update Store Object.
  */
 function applyMiddlewares( store ) {
 	const middlewares = [
-		mobileMiddleware,
 		refx( effects ),
 		multi,
 	];
@@ -37,13 +35,11 @@ function applyMiddlewares( store ) {
 		getState: store.getState,
 		dispatch: ( ...args ) => enhancedDispatch( ...args ),
 	};
-	chain = middlewares.map( middleware => middleware( middlewareAPI ) );
+	chain = middlewares.map( ( middleware ) => middleware( middlewareAPI ) );
 	enhancedDispatch = flowRight( ...chain )( store.dispatch );
 
-	return {
-		...store,
-		dispatch: enhancedDispatch,
-	};
+	store.dispatch = enhancedDispatch;
+	return store;
 }
 
 export default applyMiddlewares;

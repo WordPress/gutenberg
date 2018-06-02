@@ -1,5 +1,9 @@
 .editor-block-switcher {
 	position: relative;
+
+	.components-toolbar {
+		border-left: none;
+	}
 }
 
 .editor-block-switcher__toggle {
@@ -7,6 +11,9 @@
 	margin: 0;
 	padding: 8px;
 	border-radius: 0;
+
+	// Add a right border to show as separator in the block toolbar.
+	border-right: 1px solid $light-gray-700;
 
 	&:focus:before {
 		top: -3px;
@@ -24,7 +31,7 @@
 	box-shadow: $shadow-popover;
 	border: 1px solid $light-gray-500;
 	background: $white;
-	padding: 3px 3px 0 3px;
+	padding: 3px 3px 0;
 }
 
 .editor-block-switcher__menu-title {
@@ -45,4 +52,13 @@
 		margin-right: 8px;
 		height: 20px;
 	}
+
+	&:hover:not(:disabled):not([aria-disabled="true"]) {
+		@include menu-style__neutral;
+	}
+
+	&:focus:not(:disabled):not([aria-disabled="true"]) {
+		@include menu-style__focus;
+	}
+
 }

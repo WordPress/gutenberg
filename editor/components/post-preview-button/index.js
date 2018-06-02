@@ -1,26 +1,15 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { IconButton } from '@wordpress/components';
+import { Component, compose } from '@wordpress/element';
+import { Button, ifCondition } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import {
-	getEditedPostPreviewLink,
-	getEditedPostAttribute,
-	isEditedPostDirty,
-	isEditedPostNew,
-	isEditedPostSaveable,
-} from '../../store/selectors';
-import { autosave } from '../../store/actions';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 export class PostPreviewButton extends Component {
 	constructor() {
@@ -74,12 +63,19 @@ export class PostPreviewButton extends Component {
 			this.getWindowTarget()
 		);
 
+		// When popup is closed, delete reference to avoid later assignment of
+		// location in a post update.
+		this.previewWindow.onbeforeunload = () => delete this.previewWindow;
+
 		const markup = `
 			<div>
 				<p>Please wait&hellip;</p>
 				<p>Generating preview.</p>
 			</div>
 			<style>
+				body {
+					margin: 0;
+				}
 				div {
 					display: flex;
 					flex-direction: column;
@@ -102,26 +98,46 @@ export class PostPreviewButton extends Component {
 		const { link, isSaveable } = this.props;
 
 		return (
-			<IconButton
+			<Button
+				className="editor-post-preview"
+				isLarge
 				href={ link }
 				onClick={ this.saveForPreview }
 				target={ this.getWindowTarget() }
-				icon="visibility"
 				disabled={ ! isSaveable }
-				label={ _x( 'Preview', 'imperative verb' ) }
-			/>
+			>
+				{ _x( 'Preview', 'imperative verb' ) }
+			</Button>
 		);
 	}
 }
 
-export default connect(
-	( state ) => ( {
-		postId: state.currentPost.id,
-		link: getEditedPostPreviewLink( state ),
-		isDirty: isEditedPostDirty( state ),
-		isNew: isEditedPostNew( state ),
-		isSaveable: isEditedPostSaveable( state ),
-		modified: getEditedPostAttribute( state, 'modified' ),
+export default compose( [
+	withSelect( ( select ) => {
+		const {
+			getCurrentPostId,
+			getEditedPostPreviewLink,
+			getEditedPostAttribute,
+			isEditedPostDirty,
+			isEditedPostNew,
+			isEditedPostSaveable,
+		} = select( 'core/editor' );
+		const {
+			getPostType,
+		} = select( 'core' );
+		const postType = getPostType( getEditedPostAttribute( 'type' ) );
+		return {
+			postId: getCurrentPostId(),
+			link: getEditedPostPreviewLink(),
+			isDirty: isEditedPostDirty(),
+			isNew: isEditedPostNew(),
+			isSaveable: isEditedPostSaveable(),
+			isViewable: get( postType, [ 'viewable' ], false ),
+			modified: getEditedPostAttribute( 'modified' ),
+		};
 	} ),
-	{ autosave }
-)( PostPreviewButton );
+	withDispatch( ( dispatch ) => ( {
+		autosave: dispatch( 'core/editor' ).autosave,
+	} ) ),
+	ifCondition( ( { isViewable } ) => isViewable ),
+] )( PostPreviewButton );

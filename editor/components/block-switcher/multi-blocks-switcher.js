@@ -1,16 +1,15 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { connect } from 'react-redux';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import BlockSwitcher from './';
-import { getMultiSelectedBlockUids } from '../../store/selectors';
 
-function MultiBlocksSwitcher( { isMultiBlockSelection, selectedBlockUids } ) {
+export function MultiBlocksSwitcher( { isMultiBlockSelection, selectedBlockUids } ) {
 	if ( ! isMultiBlockSelection ) {
 		return null;
 	}
@@ -19,9 +18,9 @@ function MultiBlocksSwitcher( { isMultiBlockSelection, selectedBlockUids } ) {
 	);
 }
 
-export default connect(
-	( state ) => {
-		const selectedBlockUids = getMultiSelectedBlockUids( state );
+export default withSelect(
+	( select ) => {
+		const selectedBlockUids = select( 'core/editor' ).getMultiSelectedBlockUids();
 		return {
 			isMultiBlockSelection: selectedBlockUids.length > 1,
 			selectedBlockUids,

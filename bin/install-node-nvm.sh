@@ -10,7 +10,12 @@ set -e
 # Load NVM
 if [ -n "$NVM_DIR" ]; then
 	# The --no-use option ensures loading NVM doesn't switch the current version.
-	. "$NVM_DIR/nvm.sh" --no-use
+	if [ -f "$NVM_DIR/nvm.sh" ]; then
+		. "$NVM_DIR/nvm.sh" --no-use
+	elif command_exists "brew" && [ -f "$(brew --prefix nvm)/nvm.sh" ]; then
+		# use homebrew if that's how nvm was installed
+		. "$(brew --prefix nvm)/nvm.sh" --no-use
+	fi
 fi
 
 # Change to the expected directory
@@ -40,6 +45,7 @@ if [ "$TRAVIS" != "true" ] && ! command_exists "nvm"; then
 	exit 1
 fi
 
+# Check if the current nvm version is up to date.
 if [ "$TRAVIS" != "true" ] && [ $NVM_VERSION != "v$(nvm --version)" ]; then
 	echo -en $(status_message "Updating NVM..." )
 	download "https://raw.githubusercontent.com/creationix/nvm/$NVM_VERSION/install.sh" | bash >/dev/null 2>&1
@@ -57,7 +63,7 @@ if [ "$TRAVIS" != "true" ] && [ "$(nvm current)" != "$(nvm version-remote --lts)
 	nvm install >/dev/null 2>&1
 	echo ' done!'
 
-	echo -e $(warning_message "A new node version was install, please run this command to use it:" )
+	echo -e $(warning_message "A new node version was installed, please run this command to use it:" )
 	echo -e $(warning_message "$(action_format "nvm use")" )
 	echo -e $(warning_message "After that, re-run the setup script to continue." )
 	exit 1
@@ -67,7 +73,10 @@ fi
 echo -e $(status_message "Installing and updating NPM packages..." )
 npm install
 
-# There was a bug in NPM that caused has changes in package-lock.json. Handle that.
+# Make sure npm is up-to-date
+npm install npm -g
+
+# There was a bug in NPM that caused changes in package-lock.json. Handle that.
 if [ "$TRAVIS" != "true" ] && ! git diff --exit-code package-lock.json >/dev/null; then
 	if ask "$(warning_message "Your package-lock.json changed, which may mean there's an issue with your NPM cache. Would you like to try and automatically clean it up?" )" N 10; then
 		rm -rf node_modules/

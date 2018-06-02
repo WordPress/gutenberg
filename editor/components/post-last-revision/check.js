@@ -1,12 +1,11 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { connect } from 'react-redux';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { getCurrentPostLastRevisionId, getCurrentPostRevisionsCount } from '../../store/selectors';
 import PostTypeSupportCheck from '../post-type-support-check';
 
 export function PostLastRevisionCheck( { lastRevisionId, revisionsCount, children } ) {
@@ -17,11 +16,12 @@ export function PostLastRevisionCheck( { lastRevisionId, revisionsCount, childre
 	return <PostTypeSupportCheck supportKeys="revisions" >{ children }</PostTypeSupportCheck>;
 }
 
-export default connect(
-	( state ) => {
+export default withSelect(
+	( select ) => {
+		const { getCurrentPostLastRevisionId, getCurrentPostRevisionsCount } = select( 'core/editor' );
 		return {
-			lastRevisionId: getCurrentPostLastRevisionId( state ),
-			revisionsCount: getCurrentPostRevisionsCount( state ),
+			lastRevisionId: getCurrentPostLastRevisionId(),
+			revisionsCount: getCurrentPostRevisionsCount(),
 		};
 	}
 )( PostLastRevisionCheck );

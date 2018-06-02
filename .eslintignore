@@ -1,5 +1,5 @@
 build
+build-module
 coverage
-cypress
 node_modules
 vendor

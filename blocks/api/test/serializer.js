@@ -25,13 +25,13 @@ import { createBlock } from '../';
 
 describe( 'block serializer', () => {
 	beforeAll( () => {
-		// Load all hooks that modify blocks
-		require( 'blocks/hooks' );
+		// Initialize the block store.
+		require( '../../store' );
 	} );
 
 	afterEach( () => {
 		setUnknownTypeHandlerName( undefined );
-		getBlockTypes().forEach( block => {
+		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
 	} );
@@ -40,73 +40,17 @@ describe( 'block serializer', () => {
 		it( 'returns beautiful content', () => {
 			const content = getBeautifulContent( '<div><div>Beautiful</div></div>' );
 
-			expect( content ).toBe( '<div>\n    <div>Beautiful</div>\n</div>' );
+			expect( content ).toBe( '<div>\n\t<div>Beautiful</div>\n</div>' );
 		} );
 	} );
 
 	describe( 'getSaveContent()', () => {
 		describe( 'function save', () => {
-			it( 'should return string verbatim', () => {
-				const saved = getSaveContent(
-					{
-						save: ( { attributes } ) => attributes.fruit,
-						name: 'core/fruit',
-					},
-					{ fruit: 'Bananas' }
-				);
-
-				expect( saved ).toBe( 'Bananas' );
-			} );
-
 			it( 'should return element as string if save returns element', () => {
 				const saved = getSaveContent(
 					{
 						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
 						name: 'core/fruit',
-					},
-					{ fruit: 'Bananas' }
-				);
-
-				expect( saved ).toBe( '<div class="wp-block-fruit">Bananas</div>' );
-			} );
-
-			it( 'should use the namespace in the classname for non-core blocks', () => {
-				const saved = getSaveContent(
-					{
-						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
-						name: 'myplugin/fruit',
-					},
-					{ fruit: 'Bananas' }
-				);
-
-				expect( saved ).toBe( '<div class="wp-block-myplugin-fruit">Bananas</div>' );
-			} );
-
-			it( 'should include additional classes in block attributes', () => {
-				const saved = getSaveContent(
-					{
-						save: ( { attributes } ) => createElement( 'div', {
-							className: 'fruit',
-						}, attributes.fruit ),
-						name: 'myplugin/fruit',
-					},
-					{
-						fruit: 'Bananas',
-						className: 'fresh',
-					}
-				);
-
-				expect( saved ).toBe( '<div class="wp-block-myplugin-fruit fruit fresh">Bananas</div>' );
-			} );
-
-			it( 'should not add a className if falsy', () => {
-				const saved = getSaveContent(
-					{
-						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
-						name: 'myplugin/fruit',
-						supports: {
-							className: false,
-						},
 					},
 					{ fruit: 'Bananas' }
 				);
@@ -254,54 +198,6 @@ describe( 'block serializer', () => {
 	} );
 
 	describe( 'serializeBlock()', () => {
-		describe( '"more" block', () => {
-			beforeEach( () => {
-				registerBlockType( 'core/more', {
-					category: 'layout',
-					title: 'more',
-					attributes: {
-						customText: {
-							type: 'string',
-						},
-						noTeaser: {
-							type: 'boolean',
-							default: false,
-						},
-					},
-
-					save: ( { attributes } ) => attributes.customText,
-				} );
-			} );
-
-			it( 'serializes without text', () => {
-				const block = createBlock( 'core/more', {} );
-
-				const content = serializeBlock( block );
-
-				expect( content ).toBe( '<!--more-->' );
-			} );
-
-			it( 'serializes with text', () => {
-				const block = createBlock( 'core/more', {
-					customText: 'Read more!',
-				} );
-
-				const content = serializeBlock( block );
-
-				expect( content ).toBe( '<!--more Read more!-->' );
-			} );
-
-			it( 'serializes with no teaser', () => {
-				const block = createBlock( 'core/more', {
-					noTeaser: true,
-				} );
-
-				const content = serializeBlock( block );
-
-				expect( content ).toBe( '<!--more-->\n<!--noteaser-->' );
-			} );
-		} );
-
 		it( 'serializes the fallback block without comment delimiters', () => {
 			registerBlockType( 'core/unknown-block', {
 				category: 'common',
@@ -346,7 +242,11 @@ describe( 'block serializer', () => {
 						throw new Error();
 					}
 
-					return <p dangerouslySetInnerHTML={ { __html: attributes.content } } />;
+					return (
+						<p>
+							{ attributes.content }
+						</p>
+					);
 				},
 				category: 'common',
 				title: 'block title',
@@ -359,7 +259,7 @@ describe( 'block serializer', () => {
 				content: 'Ribs & Chicken',
 				stuff: 'left & right -- but <not>',
 			} );
-			const expectedPostContent = '<!-- wp:test-block {"stuff":"left \\u0026 right \\u002d\\u002d but \\u003cnot\\u003e"} -->\n<p class="wp-block-test-block">Ribs & Chicken</p>\n<!-- /wp:test-block -->';
+			const expectedPostContent = '<!-- wp:test-block {"stuff":"left \\u0026 right \\u002d\\u002d but \\u003cnot\\u003e"} -->\n<p>Ribs &amp; Chicken</p>\n<!-- /wp:test-block -->';
 
 			expect( serialize( [ block ] ) ).toEqual( expectedPostContent );
 			expect( serialize( block ) ).toEqual( expectedPostContent );
@@ -411,11 +311,11 @@ describe( 'block serializer', () => {
 			const block =	{
 				name: 'core/chicken',
 				attributes: {
-					content: '<p>chicken   </p>',
+					content: 'chicken',
 				},
 				isValid: true,
 			};
-			expect( getBlockContent( block ) ).toBe( '<p>chicken </p>' );
+			expect( getBlockContent( block ) ).toBe( 'chicken' );
 		} );
 	} );
 } );

@@ -10,8 +10,16 @@ services:
       WORDPRESS_DB_PASSWORD: example
       ABSPATH: /usr/src/wordpress/
     volumes:
+      - wordpress:/var/www/html
       - .:/var/www/html/wp-content/plugins/gutenberg
-    container_name: wordpress-dev
+      - ./test/e2e/test-plugins:/var/www/html/wp-content/plugins/gutenberg-test-plugins
+      - ./test/e2e/test-mu-plugins:/var/www/html/wp-content/mu-plugins
+
+  cli:
+    image: wordpress:cli
+    volumes:
+      - wordpress:/var/www/html
+      - .:/var/www/html/wp-content/plugins/gutenberg
 
   mysql:
     image: mysql:5.7
@@ -33,4 +41,5 @@ services:
       - .:/app
 
 volumes:
-  testsuite: {}
+  testsuite:
+  wordpress:

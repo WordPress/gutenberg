@@ -1,26 +1,25 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import Textarea from 'react-autosize-textarea';
 import classnames from 'classnames';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
-import { keycodes } from '@wordpress/utils';
-import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
-import { withContext } from '@wordpress/components';
+import { keycodes, decodeEntities } from '@wordpress/utils';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { KeyboardShortcuts, withInstanceId, withFocusOutside } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import PostPermalink from '../post-permalink';
-import { getEditedPostTitle } from '../../store/selectors';
-import { insertBlock, editPost, clearSelectedBlock } from '../../store/actions';
+import PostTypeSupportCheck from '../post-type-support-check';
 
 /**
  * Constants
@@ -32,47 +31,19 @@ class PostTitle extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.bindContainer = this.bindNode.bind( this, 'container' );
-		this.bindTextarea = this.bindNode.bind( this, 'textarea' );
 		this.onChange = this.onChange.bind( this );
 		this.onSelect = this.onSelect.bind( this );
 		this.onUnselect = this.onUnselect.bind( this );
-		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
-		this.blurIfOutside = this.blurIfOutside.bind( this );
-
-		this.nodes = {};
+		this.redirectHistory = this.redirectHistory.bind( this );
 
 		this.state = {
 			isSelected: false,
 		};
 	}
 
-	componentDidMount() {
-		document.addEventListener( 'selectionchange', this.onSelectionChange );
-	}
-
-	componentWillUnmount() {
-		document.removeEventListener( 'selectionchange', this.onSelectionChange );
-	}
-
-	bindNode( name, node ) {
-		this.nodes[ name ] = node;
-	}
-
-	onSelectionChange() {
-		const textarea = this.nodes.textarea.textarea;
-		if (
-			document.activeElement === textarea &&
-			textarea.selectionStart !== textarea.selectionEnd
-		) {
-			this.onSelect();
-		}
-	}
-
-	onChange( event ) {
-		const newTitle = event.target.value.replace( REGEXP_NEWLINES, ' ' );
-		this.props.onUpdate( newTitle );
+	handleFocusOutside() {
+		this.onUnselect();
 	}
 
 	onSelect() {
@@ -84,10 +55,9 @@ class PostTitle extends Component {
 		this.setState( { isSelected: false } );
 	}
 
-	blurIfOutside( event ) {
-		if ( ! this.nodes.container.contains( event.relatedTarget ) ) {
-			this.onUnselect();
-		}
+	onChange( event ) {
+		const newTitle = event.target.value.replace( REGEXP_NEWLINES, ' ' );
+		this.props.onUpdate( newTitle );
 	}
 
 	onKeyDown( event ) {
@@ -97,59 +67,102 @@ class PostTitle extends Component {
 		}
 	}
 
+	/**
+	 * Emulates behavior of an undo or redo on its corresponding key press
+	 * combination. This is a workaround to React's treatment of undo in a
+	 * controlled textarea where characters are updated one at a time.
+	 * Instead, leverage the store's undo handling of title changes.
+	 *
+	 * @see https://github.com/facebook/react/issues/8514
+	 *
+	 * @param {KeyboardEvent} event Key event.
+	 */
+	redirectHistory( event ) {
+		if ( event.shiftKey ) {
+			this.props.onRedo();
+		} else {
+			this.props.onUndo();
+		}
+
+		event.preventDefault();
+	}
+
 	render() {
-		const { title, placeholder } = this.props;
+		const { title, placeholder, instanceId, isPostTypeViewable } = this.props;
 		const { isSelected } = this.state;
-		const className = classnames( 'editor-post-title', { 'is-selected': isSelected } );
+		const className = classnames( 'editor-post-title__block', { 'is-selected': isSelected } );
+		const decodedPlaceholder = decodeEntities( placeholder );
 
 		return (
-			<div
-				ref={ this.bindContainer }
-				onFocus={ this.onSelect }
-				onBlur={ this.blurIfOutside }
-				className={ className }
-				tabIndex={ -1 /* Necessary for Firefox to include relatedTarget in blur event */ }
-			>
-				{ isSelected && <PostPermalink /> }
-				<div>
-					<Textarea
-						ref={ this.bindTextarea }
-						className="editor-post-title__input"
-						value={ title }
-						onChange={ this.onChange }
-						placeholder={ placeholder || __( 'Add title' ) }
-						onClick={ this.onSelect }
-						onKeyDown={ this.onKeyDown }
-						onKeyPress={ this.onUnselect }
-					/>
+			<PostTypeSupportCheck supportKeys="title">
+				<div className="editor-post-title">
+					<div className={ className }>
+						<KeyboardShortcuts
+							shortcuts={ {
+								'mod+z': this.redirectHistory,
+								'mod+shift+z': this.redirectHistory,
+							} }
+						>
+							<label htmlFor={ `post-title-${ instanceId }` } className="screen-reader-text">
+								{ decodedPlaceholder || __( 'Add title' ) }
+							</label>
+							<Textarea
+								id={ `post-title-${ instanceId }` }
+								className="editor-post-title__input"
+								value={ title }
+								onChange={ this.onChange }
+								placeholder={ decodedPlaceholder || __( 'Add title' ) }
+								onFocus={ this.onSelect }
+								onKeyDown={ this.onKeyDown }
+								onKeyPress={ this.onUnselect }
+							/>
+						</KeyboardShortcuts>
+						{ isSelected && isPostTypeViewable && <PostPermalink /> }
+					</div>
 				</div>
-			</div>
+			</PostTypeSupportCheck>
 		);
 	}
 }
 
-const applyConnect = connect(
-	( state ) => ( {
-		title: getEditedPostTitle( state ),
-	} ),
-	{
+const applyWithSelect = withSelect( ( select ) => {
+	const { getEditedPostAttribute, getEditorSettings } = select( 'core/editor' );
+	const { getPostType } = select( 'core' );
+	const postType = getPostType( getEditedPostAttribute( 'type' ) );
+	const { titlePlaceholder } = getEditorSettings();
+
+	return {
+		title: getEditedPostAttribute( 'title' ),
+		isPostTypeViewable: get( postType, [ 'viewable' ], false ),
+		placeholder: titlePlaceholder,
+	};
+} );
+
+const applyWithDispatch = withDispatch( ( dispatch ) => {
+	const {
+		insertDefaultBlock,
+		editPost,
+		clearSelectedBlock,
+		undo,
+		redo,
+	} = dispatch( 'core/editor' );
+
+	return {
 		onEnterPress() {
-			return insertBlock( createBlock( getDefaultBlockName() ), 0 );
+			insertDefaultBlock( undefined, undefined, 0 );
 		},
 		onUpdate( title ) {
-			return editPost( { title } );
+			editPost( { title } );
 		},
+		onUndo: undo,
+		onRedo: redo,
 		clearSelectedBlock,
-	}
-);
-
-const applyEditorSettings = withContext( 'editor' )(
-	( settings ) => ( {
-		placeholder: settings.titlePlaceholder,
-	} )
-);
+	};
+} );
 
 export default compose(
-	applyConnect,
-	applyEditorSettings
+	applyWithSelect,
+	applyWithDispatch,
+	withInstanceId,
+	withFocusOutside
 )( PostTitle );

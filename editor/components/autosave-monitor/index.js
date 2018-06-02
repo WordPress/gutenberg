@@ -1,28 +1,18 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { autosave } from '../../store/actions';
-import {
-	isEditedPostDirty,
-	isEditedPostSaveable,
-} from '../../store/selectors';
+import { Component, compose } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 export class AutosaveMonitor extends Component {
 	componentDidUpdate( prevProps ) {
-		const { isDirty, isSaveable } = this.props;
-		if ( prevProps.isDirty !== isDirty ||
-				prevProps.isSaveable !== isSaveable ) {
-			this.toggleTimer( isDirty && isSaveable );
+		const { isDirty, isAutosaveable } = this.props;
+
+		if (
+			prevProps.isDirty !== isDirty ||
+			prevProps.isAutosaveable !== isAutosaveable
+		) {
+			this.toggleTimer( isDirty && isAutosaveable );
 		}
 	}
 
@@ -32,11 +22,11 @@ export class AutosaveMonitor extends Component {
 
 	toggleTimer( isPendingSave ) {
 		clearTimeout( this.pendingSave );
-
+		const { autosaveInterval } = this.props;
 		if ( isPendingSave ) {
 			this.pendingSave = setTimeout(
 				() => this.props.autosave(),
-				10000
+				autosaveInterval * 1000
 			);
 		}
 	}
@@ -46,12 +36,21 @@ export class AutosaveMonitor extends Component {
 	}
 }
 
-export default connect(
-	( state ) => {
+export default compose( [
+	withSelect( ( select ) => {
+		const {
+			isEditedPostDirty,
+			isEditedPostAutosaveable,
+			getEditorSettings,
+		} = select( 'core/editor' );
+		const { autosaveInterval } = getEditorSettings();
 		return {
-			isDirty: isEditedPostDirty( state ),
-			isSaveable: isEditedPostSaveable( state ),
+			isDirty: isEditedPostDirty(),
+			isAutosaveable: isEditedPostAutosaveable(),
+			autosaveInterval,
 		};
-	},
-	{ autosave }
-)( AutosaveMonitor );
+	} ),
+	withDispatch( ( dispatch ) => ( {
+		autosave: dispatch( 'core/editor' ).autosave,
+	} ) ),
+] )( AutosaveMonitor );

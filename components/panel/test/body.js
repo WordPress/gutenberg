@@ -23,7 +23,7 @@ describe( 'PanelBody', () => {
 			expect( button.shallow().hasClass( 'components-panel__body-toggle' ) ).toBe( true );
 			expect( panelBody.state( 'opened' ) ).toBe( true );
 			expect( button.prop( 'onClick' ) ).toBe( panelBody.instance().toggle );
-			expect( icon.prop( 'icon' ) ).toBe( 'arrow-down' );
+			expect( icon.prop( 'icon' ) ).toBe( 'arrow-up' );
 			expect( button.childAt( 0 ).name() ).toBe( 'Dashicon' );
 			expect( button.childAt( 1 ).text() ).toBe( 'Some Text' );
 		} );
@@ -32,14 +32,14 @@ describe( 'PanelBody', () => {
 			const panelBody = shallow( <PanelBody title="Some Text" initialOpen={ false } /> );
 			expect( panelBody.state( 'opened' ) ).toBe( false );
 			const icon = panelBody.find( 'Dashicon' );
-			expect( icon.prop( 'icon' ) ).toBe( 'arrow-right' );
+			expect( icon.prop( 'icon' ) ).toBe( 'arrow-down' );
 		} );
 
 		it( 'should use the "opened" prop instead of state if provided', () => {
 			const panelBody = shallow( <PanelBody title="Some Text" opened={ true } initialOpen={ false } /> );
 			expect( panelBody.state( 'opened' ) ).toBe( false );
 			const icon = panelBody.find( 'Dashicon' );
-			expect( icon.prop( 'icon' ) ).toBe( 'arrow-down' );
+			expect( icon.prop( 'icon' ) ).toBe( 'arrow-up' );
 		} );
 
 		it( 'should render child elements within PanelBody element', () => {

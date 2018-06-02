@@ -4,19 +4,19 @@
 import { includes } from 'lodash';
 
 /**
- * Reducer enhancer for tracking changes to reducer state over time. The
- * returned reducer will include a new `isDirty` property on the object
- * reflecting whether the original reference of the reducer has changed.
+ * Higher-order reducer creator for tracking changes to state over time. The
+ * returned reducer will include a `isDirty` property on the object reflecting
+ * whether the original reference of the reducer has changed.
  *
- * @param {Function} reducer            Original reducer.
- * @param {?Object}  options            Optional .
- * @param {?Array}   options.resetTypes Action types upon which to reset dirty.
+ * @param {?Object} options             Optional options.
+ * @param {?Array}  options.ignoreTypes Action types upon which to skip check.
+ * @param {?Array}  options.resetTypes  Action types upon which to reset dirty.
  *
- * @returns {Function} Enhanced reducer.
+ * @return {Function} Higher-order reducer.
  */
-export default function withChangeDetection( reducer, options = {} ) {
+const withChangeDetection = ( options = {} ) => ( reducer ) => {
 	return ( state, action ) => {
-		const nextState = reducer( state, action );
+		let nextState = reducer( state, action );
 
 		// Reset at:
 		//  - Initial state
@@ -26,19 +26,30 @@ export default function withChangeDetection( reducer, options = {} ) {
 			includes( options.resetTypes, action.type )
 		);
 
-		if ( isReset ) {
-			return {
-				...nextState,
-				isDirty: false,
-			};
-		}
-
 		const isChanging = state !== nextState;
 
-		if ( isChanging ) {
-			nextState.isDirty = true;
+		// If not intending to update dirty flag, return early and avoid clone.
+		if ( ! isChanging && ! isReset ) {
+			return state;
+		}
+
+		// Avoid mutating state, unless it's already changing by original
+		// reducer and not initial.
+		if ( ! isChanging || state === undefined ) {
+			nextState = { ...nextState };
+		}
+
+		const isIgnored = includes( options.ignoreTypes, action.type );
+
+		if ( isIgnored ) {
+			// Preserve the original value if ignored.
+			nextState.isDirty = state.isDirty;
+		} else {
+			nextState.isDirty = ! isReset && isChanging;
 		}
 
 		return nextState;
 	};
-}
+};
+
+export default withChangeDetection;

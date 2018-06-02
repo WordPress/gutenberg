@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`splitting and merging blocks Should split and merge paragraph blocks using Enter and Backspace 1`] = `
+"<!-- wp:paragraph -->
+<p>First</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Second</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`splitting and merging blocks Should split and merge paragraph blocks using Enter and Backspace 2`] = `
+"<!-- wp:paragraph -->
+<p>FirstSecond</p>
+<!-- /wp:paragraph -->"
+`;

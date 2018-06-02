@@ -50,7 +50,7 @@ describe( 'request', () => {
 		wp.apiRequest = wpApiRequest;
 	} );
 
-	describe( 'getResponseHeaders()', () =>{
+	describe( 'getResponseHeaders()', () => {
 		it( 'returns tuples of array headers', () => {
 			expect( getResponseHeaders( xhr ) ).toEqual( [
 				[ 'connection', 'Keep-Alive' ],

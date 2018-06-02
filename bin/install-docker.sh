@@ -18,16 +18,19 @@ if ! docker info >/dev/null 2>&1; then
 	exit 1
 fi
 
-# Launch the containers
-echo -e $(status_message "Updating and starting Docker containers...")
-if ! docker-compose up -d; then
-	# Launching may fail due to the docker config file directory having changed.
-	# Remove the old wordpress-dev container, and try again.
-	docker container rm -fv wordpress-dev
-	docker-compose up -d
-fi
+# Stop existing containers
+echo -e $(status_message "Stopping Docker containers...")
+docker-compose down --remove-orphans >/dev/null 2>&1
 
-HOST_PORT=$(docker inspect --format '{{(index (index .HostConfig.PortBindings "80/tcp") 0).HostPort}}' wordpress-dev)
+# Download image updates
+echo -e $(status_message "Downloading Docker image updates...")
+docker-compose pull
+
+# Launch the containers
+echo -e $(status_message "Starting Docker containers...")
+docker-compose up -d >/dev/null
+
+HOST_PORT=$(docker-compose port wordpress 80 | awk -F : '{printf $2}')
 
 # Wait until the docker containers are setup properely
 echo -en $(status_message "Attempting to connect to wordpress...")
@@ -35,28 +38,28 @@ until $(curl -L http://localhost:$HOST_PORT -so - 2>&1 | grep -q "WordPress"); d
     echo -n '.'
     sleep 5
 done
-echo ' done!'
+echo ''
 
 # Install WordPress
-echo -en $(status_message "Installing WordPress...")
-docker run -it --rm --volumes-from wordpress-dev --network container:wordpress-dev wordpress:cli core install --url=localhost:$HOST_PORT --title=Gutenberg --admin_user=admin --admin_password=password --admin_email=test@test.com >/dev/null
+echo -e $(status_message "Installing WordPress...")
+docker-compose run --rm -u 33 cli core install --url=localhost:$HOST_PORT --title=Gutenberg --admin_user=admin --admin_password=password --admin_email=test@test.com >/dev/null
+# Check for WordPress updates, just in case the WordPress image isn't up to date.
+docker-compose run --rm -u 33 cli core update >/dev/null
 
-CURRENT_URL=$(docker run -it --rm --volumes-from wordpress-dev --network container:wordpress-dev wordpress:cli option get siteurl)
+# If the 'wordpress' volume wasn't during the down/up earlier, but the post port has changed, we need to update it.
+CURRENT_URL=$(docker-compose run -T --rm cli option get siteurl)
 if [ "$CURRENT_URL" != "http://localhost:$HOST_PORT" ]; then
-	docker run -it --rm --volumes-from wordpress-dev --network container:wordpress-dev wordpress:cli option update home "http://localhost:$HOST_PORT"
-	docker run -it --rm --volumes-from wordpress-dev --network container:wordpress-dev wordpress:cli option update siteurl "http://localhost:$HOST_PORT"
+	docker-compose run --rm cli option update home "http://localhost:$HOST_PORT" >/dev/null
+	docker-compose run --rm cli option update siteurl "http://localhost:$HOST_PORT" >/dev/null
 fi
-echo ' done!'
 
 # Activate Gutenberg
-echo -en $(status_message "Activating Gutenberg...")
-docker run -it --rm --volumes-from wordpress-dev --network container:wordpress-dev wordpress:cli plugin activate gutenberg >/dev/null
-echo ' done!'
+echo -e $(status_message "Activating Gutenberg...")
+docker-compose run --rm cli plugin activate gutenberg >/dev/null
 
 # Install the PHPUnit test scaffolding
-echo -en $(status_message "Installing PHPUnit test scaffolding...")
+echo -e $(status_message "Installing PHPUnit test scaffolding...")
 docker-compose run --rm wordpress_phpunit /app/bin/install-wp-tests.sh wordpress_test root example mysql latest false >/dev/null
-echo ' done!'
 
 # Install Composer
 echo -e $(status_message "Installing and updating Composer modules...")

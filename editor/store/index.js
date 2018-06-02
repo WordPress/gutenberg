@@ -1,18 +1,21 @@
 /**
  * WordPress Dependencies
  */
-import { registerReducer, registerSelectors } from '@wordpress/data';
+import {
+	registerReducer,
+	registerSelectors,
+	registerActions,
+	withRehydration,
+	loadAndPersist,
+} from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { PREFERENCES_DEFAULTS } from './defaults';
 import reducer from './reducer';
-import { withRehydratation, loadAndPersist } from './persist';
-import enhanceWithBrowserSize from './mobile';
 import applyMiddlewares from './middlewares';
-import { BREAK_MEDIUM } from './constants';
-import { getEditedPostTitle } from './selectors';
+import * as selectors from './selectors';
+import * as actions from './actions';
 
 /**
  * Module Constants
@@ -21,11 +24,11 @@ const STORAGE_KEY = `GUTENBERG_PREFERENCES_${ window.userSettings.uid }`;
 const MODULE_KEY = 'core/editor';
 
 const store = applyMiddlewares(
-	registerReducer( 'core/editor', withRehydratation( reducer, 'preferences' ) )
+	registerReducer( MODULE_KEY, withRehydration( reducer, 'preferences', STORAGE_KEY ) )
 );
-loadAndPersist( store, 'preferences', STORAGE_KEY, PREFERENCES_DEFAULTS );
-enhanceWithBrowserSize( store, BREAK_MEDIUM );
+loadAndPersist( store, reducer, 'preferences', STORAGE_KEY );
 
-registerSelectors( MODULE_KEY, { getEditedPostTitle } );
+registerSelectors( MODULE_KEY, selectors );
+registerActions( MODULE_KEY, actions );
 
 export default store;

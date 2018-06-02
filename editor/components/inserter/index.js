@@ -1,28 +1,16 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dropdown, IconButton, withContext } from '@wordpress/components';
-import { createBlock } from '@wordpress/blocks';
+import { Dropdown, IconButton } from '@wordpress/components';
+import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Component, compose } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import InserterMenu from './menu';
-import { getBlockInsertionPoint, getEditorMode } from '../../store/selectors';
-import {
-	insertBlock,
-	hideInsertionPoint,
-	showInsertionPoint,
-} from '../../store/actions';
 
 class Inserter extends Component {
 	constructor() {
@@ -32,13 +20,10 @@ class Inserter extends Component {
 	}
 
 	onToggle( isOpen ) {
-		const {
-			insertIndex,
-			onToggle,
-		} = this.props;
+		const { onToggle } = this.props;
 
 		if ( isOpen ) {
-			this.props.showInsertionPoint( insertIndex );
+			this.props.showInsertionPoint();
 		} else {
 			this.props.hideInsertionPoint();
 		}
@@ -51,24 +36,26 @@ class Inserter extends Component {
 
 	render() {
 		const {
+			items,
 			position,
+			title,
 			children,
 			onInsertBlock,
-			insertionPoint,
-			hasSupportedBlocks,
-			isLocked,
+			rootUID,
 		} = this.props;
 
-		if ( ! hasSupportedBlocks || isLocked ) {
+		if ( items.length === 0 ) {
 			return null;
 		}
 
 		return (
 			<Dropdown
 				className="editor-inserter"
+				contentClassName="editor-inserter__popover"
 				position={ position }
 				onToggle={ this.onToggle }
 				expandOnMobile
+				headerTitle={ title }
 				renderToggle={ ( { onToggle, isOpen } ) => (
 					<IconButton
 						icon="insert"
@@ -83,11 +70,12 @@ class Inserter extends Component {
 				) }
 				renderContent={ ( { onClose } ) => {
 					const onSelect = ( item ) => {
-						onInsertBlock( item, insertionPoint );
+						onInsertBlock( item );
+
 						onClose();
 					};
 
-					return <InserterMenu onSelect={ onSelect } />;
+					return <InserterMenu items={ items } onSelect={ onSelect } rootUID={ rootUID } />;
 				} }
 			/>
 		);
@@ -95,32 +83,35 @@ class Inserter extends Component {
 }
 
 export default compose( [
-	connect(
-		( state ) => {
-			return {
-				insertionPoint: getBlockInsertionPoint( state ),
-				mode: getEditorMode( state ),
-			};
-		},
-		( dispatch ) => ( {
-			onInsertBlock( item, position ) {
-				dispatch( insertBlock(
-					createBlock( item.name, item.initialAttributes ),
-					position
-				) );
-			},
-			...bindActionCreators( {
-				showInsertionPoint,
-				hideInsertionPoint,
-			}, dispatch ),
-		} )
-	),
-	withContext( 'editor' )( ( settings ) => {
-		const { blockTypes, templateLock } = settings;
-
+	withSelect( ( select ) => {
+		const {
+			getEditedPostAttribute,
+			getBlockInsertionPoint,
+			getSelectedBlock,
+			getInserterItems,
+		} = select( 'core/editor' );
+		const insertionPoint = getBlockInsertionPoint();
+		const { rootUID } = insertionPoint;
 		return {
-			hasSupportedBlocks: true === blockTypes || ! isEmpty( blockTypes ),
-			isLocked: !! templateLock,
+			title: getEditedPostAttribute( 'title' ),
+			insertionPoint,
+			selectedBlock: getSelectedBlock(),
+			items: getInserterItems( rootUID ),
+			rootUID,
 		};
 	} ),
+	withDispatch( ( dispatch, ownProps ) => ( {
+		showInsertionPoint: dispatch( 'core/editor' ).showInsertionPoint,
+		hideInsertionPoint: dispatch( 'core/editor' ).hideInsertionPoint,
+		onInsertBlock: ( item ) => {
+			const { insertionPoint, selectedBlock } = ownProps;
+			const { index, rootUID, layout } = insertionPoint;
+			const { name, initialAttributes } = item;
+			const insertedBlock = createBlock( name, { ...initialAttributes, layout } );
+			if ( selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
+				return dispatch( 'core/editor' ).replaceBlocks( selectedBlock.uid, insertedBlock );
+			}
+			return dispatch( 'core/editor' ).insertBlock( insertedBlock, index, rootUID );
+		},
+	} ) ),
 ] )( Inserter );

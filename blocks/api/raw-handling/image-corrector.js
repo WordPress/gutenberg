@@ -1,19 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { createBlobURL } from '@wordpress/utils';
+import { createBlobURL } from '@wordpress/blob';
 
 /**
  * Browser dependencies
  */
 const { atob, Blob } = window;
-const { ELEMENT_NODE } = window.Node;
 
 export default function( node ) {
-	if ( node.nodeType !== ELEMENT_NODE ) {
-		return;
-	}
-
 	if ( node.nodeName !== 'IMG' ) {
 		return;
 	}

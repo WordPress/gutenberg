@@ -14,13 +14,13 @@ import { __ } from '@wordpress/i18n';
  */
 import './style.scss';
 
-function Notice( { status, content, onRemove = noop, isDismissible = true } ) {
-	const className = classnames( 'notice notice-alt notice-' + status, {
+function Notice( { className, status, children, onRemove = noop, isDismissible = true } ) {
+	const classNames = classnames( className, 'notice notice-alt notice-' + status, {
 		'is-dismissible': isDismissible,
 	} );
 	return (
-		<div className={ className }>
-			{ isString( content ) ? <p>{ content }</p> : content }
+		<div className={ classNames }>
+			{ isString( children ) ? <p>{ children }</p> : children }
 			{ isDismissible && (
 				<button className="notice-dismiss" type="button" onClick={ onRemove }>
 					<span className="screen-reader-text">{ __( 'Dismiss this notice' ) }</span>

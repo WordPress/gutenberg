@@ -8,7 +8,7 @@ import { equal } from 'assert';
  */
 import isInlineContent from '../is-inline-content';
 
-describe( 'stripWrappers', () => {
+describe( 'isInlineContent', () => {
 	it( 'should be inline content', () => {
 		equal( isInlineContent( '<em>test</em>' ), true );
 		equal( isInlineContent( '<span>test</span>' ), true );

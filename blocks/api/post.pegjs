@@ -161,43 +161,19 @@ function partition( predicate, list ) {
 //////////////////////////////////////////////////////
 
 Block_List
-  = pre:$(!Token .)*
-    ts:(t:Token html:$((!Token .)*) { /** <?php return array( $t, $html ); ?> **/ return [ t, html ] })*
+  = pre:$(!Block .)*
+    bs:(b:Block html:$((!Block .)*) { /** <?php return array( $b, $html ); ?> **/ return [ b, html ] })*
     post:$(.*)
-  { /** <?php return peg_join_blocks( $pre, $ts, $post ); ?> **/
-    return joinBlocks( pre, ts, post );
+  { /** <?php return peg_join_blocks( $pre, $bs, $post ); ?> **/
+    return joinBlocks( pre, bs, post );
   }
 
-Token
-  = Tag_More
-  / Block_Void
+Block
+  = Block_Void
   / Block_Balanced
 
-Tag_More
-  = "<!--" WS* "more" customText:(WS+ text:$((!(WS* "-->") .)+) { /** <?php return $text; ?> **/ return text })? WS* "-->" noTeaser:(WS* "<!--noteaser-->")?
-  { /** <?php
-    $attrs = array( 'noTeaser' => (bool) $noTeaser );
-    if ( ! empty( $customText ) ) {
-      $attrs['customText'] = $customText;
-    }
-    return array(
-       'blockName' => 'core/more',
-       'attrs' => $attrs,
-       'innerHTML' => ''
-    );
-    ?> **/
-    return {
-      blockName: 'core/more',
-      attrs: {
-        customText: customText || undefined,
-        noTeaser: !! noTeaser
-      },
-      innerHTML: ''
-    }
-  }
-
 Block_Void
-  = "<!--" WS+ "wp:" blockName:Block_Name WS+ attrs:(a:Block_Attributes WS+ {
+  = "<!--" __ "wp:" blockName:Block_Name __ attrs:(a:Block_Attributes __ {
     /** <?php return $a; ?> **/
     return a;
   })? "/-->"
@@ -220,7 +196,7 @@ Block_Void
   }
 
 Block_Balanced
-  = s:Block_Start children:(Token / $(!Block_End .))* e:Block_End
+  = s:Block_Start children:(Block / $(!Block_End .))* e:Block_End
   {
     /** <?php
     list( $innerHTML, $innerBlocks ) = peg_array_partition( $children, 'is_string' );
@@ -246,7 +222,7 @@ Block_Balanced
   }
 
 Block_Start
-  = "<!--" WS+ "wp:" blockName:Block_Name WS+ attrs:(a:Block_Attributes WS+ {
+  = "<!--" __ "wp:" blockName:Block_Name __ attrs:(a:Block_Attributes __ {
     /** <?php return $a; ?> **/
     return a;
   })? "-->"
@@ -265,7 +241,7 @@ Block_Start
   }
 
 Block_End
-  = "<!--" WS+ "/wp:" blockName:Block_Name WS+ "-->"
+  = "<!--" __ "/wp:" blockName:Block_Name __ "-->"
   {
     /** <?php
     return array(
@@ -296,23 +272,12 @@ Block_Name_Part
   = $( [a-z][a-z0-9_-]* )
 
 Block_Attributes
-  = attrs:$("{" (!("}" WS+ """/"? "-->") .)* "}")
+  "JSON-encoded attributes embedded in a block's opening comment"
+  = attrs:$("{" (!("}" __ """/"? "-->") .)* "}")
   {
     /** <?php return json_decode( $attrs, true ); ?> **/
     return maybeJSON( attrs );
   }
 
-WS
-  = [ \t\r\n]
-
-Newline
-  = [\r\n]
-
-_
-  = [ \t]
-
 __
-  = _+
-
-Any
-  = .
+  = [ \t\r\n]+

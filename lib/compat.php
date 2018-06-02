@@ -70,58 +70,121 @@ function _gutenberg_utf8_split( $str ) {
 }
 
 /**
- * Fixes a conflict with the Jetpack plugin trying to read an undefined global
- * variable `grunionEditorView` during the initialization of the
- * `core/freeform` block.
+ * Shims fix for apiRequest on sites configured to use plain permalinks and add Preloading support.
  *
- * @since 0.7.1
+ * @see https://core.trac.wordpress.org/ticket/42382
+ *
+ * @param WP_Scripts $scripts WP_Scripts instance (passed by reference).
  */
-function gutenberg_fix_jetpack_freeform_block_conflict() {
-	if (
-		defined( 'JETPACK__VERSION' ) &&
-		version_compare( JETPACK__VERSION, '5.2.2', '<' )
-	) {
-		remove_filter(
-			'mce_external_plugins',
-			array( 'Grunion_Editor_View', 'mce_external_plugins' )
-		);
+function gutenberg_shim_api_request( $scripts ) {
+	$api_request_fix = <<<JS
+( function( wp, wpApiSettings ) {
+
+	// Fix plain permalinks sites
+	var buildAjaxOptions;
+	if ( 'string' === typeof wpApiSettings.root && -1 !== wpApiSettings.root.indexOf( '?' ) ) {
+		buildAjaxOptions = wp.apiRequest.buildAjaxOptions;
+		wp.apiRequest.buildAjaxOptions = function( options ) {
+			if ( 'string' === typeof options.path ) {
+				options.path = options.path.replace( '?', '&' );
+			}
+
+			return buildAjaxOptions.call( wp.apiRequest, options );
+		};
 	}
+
+	function getStablePath( path ) {
+		var splitted = path.split( '?' );
+		var query = splitted[ 1 ];
+		var base = splitted[ 0 ];
+		if ( ! query ) {
+			return base;
+		}
+
+		// 'b=1&c=2&a=5'
+		return base + '?' + query
+			// [ 'b=1', 'c=2', 'a=5' ]
+			.split( '&' )
+			// [ [ 'b, '1' ], [ 'c', '2' ], [ 'a', '5' ] ]
+			.map( function ( entry ) {
+				return entry.split( '=' );
+			 } )
+			// [ [ 'a', '5' ], [ 'b, '1' ], [ 'c', '2' ] ]
+			.sort( function ( a, b ) {
+				return a[ 0 ].localeCompare( b[ 0 ] );
+			 } )
+			// [ 'a=5', 'b=1', 'c=2' ]
+			.map( function ( pair ) {
+				return pair.join( '=' );
+			 } )
+			// 'a=5&b=1&c=2'
+			.join( '&' );
+	};
+
+	// Add preloading support
+	var previousApiRequest = wp.apiRequest;
+	wp.apiRequest = function( request ) {
+		var method, path;
+
+		if ( typeof request.path === 'string' && window._wpAPIDataPreload ) {
+			method = request.method || 'GET';
+			path = getStablePath( request.path );
+
+			if ( 'GET' === method && window._wpAPIDataPreload[ path ] ) {
+				var deferred = jQuery.Deferred();
+				deferred.resolve( window._wpAPIDataPreload[ path ].body );
+				return deferred.promise();
+			}
+		}
+
+		return previousApiRequest.call( previousApiRequest, request );
+	}
+	for ( var name in previousApiRequest ) {
+		if ( previousApiRequest.hasOwnProperty( name ) ) {
+			wp.apiRequest[ name ] = previousApiRequest[ name ];
+		}
+	}
+
+} )( window.wp, window.wpApiSettings );
+JS;
+
+	$scripts->add_inline_script( 'wp-api-request', $api_request_fix, 'after' );
 }
+add_action( 'wp_default_scripts', 'gutenberg_shim_api_request' );
 
 /**
- * Shims wp-api-request for WordPress installations not running 4.9-alpha or
- * newer.
+ * Shims support for emulating HTTP/1.0 requests in wp.apiRequest
  *
- * @see https://core.trac.wordpress.org/ticket/40919
+ * @see https://core.trac.wordpress.org/ticket/43605
  *
- * @since 0.10.0
+ * @param WP_Scripts $scripts WP_Scripts instance (passed by reference).
  */
-function gutenberg_ensure_wp_api_request() {
-	if ( wp_script_is( 'wp-api-request', 'registered' ) ||
-			! wp_script_is( 'wp-api-request-shim', 'registered' ) ) {
-		return;
+function gutenberg_shim_api_request_emulate_http( $scripts ) {
+	$api_request_fix = <<<JS
+( function( wp ) {
+	var oldApiRequest = wp.apiRequest;
+	wp.apiRequest = function ( options ) {
+		if ( options.method ) {
+			if ( [ 'PATCH', 'PUT', 'DELETE' ].indexOf( options.method.toUpperCase() ) >= 0 ) {
+				if ( ! options.headers ) {
+					options.headers = {};
+				}
+				options.headers['X-HTTP-Method-Override'] = options.method;
+				options.method = 'POST';
+
+				options.contentType = 'application/json';
+				options.data = JSON.stringify( options.data );
+			}
+		}
+
+		return oldApiRequest( options );
 	}
+} )( window.wp );
+JS;
 
-	global $wp_scripts;
-
-	// Define script using existing shim. We do this because we must define the
-	// vendor script in client-assets.php, but want to use consistent handle.
-	$shim = $wp_scripts->registered['wp-api-request-shim'];
-	wp_register_script(
-		'wp-api-request',
-		$shim->src,
-		$shim->deps,
-		$shim->ver
-	);
-
-	// Localize wp-api-request using wp-api handle data (swapped in 4.9-alpha).
-	$wp_api_localized_data = $wp_scripts->get_data( 'wp-api', 'data' );
-	if ( false !== $wp_api_localized_data ) {
-		wp_add_inline_script( 'wp-api-request', $wp_api_localized_data, 'before' );
-	}
+	$scripts->add_inline_script( 'wp-api-request', $api_request_fix, 'after' );
 }
-add_action( 'wp_enqueue_scripts', 'gutenberg_ensure_wp_api_request', 20 );
-add_action( 'admin_enqueue_scripts', 'gutenberg_ensure_wp_api_request', 20 );
+add_action( 'wp_default_scripts', 'gutenberg_shim_api_request_emulate_http' );
 
 /**
  * Disables wpautop behavior in classic editor when post contains blocks, to
@@ -150,30 +213,7 @@ function gutenberg_add_rest_nonce_to_heartbeat_response_headers( $response ) {
 	$response['rest-nonce'] = wp_create_nonce( 'wp_rest' );
 	return $response;
 }
-
 add_filter( 'wp_refresh_nonces', 'gutenberg_add_rest_nonce_to_heartbeat_response_headers' );
-
-/**
- * Ensure that the wp-json index contains the `permalink_structure` setting as
- * part of its site info elements.
- *
- * @see https://core.trac.wordpress.org/ticket/42465
- *
- * @param WP_REST_Response $response WP REST API response of the wp-json index.
- * @return WP_REST_Response Response that contains the permalink structure.
- */
-function gutenberg_ensure_wp_json_has_permalink_structure( $response ) {
-	$site_info = $response->get_data();
-
-	if ( ! array_key_exists( 'permalink_structure', $site_info ) ) {
-		$site_info['permalink_structure'] = get_option( 'permalink_structure' );
-	}
-
-	$response->set_data( $site_info );
-
-	return $response;
-}
-add_filter( 'rest_index', 'gutenberg_ensure_wp_json_has_permalink_structure' );
 
 /**
  * As a substitute for the default content `wpautop` filter, applies autop
@@ -191,63 +231,3 @@ function gutenberg_wpautop( $content ) {
 }
 remove_filter( 'the_content', 'wpautop' );
 add_filter( 'the_content', 'gutenberg_wpautop', 8 );
-
-/**
- * Includes the value for the custom field `post_type_capabities` inside the REST API response of user.
- *
- * TODO: This is a temporary solution. Next step would be to edit the WP_REST_Users_Controller,
- * once merged into Core.
- *
- * @since ?
- *
- * @param array           $user An array containing user properties.
- * @param string          $name The name of the custom field.
- * @param WP_REST_Request $request Full details about the REST API request.
- * @return object The Post Type capabilities.
- */
-function gutenberg_get_post_type_capabilities( $user, $name, $request ) {
-	$post_type = $request->get_param( 'post_type' );
-	$value     = new stdClass;
-
-	if ( ! empty( $user['id'] ) && $post_type && post_type_exists( $post_type ) ) {
-		// The Post Type object contains the Post Type's specific caps.
-		$post_type_object = get_post_type_object( $post_type );
-
-		// Loop in the Post Type's caps to validate the User's caps for it.
-		foreach ( $post_type_object->cap as $post_cap => $post_type_cap ) {
-			// Ignore caps requiring a post ID.
-			if ( in_array( $post_cap, array( 'edit_post', 'read_post', 'delete_post' ) ) ) {
-				continue;
-			}
-
-			// Set the User's post type capability.
-			$value->{$post_cap} = user_can( $user['id'], $post_type_cap );
-		}
-	}
-
-	return $value;
-}
-
-/**
- * Adds the custom field `post_type_capabities` to the REST API response of user.
- *
- * TODO: This is a temporary solution. Next step would be to edit the WP_REST_Users_Controller,
- * once merged into Core.
- *
- * @since ?
- */
-function gutenberg_register_rest_api_post_type_capabilities() {
-	register_rest_field( 'user',
-		'post_type_capabilities',
-		array(
-			'get_callback' => 'gutenberg_get_post_type_capabilities',
-			'schema'       => array(
-				'description' => __( 'Post Type capabilities for the user.', 'gutenberg' ),
-				'type'        => 'object',
-				'context'     => array( 'edit' ),
-				'readonly'    => true,
-			),
-		)
-	);
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_type_capabilities' );

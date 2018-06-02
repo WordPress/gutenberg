@@ -1,62 +1,107 @@
 /**
  * External Dependencies
  */
-import { compact } from 'lodash';
+import { compact, forEach, get, noop, startsWith } from 'lodash';
 
 /**
- *	Media Upload is used by image and gallery blocks to handle uploading an image.
+ *	Media Upload is used by audio, image, gallery and video blocks to handle uploading a media file
  *	when a file upload button is activated.
  *
  *	TODO: future enhancement to add an upload indicator.
  *
- * @param {Array}    filesList      List of files.
- * @param {Function} onImagesChange Function to be called each time a file or a temporary representation of the file is available.
+ * @param   {Object}   $0                   Parameters object passed to the function.
+ * @param   {string}   $0.allowedType       The type of media that can be uploaded.
+ * @param   {?Object}  $0.additionalData    Additional data to include in the request.
+ * @param   {Array}    $0.filesList         List of files.
+ * @param   {?number}  $0.maxUploadFileSize Maximum upload size in bytes allowed for the site.
+ * @param   {Function} $0.onError           Function called when an error happens.
+ * @param   {Function} $0.onFileChange      Function called each time a file or a temporary representation of the file is available.
  */
-export function mediaUpload( filesList, onImagesChange ) {
+export function mediaUpload( {
+	allowedType,
+	additionalData = {},
+	filesList,
+	maxUploadFileSize = get( window, [ '_wpMediaSettings', 'maxUploadSize' ], 0 ),
+	onError = noop,
+	onFileChange,
+} ) {
 	// Cast filesList to array
 	const files = [ ...filesList ];
 
-	const imagesSet = [];
-	const setAndUpdateImages = ( idx, value ) => {
-		imagesSet[ idx ] = value;
-		onImagesChange( compact( imagesSet ) );
+	const filesSet = [];
+	const setAndUpdateFiles = ( idx, value ) => {
+		filesSet[ idx ] = value;
+		onFileChange( compact( filesSet ) );
 	};
+	const isAllowedType = ( fileType ) => startsWith( fileType, `${ allowedType }/` );
 	files.forEach( ( mediaFile, idx ) => {
-		// Only allow image uploads, may need updating if used for video
-		if ( ! /^image\//.test( mediaFile.type ) ) {
+		if ( ! isAllowedType( mediaFile.type ) ) {
 			return;
 		}
 
-		// Set temporary URL to create placeholder image, this is replaced
-		// with final image from media gallery when upload is `done` below
-		imagesSet.push( { url: window.URL.createObjectURL( mediaFile ) } );
-		onImagesChange( imagesSet );
+		// verify if file is greater than the maximum file upload size allowed for the site.
+		if ( maxUploadFileSize && mediaFile.size > maxUploadFileSize ) {
+			onError( { sizeAboveLimit: true, file: mediaFile } );
+			return;
+		}
 
-		return createMediaFromFile( mediaFile ).then(
+		// Set temporary URL to create placeholder media file, this is replaced
+		// with final file from media gallery when upload is `done` below
+		filesSet.push( { url: window.URL.createObjectURL( mediaFile ) } );
+		onFileChange( filesSet );
+
+		return createMediaFromFile( mediaFile, additionalData ).then(
 			( savedMedia ) => {
-				setAndUpdateImages( idx, { id: savedMedia.id, url: savedMedia.source_url } );
+				const mediaObject = {
+					alt: savedMedia.alt_text,
+					caption: get( savedMedia, [ 'caption', 'raw' ], '' ),
+					id: savedMedia.id,
+					link: savedMedia.link,
+					url: savedMedia.source_url,
+				};
+				setAndUpdateFiles( idx, mediaObject );
 			},
 			() => {
 				// Reset to empty on failure.
-				// TODO: Better failure messaging
-				setAndUpdateImages( idx, null );
+				setAndUpdateFiles( idx, null );
+				onError( { generalError: true, file: mediaFile } );
 			}
 		);
 	} );
 }
 
 /**
- * @param {File} file Media File to Save.
+ * @param {File}    file           Media File to Save.
+ * @param {?Object} additionalData Additional data to include in the request.
  *
- * @returns {Promise} Media Object Promise.
+ * @return {Promise} Media Object Promise.
  */
-export function createMediaFromFile( file ) {
+function createMediaFromFile( file, additionalData ) {
 	// Create upload payload
 	const data = new window.FormData();
 	data.append( 'file', file, file.name || file.type.replace( '/', '.' ) );
-
-	return new wp.api.models.Media().save( null, {
-		data: data,
+	forEach( additionalData, ( ( value, key ) => data.append( key, value ) ) );
+	return wp.apiRequest( {
+		path: '/wp/v2/media',
+		data,
 		contentType: false,
+		processData: false,
+		method: 'POST',
+	} );
+}
+
+/**
+ * Utility used to preload an image before displaying it.
+ *
+ * @param   {string}  url Image Url.
+ * @return {Promise}     Promise resolved once the image is preloaded.
+ */
+export function preloadImage( url ) {
+	return new Promise( ( resolve ) => {
+		const newImg = new window.Image();
+		newImg.onload = function() {
+			resolve( url );
+		};
+		newImg.src = url;
 	} );
 }

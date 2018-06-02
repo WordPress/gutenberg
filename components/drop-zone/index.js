@@ -21,13 +21,12 @@ class DropZone extends Component {
 		super( ...arguments );
 
 		this.setZoneNode = this.setZoneNode.bind( this );
-		this.onDrop = this.onDrop.bind( this );
-		this.onFilesDrop = this.onFilesDrop.bind( this );
 
 		this.state = {
 			isDraggingOverDocument: false,
 			isDraggingOverElement: false,
 			position: null,
+			type: null,
 		};
 	}
 
@@ -35,25 +34,14 @@ class DropZone extends Component {
 		this.context.dropzones.add( {
 			element: this.zone,
 			updateState: this.setState.bind( this ),
-			onDrop: this.onDrop,
-			onFilesDrop: this.onFilesDrop,
+			onDrop: this.props.onDrop,
+			onFilesDrop: this.props.onFilesDrop,
+			onHTMLDrop: this.props.onHTMLDrop,
 		} );
 	}
 
 	componentWillUnmount() {
 		this.context.dropzones.remove( this.zone );
-	}
-
-	onDrop() {
-		if ( this.props.onDrop ) {
-			this.props.onDrop( ...arguments );
-		}
-	}
-
-	onFilesDrop() {
-		if ( this.props.onFilesDrop ) {
-			this.props.onFilesDrop( ...arguments );
-		}
 	}
 
 	setZoneNode( node ) {
@@ -62,7 +50,7 @@ class DropZone extends Component {
 
 	render() {
 		const { className, label } = this.props;
-		const { isDraggingOverDocument, isDraggingOverElement, position } = this.state;
+		const { isDraggingOverDocument, isDraggingOverElement, position, type } = this.state;
 		const classes = classnames( 'components-drop-zone', className, {
 			'is-active': isDraggingOverDocument || isDraggingOverElement,
 			'is-dragging-over-document': isDraggingOverDocument,
@@ -71,6 +59,7 @@ class DropZone extends Component {
 			'is-close-to-bottom': position && position.y === 'bottom',
 			'is-close-to-left': position && position.x === 'left',
 			'is-close-to-right': position && position.x === 'right',
+			[ `is-dragging-${ type }` ]: !! type,
 		} );
 
 		return (

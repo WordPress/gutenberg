@@ -22,7 +22,7 @@ const RE_NAMED_SUBPATTERN = /\(\?P?[<']\w+[>'](.*?)\)/g;
  *
  * @param {string} pattern PCRE regular expression string.
  *
- * @returns {RegExp} Equivalent JavaScript RegExp.
+ * @return {RegExp} Equivalent JavaScript RegExp.
  */
 export function getNormalizedRegExp( pattern ) {
 	pattern = pattern.replace( RE_NAMED_SUBPATTERN, '($1)' );
@@ -36,7 +36,7 @@ export function getNormalizedRegExp( pattern ) {
  * @param {string} pattern PCRE route path pattern.
  * @param {string} path    URL path.
  *
- * @returns {boolean} Whether path is a match.
+ * @return {boolean} Whether path is a match.
  */
 export function isRouteMatch( pattern, path ) {
 	return getNormalizedRegExp( pattern ).test( path );

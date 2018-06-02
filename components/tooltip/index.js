@@ -150,7 +150,7 @@ class Tooltip extends Component {
 	}
 
 	render() {
-		const { children, position, text } = this.props;
+		const { children, position, text, shortcut } = this.props;
 		if ( Children.count( children ) !== 1 ) {
 			if ( 'development' === process.env.NODE_ENV ) {
 				// eslint-disable-next-line no-console
@@ -171,15 +171,17 @@ class Tooltip extends Component {
 			onBlur: this.createToggleIsOver( 'onBlur' ),
 			children: concatChildren(
 				child.props.children,
-				<Popover
-					isOpen={ isOver }
-					focusOnOpen={ false }
-					position={ position }
-					className="components-tooltip"
-					aria-hidden="true"
-				>
-					{ text }
-				</Popover>,
+				isOver && (
+					<Popover
+						focusOnMount={ false }
+						position={ position }
+						className="components-tooltip"
+						aria-hidden="true"
+					>
+						{ text }
+						{ shortcut && <span className="components-tooltip__shortcut">{ shortcut }</span> }
+					</Popover>
+				),
 			),
 		} );
 	}
