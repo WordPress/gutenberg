@@ -15,8 +15,6 @@ import { Component, Fragment, renderToString } from '@wordpress/element';
 import { Button, Placeholder, Spinner, SandBox } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 import {
-	BlockControls,
-	BlockAlignmentToolbar,
 	RichText,
 } from '@wordpress/editor';
 import apiRequest from '@wordpress/api-request';
@@ -67,9 +65,6 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 				selector: 'figcaption',
 				default: [],
 			},
-			align: {
-				type: 'string',
-			},
 			type: {
 				type: 'string',
 			},
@@ -78,14 +73,11 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 			},
 		},
 
-		transforms,
-
-		getEditWrapperProps( attributes ) {
-			const { align } = attributes;
-			if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
-				return { 'data-align': align };
-			}
+		supports: {
+			align: true,
 		},
+
+		transforms,
 
 		edit: class extends Component {
 			constructor() {
@@ -183,23 +175,12 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 
 			render() {
 				const { html, type, error, fetching } = this.state;
-				const { align, url, caption } = this.props.attributes;
+				const { url, caption } = this.props.attributes;
 				const { setAttributes, isSelected, className } = this.props;
-				const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
-
-				const controls = (
-					<BlockControls>
-						<BlockAlignmentToolbar
-							value={ align }
-							onChange={ updateAlignment }
-						/>
-					</BlockControls>
-				);
 
 				if ( fetching ) {
 					return (
 						<Fragment>
-							{ controls }
 							<div className="wp-block-embed is-loading">
 								<Spinner />
 								<p>{ __( 'Embedding…' ) }</p>
@@ -213,7 +194,6 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 
 					return (
 						<Fragment>
-							{ controls }
 							<Placeholder icon={ icon } label={ label } className="wp-block-embed">
 								<form onSubmit={ this.doServerSideRender }>
 									<input
@@ -255,7 +235,6 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 
 				return (
 					<Fragment>
-						{ controls }
 						<figure className={ classnames( className, 'wp-block-embed', { 'is-video': 'video' === type } ) }>
 							{ ( cannotPreview ) ? (
 								<Placeholder icon={ icon } label={ __( 'Embed URL' ) }>
@@ -279,14 +258,13 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 		},
 
 		save( { attributes } ) {
-			const { url, caption, align, type, providerNameSlug } = attributes;
+			const { url, caption, type, providerNameSlug } = attributes;
 
 			if ( ! url ) {
 				return null;
 			}
 
 			const embedClassName = classnames( 'wp-block-embed', {
-				[ `align${ align }` ]: align,
 				[ `is-type-${ type }` ]: type,
 				[ `is-provider-${ providerNameSlug }` ]: providerNameSlug,
 			} );

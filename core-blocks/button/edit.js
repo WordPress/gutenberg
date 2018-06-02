@@ -16,8 +16,6 @@ import {
 import {
 	UrlInput,
 	RichText,
-	BlockControls,
-	BlockAlignmentToolbar,
 	ContrastChecker,
 	InspectorControls,
 	withColors,
@@ -46,11 +44,11 @@ class ButtonEdit extends Component {
 		super( ...arguments );
 		this.nodeRef = null;
 		this.bindRef = this.bindRef.bind( this );
-		this.updateAlignment = this.updateAlignment.bind( this );
 	}
 
-	updateAlignment( nextAlign ) {
-		this.props.setAttributes( { align: nextAlign } );
+	toggleClear() {
+		const { attributes, setAttributes } = this.props;
+		setAttributes( { clear: ! attributes.clear } );
 	}
 
 	bindRef( node ) {
@@ -76,14 +74,11 @@ class ButtonEdit extends Component {
 			text,
 			url,
 			title,
-			align,
+			clear,
 		} = attributes;
 
 		return (
 			<Fragment>
-				<BlockControls>
-					<BlockAlignmentToolbar value={ align } onChange={ this.updateAlignment } />
-				</BlockControls>
 				<span className={ className } title={ title } ref={ this.bindRef }>
 					<RichText
 						tagName="span"

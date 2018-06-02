@@ -37,10 +37,6 @@ const blockAttributes = {
 		source: 'children',
 		selector: 'a',
 	},
-	align: {
-		type: 'string',
-		default: 'none',
-	},
 	backgroundColor: {
 		type: 'string',
 	},
@@ -76,15 +72,8 @@ export const settings = {
 
 	attributes: blockAttributes,
 
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-		const props = { 'data-resized': true };
-
-		if ( 'left' === align || 'right' === align || 'center' === align ) {
-			props[ 'data-align' ] = align;
-		}
-
-		return props;
+	supports: {
+		align: true,
 	},
 
 	edit,
@@ -94,7 +83,6 @@ export const settings = {
 			url,
 			text,
 			title,
-			align,
 			backgroundColor,
 			textColor,
 			customBackgroundColor,
@@ -117,7 +105,7 @@ export const settings = {
 		};
 
 		return (
-			<div className={ `align${ align }` }>
+			<div>
 				<RichText.Content
 					tagName="a"
 					className={ buttonClasses }
@@ -132,7 +120,7 @@ export const settings = {
 
 	deprecated: [ {
 		attributes: {
-			...pick( blockAttributes, [ 'url', 'title', 'text', 'align' ] ),
+			...pick( blockAttributes, [ 'url', 'title', 'text' ] ),
 			color: {
 				type: 'string',
 			},
@@ -142,7 +130,7 @@ export const settings = {
 		},
 
 		save( { attributes } ) {
-			const { url, text, title, align, color, textColor } = attributes;
+			const { url, text, title, color, textColor } = attributes;
 
 			const buttonStyle = {
 				backgroundColor: color,
@@ -152,7 +140,7 @@ export const settings = {
 			const linkClass = 'wp-block-button__link';
 
 			return (
-				<div className={ `align${ align }` }>
+				<div>
 					<RichText.Content
 						tagName="a"
 						className={ linkClass }
@@ -168,7 +156,7 @@ export const settings = {
 	},
 	{
 		attributes: {
-			...pick( blockAttributes, [ 'url', 'title', 'text', 'align' ] ),
+			...pick( blockAttributes, [ 'url', 'title', 'text' ] ),
 			color: {
 				type: 'string',
 			},
@@ -178,10 +166,10 @@ export const settings = {
 		},
 
 		save( { attributes } ) {
-			const { url, text, title, align, color, textColor } = attributes;
+			const { url, text, title, color, textColor } = attributes;
 
 			return (
-				<div className={ `align${ align }` } style={ { backgroundColor: color } }>
+				<div style={ { backgroundColor: color } }>
 					<RichText.Content
 						tagName="a"
 						href={ url }

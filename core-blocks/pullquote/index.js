@@ -9,8 +9,6 @@ import { map } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 import {
-	BlockControls,
-	BlockAlignmentToolbar,
 	RichText,
 } from '@wordpress/editor';
 
@@ -40,10 +38,6 @@ const blockAttributes = {
 		source: 'children',
 		selector: 'cite',
 	},
-	align: {
-		type: 'string',
-		default: 'none',
-	},
 };
 
 export const name = 'core/pullquote';
@@ -60,25 +54,15 @@ export const settings = {
 
 	attributes: blockAttributes,
 
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
-			return { 'data-align': align };
-		}
+	supports: {
+		align: true,
 	},
 
 	edit( { attributes, setAttributes, isSelected, className } ) {
-		const { value, citation, align } = attributes;
-		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+		const { value, citation } = attributes;
 
 		return (
 			<Fragment>
-				<BlockControls>
-					<BlockAlignmentToolbar
-						value={ align }
-						onChange={ updateAlignment }
-					/>
-				</BlockControls>
 				<blockquote className={ className }>
 					<RichText
 						multiline="p"
@@ -111,10 +95,10 @@ export const settings = {
 	},
 
 	save( { attributes } ) {
-		const { value, citation, align } = attributes;
+		const { value, citation } = attributes;
 
 		return (
-			<blockquote className={ `align${ align }` }>
+			<blockquote>
 				<RichText.Content value={ toRichTextValue( value ) } />
 				{ citation && citation.length > 0 && <RichText.Content tagName="cite" value={ citation } /> }
 			</blockquote>
@@ -132,10 +116,10 @@ export const settings = {
 		},
 
 		save( { attributes } ) {
-			const { value, citation, align } = attributes;
+			const { value, citation } = attributes;
 
 			return (
-				<blockquote className={ `align${ align }` }>
+				<blockquote>
 					<RichText.Content value={ toRichTextValue( value ) } />
 					{ citation && citation.length > 0 && <RichText.Content tagName="footer" value={ citation } /> }
 				</blockquote>
