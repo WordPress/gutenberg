@@ -1131,6 +1131,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'bodyPlaceholder'     => apply_filters( 'write_your_story', __( 'Write your story', 'gutenberg' ), $post ),
 		'isRTL'               => is_rtl(),
 		'autosaveInterval'    => 10,
+		'wpAdminURL'          => admin_url(),
 	);
 
 	$post_autosave = get_autosave_newer_than_post_save( $post );
@@ -1152,7 +1153,6 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	$script  = '( function() {';
 	$script .= sprintf( 'var editorSettings = %s;', wp_json_encode( $editor_settings ) );
-	$script .= sprintf( 'window._wpAdminURL = %s;', wp_json_encode( admin_url() ) );
 	$script .= <<<JS
 		window._wpLoadGutenbergEditor = new Promise( function( resolve ) {
 			wp.api.init().then( function() {
