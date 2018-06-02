@@ -31,6 +31,7 @@ jobs:
     - stage: test
       script:
         - npm install || exit 1
+        - ./bin/check-npm-licenses.sh || exit 1
         - npm run ci || exit 1
 
     - stage: test
