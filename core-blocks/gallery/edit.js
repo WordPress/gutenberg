@@ -21,7 +21,6 @@ import {
 } from '@wordpress/components';
 import {
 	BlockControls,
-	BlockAlignmentToolbar,
 	MediaUpload,
 	MediaPlaceholder,
 	InspectorControls,
@@ -53,7 +52,6 @@ class GalleryEdit extends Component {
 		this.onSelectImages = this.onSelectImages.bind( this );
 		this.setLinkTo = this.setLinkTo.bind( this );
 		this.setColumnsNumber = this.setColumnsNumber.bind( this );
-		this.updateAlignment = this.updateAlignment.bind( this );
 		this.toggleImageCrop = this.toggleImageCrop.bind( this );
 		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.setImageAttributes = this.setImageAttributes.bind( this );
@@ -99,10 +97,6 @@ class GalleryEdit extends Component {
 
 	setColumnsNumber( value ) {
 		this.props.setAttributes( { columns: value } );
-	}
-
-	updateAlignment( nextAlign ) {
-		this.props.setAttributes( { align: nextAlign } );
 	}
 
 	toggleImageCrop() {
@@ -161,7 +155,7 @@ class GalleryEdit extends Component {
 
 	render() {
 		const { attributes, isSelected, className, noticeOperations, noticeUI } = this.props;
-		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
+		const { images, columns = defaultColumnsNumber( attributes ), imageCrop, linkTo } = attributes;
 
 		const dropZone = (
 			<DropZone
@@ -171,10 +165,6 @@ class GalleryEdit extends Component {
 
 		const controls = (
 			<BlockControls>
-				<BlockAlignmentToolbar
-					value={ align }
-					onChange={ this.updateAlignment }
-				/>
 				{ !! images.length && (
 					<Toolbar>
 						<MediaUpload
@@ -246,7 +236,7 @@ class GalleryEdit extends Component {
 					</PanelBody>
 				</InspectorControls>
 				{ noticeUI }
-				<ul className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
+				<ul className={ `${ className } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
 					{ dropZone }
 					{ images.map( ( img, index ) => (
 						<li className="blocks-gallery-item" key={ img.id || img.url }>
