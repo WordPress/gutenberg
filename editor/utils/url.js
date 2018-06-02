@@ -1,8 +1,7 @@
 /**
  * External Dependencies
  */
-
- import { get } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,7 +21,7 @@ import { select } from '@wordpress/data';
  */
 export function getWPAdminURL( page, query ) {
 	const settings = select( 'core/editor' ).getEditorSettings();
-	const url = get( settings, 'wpAdminURL', '' ) + page;
+	const url = get( settings, [ 'wpAdminURL' ], '' ) + page;
 	return addQueryArgs( url, query );
 }
 
