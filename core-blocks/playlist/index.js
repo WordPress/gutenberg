@@ -161,20 +161,9 @@ export const settings = {
 						</Toolbar>
 					</BlockControls>
 					<figure className={ className }>
-					/* <MediaElement
-					 id="player1"
-					 mediaType="audio"
-					 preload="auto"
-					 controls
-					 width="640"
-					 height="360"
-					 poster=""
-					 sources={JSON.stringify(tracks)}
-					 options={JSON.stringify(config)}
-					 tracks={JSON.stringify(tracks)}
-					/>
-						{ console.log( tracks ) }
-						*/
+					/*
+					need to work this bit out...
+					*/
 					</figure>
 				</Fragment>
 			);
@@ -183,26 +172,6 @@ export const settings = {
 	},
 
 	save( { attributes } ) {
-/*		const { src, caption, tracks, className } = attributes;
-		const config = {};
-		// console.log( tracks, config );
-		return (
-			<figure className={ className }>
-			<MediaElement
-			 id="player1"
-			 mediaType="audio"
-			 preload="auto"
-			 controls
-			 width="640"
-			 height="360"
-			 poster=""
-			 sources={JSON.stringify(tracks)}
-			 options={JSON.stringify(config)}
-			 tracks={JSON.stringify(tracks)}
-			/>
-
-			</figure>
-*/
 		return null;
 	},
 };
