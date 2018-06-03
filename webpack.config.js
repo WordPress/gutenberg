@@ -3,6 +3,7 @@
  */
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
+const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
 
 const { get } = require( 'lodash' );
 const { basename } = require( 'path' );
@@ -26,6 +27,11 @@ const editBlocksCSSPlugin = new ExtractTextPlugin( {
 // CSS loader for styles specific to blocks in general.
 const blocksCSSPlugin = new ExtractTextPlugin( {
 	filename: './build/core-blocks/style.css',
+} );
+
+// CSS loader for default visual block styles.
+const themeBlocksCSSPlugin = new ExtractTextPlugin( {
+	filename: './build/core-blocks/theme.css',
 } );
 
 // Configuration for the ExtractTextPlugin.
@@ -127,7 +133,6 @@ const entryPointNames = [
 	'components',
 	'editor',
 	'utils',
-	'data',
 	'viewport',
 	'core-data',
 	'plugins',
@@ -136,7 +141,10 @@ const entryPointNames = [
 ];
 
 const gutenbergPackages = [
+	'blob',
+	'data',
 	'date',
+	'deprecated',
 	'dom',
 	'element',
 ];
@@ -236,6 +244,13 @@ const config = {
 				use: editBlocksCSSPlugin.extract( extractConfig ),
 			},
 			{
+				test: /theme\.s?css$/,
+				include: [
+					/core-blocks/,
+				],
+				use: themeBlocksCSSPlugin.extract( extractConfig ),
+			},
+			{
 				test: /\.s?css$/,
 				exclude: [
 					/core-blocks/,
@@ -247,6 +262,7 @@ const config = {
 	plugins: [
 		blocksCSSPlugin,
 		editBlocksCSSPlugin,
+		themeBlocksCSSPlugin,
 		mainCSSExtractTextPlugin,
 		// Create RTL files with a -rtl suffix
 		new WebpackRTLPlugin( {
@@ -275,7 +291,7 @@ const config = {
 				return path;
 			},
 		} ),
-		new LibraryExportDefaultPlugin( [ 'dom-ready' ].map( camelCaseDash ) ),
+		new LibraryExportDefaultPlugin( [ 'deprecated', 'dom-ready' ].map( camelCaseDash ) ),
 	],
 	stats: {
 		children: false,
@@ -284,6 +300,10 @@ const config = {
 
 if ( config.mode !== 'production' ) {
 	config.devtool = process.env.SOURCEMAP || 'source-map';
+}
+
+if ( config.mode === 'development' ) {
+	config.plugins.push( new LiveReloadPlugin( { port: process.env.GUTENBERG_LIVE_RELOAD_PORT || 35729 } ) );
 }
 
 module.exports = config;

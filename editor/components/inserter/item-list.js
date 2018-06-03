@@ -74,7 +74,15 @@ class ItemList extends Component {
 						<button
 							role="menuitem"
 							key={ item.id }
-							className={ classnames( 'editor-inserter__item', getBlockMenuDefaultClassName( item.id ) ) }
+							className={
+								classnames(
+									'editor-inserter__item',
+									getBlockMenuDefaultClassName( item.id ),
+									{
+										'editor-inserter__item-has-children': item.hasChildBlocks,
+									}
+								)
+							}
 							onClick={ () => onSelect( item ) }
 							tabIndex={ isCurrent || item.isDisabled ? null : '-1' }
 							disabled={ item.isDisabled }
@@ -86,6 +94,7 @@ class ItemList extends Component {
 						>
 							<span className="editor-inserter__item-icon">
 								<BlockIcon icon={ item.icon } />
+								{ item.hasChildBlocks && <span className="editor-inserter__item-icon-stack" /> }
 							</span>
 
 							<span className="editor-inserter__item-title">

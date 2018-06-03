@@ -12,6 +12,9 @@
 	padding: 8px;
 	border-radius: 0;
 
+	// Add a right border to show as separator in the block toolbar.
+	border-right: 1px solid $light-gray-700;
+
 	&:focus:before {
 		top: -3px;
 		right: -3px;

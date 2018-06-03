@@ -6,7 +6,6 @@ import {
 	setDefaultBlockName,
 	setUnknownTypeHandlerName,
 } from '@wordpress/blocks';
-import { deprecated } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -87,14 +86,4 @@ export const registerCoreBlocks = () => {
 
 	setDefaultBlockName( paragraph.name );
 	setUnknownTypeHandlerName( freeform.name );
-};
-
-// Backwards compatibility
-wp.blocks.registerCoreBlocks = () => {
-	deprecated( 'wp.blocks.registerCoreBlocks', {
-		version: '3.0',
-		alternative: 'wp.coreBlocks.registerCoreBlocks',
-		plugin: 'Gutenberg',
-	} );
-	registerCoreBlocks();
 };

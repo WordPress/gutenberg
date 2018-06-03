@@ -14,7 +14,7 @@ describe( 'Formatting Controls', () => {
 	} );
 
 	it( 'Should apply the formatting controls', async () => {
-		// Creatinig a paragraph block with some content
+		// Creating a paragraph block with some content
 		await page.click( '.editor-default-block-appender' );
 		await page.keyboard.type( 'Paragraph to be made "bold"' );
 

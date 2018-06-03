@@ -128,6 +128,7 @@ export const settings = {
 					// It's already done as part of the `componentDidMount`
 					// int the image block
 					const block = createBlock( 'core/image', {
+						alt: file.name,
 						url: window.URL.createObjectURL( file ),
 					} );
 

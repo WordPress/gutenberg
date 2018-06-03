@@ -19,6 +19,7 @@ const mkdirp = require( 'mkdirp' );
  * Internal dependencies
  */
 const getPackages = require( './get-packages' );
+const getBabelConfig = require( './get-babel-config' );
 
 /**
  * Module Constants
@@ -30,27 +31,6 @@ const BUILD_DIR = {
 	module: 'build-module',
 };
 const DONE = chalk.reset.inverse.bold.green( ' DONE ' );
-
-/**
- * Babel Configuration
- */
-const babelDefaultConfig = require( '@wordpress/babel-preset-default' );
-babelDefaultConfig.babelrc = false;
-const presetEnvConfig = babelDefaultConfig.presets[ 0 ][ 1 ];
-const babelConfigs = {
-	main: Object.assign(
-		{},
-		babelDefaultConfig,
-		{ presets: [
-			[ 'env', Object.assign(
-				{},
-				presetEnvConfig,
-				{ modules: 'commonjs' },
-			) ],
-		] }
-	),
-	module: babelDefaultConfig,
-};
 
 /**
  * Get the package name for a specified file
@@ -98,7 +78,7 @@ function buildFile( file, silent ) {
 function buildFileFor( file, silent, environment ) {
 	const buildDir = BUILD_DIR[ environment ];
 	const destPath = getBuildPath( file, buildDir );
-	const babelOptions = babelConfigs[ environment ];
+	const babelOptions = getBabelConfig( environment );
 
 	mkdirp.sync( path.dirname( destPath ) );
 	const transformed = babel.transformFileSync( file, babelOptions ).code;
@@ -121,8 +101,10 @@ function buildFileFor( file, silent, environment ) {
  */
 function buildPackage( packagePath ) {
 	const srcDir = path.resolve( packagePath, SRC_DIR );
-	const files = glob.sync( srcDir + '/**/*.js', { nodir: true } )
-		.filter( ( file ) => ! /\.test\.js/.test( file ) );
+	const files = glob.sync( `${ srcDir }/**/*.js`, {
+		ignore: `${ srcDir }/**/test/**/*.js`,
+		nodir: true,
+	} );
 
 	process.stdout.write( `${ path.basename( packagePath ) }\n` );
 
