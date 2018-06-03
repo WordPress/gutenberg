@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { compact, forEach, get, noop, startsWith } from 'lodash';
+import { compact, forEach, get, includes, noop, startsWith } from 'lodash';
 
 /**
  *	Media Upload is used by audio, image, gallery and video blocks to handle uploading a media file
@@ -40,7 +40,7 @@ export function mediaUpload( {
 	// Allowed types for the current WP_User
 	const allowedMimeTypesForUser = get( window, [ '_wpMediaSettings', 'allowedMimeTypes' ] );
 	const isAllowedMimeTypeForUser = ( fileType ) => {
-		return Object.values( allowedMimeTypesForUser ).includes( fileType );
+		return includes( allowedMimeTypesForUser, fileType );
 	};
 
 	files.forEach( ( mediaFile, idx ) => {
