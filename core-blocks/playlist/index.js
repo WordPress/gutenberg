@@ -38,24 +38,10 @@ export const settings = {
 
 	attributes: {
 		tracks: {
+		type: 'array',
+		},
+		ids: {
 			type: 'array',
-			source: 'attribute',
-			query: {
-				url: {
-					source: 'attribute',
-					attribute: 'url',
-				},
-				id: {
-					type: 'number',
-					source: 'attribute',
-					attribute: 'data-id',
-				},
-				type: {
-					source: 'attribute',
-					selector: 'figcaption',
-				},
-			},
-
 		},
 		src: {
 			type: 'string',
@@ -89,7 +75,7 @@ export const settings = {
 		}
 
 		render() {
-			const { caption, id, tracks, listID } = this.props.attributes;
+			const { caption, id, tracks } = this.props.attributes;
 			const { setAttributes, isSelected, className} = this.props;
 			const { editing, src } = this.state;
 			const switchToEditing = () => {
@@ -99,7 +85,8 @@ export const settings = {
 				if ( media && media[0].url ) {
 					media = ( 1 < media.length ) ? media : [ media ];
 					// console.log( media );
-					setAttributes( { tracks: media.map( ( item ) => pick( item, [ 'url', 'id', 'type',  ] ) ) } );
+					// setAttributes( { ids: media.map( ( item ) => pick( item, 'id' ) ) } );
+					setAttributes( { ids: media.map( ( item ) => item.id ) } );
 					this.setState( { src: media.url, editing: false } );
 				}
 			};
@@ -115,9 +102,6 @@ export const settings = {
 			const setAudio = ( [ audio ] ) => onSelectAudio( audio );
 			const uploadFromFiles = ( event ) => editorMediaUpload( event.target.files, setAudio, 'audio' );
 			const config = {};
-			const listID = tracks.map((item) => pick( item, ['id'] )
-			);
-
 
 			if ( editing ) {
 				return (
@@ -176,8 +160,8 @@ export const settings = {
 							/>
 						</Toolbar>
 					</BlockControls>
-					<figure className={ className, listID }>
-					<MediaElement
+					<figure className={ className }>
+					/* <MediaElement
 					 id="player1"
 					 mediaType="audio"
 					 preload="auto"
@@ -190,6 +174,7 @@ export const settings = {
 					 tracks={JSON.stringify(tracks)}
 					/>
 						{ console.log( tracks ) }
+						*/
 					</figure>
 				</Fragment>
 			);
@@ -198,15 +183,11 @@ export const settings = {
 	},
 
 	save( { attributes } ) {
-		const { src, caption, tracks, className, listID } = attributes;
+/*		const { src, caption, tracks, className } = attributes;
 		const config = {};
-		const listID = tracks.map((item) => pick( item, ['id'] )
-		);
-		console.log( tracks, config );
-
+		// console.log( tracks, config );
 		return (
-			<figure className={ className, listID }>
-
+			<figure className={ className }>
 			<MediaElement
 			 id="player1"
 			 mediaType="audio"
@@ -219,7 +200,9 @@ export const settings = {
 			 options={JSON.stringify(config)}
 			 tracks={JSON.stringify(tracks)}
 			/>
+
 			</figure>
-		);
+*/
+		return null;
 	},
 };
