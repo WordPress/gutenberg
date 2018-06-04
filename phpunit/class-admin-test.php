@@ -158,6 +158,6 @@ class Admin_Test extends WP_UnitTestCase {
 	 * The array_reduce() function only accepts mixed variables starting with PHP 5.3.
 	 */
 	function test_preload_api_request_no_notices_php_52() {
-		$this->assertTrue( is_array( gutenberg_preload_api_request( null, '/' ) ) );
+		$this->assertTrue( is_array( gutenberg_preload_api_request( 0, '/' ) ) );
 	}
 }
