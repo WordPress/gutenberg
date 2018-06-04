@@ -89,9 +89,12 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 	}
 
 	// Normalize unicode to use composed characters.
-	// Unsupported in IE.
-	// See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize
-	// See https://core.trac.wordpress.org/ticket/30130
+	// This is unsupported in IE 11 but it's a nice-to-have feature, not mandatory.
+	// Not normalizing the content will only affect older browsers and won't
+	// entirely break the app.
+	// See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize
+	// See: https://core.trac.wordpress.org/ticket/30130
+	// See: https://github.com/WordPress/gutenberg/pull/6983#pullrequestreview-125151075
 	if ( String.prototype.normalize ) {
 		HTML = HTML.normalize();
 	}

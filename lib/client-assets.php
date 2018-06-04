@@ -150,6 +150,13 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'build/dom/index.js' ),
 		true
 	);
+	wp_add_inline_script(
+		'wp-dom',
+		gutenberg_get_script_polyfill( array(
+			'document.contains' => 'node-contains',
+		) ),
+		'before'
+	);
 	wp_register_script(
 		'wp-utils',
 		gutenberg_url( 'build/utils/index.js' ),
@@ -457,6 +464,15 @@ function gutenberg_register_scripts_and_styles() {
 		array( 'wp-element', 'wp-components', 'wp-utils', 'wp-data' ),
 		filemtime( gutenberg_dir_path() . 'build/plugins/index.js' )
 	);
+
+	if ( defined( 'GUTENBERG_LIVE_RELOAD' ) && GUTENBERG_LIVE_RELOAD ) {
+		$live_reload_url = ( GUTENBERG_LIVE_RELOAD === true ) ? 'http://localhost:35729/livereload.js' : GUTENBERG_LIVE_RELOAD;
+
+		wp_enqueue_script(
+			'gutenberg-live-reload',
+			$live_reload_url
+		);
+	}
 }
 add_action( 'wp_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
 add_action( 'admin_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
@@ -559,6 +575,10 @@ function gutenberg_register_vendor_scripts() {
 	gutenberg_register_vendor_script(
 		'formdata',
 		'https://unpkg.com/formdata-polyfill@3.0.9/formdata.min.js'
+	);
+	gutenberg_register_vendor_script(
+		'node-contains',
+		'https://unpkg.com/polyfill-library@3.26.0-0/polyfills/Node/prototype/contains/polyfill.js'
 	);
 }
 

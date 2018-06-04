@@ -378,12 +378,8 @@
 
 		// Without z-index, the block toolbar will be below an adjecent float
 		z-index: z-index( '.editor-block-list__block {core/image aligned wide or fullwide}' );
-	}
 
-	// Wide and full-wide
-	&[data-align="wide"],
-	&[data-align="full"] {
-			// Mover and settings above
+		// Mover and settings above
 		> .editor-block-mover,
 		> .editor-block-settings-menu {
 			top: -$block-side-ui-width - 1px; // move upwards the height of the button +1px for border
@@ -421,7 +417,7 @@
 
 		// Position hover label on the right
 		> .editor-block-list__breadcrumb {
-			right: 0;
+			right: -1px;
 		}
 
 		// Hide mover until wide breakpoints, or it might be covered by toolbar
@@ -435,9 +431,22 @@
 		}
 	}
 
+	// Wide
+	&[data-align="wide"] {
+		// Position hover label on the right
+		> .editor-block-list__breadcrumb {
+			right: -$block-padding;
+		}
+	}
+
 	// Full-wide
 	&[data-align="full"] {
 
+		// Position hover label on the right
+		> .editor-block-list__breadcrumb {
+			right: -1px;
+		}
+		
 		// compensate for main container padding, subtract border
 		@include break-small() {
 			margin-left: -$block-side-ui-padding + 1px;
@@ -841,10 +850,6 @@
 		padding: 4px 4px;
 		background: $blue-medium-focus;
 		color: $white;
-	
-		// Drag indicator
-		cursor: move; /* Fallback for IE/Edge < 14 */
-		cursor: grab;
 	
 		// Animate in
 		.editor-block-list__block:hover & {

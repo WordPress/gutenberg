@@ -103,6 +103,7 @@ describe( 'InserterMenu', () => {
 				items={ items }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
+				setTimeout={ noop }
 			/>
 		);
 
@@ -118,6 +119,7 @@ describe( 'InserterMenu', () => {
 				items={ [] }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
+				setTimeout={ noop }
 			/>
 		);
 
@@ -136,6 +138,7 @@ describe( 'InserterMenu', () => {
 				items={ items }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
+				setTimeout={ noop }
 			/>
 		);
 
@@ -155,6 +158,7 @@ describe( 'InserterMenu', () => {
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
 				maxSuggestedItems={ 2 }
+				setTimeout={ noop }
 			/>
 		);
 
@@ -170,6 +174,7 @@ describe( 'InserterMenu', () => {
 				items={ items }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
+				setTimeout={ noop }
 			/>
 		);
 		const activeTabs = wrapper.find( '.components-panel__body.is-opened button.components-panel__body-toggle' );
@@ -199,6 +204,7 @@ describe( 'InserterMenu', () => {
 				items={ items }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
+				setTimeout={ noop }
 			/>
 		);
 		const activeTabs = wrapper.find( '.components-panel__body.is-opened button.components-panel__body-toggle' );
@@ -227,6 +233,7 @@ describe( 'InserterMenu', () => {
 				items={ items }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
+				setTimeout={ noop }
 			/>
 		);
 		const activeTabs = wrapper.find( '.components-panel__body.is-opened button.components-panel__body-toggle' );
@@ -257,6 +264,7 @@ describe( 'InserterMenu', () => {
 				items={ items }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
+				setTimeout={ noop }
 			/>
 		);
 
@@ -277,6 +285,7 @@ describe( 'InserterMenu', () => {
 				items={ items }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
+				setTimeout={ noop }
 			/>
 		);
 		wrapper.find( '.editor-inserter__search' ).simulate( 'change', { target: { value: 'text' } } );
@@ -310,6 +319,7 @@ describe( 'InserterMenu', () => {
 				items={ items }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
+				setTimeout={ noop }
 			/>
 		);
 		wrapper.find( '.editor-inserter__search' ).simulate( 'change', { target: { value: ' text' } } );
