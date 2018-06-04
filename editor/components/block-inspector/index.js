@@ -34,7 +34,7 @@ const BlockInspector = ( { selectedBlock, count } ) => {
 	return [
 		<div className="editor-block-inspector__card" key="card">
 			<div className="editor-block-inspector__card-icon">
-				<BlockIcon icon={ blockType.icon } />
+				<BlockIcon icon={ blockType.icon && blockType.icon.src } />
 			</div>
 			<div className="editor-block-inspector__card-content">
 				<div className="editor-block-inspector__card-title">{ blockType.title }</div>

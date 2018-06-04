@@ -2995,7 +2995,9 @@ describe( 'selectors', () => {
 				name: 'core/test-block-a',
 				initialAttributes: {},
 				title: 'Test Block A',
-				icon: 'test',
+				icon: {
+					src: 'test',
+				},
 				category: 'formatting',
 				keywords: [ 'testing' ],
 				isDisabled: false,
@@ -3009,7 +3011,9 @@ describe( 'selectors', () => {
 				name: 'core/block',
 				initialAttributes: { ref: 1 },
 				title: 'Shared Block 1',
-				icon: 'test',
+				icon: {
+					src: 'test',
+				},
 				category: 'shared',
 				keywords: [],
 				isDisabled: false,
