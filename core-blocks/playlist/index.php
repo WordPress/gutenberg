@@ -12,7 +12,7 @@
  *
  */
 
- function playlist_block_callback_dependencies() {
+ function playlist_block_callback_dependencies( $attributes ) {
      wp_register_script(
          'gutenberg-playlist-block',
          plugins_url( 'gutenberg/core-blocks/playlist/index.js', __FILE__ ),

@@ -61,7 +61,7 @@ export const settings = {
 		}
 
 		render() {
-			const { registerBlockType } = wp.blocks;
+			// const { registerBlockType } = wp.blocks;
 			const { ServerSideRender } = wp.components;
 			const { ids } = this.props.attributes;
 			const { setAttributes, isSelected, className} = this.props;
