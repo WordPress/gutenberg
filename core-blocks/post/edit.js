@@ -40,6 +40,7 @@ import { withSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import '../cover-image/editor.scss';
+import './editor.scss';
 
 const { getComputedStyle } = window;
 
@@ -276,7 +277,7 @@ class PostEdit extends Component {
 		const richText = (
 			<RichText
 				tagName="p"
-				className={ classnames( 'wp-block-paragraph', className, {
+				className={ classnames( 'wp-block-paragraph', {
 					'has-background': backgroundColor.value,
 					'has-drop-cap': dropCap,
 					[ backgroundColor.class ]: backgroundColor.class,
@@ -301,11 +302,10 @@ class PostEdit extends Component {
 
 		if ( ! url ) {
 			return (
-				<Fragment>
+				<div className={ className }>
 					{ controls }
 					<MediaPlaceholder
 						icon="format-image"
-						className={ className }
 						labels={ {
 							title: __( 'Post image' ),
 							name: __( 'an image' ),
@@ -315,12 +315,12 @@ class PostEdit extends Component {
 						type="image"
 					/>
 					{ richText }
-				</Fragment>
+				</div>
 			);
 		}
 
 		return (
-			<Fragment>
+			<div className={ className }>
 				{ controls }
 				<div
 					data-url={ url }
@@ -328,7 +328,7 @@ class PostEdit extends Component {
 					className={ imageClasses }
 				></div>
 				{ richText }
-			</Fragment>
+			</div>
 		);
 	}
 }
