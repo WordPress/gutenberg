@@ -24,7 +24,7 @@ import { speak } from '@wordpress/a11y';
 /**
  * Internal dependencies
  */
-import { getPostEditUrl, getWPAdminURL } from '../utils/url';
+import { getWPAdminURL } from '../utils/url';
 import {
 	setupEditorState,
 	resetAutosave,
@@ -218,14 +218,6 @@ export default {
 				</p>,
 				{ id: SAVE_POST_NOTICE_ID, spokenMessage: noticeMessage }
 			) );
-		}
-
-		if ( get( window.history.state, [ 'id' ] ) !== post.id ) {
-			window.history.replaceState(
-				{ id: post.id },
-				'Post ' + post.id,
-				getPostEditUrl( post.id )
-			);
 		}
 	},
 	REQUEST_POST_UPDATE_FAILURE( action, store ) {
