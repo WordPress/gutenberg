@@ -36,7 +36,7 @@ function InserterWithShortcuts( { items, isLocked, onInsert } ) {
 					onClick={ () => onInsert( item ) }
 					label={ sprintf( __( 'Add %s' ), item.title ) }
 					icon={ (
-						<BlockIcon icon={ item.icon } />
+						<BlockIcon icon={ item.icon && item.icon.src } />
 					) }
 				/>
 			) ) }

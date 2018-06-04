@@ -258,7 +258,6 @@ describe( 'effects', () => {
 
 	describe( '.REQUEST_POST_UPDATE_SUCCESS', () => {
 		const handler = effects.REQUEST_POST_UPDATE_SUCCESS;
-		let replaceStateSpy;
 
 		const defaultPost = {
 			id: 1,
@@ -278,18 +277,6 @@ describe( 'effects', () => {
 			status: 'publish',
 		} );
 
-		beforeAll( () => {
-			replaceStateSpy = jest.spyOn( window.history, 'replaceState' );
-		} );
-
-		beforeEach( () => {
-			replaceStateSpy.mockReset();
-		} );
-
-		afterAll( () => {
-			replaceStateSpy.mockRestore();
-		} );
-
 		it( 'should dispatch notices when publishing or scheduling a post', () => {
 			const dispatch = jest.fn();
 			const store = { dispatch };
@@ -302,7 +289,7 @@ describe( 'effects', () => {
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
 				notice: {
-					content: <p><span>Post published!</span> <a>View post</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
+					content: <p>Post published!{ ' ' }<a>View post</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
 					id: 'SAVE_POST_NOTICE_ID',
 					isDismissible: true,
 					status: 'success',
@@ -325,7 +312,7 @@ describe( 'effects', () => {
 			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
 				notice: {
 					content: <p>
-						<span>Post reverted to draft.</span>
+						Post reverted to draft.
 						{ ' ' }
 						{ false }
 					</p>,
@@ -350,7 +337,7 @@ describe( 'effects', () => {
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
 				notice: {
-					content: <p><span>Post updated!</span>{ ' ' }<a>{ 'View post' }</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
+					content: <p>Post updated!{ ' ' }<a>{ 'View post' }</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
 					id: 'SAVE_POST_NOTICE_ID',
 					isDismissible: true,
 					status: 'success',
@@ -370,7 +357,6 @@ describe( 'effects', () => {
 			handler( { post, previousPost, isAutosave: true }, store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 0 );
-			expect( replaceStateSpy ).toHaveBeenCalledTimes( 0 );
 		} );
 	} );
 

@@ -18,8 +18,14 @@ function ChildBlocks( { rootBlockIcon, rootBlockTitle, items, ...props } ) {
 			{ ( rootBlockIcon || rootBlockTitle ) && (
 				<div className="editor-inserter__parent-block-header">
 					{ rootBlockIcon && (
-						<div className="editor-inserter__parent-block-icon">
-							<BlockIcon icon={ rootBlockIcon } />
+						<div
+							style={ {
+								backgroundColor: rootBlockIcon.background,
+								color: rootBlockIcon.foreground,
+							} }
+							className="editor-inserter__parent-block-icon"
+						>
+							<BlockIcon icon={ rootBlockIcon.src } />
 						</div>
 					) }
 					{ rootBlockTitle && <h2>{ rootBlockTitle }</h2> }
