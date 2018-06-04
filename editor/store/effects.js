@@ -92,11 +92,34 @@ export function removeProvisionalBlock( action, store ) {
 	}
 }
 
+/**
+ * Returns true if a requested autosave should occur as a standard save. This
+ * is true if the saved post is a draft or auto-draft, and if the request is
+ * is issued on behalf of the post author.
+ *
+ * @param {Object} post Post object
+ *
+ * @return {boolean} Whether autosave request should be issued as full save.
+ */
+function isAutosaveAsDraft( post ) {
+	// TODO: Improve retrieval of current user ID to not rely on this global.
+	const uid = Number( window.userSettings.uid );
+
+	return (
+		uid === post.author &&
+		includes( [ 'draft', 'auto-draft' ], post.status )
+	);
+}
+
 export default {
 	REQUEST_POST_UPDATE( action, store ) {
 		const { dispatch, getState } = store;
 		const state = getState();
-		const isAutosave = action.options && action.options.autosave;
+		const post = getCurrentPost( state );
+		const isAutosave = (
+			get( action.options, [ 'autosave' ], false ) &&
+			! isAutosaveAsDraft( post )
+		);
 
 		// Prevent save if not saveable.
 		const isSaveable = isAutosave ? isEditedPostAutosaveable : isEditedPostSaveable;
@@ -104,7 +127,6 @@ export default {
 			return;
 		}
 
-		const post = getCurrentPost( state );
 		const edits = getPostEdits( state );
 		let toSend = {
 			...edits,
