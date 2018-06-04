@@ -7,7 +7,7 @@ import { select } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import FootnotesEditor from './editor.js';
+import FootnotesEdit from './edit.js';
 import { orderFootnotes } from './footnotes-utils.js';
 import './style.scss';
 
@@ -38,7 +38,7 @@ export const settings = {
 		},
 	},
 
-	edit: FootnotesEditor,
+	edit: FootnotesEdit,
 
 	save( { attributes } ) {
 		const orderedFootnoteUids = select( 'core/editor' ).getFootnotes();

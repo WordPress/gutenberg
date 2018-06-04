@@ -12,7 +12,7 @@ import { RichText } from '@wordpress/blocks';
 import { getFootnoteByUid, orderFootnotes } from './footnotes-utils.js';
 import './editor.scss';
 
-class FootnotesEditor extends Component {
+class FootnotesEdit extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -73,4 +73,4 @@ class FootnotesEditor extends Component {
 
 export default withSelect( ( select ) => ( {
 	orderedFootnoteUids: select( 'core/editor' ).getFootnotes(),
-} ) )( FootnotesEditor );
+} ) )( FootnotesEdit );
