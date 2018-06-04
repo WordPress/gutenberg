@@ -42,6 +42,9 @@ export const settings = {
 		src: {
 			type: 'string',
 		},
+		type: {
+			type: 'string',
+		}
 	},
 
 	supports: {
@@ -72,7 +75,7 @@ export const settings = {
 			const onSelectAudio = ( media ) => {
 				if ( media && media[0].url ) {
 					media = ( 1 < media.length ) ? media : [ media ];
-					setAttributes( { ids: media.map( ( item ) => item.id ) } );
+					setAttributes( { ids: media.map( ( item ) => item.id ), type: media[0].type  } );
 					this.setState( { src: media[0].url, editing: false } );
 				}
 			};
