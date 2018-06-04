@@ -209,7 +209,6 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-api-request',
 			'wp-dom',
 			'wp-element',
-			'mediaelement',
 			'wp-hooks',
 			'wp-i18n',
 			'wp-is-shallow-equal',
@@ -221,7 +220,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-blocks',
 		gutenberg_url( 'build/blocks/index.js' ),
-		array( 'wp-blob', 'wp-deprecated', 'wp-dom', 'wp-element', 'wp-hooks', 'wp-i18n', 'shortcode', 'wp-data', 'lodash', 'mediaelement' ),
+		array( 'wp-blob', 'wp-deprecated', 'wp-dom', 'wp-element', 'wp-hooks', 'wp-i18n', 'shortcode', 'wp-data', 'lodash' ),
 		filemtime( gutenberg_dir_path() . 'build/blocks/index.js' ),
 		true
 	);
