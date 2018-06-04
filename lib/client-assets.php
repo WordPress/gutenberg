@@ -487,6 +487,11 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 
  * @return array        Modified reduce accumulator.
  */
 function gutenberg_preload_api_request( $memo, $path ) {
+
+	if ( ! is_array( $memo ) ) {
+		$memo = array();
+	}
+
 	if ( empty( $path ) ) {
 		return $memo;
 	}
