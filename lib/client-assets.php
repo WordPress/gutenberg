@@ -933,6 +933,35 @@ function gutenberg_capture_code_editor_settings( $settings ) {
 }
 
 /**
+ * Retrieve a stored autosave that is newer than the post save.
+ *
+ * Deletes autosaves that are older than the post save.
+ *
+ * @param  WP_Post $post Post object.
+ * @return WP_Post|boolean The post autosave. False if none found.
+ */
+function get_autosave_newer_than_post_save( $post ) {
+	// Add autosave data if it is newer and changed.
+	$autosave = wp_get_post_autosave( $post->ID );
+
+	if ( ! $autosave ) {
+		return false;
+	}
+
+	// Check if the autosave is newer than the current post.
+	if (
+		mysql2date( 'U', $autosave->post_modified_gmt, false ) > mysql2date( 'U', $post->post_modified_gmt, false )
+	) {
+		return $autosave;
+	}
+
+	// If the autosave isn't newer, remove it.
+	wp_delete_post_revision( $autosave->ID );
+
+	return false;
+}
+
+/**
  * Scripts & Styles.
  *
  * Enqueues the needed scripts and styles when visiting the top-level page of
@@ -1103,6 +1132,13 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'isRTL'               => is_rtl(),
 		'autosaveInterval'    => 10,
 	);
+
+	$post_autosave = get_autosave_newer_than_post_save( $post );
+	if ( $post_autosave ) {
+		$editor_settings['autosave'] = array(
+			'editLink' => add_query_arg( 'gutenberg', true, get_edit_post_link( $post_autosave->ID ) ),
+		);
+	}
 
 	if ( ! empty( $color_palette ) ) {
 		$editor_settings['colors'] = $color_palette;
