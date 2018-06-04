@@ -258,7 +258,6 @@ describe( 'effects', () => {
 
 	describe( '.REQUEST_POST_UPDATE_SUCCESS', () => {
 		const handler = effects.REQUEST_POST_UPDATE_SUCCESS;
-		let replaceStateSpy;
 
 		const defaultPost = {
 			id: 1,
@@ -276,18 +275,6 @@ describe( 'effects', () => {
 		const getPublishedPost = () => ( {
 			...defaultPost,
 			status: 'publish',
-		} );
-
-		beforeAll( () => {
-			replaceStateSpy = jest.spyOn( window.history, 'replaceState' );
-		} );
-
-		beforeEach( () => {
-			replaceStateSpy.mockReset();
-		} );
-
-		afterAll( () => {
-			replaceStateSpy.mockRestore();
 		} );
 
 		it( 'should dispatch notices when publishing or scheduling a post', () => {
@@ -370,7 +357,6 @@ describe( 'effects', () => {
 			handler( { post, previousPost, isAutosave: true }, store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 0 );
-			expect( replaceStateSpy ).toHaveBeenCalledTimes( 0 );
 		} );
 	} );
 
