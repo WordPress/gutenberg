@@ -48,6 +48,7 @@ export const settings = {
 		align: true,
 	},
 
+
 	edit: class extends Component {
 		constructor() {
 			super( ...arguments );
@@ -60,6 +61,8 @@ export const settings = {
 		}
 
 		render() {
+			const { registerBlockType } = wp.blocks;
+			const { ServerSideRender } = wp.components;
 			const { ids } = this.props.attributes;
 			const { setAttributes, isSelected, className} = this.props;
 			const { editing, src } = this.state;
@@ -137,16 +140,17 @@ export const settings = {
 						<Toolbar>
 							<IconButton
 								className="components-icon-button components-toolbar__control"
-								label={ __( 'Edit audio' ) }
+								label={ __( 'Edit playlist' ) }
 								onClick={ switchToEditing }
 								icon="edit"
 							/>
 						</Toolbar>
 					</BlockControls>
 					<figure className={ className }>
-					/*
-					need to work this bit out...
-					*/
+					<ServerSideRender
+							block="core/playlist"
+							attributes={ this.props.attributes }
+					/>
 					</figure>
 				</Fragment>
 			);
