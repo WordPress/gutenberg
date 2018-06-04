@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, includes, last, map, castArray, uniqueId } from 'lodash';
+import { get, includes, last, map, castArray, uniqueId, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -62,6 +62,7 @@ import {
 	isBlockSelected,
 	getTemplate,
 	getTemplateLock,
+	getCurrentAutosave,
 	POST_UPDATE_TRANSACTION_ID,
 } from './selectors';
 
@@ -103,7 +104,7 @@ export default {
 
 		const post = getCurrentPost( state );
 		const edits = getPostEdits( state );
-		const toSend = {
+		let toSend = {
 			...edits,
 			content: getEditedPostContent( state ),
 			id: post.id,
@@ -118,23 +119,19 @@ export default {
 
 		let request;
 		if ( isAutosave ) {
-			const autosaveData = {};
-
-			// Ensure autosaves contain all fields.
-			Object.assign( autosaveData,
-				{
-					title: post.title,
-					content: post.content,
-					excerpt: post.excerpt,
-				},
-				toSend
-			);
-			autosaveData.parent = post.id;
+			// Ensure autosaves contain all expected fields, using autosave or
+			// post values as fallback if not otherwise included in edits.
+			toSend = {
+				...pick( post, [ 'title', 'content', 'excerpt' ] ),
+				...getCurrentAutosave( state ),
+				...toSend,
+				parent: post.id,
+			};
 
 			request = wp.apiRequest( {
 				path: `/wp/v2/${ basePath }/${ post.id }/autosaves`,
 				method: 'POST',
-				data: autosaveData,
+				data: toSend,
 			} );
 		} else {
 			dispatch( {

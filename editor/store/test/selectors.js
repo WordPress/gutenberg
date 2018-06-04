@@ -36,6 +36,8 @@ const {
 	isEditedPostPublishable,
 	isEditedPostSaveable,
 	isEditedPostAutosaveable,
+	getAutosave,
+	hasAutosave,
 	isEditedPostEmpty,
 	isEditedPostBeingScheduled,
 	getEditedPostPreviewLink,
@@ -1105,6 +1107,49 @@ describe( 'selectors', () => {
 					expect( isEditedPostAutosaveable( state ) ).toBe( true );
 				}
 			}
+		} );
+	} );
+
+	describe( 'getAutosave', () => {
+		it( 'returns null if there is no autosave', () => {
+			const state = {
+				autosave: null,
+			};
+
+			const result = getAutosave( state );
+
+			expect( result ).toBe( null );
+		} );
+
+		it( 'returns the autosave', () => {
+			const autosave = { title: '', excerpt: '', content: '' };
+			const state = { autosave };
+
+			const result = getAutosave( state );
+
+			expect( result ).toEqual( autosave );
+		} );
+	} );
+
+	describe( 'hasAutosave', () => {
+		it( 'returns false if there is no autosave', () => {
+			const state = {
+				autosave: null,
+			};
+
+			const result = hasAutosave( state );
+
+			expect( result ).toBe( false );
+		} );
+
+		it( 'returns true if there is a autosave', () => {
+			const state = {
+				autosave: { title: '', excerpt: '', content: '' },
+			};
+
+			const result = hasAutosave( state );
+
+			expect( result ).toBe( true );
 		} );
 	} );
 
