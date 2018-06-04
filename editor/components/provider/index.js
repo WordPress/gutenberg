@@ -26,12 +26,7 @@ class EditorProvider extends Component {
 		// Assume that we don't need to initialize in the case of an error recovery.
 		if ( ! props.recovery ) {
 			this.props.updateEditorSettings( props.settings );
-			this.props.setupEditor( props.post );
-		}
-
-		// Display a notice if an autosave exists.
-		if ( props.settings.autosave ) {
-			this.props.showAutosaveNotice( props.settings.autosave );
+			this.props.setupEditor( props.post, props.settings.autosave );
 		}
 	}
 
@@ -111,14 +106,12 @@ export default withDispatch( ( dispatch ) => {
 		undo,
 		redo,
 		createUndoLevel,
-		showAutosaveNotice,
 	} = dispatch( 'core/editor' );
 	return {
 		setupEditor,
 		undo,
 		redo,
 		createUndoLevel,
-		showAutosaveNotice,
 		updateEditorSettings,
 	};
 } )( EditorProvider );

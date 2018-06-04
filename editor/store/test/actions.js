@@ -48,10 +48,12 @@ describe( 'actions', () => {
 	describe( 'setupEditor', () => {
 		it( 'should return the SETUP_EDITOR action', () => {
 			const post = {};
-			const result = setupEditor( post );
+			const autosaveStatus = {};
+			const result = setupEditor( post, autosaveStatus );
 			expect( result ).toEqual( {
 				type: 'SETUP_EDITOR',
 				post,
+				autosaveStatus,
 			} );
 		} );
 	} );

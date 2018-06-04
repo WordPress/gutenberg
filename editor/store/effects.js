@@ -246,25 +246,6 @@ export default {
 			__( 'Updating failed' );
 		dispatch( createErrorNotice( noticeMessage, { id: SAVE_POST_NOTICE_ID } ) );
 	},
-	REQUEST_AUTOSAVE_NOTICE( action, store ) {
-		const { autosaveStatus } = action;
-		const { dispatch } = store;
-		if ( ! autosaveStatus ) {
-			return;
-		}
-		const noticeMessage = __( 'There is an autosave of this post that is more recent than the version below.' );
-		dispatch( createWarningNotice(
-			<p>
-				{ noticeMessage }
-				{ ' ' }
-				<a href={ autosaveStatus.editLink }>{ __( 'View the autosave' ) }</a>
-			</p>,
-			{
-				id: AUTOSAVE_POST_NOTICE_ID,
-				spokenMessage: noticeMessage,
-			}
-		) );
-	},
 	TRASH_POST( action, store ) {
 		const { dispatch, getState } = store;
 		const { postId } = action;
@@ -366,7 +347,7 @@ export default {
 		) );
 	},
 	SETUP_EDITOR( action, { getState } ) {
-		const { post } = action;
+		const { post, autosaveStatus } = action;
 		const state = getState();
 		const template = getTemplate( state );
 		const templateLock = getTemplateLock( state );
@@ -398,9 +379,27 @@ export default {
 			edits.status = 'draft';
 		}
 
+		// Check the auto-save status
+		let autosaveAction;
+		if ( autosaveStatus ) {
+			const noticeMessage = __( 'There is an autosave of this post that is more recent than the version below.' );
+			autosaveAction = createWarningNotice(
+				<p>
+					{ noticeMessage }
+					{ ' ' }
+					<a href={ autosaveStatus.editLink }>{ __( 'View the autosave' ) }</a>
+				</p>,
+				{
+					id: AUTOSAVE_POST_NOTICE_ID,
+					spokenMessage: noticeMessage,
+				}
+			);
+		}
+
 		return [
 			setTemplateValidity( isValidTemplate ),
 			setupEditorState( post, blocks, edits ),
+			...( autosaveAction ? [ autosaveAction ] : [] ),
 		];
 	},
 	SYNCHRONIZE_TEMPLATE( action, { getState } ) {
