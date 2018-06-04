@@ -8,7 +8,6 @@ import {
 	IconButton,
 	Placeholder,
 	Toolbar,
-	MediaElement,
 } from '@wordpress/components';
 import { pick } from 'lodash';
 import { Component, Fragment } from '@wordpress/element';
@@ -30,29 +29,18 @@ export const name = 'core/playlist';
 export const settings = {
 	title: __( 'Playlist' ),
 
-	description: __( 'The Playlist block allows you to embed playlist files and play them back using the mediaElement player component.' ),
+	description: __( 'The Playlist block allows you to embed playlist files and play them back using a Core playlist.' ),
 
 	icon: 'format-audio',
 
 	category: 'common',
 
 	attributes: {
-		tracks: {
-		type: 'array',
-		},
 		ids: {
 			type: 'array',
 		},
 		src: {
 			type: 'string',
-		},
-		caption: {
-			type: 'array',
-			source: 'children',
-			selector: 'figcaption',
-		},
-		id: {
-			type: 'number',
 		},
 	},
 
@@ -72,7 +60,7 @@ export const settings = {
 		}
 
 		render() {
-			const { caption, id, tracks } = this.props.attributes;
+			const { ids } = this.props.attributes;
 			const { setAttributes, isSelected, className} = this.props;
 			const { editing, src } = this.state;
 			const switchToEditing = () => {
@@ -81,10 +69,8 @@ export const settings = {
 			const onSelectAudio = ( media ) => {
 				if ( media && media[0].url ) {
 					media = ( 1 < media.length ) ? media : [ media ];
-					// console.log( media );
-					// setAttributes( { ids: media.map( ( item ) => pick( item, 'id' ) ) } );
 					setAttributes( { ids: media.map( ( item ) => item.id ) } );
-					this.setState( { src: media.url, editing: false } );
+					this.setState( { src: media[0].url, editing: false } );
 				}
 			};
 			const onSelectUrl = ( event ) => {
@@ -133,7 +119,7 @@ export const settings = {
 							type="audio"
 							multiple
 							playlist
-							value={ id }
+							value={ ids }
 							render={ ( { open } ) => (
 								<Button isLarge onClick={ open }>
 									{ __( 'Media Library' ) }
