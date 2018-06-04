@@ -13,7 +13,7 @@ This package is based on [Gutenberg v2.9.2](https://github.com/WordPress/gutenbe
 * [Global variables](#global-variables)
     * [apiRequest](#apirequest)
         * [GET types](#get-types)
-        * [PUT post or page](#put-post-or-page)
+        * [PUT post or page (and POST post or page autosaves)](#put-post-or-page-and-post-post-or-page-autosaves)
         * [GET categories](#get-categories)
         * [GET /](#get-)
         * [POST media](#post-media)
@@ -169,17 +169,19 @@ When you initialize the editor, Gutenberg will request the settings related with
         'media-library': false,    // disable Media library from WordPress
         posts: true,               // add PostsPanel to sidebar
         'template-settings': true, // add TemplateSettingsPanel to sidebar
-        extras: true,              // show Extra tab in sidebar
+        extras: true,              // show Extras tab in sidebar
         ...,
     },
     viewable: true,
-    publishable: false, // hide Publish Toggle
-    saveable: false,    // disable save button and autosave
+    // Gutenberg by Frontkom flags
+    publishable: false,  // hide Publish Toggle
+    saveable: false,     // disable save button
+    autosaveable: false, // disable autosave
     ...,
 }
 ```
 
-#### PUT post or page
+#### PUT post or page (and POST post or page autosaves)
 
 To save a [post](https://v2.wp-api.org/reference/posts/) or a [page](https://v2.wp-api.org/reference/pages/) content, Gutenberg does a PUT request to `/wp/v2/[postType]/[id]` sending a `data` object with `content`, `id` and/or `title` ( if its **postType** requires it). The response should be an object like this:
 
