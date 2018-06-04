@@ -3,6 +3,7 @@
  */
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
+const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
 
 const { get } = require( 'lodash' );
 const { basename, resolve } = require( 'path' );
@@ -11,7 +12,7 @@ const { basename, resolve } = require( 'path' );
  * WordPress dependencies
  */
 const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
-const LibraryExportDefaultPlugin = require( '../packages/library-export-default-webpack-plugin' );
+const LibraryExportDefaultPlugin = require( '../library-export-default-webpack-plugin' );
 const PostCssWrapper = require( 'postcss-wrapper-loader' );
 const StringReplacePlugin = require( 'string-replace-webpack-plugin' );
 
@@ -30,6 +31,11 @@ const blocksCSSPlugin = new ExtractTextPlugin( {
 	filename: './css/core-blocks/style.css',
 } );
 
+// CSS loader for default visual block styles.
+const themeBlocksCSSPlugin = new ExtractTextPlugin( {
+	filename: './css/core-blocks/theme.css',
+} );
+
 // Configuration for the ExtractTextPlugin.
 const extractConfig = {
 	use: [
@@ -38,7 +44,7 @@ const extractConfig = {
 			loader: 'postcss-loader',
 			options: {
 				plugins: [
-					require( '../packages/postcss-themes' )( {
+					require( '../postcss-themes' )( {
 						defaults: {
 							primary: '#0085ba',
 							secondary: '#11a0d2',
@@ -177,10 +183,10 @@ gutenbergPackages.forEach( ( name ) => {
 const config = {
 	mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
 
-	entry: `${ dirname }/g-package/src/js/index.js`,
+	entry: `${ dirname }/packages/gutenberg/src/js/index.js`,
 	output: {
 		filename: 'js/gutenberg.js',
-		path: `${ dirname }/g-package/dist`,
+		path: `${ dirname }/packages/gutenberg/build`,
 		libraryTarget: 'this',
 	},
 	externals,
@@ -220,6 +226,7 @@ const config = {
 					use: [
 						...extractConfig.use,
 						{
+							// remove .gutenberg class in editor.scss files
 							loader: StringReplacePlugin.replace( {
 								replacements: [ {
 									pattern: /.gutenberg /ig,
@@ -231,6 +238,13 @@ const config = {
 				} ),
 			},
 			{
+				test: /theme\.s?css$/,
+				include: [
+					/core-blocks/,
+				],
+				use: themeBlocksCSSPlugin.extract( extractConfig ),
+			},
+			{
 				test: /\.s?css$/,
 				exclude: [
 					/core-blocks/,
@@ -240,7 +254,7 @@ const config = {
 			{
 				test: /\.s?css$/,
 				include: [
-					/g-package\/src/,
+					/packages\/gutenberg\/src/,
 				],
 				use: [
 					{ loader: 'sass-loader' }, // compiles Sass to CSS
@@ -251,7 +265,9 @@ const config = {
 	plugins: [
 		blocksCSSPlugin,
 		editBlocksCSSPlugin,
+		themeBlocksCSSPlugin,
 		mainCSSExtractTextPlugin,
+		// wrapping editor style with .gutenberg__editor class
 		new PostCssWrapper( './css/core-blocks/edit-blocks.css', '.gutenberg__editor' ),
 		new StringReplacePlugin(),
 		// Create RTL files with a -rtl suffix
@@ -290,6 +306,10 @@ const config = {
 
 if ( config.mode !== 'production' ) {
 	config.devtool = process.env.SOURCEMAP || 'source-map';
+}
+
+if ( config.mode === 'development' ) {
+	config.plugins.push( new LiveReloadPlugin( { port: process.env.GUTENBERG_LIVE_RELOAD_PORT || 35729 } ) );
 }
 
 module.exports = config;

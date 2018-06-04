@@ -149,8 +149,8 @@
 		"test-unit:watch": "npm run test-unit -- --watch",
 		"test-e2e": "wp-scripts test-unit-js --config test/e2e/jest.config.json",
 		"test-e2e:watch": "npm run test-e2e -- --watch",
-		"build-package:watch": "NODE_ENV=production webpack --config g-package/webpack.config.js --watch",
-		"build-package": "NODE_ENV=production webpack --config g-package/webpack.config.js",
+		"build-package:watch": "NODE_ENV=production webpack --config packages/gutenberg/webpack.config.js --watch",
+		"build-package": "NODE_ENV=production webpack --config packages/gutenberg/webpack.config.js",
 		"prepublish": "npm run lint:fix && npm run build-package"
 	}
 }

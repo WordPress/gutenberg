@@ -150,11 +150,14 @@
 
         .editor-block-list__layout {
             .editor-block-list__block {
-
                 &.is-selected,
                 &.is-hovered {
                     outline-width: 0;
                 }
+            }
+
+            .editor-default-block-appender__content {
+                font-family: inherit;
             }
         }
     }

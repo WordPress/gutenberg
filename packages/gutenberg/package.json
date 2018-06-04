@@ -2,12 +2,12 @@
   "name": "@frontkom/gutenberg",
   "version": "0.0.21",
   "description": "Gutenberg by Frontkom - A custom Gutenberg",
-  "main": "dist/js/gutenberg.js",
+  "main": "build/js/gutenberg.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/front/gutenberg.git"
   },
-  "homepage": "https://github.com/front/gutenberg#readme",
+  "homepage": "https://github.com/front/gutenberg/packages/gutenberg#readme",
   "author": "The Frontkom Contributors",
   "license": "GPL-2.0-or-later",
   "keywords": [

@@ -47,9 +47,10 @@ import './globals';
 import { initializeEditor } from '@frontkom/gutenberg';
 
 // Don't forget to import the style
-import '@frontkom/gutenberg/dist/css/core-blocks/style.css';
-import '@frontkom/gutenberg/dist/css/core-blocks/edit-blocks.css';
-import '@frontkom/gutenberg/dist/css/style.css';
+import '@frontkom/gutenberg/build/css/core-blocks/style.css';
+import '@frontkom/gutenberg/build/css/core-blocks/edit-blocks.css';
+import '@frontkom/gutenberg/build/css/core-blocks/theme.css';
+import '@frontkom/gutenberg/build/css/style.css';
 
 // DOM element id where editor will be displayed
 const target = 'editor'; 
@@ -69,10 +70,15 @@ const page = {
 
 // Some editor settings
 const settings = { 
-    alignWide: false,
+    alignWide: true,
     availableTemplates: [],
-    disableCustomColors: false,
-    titlePlaceholder: 'Add a title here...',
+    allowedBlockTypes: true, 
+    disableCustomColors: false, 
+    disablePostFormats: false,
+    titlePlaceholder: "Add title",
+    bodyPlaceholder: "Write your story",
+    isRTL: false,
+    autosaveInterval: 10,
     ...
 };
 
