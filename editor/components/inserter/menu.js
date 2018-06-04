@@ -14,16 +14,18 @@ import {
 	without,
 	includes,
 } from 'lodash';
+import scrollIntoView from 'dom-scroll-into-view';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, compose } from '@wordpress/element';
+import { Component, compose, findDOMNode, createRef } from '@wordpress/element';
 import {
 	withInstanceId,
 	withSpokenMessages,
 	PanelBody,
+	withSafeTimeout,
 } from '@wordpress/components';
 import {
 	getInserterMenuCats as getCategories,
@@ -80,6 +82,8 @@ export class InserterMenu extends Component {
 		};
 		this.onChangeSearchInput = this.onChangeSearchInput.bind( this );
 		this.onHover = this.onHover.bind( this );
+		this.panels = {};
+		this.inserterResults = createRef();
 	}
 
 	componentDidMount() {
@@ -104,6 +108,12 @@ export class InserterMenu extends Component {
 		} );
 	}
 
+	bindPanel( name ) {
+		return ( ref ) => {
+			this.panels[ name ] = ref;
+		};
+	}
+
 	onTogglePanel( panel ) {
 		return () => {
 			const isOpened = this.state.openPanels.indexOf( panel ) !== -1;
@@ -117,6 +127,14 @@ export class InserterMenu extends Component {
 						...this.state.openPanels,
 						panel,
 					],
+				} );
+
+				this.props.setTimeout( () => {
+					// We need a generic way to access the panel's container
+					// eslint-disable-next-line react/no-find-dom-node
+					scrollIntoView( findDOMNode( this.panels[ panel ] ), this.inserterResults.current, {
+						alignWithTop: true,
+					} );
 				} );
 			}
 		};
@@ -205,7 +223,7 @@ export class InserterMenu extends Component {
 					onChange={ this.onChangeSearchInput }
 				/>
 
-				<div className="editor-inserter__results">
+				<div className="editor-inserter__results" ref={ this.inserterResults }>
 					<ChildBlocks
 						rootUID={ rootUID }
 						items={ childItems }
@@ -218,6 +236,7 @@ export class InserterMenu extends Component {
 							title={ __( 'Most Used' ) }
 							opened={ isPanelOpen( SUGGESTED_PANEL ) }
 							onToggle={ this.onTogglePanel( SUGGESTED_PANEL ) }
+							ref={ this.bindPanel( SUGGESTED_PANEL ) }
 						>
 							<ItemList items={ suggestedItems } onSelect={ onSelect } onHover={ this.onHover } />
 						</PanelBody>
@@ -233,6 +252,7 @@ export class InserterMenu extends Component {
 								title={ category.title }
 								opened={ isSearching || isPanelOpen( category.slug ) }
 								onToggle={ this.onTogglePanel( category.slug ) }
+								ref={ this.bindPanel( category.slug ) }
 							>
 								<ItemList items={ categoryItems } onSelect={ onSelect } onHover={ this.onHover } />
 							</PanelBody>
@@ -244,6 +264,7 @@ export class InserterMenu extends Component {
 							opened={ isPanelOpen( SHARED_PANEL ) }
 							onToggle={ this.onTogglePanel( SHARED_PANEL ) }
 							icon="controls-repeat"
+							ref={ this.bindPanel( SHARED_PANEL ) }
 						>
 							<ItemList items={ sharedItems } onSelect={ onSelect } onHover={ this.onHover } />
 						</PanelBody>
@@ -251,11 +272,11 @@ export class InserterMenu extends Component {
 					{ isEmpty( suggestedItems ) && isEmpty( sharedItems ) && isEmpty( itemsPerCategory ) && (
 						<p className="editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
 					) }
-
-					{ hoveredItem && isSharedBlock( hoveredItem ) &&
-						<BlockPreview name={ hoveredItem.name } attributes={ hoveredItem.initialAttributes } />
-					}
 				</div>
+
+				{ hoveredItem && isSharedBlock( hoveredItem ) &&
+					<BlockPreview name={ hoveredItem.name } attributes={ hoveredItem.initialAttributes } />
+				}
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-autofocus */
@@ -279,5 +300,6 @@ export default compose(
 		fetchSharedBlocks: dispatch( 'core/editor' ).fetchSharedBlocks,
 	} ) ),
 	withSpokenMessages,
-	withInstanceId
+	withInstanceId,
+	withSafeTimeout
 )( InserterMenu );

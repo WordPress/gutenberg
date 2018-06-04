@@ -7,17 +7,18 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { Component, compose } from '@wordpress/element';
+import { ifCondition } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 export class AutosaveMonitor extends Component {
 	componentDidUpdate( prevProps ) {
-		const { isPostSaveable, isDirty, isAutosaveable } = this.props;
+		const { isDirty, isAutosaveable } = this.props;
 
 		if (
 			prevProps.isDirty !== isDirty ||
 			prevProps.isAutosaveable !== isAutosaveable
 		) {
-			this.toggleTimer( isPostSaveable && isDirty && isAutosaveable );
+			this.toggleTimer( isDirty && isAutosaveable );
 		}
 	}
 
@@ -47,19 +48,21 @@ export default compose( [
 			isEditedPostDirty,
 			isEditedPostAutosaveable,
 			getEditorSettings,
-			getCurrentPost,
+			getEditedPostAttribute,
 		} = select( 'core/editor' );
 		const { getPostType } = select( 'core' );
 		const { autosaveInterval } = getEditorSettings();
-		const post = getCurrentPost();
+		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 		return {
 			isDirty: isEditedPostDirty(),
 			isAutosaveable: isEditedPostAutosaveable(),
 			autosaveInterval,
-			isPostSaveable: get( getPostType( post.type ), [ 'saveable' ], true ),
+			isPostSaveable: get( postType, [ 'saveable' ], true ),
+			isPostAutosaveable: get( postType, [ 'autosaveable' ], true ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
 		autosave: dispatch( 'core/editor' ).autosave,
 	} ) ),
+	ifCondition( ( { isPostSaveable, isPostAutosaveable } ) => isPostSaveable && isPostAutosaveable ),
 ] )( AutosaveMonitor );
