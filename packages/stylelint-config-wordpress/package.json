@@ -37,7 +37,7 @@
 	},
 	"devDependencies": {
 		"@commitlint/cli": "^7.0.0",
-		"@commitlint/config-conventional": "^6.1.3",
+		"@commitlint/config-conventional": "^7.0.1",
 		"eslint": "^4.1.0",
 		"eslint-plugin-jest": "^21.0.0",
 		"eslint-plugin-wordpress": "git://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#b65ae0cea1199c9714641ed3be7ea98fcb27dd6c",
