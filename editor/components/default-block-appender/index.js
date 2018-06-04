@@ -88,9 +88,12 @@ export default compose(
 			insertDefaultBlock,
 			startTyping,
 		} = dispatch( 'core/editor' );
+
+		const { dismissTip } = dispatch( 'core/nux' );
+
 		return {
 			onAppend() {
-				const { layout, rootUID } = ownProps;
+				const { layout, rootUID, hasTip } = ownProps;
 
 				let attributes;
 				if ( layout ) {
@@ -99,6 +102,10 @@ export default compose(
 
 				insertDefaultBlock( attributes, rootUID );
 				startTyping();
+
+				if ( hasTip ) {
+					dismissTip( 'core/editor.inserter' );
+				}
 			},
 		};
 	} ),
