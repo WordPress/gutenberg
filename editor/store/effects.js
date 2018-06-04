@@ -62,7 +62,7 @@ import {
 	isBlockSelected,
 	getTemplate,
 	getTemplateLock,
-	getCurrentAutosave,
+	getAutosave,
 	POST_UPDATE_TRANSACTION_ID,
 } from './selectors';
 
@@ -123,7 +123,7 @@ export default {
 			// post values as fallback if not otherwise included in edits.
 			toSend = {
 				...pick( post, [ 'title', 'content', 'excerpt' ] ),
-				...getCurrentAutosave( state ),
+				...getAutosave( state ),
 				...toSend,
 				parent: post.id,
 			};
