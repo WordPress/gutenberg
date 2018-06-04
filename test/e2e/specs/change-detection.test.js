@@ -76,14 +76,45 @@ describe( 'Change detection', () => {
 	it( 'Should autosave post', async () => {
 		await page.type( '.editor-post-title__input', 'Hello World' );
 
-		// Force autosave to occur immediately.
+		// Force autosave to occur immediately. It will occur as a normal save.
 		await Promise.all( [
 			page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() ),
-			page.waitForSelector( '.editor-post-saved-state.is-autosaving' ),
+			page.waitForSelector( '.editor-post-saved-state.is-saving' ),
 			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
 		] );
 
-		// Still dirty after an autosave.
+		// Autosave draft as same user should do full save, i.e. not dirty.
+		await assertIsDirty( false );
+	} );
+
+	it( 'Should prompt to confirm unsaved changes for autosaved published post', async () => {
+		await page.type( '.editor-post-title__input', 'Hello World' );
+
+		await Promise.all( [
+			page.waitForSelector( '.editor-post-publish-button' ),
+			page.click( '.editor-post-publish-panel__toggle' ),
+		] );
+
+		await Promise.all( [
+			page.waitForSelector( '.editor-post-publish-panel__header-published' ),
+			page.click( '.editor-post-publish-button' ),
+		] );
+
+		// Close publish panel.
+		await Promise.all( [
+			page.waitForFunction( () => ! document.querySelector( '.editor-post-publish-panel' ) ),
+			page.click( '.editor-post-publish-panel__header button' ),
+		] );
+
+		// Should be dirty after autosave change of published post.
+		await page.type( '.editor-post-title__input', '!' );
+
+		await Promise.all( [
+			page.waitForSelector( '.editor-post-publish-button.is-busy' ),
+			page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() ),
+		] );
+		await page.waitForSelector( '.editor-post-publish-button:not( .is-busy )' );
+
 		await assertIsDirty( true );
 	} );
 
