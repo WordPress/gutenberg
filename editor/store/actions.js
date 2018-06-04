@@ -24,8 +24,8 @@ import {
 export function setupEditor( post, autosaveStatus ) {
 	return {
 		type: 'SETUP_EDITOR',
+		autosave: autosaveStatus,
 		post,
-		autosaveStatus,
 	};
 }
 

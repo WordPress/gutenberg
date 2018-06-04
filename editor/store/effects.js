@@ -347,7 +347,7 @@ export default {
 		) );
 	},
 	SETUP_EDITOR( action, { getState } ) {
-		const { post, autosaveStatus } = action;
+		const { post, autosave } = action;
 		const state = getState();
 		const template = getTemplate( state );
 		const templateLock = getTemplateLock( state );
@@ -381,13 +381,13 @@ export default {
 
 		// Check the auto-save status
 		let autosaveAction;
-		if ( autosaveStatus ) {
+		if ( autosave ) {
 			const noticeMessage = __( 'There is an autosave of this post that is more recent than the version below.' );
 			autosaveAction = createWarningNotice(
 				<p>
 					{ noticeMessage }
 					{ ' ' }
-					<a href={ autosaveStatus.editLink }>{ __( 'View the autosave' ) }</a>
+					<a href={ autosave.editLink }>{ __( 'View the autosave' ) }</a>
 				</p>,
 				{
 					id: AUTOSAVE_POST_NOTICE_ID,
