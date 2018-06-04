@@ -10,13 +10,13 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { Component, compose } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { ClipboardButton, Button } from '@wordpress/components';
+import { getWPAdminURL } from '@wordpress/utils';
 
 /**
  * Internal Dependencies
  */
 import './style.scss';
 import PostPermalinkEditor from './editor.js';
-import { getWPAdminURL } from '../../utils/url';
 
 class PostPermalink extends Component {
 	constructor() {

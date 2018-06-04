@@ -166,6 +166,7 @@ function gutenberg_register_scripts_and_styles() {
 	);
 	wp_add_inline_script( 'wp-utils', 'var originalUtils = window.wp && window.wp.utils ? window.wp.utils : {};', 'before' );
 	wp_add_inline_script( 'wp-utils', 'for ( var key in originalUtils ) wp.utils[ key ] = originalUtils[ key ];' );
+	wp_add_inline_script( 'wp-utils', sprintf( 'wp.utils.setWPAdminURL( %s );', wp_json_encode( admin_url() ) ), 'after' );
 	wp_register_script(
 		'wp-date',
 		gutenberg_url( 'build/date/index.js' ),
@@ -1131,7 +1132,6 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'bodyPlaceholder'     => apply_filters( 'write_your_story', __( 'Write your story', 'gutenberg' ), $post ),
 		'isRTL'               => is_rtl(),
 		'autosaveInterval'    => 10,
-		'wpAdminURL'          => admin_url(),
 	);
 
 	$post_autosave = get_autosave_newer_than_post_save( $post );
