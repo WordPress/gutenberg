@@ -1,12 +1,9 @@
 .wp-block-columns {
-
-	.editor-inner-blocks {
-		display: grid;
-		grid-auto-flow: dense;
-	}
+	display: grid;
+	grid-auto-flow: dense;
 
 	@for $i from 2 through 6 {
-		&.has-#{ $i }-columns .editor-inner-blocks {
+		&.has-#{ $i }-columns {
 			grid-auto-columns: #{ 100% / $i };
 		}
 	}
