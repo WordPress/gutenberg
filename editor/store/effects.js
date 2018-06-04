@@ -207,7 +207,7 @@ export default {
 		if ( noticeMessage ) {
 			dispatch( createSuccessNotice(
 				<p>
-					<span>{ noticeMessage }</span>
+					{ noticeMessage }
 					{ ' ' }
 					{ shouldShowLink && <a href={ post.link }>{ __( 'View post' ) }</a> }
 				</p>,
@@ -250,7 +250,7 @@ export default {
 		const noticeMessage = __( 'There is an autosave of this post that is more recent than the version below.' );
 		dispatch( createWarningNotice(
 			<p>
-				<span>{ noticeMessage }</span>
+				{ noticeMessage }
 				{ ' ' }
 				<a href={ autosaveStatus.editLink }>{ __( 'View the autosave' ) }</a>
 			</p>,
