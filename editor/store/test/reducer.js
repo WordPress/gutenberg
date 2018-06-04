@@ -1924,20 +1924,17 @@ describe( 'state', () => {
 		it( 'should add received shared blocks', () => {
 			const state = sharedBlocks( {}, {
 				type: 'RECEIVE_SHARED_BLOCKS',
-				results: [ {
-					sharedBlock: {
+				results: [
+					{
 						id: 123,
 						title: 'My cool block',
 					},
-					parsedBlock: {
-						uid: 'foo',
-					},
-				} ],
+				],
 			} );
 
 			expect( state ).toEqual( {
 				data: {
-					123: { uid: 'foo', title: 'My cool block' },
+					123: { id: 123, title: 'My cool block' },
 				},
 				isFetching: {},
 				isSaving: {},
@@ -1947,21 +1944,23 @@ describe( 'state', () => {
 		it( 'should update a shared block', () => {
 			const initialState = {
 				data: {
-					123: { uid: '', title: '' },
+					123: { title: '' },
 				},
 				isFetching: {},
 				isSaving: {},
 			};
 
 			const state = sharedBlocks( initialState, {
-				type: 'UPDATE_SHARED_BLOCK_TITLE',
+				type: 'UPDATE_SHARED_BLOCK',
 				id: 123,
-				title: 'My block',
+				changes: {
+					title: 'My block',
+				},
 			} );
 
 			expect( state ).toEqual( {
 				data: {
-					123: { uid: '', title: 'My block' },
+					123: { title: 'My block' },
 				},
 				isFetching: {},
 				isSaving: {},
@@ -1971,7 +1970,7 @@ describe( 'state', () => {
 		it( 'should update the shared block\'s id if it was temporary', () => {
 			const initialState = {
 				data: {
-					shared1: { uid: '', title: '' },
+					shared1: { title: '' },
 				},
 				isSaving: {},
 			};
@@ -1984,7 +1983,7 @@ describe( 'state', () => {
 
 			expect( state ).toEqual( {
 				data: {
-					123: { uid: '', title: '' },
+					123: { id: 123, title: '' },
 				},
 				isFetching: {},
 				isSaving: {},

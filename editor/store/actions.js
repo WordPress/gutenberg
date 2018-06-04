@@ -581,8 +581,6 @@ export function fetchSharedBlocks( id ) {
 /**
  * Returns an action object used in signalling that shared blocks have been
  * received. `results` is an array of objects containing:
- *  - `sharedBlock` - Details about how the shared block is persisted.
- *  - `parsedBlock` - The original block.
  *
  * @param {Object[]} results Shared blocks received.
  *
@@ -591,7 +589,7 @@ export function fetchSharedBlocks( id ) {
 export function receiveSharedBlocks( results ) {
 	return {
 		type: 'RECEIVE_SHARED_BLOCKS',
-		results,
+		results: castArray( results ),
 	};
 }
 
@@ -628,16 +626,16 @@ export function deleteSharedBlock( id ) {
  * Returns an action object used in signalling that a shared block's title is
  * to be updated.
  *
- * @param {number} id    The ID of the shared block to update.
- * @param {string} title The new title.
+ * @param {number} id      The ID of the shared block to update.
+ * @param {Object} changes The updated shared block properties.
  *
  * @return {Object} Action object.
  */
-export function updateSharedBlockTitle( id, title ) {
+export function updateSharedBlock( id, changes ) {
 	return {
-		type: 'UPDATE_SHARED_BLOCK_TITLE',
+		type: 'UPDATE_SHARED_BLOCK',
 		id,
-		title,
+		changes,
 	};
 }
 

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, includes, last, map, castArray, uniqueId } from 'lodash';
+import { get, includes, last, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -29,7 +29,6 @@ import {
 	setupEditorState,
 	resetAutosave,
 	resetPost,
-	receiveBlocks,
 	receiveSharedBlocks,
 	replaceBlock,
 	replaceBlocks,
@@ -425,13 +424,7 @@ export default {
 
 		result.then(
 			( sharedBlockOrBlocks ) => {
-				dispatch( receiveSharedBlocks( map(
-					castArray( sharedBlockOrBlocks ),
-					( sharedBlock ) => ( {
-						sharedBlock,
-						parsedBlock: parse( sharedBlock.content )[ 0 ],
-					} )
-				) ) );
+				dispatch( receiveSharedBlocks( sharedBlockOrBlocks ) );
 
 				dispatch( {
 					type: 'FETCH_SHARED_BLOCKS_SUCCESS',
@@ -450,9 +443,6 @@ export default {
 			}
 		);
 	},
-	RECEIVE_SHARED_BLOCKS( action ) {
-		return receiveBlocks( map( action.results, 'parsedBlock' ) );
-	},
 	SAVE_SHARED_BLOCK( action, store ) {
 		// TODO: these are potentially undefined, this fix is in place
 		// until there is a filter to not use shared blocks if undefined
@@ -465,10 +455,7 @@ export default {
 		const { dispatch } = store;
 		const state = store.getState();
 
-		const { uid, title, isTemporary } = getSharedBlock( state, id );
-		const { name, attributes, innerBlocks } = getBlock( state, uid );
-		const content = serialize( createBlock( name, attributes, innerBlocks ) );
-
+		const { isTemporary, title, content } = getSharedBlock( state, id );
 		const data = isTemporary ? { title, content } : { id, title, content };
 		const path = isTemporary ? `/wp/v2/${ basePath }` : `/wp/v2/${ basePath }/${ id }`;
 		const method = isTemporary ? 'POST' : 'PUT';
@@ -524,10 +511,7 @@ export default {
 		} );
 
 		// Remove the parsed block.
-		dispatch( removeBlocks( [
-			...associatedBlockUids,
-			sharedBlock.uid,
-		] ) );
+		dispatch( removeBlocks( associatedBlockUids ) );
 
 		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ id }`, method: 'DELETE' } ).then(
 			() => {
@@ -557,8 +541,8 @@ export default {
 		const state = store.getState();
 		const oldBlock = getBlock( state, action.uid );
 		const sharedBlock = getSharedBlock( state, oldBlock.attributes.ref );
-		const referencedBlock = getBlock( state, sharedBlock.uid );
-		const newBlock = createBlock( referencedBlock.name, referencedBlock.attributes );
+		const parsedBlock = parse( sharedBlock.content )[ 0 ];
+		const newBlock = createBlock( parsedBlock.name, parsedBlock.attributes );
 		store.dispatch( replaceBlock( oldBlock.uid, newBlock ) );
 	},
 	CONVERT_BLOCK_TO_SHARED( action, store ) {
@@ -567,15 +551,11 @@ export default {
 		const parsedBlock = getBlock( getState(), action.uid );
 		const sharedBlock = {
 			id: uniqueId( 'shared' ),
-			uid: parsedBlock.uid,
 			title: __( 'Untitled shared block' ),
+			content: serialize( parsedBlock ),
 		};
 
-		dispatch( receiveSharedBlocks( [ {
-			sharedBlock,
-			parsedBlock,
-		} ] ) );
-
+		dispatch( receiveSharedBlocks( sharedBlock ) );
 		dispatch( saveSharedBlock( sharedBlock.id ) );
 
 		dispatch( replaceBlock(
@@ -585,9 +565,6 @@ export default {
 				layout: parsedBlock.attributes.layout,
 			} )
 		) );
-
-		// Re-add the original block to the store, since replaceBlock() will have removed it
-		dispatch( receiveBlocks( [ parsedBlock ] ) );
 	},
 	CREATE_NOTICE( { notice: { content, spokenMessage } } ) {
 		const message = spokenMessage || content;

@@ -11,6 +11,7 @@ import {
 	unregisterBlockType,
 	registerBlockType,
 	createBlock,
+	serialize,
 } from '@wordpress/blocks';
 
 /**
@@ -569,15 +570,9 @@ describe( 'effects', () => {
 					expect( dispatch ).toHaveBeenCalledWith(
 						receiveSharedBlocks( [
 							{
-								sharedBlock: {
-									id: 123,
-									title: 'My cool block',
-									content: '<!-- wp:test-block {"name":"Big Bird"} /-->',
-								},
-								parsedBlock: expect.objectContaining( {
-									name: 'core/test-block',
-									attributes: { name: 'Big Bird' },
-								} ),
+								id: 123,
+								title: 'My cool block',
+								content: '<!-- wp:test-block {"name":"Big Bird"} /-->',
 							},
 						] )
 					);
@@ -605,19 +600,11 @@ describe( 'effects', () => {
 
 				return promise.then( () => {
 					expect( dispatch ).toHaveBeenCalledWith(
-						receiveSharedBlocks( [
-							{
-								sharedBlock: {
-									id: 123,
-									title: 'My cool block',
-									content: '<!-- wp:test-block {"name":"Big Bird"} /-->',
-								},
-								parsedBlock: expect.objectContaining( {
-									name: 'core/test-block',
-									attributes: { name: 'Big Bird' },
-								} ),
-							},
-						] )
+						receiveSharedBlocks( {
+							id: 123,
+							title: 'My cool block',
+							content: '<!-- wp:test-block {"name":"Big Bird"} /-->',
+						} )
 					);
 					expect( dispatch ).toHaveBeenCalledWith( {
 						type: 'FETCH_SHARED_BLOCKS_SUCCESS',
@@ -649,22 +636,6 @@ describe( 'effects', () => {
 			} );
 		} );
 
-		describe( '.RECEIVE_SHARED_BLOCKS', () => {
-			const handler = effects.RECEIVE_SHARED_BLOCKS;
-
-			it( 'should receive parsed blocks', () => {
-				const action = receiveSharedBlocks( [
-					{
-						parsedBlock: { uid: 'broccoli' },
-					},
-				] );
-
-				expect( handler( action ) ).toEqual( receiveBlocks( [
-					{ uid: 'broccoli' },
-				] ) );
-			} );
-		} );
-
 		describe( '.SAVE_SHARED_BLOCK', () => {
 			const handler = effects.SAVE_SHARED_BLOCK;
 
@@ -678,13 +649,9 @@ describe( 'effects', () => {
 					return promise;
 				} );
 
-				const sharedBlock = { id: 123, title: 'My cool block' };
-				const parsedBlock = createBlock( 'core/test-block', { name: 'Big Bird' } );
+				const sharedBlock = { id: 123, title: 'My cool block', content: '<!-- wp:test-block {\"name\":\"Big Bird\"} /-->' };
 
-				const state = reduce( [
-					receiveSharedBlocks( [ { sharedBlock, parsedBlock } ] ),
-					receiveBlocks( [ parsedBlock ] ),
-				], reducer, undefined );
+				const state = reduce( [ receiveSharedBlocks( sharedBlock ) ], reducer, undefined );
 
 				const dispatch = jest.fn();
 				const store = { getState: () => state, dispatch };
@@ -712,13 +679,8 @@ describe( 'effects', () => {
 				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
 				set( global, [ 'wp', 'apiRequest' ], () => promise );
 
-				const sharedBlock = { id: 123, title: 'My cool block' };
-				const parsedBlock = createBlock( 'core/test-block', { name: 'Big Bird' } );
-
-				const state = reduce( [
-					receiveSharedBlocks( [ { sharedBlock, parsedBlock } ] ),
-					receiveBlocks( [ parsedBlock ] ),
-				], reducer, undefined );
+				const sharedBlock = { id: 123, title: 'My cool block', content: '<!-- wp:test-block {\"name\":\"Big Bird\"} /-->' };
+				const state = reduce( [ receiveSharedBlocks( sharedBlock ) ], reducer, undefined );
 
 				const dispatch = jest.fn();
 				const store = { getState: () => state, dispatch };
@@ -744,13 +706,11 @@ describe( 'effects', () => {
 				set( global, [ 'wp', 'apiRequest' ], () => promise );
 
 				const associatedBlock = createBlock( 'core/block', { ref: 123 } );
-				const sharedBlock = { id: 123, title: 'My cool block' };
-				const parsedBlock = createBlock( 'core/test-block', { name: 'Big Bird' } );
+				const sharedBlock = { id: 123, title: 'My cool block', content: '<!-- wp:test-block {\"name\":\"Big Bird\"} /-->' };
 
 				const state = reduce( [
+					receiveSharedBlocks( [ sharedBlock ] ),
 					resetBlocks( [ associatedBlock ] ),
-					receiveSharedBlocks( [ { sharedBlock, parsedBlock } ] ),
-					receiveBlocks( [ parsedBlock ] ),
 				], reducer, undefined );
 
 				const dispatch = jest.fn();
@@ -765,7 +725,7 @@ describe( 'effects', () => {
 				} );
 
 				expect( dispatch ).toHaveBeenCalledWith(
-					removeBlocks( [ associatedBlock.uid, parsedBlock.uid ] )
+					removeBlocks( [ associatedBlock.uid ] )
 				);
 
 				return promise.then( () => {
@@ -783,13 +743,9 @@ describe( 'effects', () => {
 				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
 				set( global, [ 'wp', 'apiRequest' ], () => promise );
 
-				const sharedBlock = { id: 123, title: 'My cool block' };
-				const parsedBlock = createBlock( 'core/test-block', { name: 'Big Bird' } );
+				const sharedBlock = { id: 123, title: 'My cool block', content: '<!-- wp:test-block {\"name\":\"Big Bird\"} /-->' };
 
-				const state = reduce( [
-					receiveSharedBlocks( [ { sharedBlock, parsedBlock } ] ),
-					receiveBlocks( [ parsedBlock ] ),
-				], reducer, undefined );
+				const state = reduce( [ receiveSharedBlocks( [ sharedBlock ] ) ], reducer, undefined );
 
 				const dispatch = jest.fn();
 				const store = { getState: () => state, dispatch };
@@ -827,24 +783,22 @@ describe( 'effects', () => {
 			const handler = effects.CONVERT_BLOCK_TO_STATIC;
 
 			it( 'should convert a shared block into a static block', () => {
-				const associatedBlock = createBlock( 'core/block', { ref: 123 } );
-				const sharedBlock = { id: 123, title: 'My cool block' };
-				const parsedBlock = createBlock( 'core/test-block', { name: 'Big Bird' } );
+				const sharedBlock = { id: 123, title: 'My cool block', content: '<!-- wp:test-block {\"name\":\"Big Bird\"} /-->' };
+				const parsedBlock = createBlock( 'core/block', { ref: 123 } );
 
 				const state = reduce( [
-					resetBlocks( [ associatedBlock ] ),
-					receiveSharedBlocks( [ { sharedBlock, parsedBlock } ] ),
-					receiveBlocks( [ parsedBlock ] ),
+					resetBlocks( [ parsedBlock ] ),
+					receiveSharedBlocks( [ sharedBlock ] ),
 				], reducer, undefined );
 
 				const dispatch = jest.fn();
 				const store = { getState: () => state, dispatch };
 
-				handler( convertBlockToStatic( associatedBlock.uid ), store );
+				handler( convertBlockToStatic( parsedBlock.uid ), store );
 
 				expect( dispatch ).toHaveBeenCalledWith( {
 					type: 'REPLACE_BLOCKS',
-					uids: [ associatedBlock.uid ],
+					uids: [ parsedBlock.uid ],
 					blocks: [
 						expect.objectContaining( {
 							name: 'core/test-block',
@@ -860,7 +814,7 @@ describe( 'effects', () => {
 			const handler = effects.CONVERT_BLOCK_TO_SHARED;
 
 			it( 'should convert a static block into a shared block', () => {
-				const staticBlock = createBlock( 'core/block', { ref: 123 } );
+				const staticBlock = createBlock( 'core/test-block', { name: 'Big Bird' } );
 				const state = reducer( undefined, resetBlocks( [ staticBlock ] ) );
 
 				const dispatch = jest.fn();
@@ -870,12 +824,9 @@ describe( 'effects', () => {
 
 				expect( dispatch ).toHaveBeenCalledWith(
 					receiveSharedBlocks( [ {
-						sharedBlock: {
-							id: expect.stringMatching( /^shared/ ),
-							uid: staticBlock.uid,
-							title: 'Untitled shared block',
-						},
-						parsedBlock: staticBlock,
+						id: expect.stringMatching( /^shared/ ),
+						title: 'Untitled shared block',
+						content: serialize( staticBlock ),
 					} ] )
 				);
 
@@ -894,10 +845,6 @@ describe( 'effects', () => {
 					],
 					time: expect.any( Number ),
 				} );
-
-				expect( dispatch ).toHaveBeenCalledWith(
-					receiveBlocks( [ staticBlock ] ),
-				);
 			} );
 		} );
 	} );

@@ -2969,16 +2969,14 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {
-							block1: { name: 'core/test-block-a' },
-						},
+						blocksByUID: {},
 						blockOrder: {},
 						edits: {},
 					},
 				},
 				sharedBlocks: {
 					data: {
-						1: { uid: 'block1', title: 'Shared Block 1' },
+						1: { id: 1, content: '<!-- wp:test-block-a /-->', title: 'Shared Block 1' },
 					},
 				},
 				currentPost: {},
@@ -3032,8 +3030,8 @@ describe( 'selectors', () => {
 				},
 				sharedBlocks: {
 					data: {
-						1: { uid: 'block1', title: 'Shared Block 1' },
-						2: { uid: 'block1', title: 'Shared Block 2' },
+						1: { id: 1, content: '<!-- wp:test-block-a /-->', title: 'Shared Block 1' },
+						2: { id: 2, content: '<!-- wp:test-block-a /-->', title: 'Shared Block 2' },
 					},
 				},
 				currentPost: {},

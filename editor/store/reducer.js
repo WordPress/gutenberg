@@ -921,35 +921,26 @@ export const sharedBlocks = combineReducers( {
 		switch ( action.type ) {
 			case 'RECEIVE_SHARED_BLOCKS': {
 				return reduce( action.results, ( nextState, result ) => {
-					const { id, title } = result.sharedBlock;
-					const { uid } = result.parsedBlock;
-
-					const value = { uid, title };
-
-					if ( ! isEqual( nextState[ id ], value ) ) {
+					if ( ! isEqual( nextState[ result.id ], result ) ) {
 						if ( nextState === state ) {
 							nextState = { ...nextState };
 						}
 
-						nextState[ id ] = value;
+						nextState[ result.id ] = result;
 					}
 
 					return nextState;
 				}, state );
 			}
 
-			case 'UPDATE_SHARED_BLOCK_TITLE': {
-				const { id, title } = action;
-
-				if ( ! state[ id ] || state[ id ].title === title ) {
-					return state;
-				}
+			case 'UPDATE_SHARED_BLOCK': {
+				const { id, changes } = action;
 
 				return {
 					...state,
 					[ id ]: {
 						...state[ id ],
-						title,
+						...changes,
 					},
 				};
 			}
@@ -965,7 +956,10 @@ export const sharedBlocks = combineReducers( {
 				const value = state[ id ];
 				return {
 					...omit( state, id ),
-					[ updatedId ]: value,
+					[ updatedId ]: {
+						id: updatedId,
+						...value,
+					},
 				};
 			}
 
