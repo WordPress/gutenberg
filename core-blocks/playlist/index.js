@@ -45,9 +45,6 @@ export const settings = {
 		},
 		src: {
 			type: 'string',
-			source: 'attribute',
-			selector: 'audio',
-			attribute: 'src',
 		},
 		caption: {
 			type: 'array',
