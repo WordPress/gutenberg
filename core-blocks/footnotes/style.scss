@@ -1,9 +1,9 @@
 .post,
 .edit-post-visual-editor {
-  counter-reset: footnotes;
+	counter-reset: footnotes;
 }
 
 .wp-footnote::before {
-  counter-increment: footnotes;
-  content: counter(footnotes);
+	counter-increment: footnotes;
+	content: counter(footnotes);
 }
