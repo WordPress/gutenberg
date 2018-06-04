@@ -19,6 +19,13 @@ const {
  */
 const MOD_KEY = process.platform === 'darwin' ? 'Meta' : 'Control';
 
+/**
+ * Regular expression matching zero-width space characters.
+ *
+ * @type {RegExp}
+ */
+const REGEXP_ZWSP = /[\u200B\u200C\u200D\uFEFF]/;
+
 function getUrl( WPPath, query = '' ) {
 	const url = new URL( WP_BASE_URL );
 
@@ -89,6 +96,12 @@ export async function getHTMLFromCodeEditor() {
 	await switchToEditor( 'Code' );
 	const textEditorContent = await page.$eval( '.editor-post-text-editor', ( element ) => element.value );
 	await switchToEditor( 'Visual' );
+
+	// Globally guard against zero-width characters.
+	if ( REGEXP_ZWSP.test( textEditorContent ) ) {
+		throw new Error( 'Unexpected zero-width space character in editor content.' );
+	}
+
 	return textEditorContent;
 }
 
@@ -126,15 +139,4 @@ export async function pressWithModifier( modifier, key ) {
 	await page.keyboard.down( modifier );
 	await page.keyboard.press( key );
 	return page.keyboard.up( modifier );
-}
-
-/**
- * Promise setTimeout Wrapper.
- *
- * @param {number} timeout Timeout in milliseconds
- *
- * @return {Promise} Promise resolving after the given timeout
- */
-export async function wait( timeout ) {
-	return new Promise( ( resolve ) => setTimeout( resolve, timeout ) );
 }

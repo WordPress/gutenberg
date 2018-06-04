@@ -16,13 +16,15 @@ import {
  * Returns an action object used in signalling that editor has initialized with
  * the specified post object and editor settings.
  *
- * @param {Object} post     Post object.
+ * @param {Object}  post           Post object.
+ * @param {Object}  autosaveStatus The Post's autosave status.
  *
  * @return {Object} Action object.
  */
-export function setupEditor( post ) {
+export function setupEditor( post, autosaveStatus ) {
 	return {
 		type: 'SETUP_EDITOR',
+		autosave: autosaveStatus,
 		post,
 	};
 }
@@ -38,6 +40,21 @@ export function setupEditor( post ) {
 export function resetPost( post ) {
 	return {
 		type: 'RESET_POST',
+		post,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the latest autosave of the
+ * post has been received, by initialization or autosave.
+ *
+ * @param {Object} post Autosave post object.
+ *
+ * @return {Object} Action object.
+ */
+export function resetAutosave( post ) {
+	return {
+		type: 'RESET_AUTOSAVE',
 		post,
 	};
 }
@@ -323,7 +340,7 @@ export function setTemplateValidity( isValid ) {
 }
 
 /**
- * Returns an action object tocheck the template validity.
+ * Returns an action object to check the template validity.
  *
  * @return {Object} Action object.
  */
@@ -351,9 +368,18 @@ export function editPost( edits ) {
 	};
 }
 
-export function savePost() {
+/**
+ * Returns an action object to save the post.
+ *
+ * @param {Object}  options          Options for the save.
+ * @param {boolean} options.autosave Perform an autosave if true.
+ *
+ * @return {Object} Action object.
+ */
+export function savePost( options ) {
 	return {
 		type: 'REQUEST_POST_UPDATE',
+		options,
 	};
 }
 
@@ -392,9 +418,7 @@ export function mergeBlocks( blockAUid, blockBUid ) {
  * @return {Object} Action object.
  */
 export function autosave() {
-	return {
-		type: 'AUTOSAVE',
-	};
+	return savePost( { autosave: true } );
 }
 
 /**

@@ -84,7 +84,9 @@ describe( 'blocks', () => {
 			expect( console ).not.toHaveErrored();
 			expect( block ).toEqual( {
 				name: 'my-plugin/fancy-block-4',
-				icon: 'block-default',
+				icon: {
+					src: 'block-default',
+				},
 				save: noop,
 				category: 'common',
 				title: 'block title',
@@ -167,7 +169,9 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'common',
 				title: 'block title',
-				icon: 'block-default',
+				icon: {
+					src: 'block-default',
+				},
 				attributes: {
 					ok: {
 						type: 'boolean',
@@ -186,7 +190,9 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'common',
 				title: 'block title',
-				icon: 'block-default',
+				icon: {
+					src: 'block-default',
+				},
 			} );
 		} );
 
@@ -224,7 +230,9 @@ describe( 'blocks', () => {
 					save: noop,
 					category: 'common',
 					title: 'block title',
-					icon: 'block-default',
+					icon: {
+						src: 'block-default',
+					},
 				},
 			] );
 			const oldBlock = unregisterBlockType( 'core/test-block' );
@@ -234,7 +242,9 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'common',
 				title: 'block title',
-				icon: 'block-default',
+				icon: {
+					src: 'block-default',
+				},
 			} );
 			expect( getBlockTypes() ).toEqual( [] );
 		} );
@@ -276,7 +286,9 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'common',
 				title: 'block title',
-				icon: 'block-default',
+				icon: {
+					src: 'block-default',
+				},
 			} );
 		} );
 
@@ -289,7 +301,9 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'common',
 				title: 'block title',
-				icon: 'block-default',
+				icon: {
+					src: 'block-default',
+				},
 			} );
 		} );
 	} );
@@ -309,7 +323,9 @@ describe( 'blocks', () => {
 					save: noop,
 					category: 'common',
 					title: 'block title',
-					icon: 'block-default',
+					icon: {
+						src: 'block-default',
+					},
 				},
 				{
 					name: 'core/test-block-with-settings',
@@ -317,7 +333,9 @@ describe( 'blocks', () => {
 					save: noop,
 					category: 'common',
 					title: 'block title',
-					icon: 'block-default',
+					icon: {
+						src: 'block-default',
+					},
 				},
 			] );
 		} );

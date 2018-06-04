@@ -150,6 +150,13 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'build/dom/index.js' ),
 		true
 	);
+	wp_add_inline_script(
+		'wp-dom',
+		gutenberg_get_script_polyfill( array(
+			'document.contains' => 'node-contains',
+		) ),
+		'before'
+	);
 	wp_register_script(
 		'wp-utils',
 		gutenberg_url( 'build/utils/index.js' ),
@@ -249,7 +256,6 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-blocks',
 			'wp-components',
 			'wp-core-data',
-			'wp-deprecated',
 			'wp-element',
 			'wp-editor',
 			'wp-i18n',
@@ -426,7 +432,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_style(
 		'wp-core-blocks',
 		gutenberg_url( 'build/core-blocks/style.css' ),
-		array(),
+		current_theme_supports( 'wp-block-styles' ) ? array( 'wp-core-blocks-theme' ) : array(),
 		filemtime( gutenberg_dir_path() . 'build/core-blocks/style.css' )
 	);
 	wp_style_add_data( 'wp-core-blocks', 'rtl', 'replace' );
@@ -434,10 +440,23 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_style(
 		'wp-edit-blocks',
 		gutenberg_url( 'build/core-blocks/edit-blocks.css' ),
-		array( 'wp-components', 'wp-editor' ),
+		array(
+			'wp-components',
+			'wp-editor',
+			// Always include visual styles so the editor never appears broken.
+			'wp-core-blocks-theme',
+		),
 		filemtime( gutenberg_dir_path() . 'build/core-blocks/edit-blocks.css' )
 	);
 	wp_style_add_data( 'wp-edit-blocks', 'rtl', 'replace' );
+
+	wp_register_style(
+		'wp-core-blocks-theme',
+		gutenberg_url( 'build/core-blocks/theme.css' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'build/core-blocks/theme.css' )
+	);
+	wp_style_add_data( 'wp-core-blocks-theme', 'rtl', 'replace' );
 
 	wp_register_script(
 		'wp-plugins',
@@ -445,6 +464,15 @@ function gutenberg_register_scripts_and_styles() {
 		array( 'wp-element', 'wp-components', 'wp-utils', 'wp-data' ),
 		filemtime( gutenberg_dir_path() . 'build/plugins/index.js' )
 	);
+
+	if ( defined( 'GUTENBERG_LIVE_RELOAD' ) && GUTENBERG_LIVE_RELOAD ) {
+		$live_reload_url = ( GUTENBERG_LIVE_RELOAD === true ) ? 'http://localhost:35729/livereload.js' : GUTENBERG_LIVE_RELOAD;
+
+		wp_enqueue_script(
+			'gutenberg-live-reload',
+			$live_reload_url
+		);
+	}
 }
 add_action( 'wp_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
 add_action( 'admin_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
@@ -547,6 +575,10 @@ function gutenberg_register_vendor_scripts() {
 	gutenberg_register_vendor_script(
 		'formdata',
 		'https://unpkg.com/formdata-polyfill@3.0.9/formdata.min.js'
+	);
+	gutenberg_register_vendor_script(
+		'node-contains',
+		'https://unpkg.com/polyfill-library@3.26.0-0/polyfills/Node/prototype/contains/polyfill.js'
 	);
 }
 
@@ -901,6 +933,35 @@ function gutenberg_capture_code_editor_settings( $settings ) {
 }
 
 /**
+ * Retrieve a stored autosave that is newer than the post save.
+ *
+ * Deletes autosaves that are older than the post save.
+ *
+ * @param  WP_Post $post Post object.
+ * @return WP_Post|boolean The post autosave. False if none found.
+ */
+function get_autosave_newer_than_post_save( $post ) {
+	// Add autosave data if it is newer and changed.
+	$autosave = wp_get_post_autosave( $post->ID );
+
+	if ( ! $autosave ) {
+		return false;
+	}
+
+	// Check if the autosave is newer than the current post.
+	if (
+		mysql2date( 'U', $autosave->post_modified_gmt, false ) > mysql2date( 'U', $post->post_modified_gmt, false )
+	) {
+		return $autosave;
+	}
+
+	// If the autosave isn't newer, remove it.
+	wp_delete_post_revision( $autosave->ID );
+
+	return false;
+}
+
+/**
  * Scripts & Styles.
  *
  * Enqueues the needed scripts and styles when visiting the top-level page of
@@ -1069,7 +1130,15 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'titlePlaceholder'    => apply_filters( 'enter_title_here', __( 'Add title', 'gutenberg' ), $post ),
 		'bodyPlaceholder'     => apply_filters( 'write_your_story', __( 'Write your story', 'gutenberg' ), $post ),
 		'isRTL'               => is_rtl(),
+		'autosaveInterval'    => 10,
 	);
+
+	$post_autosave = get_autosave_newer_than_post_save( $post );
+	if ( $post_autosave ) {
+		$editor_settings['autosave'] = array(
+			'editLink' => add_query_arg( 'gutenberg', true, get_edit_post_link( $post_autosave->ID ) ),
+		);
+	}
 
 	if ( ! empty( $color_palette ) ) {
 		$editor_settings['colors'] = $color_palette;

@@ -39,7 +39,7 @@
 		"memize": "1.0.5",
 		"moment": "2.22.1",
 		"moment-timezone": "0.5.16",
-		"mousetrap": "1.6.1",
+		"mousetrap": "1.6.2",
 		"prop-types": "15.5.10",
 		"querystringify": "1.0.0",
 		"re-resizable": "4.4.8",
@@ -98,6 +98,7 @@
 		"style-loader": "0.20.3",
 		"webpack": "4.8.3",
 		"webpack-cli": "2.1.3",
+		"webpack-livereload-plugin": "2.1.1",
 		"webpack-rtl-plugin": "github:yoavf/webpack-rtl-plugin#develop"
 	},
 	"babel": {
@@ -148,8 +149,8 @@
 		"test-unit:watch": "npm run test-unit -- --watch",
 		"test-e2e": "wp-scripts test-unit-js --config test/e2e/jest.config.json",
 		"test-e2e:watch": "npm run test-e2e -- --watch",
-		"build-package:watch": "NODE_ENV=production webpack --config g-package/webpack.config.js --watch",
-		"build-package": "NODE_ENV=production webpack --config g-package/webpack.config.js",
+		"build-package:watch": "NODE_ENV=production webpack --config packages/gutenberg/webpack.config.js --watch",
+		"build-package": "NODE_ENV=production webpack --config packages/gutenberg/webpack.config.js",
 		"prepublish": "npm run lint:fix && npm run build-package"
 	}
 }

@@ -13,7 +13,7 @@ This package is based on [Gutenberg v2.9.2](https://github.com/WordPress/gutenbe
 * [Global variables](#global-variables)
     * [apiRequest](#apirequest)
         * [GET types](#get-types)
-        * [PUT post or page](#put-post-or-page)
+        * [PUT post or page (and POST post or page autosaves)](#put-post-or-page-and-post-post-or-page-autosaves)
         * [GET categories](#get-categories)
         * [GET /](#get-)
         * [POST media](#post-media)
@@ -47,9 +47,10 @@ import './globals';
 import { initializeEditor } from '@frontkom/gutenberg';
 
 // Don't forget to import the style
-import '@frontkom/gutenberg/dist/css/core-blocks/style.css';
-import '@frontkom/gutenberg/dist/css/core-blocks/edit-blocks.css';
-import '@frontkom/gutenberg/dist/css/style.css';
+import '@frontkom/gutenberg/build/css/core-blocks/style.css';
+import '@frontkom/gutenberg/build/css/core-blocks/edit-blocks.css';
+import '@frontkom/gutenberg/build/css/core-blocks/theme.css';
+import '@frontkom/gutenberg/build/css/style.css';
 
 // DOM element id where editor will be displayed
 const target = 'editor'; 
@@ -69,10 +70,15 @@ const page = {
 
 // Some editor settings
 const settings = { 
-    alignWide: false,
+    alignWide: true,
     availableTemplates: [],
-    disableCustomColors: false,
-    titlePlaceholder: 'Add a title here...',
+    allowedBlockTypes: true, 
+    disableCustomColors: false, 
+    disablePostFormats: false,
+    titlePlaceholder: "Add title",
+    bodyPlaceholder: "Write your story",
+    isRTL: false,
+    autosaveInterval: 10,
     ...
 };
 
@@ -169,17 +175,19 @@ When you initialize the editor, Gutenberg will request the settings related with
         'media-library': false,    // disable Media library from WordPress
         posts: true,               // add PostsPanel to sidebar
         'template-settings': true, // add TemplateSettingsPanel to sidebar
-        extras: true,              // show Extra tab in sidebar
+        extras: true,              // show Extras tab in sidebar
         ...,
     },
     viewable: true,
-    publishable: false, // hide Publish Toggle
-    saveable: false,    // disable save button and autosave
+    // Gutenberg by Frontkom flags
+    publishable: false,  // hide Publish Toggle
+    saveable: false,     // disable save button
+    autosaveable: false, // disable autosave
     ...,
 }
 ```
 
-#### PUT post or page
+#### PUT post or page (and POST post or page autosaves)
 
 To save a [post](https://v2.wp-api.org/reference/posts/) or a [page](https://v2.wp-api.org/reference/pages/) content, Gutenberg does a PUT request to `/wp/v2/[postType]/[id]` sending a `data` object with `content`, `id` and/or `title` ( if its **postType** requires it). The response should be an object like this:
 

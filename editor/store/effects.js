@@ -24,9 +24,10 @@ import { speak } from '@wordpress/a11y';
 /**
  * Internal dependencies
  */
-import { getPostEditUrl, getWPAdminURL } from '../utils/url';
+import { getWPAdminURL } from '../utils/url';
 import {
 	setupEditorState,
+	resetAutosave,
 	resetPost,
 	receiveBlocks,
 	receiveSharedBlocks,
@@ -34,8 +35,8 @@ import {
 	replaceBlocks,
 	createSuccessNotice,
 	createErrorNotice,
+	createWarningNotice,
 	removeNotice,
-	savePost,
 	saveSharedBlock,
 	insertBlock,
 	removeBlocks,
@@ -49,9 +50,7 @@ import {
 	getCurrentPostType,
 	getEditedPostContent,
 	getPostEdits,
-	isCurrentPostPublished,
-	isEditedPostDirty,
-	isEditedPostNew,
+	isEditedPostAutosaveable,
 	isEditedPostSaveable,
 	getBlock,
 	getBlockCount,
@@ -71,6 +70,7 @@ import {
  * Module Constants
  */
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
+const AUTOSAVE_POST_NOTICE_ID = 'AUTOSAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 const SHARED_BLOCK_NOTICE_ID = 'SHARED_BLOCK_NOTICE_ID';
 
@@ -95,6 +95,14 @@ export default {
 	REQUEST_POST_UPDATE( action, store ) {
 		const { dispatch, getState } = store;
 		const state = getState();
+		const isAutosave = action.options && action.options.autosave;
+
+		// Prevent save if not saveable.
+		const isSaveable = isAutosave ? isEditedPostAutosaveable : isEditedPostSaveable;
+		if ( ! isSaveable( state ) ) {
+			return;
+		}
+
 		const post = getCurrentPost( state );
 		const edits = getPostEdits( state );
 		const toSend = {
@@ -102,42 +110,77 @@ export default {
 			content: getEditedPostContent( state ),
 			id: post.id,
 		};
+		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( state ) );
 
 		dispatch( {
-			type: 'UPDATE_POST',
-			edits: toSend,
+			type: 'REQUEST_POST_UPDATE_START',
 			optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
+			isAutosave,
 		} );
-		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
-		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( state ) );
-		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }`, method: 'PUT', data: toSend } ).then(
+
+		let request;
+		if ( isAutosave ) {
+			toSend.parent = post.id;
+
+			request = wp.apiRequest( {
+				path: `/wp/v2/${ basePath }/${ post.id }/autosaves`,
+				method: 'POST',
+				data: toSend,
+			} );
+		} else {
+			dispatch( {
+				type: 'UPDATE_POST',
+				edits: toSend,
+				optimist: { id: POST_UPDATE_TRANSACTION_ID },
+			} );
+
+			dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
+			dispatch( removeNotice( AUTOSAVE_POST_NOTICE_ID ) );
+
+			request = wp.apiRequest( {
+				path: `/wp/v2/${ basePath }/${ post.id }`,
+				method: 'PUT',
+				data: toSend,
+			} );
+		}
+
+		request.then(
 			( newPost ) => {
-				dispatch( resetPost( newPost ) );
+				const reset = isAutosave ? resetAutosave : resetPost;
+				dispatch( reset( newPost ) );
+
 				dispatch( {
 					type: 'REQUEST_POST_UPDATE_SUCCESS',
 					previousPost: post,
 					post: newPost,
-					edits: toSend,
 					optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
+					isAutosave,
 				} );
 			},
-			( err ) => {
+			( error ) => {
+				error = get( error, [ 'responseJSON' ], {
+					code: 'unknown_error',
+					message: __( 'An unknown error occurred.' ),
+				} );
+
 				dispatch( {
 					type: 'REQUEST_POST_UPDATE_FAILURE',
-					error: get( err, [ 'responseJSON' ], {
-						code: 'unknown_error',
-						message: __( 'An unknown error occurred.' ),
-					} ),
+					optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
 					post,
 					edits,
-					optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
+					error,
 				} );
-			}
+			},
 		);
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
-		const { previousPost, post } = action;
+		const { previousPost, post, isAutosave } = action;
 		const { dispatch } = store;
+
+		// Autosaves are neither shown a notice nor redirected.
+		if ( isAutosave ) {
+			return;
+		}
 
 		const publishStatus = [ 'publish', 'private', 'future' ];
 		const isPublished = includes( publishStatus, previousPost.status );
@@ -145,8 +188,9 @@ export default {
 
 		let noticeMessage;
 		let shouldShowLink = true;
+
 		if ( ! isPublished && ! willPublish ) {
-			// If saving a non published post, don't show any notice
+			// If saving a non-published post, don't show notice.
 			noticeMessage = null;
 		} else if ( isPublished && ! willPublish ) {
 			// If undoing publish status, show specific notice
@@ -168,20 +212,12 @@ export default {
 		if ( noticeMessage ) {
 			dispatch( createSuccessNotice(
 				<p>
-					<span>{ noticeMessage }</span>
+					{ noticeMessage }
 					{ ' ' }
 					{ shouldShowLink && <a href={ post.link }>{ __( 'View post' ) }</a> }
 				</p>,
 				{ id: SAVE_POST_NOTICE_ID, spokenMessage: noticeMessage }
 			) );
-		}
-
-		if ( get( window.history.state, [ 'id' ] ) !== post.id ) {
-			window.history.replaceState(
-				{ id: post.id },
-				'Post ' + post.id,
-				getPostEditUrl( post.id )
-			);
 		}
 	},
 	REQUEST_POST_UPDATE_FAILURE( action, store ) {
@@ -302,30 +338,8 @@ export default {
 			]
 		) );
 	},
-	AUTOSAVE( action, store ) {
-		const { getState, dispatch } = store;
-		const state = getState();
-		if ( ! isEditedPostSaveable( state ) ) {
-			return;
-		}
-
-		if ( ! isEditedPostNew( state ) && ! isEditedPostDirty( state ) ) {
-			return;
-		}
-
-		if ( isCurrentPostPublished( state ) ) {
-			// TODO: Publish autosave.
-			//  - Autosaves are created as revisions for published posts, but
-			//    the necessary REST API behavior does not yet exist
-			//  - May need to check for whether the status of the edited post
-			//    has changed from the saved copy (i.e. published -> pending)
-			return;
-		}
-
-		dispatch( savePost() );
-	},
 	SETUP_EDITOR( action, { getState } ) {
-		const { post } = action;
+		const { post, autosave } = action;
 		const state = getState();
 		const template = getTemplate( state );
 		const templateLock = getTemplateLock( state );
@@ -357,9 +371,27 @@ export default {
 			edits.status = 'draft';
 		}
 
+		// Check the auto-save status
+		let autosaveAction;
+		if ( autosave ) {
+			const noticeMessage = __( 'There is an autosave of this post that is more recent than the version below.' );
+			autosaveAction = createWarningNotice(
+				<p>
+					{ noticeMessage }
+					{ ' ' }
+					<a href={ autosave.editLink }>{ __( 'View the autosave' ) }</a>
+				</p>,
+				{
+					id: AUTOSAVE_POST_NOTICE_ID,
+					spokenMessage: noticeMessage,
+				}
+			);
+		}
+
 		return [
 			setTemplateValidity( isValidTemplate ),
 			setupEditorState( post, blocks, edits ),
+			...( autosaveAction ? [ autosaveAction ] : [] ),
 		];
 	},
 	SYNCHRONIZE_TEMPLATE( action, { getState } ) {

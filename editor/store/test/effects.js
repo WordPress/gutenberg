@@ -20,7 +20,6 @@ import {
 	setupEditorState,
 	mergeBlocks,
 	replaceBlocks,
-	savePost,
 	selectBlock,
 	removeBlock,
 	createErrorNotice,
@@ -257,89 +256,8 @@ describe( 'effects', () => {
 		} );
 	} );
 
-	describe( '.AUTOSAVE', () => {
-		const handler = effects.AUTOSAVE;
-		const dispatch = jest.fn();
-		const store = { getState: () => {}, dispatch };
-
-		beforeAll( () => {
-			selectors.isEditedPostSaveable = jest.spyOn( selectors, 'isEditedPostSaveable' );
-			selectors.isEditedPostDirty = jest.spyOn( selectors, 'isEditedPostDirty' );
-			selectors.isCurrentPostPublished = jest.spyOn( selectors, 'isCurrentPostPublished' );
-			selectors.isEditedPostNew = jest.spyOn( selectors, 'isEditedPostNew' );
-		} );
-
-		beforeEach( () => {
-			dispatch.mockReset();
-			selectors.isEditedPostSaveable.mockReset();
-			selectors.isEditedPostDirty.mockReset();
-			selectors.isCurrentPostPublished.mockReset();
-			selectors.isEditedPostNew.mockReset();
-		} );
-
-		afterAll( () => {
-			selectors.isEditedPostSaveable.mockRestore();
-			selectors.isEditedPostDirty.mockRestore();
-			selectors.isCurrentPostPublished.mockRestore();
-			selectors.isEditedPostNew.mockRestore();
-		} );
-
-		it( 'should do nothing for unsaveable', () => {
-			selectors.isEditedPostSaveable.mockReturnValue( false );
-			selectors.isEditedPostDirty.mockReturnValue( true );
-			selectors.isCurrentPostPublished.mockReturnValue( false );
-			selectors.isEditedPostNew.mockReturnValue( true );
-
-			expect( dispatch ).not.toHaveBeenCalled();
-		} );
-
-		it( 'should do nothing for clean', () => {
-			selectors.isEditedPostSaveable.mockReturnValue( true );
-			selectors.isEditedPostDirty.mockReturnValue( false );
-			selectors.isCurrentPostPublished.mockReturnValue( false );
-			selectors.isEditedPostNew.mockReturnValue( false );
-
-			expect( dispatch ).not.toHaveBeenCalled();
-		} );
-
-		it( 'should return autosave action for clean, new, saveable post', () => {
-			selectors.isEditedPostSaveable.mockReturnValue( true );
-			selectors.isEditedPostDirty.mockReturnValue( false );
-			selectors.isCurrentPostPublished.mockReturnValue( false );
-			selectors.isEditedPostNew.mockReturnValue( true );
-
-			handler( {}, store );
-
-			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( savePost() );
-		} );
-
-		it( 'should return autosave action for saveable, dirty, published post', () => {
-			selectors.isEditedPostSaveable.mockReturnValue( true );
-			selectors.isEditedPostDirty.mockReturnValue( true );
-			selectors.isCurrentPostPublished.mockReturnValue( true );
-			selectors.isEditedPostNew.mockReturnValue( true );
-
-			// TODO: Publish autosave
-			expect( dispatch ).not.toHaveBeenCalled();
-		} );
-
-		it( 'should return update action for saveable, dirty draft', () => {
-			selectors.isEditedPostSaveable.mockReturnValue( true );
-			selectors.isEditedPostDirty.mockReturnValue( true );
-			selectors.isCurrentPostPublished.mockReturnValue( false );
-			selectors.isEditedPostNew.mockReturnValue( false );
-
-			handler( {}, store );
-
-			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( savePost() );
-		} );
-	} );
-
 	describe( '.REQUEST_POST_UPDATE_SUCCESS', () => {
 		const handler = effects.REQUEST_POST_UPDATE_SUCCESS;
-		let replaceStateSpy;
 
 		const defaultPost = {
 			id: 1,
@@ -359,18 +277,6 @@ describe( 'effects', () => {
 			status: 'publish',
 		} );
 
-		beforeAll( () => {
-			replaceStateSpy = jest.spyOn( window.history, 'replaceState' );
-		} );
-
-		beforeEach( () => {
-			replaceStateSpy.mockReset();
-		} );
-
-		afterAll( () => {
-			replaceStateSpy.mockRestore();
-		} );
-
 		it( 'should dispatch notices when publishing or scheduling a post', () => {
 			const dispatch = jest.fn();
 			const store = { dispatch };
@@ -383,7 +289,7 @@ describe( 'effects', () => {
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
 				notice: {
-					content: <p><span>Post published!</span> <a>View post</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
+					content: <p>Post published!{ ' ' }<a>View post</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
 					id: 'SAVE_POST_NOTICE_ID',
 					isDismissible: true,
 					status: 'success',
@@ -406,7 +312,7 @@ describe( 'effects', () => {
 			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
 				notice: {
 					content: <p>
-						<span>Post reverted to draft.</span>
+						Post reverted to draft.
 						{ ' ' }
 						{ false }
 					</p>,
@@ -431,7 +337,7 @@ describe( 'effects', () => {
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
 				notice: {
-					content: <p><span>Post updated!</span>{ ' ' }<a>{ 'View post' }</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
+					content: <p>Post updated!{ ' ' }<a>{ 'View post' }</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
 					id: 'SAVE_POST_NOTICE_ID',
 					isDismissible: true,
 					status: 'success',
@@ -439,6 +345,18 @@ describe( 'effects', () => {
 				},
 				type: 'CREATE_NOTICE',
 			} ) );
+		} );
+
+		it( 'should do nothing if the updated post was autosaved', () => {
+			const dispatch = jest.fn();
+			const store = { dispatch };
+
+			const previousPost = getPublishedPost();
+			const post = { ...getPublishedPost(), id: defaultPost.id + 1 };
+
+			handler( { post, previousPost, isAutosave: true }, store );
+
+			expect( dispatch ).toHaveBeenCalledTimes( 0 );
 		} );
 	} );
 

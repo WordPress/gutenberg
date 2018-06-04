@@ -37,9 +37,9 @@ class PanelBody extends Component {
 	}
 
 	render() {
-		const { title, children, opened, className } = this.props;
+		const { title, children, opened, className, icon } = this.props;
 		const isOpened = opened === undefined ? this.state.opened : opened;
-		const icon = `arrow-${ isOpened ? 'up' : 'down' }`;
+		const arrow = `arrow-${ isOpened ? 'up' : 'down' }`;
 		const classes = classnames( 'components-panel__body', className, { 'is-opened': isOpened } );
 
 		return (
@@ -51,7 +51,8 @@ class PanelBody extends Component {
 							onClick={ this.toggle }
 							aria-expanded={ isOpened }
 						>
-							<Dashicon icon={ icon } />
+							<Dashicon icon={ arrow } className="components-panel__arrow" />
+							{ icon && <Dashicon icon={ icon } className="components-panel__icon" /> }
 							{ title }
 						</Button>
 					</h2>

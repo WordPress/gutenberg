@@ -127,7 +127,7 @@
 	}
 
 	// Don't show block type label for classic block
-	&.is-hovered .editor-block-breadcrumb {
+	&.is-hovered .editor-block-list__breadcrumb {
 		display: none;
 	}
 }
@@ -140,7 +140,7 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 
 .freeform-toolbar {
 	width: auto;
-	margin: -$block-padding;
+	margin: #{ -$block-padding } #{ -$parent-block-padding };
 	margin-bottom: $block-padding;
 	position: sticky;
 	z-index: z-index( '.freeform-toolbar' );

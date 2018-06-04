@@ -7,14 +7,18 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { Component, compose } from '@wordpress/element';
+import { ifCondition } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 export class AutosaveMonitor extends Component {
 	componentDidUpdate( prevProps ) {
-		const { isPostSaveable, isDirty, isSaveable } = this.props;
-		if ( prevProps.isDirty !== isDirty ||
-				prevProps.isSaveable !== isSaveable ) {
-			this.toggleTimer( isPostSaveable && isDirty && isSaveable );
+		const { isDirty, isAutosaveable } = this.props;
+
+		if (
+			prevProps.isDirty !== isDirty ||
+			prevProps.isAutosaveable !== isAutosaveable
+		) {
+			this.toggleTimer( isDirty && isAutosaveable );
 		}
 	}
 
@@ -24,11 +28,11 @@ export class AutosaveMonitor extends Component {
 
 	toggleTimer( isPendingSave ) {
 		clearTimeout( this.pendingSave );
-
+		const { autosaveInterval } = this.props;
 		if ( isPendingSave ) {
 			this.pendingSave = setTimeout(
 				() => this.props.autosave(),
-				10000
+				autosaveInterval * 1000
 			);
 		}
 	}
@@ -40,18 +44,25 @@ export class AutosaveMonitor extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { isEditedPostDirty, isEditedPostSaveable, getCurrentPost } = select( 'core/editor' );
+		const {
+			isEditedPostDirty,
+			isEditedPostAutosaveable,
+			getEditorSettings,
+			getEditedPostAttribute,
+		} = select( 'core/editor' );
 		const { getPostType } = select( 'core' );
-
-		const post = getCurrentPost();
-
+		const { autosaveInterval } = getEditorSettings();
+		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 		return {
 			isDirty: isEditedPostDirty(),
-			isSaveable: isEditedPostSaveable(),
-			isPostSaveable: get( getPostType( post.type ), [ 'saveable' ], true ),
+			isAutosaveable: isEditedPostAutosaveable(),
+			autosaveInterval,
+			isPostSaveable: get( postType, [ 'saveable' ], true ),
+			isPostAutosaveable: get( postType, [ 'autosaveable' ], true ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
 		autosave: dispatch( 'core/editor' ).autosave,
 	} ) ),
+	ifCondition( ( { isPostSaveable, isPostAutosaveable } ) => isPostSaveable && isPostAutosaveable ),
 ] )( AutosaveMonitor );

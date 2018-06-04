@@ -21,6 +21,8 @@ import edit, {
 	backgroundImageStyles,
 } from './edit';
 
+import './style.scss';
+
 const blockAttributes = {
 	url: {
 		type: 'string',

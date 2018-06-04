@@ -2,7 +2,10 @@
  * Internal dependencies
  */
 import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage, wait } from '../support/utils';
+import {
+	newPost,
+	newDesktopBrowserPage,
+} from '../support/utils';
 
 describe( 'Publishing', () => {
 	beforeAll( async () => {
@@ -19,8 +22,9 @@ describe( 'Publishing', () => {
 		// Opens the publish panel
 		await page.click( '.editor-post-publish-panel__toggle' );
 
-		// Wait for a second ( wait for the animation )
-		await wait( 1000 );
+		// Disable reason: Wait for a second ( wait for the animation )
+		// eslint-disable-next-line no-restricted-syntax
+		await page.waitFor( 1000 );
 
 		// Publish the post
 		await page.click( '.editor-post-publish-button' );

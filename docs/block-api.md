@@ -70,6 +70,21 @@ An icon property should be specified to make it easier to identify a block. Thes
 icon: 'book-alt',
 ```
 
+An object can also be passed as icon, in this case, icon, as specified above, should be included in the src property.
+Besides src the object can contain background and foreground colors, this colors will appear with the icon
+when they are applicable e.g.: in the inserter.
+
+```js
+
+icon: {
+	// Specifying a background color to appear with the icon e.g.: in the inserter.
+	background: '#7e70af',
+	// Specifying a dashicon for the block
+	src: 'book-alt',
+} ,
+```
+
+
 #### Keywords (optional)
 
 Sometimes a block could have aliases that help users discover it while searching. For example, an `image` block could also want to be discovered by `photo`. You can do so by providing an array of terms (which can be translated). It is only allowed to add as much as three terms per block.
@@ -268,7 +283,7 @@ useOnce: true,
 
 * **Type:** `Array`
 
-Blocks can be inserted into other blocks as nested content. Sometimes it is useful to restrict a block so that it is only available as a nested block. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
+Blocks are able to be inserted into blocks that use [`InnerBlocks`](https://github.com/WordPress/gutenberg/blob/master/editor/components/inner-blocks/README.md) as nested content. Sometimes it is useful to restrict a block so that it is only available as a nested block. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
 
 Setting `parent` lets a block require that it is only available when nested within the specified blocks.
 

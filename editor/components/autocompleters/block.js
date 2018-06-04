@@ -42,7 +42,7 @@ export function createBlockCompleter( {
 		getOptionLabel( inserterItem ) {
 			const { icon, title } = inserterItem;
 			return [
-				<BlockIcon key="icon" icon={ icon } />,
+				<BlockIcon key="icon" icon={ icon && icon.src } />,
 				title,
 			];
 		},
