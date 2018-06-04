@@ -3,7 +3,8 @@
  */
 import { addQueryArgs } from '@wordpress/url';
 
-var wpAdminURL = "";
+let wpAdminURL = '';
+
 /**
  * Returns the URL of a WPAdmin Page.
  *
