@@ -180,6 +180,56 @@ describe( 'blocks', () => {
 			} );
 		} );
 
+		it( 'should normalize the icon containing an element', () => {
+			const blockType = {
+				settingName: 'settingValue',
+				save: noop, category:
+				'common',
+				title: 'block title',
+				icon: ( <svg width="20" height="20" viewBox="0 0 20 20">
+					<circle cx="10" cy="10" r="10"
+						fill="red" stroke="blue" strokeWidth="10" />
+				</svg> ),
+			};
+			registerBlockType( 'core/test-block-icon-normalize-element', blockType );
+			blockType.mutated = true;
+			expect( getBlockType( 'core/test-block-icon-normalize-element' ) ).toEqual( {
+				name: 'core/test-block-icon-normalize-element',
+				settingName: 'settingValue',
+				save: noop,
+				category: 'common',
+				title: 'block title',
+				icon: {
+					src: ( <svg width="20" height="20" viewBox="0 0 20 20">
+						<circle cx="10" cy="10" r="10"
+							fill="red" stroke="blue" strokeWidth="10" />
+					</svg> ),
+				},
+			} );
+		} );
+
+		it( 'should normalize the icon containing a string', () => {
+			const blockType = {
+				settingName: 'settingValue',
+				save: noop, category:
+				'common',
+				title: 'block title',
+				icon: 'foo',
+			};
+			registerBlockType( 'core/test-block-icon-normalize-string', blockType );
+			blockType.mutated = true;
+			expect( getBlockType( 'core/test-block-icon-normalize-string' ) ).toEqual( {
+				name: 'core/test-block-icon-normalize-string',
+				settingName: 'settingValue',
+				save: noop,
+				category: 'common',
+				title: 'block title',
+				icon: {
+					src: 'foo',
+				},
+			} );
+		} );
+
 		it( 'should store a copy of block type', () => {
 			const blockType = { settingName: 'settingValue', save: noop, category: 'common', title: 'block title' };
 			registerBlockType( 'core/test-block-with-settings', blockType );
