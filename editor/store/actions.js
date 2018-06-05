@@ -60,6 +60,21 @@ export function resetAutosave( post ) {
 }
 
 /**
+ * Returns an action object used in signalling that a patch of updates for the
+ * latest version of the post have been received.
+ *
+ * @param {Object} edits Updated post fields.
+ *
+ * @return {Object} Action object.
+ */
+export function updatePost( edits ) {
+	return {
+		type: 'UPDATE_POST',
+		edits,
+	};
+}
+
+/**
  * Returns an action object used to setup the editor state when first opening an editor.
  *
  * @param {Object}  post            Post object.

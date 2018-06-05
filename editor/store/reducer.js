@@ -217,15 +217,15 @@ export const editor = flow( [
 	// Track undo history, starting at editor initialization.
 	withHistory( {
 		resetTypes: [ 'SETUP_EDITOR_STATE' ],
-		ignoreTypes: [ 'RECEIVE_BLOCKS' ],
+		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
 		shouldOverwriteState,
 	} ),
 
 	// Track whether changes exist, resetting at each post save. Relies on
 	// editor initialization firing post reset as an effect.
 	withChangeDetection( {
-		resetTypes: [ 'SETUP_EDITOR_STATE', 'UPDATE_POST' ],
-		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST' ],
+		resetTypes: [ 'SETUP_EDITOR_STATE', 'REQUEST_POST_UPDATE_START' ],
+		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
 	} ),
 ] )( {
 	edits( state = {}, action ) {

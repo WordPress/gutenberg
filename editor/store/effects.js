@@ -29,6 +29,7 @@ import {
 	setupEditorState,
 	resetAutosave,
 	resetPost,
+	updatePost,
 	receiveBlocks,
 	receiveSharedBlocks,
 	replaceBlock,
@@ -92,25 +93,6 @@ export function removeProvisionalBlock( action, store ) {
 	}
 }
 
-/**
- * Returns true if a requested autosave should occur as a standard save. This
- * is true if the saved post is a draft or auto-draft, and if the request is
- * is issued on behalf of the post author.
- *
- * @param {Object} post Post object
- *
- * @return {boolean} Whether autosave request should be issued as full save.
- */
-function isAutosaveAsDraft( post ) {
-	// TODO: Improve retrieval of current user ID to not rely on this global.
-	const uid = Number( window.userSettings.uid );
-
-	return (
-		uid === post.author &&
-		includes( [ 'draft', 'auto-draft' ], post.status )
-	);
-}
-
 export default {
 	REQUEST_POST_UPDATE( action, store ) {
 		const { dispatch, getState } = store;
@@ -136,6 +118,14 @@ export default {
 			type: 'REQUEST_POST_UPDATE_START',
 			optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
 			isAutosave,
+		} );
+
+		// Optimistically apply updates under the assumption that the post
+		// will be updated. See below logic in success resolution for revert
+		// if the autosave is applied as a revision.
+		dispatch( {
+			...updatePost( toSend ),
+			optimist: { id: POST_UPDATE_TRANSACTION_ID },
 		} );
 
 		let request;
@@ -165,55 +155,63 @@ export default {
 			} );
 		}
 
-		// An autosave may be processed by the server as an update to the post,
-		// in which case it should be treated the same as a regular save so far
-		// as updating canonical post values and resetting change detection.
-		const isEffectiveAutosave = isAutosave && ! isAutosaveAsDraft( post );
-		if ( ! isEffectiveAutosave ) {
-			dispatch( {
-				type: 'UPDATE_POST',
-				edits: toSend,
-				optimist: { id: POST_UPDATE_TRANSACTION_ID },
-			} );
-		}
-
 		request.then(
 			( newPost ) => {
-				const reset = isEffectiveAutosave ? resetAutosave : resetPost;
+				// An autosave may be processed by the server as a regular save
+				// when its update is requested by the author and the post was
+				// draft or auto-draft.
+				const isRevision = newPost.id !== post.id;
 
-				// Autosave response value shape is not the same as the post
-				// endpoint, so even if the server processes it as a regular
-				// save, it can't be received into state directly. Instead,
-				// merge to known saved post with updated common keys.
-				if ( isAutosave && ! isEffectiveAutosave ) {
-					newPost = {
-						...post,
-						...pick( newPost, [
-							// Autosave content fields.
-							'title',
-							'content',
-							'excerpt',
+				// Thus, the following behaviors occur:
+				//
+				//  - If it was a revision, it is treated as latest autosave
+				//    and updates optimistically applied are reverted.
+				//  - If it was an autosave but not revision under the above
+				//    noted conditions, cherry-pick updated properties since
+				//    the received revision entity shares some but not all
+				//    properties of a post.
+				//  - Otherwise, it was a full save and the received entity
+				//    can be considered the new reset post.
+				let updateAction;
+				if ( isRevision ) {
+					updateAction = resetAutosave( newPost );
+				} else if ( isAutosave ) {
+					const revisionEdits = pick( newPost, [
+						// Autosave content fields.
+						'title',
+						'content',
+						'excerpt',
 
-							// UI considers save to have occurred if modified
-							// date of post changes (e.g. PostPreviewButton).
-							//
-							// TODO: Consider more formalized pattern for
-							// identifying a save as having completed.
-							'date',
-							'date_gmt',
-							'modified',
-							'modified_gmt',
-						] ),
-					};
+						// UI considers save to have occurred if modified date
+						// of post changes (e.g. PostPreviewButton).
+						//
+						// TODO: Consider formalized pattern for identifying a
+						// save as having completed.
+						'date',
+						'date_gmt',
+						'modified',
+						'modified_gmt',
+					] );
+
+					updateAction = updatePost( revisionEdits );
+				} else {
+					updateAction = resetPost( newPost );
 				}
 
-				dispatch( reset( newPost ) );
+				dispatch( updateAction );
 
 				dispatch( {
 					type: 'REQUEST_POST_UPDATE_SUCCESS',
 					previousPost: post,
 					post: newPost,
-					optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
+					optimist: {
+						// Note: REVERT is not a failure case here. Rather, it
+						// is simply reversing the assumption that the updates
+						// were applied to the post proper, such that the post
+						// treated as having unsaved changes.
+						type: isRevision ? REVERT : COMMIT,
+						id: POST_UPDATE_TRANSACTION_ID,
+					},
 					isAutosave,
 				} );
 			},
