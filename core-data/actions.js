@@ -81,4 +81,3 @@ export function receiveThemeSupportsFromIndex( index ) {
 		themeSupports: index.theme_supports,
 	};
 }
-

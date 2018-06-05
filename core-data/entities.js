@@ -27,7 +27,7 @@ export const kinds = [
 /**
  * Returns the list of post type entities.
  *
- * @return {Array} entities
+ * @return {Promise} Entities promise
  */
 async function loadPostTypeEntities() {
 	const postTypes = await apiRequest( { path: '/wp/v2/types?context=edit' } );
