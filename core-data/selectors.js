@@ -155,7 +155,7 @@ export const getEntityRecords = createSelector(
 	( state, kind, name ) => {
 		return Object.values( get( state.entities.data, [ kind, name, 'byKey' ] ) );
 	},
-	( state, kind, name ) => get( state.entities.data, [ kind, name, 'byKey' ] )
+	( state, kind, name ) => [ get( state.entities.data, [ kind, name, 'byKey' ] ) ]
 );
 
 /**
