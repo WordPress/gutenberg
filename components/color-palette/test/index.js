@@ -11,10 +11,13 @@ import ColorPalette from '../';
 describe( 'ColorPalette', () => {
 	const colors = [ { name: 'red', color: '#f00' }, { name: 'white', color: '#fff' }, { name: 'blue', color: '#00f' } ];
 	const currentColor = '#f00';
+	const currentColorWithAlpha = { r: 255, g: 0, b: 0, a: 0.5 };
+	const currentColorWithAlphaParsed = 'rgba(255,0,0,0.5)';
 	const onChange = jest.fn();
 
 	const wrapper = shallow( <ColorPalette colors={ colors } value={ currentColor } onChange={ onChange } /> );
-	const buttons = wrapper.find( '.components-color-palette__item-wrapper button' );
+	const wrapperWithAlpha = shallow( <ColorPalette colors={ colors } value={ currentColor } onChange={ onChange } disableAlpha={ false } /> );
+	const buttons = wrapper.find( '.blocks-color-palette__item-wrapper > button' );
 
 	beforeEach( () => {
 		onChange.mockClear();
@@ -84,6 +87,8 @@ describe( 'ColorPalette', () => {
 
 		describe( '.renderContent', () => {
 			const renderedContent = shallow( dropdown.props().renderContent() );
+			const dropdownWithAlpha = wrapperWithAlpha.find( 'Dropdown' );
+			const renderedContentWithAlpha = shallow( dropdownWithAlpha.props().renderContent() );
 
 			test( 'should render dropdown content', () => {
 				expect( renderedContent ).toMatchSnapshot();
@@ -94,6 +99,17 @@ describe( 'ColorPalette', () => {
 
 				expect( onChange ).toHaveBeenCalledTimes( 1 );
 				expect( onChange ).toHaveBeenCalledWith( currentColor );
+			} );
+
+			test( 'should enable alpha channel inside color picker', () => {
+				expect( renderedContentWithAlpha ).toMatchSnapshot();
+			} );
+
+			test( 'should return an rgba value on click.', () => {
+				renderedContentWithAlpha.simulate( 'changeComplete', { rgb: currentColorWithAlpha } );
+
+				expect( onChange ).toHaveBeenCalledTimes( 1 );
+				expect( onChange ).toHaveBeenCalledWith( currentColorWithAlphaParsed );
 			} );
 		} );
 	} );

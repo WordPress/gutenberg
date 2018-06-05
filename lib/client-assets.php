@@ -887,7 +887,27 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
 function gutenberg_enqueue_registered_block_scripts_and_styles() {
 	$is_editor = ( 'enqueue_block_editor_assets' === current_action() );
 
+	// parse and prepare blocks attributes to be used on the 'assets_callback' call
+	if( !$is_editor && is_singular() ) {
+		global $post;
+		$parsed = gutenberg_parse_blocks( $post->post_content );
+		$block_instances = array();
+
+		foreach( $parsed as $block ){
+			if( ! isset( $block['blockName'] ) ){
+				continue;
+			}
+			if( ! isset( $block_instances [ $block['blockName'] ] ) ){
+				$block_instances[ $block['blockName'] ] = array();
+			}
+	
+			$block_instances[ $block['blockName'] ][] = $block['attrs'];
+	
+		}
+	} 
+
 	$block_registry = WP_Block_Type_Registry::get_instance();
+
 	foreach ( $block_registry->get_all_registered() as $block_name => $block_type ) {
 		// Front-end styles.
 		if ( ! empty( $block_type->style ) ) {
@@ -907,6 +927,16 @@ function gutenberg_enqueue_registered_block_scripts_and_styles() {
 		// Editor script.
 		if ( $is_editor && ! empty( $block_type->editor_script ) ) {
 			wp_enqueue_script( $block_type->editor_script );
+		}
+
+		// If the block contains 'assets_callback', we should trigger it here 
+		// for all instances of the block present on the post.
+		if ( isset( $block_instances[ $block_name ] ) && ! empty( $block_type->assets_callback ) ) {
+			foreach( $block_instances[ $block_name ] as $attrs ){
+				$attributes = $block_type->prepare_attributes_for_render( $attrs );
+		
+				return ( string )call_user_func( $block_type->assets_callback, $attributes );
+			}
 		}
 	}
 }

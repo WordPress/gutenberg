@@ -18,7 +18,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import './style.scss';
 import Button from '../button';
 
-export default function ColorPalette( { colors, disableCustomColors = false, value, onChange } ) {
+export default function ColorPalette( { colors, disableCustomColors = false, value, onChange, disableAlpha = true } ) {
 	function applyOrUnset( color ) {
 		return () => onChange( value === color ? undefined : color );
 	}
@@ -65,8 +65,17 @@ export default function ColorPalette( { colors, disableCustomColors = false, val
 					renderContent={ () => (
 						<ChromePicker
 							color={ value }
-							onChangeComplete={ ( color ) => onChange( color.hex ) }
-							disableAlpha
+							onChangeComplete={ ( color ) => {
+								let colorString;
+								if ( typeof color.rgb === 'undefined' || color.rgb.a === 1 ) {
+									colorString = color.hex;
+								} else {
+									const { r, g, b, a } = color.rgb;
+									colorString = 'rgba(' + [ r, g, b, a ].join( ',' ) + ')';
+								}
+								onChange( colorString );
+							} }
+							disableAlpha={ disableAlpha }
 						/>
 					) }
 				/>
