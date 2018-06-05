@@ -1,3 +1,6 @@
+/**
+ * Internal dependencies
+ */
 import createNonceMiddleware from '../nonce';
 
 describe( 'Nonce middleware', () => {

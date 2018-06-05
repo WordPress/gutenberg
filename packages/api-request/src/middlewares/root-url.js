@@ -1,3 +1,6 @@
+/**
+ * Internal dependencies
+ */
 import namespaceAndEndpointMiddleware from './namespace-endpoint';
 
 const createRootURLMiddleware = ( rootURL ) => ( options, next ) => {

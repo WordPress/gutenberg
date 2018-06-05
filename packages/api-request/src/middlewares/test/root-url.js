@@ -1,3 +1,6 @@
+/**
+ * Internal dependencies
+ */
 import createRootUrlMiddleware from '../root-url';
 
 describe( 'Root URL middleware', () => {

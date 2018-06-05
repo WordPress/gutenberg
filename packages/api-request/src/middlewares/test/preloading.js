@@ -1,3 +1,6 @@
+/**
+ * Internal dependencies
+ */
 import createPreloadingMiddleware from '../preloading';
 
 describe( 'Preloading Middleware', () => {

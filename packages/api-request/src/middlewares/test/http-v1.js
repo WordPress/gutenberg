@@ -1,3 +1,6 @@
+/**
+ * Internal dependencies
+ */
 import httpV1Middleware from '../http-v1';
 
 describe( 'HTTP v1 Middleware', () => {

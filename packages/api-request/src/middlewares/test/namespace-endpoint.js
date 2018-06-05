@@ -1,3 +1,6 @@
+/**
+ * Internal dependencies
+ */
 import namespaceEndpointMiddleware from '../namespace-endpoint';
 
 describe( 'Namespace & Endpoint middleware', () => {
