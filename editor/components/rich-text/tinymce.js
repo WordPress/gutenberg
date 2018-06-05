@@ -37,7 +37,7 @@ function needsInternetExplorerInputFix( editorNode ) {
 }
 
 /**
- * Applies a fix that provides `input` events for contenteditable in InternetExplorer.
+ * Applies a fix that provides `input` events for contenteditable in Internet Explorer.
  *
  * @param {Element} editorNode The root editor node.
  *
@@ -101,7 +101,7 @@ const IS_PLACEHOLDER_VISIBLE_ATTR_NAME = 'data-is-placeholder-visible';
 export default class TinyMCE extends Component {
 	constructor() {
 		super();
-		this.saveEditorNode = this.saveEditorNode.bind( this );
+		this.bindEditorNode = this.bindEditorNode.bind( this );
 	}
 
 	componentDidMount() {
@@ -182,7 +182,7 @@ export default class TinyMCE extends Component {
 		} );
 	}
 
-	saveEditorNode( editorNode ) {
+	bindEditorNode( editorNode ) {
 		this.editorNode = editorNode;
 
 		/**
@@ -191,12 +191,12 @@ export default class TinyMCE extends Component {
 		 */
 		if ( this.removeInternetExplorerInputFix ) {
 			this.removeInternetExplorerInputFix();
+			this.removeInternetExplorerInputFix = null;
 		}
 
-		this.removeInternetExplorerInputFix =
-			editorNode && needsInternetExplorerInputFix( editorNode ) ?
-				applyInternetExplorerInputFix( editorNode ) :
-				null;
+		if ( editorNode && needsInternetExplorerInputFix( editorNode ) ) {
+			this.removeInternetExplorerInputFix = applyInternetExplorerInputFix( editorNode );
+		}
 	}
 
 	render() {
@@ -215,7 +215,7 @@ export default class TinyMCE extends Component {
 			className: classnames( className, 'editor-rich-text__tinymce' ),
 			contentEditable: true,
 			[ IS_PLACEHOLDER_VISIBLE_ATTR_NAME ]: isPlaceholderVisible,
-			ref: this.saveEditorNode,
+			ref: this.bindEditorNode,
 			style,
 			suppressContentEditableWarning: true,
 			dangerouslySetInnerHTML: { __html: valueToString( defaultValue, format ) },
