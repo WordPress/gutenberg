@@ -13,6 +13,7 @@ import { __, sprintf, _n } from '@wordpress/i18n';
 import { Component, Fragment } from '@wordpress/element';
 import { keycodes, decodeEntities } from '@wordpress/utils';
 import { Spinner, withInstanceId, withSpokenMessages, Popover } from '@wordpress/components';
+import { prependHTTP } from '@wordpress/url';
 
 const { UP, DOWN, ENTER } = keycodes;
 
@@ -106,7 +107,8 @@ class UrlInput extends Component {
 	}
 
 	onChange( event ) {
-		const inputValue = event.target.value;
+		const inputValue = prependHTTP( event.target.value );
+
 		this.props.onChange( inputValue );
 		this.updateSuggestions( inputValue );
 	}

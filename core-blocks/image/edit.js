@@ -204,7 +204,7 @@ class ImageEdit extends Component {
 							/>
 						) }
 					/>
-					<UrlInputButton onChange={ this.onSetHref } url={ href } />
+					<UrlInputButton onChange={ this.onSetHref } url={ href } { ...this.props } />
 				</Toolbar>
 			</BlockControls>
 		);

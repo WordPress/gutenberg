@@ -47,6 +47,20 @@ const blockAttributes = {
 		source: 'attribute',
 		selector: 'figure > a',
 		attribute: 'href',
+		default: null,
+	},
+	target: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'figure > a',
+		attribute: 'target',
+		default: null,
+	},
+	rel: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'figure > a',
+		attribute: 'rel',
 	},
 	id: {
 		type: 'number',
@@ -193,7 +207,7 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { url, alt, caption, align, href, width, height, id } = attributes;
+		const { url, alt, caption, align, href, width, height, id, target, rel } = attributes;
 
 		const classes = classnames( {
 			[ `align${ align }` ]: align,
@@ -212,7 +226,7 @@ export const settings = {
 
 		return (
 			<figure className={ classes }>
-				{ href ? <a href={ href }>{ image }</a> : image }
+				{ href ? <a href={ href } target={ target } rel={ rel }>{ image }</a> : image }
 				{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
 			</figure>
 		);

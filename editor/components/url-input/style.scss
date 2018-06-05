@@ -109,3 +109,10 @@ $input-size: 230px;
 		height: $icon-button-size;
 	}
 }
+
+.editor-format-toolbar__link-value {
+	&:focus {
+		box-shadow: none;
+	}
+}
+

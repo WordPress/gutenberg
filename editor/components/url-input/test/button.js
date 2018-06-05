@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow, mount } from 'enzyme';
+import { shallow } from 'enzyme';
 
 /**
  * Internal dependencies
@@ -48,20 +48,5 @@ describe( 'UrlInputButton', () => {
 		wrapper.find( '[data-test=\'UrlInput\']' ).simulate( 'change' );
 		wrapper.find( '[data-test=\'UrlInput\']' ).simulate( 'change' );
 		expect( onChangeMock ).toHaveBeenCalledTimes( 2 );
-	} );
-	it( 'should close the form when user clicks Close button', () => {
-		const wrapper = shallow( <UrlInputButton /> );
-		clickEditLink( wrapper );
-		expect( wrapper.state().expanded ).toBe( true );
-		wrapper.find( '.editor-url-input__back' ).simulate( 'click' );
-		expect( wrapper.state().expanded ).toBe( false );
-	} );
-	it( 'should close the form when user submits it', () => {
-		const wrapper = mount( <UrlInputButton /> );
-		clickEditLink( wrapper );
-		expect( wrapper.state().expanded ).toBe( true );
-		wrapper.find( 'form' ).simulate( 'submit' );
-		expect( wrapper.state().expanded ).toBe( false );
-		wrapper.unmount();
 	} );
 } );
