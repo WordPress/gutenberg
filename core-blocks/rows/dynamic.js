@@ -1,25 +1,8 @@
 /**
- * External dependencies
- */
-import { times, range, map } from 'lodash';
-import classnames from 'classnames';
-import memoize from 'memize';
-
-/**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
-import {
-	PanelBody,
-	RangeControl,
-	ButtonGroup,
-	Button,
-} from '@wordpress/components';
-import { Fragment } from '@wordpress/element';
-import {
-	InspectorControls,
-	InnerBlocks,
-} from '@wordpress/editor';
+import { __ } from '@wordpress/i18n';
+import { InnerBlocks } from '@wordpress/editor';
 
 /**
  * Internal dependencies

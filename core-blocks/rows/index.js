@@ -16,6 +16,7 @@ import { InnerBlocks } from '@wordpress/editor';
  * Internal dependencies
  */
 import './style.scss';
+import './editor.scss';
 import { getRows } from './rows';
 
 const rows = getRows();

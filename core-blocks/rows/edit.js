@@ -25,6 +25,7 @@ import {
  * Internal dependencies
  */
 import './style.scss';
+import './editor.scss';
 
 const COLUMNS_TOTAL = 12;
 const MIN_COLUMNS = 2;
@@ -86,9 +87,9 @@ class RowEdit extends Component {
 	}
 
 	render() {
-		const { attributes, setAttributes, className } = this.props;
+		const { attributes, className } = this.props;
 		const { columns, widths } = attributes;
-		
+
 		const classes = classnames( className, 'wp-block-rows' );
 
 		let partial = 0;
@@ -115,19 +116,19 @@ class RowEdit extends Component {
 
 						const lastIndex = availableWidths.length - 1;
 
-						 if ( ( availableWidths.length === 1 && availableWidths[ lastIndex ] !== colWidth ) || colWidth > availableWidths[ lastIndex ] ) {
+						if ( ( availableWidths.length === 1 && availableWidths[ lastIndex ] !== colWidth ) || colWidth > availableWidths[ lastIndex ] ) {
 							colWidth = availableWidths[ lastIndex ];
 							this.onWidthChange( n, availableWidths[ lastIndex ] );
 						}
 
-						partial = partial + ( colWidth - MIN_COLUMNS );							
+						partial = partial + ( colWidth - MIN_COLUMNS );
 
 						return (
 							<PanelBody title={ sprintf( __( 'Column %d width:' ), n + 1 ) }>
 								<ButtonGroup aria-label={ __( 'Column width' ) }>
 									{
 										map( availableWidths, ( width ) => {
-											return ( 
+											return (
 												<Button
 													key={ width }
 													isSmall
@@ -137,7 +138,7 @@ class RowEdit extends Component {
 												>
 													{ width }
 												</Button>
-											) 
+											);
 										} )
 									}
 								</ButtonGroup>

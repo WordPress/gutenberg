@@ -12,7 +12,7 @@ const { basename, resolve } = require( 'path' );
  * WordPress dependencies
  */
 const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
-const LibraryExportDefaultPlugin = require( '../library-export-default-webpack-plugin' );
+const LibraryExportDefaultPlugin = require( '../packages/library-export-default-webpack-plugin' );
 const PostCssWrapper = require( 'postcss-wrapper-loader' );
 const StringReplacePlugin = require( 'string-replace-webpack-plugin' );
 
@@ -44,7 +44,7 @@ const extractConfig = {
 			loader: 'postcss-loader',
 			options: {
 				plugins: [
-					require( '../postcss-themes' )( {
+					require( '../packages/postcss-themes' )( {
 						defaults: {
 							primary: '#0085ba',
 							secondary: '#11a0d2',
@@ -183,10 +183,10 @@ gutenbergPackages.forEach( ( name ) => {
 const config = {
 	mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
 
-	entry: `${ dirname }/packages/gutenberg/src/js/index.js`,
+	entry: `${ dirname }/gutenberg-package/src/js/index.js`,
 	output: {
 		filename: 'js/gutenberg.js',
-		path: `${ dirname }/packages/gutenberg/build`,
+		path: `${ dirname }/gutenberg-package/build`,
 		libraryTarget: 'this',
 	},
 	externals,
