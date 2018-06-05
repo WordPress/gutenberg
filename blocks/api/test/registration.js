@@ -180,11 +180,24 @@ describe( 'blocks', () => {
 			} );
 		} );
 
+		it( 'should validate the icon', () => {
+			const blockType = {
+				settingName: 'settingValue',
+				save: noop,
+				category: 'common',
+				title: 'block title',
+				icon: { chicken: 'ribs' },
+			};
+			const block = registerBlockType( 'core/test-block-icon-normalize-element', blockType );
+			expect( console ).toHaveErroredWith( 'The icon passed is invalid.' );
+			expect( block ).toBeUndefined();
+		} );
+
 		it( 'should normalize the icon containing an element', () => {
 			const blockType = {
 				settingName: 'settingValue',
-				save: noop, category:
-				'common',
+				save: noop,
+				category: 'common',
 				title: 'block title',
 				icon: ( <svg width="20" height="20" viewBox="0 0 20 20">
 					<circle cx="10" cy="10" r="10"
@@ -211,8 +224,8 @@ describe( 'blocks', () => {
 		it( 'should normalize the icon containing a string', () => {
 			const blockType = {
 				settingName: 'settingValue',
-				save: noop, category:
-				'common',
+				save: noop,
+				category: 'common',
 				title: 'block title',
 				icon: 'foo',
 			};
@@ -226,6 +239,68 @@ describe( 'blocks', () => {
 				title: 'block title',
 				icon: {
 					src: 'foo',
+				},
+			} );
+		} );
+
+		it( 'should normalize the icon containing a function', () => {
+			const MyTestIcon = () => {
+				return <svg width="20" height="20" viewBox="0 0 20 20">
+					<circle cx="10" cy="10" r="10"
+						fill="red" stroke="blue" strokeWidth="10" />
+				</svg>;
+			};
+			const blockType = {
+				settingName: 'settingValue',
+				save: noop,
+				category: 'common',
+				title: 'block title',
+				icon: MyTestIcon,
+			};
+			registerBlockType( 'core/test-block-icon-normalize-function', blockType );
+			blockType.mutated = true;
+			expect( getBlockType( 'core/test-block-icon-normalize-function' ) ).toEqual( {
+				name: 'core/test-block-icon-normalize-function',
+				settingName: 'settingValue',
+				save: noop,
+				category: 'common',
+				title: 'block title',
+				icon: {
+					src: MyTestIcon,
+				},
+			} );
+		} );
+
+		it( 'should correctly register an icon with background and a custom svg', () => {
+			const blockType = {
+				settingName: 'settingValue',
+				save: noop,
+				category: 'common',
+				title: 'block title',
+				icon: {
+					background: '#f00',
+					src: ( <svg width="20" height="20" viewBox="0 0 20 20">
+						<circle cx="10" cy="10" r="10"
+							fill="red" stroke="blue" strokeWidth="10" />
+					</svg> ),
+				},
+			};
+			registerBlockType( 'core/test-block-icon-normalize-background', blockType );
+			blockType.mutated = true;
+			expect( getBlockType( 'core/test-block-icon-normalize-background' ) ).toEqual( {
+				name: 'core/test-block-icon-normalize-background',
+				settingName: 'settingValue',
+				save: noop,
+				category: 'common',
+				title: 'block title',
+				icon: {
+					background: '#f00',
+					foreground: '#191e23',
+					shadowColor: 'rgba(255, 0, 0, 0.3)',
+					src: ( <svg width="20" height="20" viewBox="0 0 20 20">
+						<circle cx="10" cy="10" r="10"
+							fill="red" stroke="blue" strokeWidth="10" />
+					</svg> ),
 				},
 			} );
 		} );
