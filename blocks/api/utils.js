@@ -1,14 +1,13 @@
 /**
  * External dependencies
  */
-import { every, keys, isEqual, isFunction, isString } from 'lodash';
+import { every, keys, isEqual } from 'lodash';
 import { default as tinycolor, mostReadable } from 'tinycolor2';
 
 /**
  * WordPress dependencies
  */
 import { applyFilters } from '@wordpress/hooks';
-import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -66,7 +65,7 @@ export function normalizeIconObject( icon ) {
 	if ( ! icon ) {
 		return { src: 'block-default' };
 	}
-	if ( isString( icon ) || isFunction( icon ) || icon instanceof Component ) {
+	if ( ! icon.src ) {
 		return { src: icon };
 	}
 
