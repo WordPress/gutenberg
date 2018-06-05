@@ -95,6 +95,11 @@ describe( 'Change detection', () => {
 			page.click( '.editor-post-publish-panel__toggle' ),
 		] );
 
+		// Disable reason: Wait for animation to complete to avoid click
+		// occuring at wrong point.
+		// eslint-disable-next-line no-restricted-syntax
+		await page.waitFor( 100 );
+
 		await Promise.all( [
 			page.waitForSelector( '.editor-post-publish-panel__header-published' ),
 			page.click( '.editor-post-publish-button' ),
@@ -111,9 +116,9 @@ describe( 'Change detection', () => {
 
 		await Promise.all( [
 			page.waitForSelector( '.editor-post-publish-button.is-busy' ),
+			page.waitForSelector( '.editor-post-publish-button:not( .is-busy )' ),
 			page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() ),
 		] );
-		await page.waitForSelector( '.editor-post-publish-button:not( .is-busy )' );
 
 		await assertIsDirty( true );
 	} );
