@@ -10,3 +10,5 @@ import '@wordpress/core-data';
  */
 export { select, dispatch } from '@wordpress/data';
 export { initializeEditor } from '@wordpress/edit-post';
+export { registerBlockType } from '@wordpress/blocks';
+export * from '@wordpress/editor';
