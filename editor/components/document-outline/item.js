@@ -19,6 +19,7 @@ const TableOfContentsItem = ( {
 	level,
 	onClick,
 	path = [],
+	titleId,
 } ) => (
 	<li
 		className={ classnames(
@@ -29,11 +30,7 @@ const TableOfContentsItem = ( {
 			}
 		) }
 	>
-		<a
-			className="document-outline__button"
-			onClick={ onClick }
-			href="#"
-		>
+		<a onClick={ onClick } href={ '#' + titleId }>
 			<span className="document-outline__emdash" aria-hidden="true"></span>
 			{
 				// path is an array of nodes that are ancestors of the heading starting in the top level node.
