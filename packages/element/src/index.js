@@ -123,7 +123,7 @@ export { createContext };
 /**
  * Checks if an object is a valid WPElement
  *
- * @param {Object} objectToTest A default data stored in the context.
+ * @param {Object} objectToCheck The object to be checked.
  *
  * @return {Boolean} true if objectToTest is a valid WPElement and false otherwise.
  */
