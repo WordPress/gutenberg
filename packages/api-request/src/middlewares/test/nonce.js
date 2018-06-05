@@ -5,6 +5,8 @@ import createNonceMiddleware from '../nonce';
 
 describe( 'Nonce middleware', () => {
 	it( 'should add a nonce header to the request', () => {
+		expect.hasAssertions();
+
 		const nonce = 'nonce';
 		const nonceMiddleware = createNonceMiddleware( nonce );
 		const requestOptions = {
@@ -19,6 +21,8 @@ describe( 'Nonce middleware', () => {
 	} );
 
 	it( 'should not add a nonce header to requests with nonces', () => {
+		expect.hasAssertions();
+
 		const nonce = 'nonce';
 		const nonceMiddleware = createNonceMiddleware( nonce );
 		const requestOptions = {

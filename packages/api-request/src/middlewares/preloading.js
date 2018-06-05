@@ -39,6 +39,7 @@ const createPreloadingMiddleware = ( preloadedData ) => ( options, next ) => {
 		if ( 'GET' === method && preloadedData[ path ] ) {
 			const deferred = jQuery.Deferred();
 			deferred.resolve( preloadedData[ path ].body );
+
 			return deferred.promise();
 		}
 	}

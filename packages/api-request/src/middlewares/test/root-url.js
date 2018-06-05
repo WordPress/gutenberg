@@ -5,6 +5,8 @@ import createRootUrlMiddleware from '../root-url';
 
 describe( 'Root URL middleware', () => {
 	it( 'should append the root URL', () => {
+		expect.hasAssertions();
+
 		const rootURL = 'http://wp.org/wp-admin/rest/';
 		const rootURLMiddleware = createRootUrlMiddleware( rootURL );
 		const requestOptions = {
