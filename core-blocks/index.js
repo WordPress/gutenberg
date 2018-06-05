@@ -43,6 +43,7 @@ import * as video from './video';
 
 import * as post from './post';
 import * as rows from './rows';
+import * as dynamicRow from './rows/dynamic';
 
 export const registerCoreBlocks = () => {
 	[
@@ -55,6 +56,7 @@ export const registerCoreBlocks = () => {
 		list,
 		quote,
 		...rows.blocks,
+		dynamicRow,
 
 		// Register all remaining core blocks.
 		shortcode,
