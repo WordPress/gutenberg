@@ -8,7 +8,7 @@ import { default as tinycolor, mostReadable } from 'tinycolor2';
  * WordPress dependencies
  */
 import { applyFilters } from '@wordpress/hooks';
-import { Component } from '@wordpress/element';
+import { Component, isValidElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -52,6 +52,23 @@ export function isUnmodifiedDefaultBlock( block ) {
 }
 
 /**
+ * Function that checks if the parameter is a valid icon.
+ *
+ * @param {*} icon  Parameter to be checked.
+ *
+ * @return {boolean} True if the parameter is a valid icon and false otherwise.
+ */
+
+export function isValidIcon( icon ) {
+	return !! icon && (
+		isString( icon ) ||
+		isValidElement( icon ) ||
+		isFunction( icon ) ||
+		icon instanceof Component
+	);
+}
+
+/**
  * Function that receives an icon as set by the blocks during the registration
  * and returns a new icon object that is normalized so we can rely on just on possible icon structure
  * in the codebase.
@@ -66,7 +83,7 @@ export function normalizeIconObject( icon ) {
 	if ( ! icon ) {
 		return { src: 'block-default' };
 	}
-	if ( isString( icon ) || isFunction( icon ) || icon instanceof Component ) {
+	if ( isValidIcon( icon ) ) {
 		return { src: icon };
 	}
 
