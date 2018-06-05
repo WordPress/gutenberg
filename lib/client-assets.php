@@ -504,8 +504,19 @@ function gutenberg_preload_api_request( $memo, $path ) {
 
 	$response = rest_do_request( $request );
 	if ( 200 === $response->status ) {
+		$server = rest_get_server();
+		$data   = (array) $response->get_data();
+		if ( method_exists( $server, 'get_compact_response_links' ) ) {
+			$links = call_user_func( array( $server, 'get_compact_response_links' ), $response );
+		} else {
+			$links = call_user_func( array( $server, 'get_response_links' ), $response );
+		}
+		if ( ! empty( $links ) ) {
+			$data['_links'] = $links;
+		}
+
 		$memo[ $path ] = array(
-			'body'    => $response->data,
+			'body'    => $data,
 			'headers' => $response->headers,
 		);
 	}
