@@ -15,7 +15,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import { normalizeIconObject } from './utils';
+import { isValidIcon, normalizeIconObject } from './utils';
 
 /**
  * Defined behavior of a block type.
@@ -141,7 +141,7 @@ export function registerBlockType( name, settings ) {
 	}
 
 	settings.icon = normalizeIconObject( settings.icon );
-	if ( settings.icon === null ) {
+	if ( ! isValidIcon( settings.icon.src ) ) {
 		console.error(
 			'The icon passed is invalid.'
 		);

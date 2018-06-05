@@ -77,20 +77,14 @@ export function isValidIcon( icon ) {
  *                                          as the icon for the block in the
  *                                          inserter, or element or an object describing the icon.
  *
- * @return {?Object} Object describing the icon or null if the icon is invalid and impossible to normalize.
+ * @return {Object} Object describing the icon.
  */
 export function normalizeIconObject( icon ) {
 	if ( ! icon ) {
 		return { src: 'block-default' };
 	}
-	if (
-		isValidIcon( icon )
-	) {
+	if ( isValidIcon( icon ) ) {
 		return { src: icon };
-	}
-
-	if ( ! isValidIcon( icon.src ) ) {
-		return null;
 	}
 
 	if ( icon.background ) {
