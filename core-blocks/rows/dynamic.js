@@ -12,7 +12,7 @@ import edit from './edit';
 export const name = 'rows/dynamic';
 
 export const settings = {
-	title: 'Dynamic row',
+	title: __( 'Dynamic row' ),
 
 	icon: 'columns',
 

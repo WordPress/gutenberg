@@ -87,9 +87,9 @@ export function registerBlockType( name, settings ) {
 	}
 
 	if ( select( 'core/blocks' ).getBlockType( name ) ) {
-		// console.error(
-		//	'Block "' + name + '" is already registered.'
-		// );
+		console.error(
+			'Block "' + name + '" is already registered.'
+		);
 		return;
 	}
 
