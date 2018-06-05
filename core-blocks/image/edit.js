@@ -73,22 +73,19 @@ class ImageEdit extends Component {
 
 	componentDidMount() {
 		const { attributes, setAttributes } = this.props;
-		const { id, url = '', alt: fileName } = attributes;
+		const { id, url = '' } = attributes;
 
 		if ( ! id && url.indexOf( 'blob:' ) === 0 ) {
 			getBlobByURL( url )
-				.then(
-					( file ) => {
-						file.name = fileName;
-						editorMediaUpload( {
-							filesList: [ file ],
-							onFileChange: ( [ image ] ) => {
-								setAttributes( { ...image } );
-							},
-							allowedType: 'image',
-						} );
-					}
-				);
+				.then( ( file ) => {
+					editorMediaUpload( {
+						filesList: [ file ],
+						onFileChange: ( [ image ] ) => {
+							setAttributes( { ...image } );
+						},
+						allowedType: 'image',
+					} );
+				} );
 		}
 	}
 
