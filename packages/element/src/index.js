@@ -10,6 +10,7 @@ import {
 	cloneElement,
 	Children,
 	Fragment,
+	isValidElement,
 } from 'react';
 import { render, findDOMNode, createPortal, unmountComponentAtNode } from 'react-dom';
 import {
@@ -118,6 +119,15 @@ export { Fragment };
  * @return {Object} Context object.
  */
 export { createContext };
+
+/**
+ * Checks if an object is a valid WPElement
+ *
+ * @param {Object} objectToTest A default data stored in the context.
+ *
+ * @return {Boolean} true if objectToTest is a valid WPElement and false otherwise.
+ */
+export { isValidElement };
 
 /**
  * Creates a portal into which a component can be rendered.
