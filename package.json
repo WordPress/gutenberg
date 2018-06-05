@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "3.0.0",
+	"version": "3.0.1",
 	"private": true,
 	"description": "A new WordPress editor experience",
 	"repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -66,7 +66,7 @@
 		"@wordpress/browserslist-config": "2.1.4",
 		"@wordpress/custom-templated-path-webpack-plugin": "1.0.2",
 		"@wordpress/jest-preset-default": "1.0.6",
-		"@wordpress/scripts": "1.1.6",
+		"@wordpress/scripts": "1.2.0",
 		"autoprefixer": "8.2.0",
 		"babel-core": "6.26.0",
 		"babel-eslint": "8.0.3",
@@ -118,37 +118,60 @@
 			}
 		}
 	},
+	"npmPackageJsonLintConfig": {
+		"extends": "@wordpress/npm-package-json-lint-config",
+		"rules": {
+			"require-publishConfig": "error",
+			"valid-values-author": [
+				"error",
+				[
+					"The WordPress Contributors"
+				]
+			],
+			"valid-values-publishConfig": [
+				"error",
+				[
+					{
+						"access": "public"
+					}
+				]
+			]
+		}
+	},
 	"scripts": {
-		"prebuild": "check-node-version --package",
+		"prebuild": "npm run check-engines",
 		"build:packages": "rimraf ./packages/*/build ./packages/*/build-module && node ./bin/packages/build.js",
 		"build": "npm run build:packages && cross-env NODE_ENV=production webpack",
-		"lint": "eslint .",
-		"lint:fix": "eslint . --fix",
-		"lint-php": "docker-compose run --rm composer run-script lint",
-		"predev": "check-node-version --package",
+		"check-engines": "check-node-version --package",
+		"ci": "concurrently \"npm run lint && npm run build\" \"npm run test-unit:coverage-ci\"",
+		"predev": "npm run check-engines",
 		"dev": "npm run build:packages && concurrently \"cross-env webpack --watch\" \"npm run dev:packages\"",
 		"dev:packages": "node ./bin/packages/watch.js",
-		"test": "npm run lint && npm run test-unit",
-		"test-php": "npm run lint-php && npm run test-unit-php",
-		"ci": "concurrently \"npm run lint && npm run build\" \"npm run test-unit:coverage-ci\"",
 		"fixtures:clean": "rimraf \"core-blocks/test/fixtures/*.+(json|serialized.html)\"",
 		"fixtures:server-registered": "docker-compose run -w /var/www/html/wp-content/plugins/gutenberg --rm wordpress ./bin/get-server-blocks.php > core-blocks/test/server-registered.json",
 		"fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
+		"lint": "npm run lint-js && npm run lint-pkg-json",
+		"lint-js": "eslint .",
+		"lint-js:fix": "eslint . --fix",
+		"lint-php": "docker-compose run --rm composer run-script lint",
+		"lint-pkg-json": "wp-scripts lint-pkg-json ./packages",
 		"package-plugin": "./bin/build-plugin-zip.sh",
 		"postinstall": "lerna bootstrap --hoist && npm run build:packages",
 		"pot-to-php": "./bin/pot-to-php.js",
 		"publish:check": "lerna updated",
 		"publish:dev": "lerna publish --npm-tag next",
 		"publish:prod": "lerna publish",
+		"test": "npm run lint && npm run test-unit",
+		"test-e2e": "wp-scripts test-unit-js --config test/e2e/jest.config.json",
+		"test-e2e:watch": "npm run test-e2e -- --watch",
+		"test-php": "npm run lint-php && npm run test-unit-php",
 		"test-unit": "wp-scripts test-unit-js --config test/unit/jest.config.json",
-		"test-unit-php": "docker-compose run --rm wordpress_phpunit phpunit",
-		"test-unit-php-multisite": "docker-compose run -e WP_MULTISITE=1 --rm wordpress_phpunit phpunit",
 		"test-unit:coverage": "npm run test-unit -- --coverage",
 		"test-unit:coverage-ci": "npm run test-unit -- --coverage --maxWorkers 1 && codecov",
 		"test-unit:watch": "npm run test-unit -- --watch",
-		"test-e2e": "wp-scripts test-unit-js --config test/e2e/jest.config.json",
-		"test-e2e:watch": "npm run test-e2e -- --watch",
+		"test-unit-php": "docker-compose run --rm wordpress_phpunit phpunit",
+		"test-unit-php-multisite": "docker-compose run -e WP_MULTISITE=1 --rm wordpress_phpunit phpunit",
 		"build-package:watch": "NODE_ENV=production webpack --config gutenberg-package/webpack.config.js --watch",
 		"build-package": "NODE_ENV=production webpack --config gutenberg-package/webpack.config.js",
 		"prepublish": "npm run lint:fix && npm run build-package"
