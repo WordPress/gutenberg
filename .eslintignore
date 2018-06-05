@@ -3,4 +3,4 @@ build-module
 coverage
 node_modules
 vendor
-packages/gutenberg/build
+gutenberg-package/build

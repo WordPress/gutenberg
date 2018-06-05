@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, find, map } from 'lodash';
+import { get, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -31,7 +31,7 @@ function getInserterMenuCategories() {
 
 	if ( categories !== DEFAULT_CATEGORIES ) {
 		return categories.map( ( cat ) => {
-			return find( DEFAULT_CATEGORIES, { slug: cat } );
+			return DEFAULT_CATEGORIES.find( ( { slug } ) => slug === cat );
 		} );
 	}
 }
