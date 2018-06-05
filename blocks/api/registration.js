@@ -143,7 +143,8 @@ export function registerBlockType( name, settings ) {
 	settings.icon = normalizeIconObject( settings.icon );
 	if ( ! isValidIcon( settings.icon.src ) ) {
 		console.error(
-			'The icon passed is invalid.'
+			'The icon passed is invalid. ' +
+			'The icon should be a string, an element, a function, or an object following the specifications documented in https://wordpress.org/gutenberg/handbook/block-api/#icon-optional'
 		);
 		return;
 	}

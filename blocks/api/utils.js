@@ -56,7 +56,7 @@ export function isUnmodifiedDefaultBlock( block ) {
  *
  * @param {*} icon  Parameter to be checked.
  *
- * @return {Boolean} True if the parameter is a valid icon and false otherwise.
+ * @return {boolean} True if the parameter is a valid icon and false otherwise.
  */
 
 export function isValidIcon( icon ) {

@@ -125,7 +125,7 @@ export { createContext };
  *
  * @param {Object} objectToCheck The object to be checked.
  *
- * @return {Boolean} true if objectToTest is a valid WPElement and false otherwise.
+ * @return {boolean} true if objectToTest is a valid WPElement and false otherwise.
  */
 export { isValidElement };
 

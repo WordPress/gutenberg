@@ -182,20 +182,18 @@ describe( 'blocks', () => {
 
 		it( 'should validate the icon', () => {
 			const blockType = {
-				settingName: 'settingValue',
 				save: noop,
 				category: 'common',
 				title: 'block title',
 				icon: { chicken: 'ribs' },
 			};
 			const block = registerBlockType( 'core/test-block-icon-normalize-element', blockType );
-			expect( console ).toHaveErroredWith( 'The icon passed is invalid.' );
+			expect( console ).toHaveErrored();
 			expect( block ).toBeUndefined();
 		} );
 
 		it( 'should normalize the icon containing an element', () => {
 			const blockType = {
-				settingName: 'settingValue',
 				save: noop,
 				category: 'common',
 				title: 'block title',
@@ -205,10 +203,8 @@ describe( 'blocks', () => {
 				</svg> ),
 			};
 			registerBlockType( 'core/test-block-icon-normalize-element', blockType );
-			blockType.mutated = true;
 			expect( getBlockType( 'core/test-block-icon-normalize-element' ) ).toEqual( {
 				name: 'core/test-block-icon-normalize-element',
-				settingName: 'settingValue',
 				save: noop,
 				category: 'common',
 				title: 'block title',
@@ -223,17 +219,14 @@ describe( 'blocks', () => {
 
 		it( 'should normalize the icon containing a string', () => {
 			const blockType = {
-				settingName: 'settingValue',
 				save: noop,
 				category: 'common',
 				title: 'block title',
 				icon: 'foo',
 			};
 			registerBlockType( 'core/test-block-icon-normalize-string', blockType );
-			blockType.mutated = true;
 			expect( getBlockType( 'core/test-block-icon-normalize-string' ) ).toEqual( {
 				name: 'core/test-block-icon-normalize-string',
-				settingName: 'settingValue',
 				save: noop,
 				category: 'common',
 				title: 'block title',
@@ -251,17 +244,14 @@ describe( 'blocks', () => {
 				</svg>;
 			};
 			const blockType = {
-				settingName: 'settingValue',
 				save: noop,
 				category: 'common',
 				title: 'block title',
 				icon: MyTestIcon,
 			};
 			registerBlockType( 'core/test-block-icon-normalize-function', blockType );
-			blockType.mutated = true;
 			expect( getBlockType( 'core/test-block-icon-normalize-function' ) ).toEqual( {
 				name: 'core/test-block-icon-normalize-function',
-				settingName: 'settingValue',
 				save: noop,
 				category: 'common',
 				title: 'block title',
@@ -273,7 +263,6 @@ describe( 'blocks', () => {
 
 		it( 'should correctly register an icon with background and a custom svg', () => {
 			const blockType = {
-				settingName: 'settingValue',
 				save: noop,
 				category: 'common',
 				title: 'block title',
@@ -286,10 +275,8 @@ describe( 'blocks', () => {
 				},
 			};
 			registerBlockType( 'core/test-block-icon-normalize-background', blockType );
-			blockType.mutated = true;
 			expect( getBlockType( 'core/test-block-icon-normalize-background' ) ).toEqual( {
 				name: 'core/test-block-icon-normalize-background',
-				settingName: 'settingValue',
 				save: noop,
 				category: 'common',
 				title: 'block title',
