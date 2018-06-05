@@ -116,10 +116,7 @@ export default {
 		const { dispatch, getState } = store;
 		const state = getState();
 		const post = getCurrentPost( state );
-		const isAutosave = (
-			get( action.options, [ 'autosave' ], false ) &&
-			! isAutosaveAsDraft( post )
-		);
+		const isAutosave = get( action.options, [ 'autosave' ], false );
 
 		// Prevent save if not saveable.
 		const isSaveable = isAutosave ? isEditedPostAutosaveable : isEditedPostSaveable;
@@ -158,12 +155,6 @@ export default {
 				data: toSend,
 			} );
 		} else {
-			dispatch( {
-				type: 'UPDATE_POST',
-				edits: toSend,
-				optimist: { id: POST_UPDATE_TRANSACTION_ID },
-			} );
-
 			dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
 			dispatch( removeNotice( AUTOSAVE_POST_NOTICE_ID ) );
 
@@ -174,9 +165,48 @@ export default {
 			} );
 		}
 
+		// An autosave may be processed by the server as an update to the post,
+		// in which case it should be treated the same as a regular save so far
+		// as updating canonical post values and resetting change detection.
+		const isEffectiveAutosave = isAutosave && ! isAutosaveAsDraft( post );
+		if ( ! isEffectiveAutosave ) {
+			dispatch( {
+				type: 'UPDATE_POST',
+				edits: toSend,
+				optimist: { id: POST_UPDATE_TRANSACTION_ID },
+			} );
+		}
+
 		request.then(
 			( newPost ) => {
-				const reset = isAutosave ? resetAutosave : resetPost;
+				const reset = isEffectiveAutosave ? resetAutosave : resetPost;
+
+				// Autosave response value shape is not the same as the post
+				// endpoint, so even if the server processes it as a regular
+				// save, it can't be received into state directly. Instead,
+				// merge to known saved post with updated common keys.
+				if ( isAutosave && ! isEffectiveAutosave ) {
+					newPost = {
+						...post,
+						...pick( newPost, [
+							// Autosave content fields.
+							'title',
+							'content',
+							'excerpt',
+
+							// UI considers save to have occurred if modified
+							// date of post changes (e.g. PostPreviewButton).
+							//
+							// TODO: Consider more formalized pattern for
+							// identifying a save as having completed.
+							'date',
+							'date_gmt',
+							'modified',
+							'modified_gmt',
+						] ),
+					};
+				}
+
 				dispatch( reset( newPost ) );
 
 				dispatch( {
