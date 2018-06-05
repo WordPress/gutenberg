@@ -141,6 +141,12 @@ export function registerBlockType( name, settings ) {
 	}
 
 	settings.icon = normalizeIconObject( settings.icon );
+	if ( settings.icon === null ) {
+		console.error(
+			'The icon passed is invalid.'
+		);
+		return;
+	}
 
 	if ( 'isPrivate' in settings ) {
 		deprecated( 'isPrivate', {
