@@ -494,6 +494,16 @@ test( 'Test doingAction, didAction and hasAction.', () => {
 	doAction( 'another.action' );
 	expect( doingAction( 'test.action' ) ).toBe( false );
 
+	// Verify an action with no handlers is still counted
+	expect( didAction( 'unattached.action' ) ).toBe( 0 );
+	doAction( 'unattached.action' );
+	expect( doingAction( 'unattached.action' ) ).toBe( false );
+	expect( didAction( 'unattached.action' ) ).toBe( 1 );
+
+	doAction( 'unattached.action' );
+	expect( doingAction( 'unattached.action' ) ).toBe( false );
+	expect( didAction( 'unattached.action' ) ).toBe( 2 );
+
 	// Verify hasAction returns 0 when no matching action.
 	expect( hasAction( 'notatest.action' ) ).toBe( false );
 } );

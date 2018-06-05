@@ -22,9 +22,16 @@ function createRunHook( hooks, returnFirstArg ) {
 	 */
 	return function runHooks( hookName, ...args ) {
 		let handlers;
-		if ( hooks[ hookName ] ) {
-			handlers = hooks[ hookName ].handlers;
+		if ( ! hooks[ hookName ] ) {
+			hooks[ hookName ] = {
+				handlers: [],
+				runs: 0,
+			};
 		}
+
+		hooks[ hookName ].runs++;
+
+		handlers = hooks[ hookName ].handlers;
 
 		if ( ! handlers || ! handlers.length ) {
 			return returnFirstArg
@@ -45,7 +52,6 @@ function createRunHook( hooks, returnFirstArg ) {
 				handlers: [],
 			};
 		}
-		hooks[ hookName ].runs++;
 
 		while ( hookInfo.currentIndex < handlers.length ) {
 			const handler = handlers[ hookInfo.currentIndex ];
