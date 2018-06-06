@@ -39,3 +39,14 @@ export function disableTips() {
 		type: 'DISABLE_TIPS',
 	};
 }
+
+/**
+ * Returns an action object that, when dispatched, makes all tips show again.
+ *
+ * @return {Object} Action object.
+ */
+export function enableTips() {
+	return {
+		type: 'ENABLE_TIPS',
+	};
+}

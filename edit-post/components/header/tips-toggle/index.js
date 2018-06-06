@@ -9,29 +9,32 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/element';
 import { MenuItem } from '@wordpress/components';
-import { ifViewportMatches } from '@wordpress/viewport';
 
-function FixedToolbarToggle( { onToggle, isActive } ) {
+function TipsToggle( { onToggle, isActive } ) {
 	return (
 		<MenuItem
 			icon={ isActive && 'yes' }
 			isSelected={ isActive }
 			onClick={ onToggle }
 		>
-			{ __( 'Fix Toolbar to Top' ) }
+			{ __( 'Show Tips' ) }
 		</MenuItem>
 	);
 }
 
 export default compose( [
 	withSelect( ( select ) => ( {
-		isActive: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
+		isActive: select( 'core/nux' ).areTipsEnabled(),
 	} ) ),
 	withDispatch( ( dispatch, ownProps ) => ( {
 		onToggle() {
-			dispatch( 'core/edit-post' ).toggleFeature( 'fixedToolbar' );
+			const { disableTips, enableTips } = dispatch( 'core/nux' );
+			if ( ownProps.isActive ) {
+				disableTips();
+			} else {
+				enableTips();
+			}
 			ownProps.onToggle();
 		},
 	} ) ),
-	ifViewportMatches( 'medium' ),
-] )( FixedToolbarToggle );
+] )( TipsToggle );

@@ -38,14 +38,14 @@ describe( 'DotTip', () => {
 		expect( onDismiss ).toHaveBeenCalled();
 	} );
 
-	it( 'should call onDismiss when the X button is clicked', () => {
-		const onDismiss = jest.fn();
+	it( 'should call onDisable when the X button is clicked', () => {
+		const onDisable = jest.fn();
 		const wrapper = shallow(
-			<DotTip isVisible onDismiss={ onDismiss }>
+			<DotTip isVisible onDisable={ onDisable }>
 				It looks like you’re writing a letter. Would you like help?
 			</DotTip>
 		);
-		wrapper.find( 'IconButton[label="Dismiss tip"]' ).first().simulate( 'click' );
-		expect( onDismiss ).toHaveBeenCalled();
+		wrapper.find( 'IconButton[label="Disable tips"]' ).first().simulate( 'click' );
+		expect( onDisable ).toHaveBeenCalled();
 	} );
 } );
