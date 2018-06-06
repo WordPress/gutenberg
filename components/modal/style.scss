@@ -1,13 +1,14 @@
+// The scrim behind the modal window.
 .components-modal__screen-overlay {
 	position: fixed;
 	top: 0;
-	left: 0;
 	right: 0;
 	bottom: 0;
-	background-color: rgba(0, 0, 0, 0.6);
+	left: 0;
+	background-color: rgba( $white, .4 );
 	z-index: z-index( '.components-modal__screen-overlay' );
-	// on mobile the main content area has to scroll
-	// otherwise you can invoke the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻
+
+	// On mobile the main content area has to scroll, otherwise you can invoke the overscroll bounce on the non-scrolling container.
 	@include break-small {
 		position: fixed;
 		top: $admin-bar-height-big;
@@ -18,42 +19,49 @@
 	}
 }
 
+// The modal window element.
 .components-modal__frame {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	right: auto;
-	bottom: auto;
-	width: auto;
-	max-width: calc( 100vh - 200px );
-	max-height: 90%;
-	border: 0;
-	border-radius: 0;
-	margin-right: -50%;
-	transform: translate(-50%, -50%);
-	background-color: #fff;
-	outline: none;
-	box-shadow: 0 3px 25px #000;
-
 	// In small screens the content needs to be full width.
-	@media ( max-width: #{ ( $break-small ) } ) {
-		position: fixed;
-		top: 0;
-		bottom: 0;
-		right: 0;
-		left: 0;
-		margin: 0;
-		transform: initial;
-		max-width: none;
-		max-height: none;
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	margin: 0;
+
+	// Show slightly bigger on small screens.
+	@include break-small() {
+		position: absolute;
+		right: auto;
+		bottom: auto;
+		max-width: calc( 100% - #{ $panel-padding } - #{ $panel-padding } );
+		margin-right: -50%;
+		transform: translate( -50%, 0 );
+		top: $panel-padding;
+		left: 50%;
+		height: 90%;
 	}
+
+	// Show pretty big on desktop breakpoints.
+	@include break-medium () {
+		max-width: calc( #{ $break-medium } - #{ $panel-padding } - #{ $panel-padding } );
+		transform: translate( -50%, -30% );
+		top: 30%;
+		left: 50%;
+		height: 70%;
+	}
+
+	border: 1px solid $light-gray-500;
+	background-color: $white;
+	box-shadow: $shadow-modal;
+	outline: none;
 }
 
 .components-modal__header {
 	box-sizing: border-box;
 	height: $header-height;
 	border-bottom: 1px solid $light-gray-500;
-	padding: 10px;
+	padding: $item-spacing $item-spacing $item-spacing $panel-padding;
 	display: flex;
 	flex-direction: row;
 	align-items: stretch;
@@ -72,7 +80,6 @@
 		h1 {
 			font-size: 1em;
 			font-weight: normal;
-			padding-left: 5px;
 		}
 
 		span {
@@ -89,16 +96,10 @@
 
 .components-modal__content {
 	// The height of the content is the height of it's parent, minus the header. after that, the offset was 3px.
-	max-height: calc( 100vh - 200px - #{ $header-height } );
+	height: calc( 100% - #{ $header-height } - #{ $admin-bar-height } );
 	overflow: auto;
-	padding: 10px;
+	padding: $panel-padding;
 	z-index: z-index( '.components-modal__content' );
-
-	@media ( max-width: #{ ( $break-small ) } ) {
-		max-height: calc( 100vh );
-	}
 }
 
 @include editor-left( '.components-modal__screen-overlay' );
-
-
