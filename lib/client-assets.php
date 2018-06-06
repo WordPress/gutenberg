@@ -487,6 +487,13 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 
  * @return array        Modified reduce accumulator.
  */
 function gutenberg_preload_api_request( $memo, $path ) {
+
+	// array_reduce() doesn't support passing an array in PHP 5.2
+	// so we need to make sure we start with one.
+	if ( ! is_array( $memo ) ) {
+		$memo = array();
+	}
+
 	if ( empty( $path ) ) {
 		return $memo;
 	}
