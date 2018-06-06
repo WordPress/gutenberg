@@ -20,6 +20,7 @@ import {
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
+import { dispatch as dispatchAction } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -111,7 +112,7 @@ export default {
 			content: getEditedPostContent( state ),
 			id: post.id,
 		};
-		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( state ) );
+		const postType = getCurrentPostType( state );
 
 		dispatch( {
 			type: 'REQUEST_POST_UPDATE_START',
@@ -130,6 +131,7 @@ export default {
 				parent: post.id,
 			};
 
+			const basePath = wp.api.getPostTypeRoute( postType );
 			request = wp.apiRequest( {
 				path: `/wp/v2/${ basePath }/${ post.id }/autosaves`,
 				method: 'POST',
@@ -145,11 +147,7 @@ export default {
 			dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
 			dispatch( removeNotice( AUTOSAVE_POST_NOTICE_ID ) );
 
-			request = wp.apiRequest( {
-				path: `/wp/v2/${ basePath }/${ post.id }`,
-				method: 'PUT',
-				data: toSend,
-			} );
+			request = dispatchAction( 'core' ).updateEntityRecord( 'postType', postType, toSend );
 		}
 
 		request.then(

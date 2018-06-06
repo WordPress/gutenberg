@@ -75,16 +75,20 @@ export default function createStoreRuntime( store ) {
 	return async ( actionCreator ) => {
 		if ( isActionLike( actionCreator ) ) {
 			store.dispatch( actionCreator );
-			return;
+			return actionCreator;
 		}
 
 		// Attempt to normalize the action creator as async iterable.
 		actionCreator = toAsyncIterable( actionCreator );
-		for await ( const maybeAction of actionCreator ) {
+		let ret;
+		do {
+			ret = await actionCreator.next();
 			// Dispatch if it quacks like an action.
-			if ( isActionLike( maybeAction ) ) {
-				store.dispatch( maybeAction );
+			if ( isActionLike( ret.value ) ) {
+				store.dispatch( ret.value );
 			}
-		}
+		} while ( ! ret.done );
+
+		return ret.value;
 	};
 }
