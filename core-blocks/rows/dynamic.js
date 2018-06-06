@@ -21,11 +21,11 @@ export const settings = {
 	attributes: {
 		columns: {
 			type: 'number',
-			default: 2,
+			default: 1,
 		},
 		widths: {
 			type: 'string',
-			default: '6,6',
+			default: '12',
 		},
 	},
 
@@ -37,9 +37,9 @@ export const settings = {
 
 	edit,
 
-	save() {
+	save( { className } ) {
 		return (
-			<div className={ 'wp-block-rows' }>
+			<div className={ className }>
 				<InnerBlocks.Content />
 			</div>
 		);
