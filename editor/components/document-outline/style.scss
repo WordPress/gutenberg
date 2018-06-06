@@ -37,7 +37,7 @@
 	}
 }
 
-.document-outline__button {
+.document-outline__trigger {
 	cursor: pointer;
 	background: none;
 	border: none;
@@ -45,9 +45,14 @@
 	align-items: flex-start;
 	color: $dark-gray-800;
 	text-align: left;
+	text-decoration: none;
 
 	&:focus {
 		@include button-style__focus-active;
+	}
+
+	.document-outline__item-content {
+	  text-decoration: underline;
 	}
 }
 

@@ -30,7 +30,11 @@ const TableOfContentsItem = ( {
 			}
 		) }
 	>
-		<a onClick={ onClick } href={ '#' + titleId }>
+		<a
+			onClick={ onClick }
+			className="document-outline__trigger"
+			href={ '#' + titleId }
+		>
 			<span className="document-outline__emdash" aria-hidden="true"></span>
 			{
 				// path is an array of nodes that are ancestors of the heading starting in the top level node.
