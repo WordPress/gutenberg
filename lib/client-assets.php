@@ -796,6 +796,10 @@ function gutenberg_prepare_blocks_for_js() {
  * @since 0.4.0
  */
 function gutenberg_common_scripts_and_styles() {
+	if ( ! is_gutenberg_page() && is_admin() ) {
+		return;
+	}
+
 	// Enqueue basic styles built out of Gutenberg through `npm build`.
 	wp_enqueue_style( 'wp-core-blocks' );
 
@@ -1142,21 +1146,7 @@ JS;
  * Remove this in Gutenberg 3.1
  */
 function polyfill_blocks_module_in_scripts() {
-	global $post;
-
-	if ( ! is_admin() ) {
-		return;
-	}
-
-	if ( get_current_screen()->base !== 'post' ) {
-		return;
-	}
-
-	if ( isset( $_GET['classic-editor'] ) ) {
-		return;
-	}
-
-	if ( ! gutenberg_can_edit_post( $post ) ) {
+	if ( ! is_gutenberg_page() ) {
 		return;
 	}
 
