@@ -22,10 +22,15 @@ const createEntityRecordGetter = ( source ) => defaultEntities.reduce( ( result,
 
 const entityResolvers = createEntityRecordGetter( resolvers );
 const entitySelectors = createEntityRecordGetter( selectors );
+const entityActions = defaultEntities.reduce( ( result, entity ) => {
+	const { kind, name } = entity;
+	result[ getMethodName( kind, name, 'update' ) ] = actions.updateEntityRecord.bind( null, kind, name );
+	return result;
+}, {} );
 
 const store = registerStore( REDUCER_KEY, {
 	reducer,
-	actions,
+	actions: { ...actions, ...entityActions },
 	selectors: { ...selectors, ...entitySelectors },
 	resolvers: { ...resolvers, ...entityResolvers },
 } );

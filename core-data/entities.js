@@ -7,11 +7,11 @@ import { upperFirst, camelCase, map, find } from 'lodash';
  * WordPress dependencies
  */
 import apiRequest from '@wordpress/api-request';
+import { select } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { getEntitiesByKind } from './selectors';
 import { addEntities } from './actions';
 
 export const defaultEntities = [
@@ -61,13 +61,12 @@ export const getMethodName = ( kind, name, prefix = 'get', usePlural = false ) =
 /**
  * Loads the kind entities into the store.
  *
- * @param {Object} state Global state
  * @param {string} kind  Kind
  *
  * @return {Array} Entities
  */
-export async function* getKindEntities( state, kind ) {
-	let entities = getEntitiesByKind( state, kind );
+export async function* getKindEntities( kind ) {
+	let entities = select( 'core' ).getEntitiesByKind( kind );
 
 	if ( entities && entities.length !== 0 ) {
 		return entities;

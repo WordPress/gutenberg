@@ -1,7 +1,17 @@
 /**
  * External dependencies
  */
-import { castArray } from 'lodash';
+import { castArray, find } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import apiRequest from '@wordpress/api-request';
+
+/**
+ * Internal dependencies
+ */
+import { getKindEntities } from './entities';
 
 /**
  * Returns an action object used in signalling that terms have been received
@@ -80,4 +90,31 @@ export function receiveThemeSupportsFromIndex( index ) {
 		type: 'RECEIVE_THEME_SUPPORTS',
 		themeSupports: index.theme_supports,
 	};
+}
+
+/**
+ * Action generator to trigger update an entity record.
+ *
+ * @param {string}       kind    Kind of the received entity.
+ * @param {string}       name    Name of the received entity.
+ * @param {Object}       record  Records to update.
+ *
+ * @return {Promise} Promise of the updated post
+ */
+export async function* updateEntityRecord( kind, name, record ) {
+	const entities = yield* getKindEntities( kind );
+	const entity = find( entities, { kind, name } );
+	if ( ! entity ) {
+		return;
+	}
+
+	const key = entity.key || 'id';
+	const updatedRecord = await apiRequest( {
+		path: `${ entity.baseUrl }/${ record[ key ] }?context=edit`,
+		method: 'PUT',
+		data: record,
+	} );
+	yield receiveEntityRecords( kind, name, updatedRecord );
+
+	return updatedRecord;
 }
