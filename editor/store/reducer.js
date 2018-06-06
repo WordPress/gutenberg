@@ -1085,7 +1085,12 @@ export function autosave( state = null, action ) {
 				'content',
 			].map( ( field ) => getPostRawValue( post[ field ] ) );
 
-			return { title, excerpt, content };
+			return {
+				title,
+				excerpt,
+				content,
+				preview_link: post.preview_link,
+			};
 	}
 
 	return state;
