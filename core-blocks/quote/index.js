@@ -74,9 +74,9 @@ export const settings = {
 					const items = attributes.map( ( { content } ) => content );
 					const hasItems = ! items.every( isEmpty );
 					return createBlock( 'core/quote', {
-						value: hasItems ? [
-							{ children: items.map( ( content, index ) => <p key={ index }>{ content }</p> ) },
-						] : [],
+						value: hasItems ?
+							items.map( ( content, index ) => ( { children: <p key={ index }>{ content }</p> } ) ) :
+							[],
 					} );
 				},
 			},
