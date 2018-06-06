@@ -7,9 +7,9 @@ import {
 	ClipboardButton,
 	IconButton,
 	Toolbar,
-	withAPIData,
 	withNotices,
 } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 import { Component, compose, Fragment } from '@wordpress/element';
 import {
 	MediaUpload,
@@ -79,7 +79,7 @@ class FileEdit extends Component {
 				fileName: media.title,
 				textLinkHref: media.url,
 				id: media.id,
-			}, this.props.media.get /* refetch attachment page url */ );
+			} );
 		}
 	}
 
@@ -106,7 +106,7 @@ class FileEdit extends Component {
 			media,
 		} = this.props;
 		const { showCopyConfirmation } = this.state;
-		const attachmentPage = ( id !== undefined ) && media.data && media.data.link;
+		const attachmentPage = media && media.link;
 
 		const classNames = [
 			className,
@@ -221,8 +221,12 @@ class FileEdit extends Component {
 }
 
 export default compose( [
-	withAPIData( ( props ) => ( {
-		media: `/wp/v2/media/${ props.attributes.id }`,
-	} ) ),
+	withSelect( ( select, props ) => {
+		const { getMedia } = select( 'core' );
+		const { id } = props.attributes;
+		return {
+			media: id === undefined ? undefined : getMedia( id ),
+		};
+	} ),
 	withNotices,
 ] )( FileEdit );
