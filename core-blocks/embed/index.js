@@ -255,7 +255,7 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 				return (
 					<Fragment>
 						{ controls }
-						<figure className={ classnames( className, { 'is-video': 'video' === type } ) }>
+						<figure className={ classnames( className, 'wp-block-embed', { 'is-video': 'video' === type } ) }>
 							{ ( cannotPreview ) ? (
 								<Placeholder icon={ icon } label={ __( 'Embed URL' ) }>
 									<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
