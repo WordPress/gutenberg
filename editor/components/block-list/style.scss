@@ -243,7 +243,7 @@
 
 	// Hover style
 	&.is-hovered > .editor-block-list__block-edit:before {
-		outline: 1px solid $blue-medium-focus;
+		outline: 1px solid theme( outlines );
 	}
 }
 
@@ -848,7 +848,7 @@
 		font-family: $default-font;
 		font-size: 11px;
 		padding: 4px 4px;
-		background: $blue-medium-focus;
+		background: theme( outlines );
 		color: $white;
 	
 		// Animate in
