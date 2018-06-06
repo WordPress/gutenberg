@@ -26,7 +26,7 @@ module.exports = {
 		'jest/globals': true,
 	},
 	globals: {
-		wpApiSchema: true,
+		wpApiSettings: true,
 	},
 	plugins: [
 		'jest',
