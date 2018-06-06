@@ -56,6 +56,9 @@ export function createBlockCompleter( {
 				value: createBlock( name, initialAttributes ),
 			};
 		},
+		isOptionDisabled( inserterItem ) {
+			return inserterItem.isDisabled;
+		},
 	};
 }
 
