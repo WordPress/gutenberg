@@ -71,9 +71,11 @@ describe( 'getEntityRecord', () => {
 	it( 'should return undefined for unknown record\'s key', () => {
 		const state = deepFreeze( {
 			entities: {
-				root: {
-					postType: {
-						byKey: {},
+				data: {
+					root: {
+						postType: {
+							byKey: {},
+						},
 					},
 				},
 			},
@@ -84,10 +86,12 @@ describe( 'getEntityRecord', () => {
 	it( 'should return a record by key', () => {
 		const state = deepFreeze( {
 			entities: {
-				root: {
-					postType: {
-						byKey: {
-							post: { slug: 'post' },
+				data: {
+					root: {
+						postType: {
+							byKey: {
+								post: { slug: 'post' },
+							},
 						},
 					},
 				},
@@ -101,9 +105,11 @@ describe( 'getEntityRecords', () => {
 	it( 'should return an empty array by default', () => {
 		const state = deepFreeze( {
 			entities: {
-				root: {
-					postType: {
-						byKey: {},
+				data: {
+					root: {
+						postType: {
+							byKey: {},
+						},
 					},
 				},
 			},
@@ -114,11 +120,13 @@ describe( 'getEntityRecords', () => {
 	it( 'should return all the records', () => {
 		const state = deepFreeze( {
 			entities: {
-				root: {
-					postType: {
-						byKey: {
-							post: { slug: 'post' },
-							page: { slug: 'page' },
+				data: {
+					root: {
+						postType: {
+							byKey: {
+								post: { slug: 'post' },
+								page: { slug: 'page' },
+							},
 						},
 					},
 				},
@@ -130,3 +138,4 @@ describe( 'getEntityRecords', () => {
 		] );
 	} );
 } );
+
