@@ -183,6 +183,10 @@ export class RichText extends Component {
 		if ( this.props.setFocusedElement ) {
 			this.props.setFocusedElement( this.props.instanceId );
 		}
+
+		if ( this.props.onFocus ) {
+			this.props.onFocus( this.editor );
+		}
 	}
 
 	onInit() {
@@ -852,6 +856,7 @@ export class RichText extends Component {
 			formatters,
 			autocompleters,
 			format,
+			onSelect,
 		} = this.props;
 
 		const ariaProps = { ...pickAriaProps( this.props ), 'aria-multiline': !! MultilineTag };
@@ -889,7 +894,7 @@ export class RichText extends Component {
 						{ formatToolbar }
 					</div>
 				) }
-				<Autocomplete onReplace={ this.props.onReplace } completers={ autocompleters }>
+				<Autocomplete onReplace={ this.props.onReplace } completers={ autocompleters } onSelect={ onSelect }>
 					{ ( { isExpanded, listBoxId, activeId } ) => (
 						<Fragment>
 							<TinyMCE

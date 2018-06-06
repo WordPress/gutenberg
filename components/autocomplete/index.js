@@ -238,10 +238,9 @@ export class Autocomplete extends Component {
 	}
 
 	select( option ) {
-		const { onReplace } = this.props;
+		const { onReplace, onSelect } = this.props;
 		const { open, range, query } = this.state;
 		const { getOptionCompletion } = open || {};
-
 		this.reset();
 
 		if ( getOptionCompletion ) {
@@ -258,12 +257,17 @@ export class Autocomplete extends Component {
 				this.insertCompletion( range, value );
 			} else if ( 'backcompat' === action ) {
 				// NOTE: This block should be removed once we no longer support the old completer interface.
-				const onSelect = value;
+				const onSelectValue = value;
 				const deprecatedOptionObject = option.value;
-				const selectionResult = onSelect( deprecatedOptionObject.value, range, query );
+				const selectionResult = onSelectValue( deprecatedOptionObject.value, range, query );
 				if ( selectionResult !== undefined ) {
 					this.insertCompletion( range, selectionResult );
 				}
+			}
+
+			// Call the Autocomplete component's onSelect method if available.
+			if ( onSelect ) {
+				onSelect( completion );
 			}
 		}
 	}

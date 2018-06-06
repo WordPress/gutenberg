@@ -8,6 +8,7 @@ import { __ } from '@wordpress/i18n';
  * Internal Dependencies
  */
 import PostStatus from '../post-status';
+import PostAuthor from '../post-author';
 import PostExcerpt from '../post-excerpt';
 import PostTaxonomies from '../post-taxonomies';
 import FeaturedImage from '../featured-image';
@@ -28,6 +29,7 @@ const DocumentSidebar = () => (
 		<SettingsHeader sidebarName={ SIDEBAR_NAME } />
 		<Panel>
 			<PostStatus />
+			<PostAuthor />
 			<LastRevision />
 			<PostTaxonomies />
 			<FeaturedImage />
