@@ -50,9 +50,16 @@ export class PostPreviewButton extends Component {
 	}
 
 	saveForPreview( event ) {
-		const { isDirty, isNew } = this.props;
+		const { previewLink, isDirty, isNew } = this.props;
+
 		// Let default link behavior occur if no changes to saved post
 		if ( ! isDirty && ! isNew ) {
+			return;
+		}
+
+		// Likewise, if a preview URL is available and already assigned as
+		// the href of the clicked link, there's no need for the interstitial.
+		if ( previewLink && event.target.href === previewLink ) {
 			return;
 		}
 
@@ -100,13 +107,13 @@ export class PostPreviewButton extends Component {
 	}
 
 	render() {
-		const { currentPostLink, isSaveable } = this.props;
+		const { previewLink, currentPostLink, isSaveable } = this.props;
 
 		return (
 			<Button
 				className="editor-post-preview"
 				isLarge
-				href={ currentPostLink }
+				href={ previewLink || currentPostLink }
 				onClick={ this.saveForPreview }
 				target={ this.getWindowTarget() }
 				disabled={ ! isSaveable }
