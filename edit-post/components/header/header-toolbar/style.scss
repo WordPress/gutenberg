@@ -11,8 +11,10 @@
 	display: inline-flex;
 	align-items: center;
 
-	.editor-block-switcher .components-toolbar {
-		border: none;
+	@include break-large() {
+		.editor-block-switcher .components-toolbar {
+			border-left: 1px solid $light-gray-500;
+		}
 	}
 }
 

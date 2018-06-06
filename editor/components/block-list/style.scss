@@ -803,11 +803,8 @@
 .editor-block-contextual-toolbar .editor-block-toolbar {
 	width: 100%;
 	background: $white;
-
-	// use opacity to work in various editor styles
-	background-clip: padding-box;
-	box-sizing: padding-box;
 	border: 1px solid $light-gray-500;
+	border-right: none;
 
 	// this prevents floats from messing up the position
 	position: absolute;
