@@ -58,6 +58,7 @@ export function mediaUpload( {
 					id: savedMedia.id,
 					link: savedMedia.link,
 					url: savedMedia.source_url,
+					data: savedMedia.data,
 				};
 				setAndUpdateFiles( idx, mediaObject );
 			},
