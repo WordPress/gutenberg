@@ -265,7 +265,17 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 	 * @return array Item schema data.
 	 */
 	public function get_item_schema() {
-		return $this->revisions_controller->get_item_schema();
+		$schema = $this->revisions_controller->get_item_schema();
+
+		$schema['properties']['preview_link'] = array(
+			'description' => __( 'Preview link for the post.', 'gutenberg' ),
+			'type'        => 'string',
+			'format'      => 'uri',
+			'context'     => array( 'edit' ),
+			'readonly'    => true,
+		);
+
+		return $schema;
 	}
 
 	/**
@@ -338,6 +348,18 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 	public function prepare_item_for_response( $post, $request ) {
 
 		$response = $this->revisions_controller->prepare_item_for_response( $post, $request );
+
+		$schema = $this->get_item_schema();
+
+		if ( ! empty( $schema['properties']['preview_link'] ) ) {
+			$response->data['preview_link'] = get_preview_post_link( $post->post_parent, array(
+				'preview_id'    => $post->post_parent,
+				'preview_nonce' => wp_create_nonce( 'post_preview_' . $post->post_parent )
+			) );
+		}
+
+		$context        = ! empty( $request['context'] ) ? $request['context'] : 'view';
+		$response->data = $this->filter_response_by_context( $response->data, $context );
 
 		/**
 		 * Filters a revision returned from the API.
