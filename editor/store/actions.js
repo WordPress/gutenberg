@@ -391,7 +391,7 @@ export function editPost( edits ) {
  *
  * @return {Object} Action object.
  */
-export function savePost( options ) {
+export function savePost( options = {} ) {
 	return {
 		type: 'REQUEST_POST_UPDATE',
 		options,

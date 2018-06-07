@@ -98,7 +98,7 @@ export default {
 		const { dispatch, getState } = store;
 		const state = getState();
 		const post = getCurrentPost( state );
-		const isAutosave = get( action.options, [ 'autosave' ], false );
+		const isAutosave = !! action.options.autosave;
 
 		// Prevent save if not saveable.
 		const isSaveable = isAutosave ? isEditedPostAutosaveable : isEditedPostSaveable;
