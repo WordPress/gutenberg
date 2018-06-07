@@ -19,7 +19,7 @@ const MoreMenu = () => (
 		renderToggle={ ( { isOpen, onToggle } ) => (
 			<IconButton
 				icon="ellipsis"
-				label={ isOpen ? __('Hide additional settings') : __('Show additional settings') }
+				label={ isOpen ? __( 'Hide additional settings' ) : __( 'Show additional settings' ) }
 				onClick={ onToggle }
 				aria-expanded={ isOpen }
 			/>
