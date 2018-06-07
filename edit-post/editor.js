@@ -3,6 +3,7 @@
  */
 import { withSelect } from '@wordpress/data';
 import { EditorProvider, ErrorBoundary } from '@wordpress/editor';
+import { StrictMode } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,11 +21,13 @@ function Editor( { settings, hasFixedToolbar, post, overridePost, onError, ...pr
 	};
 
 	return (
-		<EditorProvider settings={ editorSettings } post={ { ...post, ...overridePost } } { ...props }>
-			<ErrorBoundary onError={ onError }>
-				<Layout />
-			</ErrorBoundary>
-		</EditorProvider>
+		<StrictMode>
+			<EditorProvider settings={ editorSettings } post={ { ...post, ...overridePost } } { ...props }>
+				<ErrorBoundary onError={ onError }>
+					<Layout />
+				</ErrorBoundary>
+			</EditorProvider>
+		</StrictMode>
 	);
 }
 
