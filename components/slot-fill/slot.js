@@ -11,7 +11,6 @@ import { Component, Children, cloneElement } from '@wordpress/element';
 class Slot extends Component {
 	constructor() {
 		super( ...arguments );
-
 		this.bindNode = this.bindNode.bind( this );
 	}
 
@@ -45,9 +44,8 @@ class Slot extends Component {
 	}
 
 	render() {
-		const { children, name, bubblesVirtually = false, fillProps = {} } = this.props;
+		const { children, name, bubblesVirtually = false, fillProps = {}, SlotWrap = 'div' } = this.props;
 		const { getFills = noop } = this.context;
-
 		if ( bubblesVirtually ) {
 			return <div ref={ this.bindNode } />;
 		}
@@ -69,11 +67,10 @@ class Slot extends Component {
 				return cloneElement( child, { key: childKey } );
 			} );
 		} );
-
 		return (
-			<div ref={ this.bindNode }>
+			<SlotWrap ref={ this.bindNode }>
 				{ isFunction( children ) ? children( fills.filter( Boolean ) ) : fills }
-			</div>
+			</SlotWrap>
 		);
 	}
 }

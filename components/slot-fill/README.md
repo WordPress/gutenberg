@@ -59,6 +59,15 @@ const Toolbar = () => (
 	</div>
 ); 
 ```
+createSlotFill accepts an optional second parameter that allows customization of the element that wraps the items. It can accept an html tag or Component.
+
+```jsx
+// Wrap the items in a p tag
+const { Fill, Slot } = createSlotFill( 'Toolbar', 'p' );
+
+// Wrap the items in the <PanelRow/> component
+const { Fill, Slot } = createSlotFill( 'Toolbar', PanelRow );
+```
 
 ## Props
 
