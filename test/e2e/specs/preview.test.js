@@ -14,7 +14,7 @@ import {
 	publishPost,
 } from '../support/utils';
 
-describe( 'Publishing', () => {
+describe( 'Preview', () => {
 	beforeAll( async () => {
 		await newDesktopBrowserPage();
 	} );
