@@ -69,6 +69,14 @@ export function computePopoverYAxisPosition( anchorRect, contentSize, yAxis ) {
 	const { height } = contentSize;
 
 	// y axis aligment choices
+	const anchorMidPoint = anchorRect.top + ( anchorRect.height / 2 );
+	const middleAlignment = {
+		popoverTop: anchorMidPoint,
+		contentHeight: (
+			( anchorMidPoint - ( height / 2 ) > 0 ? ( height / 2 ) : anchorMidPoint ) +
+			( anchorMidPoint + ( height / 2 ) > window.innerHeight ? window.innerHeight - anchorMidPoint : ( height / 2 ) )
+		),
+	};
 	const topAlignment = {
 		popoverTop: anchorRect.top,
 		contentHeight: anchorRect.top - HEIGHT_OFFSET - height > 0 ? height : anchorRect.top - HEIGHT_OFFSET,
@@ -81,7 +89,9 @@ export function computePopoverYAxisPosition( anchorRect, contentSize, yAxis ) {
 	// Choosing the y axis
 	let chosenYAxis;
 	let contentHeight = null;
-	if ( yAxis === 'top' && topAlignment.contentHeight === height ) {
+	if ( yAxis === 'middle' && middleAlignment.contentHeight === height ) {
+		chosenYAxis = 'middle';
+	} else if ( yAxis === 'top' && topAlignment.contentHeight === height ) {
 		chosenYAxis = 'top';
 	} else if ( yAxis === 'bottom' && bottomAlignment.contentHeight === height ) {
 		chosenYAxis = 'bottom';
@@ -91,7 +101,14 @@ export function computePopoverYAxisPosition( anchorRect, contentSize, yAxis ) {
 		contentHeight = chosenHeight !== height ? chosenHeight : null;
 	}
 
-	const popoverTop = chosenYAxis === 'top' ? topAlignment.popoverTop : bottomAlignment.popoverTop;
+	let popoverTop;
+	if ( chosenYAxis === 'middle' ) {
+		popoverTop = middleAlignment.popoverTop;
+	} else if ( chosenYAxis === 'top' ) {
+		popoverTop = topAlignment.popoverTop;
+	} else {
+		popoverTop = bottomAlignment.popoverTop;
+	}
 
 	return {
 		yAxis: chosenYAxis,
