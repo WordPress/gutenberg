@@ -32,12 +32,12 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 
 	// Show quick insertion icons faded until hover
 	.editor-inserter-with-shortcuts {
-		opacity: .5;
+		opacity: .7;
 		transition: opacity 0.2s;
 
 		.components-icon-button:not( :hover ) {
 			// use opacity to work in various editor styles
-			color: $dark-opacity-500;
+			color: $dark-gray-900;
 
 			.is-dark-theme & {
 				color: $light-opacity-500;
