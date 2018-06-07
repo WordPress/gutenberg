@@ -3,6 +3,7 @@
  */
 import { registerCoreBlocks } from '@wordpress/core-blocks';
 import { render, unmountComponentAtNode } from '@wordpress/element';
+import { dispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -72,6 +73,13 @@ export function initializeEditor( id, postType, postId, settings, overridePost )
 	const reboot = reinitializeEditor.bind( null, postType, postId, target, settings, overridePost );
 
 	registerCoreBlocks();
+
+	dispatch( 'core/nux' ).triggerGuide( [
+		'core/editor.inserter',
+		'core/editor.settings',
+		'core/editor.preview',
+		'core/editor.publish',
+	] );
 
 	render(
 		<Editor settings={ settings } onError={ reboot } postId={ postId } postType={ postType } overridePost={ overridePost } />,

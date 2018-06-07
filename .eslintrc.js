@@ -99,6 +99,10 @@ module.exports = {
 				"message": "Use @wordpress/core-blocks as import path instead."
 			},
 			{
+				"selector": "ImportDeclaration[source.value=/^nux$/]",
+				"message": "Use @wordpress/nux as import path instead."
+			},
+			{
 				selector: 'CallExpression[callee.name="deprecated"] Property[key.name="version"][value.value=/' + majorMinorRegExp + '/]',
 				message: 'Deprecated functions must be removed before releasing this version.',
 			},

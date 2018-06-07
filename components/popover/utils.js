@@ -11,26 +11,32 @@ const isMobileViewport = () => window.innerWidth < 782;
  * @param {Object} anchorRect       Anchor Rect.
  * @param {Object} contentSize      Content Size.
  * @param {string} xAxis            Desired xAxis.
+ * @param {string} chosenYAxis      yAxis to be used.
  * @param {boolean} expandOnMobile  Whether to expand the popover on mobile or not.
  *
  * @return {Object} Popover xAxis position and constraints.
  */
-export function computePopoverXAxisPosition( anchorRect, contentSize, xAxis ) {
+export function computePopoverXAxisPosition( anchorRect, contentSize, xAxis, chosenYAxis ) {
 	const { width } = contentSize;
-	const popoverLeft = Math.round( anchorRect.left + ( anchorRect.width / 2 ) );
 
 	// x axis alignment choices
+	const anchorMidPoint = Math.round( anchorRect.left + ( anchorRect.width / 2 ) );
 	const centerAlignment = {
+		popoverLeft: anchorMidPoint,
 		contentWidth: (
-			( popoverLeft - ( width / 2 ) > 0 ? ( width / 2 ) : popoverLeft ) +
-			( popoverLeft + ( width / 2 ) > window.innerWidth ? window.innerWidth - popoverLeft : ( width / 2 ) )
+			( anchorMidPoint - ( width / 2 ) > 0 ? ( width / 2 ) : anchorMidPoint ) +
+			( anchorMidPoint + ( width / 2 ) > window.innerWidth ? window.innerWidth - anchorMidPoint : ( width / 2 ) )
 		),
 	};
+	const leftAlignmentX = chosenYAxis === 'middle' ? anchorRect.left : anchorMidPoint;
 	const leftAlignment = {
-		contentWidth: popoverLeft - width > 0 ? width : popoverLeft,
+		popoverLeft: leftAlignmentX,
+		contentWidth: leftAlignmentX - width > 0 ? width : leftAlignmentX,
 	};
+	const rightAlignmentX = chosenYAxis === 'middle' ? anchorRect.right : anchorMidPoint;
 	const rightAlignment = {
-		contentWidth: popoverLeft + width > window.innerWidth ? window.innerWidth - popoverLeft : width,
+		popoverLeft: rightAlignmentX,
+		contentWidth: rightAlignmentX + width > window.innerWidth ? window.innerWidth - rightAlignmentX : width,
 	};
 
 	// Choosing the x axis
@@ -46,6 +52,15 @@ export function computePopoverXAxisPosition( anchorRect, contentSize, xAxis ) {
 		chosenXAxis = leftAlignment.contentWidth > rightAlignment.contentWidth ? 'left' : 'right';
 		const chosenWidth = chosenXAxis === 'left' ? leftAlignment.contentWidth : rightAlignment.contentWidth;
 		contentWidth = chosenWidth !== width ? chosenWidth : null;
+	}
+
+	let popoverLeft;
+	if ( chosenXAxis === 'center' ) {
+		popoverLeft = centerAlignment.popoverLeft;
+	} else if ( chosenXAxis === 'left' ) {
+		popoverLeft = leftAlignment.popoverLeft;
+	} else {
+		popoverLeft = rightAlignment.popoverLeft;
 	}
 
 	return {
@@ -131,8 +146,8 @@ export function computePopoverYAxisPosition( anchorRect, contentSize, yAxis ) {
 export function computePopoverPosition( anchorRect, contentSize, position = 'top', expandOnMobile = false ) {
 	const [ yAxis, xAxis = 'center' ] = position.split( ' ' );
 
-	const xAxisPosition = computePopoverXAxisPosition( anchorRect, contentSize, xAxis );
 	const yAxisPosition = computePopoverYAxisPosition( anchorRect, contentSize, yAxis );
+	const xAxisPosition = computePopoverXAxisPosition( anchorRect, contentSize, xAxis, yAxisPosition.yAxis );
 
 	return {
 		isMobile: isMobileViewport() && expandOnMobile,

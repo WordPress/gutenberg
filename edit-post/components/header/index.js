@@ -10,6 +10,7 @@ import {
 } from '@wordpress/editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/element';
+import { DotTip } from '@wordpress/nux';
 
 /**
  * Internal dependencies
@@ -57,7 +58,11 @@ function Header( {
 						onClick={ toggleGeneralSidebar }
 						isToggled={ isEditorSidebarOpened }
 						aria-expanded={ isEditorSidebarOpened }
-					/>
+					>
+						<DotTip id="core/editor.settings">
+							{ __( 'You’ll find more settings for your page and blocks in the sidebar. Click ‘Settings’ to open it.' ) }
+						</DotTip>
+					</IconButton>
 					<PinnedPlugins.Slot />
 					<MoreMenu />
 				</div>

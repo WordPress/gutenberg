@@ -45,17 +45,17 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 		}
 	}
 
-	// Don't show inserter until mousing
-	.editor-inserter__toggle:not( [aria-expanded="true"] ) {
-		opacity: 0;
+	&:hover .editor-inserter-with-shortcuts {
+		opacity: 1;
 	}
 
-	&:hover {
-		.editor-inserter-with-shortcuts {
-			opacity: 1;
+	// Show the inserter if mousing over or there is a tip
+	&:not( .has-tip ) {
+		.editor-inserter__toggle:not( [aria-expanded="true"] ) {
+			opacity: 0;
 		}
 
-		.editor-inserter__toggle {
+		&:hover .editor-inserter__toggle {
 			opacity: 1;
 		}
 	}
