@@ -10,23 +10,14 @@ import {
 	EditorGlobalKeyboardShortcuts,
 	BlockSelectionClearer,
 	MultiSelectScrollIntoView,
+	PluginBlockSettingsMenu,
 } from '@wordpress/editor';
-import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import BlockInspectorButton from './block-inspector-button';
-
-function VisualEditorBlockMenu( { children, onClose } ) {
-	return (
-		<Fragment>
-			<BlockInspectorButton onClick={ onClose } role="menuitem" />
-			{ children }
-		</Fragment>
-	);
-}
 
 function VisualEditor() {
 	return (
@@ -37,9 +28,12 @@ function VisualEditor() {
 			<WritingFlow>
 				<ObserveTyping>
 					<PostTitle />
-					<BlockList renderBlockMenu={ VisualEditorBlockMenu } />
+					<BlockList />
 				</ObserveTyping>
 			</WritingFlow>
+			<PluginBlockSettingsMenu>
+				{ ( { onClose } ) => <BlockInspectorButton onClick={ onClose } role="menuitem" /> }
+			</PluginBlockSettingsMenu>
 		</BlockSelectionClearer>
 	);
 }

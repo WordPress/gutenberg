@@ -86,8 +86,7 @@ export class BlockListBlock extends Component {
 	}
 
 	createInnerBlockList( uid ) {
-		const { renderBlockMenu } = this.props;
-		return createInnerBlockList( uid, renderBlockMenu );
+		return createInnerBlockList( uid );
 	}
 
 	/**
@@ -403,7 +402,6 @@ export class BlockListBlock extends Component {
 			uid,
 			rootUID,
 			layout,
-			renderBlockMenu,
 			isSelected,
 			isMultiSelected,
 			isFirstMultiSelected,
@@ -533,7 +531,6 @@ export class BlockListBlock extends Component {
 					<BlockSettingsMenu
 						uids={ uid }
 						rootUID={ rootUID }
-						renderBlockMenu={ renderBlockMenu }
 						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'right' }
 					/>
 				) }
@@ -581,7 +578,6 @@ export class BlockListBlock extends Component {
 						<BlockMobileToolbar
 							rootUID={ rootUID }
 							uid={ uid }
-							renderBlockMenu={ renderBlockMenu }
 						/>
 					) }
 				</IgnoreNestedEvents>
