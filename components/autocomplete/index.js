@@ -172,6 +172,23 @@ function lastIndexOfSpace( text ) {
 	return -1;
 }
 
+/**
+ * Answers whether the given node is followed by characters other than regular spaces and tabs.
+ *
+ * @param {Node} node The reference node.
+ *
+ * @return {boolean} Whether the given node is followed by characters other than regular spaces and tabs.
+ */
+function hasSubsequentNonWhitespace( node ) {
+	const nonWhitespacePattern = /[^ \t]/;
+	while ( null !== ( node = node.nextSibling ) ) {
+		if ( nonWhitespacePattern.test( node.textContent ) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
 function filterOptions( search, options = [], maxResults = 10 ) {
 	const filtered = [];
 	for ( let i = 0; i < options.length; i++ ) {
@@ -234,34 +251,59 @@ export class Autocomplete extends Component {
 	insertCompletion( range, replacement, completerName ) {
 		// Wrap completions so we can treat them as tokens with editing boundaries.
 		const tokenWrapper = document.createElement( 'span' );
+		tokenWrapper.dataset.autocompleter = completerName;
 		tokenWrapper.classList.add( 'autocomplete-token' );
 		tokenWrapper.classList.add( `autocomplete-token-${ completerName }` );
 
 		tokenWrapper.innerHTML = renderToString( replacement );
 
-		range.insertNode( tokenWrapper );
+		const existingTokenWrapper = this.getTokenWrapperNode( range.startContainer );
+		if ( existingTokenWrapper ) {
+			/**
+			 * If we're within an existing token, we want to replace it rather
+			 * than inserting a completion within a completion.
+			 */
+			existingTokenWrapper.parentNode.replaceChild( tokenWrapper, existingTokenWrapper );
+		} else {
+			range.insertNode( tokenWrapper );
+		}
+
 		range.setStartAfter( tokenWrapper );
 		range.deleteContents();
 
-		/*
-		 * Add non-breaking space after a completion because:
-		 * 1. If the inserted token is the last child in Chrome 66 and desktop Safari 11,
-		 *    we can set the cursor after the token and receive user input,
-		 *    but if the input isn't preceded by a space, the user may not place the
-		 *    cursor within the text by clicking. Adding a subsequent non-breaking space
-		 *    avoids this issue. A regular space is insufficient.
-		 * 2. It seems reasonable to separate a token from subsequent text with a space.
-		 */
-		tokenWrapper.parentNode.insertBefore(
-			document.createTextNode( '\u00A0' ),
-			tokenWrapper.nextSibling
-		);
-
 		const selection = window.getSelection();
 		selection.removeAllRanges();
-
 		const newCursorPosition = document.createRange();
-		newCursorPosition.setStartAfter( tokenWrapper.nextSibling );
+
+		if ( existingTokenWrapper ) {
+			/**
+			 * Since the user was already editing the token,
+			 * it seems least surprising to leave the cursor there.
+			 */
+			newCursorPosition.setStartAfter( tokenWrapper );
+		} else {
+			/*
+			 * Add space after a completion because:
+			 * 1. If the inserted token is the last child in Chrome 66 and desktop Safari 11,
+			 *    we can set the cursor after the token and receive user input,
+			 *    but if the input isn't preceded by a space, the user may not place the
+			 *    cursor within the text by clicking. Placing the cursor after a subsequent
+			 *    space avoids this issue.
+			 * 2. It seems reasonable to separate a token from subsequent text with a space.
+			 *
+			 * NOTE: Chrome 66 (and possibly others) does not render trailing spaces
+			 * in contenteditable, so we cannot set the cursor after the trailing space.
+			 * When adding such trailing space we append a zero-width non-breaking space
+			 * which causes the preceding space to be rendered.
+			 */
+			tokenWrapper.parentNode.insertBefore(
+				document.createTextNode( hasSubsequentNonWhitespace( tokenWrapper ) ? ' ' : ' \uFEFF' ),
+				tokenWrapper.nextSibling
+			);
+
+			newCursorPosition.setStart( tokenWrapper.nextSibling, 1 );
+		}
+
 		selection.addRange( newCursorPosition );
 	}
 
@@ -479,8 +521,22 @@ export class Autocomplete extends Component {
 		return { open, range, query };
 	}
 
+	getTokenWrapperNode( possibleTokenChild ) {
+		const element = isTextNode( possibleTokenChild ) ?
+			possibleTokenChild.parentNode :
+			possibleTokenChild;
+		const withinToken = element.matches( '.autocomplete-token, .autocomplete-token *' );
+
+		return withinToken ? element.closest( '.autocomplete-token' ) : null;
+	}
+
+	getCompleterFromTokenWrapper( tokenWrapperNode ) {
+		const completerName = tokenWrapperNode.dataset.autocompleter;
+		return find( this.props.completers, ( c ) => completerName === c.name );
+	}
+
 	search( event ) {
-		const { completers } = this.props;
+		let { completers } = this.props;
 		const { open: wasOpen, suppress: wasSuppress, query: wasQuery } = this.state;
 		const container = event.target;
 
@@ -489,6 +545,16 @@ export class Autocomplete extends Component {
 		if ( ! cursor ) {
 			return;
 		}
+
+		/**
+		 * If the cursor is within a autocompletion token, we only consider the same completer
+		 * because we want to support editing but not inserting a completion within a completion.
+		 */
+		const tokenNode = this.getTokenWrapperNode( cursor.node );
+		if ( tokenNode ) {
+			completers = [ this.getCompleterFromTokenWrapper( tokenNode ) ];
+		}
+
 		// look for the trigger prefix and search query just before the cursor location
 		const match = this.findMatch( container, cursor, completers, wasOpen );
 		const { open, query, range } = match || {};
