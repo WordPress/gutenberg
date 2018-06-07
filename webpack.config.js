@@ -63,7 +63,7 @@ const extractConfig = {
 								secondary: '#d9ab59',
 								toggle: '#82b4cb',
 								button: '#d9ab59',
-								outlines: '#417E9B',
+								outlines: '#417e9B',
 							},
 							'admin-color-coffee': {
 								primary: '#c2a68c',
@@ -84,14 +84,14 @@ const extractConfig = {
 								secondary: '#77a6b9',
 								toggle: '#77a6b9',
 								button: '#e14d43',
-								outlines: '#497B8D',
+								outlines: '#497b8d',
 							},
 							'admin-color-ocean': {
 								primary: '#a3b9a2',
 								secondary: '#a89d8a',
 								toggle: '#a3b9a2',
 								button: '#a3b9a2',
-								outlines: '#5E7D5E',
+								outlines: '#5e7d5e',
 							},
 							'admin-color-sunrise': {
 								primary: '#d1864a',
