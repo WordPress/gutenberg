@@ -114,16 +114,6 @@ describe( 'PostPreviewButton', () => {
 			expect( wrapper.prop( 'target' ) ).toBe( 'wp-preview-1' );
 		} );
 
-		it( 'should render with preview link as href if available', () => {
-			const wrapper = shallow(
-				<PostPreviewButton
-					currentPostLink="https://wordpress.org/?p=1"
-					previewLink="https://wordpress.org/?p=1&preview=true" />
-			);
-
-			expect( wrapper.prop( 'href' ) ).toBe( 'https://wordpress.org/?p=1&preview=true' );
-		} );
-
 		it( 'should be disabled if post is not saveable', () => {
 			const wrapper = shallow(
 				<PostPreviewButton
