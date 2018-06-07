@@ -18,10 +18,6 @@ import './style.scss';
 import PostFeaturedImageCheck from './check';
 import MediaUpload from '../media-upload';
 
-// Used when labels from post type were not yet loaded or when they are not present.
-const DEFAULT_SET_FEATURE_IMAGE_LABEL = __( 'Set featured image' );
-const DEFAULT_REMOVE_FEATURE_IMAGE_LABEL = __( 'Remove featured image' );
-
 function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, media, postType } ) {
 	const postLabel = get( postType, [ 'labels' ], {} );
 
@@ -51,13 +47,13 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 				}
 				{ !! featuredImageId && media && ! media.isLoading &&
 				<MediaUpload
-					title={ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
+					title={ __( 'Replace Image' ) }
 					onSelect={ onUpdateImage }
 					type="image"
 					modalClass="editor-post-featured-image__media-modal"
 					render={ ( { open } ) => (
 						<Button onClick={ open } isDefault isLarge>
-							{ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
+							{ __( 'Replace Image' ) }
 						</Button>
 					) }
 				/>
@@ -65,24 +61,24 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 				{ ! featuredImageId &&
 					<div>
 						<MediaUpload
-							title={ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
+							title={ __( 'No image selected' ) }
 							onSelect={ onUpdateImage }
 							type="image"
 							modalClass="editor-post-featured-image__media-modal"
 							render={ ( { open } ) => (
 								<Button className="editor-post-featured-image__toggle" onClick={ open }>
-									{ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
+									{ __( 'No image selected' ) }
 								</Button>
 							) }
 						/>
 						<MediaUpload
-							title={ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
+							title={ __( 'Add Image' ) }
 							onSelect={ onUpdateImage }
 							type="image"
 							modalClass="editor-post-featured-image__media-modal"
 							render={ ( { open } ) => (
 								<Button onClick={ open } isDefault isLarge>
-									{ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
+									{ __( 'Add Image' ) }
 								</Button>
 							) }
 						/>
@@ -90,7 +86,7 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 				}
 				{ !! featuredImageId &&
 					<Button onClick={ onRemoveImage } isDefault isLarge>
-						{ postLabel.remove_featured_image || DEFAULT_REMOVE_FEATURE_IMAGE_LABEL }
+						{ __( 'Remove Image' ) }
 					</Button>
 				}
 			</div>

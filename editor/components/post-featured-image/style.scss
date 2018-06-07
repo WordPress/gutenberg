@@ -7,6 +7,7 @@
 
 	// Space consecutive buttons evenly.
 	.components-button + .components-button {
+		display: block;
 		margin-top: 1em;
 	}
 
@@ -34,8 +35,4 @@
 	&:hover {
 		background-color: $light-gray-100;
 	}
-}
-
-.editor-post-featured-image__preview {
-
 }
