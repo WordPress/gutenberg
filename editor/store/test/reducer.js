@@ -2298,7 +2298,7 @@ describe( 'state', () => {
 						raw: 'The Excerpt',
 					},
 					status: 'draft',
-					preview_link: 'https://wordpress.org/?p=1',
+					preview_link: 'https://wordpress.org/?p=1&preview=true',
 				},
 			} );
 
@@ -2306,7 +2306,7 @@ describe( 'state', () => {
 				title: 'The Title',
 				content: 'The Content',
 				excerpt: 'The Excerpt',
-				preview_link: 'https://wordpress.org/?p=1',
+				preview_link: 'https://wordpress.org/?p=1&preview=true',
 			} );
 		} );
 	} );
