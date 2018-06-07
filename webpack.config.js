@@ -84,7 +84,7 @@ const extractConfig = {
 								secondary: '#77a6b9',
 								toggle: '#77a6b9',
 								button: '#e14d43',
-								outlines: '#DC3428',
+								outlines: '#497B8D',
 							},
 							'admin-color-ocean': {
 								primary: '#a3b9a2',
@@ -98,7 +98,7 @@ const extractConfig = {
 								secondary: '#c8b03c',
 								toggle: '#c8b03c',
 								button: '#d1864a',
-								outlines: '#AA652C',
+								outlines: '#837425',
 							},
 						},
 					} ),
