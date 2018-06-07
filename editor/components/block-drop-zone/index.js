@@ -105,6 +105,16 @@ class BlockDropZone extends Component {
 }
 
 export default compose(
+	withSelect( ( select ) => {
+		const { canInsertBlockType, getBlockName, getEditorSettings } = select( 'core/editor' );
+		const { templateLock } = getEditorSettings();
+
+		return {
+			isLocked: !! templateLock,
+			canInsertBlockType,
+			getBlockName,
+		};
+	} ),
 	withDispatch( ( dispatch, ownProps ) => {
 		const {
 			insertBlocks,
@@ -132,16 +142,15 @@ export default compose(
 				updateBlockAttributes( ...args );
 			},
 			moveBlockToPosition( uid, fromRootUID, index ) {
-				const { rootUID, layout } = ownProps;
-				moveBlockToPosition( uid, fromRootUID, rootUID, layout, index );
+				const { canInsertBlockType, getBlockName, rootUID, layout } = ownProps;
+				const blockName = getBlockName( uid );
+				// currently the only constraint to move inside the same parent is locking
+				// locking was already handled
+				// it is not possible to use drag & drop if locking is active
+				if ( rootUID === fromRootUID || canInsertBlockType( blockName, rootUID ) ) {
+					moveBlockToPosition( uid, fromRootUID, rootUID, layout, index );
+				}
 			},
-		};
-	} ),
-	withSelect( ( select ) => {
-		const { templateLock } = select( 'core/editor' ).getEditorSettings();
-
-		return {
-			isLocked: !! templateLock,
 		};
 	} )
 )( BlockDropZone );
