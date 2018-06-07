@@ -268,9 +268,8 @@ export function dispatch( reducerKey ) {
  */
 export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( WrappedComponent ) => {
 	return class ComponentWithSelect extends Component {
-		constructor() {
+		constructor( props ) {
 			super( ...arguments );
-
 			this.runSelection = this.runSelection.bind( this );
 
 			/**
@@ -280,19 +279,17 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 			 * @type {boolean}
 			 */
 			this.shouldComponentUpdate = false;
+			this.state = {
+				mergeProps: mapStateToProps( select, props ) || {},
+			};
 
-			this.state = {};
+			// Subscribtion should happen in the constructor
+			// Parent components should subscribe before children.
+			this.subscribe();
 		}
 
 		shouldComponentUpdate() {
 			return this.shouldComponentUpdate;
-		}
-
-		componentWillMount() {
-			this.subscribe();
-
-			// Populate initial state.
-			this.runSelection();
 		}
 
 		componentWillReceiveProps( nextProps ) {
@@ -302,6 +299,10 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 			}
 		}
 
+		componentDidMount() {
+			this.canRunSelection = true;
+		}
+
 		componentWillUnmount() {
 			this.unsubscribe();
 
@@ -309,7 +310,7 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 			// are snapshotted before being invoked, so if unmounting occurs
 			// during a previous callback, we need to explicitly track and
 			// avoid the `runSelection` that is scheduled to occur.
-			this.isUnmounting = true;
+			this.canRunSelection = false;
 		}
 
 		subscribe() {
@@ -317,7 +318,7 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 		}
 
 		runSelection( props = this.props ) {
-			if ( this.isUnmounting ) {
+			if ( ! this.canRunSelection ) {
 				return;
 			}
 
@@ -358,14 +359,11 @@ export const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent
 		pure,
 		( WrappedComponent ) => {
 			return class ComponentWithDispatch extends Component {
-				constructor() {
+				constructor( props ) {
 					super( ...arguments );
 
 					this.proxyProps = {};
-				}
-
-				componentWillMount() {
-					this.setProxyProps( this.props );
+					this.setProxyProps( props );
 				}
 
 				componentWillUpdate( nextProps ) {
