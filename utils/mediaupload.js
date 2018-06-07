@@ -4,6 +4,11 @@
 import { compact, forEach, get, includes, noop, startsWith } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { __, sprintf } from '../node_modules/@wordpress/i18n';
+
+/**
  *	Media Upload is used by audio, image, gallery and video blocks to handle uploading a media file
  *	when a file upload button is activated.
  *
@@ -48,15 +53,26 @@ export function mediaUpload( {
 			return;
 		}
 
-		// verify if file is greater than the maximum file upload size allowed for the site.
-		if ( maxUploadFileSize && mediaFile.size > maxUploadFileSize ) {
-			onError( { type: 'SIZE_ABOVE_LIMIT', file: mediaFile } );
+		// verify if user is allowed to upload this mime type
+		if ( allowedMimeTypesForUser && ! isAllowedMimeTypeForUser( mediaFile.type ) ) {
+			onError( {
+				code: 'MIME_TYPE_NOT_ALLOWED_FOR_USER',
+				message: __( 'Sorry, this file type is not permitted for security reasons.' ),
+				file: mediaFile,
+			} );
 			return;
 		}
 
-		// verify if user is allowed to upload this mime type
-		if ( allowedMimeTypesForUser && ! isAllowedMimeTypeForUser( mediaFile.type ) ) {
-			onError( { type: 'MIME_TYPE_NOT_ALLOWED_FOR_USER', file: mediaFile } );
+		// verify if file is greater than the maximum file upload size allowed for the site.
+		if ( maxUploadFileSize && mediaFile.size > maxUploadFileSize ) {
+			onError( {
+				code: 'SIZE_ABOVE_LIMIT',
+				message: sprintf(
+					__( '%s exceeds the maximum upload size for this site.' ),
+					mediaFile.name
+				),
+				file: mediaFile,
+			} );
 			return;
 		}
 
@@ -81,7 +97,14 @@ export function mediaUpload( {
 			() => {
 				// Reset to empty on failure.
 				setAndUpdateFiles( idx, null );
-				onError( { type: 'GENERAL', file: mediaFile } );
+				onError( {
+					code: 'GENERAL',
+					message: sprintf(
+						__( 'Error while uploading file %s to the media library.' ),
+						mediaFile.name
+					),
+					file: mediaFile,
+				} );
 			}
 		);
 	} );

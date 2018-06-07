@@ -45,7 +45,7 @@ describe( 'mediaUpload', () => {
 		expect( console.error ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should call error handler with the correct message if file size is greater than the maximum', () => {
+	it( 'should call error handler with the correct error object if file size is greater than the maximum', () => {
 		const onError = jest.fn();
 		mediaUpload( {
 			allowedType: 'image',
@@ -54,10 +54,14 @@ describe( 'mediaUpload', () => {
 			maxUploadFileSize: 512,
 			onError,
 		} );
-		expect( onError.mock.calls ).toEqual( [ [ { type: 'SIZE_ABOVE_LIMIT', file: validMediaObj } ] ] );
+		expect( onError ).toBeCalledWith( {
+			code: 'SIZE_ABOVE_LIMIT',
+			file: validMediaObj,
+			message: `${ validMediaObj.name } exceeds the maximum upload size for this site.`,
+		} );
 	} );
 
-	it( 'should call error handler with the correct message if file type is not allowed for user', () => {
+	it( 'should call error handler with the correct error object if file type is not allowed for user', () => {
 		const onError = jest.fn();
 		global._wpMediaSettings = {
 			allowedMimeTypes: { aac: 'audio/aac' },
@@ -68,6 +72,10 @@ describe( 'mediaUpload', () => {
 			onFileChange,
 			onError,
 		} );
-		expect( onError.mock.calls ).toEqual( [ [ { type: 'MIME_TYPE_NOT_ALLOWED_FOR_USER', file: validMediaObj } ] ] );
+		expect( onError ).toBeCalledWith( {
+			code: 'MIME_TYPE_NOT_ALLOWED_FOR_USER',
+			file: validMediaObj,
+			message: 'Sorry, this file type is not permitted for security reasons.',
+		} );
 	} );
 } );

@@ -8,7 +8,6 @@ import { noop } from 'lodash';
  */
 import { select } from '@wordpress/data';
 import { mediaUpload } from '@wordpress/utils';
-import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Upload a media file when the file upload button is activated.
@@ -31,28 +30,6 @@ export default function editorMediaUpload( {
 } ) {
 	const postId = select( 'core/editor' ).getCurrentPostId();
 
-	const errorHandler = ( { file, type } ) => {
-		let errorMsg;
-		switch ( type ) {
-			case 'SIZE_ABOVE_LIMIT':
-				errorMsg = sprintf(
-					__( '%s exceeds the maximum upload size for this site.' ),
-					file.name
-				);
-				break;
-			case 'MIME_TYPE_NOT_ALLOWED_FOR_USER':
-				errorMsg =
-					__( 'Sorry, this file type is not permitted for security reasons.' );
-				break;
-			default:
-				errorMsg = sprintf(
-					__( 'Error while uploading file %s to the media library.' ),
-					file.name
-				);
-		}
-		onError( errorMsg );
-	};
-
 	mediaUpload( {
 		allowedType,
 		filesList,
@@ -61,6 +38,6 @@ export default function editorMediaUpload( {
 			post: postId,
 		},
 		maxUploadFileSize,
-		onError: errorHandler,
+		onError: ( { message } ) => onError( message ),
 	} );
 }
