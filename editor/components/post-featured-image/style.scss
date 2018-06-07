@@ -7,8 +7,8 @@
 
 	// Space consecutive buttons evenly.
 	.components-button + .components-button {
-		display: block;
 		margin-top: 1em;
+		margin-right: 8px;
 	}
 
 	// Don't size up images beyond their intrinsic size.

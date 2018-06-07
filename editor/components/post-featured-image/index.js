@@ -61,7 +61,7 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 				{ ! featuredImageId &&
 					<div>
 						<MediaUpload
-							title={ __( 'No image selected' ) }
+							title={ __( 'Set featured image' ) }
 							onSelect={ onUpdateImage }
 							type="image"
 							modalClass="editor-post-featured-image__media-modal"
