@@ -1,33 +1,41 @@
 .editor-post-featured-image {
-	padding: 10px 0 0;
+	padding: 0;
 
 	.spinner {
 		margin: 0;
 	}
+
+	// Space consecutive buttons evenly.
+	.components-button + .components-button {
+		margin-top: 1em;
+	}
+
+	// Don't size up images beyond their intrinsic size.
+	.components-responsive-wrapper__content {
+		max-width: 100%;
+		width: auto;
+	}
+}
+
+.editor-post-featured-image__toggle,
+.editor-post-featured-image__preview {
+	display: block;
+	width: 100%;
+	padding: 0;
 }
 
 .editor-post-featured-image__toggle {
-	text-decoration: underline;
-	color: theme( secondary );
-
-	&:focus {
-		box-shadow: none;
-		outline: none;
-	}
+	border: 1px dashed $light-gray-900;
+	background-color: $light-gray-300;
+	line-height: 20px;
+	padding: $item-spacing 0;
+	text-align: center;
 
 	&:hover {
-		color: theme( primary );
+		background-color: $light-gray-100;
 	}
 }
 
 .editor-post-featured-image__preview {
-	display: block;
-	width: 100%;
-}
 
-.editor-post-featured-image__howto {
-	color: $dark-gray-300;
-	font-style: italic;
-	margin: 10px 0;
 }
-
