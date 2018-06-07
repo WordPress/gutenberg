@@ -1091,6 +1091,13 @@ export function autosave( state = null, action ) {
 				content,
 				preview_link: post.preview_link,
 			};
+
+		case 'REQUEST_POST_UPDATE':
+			// Invalidate known preview link when autosave starts.
+			if ( state && action.options.autosave ) {
+				return omit( state, 'preview_link' );
+			}
+			break;
 	}
 
 	return state;
