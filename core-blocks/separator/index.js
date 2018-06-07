@@ -8,6 +8,7 @@ import { createBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import './style.scss';
+import './theme.scss';
 
 export const name = 'core/separator';
 

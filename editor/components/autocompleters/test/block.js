@@ -1,95 +1,87 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
-
-/**
- * WordPress dependencies
- */
-import { registerBlockType, unregisterBlockType, getBlockTypes } from '@wordpress/blocks';
+import { shallow } from 'enzyme';
 
 /**
  * Internal dependencies
  */
-import { blockAutocompleter } from '../';
+import blockCompleter, { createBlockCompleter } from '../block';
 
 describe( 'block', () => {
-	const blockTypes = {
-		'core/foo': {
-			save: noop,
-			category: 'common',
-			title: 'foo',
-			keywords: [ 'foo-keyword-1', 'foo-keyword-2' ],
-		},
-		'core/bar': {
-			save: noop,
-			category: 'layout',
-			title: 'bar',
-			// Intentionally empty keyword list
-			keywords: [],
-		},
-		'core/baz': {
-			save: noop,
-			category: 'common',
-			title: 'baz',
-			// Intentionally omitted keyword list
-		},
-	};
+	it( 'should retrieve block options for current insertion point', () => {
+		const expectedOptions = [ {}, {}, {} ];
+		const mockGetBlockInsertionPoint = jest.fn( () => 'expected-insertion-point' );
+		const mockGetInserterItems = jest.fn( () => expectedOptions );
 
-	beforeEach( () => {
-		Object.entries( blockTypes ).forEach(
-			( [ name, settings ] ) => registerBlockType( name, settings )
-		);
-	} );
-
-	afterEach( () => {
-		getBlockTypes().forEach( ( block ) => {
-			unregisterBlockType( block.name );
+		const completer = createBlockCompleter( {
+			getBlockInsertionPoint: mockGetBlockInsertionPoint,
+			getInserterItems: mockGetInserterItems,
 		} );
-	} );
 
-	it( 'should prioritize common blocks in options', () => {
-		return blockAutocompleter.options().then( ( options ) => {
-			expect( options ).toMatchObject( [
-				blockTypes[ 'core/foo' ],
-				blockTypes[ 'core/baz' ],
-				blockTypes[ 'core/bar' ],
-			] );
-		} );
-	} );
-
-	it( 'should render a block option label composed of @wordpress/element Elements and/or strings', () => {
-		expect.hasAssertions();
-
-		// Only verify that a populated label is returned.
-		// It is likely to be fragile to assert that the contents are renderable by @wordpress/element.
-		const isAllowedLabelType = ( label ) => Array.isArray( label ) || ( typeof label === 'string' );
-
-		getBlockTypes().forEach( ( blockType ) => {
-			const label = blockAutocompleter.getOptionLabel( blockType );
-			expect( isAllowedLabelType( label ) ).toBeTruthy();
-		} );
+		const actualOptions = completer.options();
+		expect( mockGetBlockInsertionPoint ).toHaveBeenCalled();
+		expect( mockGetInserterItems ).toHaveBeenCalledWith( 'expected-insertion-point' );
+		expect( actualOptions ).toBe( expectedOptions );
 	} );
 
 	it( 'should derive option keywords from block keywords and block title', () => {
-		const optionKeywords = getBlockTypes().reduce(
-			( map, blockType ) => map.set(
-				blockType.name,
-				blockAutocompleter.getOptionKeywords( blockType )
-			),
-			new Map()
-		);
+		const inserterItemWithTitleAndKeywords = {
+			name: 'core/foo',
+			title: 'foo',
+			keywords: [ 'foo-keyword-1', 'foo-keyword-2' ],
+		};
+		const inserterItemWithTitleAndEmptyKeywords = {
+			name: 'core/bar',
+			title: 'bar',
+			// Intentionally empty keyword list
+			keywords: [],
+		};
+		const inserterItemWithTitleAndUndefinedKeywords = {
+			name: 'core/baz',
+			title: 'baz',
+			// Intentionally omitted keyword list
+		};
 
-		expect( optionKeywords.get( 'core/foo' ) ).toEqual( [
-			'foo-keyword-1',
-			'foo-keyword-2',
-			blockTypes[ 'core/foo' ].title,
-		] );
-		expect( optionKeywords.get( 'core/bar' ) ).toEqual( [
-			blockTypes[ 'core/bar' ].title,
-		] );
-		expect( optionKeywords.get( 'core/baz' ) ).toEqual( [
-			blockTypes[ 'core/baz' ].title,
-		] );
+		expect( blockCompleter.getOptionKeywords( inserterItemWithTitleAndKeywords ) )
+			.toEqual( [ 'foo-keyword-1', 'foo-keyword-2', 'foo' ] );
+		expect( blockCompleter.getOptionKeywords( inserterItemWithTitleAndEmptyKeywords ) )
+			.toEqual( [ 'bar' ] );
+		expect( blockCompleter.getOptionKeywords( inserterItemWithTitleAndUndefinedKeywords ) )
+			.toEqual( [ 'baz' ] );
+	} );
+
+	it( 'should render a block option label', () => {
+		const labelComponents = shallow( <div>
+			{ blockCompleter.getOptionLabel( {
+				icon: {
+					src: 'expected-icon',
+				},
+				title: 'expected-text',
+			} ) }
+		</div> ).children();
+
+		expect( labelComponents ).toHaveLength( 2 );
+		expect( labelComponents.at( 0 ).name() ).toBe( 'BlockIcon' );
+		expect( labelComponents.at( 0 ).prop( 'icon' ) ).toBe( 'expected-icon' );
+		expect( labelComponents.at( 1 ).text() ).toBe( 'expected-text' );
+	} );
+
+	it( 'should derive isOptionDisabled from the item\'s isDisabled', () => {
+		const disabledInserterItem = {
+			name: 'core/foo',
+			title: 'foo',
+			keywords: [ 'foo-keyword-1', 'foo-keyword-2' ],
+			isDisabled: true,
+		};
+		const enabledInserterItem = {
+			name: 'core/bar',
+			title: 'bar',
+			keywords: [],
+			isDisabled: false,
+		};
+
+		expect( blockCompleter.isOptionDisabled( disabledInserterItem ) ).toBe( true );
+		expect( blockCompleter.isOptionDisabled( enabledInserterItem ) ).toBe( false );
 	} );
 } );

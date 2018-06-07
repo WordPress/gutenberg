@@ -15,16 +15,17 @@ import {
 	orderBy,
 	reduce,
 	size,
+	some,
 } from 'lodash';
 import createSelector from 'rememo';
 
 /**
  * WordPress dependencies
  */
-import { serialize, getBlockType, getBlockTypes, hasBlockSupport } from '@wordpress/blocks';
+import { serialize, getBlockType, getBlockTypes, hasBlockSupport, hasChildBlocks } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { moment } from '@wordpress/date';
-import { deprecated } from '@wordpress/utils';
+import deprecated from '@wordpress/deprecated';
 
 /***
  * Module constants
@@ -36,9 +37,9 @@ export const INSERTER_UTILITY_HIGH = 3;
 export const INSERTER_UTILITY_MEDIUM = 2;
 export const INSERTER_UTILITY_LOW = 1;
 export const INSERTER_UTILITY_NONE = 0;
-const SECONDS_PER_HOUR = 3600;
-const SECONDS_PER_DAY = 24 * 3600;
-const SECONDS_PER_WEEK = 7 * 24 * 3600;
+const MILLISECONDS_PER_HOUR = 3600 * 1000;
+const MILLISECONDS_PER_DAY = 24 * 3600 * 1000;
+const MILLISECONDS_PER_WEEK = 7 * 24 * 3600 * 1000;
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -272,6 +273,11 @@ export function isCurrentPostScheduled( state ) {
 export function isEditedPostPublishable( state ) {
 	const post = getCurrentPost( state );
 
+	// TODO: Post being publishable should be superset of condition of post
+	// being saveable. Currently this restriction is imposed at UI.
+	//
+	//  See: <PostPublishButton /> (`isButtonEnabled` assigned by `isSaveable`)
+
 	return isEditedPostDirty( state ) || [ 'publish', 'private', 'future' ].indexOf( post.status ) === -1;
 }
 
@@ -284,9 +290,23 @@ export function isEditedPostPublishable( state ) {
  * @return {boolean} Whether the post can be saved.
  */
 export function isEditedPostSaveable( state ) {
+	if ( isSavingPost( state ) ) {
+		return false;
+	}
+
+	// TODO: Post should not be saveable if not dirty. Cannot be added here at
+	// this time since posts where meta boxes are present can be saved even if
+	// the post is not dirty. Currently this restriction is imposed at UI, but
+	// should be moved here.
+	//
+	//  See: `isEditedPostPublishable` (includes `isEditedPostDirty` condition)
+	//  See: <PostSavedState /> (`forceIsDirty` prop)
+	//  See: <PostPublishButton /> (`forceIsDirty` prop)
+	//  See: https://github.com/WordPress/gutenberg/pull/4184
+
 	return (
 		!! getEditedPostAttribute( state, 'title' ) ||
-		!! getEditedPostExcerpt( state ) ||
+		!! getEditedPostAttribute( state, 'excerpt' ) ||
 		! isEditedPostEmpty( state )
 	);
 }
@@ -304,6 +324,55 @@ export function isEditedPostEmpty( state ) {
 		! getBlockCount( state ) &&
 		! getEditedPostAttribute( state, 'content' )
 	);
+}
+
+/**
+ * Returns true if the post can be autosaved, or false otherwise.
+ *
+ * @param  {Object}  state Global application state.
+ *
+ * @return {boolean} Whether the post can be autosaved.
+ */
+export function isEditedPostAutosaveable( state ) {
+	// A post must contain a title, an excerpt, or non-empty content to be valid for autosaving.
+	if ( ! isEditedPostSaveable( state ) ) {
+		return false;
+	}
+
+	// If we don't already have an autosave, the post is autosaveable.
+	if ( ! hasAutosave( state ) ) {
+		return true;
+	}
+
+	// If the title, excerpt or content has changed, the post is autosaveable.
+	const autosave = getAutosave( state );
+	return [ 'title', 'excerpt', 'content' ].some( ( field ) => (
+		autosave[ field ] !== getEditedPostAttribute( state, field )
+	) );
+}
+
+/**
+ * Returns the current autosave, or null if one is not set (i.e. if the post
+ * has yet to be autosaved, or has been saved or published since the last
+ * autosave).
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {?Object} Current autosave, if exists.
+ */
+export function getAutosave( state ) {
+	return state.autosave;
+}
+
+/**
+ * Returns the true if there is an existing autosave, otherwise false.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether there is an existing autosave.
+ */
+export function hasAutosave( state ) {
+	return !! getAutosave( state );
 }
 
 /**
@@ -347,9 +416,13 @@ export function getDocumentTitle( state ) {
  * @return {string} Raw post excerpt.
  */
 export function getEditedPostExcerpt( state ) {
-	return state.editor.present.edits.excerpt === undefined ?
-		state.currentPost.excerpt :
-		state.editor.present.edits.excerpt;
+	deprecated( 'getEditedPostExcerpt', {
+		version: '3.1',
+		alternative: 'getEditedPostAttribute( state, \'excerpt\' )',
+		plugin: 'Gutenberg',
+	} );
+
+	return getEditedPostAttribute( state, 'excerpt' );
 }
 
 /**
@@ -936,6 +1009,18 @@ export function isBlockSelected( state, uid ) {
 }
 
 /**
+ * Returns true if one of the block's inner blocks is selected.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} uid   Block unique ID.
+ *
+ * @return {boolean} Whether the block as an inner block selected
+ */
+export function hasSelectedInnerBlock( state, uid ) {
+	return some( getBlockOrder( state, uid ), ( innerUID ) => isBlockSelected( state, innerUID ) );
+}
+
+/**
  * Returns true if the block corresponding to the specified unique ID is
  * currently selected but isn't the last of the selected blocks. Here "last"
  * refers to the block sequence in the document, _not_ the sequence of
@@ -1067,7 +1152,7 @@ export function isValidTemplate( state ) {
  * Returns the defined block template
  *
  * @param {boolean} state
- * @return {?Arary}        Block Template
+ * @return {?Array}        Block Template
  */
 export function getTemplate( state ) {
 	return state.settings.template;
@@ -1116,6 +1201,17 @@ export function didPostSaveRequestSucceed( state ) {
  */
 export function didPostSaveRequestFail( state ) {
 	return !! state.saving.error;
+}
+
+/**
+ * Returns true if the post is autosaving, or false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the post is autosaving.
+ */
+export function isAutosavingPost( state ) {
+	return isSavingPost( state ) && state.saving.isAutosave;
 }
 
 /**
@@ -1250,19 +1346,12 @@ export const canInsertBlockType = createSelector(
 		const parentName = getBlockName( state, parentUID );
 		const hasBlockAllowedParent = checkAllowList( blockAllowedParentBlocks, parentName );
 
-		let isBlockAllowedInParent;
 		if ( hasParentAllowedBlock !== null && hasBlockAllowedParent !== null ) {
-			isBlockAllowedInParent = hasParentAllowedBlock || hasBlockAllowedParent;
+			return hasParentAllowedBlock || hasBlockAllowedParent;
 		} else if ( hasParentAllowedBlock !== null ) {
-			isBlockAllowedInParent = hasParentAllowedBlock;
+			return hasParentAllowedBlock;
 		} else if ( hasBlockAllowedParent !== null ) {
-			isBlockAllowedInParent = hasBlockAllowedParent;
-		} else {
-			isBlockAllowedInParent = true;
-		}
-
-		if ( ! isBlockAllowedInParent ) {
-			return false;
+			return hasBlockAllowedParent;
 		}
 
 		return true;
@@ -1304,7 +1393,7 @@ function getInsertUsage( state, id ) {
  * 3. Blocks that are in the common category (utility = 1)
  * 4. All other blocks (utility = 0)
  *
- * The 'frecency' property is a herustic (https://en.wikipedia.org/wiki/Frecency)
+ * The 'frecency' property is a heuristic (https://en.wikipedia.org/wiki/Frecency)
  * that combines block usage frequenty and recency.
  *
  * Items are returned ordered descendingly by their 'utility' and 'frecency'.
@@ -1357,13 +1446,16 @@ export const getInserterItems = createSelector(
 				return count;
 			}
 
+			// The selector is cached, which means Date.now() is the last time that the
+			// relevant state changed. This suits our needs.
 			const duration = Date.now() - time;
+
 			switch ( true ) {
-				case duration < SECONDS_PER_HOUR:
+				case duration < MILLISECONDS_PER_HOUR:
 					return count * 4;
-				case duration < SECONDS_PER_DAY:
+				case duration < MILLISECONDS_PER_DAY:
 					return count * 2;
-				case duration < SECONDS_PER_WEEK:
+				case duration < MILLISECONDS_PER_WEEK:
 					return count / 2;
 				default:
 					return count / 4;
@@ -1375,11 +1467,7 @@ export const getInserterItems = createSelector(
 				return false;
 			}
 
-			if ( ! canInsertBlockType( state, blockType.name, parentUID ) ) {
-				return false;
-			}
-
-			return true;
+			return canInsertBlockType( state, blockType.name, parentUID );
 		};
 
 		const buildBlockTypeInserterItem = ( blockType ) => {
@@ -1387,7 +1475,7 @@ export const getInserterItems = createSelector(
 
 			let isDisabled = false;
 			if ( blockType.useOnce ) {
-				isDisabled = getBlocks( state ).some( ( block ) => block.name === blockType.name );
+				isDisabled = some( getBlocks( state ), { name: blockType.name } );
 			}
 
 			const isContextual = isArray( blockType.parent );
@@ -1404,6 +1492,7 @@ export const getInserterItems = createSelector(
 				isDisabled,
 				utility: calculateUtility( blockType.category, count, isContextual ),
 				frecency: calculateFrecency( time, count ),
+				hasChildBlocks: hasChildBlocks( blockType.name ),
 			};
 		};
 
@@ -1475,6 +1564,7 @@ export const getInserterItems = createSelector(
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		state.sharedBlocks.data,
+		getBlockTypes(),
 	],
 );
 

@@ -13,7 +13,9 @@
 
 	.components-toolbar {
 		border: none;
-		border-left: 1px solid $light-gray-500;
+
+		// Add a right border to show as separator in the block toolbar.
+		border-right: 1px solid $light-gray-500;
 	}
 
 	// this should probably have its own class
@@ -24,8 +26,4 @@
 
 .editor-block-toolbar .editor-block-switcher {
 	display: inline-flex;
-
-	.edit-post-header-toolbar__block-toolbar & {
-		border-left-color: 1px solid $light-gray-500;
-	}
 }

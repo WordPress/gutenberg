@@ -3,28 +3,32 @@
  */
 import {
 	filter,
+	find,
+	findIndex,
+	flow,
 	groupBy,
+	isEmpty,
 	map,
 	some,
-	flow,
 	sortBy,
-	findIndex,
-	find,
 	without,
+	includes,
 } from 'lodash';
+import scrollIntoView from 'dom-scroll-into-view';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, compose } from '@wordpress/element';
+import { Component, compose, findDOMNode, createRef } from '@wordpress/element';
 import {
 	withInstanceId,
 	withSpokenMessages,
 	PanelBody,
+	withSafeTimeout,
 } from '@wordpress/components';
 import { getCategories, isSharedBlock } from '@wordpress/blocks';
-import { withDispatch } from '@wordpress/data';
+import { withDispatch, withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -32,6 +36,7 @@ import { withDispatch } from '@wordpress/data';
 import './style.scss';
 import BlockPreview from '../block-preview';
 import ItemList from './item-list';
+import ChildBlocks from './child-blocks';
 
 const MAX_SUGGESTED_ITEMS = 9;
 
@@ -56,6 +61,7 @@ export class InserterMenu extends Component {
 	constructor() {
 		super( ...arguments );
 		this.state = {
+			childItems: [],
 			filterValue: '',
 			hoveredItem: null,
 			suggestedItems: [],
@@ -65,6 +71,8 @@ export class InserterMenu extends Component {
 		};
 		this.onChangeSearchInput = this.onChangeSearchInput.bind( this );
 		this.onHover = this.onHover.bind( this );
+		this.panels = {};
+		this.inserterResults = createRef();
 	}
 
 	componentDidMount() {
@@ -89,6 +97,12 @@ export class InserterMenu extends Component {
 		} );
 	}
 
+	bindPanel( name ) {
+		return ( ref ) => {
+			this.panels[ name ] = ref;
+		};
+	}
+
 	onTogglePanel( panel ) {
 		return () => {
 			const isOpened = this.state.openPanels.indexOf( panel ) !== -1;
@@ -103,13 +117,23 @@ export class InserterMenu extends Component {
 						panel,
 					],
 				} );
+
+				this.props.setTimeout( () => {
+					// We need a generic way to access the panel's container
+					// eslint-disable-next-line react/no-find-dom-node
+					scrollIntoView( findDOMNode( this.panels[ panel ] ), this.inserterResults.current, {
+						alignWithTop: true,
+					} );
+				} );
 			}
 		};
 	}
 
 	filter( filterValue = '' ) {
-		const { items } = this.props;
+		const { items, rootChildBlocks } = this.props;
 		const filteredItems = searchItems( items, filterValue );
+
+		const childItems = filter( filteredItems, ( { name } ) => includes( rootChildBlocks, name ) );
 
 		let suggestedItems = [];
 		if ( ! filterValue ) {
@@ -142,6 +166,7 @@ export class InserterMenu extends Component {
 
 		this.setState( {
 			hoveredItem: null,
+			childItems,
 			filterValue,
 			suggestedItems,
 			sharedItems,
@@ -151,9 +176,10 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
-		const { instanceId, onSelect } = this.props;
-		const { hoveredItem, suggestedItems, sharedItems, itemsPerCategory, openPanels } = this.state;
+		const { instanceId, onSelect, rootUID } = this.props;
+		const { childItems, filterValue, hoveredItem, suggestedItems, sharedItems, itemsPerCategory, openPanels } = this.state;
 		const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
+		const isSearching = !! filterValue;
 
 		// Disable reason: The inserter menu is a modal display, not one which
 		// is always visible, and one which already incurs this behavior of
@@ -174,27 +200,24 @@ export class InserterMenu extends Component {
 					onChange={ this.onChangeSearchInput }
 				/>
 
-				<div className="editor-inserter__results">
+				<div className="editor-inserter__results" ref={ this.inserterResults }>
+					<ChildBlocks
+						rootUID={ rootUID }
+						items={ childItems }
+						onSelect={ onSelect }
+						onHover={ this.onHover }
+					/>
+
 					{ !! suggestedItems.length &&
 						<PanelBody
 							title={ __( 'Most Used' ) }
 							opened={ isPanelOpen( 'suggested' ) }
 							onToggle={ this.onTogglePanel( 'suggested' ) }
+							ref={ this.bindPanel( 'suggested' ) }
 						>
 							<ItemList items={ suggestedItems } onSelect={ onSelect } onHover={ this.onHover } />
 						</PanelBody>
 					}
-
-					{ !! sharedItems.length && (
-						<PanelBody
-							title={ __( 'Shared' ) }
-							opened={ isPanelOpen( 'shared' ) }
-							onToggle={ this.onTogglePanel( 'shared' ) }
-						>
-							<ItemList items={ sharedItems } onSelect={ onSelect } onHover={ this.onHover } />
-						</PanelBody>
-					) }
-
 					{ map( getCategories(), ( category ) => {
 						const categoryItems = itemsPerCategory[ category.slug ];
 						if ( ! categoryItems || ! categoryItems.length ) {
@@ -204,18 +227,33 @@ export class InserterMenu extends Component {
 							<PanelBody
 								key={ category.slug }
 								title={ category.title }
-								opened={ isPanelOpen( category.slug ) }
+								opened={ isSearching || isPanelOpen( category.slug ) }
 								onToggle={ this.onTogglePanel( category.slug ) }
+								ref={ this.bindPanel( category.slug ) }
 							>
 								<ItemList items={ categoryItems } onSelect={ onSelect } onHover={ this.onHover } />
 							</PanelBody>
 						);
 					} ) }
-
-					{ hoveredItem && isSharedBlock( hoveredItem ) &&
-						<BlockPreview name={ hoveredItem.name } attributes={ hoveredItem.initialAttributes } />
-					}
+					{ !! sharedItems.length && (
+						<PanelBody
+							title={ __( 'Shared' ) }
+							opened={ isPanelOpen( 'shared' ) }
+							onToggle={ this.onTogglePanel( 'shared' ) }
+							icon="controls-repeat"
+							ref={ this.bindPanel( 'shared' ) }
+						>
+							<ItemList items={ sharedItems } onSelect={ onSelect } onHover={ this.onHover } />
+						</PanelBody>
+					) }
+					{ isEmpty( suggestedItems ) && isEmpty( sharedItems ) && isEmpty( itemsPerCategory ) && (
+						<p className="editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
+					) }
 				</div>
+
+				{ hoveredItem && isSharedBlock( hoveredItem ) &&
+					<BlockPreview name={ hoveredItem.name } attributes={ hoveredItem.initialAttributes } />
+				}
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-autofocus */
@@ -223,9 +261,22 @@ export class InserterMenu extends Component {
 }
 
 export default compose(
+	withSelect( ( select, { rootUID } ) => {
+		const {
+			getChildBlockNames,
+		} = select( 'core/blocks' );
+		const {
+			getBlockName,
+		} = select( 'core/editor' );
+		const rootBlockName = getBlockName( rootUID );
+		return {
+			rootChildBlocks: getChildBlockNames( rootBlockName ),
+		};
+	} ),
 	withDispatch( ( dispatch ) => ( {
 		fetchSharedBlocks: dispatch( 'core/editor' ).fetchSharedBlocks,
 	} ) ),
 	withSpokenMessages,
-	withInstanceId
+	withInstanceId,
+	withSafeTimeout
 )( InserterMenu );

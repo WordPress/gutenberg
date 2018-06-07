@@ -59,7 +59,7 @@ module.exports = {
 				message: 'Use @wordpress/date as import path instead.',
 			},
 			{
-				selector: 'ImportDeclaration[source.value=/^deprecated/]',
+				selector: 'ImportDeclaration[source.value=/^deprecated$/]',
 				message: 'Use @wordpress/deprecated as import path instead.',
 			},
 			{
@@ -99,6 +99,10 @@ module.exports = {
 				"message": "Use @wordpress/core-blocks as import path instead."
 			},
 			{
+				"selector": "ImportDeclaration[source.value=/^nux$/]",
+				"message": "Use @wordpress/nux as import path instead."
+			},
+			{
 				selector: 'CallExpression[callee.name="deprecated"] Property[key.name="version"][value.value=/' + majorMinorRegExp + '/]',
 				message: 'Deprecated functions must be removed before releasing this version.',
 			},
@@ -110,6 +114,14 @@ module.exports = {
 				selector: 'CallExpression[callee.name=/^(__|_x|_n|_nx)$/] Literal[value=/\\.{3}/]',
 				message: 'Use ellipsis character (…) in place of three dots',
 			},
+			{
+				selector: 'ImportDeclaration[source.value="lodash"] Identifier.imported[name="memoize"]',
+				message: 'Use memize instead of Lodash\'s memoize',
+			},
+			{
+				selector: 'CallExpression[callee.object.name="page"][callee.property.name="waitFor"]',
+				message: 'Prefer page.waitForSelector instead.'
+			}
 		],
 	},
 	overrides: [

@@ -37,6 +37,20 @@ export function receiveUserQuery( queryID, users ) {
 }
 
 /**
+ * Returns an action object used in adding new entities.
+ *
+ * @param {Array} entities  Entities received.
+ *
+ * @return {Object} Action object.
+ */
+export function addEntities( entities ) {
+	return {
+		type: 'ADD_ENTITIES',
+		entities,
+	};
+}
+
+/**
  * Returns an action object used in signalling that entity records have been received.
  *
  * @param {string}       kind    Kind of the received entity.

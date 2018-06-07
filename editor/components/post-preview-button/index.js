@@ -8,8 +8,9 @@ import { get } from 'lodash';
  */
 import { Component, compose } from '@wordpress/element';
 import { Button, ifCondition } from '@wordpress/components';
-import { _x } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { DotTip } from '@wordpress/nux';
 
 export class PostPreviewButton extends Component {
 	constructor() {
@@ -107,6 +108,9 @@ export class PostPreviewButton extends Component {
 				disabled={ ! isSaveable }
 			>
 				{ _x( 'Preview', 'imperative verb' ) }
+				<DotTip id="core/editor.preview">
+					{ __( 'Click ‘Preview’ to load a preview of this page, so you can make sure you’re happy with your blocks.' ) }
+				</DotTip>
 			</Button>
 		);
 	}

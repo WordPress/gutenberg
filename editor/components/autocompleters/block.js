@@ -1,12 +1,8 @@
 /**
- * External dependencies
- */
-import { filter, sortBy, once, flow } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { createBlock, getBlockTypes, hasBlockSupport } from '@wordpress/blocks';
+import { select } from '@wordpress/data';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -14,46 +10,61 @@ import { createBlock, getBlockTypes, hasBlockSupport } from '@wordpress/blocks';
 import './style.scss';
 import BlockIcon from '../block-icon';
 
-function filterBlockTypes( blockTypes ) {
-	// Exclude blocks that don't support being shown in the inserter
-	return filter( blockTypes, ( blockType ) => hasBlockSupport( blockType, 'inserter', true ) );
+function defaultGetBlockInsertionPoint() {
+	return select( 'core/editor' ).getBlockInsertionPoint();
 }
 
-function sortBlockTypes( blockTypes ) {
-	// Prioritize blocks in the common common category
-	return sortBy( blockTypes, ( { category } ) => 'common' !== category );
+function defaultGetInserterItems( { rootUID } ) {
+	return select( 'core/editor' ).getInserterItems( rootUID );
 }
 
 /**
- * A blocks repeater for replacing the current block with a selected block type.
+ * Creates a blocks repeater for replacing the current block with a selected block type.
  *
- * @type {Completer}
+ * @return {Completer} A blocks completer.
  */
-export default {
-	name: 'blocks',
-	className: 'editor-autocompleters__block',
-	triggerPrefix: '/',
-	options: once( function options() {
-		return Promise.resolve( flow( filterBlockTypes, sortBlockTypes )( getBlockTypes() ) );
-	} ),
-	getOptionKeywords( blockSettings ) {
-		const { title, keywords = [] } = blockSettings;
-		return [ ...keywords, title ];
-	},
-	getOptionLabel( blockSettings ) {
-		const { icon, title } = blockSettings;
-		return [
-			<BlockIcon key="icon" icon={ icon } />,
-			title,
-		];
-	},
-	allowContext( before, after ) {
-		return ! ( /\S/.test( before.toString() ) || /\S/.test( after.toString() ) );
-	},
-	getOptionCompletion( blockData ) {
-		return {
-			action: 'replace',
-			value: createBlock( blockData.name ),
-		};
-	},
-};
+export function createBlockCompleter( {
+	// Allow store-based selectors to be overridden for unit test.
+	getBlockInsertionPoint = defaultGetBlockInsertionPoint,
+	getInserterItems = defaultGetInserterItems,
+} = {} ) {
+	return {
+		name: 'blocks',
+		className: 'editor-autocompleters__block',
+		triggerPrefix: '/',
+		options() {
+			return getInserterItems( getBlockInsertionPoint() );
+		},
+		getOptionKeywords( inserterItem ) {
+			const { title, keywords = [] } = inserterItem;
+			return [ ...keywords, title ];
+		},
+		getOptionLabel( inserterItem ) {
+			const { icon, title } = inserterItem;
+			return [
+				<BlockIcon key="icon" icon={ icon && icon.src } />,
+				title,
+			];
+		},
+		allowContext( before, after ) {
+			return ! ( /\S/.test( before.toString() ) || /\S/.test( after.toString() ) );
+		},
+		getOptionCompletion( inserterItem ) {
+			const { name, initialAttributes } = inserterItem;
+			return {
+				action: 'replace',
+				value: createBlock( name, initialAttributes ),
+			};
+		},
+		isOptionDisabled( inserterItem ) {
+			return inserterItem.isDisabled;
+		},
+	};
+}
+
+/**
+ * Creates a blocks repeater for replacing the current block with a selected block type.
+ *
+ * @return {Completer} A blocks completer.
+ */
+export default createBlockCompleter();

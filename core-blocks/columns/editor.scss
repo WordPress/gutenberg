@@ -38,17 +38,17 @@
 	}
 }
 
-// Hide appender shortcuts in columns
-// @todo This essentially duplicates the mobile styles for the appender component
-// It would be nice to be able to use element queries in that component instead https://github.com/tomhodgins/element-queries-spec
 .wp-block-columns {
-	.editor-inserter-with-shortcuts {
-		display: none;
+	display: block;
+
+	.editor-inner-blocks {
+		display: grid;
+		grid-auto-flow: dense;
 	}
 
-	.editor-block-list__empty-block-inserter,
-	.editor-default-block-appender .editor-inserter {
-		left: auto;
-		right: $item-spacing;
+	@for $i from 2 through 6 {
+		&.has-#{ $i }-columns .editor-inner-blocks {
+			grid-auto-columns: #{ 100% / $i };
+		}
 	}
 }

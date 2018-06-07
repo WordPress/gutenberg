@@ -103,6 +103,7 @@ describe( 'InserterMenu', () => {
 				items={ items }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
+				setTimeout={ noop }
 			/>
 		);
 
@@ -118,11 +119,15 @@ describe( 'InserterMenu', () => {
 				items={ [] }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
+				setTimeout={ noop }
 			/>
 		);
 
 		const visibleBlocks = wrapper.find( '.editor-inserter__item' );
 		expect( visibleBlocks ).toHaveLength( 0 );
+
+		const noResultsMessage = wrapper.find( '.editor-inserter__no-results' );
+		expect( noResultsMessage ).toHaveLength( 1 );
 	} );
 
 	it( 'should show only high utility items in the suggested tab', () => {
@@ -133,6 +138,7 @@ describe( 'InserterMenu', () => {
 				items={ items }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
+				setTimeout={ noop }
 			/>
 		);
 
@@ -152,6 +158,7 @@ describe( 'InserterMenu', () => {
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
 				maxSuggestedItems={ 2 }
+				setTimeout={ noop }
 			/>
 		);
 
@@ -167,6 +174,7 @@ describe( 'InserterMenu', () => {
 				items={ items }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
+				setTimeout={ noop }
 			/>
 		);
 		const activeTabs = wrapper.find( '.components-panel__body.is-opened button.components-panel__body-toggle' );
@@ -183,6 +191,9 @@ describe( 'InserterMenu', () => {
 		expect( visibleBlocks ).toHaveLength( 2 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'YouTube' );
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'A Text Embed' );
+
+		const noResultsMessage = wrapper.find( '.editor-inserter__no-results' );
+		expect( noResultsMessage ).toBeEmpty();
 	} );
 
 	it( 'should show shared items in the shared tab', () => {
@@ -193,6 +204,7 @@ describe( 'InserterMenu', () => {
 				items={ items }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
+				setTimeout={ noop }
 			/>
 		);
 		const activeTabs = wrapper.find( '.components-panel__body.is-opened button.components-panel__body-toggle' );
@@ -208,6 +220,9 @@ describe( 'InserterMenu', () => {
 		const visibleBlocks = wrapper.find( '.editor-inserter__item' );
 		expect( visibleBlocks ).toHaveLength( 1 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'My shared block' );
+
+		const noResultsMessage = wrapper.find( '.editor-inserter__no-results' );
+		expect( noResultsMessage ).toBeEmpty();
 	} );
 
 	it( 'should show the common category blocks', () => {
@@ -218,6 +233,7 @@ describe( 'InserterMenu', () => {
 				items={ items }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
+				setTimeout={ noop }
 			/>
 		);
 		const activeTabs = wrapper.find( '.components-panel__body.is-opened button.components-panel__body-toggle' );
@@ -235,6 +251,9 @@ describe( 'InserterMenu', () => {
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Text' );
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Advanced Text' );
 		expect( visibleBlocks.at( 2 ).text() ).toBe( 'Some Other Block' );
+
+		const noResultsMessage = wrapper.find( '.editor-inserter__no-results' );
+		expect( noResultsMessage ).toBeEmpty();
 	} );
 
 	it( 'should disable items with `isDisabled`', () => {
@@ -245,6 +264,7 @@ describe( 'InserterMenu', () => {
 				items={ items }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
+				setTimeout={ noop }
 			/>
 		);
 
@@ -265,22 +285,30 @@ describe( 'InserterMenu', () => {
 				items={ items }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
+				setTimeout={ noop }
 			/>
 		);
 		wrapper.find( '.editor-inserter__search' ).simulate( 'change', { target: { value: 'text' } } );
 
-		// Two tabs
-		const tabs = wrapper.find( '.editor-inserter__results .components-panel__body' );
-		expect( tabs ).toHaveLength( 2 );
+		// Two panels
+		const panels = wrapper.find( '.editor-inserter__results .components-panel__body' );
+		expect( panels ).toHaveLength( 2 );
 
-		// The tab one is active
-		const activeCategory = wrapper.find( '.components-panel__body.is-opened > .components-panel__body-title' );
-		expect( activeCategory.text() ).toBe( 'Common Blocks' );
+		// Matching panels expand
+		const matchingCategories = wrapper.find( '.components-panel__body.is-opened > .components-panel__body-title' );
+		expect( matchingCategories ).toHaveLength( 2 );
+		expect( matchingCategories.at( 0 ).text() ).toBe( 'Common Blocks' );
+		expect( matchingCategories.at( 1 ).text() ).toBe( 'Embeds' );
 
+		// Find blocks across panels
 		const visibleBlocks = wrapper.find( '.editor-inserter__item' );
-		expect( visibleBlocks ).toHaveLength( 2 );
+		expect( visibleBlocks ).toHaveLength( 3 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Text' );
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Advanced Text' );
+		expect( visibleBlocks.at( 2 ).text() ).toBe( 'A Text Embed' );
+
+		const noResultsMessage = wrapper.find( '.editor-inserter__no-results' );
+		expect( noResultsMessage ).toBeEmpty();
 	} );
 
 	it( 'should trim whitespace of search terms', () => {
@@ -291,22 +319,27 @@ describe( 'InserterMenu', () => {
 				items={ items }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
+				setTimeout={ noop }
 			/>
 		);
 		wrapper.find( '.editor-inserter__search' ).simulate( 'change', { target: { value: ' text' } } );
 
-		// Two tabs
-		const tabs = wrapper.find( '.editor-inserter__results .components-panel__body' );
-		expect( tabs ).toHaveLength( 2 );
+		// Two panels
+		const panels = wrapper.find( '.editor-inserter__results .components-panel__body' );
+		expect( panels ).toHaveLength( 2 );
 
-		// The tab one is active
-		const activeCategory = wrapper.find( '.components-panel__body.is-opened > .components-panel__body-title' );
-		expect( activeCategory.text() ).toBe( 'Common Blocks' );
+		// Matching panels expand
+		const matchingCategories = wrapper.find( '.components-panel__body.is-opened > .components-panel__body-title' );
+		expect( matchingCategories ).toHaveLength( 2 );
+		expect( matchingCategories.at( 0 ).text() ).toBe( 'Common Blocks' );
+		expect( matchingCategories.at( 1 ).text() ).toBe( 'Embeds' );
 
+		// Find blocks across panels
 		const visibleBlocks = wrapper.find( '.editor-inserter__item' );
-		expect( visibleBlocks ).toHaveLength( 2 );
+		expect( visibleBlocks ).toHaveLength( 3 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Text' );
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Advanced Text' );
+		expect( visibleBlocks.at( 2 ).text() ).toBe( 'A Text Embed' );
 	} );
 } );
 
