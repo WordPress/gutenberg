@@ -352,10 +352,16 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 		$schema = $this->get_item_schema();
 
 		if ( ! empty( $schema['properties']['preview_link'] ) ) {
-			$response->data['preview_link'] = get_preview_post_link( $post->post_parent, array(
-				'preview_id'    => $post->post_parent,
-				'preview_nonce' => wp_create_nonce( 'post_preview_' . $post->post_parent )
-			) );
+			$parent_id = wp_is_post_autosave( $post );
+			$preview_post_id = false === $parent_id ? $post->ID : $parent_id;
+			$preview_query_args = array();
+
+			if ( false !== $parent_id ) {
+				$preview_query_args['preview_id']    = $parent_id;
+				$preview_query_args['preview_nonce'] = wp_create_nonce( 'post_preview_' . $parent_id );
+			}
+
+			$response->data['preview_link'] = get_preview_post_link( $preview_post_id, $preview_query_args );
 		}
 
 		$context        = ! empty( $request['context'] ) ? $request['context'] : 'view';
