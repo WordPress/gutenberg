@@ -26,7 +26,7 @@ const MOD_KEY = process.platform === 'darwin' ? 'Meta' : 'Control';
  */
 const REGEXP_ZWSP = /[\u200B\u200C\u200D\uFEFF]/;
 
-function getUrl( WPPath, query = '' ) {
+export function getUrl( WPPath, query = '' ) {
 	const url = new URL( WP_BASE_URL );
 
 	url.pathname = join( url.pathname, WPPath );
@@ -139,4 +139,26 @@ export async function pressWithModifier( modifier, key ) {
 	await page.keyboard.down( modifier );
 	await page.keyboard.press( key );
 	return page.keyboard.up( modifier );
+}
+
+/**
+ * Publishes the post, resolving once the request is complete (once a notice
+ * is displayed).
+ *
+ * @return {Promise} Promise resolving when publish is complete.
+ */
+export async function publishPost() {
+	// Opens the publish panel
+	await page.click( '.editor-post-publish-panel__toggle' );
+
+	// Disable reason: Wait for the animation to complete, since otherwise the
+	// click attempt may occur at the wrong point.
+	// eslint-disable-next-line no-restricted-syntax
+	await page.waitFor( 100 );
+
+	// Publish the post
+	await page.click( '.editor-post-publish-button' );
+
+	// A success notice should show up
+	return page.waitForSelector( '.notice-success' );
 }
