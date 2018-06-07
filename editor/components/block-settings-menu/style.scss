@@ -26,13 +26,11 @@
 	// Apply a background in nested contexts, only on desktop
 	@include break-small() {
 		.editor-block-list__layout .editor-block-list__layout & {
-			background: $white;
-			box-shadow: inset 0 0 0 1px $light-gray-500;
-			color: $dark-gray-500; // always show dark gray in nested contexts
-	
+			//color: $dark-gray-500; // always show dark gray in nested contexts
+
 			&:first-child {
 				margin-bottom: -1px;
-			}	
+			}
 
 			&:hover,
 			&:active,
