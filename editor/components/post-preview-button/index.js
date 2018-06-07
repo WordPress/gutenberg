@@ -24,7 +24,7 @@ export class PostPreviewButton extends Component {
 		// This relies on the window being responsible to unset itself when
 		// navigation occurs or a new preview window is opened, to avoid
 		// unintentional forceful redirects.
-		if ( previewLink && ! prevProps.previewLink ) {
+		if ( previewLink && previewLink !== prevProps.previewLink ) {
 			this.setPreviewWindowLink( previewLink );
 		}
 	}
