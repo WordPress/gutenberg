@@ -23,12 +23,10 @@
 
 	&:not( :disabled ):not( [aria-disabled="true"] ):not( .is-default ):hover {
 		@include button-style__hover;
-		box-shadow: none;
 	}
 
 	&:not( :disabled ):not( [aria-disabled="true"] ):active {
 		@include button-style__active;
-		box-shadow: none;
 	}
 
 	&[aria-disabled=true]:focus,
