@@ -67,18 +67,7 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 							modalClass="editor-post-featured-image__media-modal"
 							render={ ( { open } ) => (
 								<Button className="editor-post-featured-image__toggle" onClick={ open }>
-									{ __( 'No image selected' ) }
-								</Button>
-							) }
-						/>
-						<MediaUpload
-							title={ __( 'Add Image' ) }
-							onSelect={ onUpdateImage }
-							type="image"
-							modalClass="editor-post-featured-image__media-modal"
-							render={ ( { open } ) => (
-								<Button onClick={ open } isDefault isLarge>
-									{ __( 'Add Image' ) }
+									{ __( 'Set featured image' ) }
 								</Button>
 							) }
 						/>
