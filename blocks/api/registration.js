@@ -15,7 +15,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import { normalizeIconObject } from './utils';
+import { isValidIcon, normalizeIconObject } from './utils';
 
 /**
  * Defined behavior of a block type.
@@ -86,12 +86,12 @@ export function registerBlockType( name, settings ) {
 		return;
 	}
 
-	if ( select( 'core/blocks' ).getBlockType( name ) ) {
-		// console.error(
-		//	'Block "' + name + '" is already registered.'
-		// );
+	/* if ( select( 'core/blocks' ).getBlockType( name ) ) {
+		console.error(
+			'Block "' + name + '" is already registered.'
+		);
 		return;
-	}
+	} */
 
 	settings = applyFilters( 'blocks.registerBlockType', settings, name );
 
@@ -142,6 +142,13 @@ export function registerBlockType( name, settings ) {
 	}
 
 	settings.icon = normalizeIconObject( settings.icon );
+	if ( ! isValidIcon( settings.icon.src ) ) {
+		console.error(
+			'The icon passed is invalid. ' +
+			'The icon should be a string, an element, a function, or an object following the specifications documented in https://wordpress.org/gutenberg/handbook/block-api/#icon-optional'
+		);
+		return;
+	}
 
 	if ( 'isPrivate' in settings ) {
 		deprecated( 'isPrivate', {

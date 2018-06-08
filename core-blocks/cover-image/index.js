@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty } from 'lodash';
+import { isEmpty, reduce } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -57,6 +57,10 @@ const blockAttributes = {
 		type: 'number',
 		default: 50,
 	},
+	data: {
+		type: 'object',
+		default: {},
+	},
 };
 
 export const name = 'core/cover-image';
@@ -101,11 +105,27 @@ export const settings = {
 	},
 
 	edit( { attributes, setAttributes, isSelected, className } ) {
-		const { url, title, align, contentAlign, id, hasParallax, dimRatio } = attributes;
+		const { url, title, align, contentAlign, id, hasParallax, dimRatio, data } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
-		const onSelectImage = ( media ) => setAttributes( { url: media.url, id: media.id } );
+		const onSelectImage = ( media ) => {
+			setAttributes( { url: media.url, id: media.id } );
+
+			if ( media.data ) {
+				updateData( media.data );
+			}
+		};
 		const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
 		const setDimRatio = ( ratio ) => setAttributes( { dimRatio: ratio } );
+		const updateData = ( nextData ) => {
+			nextData = reduce( nextData, ( result, value, key ) => {
+				key = key.replace( '_', '-' );
+				result[ `data-${ key }` ] = value;
+
+				return result;
+			}, {} );
+
+			setAttributes( { data: nextData } );
+		};
 
 		const style = backgroundImageStyles( url );
 		const classes = classnames(
@@ -208,6 +228,7 @@ export const settings = {
 					data-url={ url }
 					style={ style }
 					className={ classes }
+					{ ...data }
 				>
 					{ title || isSelected ? (
 						<RichText
@@ -225,7 +246,7 @@ export const settings = {
 	},
 
 	save( { attributes, className } ) {
-		const { url, title, hasParallax, dimRatio, align, contentAlign } = attributes;
+		const { url, title, hasParallax, dimRatio, align, contentAlign, data } = attributes;
 		const style = backgroundImageStyles( url );
 		const classes = classnames(
 			className,
@@ -239,7 +260,7 @@ export const settings = {
 		);
 
 		return (
-			<div className={ classes } style={ style }>
+			<div className={ classes } style={ style } { ...data }>
 				{ title && title.length > 0 && (
 					<RichText.Content tagName="p" className="wp-block-cover-image-text" value={ title } />
 				) }

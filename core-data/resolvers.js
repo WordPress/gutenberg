@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { find } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import apiRequest from '@wordpress/api-request';
@@ -12,7 +17,7 @@ import {
 	receiveEntityRecords,
 	receiveThemeSupportsFromIndex,
 } from './actions';
-import { getEntity } from './entities';
+import { getKindEntities } from './entities';
 
 /**
  * Requests categories from the REST API, yielding action objects on request
@@ -32,7 +37,7 @@ export async function* getAuthors() {
 }
 
 /**
- * Requests a entity's record from the REST API.
+ * Requests an entity's record from the REST API.
  *
  * @param {Object} state  State tree
  * @param {string} kind   Entity kind.
@@ -40,7 +45,11 @@ export async function* getAuthors() {
  * @param {number} key    Record's key
  */
 export async function* getEntityRecord( state, kind, name, key ) {
-	const entity = getEntity( kind, name );
+	const entities = yield* await getKindEntities( state, kind );
+	const entity = find( entities, { kind, name } );
+	if ( ! entity ) {
+		return;
+	}
 	const record = await apiRequest( { path: `${ entity.baseUrl }/${ key }?context=edit` } );
 	yield receiveEntityRecords( kind, name, record );
 }
@@ -53,7 +62,11 @@ export async function* getEntityRecord( state, kind, name, key ) {
  * @param {string} name   Entity name.
  */
 export async function* getEntityRecords( state, kind, name ) {
-	const entity = getEntity( kind, name );
+	const entities = yield* await getKindEntities( state, kind );
+	const entity = find( entities, { kind, name } );
+	if ( ! entity ) {
+		return;
+	}
 	const records = await apiRequest( { path: `${ entity.baseUrl }?context=edit` } );
 	yield receiveEntityRecords( kind, name, Object.values( records ) );
 }

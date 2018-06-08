@@ -77,6 +77,12 @@ $z-layers: (
 	'.components-autocomplete__results': 1000000,
 
 	'.skip-to-selected-block': 100000,
+
+	// Show NUX tips above popovers, wp-admin menus, submenus, and sidebar:
+	'.nux-dot-tip': 1000001,
+
+	// Show tooltips above NUX tips, wp-admin menus, submenus, and sidebar:
+	'.components-tooltip': 1000002
 );
 
 @function z-index( $key ) {

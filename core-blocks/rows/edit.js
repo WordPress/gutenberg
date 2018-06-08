@@ -55,9 +55,9 @@ const getColumnLayouts = memoize( ( columns, widths ) => {
 
 /**
  * [description]
- * @param  {[type]} widths [description]
- * @param  {[type]} index  [description]
- * @return {[type]}        [description]
+ * @param  {string} widths [description]
+ * @param  {number} index  [description]
+ * @return {number}        [description]
  */
 const getWidth = ( widths, index ) => {
 	return parseInt( widths.split( ',' )[ index ] );
@@ -90,7 +90,7 @@ class RowEdit extends Component {
 		const { attributes, className } = this.props;
 		const { columns, widths } = attributes;
 
-		const classes = classnames( className, 'wp-block-rows' );
+		const classes = classnames( className );
 
 		let partial = 0;
 
@@ -101,7 +101,7 @@ class RowEdit extends Component {
 						label={ __( 'Columns' ) }
 						value={ columns }
 						onChange={ this.onColumnsChange }
-						min={ MIN_COLUMNS }
+						min={ 1 }
 						max={ MAX_COLUMNS }
 					/>
 				</PanelBody>

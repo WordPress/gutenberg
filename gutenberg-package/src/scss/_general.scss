@@ -1,3 +1,9 @@
+@media (min-width: 600px) {
+    body .gutenberg__editor {
+        position: relative;
+    }
+}
+
 .gutenberg__editor {
     position: relative;
 
@@ -8,7 +14,7 @@
             outline-width: 0;
         }
     }
-    
+
     input {
         margin: 1px;
     }
@@ -76,7 +82,7 @@
                 cursor: pointer;
             }    
         }
-        
+
         .edit-post-text-editor {
             @media (min-width: 960px) {
                 padding-left: 20px;

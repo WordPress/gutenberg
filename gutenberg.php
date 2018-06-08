@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
- * Version: 3.0.0
+ * Version: 3.0.1
  * Author: Gutenberg Team
  *
  * @package gutenberg
@@ -80,6 +80,35 @@ function gutenberg_menu() {
 add_action( 'admin_menu', 'gutenberg_menu' );
 
 /**
+ * Checks whether we're currently loading a Gutenberg page
+ *
+ * @return boolean Whether Gutenberg is being loaded.
+ *
+ * @since 3.1.0
+ */
+function is_gutenberg_page() {
+	global $post;
+
+	if ( ! is_admin() ) {
+		return false;
+	}
+
+	if ( get_current_screen()->base !== 'post' ) {
+		return false;
+	}
+
+	if ( isset( $_GET['classic-editor'] ) ) {
+		return false;
+	}
+
+	if ( ! gutenberg_can_edit_post( $post ) ) {
+		return false;
+	}
+
+	return true;
+}
+
+/**
  * Display a version notice and deactivate the Gutenberg plugin.
  *
  * @since 0.1.0
@@ -144,11 +173,7 @@ function gutenberg_init( $return, $post ) {
 		return $return;
 	}
 
-	if ( isset( $_GET['classic-editor'] ) ) {
-		return false;
-	}
-
-	if ( ! gutenberg_can_edit_post( $post ) ) {
+	if ( ! is_gutenberg_page() ) {
 		return false;
 	}
 
