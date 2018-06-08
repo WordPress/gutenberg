@@ -71,7 +71,7 @@ export default function ColorPalette( { colors, disableAlpha = true, disableCust
 									colorString = color.hex;
 								} else {
 									const { r, g, b, a } = color.rgb;
-									colorString = 'rgba(' + [ r, g, b, a ].join( ',' ) + ')';
+									colorString = `rgba(${ r }, ${ g }, ${ b }, ${ a })`;
 								}
 								onChange( colorString );
 							} }
