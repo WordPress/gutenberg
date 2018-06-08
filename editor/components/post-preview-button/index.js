@@ -37,7 +37,7 @@ export class PostPreviewButton extends Component {
 	 */
 	setPreviewWindowLink( url ) {
 		const { previewWindow } = this;
-		if ( ! previewWindow || previewWindow.location === url ) {
+		if ( ! previewWindow || previewWindow.location.href === url ) {
 			return;
 		}
 
