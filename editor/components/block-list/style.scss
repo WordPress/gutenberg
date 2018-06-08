@@ -74,9 +74,10 @@
 		}
 	}
 
-
-	cursor: move; // Fallback for IE/Edge < 14
-	cursor: grab;
+	&[draggable=true]{
+		cursor: move; // Fallback for IE/Edge < 14
+		cursor: grab;
+	}
 }
 
 

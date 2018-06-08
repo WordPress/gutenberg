@@ -152,13 +152,13 @@ class Draggable extends Component {
 	}
 
 	render() {
-		const { children, className } = this.props;
+		const { children, draggable = true, className } = this.props;
 		return (
 			<div
 				className={ classnames( 'components-draggable', className ) }
 				onDragStart={ this.onDragStart }
 				onDragEnd={ this.onDragEnd }
-				draggable
+				draggable={ draggable }
 			>
 				{ children }
 			</div>
