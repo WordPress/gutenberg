@@ -267,6 +267,10 @@ export function dispatch( reducerKey ) {
  * @return {Component} Enhanced component with merged state data props.
  */
 export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( WrappedComponent ) => {
+	function getNextMergeProps( props ) {
+		return mapStateToProps( select, props ) || {};
+	}
+
 	return class ComponentWithSelect extends Component {
 		constructor( props ) {
 			super( ...arguments );
@@ -280,7 +284,7 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 			 */
 			this.shouldComponentUpdate = false;
 			this.state = {
-				mergeProps: mapStateToProps( select, props ) || {},
+				mergeProps: getNextMergeProps( props ),
 			};
 
 			// Subscribtion should happen in the constructor
@@ -323,7 +327,7 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 			}
 
 			const { mergeProps } = this.state;
-			const nextMergeProps = mapStateToProps( select, props ) || {};
+			const nextMergeProps = getNextMergeProps( props );
 
 			if ( ! isShallowEqual( nextMergeProps, mergeProps ) ) {
 				this.setState( {
