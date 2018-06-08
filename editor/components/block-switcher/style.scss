@@ -5,8 +5,12 @@
 .editor-block-switcher__toggle {
 	width: auto;
 	margin: 0;
-	padding: 8px;
 	border-radius: 0;
+	padding: 8px 4px;
+
+	@include break-small() {
+		padding: 8px;
+	}
 
 	&:focus:before {
 		top: -3px;

@@ -1,17 +1,16 @@
 /**
  * WordPress dependencies
  */
-
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
-import { PanelBody, Toolbar } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
-import { RichText, BlockControls, InspectorControls, AlignmentToolbar } from '@wordpress/editor';
+import { RichText, BlockControls, AlignmentToolbar } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
+import HeadingStylesToolbar from './styles-toolbar';
 
 export default function HeadingEdit( {
 	attributes,
@@ -26,37 +25,19 @@ export default function HeadingEdit( {
 	return (
 		<Fragment>
 			<BlockControls>
-				<Toolbar
-					controls={ '234'.split( '' ).map( ( level ) => ( {
-						icon: 'heading',
-						title: sprintf( __( 'Heading %s' ), level ),
-						isActive: 'H' + level === nodeName,
-						onClick: () => setAttributes( { nodeName: 'H' + level } ),
-						subscript: level,
-					} ) ) }
+				<HeadingStylesToolbar
+					value={ nodeName }
+					onChange={ ( nextNodeName ) => {
+						setAttributes( { nodeName: nextNodeName } );
+					} }
+				/>
+				<AlignmentToolbar
+					value={ align }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { align: nextAlign } );
+					} }
 				/>
 			</BlockControls>
-			<InspectorControls>
-				<PanelBody title={ __( 'Heading Settings' ) }>
-					<p>{ __( 'Level' ) }</p>
-					<Toolbar
-						controls={ '123456'.split( '' ).map( ( level ) => ( {
-							icon: 'heading',
-							title: sprintf( __( 'Heading %s' ), level ),
-							isActive: 'H' + level === nodeName,
-							onClick: () => setAttributes( { nodeName: 'H' + level } ),
-							subscript: level,
-						} ) ) }
-					/>
-					<p>{ __( 'Text Alignment' ) }</p>
-					<AlignmentToolbar
-						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
-					/>
-				</PanelBody>
-			</InspectorControls>
 			<RichText
 				wrapperClassName="wp-block-heading"
 				tagName={ nodeName.toLowerCase() }

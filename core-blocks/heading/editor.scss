@@ -33,3 +33,45 @@
 		font-size: 0.8em;
 	}
 }
+
+.core-blocks-heading__icon {
+	height: 20px;
+	width: 20px;
+	display: inline-flex;
+	position: relative;
+
+	/*&:after {
+		content: attr( data-subscript );
+		font-family: $default-font;
+		font-size: $default-font-size;
+		font-weight: 600;
+		position: absolute;
+		bottom: 0;
+		left: 16px;
+	}*/
+
+	// subscript for numbered icon buttons, like headings
+	/*&[data-subscript] svg {
+		padding: 4px 8px 4px 0;
+	}*/
+
+	&[data-subscript]:after {
+		content: attr( data-subscript );
+		font-family: $default-font;
+		font-size: $default-font-size;
+		font-weight: 600;
+		position: absolute;
+		right: -5px;
+		bottom: 0;
+	}
+}
+
+.core-blocks-heading__styles-toolbar {
+	.components-icon-button {
+		padding: 8px 4px;
+
+		@include break-small() {
+			padding: 8px;
+		}
+	}
+}
