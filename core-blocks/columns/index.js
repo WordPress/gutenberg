@@ -29,12 +29,8 @@ import './editor.scss';
  *
  * @return {Object[]} Columns layout configuration.
  */
-const getColumnLayouts = memoize( ( columns ) => {
-	return times( columns, ( n ) => ( {
-		name: `column-${ n + 1 }`,
-		label: sprintf( __( 'Column %d' ), n + 1 ),
-		icon: 'columns',
-	} ) );
+const getColumnsTemplate = memoize( ( columns ) => {
+	return times( columns, () => [ 'core/column' ] );
 } );
 
 export const name = 'core/columns';
@@ -86,7 +82,10 @@ export const settings = {
 					</PanelBody>
 				</InspectorControls>
 				<div className={ classes }>
-					<InnerBlocks layouts={ getColumnLayouts( columns ) } />
+					<InnerBlocks
+						template={ getColumnsTemplate( columns ) }
+						templateLock="all"
+						allowedBlocks={ [ 'core/column' ] } />
 				</div>
 			</Fragment>
 		);

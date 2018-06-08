@@ -34,14 +34,18 @@
 .wp-block-columns {
 	display: block;
 
-	.editor-inner-blocks {
-		display: grid;
-		grid-auto-flow: dense;
-	}
+	> .editor-inner-blocks > .editor-block-list__layout {
+		display: flex;
 
-	@for $i from 2 through 6 {
-		&.has-#{ $i }-columns .editor-inner-blocks {
-			grid-auto-columns: #{ 100% / $i };
+		> [data-type="core/column"] {
+			display: flex;
+			flex-direction: column;
+			flex: 1;
+			width: 0;
+
+			.editor-block-list__block-edit {
+				flex-basis: 100%;
+			}
 		}
 	}
 }
