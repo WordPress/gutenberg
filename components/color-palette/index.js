@@ -18,7 +18,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import './style.scss';
 import Button from '../button';
 
-export default function ColorPalette( { colors, disableCustomColors = false, value, onChange, disableAlpha = true } ) {
+export default function ColorPalette( { colors, disableAlpha = true, disableCustomColors = false, onChange, value } ) {
 	function applyOrUnset( color ) {
 		return () => onChange( value === color ? undefined : color );
 	}
