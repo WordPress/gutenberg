@@ -25,7 +25,6 @@ import apiRequest from '@wordpress/api-request';
 /**
  * Internal dependencies
  */
-import { getWPAdminURL } from '../utils/url';
 import {
 	setupEditorState,
 	resetAutosave,
@@ -254,6 +253,8 @@ export default {
 		dispatch( removeNotice( TRASH_POST_NOTICE_ID ) );
 		apiRequest( { path: `/wp/v2/${ basePath }/${ postId }`, method: 'DELETE' } ).then(
 			() => {
+				const post = getCurrentPost( getState() );
+				dispatch( resetPost( { ...post, status: 'trashed' } ) );
 				dispatch( {
 					...action,
 					type: 'TRASH_POST_SUCCESS',
@@ -270,15 +271,6 @@ export default {
 				} );
 			}
 		);
-	},
-	TRASH_POST_SUCCESS( action ) {
-		const { postId, postType } = action;
-
-		window.location.href = getWPAdminURL( 'edit.php', {
-			trashed: 1,
-			post_type: postType,
-			ids: postId,
-		} );
 	},
 	TRASH_POST_FAILURE( action, store ) {
 		const message = action.error.message && action.error.code !== 'unknown_error' ? action.error.message : __( 'Trashing failed' );

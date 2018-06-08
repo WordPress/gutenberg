@@ -16,6 +16,22 @@ export function getPostEditURL( postId ) {
 	return addQueryArgs( 'post.php', { post: postId, action: 'edit' } );
 }
 
+/**
+ * Returns the Post's Trashedd URL.
+ *
+ * @param {number} postId    Post ID.
+ * @param {string} postType Post Type.
+ *
+ * @return {string} Post trashed URL.
+ */
+export function getPostTrashedURL( postId, postType ) {
+	return addQueryArgs( 'edit.php', {
+		trashed: 1,
+		post_type: postType,
+		ids: postId,
+	} );
+}
+
 export class BrowserURL extends Component {
 	constructor() {
 		super( ...arguments );
@@ -26,8 +42,13 @@ export class BrowserURL extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { postId, postStatus } = this.props;
+		const { postId, postStatus, postType } = this.props;
 		const { historyId } = this.state;
+
+		if ( postStatus === 'trashed' ) {
+			window.location.href = getPostTrashedURL( postId, postType );
+		}
+
 		if ( postId === prevProps.postId && postId === historyId ) {
 			return;
 		}
@@ -65,10 +86,11 @@ export class BrowserURL extends Component {
 
 export default withSelect( ( select ) => {
 	const { getCurrentPost } = select( 'core/editor' );
-	const { id, status } = getCurrentPost();
+	const { id, status, type } = getCurrentPost();
 
 	return {
 		postId: id,
 		postStatus: status,
+		postType: type,
 	};
 } )( BrowserURL );
