@@ -11,6 +11,7 @@ import {
 	Children,
 	Fragment,
 	isValidElement,
+	StrictMode,
 } from 'react';
 import { render, findDOMNode, createPortal, unmountComponentAtNode } from 'react-dom';
 import {
@@ -105,6 +106,8 @@ export { cloneElement };
 export { findDOMNode };
 
 export { Children };
+
+export { StrictMode };
 
 /**
  * A component which renders its children without any wrapping element.
