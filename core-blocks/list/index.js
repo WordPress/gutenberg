@@ -252,6 +252,7 @@ export const settings = {
 		render() {
 			const {
 				attributes,
+				canInsertSibling,
 				insertBlocksAfter,
 				setAttributes,
 				mergeBlocks,
@@ -302,6 +303,13 @@ export const settings = {
 						onSplit={
 							insertBlocksAfter ?
 								( before, after, ...blocks ) => {
+									if ( ! canInsertSibling( 'core/list' ) ) {
+										// If it is not possible to insert a list
+										// don't split the block just try to insert pasted blocks after it.
+										// Unsupported blocks are ignored.
+										insertBlocksAfter( blocks );
+										return;
+									}
 									if ( ! blocks.length ) {
 										blocks.push( createBlock( 'core/paragraph' ) );
 									}

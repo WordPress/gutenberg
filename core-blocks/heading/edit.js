@@ -15,6 +15,7 @@ import './editor.scss';
 
 export default function HeadingEdit( {
 	attributes,
+	canInsertSibling,
 	setAttributes,
 	mergeBlocks,
 	insertBlocksAfter,
@@ -66,6 +67,13 @@ export default function HeadingEdit( {
 				onSplit={
 					insertBlocksAfter ?
 						( before, after, ...blocks ) => {
+							if ( ! canInsertSibling( 'core/paragraph' ) ) {
+								// If it is not possible to insert a paragraph
+								// don't split the block just try to insert pasted blocks after it.
+								// Unsupported blocks are ignored.
+								insertBlocksAfter( blocks );
+								return;
+							}
 							setAttributes( { content: before } );
 							insertBlocksAfter( [
 								...blocks,

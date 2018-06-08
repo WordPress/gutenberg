@@ -139,6 +139,7 @@ class ParagraphBlock extends Component {
 
 	render() {
 		const {
+			canInsertSibling,
 			attributes,
 			setAttributes,
 			insertBlocksAfter,
@@ -233,6 +234,13 @@ class ParagraphBlock extends Component {
 						} }
 						onSplit={ insertBlocksAfter ?
 							( before, after, ...blocks ) => {
+								if ( ! canInsertSibling( name ) ) {
+									// If it is not possible to insert block of the same type
+									// don't split the block just try to insert pasted blocks after it.
+									// Unsupported blocks are ignored.
+									insertBlocksAfter( blocks );
+									return;
+								}
 								if ( after ) {
 									blocks.push( createBlock( name, { content: after } ) );
 								}

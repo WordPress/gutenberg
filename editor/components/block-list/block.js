@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, reduce, size, castArray, first, last, noop } from 'lodash';
+import { get, reduce, size, castArray, filter, first, last, noop } from 'lodash';
 import tinymce from 'tinymce';
 
 /**
@@ -60,6 +60,7 @@ export class BlockListBlock extends Component {
 
 		this.setBlockListRef = this.setBlockListRef.bind( this );
 		this.bindBlockNode = this.bindBlockNode.bind( this );
+		this.canInsertSibling = this.canInsertSibling.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
 		this.hideHoverEffects = this.hideHoverEffects.bind( this );
@@ -121,6 +122,11 @@ export class BlockListBlock extends Component {
 		if ( this.props.isSelected && ! prevProps.isSelected ) {
 			this.focusTabbable();
 		}
+	}
+
+	canInsertSibling( blockName ) {
+		const { canInsertBlockType, rootUID } = this.props;
+		return canInsertBlockType( blockName, rootUID );
 	}
 
 	setBlockListRef( node ) {
@@ -562,6 +568,7 @@ export class BlockListBlock extends Component {
 								id={ uid }
 								isSelectionEnabled={ this.props.isSelectionEnabled }
 								toggleSelection={ this.props.toggleSelection }
+								canInsertSibling={ this.canInsertSibling }
 							/>
 						) }
 						{ isValid && mode === 'html' && (
@@ -607,6 +614,7 @@ export class BlockListBlock extends Component {
 
 const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 	const {
+		canInsertBlockType,
 		isBlockSelected,
 		getPreviousBlockUid,
 		getNextBlockUid,
@@ -651,6 +659,7 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 		block,
 		isSelected,
 		hasFixedToolbar,
+		canInsertBlockType,
 	};
 } );
 
@@ -674,7 +683,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 			selectBlock( uid, initialPosition );
 		},
 		onInsertBlocks( blocks, index ) {
-			const { rootUID, layout } = ownProps;
+			const { canInsertBlockType, rootUID, layout } = ownProps;
+			blocks = filter( blocks, ( { name } ) => canInsertBlockType( name, rootUID ) );
 			blocks = blocks.map( ( block ) => cloneBlock( block, { layout } ) );
 			insertBlocks( blocks, index, rootUID );
 		},
