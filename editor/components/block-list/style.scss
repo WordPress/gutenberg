@@ -682,7 +682,7 @@
 	height: $block-padding * 2; // Matches the whole empty space between two blocks
 	justify-content: center;
 
-	// Show a clickable plus
+	// Show a clickable plus.
 	.editor-block-list__insertion-point-button {
 		margin-top: -4px;
 		border-radius: 50%;
@@ -695,25 +695,46 @@
 			box-shadow: none;
 		}
 
+		// Show the sibling inserter indicator when hovering the plus button.
+		&:hover + .editor-block-list__insertion-point-sibling-indicator {
+			left: $block-padding;
+			right: $block-padding;
+			opacity: 1;
+		}
 	}
 
-	// Show a line indicator when hovering, but this is unclickable
-	&:before {
+	// This is the indicator shown when using the Sibling Inserter.
+	.editor-block-list__insertion-point-sibling-indicator {
+		transition: all 0.1s ease-out 0.1s;
 		position: absolute;
+		z-index: -1;
 		top: calc( 50% - #{ $border-width } );
 		height: 2px;
-		left: 0;
-		right: 0;
-		background: $dark-gray-100;
+		left: 50%;
+		right: 50%;
+		background: $dark-gray-500;
 		content: '';
+		opacity: 0;
 	}
 
-	// Hide both the line and button until hovered
+	// Hide both the line and button until hovered.
 	opacity: 0;
 	transition: opacity 0.1s linear 0.1s;
 
-	&:hover, &.is-visible {
+	&:hover,
+	&.is-visible {
 		opacity: 1;
+	}
+}
+
+// Don't show the sibling inserter before the selected block.
+.edit-post-layout:not( .has-fixed-toolbar ) .is-selected .editor-block-list__insertion-point-inserter {
+	opacity: 0;
+	pointer-events: none;
+
+	&.is-visible {
+		opacity: 1;
+		pointer-events: auto;
 	}
 }
 
