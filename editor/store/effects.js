@@ -633,7 +633,13 @@ export default {
 
 	MULTI_SELECT: removeProvisionalBlock,
 
-	REMOVE_BLOCKS( action, { getState, dispatch } ) {
+	REMOVE_BLOCKS( action, store ) {
+		const { getState, dispatch } = store;
+
+		if ( get( window, [ 'customGutenberg', 'events', 'REMOVE_BLOCKS' ] ) ) {
+			window.customGutenberg.events.REMOVE_BLOCKS( action, store );
+		}
+
 		// if the action says previous block should not be selected don't do anything.
 		if ( ! action.selectPrevious ) {
 			return;

@@ -2,30 +2,31 @@
 
 We made [Gutenberg](https://github.com/Wordpress/gutenberg) editor a little more **customizable**! 
 
-Gutenberg editor can **be easly included in your apps** with this [package](https://github.com/front/gutenberg). Also you can customize blocks menu tabs, blocks categories, document panels and more! 
+Gutenberg editor can **be easly included in your apps** with this [package](https://github.com/front/gutenberg). Also you can customize blocks menu panels, blocks categories, document panels and more! 
 
-This package is based on [Gutenberg v3.0.0](https://github.com/WordPress/gutenberg/releases/tag/v3.0.0).
+This package is based on [Gutenberg v3.0.1](https://github.com/WordPress/gutenberg/releases/tag/v3.0.1).
 
 ## Table of contents
 * [Installation](#installation)
 * [Usage](#usage)
     * [Gutenberg Stores](#gutenberg-stores)
+    * [Registering Custom Blocks](#registering-custom-blocks)
 * [Global variables](#global-variables)
     * [apiRequest](#apirequest)
-        * [GET types](#get-types)
-        * [PUT post or page (and POST post or page autosaves)](#put-post-or-page-and-post-post-or-page-autosaves)
-        * [GET categories](#get-categories)
-        * [GET /](#get-)
-        * [POST media](#post-media)
-        * [GET media](#get-media)
+        * [Post Types](#post-types)
+        * [Posts and Pages](#posts-and-pages)
+        * [Categories](#categories)
+        * [Index](#index)
+        * [Media](#media)
     * [url](#url)
 * [Customize your Gutenberg](#customize-your-gutenberg)
     * [Inserter Menu (blocks)](#inserter-menu-blocks)
     * [Block Categories](#block-categories)
     * [Rows](#rows)
+    * [Dynamic Row](#dynamic-row)
     * [Posts Panel](#posts-panel)
         * [Post Block](#post-block)
-    * [Events (experimental)](#events-experimental)
+    * [Events](#events)
 
 ## Installation
 
@@ -35,38 +36,31 @@ This package is based on [Gutenberg v3.0.0](https://github.com/WordPress/gutenbe
 npm install @frontkom/gutenberg
 ```
 
+[↑ Go up to Table of contents](#table-of-contents)
+
 ## Usage
 
 We've tried to make it easy to import **Gutenberg by Frontkom** editor in your apps.
 
 ```js
-// Importing global variables Gutenberg requires
+// Importing global variables that Gutenberg requires
 import './globals'; 
 
-// Importing Gutenberg
+// Importing initialization method
 import { initializeEditor } from '@frontkom/gutenberg';
 
 // Don't forget to import the style
 import '@frontkom/gutenberg/build/css/core-blocks/style.css';
+import '@frontkom/gutenberg/build/css/style.css';
 import '@frontkom/gutenberg/build/css/core-blocks/edit-blocks.css';
 import '@frontkom/gutenberg/build/css/core-blocks/theme.css';
-import '@frontkom/gutenberg/build/css/style.css';
 
 // DOM element id where editor will be displayed
-const target = 'editor'; 
+const target = 'editor';
 
-// Page properties
-const page = { 
-    content: { 
-        raw: '<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->', 
-        rendered: '<p>Hello</p>' 
-    },
-    templates: '', // feel free to create your own templates
-    title: { raw: 'My first page', rendered: 'My first page' },
-    type: 'page', // or 'post'
-    id: 12345,
-    ...
-};
+// Post properties
+const postType = 'post'; // or 'page'
+const postId = 123;
 
 // Some editor settings
 const settings = { 
@@ -82,11 +76,16 @@ const settings = {
     ...
 };
 
+// Post properties to override
+const overridePost = {};
+
 // Et voilá... Initializing the editor!
-initializeEditor( target, page, settings );
+initializeEditor( target, postType, postId, settings, overridePost );
 ```
 
 **Note**: Gutenberg requires utf-8 encoding, so don't forget to add `<meta charset="utf-8">` tag to your html `<head>`.
+
+[↑ Go up to Table of contents](#table-of-contents)
 
 ### Gutenberg Stores
 
@@ -107,6 +106,78 @@ select( 'core/editor' ).getEditedPostContent();
 // <!-- /wp:paragraph -->
 
 ```
+
+[↑ Go up to Table of contents](#table-of-contents)
+
+### Registering Custom Blocks
+
+You can create your custom blocks using the `registerBlockType` method and the Gutenberg blocks and components. Check out the example below and the Wordpress [documentation](https://wordpress.org/gutenberg/handbook/blocks/) to read more about it.
+
+```js
+import {
+    registerBlockType,
+    RichText,
+    BlockControls,
+    AlignmentToolbar,
+} from '@frontkom/gutenberg';
+
+registerBlockType( 'custom/my-block', {
+    title: 'My first block',
+    icon: 'universal-access-alt',
+    category: 'common',
+    attributes: {
+        content: {
+            type: 'array',
+            source: 'children',
+            selector: 'p',
+        },
+        alignment: {
+            type: 'string',
+        },
+    },
+    edit( { attributes, className, setAttributes } ) {
+        const { content, alignment } = attributes;
+
+        function onChangeContent( newContent ) {
+            setAttributes( { content: newContent } );
+        }
+
+        function onChangeAlignment( newAlignment ) {
+            setAttributes( { alignment: newAlignment } );
+        }
+
+        return [
+            <BlockControls>
+                <AlignmentToolbar
+                    value={ alignment }
+                    onChange={ onChangeAlignment }
+                />
+            </BlockControls>,
+            <RichText
+                tagName="p"
+                className={ className }
+                style={ { textAlign: alignment } }
+                onChange={ onChangeContent }
+                value={ content }
+            />
+        ];
+    },
+    save( { attributes, className } ) {
+        const { content, alignment } = attributes;
+
+        return (
+            <RichText.Content
+                className={ className }
+                style={ { textAlign: alignment } }
+                value={ content }
+            />
+        );
+    },
+} );
+
+```
+
+[↑ Go up to Table of contents](#table-of-contents)
 
 ## Global variables 
 
@@ -132,6 +203,8 @@ window.wpApiSettings = {
 };
 ```
 
+[↑ Go up to Table of contents](#table-of-contents)
+
 We are working to include on **Gutenberg by Frontkom** all settings that shouldn't be part of your apps, but you always can override them if you need.
 
 ### apiRequest
@@ -147,79 +220,50 @@ function apiRequest( options ) {
 }
 ```
 
-Next, we will show some commons API requests Gutenberg does and the respective response it expects. For more information, you can check the [WordPress REST API Documentation](https://v2.wp-api.org/reference/).
+Next, we will show some commons API requests Gutenberg does and the respective response it expects. For more information, you can check the [WordPress REST API Documentation](https://developer.wordpress.org/rest-api/reference/post-revisions/).
 
-#### GET types
+[↑ Go up to Table of contents](#table-of-contents)
 
-When you initialize the editor, Gutenberg will request the settings related with the *postType* you choose (**post** or **page**), invoking this API request `/wp/v2/types/[postType]?context=edit`. Here is an example for a response (check documentation [here](https://v2.wp-api.org/reference/types/)):
+#### Post Types
+
+The Gutenberg editor will ask for available **Post Types** through `/wp/v2/types/?context=edit` request. In addition to the _type_ properties that can be checked in [WordPress documentation](https://developer.wordpress.org/rest-api/reference/post-types/), **Gutenberg by Frontkom** provides the following:
 
 ```js
 {
+    ...,   
+    autosaveable: false, // to disable Post Autosave featured
+    publishable: false,  // to disable Post Publish featured
+    saveable: false,     // to disable Post Save featured
+    supports: {
+        ...,
+        document: false            // to hide Documents tab in sidebar
+        'media-library': false,    // to disable Media library from WordPress
+        posts: true,               // to add PostsPanel to Documents tab
+        'template-settings': true, // to add TemplateSettingsPanel to Documents tab
+        extras: true,              // to add an extra tab in sidebar
+    },
     labels: {
         ...,
-        posts: 'Stories',
-        extras: 'Extras' // extra tab label in sidebar
-        ...,
-    },
-    name: 'Posts',
-    rest_base: 'posts',
-    slug: 'post',
-    supports: {
-        author: true,
-        comments: false,
-        'custom-fields': true,
-        thumbnail: false,
-        title: true,
-        // Gutenberg by Frontkom supports flags
-        document: true             // show Documents tab in sidebar
-        'media-library': false,    // disable Media library from WordPress
-        posts: true,               // add PostsPanel to sidebar
-        'template-settings': true, // add TemplateSettingsPanel to sidebar
-        extras: true,              // show Extras tab in sidebar
-        ...,
-    },
-    viewable: true,
-    // Gutenberg by Frontkom flags
-    publishable: false,  // hide Publish Toggle
-    saveable: false,     // disable save button
-    autosaveable: false, // disable autosave
-    ...,
+        extras: 'The extra Tab label in thesidebar'
+    }
 }
 ```
 
-#### PUT post or page (and POST post or page autosaves)
+[↑ Go up to Table of contents](#table-of-contents)
 
-To save a [post](https://v2.wp-api.org/reference/posts/) or a [page](https://v2.wp-api.org/reference/pages/) content, Gutenberg does a PUT request to `/wp/v2/[postType]/[id]` sending a `data` object with `content`, `id` and/or `title` ( if its **postType** requires it). The response should be an object like this:
+#### Posts and Pages
 
-```js
-{
-    id: 123456,
-    content: { 
-        raw: '<!-- wp:paragraph -->↵<p>World</p>↵<!-- /wp:paragraph -->',
-        rendered: '<p>World</p>',
-    },
-    title: { 
-        raw: 'Hello',
-        rendered: 'Hello',
-    },
-    preview_link, permalink_template, ...,
-}
-```
+Check the WordPress API documentation for [Posts](https://developer.wordpress.org/rest-api/reference/posts/) and [Pages](https://developer.wordpress.org/rest-api/reference/pages/) requests.
 
-#### GET categories
+[↑ Go up to Table of contents](#table-of-contents)
 
-The request to get all [categories](https://v2.wp-api.org/reference/categories/) is `/wp/v2/categories` and expects an array of objects with the following structure:
+#### Categories
 
-```js
-{
-    id: 1,
-    name: 'Category 1',
-    parent: 0,
-    ...,
-}
-```
+Check the WordPress API documentation for [Categories](https://developer.wordpress.org/rest-api/reference/categories/).
 
-#### GET /
+[↑ Go up to Table of contents](#table-of-contents)
+
+#### Index
 
 Gutenberg will ask for the [theme features](https://codex.wordpress.org/Theme_Features) through the index request (`/`). The response should be the following object.
 
@@ -234,39 +278,28 @@ Gutenberg will ask for the [theme features](https://codex.wordpress.org/Theme_Fe
 }
 ```
 
-#### POST media
+[↑ Go up to Table of contents](#table-of-contents)
 
-To save [media](https://v2.wp-api.org/reference/media/), Gutenberg makes a POST request to `/wp/v2/media` sending a `data` object. The response should be an object like this:
+#### Media
 
-```js
-{
-    ...,
-    id: 1527069591355,    
-    link: MEDIA_LINK_HERE,
-    source_url: MEDIA_URLHERE,
-    // Additionaly, you can add some data attributes for images for example
-    data: { entity_type: 'file', entity_uuid: 'e94e9d8d-4cf4-43c1-b95e-1527069591355' }
-    ...,
-}
-```
-
-#### GET media
-
-The request to retrieve a media [media](https://v2.wp-api.org/reference/media/) is `/wp/v2/media/[id]`. The response should be an object like this:
+Here is the WordPress API documentation for [Media](https://developer.wordpress.org/rest-api/reference/media/). The **Gutenberg by Frontkom** introduces the `data` property which is an object with all data attributes you want to add to image/media DOM element.
 
 ```js
 {
     ...,
     id: 1527069591355,    
     link: MEDIA_LINK_HERE,
-    source_url: MEDIA_URLHERE,
+    source_url: MEDIA_URL_HERE,
     // Additionaly, you can add some data attributes for images for example
     data: { entity_type: 'file', entity_uuid: 'e94e9d8d-4cf4-43c1-b95e-1527069591355' }
     ...,
 }
 ```
+
+[↑ Go up to Table of contents](#table-of-contents)
 
 ### url
+
 ***url*** should has a function called `addQueryArgs( url, args )` that handles with `url` and `args` and returns the final url to different actions. The original implementation is the following, feel free to keep it or change it according to your needs.
 
 ```js
@@ -293,6 +326,8 @@ export function addQueryArgs( url, args ) {
 }
 ```
 
+[↑ Go up to Table of contents](#table-of-contents)
+
 ## Customize your Gutenberg
 
 Following the same logic, we've created the `customGutenberg` global object where you can set eveything that we made customizable on Gutenberg.
@@ -304,6 +339,8 @@ window.customGutenberg = { ... };
 As the other global variables, also `customGutenberg` should be defined **before** Gutenberg import.
 
 Important to say that Gutenberg works perfectly without the settings of this object :)
+
+[↑ Go up to Table of contents](#table-of-contents)
 
 ### Inserter Menu (blocks)
 
@@ -320,6 +357,8 @@ window.customGutenberg = {
     ...,
 };
 ```
+
+[↑ Go up to Table of contents](#table-of-contents)
 
 ### Block Categories
 
@@ -339,6 +378,8 @@ window.customGutenberg = {
     ...,
 };
 ```
+
+[↑ Go up to Table of contents](#table-of-contents)
 
 ### Rows
 
@@ -373,21 +414,33 @@ window.customGutenberg = {
 };
 ```
 
-![Rows example](https://raw.githubusercontent.com/front/gutenberg/master/g-package/rows_screenshot.png)
+![Rows example](https://raw.githubusercontent.com/front/gutenberg/master/gutenberg-package/rows_screenshot.png)
+
+[↑ Go up to Table of contents](#table-of-contents)
+
+### Dynamic Row
+
+It works like a section that could be slipt in several columns with different widhts.
+
+[↑ Go up to Table of contents](#table-of-contents)
 
 ### Posts Panel
 
 The **Posts Panel** (`postType.supports[ 'posts' ] = true`) contains a list of posts which could be filtered by category and/or searched be name and then can be added to your page in form of an (Post block)[#post-block] by drag and drop.
 
+[↑ Go up to Table of contents](#table-of-contents)
+
 #### Post Block
 
 The **Post Block** is another kind of blocks created by **Gutenberg by Frontkom** which is composed by a cover image and a title.
 
-![Post Block example](https://raw.githubusercontent.com/front/gutenberg/master/g-package/post_block_screenshot.png)
+![Post Block example](https://raw.githubusercontent.com/front/gutenberg/master/gutenberg-package/post_block_screenshot.png)
 
-### Events (experimental)
+[↑ Go up to Table of contents](#table-of-contents)
 
-**Gutenberg by Frontkom** makes possible to define callbacks (or effects) for Gutenberg actions. Since it is an experimental feature, we are only providing this for 'OPEN_GENERAL_SIDEBAR' and 'CLOSE_GENERAL_SIDEBAR' actions.
+### Events
+
+**Gutenberg by Frontkom** makes possible to define callbacks (or effects) for Gutenberg actions. Since it is an experimental feature, we are only providing this for 'OPEN_GENERAL_SIDEBAR', 'CLOSE_GENERAL_SIDEBAR' and 'REMOVE_BLOCKS' actions.
 
 ```js
 window.customGutenberg = {
@@ -399,7 +452,12 @@ window.customGutenberg = {
         'CLOSE_GENERAL_SIDEBAR': function( action, store ) {
             console.log( 'CLOSE_GENERAL_SIDEBAR', action, store );
         },
+        'REMOVE_BLOCKS': function( action, store ) {
+            console.log( 'REMOVE_BLOCKS', action, store );
+        },
     },
     ...,
 };
 ```
+
+[↑ Go up to Table of contents](#table-of-contents)
