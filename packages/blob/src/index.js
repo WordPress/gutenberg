@@ -21,11 +21,13 @@ export function createBlobURL( file ) {
 }
 
 /**
- * Retrieve a file based on a blob URL.
+ * Retrieve a file based on a blob URL. The file must have been created by
+ * `createBlobURL` and not removed by `revokeBlobURL`, otherwise it will return
+ * `undefined`.
  *
  * @param {string} url The blob URL.
  *
- * @return {File} The file for the blob URL.
+ * @return {?File} The file for the blob URL.
  */
 export function getBlobByURL( url ) {
 	return cache[ url ];
