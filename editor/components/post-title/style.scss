@@ -9,14 +9,29 @@
 	.editor-post-title__input {
 		display: block;
 		width: 100%;
-		padding: #{ $block-padding + 5px } $parent-block-padding;
 		margin: 0;
 		box-shadow: none;
-		border: 1px solid transparent;
 		background: transparent;
 		font-family: $editor-font;
 		line-height: $default-line-height;
 		transition: border .1s ease-out;
+
+		// Show wider parent padding on Desktop breakpoints.
+		padding: #{ $block-padding + 5px } $block-padding;
+
+		@include break-small() {
+			padding: #{ $block-padding + 5px } $parent-block-padding;
+		}
+
+		// Stack borders on mobile.
+		border-top: 1px solid transparent;
+		border-bottom: 1px solid transparent;
+		border-left: 0;
+		border-right: 0;
+
+		@include break-small() {
+			border: 1px solid transparent;
+		}
 
 		// Match h1 heading
 		font-size: 2.441em;

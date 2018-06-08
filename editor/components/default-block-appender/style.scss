@@ -74,7 +74,7 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 	right: $item-spacing;	// show on the right on mobile
 
 	@include break-small {
-		left: -$icon-button-size - $block-side-ui-clearance - $block-parent-side-ui-clearance;
+		left: -$block-side-ui-width - $block-padding - $block-side-ui-clearance;
 		right: auto;
 	}
 
@@ -85,6 +85,10 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 	.editor-inserter__toggle {
 		transition: opacity 0.2s;
 		border-radius: 50%;
+		width: $block-side-ui-width;
+		height: $block-side-ui-width;
+		top: 4px;
+		padding: 4px;
 
 		// use opacity to work in various editor styles
 		&:not( :hover ) {

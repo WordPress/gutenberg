@@ -50,8 +50,8 @@
 		}
 
 		&[data-align="full"] > .editor-block-contextual-toolbar,
-		&[data-align="wide"] > .editor-block-contextual-toolbar { // don't affect nested block toolbars
-			max-width: $content-width + 2;	// 1px border left and right
+		&[data-align="wide"] > .editor-block-contextual-toolbar { // Don't affect nested block toolbars.
+			max-width: $content-width + $parent-block-padding; // Add 1px border left and right.
 			margin-left: auto;
 			margin-right: auto;
 		}
@@ -69,8 +69,8 @@
 // The base width of the title should match that of blocks even if it isn't a block
 .editor-post-title {
 	@include break-small() {
-		padding-left: $block-side-ui-padding;
-		padding-right: $block-side-ui-padding;
+		padding-left: $block-side-ui-width + $block-padding + $block-side-ui-clearance + $block-side-ui-clearance;
+		padding-right: $block-side-ui-width + $block-padding + $block-side-ui-clearance + $block-side-ui-clearance;
 	}
 }
 .edit-post-visual-editor .editor-post-title__block {
@@ -78,13 +78,13 @@
 	margin-right: auto;
 	max-width: $content-width;
 
-	// stack borders
+	// Stack borders.
 	> div {
-		margin-left: -1px;
-		margin-right: -1px;
+		margin-left: 0;
+		margin-right: 0;
 	}
 
-	// include space for side UI on desktops
+	// Include space for side UI on desktops.
 	@include break-small() {
 		> div {
 			margin-left: -$block-side-ui-width;
