@@ -61,7 +61,7 @@ By default, the popover will receive focus when it mounts. To suppress this beha
 
 ### position
 
-The direction in which the popover should open relative to its parent node. Specify y- and x-axis as a space-separated string. Supports `"top"`, `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
+The direction in which the popover should open relative to its parent node. Specify y- and x-axis as a space-separated string. Supports `"top"`, `"middle"`, `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
 
 - Type: `String`
 - Required: No
@@ -109,3 +109,11 @@ Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to 
 
  - Type: `String`
  - Required: No
+
+ ## noArrow
+
+ Set this to hide the arrow which visually indicates what the popover is anchored to. Note that the arrow will not display if `position` is set to `"middle center"`.
+
+ - Type: `Boolean`
+ - Required: No
+ - Default: `false`

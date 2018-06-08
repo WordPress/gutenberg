@@ -115,6 +115,31 @@ function gutenberg_register_scripts_and_styles() {
 	);
 
 	// Editor Scripts.
+	wp_deregister_script( 'wp-api-request' );
+	wp_register_script(
+		'wp-api-request',
+		gutenberg_url( 'build/api-request/index.js' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'build/api-request/index.js' ),
+		true
+	);
+	wp_add_inline_script(
+		'wp-api-request',
+		sprintf(
+			'wp.apiRequest.use( wp.apiRequest.createNonceMiddleware( "%s" ) );',
+			( wp_installing() && ! is_multisite() ) ? '' : wp_create_nonce( 'wp_rest' )
+		),
+		'after'
+	);
+	wp_add_inline_script(
+		'wp-api-request',
+		sprintf(
+			'wp.apiRequest.use( wp.apiRequest.createRootURLMiddleware( "%s" ) );',
+			esc_url_raw( get_rest_url() )
+		),
+		'after'
+	);
+
 	wp_register_script(
 		'wp-deprecated',
 		gutenberg_url( 'build/deprecated/index.js' ),
@@ -160,7 +185,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-utils',
 		gutenberg_url( 'build/utils/index.js' ),
-		array( 'lodash', 'wp-blob', 'wp-deprecated', 'wp-dom' ),
+		array( 'lodash', 'wp-blob', 'wp-deprecated', 'wp-dom', 'wp-api-request' ),
 		filemtime( gutenberg_dir_path() . 'build/utils/index.js' ),
 		true
 	);
@@ -261,8 +286,16 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-i18n',
 			'wp-utils',
 			'wp-viewport',
+			'wp-api-request',
 		),
 		filemtime( gutenberg_dir_path() . 'build/core-blocks/index.js' ),
+		true
+	);
+	wp_register_script(
+		'wp-nux',
+		gutenberg_url( 'build/nux/index.js' ),
+		array( 'wp-element', 'wp-components', 'wp-data', 'wp-i18n', 'lodash' ),
+		filemtime( gutenberg_dir_path() . 'build/nux/index.js' ),
 		true
 	);
 	// Loading the old editor and its config to ensure the classic block works as expected.
@@ -344,6 +377,7 @@ function gutenberg_register_scripts_and_styles() {
 			'postbox',
 			'wp-a11y',
 			'wp-api',
+			'wp-api-request',
 			'wp-blob',
 			'wp-blocks',
 			'wp-components',
@@ -361,6 +395,7 @@ function gutenberg_register_scripts_and_styles() {
 			'tinymce-latest-lists',
 			'tinymce-latest-paste',
 			'tinymce-latest-table',
+			'wp-nux',
 		),
 		filemtime( gutenberg_dir_path() . 'build/editor/index.js' )
 	);
@@ -374,6 +409,7 @@ function gutenberg_register_scripts_and_styles() {
 			'media-models',
 			'media-views',
 			'wp-a11y',
+			'wp-api-request',
 			'wp-components',
 			'wp-core-blocks',
 			'wp-date',
@@ -408,7 +444,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_style(
 		'wp-editor',
 		gutenberg_url( 'build/editor/style.css' ),
-		array( 'wp-components', 'wp-editor-font' ),
+		array( 'wp-components', 'wp-editor-font', 'wp-nux' ),
 		filemtime( gutenberg_dir_path() . 'build/editor/style.css' )
 	);
 	wp_style_add_data( 'wp-editor', 'rtl', 'replace' );
@@ -416,7 +452,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_style(
 		'wp-edit-post',
 		gutenberg_url( 'build/edit-post/style.css' ),
-		array( 'wp-components', 'wp-editor', 'wp-edit-blocks', 'wp-core-blocks' ),
+		array( 'wp-components', 'wp-editor', 'wp-edit-blocks', 'wp-core-blocks', 'wp-nux' ),
 		filemtime( gutenberg_dir_path() . 'build/edit-post/style.css' )
 	);
 	wp_style_add_data( 'wp-edit-post', 'rtl', 'replace' );
@@ -449,6 +485,14 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'build/core-blocks/edit-blocks.css' )
 	);
 	wp_style_add_data( 'wp-edit-blocks', 'rtl', 'replace' );
+
+	wp_register_style(
+		'wp-nux',
+		gutenberg_url( 'build/nux/style.css' ),
+		array( 'wp-components' ),
+		filemtime( gutenberg_dir_path() . 'build/nux/style.css' )
+	);
+	wp_style_add_data( 'wp-nux', 'rtl', 'replace' );
 
 	wp_register_style(
 		'wp-core-blocks-theme',
@@ -745,6 +789,11 @@ function gutenberg_extend_wp_api_backbone_client() {
 		};
 JS;
 	wp_add_inline_script( 'wp-api', $script );
+	wp_localize_script( 'wp-api', 'wpApiSettings', array(
+		'root'          => esc_url_raw( get_rest_url() ),
+		'nonce'         => ( wp_installing() && ! is_multisite() ) ? '' : wp_create_nonce( 'wp_rest' ),
+		'versionString' => 'wp/v2/',
+	) );
 
 	// Localize the wp-api settings and schema.
 	$schema_response = rest_do_request( new WP_REST_Request( 'GET', '/' ) );
@@ -972,9 +1021,9 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	);
 
 	wp_add_inline_script(
-		'wp-components',
-		sprintf( 'window._wpAPIDataPreload = %s', wp_json_encode( $preload_data ) ),
-		'before'
+		'wp-api-request',
+		sprintf( 'wp.apiRequest.use( wp.apiRequest.createPreloadingMiddleware( %s ) );', wp_json_encode( $preload_data ) ),
+		'after'
 	);
 
 	// Prepopulate with some test content in demo.

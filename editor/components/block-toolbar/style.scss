@@ -13,6 +13,9 @@
 
 	.components-toolbar {
 		border: none;
+
+		// Add a right border to show as separator in the block toolbar.
+		border-right: 1px solid $light-gray-500;
 	}
 
 	// this should probably have its own class
