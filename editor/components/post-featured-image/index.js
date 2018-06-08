@@ -26,7 +26,7 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 			<div className="editor-post-featured-image">
 				{ !! featuredImageId &&
 					<MediaUpload
-						title={ postLabel.set_featured_image }
+						title={ __( 'Set featured image' ) }
 						onSelect={ onUpdateImage }
 						type="image"
 						modalClass="editor-post-featured-image__media-modal"
@@ -47,7 +47,7 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 				}
 				{ !! featuredImageId && media && ! media.isLoading &&
 				<MediaUpload
-					title={ __( 'Replace Image' ) }
+					title={ __( 'Set featured image' ) }
 					onSelect={ onUpdateImage }
 					type="image"
 					modalClass="editor-post-featured-image__media-modal"
