@@ -119,9 +119,9 @@ class ParagraphBlock extends Component {
 
 		if ( customFontSize ) {
 			return customFontSize;
-		} else {
-            		return find( FONT_SIZES, { default: true } ).size;
-        	}
+		}
+            	
+		return find( FONT_SIZES, { default: true } ).size;
 	}
 
 	setFontSize( fontSizeValue ) {
