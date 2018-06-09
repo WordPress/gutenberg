@@ -59,6 +59,7 @@ const FONT_SIZES = [
 		size: 14,
 	},
 	{
+		default: true,
 		name: 'regular',
 		shortName: 'M',
 		size: 16,
@@ -118,7 +119,9 @@ class ParagraphBlock extends Component {
 
 		if ( customFontSize ) {
 			return customFontSize;
-		}
+		} else {
+            return find( FONT_SIZES, { default: true } ).size;
+        }
 	}
 
 	setFontSize( fontSizeValue ) {
