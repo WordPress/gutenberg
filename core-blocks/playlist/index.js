@@ -7,16 +7,16 @@ import {
 	FormFileUpload,
 	IconButton,
 	Placeholder,
+	ServerSideRender,
 	Toolbar,
 } from '@wordpress/components';
 import { pick } from 'lodash';
 import { Component, Fragment } from '@wordpress/element';
 import {
-	editorMediaUpload,
 	MediaUpload,
-	RichText,
-	BlockControls,
-} from '@wordpress/blocks';
+ 	BlockControls,
+} from '@wordpress/editor';
+import {	RichText } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -51,44 +51,38 @@ export const settings = {
 		align: true,
 	},
 
-
 	edit: class extends Component {
 		constructor() {
 			super( ...arguments );
-			// edit component has its own src in the state so it can be edited
-			// without setting the actual value outside of the edit UI
+			//check for if ids is set to determine edit state
 			this.state = {
-				editing: ! this.props.attributes.src,
-				src: this.props.attributes.src,
+				editing: ! this.props.attributes.ids,
 			};
 		}
 
 		render() {
-			// const { registerBlockType } = wp.blocks;
 			const { ServerSideRender } = wp.components;
-			const { ids } = this.props.attributes;
-			const { setAttributes, isSelected, className} = this.props;
-			const { editing, src } = this.state;
+			const { ids, type } = this.props.attributes;
+			const { setAttributes, className} = this.props;
+			const { editing } = this.state;
 			const switchToEditing = () => {
 				this.setState( { editing: true } );
 			};
-			const onSelectAudio = ( media ) => {
+			const onSelectMedia = ( media ) => {
 				if ( media && media[0].url ) {
 					media = ( 1 < media.length ) ? media : [ media ];
 					setAttributes( { ids: media.map( ( item ) => item.id ), type: media[0].type  } );
-					this.setState( { src: media[0].url, editing: false } );
+					this.setState( { editing: false } );
 				}
 			};
 			const onSelectUrl = ( event ) => {
 				event.preventDefault();
-				if ( src ) {
-					// set the block's src from the edit component's state, and switch off the editing UI
-					setAttributes( { src } );
+				if ( ids ) {
 					this.setState( { editing: false } );
 				}
 				return false;
 			};
-			const setAudio = ( [ audio ] ) => onSelectAudio( audio );
+			const setAudio = ( [ audio ] ) => onSelectMedia( audio );
 			const uploadFromFiles = ( event ) => editorMediaUpload( event.target.files, setAudio, 'audio' );
 			const config = {};
 
@@ -99,19 +93,6 @@ export const settings = {
 						label={ __( 'Audio' ) }
 						instructions={ __( 'Select an audio file from your library, or upload a new one' ) }
 						className={ className }>
-						<form onSubmit={ onSelectUrl }>
-							<input
-								type="url"
-								className="components-placeholder__input"
-								placeholder={ __( 'Enter URL of audio file here…' ) }
-								onChange={ ( event ) => this.setState( { src: event.target.value } ) }
-								value={ src || '' } />
-							<Button
-								isLarge
-								type="submit">
-								{ __( 'Use URL' ) }
-							</Button>
-						</form>
 						<FormFileUpload
 							isLarge
 							className="wp-block-audio__upload-button"
@@ -121,7 +102,7 @@ export const settings = {
 							{ __( 'Upload' ) }
 						</FormFileUpload>
 						<MediaUpload
-							onSelect={ onSelectAudio }
+							onSelect={ onSelectMedia }
 							type="audio"
 							multiple
 							playlist
