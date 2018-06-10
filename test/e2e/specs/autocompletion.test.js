@@ -10,7 +10,7 @@ describe( 'autocompletion', () => {
 		await newPost();
 	} );
 
-	it( 'adds a token followed by a non-breaking space and the cursor', async () => {
+	it( 'adds a token followed by a zero-width non-breaking space and the cursor', async () => {
 		await page.click( '.editor-default-block-appender' );
 
 		const contentEditableHandle = (
@@ -41,27 +41,39 @@ describe( 'autocompletion', () => {
 		expect( await page.evaluate(
 			( contentEditableNode ) => contentEditableNode.textContent,
 			contentEditableHandle
-		) ).toMatch( /^@\w+\u00A0$/ );
+		) ).toMatch( /^@\w+\uFEFF$/ );
 
-		// Selection is placed after a single-space text node.
+		// Selection is placed after a single zero-width space text node.
 		const selectionAnchorHandle = await page.evaluateHandle( () => window.getSelection().anchorNode );
 		expect( await page.evaluate(
-			( anchorNode ) => anchorNode.nodeType === window.Node.TEXT_NODE,
+			( contentEditableNode, anchorNode ) => contentEditableNode === anchorNode,
+			contentEditableHandle,
 			selectionAnchorHandle
 		) ).toBeTruthy();
-		const nonBreakingSpace = '\u00A0';
+		const zeroWidthNonbreakingSpace = '\uFEFF';
+		const selectionAnchorOffset = await page.evaluate( () => window.getSelection().anchorOffset );
 		expect( await page.evaluate(
-			( anchorNode ) => anchorNode.nodeValue,
-			selectionAnchorHandle
-		) ).toBe( nonBreakingSpace );
+			( anchorNode, anchorOffset ) => {
+				const lastChildNodeIndex = anchorNode.childNodes.length - 1;
+				return anchorOffset === lastChildNodeIndex;
+			},
+			selectionAnchorHandle,
+			selectionAnchorOffset
+		) ).toBeTruthy();
+		const spaceNodeHandle = await page.evaluateHandle(
+			( anchorNode, anchorOffset ) => anchorNode.childNodes[ anchorOffset ].previousSibling,
+			selectionAnchorHandle,
+			selectionAnchorOffset
+		);
 		expect( await page.evaluate(
-			() => window.getSelection().anchorOffset
-		) ).toBe( nonBreakingSpace.length );
+			( spaceNode ) => spaceNode.textContent,
+			spaceNodeHandle
+		) ).toBe( zeroWidthNonbreakingSpace );
 
 		// The autocomplete token precedes the space.
 		const tokenHandle = await page.evaluateHandle(
-			( anchorNode ) => anchorNode.previousSibling,
-			selectionAnchorHandle
+			( spaceNode ) => spaceNode.previousSibling,
+			spaceNodeHandle
 		);
 		expect( await page.evaluate(
 			( tokenNode ) => tokenNode.nodeType === window.Node.ELEMENT_NODE,
