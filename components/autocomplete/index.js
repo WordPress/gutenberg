@@ -172,23 +172,6 @@ function lastIndexOfSpace( text ) {
 	return -1;
 }
 
-/**
- * Answers whether the given node is followed by characters other than regular spaces and tabs.
- *
- * @param {Node} node The reference node.
- *
- * @return {boolean} Whether the given node is followed by characters other than regular spaces and tabs.
- */
-function hasSubsequentNonWhitespace( node ) {
-	const nonWhitespacePattern = /[^ \t]/;
-	while ( null !== ( node = node.nextSibling ) ) {
-		if ( nonWhitespacePattern.test( node.textContent ) ) {
-			return true;
-		}
-	}
-	return false;
-}
-
 function filterOptions( search, options = [], maxResults = 10 ) {
 	const filtered = [];
 	for ( let i = 0; i < options.length; i++ ) {
@@ -273,38 +256,51 @@ export class Autocomplete extends Component {
 
 		const selection = window.getSelection();
 		selection.removeAllRanges();
+
 		const newCursorPosition = document.createRange();
-
-		if ( existingTokenWrapper ) {
-			/**
-			 * Since the user was already editing the token,
-			 * it seems least surprising to leave the cursor there.
-			 */
-			newCursorPosition.setStartAfter( tokenWrapper );
-		} else {
-			/*
-			 * Add space after a completion because:
-			 * 1. If the inserted token is the last child in Chrome 66 and desktop Safari 11,
-			 *    we can set the cursor after the token and receive user input,
-			 *    but if the input isn't preceded by a space, the user may not place the
-			 *    cursor within the text by clicking. Placing the cursor after a subsequent
-			 *    space avoids this issue.
-			 * 2. It seems reasonable to separate a token from subsequent text with a space.
-			 *
-			 * NOTE: Chrome 66 (and possibly others) does not render trailing spaces
-			 * in contenteditable, so we cannot set the cursor after the trailing space.
-			 * When adding such trailing space we append a zero-width non-breaking space
-			 * which causes the preceding space to be rendered.
-			 */
-			tokenWrapper.parentNode.insertBefore(
-				document.createTextNode( hasSubsequentNonWhitespace( tokenWrapper ) ? ' ' : ' \uFEFF' ),
-				tokenWrapper.nextSibling
-			);
-
-			newCursorPosition.setStart( tokenWrapper.nextSibling, 1 );
-		}
-
+		/**
+		 * Add a zero-width non-breaking space (ZWNBSP) so we can place cursor
+		 * after. TinyMCE handles ZWNBSP's nicely around token boundaries,
+		 * adding and removing them as necessary as the keyboard is used to
+		 * move the cursor in and out of boundaries.
+		 */
+		tokenWrapper.parentNode.insertBefore(
+			document.createTextNode( '\uFEFF' ),
+			tokenWrapper.nextSibling
+		);
+		newCursorPosition.setStartAfter( tokenWrapper.nextSibling );
 		selection.addRange( newCursorPosition );
+	}
+
+	/**
+	 * Gets the token wrapper for a node if it has one.
+	 *
+	 * @param {Node} possibleTokenChild The node for which to find the wrapper.
+	 *
+	 * @return {Node?} The token wrapper or null if there is none.
+	 * @private
+	 */
+	getTokenWrapperNode( possibleTokenChild ) {
+		const element = isTextNode( possibleTokenChild ) ?
+			possibleTokenChild.parentNode :
+			possibleTokenChild;
+		const withinToken = element.matches( '.autocomplete-token, .autocomplete-token *' );
+
+		return withinToken ? element.closest( '.autocomplete-token' ) : null;
+	}
+
+	/**
+	 * Gets the completer associated with the specified autocomplete token wrapper.
+	 *
+	 * @param {Node} tokenWrapperNode The wrapper node.
+	 *
+	 * @return {(Completer|undefined)} The completer associated with the wrapper or
+	 *                                 undefined if one is not found.
+	 * @private
+	 */
+	getCompleterFromTokenWrapper( tokenWrapperNode ) {
+		const completerName = tokenWrapperNode.dataset.autocompleter;
+		return find( this.props.completers, ( c ) => completerName === c.name );
 	}
 
 	select( option ) {
@@ -521,20 +517,6 @@ export class Autocomplete extends Component {
 		return { open, range, query };
 	}
 
-	getTokenWrapperNode( possibleTokenChild ) {
-		const element = isTextNode( possibleTokenChild ) ?
-			possibleTokenChild.parentNode :
-			possibleTokenChild;
-		const withinToken = element.matches( '.autocomplete-token, .autocomplete-token *' );
-
-		return withinToken ? element.closest( '.autocomplete-token' ) : null;
-	}
-
-	getCompleterFromTokenWrapper( tokenWrapperNode ) {
-		const completerName = tokenWrapperNode.dataset.autocompleter;
-		return find( this.props.completers, ( c ) => completerName === c.name );
-	}
-
 	search( event ) {
 		let { completers } = this.props;
 		const { open: wasOpen, suppress: wasSuppress, query: wasQuery } = this.state;
@@ -552,7 +534,8 @@ export class Autocomplete extends Component {
 		 */
 		const tokenNode = this.getTokenWrapperNode( cursor.node );
 		if ( tokenNode ) {
-			completers = [ this.getCompleterFromTokenWrapper( tokenNode ) ];
+			const currentCompleter = this.getCompleterFromTokenWrapper( tokenNode );
+			completers = currentCompleter ? [ currentCompleter ] : [];
 		}
 
 		// look for the trigger prefix and search query just before the cursor location
