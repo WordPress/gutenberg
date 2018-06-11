@@ -303,10 +303,6 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 			}
 		}
 
-		componentDidMount() {
-			this.canRunSelection = true;
-		}
-
 		componentWillUnmount() {
 			this.unsubscribe();
 
@@ -314,7 +310,7 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 			// are snapshotted before being invoked, so if unmounting occurs
 			// during a previous callback, we need to explicitly track and
 			// avoid the `runSelection` that is scheduled to occur.
-			this.canRunSelection = false;
+			this.isUnmounting = true;
 		}
 
 		subscribe() {
@@ -322,7 +318,7 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 		}
 
 		runSelection( props = this.props ) {
-			if ( ! this.canRunSelection ) {
+			if ( this.isUnmounting ) {
 				return;
 			}
 
