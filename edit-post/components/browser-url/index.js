@@ -46,16 +46,23 @@ export class BrowserURL extends Component {
 		const { historyId } = this.state;
 
 		if ( postStatus === 'trash' ) {
-			window.location.href = getPostTrashedURL( postId, postType );
-		}
-
-		if ( postId === prevProps.postId && postId === historyId ) {
+			this.setTrashURL( postId, postType );
 			return;
 		}
 
-		if ( postStatus !== 'auto-draft' ) {
+		if ( ( postId !== prevProps.postId || postId !== historyId ) && postStatus !== 'auto-draft' ) {
 			this.setBrowserURL( postId );
 		}
+	}
+
+	/**
+	 * Navigates the browser to the post trashed URL to show a notice about the trashed post.
+	 *
+	 * @param {number} postId    Post ID.
+	 * @param {string} postType  Post Type.
+	 */
+	setTrashURL( postId, postType ) {
+		window.location.href = getPostTrashedURL( postId, postType );
 	}
 
 	/**
