@@ -126,19 +126,22 @@ class PostTitle extends Component {
 }
 
 const applyWithSelect = withSelect( ( select ) => {
-	const { getEditedPostAttribute, getEditorSettings } = select( 'core/editor' );
+	const { canInsertBlockType, getEditedPostAttribute, getEditorSettings } = select( 'core/editor' );
 	const { getPostType } = select( 'core' );
+	const { getDefaultBlockName } = select( 'core/blocks' );
 	const postType = getPostType( getEditedPostAttribute( 'type' ) );
 	const { titlePlaceholder } = getEditorSettings();
+	const defaultBlockName = getDefaultBlockName();
 
 	return {
 		title: getEditedPostAttribute( 'title' ),
 		isPostTypeViewable: get( postType, [ 'viewable' ], false ),
 		placeholder: titlePlaceholder,
+		canInsertDefaultBlock: canInsertBlockType( defaultBlockName ),
 	};
 } );
 
-const applyWithDispatch = withDispatch( ( dispatch ) => {
+const applyWithDispatch = withDispatch( ( dispatch, { canInsertDefaultBlock } ) => {
 	const {
 		insertDefaultBlock,
 		editPost,
@@ -149,7 +152,9 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 
 	return {
 		onEnterPress() {
-			insertDefaultBlock( undefined, undefined, 0 );
+			if ( canInsertDefaultBlock ) {
+				insertDefaultBlock( undefined, undefined, 0 );
+			}
 		},
 		onUpdate( title ) {
 			editPost( { title } );
