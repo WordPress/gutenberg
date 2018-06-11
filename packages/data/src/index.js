@@ -267,8 +267,9 @@ export function dispatch( reducerKey ) {
  * @return {Component} Enhanced component with merged state data props.
  */
 export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( WrappedComponent ) => {
+	const defaultMergeProps = {};
 	function getNextMergeProps( props ) {
-		return mapStateToProps( select, props ) || {};
+		return mapStateToProps( select, props ) || defaultMergeProps;
 	}
 
 	return class ComponentWithSelect extends Component {
