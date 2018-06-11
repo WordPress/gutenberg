@@ -34,7 +34,7 @@ function Header( {
 	return (
 		<div
 			role="region"
-			aria-label={ __( 'Editor toolbar' ) }
+			aria-label={ __( 'Editor Toolbar' ) }
 			className="edit-post-header"
 			tabIndex="-1"
 		>
