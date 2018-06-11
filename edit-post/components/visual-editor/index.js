@@ -10,7 +10,7 @@ import {
 	EditorGlobalKeyboardShortcuts,
 	BlockSelectionClearer,
 	MultiSelectScrollIntoView,
-	PluginBlockSettingsMenu,
+	_BlockSettingsMenuFirstItem,
 } from '@wordpress/editor';
 
 /**
@@ -31,9 +31,9 @@ function VisualEditor() {
 					<BlockList />
 				</ObserveTyping>
 			</WritingFlow>
-			<PluginBlockSettingsMenu>
+			<_BlockSettingsMenuFirstItem>
 				{ ( { onClose } ) => <BlockInspectorButton onClick={ onClose } role="menuitem" /> }
-			</PluginBlockSettingsMenu>
+			</_BlockSettingsMenuFirstItem>
 		</BlockSelectionClearer>
 	);
 }

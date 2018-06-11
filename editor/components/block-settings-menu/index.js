@@ -22,7 +22,7 @@ import BlockDuplicateButton from './block-duplicate-button';
 import BlockTransformations from './block-transformations';
 import SharedBlockSettings from './shared-block-settings';
 import UnknownConverter from './unknown-converter';
-import PluginBlockSettingsMenu from './plugin-block-settings-menu';
+import _BlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 
 export class BlockSettingsMenu extends Component {
 	constructor() {
@@ -94,7 +94,7 @@ export class BlockSettingsMenu extends Component {
 					renderContent={ ( { onClose } ) => (
 						// Should this just use a DropdownMenu instead of a DropDown ?
 						<NavigableMenu className="editor-block-settings-menu__content">
-							<PluginBlockSettingsMenu.Slot fillProps={ { onClose } } />
+							<_BlockSettingsMenuFirstItem.Slot fillProps={ { onClose } } />
 							{ count === 1 && <BlockModeToggle uid={ firstBlockUID } onToggle={ onClose } role="menuitem" /> }
 							{ count === 1 && <UnknownConverter uid={ firstBlockUID } role="menuitem" /> }
 							<BlockDuplicateButton uids={ uids } rootUID={ rootUID } role="menuitem" />
