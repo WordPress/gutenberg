@@ -25,6 +25,7 @@ import * as coverImage from './cover-image';
 import * as embed from './embed';
 import * as freeform from './freeform';
 import * as html from './html';
+import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
 import * as list from './list';
 import * as more from './more';
@@ -65,6 +66,7 @@ export const registerCoreBlocks = () => {
 		...embed.others,
 		freeform,
 		html,
+		latestComments,
 		latestPosts,
 		more,
 		nextpage,
