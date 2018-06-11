@@ -98,7 +98,7 @@ export default {
 		const { dispatch, getState } = store;
 		const state = getState();
 		const post = getCurrentPost( state );
-		const isAutosave = get( action.options, [ 'autosave' ], false );
+		const isAutosave = !! action.options.autosave;
 
 		// Prevent save if not saveable.
 		const isSaveable = isAutosave ? isEditedPostAutosaveable : isEditedPostSaveable;
@@ -157,48 +157,13 @@ export default {
 
 		request.then(
 			( newPost ) => {
+				const reset = isAutosave ? resetAutosave : resetPost;
+				dispatch( reset( newPost ) );
+
 				// An autosave may be processed by the server as a regular save
 				// when its update is requested by the author and the post was
 				// draft or auto-draft.
 				const isRevision = newPost.id !== post.id;
-
-				// Thus, the following behaviors occur:
-				//
-				//  - If it was a revision, it is treated as latest autosave
-				//    and updates optimistically applied are reverted.
-				//  - If it was an autosave but not revision under the above
-				//    noted conditions, cherry-pick updated properties since
-				//    the received revision entity shares some but not all
-				//    properties of a post.
-				//  - Otherwise, it was a full save and the received entity
-				//    can be considered the new reset post.
-				let updateAction;
-				if ( isRevision ) {
-					updateAction = resetAutosave( newPost );
-				} else if ( isAutosave ) {
-					const revisionEdits = pick( newPost, [
-						// Autosave content fields.
-						'title',
-						'content',
-						'excerpt',
-
-						// UI considers save to have occurred if modified date
-						// of post changes (e.g. PostPreviewButton).
-						//
-						// TODO: Consider formalized pattern for identifying a
-						// save as having completed.
-						'date',
-						'date_gmt',
-						'modified',
-						'modified_gmt',
-					] );
-
-					updateAction = updatePost( revisionEdits );
-				} else {
-					updateAction = resetPost( newPost );
-				}
-
-				dispatch( updateAction );
 
 				dispatch( {
 					type: 'REQUEST_POST_UPDATE_SUCCESS',
