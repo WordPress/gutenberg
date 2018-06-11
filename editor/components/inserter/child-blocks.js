@@ -10,24 +10,14 @@ import { ifCondition } from '@wordpress/components';
  */
 import './style.scss';
 import ItemList from './item-list';
-import BlockIcon from '../block-icon';
+import BlockIconWithColors from '../block-icon-with-colors';
 
 function ChildBlocks( { rootBlockIcon, rootBlockTitle, items, ...props } ) {
 	return (
 		<div className="editor-inserter__child-blocks">
 			{ ( rootBlockIcon || rootBlockTitle ) && (
 				<div className="editor-inserter__parent-block-header">
-					{ rootBlockIcon && (
-						<div
-							style={ {
-								backgroundColor: rootBlockIcon.background,
-								color: rootBlockIcon.foreground,
-							} }
-							className="editor-inserter__parent-block-icon"
-						>
-							<BlockIcon icon={ rootBlockIcon.src } />
-						</div>
-					) }
+					<BlockIconWithColors iconObject={ rootBlockIcon } />
 					{ rootBlockTitle && <h2>{ rootBlockTitle }</h2> }
 				</div>
 			) }

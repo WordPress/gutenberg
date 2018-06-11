@@ -16,11 +16,11 @@ import { withSelect } from '@wordpress/data';
  */
 import './style.scss';
 import SkipToSelectedBlock from '../skip-to-selected-block';
-import BlockIcon from '../block-icon';
+import BlockIconWithColors from '../block-icon-with-colors';
 import InspectorControls from '../inspector-controls';
 import InspectorAdvancedControls from '../inspector-advanced-controls';
 
-const BlockInspector = ( { selectedBlock, count } ) => {
+const BlockInspector = ( { selectedBlock, blockType, count } ) => {
 	if ( count > 1 ) {
 		return <span className="editor-block-inspector__multi-blocks">{ __( 'Coming Soon' ) }</span>;
 	}
@@ -29,13 +29,9 @@ const BlockInspector = ( { selectedBlock, count } ) => {
 		return <span className="editor-block-inspector__no-blocks">{ __( 'No block selected.' ) }</span>;
 	}
 
-	const blockType = getBlockType( selectedBlock.name );
-
 	return [
 		<div className="editor-block-inspector__card" key="card">
-			<div className="editor-block-inspector__card-icon">
-				<BlockIcon icon={ blockType.icon && blockType.icon.src } />
-			</div>
+			<BlockIconWithColors iconObject={ blockType.icon } />
 			<div className="editor-block-inspector__card-content">
 				<div className="editor-block-inspector__card-title">{ blockType.title }</div>
 				<div className="editor-block-inspector__card-description">{ blockType.description }</div>
@@ -60,8 +56,11 @@ const BlockInspector = ( { selectedBlock, count } ) => {
 export default withSelect(
 	( select ) => {
 		const { getSelectedBlock, getSelectedBlockCount } = select( 'core/editor' );
+		const selectedBlock = getSelectedBlock();
+		const blockType = selectedBlock && getBlockType( selectedBlock.name );
 		return {
-			selectedBlock: getSelectedBlock(),
+			selectedBlock,
+			blockType,
 			count: getSelectedBlockCount(),
 		};
 	}
