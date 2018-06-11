@@ -116,7 +116,7 @@ remove_filter( 'the_content', 'wpautop' );
 add_filter( 'the_content', 'gutenberg_wpautop', 8 );
 
 /**
- * Add `srcset` to the image meta `sizes` array.
+ * Add `srcset` to the image meta `sizes` array in the REST API response.
  *
  * @param WP_REST_Response $response Response object.
  * @param WP_Post $attachment Attachment post object.
