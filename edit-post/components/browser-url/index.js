@@ -45,7 +45,7 @@ export class BrowserURL extends Component {
 		const { postId, postStatus, postType } = this.props;
 		const { historyId } = this.state;
 
-		if ( postStatus === 'trashed' ) {
+		if ( postStatus === 'trash' ) {
 			window.location.href = getPostTrashedURL( postId, postType );
 		}
 

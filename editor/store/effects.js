@@ -254,7 +254,7 @@ export default {
 		apiRequest( { path: `/wp/v2/${ basePath }/${ postId }`, method: 'DELETE' } ).then(
 			() => {
 				const post = getCurrentPost( getState() );
-				dispatch( resetPost( { ...post, status: 'trashed' } ) );
+				dispatch( resetPost( { ...post, status: 'trash' } ) );
 				dispatch( {
 					...action,
 					type: 'TRASH_POST_SUCCESS',
