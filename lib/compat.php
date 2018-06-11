@@ -114,3 +114,53 @@ function gutenberg_wpautop( $content ) {
 }
 remove_filter( 'the_content', 'wpautop' );
 add_filter( 'the_content', 'gutenberg_wpautop', 8 );
+
+/**
+ * Add `srcset` to the image meta `sizes` array.
+ *
+ * @param WP_REST_Response $response Response object.
+ * @param WP_Post $attachment Attachment post object.
+ * @return WP_REST_Response Response object.
+ */
+function gutenberg_rest_prepare_attachment( $response, $attachment ) {
+	if ( $response->data['media_type'] === 'image' && ! empty( $response->data['media_details']['sizes'] ) ) {
+		$meta = wp_get_attachment_metadata( $attachment->ID );
+		$sizes = $response->data['media_details']['sizes'];
+
+		foreach ( $sizes as $size_name => $size ) {
+			$srcset = wp_calculate_image_srcset( array( $size['width'], $size['height'] ), $size['source_url'], $meta, $attachment->ID );
+
+			if ( $srcset ) {
+				$sizes[ $size_name ]['srcset'] = $srcset;
+			}
+		}
+
+		$response->data['media_details']['sizes'] = $sizes;
+	}
+
+	return $response;
+}
+add_filter( 'rest_prepare_attachment', 'gutenberg_rest_prepare_attachment', 10, 2 );
+
+/**
+ * Add `srcset` to the prepared attachment data for the Media Library.
+ *
+ * @param array   $response   Array of prepared attachment data.
+ * @param WP_Post $attachment Attachment object.
+ * @param array   $meta       Array of attachment meta data.
+ * @return array Array of prepared attachment data.
+ */
+function gutenberg_prepare_attachment_for_js( $response, $attachment, $meta ) {
+	if ( ! empty( $response['type'] ) && $response['type'] === 'image' && ! empty( $response['sizes'] ) ) {
+		foreach ( $response['sizes'] as $size_name => $size ) {
+			$srcset = wp_calculate_image_srcset( array( $size['width'], $size['height'] ), $size['url'], $meta, $attachment->ID );
+
+			if ( $srcset ) {
+				$response['sizes'][ $size_name ]['srcset'] = $srcset;
+			}
+		}
+	}
+
+	return $response;
+}
+add_filter( 'wp_prepare_attachment_for_js', 'gutenberg_prepare_attachment_for_js', 10, 3 );
