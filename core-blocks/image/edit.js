@@ -9,6 +9,7 @@ import {
 	map,
 	pick,
 	startCase,
+	round,
 } from 'lodash';
 
 /**
@@ -46,6 +47,7 @@ import { withViewportMatch } from '@wordpress/viewport';
  */
 import './editor.scss';
 import ImageSize from './image-size';
+import { getEditorWidth, getPercentWidth } from './image-size';
 
 /**
  * Module constants
@@ -117,10 +119,41 @@ class ImageEdit extends Component {
 			} );
 			return;
 		}
+
+		const editorWidth = getEditorWidth();
+		let src = media.url;
+		let img = {};
+		let percentWidth = 100;
+		let sizesWidth = editorWidth;
+
+		if ( media.sizes ) {
+			// The "full" size is included in `sizes`.
+			img = media.sizes.large || media.sizes.full;
+			src = img.url;
+
+			if ( img.width < editorWidth ) {
+				// The "full" size may be narrower than 100%.
+				sizesWidth = img.width;
+				percentWidth = getPercentWidth( sizesWidth );
+			}
+
+			if ( img.srcset ) {
+				img.sizes = this.getSizesAttr( sizesWidth );
+			}
+		} else {
+			if ( media.width && media.width < editorWidth ) {
+				percentWidth = getPercentWidth( media.width );
+			}
+		}
+
 		this.props.setAttributes( {
-			...pick( media, [ 'alt', 'id', 'caption', 'url' ] ),
+			...pick( media, [ 'alt', 'id', 'caption' ] ),
+			url: src,
+			srcSet: img.srcset,
+			sizes: img.sizes,
 			width: undefined,
 			height: undefined,
+			'data-wp-percent-width': percentWidth,
 		} );
 	}
 
@@ -157,10 +190,15 @@ class ImageEdit extends Component {
 
 	updateImageURL( url ) {
 		this.props.setAttributes( { url, width: undefined, height: undefined } );
+		this.updateSrcsetAndSizes( url );
 	}
 
 	updateWidth( width ) {
-		this.props.setAttributes( { width: parseInt( width, 10 ) } );
+		width = parseInt( width, 10 );
+		this.props.setAttributes( {
+			width: width,
+			'data-wp-percent-width': getPercentWidth( width ),
+		} );
 	}
 
 	updateHeight( height ) {
@@ -169,17 +207,136 @@ class ImageEdit extends Component {
 
 	updateDimensions( width = undefined, height = undefined ) {
 		return () => {
-			this.props.setAttributes( { width, height } );
+			this.props.setAttributes( {
+				width: width,
+				height: height,
+				'data-wp-percent-width': getPercentWidth( width ) || 100,
+			} );
+		};
+	}
+
+	updateSrcsetAndSizes( url ) {
+		const sizes = get( this.props.image, [ 'media_details', 'sizes' ], {} );
+
+		if ( ! sizes.full ) {
+			this.resetSrcsetAndSizes();
+		}
+
+		let imageData;
+		const defaultImage = sizes.large || sizes.full;
+
+		if ( defaultImage.source_url === url ) {
+			imageData = defaultImage;
+		} else if ( sizes.thumbnail && sizes.thumbnail.source_url === url ) {
+			imageData = sizes.thumbnail;
+		}
+
+		if ( ! imageData || ! imageData.srcset ) {
+			this.resetSrcsetAndSizes();
+		} else {
+			const editorWidth = getEditorWidth();
+			let percentWidth = 100;
+			let sizesWidth = editorWidth;
+
+			if ( imageData.width < editorWidth ) {
+				sizesWidth = imageData.width;
+				percentWidth = getPercentWidth( sizesWidth );
+			}
+
+			this.props.setAttributes( {
+				srcSet: imageData.srcset,
+				sizes: this.getSizesAttr( sizesWidth ),
+				'data-wp-percent-width': percentWidth,
+			} );
+		}
+	}
+
+	resetSrcsetAndSizes() {
+		this.props.setAttributes( {
+			srcSet: null,
+			sizes: null,
+			'data-wp-percent-width': 100,
+		} );
+	}
+
+	getSizesAttr( width ) {
+		return '(max-width: '.concat( width, 'px) 100vw, ', width, 'px' );
+	}
+
+	/**
+	 * Helper function to test if aspect ratios for two images match.
+	 *
+	 * @param int fullWidth  Width of the image in pixels.
+	 * @param int fullHeight Height of the image in pixels.
+	 * @param int targetWidth  Width of the smaller image in pixels.
+	 * @param int targetHeight Height of the smaller image in pixels.
+	 * @return bool True if aspect ratios match within 1px. False if not.
+	 */
+	imageMatchesRatio( fullWidth, fullHeight, targetWidth, targetHeight ) {
+		if ( ! fullWidth || ! fullHeight || ! targetWidth || ! targetHeight ) {
+			return false;
+		}
+
+		const { width, height } = this.constrainImageDimensions( fullWidth, fullHeight, targetWidth );
+
+		// If the image dimensions are within 1px of the expected size, we consider it a match.
+		return ( Math.abs( width - targetWidth ) <= 1 && Math.abs( height - targetHeight ) <= 1 );
+	}
+
+	constrainImageDimensions( fullWidth, fullHeight, targetWidth ) {
+		const ratio = targetWidth / fullWidth;
+
+		// Very small dimensions may result in 0, 1 should be the minimum.
+		let width = Math.max( 1, round( fullWidth * ratio ) );
+		let height = Math.max( 1, round( fullHeight * ratio ) );
+
+		// Sometimes, due to rounding, we'll end up with a result like this: 465x700 in a 177x177 box is 117x176... a pixel short.
+		if ( width === targetWidth - 1 ) {
+			width = targetWidth; // Round it up
+		}
+
+		return {
+			width: width,
+			height: height,
 		};
 	}
 
 	getAvailableSizes() {
-		return get( this.props.image, [ 'media_details', 'sizes' ], {} );
+		const sizes = get( this.props.image, [ 'media_details', 'sizes' ], {} );
+
+		if ( ! sizes.full ) {
+			return;
+		}
+
+		let showSizes = {
+			'default': sizes.large || sizes.full,
+			// Always show the thumbnail size.
+			thumbnail: sizes.thumbnail,
+		};
+		const fullWidth = sizes.full.width;
+		const fullHeight = sizes.full.height;
+
+		for( name in sizes ) {
+			const size = sizes[ name ];
+
+			// Add custom sizes that do not match the ratio (they won't be in the srcset).
+			if ( ! this.imageMatchesRatio( fullWidth, fullHeight, size.width, size.height ) ) {
+				showSizes[ name ] = size;
+			}
+		}
+
+		// Possibly a mismatch?
+		if ( showSizes.hasOwnProperty( 'large' ) ) {
+			delete showSizes['default'];
+		}
+
+		return showSizes;
 	}
 
 	render() {
 		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, noticeOperations, noticeUI, toggleSelection } = this.props;
-		const { url, alt, caption, align, id, href, width, height } = attributes;
+		const { url, alt, caption, align, id, href, width, height, srcSet } = attributes;
+		const sizesAttr = attributes.sizes;
 
 		const controls = (
 			<BlockControls>
@@ -283,8 +440,18 @@ class ImageEdit extends Component {
 						<div className="core-blocks-image__dimensions__row">
 							<ButtonGroup aria-label={ __( 'Image Size' ) }>
 								{ [ 25, 50, 75, 100 ].map( ( scale ) => {
-									const scaledWidth = Math.round( imageWidth * ( scale / 100 ) );
-									const scaledHeight = Math.round( imageHeight * ( scale / 100 ) );
+									const editorWidth = getEditorWidth();
+									let renderWidth = imageWidth;
+									let renderHeight = imageHeight;
+
+									if ( imageWidth > editorWidth ) {
+										const dimensions = this.constrainImageDimensions( imageWidth, imageHeight, editorWidth );
+										renderWidth = dimensions.width;
+										renderHeight = dimensions.height;
+									}
+
+									const scaledWidth = round( renderWidth * ( scale / 100 ) );
+									const scaledHeight = round( renderHeight * ( scale / 100 ) );
 
 									const isCurrent = width === scaledWidth && height === scaledHeight;
 
@@ -332,7 +499,13 @@ class ImageEdit extends Component {
 							// Disable reason: Image itself is not meant to be
 							// interactive, but should direct focus to block
 							// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-							const img = <img src={ url } alt={ alt } onClick={ this.onImageClick } />;
+							const img = <img
+								src={ url }
+								alt={ alt }
+								srcSet={ srcSet }
+								sizes={ sizesAttr }
+								onClick={ this.onImageClick }
+							/>;
 
 							if ( ! isResizable || ! imageWidthWithinContainer ) {
 								return (
@@ -375,10 +548,8 @@ class ImageEdit extends Component {
 											toggleSelection( false );
 										} }
 										onResizeStop={ ( event, direction, elt, delta ) => {
-											setAttributes( {
-												width: parseInt( currentWidth + delta.width, 10 ),
-												height: parseInt( currentHeight + delta.height, 10 ),
-											} );
+											this.updateWidth( currentWidth + delta.width );
+											this.updateHeight( currentHeight + delta.height );
 											toggleSelection( true );
 										} }
 									>

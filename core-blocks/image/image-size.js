@@ -1,13 +1,32 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
+import { noop, round } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { withGlobalEvents } from '@wordpress/components';
 import { Component } from '@wordpress/element';
+
+export function getEditorWidth() {
+	const node = document.querySelector( 'div.editor-block-list__block-edit' );
+	return node && node.clientWidth;
+}
+
+export function getPercentWidth( width ) {
+	const editorWidth = getEditorWidth();
+
+	if ( ! width || ! editorWidth ) {
+		return;
+	}
+
+	if ( width < editorWidth ) {
+		return round( ( width / editorWidth ) * 100, 4 );
+	}
+
+	return 100;
+}
 
 class ImageSize extends Component {
 	constructor() {
