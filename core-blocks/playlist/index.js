@@ -54,7 +54,7 @@ export const settings = {
 	edit: class extends Component {
 		constructor() {
 			super( ...arguments );
-			//check for if ids is set to determine edit state
+			// check for if ids is set to determine edit state
 			this.state = {
 				editing: ! this.props.attributes.ids,
 			};
@@ -69,6 +69,7 @@ export const settings = {
 				this.setState( { editing: true } );
 			};
 			const onSelectMedia = ( media ) => {
+				//check if there are returned media items and set attributes when there are
 				if ( media && media[0].url ) {
 					media = ( 1 < media.length ) ? media : [ media ];
 					setAttributes( { ids: media.map( ( item ) => item.id ), type: media[0].type  } );
@@ -90,8 +91,8 @@ export const settings = {
 				return (
 					<Placeholder
 						icon="media-audio"
-						label={ __( 'Audio' ) }
-						instructions={ __( 'Select an audio file from your library, or upload a new one' ) }
+						label={ __( 'Audio/Video Playlist' ) }
+						instructions={ __( 'Select audio or video files from your library, or upload a new ones' ) }
 						className={ className }>
 						<FormFileUpload
 							isLarge
