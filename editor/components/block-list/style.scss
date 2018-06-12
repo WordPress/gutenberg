@@ -581,17 +581,27 @@
 		}
 	}
 
-	// Show side UI inline below the block on mobile
+	// Show side UI inline below the block on mobile.
 	.editor-block-list__block-mobile-toolbar {
 		display: flex;
 		flex-direction: row;
-		margin-top: $item-spacing;
+		margin-top: $item-spacing + $block-toolbar-height; // Make room for the formatting bar above. 
+		margin-right: -$block-padding;
+		margin-bottom: -$block-padding - 1px; // Include border.
+		margin-left: -$block-padding;
+		border-top: 1px solid $light-gray-500;
 
 		@include break-small() {
 			display: none;
 		}
 
-		// Movers, inserter, trash & ellipsis
+		// Show a shadow below the selected block to imply separation.
+		box-shadow: $shadow-below-only;
+		@include break-mobile() {
+			box-shadow: none;
+		}
+
+		// Movers, inserter, trash & ellipsis.
 		.editor-inserter {
 			position: relative;
 			left: auto;
@@ -753,10 +763,10 @@
 
 	// Position toolbar below the block on mobile
 	position: absolute;
-	bottom: -$block-toolbar-height + 1px;
+	//bottom: -$block-toolbar-height + 1px;
+	bottom: $block-toolbar-height;
 	left: $block-padding;
 	right: $block-padding;
-	box-shadow: $shadow-below-only;
 
 	// Position the contextual toolbar above the block, add 1px to each to stack borders
 	@include break-mobile() {
@@ -764,7 +774,6 @@
 		bottom: auto;
 		left: auto;
 		right: auto;
-		box-shadow: none;
 		margin-top: -$block-toolbar-height - 1px;
 		margin-bottom: $block-padding + 1px;
 	}
