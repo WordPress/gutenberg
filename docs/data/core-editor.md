@@ -10,7 +10,6 @@ Returns true if any past editor history snapshots exist, or false otherwise.
 
  * state: Global application state.
 
-
 ### hasEditorRedo
 
 Returns true if any future editor history snapshots exist, or false
@@ -1030,9 +1029,6 @@ Block settings of the block if set.
 
 eslint-disable-next-line no-unused-vars
 
-
-
-
 ### getEditorSettings
 
 Returns the editor settings.
@@ -1057,7 +1053,6 @@ the specified post object and editor settings.
  * post: Post object.
  * autosaveStatus: The Post's autosave status.
 
-
 ### resetPost
 
 Returns an action object used in signalling that the latest version of the
@@ -1067,7 +1062,6 @@ post has been received, either by initialization or save.
 
  * post: Post object.
 
-
 ### resetAutosave
 
 Returns an action object used in signalling that the latest autosave of the
@@ -1076,7 +1070,6 @@ post has been received, by initialization or autosave.
 *Parameters*
 
  * post: Autosave post object.
-
 
 ### setupEditorState
 
@@ -1088,7 +1081,6 @@ Returns an action object used to setup the editor state when first opening an ed
  * blocks: Array of blocks.
  * edits: Initial edited attributes object.
 
-
 ### resetBlocks
 
 Returns an action object used in signalling that blocks state should be
@@ -1098,7 +1090,6 @@ content reflected as an edit in state.
 *Parameters*
 
  * blocks: Array of blocks.
-
 
 ### receiveBlocks
 
@@ -1110,7 +1101,6 @@ replacing.
 
  * blocks: Array of block objects.
 
-
 ### updateBlockAttributes
 
 Returns an action object used in signalling that the block attributes with
@@ -1120,7 +1110,6 @@ the specified UID has been updated.
 
  * uid: Block UID.
  * attributes: Block attributes to be merged.
-
 
 ### updateBlock
 
@@ -1132,7 +1121,6 @@ specified UID has been updated.
  * uid: Block UID.
  * updates: Block attributes to be merged.
 
-
 ### toggleSelection
 
 Returns an action object that enables or disables block selection.
@@ -1141,7 +1129,6 @@ Returns an action object that enables or disables block selection.
 
  * boolean: [isSelectionEnabled=true] Whether block selection should
                                            be enabled.
-
 
 ### replaceBlocks
 
@@ -1153,7 +1140,6 @@ one or more replacement blocks.
  * uids: Block UID(s) to replace.
  * blocks: Replacement block(s).
 
-
 ### replaceBlock
 
 Returns an action object signalling that a single block should be replaced
@@ -1163,7 +1149,6 @@ with one or more replacement blocks.
 
  * uid: Block UID(s) to replace.
  * block: Replacement block(s).
-
 
 ### moveBlockToPosition
 
@@ -1178,7 +1163,6 @@ to a new index.
  * layout: layout to move the block into.
  * index: The index to move the block into.
 
-
 ### insertBlock
 
 Returns an action object used in signalling that a single block should be
@@ -1189,7 +1173,6 @@ inserted, optionally at a specific index respective a root block list.
  * block: Block object to insert.
  * index: Index at which block should be inserted.
  * rootUID: Optional root UID of block list to insert.
-
 
 ### insertBlocks
 
@@ -1202,21 +1185,14 @@ be inserted, optionally at a specific index respective a root block list.
  * index: Index at which block should be inserted.
  * rootUID: Optional root UID of block list to insert.
 
-
 ### showInsertionPoint
 
 Returns an action object used in signalling that the insertion point should
 be shown.
 
-
-
-
 ### hideInsertionPoint
 
 Returns an action object hiding the insertion point.
-
-
-
 
 ### setTemplateValidity
 
@@ -1226,20 +1202,13 @@ Returns an action object resetting the template validity.
 
  * isValid: template validity flag.
 
-
 ### checkTemplateValidity
 
 Returns an action object to check the template validity.
 
-
-
-
 ### synchronizeTemplate
 
 Returns an action object synchronize the template with the list of blocks
-
-
-
 
 ### savePost
 
@@ -1250,7 +1219,6 @@ Returns an action object to save the post.
  * options: Options for the save.
  * options.autosave: Perform an autosave if true.
 
-
 ### mergeBlocks
 
 Returns an action object used in signalling that two blocks should be merged
@@ -1260,36 +1228,23 @@ Returns an action object used in signalling that two blocks should be merged
  * blockAUid: UID of the first block to merge.
  * blockBUid: UID of the second block to merge.
 
-
 ### autosave
 
 Returns an action object used in signalling that the post should autosave.
-
-
-
 
 ### redo
 
 Returns an action object used in signalling that undo history should
 restore last popped state.
 
-
-
-
 ### undo
 
 Returns an action object used in signalling that undo history should pop.
-
-
-
 
 ### createUndoLevel
 
 Returns an action object used in signalling that undo history record should
 be created.
-
-
-
 
 ### removeBlocks
 
@@ -1301,7 +1256,6 @@ corresponding to the specified UID set are to be removed.
  * uids: Block UIDs.
  * selectPrevious: True if the previous block should be selected when a block is removed.
 
-
 ### removeBlock
 
 Returns an action object used in signalling that the block with the
@@ -1312,7 +1266,6 @@ specified UID is to be removed.
  * uid: Block UID.
  * selectPrevious: True if the previous block should be selected when a block is removed.
 
-
 ### toggleBlockMode
 
 Returns an action object used to toggle the block editing mode (visual/html).
@@ -1321,20 +1274,13 @@ Returns an action object used to toggle the block editing mode (visual/html).
 
  * uid: Block UID.
 
-
 ### startTyping
 
 Returns an action object used in signalling that the user has begun to type.
 
-
-
-
 ### stopTyping
 
 Returns an action object used in signalling that the user has stopped typing.
-
-
-
 
 ### createNotice
 
@@ -1348,7 +1294,6 @@ Returns an action object used to create a notice.
                              `id` (string; default auto-generated)
                              `isDismissible` (boolean; default `true`).
 
-
 ### removeNotice
 
 Returns an action object used to remove a notice.
@@ -1356,7 +1301,6 @@ Returns an action object used to remove a notice.
 *Parameters*
 
  * id: The notice id.
-
 
 ### fetchSharedBlocks
 
@@ -1367,7 +1311,6 @@ blocks from the REST API into the store.
 
  * id: If given, only a single shared block with this ID will
                     be fetched.
-
 
 ### receiveSharedBlocks
 
@@ -1380,7 +1323,6 @@ received. `results` is an array of objects containing:
 
  * results: Shared blocks received.
 
-
 ### saveSharedBlock
 
 Returns an action object used to save a shared block that's in the store to
@@ -1390,7 +1332,6 @@ the REST API.
 
  * id: The ID of the shared block to save.
 
-
 ### deleteSharedBlock
 
 Returns an action object used to delete a shared block via the REST API.
@@ -1398,7 +1339,6 @@ Returns an action object used to delete a shared block via the REST API.
 *Parameters*
 
  * id: The ID of the shared block to delete.
-
 
 ### updateSharedBlockTitle
 
@@ -1410,7 +1350,6 @@ to be updated.
  * id: The ID of the shared block to update.
  * title: The new title.
 
-
 ### convertBlockToStatic
 
 Returns an action object used to convert a shared block into a static block.
@@ -1419,7 +1358,6 @@ Returns an action object used to convert a shared block into a static block.
 
  * uid: The ID of the block to attach.
 
-
 ### convertBlockToShared
 
 Returns an action object used to convert a static block into a shared block.
@@ -1427,7 +1365,6 @@ Returns an action object used to convert a static block into a shared block.
 *Parameters*
 
  * uid: The ID of the block to detach.
-
 
 ### insertDefaultBlock
 
@@ -1440,7 +1377,6 @@ type should be added to the block list.
  * rootUID: Optional root UID of block list to append.
  * index: Optional index where to insert the default block
 
-
 ### updateBlockListSettings
 
 Returns an action object that changes the nested settings of a given block.
@@ -1449,7 +1385,6 @@ Returns an action object that changes the nested settings of a given block.
 
  * id: UID of the block whose nested setting.
  * settings: Object with the new settings for the nested block.
-
 
 ### updateEditorSettings
 

@@ -11,7 +11,6 @@ Returns a block type by name.
  * state: Data state.
  * name: Block type name.
 
-
 ### getCategories
 
 Returns all the available categories.
@@ -58,7 +57,6 @@ Returns an action object used in signalling that block types have been added.
 
  * blockTypes: Block types received.
 
-
 ### removeBlockTypes
 
 Returns an action object used to remove a registered block type.
@@ -67,7 +65,6 @@ Returns an action object used to remove a registered block type.
 
  * names: Block name.
 
-
 ### setDefaultBlockName
 
 Returns an action object used to set the default block name.
@@ -75,7 +72,6 @@ Returns an action object used to set the default block name.
 *Parameters*
 
  * name: Block name.
-
 
 ### setFallbackBlockName
 

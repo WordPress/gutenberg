@@ -11,7 +11,6 @@ Returns all the available terms for the given taxonomy.
  * state: Data state.
  * taxonomy: Taxonomy name.
 
-
 ### getCategories
 
 Returns all the available categories.
@@ -129,7 +128,6 @@ for a given taxonomy.
  * taxonomy: Taxonomy name.
  * terms: Terms received.
 
-
 ### receiveUserQuery
 
 Returns an action object used in signalling that authors have been received.
@@ -139,7 +137,6 @@ Returns an action object used in signalling that authors have been received.
  * queryID: Query ID.
  * users: Users received.
 
-
 ### addEntities
 
 Returns an action object used in adding new entities.
@@ -147,7 +144,6 @@ Returns an action object used in adding new entities.
 *Parameters*
 
  * entities: Entities received.
-
 
 ### receiveEntityRecords
 
@@ -158,7 +154,6 @@ Returns an action object used in signalling that entity records have been receiv
  * kind: Kind of the received entity.
  * name: Name of the received entity.
  * records: Records received.
-
 
 ### receiveThemeSupportsFromIndex
 

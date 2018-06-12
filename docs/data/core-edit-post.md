@@ -10,7 +10,6 @@ Returns the current editing mode.
 
  * state: Global application state.
 
-
 ### isEditorSidebarOpened
 
 Returns true if the editor sidebar is opened.
@@ -60,8 +59,6 @@ Returns the preferences (these preferences are persisted locally).
 Preferences Object.
 
 ### getPreference
-
-
 
 *Parameters*
 
@@ -172,36 +169,23 @@ Returns an action object used in signalling that the user opened an editor sideb
 
  * name: Sidebar name to be opened.
 
-
 ### closeGeneralSidebar
 
 Returns an action object signalling that the user closed the sidebar.
-
-
-
 
 ### openPublishSidebar
 
 Returns an action object used in signalling that the user opened the publish
 sidebar.
 
-
-
-
 ### closePublishSidebar
 
 Returns an action object used in signalling that the user closed the
 publish sidebar.
 
-
-
-
 ### togglePublishSidebar
 
 Returns an action object used in signalling that the user toggles the publish sidebar.
-
-
-
 
 ### toggleGeneralSidebarEditorPanel
 
@@ -211,7 +195,6 @@ Returns an action object used in signalling that use toggled a panel in the edit
 
  * panel: The panel to toggle.
 
-
 ### toggleFeature
 
 Returns an action object used to toggle a feature flag.
@@ -220,7 +203,6 @@ Returns an action object used to toggle a feature flag.
 
  * feature: Feature name.
 
-
 ### togglePinnedPluginItem
 
 Returns an action object used to toggle a plugin name flag.
@@ -228,7 +210,6 @@ Returns an action object used to toggle a plugin name flag.
 *Parameters*
 
  * pluginName: Plugin name.
-
 
 ### initializeMetaBoxState
 
@@ -246,20 +227,13 @@ This indicates that the sidebar has a meta box but the normal area does not.
 
  * metaBoxes: Whether meta box locations are active.
 
-
 ### requestMetaBoxUpdates
 
 Returns an action object used to request meta box update.
 
-
-
-
 ### metaBoxUpdatesSuccess
 
 Returns an action object used signal a successfull meta box update.
-
-
-
 
 ### setMetaBoxSavedData
 

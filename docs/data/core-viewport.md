@@ -12,7 +12,6 @@ Returns true if the viewport matches the given query, or false otherwise.
  * query: Query string. Includes operator and breakpoint name,
                       space separated. Operator defaults to >=.
 
-
 ## Actions
 
 ### setIsMatching

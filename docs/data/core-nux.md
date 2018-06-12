@@ -13,7 +13,6 @@ guide that they have been added to.
  * state: Global application state.
  * id: The tip to query.
 
-
 ## Actions
 
 ### triggerGuide
@@ -25,7 +24,6 @@ the user through a series of tips step by step.
 
  * tipIds: Which tips to show in the guide.
 
-
 ### dismissTip
 
 Returns an action object that, when dispatched, dismisses the given tip. A
@@ -35,10 +33,7 @@ dismissed tip will not show again.
 
  * id: The tip to dismiss.
 
-
 ### disableTips
 
 Returns an action object that, when dispatched, prevents all tips from
 showing again.
-
-

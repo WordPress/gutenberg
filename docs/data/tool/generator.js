@@ -33,23 +33,25 @@ function generateTableOfContent( parsed ) {
 function generateFunctionDocs( parsedFunc, generateDocsForReturn = true ) {
 	return [
 		`### ${ parsedFunc.name }`,
-		'',
-		parsedFunc.description,
-		'',
+		parsedFunc.description ? [
+			'',
+			parsedFunc.description,
+		].join( '\n' ) : null,
 		parsedFunc.params.length ? [
+			'',
 			'*Parameters*',
 			'',
 			parsedFunc.params.map( ( param ) => (
 				` * ${ param.name }: ${ param.description }`
 			) ).join( '\n' ),
-		].join( '\n' ) : '',
+		].join( '\n' ) : null,
 		parsedFunc.return && generateDocsForReturn ? [
 			'',
 			'*Returns*',
 			'',
 			parsedFunc.return.description,
-		].join( '\n' ) : '',
-	].join( '\n' );
+		].join( '\n' ) : null,
+	].filter( ( row ) => row !== null ).join( '\n' );
 }
 
 /**
