@@ -1,6 +1,7 @@
 // These margins make sure that nested blocks stack/overlay with the parent block chrome
 // This is sort of an experiment at making sure the editor looks as much like the end result as possible
 // Potentially the rules here can apply to all nested blocks and enable stacking, in which case it should be moved elsewhere
+// Note that when using CSS grid, margins do not collapse on the container
 .wp-block-columns .editor-block-list__layout {
 	margin-left: 0;
 	margin-right: 0;

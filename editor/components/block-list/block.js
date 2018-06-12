@@ -401,7 +401,8 @@ export class BlockListBlock extends Component {
 		// Empty paragraph blocks should always show up as unselected.
 		const showEmptyBlockSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
 		const showSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
-		const shouldAppearSelected = ! showSideInserter && ( isSelected || hasSelectedInnerBlock ) && ! isTypingWithinBlock;
+		const shouldAppearSelected = ! showSideInserter && isSelected && ! isTypingWithinBlock;
+		const shouldAppearSelectedParent = ! showSideInserter && hasSelectedInnerBlock && ! isTypingWithinBlock;
 		// We render block movers and block settings to keep them tabbale even if hidden
 		const shouldRenderMovers = ( isSelected || hoverArea === 'left' ) && ! showEmptyBlockSideInserter && ! isMultiSelecting && ! isPartOfMultiSelection && ! isTypingWithinBlock;
 		const shouldRenderBlockSettings = ( isSelected || hoverArea === 'right' ) && ! isMultiSelecting && ! isPartOfMultiSelection && ! isTypingWithinBlock;
@@ -421,6 +422,7 @@ export class BlockListBlock extends Component {
 			'has-warning': ! isValid || !! error,
 			'is-selected': shouldAppearSelected,
 			'is-multi-selected': isPartOfMultiSelection,
+			'is-selected-parent': shouldAppearSelectedParent,
 			'is-hovered': isHovered && ! isEmptyDefaultBlock,
 			'is-shared': isSharedBlock( blockType ),
 			'is-hidden': dragging,
@@ -513,7 +515,6 @@ export class BlockListBlock extends Component {
 					/>
 				) }
 				{ shouldShowBreadcrumb && <BlockBreadcrumb uid={ uid } isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' } /> }
-				{ shouldShowContextualToolbar && <BlockContextualToolbar /> }
 				{ isFirstMultiSelected && <BlockMultiControls rootUID={ rootUID } /> }
 				<IgnoreNestedEvents
 					ref={ this.bindBlockNode }
@@ -522,7 +523,7 @@ export class BlockListBlock extends Component {
 					className="editor-block-list__block-edit"
 					data-block={ uid }
 				>
-
+					{ shouldShowContextualToolbar && <BlockContextualToolbar /> }
 					<BlockCrashBoundary onError={ this.onBlockError }>
 						{ isValid && mode === 'visual' && (
 							<BlockEdit

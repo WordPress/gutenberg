@@ -103,6 +103,11 @@
 	}
 }
 
+
+/**
+ * General layout
+ */
+
 .editor-block-list__layout {
 	// Make room in the main content column for the side UI.
 	// The side UI uses negative margins to position itself so as to not affect the block width.
@@ -121,15 +126,26 @@
 		margin-left: -$block-padding;
 		margin-right: -$block-padding;
 
-		// Compensate for block padding and collapsing margins vertically.
-		margin-top: -$block-padding + $border-width;
-		margin-bottom: -$block-padding + $border-width;
+		// Compensate for block padding.
+		margin-top: -$block-padding;
+		margin-bottom: -$block-padding;
+	}
+
+	// Adjust the spacing of the appender, or the first block, to sit near the title.
+	.editor-default-block-appender .editor-default-block-appender__content,
+	.editor-block-list__block:first-child .editor-block-list__block-edit {
+		margin-top: $block-padding - $block-spacing / 2;
+	}
+
+	// Space every block, and the default appender, using margins.
+	// This allows margins to collapse, which gives a better representation of how it looks on the frontend.
+	.editor-default-block-appender__content,
+	.editor-block-list__block .editor-block-list__block-edit,
+	.editor-block-list__layout .editor-block-list__block .editor-block-list__block-edit { // Explicitly target nested blocks, as those need to override the preceeding rule.
+		margin-top: $block-padding * 2 + $block-spacing;
+		margin-bottom: $block-padding * 2 + $block-spacing;
 	}
 }
-
-/**
- * General layout
- */
 
 .editor-block-list__layout .editor-block-list__block {
 	position: relative;
@@ -144,23 +160,6 @@
 		padding-left: $block-padding + $block-side-ui-padding - $border-width;
 		padding-right: $block-padding + $block-side-ui-padding - $border-width;
 	}
-
-	// Prevent collapsing margins @todo try and revisit this, it's conducive to theming to allow these to collapse
-	padding-top: 1px;
-	padding-bottom: 1px;
-
-	// Space every block using margins instead of padding
-	// This allows margins to collapse, which gives a better representation of how it looks on the frontend
-	.editor-block-list__block-edit {
-		margin-top: $block-padding;
-		margin-bottom: $block-padding;
-
-		// Prevent collapsing margins @todo try and revisit this, it's conducive to theming to allow these to collapse
-		padding-top: 1px;
-		padding-bottom: 1px;
-	}
-
-	margin-bottom: $block-spacing;
 
 	/**
 	 * Notices
@@ -213,6 +212,7 @@
 	/**
 	 * Block outline layout
 	 */
+
 	.editor-block-list__block-edit {
 		position: relative;
 
@@ -224,6 +224,9 @@
 			transition: outline .1s linear;
 			pointer-events: none;
 
+			// Show wider padding for top level blocks.
+			right: -$parent-block-padding;
+			left: -$parent-block-padding;
 			top: -$block-padding;
 			bottom: -$block-padding;
 			right: -$block-padding;
@@ -246,11 +249,10 @@
 	}
 
 	// Selected style
+	&.is-selected-parent > .editor-block-list__block-edit:before,
 	&.is-selected > .editor-block-list__block-edit:before {
 		// use opacity to work in various editor styles
 		outline: $border-width solid $dark-opacity-light-500;
-		top: -$block-padding;
-		bottom: -$block-padding;
 
 		.is-dark-theme & {
 			outline-color: $light-opacity-light-500;
@@ -413,8 +415,8 @@
 		// Mover and settings above
 		> .editor-block-mover,
 		> .editor-block-settings-menu {
-			// This moves the menu up by the height of the button + border.
-			top: -$block-side-ui-width - $border-width;
+			// This moves the menu up by the height of the button + border + padding.
+			top: -$block-side-ui-width - $block-padding - $border-width;
 			bottom: auto;
 			min-height: 0;
 			height: auto;
@@ -427,11 +429,11 @@
 		}
 
 		> .editor-block-mover {
-			left: 10px;
+			left: $parent-block-padding;
 		}
 
 		> .editor-block-settings-menu {
-			right: 10px;
+			right: $parent-block-padding;
 			width: $block-side-ui-width * 2;
 			flex-direction: row;
 		}
@@ -539,7 +541,7 @@
 
 
 /**
- * Left and right side UI
+ * Left and right side UI, & Unified toolbar on Mobile
  */
 
 .editor-block-list__block {
@@ -548,11 +550,16 @@
 	> .editor-block-settings-menu,
 	> .editor-block-mover {
 		position: absolute;
-		top: 0;
 		width: $block-side-ui-width + $block-side-ui-clearance;
 		// stretch to fill half of the available space to increase hoverable area
 		height: 100%;
 		max-height: $block-side-ui-width * 4;
+	}
+
+	// Position depending on whether selected or not.
+	> .editor-block-settings-menu,
+	> .editor-block-mover {
+		top: -$block-padding - $border-width;
 	}
 
 	// Elevate when selected or hovered
@@ -619,11 +626,13 @@
 		display: flex;
 		flex-direction: row;
 		// Make room for the height of the block toolbar above.
-		margin-top: $item-spacing + $block-toolbar-height;
+		margin-top: $item-spacing + $block-toolbar-height - $block-padding;
 		margin-right: -$block-padding;
-		margin-bottom: -$block-padding - $border-width;
 		margin-left: -$block-padding;
 		border-top: $border-width solid $light-gray-500;
+		height: $block-toolbar-height;
+
+		transform: translateY( #{ $block-padding + $border-width } );
 
 		@include break-small() {
 			display: none;
@@ -631,7 +640,7 @@
 
 		// Show a shadow below the selected block to imply separation.
 		box-shadow: $shadow-below-only;
-		@include break-mobile() {
+		@include break-small() {
 			box-shadow: none;
 		}
 
@@ -687,6 +696,7 @@
 /**
  * In-Canvas Inserter
  */
+
 .editor-block-list .editor-inserter {
 	margin: $item-spacing;
 	cursor: move; // Fallback for IE/Edge < 14
@@ -716,13 +726,15 @@
 	}
 
 	position: absolute;
-	top: 0;
 	bottom: auto;
 	left: 0;
 	right: 0;
 	// Matches the whole empty space between two blocks
 	height: $block-padding * 2;
 	justify-content: center;
+
+	// Position above block.
+	top: -$block-padding;
 
 	// Show a clickable plus.
 	.editor-block-list__insertion-point-button {
@@ -801,10 +813,10 @@
 
 
 /**
- * Block Toolbar
+ * Block Toolbar when contextual.
  */
 
- .editor-block-list__block .editor-block-contextual-toolbar {
+.editor-block-list__block .editor-block-contextual-toolbar {
 	position: sticky;
 	z-index: z-index( '.editor-block-contextual-toolbar' );
 	white-space: nowrap;
@@ -814,29 +826,23 @@
 
 	// Position toolbar below the block on mobile.
 	position: absolute;
-	bottom: $block-toolbar-height;
-	left: $block-padding;
-	right: $block-padding;
+	bottom: $block-toolbar-height - $block-padding;
+	left: 0;
+	right: 0;
 
-	@include break-small() {
-		top: -$border-width;
+	// Paint the borders on the toolbar itself on mobile.
+	border-top: 1px solid $light-gray-500;
+	.components-toolbar {
+		border-top: none;
+		border-bottom: none;
+
 	}
 
-	// Position the contextual toolbar above the block.
-	@include break-mobile() {
-		position: relative;
-		top: auto;
-		bottom: auto;
-		left: auto;
-		right: auto;
-		margin-top: -$block-toolbar-height - $border-width;
-		margin-bottom: $block-padding + $border-width;
-
-		// IE11 does not support `position: sticky`.
-		@supports (position: sticky) {
-			position: sticky;
-			// Avoid appearance of double border when toolbar sticks at the top of the editor.
-			top: -$border-width;
+	@include break-small() {
+		border-top: none;
+		.components-toolbar {
+			border-top: 1px solid $light-gray-500;
+			border-bottom: 1px solid $light-gray-500;
 		}
 	}
 
@@ -852,13 +858,13 @@
 	margin-right: -$block-padding - $border-width;
 
 	@include break-small() {
-		margin-left: -$parent-block-padding - $block-side-ui-width - $border-width;
-		margin-right: -$parent-block-padding - $block-side-ui-width - $border-width;
+		margin-left: -$parent-block-padding - $border-width;
+		margin-right: -$parent-block-padding - $border-width;
 
 		// Position toolbar for nested contexts.
 		.editor-block-list__block & {
-			margin-left: -$block-padding - $block-side-ui-width - $border-width;
-			margin-right: -$block-padding - $block-side-ui-padding - $border-width;
+			margin-left: -$block-padding - $border-width;
+			margin-right: -$block-padding - $border-width;
 		}
 
 		// Except for wide elements, this causes a horizontal scrollbar.
@@ -872,13 +878,47 @@
 	& > * {
 		pointer-events: auto;
 	}
-
 }
 
+// Enable toolbar footprint collapsing
+.editor-block-contextual-toolbar {
+	// Position the contextual toolbar above the block.
+	.editor-block-list__block & {
+		@include break-small() {
+			bottom: auto;
+			left: auto;
+			right: auto;
+			box-shadow: none;
+
+			// Move the block toolbar out of the flow using translate.
+			transform: translateY( -$block-toolbar-height -$block-padding -$border-width );
+
+			// IE11 does not support `position: sticky`.
+			@supports ( position: sticky ) {
+				position: sticky;
+
+				// Compensate for translate, so the sticky sticks to the top.
+				top: $block-toolbar-height + $block-padding;
+			}
+
+			// This is an important one. Because the toolbar is sticky, it's part of the flow.
+			// It behaves as relative, in other words, until it reaches an edge and then behaves as fixed.
+			// But by applying a float, we take it out of this flow. The benefit is that we don't need to compensate for margins.
+			// In turn, this allows margins on sibling elements to collapse to parent elements.
+			float: left;
+		}
+	}
+
+	.editor-block-list__block[data-align="right"] & {
+		@include break-small() {
+			float: right;
+		}
+	}
+}
+
+// Position the block toolbar when contextual.
 .editor-block-contextual-toolbar .editor-block-toolbar {
 	width: 100%;
-	background: $white;
-	border: $border-width solid $light-gray-500;
 
 	// Hide right border on desktop, where the .components-toolbar instead has a right border.
 	@include break-small() {
@@ -886,8 +926,10 @@
 	}
 
 	// This prevents floats from messing up the position.
-	position: absolute;
-	left: 0;
+	@include break-small() {
+		position: absolute;
+		left: 0;
+	}
 
 	.editor-block-list__block[data-align="right"] & {
 		/*!rtl:begin:ignore*/
@@ -909,21 +951,19 @@
 	}
 }
 
+
 /**
  * Hover label
  */
- .editor-block-list__breadcrumb {
+
+.editor-block-list__breadcrumb {
 	position: absolute;
 	line-height: 1;
 	z-index: z-index( '.editor-block-list__breadcrumb' );
 
-	// Position in the top right of the border
-	right: -$block-side-ui-clearance;
-
-	@include break-small() {
-		right: -$block-parent-side-ui-clearance;
-	}
-	top: 0;
+	// Position in the top right of the border.
+	right: -$block-parent-side-ui-clearance;
+	top: -$block-padding - $border-width;
 
 	// Nested
 	.editor-block-list__block-edit & {
@@ -981,6 +1021,11 @@
 		& &:before {
 			left: 0;
 			right: 0;
+		}
+
+		// Don't use this for full-wide blocks, as there's no clearance to accommodate extra area on the side.
+		&[data-align="full"]:before {
+			content: none;
 		}
 	}
 }
