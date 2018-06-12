@@ -2,7 +2,12 @@
  * Internal dependencies
  */
 import '../support/bootstrap';
-import { clickOnMoreMenuItem, newPost, newDesktopBrowserPage } from '../support/utils';
+import {
+	clickOnMoreMenuItem,
+	ensureDocumentSettingsSidebarIsOpened,
+	newPost,
+	newDesktopBrowserPage,
+} from '../support/utils';
 import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
 describe( 'Using Plugins API', () => {
@@ -15,6 +20,15 @@ describe( 'Using Plugins API', () => {
 	afterAll( async () => {
 		await newDesktopBrowserPage();
 		await deactivatePlugin( 'gutenberg-test-plugin-plugins-api' );
+	} );
+
+	describe( 'Post Status Info', () => {
+		it( 'Should render post status info inside Document Setting sidebar', async () => {
+			await ensureDocumentSettingsSidebarIsOpened();
+
+			const pluginPostStatusInfoText = await page.$eval( '.my-post-status-info-plugin', ( el ) => el.innerText );
+			expect( pluginPostStatusInfoText ).toBe( 'My post status info' );
+		} );
 	} );
 
 	describe( 'Sidebar', () => {
