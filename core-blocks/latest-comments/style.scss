@@ -1,0 +1,12 @@
+.editor-visual-editor__block[data-type="core/latest-comments"] {
+
+	.wp-block-latest-comments {
+		padding-left: 2.5em;
+	}
+
+	.wp-block-latest-comments__comment-timestamp {
+		color: $dark-gray-100;
+		font-size: $default-font-size;
+	}
+
+}
