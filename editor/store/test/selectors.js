@@ -125,7 +125,9 @@ describe( 'selectors', () => {
 			title: 'Test Block B',
 			icon: 'test',
 			keywords: [ 'testing' ],
-			useOnce: true,
+			supports: {
+				useOnce: true,
+			},
 		} );
 
 		registerBlockType( 'core/test-block-c', {

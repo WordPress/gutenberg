@@ -158,6 +158,15 @@ export function registerBlockType( name, settings ) {
 		set( settings, [ 'supports', 'inserter' ], ! settings.isPrivate );
 	}
 
+	if ( 'useOnce' in settings ) {
+		deprecated( 'useOnce', {
+			version: '3.3',
+			alternative: 'supports.useOnce',
+			plugin: 'Gutenberg',
+		} );
+		set( settings, [ 'supports', 'useOnce' ], settings.useOnce );
+	}
+
 	dispatch( 'core/blocks' ).addBlockTypes( settings );
 
 	return settings;

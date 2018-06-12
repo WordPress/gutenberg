@@ -1,5 +1,9 @@
 Gutenberg's deprecation policy is intended to support backwards-compatibility for two minor releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
 
+## 3.3.0
+ - `useOnce: true` has been moved into the `supports` object. Please use `supports.useOnce: true` instead.
+
+
 ## 3.2.0
 
  - `wp.data.withRehydratation` has been renamed to `wp.data.withRehydration`.

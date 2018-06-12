@@ -26,12 +26,11 @@ export const settings = {
 
 	category: 'layout',
 
-	useOnce: true,
-
 	supports: {
 		customClassName: false,
 		className: false,
 		html: false,
+		useOnce: true,
 	},
 
 	attributes: {
