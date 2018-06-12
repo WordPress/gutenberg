@@ -217,17 +217,19 @@ export function toggleSelection( isSelectionEnabled = true ) {
  * Returns an action object signalling that a blocks should be replaced with
  * one or more replacement blocks.
  *
- * @param {(string|string[])} clientIds Block client ID(s) to replace.
- * @param {(Object|Object[])} blocks    Replacement block(s).
+ * @param {(string|string[])} clientIds                     Block client ID(s) to replace.
+ * @param {(Object|Object[])} blocks                        Replacement block(s).
+ * @param {?boolean}          ignoreAllowedBlocksValidation If true the replacement will occur even if some of the new blocks were not allowed e.g: because of allowed blocks restrictions.
  *
  * @return {Object} Action object.
  */
-export function replaceBlocks( clientIds, blocks ) {
+export function replaceBlocks( clientIds, blocks, ignoreAllowedBlocksValidation = false ) {
 	return {
 		type: 'REPLACE_BLOCKS',
 		clientIds: castArray( clientIds ),
 		blocks: castArray( blocks ),
 		time: Date.now(),
+		ignoreAllowedBlocksValidation,
 	};
 }
 
@@ -305,14 +307,21 @@ export function insertBlock( block, index, rootClientId, updateSelection = true 
  * Returns an action object used in signalling that an array of blocks should
  * be inserted, optionally at a specific index respective a root block list.
  *
- * @param {Object[]} blocks          Block objects to insert.
- * @param {?number}  index           Index at which block should be inserted.
- * @param {?string}  rootClientId    Optional root cliente ID of block list on which to insert.
- * @param {?boolean} updateSelection If true block selection will be updated.  If false, block selection will not change. Defaults to true.
+ * @param {Object[]} blocks                        Block objects to insert.
+ * @param {?number}  index                         Index at which block should be inserted.
+ * @param {?string}  rootClientId                  Optional root client ID of block list on which to insert.
+ * @param {?boolean} updateSelection               If true block selection will be updated.  If false, block selection will not change. Defaults to true.
+ * @param {?boolean} ignoreAllowedBlocksValidation If true the block will be inserted even if the insertion was not allowed e.g: because of allowed blocks restrictions.
  *
  * @return {Object} Action object.
  */
-export function insertBlocks( blocks, index, rootClientId, updateSelection = true ) {
+export function insertBlocks(
+	blocks,
+	index,
+	rootClientId,
+	updateSelection = true,
+	ignoreAllowedBlocksValidation = false
+) {
 	return {
 		type: 'INSERT_BLOCKS',
 		blocks: castArray( blocks ),
@@ -320,6 +329,7 @@ export function insertBlocks( blocks, index, rootClientId, updateSelection = tru
 		rootClientId,
 		time: Date.now(),
 		updateSelection,
+		ignoreAllowedBlocksValidation,
 	};
 }
 

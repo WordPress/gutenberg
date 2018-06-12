@@ -154,9 +154,9 @@ InnerBlocks = compose( [
 			replaceInnerBlocks( blocks ) {
 				const clientIds = map( block.innerBlocks, 'clientId' );
 				if ( clientIds.length ) {
-					replaceBlocks( clientIds, blocks );
+					replaceBlocks( clientIds, blocks, true );
 				} else {
-					insertBlocks( blocks, undefined, clientId, templateInsertUpdatesSelection );
+					insertBlocks( blocks, undefined, clientId, templateInsertUpdatesSelection, true );
 				}
 			},
 			updateNestedSettings( settings ) {
