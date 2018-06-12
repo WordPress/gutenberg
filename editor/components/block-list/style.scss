@@ -813,9 +813,13 @@
 	width: 100%;
 	background: $white;
 	border: 1px solid $light-gray-500;
-	border-right: none;
 
-	// this prevents floats from messing up the position
+	// Hide right border on desktop, where the .components-toolbar instead has a right border.
+	@include break-small() {
+		border-right: none;
+	}
+
+	// This prevents floats from messing up the position.
 	position: absolute;
 	left: 0;
 
