@@ -61,7 +61,7 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 
 	// This is current max width of the block inner area
 	// It's used to constraint image resizing and this value could be overridden later by themes
-	maxWidth: 608,
+	maxWidth: 580,
 
 	// Allowed block types for the editor, defaulting to true (all supported).
 	allowedBlockTypes: true,

@@ -68,7 +68,7 @@ export const name = 'core/cover-image';
 export const settings = {
 	title: __( 'Cover Image' ),
 
-	description: __( 'Add a full-width image, and layer text over it -- great for headers.' ),
+	description: __( 'Add a full-width image, and layer text over it — great for headers.' ),
 
 	icon: 'cover-image',
 

@@ -2,5 +2,6 @@ build
 build-module
 coverage
 node_modules
+test/e2e/test-plugins
 vendor
 gutenberg-package/build
