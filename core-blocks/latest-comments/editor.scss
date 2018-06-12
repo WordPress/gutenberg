@@ -25,3 +25,8 @@
 	border-radius: 24px;
 	margin-right: 5px;
 }
+
+.wp-block-latest-comments a {
+	pointer-events: none;
+	cursor: default;
+}

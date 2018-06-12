@@ -49,26 +49,22 @@ class latestComments extends Component {
 
 	render() {
 
-		const { focus } = this.props;
+		const { isSelected } = this.props;
 		const { align, displayAvatar, displayTimestamp } = this.props.attributes;
 
 		return (
 			<Fragment>
+				<BlockControls key="controls">
+					<BlockAlignmentToolbar
+						value={ align }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { align: nextAlign } );
+						} }
+						controls={ [ 'left', 'center', 'right', 'wide', 'full' ] }
+					/>
+				</BlockControls>
 				{
-					focus && (
-						<BlockControls key="controls">
-							<BlockAlignmentToolbar
-								value={ align }
-								onChange={ ( nextAlign ) => {
-									setAttributes( { align: nextAlign } );
-								} }
-								controls={ [ 'left', 'center', 'right', 'wide', 'full' ] }
-							/>
-						</BlockControls>
-					)
-				}
-				{
-					focus && (
+					isSelected && (
 						<InspectorControls key="inspector">
 							<h3>{ __( 'Latest Comments Settings' ) }</h3>
 
