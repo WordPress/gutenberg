@@ -20,7 +20,43 @@ This method takes two arguments:
 See [the edit-post module documentation](../edit-post/) for available components.
 
 _Example:_
+{% codetabs %}
+{% ES5 %}
+```js
+var el = wp.element.createElement;
+var Fragment = wp.element.Fragment;
+var PluginSidebar = wp.editPost.PluginSidebar;
+var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
+var registerPlugin = wp.plugins.registerPlugin;
 
+function Component(){
+	return el(
+		Fragment,
+		{},
+		el(
+			PluginSidebarMoreMenuItem,
+			{
+				target: 'sidebar-name',
+			},
+			'My Sidebar'
+		),
+		el(
+			PluginSidebar,
+			{
+				name: 'sidebar-name',
+				title: 'My Sidebar',
+			},
+			'Content of the sidebar'
+		)
+	);
+}
+registerPlugin( 'plugin-name', {
+	icon: 'smiley',
+	render: Component,
+} );
+```
+
+{% ESNext %}
 ```jsx
 const { Fragment } = wp.element;
 const { PluginSidebar, PluginSidebarMoreMenuItem } = wp.editPost;
@@ -47,6 +83,7 @@ registerPlugin( 'plugin-name', {
 	render: Component,
 } );
 ```
+{% end %}
 
 #### `wp.plugins.unregisterPlugin( name: string )`
 
@@ -71,6 +108,24 @@ unregisterPlugin( 'plugin-name' );
 A component that renders all registered plugins in a hidden div.
 
 _Example:_
+{% codetabs %}
+
+{% ES5 %}
+```js
+var el = wp.element.createElement;
+var PluginArea = wp.plugins.PluginArea;
+
+function Layout(){
+	return el(
+		'div',
+		{},
+		'Content of the page',
+		PluginArea
+	);
+}
+```
+
+{% ESNext %}
 
 ```jsx
 const { PluginArea } = wp.plugins;
@@ -82,3 +137,4 @@ const Layout = () => (
 	</div>
 );
 ```
+{% end %}
