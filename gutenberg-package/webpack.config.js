@@ -138,7 +138,6 @@ const entryPointNames = [
 	'editor',
 	'utils',
 	'viewport',
-	'core-data',
 	'plugins',
 	'edit-post',
 	'core-blocks',
@@ -152,6 +151,7 @@ const gutenbergPackages = [
 	'deprecated',
 	'dom',
 	'element',
+	'core-data',
 ];
 
 const coreGlobals = [
