@@ -441,10 +441,6 @@ export function renderNativeComponent( type, props, context = {} ) {
 export function renderComponent( Component, props, context = {} ) {
 	const instance = new Component( props, context );
 
-	if ( typeof instance.componentWillMount === 'function' ) {
-		instance.componentWillMount();
-	}
-
 	if ( typeof instance.getChildContext === 'function' ) {
 		Object.assign( context, instance.getChildContext() );
 	}
