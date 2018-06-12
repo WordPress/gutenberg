@@ -1,15 +1,15 @@
 {
-	"name": "@wordpress/api-request",
+	"name": "@wordpress/core-data",
 	"version": "1.0.0-alpha.1",
-	"description": "Utility to call WordPress REST APIs",
+	"description": "Access to and manipulation of core WordPress entities",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
-		"rest-api",
-		"fetch"
+		"data",
+		"entities"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/api-request/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/core-data/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git"
@@ -20,7 +20,10 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"jquery": "3.3.1"
+		"@wordpress/api-request": "^1.0.0-alpha.1",
+		"@wordpress/data": "^1.0.0-alpha.1",
+		"lodash": "4.17.5",
+		"rememo": "3.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

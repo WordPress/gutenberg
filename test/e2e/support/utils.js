@@ -147,3 +147,14 @@ export async function pressWithModifier( modifier, key ) {
 	await page.keyboard.press( key );
 	return page.keyboard.up( modifier );
 }
+
+/**
+ * Toggles More Menu item, searchers for the button with the text provided and clicks it.
+ *
+ * @param {string} buttonLabel The label to search the button for.
+ */
+export async function toggleMoreMenuItem( buttonLabel ) {
+	await page.click( '.edit-post-more-menu [aria-label="More"]' );
+	const itemButton = ( await page.$x( `//button[contains(text(), \'${ buttonLabel }\')]` ) )[ 0 ];
+	await itemButton.click( 'button' );
+}

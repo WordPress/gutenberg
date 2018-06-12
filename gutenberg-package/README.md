@@ -236,7 +236,6 @@ The Gutenberg editor will ask for available **Post Types** through `/wp/v2/types
     saveable: false,     // to disable Post Save featured
     supports: {
         ...,
-        document: false            // to hide Documents tab in sidebar
         'media-library': false,    // to disable Media library from WordPress
         posts: true,               // to add PostsPanel to Documents tab
         'template-settings': true, // to add TemplateSettingsPanel to Documents tab

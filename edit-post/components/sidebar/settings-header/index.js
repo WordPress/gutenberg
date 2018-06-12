@@ -26,15 +26,13 @@ const SettingsHeader = ( { count, openDocumentSettings, openBlockSettings, openE
 			className="edit-post-sidebar__panel-tabs"
 			closeLabel={ __( 'Close settings' ) }
 		>
-			<PostTypeSupportCheck supportKeys="document" defaultValue={ true }>
-				<button
-					onClick={ openDocumentSettings }
-					className={ `edit-post-sidebar__panel-tab ${ sidebarName === 'edit-post/document' ? 'is-active' : '' }` }
-					aria-label={ __( 'Document settings' ) }
-				>
-					{ __( 'Document' ) }
-				</button>
-			</PostTypeSupportCheck>
+			<button
+				onClick={ openDocumentSettings }
+				className={ `edit-post-sidebar__panel-tab ${ sidebarName === 'edit-post/document' ? 'is-active' : '' }` }
+				aria-label={ __( 'Document settings' ) }
+			>
+				{ __( 'Document' ) }
+			</button>
 			<button
 				onClick={ openBlockSettings }
 				className={ `edit-post-sidebar__panel-tab ${ sidebarName === 'edit-post/block' ? 'is-active' : '' }` }
@@ -42,7 +40,7 @@ const SettingsHeader = ( { count, openDocumentSettings, openBlockSettings, openE
 			>
 				{ sprintf( _n( 'Block', '%d Blocks', count ), count ) }
 			</button>
-			<PostTypeSupportCheck supportKeys="extras" defaultValue={ true }>
+			<PostTypeSupportCheck supportKeys="extras">
 				<button
 					onClick={ openExtrasSettings }
 					className={ `edit-post-sidebar__panel-tab ${ sidebarName === 'edit-post/extras' ? 'is-active' : '' }` }
