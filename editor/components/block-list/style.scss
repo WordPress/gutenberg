@@ -669,7 +669,12 @@
 }
 
 .editor-block-list__insertion-point-inserter {
-	display: flex;
+	// Don't show on mobile.
+	display: none;
+	@include break-mobile() {
+		display: flex;
+	}
+
 	position: absolute;
 	top: 0;
 	bottom: auto;
