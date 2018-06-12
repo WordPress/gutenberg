@@ -11,17 +11,17 @@ import blockCompleter, { createBlockCompleter } from '../block';
 describe( 'block', () => {
 	it( 'should retrieve block options for current insertion point', () => {
 		const expectedOptions = [ {}, {}, {} ];
-		const mockGetBlockInsertionParent = jest.fn( () => 'expected-insertion-point' );
+		const mockGetBlockInsertionParentUID = jest.fn( () => 'expected-insertion-point' );
 		const mockGetInserterItems = jest.fn( () => expectedOptions );
 
 		const completer = createBlockCompleter( {
-			getBlockInsertionParent: mockGetBlockInsertionParent,
+			getBlockInsertionParentUID: mockGetBlockInsertionParentUID,
 			getInserterItems: mockGetInserterItems,
 			getSelectedBlockName: () => 'non-existent-block-name',
 		} );
 
 		const actualOptions = completer.options();
-		expect( mockGetBlockInsertionParent ).toHaveBeenCalled();
+		expect( mockGetBlockInsertionParentUID ).toHaveBeenCalled();
 		expect( mockGetInserterItems ).toHaveBeenCalledWith( 'expected-insertion-point' );
 		expect( actualOptions ).toEqual( expectedOptions );
 	} );
@@ -32,7 +32,7 @@ describe( 'block', () => {
 		const option3 = { name: 'block-3' };
 
 		const completer = createBlockCompleter( {
-			getBlockInsertionParent: () => 'ignored',
+			getBlockInsertionParentUID: () => 'ignored',
 			getInserterItems: () => [ option1, option2CurrentlySelected, option3 ],
 			getSelectedBlockName: () => 'block-2-currently-selected',
 		} );

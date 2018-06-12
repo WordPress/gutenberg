@@ -15,7 +15,7 @@ import BlockIcon from '../block-icon';
  *
  * @return {string} The UID of the parent where a newly inserted block would be placed.
  */
-function defaultGetBlockInsertionParent() {
+function defaultGetBlockInsertionParentUID() {
 	return select( 'core/editor' ).getBlockInsertionPoint().rootUID;
 }
 
@@ -47,7 +47,7 @@ function defaultGetSelectedBlockName() {
  */
 export function createBlockCompleter( {
 	// Allow store-based selectors to be overridden for unit test.
-	getBlockInsertionParent = defaultGetBlockInsertionParent,
+	getBlockInsertionParentUID = defaultGetBlockInsertionParentUID,
 	getInserterItems = defaultGetInserterItems,
 	getSelectedBlockName = defaultGetSelectedBlockName,
 } = {} ) {
@@ -57,7 +57,7 @@ export function createBlockCompleter( {
 		triggerPrefix: '/',
 		options() {
 			const selectedBlockName = getSelectedBlockName();
-			return getInserterItems( getBlockInsertionParent() ).filter(
+			return getInserterItems( getBlockInsertionParentUID() ).filter(
 				// Avoid offering to replace the current block with a block of the same type.
 				( inserterItem ) => selectedBlockName !== inserterItem.name
 			);
