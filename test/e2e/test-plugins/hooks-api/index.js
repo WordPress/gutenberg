@@ -2,6 +2,7 @@
 	var el = wp.element.createElement;
 	var Fragment = wp.element.Fragment;
 	var Button = wp.components.Button;
+	var PanelBody = wp.components.PanelBody;
 	var InspectorControls = wp.editor.InspectorControls;
 	var addFilter = wp.hooks.addFilter;
 	var createBlock = wp.blocks.createBlock;
@@ -9,17 +10,21 @@
 
 	function ResetBlockButton( props ) {
 		return el(
-			Button,
-			{
-				className: 'e2e-reset-block-button',
-				isDefault: true,
-				isLarge: true,
-				onClick: function() {
-					var emptyBlock = createBlock( props.name );
-					props.onReplace( emptyBlock );
-				}
-			},
-			__( 'Reset Block' )
+			PanelBody,
+			{},
+			el(
+				Button,
+				{
+					className: 'e2e-reset-block-button',
+					isDefault: true,
+					isLarge: true,
+					onClick: function() {
+						var emptyBlock = createBlock( props.name );
+						props.onReplace( emptyBlock );
+					}
+				},
+				__( 'Reset Block' )
+			)
 		);
 	}
 
@@ -34,7 +39,8 @@
 					el(
 						ResetBlockButton,
 						{
-							name: props.name
+							name: props.name,
+							onReplace: props.onReplace
 						}
 					)
 				),
