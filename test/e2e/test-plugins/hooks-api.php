@@ -10,12 +10,12 @@ wp_enqueue_script(
 	'gutenberg-test-hooks-api',
 	plugins_url( 'hooks-api/index.js', __FILE__ ),
 	array(
+		'wp-blocks',
 		'wp-components',
-		'wp-data',
 		'wp-element',
-		'wp-edit-post',
-		'wp-i18n',
-		'wp-plugins',
+		'wp-editor',
+		'wp-hooks',
+		'wp-i18n'
 	),
 	filemtime( plugin_dir_path( __FILE__ ) . 'hooks-api/index.js' ),
 	true
