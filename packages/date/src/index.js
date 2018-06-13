@@ -103,6 +103,11 @@ export const moment = ( ...args ) => {
 	return momentLib.tz( ...args, 'WP' );
 };
 
+// Make available other moment.js methods, such as moment.isMoment()
+Object.keys( momentLib ).forEach( ( key ) => {
+	moment[ key ] = momentLib[ key ];
+} );
+
 // Date constants.
 /**
  * Number of seconds in one minute.
