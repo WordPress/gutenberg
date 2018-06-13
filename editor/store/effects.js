@@ -20,6 +20,7 @@ import {
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
+import apiRequest from '@wordpress/api-request';
 
 /**
  * Internal dependencies
@@ -130,7 +131,7 @@ export default {
 				parent: post.id,
 			};
 
-			request = wp.apiRequest( {
+			request = apiRequest( {
 				path: `/wp/v2/${ basePath }/${ post.id }/autosaves`,
 				method: 'POST',
 				data: toSend,
@@ -145,7 +146,7 @@ export default {
 			dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
 			dispatch( removeNotice( AUTOSAVE_POST_NOTICE_ID ) );
 
-			request = wp.apiRequest( {
+			request = apiRequest( {
 				path: `/wp/v2/${ basePath }/${ post.id }`,
 				method: 'PUT',
 				data: toSend,
@@ -251,7 +252,7 @@ export default {
 		const { postId } = action;
 		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( getState() ) );
 		dispatch( removeNotice( TRASH_POST_NOTICE_ID ) );
-		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ postId }`, method: 'DELETE' } ).then(
+		apiRequest( { path: `/wp/v2/${ basePath }/${ postId }`, method: 'DELETE' } ).then(
 			() => {
 				dispatch( {
 					...action,
@@ -294,7 +295,7 @@ export default {
 			context: 'edit',
 		};
 
-		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }`, data } ).then(
+		apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }`, data } ).then(
 			( newPost ) => {
 				dispatch( resetPost( newPost ) );
 			}
@@ -439,9 +440,9 @@ export default {
 
 		let result;
 		if ( id ) {
-			result = wp.apiRequest( { path: `/wp/v2/${ basePath }/${ id }` } );
+			result = apiRequest( { path: `/wp/v2/${ basePath }/${ id }` } );
 		} else {
-			result = wp.apiRequest( { path: `/wp/v2/${ basePath }?per_page=-1` } );
+			result = apiRequest( { path: `/wp/v2/${ basePath }?per_page=-1` } );
 		}
 
 		result.then(
@@ -494,7 +495,7 @@ export default {
 		const path = isTemporary ? `/wp/v2/${ basePath }` : `/wp/v2/${ basePath }/${ id }`;
 		const method = isTemporary ? 'POST' : 'PUT';
 
-		wp.apiRequest( { path, data, method } ).then(
+		apiRequest( { path, data, method } ).then(
 			( updatedSharedBlock ) => {
 				dispatch( {
 					type: 'SAVE_SHARED_BLOCK_SUCCESS',
@@ -550,7 +551,7 @@ export default {
 			sharedBlock.uid,
 		] ) );
 
-		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ id }`, method: 'DELETE' } ).then(
+		apiRequest( { path: `/wp/v2/${ basePath }/${ id }`, method: 'DELETE' } ).then(
 			() => {
 				dispatch( {
 					type: 'DELETE_SHARED_BLOCK_SUCCESS',

@@ -15,16 +15,6 @@ import { initializeMetaBoxState } from './store/actions';
 import Editor from './editor';
 
 /**
- * Configure heartbeat to refresh the wp-api nonce, keeping the editor
- * authorization intact.
- */
-window.jQuery( document ).on( 'heartbeat-tick', ( event, response ) => {
-	if ( response[ 'rest-nonce' ] ) {
-		window.wpApiSettings.nonce = response[ 'rest-nonce' ];
-	}
-} );
-
-/**
  * Reinitializes the editor after the user chooses to reboot the editor after
  * an unhandled error occurs, replacing previously mounted editor element using
  * an initial state from prior to the crash.

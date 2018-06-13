@@ -111,10 +111,19 @@
 		padding-right: $block-side-ui-padding;
 	}
 
-	// Don't add side padding for nested blocks, @todo see if this can be scoped better
+	// Don't add side padding for nested blocks, and compensate for block padding
 	.editor-block-list__block & {
+		// compensate for side UI
 		padding-left: 0;
 		padding-right: 0;
+
+		// compensate for block padding horizontally
+		margin-left: -$block-padding;
+		margin-right: -$block-padding;
+
+		// compensate for block padding and collapsing margins vertically
+		margin-top: -$block-padding + 1px;
+		margin-top: -$block-padding + 1px;
 	}
 }
 

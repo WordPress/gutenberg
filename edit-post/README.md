@@ -121,12 +121,22 @@ const { __ } = wp.i18n;
 const { PluginPostStatusInfo } = wp.editPost;
 
 const MyPluginPostStatusInfo = () => (
-	<PluginPostStatusInfo>
+	<PluginPostStatusInfo
+		className="my-plugin-post-status-info"
+	>
 		{ __( 'My post status info' ) }
 	</PluginPostStatusInfo>
 );
 ```
 
+#### Props
+
+##### className
+
+An optional class name added to the row.
+
+- Type: `String`
+- Required: No
 
 ### `PluginPrePublishPanel`
 

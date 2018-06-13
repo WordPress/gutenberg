@@ -261,16 +261,16 @@ export class RichText extends Component {
 		// Only process file if no HTML is present.
 		// Note: a pasted file may have the URL as plain text.
 		if ( item && ! HTML ) {
-			const blob = item.getAsFile ? item.getAsFile() : item;
+			const file = item.getAsFile ? item.getAsFile() : item;
 			const content = rawHandler( {
-				HTML: `<img src="${ createBlobURL( blob ) }">`,
+				HTML: `<img src="${ createBlobURL( file ) }">`,
 				mode: 'BLOCKS',
 				tagName: this.props.tagName,
 			} );
 			const shouldReplace = this.props.onReplace && this.isEmpty();
 
 			// Allows us to ask for this information when we get a report.
-			window.console.log( 'Received item:\n\n', blob );
+			window.console.log( 'Received item:\n\n', file );
 
 			if ( shouldReplace ) {
 				// Necessary to allow the paste bin to be removed without errors.

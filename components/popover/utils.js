@@ -6,7 +6,7 @@ const HEIGHT_OFFSET = 10; // used by the arrow and a bit of empty space
 const isMobileViewport = () => window.innerWidth < 782;
 
 /**
- * Utilitity used to compute the popover position over the xAxis
+ * Utility used to compute the popover position over the xAxis
  *
  * @param {Object} anchorRect       Anchor Rect.
  * @param {Object} contentSize      Content Size.
@@ -71,7 +71,7 @@ export function computePopoverXAxisPosition( anchorRect, contentSize, xAxis, cho
 }
 
 /**
- * Utilitity used to compute the popover position over the yAxis
+ * Utility used to compute the popover position over the yAxis
  *
  * @param {Object} anchorRect       Anchor Rect.
  * @param {Object} contentSize      Content Size.
@@ -83,7 +83,7 @@ export function computePopoverXAxisPosition( anchorRect, contentSize, xAxis, cho
 export function computePopoverYAxisPosition( anchorRect, contentSize, yAxis ) {
 	const { height } = contentSize;
 
-	// y axis aligment choices
+	// y axis alignment choices
 	const anchorMidPoint = anchorRect.top + ( anchorRect.height / 2 );
 	const middleAlignment = {
 		popoverTop: anchorMidPoint,
@@ -133,7 +133,7 @@ export function computePopoverYAxisPosition( anchorRect, contentSize, yAxis ) {
 }
 
 /**
- * Utilitity used to compute the popover position and the content max width/height for a popover
+ * Utility used to compute the popover position and the content max width/height for a popover
  * given its anchor rect and its content size.
  *
  * @param {Object} anchorRect       Anchor Rect.
