@@ -64,7 +64,6 @@ class BlockInsertionPoint extends Component {
 							onFocus={ this.onFocusInserter }
 							onBlur={ this.onBlurInserter }
 						/>
-						<div class="editor-block-list__insertion-point-sibling-indicator"></div>
 					</div>
 				) }
 			</div>
