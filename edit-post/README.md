@@ -115,14 +115,14 @@ var __ = wp.i18n.__;
 var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
 var el = wp.element.createElement;
 
-function MySidebarMoreMenuItem(){
+function MySidebarMoreMenuItem() {
 	return el(
 		PluginSidebarMoreMenuItem,
 		{
 			target: 'my-sidebar',
 			icon: 'smiley',
 		},
-		'My sidebar title'
+		__( 'My sidebar title' )
 	)
 }
 ```
@@ -176,7 +176,7 @@ var __ = wp.i18n.__;
 var PluginPostStatusInfo = wp.editPost.PluginPostStatusInfo;
 var el = wp.element.createElement;
 
-function MyPluginPostStatusInfo(){
+function MyPluginPostStatusInfo() {
 	return el(
 		PluginPostStatusInfo,
 		{
@@ -225,7 +225,7 @@ var __ = wp.i18n.__;
 var PluginPrePublishPanel = wp.editPost.PluginPrePublishPanel;
 var el = wp.element.createElement;
 
-function MyPluginPrePublishPanel(){
+function MyPluginPrePublishPanel() {
 	return el(
 		PluginPrePublishPanel,
 		{
@@ -294,7 +294,7 @@ var __ = wp.i18n.__;
 var PluginPostPublishPanel = wp.editPost.PluginPostPublishPanel;
 var el = wp.element.createElement;
 
-function MyPluginPostPublishPanel(){
+function MyPluginPostPublishPanel() {
 	return el(
 		PluginPostPublishPanel,
 		{
