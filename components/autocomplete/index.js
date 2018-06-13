@@ -234,11 +234,14 @@ export class Autocomplete extends Component {
 	insertCompletion( range, replacement, completerName ) {
 		// Wrap completions so we can treat them as tokens with editing boundaries.
 		const tokenWrapper = document.createElement( 'span' );
+		tokenWrapper.innerHTML = renderToString( replacement );
+
+		// Remember the completer in case the user wants to edit the token.
 		tokenWrapper.dataset.autocompleter = completerName;
+
+		// Add classes for general and completer-specific styling.
 		tokenWrapper.classList.add( 'autocomplete-token' );
 		tokenWrapper.classList.add( `autocomplete-token-${ completerName }` );
-
-		tokenWrapper.innerHTML = renderToString( replacement );
 
 		const existingTokenWrapper = this.getTokenWrapperNode( range.startContainer );
 		if ( existingTokenWrapper ) {
