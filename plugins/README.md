@@ -29,7 +29,7 @@ var PluginSidebar = wp.editPost.PluginSidebar;
 var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
 var registerPlugin = wp.plugins.registerPlugin;
 
-function Component(){
+function Component() {
 	return el(
 		Fragment,
 		{},
@@ -95,11 +95,23 @@ This method takes one argument:
 
 _Example:_
 
+{% codetabs %}
+
+{% ES5 %}
+```js
+var unregisterPlugin = wp.plugins.unregisterPlugin;
+
+unregisterPlugin( 'plugin-name' );
+```
+
+{% ESNext %}
+
 ```js
 const { unregisterPlugin } = wp.plugins;
 
 unregisterPlugin( 'plugin-name' );
 ```
+{% end %}
 
 ### Components
 
@@ -115,7 +127,7 @@ _Example:_
 var el = wp.element.createElement;
 var PluginArea = wp.plugins.PluginArea;
 
-function Layout(){
+function Layout() {
 	return el(
 		'div',
 		{},
