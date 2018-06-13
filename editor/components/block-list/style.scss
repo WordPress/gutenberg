@@ -390,7 +390,7 @@
 		// Mover and settings above
 		> .editor-block-mover,
 		> .editor-block-settings-menu {
-			top: -$block-side-ui-width - $border-width; // Move upwards the height of the button & border.
+			top: -$block-side-ui-width - $border-width; // This moves the menu up by the height of the button + border.
 			bottom: auto;
 			min-height: 0;
 			height: auto;
@@ -792,7 +792,7 @@
 		margin-top: -$block-toolbar-height - $border-width;
 	}
 
-	// Put toolbar snugly to side edges on mobile.
+	// Make block toolbar full width on mobile.
 	margin-left: -$block-padding - $border-width;
 	margin-right: -$block-padding - $border-width;
 
@@ -806,7 +806,7 @@
 			margin-right: -$block-padding - $block-side-ui-padding - $border-width;
 		}
 
-		// ... Except for wide elements, this causes a horizontal scrollbar.
+		// Except for wide elements, this causes a horizontal scrollbar.
 		[data-align="full"] & {
 			margin-left: -$block-padding - $block-side-ui-width;
 			margin-right: -$block-padding - $block-side-ui-width;
