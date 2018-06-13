@@ -7,14 +7,14 @@
 	var createBlock = wp.blocks.createBlock;
 	var __ = wp.i18n.__;
 
-	function ResetBlockUI( props ){
+	function ResetBlockButton( props ) {
 		return el(
 			Button,
 			{
-				className: 'reset-block-button',
+				className: 'e2e-reset-block-button',
 				isDefault: true,
 				isLarge: true,
-				onClick: function(){
+				onClick: function() {
 					var emptyBlock = createBlock( props.name );
 					props.onReplace( emptyBlock );
 				}
@@ -23,15 +23,33 @@
 		);
 	}
 
-	function resetBlockFilter( BlockEdit ){
-		return function( props ){
+	function addResetBlockButton( BlockEdit ) {
+		return function( props ) {
 			return el(
 				Fragment,
 				{},
-				el( InspectorControls, {}, el( ResetBlockUI, props )  ),
-				el( BlockEdit, props )
+				el(
+					InspectorControls,
+					{},
+					el(
+						ResetBlockButton,
+						{
+							name: props.name
+						}
+					)
+				),
+				el(
+					BlockEdit,
+					props
+				)
 			);
 		};
 	}
-	addFilter( 'blocks.BlockEdit', 'demo/resetBlock', resetBlockFilter, 100 );
+
+	addFilter(
+		'blocks.BlockEdit',
+		'e2e/hooks-api/add-reset-block-button',
+		addResetBlockButton,
+		100
+	);
 } )();
