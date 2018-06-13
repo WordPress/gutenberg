@@ -35,11 +35,12 @@ $sidebar-width: 280px;
 $content-width: 610px; // For the visual width, subtract 30px (2 * $block-padding + 2px borders). This comes to 580px, which is optimized for 70 characters.
 
 // Block UI
+$border-width: 1px;
 $block-controls-height: 36px;
 $icon-button-size: 36px;
 $icon-button-size-small: 24px;
 $inserter-tabs-height: 36px;
-$block-toolbar-height: $block-controls-height + 1px;
+$block-toolbar-height: $block-controls-height + $border-width;
 
 // Blocks
 $parent-block-padding: 28px; // padding of top level blocks, should be larger than $block-padding, otherwise a user can't select the parent from a child

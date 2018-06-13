@@ -15,9 +15,10 @@
 		border: none;
 
 		// Add a right border to show as separator in the block toolbar.
-		border-right: 1px solid $light-gray-500;
+		border-right: $border-width solid $light-gray-500;
 	}
 
+	// This should be refactored to have its own class to target.
 	> div {
 		display: flex;
 	}
