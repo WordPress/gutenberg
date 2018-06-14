@@ -32,7 +32,7 @@ describe( 'reducer', () => {
 			expect( state ).toBe( false );
 		} );
 
-		it( 'sholud flip when tips are enabled', () => {
+		it( 'should flip when tips are enabled', () => {
 			const state = areTipsEnabled( false, {
 				type: 'ENABLE_TIPS',
 			} );
