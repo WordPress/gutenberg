@@ -627,65 +627,70 @@ function gutenberg_register_vendor_scripts() {
 	);
 	wp_add_inline_script( 'lodash', 'window.lodash = _.noConflict();' );
 	gutenberg_register_vendor_script(
-		'fetch',
+		'wp-polyfill-fetch',
 		'https://unpkg.com/whatwg-fetch/fetch.js'
 	);
 	gutenberg_register_vendor_script(
-		'promise',
+		'wp-polyfill-promise',
 		'https://unpkg.com/promise-polyfill@7.0.0/dist/promise' . $suffix . '.js'
 	);
 	gutenberg_register_vendor_script(
-		'formdata',
+		'wp-polyfill-formdata',
 		'https://unpkg.com/formdata-polyfill@3.0.9/formdata.min.js'
 	);
 	gutenberg_register_vendor_script(
-		'node-contains',
+		'wp-polyfill-node-contains',
 		'https://unpkg.com/polyfill-library@3.26.0-0/polyfills/Node/prototype/contains/polyfill.js'
 	);
 }
 
 /**
  * Retrieves a unique and reasonably short and human-friendly filename for a
- * vendor script based on a URL.
+ * vendor script based on a URL and the script handle.
  *
- * @param  string $src Full URL of the external script.
+ * @param  string $src    Full URL of the external script.
+ * @param  string $handle The name of the script.
  *
- * @return string      Script filename suitable for local caching.
+ * @return string         Script filename suitable for local caching.
  *
  * @since 0.1.0
  */
-function gutenberg_vendor_script_filename( $src ) {
-	$filename = basename( $src );
-	$hash     = substr( md5( $src ), 0, 8 );
-
-	$match = preg_match(
-		'/^'
-		. '(?P<prefix>.*?)'
-		. '(?P<ignore>\.development|\.production)?'
-		. '(?P<suffix>\.min)?'
-		. '(?P<extension>\.js)'
-		. '(?P<extra>.*)'
-		. '$/',
-		$filename,
-		$filename_pieces
-	);
-
-	if ( ! $match ) {
-		return "$filename.$hash.js";
-	}
-
-	$match = preg_match(
+function gutenberg_vendor_script_filename( $src, $handle = '' ) {
+	$match_tinymce_plugin = preg_match(
 		'@tinymce.*/plugins/([^/]+)/plugin(\.min)?\.js$@',
 		$src,
 		$tinymce_plugin_pieces
 	);
-	if ( $match ) {
-		$filename_pieces['prefix'] = 'tinymce-plugin-' . $tinymce_plugin_pieces[1];
+	if ( $match_tinymce_plugin ) {
+		$prefix = 'tinymce-plugin-' . $tinymce_plugin_pieces[1];
+		$suffix = isset( $tinymce_plugin_pieces[2] ) ? $tinymce_plugin_pieces[2] : '';
+	} else {
+		$filename = basename( $src );
+		$match    = preg_match(
+			'/^'
+			. '(?P<prefix>.*?)'
+			. '(?P<ignore>\.development|\.production)?'
+			. '(?P<suffix>\.min)?'
+			. '(?P<extension>\.js)'
+			. '(?P<extra>.*)'
+			. '$/',
+			$filename,
+			$filename_pieces
+		);
+
+		if ( $handle ) {
+			$prefix = $handle;
+		} elseif ( $match ) {
+			$prefix = $filename_pieces['prefix'];
+		} else {
+			$prefix = $filename;
+		}
+		$suffix = $match ? $filename_pieces['suffix'] : '';
 	}
 
-	return $filename_pieces['prefix'] . $filename_pieces['suffix']
-		. '.' . $hash
-		. $filename_pieces['extension'];
+	$hash = substr( md5( $src ), 0, 8 );
+
+	return "${prefix}${suffix}.${hash}.js";
 }
 
 /**
@@ -705,7 +710,7 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
 		return;
 	}
 
-	$filename = gutenberg_vendor_script_filename( $src );
+	$filename = gutenberg_vendor_script_filename( $src, $handle );
 
 	if ( defined( 'GUTENBERG_LIST_VENDOR_ASSETS' ) && GUTENBERG_LIST_VENDOR_ASSETS ) {
 		echo "$src|$filename\n";
