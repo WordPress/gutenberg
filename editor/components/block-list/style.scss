@@ -707,13 +707,16 @@
 }
 
 // Don't show the sibling inserter before the selected block.
-.edit-post-layout:not( .has-fixed-toolbar ) .is-selected .editor-block-list__insertion-point-inserter {
-	opacity: 0;
-	pointer-events: none;
+.edit-post-layout:not( .has-fixed-toolbar ) {
+	// The child selector is necessary for this to work properly in nested contexts.
+	.is-selected > .editor-block-list__insertion-point > .editor-block-list__insertion-point-inserter {
+		opacity: 0;
+		pointer-events: none;
 
-	&.is-visible {
-		opacity: 1;
-		pointer-events: auto;
+		&.is-visible {
+			opacity: 1;
+			pointer-events: auto;
+		}
 	}
 }
 
