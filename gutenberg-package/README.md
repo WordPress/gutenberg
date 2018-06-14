@@ -239,12 +239,7 @@ The Gutenberg editor will ask for available **Post Types** through `/wp/v2/types
         'media-library': false,    // to disable Media library from WordPress
         posts: true,               // to add PostsPanel to Documents tab
         'template-settings': true, // to add TemplateSettingsPanel to Documents tab
-        extras: true,              // to add an extra tab in sidebar
     },
-    labels: {
-        ...,
-        extras: 'The extra Tab label in thesidebar'
-    }
 }
 ```
 
