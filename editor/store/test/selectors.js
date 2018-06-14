@@ -126,7 +126,7 @@ describe( 'selectors', () => {
 			icon: 'test',
 			keywords: [ 'testing' ],
 			supports: {
-				useOnce: true,
+				multiple: false,
 			},
 		} );
 
@@ -3106,7 +3106,7 @@ describe( 'selectors', () => {
 			] );
 		} );
 
-		it( 'should set isDisabled when a block with useOnce has been used', () => {
+		it( 'should set isDisabled when a block with `multiple: false` has been used', () => {
 			const state = {
 				editor: {
 					present: {

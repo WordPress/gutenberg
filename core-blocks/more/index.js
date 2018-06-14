@@ -30,7 +30,7 @@ export const settings = {
 		customClassName: false,
 		className: false,
 		html: false,
-		useOnce: true,
+		multiple: false,
 	},
 
 	attributes: {

@@ -322,11 +322,11 @@ html: false,
 inserter: false,
 ```
 
-- `useOnce` (default `false`): A once-only block can be inserted into each post, one time only. For example, the built-in 'More' block cannot be inserted again if it already exists in the post being edited. A once-only block's icon is automatically dimmed (unclickable) to prevent multiple instances.
+- `multiple` (default `true`): A non-multiple block can be inserted into each post, one time only. For example, the built-in 'More' block cannot be inserted again if it already exists in the post being edited. A non-multiple block's icon is automatically dimmed (unclickable) to prevent multiple instances.
 
 ```js
 // Use the block just once per post
-useOnce: true,
+multiple: false,
 ```
 
 ## Edit and Save

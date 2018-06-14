@@ -22,7 +22,7 @@ import { __ } from '@wordpress/i18n';
 
 const enhance = compose(
 	/*
-	 * For blocks whose block type supports `useOnce`, provides the wrapped
+	 * For blocks whose block type doesn't support `multiple`, provides the wrapped
 	 * component with `originalBlockUid` -- a reference to the first block of
 	 * the same type in the content -- if and only if that "original" block is
 	 * not the current one. Thus, an inexisting `originalBlockUid` prop signals
@@ -34,11 +34,11 @@ const enhance = compose(
 	 */
 	withSelect( ( select, block ) => {
 		const blocks = select( 'core/editor' ).getBlocks();
-		const useOnce = hasBlockSupport( block.name, 'useOnce', false );
+		const multiple = hasBlockSupport( block.name, 'multiple', false );
 
-		// For block types with no `useOnce` support, there is no "original
+		// For block types with `multiple` support, there is no "original
 		// block" to be found in the content, as the block itself is valid.
-		if ( ! useOnce ) {
+		if ( multiple ) {
 			return {};
 		}
 
@@ -55,7 +55,7 @@ const enhance = compose(
 	} ) ),
 );
 
-const withUseOnceValidation = createHigherOrderComponent( ( BlockEdit ) => {
+const withMultipleValidation = createHigherOrderComponent( ( BlockEdit ) => {
 	return enhance( ( {
 		originalBlockUid,
 		selectFirst,
@@ -73,7 +73,7 @@ const withUseOnceValidation = createHigherOrderComponent( ( BlockEdit ) => {
 				<BlockEdit key="block-edit" { ...props } />
 			</div>,
 			<Warning
-				key="use-once-warning"
+				key="multiple-use-warning"
 				actions={ [
 					<Button key="find-original" isLarge onClick={ selectFirst }>
 						{ __( 'Find original' ) }
@@ -100,7 +100,7 @@ const withUseOnceValidation = createHigherOrderComponent( ( BlockEdit ) => {
 			</Warning>,
 		];
 	} );
-}, 'withUseOnceValidation' );
+}, 'withMultipleValidation' );
 
 /**
  * Given a base block name, returns the default block type to which to offer
@@ -126,6 +126,6 @@ function getOutboundType( blockName ) {
 
 addFilter(
 	'blocks.BlockEdit',
-	'core/validation/useOnce',
-	withUseOnceValidation
+	'core/validation/multiple',
+	withMultipleValidation
 );

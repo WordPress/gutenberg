@@ -28,7 +28,7 @@ export const settings = {
 	category: 'common',
 
 	supports: {
-		useOnce: true,
+		multiple: false,
 	},
 
 	attributes: {
