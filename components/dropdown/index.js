@@ -1,10 +1,10 @@
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 import Popover from '../popover';
 

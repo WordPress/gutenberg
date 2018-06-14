@@ -295,7 +295,7 @@ export class Autocomplete extends Component {
 		this.reset();
 	}
 
-	// this method is separate so it can be overrided in tests
+	// this method is separate so it can be overridden in tests
 	getCursor( container ) {
 		const selection = window.getSelection();
 		if ( selection.isCollapsed ) {
@@ -312,7 +312,7 @@ export class Autocomplete extends Component {
 		return null;
 	}
 
-	// this method is separate so it can be overrided in tests
+	// this method is separate so it can be overridden in tests
 	createRange( startNode, startOffset, endNode, endOffset ) {
 		const range = document.createRange();
 		range.setStart( startNode, startOffset );
@@ -375,7 +375,7 @@ export class Autocomplete extends Component {
 		const allowAnything = () => true;
 		let endTextNode;
 		let endIndex;
-		// search backwards to find the first preceeding space or non-text node.
+		// search backwards to find the first preceding space or non-text node.
 		if ( isTextNode( cursor.node ) ) { // TEXT node
 			endTextNode = cursor.node;
 			endIndex = cursor.offset;
