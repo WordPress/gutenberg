@@ -7,7 +7,8 @@ import { omit, noop, includes } from 'lodash';
  * WordPress Dependencies
  */
 import { Component } from '@wordpress/element';
-import { focus, keycodes } from '@wordpress/utils';
+import { focus } from '@wordpress/dom';
+import { keycodes } from '@wordpress/utils';
 
 /**
  * Module constants
@@ -74,7 +75,13 @@ class NavigableContainer extends Component {
 		if ( offset !== undefined && stopNavigationEvents ) {
 			// Prevents arrow key handlers bound to the document directly interfering
 			event.nativeEvent.stopImmediatePropagation();
-			event.preventDefault();
+
+			// When navigating a collection of items, prevent scroll containers
+			// from scrolling.
+			if ( event.target.getAttribute( 'role' ) === 'menuitem' ) {
+				event.preventDefault();
+			}
+
 			event.stopPropagation();
 		}
 

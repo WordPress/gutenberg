@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * WordPress dependencies
  */
-import { registerCoreBlocks } from '@wordpress/blocks';
+import { registerCoreBlocks } from '@wordpress/core-blocks';
 import { keycodes } from '@wordpress/utils';
 
 /**

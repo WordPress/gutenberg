@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escapeRegExp, find, filter, map } from 'lodash';
+import { escapeRegExp, find, filter, map, debounce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,6 +22,89 @@ import withInstanceId from '../higher-order/with-instance-id';
 import withSpokenMessages from '../higher-order/with-spoken-messages';
 
 const { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT, SPACE } = keycodes;
+
+/**
+ * A raw completer option.
+ * @typedef {*} CompleterOption
+ */
+
+/**
+ * @callback FnGetOptions
+ *
+ * @returns {(CompleterOption[]|Promise.<CompleterOption[]>)} The completer options or a promise for them.
+ */
+
+/**
+ * @callback FnGetOptionKeywords
+ * @param {CompleterOption} option a completer option.
+ *
+ * @returns {string[]} list of key words to search.
+ */
+
+/**
+ * @callback FnIsOptionDisabled
+ * @param {CompleterOption} option a completer option.
+ *
+ * @returns {string[]} whether or not the given option is disabled.
+ */
+
+/**
+ * @callback FnGetOptionLabel
+ * @param {CompleterOption} option a completer option.
+ *
+ * @returns {(string|Array.<(string|Component)>)} list of react components to render.
+ */
+
+/**
+ * @callback FnAllowNode
+ * @param {Node} textNode check if the completer can handle this text node.
+ *
+ * @returns {boolean} true if the completer can handle this text node.
+ */
+
+/**
+ * @callback FnAllowContext
+ * @param {Range} before the range before the auto complete trigger and query.
+ * @param {Range} after the range after the autocomplete trigger and query.
+ *
+ * @returns {boolean} true if the completer can handle these ranges.
+ */
+
+/**
+ * @typedef {Object} OptionCompletion
+ * @property {('insert-at-caret', 'replace')} action the intended placement of the completion.
+ * @property {OptionCompletionValue} value the completion value.
+ */
+
+/**
+ * A completion value.
+ * @typedef {(String|WPElement|Object)} OptionCompletionValue
+ */
+
+/**
+ * @callback FnGetOptionCompletion
+ * @param {CompleterOption} value the value of the completer option.
+ * @param {Range} range the nodes included in the autocomplete trigger and query.
+ * @param {String} query the text value of the autocomplete query.
+ *
+ * @returns {(OptionCompletion|OptionCompletionValue)} the completion for the given option. If an
+ * 													   OptionCompletionValue is returned, the
+ * 													   completion action defaults to `insert-at-caret`.
+ */
+
+/**
+ * @typedef {Object} Completer
+ * @property {String} name a way to identify a completer, useful for selective overriding.
+ * @property {?String} className A class to apply to the popup menu.
+ * @property {String} triggerPrefix the prefix that will display the menu.
+ * @property {(CompleterOption[]|FnGetOptions)} options the completer options or a function to get them.
+ * @property {?FnGetOptionKeywords} getOptionKeywords get the keywords for a given option.
+ * @property {?FnIsOptionDisabled} isOptionDisabled get whether or not the given option is disabled.
+ * @property {FnGetOptionLabel} getOptionLabel get the label for a given option.
+ * @property {?FnAllowNode} allowNode filter the allowed text nodes in the autocomplete.
+ * @property {?FnAllowContext} allowContext filter the context under which the autocomplete activates.
+ * @property {FnGetOptionCompletion} getOptionCompletion get the completion associated with a given option.
+ */
 
 /**
  * Recursively select the firstChild until hitting a leaf node.
@@ -76,7 +159,7 @@ function onlyTextNode( node ) {
 }
 
 /**
- * Find the index of the last charater in the text that is whitespace.
+ * Find the index of the last character in the text that is whitespace.
  *
  * @param {string} text The text to search.
  *
@@ -141,6 +224,7 @@ export class Autocomplete extends Component {
 		this.search = this.search.bind( this );
 		this.handleKeyDown = this.handleKeyDown.bind( this );
 		this.getWordRect = this.getWordRect.bind( this );
+		this.debouncedLoadOptions = debounce( this.loadOptions, 250 );
 
 		this.state = this.constructor.getInitialState();
 	}
@@ -149,7 +233,7 @@ export class Autocomplete extends Component {
 		this.node = node;
 	}
 
-	replace( range, replacement ) {
+	insertCompletion( range, replacement ) {
 		const container = document.createElement( 'div' );
 		container.innerHTML = renderToString( replacement );
 		while ( container.firstChild ) {
@@ -162,15 +246,36 @@ export class Autocomplete extends Component {
 	}
 
 	select( option ) {
+		const { onReplace } = this.props;
 		const { open, range, query } = this.state;
-		const { onSelect } = open || {};
+		const { getOptionCompletion } = open || {};
+
+		if ( option.isDisabled ) {
+			return;
+		}
 
 		this.reset();
 
-		if ( onSelect ) {
-			const replacement = onSelect( option.value, range, query );
-			if ( replacement !== undefined ) {
-				this.replace( range, replacement );
+		if ( getOptionCompletion ) {
+			const completion = getOptionCompletion( option.value, range, query );
+
+			const { action, value } =
+				( undefined === completion.action || undefined === completion.value ) ?
+					{ action: 'insert-at-caret', value: completion } :
+					completion;
+
+			if ( 'replace' === action ) {
+				onReplace( [ value ] );
+			} else if ( 'insert-at-caret' === action ) {
+				this.insertCompletion( range, value );
+			} else if ( 'backcompat' === action ) {
+				// NOTE: This block should be removed once we no longer support the old completer interface.
+				const onSelect = value;
+				const deprecatedOptionObject = option.value;
+				const selectionResult = onSelect( deprecatedOptionObject.value, range, query );
+				if ( selectionResult !== undefined ) {
+					this.insertCompletion( range, selectionResult );
+				}
 			}
 		}
 	}
@@ -190,7 +295,7 @@ export class Autocomplete extends Component {
 		this.reset();
 	}
 
-	// this method is separate so it can be overrided in tests
+	// this method is separate so it can be overridden in tests
 	getCursor( container ) {
 		const selection = window.getSelection();
 		if ( selection.isCollapsed ) {
@@ -207,7 +312,7 @@ export class Autocomplete extends Component {
 		return null;
 	}
 
-	// this method is separate so it can be overrided in tests
+	// this method is separate so it can be overridden in tests
 	createRange( startNode, startOffset, endNode, endOffset ) {
 		const range = document.createRange();
 		range.setStart( startNode, startOffset );
@@ -231,13 +336,34 @@ export class Autocomplete extends Component {
 		}
 	}
 
-	loadOptions( index ) {
-		this.props.completers[ index ].getOptions().then( ( options ) => {
-			const keyedOptions = map( options, ( option, i ) => ( { ...option, key: index + '-' + i } ) );
+	/**
+	 * Load options for an autocompleter.
+	 *
+	 * @param {Completer} completer The autocompleter.
+	 * @param {string}    query     The query, if any.
+	 */
+	loadOptions( completer, query ) {
+		const { options } = completer;
+
+		/*
+		 * We support both synchronous and asynchronous retrieval of completer options
+		 * but internally treat all as async so we maintain a single, consistent code path.
+		 */
+		Promise.resolve(
+			typeof options === 'function' ? options( query ) : options
+		).then( ( optionsData ) => {
+			const keyedOptions = optionsData.map( ( optionData, optionIndex ) => ( {
+				key: `${ completer.idx }-${ optionIndex }`,
+				value: optionData,
+				label: completer.getOptionLabel( optionData ),
+				keywords: completer.getOptionKeywords ? completer.getOptionKeywords( optionData ) : [],
+				isDisabled: completer.isOptionDisabled ? completer.isOptionDisabled( optionData ) : false,
+			} ) );
+
 			const filteredOptions = filterOptions( this.state.search, keyedOptions );
 			const selectedIndex = filteredOptions.length === this.state.filteredOptions.length ? this.state.selectedIndex : 0;
 			this.setState( {
-				[ 'options_' + index ]: keyedOptions,
+				[ 'options_' + completer.idx ]: keyedOptions,
 				filteredOptions,
 				selectedIndex,
 			} );
@@ -249,7 +375,7 @@ export class Autocomplete extends Component {
 		const allowAnything = () => true;
 		let endTextNode;
 		let endIndex;
-		// search backwards to find the first preceeding space or non-text node.
+		// search backwards to find the first preceding space or non-text node.
 		if ( isTextNode( cursor.node ) ) { // TEXT node
 			endTextNode = cursor.node;
 			endIndex = cursor.offset;
@@ -322,9 +448,10 @@ export class Autocomplete extends Component {
 	}
 
 	search( event ) {
-		const { open: wasOpen, suppress: wasSuppress } = this.state;
 		const { completers } = this.props;
+		const { open: wasOpen, suppress: wasSuppress, query: wasQuery } = this.state;
 		const container = event.target;
+
 		// ensure that the cursor location is unambiguous
 		const cursor = this.getCursor( container );
 		if ( ! cursor ) {
@@ -334,8 +461,12 @@ export class Autocomplete extends Component {
 		const match = this.findMatch( container, cursor, completers, wasOpen );
 		const { open, query, range } = match || {};
 		// asynchronously load the options for the open completer
-		if ( open && ( ! wasOpen || open.idx !== wasOpen.idx ) ) {
-			this.loadOptions( open.idx );
+		if ( open && ( ! wasOpen || open.idx !== wasOpen.idx || query !== wasQuery ) ) {
+			if ( open.isDebounced ) {
+				this.debouncedLoadOptions( open, query );
+			} else {
+				this.loadOptions( open, query );
+			}
 		}
 		// create a regular expression to filter the options
 		const search = open ? new RegExp( '(?:\\b|\\s|^)' + escapeRegExp( query ), 'i' ) : /./;
@@ -417,18 +548,12 @@ export class Autocomplete extends Component {
 		event.stopPropagation();
 	}
 
-	getWordRect( { isLeft, isRight } ) {
+	getWordRect() {
 		const { range } = this.state;
 		if ( ! range ) {
 			return;
 		}
-		if ( isLeft ) {
-			const rects = range.getClientRects();
-			return rects[ 0 ];
-		} else if ( isRight ) {
-			const rects = range.getClientRects();
-			return rects[ rects.length - 1 ];
-		}
+
 		return range.getBoundingClientRect();
 	}
 
@@ -452,6 +577,7 @@ export class Autocomplete extends Component {
 
 	componentWillUnmount() {
 		this.toggleKeyEvents( false );
+		this.debouncedLoadOptions.cancel();
 	}
 
 	render() {
@@ -491,6 +617,7 @@ export class Autocomplete extends Component {
 									id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
 									role="option"
 									aria-selected={ index === selectedIndex }
+									disabled={ option.isDisabled }
 									className={ classnames( 'components-autocomplete__result', className, {
 										'is-selected': index === selectedIndex,
 									} ) }

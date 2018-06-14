@@ -26,20 +26,23 @@ import { withViewportMatch } from '@wordpress/viewport';
  * Internal dependencies
  */
 import './style.scss';
+import BrowserURL from '../browser-url';
+import BlockSidebar from '../sidebar/block-sidebar';
+import DocumentSidebar from '../sidebar/document-sidebar';
 import Header from '../header';
-import Sidebar from '../sidebar';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
 import MetaBoxes from '../meta-boxes';
 import { getMetaBoxContainer } from '../../utils/meta-boxes';
-import PluginSidebar from '../plugin-sidebar';
+import Sidebar from '../sidebar';
+import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
+import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 
 function Layout( {
 	mode,
 	editorSidebarOpened,
 	pluginSidebarOpened,
-	sidebarName,
 	publishSidebarOpened,
 	hasFixedToolbar,
 	closePublishSidebar,
@@ -58,6 +61,7 @@ function Layout( {
 	return (
 		<div className={ className }>
 			<DocumentTitle />
+			<BrowserURL />
 			<UnsavedChangesWarning forceIsDirty={ () => {
 				return some( metaBoxes, ( metaBox, location ) => {
 					return metaBox.isActive &&
@@ -84,10 +88,13 @@ function Layout( {
 					onClose={ closePublishSidebar }
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }
+					PrePublishExtension={ PluginPrePublishPanel.Slot }
+					PostPublishExtension={ PluginPostPublishPanel.Slot }
 				/>
 			) }
-			{ editorSidebarOpened && <Sidebar /> }
-			{ pluginSidebarOpened && <PluginSidebar.Slot name={ sidebarName } /> }
+			<DocumentSidebar />
+			<BlockSidebar />
+			<Sidebar.Slot />
 			{
 				isMobileViewport && sidebarIsOpened && <ScrollLock />
 			}
@@ -102,7 +109,6 @@ export default compose(
 		mode: select( 'core/edit-post' ).getEditorMode(),
 		editorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
 		pluginSidebarOpened: select( 'core/edit-post' ).isPluginSidebarOpened(),
-		sidebarName: select( 'core/edit-post' ).getActiveGeneralSidebarName(),
 		publishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
 		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
 		metaBoxes: select( 'core/edit-post' ).getMetaBoxes(),

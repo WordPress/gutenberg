@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { compose, getWrapperDisplayName } from '@wordpress/element';
+import { compose, createHigherOrderComponent } from '@wordpress/element';
 import { ifCondition } from '@wordpress/components';
 
 /**
@@ -19,17 +19,14 @@ import withViewportMatch from './with-viewport-match';
  *
  * @return {Function} Higher-order component.
  */
-const ifViewportMatches = ( query ) => ( WrappedComponent ) => {
-	const EnhancedComponent = compose( [
+const ifViewportMatches = ( query ) => createHigherOrderComponent(
+	compose( [
 		withViewportMatch( {
 			isViewportMatch: query,
 		} ),
 		ifCondition( ( props ) => props.isViewportMatch ),
-	] )( WrappedComponent );
-
-	EnhancedComponent.displayName = getWrapperDisplayName( WrappedComponent, 'ifViewportMatches' );
-
-	return EnhancedComponent;
-};
+	] ),
+	'ifViewportMatches'
+);
 
 export default ifViewportMatches;

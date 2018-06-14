@@ -1,23 +1,16 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
-import { get } from 'lodash';
+import { get, partial } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, withAPIData } from '@wordpress/components';
+import { PanelBody } from '@wordpress/components';
 import { PostFeaturedImage, PostFeaturedImageCheck } from '@wordpress/editor';
 import { compose } from '@wordpress/element';
-import { withSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { isEditorSidebarPanelOpened } from '../../../store/selectors';
-import { toggleGeneralSidebarEditorPanel } from '../../../store/actions';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Module Constants
@@ -30,7 +23,7 @@ function FeaturedImage( { isOpened, postType, onTogglePanel } ) {
 			<PanelBody
 				title={ get(
 					postType,
-					[ 'data', 'labels', 'featured_image' ],
+					[ 'labels', 'featured_image' ],
 					__( 'Featured Image' )
 				) }
 				opened={ isOpened }
@@ -42,34 +35,26 @@ function FeaturedImage( { isOpened, postType, onTogglePanel } ) {
 	);
 }
 
-const applyWithSelect = withSelect( ( select ) => ( {
-	postTypeSlug: select( 'core/editor' ).getEditedPostAttribute( 'type' ),
-} ) );
+const applyWithSelect = withSelect( ( select ) => {
+	const { getEditedPostAttribute } = select( 'core/editor' );
+	const { getPostType } = select( 'core' );
+	const { isEditorSidebarPanelOpened } = select( 'core/edit-post' );
 
-const applyConnect = connect(
-	( state ) => {
-		return {
-			isOpened: isEditorSidebarPanelOpened( state, PANEL_NAME ),
-		};
-	},
-	{
-		onTogglePanel() {
-			return toggleGeneralSidebarEditorPanel( PANEL_NAME );
-		},
-	},
-	undefined,
-	{ storeKey: 'edit-post' }
-);
-
-const applyWithAPIData = withAPIData( ( props ) => {
-	const { postTypeSlug } = props;
 	return {
-		postType: `/wp/v2/types/${ postTypeSlug }?context=edit`,
+		postType: getPostType( getEditedPostAttribute( 'type' ) ),
+		isOpened: isEditorSidebarPanelOpened( PANEL_NAME ),
+	};
+} );
+
+const applyWithDispatch = withDispatch( ( dispatch ) => {
+	const { toggleGeneralSidebarEditorPanel } = dispatch( 'core/edit-post' );
+
+	return {
+		onTogglePanel: partial( toggleGeneralSidebarEditorPanel, PANEL_NAME ),
 	};
 } );
 
 export default compose(
 	applyWithSelect,
-	applyConnect,
-	applyWithAPIData,
+	applyWithDispatch,
 )( FeaturedImage );

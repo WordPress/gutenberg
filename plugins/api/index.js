@@ -3,7 +3,7 @@
 /**
  * WordPress dependencies
  */
-import { applyFilters } from '@wordpress/hooks';
+import { applyFilters, doAction } from '@wordpress/hooks';
 
 /**
  * External dependencies
@@ -20,9 +20,10 @@ const plugins = {};
 /**
  * Registers a plugin to the editor.
  *
- * @param {string}   name   The name of the plugin.
- * @param {Object}   settings        The settings for this plugin.
- * @param {Function} settings.render The function that renders the plugin.
+ * @param {string}                    name            The name of the plugin.
+ * @param {Object}                    settings        The settings for this plugin.
+ * @param {Function}                  settings.render The function that renders the plugin.
+ * @param {string|WPElement|Function} settings.icon   An icon to be shown in the UI.
  *
  * @return {Object} The final plugin settings object.
  */
@@ -50,6 +51,9 @@ export function registerPlugin( name, settings ) {
 			`Plugin "${ name }" is already registered.`
 		);
 	}
+
+	settings = applyFilters( 'plugins.registerPlugin', settings, name );
+
 	if ( ! isFunction( settings.render ) ) {
 		console.error(
 			'The "render" property must be specified and must be a valid function.'
@@ -57,11 +61,15 @@ export function registerPlugin( name, settings ) {
 		return null;
 	}
 
-	settings.name = name;
+	plugins[ name ] = {
+		name,
+		icon: 'admin-plugins',
+		...settings,
+	};
 
-	settings = applyFilters( 'plugins.registerPlugin', settings, name );
+	doAction( 'plugins.pluginRegistered', settings, name );
 
-	return plugins[ settings.name ] = settings;
+	return settings;
 }
 
 /**
@@ -81,6 +89,9 @@ export function unregisterPlugin( name ) {
 	}
 	const oldPlugin = plugins[ name ];
 	delete plugins[ name ];
+
+	doAction( 'plugins.pluginUnregistered', oldPlugin, name );
+
 	return oldPlugin;
 }
 

@@ -24,4 +24,4 @@ function MyCustomElement() {
 export default withFilters( 'MyCustomElement' )( MyCustomElement );
 ```
 
-`withFilters` expects a string argument which provides a hook name. It returns a function which can then be used in composing your component. The hook name allows plugin developers to customize or completely override the component passed to this higher-order component using `wp.utils.addFilter` method.
+`withFilters` expects a string argument which provides a hook name. It returns a function which can then be used in composing your component. The hook name allows plugin developers to customize or completely override the component passed to this higher-order component using `wp.hooks.addFilter` method.

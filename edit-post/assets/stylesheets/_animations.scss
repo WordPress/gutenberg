@@ -1,3 +1,12 @@
+@keyframes fade-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
 @mixin animate_fade {
 	animation: animate_fade 0.1s ease-out;
 	animation-fill-mode: forwards;
@@ -17,4 +26,7 @@
 	animation: slide_in_right 0.1s forwards;
 }
 
-
+@mixin fade_in( $speed: 0.2s ) {
+	animation: fade-in $speed ease-out;
+	animation-fill-mode: forwards;
+}

@@ -43,10 +43,7 @@ class IgnoreNestedEvents extends Component {
 	 * @return {void}
 	 */
 	proxyEvent( event ) {
-		// Skip if already handled (i.e. assume nested block)
-		if ( event.nativeEvent._blockHandled ) {
-			return;
-		}
+		const isHandled = !! event.nativeEvent._blockHandled;
 
 		// Assign into the native event, since React will reuse their synthetic
 		// event objects and this property assignment could otherwise leak.
@@ -55,7 +52,14 @@ class IgnoreNestedEvents extends Component {
 		event.nativeEvent._blockHandled = true;
 
 		// Invoke original prop handler
-		const propKey = this.eventMap[ event.type ];
+		let propKey = this.eventMap[ event.type ];
+
+		// If already handled (i.e. assume nested block), only invoke a
+		// corresponding "Handled"-suffixed prop callback.
+		if ( isHandled ) {
+			propKey += 'Handled';
+		}
+
 		if ( this.props[ propKey ] ) {
 			this.props[ propKey ]( event );
 		}
@@ -69,16 +73,24 @@ class IgnoreNestedEvents extends Component {
 			...Object.keys( props ),
 		], ( result, key ) => {
 			// Try to match prop key as event handler
-			const match = key.match( /^on([A-Z][a-zA-Z]+)$/ );
+			const match = key.match( /^on([A-Z][a-zA-Z]+?)(Handled)?$/ );
 			if ( match ) {
+				const isHandledProp = !! match[ 2 ];
+				if ( isHandledProp ) {
+					// Avoid assigning through the invalid prop key. This
+					// assumes mutation of shallow clone by above spread.
+					delete props[ key ];
+				}
+
 				// Re-map the prop to the local proxy handler to check whether
 				// the event has already been handled.
-				result[ key ] = this.proxyEvent;
+				const proxiedPropName = 'on' + match[ 1 ];
+				result[ proxiedPropName ] = this.proxyEvent;
 
 				// Assign event -> propName into an instance variable, so as to
 				// avoid re-renders which could be incurred either by setState
 				// or in mapping values to a newly created function.
-				this.eventMap[ match[ 1 ].toLowerCase() ] = key;
+				this.eventMap[ match[ 1 ].toLowerCase() ] = proxiedPropName;
 			}
 
 			return result;

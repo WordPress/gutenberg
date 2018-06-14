@@ -9,8 +9,8 @@
 	.components-notice-list {
 		position: sticky;
 		top: $header-height;
-		left: 0;
 		right: 0;
+		color: $dark-gray-900;
 
 		@include break-small {
 			position: fixed;
@@ -73,12 +73,17 @@
 	min-height: 100%;
 	flex-direction: column;
 
-	// on mobile the main content area has to scroll
-	// otherwise you can invoke the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻
+	// Pad the scroll box so content on the bottom can be scrolled up.
+	padding-bottom: 50vh;
 	@include break-small {
-		overflow-y: auto;
-		-webkit-overflow-scrolling: touch;
+		padding-bottom: 0;
 	}
+
+	// On mobile the main content area has to scroll otherwise you can invoke
+	// the overscroll bounce on the non-scrolling container, causing
+	// (ノಠ益ಠ)ノ彡┻━┻
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
 
 	.edit-post-visual-editor {
 		flex-basis: 100%;

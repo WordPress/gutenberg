@@ -1,24 +1,10 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import { serialize } from '@wordpress/blocks';
-import { documentHasSelection } from '@wordpress/utils';
-
-/**
- * Internal dependencies
- */
-import { removeBlocks } from '../../store/actions';
-import {
-	getMultiSelectedBlocks,
-	getMultiSelectedBlockUids,
-	getSelectedBlock,
-} from '../../store/selectors';
+import { documentHasSelection } from '@wordpress/dom';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 class CopyHandler extends Component {
 	constructor() {
@@ -73,13 +59,20 @@ class CopyHandler extends Component {
 	}
 }
 
-export default connect(
-	( state ) => {
+export default compose( [
+	withSelect( ( select ) => {
+		const {
+			getMultiSelectedBlocks,
+			getMultiSelectedBlockUids,
+			getSelectedBlock,
+		} = select( 'core/editor' );
 		return {
-			multiSelectedBlocks: getMultiSelectedBlocks( state ),
-			multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
-			selectedBlock: getSelectedBlock( state ),
+			multiSelectedBlocks: getMultiSelectedBlocks(),
+			multiSelectedBlockUids: getMultiSelectedBlockUids(),
+			selectedBlock: getSelectedBlock(),
 		};
-	},
-	{ onRemove: removeBlocks },
-)( CopyHandler );
+	} ),
+	withDispatch( ( dispatch ) => ( {
+		onRemove: dispatch( 'core/editor' ).removeBlocks,
+	} ) ),
+] )( CopyHandler );

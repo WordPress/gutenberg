@@ -14,14 +14,13 @@
 .editor-block-inspector__card {
 	display: flex;
 	align-items: flex-start;
-	border-bottom: 1px solid $light-gray-500;
-	margin: -16px -16px 16px -16px;
+	margin: -16px;
 	padding: 16px;
 }
 
 .editor-block-inspector__card-icon {
 	border: 1px solid $light-gray-700;
-	padding: 8px;
+	padding: 7px;
 	margin-right: 10px;
 	height: 36px;
 	width: 36px;
@@ -37,5 +36,5 @@
 }
 
 .editor-block-inspector__card-description {
-	font-size: 12px;
+	font-size: $default-font-size;
 }

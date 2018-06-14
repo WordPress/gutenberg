@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
-import { get, unescape as unescapeString, without, find, some } from 'lodash';
+import { get, unescape as unescapeString, without, find, some, invoke } from 'lodash';
 import { stringify } from 'querystring';
 
 /**
@@ -10,20 +9,16 @@ import { stringify } from 'querystring';
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
-import { TreeSelect, withAPIData, withInstanceId, withSpokenMessages } from '@wordpress/components';
+import { TreeSelect, withAPIData, withInstanceId, withSpokenMessages, Button } from '@wordpress/components';
 import { buildTermsTree } from '@wordpress/utils';
-
-/**
- * Internal dependencies
- */
-import { getEditedPostAttribute } from '../../store/selectors';
-import { editPost } from '../../store/actions';
+import { withSelect, withDispatch } from '@wordpress/data';
+import apiRequest from '@wordpress/api-request';
 
 /**
  * Module Constants
  */
 const DEFAULT_QUERY = {
-	per_page: 100,
+	per_page: -1,
 	orderby: 'count',
 	order: 'desc',
 	_fields: 'id,name,parent',
@@ -75,7 +70,7 @@ class HierarchicalTermSelector extends Component {
 	}
 
 	findTerm( terms, parent, name ) {
-		return find( terms, term => {
+		return find( terms, ( term ) => {
 			return ( ( ! term.parent && ! parent ) || parseInt( term.parent ) === parseInt( parent ) ) &&
 				term.name.toLowerCase() === name.toLowerCase();
 		} );
@@ -93,7 +88,7 @@ class HierarchicalTermSelector extends Component {
 		const existingTerm = this.findTerm( availableTerms, formParent, formName );
 		if ( existingTerm ) {
 			// if the term we are adding exists but is not selected select it
-			if ( ! some( terms, term => term === existingTerm.id ) ) {
+			if ( ! some( terms, ( term ) => term === existingTerm.id ) ) {
 				onUpdateTerms( [ ...terms, existingTerm.id ], restBase );
 			}
 			this.setState( {
@@ -109,7 +104,7 @@ class HierarchicalTermSelector extends Component {
 			} );
 			// Tries to create a term or fetch it if it already exists
 			const basePath = wp.api.getTaxonomyRoute( this.props.slug );
-			this.addRequest = wp.apiRequest( {
+			this.addRequest = apiRequest( {
 				path: `/wp/v2/${ basePath }`,
 				method: 'POST',
 				data: {
@@ -122,10 +117,10 @@ class HierarchicalTermSelector extends Component {
 					const errorCode = xhr.responseJSON && xhr.responseJSON.code;
 					if ( errorCode === 'term_exists' ) {
 						// search the new category created since last fetch
-						this.addRequest = wp.apiRequest( {
+						this.addRequest = apiRequest( {
 							path: `/wp/v2/${ basePath }?${ stringify( { ...DEFAULT_QUERY, parent: formParent || 0, search: formName } ) }`,
 						} );
-						return this.addRequest.then( searchResult => {
+						return this.addRequest.then( ( searchResult ) => {
 							resolve( this.findTerm( searchResult, formParent, formName ) );
 						}, reject );
 					}
@@ -167,7 +162,7 @@ class HierarchicalTermSelector extends Component {
 
 	componentDidMount() {
 		const basePath = wp.api.getTaxonomyRoute( this.props.slug );
-		this.fetchRequest = wp.apiRequest( { path: `/wp/v2/${ basePath }?${ stringify( DEFAULT_QUERY ) }` } );
+		this.fetchRequest = apiRequest( { path: `/wp/v2/${ basePath }?${ stringify( DEFAULT_QUERY ) }` } );
 		this.fetchRequest.then(
 			( terms ) => { // resolve
 				const availableTermsTree = buildTermsTree( terms );
@@ -192,13 +187,8 @@ class HierarchicalTermSelector extends Component {
 	}
 
 	componentWillUnmount() {
-		if ( this.fetchRequest ) {
-			this.fetchRequest.abort();
-		}
-
-		if ( this.addRequest ) {
-			this.addRequest.abort();
-		}
+		invoke( this.fetchRequest, [ 'abort' ] );
+		invoke( this.addRequest, [ 'abort' ] );
 	}
 
 	renderTerms( renderedTerms ) {
@@ -227,7 +217,12 @@ class HierarchicalTermSelector extends Component {
 	}
 
 	render() {
-		const { slug, taxonomy, instanceId } = this.props;
+		const { slug, taxonomy, instanceId, hasCreateAction, hasAssignAction } = this.props;
+
+		if ( ! hasAssignAction ) {
+			return null;
+		}
+
 		const { availableTermsTree, availableTerms, formName, formParent, loading, showForm } = this.state;
 		const labelWithFallback = ( labelProperty, fallbackIsCategory, fallbackIsNotCategory ) => get(
 			taxonomy,
@@ -256,15 +251,16 @@ class HierarchicalTermSelector extends Component {
 		/* eslint-disable jsx-a11y/no-onchange */
 		return [
 			...this.renderTerms( availableTermsTree ),
-			! loading && (
-				<button
+			! loading && hasCreateAction && (
+				<Button
 					key="term-add-button"
 					onClick={ this.onToggleForm }
-					className="button-link editor-post-taxonomies__hierarchical-terms-add"
+					className="editor-post-taxonomies__hierarchical-terms-add"
 					aria-expanded={ showForm }
+					isLink
 				>
 					{ newTermButtonLabel }
-				</button>
+				</Button>
 			),
 			showForm && (
 				<form onSubmit={ this.onAddTerm } key="hierarchical-terms-form">
@@ -291,12 +287,13 @@ class HierarchicalTermSelector extends Component {
 							tree={ availableTermsTree }
 						/>
 					}
-					<button
+					<Button
+						isDefault
 						type="submit"
-						className="button editor-post-taxonomies__hierarchical-terms-submit"
+						className="editor-post-taxonomies__hierarchical-terms-submit"
 					>
 						{ newTermSubmitLabel }
-					</button>
+					</Button>
 				</form>
 			),
 		];
@@ -304,29 +301,26 @@ class HierarchicalTermSelector extends Component {
 	}
 }
 
-const applyWithAPIData = withAPIData( ( props ) => {
-	const { slug } = props;
-	return {
-		taxonomy: `/wp/v2/taxonomies/${ slug }?context=edit`,
-	};
-} );
-
-const applyConnect = connect(
-	( state, ownProps ) => {
+export default compose( [
+	withAPIData( ( props ) => {
+		const { slug } = props;
 		return {
-			terms: getEditedPostAttribute( state, ownProps.restBase ),
+			taxonomy: `/wp/v2/taxonomies/${ slug }?context=edit`,
 		};
-	},
-	{
+	} ),
+	withSelect( ( select, ownProps ) => {
+		const { getCurrentPost } = select( 'core/editor' );
+		return {
+			hasCreateAction: get( getCurrentPost(), [ '_links', 'wp:action-create-' + ownProps.restBase ], false ),
+			hasAssignAction: get( getCurrentPost(), [ '_links', 'wp:action-assign-' + ownProps.restBase ], false ),
+			terms: select( 'core/editor' ).getEditedPostAttribute( ownProps.restBase ),
+		};
+	} ),
+	withDispatch( ( dispatch ) => ( {
 		onUpdateTerms( terms, restBase ) {
-			return editPost( { [ restBase ]: terms } );
+			dispatch( 'core/editor' ).editPost( { [ restBase ]: terms } );
 		},
-	}
-);
-
-export default compose(
-	applyWithAPIData,
-	applyConnect,
+	} ) ),
 	withSpokenMessages,
-	withInstanceId
-)( HierarchicalTermSelector );
+	withInstanceId,
+] )( HierarchicalTermSelector );

@@ -10,7 +10,7 @@ function CopyContentMenuItem( { editedPostContent, hasCopied, setState } ) {
 	return (
 		<ClipboardButton
 			text={ editedPostContent }
-			className="components-menu-items__button"
+			className="components-menu-item__button"
 			onCopy={ () => setState( { hasCopied: true } ) }
 			onFinishCopy={ () => setState( { hasCopied: false } ) }
 		>

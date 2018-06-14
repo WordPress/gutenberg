@@ -1,32 +1,69 @@
 /**
  * External dependencies
  */
-import { compact } from 'lodash';
-import showdown from 'showdown';
+import { flatMap, filter, compact } from 'lodash';
+// Also polyfills Element#matches.
+import 'element-closest';
 
 /**
  * Internal dependencies
  */
 import { createBlock, getBlockTransforms, findTransform } from '../factory';
-import { getBlockType, getUnknownTypeHandlerName } from '../registration';
+import { getBlockType } from '../registration';
 import { getBlockAttributes, parseWithGrammar } from '../parser';
 import normaliseBlocks from './normalise-blocks';
-import stripAttributes from './strip-attributes';
 import specialCommentConverter from './special-comment-converter';
-import commentRemover from './comment-remover';
-import createUnwrapper from './create-unwrapper';
 import isInlineContent from './is-inline-content';
-import formattingTransformer from './formatting-transformer';
+import phrasingContentReducer from './phrasing-content-reducer';
 import msListConverter from './ms-list-converter';
 import listReducer from './list-reducer';
 import imageCorrector from './image-corrector';
 import blockquoteNormaliser from './blockquote-normaliser';
-import tableNormaliser from './table-normaliser';
-import inlineContentConverter from './inline-content-converter';
-import embeddedContentReducer from './embedded-content-reducer';
-import { deepFilterHTML, isInvalidInline, isNotWhitelisted, isPlain, isInline } from './utils';
+import figureContentReducer from './figure-content-reducer';
 import shortcodeConverter from './shortcode-converter';
-import slackMarkdownVariantCorrector from './slack-markdown-variant-corrector';
+import markdownConverter from './markdown-converter';
+import iframeRemover from './iframe-remover';
+import {
+	deepFilterHTML,
+	isPlain,
+	removeInvalidHTML,
+	getPhrasingContentSchema,
+	getBlockContentSchema,
+} from './utils';
+
+/**
+ * Browser dependencies
+ */
+const { log, warn } = window.console;
+
+export { getPhrasingContentSchema };
+
+/**
+ * Filters HTML to only contain phrasing content.
+ *
+ * @param {string} HTML The HTML to filter.
+ *
+ * @return {string} HTML only containing phrasing content.
+ */
+function filterInlineHTML( HTML ) {
+	HTML = deepFilterHTML( HTML, [ phrasingContentReducer ] );
+	HTML = removeInvalidHTML( HTML, getPhrasingContentSchema(), { inline: true } );
+
+	// Allows us to ask for this information when we get a report.
+	log( 'Processed inline HTML:\n\n', HTML );
+
+	return HTML;
+}
+
+function getRawTransformations() {
+	return filter( getBlockTransforms( 'from' ), { type: 'raw' } )
+		.map( ( transform ) => {
+			return transform.isMatch ? transform : {
+				...transform,
+				isMatch: ( node ) => transform.selector && node.matches( transform.selector ),
+			};
+		} );
+}
 
 /**
  * Converts an HTML string to known blocks. Strips everything else.
@@ -38,11 +75,11 @@ import slackMarkdownVariantCorrector from './slack-markdown-variant-corrector';
  *                                                     * 'INLINE': Always handle as inline content, and return string.
  *                                                     * 'BLOCKS': Always handle as blocks, and return array of blocks.
  * @param {Array}   [options.tagName]                  The tag into which content will be inserted.
- * @param {boolean} [options.canUserUseUnfilteredHTML] Whether or not to user can use unfiltered HTML.
+ * @param {boolean} [options.canUserUseUnfilteredHTML] Whether or not the user can use unfiltered HTML.
  *
  * @return {Array|string} A list of blocks or a string, depending on `handlerMode`.
  */
-export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagName, canUserUseUnfilteredHTML = false } ) {
+export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', tagName, canUserUseUnfilteredHTML = false } ) {
 	// First of all, strip any meta tags.
 	HTML = HTML.replace( /<meta[^>]+>/, '' );
 
@@ -51,21 +88,22 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagNa
 		return parseWithGrammar( HTML );
 	}
 
-	// Parse Markdown (and HTML) if:
+	// Normalize unicode to use composed characters.
+	// This is unsupported in IE 11 but it's a nice-to-have feature, not mandatory.
+	// Not normalizing the content will only affect older browsers and won't
+	// entirely break the app.
+	// See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize
+	// See: https://core.trac.wordpress.org/ticket/30130
+	// See: https://github.com/WordPress/gutenberg/pull/6983#pullrequestreview-125151075
+	if ( String.prototype.normalize ) {
+		HTML = HTML.normalize();
+	}
+
+	// Parse Markdown (and encoded HTML) if:
 	// * There is a plain text version.
-	// * The HTML version has no formatting.
-	if ( plainText && isPlain( HTML ) ) {
-		const converter = new showdown.Converter();
-
-		converter.setOption( 'noHeaderId', true );
-		converter.setOption( 'tables', true );
-		converter.setOption( 'literalMidWordUnderscores', true );
-		converter.setOption( 'omitExtraWLInCodeBlocks', true );
-		converter.setOption( 'simpleLineBreaks', true );
-
-		plainText = slackMarkdownVariantCorrector( plainText );
-
-		HTML = converter.makeHtml( plainText );
+	// * There is no HTML version, or it has no formatting.
+	if ( plainText && ( ! HTML || isPlain( HTML ) ) ) {
+		HTML = markdownConverter( plainText );
 
 		// Switch to inline mode if:
 		// * The current mode is AUTO.
@@ -82,101 +120,91 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagNa
 		}
 	}
 
-	// An array of HTML strings and block objects. The blocks replace matched shortcodes.
-	const pieces = shortcodeConverter( HTML );
-
-	// The call to shortcodeConverter will always return more than one element if shortcodes are matched.
-	// The reason is when shortcodes are matched empty HTML strings are included.
-	const hasShortcodes = pieces.length > 1;
-
-	// True if mode is auto, no shortcode is included and HTML verifies the isInlineContent condition
-	const isAutoModeInline = mode === 'AUTO' && isInlineContent( HTML, tagName ) && ! hasShortcodes;
-
-	// Return filtered HTML if condition is true
-	if ( mode === 'INLINE' || isAutoModeInline ) {
-		HTML = deepFilterHTML( HTML, [
-			// Add semantic formatting before attributes are stripped.
-			formattingTransformer,
-			stripAttributes,
-			specialCommentConverter,
-			commentRemover,
-			createUnwrapper( ( node ) => ! isInline( node, tagName ) ),
-		] );
-
-		// Allows us to ask for this information when we get a report.
-		window.console.log( 'Processed inline HTML:\n\n', HTML );
-
-		return HTML;
+	if ( mode === 'INLINE' ) {
+		return filterInlineHTML( HTML );
 	}
 
-	// Before we parse any HTML, extract shorcodes so they don't get messed up.
-	return pieces.reduce( ( accu, piece ) => {
+	// An array of HTML strings and block objects. The blocks replace matched
+	// shortcodes.
+	const pieces = shortcodeConverter( HTML );
+
+	// The call to shortcodeConverter will always return more than one element
+	// if shortcodes are matched. The reason is when shortcodes are matched
+	// empty HTML strings are included.
+	const hasShortcodes = pieces.length > 1;
+
+	if ( mode === 'AUTO' && ! hasShortcodes && isInlineContent( HTML, tagName ) ) {
+		return filterInlineHTML( HTML );
+	}
+
+	const rawTransformations = getRawTransformations();
+	const phrasingContentSchema = getPhrasingContentSchema();
+	const blockContentSchema = getBlockContentSchema( rawTransformations );
+
+	return compact( flatMap( pieces, ( piece ) => {
 		// Already a block from shortcode.
 		if ( typeof piece !== 'string' ) {
-			return [ ...accu, piece ];
+			return piece;
 		}
 
-		// Context dependent filters. Needs to run before we remove nodes.
-		piece = deepFilterHTML( piece, [
+		const filters = [
 			msListConverter,
-		] );
-
-		piece = deepFilterHTML( piece, compact( [
 			listReducer,
 			imageCorrector,
-			// Add semantic formatting before attributes are stripped.
-			formattingTransformer,
-			stripAttributes,
+			phrasingContentReducer,
 			specialCommentConverter,
-			commentRemover,
-			! canUserUseUnfilteredHTML && createUnwrapper( ( element ) => element.nodeName === 'IFRAME' ),
-			embeddedContentReducer,
-			createUnwrapper( isNotWhitelisted ),
+			figureContentReducer,
 			blockquoteNormaliser,
-			tableNormaliser,
-			inlineContentConverter,
-		] ) );
+		];
 
-		piece = deepFilterHTML( piece, [
-			createUnwrapper( isInvalidInline ),
-		] );
+		if ( ! canUserUseUnfilteredHTML ) {
+			// Should run before `figureContentReducer`.
+			filters.unshift( iframeRemover );
+		}
 
+		const schema = {
+			...blockContentSchema,
+			// Keep top-level phrasing content, normalised by `normaliseBlocks`.
+			...phrasingContentSchema,
+		};
+
+		piece = deepFilterHTML( piece, filters, blockContentSchema );
+		piece = removeInvalidHTML( piece, schema );
 		piece = normaliseBlocks( piece );
 
 		// Allows us to ask for this information when we get a report.
-		window.console.log( 'Processed HTML piece:\n\n', piece );
+		log( 'Processed HTML piece:\n\n', piece );
 
 		const doc = document.implementation.createHTMLDocument( '' );
 
 		doc.body.innerHTML = piece;
 
-		const transformsFrom = getBlockTransforms( 'from' );
+		return Array.from( doc.body.children ).map( ( node ) => {
+			const rawTransformation = findTransform( rawTransformations, ( { isMatch } ) => isMatch( node ) );
 
-		const blocks = Array.from( doc.body.children ).map( ( node ) => {
-			const transformation = findTransform( transformsFrom, ( transform ) => (
-				transform.type === 'raw' &&
-				transform.isMatch( node )
-			) );
-
-			if ( transformation ) {
-				if ( transformation.transform ) {
-					return transformation.transform( node );
-				}
-
-				return createBlock(
-					transformation.blockName,
-					getBlockAttributes(
-						getBlockType( transformation.blockName ),
-						node.outerHTML
-					)
+			if ( ! rawTransformation ) {
+				warn(
+					'A block registered a raw transformation schema for `' + node.nodeName + '` but did not match it. ' +
+					'Make sure there is a `selector` or `isMatch` property that can match the schema.\n' +
+					'Sanitized HTML: `' + node.outerHTML + '`'
 				);
+
+				return;
 			}
 
-			return createBlock( getUnknownTypeHandlerName(), {
-				content: node.outerHTML,
-			} );
-		} );
+			const { transform, blockName } = rawTransformation;
 
-		return [ ...accu, ...blocks ];
-	}, [] );
+			if ( transform ) {
+				return transform( node );
+			}
+
+			return createBlock(
+				blockName,
+				getBlockAttributes(
+					getBlockType( blockName ),
+					node.outerHTML
+				)
+			);
+		} );
+	} ) );
 }

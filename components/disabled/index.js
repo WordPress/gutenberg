@@ -1,18 +1,39 @@
 /**
  * External dependencies
  */
-import { debounce } from 'lodash';
+import { includes, debounce } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { focus } from '@wordpress/utils';
+import { createContext, Component } from '@wordpress/element';
+import { focus } from '@wordpress/dom';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+
+const { Consumer, Provider } = createContext( false );
+
+/**
+ * Names of control nodes which qualify for disabled behavior.
+ *
+ * See WHATWG HTML Standard: 4.10.18.5: "Enabling and disabling form controls: the disabled attribute".
+ *
+ * @link https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#enabling-and-disabling-form-controls:-the-disabled-attribute
+ *
+ * @type {string[]}
+ */
+const DISABLED_ELIGIBLE_NODE_NAMES = [
+	'BUTTON',
+	'FIELDSET',
+	'INPUT',
+	'OPTGROUP',
+	'OPTION',
+	'SELECT',
+	'TEXTAREA',
+];
 
 class Disabled extends Component {
 	constructor() {
@@ -48,8 +69,12 @@ class Disabled extends Component {
 
 	disable() {
 		focus.focusable.find( this.node ).forEach( ( focusable ) => {
-			if ( ! focusable.hasAttribute( 'disabled' ) ) {
+			if ( includes( DISABLED_ELIGIBLE_NODE_NAMES, focusable.nodeName ) ) {
 				focusable.setAttribute( 'disabled', '' );
+			}
+
+			if ( focusable.hasAttribute( 'tabindex' ) ) {
+				focusable.removeAttribute( 'tabindex' );
 			}
 
 			if ( focusable.hasAttribute( 'contenteditable' ) ) {
@@ -60,11 +85,15 @@ class Disabled extends Component {
 
 	render() {
 		return (
-			<div ref={ this.bindNode } className="components-disabled">
-				{ this.props.children }
-			</div>
+			<Provider value={ true }>
+				<div ref={ this.bindNode } className="components-disabled">
+					{ this.props.children }
+				</div>
+			</Provider>
 		);
 	}
 }
+
+Disabled.Consumer = Consumer;
 
 export default Disabled;

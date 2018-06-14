@@ -1,13 +1,12 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import { Component } from 'react';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { getDocumentTitle } from '../../store/selectors';
+import { withSelect } from '@wordpress/data';
 
 class DocumentTitle extends Component {
 	constructor( props ) {
@@ -38,8 +37,6 @@ class DocumentTitle extends Component {
 	}
 }
 
-export default connect(
-	( state ) => ( {
-		title: getDocumentTitle( state ),
-	} ),
-)( DocumentTitle );
+export default withSelect( ( select ) => ( {
+	title: select( 'core/editor' ).getDocumentTitle(),
+} ) )( DocumentTitle );

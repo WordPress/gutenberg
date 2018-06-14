@@ -1,18 +1,13 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { NoticeList } from '@wordpress/components';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { removeNotice } from '../../store/actions';
-import { getNotices } from '../../store/selectors';
 import TemplateValidationNotice from '../template-validation-notice';
 
 function EditorNotices( props ) {
@@ -23,9 +18,11 @@ function EditorNotices( props ) {
 	);
 }
 
-export default connect(
-	( state ) => ( {
-		notices: getNotices( state ),
-	} ),
-	{ onRemove: removeNotice }
-)( EditorNotices );
+export default compose( [
+	withSelect( ( select ) => ( {
+		notices: select( 'core/editor' ).getNotices(),
+	} ) ),
+	withDispatch( ( dispatch ) => ( {
+		onRemove: dispatch( 'core/editor' ).removeNotice,
+	} ) ),
+] )( EditorNotices );

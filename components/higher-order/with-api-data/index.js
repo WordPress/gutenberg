@@ -6,7 +6,7 @@ import { mapValues, reduce, forEach, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, getWrapperDisplayName } from '@wordpress/element';
+import { Component, createHigherOrderComponent } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -14,7 +14,7 @@ import { Component, getWrapperDisplayName } from '@wordpress/element';
 import request, { getCachedResponse } from './request';
 import { getRoute } from './routes';
 
-export default ( mapPropsToData ) => ( WrappedComponent ) => {
+export default ( mapPropsToData ) => createHigherOrderComponent( ( WrappedComponent ) => {
 	class APIDataComponent extends Component {
 		constructor( props, context ) {
 			super( ...arguments );
@@ -165,7 +165,7 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 			const mapping = mapPropsToData( props, this.routeHelpers );
 			const nextDataProps = reduce( mapping, ( result, path, propName ) => {
 				// Skip if mapping already assigned into state data props
-				// Exmaple: Component updates with one new prop and other
+				// Example: Component updates with one new prop and other
 				// previously existing; previously existing should not be
 				// clobbered or re-trigger fetch
 				const dataProp = dataProps[ propName ];
@@ -182,7 +182,7 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 				}
 
 				route.methods.forEach( ( method ) => {
-					// Add request initiater into data props
+					// Add request initiator into data props
 					const requestKey = this.getRequestKey( method );
 					result[ propName ][ requestKey ] = this.request.bind(
 						this,
@@ -221,8 +221,6 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 		}
 	}
 
-	APIDataComponent.displayName = getWrapperDisplayName( WrappedComponent, 'apiData' );
-
 	APIDataComponent.contextTypes = {
 		getAPISchema: noop,
 		getAPIPostTypeRestBaseMapping: noop,
@@ -230,4 +228,4 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 	};
 
 	return APIDataComponent;
-};
+}, 'withAPIData' );

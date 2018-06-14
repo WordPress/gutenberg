@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { pick } from 'lodash';
+import { castArray, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -47,6 +47,7 @@ const getGalleryDetailsMediaFrame = () => {
 					editing: this.options.editing,
 					menu: 'gallery',
 					displaySettings: false,
+					multiple: true,
 				} ),
 
 				new wp.media.controller.GalleryAdd(),
@@ -62,35 +63,54 @@ const slimImageObject = ( img ) => {
 	return pick( img, attrSet );
 };
 
+const getAttachmentsCollection = ( ids ) => {
+	return wp.media.query( {
+		order: 'ASC',
+		orderby: 'post__in',
+		perPage: -1,
+		post__in: ids,
+		query: true,
+		type: 'image',
+	} );
+};
+
 class MediaUpload extends Component {
-	constructor( { multiple = false, type, gallery = false, title = __( 'Select or Upload Media' ), modalClass } ) {
+	constructor( { multiple = false, type, gallery = false, title = __( 'Select or Upload Media' ), modalClass, value } ) {
 		super( ...arguments );
 		this.openModal = this.openModal.bind( this );
+		this.onOpen = this.onOpen.bind( this );
 		this.onSelect = this.onSelect.bind( this );
 		this.onUpdate = this.onUpdate.bind( this );
-		this.onOpen = this.onOpen.bind( this );
 		this.processMediaCaption = this.processMediaCaption.bind( this );
-		const frameConfig = {
-			title,
-			button: {
-				text: __( 'Select' ),
-			},
-			multiple,
-			selection: new wp.media.model.Selection( [] ),
-		};
-		if ( !! type ) {
-			frameConfig.library = { type };
-		}
 
 		if ( gallery ) {
+			const currentState = value ? 'gallery-edit' : 'gallery';
 			const GalleryDetailsMediaFrame = getGalleryDetailsMediaFrame();
+			const attachments = getAttachmentsCollection( value );
+			const selection = new wp.media.model.Selection( attachments.models, {
+				props: attachments.props.toJSON(),
+				multiple,
+			} );
 			this.frame = new GalleryDetailsMediaFrame( {
-				frame: 'select',
 				mimeType: type,
-				state: 'gallery',
+				state: currentState,
+				multiple,
+				selection,
+				editing: ( value ) ? true : false,
 			} );
 			wp.media.frame = this.frame;
 		} else {
+			const frameConfig = {
+				title,
+				button: {
+					text: __( 'Select' ),
+				},
+				multiple,
+			};
+			if ( !! type ) {
+				frameConfig.library = { type };
+			}
+
 			this.frame = wp.media( frameConfig );
 		}
 
@@ -136,22 +156,17 @@ class MediaUpload extends Component {
 	}
 
 	onOpen() {
-		const selection = this.frame.state().get( 'selection' );
-		const addMedia = ( id ) => {
-			const attachment = wp.media.attachment( id );
-			attachment.fetch();
-			selection.add( attachment );
-		};
-
 		if ( ! this.props.value ) {
 			return;
 		}
-
-		if ( this.props.multiple ) {
-			this.props.value.map( addMedia );
-		} else {
-			addMedia( this.props.value );
+		if ( ! this.props.gallery ) {
+			const selection = this.frame.state().get( 'selection' );
+			castArray( this.props.value ).map( ( id ) => {
+				selection.add( wp.media.attachment( id ) );
+			} );
 		}
+		// load the images so they are available in the media modal.
+		getAttachmentsCollection( castArray( this.props.value ) ).more();
 	}
 
 	openModal() {

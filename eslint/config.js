@@ -34,6 +34,8 @@ module.exports = {
 	},
 	rules: {
 		'array-bracket-spacing': [ 'error', 'always' ],
+		'arrow-parens': [ 'error', 'always' ],
+		'arrow-spacing': 'error',
 		'brace-style': [ 'error', '1tbs' ],
 		camelcase: [ 'error', { properties: 'never' } ],
 		'comma-dangle': [ 'error', 'always-multiline' ],
@@ -114,7 +116,6 @@ module.exports = {
 		'react/jsx-key': 'error',
 		'react/jsx-tag-spacing': 'error',
 		'react/no-children-prop': 'off',
-		'react/no-find-dom-node': 'warn',
 		'react/prop-types': 'off',
 		semi: 'error',
 		'semi-spacing': 'error',
@@ -159,4 +160,14 @@ module.exports = {
 		'valid-typeof': 'error',
 		yoda: 'off',
 	},
+	overrides: [
+		{
+			files: 'packages/**/*.js',
+			settings: {
+				react: {
+					pragma: 'createElement',
+				},
+			},
+		},
+	],
 };

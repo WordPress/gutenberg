@@ -6,7 +6,7 @@ import { debounce, uniqueId } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, getWrapperDisplayName } from '@wordpress/element';
+import { Component, createHigherOrderComponent } from '@wordpress/element';
 import { addAction, applyFilters, removeAction } from '@wordpress/hooks';
 
 const ANIMATION_FRAME_PERIOD = 16;
@@ -22,8 +22,8 @@ const ANIMATION_FRAME_PERIOD = 16;
  * @return {Function} Higher-order component factory.
  */
 export default function withFilters( hookName ) {
-	return ( OriginalComponent ) => {
-		class FilteredComponent extends Component {
+	return createHigherOrderComponent( ( OriginalComponent ) => {
+		return class FilteredComponent extends Component {
 			/** @inheritdoc */
 			constructor( props ) {
 				super( props );
@@ -62,9 +62,6 @@ export default function withFilters( hookName ) {
 			render() {
 				return <this.Component { ...this.props } />;
 			}
-		}
-		FilteredComponent.displayName = getWrapperDisplayName( OriginalComponent, 'filters' );
-
-		return FilteredComponent;
-	};
+		};
+	}, 'withFilters' );
 }

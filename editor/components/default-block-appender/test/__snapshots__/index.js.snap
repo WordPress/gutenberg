@@ -5,7 +5,7 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
   className="editor-default-block-appender"
   data-root-uid=""
 >
-  <Connect(WrappedComponent) />
+  <WithDispatch(WithSelect(BlockDropZone)) />
   <input
     aria-label="Add block"
     className="editor-default-block-appender__content"
@@ -35,10 +35,16 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
     type="text"
     value="Write your story"
   />
-  <WrappedComponent />
-  <Select(Dispatch(WrappedComponent))
+  <WithSelect(WithDispatch(InserterWithShortcuts)) />
+  <WithSelect(WithDispatch(Inserter))
     position="top right"
-  />
+  >
+    <WithSelect(WithDispatch(DotTip))
+      id="core/editor.inserter"
+    >
+      Welcome to the wonderful world of blocks! Click ‘Add block’ to insert different kinds of content—text, images, quotes, video, lists, and much more.
+    </WithSelect(WithDispatch(DotTip))>
+  </WithSelect(WithDispatch(Inserter))>
 </div>
 `;
 
@@ -47,7 +53,7 @@ exports[`DefaultBlockAppender should match snapshot 1`] = `
   className="editor-default-block-appender"
   data-root-uid=""
 >
-  <Connect(WrappedComponent) />
+  <WithDispatch(WithSelect(BlockDropZone)) />
   <input
     aria-label="Add block"
     className="editor-default-block-appender__content"
@@ -59,10 +65,16 @@ exports[`DefaultBlockAppender should match snapshot 1`] = `
     type="text"
     value="Write your story"
   />
-  <WrappedComponent />
-  <Select(Dispatch(WrappedComponent))
+  <WithSelect(WithDispatch(InserterWithShortcuts)) />
+  <WithSelect(WithDispatch(Inserter))
     position="top right"
-  />
+  >
+    <WithSelect(WithDispatch(DotTip))
+      id="core/editor.inserter"
+    >
+      Welcome to the wonderful world of blocks! Click ‘Add block’ to insert different kinds of content—text, images, quotes, video, lists, and much more.
+    </WithSelect(WithDispatch(DotTip))>
+  </WithSelect(WithDispatch(Inserter))>
 </div>
 `;
 
@@ -71,7 +83,7 @@ exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
   className="editor-default-block-appender"
   data-root-uid=""
 >
-  <Connect(WrappedComponent) />
+  <WithDispatch(WithSelect(BlockDropZone)) />
   <input
     aria-label="Add block"
     className="editor-default-block-appender__content"
@@ -83,9 +95,15 @@ exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
     type="text"
     value=""
   />
-  <WrappedComponent />
-  <Select(Dispatch(WrappedComponent))
+  <WithSelect(WithDispatch(InserterWithShortcuts)) />
+  <WithSelect(WithDispatch(Inserter))
     position="top right"
-  />
+  >
+    <WithSelect(WithDispatch(DotTip))
+      id="core/editor.inserter"
+    >
+      Welcome to the wonderful world of blocks! Click ‘Add block’ to insert different kinds of content—text, images, quotes, video, lists, and much more.
+    </WithSelect(WithDispatch(DotTip))>
+  </WithSelect(WithDispatch(Inserter))>
 </div>
 `;

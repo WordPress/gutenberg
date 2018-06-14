@@ -10,10 +10,8 @@ import { PageAttributesCheck } from '../check';
 
 describe( 'PageAttributesCheck', () => {
 	const postType = {
-		data: {
-			supports: {
-				'page-attributes': true,
-			},
+		supports: {
+			'page-attributes': true,
 		},
 	};
 

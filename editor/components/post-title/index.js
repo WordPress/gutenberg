@@ -3,6 +3,7 @@
  */
 import Textarea from 'react-autosize-textarea';
 import classnames from 'classnames';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,13 +12,14 @@ import { __ } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
 import { keycodes, decodeEntities } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { KeyboardShortcuts, withContext, withInstanceId, withFocusOutside } from '@wordpress/components';
+import { KeyboardShortcuts, withInstanceId, withFocusOutside } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import PostPermalink from '../post-permalink';
+import PostTypeSupportCheck from '../post-type-support-check';
 
 /**
  * Constants
@@ -86,44 +88,53 @@ class PostTitle extends Component {
 	}
 
 	render() {
-		const { title, placeholder, instanceId } = this.props;
+		const { title, placeholder, instanceId, isPostTypeViewable } = this.props;
 		const { isSelected } = this.state;
-		const className = classnames( 'editor-post-title', { 'is-selected': isSelected } );
+		const className = classnames( 'editor-post-title__block', { 'is-selected': isSelected } );
 		const decodedPlaceholder = decodeEntities( placeholder );
 
 		return (
-			<div className={ className }>
-				{ isSelected && <PostPermalink /> }
-				<KeyboardShortcuts
-					shortcuts={ {
-						'mod+z': this.redirectHistory,
-						'mod+shift+z': this.redirectHistory,
-					} }
-				>
-					<label htmlFor={ `post-title-${ instanceId }` } className="screen-reader-text">
-						{ decodedPlaceholder || __( 'Add title' ) }
-					</label>
-					<Textarea
-						id={ `post-title-${ instanceId }` }
-						className="editor-post-title__input"
-						value={ title }
-						onChange={ this.onChange }
-						placeholder={ decodedPlaceholder || __( 'Add title' ) }
-						onFocus={ this.onSelect }
-						onKeyDown={ this.onKeyDown }
-						onKeyPress={ this.onUnselect }
-					/>
-				</KeyboardShortcuts>
-			</div>
+			<PostTypeSupportCheck supportKeys="title">
+				<div className="editor-post-title">
+					<div className={ className }>
+						<KeyboardShortcuts
+							shortcuts={ {
+								'mod+z': this.redirectHistory,
+								'mod+shift+z': this.redirectHistory,
+							} }
+						>
+							<label htmlFor={ `post-title-${ instanceId }` } className="screen-reader-text">
+								{ decodedPlaceholder || __( 'Add title' ) }
+							</label>
+							<Textarea
+								id={ `post-title-${ instanceId }` }
+								className="editor-post-title__input"
+								value={ title }
+								onChange={ this.onChange }
+								placeholder={ decodedPlaceholder || __( 'Add title' ) }
+								onFocus={ this.onSelect }
+								onKeyDown={ this.onKeyDown }
+								onKeyPress={ this.onUnselect }
+							/>
+						</KeyboardShortcuts>
+						{ isSelected && isPostTypeViewable && <PostPermalink /> }
+					</div>
+				</div>
+			</PostTypeSupportCheck>
 		);
 	}
 }
 
 const applyWithSelect = withSelect( ( select ) => {
-	const { getEditedPostAttribute } = select( 'core/editor' );
+	const { getEditedPostAttribute, getEditorSettings } = select( 'core/editor' );
+	const { getPostType } = select( 'core' );
+	const postType = getPostType( getEditedPostAttribute( 'type' ) );
+	const { titlePlaceholder } = getEditorSettings();
 
 	return {
 		title: getEditedPostAttribute( 'title' ),
+		isPostTypeViewable: get( postType, [ 'viewable' ], false ),
+		placeholder: titlePlaceholder,
 	};
 } );
 
@@ -149,16 +160,9 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 	};
 } );
 
-const applyEditorSettings = withContext( 'editor' )(
-	( settings ) => ( {
-		placeholder: settings.titlePlaceholder,
-	} )
-);
-
 export default compose(
 	applyWithSelect,
 	applyWithDispatch,
-	applyEditorSettings,
 	withInstanceId,
 	withFocusOutside
 )( PostTitle );

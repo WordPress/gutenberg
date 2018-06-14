@@ -1,12 +1,7 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { connect } from 'react-redux';
-
-/**
- * Internal dependencies
- */
-import { isEditedPostNew, getCurrentPostId } from '../../store/selectors';
+import { withSelect } from '@wordpress/data';
 
 function PostTrashCheck( { isNew, postId, children } ) {
 	if ( isNew || ! postId ) {
@@ -16,11 +11,10 @@ function PostTrashCheck( { isNew, postId, children } ) {
 	return children;
 }
 
-export default connect(
-	( state ) => {
-		return {
-			isNew: isEditedPostNew( state ),
-			postId: getCurrentPostId( state ),
-		};
-	},
-)( PostTrashCheck );
+export default withSelect( ( select ) => {
+	const { isEditedPostNew, getCurrentPostId } = select( 'core/editor' );
+	return {
+		isNew: isEditedPostNew(),
+		postId: getCurrentPostId(),
+	};
+} )( PostTrashCheck );

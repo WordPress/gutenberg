@@ -6,6 +6,10 @@
 	.is-sidebar-opened & {
 		display: block;
 	}
+
+	.edit-post-meta-boxes-panel__toggle .components-panel__header {
+		position: inherit;
+	}
 }
 
 .edit-post-meta-boxes-panel__body {

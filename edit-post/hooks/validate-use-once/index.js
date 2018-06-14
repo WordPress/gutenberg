@@ -10,7 +10,7 @@ import { createBlock, getBlockType, findTransform, getBlockTransforms } from '@w
 import { Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { Warning } from '@wordpress/editor';
-import { compose, getWrapperDisplayName } from '@wordpress/element';
+import { compose, createHigherOrderComponent } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 
@@ -49,8 +49,8 @@ const enhance = compose(
 	} ) ),
 );
 
-function withUseOnceValidation( BlockEdit ) {
-	const WrappedBlockEdit = ( {
+const withUseOnceValidation = createHigherOrderComponent( ( BlockEdit ) => {
+	return enhance( ( {
 		originalBlockUid,
 		selectFirst,
 		...props
@@ -93,12 +93,8 @@ function withUseOnceValidation( BlockEdit ) {
 				{ __( 'This block may not be used more than once.' ) }
 			</Warning>,
 		];
-	};
-
-	WrappedBlockEdit.displayName = getWrapperDisplayName( BlockEdit, 'useOnceValidation' );
-
-	return enhance( WrappedBlockEdit );
-}
+	} );
+}, 'withUseOnceValidation' );
 
 /**
  * Given a base block name, returns the default block type to which to offer

@@ -70,6 +70,21 @@ An icon property should be specified to make it easier to identify a block. Thes
 icon: 'book-alt',
 ```
 
+An object can also be passed as icon, in this case, icon, as specified above, should be included in the src property.
+Besides src the object can contain background and foreground colors, this colors will appear with the icon
+when they are applicable e.g.: in the inserter.
+
+```js
+
+icon: {
+	// Specifying a background color to appear with the icon e.g.: in the inserter.
+	background: '#7e70af',
+	// Specifying a dashicon for the block
+	src: 'book-alt',
+} ,
+```
+
+
 #### Keywords (optional)
 
 Sometimes a block could have aliases that help users discover it while searching. For example, an `image` block could also want to be discovered by `photo`. You can do so by providing an array of terms (which can be translated). It is only allowed to add as much as three terms per block.
@@ -105,7 +120,7 @@ attributes: {
 },
 ```
 
-* **See: [Attributes](https://wordpress.org/gutenberg/handbook/block-api/attributes/).**
+* **See: [Attributes](../docs/block-api/attributes.md).**
 
 #### Transforms (optional)
 
@@ -264,6 +279,19 @@ A once-only block can be inserted into each post, one time only. For example, th
 useOnce: true,
 ```
 
+#### parent (optional)
+
+* **Type:** `Array`
+
+Blocks are able to be inserted into blocks that use [`InnerBlocks`](https://github.com/WordPress/gutenberg/blob/master/editor/components/inner-blocks/README.md) as nested content. Sometimes it is useful to restrict a block so that it is only available as a nested block. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
+
+Setting `parent` lets a block require that it is only available when nested within the specified blocks.
+
+```js
+// Only allow this block when it is nested in a Columns block
+parent: [ 'core/columns' ],
+```
+
 #### supports (optional)
 
 * **Type:** `Object`
@@ -280,14 +308,14 @@ anchor: true,
 - `customClassName` (default `true`): This property adds a field to define a custom className for the block's wrapper.
 
 ```js
-// Remove the support for a the custom className .
+// Remove the support for the custom className.
 customClassName: false,
 ```
 
 - `className` (default `true`): By default, Gutenberg adds a class with the form `.wp-block-your-block-name` to the root element of your saved markup. This helps having a consistent mechanism for styling blocks that themes and plugins can rely on. If for whatever reason a class is not desired on the markup, this functionality can be disabled.
 
 ```js
-// Remove the support for a the generated className .
+// Remove the support for the generated className.
 className: false,
 ```
 
@@ -298,6 +326,13 @@ className: false,
 html: false,
 ```
 
+- `inserter` (default `true`): By default, all blocks will appear in the Gutenberg inserter. To hide a block so that it can only be inserted programatically, set `inserter` to `false`.
+
+```js
+// Hide this block from the inserter.
+inserter: false,
+```
+
 ## Edit and Save
 
-The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](https://wordpress.org/gutenberg/handbook/block-edit-save/).
+The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](../docs/block-api/block-edit-save.md).

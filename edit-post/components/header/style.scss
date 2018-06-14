@@ -27,8 +27,7 @@
 		top: $admin-bar-height;
 	}
 
-	.editor-post-switch-to-draft + .editor-post-preview,
-	.editor-post-switch-to-draft + .editor-post-preview + .editor-post-publish-button {
+	.editor-post-switch-to-draft + .editor-post-preview {
 		display: none;
 
 		@include break-small {

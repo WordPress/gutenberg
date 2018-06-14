@@ -65,6 +65,31 @@ describe( 'withFilters', () => {
 		expect( wrapper.html() ).toBe( '<div><div>My component</div><div>Composed component</div></div>' );
 	} );
 
+	it( 'should not re-render component when new filter added before component was mounted', () => {
+		const spy = jest.fn();
+		const SpiedComponent = () => {
+			spy();
+			return <div>Spied component</div>;
+		};
+		addFilter(
+			hookName,
+			'test/enhanced-component-spy-1',
+			( FilteredComponent ) => () => (
+				<blockquote>
+					<FilteredComponent />
+				</blockquote>
+			),
+		);
+		const EnhancedComponent = withFilters( hookName )( SpiedComponent );
+
+		wrapper = mount( <EnhancedComponent /> );
+
+		jest.runAllTimers();
+
+		expect( spy ).toHaveBeenCalledTimes( 1 );
+		expect( wrapper.html() ).toBe( '<blockquote><div>Spied component</div></blockquote>' );
+	} );
+
 	it( 'should re-render component once when new filter added after component was mounted', () => {
 		const spy = jest.fn();
 		const SpiedComponent = () => {
@@ -79,7 +104,7 @@ describe( 'withFilters', () => {
 		addFilter(
 			hookName,
 			'test/enhanced-component-spy-1',
-			FilteredComponent => () => (
+			( FilteredComponent ) => () => (
 				<blockquote>
 					<FilteredComponent />
 				</blockquote>
@@ -105,7 +130,7 @@ describe( 'withFilters', () => {
 		addFilter(
 			hookName,
 			'test/enhanced-component-spy-1',
-			FilteredComponent => () => (
+			( FilteredComponent ) => () => (
 				<blockquote>
 					<FilteredComponent />
 				</blockquote>
@@ -114,7 +139,7 @@ describe( 'withFilters', () => {
 		addFilter(
 			hookName,
 			'test/enhanced-component-spy-2',
-			FilteredComponent => () => (
+			( FilteredComponent ) => () => (
 				<section>
 					<FilteredComponent />
 				</section>
@@ -139,7 +164,7 @@ describe( 'withFilters', () => {
 		addFilter(
 			hookName,
 			'test/enhanced-component-spy',
-			FilteredComponent => () => (
+			( FilteredComponent ) => () => (
 				<div>
 					<FilteredComponent />
 				</div>
@@ -176,7 +201,7 @@ describe( 'withFilters', () => {
 		addFilter(
 			hookName,
 			'test/enhanced-component-spy-1',
-			FilteredComponent => () => (
+			( FilteredComponent ) => () => (
 				<blockquote>
 					<FilteredComponent />
 				</blockquote>

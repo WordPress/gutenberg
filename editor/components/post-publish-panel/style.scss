@@ -29,7 +29,7 @@
 	flex-grow: 1;
 }
 
-.wp-core-ui .editor-post-publish-panel__toggle.button-primary {
+.components-button.editor-post-publish-panel__toggle.is-primary {
 	display: inline-flex;
 	align-items: center;
 
@@ -58,7 +58,7 @@
 		border: none;
 
 		.components-panel__body-toggle {
-			font-weight: normal;
+			font-weight: 400;
 		}
 	}
 
@@ -72,7 +72,7 @@
 	border-top: none;
 }
 
-.wp-core-ui .post-publish-panel__postpublish-buttons {
+.post-publish-panel__postpublish-buttons {
 	display: flex;
 	align-content: space-between;
 
@@ -96,9 +96,7 @@
 
 .post-publish-panel__postpublish-link-input[readonly] {
 	width: 100%;
-	border: 1px solid $light-gray-500;
 	padding: 10px;
-	border-radius: $button-style__radius-roundrect;
 	margin: 15px 0;
 	background: $white;
 	overflow: hidden;

@@ -1,6 +1,6 @@
 <?php
 /**
- * Reusable Blocks REST API: WP_REST_Blocks_Controller class
+ * Shared blocks REST API: WP_REST_Blocks_Controller class
  *
  * @package gutenberg
  * @since 0.10.0
@@ -8,8 +8,8 @@
 
 /**
  * Controller which provides a REST endpoint for Gutenberg to read, create,
- * edit and delete reusable blocks. Blocks are stored as posts with the
- * wp_block post type.
+ * edit and delete shared blocks. Blocks are stored as posts with the wp_block
+ * post type.
  *
  * @since 0.10.0
  *

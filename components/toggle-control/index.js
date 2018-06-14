@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isFunction } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -28,16 +33,17 @@ class ToggleControl extends Component {
 		const { label, checked, help, instanceId } = this.props;
 		const id = `inspector-toggle-control-${ instanceId }`;
 
-		let describedBy;
+		let describedBy, helpLabel;
 		if ( help ) {
 			describedBy = id + '__help';
+			helpLabel = isFunction( help ) ? help( checked ) : help;
 		}
 
 		return (
 			<BaseControl
 				label={ label }
 				id={ id }
-				help={ help }
+				help={ helpLabel }
 				className="components-toggle-control"
 			>
 				<FormToggle

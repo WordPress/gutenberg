@@ -11,12 +11,12 @@ export {
 	getBlockAttributes,
 	parseWithAttributeSchema,
 } from './parser';
-export { default as rawHandler } from './raw-handling';
+export { default as rawHandler, getPhrasingContentSchema } from './raw-handling';
 export {
 	default as serialize,
 	getBlockContent,
-	getBlockDefaultClassname,
 	getBlockDefaultClassName,
+	getBlockMenuDefaultClassName,
 	getSaveElement,
 } from './serializer';
 export { isValidBlock } from './validation';
@@ -33,7 +33,9 @@ export {
 	getBlockTypes,
 	getBlockSupport,
 	hasBlockSupport,
-	isReusableBlock,
+	isSharedBlock,
+	getChildBlockNames,
+	hasChildBlocks,
 } from './registration';
 export {
 	isUnmodifiedDefaultBlock,

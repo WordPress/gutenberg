@@ -10,7 +10,12 @@ set -e
 # Load NVM
 if [ -n "$NVM_DIR" ]; then
 	# The --no-use option ensures loading NVM doesn't switch the current version.
-	. "$NVM_DIR/nvm.sh" --no-use
+	if [ -f "$NVM_DIR/nvm.sh" ]; then
+		. "$NVM_DIR/nvm.sh" --no-use
+	elif command_exists "brew" && [ -f "$(brew --prefix nvm)/nvm.sh" ]; then
+		# use homebrew if that's how nvm was installed
+		. "$(brew --prefix nvm)/nvm.sh" --no-use
+	fi
 fi
 
 # Change to the expected directory
@@ -67,6 +72,9 @@ fi
 # Install/update packages
 echo -e $(status_message "Installing and updating NPM packages..." )
 npm install
+
+# Make sure npm is up-to-date
+npm install npm -g
 
 # There was a bug in NPM that caused changes in package-lock.json. Handle that.
 if [ "$TRAVIS" != "true" ] && ! git diff --exit-code package-lock.json >/dev/null; then

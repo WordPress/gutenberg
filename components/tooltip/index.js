@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { debounce, includes, upperFirst, toLower } from 'lodash';
+import { debounce, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -150,7 +150,7 @@ class Tooltip extends Component {
 	}
 
 	render() {
-		const { children, position, text } = this.props;
+		const { children, position, text, shortcut } = this.props;
 		if ( Children.count( children ) !== 1 ) {
 			if ( 'development' === process.env.NODE_ENV ) {
 				// eslint-disable-next-line no-console
@@ -178,7 +178,8 @@ class Tooltip extends Component {
 						className="components-tooltip"
 						aria-hidden="true"
 					>
-						{ upperFirst( toLower( text ) ) }
+						{ text }
+						{ shortcut && <span className="components-tooltip__shortcut">{ shortcut }</span> }
 					</Popover>
 				),
 			),

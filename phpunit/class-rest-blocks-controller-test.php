@@ -59,7 +59,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * Check that our routes get set up properly.
 	 */
 	public function test_register_routes() {
-		$routes = $this->server->get_routes();
+		$routes = rest_get_server()->get_routes();
 
 		$this->assertArrayHasKey( '/wp/v2/blocks', $routes );
 		$this->assertCount( 2, $routes['/wp/v2/blocks'] );
@@ -74,7 +74,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		wp_set_current_user( self::$user_id );
 
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/blocks' );
-		$response = $this->server->dispatch( $request );
+		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertEquals(
@@ -95,7 +95,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		wp_set_current_user( self::$user_id );
 
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/blocks/' . self::$post_id );
-		$response = $this->server->dispatch( $request );
+		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertEquals(
@@ -121,16 +121,19 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			)
 		);
 
-		$response = $this->server->dispatch( $request );
+		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertEquals( 200, $response->get_status() );
-		$this->assertEquals(
-			array(
-				'id'      => self::$post_id,
-				'title'   => 'New cool block',
-				'content' => '<!-- wp:core/paragraph --><p>Wow!</p><!-- /wp:core/paragraph -->',
-			), $response->get_data()
-		);
+
+		$data = $response->get_data();
+
+		$this->assertArrayHasKey( 'id', $data );
+		$this->assertArrayHasKey( 'title', $data );
+		$this->assertArrayHasKey( 'content', $data );
+
+		$this->assertEquals( self::$post_id, $data['id'] );
+		$this->assertEquals( 'New cool block', $data['title'] );
+		$this->assertEquals( '<!-- wp:core/paragraph --><p>Wow!</p><!-- /wp:core/paragraph -->', $data['content'] );
 	}
 
 	/**
@@ -147,16 +150,19 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			)
 		);
 
-		$response = $this->server->dispatch( $request );
+		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertEquals( 200, $response->get_status() );
-		$this->assertEquals(
-			array(
-				'id'      => self::$post_id,
-				'title'   => 'Updated cool block',
-				'content' => '<!-- wp:core/paragraph --><p>Nice!</p><!-- /wp:core/paragraph -->',
-			), $response->get_data()
-		);
+
+		$data = $response->get_data();
+
+		$this->assertArrayHasKey( 'id', $data );
+		$this->assertArrayHasKey( 'title', $data );
+		$this->assertArrayHasKey( 'content', $data );
+
+		$this->assertEquals( self::$post_id, $data['id'] );
+		$this->assertEquals( 'Updated cool block', $data['title'] );
+		$this->assertEquals( '<!-- wp:core/paragraph --><p>Nice!</p><!-- /wp:core/paragraph -->', $data['content'] );
 	}
 
 	/**
@@ -167,19 +173,24 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 		$request = new WP_REST_Request( 'DELETE', '/wp/v2/blocks/' . self::$post_id );
 
-		$response = $this->server->dispatch( $request );
+		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertEquals( 200, $response->get_status() );
-		$this->assertEquals(
-			array(
-				'deleted'  => true,
-				'previous' => array(
-					'id'      => self::$post_id,
-					'title'   => 'My cool block',
-					'content' => '<!-- wp:core/paragraph --><p>Hello!</p><!-- /wp:core/paragraph -->',
-				),
-			), $response->get_data()
-		);
+
+		$data = $response->get_data();
+
+		$this->assertArrayHasKey( 'deleted', $data );
+		$this->assertArrayHasKey( 'previous', $data );
+
+		$this->assertTrue( $data['deleted'] );
+
+		$this->assertArrayHasKey( 'id', $data['previous'] );
+		$this->assertArrayHasKey( 'title', $data['previous'] );
+		$this->assertArrayHasKey( 'content', $data['previous'] );
+
+		$this->assertEquals( self::$post_id, $data['previous']['id'] );
+		$this->assertEquals( 'My cool block', $data['previous']['title'] );
+		$this->assertEquals( '<!-- wp:core/paragraph --><p>Hello!</p><!-- /wp:core/paragraph -->', $data['previous']['content'] );
 	}
 
 	/**
@@ -187,7 +198,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 */
 	public function test_get_item_schema() {
 		$request    = new WP_REST_Request( 'OPTIONS', '/wp/v2/blocks' );
-		$response   = $this->server->dispatch( $request );
+		$response   = rest_get_server()->dispatch( $request );
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
 
@@ -225,7 +236,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 	/**
 	 * Exhaustively check that each role either can or cannot create, edit,
-	 * update, and delete reusable blocks.
+	 * update, and delete shared blocks.
 	 *
 	 * @dataProvider data_capabilities
 	 */
@@ -247,7 +258,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 					)
 				);
 
-				$response = $this->server->dispatch( $request );
+				$response = rest_get_server()->dispatch( $request );
 				$this->assertEquals( $expected_status, $response->get_status() );
 
 				break;
@@ -255,7 +266,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			case 'read':
 				$request = new WP_REST_Request( 'GET', '/wp/v2/blocks/' . self::$post_id );
 
-				$response = $this->server->dispatch( $request );
+				$response = rest_get_server()->dispatch( $request );
 				$this->assertEquals( $expected_status, $response->get_status() );
 
 				break;
@@ -279,12 +290,12 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 					)
 				);
 
-				$response = $this->server->dispatch( $request );
+				$response = rest_get_server()->dispatch( $request );
 				$this->assertEquals( $expected_status, $response->get_status() );
 
 				$request = new WP_REST_Request( 'DELETE', '/wp/v2/blocks/' . $post_id );
 
-				$response = $this->server->dispatch( $request );
+				$response = rest_get_server()->dispatch( $request );
 				$this->assertEquals( $expected_status, $response->get_status() );
 
 				wp_delete_post( $post_id );
@@ -300,12 +311,12 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 					)
 				);
 
-				$response = $this->server->dispatch( $request );
+				$response = rest_get_server()->dispatch( $request );
 				$this->assertEquals( $expected_status, $response->get_status() );
 
 				$request = new WP_REST_Request( 'DELETE', '/wp/v2/blocks/' . self::$post_id );
 
-				$response = $this->server->dispatch( $request );
+				$response = rest_get_server()->dispatch( $request );
 				$this->assertEquals( $expected_status, $response->get_status() );
 
 				break;

@@ -3,7 +3,7 @@
  */
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import { getScrollContainer } from '@wordpress/utils';
+import { getScrollContainer } from '@wordpress/dom';
 
 /**
  * Internal dependencies

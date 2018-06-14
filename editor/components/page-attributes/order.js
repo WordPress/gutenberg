@@ -1,21 +1,15 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { withInstanceId } from '@wordpress/components';
 import { compose, Fragment } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import PostTypeSupportCheck from '../post-type-support-check';
-import { editPost } from '../../store/actions';
-import { getEditedPostAttribute } from '../../store/selectors';
 
 export function PageAttributesOrder( { onUpdateOrder, instanceId, order } ) {
 	const setUpdatedOrder = ( event ) => {
@@ -51,22 +45,18 @@ function PageAttributesOrderWithChecks( props ) {
 	);
 }
 
-const applyConnect = connect(
-	( state ) => {
+export default compose( [
+	withSelect( ( select ) => {
 		return {
-			order: getEditedPostAttribute( state, 'menu_order' ),
+			order: select( 'core/editor' ).getEditedPostAttribute( 'menu_order' ),
 		};
-	},
-	{
+	} ),
+	withDispatch( ( dispatch ) => ( {
 		onUpdateOrder( order ) {
-			return editPost( {
+			dispatch( 'core/editor' ).editPost( {
 				menu_order: order,
 			} );
 		},
-	}
-);
-
-export default compose( [
-	applyConnect,
+	} ) ),
 	withInstanceId,
 ] )( PageAttributesOrderWithChecks );

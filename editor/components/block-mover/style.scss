@@ -1,50 +1,81 @@
+.editor-block-mover {
+	opacity: 0;
+
+	&.is-visible {
+		@include fade_in;
+	}
+}
+
 // Mover icon buttons
 .editor-block-mover__control {
-	display: block;
-	padding: 2px;
-	margin: 0 6px 0 4px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	border: none;
 	outline: none;
 	background: none;
-	color: $dark-gray-300;
 	cursor: pointer;
-	border-radius: 50%;
-	width: $icon-button-size-small;
+	padding: 0;
+	width: $block-side-ui-width;
+	height: $block-side-ui-width;	// the side UI can be no taller than 2 * $block-side-ui-width, which matches the height of a line of text
+	border-radius: $button-style__radius-roundrect;
+
+	// use opacity to work in various editor styles
+	color: $dark-opacity-300;
+
+	.is-dark-theme & {
+		color: $light-opacity-300;
+	}
 
 	&[aria-disabled="true"] {
 		cursor: default;
-		color: $light-gray-300;
 		pointer-events: none;
+		color: $dark-opacity-light-300; // use opacity to work in various editor styles
+
+		.is-dark-theme & {
+			color: $light-opacity-light-300;
+		}
 	}
 
-	// apply styles to SVG for movers on the desktop breakpoint
-	@include break-small {
-		// unstyle inherited icon button styles
-		&:not(:disabled):hover,
-		&:not(:disabled):active,
-		&:not(:disabled):focus {
-			box-shadow: none;
-			color: inherit;
-		}
+	svg {
+		width: $block-side-ui-width;
+		height: $block-side-ui-width;
+		padding: ( $block-side-ui-width - 18px ) / 2;	// this makes the SVG fill the whole available area, without scaling the artwork
+	}
 
-		svg {
-			display: block;
-			position: relative; // Fixing the Safari bug for `<button>`s overflow
-			border-radius: 50%;
-			margin: auto;
-
-		}
-
-		&:not(:disabled):hover svg {
+	// Apply a background in nested contexts, only on desktop
+	@include break-small() {
+		.editor-block-list__layout .editor-block-list__layout & {
+			background: $white;
 			box-shadow: inset 0 0 0 1px $light-gray-500;
-		}
 
-		&:not(:disabled):active svg {
-			@include button-style__active;
-		}
-
-		&:not(:disabled):focus svg {
-			@include button-style__focus-active;
+			&:first-child {
+				margin-bottom: -1px;
+			}
+		
+			&:hover,
+			&:active,
+			&:focus {
+				// Buttons are stacked with overlapping border to look like a unit, so elevate on interactions.
+				z-index: z-index( '.editor-block-mover__control' );
+			}
 		}
 	}
+
+	// Hover, active and focus styles
+	&:not( :disabled ):not( [aria-disabled="true"] ):hover {
+		@include button-style__hover;
+	}
+
+	&:not( :disabled ):not( [aria-disabled="true"] ):active {
+		@include button-style__active;
+	}
+
+	&:not( :disabled ):not( [aria-disabled="true"] ):focus {
+		@include button-style__focus-active;
+	}
+}
+
+.editor-block-mover__description {
+	display: none;
 }

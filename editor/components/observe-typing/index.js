@@ -8,7 +8,8 @@ import { includes } from 'lodash';
  */
 import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { isTextField, keycodes } from '@wordpress/utils';
+import { isTextField } from '@wordpress/dom';
+import { keycodes } from '@wordpress/utils';
 import { withSafeTimeout } from '@wordpress/components';
 
 const { UP, RIGHT, DOWN, LEFT, ENTER, BACKSPACE } = keycodes;
@@ -120,7 +121,8 @@ class ObserveTyping extends Component {
 
 		// Abort early if already typing, or key press is incurred outside a
 		// text field (e.g. arrow-ing through toolbar buttons).
-		if ( isTyping || ! isTextField( target ) ) {
+		// Ignore typing in a block toolbar
+		if ( isTyping || ! isTextField( target ) || target.closest( '.editor-block-toolbar' ) ) {
 			return;
 		}
 

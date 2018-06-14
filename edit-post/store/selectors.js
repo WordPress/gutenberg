@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { includes, some } from 'lodash';
+import { get, includes, some } from 'lodash';
 
 /**
  * Returns the current editing mode.
@@ -109,6 +109,21 @@ export function isFeatureActive( state, feature ) {
 }
 
 /**
+ * Returns true if the the plugin item is pinned to the header.
+ * When the value is not set it defaults to true.
+ *
+ * @param  {Object}  state      Global application state.
+ * @param  {string}  pluginName Plugin item name.
+ *
+ * @return {boolean} Whether the plugin item is pinned.
+ */
+export function isPluginItemPinned( state, pluginName ) {
+	const pinnedPluginItems = getPreference( state, 'pinnedPluginItems', {} );
+
+	return get( pinnedPluginItems, [ pluginName ], true );
+}
+
+/**
  * Returns the state of legacy meta boxes.
  *
  * @param   {Object} state Global application state.
@@ -142,7 +157,9 @@ export const hasMetaBoxes = createSelector(
 			return metaBox.isActive;
 		} );
 	},
-	( state ) => state.metaBoxes,
+	( state ) => [
+		state.metaBoxes,
+	],
 );
 
 /**

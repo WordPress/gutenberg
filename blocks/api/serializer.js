@@ -3,14 +3,13 @@
  */
 import { isEmpty, reduce, isObject, castArray, startsWith } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
-import isShallowEqual from 'shallowequal';
 
 /**
  * WordPress dependencies
  */
 import { Component, cloneElement, renderToString } from '@wordpress/element';
 import { hasFilter, applyFilters } from '@wordpress/hooks';
-import { deprecated } from '@wordpress/utils';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -34,23 +33,22 @@ export function getBlockDefaultClassName( blockName ) {
 }
 
 /**
- * Returns the block's default classname from its name.
+ * Returns the block's default menu item classname from its name.
  *
  * @param {string} blockName The block name.
  *
- * @return {string} The block's default class.
+ * @return {string} The block's default menu item class.
  */
-export function getBlockDefaultClassname( blockName ) {
-	deprecated( 'getBlockDefaultClassname', {
-		version: '2.6',
-		alternative: 'wp.blocks.getBlockDefaultClassName',
-		plugin: 'Gutenberg',
-	} );
-	return getBlockDefaultClassName( blockName );
+export function getBlockMenuDefaultClassName( blockName ) {
+	// Generated HTML classes for blocks follow the `editor-block-list-item-{name}` nomenclature.
+	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (used in 'core-embed/').
+	const className = 'editor-block-list-item-' + blockName.replace( /\//, '-' ).replace( /^core-/, '' );
+
+	return applyFilters( 'blocks.getBlockMenuDefaultClassName', className, blockName );
 }
 
 /**
- * Given a block type containg a save render implementation and attributes, returns the
+ * Given a block type containing a save render implementation and attributes, returns the
  * enhanced element to be saved or string when raw HTML expected.
  *
  * @param {Object} blockType   Block type.
@@ -109,7 +107,7 @@ export function getSaveElement( blockType, attributes, innerBlocks = [] ) {
 }
 
 /**
- * Given a block type containg a save render implementation and attributes, returns the
+ * Given a block type containing a save render implementation and attributes, returns the
  * static markup to be saved.
  *
  * @param {Object} blockType   Block type.
@@ -185,6 +183,7 @@ export function serializeAttributes( attrs ) {
 export function getBeautifulContent( content ) {
 	return beautifyHtml( content, {
 		indent_inner_html: true,
+		indent_with_tabs: true,
 		wrap_line_length: 0,
 	} );
 }

@@ -21,11 +21,11 @@
 		outline: none;
 	}
 
-	&:not( :disabled ):hover {
+	&:not( :disabled ):not( [aria-disabled="true"] ):not( .is-default ):hover {
 		@include button-style__hover;
 	}
 
-	&:not( :disabled ):active {
+	&:not( :disabled ):not( [aria-disabled="true"] ):active {
 		@include button-style__active;
 	}
 

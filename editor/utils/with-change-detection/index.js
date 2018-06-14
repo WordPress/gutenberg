@@ -16,11 +16,7 @@ import { includes } from 'lodash';
  */
 const withChangeDetection = ( options = {} ) => ( reducer ) => {
 	return ( state, action ) => {
-		const nextState = reducer( state, action );
-
-		if ( includes( options.ignoreTypes, action.type ) ) {
-			return nextState;
-		}
+		let nextState = reducer( state, action );
 
 		// Reset at:
 		//  - Initial state
@@ -30,17 +26,26 @@ const withChangeDetection = ( options = {} ) => ( reducer ) => {
 			includes( options.resetTypes, action.type )
 		);
 
-		if ( isReset ) {
-			return {
-				...nextState,
-				isDirty: false,
-			};
-		}
-
 		const isChanging = state !== nextState;
 
-		if ( isChanging ) {
-			nextState.isDirty = true;
+		// If not intending to update dirty flag, return early and avoid clone.
+		if ( ! isChanging && ! isReset ) {
+			return state;
+		}
+
+		// Avoid mutating state, unless it's already changing by original
+		// reducer and not initial.
+		if ( ! isChanging || state === undefined ) {
+			nextState = { ...nextState };
+		}
+
+		const isIgnored = includes( options.ignoreTypes, action.type );
+
+		if ( isIgnored ) {
+			// Preserve the original value if ignored.
+			nextState.isDirty = state.isDirty;
+		} else {
+			nextState.isDirty = ! isReset && isChanging;
 		}
 
 		return nextState;

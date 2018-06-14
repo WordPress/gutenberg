@@ -18,16 +18,17 @@ export function BlockInspectorButton( {
 	onClick = noop,
 	small = false,
 	speak,
+	role,
 } ) {
 	const speakMessage = () => {
 		if ( areAdvancedSettingsOpened ) {
-			speak( __( 'Additional settings are now available in the Editor advanced settings sidebar' ) );
+			speak( __( 'Block settings closed' ) );
 		} else {
-			speak( __( 'Advanced settings closed' ) );
+			speak( __( 'Additional settings are now available in the Editor block settings sidebar' ) );
 		}
 	};
 
-	const label = areAdvancedSettingsOpened ? __( 'Hide Advanced Settings' ) : __( 'Show Advanced Settings' );
+	const label = areAdvancedSettingsOpened ? __( 'Hide Block Settings' ) : __( 'Show Block Settings' );
 
 	return (
 		<IconButton
@@ -35,6 +36,7 @@ export function BlockInspectorButton( {
 			onClick={ flow( areAdvancedSettingsOpened ? closeSidebar : openEditorSidebar, speakMessage, onClick ) }
 			icon="admin-generic"
 			label={ small ? label : undefined }
+			role={ role }
 		>
 			{ ! small && label }
 		</IconButton>

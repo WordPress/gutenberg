@@ -47,8 +47,8 @@ div.components-toolbar {
 
 	// unset icon button styles
 	&:active,
-	&:hover,
-	&:focus {
+	&:not( [aria-disabled="true"] ):hover,
+	&:not( [aria-disabled="true"] ):focus {
 		outline: none;
 		box-shadow: none;
 		background: none;
@@ -68,14 +68,14 @@ div.components-toolbar {
 
 	// subscript for numbered icon buttons, like headings
 	&[data-subscript] svg {
-		padding: 4px 8px 4px 0px;
+		padding: 4px 8px 4px 0;
 	}
 
 	&[data-subscript]:after {
 		content: attr( data-subscript );
 		font-family: $default-font;
 		font-size: $default-font-size;
-		font-weight: bold;
+		font-weight: 600;
 		position: absolute;
 		right: 8px;
 		bottom: 8px;

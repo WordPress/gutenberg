@@ -4,7 +4,7 @@
 
 	.components-dropdown-menu__toggle {
 		width: auto;
-		margin: 0px;
+		margin: 0;
 		padding: 4px;
 		border: 1px solid transparent;
 		border-radius: 0;
@@ -47,7 +47,7 @@
 .components-dropdown-menu__menu {
 	// note that left is set by react in a style attribute
 	width: 100%;
-	padding: 3px 3px 0 3px;
+	padding: 3px 3px 0;
 	font-family: $default-font;
 	font-size: $default-font-size;
 	line-height: $default-line-height;

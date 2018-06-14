@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -13,11 +8,11 @@ import {
 	createBlock,
 	rawHandler,
 } from '@wordpress/blocks';
+import { withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { replaceBlock } from '../../store/actions';
 import Warning from '../warning';
 
 function InvalidBlockWarning( { convertToHTML, convertToBlocks } ) {
@@ -41,19 +36,19 @@ function InvalidBlockWarning( { convertToHTML, convertToBlocks } ) {
 	);
 }
 
-export default connect(
-	null,
-	( dispatch, { block } ) => ( {
+export default withDispatch( ( dispatch, { block } ) => {
+	const { replaceBlock } = dispatch( 'core/editor' );
+	return {
 		convertToHTML() {
-			dispatch( replaceBlock( block.uid, createBlock( 'core/html', {
+			replaceBlock( block.uid, createBlock( 'core/html', {
 				content: block.originalContent,
-			} ) ) );
+			} ) );
 		},
 		convertToBlocks() {
-			dispatch( replaceBlock( block.uid, rawHandler( {
+			replaceBlock( block.uid, rawHandler( {
 				HTML: block.originalContent,
 				mode: 'BLOCKS',
-			} ) ) );
+			} ) );
 		},
-	} )
-)( InvalidBlockWarning );
+	};
+} )( InvalidBlockWarning );

@@ -24,45 +24,60 @@ import { PREFERENCES_DEFAULTS } from './defaults';
  *
  * @return {string} Updated state.
  */
-export function preferences( state = PREFERENCES_DEFAULTS, action ) {
-	switch ( action.type ) {
-		case 'OPEN_GENERAL_SIDEBAR':
-			return {
-				...state,
-				activeGeneralSidebar: action.name,
-			};
-		case 'CLOSE_GENERAL_SIDEBAR':
-			return {
-				...state,
-				activeGeneralSidebar: null,
-			};
-		case 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL':
-			return {
-				...state,
-				panels: {
-					...state.panels,
-					[ action.panel ]: ! get( state, [ 'panels', action.panel ], false ),
-				},
-			};
-		case 'SWITCH_MODE':
-			return {
-				...state,
-				editorMode: action.mode,
-			};
-		case 'TOGGLE_FEATURE':
-			return {
-				...state,
-				features: {
-					...state.features,
-					[ action.feature ]: ! state.features[ action.feature ],
-				},
-			};
-		case 'SERIALIZE':
-			return state;
-	}
+export const preferences = combineReducers( {
+	activeGeneralSidebar( state = PREFERENCES_DEFAULTS.activeGeneralSidebar, action ) {
+		switch ( action.type ) {
+			case 'OPEN_GENERAL_SIDEBAR':
+				return action.name;
 
-	return state;
-}
+			case 'CLOSE_GENERAL_SIDEBAR':
+				return null;
+			case 'SERIALIZE': {
+				if ( state === 'edit-post/block' ) {
+					return PREFERENCES_DEFAULTS.activeGeneralSidebar;
+				}
+			}
+		}
+
+		return state;
+	},
+	panels( state = PREFERENCES_DEFAULTS.panels, action ) {
+		if ( action.type === 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL' ) {
+			return {
+				...state,
+				[ action.panel ]: ! state[ action.panel ],
+			};
+		}
+
+		return state;
+	},
+	features( state = PREFERENCES_DEFAULTS.features, action ) {
+		if ( action.type === 'TOGGLE_FEATURE' ) {
+			return {
+				...state,
+				[ action.feature ]: ! state[ action.feature ],
+			};
+		}
+
+		return state;
+	},
+	editorMode( state = PREFERENCES_DEFAULTS.editorMode, action ) {
+		if ( action.type === 'SWITCH_MODE' ) {
+			return action.mode;
+		}
+
+		return state;
+	},
+	pinnedPluginItems( state = PREFERENCES_DEFAULTS.pinnedPluginItems, action ) {
+		if ( action.type === 'TOGGLE_PINNED_PLUGIN_ITEM' ) {
+			return {
+				...state,
+				[ action.pluginName ]: ! get( state, [ action.pluginName ], true ),
+			};
+		}
+		return state;
+	},
+} );
 
 export function panel( state = 'document', action ) {
 	switch ( action.type ) {

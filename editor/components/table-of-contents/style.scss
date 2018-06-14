@@ -5,6 +5,12 @@
 .table-of-contents__popover {
 	.components-popover__content {
 		padding: 16px;
+
+		@include break-small {
+			max-height: calc(100vh - 120px);
+			overflow-y: auto;
+			box-shadow: inset 0 -5px 5px -4px rgba( $dark-gray-900, .1 );
+		}
 	}
 
 	hr {
@@ -21,7 +27,7 @@
 	width: 25%;
 	display: flex;
 	flex-direction: column;
-	font-size: 12px;
+	font-size: $default-font-size;
 	color: $dark-gray-300;
 }
 

@@ -3,43 +3,51 @@
  */
 import {
 	filter,
+	find,
 	findIndex,
 	flow,
 	groupBy,
-	includes,
-	pick,
+	isEmpty,
+	map,
 	some,
 	sortBy,
-	isEmpty,
+	without,
+	includes,
 } from 'lodash';
-import { connect } from 'react-redux';
+import scrollIntoView from 'dom-scroll-into-view';
 
 /**
  * WordPress dependencies
  */
-import { __, _n, sprintf } from '@wordpress/i18n';
-import { Component, compose } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { Component, compose, findDOMNode, createRef } from '@wordpress/element';
 import {
-	TabPanel,
-	TabbableContainer,
 	withInstanceId,
 	withSpokenMessages,
-	withContext,
+	PanelBody,
+	withSafeTimeout,
 } from '@wordpress/components';
-import { getCategories, isReusableBlock } from '@wordpress/blocks';
-import { keycodes } from '@wordpress/utils';
+import { getCategories, isSharedBlock } from '@wordpress/blocks';
+import { withDispatch, withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import NoBlocks from './no-blocks';
-
-import { getInserterItems, getFrecentInserterItems } from '../../store/selectors';
-import { fetchReusableBlocks } from '../../store/actions';
-import { default as InserterGroup } from './group';
 import BlockPreview from '../block-preview';
+import ItemList from './item-list';
+import ChildBlocks from './child-blocks';
 
+const MAX_SUGGESTED_ITEMS = 9;
+
+/**
+ * Filters an item list given a search term.
+ *
+ * @param {Array} items        Item list
+ * @param {string} searchTerm  Search term.
+ *
+ * @return {Array}             Filtered item list.
+ */
 export const searchItems = ( items, searchTerm ) => {
 	const normalizedSearchTerm = searchTerm.toLowerCase().trim();
 	const matchSearch = ( string ) => string.toLowerCase().indexOf( normalizedSearchTerm ) !== -1;
@@ -49,226 +57,129 @@ export const searchItems = ( items, searchTerm ) => {
 	);
 };
 
-/**
- * Module constants
- */
-const ARROWS = pick( keycodes, [ 'UP', 'DOWN', 'LEFT', 'RIGHT' ] );
-
 export class InserterMenu extends Component {
 	constructor() {
 		super( ...arguments );
-		this.nodes = {};
 		this.state = {
+			childItems: [],
 			filterValue: '',
-			tab: 'frequent',
-			selectedItem: null,
+			hoveredItem: null,
+			suggestedItems: [],
+			sharedItems: [],
+			itemsPerCategory: {},
+			openPanels: [ 'suggested' ],
 		};
-		this.filter = this.filter.bind( this );
-		this.searchItems = this.searchItems.bind( this );
-		this.getItemsForTab = this.getItemsForTab.bind( this );
-		this.sortItems = this.sortItems.bind( this );
-		this.selectItem = this.selectItem.bind( this );
-
-		this.tabScrollTop = { frequent: 0, blocks: 0, embeds: 0 };
-		this.switchTab = this.switchTab.bind( this );
-		this.previewItem = this.previewItem.bind( this );
+		this.onChangeSearchInput = this.onChangeSearchInput.bind( this );
+		this.onHover = this.onHover.bind( this );
+		this.panels = {};
+		this.inserterResults = createRef();
 	}
 
 	componentDidMount() {
-		this.props.fetchReusableBlocks();
+		// This could be replaced by a resolver.
+		this.props.fetchSharedBlocks();
+		this.filter();
 	}
 
-	componentDidUpdate( prevProps, prevState ) {
-		const searchResults = this.searchItems( this.props.items );
-		// Announce the search results to screen readers.
-		if ( this.state.filterValue && !! searchResults.length ) {
-			this.props.debouncedSpeak( sprintf( _n(
-				'%d result found',
-				'%d results found',
-				searchResults.length
-			), searchResults.length ), 'assertive' );
-		} else if ( this.state.filterValue ) {
-			this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
-		}
-
-		if ( this.state.tab !== prevState.tab ) {
-			this.tabContainer.scrollTop = this.tabScrollTop[ this.state.tab ];
+	componentDidUpdate( prevProps ) {
+		if ( prevProps.items !== this.props.items ) {
+			this.filter( this.state.filterValue );
 		}
 	}
 
-	filter( event ) {
+	onChangeSearchInput( event ) {
+		this.filter( event.target.value );
+	}
+
+	onHover( item ) {
 		this.setState( {
-			filterValue: event.target.value,
+			hoveredItem: item,
 		} );
 	}
 
-	previewItem( item ) {
-		this.setState( { selectedItem: item } );
+	bindPanel( name ) {
+		return ( ref ) => {
+			this.panels[ name ] = ref;
+		};
 	}
 
-	selectItem( item ) {
-		this.props.onSelect( item );
-		this.setState( {
-			filterValue: '',
-		} );
+	onTogglePanel( panel ) {
+		return () => {
+			const isOpened = this.state.openPanels.indexOf( panel ) !== -1;
+			if ( isOpened ) {
+				this.setState( {
+					openPanels: without( this.state.openPanels, panel ),
+				} );
+			} else {
+				this.setState( {
+					openPanels: [
+						...this.state.openPanels,
+						panel,
+					],
+				} );
+
+				this.props.setTimeout( () => {
+					// We need a generic way to access the panel's container
+					// eslint-disable-next-line react/no-find-dom-node
+					scrollIntoView( findDOMNode( this.panels[ panel ] ), this.inserterResults.current, {
+						alignWithTop: true,
+					} );
+				} );
+			}
+		};
 	}
 
-	searchItems( items ) {
-		return searchItems( items, this.state.filterValue );
-	}
+	filter( filterValue = '' ) {
+		const { items, rootChildBlocks } = this.props;
+		const filteredItems = searchItems( items, filterValue );
 
-	getItemsForTab( tab ) {
-		const { items, frecentItems } = this.props;
+		const childItems = filter( filteredItems, ( { name } ) => includes( rootChildBlocks, name ) );
 
-		// If we're searching, use everything, otherwise just get the items visible in this tab
-		if ( this.state.filterValue ) {
-			return items;
+		let suggestedItems = [];
+		if ( ! filterValue ) {
+			const maxSuggestedItems = this.props.maxSuggestedItems || MAX_SUGGESTED_ITEMS;
+			suggestedItems = filter( items, ( item ) => item.utility > 0 ).slice( 0, maxSuggestedItems );
 		}
 
-		let predicate;
-		switch ( tab ) {
-			case 'frequent':
-				return frecentItems;
-
-			case 'blocks':
-				predicate = ( item ) => item.category !== 'embed' && item.category !== 'shared';
-				break;
-
-			case 'embeds':
-				predicate = ( item ) => item.category === 'embed';
-				break;
-
-			case 'shared':
-				predicate = ( item ) => item.category === 'shared';
-				break;
-		}
-
-		return filter( items, predicate );
-	}
-
-	sortItems( items ) {
-		if ( 'frequent' === this.state.tab && ! this.state.filterValue ) {
-			return items;
-		}
+		const sharedItems = filter( filteredItems, { category: 'shared' } );
 
 		const getCategoryIndex = ( item ) => {
 			return findIndex( getCategories(), ( category ) => category.slug === item.category );
 		};
+		const itemsPerCategory = flow(
+			( itemList ) => filter( itemList, ( item ) => item.category !== 'shared' ),
+			( itemList ) => sortBy( itemList, getCategoryIndex ),
+			( itemList ) => groupBy( itemList, 'category' )
+		)( filteredItems );
 
-		return sortBy( items, getCategoryIndex );
-	}
-
-	groupByCategory( items ) {
-		return groupBy( items, ( item ) => item.category );
-	}
-
-	getVisibleItemsByCategory( items ) {
-		return flow(
-			this.searchItems,
-			this.sortItems,
-			this.groupByCategory
-		)( items );
-	}
-
-	renderItems( items, separatorSlug ) {
-		const { instanceId } = this.props;
-		const labelledBy = separatorSlug === undefined ? null : `editor-inserter__separator-${ separatorSlug }-${ instanceId }`;
-		return (
-			<InserterGroup
-				items={ items }
-				labelledBy={ labelledBy }
-				onSelectItem={ this.selectItem }
-				onHover={ this.previewItem }
-			/>
-		);
-	}
-
-	renderCategory( category, items ) {
-		const { instanceId } = this.props;
-		return items && (
-			<div key={ category.slug }>
-				<div
-					className="editor-inserter__separator"
-					id={ `editor-inserter__separator-${ category.slug }-${ instanceId }` }
-					aria-hidden="true"
-				>
-					{ category.title }
-				</div>
-				{ this.renderItems( items, category.slug ) }
-			</div>
-		);
-	}
-
-	renderCategories( visibleItemsByCategory ) {
-		if ( isEmpty( visibleItemsByCategory ) ) {
-			return (
-				<NoBlocks />
-			);
+		let openPanels = this.state.openPanels;
+		if ( filterValue !== this.state.filterValue ) {
+			if ( ! filterValue ) {
+				openPanels = [ 'suggested' ];
+			} else if ( sharedItems.length ) {
+				openPanels = [ 'shared' ];
+			} else if ( filteredItems.length ) {
+				const firstCategory = find( getCategories(), ( { slug } ) => itemsPerCategory[ slug ] && itemsPerCategory[ slug ].length );
+				openPanels = [ firstCategory.slug ];
+			}
 		}
 
-		return getCategories().map(
-			( category ) => this.renderCategory( category, visibleItemsByCategory[ category.slug ] )
-		);
-	}
-
-	switchTab( tab ) {
-		// store the scrollTop of the tab switched from
-		this.tabScrollTop[ this.state.tab ] = this.tabContainer.scrollTop;
-		this.setState( { tab } );
-	}
-
-	renderTabView( tab ) {
-		const itemsForTab = this.getItemsForTab( tab );
-
-		// If the Frequent tab is selected, don't render category headers
-		if ( 'frequent' === tab ) {
-			return this.renderItems( itemsForTab );
-		}
-
-		// If the Shared tab is selected and we have no results, display a friendly message
-		if ( 'shared' === tab && itemsForTab.length === 0 ) {
-			return (
-				<NoBlocks>
-					{ __( 'No shared blocks.' ) }
-				</NoBlocks>
-			);
-		}
-
-		const visibleItemsByCategory = this.getVisibleItemsByCategory( itemsForTab );
-
-		// If our results have only items from one category, don't render category headers
-		const categories = Object.keys( visibleItemsByCategory );
-		if ( categories.length === 1 ) {
-			const [ soleCategory ] = categories;
-			return this.renderItems( visibleItemsByCategory[ soleCategory ] );
-		}
-
-		return this.renderCategories( visibleItemsByCategory );
-	}
-
-	// Passed to TabbableContainer, extending its event-handling logic
-	eventToOffset( event ) {
-		// If a tab (Frequent, Blocks, …) is focused, pressing the down arrow
-		// moves focus to the selected panel below.
-		if (
-			event.keyCode === keycodes.DOWN &&
-			document.activeElement.getAttribute( 'role' ) === 'tab'
-		) {
-			return 1; // Move focus forward
-		}
-
-		// Prevent cases of focus being unexpectedly stolen up in the tree.
-		if ( includes( ARROWS, event.keyCode ) ) {
-			return 0; // Don't move focus, but prevent event propagation
-		}
-
-		// Implicit `undefined` return: let the event propagate
+		this.setState( {
+			hoveredItem: null,
+			childItems,
+			filterValue,
+			suggestedItems,
+			sharedItems,
+			itemsPerCategory,
+			openPanels,
+		} );
 	}
 
 	render() {
-		const { instanceId, items } = this.props;
-		const { selectedItem } = this.state;
-		const isSearching = this.state.filterValue;
+		const { instanceId, onSelect, rootUID } = this.props;
+		const { childItems, filterValue, hoveredItem, suggestedItems, sharedItems, itemsPerCategory, openPanels } = this.state;
+		const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
+		const isSearching = !! filterValue;
 
 		// Disable reason: The inserter menu is a modal display, not one which
 		// is always visible, and one which already incurs this behavior of
@@ -276,11 +187,7 @@ export class InserterMenu extends Component {
 
 		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
-			<TabbableContainer
-				className="editor-inserter__menu"
-				deep
-				eventToOffset={ this.eventToOffset }
-			>
+			<div className="editor-inserter__menu">
 				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
 					{ __( 'Search for a block' ) }
 				</label>
@@ -289,73 +196,87 @@ export class InserterMenu extends Component {
 					type="search"
 					placeholder={ __( 'Search for a block' ) }
 					className="editor-inserter__search"
-					onChange={ this.filter }
 					autoFocus
+					onChange={ this.onChangeSearchInput }
 				/>
-				{ ! isSearching &&
-					<TabPanel className="editor-inserter__tabs" activeClass="is-active"
-						onSelect={ this.switchTab }
-						tabs={ [
-							{
-								name: 'frequent',
-								title: __( 'Frequent' ),
-								className: 'editor-inserter__tab',
-							},
-							{
-								name: 'blocks',
-								title: __( 'Blocks' ),
-								className: 'editor-inserter__tab',
-							},
-							{
-								name: 'embeds',
-								title: __( 'Embeds' ),
-								className: 'editor-inserter__tab',
-							},
-							{
-								name: 'shared',
-								title: __( 'Shared' ),
-								className: 'editor-inserter__tab',
-							},
-						] }
-					>
-						{ ( tabKey ) => (
-							<div ref={ ( ref ) => this.tabContainer = ref }>
-								{ this.renderTabView( tabKey ) }
-							</div>
-						) }
-					</TabPanel>
+
+				<div className="editor-inserter__results" ref={ this.inserterResults }>
+					<ChildBlocks
+						rootUID={ rootUID }
+						items={ childItems }
+						onSelect={ onSelect }
+						onHover={ this.onHover }
+					/>
+
+					{ !! suggestedItems.length &&
+						<PanelBody
+							title={ __( 'Most Used' ) }
+							opened={ isPanelOpen( 'suggested' ) }
+							onToggle={ this.onTogglePanel( 'suggested' ) }
+							ref={ this.bindPanel( 'suggested' ) }
+						>
+							<ItemList items={ suggestedItems } onSelect={ onSelect } onHover={ this.onHover } />
+						</PanelBody>
+					}
+					{ map( getCategories(), ( category ) => {
+						const categoryItems = itemsPerCategory[ category.slug ];
+						if ( ! categoryItems || ! categoryItems.length ) {
+							return null;
+						}
+						return (
+							<PanelBody
+								key={ category.slug }
+								title={ category.title }
+								opened={ isSearching || isPanelOpen( category.slug ) }
+								onToggle={ this.onTogglePanel( category.slug ) }
+								ref={ this.bindPanel( category.slug ) }
+							>
+								<ItemList items={ categoryItems } onSelect={ onSelect } onHover={ this.onHover } />
+							</PanelBody>
+						);
+					} ) }
+					{ !! sharedItems.length && (
+						<PanelBody
+							title={ __( 'Shared' ) }
+							opened={ isPanelOpen( 'shared' ) }
+							onToggle={ this.onTogglePanel( 'shared' ) }
+							icon="controls-repeat"
+							ref={ this.bindPanel( 'shared' ) }
+						>
+							<ItemList items={ sharedItems } onSelect={ onSelect } onHover={ this.onHover } />
+						</PanelBody>
+					) }
+					{ isEmpty( suggestedItems ) && isEmpty( sharedItems ) && isEmpty( itemsPerCategory ) && (
+						<p className="editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
+					) }
+				</div>
+
+				{ hoveredItem && isSharedBlock( hoveredItem ) &&
+					<BlockPreview name={ hoveredItem.name } attributes={ hoveredItem.initialAttributes } />
 				}
-				{ isSearching &&
-					<div role="menu" className="editor-inserter__search-results">
-						{ this.renderCategories( this.getVisibleItemsByCategory( items ) ) }
-					</div>
-				}
-				{ selectedItem && isReusableBlock( selectedItem ) &&
-					<BlockPreview name={ selectedItem.name } attributes={ selectedItem.initialAttributes } />
-				}
-			</TabbableContainer>
+			</div>
 		);
 		/* eslint-enable jsx-a11y/no-autofocus */
 	}
 }
 
 export default compose(
-	withContext( 'editor' )( ( settings ) => {
-		const { blockTypes } = settings;
-
+	withSelect( ( select, { rootUID } ) => {
+		const {
+			getChildBlockNames,
+		} = select( 'core/blocks' );
+		const {
+			getBlockName,
+		} = select( 'core/editor' );
+		const rootBlockName = getBlockName( rootUID );
 		return {
-			enabledBlockTypes: blockTypes,
+			rootChildBlocks: getChildBlockNames( rootBlockName ),
 		};
 	} ),
-	connect(
-		( state, ownProps ) => {
-			return {
-				items: getInserterItems( state, ownProps.enabledBlockTypes ),
-				frecentItems: getFrecentInserterItems( state, ownProps.enabledBlockTypes ),
-			};
-		},
-		{ fetchReusableBlocks }
-	),
+	withDispatch( ( dispatch ) => ( {
+		fetchSharedBlocks: dispatch( 'core/editor' ).fetchSharedBlocks,
+	} ) ),
 	withSpokenMessages,
-	withInstanceId
+	withInstanceId,
+	withSafeTimeout
 )( InserterMenu );

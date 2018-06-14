@@ -55,8 +55,8 @@
 	background: $light-gray-500;
 	color: $dark-gray-800;
 	border-radius: 3px;
-	font-size: 12px;
-	padding: 2px 6px;
+	font-size: $default-font-size;
+	padding: 1px 6px;
 	margin-right: 4px;
 
 	.is-invalid & {

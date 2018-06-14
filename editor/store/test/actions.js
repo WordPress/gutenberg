@@ -5,11 +5,11 @@ import {
 	replaceBlocks,
 	startTyping,
 	stopTyping,
-	fetchReusableBlocks,
-	saveReusableBlock,
-	deleteReusableBlock,
+	fetchSharedBlocks,
+	saveSharedBlock,
+	deleteSharedBlock,
 	convertBlockToStatic,
-	convertBlockToReusable,
+	convertBlockToShared,
 	toggleSelection,
 	setupEditor,
 	resetPost,
@@ -30,7 +30,6 @@ import {
 	savePost,
 	trashPost,
 	mergeBlocks,
-	autosave,
 	redo,
 	undo,
 	removeBlocks,
@@ -42,18 +41,19 @@ import {
 	createErrorNotice,
 	createWarningNotice,
 	removeNotice,
+	updateBlockListSettings,
 } from '../actions';
 
 describe( 'actions', () => {
 	describe( 'setupEditor', () => {
 		it( 'should return the SETUP_EDITOR action', () => {
 			const post = {};
-			const settings = {};
-			const result = setupEditor( post, settings );
+			const autosave = {};
+			const result = setupEditor( post, autosave );
 			expect( result ).toEqual( {
 				type: 'SETUP_EDITOR',
 				post,
-				settings,
+				autosave,
 			} );
 		} );
 	} );
@@ -271,14 +271,6 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'autosave', () => {
-		it( 'should return AUTOSAVE action', () => {
-			expect( autosave() ).toEqual( {
-				type: 'AUTOSAVE',
-			} );
-		} );
-	} );
-
 	describe( 'redo', () => {
 		it( 'should return REDO action', () => {
 			expect( redo() ).toEqual( {
@@ -460,51 +452,56 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'fetchReusableBlocks', () => {
-		it( 'should return the FETCH_REUSABLE_BLOCKS action', () => {
-			expect( fetchReusableBlocks() ).toEqual( {
-				type: 'FETCH_REUSABLE_BLOCKS',
+	describe( 'fetchSharedBlocks', () => {
+		it( 'should return the FETCH_SHARED_BLOCKS action', () => {
+			expect( fetchSharedBlocks() ).toEqual( {
+				type: 'FETCH_SHARED_BLOCKS',
 			} );
 		} );
 
 		it( 'should take an optional id argument', () => {
-			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-			expect( fetchReusableBlocks( id ) ).toEqual( {
-				type: 'FETCH_REUSABLE_BLOCKS',
-				id,
+			expect( fetchSharedBlocks( 123 ) ).toEqual( {
+				type: 'FETCH_SHARED_BLOCKS',
+				id: 123,
 			} );
 		} );
 	} );
 
-	describe( 'saveReusableBlock', () => {
-		const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-		expect( saveReusableBlock( id ) ).toEqual( {
-			type: 'SAVE_REUSABLE_BLOCK',
-			id,
+	describe( 'saveSharedBlock', () => {
+		it( 'should return the SAVE_SHARED_BLOCK action', () => {
+			expect( saveSharedBlock( 123 ) ).toEqual( {
+				type: 'SAVE_SHARED_BLOCK',
+				id: 123,
+			} );
 		} );
 	} );
 
-	describe( 'deleteReusableBlock', () => {
-		const id = 123;
-		expect( deleteReusableBlock( id ) ).toEqual( {
-			type: 'DELETE_REUSABLE_BLOCK',
-			id,
+	describe( 'deleteSharedBlock', () => {
+		it( 'should return the DELETE_SHARED_BLOCK action', () => {
+			expect( deleteSharedBlock( 123 ) ).toEqual( {
+				type: 'DELETE_SHARED_BLOCK',
+				id: 123,
+			} );
 		} );
 	} );
 
 	describe( 'convertBlockToStatic', () => {
-		const uid = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-		expect( convertBlockToStatic( uid ) ).toEqual( {
-			type: 'CONVERT_BLOCK_TO_STATIC',
-			uid,
+		it( 'should return the CONVERT_BLOCK_TO_STATIC action', () => {
+			const uid = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			expect( convertBlockToStatic( uid ) ).toEqual( {
+				type: 'CONVERT_BLOCK_TO_STATIC',
+				uid,
+			} );
 		} );
 	} );
 
-	describe( 'convertBlockToReusable', () => {
-		const uid = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-		expect( convertBlockToReusable( uid ) ).toEqual( {
-			type: 'CONVERT_BLOCK_TO_REUSABLE',
-			uid,
+	describe( 'convertBlockToShared', () => {
+		it( 'should return the CONVERT_BLOCK_TO_SHARED action', () => {
+			const uid = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			expect( convertBlockToShared( uid ) ).toEqual( {
+				type: 'CONVERT_BLOCK_TO_SHARED',
+				uid,
+			} );
 		} );
 	} );
 
@@ -527,6 +524,24 @@ describe( 'actions', () => {
 			expect( toggleSelection( false ) ).toEqual( {
 				type: 'TOGGLE_SELECTION',
 				isSelectionEnabled: false,
+			} );
+		} );
+	} );
+
+	describe( 'updateBlockListSettings', () => {
+		it( 'should return the UPDATE_BLOCK_LIST_SETTINGS with undefined settings', () => {
+			expect( updateBlockListSettings( 'chicken' ) ).toEqual( {
+				type: 'UPDATE_BLOCK_LIST_SETTINGS',
+				id: 'chicken',
+				settings: undefined,
+			} );
+		} );
+
+		it( 'should return the UPDATE_BLOCK_LIST_SETTINGS action with the passed settings', () => {
+			expect( updateBlockListSettings( 'chicken', { chicken: 'ribs' } ) ).toEqual( {
+				type: 'UPDATE_BLOCK_LIST_SETTINGS',
+				id: 'chicken',
+				settings: { chicken: 'ribs' },
 			} );
 		} );
 	} );

@@ -4,6 +4,7 @@
 import {
 	registerPlugin,
 	unregisterPlugin,
+	getPlugin,
 	getPlugins,
 } from '../';
 
@@ -15,8 +16,19 @@ describe( 'registerPlugin', () => {
 	} );
 
 	it( 'successfully registers a plugin', () => {
-		registerPlugin( 'plugin', {
-			render: () => 'plugin content',
+		const name = 'plugin';
+		const icon = 'smiley';
+		const Component = () => 'plugin content';
+
+		registerPlugin( name, {
+			render: Component,
+			icon,
+		} );
+
+		expect( getPlugin( name ) ).toEqual( {
+			name,
+			render: Component,
+			icon,
 		} );
 	} );
 
@@ -51,7 +63,6 @@ describe( 'registerPlugin', () => {
 		registerPlugin( 'plugin', {
 			render: () => 'plugin content',
 		} );
-		console.log( console ); // eslint-disable-line
 		expect( console ).toHaveErroredWith( 'Plugin "plugin" is already registered.' );
 	} );
 } );

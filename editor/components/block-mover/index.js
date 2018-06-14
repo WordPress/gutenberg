@@ -1,123 +1,129 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
-import { first } from 'lodash';
+import { first, partial, castArray } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, withContext } from '@wordpress/components';
+import { IconButton, withInstanceId } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
-import { compose } from '@wordpress/element';
+import { compose, Component } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { getBlockMoverLabel } from './mover-label';
-import { getBlockIndex, getBlock } from '../../store/selectors';
+import { getBlockMoverDescription } from './mover-description';
+import { upArrow, downArrow } from './arrows';
 
-/**
- * Module constants
- */
-const upArrow = (
-	<svg tabIndex="-1" width="18" height="18" xmlns="http://www.w3.org/2000/svg" aria-hidden role="img" focusable="false">
-		<path d="M12.293 12.207L9 8.914l-3.293 3.293-1.414-1.414L9 6.086l4.707 4.707z" />
-	</svg>
-);
-
-const downArrow = (
-	<svg tabIndex="-1" width="18" height="18" xmlns="http://www.w3.org/2000/svg" aria-hidden role="img" focusable="false">
-		<path d="M12.293 6.086L9 9.379 5.707 6.086 4.293 7.5 9 12.207 13.707 7.5z" />
-	</svg>
-);
-
-export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex, isLocked } ) {
-	if ( isLocked ) {
-		return null;
+export class BlockMover extends Component {
+	constructor() {
+		super( ...arguments );
+		this.state = {
+			isFocused: false,
+		};
+		this.onFocus = this.onFocus.bind( this );
+		this.onBlur = this.onBlur.bind( this );
 	}
 
-	// We emulate a disabled state because forcefully applying the `disabled`
-	// attribute on the button while it has focus causes the screen to change
-	// to an unfocused state (body as active element) without firing blur on,
-	// the rendering parent, leaving it unable to react to focus out.
-	return (
-		<div className="editor-block-mover">
-			<IconButton
-				className="editor-block-mover__control"
-				onClick={ isFirst ? null : onMoveUp }
-				icon={ upArrow }
-				tooltip={ __( 'Move Up' ) }
-				label={ getBlockMoverLabel(
-					uids.length,
-					blockType && blockType.title,
-					firstIndex,
-					isFirst,
-					isLast,
-					-1,
-				) }
-				aria-disabled={ isFirst }
-			/>
-			<IconButton
-				className="editor-block-mover__control"
-				onClick={ isLast ? null : onMoveDown }
-				icon={ downArrow }
-				tooltip={ __( 'Move Down' ) }
-				label={ getBlockMoverLabel(
-					uids.length,
-					blockType && blockType.title,
-					firstIndex,
-					isFirst,
-					isLast,
-					1,
-				) }
-				aria-disabled={ isLast }
-			/>
-		</div>
-	);
-}
+	onFocus() {
+		this.setState( {
+			isFocused: true,
+		} );
+	}
 
-/**
- * Action creator creator which, given the action type to dispatch and the
- * arguments of mapDispatchToProps, creates a prop dispatcher callback for
- * managing block movement.
- *
- * @param {string}   type     Action type to dispatch.
- * @param {Function} dispatch Store dispatch.
- * @param {Object}   ownProps The wrapped component's own props.
- *
- * @return {Function} Prop dispatcher callback.
- */
-function createOnMove( type, dispatch, ownProps ) {
-	return () => {
-		const { uids, rootUID } = ownProps;
-		dispatch( { type, uids, rootUID } );
-	};
+	onBlur() {
+		this.setState( {
+			isFocused: false,
+		} );
+	}
+
+	render() {
+		const { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex, isLocked, instanceId, isHidden } = this.props;
+		const { isFocused } = this.state;
+		const blocksCount = castArray( uids ).length;
+		if ( isLocked ) {
+			return null;
+		}
+
+		// We emulate a disabled state because forcefully applying the `disabled`
+		// attribute on the button while it has focus causes the screen to change
+		// to an unfocused state (body as active element) without firing blur on,
+		// the rendering parent, leaving it unable to react to focus out.
+		return (
+			<div className={ classnames( 'editor-block-mover', { 'is-visible': isFocused || ! isHidden } ) }>
+				<IconButton
+					className="editor-block-mover__control"
+					onClick={ isFirst ? null : onMoveUp }
+					icon={ upArrow }
+					label={ __( 'Move up' ) }
+					aria-describedby={ `editor-block-mover__up-description-${ instanceId }` }
+					aria-disabled={ isFirst }
+					onFocus={ this.onFocus }
+					onBlur={ this.onBlur }
+				/>
+				<IconButton
+					className="editor-block-mover__control"
+					onClick={ isLast ? null : onMoveDown }
+					icon={ downArrow }
+					label={ __( 'Move down' ) }
+					aria-describedby={ `editor-block-mover__down-description-${ instanceId }` }
+					aria-disabled={ isLast }
+					onFocus={ this.onFocus }
+					onBlur={ this.onBlur }
+				/>
+				<span id={ `editor-block-mover__up-description-${ instanceId }` } className="editor-block-mover__description">
+					{
+						getBlockMoverDescription(
+							blocksCount,
+							blockType && blockType.title,
+							firstIndex,
+							isFirst,
+							isLast,
+							-1,
+						)
+					}
+				</span>
+				<span id={ `editor-block-mover__down-description-${ instanceId }` } className="editor-block-mover__description">
+					{
+						getBlockMoverDescription(
+							blocksCount,
+							blockType && blockType.title,
+							firstIndex,
+							isFirst,
+							isLast,
+							1,
+						)
+					}
+				</span>
+			</div>
+		);
+	}
 }
 
 export default compose(
-	connect(
-		( state, ownProps ) => {
-			const { uids, rootUID } = ownProps;
-			const block = getBlock( state, first( uids ) );
-
-			return ( {
-				firstIndex: getBlockIndex( state, first( uids ), rootUID ),
-				blockType: block ? getBlockType( block.name ) : null,
-			} );
-		},
-		( ...args ) => ( {
-			onMoveDown: createOnMove( 'MOVE_BLOCKS_DOWN', ...args ),
-			onMoveUp: createOnMove( 'MOVE_BLOCKS_UP', ...args ),
-		} )
-	),
-	withContext( 'editor' )( ( settings ) => {
-		const { templateLock } = settings;
+	withSelect( ( select, { uids, rootUID } ) => {
+		const { getBlock, getBlockIndex, getEditorSettings } = select( 'core/editor' );
+		const firstUID = first( castArray( uids ) );
+		const block = getBlock( firstUID );
+		const { templateLock } = getEditorSettings();
 
 		return {
+			firstIndex: getBlockIndex( firstUID, rootUID ),
+			blockType: block ? getBlockType( block.name ) : null,
 			isLocked: templateLock === 'all',
 		};
 	} ),
+	withDispatch( ( dispatch, { uids, rootUID } ) => {
+		const { moveBlocksDown, moveBlocksUp } = dispatch( 'core/editor' );
+		return {
+			onMoveDown: partial( moveBlocksDown, uids, rootUID ),
+			onMoveUp: partial( moveBlocksUp, uids, rootUID ),
+		};
+	} ),
+	withInstanceId,
 )( BlockMover );

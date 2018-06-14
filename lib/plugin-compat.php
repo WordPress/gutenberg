@@ -17,7 +17,7 @@
 /**
  * WPCOM markdown support causes issues when saving a Gutenberg post by
  * stripping out the <p> tags. This adds a filter prior to saving the post via
- * REST API to disable markdown support. Fixes markdown support provided by
+ * REST API to disable markdown support. Disables markdown support provided by
  * plugins Jetpack, JP-Markdown, and WP Editor.MD
  *
  * @since 1.3.0

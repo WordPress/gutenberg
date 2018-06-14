@@ -58,6 +58,13 @@ If this property is true, a button to reset the the slider is rendered.
 - Type: `Boolean`
 - Required: No
 
+### initialPosition
+
+In no value exists this prop contains the slider starting position.
+
+- Type: `Number`
+- Required: No
+
 ### value
 
 The current value of the range slider.

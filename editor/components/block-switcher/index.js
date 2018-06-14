@@ -1,23 +1,18 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dropdown, Dashicon, IconButton, Toolbar, NavigableMenu, withContext } from '@wordpress/components';
-import { getBlockType, getPossibleBlockTransformations, switchToBlockType, BlockIcon } from '@wordpress/blocks';
+import { Dropdown, Dashicon, IconButton, Toolbar, NavigableMenu } from '@wordpress/components';
+import { getBlockType, getPossibleBlockTransformations, switchToBlockType } from '@wordpress/blocks';
 import { compose } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { replaceBlocks } from '../../store/actions';
-import { getBlock } from '../../store/selectors';
+import BlockIcon from '../block-icon';
 
 /**
  * Module Constants
@@ -52,7 +47,7 @@ export function BlockSwitcher( { blocks, onTransform, isLocked } ) {
 					<Toolbar>
 						<IconButton
 							className="editor-block-switcher__toggle"
-							icon={ <BlockIcon icon={ blockType.icon } /> }
+							icon={ <BlockIcon icon={ blockType.icon && blockType.icon.src } /> }
 							onClick={ onToggle }
 							aria-haspopup="true"
 							aria-expanded={ isOpen }
@@ -86,7 +81,7 @@ export function BlockSwitcher( { blocks, onTransform, isLocked } ) {
 								className="editor-block-switcher__menu-item"
 								icon={ (
 									<span className="editor-block-switcher__block-icon">
-										<BlockIcon icon={ icon } />
+										<BlockIcon icon={ icon && icon.src } />
 									</span>
 								) }
 								role="menuitem"
@@ -102,26 +97,20 @@ export function BlockSwitcher( { blocks, onTransform, isLocked } ) {
 }
 
 export default compose(
-	connect(
-		( state, ownProps ) => {
-			return {
-				blocks: ownProps.uids.map( ( uid ) => getBlock( state, uid ) ),
-			};
-		},
-		( dispatch, ownProps ) => ( {
-			onTransform( blocks, name ) {
-				dispatch( replaceBlocks(
-					ownProps.uids,
-					switchToBlockType( blocks, name )
-				) );
-			},
-		} )
-	),
-	withContext( 'editor' )( ( settings ) => {
-		const { templateLock } = settings;
-
+	withSelect( ( select, ownProps ) => {
+		const { getBlock, getEditorSettings } = select( 'core/editor' );
+		const { templateLock } = getEditorSettings();
 		return {
+			blocks: ownProps.uids.map( getBlock ),
 			isLocked: !! templateLock,
 		};
 	} ),
+	withDispatch( ( dispatch, ownProps ) => ( {
+		onTransform( blocks, name ) {
+			dispatch( 'core/editor' ).replaceBlocks(
+				ownProps.uids,
+				switchToBlockType( blocks, name )
+			);
+		},
+	} ) ),
 )( BlockSwitcher );

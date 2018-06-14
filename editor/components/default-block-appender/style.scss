@@ -1,7 +1,7 @@
 $empty-paragraph-height: $text-editor-font-size * 4;
 
 .editor-default-block-appender {
-	.editor-default-block-appender__content {
+	input[type=text].editor-default-block-appender__content { // needs specificity
 		border: none;
 		background: none;
 		box-shadow: none;
@@ -9,39 +9,53 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 		margin: 0;
 		max-width: none; // fixes a bleed issue from the admin
 		padding: $block-padding;
-		height: $empty-paragraph-height;
 		font-size: $editor-font-size;
+		font-family: $editor-font;
 		cursor: text;
 		width: 100%;
-		height: $empty-paragraph-height;
-		color: $dark-gray-300;
+		font-family: $editor-font;
 		outline: 1px solid transparent;
 		transition: 0.2s outline;
+
+		// match the height of an empty paragraph
+		// to prevent margins from collapsing we add 1px padding top and bottom to both .editor-block-list__block and .editor-block-list__block-edit (coming to a total of 4px extra)
+		// @todo: revisit when we allow margins to collapse
+		height: $empty-paragraph-height + 4px;
+
+		// use opacity to work in various editor styles
+		color: $dark-opacity-300;
+
+		.is-dark-theme & {
+			color: $light-opacity-300;
+		}
 	}
 
 	// Show quick insertion icons faded until hover
 	.editor-inserter-with-shortcuts {
-		.components-icon-button {
-			color: $light-gray-700;
-			transition: color 0.2s;
-		}
-	}
+		opacity: .5;
+		transition: opacity 0.2s;
 
-	// Don't show inserter until mousing
-	.editor-inserter {
-		opacity: 0;
-	}
+		.components-icon-button:not( :hover ) {
+			// use opacity to work in various editor styles
+			color: $dark-opacity-500;
 
-	&:hover {
-		.editor-inserter-with-shortcuts {
-			opacity: 1;
-
-			.components-icon-button {
-				color: $dark-gray-500;
+			.is-dark-theme & {
+				color: $light-opacity-500;
 			}
 		}
+	}
 
-		.editor-inserter {
+	&:hover .editor-inserter-with-shortcuts {
+		opacity: 1;
+	}
+
+	// Show the inserter if mousing over or there is a tip
+	&:not( .has-tip ) {
+		.editor-inserter__toggle:not( [aria-expanded="true"] ) {
+			opacity: 0;
+		}
+
+		&:hover .editor-inserter__toggle {
 			opacity: 1;
 		}
 	}
@@ -56,21 +70,30 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 .editor-block-list__empty-block-inserter,
 .editor-default-block-appender .editor-inserter {
 	position: absolute;
-		top: $item-spacing;
-		right: $item-spacing;	// show on the right on mobile
-	transition: opacity 0.2s;
+	top: $item-spacing;
+	right: $item-spacing;	// show on the right on mobile
 
 	@include break-small {
-		left: -$block-side-ui-padding;
+		left: -$icon-button-size - $block-side-ui-clearance - $block-parent-side-ui-clearance;
 		right: auto;
-	}
-
-	.editor-inserter__toggle {
-		border-radius: 50%;
 	}
 
 	&:disabled {
 		display: none;
+	}
+
+	.editor-inserter__toggle {
+		transition: opacity 0.2s;
+		border-radius: 50%;
+
+		// use opacity to work in various editor styles
+		&:not( :hover ) {
+			color: $dark-opacity-500;
+
+			.is-dark-theme & {
+				color: $light-opacity-500;
+			}
+		}
 	}
 }
 

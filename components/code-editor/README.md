@@ -54,3 +54,35 @@ editor. It is passed the new value as an argument.
 
 - Type: `Function`
 - Required: No
+
+### settings
+
+The settings object used to initialize the WordPress code editor. The object contains all of the settings for the editor, including specific settings for CodeMirror. This object is passed into `wp.codeEditor.initialize()`. If you do not specify a settings object, `window._wpGutenbergCodeEditorSettings` will be used instead.
+
+If you are extending `window._wpGutenbergCodeEditorSettings` make sure to clone the object using `Object.assign` or something similar instead of modifying it directly so the default settings remain the same.
+
+```
+const settings = Object.assign(  {
+	codemirror: {
+		mode: css,
+		lint: false,
+	} },
+	window._wpGutenbergCodeEditorSetting
+);
+```
+
+- Type: `Object`
+- Required: No
+
+### editorRef
+
+A reference to the instance of CodeMirror initialized when the editor is loaded so that it can be dynamically updated from a parent component.
+
+`editorRef={ ( ref ) => this.editorInstance = ref }`
+
+`this.editorInstance` will contain a full instance of `CodeMirror` which can then be modified or updated from the component it is being reference from using the [CodeMirror API](https://codemirror.net/doc/manual.html#api). For example, to dynamically change the language mode of CodeMirror to CSS you can call:
+
+`this.editorInstance.setOption( 'mode', 'css' );`
+
+- Type `Function`
+- Required: No

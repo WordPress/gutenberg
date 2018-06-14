@@ -37,14 +37,26 @@ describe( 'listReducer', () => {
 		equal( deepFilterHTML( input, [ listReducer ] ), output );
 	} );
 
-	it( 'Should remove empty list wrappers', () => {
+	it( 'should remove empty list wrappers', () => {
 		const input = '<ul><li>\n<ul><li>test</li></ul>\n</li></ul>';
 		const output = '<ul><li>test</li></ul>';
 		equal( deepFilterHTML( input, [ listReducer ] ), output );
 	} );
 
-	it( 'Should not remove filled list wrappers', () => {
+	it( 'should not remove filled list wrappers', () => {
 		const input = '<ul><li>\ntest\n<ul><li>test</li></ul>\n</li></ul>';
 		equal( deepFilterHTML( input, [ listReducer ] ), input );
+	} );
+
+	it( 'should adjust wrong indentation (1)', () => {
+		const input = '<ul><li>test</li><ul><li>test</li></ul></ul>';
+		const output = '<ul><li>test<ul><li>test</li></ul></li></ul>';
+		equal( deepFilterHTML( input, [ listReducer ] ), output );
+	} );
+
+	it( 'should adjust wrong indentation (2)', () => {
+		const input = '<ul><ul><li>test</li></ul><li>test</li></ul>';
+		const output = '<ul><li>test</li><li>test</li></ul>';
+		equal( deepFilterHTML( input, [ listReducer ] ), output );
 	} );
 } );

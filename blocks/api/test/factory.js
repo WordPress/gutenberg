@@ -30,8 +30,8 @@ describe( 'block factory', () => {
 	};
 
 	beforeAll( () => {
-		// Load all hooks that modify blocks
-		require( 'blocks/hooks' );
+		// Load blocks store
+		require( 'blocks/store' );
 	} );
 
 	afterEach( () => {
@@ -77,41 +77,6 @@ describe( 'block factory', () => {
 			expect( block.innerBlocks ).toHaveLength( 1 );
 			expect( block.innerBlocks[ 0 ].name ).toBe( 'core/test-block' );
 			expect( typeof block.uid ).toBe( 'string' );
-		} );
-
-		it( 'should keep the className if the block supports it', () => {
-			registerBlockType( 'core/test-block', {
-				attributes: {},
-				save: noop,
-				category: 'common',
-				title: 'test block',
-			} );
-			const block = createBlock( 'core/test-block', {
-				className: 'chicken',
-			} );
-
-			expect( block.attributes ).toEqual( {
-				className: 'chicken',
-			} );
-			expect( block.isValid ).toBe( true );
-		} );
-
-		it( 'should not keep the className if the block supports it', () => {
-			registerBlockType( 'core/test-block', {
-				attributes: {},
-				save: noop,
-				category: 'common',
-				title: 'test block',
-				supports: {
-					customClassName: false,
-				},
-			} );
-			const block = createBlock( 'core/test-block', {
-				className: 'chicken',
-			} );
-
-			expect( block.attributes ).toEqual( {} );
-			expect( block.isValid ).toBe( true );
 		} );
 	} );
 
@@ -185,6 +150,43 @@ describe( 'block factory', () => {
 
 			expect( clonedBlock.innerBlocks ).toHaveLength( 1 );
 			expect( clonedBlock.innerBlocks[ 0 ].attributes ).not.toHaveProperty( 'align' );
+		} );
+
+		it( 'should clone innerBlocks if innerBlocks are not passed', () => {
+			registerBlockType( 'core/test-block', {
+				attributes: {
+					align: {
+						type: 'string',
+					},
+					isDifferent: {
+						type: 'boolean',
+						default: false,
+					},
+				},
+				save: noop,
+				category: 'common',
+				title: 'test block',
+			} );
+			const block = deepFreeze(
+				createBlock(
+					'core/test-block',
+					{ align: 'left' },
+					[
+						createBlock( 'core/test-block', { align: 'right' } ),
+						createBlock( 'core/test-block', { align: 'left' } ),
+					],
+				)
+			);
+
+			const clonedBlock = cloneBlock( block );
+
+			expect( clonedBlock.innerBlocks ).toHaveLength( 2 );
+			expect( clonedBlock.innerBlocks[ 0 ].uid ).not.toBe( block.innerBlocks[ 0 ].uid );
+			expect( clonedBlock.innerBlocks[ 0 ].attributes ).not.toBe( block.innerBlocks[ 0 ].attributes );
+			expect( clonedBlock.innerBlocks[ 0 ].attributes ).toEqual( block.innerBlocks[ 0 ].attributes );
+			expect( clonedBlock.innerBlocks[ 1 ].uid ).not.toBe( block.innerBlocks[ 1 ].uid );
+			expect( clonedBlock.innerBlocks[ 1 ].attributes ).not.toBe( block.innerBlocks[ 1 ].attributes );
+			expect( clonedBlock.innerBlocks[ 1 ].attributes ).toEqual( block.innerBlocks[ 1 ].attributes );
 		} );
 	} );
 

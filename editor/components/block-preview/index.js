@@ -6,12 +6,14 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { createBlock, BlockEdit } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
+import BlockEdit from '../block-edit';
 import { createInnerBlockList } from '../../utils/block-list';
 import './style.scss';
 
@@ -28,9 +30,7 @@ class BlockPreview extends Component {
 		// is defined in `@wordpress/blocks`, so to avoid a circular dependency
 		// we inject this function via context.
 		return {
-			createInnerBlockList: ( uid ) => {
-				return createInnerBlockList( uid, noop, noop );
-			},
+			createInnerBlockList,
 		};
 	}
 
@@ -41,7 +41,7 @@ class BlockPreview extends Component {
 
 		return (
 			<div className="editor-block-preview">
-				<div className="editor-block-preview__title">Preview</div>
+				<div className="editor-block-preview__title">{ __( 'Preview' ) }</div>
 				<div className="editor-block-preview__content">
 					<BlockEdit
 						name={ name }
