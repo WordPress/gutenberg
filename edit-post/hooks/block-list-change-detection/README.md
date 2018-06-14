@@ -10,6 +10,8 @@ The `blockListChangeListener` is a listener function that observes changes in th
 - `blocks.transformed.from.coreParagraph` - When a block is being transformed from a block with the name "blockName".
 - `blocks.transformed.to.blockName` - When a block is being transformed to a block with the name "blockName".
 
+
+`blockName` is the camelCased version of the block name. E.g. `coreParagraph` for `core/paragraph`.
 The object of the block is being passed as an argument. 
 
 ## Example 
