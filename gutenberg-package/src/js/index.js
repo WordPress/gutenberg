@@ -8,7 +8,20 @@ import '@wordpress/core-data';
 /**
  * WordPress dependencies
  */
-export { select, dispatch } from '@wordpress/data';
-export { initializeEditor } from '@wordpress/edit-post';
-export { registerBlockType } from '@wordpress/blocks';
-export * from '@wordpress/editor';
+import * as blocks from '@wordpress/blocks';
+import * as components from '@wordpress/components';
+import * as coreBlocks from '@wordpress/core-blocks';
+import * as data from '@wordpress/data';
+import * as editor from '@wordpress/editor';
+import * as editPost from '@wordpress/edit-post';
+import * as plugins from '@wordpress/plugins';
+
+export {
+	blocks,
+	components,
+	coreBlocks,
+	data,
+	editor,
+	editPost,
+	plugins,
+};
