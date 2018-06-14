@@ -3,7 +3,6 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 ## 3.3.0
  - `useOnce: true` has been removed from the Block API. Please use `supports.multiple: false` instead.
 
-
 ## 3.2.0
 
  - `wp.data.withRehydratation` has been renamed to `wp.data.withRehydration`.
