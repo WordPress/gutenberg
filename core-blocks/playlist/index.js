@@ -37,7 +37,7 @@ export const settings = {
 
 	attributes: {
 		ids: {
-			type: 'array',
+			type: 'string',
 		},
 		src: {
 			type: 'string',
@@ -54,10 +54,17 @@ export const settings = {
 	edit: class extends Component {
 		constructor() {
 			super( ...arguments );
+
+			this.initializePlaylist = this.initializePlaylist.bind( this );
+
 			// check for if ids is set to determine edit state
 			this.state = {
 				editing: ! this.props.attributes.ids,
 			};
+		}
+
+		initializePlaylist() {
+			window.wp.playlist.initialize();
 		}
 
 		render() {
@@ -72,7 +79,8 @@ export const settings = {
 				//check if there are returned media items and set attributes when there are
 				if ( media && media[0].url ) {
 					media = ( 1 < media.length ) ? media : [ media ];
-					setAttributes( { ids: media.map( ( item ) => item.id ), type: media[0].type  } );
+					const ids = JSON.stringify( media.map( ( item ) => item.id ) );
+					setAttributes( { ids, type: media[0].type  } );
 					this.setState( { editing: false } );
 				}
 			};
@@ -107,7 +115,6 @@ export const settings = {
 							type="audio"
 							multiple
 							playlist
-							value={ ids }
 							render={ ( { open } ) => (
 								<Button isLarge onClick={ open }>
 									{ __( 'Media Library' ) }
@@ -135,6 +142,7 @@ export const settings = {
 					<ServerSideRender
 							block="core/playlist"
 							attributes={ this.props.attributes }
+							onChange={ this.initializePlaylist }
 					/>
 					</figure>
 				</Fragment>

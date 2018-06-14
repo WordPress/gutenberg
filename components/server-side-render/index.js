@@ -1,7 +1,7 @@
 /**
  * External dependencies.
  */
-import { isEqual, isPlainObject, map } from 'lodash';
+import { isEqual, isPlainObject, map, get } from 'lodash';
 
 /**
  * WordPress dependencies.
@@ -42,6 +42,14 @@ export class ServerSideRender extends Component {
 		}
 	}
 
+	componentDidUpdate( prevProps, prevState ) {
+		if ( this.state.response !== prevState.response ) {
+			if ( this.props.onChange ) {
+				this.props.onChange();
+			}
+		}
+	}
+
 	fetch( props ) {
 		if ( null !== this.state.response ) {
 			this.setState( { response: null } );
@@ -53,7 +61,7 @@ export class ServerSideRender extends Component {
 		return apiRequest( { path } ).fail( ( response ) => {
 			const failResponse = {
 				error: true,
-				errorMsg: response.responseJSON.message || __( 'Unknown error' ),
+				errorMsg: get( response, [ 'responseJSON', 'message' ], __( 'Unknown error' ) ),
 			};
 			if ( this.isStillMounted ) {
 				this.setState( { response: failResponse } );
