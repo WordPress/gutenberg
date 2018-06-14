@@ -14,7 +14,7 @@ import { cloneBlock, hasBlockSupport } from '@wordpress/blocks';
 
 export function BlockDuplicateButton( { blocks, onDuplicate, onClick = noop, isLocked, small = false, role } ) {
 	const canDuplicate = every( blocks, ( block ) => {
-		return hasBlockSupport( block.name, 'multiple', false );
+		return hasBlockSupport( block.name, 'multiple', true );
 	} );
 	if ( isLocked || ! canDuplicate ) {
 		return null;

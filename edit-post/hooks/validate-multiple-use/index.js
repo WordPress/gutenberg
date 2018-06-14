@@ -34,7 +34,7 @@ const enhance = compose(
 	 */
 	withSelect( ( select, block ) => {
 		const blocks = select( 'core/editor' ).getBlocks();
-		const multiple = hasBlockSupport( block.name, 'multiple', false );
+		const multiple = hasBlockSupport( block.name, 'multiple', true );
 
 		// For block types with `multiple` support, there is no "original
 		// block" to be found in the content, as the block itself is valid.
