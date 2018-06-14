@@ -22,7 +22,6 @@ const Sidebar = ( { children, label } ) => {
 		<Fill>
 			<div
 				className="edit-post-sidebar"
-				role="region"
 				aria-label={ label }
 				tabIndex="-1"
 			>

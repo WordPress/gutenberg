@@ -295,6 +295,6 @@ PopoverContainer.contextTypes = {
 	getSlot: noop,
 };
 
-PopoverContainer.Slot = () => <Slot bubblesVirtually name={ SLOT_NAME } />;
+PopoverContainer.Slot = ( props ) => <Slot bubblesVirtually name={ SLOT_NAME } { ...props } />;
 
 export default PopoverContainer;
