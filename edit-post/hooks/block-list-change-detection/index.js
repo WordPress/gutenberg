@@ -9,8 +9,6 @@ import { cloneDeep, differenceBy, camelCase } from 'lodash';
 import { doAction, addAction } from '@wordpress/hooks';
 import { subscribe, select, dispatch } from '@wordpress/data';
 
-console.log( select( 'core/editor' ) );
-
 /**
  * A compare helper for lodash's difference by
  */
@@ -71,21 +69,21 @@ const blockListChangeListener = subscribe( onBlocksChangeListener( select( 'core
 			console.log(actionName);
 			doAction(actionName, block);
 		}
-	}
-
-	// A block has been added
-	for ( var i in addedBlocks ) {
-		const block = addedBlocks[i];
-		const actionName = 'blocks.added.' + camelCase( block.name );
-		console.log(actionName);
-		doAction(actionName, block);
-	}
-
-	// A block has been deleted
-	for ( var i in deletedBlocks ) {
-		const block = deletedBlocks[i];
-		const actionName = 'blocks.removed.' + camelCase( block.name );
+	} else {
+		// A block has been added
+		for ( var i in addedBlocks ) {
+			const block = addedBlocks[i];
+			const actionName = 'blocks.added.' + camelCase( block.name );
 			console.log(actionName);
-		doAction(actionName, block);
+			doAction(actionName, block);
+		}
+
+		// A block has been deleted
+		for ( var i in deletedBlocks ) {
+			const block = deletedBlocks[i];
+			const actionName = 'blocks.removed.' + camelCase( block.name );
+				console.log(actionName);
+			doAction(actionName, block);
+		}
 	}
 } ) );
