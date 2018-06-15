@@ -25,16 +25,16 @@ export const settings = {
 		},
 		type: {
 			type: 'string',
-		}
+		},
 	},
 
 	supports: {
 		align: true,
 	},
 
-edit,
+	edit,
 
-	save( { attributes } ) {
+	save() {
 		return null;
 	},
 };
