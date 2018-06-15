@@ -9,11 +9,17 @@
  * Renders the `core/playlist` block on server.
  *
  * @param array $attributes The block attributes.
+ *
  * @return string Playlist output. Empty string if the passed type is unsupported.
  */
 function render_block_core_playlist( $attributes ) {
 	$attributes['ids'] = json_decode( $attributes['ids'] );
-	return wp_playlist_shortcode( $attributes );
+
+	$html = sprintf( '<figure class="wp-block-playlist">%s</figure>',
+		wp_playlist_shortcode( $attributes )
+	);
+
+	return $html;
 }
 
 /**
