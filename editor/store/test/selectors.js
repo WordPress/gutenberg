@@ -125,7 +125,9 @@ describe( 'selectors', () => {
 			title: 'Test Block B',
 			icon: 'test',
 			keywords: [ 'testing' ],
-			useOnce: true,
+			supports: {
+				multiple: false,
+			},
 		} );
 
 		registerBlockType( 'core/test-block-c', {
@@ -3104,7 +3106,7 @@ describe( 'selectors', () => {
 			] );
 		} );
 
-		it( 'should set isDisabled when a block with useOnce has been used', () => {
+		it( 'should set isDisabled when a block with `multiple: false` has been used', () => {
 			const state = {
 				editor: {
 					present: {
