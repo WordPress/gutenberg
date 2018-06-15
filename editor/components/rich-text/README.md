@@ -18,11 +18,15 @@ a traditional `input` field, usually when the user exits the field.
 
 ### `value: Array|String`
 
-*Required.* Depending on the format prop, this value could be an array of React DOM to make editable or an HTML string. The rendered HTML should be valid, and valid with respect to the `tagName` and `inline` property.
+*Optional.* Depending on the format prop, this value could be an array of React DOM to make editable or an HTML string. The rendered HTML should be valid, and valid with respect to the `tagName` and `inline` property. Omit this prop and use `name` instead if you prefer to have it handled by the editor.
 
 ### `onChange( value: Array|String ): Function`
 
-*Required.* Called when the value changes.
+*Optional.* Called when the value changes. Omit this prop and use `name` instead if you prefer to have it handled by the editor.
+
+### `name: String`
+
+*Optional.*  It has to match the name of one of block's attributes. It enables the default handling of `value` and `onChange` props controlled by the editor.
 
 ### `tagName: String`
 
@@ -93,11 +97,8 @@ wp.blocks.registerBlockType( /* ... */, {
 	edit: function( props ) {
 		return wp.element.createElement( wp.editor.RichText, {
 			tagName: 'h2',
-			className: props.className,
-			value: props.attributes.content,
-			onChange: function( content ) {
-				props.setAttributes( { content: content } );
-			}
+			name: 'content',
+			className: props.className
 		} );
 	},
 
@@ -124,13 +125,12 @@ registerBlockType( /* ... */, {
 		},
 	},
 
-	edit( { className, attributes, setAttributes } ) {
+	edit( { className } ) {
 		return (
 			<RichText
 				tagName="h2"
+				name="content"
 				className={ className }
-				value={ attributes.content }
-				onChange={ ( content ) => setAttributes( { content } ) }
 			/>
 		);
 	},
