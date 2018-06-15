@@ -15,7 +15,7 @@ import { find, kebabCase } from 'lodash';
  */
 export const getColorValue = ( colors, namedColor, customColor ) => {
 	if ( namedColor ) {
-		const colorObj = find( colors, { name: namedColor } );
+		const colorObj = ( find( colors, { name: namedColor } ) || find( colors, { slug: namedColor } ) );
 		return colorObj && colorObj.color;
 	}
 	if ( customColor ) {
@@ -39,7 +39,7 @@ export const getColorName = ( colors, colorValue ) => {
 /**
  * Returns a function that receives the color value and sets it using the attribute for named colors or for custom colors.
  *
- * @param {Array}  colors                   Array of color objects containing the "name" and "color" value as properties.
+ * @param {Array}  colors                   Array of color objects containing the "name", "slug" and "color" value as properties.
  * @param {string} colorAttributeName       Name of the attribute where named colors are stored.
  * @param {string} customColorAttributeName Name of the attribute where custom colors are stored.
  * @param {string} setAttributes            A function that receives an object with the attributes to set.
@@ -50,8 +50,8 @@ export const setColorValue = ( colors, colorAttributeName, customColorAttributeN
 	( colorValue ) => {
 		const colorObj = find( colors, { color: colorValue } );
 		setAttributes( {
-			[ colorAttributeName ]: colorObj && colorObj.name ? colorObj.name : undefined,
-			[ customColorAttributeName ]: colorObj && colorObj.name ? undefined : colorValue,
+			[ colorAttributeName ]: colorObj && ( colorObj.slug || colorObj.name ) ? colorObj.slug || colorObj.name : undefined,
+			[ customColorAttributeName ]: colorObj && ( colorObj.slug || colorObj.name ) ? undefined : colorValue,
 		} );
 	};
 
