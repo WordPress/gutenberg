@@ -26,6 +26,9 @@ export const settings = {
 		type: {
 			type: 'string',
 		},
+		align: {
+			type: 'string',
+		},
 	},
 
 	supports: {
