@@ -30,6 +30,7 @@ import * as latestPosts from './latest-posts';
 import * as list from './list';
 import * as more from './more';
 import * as nextpage from './nextpage';
+import * as playlist from './playlist';
 import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
 import * as sharedBlock from './block';
@@ -41,7 +42,6 @@ import * as table from './table';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
-import * as playlist from './playlist';
 
 export const registerCoreBlocks = () => {
 	[
@@ -57,7 +57,6 @@ export const registerCoreBlocks = () => {
 		// Register all remaining core blocks.
 		shortcode,
 		audio,
-		playlist,
 		button,
 		categories,
 		code,
@@ -71,6 +70,7 @@ export const registerCoreBlocks = () => {
 		latestPosts,
 		more,
 		nextpage,
+		playlist,
 		preformatted,
 		pullquote,
 		separator,
