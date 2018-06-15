@@ -345,9 +345,23 @@ export function isEditedPostAutosaveable( state ) {
 	}
 
 	// If the title, excerpt or content has changed, the post is autosaveable.
+	const autosave = getAutosave( state );
 	return [ 'title', 'excerpt', 'content' ].some( ( field ) => (
-		state.autosave[ field ] !== getEditedPostAttribute( state, field )
+		autosave[ field ] !== getEditedPostAttribute( state, field )
 	) );
+}
+
+/**
+ * Returns the current autosave, or null if one is not set (i.e. if the post
+ * has yet to be autosaved, or has been saved or published since the last
+ * autosave).
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {?Object} Current autosave, if exists.
+ */
+export function getAutosave( state ) {
+	return state.autosave;
 }
 
 /**
@@ -358,7 +372,7 @@ export function isEditedPostAutosaveable( state ) {
  * @return {boolean} Whether there is an existing autosave.
  */
 export function hasAutosave( state ) {
-	return !! state.autosave;
+	return !! getAutosave( state );
 }
 
 /**

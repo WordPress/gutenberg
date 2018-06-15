@@ -72,6 +72,7 @@ export class BlockSettingsMenu extends Component {
 						const toggleClassname = classnames( 'editor-block-settings-menu__toggle', {
 							'is-opened': isOpen,
 						} );
+						const label = isOpen ? __( 'Hide Options' ) : __( 'More Options' );
 
 						return (
 							<IconButton
@@ -83,7 +84,7 @@ export class BlockSettingsMenu extends Component {
 									onToggle();
 								} }
 								icon="ellipsis"
-								label={ __( 'More Options' ) }
+								label={ label }
 								aria-expanded={ isOpen }
 								focus={ focus }
 								onFocus={ this.onFocus }

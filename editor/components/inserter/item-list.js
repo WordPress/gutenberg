@@ -1,14 +1,12 @@
 /**
  * External dependencies
  */
-import { isEqual } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { NavigableMenu } from '@wordpress/components';
 import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
 
 /**
@@ -16,94 +14,67 @@ import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
  */
 import BlockIcon from '../block-icon';
 
-function deriveActiveItems( items ) {
-	return items.filter( ( item ) => ! item.isDisabled );
-}
-
 class ItemList extends Component {
-	constructor() {
-		super( ...arguments );
-		this.onNavigate = this.onNavigate.bind( this );
-		this.activeItems = deriveActiveItems( this.props.items );
-		this.state = {
-			current: this.activeItems.length > 0 ? this.activeItems[ 0 ] : null,
-		};
-	}
-
-	componentDidUpdate( prevProps ) {
-		if ( ! isEqual( this.props.items, prevProps.items ) ) {
-			this.activeItems = deriveActiveItems( this.props.items );
-
-			// Try and preserve any still valid selected state.
-			const currentIsStillActive = this.state.current && this.activeItems.some( ( item ) =>
-				item.id === this.state.current.id
-			);
-
-			if ( ! currentIsStillActive ) {
-				this.setState( {
-					current: this.activeItems.length > 0 ? this.activeItems[ 0 ] : null,
-				} );
-			}
-		}
-	}
-
-	onNavigate( index ) {
-		const { activeItems } = this;
-		const dest = activeItems[ index ];
-		if ( dest ) {
-			this.setState( {
-				current: dest,
-			} );
-		}
-	}
-
 	render() {
 		const { items, onSelect, onHover } = this.props;
-		const { current } = this.state;
 
 		return (
-			<NavigableMenu
-				className="editor-inserter__item-list"
-				orientation="both"
-				cycle={ false }
-				onNavigate={ this.onNavigate }
-			>
+			/*
+			 * Disable reason: The `list` ARIA role is redundant but
+			 * Safari+VoiceOver won't announce the list otherwise.
+			 */
+			/* eslint-disable jsx-a11y/no-redundant-roles */
+			<ul role="list" className="editor-inserter__list">
 				{ items.map( ( item ) => {
-					const isCurrent = current && current.id === item.id;
+					const itemIconStyle = item.icon ? {
+						backgroundColor: item.icon.background,
+						color: item.icon.foreground,
+					} : {};
+					const itemIconStackStyle = item.icon && item.icon.shadowColor ? {
+						backgroundColor: item.icon.shadowColor,
+					} : {};
 					return (
-						<button
-							role="menuitem"
-							key={ item.id }
-							className={
-								classnames(
-									'editor-inserter__item',
-									getBlockMenuDefaultClassName( item.id ),
-									{
-										'editor-inserter__item-has-children': item.hasChildBlocks,
+						<li className="editor-inserter__list-item" key={ item.id }>
+							<button
+								className={
+									classnames(
+										'editor-inserter__item',
+										getBlockMenuDefaultClassName( item.id ),
+										{
+											'editor-inserter__item-has-children': item.hasChildBlocks,
+										}
+									)
+								}
+								onClick={ () => onSelect( item ) }
+								disabled={ item.isDisabled }
+								onMouseEnter={ () => onHover( item ) }
+								onMouseLeave={ () => onHover( null ) }
+								onFocus={ () => onHover( item ) }
+								onBlur={ () => onHover( null ) }
+								aria-label={ item.title } // Fix for IE11 and JAWS 2018.
+							>
+								<span
+									className="editor-inserter__item-icon"
+									style={ itemIconStyle }
+								>
+									<BlockIcon icon={ item.icon && item.icon.src } />
+									{ item.hasChildBlocks &&
+									<span
+										className="editor-inserter__item-icon-stack"
+										style={ itemIconStackStyle }
+									/>
 									}
-								)
-							}
-							onClick={ () => onSelect( item ) }
-							tabIndex={ isCurrent || item.isDisabled ? null : '-1' }
-							disabled={ item.isDisabled }
-							onMouseEnter={ () => onHover( item ) }
-							onMouseLeave={ () => onHover( null ) }
-							onFocus={ () => onHover( item ) }
-							onBlur={ () => onHover( null ) }
-							aria-label={ item.title } // Fix for IE11 and JAWS 2018.
-						>
-							<span className="editor-inserter__item-icon">
-								<BlockIcon icon={ item.icon } />
-								{ item.hasChildBlocks && <span className="editor-inserter__item-icon-stack" /> }
-							</span>
+								</span>
 
-							<span className="editor-inserter__item-title">
-								{ item.title }
-							</span>
-						</button>
+								<span className="editor-inserter__item-title">
+									{ item.title }
+								</span>
+							</button>
+						</li>
 					);
 				} ) }
-			</NavigableMenu>
+			</ul>
+			/* eslint-enable jsx-a11y/no-redundant-roles */
 		);
 	}
 }

@@ -32,8 +32,7 @@ $shadow-below-only: 0 5px 10px rgba( $dark-gray-900, .1 ), 0 2px 2px rgba( $dark
 
 // Editor Widths
 $sidebar-width: 280px;
-$text-editor-max-width: 760px;	// @todo: merge with variable below
-$content-width: 636px;	// @todo: leverage theme $content_width variable
+$content-width: 610px; // For the visual width, subtract 30px (2 * $block-padding + 2px borders). This comes to 580px, which is optimized for 70 characters.
 
 // Block UI
 $block-controls-height: 36px;

@@ -93,8 +93,14 @@ $block-inserter-search-height: 38px;
 	}
 }
 
-.editor-inserter__item-list {
+.editor-inserter__list {
+	list-style: none;
 	margin: 0 -8px;
+	padding: 0;
+}
+
+.editor-inserter__list-item {
+	display: inline;
 }
 
 .editor-inserter__item {

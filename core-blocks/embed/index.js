@@ -17,6 +17,7 @@ import { createBlock } from '@wordpress/blocks';
 import {
 	RichText,
 } from '@wordpress/editor';
+import apiRequest from '@wordpress/api-request';
 
 /**
  * Internal dependencies
@@ -28,7 +29,7 @@ import './editor.scss';
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
 // Caches the embed API calls, so if blocks get transformed, or deleted and added again, we don't spam the API.
-const wpEmbedAPI = memoize( ( url ) => wp.apiRequest( { path: `/oembed/1.0/proxy?${ stringify( { url } ) }` } ) );
+const wpEmbedAPI = memoize( ( url ) => apiRequest( { path: `/oembed/1.0/proxy?${ stringify( { url } ) }` } ) );
 
 const matchesPatterns = ( url, patterns = [] ) => {
 	return patterns.some( ( pattern ) => {
@@ -234,7 +235,7 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 
 				return (
 					<Fragment>
-						<figure className={ classnames( className, { 'is-video': 'video' === type } ) }>
+						<figure className={ classnames( className, 'wp-block-embed', { 'is-video': 'video' === type } ) }>
 							{ ( cannotPreview ) ? (
 								<Placeholder icon={ icon } label={ __( 'Embed URL' ) }>
 									<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>

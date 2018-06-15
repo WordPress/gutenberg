@@ -39,6 +39,7 @@ class Popover extends Component {
 
 		this.focus = this.focus.bind( this );
 		this.getAnchorRect = this.getAnchorRect.bind( this );
+		this.updatePopoverSize = this.updatePopoverSize.bind( this );
 		this.computePopoverPosition = this.computePopoverPosition.bind( this );
 		this.throttledComputePopoverPosition = this.throttledComputePopoverPosition.bind( this );
 		this.maybeClose = this.maybeClose.bind( this );
@@ -220,7 +221,7 @@ class Popover extends Component {
 			'is-' + xAxis,
 			{
 				'is-mobile': isMobile,
-				'no-arrow': noArrow,
+				'no-arrow': noArrow || ( xAxis === 'center' && yAxis === 'middle' ),
 			}
 		);
 

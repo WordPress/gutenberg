@@ -54,7 +54,9 @@ describe( 'block', () => {
 	it( 'should render a block option label', () => {
 		const labelComponents = shallow( <div>
 			{ blockCompleter.getOptionLabel( {
-				icon: 'expected-icon',
+				icon: {
+					src: 'expected-icon',
+				},
 				title: 'expected-text',
 			} ) }
 		</div> ).children();
@@ -63,5 +65,23 @@ describe( 'block', () => {
 		expect( labelComponents.at( 0 ).name() ).toBe( 'BlockIcon' );
 		expect( labelComponents.at( 0 ).prop( 'icon' ) ).toBe( 'expected-icon' );
 		expect( labelComponents.at( 1 ).text() ).toBe( 'expected-text' );
+	} );
+
+	it( 'should derive isOptionDisabled from the item\'s isDisabled', () => {
+		const disabledInserterItem = {
+			name: 'core/foo',
+			title: 'foo',
+			keywords: [ 'foo-keyword-1', 'foo-keyword-2' ],
+			isDisabled: true,
+		};
+		const enabledInserterItem = {
+			name: 'core/bar',
+			title: 'bar',
+			keywords: [],
+			isDisabled: false,
+		};
+
+		expect( blockCompleter.isOptionDisabled( disabledInserterItem ) ).toBe( true );
+		expect( blockCompleter.isOptionDisabled( enabledInserterItem ) ).toBe( false );
 	} );
 } );

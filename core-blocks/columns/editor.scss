@@ -2,6 +2,9 @@
 // This is sort of an experiment at making sure the editor looks as much like the end result as possible
 // Potentially the rules here can apply to all nested blocks and enable stacking, in which case it should be moved elsewhere
 .wp-block-columns .editor-block-list__layout {
+	margin-left: 0;
+	margin-right: 0;
+
 	&:first-child {
 		margin-left: -$block-padding;
 	}
@@ -15,16 +18,6 @@
 	}
 }
 
-// Wide: show no left/right margin on wide, so they stack with the column side UI
-.editor-block-list__block[data-align="wide"] .wp-block-columns .editor-block-list__layout {
-	&:first-child {
-		margin-left: 0;
-	}
-	&:last-child {
-		margin-right: 0;
-	}
-}
-
 // Fullwide: show margin left/right to ensure there's room for the side UI
 // This is not a 1:1 preview with the front-end where these margins would presumably be zero
 // @todo this could be revisited, by for example showing this margin only when the parent block was selected first
@@ -35,5 +28,20 @@
 	}
 	&:last-child {
 		margin-right: $block-side-ui-padding;
+	}
+}
+
+.wp-block-columns {
+	display: block;
+
+	.editor-inner-blocks {
+		display: grid;
+		grid-auto-flow: dense;
+	}
+
+	@for $i from 2 through 6 {
+		&.has-#{ $i }-columns .editor-inner-blocks {
+			grid-auto-columns: #{ 100% / $i };
+		}
 	}
 }

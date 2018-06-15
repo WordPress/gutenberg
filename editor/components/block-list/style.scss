@@ -111,10 +111,19 @@
 		padding-right: $block-side-ui-padding;
 	}
 
-	// Don't add side padding for nested blocks, @todo see if this can be scoped better
+	// Don't add side padding for nested blocks, and compensate for block padding
 	.editor-block-list__block & {
+		// compensate for side UI
 		padding-left: 0;
 		padding-right: 0;
+
+		// compensate for block padding horizontally
+		margin-left: -$block-padding;
+		margin-right: -$block-padding;
+
+		// compensate for block padding and collapsing margins vertically
+		margin-top: -$block-padding + 1px;
+		margin-top: -$block-padding + 1px;
 	}
 }
 
@@ -243,7 +252,7 @@
 
 	// Hover style
 	&.is-hovered > .editor-block-list__block-edit:before {
-		outline: 1px solid $blue-medium-focus;
+		outline: 1px solid theme( outlines );
 	}
 }
 
@@ -803,11 +812,8 @@
 .editor-block-contextual-toolbar .editor-block-toolbar {
 	width: 100%;
 	background: $white;
-
-	// use opacity to work in various editor styles
-	background-clip: padding-box;
-	box-sizing: padding-box;
 	border: 1px solid $light-gray-500;
+	border-right: none;
 
 	// this prevents floats from messing up the position
 	position: absolute;
@@ -848,7 +854,7 @@
 		font-family: $default-font;
 		font-size: 11px;
 		padding: 4px 4px;
-		background: $blue-medium-focus;
+		background: theme( outlines );
 		color: $white;
 	
 		// Animate in

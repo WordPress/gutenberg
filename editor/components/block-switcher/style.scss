@@ -1,9 +1,5 @@
 .editor-block-switcher {
 	position: relative;
-
-	.components-toolbar {
-		border-left: none;
-	}
 }
 
 .editor-block-switcher__toggle {
@@ -11,9 +7,6 @@
 	margin: 0;
 	padding: 8px;
 	border-radius: 0;
-
-	// Add a right border to show as separator in the block toolbar.
-	border-right: 1px solid $light-gray-700;
 
 	&:focus:before {
 		top: -3px;

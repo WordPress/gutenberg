@@ -11,6 +11,7 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
 import { FormTokenField, withAPIData } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
+import apiRequest from '@wordpress/api-request';
 
 /**
  * Module constants
@@ -75,7 +76,7 @@ class FlatTermSelector extends Component {
 	fetchTerms( params = {} ) {
 		const query = { ...DEFAULT_QUERY, ...params };
 		const basePath = wp.api.getTaxonomyRoute( this.props.slug );
-		const request = wp.apiRequest( { path: `/wp/v2/${ basePath }?${ stringify( query ) }` } );
+		const request = apiRequest( { path: `/wp/v2/${ basePath }?${ stringify( query ) }` } );
 		request.then( ( terms ) => {
 			this.setState( ( state ) => ( {
 				availableTerms: state.availableTerms.concat(
@@ -106,7 +107,7 @@ class FlatTermSelector extends Component {
 		return new Promise( ( resolve, reject ) => {
 			// Tries to create a term or fetch it if it already exists
 			const basePath = wp.api.getTaxonomyRoute( this.props.slug );
-			wp.apiRequest( {
+			apiRequest( {
 				path: `/wp/v2/${ basePath }`,
 				method: 'POST',
 				data: { name: termName },
@@ -114,7 +115,7 @@ class FlatTermSelector extends Component {
 				const errorCode = xhr.responseJSON && xhr.responseJSON.code;
 				if ( errorCode === 'term_exists' ) {
 					// search the new category created since last fetch
-					this.addRequest = wp.apiRequest( {
+					this.addRequest = apiRequest( {
 						path: `/wp/v2/${ basePath }?${ stringify( { ...DEFAULT_QUERY, search: termName } ) }`,
 					} );
 					return this.addRequest.then( ( searchResult ) => {

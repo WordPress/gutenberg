@@ -11,8 +11,6 @@ import { Component, Fragment } from '@wordpress/element';
 import {
 	Dashicon,
 	IconButton,
-	PanelBody,
-	ToggleControl,
 	withFallbackStyles,
 } from '@wordpress/components';
 import {
@@ -46,12 +44,6 @@ class ButtonEdit extends Component {
 		super( ...arguments );
 		this.nodeRef = null;
 		this.bindRef = this.bindRef.bind( this );
-		this.toggleClear = this.toggleClear.bind( this );
-	}
-
-	toggleClear() {
-		const { attributes, setAttributes } = this.props;
-		setAttributes( { clear: ! attributes.clear } );
 	}
 
 	bindRef( node ) {
@@ -77,7 +69,6 @@ class ButtonEdit extends Component {
 			text,
 			url,
 			title,
-			clear,
 		} = attributes;
 
 		return (
@@ -104,29 +95,22 @@ class ButtonEdit extends Component {
 						keepPlaceholderOnFocus
 					/>
 					<InspectorControls>
-						<PanelBody>
-							<ToggleControl
-								label={ __( 'Wrap text' ) }
-								checked={ !! clear }
-								onChange={ this.toggleClear }
-							/>
-							<PanelColor
-								colorValue={ backgroundColor.value }
-								title={ __( 'Background Color' ) }
-								onChange={ setBackgroundColor }
-							/>
-							<PanelColor
-								colorValue={ textColor.value }
-								title={ __( 'Text Color' ) }
-								onChange={ setTextColor }
-							/>
-							{ this.nodeRef && <ContrastCheckerWithFallbackStyles
-								node={ this.nodeRef }
-								textColor={ textColor.value }
-								backgroundColor={ backgroundColor.value }
-								isLargeText={ true }
-							/> }
-						</PanelBody>
+						<PanelColor
+							colorValue={ backgroundColor.value }
+							title={ __( 'Background Color' ) }
+							onChange={ setBackgroundColor }
+						/>
+						<PanelColor
+							colorValue={ textColor.value }
+							title={ __( 'Text Color' ) }
+							onChange={ setTextColor }
+						/>
+						{ this.nodeRef && <ContrastCheckerWithFallbackStyles
+							node={ this.nodeRef }
+							textColor={ textColor.value }
+							backgroundColor={ backgroundColor.value }
+							isLargeText={ true }
+						/> }
 					</InspectorControls>
 				</span>
 				{ isSelected && (
