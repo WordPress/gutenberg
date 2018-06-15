@@ -17,6 +17,11 @@ import {
 	editorMediaUpload,
 } from '@wordpress/editor';
 
+/**
+ * Internal dependencies
+ */
+import './editor.scss';
+
 class PlaylistEdit extends Component {
 	constructor() {
 		super( ...arguments );
