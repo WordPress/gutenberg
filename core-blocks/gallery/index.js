@@ -158,7 +158,7 @@ export const settings = {
 	save( { attributes } ) {
 		const { images, columns = defaultColumnsNumber( attributes ), imageCrop, linkTo } = attributes;
 		return (
-			<ul className={ ` columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
+			<ul className={ `columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
 				{ images.map( ( image ) => {
 					let href;
 
