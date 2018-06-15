@@ -40,14 +40,14 @@ npm install @frontkom/gutenberg
 
 ## Usage
 
-We've tried to make it easy to import **Gutenberg by Frontkom** editor in your apps.
+We've tried to make it easy to import **Gutenberg by Frontkom** modules to your apps.
 
 ```js
 // Importing global variables that Gutenberg requires
 import './globals'; 
 
-// Importing initialization method
-import { initializeEditor } from '@frontkom/gutenberg';
+// Importing editPost module
+import { editPost } from '@frontkom/gutenberg';
 
 // Don't forget to import the style
 import '@frontkom/gutenberg/build/css/core-blocks/style.css';
@@ -80,7 +80,7 @@ const settings = {
 const overridePost = {};
 
 // Et voilá... Initializing the editor!
-initializeEditor( target, postType, postId, settings, overridePost );
+editPost.initializeEditor( target, postType, postId, settings, overridePost );
 ```
 
 **Note**: Gutenberg requires utf-8 encoding, so don't forget to add `<meta charset="utf-8">` tag to your html `<head>`.
@@ -89,18 +89,18 @@ initializeEditor( target, postType, postId, settings, overridePost );
 
 ### Gutenberg Stores
 
-Additionally, after initializing the editor, you can have access to Gutenberg stores (`core`, `core/blocks`, `core/data`, `core/edit-post`, `core/editor`, `core/viewport`) and respective actions using `select` and `dispatch` methods:
+Additionally, after initializing the editor, you can have access to Gutenberg stores (`core`, `core/blocks`, `core/data`, `core/edit-post`, `core/editor`, `core/viewport`) through the `data` module and its `select` and `dispatch` methods:
 
 ```js
 // Importing select and dispatch methods from @frontkom/gutenberg package
-import { select, dispatch } from '@frontkom/gutenberg';
+import { data } from '@frontkom/gutenberg';
 
 // Use dispatch to change the state of something
-dispatch( 'core/edit-post' ).openGeneralSidebar( 'edit-post/block' );
-dispatch( 'core/edit-post' ).closeGeneralSidebar();
+data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'edit-post/block' );
+data.dispatch( 'core/edit-post' ).closeGeneralSidebar();
 
 // Use select to get the state of something
-select( 'core/editor' ).getEditedPostContent();
+data.select( 'core/editor' ).getEditedPostContent();
 // <!-- wp:paragraph -->
 // <p>Hello</p>
 // <!-- /wp:paragraph -->
@@ -111,15 +111,17 @@ select( 'core/editor' ).getEditedPostContent();
 
 ### Registering Custom Blocks
 
-You can create your custom blocks using the `registerBlockType` method and the Gutenberg blocks and components. Check out the example below and the Wordpress [documentation](https://wordpress.org/gutenberg/handbook/blocks/) to read more about it.
+You can create your custom blocks using the `registerBlockType` method from `blocks` module. Check out the example below and the Wordpress [documentation](https://wordpress.org/gutenberg/handbook/blocks/) to read more about it.
 
 ```js
-import {
-    registerBlockType,
-    RichText,
-    BlockControls,
+import { blocks, editor } from '@frontkom/gutenberg';
+
+const { registerBlockType } = blocks;
+const {    
     AlignmentToolbar,
-} from '@frontkom/gutenberg';
+    BlockControls,
+    RichText,
+} = editor;
 
 registerBlockType( 'custom/my-block', {
     title: 'My first block',
@@ -239,12 +241,7 @@ The Gutenberg editor will ask for available **Post Types** through `/wp/v2/types
         'media-library': false,    // to disable Media library from WordPress
         posts: true,               // to add PostsPanel to Documents tab
         'template-settings': true, // to add TemplateSettingsPanel to Documents tab
-        extras: true,              // to add an extra tab in sidebar
     },
-    labels: {
-        ...,
-        extras: 'The extra Tab label in thesidebar'
-    }
 }
 ```
 

@@ -29,7 +29,6 @@ import './style.scss';
 import BrowserURL from '../browser-url';
 import BlockSidebar from '../sidebar/block-sidebar';
 import DocumentSidebar from '../sidebar/document-sidebar';
-import ExtrasSidebar from '../sidebar/extras-sidebar';
 import Header from '../header';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
@@ -95,7 +94,6 @@ function Layout( {
 			) }
 			<DocumentSidebar />
 			<BlockSidebar />
-			<ExtrasSidebar />
 			<Sidebar.Slot />
 			{
 				isMobileViewport && sidebarIsOpened && <ScrollLock />

@@ -86,12 +86,12 @@ export function registerBlockType( name, settings ) {
 		return;
 	}
 
-	/* if ( select( 'core/blocks' ).getBlockType( name ) ) {
+	if ( select( 'core/blocks' ).getBlockType( name ) ) {
 		console.error(
 			'Block "' + name + '" is already registered.'
 		);
 		return;
-	} */
+	}
 
 	settings = applyFilters( 'blocks.registerBlockType', settings, name );
 
@@ -157,6 +157,16 @@ export function registerBlockType( name, settings ) {
 			plugin: 'Gutenberg',
 		} );
 		set( settings, [ 'supports', 'inserter' ], ! settings.isPrivate );
+	}
+
+	if ( 'useOnce' in settings ) {
+		deprecated( 'useOnce', {
+			version: '3.3',
+			alternative: 'supports.multiple',
+			plugin: 'Gutenberg',
+			hint: 'useOnce property in the settings param passed to wp.block.registerBlockType.',
+		} );
+		set( settings, [ 'supports', 'multiple' ], ! settings.useOnce );
 	}
 
 	dispatch( 'core/blocks' ).addBlockTypes( settings );
