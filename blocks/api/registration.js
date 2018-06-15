@@ -86,12 +86,12 @@ export function registerBlockType( name, settings ) {
 		return;
 	}
 
-	/* if ( select( 'core/blocks' ).getBlockType( name ) ) {
+	if ( select( 'core/blocks' ).getBlockType( name ) ) {
 		console.error(
 			'Block "' + name + '" is already registered.'
 		);
 		return;
-	} */
+	}
 
 	settings = applyFilters( 'blocks.registerBlockType', settings, name );
 
