@@ -58,7 +58,10 @@ class PlaylistEdit extends Component {
 
 		const setAudio = ( [ audio ] ) => onSelectMedia( audio );
 
+
 		const uploadFromFiles = ( event ) => editorMediaUpload( event.target.files, setAudio, 'audio' );
+
+		const mediaIds = this.props.attributes.ids && this.props.attributes.ids.replace( /^\[(.+)\]$/, '$1' ).split( ',' );
 
 		if ( editing ) {
 			return (
@@ -80,8 +83,11 @@ class PlaylistEdit extends Component {
 						type="audio"
 						multiple
 						playlist
+						value={ this.props.attributes.ids }
 						render={ ( { open } ) => (
-							<Button isLarge onClick={ open }>
+							<Button
+								isLarge
+								onClick={ open }>
 								{ __( 'Media Library' ) }
 							</Button>
 						) }
@@ -95,12 +101,21 @@ class PlaylistEdit extends Component {
 			<Fragment>
 				<BlockControls>
 					<Toolbar>
-						<IconButton
-							className="components-icon-button components-toolbar__control"
-							label={ __( 'Edit playlist' ) }
-							onClick={ switchToEditing }
-							icon="edit"
-						/>
+					<MediaUpload
+						onSelect={ onSelectMedia }
+						type="audio"
+						multiple
+						playlist
+						value={ mediaIds }
+						render={ ( { open } ) => (
+							<IconButton
+								className="components-toolbar__control"
+								label={ __( 'Edit Playlist' ) }
+								icon="edit"
+								onClick={ open }
+							/>
+						) }
+					/>
 					</Toolbar>
 				</BlockControls>
 				<figure className={ className }>
