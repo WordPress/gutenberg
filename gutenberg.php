@@ -177,6 +177,8 @@ function gutenberg_init( $return, $post ) {
 		return false;
 	}
 
+	add_action( 'wp_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
+	add_action( 'admin_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
 	add_action( 'admin_enqueue_scripts', 'gutenberg_editor_scripts_and_styles' );
 	add_filter( 'screen_options_show_screen', '__return_false' );
 	add_filter( 'admin_body_class', 'gutenberg_add_admin_body_class' );
