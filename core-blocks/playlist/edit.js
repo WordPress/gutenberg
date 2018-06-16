@@ -58,7 +58,6 @@ class PlaylistEdit extends Component {
 
 		const setAudio = ( [ audio ] ) => onSelectMedia( audio );
 
-
 		const uploadFromFiles = ( event ) => editorMediaUpload( event.target.files, setAudio, 'audio' );
 
 		const mediaIds = this.props.attributes.ids && this.props.attributes.ids.replace( /^\[(.+)\]$/, '$1' ).split( ',' );
@@ -85,9 +84,7 @@ class PlaylistEdit extends Component {
 						playlist
 						value={ this.props.attributes.ids }
 						render={ ( { open } ) => (
-							<Button
-								isLarge
-								onClick={ open }>
+							<Button isLarge onClick={ open }>
 								{ __( 'Media Library' ) }
 							</Button>
 						) }
