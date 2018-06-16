@@ -46,7 +46,7 @@ export class ServerSideRender extends Component {
 		if ( null !== this.state.response ) {
 			this.setState( { response: null } );
 		}
-		const { block, attributes } = props;
+		const { block, attributes = {} } = props;
 
 		const path = '/gutenberg/v1/block-renderer/' + block + '?context=edit&' + this.getQueryUrlFromObject( { attributes } );
 
