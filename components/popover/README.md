@@ -103,23 +103,17 @@ Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to 
  - Required: No
  - Default: `false`
 
- ### headerTitle
+ ## headerTitle
 
  Set this to customize the text that is shown in popover's header when it is fullscreen on mobile.
 
  - Type: `String`
  - Required: No
 
- ### noArrow
+ ## noArrow
 
  Set this to hide the arrow which visually indicates what the popover is anchored to. Note that the arrow will not display if `position` is set to `"middle center"`.
 
  - Type: `Boolean`
  - Required: No
  - Default: `false`
-
-## Methods
-
-### refresh
-
-Calling `refresh()` will force the Popover to recalculate its size and position. This is useful when a DOM change causes the anchor node to change position.

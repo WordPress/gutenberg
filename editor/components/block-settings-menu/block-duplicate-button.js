@@ -10,11 +10,12 @@ import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { cloneBlock, hasBlockSupport } from '@wordpress/blocks';
+import { cloneBlock, getBlockType } from '@wordpress/blocks';
 
 export function BlockDuplicateButton( { blocks, onDuplicate, onClick = noop, isLocked, small = false, role } ) {
 	const canDuplicate = every( blocks, ( block ) => {
-		return hasBlockSupport( block.name, 'multiple', true );
+		const type = getBlockType( block.name );
+		return ! type.useOnce;
 	} );
 	if ( isLocked || ! canDuplicate ) {
 		return null;

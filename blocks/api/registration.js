@@ -158,16 +158,6 @@ export function registerBlockType( name, settings ) {
 		set( settings, [ 'supports', 'inserter' ], ! settings.isPrivate );
 	}
 
-	if ( 'useOnce' in settings ) {
-		deprecated( 'useOnce', {
-			version: '3.3',
-			alternative: 'supports.multiple',
-			plugin: 'Gutenberg',
-			hint: 'useOnce property in the settings param passed to wp.block.registerBlockType.',
-		} );
-		set( settings, [ 'supports', 'multiple' ], ! settings.useOnce );
-	}
-
 	dispatch( 'core/blocks' ).addBlockTypes( settings );
 
 	return settings;

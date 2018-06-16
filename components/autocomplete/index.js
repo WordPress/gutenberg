@@ -348,22 +348,10 @@ export class Autocomplete extends Component {
 		/*
 		 * We support both synchronous and asynchronous retrieval of completer options
 		 * but internally treat all as async so we maintain a single, consistent code path.
-		 *
-		 * Because networks can be slow, and the internet is wonderfully unpredictable,
-		 * we don't want two promises updating the state at once. This ensures that only
-		 * the most recent promise will act on `optionsData`. This doesn't use the state
-		 * because `setState` is batched, and so there's no guarantee that setting
-		 * `activePromise` in the state would result in it actually being in `this.state`
-		 * before the promise resolves and we check to see if this is the active promise or not.
 		 */
-		const promise = this.activePromise = Promise.resolve(
+		Promise.resolve(
 			typeof options === 'function' ? options( query ) : options
 		).then( ( optionsData ) => {
-			if ( promise !== this.activePromise ) {
-				// Another promise has become active since this one was asked to resolve, so do nothing,
-				// or else we might end triggering a race condition updating the state.
-				return;
-			}
 			const keyedOptions = optionsData.map( ( optionData, optionIndex ) => ( {
 				key: `${ completer.idx }-${ optionIndex }`,
 				value: optionData,

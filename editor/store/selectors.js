@@ -1474,7 +1474,7 @@ export const getInserterItems = createSelector(
 			const id = blockType.name;
 
 			let isDisabled = false;
-			if ( ! hasBlockSupport( blockType.name, 'multiple', true ) ) {
+			if ( blockType.useOnce ) {
 				isDisabled = some( getBlocks( state ), { name: blockType.name } );
 			}
 

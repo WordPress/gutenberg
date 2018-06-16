@@ -60,8 +60,9 @@ class Popover extends Component {
 	}
 
 	componentDidMount() {
+		const popoverSize = this.updatePopoverSize();
+		this.computePopoverPosition( popoverSize );
 		this.toggleWindowEvents( true );
-		this.refresh();
 		this.focus();
 	}
 
@@ -88,11 +89,6 @@ class Popover extends Component {
 			return;
 		}
 		this.rafHandle = window.requestAnimationFrame( () => this.computePopoverPosition() );
-	}
-
-	refresh() {
-		const popoverSize = this.updatePopoverSize();
-		this.computePopoverPosition( popoverSize );
 	}
 
 	focus() {
