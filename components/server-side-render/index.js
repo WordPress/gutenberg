@@ -1,7 +1,7 @@
 /**
  * External dependencies.
  */
-import { isEqual, isPlainObject, map } from 'lodash';
+import { isEqual, isEmpty, map } from 'lodash';
 
 /**
  * WordPress dependencies.
@@ -12,6 +12,7 @@ import {
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import apiRequest from '@wordpress/api-request';
+import httpBuildQuery from 'http-build-query';
 
 /**
  * Internal dependencies.
@@ -48,7 +49,7 @@ export class ServerSideRender extends Component {
 		}
 		const { block, attributes = {} } = props;
 
-		const path = '/gutenberg/v1/block-renderer/' + block + '?context=edit&' + this.getQueryUrlFromObject( { attributes } );
+		const path = '/gutenberg/v1/block-renderer/' + block + '?context=edit' + this.getQueryStringFromAttributes( { attributes } );
 
 		return apiRequest( { path } ).fail( ( response ) => {
 			const failResponse = {
@@ -65,12 +66,8 @@ export class ServerSideRender extends Component {
 		} );
 	}
 
-	getQueryUrlFromObject( obj, prefix ) {
-		return map( obj, ( paramValue, paramName ) => {
-			const key = prefix ? prefix + '[' + paramName + ']' : paramName;
-			return isPlainObject( paramValue ) ? this.getQueryUrlFromObject( paramValue, key ) :
-				encodeURIComponent( key ) + '=' + encodeURIComponent( paramValue );
-		} ).join( '&' );
+	getQueryStringFromAttributes( attributes ) {
+		return isEmpty( attributes.attributes ) ? '' : '&' + httpBuildQuery( attributes );
 	}
 
 	render() {
