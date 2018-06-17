@@ -147,11 +147,11 @@ final class WP_Block_Type_Registry {
 	public function get_all_registered() {
 
 		/**
-		 * Adjust the blocks registered at runtime 
+		 * Adjust the blocks registered at runtime
 		 *
 		 * @param array WP_Block_Type[] Associative array of `$block_type_name => $block_type` pairs.
 		 */
-		return apply_filter( 'gutenberg_registered_blocks', $this->registered_block_types );
+		return apply_filters( 'gutenberg_registered_blocks', $this->registered_block_types );
 	}
 
 	/**
