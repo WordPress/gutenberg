@@ -32,7 +32,7 @@
 		"escape-string-regexp": "1.0.5",
 		"eslint-plugin-wordpress": "git://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#1774343f6226052a46b081e01db3fca8793cc9f1",
 		"hpq": "1.2.0",
-		"http-build-query": "0.6.1",
+		"http-build-query": "0.7.0",
 		"jquery": "3.3.1",
 		"js-beautify": "1.6.14",
 		"lerna": "2.11.0",
