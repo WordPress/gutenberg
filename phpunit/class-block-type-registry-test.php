@@ -150,4 +150,31 @@ class Block_Type_Registry_Test extends WP_UnitTestCase {
 		$registered = $this->registry->get_all_registered();
 		$this->assertEqualSets( $names, array_keys( $registered ) );
 	}
+
+	function test_get_all_registered_filter() {
+		$names    = array( 'test/paragraph', 'test/image', 'test/blockquote' );
+		$settings = array(
+			'icon' => 'random',
+		);
+
+		foreach ( $names as $name ) {
+			$this->registry->register( $name, $settings );
+		}
+
+		add_filter( 'gutenberg_registered_blocks', array( $this, 'filter_get_all_registered_filter' ) );
+
+		$registered = $this->registry->get_all_registered();
+
+		remove_filter( 'gutenberg_registered_blocks', array( $this, 'filter_get_all_registered_filter' ) );
+
+		$block_names = array( 'test/paragraph', 'test/blockquote' );
+		$this->assertEqualSets( $block_names, array_keys( $registered ) );
+	}
+
+	function filter_get_all_registered_filter( $blocks ){
+
+		unset( $blocks[ 'test/image' ] ); 
+
+		return $blocks;
+	}
 }
