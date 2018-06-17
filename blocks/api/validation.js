@@ -459,7 +459,7 @@ export function isValidBlock( innerHTML, blockType, attributes ) {
 		);
 	}
 	if ( blockType.ignoreValidation ) {
-		return true
+		return true;
 	}
 	return isValid;
 }
