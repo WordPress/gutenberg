@@ -171,10 +171,8 @@ class Block_Type_Registry_Test extends WP_UnitTestCase {
 		$this->assertEqualSets( $block_names, array_keys( $registered ) );
 	}
 
-	function filter_get_all_registered_filter( $blocks ){
-
-		unset( $blocks[ 'test/image' ] ); 
-
+	function filter_get_all_registered_filter( $blocks ) {
+		unset( $blocks['test/image'] );
 		return $blocks;
 	}
 }
