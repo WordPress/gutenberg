@@ -6,6 +6,8 @@ The presence of a `href` prop determines whether an `anchor` element is rendere
 
 ## Usage
 
+Renders a button with default style.
+
 ```jsx
 /**
  * WordPress dependencies
