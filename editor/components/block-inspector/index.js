@@ -16,7 +16,7 @@ import { withSelect } from '@wordpress/data';
  */
 import './style.scss';
 import SkipToSelectedBlock from '../skip-to-selected-block';
-import BlockIconWithColors from '../block-icon-with-colors';
+import BlockIcon from '../block-icon';
 import InspectorControls from '../inspector-controls';
 import InspectorAdvancedControls from '../inspector-advanced-controls';
 
@@ -31,7 +31,7 @@ const BlockInspector = ( { selectedBlock, blockType, count } ) => {
 
 	return [
 		<div className="editor-block-inspector__card" key="card">
-			<BlockIconWithColors iconObject={ blockType.icon } />
+			<BlockIcon icon={ blockType.icon } showColors />
 			<div className="editor-block-inspector__card-content">
 				<div className="editor-block-inspector__card-title">{ blockType.title }</div>
 				<div className="editor-block-inspector__card-description">{ blockType.description }</div>
