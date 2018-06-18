@@ -1,6 +1,6 @@
 # `RichText`
 
-Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content), providing users the option to add emphasis to content or links to content. It behaves similarly to a [controlled component](https://facebook.github.io/react/docs/forms.html#controlled-components),except that `onChange` is triggered less frequently than would be expected from a traditional `input` field, usually when the user exits the field.
+Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content), providing users the option to add emphasis to content or links to content. It behaves similarly to a [controlled component](https://facebook.github.io/react/docs/forms.html#controlled-components), except that `onChange` is triggered less frequently than would be expected from a traditional `input` field, usually when the user exits the field.
 
 ## Properties
 
