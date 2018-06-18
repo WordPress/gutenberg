@@ -68,7 +68,8 @@ export class ServerSideRender extends Component {
 	getQueryUrlFromObject( obj, prefix ) {
 		return map( obj, ( paramValue, paramName ) => {
 			const key = prefix ? prefix + '[' + paramName + ']' : paramName;
-			return isPlainObject( paramValue ) ? this.getQueryUrlFromObject( paramValue, key ) :
+			return ( isPlainObject( paramValue ) || Array.isArray( paramValue ) ) ?
+				this.getQueryUrlFromObject( paramValue, key ) :
 				encodeURIComponent( key ) + '=' + encodeURIComponent( paramValue );
 		} ).join( '&' );
 	}
