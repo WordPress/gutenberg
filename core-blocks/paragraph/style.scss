@@ -21,10 +21,10 @@ p {
 	// typing at the end of the paragraph doesn't work.
 	&.has-drop-cap:not( :focus ):first-letter {
 		float: left;
-		font-size: 4.1em;
-		line-height: 0.7;
-		font-weight: 600;
-		margin: .07em .23em 0 0;
+		font-size: 8.4em;
+		line-height: 0.68;
+		font-weight: 100;
+		margin: .05em .1em 0 0;
 		text-transform: uppercase;
 		font-style: normal;
 	}
