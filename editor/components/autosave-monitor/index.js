@@ -6,10 +6,13 @@ import { withSelect, withDispatch } from '@wordpress/data';
 
 export class AutosaveMonitor extends Component {
 	componentDidUpdate( prevProps ) {
-		const { isDirty, isSaveable } = this.props;
-		if ( prevProps.isDirty !== isDirty ||
-				prevProps.isSaveable !== isSaveable ) {
-			this.toggleTimer( isDirty && isSaveable );
+		const { isDirty, isAutosaveable } = this.props;
+
+		if (
+			prevProps.isDirty !== isDirty ||
+			prevProps.isAutosaveable !== isAutosaveable
+		) {
+			this.toggleTimer( isDirty && isAutosaveable );
 		}
 	}
 
@@ -19,11 +22,11 @@ export class AutosaveMonitor extends Component {
 
 	toggleTimer( isPendingSave ) {
 		clearTimeout( this.pendingSave );
-
+		const { autosaveInterval } = this.props;
 		if ( isPendingSave ) {
 			this.pendingSave = setTimeout(
 				() => this.props.autosave(),
-				10000
+				autosaveInterval * 1000
 			);
 		}
 	}
@@ -35,10 +38,16 @@ export class AutosaveMonitor extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { isEditedPostDirty, isEditedPostSaveable } = select( 'core/editor' );
+		const {
+			isEditedPostDirty,
+			isEditedPostAutosaveable,
+			getEditorSettings,
+		} = select( 'core/editor' );
+		const { autosaveInterval } = getEditorSettings();
 		return {
 			isDirty: isEditedPostDirty(),
-			isSaveable: isEditedPostSaveable(),
+			isAutosaveable: isEditedPostAutosaveable(),
+			autosaveInterval,
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {

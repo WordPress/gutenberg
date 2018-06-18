@@ -1,10 +1,16 @@
 Gutenberg's deprecation policy is intended to support backwards-compatibility for two minor releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
 
+## 3.3.0
+ - `useOnce: true` has been removed from the Block API. Please use `supports.multiple: false` instead.
+
 ## 3.2.0
 
  - `wp.data.withRehydratation` has been renamed to `wp.data.withRehydration`.
  - The `wp.editor.ImagePlaceholder` component is removed. Please use `wp.editor.MediaPlaceholder` instead.
  - `wp.utils.deprecated` function removed. Please use `wp.deprecated` instead.
+- `getInserterItems`: the `allowedBlockTypes` argument was removed and the `parentUID` argument was added.
+- `getFrecentInserterItems` selector removed. Please use `getInserterItems` instead.
+- `getSupportedBlocks` selector removed. Please use `canInsertBlockType` instead.
 
 ## 3.1.0
 

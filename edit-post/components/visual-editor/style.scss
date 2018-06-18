@@ -45,8 +45,8 @@
 
 	@include break-small() {
 		.editor-block-list__block-edit {
-			margin-left: -$block-side-ui-padding;
-			margin-right: -$block-side-ui-padding;
+			margin-left: -$block-side-ui-width;
+			margin-right: -$block-side-ui-width;
 		}
 
 		&[data-align="full"] > .editor-block-contextual-toolbar,
@@ -67,15 +67,28 @@
 }
 
 // The base width of the title should match that of blocks even if it isn't a block
-.edit-post-visual-editor .editor-post-title {
+.editor-post-title {
+	@include break-small() {
+		padding-left: $block-side-ui-padding;
+		padding-right: $block-side-ui-padding;
+	}
+}
+.edit-post-visual-editor .editor-post-title__block {
 	margin-left: auto;
 	margin-right: auto;
 	max-width: $content-width;
 
+	// stack borders
+	> div {
+		margin-left: -1px;
+		margin-right: -1px;
+	}
+
+	// include space for side UI on desktops
 	@include break-small() {
 		> div {
-			margin-left: -$block-side-ui-padding;
-			margin-right: -$block-side-ui-padding;
+			margin-left: -$block-side-ui-width;
+			margin-right: -$block-side-ui-width;
 		}
 	}
 }

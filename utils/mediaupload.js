@@ -9,6 +9,11 @@ import { compact, forEach, get, includes, noop, startsWith } from 'lodash';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
+ * WordPress dependencies
+ */
+import apiRequest from '@wordpress/api-request';
+
+/**
  *	Media Upload is used by audio, image, gallery and video blocks to handle uploading a media file
  *	when a file upload button is activated.
  *
@@ -84,14 +89,12 @@ export function mediaUpload( {
 		return createMediaFromFile( mediaFile, additionalData ).then(
 			( savedMedia ) => {
 				const mediaObject = {
+					alt: savedMedia.alt_text,
+					caption: get( savedMedia, [ 'caption', 'raw' ], '' ),
 					id: savedMedia.id,
-					url: savedMedia.source_url,
 					link: savedMedia.link,
+					url: savedMedia.source_url,
 				};
-				const caption = get( savedMedia, [ 'caption', 'raw' ] );
-				if ( caption ) {
-					mediaObject.caption = [ caption ];
-				}
 				setAndUpdateFiles( idx, mediaObject );
 			},
 			() => {
@@ -121,7 +124,7 @@ function createMediaFromFile( file, additionalData ) {
 	const data = new window.FormData();
 	data.append( 'file', file, file.name || file.type.replace( '/', '.' ) );
 	forEach( additionalData, ( ( value, key ) => data.append( key, value ) ) );
-	return wp.apiRequest( {
+	return apiRequest( {
 		path: '/wp/v2/media',
 		data,
 		contentType: false,

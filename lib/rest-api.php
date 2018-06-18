@@ -18,6 +18,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 function gutenberg_register_rest_routes() {
 	$controller = new WP_REST_Block_Renderer_Controller();
 	$controller->register_routes();
+
+	foreach ( get_post_types( array( 'show_in_rest' => true ), 'objects' ) as $post_type ) {
+		$class = ! empty( $post_type->rest_controller_class ) ? $post_type->rest_controller_class : 'WP_REST_Posts_Controller';
+
+		// Check if the class exists and is a subclass of WP_REST_Controller.
+		if ( ! is_subclass_of( $class, 'WP_REST_Controller' ) ) {
+			continue;
+		}
+
+		if ( post_type_supports( $post_type->name, 'revisions' ) ) {
+			$autosaves_controller = new WP_REST_Autosaves_Controller( $post_type->name );
+			$autosaves_controller->register_routes();
+		}
+	}
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_routes' );
 
@@ -501,26 +515,16 @@ add_filter( 'rest_index', 'gutenberg_ensure_wp_json_has_theme_supports' );
  */
 function gutenberg_handle_early_callback_checks( $response, $handler, $request ) {
 	if ( 0 === strpos( $request->get_route(), '/wp/v2/' ) ) {
-		$can_view_authors    = false;
 		$can_unbounded_query = false;
 		$types               = get_post_types( array( 'show_in_rest' => true ), 'objects' );
 		foreach ( $types as $type ) {
 			if ( current_user_can( $type->cap->edit_posts ) ) {
 				$can_unbounded_query = true;
-				if ( post_type_supports( $type->name, 'author' ) ) {
-					$can_view_authors = true;
-				}
 			}
 		}
 		if ( $request['per_page'] < 0 ) {
 			if ( ! $can_unbounded_query ) {
 				return new WP_Error( 'rest_forbidden_per_page', __( 'Sorry, you are not allowed make unbounded queries.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
-			}
-		}
-		if ( '/wp/v2/users' === $request->get_route()
-			&& ! empty( $request['who'] ) && 'authors' === $request['who'] ) {
-			if ( ! $can_view_authors ) {
-				return new WP_Error( 'rest_forbidden_who', __( 'Sorry, you are not allowed to query users by this parameter.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
 			}
 		}
 	}
@@ -619,7 +623,6 @@ function gutenberg_filter_term_query_arguments( $prepared_args, $request ) {
 /**
  * Include additional query parameters on the user query endpoint.
  *
- * @see https://core.trac.wordpress.org/ticket/42202
  * @see https://core.trac.wordpress.org/ticket/43998
  *
  * @param array $query_params JSON Schema-formatted collection parameters.
@@ -632,37 +635,9 @@ function gutenberg_filter_user_collection_parameters( $query_params ) {
 		// Default sanitize callback is 'absint', which won't work in our case.
 		$query_params['per_page']['sanitize_callback'] = 'rest_sanitize_request_arg';
 	}
-	// Support for 'who' query param.
-	$query_params['who'] = array(
-		'description' => __( 'Limit result set to users who are considered authors.', 'gutenberg' ),
-		'type'        => 'string',
-		'enum'        => array(
-			'authors',
-		),
-	);
 	return $query_params;
 }
 add_filter( 'rest_user_collection_params', 'gutenberg_filter_user_collection_parameters' );
-
-/**
- * Filter user collection query parameters to include specific behavior.
- *
- * @see https://core.trac.wordpress.org/ticket/42202
- *
- * @param array           $prepared_args Array of arguments for WP_User_Query.
- * @param WP_REST_Request $request       The current request.
- * @return array
- */
-function gutenberg_filter_user_query_arguments( $prepared_args, $request ) {
-	if ( ! empty( $request['who'] ) && 'authors' === $request['who'] ) {
-		$prepared_args['who'] = 'authors';
-		if ( isset( $prepared_args['has_published_posts'] ) ) {
-			unset( $prepared_args['has_published_posts'] );
-		}
-	}
-	return $prepared_args;
-}
-add_filter( 'rest_user_query', 'gutenberg_filter_user_query_arguments', 10, 2 );
 
 /**
  * Overload taxonomy and term permission handling to address our new necessary behavior.

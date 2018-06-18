@@ -47,7 +47,7 @@ export function BlockSwitcher( { blocks, onTransform, isLocked } ) {
 					<Toolbar>
 						<IconButton
 							className="editor-block-switcher__toggle"
-							icon={ <BlockIcon icon={ blockType.icon } /> }
+							icon={ <BlockIcon icon={ blockType.icon && blockType.icon.src } /> }
 							onClick={ onToggle }
 							aria-haspopup="true"
 							aria-expanded={ isOpen }
@@ -81,7 +81,7 @@ export function BlockSwitcher( { blocks, onTransform, isLocked } ) {
 								className="editor-block-switcher__menu-item"
 								icon={ (
 									<span className="editor-block-switcher__block-icon">
-										<BlockIcon icon={ icon } />
+										<BlockIcon icon={ icon && icon.src } />
 									</span>
 								) }
 								role="menuitem"

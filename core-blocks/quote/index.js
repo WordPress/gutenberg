@@ -22,6 +22,7 @@ import {
  */
 import './style.scss';
 import './editor.scss';
+import './theme.scss';
 
 const toRichTextValue = ( value ) => value.map( ( ( subValue ) => subValue.children ) );
 const fromRichTextValue = ( value ) => value.map( ( subValue ) => ( {

@@ -1,8 +1,8 @@
 {
 	"name": "@wordpress/date",
-	"version": "0.0.1",
+	"version": "1.0.0-alpha.1",
 	"description": "Date module for WordPress",
-	"author": "WordPress",
+	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",

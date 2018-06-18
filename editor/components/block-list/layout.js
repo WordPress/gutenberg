@@ -193,7 +193,6 @@ class BlockListLayout extends Component {
 			layout,
 			isGroupedByLayout,
 			rootUID,
-			renderBlockMenu,
 		} = this.props;
 
 		let defaultLayout;
@@ -219,7 +218,6 @@ class BlockListLayout extends Component {
 						layout={ defaultLayout }
 						isFirst={ blockIndex === 0 }
 						isLast={ blockIndex === blockUIDs.length - 1 }
-						renderBlockMenu={ renderBlockMenu }
 					/>
 				) ) }
 				<IgnoreNestedEvents childHandledEvents={ [ 'onFocus', 'onClick', 'onKeyDown' ] }>

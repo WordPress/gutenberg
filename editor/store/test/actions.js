@@ -30,7 +30,6 @@ import {
 	savePost,
 	trashPost,
 	mergeBlocks,
-	autosave,
 	redo,
 	undo,
 	removeBlocks,
@@ -49,10 +48,12 @@ describe( 'actions', () => {
 	describe( 'setupEditor', () => {
 		it( 'should return the SETUP_EDITOR action', () => {
 			const post = {};
-			const result = setupEditor( post );
+			const autosave = {};
+			const result = setupEditor( post, autosave );
 			expect( result ).toEqual( {
 				type: 'SETUP_EDITOR',
 				post,
+				autosave,
 			} );
 		} );
 	} );
@@ -266,14 +267,6 @@ describe( 'actions', () => {
 			expect( mergeBlocks( blockAUid, blockBUid ) ).toEqual( {
 				type: 'MERGE_BLOCKS',
 				blocks: [ blockAUid, blockBUid ],
-			} );
-		} );
-	} );
-
-	describe( 'autosave', () => {
-		it( 'should return AUTOSAVE action', () => {
-			expect( autosave() ).toEqual( {
-				type: 'AUTOSAVE',
 			} );
 		} );
 	} );

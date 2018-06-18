@@ -16,7 +16,7 @@ import {
  */
 import { __ } from '@wordpress/i18n';
 import { Component, compose, Fragment } from '@wordpress/element';
-import { getBlobByURL, revokeBlobURL } from '@wordpress/utils';
+import { getBlobByURL, revokeBlobURL } from '@wordpress/blob';
 import {
 	Button,
 	ButtonGroup,
@@ -26,7 +26,6 @@ import {
 	TextControl,
 	TextareaControl,
 	Toolbar,
-	withNotices,
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import {
@@ -76,17 +75,17 @@ class ImageEdit extends Component {
 		const { id, url = '' } = attributes;
 
 		if ( ! id && url.indexOf( 'blob:' ) === 0 ) {
-			getBlobByURL( url )
-				.then(
-					( file ) =>
-						editorMediaUpload( {
-							filesList: [ file ],
-							onFileChange: ( [ image ] ) => {
-								setAttributes( { ...image } );
-							},
-							allowedType: 'image',
-						} )
-				);
+			const file = getBlobByURL( url );
+
+			if ( file ) {
+				editorMediaUpload( {
+					filesList: [ file ],
+					onFileChange: ( [ image ] ) => {
+						setAttributes( { ...image } );
+					},
+					allowedType: 'image',
+				} );
+			}
 		}
 	}
 
@@ -178,7 +177,7 @@ class ImageEdit extends Component {
 	}
 
 	render() {
-		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, noticeOperations, noticeUI, toggleSelection } = this.props;
+		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, toggleSelection } = this.props;
 		const { url, alt, caption, align, id, href, width, height } = attributes;
 
 		const controls = (
@@ -221,8 +220,6 @@ class ImageEdit extends Component {
 						} }
 						className={ className }
 						onSelect={ this.onSelectImage }
-						notices={ noticeUI }
-						onError={ noticeOperations.createErrorNotice }
 						accept="image/*"
 						type="image"
 					/>
@@ -318,7 +315,6 @@ class ImageEdit extends Component {
 		return (
 			<Fragment>
 				{ controls }
-				{ noticeUI }
 				<figure className={ classes }>
 					<ImageSize src={ url } dirtynessTrigger={ align }>
 						{ ( sizes ) => {
@@ -393,7 +389,7 @@ class ImageEdit extends Component {
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
 							value={ caption || [] }
-							onFocus={ this.onFocusCaption }
+							unstableOnFocus={ this.onFocusCaption }
 							onChange={ ( value ) => setAttributes( { caption: value } ) }
 							isSelected={ this.state.captionFocused }
 							inlineToolbar
@@ -419,5 +415,4 @@ export default compose( [
 		};
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
-	withNotices,
 ] )( ImageEdit );

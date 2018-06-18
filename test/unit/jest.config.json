@@ -1,12 +1,12 @@
 {
 	"rootDir": "../../",
 	"collectCoverageFrom": [
-		"(blocks|components|editor|data|utils|edit-post|viewport|plugins|core-data|core-blocks)/**/*.js",
+		"(blocks|components|editor|utils|edit-post|viewport|plugins|core-blocks|nux)/**/*.js",
 		"packages/**/*.js"
 	],
 	"moduleNameMapper": {
-		"@wordpress\\/(blocks|components|editor|data|utils|edit-post|viewport|plugins|core-data|core-blocks)$": "$1",
-		"@wordpress\\/(date|dom|deprecated|element)$": "packages/$1/src"
+		"@wordpress\\/(blocks|components|editor|utils|edit-post|viewport|plugins|core-data|core-blocks|nux)$": "$1",
+		"@wordpress\\/(api-request|blob|core-data|data|date|dom|deprecated|element|postcss-themes)$": "packages/$1/src"
 	},
 	"preset": "@wordpress/jest-preset-default",
 	"setupFiles": [
