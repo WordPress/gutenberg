@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { forEach, noop } from 'lodash';
+import { forEach } from 'lodash';
 
 /**
  * WordPress dependencies
