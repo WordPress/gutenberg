@@ -64,7 +64,7 @@ function withGlobalEvents( eventTypesToHandlers ) {
 		}
 
 		return forwardRef( ( props, ref ) => {
-			return <Wrapper { ...props } forwardedRef={ ref || noop } />;
+			return <Wrapper { ...props } forwardedRef={ ref } />;
 		} );
 	}, 'withGlobalEvents' );
 }

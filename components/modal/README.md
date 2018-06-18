@@ -3,7 +3,7 @@ Modal
 
 The modal is used to create an accessible modal over an application.
 
-**Note:** The API for this modal has been mimicked to resemble `react-modal`.
+**Note:** The API for this modal has been mimicked to resemble [`react-modal`](https://github.com/reactjs/react-modal).
 
 ## Usage
 
@@ -13,6 +13,9 @@ Render a screen overlay with a modal on top.
 		title="My Modal"
 		onRequestClose={ closeFunction }
 		isOpen={ openState }
+		aria={ {
+		    describedby: "modal-description",
+		} }
 		>
 		<ModalContent>
 			<p id="modal-description">This modal is meant to be awesome!</p>
@@ -34,12 +37,9 @@ class MyModalWrapper extends Component {
 		this.state = {
 			isOpen: true,
 		}
-	}
 
-	closeModal() {
-		if ( this.state.isOpen ) {
-			this.setState( { isOpen: false } );
-		}
+		this.openModal = this.openModal.bind( this );
+		this.closeModal = this.closeModal.bind( this );
 	}
 	
 	openModal() {
@@ -48,15 +48,21 @@ class MyModalWrapper extends Component {
 		}
 	}
 
+	closeModal() {
+		if ( this.state.isOpen ) {
+			this.setState( { isOpen: false } );
+		}
+	}
+
 	render() {
 		return (
 			<Fragment>
-				<button onClick={ this.openModal.bind( this ) }>Open Modal</button>
+				<button onClick={ this.openModal }>Open Modal</button>
 				<Modal
 					title="This is my modal"
-					onRequestClose={ this.closeModal.bind( this ) }
+					onRequestClose={ this.closeModal }
 					isOpen={ this.state.isOpen }>
-					<button onClick={ this.closeModal.bind( this ) }>
+					<button onClick={ this.closeModal }>
 						My custom close button
 					</button>
 				</Modal>

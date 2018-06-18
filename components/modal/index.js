@@ -172,8 +172,6 @@ class Modal extends Component {
 }
 
 Modal.defaultProps = {
-	className: null,
-	overlayClassName: null,
 	bodyOpenClassName: 'modal-open',
 	role: 'dialog',
 	title: null,
@@ -186,7 +184,6 @@ Modal.defaultProps = {
 		overlay: null,
 	},
 	/* accessibility */
-	contentLabel: null,
 	aria: {
 		labelledby: 'modal-heading',
 		describedby: null,

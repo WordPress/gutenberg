@@ -1,21 +1,28 @@
+/**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies.
+ */
 import IconButton from '../icon-button';
 import './style.scss';
-import { __ } from '@wordpress/i18n';
 
 const ModalHeader = ( { icon, title, onClose, closeLabel } ) => {
 	const label = closeLabel ? closeLabel : __( 'Close dialog' );
 
 	return (
 		<div
-			className={ 'components-modal__header' }
+			className="components-modal__header"
 		>
-			<div>
+			<div className="components-modal__header-heading-container">
 				{ icon &&
-					<span aria-hidden="true">
+					<span className="components-modal__icon-container" aria-hidden>
 						{ icon }
 					</span>
 				}
-				<h1 id="modal-heading" >
+				<h1 className="components-modal__header-heading" >
 					{ title }
 				</h1>
 			</div>

@@ -66,25 +66,24 @@
 	flex-direction: row;
 	align-items: stretch;
 	justify-content: space-between;
-	z-index: z-index( '.edit-post-header' );
 	left: 0;
 	right: 0;
 
-	div {
+	&-heading-container {
 		align-items: center;
 		flex-grow: 1;
 		display: flex;
 		flex-direction: row;
 		justify-content: left;
+	}
 
-		h1 {
-			font-size: 1em;
-			font-weight: normal;
-		}
+	&-heading {
+		font-size: 1em;
+		font-weight: normal;
+	}
 
-		span {
-			display: inline-block;
-		}
+	&-icon-container {
+		display: inline-block;
 
 		svg {
 			max-width: $icon-button-size;
