@@ -6,7 +6,7 @@ import { compact, forEach, get, includes, noop, startsWith } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '../node_modules/@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  *	Media Upload is used by audio, image, gallery and video blocks to handle uploading a media file

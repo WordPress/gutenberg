@@ -146,7 +146,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-utils',
 		gutenberg_url( 'build/utils/index.js' ),
-		array( 'lodash', 'wp-deprecated', 'wp-dom' ),
+		array( 'lodash', 'wp-deprecated', 'wp-dom', 'wp-i18n' ),
 		filemtime( gutenberg_dir_path() . 'build/utils/index.js' ),
 		true
 	);
