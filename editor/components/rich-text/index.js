@@ -41,6 +41,7 @@ import TinyMCE from './tinymce';
 import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
+import withBindAttribute from '../higher-order/with-bind-attribute';
 import { domToFormat, valueToString } from './format';
 
 const { BACKSPACE, DELETE, ENTER, rawShortcut } = keycodes;
@@ -941,6 +942,7 @@ RichText.defaultProps = {
 
 const RichTextContainer = compose( [
 	withInstanceId,
+	withBindAttribute,
 	withBlockEditContext( ( context, ownProps ) => {
 		// When explicitly set as not selected, do nothing.
 		if ( ownProps.isSelected === false ) {

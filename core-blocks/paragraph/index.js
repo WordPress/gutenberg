@@ -225,12 +225,7 @@ class ParagraphBlock extends Component {
 							fontSize: fontSize ? fontSize + 'px' : undefined,
 							textAlign: align,
 						} }
-						value={ content }
-						onChange={ ( nextContent ) => {
-							setAttributes( {
-								content: nextContent,
-							} );
-						} }
+						bindAttribute="content"
 						onSplit={ insertBlocksAfter ?
 							( before, after, ...blocks ) => {
 								if ( after ) {

@@ -31,19 +31,12 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
 	},
 
 	edit: function( props ) {
-		var content = props.attributes.content;
-
-		function onChangeContent( newContent ) {
-			props.setAttributes( { content: newContent } );
-		}
-
 		return el(
 			RichText,
 			{
 				tagName: 'p',
 				className: props.className,
-				onChange: onChangeContent,
-				value: content,
+				bindAttribute: 'content',
 			}
 		);
 	},
@@ -80,18 +73,11 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 	},
 
 	edit( { attributes, className, setAttributes } ) {
-		const { content } = attributes;
-
-		function onChangeContent( newContent ) {
-			setAttributes( { content: newContent } );
-		}
-
 		return (
 			<RichText
 				tagName="p"
 				className={ className }
-				onChange={ onChangeContent }
-				value={ content }
+				bindAttribute="content"
 			/>
 		);
 	},

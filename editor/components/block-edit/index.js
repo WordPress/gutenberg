@@ -19,10 +19,14 @@ import { BlockEditContextProvider } from './context';
 export class BlockEdit extends Component {
 	constructor( props ) {
 		super( props );
+
 		this.setFocusedElement = this.setFocusedElement.bind( this );
+
 		this.state = {
 			focusedElement: null,
 			setFocusedElement: this.setFocusedElement,
+			attributes: {},
+			setAttributes: noop,
 		};
 	}
 
@@ -52,7 +56,7 @@ export class BlockEdit extends Component {
 		} );
 	}
 
-	static getDerivedStateFromProps( { name, isSelected }, prevState ) {
+	static getDerivedStateFromProps( { name, isSelected, attributes, setAttributes }, prevState ) {
 		if (
 			name === prevState.name &&
 			isSelected === prevState.isSelected
@@ -64,6 +68,8 @@ export class BlockEdit extends Component {
 			...prevState,
 			name,
 			isSelected,
+			attributes,
+			setAttributes,
 		};
 	}
 

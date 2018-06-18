@@ -2,7 +2,7 @@
 
 Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content), providing users the option to add emphasis to content or links to content. It behaves similarly to a [controlled component](https://facebook.github.io/react/docs/forms.html#controlled-components), except that `onChange` is triggered less frequently than would be expected from a traditional `input` field, usually when the user exits the field.
 
-## Properties
+## Props
 
 ### `format: String`
 
@@ -10,13 +10,25 @@ Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs
 
 *Default: `element`*.
 
+### `bindAttribute: string`
+
+*Optional.* As an alternative to passing `value` and `onChange` to managing the
+attribute value for a given attribute name, pass `bindAttribute`. Only one or
+the other of `bindAttribute` and `value` + `onChange` are required.
+
 ### `value: Array|String`
 
-*Required.* Depending on the format prop, this value could be an array of React DOM to make editable or an HTML string. The rendered HTML should be valid, and valid with respect to the `tagName` and `inline` property.
+*Optional.* Depending on the format prop, this value could be an array of React
+DOM to make editable or an HTML string. The rendered HTML should be valid, and
+valid with respect to the `tagName` and `inline` property. Can be omitted if
+using `bindAttribute`, since only one or the other of `bindAttribute` and
+`value` + `onChange` are required.
 
 ### `onChange( value: Array|String ): Function`
 
-*Required.* Called when the value changes.
+*Optional.* Called when the value changes. Can be omitted if using
+`bindAttribute`, since only one or the other of `bindAttribute` and `value` +
+`onChange` are required.
 
 ### `tagName: String`
 
