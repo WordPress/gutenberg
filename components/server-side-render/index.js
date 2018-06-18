@@ -47,9 +47,10 @@ export class ServerSideRender extends Component {
 		if ( null !== this.state.response ) {
 			this.setState( { response: null } );
 		}
-		const { block, attributes = {} } = props;
+		const { block, attributes } = props;
 
-		const path = '/gutenberg/v1/block-renderer/' + block + '?context=edit' + this.getQueryStringFromAttributes( { attributes } );
+		const path = `/gutenberg/v1/block-renderer/${ block }?context=edit` +
+			( attributes ? '&' + httpBuildQuery( { attributes } ) : '' );
 
 		return apiRequest( { path } ).fail( ( response ) => {
 			const failResponse = {
@@ -64,10 +65,6 @@ export class ServerSideRender extends Component {
 				this.setState( { response: response.rendered } );
 			}
 		} );
-	}
-
-	getQueryStringFromAttributes( attributes ) {
-		return isEmpty( attributes.attributes ) ? '' : '&' + httpBuildQuery( attributes );
 	}
 
 	render() {
