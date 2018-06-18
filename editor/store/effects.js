@@ -230,7 +230,14 @@ export default {
 		}
 	},
 	REQUEST_POST_UPDATE_FAILURE( action, store ) {
-		const { post, edits } = action;
+		const { post, edits, error } = action;
+
+		if ( error && 'rest_autosave_no_changes' === error.code ) {
+			// Autosave requested a new autosave, but there were no changes. This shouldn't
+			// result in an error notice for the user.
+			return;
+		}
+
 		const { dispatch } = store;
 
 		const publishStatus = [ 'publish', 'private', 'future' ];
