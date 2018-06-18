@@ -12,9 +12,10 @@ import {
 	FormFileUpload,
 	Placeholder,
 	DropZone,
+	withNotices,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -63,13 +64,26 @@ class MediaPlaceholder extends Component {
 	}
 
 	onFilesUpload( files ) {
-		const { onSelect, type, multiple, onError } = this.props;
+		/**
+		 * We use a prop named `disable`, set to `false` by default, because it makes for a nicer
+		 * component prop API. eg:
+		 *
+		 * <MediaPlaceholder disableMaxUploadErrorMessages />
+		 * instead of:
+		 * <MediaPlaceholder enableMaxUploadErrorMessages={ false } />
+		 */
+		const { onSelect, type, multiple, onError = noop, disableMaxUploadErrorMessages = false, noticeOperations } = this.props;
 		const setMedia = multiple ? onSelect : ( [ media ] ) => onSelect( media );
 		editorMediaUpload( {
 			allowedType: type,
 			filesList: files,
 			onFileChange: setMedia,
-			onError,
+			onError: ( errorMessage ) => {
+				onError( errorMessage );
+				if ( disableMaxUploadErrorMessages === false ) {
+					noticeOperations.createErrorNotice( errorMessage );
+				}
+			},
 		} );
 	}
 
@@ -85,7 +99,8 @@ class MediaPlaceholder extends Component {
 			onSelectUrl,
 			onHTMLDrop = noop,
 			multiple = false,
-			notices,
+			additionalNotices,
+			noticeUI,
 		} = this.props;
 
 		return (
@@ -94,7 +109,7 @@ class MediaPlaceholder extends Component {
 				label={ labels.title }
 				instructions={ sprintf( __( 'Drag %s, upload a new one or select a file from your library.' ), labels.name ) }
 				className={ classnames( 'editor-media-placeholder', className ) }
-				notices={ notices }
+				notices={ <Fragment>{ additionalNotices }{ noticeUI }</Fragment> }
 			>
 				<DropZone
 					onFilesDrop={ this.onFilesUpload }
@@ -141,4 +156,4 @@ class MediaPlaceholder extends Component {
 	}
 }
 
-export default MediaPlaceholder;
+export default withNotices( MediaPlaceholder );
