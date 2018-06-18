@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
-import { focus, keycodes } from '@wordpress/utils';
+import { keycodes } from '@wordpress/utils';
+import { focus } from '@wordpress/dom';
 
 const {
 	TAB,

@@ -7,7 +7,8 @@ import clickOutside from 'react-click-outside';
  * WordPress dependencies
  */
 import { Component, compose, createRef } from '@wordpress/element';
-import { focus, keycodes } from '@wordpress/utils';
+import { keycodes } from '@wordpress/utils';
+import { focus } from '@wordpress/dom';
 
 /**
  * Internal dependencies
