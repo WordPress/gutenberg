@@ -145,7 +145,13 @@ final class WP_Block_Type_Registry {
 	 * @return WP_Block_Type[] Associative array of `$block_type_name => $block_type` pairs.
 	 */
 	public function get_all_registered() {
-		return $this->registered_block_types;
+
+		/**
+		 * Adjust the blocks registered at runtime
+		 *
+		 * @param array WP_Block_Type[] Associative array of `$block_type_name => $block_type` pairs.
+		 */
+		return apply_filters( 'gutenberg_registered_blocks', $this->registered_block_types );
 	}
 
 	/**
