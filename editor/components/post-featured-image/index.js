@@ -25,7 +25,7 @@ const DEFAULT_REMOVE_FEATURE_IMAGE_LABEL = __( 'Remove featured image' );
 function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, media, postType } ) {
 	const postLabel = get( postType, [ 'labels' ], {} );
 	const featuredImageAltText = ( altText ) => {
-		return altText ? ' Current image: ' + altText : '';
+		return altText ? __( ' Current image: ' ) + altText : '';
 	};
 
 	return (
@@ -45,7 +45,7 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 										naturalHeight={ media.media_details.height }
 									>
 										<img
-											alt={ __( 'Replace featured image.' + featuredImageAltText( media.alt_text ) ) }
+											alt={ __( 'Replace featured image.' ) + featuredImageAltText( media.alt_text ) }
 											src={ media.source_url }
 										/>
 									</ResponsiveWrapper>
