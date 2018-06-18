@@ -42,9 +42,10 @@ const onBlocksChangeListener = ( selector, listener ) => {
 			listener( selectedBlocks, previousBlocks );
 			previousBlocks = selectedBlocks;
 		} else {
-			const intersection = differenceBy( selectedBlocks, previousBlocks, compareBlocks );
-			if ( intersection.length ) {
-				listener( selectedBlocks, previousBlocks, intersection );
+			// The constant 'hasChanged' signals, that the blockList was updated, allthough the number of blocks remaind the same
+			const hasChanged = ( differenceBy( selectedBlocks, previousBlocks, compareBlocks ).length > 0 ) ? true : false;
+			if ( hasChanged ) {
+				listener( selectedBlocks, previousBlocks, true );
 				previousBlocks = selectedBlocks;
 			}
 		}
@@ -74,12 +75,12 @@ const doActionForBlocks = ( actionName, blocks ) => {
  * This function subscribes to block data, compares old and new states upon
  * change and fires actions accordingly.
  */
-subscribe( onBlocksChangeListener( select( 'core/editor' ).getBlocks, ( blocks, oldBlocks, difference = null ) => {
+subscribe( onBlocksChangeListener( select( 'core/editor' ).getBlocks, ( blocks, oldBlocks, hasChanged = false ) => {
 	const addedBlocks = differenceBy( blocks, oldBlocks, compareBlocks );
 	const deletedBlocks = differenceBy( oldBlocks, blocks, compareBlocks );
 
 	// When the length is equal, but a change hapened, we have a transformation
-	if ( oldBlocks.length === blocks.length && difference ) {
+	if ( oldBlocks.length === blocks.length && hasChanged ) {
 		// A block has been deleted
 		doActionForBlocks( 'blocks.transformed.from', deletedBlocks );
 
