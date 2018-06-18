@@ -7,6 +7,9 @@ The presence of a `href` prop determines whether an `anchor` element is rendere
 ## Usage
 
 ```jsx
+/**
+ * WordPress dependencies
+ */
 import { Button } from "@wordpress/components";
 
 export default function ClickMeButton() {
@@ -26,8 +29,8 @@ Name | Type | Default | Description
 `target` | `string` | `undefined` | Context in which the `href` resource will open.
 `isDefault` | `bool` | `false` | Renders a default button style.
 `isPrimary` | `bool` | `false` | Renders a primary button style.
-`isLarge` | `bool` | `false` | Increases the size of the button
-`isSmall` | `bool` | `false` | Decreases the size of the button
+`isLarge` | `bool` | `false` | Increases the size of the button.
+`isSmall` | `bool` | `false` | Decreases the size of the button.
 `isToggled` | `bool` | `false` | Renders a toggled button style.
 `isBusy` | `bool` | `false` | Indicates activity while a action is being performed.
 `isLink` | `bool` | `false` | Renders a button with an anchor style.
