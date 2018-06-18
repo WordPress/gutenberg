@@ -47,10 +47,10 @@ export class ServerSideRender extends Component {
 		if ( null !== this.state.response ) {
 			this.setState( { response: null } );
 		}
-		const { block, attributes } = props;
+		const { block, attributes = null } = props;
 
 		const path = `/gutenberg/v1/block-renderer/${ block }?context=edit` +
-			( attributes ? '&' + httpBuildQuery( { attributes } ) : '' );
+			( null !== attributes ? '&' + httpBuildQuery( { attributes } ) : '' );
 
 		return apiRequest( { path } ).fail( ( response ) => {
 			const failResponse = {
