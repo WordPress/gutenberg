@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isFinite, find, omit } from 'lodash';
+import { isFinite, find, last, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -84,7 +84,7 @@ class ParagraphBlock extends Component {
 		this.setFontSize = this.setFontSize.bind( this );
 	}
 
-	onReplace( blocks ) {
+	onReplace( blocks, blockToSelect ) {
 		const { attributes, onReplace } = this.props;
 		onReplace( blocks.map( ( block, index ) => (
 			index === 0 && block.name === name ?
@@ -93,9 +93,10 @@ class ParagraphBlock extends Component {
 						...attributes,
 						...block.attributes,
 					},
+					uid: this.props.id,
 				} :
 				block
-		) ) );
+		) ), blockToSelect );
 	}
 
 	toggleDropCap() {
@@ -236,14 +237,12 @@ class ParagraphBlock extends Component {
 								if ( after ) {
 									blocks.push( createBlock( name, { content: after } ) );
 								}
+								const replaceArrayStart = before ?
+									[ createBlock( name, { ...attributes, content: before } ) ] :
+									[];
 
-								insertBlocksAfter( blocks );
-
-								if ( before ) {
-									setAttributes( { content: before } );
-								} else {
-									onReplace( [] );
-								}
+								const newBlocks = replaceArrayStart.concat( blocks );
+								this.onReplace( newBlocks, newBlocks.length > 1 ? last( newBlocks ).uid : undefined );
 							} :
 							undefined
 						}
