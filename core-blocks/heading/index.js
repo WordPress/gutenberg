@@ -1,15 +1,59 @@
 /**
+ * External dependencies
+ */
+import { omit } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { concatChildren } from '@wordpress/element';
-import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
+import {
+	createBlock,
+	getPhrasingContentSchema,
+	getBlockAttributes,
+	getBlockType,
+} from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import edit from './edit';
+
+/**
+ * Given a node name string for a heading node, returns its numeric level.
+ *
+ * @param {string} nodeName Heading node name.
+ *
+ * @return {number} Heading level.
+ */
+export function getLevelFromHeadingNodeName( nodeName ) {
+	return Number( nodeName.substr( 1 ) );
+}
+
+const supports = {
+	className: false,
+	anchor: true,
+};
+
+const schema = {
+	content: {
+		type: 'array',
+		source: 'children',
+		selector: 'h1,h2,h3,h4,h5,h6',
+	},
+	level: {
+		type: 'number',
+		default: 2,
+	},
+	align: {
+		type: 'string',
+	},
+	placeholder: {
+		type: 'string',
+	},
+};
 
 export const name = 'core/heading';
 
@@ -24,31 +68,9 @@ export const settings = {
 
 	keywords: [ __( 'title' ), __( 'subtitle' ) ],
 
-	supports: {
-		className: false,
-		anchor: true,
-	},
+	supports,
 
-	attributes: {
-		content: {
-			type: 'array',
-			source: 'children',
-			selector: 'h1,h2,h3,h4,h5,h6',
-		},
-		nodeName: {
-			type: 'string',
-			source: 'property',
-			selector: 'h1,h2,h3,h4,h5,h6',
-			property: 'nodeName',
-			default: 'H2',
-		},
-		align: {
-			type: 'string',
-		},
-		placeholder: {
-			type: 'string',
-		},
-	},
+	attributes: schema,
 
 	transforms: {
 		from: [
@@ -72,6 +94,15 @@ export const settings = {
 					h5: { children: getPhrasingContentSchema() },
 					h6: { children: getPhrasingContentSchema() },
 				},
+				transform( node ) {
+					return createBlock( 'core/heading', {
+						...getBlockAttributes(
+							getBlockType( 'core/heading' ),
+							node.outerHTML
+						),
+						level: getLevelFromHeadingNodeName( node.nodeName ),
+					} );
+				},
 			},
 			{
 				type: 'pattern',
@@ -80,7 +111,7 @@ export const settings = {
 					const level = match[ 1 ].length;
 
 					return createBlock( 'core/heading', {
-						nodeName: `H${ level }`,
+						level,
 						content,
 					} );
 				},
@@ -99,6 +130,41 @@ export const settings = {
 		],
 	},
 
+	deprecated: [
+		{
+			supports,
+			attributes: {
+				...omit( schema, [ 'level' ] ),
+				nodeName: {
+					type: 'string',
+					source: 'property',
+					selector: 'h1,h2,h3,h4,h5,h6',
+					property: 'nodeName',
+					default: 'H2',
+				},
+			},
+			migrate( { attributes } ) {
+				const { nodeName, ...migratedAttributes } = attributes;
+
+				return {
+					...migratedAttributes,
+					level: getLevelFromHeadingNodeName( nodeName ),
+				};
+			},
+			save( { attributes } ) {
+				const { align, nodeName, content } = attributes;
+
+				return (
+					<RichText.Content
+						tagName={ nodeName.toLowerCase() }
+						style={ { textAlign: align } }
+						value={ content }
+					/>
+				);
+			},
+		},
+	],
+
 	merge( attributes, attributesToMerge ) {
 		return {
 			content: concatChildren( attributes.content, attributesToMerge.content ),
@@ -108,11 +174,12 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { align, nodeName, content } = attributes;
+		const { align, level, content } = attributes;
+		const tagName = 'h' + level;
 
 		return (
 			<RichText.Content
-				tagName={ nodeName.toLowerCase() }
+				tagName={ tagName }
 				style={ { textAlign: align } }
 				value={ content }
 			/>

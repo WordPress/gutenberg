@@ -1,14 +1,19 @@
 /**
  * External dependencies
  */
-import { find, compact, get, initial, last, isEmpty } from 'lodash';
+import { find, compact, get, initial, last, isEmpty, omit } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Component, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
+import {
+	createBlock,
+	getPhrasingContentSchema,
+	getBlockAttributes,
+	getBlockType,
+} from '@wordpress/blocks';
 import {
 	BlockControls,
 	RichText,
@@ -36,6 +41,23 @@ const listContentSchema = {
 	};
 } );
 
+const supports = {
+	className: false,
+};
+
+const schema = {
+	ordered: {
+		type: 'boolean',
+		default: false,
+	},
+	values: {
+		type: 'array',
+		source: 'children',
+		selector: 'ol,ul',
+		default: [],
+	},
+};
+
 export const name = 'core/list';
 
 export const settings = {
@@ -45,25 +67,9 @@ export const settings = {
 	category: 'common',
 	keywords: [ __( 'bullet list' ), __( 'ordered list' ), __( 'numbered list' ) ],
 
-	attributes: {
-		nodeName: {
-			type: 'string',
-			source: 'property',
-			selector: 'ol,ul',
-			property: 'nodeName',
-			default: 'UL',
-		},
-		values: {
-			type: 'array',
-			source: 'children',
-			selector: 'ol,ul',
-			default: [],
-		},
-	},
+	attributes: schema,
 
-	supports: {
-		className: false,
-	},
+	supports,
 
 	transforms: {
 		from: [
@@ -75,7 +81,6 @@ export const settings = {
 					const items = blockAttributes.map( ( { content } ) => content );
 					const hasItems = ! items.every( isEmpty );
 					return createBlock( 'core/list', {
-						nodeName: 'UL',
 						values: hasItems ? items.map( ( content, index ) => <li key={ index }>{ content }</li> ) : [],
 					} );
 				},
@@ -90,7 +95,6 @@ export const settings = {
 					}
 					const hasItems = ! items.every( isEmpty );
 					return createBlock( 'core/list', {
-						nodeName: 'UL',
 						values: hasItems ? items.map( ( content, index ) => <li key={ index }>{ content }</li> ) : [],
 					} );
 				},
@@ -102,13 +106,21 @@ export const settings = {
 					ol: listContentSchema.ol,
 					ul: listContentSchema.ul,
 				},
+				transform( node ) {
+					return createBlock( 'core/list', {
+						...getBlockAttributes(
+							getBlockType( 'core/list' ),
+							node.outerHTML
+						),
+						ordered: node.nodeName === 'OL',
+					} );
+				},
 			},
 			{
 				type: 'pattern',
 				regExp: /^[*-]\s/,
 				transform: ( { content } ) => {
 					return createBlock( 'core/list', {
-						nodeName: 'UL',
 						values: [ <li key="1">{ content }</li> ],
 					} );
 				},
@@ -118,7 +130,7 @@ export const settings = {
 				regExp: /^1[.)]\s/,
 				transform: ( { content } ) => {
 					return createBlock( 'core/list', {
-						nodeName: 'OL',
+						ordered: true,
 						values: [ <li key="1">{ content }</li> ],
 					} );
 				},
@@ -149,6 +161,40 @@ export const settings = {
 		],
 	},
 
+	deprecated: [
+		{
+			supports,
+			attributes: {
+				...omit( schema, [ 'ordered' ] ),
+				nodeName: {
+					type: 'string',
+					source: 'property',
+					selector: 'ol,ul',
+					property: 'nodeName',
+					default: 'UL',
+				},
+			},
+			migrate( { attributes } ) {
+				const { nodeName, ...migratedAttributes } = attributes;
+
+				return {
+					...migratedAttributes,
+					ordered: 'OL' === nodeName,
+				};
+			},
+			save( { attributes } ) {
+				const { nodeName, values } = attributes;
+
+				return (
+					<RichText.Content
+						tagName={ nodeName.toLowerCase() }
+						value={ values }
+					/>
+				);
+			},
+		},
+	],
+
 	merge( attributes, attributesToMerge ) {
 		const valuesToMerge = attributesToMerge.values || [];
 
@@ -177,13 +223,6 @@ export const settings = {
 			this.state = {
 				internalListType: null,
 			};
-		}
-
-		isListActive( listType ) {
-			const { internalListType } = this.state;
-			const { nodeName } = this.props.attributes;
-
-			return listType === ( internalListType ? internalListType : nodeName );
 		}
 
 		findInternalListType( { parents } ) {
@@ -224,7 +263,7 @@ export const settings = {
 						this.editor.execCommand( command );
 					}
 				} else {
-					setAttributes( { nodeName: type } );
+					setAttributes( { ordered: type === 'OL' } );
 				}
 			};
 		}
@@ -258,7 +297,8 @@ export const settings = {
 				onReplace,
 				className,
 			} = this.props;
-			const { nodeName, values } = attributes;
+			const { ordered, values } = attributes;
+			const tagName = ordered ? 'ol' : 'ul';
 
 			return (
 				<Fragment>
@@ -267,13 +307,13 @@ export const settings = {
 							{
 								icon: 'editor-ul',
 								title: __( 'Convert to unordered list' ),
-								isActive: this.isListActive( 'UL' ),
+								isActive: ! ordered,
 								onClick: this.createSetListType( 'UL', 'InsertUnorderedList' ),
 							},
 							{
 								icon: 'editor-ol',
 								title: __( 'Convert to ordered list' ),
-								isActive: this.isListActive( 'OL' ),
+								isActive: ordered,
 								onClick: this.createSetListType( 'OL', 'InsertOrderedList' ),
 							},
 							{
@@ -290,7 +330,7 @@ export const settings = {
 					/>
 					<RichText
 						multiline="li"
-						tagName={ nodeName.toLowerCase() }
+						tagName={ tagName }
 						getSettings={ this.getEditorSettings }
 						onSetup={ this.setupEditor }
 						onChange={ this.setNextValues }
@@ -308,7 +348,7 @@ export const settings = {
 
 									if ( after.length ) {
 										blocks.push( createBlock( 'core/list', {
-											nodeName,
+											ordered,
 											values: after,
 										} ) );
 									}
@@ -326,10 +366,11 @@ export const settings = {
 	},
 
 	save( { attributes } ) {
-		const { nodeName, values } = attributes;
+		const { ordered, values } = attributes;
+		const tagName = ordered ? 'ol' : 'ul';
 
 		return (
-			<RichText.Content tagName={ nodeName.toLowerCase() } value={ values } />
+			<RichText.Content tagName={ tagName } value={ values } />
 		);
 	},
 };
