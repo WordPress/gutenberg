@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { differenceBy, camelCase } from 'lodash';
+import { differenceBy, camelCase, forEach } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,24 +10,25 @@ import { doAction } from '@wordpress/hooks';
 import { subscribe, select } from '@wordpress/data';
 
 /**
- * A compare helper for lodash's difference by
+ * A compare helper for lodash's differenceBy function
  *
- * @param {Component} block A block object.
- * @return {string} block.uid The uid of the block object for comparison.
+ * @param  {Component} block      A block object.
+ * @return {string}    block.uid  The uid of the block object for comparison.
  */
 const compareBlocks = ( block ) => {
 	return block.uid;
 };
 
 /**
- * A change listener for blocks
+ * A change listener for blocks from the 'core/editor' store that fires a
+ * function upon a change in the block collection.
  *
  * The subscribe on the 'core/editor' getBlocks() function fires on any change,
  * not just additions/removals. Therefore we actually compare the array with a
  * previous state and look for changes in length or uid.
  *
- * @param  {function} selector Selector.
- * @param  {function} listener Listener.
+ * @param  {function} selector Selector. A collection of object that are watched.
+ * @param  {function} listener Listener. A function beeing called when selector changes.
  * @return {function}          Listener creator.
  */
 const onBlocksChangeListener = ( selector, listener ) => {
@@ -35,22 +36,40 @@ const onBlocksChangeListener = ( selector, listener ) => {
 	return () => {
 		const selectedBlocks = selector();
 
-		// For performance reasons we first check the cheap length change,
-		// before we actuallly do a deep object comparison
+		// Check to see if the number of blocks has changed. This is faster than a
+		// deep object compare and signifies a change event should be fired.
 		if ( selectedBlocks.length !== previousBlocks.length ) {
-			// The block list length has changed, so there is obviously a change event happening
 			listener( selectedBlocks, previousBlocks );
 			previousBlocks = selectedBlocks;
-		} else if ( differenceBy( selectedBlocks, previousBlocks, compareBlocks ).length ) {
-			// A deep inspection has shown, that the list has changed
-			listener( selectedBlocks, previousBlocks, differenceBy( selectedBlocks, previousBlocks, compareBlocks ) );
-			previousBlocks = selectedBlocks;
+		} else {
+			const intersection = differenceBy( selectedBlocks, previousBlocks, compareBlocks );
+			if ( intersection.length ) {
+				listener( selectedBlocks, previousBlocks, intersection );
+				previousBlocks = selectedBlocks;
+			}
 		}
 	};
 };
 
 /**
- * Subscribe to block data
+ * Loop over a collection of blocks and perform an action with the block name.
+ *
+ * @param  {string} actionName  The name of the action to be performed
+ * @param  {Array}  blocks      The collection of blocks for which the action shall be called
+ */
+const doActionForBlocks = ( actionName, blocks ) => {
+	if ( typeof blocks !== 'object' || blocks.length < 1 ) {
+		return;
+	}
+
+	forEach( blocks, ( block ) => {
+		const finalActionName = `${ actionName }.${ camelCase( block.name ) }`;
+		doAction( finalActionName, block );
+	} );
+};
+
+/**
+ * Subscribe to the blockList data from the 'core/editor' store to perform actions upon list change.
  *
  * This function subscribes to block data, compares old and new states upon
  * change and fires actions accordingly.
@@ -62,31 +81,15 @@ subscribe( onBlocksChangeListener( select( 'core/editor' ).getBlocks, ( blocks, 
 	// When the length is equal, but a change hapened, we have a transformation
 	if ( oldBlocks.length === blocks.length && difference ) {
 		// A block has been deleted
-		for ( const i in deletedBlocks ) {
-			const block = deletedBlocks[ i ];
-			const actionName = 'blocks.transformed.from.' + camelCase( block.name );
-			doAction( actionName, block );
-		}
+		doActionForBlocks( 'blocks.transformed.from', deletedBlocks );
 
 		// A block has been added
-		for ( const i in addedBlocks ) {
-			const block = addedBlocks[ i ];
-			const actionName = 'blocks.transformed.to.' + camelCase( block.name );
-			doAction( actionName, block );
-		}
+		doActionForBlocks( 'blocks.transformed.to', addedBlocks );
 	} else {
-		// A block has been added
-		for ( const i in addedBlocks ) {
-			const block = addedBlocks[ i ];
-			const actionName = 'blocks.added.' + camelCase( block.name );
-			doAction( actionName, block );
-		}
-
 		// A block has been deleted
-		for ( const i in deletedBlocks ) {
-			const block = deletedBlocks[ i ];
-			const actionName = 'blocks.removed.' + camelCase( block.name );
-			doAction( actionName, block );
-		}
+		doActionForBlocks( 'blocks.removed', deletedBlocks );
+
+		// A block has been added
+		doActionForBlocks( 'blocks.added', addedBlocks );
 	}
 } ) );
