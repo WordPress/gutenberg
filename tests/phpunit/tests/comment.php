@@ -1042,7 +1042,7 @@ class Tests_Comment extends WP_UnitTestCase {
 		$this->assertSame( $expected['comment_agent'], $actual['data'][0]['data'][4]['value'] );
 		$this->assertSame( $expected['comment_date'], $actual['data'][0]['data'][5]['value'] );
 		$this->assertSame( $expected['comment_content'], $actual['data'][0]['data'][6]['value'] );
-		$this->assertSame( get_comment_link( $comment_id ), strip_tags( $actual['data'][0]['data'][7]['value'] ) );
+		$this->assertSame( esc_html( get_comment_link( $comment_id ) ), strip_tags( $actual['data'][0]['data'][7]['value'] ) );
 	}
 
 	/**
