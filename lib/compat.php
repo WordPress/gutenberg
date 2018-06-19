@@ -94,7 +94,7 @@ add_filter( 'wp_editor_settings', 'gutenberg_disable_editor_settings_wpautop' );
 function gutenberg_add_classic_editor_fixes() {
 	// Temp add the fix for not creating paragraphs from HTML comments.
 	// TODO: remove after 4.9.7, this should be in core.
-	$scritp = <<<JS
+	$script = <<<JS
 jQuery( document ).on( 'tinymce-editor-setup', function( event, editor ) {
 	var hasWpautop = ( window.wp && window.wp.editor && window.wp.editor.autop && editor.getParam( 'wpautop', true ) );
 
@@ -114,7 +114,7 @@ jQuery( document ).on( 'tinymce-editor-setup', function( event, editor ) {
 });
 JS;
 
-	wp_add_inline_script( 'editor', $scritp, 'before' );
+	wp_add_inline_script( 'editor', $script, 'before' );
 
 }
 add_action( 'init', 'gutenberg_add_classic_editor_fixes' );
