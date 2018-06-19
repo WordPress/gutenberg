@@ -1210,14 +1210,14 @@ add_action( 'enqueue_block_assets', 'polyfill_blocks_module_in_scripts', 9 );
  * This helper function ensures, that every item in $color_palette has a slug.
  *
  * @access public
- * @param array $color_palette The color palette registered with theme_support
+ * @param array $color_palette The color palette registered with theme_support.
  * @return array $new_color_palette The color palette with slugs added where needed
  */
 function editor_color_palette_slugs( $color_palette ) {
 	$new_color_palette = array();
 
-	foreach( $color_palette as $color ) {
-		if( ! isset( $color['slug'] ) ) {
+	foreach ( $color_palette as $color ) {
+		if ( ! isset( $color['slug'] ) ) {
 			$color['slug'] = esc_js( $color['name'] );
 		}
 
