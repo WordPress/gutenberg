@@ -55,6 +55,9 @@ export class PostAuthor extends Component {
 	}
 
 	suggestAuthor( query, populateResults ) {
+		if ( query.length < 2 ) {
+			return;
+		}
 		const payload = '?search=' + encodeURIComponent( query );
 		apiRequest( { path: '/wp/v2/users' + payload } ).done( ( results ) => {
 			this.authors = results;
