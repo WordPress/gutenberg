@@ -32,7 +32,7 @@ export async function* getCategories() {
  * Requests authors from the REST API.
  */
 export async function* getAuthors() {
-	const users = await apiRequest( { path: '/wp/v2/users/?who=authors&per_page=-1' } );
+	const users = await apiRequest( { path: '/wp/v2/users/?who=authors&per_page=100' } );
 	yield receiveUserQuery( 'authors', users );
 }
 
