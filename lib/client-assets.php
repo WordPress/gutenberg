@@ -1139,7 +1139,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	}
 
 	if ( ! empty( $color_palette ) ) {
-		$editor_settings['colors'] = apply_filters( 'editor_color_palette', $color_palette );
+		$editor_settings['colors'] = editor_color_palette_slugs( $color_palette );
 	}
 
 	if ( ! empty( $post_type_object->template ) ) {
@@ -1226,4 +1226,3 @@ function editor_color_palette_slugs( $color_palette ) {
 
 	return $new_color_palette;
 }
-add_filter( 'editor_color_palette', 'editor_color_palette_slugs' );
