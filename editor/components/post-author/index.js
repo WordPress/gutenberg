@@ -32,25 +32,24 @@ export class PostAuthor extends Component {
 		this.authors = authors;
 		if ( authors.length > 50 ) {
 			accessibleAutocomplete.enhanceSelectElement( {
-			  selectElement: document.querySelector( '#post-author-selector-' + instanceId ),
-			  minLength: 2,
-			  showAllValues: true,
-			  autoselect: true,
-			  displayMenu: 'overlay',
-			  onConfirm: this.setAuthorId,
-			  source: debounce( this.suggestAuthor, 300 ),
-			  tNoResults: () => __( 'No results found' ),
-			  'tStatusQueryTooShort': ( minQueryLength ) => __( 'Type in ${minQueryLength} or more characters for results' ),
-			  tStatusNoResults:: => __( 'No search results' ),
-			  tStatusSelectedOption: ( selectedOption, length ) => __( '${selectedOption} (1 of ${length}) is selected' ),
-			  tStatusResults: ( length, contentSelectedOption ) => {
-				const words = {
-					result: (length === 1) ? __( 'result' ) : __( 'results' ),
-					is: (length === 1) ? __( 'is' ) : __( 'are' )
+				selectElement: document.querySelector( '#post-author-selector-' + instanceId ),
+				minLength: 2,
+				showAllValues: true,
+				autoselect: true,
+				displayMenu: 'overlay',
+				onConfirm: this.setAuthorId,
+				source: debounce( this.suggestAuthor, 300 ),
+				tNoResults: () => __( 'No results found' ),
+				tStatusQueryTooShort: ( minQueryLength ) => __( 'Type in ${minQueryLength} or more characters for results' ),
+				tStatusNoResults: () => __( 'No search results' ),
+				tStatusSelectedOption: ( selectedOption, length ) => __( '${selectedOption} (1 of ${length}) is selected' ),
+				tStatusResults: ( length, contentSelectedOption ) => {
+					const words = {
+						result: (length === 1) ? __( 'result' ) : __( 'results' ),
+						is: (length === 1) ? __( 'is' ) : __( 'are' )
+					}
+					return <span>{length} {words.result} {words.is} available. {contentSelectedOption}</span>
 				}
-
-				  return <span>{length} {words.result} {words.is} available. {contentSelectedOption}</span>
-}
 			} );
 		}
 	}
