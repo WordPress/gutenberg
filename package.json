@@ -67,6 +67,7 @@
 		"@wordpress/custom-templated-path-webpack-plugin": "1.0.2",
 		"@wordpress/jest-preset-default": "1.0.6",
 		"@wordpress/scripts": "1.2.0",
+		"accessible-autocomplete": "1.6.1",
 		"autoprefixer": "8.2.0",
 		"babel-core": "6.26.0",
 		"babel-eslint": "8.0.3",
