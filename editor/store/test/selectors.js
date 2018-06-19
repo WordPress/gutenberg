@@ -418,6 +418,19 @@ describe( 'selectors', () => {
 
 			expect( getEditedPostAttribute( state, 'title' ) ).toBe( 'youcha' );
 		} );
+
+		it( 'should not return by object prototype member', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
+			};
+
+			expect( getEditedPostAttribute( state, 'valueOf' ) ).toBeUndefined();
+		} );
 	} );
 
 	describe( 'getCurrentPostLastRevisionId', () => {

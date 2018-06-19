@@ -200,10 +200,14 @@ export function getEditedPostAttribute( state, attributeName ) {
 	}
 
 	const edits = getPostEdits( state );
+	if ( edits.hasOwnProperty( attributeName ) ) {
+		return edits[ attributeName ];
+	}
 
-	return edits[ attributeName ] === undefined ?
-		state.currentPost[ attributeName ] :
-		edits[ attributeName ];
+	const currentPost = getCurrentPost( state );
+	if ( currentPost.hasOwnProperty( attributeName ) ) {
+		return currentPost[ attributeName ];
+	}
 }
 
 /**
