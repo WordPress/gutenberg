@@ -49,6 +49,7 @@ class latestComments extends Component {
 
 	render() {
 
+		const { setAttributes } = this.props;
 		const { align, displayAvatar, displayTimestamp } = this.props.attributes;
 
 		return (
