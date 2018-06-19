@@ -11,6 +11,13 @@ import { withSelect, withDispatch } from '@wordpress/data';
  */
 import PostAuthorCheck from './check';
 
+/**
+ * External dependencies
+ */
+import accessibleAutocomplete from 'accessible-autocomplete';
+import './accessible-autocomplete.css';
+import { findWhere } from 'underscore';
+
 export class PostAuthor extends Component {
 	constructor() {
 		super( ...arguments );
@@ -18,10 +25,23 @@ export class PostAuthor extends Component {
 		this.setAuthorId = this.setAuthorId.bind( this );
 	}
 
-	setAuthorId( event ) {
-		const { onUpdateAuthor } = this.props;
-		const { value } = event.target;
-		onUpdateAuthor( Number( value ) );
+	componentDidMount() {
+		const { instanceId } = this.props;
+		accessibleAutocomplete.enhanceSelectElement( {
+		  selectElement: document.querySelector( '#post-author-selector-' + instanceId ),
+		  minLength: 2,
+		  showAllValues: true,
+		  autoselect: true,
+		  displayMenu: 'overlay',
+		  onConfirm: this.setAuthorId
+		} );
+	}
+
+	setAuthorId( selectedName ) {
+		const { onUpdateAuthor, authors } = this.props;
+		const author = findWhere( authors, { name: selectedName } );
+		console.log( 'author.id', author.id );
+		onUpdateAuthor( Number( author.id ) );
 	}
 
 	render() {
@@ -37,7 +57,6 @@ export class PostAuthor extends Component {
 				<select
 					id={ selectId }
 					value={ postAuthor }
-					onChange={ this.setAuthorId }
 					className="editor-post-author__select"
 				>
 					{ authors.map( ( author ) => (
