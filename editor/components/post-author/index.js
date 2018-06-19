@@ -59,7 +59,6 @@ export class PostAuthor extends Component {
 		apiRequest( { path: '/wp/v2/users' + payload } ).done( ( results ) => {
 			this.authors = results;
 			populateResults( results.map( ( author ) => ( author.name ) ) );
-
 		} );
 	}
 
