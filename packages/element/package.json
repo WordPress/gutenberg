@@ -20,6 +20,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
+		"@wordpress/deprecated": "^1.0.0-alpha.1",
 		"@wordpress/is-shallow-equal": "1.0.2",
 		"lodash": "4.17.5",
 		"react": "16.3.2",
