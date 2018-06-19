@@ -1139,7 +1139,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	}
 
 	if ( ! empty( $color_palette ) ) {
-		$editor_settings['colors'] = $color_palette;
+		$editor_settings['colors'] = apply_filters( 'editor_color_palette', $color_palette );
 	}
 
 	if ( ! empty( $post_type_object->template ) ) {
@@ -1204,3 +1204,26 @@ function polyfill_blocks_module_in_scripts() {
 
 add_action( 'enqueue_block_editor_assets', 'polyfill_blocks_module_in_scripts', 9 );
 add_action( 'enqueue_block_assets', 'polyfill_blocks_module_in_scripts', 9 );
+
+
+/**
+ * This helper function ensures, that every item in $color_palette has a slug.
+ *
+ * @access public
+ * @param array $color_palette The color palette registered with theme_support
+ * @return array $new_color_palette The color palette with slugs added where needed
+ */
+function editor_color_palette_slugs( $color_palette ) {
+	$new_color_palette = array();
+
+	foreach( $color_palette as $color ) {
+		if( ! isset( $color['slug'] ) ) {
+			$color['slug'] = esc_js( $color['name'] );
+		}
+
+		$new_color_palette[] = $color;
+	}
+
+	return $new_color_palette;
+}
+add_filter( 'editor_color_palette', 'editor_color_palette_slugs' );

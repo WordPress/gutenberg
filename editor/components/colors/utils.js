@@ -15,7 +15,7 @@ import { find, kebabCase } from 'lodash';
  */
 export const getColorValue = ( colors, namedColor, customColor ) => {
 	if ( namedColor ) {
-		const colorObj = ( find( colors, { name: namedColor } ) || find( colors, { slug: namedColor } ) );
+		const colorObj = find( colors, { slug: namedColor } );
 		return colorObj && colorObj.color;
 	}
 	if ( customColor ) {
