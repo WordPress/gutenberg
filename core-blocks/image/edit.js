@@ -344,6 +344,7 @@ class ImageEdit extends Component {
 							const ratio = imageWidth / imageHeight;
 							const minWidth = imageWidth < imageHeight ? MIN_SIZE : MIN_SIZE * ratio;
 							const minHeight = imageHeight < imageWidth ? MIN_SIZE : MIN_SIZE / ratio;
+							const isRLT = window.getComputedStyle( document.querySelector( '.editor-block-list__layout' ) ).direction === 'rtl';
 
 							return (
 								<Fragment>
@@ -361,12 +362,11 @@ class ImageEdit extends Component {
 										maxHeight={ maxWidth / ratio }
 										lockAspectRatio
 										handleClasses={ {
-											topRight: 'wp-block-image__resize-handler-top-right',
-											bottomRight: 'wp-block-image__resize-handler-bottom-right',
-											topLeft: 'wp-block-image__resize-handler-top-left',
-											bottomLeft: 'wp-block-image__resize-handler-bottom-left',
+											right: 'wp-block-image__resize-handler-right',
+											bottom: 'wp-block-image__resize-handler-bottom',
+											left: 'wp-block-image__resize-handler-left',
 										} }
-										enable={ { top: false, right: true, bottom: false, left: false, topRight: true, bottomRight: true, bottomLeft: true, topLeft: true } }
+										enable={ { top: false, right: ! isRLT, bottom: true, left: isRLT } }
 										onResizeStart={ () => {
 											toggleSelection( false );
 										} }
