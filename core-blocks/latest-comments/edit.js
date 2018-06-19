@@ -3,11 +3,9 @@
  */
 import { Component, Fragment } from '@wordpress/element';
 import {
-	Placeholder,
-	Spinner,
 	TextControl,
 	ToggleControl,
-	ServerSideRender
+	ServerSideRender,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -48,7 +46,6 @@ class latestComments extends Component {
 	}
 
 	render() {
-
 		const { setAttributes } = this.props;
 		const { align, displayAvatar, displayTimestamp } = this.props.attributes;
 
