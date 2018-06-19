@@ -38,7 +38,7 @@ export class DotTip extends Component {
 	}
 
 	render() {
-		const { children, isVisible, hasNextTip, onDismiss } = this.props;
+		const { children, isVisible, hasNextTip, onDismiss, onDisable } = this.props;
 
 		if ( ! isVisible ) {
 			return null;
@@ -65,8 +65,8 @@ export class DotTip extends Component {
 				<IconButton
 					className="nux-dot-tip__disable"
 					icon="no-alt"
-					label={ __( 'Dismiss tip' ) }
-					onClick={ onDismiss }
+					label={ __( 'Disable tips' ) }
+					onClick={ onDisable }
 				/>
 			</Popover>
 		);
@@ -83,10 +83,13 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch, { id } ) => {
-		const { dismissTip } = dispatch( 'core/nux' );
+		const { dismissTip, disableTips } = dispatch( 'core/nux' );
 		return {
 			onDismiss() {
 				dismissTip( id );
+			},
+			onDisable() {
+				disableTips();
 			},
 		};
 	} ),
