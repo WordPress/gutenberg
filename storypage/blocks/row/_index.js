@@ -55,7 +55,7 @@ function getBlockName( row ) {
 	}
 
 	const cols = map( row.cols, ( col ) => `col${ col }` );
-	return `rows/${ cols.join( '-' ) }`;
+	return `storypage/rows-${ cols.join( '-' ) }`;
 }
 
 /**
@@ -69,7 +69,7 @@ function getBlockSettings( row ) {
 
 		icon: 'columns',
 
-		category: 'rows',
+		category: 'storypage',
 
 		attributes: {
 			columns: {
@@ -80,13 +80,9 @@ function getBlockSettings( row ) {
 
 		description: row.description,
 
-		// supports: {
-		// 	align: [ 'wide', 'full' ],
-		// },
-
 		edit( { attributes, className } ) {
 			const { columns } = attributes;
-			const classes = classnames( className, 'wp-block-rows' );
+			const classes = classnames( className, 'wp-block-storypage-rows' );
 
 			return (
 				<Fragment>
@@ -99,7 +95,7 @@ function getBlockSettings( row ) {
 
 		save() {
 			return (
-				<div className={ 'wp-block-rows' }>
+				<div className={ 'wp-block-storypage-rows' }>
 					<InnerBlocks.Content />
 				</div>
 			);

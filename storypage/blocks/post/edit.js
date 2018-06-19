@@ -39,7 +39,7 @@ import { withSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import '../cover-image/editor.scss';
+// import '../../core-blocks/cover-image/editor.scss';
 import './editor.scss';
 
 const { getComputedStyle } = window;

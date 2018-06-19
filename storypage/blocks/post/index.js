@@ -14,8 +14,8 @@ import {
 /**
  * Internal dependencies
  */
-import '../paragraph/style.scss';
-import '../cover-image/style.scss';
+// import '../paragraph/style.scss';
+// import '../cover-image/style.scss';
 import edit, {
 	dimRatioToClass,
 	backgroundImageStyles,
@@ -75,7 +75,7 @@ const blockAttributes = {
 	},
 };
 
-export const name = 'custom/post';
+export const name = 'storypage/post';
 
 export const settings = {
 	title: __( 'Post' ),
@@ -84,7 +84,7 @@ export const settings = {
 
 	icon: 'universal-access-alt',
 
-	category: 'common',
+	category: 'storypage',
 
 	attributes: blockAttributes,
 

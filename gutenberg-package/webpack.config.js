@@ -222,6 +222,7 @@ const config = {
 				test: /editor\.s?css$/,
 				include: [
 					/core-blocks/,
+					/storypage\/blocks/
 				],
 				use: editBlocksCSSPlugin.extract( {
 					use: [
