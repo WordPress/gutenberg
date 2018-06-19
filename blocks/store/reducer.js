@@ -6,12 +6,28 @@ import { filter, map, keyBy, omit } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { combineReducers } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { DEFAULT_CATEGORIES } from './defaults';
+import {
+	SUGGESTED_PANEL,
+	SHARED_PANEL,
+} from '../api/inserter_menu';
+
+/**
+ * Module Constants
+ */
+export const DEFAULT_CATEGORIES = [
+	{ slug: 'common', title: __( 'Common Blocks' ) },
+	{ slug: 'formatting', title: __( 'Formatting' ) },
+	{ slug: 'layout', title: __( 'Layout Elements' ) },
+	{ slug: 'widgets', title: __( 'Widgets' ) },
+	{ slug: 'embed', title: __( 'Embeds' ) },
+	{ slug: 'shared', title: __( 'Shared Blocks' ) },
+];
 
 /**
  * Reducer managing the block types
@@ -72,10 +88,46 @@ export const fallbackBlockName = createBlockNameSetterReducer( 'SET_FALLBACK_BLO
  * @return {Object} Updated state.
  */
 export function categories( state = DEFAULT_CATEGORIES, action ) {
-	if ( action.type === 'ADD_CATEGORIES' ) {
-		const addedSlugs = map( action.categories, ( category ) => category.slug );
-		const previousState = filter( state, ( category ) => addedSlugs.indexOf( category.slug ) === -1 );
-		return [ ...previousState, ...action.categories ];
+	switch ( action.type ) {
+		case 'ADD_CATEGORIES':
+			const addedSlugs = map( action.categories, ( category ) => category.slug );
+			const previousState = filter( state, ( category ) => addedSlugs.indexOf( category.slug ) === -1 );
+			return [ ...previousState, ...action.categories ];
+		/*
+		 * @frontkom/gutenberg 0.1.4
+		 */
+		case 'REMOVE_CATEGORIES':
+			const nextState = filter( state, ( category ) => action.categories.indexOf( category.slug ) === -1 );
+			return [ ...nextState ];
+	}
+
+	return state;
+}
+
+/*
+ * @frontkom/gutenberg 0.1.4
+ */
+const defaultInserterMenuPanels = { [ SUGGESTED_PANEL ]: true, [ SHARED_PANEL ]: true };
+
+/**
+ * Reducer managing the inserter menu panels
+ * @since  @frontkom/gutenberg 0.1.4
+ * @param  {Object} state  Current state.
+ * @param  {Object} action Dispatched action.
+ * @return {Object}        Updated state.
+ */
+export function inserterMenuPanels( state = defaultInserterMenuPanels, action ) {
+	switch ( action.type ) {
+		case 'HIDE_INSERTER_MENU_PANEL':
+			return { 
+				...state,
+				[ action.slug ]: false,
+			};
+		case 'SHOW_INSERTER_MENU_PANEL':
+			return { 
+				...state,
+				[ action.slug ]: true,
+			};
 	}
 
 	return state;
@@ -86,4 +138,5 @@ export default combineReducers( {
 	defaultBlockName,
 	fallbackBlockName,
 	categories,
+	inserterMenuPanels,
 } );

@@ -25,7 +25,7 @@ export default withAPIData( ( props ) => {
 		order: props.options.order || 'desc',
 		orderby: props.options.orderBy || 'date',
 		per_page: 10,
-		datetime: Date.now(), // make postsList is always updated
+		// datetime: Date.now(), // make postsList is always updated
 	}, ( value ) => ! isUndefined( value ) ) );
 
 	return {

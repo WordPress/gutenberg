@@ -25,10 +25,7 @@ export {
 	SUGGESTED_PANEL,
 	SHARED_PANEL,
 	getDefaultOpenPanels,
-	isSuggestedPanelVisible,
-	isSharedPanelVisible,
-	getInserterMenuCats,
-} from './inserter_menu_panels';
+} from './inserter_menu';
 export {
 	registerBlockType,
 	unregisterBlockType,
