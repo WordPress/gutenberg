@@ -1,4 +1,4 @@
-/* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
+/* eslint no-console: [ 'error', { allow: [ 'error', 'log' ] } ] */
 
 /**
  * External dependencies
@@ -124,7 +124,7 @@ export function registerBlockType( name, settings ) {
 		! some( select( 'core/blocks' ).getCategories(), { slug: settings.category } )
 	) {
 		/*
-		 * Gutenberg by Front 0.1.4 
+		 * Gutenberg by Front 0.1.4
 		 */
 		console.log(
 			'The block "' + name + '" must have a registered category.'
