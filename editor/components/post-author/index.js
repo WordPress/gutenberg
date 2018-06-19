@@ -39,6 +39,18 @@ export class PostAuthor extends Component {
 			  displayMenu: 'overlay',
 			  onConfirm: this.setAuthorId,
 			  source: debounce( this.suggestAuthor, 300 ),
+			  tNoResults: () => __( 'No results found' ),
+			  'tStatusQueryTooShort': ( minQueryLength ) => __( 'Type in ${minQueryLength} or more characters for results' ),
+			  tStatusNoResults:: => __( 'No search results' ),
+			  tStatusSelectedOption: ( selectedOption, length ) => __( '${selectedOption} (1 of ${length}) is selected' ),
+			  tStatusResults: ( length, contentSelectedOption ) => {
+				const words = {
+					result: (length === 1) ? __( 'result' ) : __( 'results' ),
+					is: (length === 1) ? __( 'is' ) : __( 'are' )
+				}
+
+				  return <span>{length} {words.result} {words.is} available. {contentSelectedOption}</span>
+}
 			} );
 		}
 	}
