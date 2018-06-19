@@ -159,7 +159,7 @@ export const getEntityRecords = createSelector(
 );
 
 /**
- * Return theme suports data in the index.
+ * Return theme supports data in the index.
  *
  * @param {Object} state Data state.
  *

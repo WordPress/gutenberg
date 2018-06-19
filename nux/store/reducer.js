@@ -25,16 +25,19 @@ export function guides( state = [], action ) {
 }
 
 /**
- * Reducer that tracks whether or not tips are globally disabled.
+ * Reducer that tracks whether or not tips are globally enabled.
  *
  * @param {boolean} state Current state.
  * @param {Object} action Dispatched action.
  *
  * @return {boolean} Updated state.
  */
-export function areTipsDisabled( state = false, action ) {
+export function areTipsEnabled( state = true, action ) {
 	switch ( action.type ) {
 		case 'DISABLE_TIPS':
+			return false;
+
+		case 'ENABLE_TIPS':
 			return true;
 	}
 
@@ -57,11 +60,14 @@ export function dismissedTips( state = {}, action ) {
 				...state,
 				[ action.id ]: true,
 			};
+
+		case 'ENABLE_TIPS':
+			return {};
 	}
 
 	return state;
 }
 
-const preferences = combineReducers( { areTipsDisabled, dismissedTips } );
+const preferences = combineReducers( { areTipsEnabled, dismissedTips } );
 
 export default combineReducers( { guides, preferences } );

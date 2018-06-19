@@ -25,22 +25,20 @@ export class DotTip extends Component {
 
 	componentDidMount() {
 		if ( this.props.isVisible ) {
-			// Force the popover to recalculate its position on the next frame. This is a
-			// Temporary workaround to fix the tip not appearing next to the inserter
-			// toggle on page load. This happens because the popover calculates its
-			// position before <PostTitle> is made visible, resulting in the position
-			// being too high on the page.
+			// Force the popover to recalculate its position on the next frame. This
+			// fixes the tip not appearing next to the inserter toggle on page load. This
+			// happens because the popover calculates its position before <PostTitle> is
+			// made visible, resulting in the position being too high on the page.
 			defer( () => {
 				const popover = this.popoverRef.current;
-				const popoverSize = popover.updatePopoverSize();
-				popover.computePopoverPosition( popoverSize );
+				popover.refresh();
 				popover.focus();
 			} );
 		}
 	}
 
 	render() {
-		const { children, isVisible, hasNextTip, onDismiss } = this.props;
+		const { children, isVisible, hasNextTip, onDismiss, onDisable } = this.props;
 
 		if ( ! isVisible ) {
 			return null;
@@ -67,8 +65,8 @@ export class DotTip extends Component {
 				<IconButton
 					className="nux-dot-tip__disable"
 					icon="no-alt"
-					label={ __( 'Dismiss tip' ) }
-					onClick={ onDismiss }
+					label={ __( 'Disable tips' ) }
+					onClick={ onDisable }
 				/>
 			</Popover>
 		);
@@ -85,10 +83,13 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch, { id } ) => {
-		const { dismissTip } = dispatch( 'core/nux' );
+		const { dismissTip, disableTips } = dispatch( 'core/nux' );
 		return {
 			onDismiss() {
 				dismissTip( id );
+			},
+			onDisable() {
+				disableTips();
 			},
 		};
 	} ),

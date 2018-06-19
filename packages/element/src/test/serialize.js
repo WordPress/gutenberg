@@ -322,6 +322,7 @@ describe( 'renderComponent()', () => {
 
 		const result = renderComponent( Example, {} );
 
+		expect( console ).toHaveWarned();
 		expect( result ).toBe( 'constructedwillMounted' );
 	} );
 

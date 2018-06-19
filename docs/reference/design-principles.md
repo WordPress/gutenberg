@@ -216,7 +216,7 @@ This concept is speculative, but it's one direction Gutenberg could go in the fu
 
 ## More resources
 
-If you'd like to contribute, you can download a Sketch file of the Gutenberg mockups. Note that those are still mockups, and not 1:1 accurate. It is also possibole that the Sketch files aren't up-to-date with the latest Gutenberg itself, as development sometimes moves faster than our updating of the Sketch files!
+If you'd like to contribute, you can download a Sketch file of the Gutenberg mockups. Note that those are still mockups, and not 1:1 accurate. It is also possible that the Sketch files aren't up-to-date with the latest Gutenberg itself, as development sometimes moves faster than our updating of the Sketch files!
 
 **<a href="https://cloudup.com/c8Rbgsgg3nq">Download Sketch mockups & patterns files</a>**.
 

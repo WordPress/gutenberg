@@ -7,6 +7,7 @@ import { mapValues, reduce, forEach, noop } from 'lodash';
  * WordPress dependencies
  */
 import { Component, createHigherOrderComponent } from '@wordpress/element';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -18,32 +19,26 @@ export default ( mapPropsToData ) => createHigherOrderComponent( ( WrappedCompon
 	class APIDataComponent extends Component {
 		constructor( props, context ) {
 			super( ...arguments );
-
-			this.state = {
-				dataProps: {},
-			};
-
 			this.schema = context.getAPISchema();
 			this.routeHelpers = mapValues( {
 				type: context.getAPIPostTypeRestBaseMapping(),
 				taxonomy: context.getAPITaxonomyRestBaseMapping(),
 			}, ( mapping ) => ( key ) => mapping[ key ] );
-		}
-
-		componentWillMount() {
+			this.state = {
+				dataProps: this.applyMapping( props ),
+			};
 			this.isStillMounted = true;
-			this.applyMapping( this.props );
 		}
 
 		componentDidMount() {
 			this.initializeFetchable( {} );
 		}
 
-		componentWillReceiveProps( nextProps ) {
-			this.applyMapping( nextProps );
-		}
-
 		componentDidUpdate( prevProps, prevState ) {
+			if ( ! isShallowEqual( prevProps, this.props ) ) {
+				const dataProps = this.applyMapping( this.props, this.state.dataProps );
+				this.setState( { dataProps } );
+			}
 			this.initializeFetchable( prevState.dataProps );
 		}
 
@@ -159,16 +154,14 @@ export default ( mapPropsToData ) => createHigherOrderComponent( ( WrappedCompon
 				} );
 		}
 
-		applyMapping( props ) {
-			const { dataProps } = this.state;
-
+		applyMapping( props, previousDataProps = {} ) {
 			const mapping = mapPropsToData( props, this.routeHelpers );
 			const nextDataProps = reduce( mapping, ( result, path, propName ) => {
 				// Skip if mapping already assigned into state data props
-				// Exmaple: Component updates with one new prop and other
+				// Example: Component updates with one new prop and other
 				// previously existing; previously existing should not be
 				// clobbered or re-trigger fetch
-				const dataProp = dataProps[ propName ];
+				const dataProp = previousDataProps[ propName ];
 				if ( dataProp && dataProp.path === path ) {
 					result[ propName ] = dataProp;
 					return result;
@@ -182,7 +175,7 @@ export default ( mapPropsToData ) => createHigherOrderComponent( ( WrappedCompon
 				}
 
 				route.methods.forEach( ( method ) => {
-					// Add request initiater into data props
+					// Add request initiator into data props
 					const requestKey = this.getRequestKey( method );
 					result[ propName ][ requestKey ] = this.request.bind(
 						this,
@@ -209,7 +202,7 @@ export default ( mapPropsToData ) => createHigherOrderComponent( ( WrappedCompon
 				return result;
 			}, {} );
 
-			this.setState( () => ( { dataProps: nextDataProps } ) );
+			return nextDataProps;
 		}
 
 		render() {
