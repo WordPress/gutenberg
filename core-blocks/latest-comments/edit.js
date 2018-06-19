@@ -49,7 +49,6 @@ class latestComments extends Component {
 
 	render() {
 
-		const { isSelected } = this.props;
 		const { align, displayAvatar, displayTimestamp } = this.props.attributes;
 
 		return (
@@ -63,40 +62,36 @@ class latestComments extends Component {
 						controls={ [ 'left', 'center', 'right', 'wide', 'full' ] }
 					/>
 				</BlockControls>
-				{
-					isSelected && (
-						<InspectorControls key="inspector">
-							<h3>{ __( 'Latest Comments Settings' ) }</h3>
+				<InspectorControls key="inspector">
+					<h3>{ __( 'Latest Comments Settings' ) }</h3>
 
-							<ToggleControl
-								label={ __( 'Display avatar' ) }
-								checked={ displayAvatar }
-								onChange={ this.toggleHandler( 'displayAvatar' ) }
-							/>
+					<ToggleControl
+						label={ __( 'Display avatar' ) }
+						checked={ displayAvatar }
+						onChange={ this.toggleHandler( 'displayAvatar' ) }
+					/>
 
-							<ToggleControl
-								label={ __( 'Display timestamp' ) }
-								checked={ displayTimestamp }
-								onChange={ this.toggleHandler( 'displayTimestamp' ) }
-							/>
+					<ToggleControl
+						label={ __( 'Display timestamp' ) }
+						checked={ displayTimestamp }
+						onChange={ this.toggleHandler( 'displayTimestamp' ) }
+					/>
 
-							<ToggleControl
-								label={ __( 'Display excerpt' ) }
-								checked={ this.props.attributes.displayExcerpt }
-								onChange={ this.toggleHandler( 'displayExcerpt' ) }
-							/>
+					<ToggleControl
+						label={ __( 'Display excerpt' ) }
+						checked={ this.props.attributes.displayExcerpt }
+						onChange={ this.toggleHandler( 'displayExcerpt' ) }
+					/>
 
-							<TextControl
-								label={ __( 'Number of comments to show' ) }
-								type="number"
-								min={ MIN_COMMENTS }
-								max={ MAX_COMMENTS }
-								value={ this.props.attributes.commentsToShow }
-								onChange={ ( value ) => this.changeCommentsToShow( value ) }
-							/>
-						</InspectorControls>
-					)
-				}
+					<TextControl
+						label={ __( 'Number of comments to show' ) }
+						type="number"
+						min={ MIN_COMMENTS }
+						max={ MAX_COMMENTS }
+						value={ this.props.attributes.commentsToShow }
+						onChange={ ( value ) => this.changeCommentsToShow( value ) }
+					/>
+				</InspectorControls>
 				<ServerSideRender key="latest-comments" block="core/latest-comments" attributes={ this.props.attributes } />
 			</Fragment>
 		);
