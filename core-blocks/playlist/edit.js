@@ -9,9 +9,12 @@ import {
 	Placeholder,
 	ServerSideRender,
 	Toolbar,
+	CheckboxControl,
+	PanelBody,
 } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
 import {
+	InspectorControls,
 	MediaUpload,
 	BlockControls,
 	editorMediaUpload,
@@ -41,6 +44,7 @@ class PlaylistEdit extends Component {
 	render() {
 		const { attributes, setAttributes, className } = this.props;
 		const { editing } = this.state;
+		const { tracklist, artists, images } = attributes;
 
 		const onSelectMedia = ( media ) => {
 			//check if there are returned media items and set attributes when there are
@@ -57,6 +61,18 @@ class PlaylistEdit extends Component {
 		const uploadFromFiles = ( event ) => editorMediaUpload( event.target.files, setAudio, 'audio' );
 
 		const mediaIds = this.props.attributes.ids && this.props.attributes.ids.replace( /^\[(.+)\]$/, '$1' ).split( ',' );
+
+		const onToggleTracklist = ( newVal ) => {
+			setAttributes( { tracklist: newVal } );
+		};
+
+		const onToggleArtists = ( newVal ) => {
+			setAttributes( { artists: newVal } );
+		};
+
+		const onToggleImages = ( newVal ) => {
+			setAttributes( { images: newVal } );
+		};
 
 		if ( editing ) {
 			return (
@@ -80,11 +96,11 @@ class PlaylistEdit extends Component {
 						playlist
 						value={ this.props.attributes.ids }
 						render={ ( { open } ) => (
-						<Button isLarge onClick={ open }>
-							{ __( 'Media Library' ) }
-						</Button>
+							<Button isLarge onClick={ open }>
+								{ __( 'Media Library' ) }
+							</Button>
 						) }
-						/>
+					/>
 				</Placeholder>
 			);
 		}
@@ -94,23 +110,42 @@ class PlaylistEdit extends Component {
 			<Fragment>
 				<BlockControls>
 					<Toolbar>
-					<MediaUpload
-						onSelect={ onSelectMedia }
-						type="audio"
-						multiple
-						playlist
-						value={ mediaIds }
-						render={ ( { open } ) => (
-							<IconButton
-								className="components-toolbar__control"
-								label={ __( 'Edit Playlist' ) }
-								icon="edit"
-								onClick={ open }
-							/>
-						) }
-					/>
+						<MediaUpload
+							onSelect={ onSelectMedia }
+							type="audio"
+							multiple
+							playlist
+							value={ mediaIds }
+							render={ ( { open } ) => (
+								<IconButton
+									className="components-toolbar__control"
+									label={ __( 'Edit Playlist' ) }
+									icon="edit"
+									onClick={ open }
+								/>
+							) }
+						/>
 					</Toolbar>
 				</BlockControls>
+				<InspectorControls>
+					<PanelBody title={ __( 'Playback Controls' ) }>
+						<CheckboxControl
+							label={ __( 'Show Tracklist' ) }
+							onChange={ onToggleTracklist }
+							checked={ tracklist }
+						/>
+						<CheckboxControl
+							label={ __( 'Show Artist Name in Tracklist' ) }
+							onChange={ onToggleArtists }
+							checked={ artists }
+						/>
+						<CheckboxControl
+							label={ __( 'Show Images' ) }
+							onChange={ onToggleImages }
+							checked={ images }
+						/>
+					</PanelBody>
+				</InspectorControls>
 				<figure className={ className }>
 					<ServerSideRender
 						block="core/playlist"

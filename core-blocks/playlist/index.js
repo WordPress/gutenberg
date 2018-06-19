@@ -32,7 +32,7 @@ export const settings = {
 		images: {
 			type: 'boolean',
 		},
-		tracklist : {
+		tracklist: {
 			type: 'boolean',
 		},
 		align: {
