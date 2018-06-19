@@ -70,7 +70,7 @@ export function replaceActiveStyle( className, activeStyle, newStyle ) {
 
 function BlockStyles( { styles, className, onChangeClassName } ) {
 	if ( ! styles ) {
-		return;
+		return null;
 	}
 
 	const activeStyle = getActiveStyle( styles, className );
