@@ -10,6 +10,7 @@ import './style.scss';
 import BlockSwitcher from '../block-switcher';
 import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
+import BlockStyles from '../block-styles';
 
 function BlockToolbar( { block, mode } ) {
 	if ( ! block || ! block.isValid || mode !== 'visual' ) {
@@ -19,6 +20,7 @@ function BlockToolbar( { block, mode } ) {
 	return (
 		<div className="editor-block-toolbar">
 			<BlockSwitcher uids={ [ block.uid ] } />
+			<BlockStyles uid={ block.uid } />
 			<BlockControls.Slot />
 			<BlockFormatControls.Slot />
 		</div>
