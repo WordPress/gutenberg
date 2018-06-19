@@ -193,13 +193,13 @@ export function getPostEdits( state ) {
  * @return {*} Post attribute value.
  */
 export function getEditedPostAttribute( state, attributeName ) {
-	const edits = getPostEdits( state );
-
 	// Special cases
 	switch ( attributeName ) {
 		case 'content':
 			return getEditedPostContent( state );
 	}
+
+	const edits = getPostEdits( state );
 
 	return edits[ attributeName ] === undefined ?
 		state.currentPost[ attributeName ] :
