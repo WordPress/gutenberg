@@ -12,11 +12,15 @@ import { compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { getBlockType } from '@wordpress/blocks';
 
-function BlockStyles( { styles, className, onChangeClassName } ) {
-	if ( ! styles ) {
-		return;
-	}
-
+/**
+ * Returns the active style from the given className.
+ *
+ * @param {Array} styles Block style variations.
+ * @param {string} className  Class name
+ *
+ * @return {Object?} The active style.
+ */
+export function getActiveStyle( styles, className ) {
 	let activeStyle;
 	className
 		.split( ' ' )
@@ -33,21 +37,45 @@ function BlockStyles( { styles, className, onChangeClassName } ) {
 		activeStyle = find( styles, ( style ) => style.isDefault );
 	}
 
-	function updateClassName( style ) {
-		let added = false;
-		let updatedClassName = compact( className
-			.split( ' ' )
-			.map( ( current ) => {
-				const trimmed = current.trim();
-				if ( activeStyle && trimmed === 'is-style-' + activeStyle.name ) {
-					added = true;
-					return style.isDefault ? null : 'is-style-' + style.name;
-				}
-			} ) ).join( ' ' );
-		if ( ! added && ! style.isDefault ) {
-			updatedClassName = updatedClassName + ' is-style-' + style.name;
-		}
+	return activeStyle;
+}
 
+/**
+ * Replaces the active style in the block's className.
+ *
+ * @param {string}  className   Class name.
+ * @param {Object?} activeStyle The replaced style.
+ * @param {Object}  newStyle    The replacing style.
+ *
+ * @return {string} The updated className.
+ */
+export function replaceActiveStyle( className, activeStyle, newStyle ) {
+	let added = false;
+	let updatedClassName = compact( className
+		.split( ' ' )
+		.map( ( current ) => {
+			const trimmed = current.trim();
+			if ( activeStyle && trimmed === 'is-style-' + activeStyle.name ) {
+				added = true;
+				return newStyle.isDefault ? null : 'is-style-' + newStyle.name;
+			}
+			return trimmed;
+		} ) ).join( ' ' );
+	if ( ! added && ! newStyle.isDefault ) {
+		updatedClassName = updatedClassName + ' is-style-' + newStyle.name;
+	}
+
+	return updatedClassName;
+}
+
+function BlockStyles( { styles, className, onChangeClassName } ) {
+	if ( ! styles ) {
+		return;
+	}
+
+	const activeStyle = getActiveStyle( styles, className );
+	function updateClassName( style ) {
+		const updatedClassName = replaceActiveStyle( className, activeStyle, style );
 		onChangeClassName( updatedClassName );
 	}
 
