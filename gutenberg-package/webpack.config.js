@@ -215,6 +215,7 @@ const config = {
 				test: /style\.s?css$/,
 				include: [
 					/core-blocks/,
+					/storypage\/blocks/,
 				],
 				use: blocksCSSPlugin.extract( extractConfig ),
 			},
@@ -222,7 +223,7 @@ const config = {
 				test: /editor\.s?css$/,
 				include: [
 					/core-blocks/,
-					/storypage\/blocks/
+					/storypage\/blocks/,
 				],
 				use: editBlocksCSSPlugin.extract( {
 					use: [
@@ -243,6 +244,7 @@ const config = {
 				test: /theme\.s?css$/,
 				include: [
 					/core-blocks/,
+					/storypage\/blocks/,
 				],
 				use: themeBlocksCSSPlugin.extract( extractConfig ),
 			},
@@ -250,6 +252,7 @@ const config = {
 				test: /\.s?css$/,
 				exclude: [
 					/core-blocks/,
+					/storypage\/blocks/,
 				],
 				use: mainCSSExtractTextPlugin.extract( extractConfig ),
 			},
