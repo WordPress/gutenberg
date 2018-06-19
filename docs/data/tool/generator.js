@@ -8,15 +8,15 @@ const lodash = require( 'lodash' );
 /**
  * Generates the table of contents' markdown.
  *
- * @param {Object} parsed Parsed Namespace Object
+ * @param {Object} parsedNamespaces Parsed Namespace Object
  *
  * @return {string} Markdown string
  */
-function generateTableOfContent( parsed ) {
+function generateTableOfContent( parsedNamespaces ) {
 	return [
 		'# Data Module Reference',
 		'',
-		Object.values( parsed ).map( ( parsedNamespace ) => {
+		Object.values( parsedNamespaces ).map( ( parsedNamespace ) => {
 			return ` - [**${ parsedNamespace.name }**: ${ parsedNamespace.title }](./${ lodash.kebabCase( parsedNamespace.name ) }.md)`;
 		} ).join( '\n' ),
 	].join( '\n' );
@@ -77,14 +77,14 @@ function generateNamespaceDocs( parsedNamespace ) {
 	].join( '\n' );
 }
 
-module.exports = function( parsed, rootFolder ) {
-	const tableOfContent = generateTableOfContent( parsed );
+module.exports = function( parsedNamespaces, rootFolder ) {
+	const tableOfContent = generateTableOfContent( parsedNamespaces );
 	fs.writeFileSync(
 		path.join( rootFolder, 'index.md' ),
 		tableOfContent
 	);
 
-	Object.values( parsed ).forEach( ( parsedNamespace ) => {
+	Object.values( parsedNamespaces ).forEach( ( parsedNamespace ) => {
 		const namespaceDocs = generateNamespaceDocs( parsedNamespace );
 		fs.writeFileSync(
 			path.join( rootFolder, lodash.kebabCase( parsedNamespace.name ) + '.md' ),

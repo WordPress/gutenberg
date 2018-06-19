@@ -9,7 +9,7 @@ module.exports = {
 	namespaces: {
 		core: {
 			title: 'WordPress Core Data',
-			// Figures out a way to generate docs for the dynamic actions/selectors
+			// TODO: Figure out a way to generate docs for dynamic actions/selectors
 			selectors: [ path.resolve( root, 'packages/core-data/src/selectors.js' ) ],
 			actions: [ path.resolve( root, 'packages/core-data/src/actions.js' ) ],
 		},
@@ -34,7 +34,7 @@ module.exports = {
 			actions: [ path.resolve( root, 'viewport/store/actions.js' ) ],
 		},
 		'core/nux': {
-			title: 'The NUX module Data',
+			title: 'The NUX (New User Experience) module Data',
 			selectors: [ path.resolve( root, 'nux/store/selectors.js' ) ],
 			actions: [ path.resolve( root, 'nux/store/actions.js' ) ],
 		},

@@ -25,6 +25,7 @@ module.exports = function( config ) {
 				const code = fs.readFileSync( file, 'utf8' );
 				const parsedCode = espree.parse( code, {
 					attachComment: true,
+					// This should ideally match our babel config, but espree doesn't support it.
 					ecmaVersion: 9,
 					sourceType: 'module',
 				} );
