@@ -1,47 +1,40 @@
-import httpBuildQuery from 'http-build-query';
+import { rendererPathWithAttributes } from '../index';
 
-// The following tests are adapted to the behavior of http-build-query v0.7.0,
-// to help mitigating possible regressions in the upstream library.
-describe( 'http-build-query', function() {
-	test( 'should return an empty string for empty input', function() {
-		expect( httpBuildQuery( null ) ).toBe( '' );
-		expect( httpBuildQuery() ).toBe( '' );
-		expect( httpBuildQuery( {} ) ).toBe( '' );
+describe( 'blockPathWithAttributes', function() {
+	test( 'should return an base path for empty input', function() {
+		expect( rendererPathWithAttributes( 'core/test-block', null ) ).toBe( '/gutenberg/v1/block-renderer/core/test-block?context=edit' );
+		expect( rendererPathWithAttributes( 'core/test-block' ) ).toBe( '/gutenberg/v1/block-renderer/core/test-block?context=edit' );
 	} );
 
 	test( 'should format basic url params ', function() {
 		expect(
-			httpBuildQuery( {
+			rendererPathWithAttributes( 'core/test-block', {
 				stringArg: 'test',
 				nullArg: null,
 				emptyArg: '',
 				numberArg: 123,
 			} )
 		).toBe(
-			encodeURI(
-				'stringArg=test&nullArg=&emptyArg=&numberArg=123'
-			)
+			'/gutenberg/v1/block-renderer/core/test-block?context=edit&attributes%5BstringArg%5D=test&attributes%5BnullArg%5D=&attributes%5BemptyArg%5D=&attributes%5BnumberArg%5D=123',
 		);
 	} );
 
 	test( 'should format object params ', function() {
 		expect(
-			httpBuildQuery( {
+			rendererPathWithAttributes( 'core/test-block', {
 				objectArg: {
 					stringProp: 'test',
 					numberProp: 123,
 				},
 			} )
 		).toBe(
-			encodeURI(
-				'objectArg[stringProp]=test&objectArg[numberProp]=123'
-			)
+			'/gutenberg/v1/block-renderer/core/test-block?context=edit&attributes%5BobjectArg%5D%5BstringProp%5D=test&attributes%5BobjectArg%5D%5BnumberProp%5D=123',
 		);
 	} );
 
 	test( 'should format an array of objects', function() {
 		expect(
-			httpBuildQuery( {
+			rendererPathWithAttributes( 'core/test-block', {
 				children: [
 					{
 						name: 'bobby',
@@ -56,9 +49,7 @@ describe( 'http-build-query', function() {
 				],
 			} )
 		).toBe(
-			encodeURI(
-				'children[0][name]=bobby&children[0][age]=12&children[0][sex]=M&children[1][name]=sally&children[1][age]=8&children[1][sex]=F'
-			)
+			'/gutenberg/v1/block-renderer/core/test-block?context=edit&attributes%5Bchildren%5D%5B0%5D%5Bname%5D=bobby&attributes%5Bchildren%5D%5B0%5D%5Bage%5D=12&attributes%5Bchildren%5D%5B0%5D%5Bsex%5D=M&attributes%5Bchildren%5D%5B1%5D%5Bname%5D=sally&attributes%5Bchildren%5D%5B1%5D%5Bage%5D=8&attributes%5Bchildren%5D%5B1%5D%5Bsex%5D=F',
 		);
 	} );
 } );
