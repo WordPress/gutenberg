@@ -17,7 +17,7 @@ import PostAuthorCheck from './check';
  */
 import accessibleAutocomplete from 'accessible-autocomplete';
 import './accessible-autocomplete.css';
-import { findWhere } from 'underscore';
+import { findWhere, debounce } from 'underscore';
 
 export class PostAuthor extends Component {
 	constructor() {
@@ -30,15 +30,17 @@ export class PostAuthor extends Component {
 	componentDidMount() {
 		const { instanceId, authors } = this.props;
 		this.authors = authors;
-		accessibleAutocomplete.enhanceSelectElement( {
-		  selectElement: document.querySelector( '#post-author-selector-' + instanceId ),
-		  minLength: 2,
-		  showAllValues: true,
-		  autoselect: true,
-		  displayMenu: 'overlay',
-		  onConfirm: this.setAuthorId,
-		  source: this.suggestAuthor,
-		} );
+		if ( authors.length > 50 ) {
+			accessibleAutocomplete.enhanceSelectElement( {
+			  selectElement: document.querySelector( '#post-author-selector-' + instanceId ),
+			  minLength: 2,
+			  showAllValues: true,
+			  autoselect: true,
+			  displayMenu: 'overlay',
+			  onConfirm: this.setAuthorId,
+			  source: debounce( this.suggestAuthor, 300 ),
+			} );
+		}
 	}
 
 	suggestAuthor( query, populateResults ) {
@@ -56,7 +58,6 @@ export class PostAuthor extends Component {
 		}
 		const { onUpdateAuthor } = this.props;
 		const author = findWhere( this.authors, { name: selectedName } );
-		console.log( 'author.id', author.id );
 		onUpdateAuthor( Number( author.id ) );
 	}
 
