@@ -303,7 +303,7 @@ describe( 'renderNativeComponent()', () => {
 } );
 
 describe( 'renderComponent()', () => {
-	it( 'calls constructor', () => {
+	it( 'calls constructor and componentWillMount', () => {
 		class Example extends Component {
 			constructor() {
 				super( ...arguments );
@@ -311,14 +311,19 @@ describe( 'renderComponent()', () => {
 				this.constructed = 'constructed';
 			}
 
+			componentWillMount() {
+				this.willMounted = 'willMounted';
+			}
+
 			render() {
-				return this.constructed;
+				return this.constructed + this.willMounted;
 			}
 		}
 
 		const result = renderComponent( Example, {} );
 
-		expect( result ).toBe( 'constructed' );
+		expect( console ).toHaveWarned();
+		expect( result ).toBe( 'constructedwillMounted' );
 	} );
 
 	it( 'does not call componentDidMount', () => {
