@@ -42,16 +42,16 @@ class PlaylistEdit extends Component {
 		const { attributes, setAttributes, className } = this.props;
 		const { editing } = this.state;
 
-		const switchToEditing = () => {
-			this.setState( { editing: true } );
-		};
-
 		const onSelectMedia = ( media ) => {
 			//check if there are returned media items and set attributes when there are
 			if ( media && media[ 0 ].url ) {
 				media = ( 1 < media.length ) ? media : [ media ];
 				const ids = JSON.stringify( media.map( ( item ) => item.id ) );
-				setAttributes( { ids, type: media[ 0 ].type } );
+				const tracklist = media.tracklist;
+				const artists = media.artists;
+				const images = media.images;
+				// console.log(media.views.settings);
+				setAttributes( { ids, type: media[ 0 ].type, tracklist, artists, images } );
 				this.setState( { editing: false } );
 			}
 		};
@@ -84,11 +84,11 @@ class PlaylistEdit extends Component {
 						playlist
 						value={ this.props.attributes.ids }
 						render={ ( { open } ) => (
-							<Button isLarge onClick={ open }>
-								{ __( 'Media Library' ) }
-							</Button>
+						<Button isLarge onClick={ open }>
+							{ __( 'Media Library' ) }
+						</Button>
 						) }
-					/>
+						/>
 				</Placeholder>
 			);
 		}

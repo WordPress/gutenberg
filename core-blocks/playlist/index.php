@@ -31,11 +31,20 @@ function register_block_core_playlist() {
 	register_block_type( 'core/playlist', array(
 		'render_callback' => 'render_block_core_playlist',
 		'attributes'      => array(
-			'ids'  => array(
+			'ids' => array(
 				'type' => 'string',
 			),
 			'type' => array(
 				'type' => 'string',
+			),
+			'tracklist' => array(
+				'type' => 'boolean',
+			),
+			'artists' => array(
+				'type' => 'boolean',
+			),
+			'images' => array(
+				'type' => 'boolean',
 			),
 			'align' => array(
 				'type' => 'string',

@@ -26,6 +26,15 @@ export const settings = {
 		type: {
 			type: 'string',
 		},
+		artists: {
+			type: 'boolean',
+		},
+		images: {
+			type: 'boolean',
+		},
+		tracklist : {
+			type: 'boolean',
+		},
 		align: {
 			type: 'string',
 		},
@@ -33,6 +42,7 @@ export const settings = {
 
 	supports: {
 		align: true,
+		html: false,
 	},
 
 	edit,
