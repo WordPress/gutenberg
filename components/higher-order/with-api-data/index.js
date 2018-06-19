@@ -7,6 +7,7 @@ import { mapValues, reduce, forEach, noop } from 'lodash';
  * WordPress dependencies
  */
 import { Component, createHigherOrderComponent } from '@wordpress/element';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -34,7 +35,7 @@ export default ( mapPropsToData ) => createHigherOrderComponent( ( WrappedCompon
 		}
 
 		componentDidUpdate( prevProps, prevState ) {
-			if ( prevProps !== this.props ) {
+			if ( ! isShallowEqual( prevProps, this.props ) ) {
 				const dataProps = this.applyMapping( this.props, this.state.dataProps );
 				this.setState( { dataProps } );
 			}
