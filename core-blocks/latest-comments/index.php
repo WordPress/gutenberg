@@ -14,21 +14,13 @@
  */
 function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 
-	$default_attributes = array(
-		'commentsToShow'   => 5,
-		'displayAvatar'    => true,
-		'displayExcerpt'   => true,
-		'displayTimestamp' => true,
-	);
-	$attributes = array_merge( $default_attributes, $attributes );
-
 	// Basic attribute validation.
 	if (
 		! is_numeric( $attributes['commentsToShow'] ) ||
-		$attributes['commentsToShow'] < 0 &&
+		$attributes['commentsToShow'] < 0 ||
 		$attributes['commentsToShow'] > 100
 	) {
-		$attributes['commentsToShow'] = $default_attributes['commentsToShow'];
+		$attributes['commentsToShow'] = 5;
 	}
 
 	$align = 'center';
