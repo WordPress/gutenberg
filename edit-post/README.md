@@ -20,6 +20,34 @@ wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/sidebar-na
 
 _Example:_
 
+{% codetabs %}
+
+{% ES5 %}
+```js
+var __ = wp.i18n.__;
+var el = wp.element.createElement;
+var PanelBody = wp.components.PanelBody;
+var PluginSidebar = wp.editPost.PluginSidebar;
+
+
+function MyPluginSidebar() {
+	return el(
+			PluginSidebar,
+			{
+				name: 'my-sidebar',
+				title: 'My sidebar title',
+				icon: 'smiley',
+			},
+			el(
+				PanelBody,
+				{},
+				__( 'My sidebar content' )
+			)
+	);
+}
+```
+
+{% ESNext %}
 ```jsx
 const { __ } = wp.i18n;
 const { PanelBody } = wp.components;
@@ -37,6 +65,7 @@ const MyPluginSidebar = () => (
 	</PluginSidebar>
 );
 ```
+{% end %}
 
 #### Props
 
@@ -78,6 +107,27 @@ The text within the component appears as the menu item label.
 
 _Example:_
 
+{% codetabs %}
+
+{% ES5 %}
+```js
+var __ = wp.i18n.__;
+var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
+var el = wp.element.createElement;
+
+function MySidebarMoreMenuItem() {
+	return el(
+		PluginSidebarMoreMenuItem,
+		{
+			target: 'my-sidebar',
+			icon: 'smiley',
+		},
+		__( 'My sidebar title' )
+	)
+}
+```
+
+{% ESNext %}
 ```jsx
 const { __ } = wp.i18n;
 const { PluginSidebarMoreMenuItem } = wp.editPost;
@@ -91,6 +141,7 @@ const MySidebarMoreMenuItem = () => (
 	</PluginSidebarMoreMenuItem>
 );
 ```
+{% end %}
 
 #### Props
 
@@ -116,6 +167,27 @@ Renders a row in the Status & Visibility panel of the Document sidebar.
 It should be noted that this is named and implemented around the function it serves and not its location, which may change in future iterations.
 
 _Example:_
+
+{% codetabs %}
+
+{% ES5 %}
+```js
+var __ = wp.i18n.__;
+var PluginPostStatusInfo = wp.editPost.PluginPostStatusInfo;
+var el = wp.element.createElement;
+
+function MyPluginPostStatusInfo() {
+	return el(
+		PluginPostStatusInfo,
+		{
+			className: 'my-plugin-post-status-info',
+		},
+		__( 'My post status info' )
+	)
+}
+```
+
+{% ESNext %}
 ```jsx
 const { __ } = wp.i18n;
 const { PluginPostStatusInfo } = wp.editPost;
@@ -128,6 +200,7 @@ const MyPluginPostStatusInfo = () => (
 	</PluginPostStatusInfo>
 );
 ```
+{% end %}
 
 #### Props
 
@@ -144,6 +217,28 @@ Renders provided content to the pre-publish side panel in the publish flow (side
 
 _Example:_
 
+{% codetabs %}
+
+{% ES5 %}
+```js
+var __ = wp.i18n.__;
+var PluginPrePublishPanel = wp.editPost.PluginPrePublishPanel;
+var el = wp.element.createElement;
+
+function MyPluginPrePublishPanel() {
+	return el(
+		PluginPrePublishPanel,
+		{
+			className: 'my-plugin-pre-publish-panel',
+			title: __( 'My panel title' ),
+			initialOpen: true,
+		},
+		__( 'My panel content' )
+	);
+}
+```
+
+{% ESNext %}
 ```jsx
 const { __ } = wp.i18n;
 const { PluginPrePublishPanel } = wp.editPost;
@@ -158,6 +253,7 @@ const MyPluginPrePublishPanel = () => (
 	</PluginPrePublishPanel>
 );
 ```
+{% end %}
 
 #### Props
 
@@ -190,6 +286,28 @@ Renders provided content to the post-publish panel in the publish flow (side pan
 
 _Example:_
 
+{% codetabs %}
+
+{% ES5 %}
+```js
+var __ = wp.i18n.__;
+var PluginPostPublishPanel = wp.editPost.PluginPostPublishPanel;
+var el = wp.element.createElement;
+
+function MyPluginPostPublishPanel() {
+	return el(
+		PluginPostPublishPanel,
+		{
+			className: 'my-plugin-post-publish-panel',
+			title: __( 'My panel title' ),
+			initialOpen: true,
+		},
+		__( 'My panel content' )
+	);
+}
+```
+
+{% ESNext %}
 ```jsx
 const { __ } = wp.i18n;
 const { PluginPostPublishPanel } = wp.editPost;
@@ -204,6 +322,7 @@ const MyPluginPostPublishPanel = () => (
 	</PluginPostPublishPanel>
 );
 ```
+{% end %}
 
 #### Props
 

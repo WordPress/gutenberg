@@ -79,6 +79,8 @@ when they are applicable e.g.: in the inserter.
 icon: {
 	// Specifying a background color to appear with the icon e.g.: in the inserter.
 	background: '#7e70af',
+	// Specifying a color for the icon (optional: if not set, a readable color will be automatically defined)
+	foreground: '#fff',
 	// Specifying a dashicon for the block
 	src: 'book-alt',
 } ,
@@ -267,17 +269,6 @@ transforms: {
 
 To control the priority with which a transform is applied, define a `priority` numeric property on your transform object, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
-#### useOnce (optional)
-
-* **Type:** `Bool`
-* **Default:** `false`
-
-A once-only block can be inserted into each post, one time only. For example, the built-in 'More' block cannot be inserted again if it already exists in the post being edited. A once-only block's icon is automatically dimmed (unclickable) to prevent multiple instances.
-
-```js
-// Use the block just once per post
-useOnce: true,
-```
 
 #### parent (optional)
 
@@ -331,6 +322,13 @@ html: false,
 ```js
 // Hide this block from the inserter.
 inserter: false,
+```
+
+- `multiple` (default `true`): A non-multiple block can be inserted into each post, one time only. For example, the built-in 'More' block cannot be inserted again if it already exists in the post being edited. A non-multiple block's icon is automatically dimmed (unclickable) to prevent multiple instances.
+
+```js
+// Use the block just once per post
+multiple: false,
 ```
 
 ## Edit and Save

@@ -295,7 +295,7 @@ export class Autocomplete extends Component {
 		this.reset();
 	}
 
-	// this method is separate so it can be overrided in tests
+	// this method is separate so it can be overridden in tests
 	getCursor( container ) {
 		const selection = window.getSelection();
 		if ( selection.isCollapsed ) {
@@ -312,7 +312,7 @@ export class Autocomplete extends Component {
 		return null;
 	}
 
-	// this method is separate so it can be overrided in tests
+	// this method is separate so it can be overridden in tests
 	createRange( startNode, startOffset, endNode, endOffset ) {
 		const range = document.createRange();
 		range.setStart( startNode, startOffset );
@@ -348,10 +348,22 @@ export class Autocomplete extends Component {
 		/*
 		 * We support both synchronous and asynchronous retrieval of completer options
 		 * but internally treat all as async so we maintain a single, consistent code path.
+		 *
+		 * Because networks can be slow, and the internet is wonderfully unpredictable,
+		 * we don't want two promises updating the state at once. This ensures that only
+		 * the most recent promise will act on `optionsData`. This doesn't use the state
+		 * because `setState` is batched, and so there's no guarantee that setting
+		 * `activePromise` in the state would result in it actually being in `this.state`
+		 * before the promise resolves and we check to see if this is the active promise or not.
 		 */
-		Promise.resolve(
+		const promise = this.activePromise = Promise.resolve(
 			typeof options === 'function' ? options( query ) : options
 		).then( ( optionsData ) => {
+			if ( promise !== this.activePromise ) {
+				// Another promise has become active since this one was asked to resolve, so do nothing,
+				// or else we might end triggering a race condition updating the state.
+				return;
+			}
 			const keyedOptions = optionsData.map( ( optionData, optionIndex ) => ( {
 				key: `${ completer.idx }-${ optionIndex }`,
 				value: optionData,
@@ -375,7 +387,7 @@ export class Autocomplete extends Component {
 		const allowAnything = () => true;
 		let endTextNode;
 		let endIndex;
-		// search backwards to find the first preceeding space or non-text node.
+		// search backwards to find the first preceding space or non-text node.
 		if ( isTextNode( cursor.node ) ) { // TEXT node
 			endTextNode = cursor.node;
 			endIndex = cursor.offset;

@@ -165,7 +165,7 @@ export default ( mapPropsToData ) => createHigherOrderComponent( ( WrappedCompon
 			const mapping = mapPropsToData( props, this.routeHelpers );
 			const nextDataProps = reduce( mapping, ( result, path, propName ) => {
 				// Skip if mapping already assigned into state data props
-				// Exmaple: Component updates with one new prop and other
+				// Example: Component updates with one new prop and other
 				// previously existing; previously existing should not be
 				// clobbered or re-trigger fetch
 				const dataProp = dataProps[ propName ];
@@ -182,7 +182,7 @@ export default ( mapPropsToData ) => createHigherOrderComponent( ( WrappedCompon
 				}
 
 				route.methods.forEach( ( method ) => {
-					// Add request initiater into data props
+					// Add request initiator into data props
 					const requestKey = this.getRequestKey( method );
 					result[ propName ][ requestKey ] = this.request.bind(
 						this,

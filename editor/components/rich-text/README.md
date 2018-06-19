@@ -1,12 +1,6 @@
 # `RichText`
 
-Render a rich
-[`contenteditable` input](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content),
-providing users the option to add emphasis to content or links to content. It
-behaves similarly to a
-[controlled component](https://facebook.github.io/react/docs/forms.html#controlled-components),
-except that `onChange` is triggered less frequently than would be expected from
-a traditional `input` field, usually when the user exits the field.
+Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content), providing users the option to add emphasis to content or links to content. It behaves similarly to a [controlled component](https://facebook.github.io/react/docs/forms.html#controlled-components), except that `onChange` is triggered less frequently than would be expected from a traditional `input` field, usually when the user exits the field.
 
 ## Properties
 
@@ -68,6 +62,11 @@ a traditional `input` field, usually when the user exits the field.
 ### `autocompleters: Array<Completer>`
 
 *Optional.* A list of autocompleters to use instead of the default.
+
+### `aria-multiline: Boolean`
+
+*Default: `true`.* [aria-multiline](https://www.w3.org/TR/wai-aria-1.1/#aria-multiline) indicates whether a text box accepts multiple lines of input or only a single line.
+If the context where the RichText is being used is closer to a `<textarea />` than to a `<input type="text">` (multiple lines can be rendered to represent the input) aria-multiline should be equal to true (default) otherwise false should be used.
 
 ## RichText.Content
 

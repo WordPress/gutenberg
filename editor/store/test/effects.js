@@ -389,6 +389,35 @@ describe( 'effects', () => {
 			expect( dispatch ).toHaveBeenCalledWith( createErrorNotice( 'Publishing failed', { id: 'SAVE_POST_NOTICE_ID' } ) );
 		} );
 
+		it( 'should not dispatch a notice when there were no changes for autosave to save.', () => {
+			const handler = effects.REQUEST_POST_UPDATE_FAILURE;
+			const dispatch = jest.fn();
+			const store = { getState: () => {}, dispatch };
+
+			const action = {
+				post: {
+					id: 1,
+					title: {
+						raw: 'A History of Pork',
+					},
+					content: {
+						raw: '',
+					},
+					status: 'draft',
+				},
+				edits: {
+					status: 'publish',
+				},
+				error: {
+					code: 'rest_autosave_no_changes',
+				},
+			};
+
+			handler( action, store );
+
+			expect( dispatch ).toHaveBeenCalledTimes( 0 );
+		} );
+
 		it( 'should dispatch a notice on failure when trying to update a draft.', () => {
 			const handler = effects.REQUEST_POST_UPDATE_FAILURE;
 			const dispatch = jest.fn();
