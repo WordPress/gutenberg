@@ -20,6 +20,11 @@ import httpBuildQuery from 'http-build-query';
 import Placeholder from '../placeholder';
 import Spinner from '../spinner';
 
+export function rendererPathWithAttributes( block, attributes = null ) {
+	return `/gutenberg/v1/block-renderer/${ block }?context=edit` +
+			( null !== attributes ? '&' + httpBuildQuery( { attributes } ) : '' );
+}
+
 export class ServerSideRender extends Component {
 	constructor( props ) {
 		super( props );
@@ -49,8 +54,7 @@ export class ServerSideRender extends Component {
 		}
 		const { block, attributes = null } = props;
 
-		const path = `/gutenberg/v1/block-renderer/${ block }?context=edit` +
-			( null !== attributes ? '&' + httpBuildQuery( { attributes } ) : '' );
+		const path = rendererPathWithAttributes( block, attributes );
 
 		return apiRequest( { path } ).fail( ( response ) => {
 			const failResponse = {
