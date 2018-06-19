@@ -5,27 +5,6 @@
 	margin-right: 2em;
 }
 
-.wp-block-latest-comments.has-avatars > li {
-	min-height: 48px;
-}
-.wp-block-latest-comments > li {
-	margin-bottom: 1em;
-}
-
-.wp-block-latest-comments__comment-timestamp {
-	display: block;
-}
-
-.wp-block-latest-comments .avatar,
-.wp-block-latest-comments__comment-avatar {
-	display: block;
-	float: left;
-	height: 48px;
-	width: 48px;
-	border-radius: 24px;
-	margin-right: 5px;
-}
-
 .wp-block-latest-comments a {
 	pointer-events: none;
 	cursor: default;
