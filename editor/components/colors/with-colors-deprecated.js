@@ -40,7 +40,7 @@ export default ( mapGetSetColorToProps ) => createHigherOrderComponent(
 				constructor() {
 					super( ...arguments );
 					/**
-					* Even though, we don't expect setAttributes or colors to change memoizing it is essential.
+					* Even though we don't expect setAttributes or colors to change memoizing it is essential.
 					* If setAttributes or colors are not memoized, each time memoizedGetColor/memoizedSetColor are called:
 					* a new function reference is returned (even if arguments have not changed).
 					* This would make our memoized chain useless.

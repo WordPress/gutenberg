@@ -14,7 +14,7 @@ import { deprecated } from '@wordpress/utils';
  * Internal dependencies
  */
 import { getColorValue, getColorClass } from './utils';
-import { default as withColorsDeprecated } from './with-colors-deprecated';
+import withColorsDeprecated from './with-colors-deprecated';
 
 const DEFAULT_COLORS = [];
 
@@ -36,15 +36,15 @@ const DEFAULT_COLORS = [];
 export default ( ...args ) => {
 	if ( isFunction( args[ 0 ] ) ) {
 		deprecated( 'Using withColors( mapGetSetColorToProps ) ', {
-			version: '3.2',
+			version: '3.3',
 			alternative: 'withColors( colorAttributeName, { secondColorAttributeName: \'color-context\' }, ... )',
 		} );
 		return withColorsDeprecated( args[ 0 ] );
 	}
 
-	const colorMap = reduce( args, ( colorObj, arg ) => {
+	const colorMap = reduce( args, ( colorObject, arg ) => {
 		return {
-			...colorObj,
+			...colorObject,
 			...( isString( arg ) ? { [ arg ]: kebabCase( arg ) } : arg ),
 		};
 	}, {} );
@@ -68,25 +68,26 @@ export default ( ...args ) => {
 					}
 
 					createSetters() {
-						return reduce( colorMap, ( settersAcc, colorContext, colorAttributeName ) => {
-							const ufColorAttrName = upperFirst( colorAttributeName );
-							const customColorAttributeName = `custom${ ufColorAttrName }`;
-							settersAcc[ `set${ ufColorAttrName }` ] = this.createSetColor( colorAttributeName, customColorAttributeName );
-							return settersAcc;
+						return reduce( colorMap, ( settersAccumulator, colorContext, colorAttributeName ) => {
+							const upperFirstColorAttributeName = upperFirst( colorAttributeName );
+							const customColorAttributeName = `custom${ upperFirstColorAttributeName }`;
+							settersAccumulator[ `set${ upperFirstColorAttributeName }` ] =
+								this.createSetColor( colorAttributeName, customColorAttributeName );
+							return settersAccumulator;
 						}, {} );
 					}
 
 					createSetColor( colorAttributeName, customColorAttributeName ) {
 						return ( colorValue ) => {
-							const colorObj = find( this.props.colors, { color: colorValue } );
+							const colorObject = find( this.props.colors, { color: colorValue } );
 							this.props.setAttributes( {
-								[ colorAttributeName ]: colorObj && colorObj.name ? colorObj.name : undefined,
-								[ customColorAttributeName ]: colorObj && colorObj.name ? undefined : colorValue,
+								[ colorAttributeName ]: colorObject && colorObject.name ? colorObject.name : undefined,
+								[ customColorAttributeName ]: colorObject && colorObject.name ? undefined : colorValue,
 							} );
 						};
 					}
 
-					static getDerivedStateFromProps( { attributes, colors }, prevState ) {
+					static getDerivedStateFromProps( { attributes, colors }, previousState ) {
 						return reduce( colorMap, ( newState, colorContext, colorAttributeName ) => {
 							const colorName = attributes[ colorAttributeName ];
 							const colorValue = getColorValue(
@@ -94,15 +95,15 @@ export default ( ...args ) => {
 								colorName,
 								attributes[ `custom${ upperFirst( colorAttributeName ) }` ]
 							);
-							const prevColorObject = prevState[ colorAttributeName ];
-							const prevColorValue = get( prevColorObject, [ 'value' ] );
+							const previousColorObject = previousState[ colorAttributeName ];
+							const previousColorValue = get( previousColorObject, [ 'value' ] );
 							/**
-							* && prevColorObject checks that a previous color object was already computed.
-							* At the start prevColorValue and colorValue are both equal to undefined
-							* bus as prevColorObject does not exist we should compute the object.
+							* The "and previousColorObject" condition checks that a previous color object was already computed.
+							* At the start previousColorObject and colorValue are both equal to undefined
+							* bus as previousColorObject does not exist we should compute the object.
 							*/
-							if ( prevColorValue === colorValue && prevColorObject ) {
-								newState[ colorAttributeName ] = prevColorObject;
+							if ( previousColorValue === colorValue && previousColorObject ) {
+								newState[ colorAttributeName ] = previousColorObject;
 							} else {
 								newState[ colorAttributeName ] = {
 									name: colorName,
