@@ -76,8 +76,6 @@ export class PostAuthor extends Component {
 		const { postAuthor, instanceId, authors } = this.props;
 		const selectId = 'post-author-selector-' + instanceId;
 
-		// Disable reason: A select with an onchange throws a warning
-
 		/* eslint-disable jsx-a11y/no-onchange */
 		return (
 			<PostAuthorCheck>
