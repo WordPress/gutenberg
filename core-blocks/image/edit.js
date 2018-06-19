@@ -366,7 +366,12 @@ class ImageEdit extends Component {
 											bottom: 'wp-block-image__resize-handler-bottom',
 											left: 'wp-block-image__resize-handler-left',
 										} }
-										enable={ { top: false, right: ! isRLT, bottom: true, left: isRLT } }
+										enable={ {
+											top: false,
+											right: ( ! isRLT && align !== 'right' ),
+											bottom: true,
+											left: ( isRLT || align === 'right' || align === 'center' ),
+										} }
 										onResizeStart={ () => {
 											toggleSelection( false );
 										} }
