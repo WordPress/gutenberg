@@ -47,10 +47,6 @@ class PlaylistEdit extends Component {
 			if ( media && media[ 0 ].url ) {
 				media = ( 1 < media.length ) ? media : [ media ];
 				const ids = JSON.stringify( media.map( ( item ) => item.id ) );
-				const tracklist = media.tracklist;
-				const artists = media.artists;
-				const images = media.images;
-				// console.log(media.views.settings);
 				setAttributes( { ids, type: media[ 0 ].type, tracklist, artists, images } );
 				this.setState( { editing: false } );
 			}
