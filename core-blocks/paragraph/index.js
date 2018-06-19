@@ -156,7 +156,6 @@ class ParagraphBlock extends Component {
 
 		const {
 			align,
-			content,
 			dropCap,
 			placeholder,
 		} = attributes;
