@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { withInstanceId } from '@wordpress/components';
 import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
+import apiRequest from '@wordpress/api-request';
 
 /**
  * Internal dependencies
@@ -23,23 +24,38 @@ export class PostAuthor extends Component {
 		super( ...arguments );
 
 		this.setAuthorId = this.setAuthorId.bind( this );
+		this.suggestAuthor = this.suggestAuthor.bind( this );
 	}
 
 	componentDidMount() {
-		const { instanceId } = this.props;
+		const { instanceId, authors } = this.props;
+		this.authors = authors;
 		accessibleAutocomplete.enhanceSelectElement( {
 		  selectElement: document.querySelector( '#post-author-selector-' + instanceId ),
 		  minLength: 2,
 		  showAllValues: true,
 		  autoselect: true,
 		  displayMenu: 'overlay',
-		  onConfirm: this.setAuthorId
+		  onConfirm: this.setAuthorId,
+		  source: this.suggestAuthor,
+		} );
+	}
+
+	suggestAuthor( query, populateResults ) {
+		const payload = '?search=' + encodeURIComponent( query );
+		apiRequest( { path: '/wp/v2/users' + payload } ).done( ( results ) => {
+			this.authors = results;
+			populateResults( results.map( ( author ) => ( author.name ) ) );
+
 		} );
 	}
 
 	setAuthorId( selectedName ) {
-		const { onUpdateAuthor, authors } = this.props;
-		const author = findWhere( authors, { name: selectedName } );
+		if ( ! selectedName ) {
+			return;
+		}
+		const { onUpdateAuthor } = this.props;
+		const author = findWhere( this.authors, { name: selectedName } );
 		console.log( 'author.id', author.id );
 		onUpdateAuthor( Number( author.id ) );
 	}
