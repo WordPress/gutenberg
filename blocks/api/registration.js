@@ -123,9 +123,12 @@ export function registerBlockType( name, settings ) {
 		'category' in settings &&
 		! some( select( 'core/blocks' ).getCategories(), { slug: settings.category } )
 	) {
-		// console.error(
-		// 	'The block "' + name + '" must have a registered category.'
-		// );
+		/*
+		 * Gutenberg by Front 0.1.4 
+		 */
+		console.log(
+			'The block "' + name + '" must have a registered category.'
+		);
 		return;
 	}
 	if ( ! ( 'title' in settings ) || settings.title === '' ) {
