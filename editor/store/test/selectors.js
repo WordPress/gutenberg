@@ -369,6 +369,11 @@ describe( 'selectors', () => {
 		it( 'should return the current post\'s slug if no edits have been made', () => {
 			const state = {
 				currentPost: { slug: 'post slug' },
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
 			};
 
 			expect( getEditedPostAttribute( state, 'slug' ) ).toBe( 'post slug' );
@@ -3583,6 +3588,11 @@ describe( 'selectors', () => {
 		it( 'should be false if there is no permalink', () => {
 			const state = {
 				currentPost: { permalink_template: '' },
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
 			};
 
 			expect( isPermalinkEditable( state ) ).toBe( false );
@@ -3591,6 +3601,11 @@ describe( 'selectors', () => {
 		it( 'should be false if the permalink is not of an editable kind', () => {
 			const state = {
 				currentPost: { permalink_template: 'http://foo.test/bar/%baz%/' },
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
 			};
 
 			expect( isPermalinkEditable( state ) ).toBe( false );
@@ -3599,6 +3614,11 @@ describe( 'selectors', () => {
 		it( 'should be true if the permalink has %postname%', () => {
 			const state = {
 				currentPost: { permalink_template: 'http://foo.test/bar/%postname%/' },
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
 			};
 
 			expect( isPermalinkEditable( state ) ).toBe( true );
@@ -3607,6 +3627,11 @@ describe( 'selectors', () => {
 		it( 'should be true if the permalink has %pagename%', () => {
 			const state = {
 				currentPost: { permalink_template: 'http://foo.test/bar/%pagename%/' },
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
 			};
 
 			expect( isPermalinkEditable( state ) ).toBe( true );
@@ -3618,6 +3643,11 @@ describe( 'selectors', () => {
 			const url = 'http://foo.test/?post=1';
 			const state = {
 				currentPost: { permalink_template: url },
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
 			};
 
 			expect( getPermalink( state ) ).toBe( url );
@@ -3628,6 +3658,11 @@ describe( 'selectors', () => {
 				currentPost: {
 					permalink_template: 'http://foo.test/bar/%postname%/',
 					slug: 'baz',
+				},
+				editor: {
+					present: {
+						edits: {},
+					},
 				},
 			};
 
@@ -3647,6 +3682,11 @@ describe( 'selectors', () => {
 					permalink_template: 'http://foo.test/bar/%postname%/',
 					slug: 'baz',
 				},
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
 			};
 
 			expect( getPermalinkParts( state ) ).toEqual( parts );
@@ -3661,6 +3701,11 @@ describe( 'selectors', () => {
 				currentPost: {
 					permalink_template: 'http://foo.test/?post=1',
 					slug: 'baz',
+				},
+				editor: {
+					present: {
+						edits: {},
+					},
 				},
 			};
 

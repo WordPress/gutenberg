@@ -179,7 +179,7 @@ export function getCurrentPostLastRevisionId( state ) {
  * @return {Object} Object of key value pairs comprising unsaved edits.
  */
 export function getPostEdits( state ) {
-	return get( state, [ 'editor', 'present', 'edits' ], {} );
+	return state.editor.present.edits;
 }
 
 /**
