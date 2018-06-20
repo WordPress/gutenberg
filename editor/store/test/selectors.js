@@ -36,6 +36,8 @@ const {
 	isEditedPostPublishable,
 	isEditedPostSaveable,
 	isEditedPostAutosaveable,
+	getAutosave,
+	hasAutosave,
 	isEditedPostEmpty,
 	isEditedPostBeingScheduled,
 	getEditedPostPreviewLink,
@@ -59,6 +61,7 @@ const {
 	getPreviousBlockUid,
 	getNextBlockUid,
 	isBlockSelected,
+	hasSelectedInnerBlock,
 	isBlockWithinSelection,
 	hasMultiSelection,
 	isBlockMultiSelected,
@@ -122,7 +125,9 @@ describe( 'selectors', () => {
 			title: 'Test Block B',
 			icon: 'test',
 			keywords: [ 'testing' ],
-			useOnce: true,
+			supports: {
+				multiple: false,
+			},
 		} );
 
 		registerBlockType( 'core/test-block-c', {
@@ -364,6 +369,11 @@ describe( 'selectors', () => {
 		it( 'should return the current post\'s slug if no edits have been made', () => {
 			const state = {
 				currentPost: { slug: 'post slug' },
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
 			};
 
 			expect( getEditedPostAttribute( state, 'slug' ) ).toBe( 'post slug' );
@@ -1104,6 +1114,49 @@ describe( 'selectors', () => {
 					expect( isEditedPostAutosaveable( state ) ).toBe( true );
 				}
 			}
+		} );
+	} );
+
+	describe( 'getAutosave', () => {
+		it( 'returns null if there is no autosave', () => {
+			const state = {
+				autosave: null,
+			};
+
+			const result = getAutosave( state );
+
+			expect( result ).toBe( null );
+		} );
+
+		it( 'returns the autosave', () => {
+			const autosave = { title: '', excerpt: '', content: '' };
+			const state = { autosave };
+
+			const result = getAutosave( state );
+
+			expect( result ).toEqual( autosave );
+		} );
+	} );
+
+	describe( 'hasAutosave', () => {
+		it( 'returns false if there is no autosave', () => {
+			const state = {
+				autosave: null,
+			};
+
+			const result = hasAutosave( state );
+
+			expect( result ).toBe( false );
+		} );
+
+		it( 'returns true if there is a autosave', () => {
+			const state = {
+				autosave: { title: '', excerpt: '', content: '' },
+			};
+
+			const result = hasAutosave( state );
+
+			expect( result ).toBe( true );
 		} );
 	} );
 
@@ -2211,6 +2264,38 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'hasSelectedInnerBlock', () => {
+		it( 'should return false if the selected block is a child of the given UID', () => {
+			const state = {
+				blockSelection: { start: 5, end: 5 },
+				editor: {
+					present: {
+						blockOrder: {
+							4: [ 3, 2, 1 ],
+						},
+					},
+				},
+			};
+
+			expect( hasSelectedInnerBlock( state, 4 ) ).toBe( false );
+		} );
+
+		it( 'should return true if the selected block is a child of the given UID', () => {
+			const state = {
+				blockSelection: { start: 3, end: 3 },
+				editor: {
+					present: {
+						blockOrder: {
+							4: [ 3, 2, 1 ],
+						},
+					},
+				},
+			};
+
+			expect( hasSelectedInnerBlock( state, 4 ) ).toBe( true );
+		} );
+	} );
+
 	describe( 'isBlockWithinSelection', () => {
 		it( 'should return true if the block is selected but not the last', () => {
 			const state = {
@@ -2962,12 +3047,15 @@ describe( 'selectors', () => {
 				name: 'core/test-block-a',
 				initialAttributes: {},
 				title: 'Test Block A',
-				icon: 'test',
+				icon: {
+					src: 'test',
+				},
 				category: 'formatting',
 				keywords: [ 'testing' ],
 				isDisabled: false,
 				utility: 0,
 				frecency: 0,
+				hasChildBlocks: false,
 			} );
 			const sharedBlockItem = items.find( ( item ) => item.id === 'core/block/1' );
 			expect( sharedBlockItem ).toEqual( {
@@ -2975,7 +3063,9 @@ describe( 'selectors', () => {
 				name: 'core/block',
 				initialAttributes: { ref: 1 },
 				title: 'Shared Block 1',
-				icon: 'test',
+				icon: {
+					src: 'test',
+				},
 				category: 'shared',
 				keywords: [],
 				isDisabled: false,
@@ -3021,7 +3111,7 @@ describe( 'selectors', () => {
 			] );
 		} );
 
-		it( 'should set isDisabled when a block with useOnce has been used', () => {
+		it( 'should set isDisabled when a block with `multiple: false` has been used', () => {
 			const state = {
 				editor: {
 					present: {
@@ -3498,6 +3588,11 @@ describe( 'selectors', () => {
 		it( 'should be false if there is no permalink', () => {
 			const state = {
 				currentPost: { permalink_template: '' },
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
 			};
 
 			expect( isPermalinkEditable( state ) ).toBe( false );
@@ -3506,6 +3601,11 @@ describe( 'selectors', () => {
 		it( 'should be false if the permalink is not of an editable kind', () => {
 			const state = {
 				currentPost: { permalink_template: 'http://foo.test/bar/%baz%/' },
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
 			};
 
 			expect( isPermalinkEditable( state ) ).toBe( false );
@@ -3514,6 +3614,11 @@ describe( 'selectors', () => {
 		it( 'should be true if the permalink has %postname%', () => {
 			const state = {
 				currentPost: { permalink_template: 'http://foo.test/bar/%postname%/' },
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
 			};
 
 			expect( isPermalinkEditable( state ) ).toBe( true );
@@ -3522,6 +3627,11 @@ describe( 'selectors', () => {
 		it( 'should be true if the permalink has %pagename%', () => {
 			const state = {
 				currentPost: { permalink_template: 'http://foo.test/bar/%pagename%/' },
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
 			};
 
 			expect( isPermalinkEditable( state ) ).toBe( true );
@@ -3533,6 +3643,11 @@ describe( 'selectors', () => {
 			const url = 'http://foo.test/?post=1';
 			const state = {
 				currentPost: { permalink_template: url },
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
 			};
 
 			expect( getPermalink( state ) ).toBe( url );
@@ -3543,6 +3658,11 @@ describe( 'selectors', () => {
 				currentPost: {
 					permalink_template: 'http://foo.test/bar/%postname%/',
 					slug: 'baz',
+				},
+				editor: {
+					present: {
+						edits: {},
+					},
 				},
 			};
 
@@ -3562,6 +3682,11 @@ describe( 'selectors', () => {
 					permalink_template: 'http://foo.test/bar/%postname%/',
 					slug: 'baz',
 				},
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
 			};
 
 			expect( getPermalinkParts( state ) ).toEqual( parts );
@@ -3576,6 +3701,11 @@ describe( 'selectors', () => {
 				currentPost: {
 					permalink_template: 'http://foo.test/?post=1',
 					slug: 'baz',
+				},
+				editor: {
+					present: {
+						edits: {},
+					},
 				},
 			};
 

@@ -6,13 +6,15 @@ import { includes, debounce } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { createContext, Component } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+
+const { Consumer, Provider } = createContext( false );
 
 /**
  * Names of control nodes which qualify for disabled behavior.
@@ -83,11 +85,15 @@ class Disabled extends Component {
 
 	render() {
 		return (
-			<div ref={ this.bindNode } className="components-disabled">
-				{ this.props.children }
-			</div>
+			<Provider value={ true }>
+				<div ref={ this.bindNode } className="components-disabled">
+					{ this.props.children }
+				</div>
+			</Provider>
 		);
 	}
 }
+
+Disabled.Consumer = Consumer;
 
 export default Disabled;

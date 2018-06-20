@@ -11,8 +11,6 @@ import { Component, Fragment } from '@wordpress/element';
 import {
 	Dashicon,
 	IconButton,
-	PanelBody,
-	ToggleControl,
 	withFallbackStyles,
 } from '@wordpress/components';
 import {
@@ -49,16 +47,10 @@ class ButtonEdit extends Component {
 		this.nodeRef = null;
 		this.bindRef = this.bindRef.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
-		this.toggleClear = this.toggleClear.bind( this );
 	}
 
 	updateAlignment( nextAlign ) {
 		this.props.setAttributes( { align: nextAlign } );
-	}
-
-	toggleClear() {
-		const { attributes, setAttributes } = this.props;
-		setAttributes( { clear: ! attributes.clear } );
 	}
 
 	bindRef( node ) {
@@ -85,7 +77,6 @@ class ButtonEdit extends Component {
 			url,
 			title,
 			align,
-			clear,
 		} = attributes;
 
 		return (
@@ -115,29 +106,22 @@ class ButtonEdit extends Component {
 						keepPlaceholderOnFocus
 					/>
 					<InspectorControls>
-						<PanelBody>
-							<ToggleControl
-								label={ __( 'Wrap text' ) }
-								checked={ !! clear }
-								onChange={ this.toggleClear }
-							/>
-							<PanelColor
-								colorValue={ backgroundColor.value }
-								title={ __( 'Background Color' ) }
-								onChange={ setBackgroundColor }
-							/>
-							<PanelColor
-								colorValue={ textColor.value }
-								title={ __( 'Text Color' ) }
-								onChange={ setTextColor }
-							/>
-							{ this.nodeRef && <ContrastCheckerWithFallbackStyles
-								node={ this.nodeRef }
-								textColor={ textColor.value }
-								backgroundColor={ backgroundColor.value }
-								isLargeText={ true }
-							/> }
-						</PanelBody>
+						<PanelColor
+							colorValue={ backgroundColor.value }
+							title={ __( 'Background Color' ) }
+							onChange={ setBackgroundColor }
+						/>
+						<PanelColor
+							colorValue={ textColor.value }
+							title={ __( 'Text Color' ) }
+							onChange={ setTextColor }
+						/>
+						{ this.nodeRef && <ContrastCheckerWithFallbackStyles
+							node={ this.nodeRef }
+							textColor={ textColor.value }
+							backgroundColor={ backgroundColor.value }
+							isLargeText={ true }
+						/> }
 					</InspectorControls>
 				</span>
 				{ isSelected && (
@@ -157,11 +141,4 @@ class ButtonEdit extends Component {
 	}
 }
 
-export default withColors( ( getColor, setColor, { attributes } ) => {
-	return {
-		backgroundColor: getColor( attributes.backgroundColor, attributes.customBackgroundColor, 'background-color' ),
-		setBackgroundColor: setColor( 'backgroundColor', 'customBackgroundColor' ),
-		textColor: getColor( attributes.textColor, attributes.customTextColor, 'color' ),
-		setTextColor: setColor( 'textColor', 'customTextColor' ),
-	};
-} )( ButtonEdit );
+export default withColors( 'backgroundColor', { textColor: 'color' } )( ButtonEdit );

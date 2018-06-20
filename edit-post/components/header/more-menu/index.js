@@ -11,6 +11,7 @@ import './style.scss';
 import ModeSwitcher from '../mode-switcher';
 import FixedToolbarToggle from '../fixed-toolbar-toggle';
 import PluginMoreMenuGroup from '../plugins-more-menu-group';
+import TipsToggle from '../tips-toggle';
 
 const MoreMenu = () => (
 	<Dropdown
@@ -27,7 +28,13 @@ const MoreMenu = () => (
 		renderContent={ ( { onClose } ) => (
 			<div className="edit-post-more-menu__content">
 				<ModeSwitcher onSelect={ onClose } />
-				<FixedToolbarToggle onToggle={ onClose } />
+				<MenuGroup
+					label={ __( 'Settings' ) }
+					filterName="editPost.MoreMenu.settings"
+				>
+					<FixedToolbarToggle onToggle={ onClose } />
+					<TipsToggle onToggle={ onClose } />
+				</MenuGroup>
 				<PluginMoreMenuGroup.Slot fillProps={ { onClose } } />
 				<MenuGroup
 					label={ __( 'Tools' ) }

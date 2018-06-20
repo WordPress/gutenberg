@@ -22,10 +22,10 @@ import createSelector from 'rememo';
 /**
  * WordPress dependencies
  */
-import { serialize, getBlockType, getBlockTypes, hasBlockSupport } from '@wordpress/blocks';
+import { serialize, getBlockType, getBlockTypes, hasBlockSupport, hasChildBlocks } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { moment } from '@wordpress/date';
-import { deprecated } from '@wordpress/utils';
+import deprecated from '@wordpress/deprecated';
 
 /***
  * Module constants
@@ -179,7 +179,7 @@ export function getCurrentPostLastRevisionId( state ) {
  * @return {Object} Object of key value pairs comprising unsaved edits.
  */
 export function getPostEdits( state ) {
-	return get( state, [ 'editor', 'present', 'edits' ], {} );
+	return state.editor.present.edits;
 }
 
 /**
@@ -345,9 +345,23 @@ export function isEditedPostAutosaveable( state ) {
 	}
 
 	// If the title, excerpt or content has changed, the post is autosaveable.
+	const autosave = getAutosave( state );
 	return [ 'title', 'excerpt', 'content' ].some( ( field ) => (
-		state.autosave[ field ] !== getEditedPostAttribute( state, field )
+		autosave[ field ] !== getEditedPostAttribute( state, field )
 	) );
+}
+
+/**
+ * Returns the current autosave, or null if one is not set (i.e. if the post
+ * has yet to be autosaved, or has been saved or published since the last
+ * autosave).
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {?Object} Current autosave, if exists.
+ */
+export function getAutosave( state ) {
+	return state.autosave;
 }
 
 /**
@@ -358,7 +372,7 @@ export function isEditedPostAutosaveable( state ) {
  * @return {boolean} Whether there is an existing autosave.
  */
 export function hasAutosave( state ) {
-	return !! state.autosave;
+	return !! getAutosave( state );
 }
 
 /**
@@ -995,6 +1009,18 @@ export function isBlockSelected( state, uid ) {
 }
 
 /**
+ * Returns true if one of the block's inner blocks is selected.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} uid   Block unique ID.
+ *
+ * @return {boolean} Whether the block as an inner block selected
+ */
+export function hasSelectedInnerBlock( state, uid ) {
+	return some( getBlockOrder( state, uid ), ( innerUID ) => isBlockSelected( state, innerUID ) );
+}
+
+/**
  * Returns true if the block corresponding to the specified unique ID is
  * currently selected but isn't the last of the selected blocks. Here "last"
  * refers to the block sequence in the document, _not_ the sequence of
@@ -1448,7 +1474,7 @@ export const getInserterItems = createSelector(
 			const id = blockType.name;
 
 			let isDisabled = false;
-			if ( blockType.useOnce ) {
+			if ( ! hasBlockSupport( blockType.name, 'multiple', true ) ) {
 				isDisabled = some( getBlocks( state ), { name: blockType.name } );
 			}
 
@@ -1466,6 +1492,7 @@ export const getInserterItems = createSelector(
 				isDisabled,
 				utility: calculateUtility( blockType.category, count, isContextual ),
 				frecency: calculateFrecency( time, count ),
+				hasChildBlocks: hasChildBlocks( blockType.name ),
 			};
 		};
 
@@ -1537,6 +1564,7 @@ export const getInserterItems = createSelector(
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		state.sharedBlocks.data,
+		getBlockTypes(),
 	],
 );
 

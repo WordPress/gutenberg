@@ -3,33 +3,37 @@
 	padding: 5px 0;
 	
 	@include break-small() {
-		padding: 5px $block-side-ui-padding;
+		padding: 5px $block-parent-side-ui-clearance;
 	}
 
 	.editor-post-title__input {
 		display: block;
 		width: 100%;
-		padding: #{ $block-padding + 5px } $block-padding;
+		padding: #{ $block-padding + 5px } $parent-block-padding;
 		margin: 0;
 		box-shadow: none;
 		border: 1px solid transparent;
 		background: transparent;
 		font-family: $editor-font;
 		line-height: $default-line-height;
+		transition: border .1s ease-out;
 
 		// Match h1 heading
 		font-size: 2.441em;
 		font-weight: 600;
 	}
 
-	&.is-selected .editor-post-title__input,
-	.editor-post-title__input:hover {
+	&.is-selected .editor-post-title__input {
 		// use opacity to work in various editor styles
-		border: 1px solid $dark-opacity-light-500;
+		border-color: $dark-opacity-light-500;
 
 		.is-dark-theme & {
 			border-color: $light-opacity-light-500;
 		}
+	}
+
+	.editor-post-title__input:hover {
+		border-color: theme( outlines );
 	}
 }
 
@@ -42,7 +46,7 @@
 	right: 0;
 
 	@include break-small() {
-		left: $block-side-ui-padding;
-		right: $block-side-ui-padding;
+		left: $block-parent-side-ui-clearance;
+		right: $block-parent-side-ui-clearance;
 	}
 }

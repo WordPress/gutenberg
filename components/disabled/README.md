@@ -31,3 +31,20 @@ const DisableToggleForm = withState( {
 	);
 } )
 ```
+
+A component can detect if it has been wrapped in a `<Disabled>` by accessing its [context](https://reactjs.org/docs/context.html) using `Disabled.Consumer`.
+
+```jsx
+function CustomButton() {
+	return (
+		<Disabled.Consumer>
+			{ ( isDisabled ) => (
+				<button
+					{ ...this.props }
+					style={ { opacity: isDisabled ? 0.5 : 1 } }
+				/>
+			) }
+		</Disabled.Consumer>
+	);
+}
+```

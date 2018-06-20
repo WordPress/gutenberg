@@ -2,6 +2,9 @@
 // This is sort of an experiment at making sure the editor looks as much like the end result as possible
 // Potentially the rules here can apply to all nested blocks and enable stacking, in which case it should be moved elsewhere
 .wp-block-columns .editor-block-list__layout {
+	margin-left: 0;
+	margin-right: 0;
+
 	&:first-child {
 		margin-left: -$block-padding;
 	}
@@ -12,16 +15,6 @@
 	// This max-width is used to constrain the main editor column, it should not cascade into columns
 	.editor-block-list__block {
 		max-width: none;
-	}
-}
-
-// Wide: show no left/right margin on wide, so they stack with the column side UI
-.editor-block-list__block[data-align="wide"] .wp-block-columns .editor-block-list__layout {
-	&:first-child {
-		margin-left: 0;
-	}
-	&:last-child {
-		margin-right: 0;
 	}
 }
 
@@ -38,17 +31,17 @@
 	}
 }
 
-// Hide appender shortcuts in columns
-// @todo This essentially duplicates the mobile styles for the appender component
-// It would be nice to be able to use element queries in that component instead https://github.com/tomhodgins/element-queries-spec
 .wp-block-columns {
-	.editor-inserter-with-shortcuts {
-		display: none;
+	display: block;
+
+	.editor-inner-blocks {
+		display: grid;
+		grid-auto-flow: dense;
 	}
 
-	.editor-block-list__empty-block-inserter,
-	.editor-default-block-appender .editor-inserter {
-		left: auto;
-		right: $item-spacing;
+	@for $i from 2 through 6 {
+		&.has-#{ $i }-columns .editor-inner-blocks {
+			grid-auto-columns: #{ 100% / $i };
+		}
 	}
 }

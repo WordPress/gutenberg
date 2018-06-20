@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "2.9.2",
+	"version": "3.0.1",
 	"private": true,
 	"description": "A new WordPress editor experience",
 	"repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -32,23 +32,24 @@
 		"escape-string-regexp": "1.0.5",
 		"eslint-plugin-wordpress": "git://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#1774343f6226052a46b081e01db3fca8793cc9f1",
 		"hpq": "1.2.0",
-		"jquery": "3.2.1",
+		"http-build-query": "0.7.0",
+		"jquery": "3.3.1",
 		"js-beautify": "1.6.14",
 		"lerna": "2.11.0",
 		"lodash": "4.17.5",
 		"memize": "1.0.5",
 		"moment": "2.22.1",
 		"moment-timezone": "0.5.16",
-		"mousetrap": "1.6.1",
+		"mousetrap": "1.6.2",
 		"prop-types": "15.5.10",
 		"querystringify": "1.0.0",
 		"re-resizable": "4.4.8",
-		"react": "16.3.2",
+		"react": "16.4.1",
 		"react-autosize-textarea": "3.0.2",
 		"react-click-outside": "2.3.1",
 		"react-color": "2.13.4",
 		"react-datepicker": "1.4.1",
-		"react-dom": "16.3.2",
+		"react-dom": "16.4.1",
 		"redux": "3.7.2",
 		"redux-multi": "0.1.12",
 		"redux-optimist": "1.0.0",
@@ -66,7 +67,7 @@
 		"@wordpress/browserslist-config": "2.1.4",
 		"@wordpress/custom-templated-path-webpack-plugin": "1.0.2",
 		"@wordpress/jest-preset-default": "1.0.6",
-		"@wordpress/scripts": "1.1.6",
+		"@wordpress/scripts": "1.2.0",
 		"autoprefixer": "8.2.0",
 		"babel-core": "6.26.0",
 		"babel-eslint": "8.0.3",
@@ -78,11 +79,13 @@
 		"core-js": "2.5.3",
 		"cross-env": "3.2.4",
 		"deep-freeze": "0.0.1",
+		"doctrine": "2.1.0",
 		"eslint": "4.16.0",
 		"eslint-config-wordpress": "2.0.0",
 		"eslint-plugin-jest": "21.5.0",
 		"eslint-plugin-jsx-a11y": "6.0.2",
 		"eslint-plugin-react": "7.7.0",
+		"espree": "3.5.4",
 		"extract-text-webpack-plugin": "4.0.0-beta.0",
 		"node-sass": "git://github.com/sass/node-sass.git#v4.7.0",
 		"pegjs": "0.10.0",
@@ -92,12 +95,13 @@
 		"postcss-loader": "2.1.3",
 		"puppeteer": "1.2.0",
 		"raw-loader": "0.5.1",
-		"react-test-renderer": "16.3.2",
+		"react-test-renderer": "16.4.1",
 		"sass-loader": "6.0.7",
 		"sprintf-js": "1.1.1",
 		"style-loader": "0.20.3",
 		"webpack": "4.8.3",
 		"webpack-cli": "2.1.3",
+		"webpack-livereload-plugin": "2.1.1",
 		"webpack-rtl-plugin": "github:yoavf/webpack-rtl-plugin#develop"
 	},
 	"babel": {
@@ -117,36 +121,60 @@
 			}
 		}
 	},
+	"npmPackageJsonLintConfig": {
+		"extends": "@wordpress/npm-package-json-lint-config",
+		"rules": {
+			"require-publishConfig": "error",
+			"valid-values-author": [
+				"error",
+				[
+					"The WordPress Contributors"
+				]
+			],
+			"valid-values-publishConfig": [
+				"error",
+				[
+					{
+						"access": "public"
+					}
+				]
+			]
+		}
+	},
 	"scripts": {
-		"prebuild": "check-node-version --package",
+		"prebuild": "npm run check-engines",
 		"build:packages": "rimraf ./packages/*/build ./packages/*/build-module && node ./bin/packages/build.js",
 		"build": "npm run build:packages && cross-env NODE_ENV=production webpack",
-		"lint": "eslint .",
-		"lint:fix": "eslint . --fix",
-		"lint-php": "docker-compose run --rm composer run-script lint",
-		"predev": "check-node-version --package",
+		"check-engines": "check-node-version --package",
+		"ci": "concurrently \"npm run lint && npm run build\" \"npm run test-unit:coverage-ci\"",
+		"predev": "npm run check-engines",
 		"dev": "npm run build:packages && concurrently \"cross-env webpack --watch\" \"npm run dev:packages\"",
 		"dev:packages": "node ./bin/packages/watch.js",
-		"test": "npm run lint && npm run test-unit",
-		"test-php": "npm run lint-php && npm run test-unit-php",
-		"ci": "concurrently \"npm run lint && npm run build\" \"npm run test-unit:coverage-ci\"",
+		"docs:generate-data-reference": "node docs/data/tool",
 		"fixtures:clean": "rimraf \"core-blocks/test/fixtures/*.+(json|serialized.html)\"",
 		"fixtures:server-registered": "docker-compose run -w /var/www/html/wp-content/plugins/gutenberg --rm wordpress ./bin/get-server-blocks.php > core-blocks/test/server-registered.json",
 		"fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
+		"lint": "npm run lint-js && npm run lint-pkg-json",
+		"lint-js": "eslint .",
+		"lint-js:fix": "eslint . --fix",
+		"lint-php": "docker-compose run --rm composer run-script lint",
+		"lint-pkg-json": "wp-scripts lint-pkg-json ./packages",
 		"package-plugin": "./bin/build-plugin-zip.sh",
 		"postinstall": "lerna bootstrap --hoist && npm run build:packages",
 		"pot-to-php": "./bin/pot-to-php.js",
 		"publish:check": "lerna updated",
 		"publish:dev": "lerna publish --npm-tag next",
 		"publish:prod": "lerna publish",
+		"test": "npm run lint && npm run test-unit",
+		"test-e2e": "wp-scripts test-unit-js --config test/e2e/jest.config.json",
+		"test-e2e:watch": "npm run test-e2e -- --watch",
+		"test-php": "npm run lint-php && npm run test-unit-php",
 		"test-unit": "wp-scripts test-unit-js --config test/unit/jest.config.json",
-		"test-unit-php": "docker-compose run --rm wordpress_phpunit phpunit",
-		"test-unit-php-multisite": "docker-compose run -e WP_MULTISITE=1 --rm wordpress_phpunit phpunit",
 		"test-unit:coverage": "npm run test-unit -- --coverage",
 		"test-unit:coverage-ci": "npm run test-unit -- --coverage --maxWorkers 1 && codecov",
 		"test-unit:watch": "npm run test-unit -- --watch",
-		"test-e2e": "wp-scripts test-unit-js --config test/e2e/jest.config.json",
-		"test-e2e:watch": "npm run test-e2e -- --watch"
+		"test-unit-php": "docker-compose run --rm wordpress_phpunit phpunit",
+		"test-unit-php-multisite": "docker-compose run -e WP_MULTISITE=1 --rm wordpress_phpunit phpunit"
 	}
 }

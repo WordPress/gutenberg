@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, includes, last, map, castArray, uniqueId } from 'lodash';
+import { get, includes, last, map, castArray, uniqueId, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -20,11 +20,11 @@ import {
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
+import apiRequest from '@wordpress/api-request';
 
 /**
  * Internal dependencies
  */
-import { getPostEditUrl, getWPAdminURL } from '../utils/url';
 import {
 	setupEditorState,
 	resetAutosave,
@@ -35,6 +35,7 @@ import {
 	replaceBlocks,
 	createSuccessNotice,
 	createErrorNotice,
+	createWarningNotice,
 	removeNotice,
 	saveSharedBlock,
 	insertBlock,
@@ -62,6 +63,7 @@ import {
 	isBlockSelected,
 	getTemplate,
 	getTemplateLock,
+	getAutosave,
 	POST_UPDATE_TRANSACTION_ID,
 } from './selectors';
 
@@ -69,6 +71,7 @@ import {
  * Module Constants
  */
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
+const AUTOSAVE_POST_NOTICE_ID = 'AUTOSAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 const SHARED_BLOCK_NOTICE_ID = 'SHARED_BLOCK_NOTICE_ID';
 
@@ -103,7 +106,7 @@ export default {
 
 		const post = getCurrentPost( state );
 		const edits = getPostEdits( state );
-		const toSend = {
+		let toSend = {
 			...edits,
 			content: getEditedPostContent( state ),
 			id: post.id,
@@ -118,9 +121,16 @@ export default {
 
 		let request;
 		if ( isAutosave ) {
-			toSend.parent = post.id;
+			// Ensure autosaves contain all expected fields, using autosave or
+			// post values as fallback if not otherwise included in edits.
+			toSend = {
+				...pick( post, [ 'title', 'content', 'excerpt' ] ),
+				...getAutosave( state ),
+				...toSend,
+				parent: post.id,
+			};
 
-			request = wp.apiRequest( {
+			request = apiRequest( {
 				path: `/wp/v2/${ basePath }/${ post.id }/autosaves`,
 				method: 'POST',
 				data: toSend,
@@ -133,8 +143,9 @@ export default {
 			} );
 
 			dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
+			dispatch( removeNotice( AUTOSAVE_POST_NOTICE_ID ) );
 
-			request = wp.apiRequest( {
+			request = apiRequest( {
 				path: `/wp/v2/${ basePath }/${ post.id }`,
 				method: 'PUT',
 				data: toSend,
@@ -174,6 +185,11 @@ export default {
 		const { previousPost, post, isAutosave } = action;
 		const { dispatch } = store;
 
+		// Autosaves are neither shown a notice nor redirected.
+		if ( isAutosave ) {
+			return;
+		}
+
 		const publishStatus = [ 'publish', 'private', 'future' ];
 		const isPublished = includes( publishStatus, previousPost.status );
 		const willPublish = includes( publishStatus, post.status );
@@ -181,8 +197,8 @@ export default {
 		let noticeMessage;
 		let shouldShowLink = true;
 
-		if ( isAutosave || ( ! isPublished && ! willPublish ) ) {
-			// If autosaving or saving a non-published post, don't show notice.
+		if ( ! isPublished && ! willPublish ) {
+			// If saving a non-published post, don't show notice.
 			noticeMessage = null;
 		} else if ( isPublished && ! willPublish ) {
 			// If undoing publish status, show specific notice
@@ -204,24 +220,23 @@ export default {
 		if ( noticeMessage ) {
 			dispatch( createSuccessNotice(
 				<p>
-					<span>{ noticeMessage }</span>
+					{ noticeMessage }
 					{ ' ' }
 					{ shouldShowLink && <a href={ post.link }>{ __( 'View post' ) }</a> }
 				</p>,
 				{ id: SAVE_POST_NOTICE_ID, spokenMessage: noticeMessage }
 			) );
 		}
-
-		if ( get( window.history.state, [ 'id' ] ) !== post.id ) {
-			window.history.replaceState(
-				{ id: post.id },
-				'Post ' + post.id,
-				getPostEditUrl( post.id )
-			);
-		}
 	},
 	REQUEST_POST_UPDATE_FAILURE( action, store ) {
-		const { post, edits } = action;
+		const { post, edits, error } = action;
+
+		if ( error && 'rest_autosave_no_changes' === error.code ) {
+			// Autosave requested a new autosave, but there were no changes. This shouldn't
+			// result in an error notice for the user.
+			return;
+		}
+
 		const { dispatch } = store;
 
 		const publishStatus = [ 'publish', 'private', 'future' ];
@@ -243,12 +258,13 @@ export default {
 		const { postId } = action;
 		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( getState() ) );
 		dispatch( removeNotice( TRASH_POST_NOTICE_ID ) );
-		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ postId }`, method: 'DELETE' } ).then(
+		apiRequest( { path: `/wp/v2/${ basePath }/${ postId }`, method: 'DELETE' } ).then(
 			() => {
-				dispatch( {
-					...action,
-					type: 'TRASH_POST_SUCCESS',
-				} );
+				const post = getCurrentPost( getState() );
+
+				// TODO: This should be an updatePost action (updating subsets of post properties),
+				// But right now editPost is tied with change detection.
+				dispatch( resetPost( { ...post, status: 'trash' } ) );
 			},
 			( err ) => {
 				dispatch( {
@@ -261,15 +277,6 @@ export default {
 				} );
 			}
 		);
-	},
-	TRASH_POST_SUCCESS( action ) {
-		const { postId, postType } = action;
-
-		window.location.href = getWPAdminURL( 'edit.php', {
-			trashed: 1,
-			post_type: postType,
-			ids: postId,
-		} );
 	},
 	TRASH_POST_FAILURE( action, store ) {
 		const message = action.error.message && action.error.code !== 'unknown_error' ? action.error.message : __( 'Trashing failed' );
@@ -286,7 +293,7 @@ export default {
 			context: 'edit',
 		};
 
-		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }`, data } ).then(
+		apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }`, data } ).then(
 			( newPost ) => {
 				dispatch( resetPost( newPost ) );
 			}
@@ -339,7 +346,7 @@ export default {
 		) );
 	},
 	SETUP_EDITOR( action, { getState } ) {
-		const { post } = action;
+		const { post, autosave } = action;
 		const state = getState();
 		const template = getTemplate( state );
 		const templateLock = getTemplateLock( state );
@@ -371,9 +378,27 @@ export default {
 			edits.status = 'draft';
 		}
 
+		// Check the auto-save status
+		let autosaveAction;
+		if ( autosave ) {
+			const noticeMessage = __( 'There is an autosave of this post that is more recent than the version below.' );
+			autosaveAction = createWarningNotice(
+				<p>
+					{ noticeMessage }
+					{ ' ' }
+					<a href={ autosave.editLink }>{ __( 'View the autosave' ) }</a>
+				</p>,
+				{
+					id: AUTOSAVE_POST_NOTICE_ID,
+					spokenMessage: noticeMessage,
+				}
+			);
+		}
+
 		return [
 			setTemplateValidity( isValidTemplate ),
 			setupEditorState( post, blocks, edits ),
+			...( autosaveAction ? [ autosaveAction ] : [] ),
 		];
 	},
 	SYNCHRONIZE_TEMPLATE( action, { getState } ) {
@@ -413,9 +438,9 @@ export default {
 
 		let result;
 		if ( id ) {
-			result = wp.apiRequest( { path: `/wp/v2/${ basePath }/${ id }` } );
+			result = apiRequest( { path: `/wp/v2/${ basePath }/${ id }` } );
 		} else {
-			result = wp.apiRequest( { path: `/wp/v2/${ basePath }?per_page=-1` } );
+			result = apiRequest( { path: `/wp/v2/${ basePath }?per_page=-1` } );
 		}
 
 		result.then(
@@ -468,7 +493,7 @@ export default {
 		const path = isTemporary ? `/wp/v2/${ basePath }` : `/wp/v2/${ basePath }/${ id }`;
 		const method = isTemporary ? 'POST' : 'PUT';
 
-		wp.apiRequest( { path, data, method } ).then(
+		apiRequest( { path, data, method } ).then(
 			( updatedSharedBlock ) => {
 				dispatch( {
 					type: 'SAVE_SHARED_BLOCK_SUCCESS',
@@ -524,7 +549,7 @@ export default {
 			sharedBlock.uid,
 		] ) );
 
-		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ id }`, method: 'DELETE' } ).then(
+		apiRequest( { path: `/wp/v2/${ basePath }/${ id }`, method: 'DELETE' } ).then(
 			() => {
 				dispatch( {
 					type: 'DELETE_SHARED_BLOCK_SUCCESS',

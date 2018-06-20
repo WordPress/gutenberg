@@ -39,7 +39,7 @@ function BlockTransformations( { blocks, small = false, onTransform, onClick = n
 							onTransform( blocks, name );
 							onClick( event );
 						} }
-						icon={ icon }
+						icon={ icon.src }
 						label={ small ? title : undefined }
 						role={ itemsRole }
 					>

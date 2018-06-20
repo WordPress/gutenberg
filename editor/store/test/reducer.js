@@ -1134,7 +1134,7 @@ describe( 'state', () => {
 				} );
 			} );
 
-			it( 'should ignore updates to non-existant block', () => {
+			it( 'should ignore updates to non-existent block', () => {
 				const original = deepFreeze( editor( undefined, {
 					type: 'RESET_BLOCKS',
 					blocks: [],
@@ -1271,6 +1271,24 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				title: 'updated post object from server',
 				status: 'publish',
+			} );
+		} );
+
+		it( 'should set status to draft if autosave reset while auto-draft', () => {
+			const original = deepFreeze( { title: '', status: 'auto-draft' } );
+
+			const state = currentPost( original, {
+				type: 'RESET_AUTOSAVE',
+				edits: {
+					title: 'Hello world',
+					content: '',
+					excerpt: '',
+				},
+			} );
+
+			expect( state ).toEqual( {
+				title: '',
+				status: 'draft',
 			} );
 		} );
 	} );

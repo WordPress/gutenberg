@@ -59,7 +59,14 @@ A function that returns the label for a given option. A label may be a string or
 A function that returns the keywords for the specified option.
 
 - Type: `Function`
-- Required: Yes
+- Required: No
+
+#### isOptionDisabled
+
+A function that returns whether or not the specified option should be disabled. Disabled options cannot be selected.
+
+- Type: `Function`
+- Required: No
 
 #### getOptionCompletion
 
@@ -120,6 +127,8 @@ const fruitCompleter = {
 	],
 	// Declares that options should be matched by their name
 	getOptionKeywords: option => [ option.name ],
+	// Declares that the Grapes option is disabled
+	isOptionDisabled: option => option.name === 'Grapes',
 	// Declares completions should be inserted as abbreviations
 	getOptionCompletion: option => (
 		<abbr title={ option.name }>{ option.visual }</abbr>

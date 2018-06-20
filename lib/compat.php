@@ -70,123 +70,6 @@ function _gutenberg_utf8_split( $str ) {
 }
 
 /**
- * Shims fix for apiRequest on sites configured to use plain permalinks and add Preloading support.
- *
- * @see https://core.trac.wordpress.org/ticket/42382
- *
- * @param WP_Scripts $scripts WP_Scripts instance (passed by reference).
- */
-function gutenberg_shim_api_request( $scripts ) {
-	$api_request_fix = <<<JS
-( function( wp, wpApiSettings ) {
-
-	// Fix plain permalinks sites
-	var buildAjaxOptions;
-	if ( 'string' === typeof wpApiSettings.root && -1 !== wpApiSettings.root.indexOf( '?' ) ) {
-		buildAjaxOptions = wp.apiRequest.buildAjaxOptions;
-		wp.apiRequest.buildAjaxOptions = function( options ) {
-			if ( 'string' === typeof options.path ) {
-				options.path = options.path.replace( '?', '&' );
-			}
-
-			return buildAjaxOptions.call( wp.apiRequest, options );
-		};
-	}
-
-	function getStablePath( path ) {
-		var splitted = path.split( '?' );
-		var query = splitted[ 1 ];
-		var base = splitted[ 0 ];
-		if ( ! query ) {
-			return base;
-		}
-
-		// 'b=1&c=2&a=5'
-		return base + '?' + query
-			// [ 'b=1', 'c=2', 'a=5' ]
-			.split( '&' )
-			// [ [ 'b, '1' ], [ 'c', '2' ], [ 'a', '5' ] ]
-			.map( function ( entry ) {
-				return entry.split( '=' );
-			 } )
-			// [ [ 'a', '5' ], [ 'b, '1' ], [ 'c', '2' ] ]
-			.sort( function ( a, b ) {
-				return a[ 0 ].localeCompare( b[ 0 ] );
-			 } )
-			// [ 'a=5', 'b=1', 'c=2' ]
-			.map( function ( pair ) {
-				return pair.join( '=' );
-			 } )
-			// 'a=5&b=1&c=2'
-			.join( '&' );
-	};
-
-	// Add preloading support
-	var previousApiRequest = wp.apiRequest;
-	wp.apiRequest = function( request ) {
-		var method, path;
-
-		if ( typeof request.path === 'string' && window._wpAPIDataPreload ) {
-			method = request.method || 'GET';
-			path = getStablePath( request.path );
-
-			if ( 'GET' === method && window._wpAPIDataPreload[ path ] ) {
-				var deferred = jQuery.Deferred();
-				deferred.resolve( window._wpAPIDataPreload[ path ].body );
-				return deferred.promise();
-			}
-		}
-
-		return previousApiRequest.call( previousApiRequest, request );
-	}
-	for ( var name in previousApiRequest ) {
-		if ( previousApiRequest.hasOwnProperty( name ) ) {
-			wp.apiRequest[ name ] = previousApiRequest[ name ];
-		}
-	}
-
-} )( window.wp, window.wpApiSettings );
-JS;
-
-	$scripts->add_inline_script( 'wp-api-request', $api_request_fix, 'after' );
-}
-add_action( 'wp_default_scripts', 'gutenberg_shim_api_request' );
-
-/**
- * Shims support for emulating HTTP/1.0 requests in wp.apiRequest
- *
- * @see https://core.trac.wordpress.org/ticket/43605
- *
- * @param WP_Scripts $scripts WP_Scripts instance (passed by reference).
- */
-function gutenberg_shim_api_request_emulate_http( $scripts ) {
-	$api_request_fix = <<<JS
-( function( wp ) {
-	var oldApiRequest = wp.apiRequest;
-	wp.apiRequest = function ( options ) {
-		if ( options.method ) {
-			if ( [ 'PATCH', 'PUT', 'DELETE' ].indexOf( options.method.toUpperCase() ) >= 0 ) {
-				if ( ! options.headers ) {
-					options.headers = {};
-				}
-				options.headers['X-HTTP-Method-Override'] = options.method;
-				options.method = 'POST';
-
-				options.contentType = 'application/json';
-				options.data = JSON.stringify( options.data );
-			}
-		}
-
-		return oldApiRequest( options );
-	}
-} )( window.wp );
-JS;
-
-	$scripts->add_inline_script( 'wp-api-request', $api_request_fix, 'after' );
-}
-add_action( 'wp_default_scripts', 'gutenberg_shim_api_request_emulate_http' );
-
-/**
  * Disables wpautop behavior in classic editor when post contains blocks, to
  * prevent removep from invalidating paragraph blocks.
  *
@@ -202,6 +85,39 @@ function gutenberg_disable_editor_settings_wpautop( $settings ) {
 	return $settings;
 }
 add_filter( 'wp_editor_settings', 'gutenberg_disable_editor_settings_wpautop' );
+
+/**
+ * Add TinyMCE fixes for the Classic Editor.
+ *
+ * @see https://core.trac.wordpress.org/ticket/44308
+ */
+function gutenberg_add_classic_editor_fixes() {
+	// Temp add the fix for not creating paragraphs from HTML comments.
+	// TODO: remove after 4.9.7, this should be in core.
+	$script = <<<JS
+jQuery( document ).on( 'tinymce-editor-setup', function( event, editor ) {
+	var hasWpautop = ( window.wp && window.wp.editor && window.wp.editor.autop && editor.getParam( 'wpautop', true ) );
+
+	editor.on( 'BeforeSetContent', function( event ) {
+		if ( event.load && event.format !== 'raw' && ! hasWpautop ) {
+			// Prevent creation of paragraphs out of multiple HTML comments.
+			event.content = event.content.replace( /-->\s+<!--/g, '--><!--' );
+		}
+	});
+
+	editor.on( 'SaveContent', function( event ) {
+		if ( ! hasWpautop ) {
+			// Restore formatting of block boundaries.
+			event.content = event.content.replace( /-->\s*<!-- wp:/g, '-->\\n\\n<!-- wp:' );
+		}
+	});
+});
+JS;
+
+	wp_add_inline_script( 'editor', $script, 'before' );
+
+}
+add_action( 'init', 'gutenberg_add_classic_editor_fixes' );
 
 /**
  * Add rest nonce to the heartbeat response.

@@ -3,4 +3,4 @@
  */
 import './blocks';
 import './more-menu';
-import './validate-use-once';
+import './validate-multiple-use';

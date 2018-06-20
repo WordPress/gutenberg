@@ -454,17 +454,10 @@ export const settings = {
 		}
 	},
 
-	edit: compose(
-		withColors( ( getColor, setColor, { attributes } ) => {
-			return {
-				backgroundColor: getColor( attributes.backgroundColor, attributes.customBackgroundColor, 'background-color' ),
-				setBackgroundColor: setColor( 'backgroundColor', 'customBackgroundColor' ),
-				textColor: getColor( attributes.textColor, attributes.customTextColor, 'color' ),
-				setTextColor: setColor( 'textColor', 'customTextColor' ),
-			};
-		} ),
+	edit: compose( [
+		withColors( 'backgroundColor', { textColor: 'color' } ),
 		FallbackStyles,
-	)( ParagraphBlock ),
+	] )( ParagraphBlock ),
 
 	save( { attributes } ) {
 		const {

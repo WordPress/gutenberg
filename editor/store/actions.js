@@ -16,13 +16,15 @@ import {
  * Returns an action object used in signalling that editor has initialized with
  * the specified post object and editor settings.
  *
- * @param {Object} post     Post object.
+ * @param {Object}  post           Post object.
+ * @param {Object}  autosaveStatus The Post's autosave status.
  *
  * @return {Object} Action object.
  */
-export function setupEditor( post ) {
+export function setupEditor( post, autosaveStatus ) {
 	return {
 		type: 'SETUP_EDITOR',
+		autosave: autosaveStatus,
 		post,
 	};
 }
@@ -338,7 +340,7 @@ export function setTemplateValidity( isValid ) {
 }
 
 /**
- * Returns an action object tocheck the template validity.
+ * Returns an action object to check the template validity.
  *
  * @return {Object} Action object.
  */

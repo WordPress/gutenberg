@@ -27,7 +27,7 @@ export async function activatePlugin( slug ) {
 }
 
 /**
- * Dectivates an active plugin.
+ * Deactivates an active plugin.
  *
  * @param {string} slug Plugin slug.
  */

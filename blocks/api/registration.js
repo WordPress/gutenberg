@@ -13,28 +13,33 @@ import { select, dispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 
 /**
+ * Internal dependencies
+ */
+import { isValidIcon, normalizeIconObject } from './utils';
+
+/**
  * Defined behavior of a block type.
  *
  * @typedef {WPBlockType}
  *
- * @property {string}             name       Block's namespaced name.
- * @property {string}             title      Human-readable label for a block.
- *                                           Shown in the block inserter.
- * @property {string}             category   Category classification of block,
- *                                           impacting where block is shown in
- *                                           inserter results.
- * @property {(string|WPElement)} icon       Slug of the Dashicon to be shown
- *                                           as the icon for the block in the
- *                                           inserter, or element.
- * @property {?string[]}          keywords   Additional keywords to produce
- *                                           block as inserter search result.
- * @property {?Object}            attributes Block attributes.
- * @property {Function}           save       Serialize behavior of a block,
- *                                           returning an element describing
- *                                           structure of the block's post
- *                                           content markup.
- * @property {WPComponent}        edit       Component rendering element to be
- *                                           interacted with in an editor.
+ * @property {string}                    name       Block's namespaced name.
+ * @property {string}                    title      Human-readable label for a block.
+ *                                                  Shown in the block inserter.
+ * @property {string}                    category   Category classification of block,
+ *                                                  impacting where block is shown in
+ *                                                  inserter results.
+ * @property {(Object|string|WPElement)} icon       Slug of the Dashicon to be shown
+ *                                                  as the icon for the block in the
+ *                                                  inserter, or element or an object describing the icon.
+ * @property {?string[]}                 keywords   Additional keywords to produce
+ *                                                  block as inserter search result.
+ * @property {?Object}                   attributes Block attributes.
+ * @property {Function}                  save       Serialize behavior of a block,
+ *                                                  returning an element describing
+ *                                                  structure of the block's post
+ *                                                  content markup.
+ * @property {WPComponent}               edit       Component rendering element to be
+ *                                                  interacted with in an editor.
  */
 
 /**
@@ -134,9 +139,16 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
-	if ( ! settings.icon ) {
-		settings.icon = 'block-default';
+
+	settings.icon = normalizeIconObject( settings.icon );
+	if ( ! isValidIcon( settings.icon.src ) ) {
+		console.error(
+			'The icon passed is invalid. ' +
+			'The icon should be a string, an element, a function, or an object following the specifications documented in https://wordpress.org/gutenberg/handbook/block-api/#icon-optional'
+		);
+		return;
 	}
+
 	if ( 'isPrivate' in settings ) {
 		deprecated( 'isPrivate', {
 			version: '3.1',
@@ -144,6 +156,16 @@ export function registerBlockType( name, settings ) {
 			plugin: 'Gutenberg',
 		} );
 		set( settings, [ 'supports', 'inserter' ], ! settings.isPrivate );
+	}
+
+	if ( 'useOnce' in settings ) {
+		deprecated( 'useOnce', {
+			version: '3.3',
+			alternative: 'supports.multiple',
+			plugin: 'Gutenberg',
+			hint: 'useOnce property in the settings param passed to wp.block.registerBlockType.',
+		} );
+		set( settings, [ 'supports', 'multiple' ], ! settings.useOnce );
 	}
 
 	dispatch( 'core/blocks' ).addBlockTypes( settings );
@@ -288,3 +310,25 @@ export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
 export function isSharedBlock( blockOrType ) {
 	return blockOrType.name === 'core/block';
 }
+
+/**
+ * Returns an array with the child blocks of a given block.
+ *
+ * @param {string} blockName Block type name.
+ *
+ * @return {Array} Array of child block names.
+ */
+export const getChildBlockNames = ( blockName ) => {
+	return select( 'core/blocks' ).getChildBlockNames( blockName );
+};
+
+/**
+ * Returns a boolean indicating if a block has child blocks or not.
+ *
+ * @param {string} blockName Block type name.
+ *
+ * @return {boolean} True if a block contains child blocks and false otherwise.
+ */
+export const hasChildBlocks = ( blockName ) => {
+	return select( 'core/blocks' ).hasChildBlocks( blockName );
+};
