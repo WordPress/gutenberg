@@ -38,12 +38,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 	},
 
 	edit: function( props ) {
-		var content = props.attributes.content,
-			alignment = props.attributes.alignment;
-
-		function onChangeContent( newContent ) {
-			props.setAttributes( { content: newContent } );
-		}
+		var alignment = props.attributes.alignment;
 
 		function onChangeAlignment( newAlignment ) {
 			props.setAttributes( { alignment: newAlignment } );
@@ -68,8 +63,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 					tagName: 'p',
 					className: props.className,
 					style: { textAlign: alignment },
-					onChange: onChangeContent,
-					value: content,
+					bindAttribute: 'content',
 				}
 			)
 		];
@@ -115,11 +109,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 	},
 
 	edit( { attributes, className, setAttributes } ) {
-		const { content, alignment } = attributes;
-
-		function onChangeContent( newContent ) {
-			setAttributes( { content: newContent } );
-		}
+		const { alignment } = attributes;
 
 		function onChangeAlignment( newAlignment ) {
 			setAttributes( { alignment: newAlignment } );
@@ -137,8 +127,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 				tagName="p"
 				className={ className }
 				style={ { textAlign: alignment } }
-				onChange={ onChangeContent }
-				value={ content }
+				bindAttribute="content"
 			/>
 		];
 	},

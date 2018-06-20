@@ -13,6 +13,8 @@ const { Consumer, Provider } = createContext( {
 	isSelected: false,
 	focusedElement: null,
 	setFocusedElement: noop,
+	attributes: {},
+	setAttributes: noop,
 } );
 
 export { Provider as BlockEditContextProvider };

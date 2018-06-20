@@ -101,3 +101,6 @@ export { default as WritingFlow } from './writing-flow';
 
 // State Related Components
 export { default as EditorProvider } from './provider';
+
+// Higher-Order Components
+export { default as withBindAttribute } from './higher-order/with-bind-attribute';
