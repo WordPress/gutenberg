@@ -7,6 +7,7 @@ export { default as BlockControls } from './block-controls';
 export { default as BlockEdit } from './block-edit';
 export { default as BlockFormatControls } from './block-format-controls';
 export { default as BlockIcon } from './block-icon';
+export { default as BlockPlaceholder } from './block-placeholder';
 export { default as ColorPalette } from './color-palette';
 export { default as withColorContext } from './color-palette/with-color-context';
 export * from './colors';

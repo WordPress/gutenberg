@@ -28,6 +28,9 @@ import * as column from '../packages/block-library/src/columns/column';
 import * as coverImage from '../packages/block-library/src/cover-image';
 import * as embed from '../packages/block-library/src/embed';
 import * as file from '../packages/block-library/src/file';
+import * as halfMediaText from '../packages/block-library/src/layout-half-media-text';
+import * as halfMediaTextContent from '../packages/block-library/src/layout-half-media-text/content-area';
+import * as halfMediaTextMedia from '../packages/block-library/src/layout-half-media-text/media-area';
 import * as latestComments from '../packages/block-library/src/latest-comments';
 import * as latestPosts from '../packages/block-library/src/latest-posts';
 import * as list from '../packages/block-library/src/list';
@@ -77,6 +80,9 @@ export const registerCoreBlocks = () => {
 		...embed.others,
 		file,
 		freeform,
+		halfMediaText,
+		halfMediaTextContent,
+		halfMediaTextMedia,
 		html,
 		latestComments,
 		latestPosts,

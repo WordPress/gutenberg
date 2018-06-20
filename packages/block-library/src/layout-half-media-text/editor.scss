@@ -1,0 +1,37 @@
+.half-media__media .block-alignment-toolbar {
+	display: none;
+}
+
+.half-media {
+	display: block;
+	.half-media__media {
+		padding: 0;
+	}
+}
+
+.half-media > .editor-inner-blocks > .editor-block-list__layout {
+	display: flex;
+	> [data-type="core/half-media-media-area"],
+	> [data-type="core/half-media-content-area"] {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		width: 0;
+		.editor-block-list__block-edit {
+			flex-basis: 100%;
+		}
+	}
+	> [data-type="core/half-media-media-area"] > .editor-block-list__block-edit {
+		margin-top: 0;
+		margin-bottom: 0;
+	}
+	> [data-type="core/half-media-content-area"] > .editor-block-list__block-edit {
+		display: flex;
+	}
+}
+
+.half-media.has-media-on-the-right > .editor-inner-blocks > .editor-block-list__layout {
+	flex-direction: row-reverse;
+}
+
+

@@ -84,16 +84,20 @@ class InnerBlocks extends Component {
 			allowedBlocks,
 			templateLock,
 			template,
+			isEmpty,
 			isSmallScreen,
 			isSelectedBlockInRoot,
+			showWhenEmpty,
+			className,
 		} = this.props;
 
-		const classes = classnames( 'editor-inner-blocks', {
+		const classes = classnames( className, 'editor-inner-blocks', {
 			'has-overlay': isSmallScreen && ! isSelectedBlockInRoot,
 		} );
 
 		return (
 			<div className={ classes }>
+				{ isEmpty && showWhenEmpty }
 				<BlockList
 					rootClientId={ clientId }
 					{ ...{ layouts, allowedBlocks, templateLock, template } }
@@ -114,14 +118,17 @@ InnerBlocks = compose( [
 			getBlockListSettings,
 			getBlockRootClientId,
 			getTemplateLock,
+			getBlockOrder,
 		} = select( 'core/editor' );
 		const { clientId } = ownProps;
 		const parentClientId = getBlockRootClientId( clientId );
+		const blocksInside = getBlockOrder( clientId );
 		return {
 			isSelectedBlockInRoot: isBlockSelected( clientId ) || hasSelectedInnerBlock( clientId ),
 			block: getBlock( clientId ),
 			blockListSettings: getBlockListSettings( clientId ),
 			parentLock: getTemplateLock( parentClientId ),
+			isEmpty: blocksInside && blocksInside.length === 0,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
