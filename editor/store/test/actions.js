@@ -1,4 +1,12 @@
 /**
+ * WordPress dependencies
+ */
+import {
+	unregisterBlockType,
+	registerBlockType,
+} from '@wordpress/blocks';
+
+/**
  * Internal dependencies
  */
 import {
@@ -24,6 +32,7 @@ import {
 	replaceBlock,
 	insertBlock,
 	insertBlocks,
+	insertFootnotesBlock,
 	showInsertionPoint,
 	hideInsertionPoint,
 	editPost,
@@ -209,6 +218,38 @@ describe( 'actions', () => {
 				blocks,
 				index,
 				rootUID: 'test_uid',
+				time: expect.any( Number ),
+			} );
+		} );
+	} );
+
+	describe( 'insertFootnotesBlock', () => {
+		beforeEach( () => {
+			registerBlockType( 'core/footnotes', {
+				title: 'Footnotes',
+				category: 'common',
+				save: () => null,
+				attributes: {
+					footnotes: [],
+				},
+			} );
+		} );
+
+		afterEach( () => {
+			unregisterBlockType( 'core/footnotes' );
+		} );
+
+		it( 'should return the INSERT_BLOCKS action', () => {
+			const block = {
+				attributes: {},
+				innerBlocks: [],
+				isValid: true,
+				name: 'core/footnotes',
+				uid: expect.any( String ),
+			};
+			expect( insertFootnotesBlock() ).toEqual( {
+				type: 'INSERT_BLOCKS',
+				blocks: [ block ],
 				time: expect.any( Number ),
 			} );
 		} );

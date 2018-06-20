@@ -24,6 +24,7 @@ import * as columns from './columns';
 import * as coverImage from './cover-image';
 import * as embed from './embed';
 import * as freeform from './freeform';
+import * as footnotes from './footnotes';
 import * as html from './html';
 import * as latestPosts from './latest-posts';
 import * as list from './list';
@@ -64,6 +65,7 @@ export const registerCoreBlocks = () => {
 		...embed.common,
 		...embed.others,
 		freeform,
+		footnotes,
 		html,
 		latestPosts,
 		more,

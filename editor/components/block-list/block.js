@@ -51,6 +51,7 @@ import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
 import withHoverAreas from './with-hover-areas';
 import { createInnerBlockList } from '../../utils/block-list';
+import { updateFootnotesBlockVisibility } from '../../utils/footnotes';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
 
@@ -60,6 +61,7 @@ export class BlockListBlock extends Component {
 
 		this.setBlockListRef = this.setBlockListRef.bind( this );
 		this.bindBlockNode = this.bindBlockNode.bind( this );
+		this.updateFootnotes = this.updateFootnotes.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
 		this.hideHoverEffects = this.hideHoverEffects.bind( this );
@@ -186,6 +188,15 @@ export class BlockListBlock extends Component {
 				placeCaretAtVerticalEdge( target, true );
 			}
 		}
+	}
+
+	updateFootnotes( currentBlockFootnotes, updatedBlocks ) {
+		const { block } = this.props;
+
+		updateFootnotesBlockVisibility( {
+			...updatedBlocks,
+			[ block.uid ]: currentBlockFootnotes,
+		} );
 	}
 
 	setAttributes( attributes ) {
@@ -552,6 +563,7 @@ export class BlockListBlock extends Component {
 								name={ blockName }
 								isSelected={ isSelected }
 								attributes={ block.attributes }
+								updateFootnotes={ this.updateFootnotes }
 								setAttributes={ this.setAttributes }
 								insertBlocksAfter={ isLocked ? undefined : this.insertBlocksAfter }
 								onReplace={ isLocked ? undefined : onReplace }

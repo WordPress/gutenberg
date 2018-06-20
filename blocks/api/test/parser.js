@@ -5,6 +5,7 @@ import {
 	getBlockAttribute,
 	getBlockAttributes,
 	asType,
+	parseFootnotesFromContent,
 	createBlockWithFallback,
 	getAttributesAndInnerBlocksFromDeprecatedVersion,
 	default as parse,
@@ -309,6 +310,25 @@ describe( 'block parser', () => {
 			expect( attributesAndInnerBlocks.innerBlocks ).toHaveLength( 1 );
 			expect( attributesAndInnerBlocks.innerBlocks[ 0 ].name ).toEqual( 'core/test-block' );
 			expect( attributesAndInnerBlocks.innerBlocks[ 0 ].attributes ).toEqual( { aaa: 'bbb' } );
+		} );
+	} );
+
+	describe( 'parseFootnotesFromContent', () => {
+		it( 'should return empty array if there is no content', () => {
+			const footnotes = parseFootnotesFromContent();
+
+			expect( footnotes ).toEqual( [] );
+		} );
+		it( 'should parse content and return footnote ids', () => {
+			const content = [
+				'Lorem ipsum',
+				{ type: 'sup', props: { 'data-wp-footnote-id': '12345' } },
+				'is a text',
+			];
+
+			const footnotes = parseFootnotesFromContent( content );
+
+			expect( footnotes ).toEqual( [ { id: '12345' } ] );
 		} );
 	} );
 

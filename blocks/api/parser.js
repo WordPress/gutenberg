@@ -206,6 +206,30 @@ export function getAttributesAndInnerBlocksFromDeprecatedVersion( blockType, inn
 }
 
 /**
+ * Parses the content and extracts the list of footnotes.
+ *
+ * @param {?Array} content The content to parse.
+ *
+ * @return {Array} Array of footnote ids.
+ */
+export function parseFootnotesFromContent( content ) {
+	if ( ! content || ! Array.isArray( content ) ) {
+		return [];
+	}
+
+	return content.reduce( ( footnotes, element ) => {
+		if ( element.type === 'sup' && element.props[ 'data-wp-footnote-id' ] ) {
+			return [
+				...footnotes,
+				{ id: element.props[ 'data-wp-footnote-id' ] },
+			];
+		}
+
+		return footnotes;
+	}, [] );
+}
+
+/**
  * Creates a block with fallback to the unknown type handler.
  *
  * @param {Object} blockNode Parsed block node.

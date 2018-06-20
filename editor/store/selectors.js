@@ -788,6 +788,50 @@ export function getNextBlockUid( state, startUID ) {
 }
 
 /**
+ * Returns the UID from the footnotes block if it exists, or null if there isn't
+ * any footnotes block.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string|null} Footnotes block's UID, or null if none exists.
+ */
+export function getFootnotesBlockUid( state ) {
+	const blocks = getBlocks( state );
+
+	for ( let i = 0; i < blocks.length; i++ ) {
+		if ( blocks[ i ].name === 'core/footnotes' ) {
+			return blocks[ i ].uid;
+		}
+	}
+
+	return null;
+}
+
+/**
+ * Returns an array with all footnote UIDs contained in the specified block
+ * including its children. If no block UID is specified, it returns the array
+ * of footnotes of the entire post.
+ *
+ * @param {Object}  state   Global application state.
+ * @param {?string} rootUID Optional root UID of the block to search footnotes in.
+ *
+ * @return {Array} Footnote ids.
+ */
+export function getFootnotes( state, rootUID = '' ) {
+	const blockFootnotes = get( state.editor.present.blocksByUID[ rootUID ],
+		[ 'attributes', 'blockFootnotes' ], [] );
+	const innerBlocksUids = getBlockOrder( state, rootUID );
+
+	return innerBlocksUids.reduce(
+		( footnotes, blockUid ) => [
+			...footnotes,
+			...getFootnotes( state, blockUid ),
+		],
+		blockFootnotes
+	);
+}
+
+/**
  * Returns the initial caret position for the selected block.
  * This position is to used to position the caret properly when the selected block changes.
  *

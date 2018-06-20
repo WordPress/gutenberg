@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import uuid from 'uuid/v4';
 import classnames from 'classnames';
 import {
 	last,
@@ -18,6 +19,7 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { Component, Fragment, compose, RawHTML, createRef } from '@wordpress/element';
 import {
 	isHorizontalEdge,
@@ -116,6 +118,7 @@ export class RichText extends Component {
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onKeyUp = this.onKeyUp.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
+		this.addFootnote = this.addFootnote.bind( this );
 		this.onPropagateUndo = this.onPropagateUndo.bind( this );
 		this.onPastePreProcess = this.onPastePreProcess.bind( this );
 		this.onPaste = this.onPaste.bind( this );
@@ -823,6 +826,15 @@ export class RichText extends Component {
 		} ) );
 	}
 
+	addFootnote() {
+		this.editor.selection.collapse();
+		if ( this.editor.selection.getNode().tagName === 'SUP' ) {
+			return;
+		}
+		const uid = uuid();
+		this.editor.insertContent( `<sup data-wp-footnote-id="${ uid }" contenteditable="false"><a href="#${ uid }" class="wp-footnote"><span class="screen-reader-text">${ __( 'See footnote' ) }</span></a></sup> ` );
+	}
+
 	/**
 	 * Calling onSplit means we need to abort the change done by TinyMCE.
 	 * we need to call updateContent to restore the initial content before calling onSplit.
@@ -869,6 +881,7 @@ export class RichText extends Component {
 				focusPosition={ this.state.focusPosition }
 				formats={ this.state.formats }
 				onChange={ this.changeFormats }
+				onAddFootnote={ this.addFootnote }
 				enabledControls={ formattingControls }
 				customControls={ formatters }
 			/>

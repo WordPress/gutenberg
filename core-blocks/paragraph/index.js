@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isFinite, find, omit } from 'lodash';
+import { isEqual, isFinite, find, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -31,7 +31,11 @@ import {
 	PanelColor,
 	RichText,
 } from '@wordpress/editor';
-import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
+import {
+	createBlock,
+	getPhrasingContentSchema,
+	parseFootnotesFromContent,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -140,6 +144,7 @@ class ParagraphBlock extends Component {
 	render() {
 		const {
 			attributes,
+			updateFootnotes,
 			setAttributes,
 			insertBlocksAfter,
 			mergeBlocks,
@@ -156,12 +161,15 @@ class ParagraphBlock extends Component {
 
 		const {
 			align,
+			blockFootnotes,
 			content,
 			dropCap,
 			placeholder,
 		} = attributes;
 
 		const fontSize = this.getFontSize();
+
+		const formattingControls = [ 'bold', 'italic', 'strikethrough', 'link', 'footnote' ];
 
 		return (
 			<Fragment>
@@ -227,20 +235,34 @@ class ParagraphBlock extends Component {
 						} }
 						value={ content }
 						onChange={ ( nextContent ) => {
+							const previousFootnotes = blockFootnotes || [];
+							const footnotes = parseFootnotesFromContent( nextContent );
+
 							setAttributes( {
 								content: nextContent,
+								blockFootnotes: footnotes,
 							} );
+
+							if ( ! isEqual( previousFootnotes, footnotes ) ) {
+								updateFootnotes( footnotes );
+							}
 						} }
 						onSplit={ insertBlocksAfter ?
 							( before, after, ...blocks ) => {
 								if ( after ) {
-									blocks.push( createBlock( name, { content: after } ) );
+									blocks.push( createBlock( name, {
+										content: after,
+										blockFootnotes: parseFootnotesFromContent( after ),
+									} ) );
 								}
 
 								insertBlocksAfter( blocks );
 
 								if ( before ) {
-									setAttributes( { content: before } );
+									setAttributes( {
+										content: before,
+										blockFootnotes: parseFootnotesFromContent( before ),
+									} );
 								} else {
 									onReplace( [] );
 								}
@@ -251,6 +273,7 @@ class ParagraphBlock extends Component {
 						onReplace={ this.onReplace }
 						onRemove={ () => onReplace( [] ) }
 						placeholder={ placeholder || __( 'Add text or type / to add content' ) }
+						formattingControls={ formattingControls }
 					/>
 				</div>
 			</Fragment>
@@ -296,6 +319,17 @@ const schema = {
 	},
 	customFontSize: {
 		type: 'number',
+	},
+	blockFootnotes: {
+		type: 'array',
+		source: 'query',
+		selector: 'sup',
+		query: {
+			id: {
+				source: 'attribute',
+				attribute: 'data-wp-footnote-id',
+			},
+		},
 	},
 };
 

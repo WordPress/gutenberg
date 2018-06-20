@@ -60,6 +60,8 @@ const {
 	getBlockIndex,
 	getPreviousBlockUid,
 	getNextBlockUid,
+	getFootnotesBlockUid,
+	getFootnotes,
 	isBlockSelected,
 	hasSelectedInnerBlock,
 	isBlockWithinSelection,
@@ -2235,6 +2237,121 @@ describe( 'selectors', () => {
 			};
 
 			expect( getNextBlockUid( state, 56, '123' ) ).toBeNull();
+		} );
+	} );
+
+	describe( 'getFootnotesBlockUid', () => {
+		it( 'should return the footnotes block\'s UID', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUID: {
+							uid1: {
+								uid: 'uid1',
+								name: 'core/footnotes',
+								attributes: {},
+							},
+						},
+						blockOrder: {
+							'': [ 'uid1' ],
+							uid1: [],
+						},
+						edits: {},
+					},
+				},
+			};
+
+			expect( getFootnotesBlockUid( state ) ).toEqual( 'uid1' );
+		} );
+
+		it( 'should return null if there isn\'t any footnotes block', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUID: [],
+						blockOrder: { '': [] },
+					},
+				},
+			};
+
+			expect( getFootnotesBlockUid( state ) ).toBeNull();
+		} );
+	} );
+
+	describe( 'getFootnotes', () => {
+		it( 'should return the footnotes array ordered', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUID: {
+							uid1: {
+								uid: 'uid1',
+								attributes: {
+									blockFootnotes: [ { id: '123' }, { id: '456' } ],
+								},
+							},
+							uid2: {
+								uid: 'uid2',
+								attributes: {
+									blockFootnotes: [ { id: '789' } ],
+								},
+							},
+						},
+						blockOrder: {
+							'': [ 'uid2', 'uid1' ],
+							uid1: [],
+							uid2: [],
+						},
+						edits: {},
+					},
+				},
+			};
+
+			expect( getFootnotes( state ) ).toEqual(
+				[ { id: '789' }, { id: '123' }, { id: '456' } ] );
+		} );
+
+		it( 'should return the footnotes from inner blocks', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUID: {
+							uid1: {
+								uid: 'uid1',
+							},
+							uid2: {
+								uid: 'uid2',
+								attributes: {
+									blockFootnotes: [ { id: '123' } ],
+								},
+							},
+						},
+						blockOrder: {
+							'': [ 'uid1' ],
+							uid1: [ 'uid2' ],
+						},
+						edits: {},
+					},
+				},
+			};
+
+			expect( getFootnotes( state ) ).toEqual( [ { id: '123' } ] );
+		} );
+
+		it( 'should return empty array if there isn\'t any footnote', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUID: [],
+						blockOrder: { '': [] },
+					},
+				},
+			};
+
+			expect( getFootnotes( state ) ).toEqual( [] );
 		} );
 	} );
 

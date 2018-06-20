@@ -1,0 +1,21 @@
+[
+    {
+        "uid": "_uid_0",
+        "name": "core/footnotes",
+        "isValid": true,
+        "attributes": {
+            "footnotes": [
+                {
+                    "id": "7edc47cb-3fe1-4ce0-ae6f-5e23e1e67aa2",
+                    "text": [ "Reference 1" ]
+                },
+                {
+                    "id": "2e5f8a19-d9cd-4898-8686-cb6518450dc5",
+                    "text": [ "Reference 2" ]
+                }
+            ]
+        },
+        "innerBlocks": [],
+        "originalContent": "<div class=\"wp-block-footnotes\"><ol><li id=\"7edc47cb-3fe1-4ce0-ae6f-5e23e1e67aa2\">Reference 1</li><li id=\"2e5f8a19-d9cd-4898-8686-cb6518450dc5\">Reference 2</li></ol></div>"
+    }
+]

@@ -48,6 +48,11 @@ const FORMATTING_CONTROLS = [
 		shortcut: displayShortcut.primary( 'k' ),
 		format: 'link',
 	},
+	{
+		icon: 'editor-textcolor', // TODO: Need proper footnote icon
+		title: __( 'Footnote' ),
+		format: 'footnote',
+	},
 ];
 
 // Default controls shown if no `enabledControls` prop provided
@@ -112,6 +117,12 @@ class FormatToolbar extends Component {
 			this.props.onChange( {
 				[ format ]: ! this.props.formats[ format ],
 			} );
+		};
+	}
+
+	addFootnote() {
+		return () => {
+			this.props.onAddFootnote();
 		};
 	}
 
@@ -183,6 +194,13 @@ class FormatToolbar extends Component {
 						title: isFormatActive ? __( 'Unlink' ) : __( 'Link' ),
 						onClick: isActive ? this.dropLink : this.addLink,
 						isActive,
+					};
+				}
+
+				if ( control.format === 'footnote' ) {
+					return {
+						...control,
+						onClick: this.addFootnote(),
 					};
 				}
 

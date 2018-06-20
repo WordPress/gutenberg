@@ -9,6 +9,7 @@ export {
 export {
 	default as parse,
 	getBlockAttributes,
+	parseFootnotesFromContent,
 	parseWithAttributeSchema,
 } from './parser';
 export { default as rawHandler, getPhrasingContentSchema } from './raw-handling';
