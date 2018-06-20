@@ -517,7 +517,6 @@ class FormTokenField extends Component {
 		} );
 
 		let tokenFieldProps = {
-			ref: 'main',
 			className: classes,
 			tabIndex: '-1',
 		};
