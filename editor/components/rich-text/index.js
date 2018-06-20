@@ -12,6 +12,7 @@ import {
 	defer,
 	noop,
 	reject,
+	forOwn,
 } from 'lodash';
 import 'element-closest';
 
@@ -27,7 +28,7 @@ import {
 import { createBlobURL } from '@wordpress/blob';
 import { keycodes } from '@wordpress/utils';
 import { withInstanceId, withSafeTimeout, Slot } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { rawHandler } from '@wordpress/blocks';
 
 /**
@@ -42,7 +43,7 @@ import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
 import { domToFormat, valueToString } from './format';
-import { registerCoreTokens } from './core-tokens';
+import * as tokens from './core-tokens';
 import TokenUI from './tokens/ui';
 
 const { BACKSPACE, DELETE, ENTER, rawShortcut } = keycodes;
@@ -104,8 +105,10 @@ export function getFormatProperties( formatName, parents ) {
 
 const DEFAULT_FORMATS = [ 'bold', 'italic', 'strikethrough', 'link', 'code' ];
 
+let coreTokensRegistered = false;
+
 export class RichText extends Component {
-	constructor() {
+	constructor( { registerToken } ) {
 		super( ...arguments );
 
 		this.onInit = this.onInit.bind( this );
@@ -130,6 +133,14 @@ export class RichText extends Component {
 		};
 
 		this.containerRef = createRef();
+
+		if ( ! coreTokensRegistered ) {
+			forOwn( tokens, ( { name, settings } ) => {
+				registerToken( name, settings );
+			} );
+
+			coreTokensRegistered = true;
+		}
 	}
 
 	/**
@@ -945,8 +956,6 @@ RichText.defaultProps = {
 	format: 'element',
 };
 
-registerCoreTokens();
-
 const RichTextContainer = compose( [
 	withInstanceId,
 	withBlockEditContext( ( context, ownProps ) => {
@@ -971,6 +980,13 @@ const RichTextContainer = compose( [
 
 		return {
 			isViewportSmall: isViewportMatch( '< small' ),
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		const { registerToken } = dispatch( 'core/editor' );
+
+		return {
+			registerToken,
 		};
 	} ),
 	withSafeTimeout,

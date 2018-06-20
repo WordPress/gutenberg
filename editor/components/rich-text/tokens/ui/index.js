@@ -4,15 +4,15 @@
 import { Component, Fragment, renderToString } from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
 import { __ } from '@wordpress/i18n';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import { InserterResultsPortal } from '../../../inserter';
-import { getTokenSettings } from '../registration';
 
-export default class TokenUI extends Component {
+class TokenUI extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -20,7 +20,6 @@ export default class TokenUI extends Component {
 		this.onSelect = this.onSelect.bind( this );
 		this.onSave = this.onSave.bind( this );
 
-		this.items = Object.values( getTokenSettings() );
 		this.state = {
 			selected: null,
 			hovered: null,
@@ -68,7 +67,7 @@ export default class TokenUI extends Component {
 			<Fragment>
 				<InserterResultsPortal
 					title={ __( 'Inline Elements' ) }
-					items={ this.items }
+					items={ this.props.items }
 					onSelect={ this.onSelect }
 					onHover={ this.onHover }
 				/>
@@ -85,3 +84,11 @@ export default class TokenUI extends Component {
 		);
 	}
 }
+
+export default withSelect( ( select ) => {
+	const { getTokenSettings } = select( 'core/editor' );
+
+	return {
+		items: Object.values( getTokenSettings() ),
+	};
+} )( TokenUI );

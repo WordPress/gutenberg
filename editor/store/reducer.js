@@ -18,13 +18,16 @@ import {
 	includes,
 	overSome,
 	get,
+	has,
+	isFunction,
 } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { isSharedBlock } from '@wordpress/blocks';
+import { isSharedBlock, isValidIcon, normalizeIconObject } from '@wordpress/blocks';
 import { combineReducers } from '@wordpress/data';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -33,6 +36,11 @@ import withHistory from '../utils/with-history';
 import withChangeDetection from '../utils/with-change-detection';
 import { PREFERENCES_DEFAULTS, EDITOR_SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
+
+/**
+ * Browser dependencies
+ */
+const { error } = window.console;
 
 /**
  * Returns a post attribute value, flattening nested rendered content using its
@@ -1096,6 +1104,99 @@ export function autosave( state = null, action ) {
 	return state;
 }
 
+/**
+ * Reducer managing the block types
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function tokens( state = {}, action ) {
+	switch ( action.type ) {
+		case 'REGISTER_TOKEN': {
+			const { name } = action;
+
+			if ( typeof name !== 'string' ) {
+				error(
+					'Token names must be strings.'
+				);
+				return state;
+			}
+
+			if ( ! /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/.test( name ) ) {
+				error(
+					'Token names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-token'
+				);
+				return state;
+			}
+
+			if ( has( state, [ name ] ) ) {
+				error(
+					'Token "' + name + '" is already registered.'
+				);
+				return state;
+			}
+
+			const tokenSettings = applyFilters( 'editor.registerToken', action.settings, name );
+
+			if ( ! tokenSettings || ! isFunction( tokenSettings.save ) ) {
+				error(
+					'The "save" property must be specified and must be a valid function.'
+				);
+				return state;
+			}
+
+			if ( has( tokenSettings, [ 'edit' ] ) && ! isFunction( tokenSettings.edit ) ) {
+				error(
+					'The "edit" property must be a valid function.'
+				);
+				return state;
+			}
+
+			if ( has( tokenSettings, [ 'keywords' ] ) && tokenSettings.keywords.length > 3 ) {
+				error(
+					'The token "' + name + '" can have a maximum of 3 keywords.'
+				);
+				return state;
+			}
+
+			if ( ! has( tokenSettings, [ 'title' ] ) || tokenSettings.title === '' ) {
+				error(
+					'The token "' + name + '" must have a title.'
+				);
+				return state;
+			}
+
+			if ( typeof tokenSettings.title !== 'string' ) {
+				error(
+					'Token titles must be strings.'
+				);
+				return state;
+			}
+
+			tokenSettings.icon = normalizeIconObject( tokenSettings.icon );
+
+			if ( ! isValidIcon( tokenSettings.icon.src ) ) {
+				error(
+					'The icon passed is invalid. ' +
+					'The icon should be a string, an element, a function, or an object following the specifications documented in https://wordpress.org/gutenberg/handbook/block-api/#icon-optional'
+				);
+				return state;
+			}
+
+			return {
+				...state,
+				[ name ]: tokenSettings,
+			};
+		}
+		case 'UNREGISTER_TOKEN':
+			return omit( state, action.name );
+	}
+
+	return state;
+}
+
 export default optimist( combineReducers( {
 	editor,
 	currentPost,
@@ -1112,4 +1213,5 @@ export default optimist( combineReducers( {
 	template,
 	autosave,
 	settings,
+	tokens,
 } ) );
