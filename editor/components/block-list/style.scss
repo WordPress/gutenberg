@@ -454,7 +454,7 @@
 		> .editor-block-list__breadcrumb {
 			right: -$border-width;
 		}
-		
+
 		// compensate for main container padding, subtract border
 		@include break-small() {
 			margin-left: -$block-side-ui-padding + $border-width;
@@ -522,11 +522,10 @@
 	// Left and right
 	> .editor-block-settings-menu,
 	> .editor-block-mover {
+		padding: $block-side-ui-clearance;
 		position: absolute;
-		top: 0;
-		width: $block-side-ui-width + $block-side-ui-clearance;
-		height: 100%; // stretch to fill half of the available space to increase hoverable area
-		max-height: $block-side-ui-width * 4; // stretch to fill half of the available space to increase hoverable area
+		width: $block-side-ui-width + ( $block-side-ui-clearance * 2 );
+		background: $white;
 	}
 
 	// Elevate when selected or hovered
@@ -536,7 +535,15 @@
 		&.is-hovered {
 			.editor-block-settings-menu,
 			.editor-block-mover {
+				outline: 1px solid $dark-opacity-light-500;
 				z-index: z-index( '.editor-block-list__block.is-{selected,hovered} .editor-block-{settings-menu,mover}' );
+			}
+		}
+
+		&.is-hovered {
+			.editor-block-settings-menu,
+			.editor-block-mover {
+				outline: 1px solid theme( outlines );
 			}
 		}
 	}
@@ -563,8 +570,6 @@
 
 	// Left side UI
 	> .editor-block-mover {
-		padding-right: $block-side-ui-clearance;
-
 		// Position for top level blocks
 		left: -$block-side-ui-width - $block-side-ui-clearance - $block-parent-side-ui-clearance;
 
@@ -853,7 +858,7 @@
 	z-index: z-index( '.editor-block-list__breadcrumb' );
 
 	// Position in the top right of the border
-	right: -$block-parent-side-ui-clearance;
+	right: -10px;
 	top: 0;
 
 	// Nested
@@ -871,7 +876,7 @@
 		padding: 4px 4px;
 		background: theme( outlines );
 		color: $white;
-	
+
 		// Animate in
 		.editor-block-list__block:hover & {
 			@include fade_in( .1s );

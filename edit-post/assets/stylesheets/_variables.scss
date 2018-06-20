@@ -48,8 +48,8 @@ $block-padding: 14px; // padding of nested blocks
 $block-spacing: 4px; // vertical space between blocks
 
 $block-side-ui-width: 28px; // width of the side UI, matches half matches half of a single line of text, so two buttons stacke matches 1
-$block-side-ui-clearance: 2px; // space between side UI and block
-$block-side-ui-padding: $block-side-ui-width + $block-side-ui-clearance; // total space used to accommodate side UI
+$block-side-ui-clearance: 4px; // space between side UI and block
+$block-side-ui-padding: $block-side-ui-width + $block-side-ui-clearance + 2px; // total space used to accommodate side UI
 $block-parent-side-ui-clearance: $parent-block-padding - $block-padding; // space between side UI and block on top level blocks
 
 // Buttons & UI Widgets
