@@ -349,6 +349,7 @@ function gutenberg_register_post_prepare_functions( $post_type ) {
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_block_format_to_post_content', 10, 3 );
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_target_schema_to_links', 10, 3 );
 	add_filter( "rest_{$post_type}_collection_params", 'gutenberg_filter_post_collection_parameters', 10, 2 );
+	add_filter( "rest_{$post_type}_query", 'gutenberg_filter_post_query_arguments', 10, 2 );
 	return $post_type;
 }
 add_filter( 'registered_post_type', 'gutenberg_register_post_prepare_functions' );
@@ -550,6 +551,27 @@ function gutenberg_filter_post_collection_parameters( $query_params, $post_type 
 		$query_params['per_page']['sanitize_callback'] = 'rest_sanitize_request_arg';
 	}
 	return $query_params;
+}
+
+/**
+ * Filter post collection query parameters to include specific behavior.
+ *
+ * @see https://core.trac.wordpress.org/ticket/43998
+ *
+ * @param array           $prepared_args Array of arguments for WP_Query.
+ * @param WP_REST_Request $request       The current request.
+ * @return array
+ */
+function gutenberg_filter_post_query_arguments( $prepared_args, $request ) {
+	$post_types = array( 'page', 'wp_block' );
+	if ( in_array( $prepared_args['post_type'], $post_types, true ) ) {
+		// Avoid triggering 'rest_post_invalid_page_number' error
+		// which will need to be addressed in https://core.trac.wordpress.org/ticket/43998.
+		if ( -1 === $prepared_args['posts_per_page'] ) {
+			$prepared_args['posts_per_page'] = 100000;
+		}
+	}
+	return $prepared_args;
 }
 
 /**
