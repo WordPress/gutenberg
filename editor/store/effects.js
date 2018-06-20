@@ -65,6 +65,7 @@ import {
 	getTemplate,
 	getTemplateLock,
 	getAutosave,
+	isEditedPostNew,
 	POST_UPDATE_TRANSACTION_ID,
 } from './selectors';
 
@@ -106,7 +107,26 @@ export default {
 			return;
 		}
 
-		const edits = getPostEdits( state );
+		let edits = getPostEdits( state );
+		if ( isAutosave ) {
+			edits = pick( edits, [ 'title', 'content', 'excerpt' ] );
+		}
+
+		// New posts (with auto-draft status) must be explicitly assigned draft
+		// status if there is not already a status assigned in edits (publish).
+		// Otherwise, they are wrongly left as auto-draft. Status is not always
+		// respected for autosaves, so it cannot simply be included in the pick
+		// above. This behavior relies on an assumption that an auto-draft post
+		// would never be saved by anyone other than the owner of the post, per
+		// logic within autosaves REST controller to save status field only for
+		// draft/auto-draft by current user.
+		//
+		// See: https://core.trac.wordpress.org/ticket/43316#comment:88
+		// See: https://core.trac.wordpress.org/ticket/43316#comment:89
+		if ( isEditedPostNew( state ) ) {
+			edits = { status: 'draft', ...edits };
+		}
+
 		let toSend = {
 			...edits,
 			content: getEditedPostContent( state ),
@@ -198,7 +218,16 @@ export default {
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
 		const { previousPost, post, isAutosave } = action;
-		const { dispatch } = store;
+		const { dispatch, getState } = store;
+
+		// TEMPORARY: If edits remain after a save completes, the user must be
+		// prompted about unsaved changes. This should be refactored as part of
+		// the `isEditedPostDirty` selector instead.
+		//
+		// See: https://github.com/WordPress/gutenberg/issues/7409
+		if ( Object.keys( getPostEdits( getState() ) ).length ) {
+			dispatch( { type: 'DIRTY_ARTIFICIALLY' } );
+		}
 
 		// Autosaves are neither shown a notice nor redirected.
 		if ( isAutosave ) {
@@ -390,7 +419,6 @@ export default {
 		const edits = {};
 		if ( post.status === 'auto-draft' ) {
 			edits.title = post.title.raw;
-			edits.status = 'draft';
 		}
 
 		// Check the auto-save status

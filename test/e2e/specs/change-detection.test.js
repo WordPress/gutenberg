@@ -2,7 +2,12 @@
  * Internal dependencies
  */
 import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage, pressWithModifier } from '../support/utils';
+import {
+	newPost,
+	newDesktopBrowserPage,
+	pressWithModifier,
+	ensureSidebarOpened,
+} from '../support/utils';
 
 describe( 'Change detection', () => {
 	let handleInterceptedRequest, hadInterceptedSave;
@@ -85,6 +90,23 @@ describe( 'Change detection', () => {
 
 		// Autosave draft as same user should do full save, i.e. not dirty.
 		await assertIsDirty( false );
+	} );
+
+	it( 'Should prompt to confirm unsaved changes for autosaved draft for non-content fields', async () => {
+		await page.type( '.editor-post-title__input', 'Hello World' );
+
+		// Toggle post as sticky (not persisted for autosave).
+		await ensureSidebarOpened();
+		await page.click( '[id^="post-sticky-toggle-"]' );
+
+		// Force autosave to occur immediately.
+		await Promise.all( [
+			page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() ),
+			page.waitForSelector( '.editor-post-saved-state.is-autosaving' ),
+			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
+		] );
+
+		await assertIsDirty( true );
 	} );
 
 	it( 'Should prompt to confirm unsaved changes for autosaved published post', async () => {
