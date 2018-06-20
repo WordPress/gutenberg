@@ -74,6 +74,13 @@
 		}
 	}
 
+	// Apply max-width to gallery item that contains the add new gallery item button
+	.blocks-gallery-item {
+		&.has-add-item-button {
+			width: 100%;
+		}
+	}
+
 	// Apply max-width to floated items that have no intrinsic width
 	[data-align="left"] &,
 	[data-align="right"] &,

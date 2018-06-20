@@ -263,7 +263,7 @@ class GalleryEdit extends Component {
 						</li>
 					) ) }
 					{ isSelected &&
-						<li className="blocks-gallery-item">
+						<li className="blocks-gallery-item has-add-item-button">
 							<FormFileUpload
 								multiple
 								isLarge
