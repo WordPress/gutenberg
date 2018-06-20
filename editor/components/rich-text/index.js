@@ -165,7 +165,7 @@ export class RichText extends Component {
 				return;
 			}
 
-			deprecated( 'Raw TinyMCE event handlers for RichText', {
+			deprecated( 'Raw TinyMCE event handler on' + name + ' for RichText', {
 				version: '3.0',
 				alternative: (
 					'Documented props, ancestor event handler, or onSetup ' +
