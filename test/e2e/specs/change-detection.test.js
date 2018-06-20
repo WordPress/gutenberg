@@ -7,6 +7,7 @@ import {
 	newDesktopBrowserPage,
 	pressWithModifier,
 	ensureSidebarOpened,
+	publishPost,
 } from '../support/utils';
 
 describe( 'Change detection', () => {
@@ -112,20 +113,7 @@ describe( 'Change detection', () => {
 	it( 'Should prompt to confirm unsaved changes for autosaved published post', async () => {
 		await page.type( '.editor-post-title__input', 'Hello World' );
 
-		await Promise.all( [
-			page.waitForSelector( '.editor-post-publish-button' ),
-			page.click( '.editor-post-publish-panel__toggle' ),
-		] );
-
-		// Disable reason: Wait for animation to complete to avoid click
-		// occuring at wrong point.
-		// eslint-disable-next-line no-restricted-syntax
-		await page.waitFor( 100 );
-
-		await Promise.all( [
-			page.waitForSelector( '.editor-post-publish-panel__header-published' ),
-			page.click( '.editor-post-publish-button' ),
-		] );
+		await publishPost();
 
 		// Close publish panel.
 		await Promise.all( [
