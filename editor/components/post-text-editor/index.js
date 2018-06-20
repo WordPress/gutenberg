@@ -18,6 +18,21 @@ import { withInstanceId } from '@wordpress/components';
  */
 import './style.scss';
 
+/**
+ * Returns the PostTextEditor state given a set of props.
+ *
+ * @param {Object} props Component props.
+ *
+ * @return {Object} State object.
+ */
+function computeDerivedState( props ) {
+	return {
+		persistedValue: props.value,
+		value: props.value,
+		isDirty: false,
+	};
+}
+
 class PostTextEditor extends Component {
 	constructor() {
 		super( ...arguments );
@@ -32,12 +47,14 @@ class PostTextEditor extends Component {
 		};
 	}
 
-	componentDidUpdate( prevProps ) {
+	static getDerivedPropsFromState( props, state ) {
 		// If we receive a new value while we're editing (but before we've made
 		// changes), go ahead and clobber the local state
-		if ( this.props.value !== prevProps.value && this.state.value && ! this.state.isDirty ) {
-			this.setState( { value: this.props.value } );
+		if ( state.persistedValue !== props.value && ! state.isDirty ) {
+			return computeDerivedState( props );
 		}
+
+		return null;
 	}
 
 	startEditing() {
