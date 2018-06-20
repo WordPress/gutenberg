@@ -11,7 +11,8 @@
 		margin-right: 8px;
 	}
 
-	// Don't size up images beyond their intrinsic size.
+	// This keeps images at their intrinsic size (eg. a 50px
+	// image will never be wider than 50px).
 	.components-responsive-wrapper__content {
 		max-width: 100%;
 		width: auto;
