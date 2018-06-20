@@ -571,6 +571,7 @@ describe( 'withSelect', () => {
 		expect( wrapper.childAt( 0 ).props() ).toEqual( { foo: 'OK', propName: 'foo' } );
 
 		wrapper.setProps( { propName: 'bar' } );
+		wrapper.update();
 
 		expect( wrapper.childAt( 0 ).props() ).toEqual( { bar: 'OK', propName: 'bar' } );
 	} );
