@@ -352,8 +352,8 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 		$schema = $this->get_item_schema();
 
 		if ( ! empty( $schema['properties']['preview_link'] ) ) {
-			$parent_id = wp_is_post_autosave( $post );
-			$preview_post_id = false === $parent_id ? $post->ID : $parent_id;
+			$parent_id          = wp_is_post_autosave( $post );
+			$preview_post_id    = false === $parent_id ? $post->ID : $parent_id;
 			$preview_query_args = array();
 
 			if ( false !== $parent_id ) {
