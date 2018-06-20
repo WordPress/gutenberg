@@ -1376,7 +1376,7 @@ export const canInsertBlockType = createSelector(
 		}
 
 		const parentBlockListSettings = getBlockListSettings( state, parentUID );
-		const parentAllowedBlocks = get( parentBlockListSettings, [ 'supportedBlocks' ] );
+		const parentAllowedBlocks = get( parentBlockListSettings, [ 'allowedBlocks' ] );
 		const hasParentAllowedBlock = checkAllowList( parentAllowedBlocks, blockName );
 
 		const blockAllowedParentBlocks = blockType.parent;
