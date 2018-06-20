@@ -91,7 +91,6 @@ const getPlaylistDetailsMediaFrame = () => {
 					type: 'audio',
 					collectionType: 'playlist',
 					title:          wp.media.view.l10n.editPlaylistTitle,
-					SettingsView:   wp.media.view.Settings.Playlist,
 					library:        this.options.selection,
 					editing:        this.options.editing,
 					menu:           'playlist',
