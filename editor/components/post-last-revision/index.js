@@ -4,13 +4,13 @@
 import { sprintf, _n } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
+import { getWPAdminURL } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import PostLastRevisionCheck from './check';
-import { getWPAdminURL } from '../../utils/url';
 
 function LastRevision( { lastRevisionId, revisionsCount } ) {
 	return (

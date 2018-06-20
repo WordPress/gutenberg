@@ -10,5 +10,7 @@ export { keycodes };
 export * from './mediaupload';
 export * from './terms';
 
+export { setWPAdminURL, getWPAdminURL } from './urls';
+
 // Deprecations
 export * from './deprecated';

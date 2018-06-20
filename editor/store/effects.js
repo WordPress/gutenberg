@@ -25,7 +25,7 @@ import apiRequest from '@wordpress/api-request';
 /**
  * Internal dependencies
  */
-import { getWPAdminURL } from '../utils/url';
+import { getWPAdminURL } from '@wordpress/utils';
 import {
 	setupEditorState,
 	resetAutosave,

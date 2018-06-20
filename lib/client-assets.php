@@ -191,6 +191,7 @@ function gutenberg_register_scripts_and_styles() {
 	);
 	wp_add_inline_script( 'wp-utils', 'var originalUtils = window.wp && window.wp.utils ? window.wp.utils : {};', 'before' );
 	wp_add_inline_script( 'wp-utils', 'for ( var key in originalUtils ) wp.utils[ key ] = originalUtils[ key ];' );
+	wp_add_inline_script( 'wp-utils', sprintf( 'wp.utils.setWPAdminURL( %s );', wp_json_encode( admin_url() ) ), 'after' );
 	wp_register_script(
 		'wp-date',
 		gutenberg_url( 'build/date/index.js' ),
