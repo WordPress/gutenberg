@@ -81,8 +81,8 @@ export default ( ...args ) => {
 						return ( colorValue ) => {
 							const colorObject = find( this.props.colors, { color: colorValue } );
 							this.props.setAttributes( {
-								[ colorAttributeName ]: colorObject && colorObject.name ? colorObject.name : undefined,
-								[ customColorAttributeName ]: colorObject && colorObject.name ? undefined : colorValue,
+								[ colorAttributeName ]: colorObject && colorObject.slug ? colorObject.slug : undefined,
+								[ customColorAttributeName ]: colorObject && colorObject.slug ? undefined : colorValue,
 							} );
 						};
 					}
