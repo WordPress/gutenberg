@@ -56,14 +56,26 @@ const DEFAULT_CONTROLS = [ 'bold', 'italic', 'strikethrough', 'link' ];
 // Stop the key event from propagating up to maybeStartTyping in BlockListBlock
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 
+/**
+ * Returns the Format Toolbar state given a set of props.
+ *
+ * @param {Object} props Component props.
+ *
+ * @return {Object} State object.
+ */
+function computeDerivedState( props ) {
+	return {
+		selectedNodeId: props.selectedNodeId,
+		settingsVisible: false,
+		opensInNewWindow: !! props.formats.link && !! props.formats.link.target,
+		linkValue: '',
+	};
+}
+
 class FormatToolbar extends Component {
 	constructor() {
 		super( ...arguments );
-		this.state = {
-			settingsVisible: false,
-			opensInNewWindow: false,
-			linkValue: '',
-		};
+		this.state = {};
 
 		this.addLink = this.addLink.bind( this );
 		this.editLink = this.editLink.bind( this );
@@ -93,14 +105,12 @@ class FormatToolbar extends Component {
 		}
 	}
 
-	componentDidUpdate( prevProps ) {
-		if ( this.props.selectedNodeId !== prevProps.selectedNodeId ) {
-			this.setState( {
-				settingsVisible: false,
-				opensInNewWindow: !! this.props.formats.link && !! this.props.formats.link.target,
-				linkValue: '',
-			} );
+	static getDerivedStateFromProps( props, state ) {
+		if ( state.selectedNodeId !== props.selectedNodeId ) {
+			return computeDerivedState( props );
 		}
+
+		return null;
 	}
 
 	onChangeLinkValue( value ) {
