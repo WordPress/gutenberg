@@ -1,4 +1,14 @@
-# Plugins
+# @wordpress/plugins
+
+Plugins module for WordPress.
+
+## Installation
+
+Install the module
+
+```bash
+npm install @wordpress/plugins --save
+```
 
 ### Plugins API
 
