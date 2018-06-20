@@ -145,6 +145,11 @@
 		}
 	}
 
+	/* Buttons that look scary */
+	&.is-link.is-scary {
+		color: $alert-red;
+	}
+
 	&:active {
 		color: currentColor;
 	}
