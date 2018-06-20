@@ -183,6 +183,21 @@ export function getPostEdits( state ) {
 }
 
 /**
+ * Returns an attribute value of the saved post.
+ *
+ * @param {Object} state         Global application state.
+ * @param {string} attributeName Post attribute name.
+ *
+ * @return {*} Post attribute value.
+ */
+export function getCurrentPostAttribute( state, attributeName ) {
+	const post = getCurrentPost( state );
+	if ( post.hasOwnProperty( attributeName ) ) {
+		return post[ attributeName ];
+	}
+}
+
+/**
  * Returns a single attribute of the post being edited, preferring the unsaved
  * edit if one exists, but falling back to the attribute for the last known
  * saved state of the post.
@@ -201,9 +216,31 @@ export function getEditedPostAttribute( state, attributeName ) {
 			return getEditedPostContent( state );
 	}
 
-	return edits[ attributeName ] === undefined ?
-		state.currentPost[ attributeName ] :
-		edits[ attributeName ];
+	if ( ! edits.hasOwnProperty( attributeName ) ) {
+		return getCurrentPostAttribute( state, attributeName );
+	}
+
+	return edits[ attributeName ];
+}
+
+/**
+ * Returns an attribute value of the current autosave revision for a post, or
+ * null if there is no autosave for the post.
+ *
+ * @param {Object} state         Global application state.
+ * @param {string} attributeName Autosave attribute name.
+ *
+ * @return {*} Autosave attribute value.
+ */
+export function getAutosaveAttribute( state, attributeName ) {
+	if ( ! hasAutosave( state ) ) {
+		return null;
+	}
+
+	const autosave = getAutosave( state );
+	if ( autosave.hasOwnProperty( attributeName ) ) {
+		return autosave[ attributeName ];
+	}
 }
 
 /**
