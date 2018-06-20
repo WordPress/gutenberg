@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pick } from 'lodash';
+import { pick, isEqual, map } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -22,21 +22,40 @@ import BlockList from '../block-list';
 import { withBlockEditContext } from '../block-edit/context';
 
 class InnerBlocks extends Component {
-	componentDidUpdate() {
-		this.updateNestedSettings();
-	}
-
 	componentDidMount() {
 		this.updateNestedSettings();
-		this.insertTemplateBlocks( this.props.template );
+		this.synchronizeBlocksWithTemplate();
 	}
 
-	insertTemplateBlocks( template ) {
-		const { block, insertBlocks } = this.props;
-		if ( template && ! block.innerBlocks.length ) {
-			// synchronizeBlocksWithTemplate( [], template ) parses the template structure,
-			// and returns/creates the necessary blocks to represent it.
-			insertBlocks( synchronizeBlocksWithTemplate( [], template ) );
+	componentDidUpdate( prevProps ) {
+		const { template, block } = this.props;
+
+		this.updateNestedSettings();
+
+		const hasTemplateChanged = ! isEqual( template, prevProps.template );
+		const isTemplateInnerBlockMismatch = (
+			template &&
+			block.innerBlocks.length !== template.length
+		);
+
+		if ( hasTemplateChanged || isTemplateInnerBlockMismatch ) {
+			this.synchronizeBlocksWithTemplate();
+		}
+	}
+
+	/**
+	 * Called on mount or when a mismatch exists between the templates and
+	 * inner blocks, synchronizes inner blocks with the template, replacing
+	 * current blocks.
+	 */
+	synchronizeBlocksWithTemplate() {
+		const { template, block, replaceInnerBlocks } = this.props;
+		const { innerBlocks } = block;
+
+		// Synchronize with templates. If the next set differs, replace.
+		const nextBlocks = synchronizeBlocksWithTemplate( innerBlocks, template );
+		if ( ! isEqual( nextBlocks, innerBlocks	) ) {
+			replaceInnerBlocks( nextBlocks );
 		}
 	}
 
@@ -107,12 +126,16 @@ InnerBlocks = compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
-		const { insertBlocks, updateBlockListSettings } = dispatch( 'core/editor' );
-		const { uid } = ownProps;
+		const {
+			replaceBlocks,
+			updateBlockListSettings,
+		} = dispatch( 'core/editor' );
+		const { block, uid } = ownProps;
 
 		return {
-			insertBlocks( blocks ) {
-				dispatch( insertBlocks( blocks, undefined, uid ) );
+			replaceInnerBlocks( blocks ) {
+				const uids = map( block.innerBlocks, 'uid' );
+				replaceBlocks( uids, blocks );
 			},
 			updateNestedSettings( settings ) {
 				dispatch( updateBlockListSettings( uid, settings ) );
