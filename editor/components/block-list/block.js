@@ -510,6 +510,7 @@ export class BlockListBlock extends Component {
 						rootUID={ rootUID }
 						layout={ layout }
 						canShowInserter={ canShowInBetweenInserter }
+						onInsert={ this.hideHoverEffects }
 					/>
 				) }
 				<BlockDropZone
