@@ -191,16 +191,6 @@ class MediaUpload extends Component {
 			} );
 			wp.media.frame = this.frame;
 		}
-		if ( playlist ) {
-			const PlaylistDetailsMediaFrame = getPlaylistDetailsMediaFrame();
-			this.frame = new PlaylistDetailsMediaFrame( {
-				frame: 'select',
-				mimeType: type,
-				state: 'playlist',
-			} );
-			wp.media.frame = this.frame;
-		}
-
 		else {
 			const frameConfig = {
 				title,
@@ -214,6 +204,16 @@ class MediaUpload extends Component {
 			}
 
 			this.frame = wp.media( frameConfig );
+		}
+
+		if ( playlist ) {
+			const PlaylistDetailsMediaFrame = getPlaylistDetailsMediaFrame();
+			this.frame = new PlaylistDetailsMediaFrame( {
+				frame: 'select',
+				mimeType: type,
+				state: 'playlist',
+			} );
+			wp.media.frame = this.frame;
 		}
 
 		if ( modalClass ) {
