@@ -7,7 +7,7 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button, Spinner, ResponsiveWrapper } from '@wordpress/components';
+import { IconButton, Button, Spinner, ResponsiveWrapper } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -28,6 +28,14 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 	return (
 		<PostFeaturedImageCheck>
 			<div className="editor-post-featured-image">
+				{ !! featuredImageId &&
+				<IconButton
+					className="editor-post-featured-image__remove"
+					onClick={ onRemoveImage }
+					label={ postLabel.remove_featured_image || DEFAULT_REMOVE_FEATURE_IMAGE_LABEL }
+					icon="no-alt"
+				/>
+				}
 				{ !! featuredImageId &&
 					<MediaUpload
 						title={ __( 'Set featured image' ) }
@@ -76,11 +84,6 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 							) }
 						/>
 					</div>
-				}
-				{ !! featuredImageId &&
-					<Button onClick={ onRemoveImage } isDefault isLarge>
-						{ postLabel.remove_featured_image || DEFAULT_REMOVE_FEATURE_IMAGE_LABEL }
-					</Button>
 				}
 			</div>
 		</PostFeaturedImageCheck>

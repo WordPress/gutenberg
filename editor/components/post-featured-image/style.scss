@@ -1,5 +1,6 @@
 .editor-post-featured-image {
 	padding: 0;
+	position: relative;
 
 	.spinner {
 		margin: 0;
@@ -17,6 +18,17 @@
 		max-width: 100%;
 		width: auto;
 	}
+
+	// Show Remove button
+	.editor-post-featured-image__remove {
+		position: absolute;
+		z-index: 1;
+		top: -8px;
+		right: -8px;
+		border-radius: 50%;
+		background-color: $white;
+		box-shadow: inset 0 0 0 1px $light-gray-500;
+	}
 }
 
 .editor-post-featured-image__toggle,
@@ -24,6 +36,12 @@
 	display: block;
 	width: 100%;
 	padding: 0;
+	transition: all .1s ease-out;
+	box-shadow: 0 0 0 0 $blue-medium-500;
+}
+
+.editor-post-featured-image__preview:not(:disabled):not([aria-disabled="true"]):focus {
+	box-shadow: 0 0 0 4px $blue-medium-500;
 }
 
 .editor-post-featured-image__toggle {
