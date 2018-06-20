@@ -100,12 +100,14 @@ export function mediaUpload( {
 			( response ) => {
 				// Reset to empty on failure.
 				setAndUpdateFiles( idx, null );
-				let message = sprintf(
-					__( 'Error while uploading file %s to the media library.' ),
-					mediaFile.name
-				);
+				let message;
 				if ( ! isEmpty( response.responseJSON.message ) ) {
 					message = response.responseJSON.message;
+				} else {
+					message = sprintf(
+						__( 'Error while uploading file %s to the media library.' ),
+						mediaFile.name
+					);
 				}
 				onError( {
 					code: 'GENERAL',
