@@ -102,7 +102,7 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 				};
 			}
 
-			componentWillMount() {
+			componentDidMount() {
 				this.doServerSideRender();
 			}
 

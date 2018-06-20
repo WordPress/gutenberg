@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { getAssociatedGuide, isTipVisible } from '../selectors';
+import { getAssociatedGuide, isTipVisible, areTipsEnabled } from '../selectors';
 
 describe( 'selectors', () => {
 	describe( 'getAssociatedGuide', () => {
@@ -57,7 +57,7 @@ describe( 'selectors', () => {
 			const state = {
 				guides: [],
 				preferences: {
-					areTipsDisabled: false,
+					areTipsEnabled: true,
 					dismissedTips: {},
 				},
 			};
@@ -68,7 +68,7 @@ describe( 'selectors', () => {
 			const state = {
 				guides: [],
 				preferences: {
-					areTipsDisabled: true,
+					areTipsEnabled: false,
 					dismissedTips: {},
 				},
 			};
@@ -79,7 +79,7 @@ describe( 'selectors', () => {
 			const state = {
 				guides: [],
 				preferences: {
-					areTipsDisabled: false,
+					areTipsEnabled: true,
 					dismissedTips: {
 						'test/tip': true,
 					},
@@ -94,11 +94,35 @@ describe( 'selectors', () => {
 					[ 'test/tip-1', 'test/tip-2', 'test/tip-3' ],
 				],
 				preferences: {
-					areTipsDisabled: false,
+					areTipsEnabled: true,
 					dismissedTips: {},
 				},
 			};
 			expect( isTipVisible( state, 'test/tip-2' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'areTipsEnabled', () => {
+		it( 'should return true if tips are enabled', () => {
+			const state = {
+				guides: [],
+				preferences: {
+					areTipsEnabled: true,
+					dismissedTips: {},
+				},
+			};
+			expect( areTipsEnabled( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if tips are disabled', () => {
+			const state = {
+				guides: [],
+				preferences: {
+					areTipsEnabled: false,
+					dismissedTips: {},
+				},
+			};
+			expect( areTipsEnabled( state ) ).toBe( false );
 		} );
 	} );
 } );

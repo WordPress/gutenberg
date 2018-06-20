@@ -23,7 +23,7 @@ exports[`DotTip should render correctly 1`] = `
   <IconButton
     className="nux-dot-tip__disable"
     icon="no-alt"
-    label="Dismiss tip"
+    label="Disable tips"
   />
 </Popover>
 `;

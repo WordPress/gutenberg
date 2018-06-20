@@ -23,9 +23,12 @@ function InserterWithShortcuts( { items, isLocked, onInsert } ) {
 		return null;
 	}
 
-	const itemsWithoutDefaultBlock = filter( items, ( item ) =>
-		item.name !== getDefaultBlockName() || ! isEmpty( item.initialAttributes )
-	).slice( 0, 3 );
+	const itemsWithoutDefaultBlock = filter( items, ( item ) => {
+		return ! item.isDisabled && (
+			item.name !== getDefaultBlockName() ||
+			! isEmpty( item.initialAttributes )
+		);
+	} ).slice( 0, 3 );
 
 	return (
 		<div className="editor-inserter-with-shortcuts">

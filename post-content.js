@@ -124,9 +124,9 @@ window._wpGutenbergDefaultPost = {
 			'<p>Any block can opt into these alignments. The embed block has them also, and is responsive out of the box:</p>',
 			'<!-- /wp:paragraph -->',
 
-			'<!-- wp:embed {"url":"https://vimeo.com/22439234","align":"wide","type":"video","providerNameSlug":"vimeo"} -->',
-			'<figure class="wp-block-embed alignwide is-type-video is-provider-vimeo">https://vimeo.com/22439234</figure>',
-			'<!-- /wp:embed -->',
+			'<!-- wp:core-embed/vimeo {"url":"https://vimeo.com/22439234","align":"wide","type":"video","providerNameSlug":"vimeo"} -->',
+			'<figure class="wp-block-embed-vimeo wp-block-embed alignwide is-type-video is-provider-vimeo">https://vimeo.com/22439234</figure>',
+			'<!-- /wp:core-embed/vimeo -->',
 
 			'<!-- wp:paragraph -->',
 			'<p>You can build any block you like, static or dynamic, decorative or plain. Here\'s a pullquote block:</p>',
