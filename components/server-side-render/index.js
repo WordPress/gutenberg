@@ -42,9 +42,9 @@ export class ServerSideRender extends Component {
 		this.isStillMounted = false;
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		if ( ! isEqual( nextProps, this.props ) ) {
-			this.fetch( nextProps );
+	componentDidUpdate( prevProps ) {
+		if ( ! isEqual( prevProps, this.props ) ) {
+			this.fetch( this.props );
 		}
 	}
 

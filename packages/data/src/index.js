@@ -284,6 +284,12 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 			 * @type {boolean}
 			 */
 			this.shouldComponentUpdate = false;
+			/**
+			 * Boolean tracking when can we run selection
+			 * The selection can be run only when the component is mounted.
+			 */
+			this.shouldRunSelection = false;
+
 			this.state = {
 				mergeProps: getNextMergeProps( props ),
 			};
@@ -297,9 +303,13 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 			return this.shouldComponentUpdate;
 		}
 
-		componentWillReceiveProps( nextProps ) {
-			if ( ! isShallowEqual( nextProps, this.props ) ) {
-				this.runSelection( nextProps );
+		componentDidMount() {
+			this.shouldRunSelection = true;
+		}
+
+		componentDidUpdate( prevProps ) {
+			if ( ! isShallowEqual( prevProps, this.props ) ) {
+				this.runSelection( this.props );
 				this.shouldComponentUpdate = true;
 			}
 		}
@@ -311,7 +321,7 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 			// are snapshotted before being invoked, so if unmounting occurs
 			// during a previous callback, we need to explicitly track and
 			// avoid the `runSelection` that is scheduled to occur.
-			this.isUnmounting = true;
+			this.shouldRunSelection = false;
 		}
 
 		subscribe() {
@@ -319,7 +329,7 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 		}
 
 		runSelection( props = this.props ) {
-			if ( this.isUnmounting ) {
+			if ( ! this.shouldRunSelection ) {
 				return;
 			}
 

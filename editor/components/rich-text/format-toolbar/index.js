@@ -93,11 +93,11 @@ class FormatToolbar extends Component {
 		}
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		if ( this.props.selectedNodeId !== nextProps.selectedNodeId ) {
+	componentDidUpdate( prevProps ) {
+		if ( this.props.selectedNodeId !== prevProps.selectedNodeId ) {
 			this.setState( {
 				settingsVisible: false,
-				opensInNewWindow: !! nextProps.formats.link && !! nextProps.formats.link.target,
+				opensInNewWindow: !! this.props.formats.link && !! this.props.formats.link.target,
 				linkValue: '',
 			} );
 		}

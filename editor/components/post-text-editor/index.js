@@ -32,11 +32,11 @@ class PostTextEditor extends Component {
 		};
 	}
 
-	componentWillReceiveProps( nextProps ) {
+	componentDidUpdate( prevProps ) {
 		// If we receive a new value while we're editing (but before we've made
 		// changes), go ahead and clobber the local state
-		if ( this.props.value !== nextProps.value && this.state.value && ! this.state.isDirty ) {
-			this.setState( { value: nextProps.value } );
+		if ( this.props.value !== prevProps.value && this.state.value && ! this.state.isDirty ) {
+			this.setState( { value: this.props.value } );
 		}
 	}
 

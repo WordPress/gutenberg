@@ -96,10 +96,8 @@ class ImageEdit extends Component {
 		if ( ! prevID && prevUrl.indexOf( 'blob:' ) === 0 && id && url.indexOf( 'blob:' ) === -1 ) {
 			revokeBlobURL( url );
 		}
-	}
 
-	componentWillReceiveProps( { isSelected } ) {
-		if ( ! isSelected && this.props.isSelected && this.state.captionFocused ) {
+		if ( ! this.props.isSelected && prevProps.isSelected && this.state.captionFocused ) {
 			this.setState( {
 				captionFocused: false,
 			} );

@@ -89,13 +89,11 @@ export class BlockListBlock extends Component {
 		}
 	}
 
-	componentWillReceiveProps( newProps ) {
-		if ( newProps.isTypingWithinBlock || newProps.isSelected ) {
+	componentDidUpdate( prevProps ) {
+		if ( this.props.isTypingWithinBlock || this.props.isSelected ) {
 			this.hideHoverEffects();
 		}
-	}
 
-	componentDidUpdate( prevProps ) {
 		if ( this.props.isSelected && ! prevProps.isSelected ) {
 			this.focusTabbable();
 		}
