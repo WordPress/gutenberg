@@ -177,7 +177,7 @@ class ImageEdit extends Component {
 	}
 
 	render() {
-		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, toggleSelection } = this.props;
+		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, toggleSelection, isRTL } = this.props;
 		const { url, alt, caption, align, id, href, width, height } = attributes;
 
 		const controls = (
@@ -344,7 +344,9 @@ class ImageEdit extends Component {
 							const ratio = imageWidth / imageHeight;
 							const minWidth = imageWidth < imageHeight ? MIN_SIZE : MIN_SIZE * ratio;
 							const minHeight = imageHeight < imageWidth ? MIN_SIZE : MIN_SIZE / ratio;
-							const isRLT = window.getComputedStyle( document.querySelector( '.editor-block-list__layout' ) ).direction === 'rtl';
+
+							const showRightHandle = ( isRTL && ( align === 'left' || align === 'center' ) || ! isRTL && align !== 'right' );
+							const showLeftHandle = ( isRTL && align !== 'left' || ! isRTL && ( align === 'right' || align === 'center' ) );
 
 							return (
 								<Fragment>
@@ -368,9 +370,9 @@ class ImageEdit extends Component {
 										} }
 										enable={ {
 											top: false,
-											right: ( ! isRLT && align !== 'right' ),
+											right: showRightHandle,
 											bottom: true,
-											left: ( isRLT || align === 'right' || align === 'center' ),
+											left: showLeftHandle,
 										} }
 										onResizeStart={ () => {
 											toggleSelection( false );
@@ -412,11 +414,12 @@ export default compose( [
 		const { getMedia } = select( 'core' );
 		const { getEditorSettings } = select( 'core/editor' );
 		const { id } = props.attributes;
-		const { maxWidth } = getEditorSettings();
+		const { maxWidth, isRTL } = getEditorSettings();
 
 		return {
 			image: id ? getMedia( id ) : null,
 			maxWidth,
+			isRTL,
 		};
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
