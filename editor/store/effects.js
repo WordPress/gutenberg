@@ -254,11 +254,10 @@ export default {
 		apiRequest( { path: `/wp/v2/${ basePath }/${ postId }`, method: 'DELETE' } ).then(
 			() => {
 				const post = getCurrentPost( getState() );
+
+				// TODO: This should be an updatePost action (updating subsets of post properties),
+				// But right now editPost is tied with change detection.
 				dispatch( resetPost( { ...post, status: 'trash' } ) );
-				dispatch( {
-					...action,
-					type: 'TRASH_POST_SUCCESS',
-				} );
 			},
 			( err ) => {
 				dispatch( {
