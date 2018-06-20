@@ -28,12 +28,15 @@ export const settings = {
 		},
 		artists: {
 			type: 'boolean',
+			default: true,
 		},
 		images: {
 			type: 'boolean',
+			default: true,
 		},
 		tracklist: {
 			type: 'boolean',
+			default: true,
 		},
 		align: {
 			type: 'string',
