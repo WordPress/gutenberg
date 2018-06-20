@@ -1,7 +1,17 @@
 /**
  * External Dependencies
  */
-import { compact, forEach, get, noop, startsWith } from 'lodash';
+import { compact, forEach, get, includes, noop, startsWith } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { __, sprintf } from '@wordpress/i18n';
+
+/**
+ * WordPress dependencies
+ */
+import apiRequest from '@wordpress/api-request';
 
 /**
  *	Media Upload is used by audio, image, gallery and video blocks to handle uploading a media file
@@ -33,15 +43,41 @@ export function mediaUpload( {
 		filesSet[ idx ] = value;
 		onFileChange( compact( filesSet ) );
 	};
+
+	// Allowed type specified by consumer
 	const isAllowedType = ( fileType ) => startsWith( fileType, `${ allowedType }/` );
+
+	// Allowed types for the current WP_User
+	const allowedMimeTypesForUser = get( window, [ '_wpMediaSettings', 'allowedMimeTypes' ] );
+	const isAllowedMimeTypeForUser = ( fileType ) => {
+		return includes( allowedMimeTypesForUser, fileType );
+	};
+
 	files.forEach( ( mediaFile, idx ) => {
 		if ( ! isAllowedType( mediaFile.type ) ) {
 			return;
 		}
 
+		// verify if user is allowed to upload this mime type
+		if ( allowedMimeTypesForUser && ! isAllowedMimeTypeForUser( mediaFile.type ) ) {
+			onError( {
+				code: 'MIME_TYPE_NOT_ALLOWED_FOR_USER',
+				message: __( 'Sorry, this file type is not permitted for security reasons.' ),
+				file: mediaFile,
+			} );
+			return;
+		}
+
 		// verify if file is greater than the maximum file upload size allowed for the site.
 		if ( maxUploadFileSize && mediaFile.size > maxUploadFileSize ) {
-			onError( { sizeAboveLimit: true, file: mediaFile } );
+			onError( {
+				code: 'SIZE_ABOVE_LIMIT',
+				message: sprintf(
+					__( '%s exceeds the maximum upload size for this site.' ),
+					mediaFile.name
+				),
+				file: mediaFile,
+			} );
 			return;
 		}
 
@@ -53,20 +89,25 @@ export function mediaUpload( {
 		return createMediaFromFile( mediaFile, additionalData ).then(
 			( savedMedia ) => {
 				const mediaObject = {
+					alt: savedMedia.alt_text,
+					caption: get( savedMedia, [ 'caption', 'raw' ], '' ),
 					id: savedMedia.id,
-					url: savedMedia.source_url,
 					link: savedMedia.link,
+					url: savedMedia.source_url,
 				};
-				const caption = get( savedMedia, [ 'caption', 'raw' ] );
-				if ( caption ) {
-					mediaObject.caption = [ caption ];
-				}
 				setAndUpdateFiles( idx, mediaObject );
 			},
 			() => {
 				// Reset to empty on failure.
 				setAndUpdateFiles( idx, null );
-				onError( { generalError: true, file: mediaFile } );
+				onError( {
+					code: 'GENERAL',
+					message: sprintf(
+						__( 'Error while uploading file %s to the media library.' ),
+						mediaFile.name
+					),
+					file: mediaFile,
+				} );
 			}
 		);
 	} );
@@ -83,7 +124,7 @@ function createMediaFromFile( file, additionalData ) {
 	const data = new window.FormData();
 	data.append( 'file', file, file.name || file.type.replace( '/', '.' ) );
 	forEach( additionalData, ( ( value, key ) => data.append( key, value ) ) );
-	return wp.apiRequest( {
+	return apiRequest( {
 		path: '/wp/v2/media',
 		data,
 		contentType: false,

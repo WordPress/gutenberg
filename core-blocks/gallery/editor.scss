@@ -2,7 +2,7 @@
 	margin: 0px;
 }
 .gutenberg .wp-block-gallery:not( .components-placeholder ) {
-	// allow gallery items to go edge to edge
+	// Allow gallery items to go edge to edge.
 	margin-left: -8px;
 	margin-right: -8px;
 }
@@ -34,6 +34,16 @@
 		width: calc( 100% - 8px );
 		left: 4px;
 		margin-top: -4px;
+
+		// Override negative margins so this toolbar isn't hidden by overflow. Overflow is needed for long captions.
+		.editor-rich-text__inline-toolbar {
+			top: 0;
+		}
+
+		// Make extra space for the inline toolbar.
+		.editor-rich-text__tinymce {
+			padding-top: 48px;
+		}
 	}
 
 	.components-form-file-upload,

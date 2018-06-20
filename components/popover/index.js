@@ -39,6 +39,7 @@ class Popover extends Component {
 
 		this.focus = this.focus.bind( this );
 		this.getAnchorRect = this.getAnchorRect.bind( this );
+		this.updatePopoverSize = this.updatePopoverSize.bind( this );
 		this.computePopoverPosition = this.computePopoverPosition.bind( this );
 		this.throttledComputePopoverPosition = this.throttledComputePopoverPosition.bind( this );
 		this.maybeClose = this.maybeClose.bind( this );
@@ -59,9 +60,8 @@ class Popover extends Component {
 	}
 
 	componentDidMount() {
-		const popoverSize = this.updatePopoverSize();
-		this.computePopoverPosition( popoverSize );
 		this.toggleWindowEvents( true );
+		this.refresh();
 		this.focus();
 	}
 
@@ -88,6 +88,11 @@ class Popover extends Component {
 			return;
 		}
 		this.rafHandle = window.requestAnimationFrame( () => this.computePopoverPosition() );
+	}
+
+	refresh() {
+		const popoverSize = this.updatePopoverSize();
+		this.computePopoverPosition( popoverSize );
 	}
 
 	focus() {
@@ -220,7 +225,7 @@ class Popover extends Component {
 			'is-' + xAxis,
 			{
 				'is-mobile': isMobile,
-				'no-arrow': noArrow,
+				'no-arrow': noArrow || ( xAxis === 'center' && yAxis === 'middle' ),
 			}
 		);
 

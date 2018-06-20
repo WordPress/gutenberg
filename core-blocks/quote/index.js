@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, get, isString } from 'lodash';
+import { castArray, get, isString, isEmpty } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -22,6 +22,7 @@ import {
  */
 import './style.scss';
 import './editor.scss';
+import './theme.scss';
 
 const toRichTextValue = ( value ) => value.map( ( ( subValue ) => subValue.children ) );
 const fromRichTextValue = ( value ) => value.map( ( subValue ) => ( {
@@ -68,12 +69,15 @@ export const settings = {
 		from: [
 			{
 				type: 'block',
+				isMultiBlock: true,
 				blocks: [ 'core/paragraph' ],
-				transform: ( { content } ) => {
+				transform: ( attributes ) => {
+					const items = attributes.map( ( { content } ) => content );
+					const hasItems = ! items.every( isEmpty );
 					return createBlock( 'core/quote', {
-						value: [
-							{ children: <p key="1">{ content }</p> },
-						],
+						value: hasItems ?
+							items.map( ( content, index ) => ( { children: <p key={ index }>{ content }</p> } ) ) :
+							[],
 					} );
 				},
 			},

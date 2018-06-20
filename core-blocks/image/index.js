@@ -14,6 +14,7 @@ import {
 	getPhrasingContentSchema,
 } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
+import { createBlobURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -128,7 +129,7 @@ export const settings = {
 					// It's already done as part of the `componentDidMount`
 					// int the image block
 					const block = createBlock( 'core/image', {
-						url: window.URL.createObjectURL( file ),
+						url: createBlobURL( file ),
 					} );
 
 					return block;

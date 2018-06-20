@@ -3,20 +3,22 @@
 	flex-grow: 1;
 	width: 100%;
 	background: $white;
-	overflow: auto; // allow horizontal scrolling on mobile
+	overflow: auto; // Allow horizontal scrolling on mobile.
 	position: relative;
 
-	// allow overflow on desktop
+	// Allow overflow on desktop.
 	@include break-small() {
 		overflow: inherit;
 	}
 
 	.components-toolbar {
 		border: none;
-		border-left: 1px solid $light-gray-500;
+
+		// Add a right border to show as separator in the block toolbar.
+		border-right: $border-width solid $light-gray-500;
 	}
 
-	// this should probably have its own class
+	// This should be refactored to have its own class to target.
 	> div {
 		display: flex;
 	}
@@ -24,8 +26,4 @@
 
 .editor-block-toolbar .editor-block-switcher {
 	display: inline-flex;
-
-	.edit-post-header-toolbar__block-toolbar & {
-		border-left-color: 1px solid $light-gray-500;
-	}
 }

@@ -3,7 +3,7 @@
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { deprecated } from '@wordpress/utils';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies

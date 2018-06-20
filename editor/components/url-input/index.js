@@ -14,6 +14,7 @@ import { Component, Fragment } from '@wordpress/element';
 import { keycodes, decodeEntities } from '@wordpress/utils';
 import { Spinner, withInstanceId, withSpokenMessages, Popover } from '@wordpress/components';
 import { prependHTTP } from '@wordpress/url';
+import apiRequest from '@wordpress/api-request';
 
 const { UP, DOWN, ENTER } = keycodes;
 
@@ -69,7 +70,7 @@ class UrlInput extends Component {
 			selectedSuggestion: null,
 			loading: true,
 		} );
-		this.suggestionsRequest = wp.apiRequest( {
+		this.suggestionsRequest = apiRequest( {
 			path: `/wp/v2/posts?${ stringify( {
 				search: value,
 				per_page: 20,

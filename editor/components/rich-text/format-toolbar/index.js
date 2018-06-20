@@ -120,7 +120,7 @@ class FormatToolbar extends Component {
 
 	setLinkTarget( opensInNewWindow ) {
 		this.setState( { opensInNewWindow } );
-		if ( this.props.formats.link ) {
+		if ( this.props.formats.link && ! this.props.formats.link.isAdding ) {
 			this.props.onChange( { link: {
 				value: this.props.formats.link.value,
 				target: opensInNewWindow ? '_blank' : null,

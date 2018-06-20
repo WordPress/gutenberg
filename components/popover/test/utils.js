@@ -73,6 +73,28 @@ describe( 'computePopoverYAxisPosition', () => {
 			yAxis: 'top',
 		} );
 	} );
+
+	it( 'should position a popover in the middle', () => {
+		const anchorRect = {
+			top: 400,
+			left: 10,
+			bottom: 30,
+			right: 30,
+			width: 20,
+			height: 20,
+		};
+
+		const contentSize = {
+			width: 200,
+			height: 300,
+		};
+
+		expect( computePopoverYAxisPosition( anchorRect, contentSize, 'middle' ) ).toEqual( {
+			contentHeight: null,
+			popoverTop: 410,
+			yAxis: 'middle',
+		} );
+	} );
 } );
 
 describe( 'computePopoverXAxisPosition', () => {

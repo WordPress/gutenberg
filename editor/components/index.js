@@ -83,6 +83,7 @@ export { default as BlockList } from './block-list';
 export { default as BlockMover } from './block-mover';
 export { default as BlockSelectionClearer } from './block-selection-clearer';
 export { default as BlockSettingsMenu } from './block-settings-menu';
+export { default as _BlockSettingsMenuFirstItem } from './block-settings-menu/block-settings-menu-first-item';
 export { default as BlockTitle } from './block-title';
 export { default as BlockToolbar } from './block-toolbar';
 export { default as CopyHandler } from './copy-handler';

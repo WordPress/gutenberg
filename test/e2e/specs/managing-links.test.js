@@ -42,7 +42,7 @@ describe( 'Managing links', () => {
 	} );
 
 	it( 'Pressing Left and Esc in Link Dialog in "Docked Toolbar" mode', async () => {
-		setFixedToolbar( false );
+		await setFixedToolbar( false );
 
 		await page.click( '.editor-default-block-appender' );
 		await page.keyboard.type( 'Text' );

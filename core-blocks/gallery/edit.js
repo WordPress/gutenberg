@@ -89,7 +89,7 @@ class GalleryEdit extends Component {
 
 	onSelectImages( images ) {
 		this.props.setAttributes( {
-			images: images.map( ( image ) => pick( image, [ 'alt', 'caption', 'id', 'url' ] ) ),
+			images: images.map( ( image ) => pick( image, [ 'alt', 'caption', 'id', 'link', 'url' ] ) ),
 		} );
 	}
 
@@ -211,8 +211,9 @@ class GalleryEdit extends Component {
 						onSelect={ this.onSelectImages }
 						accept="image/*"
 						type="image"
+						disableMaxUploadErrorMessages
 						multiple
-						notices={ noticeUI }
+						additionalNotices={ noticeUI }
 						onError={ noticeOperations.createErrorNotice }
 					/>
 				</Fragment>
