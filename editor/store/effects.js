@@ -25,7 +25,6 @@ import apiRequest from '@wordpress/api-request';
 /**
  * Internal dependencies
  */
-import { getWPAdminURL } from '../utils/url';
 import {
 	setupEditorState,
 	resetAutosave,
@@ -230,7 +229,14 @@ export default {
 		}
 	},
 	REQUEST_POST_UPDATE_FAILURE( action, store ) {
-		const { post, edits } = action;
+		const { post, edits, error } = action;
+
+		if ( error && 'rest_autosave_no_changes' === error.code ) {
+			// Autosave requested a new autosave, but there were no changes. This shouldn't
+			// result in an error notice for the user.
+			return;
+		}
+
 		const { dispatch } = store;
 
 		const publishStatus = [ 'publish', 'private', 'future' ];
@@ -254,10 +260,11 @@ export default {
 		dispatch( removeNotice( TRASH_POST_NOTICE_ID ) );
 		apiRequest( { path: `/wp/v2/${ basePath }/${ postId }`, method: 'DELETE' } ).then(
 			() => {
-				dispatch( {
-					...action,
-					type: 'TRASH_POST_SUCCESS',
-				} );
+				const post = getCurrentPost( getState() );
+
+				// TODO: This should be an updatePost action (updating subsets of post properties),
+				// But right now editPost is tied with change detection.
+				dispatch( resetPost( { ...post, status: 'trash' } ) );
 			},
 			( err ) => {
 				dispatch( {
@@ -270,15 +277,6 @@ export default {
 				} );
 			}
 		);
-	},
-	TRASH_POST_SUCCESS( action ) {
-		const { postId, postType } = action;
-
-		window.location.href = getWPAdminURL( 'edit.php', {
-			trashed: 1,
-			post_type: postType,
-			ids: postId,
-		} );
 	},
 	TRASH_POST_FAILURE( action, store ) {
 		const message = action.error.message && action.error.code !== 'unknown_error' ? action.error.message : __( 'Trashing failed' );

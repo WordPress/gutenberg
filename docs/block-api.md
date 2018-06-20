@@ -79,6 +79,8 @@ when they are applicable e.g.: in the inserter.
 icon: {
 	// Specifying a background color to appear with the icon e.g.: in the inserter.
 	background: '#7e70af',
+	// Specifying a color for the icon (optional: if not set, a readable color will be automatically defined)
+	foreground: '#fff',
 	// Specifying a dashicon for the block
 	src: 'book-alt',
 } ,

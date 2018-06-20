@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createContext, createHigherOrderComponent } from '@wordpress/element';
+import { createContext, createHigherOrderComponent, createElement } from '@wordpress/element';
 
 const { Consumer, Provider } = createContext( {
 	name: null,

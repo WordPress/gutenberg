@@ -267,10 +267,14 @@ export function dispatch( reducerKey ) {
  * @return {Component} Enhanced component with merged state data props.
  */
 export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( WrappedComponent ) => {
-	return class ComponentWithSelect extends Component {
-		constructor() {
-			super( ...arguments );
+	const defaultMergeProps = {};
+	function getNextMergeProps( props ) {
+		return mapStateToProps( select, props ) || defaultMergeProps;
+	}
 
+	return class ComponentWithSelect extends Component {
+		constructor( props ) {
+			super( ...arguments );
 			this.runSelection = this.runSelection.bind( this );
 
 			/**
@@ -280,19 +284,17 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 			 * @type {boolean}
 			 */
 			this.shouldComponentUpdate = false;
+			this.state = {
+				mergeProps: getNextMergeProps( props ),
+			};
 
-			this.state = {};
+			// Subscribtion should happen in the constructor
+			// Parent components should subscribe before children.
+			this.subscribe();
 		}
 
 		shouldComponentUpdate() {
 			return this.shouldComponentUpdate;
-		}
-
-		componentWillMount() {
-			this.subscribe();
-
-			// Populate initial state.
-			this.runSelection();
 		}
 
 		componentWillReceiveProps( nextProps ) {
@@ -322,7 +324,7 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 			}
 
 			const { mergeProps } = this.state;
-			const nextMergeProps = mapStateToProps( select, props ) || {};
+			const nextMergeProps = getNextMergeProps( props );
 
 			if ( ! isShallowEqual( nextMergeProps, mergeProps ) ) {
 				this.setState( {
@@ -358,14 +360,11 @@ export const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent
 		pure,
 		( WrappedComponent ) => {
 			return class ComponentWithDispatch extends Component {
-				constructor() {
+				constructor( props ) {
 					super( ...arguments );
 
 					this.proxyProps = {};
-				}
-
-				componentWillMount() {
-					this.setProxyProps( this.props );
+					this.setProxyProps( props );
 				}
 
 				componentWillUpdate( nextProps ) {

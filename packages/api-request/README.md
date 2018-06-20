@@ -1,4 +1,4 @@
-# @wordpress/blob
+# @wordpress/api-request
 
 Wrapper around `jQuery.ajax` to call WordPress REST APIs.
 

@@ -11,7 +11,8 @@ import { Component, createPortal } from '@wordpress/element';
 let occurrences = 0;
 
 class Fill extends Component {
-	componentWillMount() {
+	constructor() {
+		super( ...arguments );
 		this.occurrence = ++occurrences;
 	}
 
