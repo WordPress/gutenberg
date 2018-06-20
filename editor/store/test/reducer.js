@@ -1273,24 +1273,6 @@ describe( 'state', () => {
 				status: 'publish',
 			} );
 		} );
-
-		it( 'should set status to draft if autosave reset while auto-draft', () => {
-			const original = deepFreeze( { title: '', status: 'auto-draft' } );
-
-			const state = currentPost( original, {
-				type: 'RESET_AUTOSAVE',
-				edits: {
-					title: 'Hello world',
-					content: '',
-					excerpt: '',
-				},
-			} );
-
-			expect( state ).toEqual( {
-				title: '',
-				status: 'draft',
-			} );
-		} );
 	} );
 
 	describe( 'isInsertionPointVisible', () => {

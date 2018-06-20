@@ -562,16 +562,6 @@ export function currentPost( state = {}, action ) {
 			}
 
 			return mapValues( post, getPostRawValue );
-
-		case 'RESET_AUTOSAVE':
-			// A post is no longer auto-draft (now draft) when autosave occurs.
-			if ( state.status === 'auto-draft' ) {
-				return {
-					...state,
-					status: 'draft',
-				};
-			}
-			break;
 	}
 
 	return state;
