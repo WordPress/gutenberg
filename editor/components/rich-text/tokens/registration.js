@@ -9,6 +9,11 @@ import { isFunction, has } from 'lodash';
 import { applyFilters } from '@wordpress/hooks';
 
 /**
+ * Internal dependencies
+ */
+import { isValidIcon, normalizeIconObject } from '@wordpress/blocks';
+
+/**
  * Browser dependencies
  */
 const { error } = window.console;
@@ -16,24 +21,29 @@ const { error } = window.console;
 const tokenSettings = {};
 
 /**
- * Defined behavior of token settings.
+ * Defined behavior of a token type.
  *
  * @typedef {WPTokenSettings}
  *
- * @property {string}             name       Token's namespaced name.
- * @property {string}             title      Human-readable label for a token.
- *                                           Shown in the token inserter.
- * @property {(string|WPElement)} icon       Slug of the Dashicon to be shown
- *                                           as the icon for the token in the
- *                                           inserter, or element.
- * @property {?string[]}          keywords   Additional keywords to produce
- *                                           block as inserter search result.
- * @property {Function}           save       Serialize behavior of a token,
- *                                           returning an element describing
- *                                           structure of the token's post
- *                                           content markup.
- * @property {WPComponent}        edit       Component rendering element to be
- *                                           interacted with in an editor.
+ * @property {string}                    name       Token's namespaced name.
+ * @property {string}                    title      Human-readable label for a
+ *                                                  Token. Shown in the token
+ *                                                  inserter.
+ * @property {(Object|string|WPElement)} icon       Slug of the Dashicon to be
+ *                                                  shown as the icon for the
+ *                                                  token in the inserter, or
+ *                                                  element or an object
+ *                                                  describing the icon.
+ * @property {?string[]}                 keywords   Additional keywords to
+ *                                                  produce token as inserter
+ *                                                  search result.
+ * @property {Function}                  save       Serialize behavior of a
+ *                                                  token, returning an element
+ *                                                  describing structure of the
+ *                                                  token's post content markup.
+ * @property {WPComponent}               edit       Component rendering element
+ *                                                  to be interacted with in an
+ *                                                  editor.
  */
 
 /**
@@ -106,8 +116,13 @@ export function registerToken( name, settings ) {
 		return;
 	}
 
-	if ( ! settings.icon ) {
-		settings.icon = 'block-default';
+	settings.icon = normalizeIconObject( settings.icon );
+	if ( ! isValidIcon( settings.icon.src ) ) {
+		error(
+			'The icon passed is invalid. ' +
+			'The icon should be a string, an element, a function, or an object following the specifications documented in https://wordpress.org/gutenberg/handbook/block-api/#icon-optional'
+		);
+		return;
 	}
 
 	tokenSettings[ name ] = settings;

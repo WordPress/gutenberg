@@ -39,6 +39,8 @@ export {
 } from './registration';
 export {
 	isUnmodifiedDefaultBlock,
+	normalizeIconObject,
+	isValidIcon,
 } from './utils';
 export {
 	doBlocksMatchTemplate,

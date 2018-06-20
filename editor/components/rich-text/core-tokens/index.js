@@ -1,3 +1,6 @@
+/**
+ * Internal dependencies
+ */
 import { registerToken } from '../tokens/registration';
 import * as image from './image';
 

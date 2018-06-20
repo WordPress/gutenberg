@@ -2,6 +2,11 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import './editor.scss';
 import MediaUpload from '../../../media-upload';
 
 export const name = 'core/image';
@@ -14,8 +19,6 @@ export const settings = {
 	type: 'image',
 
 	icon: 'format-image',
-
-	category: 'inline',
 
 	edit( { onSave } ) {
 		return (

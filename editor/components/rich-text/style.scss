@@ -90,19 +90,6 @@
 	&.mce-content-body {
 		line-height: $editor-line-height;
 	}
-
-	div.mce-resizehandle {
-		border-radius: 50%;
-		border: 1px solid $black;
-		width: 12px;
-		height: 12px;
-		background: $white;
-		box-sizing: border-box;
-
-		&:hover {
-			background: $white;
-		}
-	}
 }
 
 .editor-rich-text__inline-toolbar {
