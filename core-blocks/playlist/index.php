@@ -39,12 +39,15 @@ function register_block_core_playlist() {
 			),
 			'tracklist' => array(
 				'type' => 'boolean',
+				'default' => true,
 			),
 			'artists'   => array(
 				'type' => 'boolean',
+				'default' => true,
 			),
 			'images'    => array(
 				'type' => 'boolean',
+				'default' => true,
 			),
 			'align'     => array(
 				'type' => 'string',

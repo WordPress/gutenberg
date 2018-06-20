@@ -69,7 +69,7 @@ const getPlaylistDetailsMediaFrame = () => {
 		/**
 		 * Create the default states.
 		 *
-		 * @returns {void}
+		 * @return {void}
 		 */
 		createStates: function createStates() {
 			this.states.add( [
@@ -90,18 +90,18 @@ const getPlaylistDetailsMediaFrame = () => {
 				new wp.media.controller.CollectionEdit( {
 					type: 'audio',
 					collectionType: 'playlist',
-					title:          wp.media.view.l10n.editPlaylistTitle,
-					library:        this.options.selection,
-					editing:        this.options.editing,
-					menu:           'playlist',
-					dragInfoText:   wp.media.view.l10n.playlistDragInfo,
-					dragInfo:       true
+					title: wp.media.view.l10n.editPlaylistTitle,
+					library: this.options.selection,
+					editing: this.options.editing,
+					menu: 'playlist',
+					dragInfoText: wp.media.view.l10n.playlistDragInfo,
+					dragInfo: true,
 				} ),
 
 				new wp.media.controller.CollectionAdd( {
 					type: 'audio',
 					collectionType: 'playlist',
-					title: wp.media.view.l10n.addToPlaylistTitle
+					title: wp.media.view.l10n.addToPlaylistTitle,
 				}	),
 
 				new wp.media.controller.Library( {
@@ -121,19 +121,18 @@ const getPlaylistDetailsMediaFrame = () => {
 				new wp.media.controller.CollectionEdit( {
 					type: 'video',
 					collectionType: 'playlist',
-					title:          wp.media.view.l10n.editVideoPlaylistTitle,
-					SettingsView:   wp.media.view.Settings.Playlist,
-					library:        this.options.selection,
-					editing:        this.options.editing,
-					menu:           'video-playlist',
-					dragInfoText:   wp.media.view.l10n.videoPlaylistDragInfo,
-					dragInfo:       false
+					title: wp.media.view.l10n.editVideoPlaylistTitle,
+					library: this.options.selection,
+					editing: this.options.editing,
+					menu: 'video-playlist',
+					dragInfoText: wp.media.view.l10n.videoPlaylistDragInfo,
+					dragInfo: false,
 				} ),
 
 				new wp.media.controller.CollectionAdd( {
 					type: 'video',
 					collectionType: 'playlist',
-					title: wp.media.view.l10n.addToVideoPlaylistTitle
+					title: wp.media.view.l10n.addToVideoPlaylistTitle,
 				}	),
 
 			] );
@@ -150,7 +149,7 @@ const slimImageObject = ( img ) => {
 
 // the playlist object contains attributes required for render. These will be used for playlist
 const playlistItemObject = ( playlistMedia ) => {
-	const attrSet = [ 'sizes', 'mime', 'type', 'subtype', 'id', 'url', 'link', 'caption', 'album', 'artist', 'image', 'title'];
+	const attrSet = [ 'sizes', 'mime', 'type', 'subtype', 'id', 'url', 'link', 'caption', 'album', 'artist', 'image', 'title' ];
 	return pick( playlistMedia, attrSet );
 };
 
@@ -242,7 +241,7 @@ class MediaUpload extends Component {
 		if ( multiple ) {
 			if ( playlist ) {
 				onSelect( selectedImages.models.map( ( model ) => playlistItemObject( model.toJSON() ) ) );
-		}
+			}
 			onSelect( selectedImages.models.map( ( model ) => this.processMediaCaption( slimImageObject( model.toJSON() ) ) ) );
 		} else {
 			onSelect( this.processMediaCaption( slimImageObject( ( selectedImages.models[ 0 ].toJSON() ) ) ) );
