@@ -9,11 +9,11 @@ import { mount } from 'enzyme';
 import MoreMenu from '../index';
 
 describe( 'MoreMenu', () => {
-	it('should match snapshot', () => {
+	it( 'should match snapshot', () => {
 		const wrapper = mount(
 			<MoreMenu />
 		);
 
-		expect(wrapper).toMatchSnapshot();
-	});
-});
+		expect( wrapper ).toMatchSnapshot();
+	} );
+} );
