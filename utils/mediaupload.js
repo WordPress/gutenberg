@@ -1,7 +1,12 @@
 /**
  * External Dependencies
  */
-import { compact, forEach, get, noop, startsWith } from 'lodash';
+import { compact, forEach, get, includes, noop, startsWith } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * WordPress dependencies
@@ -38,15 +43,41 @@ export function mediaUpload( {
 		filesSet[ idx ] = value;
 		onFileChange( compact( filesSet ) );
 	};
+
+	// Allowed type specified by consumer
 	const isAllowedType = ( fileType ) => startsWith( fileType, `${ allowedType }/` );
+
+	// Allowed types for the current WP_User
+	const allowedMimeTypesForUser = get( window, [ '_wpMediaSettings', 'allowedMimeTypes' ] );
+	const isAllowedMimeTypeForUser = ( fileType ) => {
+		return includes( allowedMimeTypesForUser, fileType );
+	};
+
 	files.forEach( ( mediaFile, idx ) => {
 		if ( ! isAllowedType( mediaFile.type ) ) {
 			return;
 		}
 
+		// verify if user is allowed to upload this mime type
+		if ( allowedMimeTypesForUser && ! isAllowedMimeTypeForUser( mediaFile.type ) ) {
+			onError( {
+				code: 'MIME_TYPE_NOT_ALLOWED_FOR_USER',
+				message: __( 'Sorry, this file type is not permitted for security reasons.' ),
+				file: mediaFile,
+			} );
+			return;
+		}
+
 		// verify if file is greater than the maximum file upload size allowed for the site.
 		if ( maxUploadFileSize && mediaFile.size > maxUploadFileSize ) {
-			onError( { sizeAboveLimit: true, file: mediaFile } );
+			onError( {
+				code: 'SIZE_ABOVE_LIMIT',
+				message: sprintf(
+					__( '%s exceeds the maximum upload size for this site.' ),
+					mediaFile.name
+				),
+				file: mediaFile,
+			} );
 			return;
 		}
 
@@ -69,7 +100,14 @@ export function mediaUpload( {
 			() => {
 				// Reset to empty on failure.
 				setAndUpdateFiles( idx, null );
-				onError( { generalError: true, file: mediaFile } );
+				onError( {
+					code: 'GENERAL',
+					message: sprintf(
+						__( 'Error while uploading file %s to the media library.' ),
+						mediaFile.name
+					),
+					file: mediaFile,
+				} );
 			}
 		);
 	} );

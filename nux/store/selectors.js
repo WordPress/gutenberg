@@ -51,7 +51,7 @@ export const getAssociatedGuide = createSelector(
  * @return {boolean} Whether or not the given tip is showing.
  */
 export function isTipVisible( state, id ) {
-	if ( state.preferences.areTipsDisabled ) {
+	if ( ! state.preferences.areTipsEnabled ) {
 		return false;
 	}
 
@@ -65,4 +65,15 @@ export function isTipVisible( state, id ) {
 	}
 
 	return true;
+}
+
+/**
+ * Returns whether or not tips are globally enabled.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether tips are globally enabled.
+ */
+export function areTipsEnabled( state ) {
+	return state.preferences.areTipsEnabled;
 }

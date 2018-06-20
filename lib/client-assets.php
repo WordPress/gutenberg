@@ -185,7 +185,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-utils',
 		gutenberg_url( 'build/utils/index.js' ),
-		array( 'lodash', 'wp-blob', 'wp-deprecated', 'wp-dom', 'wp-api-request' ),
+		array( 'lodash', 'wp-blob', 'wp-deprecated', 'wp-dom', 'wp-api-request', 'wp-i18n' ),
 		filemtime( gutenberg_dir_path() . 'build/utils/index.js' ),
 		true
 	);
@@ -1048,7 +1048,8 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	}
 	// Initialize media settings.
 	wp_add_inline_script( 'wp-editor', 'window._wpMediaSettings = ' . wp_json_encode( array(
-		'maxUploadSize' => $max_upload_size,
+		'maxUploadSize'    => $max_upload_size,
+		'allowedMimeTypes' => get_allowed_mime_types(),
 	) ), 'before' );
 
 	// Prepare Jed locale data.
