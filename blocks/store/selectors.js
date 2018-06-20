@@ -87,7 +87,7 @@ export const getChildBlockNames = createSelector(
 
 /**
  * Returns a boolean indicating if a block has child blocks or not.
- * 
+ *
  * @param {Object} state     Data state.
  * @param {string} blockName Block type name.
  *
@@ -99,7 +99,7 @@ export const hasChildBlocks = ( state, blockName ) => {
 
 /**
  * Returns a boolean indicating if panel is visible or not.
- * 
+ *
  * @since  @frontkom/gutenberg 0.1.4
  * @param {Object} state     Data state.
  * @param {string} slug		 Panel slug.

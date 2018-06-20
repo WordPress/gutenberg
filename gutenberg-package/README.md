@@ -74,6 +74,10 @@ const settings = {
     isRTL: false,
     autosaveInterval: 10,
     ...
+    // @frontkom/gutenberg settings
+    canAutosave: false, // to disable Editor Autosave featured
+    canPublish: false,  // to disable Editor Publish featured
+    canSave: false,     // to disable Editor Save featured
 };
 
 // Post properties to override
@@ -232,9 +236,6 @@ The Gutenberg editor will ask for available **Post Types** through `/wp/v2/types
 ```js
 {
     ...,   
-    autosaveable: false, // to disable Post Autosave featured
-    publishable: false,  // to disable Post Publish featured
-    saveable: false,     // to disable Post Save featured
     supports: {
         ...,
         'media-library': false,    // to disable Media library from WordPress

@@ -119,12 +119,12 @@ const defaultInserterMenuPanels = { [ SUGGESTED_PANEL ]: true, [ SHARED_PANEL ]:
 export function inserterMenuPanels( state = defaultInserterMenuPanels, action ) {
 	switch ( action.type ) {
 		case 'HIDE_INSERTER_MENU_PANEL':
-			return { 
+			return {
 				...state,
 				[ action.slug ]: false,
 			};
 		case 'SHOW_INSERTER_MENU_PANEL':
-			return { 
+			return {
 				...state,
 				[ action.slug ]: true,
 			};

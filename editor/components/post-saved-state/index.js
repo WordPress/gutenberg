@@ -1,7 +1,6 @@
 /**
  * External Dependencies
  */
-import { get } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -102,25 +101,25 @@ export default compose( [
 			isEditedPostSaveable,
 			getCurrentPost,
 			isAutosavingPost,
+			getEditorSettings,
 		} = select( 'core/editor' );
-		const { getPostType } = select( 'core' );
 
-		const post = getCurrentPost();
+		const { canSave } = getEditorSettings();
 
 		return {
-			post,
+			post: getCurrentPost(),
 			isNew: isEditedPostNew(),
 			isPublished: isCurrentPostPublished(),
 			isDirty: forceIsDirty || isEditedPostDirty(),
 			isSaving: forceIsSaving || isSavingPost(),
 			isSaveable: isEditedPostSaveable(),
-			isPostSaveable: get( getPostType( post.type ), [ 'saveable' ], true ),
 			isAutosaving: isAutosavingPost(),
+			canSave,
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
 		onSave: dispatch( 'core/editor' ).savePost,
 	} ) ),
 	withSafeTimeout,
-	ifCondition( ( { isPostSaveable } ) => isPostSaveable ),
+	ifCondition( ( { canSave } ) => canSave ),
 ] )( PostSavedState );

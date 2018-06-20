@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { getCategories } from '@wordpress/blocks';
@@ -21,11 +16,11 @@ export function getDefaultOpenPanels() {
 	const isSuggestedVisible = select( 'core/blocks' ).isInserterMenuPanelVisible( SUGGESTED_PANEL );
 	const isSharedVisible = select( 'core/blocks' ).isInserterMenuPanelVisible( SUGGESTED_PANEL );
 
-	const categories = select( 'core/blocks' ).getCategories();
+	const categories = getCategories();
 
 	if ( isSuggestedVisible ) {
 		return [ SUGGESTED_PANEL ];
-	} else if ( isSharedVisible) {
+	} else if ( isSharedVisible ) {
 		return [ SHARED_PANEL ];
 	} else if ( categories.length ) {
 		return [ categories[ 0 ].slug ];

@@ -1,9 +1,4 @@
 /**
- * External Dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Component, compose } from '@wordpress/element';
@@ -48,21 +43,20 @@ export default compose( [
 			isEditedPostDirty,
 			isEditedPostAutosaveable,
 			getEditorSettings,
-			getEditedPostAttribute,
 		} = select( 'core/editor' );
-		const { getPostType } = select( 'core' );
-		const { autosaveInterval } = getEditorSettings();
-		const postType = getPostType( getEditedPostAttribute( 'type' ) );
+
+		const { autosaveInterval, canSave, canAutosave } = getEditorSettings();
+
 		return {
 			isDirty: isEditedPostDirty(),
 			isAutosaveable: isEditedPostAutosaveable(),
 			autosaveInterval,
-			isPostSaveable: get( postType, [ 'saveable' ], true ),
-			isPostAutosaveable: get( postType, [ 'autosaveable' ], true ),
+			canSave,
+			canAutosave,
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
 		autosave: dispatch( 'core/editor' ).autosave,
 	} ) ),
-	ifCondition( ( { isPostSaveable, isPostAutosaveable } ) => isPostSaveable && isPostAutosaveable ),
+	ifCondition( ( { canSave, canAutosave } ) => canSave && canAutosave ),
 ] )( AutosaveMonitor );
