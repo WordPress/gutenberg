@@ -377,8 +377,8 @@ export const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent
 					this.setProxyProps( props );
 				}
 
-				componentWillUpdate( nextProps ) {
-					this.setProxyProps( nextProps );
+				componentDidUpdate() {
+					this.setProxyProps( this.props );
 				}
 
 				proxyDispatch( propName, ...args ) {
