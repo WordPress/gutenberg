@@ -87,6 +87,17 @@ export function getAuthors( state ) {
 }
 
 /**
+ * Returns all the post author.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Array} Authors list.
+ */
+export function getAuthor( state ) {
+	return getUserQueryResults( state, 'author' );
+}
+
+/**
  * Returns all the users returned by a query ID.
  *
  * @param {Object} state   Data state.
