@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { compact, forEach, get, includes, isEmpty, noop, startsWith } from 'lodash';
+import { compact, forEach, get, has, includes, noop, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -102,8 +102,8 @@ export function mediaUpload( {
 				// Reset to empty on failure.
 				setAndUpdateFiles( idx, null );
 				let message;
-				if ( ! isEmpty( response.responseJSON.message ) ) {
-					message = response.responseJSON.message;
+				if ( has( response, [ 'responseJSON', 'message' ] ) ) {
+					message = get( response, [ 'responseJSON', 'message' ] );
 				} else {
 					message = sprintf(
 						// translators: %s: file name
