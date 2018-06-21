@@ -92,6 +92,7 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 				super( ...arguments );
 
 				this.doServerSideRender = this.doServerSideRender.bind( this );
+				this.doDroplr = this.doDroplr.bind( this );
 
 				this.state = {
 					html: '',
@@ -116,6 +117,21 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 				// acually the full size photo.
 				const photoPreview = <p><img src={ photo.thumbnail_url } alt={ photo.title } width="100%" /></p>;
 				return renderToString( photoPreview );
+			}
+
+			doDroplr( droplr ) {
+				const { setAttributes } = this.props;
+				const { drop_type: dropType } = droplr;
+				const providerNameSlug = 'droplr';
+				if ( 'IMAGE' === dropType ) {
+					const photoPreview = <p><img src={ droplr.url } alt={ droplr.title } width="100%" /></p>;
+					const html = renderToString( photoPreview );
+					this.setState( { html, type: dropType, providerNameSlug } );
+					setAttributes( { type: dropType, providerNameSlug } );
+				} else {
+					// we hit some Droplr content that we don't know how to support yet.
+					this.setState( { fetching: false, error: true } );
+				}
 			}
 
 			doServerSideRender( event ) {
@@ -169,6 +185,9 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 							} else if ( 'photo' === type ) {
 								this.setState( { html: this.getPhotoHtml( obj ), type, providerNameSlug } );
 								setAttributes( { type, providerNameSlug } );
+							} else if ( undefined !== obj.drop_type ) {
+								// Droplr does its own thing with the oEmbed data here.
+								this.doDroplr( obj );
 							} else {
 								// No html, no custom type that we support, so show the error state.
 								this.setState( { error: true } );
