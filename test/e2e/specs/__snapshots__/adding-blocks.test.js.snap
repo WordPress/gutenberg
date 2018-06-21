@@ -5,15 +5,17 @@ exports[`adding blocks Should insert content using the placeholder and the regul
 <p>Paragraph block</p>
 <!-- /wp:paragraph -->
 
+<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\">
+	<!-- wp:paragraph -->
+	<p>Quote block</p>
+	<!-- /wp:paragraph -->
+</blockquote>
+<!-- /wp:quote -->
+
 <!-- wp:paragraph -->
 <p>Second paragraph</p>
 <!-- /wp:paragraph -->
-
-<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\">
-	<p>Quote block</p>
-</blockquote>
-<!-- /wp:quote -->
 
 <!-- wp:code -->
 <pre class=\\"wp-block-code\\"><code>Code block</code></pre>

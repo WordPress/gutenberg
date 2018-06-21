@@ -15,3 +15,17 @@ exports[`splitting and merging blocks Should split and merge paragraph blocks us
 <p>FirstSecond</p>
 <!-- /wp:paragraph -->"
 `;
+
+exports[`splitting and merging blocks should split out of quote block using enter 1`] = `
+"<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\">
+	<!-- wp:paragraph -->
+	<p>test</p>
+	<!-- /wp:paragraph -->
+</blockquote>
+<!-- /wp:quote -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->"
+`;

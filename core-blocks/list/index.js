@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, compact, get, initial, last, isEmpty } from 'lodash';
+import { find, compact, get, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -81,21 +81,6 @@ export const settings = {
 				},
 			},
 			{
-				type: 'block',
-				blocks: [ 'core/quote' ],
-				transform: ( { value, citation } ) => {
-					const items = value.map( ( p ) => get( p, [ 'children', 'props', 'children' ] ) );
-					if ( ! isEmpty( citation ) ) {
-						items.push( citation );
-					}
-					const hasItems = ! items.every( isEmpty );
-					return createBlock( 'core/list', {
-						nodeName: 'UL',
-						values: hasItems ? items.map( ( content, index ) => <li key={ index }>{ content }</li> ) : [],
-					} );
-				},
-			},
-			{
 				type: 'raw',
 				selector: 'ol,ul',
 				schema: {
@@ -133,18 +118,6 @@ export const settings = {
 						.map( ( content ) => createBlock( 'core/paragraph', {
 							content: [ content ],
 						} ) ),
-			},
-			{
-				type: 'block',
-				blocks: [ 'core/quote' ],
-				transform: ( { values } ) => {
-					return createBlock( 'core/quote', {
-						value: compact( ( values.length === 1 ? values : initial( values ) )
-							.map( ( value ) => get( value, [ 'props', 'children' ], null ) ) )
-							.map( ( children ) => ( { children: <p>{ children }</p> } ) ),
-						citation: ( values.length === 1 ? undefined : [ get( last( values ), [ 'props', 'children' ] ) ] ),
-					} );
-				},
 			},
 		],
 	},
@@ -253,7 +226,6 @@ export const settings = {
 			const {
 				attributes,
 				insertBlocksAfter,
-				setAttributes,
 				mergeBlocks,
 				onReplace,
 				className,
@@ -301,7 +273,7 @@ export const settings = {
 						onMerge={ mergeBlocks }
 						onSplit={
 							insertBlocksAfter ?
-								( before, after, ...blocks ) => {
+								( unused, after, ...blocks ) => {
 									if ( ! blocks.length ) {
 										blocks.push( createBlock( 'core/paragraph' ) );
 									}
@@ -313,7 +285,6 @@ export const settings = {
 										} ) );
 									}
 
-									setAttributes( { values: before } );
 									insertBlocksAfter( blocks );
 								} :
 								undefined

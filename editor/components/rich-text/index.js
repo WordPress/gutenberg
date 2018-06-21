@@ -43,6 +43,11 @@ import patterns from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
 import { domToFormat, valueToString } from './format';
 
+/**
+ * Browser dependencies
+ */
+const { log, warn, error } = window.console;
+
 const { BACKSPACE, DELETE, ENTER, rawShortcut } = keycodes;
 
 /**
@@ -103,7 +108,7 @@ export function getFormatProperties( formatName, parents ) {
 const DEFAULT_FORMATS = [ 'bold', 'italic', 'strikethrough', 'link', 'code' ];
 
 export class RichText extends Component {
-	constructor() {
+	constructor( { value } ) {
 		super( ...arguments );
 
 		this.onInit = this.onInit.bind( this );
@@ -128,6 +133,7 @@ export class RichText extends Component {
 		};
 
 		this.containerRef = createRef();
+		this.savedContent = value;
 	}
 
 	/**
@@ -270,7 +276,7 @@ export class RichText extends Component {
 			const shouldReplace = this.props.onReplace && this.isEmpty();
 
 			// Allows us to ask for this information when we get a report.
-			window.console.log( 'Received item:\n\n', file );
+			log( 'Received item:\n\n', file );
 
 			if ( shouldReplace ) {
 				// Necessary to allow the paste bin to be removed without errors.
@@ -304,8 +310,8 @@ export class RichText extends Component {
 		event.preventDefault();
 
 		// Allows us to ask for this information when we get a report.
-		window.console.log( 'Received HTML:\n\n', HTML );
-		window.console.log( 'Received plain text:\n\n', this.pastedPlainText );
+		log( 'Received HTML:\n\n', HTML );
+		log( 'Received plain text:\n\n', this.pastedPlainText );
 
 		// There is a selection, check if a link is pasted.
 		if ( ! this.editor.selection.isCollapsed() ) {
@@ -320,7 +326,7 @@ export class RichText extends Component {
 				} );
 
 				// Allows us to ask for this information when we get a report.
-				window.console.log( 'Created link:\n\n', pastedText );
+				log( 'Created link:\n\n', pastedText );
 
 				return;
 			}
@@ -510,6 +516,10 @@ export class RichText extends Component {
 				if ( event.shiftKey || ! this.props.onSplit ) {
 					this.editor.execCommand( 'InsertLineBreak', false, event );
 				} else {
+					// Splitting the content might destroy the editor, so it's
+					// important that we stop other handlers (e.g. ones
+					// registered by TinyMCE) from also handling this event.
+					event.stopImmediatePropagation();
 					this.splitContent();
 				}
 			}
@@ -650,10 +660,8 @@ export class RichText extends Component {
 			return memo;
 		}, [] );
 
-		// Splitting into two blocks
-		this.setContent( this.props.value );
-
 		const { format } = this.props;
+
 		this.restoreContentAndSplit(
 			domToFormat( before, format, this.editor ),
 			domToFormat( after, format, this.editor )
@@ -732,21 +740,21 @@ export class RichText extends Component {
 			!! this.editor &&
 			this.props.tagName === prevProps.tagName &&
 			this.props.value !== prevProps.value &&
-			this.props.value !== this.savedContent &&
-
-			// Comparing using isEqual is necessary especially to avoid unnecessary updateContent calls
-			// This fixes issues in multi richText blocks like quotes when moving the focus between
-			// the different editables.
-			! isEqual( this.props.value, prevProps.value ) &&
-			! isEqual( this.props.value, this.savedContent )
+			this.props.value !== this.savedContent
 		) {
 			this.updateContent();
+
+			if (
+				'development' === process.env.NODE_ENV &&
+				isEqual( this.props.value, prevProps.value )
+			) {
+				warn( 'The current and previous value props are not strictly equal but the contents are the same. Please ensure the value prop reference does not change.' );
+			}
 		}
 
 		if ( 'development' === process.env.NODE_ENV ) {
 			if ( ! isEqual( this.props.formatters, prevProps.formatters ) ) {
-				// eslint-disable-next-line no-console
-				console.error( 'Formatters passed via `formatters` prop will only be registered once. Formatters can be enabled/disabled via the `formattingControls` prop.' );
+				error( 'Formatters passed via `formatters` prop will only be registered once. Formatters can be enabled/disabled via the `formattingControls` prop.' );
 			}
 		}
 	}
@@ -823,14 +831,15 @@ export class RichText extends Component {
 
 	/**
 	 * Calling onSplit means we need to abort the change done by TinyMCE.
-	 * we need to call updateContent to restore the initial content before calling onSplit.
+	 * we need to call setContent to restore the initial content before calling onSplit.
 	 *
 	 * @param {Array}  before content before the split position
 	 * @param {Array}  after  content after the split position
 	 * @param {?Array} blocks blocks to insert at the split position
 	 */
 	restoreContentAndSplit( before, after, blocks = [] ) {
-		this.updateContent();
+		this.setContent( before );
+		this.onChange();
 		this.props.onSplit( before, after, ...blocks );
 	}
 
@@ -883,7 +892,10 @@ export class RichText extends Component {
 					</BlockFormatControls>
 				) }
 				{ isSelected && inlineToolbar && (
-					<div className="editor-rich-text__inline-toolbar">
+					<div
+						className="editor-rich-text__inline-toolbar"
+						style={ { justifyContent: inlineToolbar } }
+					>
 						{ formatToolbar }
 					</div>
 				) }

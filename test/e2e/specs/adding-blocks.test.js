@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage, insertBlock } from '../support/utils';
+import { newPost, newDesktopBrowserPage, insertBlock, getHTMLFromCodeEditor } from '../support/utils';
 
 describe( 'adding blocks', () => {
 	beforeAll( async () => {
@@ -48,6 +48,10 @@ describe( 'adding blocks', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Quote block' );
 
+		// Leave nested area.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+
 		// Using the regular inserter
 		await insertBlock( 'code' );
 		await page.keyboard.type( 'Code block' );
@@ -56,20 +60,12 @@ describe( 'adding blocks', () => {
 		await page.click( '.editor-post-title__input' );
 
 		// Using the between inserter
-		const insertionPoint = await page.$( '[data-type="core/quote"] .editor-block-list__insertion-point-button' );
+		const insertionPoint = await page.$( '[data-type="core/code"] .editor-block-list__insertion-point-button' );
 		const rect = await insertionPoint.boundingBox();
 		await page.mouse.move( rect.x + ( rect.width / 2 ), rect.y + ( rect.height / 2 ) );
-		await page.click( '[data-type="core/quote"] .editor-block-list__insertion-point-button' );
+		await page.click( '[data-type="core/code"] .editor-block-list__insertion-point-button' );
 		await page.keyboard.type( 'Second paragraph' );
 
-		// Switch to Text Mode to check HTML Output
-		await page.click( '.edit-post-more-menu [aria-label="More"]' );
-		const codeEditorButton = ( await page.$x( '//button[contains(text(), \'Code Editor\')]' ) )[ 0 ];
-		await codeEditorButton.click( 'button' );
-
-		// Assertions
-		const textEditorContent = await page.$eval( '.editor-post-text-editor', ( element ) => element.value );
-
-		expect( textEditorContent ).toMatchSnapshot();
+		expect( await getHTMLFromCodeEditor() ).toMatchSnapshot();
 	} );
 } );

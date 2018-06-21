@@ -393,7 +393,7 @@ class ImageEdit extends Component {
 							unstableOnFocus={ this.onFocusCaption }
 							onChange={ ( value ) => setAttributes( { caption: value } ) }
 							isSelected={ this.state.captionFocused }
-							inlineToolbar
+							inlineToolbar="center"
 						/>
 					) : null }
 				</figure>

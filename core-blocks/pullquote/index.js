@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
+import { castArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,9 +9,11 @@ import { map } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 import {
+	createBlock,
 	BlockControls,
 	BlockAlignmentToolbar,
 	RichText,
+	InnerBlocks,
 } from '@wordpress/editor';
 
 /**
@@ -20,21 +22,7 @@ import {
 import './editor.scss';
 import './style.scss';
 
-const toRichTextValue = ( value ) => map( value, ( ( subValue ) => subValue.children ) );
-const fromRichTextValue = ( value ) => map( value, ( subValue ) => ( {
-	children: subValue,
-} ) );
 const blockAttributes = {
-	value: {
-		type: 'array',
-		source: 'query',
-		selector: 'blockquote > p',
-		query: {
-			children: {
-				source: 'node',
-			},
-		},
-	},
 	citation: {
 		type: 'array',
 		source: 'children',
@@ -68,7 +56,7 @@ export const settings = {
 	},
 
 	edit( { attributes, setAttributes, isSelected, className } ) {
-		const { value, citation, align } = attributes;
+		const { citation, align } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
 		return (
@@ -80,18 +68,7 @@ export const settings = {
 					/>
 				</BlockControls>
 				<blockquote className={ className }>
-					<RichText
-						multiline="p"
-						value={ toRichTextValue( value ) }
-						onChange={
-							( nextValue ) => setAttributes( {
-								value: fromRichTextValue( nextValue ),
-							} )
-						}
-						/* translators: the text of the quotation */
-						placeholder={ __( 'Write quote…' ) }
-						wrapperClassName="core-blocks-pullquote__content"
-					/>
+					<InnerBlocks />
 					{ ( citation || isSelected ) && (
 						<RichText
 							tagName="cite"
@@ -103,6 +80,7 @@ export const settings = {
 									citation: nextCitation,
 								} )
 							}
+							inlineToolbar="center"
 						/>
 					) }
 				</blockquote>
@@ -111,11 +89,11 @@ export const settings = {
 	},
 
 	save( { attributes } ) {
-		const { value, citation, align } = attributes;
+		const { citation, align } = attributes;
 
 		return (
 			<blockquote className={ `align${ align }` }>
-				<RichText.Content value={ toRichTextValue( value ) } />
+				<InnerBlocks.Content />
 				{ citation && citation.length > 0 && <RichText.Content tagName="cite" value={ citation } /> }
 			</blockquote>
 		);
@@ -124,6 +102,54 @@ export const settings = {
 	deprecated: [ {
 		attributes: {
 			...blockAttributes,
+			value: {
+				type: 'array',
+				source: 'query',
+				selector: 'blockquote > p',
+				query: {
+					children: {
+						source: 'node',
+					},
+				},
+			},
+		},
+
+		migrate( { value = [], ...attributes } ) {
+			return [
+				attributes,
+				value.map( ( { children: paragraph } ) =>
+					createBlock( 'core/paragraph', {
+						content: castArray( paragraph.props.children ),
+					} )
+				),
+			];
+		},
+
+		save( { attributes } ) {
+			const { value, citation, align } = attributes;
+
+			return (
+				<blockquote className={ `align${ align }` }>
+					{ value && value.map( ( paragraph, i ) =>
+						<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
+					) }
+					{ citation && citation.length > 0 && <RichText.Content tagName="cite" value={ citation } /> }
+				</blockquote>
+			);
+		},
+	}, {
+		attributes: {
+			...blockAttributes,
+			value: {
+				type: 'array',
+				source: 'query',
+				selector: 'blockquote > p',
+				query: {
+					children: {
+						source: 'node',
+					},
+				},
+			},
 			citation: {
 				type: 'array',
 				source: 'children',
@@ -136,7 +162,9 @@ export const settings = {
 
 			return (
 				<blockquote className={ `align${ align }` }>
-					<RichText.Content value={ toRichTextValue( value ) } />
+					{ value && value.map( ( paragraph, i ) =>
+						<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
+					) }
 					{ citation && citation.length > 0 && <RichText.Content tagName="footer" value={ citation } /> }
 				</blockquote>
 			);

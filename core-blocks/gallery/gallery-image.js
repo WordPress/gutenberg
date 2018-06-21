@@ -136,7 +136,7 @@ class GalleryImage extends Component {
 						isSelected={ this.state.captionSelected }
 						onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
 						unstableOnFocus={ this.onSelectCaption }
-						inlineToolbar
+						inlineToolbar="center"
 					/>
 				) : null }
 			</figure>

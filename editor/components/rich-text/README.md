@@ -33,7 +33,7 @@ Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs
 
 ### `onSplit( before: Array|String, after: Array|String, ...blocks: Object ): Function`
 
-*Optional.* Called when the content can be split with `before` and `after`. There might be blocks present, which should be inserted in between.
+*Optional.* Called when the content can be split with `after` as the split off value. There might be blocks present, which should be inserted before the `after` value. Note: the `before` value should no longer be used.
 
 ### `onReplace( blocks: Array ): Function`
 
@@ -62,6 +62,10 @@ Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs
 ### `autocompleters: Array<Completer>`
 
 *Optional.* A list of autocompleters to use instead of the default.
+
+### `inlineToolbar: String`
+
+*Optional.* Render the formatting toolbar inline, next to the rich text field.  Needs to be a string that can be used with the `justify-content` CSS property.
 
 ## RichText.Content
 

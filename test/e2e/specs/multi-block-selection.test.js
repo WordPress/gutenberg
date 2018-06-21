@@ -13,15 +13,15 @@ describe( 'Multi-block selection', () => {
 	it( 'Should select/unselect multiple blocks', async () => {
 		const firstBlockSelector = '[data-type="core/paragraph"]';
 		const secondBlockSelector = '[data-type="core/image"]';
-		const thirdBlockSelector = '[data-type="core/quote"]';
+		const thirdBlockSelector = '[data-type="core/list"]';
 		const multiSelectedCssClass = 'is-multi-selected';
 
 		// Creating test blocks
 		await page.click( '.editor-default-block-appender' );
 		await page.keyboard.type( 'First Paragraph' );
 		await insertBlock( 'Image' );
-		await insertBlock( 'Quote' );
-		await page.keyboard.type( 'Quote Block' );
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'List Block' );
 
 		const blocks = [ firstBlockSelector, secondBlockSelector, thirdBlockSelector ];
 		const expectMultiSelected = async ( selectors, areMultiSelected ) => {

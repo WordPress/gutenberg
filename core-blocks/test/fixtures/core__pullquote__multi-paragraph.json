@@ -4,50 +4,43 @@
         "name": "core/pullquote",
         "isValid": true,
         "attributes": {
-            "value": [
-                {
-                    "children": {
-                        "type": "p",
-                        "key": null,
-                        "ref": null,
-                        "props": {
-                            "children": [
-                                "Paragraph ",
-                                {
-                                    "type": "strong",
-                                    "key": "_domReact71",
-                                    "ref": null,
-                                    "props": {
-                                        "children": "one"
-                                    },
-                                    "_owner": null,
-                                    "_store": {}
-                                }
-                            ]
-                        },
-                        "_owner": null,
-                        "_store": {}
-                    }
-                },
-                {
-                    "children": {
-                        "type": "p",
-                        "key": null,
-                        "ref": null,
-                        "props": {
-                            "children": "Paragraph two"
-                        },
-                        "_owner": null,
-                        "_store": {}
-                    }
-                }
-            ],
             "citation": [
                 "by whomever"
             ],
             "align": "none"
         },
-        "innerBlocks": [],
-        "originalContent": "<blockquote class=\"wp-block-pullquote alignnone\">\n    <p>Paragraph <strong>one</strong></p>\n    <p>Paragraph two</p>\n    <cite>by whomever</cite>\n</blockquote>"
+        "innerBlocks": [
+            {
+                "uid": "_uid_0",
+                "name": "core/paragraph",
+                "isValid": true,
+                "attributes": {
+                    "content": [
+                        "Paragraph ",
+                        {
+                            "type": "strong",
+                            "children": "one"
+                        }
+                    ],
+                    "dropCap": false
+                },
+                "innerBlocks": [],
+                "originalContent": "<p>Paragraph <strong>one</strong></p>"
+            },
+            {
+                "uid": "_uid_1",
+                "name": "core/paragraph",
+                "isValid": true,
+                "attributes": {
+                    "content": [
+                        "Paragraph two"
+                    ],
+                    "dropCap": false
+                },
+                "innerBlocks": [],
+                "originalContent": "<p>Paragraph two</p>"
+            }
+        ],
+        "originalContent": "<blockquote class=\"wp-block-pullquote alignnone\">\n\t\n    \n    <cite>by whomever</cite>\n</blockquote>"
     }
 ]

@@ -4,26 +4,26 @@
         "name": "core/pullquote",
         "isValid": true,
         "attributes": {
-            "value": [
-                {
-                    "children": {
-                        "type": "p",
-                        "key": null,
-                        "ref": null,
-                        "props": {
-                            "children": "Testing pullquote block..."
-                        },
-                        "_owner": null,
-                        "_store": {}
-                    }
-                }
-            ],
             "citation": [
                 "...with a caption"
             ],
             "align": "none"
         },
-        "innerBlocks": [],
-        "originalContent": "<blockquote class=\"wp-block-pullquote alignnone\">\n<p>Testing pullquote block...</p><cite>...with a caption</cite>\n</blockquote>"
+        "innerBlocks": [
+            {
+                "name": "core/paragraph",
+                "uid": "_uid_0",
+                "isValid": true,
+                "attributes": {
+                    "content": [
+                        "Testing pullquote block..."
+                    ],
+                    "dropCap": false
+                },
+                "innerBlocks": [],
+                "originalContent": "<p>Testing pullquote block...</p>"
+            }
+        ],
+        "originalContent": "<blockquote class=\"wp-block-pullquote alignnone\">\n\t\n\t<cite>...with a caption</cite>\n</blockquote>"
     }
 ]

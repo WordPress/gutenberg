@@ -46,7 +46,13 @@ export class BlockMover extends Component {
 		const { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex, isLocked, instanceId, isHidden } = this.props;
 		const { isFocused } = this.state;
 		const blocksCount = castArray( uids ).length;
+
 		if ( isLocked ) {
+			return null;
+		}
+
+		// Don't render if there's only one block in the list.
+		if ( isFirst && isLast ) {
 			return null;
 		}
 

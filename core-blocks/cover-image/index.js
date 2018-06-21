@@ -221,7 +221,7 @@ export const settings = {
 							placeholder={ __( 'Write title…' ) }
 							value={ title }
 							onChange={ ( value ) => setAttributes( { title: value } ) }
-							inlineToolbar
+							inlineToolbar="center"
 						/>
 					) : null }
 				</div>

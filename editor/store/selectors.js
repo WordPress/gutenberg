@@ -691,6 +691,25 @@ export function getSelectedBlockUID( state ) {
 }
 
 /**
+ * Returns true if there is a selected block inside a given block, or false
+ * otherwise.
+ *
+ * @param {Object} state Editor state.
+ * @param {string} uid   Block in which to find a selected block.
+ *
+ * @return {boolean} Whether a the block contains a selected block.
+ */
+export function hasBlockSelectedBlock( state, uid ) {
+	const { start, end } = state.blockSelection;
+
+	if ( ! start || start !== end ) {
+		return false;
+	}
+
+	return getBlockRootUID( state, start ) === uid;
+}
+
+/**
  * Returns the currently selected block, or null if there is no selected block.
  *
  * @param {Object} state Global application state.
