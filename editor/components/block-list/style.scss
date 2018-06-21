@@ -593,6 +593,14 @@
 			display: block;
 		}
 	}
+}
+
+
+/**
+ * Mobile unified toolbar.
+ */
+
+.editor-block-list__block {
 
 	// Show side UI inline below the block on mobile.
 	.editor-block-list__block-mobile-toolbar {
@@ -653,6 +661,12 @@
 		.editor-block-settings-menu > * {
 			float: left;
 		}
+	}
+
+	// sth
+	&[data-align="full"] .editor-block-list__block-mobile-toolbar {
+		margin-left: 0;
+		margin-right: 0;
 	}
 }
 
