@@ -20,7 +20,7 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
  - `wp.blocks.withEditorSettings` is removed. Please use the data module to access the editor settings `wp.data.select( "core/editor" ).getEditorSettings()`.
  - All DOM utils in `wp.utils.*` are removed. Please use `wp.dom.*` instead.
  - `isPrivate: true` has been removed from the Block API. Please use `supports.inserter: false` instead.
- - `wp.utils.isExtraSmall` function removed. Please use `wp.viewport.isExtraSmall` instead.
+ - `wp.utils.isExtraSmall` function removed. Please use `wp.viewport` module instead.
  - `getEditedPostExcerpt` selector removed (`core/editor`). Use `getEditedPostAttribute( 'excerpt' )` instead.
 
 ## 3.0.0
