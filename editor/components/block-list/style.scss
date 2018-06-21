@@ -682,11 +682,11 @@
 	height: $block-padding * 2; // Matches the whole empty space between two blocks
 	justify-content: center;
 
-	// Show a clickable plus
+	// Show a clickable plus.
 	.editor-block-list__insertion-point-button {
 		margin-top: -4px;
 		border-radius: 50%;
-		color: $dark-gray-100;
+		color: $blue-medium-focus;
 		background: $white;
 		height: $block-padding * 2 + 8px;
 		width: $block-padding * 2 + 8px;
@@ -694,26 +694,29 @@
 		&:not(:disabled):not([aria-disabled="true"]):hover {
 			box-shadow: none;
 		}
-
 	}
 
-	// Show a line indicator when hovering, but this is unclickable
-	&:before {
-		position: absolute;
-		top: calc( 50% - #{ $border-width } );
-		height: 2px;
-		left: 0;
-		right: 0;
-		background: $dark-gray-100;
-		content: '';
-	}
-
-	// Hide both the line and button until hovered
+	// Hide both the button until hovered.
 	opacity: 0;
 	transition: opacity 0.1s linear 0.1s;
 
-	&:hover, &.is-visible {
+	&:hover,
+	&.is-visible {
 		opacity: 1;
+	}
+}
+
+// Don't show the sibling inserter before the selected block.
+.edit-post-layout:not( .has-fixed-toolbar ) {
+	// The child selector is necessary for this to work properly in nested contexts.
+	.is-selected > .editor-block-list__insertion-point > .editor-block-list__insertion-point-inserter {
+		opacity: 0;
+		pointer-events: none;
+
+		&.is-visible {
+			opacity: 1;
+			pointer-events: auto;
+		}
 	}
 }
 
