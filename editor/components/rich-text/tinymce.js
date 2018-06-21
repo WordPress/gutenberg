@@ -202,7 +202,7 @@ export default class TinyMCE extends Component {
 	render() {
 		const { tagName = 'div', style, defaultValue, className, isPlaceholderVisible, format } = this.props;
 		const ariaProps = pickAriaProps( this.props );
-		if ( [ 'ul', 'ol', 'table' ].indexOf( tagName ) === -1 ) {
+		if ( [ 'table' ].indexOf( tagName ) === -1 ) {
 			ariaProps.role = 'textbox';
 		}
 
