@@ -3,6 +3,7 @@
  */
 import { Component, Fragment } from '@wordpress/element';
 import {
+	PanelBody,
 	TextControl,
 	ToggleControl,
 	ServerSideRender,
@@ -61,7 +62,7 @@ class latestComments extends Component {
 					/>
 				</BlockControls>
 				<InspectorControls key="inspector">
-					<h3>{ __( 'Latest Comments Settings' ) }</h3>
+					<PanelBody title={ __( 'Latest Comments Settings' ) } />
 
 					<ToggleControl
 						label={ __( 'Display avatar' ) }
