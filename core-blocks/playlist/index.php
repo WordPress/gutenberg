@@ -38,19 +38,19 @@ function register_block_core_playlist() {
 				'type' => 'string',
 			),
 			'tracklist' => array(
-				'type' => 'boolean',
+				'type'    => 'boolean',
 				'default' => true,
 			),
 			'artists'   => array(
-				'type' => 'boolean',
+				'type'    => 'boolean',
 				'default' => true,
 			),
 			'images'    => array(
-				'type' => 'boolean',
+				'type'    => 'boolean',
 				'default' => true,
 			),
-			'style'    => array(
-				'type' => 'string',
+			'style'     => array(
+				'type'    => 'string',
 				'default' => 'light',
 			),
 			'align'     => array(
