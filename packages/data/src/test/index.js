@@ -394,24 +394,12 @@ describe( 'select', () => {
 describe( 'withSelect', () => {
 	let wrapper, store;
 
-	const unsubscribes = [];
 	afterEach( () => {
-		let unsubscribe;
-		while ( ( unsubscribe = unsubscribes.shift() ) ) {
-			unsubscribe();
-		}
-
 		if ( wrapper ) {
 			wrapper.unmount();
 			wrapper = null;
 		}
 	} );
-
-	function subscribeWithUnsubscribe( ...args ) {
-		const unsubscribe = store.subscribe( ...args );
-		unsubscribes.push( unsubscribe );
-		return unsubscribe;
-	}
 
 	it( 'passes the relevant data to the component', () => {
 		registerReducer( 'reactReducer', () => ( { reactKey: 'reactState' } ) );
@@ -426,11 +414,20 @@ describe( 'withSelect', () => {
 		// including both `withSelect` and `select` in the same scope, which
 		// shouldn't occur for a typical component, and if it did might wrongly
 		// encourage the developer to use `select` within the component itself.
-		const Component = withSelect( ( _select, ownProps ) => ( {
+		const mapSelectToProps = jest.fn().mockImplementation( ( _select, ownProps ) => ( {
 			data: _select( 'reactReducer' ).reactSelector( ownProps.keyName ),
-		} ) )( ( props ) => <div>{ props.data }</div> );
+		} ) );
+
+		const OriginalComponent = jest.fn().mockImplementation( ( props ) => (
+			<div>{ props.data }</div>
+		) );
+
+		const Component = withSelect( mapSelectToProps )( OriginalComponent );
 
 		wrapper = mount( <Component keyName="reactKey" /> );
+
+		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
+		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 
 		// Wrapper is the enhanced component. Find props on the rendered child.
 		const child = wrapper.childAt( 0 );
@@ -458,26 +455,43 @@ describe( 'withSelect', () => {
 			increment: () => ( { type: 'increment' } ),
 		} );
 
-		const Component = compose( [
-			withSelect( ( _select ) => ( {
-				count: _select( 'counter' ).getCount(),
-			} ) ),
-			withDispatch( ( _dispatch ) => ( {
-				increment: _dispatch( 'counter' ).increment,
-			} ) ),
-		] )( ( props ) => (
+		const mapSelectToProps = jest.fn().mockImplementation( ( _select ) => ( {
+			count: _select( 'counter' ).getCount(),
+		} ) );
+
+		const mapDispatchToProps = jest.fn().mockImplementation( ( _dispatch ) => ( {
+			increment: _dispatch( 'counter' ).increment,
+		} ) );
+
+		const OriginalComponent = jest.fn().mockImplementation( ( props ) => (
 			<button onClick={ props.increment }>
 				{ props.count }
 			</button>
 		) );
 
+		const Component = compose( [
+			withSelect( mapSelectToProps ),
+			withDispatch( mapDispatchToProps ),
+		] )( OriginalComponent );
+
 		wrapper = mount( <Component /> );
+
+		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
+		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
+		expect( mapDispatchToProps ).toHaveBeenCalledTimes( 1 );
 
 		const button = wrapper.find( 'button' );
 
 		button.simulate( 'click' );
 
 		expect( button.text() ).toBe( '1' );
+		// 3 times =
+		//  1. Initial mount
+		//  2. When click handler is called
+		//  3. After select updates its merge props
+		expect( mapDispatchToProps ).toHaveBeenCalledTimes( 3 );
+		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
+		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
 	} );
 
 	it( 'should rerun selection on props changes', () => {
@@ -493,45 +507,52 @@ describe( 'withSelect', () => {
 			getCount: ( state, offset ) => state + offset,
 		} );
 
-		const Component = withSelect( ( _select, ownProps ) => ( {
+		const mapSelectToProps = jest.fn().mockImplementation( ( _select, ownProps ) => ( {
 			count: _select( 'counter' ).getCount( ownProps.offset ),
-		} ) )( ( props ) => <div>{ props.count }</div> );
+		} ) );
+
+		const OriginalComponent = jest.fn().mockImplementation( ( props ) => (
+			<div>{ props.count }</div>
+		) );
+
+		const Component = withSelect( mapSelectToProps )( OriginalComponent );
 
 		wrapper = mount( <Component offset={ 0 } /> );
+
+		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
+		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 
 		wrapper.setProps( { offset: 10 } );
 
 		expect( wrapper.childAt( 0 ).text() ).toBe( '10' );
+		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
+		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
 	} );
 
-	it( 'ensures component is still mounted before setting state', () => {
-		// This test verifies that even though unsubscribe doesn't take effect
-		// until after the current listener stack is called, we don't attempt
-		// to setState on an unmounting `withSelect` component. It will fail if
-		// an attempt is made to `setState` on an unmounted component.
-		store = registerReducer( 'counter', ( state = 0, action ) => {
-			if ( action.type === 'increment' ) {
-				return state + 1;
-			}
+	it( 'should render if props have changed but not state', () => {
+		store = registerReducer( 'unchanging', ( state = {} ) => state );
 
-			return state;
+		registerSelectors( 'unchanging', {
+			getState: ( state ) => state,
 		} );
 
-		registerSelectors( 'counter', {
-			getCount: ( state, offset ) => state + offset,
-		} );
+		const mapSelectToProps = jest.fn();
 
-		subscribeWithUnsubscribe( () => {
-			wrapper.unmount();
-		} );
+		const OriginalComponent = jest.fn().mockImplementation( () => <div /> );
 
-		const Component = withSelect( ( _select, ownProps ) => ( {
-			count: _select( 'counter' ).getCount( ownProps.offset ),
-		} ) )( ( props ) => <div>{ props.count }</div> );
+		const Component = compose( [
+			withSelect( mapSelectToProps ),
+		] )( OriginalComponent );
 
-		wrapper = mount( <Component offset={ 0 } /> );
+		wrapper = mount( <Component /> );
 
-		store.dispatch( { type: 'increment' } );
+		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
+		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
+
+		wrapper.setProps( { propName: 'foo' } );
+
+		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
+		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
 	} );
 
 	it( 'should not rerun selection on unchanging state', () => {
@@ -543,15 +564,21 @@ describe( 'withSelect', () => {
 
 		const mapSelectToProps = jest.fn();
 
+		const OriginalComponent = jest.fn().mockImplementation( () => <div /> );
+
 		const Component = compose( [
 			withSelect( mapSelectToProps ),
-		] )( () => <div /> );
+		] )( OriginalComponent );
 
 		wrapper = mount( <Component /> );
+
+		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
+		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 
 		store.dispatch( { type: 'dummy' } );
 
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
+		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'omits props which are not returned on subsequent mappings', () => {
@@ -560,19 +587,26 @@ describe( 'withSelect', () => {
 			getValue: ( state ) => state,
 		} );
 
-		const Component = withSelect( ( _select, ownProps ) => {
+		const mapSelectToProps = jest.fn().mockImplementation( ( _select, ownProps ) => {
 			return {
 				[ ownProps.propName ]: _select( 'demo' ).getValue(),
 			};
-		} )( () => <div /> );
+		} );
+
+		const OriginalComponent = jest.fn().mockImplementation( () => <div /> );
+
+		const Component = withSelect( mapSelectToProps )( OriginalComponent );
 
 		wrapper = mount( <Component propName="foo" /> );
 
+		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
+		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 		expect( wrapper.childAt( 0 ).props() ).toEqual( { foo: 'OK', propName: 'foo' } );
 
 		wrapper.setProps( { propName: 'bar' } );
-		wrapper.update();
 
+		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
+		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
 		expect( wrapper.childAt( 0 ).props() ).toEqual( { bar: 'OK', propName: 'bar' } );
 	} );
 
@@ -582,25 +616,76 @@ describe( 'withSelect', () => {
 			getValue: ( state ) => state,
 		} );
 
-		const Component = withSelect( ( _select, ownProps ) => {
+		const mapSelectToProps = jest.fn().mockImplementation( ( _select, ownProps ) => {
 			if ( ownProps.pass ) {
 				return {
 					count: _select( 'demo' ).getValue(),
 				};
 			}
-		} )( ( props ) => <div>{ props.count || 'Unknown' }</div> );
+		} );
+
+		const OriginalComponent = jest.fn().mockImplementation( (
+			( props ) => <div>{ props.count || 'Unknown' }</div>
+		) );
+
+		const Component = withSelect( mapSelectToProps )( OriginalComponent );
 
 		wrapper = mount( <Component pass={ false } /> );
 
+		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
+		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 		expect( wrapper.childAt( 0 ).text() ).toBe( 'Unknown' );
 
 		wrapper.setProps( { pass: true } );
 
+		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
+		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
 		expect( wrapper.childAt( 0 ).text() ).toBe( 'OK' );
 
 		wrapper.setProps( { pass: false } );
 
+		expect( mapSelectToProps ).toHaveBeenCalledTimes( 3 );
+		expect( OriginalComponent ).toHaveBeenCalledTimes( 3 );
 		expect( wrapper.childAt( 0 ).text() ).toBe( 'Unknown' );
+	} );
+
+	it( 'should run selections on parents before its children', () => {
+		registerReducer( 'childRender', ( state = true, action ) => (
+			action.type === 'TOGGLE_RENDER' ? ! state : state
+		) );
+		registerSelectors( 'childRender', {
+			getValue: ( state ) => state,
+		} );
+		registerActions( 'childRender', {
+			toggleRender: () => ( { type: 'TOGGLE_RENDER' } ),
+		} );
+
+		const childMapStateToProps = jest.fn();
+		const parentMapStateToProps = jest.fn().mockImplementation( ( _select ) => ( {
+			isRenderingChild: _select( 'childRender' ).getValue(),
+		} ) );
+
+		const ChildOriginalComponent = jest.fn().mockImplementation( () => <div /> );
+		const ParentOriginalComponent = jest.fn().mockImplementation( ( props ) => (
+			<div>{ props.isRenderingChild ? <Child /> : null }</div>
+		) );
+
+		const Child = withSelect( childMapStateToProps )( ChildOriginalComponent );
+		const Parent = withSelect( parentMapStateToProps )( ParentOriginalComponent );
+
+		wrapper = mount( <Parent /> );
+
+		expect( childMapStateToProps ).toHaveBeenCalledTimes( 1 );
+		expect( parentMapStateToProps ).toHaveBeenCalledTimes( 1 );
+		expect( ChildOriginalComponent ).toHaveBeenCalledTimes( 1 );
+		expect( ParentOriginalComponent ).toHaveBeenCalledTimes( 1 );
+
+		dispatch( 'childRender' ).toggleRender();
+
+		expect( childMapStateToProps ).toHaveBeenCalledTimes( 1 );
+		expect( parentMapStateToProps ).toHaveBeenCalledTimes( 2 );
+		expect( ChildOriginalComponent ).toHaveBeenCalledTimes( 1 );
+		expect( ParentOriginalComponent ).toHaveBeenCalledTimes( 2 );
 	} );
 } );
 
