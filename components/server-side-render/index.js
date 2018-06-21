@@ -78,8 +78,10 @@ export class ServerSideRender extends Component {
 				<Placeholder><Spinner /></Placeholder>
 			);
 		} else if ( response.error ) {
+			// translators: %s: error message describing the problem
+			const errorMessage = sprintf( __( 'Error loading block: %s' ), response.errorMsg );
 			return (
-				<Placeholder>{ sprintf( __( 'Error loading block: %s' ), response.errorMsg ) }</Placeholder>
+				<Placeholder>{ errorMessage }</Placeholder>
 			);
 		} else if ( ! response.length ) {
 			return (
