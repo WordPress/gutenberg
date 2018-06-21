@@ -206,11 +206,19 @@ class MediaUpload extends Component {
 
 		if ( playlist ) {
 			const PlaylistDetailsMediaFrame = getPlaylistDetailsMediaFrame();
-			this.frame = new PlaylistDetailsMediaFrame( {
-				frame: 'select',
-				mimeType: type,
-				state: 'playlist',
-			} );
+			if ( type === 'video' ) {
+				this.frame = new PlaylistDetailsMediaFrame( {
+					frame: 'edit',
+					mimeType: 'video',
+					state: 'video-playlist',
+				} );
+			} else {
+				this.frame = new PlaylistDetailsMediaFrame( {
+					frame: 'select',
+					mimeType: type,
+					state: 'playlist',
+				} );
+			}
 			wp.media.frame = this.frame;
 		}
 
