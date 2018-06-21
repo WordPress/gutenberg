@@ -48,11 +48,17 @@ class PlaylistEdit extends Component {
 	}
 
 	addFiles( files ) {
-		editorMediaUpload( {
-			allowedType: 'audio',
-			filesList: files,
-		} );
-	}
+	        const { setAttributes } = this.props;
+	        editorMediaUpload( {
+	            allowedType: 'audio',
+	            filesList: files,
+	            onFileChange: ( media ) => {
+	                const ids = JSON.stringify( media.map( ( item ) => item.id ) );
+	                setAttributes( { ids, type: 'audio' } );
+	                this.setState( { editing: false } );
+	            },
+	        } );
+	    }
 
 	render() {
 		const { attributes, setAttributes, className } = this.props;
