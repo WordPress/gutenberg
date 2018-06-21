@@ -63,7 +63,7 @@ class PlaylistEdit extends Component {
 	render() {
 		const { attributes, setAttributes, className } = this.props;
 		const { editing } = this.state;
-		const { tracklist, artists, images, style } = attributes;
+		const { tracklist, artists, images, style, type } = attributes;
 		const styleOptions = [
 			{ value: 'light', label: __( 'Light' ) },
 			{ value: 'dark', label: __( 'Dark' ) },
@@ -139,7 +139,7 @@ class PlaylistEdit extends Component {
 					<Toolbar>
 						<MediaUpload
 							onSelect={ onSelectMedia }
-							type="audio"
+							type={ type }
 							multiple
 							playlist
 							value={ mediaIds }
