@@ -24,7 +24,7 @@ import apiRequest from '@wordpress/api-request';
  * @param {?Object} wpMimeTypesObject Mime type object received from the server.
  *                                    Extensions are keys separated by '|' and values are mime types associated with an extension.
  *
- * @return {?Array} Media Object Promise.
+ * @return {?Array} An array of mime types or the parameter passed if it was "falsy".
  */
 export function getMimeTypesArray( wpMimeTypesObject ) {
 	if ( ! wpMimeTypesObject ) {
