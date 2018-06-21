@@ -601,6 +601,36 @@ describe( 'withSelect', () => {
 
 		expect( wrapper.childAt( 0 ).text() ).toBe( 'Unknown' );
 	} );
+
+	it( 'should run selections on parents before its children', () => {
+		registerReducer( 'childRender', ( state = true, action ) => (
+			action.type === 'TOGGLE_RENDER' ? ! state : state
+		) );
+		registerSelectors( 'childRender', {
+			getValue: ( state ) => state,
+		} );
+		registerActions( 'childRender', {
+			toggleRender: () => ( { type: 'TOGGLE_RENDER' } ),
+		} );
+
+		const childMapStateToProps = jest.fn();
+
+		const Child = withSelect( childMapStateToProps )( () => {
+			return <div />;
+		} );
+
+		const Parent = withSelect( ( _select ) => ( {
+			isRenderingChild: _select( 'childRender' ).getValue(),
+		} ) )( ( props ) => ( <div>{ props.isRenderingChild ? <Child /> : null }</div> ) );
+
+		wrapper = mount( <Parent /> );
+
+		expect( childMapStateToProps ).toHaveBeenCalledTimes( 1 );
+
+		dispatch( 'childRender' ).toggleRender();
+
+		expect( childMapStateToProps ).toHaveBeenCalledTimes( 1 );
+	} );
 } );
 
 describe( 'withDispatch', () => {

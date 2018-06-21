@@ -273,6 +273,8 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 		constructor() {
 			super( ...arguments );
 
+			this.subscribe();
+
 			this.state = {};
 		}
 
@@ -289,14 +291,11 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 		}
 
 		componentDidMount() {
-			this.unsubscribe = subscribe( () => {
-				this.setState( () => (
-					this.constructor.getDerivedStateFromProps( this.props )
-				) );
-			} );
+			this.canRunSelection = true;
 		}
 
 		componentWillUnmount() {
+			this.canRunSelection = false;
 			this.unsubscribe();
 		}
 
@@ -305,6 +304,18 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 				! isShallowEqual( this.props, nextProps ) ||
 				! isShallowEqual( this.state.mergeProps, nextState.mergeProps )
 			);
+		}
+
+		subscribe() {
+			this.unsubscribe = subscribe( () => {
+				if ( ! this.canRunSelection ) {
+					return;
+				}
+
+				this.setState( () => (
+					this.constructor.getDerivedStateFromProps( this.props )
+				) );
+			} );
 		}
 
 		render() {
