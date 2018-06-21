@@ -366,7 +366,7 @@
 			}
 		}
 
-		// The padding collapses, but the outline is still 1px to compensate for. 
+		// The padding collapses, but the outline is still 1px to compensate for.
 		.editor-block-contextual-toolbar {
 			margin-bottom: 1px;
 		}
@@ -473,7 +473,7 @@
 		> .editor-block-list__breadcrumb {
 			right: -$border-width;
 		}
-		
+
 		// Compensate for main container padding and subtract border.
 		@include break-small() {
 			margin-left: -$block-side-ui-width - $block-padding - $block-side-ui-clearance - $border-width;
@@ -868,11 +868,14 @@
 
 	// This prevents floats from messing up the position.
 	position: absolute;
+	/*!rtl:ignore*/
 	left: 0;
 
 	.editor-block-list__block[data-align="right"] & {
+		/*!rtl:begin:ignore*/
 		left: auto;
 		right: 0;
+		/*!rtl:end:ignore*/
 	}
 
 	@include break-small() {
