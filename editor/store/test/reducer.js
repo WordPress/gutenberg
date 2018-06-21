@@ -1273,24 +1273,6 @@ describe( 'state', () => {
 				status: 'publish',
 			} );
 		} );
-
-		it( 'should set status to draft if autosave reset while auto-draft', () => {
-			const original = deepFreeze( { title: '', status: 'auto-draft' } );
-
-			const state = currentPost( original, {
-				type: 'RESET_AUTOSAVE',
-				edits: {
-					title: 'Hello world',
-					content: '',
-					excerpt: '',
-				},
-			} );
-
-			expect( state ).toEqual( {
-				title: '',
-				status: 'draft',
-			} );
-		} );
 	} );
 
 	describe( 'isInsertionPointVisible', () => {
@@ -2298,6 +2280,7 @@ describe( 'state', () => {
 						raw: 'The Excerpt',
 					},
 					status: 'draft',
+					preview_link: 'https://wordpress.org/?p=1&preview=true',
 				},
 			} );
 
@@ -2305,6 +2288,7 @@ describe( 'state', () => {
 				title: 'The Title',
 				content: 'The Content',
 				excerpt: 'The Excerpt',
+				preview_link: 'https://wordpress.org/?p=1&preview=true',
 			} );
 		} );
 	} );

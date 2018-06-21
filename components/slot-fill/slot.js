@@ -27,15 +27,15 @@ class Slot extends Component {
 		unregisterSlot( this.props.name, this );
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		const { name } = nextProps;
+	componentDidUpdate( prevProps ) {
+		const { name } = this.props;
 		const {
 			unregisterSlot = noop,
 			registerSlot = noop,
 		} = this.context;
 
-		if ( this.props.name !== name ) {
-			unregisterSlot( this.props.name );
+		if ( prevProps.name !== name ) {
+			unregisterSlot( prevProps.name );
 			registerSlot( name, this );
 		}
 	}

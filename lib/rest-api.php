@@ -439,45 +439,6 @@ function gutenberg_register_rest_api_post_revisions() {
 add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_revisions' );
 
 /**
- * Get the preview link for the post object.
- *
- * @see https://github.com/WordPress/gutenberg/issues/4555
- *
- * @param WP_Post $post Post object.
- * @return string
- */
-function gutenberg_get_post_preview_link( $post ) {
-	return get_preview_post_link( $post['id'] );
-}
-
-/**
- * Adds the 'preview_link' attribute to the REST API response of a post.
- *
- * @see https://github.com/WordPress/gutenberg/issues/4555
- */
-function gutenberg_register_rest_api_post_preview_link() {
-	foreach ( get_post_types( array( 'show_in_rest' => true ), 'names' ) as $post_type ) {
-		if ( ! is_post_type_viewable( $post_type ) ) {
-			continue;
-		}
-		register_rest_field( $post_type,
-			'preview_link',
-			array(
-				'get_callback' => 'gutenberg_get_post_preview_link',
-				'schema'       => array(
-					'description' => __( 'Preview link for the post.', 'gutenberg' ),
-					'type'        => 'string',
-					'format'      => 'uri',
-					'context'     => array( 'edit' ),
-					'readonly'    => true,
-				),
-			)
-		);
-	}
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_preview_link' );
-
-/**
  * Ensure that the wp-json index contains the 'theme-supports' setting as
  * part of its site info elements.
  *

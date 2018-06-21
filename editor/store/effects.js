@@ -29,6 +29,7 @@ import {
 	setupEditorState,
 	resetAutosave,
 	resetPost,
+	updatePost,
 	receiveBlocks,
 	receiveSharedBlocks,
 	replaceBlock,
@@ -64,6 +65,7 @@ import {
 	getTemplate,
 	getTemplateLock,
 	getAutosave,
+	isEditedPostNew,
 	POST_UPDATE_TRANSACTION_ID,
 } from './selectors';
 
@@ -96,7 +98,8 @@ export default {
 	REQUEST_POST_UPDATE( action, store ) {
 		const { dispatch, getState } = store;
 		const state = getState();
-		const isAutosave = action.options && action.options.autosave;
+		const post = getCurrentPost( state );
+		const isAutosave = !! action.options.autosave;
 
 		// Prevent save if not saveable.
 		const isSaveable = isAutosave ? isEditedPostAutosaveable : isEditedPostSaveable;
@@ -104,8 +107,26 @@ export default {
 			return;
 		}
 
-		const post = getCurrentPost( state );
-		const edits = getPostEdits( state );
+		let edits = getPostEdits( state );
+		if ( isAutosave ) {
+			edits = pick( edits, [ 'title', 'content', 'excerpt' ] );
+		}
+
+		// New posts (with auto-draft status) must be explicitly assigned draft
+		// status if there is not already a status assigned in edits (publish).
+		// Otherwise, they are wrongly left as auto-draft. Status is not always
+		// respected for autosaves, so it cannot simply be included in the pick
+		// above. This behavior relies on an assumption that an auto-draft post
+		// would never be saved by anyone other than the owner of the post, per
+		// logic within autosaves REST controller to save status field only for
+		// draft/auto-draft by current user.
+		//
+		// See: https://core.trac.wordpress.org/ticket/43316#comment:88
+		// See: https://core.trac.wordpress.org/ticket/43316#comment:89
+		if ( isEditedPostNew( state ) ) {
+			edits = { status: 'draft', ...edits };
+		}
+
 		let toSend = {
 			...edits,
 			content: getEditedPostContent( state ),
@@ -117,6 +138,14 @@ export default {
 			type: 'REQUEST_POST_UPDATE_START',
 			optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
 			isAutosave,
+		} );
+
+		// Optimistically apply updates under the assumption that the post
+		// will be updated. See below logic in success resolution for revert
+		// if the autosave is applied as a revision.
+		dispatch( {
+			...updatePost( toSend ),
+			optimist: { id: POST_UPDATE_TRANSACTION_ID },
 		} );
 
 		let request;
@@ -136,12 +165,6 @@ export default {
 				data: toSend,
 			} );
 		} else {
-			dispatch( {
-				type: 'UPDATE_POST',
-				edits: toSend,
-				optimist: { id: POST_UPDATE_TRANSACTION_ID },
-			} );
-
 			dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
 			dispatch( removeNotice( AUTOSAVE_POST_NOTICE_ID ) );
 
@@ -157,11 +180,23 @@ export default {
 				const reset = isAutosave ? resetAutosave : resetPost;
 				dispatch( reset( newPost ) );
 
+				// An autosave may be processed by the server as a regular save
+				// when its update is requested by the author and the post was
+				// draft or auto-draft.
+				const isRevision = newPost.id !== post.id;
+
 				dispatch( {
 					type: 'REQUEST_POST_UPDATE_SUCCESS',
 					previousPost: post,
 					post: newPost,
-					optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
+					optimist: {
+						// Note: REVERT is not a failure case here. Rather, it
+						// is simply reversing the assumption that the updates
+						// were applied to the post proper, such that the post
+						// treated as having unsaved changes.
+						type: isRevision ? REVERT : COMMIT,
+						id: POST_UPDATE_TRANSACTION_ID,
+					},
 					isAutosave,
 				} );
 			},
@@ -183,7 +218,16 @@ export default {
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
 		const { previousPost, post, isAutosave } = action;
-		const { dispatch } = store;
+		const { dispatch, getState } = store;
+
+		// TEMPORARY: If edits remain after a save completes, the user must be
+		// prompted about unsaved changes. This should be refactored as part of
+		// the `isEditedPostDirty` selector instead.
+		//
+		// See: https://github.com/WordPress/gutenberg/issues/7409
+		if ( Object.keys( getPostEdits( getState() ) ).length ) {
+			dispatch( { type: 'DIRTY_ARTIFICIALLY' } );
+		}
 
 		// Autosaves are neither shown a notice nor redirected.
 		if ( isAutosave ) {
@@ -375,7 +419,6 @@ export default {
 		const edits = {};
 		if ( post.status === 'auto-draft' ) {
 			edits.title = post.title.raw;
-			edits.status = 'draft';
 		}
 
 		// Check the auto-save status

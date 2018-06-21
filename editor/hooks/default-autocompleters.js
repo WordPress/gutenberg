@@ -40,7 +40,7 @@ function setDefaultCompleters( completers, blockName ) {
 }
 
 addFilter(
-	'blocks.Autocomplete.completers',
-	'blocks/autocompleters/set-default-completers',
+	'editor.Autocomplete.completers',
+	'editor/autocompleters/set-default-completers',
 	setDefaultCompleters
 );

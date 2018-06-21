@@ -104,5 +104,5 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 }
 
 addFilter( 'blocks.registerBlockType', 'core/anchor/attribute', addAttribute );
-addFilter( 'blocks.BlockEdit', 'core/anchor/inspector-control', withInspectorControl );
+addFilter( 'editor.BlockEdit', 'core/editor/anchor/with-inspector-control', withInspectorControl );
 addFilter( 'blocks.getSaveContent.extraProps', 'core/anchor/save-props', addSaveProps );
