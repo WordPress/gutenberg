@@ -312,9 +312,12 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 					return;
 				}
 
-				this.setState( () => (
-					this.constructor.getDerivedStateFromProps( this.props )
-				) );
+				// Trigger an update. Behavior of `getDerivedStateFromProps` as
+				// of React 16.4.0 is such that it will be called by any update
+				// to the component, including state changes.
+				//
+				// See: https://reactjs.org/blog/2018/05/23/react-v-16-4.html#bugfix-for-getderivedstatefromprops
+				this.setState( () => ( {} ) );
 			} );
 		}
 
