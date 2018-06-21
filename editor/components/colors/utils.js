@@ -20,7 +20,7 @@ export const getColorValue = ( colors, namedColor, customColor ) => {
 
 		if( typeof colorObj === 'undefined' && typeof ( colorObj = find( colors, { name: namedColor } ) ) !== 'undefined' ) {
 			deprecated( 'Using color objects without slugs', {
-				version: '3.3',
+				version: '3.4',
 				hint: 'You might want to re-select the color if you have saved in previous versions. The frontend is unaffected by this deprecation.',
 			} );
 		}
