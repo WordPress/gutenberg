@@ -214,6 +214,7 @@ describe( 'blocks', () => {
 							fill="red" stroke="blue" strokeWidth="10" />
 					</svg> ),
 				},
+				attributes: {},
 			} );
 		} );
 
@@ -233,6 +234,7 @@ describe( 'blocks', () => {
 				icon: {
 					src: 'foo',
 				},
+				attributes: {},
 			} );
 		} );
 
@@ -258,6 +260,7 @@ describe( 'blocks', () => {
 				icon: {
 					src: MyTestIcon,
 				},
+				attributes: {},
 			} );
 		} );
 
@@ -289,6 +292,7 @@ describe( 'blocks', () => {
 							fill="red" stroke="blue" strokeWidth="10" />
 					</svg> ),
 				},
+				attributes: {},
 			} );
 		} );
 
@@ -305,6 +309,7 @@ describe( 'blocks', () => {
 				icon: {
 					src: 'block-default',
 				},
+				attributes: {},
 			} );
 		} );
 
@@ -345,6 +350,7 @@ describe( 'blocks', () => {
 					icon: {
 						src: 'block-default',
 					},
+					attributes: {},
 				},
 			] );
 			const oldBlock = unregisterBlockType( 'core/test-block' );
@@ -357,6 +363,7 @@ describe( 'blocks', () => {
 				icon: {
 					src: 'block-default',
 				},
+				attributes: {},
 			} );
 			expect( getBlockTypes() ).toEqual( [] );
 		} );
@@ -401,6 +408,7 @@ describe( 'blocks', () => {
 				icon: {
 					src: 'block-default',
 				},
+				attributes: {},
 			} );
 		} );
 
@@ -416,6 +424,7 @@ describe( 'blocks', () => {
 				icon: {
 					src: 'block-default',
 				},
+				attributes: {},
 			} );
 		} );
 	} );
@@ -438,6 +447,7 @@ describe( 'blocks', () => {
 					icon: {
 						src: 'block-default',
 					},
+					attributes: {},
 				},
 				{
 					name: 'core/test-block-with-settings',
@@ -448,6 +458,7 @@ describe( 'blocks', () => {
 					icon: {
 						src: 'block-default',
 					},
+					attributes: {},
 				},
 			] );
 		} );
