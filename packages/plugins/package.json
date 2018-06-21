@@ -1,15 +1,14 @@
 {
-	"name": "@wordpress/element",
+	"name": "@wordpress/plugins",
 	"version": "1.0.0-alpha.1",
-	"description": "Element React module for WordPress",
+	"description": "Plugins module for WordPress",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
-		"element",
-		"react"
+		"plugins"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/element/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/plugins/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git"
@@ -20,14 +19,9 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"@wordpress/deprecated": "^1.0.0-alpha.1",
-		"@wordpress/is-shallow-equal": "1.0.2",
-		"lodash": "4.17.5",
-		"react": "16.4.1",
-		"react-dom": "16.4.1"
-	},
-	"devDependencies": {
-		"enzyme": "3.3.0"
+		"@wordpress/element": "^1.0.0-alpha.1",
+		"@wordpress/hooks": "1.1.6",
+		"lodash": "4.17.5"
 	},
 	"publishConfig": {
 		"access": "public"

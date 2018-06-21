@@ -107,6 +107,7 @@ class MediaPlaceholder extends Component {
 			<Placeholder
 				icon={ icon }
 				label={ labels.title }
+				// translators: %s: media name label e.g: "an audio","an image", "a video"
 				instructions={ sprintf( __( 'Drag %s, upload a new one or select a file from your library.' ), labels.name ) }
 				className={ classnames( 'editor-media-placeholder', className ) }
 				notices={ <Fragment>{ additionalNotices }{ noticeUI }</Fragment> }

@@ -73,6 +73,7 @@ export function mediaUpload( {
 			onError( {
 				code: 'SIZE_ABOVE_LIMIT',
 				message: sprintf(
+					// translators: %s: file name
 					__( '%s exceeds the maximum upload size for this site.' ),
 					mediaFile.name
 				),
@@ -103,6 +104,7 @@ export function mediaUpload( {
 				onError( {
 					code: 'GENERAL',
 					message: sprintf(
+						// translators: %s: file name
 						__( 'Error while uploading file %s to the media library.' ),
 						mediaFile.name
 					),

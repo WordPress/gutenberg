@@ -145,6 +145,11 @@
 		}
 	}
 
+	/* Link buttons that are red to indicate destructive behavior. */
+	&.is-link.is-destructive {
+		color: $alert-red;
+	}
+
 	&:active {
 		color: currentColor;
 	}
