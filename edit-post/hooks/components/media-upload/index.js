@@ -215,7 +215,7 @@ class MediaUpload extends Component {
 			} );
 			wp.media.frame = this.frame;
 		}
-
+  
 		if ( modalClass ) {
 			this.frame.$el.addClass( modalClass );
 		}

@@ -31,7 +31,6 @@ export const blockEditRender = ( name, settings ) => {
 			attributes={ block.attributes }
 			setAttributes={ noop }
 			user={ {} }
-			createInnerBlockList={ noop }
 		/>
 	);
 };

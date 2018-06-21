@@ -63,11 +63,6 @@ Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs
 
 *Optional.* A list of autocompleters to use instead of the default.
 
-### `aria-multiline: Boolean`
-
-*Default: `true`.* [aria-multiline](https://www.w3.org/TR/wai-aria-1.1/#aria-multiline) indicates whether a text box accepts multiple lines of input or only a single line.
-If the context where the RichText is being used is closer to a `<textarea />` than to a `<input type="text">` (multiple lines can be rendered to represent the input) aria-multiline should be equal to true (default) otherwise false should be used.
-
 ## RichText.Content
 
 When using RichText in the edit function of blocks, the usage of `RichText.Content` is recommended in the save function of your blocks to save the correct HTML.

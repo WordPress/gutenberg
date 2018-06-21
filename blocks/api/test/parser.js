@@ -16,6 +16,8 @@ import {
 	getBlockTypes,
 	setUnknownTypeHandlerName,
 } from '../registration';
+import { createBlock } from '../factory';
+import serialize from '../serializer';
 
 describe( 'block parser', () => {
 	const defaultBlockSettings = {
@@ -570,6 +572,25 @@ describe( 'block parser', () => {
 			expect( parsed.map( ( { name } ) => name ) ).toEqual( [
 				'core/test-block', 'core/void-block',
 			] );
+		} );
+
+		it( 'should parse with unicode escaped returned to original representation', () => {
+			registerBlockType( 'core/code', {
+				category: 'common',
+				title: 'Code Block',
+				attributes: {
+					content: {
+						type: 'string',
+					},
+				},
+				save: ( { attributes } ) => attributes.content,
+			} );
+
+			const content = '$foo = "My \"escaped\" text.";';
+			const block = createBlock( 'core/code', { content } );
+			const serialized = serialize( block );
+			const parsed = parse( serialized );
+			expect( parsed[ 0 ].attributes.content ).toBe( content );
 		} );
 	} );
 } );

@@ -10,10 +10,6 @@ To modify the behavior of existing blocks, Gutenberg exposes the following Filte
 
 Used to filter the block settings. It receives the block settings and the name of the block the registered block as arguments.
 
-#### `blocks.BlockEdit`
-
-Used to modify the block's `edit` component. It receives the original block `edit` component and returns a new wrapped component.
-
 #### `blocks.getSaveElement`
 
 A filter that applies to the result of a block's `save` function. This filter is used to replace or extend the element, for example using `wp.element.cloneElement` to modify the element's props or replace its children, or returning an entirely new element.
@@ -69,6 +65,75 @@ Used internally by the default block (paragraph) to exclude the attributes from 
 #### `blocks.switchToBlockType.transformedBlock`
 
 Used to filters an individual transform result from block transformation. All of the original blocks are passed, since transformations are many-to-many, not one-to-one.
+
+#### `editor.BlockEdit`
+
+Used to modify the block's `edit` component. It receives the original block `BlockEdit` component and returns a new wrapped component.
+
+_Example:_
+
+```js
+var el = wp.element.createElement;
+
+var withInspectorControls = wp.element.createHigherOrderComponent( function( BlockEdit ) {
+	return function( props ) {
+		return el(
+			wp.element.Fragment,
+			{},
+			el(
+				BlockEdit,
+				props
+			),
+			el(
+				wp.editor.InspectorControls,
+				{},
+				el(
+					wp.components.PanelBody,
+					{},
+					'My custom control'
+				)
+			)
+		);
+	};
+}, 'withInspectorControls' );
+
+wp.hooks.addFilter( 'editor.BlockEdit', 'my-plugin/with-inspector-controls', withInspectorControls );
+```
+
+#### `editor.BlockListBlock`
+
+Used to modify the block's wrapper component containing the block's `edit` component and all toolbars. It receives the original `BlockListBlock` component and returns a new wrapped component.
+
+_Example:_
+
+```js
+var el = wp.element.createElement;
+
+var withDataAlign = wp.element.createHigherOrderComponent( function( BlockListBlock ) {
+	return function( props ) {
+		var newProps = Object.assign(
+			{},
+			props,
+			{
+				wrapperProps: Object.assign(
+					{},
+					props.wrapperProps,
+					{
+						'data-align': props.block.attributes.align
+					}
+				)
+			}
+		);
+
+		return el(
+			BlockListBlock,
+			newProps
+		);
+	};
+}, 'withAlign' );
+
+wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-data-align', withDataAlign );
+```
 
 ## Removing Blocks
 

@@ -1,4 +1,3 @@
-import './deprecated';
 import './store';
 import './hooks';
 

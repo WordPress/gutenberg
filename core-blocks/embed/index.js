@@ -209,6 +209,7 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 				}
 
 				if ( ! html ) {
+					// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
 					const label = sprintf( __( '%s URL' ), title );
 
 					return (
@@ -237,6 +238,7 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 
 				const parsedUrl = parse( url );
 				const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedUrl.host.replace( /^www\./, '' ) );
+				// translators: %s: host providing embed content e.g: www.youtube.com
 				const iframeTitle = sprintf( __( 'Embedded content from %s' ), parsedUrl.host );
 				const embedWrapper = 'wp-embed' === type ? (
 					<div
