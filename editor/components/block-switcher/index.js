@@ -96,7 +96,7 @@ export class BlockSwitcher extends Component {
 						}
 						<PanelBody
 							title={ __( 'Block transforms' ) }
-							initialOpen={ ! hasStyles }
+							initialOpen
 						>
 							{ allowedBlocks.map( ( { name, title, icon } ) => (
 								<IconButton

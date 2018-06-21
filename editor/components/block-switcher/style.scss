@@ -51,6 +51,8 @@
 		border: 1px solid $light-gray-500;
 		overflow: hidden;
 		padding: 5px;
+		text-align: initial;
+
 		> * {
 			transform: scale( 0.7 );
 			transform-origin: center top;
