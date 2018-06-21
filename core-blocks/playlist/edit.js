@@ -3,7 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
-	Button,
 	FormFileUpload,
 	IconButton,
 	Placeholder,
@@ -114,9 +113,7 @@ class PlaylistEdit extends Component {
 						playlist
 						value={ this.props.attributes.ids }
 						render={ ( { open } ) => (
-							<Button isLarge onClick={ open }>
-								{ __( 'Media Library' ) }
-							</Button>
+							<IconButton isLarge icon="edit" label={ __( 'Media Library' ) } onClick={ open } />
 						) }
 					/>
 				</Placeholder>
