@@ -9,6 +9,9 @@ import { StrictMode } from '@wordpress/element';
  * Internal dependencies
  */
 import Layout from './components/layout';
+import store from './store';
+
+const initializeStore = () => store.dispatch( { type: 'INIT' } );
 
 function Editor( { settings, hasFixedToolbar, post, overridePost, onError, ...props } ) {
 	if ( ! post ) {
@@ -22,7 +25,11 @@ function Editor( { settings, hasFixedToolbar, post, overridePost, onError, ...pr
 
 	return (
 		<StrictMode>
-			<EditorProvider settings={ editorSettings } post={ { ...post, ...overridePost } } { ...props }>
+			<EditorProvider
+				settings={ editorSettings }
+				post={ { ...post, ...overridePost } }
+				onStoreCreated={ initializeStore }
+				{ ...props }>
 				<ErrorBoundary onError={ onError }>
 					<Layout />
 				</ErrorBoundary>

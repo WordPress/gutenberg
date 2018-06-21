@@ -28,6 +28,5 @@ const store = registerStore( 'core/edit-post', {
 
 applyMiddlewares( store );
 loadAndPersist( store, reducer, 'preferences', STORAGE_KEY );
-store.dispatch( { type: 'INIT' } );
 
 export default store;

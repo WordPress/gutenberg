@@ -13,7 +13,6 @@ import {
 	switchToBlockType,
 	createBlock,
 	serialize,
-	isSharedBlock,
 	getDefaultBlockForPostFormat,
 	doBlocksMatchTemplate,
 	synchronizeBlocksWithTemplate,
@@ -21,6 +20,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import apiRequest from '@wordpress/api-request';
+import { select } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -30,7 +30,6 @@ import {
 	resetAutosave,
 	resetPost,
 	updatePost,
-	receiveBlocks,
 	receiveSharedBlocks,
 	replaceBlock,
 	replaceBlocks,
@@ -40,7 +39,6 @@ import {
 	removeNotice,
 	saveSharedBlock,
 	insertBlock,
-	removeBlocks,
 	selectBlock,
 	removeBlock,
 	resetBlocks,
@@ -57,7 +55,6 @@ import {
 	getBlockCount,
 	getBlockRootUID,
 	getBlocks,
-	getSharedBlock,
 	getPreviousBlockUid,
 	getProvisionalBlockUID,
 	getSelectedBlock,
@@ -476,35 +473,25 @@ export default {
 			return;
 		}
 
-		const { id } = action;
 		const { dispatch } = store;
 
-		let result;
-		if ( id ) {
-			result = apiRequest( { path: `/wp/v2/${ basePath }/${ id }` } );
-		} else {
-			result = apiRequest( { path: `/wp/v2/${ basePath }?per_page=-1` } );
-		}
-
-		result.then(
+		apiRequest( { path: `/wp/v2/${ basePath }?context=edit&per_page=-1` } ).then(
 			( sharedBlockOrBlocks ) => {
 				dispatch( receiveSharedBlocks( map(
 					castArray( sharedBlockOrBlocks ),
 					( sharedBlock ) => ( {
 						sharedBlock,
-						parsedBlock: parse( sharedBlock.content )[ 0 ],
+						parsedBlock: parse( sharedBlock.content.raw )[ 0 ],
 					} )
 				) ) );
 
 				dispatch( {
 					type: 'FETCH_SHARED_BLOCKS_SUCCESS',
-					id,
 				} );
 			},
 			( error ) => {
 				dispatch( {
 					type: 'FETCH_SHARED_BLOCKS_FAILURE',
-					id,
 					error: error.responseJSON || {
 						code: 'unknown_error',
 						message: __( 'An unknown error occurred.' ),
@@ -512,9 +499,6 @@ export default {
 				} );
 			}
 		);
-	},
-	RECEIVE_SHARED_BLOCKS( action ) {
-		return receiveBlocks( map( action.results, 'parsedBlock' ) );
 	},
 	SAVE_SHARED_BLOCK( action, store ) {
 		// TODO: these are potentially undefined, this fix is in place
@@ -524,17 +508,13 @@ export default {
 			return;
 		}
 
-		const { id } = action;
+		const { sharedBlock, content } = action;
+		const { id, title } = sharedBlock;
 		const { dispatch } = store;
-		const state = store.getState();
 
-		const { uid, title, isTemporary } = getSharedBlock( state, id );
-		const { name, attributes, innerBlocks } = getBlock( state, uid );
-		const content = serialize( createBlock( name, attributes, innerBlocks ) );
-
-		const data = isTemporary ? { title, content } : { id, title, content };
-		const path = isTemporary ? `/wp/v2/${ basePath }` : `/wp/v2/${ basePath }/${ id }`;
-		const method = isTemporary ? 'POST' : 'PUT';
+		const data = { title, content };
+		const path = `/wp/v2/${ basePath }`;
+		const method = 'POST';
 
 		apiRequest( { path, data, method } ).then(
 			( updatedSharedBlock ) => {
@@ -543,7 +523,7 @@ export default {
 					updatedId: updatedSharedBlock.id,
 					id,
 				} );
-				const message = isTemporary ? __( 'Block created.' ) : __( 'Block updated.' );
+				const message = __( 'Block created.' );
 				dispatch( createSuccessNotice( message, { id: SHARED_BLOCK_NOTICE_ID } ) );
 			},
 			( error ) => {
@@ -565,18 +545,7 @@ export default {
 		}
 
 		const { id } = action;
-		const { getState, dispatch } = store;
-
-		// Don't allow a shared block with a temporary ID to be deleted
-		const sharedBlock = getSharedBlock( getState(), id );
-		if ( ! sharedBlock || sharedBlock.isTemporary ) {
-			return;
-		}
-
-		// Remove any other blocks that reference this shared block
-		const allBlocks = getBlocks( getState() );
-		const associatedBlocks = allBlocks.filter( ( block ) => isSharedBlock( block ) && block.attributes.ref === id );
-		const associatedBlockUids = associatedBlocks.map( ( block ) => block.uid );
+		const { dispatch } = store;
 
 		const transactionId = uniqueId();
 
@@ -586,13 +555,7 @@ export default {
 			optimist: { type: BEGIN, id: transactionId },
 		} );
 
-		// Remove the parsed block.
-		dispatch( removeBlocks( [
-			...associatedBlockUids,
-			sharedBlock.uid,
-		] ) );
-
-		apiRequest( { path: `/wp/v2/${ basePath }/${ id }`, method: 'DELETE' } ).then(
+		apiRequest( { path: `/wp/v2/${ basePath }/${ id }?force=true`, method: 'DELETE' } ).then(
 			() => {
 				dispatch( {
 					type: 'DELETE_SHARED_BLOCK_SUCCESS',
@@ -619,8 +582,8 @@ export default {
 	CONVERT_BLOCK_TO_STATIC( action, store ) {
 		const state = store.getState();
 		const oldBlock = getBlock( state, action.uid );
-		const sharedBlock = getSharedBlock( state, oldBlock.attributes.ref );
-		const referencedBlock = getBlock( state, sharedBlock.uid );
+		const reducerKey = 'core/editor-shared-' + oldBlock.attributes.ref;
+		const referencedBlock = select( reducerKey ).getBlocks()[ 0 ];
 		const newBlock = createBlock( referencedBlock.name, referencedBlock.attributes );
 		store.dispatch( replaceBlock( oldBlock.uid, newBlock ) );
 	},
@@ -628,6 +591,7 @@ export default {
 		const { getState, dispatch } = store;
 
 		const parsedBlock = getBlock( getState(), action.uid );
+		const content = serialize( parsedBlock );
 		const sharedBlock = {
 			id: uniqueId( 'shared' ),
 			uid: parsedBlock.uid,
@@ -639,7 +603,7 @@ export default {
 			parsedBlock,
 		} ] ) );
 
-		dispatch( saveSharedBlock( sharedBlock.id ) );
+		dispatch( saveSharedBlock( sharedBlock, content ) );
 
 		dispatch( replaceBlock(
 			parsedBlock.uid,
@@ -648,9 +612,6 @@ export default {
 				layout: parsedBlock.attributes.layout,
 			} )
 		) );
-
-		// Re-add the original block to the store, since replaceBlock() will have removed it
-		dispatch( receiveBlocks( [ parsedBlock ] ) );
 	},
 	CREATE_NOTICE( { notice: { content, spokenMessage } } ) {
 		const message = spokenMessage || content;

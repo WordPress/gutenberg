@@ -1,169 +1,111 @@
 /**
- * External dependencies
- */
-import { noop, partial } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { Component, Fragment, compose } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import { Placeholder, Spinner, Disabled } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
-import { BlockEdit } from '@wordpress/editor';
+import { EditorProvider, BlockList } from '@wordpress/editor';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
  */
 import SharedBlockEditPanel from './edit-panel';
 import SharedBlockIndicator from './indicator';
+import SharedBlockSelection from './selection';
 
 class SharedBlockEdit extends Component {
-	constructor( { sharedBlock } ) {
+	constructor( props ) {
 		super( ...arguments );
 
-		this.startEditing = this.startEditing.bind( this );
-		this.stopEditing = this.stopEditing.bind( this );
-		this.setAttributes = this.setAttributes.bind( this );
-		this.setTitle = this.setTitle.bind( this );
-		this.save = this.save.bind( this );
+		this.startEditing = this.toggleEditing.bind( this, true );
+		this.stopEditing = this.toggleEditing.bind( this, false );
 
+		const { sharedBlock, settings } = props;
 		this.state = {
 			isEditing: !! ( sharedBlock && sharedBlock.isTemporary ),
-			title: null,
-			changedAttributes: null,
+			settingsWithLock: { ...settings, templateLock: true },
 		};
 	}
 
-	componentDidMount() {
-		if ( ! this.props.sharedBlock ) {
-			this.props.fetchSharedBlock();
-		}
-	}
-
-	startEditing() {
-		const { sharedBlock } = this.props;
-
-		this.setState( {
-			isEditing: true,
-			title: sharedBlock.title,
-			changedAttributes: {},
-		} );
-	}
-
-	stopEditing() {
-		this.setState( {
-			isEditing: false,
-			title: null,
-			changedAttributes: null,
-		} );
-	}
-
-	setAttributes( attributes ) {
-		this.setState( ( prevState ) => {
-			if ( prevState.changedAttributes !== null ) {
-				return { changedAttributes: { ...prevState.changedAttributes, ...attributes } };
-			}
-		} );
-	}
-
-	setTitle( title ) {
-		this.setState( { title } );
-	}
-
-	save() {
-		const { sharedBlock, onUpdateTitle, updateAttributes, block, onSave } = this.props;
-		const { title, changedAttributes } = this.state;
-
-		if ( title !== sharedBlock.title ) {
-			onUpdateTitle( title );
+	static getDerivedStateFromProps( props, prevState ) {
+		if ( isShallowEqual( props.settings, prevState.settings ) ) {
+			return null;
 		}
 
-		updateAttributes( block.uid, changedAttributes );
-		onSave();
+		return {
+			settings: props.settings,
+			settingsWithLock: {
+				...props.settings,
+				templateLock: true,
+			},
+		};
+	}
 
-		this.stopEditing();
+	toggleEditing( isEditing ) {
+		this.setState( { isEditing } );
 	}
 
 	render() {
-		const { isSelected, sharedBlock, block, isFetching, isSaving } = this.props;
-		const { isEditing, title, changedAttributes } = this.state;
+		const { setIsSelected, sharedBlock, isSelected, isSaving } = this.props;
+		const { settingsWithLock, isEditing } = this.state;
 
-		if ( ! sharedBlock && isFetching ) {
+		if ( ! sharedBlock ) {
 			return <Placeholder><Spinner /></Placeholder>;
 		}
 
-		if ( ! sharedBlock || ! block ) {
-			return <Placeholder>{ __( 'Block has been deleted or is unavailable.' ) }</Placeholder>;
-		}
-
-		let element = (
-			<BlockEdit
-				{ ...this.props }
-				isSelected={ isEditing && isSelected }
-				id={ block.uid }
-				name={ block.name }
-				attributes={ { ...block.attributes, ...changedAttributes } }
-				setAttributes={ isEditing ? this.setAttributes : noop }
-			/>
-		);
-
+		let list = <BlockList />;
 		if ( ! isEditing ) {
-			element = <Disabled>{ element }</Disabled>;
+			list = <Disabled>{ list }</Disabled>;
 		}
 
 		return (
-			<Fragment>
-				{ element }
-				{ ( isSelected || isEditing ) && (
-					<SharedBlockEditPanel
-						isEditing={ isEditing }
-						title={ title !== null ? title : sharedBlock.title }
-						isSaving={ isSaving && ! sharedBlock.isTemporary }
-						onEdit={ this.startEditing }
-						onChangeTitle={ this.setTitle }
-						onSave={ this.save }
-						onCancel={ this.stopEditing }
-					/>
-				) }
-				{ ! isSelected && ! isEditing && <SharedBlockIndicator title={ sharedBlock.title } /> }
-			</Fragment>
+			<EditorProvider
+				reducerKey={ 'core/editor-shared-' + sharedBlock.id }
+				postType="wp_block"
+				inheritContext
+				settings={ settingsWithLock }
+				post={ sharedBlock }
+			>
+				<SharedBlockSelection
+					isSharedBlockSelected={ isSelected }
+					onBlockSelection={ setIsSelected }
+				>
+					{ list }
+					{ ( isSelected || isEditing ) && (
+						<SharedBlockEditPanel
+							isEditing={ isEditing }
+							isSaving={ isSaving && ! sharedBlock.isTemporary }
+							onEdit={ this.startEditing }
+							onFinishedEditing={ this.stopEditing }
+						/>
+					) }
+					{ ! isSelected && ! isEditing && <SharedBlockIndicator /> }
+				</SharedBlockSelection>
+			</EditorProvider>
 		);
 	}
 }
 
 export default compose( [
 	withSelect( ( select, ownProps ) => {
-		const {
-			getSharedBlock,
-			isFetchingSharedBlock,
-			isSavingSharedBlock,
-			getBlock,
-		} = select( 'core/editor' );
 		const { ref } = ownProps.attributes;
-		const sharedBlock = getSharedBlock( ref );
+		if ( ! Number.isFinite( ref ) ) {
+			return;
+		}
 
+		const { getEntityRecord } = select( 'core' );
 		return {
-			sharedBlock,
-			isFetching: isFetchingSharedBlock( ref ),
-			isSaving: isSavingSharedBlock( ref ),
-			block: sharedBlock ? getBlock( sharedBlock.uid ) : null,
+			sharedBlock: getEntityRecord( 'postType', 'wp_block', ref ),
+			settings: select( 'core/editor' ).getEditorSettings(),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
-		const {
-			fetchSharedBlocks,
-			updateBlockAttributes,
-			updateSharedBlockTitle,
-			saveSharedBlock,
-		} = dispatch( 'core/editor' );
-		const { ref } = ownProps.attributes;
+		const { selectBlock } = dispatch( 'core/editor' );
+		const { id } = ownProps;
 
 		return {
-			fetchSharedBlock: partial( fetchSharedBlocks, ref ),
-			updateAttributes: updateBlockAttributes,
-			onUpdateTitle: partial( updateSharedBlockTitle, ref ),
-			onSave: partial( saveSharedBlock, ref ),
+			setIsSelected: () => selectBlock( id ),
 		};
 	} ),
 ] )( SharedBlockEdit );

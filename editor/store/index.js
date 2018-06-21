@@ -21,14 +21,18 @@ import * as actions from './actions';
  * Module Constants
  */
 const STORAGE_KEY = `GUTENBERG_PREFERENCES_${ window.userSettings.uid }`;
-const MODULE_KEY = 'core/editor';
+const REDUCER_KEY = 'core/editor';
 
-const store = applyMiddlewares(
-	registerReducer( MODULE_KEY, withRehydration( reducer, 'preferences', STORAGE_KEY ) )
-);
-loadAndPersist( store, reducer, 'preferences', STORAGE_KEY );
+function createEditorStore( reducerKey = REDUCER_KEY ) {
+	const store = applyMiddlewares(
+		registerReducer( reducerKey, withRehydration( reducer, 'preferences', STORAGE_KEY ) )
+	);
+	loadAndPersist( store, reducer, 'preferences', STORAGE_KEY );
 
-registerSelectors( MODULE_KEY, selectors );
-registerActions( MODULE_KEY, actions );
+	registerSelectors( reducerKey, selectors );
+	registerActions( reducerKey, actions );
 
-export default store;
+	return store;
+}
+
+export default createEditorStore;

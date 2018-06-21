@@ -64,6 +64,17 @@ const withHistory = ( options = {} ) => ( reducer ) => {
 		lastAction = action;
 
 		switch ( action.type ) {
+			case 'UNDO_ALL':
+				// Can't undo if no past.
+				if ( ! past.length ) {
+					return state;
+				}
+
+				return {
+					past: [],
+					present: first( past ),
+					future: [],
+				};
 			case 'UNDO':
 				// Can't undo if no past.
 				if ( ! past.length ) {

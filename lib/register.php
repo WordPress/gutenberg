@@ -389,7 +389,6 @@ function gutenberg_register_post_types() {
 		'public'                => false,
 		'show_in_rest'          => true,
 		'rest_base'             => 'blocks',
-		'rest_controller_class' => 'WP_REST_Blocks_Controller',
 		'capability_type'       => 'block',
 		'capabilities'          => array(
 			'read'         => 'read_blocks',

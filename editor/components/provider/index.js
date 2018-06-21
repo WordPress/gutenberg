@@ -2,17 +2,19 @@
  * External dependencies
  */
 import { flow, pick } from 'lodash';
+import memoize from 'memize';
 
 /**
  * WordPress Dependencies
  */
-import { createElement, Component } from '@wordpress/element';
+import { createElement, Component, compose } from '@wordpress/element';
 import {
 	APIProvider,
 	DropZoneProvider,
 	SlotFillProvider,
 } from '@wordpress/components';
-import { withDispatch } from '@wordpress/data';
+import { withDispatch, withCustomReducerKey } from '@wordpress/data';
+import createEditorStore from '../../store';
 
 /**
  * Internal dependencies
@@ -42,7 +44,13 @@ class EditorProvider extends Component {
 			undo,
 			redo,
 			createUndoLevel,
+			inheritContext,
 		} = this.props;
+
+		if ( inheritContext ) {
+			return children;
+		}
+
 		const providers = [
 			// RichText provider:
 			//
@@ -99,19 +107,47 @@ class EditorProvider extends Component {
 	}
 }
 
-export default withDispatch( ( dispatch ) => {
-	const {
-		setupEditor,
-		updateEditorSettings,
-		undo,
-		redo,
-		createUndoLevel,
-	} = dispatch( 'core/editor' );
-	return {
-		setupEditor,
-		undo,
-		redo,
-		createUndoLevel,
-		updateEditorSettings,
-	};
-} )( EditorProvider );
+const createStoreOnce = memoize( ( reducerKey ) => createEditorStore( reducerKey ) );
+
+export default compose( [
+	( WrappedComponent ) => class extends Component {
+		constructor( props ) {
+			super( ...arguments );
+
+			createStoreOnce( props.reducerKey );
+		}
+
+		componentDidMount() {
+			if ( this.props.onStoreCreated ) {
+				this.props.onStoreCreated();
+			}
+		}
+
+		render() {
+			return <WrappedComponent { ...this.props } />;
+		}
+	},
+	withCustomReducerKey( ( reducerKey, ownProps ) => {
+		if ( reducerKey === 'core/editor' && ownProps.reducerKey ) {
+			return ownProps.reducerKey;
+		}
+
+		return reducerKey;
+	} ),
+	withDispatch( ( dispatch ) => {
+		const {
+			setupEditor,
+			updateEditorSettings,
+			undo,
+			redo,
+			createUndoLevel,
+		} = dispatch( 'core/editor' );
+		return {
+			setupEditor,
+			undo,
+			redo,
+			createUndoLevel,
+			updateEditorSettings,
+		};
+	} ),
+] )( EditorProvider );

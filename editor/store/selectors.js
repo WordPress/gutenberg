@@ -1520,12 +1520,7 @@ export const getInserterItems = createSelector(
 				return false;
 			}
 
-			const referencedBlock = getBlock( state, sharedBlock.uid );
-			if ( ! referencedBlock ) {
-				return false;
-			}
-
-			const referencedBlockType = getBlockType( referencedBlock.name );
+			const referencedBlockType = getBlockType( sharedBlock.blockName );
 			if ( ! referencedBlockType ) {
 				return false;
 			}
@@ -1540,8 +1535,7 @@ export const getInserterItems = createSelector(
 		const buildSharedBlockInserterItem = ( sharedBlock ) => {
 			const id = `core/block/${ sharedBlock.id }`;
 
-			const referencedBlock = getBlock( state, sharedBlock.uid );
-			const referencedBlockType = getBlockType( referencedBlock.name );
+			const referencedBlockType = getBlockType( sharedBlock.blockName );
 
 			const { time, count = 0 } = getInsertUsage( state, id ) || {};
 			const utility = calculateUtility( 'shared', count, false );

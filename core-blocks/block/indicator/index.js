@@ -3,6 +3,7 @@
  */
 import { Tooltip, Dashicon } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -21,4 +22,10 @@ function SharedBlockIndicator( { title } ) {
 	);
 }
 
-export default SharedBlockIndicator;
+export default withSelect( ( select ) => {
+	const { getEditedPostAttribute } = select( 'core/editor' );
+
+	return {
+		title: getEditedPostAttribute( 'title' ),
+	};
+} )( SharedBlockIndicator );

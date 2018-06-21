@@ -12,10 +12,10 @@ import { __ } from '@wordpress/i18n';
 import { isSharedBlock } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 
-export function SharedBlockSettings( { sharedBlock, onConvertToStatic, onConvertToShared, onDelete, itemsRole } ) {
+export function SharedBlockSettings( { isStaticBlock, onConvertToStatic, onConvertToShared, onDelete, itemsRole } ) {
 	return (
 		<Fragment>
-			{ ! sharedBlock && (
+			{ isStaticBlock && (
 				<IconButton
 					className="editor-block-settings-menu__control"
 					icon="controls-repeat"
@@ -25,7 +25,7 @@ export function SharedBlockSettings( { sharedBlock, onConvertToStatic, onConvert
 					{ __( 'Convert to Shared Block' ) }
 				</IconButton>
 			) }
-			{ sharedBlock && (
+			{ ! isStaticBlock && (
 				<Fragment>
 					<IconButton
 						className="editor-block-settings-menu__control"
@@ -38,8 +38,7 @@ export function SharedBlockSettings( { sharedBlock, onConvertToStatic, onConvert
 					<IconButton
 						className="editor-block-settings-menu__control"
 						icon="no"
-						disabled={ sharedBlock.isTemporary }
-						onClick={ () => onDelete( sharedBlock.id ) }
+						onClick={ onDelete }
 						role={ itemsRole }
 					>
 						{ __( 'Delete Shared Block' ) }
@@ -52,18 +51,20 @@ export function SharedBlockSettings( { sharedBlock, onConvertToStatic, onConvert
 
 export default compose( [
 	withSelect( ( select, { uid } ) => {
-		const { getBlock, getSharedBlock } = select( 'core/editor' );
+		const { getBlock } = select( 'core/editor' );
 		const block = getBlock( uid );
 		return {
-			sharedBlock: block && isSharedBlock( block ) ? getSharedBlock( block.attributes.ref ) : null,
+			sharedBlockId: block.attributes.ref,
+			isStaticBlock: ! block || ! isSharedBlock( block ),
 		};
 	} ),
-	withDispatch( ( dispatch, { uid, onToggle = noop } ) => {
+	withDispatch( ( dispatch, ownProps ) => {
 		const {
 			convertBlockToShared,
 			convertBlockToStatic,
 			deleteSharedBlock,
 		} = dispatch( 'core/editor' );
+		const { uid, onToggle = noop, sharedBlockId } = ownProps;
 
 		return {
 			onConvertToStatic() {
@@ -74,7 +75,7 @@ export default compose( [
 				convertBlockToShared( uid );
 				onToggle();
 			},
-			onDelete( id ) {
+			onDelete() {
 				// TODO: Make this a <Confirm /> component or similar
 				// eslint-disable-next-line no-alert
 				const hasConfirmed = window.confirm( __(
@@ -83,7 +84,7 @@ export default compose( [
 				) );
 
 				if ( hasConfirmed ) {
-					deleteSharedBlock( id );
+					deleteSharedBlock( sharedBlockId );
 					onToggle();
 				}
 			},

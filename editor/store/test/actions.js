@@ -6,7 +6,6 @@ import {
 	startTyping,
 	stopTyping,
 	fetchSharedBlocks,
-	saveSharedBlock,
 	deleteSharedBlock,
 	convertBlockToStatic,
 	convertBlockToShared,
@@ -464,22 +463,6 @@ describe( 'actions', () => {
 		it( 'should return the FETCH_SHARED_BLOCKS action', () => {
 			expect( fetchSharedBlocks() ).toEqual( {
 				type: 'FETCH_SHARED_BLOCKS',
-			} );
-		} );
-
-		it( 'should take an optional id argument', () => {
-			expect( fetchSharedBlocks( 123 ) ).toEqual( {
-				type: 'FETCH_SHARED_BLOCKS',
-				id: 123,
-			} );
-		} );
-	} );
-
-	describe( 'saveSharedBlock', () => {
-		it( 'should return the SAVE_SHARED_BLOCK action', () => {
-			expect( saveSharedBlock( 123 ) ).toEqual( {
-				type: 'SAVE_SHARED_BLOCK',
-				id: 123,
 			} );
 		} );
 	} );

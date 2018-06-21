@@ -1944,30 +1944,6 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should update a shared block', () => {
-			const initialState = {
-				data: {
-					123: { uid: '', title: '' },
-				},
-				isFetching: {},
-				isSaving: {},
-			};
-
-			const state = sharedBlocks( initialState, {
-				type: 'UPDATE_SHARED_BLOCK_TITLE',
-				id: 123,
-				title: 'My block',
-			} );
-
-			expect( state ).toEqual( {
-				data: {
-					123: { uid: '', title: 'My block' },
-				},
-				isFetching: {},
-				isSaving: {},
-			} );
-		} );
-
 		it( 'should update the shared block\'s id if it was temporary', () => {
 			const initialState = {
 				data: {

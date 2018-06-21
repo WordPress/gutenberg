@@ -109,22 +109,6 @@ export function resetBlocks( blocks ) {
 }
 
 /**
- * Returns an action object used in signalling that blocks have been received.
- * Unlike resetBlocks, these should be appended to the existing known set, not
- * replacing.
- *
- * @param {Object[]} blocks Array of block objects.
- *
- * @return {Object} Action object.
- */
-export function receiveBlocks( blocks ) {
-	return {
-		type: 'RECEIVE_BLOCKS',
-		blocks,
-	};
-}
-
-/**
  * Returns an action object used in signalling that the block attributes with
  * the specified UID has been updated.
  *
@@ -455,6 +439,10 @@ export function undo() {
 	return { type: 'UNDO' };
 }
 
+export function undoAll() {
+	return { type: 'UNDO_ALL' };
+}
+
 /**
  * Returns an action object used in signalling that undo history record should
  * be created.
@@ -580,18 +568,13 @@ export const createErrorNotice = partial( createNotice, 'error' );
 export const createWarningNotice = partial( createNotice, 'warning' );
 
 /**
- * Returns an action object used to fetch a single shared block or all shared
- * blocks from the REST API into the store.
- *
- * @param {?string} id If given, only a single shared block with this ID will
- *                     be fetched.
+ * Returns an action object used to fetch all shared blocks from the REST API.
  *
  * @return {Object} Action object.
  */
-export function fetchSharedBlocks( id ) {
+export function fetchSharedBlocks() {
 	return {
 		type: 'FETCH_SHARED_BLOCKS',
-		id,
 	};
 }
 
@@ -613,17 +596,18 @@ export function receiveSharedBlocks( results ) {
 }
 
 /**
- * Returns an action object used to save a shared block that's in the store to
- * the REST API.
+ * Returns an action object used to create a new shared block.
  *
- * @param {Object} id The ID of the shared block to save.
+ * @param {Object} sharedBlock Temporary shared block to be updated once saved.
+ * @param {string} content     Content of shared block.
  *
  * @return {Object} Action object.
  */
-export function saveSharedBlock( id ) {
+export function saveSharedBlock( sharedBlock, content ) {
 	return {
 		type: 'SAVE_SHARED_BLOCK',
-		id,
+		sharedBlock,
+		content,
 	};
 }
 
@@ -638,23 +622,6 @@ export function deleteSharedBlock( id ) {
 	return {
 		type: 'DELETE_SHARED_BLOCK',
 		id,
-	};
-}
-
-/**
- * Returns an action object used in signalling that a shared block's title is
- * to be updated.
- *
- * @param {number} id    The ID of the shared block to update.
- * @param {string} title The new title.
- *
- * @return {Object} Action object.
- */
-export function updateSharedBlockTitle( id, title ) {
-	return {
-		type: 'UPDATE_SHARED_BLOCK_TITLE',
-		id,
-		title,
 	};
 }
 

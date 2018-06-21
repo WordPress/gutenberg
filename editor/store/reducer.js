@@ -217,7 +217,7 @@ export const editor = flow( [
 	// Track undo history, starting at editor initialization.
 	withHistory( {
 		resetTypes: [ 'SETUP_EDITOR_STATE' ],
-		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
+		ignoreTypes: [ 'RESET_POST', 'UPDATE_POST' ],
 		shouldOverwriteState,
 	} ),
 
@@ -225,7 +225,7 @@ export const editor = flow( [
 	// editor initialization firing post reset as an effect.
 	withChangeDetection( {
 		resetTypes: [ 'SETUP_EDITOR_STATE', 'REQUEST_POST_UPDATE_START' ],
-		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
+		ignoreTypes: [ 'RESET_POST', 'UPDATE_POST' ],
 	} ),
 ] )( {
 	edits( state = {}, action ) {
@@ -285,12 +285,6 @@ export const editor = flow( [
 			case 'RESET_BLOCKS':
 			case 'SETUP_EDITOR_STATE':
 				return getFlattenedBlocks( action.blocks );
-
-			case 'RECEIVE_BLOCKS':
-				return {
-					...state,
-					...getFlattenedBlocks( action.blocks ),
-				};
 
 			case 'UPDATE_BLOCK_ATTRIBUTES':
 				// Ignore updates if block isn't known
@@ -409,12 +403,6 @@ export const editor = flow( [
 			case 'RESET_BLOCKS':
 			case 'SETUP_EDITOR_STATE':
 				return mapBlockOrder( action.blocks );
-
-			case 'RECEIVE_BLOCKS':
-				return {
-					...state,
-					...omit( mapBlockOrder( action.blocks ), '' ),
-				};
 
 			case 'INSERT_BLOCKS': {
 				const { rootUID = '', blocks } = action;
@@ -924,10 +912,11 @@ export const sharedBlocks = combineReducers( {
 		switch ( action.type ) {
 			case 'RECEIVE_SHARED_BLOCKS': {
 				return reduce( action.results, ( nextState, result ) => {
-					const { id, title } = result.sharedBlock;
-					const { uid } = result.parsedBlock;
+					const { id } = result.sharedBlock;
+					const title = getPostRawValue( result.sharedBlock.title );
+					const { name: blockName } = result.parsedBlock;
 
-					const value = { uid, title };
+					const value = { blockName, title };
 
 					if ( ! isEqual( nextState[ id ], value ) ) {
 						if ( nextState === state ) {
@@ -939,22 +928,6 @@ export const sharedBlocks = combineReducers( {
 
 					return nextState;
 				}, state );
-			}
-
-			case 'UPDATE_SHARED_BLOCK_TITLE': {
-				const { id, title } = action;
-
-				if ( ! state[ id ] || state[ id ].title === title ) {
-					return state;
-				}
-
-				return {
-					...state,
-					[ id ]: {
-						...state[ id ],
-						title,
-					},
-				};
 			}
 
 			case 'SAVE_SHARED_BLOCK_SUCCESS': {
@@ -973,48 +946,6 @@ export const sharedBlocks = combineReducers( {
 			}
 
 			case 'REMOVE_SHARED_BLOCK': {
-				const { id } = action;
-				return omit( state, id );
-			}
-		}
-
-		return state;
-	},
-
-	isFetching( state = {}, action ) {
-		switch ( action.type ) {
-			case 'FETCH_SHARED_BLOCKS': {
-				const { id } = action;
-				if ( ! id ) {
-					return state;
-				}
-
-				return {
-					...state,
-					[ id ]: true,
-				};
-			}
-
-			case 'FETCH_SHARED_BLOCKS_SUCCESS':
-			case 'FETCH_SHARED_BLOCKS_FAILURE': {
-				const { id } = action;
-				return omit( state, id );
-			}
-		}
-
-		return state;
-	},
-
-	isSaving( state = {}, action ) {
-		switch ( action.type ) {
-			case 'SAVE_SHARED_BLOCK':
-				return {
-					...state,
-					[ action.id ]: true,
-				};
-
-			case 'SAVE_SHARED_BLOCK_SUCCESS':
-			case 'SAVE_SHARED_BLOCK_FAILURE': {
 				const { id } = action;
 				return omit( state, id );
 			}

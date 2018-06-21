@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { combineReducers, createStore } from 'redux';
-import { flowRight, without, mapValues, overEvery } from 'lodash';
+import { flowRight, without, mapValues, overEvery, identity } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,6 +12,7 @@ import {
 	compose,
 	createElement,
 	createHigherOrderComponent,
+	createContext,
 	pure,
 } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
@@ -256,6 +257,11 @@ export function dispatch( reducerKey ) {
 	return actions[ reducerKey ];
 }
 
+const {
+	Consumer: CustomReducerKeyConsumer,
+	Provider: CustomReducerKeyProvider,
+} = createContext( identity );
+
 /**
  * Higher-order component used to inject state-derived props using registered
  * selectors.
@@ -269,7 +275,7 @@ export function dispatch( reducerKey ) {
 export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( WrappedComponent ) => {
 	const DEFAULT_MERGE_PROPS = {};
 
-	return class ComponentWithSelect extends Component {
+	class ComponentWithSelect extends Component {
 		constructor() {
 			super( ...arguments );
 
@@ -279,11 +285,17 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 		}
 
 		static getDerivedStateFromProps( props ) {
+			const { ownProps, mapReducerKey } = props;
+			const selectWithCustomReducerKey = flowRight( [
+				select,
+				mapReducerKey,
+			] );
+
 			// A constant value is used as the fallback since it can be more
 			// efficiently shallow compared in case component is repeatedly
 			// rendered without its own merge props.
 			const mergeProps = (
-				mapStateToProps( select, props ) ||
+				mapStateToProps( selectWithCustomReducerKey, ownProps ) ||
 				DEFAULT_MERGE_PROPS
 			);
 
@@ -301,7 +313,7 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 
 		shouldComponentUpdate( nextProps, nextState ) {
 			return (
-				! isShallowEqual( this.props, nextProps ) ||
+				! isShallowEqual( this.props.ownProps, nextProps.ownProps ) ||
 				! isShallowEqual( this.state.mergeProps, nextState.mergeProps )
 			);
 		}
@@ -322,9 +334,25 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 		}
 
 		render() {
-			return <WrappedComponent { ...this.props } { ...this.state.mergeProps } />;
+			return (
+				<WrappedComponent
+					{ ...this.props.ownProps }
+					{ ...this.state.mergeProps }
+				/>
+			);
 		}
-	};
+	}
+
+	return ( props ) => (
+		<CustomReducerKeyConsumer>
+			{ ( mapReducerKey ) => (
+				<ComponentWithSelect
+					ownProps={ props }
+					mapReducerKey={ mapReducerKey }
+				/>
+			) }
+		</CustomReducerKeyConsumer>
+	);
 }, 'withSelect' );
 
 /**
@@ -343,7 +371,7 @@ export const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent
 	compose( [
 		pure,
 		( WrappedComponent ) => {
-			return class ComponentWithDispatch extends Component {
+			class ComponentWithDispatch extends Component {
 				constructor( props ) {
 					super( ...arguments );
 
@@ -356,14 +384,20 @@ export const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent
 				}
 
 				proxyDispatch( propName, ...args ) {
+					const { mapReducerKey, ownProps } = this.props;
+					const dispatchWithCustomReducerKey = flowRight( [ dispatch, mapReducerKey ] );
+
 					// Original dispatcher is a pre-bound (dispatching) action creator.
-					mapDispatchToProps( dispatch, this.props )[ propName ]( ...args );
+					mapDispatchToProps( dispatchWithCustomReducerKey, ownProps )[ propName ]( ...args );
 				}
 
 				setProxyProps( props ) {
+					const { ownProps, mapReducerKey } = props;
+					const dispatchWithCustomReducerKey = flowRight( [ dispatch, mapReducerKey ] );
+
 					// Assign as instance property so that in reconciling subsequent
 					// renders, the assigned prop values are referentially equal.
-					const propsToDispatchers = mapDispatchToProps( dispatch, props );
+					const propsToDispatchers = mapDispatchToProps( dispatchWithCustomReducerKey, ownProps );
 					this.proxyProps = mapValues( propsToDispatchers, ( dispatcher, propName ) => {
 						// Prebind with prop name so we have reference to the original
 						// dispatcher to invoke. Track between re-renders to avoid
@@ -377,13 +411,58 @@ export const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent
 				}
 
 				render() {
-					return <WrappedComponent { ...this.props } { ...this.proxyProps } />;
+					return (
+						<WrappedComponent
+							{ ...this.props.ownProps }
+							{ ...this.proxyProps }
+						/>
+					);
 				}
-			};
+			}
+
+			return ( props ) => (
+				<CustomReducerKeyConsumer>
+					{ ( mapReducerKey ) => (
+						<ComponentWithDispatch
+							ownProps={ props }
+							mapReducerKey={ mapReducerKey }
+						/>
+					) }
+				</CustomReducerKeyConsumer>
+			);
 		},
 	] ),
 	'withDispatch'
 );
+
+export function withCustomReducerKey( mapReducerKey ) {
+	return createHigherOrderComponent(
+		( WrappedComponent ) => class extends Component {
+			constructor() {
+				super( ...arguments );
+
+				this.mapReducerKey = this.mapReducerKey.bind( this );
+
+				this.state = {
+					mapReducerKey: this.mapReducerKey,
+				};
+			}
+
+			mapReducerKey( reducerKey ) {
+				return mapReducerKey( reducerKey, this.props );
+			}
+
+			render() {
+				return (
+					<CustomReducerKeyProvider value={ this.state.mapReducerKey }>
+						<WrappedComponent { ...this.props } />
+					</CustomReducerKeyProvider>
+				);
+			}
+		},
+		'withCustomReducerKey'
+	);
+}
 
 /**
  * Returns true if the given argument appears to be a dispatchable action.

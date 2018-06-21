@@ -1,10 +1,16 @@
 /**
+ * External dependencies
+ */
+import { over, compact } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Button, withInstanceId } from '@wordpress/components';
-import { Component, Fragment, createRef } from '@wordpress/element';
+import { Component, Fragment, createRef, compose } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { keycodes } from '@wordpress/utils';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -117,4 +123,33 @@ class SharedBlockEditPanel extends Component {
 	}
 }
 
-export default withInstanceId( SharedBlockEditPanel );
+export default compose( [
+	withInstanceId,
+	withSelect( ( select ) => {
+		const { getEditedPostAttribute } = select( 'core/editor' );
+
+		return {
+			title: getEditedPostAttribute( 'title' ),
+		};
+	} ),
+	withDispatch( ( dispatch, ownProps ) => {
+		const {
+			editPost,
+			undoAll,
+			savePost,
+			clearSelectedBlock,
+		} = dispatch( 'core/editor' );
+
+		const withClearAndFinish = ( fn ) => over( compact( [
+			clearSelectedBlock,
+			ownProps.onFinishedEditing,
+			fn,
+		] ) );
+
+		return {
+			onChangeTitle: ( title ) => editPost( { title } ),
+			onSave: withClearAndFinish( savePost ),
+			onCancel: withClearAndFinish( undoAll ),
+		};
+	} ),
+] )( SharedBlockEditPanel );
