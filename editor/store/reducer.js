@@ -217,15 +217,15 @@ export const editor = flow( [
 	// Track undo history, starting at editor initialization.
 	withHistory( {
 		resetTypes: [ 'SETUP_EDITOR_STATE' ],
-		ignoreTypes: [ 'RECEIVE_BLOCKS' ],
+		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
 		shouldOverwriteState,
 	} ),
 
 	// Track whether changes exist, resetting at each post save. Relies on
 	// editor initialization firing post reset as an effect.
 	withChangeDetection( {
-		resetTypes: [ 'SETUP_EDITOR_STATE', 'UPDATE_POST' ],
-		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST' ],
+		resetTypes: [ 'SETUP_EDITOR_STATE', 'REQUEST_POST_UPDATE_START' ],
+		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
 	} ),
 ] )( {
 	edits( state = {}, action ) {
@@ -253,6 +253,9 @@ export const editor = flow( [
 				}
 
 				return state;
+
+			case 'DIRTY_ARTIFICIALLY':
+				return { ...state };
 
 			case 'UPDATE_POST':
 			case 'RESET_POST':
@@ -559,16 +562,6 @@ export function currentPost( state = {}, action ) {
 			}
 
 			return mapValues( post, getPostRawValue );
-
-		case 'RESET_AUTOSAVE':
-			// A post is no longer auto-draft (now draft) when autosave occurs.
-			if ( state.status === 'auto-draft' ) {
-				return {
-					...state,
-					status: 'draft',
-				};
-			}
-			break;
 	}
 
 	return state;
@@ -1085,7 +1078,19 @@ export function autosave( state = null, action ) {
 				'content',
 			].map( ( field ) => getPostRawValue( post[ field ] ) );
 
-			return { title, excerpt, content };
+			return {
+				title,
+				excerpt,
+				content,
+				preview_link: post.preview_link,
+			};
+
+		case 'REQUEST_POST_UPDATE':
+			// Invalidate known preview link when autosave starts.
+			if ( state && action.options.autosave ) {
+				return omit( state, 'preview_link' );
+			}
+			break;
 	}
 
 	return state;

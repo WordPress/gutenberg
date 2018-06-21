@@ -37,6 +37,7 @@ function InserterWithShortcuts( { items, isLocked, onInsert } ) {
 					key={ item.id }
 					className="editor-inserter-with-shortcuts__block"
 					onClick={ () => onInsert( item ) }
+					// translators: %s: block title/name to be added
 					label={ sprintf( __( 'Add %s' ), item.title ) }
 					icon={ (
 						<BlockIcon icon={ item.icon && item.icon.src } />

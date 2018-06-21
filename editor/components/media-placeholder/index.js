@@ -12,10 +12,9 @@ import {
 	FormFileUpload,
 	Placeholder,
 	DropZone,
-	withNotices,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -64,26 +63,13 @@ class MediaPlaceholder extends Component {
 	}
 
 	onFilesUpload( files ) {
-		/**
-		 * We use a prop named `disable`, set to `false` by default, because it makes for a nicer
-		 * component prop API. eg:
-		 *
-		 * <MediaPlaceholder disableMaxUploadErrorMessages />
-		 * instead of:
-		 * <MediaPlaceholder enableMaxUploadErrorMessages={ false } />
-		 */
-		const { onSelect, type, multiple, onError = noop, disableMaxUploadErrorMessages = false, noticeOperations } = this.props;
+		const { onSelect, type, multiple, onError } = this.props;
 		const setMedia = multiple ? onSelect : ( [ media ] ) => onSelect( media );
 		editorMediaUpload( {
 			allowedType: type,
 			filesList: files,
 			onFileChange: setMedia,
-			onError: ( errorMessage ) => {
-				onError( errorMessage );
-				if ( disableMaxUploadErrorMessages === false ) {
-					noticeOperations.createErrorNotice( errorMessage );
-				}
-			},
+			onError,
 		} );
 	}
 
@@ -99,17 +85,17 @@ class MediaPlaceholder extends Component {
 			onSelectUrl,
 			onHTMLDrop = noop,
 			multiple = false,
-			additionalNotices,
-			noticeUI,
+			notices,
 		} = this.props;
 
 		return (
 			<Placeholder
 				icon={ icon }
 				label={ labels.title }
+				// translators: %s: media name label e.g: "an audio","an image", "a video"
 				instructions={ sprintf( __( 'Drag %s, upload a new one or select a file from your library.' ), labels.name ) }
 				className={ classnames( 'editor-media-placeholder', className ) }
-				notices={ <Fragment>{ additionalNotices }{ noticeUI }</Fragment> }
+				notices={ notices }
 			>
 				<DropZone
 					onFilesDrop={ this.onFilesUpload }
@@ -156,4 +142,4 @@ class MediaPlaceholder extends Component {
 	}
 }
 
-export default withNotices( MediaPlaceholder );
+export default MediaPlaceholder;

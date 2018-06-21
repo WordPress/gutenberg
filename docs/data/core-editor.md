@@ -305,19 +305,6 @@ Gets the document title to be used.
 
 Document title.
 
-### getEditedPostExcerpt
-
-Returns the raw excerpt of the post being edited, preferring the unsaved
-value if different than the saved post.
-
-*Parameters*
-
- * state: Global application state.
-
-*Returns*
-
-Raw post excerpt.
-
 ### getEditedPostPreviewLink
 
 Returns a URL to preview the post being edited.

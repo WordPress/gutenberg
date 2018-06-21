@@ -22,10 +22,10 @@ class BlockHTML extends Component {
 		};
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		if ( ! isEqual( nextProps.block.attributes, this.props.block.attributes ) ) {
+	componentDidUpdate( prevProps ) {
+		if ( ! isEqual( this.props.block.attributes, prevProps.block.attributes ) ) {
 			this.setState( {
-				html: getBlockContent( nextProps.block ),
+				html: getBlockContent( this.props.block ),
 			} );
 		}
 	}
