@@ -56,6 +56,8 @@
 @include editor-left('.components-notice-list');
 @include editor-right('.components-notice-list');
 
+@include editor-left( '.components-modal__screen-overlay' );
+
 .edit-post-layout__metaboxes:not(:empty) {
 	border-top: 1px solid $light-gray-500;
 	margin-top: 10px;
