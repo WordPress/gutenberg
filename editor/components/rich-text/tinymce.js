@@ -202,8 +202,12 @@ export default class TinyMCE extends Component {
 	render() {
 		const { tagName = 'div', style, defaultValue, className, isPlaceholderVisible, format } = this.props;
 		const ariaProps = pickAriaProps( this.props );
+
 		if ( tagName !== 'table' ) {
 			ariaProps.role = 'textbox';
+		} else {
+			// The `aria-multiline` attribute must be used only together with `role=textbox`.
+			ariaProps[ 'aria-multiline' ] = null;
 		}
 
 		// If a default value is provided, render it into the DOM even before

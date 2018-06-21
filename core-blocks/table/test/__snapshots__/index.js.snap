@@ -12,7 +12,6 @@ exports[`core/embed block edit matches snapshot 1`] = `
         <table
           aria-autocomplete="list"
           aria-expanded="false"
-          aria-multiline="true"
           class="editor-rich-text__tinymce"
           contenteditable="true"
         >
