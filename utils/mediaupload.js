@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { compact, forEach, get, includes, noop, startsWith } from 'lodash';
+import { compact, forEach, get, includes, isEmpty, noop, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -97,15 +97,21 @@ export function mediaUpload( {
 				};
 				setAndUpdateFiles( idx, mediaObject );
 			},
-			() => {
+			( response ) => {
 				// Reset to empty on failure.
 				setAndUpdateFiles( idx, null );
-				onError( {
-					code: 'GENERAL',
-					message: sprintf(
+				let message;
+				if ( ! isEmpty( response.responseJSON.message ) ) {
+					message = response.responseJSON.message;
+				} else {
+					message = sprintf(
 						__( 'Error while uploading file %s to the media library.' ),
 						mediaFile.name
-					),
+					);
+				}
+				onError( {
+					code: 'GENERAL',
+					message,
 					file: mediaFile,
 				} );
 			}
