@@ -49,7 +49,6 @@ class PlaylistEdit extends Component {
 		const onSelectMedia = ( media ) => {
 			//check if there are returned media items and set attributes when there are
 			if ( media && media[ 0 ].url ) {
-				media = ( 1 < media.length ) ? media : [ media ];
 				const ids = JSON.stringify( media.map( ( item ) => item.id ) );
 				setAttributes( { tracklist, artists, images, ids, type: media[ 0 ].type } );
 				this.setState( { editing: false } );
@@ -58,7 +57,7 @@ class PlaylistEdit extends Component {
 
 		const setAudio = ( [ audio ] ) => onSelectMedia( audio );
 
-		const uploadFromFiles = ( event ) => editorMediaUpload( event.target.files, setAudio, 'audio' );
+		const uploadFromFiles = ( event ) => editorMediaUpload( event.target.files, setAudio );
 
 		const mediaIds = this.props.attributes.ids && this.props.attributes.ids.replace( /^\[(.+)\]$/, '$1' ).split( ',' );
 
