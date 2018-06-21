@@ -375,19 +375,24 @@
 	// Left
 	&[data-align="left"] {
 		.editor-block-list__block-edit {	// This is in the editor only, on the frontend, the img should be floated
+			/*!rtl:begin:ignore*/
 			float: left;
 			margin-right: 2em;
+			/*!rtl:end:ignore*/
 		}
 	}
 
 	// Right
 	&[data-align="right"] {
 		.editor-block-list__block-edit {	// This is in the editor only, on the frontend, the img should be floated
+			/*!rtl:begin:ignore*/
 			float: right;
 			margin-left: 2em;
+			/*!rtl:end:ignore*/
 		}
 
 		.editor-block-toolbar {
+			/*!rtl:ignore*/
 			float: right;
 		}
 	}
@@ -606,7 +611,7 @@
 	.editor-block-list__block-mobile-toolbar {
 		display: flex;
 		flex-direction: row;
-		margin-top: $item-spacing + $block-toolbar-height; // Make room for the height of the block toolbar above. 
+		margin-top: $item-spacing + $block-toolbar-height; // Make room for the height of the block toolbar above.
 		margin-right: -$block-padding;
 		margin-bottom: -$block-padding - $border-width;
 		margin-left: -$block-padding;
@@ -906,7 +911,7 @@
 		padding: 4px 4px;
 		background: theme( outlines );
 		color: $white;
-	
+
 		// Animate in
 		.editor-block-list__block:hover & {
 			@include fade_in( .1s );
