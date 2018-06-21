@@ -119,7 +119,13 @@ class PlaylistEdit extends Component {
 						playlist
 						value={ this.props.attributes.ids }
 						render={ ( { open } ) => (
-							<IconButton isLarge icon="edit" label={ __( 'Media Library' ) } onClick={ open } />
+							<IconButton
+								isLarge
+								icon="edit"
+								label={ __( 'Media Library' ) }
+								onClick={ open }
+							> { __( 'Media Library' ) }
+							</IconButton>
 						) }
 					/>
 				</Placeholder>
