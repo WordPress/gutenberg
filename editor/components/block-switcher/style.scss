@@ -17,28 +17,63 @@
 }
 
 .editor-block-switcher__popover .components-popover__content {
-	width: 200px;
+	width: 300px;
+
+	@include break-medium {
+		position: relative;
+
+		.editor-block-preview {
+			border: 1px solid $light-gray-500;
+			box-shadow: $shadow-popover;
+			background: $white;
+			position: absolute;
+			left: 100%;
+			top: 0;
+			bottom: 0;
+			width: 300px;
+		}
+	}
 }
 
-.editor-block-switcher__menu {
-	box-shadow: $shadow-popover;
-	border: 1px solid $light-gray-500;
-	background: $white;
-	padding: 3px 3px 0;
+.editor-block-switcher__popover:not(.is-mobile) > .components-popover__content {
+	// Reset overflow to allow showing the preview on the left once an item is hovered.
+	overflow-y: initial;
 }
 
-.editor-block-switcher__menu-title {
-	display: block;
-	padding: 6px;
-	color: $dark-gray-300;
+.editor-block-switcher__popover .editor-block-styles {
+	margin: 0 -11px; // Remove the panel body padding while keeping it for the title
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-template-rows: 60px;
+	grid-gap: 5px;
+
+	.editor-block-styles__item {
+		border: 1px solid $light-gray-500;
+		overflow: hidden;
+		padding: 5px;
+		> * {
+			transform: scale( 0.7 );
+			transform-origin: center top;
+			font-family: $editor-font;
+		}
+
+		&.is-selected {
+			@include formatting-button-style__active;
+		}
+
+		&:hover {
+			@include formatting-button-style__hover;
+		}
+	}
 }
 
-.editor-block-switcher__menu-item {
+.editor-block-switcher__transform {
 	color: $dark-gray-500;
 	display: flex;
 	align-items: center;
-	width: 100%;
+	width: calc( 100% + 16 * 2px);
 	padding: 6px;
+	margin: 0 -16px; // Remove the panel body padding while keeping it for the title
 	text-align: left;
 
 	.editor-block-switcher__block-icon {

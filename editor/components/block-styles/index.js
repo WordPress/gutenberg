@@ -6,11 +6,15 @@ import { find, compact, get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
-import { Toolbar } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { getBlockType } from '@wordpress/blocks';
+import { Button } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import { BlockPreviewContent } from '../block-preview';
 
 /**
  * Returns the active style from the given className.
@@ -68,7 +72,15 @@ export function replaceActiveStyle( className, activeStyle, newStyle ) {
 	return updatedClassName;
 }
 
-function BlockStyles( { styles, className, onChangeClassName } ) {
+function BlockStyles( {
+	styles,
+	className,
+	onChangeClassName,
+	name,
+	attributes,
+	onSwitch,
+	onHoverClassName,
+} ) {
 	if ( ! styles ) {
 		return null;
 	}
@@ -77,17 +89,32 @@ function BlockStyles( { styles, className, onChangeClassName } ) {
 	function updateClassName( style ) {
 		const updatedClassName = replaceActiveStyle( className, activeStyle, style );
 		onChangeClassName( updatedClassName );
+		onSwitch();
 	}
 
 	return (
-		<Toolbar controls={ styles.map( ( variation ) => ( {
-			icon: variation.icon,
-			title: sprintf( __( 'Style %s' ), variation.label || variation.name ),
-			isActive: activeStyle === variation,
-			onClick() {
-				updateClassName( variation );
-			},
-		} ) ) } />
+		<div className="editor-block-styles">
+			{ styles.map( ( style ) => {
+				const styleClassName = replaceActiveStyle( className, activeStyle, style );
+				return (
+					<Button
+						key={ style.name }
+						className="editor-block-styles__item"
+						onClick={ () => updateClassName( style ) }
+						onMouseEnter={ () => onHoverClassName( styleClassName ) }
+						onMouseLeave={ () => onHoverClassName( null ) }
+					>
+						<BlockPreviewContent
+							name={ name }
+							attributes={ {
+								...attributes,
+								className: styleClassName,
+							} }
+						/>
+					</Button>
+				);
+			} ) }
+		</div>
 	);
 }
 
@@ -96,6 +123,8 @@ export default compose( [
 		const block = select( 'core/editor' ).getBlock( uid );
 
 		return {
+			name: block.name,
+			attributes: block.attributes,
 			className: block.attributes.className || '',
 			styles: get( getBlockType( block.name ), [ 'transforms', 'styles' ] ),
 		};

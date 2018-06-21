@@ -61,8 +61,8 @@ export const settings = {
 
 	transforms: {
 		styles: [
-			{ name: 'default', label: '1', isDefault: true, icon: 'format-quote' },
-			{ name: 'large', label: '2', icon: 'testimonial' },
+			{ name: 'default', label: '1', isDefault: true },
+			{ name: 'large', label: '2' },
 		],
 		from: [
 			{

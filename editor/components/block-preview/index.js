@@ -22,21 +22,26 @@ import './style.scss';
  *
  * @return {WPElement} Rendered element.
  */
-function BlockPreview( { name, attributes } ) {
-	const block = createBlock( name, attributes );
-
+function BlockPreview( props ) {
 	return (
 		<div className="editor-block-preview">
 			<div className="editor-block-preview__title">{ __( 'Preview' ) }</div>
 			<div className="editor-block-preview__content">
-				<BlockEdit
-					name={ name }
-					focus={ false }
-					attributes={ block.attributes }
-					setAttributes={ noop }
-				/>
+				<BlockPreviewContent { ...props } />
 			</div>
 		</div>
+	);
+}
+
+export function BlockPreviewContent( { name, attributes } ) {
+	const block = createBlock( name, attributes );
+	return (
+		<BlockEdit
+			name={ name }
+			focus={ false }
+			attributes={ block.attributes }
+			setAttributes={ noop }
+		/>
 	);
 }
 
