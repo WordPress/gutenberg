@@ -54,7 +54,6 @@
 			background: #f7f7f7 !important;
 			box-shadow: none !important;
 			text-shadow: 0 1px 0 #fff !important;
-			cursor: default;
 			-webkit-transform: none !important;
 			transform: none !important;
 		}
@@ -98,7 +97,6 @@
 			border-color: color( theme( button ) shade( 20% ) ) !important;
 			box-shadow: none !important;
 			text-shadow: 0 -1px 0 rgba( 0, 0, 0, 0.1 ) !important;
-			cursor: default;
 		}
 
 		&.is-busy,
@@ -124,7 +122,6 @@
 		border-radius: 0;
 		background: none;
 		outline: none;
-		cursor: pointer;
 		text-align: left;
 		/* Mimics the default link style in common.css */
 		color: #0073aa;
@@ -154,12 +151,10 @@
 		color: currentColor;
 	}
 
-	&:disabled {
+	&:disabled,
+	&[disabled] {
+		cursor: default;
 		opacity: 0.3;
-	}
-
-	&:not( :disabled ):not( [aria-disabled="true"] ) {
-		cursor: pointer;
 	}
 
 	&:not( :disabled ):not( [aria-disabled="true"] ):focus {
