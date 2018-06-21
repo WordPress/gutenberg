@@ -211,9 +211,8 @@ class GalleryEdit extends Component {
 						onSelect={ this.onSelectImages }
 						accept="image/*"
 						type="image"
-						disableMaxUploadErrorMessages
 						multiple
-						additionalNotices={ noticeUI }
+						notices={ noticeUI }
 						onError={ noticeOperations.createErrorNotice }
 					/>
 				</Fragment>

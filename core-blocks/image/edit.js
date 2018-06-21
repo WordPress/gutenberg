@@ -26,6 +26,7 @@ import {
 	TextControl,
 	TextareaControl,
 	Toolbar,
+	withNotices,
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import {
@@ -105,7 +106,7 @@ class ImageEdit extends Component {
 	}
 
 	onSelectImage( media ) {
-		if ( ! media ) {
+		if ( ! media || ! media.url ) {
 			this.props.setAttributes( {
 				url: undefined,
 				alt: undefined,
@@ -175,7 +176,7 @@ class ImageEdit extends Component {
 	}
 
 	render() {
-		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, toggleSelection } = this.props;
+		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, noticeOperations, noticeUI, toggleSelection } = this.props;
 		const { url, alt, caption, align, id, href, width, height } = attributes;
 
 		const controls = (
@@ -218,6 +219,8 @@ class ImageEdit extends Component {
 						} }
 						className={ className }
 						onSelect={ this.onSelectImage }
+						notices={ noticeUI }
+						onError={ noticeOperations.createErrorNotice }
 						accept="image/*"
 						type="image"
 					/>
@@ -413,4 +416,5 @@ export default compose( [
 		};
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
+	withNotices,
 ] )( ImageEdit );
