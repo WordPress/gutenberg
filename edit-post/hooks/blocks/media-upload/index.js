@@ -191,8 +191,7 @@ class MediaUpload extends Component {
 				editing: ( value ) ? true : false,
 			} );
 			wp.media.frame = this.frame;
-		}
-		else {
+		} else {
 			const frameConfig = {
 				title,
 				button: {
