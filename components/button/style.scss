@@ -54,7 +54,7 @@
 			background: #f7f7f7 !important;
 			box-shadow: none !important;
 			text-shadow: 0 1px 0 #fff !important;
-			cursor: not-allowed;
+			cursor: default;
 			-webkit-transform: none !important;
 			transform: none !important;
 		}
@@ -98,7 +98,7 @@
 			border-color: color( theme( button ) shade( 20% ) ) !important;
 			box-shadow: none !important;
 			text-shadow: 0 -1px 0 rgba( 0, 0, 0, 0.1 ) !important;
-			cursor: not-allowed;
+			cursor: default;
 		}
 
 		&.is-busy,
@@ -155,7 +155,7 @@
 	}
 
 	&:disabled {
-		cursor: not-allowed;
+		cursor: default;
 		opacity: 0.3;
 	}
 
