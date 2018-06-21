@@ -145,8 +145,8 @@
 		}
 	}
 
-	/* Buttons that look scary */
-	&.is-link.is-scary {
+	/* Link buttons that are red to indicate destructive behavior. */
+	&.is-link.is-destructive {
 		color: $alert-red;
 	}
 

@@ -78,7 +78,7 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 					</div>
 				}
 				{ !! featuredImageId &&
-					<Button onClick={ onRemoveImage } isLink isScary>
+					<Button onClick={ onRemoveImage } isLink isDestructive>
 						{ postLabel.remove_featured_image || DEFAULT_REMOVE_FEATURE_IMAGE_LABEL }
 					</Button>
 				}
