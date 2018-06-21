@@ -149,15 +149,6 @@ export function registerBlockType( name, settings ) {
 		return;
 	}
 
-	if ( 'isPrivate' in settings ) {
-		deprecated( 'isPrivate', {
-			version: '3.1',
-			alternative: 'supports.inserter',
-			plugin: 'Gutenberg',
-		} );
-		set( settings, [ 'supports', 'inserter' ], ! settings.isPrivate );
-	}
-
 	if ( 'useOnce' in settings ) {
 		deprecated( 'useOnce', {
 			version: '3.3',

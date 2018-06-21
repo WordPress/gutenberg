@@ -445,24 +445,6 @@ export function getDocumentTitle( state ) {
 }
 
 /**
- * Returns the raw excerpt of the post being edited, preferring the unsaved
- * value if different than the saved post.
- *
- * @param {Object} state Global application state.
- *
- * @return {string} Raw post excerpt.
- */
-export function getEditedPostExcerpt( state ) {
-	deprecated( 'getEditedPostExcerpt', {
-		version: '3.1',
-		alternative: 'getEditedPostAttribute( state, \'excerpt\' )',
-		plugin: 'Gutenberg',
-	} );
-
-	return getEditedPostAttribute( state, 'excerpt' );
-}
-
-/**
  * Returns a URL to preview the post being edited.
  *
  * @param {Object} state Global application state.

@@ -28,7 +28,6 @@ const {
 	getCurrentPostType,
 	getPostEdits,
 	getDocumentTitle,
-	getEditedPostExcerpt,
 	getEditedPostVisibility,
 	isCurrentPostPending,
 	isCurrentPostPublished,
@@ -662,40 +661,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( getDocumentTitle( state ) ).toBe( __( '(Untitled)' ) );
-		} );
-	} );
-
-	describe( 'getEditedPostExcerpt', () => {
-		it( 'should return the post saved excerpt if the excerpt is not edited', () => {
-			const state = {
-				currentPost: {
-					excerpt: 'sassel',
-				},
-				editor: {
-					present: {
-						edits: { status: 'private' },
-					},
-				},
-			};
-
-			expect( getEditedPostExcerpt( state ) ).toBe( 'sassel' );
-			expect( console ).toHaveWarned();
-		} );
-
-		it( 'should return the edited excerpt', () => {
-			const state = {
-				currentPost: {
-					excerpt: 'sassel',
-				},
-				editor: {
-					present: {
-						edits: { excerpt: 'youcha' },
-					},
-				},
-			};
-
-			expect( getEditedPostExcerpt( state ) ).toBe( 'youcha' );
-			expect( console ).toHaveWarned();
 		} );
 	} );
 
