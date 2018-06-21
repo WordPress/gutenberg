@@ -38,6 +38,10 @@ export const settings = {
 			type: 'boolean',
 			default: true,
 		},
+		style: {
+			type: 'string',
+			default: 'light',
+		},
 		align: {
 			type: 'string',
 		},

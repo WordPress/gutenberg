@@ -11,6 +11,7 @@ import {
 	Toolbar,
 	CheckboxControl,
 	PanelBody,
+	SelectControl,
 } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
 import {
@@ -30,6 +31,8 @@ class PlaylistEdit extends Component {
 		super( ...arguments );
 
 		this.initializePlaylist = this.initializePlaylist.bind( this );
+		this.uploadFromFiles = this.uploadFromFiles.bind( this );
+		this.addFiles = this.addFiles.bind( this );
 
 		// check for if ids is set to determine edit state
 		this.state = {
@@ -41,10 +44,25 @@ class PlaylistEdit extends Component {
 		window.wp.playlist.initialize();
 	}
 
+	uploadFromFiles( event ) {
+		this.addFiles( event.target.files );
+	}
+
+	addFiles( files ) {
+		editorMediaUpload( {
+			allowedType: 'audio',
+			filesList: files,
+		} );
+	}
+
 	render() {
 		const { attributes, setAttributes, className } = this.props;
 		const { editing } = this.state;
-		const { tracklist, artists, images } = attributes;
+		const { tracklist, artists, images, style } = attributes;
+		const styleOptions = [
+			{ value: 'light', label: __( 'Light' ) },
+			{ value: 'dark', label: __( 'Dark' ) },
+		];
 
 		const onSelectMedia = ( media ) => {
 			//check if there are returned media items and set attributes when there are
@@ -54,10 +72,6 @@ class PlaylistEdit extends Component {
 				this.setState( { editing: false } );
 			}
 		};
-
-		const setAudio = ( [ audio ] ) => onSelectMedia( audio );
-
-		const uploadFromFiles = ( event ) => editorMediaUpload( event.target.files, setAudio );
 
 		const mediaIds = this.props.attributes.ids && this.props.attributes.ids.replace( /^\[(.+)\]$/, '$1' ).split( ',' );
 
@@ -73,6 +87,10 @@ class PlaylistEdit extends Component {
 			setAttributes( { images: newVal } );
 		};
 
+		const onToggleStyle = ( newVal ) => {
+			setAttributes( { style: newVal } );
+		};
+
 		if ( editing ) {
 			return (
 				<Placeholder
@@ -82,9 +100,10 @@ class PlaylistEdit extends Component {
 					className={ className }>
 					<FormFileUpload
 						isLarge
-						className="wp-block-audio__upload-button"
-						onChange={ uploadFromFiles }
-						accept="audio/*"
+						multiple
+						className="wp-block-playlist__upload-button"
+						onChange={ this.uploadFromFiles }
+						accept="audiovideo"
 					>
 						{ __( 'Upload' ) }
 					</FormFileUpload>
@@ -142,6 +161,12 @@ class PlaylistEdit extends Component {
 							label={ __( 'Show Images' ) }
 							onChange={ onToggleImages }
 							checked={ images }
+						/>
+						<SelectControl
+							label={ __( 'Playlist Style' ) }
+							value={ style }
+							onChange={ onToggleStyle }
+							options={ styleOptions }
 						/>
 					</PanelBody>
 				</InspectorControls>

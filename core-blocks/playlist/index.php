@@ -49,6 +49,10 @@ function register_block_core_playlist() {
 				'type' => 'boolean',
 				'default' => true,
 			),
+			'style'    => array(
+				'type' => 'string',
+				'default' => 'light',
+			),
 			'align'     => array(
 				'type' => 'string',
 			),
