@@ -29,17 +29,19 @@ class PostPublishPanel extends Component {
 		};
 	}
 
-	componentWillReceiveProps( newProps ) {
+	static getDerivedStateFromProps( props, state ) {
 		if (
-			! this.state.submitted &&
-			! newProps.isSaving &&
-			( newProps.isPublished || newProps.isScheduled )
+			state.submitted ||
+			props.isSaving ||
+			( ! props.isPublished && ! props.isScheduled )
 		) {
-			this.setState( {
-				submitted: true,
-				loading: false,
-			} );
+			return null;
 		}
+
+		return {
+			submitted: true,
+			loading: false,
+		};
 	}
 
 	componentDidUpdate( prevProps ) {

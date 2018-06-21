@@ -26,7 +26,7 @@ const MOD_KEY = process.platform === 'darwin' ? 'Meta' : 'Control';
  */
 const REGEXP_ZWSP = /[\u200B\u200C\u200D\uFEFF]/;
 
-function getUrl( WPPath, query = '' ) {
+export function getUrl( WPPath, query = '' ) {
 	const url = new URL( WP_BASE_URL );
 
 	url.pathname = join( url.pathname, WPPath );
@@ -113,6 +113,22 @@ export async function getHTMLFromCodeEditor() {
 }
 
 /**
+ * Verifies that the edit post sidebar is opened, and if it is not, opens it.
+ *
+ * @return {Promise} Promise resolving once the edit post sidebar is opened.
+ */
+export async function ensureSidebarOpened() {
+	// This try/catch flow relies on the fact that `page.$eval` throws an error
+	// if the element matching the given selector does not exist. Thus, if an
+	// error is thrown, it can be inferred that the sidebar is not opened.
+	try {
+		return page.$eval( '.edit-post-sidebar', () => {} );
+	} catch ( error ) {
+		return page.click( '.edit-post-header__settings [aria-label="Settings"]' );
+	}
+}
+
+/**
  * Opens the inserter, searches for the given term, then selects the first
  * result that appears.
  *
@@ -157,4 +173,26 @@ export async function toggleMoreMenuItem( buttonLabel ) {
 	await page.click( '.edit-post-more-menu [aria-label="More"]' );
 	const itemButton = ( await page.$x( `//button[contains(text(), \'${ buttonLabel }\')]` ) )[ 0 ];
 	await itemButton.click( 'button' );
+}
+
+/**
+ * Publishes the post, resolving once the request is complete (once a notice
+ * is displayed).
+ *
+ * @return {Promise} Promise resolving when publish is complete.
+ */
+export async function publishPost() {
+	// Opens the publish panel
+	await page.click( '.editor-post-publish-panel__toggle' );
+
+	// Disable reason: Wait for the animation to complete, since otherwise the
+	// click attempt may occur at the wrong point.
+	// eslint-disable-next-line no-restricted-syntax
+	await page.waitFor( 100 );
+
+	// Publish the post
+	await page.click( '.editor-post-publish-button' );
+
+	// A success notice should show up
+	return page.waitForSelector( '.notice-success' );
 }

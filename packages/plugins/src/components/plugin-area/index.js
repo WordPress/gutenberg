@@ -6,7 +6,7 @@ import { map } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createElement } from '@wordpress/element';
 import { addAction, removeAction } from '@wordpress/hooks';
 
 /**

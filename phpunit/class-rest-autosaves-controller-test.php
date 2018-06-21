@@ -239,7 +239,7 @@ class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controlle
 		$response   = rest_get_server()->dispatch( $request );
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
-		$this->assertEquals( 12, count( $properties ) );
+		$this->assertEquals( 13, count( $properties ) );
 		$this->assertArrayHasKey( 'author', $properties );
 		$this->assertArrayHasKey( 'content', $properties );
 		$this->assertArrayHasKey( 'date', $properties );
@@ -252,6 +252,7 @@ class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controlle
 		$this->assertArrayHasKey( 'parent', $properties );
 		$this->assertArrayHasKey( 'slug', $properties );
 		$this->assertArrayHasKey( 'title', $properties );
+		$this->assertArrayHasKey( 'preview_link', $properties );
 	}
 
 	public function test_create_item() {
