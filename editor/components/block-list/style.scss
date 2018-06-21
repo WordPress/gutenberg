@@ -868,7 +868,6 @@
 
 	// This prevents floats from messing up the position.
 	position: absolute;
-	/*!rtl:ignore*/
 	left: 0;
 
 	.editor-block-list__block[data-align="right"] & {
@@ -877,6 +876,14 @@
 		right: 0;
 		/*!rtl:end:ignore*/
 	}
+
+	.editor-block-list__block[data-align="left"] & {
+		/*!rtl:begin:ignore*/
+		right: auto;
+		left: 0;
+		/*!rtl:end:ignore*/
+	}
+
 
 	@include break-small() {
 		width: auto;
