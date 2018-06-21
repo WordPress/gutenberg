@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { find, kebabCase } from 'lodash';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Returns the color value based on an array of named colors and the namedColor or the customColor value.
@@ -15,7 +16,15 @@ import { find, kebabCase } from 'lodash';
  */
 export const getColorValue = ( colors, namedColor, customColor ) => {
 	if ( namedColor ) {
-		const colorObj = ( find( colors, { slug: namedColor } ) || find( colors, { name: namedColor } ) );
+		let colorObj = find( colors, { slug: namedColor } );
+
+		if( typeof colorObj === 'undefined' && typeof ( colorObj = find( colors, { name: namedColor } ) ) !== 'undefined' ) {
+			deprecated( 'Using color objects without slugs', {
+				version: '3.3',
+				hint: 'You might want to re-select the color if you have saved in previous versions. The frontend is unaffected by this deprecation.',
+			} );
+		}
+
 		return colorObj && colorObj.color;
 	}
 	if ( customColor ) {
