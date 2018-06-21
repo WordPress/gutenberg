@@ -91,7 +91,6 @@ const getPlaylistDetailsMediaFrame = () => {
 					type: 'audio',
 					collectionType: 'playlist',
 					title: wp.media.view.l10n.editPlaylistTitle,
-					SettingsView: wp.media.view.Settings.Playlist,
 					library: this.options.selection,
 					editing: this.options.editing,
 					menu: 'playlist',
@@ -123,7 +122,6 @@ const getPlaylistDetailsMediaFrame = () => {
 					type: 'video',
 					collectionType: 'playlist',
 					title: wp.media.view.l10n.editVideoPlaylistTitle,
-					SettingsView: wp.media.view.Settings.Playlist,
 					library: this.options.selection,
 					editing: this.options.editing,
 					menu: 'video-playlist',
@@ -215,7 +213,7 @@ class MediaUpload extends Component {
 			} );
 			wp.media.frame = this.frame;
 		}
-  
+
 		if ( modalClass ) {
 			this.frame.$el.addClass( modalClass );
 		}
