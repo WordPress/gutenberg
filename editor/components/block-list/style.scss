@@ -107,8 +107,8 @@
 	// Make room in the main content column for the side UI.
 	// The side UI uses negative margins to position itself so as to not affect the block width.
 	@include break-small() {
-		padding-left: $block-side-ui-width + $block-padding + $block-side-ui-clearance + $block-side-ui-clearance;
-		padding-right: $block-side-ui-width + $block-padding + $block-side-ui-clearance + $block-side-ui-clearance;
+		padding-left: $block-container-side-padding;
+		padding-right: $block-container-side-padding;
 	}
 
 	// Don't add side padding for nested blocks, and compensate for block padding
@@ -361,7 +361,6 @@
 
 		// Hide block outline when an image is floated.
 		.editor-block-list__block-edit {
-
 			&:before {
 				content: none;
 			}

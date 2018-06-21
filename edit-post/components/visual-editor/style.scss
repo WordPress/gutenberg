@@ -69,8 +69,8 @@
 // The base width of the title should match that of blocks even if it isn't a block
 .editor-post-title {
 	@include break-small() {
-		padding-left: $block-side-ui-width + $block-padding + $block-side-ui-clearance + $block-side-ui-clearance;
-		padding-right: $block-side-ui-width + $block-padding + $block-side-ui-clearance + $block-side-ui-clearance;
+		padding-left: $block-container-side-padding;
+		padding-right: $block-container-side-padding;
 	}
 }
 .edit-post-visual-editor .editor-post-title__block {

@@ -24,13 +24,12 @@
 		}
 
 		// Stack borders on mobile.
-		border-top: 1px solid transparent;
-		border-bottom: 1px solid transparent;
-		border-left: 0;
-		border-right: 0;
+		border: 1px solid transparent;
+		border-left-width: 0;
+		border-right-width: 0;
 
 		@include break-small() {
-			border: 1px solid transparent;
+			border-width: 1px;
 		}
 
 		// Match h1 heading
