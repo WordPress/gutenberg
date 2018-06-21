@@ -366,7 +366,7 @@
 			}
 		}
 
-		// The padding collapses, but the outline is still 1px to compensate for. 
+		// The padding collapses, but the outline is still 1px to compensate for.
 		.editor-block-contextual-toolbar {
 			margin-bottom: 1px;
 		}
@@ -468,7 +468,7 @@
 		> .editor-block-list__breadcrumb {
 			right: -$border-width;
 		}
-		
+
 		// Compensate for main container padding and subtract border.
 		@include break-small() {
 			margin-left: -$block-side-ui-width - $block-padding - $block-side-ui-clearance - $border-width;
@@ -606,7 +606,7 @@
 	.editor-block-list__block-mobile-toolbar {
 		display: flex;
 		flex-direction: row;
-		margin-top: $item-spacing + $block-toolbar-height; // Make room for the height of the block toolbar above. 
+		margin-top: $item-spacing + $block-toolbar-height; // Make room for the height of the block toolbar above.
 		margin-right: -$block-padding;
 		margin-bottom: -$block-padding - $border-width;
 		margin-left: -$block-padding;
@@ -802,18 +802,26 @@
 	left: $block-padding;
 	right: $block-padding;
 
+	@include break-small() {
+		top: -$border-width;
+	}
+
 	// Position the contextual toolbar above the block.
 	@include break-mobile() {
-		position: sticky;
+		position: relative;
+		top: auto;
 		bottom: auto;
 		left: auto;
 		right: auto;
 		margin-top: -$block-toolbar-height - $border-width;
 		margin-bottom: $block-padding + $border-width;
-	}
 
-	@include break-small() {
-		top: -$border-width;
+		// IE11 does not support `position: sticky`.
+		@supports (position: sticky) {
+			position: sticky;
+			// Avoid appearance of double border when toolbar sticks at the top of the editor.
+			top: -$border-width;
+		}
 	}
 
 	// Floated items have special needs for the contextual toolbar position.
@@ -906,7 +914,7 @@
 		padding: 4px 4px;
 		background: theme( outlines );
 		color: $white;
-	
+
 		// Animate in
 		.editor-block-list__block:hover & {
 			@include fade_in( .1s );
