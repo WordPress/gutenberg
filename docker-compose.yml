@@ -17,6 +17,7 @@ services:
 
   cli:
     image: wordpress:cli
+    user: xfs
     volumes:
       - wordpress:/var/www/html
       - .:/var/www/html/wp-content/plugins/gutenberg
