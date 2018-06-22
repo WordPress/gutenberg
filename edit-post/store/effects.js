@@ -54,9 +54,20 @@ const effects = {
 		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
 
 		// Saving metaboxes when saving posts
+		const { isAutosavingPost } = select( 'core/editor' );
+		let shouldRequestMetaBoxUpdates = false;
 		subscribe( onChangeListener( select( 'core/editor' ).isSavingPost, ( isSavingPost ) => {
-			if ( ! isSavingPost ) {
+			// Only save metaboxes when this isn't an autosave.
+			if ( isSavingPost && ! isAutosavingPost( store.getState() ) ) {
+				shouldRequestMetaBoxUpdates = true;
+			}
+			// If a full save just completed, trigger metabox save.
+			if ( ! isSavingPost && shouldRequestMetaBoxUpdates ) {
 				store.dispatch( requestMetaBoxUpdates() );
+			}
+			// Regardless of which save just occurred, reset metabox save state.
+			if ( ! isSavingPost ) {
+				shouldRequestMetaBoxUpdates = false;
 			}
 		} ) );
 	},
