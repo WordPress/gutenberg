@@ -852,7 +852,7 @@ export class RichText extends Component {
 			format,
 		} = this.props;
 
-		const ariaProps = { 'aria-multiline': true, ...pickAriaProps( this.props ) };
+		const ariaProps = pickAriaProps( this.props );
 
 		// Generating a key that includes `tagName` ensures that if the tag
 		// changes, we unmount and destroy the previous TinyMCE element, then

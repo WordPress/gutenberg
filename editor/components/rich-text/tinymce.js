@@ -202,8 +202,15 @@ export default class TinyMCE extends Component {
 	render() {
 		const { tagName = 'div', style, defaultValue, className, isPlaceholderVisible, format } = this.props;
 		const ariaProps = pickAriaProps( this.props );
-		if ( [ 'ul', 'ol', 'table' ].indexOf( tagName ) === -1 ) {
+
+		/*
+		 * The role=textbox and aria-multiline=true must always be used together
+		 * as TinyMCE always behaves like a sort of textarea where text wraps in
+		 * multiple lines. Only the table block editable element is excluded.
+		 */
+		if ( tagName !== 'table' ) {
 			ariaProps.role = 'textbox';
+			ariaProps[ 'aria-multiline' ] = true;
 		}
 
 		// If a default value is provided, render it into the DOM even before
