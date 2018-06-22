@@ -471,7 +471,7 @@ export class BlockListBlock extends Component {
 				] }
 				{ ...wrapperProps }
 			>
-				{ ! isMultiSelected && (
+				{ ! isMultiSelected && isMovable && (
 					<BlockDraggable
 						rootUID={ rootUID }
 						index={ order }
@@ -481,7 +481,6 @@ export class BlockListBlock extends Component {
 						onDragEnd={ this.onDragEnd }
 						isDragging={ dragging }
 						elementId={ blockElementId }
-						draggable={ isMovable } // only in locking all moving blocks is totally impossible
 					/>
 				) }
 				{ shouldShowInsertionPoint && (

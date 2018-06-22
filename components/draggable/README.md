@@ -6,14 +6,6 @@
 
 The component accepts the following props:
 
-### draggable
-
-If the component is in a draggable state or not. If false, the component is rendered but it is not possible to drag it. Defaults to true.
-
-- Type: `boolean`
-- Required: No
-- Default:  `true`
-
 ### elementId
 
 The HTML id of the element to clone on drag

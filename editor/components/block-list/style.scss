@@ -74,10 +74,9 @@
 		}
 	}
 
-	&[draggable=true]{
-		cursor: move; // Fallback for IE/Edge < 14
-		cursor: grab;
-	}
+
+	cursor: move; // Fallback for IE/Edge < 14
+	cursor: grab;
 }
 
 
@@ -933,5 +932,30 @@
 
 	.rtl & {
 		content: '←';
+	}
+}
+
+.editor-block-list__block {
+	@include break-small {
+        // Increases the hover and selection area around blocks.
+        // This makes the blue hover line, and the settings button appear even if the mouse,
+        // is still some pixels outside the block.
+        // It is also possible to click some pixels outside the block and select it.
+		&:before {
+			content: '';
+			position: absolute;
+			right: -$parent-block-padding - $block-padding;
+			left: -$parent-block-padding - $block-padding;
+
+			bottom: 0;
+			top: 0;
+		}
+
+		// Removes the effect of the previous rule on nested blocks,
+		// so it only applies to top-level blocks.
+		& &:before {
+			left: 0;
+			right: 0;
+		}
 	}
 }
