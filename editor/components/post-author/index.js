@@ -55,7 +55,6 @@ export class PostAuthor extends Component {
 		return (
 			currentPostAuthor && allAuthors &&
 			<PostAuthorCheck>
-				<label htmlFor={ selectId }>{ __( 'Author' ) }</label>
 				<Downshift
 					onChange={ this.setAuthorId }
 					itemToString={ ( author ) => ( author ? author.value : '' ) }
@@ -65,6 +64,7 @@ export class PostAuthor extends Component {
 					{ ( {
 						getInputProps,
 						getItemProps,
+						getLabelProps,
 						getMenuProps,
 						isOpen,
 						inputValue,
@@ -72,15 +72,13 @@ export class PostAuthor extends Component {
 						selectedItem,
 					} ) => (
 						<div>
-
-							<div>
-								<input id={ selectId } { ...getInputProps() } />
-								<span
-									className={ 'spinner' + ( isSearching ? ' is-active' : '' ) }
-									style={ { position: 'absolute', right: '10px' } }
-								/>
-							</div>
-							<ul className="editor-post-author__select" { ...getMenuProps() } >
+							<label { ...getLabelProps() }>{ __( 'Author' ) }</label>
+							<input { ...getInputProps() } />
+							<span
+								className={ 'spinner' + ( isSearching ? ' is-active' : '' ) }
+								style={ { position: 'absolute', right: '10px' } }
+							/>
+							<ul { ...getMenuProps() } >
 								{ isOpen ?
 									allAuthors
 										.map( ( author ) => ( { id: author.id, value: author.name } ) )
@@ -89,7 +87,6 @@ export class PostAuthor extends Component {
 											author.value.toLowerCase().includes( inputValue.toLowerCase() ) )
 										.map( ( author, index ) => (
 											<li
-												key={ author.id }
 												{ ...getItemProps( {
 													key: author.id,
 													index,
