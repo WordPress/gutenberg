@@ -71,7 +71,7 @@ class Slot extends Component {
 		} );
 
 		return (
-			<div ref={ this.bindNode }>
+			<div ref={ this.bindNode } role="presentation">
 				{ isFunction( children ) ? children( fills.filter( Boolean ) ) : fills }
 			</div>
 		);

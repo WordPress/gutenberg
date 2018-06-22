@@ -93,7 +93,7 @@ export class BlockSettingsMenu extends Component {
 					} }
 					renderContent={ ( { onClose } ) => (
 						// Should this just use a DropdownMenu instead of a DropDown ?
-						<NavigableMenu className="editor-block-settings-menu__content">
+						<NavigableMenu className="editor-block-settings-menu__content" deep>
 							<_BlockSettingsMenuFirstItem.Slot fillProps={ { onClose } } />
 							{ count === 1 && <BlockModeToggle uid={ firstBlockUID } onToggle={ onClose } role="menuitem" /> }
 							{ count === 1 && <UnknownConverter uid={ firstBlockUID } role="menuitem" /> }
