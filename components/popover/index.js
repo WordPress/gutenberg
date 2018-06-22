@@ -8,7 +8,6 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
-import { focus } from '@wordpress/dom';
 import { keycodes } from '@wordpress/utils';
 
 /**
@@ -109,10 +108,9 @@ class Popover extends Component {
 		// Related https://stackoverflow.com/questions/35522220/react-ref-with-focus-doesnt-work-without-settimeout-my-example
 		const focusNode = ( domNode ) => setTimeout( () => domNode.focus() );
 
-		// Find first tabbable node within content and shift focus, falling
-		// back to the popover panel itself.
-		const firstTabbable = focus.tabbable.find( this.contentNode.current )[ 0 ];
-		focusNode( firstTabbable ? firstTabbable : this.contentNode.current );
+		// Focus the popover panel so further tips are easily navigated to via the
+		// keyboard.
+		focusNode( this.contentNode.current );
 	}
 
 	getAnchorRect() {
