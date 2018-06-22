@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { compact, flatMap, forEach, get, includes, map, noop, startsWith } from 'lodash';
+import { compact, flatMap, forEach, get, has, includes, map, noop, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -122,16 +122,22 @@ export function mediaUpload( {
 				};
 				setAndUpdateFiles( idx, mediaObject );
 			},
-			() => {
+			( response ) => {
 				// Reset to empty on failure.
 				setAndUpdateFiles( idx, null );
-				onError( {
-					code: 'GENERAL',
-					message: sprintf(
+				let message;
+				if ( has( response, [ 'responseJSON', 'message' ] ) ) {
+					message = get( response, [ 'responseJSON', 'message' ] );
+				} else {
+					message = sprintf(
 						// translators: %s: file name
 						__( 'Error while uploading file %s to the media library.' ),
 						mediaFile.name
-					),
+					);
+				}
+				onError( {
+					code: 'GENERAL',
+					message,
 					file: mediaFile,
 				} );
 			}
