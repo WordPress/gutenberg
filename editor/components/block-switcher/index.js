@@ -8,7 +8,7 @@ import { get } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Dropdown, Dashicon, IconButton, Toolbar, PanelBody } from '@wordpress/components';
-import { getBlockType, getPossibleBlockTransformations, switchToBlockType } from '@wordpress/blocks';
+import { getBlockType, getPossibleBlockTransformations, switchToBlockType, hasChildBlocks } from '@wordpress/blocks';
 import { compose, Component, Fragment } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -20,6 +20,7 @@ import './style.scss';
 import BlockIcon from '../block-icon';
 import BlockStyles from '../block-styles';
 import BlockPreview from '../block-preview';
+import BlockTypesList from '../block-types-list';
 
 /**
  * Module Constants
@@ -95,26 +96,21 @@ export class BlockSwitcher extends Component {
 						</PanelBody>
 						}
 						<PanelBody
-							title={ __( 'Block transforms' ) }
+							title={ __( 'Transform To:' ) }
 							initialOpen
 						>
-							{ allowedBlocks.map( ( { name, title, icon } ) => (
-								<IconButton
-									key={ name }
-									onClick={ () => {
-										onTransform( blocks, name );
-										onClose();
-									} }
-									className="editor-block-switcher__transform"
-									icon={ (
-										<span className="editor-block-switcher__block-icon">
-											<BlockIcon icon={ icon && icon.src } />
-										</span>
-									) }
-								>
-									{ title }
-								</IconButton>
-							) ) }
+							<BlockTypesList
+								items={ allowedBlocks.map( ( destinationBlockType ) => ( {
+									id: destinationBlockType.name,
+									icon: destinationBlockType.icon,
+									title: destinationBlockType.title,
+									hasChildBlocks: hasChildBlocks( destinationBlockType.name ),
+								} ) ) }
+								onSelect={ ( item ) => {
+									onTransform( blocks, item.id );
+									onClose();
+								} }
+							/>
 						</PanelBody>
 
 						{ ( hoveredClassName !== null ) &&

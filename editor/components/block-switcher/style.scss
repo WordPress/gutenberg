@@ -69,26 +69,6 @@
 	}
 }
 
-.editor-block-switcher__transform {
-	color: $dark-gray-500;
-	display: flex;
-	align-items: center;
-	width: calc( 100% + 16 * 2px);
-	padding: 6px;
-	margin: 0 -16px; // Remove the panel body padding while keeping it for the title
-	text-align: left;
-
-	.editor-block-switcher__block-icon {
-		margin-right: 8px;
-		height: 20px;
-	}
-
-	&:hover:not(:disabled):not([aria-disabled="true"]) {
-		@include menu-style__neutral;
-	}
-
-	&:focus:not(:disabled):not([aria-disabled="true"]) {
-		@include menu-style__focus;
-	}
-
+.editor-block-switcher__popover .editor-block-types-list {
+	margin: 8px -8px -8px;
 }
