@@ -8,11 +8,12 @@
                 "A ",
                 {
                     "type": "em",
-                    "children": "verse"
+                    "children": [ "verse" ]
                 },
                 "…",
                 {
-                    "type": "br"
+					"type": "br",
+					"children": []
                 },
                 "And more!"
             ]

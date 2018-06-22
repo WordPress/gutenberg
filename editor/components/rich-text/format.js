@@ -7,7 +7,8 @@ import { nodeListToReact } from 'dom-react';
 /**
  * WordPress dependencies
  */
-import { createElement, renderToString } from '@wordpress/element';
+import { renderToString } from '@wordpress/element';
+import { createSimpleElement } from '@wordpress/blocks';
 
 /**
  * Transforms a WP Element to its corresponding HTML string.
@@ -55,7 +56,7 @@ export function createTinyMCEElement( type, props, ...children ) {
 		return children;
 	}
 
-	return createElement(
+	return createSimpleElement(
 		type,
 		omitBy( props, ( _, key ) => key.indexOf( 'data-mce-' ) === 0 ),
 		...children

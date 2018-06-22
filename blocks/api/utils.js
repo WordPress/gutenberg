@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, keys, isEqual, isFunction, isString } from 'lodash';
+import { every, keys, isEqual, isFunction, isString, omit } from 'lodash';
 import { default as tinycolor, mostReadable } from 'tinycolor2';
 
 /**
@@ -117,4 +117,22 @@ export function normalizeIconObject( icon ) {
 		icon.shadowColor = tinyBgColor.setAlpha( 0.3 ).toRgbString();
 	}
 	return icon;
+}
+
+/**
+ * Creates a simplified element representation.
+ *
+ * @param {string} type
+ * @param {Object} props
+ * @param {Array?} children
+ *
+ * @return {Object} Element.
+ */
+export function createSimpleElement( type, props, ...children ) {
+	return {
+		type, props: {
+			...omit( props, [ 'key' ] ),
+			children,
+		},
+	};
 }

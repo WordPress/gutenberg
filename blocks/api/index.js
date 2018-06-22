@@ -39,6 +39,7 @@ export {
 } from './registration';
 export {
 	isUnmodifiedDefaultBlock,
+	createSimpleElement,
 } from './utils';
 export {
 	doBlocksMatchTemplate,

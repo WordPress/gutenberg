@@ -12,12 +12,21 @@ exports[`createTinyMCEElement should render a TinyMCE element 1`] = `
 
 exports[`domToElement should return the corresponding element  1`] = `
 Array [
-  <div
-    className="container"
-  >
-    <strong>
-      content
-    </strong>
-  </div>,
+  Object {
+    "props": Object {
+      "children": Array [
+        Object {
+          "props": Object {
+            "children": Array [
+              "content",
+            ],
+          },
+          "type": "strong",
+        },
+      ],
+      "className": "container",
+    },
+    "type": "div",
+  },
 ]
 `;

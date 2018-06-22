@@ -1,13 +1,13 @@
 /**
- * WordPress dependencies
- */
-import { createElement } from '@wordpress/element';
-
-/**
  * External dependencies
  */
 import { nodeListToReact, nodeToReact } from 'dom-react';
 export { attr, prop, html, text, query } from 'hpq';
+
+/**
+ * Internal dependencies
+ */
+import { createSimpleElement } from './utils';
 
 export const children = ( selector ) => {
 	return ( domNode ) => {
@@ -18,7 +18,7 @@ export const children = ( selector ) => {
 		}
 
 		if ( match ) {
-			return nodeListToReact( match.childNodes || [], createElement );
+			return nodeListToReact( match.childNodes || [], createSimpleElement );
 		}
 
 		return [];
@@ -33,6 +33,6 @@ export const node = ( selector ) => {
 			match = domNode.querySelector( selector );
 		}
 
-		return nodeToReact( match, createElement );
+		return nodeToReact( match, createSimpleElement );
 	};
 };
