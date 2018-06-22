@@ -208,7 +208,7 @@ class MediaUpload extends Component {
 			const PlaylistDetailsMediaFrame = getPlaylistDetailsMediaFrame();
 			if ( type === 'video' ) {
 				this.frame = new PlaylistDetailsMediaFrame( {
-					frame: 'edit',
+					frame: 'select',
 					mimeType: 'video',
 					state: 'video-playlist',
 				} );
