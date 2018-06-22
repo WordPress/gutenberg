@@ -339,6 +339,48 @@ function gutenberg_add_target_schema_to_links( $response, $post, $request ) {
 }
 
 /**
+ * Include revisions data on post response links.
+ *
+ * @see https://core.trac.wordpress.org/ticket/44321
+ *
+ * @param WP_REST_Response $response WP REST API response of a post.
+ * @param WP_Post          $post The post being returned.
+ * @param WP_REST_Request  $request WP REST API request.
+ * @return WP_REST_Response Response containing the new links.
+ */
+function gutenberg_add_revisions_data_to_links( $response, $post, $request ) {
+
+	$new_links  = array();
+	$orig_links = $response->get_links();
+
+	if ( in_array( $post->post_type, array( 'post', 'page' ), true ) || post_type_supports( $post->post_type, 'revisions' ) ) {
+		// 'version-history' already exists and we don't want to duplicate it.
+		$response->remove_link( 'version-history' );
+
+		$orig_href       = ! empty( $orig_links['self'][0]['href'] ) ? $orig_links['self'][0]['href'] : null;
+		$revisions       = wp_get_post_revisions( $post->ID, array( 'fields' => 'ids' ) );
+		$revisions_count = count( $revisions );
+
+		$new_links['version-history'] = array(
+			'href'  => $orig_href . '/revisions',
+			'count' => $revisions_count,
+		);
+
+		if ( $revisions_count > 0 ) {
+			$last_revision = array_shift( $revisions );
+
+			$new_links['predecessor'] = array(
+				'href' => $orig_href . '/revisions/' . $last_revision,
+				'id'   => $last_revision,
+			);
+		}
+	}
+
+	$response->add_links( $new_links );
+	return $response;
+}
+
+/**
  * Whenever a post type is registered, ensure we're hooked into it's WP REST API response.
  *
  * @param string $post_type The newly registered post type.
@@ -348,6 +390,7 @@ function gutenberg_register_post_prepare_functions( $post_type ) {
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_permalink_template_to_posts', 10, 3 );
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_block_format_to_post_content', 10, 3 );
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_target_schema_to_links', 10, 3 );
+	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_revisions_data_to_links', 10, 3 );
 	add_filter( "rest_{$post_type}_collection_params", 'gutenberg_filter_post_collection_parameters', 10, 2 );
 	add_filter( "rest_{$post_type}_query", 'gutenberg_filter_post_query_arguments', 10, 2 );
 	return $post_type;
@@ -364,46 +407,6 @@ function gutenberg_register_taxonomy_prepare_functions( $taxonomy ) {
 	add_filter( "rest_{$taxonomy}_query", 'gutenberg_filter_term_query_arguments', 10, 2 );
 }
 add_filter( 'registered_taxonomy', 'gutenberg_register_taxonomy_prepare_functions' );
-
-/**
- * Gets revisions details for the selected post.
- *
- * @since 1.6.0
- *
- * @param array $post The post object from the response.
- * @return array|null Revisions details or null when no revisions present.
- */
-function gutenberg_get_post_revisions( $post ) {
-	$revisions       = wp_get_post_revisions( $post['id'] );
-	$revisions_count = count( $revisions );
-	if ( 0 === $revisions_count ) {
-		return null;
-	}
-
-	$last_revision = array_shift( $revisions );
-
-	return array(
-		'count'   => $revisions_count,
-		'last_id' => $last_revision->ID,
-	);
-}
-
-/**
- * Adds the custom field `revisions` to the REST API response of post.
- *
- * TODO: This is a temporary solution. Next step would be to find a solution that is limited to the editor.
- *
- * @since 1.6.0
- */
-function gutenberg_register_rest_api_post_revisions() {
-	register_rest_field( get_post_types( '', 'names' ),
-		'revisions',
-		array(
-			'get_callback' => 'gutenberg_get_post_revisions',
-		)
-	);
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_revisions' );
 
 /**
  * Ensure that the wp-json index contains the 'theme-supports' setting as

@@ -155,7 +155,7 @@ export function getCurrentPostId( state ) {
  * @return {number} Number of revisions.
  */
 export function getCurrentPostRevisionsCount( state ) {
-	return get( getCurrentPost( state ), [ 'revisions', 'count' ], 0 );
+	return get( getCurrentPost( state ), [ '_links', 'version-history', 0, 'count' ], 0 );
 }
 
 /**
@@ -167,7 +167,7 @@ export function getCurrentPostRevisionsCount( state ) {
  * @return {?number} ID of the last revision.
  */
 export function getCurrentPostLastRevisionId( state ) {
-	return get( getCurrentPost( state ), [ 'revisions', 'last_id' ], null );
+	return get( getCurrentPost( state ), [ '_links', 'predecessor', 0, 'id' ], null );
 }
 
 /**

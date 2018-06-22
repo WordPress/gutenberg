@@ -414,4 +414,27 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 		$data = $response->get_data();
 		$this->assertEquals( 'rest_forbidden_per_page', $data['code'] );
 	}
+
+	public function test_get_post_links_predecessor() {
+		$post_id = $this->factory->post->create();
+		wp_update_post(
+			array(
+				'post_content' => 'This content is marvelous.',
+				'ID'           => $post_id,
+			)
+		);
+		$revisions  = wp_get_post_revisions( $post_id );
+		$revision_1 = array_pop( $revisions );
+
+		$request  = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', $post_id ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$links = $response->get_links();
+
+		$this->assertEquals( rest_url( '/wp/v2/posts/' . $post_id . '/revisions' ), $links['version-history'][0]['href'] );
+		$this->assertEquals( 1, $links['version-history'][0]['attributes']['count'] );
+
+		$this->assertEquals( rest_url( '/wp/v2/posts/' . $post_id . '/revisions/' . $revision_1->ID ), $links['predecessor'][0]['href'] );
+		$this->assertEquals( $revision_1->ID, $links['predecessor'][0]['attributes']['id'] );
+	}
 }
