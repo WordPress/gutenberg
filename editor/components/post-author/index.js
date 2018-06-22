@@ -32,7 +32,10 @@ export class PostAuthor extends Component {
 		onUpdateAuthor( Number( id ) );
 	}
 
-	suggestAuthors( query ) {
+	suggestAuthors( query, args ) {
+		if ( ! args.isOpen ) {
+			return;
+		}
 		const payload = '?search=' + encodeURIComponent( query );
 		this.setState( { searching: true } );
 		apiRequest( { path: '/wp/v2/users' + payload } ).done( ( results ) => {
