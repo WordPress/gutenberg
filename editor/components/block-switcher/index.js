@@ -72,7 +72,6 @@ export class BlockSwitcher extends Component {
 						<Toolbar>
 							<IconButton
 								className="editor-block-switcher__toggle"
-								icon={ <BlockIcon icon={ blockType.icon && blockType.icon.src } /> }
 								onClick={ onToggle }
 								aria-haspopup="true"
 								aria-expanded={ isOpen }
@@ -80,7 +79,7 @@ export class BlockSwitcher extends Component {
 								tooltip={ label }
 								onKeyDown={ openOnArrowDown }
 							>
-								<Dashicon icon="arrow-down" />
+								<BlockIcon icon={ blockType.icon && blockType.icon.src } showColors />
 							</IconButton>
 						</Toolbar>
 					);
