@@ -366,39 +366,6 @@ function gutenberg_register_taxonomy_prepare_functions( $taxonomy ) {
 add_filter( 'registered_taxonomy', 'gutenberg_register_taxonomy_prepare_functions' );
 
 /**
- * Includes the value for the 'viewable' attribute of a post type resource.
- *
- * @see https://core.trac.wordpress.org/ticket/43739
- *
- * @param object $post_type Post type response object.
- * @return boolean Whether or not the post type can be viewed.
- */
-function gutenberg_get_post_type_viewable( $post_type ) {
-	return is_post_type_viewable( $post_type['slug'] );
-}
-
-/**
- * Adds the 'viewable' attribute to the REST API response of a post type.
- *
- * @see https://core.trac.wordpress.org/ticket/43739
- */
-function gutenberg_register_rest_api_post_type_viewable() {
-	register_rest_field( 'type',
-		'viewable',
-		array(
-			'get_callback' => 'gutenberg_get_post_type_viewable',
-			'schema'       => array(
-				'description' => __( 'Whether or not the post type can be viewed', 'gutenberg' ),
-				'type'        => 'boolean',
-				'context'     => array( 'edit' ),
-				'readonly'    => true,
-			),
-		)
-	);
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_type_viewable' );
-
-/**
  * Gets revisions details for the selected post.
  *
  * @since 1.6.0
