@@ -64,10 +64,12 @@ If you've configured [Babel](http://babeljs.io/) for your project, you can opt i
 {
 	"plugins": [
 		[ "transform-react-jsx", {
-			"pragma": "wp.element.createElement"
+			"pragma": "createElement"
 		} ]
 	]
 }
 ```
+
+This assumes that you will import the `createElement` function in any file where you use JSX. Alternatively, consider using the [`@wordpress/babel-plugin-import-jsx-pragma` Babel plugin](https://www.npmjs.com/package/@wordpress/babel-plugin-import-jsx-pragma) to automate the import of this function.
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

@@ -108,6 +108,22 @@
 		"presets": [
 			"@wordpress/default"
 		],
+		"plugins": [
+			[
+				"./packages/babel-plugin-import-jsx-pragma",
+				{
+					"scopeVariable": "createElement",
+					"source": "@wordpress/element",
+					"isDefault": false
+				}
+			],
+			[
+				"babel-plugin-transform-react-jsx",
+				{
+					"pragma": "createElement"
+				}
+			]
+		],
 		"env": {
 			"production": {
 				"plugins": [
