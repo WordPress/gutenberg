@@ -38,6 +38,9 @@ export async function* getAuthors() {
 
 /**
  * Requests author details from the REST API.
+ *
+ * @param {Object} state  State tree
+ * @param {number} id Author id.
  */
 export async function* getAuthor( state, id ) {
 	const author = await apiRequest( { path: `/wp/v2/users/${ id }` } );

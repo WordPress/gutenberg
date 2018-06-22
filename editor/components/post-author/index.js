@@ -32,19 +32,19 @@ export class PostAuthor extends Component {
 		onUpdateAuthor( Number( id ) );
 	}
 
-	suggestAuthors( query, populateResults ) {
+	suggestAuthors( query ) {
 		const payload = '?search=' + encodeURIComponent( query );
 		this.setState( { searching: true } );
 		apiRequest( { path: '/wp/v2/users' + payload } ).done( ( results ) => {
 			this.setState( { searching: false } );
-			this.setState( { authors: results.map( author => ( { id: author.id, name: author.name} ) ) } );
+			this.setState( { authors: results.map( ( author ) => ( { id: author.id, name: author.name } ) ) } );
 		} );
- 	}
+	}
 
 	render() {
-		const { postAuthor, instanceId, authors, author } = this.props;
+		const { instanceId, authors, postAuthor } = this.props;
 		const selectId = 'post-author-selector-' + instanceId;
-		const currentPostAuthor = author.length > 0 ? author[0].name : '';
+		const currentPostAuthor = postAuthor.length > 0 ? postAuthor[ 0 ].name : '';
 		const allAuthors = this.state && this.state.authors ? this.state.authors : authors;
 		const isSearching = this.state && this.state.searching;
 
@@ -54,54 +54,54 @@ export class PostAuthor extends Component {
 			<PostAuthorCheck>
 				<label htmlFor={ selectId }>{ __( 'Author' ) }</label>
 				<Downshift
-					onChange={this.setAuthorId}
-					itemToString={author => (author ? author.value : '')}
+					onChange={ this.setAuthorId }
+					itemToString={ ( author ) => ( author ? author.value : '' ) }
 					defaultInputValue={ currentPostAuthor }
 					onInputValueChange={ debounce( this.suggestAuthors, 300 ) }
 				>
-					{({
+					{ ( {
 						getInputProps,
 						getItemProps,
-						getLabelProps,
 						getMenuProps,
 						isOpen,
 						inputValue,
 						highlightedIndex,
 						selectedItem,
-					}) => (
+					} ) => (
 						<div>
 
 							<div>
-								<input id={ selectId } {...getInputProps()}  />
+								<input id={ selectId } { ...getInputProps() } />
 								<span
 									className={ 'spinner' + ( isSearching ? ' is-active' : '' ) }
 									style={ { position: 'absolute', right: '10px' } }
 								/>
 							</div>
-							<ul className="editor-post-author__select" {...getMenuProps()}>
-								{isOpen
-								? allAuthors
-									.map( author => ( { id: author.id, value: author.name} ) )
-									.filter( author =>
-										! inputValue ||
-										author.value.toLowerCase().includes(inputValue.toLowerCase() ) )
-									.map( ( author, index) => (
-										<li
-										{ ...getItemProps( {
-											key: author.id,
-											index,
-											item: author,
-											style: {
-											backgroundColor:
-												highlightedIndex === index ? 'lightgray' : 'white',
-											fontWeight: selectedItem === author ? 'bold' : 'normal',
-											},
-										} ) }
-										>
-										{author.value}
-										</li>
-									))
-								: null}
+							<ul className="editor-post-author__select" { ...getMenuProps() } >
+								{ isOpen ?
+									allAuthors
+										.map( ( author ) => ( { id: author.id, value: author.name } ) )
+										.filter( ( author ) =>
+											! inputValue ||
+											author.value.toLowerCase().includes( inputValue.toLowerCase() ) )
+										.map( ( author, index ) => (
+											<li
+												key={ author.id }
+												{ ...getItemProps( {
+													key: author.id,
+													index,
+													item: author,
+													style: {
+														backgroundColor:
+															highlightedIndex === index ? 'lightgray' : 'white',
+														fontWeight: selectedItem === author ? 'bold' : 'normal',
+													},
+												} ) }
+											>
+												{ author.value }
+											</li>
+										) ) :
+									null }
 							</ul>
 						</div>
 					) }
@@ -115,9 +115,8 @@ export class PostAuthor extends Component {
 export default compose( [
 	withSelect( ( select ) => {
 		return {
-			postAuthor: select( 'core/editor' ).getEditedPostAttribute( 'author' ),
+			postAuthor: select( 'core' ).getAuthor( select( 'core/editor' ).getEditedPostAttribute( 'author' ) ),
 			authors: select( 'core' ).getAuthors(),
-			author: select( 'core' ).getAuthor( select( 'core/editor' ).getEditedPostAttribute( 'author' ) ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
