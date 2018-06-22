@@ -1,0 +1,28 @@
+.editor-block-styles {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-template-rows: 60px;
+	grid-gap: 5px;
+}
+
+.editor-block-styles__item {
+	cursor: pointer;
+	border: 1px solid $light-gray-500;
+	overflow: hidden;
+	padding: 5px;
+	text-align: initial;
+
+	> * {
+		transform: scale( 0.7 );
+		transform-origin: center center;
+		font-family: $editor-font;
+	}
+
+	&.is-selected {
+		@include formatting-button-style__active;
+	}
+
+	&:hover {
+		@include formatting-button-style__hover;
+	}
+}

@@ -42,31 +42,6 @@
 
 .editor-block-switcher__popover .editor-block-styles {
 	margin: 0 -11px; // Remove the panel body padding while keeping it for the title
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	grid-template-rows: 60px;
-	grid-gap: 5px;
-
-	.editor-block-styles__item {
-		border: 1px solid $light-gray-500;
-		overflow: hidden;
-		padding: 5px;
-		text-align: initial;
-
-		> * {
-			transform: scale( 0.7 );
-			transform-origin: center center;
-			font-family: $editor-font;
-		}
-
-		&.is-selected {
-			@include formatting-button-style__active;
-		}
-
-		&:hover {
-			@include formatting-button-style__hover;
-		}
-	}
 }
 
 .editor-block-switcher__popover .editor-block-types-list {

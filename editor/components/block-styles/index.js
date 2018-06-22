@@ -9,11 +9,11 @@ import { find, compact, get } from 'lodash';
 import { compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { getBlockType } from '@wordpress/blocks';
-import { Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
+import './style.scss';
 import { BlockPreviewContent } from '../block-preview';
 
 /**
@@ -96,13 +96,16 @@ function BlockStyles( {
 		<div className="editor-block-styles">
 			{ styles.map( ( style ) => {
 				const styleClassName = replaceActiveStyle( className, activeStyle, style );
+				/* eslint-disable jsx-a11y/click-events-have-key-events */
 				return (
-					<Button
+					<div
 						key={ style.name }
 						className="editor-block-styles__item"
 						onClick={ () => updateClassName( style ) }
 						onMouseEnter={ () => onHoverClassName( styleClassName ) }
 						onMouseLeave={ () => onHoverClassName( null ) }
+						role="button"
+						tabIndex="0"
 					>
 						<BlockPreviewContent
 							name={ name }
@@ -111,8 +114,9 @@ function BlockStyles( {
 								className: styleClassName,
 							} }
 						/>
-					</Button>
+					</div>
 				);
+				/* eslint-enable jsx-a11y/click-events-have-key-events */
 			} ) }
 		</div>
 	);
