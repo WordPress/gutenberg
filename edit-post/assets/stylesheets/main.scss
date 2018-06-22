@@ -45,6 +45,7 @@ html.wp-toolbar {
 
 body.gutenberg-editor-page {
 	background: $white;
+	overflow-wrap: break-word;
 
 	#wpcontent {
 		padding-left: 0;
