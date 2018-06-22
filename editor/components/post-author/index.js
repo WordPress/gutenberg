@@ -33,12 +33,11 @@ export class PostAuthor extends Component {
 	}
 
 	suggestAuthors( query, populateResults ) {
-		if ( query.length < 2 ) {
-			return;
-		}
 		const payload = '?search=' + encodeURIComponent( query );
+		this.setState( { searching: true } );
 		apiRequest( { path: '/wp/v2/users' + payload } ).done( ( results ) => {
-			this.setState( results.map( ( author ) => ( author.name ) ) );
+			this.setState( { searching: false } );
+			this.setState( { authors: results.map( author => ( { id: author.id, name: author.name} ) ) } );
 		} );
  	}
 
@@ -47,10 +46,11 @@ export class PostAuthor extends Component {
 		const selectId = 'post-author-selector-' + instanceId;
 		const currentPostAuthor = author.length > 0 ? author[0].name : '';
 		const allAuthors = this.state && this.state.authors ? this.state.authors : authors;
+		const isSearching = this.state && this.state.searching;
 
 		/* eslint-disable jsx-a11y/no-onchange */
 		return (
-			currentPostAuthor &&
+			currentPostAuthor && allAuthors &&
 			<PostAuthorCheck>
 				<label htmlFor={ selectId }>{ __( 'Author' ) }</label>
 				<Downshift
@@ -70,32 +70,39 @@ export class PostAuthor extends Component {
 						selectedItem,
 					}) => (
 						<div>
-						<input id={ selectId } {...getInputProps()} />
-						<ul className="editor-post-author__select" {...getMenuProps()}>
-							{isOpen
-							? allAuthors
-								.map( author => ( { id: author.id, value: author.name} ) )
-								.filter( author =>
-									! inputValue ||
-									author.value.toLowerCase().includes(inputValue.toLowerCase() ) )
-								.map( ( author, index) => (
-									<li
-									{ ...getItemProps( {
-										key: author.id,
-										index,
-										item: author,
-										style: {
-										backgroundColor:
-											highlightedIndex === index ? 'lightgray' : 'white',
-										fontWeight: selectedItem === author ? 'bold' : 'normal',
-										},
-									} ) }
-									>
-									{author.value}
-									</li>
-								))
-							: null}
-						</ul>
+
+							<div>
+								<input id={ selectId } {...getInputProps()}  />
+								<span
+									className={ 'spinner' + ( isSearching ? ' is-active' : '' ) }
+									style={ { position: 'absolute', right: '10px' } }
+								/>
+							</div>
+							<ul className="editor-post-author__select" {...getMenuProps()}>
+								{isOpen
+								? allAuthors
+									.map( author => ( { id: author.id, value: author.name} ) )
+									.filter( author =>
+										! inputValue ||
+										author.value.toLowerCase().includes(inputValue.toLowerCase() ) )
+									.map( ( author, index) => (
+										<li
+										{ ...getItemProps( {
+											key: author.id,
+											index,
+											item: author,
+											style: {
+											backgroundColor:
+												highlightedIndex === index ? 'lightgray' : 'white',
+											fontWeight: selectedItem === author ? 'bold' : 'normal',
+											},
+										} ) }
+										>
+										{author.value}
+										</li>
+									))
+								: null}
+							</ul>
 						</div>
 					) }
 				</Downshift>
