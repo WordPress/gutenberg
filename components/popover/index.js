@@ -108,8 +108,8 @@ class Popover extends Component {
 		// Related https://stackoverflow.com/questions/35522220/react-ref-with-focus-doesnt-work-without-settimeout-my-example
 		const focusNode = ( domNode ) => setTimeout( () => domNode.focus() );
 
-		// Focus the popover panel so further tips are easily navigated to via the
-		// keyboard.
+		// Focus the popover panel itself so items in the popover are easily
+		// accessed via keyboard navigation.
 		focusNode( this.contentNode.current );
 	}
 
