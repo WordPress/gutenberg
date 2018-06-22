@@ -7,7 +7,7 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dropdown, Dashicon, IconButton, Toolbar, PanelBody } from '@wordpress/components';
+import { Dropdown, IconButton, Toolbar, PanelBody } from '@wordpress/components';
 import { getBlockType, getPossibleBlockTransformations, switchToBlockType, hasChildBlocks } from '@wordpress/blocks';
 import { compose, Component, Fragment } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
