@@ -7,8 +7,9 @@
 	color: $dark-gray-500;
 
 	.dashicon,
-	.components-menu-items__item-icon {
-		margin-right: 5px;
+	.components-menu-items__item-icon,
+	> span > svg { // Also target plugin icons that can have arbitrary classes.
+		margin-right: 4px;
 	}
 
 	.components-menu-items__item-icon {
@@ -26,6 +27,14 @@
 
 	&:focus:not(:disabled):not([aria-disabled="true"]) {
 		@include menu-style__focus;
+	}
+
+	// Forcefully colorize plugin icons to ensure contrast and cohesion.
+	svg,
+	g,
+	path {
+		stroke: $dark-gray-500 !important;
+		fill: $dark-gray-500 !important;
 	}
 }
 

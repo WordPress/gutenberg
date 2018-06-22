@@ -4,4 +4,26 @@
 	.components-icon-button {
 		margin-left: 4px;
 	}
+
+	// Forcefully colorize plugin icons to ensure contrast and cohesion.
+	.components-icon-button:not( .is-toggled ) svg,
+	.components-icon-button:not( .is-toggled ) g,
+	.components-icon-button:not( .is-toggled ) path {
+		stroke: $dark-gray-500 !important;
+		fill: $dark-gray-500 !important;
+	}
+
+	.components-icon-button.is-toggled svg,
+	.components-icon-button.is-toggled g,
+	.components-icon-button.is-toggled path {
+		stroke: $white !important;
+		fill: $white !important;
+	}
+
+	.components-icon-button:hover svg,
+	.components-icon-button:hover g,
+	.components-icon-button:hover path {
+		stroke: $dark-gray-900 !important;
+		fill: $dark-gray-900 !important;
+	}
 }
