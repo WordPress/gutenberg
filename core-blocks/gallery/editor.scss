@@ -100,3 +100,14 @@
 	left: 50%;
 	transform: translate( -50%, -50% );
 }
+
+// IE11 doesn't support object-fit or flex very well, so we inline-block.
+@media all and ( -ms-high-contrast: none ) {
+	*::-ms-backdrop, .blocks-gallery-item {
+		display: inline-block;
+	}
+
+	*::-ms-backdrop, .blocks-gallery-item img {
+		width: 100%;
+	}
+}
