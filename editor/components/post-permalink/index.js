@@ -60,7 +60,7 @@ class PostPermalink extends Component {
 		const { isCopied, isEditingPermalink } = this.state;
 		const ariaLabel = isCopied ? __( 'Permalink copied' ) : __( 'Copy the permalink' );
 
-		if ( isNew || ! previewLink ) {
+		if ( isNew ) {
 			return null;
 		}
 
@@ -123,7 +123,13 @@ class PostPermalink extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { isEditedPostNew, isPermalinkEditable, getEditedPostPreviewLink, getPermalink, isCurrentPostPublished } = select( 'core/editor' );
+		const {
+			isEditedPostNew,
+			isPermalinkEditable,
+			getEditedPostPreviewLink,
+			getPermalink,
+			isCurrentPostPublished,
+		} = select( 'core/editor' );
 		return {
 			isNew: isEditedPostNew(),
 			previewLink: getEditedPostPreviewLink(),
