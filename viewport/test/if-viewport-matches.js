@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import renderer from 'react-test-renderer';
+import TestRenderer from 'react-test-renderer';
 
 /**
  * WordPress dependencies
@@ -20,19 +20,16 @@ describe( 'ifViewportMatches()', () => {
 	it( 'should not render if query does not match', () => {
 		dispatch( 'core/viewport' ).setIsMatching( { '> wide': false } );
 		const EnhancedComponent = ifViewportMatches( '> wide' )( Component );
-		const wrapper = renderer.create( <EnhancedComponent /> );
+		const testRenderer = TestRenderer.create( <EnhancedComponent /> );
 
-		expect( wrapper.root.findAllByType( Component ) ).toHaveLength( 0 );
-
-		wrapper.unmount();
+		expect( testRenderer.root.findAllByType( Component ) ).toHaveLength( 0 );
 	} );
 
 	it( 'should render if query does match', () => {
 		dispatch( 'core/viewport' ).setIsMatching( { '> wide': true } );
 		const EnhancedComponent = ifViewportMatches( '> wide' )( Component );
-		const wrapper = renderer.create( <EnhancedComponent /> );
-		expect( wrapper.root.findByType( Component ).children[ 0 ].type ).toBe( 'div' );
+		const testRenderer = TestRenderer.create( <EnhancedComponent /> );
 
-		wrapper.unmount();
+		expect( testRenderer.root.findAllByType( Component ) ).toHaveLength( 1 );
 	} );
 } );
