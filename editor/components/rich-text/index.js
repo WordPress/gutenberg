@@ -573,12 +573,27 @@ export class RichText extends Component {
 	 * @param {Object} context The context for splitting.
 	 */
 	splitContent( blocks = [], context = {} ) {
-		if ( ! this.props.onSplit ) {
+		const { onSplit } = this.props;
+		if ( ! onSplit ) {
+			return;
+		}
+
+		const rootNode = this.editor.getBody();
+
+		// In case split occurs at the trailing or leading edge of the field,
+		// shortcut with assumption that the before/after values respectively
+		// reflect the current value. This also provides an opportunity for the
+		// parent component to determine whether the before/after value has
+		// changed using a trivial strict equality operation.
+		if ( isHorizontalEdge( rootNode ) ) {
+			onSplit( this.props.value, [], ...blocks );
+			return;
+		} else if ( isHorizontalEdge( rootNode, true ) ) {
+			onSplit( [], this.props.value, ...blocks );
 			return;
 		}
 
 		const { dom } = this.editor;
-		const rootNode = this.editor.getBody();
 		const beforeRange = dom.createRng();
 		const afterRange = dom.createRng();
 		const selectionRange = this.editor.selection.getRng();
