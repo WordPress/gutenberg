@@ -19,18 +19,15 @@
 .edit-post-visual-editor {
 	.wp-block-latest-comments__comment-excerpt p {
 		font-size: 14px;
-		line-height: 1.1;
+		line-height: 1.8;
 		padding-top: 0;
+		margin: 5px 0 20px;
 	}
 
 	.wp-block-latest-comments {
 
 		.has-avatars > li {
-			min-height: 40px;
-		}
-
-		.recentcomments {
-			line-height: 1.2;
+			min-height: 36px;
 		}
 	}
 }

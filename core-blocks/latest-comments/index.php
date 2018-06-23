@@ -84,6 +84,12 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 	if ( $attributes['displayAvatar'] ) {
 		$class .= ' has-avatars';
 	}
+	if ( $attributes['displayTimestamp'] ) {
+		$class .= ' has-timestamps';
+	}
+	if ( $attributes['displayExcerpt'] ) {
+		$class .= ' has-excerpts';
+	}
 
 	$block_content = sprintf(
 		'<ul class="%1$s">%2$s</ul>',
