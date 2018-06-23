@@ -4,7 +4,7 @@
 import { Component, Fragment } from '@wordpress/element';
 import {
 	PanelBody,
-	TextControl,
+	RangeControl,
 	ToggleControl,
 	ServerSideRender,
 } from '@wordpress/components';
@@ -82,14 +82,14 @@ class latestComments extends Component {
 						onChange={ this.toggleHandler( 'displayExcerpt' ) }
 					/>
 
-					<TextControl
+					<RangeControl
 						label={ __( 'Number of comments to show' ) }
-						type="number"
-						min={ MIN_COMMENTS }
-						max={ MAX_COMMENTS }
 						value={ this.props.attributes.commentsToShow }
 						onChange={ ( value ) => this.changeCommentsToShow( value ) }
+						min={ MIN_COMMENTS }
+						max={ MAX_COMMENTS }
 					/>
+
 				</InspectorControls>
 				<ServerSideRender key="latest-comments" block="core/latest-comments" attributes={ this.props.attributes } />
 			</Fragment>
