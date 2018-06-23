@@ -173,6 +173,7 @@
 		"test-unit": "wp-scripts test-unit-js --config test/unit/jest.config.json",
 		"test-unit:coverage": "npm run test-unit -- --coverage",
 		"test-unit:coverage-ci": "npm run test-unit -- --coverage --maxWorkers 1 && codecov",
+		"test-unit:update": "wp-scripts test-unit-js --config test/unit/jest.config.json --updateSnapshot",
 		"test-unit:watch": "npm run test-unit -- --watch",
 		"test-unit-php": "docker-compose run --rm wordpress_phpunit phpunit",
 		"test-unit-php-multisite": "docker-compose run -e WP_MULTISITE=1 --rm wordpress_phpunit phpunit"
