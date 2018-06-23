@@ -51,6 +51,16 @@ render(
 
 The component accepts the following props. Props not included in this set will be applied to the element wrapping Popover content.
 
+### focusFirstElement
+
+Focus the *first tabblable element* inside the `Popover` if `focusOnMount` is enabled. This is the default behaviour; set this flag to `false` to focus the container, requiring the user to manually tab to the first element inside the `Popover`.
+
+Has no effect if `focusOnMount` is set to `false`.
+
+- Type: `Boolean`
+- Required: No
+- Default: `true`
+
 ### focusOnMount
 
 By default, the popover will receive focus when it mounts. To suppress this behavior, assign `focusOnMount` to `false`. This should only be assigned when an appropriately accessible substitute behavior exists.

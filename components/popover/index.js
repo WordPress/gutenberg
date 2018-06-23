@@ -8,6 +8,7 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
+import { focus } from '@wordpress/dom';
 import { keycodes } from '@wordpress/utils';
 
 /**
@@ -95,18 +96,23 @@ class Popover extends Component {
 	}
 
 	focus() {
-		const { focusOnMount = true } = this.props;
-		if ( ! focusOnMount ) {
-			return;
-		}
-
-		if ( ! this.contentNode.current ) {
+		const { focusFirstElement, focusOnMount } = this.props;
+		if ( ! focusOnMount || ! this.contentNode.current ) {
 			return;
 		}
 
 		// Without the setTimeout, the dom node is not being focused
 		// Related https://stackoverflow.com/questions/35522220/react-ref-with-focus-doesnt-work-without-settimeout-my-example
 		const focusNode = ( domNode ) => setTimeout( () => domNode.focus() );
+
+		if ( focusFirstElement ) {
+			// Find first tabbable node within content and shift focus, falling
+			// back to the popover panel itself.
+			const firstTabbable = focus.tabbable.find( this.contentNode.current )[ 0 ];
+			focusNode( firstTabbable ? firstTabbable : this.contentNode.current );
+
+			return;
+		}
 
 		// Focus the popover panel itself so items in the popover are easily
 		// accessed via keyboard navigation.
@@ -193,12 +199,13 @@ class Popover extends Component {
 			children,
 			className,
 			onClickOutside = onClose,
-			noArrow = false,
+			noArrow,
 			// Disable reason: We generate the `...contentProps` rest as remainder
 			// of props which aren't explicitly handled by this component.
 			/* eslint-disable no-unused-vars */
 			position,
 			range,
+			focusFirstElement,
 			focusOnMount,
 			getAnchorRect,
 			expandOnMobile,
@@ -286,6 +293,12 @@ class Popover extends Component {
 		</span>;
 	}
 }
+
+Popover.defaultProps = {
+	focusFirstElement: true,
+	focusOnMount: true,
+	noArrow: false,
+};
 
 const PopoverContainer = Popover;
 

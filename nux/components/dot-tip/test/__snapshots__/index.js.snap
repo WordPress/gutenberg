@@ -4,6 +4,7 @@ exports[`DotTip should render correctly 1`] = `
 <Popover
   aria-label="Gutenberg tips"
   className="nux-dot-tip"
+  focusFirstElement={false}
   focusOnMount={true}
   noArrow={true}
   onClick={[Function]}
