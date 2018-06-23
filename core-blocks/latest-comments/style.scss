@@ -12,7 +12,7 @@
 	}
 
 	&.has-avatars > li {
-		min-height: 40px;
+		min-height: 36px;
 		list-style: none;
 
 		.wp-block-latest-comments__comment-excerpt {
@@ -27,12 +27,20 @@
 
 	.wp-block-latest-comments__comment-excerpt p {
 		font-size: 14px;
-		line-height: 1.1;
-		padding-top: 10px;
+		line-height: 1.8;
+		margin: 5px 0 20px;
 	}
 
 	.recentcomments {
-		line-height: 1.2;
+		line-height: 2.3;
+	}
+
+	&.has-timestamps,
+	&.has-excerpts {
+		.recentcomments {
+			line-height: 1.2;
+		}
+
 	}
 }
 
