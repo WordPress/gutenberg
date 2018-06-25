@@ -12,6 +12,7 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
  * Internal dependencies
  */
 import defaultRegistry from '../default-registry';
+import { withRegistry } from './registry-provider';
 
 /**
  * Higher-order component used to inject state-derived props using registered
@@ -26,7 +27,7 @@ import defaultRegistry from '../default-registry';
 const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( WrappedComponent ) => {
 	const DEFAULT_MERGE_PROPS = {};
 
-	return class ComponentWithSelect extends Component {
+	class ComponentWithSelect extends Component {
 		constructor() {
 			super( ...arguments );
 
@@ -39,8 +40,9 @@ const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( WrappedC
 			// A constant value is used as the fallback since it can be more
 			// efficiently shallow compared in case component is repeatedly
 			// rendered without its own merge props.
+			const select = props.registry ? props.registry.select : defaultRegistry.select;
 			const mergeProps = (
-				mapStateToProps( defaultRegistry.select, props ) ||
+				mapStateToProps( select, props ) ||
 				DEFAULT_MERGE_PROPS
 			);
 
@@ -64,7 +66,8 @@ const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( WrappedC
 		}
 
 		subscribe() {
-			this.unsubscribe = defaultRegistry.subscribe( () => {
+			const subscribe = this.props.registry ? this.props.registry.subscribe : defaultRegistry.subscribe;
+			this.unsubscribe = subscribe( () => {
 				if ( ! this.canRunSelection ) {
 					return;
 				}
@@ -81,7 +84,9 @@ const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( WrappedC
 		render() {
 			return <WrappedComponent { ...this.props } { ...this.state.mergeProps } />;
 		}
-	};
+	}
+
+	return withRegistry( ComponentWithSelect );
 }, 'withSelect' );
 
 export default withSelect;

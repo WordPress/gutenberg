@@ -10,6 +10,7 @@ import defaultRegistry from './default-registry';
 export { loadAndPersist, withRehydration, withRehydratation } from './persist';
 export { default as withSelect } from './components/with-select';
 export { default as withDispatch } from './components/with-dispatch';
+export { RegistryProvider } from './components/registry-provider';
 
 /**
  * The combineReducers helper function turns an object whose values are different
