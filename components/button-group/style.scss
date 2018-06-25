@@ -1,9 +1,10 @@
 .components-button-group {
 	display: inline-block;
 
-	.components-button {
+	.components-button.is-button {
 		border-radius: 0;
-		& + .components-button {
+
+		& + .components-button.is-button {
 			margin-left: -1px;
 		}
 
