@@ -98,7 +98,11 @@ export function matcherFromSource( sourceConfig ) {
  * @return {*} Attribute value.
  */
 export function parseWithAttributeSchema( innerHTML, attributeSchema ) {
-	return hpqParse( innerHTML, matcherFromSource( attributeSchema ) );
+	const attrValue = hpqParse( innerHTML, matcherFromSource( attributeSchema ) );
+	if ( 'attribute' === attributeSchema.source && 'boolean' === attributeSchema.type ) {
+		return '' === attrValue;
+	}
+	return attrValue;
 }
 
 /**

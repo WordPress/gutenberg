@@ -105,6 +105,45 @@ describe( 'block parser', () => {
 			);
 			expect( value ).toBe( 'chicken' );
 		} );
+
+		it( 'should return the matcher\'s string attribute value', () => {
+			const value = parseWithAttributeSchema(
+				'<audio src="#" loop>',
+				{
+					type: 'string',
+					source: 'attribute',
+					selector: 'audio',
+					attribute: 'src',
+				},
+			);
+			expect( value ).toBe( '#' );
+		} );
+
+		it( 'should return the matcher\'s true boolean attribute value', () => {
+			const value = parseWithAttributeSchema(
+				'<audio src="#" loop>',
+				{
+					type: 'boolean',
+					source: 'attribute',
+					selector: 'audio',
+					attribute: 'loop',
+				},
+			);
+			expect( value ).toBe( true );
+		} );
+
+		it( 'should return the matcher\'s false boolean attribute value', () => {
+			const value = parseWithAttributeSchema(
+				'<audio src="#" autoplay>',
+				{
+					type: 'boolean',
+					source: 'attribute',
+					selector: 'audio',
+					attribute: 'loop',
+				},
+			);
+			expect( value ).toBe( false );
+		} );
 	} );
 
 	describe( 'getBlockAttribute', () => {
