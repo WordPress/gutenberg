@@ -11,6 +11,7 @@ This package is based on [Gutenberg v3.0.1](https://github.com/WordPress/gutenbe
 * [Usage](#usage)
     * [Gutenberg Stores](#gutenberg-stores)
     * [Registering Custom Blocks](#registering-custom-blocks)
+    * [Inserter Menu (blocks)](#inserter-menu-blocks)
 * [Global variables](#global-variables)
     * [apiRequest](#apirequest)
         * [Post Types](#post-types)
@@ -19,15 +20,14 @@ This package is based on [Gutenberg v3.0.1](https://github.com/WordPress/gutenbe
         * [Index](#index)
         * [Media](#media)
     * [url](#url)
-* [Customize your Gutenberg](#customize-your-gutenberg)
-    * [Inserter Menu (blocks)](#inserter-menu-blocks)
-    * [Block Categories](#block-categories)
-    * [Rows](#rows)
-    * [Dynamic Row](#dynamic-row)
-    * [Posts Panel](#posts-panel)
-        * [Post Block](#post-block)
+* [Customize your Gutenberg](#customize-your-gutenberg)    
     * [Events](#events)
-
+* [StoryPage Module](#storypage-module)
+    * [Post block](#post-block)
+    * [Row block](#row-block)
+    * [Section block](#section-block)
+    * [PostsPanel component](#postspanel-component)
+    
 ## Installation
 
 **Gutenberg by Frontkom** is available through npm.
@@ -75,9 +75,9 @@ const settings = {
     autosaveInterval: 10,
     ...
     // @frontkom/gutenberg settings
-    canAutosave: false, // to disable Editor Autosave featured
-    canPublish: false,  // to disable Editor Publish featured
-    canSave: false,     // to disable Editor Save featured
+    canAutosave: false, // to disable Editor Autosave featured (default: true)
+    canPublish: false,  // to disable Editor Publish featured (default: true)
+    canSave: false,     // to disable Editor Save featured (default: true)
 };
 
 // Post properties to override
@@ -180,6 +180,37 @@ blocks.registerBlockType( 'custom/my-block', {
     },
 } );
 
+```
+
+[↑ Go up to Table of contents](#table-of-contents)
+
+### Inserter Menu (blocks)
+
+You can customize the panels which are displayed on the editor *Add block popup*. By default, Gutenberg displays `suggested` and `shared` panels but you can hide them:
+
+```js
+import { data, blocks } from '@frontkom/gutenberg';
+
+const { SHARED_PANEL, SUGGESTED_PANEL } = blocks;
+
+// Hidding 'shared' and 'suggested' panels
+data.dispatch( 'core/blocks' ).hideInserterMenuPanel( SHARED_PANEL );
+data.dispatch( 'core/blocks' ).hideInserterMenuPanel( SUGGESTED_PANEL );
+```
+
+Also, **Gutenberg by Frontkom** added `addCategories` and `removeCategories` actions so you can manage blocks categories.
+
+```js
+import { data } from '@frontkom/gutenberg';
+
+// Removing 'widgets' category
+data.dispatch( 'core/blocks' ).removeCategories( [ 'widgets' ] );
+
+// Adding 'StoryPage Blocks' category
+data.dispatch( 'core/blocks' ).addCategories( [ {
+    slug: 'storypage',
+    title: 'StoryPage Blocks',
+} ] );
 ```
 
 [↑ Go up to Table of contents](#table-of-contents)
@@ -336,37 +367,6 @@ Important to say that Gutenberg works perfectly without the settings of this obj
 
 [↑ Go up to Table of contents](#table-of-contents)
 
-### Inserter Menu (blocks)
-
-You can customize the panels which are displayed on the editor *Add block popup*. By default, Gutenberg displays `suggested` and `shared` panels but you can hide them:
-
-```js
-import { data, blocks } from '@frontkom/gutenberg';
-
-const { SHARED_PANEL, SUGGESTED_PANEL } = blocks;
-
-// Hidding 'shared' and 'suggested' panels
-data.dispatch( 'core/blocks' ).hideInserterMenuPanel( SHARED_PANEL );
-data.dispatch( 'core/blocks' ).hideInserterMenuPanel( SUGGESTED_PANEL );
-```
-
-Also, **Gutenberg by Frontkom** added `addCategories` and `removeCategories` actions so you can manage blocks categories.
-
-```js
-import { data } from '@frontkom/gutenberg';
-
-// Removing 'widgets' category
-data.dispatch( 'core/blocks' ).removeCategories( [ 'widgets' ] );
-
-// Adding 'StoryPage Blocks' category
-data.dispatch( 'core/blocks' ).addCategories( [ {
-    slug: 'storypage',
-    title: 'StoryPage Blocks',
-} ] );
-```
-
-[↑ Go up to Table of contents](#table-of-contents)
-
 ### Events
 
 **Gutenberg by Frontkom** makes possible to define callbacks (or effects) for Gutenberg actions. Since it is an experimental feature, we are only providing this for 'OPEN_GENERAL_SIDEBAR', 'CLOSE_GENERAL_SIDEBAR' and 'REMOVE_BLOCKS' actions.
@@ -417,7 +417,6 @@ const postBlock = storypage.blocks.post;
 blocks.registerBlockType( postBlock.name, postBlock.settings );
 ```
 
-![Post block example](https://raw.githubusercontent.com/front/gutenberg/master/gutenberg-package/post_block_screenshot.png)
 
 [↑ Go up to Table of contents](#table-of-contents)
 
