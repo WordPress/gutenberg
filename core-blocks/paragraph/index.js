@@ -238,9 +238,7 @@ class ParagraphBlock extends Component {
 
 							insertBlocksAfter( blocks );
 
-							if ( before ) {
-								setAttributes( { content: before } );
-							} else {
+							if ( ! before ) {
 								onReplace( [] );
 							}
 						} :
