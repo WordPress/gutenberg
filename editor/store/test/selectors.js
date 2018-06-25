@@ -515,8 +515,12 @@ describe( 'selectors', () => {
 		it( 'should return the last revision ID', () => {
 			const state = {
 				currentPost: {
-					revisions: {
-						last_id: 123,
+					_links: {
+						'predecessor-version': [
+							{
+								id: 123,
+							},
+						],
 					},
 				},
 			};
@@ -537,8 +541,12 @@ describe( 'selectors', () => {
 		it( 'should return the number of revisions', () => {
 			const state = {
 				currentPost: {
-					revisions: {
-						count: 5,
+					_links: {
+						'version-history': [
+							{
+								count: 5,
+							},
+						],
 					},
 				},
 			};
