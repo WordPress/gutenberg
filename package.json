@@ -51,6 +51,7 @@
   },
   "dependencies": {
     "@wordpress/autop": "^1.0.6",
+    "@wordpress/hooks": "^1.2.0",
     "@wordpress/i18n": "^1.1.0",
     "@wordpress/is-shallow-equal": "^1.0.1",
     "babel-plugin-module-resolver": "^3.1.0",
