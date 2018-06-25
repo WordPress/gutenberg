@@ -1,9 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, every } from 'lodash';
-import { stringify } from 'querystring';
-import memoize from 'memize';
+import { compact, every, filter, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,23 +9,13 @@ import memoize from 'memize';
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import { RichText, editorMediaUpload } from '@wordpress/editor';
-import { dispatch } from '@wordpress/data';
+import { dispatch, select, subscribe } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import { default as edit, defaultColumnsNumber } from './edit';
-
-// Caches the media API calls, so if blocks get transformed, or deleted and added again, we don't spam the API.
-// This should be replaced as soon as we have an external data layer api that return promises or an equivalent interface.
-const requestMediaById = memoize( ( id ) =>
-	wp.apiRequest( { path: `/wp/v2/media/${ id }?${
-		stringify( {
-			_fields: 'id,source_url,alt_text,caption',
-		} )
-	}` } )
-);
 
 const blockAttributes = {
 	align: {
@@ -139,21 +127,43 @@ export const settings = {
 				transform( attributes ) {
 					const block = createBlock( 'core/gallery' );
 					if ( attributes.images && attributes.images.length > 0 ) {
-						const convertApiToAttributeImage = ( image ) => ( {
-							alt: image.alt_text,
-							caption: image.caption.rendered,
-							id: image.id,
-							url: image.source_url,
+						const { getMedia } = select( 'core' );
+
+						const getAllImages = () => map( attributes.images, ( { id } ) => {
+							return getMedia( id );
 						} );
-						Promise.all(
-							attributes.images.map( ( { id } ) => requestMediaById( id ) )
-						).then(
-							( apiImages ) => {
+
+						const convertApiImageToAttribute = ( image ) => {
+							if ( ! image ) {
+								return image;
+							}
+							return {
+								alt: image.alt_text,
+								caption: image.caption.rendered,
+								id: image.id,
+								url: image.source_url,
+							};
+						};
+
+						//trigger resolver for all images
+						getAllImages();
+						// subcribe and wait until all images were requested
+						const unsubscribe = subscribe( () => {
+							const images = getAllImages();
+							const allImagesRequested = every(
+								images,
+								( image ) => {
+									return image !== undefined;
+								}
+							);
+							if ( allImagesRequested ) {
+								unsubscribe();
+								// update the block with the images we requested.
 								dispatch( 'core/editor' ).updateBlockAttributes( block.uid, {
-									images: apiImages.map( convertApiToAttributeImage ),
+									images: compact( map( images, convertApiImageToAttribute ) ),
 								} );
 							}
-						);
+						} );
 					}
 					return block;
 				},
