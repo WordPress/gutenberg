@@ -92,6 +92,7 @@ const getPlaylistDetailsMediaFrame = () => {
 					collectionType: 'playlist',
 					title: wp.media.view.l10n.editPlaylistTitle,
 					library: this.options.selection,
+					SettingsView: wp.media.view.Settings.Playlist,
 					editing: this.options.editing,
 					menu: 'playlist',
 					dragInfoText: wp.media.view.l10n.playlistDragInfo,
@@ -124,6 +125,7 @@ const getPlaylistDetailsMediaFrame = () => {
 					title: wp.media.view.l10n.editVideoPlaylistTitle,
 					library: this.options.selection,
 					editing: this.options.editing,
+					SettingsView: wp.media.view.Settings.Playlist,
 					menu: 'video-playlist',
 					dragInfoText: wp.media.view.l10n.videoPlaylistDragInfo,
 					dragInfo: false,
@@ -215,7 +217,7 @@ class MediaUpload extends Component {
 			} else {
 				this.frame = new PlaylistDetailsMediaFrame( {
 					frame: 'select',
-					mimeType: type,
+					mimeType: 'audio',
 					state: 'playlist',
 				} );
 			}
