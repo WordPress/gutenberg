@@ -9,6 +9,7 @@ import { find, compact, get } from 'lodash';
 import { compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { getBlockType } from '@wordpress/blocks';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -106,6 +107,7 @@ function BlockStyles( {
 						onMouseLeave={ () => onHoverClassName( null ) }
 						role="button"
 						tabIndex="0"
+						aria-label={ sprintf( __( 'Apply style variation "%s"' ), style.label || style.name ) }
 					>
 						<BlockPreviewContent
 							name={ name }

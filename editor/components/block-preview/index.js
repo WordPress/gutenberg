@@ -26,7 +26,7 @@ function BlockPreview( props ) {
 	return (
 		<div className="editor-block-preview">
 			<div className="editor-block-preview__title">{ __( 'Preview' ) }</div>
-			<div className="editor-block-preview__content">
+			<div className="editor-block-preview__content" aria-hidden>
 				<BlockPreviewContent { ...props } />
 			</div>
 		</div>
