@@ -3,4 +3,20 @@
 	border-bottom: 2px solid $dark-gray-100;
 	max-width: 100px;
 	margin: 1.65em auto;
+
+	&.is-style-wide {
+		max-width: 100%;
+	}
+
+	&.is-style-asterisks {
+		border: none;
+		text-align: center;
+
+		&::before {
+			content: '* *';
+			color: $dark-gray-500;
+			font-size: 35px;
+			font-family: serif;
+		}
+	}
 }
