@@ -15,7 +15,6 @@
 		justify-content: center;
 		position: relative;
 
-
 		figure {
 			margin: 0;
 			height: 100%;
@@ -52,12 +51,6 @@
 			height: 100%;
 			object-fit: cover;
 
-		}
-
-		// Alas, IE11+ doesn't support object-fit
-		_:-ms-lang(x), figure {
-			height: auto;
-			width: auto;
 		}
 	}
 

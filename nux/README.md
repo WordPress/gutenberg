@@ -42,24 +42,33 @@ console.log( isVisible ); // true or false
 <button
 	onClick={ () => {
 		dispatch( 'core/nux' ).dismissTip( 'acme/add-to-cart' );
-	}
+	} }
 >
 	Dismiss tip
 </button>
 ```
 
-## Manually disabling tips
+## Disabling and enabling tips
 
-`disableTips` is a dispatch method that allows you to programmatically disable all tips.
+Tips can be programatically disabled or enabled using the `disableTips` and `enableTips` dispatch methods. You can query the current setting by using the `areTipsEnabled` select method.
+
+Calling `enableTips` will also un-dismiss all previously dismissed tips.
 
 ```jsx
-<button
-	onClick={ () => {
-		dispatch( 'core/nux' ).disableTips();
-	}
->
-	Disable tips
-</button>
+const areTipsEnabled = select( 'core/nux' ).areTipsEnabled();
+return (
+	<button
+		onClick={ () => {
+			if ( areTipsEnabled ) {
+				dispatch( 'core/nux' ).disableTips();
+			} else {
+				dispatch( 'core/nux' ).enableTips();
+			}
+		} }
+	>
+		{ areTipsEnabled ? 'Disable tips' : 'Enable tips' }
+	</button>
+);
 ```
 
 ## Triggering a guide

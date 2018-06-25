@@ -1,0 +1,18 @@
+$totalColumns: 12;
+
+.wp-block-storypage-row {
+	display: grid;
+	grid-auto-flow: dense;
+	grid-gap: 0;
+	grid-template-columns: repeat($totalColumns, 1fr);
+
+	@for $i from 1 through $totalColumns {
+		.column-start#{ $i } {
+			grid-column-start: #{ $i };
+		}
+
+		.layout-col#{ $i } {
+			grid-column-end: span #{ $i };
+		}
+	}
+}

@@ -1,0 +1,26 @@
+$totalColumns: 12;
+
+.wp-block-storypage-row {
+	display: block;
+	
+	.editor-inner-blocks {
+		display: grid;
+		grid-auto-flow: dense;
+		grid-gap: 0;
+		grid-template-columns: repeat($totalColumns, 1fr);
+
+		.editor-block-list__layout {
+			&:first-child {
+				margin-left: -$block-padding;
+			}
+			&:last-child {
+				margin-right: -$block-padding;
+			}
+
+			// This max-width is used to constrain the main editor column, it should not cascade into columns
+			.editor-block-list__block {
+				max-width: none;
+			}
+		}
+	}
+}

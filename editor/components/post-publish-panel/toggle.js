@@ -17,7 +17,7 @@ import { DotTip } from '@wordpress/nux';
  */
 import PostPublishButton from '../post-publish-button';
 
-function PostPublishPanelToggle( {
+export function PostPublishPanelToggle( {
 	hasPublishAction,
 	isSaving,
 	isPublishable,
@@ -69,14 +69,10 @@ export default compose( [
 			isEditedPostBeingScheduled,
 			isCurrentPostScheduled,
 			getCurrentPost,
-			getCurrentPostType,
+			getEditorSettings,
 		} = select( 'core/editor' );
 
-		const {
-			getPostType,
-		} = select( 'core' );
-
-		const postType = getCurrentPostType();
+		const { canPublish } = getEditorSettings();
 
 		return {
 			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
@@ -87,9 +83,8 @@ export default compose( [
 			isPublished: isCurrentPostPublished(),
 			isScheduled: isCurrentPostScheduled(),
 			isBeingScheduled: isEditedPostBeingScheduled(),
-			postType: postType,
-			isPostPublishable: get( getPostType( postType ), [ 'publishable' ], true ),
+			canPublish,
 		};
 	} ),
-	ifCondition( ( { isPostPublishable } ) => isPostPublishable ),
+	ifCondition( ( { canPublish } ) => canPublish ),
 ] )( PostPublishPanelToggle );

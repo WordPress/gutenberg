@@ -4,13 +4,10 @@ We made [Gutenberg](https://github.com/Wordpress/gutenberg) editor a little more
 
 Gutenberg editor can **be easly included in your apps** with this [package](https://github.com/front/gutenberg). Also you can customize blocks menu panels, blocks categories, document panels and more! 
 
-This package is based on [Gutenberg v3.0.1](https://github.com/WordPress/gutenberg/releases/tag/v3.0.1).
+This package is based on [Gutenberg v3.1.0](https://github.com/WordPress/gutenberg/releases/tag/v3.1.0).
 
 ## Table of contents
 * [Installation](#installation)
-* [Usage](#usage)
-    * [Gutenberg Stores](#gutenberg-stores)
-    * [Registering Custom Blocks](#registering-custom-blocks)
 * [Global variables](#global-variables)
     * [apiRequest](#apirequest)
         * [Post Types](#post-types)
@@ -19,14 +16,17 @@ This package is based on [Gutenberg v3.0.1](https://github.com/WordPress/gutenbe
         * [Index](#index)
         * [Media](#media)
     * [url](#url)
-* [Customize your Gutenberg](#customize-your-gutenberg)
+* [Usage](#usage)
+    * [Gutenberg Stores](#gutenberg-stores)
+    * [Registering Custom Blocks](#registering-custom-blocks)
     * [Inserter Menu (blocks)](#inserter-menu-blocks)
-    * [Block Categories](#block-categories)
-    * [Rows](#rows)
-    * [Dynamic Row](#dynamic-row)
-    * [Posts Panel](#posts-panel)
-        * [Post Block](#post-block)
+* [Customize your Gutenberg](#customize-your-gutenberg)    
     * [Events](#events)
+* [StoryPage Module](#storypage-module)
+    * [Post block](#post-block)
+    * [Row block](#row-block)
+    * [Section block](#section-block)
+    * [PostsPanel component](#postspanel-component)
 
 ## Installation
 
@@ -34,149 +34,6 @@ This package is based on [Gutenberg v3.0.1](https://github.com/WordPress/gutenbe
 
 ```sh
 npm install @frontkom/gutenberg
-```
-
-[↑ Go up to Table of contents](#table-of-contents)
-
-## Usage
-
-We've tried to make it easy to import **Gutenberg by Frontkom** modules to your apps.
-
-```js
-// Importing global variables that Gutenberg requires
-import './globals'; 
-
-// Importing editPost module
-import { editPost } from '@frontkom/gutenberg';
-
-// Don't forget to import the style
-import '@frontkom/gutenberg/build/css/core-blocks/style.css';
-import '@frontkom/gutenberg/build/css/style.css';
-import '@frontkom/gutenberg/build/css/core-blocks/edit-blocks.css';
-import '@frontkom/gutenberg/build/css/core-blocks/theme.css';
-
-// DOM element id where editor will be displayed
-const target = 'editor';
-
-// Post properties
-const postType = 'post'; // or 'page'
-const postId = 123;
-
-// Some editor settings
-const settings = { 
-    alignWide: true,
-    availableTemplates: [],
-    allowedBlockTypes: true, 
-    disableCustomColors: false, 
-    disablePostFormats: false,
-    titlePlaceholder: "Add title",
-    bodyPlaceholder: "Write your story",
-    isRTL: false,
-    autosaveInterval: 10,
-    ...
-};
-
-// Post properties to override
-const overridePost = {};
-
-// Et voilá... Initializing the editor!
-editPost.initializeEditor( target, postType, postId, settings, overridePost );
-```
-
-**Note**: Gutenberg requires utf-8 encoding, so don't forget to add `<meta charset="utf-8">` tag to your html `<head>`.
-
-[↑ Go up to Table of contents](#table-of-contents)
-
-### Gutenberg Stores
-
-Additionally, after initializing the editor, you can have access to Gutenberg stores (`core`, `core/blocks`, `core/data`, `core/edit-post`, `core/editor`, `core/viewport`) through the `data` module and its `select` and `dispatch` methods:
-
-```js
-// Importing select and dispatch methods from @frontkom/gutenberg package
-import { data } from '@frontkom/gutenberg';
-
-// Use dispatch to change the state of something
-data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'edit-post/block' );
-data.dispatch( 'core/edit-post' ).closeGeneralSidebar();
-
-// Use select to get the state of something
-data.select( 'core/editor' ).getEditedPostContent();
-// <!-- wp:paragraph -->
-// <p>Hello</p>
-// <!-- /wp:paragraph -->
-
-```
-
-[↑ Go up to Table of contents](#table-of-contents)
-
-### Registering Custom Blocks
-
-You can create your custom blocks using the `registerBlockType` method from `blocks` module. Check out the example below and the Wordpress [documentation](https://wordpress.org/gutenberg/handbook/blocks/) to read more about it.
-
-```js
-import { blocks, editor } from '@frontkom/gutenberg';
-
-const { registerBlockType } = blocks;
-const {    
-    AlignmentToolbar,
-    BlockControls,
-    RichText,
-} = editor;
-
-registerBlockType( 'custom/my-block', {
-    title: 'My first block',
-    icon: 'universal-access-alt',
-    category: 'common',
-    attributes: {
-        content: {
-            type: 'array',
-            source: 'children',
-            selector: 'p',
-        },
-        alignment: {
-            type: 'string',
-        },
-    },
-    edit( { attributes, className, setAttributes } ) {
-        const { content, alignment } = attributes;
-
-        function onChangeContent( newContent ) {
-            setAttributes( { content: newContent } );
-        }
-
-        function onChangeAlignment( newAlignment ) {
-            setAttributes( { alignment: newAlignment } );
-        }
-
-        return [
-            <BlockControls>
-                <AlignmentToolbar
-                    value={ alignment }
-                    onChange={ onChangeAlignment }
-                />
-            </BlockControls>,
-            <RichText
-                tagName="p"
-                className={ className }
-                style={ { textAlign: alignment } }
-                onChange={ onChangeContent }
-                value={ content }
-            />
-        ];
-    },
-    save( { attributes, className } ) {
-        const { content, alignment } = attributes;
-
-        return (
-            <RichText.Content
-                className={ className }
-                style={ { textAlign: alignment } }
-                value={ content }
-            />
-        );
-    },
-} );
-
 ```
 
 [↑ Go up to Table of contents](#table-of-contents)
@@ -196,6 +53,10 @@ window.wp = {
     apiRequest, 
     url: { addQueryArgs },
     ...,
+};
+
+window.userSettings = {
+    uid: 2, // Among other things, this uid is used to identify and store editor user preferences in localStorage
 };
 
 // set your root path
@@ -233,14 +94,9 @@ The Gutenberg editor will ask for available **Post Types** through `/wp/v2/types
 ```js
 {
     ...,   
-    autosaveable: false, // to disable Post Autosave featured
-    publishable: false,  // to disable Post Publish featured
-    saveable: false,     // to disable Post Save featured
     supports: {
         ...,
         'media-library': false,    // to disable Media library from WordPress
-        posts: true,               // to add PostsPanel to Documents tab
-        'template-settings': true, // to add TemplateSettingsPanel to Documents tab
     },
 }
 ```
@@ -324,6 +180,183 @@ export function addQueryArgs( url, args ) {
 
 [↑ Go up to Table of contents](#table-of-contents)
 
+## Usage
+
+We've tried to make it easy to import **Gutenberg by Frontkom** modules to your apps.
+
+```js
+// Importing global variables that Gutenberg requires
+import './globals'; 
+
+// Importing editPost module
+import { editPost } from '@frontkom/gutenberg';
+
+// Don't forget to import the style
+import '@frontkom/gutenberg/build/css/core-blocks/style.css';
+import '@frontkom/gutenberg/build/css/style.css';
+import '@frontkom/gutenberg/build/css/core-blocks/edit-blocks.css';
+import '@frontkom/gutenberg/build/css/core-blocks/theme.css';
+
+// DOM element id where editor will be displayed
+const target = 'editor';
+
+// Post properties
+const postType = 'post'; // or 'page'
+const postId = 123;
+
+// Some editor settings
+const settings = { 
+    alignWide: true,
+    availableTemplates: [],
+    allowedBlockTypes: true, 
+    disableCustomColors: false, 
+    disablePostFormats: false,
+    titlePlaceholder: "Add title",
+    bodyPlaceholder: "Write your story",
+    isRTL: false,
+    autosaveInterval: 10,
+    ...
+    // @frontkom/gutenberg settings
+    canAutosave: false, // to disable Editor Autosave featured (default: true)
+    canPublish: false,  // to disable Editor Publish featured (default: true)
+    canSave: false,     // to disable Editor Save featured (default: true)
+};
+
+// Post properties to override
+const overridePost = {};
+
+// Et voilá... Initializing the editor!
+editPost.initializeEditor( target, postType, postId, settings, overridePost );
+```
+
+**Note**: Gutenberg requires utf-8 encoding, so don't forget to add `<meta charset="utf-8">` tag to your html `<head>`.
+
+[↑ Go up to Table of contents](#table-of-contents)
+
+### Gutenberg Stores
+
+Additionally, after initializing the editor, you can have access to Gutenberg stores (`core`, `core/blocks`, `core/data`, `core/edit-post`, `core/editor`, `core/viewport`) through the `data` module and its `select` and `dispatch` methods:
+
+```js
+// Importing select and dispatch methods from @frontkom/gutenberg package
+import { data } from '@frontkom/gutenberg';
+
+// Use dispatch to change the state of something
+data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'edit-post/block' );
+data.dispatch( 'core/edit-post' ).closeGeneralSidebar();
+
+// Use select to get the state of something
+data.select( 'core/editor' ).getEditedPostContent();
+// <!-- wp:paragraph -->
+// <p>Hello</p>
+// <!-- /wp:paragraph -->
+
+```
+
+[↑ Go up to Table of contents](#table-of-contents)
+
+### Registering Custom Blocks
+
+You can create your custom blocks using the `registerBlockType` method from `blocks` module. Check out the example below and the Wordpress [documentation](https://wordpress.org/gutenberg/handbook/blocks/) to read more about it.
+
+```js
+import { blocks, editor } from '@frontkom/gutenberg';
+
+const {    
+    AlignmentToolbar,
+    BlockControls,
+    RichText,
+} = editor;
+
+blocks.registerBlockType( 'custom/my-block', {
+    title: 'My first block',
+    icon: 'universal-access-alt',
+    category: 'common',
+    attributes: {
+        content: {
+            type: 'array',
+            source: 'children',
+            selector: 'p',
+        },
+        alignment: {
+            type: 'string',
+        },
+    },
+    edit( { attributes, className, setAttributes } ) {
+        const { content, alignment } = attributes;
+
+        function onChangeContent( newContent ) {
+            setAttributes( { content: newContent } );
+        }
+
+        function onChangeAlignment( newAlignment ) {
+            setAttributes( { alignment: newAlignment } );
+        }
+
+        return [
+            <BlockControls>
+                <AlignmentToolbar
+                    value={ alignment }
+                    onChange={ onChangeAlignment }
+                />
+            </BlockControls>,
+            <RichText
+                tagName="p"
+                className={ className }
+                style={ { textAlign: alignment } }
+                onChange={ onChangeContent }
+                value={ content }
+            />
+        ];
+    },
+    save( { attributes, className } ) {
+        const { content, alignment } = attributes;
+
+        return (
+            <RichText.Content
+                className={ className }
+                style={ { textAlign: alignment } }
+                value={ content }
+            />
+        );
+    },
+} );
+
+```
+
+[↑ Go up to Table of contents](#table-of-contents)
+
+### Inserter Menu (blocks)
+
+You can customize the panels which are displayed on the editor *Add block popup*. By default, Gutenberg displays `suggested` and `shared` panels but you can hide them:
+
+```js
+import { data, blocks } from '@frontkom/gutenberg';
+
+const { SHARED_PANEL, SUGGESTED_PANEL } = blocks;
+
+// Hidding 'shared' and 'suggested' panels
+data.dispatch( 'core/blocks' ).hideInserterMenuPanel( SHARED_PANEL );
+data.dispatch( 'core/blocks' ).hideInserterMenuPanel( SUGGESTED_PANEL );
+```
+
+Also, **Gutenberg by Frontkom** added `addCategories` and `removeCategories` actions so you can manage blocks categories.
+
+```js
+import { data } from '@frontkom/gutenberg';
+
+// Removing 'widgets' category
+data.dispatch( 'core/blocks' ).removeCategories( [ 'widgets' ] );
+
+// Adding 'StoryPage Blocks' category
+data.dispatch( 'core/blocks' ).addCategories( [ {
+    slug: 'storypage',
+    title: 'StoryPage Blocks',
+} ] );
+```
+
+[↑ Go up to Table of contents](#table-of-contents)
+
 ## Customize your Gutenberg
 
 Following the same logic, we've created the `customGutenberg` global object where you can set eveything that we made customizable on Gutenberg.
@@ -332,105 +365,9 @@ Following the same logic, we've created the `customGutenberg` global object wher
 window.customGutenberg = { ... };
 ```
 
-As the other global variables, also `customGutenberg` should be defined **before** Gutenberg import.
+As the other global variables, `customGutenberg` should be defined **before** Gutenberg import.
 
 Important to say that Gutenberg works perfectly without the settings of this object :)
-
-[↑ Go up to Table of contents](#table-of-contents)
-
-### Inserter Menu (blocks)
-
-You can customize the panels are displayed on the editor *Add block popup*, like as which block categories they should display. By default, Gutenberg display `suggested`, `shared` and categories panels.
-
-```js
-window.customGutenberg = {
-    ...,
-    blocks: {
-        suggested: false,
-        shared: false,
-        categories: [ 'rows', 'common' ],
-    },
-    ...,
-};
-```
-
-[↑ Go up to Table of contents](#table-of-contents)
-
-### Block Categories
-
-You can set which block categories and consequently which blocks will be displayed on your editor. By default, Gutenberg has `common`, `formatting`, `layout`, `widgets`, `embed` and `shared` blocks categories and we added our [`rows`](#rows).
-
-```js
-window.customGutenberg = {
-    ...,
-    categories: [ 
-        // 'common' category should always be included because of 
-        // the default block - paragraph
-        { slug: 'common', title: 'Common blocks' },
-        { slug: 'formatting', title: 'Formatting' },
-        { slug: 'layout', title: 'Layout Elements' },
-        ...,
-    ],
-    ...,
-};
-```
-
-[↑ Go up to Table of contents](#table-of-contents)
-
-### Rows
-
-**Gutenberg by Frontkom** introduces a new category of blocks: the rows. Rows are divided in columns (minimum of 2) which you can defined by its size (1, 2, 3, ...). The total of columns are 12 and it must be the sum of `cols` array items. By default, the rows blocks will be available under the Blocks tab.
-
-```js
-window.customGutenberg = {
-    ...,
-    rows: [
-        { 
-            cols: [ 6, 6 ], 
-            title: 'col6 x 2', 
-            description: '2 eq columns layout', 
-        },
-        { 
-            cols: [ 4, 4, 4 ], 
-            title: 'col4 x 3', 
-            description: '3 eq columns layout',
-        },
-        { 
-            cols: [ 7, 5 ], 
-            title: 'col7-col5', 
-            description: 'A col7 and a col5',
-            },
-        { 
-            cols: [ 2, 8, 2 ], 
-            title: 'col2-col8-col2', 
-            description: 'A col2, a col8 and a col2',
-        },
-    ],
-    ...,
-};
-```
-
-![Rows example](https://raw.githubusercontent.com/front/gutenberg/master/gutenberg-package/rows_screenshot.png)
-
-[↑ Go up to Table of contents](#table-of-contents)
-
-### Dynamic Row
-
-It works like a section that could be slipt in several columns with different widhts.
-
-[↑ Go up to Table of contents](#table-of-contents)
-
-### Posts Panel
-
-The **Posts Panel** (`postType.supports[ 'posts' ] = true`) contains a list of posts which could be filtered by category and/or searched be name and then can be added to your page in form of an (Post block)[#post-block] by drag and drop.
-
-[↑ Go up to Table of contents](#table-of-contents)
-
-#### Post Block
-
-The **Post Block** is another kind of blocks created by **Gutenberg by Frontkom** which is composed by a cover image and a title.
-
-![Post Block example](https://raw.githubusercontent.com/front/gutenberg/master/gutenberg-package/post_block_screenshot.png)
 
 [↑ Go up to Table of contents](#table-of-contents)
 
@@ -457,3 +394,98 @@ window.customGutenberg = {
 ```
 
 [↑ Go up to Table of contents](#table-of-contents)
+
+## StoryPage Module
+
+```js
+import { storypage } from '@frontkom/gutenberg';
+
+console.log( 'blocks', storypage.blocks );
+console.log( 'components', storypage.components );
+```
+
+[↑ Go up to Table of contents](#table-of-contents)
+
+### Post block
+
+The **Post Block** is another kind of blocks created by **Gutenberg by Frontkom** which is composed by a cover image and a title.
+
+```js
+import {
+    blocks,
+    storypage,
+} from '@frontkom/gutenberg';
+
+const postBlock = storypage.blocks.post;
+
+blocks.registerBlockType( postBlock.name, postBlock.settings );
+```
+
+
+[↑ Go up to Table of contents](#table-of-contents)
+
+### Row block
+
+Rows work like columns but they could be slipt in spots with different widths.
+
+```js
+import {
+    blocks,
+    storypage,
+} from '@frontkom/gutenberg';
+
+const rowBlock = storypage.blocks.row;
+
+blocks.registerBlockType( rowBlock.name, rowBlock.settings );
+```
+
+[↑ Go up to Table of contents](#table-of-contents)
+
+### Section block
+
+Section is a row with just one column. You can add blocks inside and add classes to style that section.
+
+```js
+import {
+    blocks,
+    storypage,
+} from '@frontkom/gutenberg';
+
+const sectionBlock = storypage.blocks.section;
+
+blocks.registerBlockType( sectionBlock.name, sectionBlock.settings );
+```
+
+[↑ Go up to Table of contents](#table-of-contents)
+
+### PostsPanel component
+
+The **Posts Panel** contains a list of posts which could be filtered by category and/or searched be name. Posts can be added to your page as (Post block)[#post-block] by drag and drop.
+
+```js
+import {
+    editPost,
+    plugins,
+    storypage,
+} from '@frontkom/gutenberg';
+
+const { PluginDocumentSidebarPanel } = editPost;
+const { PostsPanel } = storypage.components;
+
+const MyPluginDocumentSidebarPanel = () => (
+    <PluginDocumentSidebarPanel
+        className="my-plugin-post-publish-panel"
+        title={ 'My Stories' }
+        initialOpen={ true }
+    >
+        <PostsPanel />              
+    </PluginDocumentSidebarPanel>
+);
+
+plugins.registerPlugin( 'plugin-document-sidebar', {
+    render: MyPluginDocumentSidebarPanel,
+} );
+```
+
+[↑ Go up to Table of contents](#table-of-contents)
+

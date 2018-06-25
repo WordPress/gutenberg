@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, reduce, size, castArray, first, last, noop } from 'lodash';
+import { get, reduce, size, castArray, first, last } from 'lodash';
 import tinymce from 'tinymce';
 
 /**
@@ -50,7 +50,6 @@ import IgnoreNestedEvents from './ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
 import withHoverAreas from './with-hover-areas';
-import { createInnerBlockList } from '../../utils/block-list';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
 
@@ -75,7 +74,6 @@ export class BlockListBlock extends Component {
 		this.onDragStart = this.onDragStart.bind( this );
 		this.onDragEnd = this.onDragEnd.bind( this );
 		this.selectOnOpen = this.selectOnOpen.bind( this );
-		this.createInnerBlockList = this.createInnerBlockList.bind( this );
 		this.hadTouchStart = false;
 
 		this.state = {
@@ -85,38 +83,17 @@ export class BlockListBlock extends Component {
 		};
 	}
 
-	createInnerBlockList( uid ) {
-		return createInnerBlockList( uid );
-	}
-
-	/**
-	 * Provides context for descendent components for use in block rendering.
-	 *
-	 * @return {Object} Child context.
-	 */
-	getChildContext() {
-		// Blocks may render their own BlockEdit, in which case we must provide
-		// a mechanism for them to create their own InnerBlockList. BlockEdit
-		// is defined in `@wordpress/blocks`, so to avoid a circular dependency
-		// we inject this function via context.
-		return {
-			createInnerBlockList: this.createInnerBlockList,
-		};
-	}
-
 	componentDidMount() {
 		if ( this.props.isSelected ) {
 			this.focusTabbable();
 		}
 	}
 
-	componentWillReceiveProps( newProps ) {
-		if ( newProps.isTypingWithinBlock || newProps.isSelected ) {
+	componentDidUpdate( prevProps ) {
+		if ( this.props.isTypingWithinBlock || this.props.isSelected ) {
 			this.hideHoverEffects();
 		}
-	}
 
-	componentDidUpdate( prevProps ) {
 		if ( this.props.isSelected && ! prevProps.isSelected ) {
 			this.focusTabbable();
 		}
@@ -511,6 +488,7 @@ export class BlockListBlock extends Component {
 						rootUID={ rootUID }
 						layout={ layout }
 						canShowInserter={ canShowInBetweenInserter }
+						onInsert={ this.hideHoverEffects }
 					/>
 				) }
 				<BlockDropZone
@@ -695,10 +673,6 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 		},
 	};
 } );
-
-BlockListBlock.childContextTypes = {
-	createInnerBlockList: noop,
-};
 
 export default compose(
 	applyWithSelect,

@@ -138,7 +138,6 @@ const entryPointNames = [
 	'editor',
 	'utils',
 	'viewport',
-	'plugins',
 	'edit-post',
 	'core-blocks',
 	'nux',
@@ -146,12 +145,13 @@ const entryPointNames = [
 
 const gutenbergPackages = [
 	'blob',
+	'core-data',
 	'data',
 	'date',
 	'deprecated',
 	'dom',
 	'element',
-	'core-data',
+	'plugins',
 ];
 
 const coreGlobals = [
@@ -215,6 +215,7 @@ const config = {
 				test: /style\.s?css$/,
 				include: [
 					/core-blocks/,
+					/storypage\/blocks/,
 				],
 				use: blocksCSSPlugin.extract( extractConfig ),
 			},
@@ -222,6 +223,7 @@ const config = {
 				test: /editor\.s?css$/,
 				include: [
 					/core-blocks/,
+					/storypage\/blocks/,
 				],
 				use: editBlocksCSSPlugin.extract( {
 					use: [
@@ -242,6 +244,7 @@ const config = {
 				test: /theme\.s?css$/,
 				include: [
 					/core-blocks/,
+					/storypage\/blocks/,
 				],
 				use: themeBlocksCSSPlugin.extract( extractConfig ),
 			},
@@ -249,6 +252,7 @@ const config = {
 				test: /\.s?css$/,
 				exclude: [
 					/core-blocks/,
+					/storypage\/blocks/,
 				],
 				use: mainCSSExtractTextPlugin.extract( extractConfig ),
 			},

@@ -65,4 +65,11 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 
 	// Allowed block types for the editor, defaulting to true (all supported).
 	allowedBlockTypes: true,
+
+	/**
+	 * @frontkom/gutenberg 0.2.0
+	 */
+	canPublish: true,
+	canSave: true,
+	canAutosave: true,
 };

@@ -116,13 +116,6 @@ export default class TinyMCE extends Component {
 		return false;
 	}
 
-	configureIsPlaceholderVisible( isPlaceholderVisible ) {
-		const isPlaceholderVisibleString = String( !! isPlaceholderVisible );
-		if ( this.editorNode.getAttribute( IS_PLACEHOLDER_VISIBLE_ATTR_NAME ) !== isPlaceholderVisibleString ) {
-			this.editorNode.setAttribute( IS_PLACEHOLDER_VISIBLE_ATTR_NAME, isPlaceholderVisibleString );
-		}
-	}
-
 	componentWillReceiveProps( nextProps ) {
 		this.configureIsPlaceholderVisible( nextProps.isPlaceholderVisible );
 
@@ -153,6 +146,13 @@ export default class TinyMCE extends Component {
 		this.editor.container = document.createDocumentFragment();
 		this.editor.destroy();
 		delete this.editor;
+	}
+
+	configureIsPlaceholderVisible( isPlaceholderVisible ) {
+		const isPlaceholderVisibleString = String( !! isPlaceholderVisible );
+		if ( this.editorNode.getAttribute( IS_PLACEHOLDER_VISIBLE_ATTR_NAME ) !== isPlaceholderVisibleString ) {
+			this.editorNode.setAttribute( IS_PLACEHOLDER_VISIBLE_ATTR_NAME, isPlaceholderVisibleString );
+		}
 	}
 
 	initialize() {
@@ -202,8 +202,15 @@ export default class TinyMCE extends Component {
 	render() {
 		const { tagName = 'div', style, defaultValue, className, isPlaceholderVisible, format } = this.props;
 		const ariaProps = pickAriaProps( this.props );
-		if ( [ 'ul', 'ol', 'table' ].indexOf( tagName ) === -1 ) {
+
+		/*
+		 * The role=textbox and aria-multiline=true must always be used together
+		 * as TinyMCE always behaves like a sort of textarea where text wraps in
+		 * multiple lines. Only the table block editable element is excluded.
+		 */
+		if ( tagName !== 'table' ) {
 			ariaProps.role = 'textbox';
+			ariaProps[ 'aria-multiline' ] = true;
 		}
 
 		// If a default value is provided, render it into the DOM even before

@@ -28,13 +28,11 @@ import {
 	withSafeTimeout,
 } from '@wordpress/components';
 import {
-	getInserterMenuCats as getCategories,
+	getCategories,
 	isSharedBlock,
 	SUGGESTED_PANEL,
 	SHARED_PANEL,
 	getDefaultOpenPanels,
-	isSuggestedPanelVisible,
-	isSharedPanelVisible,
 } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 
@@ -73,12 +71,10 @@ export class InserterMenu extends Component {
 			childItems: [],
 			filterValue: '',
 			hoveredItem: null,
-			isSuggestedVisible: isSuggestedPanelVisible(),
 			suggestedItems: [],
-			isSharedVisible: isSharedPanelVisible(),
 			sharedItems: [],
 			itemsPerCategory: {},
-			openPanels: getDefaultOpenPanels(), // [ SUGGESTED_PANEL ],
+			openPanels: getDefaultOpenPanels(),
 		};
 		this.onChangeSearchInput = this.onChangeSearchInput.bind( this );
 		this.onHover = this.onHover.bind( this );
@@ -141,9 +137,7 @@ export class InserterMenu extends Component {
 	}
 
 	filter( filterValue = '' ) {
-		const { items, rootChildBlocks } = this.props;
-		const { isSuggestedVisible, isSharedVisible } = this.state;
-
+		const { items, rootChildBlocks, isSuggestedVisible, isSharedVisible } = this.props;
 		const filteredItems = searchItems( items, filterValue );
 
 		const childItems = filter( filteredItems, ( { name } ) => includes( rootChildBlocks, name ) );
@@ -195,9 +189,7 @@ export class InserterMenu extends Component {
 			filterValue,
 			hoveredItem,
 			suggestedItems,
-			isSuggestedVisible,
 			sharedItems,
-			isSharedVisible,
 			itemsPerCategory,
 			openPanels,
 		} = this.state;
@@ -231,7 +223,7 @@ export class InserterMenu extends Component {
 						onHover={ this.onHover }
 					/>
 
-					{ isSuggestedVisible && !! suggestedItems.length &&
+					{ !! suggestedItems.length &&
 						<PanelBody
 							title={ __( 'Most Used' ) }
 							opened={ isPanelOpen( SUGGESTED_PANEL ) }
@@ -258,7 +250,7 @@ export class InserterMenu extends Component {
 							</PanelBody>
 						);
 					} ) }
-					{ isSharedVisible && !! sharedItems.length && (
+					{ !! sharedItems.length && (
 						<PanelBody
 							title={ __( 'Shared' ) }
 							opened={ isPanelOpen( SHARED_PANEL ) }
@@ -287,6 +279,7 @@ export default compose(
 	withSelect( ( select, { rootUID } ) => {
 		const {
 			getChildBlockNames,
+			isInserterMenuPanelVisible,
 		} = select( 'core/blocks' );
 		const {
 			getBlockName,
@@ -294,6 +287,8 @@ export default compose(
 		const rootBlockName = getBlockName( rootUID );
 		return {
 			rootChildBlocks: getChildBlockNames( rootBlockName ),
+			isSuggestedVisible: isInserterMenuPanelVisible( SUGGESTED_PANEL ),
+			isSharedVisible: isInserterMenuPanelVisible( SHARED_PANEL ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {

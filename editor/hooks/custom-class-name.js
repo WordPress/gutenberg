@@ -94,5 +94,5 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 }
 
 addFilter( 'blocks.registerBlockType', 'core/custom-class-name/attribute', addAttribute );
-addFilter( 'blocks.BlockEdit', 'core/custom-class-name/inspector-control', withInspectorControl );
+addFilter( 'editor.BlockEdit', 'core/editor/custom-class-name/with-inspector-control', withInspectorControl );
 addFilter( 'blocks.getSaveContent.extraProps', 'core/custom-class-name/save-props', addSaveProps );

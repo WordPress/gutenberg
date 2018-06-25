@@ -96,3 +96,16 @@ export const getChildBlockNames = createSelector(
 export const hasChildBlocks = ( state, blockName ) => {
 	return getChildBlockNames( state, blockName ).length > 0;
 };
+
+/**
+ * Returns a boolean indicating if panel is visible or not.
+ *
+ * @since  @frontkom/gutenberg 0.2.0
+ * @param {Object} state     Data state.
+ * @param {string} slug		 Panel slug.
+ *
+ * @return {boolean} True if panel is visible and false otherwise.
+ */
+export function isInserterMenuPanelVisible( state, slug ) {
+	return state.inserterMenuPanels[ slug ];
+}

@@ -17,8 +17,7 @@ import PageAttributes from '../page-attributes';
 import MetaBoxes from '../../meta-boxes';
 import SettingsHeader from '../settings-header';
 import Sidebar from '../';
-import PostsPanel from '../posts-panel';
-import TemplateSettingsPanel from '../template-settings-panel';
+import PluginDocumentSidebarPanel from '../plugin-document-sidebar-panel';
 
 const SIDEBAR_NAME = 'edit-post/document';
 
@@ -30,8 +29,7 @@ const DocumentSidebar = () => (
 		<SettingsHeader sidebarName={ SIDEBAR_NAME } />
 		<Panel>
 			<PostStatus />
-			<PostsPanel />
-			<TemplateSettingsPanel />
+			<PluginDocumentSidebarPanel.Slot />
 			<LastRevision />
 			<PostTaxonomies />
 			<FeaturedImage />

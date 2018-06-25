@@ -53,7 +53,7 @@
 	}
 
 	addFilter(
-		'blocks.BlockEdit',
+		'editor.BlockEdit',
 		'e2e/hooks-api/add-reset-block-button',
 		addResetBlockButton,
 		100

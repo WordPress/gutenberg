@@ -1,0 +1,29 @@
+{
+	"name": "@wordpress/plugins",
+	"version": "1.0.0-alpha.1",
+	"description": "Plugins module for WordPress",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"plugins"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/plugins/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"dependencies": {
+		"@wordpress/element": "^1.0.0-alpha.1",
+		"@wordpress/hooks": "1.1.6",
+		"lodash": "4.17.5"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}
