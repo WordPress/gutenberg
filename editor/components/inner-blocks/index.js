@@ -128,6 +128,7 @@ InnerBlocks = compose( [
 	withDispatch( ( dispatch, ownProps ) => {
 		const {
 			replaceBlocks,
+			insertBlocks,
 			updateBlockListSettings,
 		} = dispatch( 'core/editor' );
 		const { block, uid } = ownProps;
@@ -135,7 +136,11 @@ InnerBlocks = compose( [
 		return {
 			replaceInnerBlocks( blocks ) {
 				const uids = map( block.innerBlocks, 'uid' );
-				replaceBlocks( uids, blocks );
+				if ( uids.length ) {
+					replaceBlocks( uids, blocks );
+				} else {
+					insertBlocks( blocks, undefined, uid );
+				}
 			},
 			updateNestedSettings( settings ) {
 				dispatch( updateBlockListSettings( uid, settings ) );
