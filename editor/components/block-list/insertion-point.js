@@ -22,6 +22,7 @@ class BlockInsertionPoint extends Component {
 		this.onBlurInserter = this.onBlurInserter.bind( this );
 		this.onFocusInserter = this.onFocusInserter.bind( this );
 		this.onClick = this.onClick.bind( this );
+		this.onMouseDown = this.onMouseDown.bind( this );
 	}
 
 	onFocusInserter( event ) {
@@ -50,6 +51,16 @@ class BlockInsertionPoint extends Component {
 		}
 	}
 
+	onMouseDown() {
+		const { layout, rootUID, index, ...props } = this.props;
+		props.insertDefaultBlock( { layout }, rootUID, index );
+		props.startTyping();
+		this.onBlurInserter();
+		if ( props.onInsert ) {
+			this.props.onInsert();
+		}
+	}
+
 	render() {
 		const { isInserterFocused } = this.state;
 		const { showInsertionPoint, showInserter } = this.props;
@@ -63,6 +74,7 @@ class BlockInsertionPoint extends Component {
 							icon="insert"
 							className="editor-block-list__insertion-point-button"
 							onClick={ this.onClick }
+							onMouseDown={ this.onMouseDown }
 							label={ __( 'Insert block' ) }
 							onFocus={ this.onFocusInserter }
 							onBlur={ this.onBlurInserter }
