@@ -742,11 +742,9 @@ export class RichText extends Component {
 		) {
 			this.updateContent();
 		}
-	}
 
-	componentWillReceiveProps( nextProps ) {
 		if ( 'development' === process.env.NODE_ENV ) {
-			if ( ! isEqual( this.props.formatters, nextProps.formatters ) ) {
+			if ( ! isEqual( this.props.formatters, prevProps.formatters ) ) {
 				// eslint-disable-next-line no-console
 				console.error( 'Formatters passed via `formatters` prop will only be registered once. Formatters can be enabled/disabled via the `formattingControls` prop.' );
 			}
@@ -854,7 +852,7 @@ export class RichText extends Component {
 			format,
 		} = this.props;
 
-		const ariaProps = { ...pickAriaProps( this.props ), 'aria-multiline': !! MultilineTag };
+		const ariaProps = pickAriaProps( this.props );
 
 		// Generating a key that includes `tagName` ensures that if the tag
 		// changes, we unmount and destroy the previous TinyMCE element, then

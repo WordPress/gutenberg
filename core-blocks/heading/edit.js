@@ -29,6 +29,7 @@ export default function HeadingEdit( {
 				<Toolbar
 					controls={ '234'.split( '' ).map( ( level ) => ( {
 						icon: 'heading',
+						// translators: %s: heading level e.g: "1", "2", "3"
 						title: sprintf( __( 'Heading %s' ), level ),
 						isActive: 'H' + level === nodeName,
 						onClick: () => setAttributes( { nodeName: 'H' + level } ),
@@ -42,6 +43,7 @@ export default function HeadingEdit( {
 					<Toolbar
 						controls={ '123456'.split( '' ).map( ( level ) => ( {
 							icon: 'heading',
+							// translators: %s: heading level e.g: "1", "2", "3"
 							title: sprintf( __( 'Heading %s' ), level ),
 							isActive: 'H' + level === nodeName,
 							onClick: () => setAttributes( { nodeName: 'H' + level } ),

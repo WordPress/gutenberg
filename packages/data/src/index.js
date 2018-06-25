@@ -267,75 +267,61 @@ export function dispatch( reducerKey ) {
  * @return {Component} Enhanced component with merged state data props.
  */
 export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( WrappedComponent ) => {
+	const DEFAULT_MERGE_PROPS = {};
+
 	return class ComponentWithSelect extends Component {
 		constructor() {
 			super( ...arguments );
 
-			this.runSelection = this.runSelection.bind( this );
-
-			/**
-			 * Boolean tracking known render conditions (own props or merged
-			 * props update) for `shouldComponentUpdate`.
-			 *
-			 * @type {boolean}
-			 */
-			this.shouldComponentUpdate = false;
+			this.subscribe();
 
 			this.state = {};
 		}
 
-		shouldComponentUpdate() {
-			return this.shouldComponentUpdate;
+		static getDerivedStateFromProps( props ) {
+			// A constant value is used as the fallback since it can be more
+			// efficiently shallow compared in case component is repeatedly
+			// rendered without its own merge props.
+			const mergeProps = (
+				mapStateToProps( select, props ) ||
+				DEFAULT_MERGE_PROPS
+			);
+
+			return { mergeProps };
 		}
 
-		componentWillMount() {
-			this.subscribe();
-
-			// Populate initial state.
-			this.runSelection();
-		}
-
-		componentWillReceiveProps( nextProps ) {
-			if ( ! isShallowEqual( nextProps, this.props ) ) {
-				this.runSelection( nextProps );
-				this.shouldComponentUpdate = true;
-			}
+		componentDidMount() {
+			this.canRunSelection = true;
 		}
 
 		componentWillUnmount() {
+			this.canRunSelection = false;
 			this.unsubscribe();
+		}
 
-			// While above unsubscribe avoids future listener calls, callbacks
-			// are snapshotted before being invoked, so if unmounting occurs
-			// during a previous callback, we need to explicitly track and
-			// avoid the `runSelection` that is scheduled to occur.
-			this.isUnmounting = true;
+		shouldComponentUpdate( nextProps, nextState ) {
+			return (
+				! isShallowEqual( this.props, nextProps ) ||
+				! isShallowEqual( this.state.mergeProps, nextState.mergeProps )
+			);
 		}
 
 		subscribe() {
-			this.unsubscribe = subscribe( this.runSelection );
-		}
+			this.unsubscribe = subscribe( () => {
+				if ( ! this.canRunSelection ) {
+					return;
+				}
 
-		runSelection( props = this.props ) {
-			if ( this.isUnmounting ) {
-				return;
-			}
-
-			const { mergeProps } = this.state;
-			const nextMergeProps = mapStateToProps( select, props ) || {};
-
-			if ( ! isShallowEqual( nextMergeProps, mergeProps ) ) {
-				this.setState( {
-					mergeProps: nextMergeProps,
-				} );
-
-				this.shouldComponentUpdate = true;
-			}
+				// Trigger an update. Behavior of `getDerivedStateFromProps` as
+				// of React 16.4.0 is such that it will be called by any update
+				// to the component, including state changes.
+				//
+				// See: https://reactjs.org/blog/2018/05/23/react-v-16-4.html#bugfix-for-getderivedstatefromprops
+				this.setState( () => ( {} ) );
+			} );
 		}
 
 		render() {
-			this.shouldComponentUpdate = false;
-
 			return <WrappedComponent { ...this.props } { ...this.state.mergeProps } />;
 		}
 	};
@@ -358,18 +344,15 @@ export const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent
 		pure,
 		( WrappedComponent ) => {
 			return class ComponentWithDispatch extends Component {
-				constructor() {
+				constructor( props ) {
 					super( ...arguments );
 
 					this.proxyProps = {};
+					this.setProxyProps( props );
 				}
 
-				componentWillMount() {
+				componentDidUpdate() {
 					this.setProxyProps( this.props );
-				}
-
-				componentWillUpdate( nextProps ) {
-					this.setProxyProps( nextProps );
 				}
 
 				proxyDispatch( propName, ...args ) {

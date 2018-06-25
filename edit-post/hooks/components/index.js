@@ -11,7 +11,7 @@ import MediaUpload from './media-upload';
 const replaceMediaUpload = () => MediaUpload;
 
 addFilter(
-	'blocks.MediaUpload',
-	'core/edit-post/blocks/media-upload/replaceMediaUpload',
+	'editor.MediaUpload',
+	'core/edit-post/components/media-upload/replace-media-upload',
 	replaceMediaUpload
 );

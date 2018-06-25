@@ -57,13 +57,15 @@ class FormTokenField extends Component {
 		}
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		if ( nextProps.disabled && this.state.isActive ) {
-			this.setState( {
-				isActive: false,
-				incompleteTokenValue: '',
-			} );
+	static getDerivedStateFromProps( props, state ) {
+		if ( ! props.disabled || ! state.isActive ) {
+			return null;
 		}
+
+		return {
+			isActive: false,
+			incompleteTokenValue: '',
+		};
 	}
 
 	bindInput( ref ) {
@@ -515,7 +517,6 @@ class FormTokenField extends Component {
 		} );
 
 		let tokenFieldProps = {
-			ref: 'main',
 			className: classes,
 			tabIndex: '-1',
 		};

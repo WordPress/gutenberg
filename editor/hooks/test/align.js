@@ -20,7 +20,7 @@ import {
 import {
 	getBlockValidAlignments,
 	withToolbarControls,
-	withAlign,
+	withDataAlign,
 	addAssignedAlign,
 } from '../align';
 
@@ -150,7 +150,7 @@ describe( 'align', () => {
 		} );
 	} );
 
-	describe( 'withAlign', () => {
+	describe( 'withDataAlign', () => {
 		it( 'should render with wrapper props', () => {
 			registerBlockType( 'core/foo', {
 				...blockSettings,
@@ -160,7 +160,7 @@ describe( 'align', () => {
 				},
 			} );
 
-			const EnhancedComponent = withAlign( ( { wrapperProps } ) => (
+			const EnhancedComponent = withDataAlign( ( { wrapperProps } ) => (
 				<div { ...wrapperProps } />
 			) );
 
@@ -189,7 +189,7 @@ describe( 'align', () => {
 				},
 			} );
 
-			const EnhancedComponent = withAlign( ( { wrapperProps } ) => (
+			const EnhancedComponent = withDataAlign( ( { wrapperProps } ) => (
 				<div { ...wrapperProps } />
 			) );
 

@@ -11,7 +11,8 @@ import { Component, createPortal } from '@wordpress/element';
 let occurrences = 0;
 
 class Fill extends Component {
-	componentWillMount() {
+	constructor() {
+		super( ...arguments );
 		this.occurrence = ++occurrences;
 	}
 
@@ -38,15 +39,15 @@ class Fill extends Component {
 		unregisterFill( this.props.name, this );
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		const { name } = nextProps;
+	componentDidUpdate( prevProps ) {
+		const { name } = this.props;
 		const {
 			unregisterFill = noop,
 			registerFill = noop,
 		} = this.context;
 
-		if ( this.props.name !== name ) {
-			unregisterFill( this.props.name, this );
+		if ( prevProps.name !== name ) {
+			unregisterFill( prevProps.name, this );
 			registerFill( name, this );
 		}
 	}

@@ -99,22 +99,20 @@ class ImageEdit extends Component {
 		if ( ! prevID && prevUrl.indexOf( 'blob:' ) === 0 && id && url.indexOf( 'blob:' ) === -1 ) {
 			revokeBlobURL( url );
 		}
-	}
 
-	componentWillReceiveProps( { isSelected, image } ) {
-		if ( ! isSelected && this.props.isSelected && this.state.captionFocused ) {
+		if ( ! this.props.isSelected && prevProps.isSelected && this.state.captionFocused ) {
 			this.setState( {
 				captionFocused: false,
 			} );
 		}
 
-		if ( image && image !== this.props.image && image.data ) {
-			this.updateData( image.data );
+		if ( this.props.image && this.props.image !== prevProps.image && this.props.image.data ) {
+			this.updateData( this.props.image.data );
 		}
 	}
 
 	onSelectImage( media ) {
-		if ( ! media ) {
+		if ( ! media || ! media.url ) {
 			this.props.setAttributes( {
 				url: undefined,
 				alt: undefined,
@@ -342,7 +340,6 @@ class ImageEdit extends Component {
 		return (
 			<Fragment>
 				{ controls }
-				{ noticeUI }
 				<figure className={ classes }>
 					<ImageSize src={ url } dirtynessTrigger={ align }>
 						{ ( sizes ) => {

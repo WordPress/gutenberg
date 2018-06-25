@@ -125,7 +125,7 @@ function getOutboundType( blockName ) {
 }
 
 addFilter(
-	'blocks.BlockEdit',
-	'core/validation/multiple',
+	'editor.BlockEdit',
+	'core/edit-post/validate-multiple-use/with-multiple-validation',
 	withMultipleValidation
 );
