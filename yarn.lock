@@ -529,6 +529,10 @@
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/@wordpress/browserslist-config/-/browserslist-config-2.1.4.tgz#2297713d53424dec835eed4895abd4ceb3cac297"
 
+"@wordpress/hooks@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@wordpress/hooks/-/hooks-1.2.0.tgz#258196ca9c59a08b28faf759706ab409b12674c9"
+
 "@wordpress/i18n@^1.1.0":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@wordpress/i18n/-/i18n-1.1.1.tgz#e97c31879e1f76878cfdd14eb7d7a0ec99a234c3"
