@@ -219,8 +219,8 @@ class ParagraphBlock extends Component {
 						[ textColor.class ]: textColor.class,
 					} ) }
 					style={ {
-						backgroundColor: backgroundColor.class ? undefined : backgroundColor.value,
-						color: textColor.class ? undefined : textColor.value,
+						backgroundColor: backgroundColor.value,
+						color: textColor.value,
 						fontSize: fontSize ? fontSize + 'px' : undefined,
 						textAlign: align,
 					} }
