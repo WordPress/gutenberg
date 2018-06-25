@@ -44,14 +44,13 @@ export class BlockSwitcher extends Component {
 		const { blocks, onTransform, isLocked } = this.props;
 		const { hoveredClassName } = this.state;
 		const allowedBlocks = getPossibleBlockTransformations( blocks );
-
-		if ( isLocked || ! allowedBlocks.length ) {
-			return null;
-		}
-
 		const sourceBlockName = blocks[ 0 ].name;
 		const blockType = getBlockType( sourceBlockName );
 		const hasStyles = blocks.length === 1 && get( blockType, [ 'transforms', 'styles' ], [] ).length !== 0;
+
+		if ( ! hasStyles && ( ! allowedBlocks.length || isLocked ) ) {
+			return null;
+		}
 
 		return (
 			<Dropdown
@@ -87,30 +86,32 @@ export class BlockSwitcher extends Component {
 				renderContent={ ( { onClose } ) => (
 					<Fragment>
 						{ hasStyles &&
-						<PanelBody
-							title={ __( 'Block Styles' ) }
-							initialOpen
-						>
-							<BlockStyles uid={ blocks[ 0 ].uid } onSwitch={ onClose } onHoverClassName={ this.onHoverClassName } />
-						</PanelBody>
+							<PanelBody
+								title={ __( 'Block Styles' ) }
+								initialOpen
+							>
+								<BlockStyles uid={ blocks[ 0 ].uid } onSwitch={ onClose } onHoverClassName={ this.onHoverClassName } />
+							</PanelBody>
 						}
-						<PanelBody
-							title={ __( 'Transform To:' ) }
-							initialOpen
-						>
-							<BlockTypesList
-								items={ allowedBlocks.map( ( destinationBlockType ) => ( {
-									id: destinationBlockType.name,
-									icon: destinationBlockType.icon,
-									title: destinationBlockType.title,
-									hasChildBlocks: hasChildBlocks( destinationBlockType.name ),
-								} ) ) }
-								onSelect={ ( item ) => {
-									onTransform( blocks, item.id );
-									onClose();
-								} }
-							/>
-						</PanelBody>
+						{ allowedBlocks.length !== 0 && ! isLocked &&
+							<PanelBody
+								title={ __( 'Transform To:' ) }
+								initialOpen
+							>
+								<BlockTypesList
+									items={ allowedBlocks.map( ( destinationBlockType ) => ( {
+										id: destinationBlockType.name,
+										icon: destinationBlockType.icon,
+										title: destinationBlockType.title,
+										hasChildBlocks: hasChildBlocks( destinationBlockType.name ),
+									} ) ) }
+									onSelect={ ( item ) => {
+										onTransform( blocks, item.id );
+										onClose();
+									} }
+								/>
+							</PanelBody>
+						}
 
 						{ ( hoveredClassName !== null ) &&
 							<BlockPreview
