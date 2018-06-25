@@ -190,11 +190,11 @@ export async function pressWithModifier( modifier, key ) {
 }
 
 /**
- * Toggles More Menu item, searchers for the button with the text provided and clicks it.
+ * Clicks on More Menu item, searchers for the button with the text provided and clicks it.
  *
  * @param {string} buttonLabel The label to search the button for.
  */
-export async function toggleMoreMenuItem( buttonLabel ) {
+export async function clickOnMoreMenuItem( buttonLabel ) {
 	await page.click( '.edit-post-more-menu [aria-label="More"]' );
 	const itemButton = ( await page.$x( `//button[contains(text(), \'${ buttonLabel }\')]` ) )[ 0 ];
 	await itemButton.click( 'button' );
@@ -222,7 +222,17 @@ export async function publishPost() {
 	return page.waitForSelector( '.notice-success' );
 }
 
+/**
+ * Clicks on the button in the header which opens Document Settings sidebar when it is closed.
+ */
+export async function openDocumentSettingsSidebar() {
+	const openButton = await page.$( '.edit-post-header__settings button[aria-label="Settings"][aria-expaned="false"]' );
+
+	if ( openButton ) {
+		await page.click( openButton );
+	}
+}
+
 export async function clearLocalStorage() {
 	await page.evaluate( () => window.localStorage.clear() );
 }
-
