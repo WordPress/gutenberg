@@ -516,7 +516,7 @@ describe( 'selectors', () => {
 			const state = {
 				currentPost: {
 					_links: {
-						predecessor: [
+						'predecessor-version': [
 							{
 								id: 123,
 							},

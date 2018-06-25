@@ -415,7 +415,7 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 		$this->assertEquals( 'rest_forbidden_per_page', $data['code'] );
 	}
 
-	public function test_get_post_links_predecessor() {
+	public function test_get_post_links_predecessor_version() {
 		$post_id = $this->factory->post->create();
 		wp_update_post(
 			array(
@@ -434,7 +434,7 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 		$this->assertEquals( rest_url( '/wp/v2/posts/' . $post_id . '/revisions' ), $links['version-history'][0]['href'] );
 		$this->assertEquals( 1, $links['version-history'][0]['attributes']['count'] );
 
-		$this->assertEquals( rest_url( '/wp/v2/posts/' . $post_id . '/revisions/' . $revision_1->ID ), $links['predecessor'][0]['href'] );
-		$this->assertEquals( $revision_1->ID, $links['predecessor'][0]['attributes']['id'] );
+		$this->assertEquals( rest_url( '/wp/v2/posts/' . $post_id . '/revisions/' . $revision_1->ID ), $links['predecessor-version'][0]['href'] );
+		$this->assertEquals( $revision_1->ID, $links['predecessor-version'][0]['attributes']['id'] );
 	}
 }

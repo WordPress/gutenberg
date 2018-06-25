@@ -369,7 +369,7 @@ function gutenberg_add_revisions_data_to_links( $response, $post, $request ) {
 		if ( $revisions_count > 0 ) {
 			$last_revision = array_shift( $revisions );
 
-			$new_links['predecessor'] = array(
+			$new_links['predecessor-version'] = array(
 				'href' => $orig_href . '/revisions/' . $last_revision,
 				'id'   => $last_revision,
 			);
