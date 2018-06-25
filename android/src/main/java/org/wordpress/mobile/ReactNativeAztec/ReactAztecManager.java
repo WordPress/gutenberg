@@ -60,6 +60,11 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
                                 MapBuilder.of(
                                         "bubbled", "onSubmitEditing", "captured", "onSubmitEditingCapture")))*/
                 .put(
+                        "topChange",
+                        MapBuilder.of(
+                                "phasedRegistrationNames",
+                                MapBuilder.of("bubbled", "onChange")))
+                .put(
                         "topEndEditing",
                         MapBuilder.of(
                                 "phasedRegistrationNames",
@@ -141,16 +146,16 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
                         if (hasFocus) {
                             eventDispatcher.dispatchEvent(
                                     new ReactAztecFocusEvent(
-                                            aztecText.getId()));
+                                            editText.getId()));
                         } else {
                             eventDispatcher.dispatchEvent(
                                     new ReactAztecBlurEvent(
-                                            aztecText.getId()));
+                                            editText.getId()));
 
                             eventDispatcher.dispatchEvent(
                                     new ReactAztecEndEditingEvent(
-                                            aztecText.getId(),
-                                            editText.getText().toString()));
+                                            editText.getId(),
+                                            editText.toHtml(false)));
                         }
                     }
                 });
@@ -198,7 +203,7 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
             mEventDispatcher.dispatchEvent(
                     new ReactTextChangedEvent(
                             mEditText.getId(),
-                            s.toString(),
+                            mEditText.toHtml(false),
                             mEditText.incrementAndGetEventCounter()));
 
             mEventDispatcher.dispatchEvent(
@@ -247,9 +252,9 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
                 // FIXME: Note the 2 hacks here
                 mEventDispatcher.dispatchEvent(
                         new ReactContentSizeChangedEvent(
-                                mReactAztecText.getId(), // Note the ID of the parent here ;)
-                                PixelUtil.toDIPFromPixel(contentWidth) + 48,
-                                PixelUtil.toDIPFromPixel(contentHeight) + 48));
+                                mReactAztecText.getId(),
+                                PixelUtil.toDIPFromPixel(contentWidth),
+                                PixelUtil.toDIPFromPixel(contentHeight)));
             }
         }
     }
