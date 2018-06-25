@@ -67,7 +67,7 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 	allowedBlockTypes: true,
 
 	/**
-	 * @frontkom/gutenberg 0.1.14
+	 * @frontkom/gutenberg 0.2.0
 	 */
 	canPublish: true,
 	canSave: true,

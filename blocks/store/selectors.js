@@ -100,7 +100,7 @@ export const hasChildBlocks = ( state, blockName ) => {
 /**
  * Returns a boolean indicating if panel is visible or not.
  *
- * @since  @frontkom/gutenberg 0.1.4
+ * @since  @frontkom/gutenberg 0.2.0
  * @param {Object} state     Data state.
  * @param {string} slug		 Panel slug.
  *

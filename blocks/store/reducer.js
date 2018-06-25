@@ -94,7 +94,7 @@ export function categories( state = DEFAULT_CATEGORIES, action ) {
 			const previousState = filter( state, ( category ) => addedSlugs.indexOf( category.slug ) === -1 );
 			return [ ...previousState, ...action.categories ];
 		/*
-		 * @frontkom/gutenberg 0.1.4
+		 * @frontkom/gutenberg 0.2.0
 		 */
 		case 'REMOVE_CATEGORIES':
 			const nextState = filter( state, ( category ) => action.categories.indexOf( category.slug ) === -1 );
@@ -105,13 +105,13 @@ export function categories( state = DEFAULT_CATEGORIES, action ) {
 }
 
 /*
- * @frontkom/gutenberg 0.1.4
+ * @frontkom/gutenberg 0.2.0
  */
 const defaultInserterMenuPanels = { [ SUGGESTED_PANEL ]: true, [ SHARED_PANEL ]: true };
 
 /**
  * Reducer managing the inserter menu panels
- * @since  @frontkom/gutenberg 0.1.4
+ * @since  @frontkom/gutenberg 0.2.0
  * @param  {Object} state  Current state.
  * @param  {Object} action Dispatched action.
  * @return {Object}        Updated state.

@@ -30,26 +30,26 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 		<PostFeaturedImageCheck>
 			<div className="editor-post-featured-image">
 				<PostTypeSupportCheck supportKeys="media-library">
-					{ !! featuredImageId &&					
-							<MediaUpload
-								title={ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
-								onSelect={ onUpdateImage }
-								type="image"
-								modalClass="editor-post-featured-image__media-modal"
-								render={ ( { open } ) => (
-									<Button className="editor-post-featured-image__preview" onClick={ open }>
-										{ media &&
-											<ResponsiveWrapper
-												naturalWidth={ media.media_details.width }
-												naturalHeight={ media.media_details.height }
-											>
-												<img src={ media.source_url } alt={ __( 'Featured image' ) } />
-											</ResponsiveWrapper>
-										}
-										{ ! media && <Spinner /> }
-									</Button>
-								) }
-							/>
+					{ !! featuredImageId &&
+					<MediaUpload
+						title={ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
+						onSelect={ onUpdateImage }
+						type="image"
+						modalClass="editor-post-featured-image__media-modal"
+						render={ ( { open } ) => (
+							<Button className="editor-post-featured-image__preview" onClick={ open }>
+								{ media &&
+								<ResponsiveWrapper
+									naturalWidth={ media.media_details.width }
+									naturalHeight={ media.media_details.height }
+								>
+									<img src={ media.source_url } alt={ __( 'Featured image' ) } />
+								</ResponsiveWrapper>
+								}
+								{ ! media && <Spinner /> }
+							</Button>
+						) }
+					/>
 					}
 					{ !! featuredImageId && media && ! media.isLoading &&
 						<MediaUpload
@@ -65,22 +65,22 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 						/>
 					}
 					{ ! featuredImageId &&
-							<div>
-								<MediaUpload
-									title={ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
-									onSelect={ onUpdateImage }
-									type="image"
-									modalClass="editor-post-featured-image__media-modal"
-									render={ ( { open } ) => (
-										<Button className="editor-post-featured-image__toggle" onClick={ open }>
-											{ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
-										</Button>
-									) }
-								/>
-							</div>
+					<div>
+						<MediaUpload
+							title={ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
+							onSelect={ onUpdateImage }
+							type="image"
+							modalClass="editor-post-featured-image__media-modal"
+							render={ ( { open } ) => (
+								<Button className="editor-post-featured-image__toggle" onClick={ open }>
+									{ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
+								</Button>
+							) }
+						/>
+					</div>
 					}
 				</PostTypeSupportCheck>
-				
+
 				{ !! featuredImageId &&
 					<Button onClick={ onRemoveImage } isLink isDestructive>
 						{ postLabel.remove_featured_image || DEFAULT_REMOVE_FEATURE_IMAGE_LABEL }

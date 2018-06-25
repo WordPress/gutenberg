@@ -8,10 +8,6 @@ This package is based on [Gutenberg v3.1.0](https://github.com/WordPress/gutenbe
 
 ## Table of contents
 * [Installation](#installation)
-* [Usage](#usage)
-    * [Gutenberg Stores](#gutenberg-stores)
-    * [Registering Custom Blocks](#registering-custom-blocks)
-    * [Inserter Menu (blocks)](#inserter-menu-blocks)
 * [Global variables](#global-variables)
     * [apiRequest](#apirequest)
         * [Post Types](#post-types)
@@ -20,6 +16,10 @@ This package is based on [Gutenberg v3.1.0](https://github.com/WordPress/gutenbe
         * [Index](#index)
         * [Media](#media)
     * [url](#url)
+* [Usage](#usage)
+    * [Gutenberg Stores](#gutenberg-stores)
+    * [Registering Custom Blocks](#registering-custom-blocks)
+    * [Inserter Menu (blocks)](#inserter-menu-blocks)
 * [Customize your Gutenberg](#customize-your-gutenberg)    
     * [Events](#events)
 * [StoryPage Module](#storypage-module)
@@ -34,6 +34,148 @@ This package is based on [Gutenberg v3.1.0](https://github.com/WordPress/gutenbe
 
 ```sh
 npm install @frontkom/gutenberg
+```
+
+[↑ Go up to Table of contents](#table-of-contents)
+
+## Global variables 
+
+Gutenberg depends on several global variables: `wp`, `userSettings`, `wpEditorL10n`, `wpApiSettings`, etc and probably during your Gutenberg experiencie you will discover other required variables, please share with us if you feel they are important to Gutenberg execution. 
+
+Here we're only presenting those variables which - by our experience - we belive are crucial to Gutenberg and already set to them default values. If you don't set them up, you'll see that Gutenberg editor won't run.
+
+So we recommend you to set up them all in one file called `globals.js` or `settings.js` for example and import them **before** Gutenberg call. Feel free to override Gutenberg global variables if you need.
+
+```js
+// globals.js
+
+window.wp = {
+    apiRequest, 
+    url: { addQueryArgs },
+    ...,
+};
+
+window.userSettings = {
+    uid: 2, // Among other things, this uid is used to identify and store editor user preferences in localStorage
+};
+
+// set your root path
+window.wpApiSettings = { 
+    root: 'YOUR_ROOT_PATH',
+    ...,
+};
+```
+
+[↑ Go up to Table of contents](#table-of-contents)
+
+We are working to include on **Gutenberg by Frontkom** all settings that shouldn't be part of your apps, but you always can override them if you need.
+
+### apiRequest
+
+Those two are very important for comunication between the editor and remaining app, so you should set them up accordingly your needs. 
+
+***apiRequest*** is the method that will handle with data operations on Gutenberg, like getting resources (categories for example), saving page changes or deleting pages, etc. It receives an object with `path`, `method`, `data`, etc, so you can treat it as you want.
+
+```js
+function apiRequest( options ) {
+    // Do something with those options like calling an API 
+    // or actions from your store...
+}
+```
+
+Next, we will show some commons API requests Gutenberg does and the respective response it expects. For more information, you can check the [WordPress REST API Documentation](https://developer.wordpress.org/rest-api/reference/post-revisions/).
+
+[↑ Go up to Table of contents](#table-of-contents)
+
+#### Post Types
+
+The Gutenberg editor will ask for available **Post Types** through `/wp/v2/types/?context=edit` request. In addition to the _type_ properties that can be checked in [WordPress documentation](https://developer.wordpress.org/rest-api/reference/post-types/), **Gutenberg by Frontkom** provides the following:
+
+```js
+{
+    ...,   
+    supports: {
+        ...,
+        'media-library': false,    // to disable Media library from WordPress
+    },
+}
+```
+
+[↑ Go up to Table of contents](#table-of-contents)
+
+#### Posts and Pages
+
+Check the WordPress API documentation for [Posts](https://developer.wordpress.org/rest-api/reference/posts/) and [Pages](https://developer.wordpress.org/rest-api/reference/pages/) requests.
+
+[↑ Go up to Table of contents](#table-of-contents)
+
+#### Categories
+
+Check the WordPress API documentation for [Categories](https://developer.wordpress.org/rest-api/reference/categories/).
+
+[↑ Go up to Table of contents](#table-of-contents)
+
+#### Index
+
+Gutenberg will ask for the [theme features](https://codex.wordpress.org/Theme_Features) through the index request (`/`). The response should be the following object.
+
+```js
+{
+    ...,
+    theme_supports: {
+        formats: [ 'standard', 'aside', 'image', 'video', 'quote', 'link', 'gallery', 'audio' ],
+        'post-thumbnails': true,
+    },
+    ...,
+}
+```
+
+[↑ Go up to Table of contents](#table-of-contents)
+
+#### Media
+
+Here is the WordPress API documentation for [Media](https://developer.wordpress.org/rest-api/reference/media/). The **Gutenberg by Frontkom** introduces the `data` property which is an object with all data attributes you want to add to image/media DOM element.
+
+```js
+{
+    ...,
+    id: 1527069591355,    
+    link: MEDIA_LINK_HERE,
+    source_url: MEDIA_URL_HERE,
+    // Additionaly, you can add some data attributes for images for example
+    data: { entity_type: 'file', entity_uuid: 'e94e9d8d-4cf4-43c1-b95e-1527069591355' }
+    ...,
+}
+```
+
+[↑ Go up to Table of contents](#table-of-contents)
+
+### url
+
+***url*** should has a function called `addQueryArgs( url, args )` that handles with `url` and `args` and returns the final url to different actions. The original implementation is the following, feel free to keep it or change it according to your needs.
+
+```js
+/**
+ * External dependencies
+ */
+import { parse, format } from 'url';
+import { parse as parseQueryString, stringify } from 'querystring';
+
+/**
+ * Appends arguments to the query string of the url
+ *
+ * @param  {String} url   URL
+ * @param  {Object} args  Query Args
+ *
+ * @return {String}       Updated URL
+ */
+export function addQueryArgs( url, args ) {
+    const parsedURL = parse( url, true );
+    const query = { ...parsedURL.query, ...args };
+    delete parsedURL.search;
+
+    return format( { ...parsedURL, query } );
+}
 ```
 
 [↑ Go up to Table of contents](#table-of-contents)
@@ -211,144 +353,6 @@ data.dispatch( 'core/blocks' ).addCategories( [ {
     slug: 'storypage',
     title: 'StoryPage Blocks',
 } ] );
-```
-
-[↑ Go up to Table of contents](#table-of-contents)
-
-## Global variables 
-
-Gutenberg depends on several global variables: `wp`, `userSettings`, `wpEditorL10n`, `wpApiSettings`, etc and probably during your Gutenberg experiencie you will discover other required variables, please share with us if you feel they are important to Gutenberg execution. 
-
-Here we're only presenting those variables which - by our experience - we belive are crucial to Gutenberg and already set to them default values. If you don't set them up, you'll see that Gutenberg editor won't run.
-
-So we recommend you to set up them all in one file called `globals.js` or `settings.js` for example and import them **before** Gutenberg call. Feel free to override Gutenberg global variables if you need.
-
-```js
-// globals.js
-
-window.wp = {
-    apiRequest, 
-    url: { addQueryArgs },
-    ...,
-};
-
-// set your root path
-window.wpApiSettings = { 
-    root: 'YOUR_ROOT_PATH',
-    ...,
-};
-```
-
-[↑ Go up to Table of contents](#table-of-contents)
-
-We are working to include on **Gutenberg by Frontkom** all settings that shouldn't be part of your apps, but you always can override them if you need.
-
-### apiRequest
-
-Those two are very important for comunication between the editor and remaining app, so you should set them up accordingly your needs. 
-
-***apiRequest*** is the method that will handle with data operations on Gutenberg, like getting resources (categories for example), saving page changes or deleting pages, etc. It receives an object with `path`, `method`, `data`, etc, so you can treat it as you want.
-
-```js
-function apiRequest( options ) {
-    // Do something with those options like calling an API 
-    // or actions from your store...
-}
-```
-
-Next, we will show some commons API requests Gutenberg does and the respective response it expects. For more information, you can check the [WordPress REST API Documentation](https://developer.wordpress.org/rest-api/reference/post-revisions/).
-
-[↑ Go up to Table of contents](#table-of-contents)
-
-#### Post Types
-
-The Gutenberg editor will ask for available **Post Types** through `/wp/v2/types/?context=edit` request. In addition to the _type_ properties that can be checked in [WordPress documentation](https://developer.wordpress.org/rest-api/reference/post-types/), **Gutenberg by Frontkom** provides the following:
-
-```js
-{
-    ...,   
-    supports: {
-        ...,
-        'media-library': false,    // to disable Media library from WordPress
-    },
-}
-```
-
-[↑ Go up to Table of contents](#table-of-contents)
-
-#### Posts and Pages
-
-Check the WordPress API documentation for [Posts](https://developer.wordpress.org/rest-api/reference/posts/) and [Pages](https://developer.wordpress.org/rest-api/reference/pages/) requests.
-
-[↑ Go up to Table of contents](#table-of-contents)
-
-#### Categories
-
-Check the WordPress API documentation for [Categories](https://developer.wordpress.org/rest-api/reference/categories/).
-
-[↑ Go up to Table of contents](#table-of-contents)
-
-#### Index
-
-Gutenberg will ask for the [theme features](https://codex.wordpress.org/Theme_Features) through the index request (`/`). The response should be the following object.
-
-```js
-{
-    ...,
-    theme_supports: {
-        formats: [ 'standard', 'aside', 'image', 'video', 'quote', 'link', 'gallery', 'audio' ],
-        'post-thumbnails': true,
-    },
-    ...,
-}
-```
-
-[↑ Go up to Table of contents](#table-of-contents)
-
-#### Media
-
-Here is the WordPress API documentation for [Media](https://developer.wordpress.org/rest-api/reference/media/). The **Gutenberg by Frontkom** introduces the `data` property which is an object with all data attributes you want to add to image/media DOM element.
-
-```js
-{
-    ...,
-    id: 1527069591355,    
-    link: MEDIA_LINK_HERE,
-    source_url: MEDIA_URL_HERE,
-    // Additionaly, you can add some data attributes for images for example
-    data: { entity_type: 'file', entity_uuid: 'e94e9d8d-4cf4-43c1-b95e-1527069591355' }
-    ...,
-}
-```
-
-[↑ Go up to Table of contents](#table-of-contents)
-
-### url
-
-***url*** should has a function called `addQueryArgs( url, args )` that handles with `url` and `args` and returns the final url to different actions. The original implementation is the following, feel free to keep it or change it according to your needs.
-
-```js
-/**
- * External dependencies
- */
-import { parse, format } from 'url';
-import { parse as parseQueryString, stringify } from 'querystring';
-
-/**
- * Appends arguments to the query string of the url
- *
- * @param  {String} url   URL
- * @param  {Object} args  Query Args
- *
- * @return {String}       Updated URL
- */
-export function addQueryArgs( url, args ) {
-    const parsedURL = parse( url, true );
-    const query = { ...parsedURL.query, ...args };
-    delete parsedURL.search;
-
-    return format( { ...parsedURL, query } );
-}
 ```
 
 [↑ Go up to Table of contents](#table-of-contents)
