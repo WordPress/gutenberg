@@ -20,6 +20,10 @@ $blocks-button__line-height: $big-font-size + 6px;
 		word-break: break-all;
 	}
 
+	&.is-style-squared .wp-block-button__link {
+		border-radius: 0;
+	}
+
 	&.aligncenter {
 		text-align: center;
 	}
