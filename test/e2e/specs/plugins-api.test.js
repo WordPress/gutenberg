@@ -4,7 +4,7 @@
 import '../support/bootstrap';
 import {
 	clickOnMoreMenuItem,
-	ensureDocumentSettingsSidebarIsOpened,
+	openDocumentSettingsSidebar,
 	newPost,
 	newDesktopBrowserPage,
 } from '../support/utils';
@@ -24,9 +24,9 @@ describe( 'Using Plugins API', () => {
 
 	describe( 'Post Status Info', () => {
 		it( 'Should render post status info inside Document Setting sidebar', async () => {
-			await ensureDocumentSettingsSidebarIsOpened();
+			await openDocumentSettingsSidebar();
 
-			const pluginPostStatusInfoText = await page.$eval( '.my-post-status-info-plugin', ( el ) => el.innerText );
+			const pluginPostStatusInfoText = await page.$eval( '.edit-post-post-status .my-post-status-info-plugin', ( el ) => el.innerText );
 			expect( pluginPostStatusInfoText ).toBe( 'My post status info' );
 		} );
 	} );
