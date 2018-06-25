@@ -78,7 +78,7 @@ function findVariant( name, extensions, includePaths ) {
 		const includePath = includePaths[ i ];
 
 		// try to find the file iterating through the extensions, in order.
-		const foundExtention = extensions.find( extension => {
+		const foundExtention = extensions.find( ( extension ) => {
 			const fname = includePath + '/' + name + extension;
 			return fs.existsSync( fname );
 		} );

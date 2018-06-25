@@ -9,7 +9,7 @@ import {
 } from '../store/actions';
 import MainApp from './MainApp';
 
-const mapStateToProps = state => ( {
+const mapStateToProps = ( state ) => ( {
 	...state,
 } );
 
@@ -19,16 +19,16 @@ const mapDispatchToProps = ( dispatch, ownProps ) => {
 		onChange: ( uid, attributes ) => {
 			dispatch( updateBlockAttributes( uid, attributes ) );
 		},
-		focusBlockAction: uid => {
+		focusBlockAction: ( uid ) => {
 			dispatch( focusBlockAction( uid ) );
 		},
-		moveBlockUpAction: uid => {
+		moveBlockUpAction: ( uid ) => {
 			dispatch( moveBlockUpAction( uid ) );
 		},
-		moveBlockDownAction: uid => {
+		moveBlockDownAction: ( uid ) => {
 			dispatch( moveBlockDownAction( uid ) );
 		},
-		deleteBlockAction: uid => {
+		deleteBlockAction: ( uid ) => {
 			dispatch( deleteBlockAction( uid ) );
 		},
 	};
