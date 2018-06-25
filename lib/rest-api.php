@@ -353,16 +353,16 @@ function gutenberg_add_revisions_data_to_links( $response, $post, $request ) {
 	$new_links  = array();
 	$orig_links = $response->get_links();
 
-	if ( in_array( $post->post_type, array( 'post', 'page' ), true ) || post_type_supports( $post->post_type, 'revisions' ) ) {
+	if ( ! empty( $orig_links['version-history'] ) ) {
+		$version_history_link = array_shift( $orig_links['version-history'] );
 		// 'version-history' already exists and we don't want to duplicate it.
 		$response->remove_link( 'version-history' );
 
-		$orig_href       = ! empty( $orig_links['self'][0]['href'] ) ? $orig_links['self'][0]['href'] : null;
 		$revisions       = wp_get_post_revisions( $post->ID, array( 'fields' => 'ids' ) );
 		$revisions_count = count( $revisions );
 
 		$new_links['version-history'] = array(
-			'href'  => $orig_href . '/revisions',
+			'href'  => $version_history_link['href'],
 			'count' => $revisions_count,
 		);
 
@@ -370,7 +370,7 @@ function gutenberg_add_revisions_data_to_links( $response, $post, $request ) {
 			$last_revision = array_shift( $revisions );
 
 			$new_links['predecessor-version'] = array(
-				'href' => $orig_href . '/revisions/' . $last_revision,
+				'href' => $version_history_link['href'] . '/' . $last_revision,
 				'id'   => $last_revision,
 			);
 		}
