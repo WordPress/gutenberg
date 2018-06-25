@@ -81,7 +81,7 @@ export function toAsyncIterable( object ) {
 	}() );
 }
 
-export function createRegistry( storeConfigs = [] ) {
+export function createRegistry( storeConfigs = {} ) {
 	const namespaces = {};
 	let listeners = [];
 
@@ -298,7 +298,10 @@ export function createRegistry( storeConfigs = [] ) {
 		return get( namespaces, [ reducerKey, 'actions' ] );
 	}
 
-	[ dataStore, ...storeConfigs ].map( ( { name, ...config } ) => registerStore( name, config ) );
+	Object.entries( {
+		'core/data': dataStore,
+		...storeConfigs,
+	} ).map( ( [ name, config ] ) => registerStore( name, config ) );
 
 	return {
 		registerReducer,
