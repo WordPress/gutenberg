@@ -1,39 +1,34 @@
 /**
  * External dependencies
  */
-import { mount } from 'enzyme';
+import TestRenderer from 'react-test-renderer';
+import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { compose, createElement } from '@wordpress/element';
+import { createElement, compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import {
-	registerReducer,
-	registerSelectors,
-	registerActions,
-	dispatch,
-	withSelect,
-	withDispatch,
-} from '../';
+import withSelect from '../with-select';
+import withDispatch from '../with-dispatch';
+import { createRegistry } from '../../registry';
+import { RegistryProvider } from '../registry-provider';
 
 describe( 'withSelect', () => {
-	let wrapper, store;
-
-	afterEach( () => {
-		if ( wrapper ) {
-			wrapper.unmount();
-			wrapper = null;
-		}
+	let registry;
+	beforeEach( () => {
+		registry = createRegistry();
 	} );
 
 	it( 'passes the relevant data to the component', () => {
-		registerReducer( 'reactReducer', () => ( { reactKey: 'reactState' } ) );
-		registerSelectors( 'reactReducer', {
-			reactSelector: ( state, key ) => state[ key ],
+		registry.registerStore( 'reactReducer', {
+			reducer: () => ( { reactKey: 'reactState' } ),
+			selectors: {
+				reactSelector: ( state, key ) => state[ key ],
+			},
 		} );
 
 		// In normal circumstances, the fact that we have to add an arbitrary
@@ -53,35 +48,37 @@ describe( 'withSelect', () => {
 
 		const Component = withSelect( mapSelectToProps )( OriginalComponent );
 
-		wrapper = mount( <Component keyName="reactKey" /> );
+		const testRenderer = TestRenderer.create(
+			<RegistryProvider value={ registry }>
+				<Component keyName="reactKey" />
+			</RegistryProvider>
+		);
+		const testInstance = testRenderer.root;
 
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 
 		// Wrapper is the enhanced component. Find props on the rendered child.
-		const child = wrapper.childAt( 0 );
-		expect( child.props() ).toEqual( {
-			keyName: 'reactKey',
-			data: 'reactState',
+		expect( testInstance.findByType( 'div' ).props ).toEqual( {
+			children: 'reactState',
 		} );
-		expect( wrapper.text() ).toBe( 'reactState' );
 	} );
 
 	it( 'should rerun selection on state changes', () => {
-		registerReducer( 'counter', ( state = 0, action ) => {
-			if ( action.type === 'increment' ) {
-				return state + 1;
-			}
+		registry.registerStore( 'counter', {
+			reducer: ( state = 0, action ) => {
+				if ( action.type === 'increment' ) {
+					return state + 1;
+				}
 
-			return state;
-		} );
-
-		registerSelectors( 'counter', {
-			getCount: ( state ) => state,
-		} );
-
-		registerActions( 'counter', {
-			increment: () => ( { type: 'increment' } ),
+				return state;
+			},
+			selectors: {
+				getCount: ( state ) => state,
+			},
+			actions: {
+				increment: () => ( { type: 'increment' } ),
+			},
 		} );
 
 		const mapSelectToProps = jest.fn().mockImplementation( ( _select ) => ( {
@@ -103,17 +100,21 @@ describe( 'withSelect', () => {
 			withDispatch( mapDispatchToProps ),
 		] )( OriginalComponent );
 
-		wrapper = mount( <Component /> );
+		const testRenderer = TestRenderer.create(
+			<RegistryProvider value={ registry }>
+				<Component />
+			</RegistryProvider>
+		);
+		const testInstance = testRenderer.root;
 
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
 		expect( mapDispatchToProps ).toHaveBeenCalledTimes( 1 );
 
-		const button = wrapper.find( 'button' );
+		// Simulate a click on the button
+		testInstance.findByType( 'button' ).props.onClick();
 
-		button.simulate( 'click' );
-
-		expect( button.text() ).toBe( '1' );
+		expect( testInstance.findByType( 'button' ).props.children ).toBe( 1 );
 		// 3 times =
 		//  1. Initial mount
 		//  2. When click handler is called
@@ -124,16 +125,17 @@ describe( 'withSelect', () => {
 	} );
 
 	it( 'should rerun selection on props changes', () => {
-		registerReducer( 'counter', ( state = 0, action ) => {
-			if ( action.type === 'increment' ) {
-				return state + 1;
-			}
+		registry.registerStore( 'counter', {
+			reducer: ( state = 0, action ) => {
+				if ( action.type === 'increment' ) {
+					return state + 1;
+				}
 
-			return state;
-		} );
-
-		registerSelectors( 'counter', {
-			getCount: ( state, offset ) => state + offset,
+				return state;
+			},
+			selectors: {
+				getCount: ( state, offset ) => state + offset,
+			},
 		} );
 
 		const mapSelectToProps = jest.fn().mockImplementation( ( _select, ownProps ) => ( {
@@ -146,23 +148,33 @@ describe( 'withSelect', () => {
 
 		const Component = withSelect( mapSelectToProps )( OriginalComponent );
 
-		wrapper = mount( <Component offset={ 0 } /> );
+		const testRenderer = TestRenderer.create(
+			<RegistryProvider value={ registry }>
+				<Component offset={ 0 } />
+			</RegistryProvider>
+		);
+		const testInstance = testRenderer.root;
 
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 
-		wrapper.setProps( { offset: 10 } );
+		testRenderer.update(
+			<RegistryProvider value={ registry }>
+				<Component offset={ 10 } />
+			</RegistryProvider>
+		);
 
-		expect( wrapper.childAt( 0 ).text() ).toBe( '10' );
+		expect( testInstance.findByType( 'div' ).props.children ).toBe( 10 );
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
 	} );
 
 	it( 'should render if props have changed but not state', () => {
-		store = registerReducer( 'unchanging', ( state = {} ) => state );
-
-		registerSelectors( 'unchanging', {
-			getState: ( state ) => state,
+		registry.registerStore( 'unchanging', {
+			reducer: ( state = {} ) => state,
+			selectors: {
+				getState: ( state ) => state,
+			},
 		} );
 
 		const mapSelectToProps = jest.fn();
@@ -173,22 +185,31 @@ describe( 'withSelect', () => {
 			withSelect( mapSelectToProps ),
 		] )( OriginalComponent );
 
-		wrapper = mount( <Component /> );
+		const testRenderer = TestRenderer.create(
+			<RegistryProvider value={ registry }>
+				<Component />
+			</RegistryProvider>
+		);
 
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 
-		wrapper.setProps( { propName: 'foo' } );
+		testRenderer.update(
+			<RegistryProvider value={ registry }>
+				<Component propName="foo" />
+			</RegistryProvider>
+		);
 
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
 	} );
 
 	it( 'should not rerun selection on unchanging state', () => {
-		store = registerReducer( 'unchanging', ( state = {} ) => state );
-
-		registerSelectors( 'unchanging', {
-			getState: ( state ) => state,
+		const store = registry.registerStore( 'unchanging', {
+			reducer: ( state = {} ) => state,
+			selectors: {
+				getState: ( state ) => state,
+			},
 		} );
 
 		const mapSelectToProps = jest.fn();
@@ -199,7 +220,11 @@ describe( 'withSelect', () => {
 			withSelect( mapSelectToProps ),
 		] )( OriginalComponent );
 
-		wrapper = mount( <Component /> );
+		TestRenderer.create(
+			<RegistryProvider value={ registry }>
+				<Component />
+			</RegistryProvider>
+		);
 
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
@@ -211,9 +236,11 @@ describe( 'withSelect', () => {
 	} );
 
 	it( 'omits props which are not returned on subsequent mappings', () => {
-		registerReducer( 'demo', ( state = 'OK' ) => state );
-		registerSelectors( 'demo', {
-			getValue: ( state ) => state,
+		registry.registerStore( 'demo', {
+			reducer: ( state = 'OK' ) => state,
+			selectors: {
+				getValue: ( state ) => state,
+			},
 		} );
 
 		const mapSelectToProps = jest.fn().mockImplementation( ( _select, ownProps ) => {
@@ -222,27 +249,42 @@ describe( 'withSelect', () => {
 			};
 		} );
 
-		const OriginalComponent = jest.fn().mockImplementation( () => <div /> );
+		const OriginalComponent = jest.fn()
+			.mockImplementation( ( props ) => <div>{ JSON.stringify( props ) }</div> );
 
 		const Component = withSelect( mapSelectToProps )( OriginalComponent );
 
-		wrapper = mount( <Component propName="foo" /> );
+		const testRenderer = TestRenderer.create(
+			<RegistryProvider value={ registry }>
+				<Component propName="foo" />
+			</RegistryProvider>
+		);
+		const testInstance = testRenderer.root;
 
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
-		expect( wrapper.childAt( 0 ).props() ).toEqual( { foo: 'OK', propName: 'foo' } );
 
-		wrapper.setProps( { propName: 'bar' } );
+		expect( omit( JSON.parse( testInstance.findByType( 'div' ).props.children ), [ 'registry' ] ) )
+			.toEqual( { foo: 'OK', propName: 'foo' } );
+
+		testRenderer.update(
+			<RegistryProvider value={ registry }>
+				<Component propName="bar" />
+			</RegistryProvider>
+		);
 
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
-		expect( wrapper.childAt( 0 ).props() ).toEqual( { bar: 'OK', propName: 'bar' } );
+		expect( omit( JSON.parse( testInstance.findByType( 'div' ).props.children ), [ 'registry' ] ) )
+			.toEqual( { bar: 'OK', propName: 'bar' } );
 	} );
 
 	it( 'allows undefined return from mapSelectToProps', () => {
-		registerReducer( 'demo', ( state = 'OK' ) => state );
-		registerSelectors( 'demo', {
-			getValue: ( state ) => state,
+		registry.registerStore( 'demo', {
+			reducer: ( state = 'OK' ) => state,
+			selectors: {
+				getValue: ( state ) => state,
+			},
 		} );
 
 		const mapSelectToProps = jest.fn().mockImplementation( ( _select, ownProps ) => {
@@ -259,34 +301,49 @@ describe( 'withSelect', () => {
 
 		const Component = withSelect( mapSelectToProps )( OriginalComponent );
 
-		wrapper = mount( <Component pass={ false } /> );
+		const testRenderer = TestRenderer.create(
+			<RegistryProvider value={ registry }>
+				<Component pass={ false } />
+			</RegistryProvider>
+		);
+		const testInstance = testRenderer.root;
 
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
-		expect( wrapper.childAt( 0 ).text() ).toBe( 'Unknown' );
+		expect( testInstance.findByType( 'div' ).props.children ).toBe( 'Unknown' );
 
-		wrapper.setProps( { pass: true } );
+		testRenderer.update(
+			<RegistryProvider value={ registry }>
+				<Component pass />
+			</RegistryProvider>
+		);
 
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
-		expect( wrapper.childAt( 0 ).text() ).toBe( 'OK' );
+		expect( testInstance.findByType( 'div' ).props.children ).toBe( 'OK' );
 
-		wrapper.setProps( { pass: false } );
+		testRenderer.update(
+			<RegistryProvider value={ registry }>
+				<Component pass={ false } />
+			</RegistryProvider>
+		);
 
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 3 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 3 );
-		expect( wrapper.childAt( 0 ).text() ).toBe( 'Unknown' );
+		expect( testInstance.findByType( 'div' ).props.children ).toBe( 'Unknown' );
 	} );
 
 	it( 'should run selections on parents before its children', () => {
-		registerReducer( 'childRender', ( state = true, action ) => (
-			action.type === 'TOGGLE_RENDER' ? ! state : state
-		) );
-		registerSelectors( 'childRender', {
-			getValue: ( state ) => state,
-		} );
-		registerActions( 'childRender', {
-			toggleRender: () => ( { type: 'TOGGLE_RENDER' } ),
+		registry.registerStore( 'childRender', {
+			reducer: ( state = true, action ) => (
+				action.type === 'TOGGLE_RENDER' ? ! state : state
+			),
+			selectors: {
+				getValue: ( state ) => state,
+			},
+			actions: {
+				toggleRender: () => ( { type: 'TOGGLE_RENDER' } ),
+			},
 		} );
 
 		const childMapStateToProps = jest.fn();
@@ -302,68 +359,22 @@ describe( 'withSelect', () => {
 		const Child = withSelect( childMapStateToProps )( ChildOriginalComponent );
 		const Parent = withSelect( parentMapStateToProps )( ParentOriginalComponent );
 
-		wrapper = mount( <Parent /> );
+		TestRenderer.create(
+			<RegistryProvider value={ registry }>
+				<Parent />
+			</RegistryProvider>
+		);
 
 		expect( childMapStateToProps ).toHaveBeenCalledTimes( 1 );
 		expect( parentMapStateToProps ).toHaveBeenCalledTimes( 1 );
 		expect( ChildOriginalComponent ).toHaveBeenCalledTimes( 1 );
 		expect( ParentOriginalComponent ).toHaveBeenCalledTimes( 1 );
 
-		dispatch( 'childRender' ).toggleRender();
+		registry.dispatch( 'childRender' ).toggleRender();
 
 		expect( childMapStateToProps ).toHaveBeenCalledTimes( 1 );
 		expect( parentMapStateToProps ).toHaveBeenCalledTimes( 2 );
 		expect( ChildOriginalComponent ).toHaveBeenCalledTimes( 1 );
 		expect( ParentOriginalComponent ).toHaveBeenCalledTimes( 2 );
-	} );
-} );
-
-describe( 'withDispatch', () => {
-	let wrapper;
-	afterEach( () => {
-		if ( wrapper ) {
-			wrapper.unmount();
-			wrapper = null;
-		}
-	} );
-
-	it( 'passes the relevant data to the component', () => {
-		const store = registerReducer( 'counter', ( state = 0, action ) => {
-			if ( action.type === 'increment' ) {
-				return state + action.count;
-			}
-			return state;
-		} );
-
-		const increment = ( count = 1 ) => ( { type: 'increment', count } );
-		registerActions( 'counter', {
-			increment,
-		} );
-
-		const Component = withDispatch( ( _dispatch, ownProps ) => {
-			const { count } = ownProps;
-
-			return {
-				increment: () => _dispatch( 'counter' ).increment( count ),
-			};
-		} )( ( props ) => <button onClick={ props.increment } /> );
-
-		wrapper = mount( <Component count={ 0 } /> );
-
-		// Wrapper is the enhanced component. Find props on the rendered child.
-		const child = wrapper.childAt( 0 );
-
-		const incrementBeforeSetProps = child.prop( 'increment' );
-
-		// Verify that dispatch respects props at the time of being invoked by
-		// changing props after the initial mount.
-		wrapper.setProps( { count: 2 } );
-
-		// Function value reference should not have changed in props update.
-		expect( child.prop( 'increment' ) ).toBe( incrementBeforeSetProps );
-
-		wrapper.find( 'button' ).simulate( 'click' );
-
-		expect( store.getState() ).toBe( 2 );
 	} );
 } );

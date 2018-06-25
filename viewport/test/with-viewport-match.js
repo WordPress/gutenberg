@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mount } from 'enzyme';
+import TestRenderer from 'react-test-renderer';
 
 /**
  * WordPress dependencies
@@ -15,15 +15,13 @@ import '../store';
 import withViewportMatch from '../with-viewport-match';
 
 describe( 'withViewportMatch()', () => {
-	const Component = () => <div>Hello</div>;
+	const Component = ( props ) => <div>{ props.isWide ? 'true' : 'false' }</div>;
 
 	it( 'should render with result of query as custom prop name', () => {
 		dispatch( 'core/viewport' ).setIsMatching( { '> wide': true } );
 		const EnhancedComponent = withViewportMatch( { isWide: '> wide' } )( Component );
-		const wrapper = mount( <EnhancedComponent /> );
+		const testRenderer = TestRenderer.create( <EnhancedComponent /> );
 
-		expect( wrapper.find( Component ).props() ).toEqual( { isWide: true } );
-
-		wrapper.unmount();
+		expect( testRenderer.root.findByType( 'div' ).props.children ).toBe( 'true' );
 	} );
 } );
