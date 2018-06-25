@@ -53,23 +53,24 @@ const effects = {
 		}, {} );
 		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
 
-		// Saving metaboxes when saving posts
-		const { isAutosavingPost } = select( 'core/editor' );
-		let shouldRequestMetaBoxUpdates = false;
-		subscribe( onChangeListener( select( 'core/editor' ).isSavingPost, ( isSavingPost ) => {
-			// Only save metaboxes when this isn't an autosave.
-			if ( isSavingPost && ! isAutosavingPost( store.getState() ) ) {
-				shouldRequestMetaBoxUpdates = true;
-			}
-			// If a full save just completed, trigger metabox save.
-			if ( ! isSavingPost && shouldRequestMetaBoxUpdates ) {
+		let wasSavingPost = select( 'core/editor' ).isSavingPost();
+		let wasAutosavingPost = select( 'core/editor' ).isAutosavingPost();
+		// Save metaboxes when performing a full save on the post.
+		subscribe( () => {
+			const isSavingPost = select( 'core/editor' ).isSavingPost();
+			const isAutosavingPost = select( 'core/editor' ).isAutosavingPost();
+
+			// Save metaboxes on save completion when past save wasn't an autosave.
+			const shouldTriggerMetaboxesSave = wasSavingPost && ! wasAutosavingPost && ! isSavingPost && ! isAutosavingPost;
+
+			// Save current state for next inspection.
+			wasSavingPost = isSavingPost;
+			wasAutosavingPost = isAutosavingPost;
+
+			if ( shouldTriggerMetaboxesSave ) {
 				store.dispatch( requestMetaBoxUpdates() );
 			}
-			// Regardless of which save just occurred, reset metabox save state.
-			if ( ! isSavingPost ) {
-				shouldRequestMetaBoxUpdates = false;
-			}
-		} ) );
+		} );
 	},
 	REQUEST_META_BOX_UPDATES( action, store ) {
 		const state = store.getState();
