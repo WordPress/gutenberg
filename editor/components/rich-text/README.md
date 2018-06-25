@@ -31,6 +31,22 @@ Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs
 
 *Optional.* By default, a line break will be inserted on <kbd>Enter</kbd>. If the editable field can contain multiple paragraphs, this property can be set to `p` to create new paragraphs on <kbd>Enter</kbd>.
 
+### `onSetup( editor: Object ): Function`
+
+*Optional.* Called when the editor has been setup.
+
+If you want to use this to give focus to a new editor instance, you must wait until the editor has been rendered before calling `.focus` on it.
+
+An easy way to do this is to have an `onSetup` function that focuses the editor on the next screen repaint, using `requestAnimationFrame`:
+
+```js
+function onSetupFocusEditor( editor ) {
+	window.requestAnimationFrame( () => {
+		editor.focus();
+	} );
+}
+```
+
 ### `onSplit( before: Array|String, after: Array|String, ...blocks: Object ): Function`
 
 *Optional.* Called when the content can be split with `before` and `after`. There might be blocks present, which should be inserted in between.
