@@ -27,6 +27,7 @@ class BlockInsertionPoint extends Component {
 	onFocusInserter( event ) {
 		// We stop propagation of the focus event to avoid selecting the current block
 		// While we're trying to insert a new block
+		// We also attach this to onMouseDown, due to a difference in behavior in Firefox and Safari, where buttons don't receive focus: https://gist.github.com/cvrebert/68659d0333a578d75372
 		event.stopPropagation();
 
 		this.setState( {
