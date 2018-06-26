@@ -89,22 +89,28 @@ describe( 'utils', () => {
 
 		test( 'should exit when no script name provided', () => {
 			expect( () => spawnScript() ).toThrow( 'Exit code: 1.' );
+			expect( console ).toHaveLoggedWith( 'Script name is missing.' );
 		} );
 
 		test( 'should exit when an unknown script name provided', () => {
 			expect( () => spawnScript( 'unknown-script' ) ).toThrow( 'Exit code: 1.' );
+			expect( console ).toHaveLoggedWith(
+				'Unknown script "unknown-script". Perhaps you need to update @wordpress/scripts?'
+			);
 		} );
 
 		test( 'should exit when the script failed because of SIGKILL signal', () => {
 			crossSpawnMock.mockReturnValueOnce( { signal: 'SIGKILL' } );
 
 			expect( () => spawnScript( scriptName ) ).toThrow( 'Exit code: 1.' );
+			expect( console ).toHaveLogged();
 		} );
 
 		test( 'should exit when the script failed because of SIGTERM signal', () => {
 			crossSpawnMock.mockReturnValueOnce( { signal: 'SIGTERM' } );
 
 			expect( () => spawnScript( scriptName ) ).toThrow( 'Exit code: 1.' );
+			expect( console ).toHaveLogged();
 		} );
 
 		test( 'should finish successfully when the script properly executed', () => {

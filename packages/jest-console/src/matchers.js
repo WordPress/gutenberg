@@ -2,7 +2,12 @@
  * External dependencies
  */
 import { matcherHint, printExpected, printReceived } from 'jest-matcher-utils';
-import { isEqual, some } from 'lodash';
+import { isEqual, reduce, some } from 'lodash';
+
+/**
+ * Internal dependencies
+ */
+import supportedMatchers from './supported-matchers';
 
 const createToBeCalledMatcher = ( matcherName, methodName ) =>
 	( received ) => {
@@ -58,9 +63,14 @@ const createToBeCalledWithMatcher = ( matcherName, methodName ) =>
 		};
 	};
 
-expect.extend( {
-	toHaveErrored: createToBeCalledMatcher( '.toHaveErrored', 'error' ),
-	toHaveErroredWith: createToBeCalledWithMatcher( '.toHaveErroredWith', 'error' ),
-	toHaveWarned: createToBeCalledMatcher( '.toHaveWarned', 'warn' ),
-	toHaveWarnedWith: createToBeCalledWithMatcher( '.toHaveWarnedWith', 'warn' ),
-} );
+expect.extend(
+	reduce( supportedMatchers, ( result, matcherName, methodName ) => {
+		const matcherNameWith = `${ matcherName }With`;
+
+		return {
+			...result,
+			[ matcherName ]: createToBeCalledMatcher( `.${ matcherName }`, methodName ),
+			[ matcherNameWith ]: createToBeCalledWithMatcher( `.${ matcherNameWith }`, methodName ),
+		};
+	}, {} )
+);

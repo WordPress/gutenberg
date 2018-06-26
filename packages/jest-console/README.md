@@ -3,10 +3,10 @@
 Custom [Jest](http://facebook.github.io/jest/) matchers for the [Console](https://developer.mozilla.org/en-US/docs/Web/API/Console)
 object to test JavaScript code in WordPress.
 
-This package converts `console.error` and `console.warn` functions into mocks and tracks their calls.
+This package converts `console.error`, `console.info`, `console.log` and `console.warn` functions into mocks and tracks their calls.
 It also enforces usage of one of the related matchers whenever tested code calls one of the mentioned `console` methods.
 It means that you need to assert with `.toHaveErrored()` or `.toHaveErroredWith( arg1, arg2, ... )` when `console.error`
-gets executed, and `.toHaveWarned()` or `.toHaveWarnedWith( arg1, arg2, ... )` when `console.warn` is called.
+gets executed, and use the corresponding methods when `console.info`, `console.log` or `console.warn` are called.
 Your test will fail otherwise! This is a conscious design decision which helps to detect deprecation warnings when
 upgrading dependent libraries or smaller errors when refactoring code.
 
@@ -75,6 +75,32 @@ describe( 'drinkAll', () => {
   } );
 } );
 ```
+
+### `.toHaveInformed()`
+
+Use `.toHaveInformed` to ensure that `console.info` function was called.
+
+Almost identical usage as `.toHaveErrored()`.
+
+### `.toHaveInformedWith( arg1, arg2, ... )`
+
+Use `.toHaveInformedWith` to ensure that `console.info` function was called with
+specific arguments.
+
+Almost identical usage as `.toHaveErroredWith()`.
+
+### `.toHaveLogged()`
+
+Use `.toHaveLogged` to ensure that `console.log` function was called.
+
+Almost identical usage as `.toHaveErrored()`.
+
+### `.toHaveLoggedWith( arg1, arg2, ... )`
+
+Use `.toHaveLoggedWith` to ensure that `console.log` function was called with
+specific arguments.
+
+Almost identical usage as `.toHaveErroredWith()`.
 
 ### `.toHaveWarned()`
 

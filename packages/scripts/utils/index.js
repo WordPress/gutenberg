@@ -55,8 +55,10 @@ const spawnScript = ( scriptName, args = [] ) => {
 	}
 
 	if ( ! hasScriptFile( scriptName ) ) {
-		console.log( 'Unknown script "' + scriptName + '".' );
-		console.log( 'Perhaps you need to update @wordpress/scripts?' );
+		console.log(
+			'Unknown script "' + scriptName + '". ' +
+			'Perhaps you need to update @wordpress/scripts?'
+		);
 		exit( 1 );
 	}
 
