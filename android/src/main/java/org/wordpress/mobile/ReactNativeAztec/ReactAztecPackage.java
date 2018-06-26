@@ -15,7 +15,7 @@ public class ReactAztecPackage implements ReactPackage {
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
         List<ViewManager> views = new ArrayList<>();
-        views.add(new ReactAztecManager(reactContext));
+        views.add(new ReactAztecManager());
         return views;
     }
 

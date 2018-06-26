@@ -1,6 +1,5 @@
 package org.wordpress.mobile.ReactNativeAztec;
 
-import android.content.Context;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -41,8 +40,8 @@ public class ReactAztecText extends AztecText {
     // check when it's used in EditText in RN. (maybe tests?)
     private int mNativeEventCount = 0;
 
-    public ReactAztecText(ThemedReactContext reactContext, Context context) {
-        super(context);
+    public ReactAztecText(ThemedReactContext reactContext) {
+        super(reactContext);
         this.setFocusableInTouchMode(true);
         this.setFocusable(true);
 
@@ -52,8 +51,8 @@ public class ReactAztecText extends AztecText {
         addPlugin(new VideoShortcodePlugin());
         addPlugin(new AudioShortcodePlugin());
         addPlugin(new CssUnderlinePlugin());
-        this.setImageGetter(new GlideImageLoader(context));
-        this.setVideoThumbnailGetter(new GlideVideoThumbnailLoader(context));
+        this.setImageGetter(new GlideImageLoader(reactContext));
+        this.setVideoThumbnailGetter(new GlideVideoThumbnailLoader(reactContext));
     }
 
     @Override
