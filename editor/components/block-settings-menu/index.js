@@ -17,7 +17,6 @@ import { withDispatch } from '@wordpress/data';
  */
 import './style.scss';
 import BlockModeToggle from './block-mode-toggle';
-import BlockRemoveButton from './block-remove-button';
 import BlockDuplicateButton from './block-duplicate-button';
 import SharedBlockSettings from './shared-block-settings';
 import UnknownConverter from './unknown-converter';
@@ -101,11 +100,6 @@ export class BlockSettingsMenu extends Component {
 							{ count === 1 && <SharedBlockSettings uid={ firstBlockUID } onToggle={ onClose } itemsRole="menuitem" /> }
 						</NavigableMenu>
 					) }
-				/>
-				<BlockRemoveButton
-					uids={ uids }
-					onFocus={ this.onFocus }
-					onBlur={ this.onBlur }
 				/>
 			</div>
 		);
