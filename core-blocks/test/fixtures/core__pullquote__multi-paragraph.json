@@ -11,19 +11,7 @@
                         "key": null,
                         "ref": null,
                         "props": {
-                            "children": [
-                                "Paragraph ",
-                                {
-                                    "type": "strong",
-                                    "key": "_domReact71",
-                                    "ref": null,
-                                    "props": {
-                                        "children": "one"
-                                    },
-                                    "_owner": null,
-                                    "_store": {}
-                                }
-                            ]
+                            "children": "Paragraph one"
                         },
                         "_owner": null,
                         "_store": {}
@@ -48,6 +36,6 @@
             "align": "none"
         },
         "innerBlocks": [],
-        "originalContent": "<blockquote class=\"wp-block-pullquote alignnone\">\n    <p>Paragraph <strong>one</strong></p>\n    <p>Paragraph two</p>\n    <cite>by whomever</cite>\n</blockquote>"
+        "originalContent": "<blockquote class=\"wp-block-pullquote alignnone\">\n    <p>Paragraph one</p>\n    <p>Paragraph two</p>\n    <cite>by whomever</cite>\n</blockquote>"
     }
 ]
