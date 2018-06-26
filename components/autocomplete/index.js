@@ -243,6 +243,16 @@ export class Autocomplete extends Component {
 			range.setStartAfter( child );
 		}
 		range.deleteContents();
+
+		let inputEvent;
+		if ( undefined !== window.InputEvent ) {
+			inputEvent = new window.InputEvent( 'input', { bubbles: true, cancelable: false } );
+		} else {
+			// IE11 doesn't provide an InputEvent constructor.
+			inputEvent = document.createEvent( 'UIEvent' );
+			inputEvent.initEvent( 'input', true /* bubbles */, false /* cancelable */ );
+		}
+		range.commonAncestorContainer.closest( '[contenteditable=true]' ).dispatchEvent( inputEvent );
 	}
 
 	select( option ) {
