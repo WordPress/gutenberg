@@ -140,6 +140,10 @@ public class ReactAztecText extends AztecText {
         return mTextWatcherDelegator;
     }
 
+    public void setIsSettingTextFromJS(boolean mIsSettingTextFromJS) {
+        this.mIsSettingTextFromJS = mIsSettingTextFromJS;
+    }
+
     /**
      * This class will redirect *TextChanged calls to the listeners only in the case where the text
      * is changed by the user, and not explicitly set by JS.
