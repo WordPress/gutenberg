@@ -12,11 +12,12 @@
 		border: none;
 		text-align: center;
 
-		&::before {
+		&:before {
 			content: '* *';
 			color: $dark-gray-500;
-			font-size: 35px;
+			font-size: 36px;
 			font-family: serif;
+			line-height: 1;
 		}
 	}
 }
