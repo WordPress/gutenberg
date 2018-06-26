@@ -1,0 +1,42 @@
+{
+	"name": "@wordpress/jest-preset-default",
+	"version": "1.0.6",
+	"description": "Default Jest preset for WordPress development",
+	"author": "WordPress",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"jest",
+		"jest-preset",
+		"preset",
+		"react",
+		"enzyme"
+	],
+	"homepage": "https://github.com/WordPress/packages/tree/master/packages/jest-preset-default/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/packages.git"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/packages/issues"
+	},
+	"files": [
+		"scripts",
+		"jest-preset.json"
+	],
+	"main": "index.js",
+	"dependencies": {
+		"@wordpress/jest-console": "^1.0.7",
+		"babel-jest": "^22.1.0",
+		"enzyme": "^3.3.0",
+		"enzyme-adapter-react-16": "^1.1.1",
+		"jest-enzyme": "^4.0.2",
+		"pegjs": "^0.10.0"
+	},
+	"peerDependencies": {
+		"jest": ">=22"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

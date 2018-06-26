@@ -1,0 +1,97 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`jest-console console.error toHaveErrored works when not called 1`] = `
+"[2mexpect([22m[31mjest.fn()[39m[2m).toHaveErrored([22m[32mexpected[39m[2m)[22m
+
+Expected mock function to be called."
+`;
+
+exports[`jest-console console.error toHaveErroredWith works when not called 1`] = `
+"[2mexpect([22m[31mjest.fn()[39m[2m).toHaveErroredWith([22m[32mexpected[39m[2m)[22m
+
+Expected mock function to be called with:
+[32m[\\"This is error!\\"][39m
+but it was called with:
+"
+`;
+
+exports[`jest-console console.error toHaveErroredWith works with many arguments that do not match 1`] = `
+"[2mexpect([22m[31mjest.fn()[39m[2m).toHaveErroredWith([22m[32mexpected[39m[2m)[22m
+
+Expected mock function to be called with:
+[32m[\\"This is error!\\"][39m
+but it was called with:
+[31m[\\"Unknown message.\\"][39m,[31m[\\"This is error!\\", \\"Unknown param.\\"][39m"
+`;
+
+exports[`jest-console console.info toHaveInformed works when not called 1`] = `
+"[2mexpect([22m[31mjest.fn()[39m[2m).toHaveInformed([22m[32mexpected[39m[2m)[22m
+
+Expected mock function to be called."
+`;
+
+exports[`jest-console console.info toHaveInformedWith works when not called 1`] = `
+"[2mexpect([22m[31mjest.fn()[39m[2m).toHaveInformedWith([22m[32mexpected[39m[2m)[22m
+
+Expected mock function to be called with:
+[32m[\\"This is info!\\"][39m
+but it was called with:
+"
+`;
+
+exports[`jest-console console.info toHaveInformedWith works with many arguments that do not match 1`] = `
+"[2mexpect([22m[31mjest.fn()[39m[2m).toHaveInformedWith([22m[32mexpected[39m[2m)[22m
+
+Expected mock function to be called with:
+[32m[\\"This is info!\\"][39m
+but it was called with:
+[31m[\\"Unknown message.\\"][39m,[31m[\\"This is info!\\", \\"Unknown param.\\"][39m"
+`;
+
+exports[`jest-console console.log toHaveLogged works when not called 1`] = `
+"[2mexpect([22m[31mjest.fn()[39m[2m).toHaveLogged([22m[32mexpected[39m[2m)[22m
+
+Expected mock function to be called."
+`;
+
+exports[`jest-console console.log toHaveLoggedWith works when not called 1`] = `
+"[2mexpect([22m[31mjest.fn()[39m[2m).toHaveLoggedWith([22m[32mexpected[39m[2m)[22m
+
+Expected mock function to be called with:
+[32m[\\"This is log!\\"][39m
+but it was called with:
+"
+`;
+
+exports[`jest-console console.log toHaveLoggedWith works with many arguments that do not match 1`] = `
+"[2mexpect([22m[31mjest.fn()[39m[2m).toHaveLoggedWith([22m[32mexpected[39m[2m)[22m
+
+Expected mock function to be called with:
+[32m[\\"This is log!\\"][39m
+but it was called with:
+[31m[\\"Unknown message.\\"][39m,[31m[\\"This is log!\\", \\"Unknown param.\\"][39m"
+`;
+
+exports[`jest-console console.warn toHaveWarned works when not called 1`] = `
+"[2mexpect([22m[31mjest.fn()[39m[2m).toHaveWarned([22m[32mexpected[39m[2m)[22m
+
+Expected mock function to be called."
+`;
+
+exports[`jest-console console.warn toHaveWarnedWith works when not called 1`] = `
+"[2mexpect([22m[31mjest.fn()[39m[2m).toHaveWarnedWith([22m[32mexpected[39m[2m)[22m
+
+Expected mock function to be called with:
+[32m[\\"This is warn!\\"][39m
+but it was called with:
+"
+`;
+
+exports[`jest-console console.warn toHaveWarnedWith works with many arguments that do not match 1`] = `
+"[2mexpect([22m[31mjest.fn()[39m[2m).toHaveWarnedWith([22m[32mexpected[39m[2m)[22m
+
+Expected mock function to be called with:
+[32m[\\"This is warn!\\"][39m
+but it was called with:
+[31m[\\"Unknown message.\\"][39m,[31m[\\"This is warn!\\", \\"Unknown param.\\"][39m"
+`;

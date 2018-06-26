@@ -1,0 +1,23 @@
+{
+	"name": "@wordpress/dom-ready",
+	"version": "1.0.4",
+	"description": "Execute callback after the DOM is loaded.",
+	"author": "WordPress",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"dom-ready"
+	],
+	"homepage": "https://github.com/WordPress/packages/tree/master/packages/dom-ready/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/packages.git"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/packages/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"publishConfig": {
+		"access": "public"
+	}
+}

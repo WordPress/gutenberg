@@ -1,0 +1,35 @@
+{
+	"name": "@wordpress/babel-preset-default",
+	"version": "1.3.0",
+	"description": "Default Babel preset for WordPress development",
+	"author": "WordPress",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"babel",
+		"preset",
+		"default"
+	],
+	"homepage": "https://github.com/WordPress/packages/tree/master/packages/babel-preset-default/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/packages.git"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/packages/issues"
+	},
+	"engines": {
+		"node": ">=8"
+	},
+	"dependencies": {
+		"@wordpress/browserslist-config": "^2.1.4",
+		"babel-plugin-transform-async-generator-functions": "^6.24.1",
+		"babel-plugin-transform-object-rest-spread": "^6.23.0",
+		"babel-plugin-transform-react-jsx": "^6.24.1",
+		"babel-plugin-transform-runtime": "^6.23.0",
+		"babel-preset-env": "^1.6.1"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}
