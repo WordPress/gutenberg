@@ -87,7 +87,9 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
 
     @ReactProp(name = "text")
     public void setText(ReactAztecText view, String text) {
+        view.setIsSettingTextFromJS(true);
         view.fromHtml(text);
+        view.setIsSettingTextFromJS(false);
     }
 
     @ReactProp(name = "color")
