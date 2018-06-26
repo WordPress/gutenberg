@@ -445,17 +445,6 @@ export function getDocumentTitle( state ) {
 }
 
 /**
- * Returns a URL to preview the post being edited.
- *
- * @param {Object} state Global application state.
- *
- * @return {string} Preview URL.
- */
-export function getEditedPostPreviewLink( state ) {
-	return getCurrentPost( state ).preview_link || null;
-}
-
-/**
  * Returns a new reference when the inner blocks of a given block UID change.
  * This is used exclusively as a memoized selector dependant, relying on this
  * selector's shared return value and recursively those of its inner blocks
