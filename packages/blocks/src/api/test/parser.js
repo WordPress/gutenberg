@@ -137,7 +137,7 @@ describe( 'block parser', () => {
 	} );
 
 	describe( 'parseWithAttributeSchema', () => {
-		it( 'should return the matcher\'s attribute value', () => {
+		it( "should return the matcher's attribute value", () => {
 			const value = parseWithAttributeSchema(
 				'<div>chicken</div>',
 				{
@@ -216,7 +216,7 @@ describe( 'block parser', () => {
 			expect( value ).toBe( 10 );
 		} );
 
-		it( 'should return the matcher\'s attribute value', () => {
+		it( "should return the matcher's attribute value", () => {
 			const value = getBlockAttribute(
 				'content',
 				{
@@ -571,7 +571,7 @@ describe( 'block parser', () => {
 			} );
 
 			const parsed = parse(
-				'<!-- wp:core/test-block {"smoked":"yes","url":"http://google.com","chicken":"ribs & \'wings\'"} -->' +
+				`<!-- wp:core/test-block {"smoked":"yes","url":"http://google.com","chicken":"ribs & 'wings'"} -->` +
 				'Brisket' +
 				'<!-- /wp:core/test-block -->'
 			);
@@ -582,7 +582,7 @@ describe( 'block parser', () => {
 				content: 'Brisket',
 				smoked: 'yes',
 				url: 'http://google.com',
-				chicken: 'ribs & \'wings\'',
+				chicken: "ribs & 'wings'",
 			} );
 			expect( typeof parsed[ 0 ].clientId ).toBe( 'string' );
 		} );

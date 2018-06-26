@@ -46,7 +46,7 @@ describe( 'DOM', () => {
 			expect( isHorizontalEdge( input, false ) ).toBe( false );
 		} );
 
-		it( 'Should return false if we\'re not at the edge', () => {
+		it( "Should return false if we're not at the edge", () => {
 			const input = document.createElement( 'input' );
 			parent.appendChild( input );
 			input.value = 'value';

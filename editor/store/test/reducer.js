@@ -1968,7 +1968,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should update the shared block\'s id if it was temporary', () => {
+		it( "should update the shared block's id if it was temporary", () => {
 			const initialState = {
 				data: {
 					shared1: { clientId: '', title: '' },

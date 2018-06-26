@@ -82,7 +82,7 @@ describe( 'block', () => {
 		expect( labelComponents.at( 1 ).text() ).toBe( 'expected-text' );
 	} );
 
-	it( 'should derive isOptionDisabled from the item\'s isDisabled', () => {
+	it( "should derive isOptionDisabled from the item's isDisabled", () => {
 		const disabledInserterItem = {
 			name: 'core/foo',
 			title: 'foo',

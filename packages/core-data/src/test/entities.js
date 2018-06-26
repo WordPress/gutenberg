@@ -59,7 +59,7 @@ describe( 'getKindEntities', () => {
 		} );
 	} );
 
-	it( 'shouldn\'t do anything if the entities have already been resolved', async () => {
+	it( "shouldn't do anything if the entities have already been resolved", async () => {
 		const state = {
 			entities: { config: [ { kind: 'postType' } ] },
 		};
@@ -68,7 +68,7 @@ describe( 'getKindEntities', () => {
 		expect( done ).toBe( true );
 	} );
 
-	it( 'shouldn\'t do anything if there no defined kind config', async () => {
+	it( "shouldn't do anything if there no defined kind config", async () => {
 		const state = { entities: { config: [] } };
 		const fulfillment = getKindEntities( state, 'unknownKind' );
 		const done = ( await fulfillment.next() ).done;

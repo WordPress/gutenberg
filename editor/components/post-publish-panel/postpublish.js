@@ -56,7 +56,7 @@ class PostPublishPanelPostpublish extends Component {
 			__( 'is now live.' );
 		const postPublishBodyText = isScheduled ?
 			__( 'The post address will be:' ) :
-			__( 'What\'s next?' );
+			__( "What's next?" );
 
 		return (
 			<div className="post-publish-panel__postpublish">

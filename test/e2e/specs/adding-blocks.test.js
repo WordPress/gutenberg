@@ -90,7 +90,7 @@ describe( 'adding blocks', () => {
 
 		// Switch to Text Mode to check HTML Output
 		await page.click( '.edit-post-more-menu [aria-label="More"]' );
-		const codeEditorButton = ( await page.$x( '//button[contains(text(), \'Code Editor\')]' ) )[ 0 ];
+		const codeEditorButton = ( await page.$x( "//button[contains(text(), 'Code Editor')]" ) )[ 0 ];
 		await codeEditorButton.click( 'button' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

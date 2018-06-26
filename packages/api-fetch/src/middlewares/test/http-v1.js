@@ -15,7 +15,7 @@ describe( 'HTTP v1 Middleware', () => {
 		httpV1Middleware( { method: 'PUT', data: {} }, callback );
 	} );
 
-	it( 'shouldn\'t touch the options for GET requests', () => {
+	it( "shouldn't touch the options for GET requests", () => {
 		expect.hasAssertions();
 
 		const requestOptions = { method: 'GET', path: '/wp/v2/posts' };
