@@ -13,11 +13,10 @@
 	padding: 0;
 	text-align: initial;
 	border-radius: $button-style__radius-roundrect;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
 
 	> * {
 		transform: scale( 0.7 );
