@@ -30,7 +30,7 @@ $z-layers: (
 	// Side UI active buttons
 	'.editor-block-settings-remove': 1,
 	'.editor-block-mover__control': 1,
-	
+
 	// Should have lower index than anything else positioned inside the block containers
 	'.editor-block-list__block-draggable': 0,
 
@@ -77,6 +77,7 @@ $z-layers: (
 	'.components-autocomplete__results': 1000000,
 
 	'.skip-to-selected-block': 100000,
+	'.edit-post-toggle-publish-panel': 100000,
 
 	// Show NUX tips above popovers, wp-admin menus, submenus, and sidebar:
 	'.nux-dot-tip': 1000001,
