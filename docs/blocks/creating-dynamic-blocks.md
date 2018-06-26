@@ -83,7 +83,7 @@ registerBlockType( 'my-plugin/latest-post', {
 ```
 {% end %}
 
-Because it is a dynamic block it also needs a server component. The rendering can be added using the `render_callback` property when using the `register_block_type` function.
+Because it is a dynamic block it also needs a server component. The rendering can be added using the `render_callback` property when using the `register_block_type` function. Please note, that the `render_callback` function should be called by the `init` action.
 
 ```php
 <?php
@@ -91,8 +91,10 @@ Because it is a dynamic block it also needs a server component. The rendering ca
 
 function my_plugin_render_block_latest_post( $attributes ) {
 	$recent_posts = wp_get_recent_posts( array(
-		'numberposts' => 1,
+		'numberposts' => $attributes['postsToShow'],
 		'post_status' => 'publish',
+		'order'       => $attributes['order'],
+		'orderby'     => $attributes['orderBy'],
 	) );
 	if ( count( $recent_posts ) === 0 ) {
 		return 'No posts';
@@ -108,6 +110,17 @@ function my_plugin_render_block_latest_post( $attributes ) {
 
 register_block_type( 'my-plugin/latest-post', array(
 	'render_callback' => 'my_plugin_render_block_latest_post',
+	'attributes' => array(
+		'postsToShow' => array(
+			'type'	=> 'number',
+		),
+		'order' => array(
+			'type'	=> 'string',
+		),
+		'orderBy' => array(
+			'type'	=> 'string',
+		),
+	),
 ) );
 ```
 
