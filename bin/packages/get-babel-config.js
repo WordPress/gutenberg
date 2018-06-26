@@ -10,21 +10,22 @@ const babelPresetEnv = require( 'babel-preset-env' );
  */
 const babelDefaultConfig = require( '@wordpress/babel-preset-default' );
 
-const plugins = [
-	...map( babelDefaultConfig.plugins, ( plugin ) => {
-		if ( isArray( plugin ) && plugin[ 0 ] === babelPluginTransformReactJSX ) {
-			// TODO: It should become the default value when all modules are moved to packages.
-			return [ babelPluginTransformReactJSX, { pragma: 'createElement' } ];
-		}
+const plugins = map( babelDefaultConfig.plugins, ( plugin ) => {
+	if ( isArray( plugin ) && plugin[ 0 ] === babelPluginTransformReactJSX ) {
+		// TODO: It should become the default value when all modules are moved to packages.
+		return [ babelPluginTransformReactJSX, { pragma: 'createElement' } ];
+	}
 
-		return plugin;
-	} ),
-	[ require( '../../packages/babel-plugin-import-jsx-pragma' ).default, {
+	return plugin;
+} );
+
+if ( process.env.TRANSFORM_JSX_PRAGMA ) {
+	plugins.push( [ require( '../../packages/babel-plugin-import-jsx-pragma' ).default, {
 		scopeVariable: 'createElement',
 		source: '@wordpress/element',
 		isDefault: false,
-	} ],
-];
+	} ] );
+}
 
 const babelConfigs = {
 	main: Object.assign(
