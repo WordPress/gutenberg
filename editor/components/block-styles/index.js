@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { find, compact, get } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -101,7 +102,11 @@ function BlockStyles( {
 				return (
 					<div
 						key={ style.name }
-						className="editor-block-styles__item"
+						className={ classnames(
+							'editor-block-styles__item', {
+								'is-active': activeStyle === style,
+							}
+						) }
 						onClick={ () => updateClassName( style ) }
 						onMouseEnter={ () => onHoverClassName( styleClassName ) }
 						onMouseLeave={ () => onHoverClassName( null ) }
