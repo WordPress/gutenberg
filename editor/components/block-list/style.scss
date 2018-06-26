@@ -937,22 +937,24 @@
 
 .editor-block-list__block {
 	@include break-small {
-        // Increases the hover and selection area around blocks.
-        // This makes the blue hover line, and the settings button appear even if the mouse,
-        // is still some pixels outside the block.
-        // It is also possible to click some pixels outside the block and select it.
+		// Increase the hover and selection area around blocks.
+		// This makes the blue hover line and the settings button appear even if
+		// the mouse cursor is technically outside the block.
+		// This improves usability by making it possible to click somewhat outside
+		// the block and select it. (eg. A fuzzy click target.)
 		&:before {
+			bottom: 0;
 			content: '';
+			left: -$parent-block-padding - $block-padding;
 			position: absolute;
 			right: -$parent-block-padding - $block-padding;
-			left: -$parent-block-padding - $block-padding;
-
-			bottom: 0;
 			top: 0;
 		}
 
-		// Removes the effect of the previous rule on nested blocks,
-		// so it only applies to top-level blocks.
+		// Remove the fuzzy click area effect set above on nested blocks.
+		// It should only applies to top-level blocks; applying this rule to
+		// nested blocks will result in difficult-to-use and possibly overlapping
+		// click targets.
 		& &:before {
 			left: 0;
 			right: 0;
