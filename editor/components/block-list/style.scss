@@ -136,6 +136,9 @@
 	padding-left: $block-padding;
 	padding-right: $block-padding;
 
+	// Break long strings of text without spaces so they don't overflow the block.
+	overflow-wrap: break-word;
+
 	@include break-small() {
 		// The block mover needs to stay inside the block to allow clicks when hovering the block
 		padding-left: $block-padding + $block-side-ui-padding - $border-width;
