@@ -55,7 +55,7 @@ function withGlobalEvents( eventTypesToHandlers ) {
 
 			handleRef( el ) {
 				this.wrappedRef = el;
-				if ( this.props.forwardRef ) {
+				if ( this.props.forwardedRef ) {
 					this.props.forwardedRef( el );
 				}
 			}
