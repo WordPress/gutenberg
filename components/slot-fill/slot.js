@@ -45,7 +45,7 @@ class Slot extends Component {
 	}
 
 	render() {
-		const { children, name, bubblesVirtually = false, fillProps = {} } = this.props;
+		const { children, name, bubblesVirtually = false, fillProps = {}, ...props } = this.props;
 		const { getFills = noop } = this.context;
 
 		if ( bubblesVirtually ) {
@@ -71,7 +71,7 @@ class Slot extends Component {
 		} );
 
 		return (
-			<div ref={ this.bindNode }>
+			<div ref={ this.bindNode } { ...props }>
 				{ isFunction( children ) ? children( fills.filter( Boolean ) ) : fills }
 			</div>
 		);

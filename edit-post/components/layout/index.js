@@ -8,7 +8,7 @@ import { some } from 'lodash';
  * WordPress dependencies
  */
 import { Popover, ScrollLock, navigateRegions } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	AutosaveMonitor,
 	UnsavedChangesWarning,
@@ -50,6 +50,7 @@ function Layout( {
 	hasActiveMetaboxes,
 	isSaving,
 	isMobileViewport,
+	currentSidebar,
 } ) {
 	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 
@@ -69,8 +70,15 @@ function Layout( {
 				} );
 			} } />
 			<AutosaveMonitor />
-			<Header />
-			<div className="edit-post-layout__content" role="region" aria-label={ __( 'Editor content' ) } tabIndex="-1">
+			<Header
+				role="region"
+				aria-label={ __( 'Editor toolbar' ) }
+			/>
+			<div className="edit-post-layout__content"
+				role="region"
+				aria-label={ __( 'Editor content' ) }
+				tabIndex="-1"
+			>
 				<EditorNotices />
 				<PreserveScrollInReorder />
 				<EditorModeKeyboardShortcuts />
@@ -83,23 +91,31 @@ function Layout( {
 					<MetaBoxes location="advanced" />
 				</div>
 			</div>
-			{ publishSidebarOpened && (
-				<PostPublishPanel
-					onClose={ closePublishSidebar }
-					forceIsDirty={ hasActiveMetaboxes }
-					forceIsSaving={ isSaving }
-					PrePublishExtension={ PluginPrePublishPanel.Slot }
-					PostPublishExtension={ PluginPostPublishPanel.Slot }
-				/>
-			) }
-			<DocumentSidebar />
-			<BlockSidebar />
-			<Sidebar.Slot />
-			{
-				isMobileViewport && sidebarIsOpened && <ScrollLock />
-			}
-			<Popover.Slot />
-			<PluginArea />
+			<div className="edit-post-layout__sidebar-area"
+				role="region"
+				aria-label={ __( 'Editor Sidebar' ) }
+			>
+				{ publishSidebarOpened && (
+					<PostPublishPanel
+						onClose={ closePublishSidebar }
+						forceIsDirty={ hasActiveMetaboxes }
+						forceIsSaving={ isSaving }
+						PrePublishExtension={ PluginPrePublishPanel.Slot }
+						PostPublishExtension={ PluginPostPublishPanel.Slot }
+					/>
+				) }
+				<DocumentSidebar />
+				<BlockSidebar />
+				<Sidebar.Slot />
+				{
+					isMobileViewport && sidebarIsOpened && <ScrollLock />
+				}
+				<PluginArea />
+			</div>
+			<Popover.Slot
+				role="region"
+				aria-label={ __( 'Editor Popovers' ) }
+			/>
 		</div>
 	);
 }
@@ -114,6 +130,7 @@ export default compose(
 		metaBoxes: select( 'core/edit-post' ).getMetaBoxes(),
 		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+		currentSidebar: select( 'core/edit-post' ).getActiveGeneralSidebarName(),
 	} ) ),
 	withDispatch( ( dispatch ) => ( {
 		closePublishSidebar: dispatch( 'core/edit-post' ).closePublishSidebar,

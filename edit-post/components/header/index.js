@@ -28,15 +28,15 @@ function Header( {
 	togglePublishSidebar,
 	hasActiveMetaboxes,
 	isSaving,
+	props,
 } ) {
 	const toggleGeneralSidebar = isEditorSidebarOpened ? closeGeneralSidebar : openGeneralSidebar;
 
 	return (
 		<div
-			role="region"
-			aria-label={ __( 'Editor toolbar' ) }
 			className="edit-post-header"
 			tabIndex="-1"
+			{ ...props }
 		>
 			<HeaderToolbar />
 			{ ! isPublishSidebarOpened && (
