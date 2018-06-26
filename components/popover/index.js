@@ -96,7 +96,13 @@ class Popover extends Component {
 	}
 
 	focus() {
-		const { focusFirstElement, focusOnMount } = this.props;
+		const { focusOnMount } = this.props;
+
+		// Boolean values for focusOnMount deprecated in 3.2.
+		if ( focusOnMount === true ) {
+			window.console.warn( '<Popover> component: focusOnMount should be false or a string as of Gutenberg 3.2. See: https://github.com/WordPress/gutenberg/tree/master/components/popover/README.md' );
+		}
+
 		if ( ! focusOnMount || ! this.contentNode.current ) {
 			return;
 		}
@@ -105,7 +111,7 @@ class Popover extends Component {
 		// Related https://stackoverflow.com/questions/35522220/react-ref-with-focus-doesnt-work-without-settimeout-my-example
 		const focusNode = ( domNode ) => setTimeout( () => domNode.focus() );
 
-		if ( focusFirstElement ) {
+		if ( focusOnMount === 'firstElement' || focusOnMount === true ) {
 			// Find first tabbable node within content and shift focus, falling
 			// back to the popover panel itself.
 			const firstTabbable = focus.tabbable.find( this.contentNode.current )[ 0 ];
@@ -114,9 +120,15 @@ class Popover extends Component {
 			return;
 		}
 
-		// Focus the popover panel itself so items in the popover are easily
-		// accessed via keyboard navigation.
-		focusNode( this.contentNode.current );
+		if ( focusOnMount === 'container' ) {
+			// Focus the popover panel itself so items in the popover are easily
+			// accessed via keyboard navigation.
+			focusNode( this.contentNode.current );
+
+			return;
+		}
+
+		window.console.warn( `<Popover> component: focusOnMount argument "${ focusOnMount }" not recognized.` );
 	}
 
 	getAnchorRect() {
@@ -205,7 +217,6 @@ class Popover extends Component {
 			/* eslint-disable no-unused-vars */
 			position,
 			range,
-			focusFirstElement,
 			focusOnMount,
 			getAnchorRect,
 			expandOnMobile,
@@ -276,7 +287,7 @@ class Popover extends Component {
 
 		// Apply focus return behavior except when default focus on open
 		// behavior is disabled.
-		if ( false !== focusOnMount ) {
+		if ( ! focusOnMount ) {
 			content = <FocusManaged>{ content }</FocusManaged>;
 		}
 
@@ -295,8 +306,7 @@ class Popover extends Component {
 }
 
 Popover.defaultProps = {
-	focusFirstElement: true,
-	focusOnMount: true,
+	focusOnMount: 'firstElement',
 	noArrow: false,
 };
 
