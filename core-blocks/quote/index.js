@@ -59,11 +59,12 @@ export const settings = {
 
 	attributes: blockAttributes,
 
+	styles: [
+		{ name: 'default', label: '1', isDefault: true },
+		{ name: 'large', label: '2' },
+	],
+
 	transforms: {
-		styles: [
-			{ name: 'default', label: '1', isDefault: true },
-			{ name: 'large', label: '2' },
-		],
 		from: [
 			{
 				type: 'block',

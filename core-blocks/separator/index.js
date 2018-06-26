@@ -23,12 +23,13 @@ export const settings = {
 
 	keywords: [ __( 'horizontal-line' ), 'hr', __( 'divider' ) ],
 
+	styles: [
+		{ name: 'default', label: __( 'Short Line' ), isDefault: true },
+		{ name: 'wide', label: __( 'Wide Line' ) },
+		{ name: 'asterisks', label: __( 'Asterisks' ) },
+	],
+
 	transforms: {
-		styles: [
-			{ name: 'default', label: __( 'Short Line' ), isDefault: true },
-			{ name: 'wide', label: __( 'Wide Line' ) },
-			{ name: 'asterisks', label: __( 'Asterisks' ) },
-		],
 		from: [
 			{
 				type: 'pattern',

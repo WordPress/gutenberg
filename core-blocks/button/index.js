@@ -87,12 +87,10 @@ export const settings = {
 		return props;
 	},
 
-	transforms: {
-		styles: [
-			{ name: 'default', label: __( 'Rounded' ), isDefault: true },
-			{ name: 'squared', label: __( 'Squared' ) },
-		],
-	},
+	styles: [
+		{ name: 'default', label: __( 'Rounded' ), isDefault: true },
+		{ name: 'squared', label: __( 'Squared' ) },
+	],
 
 	edit,
 

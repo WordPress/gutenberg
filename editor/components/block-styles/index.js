@@ -137,7 +137,7 @@ export default compose( [
 			name: block.name,
 			attributes: block.attributes,
 			className: block.attributes.className || '',
-			styles: get( getBlockType( block.name ), [ 'transforms', 'styles' ] ),
+			styles: get( getBlockType( block.name ), [ 'styles' ] ),
 		};
 	} ),
 	withDispatch( ( dispatch, { uid } ) => {

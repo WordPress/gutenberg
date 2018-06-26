@@ -46,7 +46,7 @@ export class BlockSwitcher extends Component {
 		const allowedBlocks = getPossibleBlockTransformations( blocks );
 		const sourceBlockName = blocks[ 0 ].name;
 		const blockType = getBlockType( sourceBlockName );
-		const hasStyles = blocks.length === 1 && get( blockType, [ 'transforms', 'styles' ], [] ).length !== 0;
+		const hasStyles = blocks.length === 1 && get( blockType, [ 'styles' ], [] ).length !== 0;
 
 		if ( ! hasStyles && ( ! allowedBlocks.length || isLocked ) ) {
 			return null;
