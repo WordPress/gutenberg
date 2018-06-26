@@ -221,6 +221,7 @@ export class Autocomplete extends Component {
 		this.reset = this.reset.bind( this );
 		this.resetWhenSuppressed = this.resetWhenSuppressed.bind( this );
 		this.search = this.search.bind( this );
+		this.captureNativeKeyDown = this.captureNativeKeyDown.bind( this );
 		this.handleKeyDown = this.handleKeyDown.bind( this );
 		this.getWordRect = this.getWordRect.bind( this );
 		this.debouncedLoadOptions = debounce( this.loadOptions, 250 );
@@ -233,6 +234,17 @@ export class Autocomplete extends Component {
 	}
 
 	insertCompletion( range, replacement, completerName ) {
+		const selection = window.getSelection();
+		/*
+		 * If we are replacing a range containing the cursor,
+		 * we need to set the cursor position afterward.
+		 */
+		const shouldSetCursor =
+			selection.focusNode === range.startContainer &&
+			selection.focusOffset >= range.startOffset &&
+			selection.focusNode === range.endContainer &&
+			selection.focusOffset <= range.endOffset;
+
 		// Wrap completions so we can treat them as tokens with editing boundaries.
 		const tokenWrapper = document.createElement( 'span' );
 		tokenWrapper.innerHTML = renderToString( replacement );
@@ -258,22 +270,24 @@ export class Autocomplete extends Component {
 		range.setStartAfter( tokenWrapper );
 		range.deleteContents();
 
-		const selection = window.getSelection();
-		selection.removeAllRanges();
+		if ( shouldSetCursor ) {
+			selection.removeAllRanges();
 
-		const newCursorPosition = document.createRange();
-		/**
-		 * Add a zero-width non-breaking space (ZWNBSP) so we can place cursor
-		 * after. TinyMCE handles ZWNBSP's nicely around token boundaries,
-		 * adding and removing them as necessary as the keyboard is used to
-		 * move the cursor in and out of boundaries.
-		 */
-		tokenWrapper.parentNode.insertBefore(
-			document.createTextNode( '\uFEFF' ),
-			tokenWrapper.nextSibling
-		);
-		newCursorPosition.setStartAfter( tokenWrapper.nextSibling );
-		selection.addRange( newCursorPosition );
+			const newCursorPosition = document.createRange();
+
+			/**
+			 * Add a zero-width non-breaking space (ZWNBSP) so we can place cursor
+			 * after. TinyMCE handles ZWNBSP's nicely around token boundaries,
+			 * adding and removing them as necessary as the keyboard is used to
+			 * move the cursor in and out of boundaries.
+			 */
+			tokenWrapper.parentNode.insertBefore(
+				document.createTextNode( '\uFEFF' ),
+				tokenWrapper.nextSibling
+			);
+			newCursorPosition.setStartAfter( tokenWrapper.nextSibling );
+			selection.addRange( newCursorPosition );
+		}
 	}
 
 	/**
@@ -569,7 +583,7 @@ export class Autocomplete extends Component {
 		}
 	}
 
-	handleKeyDown( event ) {
+	captureNativeKeyDown( event ) {
 		const { open, suppress, selectedIndex, filteredOptions } = this.state;
 		if ( ! open ) {
 			return;
@@ -633,6 +647,24 @@ export class Autocomplete extends Component {
 		event.stopPropagation();
 	}
 
+	handleKeyDown( event ) {
+		const { ctrlKey, shiftKey, altKey, metaKey } = event;
+		const { open, suppress, query } = this.state;
+		if (
+			event.keyCode === SPACE &&
+			! ( ctrlKey || shiftKey || altKey || metaKey ) &&
+			open && suppress !== open.idx
+		) {
+			// Insert a completion when the user spaces after typing an exact option match.
+			const exactMatchSearch = new RegExp( '^' + escapeRegExp( query ) + '$', 'i' );
+			const wasOptions = this.state[ 'options_' + open.idx ];
+			const [ firstMatchingOption ] = filterOptions( exactMatchSearch, wasOptions );
+			if ( firstMatchingOption ) {
+				this.select( firstMatchingOption );
+			}
+		}
+	}
+
 	getWordRect() {
 		const { range } = this.state;
 		if ( ! range ) {
@@ -649,7 +681,7 @@ export class Autocomplete extends Component {
 		// and avoid RichText getting the event from TinyMCE, hence we must
 		// register a native event handler.
 		const handler = isListening ? 'addEventListener' : 'removeEventListener';
-		this.node[ handler ]( 'keydown', this.handleKeyDown, true );
+		this.node[ handler ]( 'keydown', this.captureNativeKeyDown, true );
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
@@ -679,6 +711,7 @@ export class Autocomplete extends Component {
 			<div
 				ref={ this.bindNode }
 				onInput={ this.search }
+				onKeyDown={ this.handleKeyDown }
 				onClick={ this.resetWhenSuppressed }
 				className="components-autocomplete"
 			>
