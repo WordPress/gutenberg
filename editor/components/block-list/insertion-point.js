@@ -63,9 +63,9 @@ class BlockInsertionPoint extends Component {
 							icon="insert"
 							className="editor-block-list__insertion-point-button"
 							onClick={ this.onClick }
-							onMouseDown={ this.onClick }
 							label={ __( 'Insert block' ) }
 							onFocus={ this.onFocusInserter }
+							onMouseDown={ this.onFocusInserter }
 							onBlur={ this.onBlurInserter }
 						/>
 					</div>
