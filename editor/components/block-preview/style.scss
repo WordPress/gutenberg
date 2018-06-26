@@ -7,29 +7,29 @@
 	@include break-medium {
 		display: block;
 	}
+
+	.editor-block-preview__content {
+		padding: $block-padding;
+		border: 1px solid $light-gray-500;
+		font-family: $editor-font;
+
+		> div {
+			transform: scale( 0.9 );
+			transform-origin: center top;
+			font-family: $editor-font;
+		}
+
+		> div section {
+			height: auto;
+		}
+
+		> .shared-block-indicator {
+			display: none;
+		}
+	}
 }
 
 .editor-block-preview__title {
 	margin-bottom: 10px;
 	color: $dark-gray-300;
-}
-
-.editor-block-preview__content {
-	padding: $block-padding;
-	border: 1px solid $light-gray-500;
-	font-family: $editor-font;
-
-	> div {
-		transform: scale( 0.9 );
-		transform-origin: center top;
-		font-family: $editor-font;
-	}
-
-	> div section {
-		height: auto;
-	}
-
-	> .shared-block-indicator {
-		display: none;
-	}
 }

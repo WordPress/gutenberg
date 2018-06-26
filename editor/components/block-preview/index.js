@@ -8,6 +8,7 @@ import { noop } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
+import { Disabled } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -26,9 +27,7 @@ function BlockPreview( props ) {
 	return (
 		<div className="editor-block-preview">
 			<div className="editor-block-preview__title">{ __( 'Preview' ) }</div>
-			<div className="editor-block-preview__content" aria-hidden>
-				<BlockPreviewContent { ...props } />
-			</div>
+			<BlockPreviewContent { ...props } />
 		</div>
 	);
 }
@@ -36,12 +35,14 @@ function BlockPreview( props ) {
 export function BlockPreviewContent( { name, attributes } ) {
 	const block = createBlock( name, attributes );
 	return (
-		<BlockEdit
-			name={ name }
-			focus={ false }
-			attributes={ block.attributes }
-			setAttributes={ noop }
-		/>
+		<Disabled className="editor-block-preview__content" aria-hidden>
+			<BlockEdit
+				name={ name }
+				focus={ false }
+				attributes={ block.attributes }
+				setAttributes={ noop }
+			/>
+		</Disabled>
 	);
 }
 
