@@ -136,7 +136,7 @@
 	padding-left: $block-padding;
 	padding-right: $block-padding;
 
-	// Break long spaceless words so they don't overflow the block.
+	// Break long strings of text without spaces so they don't overflow the block.
 	overflow-wrap: break-word;
 
 	@include break-small() {
