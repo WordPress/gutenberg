@@ -5,8 +5,6 @@ import { createContext, createHigherOrderComponent, createElement } from '@wordp
 
 const { Consumer, Provider } = createContext( null );
 
-export { Provider as RegistryProvider };
-
 /**
  * A Higher Order Component used to inject the data registry as a prop
  * to the wrapped component.
@@ -24,3 +22,5 @@ export const withRegistry = createHigherOrderComponent( ( OriginalComponent ) =>
 		</Consumer>
 	);
 }, 'withRegistry' );
+
+export default Provider;

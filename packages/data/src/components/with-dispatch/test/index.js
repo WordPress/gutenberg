@@ -11,9 +11,9 @@ import { createElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import withDispatch from '../with-dispatch';
-import { createRegistry } from '../../registry';
-import { RegistryProvider } from '../registry-provider';
+import withDispatch from '../';
+import { createRegistry } from '../../../registry';
+import RegistryProvider from '../../registry-provider';
 
 describe( 'withDispatch', () => {
 	let registry;

@@ -17,8 +17,8 @@ import {
 /**
  * Internal dependencies
  */
-import defaultRegistry from '../default-registry';
-import { withRegistry } from './registry-provider';
+import defaultRegistry from '../../default-registry';
+import { withRegistry } from '../registry-provider';
 
 /**
  * Higher-order component used to add dispatch props using registered action

@@ -12,10 +12,10 @@ import { createElement, compose } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import withSelect from '../with-select';
-import withDispatch from '../with-dispatch';
-import { createRegistry } from '../../registry';
-import { RegistryProvider } from '../registry-provider';
+import withSelect from '../';
+import withDispatch from '../../with-dispatch';
+import { createRegistry } from '../../../registry';
+import RegistryProvider from '../../registry-provider';
 
 describe( 'withSelect', () => {
 	let registry;
