@@ -22,7 +22,7 @@
 	}
 
 	&:focus,
-	&.is-selected {
+	&.is-active {
 		@include block-style__focus-active();
 	}
 
