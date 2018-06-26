@@ -213,6 +213,7 @@ function gutenberg_register_scripts_and_styles() {
 				/* translators: %s: duration */
 				'past'   => __( '%s ago', 'default' ),
 			),
+			'start_of_week' => get_option( 'start_of_week', 0 ),
 		),
 		'formats'  => array(
 			'time'     => get_option( 'time_format', __( 'g:i a', 'default' ) ),

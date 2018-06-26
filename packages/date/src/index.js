@@ -71,8 +71,10 @@ export function setSettings( dateSettings ) {
 			y: 'a year',
 			yy: '%d years',
 		},
+		week: {
+			dow: dateSettings.l10n.start_of_week,
+		},
 	} );
-	momentLib.locale( currentLocale );
 
 	setupWPTimezone();
 }
