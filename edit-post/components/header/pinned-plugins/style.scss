@@ -5,24 +5,22 @@
 		margin-left: 4px;
 	}
 
-	// Forcefully colorize plugin icons to ensure contrast and cohesion.
+	// Colorize plugin icons to ensure contrast and cohesion, but allow plugin devs to override.
 	.components-icon-button:not( .is-toggled ) svg,
-	.components-icon-button:not( .is-toggled ) g,
-	.components-icon-button:not( .is-toggled ) path {
-		stroke: $dark-gray-500 !important;
-		fill: $dark-gray-500 !important;
+	.components-icon-button:not( .is-toggled ) svg * {
+		stroke: $dark-gray-500;
+		fill: $dark-gray-500;
 	}
-
+	
+	// Forcefully colorize hover & toggled plugin icon states to ensure legibility and consistency.
 	.components-icon-button.is-toggled svg,
-	.components-icon-button.is-toggled g,
-	.components-icon-button.is-toggled path {
+	.components-icon-button.is-toggled svg * {
 		stroke: $white !important;
 		fill: $white !important;
 	}
 
 	.components-icon-button:hover svg,
-	.components-icon-button:hover g,
-	.components-icon-button:hover path {
+	.components-icon-button:hover svg * {
 		stroke: $dark-gray-900 !important;
 		fill: $dark-gray-900 !important;
 	}

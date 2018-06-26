@@ -29,12 +29,17 @@
 		@include menu-style__focus;
 	}
 
-	// Forcefully colorize plugin icons to ensure contrast and cohesion.
+	// Colorize plugin icons to ensure contrast and cohesion, but allow plugin devs to override.
 	svg,
-	g,
-	path {
-		stroke: $dark-gray-500 !important;
-		fill: $dark-gray-500 !important;
+	svg * {
+		stroke: $dark-gray-500;
+		fill: $dark-gray-500;
+	}
+
+	&:hover svg,
+	&:hover svg * {
+		stroke: $dark-gray-900 !important;
+		fill: $dark-gray-900 !important;
 	}
 }
 
