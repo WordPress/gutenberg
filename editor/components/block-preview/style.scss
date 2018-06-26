@@ -17,6 +17,7 @@
 .editor-block-preview__content {
 	padding: $block-padding;
 	border: 1px solid $light-gray-500;
+	font-family: $editor-font;
 
 	> div {
 		transform: scale( 0.9 );

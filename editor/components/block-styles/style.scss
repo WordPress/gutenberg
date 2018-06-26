@@ -2,15 +2,22 @@
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 	grid-template-rows: 60px;
-	grid-gap: 5px;
+	grid-gap: $item-spacing;
 }
 
 .editor-block-styles__item {
 	cursor: pointer;
-	border: 1px solid $light-gray-500;
+	outline: 1px solid transparent; // Shown in Windows High Contrast mode.
+	box-shadow: inset 0 0 0 1px rgba( $dark-gray-900, .2 );
 	overflow: hidden;
-	padding: 5px;
+	padding: 0;
 	text-align: initial;
+	border-radius: $button-style__radius-roundrect;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 
 	> * {
 		transform: scale( 0.7 );
@@ -18,11 +25,17 @@
 		font-family: $editor-font;
 	}
 
+	// Make vertical centering easier.
+	> blockquote.wp-block-quote,
+	> * p:last-child {
+		margin-bottom: 0;
+	}
+
 	&.is-selected {
-		@include formatting-button-style__active;
+		@include block-style__focus-active();
 	}
 
 	&:hover {
-		@include formatting-button-style__hover;
+		@include block-style__hover;
 	}
 }
