@@ -18,7 +18,7 @@ import {
  * Internal dependencies
  */
 import defaultRegistry from '../../default-registry';
-import { withRegistry } from '../registry-provider';
+import { RegistryConsumer } from '../registry-provider';
 
 /**
  * Higher-order component used to add dispatch props using registered action
@@ -51,14 +51,14 @@ const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent(
 				proxyDispatch( propName, ...args ) {
 					// Original dispatcher is a pre-bound (dispatching) action creator.
 					const dispatch = this.props.registry ? this.props.registry.dispatch : defaultRegistry.dispatch;
-					mapDispatchToProps( dispatch, this.props )[ propName ]( ...args );
+					mapDispatchToProps( dispatch, this.props.ownProps )[ propName ]( ...args );
 				}
 
 				setProxyProps( props ) {
 					// Assign as instance property so that in reconciling subsequent
 					// renders, the assigned prop values are referentially equal.
-					const dispatch = this.props.registry ? this.props.registry.dispatch : defaultRegistry.dispatch;
-					const propsToDispatchers = mapDispatchToProps( dispatch, props );
+					const dispatch = props.registry ? props.registry.dispatch : defaultRegistry.dispatch;
+					const propsToDispatchers = mapDispatchToProps( dispatch, props.ownProps );
 					this.proxyProps = mapValues( propsToDispatchers, ( dispatcher, propName ) => {
 						// Prebind with prop name so we have reference to the original
 						// dispatcher to invoke. Track between re-renders to avoid
@@ -72,11 +72,20 @@ const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent(
 				}
 
 				render() {
-					return <WrappedComponent { ...this.props } { ...this.proxyProps } />;
+					return <WrappedComponent { ...this.props.ownProps } { ...this.proxyProps } />;
 				}
 			}
 
-			return withRegistry( ComponentWithDispatch );
+			return ( ownProps ) => (
+				<RegistryConsumer>
+					{ ( registry ) => (
+						<ComponentWithDispatch
+							ownProps={ ownProps }
+							registry={ registry }
+						/>
+					) }
+				</RegistryConsumer>
+			);
 		},
 	] ),
 	'withDispatch'

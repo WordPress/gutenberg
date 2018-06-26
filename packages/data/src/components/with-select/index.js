@@ -12,7 +12,7 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
  * Internal dependencies
  */
 import defaultRegistry from '../../default-registry';
-import { withRegistry } from '../registry-provider';
+import { RegistryConsumer } from '../registry-provider';
 
 /**
  * Higher-order component used to inject state-derived props using registered
@@ -42,7 +42,7 @@ const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( WrappedC
 			// rendered without its own merge props.
 			const select = props.registry ? props.registry.select : defaultRegistry.select;
 			const mergeProps = (
-				mapStateToProps( select, props ) ||
+				mapStateToProps( select, props.ownProps ) ||
 				DEFAULT_MERGE_PROPS
 			);
 
@@ -60,7 +60,7 @@ const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( WrappedC
 
 		shouldComponentUpdate( nextProps, nextState ) {
 			return (
-				! isShallowEqual( this.props, nextProps ) ||
+				! isShallowEqual( this.props.ownProps, nextProps.ownProps ) ||
 				! isShallowEqual( this.state.mergeProps, nextState.mergeProps )
 			);
 		}
@@ -82,11 +82,20 @@ const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( WrappedC
 		}
 
 		render() {
-			return <WrappedComponent { ...this.props } { ...this.state.mergeProps } />;
+			return <WrappedComponent { ...this.props.ownProps } { ...this.state.mergeProps } />;
 		}
 	}
 
-	return withRegistry( ComponentWithSelect );
+	return ( ownProps ) => (
+		<RegistryConsumer>
+			{ ( registry ) => (
+				<ComponentWithSelect
+					ownProps={ ownProps }
+					registry={ registry }
+				/>
+			) }
+		</RegistryConsumer>
+	);
 }, 'withSelect' );
 
 export default withSelect;

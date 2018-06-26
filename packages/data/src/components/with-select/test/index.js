@@ -2,7 +2,6 @@
  * External dependencies
  */
 import TestRenderer from 'react-test-renderer';
-import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -264,7 +263,7 @@ describe( 'withSelect', () => {
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 
-		expect( omit( JSON.parse( testInstance.findByType( 'div' ).props.children ), [ 'registry' ] ) )
+		expect( JSON.parse( testInstance.findByType( 'div' ).props.children ) )
 			.toEqual( { foo: 'OK', propName: 'foo' } );
 
 		testRenderer.update(
@@ -275,7 +274,7 @@ describe( 'withSelect', () => {
 
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
-		expect( omit( JSON.parse( testInstance.findByType( 'div' ).props.children ), [ 'registry' ] ) )
+		expect( JSON.parse( testInstance.findByType( 'div' ).props.children ) )
 			.toEqual( { bar: 'OK', propName: 'bar' } );
 	} );
 
