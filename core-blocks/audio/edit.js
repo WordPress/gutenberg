@@ -30,6 +30,14 @@ class AudioEdit extends Component {
 		this.state = {
 			editing: ! this.props.attributes.src,
 		};
+
+		this.toggleAttribute = this.toggleAttribute.bind( this );
+	}
+
+	toggleAttribute( attribute ) {
+		return ( newValue ) => {
+			this.props.setAttributes( { [ attribute ]: newValue } );
+		};
 	}
 
 	render() {
@@ -58,14 +66,6 @@ class AudioEdit extends Component {
 				setAttributes( { src: newSrc, id: undefined } );
 			}
 			this.setState( { editing: false } );
-		};
-
-		const onToggleAutoplay = ( newVal ) => {
-			setAttributes( { autoplay: newVal } );
-		};
-
-		const onToggleLoop = ( newVal ) => {
-			setAttributes( { loop: newVal } );
 		};
 
 		if ( editing ) {
@@ -105,12 +105,12 @@ class AudioEdit extends Component {
 					<PanelBody title={ __( 'Playback Controls' ) }>
 						<CheckboxControl
 							label={ __( 'Autoplay' ) }
-							onChange={ onToggleAutoplay }
+							onChange={ this.toggleAttribute( 'autoplay' ) }
 							checked={ autoplay }
 						/>
 						<CheckboxControl
 							label={ __( 'Loop' ) }
-							onChange={ onToggleLoop }
+							onChange={ this.toggleAttribute( 'loop' ) }
 							checked={ loop }
 						/>
 					</PanelBody>
@@ -122,7 +122,7 @@ class AudioEdit extends Component {
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
 							value={ caption }
-							onChange={ ( value ) => setAttributes( { caption: value } ) }
+							onChange={ this.toggleAttribute( 'caption' ) }
 							inlineToolbar
 						/>
 					) }
