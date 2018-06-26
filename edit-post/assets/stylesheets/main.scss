@@ -76,7 +76,9 @@ body.gutenberg-editor-page {
 }
 
 .gutenberg {
-	* {
+	*,
+	*:before,
+	*:after {
 		box-sizing: border-box;
 	}
 
