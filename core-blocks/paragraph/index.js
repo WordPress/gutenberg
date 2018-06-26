@@ -210,49 +210,47 @@ class ParagraphBlock extends Component {
 						isLargeText={ fontSize >= 18 }
 					/>
 				</InspectorControls>
-				<div>
-					<RichText
-						tagName="p"
-						className={ classnames( 'wp-block-paragraph', className, {
-							'has-background': backgroundColor.value,
-							'has-drop-cap': dropCap,
-							[ backgroundColor.class ]: backgroundColor.class,
-							[ textColor.class ]: textColor.class,
-						} ) }
-						style={ {
-							backgroundColor: backgroundColor.class ? undefined : backgroundColor.value,
-							color: textColor.class ? undefined : textColor.value,
-							fontSize: fontSize ? fontSize + 'px' : undefined,
-							textAlign: align,
-						} }
-						value={ content }
-						onChange={ ( nextContent ) => {
-							setAttributes( {
-								content: nextContent,
-							} );
-						} }
-						onSplit={ insertBlocksAfter ?
-							( before, after, ...blocks ) => {
-								if ( after ) {
-									blocks.push( createBlock( name, { content: after } ) );
-								}
+				<RichText
+					tagName="p"
+					className={ classnames( 'wp-block-paragraph', className, {
+						'has-background': backgroundColor.value,
+						'has-drop-cap': dropCap,
+						[ backgroundColor.class ]: backgroundColor.class,
+						[ textColor.class ]: textColor.class,
+					} ) }
+					style={ {
+						backgroundColor: backgroundColor.class ? undefined : backgroundColor.value,
+						color: textColor.class ? undefined : textColor.value,
+						fontSize: fontSize ? fontSize + 'px' : undefined,
+						textAlign: align,
+					} }
+					value={ content }
+					onChange={ ( nextContent ) => {
+						setAttributes( {
+							content: nextContent,
+						} );
+					} }
+					onSplit={ insertBlocksAfter ?
+						( before, after, ...blocks ) => {
+							if ( after ) {
+								blocks.push( createBlock( name, { content: after } ) );
+							}
 
-								insertBlocksAfter( blocks );
+							insertBlocksAfter( blocks );
 
-								if ( before ) {
-									setAttributes( { content: before } );
-								} else {
-									onReplace( [] );
-								}
-							} :
-							undefined
-						}
-						onMerge={ mergeBlocks }
-						onReplace={ this.onReplace }
-						onRemove={ () => onReplace( [] ) }
-						placeholder={ placeholder || __( 'Add text or type / to add content' ) }
-					/>
-				</div>
+							if ( before ) {
+								setAttributes( { content: before } );
+							} else {
+								onReplace( [] );
+							}
+						} :
+						undefined
+					}
+					onMerge={ mergeBlocks }
+					onReplace={ this.onReplace }
+					onRemove={ () => onReplace( [] ) }
+					placeholder={ placeholder || __( 'Add text or type / to add content' ) }
+				/>
 			</Fragment>
 		);
 	}

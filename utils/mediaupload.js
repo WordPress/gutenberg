@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { compact, forEach, get, includes, noop, startsWith } from 'lodash';
+import { compact, flatMap, forEach, get, has, includes, map, noop, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,6 +12,30 @@ import { __, sprintf } from '@wordpress/i18n';
  * WordPress dependencies
  */
 import apiRequest from '@wordpress/api-request';
+
+/**
+ * Browsers may use unexpected mime types, and they differ from browser to browser.
+ * This function computes a flexible array of mime types from the mime type structured provided by the server.
+ * Converts { jpg|jpeg|jpe: "image/jpeg" } into [ "image/jpeg", "image/jpg", "image/jpeg", "image/jpe" ]
+ * The computation of this array instead of directly using the object,
+ * solves the problem in chrome where mp3 files have audio/mp3 as mime type instead of audio/mpeg.
+ * https://bugs.chromium.org/p/chromium/issues/detail?id=227004
+ *
+ * @param {?Object} wpMimeTypesObject Mime type object received from the server.
+ *                                    Extensions are keys separated by '|' and values are mime types associated with an extension.
+ *
+ * @return {?Array} An array of mime types or the parameter passed if it was "falsy".
+ */
+export function getMimeTypesArray( wpMimeTypesObject ) {
+	if ( ! wpMimeTypesObject ) {
+		return wpMimeTypesObject;
+	}
+	return flatMap( wpMimeTypesObject, ( mime, extensionsString ) => {
+		const [ type ] = mime.split( '/' );
+		const extensions = extensionsString.split( '|' );
+		return [ mime, ...map( extensions, ( extension ) => `${ type }/${ extension }` ) ];
+	} );
+}
 
 /**
  *	Media Upload is used by audio, image, gallery and video blocks to handle uploading a media file
@@ -48,7 +72,7 @@ export function mediaUpload( {
 	const isAllowedType = ( fileType ) => startsWith( fileType, `${ allowedType }/` );
 
 	// Allowed types for the current WP_User
-	const allowedMimeTypesForUser = get( window, [ '_wpMediaSettings', 'allowedMimeTypes' ] );
+	const allowedMimeTypesForUser = getMimeTypesArray( get( window, [ '_wpMediaSettings', 'allowedMimeTypes' ] ) );
 	const isAllowedMimeTypeForUser = ( fileType ) => {
 		return includes( allowedMimeTypesForUser, fileType );
 	};
@@ -98,16 +122,22 @@ export function mediaUpload( {
 				};
 				setAndUpdateFiles( idx, mediaObject );
 			},
-			() => {
+			( response ) => {
 				// Reset to empty on failure.
 				setAndUpdateFiles( idx, null );
-				onError( {
-					code: 'GENERAL',
-					message: sprintf(
+				let message;
+				if ( has( response, [ 'responseJSON', 'message' ] ) ) {
+					message = get( response, [ 'responseJSON', 'message' ] );
+				} else {
+					message = sprintf(
 						// translators: %s: file name
 						__( 'Error while uploading file %s to the media library.' ),
 						mediaFile.name
-					),
+					);
+				}
+				onError( {
+					code: 'GENERAL',
+					message,
 					file: mediaFile,
 				} );
 			}

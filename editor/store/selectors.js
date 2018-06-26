@@ -155,7 +155,7 @@ export function getCurrentPostId( state ) {
  * @return {number} Number of revisions.
  */
 export function getCurrentPostRevisionsCount( state ) {
-	return get( getCurrentPost( state ), [ 'revisions', 'count' ], 0 );
+	return get( getCurrentPost( state ), [ '_links', 'version-history', 0, 'count' ], 0 );
 }
 
 /**
@@ -167,7 +167,7 @@ export function getCurrentPostRevisionsCount( state ) {
  * @return {?number} ID of the last revision.
  */
 export function getCurrentPostLastRevisionId( state ) {
-	return get( getCurrentPost( state ), [ 'revisions', 'last_id' ], null );
+	return get( getCurrentPost( state ), [ '_links', 'predecessor-version', 0, 'id' ], null );
 }
 
 /**
@@ -442,17 +442,6 @@ export function getDocumentTitle( state ) {
 		title = isCleanNewPost( state ) ? __( 'New post' ) : __( '(Untitled)' );
 	}
 	return title;
-}
-
-/**
- * Returns a URL to preview the post being edited.
- *
- * @param {Object} state Global application state.
- *
- * @return {string} Preview URL.
- */
-export function getEditedPostPreviewLink( state ) {
-	return getCurrentPost( state ).preview_link || null;
 }
 
 /**
