@@ -99,6 +99,9 @@ export function matcherFromSource( sourceConfig ) {
  */
 export function parseWithAttributeSchema( innerHTML, attributeSchema ) {
 	const attributeValue = hpqParse( innerHTML, matcherFromSource( attributeSchema ) );
+	// HTML attributes without a defined value (e.g. <audio loop>) are parsed
+	// to a value of '' (empty string), so return `true` if we know this should
+	// be boolean.
 	if ( 'attribute' === attributeSchema.source && 'boolean' === attributeSchema.type ) {
 		return '' === attributeValue;
 	}
