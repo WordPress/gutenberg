@@ -257,20 +257,32 @@ function gutenberg_collect_meta_box_data() {
  */
 function gutenberg_can_edit_post( $post ) {
 	$post = get_post( $post );
+	$can_edit = true;
 
 	if ( ! $post ) {
-		return false;
+		$can_edit = false;
 	}
 
 	if ( 'trash' === $post->post_status ) {
-		return false;
+		$can_edit = false;
 	}
 
 	if ( ! gutenberg_can_edit_post_type( $post->post_type ) ) {
-		return false;
+		$can_edit = false;
 	}
 
-	return current_user_can( 'edit_post', $post->ID );
+	if( ! current_user_can( 'edit_post', $post->ID ) ) {
+		$can_edit = false;
+	}
+
+	/**
+	 * Filter to allow plugins to enable/disable Gutenberg for particular posts.
+	 *
+	 *
+	 * @param bool   $can_edit  Whether the post can be edited or not.
+	 * @param string $post The post being checked.
+	 */
+	return apply_filters( 'gutenberg_can_edit_post', $can_edit, $post );
 }
 
 /**
