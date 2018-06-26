@@ -41,11 +41,9 @@ class NavigableContainer extends Component {
 	}
 
 	getFocusableContext( target ) {
-		const { deep = false, onlyBrowserTabstops } = this.props;
+		const { onlyBrowserTabstops } = this.props;
 		const finder = onlyBrowserTabstops ? focus.tabbable : focus.focusable;
-		const focusables = finder
-			.find( this.container )
-			.filter( ( node ) => deep || node.parentElement === this.container );
+		const focusables = finder.find( this.container );
 
 		const index = this.getFocusableIndex( focusables, target );
 		if ( index > -1 && target ) {
@@ -114,7 +112,6 @@ class NavigableContainer extends Component {
 					'eventToOffset',
 					'onNavigate',
 					'cycle',
-					'deep',
 					'onlyBrowserTabstops',
 				] ) }
 				onKeyDown={ this.onKeyDown }
