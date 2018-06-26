@@ -2,6 +2,7 @@
  * External dependencies
  */
 import clickOutside from 'react-click-outside';
+import { forEach } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -30,6 +31,7 @@ class ModalFrame extends Component {
 		this.containerRef = createRef();
 		this.handleKeyDown = this.handleKeyDown.bind( this );
 		this.handleClickOutside = this.handleClickOutside.bind( this );
+		this.focusFirstFocusable = this.focusFirstFocusable.bind( this );
 		this.focusFirstTabbable = this.focusFirstTabbable.bind( this );
 	}
 
@@ -39,7 +41,24 @@ class ModalFrame extends Component {
 	componentDidMount() {
 		// Focus on mount
 		if ( this.props.focusOnMount ) {
-			this.focusFirstTabbable();
+			const { setTimeout } = this.props;
+			// Required because the node is appended to the DOM after rendering.
+			setTimeout( () => {
+				this.focusFirstTabbable();
+				this.focusFirstFocusable();
+			}, 0 );
+		}
+	}
+
+	focusFirstFocusable() {
+		const focusables = focus.focusable.find( this.containerRef.current );
+		if ( focusables.length ) {
+			forEach( focusables, ( focusable ) => {
+				if ( focusable.hasAttribute( 'tabindex', -1 ) ) {
+					focusable.focus();
+					return false;
+				}
+			} );
 		}
 	}
 
@@ -47,14 +66,10 @@ class ModalFrame extends Component {
 	 * Focuses the first tabbable element.
 	 */
 	focusFirstTabbable() {
-		// Required because the node is appended to the DOM after rendering.
-		const { setTimeout } = this.props;
-		setTimeout( () => {
-			const tabbables = focus.tabbable.find( this.containerRef.current );
-			if ( tabbables.length ) {
-				tabbables[ 0 ].focus();
-			}
-		}, 0 );
+		const tabbables = focus.tabbable.find( this.containerRef.current );
+		if ( tabbables.length ) {
+			tabbables[ 0 ].focus();
+		}
 	}
 
 	/**
