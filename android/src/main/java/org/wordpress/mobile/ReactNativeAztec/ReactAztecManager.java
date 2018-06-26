@@ -1,7 +1,6 @@
 package org.wordpress.mobile.ReactNativeAztec;
 
 
-import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.text.Editable;
@@ -29,12 +28,6 @@ import java.util.Map;
 public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
 
     public static final String REACT_CLASS = "RCTAztecView";
-    private Context mCallerContext;
-
-    public ReactAztecManager(Context ctx) {
-        super();
-        this.mCallerContext = ctx;
-    }
 
     @Override
     public String getName() {
@@ -43,7 +36,7 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
 
     @Override
     protected ReactAztecText createViewInstance(ThemedReactContext reactContext) {
-        ReactAztecText aztecText = new ReactAztecText(reactContext, mCallerContext);
+        ReactAztecText aztecText = new ReactAztecText(reactContext);
         aztecText.setCalypsoMode(false);
 
         return aztecText;
