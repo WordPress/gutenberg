@@ -39,7 +39,6 @@ const {
 	hasAutosave,
 	isEditedPostEmpty,
 	isEditedPostBeingScheduled,
-	getEditedPostPreviewLink,
 	getBlockDependantsCacheBust,
 	getBlockName,
 	getBlock,
@@ -1311,26 +1310,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( isEditedPostBeingScheduled( state ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'getEditedPostPreviewLink', () => {
-		it( 'should return null if the post has not link yet', () => {
-			const state = {
-				currentPost: {},
-			};
-
-			expect( getEditedPostPreviewLink( state ) ).toBeNull();
-		} );
-
-		it( 'should return the correct url when the post object has a preview_link', () => {
-			const state = {
-				currentPost: {
-					preview_link: 'https://andalouses.com/?p=1&preview=true',
-				},
-			};
-
-			expect( getEditedPostPreviewLink( state ) ).toBe( 'https://andalouses.com/?p=1&preview=true' );
 		} );
 	} );
 
