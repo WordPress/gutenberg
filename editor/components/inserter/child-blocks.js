@@ -9,7 +9,7 @@ import { ifCondition } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import ItemList from './item-list';
+import BlockTypesList from '../block-types-list';
 import BlockIcon from '../block-icon';
 
 function ChildBlocks( { rootBlockIcon, rootBlockTitle, items, ...props } ) {
@@ -21,7 +21,7 @@ function ChildBlocks( { rootBlockIcon, rootBlockTitle, items, ...props } ) {
 					{ rootBlockTitle && <h2>{ rootBlockTitle }</h2> }
 				</div>
 			) }
-			<ItemList items={ items } { ...props } />
+			<BlockTypesList items={ items } { ...props } />
 		</div>
 	);
 }
