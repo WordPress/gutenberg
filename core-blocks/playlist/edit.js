@@ -164,7 +164,7 @@ class PlaylistEdit extends Component {
 						<SelectControl
 							label={ __( 'Playlist Style' ) }
 							value={ style }
-							onChange={ this.toggleAttribute( 'styleOptions' ) }
+							onChange={ this.toggleAttribute( 'style' ) }
 							options={ styleOptions }
 						/>
 					</PanelBody>
