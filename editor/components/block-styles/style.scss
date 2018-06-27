@@ -6,6 +6,7 @@
 
 .editor-block-styles__item {
 	cursor: pointer;
+	overflow: hidden;
 
 	&:focus,
 	&.is-active {
