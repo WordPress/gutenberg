@@ -11,22 +11,24 @@ import { IconButton } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 
-export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, role, ...props } ) {
+export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, role, small = false, ...props } ) {
 	if ( isLocked ) {
 		return null;
 	}
 
-	const label = __( 'Remove' );
+	const label = __( 'Remove this block' );
 
 	return (
 		<IconButton
-			className="editor-block-settings-remove"
+			className="editor-block-settings-menu__control"
 			onClick={ flow( onRemove, onClick ) }
 			icon="trash"
-			label={ label }
+			label={ small ? label : undefined }
 			role={ role }
 			{ ...props }
-		/>
+		>
+			{ ! small && label }
+		</IconButton>
 	);
 }
 

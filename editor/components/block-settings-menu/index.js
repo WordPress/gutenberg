@@ -71,7 +71,7 @@ export class BlockSettingsMenu extends Component {
 						const toggleClassname = classnames( 'editor-block-settings-menu__toggle', {
 							'is-opened': isOpen,
 						} );
-						const label = isOpen ? __( 'Hide Options' ) : __( 'More Options' );
+						const label = isOpen ? __( 'Hide Options' ) : __( 'Show Options' );
 
 						return (
 							<IconButton
@@ -99,13 +99,13 @@ export class BlockSettingsMenu extends Component {
 							{ count === 1 && <UnknownConverter uid={ firstBlockUID } role="menuitem" /> }
 							<BlockDuplicateButton uids={ uids } rootUID={ rootUID } role="menuitem" />
 							{ count === 1 && <SharedBlockSettings uid={ firstBlockUID } onToggle={ onClose } itemsRole="menuitem" /> }
+							<BlockRemoveButton
+								uids={ uids }
+								onFocus={ this.onFocus }
+								onBlur={ this.onBlur }
+							/>
 						</NavigableMenu>
 					) }
-				/>
-				<BlockRemoveButton
-					uids={ uids }
-					onFocus={ this.onFocus }
-					onBlur={ this.onBlur }
 				/>
 			</div>
 		);
