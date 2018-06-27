@@ -18,7 +18,6 @@ import './style.scss';
 import withFocusReturn from '../higher-order/with-focus-return';
 import withFocusContain from '../higher-order/with-focus-contain';
 import withGlobalEvents from '../higher-order/with-global-events';
-import withSafeTimeout from '../higher-order/with-safe-timeout';
 
 const {
 	ESCAPE,
@@ -41,12 +40,8 @@ class ModalFrame extends Component {
 	componentDidMount() {
 		// Focus on mount
 		if ( this.props.focusOnMount ) {
-			const { setTimeout } = this.props;
-			// Required because the node is appended to the DOM after rendering.
-			setTimeout( () => {
-				this.focusFirstTabbable();
-				this.focusFirstFocusable();
-			}, 0 );
+			this.focusFirstTabbable();
+			this.focusFirstFocusable();
 		}
 	}
 
@@ -156,7 +151,6 @@ class ModalFrame extends Component {
 export default compose( [
 	withFocusReturn,
 	withFocusContain,
-	withSafeTimeout,
 	clickOutside,
 	withGlobalEvents( {
 		keydown: 'handleKeyDown',

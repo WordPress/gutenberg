@@ -25,17 +25,32 @@ class Modal extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.node = document.createElement( 'div' );
+		this.prepareDOM();
 	}
 
 	/**
-	 * Opens the modal if the initial isOpen prop is true.
+	 * Prepares the DOM for the modals to be rendered.
+	 *
+	 * Every modal is mounted in a separate div appended to a parent div
+	 * that is appended to the document body.
+	 *
+	 * The parent div will be created if it does not yet exist, and the
+	 * separate div for this specific modal will be appended to that.
 	 */
-	componentDidMount() {
-		const { isOpen } = this.props;
-		if ( isOpen ) {
-			this.openModal();
+	prepareDOM() {
+		if ( ! parentElement ) {
+			parentElement = document.createElement( 'div' );
+			document.body.appendChild( parentElement );
 		}
+		this.node = document.createElement( 'div' );
+		parentElement.appendChild( this.node );
+	}
+
+	/**
+	 * Removes the specific mounting point for this modal from the DOM.
+	 */
+	cleanDOM() {
+		parentElement.removeChild( this.node );
 	}
 
 	/**
@@ -73,7 +88,6 @@ class Modal extends Component {
 		if ( openModalCount === 1 ) {
 			this.openFirstModal();
 		}
-		parentElement.appendChild( this.node );
 	}
 
 	/**
@@ -84,8 +98,6 @@ class Modal extends Component {
 	 * to the body to prevent scrolling while the modal is open.
 	 */
 	openFirstModal() {
-		parentElement = document.createElement( 'div' );
-		document.body.appendChild( parentElement );
 		ariaHelper.hideApp( parentElement );
 		document.body.classList.add( this.props.bodyOpenClassName );
 	}
@@ -97,7 +109,7 @@ class Modal extends Component {
 	closeModal() {
 		openModalCount--;
 
-		parentElement.removeChild( this.node );
+		this.cleanDOM();
 		if ( openModalCount === 0 ) {
 			this.closeLastModal();
 		}
@@ -110,8 +122,6 @@ class Modal extends Component {
 	closeLastModal() {
 		document.body.classList.remove( this.props.bodyOpenClassName );
 		ariaHelper.showApp();
-		document.body.removeChild( parentElement );
-		parentElement = null;
 	}
 
 	/**
