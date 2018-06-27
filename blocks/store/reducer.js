@@ -97,7 +97,7 @@ export function categories( state = DEFAULT_CATEGORIES, action ) {
 				return [ ...previousState, ...action.categories ];
 			}
 
-			return [ ...action.categories, ...previousState ];			
+			return [ ...action.categories, ...previousState ];
 		/*
 		 * @frontkom/gutenberg 0.2.0
 		 */

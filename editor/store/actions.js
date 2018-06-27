@@ -5,17 +5,13 @@ import uuid from 'uuid/v4';
 import { partial, castArray } from 'lodash';
 
 /**
- * Internal Dependencies
- */
-import * as paragraph from '@wordpress/core-blocks/paragraph';
-
-/**
  * WordPress dependencies
  */
 import {
 	getDefaultBlockName,
 	createBlock,
 } from '@wordpress/blocks';
+import { paragraph } from '@wordpress/core-blocks';
 
 /**
  * Returns an action object used in signalling that editor has initialized with
@@ -710,7 +706,7 @@ export function insertDefaultBlock( attributes, rootUID, index ) {
 
 	return {
 		...insertBlock( block, index, rootUID ),
-		isProvisional: blockName == paragraph.name,
+		isProvisional: blockName === paragraph.name,
 	};
 }
 

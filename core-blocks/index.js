@@ -85,3 +85,10 @@ export const registerCoreBlocks = () => {
 	setDefaultBlockName( paragraph.name );
 	setUnknownTypeHandlerName( freeform.name );
 };
+
+/**
+ * @frontkom/gutenberg 0.2.1
+ */
+export {
+	paragraph,
+};
