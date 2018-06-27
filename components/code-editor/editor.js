@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { UP, DOWN } from '@wordpress/utils';
+import { UP, DOWN } from '@wordpress/keycodes';
 
 class CodeEditor extends Component {
 	constructor() {
