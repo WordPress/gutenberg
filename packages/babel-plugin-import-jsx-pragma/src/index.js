@@ -29,38 +29,34 @@ const DEFAULT_OPTIONS = {
 export default function( babel ) {
 	const { types: t } = babel;
 
-	let _options;
-
-	let hasJSX, hasImportedScopeVariable;
-
-	function getOptions( options ) {
-		if ( ! _options ) {
-			_options = {
+	function getOptions( state ) {
+		if ( ! state._options ) {
+			state._options = {
 				...DEFAULT_OPTIONS,
-				...options,
+				...state.opts,
 			};
 		}
 
-		return _options;
+		return state._options;
 	}
 
 	return {
 		visitor: {
-			JSXElement() {
-				hasJSX = true;
+			JSXElement( path, state ) {
+				state.hasJSX = true;
 			},
 			ImportDeclaration( path, state ) {
-				if ( hasImportedScopeVariable ) {
+				if ( state.hasImportedScopeVariable ) {
 					return;
 				}
 
-				const { scopeVariable, isDefault } = getOptions( state.opts );
+				const { scopeVariable, isDefault } = getOptions( state );
 
 				// Test that at least one import specifier exists matching the
 				// scope variable name. The module source is not verfied since
 				// we must avoid introducing a conflicting import name, even if
 				// the scope variable is referenced from a different source.
-				hasImportedScopeVariable = path.node.specifiers.some( ( specifier ) => {
+				state.hasImportedScopeVariable = path.node.specifiers.some( ( specifier ) => {
 					switch ( specifier.type ) {
 						case 'ImportSpecifier':
 							return (
@@ -74,17 +70,12 @@ export default function( babel ) {
 				} );
 			},
 			Program: {
-				enter() {
-					_options = null;
-					hasJSX = false;
-					hasImportedScopeVariable = false;
-				},
 				exit( path, state ) {
-					if ( ! hasJSX || hasImportedScopeVariable ) {
+					if ( ! state.hasJSX || state.hasImportedScopeVariable ) {
 						return;
 					}
 
-					const { scopeVariable, source, isDefault } = getOptions( state.opts );
+					const { scopeVariable, source, isDefault } = getOptions( state );
 
 					let specifier;
 					if ( isDefault ) {
