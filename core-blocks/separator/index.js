@@ -26,7 +26,7 @@ export const settings = {
 	styles: [
 		{ name: 'default', label: __( 'Short Line' ), isDefault: true },
 		{ name: 'wide', label: __( 'Wide Line' ) },
-		{ name: 'asterisks', label: __( 'Dots' ) },
+		{ name: 'dots', label: __( 'Dots' ) },
 	],
 
 	transforms: {

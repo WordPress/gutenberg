@@ -1,19 +1,18 @@
 .wp-block-separator {
-	border: none;
-	border-bottom: 2px solid $dark-gray-100;
-	max-width: 100px;
-	margin: 1.65em auto;
+	// Default, thin style, is stored in theme.scss so it can be opted out of
 
+	// Wide style
 	&.is-style-wide {
-		max-width: 100%;
 		border-bottom-width: 1px;
 	}
 
-	&.is-style-asterisks {
+	// Dots style
+	&.is-style-dots {
 		border: none;
 		text-align: center;
 		max-width: none;
 		line-height: 1;
+		height: auto;
 
 		&:before {
 			content: '\00b7 \00b7 \00b7';
