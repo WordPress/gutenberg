@@ -5,24 +5,47 @@ import { extend, pick, isString, isEqual, forEach, isNumber } from 'lodash';
 import memize from 'memize';
 
 /**
+ * Shortcode attributes object.
+ *
+ * @typedef {Object} WPShortcodeAttrs
+ *
+ * @property {Object} named   Object with named attributes.
+ * @property {Array}  numeric Array with numeric attributes.
+ */
+
+/**
+ * Shortcode object.
+ *
+ * @typedef {Object} WPShortcode
+ *
+ * @property {string}           tag     Shortcode tag.
+ * @property {WPShortcodeAttrs} attrs   Shortcode attributes.
+ * @property {string}           content Shortcode content.
+ * @property {string}           type    Shortcode type: `self-closing`,
+ *                                      `closed`, or `single`.
+ */
+
+/**
+ * @typedef {Object} WPShortcodeMatch
+ *
+ * @property {number}      index     Index the shortcode is found at.
+ * @property {string}      content   Matched content.
+ * @property {WPShortcode} shortcode Shortcode instance of the match.
+ */
+
+/**
  * Find the next matching shortcode.
  *
- * Given a shortcode `tag`, a block of `text`, and an optional starting
- * `index`, returns the next matching shortcode or `undefined`.
+ * @param {string} tag   Shortcode tag.
+ * @param {string} text  Text to search.
+ * @param {number} index Index to start search from.
  *
- * Shortcodes are formatted as an object that contains the match
- * `content`, the matching `index`, and the parsed `shortcode` object.
- *
- * @param {[type]} tag   [description]
- * @param {[type]} text  [description]
- * @param {[type]} index [description]
- *
- * @return {Object} [description]
+ * @return {?WPShortcodeMatch} Matched information.
  */
-export function next( tag, text, index ) {
+export function next( tag, text, index = 0 ) {
 	const re = regexp( tag );
 
-	re.lastIndex = index || 0;
+	re.lastIndex = index;
 
 	const match = re.exec( text );
 
@@ -41,8 +64,8 @@ export function next( tag, text, index ) {
 		shortcode: fromMatch( match ),
 	};
 
-	// If we matched a leading `[`, strip it from the match
-	// and increment the index accordingly.
+	// If we matched a leading `[`, strip it from the match and increment the
+	// index accordingly.
 	if ( match[ 1 ] ) {
 		result.content = result.content.slice( 1 );
 		result.index++;
@@ -59,24 +82,17 @@ export function next( tag, text, index ) {
 /**
  * Replace matching shortcodes in a block of text.
  *
- * Accepts a shortcode `tag`, content `text` to scan, and a `callback`
- * to process the shortcode matches and return a replacement string.
- * Returns the `text` with all shortcodes replaced.
+ * @param {string}   tag      Shortcode tag.
+ * @param {string}   text     Text to search.
+ * @param {Function} callback Function to process the match and return
+ *                            replacement string.
  *
- * Shortcode matches are objects that contain the shortcode `tag`,
- * a shortcode `attrs` object, the `content` between shortcode tags,
- * and a boolean flag to indicate if the match was a `single` tag.
- *
- * @param {[type]}   tag      [description]
- * @param {[type]}   text     [description]
- * @param {Function} callback [description]
- *
- * @return {[type]}   [description]
+ * @return {string} Text with shortcodes replaced.
  */
 export function replace( tag, text, callback ) {
 	return text.replace( regexp( tag ), ( match, left, $3, attrs, slash, content, closing, right ) => {
-		// If both extra brackets exist, the shortcode has been
-		// properly escaped.
+		// If both extra brackets exist, the shortcode has been properly
+		// escaped.
 		if ( left === '[' && right === ']' ) {
 			return match;
 		}
@@ -84,25 +100,24 @@ export function replace( tag, text, callback ) {
 		// Create the match object and pass it through the callback.
 		const result = callback( fromMatch( arguments ) );
 
-		// Make sure to return any of the extra brackets if they
-		// weren't used to escape the shortcode.
+		// Make sure to return any of the extra brackets if they weren't used to
+		// escape the shortcode.
 		return result ? left + result + right : match;
 	} );
 }
 
 /**
- * Generate a string from shortcode parameters,
+ * Generate a string from shortcode parameters.
  *
- * Creates a `wp.shortcode` instance and returns a string.
+ * Creates a shortcode instance and returns a string.
  *
- * Accepts the same `options` as the `wp.shortcode()` constructor,
- * containing a `tag` string, a string or object of `attrs`, a boolean
- * indicating whether to format the shortcode using a `single` tag, and a
- * `content` string.
+ * Accepts the same `options` as the `shortcode()` constructor, containing a
+ * `tag` string, a string or object of `attrs`, a boolean indicating whether to
+ * format the shortcode using a `single` tag, and a `content` string.
  *
- * @param {[type]} options [description]
+ * @param {Object} options
  *
- * @return {[type]} [description]
+ * @return {string} String representation of the shortcode.
  */
 export function string( options ) {
 	return new shortcode( options ).string();
@@ -124,9 +139,9 @@ export function string( options ) {
  * 6. The closing tag.
  * 7. An extra `]` to allow for escaping shortcodes with double `[[]]`
  *
- * @param {[type]} tag [description]
+ * @param {string} tag Shortcode tag.
  *
- * @return {[type]} [description]
+ * @return {RegExp} Shortcode RegExp.
  */
 export const regexp = memize( ( tag ) => {
 	return new RegExp( '\\[(\\[?)(' + tag + ')(?![\\w-])([^\\]\\/]*(?:\\/(?!\\])[^\\]\\/]*)*?)(?:(\\/)\\]|\\](?:([^\\[]*(?:\\[(?!\\/\\2\\])[^\\[]*)*)(\\[\\/\\2\\]))?)(\\]?)', 'g' );
@@ -135,29 +150,26 @@ export const regexp = memize( ( tag ) => {
 /**
  * Parse shortcode attributes.
  *
- * Shortcodes accept many types of attributes. These can chiefly be
- * divided into named and numeric attributes:
+ * Shortcodes accept many types of attributes. These can chiefly be divided into
+ * named and numeric attributes:
  *
- * Named attributes are assigned on a key/value basis, while numeric
- * attributes are treated as an array.
+ * Named attributes are assigned on a key/value basis, while numeric attributes
+ * are treated as an array.
  *
- * Named attributes can be formatted as either `name="value"`,
- * `name='value'`, or `name=value`. Numeric attributes can be formatted
- * as `"value"` or just `value`.
+ * Named attributes can be formatted as either `name="value"`, `name='value'`,
+ * or `name=value`. Numeric attributes can be formatted as `"value"` or just
+ * `value`.
  *
- * @param {Object} text                         )             {	var named [description]
- * @param {Array}  numeric                      [description]
- * @param {[type]} pattern                      [description]
- * @param {RegExp} match;															pattern [description]
+ * @param {string} text Serialised shortcode attributes.
  *
- * @return {[type]} [description]
+ * @return {WPShortcodeAttrs} Parsed shortcode attributes.
  */
 export const attrs = memize( ( text ) => {
 	const named = {};
 	const numeric = [];
 
-	// This regular expression is reused from `shortcode_parse_atts()`
-	// in `wp-includes/shortcodes.php`.
+	// This regular expression is reused from `shortcode_parse_atts()` in
+	// `wp-includes/shortcodes.php`.
 	//
 	// Capture groups:
 	//
@@ -200,13 +212,13 @@ export const attrs = memize( ( text ) => {
 /**
  * Generate a Shortcode Object from a RegExp match.
  *
- * Accepts a `match` object from calling `regexp.exec()` on a `RegExp`
- * generated by `wp.shortcode.regexp()`. `match` can also be set to the
- * `arguments` from a callback passed to `regexp.replace()`.
+ * Accepts a `match` object from calling `regexp.exec()` on a `RegExp` generated
+ * by `regexp()`. `match` can also be set to the `arguments` from a callback
+ * passed to `regexp.replace()`.
  *
- * @param {[type]} match [description]
+ * @param {Array} match Match array.
  *
- * @return {[type]} [description]
+ * @return {WPShortcode} Shortcode instance.
  */
 export function fromMatch( match ) {
 	let type;
@@ -228,15 +240,16 @@ export function fromMatch( match ) {
 }
 
 /**
- * Shortcode Objects.
- *
- * Shortcode objects are generated automatically when using the main
- * `wp.shortcode` methods: `next()`, `replace()`, and `string()`.
+ * Creates a shortcode instance.
  *
  * To access a raw representation of a shortcode, pass an `options` object,
- * containing a `tag` string, a string or object of `attrs`, a string
- * indicating the `type` of the shortcode ('single', 'self-closing', or
- * 'closed'), and a `content` string.
+ * containing a `tag` string, a string or object of `attrs`, a string indicating
+ * the `type` of the shortcode ('single', 'self-closing', or 'closed'), and a
+ * `content` string.
+ *
+ * @param {Object} options Options as described.
+ *
+ * @return {WPShortcode} Shortcode instance.
  */
 const shortcode = extend( function( options ) {
 	extend( this, pick( options || {}, 'tag', 'attrs', 'type', 'content' ) );
@@ -279,12 +292,12 @@ extend( shortcode.prototype, {
 	/**
 	 * Get a shortcode attribute.
 	 *
-	 * Automatically detects whether `attr` is named or numeric and routes
-	 * it accordingly.
+	 * Automatically detects whether `attr` is named or numeric and routes it
+	 * accordingly.
 	 *
-	 * @param {[type]} attr [description]
+	 * @param {(number|string)} attr Attribute key.
 	 *
-	 * @return {[type]} [description]
+	 * @return {string} Attribute value.
 	 */
 	get( attr ) {
 		return this.attrs[ isNumber( attr ) ? 'numeric' : 'named' ][ attr ];
@@ -293,13 +306,13 @@ extend( shortcode.prototype, {
 	/**
 	 * Set a shortcode attribute.
 	 *
-	 * Automatically detects whether `attr` is named or numeric and routes
-	 * it accordingly.
+	 * Automatically detects whether `attr` is named or numeric and routes it
+	 * accordingly.
 	 *
-	 * @param {[type]} attr  [description]
-	 * @param {[type]} value [description]
+	 * @param {(number|string)} attr  Attribute key.
+	 * @param {string}          value Attribute value.
 	 *
-	 * @return {[type]} [description]
+	 * @return {WPShortcode} Shortcode instance.
 	 */
 	set( attr, value ) {
 		this.attrs[ isNumber( attr ) ? 'numeric' : 'named' ][ attr ] = value;
@@ -307,9 +320,9 @@ extend( shortcode.prototype, {
 	},
 
 	/**
-	 * Transform the shortcode match into a string.
+	 * Transform the shortcode into a string.
 	 *
-	 * @return {[type]} [description]
+	 * @return {string} String representation of the shortcode.
 	 */
 	string() {
 		let text = '[' + this.tag;
@@ -326,8 +339,8 @@ extend( shortcode.prototype, {
 			text += ' ' + name + '="' + value + '"';
 		} );
 
-		// If the tag is marked as `single` or `self-closing`, close the
-		// tag and ignore any additional content.
+		// If the tag is marked as `single` or `self-closing`, close the tag and
+		// ignore any additional content.
 		if ( 'single' === this.type ) {
 			return text + ']';
 		} else if ( 'self-closing' === this.type ) {
