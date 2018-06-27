@@ -8,6 +8,7 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 import { focus } from '@wordpress/dom';
 import { keycodes } from '@wordpress/utils';
 
@@ -98,9 +99,12 @@ class Popover extends Component {
 	focus() {
 		const { focusOnMount } = this.props;
 
-		// Boolean values for focusOnMount deprecated in 3.2.
 		if ( focusOnMount === true ) {
-			window.console.warn( '<Popover> component: focusOnMount should be false or a string as of Gutenberg 3.2. See: https://github.com/WordPress/gutenberg/tree/master/components/popover/README.md' );
+			deprecated( 'focusOnMount={ true }', {
+				version: '3.4',
+				alternative: 'focusOnMount="firstElement"',
+				plugin: 'Gutenberg',
+			} );
 		}
 
 		if ( ! focusOnMount || ! this.contentNode.current ) {
@@ -111,6 +115,8 @@ class Popover extends Component {
 		// Related https://stackoverflow.com/questions/35522220/react-ref-with-focus-doesnt-work-without-settimeout-my-example
 		const focusNode = ( domNode ) => setTimeout( () => domNode.focus() );
 
+		// Boolean values for focusOnMount deprecated in 3.2–remove
+		// `focusOnMount === true` check in 3.4.
 		if ( focusOnMount === 'firstElement' || focusOnMount === true ) {
 			// Find first tabbable node within content and shift focus, falling
 			// back to the popover panel itself.

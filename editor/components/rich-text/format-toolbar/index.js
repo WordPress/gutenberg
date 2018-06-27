@@ -221,7 +221,7 @@ class FormatToolbar extends Component {
 						<div className="editor-format-toolbar__link-container" style={ { ...focusPosition } }>
 							<Popover
 								position="bottom center"
-								focusOnMount={ !! isAddingLink ? 'firstElement' : false }
+								focusOnMount={ isAddingLink ? 'firstElement' : false }
 								key={ selectedNodeId /* Used to force rerender on change */ }
 							>
 								{ isAddingLink && (
