@@ -2,7 +2,17 @@
 
 Keycodes utilities for WordPress, used to check the key pressed in events like `onKeyDown`. Contains keycodes constants for keyboard keys like `DOWN`, `UP`, `ENTER`, etc.
 
-Example usage:
+## Installation
+
+Install the module
+
+```bash
+npm install @wordpress/keycodes --save
+```
+
+## Usage
+
+Check which key was used in an `onKeyDown` event:
 
 ```js
 import { DOWN, ENTER } from '@wordpress/keycodes';
@@ -20,14 +30,6 @@ onKeyDown( event ) {
 		alert( 'You pressed another key.' );
 	}
 }
-```
-
-## Installation
-
-Install the module
-
-```bash
-npm install @wordpress/keycodes --save
 ```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
