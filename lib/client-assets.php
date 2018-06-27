@@ -518,8 +518,6 @@ function gutenberg_register_scripts_and_styles() {
 		);
 	}
 }
-add_action( 'wp_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
-add_action( 'admin_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
 
 /**
  * Append result of internal request to REST API for purpose of preloading
