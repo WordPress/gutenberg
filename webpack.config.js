@@ -158,6 +158,7 @@ const gutenbergPackages = [
 	'element',
 	'keycodes',
 	'plugins',
+	'shortcode',
 ];
 
 const wordPressPackages = [
