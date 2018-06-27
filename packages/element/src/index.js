@@ -214,13 +214,18 @@ export { flowRight as compose };
  *
  * @return {WPComponent} Component class with generated display name assigned.
  */
-export function createHigherOrderComponent( mapComponentToEnhancedComponent, modifierName ) {
+export function createHigherOrderComponent( mapComponentToEnhancedComponent,
+	modifierName,
+) {
 	return ( OriginalComponent ) => {
 		const EnhancedComponent = mapComponentToEnhancedComponent( OriginalComponent );
-		const { displayName = OriginalComponent.name || 'Component' } = OriginalComponent;
-		EnhancedComponent.displayName = `${ upperFirst( camelCase( modifierName ) ) }(${ displayName })`;
+		const forwardedRefComponent = ( props, ref ) => {
+			return <EnhancedComponent { ...props } forwardedRef={ ref } />;
+		};
 
-		return EnhancedComponent;
+		const { displayName = OriginalComponent.name || 'Component' } = OriginalComponent;
+		forwardedRefComponent.displayName = `${ upperFirst( camelCase( modifierName ) ) }(${ displayName })`;
+		return forwardRef( forwardedRefComponent ).render;
 	};
 }
 
