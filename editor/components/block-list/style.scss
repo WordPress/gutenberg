@@ -136,6 +136,9 @@
 	padding-left: $block-padding;
 	padding-right: $block-padding;
 
+	// Break long strings of text without spaces so they don't overflow the block.
+	overflow-wrap: break-word;
+
 	@include break-small() {
 		// The block mover needs to stay inside the block to allow clicks when hovering the block
 		padding-left: $block-padding + $block-side-ui-padding - $border-width;
@@ -929,5 +932,32 @@
 
 	.rtl & {
 		content: '←';
+	}
+}
+
+.editor-block-list__block {
+	@include break-small {
+		// Increase the hover and selection area around blocks.
+		// This makes the blue hover line and the settings button appear even if
+		// the mouse cursor is technically outside the block.
+		// This improves usability by making it possible to click somewhat outside
+		// the block and select it. (eg. A fuzzy click target.)
+		&:before {
+			bottom: 0;
+			content: '';
+			left: -$parent-block-padding - $block-padding;
+			position: absolute;
+			right: -$parent-block-padding - $block-padding;
+			top: 0;
+		}
+
+		// Remove the fuzzy click area effect set above on nested blocks.
+		// It should only applies to top-level blocks; applying this rule to
+		// nested blocks will result in difficult-to-use and possibly overlapping
+		// click targets.
+		& &:before {
+			left: 0;
+			right: 0;
+		}
 	}
 }
