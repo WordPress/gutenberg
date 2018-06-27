@@ -89,6 +89,7 @@ export const settings = {
 
 	styles: [
 		{ name: 'default', label: __( 'Rounded' ), isDefault: true },
+		{ name: 'outline', label: __( 'Outline' ) },
 		{ name: 'squared', label: __( 'Squared' ) },
 	],
 
