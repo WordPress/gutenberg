@@ -291,9 +291,9 @@ class Popover extends Component {
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
 
-		// Apply focus return behavior except when default focus on open
-		// behavior is disabled.
-		if ( ! focusOnMount ) {
+		// Apply focus to element as long as focusOnMount is truthy; false is
+		// the only "disabled" value.
+		if ( focusOnMount ) {
 			content = <FocusManaged>{ content }</FocusManaged>;
 		}
 
