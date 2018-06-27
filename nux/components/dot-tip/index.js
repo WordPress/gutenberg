@@ -1,13 +1,8 @@
 /**
- * External dependencies
- */
-import { defer } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Component, createRef, compose } from '@wordpress/element';
-import { Popover, Button, IconButton } from '@wordpress/components';
+import { Popover, Button, IconButton, withSafeTimeout } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -24,16 +19,18 @@ export class DotTip extends Component {
 	}
 
 	componentDidMount() {
-		if ( this.props.isVisible ) {
+		const { isVisible, setTimeout } = this.props;
+
+		if ( isVisible ) {
 			// Force the popover to recalculate its position on the next frame. This
 			// fixes the tip not appearing next to the inserter toggle on page load. This
 			// happens because the popover calculates its position before <PostTitle> is
 			// made visible, resulting in the position being too high on the page.
-			defer( () => {
+			setTimeout( () => {
 				const popover = this.popoverRef.current;
 				popover.refresh();
 				popover.focus();
-			} );
+			}, 0 );
 		}
 	}
 
@@ -74,6 +71,7 @@ export class DotTip extends Component {
 }
 
 export default compose(
+	withSafeTimeout,
 	withSelect( ( select, { id } ) => {
 		const { isTipVisible, getAssociatedGuide } = select( 'core/nux' );
 		const associatedGuide = getAssociatedGuide( id );
