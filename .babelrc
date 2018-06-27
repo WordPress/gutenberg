@@ -7,13 +7,12 @@
     [
       "module-resolver",
       {
+        "cwd": "babelrc",
         "alias": {
           "react-native-aztec": "./react-native-aztec",
-          "@wordpress/blocks": "./gutenberg/blocks",
-          "@wordpress/editor": "./gutenberg/editor",
-          "@wordpress/element": "./gutenberg/element",
-          "@wordpress/hooks": "./wordpress/hooks",
-          "@wordpress/utils": "./gutenberg/utils",
+          "@wordpress/blocks": "./blocks",
+          "@wordpress/editor": "./editor",
+          "@wordpress/element": "./element",
           "@gutenberg": "./gutenberg"
         },
         "extensions": [
