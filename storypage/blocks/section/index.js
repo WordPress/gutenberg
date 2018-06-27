@@ -9,7 +9,7 @@ export const name = 'storypage/section';
 export const settings = {
 	title: __( 'Section' ),
 
-	icon: 'columns',
+	icon: 'editor-table',
 
 	category: 'storypage',
 
@@ -20,11 +20,7 @@ export const settings = {
 	edit( { className } ) {
 		return (
 			<div className={ className }>
-				<InnerBlocks layouts={ {
-					name: 'section',
-					label: __( 'Section' ),
-					icon: 'columns',
-				} } />
+				<InnerBlocks />
 			</div>
 		);
 	},

@@ -5,6 +5,11 @@ import uuid from 'uuid/v4';
 import { partial, castArray } from 'lodash';
 
 /**
+ * Internal Dependencies
+ */
+import * as paragraph from '@wordpress/core-blocks/paragraph';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -696,11 +701,16 @@ export function convertBlockToShared( uid ) {
  * @return {Object} Action object
  */
 export function insertDefaultBlock( attributes, rootUID, index ) {
-	const block = createBlock( getDefaultBlockName(), attributes );
+	/**
+	 * @frontkom/gutenberg 0.2.1
+	 * @type {[type]}
+	 */
+	const blockName = rootUID === undefined ? getDefaultBlockName() : paragraph.name;
+	const block = createBlock( blockName, attributes );
 
 	return {
 		...insertBlock( block, index, rootUID ),
-		isProvisional: true,
+		isProvisional: blockName == paragraph.name,
 	};
 }
 
