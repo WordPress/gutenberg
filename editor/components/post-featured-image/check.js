@@ -1,4 +1,10 @@
 /**
+ * WordPress dependencies
+ */
+import { compose } from '@wordpress/element';
+import { withSelect } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
 import PostTypeSupportCheck from '../post-type-support-check';
@@ -13,4 +19,12 @@ function PostFeaturedImageCheck( props ) {
 	);
 }
 
-export default PostFeaturedImageCheck;
+const applyWithSelect = withSelect( ( select ) => {
+	const { getEditedPostAttribute } = select( 'core/editor' );
+	return {
+		postType: getEditedPostAttribute( 'type' ),
+	};
+} );
+export default compose(
+	applyWithSelect,
+)( PostFeaturedImageCheck );
