@@ -6,9 +6,10 @@
 	padding-left: 25px;
 	color: $dark-gray-500;
 
+	// Target plugin icons that can have arbitrary classes by using an aggressive selector.
 	.dashicon,
 	.components-menu-items__item-icon,
-	> span > svg { // Also target plugin icons that can have arbitrary classes.
+	> span > svg {
 		margin-right: 4px;
 	}
 
@@ -29,7 +30,7 @@
 		@include menu-style__focus;
 	}
 
-	// Colorize plugin icons to ensure contrast and cohesion, but allow plugin devs to override.
+	// Colorize plugin icons to ensure contrast and cohesion, but allow plugin developers to override.
 	svg,
 	svg * {
 		stroke: $dark-gray-500;
