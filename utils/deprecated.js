@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import * as blob from '@wordpress/blob';
+import * as keycodesSource from '@wordpress/keycodes';
 import originalDeprecated from '@wordpress/deprecated';
 
 const wrapFunction = ( source, sourceName, version ) =>
@@ -30,3 +31,24 @@ export function deprecated( ...params ) {
 
 	return originalDeprecated( ...params );
 }
+
+// keycodes
+const wrapKeycodeFunction = ( source, functionName ) => ( ...args ) => {
+	originalDeprecated( `wp.utils.keycodes.${ functionName }`, {
+		version: '3.3',
+		alternative: `wp.keycodes.${ functionName }`,
+		plugin: 'Gutenberg',
+	} );
+	return source( ...args );
+};
+
+const keycodes = { ...keycodesSource, rawShortcut: {}, displayShortcut: {}, isKeyboardEvent: {} };
+const modifiers = [ 'primary', 'primaryShift', 'secondary', 'access' ];
+keycodes.isMacOS = wrapKeycodeFunction( keycodes.isMacOS, 'isMacOS' );
+modifiers.forEach( ( modifier ) => {
+	keycodes.rawShortcut[ modifier ] = wrapKeycodeFunction( keycodesSource.rawShortcut[ modifier ], 'rawShortcut.' + modifier );
+	keycodes.displayShortcut[ modifier ] = wrapKeycodeFunction( keycodesSource.displayShortcut[ modifier ], 'displayShortcut.' + modifier );
+	keycodes.isKeyboardEvent[ modifier ] = wrapKeycodeFunction( keycodesSource.isKeyboardEvent[ modifier ], 'isKeyboardEvent.' + modifier );
+} );
+
+export { keycodes };

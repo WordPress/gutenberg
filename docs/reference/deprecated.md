@@ -8,6 +8,7 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
  - `blocks.BlockEdit` filter removed. Please use `editor.BlockEdit` instead.
  - `blocks.BlockListBlock` filter removed. Please use `editor.BlockListBlock` instead.
  - `blocks.MediaUpload` filter removed. Please use `editor.MediaUpload` instead.
+ - `wp.utils.keycodes` utilities are removed. Please use `wp.keycodes` instead.
 
 ## 3.2.0
 
