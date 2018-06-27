@@ -71,7 +71,7 @@ export class BlockSettingsMenu extends Component {
 						const toggleClassname = classnames( 'editor-block-settings-menu__toggle', {
 							'is-opened': isOpen,
 						} );
-						const label = isOpen ? __( 'Hide Options' ) : __( 'More Options' );
+						const label = isOpen ? __( 'Hide Options' ) : __( 'Show Options' );
 
 						return (
 							<IconButton
