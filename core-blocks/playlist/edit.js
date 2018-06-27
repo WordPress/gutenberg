@@ -60,6 +60,12 @@ class PlaylistEdit extends Component {
 		} );
 	}
 
+	toggleAttribute( attribute ) {
+		return ( newValue ) => {
+			this.props.setAttributes( { [ attribute ]: newValue } );
+		};
+	}
+
 	render() {
 		const { attributes, setAttributes, className } = this.props;
 		const { editing } = this.state;
@@ -79,22 +85,6 @@ class PlaylistEdit extends Component {
 		};
 
 		const mediaIds = this.props.attributes.ids && this.props.attributes.ids.replace( /^\[(.+)\]$/, '$1' ).split( ',' );
-
-		const onToggleTracklist = ( newVal ) => {
-			setAttributes( { tracklist: newVal } );
-		};
-
-		const onToggleArtists = ( newVal ) => {
-			setAttributes( { artists: newVal } );
-		};
-
-		const onToggleImages = ( newVal ) => {
-			setAttributes( { images: newVal } );
-		};
-
-		const onToggleStyle = ( newVal ) => {
-			setAttributes( { style: newVal } );
-		};
 
 		if ( editing ) {
 			return (
@@ -158,23 +148,23 @@ class PlaylistEdit extends Component {
 					<PanelBody title={ __( 'Playback Controls' ) }>
 						<CheckboxControl
 							label={ __( 'Show Tracklist' ) }
-							onChange={ onToggleTracklist }
+							onChange={ this.toggleAttribute( 'tracklist' ) }
 							checked={ tracklist }
 						/>
 						<CheckboxControl
 							label={ __( 'Show Artist Name in Tracklist' ) }
-							onChange={ onToggleArtists }
+							onChange={ this.toggleAttribute( 'artists' ) }
 							checked={ artists }
 						/>
 						<CheckboxControl
 							label={ __( 'Show Images' ) }
-							onChange={ onToggleImages }
+							onChange={ this.toggleAttribute( 'images' ) }
 							checked={ images }
 						/>
 						<SelectControl
 							label={ __( 'Playlist Style' ) }
 							value={ style }
-							onChange={ onToggleStyle }
+							onChange={ this.toggleAttribute( 'styleOptions' ) }
 							options={ styleOptions }
 						/>
 					</PanelBody>
