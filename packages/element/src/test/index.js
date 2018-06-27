@@ -16,6 +16,7 @@ import {
 	RawHTML,
 	pure,
 	createRef,
+	compose,
 } from '../';
 
 describe( 'element', () => {
@@ -187,9 +188,18 @@ describe( 'element', () => {
 			function SomeComponent() {
 				return <div />;
 			}
-			const TestComponent = createHigherOrderComponent(
-				( OriginalComponent ) => OriginalComponent,
-				'withTest'
+			function SomeComponent2() {
+				return <div />;
+			}
+			const TestComponent = compose(
+				createHigherOrderComponent(
+					( OriginalComponent ) => OriginalComponent,
+					'withTest'
+				),
+				createHigherOrderComponent(
+					( OriginalComponent ) => OriginalComponent,
+					'withTest2'
+				)
 			)( SomeComponent );
 			const testRef = createRef();
 			const element = shallow( <TestComponent ref={ testRef } /> );
