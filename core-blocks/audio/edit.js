@@ -122,7 +122,7 @@ class AudioEdit extends Component {
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
 							value={ caption }
-							onChange={ this.toggleAttribute( 'caption' ) }
+							onChange={ ( value ) => setAttributes( { caption: value } ) }
 							inlineToolbar
 						/>
 					) }
