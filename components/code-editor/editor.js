@@ -2,12 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { keycodes } from '@wordpress/utils';
-
-/**
- * Module constants
- */
-const { UP, DOWN } = keycodes;
+import { UP, DOWN } from '@wordpress/utils';
 
 class CodeEditor extends Component {
 	constructor() {

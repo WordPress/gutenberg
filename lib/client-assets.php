@@ -155,6 +155,13 @@ function gutenberg_register_scripts_and_styles() {
 		true
 	);
 	wp_register_script(
+		'wp-keycodes',
+		gutenberg_url( 'build/keycodes/index.js' ),
+		array( 'lodash' ),
+		filemtime( gutenberg_dir_path() . 'build/keycodes/index.js' ),
+		true
+	);
+	wp_register_script(
 		'wp-data',
 		gutenberg_url( 'build/data/index.js' ),
 		array( 'wp-deprecated', 'wp-element', 'wp-is-shallow-equal', 'lodash' ),
@@ -244,6 +251,7 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-hooks',
 			'wp-i18n',
 			'wp-is-shallow-equal',
+			'wp-keycodes',
 			'wp-utils',
 		),
 		filemtime( gutenberg_dir_path() . 'build/components/index.js' ),
@@ -284,6 +292,7 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-element',
 			'wp-editor',
 			'wp-i18n',
+			'wp-keycodes',
 			'wp-utils',
 			'wp-viewport',
 			'wp-api-request',
@@ -387,6 +396,7 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-deprecated',
 			'wp-dom',
 			'wp-i18n',
+			'wp-keycodes',
 			'wp-element',
 			'wp-plugins',
 			'wp-utils',
@@ -419,9 +429,9 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-element',
 			'wp-embed',
 			'wp-i18n',
+			'wp-keycodes',
 			'wp-plugins',
 			'wp-viewport',
-			'wp-utils',
 		),
 		filemtime( gutenberg_dir_path() . 'build/edit-post/index.js' ),
 		true

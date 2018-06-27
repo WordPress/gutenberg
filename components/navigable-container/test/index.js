@@ -7,14 +7,12 @@ import { each } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { keycodes } from '@wordpress/utils';
+import { UP, DOWN, TAB, LEFT, RIGHT, SPACE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import { TabbableContainer, NavigableMenu } from '../';
-
-const { UP, DOWN, TAB, LEFT, RIGHT, SPACE } = keycodes;
 
 function simulateVisible( wrapper, selector ) {
 	const elements = wrapper.getDOMNode().querySelectorAll( selector );

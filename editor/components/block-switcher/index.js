@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 import { Dropdown, IconButton, Toolbar, PanelBody } from '@wordpress/components';
 import { getBlockType, getPossibleBlockTransformations, switchToBlockType, hasChildBlocks } from '@wordpress/blocks';
 import { compose, Component, Fragment } from '@wordpress/element';
-import { keycodes } from '@wordpress/utils';
+import { DOWN } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
@@ -21,11 +21,6 @@ import BlockIcon from '../block-icon';
 import BlockStyles from '../block-styles';
 import BlockPreview from '../block-preview';
 import BlockTypesList from '../block-types-list';
-
-/**
- * Module Constants
- */
-const { DOWN } = keycodes;
 
 export class BlockSwitcher extends Component {
 	constructor() {

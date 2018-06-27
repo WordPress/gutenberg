@@ -7,14 +7,12 @@ import { shallow } from 'enzyme';
  * WordPress dependencies
  */
 import { registerCoreBlocks } from '@wordpress/core-blocks';
-import { keycodes } from '@wordpress/utils';
+import { DOWN } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import { BlockSwitcher } from '../';
-
-const { DOWN } = keycodes;
 
 describe( 'BlockSwitcher', () => {
 	const headingBlock1 = {
