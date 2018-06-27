@@ -346,8 +346,31 @@ class ImageEdit extends Component {
 							const minWidth = imageWidth < imageHeight ? MIN_SIZE : MIN_SIZE * ratio;
 							const minHeight = imageHeight < imageWidth ? MIN_SIZE : MIN_SIZE / ratio;
 
-							const showRightHandle = ( isRTL && ( align === 'left' || align === 'center' ) || ! isRTL && align !== 'right' );
-							const showLeftHandle = ( isRTL && align !== 'left' || ! isRTL && ( align === 'right' || align === 'center' ) );
+							let showRightHandle = false;
+							let showLeftHandle = false;
+
+							if ( align === 'center' ) {
+								// When the image is centered, show both handles.
+								showRightHandle = true;
+								showLeftHandle = true;
+							} else if ( isRTL ) {
+								// In RTL mode the image is on the right by default.
+								// Show the right handle and hide the left handle only when it is aligned left.
+								// Otherwise always show the left handle.
+								if ( align === 'left' ) {
+									showRightHandle = true;
+								} else {
+									showLeftHandle = true;
+								}
+							} else {
+								// Show the left handle and hide the right handle only when the image is aligned right.
+								// Otherwise always show the right handle.
+								if ( align === 'right' ) {
+									showLeftHandle = true;
+								} else {
+									showRightHandle = true;
+								}
+							}
 
 							return (
 								<Fragment>
