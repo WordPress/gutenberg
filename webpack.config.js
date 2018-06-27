@@ -156,6 +156,7 @@ const gutenbergPackages = [
 	'deprecated',
 	'dom',
 	'element',
+	'keycodes',
 	'plugins',
 ];
 

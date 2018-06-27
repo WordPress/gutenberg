@@ -11,7 +11,7 @@ import {
 	withSpokenMessages,
 	Popover,
 } from '@wordpress/components';
-import { keycodes } from '@wordpress/utils';
+import { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER, displayShortcut } from '@wordpress/keycodes';
 import { prependHTTP } from '@wordpress/url';
 
 /**
@@ -20,8 +20,6 @@ import { prependHTTP } from '@wordpress/url';
 import './style.scss';
 import UrlInput from '../../url-input';
 import { filterURLForDisplay } from '../../../utils/url';
-
-const { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER, displayShortcut } = keycodes;
 
 const FORMATTING_CONTROLS = [
 	{

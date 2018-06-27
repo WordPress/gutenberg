@@ -9,14 +9,9 @@ import classnames from 'classnames';
 import { Component } from '@wordpress/element';
 import { IconButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { keycodes } from '@wordpress/utils';
+import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { withSelect } from '@wordpress/data';
 import { RichText } from '@wordpress/editor';
-
-/**
- * Module constants
- */
-const { BACKSPACE, DELETE } = keycodes;
 
 class GalleryImage extends Component {
 	constructor() {

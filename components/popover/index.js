@@ -10,7 +10,7 @@ import { noop } from 'lodash';
 import { Component, createRef } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 import { focus } from '@wordpress/dom';
-import { keycodes } from '@wordpress/utils';
+import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -24,8 +24,6 @@ import ScrollLock from '../scroll-lock';
 import { Slot, Fill } from '../slot-fill';
 
 const FocusManaged = withFocusReturn( ( { children } ) => children );
-
-const { ESCAPE } = keycodes;
 
 /**
  * Name of slot in which popover should fill.

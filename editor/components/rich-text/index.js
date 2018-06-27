@@ -25,7 +25,7 @@ import {
 	getScrollContainer,
 } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
-import { keycodes } from '@wordpress/utils';
+import { BACKSPACE, DELETE, ENTER, rawShortcut } from '@wordpress/keycodes';
 import { withInstanceId, withSafeTimeout, Slot } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { rawHandler } from '@wordpress/blocks';
@@ -42,8 +42,6 @@ import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
 import { domToFormat, valueToString } from './format';
-
-const { BACKSPACE, DELETE, ENTER, rawShortcut } = keycodes;
 
 /**
  * Returns true if the node is the inline node boundary. This is used in node
