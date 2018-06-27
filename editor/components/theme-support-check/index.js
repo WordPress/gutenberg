@@ -14,7 +14,7 @@ import {
  */
 import { withSelect } from '@wordpress/data';
 
-export function ThemeSupportCheck( { themeSupports, children, postType = null, supportKeys } ) {
+export function ThemeSupportCheck( { themeSupports, children, postType, supportKeys } ) {
 	const isSupported = some(
 		castArray( supportKeys ), ( key ) => {
 			const supported = get( themeSupports, [ key ], false );
@@ -23,7 +23,7 @@ export function ThemeSupportCheck( { themeSupports, children, postType = null, s
 			// within `supported`. If `postType` isn't passed, then the check
 			// should fail.
 			if ( 'post-thumbnails' === key && isArray( supported ) ) {
-				if ( null === postType ) {
+				if ( ! postType ) {
 					return false;
 				}
 				return includes( supported, postType );
@@ -41,7 +41,9 @@ export function ThemeSupportCheck( { themeSupports, children, postType = null, s
 
 export default withSelect( ( select ) => {
 	const { getThemeSupports } = select( 'core' );
+	const { getEditedPostAttribute } = select( 'core/editor' );
 	return {
+		postType: getEditedPostAttribute( 'type' ),
 		themeSupports: getThemeSupports(),
 	};
 } )( ThemeSupportCheck );
