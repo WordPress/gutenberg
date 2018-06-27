@@ -3,7 +3,12 @@
  */
 import { createContext } from '@wordpress/element';
 
-const { Consumer, Provider } = createContext( null );
+/**
+ * Internal dependencies
+ */
+import defaultRegistry from '../../default-registry';
+
+const { Consumer, Provider } = createContext( defaultRegistry );
 
 export const RegistryConsumer = Consumer;
 

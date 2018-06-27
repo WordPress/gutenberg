@@ -11,7 +11,6 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 /**
  * Internal dependencies
  */
-import defaultRegistry from '../../default-registry';
 import { RegistryConsumer } from '../registry-provider';
 
 /**
@@ -40,9 +39,8 @@ const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( WrappedC
 			// A constant value is used as the fallback since it can be more
 			// efficiently shallow compared in case component is repeatedly
 			// rendered without its own merge props.
-			const select = props.registry ? props.registry.select : defaultRegistry.select;
 			const mergeProps = (
-				mapStateToProps( select, props.ownProps ) ||
+				mapStateToProps( props.registry.select, props.ownProps ) ||
 				DEFAULT_MERGE_PROPS
 			);
 
@@ -66,8 +64,7 @@ const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( WrappedC
 		}
 
 		subscribe() {
-			const subscribe = this.props.registry ? this.props.registry.subscribe : defaultRegistry.subscribe;
-			this.unsubscribe = subscribe( () => {
+			this.unsubscribe = this.props.registry.subscribe( () => {
 				if ( ! this.canRunSelection ) {
 					return;
 				}

@@ -17,7 +17,6 @@ import {
 /**
  * Internal dependencies
  */
-import defaultRegistry from '../../default-registry';
 import { RegistryConsumer } from '../registry-provider';
 
 /**
@@ -50,15 +49,13 @@ const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent(
 
 				proxyDispatch( propName, ...args ) {
 					// Original dispatcher is a pre-bound (dispatching) action creator.
-					const dispatch = this.props.registry ? this.props.registry.dispatch : defaultRegistry.dispatch;
-					mapDispatchToProps( dispatch, this.props.ownProps )[ propName ]( ...args );
+					mapDispatchToProps( this.props.registry.dispatch, this.props.ownProps )[ propName ]( ...args );
 				}
 
 				setProxyProps( props ) {
 					// Assign as instance property so that in reconciling subsequent
 					// renders, the assigned prop values are referentially equal.
-					const dispatch = props.registry ? props.registry.dispatch : defaultRegistry.dispatch;
-					const propsToDispatchers = mapDispatchToProps( dispatch, props.ownProps );
+					const propsToDispatchers = mapDispatchToProps( this.props.registry.dispatch, props.ownProps );
 					this.proxyProps = mapValues( propsToDispatchers, ( dispatcher, propName ) => {
 						// Prebind with prop name so we have reference to the original
 						// dispatcher to invoke. Track between re-renders to avoid
