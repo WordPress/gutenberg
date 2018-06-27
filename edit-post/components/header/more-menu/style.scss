@@ -19,10 +19,3 @@
 		transform: rotate(90deg);
 	}
 }
-
-.edit-post-more-menu__content {
-	.components-menu-group:not(:last-child),
-	> div:not(:last-child) .components-menu-group {
-  		border-bottom: 1px solid $light-gray-500;
-	}
-}
