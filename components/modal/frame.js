@@ -2,7 +2,6 @@
  * External dependencies
  */
 import clickOutside from 'react-click-outside';
-import { forEach } from 'lodash';
 
 /**
  * WordPress dependencies
