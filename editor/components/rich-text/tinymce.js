@@ -168,7 +168,8 @@ export default class TinyMCE extends Component {
 			},
 		} );
 
-		settings.plugins.push( 'paste' );
+		settings.plugins.push( 'paste', 'noneditable' );
+		settings.noneditable_noneditable_class = 'readonly-token';
 
 		tinymce.init( {
 			...settings,

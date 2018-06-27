@@ -147,6 +147,17 @@ function isTextNode( node ) {
 }
 
 /**
+ * Is the node an element.
+ *
+ * @param {?Node} node The node to check.
+ *
+ * @return {boolean} True if the node is an element.
+ */
+function isElement( node ) {
+	return node !== null && node.nodeType === window.Node.ELEMENT_NODE;
+}
+
+/**
  * Return the node only if it is a text node, otherwise return null.
  *
  * @param {?Node} node The node to filter.
@@ -245,16 +256,41 @@ export class Autocomplete extends Component {
 			selection.focusNode === range.endContainer &&
 			selection.focusOffset <= range.endOffset;
 
-		// Wrap completions so we can treat them as tokens with editing boundaries.
-		const tokenWrapper = document.createElement( 'span' );
-		tokenWrapper.innerHTML = renderToString( replacement );
+		const tempContainer = document.createElement( 'div' );
+		tempContainer.innerHTML = renderToString( replacement );
 
-		// Remember the completer in case the user wants to edit the token.
-		tokenWrapper.dataset.autocompleter = completerName;
+		const isSingleNode = tempContainer.childNodes.length === 1;
+		let wrapper;
+		if ( isSingleNode && isTextNode( tempContainer.childNodes[ 0 ] ) ) {
+			// This represents a simple, textual, and editable autocompletion.
 
-		// Add classes for general and completer-specific styling.
-		tokenWrapper.classList.add( 'autocomplete-token' );
-		tokenWrapper.classList.add( `autocomplete-token-${ completerName }` );
+			wrapper = document.createElement( 'span' );
+			while ( tempContainer.childNodes.length > 0 ) {
+				wrapper.appendChild( tempContainer.firstChild );
+			}
+
+			// Remember the completer in case the user wants to edit the token.
+			wrapper.dataset.autocompleter = completerName;
+
+			// Add classes for general and completer-specific styling.
+			wrapper.classList.add( 'autocomplete-token' );
+			wrapper.classList.add( `autocomplete-token-${ completerName }` );
+		} else {
+			// This represents a custom autocompletion and is marked readonly,
+			// allowing it to be deleted but not edited.
+
+			if ( isSingleNode && isElement( tempContainer.childNodes[ 0 ] ) ) {
+				wrapper = tempContainer.childNodes[ 0 ];
+			} else {
+				wrapper = tempContainer;
+			}
+
+			// Explicitly communicate we intend this as a readonly token.
+			wrapper.classList.add( 'readonly-token' );
+
+			// Make new token readonly.
+			wrapper.contentEditable = false;
+		}
 
 		const existingTokenWrapper = this.getTokenWrapperNode( range.startContainer );
 		if ( existingTokenWrapper ) {
@@ -262,12 +298,12 @@ export class Autocomplete extends Component {
 			 * If we're within an existing token, we want to replace it rather
 			 * than inserting a completion within a completion.
 			 */
-			existingTokenWrapper.parentNode.replaceChild( tokenWrapper, existingTokenWrapper );
+			existingTokenWrapper.parentNode.replaceChild( wrapper, existingTokenWrapper );
 		} else {
-			range.insertNode( tokenWrapper );
+			range.insertNode( wrapper );
 		}
 
-		range.setStartAfter( tokenWrapper );
+		range.setStartAfter( wrapper );
 		range.deleteContents();
 
 		if ( shouldSetCursor ) {
@@ -281,11 +317,11 @@ export class Autocomplete extends Component {
 			 * adding and removing them as necessary as the keyboard is used to
 			 * move the cursor in and out of boundaries.
 			 */
-			tokenWrapper.parentNode.insertBefore(
+			wrapper.parentNode.insertBefore(
 				document.createTextNode( '\uFEFF' ),
-				tokenWrapper.nextSibling
+				wrapper.nextSibling
 			);
-			newCursorPosition.setStartAfter( tokenWrapper.nextSibling );
+			newCursorPosition.setStartAfter( wrapper.nextSibling );
 			selection.addRange( newCursorPosition );
 		}
 	}
