@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { attr } from 'hpq';
+import deepFreeze from 'deep-freeze';
 
 /**
  * Internal dependencies
@@ -11,7 +12,7 @@ import {
 	getBlockAttributes,
 	asType,
 	createBlockWithFallback,
-	getAttributesAndInnerBlocksFromDeprecatedVersion,
+	getMigratedBlock,
 	default as parse,
 	parseWithAttributeSchema,
 	toBooleanAttributeMatcher,
@@ -281,130 +282,173 @@ describe( 'block parser', () => {
 		} );
 	} );
 
-	describe( 'getAttributesAndInnerBlocksFromDeprecatedVersion', () => {
-		it( 'should return undefined if the block has no deprecated versions', () => {
-			const attributesAndInnerBlocks = getAttributesAndInnerBlocksFromDeprecatedVersion(
-				defaultBlockSettings,
-				'<span class="wp-block-test-block">Bananas</span>',
-				{},
-			);
-			expect( attributesAndInnerBlocks ).toBeUndefined();
+	describe( 'getMigratedBlock', () => {
+		it( 'should return the original block if it has no deprecated versions', () => {
+			const block = deepFreeze( {
+				name: 'core/test-block',
+				attributes: {},
+				originalContent: '<span class="wp-block-test-block">Bananas</span>',
+				isValid: false,
+			} );
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			const migratedBlock = getMigratedBlock( block );
+
+			expect( migratedBlock ).toBe( block );
 		} );
 
-		it( 'should return undefined if no valid deprecated version found', () => {
-			const attributesAndInnerBlocks = getAttributesAndInnerBlocksFromDeprecatedVersion(
-				{
-					name: 'core/test-block',
-					...defaultBlockSettings,
-					deprecated: [
-						{
-							save() {
-								return 'nothing';
-							},
+		it( 'should return the original block if no valid deprecated version found', () => {
+			const block = deepFreeze( {
+				name: 'core/test-block',
+				attributes: {},
+				originalContent: '<span class="wp-block-test-block">Bananas</span>',
+				isValid: false,
+			} );
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				deprecated: [
+					{
+						save() {
+							return 'nothing';
 						},
-					],
-				},
-				'<span class="wp-block-test-block">Bananas</span>',
-				{},
-			);
-			expect( attributesAndInnerBlocks ).toBeUndefined();
+					},
+				],
+			} );
+
+			const migratedBlock = getMigratedBlock( block );
+
+			expect( migratedBlock ).toBe( block );
 			expect( console ).toHaveErrored();
 			expect( console ).toHaveWarned();
 		} );
 
-		it( 'should return the attributes parsed by the deprecated version', () => {
-			const attributesAndInnerBlocks = getAttributesAndInnerBlocksFromDeprecatedVersion(
-				{
-					name: 'core/test-block',
-					...defaultBlockSettings,
-					save: ( props ) => <div>{ props.attributes.fruit }</div>,
-					deprecated: [
-						{
-							attributes: {
-								fruit: {
-									type: 'string',
-									source: 'text',
-									selector: 'span',
-								},
+		it( 'should return with attributes parsed by the deprecated version', () => {
+			const block = deepFreeze( {
+				name: 'core/test-block',
+				attributes: {},
+				originalContent: '<span>Bananas</span>',
+				isValid: false,
+			} );
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				save: ( props ) => <div>{ props.attributes.fruit }</div>,
+				deprecated: [
+					{
+						attributes: {
+							fruit: {
+								type: 'string',
+								source: 'text',
+								selector: 'span',
 							},
-							save: ( props ) => <span>{ props.attributes.fruit }</span>,
 						},
-					],
-				},
-				'<span>Bananas</span>',
-				{},
-			);
-			expect( attributesAndInnerBlocks.attributes ).toEqual( { fruit: 'Bananas' } );
-		} );
+						save: ( props ) => <span>{ props.attributes.fruit }</span>,
+					},
+				],
+			} );
 
-		it( 'should return the innerBlocks if they are passed', () => {
-			const attributesAndInnerBlocks = getAttributesAndInnerBlocksFromDeprecatedVersion(
-				{
-					name: 'core/test-block',
-					...defaultBlockSettings,
-					save: ( props ) => <div>{ props.attributes.fruit }</div>,
-					deprecated: [
-						{
-							attributes: {
-								fruit: {
-									type: 'string',
-									source: 'text',
-									selector: 'span',
-								},
-							},
-							save: ( props ) => <span>{ props.attributes.fruit }</span>,
-						},
-					],
-				},
-				'<span>Bananas</span>',
-				{},
-				[ {
-					name: 'core/test-block',
-					attributes: { aaa: 'bbb' },
-				} ]
-			);
+			const migratedBlock = getMigratedBlock( block );
 
-			expect( attributesAndInnerBlocks.innerBlocks ).toHaveLength( 1 );
-			expect( attributesAndInnerBlocks.innerBlocks[ 0 ].name ).toEqual( 'core/test-block' );
-			expect( attributesAndInnerBlocks.innerBlocks[ 0 ].attributes ).toEqual( { aaa: 'bbb' } );
+			expect( migratedBlock.attributes ).toEqual( { fruit: 'Bananas' } );
 		} );
 
 		it( 'should be able to migrate attributes and innerBlocks', () => {
-			const attributesAndInnerBlocks = getAttributesAndInnerBlocksFromDeprecatedVersion(
-				{
-					name: 'core/test-block',
-					...defaultBlockSettings,
-					save: ( props ) => <div>{ props.attributes.fruit }</div>,
-					deprecated: [
-						{
-							attributes: {
-								fruit: {
-									type: 'string',
-									source: 'text',
-									selector: 'span',
-								},
-							},
-							save: ( props ) => <span>{ props.attributes.fruit }</span>,
-							migrate: ( attributes ) => {
-								return [
-									{ newFruit: attributes.fruit },
-									[ {
-										name: 'core/test-block',
-										attributes: { aaa: 'bbb' },
-									} ],
-								];
+			const block = deepFreeze( {
+				name: 'core/test-block',
+				attributes: {},
+				originalContent: '<span>Bananas</span>',
+				isValid: false,
+			} );
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				save: ( props ) => <div>{ props.attributes.fruit }</div>,
+				deprecated: [
+					{
+						attributes: {
+							fruit: {
+								type: 'string',
+								source: 'text',
+								selector: 'span',
 							},
 						},
-					],
-				},
-				'<span>Bananas</span>',
-				{},
-			);
+						save: ( props ) => <span>{ props.attributes.fruit }</span>,
+						migrate: ( attributes ) => {
+							return [
+								{ newFruit: attributes.fruit },
+								[ {
+									name: 'core/test-block',
+									attributes: { aaa: 'bbb' },
+								} ],
+							];
+						},
+					},
+				],
+			} );
 
-			expect( attributesAndInnerBlocks.attributes ).toEqual( { newFruit: 'Bananas' } );
-			expect( attributesAndInnerBlocks.innerBlocks ).toHaveLength( 1 );
-			expect( attributesAndInnerBlocks.innerBlocks[ 0 ].name ).toEqual( 'core/test-block' );
-			expect( attributesAndInnerBlocks.innerBlocks[ 0 ].attributes ).toEqual( { aaa: 'bbb' } );
+			const migratedBlock = getMigratedBlock( block );
+
+			expect( migratedBlock.attributes ).toEqual( { newFruit: 'Bananas' } );
+			expect( migratedBlock.innerBlocks ).toHaveLength( 1 );
+			expect( migratedBlock.innerBlocks[ 0 ].name ).toEqual( 'core/test-block' );
+			expect( migratedBlock.innerBlocks[ 0 ].attributes ).toEqual( { aaa: 'bbb' } );
+		} );
+
+		it( 'should ignore valid uneligible blocks', () => {
+			const block = deepFreeze( {
+				name: 'core/test-block',
+				attributes: {
+					fruit: 'Bananas',
+				},
+				originalContent: 'Bananas',
+				isValid: true,
+			} );
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				deprecated: [
+					{
+						attributes: defaultBlockSettings.attributes,
+						save: defaultBlockSettings.save,
+						migrate( attributes ) {
+							return {
+								fruit: attributes.fruit + '!',
+							};
+						},
+					},
+				],
+			} );
+
+			const migratedBlock = getMigratedBlock( block );
+
+			expect( migratedBlock.attributes ).toEqual( { fruit: 'Bananas' } );
+		} );
+
+		it( 'should allow opt-in eligibility of valid block', () => {
+			const block = deepFreeze( {
+				name: 'core/test-block',
+				attributes: {
+					fruit: 'Bananas',
+				},
+				originalContent: 'Bananas',
+				isValid: true,
+			} );
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				deprecated: [
+					{
+						attributes: defaultBlockSettings.attributes,
+						save: defaultBlockSettings.save,
+						isEligible: () => true,
+						migrate( attributes ) {
+							return {
+								fruit: attributes.fruit + '!',
+							};
+						},
+					},
+				],
+			} );
+
+			const migratedBlock = getMigratedBlock( block );
+
+			expect( migratedBlock.attributes ).toEqual( { fruit: 'Bananas!' } );
 		} );
 	} );
 

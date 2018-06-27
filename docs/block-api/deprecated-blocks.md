@@ -5,9 +5,17 @@ When updating static blocks markup and attributes, block authors need to conside
  - Do not deprecate the block and create a new one (a different name)
  - Provide a "deprecated" version of the block allowing users opening these blocks in Gutenberg to edit them using the updated block.
 
-A block can have several deprecated versions. Gutenberg will try them one after another until finding the one that matches the saved markup.
+A block can have several deprecated versions. A deprecation will be tried if a parsed block appears to be invalid, or if there is a deprecation defined for which its `isEligible` property function returns true.
 
-To declare a deprecated version, you need to copy the old `attributes`, `support` and `save` properties from the old definition to the `deprecated` property of the updated block.
+Deprecations are defined on a block type as its `deprecated` property, an array of deprecation objects where each object takes the form:
+
+- `attributes` (Object): The [attributes definition](../docs/block-api/attributes.md) of the deprecated form of the block.
+- `support` (Object): The [supports definition](../docs/block-api.md) of the deprecated form of the block.
+- `save` (Function): The [save implementation](../docs/block-api/block-edit-save.md) of the deprecated form of the block.
+- `migrate` (Function, Optional): A function which, given the attributes and inner blocks of the parsed block, is expected to return either the attributes compatible with the deprecated block, or a tuple array of `[ attributes, innerBlocks ]`.
+- `isEligible` (Function, Optional): A function which, given the attributes and inner blocks of the parsed block, returns true if the deprecation can handle the block migration. This is particularly useful in cases where a block is technically valid even once deprecated, and requires updates to its attributes or inner blocks.
+
+It's important to note that `attributes`, `support`, and `save` are not automatically inherited from the current version, since they can impact parsing and serialization of a block, so they must be defined on the deprecated object in order to be processed during a migration.
 
 ### Example:
 
