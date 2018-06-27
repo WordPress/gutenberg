@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * WordPress dependencies
  */
-import { createSimpleElement } from '@wordpress/blocks';
+import { createSimpleElement } from '@wordpress/element';
 
 /**
  * Internal dependencies

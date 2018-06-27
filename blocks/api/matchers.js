@@ -5,9 +5,9 @@ import { nodeListToReact, nodeToReact } from 'dom-react';
 export { attr, prop, html, text, query } from 'hpq';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { createSimpleElement } from './utils';
+import { createSimpleElement } from '@wordpress/element';
 
 export const children = ( selector ) => {
 	return ( domNode ) => {

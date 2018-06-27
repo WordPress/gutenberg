@@ -7,8 +7,7 @@ import { nodeListToReact } from 'dom-react';
 /**
  * WordPress dependencies
  */
-import { renderToString } from '@wordpress/element';
-import { createSimpleElement } from '@wordpress/blocks';
+import { renderToString, createSimpleElement } from '@wordpress/element';
 
 /**
  * Transforms a WP Element to its corresponding HTML string.

@@ -118,21 +118,3 @@ export function normalizeIconObject( icon ) {
 	}
 	return icon;
 }
-
-/**
- * Creates a simplified element representation.
- *
- * @param {string} type
- * @param {Object} props
- * @param {Array?} children
- *
- * @return {Object} Element.
- */
-export function createSimpleElement( type, props, ...children ) {
-	return {
-		type, props: {
-			...omit( props, [ 'key' ] ),
-			children,
-		},
-	};
-}
