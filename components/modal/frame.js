@@ -45,16 +45,17 @@ class ModalFrame extends Component {
 		}
 	}
 
+	/**
+	 * Focusses the first focusable with a `tabindex` of -1.
+	 */
 	focusFirstFocusable() {
 		const focusables = focus.focusable.find( this.containerRef.current );
-		if ( focusables.length ) {
-			forEach( focusables, ( focusable ) => {
-				if ( focusable.hasAttribute( 'tabindex', -1 ) ) {
-					focusable.focus();
-					return false;
-				}
-			} );
-		}
+		forEach( focusables, ( focusable ) => {
+			if ( focusable.getAttribute( 'tabindex' ) === '-1' ) {
+				focusable.focus();
+				return false;
+			}
+		} );
 	}
 
 	/**
