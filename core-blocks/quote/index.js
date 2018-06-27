@@ -60,8 +60,8 @@ export const settings = {
 	attributes: blockAttributes,
 
 	styles: [
-		{ name: 'default', label: __( 'Style 1' ), isDefault: true },
-		{ name: 'large', label: __( 'Style 2' ) },
+		{ name: 'default', label: __( 'Regular' ), isDefault: true },
+		{ name: 'large', label: __( 'Large' ) },
 	],
 
 	transforms: {
