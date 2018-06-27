@@ -220,7 +220,8 @@ export function createHigherOrderComponent( mapComponentToEnhancedComponent,
 	return ( OriginalComponent ) => {
 		const WrappedComponent = forwardRef(
 			( props, ref ) => {
-				return <OriginalComponent { ...props } forwardedRef={ ref } />;
+				const { forwardedRef = ref, ...rest } = props;
+				return <OriginalComponent { ...rest } forwardedRef={ forwardedRef } />;
 			}
 		);
 		const EnhancedComponent = mapComponentToEnhancedComponent( WrappedComponent );
