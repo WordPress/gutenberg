@@ -114,13 +114,18 @@ function BlockStyles( {
 						tabIndex="0"
 						aria-label={ sprintf( __( 'Apply style variation "%s"' ), style.label || style.name ) }
 					>
-						<BlockPreviewContent
-							name={ name }
-							attributes={ {
-								...attributes,
-								className: styleClassName,
-							} }
-						/>
+						<div className="editor-block-styles__item-preview">
+							<BlockPreviewContent
+								name={ name }
+								attributes={ {
+									...attributes,
+									className: styleClassName,
+								} }
+							/>
+						</div>
+						<div className="editor-block-styles__item-label">
+							{ style.label || style.name }
+						</div>
 					</div>
 				);
 				/* eslint-enable jsx-a11y/click-events-have-key-events */
