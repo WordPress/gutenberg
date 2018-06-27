@@ -35,7 +35,7 @@ export function deprecated( ...params ) {
 // keycodes
 const wrapKeycodeFunction = ( source, functionName ) => ( ...args ) => {
 	originalDeprecated( `wp.utils.keycodes.${ functionName }`, {
-		version: '3.3',
+		version: '3.4',
 		alternative: `wp.keycodes.${ functionName }`,
 		plugin: 'Gutenberg',
 	} );
