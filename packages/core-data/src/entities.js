@@ -66,7 +66,7 @@ export const getMethodName = ( kind, name, prefix = 'get', usePlural = false ) =
  *
  * @return {Array} Entities
  */
-export async function* getKindEntities( state, kind ) {
+export function* getKindEntities( state, kind ) {
 	let entities = getEntitiesByKind( state, kind );
 
 	if ( entities && entities.length !== 0 ) {
@@ -78,7 +78,7 @@ export async function* getKindEntities( state, kind ) {
 		return [];
 	}
 
-	entities = await kindConfig.loadEntities();
+	entities = yield kindConfig.loadEntities();
 	yield addEntities( entities );
 
 	return entities;

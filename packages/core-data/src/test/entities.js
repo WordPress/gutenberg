@@ -59,26 +59,27 @@ describe( 'getKindEntities', () => {
 		} );
 	} );
 
-	it( 'shouldn\'t do anything if the entities have already been resolved', async () => {
+	it( 'shouldn\'t do anything if the entities have already been resolved', () => {
 		const state = {
 			entities: { config: [ { kind: 'postType' } ] },
 		};
 		const fulfillment = getKindEntities( state, 'postType' );
-		const done = ( await fulfillment.next() ).done;
+		const done = fulfillment.next().done;
 		expect( done ).toBe( true );
 	} );
 
-	it( 'shouldn\'t do anything if there no defined kind config', async () => {
+	it( 'shouldn\'t do anything if there no defined kind config', () => {
 		const state = { entities: { config: [] } };
 		const fulfillment = getKindEntities( state, 'unknownKind' );
-		const done = ( await fulfillment.next() ).done;
+		const done = fulfillment.next().done;
 		expect( done ).toBe( true );
 	} );
 
 	it( 'should fetch and add the entities', async () => {
 		const state = { entities: { config: [] } };
 		const fulfillment = getKindEntities( state, 'postType' );
-		const received = ( await fulfillment.next() ).value;
+		const receivedEntities = await fulfillment.next().value;
+		const received = ( fulfillment.next( receivedEntities ) ).value;
 		expect( received ).toEqual( addEntities( [ {
 			baseUrl: '/wp/v2/posts',
 			kind: 'postType',

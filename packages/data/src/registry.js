@@ -3,83 +3,12 @@
  */
 import { createStore } from 'redux';
 import { flowRight, without, mapValues, overEvery, get } from 'lodash';
+import createStoreRuntime from './runtime';
 
 /**
  * Internal dependencies
  */
 import dataStore from './store';
-
-/**
- * Returns true if the given argument appears to be a dispatchable action.
- *
- * @param {*} action Object to test.
- *
- * @return {boolean} Whether object is action-like.
- */
-export function isActionLike( action ) {
-	return (
-		!! action &&
-		typeof action.type === 'string'
-	);
-}
-
-/**
- * Returns true if the given object is an async iterable, or false otherwise.
- *
- * @param {*} object Object to test.
- *
- * @return {boolean} Whether object is an async iterable.
- */
-export function isAsyncIterable( object ) {
-	return (
-		!! object &&
-		typeof object[ Symbol.asyncIterator ] === 'function'
-	);
-}
-
-/**
- * Returns true if the given object is iterable, or false otherwise.
- *
- * @param {*} object Object to test.
- *
- * @return {boolean} Whether object is iterable.
- */
-export function isIterable( object ) {
-	return (
-		!! object &&
-		typeof object[ Symbol.iterator ] === 'function'
-	);
-}
-
-/**
- * Normalizes the given object argument to an async iterable, asynchronously
- * yielding on a singular or array of generator yields or promise resolution.
- *
- * @param {*} object Object to normalize.
- *
- * @return {AsyncGenerator} Async iterable actions.
- */
-export function toAsyncIterable( object ) {
-	if ( isAsyncIterable( object ) ) {
-		return object;
-	}
-
-	return ( async function* () {
-		// Normalize as iterable...
-		if ( ! isIterable( object ) ) {
-			object = [ object ];
-		}
-
-		for ( let maybeAction of object ) {
-			// ...of Promises.
-			if ( ! ( maybeAction instanceof Promise ) ) {
-				maybeAction = Promise.resolve( maybeAction );
-			}
-
-			yield await maybeAction;
-		}
-	}() );
-}
 
 export function createRegistry( storeConfigs = {} ) {
 	const namespaces = {};
@@ -106,7 +35,10 @@ export function createRegistry( storeConfigs = {} ) {
 			enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__( { name: reducerKey, instanceId: reducerKey } ) );
 		}
 		const store = createStore( reducer, flowRight( enhancers ) );
-		namespaces[ reducerKey ] = { store };
+		namespaces[ reducerKey ] = {
+			runtime: createStoreRuntime( store ),
+			store,
+		};
 
 		// Customize subscribe behavior to call listeners only on effective change,
 		// not on every dispatch.
@@ -159,6 +91,7 @@ export function createRegistry( storeConfigs = {} ) {
 			}
 
 			const store = namespaces[ reducerKey ].store;
+			const runtime = namespaces[ reducerKey ].runtime;
 
 			// Normalize resolver shape to object.
 			let resolver = newResolvers[ selectorName ];
@@ -166,7 +99,7 @@ export function createRegistry( storeConfigs = {} ) {
 				resolver = { fulfill: resolver };
 			}
 
-			async function fulfill( ...args ) {
+			function fulfill( ...args ) {
 				if ( hasStartedResolution( reducerKey, selectorName, args ) ) {
 					return;
 				}
@@ -177,27 +110,15 @@ export function createRegistry( storeConfigs = {} ) {
 				// state, it would not be otherwise provided to fulfill.
 				const state = store.getState();
 
-				let fulfillment = resolver.fulfill( state, ...args );
-
-				// Attempt to normalize fulfillment as async iterable.
-				fulfillment = toAsyncIterable( fulfillment );
-				if ( ! isAsyncIterable( fulfillment ) ) {
-					return;
-				}
-
-				for await ( const maybeAction of fulfillment ) {
-				// Dispatch if it quacks like an action.
-					if ( isActionLike( maybeAction ) ) {
-						store.dispatch( maybeAction );
-					}
-				}
-
-				finishResolution( reducerKey, selectorName, args );
+				const fulfillment = resolver.fulfill( state, ...args );
+				runtime( fulfillment, () => {
+					finishResolution( reducerKey, selectorName, args );
+				} );
 			}
 
 			if ( typeof resolver.isFulfilled === 'function' ) {
-			// When resolver provides its own fulfillment condition, fulfill
-			// should only occur if not already fulfilled (opt-out condition).
+				// When resolver provides its own fulfillment condition, fulfill
+				// should only occur if not already fulfilled (opt-out condition).
 				fulfill = overEvery( [
 					( ...args ) => {
 						const state = store.getState();
@@ -224,8 +145,8 @@ export function createRegistry( storeConfigs = {} ) {
 	 * @param {Object} newActions   Actions to register.
 	 */
 	function registerActions( reducerKey, newActions ) {
-		const store = namespaces[ reducerKey ].store;
-		const createBoundAction = ( action ) => ( ...args ) => store.dispatch( action( ...args ) );
+		const runtime = namespaces[ reducerKey ].runtime;
+		const createBoundAction = ( action ) => ( ...args ) => runtime( action( ...args ) );
 		namespaces[ reducerKey ].actions = mapValues( newActions, createBoundAction );
 	}
 
