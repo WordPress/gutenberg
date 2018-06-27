@@ -2,6 +2,7 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 
 ## 3.4.0
 
+ - `focusOnMount` prop in the `Popover` component has been changed from `Boolean`-only to an enum-style property that accepts `"firstElement"`, `"container"`, or `false`. Please convert any `<Popover focusOnMount />` usage to `<Popover focusOnMount="firstElement" />`.
  - `wp.utils.keycodes` utilities are removed. Please use `wp.keycodes` instead.
 
 ## 3.3.0
