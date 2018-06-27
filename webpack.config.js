@@ -11,8 +11,8 @@ const { basename } = require( 'path' );
 /**
  * WordPress dependencies
  */
-const CustomTemplatedPathPlugin = require( './packages/custom-templated-path-webpack-plugin' );
-const LibraryExportDefaultPlugin = require( './packages/library-export-default-webpack-plugin' );
+const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
+const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-webpack-plugin' );
 
 // Main CSS loader for everything but blocks..
 const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
@@ -42,7 +42,7 @@ const extractConfig = {
 			loader: 'postcss-loader',
 			options: {
 				plugins: [
-					require( './packages/postcss-themes' )( {
+					require( '@wordpress/postcss-themes' )( {
 						defaults: {
 							primary: '#0085ba',
 							secondary: '#11a0d2',

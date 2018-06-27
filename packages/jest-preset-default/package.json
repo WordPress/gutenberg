@@ -26,8 +26,8 @@
 	],
 	"main": "index.js",
 	"dependencies": {
-		"@wordpress/jest-console": "^1.0.7",
-		"babel-jest": "^22.1.0",
+		"@wordpress/jest-console": "file:../jest-console",
+		"babel-jest": "^22.4.4",
 		"enzyme": "^3.3.0",
 		"enzyme-adapter-react-16": "^1.1.1",
 		"jest-enzyme": "^4.0.2",

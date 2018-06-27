@@ -19,8 +19,8 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"@wordpress/element": "^1.0.0-alpha.1",
-		"@wordpress/hooks": "^1.2.0",
+		"@wordpress/element": "file:../element",
+		"@wordpress/hooks": "file:../hooks",
 		"lodash": "4.17.10"
 	},
 	"publishConfig": {

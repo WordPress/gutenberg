@@ -22,7 +22,7 @@
 		"node": ">=8"
 	},
 	"dependencies": {
-		"@wordpress/browserslist-config": "^2.1.4",
+		"@wordpress/browserslist-config": "file:../browserslist-config",
 		"babel-plugin-transform-async-generator-functions": "^6.24.1",
 		"babel-plugin-transform-object-rest-spread": "^6.23.0",
 		"babel-plugin-transform-react-jsx": "^6.24.1",

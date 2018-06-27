@@ -25,7 +25,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"jest-matcher-utils": "^22.4.0",
+		"jest-matcher-utils": "^22.4.3",
 		"lodash": "4.17.10"
 	},
 	"peerDependencies": {

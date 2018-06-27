@@ -20,7 +20,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"@wordpress/dom-ready": "^1.0.4"
+		"@wordpress/dom-ready": "file:../dom-ready"
 	},
 	"publishConfig": {
 		"access": "public"

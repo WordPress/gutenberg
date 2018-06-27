@@ -15,15 +15,23 @@
 		"npm": ">=6.0.0"
 	},
 	"dependencies": {
-		"@wordpress/autop": "file:./packages/autop",
-		"@wordpress/babel-preset-default": "file:./packages/babel-preset-default",
-		"@wordpress/browserslist-config": "file:./packages/browserslist-config",
-		"@wordpress/jest-preset-default": "file:./packages/jest-preset-default",
-		"@wordpress/npm-package-json-lint-config": "file:./packages/npm-package-json-lint-config",
-		"@wordpress/babel-plugin-makepot": "file:./packages/babel-plugin-makepot",
-		"@wordpress/scripts": "file:./packages/scripts",
-		"@wordpress/url": "file:./packages/url",
-		"@wordpress/wordcount": "file:./packages/wordcount",
+		"@wordpress/a11y": "file:packages/a11y",
+		"@wordpress/api-request": "file:packages/api-request",
+		"@wordpress/autop": "file:packages/autop",
+		"@wordpress/blob": "file:packages/blob",
+		"@wordpress/core-data": "file:packages/core-data",
+		"@wordpress/data": "file:packages/data",
+		"@wordpress/date": "file:packages/date",
+		"@wordpress/deprecated": "file:packages/deprecated",
+		"@wordpress/dom": "file:packages/dom",
+		"@wordpress/dom-ready": "file:packages/dom-ready",
+		"@wordpress/element": "file:packages/element",
+		"@wordpress/hooks": "file:packages/hooks",
+		"@wordpress/i18n": "file:packages/i18n",
+		"@wordpress/is-shallow-equal": "file:packages/is-shallow-equal",
+		"@wordpress/plugins": "file:packages/plugins",
+		"@wordpress/url": "file:packages/url",
+		"@wordpress/wordcount": "file:packages/wordcount",
 		"classnames": "2.2.5",
 		"clipboard": "1.7.1",
 		"dom-react": "2.2.1",
@@ -35,7 +43,6 @@
 		"http-build-query": "0.7.0",
 		"jquery": "3.3.1",
 		"js-beautify": "1.6.14",
-		"lerna": "2.11.0",
 		"lodash": "4.17.10",
 		"memize": "1.0.5",
 		"moment": "2.22.1",
@@ -62,6 +69,15 @@
 		"uuid": "3.1.0"
 	},
 	"devDependencies": {
+		"@wordpress/babel-plugin-makepot": "file:packages/babel-plugin-makepot",
+		"@wordpress/babel-preset-default": "file:packages/babel-preset-default",
+		"@wordpress/browserslist-config": "file:packages/browserslist-config",
+		"@wordpress/custom-templated-path-webpack-plugin": "file:packages/custom-templated-path-webpack-plugin",
+		"@wordpress/jest-preset-default": "file:packages/jest-preset-default",
+		"@wordpress/library-export-default-webpack-plugin": "file:packages/library-export-default-webpack-plugin",
+		"@wordpress/npm-package-json-lint-config": "file:packages/npm-package-json-lint-config",
+		"@wordpress/postcss-themes": "file:packages/postcss-themes",
+		"@wordpress/scripts": "file:packages/scripts",
 		"autoprefixer": "8.2.0",
 		"babel-core": "6.26.0",
 		"babel-eslint": "8.0.3",
@@ -82,6 +98,7 @@
 		"espree": "3.5.4",
 		"extract-text-webpack-plugin": "4.0.0-beta.0",
 		"glob": "7.1.2",
+		"lerna": "3.0.0-beta.21",
 		"mkdirp": "0.5.1",
 		"node-sass": "git://github.com/sass/node-sass.git#v4.7.0",
 		"path-type": "3.0.0",
@@ -105,7 +122,7 @@
 	},
 	"babel": {
 		"presets": [
-			"@wordpress/default"
+			"@wordpress/babel-preset-default"
 		],
 		"env": {
 			"production": {
@@ -160,7 +177,7 @@
 		"lint-php": "docker-compose run --rm composer run-script lint",
 		"lint-pkg-json": "wp-scripts lint-pkg-json ./packages",
 		"package-plugin": "./bin/build-plugin-zip.sh",
-		"postinstall": "lerna bootstrap --hoist && npm run build:packages",
+		"postinstall": "npm run build:packages",
 		"pot-to-php": "./bin/pot-to-php.js",
 		"publish:check": "npm run build:packages && lerna updated",
 		"publish:dev": "npm run build:packages && lerna publish --npm-tag next",
