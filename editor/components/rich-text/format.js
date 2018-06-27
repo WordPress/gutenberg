@@ -1,13 +1,12 @@
 /**
- * External dependencies
- */
-import { omitBy } from 'lodash';
-import { nodeListToReact } from 'dom-react';
-
-/**
  * WordPress dependencies
  */
 import { createElement, renderToString } from '@wordpress/element';
+
+/**
+ * Browser dependencies
+ */
+const { Node } = window;
 
 /**
  * Transforms a WP Element to its corresponding HTML string.
@@ -37,29 +36,30 @@ export function valueToString( value, format ) {
 	}
 }
 
-/**
- * Strips out TinyMCE specific attributes and nodes from a WPElement
- *
- * @param {string} type    Element type
- * @param {Object} props   Element Props
- * @param {Array} children Element Children
- *
- * @return {Element} WPElement.
- */
-export function createTinyMCEElement( type, props, ...children ) {
-	if ( props[ 'data-mce-bogus' ] === 'all' ) {
-		return null;
+function walkChildren( node, mapFn ) {
+	const result = [];
+
+	let child = node.firstChild;
+	while ( child ) {
+		result.push( mapFn( child ) );
+		child = child.next;
 	}
 
-	if ( props.hasOwnProperty( 'data-mce-bogus' ) ) {
-		return children;
-	}
+	return result;
+}
 
-	return createElement(
-		type,
-		omitBy( props, ( _, key ) => key.indexOf( 'data-mce-' ) === 0 ),
-		...children
-	);
+export function treeNodeToElement( node ) {
+	switch ( node.type ) {
+		case Node.TEXT_NODE:
+			return node.value;
+
+		default:
+			return createElement(
+				node.name,
+				null,
+				...walkChildren( node, treeNodeToElement )
+			);
+	}
 }
 
 /**
@@ -69,8 +69,12 @@ export function createTinyMCEElement( type, props, ...children ) {
  *
  * @return {WPElement} WP Element.
  */
-export function domToElement( value ) {
-	return nodeListToReact( value || [], createTinyMCEElement );
+export function treeToElement( node ) {
+	if ( ! node ) {
+		return [];
+	}
+
+	return walkChildren( node, treeNodeToElement );
 }
 
 /**
@@ -81,14 +85,8 @@ export function domToElement( value ) {
  *
  * @return {string} HTML.
  */
-export function domToString( value, editor ) {
-	const doc = document.implementation.createHTMLDocument( '' );
-
-	Array.from( value ).forEach( ( child ) => {
-		doc.body.appendChild( child );
-	} );
-
-	return editor ? editor.serializer.serialize( doc.body ) : doc.body.innerHTML;
+export function treeToString( tree ) {
+	return renderToString( treeToElement( tree ) );
 }
 
 /**
@@ -100,11 +98,11 @@ export function domToString( value, editor ) {
  *
  * @return {*} Output.
  */
-export function domToFormat( value, format, editor ) {
+export function treeToFormat( tree, format ) {
 	switch ( format ) {
 		case 'string':
-			return domToString( value, editor );
+			return treeToString( tree );
 		default:
-			return domToElement( value );
+			return treeToElement( tree );
 	}
 }

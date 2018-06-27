@@ -3,7 +3,6 @@
  */
 import classnames from 'classnames';
 import {
-	last,
 	isEqual,
 	forEach,
 	merge,
@@ -11,7 +10,6 @@ import {
 	find,
 	defer,
 	noop,
-	reject,
 } from 'lodash';
 import 'element-closest';
 
@@ -41,53 +39,9 @@ import TinyMCE from './tinymce';
 import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
-import { domToFormat, valueToString } from './format';
+import { treeToFormat, valueToString } from './format';
 
 const { BACKSPACE, DELETE, ENTER, rawShortcut } = keycodes;
-
-/**
- * Returns true if the node is the inline node boundary. This is used in node
- * filtering prevent the inline boundary from being included in the split which
- * occurs while within but at the end of an inline node, since TinyMCE includes
- * a placeholder caret character at the end.
- *
- * @see https://github.com/tinymce/tinymce/blob/master/src/plugins/link/main/ts/core/Utils.ts
- *
- * @param {Node} node Node to test.
- *
- * @return {boolean} Whether node is inline boundary.
- */
-export function isEmptyInlineBoundary( node ) {
-	const text = node.nodeName === 'A' ? node.innerText : node.textContent;
-	return text === '\uFEFF';
-}
-
-/**
- * Returns true if the node is empty, meaning it contains only the placeholder
- * caret character or is an empty text node.
- *
- * @param {Node} node Node to test.
- *
- * @return {boolean} Whether node is empty.
- */
-export function isEmptyNode( node ) {
-	return (
-		'' === node.nodeValue ||
-		isEmptyInlineBoundary( node )
-	);
-}
-
-/**
- * Given a set of Nodes, filters to set to exclude any empty nodes: those with
- * either empty text nodes or only including the inline boundary caret.
- *
- * @param {Node[]} childNodes Nodes to filter.
- *
- * @return {Node[]} Non-empty nodes.
- */
-export function filterEmptyNodes( childNodes ) {
-	return reject( childNodes, isEmptyNode );
-}
 
 export function getFormatProperties( formatName, parents ) {
 	switch ( formatName ) {
@@ -139,9 +93,10 @@ export class RichText extends Component {
 	 * @return {Object} The settings for this block.
 	 */
 	getSettings( settings ) {
+		const { multiline, tagName } = this.props;
 		return ( this.props.getSettings || identity )( {
 			...settings,
-			forced_root_block: this.props.multiline || false,
+			forced_root_block: multiline || tagName,
 			// Allow TinyMCE to keep one undo level for comparing changes.
 			// Prevent it otherwise from accumulating any history.
 			custom_undo_redo_levels: 1,
@@ -187,6 +142,15 @@ export class RichText extends Component {
 
 	onInit() {
 		this.registerCustomFormatters();
+
+		// Strip default padding setting for elements in schema, in order to
+		// avoid (a) new blocks being considered non-empty by non-breaking
+		// space character and (b) empty string or whitespace being assigned
+		// as value for the empty field.
+		forEach(
+			this.editor.schema.elements,
+			( element ) => delete element.paddEmpty
+		);
 
 		this.editor.shortcuts.add( rawShortcut.primary( 'k' ), '', () => this.changeFormats( { link: { isAdding: true } } ) );
 		this.editor.shortcuts.add( rawShortcut.access( 'a' ), '', () => this.changeFormats( { link: { isAdding: true } } ) );
@@ -441,7 +405,6 @@ export class RichText extends Component {
 	 * @param {KeydownEvent} event The keydown event as triggered by TinyMCE.
 	 */
 	onKeyDown( event ) {
-		const dom = this.editor.dom;
 		const rootNode = this.editor.getBody();
 
 		if (
@@ -470,49 +433,6 @@ export class RichText extends Component {
 			// that we stop other handlers (e.g. ones registered by TinyMCE) from
 			// also handling this event.
 			event.stopImmediatePropagation();
-		}
-
-		// If we click shift+Enter on inline RichTexts, we avoid creating two contenteditables
-		// We also split the content and call the onSplit prop if provided.
-		if ( event.keyCode === ENTER ) {
-			if ( this.props.multiline ) {
-				if ( ! this.props.onSplit ) {
-					return;
-				}
-
-				const selectedNode = this.editor.selection.getNode();
-
-				if ( selectedNode.parentNode !== rootNode ) {
-					return;
-				}
-
-				if ( ! dom.isEmpty( selectedNode ) ) {
-					return;
-				}
-
-				event.preventDefault();
-				this.onCreateUndoLevel();
-
-				const childNodes = Array.from( rootNode.childNodes );
-				const index = dom.nodeIndex( selectedNode );
-				const beforeNodes = childNodes.slice( 0, index );
-				const afterNodes = childNodes.slice( index + 1 );
-
-				const { format } = this.props;
-				const before = domToFormat( beforeNodes, format, this.editor );
-				const after = domToFormat( afterNodes, format, this.editor );
-
-				this.restoreContentAndSplit( before, after );
-			} else {
-				event.preventDefault();
-				this.onCreateUndoLevel();
-
-				if ( event.shiftKey || ! this.props.onSplit ) {
-					this.editor.execCommand( 'InsertLineBreak', false, event );
-				} else {
-					this.splitContent();
-				}
-			}
 		}
 	}
 
@@ -563,101 +483,25 @@ export class RichText extends Component {
 		}
 	}
 
-	/**
-	 * Splits the content at the location of the selection.
-	 *
-	 * Replaces the content of the editor inside this element with the contents
-	 * before the selection. Sends the elements after the selection to the `onSplit`
-	 * handler.
-	 *
-	 * @param {Array}  blocks  The blocks to add after the split point.
-	 * @param {Object} context The context for splitting.
-	 */
-	splitContent( blocks = [], context = {} ) {
-		if ( ! this.props.onSplit ) {
+	onNewBlock( event ) {
+		const { multiline, onSplit } = this.props;
+		if ( multiline || ! onSplit ) {
 			return;
 		}
 
-		const { dom } = this.editor;
-		const rootNode = this.editor.getBody();
-		const beforeRange = dom.createRng();
-		const afterRange = dom.createRng();
-		const selectionRange = this.editor.selection.getRng();
-
-		if ( rootNode.childNodes.length ) {
-			beforeRange.setStart( rootNode, 0 );
-			beforeRange.setEnd( selectionRange.startContainer, selectionRange.startOffset );
-
-			afterRange.setStart( selectionRange.endContainer, selectionRange.endOffset );
-			afterRange.setEnd( rootNode, dom.nodeIndex( rootNode.lastChild ) + 1 );
-
-			const beforeFragment = beforeRange.extractContents();
-			const afterFragment = afterRange.extractContents();
-
-			const { format } = this.props;
-			let before = domToFormat( filterEmptyNodes( beforeFragment.childNodes ), format, this.editor );
-			let after = domToFormat( filterEmptyNodes( afterFragment.childNodes ), format, this.editor );
-
-			if ( context.paste ) {
-				before = this.isEmpty( before ) ? null : before;
-				after = this.isEmpty( after ) ? null : after;
-			}
-
-			this.restoreContentAndSplit( before, after, blocks );
-		} else if ( context.paste ) {
-			this.restoreContentAndSplit( null, null, blocks );
+		const { format, value } = this.props;
+		const { firstChild, lastChild } = this.editor.getContent( { format: 'tree' } );
+		const isEmptyNewBlock = lastChild.isEmpty( {} );
+		if ( isEmptyNewBlock ) {
+			onSplit( value, [] );
 		} else {
-			this.restoreContentAndSplit( [], [], blocks );
-		}
-	}
-
-	onNewBlock() {
-		if ( this.props.multiline !== 'p' || ! this.props.onSplit ) {
-			return;
+			onSplit(
+				treeToFormat( firstChild, format ),
+				treeToFormat( lastChild, format )
+			);
 		}
 
-		// Getting the content before and after the cursor
-		const childNodes = Array.from( this.editor.getBody().childNodes );
-		let selectedChild = this.editor.selection.getStart();
-		while ( childNodes.indexOf( selectedChild ) === -1 && selectedChild.parentNode ) {
-			selectedChild = selectedChild.parentNode;
-		}
-		const splitIndex = childNodes.indexOf( selectedChild );
-		if ( splitIndex === -1 ) {
-			return;
-		}
-		const beforeNodes = childNodes.slice( 0, splitIndex );
-		const lastNodeBeforeCursor = last( beforeNodes );
-		// Avoid splitting on single enter
-		if (
-			! lastNodeBeforeCursor ||
-			beforeNodes.length < 2 ||
-			!! lastNodeBeforeCursor.textContent
-		) {
-			return;
-		}
-
-		const before = beforeNodes.slice( 0, beforeNodes.length - 1 );
-
-		// Removing empty nodes from the beginning of the "after"
-		// avoids empty paragraphs at the beginning of newly created blocks.
-		const after = childNodes.slice( splitIndex ).reduce( ( memo, node ) => {
-			if ( ! memo.length && ! node.textContent ) {
-				return memo;
-			}
-
-			memo.push( node );
-			return memo;
-		}, [] );
-
-		// Splitting into two blocks
-		this.setContent( this.props.value );
-
-		const { format } = this.props;
-		this.restoreContentAndSplit(
-			domToFormat( before, format, this.editor ),
-			domToFormat( after, format, this.editor )
-		);
+		event.newBlock.remove();
 	}
 
 	onNodeChange( { parents } ) {
@@ -714,16 +558,14 @@ export class RichText extends Component {
 	}
 
 	getContent() {
-		const { format } = this.props;
+		const { multiline, format } = this.props;
 
-		switch ( format ) {
-			case 'string':
-				return this.editor.getContent();
-			default:
-				return this.editor.dom.isEmpty( this.editor.getBody() ) ?
-					[] :
-					domToFormat( this.editor.getBody().childNodes || [], 'element', this.editor );
+		let tree = this.editor.getContent( { format: 'tree' } );
+		if ( ! multiline ) {
+			tree = tree.firstChild;
 		}
+
+		return treeToFormat( tree, format );
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -891,7 +733,7 @@ export class RichText extends Component {
 					{ ( { isExpanded, listBoxId, activeId } ) => (
 						<Fragment>
 							<TinyMCE
-								tagName={ Tagname }
+								tagName={ MultilineTag ? Tagname : 'div' }
 								getSettings={ this.getSettings }
 								onSetup={ this.onSetup }
 								style={ style }

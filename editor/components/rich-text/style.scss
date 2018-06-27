@@ -5,15 +5,15 @@
 }
 
 .editor-rich-text__tinymce {
-	margin: 0;
 	position: relative;
+
+	&,
+	p {
+		margin: 0;
+	}
 
 	> p:empty {
 		min-height: $editor-font-size * $editor-line-height;
-	}
-
-	> p:first-child {
-		margin-top: 0;
 	}
 
 	&:focus {
@@ -66,10 +66,6 @@
 		top: 0;
 		width: 100%;
 		margin-top: 0;
-
-		& > p {
-			margin-top: 0;
-		}
 	}
 
 	& + .editor-rich-text__tinymce {
