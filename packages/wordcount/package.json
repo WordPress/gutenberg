@@ -19,7 +19,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"lodash": "^4.17.4"
+		"lodash": "4.17.10"
 	},
 	"publishConfig": {
 		"access": "public"

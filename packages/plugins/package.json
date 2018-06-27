@@ -21,7 +21,7 @@
 	"dependencies": {
 		"@wordpress/element": "^1.0.0-alpha.1",
 		"@wordpress/hooks": "1.1.6",
-		"lodash": "4.17.5"
+		"lodash": "4.17.10"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -22,7 +22,7 @@
 	"dependencies": {
 		"@wordpress/api-request": "^1.0.0-alpha.1",
 		"@wordpress/data": "^1.0.0-alpha.1",
-		"lodash": "4.17.5",
+		"lodash": "4.17.10",
 		"rememo": "3.0.0"
 	},
 	"publishConfig": {
