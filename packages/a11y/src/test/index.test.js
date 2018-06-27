@@ -4,10 +4,14 @@ jest.mock( '../clear', () => {
 	return jest.fn();
 } );
 jest.mock( '@wordpress/dom-ready', () => {
-	return jest.fn( ( callback ) => { callback(); } );
+	return jest.fn( ( callback ) => {
+		callback();
+	} );
 } );
 jest.mock( '../filterMessage', () => {
-	return jest.fn( ( message ) => { return message; } );
+	return jest.fn( ( message ) => {
+		return message;
+	} );
 } );
 
 import clear from '../clear';
@@ -92,9 +96,9 @@ describe( 'speak', () => {
 
 	describe( 'setup when the elements already exist', () => {
 		it( 'should not create the aria live regions again', () => {
-			let before = document.getElementsByClassName( 'a11y-speak-region' ).length;
+			const before = document.getElementsByClassName( 'a11y-speak-region' ).length;
 			setup();
-			let after = document.getElementsByClassName( 'a11y-speak-region' ).length;
+			const after = document.getElementsByClassName( 'a11y-speak-region' ).length;
 
 			expect( before ).toBe( after );
 		} );

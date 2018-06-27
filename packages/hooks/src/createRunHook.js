@@ -6,7 +6,7 @@ import validateHookName from './validateHookName.js';
  * value of the call chain.
  *
  * @param  {Object}   hooks          Stored hooks, keyed by hook name.
- * @param  {?bool}    returnFirstArg Whether each hook callback is expected to
+ * @param  {?boolean}    returnFirstArg Whether each hook callback is expected to
  *                                   return its first argument.
  *
  * @return {Function}                Function that runs hook callbacks.
@@ -34,9 +34,9 @@ function createRunHook( hooks, returnFirstArg ) {
 		handlers = hooks[ hookName ].handlers;
 
 		if ( ! handlers || ! handlers.length ) {
-			return returnFirstArg
-				? args[ 0 ]
-				: undefined;
+			return returnFirstArg ?
+				args[ 0 ] :
+				undefined;
 		}
 
 		const hookInfo = {

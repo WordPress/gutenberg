@@ -1,14 +1,14 @@
 /**
  * Build the live regions markup.
  *
- * @param {String} ariaLive Optional. Value for the 'aria-live' attribute, default 'polite'.
+ * @param {string} ariaLive Optional. Value for the 'aria-live' attribute, default 'polite'.
  *
- * @returns {Object} $container The ARIA live region jQuery object.
+ * @return {Object} $container The ARIA live region jQuery object.
  */
 const addContainer = function( ariaLive ) {
 	ariaLive = ariaLive || 'polite';
 
-	let container = document.createElement( 'div' );
+	const container = document.createElement( 'div' );
 	container.id = 'a11y-speak-' + ariaLive;
 	container.className = 'a11y-speak-region';
 

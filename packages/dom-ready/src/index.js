@@ -3,7 +3,7 @@
  *
  * @param {Function} callback A function to execute after the DOM is ready.
  *
- * @returns {void}
+ * @return {void}
  */
 const domReady = function( callback ) {
 	if ( document.readyState === 'complete' ) {

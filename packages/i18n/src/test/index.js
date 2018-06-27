@@ -8,12 +8,12 @@ import { dcnpgettext, sprintf, __, _x, _n, _nx, setLocaleData } from '../';
 jest.mock( 'memize', () => ( fn ) => fn );
 
 const localeData = {
-	"" : {
+	'': {
 		// Domain name
 		domain: 'test_domain',
 		lang: 'fr',
 		// Plural form function for language
-		plural_forms: 'nplurals=2; plural=(n != 1);'
+		plural_forms: 'nplurals=2; plural=(n != 1);',
 	},
 
 	hello: [ 'bonjour' ],
@@ -25,10 +25,10 @@ const localeData = {
 	'%d banana': [ 'une banane', '%d bananes' ],
 
 	'fruit\u0004%d apple': [ 'une pomme', '%d pommes' ],
-}
+};
 const additionalLocaleData = {
 	cheeseburger: [ 'hamburger au fromage' ],
-	'%d cat': [ 'un chat', '%d chats' ]
+	'%d cat': [ 'un chat', '%d chats' ],
 };
 
 setLocaleData( localeData, 'test_domain' );
@@ -84,7 +84,7 @@ describe( 'i18n', () => {
 		} );
 
 		it( 'replaces placeholders', () => {
-			const result = sprintf( __( 'hello %s', 'test_domain'), 'Riad' );
+			const result = sprintf( __( 'hello %s', 'test_domain' ), 'Riad' );
 
 			expect( result ).toBe( 'bonjour Riad' );
 		} );

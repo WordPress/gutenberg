@@ -19,7 +19,6 @@ function createAddHook( hooks ) {
 	 * @param {?number}  priority  Priority of this hook (default=10)
 	 */
 	return function addHook( hookName, namespace, callback, priority = 10 ) {
-
 		if ( ! validateHookName( hookName ) ) {
 			return;
 		}
@@ -57,7 +56,7 @@ function createAddHook( hooks ) {
 			// we're adding would come after the current callback, there's no
 			// problem; otherwise we need to increase the execution index of
 			// any other runs by 1 to account for the added element.
-			( hooks.__current || [] ).forEach( hookInfo => {
+			( hooks.__current || [] ).forEach( ( hookInfo ) => {
 				if ( hookInfo.name === hookName && hookInfo.currentIndex >= i ) {
 					hookInfo.currentIndex++;
 				}

@@ -6,10 +6,10 @@
  * @param {Array} a First array to compare.
  * @param {Array} b Second array to compare.
  *
- * @return {Boolean} Whether the two arrays are shallow equal.
+ * @return {boolean} Whether the two arrays are shallow equal.
  */
 function isShallowEqualArrays( a, b ) {
-	var i;
+	let i;
 
 	if ( a === b ) {
 		return true;

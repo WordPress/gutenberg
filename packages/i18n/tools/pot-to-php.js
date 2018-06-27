@@ -102,7 +102,7 @@ function convertPOTToPHP( potFile, phpFile, options ) {
 
 		const newOutput = Object.values( translations )
 			.map( ( translation ) => convertTranslationToPHP( translation, options.textdomain, context ) )
-			.filter( php => php !== '' );
+			.filter( ( php ) => php !== '' );
 
 		output = [ ...output, ...newOutput ];
 	}
@@ -112,12 +112,12 @@ function convertPOTToPHP( potFile, phpFile, options ) {
 	fs.writeFileSync( phpFile, fileOutput );
 }
 
-const args = process.argv.slice(2);
+const args = process.argv.slice( 2 );
 
 convertPOTToPHP(
 	args[ 0 ],
 	args[ 1 ],
 	{
-		textdomain: args[ 2 ]
+		textdomain: args[ 2 ],
 	}
 );

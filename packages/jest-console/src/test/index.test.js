@@ -18,7 +18,7 @@ describe( 'jest-console', () => {
 		},
 		( matcherName, methodName ) => {
 			describe( `console.${ methodName }`, () => {
-				const matcherNameWith = `${ matcherName}With`;
+				const matcherNameWith = `${ matcherName }With`;
 				const message = `This is ${ methodName }!`;
 
 				test( '${ matcherName } works', () => {

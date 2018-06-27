@@ -12,7 +12,7 @@ const {
 } = require( '../utils' );
 
 const jestConfig = {
-	preset: '@wordpress/jest-preset-default'
+	preset: '@wordpress/jest-preset-default',
 };
 
 const hasBabelConfig = hasProjectFile( '.babelrc' ) ||

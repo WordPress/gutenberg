@@ -26,8 +26,8 @@ domReady( setup );
 /**
  * Update the ARIA live notification area text node.
  *
- * @param {String} message  The message to be announced by Assistive Technologies.
- * @param {String} ariaLive Optional. The politeness level for aria-live. Possible values:
+ * @param {string} message  The message to be announced by Assistive Technologies.
+ * @param {string} ariaLive Optional. The politeness level for aria-live. Possible values:
  *                          polite or assertive. Default polite.
  */
 export const speak = function( message, ariaLive ) {
@@ -36,8 +36,8 @@ export const speak = function( message, ariaLive ) {
 
 	message = filterMessage( message );
 
-	let containerPolite = document.getElementById( 'a11y-speak-polite' );
-	let containerAssertive = document.getElementById( 'a11y-speak-assertive' );
+	const containerPolite = document.getElementById( 'a11y-speak-polite' );
+	const containerAssertive = document.getElementById( 'a11y-speak-assertive' );
 
 	if ( containerAssertive && 'assertive' === ariaLive ) {
 		containerAssertive.textContent = message;

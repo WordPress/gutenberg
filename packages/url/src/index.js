@@ -10,10 +10,10 @@ const USABLE_HREF_REGEXP = /^(?:[a-z]+:|#|\?|\.|\/)/i;
 /**
  * Appends arguments to the query string of the url
  *
- * @param  {String} url   URL
+ * @param  {string} url   URL
  * @param  {Object} args  Query Args
  *
- * @return {String}       Updated URL
+ * @return {string}       Updated URL
  */
 export function addQueryArgs( url, args ) {
 	const parsedURL = parse( url, true );
@@ -26,9 +26,9 @@ export function addQueryArgs( url, args ) {
 /**
  * Prepends "http://" to a url, if it looks like something that is meant to be a TLD.
  *
- * @param  {String} url The URL to test
+ * @param  {string} url The URL to test
  *
- * @return {String}     The updated URL
+ * @return {string}     The updated URL
  */
 export function prependHTTP( url ) {
 	if ( ! USABLE_HREF_REGEXP.test( url ) && ! EMAIL_REGEXP.test( url ) ) {

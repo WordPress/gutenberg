@@ -8,7 +8,7 @@ export const defaultSettings = {
 	connectorRegExp: /--|\u2014/g,
 
 	// Characters to be removed from input text.
-	removeRegExp: new RegExp([
+	removeRegExp: new RegExp( [
 		'[',
 
 		// Basic Latin (extract)
@@ -48,8 +48,8 @@ export const defaultSettings = {
 
 		// Supplemental Punctuation
 		'\u2E00-\u2E7F',
-		']'
-	].join(''), 'g'),
+		']',
+	].join( '' ), 'g' ),
 
 	// Remove UTF-16 surrogate points, see https://en.wikipedia.org/wiki/UTF-16#U.2BD800_to_U.2BDFFF
 	astralRegExp: /[\uD800-\uDBFF][\uDC00-\uDFFF]/g,
@@ -69,6 +69,6 @@ export const defaultSettings = {
 	 */
 	characters_including_spacesRegExp: /[^\f\n\r\t\v\u00AD\u2028\u2029]/g,
 	l10n: {
-		type: 'words'
-	}
+		type: 'words',
+	},
 };

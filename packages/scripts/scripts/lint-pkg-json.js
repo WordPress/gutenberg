@@ -23,9 +23,9 @@ const hasLintConfig = hasCliArg( '-c' ) ||
 	hasProjectFile( 'npmpackagejsonlint.config.js' ) ||
 	hasPackageProp( 'npmPackageJsonLintConfig' );
 
-const config = ! hasLintConfig
-	? [ '--configFile', fromConfigRoot( 'npmpackagejsonlint.json' ) ]
-	: [];
+const config = ! hasLintConfig ?
+	[ '--configFile', fromConfigRoot( 'npmpackagejsonlint.json' ) ] :
+	[];
 
 const result = spawn(
 	resolveBin( 'npm-package-json-lint', { executable: 'npmPkgJsonLint' } ),

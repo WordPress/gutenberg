@@ -11,7 +11,7 @@ const path = require( 'path' );
 const { getPackagePath, hasPackageProp } = require( './package' );
 const { exit, getCliArgs } = require( './process' );
 
-const first = list => list[ 0 ];
+const first = ( list ) => list[ 0 ];
 
 const hasCliArg = ( arg ) => getCliArgs()
 	.some( ( value ) => first( value.split( '=' ) ) === arg );
@@ -66,7 +66,7 @@ const spawnScript = ( scriptName, args = [] ) => {
 		'node',
 		[
 			fromScriptsRoot( scriptName ),
-			...args
+			...args,
 		],
 		{ stdio: 'inherit' },
 	);

@@ -1,6 +1,6 @@
 'use strict';
 
-var keys = Object.keys;
+const keys = Object.keys;
 
 /**
  * Returns true if the two objects are shallow equal, or false otherwise.
@@ -8,10 +8,10 @@ var keys = Object.keys;
  * @param {Object} a First object to compare.
  * @param {Object} b Second object to compare.
  *
- * @return {Boolean} Whether the two objects are shallow equal.
+ * @return {boolean} Whether the two objects are shallow equal.
  */
 function isShallowEqualObjects( a, b ) {
-	var aKeys, bKeys, i, key;
+	let aKeys, bKeys, i, key;
 
 	if ( a === b ) {
 		return true;
@@ -36,6 +36,6 @@ function isShallowEqualObjects( a, b ) {
 	}
 
 	return true;
-};
+}
 
 module.exports = isShallowEqualObjects;

@@ -51,7 +51,7 @@ const htmlSplitRegex = ( () => {
 /**
  * Separate HTML elements and comments from the text.
  *
- * @param  {String} input The text which has to be formatted.
+ * @param  {string} input The text which has to be formatted.
  * @return {Array}        The formatted text.
  */
 function htmlSplit( input ) {
@@ -75,9 +75,9 @@ function htmlSplit( input ) {
 /**
  * Replace characters or phrases within HTML elements only.
  *
- * @param  {String} haystack     The text which has to be formatted.
+ * @param  {string} haystack     The text which has to be formatted.
  * @param  {Object} replacePairs In the form {from: 'to', ...}.
- * @return {String}              The formatted text.
+ * @return {string}              The formatted text.
  */
 function replaceInHtmlTags( haystack, replacePairs ) {
 	// Find all elements.
@@ -114,10 +114,10 @@ function replaceInHtmlTags( haystack, replacePairs ) {
  * replace double line-breaks with HTML paragraph tags. The remaining line-
  * breaks after conversion become <<br />> tags, unless br is set to 'false'.
  *
- * @param  {String}    text The text which has to be formatted.
- * @param  {Boolean}   br   Optional. If set, will convert all remaining line-
+ * @param  {string}    text The text which has to be formatted.
+ * @param  {boolean}   br   Optional. If set, will convert all remaining line-
  *                          breaks after paragraphing. Default true.
- * @return {String}         Text which has been converted into paragraph tags.
+ * @return {string}         Text which has been converted into paragraph tags.
  */
 export function autop( text, br = true ) {
 	const preTags = [];
@@ -283,8 +283,8 @@ export function autop( text, br = true ) {
  * Replaces <p> tags with two line breaks except where the <p> has attributes.
  * Unifies whitespace. Indents <li>, <dt> and <dd> for better readability.
  *
- * @param  {String} html The content from the editor.
- * @return {String}      The content with stripped paragraph tags.
+ * @param  {string} html The content from the editor.
+ * @return {string}      The content with stripped paragraph tags.
  */
 export function removep( html ) {
 	const blocklist = 'blockquote|ul|ol|li|dl|dt|dd|table|thead|tbody|tfoot|tr|th|td|h[1-6]|fieldset|figure';

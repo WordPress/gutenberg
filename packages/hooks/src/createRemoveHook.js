@@ -7,7 +7,7 @@ import { doAction } from './';
  * hooks by the given name.
  *
  * @param  {Object}   hooks      Stored hooks, keyed by hook name.
- * @param  {bool}     removeAll  Whether to remove all callbacks for a hookName, without regard to namespace. Used to create `removeAll*` functions.
+ * @param  {boolean}     removeAll  Whether to remove all callbacks for a hookName, without regard to namespace. Used to create `removeAll*` functions.
  *
  * @return {Function}            Function that removes hooks.
  */
@@ -22,7 +22,6 @@ function createRemoveHook( hooks, removeAll ) {
 	 * @return {number}             The number of callbacks removed.
 	 */
 	return function removeHook( hookName, namespace ) {
-
 		if ( ! validateHookName( hookName ) ) {
 			return;
 		}
@@ -58,7 +57,7 @@ function createRemoveHook( hooks, removeAll ) {
 					// comes after the current callback, there's no problem;
 					// otherwise we need to decrease the execution index of any
 					// other runs by 1 to account for the removed element.
-					( hooks.__current || [] ).forEach( hookInfo => {
+					( hooks.__current || [] ).forEach( ( hookInfo ) => {
 						if ( hookInfo.name === hookName && hookInfo.currentIndex >= i ) {
 							hookInfo.currentIndex--;
 						}

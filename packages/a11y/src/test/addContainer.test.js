@@ -3,7 +3,7 @@ import addContainer from '../addContainer';
 describe( 'addContainer', () => {
 	describe( 'with polite param', () => {
 		it( 'should create an aria-live element with aria-live attr set to polite', () => {
-			let container = addContainer( 'polite' );
+			const container = addContainer( 'polite' );
 
 			expect( container ).not.toBe( null );
 			expect( container.className ).toBe( 'a11y-speak-region' );
@@ -17,7 +17,7 @@ describe( 'addContainer', () => {
 
 	describe( 'with assertive param', () => {
 		it( 'should create an aria-live element with aria-live attr set to assertive', () => {
-			let container = addContainer( 'assertive' );
+			const container = addContainer( 'assertive' );
 
 			expect( container ).not.toBe( null );
 			expect( container.className ).toBe( 'a11y-speak-region' );
@@ -31,7 +31,7 @@ describe( 'addContainer', () => {
 
 	describe( 'without param', () => {
 		it( 'should default to creating an aria-live element with aria-live attr set to polite', () => {
-			let container = addContainer( 'polite' );
+			const container = addContainer( 'polite' );
 
 			expect( container ).not.toBe( null );
 			expect( container.className ).toBe( 'a11y-speak-region' );

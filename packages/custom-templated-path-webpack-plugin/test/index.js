@@ -17,7 +17,7 @@ const config = require( './fixtures/webpack.config.js' );
 const CustomTemplatedPathPlugin = require( '../' );
 
 describe( 'CustomTemplatedPathPlugin', () => {
-	const outputFile = path.join( __dirname, '/fixtures/entry.js' )
+	const outputFile = path.join( __dirname, '/fixtures/entry.js' );
 
 	beforeAll( async () => {
 		// Remove output file so as not to report false positive from previous

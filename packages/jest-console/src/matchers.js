@@ -39,7 +39,7 @@ const createToBeCalledWithMatcher = ( matcherName, methodName ) =>
 		const calls = spy.mock.calls;
 		const pass = some(
 			calls,
-			objects => isEqual( objects, expected )
+			( objects ) => isEqual( objects, expected )
 		);
 		const message = pass ?
 			() =>

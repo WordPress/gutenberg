@@ -3,7 +3,6 @@
  */
 import {
 	autop,
-	removep,
 } from '../';
 
 test( 'empty string', () => {
@@ -248,7 +247,7 @@ Paragraph two.`;
 
 	expect( autop( content1 ).trim() ).toBe( expected1 );
 	expect( autop( content2 ).trim() ).toBe( expected2 );
-} )
+} );
 
 test( 'skip select option elements', () => {
 	const str = 'Country: <select id="state" name="state"><option value="1">Alabama</option><option value="2">Alaska</option><option value="3">Arizona</option><option value="4">Arkansas</option><option value="5">California</option></select>';
@@ -352,7 +351,6 @@ test( 'autop does not wrap blockquotes but does autop their contents', () => {
 
 	expect( autop( content ).trim() ).toBe( expected );
 } );
-
 
 test( 'that autop treats inline elements as inline', () => {
 	const inlines = [

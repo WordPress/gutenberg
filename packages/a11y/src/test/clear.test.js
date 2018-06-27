@@ -2,12 +2,12 @@ import clear from '../clear';
 
 describe( 'clear', () => {
 	it( 'should clear all a11y-speak-region elements', () => {
-		let container1 = document.createElement( 'div' );
+		const container1 = document.createElement( 'div' );
 		container1.className = 'a11y-speak-region';
 		container1.textContent = 'not empty';
 		document.querySelector( 'body' ).appendChild( container1 );
 
-		let container2 = document.createElement( 'div' );
+		const container2 = document.createElement( 'div' );
 		container2.className = 'a11y-speak-region';
 		container2.textContent = 'not empty';
 		document.querySelector( 'body' ).appendChild( container2 );

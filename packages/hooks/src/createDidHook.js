@@ -17,14 +17,13 @@ function createDidHook( hooks ) {
 	 * @return {number}          The number of times the hook has run.
 	 */
 	return function didHook( hookName ) {
-
 		if ( ! validateHookName( hookName ) ) {
 			return;
 		}
 
-		return hooks[ hookName ] && hooks[ hookName ].runs
-			? hooks[ hookName ].runs
-			: 0;
+		return hooks[ hookName ] && hooks[ hookName ].runs ?
+			hooks[ hookName ].runs :
+			0;
 	};
 }
 

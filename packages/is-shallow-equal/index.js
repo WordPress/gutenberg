@@ -1,6 +1,6 @@
 'use strict';
 
-var isShallowEqualObjects = require( './objects' ),
+let isShallowEqualObjects = require( './objects' ),
 	isShallowEqualArrays = require( './arrays' ),
 	isArray = Array.isArray;
 
@@ -11,7 +11,7 @@ var isShallowEqualObjects = require( './objects' ),
  * @param {(Array|Object)} a First object or array to compare.
  * @param {(Array|Object)} b Second object or array to compare.
  *
- * @return {Boolean} Whether the two values are shallow equal.
+ * @return {boolean} Whether the two values are shallow equal.
  */
 function isShallowEqual( a, b ) {
 	if ( a && b ) {

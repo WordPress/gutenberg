@@ -79,7 +79,7 @@ describe( 'utils', () => {
 
 		beforeAll( () => {
 			exitMock.mockImplementation( ( code ) => {
-				throw new Error( `Exit code: ${ code }.` )
+				throw new Error( `Exit code: ${ code }.` );
 			} );
 		} );
 

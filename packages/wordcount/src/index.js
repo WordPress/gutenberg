@@ -1,5 +1,5 @@
 import { extend, flow } from 'lodash';
-import { defaultSettings } from './defaultSettings'
+import { defaultSettings } from './defaultSettings';
 import stripTags from './stripTags';
 import transposeAstralsToCountableChar from './transposeAstralsToCountableChar';
 import stripHTMLEntities from './stripHTMLEntities';
@@ -19,7 +19,7 @@ import transposeHTMLEntitiesToCountableChars from './transposeHTMLEntitiesToCoun
  * @return {void|Object|*} The combined settings object to be used.
  */
 function loadSettings( type, userSettings ) {
-	const settings = extend( defaultSettings, userSettings  );
+	const settings = extend( defaultSettings, userSettings );
 
 	settings.shortcodes = settings.l10n.shortcodes || {};
 
@@ -41,7 +41,7 @@ function loadSettings( type, userSettings ) {
  *
  * @param {string} text     The text being processed
  * @param {string} regex    The regular expression pattern being matched
- * @param {object} settings Settings object containing regular expressions for each strip function
+ * @param {Object} settings Settings object containing regular expressions for each strip function
  *
  * @return {Array|{index: number, input: string}} The matched string.
  */
@@ -64,7 +64,7 @@ function matchWords( text, regex, settings ) {
  *
  * @param {string} text     The text being processed
  * @param {string} regex    The regular expression pattern being matched
- * @param {object} settings Settings object containing regular expressions for each strip function
+ * @param {Object} settings Settings object containing regular expressions for each strip function
  *
  * @return {Array|{index: number, input: string}} The matched string.
  */
@@ -94,7 +94,7 @@ function matchCharacters( text, regex, settings ) {
 export function count( text, type, userSettings ) {
 	const settings = loadSettings( type, userSettings );
 	if ( text ) {
-		let matchRegExp = settings[ type + 'RegExp' ];
+		const matchRegExp = settings[ type + 'RegExp' ];
 		const results = ( 'words' === settings.type ) ?
 			matchWords( text, matchRegExp, settings ) :
 			matchCharacters( text, matchRegExp, settings );
