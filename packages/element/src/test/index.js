@@ -15,6 +15,7 @@ import {
 	switchChildrenNodeName,
 	RawHTML,
 	pure,
+	createRef,
 } from '../';
 
 describe( 'element', () => {
@@ -130,7 +131,6 @@ describe( 'element', () => {
 				( OriginalComponent ) => OriginalComponent,
 				'withTest'
 			)( () => <div /> );
-
 			expect( TestComponent.displayName ).toBe( 'WithTest(Component)' );
 		} );
 
@@ -183,6 +183,18 @@ describe( 'element', () => {
 
 			expect( TestComponent.displayName ).toBe( 'WithTest(CustomDisplayName)' );
 		} );
+		it( 'should forward the ref to the wrapped component', () => {
+			function SomeComponent() {
+				return <div />;
+			}
+			const TestComponent = createHigherOrderComponent(
+				( OriginalComponent ) => OriginalComponent,
+				'withTest'
+			)( SomeComponent );
+			const testRef = createRef();
+			const element = shallow( <TestComponent ref={ testRef } /> );
+			expect( element.prop( 'forwardedRef' ) ).toBe( testRef );
+		} )
 	} );
 
 	describe( 'RawHTML', () => {
