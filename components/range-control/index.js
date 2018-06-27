@@ -32,6 +32,7 @@ function RangeControl( {
 	const id = `inspector-range-control-${ instanceId }`;
 	const onChangeValue = ( event ) => onChange( Number( event.target.value ) );
 	const initialSliderValue = isFinite( value ) ? value : initialPosition || '';
+	const initialNumberValue = isFinite( value ) ? value : initialPosition || '';
 
 	return (
 		<BaseControl
@@ -55,7 +56,7 @@ function RangeControl( {
 				type="number"
 				onChange={ onChangeValue }
 				aria-label={ label }
-				value={ value }
+				value={ initialNumberValue }
 				{ ...props }
 			/>
 			{ allowReset &&
