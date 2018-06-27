@@ -30,7 +30,6 @@ class ModalFrame extends Component {
 		this.containerRef = createRef();
 		this.handleKeyDown = this.handleKeyDown.bind( this );
 		this.handleClickOutside = this.handleClickOutside.bind( this );
-		this.focusFirstFocusable = this.focusFirstFocusable.bind( this );
 		this.focusFirstTabbable = this.focusFirstTabbable.bind( this );
 	}
 
@@ -41,21 +40,7 @@ class ModalFrame extends Component {
 		// Focus on mount
 		if ( this.props.focusOnMount ) {
 			this.focusFirstTabbable();
-			this.focusFirstFocusable();
 		}
-	}
-
-	/**
-	 * Focusses the first focusable with a `tabindex` of -1.
-	 */
-	focusFirstFocusable() {
-		const focusables = focus.focusable.find( this.containerRef.current );
-		forEach( focusables, ( focusable ) => {
-			if ( focusable.getAttribute( 'tabindex' ) === '-1' ) {
-				focusable.focus();
-				return false;
-			}
-		} );
 	}
 
 	/**

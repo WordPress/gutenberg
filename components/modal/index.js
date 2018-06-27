@@ -75,6 +75,7 @@ class Modal extends Component {
 		if ( isOpen ) {
 			this.closeModal();
 		}
+		this.cleanDOM();
 	}
 
 	/**
@@ -109,7 +110,6 @@ class Modal extends Component {
 	closeModal() {
 		openModalCount--;
 
-		this.cleanDOM();
 		if ( openModalCount === 0 ) {
 			this.closeLastModal();
 		}
