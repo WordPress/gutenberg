@@ -3,10 +3,10 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
-	CheckboxControl,
 	IconButton,
 	PanelBody,
 	Toolbar,
+	ToggleControl,
 	withNotices,
 } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
@@ -103,12 +103,12 @@ class AudioEdit extends Component {
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'Playback Controls' ) }>
-						<CheckboxControl
+						<ToggleControl
 							label={ __( 'Autoplay' ) }
 							onChange={ this.toggleAttribute( 'autoplay' ) }
 							checked={ autoplay }
 						/>
-						<CheckboxControl
+						<ToggleControl
 							label={ __( 'Loop' ) }
 							onChange={ this.toggleAttribute( 'loop' ) }
 							checked={ loop }
