@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { isSharedBlock } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 
-export function SharedBlockSettings( { sharedBlock, onConvertToStatic, onConvertToShared, onDelete, itemsRole } ) {
+export function SharedBlockSettings( { sharedBlock, onConvertToStatic, onConvertToShared, itemsRole } ) {
 	return (
 		<Fragment>
 			{ ! sharedBlock && (
@@ -26,25 +26,14 @@ export function SharedBlockSettings( { sharedBlock, onConvertToStatic, onConvert
 				</IconButton>
 			) }
 			{ sharedBlock && (
-				<Fragment>
-					<IconButton
-						className="editor-block-settings-menu__control"
-						icon="controls-repeat"
-						onClick={ onConvertToStatic }
-						role={ itemsRole }
-					>
-						{ __( 'Convert to Regular Block' ) }
-					</IconButton>
-					<IconButton
-						className="editor-block-settings-menu__control"
-						icon="no"
-						disabled={ sharedBlock.isTemporary }
-						onClick={ () => onDelete( sharedBlock.id ) }
-						role={ itemsRole }
-					>
-						{ __( 'Delete Shared Block' ) }
-					</IconButton>
-				</Fragment>
+				<IconButton
+					className="editor-block-settings-menu__control"
+					icon="controls-repeat"
+					onClick={ onConvertToStatic }
+					role={ itemsRole }
+				>
+					{ __( 'Convert to Regular Block' ) }
+				</IconButton>
 			) }
 		</Fragment>
 	);
@@ -62,7 +51,6 @@ export default compose( [
 		const {
 			convertBlockToShared,
 			convertBlockToStatic,
-			deleteSharedBlock,
 		} = dispatch( 'core/editor' );
 
 		return {
@@ -73,19 +61,6 @@ export default compose( [
 			onConvertToShared() {
 				convertBlockToShared( uid );
 				onToggle();
-			},
-			onDelete( id ) {
-				// TODO: Make this a <Confirm /> component or similar
-				// eslint-disable-next-line no-alert
-				const hasConfirmed = window.confirm( __(
-					'Are you sure you want to delete this Shared Block?\n\n' +
-					'It will be permanently removed from all posts and pages that use it.'
-				) );
-
-				if ( hasConfirmed ) {
-					deleteSharedBlock( id );
-					onToggle();
-				}
 			},
 		};
 	} ),
