@@ -1,8 +1,15 @@
 /**
+ * External dependencies
+ */
+import { map } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import {
+	Button,
+	ButtonGroup,
 	IconButton,
 	PanelBody,
 	Toolbar,
@@ -41,7 +48,7 @@ class AudioEdit extends Component {
 	}
 
 	render() {
-		const { autoplay, caption, loop, src } = this.props.attributes;
+		const { autoplay, caption, loop, preload, src } = this.props.attributes;
 		const { setAttributes, isSelected, className, noticeOperations, noticeUI } = this.props;
 		const { editing } = this.state;
 		const switchToEditing = () => {
@@ -102,6 +109,37 @@ class AudioEdit extends Component {
 					</Toolbar>
 				</BlockControls>
 				<InspectorControls>
+					<PanelBody title={ __( 'Preload' ) }>
+						<ButtonGroup aria-label={ __( 'Preload' ) }>
+							{ map( [
+								{
+									name: __( 'Auto' ),
+									key: 'auto',
+									attributeValue: 'auto',
+								},
+								{
+									name: __( 'Metadata' ),
+									key: 'metadata',
+									attributeValue: 'metadata',
+								},
+								{
+									name: __( 'None' ),
+									key: 'none',
+									attributeValue: undefined,
+								},
+							], ( { name, key, attributeValue } ) => (
+								<Button
+									key={ key }
+									isLarge
+									isPrimary={ attributeValue === preload }
+									aria-pressed={ attributeValue === preload }
+									onClick={ () => setAttributes( { preload: attributeValue } ) }
+								>
+									{ name }
+								</Button>
+							) ) }
+						</ButtonGroup>
+					</PanelBody>
 					<PanelBody title={ __( 'Playback Controls' ) }>
 						<ToggleControl
 							label={ __( 'Autoplay' ) }
