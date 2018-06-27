@@ -6,18 +6,22 @@
 
 	&.is-style-wide {
 		max-width: 100%;
+		border-bottom-width: 1px;
 	}
 
 	&.is-style-asterisks {
 		border: none;
 		text-align: center;
+		max-width: none;
+		line-height: 1;
 
 		&:before {
-			content: '* *';
-			color: $dark-gray-500;
-			font-size: 36px;
+			content: '\00b7 \00b7 \00b7';
+			color: $dark-gray-700;
+			font-size: 20px;
+			letter-spacing: 2em;
+			padding-left: 2em;
 			font-family: serif;
-			line-height: 1;
 		}
 	}
 }
