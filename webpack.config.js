@@ -11,7 +11,7 @@ const { basename } = require( 'path' );
 /**
  * WordPress dependencies
  */
-const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
+const CustomTemplatedPathPlugin = require( './packages/custom-templated-path-webpack-plugin' );
 const LibraryExportDefaultPlugin = require( './packages/library-export-default-webpack-plugin' );
 
 // Main CSS loader for everything but blocks..
@@ -148,6 +148,7 @@ const entryPointNames = [
 ];
 
 const gutenbergPackages = [
+	'a11y',
 	'api-request',
 	'blob',
 	'core-data',
@@ -155,16 +156,12 @@ const gutenbergPackages = [
 	'date',
 	'deprecated',
 	'dom',
-	'element',
-	'plugins',
-];
-
-const wordPressPackages = [
-	'a11y',
 	'dom-ready',
 	'hooks',
+	'element',
 	'i18n',
 	'is-shallow-equal',
+	'plugins',
 ];
 
 const externals = {
@@ -180,7 +177,6 @@ const externals = {
 [
 	...entryPointNames,
 	...gutenbergPackages,
-	...wordPressPackages,
 ].forEach( ( name ) => {
 	externals[ `@wordpress/${ name }` ] = {
 		this: [ 'wp', camelCaseDash( name ) ],
@@ -201,11 +197,6 @@ const config = {
 			memo[ name ] = `./packages/${ packageName }`;
 			return memo;
 		}, {} ),
-		wordPressPackages.reduce( ( memo, packageName ) => {
-			const name = camelCaseDash( packageName );
-			memo[ name ] = `./node_modules/@wordpress/${ packageName }`;
-			return memo;
-		}, {} )
 	),
 	output: {
 		filename: './build/[basename]/index.js',
