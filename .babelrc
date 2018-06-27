@@ -8,6 +8,7 @@
       "module-resolver",
       {
         "alias": {
+          "react-native-aztec": "./react-native-aztec",
           "@wordpress/blocks": "./gutenberg/blocks",
           "@wordpress/editor": "./gutenberg/editor",
           "@wordpress/element": "./gutenberg/element",
