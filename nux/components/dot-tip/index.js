@@ -47,7 +47,7 @@ export class DotTip extends Component {
 				className="nux-dot-tip"
 				position="middle right"
 				noArrow
-				focusOnMount
+				focusOnMount="container"
 				role="dialog"
 				aria-label={ __( 'Gutenberg tips' ) }
 				onClose={ onDismiss }
