@@ -5,6 +5,6 @@ module.exports = {
 		return require.resolve( './sass-transformer.js' );
 	},
 	getSourceExts() {
-		return [ 'scss', 'sass' ];
+		return [ 'js', 'json', 'scss', 'sass' ];
 	},
 };
