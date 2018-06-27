@@ -75,7 +75,7 @@ class PostPermalinkEditor extends Component {
 					isLarge
 					onClick={ this.onSavePermalink }
 				>
-					{ __( 'OK' ) }
+					{ __( 'Save' ) }
 				</Button>
 			</form>
 		);

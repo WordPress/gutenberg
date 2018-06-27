@@ -127,6 +127,7 @@ class SharedBlockEdit extends Component {
 				{ element }
 				{ ( isSelected || isEditing ) && (
 					<SharedBlockEditPanel
+						isSelected={ isSelected }
 						isEditing={ isEditing }
 						title={ title !== null ? title : sharedBlock.title }
 						isSaving={ isSaving && ! sharedBlock.isTemporary }
