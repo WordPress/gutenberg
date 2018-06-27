@@ -161,7 +161,17 @@ export { serialize as renderToString };
 export function concatChildren( ...childrenArguments ) {
 	return childrenArguments.reduce( ( memo, children, i ) => {
 		Children.forEach( children, ( child, j ) => {
-			if ( child && 'string' !== typeof child ) {
+			if ( ! child ) {
+				return;
+			}
+
+			if ( typeof child === 'string' ) {
+				const lastChild = memo[ memo.length - 1 ];
+				if ( typeof lastChild === 'string' ) {
+					memo[ memo.length - 1 ] = lastChild + child;
+					return;
+				}
+			} else {
 				child = cloneElement( child, {
 					key: [ i, j ].join(),
 				} );

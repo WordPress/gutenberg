@@ -81,8 +81,12 @@ describe( 'element', () => {
 			expect( concatChildren() ).toEqual( [] );
 		} );
 
+		it( 'should disregard falsey children', () => {
+			expect( concatChildren( [ 'a' ], [ null ], [ 'b' ] ) ).toEqual( [ 'ab' ] );
+		} );
+
 		it( 'should concat the string arrays', () => {
-			expect( concatChildren( [ 'a' ], 'b' ) ).toEqual( [ 'a', 'b' ] );
+			expect( concatChildren( [ 'a' ], 'b' ) ).toEqual( [ 'ab' ] );
 		} );
 
 		it( 'should concat the object arrays and rewrite keys', () => {
