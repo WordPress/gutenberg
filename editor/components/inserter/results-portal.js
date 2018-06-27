@@ -6,7 +6,7 @@ import { createSlotFill, PanelBody } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import ItemList from './item-list';
+import BlockTypesList from '../block-types-list';
 import { searchItems } from './menu';
 
 const { Fill, Slot } = createSlotFill( 'InserterResultsPortal' );
@@ -25,7 +25,7 @@ const InserterResultsPortal = ( { items, title, onSelect, onHover } ) => {
 					<PanelBody
 						title={ title }
 					>
-						<ItemList items={ filteredItems } onSelect={ onSelect } onHover={ onHover } />
+						<BlockTypesList items={ filteredItems } onSelect={ onSelect } onHover={ onHover } />
 					</PanelBody>
 				);
 			} }

@@ -20,7 +20,7 @@ describe( 'adding inline tokens', () => {
 		await page.click( '.editor-default-block-appender' );
 		await page.keyboard.type( 'a ' );
 
-		insertBlock( 'Inline Image' );
+		await insertBlock( 'Inline Image' );
 
 		// Wait for media modal to appear and upload image.
 		await page.waitForSelector( '.media-modal input[type=file]' );
@@ -38,7 +38,7 @@ describe( 'adding inline tokens', () => {
 		expect( await getHTMLFromCodeEditor() ).toMatch( /<!-- wp:paragraph -->\s*<p>a\u00A0<img class="wp-image-\d+" style="width:10px" src="[^"]+\/10x10_e2e_test_image_z9T8jK\.png" alt="" \/><\/p>\s*<!-- \/wp:paragraph -->/ );
 
 		// Open the media modal again by inserting inline image
-		insertBlock( 'Inline Image' );
+		await insertBlock( 'Inline Image' );
 
 		// Confirm deletion.
 		page.on( 'dialog', async ( dialog ) => {
