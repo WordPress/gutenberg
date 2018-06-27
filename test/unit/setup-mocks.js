@@ -15,11 +15,11 @@ jest.mock( '../../packages/components/src/button', () => {
 	};
 } );
 
-jest.mock( '@wordpress/api-request', () => {
-	const apiRequest = jest.fn( () => {
-		return apiRequest.mockReturnValue;
+jest.mock( '@wordpress/fetch', () => {
+	const fetch = jest.fn( () => {
+		return fetch.mockReturnValue;
 	} );
-	apiRequest.mockReturnValue = 'mock this value by overriding apiRequest.mockReturnValue';
+	fetch.mockReturnValue = 'mock this value by overriding fetch.mockReturnValue';
 
-	return apiRequest;
+	return fetch;
 } );

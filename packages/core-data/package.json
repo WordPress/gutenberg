@@ -20,8 +20,8 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"@wordpress/api-request": "file:../api-request",
 		"@wordpress/data": "file:../data",
+		"@wordpress/fetch": "file:../fetch",
 		"lodash": "^4.17.10",
 		"rememo": "^3.0.0"
 	},

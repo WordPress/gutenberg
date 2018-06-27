@@ -95,6 +95,7 @@ const gutenbergPackages = [
 	'dom',
 	'dom-ready',
 	'element',
+	'fetch',
 	'hooks',
 	'html-entities',
 	'i18n',
@@ -229,9 +230,9 @@ const config = {
 			},
 		} ),
 		new LibraryExportDefaultPlugin( [
-			'api-request',
 			'deprecated',
 			'dom-ready',
+			'fetch',
 			'is-shallow-equal',
 		].map( camelCaseDash ) ),
 	],

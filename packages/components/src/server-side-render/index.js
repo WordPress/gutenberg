@@ -11,7 +11,7 @@ import {
 	RawHTML,
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import apiRequest from '@wordpress/api-request';
+import fetch from '@wordpress/fetch';
 import httpBuildQuery from 'http-build-query';
 
 /**
@@ -56,19 +56,21 @@ export class ServerSideRender extends Component {
 
 		const path = rendererPathWithAttributes( block, attributes );
 
-		return apiRequest( { path } ).fail( ( response ) => {
-			const failResponse = {
-				error: true,
-				errorMsg: response.responseJSON.message || __( 'Unknown error' ),
-			};
-			if ( this.isStillMounted ) {
-				this.setState( { response: failResponse } );
-			}
-		} ).done( ( response ) => {
-			if ( this.isStillMounted && response && response.rendered ) {
-				this.setState( { response: response.rendered } );
-			}
-		} );
+		return fetch( { path } )
+			.then( ( response ) => {
+				if ( this.isStillMounted && response && response.rendered ) {
+					this.setState( { response: response.rendered } );
+				}
+			} )
+			.catch( ( response ) => {
+				const failResponse = {
+					error: true,
+					errorMsg: response.json().message || __( 'Unknown error' ),
+				};
+				if ( this.isStillMounted ) {
+					this.setState( { response: failResponse } );
+				}
+			} );
 	}
 
 	render() {

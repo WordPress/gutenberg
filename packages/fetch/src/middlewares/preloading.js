@@ -1,8 +1,3 @@
-/**
- * External dependencies
- */
-import jQuery from 'jquery';
-
 const createPreloadingMiddleware = ( preloadedData ) => ( options, next ) => {
 	function getStablePath( path ) {
 		const splitted = path.split( '?' );
@@ -32,15 +27,12 @@ const createPreloadingMiddleware = ( preloadedData ) => ( options, next ) => {
 			.join( '&' );
 	}
 
-	if ( typeof options.path === 'string' ) {
+	if ( typeof options.path === 'string' && options.parse !== false ) {
 		const method = options.method || 'GET';
 		const path = getStablePath( options.path );
 
 		if ( 'GET' === method && preloadedData[ path ] ) {
-			const deferred = jQuery.Deferred();
-			deferred.resolve( preloadedData[ path ].body );
-
-			return deferred.promise();
+			return Promise.resolve( preloadedData[ path ].body );
 		}
 	}
 

@@ -7,7 +7,7 @@ import { mapKeys } from 'lodash';
 /**
  * WordPress dependencies
  */
-import apiRequest from '@wordpress/api-request';
+import fetch from '@wordpress/fetch';
 
 export const getStablePath = memoize( ( path ) => {
 	const [ base, query ] = path.split( '?' );
@@ -46,26 +46,6 @@ export const cache = mapKeys(
 );
 
 /**
- * Given an XMLHttpRequest object, returns an array of header tuples.
- *
- * @see https://xhr.spec.whatwg.org/#the-getallresponseheaders()-method
- *
- * @param {XMLHttpRequest} xhr XMLHttpRequest object.
- *
- * @return {Array[]} Array of header tuples.
- */
-export function getResponseHeaders( xhr ) {
-	// 'date: Tue, 22 Aug 2017 18:45:28 GMT↵server: nginx'
-	return xhr.getAllResponseHeaders().trim()
-
-		// [ 'date: Tue, 22 Aug 2017 18:45:28 GMT', 'server: nginx' ]
-		.split( '\u000d\u000a' )
-
-		// [ [ 'date', 'Tue, 22 Aug 2017 18:45:28 GMT' ], [ 'server', 'nginx' ] ]
-		.map( ( entry ) => entry.split( '\u003a\u0020' ) );
-}
-
-/**
  * Returns a response payload if GET request and a cached result exists, or
  * undefined otherwise.
  *
@@ -80,11 +60,11 @@ export function getCachedResponse( request ) {
 }
 
 export function getResponseFromNetwork( request ) {
-	const promise = apiRequest( request )
-		.then( ( body, status, xhr ) => {
+	const promise = fetch( { ...request, parse: false } )
+		.then( ( response ) => {
 			return {
-				body,
-				headers: getResponseHeaders( xhr ),
+				body: response.json(),
+				headers: response.headers,
 			};
 		} );
 

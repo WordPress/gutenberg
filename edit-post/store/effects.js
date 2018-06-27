@@ -9,7 +9,7 @@ import { reduce, some } from 'lodash';
 import { select, subscribe } from '@wordpress/data';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
-import apiRequest from '@wordpress/api-request';
+import fetch from '@wordpress/fetch';
 
 /**
  * Internal dependencies
@@ -111,12 +111,10 @@ const effects = {
 		additionalData.forEach( ( [ key, value ] ) => formData.append( key, value ) );
 
 		// Save the metaboxes
-		apiRequest( {
+		fetch( {
 			url: window._wpMetaBoxUrl,
 			method: 'POST',
-			processData: false,
-			contentType: false,
-			data: formData,
+			body: formData,
 		} )
 			.then( () => store.dispatch( metaBoxUpdatesSuccess() ) );
 	},

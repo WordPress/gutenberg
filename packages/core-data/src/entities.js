@@ -6,7 +6,7 @@ import { upperFirst, camelCase, map, find } from 'lodash';
 /**
  * WordPress dependencies
  */
-import apiRequest from '@wordpress/api-request';
+import fetch from '@wordpress/fetch';
 
 /**
  * Internal dependencies
@@ -30,7 +30,7 @@ export const kinds = [
  * @return {Promise} Entities promise
  */
 async function loadPostTypeEntities() {
-	const postTypes = await apiRequest( { path: '/wp/v2/types?context=edit' } );
+	const postTypes = await fetch( { path: '/wp/v2/types?context=edit' } );
 	return map( postTypes, ( postType, name ) => {
 		return {
 			kind: 'postType',
