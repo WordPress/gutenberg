@@ -43,6 +43,11 @@ export class BlockSwitcher extends Component {
 	render() {
 		const { blocks, onTransform, isLocked } = this.props;
 		const { hoveredClassName } = this.state;
+
+		if ( ! blocks || ! blocks.length ) {
+			return null;
+		}
+
 		const allowedBlocks = getPossibleBlockTransformations( blocks );
 		const sourceBlockName = blocks[ 0 ].name;
 		const blockType = getBlockType( sourceBlockName );
