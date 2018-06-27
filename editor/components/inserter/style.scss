@@ -84,12 +84,16 @@ $block-inserter-search-height: 38px;
 
 	@include break-medium {
 		height: $block-inserter-content-height + $block-inserter-tabs-height;
-		box-shadow: inset 0 -5px 5px -4px rgba( $dark-gray-900, .1 );
 	}
 
 	// Don't show the top border on the first panel, let the Search border be the border.
 	.components-panel__body:first-child {
 		border-top: none;
+	}
+
+	// Don't show the bottom border on the last panel, let the library itself show the border.
+	.components-panel__body:last-child {
+		border-bottom: none;
 	}
 }
 

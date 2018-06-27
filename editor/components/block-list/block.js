@@ -387,6 +387,7 @@ export class BlockListBlock extends Component {
 			hoverArea,
 			isLargeViewport,
 			isEmptyDefaultBlock,
+			isMovable,
 			isPreviousBlockADefaultEmptyBlock,
 			hasSelectedInnerBlock,
 		} = this.props;
@@ -470,7 +471,7 @@ export class BlockListBlock extends Component {
 				] }
 				{ ...wrapperProps }
 			>
-				{ ! isMultiSelected && (
+				{ ! isMultiSelected && isMovable && (
 					<BlockDraggable
 						rootUID={ rootUID }
 						index={ order }
@@ -620,6 +621,7 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 		initialPosition: getSelectedBlocksInitialCaretPosition(),
 		isEmptyDefaultBlock: block && isUnmodifiedDefaultBlock( block ),
 		isPreviousBlockADefaultEmptyBlock: previousBlock && isUnmodifiedDefaultBlock( previousBlock ),
+		isMovable: 'all' !== templateLock,
 		isLocked: !! templateLock,
 		previousBlockUid,
 		block,

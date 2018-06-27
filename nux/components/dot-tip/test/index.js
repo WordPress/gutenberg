@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { shallow } from 'enzyme';
+import { noop } from 'lodash';
 
 /**
  * Internal dependencies
@@ -20,7 +21,7 @@ describe( 'DotTip', () => {
 
 	it( 'should render correctly', () => {
 		const wrapper = shallow(
-			<DotTip isVisible>
+			<DotTip isVisible setTimeout={ noop }>
 				It looks like you’re writing a letter. Would you like help?
 			</DotTip>
 		);
@@ -30,7 +31,7 @@ describe( 'DotTip', () => {
 	it( 'should call onDismiss when the dismiss button is clicked', () => {
 		const onDismiss = jest.fn();
 		const wrapper = shallow(
-			<DotTip isVisible onDismiss={ onDismiss }>
+			<DotTip isVisible onDismiss={ onDismiss } setTimeout={ noop }>
 				It looks like you’re writing a letter. Would you like help?
 			</DotTip>
 		);
@@ -41,7 +42,7 @@ describe( 'DotTip', () => {
 	it( 'should call onDisable when the X button is clicked', () => {
 		const onDisable = jest.fn();
 		const wrapper = shallow(
-			<DotTip isVisible onDisable={ onDisable }>
+			<DotTip isVisible onDisable={ onDisable } setTimeout={ noop }>
 				It looks like you’re writing a letter. Would you like help?
 			</DotTip>
 		);
