@@ -119,7 +119,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-api-request',
 		gutenberg_url( 'build/api-request/index.js' ),
-		array(),
+		array( 'jquery' ),
 		filemtime( gutenberg_dir_path() . 'build/api-request/index.js' ),
 		true
 	);
