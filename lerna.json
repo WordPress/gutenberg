@@ -3,6 +3,7 @@
 	"commands": {
 		"publish": {
 			"ignore": [
+				"**/benchmark/*.js",
 				"**/test/*.js"
 			],
 			"message": "chore(release): publish"
