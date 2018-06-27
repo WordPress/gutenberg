@@ -24,9 +24,10 @@ registerActions( 'core/blocks', {
 
 	// 'addCategories' and 'removeCategories'
 	// to handle with categories
-	addCategories: ( categories ) => ( {
+	addCategories: ( categories, atTheEnd = true ) => ( {
 		type: 'ADD_CATEGORIES',
 		categories,
+		atTheEnd,
 	} ),
 	removeCategories: ( categories ) => ( {
 		type: 'REMOVE_CATEGORIES',
@@ -49,7 +50,7 @@ registerActions( 'core/blocks', {
 dispatch( 'core/blocks' ).removeCategories( [ 'widgets' ] );
 
 // Adding 'StoryPage Blocks' category
-dispatch( 'core/blocks' ).addCategories( [ category ] );
+dispatch( 'core/blocks' ).addCategories( [ category ], false );
 
 // Hidding 'shared' and suggested panels
 dispatch( 'core/blocks' ).hideInserterMenuPanel( SHARED_PANEL );

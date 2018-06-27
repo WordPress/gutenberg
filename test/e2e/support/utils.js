@@ -90,7 +90,32 @@ export async function newDesktopBrowserPage() {
 		fail( error );
 	} );
 
-	await page.setViewport( { width: 1000, height: 700 } );
+	await setViewport( 'large' );
+}
+
+export async function setViewport( type ) {
+	const allowedDimensions = {
+		large: { width: 960, height: 700 },
+		small: { width: 600, height: 700 },
+	};
+	const currentDimmension = allowedDimensions[ type ];
+	await page.setViewport( currentDimmension );
+	await waitForPageDimensions( currentDimmension.width, currentDimmension.height );
+}
+
+/**
+ * Function that waits until the page viewport has the required dimensions.
+ * It is being used to address a problem where after using setViewport the execution may continue,
+ * without the new dimensions being applied.
+ * https://github.com/GoogleChrome/puppeteer/issues/1751
+ *
+ * @param {number} width  Width of the window.
+ * @param {height} height Height of the window.
+ */
+export async function waitForPageDimensions( width, height ) {
+	await page.mainFrame().waitForFunction(
+		`window.innerWidth === ${ width } && window.innerHeight === ${ height }`
+	);
 }
 
 export async function switchToEditor( mode ) {
@@ -165,11 +190,11 @@ export async function pressWithModifier( modifier, key ) {
 }
 
 /**
- * Toggles More Menu item, searchers for the button with the text provided and clicks it.
+ * Clicks on More Menu item, searchers for the button with the text provided and clicks it.
  *
  * @param {string} buttonLabel The label to search the button for.
  */
-export async function toggleMoreMenuItem( buttonLabel ) {
+export async function clickOnMoreMenuItem( buttonLabel ) {
 	await page.click( '.edit-post-more-menu [aria-label="More"]' );
 	const itemButton = ( await page.$x( `//button[contains(text(), \'${ buttonLabel }\')]` ) )[ 0 ];
 	await itemButton.click( 'button' );
@@ -195,4 +220,19 @@ export async function publishPost() {
 
 	// A success notice should show up
 	return page.waitForSelector( '.notice-success' );
+}
+
+/**
+ * Clicks on the button in the header which opens Document Settings sidebar when it is closed.
+ */
+export async function openDocumentSettingsSidebar() {
+	const openButton = await page.$( '.edit-post-header__settings button[aria-label="Settings"][aria-expaned="false"]' );
+
+	if ( openButton ) {
+		await page.click( openButton );
+	}
+}
+
+export async function clearLocalStorage() {
+	await page.evaluate( () => window.localStorage.clear() );
 }

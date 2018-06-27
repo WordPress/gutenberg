@@ -11,6 +11,7 @@ import {
 	getDefaultBlockName,
 	createBlock,
 } from '@wordpress/blocks';
+import { paragraph } from '@wordpress/core-blocks';
 
 /**
  * Returns an action object used in signalling that editor has initialized with
@@ -696,11 +697,16 @@ export function convertBlockToShared( uid ) {
  * @return {Object} Action object
  */
 export function insertDefaultBlock( attributes, rootUID, index ) {
-	const block = createBlock( getDefaultBlockName(), attributes );
+	/**
+	 * @frontkom/gutenberg 0.2.1
+	 * @type {[type]}
+	 */
+	const blockName = rootUID === undefined ? getDefaultBlockName() : paragraph.name;
+	const block = createBlock( blockName, attributes );
 
 	return {
 		...insertBlock( block, index, rootUID ),
-		isProvisional: true,
+		isProvisional: blockName === paragraph.name,
 	};
 }
 

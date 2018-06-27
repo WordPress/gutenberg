@@ -92,7 +92,12 @@ export function categories( state = DEFAULT_CATEGORIES, action ) {
 		case 'ADD_CATEGORIES':
 			const addedSlugs = map( action.categories, ( category ) => category.slug );
 			const previousState = filter( state, ( category ) => addedSlugs.indexOf( category.slug ) === -1 );
-			return [ ...previousState, ...action.categories ];
+
+			if ( !! action.atTheEnd ) {
+				return [ ...previousState, ...action.categories ];
+			}
+
+			return [ ...action.categories, ...previousState ];
 		/*
 		 * @frontkom/gutenberg 0.2.0
 		 */

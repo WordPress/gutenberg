@@ -443,7 +443,7 @@ blocks.registerBlockType( rowBlock.name, rowBlock.settings );
 
 ### Section block
 
-Section is a row with just one column. You can add blocks inside and add classes to style that section.
+**Section** is a row with just one column. You can add blocks inside and add classes to style that section.
 
 ```js
 import {
@@ -454,6 +454,17 @@ import {
 const sectionBlock = storypage.blocks.section;
 
 blocks.registerBlockType( sectionBlock.name, sectionBlock.settings );
+```
+
+After register the block and initialize the editor, you can set **Section** as default block:
+
+```
+import {
+    data,
+    storypage,
+} from '@frontkom/gutenberg';
+
+data.dispatch( 'core/blocks' ).setDefaultBlockName( storypage.blocks.section.name );
 ```
 
 [↑ Go up to Table of contents](#table-of-contents)

@@ -25,9 +25,7 @@ import {
 import {
 	withColors,
 	PostTypeSupportCheck,
-	AlignmentToolbar,
 	BlockControls,
-	ContrastChecker,
 	MediaPlaceholder,
 	InspectorControls,
 	MediaUpload,
@@ -45,13 +43,11 @@ import './editor.scss';
 const { getComputedStyle } = window;
 
 const FallbackStyles = withFallbackStyles( ( node, ownProps ) => {
-	const { textColor, backgroundColor, fontSize, customFontSize } = ownProps.attributes;
+	const { fontSize, customFontSize } = ownProps.attributes;
 	const editableNode = node.querySelector( '[contenteditable="true"]' );
 	//verify if editableNode is available, before using getComputedStyle.
 	const computedStyles = editableNode ? getComputedStyle( editableNode ) : null;
 	return {
-		fallbackBackgroundColor: backgroundColor || ! computedStyles ? undefined : computedStyles.backgroundColor,
-		fallbackTextColor: textColor || ! computedStyles ? undefined : computedStyles.color,
 		fallbackFontSize: fontSize || customFontSize || ! computedStyles ? undefined : parseInt( computedStyles.fontSize ) || undefined,
 	};
 } );
@@ -84,9 +80,9 @@ class PostEdit extends Component {
 		super( ...arguments );
 
 		this.onSelectImage = this.onSelectImage.bind( this );
+		this.toggleImage = this.toggleImage.bind( this );
 		this.toggleParallax = this.toggleParallax.bind( this );
 		this.setDimRatio = this.setDimRatio.bind( this );
-		this.toggleDropCap = this.toggleDropCap.bind( this );
 		this.getFontSize = this.getFontSize.bind( this );
 		this.setFontSize = this.setFontSize.bind( this );
 	}
@@ -98,21 +94,16 @@ class PostEdit extends Component {
 		} );
 	}
 
+	toggleImage() {
+		this.props.setAttributes( { hasImage: ! this.props.attributes.hasImage } );
+	}
+
 	toggleParallax() {
 		this.props.setAttributes( { hasParallax: ! this.props.attributes.hasParallax } );
 	}
 
 	setDimRatio( ratio ) {
 		this.props.setAttributes( { dimRatio: ratio } );
-	}
-
-	toggleDropCap() {
-		const { attributes, setAttributes } = this.props;
-		setAttributes( { dropCap: ! attributes.dropCap } );
-	}
-
-	getDropCapHelp( checked ) {
-		return checked ? __( 'Showing large initial letter.' ) : __( 'Toggle to show a large initial letter.' );
 	}
 
 	getFontSize() {
@@ -158,12 +149,8 @@ class PostEdit extends Component {
 			attributes,
 			setAttributes,
 			className,
-			backgroundColor,
 			textColor,
-			setBackgroundColor,
 			setTextColor,
-			fallbackBackgroundColor,
-			fallbackTextColor,
 			fallbackFontSize,
 		} = this.props;
 
@@ -171,10 +158,9 @@ class PostEdit extends Component {
 			url,
 			title,
 			id,
+			hasImage,
 			hasParallax,
 			dimRatio,
-			textAlign,
-			dropCap,
 			placeholder,
 		} = attributes;
 
@@ -193,12 +179,6 @@ class PostEdit extends Component {
 		const controls = (
 			<Fragment>
 				<BlockControls>
-					<AlignmentToolbar
-						value={ textAlign }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { textAlign: nextAlign } );
-						} }
-					/>
 					<Toolbar>
 						<PostTypeSupportCheck supportKeys="media-library">
 							<MediaUpload
@@ -218,23 +198,30 @@ class PostEdit extends Component {
 					</Toolbar>
 				</BlockControls>
 				<InspectorControls>
-					{ !! url && (
-						<PanelBody title={ __( 'Post Image Settings' ) }>
-							<ToggleControl
-								label={ __( 'Fixed Background' ) }
-								checked={ !! hasParallax }
-								onChange={ this.toggleParallax }
-							/>
-							<RangeControl
-								label={ __( 'Background Dimness' ) }
-								value={ dimRatio }
-								onChange={ this.setDimRatio }
-								min={ 0 }
-								max={ 100 }
-								step={ 10 }
-							/>
-						</PanelBody>
-					) }
+					<PanelBody title={ __( 'Post Image Settings' ) }>
+						<ToggleControl
+							label={ __( 'Show image' ) }
+							checked={ !! hasImage }
+							onChange={ this.toggleImage }
+						/>
+						{ !! url && hasImage && (
+							<Fragment>
+								<ToggleControl
+									label={ __( 'Fixed Background' ) }
+									checked={ !! hasParallax }
+									onChange={ this.toggleParallax }
+								/>
+								<RangeControl
+									label={ __( 'Background Dimness' ) }
+									value={ dimRatio }
+									onChange={ this.setDimRatio }
+									min={ 0 }
+									max={ 100 }
+									step={ 10 }
+								/>
+							</Fragment>
+						) }
+					</PanelBody>
 					<PanelBody title={ __( 'Text Settings' ) } className="blocks-font-size">
 						<FontSizePicker
 							fontSizes={ FONT_SIZES }
@@ -242,33 +229,12 @@ class PostEdit extends Component {
 							value={ fontSize }
 							onChange={ this.setFontSize }
 						/>
-						<ToggleControl
-							label={ __( 'Drop Cap' ) }
-							checked={ !! dropCap }
-							onChange={ this.toggleDropCap }
-							help={ this.getDropCapHelp }
-						/>
 					</PanelBody>
-					<PanelColor
-						colorValue={ backgroundColor.value }
-						initialOpen={ false }
-						title={ __( 'Background Color' ) }
-						onChange={ setBackgroundColor }
-					/>
 					<PanelColor
 						colorValue={ textColor.value }
 						initialOpen={ false }
 						title={ __( 'Text Color' ) }
 						onChange={ setTextColor }
-					/>
-					<ContrastChecker
-						textColor={ textColor.value }
-						backgroundColor={ backgroundColor.value }
-						{ ...{
-							fallbackBackgroundColor,
-							fallbackTextColor,
-						} }
-						isLargeText={ fontSize >= 18 }
 					/>
 				</InspectorControls>
 			</Fragment>
@@ -278,16 +244,11 @@ class PostEdit extends Component {
 			<RichText
 				tagName="p"
 				className={ classnames( 'wp-block-paragraph', {
-					'has-background': backgroundColor.value,
-					'has-drop-cap': dropCap,
-					[ backgroundColor.class ]: backgroundColor.class,
 					[ textColor.class ]: textColor.class,
 				} ) }
 				style={ {
-					backgroundColor: backgroundColor.class ? undefined : backgroundColor.value,
 					color: textColor.class ? undefined : textColor.value,
 					fontSize: fontSize ? fontSize + 'px' : undefined,
-					textAlign,
 				} }
 				value={ title }
 				onChange={ ( nextContent ) => {
@@ -296,6 +257,7 @@ class PostEdit extends Component {
 					} );
 				} }
 				placeholder={ placeholder || __( 'Add text or type' ) }
+				formattingControls={ [ 'bold', 'italic' ] }
 				inlineToolbar
 			/>
 		);
@@ -304,16 +266,18 @@ class PostEdit extends Component {
 			return (
 				<div className={ className }>
 					{ controls }
-					<MediaPlaceholder
-						icon="format-image"
-						labels={ {
-							title: __( 'Post image' ),
-							name: __( 'an image' ),
-						} }
-						onSelect={ this.onSelectImage }
-						accept="image/*"
-						type="image"
-					/>
+					{ hasImage &&
+						<MediaPlaceholder
+							icon="format-image"
+							labels={ {
+								title: __( 'Post image' ),
+								name: __( 'an image' ),
+							} }
+							onSelect={ this.onSelectImage }
+							accept="image/*"
+							type="image"
+						/>
+					}
 					{ richText }
 				</div>
 			);
@@ -322,11 +286,13 @@ class PostEdit extends Component {
 		return (
 			<div className={ className }>
 				{ controls }
-				<div
-					data-url={ url }
-					style={ imageStyle }
-					className={ imageClasses }
-				></div>
+				{ hasImage &&
+					<div
+						data-url={ url }
+						style={ imageStyle }
+						className={ imageClasses }
+					></div>
+				}
 				{ richText }
 			</div>
 		);
@@ -344,8 +310,6 @@ export default compose(
 	} ),
 	withColors( ( getColor, setColor, { attributes } ) => {
 		return {
-			backgroundColor: getColor( attributes.backgroundColor, attributes.customBackgroundColor, 'background-color' ),
-			setBackgroundColor: setColor( 'backgroundColor', 'customBackgroundColor' ),
 			textColor: getColor( attributes.textColor, attributes.customTextColor, 'color' ),
 			setTextColor: setColor( 'textColor', 'customTextColor' ),
 		};

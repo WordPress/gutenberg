@@ -30,6 +30,10 @@ const blockAttributes = {
 	id: { // mediaId
 		type: 'number',
 	},
+	hasImage: {
+		type: 'boolean',
+		default: true,
+	},
 	hasParallax: {
 		type: 'boolean',
 		default: false,
@@ -44,28 +48,15 @@ const blockAttributes = {
 		selector: 'p',
 		default: [],
 	},
-	textAlign: { // align
-		type: 'string',
-	},
-	dropCap: {
-		type: 'boolean',
-		default: false,
-	},
 	textColor: {
 		type: 'string',
 	},
 	customTextColor: {
 		type: 'string',
 	},
-	backgroundColor: {
-		type: 'string',
-	},
-	customBackgroundColor: {
-		type: 'string',
-	},
 	fontSize: {
 		type: 'string',
-		default: 'regular',
+		default: 'large',
 	},
 	customFontSize: {
 		type: 'number',
@@ -93,15 +84,12 @@ export const settings = {
 	save( { attributes, className } ) {
 		const {
 			url,
+			hasImage,
 			hasParallax,
 			dimRatio,
 			title,
-			textAlign,
-			dropCap,
 			textColor,
 			customTextColor,
-			backgroundColor,
-			customBackgroundColor,
 			fontSize,
 			customFontSize,
 			link,
@@ -120,30 +108,26 @@ export const settings = {
 
 		// Title
 		const textClass = getColorClass( 'color', textColor );
-		const backgroundClass = getColorClass( 'background-color', backgroundColor );
 		const fontSizeClass = fontSize && `is-${ fontSize }-text`;
 
 		const textClasses = classnames( {
-			'has-background': backgroundColor || customBackgroundColor,
-			'has-drop-cap': dropCap,
 			[ fontSizeClass ]: fontSizeClass,
 			[ textClass ]: textClass,
-			[ backgroundClass ]: backgroundClass,
 		} );
 
 		const textStyle = {
-			backgroundColor: backgroundClass ? undefined : customBackgroundColor,
 			color: textClass ? undefined : customTextColor,
 			fontSize: fontSizeClass ? undefined : customFontSize,
-			textAlign,
 		};
 
 		const post = (
 			<div className={ className }>
-				<div
-					className={ imageClasses }
-					style={ imageStyle }
-				></div>
+				{ hasImage &&
+					<div
+						className={ imageClasses }
+						style={ imageStyle }
+					></div>
+				}
 				<RichText.Content
 					tagName="p"
 					style={ textStyle }
