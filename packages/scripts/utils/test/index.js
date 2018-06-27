@@ -18,7 +18,6 @@ jest.mock( '../process', () => {
  */
 import crossSpawn from 'cross-spawn';
 import {
-	getCliArgs,
 	hasCliArg,
 	hasProjectFile,
 	spawnScript,

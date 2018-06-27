@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { parse, format } from 'url';
-import { parse as parseQueryString, stringify } from 'querystring';
 
 const EMAIL_REGEXP = /^(mailto:)?[a-z0-9._%+-]+@[a-z0-9][a-z0-9.-]*\.[a-z]{2,63}$/i;
 const USABLE_HREF_REGEXP = /^(?:[a-z]+:|#|\?|\.|\/)/i;

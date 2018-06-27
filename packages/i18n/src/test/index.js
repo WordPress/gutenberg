@@ -98,9 +98,7 @@ describe( 'i18n', () => {
 			it( 'existing translation still available', () => {
 				expect( __( 'hello', 'test_domain' ) ).toBe( 'bonjour' );
 			} );
-		} );
 
-		describe( '__', () => {
 			it( 'new translation available.', () => {
 				expect( __( 'cheeseburger', 'test_domain' ) ).toBe( 'hamburger au fromage' );
 			} );

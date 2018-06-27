@@ -2,20 +2,21 @@
 	"name": "@wordpress/is-shallow-equal",
 	"version": "1.0.2",
 	"description": "Test for shallow equality between two objects or arrays",
-	"author": "WordPress",
+	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
+		"wordpress",
 		"shallow",
 		"shallow-equal",
 		"shallowequal"
 	],
-	"homepage": "https://github.com/WordPress/packages/tree/master/packages/is-shallow-equal/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/is-shallow-equal/README.md",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/WordPress/packages.git"
+		"url": "https://github.com/WordPress/gutenberg.git"
 	},
 	"bugs": {
-		"url": "https://github.com/WordPress/packages/issues"
+		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",

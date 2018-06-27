@@ -1,34 +1,36 @@
 /**
  * External dependencies
  */
-
-const path = require( 'path' );
-const { promisify } = require( 'util' );
-const webpack = promisify( require( 'webpack' ) );
-const fs = require( 'fs' );
-const access = promisify( fs.access );
-const unlink = promisify( fs.unlink );
+import { access, unlink } from 'fs';
+import path from 'path';
+import { promisify } from 'util';
+import webpack from 'webpack';
 
 /**
  * Internal dependencies
  */
+import config from './fixtures/webpack.config.js';
 
-const config = require( './fixtures/webpack.config.js' );
-const CustomTemplatedPathPlugin = require( '../' );
+/**
+ * Local variables
+ */
+const accessAsync = promisify( access );
+const unlinkAsync = promisify( unlink );
+const webpackAsync = promisify( webpack );
 
 describe( 'CustomTemplatedPathPlugin', () => {
-	const outputFile = path.join( __dirname, '/fixtures/entry.js' );
+	const outputFile = path.join( __dirname, '/fixtures/build/entry.js' );
 
 	beforeAll( async () => {
 		// Remove output file so as not to report false positive from previous
 		// test. Absorb error since the file may not exist (unlink will throw).
 		try {
-			await unlink( outputFile );
+			await unlinkAsync( outputFile );
 		} catch ( error ) {}
 	} );
 
 	it( 'should resolve with basename output', async () => {
-		const stats = await webpack( config );
-		await access( outputFile );
+		await webpackAsync( config );
+		await accessAsync( outputFile );
 	} );
 } );

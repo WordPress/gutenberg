@@ -1,5 +1,3 @@
-import validateHookName from './validateHookName.js';
-
 /**
  * Returns a function which, when invoked, will execute all callbacks
  * registered to a hook of the specified type, optionally returning the final
@@ -21,7 +19,6 @@ function createRunHook( hooks, returnFirstArg ) {
 	 * @return {*}               Return value of runner, if applicable.
 	 */
 	return function runHooks( hookName, ...args ) {
-		let handlers;
 		if ( ! hooks[ hookName ] ) {
 			hooks[ hookName ] = {
 				handlers: [],
@@ -31,7 +28,7 @@ function createRunHook( hooks, returnFirstArg ) {
 
 		hooks[ hookName ].runs++;
 
-		handlers = hooks[ hookName ].handlers;
+		const handlers = hooks[ hookName ].handlers;
 
 		if ( ! handlers || ! handlers.length ) {
 			return returnFirstArg ?

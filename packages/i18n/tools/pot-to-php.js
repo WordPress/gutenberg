@@ -2,7 +2,6 @@
 
 const gettextParser = require( 'gettext-parser' );
 const { isEmpty } = require( 'lodash' );
-const path = require( 'path' );
 const fs = require( 'fs' );
 
 const TAB = '\t';

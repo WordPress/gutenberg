@@ -15,7 +15,7 @@ module.exports = {
 	context: __dirname,
 	entry: './entry',
 	output: {
-		filename: '[basename].js',
+		filename: 'build/[basename].js',
 		path: __dirname,
 	},
 	plugins: [

@@ -2,18 +2,19 @@
 	"name": "@wordpress/i18n",
 	"version": "1.1.1",
 	"description": "WordPress i18n library",
-	"author": "WordPress",
+	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
+		"wordpress",
 		"i18n"
 	],
-	"homepage": "https://github.com/WordPress/packages/tree/master/packages/i18n/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/i18n/README.md",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/WordPress/packages.git"
+		"url": "https://github.com/WordPress/gutenberg.git"
 	},
 	"bugs": {
-		"url": "https://github.com/WordPress/packages/issues"
+		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",

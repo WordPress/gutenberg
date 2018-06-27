@@ -48,5 +48,6 @@ const afterArrayUnequal = [ 1, 2, 3, 4, 5, 'Unequal', 7 ];
 } );
 
 suite
+	// eslint-disable-next-line no-console
 	.on( 'cycle', ( event ) => console.log( event.target.toString() ) )
 	.run( { async: true } );

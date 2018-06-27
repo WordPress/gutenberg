@@ -7,7 +7,7 @@
  *
  * @return {Function}                Function that returns the current hook.
  */
-function createCurrentHook( hooks, returnFirstArg ) {
+function createCurrentHook( hooks ) {
 	/**
 	 * Returns the name of the currently running hook, or `null` if no hook of
 	 * the given type is currently running.

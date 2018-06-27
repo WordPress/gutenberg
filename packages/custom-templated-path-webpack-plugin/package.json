@@ -2,19 +2,20 @@
 	"name": "@wordpress/custom-templated-path-webpack-plugin",
 	"version": "1.0.2",
 	"description": "Webpack plugin for creating custom path template tags",
-	"author": "WordPress",
+	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
+		"wordpress",
 		"webpack",
 		"webpack-plugin"
 	],
-	"homepage": "https://github.com/WordPress/packages/blob/master/packages/custom-templated-path-webpack-plugin/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/blob/master/packages/custom-templated-path-webpack-plugin/README.md",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/WordPress/packages.git"
+		"url": "https://github.com/WordPress/gutenberg.git"
 	},
 	"bugs": {
-		"url": "https://github.com/WordPress/packages/issues"
+		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",

@@ -28,12 +28,14 @@ function createAddHook( hooks ) {
 		}
 
 		if ( 'function' !== typeof callback ) {
+			// eslint-disable-next-line no-console
 			console.error( 'The hook callback must be a function.' );
 			return;
 		}
 
 		// Validate numeric priority
 		if ( 'number' !== typeof priority ) {
+			// eslint-disable-next-line no-console
 			console.error( 'If specified, the hook priority must be a number.' );
 			return;
 		}

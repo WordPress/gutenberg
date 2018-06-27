@@ -13,7 +13,7 @@ describe( 'npm-package-json-lint config tests', () => {
 		expect( isPlainObj( config ) ).toBeTruthy();
 	} );
 
-	it( 'should be an object', () => {
+	it( 'should have rules property as an object', () => {
 		expect( isPlainObj( config.rules ) ).toBeTruthy();
 	} );
 } );
