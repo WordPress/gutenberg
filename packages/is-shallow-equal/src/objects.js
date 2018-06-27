@@ -1,6 +1,7 @@
-'use strict';
-
-const keys = Object.keys;
+/**
+ * Local variables
+ */
+const { keys } = Object;
 
 /**
  * Returns true if the two objects are shallow equal, or false otherwise.
@@ -11,23 +12,21 @@ const keys = Object.keys;
  * @return {boolean} Whether the two objects are shallow equal.
  */
 function isShallowEqualObjects( a, b ) {
-	let aKeys, bKeys, i, key;
-
 	if ( a === b ) {
 		return true;
 	}
 
-	aKeys = keys( a );
-	bKeys = keys( b );
+	const aKeys = keys( a );
+	const bKeys = keys( b );
 
 	if ( aKeys.length !== bKeys.length ) {
 		return false;
 	}
 
-	i = 0;
+	let i = 0;
 
 	while ( i < aKeys.length ) {
-		key = aKeys[ i ];
+		const key = aKeys[ i ];
 		if ( a[ key ] !== b[ key ] ) {
 			return false;
 		}
@@ -38,4 +37,4 @@ function isShallowEqualObjects( a, b ) {
 	return true;
 }
 
-module.exports = isShallowEqualObjects;
+export default isShallowEqualObjects;

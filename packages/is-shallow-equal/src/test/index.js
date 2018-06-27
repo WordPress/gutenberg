@@ -1,9 +1,9 @@
 /**
  * Internal Dependencies
  */
-const isShallowEqual = require( '../' );
-const isShallowEqualArrays = require( '../arrays' );
-const isShallowEqualObjects = require( '../objects' );
+import isShallowEqual from '../';
+import isShallowEqualArrays from '../arrays';
+import isShallowEqualObjects from '../objects';
 
 describe( 'isShallowEqual', () => {
 	it( 'returns false if of different types', () => {

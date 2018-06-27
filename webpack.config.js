@@ -287,7 +287,12 @@ const config = {
 				return path;
 			},
 		} ),
-		new LibraryExportDefaultPlugin( [ 'deprecated', 'dom-ready', 'api-request' ].map( camelCaseDash ) ),
+		new LibraryExportDefaultPlugin( [
+			'api-request',
+			'deprecated',
+			'dom-ready',
+			'is-shallow-equal',
+		].map( camelCaseDash ) ),
 	],
 	stats: {
 		children: false,

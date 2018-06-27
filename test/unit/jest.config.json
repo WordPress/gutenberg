@@ -6,8 +6,8 @@
 	],
 	"moduleNameMapper": {
 		"@wordpress\\/(blocks|components|editor|utils|edit-post|viewport|core-blocks|nux)$": "$1",
-		"@wordpress\\/(a11y|api-request|autop|blob|core-data|data|date|dom|deprecated|element|hooks|i18n|plugins|postcss-themes|url|wordcount)$": "packages/$1/src",
-		"@wordpress\\/(is-shallow-equal)$": "packages/$1"
+		"@wordpress\\/(browserslist-config)$": "packages/$1",
+		"@wordpress\\/(.*)$": "packages/$1/src"
 	},
 	"preset": "@wordpress/jest-preset-default",
 	"setupFiles": [

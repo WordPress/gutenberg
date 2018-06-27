@@ -17,6 +17,8 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/packages/issues"
 	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
 	"devDependencies": {
 		"benchmark": "^2.1.4",
 		"fbjs": "^0.8.16",

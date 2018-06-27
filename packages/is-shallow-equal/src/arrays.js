@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Returns true if the two arrays are shallow equal, or false otherwise.
  *
@@ -9,8 +7,6 @@
  * @return {boolean} Whether the two arrays are shallow equal.
  */
 function isShallowEqualArrays( a, b ) {
-	let i;
-
 	if ( a === b ) {
 		return true;
 	}
@@ -19,7 +15,7 @@ function isShallowEqualArrays( a, b ) {
 		return false;
 	}
 
-	for ( i = 0; i < a.length; i++ ) {
+	for ( let i = 0; i < a.length; i++ ) {
 		if ( a[ i ] !== b[ i ] ) {
 			return false;
 		}
@@ -28,4 +24,4 @@ function isShallowEqualArrays( a, b ) {
 	return true;
 }
 
-module.exports = isShallowEqualArrays;
+export default isShallowEqualArrays;

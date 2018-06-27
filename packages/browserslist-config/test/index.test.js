@@ -1,17 +1,19 @@
-const browserslist = require( 'browserslist' );
-const config = require( '../' );
+/**
+ * External dependencies
+ */
+import browserslist from 'browserslist';
 
-beforeEach( () => {
-	jest.resetModules();
-} );
+/**
+ * Internal dependencies
+ */
+import config from '../';
 
 it( 'should export an array', () => {
 	expect( Array.isArray( config ) ).toBe( true );
 } );
 
 it( 'should not contain invalid queries', () => {
-	jest.doMock( '@wordpress/browserslist-config', () => require( '../index' ), { virtual: true } );
-
 	const result = browserslist( [ 'extends @wordpress/browserslist-config' ] );
+
 	expect( result ).toBeTruthy();
 } );
