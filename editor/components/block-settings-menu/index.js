@@ -9,7 +9,7 @@ import { castArray } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { IconButton, Dropdown, NavigableMenu } from '@wordpress/components';
+import { IconButton, Dropdown, NavigableMenu, MenuGroup } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
 
 /**
@@ -94,12 +94,16 @@ export class BlockSettingsMenu extends Component {
 					renderContent={ ( { onClose } ) => (
 						// Should this just use a DropdownMenu instead of a DropDown ?
 						<NavigableMenu className="editor-block-settings-menu__content">
-							<_BlockSettingsMenuFirstItem.Slot fillProps={ { onClose } } />
-							{ count === 1 && <BlockModeToggle uid={ firstBlockUID } onToggle={ onClose } role="menuitem" /> }
-							{ count === 1 && <UnknownConverter uid={ firstBlockUID } role="menuitem" /> }
-							<BlockDuplicateButton uids={ uids } rootUID={ rootUID } role="menuitem" />
-							{ count === 1 && <SharedBlockSettings uid={ firstBlockUID } onToggle={ onClose } itemsRole="menuitem" /> }
-							<BlockRemoveButton uids={ uids } role="menuitem" />
+							<MenuGroup>
+								<_BlockSettingsMenuFirstItem.Slot fillProps={ { onClose } } />
+								{ count === 1 && <BlockModeToggle uid={ firstBlockUID } onToggle={ onClose } role="menuitem" /> }
+								{ count === 1 && <UnknownConverter uid={ firstBlockUID } role="menuitem" /> }
+								<BlockDuplicateButton uids={ uids } rootUID={ rootUID } role="menuitem" />
+								{ count === 1 && <SharedBlockSettings uid={ firstBlockUID } onToggle={ onClose } itemsRole="menuitem" /> }
+							</MenuGroup>
+							<MenuGroup>
+								<BlockRemoveButton uids={ uids } role="menuitem" />
+							</MenuGroup>
 						</NavigableMenu>
 					) }
 				/>
