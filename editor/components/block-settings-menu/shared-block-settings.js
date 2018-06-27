@@ -9,10 +9,26 @@ import { noop } from 'lodash';
 import { Fragment, compose } from '@wordpress/element';
 import { IconButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { isSharedBlock } from '@wordpress/blocks';
+import { isSharedBlock, hasBlockSupport } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 
-export function SharedBlockSettings( { sharedBlock, onConvertToStatic, onConvertToShared, onDelete, itemsRole } ) {
+export function SharedBlockSettings( {
+	block,
+	sharedBlock,
+	onConvertToStatic,
+	onConvertToShared,
+	onDelete,
+	itemsRole,
+} ) {
+	/**
+	 * Allow blocks to indicate that they cannot be made into a shared block. This
+	 * is a non-public API since the user could work around it by e.g. nesting the
+	 * block within a container block and sharing the container block.
+	 */
+	if ( ! hasBlockSupport( block.name, '_sharing', true ) ) {
+		return null;
+	}
+
 	return (
 		<Fragment>
 			{ ! sharedBlock && (
@@ -55,6 +71,7 @@ export default compose( [
 		const { getBlock, getSharedBlock } = select( 'core/editor' );
 		const block = getBlock( uid );
 		return {
+			block,
 			sharedBlock: block && isSharedBlock( block ) ? getSharedBlock( block.attributes.ref ) : null,
 		};
 	} ),
