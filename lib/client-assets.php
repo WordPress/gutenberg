@@ -1229,8 +1229,8 @@ function editor_color_palette_slugs( $color_palette ) {
 
 	if ( $is_doing_it_wrong ) {
 		_doing_it_wrong(
-			'add_theme_support/editor-color-palette',
-			__( 'Color palette should have a color slug defined.', 'gutenberg' ),
+			'add_theme_support',
+			__( 'The "editor-color-palette" should have color slugs defined.', 'gutenberg' ),
 			'3.2.0'
 		);
 	}
