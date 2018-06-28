@@ -39,6 +39,7 @@
     "bypass-gb-babel": "echo '{}' > gutenberg/.babelrc",
     "pre-build": "yarn check-gb-unused-babelrc && yarn bypass-gb-babel",
     "start": "yarn pre-build && yarn react-native start",
+    "start:reset": "yarn clean:runtime && yarn start --reset-cache",
     "start:debug": "yarn pre-build && node --inspect-brk node_modules/.bin/react-native start",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
@@ -46,7 +47,9 @@
     "test:debug": "cross-env NODE_ENV=test node --inspect-brk node_modules/jest/bin/jest.js --runInBand --verbose --config jest.config.js",
     "flow": "flow",
     "prettier": "prettier-eslint --write $npm_package_config_jsfiles $npm_package_config_scssfiles",
-    "clean": "yarn test --clearCache; watchman watch-del-all; rm -rf node_modules; rm -f yarn.lock; rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/jest_*",
+    "clean": "yarn clean:setup; yarn clean:runtime",
+    "clean:runtime": "yarn test --clearCache; watchman watch-del-all; rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/jest_*",
+    "clean:setup": "rm -rf node_modules; rm -f yarn.lock",
     "clean:install": "yarn clean; yarn",
     "lint": "eslint $npm_package_config_jsfiles",
     "lint:fix": "eslint $npm_package_config_jsfiles --fix"
