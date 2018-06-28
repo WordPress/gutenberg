@@ -87,7 +87,7 @@
 		"eslint-plugin-react": "7.7.0",
 		"espree": "3.5.4",
 		"extract-text-webpack-plugin": "4.0.0-beta.0",
-		"node-sass": "git://github.com/sass/node-sass.git#v4.7.0",
+		"node-sass": "4.9.0",
 		"pegjs": "0.10.0",
 		"pegjs-loader": "0.5.4",
 		"phpegjs": "1.0.0-beta7",
