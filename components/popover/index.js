@@ -18,12 +18,13 @@ import { ESCAPE } from '@wordpress/keycodes';
 import './style.scss';
 import { computePopoverPosition } from './utils';
 import withFocusReturn from '../higher-order/with-focus-return';
+import withConstrainedTabbing from '../higher-order/with-constrained-tabbing';
 import PopoverDetectOutside from './detect-outside';
 import IconButton from '../icon-button';
 import ScrollLock from '../scroll-lock';
 import { Slot, Fill } from '../slot-fill';
 
-const FocusManaged = withFocusReturn( ( { children } ) => children );
+const FocusManaged = withConstrainedTabbing( withFocusReturn( ( { children } ) => children ) );
 
 /**
  * Name of slot in which popover should fill.
