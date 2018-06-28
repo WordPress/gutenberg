@@ -1216,13 +1216,23 @@ add_action( 'enqueue_block_assets', 'polyfill_blocks_module_in_scripts', 9 );
  */
 function editor_color_palette_slugs( $color_palette ) {
 	$new_color_palette = array();
+	$is_doing_it_wrong = false;
 
 	foreach ( $color_palette as $color ) {
 		if ( ! isset( $color['slug'] ) ) {
 			$color['slug'] = esc_js( $color['name'] );
+			$is_doing_it_wrong = true;
 		}
 
 		$new_color_palette[] = $color;
+	}
+
+	if( $is_doing_it_wrong ) {
+		_doing_it_wrong(
+			'add_theme_support/editor-color-palette',
+			__( 'Color palette should have a color slug defined.', 'gutenberg'),
+			'3.2.0'
+		);
 	}
 
 	return $new_color_palette;
