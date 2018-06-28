@@ -931,6 +931,30 @@ export function isBlockMultiSelected( state, uid ) {
 }
 
 /**
+ * Returns true if an ancestor of the block is multi-selected and false otherwise.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} uid   Block unique ID.
+ *
+ * @return {boolean} Whether an ancestor of the block is in multi-selection set.
+ */
+export const isAncestorMultiSelected = createSelector(
+	( state, uid ) => {
+		let ancestorUid = uid;
+		let isMultiSelected = false;
+		while ( ancestorUid && ! isMultiSelected ) {
+			ancestorUid = getBlockRootUID( state, ancestorUid );
+			isMultiSelected = isBlockMultiSelected( state, ancestorUid );
+		}
+		return isMultiSelected;
+	},
+	( state ) => [
+		state.editor.present.blockOrder,
+		state.blockSelection.start,
+		state.blockSelection.end,
+	],
+);
+/**
  * Returns the unique ID of the block which begins the multi-selection set, or
  * null if there is no multi-selection.
  *
