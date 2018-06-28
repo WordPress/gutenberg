@@ -119,7 +119,7 @@ Whether to apply debouncing for the autocompleter. Set to true to enable debounc
 Here is a contrived completer for feelings. It yields editable tokens like "!resolute".
 
 ```jsx
-const fruitCompleter = {
+const feelingCompleter = {
 	name: 'feeling',
 	// The prefix that triggers this completer
 	triggerPrefix: '!',

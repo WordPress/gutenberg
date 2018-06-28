@@ -658,19 +658,21 @@ export class Autocomplete extends Component {
 	}
 
 	handleKeyDown( event ) {
-		const { ctrlKey, shiftKey, altKey, metaKey } = event;
+		const { keyCode, ctrlKey, shiftKey, altKey, metaKey } = event;
 		const { open, suppress, query } = this.state;
-		if (
-			event.keyCode === SPACE &&
-			! ( ctrlKey || shiftKey || altKey || metaKey ) &&
-			open && suppress !== open.idx
-		) {
+		const completerIsOpenAndUnsuppressed = open && suppress !== open.idx;
+
+		if ( ! completerIsOpenAndUnsuppressed ) {
+			return;
+		}
+
+		if ( keyCode === SPACE && ! ( ctrlKey || shiftKey || altKey || metaKey ) ) {
 			// Insert a completion when the user spaces after typing an exact option match.
 			const exactMatchSearch = new RegExp( '^' + escapeRegExp( query ) + '$', 'i' );
-			const wasOptions = this.state[ 'options_' + open.idx ];
-			const [ firstMatchingOption ] = filterOptions( exactMatchSearch, wasOptions );
-			if ( firstMatchingOption ) {
-				this.select( firstMatchingOption );
+			const currentCompleterOptions = this.state[ 'options_' + open.idx ];
+			const [ exactMatch ] = filterOptions( exactMatchSearch, currentCompleterOptions );
+			if ( exactMatch ) {
+				this.select( exactMatch );
 			}
 		}
 	}
