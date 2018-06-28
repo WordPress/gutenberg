@@ -7,7 +7,7 @@ import { castArray } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { compose, createElement } from '@wordpress/element';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal dependencies

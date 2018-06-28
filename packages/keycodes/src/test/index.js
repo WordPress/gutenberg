@@ -5,7 +5,7 @@ import {
 	isMacOS,
 	displayShortcut,
 	rawShortcut,
-} from '../keycodes';
+} from '../';
 
 const isMacOSFalse = () => false;
 const isMacOSTrue = () => true;

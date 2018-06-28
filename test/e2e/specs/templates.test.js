@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage, toggleMoreMenuItem } from '../support/utils';
+import { clickOnMoreMenuItem, newPost, newDesktopBrowserPage } from '../support/utils';
 import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
 describe( 'Using a CPT with a predefined template', () => {
@@ -19,7 +19,7 @@ describe( 'Using a CPT with a predefined template', () => {
 
 	it( 'Should add a custom post types with a predefined template', async () => {
 		//Switch to Code Editor to check HTML output
-		await toggleMoreMenuItem( 'Code Editor' );
+		await clickOnMoreMenuItem( 'Code Editor' );
 
 		// Assert that the post already contains the template defined blocks
 		const textEditorContent = await page.$eval( '.editor-post-text-editor', ( element ) => element.value );

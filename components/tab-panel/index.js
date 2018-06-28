@@ -29,12 +29,13 @@ const TabButton = ( { tabId, onClick, children, selected, ...rest } ) => (
 class TabPanel extends Component {
 	constructor() {
 		super( ...arguments );
+		const { tabs, initialTabName } = this.props;
 
 		this.handleClick = this.handleClick.bind( this );
 		this.onNavigate = this.onNavigate.bind( this );
 
 		this.state = {
-			selected: this.props.tabs.length > 0 ? this.props.tabs[ 0 ].name : null,
+			selected: initialTabName || ( tabs.length > 0 ? tabs[ 0 ].name : null ),
 		};
 	}
 

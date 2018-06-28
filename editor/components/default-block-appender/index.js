@@ -59,7 +59,7 @@ export function DefaultBlockAppender( {
 			<InserterWithShortcuts rootUID={ rootUID } layout={ layout } />
 			<Inserter position="top right">
 				<DotTip id="core/editor.inserter">
-					{ __( 'Welcome to the wonderful world of blocks! Click ‘Add block’ to insert different kinds of content—text, images, quotes, video, lists, and much more.' ) }
+					{ __( 'Welcome to the wonderful world of blocks! Click the “+” (“Add block”) button to add a new block. There are blocks available for all kind of content: you can insert text, headings, images, lists, and lots more!' ) }
 				</DotTip>
 			</Inserter>
 		</div>

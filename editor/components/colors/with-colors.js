@@ -8,7 +8,7 @@ import { find, get, isFunction, isString, kebabCase, reduce, upperFirst } from '
  */
 import { createHigherOrderComponent, Component, compose } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import { deprecated } from '@wordpress/utils';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies

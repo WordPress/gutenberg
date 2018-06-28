@@ -108,6 +108,22 @@
 		"presets": [
 			"@wordpress/default"
 		],
+		"plugins": [
+			[
+				"./packages/babel-plugin-import-jsx-pragma",
+				{
+					"scopeVariable": "createElement",
+					"source": "@wordpress/element",
+					"isDefault": false
+				}
+			],
+			[
+				"babel-plugin-transform-react-jsx",
+				{
+					"pragma": "createElement"
+				}
+			]
+		],
 		"env": {
 			"production": {
 				"plugins": [
@@ -143,14 +159,16 @@
 	},
 	"scripts": {
 		"prebuild": "npm run check-engines",
-		"build:packages": "rimraf ./packages/*/build ./packages/*/build-module && node ./bin/packages/build.js",
+		"clean:packages": "rimraf ./packages/*/build ./packages/*/build-module",
+		"prebuild:packages": "npm run clean:packages && cross-env INCLUDE_PACKAGES=babel-plugin-import-jsx-pragma node ./bin/packages/build.js",
+		"build:packages": "cross-env TRANSFORM_JSX_PRAGMA=1 EXCLUDE_PACKAGES=babel-plugin-import-jsx-pragma node ./bin/packages/build.js",
 		"build": "npm run build:packages && cross-env NODE_ENV=production webpack",
 		"check-engines": "check-node-version --package",
 		"ci": "concurrently \"npm run lint && npm run build\" \"npm run test-unit:coverage-ci\"",
 		"predev": "npm run check-engines",
 		"dev": "npm run build:packages && concurrently \"cross-env webpack --watch\" \"npm run dev:packages\"",
 		"dev:packages": "node ./bin/packages/watch.js",
-		"docs:generate-data-reference": "node docs/data/tool",
+		"docs:build": "node docs/tool",
 		"fixtures:clean": "rimraf \"core-blocks/test/fixtures/*.+(json|serialized.html)\"",
 		"fixtures:server-registered": "docker-compose run -w /var/www/html/wp-content/plugins/gutenberg --rm wordpress ./bin/get-server-blocks.php > core-blocks/test/server-registered.json",
 		"fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
@@ -167,12 +185,13 @@
 		"publish:dev": "lerna publish --npm-tag next",
 		"publish:prod": "lerna publish",
 		"test": "npm run lint && npm run test-unit",
-		"test-e2e": "wp-scripts test-unit-js --config test/e2e/jest.config.json",
+		"test-e2e": "wp-scripts test-unit-js --config test/e2e/jest.config.json --runInBand",
 		"test-e2e:watch": "npm run test-e2e -- --watch",
 		"test-php": "npm run lint-php && npm run test-unit-php",
 		"test-unit": "wp-scripts test-unit-js --config test/unit/jest.config.json",
 		"test-unit:coverage": "npm run test-unit -- --coverage",
 		"test-unit:coverage-ci": "npm run test-unit -- --coverage --maxWorkers 1 && codecov",
+		"test-unit:update": "npm run test-unit -- --updateSnapshot",
 		"test-unit:watch": "npm run test-unit -- --watch",
 		"test-unit-php": "docker-compose run --rm wordpress_phpunit phpunit",
 		"test-unit-php-multisite": "docker-compose run -e WP_MULTISITE=1 --rm wordpress_phpunit phpunit"

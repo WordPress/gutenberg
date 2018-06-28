@@ -15,7 +15,7 @@ import {
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
 } from '@wordpress/dom';
-import { keycodes } from '@wordpress/utils';
+import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import {
 	createBlock,
 	cloneBlock,
@@ -50,8 +50,6 @@ import IgnoreNestedEvents from './ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
 import withHoverAreas from './with-hover-areas';
-
-const { BACKSPACE, DELETE, ENTER } = keycodes;
 
 export class BlockListBlock extends Component {
 	constructor() {
@@ -387,6 +385,7 @@ export class BlockListBlock extends Component {
 			hoverArea,
 			isLargeViewport,
 			isEmptyDefaultBlock,
+			isMovable,
 			isPreviousBlockADefaultEmptyBlock,
 			hasSelectedInnerBlock,
 		} = this.props;
@@ -470,7 +469,7 @@ export class BlockListBlock extends Component {
 				] }
 				{ ...wrapperProps }
 			>
-				{ ! isMultiSelected && (
+				{ ! isMultiSelected && isMovable && (
 					<BlockDraggable
 						rootUID={ rootUID }
 						index={ order }
@@ -620,6 +619,7 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 		initialPosition: getSelectedBlocksInitialCaretPosition(),
 		isEmptyDefaultBlock: block && isUnmodifiedDefaultBlock( block ),
 		isPreviousBlockADefaultEmptyBlock: previousBlock && isUnmodifiedDefaultBlock( previousBlock ),
+		isMovable: 'all' !== templateLock,
 		isLocked: !! templateLock,
 		previousBlockUid,
 		block,

@@ -2,12 +2,19 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, Toolbar, withNotices } from '@wordpress/components';
+import {
+	IconButton,
+	PanelBody,
+	Toolbar,
+	ToggleControl,
+	withNotices,
+} from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
 import {
+	BlockControls,
+	InspectorControls,
 	MediaPlaceholder,
 	RichText,
-	BlockControls,
 } from '@wordpress/editor';
 
 /**
@@ -23,10 +30,18 @@ class AudioEdit extends Component {
 		this.state = {
 			editing: ! this.props.attributes.src,
 		};
+
+		this.toggleAttribute = this.toggleAttribute.bind( this );
+	}
+
+	toggleAttribute( attribute ) {
+		return ( newValue ) => {
+			this.props.setAttributes( { [ attribute ]: newValue } );
+		};
 	}
 
 	render() {
-		const { caption, src } = this.props.attributes;
+		const { autoplay, caption, loop, src } = this.props.attributes;
 		const { setAttributes, isSelected, className, noticeOperations, noticeUI } = this.props;
 		const { editing } = this.state;
 		const switchToEditing = () => {
@@ -86,6 +101,20 @@ class AudioEdit extends Component {
 						/>
 					</Toolbar>
 				</BlockControls>
+				<InspectorControls>
+					<PanelBody title={ __( 'Playback Controls' ) }>
+						<ToggleControl
+							label={ __( 'Autoplay' ) }
+							onChange={ this.toggleAttribute( 'autoplay' ) }
+							checked={ autoplay }
+						/>
+						<ToggleControl
+							label={ __( 'Loop' ) }
+							onChange={ this.toggleAttribute( 'loop' ) }
+							checked={ loop }
+						/>
+					</PanelBody>
+				</InspectorControls>
 				<figure className={ className }>
 					<audio controls="controls" src={ src } />
 					{ ( ( caption && caption.length ) || !! isSelected ) && (

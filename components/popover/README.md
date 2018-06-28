@@ -53,11 +53,15 @@ The component accepts the following props. Props not included in this set will b
 
 ### focusOnMount
 
-By default, the popover will receive focus when it mounts. To suppress this behavior, assign `focusOnMount` to `false`. This should only be assigned when an appropriately accessible substitute behavior exists.
+By default, the *first tabblable element* in the popover will receive focus when it mounts. This is the same as setting `focusOnMount` to `"firstElement"`. If you want to focus the container instead, you can set `focusOnMount` to `"container"`.
 
-- Type: `Boolean`
+Set this prop to `false` to disable focus changing entirely. This should only be set when an appropriately accessible substitute behavior exists.
+
+**Deprecation notice:** Before Gutenberg 3.2 this value was `Boolean` and the value `true` was equivalent to `"firstElement"`. This behaviour is deprecated and will cause a console warning message.
+
+- Type: `String` or `Boolean`
 - Required: No
-- Default: `true`
+- Default: `"firstElement"`
 
 ### position
 
