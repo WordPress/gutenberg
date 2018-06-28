@@ -38,7 +38,7 @@ public class ReactAztecText extends AztecText {
 
     // FIXME: Used in `incrementAndGetEventCounter` but never read. I guess we can get rid of it, but before this
     // check when it's used in EditText in RN. (maybe tests?)
-    private int mNativeEventCount = 0;
+    int mNativeEventCount = 0;
 
     public ReactAztecText(ThemedReactContext reactContext) {
         super(reactContext);

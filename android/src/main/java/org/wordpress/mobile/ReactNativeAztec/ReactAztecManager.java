@@ -9,6 +9,8 @@ import android.view.View;
 
 import com.facebook.infer.annotation.Assertions;
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.PixelUtil;
 import com.facebook.react.uimanager.SimpleViewManager;
@@ -86,9 +88,18 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
     }
 
     @ReactProp(name = "text")
-    public void setText(ReactAztecText view, String text) {
+    public void setText(ReactAztecText view, ReadableMap inputMap) {
         view.setIsSettingTextFromJS(true);
-        view.fromHtml(text);
+        if (!inputMap.hasKey("eventCount")) {
+            view.fromHtml(inputMap.getString("text"));
+        } else {
+            // Don't think there is necessity of this branch, but justin case we want to
+            // force a 2nd setText from JS side to Native, just set a high eventCount
+            int eventCount = inputMap.getInt("eventCount");
+            if (view.mNativeEventCount < eventCount) {
+                view.fromHtml(inputMap.getString("text"));
+            }
+        }
         view.setIsSettingTextFromJS(false);
     }
 
