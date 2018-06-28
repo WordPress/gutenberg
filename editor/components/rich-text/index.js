@@ -25,15 +25,7 @@ import {
 	getScrollContainer,
 } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
-import {
-	BACKSPACE,
-	DELETE,
-	ENTER,
-	LEFT,
-	RIGHT,
-	TINYMCE_ZERO_WIDTH_SPACE,
-	rawShortcut,
-} from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, rawShortcut } from '@wordpress/keycodes';
 import { withInstanceId, withSafeTimeout, Slot } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { rawHandler } from '@wordpress/blocks';
@@ -59,6 +51,16 @@ import TokenUI from './tokens/ui';
 const { Node } = window;
 
 /**
+ * Zero-width space character used by TinyMCE as a caret landing point for
+ * inline boundary nodes.
+ *
+ * @see tinymce/src/core/main/ts/text/Zwsp.ts
+ *
+ * @type {string}
+ */
+const TINYMCE_ZWSP = '\uFEFF';
+
+/**
  * Returns true if the node is the inline node boundary. This is used in node
  * filtering prevent the inline boundary from being included in the split which
  * occurs while within but at the end of an inline node, since TinyMCE includes
@@ -72,7 +74,7 @@ const { Node } = window;
  */
 export function isEmptyInlineBoundary( node ) {
 	const text = node.nodeName === 'A' ? node.innerText : node.textContent;
-	return text === TINYMCE_ZERO_WIDTH_SPACE;
+	return text === TINYMCE_ZWSP;
 }
 
 /**
@@ -476,11 +478,11 @@ export class RichText extends Component {
 		// only be exempt when focusNode is not _only_ the ZWSP, which occurs
 		// when caret is placed on the right outside edge of inline boundary.
 		if ( ! isReverse && focusOffset === nodeValue.length &&
-				nodeValue.length > 1 && nodeValue[ 0 ] === TINYMCE_ZERO_WIDTH_SPACE ) {
+				nodeValue.length > 1 && nodeValue[ 0 ] === TINYMCE_ZWSP ) {
 			offset = 0;
 		}
 
-		if ( nodeValue[ offset ] === TINYMCE_ZERO_WIDTH_SPACE ) {
+		if ( nodeValue[ offset ] === TINYMCE_ZWSP ) {
 			event.stopPropagation();
 		}
 	}
