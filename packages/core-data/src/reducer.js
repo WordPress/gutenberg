@@ -201,10 +201,31 @@ export const entities = ( state = {}, action ) => {
 	};
 };
 
+/**
+ * Reducer managing embed preview data.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function embedPreviews( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_EMBED_PREVIEW':
+			const { url, preview } = action;
+			return {
+				...state,
+				[ url ]: preview,
+			};
+	}
+	return state;
+}
+
 export default combineReducers( {
 	terms,
 	users,
 	taxonomies,
 	themeSupports,
 	entities,
+	embedPreviews,
 } );

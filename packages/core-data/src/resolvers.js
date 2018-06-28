@@ -9,6 +9,11 @@ import { find } from 'lodash';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
+ * External dependencies
+ */
+import { stringify } from 'querystring';
+
+/**
  * Internal dependencies
  */
 import {
@@ -16,6 +21,7 @@ import {
 	receiveUserQuery,
 	receiveEntityRecords,
 	receiveThemeSupportsFromIndex,
+	receiveEmbedPreview,
 } from './actions';
 import { getKindEntities } from './entities';
 
@@ -77,4 +83,20 @@ export async function* getEntityRecords( state, kind, name ) {
 export async function* getThemeSupports() {
 	const index = await apiFetch( { path: '/' } );
 	yield receiveThemeSupportsFromIndex( index );
+}
+
+/**
+ * Requests a preview from the from the Embed API.
+ *
+ * @param {Object} state State tree
+ * @param {string} url   URL to get the preview for.
+ */
+export async function* getEmbedPreview( state, url ) {
+	try {
+		const embedProxyResponse = await apiRequest( { path: `/oembed/1.0/proxy?${ stringify( { url } ) }` } );
+		yield receiveEmbedPreview( url, embedProxyResponse );
+	} catch ( error ) {
+		// Embed API 404s if the URL cannot be embedded, so we have to catch the error from the apiRequest here.
+		yield receiveEmbedPreview( url, false );
+	}
 }
