@@ -8,6 +8,7 @@ import { flow, castArray, mapValues, omit } from 'lodash';
  * WordPress dependencies
  */
 import { autop } from '@wordpress/autop';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -182,7 +183,13 @@ export function getBlockAttributes( blockType, innerHTML, attributes ) {
 		return getBlockAttribute( attributeKey, attributeSchema, innerHTML, attributes );
 	} );
 
-	return blockAttributes;
+	return applyFilters(
+		'blocks.getBlockAttributes',
+		blockAttributes,
+		blockType,
+		innerHTML,
+		attributes
+	);
 }
 
 /**
