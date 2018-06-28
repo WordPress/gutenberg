@@ -16,12 +16,18 @@ function registerMiddleware( middleware ) {
 function request( options ) {
 	const raw = ( nextOptions ) => {
 		const { url, path, body, data, parse = true, ...remainingOptions } = nextOptions;
+		const headers = remainingOptions.headers || {};
+		if ( ! headers[ 'Content-Type' ] && data ) {
+			headers[ 'Content-Type' ] = 'application/json';
+		}
+
 		const responsePromise = window.fetch(
 			url || path,
 			{
 				...remainingOptions,
 				credentials: 'include',
 				body: body || JSON.stringify( data ),
+				headers,
 			}
 		);
 		const checkStatus = ( response ) => {
