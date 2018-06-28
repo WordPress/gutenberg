@@ -6,7 +6,6 @@
 	],
 	"moduleNameMapper": {
 		"@wordpress\\/(blocks|components|editor|utils|edit-post|viewport|core-blocks|nux)$": "$1",
-		"@wordpress\\/(browserslist-config)$": "packages/$1",
 		"@wordpress\\/(.*)$": "packages/$1/src"
 	},
 	"preset": "@wordpress/jest-preset-default",

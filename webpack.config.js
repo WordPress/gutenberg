@@ -157,11 +157,13 @@ const gutenbergPackages = [
 	'deprecated',
 	'dom',
 	'dom-ready',
-	'hooks',
 	'element',
+	'hooks',
 	'i18n',
 	'is-shallow-equal',
+	'keycodes',
 	'plugins',
+	'shortcode',
 ];
 
 const externals = {

@@ -292,6 +292,38 @@ describe( 'blocks', () => {
 			} );
 		} );
 
+		it( 'should warn if the icon background and foreground are not readable', () => {
+			const blockType = {
+				save: noop,
+				category: 'common',
+				title: 'block title',
+				icon: {
+					background: '#f00',
+					foreground: '#d00',
+					src: 'block-default',
+				},
+			};
+			registerBlockType( 'core/test-block-icon-unreadable', blockType );
+			expect( console ).toHaveWarned();
+		} );
+
+		it( 'should  not warn if the icon background and foreground are readable', () => {
+			const blockType = {
+				save: noop,
+				category: 'common',
+				title: 'block title',
+				icon: {
+					background: '#f00',
+					foreground: '#000',
+					src: 'block-default',
+				},
+			};
+			registerBlockType( 'core/test-block-icon-readable', blockType );
+			expect( getBlockType( 'core/test-block-icon-readable' ).name ).toEqual(
+				'core/test-block-icon-readable'
+			);
+		} );
+
 		it( 'should store a copy of block type', () => {
 			const blockType = { settingName: 'settingValue', save: noop, category: 'common', title: 'block title' };
 			registerBlockType( 'core/test-block-with-settings', blockType );
