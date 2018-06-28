@@ -6,13 +6,13 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import { SharedBlockSettings } from '../shared-block-settings';
+import { SharedBlockConvertButton } from '../shared-block-convert-button';
 
-describe( 'SharedBlockSettings', () => {
+describe( 'SharedBlockConvertButton', () => {
 	it( 'should allow converting a static block to a shared block', () => {
 		const onConvert = jest.fn();
 		const wrapper = shallow(
-			<SharedBlockSettings
+			<SharedBlockConvertButton
 				sharedBlock={ null }
 				onConvertToShared={ onConvert }
 			/>
@@ -28,7 +28,7 @@ describe( 'SharedBlockSettings', () => {
 	it( 'should allow converting a shared block to static', () => {
 		const onConvert = jest.fn();
 		const wrapper = shallow(
-			<SharedBlockSettings
+			<SharedBlockConvertButton
 				sharedBlock={ {} }
 				onConvertToStatic={ onConvert }
 			/>
@@ -39,21 +39,5 @@ describe( 'SharedBlockSettings', () => {
 
 		wrapper.find( 'IconButton' ).first().simulate( 'click' );
 		expect( onConvert ).toHaveBeenCalled();
-	} );
-
-	it( 'should allow deleting a shared block', () => {
-		const onDelete = jest.fn();
-		const wrapper = shallow(
-			<SharedBlockSettings
-				sharedBlock={ { id: 123 } }
-				onDelete={ onDelete }
-			/>
-		);
-
-		const text = wrapper.find( 'IconButton' ).last().children().text();
-		expect( text ).toEqual( 'Delete Shared Block' );
-
-		wrapper.find( 'IconButton' ).last().simulate( 'click' );
-		expect( onDelete ).toHaveBeenCalledWith( 123 );
 	} );
 } );
