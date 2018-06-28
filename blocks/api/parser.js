@@ -24,14 +24,27 @@ import { attr, prop, html, text, query, node, children } from './matchers';
  * or false depending on whether the original matcher returns undefined. This
  * is useful for boolean attributes (e.g. disabled) whose attribute values may
  * be technically falsey (empty string), though their mere presence should be
- * enough to infer as a truthy value.
+ * enough to infer as true.
  *
  * @param {Function} matcher Original hpq matcher.
  *
- * @return {Function} Enhanced hpq matcher.``
+ * @return {Function} Enhanced hpq matcher.
  */
 export const toBooleanAttributeMatcher = ( matcher ) => flow( [
 	matcher,
+	// Expected values from `attr( 'disabled' )`:
+	//
+	// <input>
+	// - Value:       `undefined`
+	// - Transformed: `false`
+	//
+	// <input disabled>
+	// - Value:       `''`
+	// - Transformed: `true`
+	//
+	// <input disabled="disabled">
+	// - Value:       `'disabled'`
+	// - Transformed: `true`
 	( value ) => value !== undefined,
 ] );
 
