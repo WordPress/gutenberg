@@ -14,7 +14,7 @@ module.exports = function( parsedNamespaces ) {
 	return [ {
 		title: 'Data Package Reference',
 		slug: 'packages-data',
-		markdown_source: 'https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/index.md',
+		markdown_source: 'https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/README.md',
 		parent: 'reference',
 	} ].concat(
 		Object.values( parsedNamespaces ).map( ( parsedNamespace ) => {

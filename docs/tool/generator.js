@@ -80,7 +80,7 @@ function generateNamespaceDocs( parsedNamespace ) {
 module.exports = function( parsedNamespaces, rootFolder ) {
 	const tableOfContent = generateTableOfContent( parsedNamespaces );
 	fs.writeFileSync(
-		path.join( rootFolder, 'index.md' ),
+		path.join( rootFolder, 'README.md' ),
 		tableOfContent
 	);
 
