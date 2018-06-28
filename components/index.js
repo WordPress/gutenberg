@@ -39,7 +39,6 @@ export { default as PanelHeader } from './panel/header';
 export { default as PanelRow } from './panel/row';
 export { default as Placeholder } from './placeholder';
 export { default as Popover } from './popover';
-export { default as PostsList } from './posts-list';
 export { default as QueryControls } from './query-controls';
 export { default as RadioControl } from './radio-control';
 export { default as RangeControl } from './range-control';
