@@ -10,7 +10,7 @@ import { noop } from 'lodash';
 import { Component, createRef } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 import { focus } from '@wordpress/dom';
-import { keycodes } from '@wordpress/utils';
+import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -18,14 +18,13 @@ import { keycodes } from '@wordpress/utils';
 import './style.scss';
 import { computePopoverPosition } from './utils';
 import withFocusReturn from '../higher-order/with-focus-return';
+import withConstrainedTabbing from '../higher-order/with-constrained-tabbing';
 import PopoverDetectOutside from './detect-outside';
 import IconButton from '../icon-button';
 import ScrollLock from '../scroll-lock';
 import { Slot, Fill } from '../slot-fill';
 
-const FocusManaged = withFocusReturn( ( { children } ) => children );
-
-const { ESCAPE } = keycodes;
+const FocusManaged = withConstrainedTabbing( withFocusReturn( ( { children } ) => children ) );
 
 /**
  * Name of slot in which popover should fill.
@@ -291,9 +290,9 @@ class Popover extends Component {
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
 
-		// Apply focus return behavior except when default focus on open
-		// behavior is disabled.
-		if ( ! focusOnMount ) {
+		// Apply focus to element as long as focusOnMount is truthy; false is
+		// the only "disabled" value.
+		if ( focusOnMount ) {
 			content = <FocusManaged>{ content }</FocusManaged>;
 		}
 

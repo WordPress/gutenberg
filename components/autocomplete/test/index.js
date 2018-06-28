@@ -8,14 +8,12 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { keycodes } from '@wordpress/utils';
+import { ENTER, ESCAPE, UP, DOWN, SPACE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import EnhancedAutocomplete, { Autocomplete } from '../';
-
-const { ENTER, ESCAPE, UP, DOWN, SPACE } = keycodes;
 
 jest.useFakeTimers();
 

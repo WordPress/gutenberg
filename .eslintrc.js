@@ -79,6 +79,10 @@ module.exports = {
 				message: 'Use @wordpress/element as import path instead.',
 			},
 			{
+				selector: 'ImportDeclaration[source.value=/^keycodes$/]',
+				message: 'Use @wordpress/keycodes as import path instead.',
+			},
+			{
 				selector: 'ImportDeclaration[source.value=/^utils$/]',
 				message: 'Use @wordpress/utils as import path instead.',
 			},

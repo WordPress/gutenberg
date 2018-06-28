@@ -16,17 +16,19 @@ export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, role, .
 		return null;
 	}
 
-	const label = __( 'Remove' );
+	const label = __( 'Remove Block' );
 
 	return (
 		<IconButton
-			className="editor-block-settings-remove"
+			className="editor-block-settings-menu__control"
 			onClick={ flow( onRemove, onClick ) }
 			icon="trash"
 			label={ label }
 			role={ role }
 			{ ...props }
-		/>
+		>
+			{ label }
+		</IconButton>
 	);
 }
 

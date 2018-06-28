@@ -106,7 +106,7 @@ Record.
 
 ### getThemeSupports
 
-Return theme suports data in the index.
+Return theme supports data in the index.
 
 *Parameters*
 

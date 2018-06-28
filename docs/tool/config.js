@@ -3,10 +3,10 @@
  */
 const path = require( 'path' );
 
-const root = path.resolve( __dirname, '../../../' );
+const root = path.resolve( __dirname, '../../' );
 
 module.exports = {
-	namespaces: {
+	dataNamespaces: {
 		core: {
 			title: 'WordPress Core Data',
 			// TODO: Figure out a way to generate docs for dynamic actions/selectors
@@ -40,5 +40,9 @@ module.exports = {
 		},
 	},
 
-	output: path.resolve( __dirname, '../' ),
+	dataDocsOutput: path.resolve( __dirname, '../data' ),
+
+	rootManifest: path.resolve( __dirname, '../root-manifest.json' ),
+
+	manifestOutput: path.resolve( __dirname, '../manifest.json' ),
 };

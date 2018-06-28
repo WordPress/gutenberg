@@ -156,7 +156,9 @@ const gutenbergPackages = [
 	'deprecated',
 	'dom',
 	'element',
+	'keycodes',
 	'plugins',
+	'shortcode',
 ];
 
 const wordPressPackages = [

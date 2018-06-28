@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,11 +13,12 @@ import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
+import './style.scss';
 import BlockIcon from '../block-icon';
 
-class ItemList extends Component {
+class BlockTypesList extends Component {
 	render() {
-		const { items, onSelect, onHover } = this.props;
+		const { items, onSelect, onHover = noop } = this.props;
 
 		return (
 			/*
@@ -24,7 +26,7 @@ class ItemList extends Component {
 			 * Safari+VoiceOver won't announce the list otherwise.
 			 */
 			/* eslint-disable jsx-a11y/no-redundant-roles */
-			<ul role="list" className="editor-inserter__list">
+			<ul role="list" className="editor-block-types-list">
 				{ items.map( ( item ) => {
 					const itemIconStyle = item.icon ? {
 						backgroundColor: item.icon.background,
@@ -34,18 +36,21 @@ class ItemList extends Component {
 						backgroundColor: item.icon.shadowColor,
 					} : {};
 					return (
-						<li className="editor-inserter__list-item" key={ item.id }>
+						<li className="editor-block-types-list__list-item" key={ item.id }>
 							<button
 								className={
 									classnames(
-										'editor-inserter__item',
+										'editor-block-types-list__item',
 										getBlockMenuDefaultClassName( item.id ),
 										{
-											'editor-inserter__item-has-children': item.hasChildBlocks,
+											'editor-block-types-list__item-has-children': item.hasChildBlocks,
 										}
 									)
 								}
-								onClick={ () => onSelect( item ) }
+								onClick={ () => {
+									onSelect( item );
+									onHover( null );
+								} }
 								disabled={ item.isDisabled }
 								onMouseEnter={ () => onHover( item ) }
 								onMouseLeave={ () => onHover( null ) }
@@ -54,19 +59,19 @@ class ItemList extends Component {
 								aria-label={ item.title } // Fix for IE11 and JAWS 2018.
 							>
 								<span
-									className="editor-inserter__item-icon"
+									className="editor-block-types-list__item-icon"
 									style={ itemIconStyle }
 								>
 									<BlockIcon icon={ item.icon && item.icon.src } />
 									{ item.hasChildBlocks &&
 									<span
-										className="editor-inserter__item-icon-stack"
+										className="editor-block-types-list__item-icon-stack"
 										style={ itemIconStackStyle }
 									/>
 									}
 								</span>
 
-								<span className="editor-inserter__item-title">
+								<span className="editor-block-types-list__item-title">
 									{ item.title }
 								</span>
 							</button>
@@ -79,4 +84,4 @@ class ItemList extends Component {
 	}
 }
 
-export default ItemList;
+export default BlockTypesList;

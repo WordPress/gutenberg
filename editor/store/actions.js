@@ -739,3 +739,18 @@ export function updateEditorSettings( settings ) {
 		settings,
 	};
 }
+
+export function registerToken( name, settings ) {
+	return {
+		type: 'REGISTER_TOKEN',
+		name,
+		settings,
+	};
+}
+
+export function unregisterToken( name ) {
+	return {
+		type: 'UNREGISTER_TOKEN',
+		name,
+	};
+}

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { includes, debounce } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -84,9 +85,14 @@ class Disabled extends Component {
 	}
 
 	render() {
+		const { className, ...props } = this.props;
 		return (
 			<Provider value={ true }>
-				<div ref={ this.bindNode } className="components-disabled">
+				<div
+					ref={ this.bindNode }
+					className={ classnames( className, 'components-disabled' ) }
+					{ ...props }
+				>
 					{ this.props.children }
 				</div>
 			</Provider>

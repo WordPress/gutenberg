@@ -12,6 +12,8 @@ import { withSelect, withDispatch } from '@wordpress/data';
  */
 import InserterMenu from './menu';
 
+export { default as InserterResultsPortal } from './results-portal';
+
 class Inserter extends Component {
 	constructor() {
 		super( ...arguments );
@@ -21,12 +23,6 @@ class Inserter extends Component {
 
 	onToggle( isOpen ) {
 		const { onToggle } = this.props;
-
-		if ( isOpen ) {
-			this.props.showInsertionPoint();
-		} else {
-			this.props.hideInsertionPoint();
-		}
 
 		// Surface toggle callback to parent component
 		if ( onToggle ) {
@@ -101,8 +97,6 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {
-		showInsertionPoint: dispatch( 'core/editor' ).showInsertionPoint,
-		hideInsertionPoint: dispatch( 'core/editor' ).hideInsertionPoint,
 		onInsertBlock: ( item ) => {
 			const { insertionPoint, selectedBlock } = ownProps;
 			const { index, rootUID, layout } = insertionPoint;
