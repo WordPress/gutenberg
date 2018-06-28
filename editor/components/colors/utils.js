@@ -7,18 +7,18 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Returns the color value based on an array of named colors and the namedColor or the customColor value.
  *
- * @param {Array}   colors      Array of color objects containing the "name" and "color" value as properties.
- * @param {?string} namedColor  A string containing the color name.
- * @param {?string} customColor A string containing the customColor value.
+ * @param {Array}   colors        Array of color objects containing the "name", "slug" and "color" value as properties.
+ * @param {?string} definedColor  A string containing the color slug.
+ * @param {?string} customColor   A string containing the customColor value.
  *
  * @return {?string} If namedColor is passed and the name is found in colors it returns the color for that name.
  * 					 Otherwise, the customColor parameter is returned.
  */
-export const getColorValue = ( colors, namedColor, customColor ) => {
+export const getColorValue = ( colors, definedColor, customColor ) => {
 	if ( namedColor ) {
-		let colorObj = find( colors, { slug: namedColor } );
+		let colorObj = find( colors, { slug: definedColor } );
 
-		if ( typeof colorObj === 'undefined' && typeof ( colorObj = find( colors, { name: namedColor } ) ) !== 'undefined' ) {
+		if ( typeof colorObj === 'undefined' && typeof ( colorObj = find( colors, { name: definedColor } ) ) !== 'undefined' ) {
 			deprecated( 'Using color objects without slugs', {
 				version: '3.4',
 				hint: 'You might want to re-select the color if you have saved in previous versions. The frontend is unaffected by this deprecation.',
