@@ -52,6 +52,8 @@
     "lint:fix": "eslint $npm_package_config_jsfiles --fix"
   },
   "dependencies": {
+    "@wordpress/data": "^1.0.0-alpha.1",
+    "@wordpress/element": "^1.0.0-alpha.1",
     "@wordpress/hooks": "^1.2.0",
     "@wordpress/i18n": "^1.1.0",
     "@wordpress/is-shallow-equal": "^1.0.1",
@@ -68,6 +70,8 @@
     "react-native-recyclerview-list": "git+https://github.com/wordpress-mobile/react-native-recyclerview-list.git#bfccbaab6b5954e18f8b0ed441ba38275853b79c",
     "react-redux": "^5.0.7",
     "redux": "^3.7.2",
-    "shallowequal": "^1.0.2"
+    "rememo": "^3.0.0",
+    "shallowequal": "^1.0.2",
+    "tinycolor2": "^1.4.1"
   }
 }

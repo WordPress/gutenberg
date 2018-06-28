@@ -11,7 +11,6 @@
         "alias": {
           "@wordpress/blocks": "./blocks",
           "@wordpress/editor": "./editor",
-          "@wordpress/element": "./element",
           "@gutenberg": "./gutenberg"
         },
         "extensions": [
