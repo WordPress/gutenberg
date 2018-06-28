@@ -1220,17 +1220,17 @@ function editor_color_palette_slugs( $color_palette ) {
 
 	foreach ( $color_palette as $color ) {
 		if ( ! isset( $color['slug'] ) ) {
-			$color['slug'] = esc_js( $color['name'] );
+			$color['slug']     = esc_js( $color['name'] );
 			$is_doing_it_wrong = true;
 		}
 
 		$new_color_palette[] = $color;
 	}
 
-	if( $is_doing_it_wrong ) {
+	if ( $is_doing_it_wrong ) {
 		_doing_it_wrong(
 			'add_theme_support/editor-color-palette',
-			__( 'Color palette should have a color slug defined.', 'gutenberg'),
+			__( 'Color palette should have a color slug defined.', 'gutenberg' ),
 			'3.2.0'
 		);
 	}
