@@ -2,6 +2,9 @@
  * Node dependencies
  */
 import path from 'path';
+import fs from 'fs';
+import os from 'os';
+import uuid from 'uuid/v4';
 
 /**
  * Internal dependencies
@@ -26,16 +29,20 @@ describe( 'adding inline tokens', () => {
 		await page.waitForSelector( '.media-modal input[type=file]' );
 		const inputElement = await page.$( '.media-modal input[type=file]' );
 		const testImagePath = path.join( __dirname, '..', 'assets', '10x10_e2e_test_image_z9T8jK.png' );
-		await inputElement.uploadFile( testImagePath );
+		const filename = uuid();
+		const tmpFileName = path.join( os.tmpdir(), filename + '.png' );
+		fs.copyFileSync( testImagePath, tmpFileName );
+		await inputElement.uploadFile( tmpFileName );
 
 		// Wait for upload.
-		await page.waitForSelector( '.media-modal li[aria-label="10x10_e2e_test_image_z9T8jK"]' );
+		await page.waitForSelector( '.media-modal li[aria-label="' + filename + '"]' );
 
 		// Insert the uploaded image.
 		await page.click( '.media-modal button.media-button-select' );
 
 		// Check the content.
-		expect( await getHTMLFromCodeEditor() ).toMatch( /<!-- wp:paragraph -->\s*<p>a\u00A0<img class="wp-image-\d+" style="width:10px" src="[^"]+\/10x10_e2e_test_image_z9T8jK\.png" alt="" \/><\/p>\s*<!-- \/wp:paragraph -->/ );
+		const regex = new RegExp( '<!-- wp:paragraph -->\\s*<p>a\\u00A0<img class="wp-image-\\d+" style="width:10px" src="[^"]+\\/' + filename + '\\.png" alt="" \\/><\\/p>\\s*<!-- \\/wp:paragraph -->' );
+		expect( await getHTMLFromCodeEditor() ).toMatch( regex );
 
 		// Open the media modal again by inserting inline image
 		await insertBlock( 'Inline Image' );
