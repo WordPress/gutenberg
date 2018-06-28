@@ -34,6 +34,16 @@ export const COMMAND = 'meta';
 export const SHIFT = 'shift';
 
 /**
+ * Zero-width space character used by TinyMCE as a caret landing point for
+ * inline boundary nodes.
+ *
+ * @see tinymce/src/core/main/ts/text/Zwsp.ts
+ *
+ * @type {string}
+ */
+export const TINYMCE_ZERO_WIDTH_SPACE = '\uFEFF';
+
+/**
  * Return true if platform is MacOS.
  *
  * @param {Object} _window   window object by default; used for DI testing.
