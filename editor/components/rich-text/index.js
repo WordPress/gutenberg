@@ -42,6 +42,7 @@ import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
 import { domToFormat, valueToString } from './format';
+import TokenUI from './tokens/ui';
 
 /**
  * Returns true if the node is the inline node boundary. This is used in node
@@ -885,6 +886,12 @@ export class RichText extends Component {
 						{ formatToolbar }
 					</div>
 				) }
+				{ isSelected &&
+					<TokenUI
+						editor={ this.editor }
+						containerRef={ this.containerRef }
+					/>
+				}
 				<Autocomplete onReplace={ this.props.onReplace } completers={ autocompleters }>
 					{ ( { isExpanded, listBoxId, activeId } ) => (
 						<Fragment>
