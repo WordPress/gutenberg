@@ -349,6 +349,8 @@ class ImageEdit extends Component {
 							let showRightHandle = false;
 							let showLeftHandle = false;
 
+							/* eslint-disable no-lonely-if */
+							// See https://github.com/WordPress/gutenberg/issues/7584.
 							if ( align === 'center' ) {
 								// When the image is centered, show both handles.
 								showRightHandle = true;
@@ -371,6 +373,7 @@ class ImageEdit extends Component {
 									showRightHandle = true;
 								}
 							}
+							/* eslint-enable no-lonely-if */
 
 							return (
 								<Fragment>
