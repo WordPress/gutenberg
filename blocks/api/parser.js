@@ -9,6 +9,7 @@ import { flow, castArray, mapValues, omit, stubFalse } from 'lodash';
  */
 import { autop } from '@wordpress/autop';
 import { applyFilters } from '@wordpress/hooks';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -105,6 +106,12 @@ export function matcherFromSource( sourceConfig ) {
 
 			return matcher;
 		case 'property':
+			deprecated( '`property` source', {
+				version: '3.4',
+				alternative: 'equivalent `text`, `html`, or `attribute` source, or comment attribute',
+				plugin: 'Gutenberg',
+			} );
+
 			return prop( sourceConfig.selector, sourceConfig.property );
 		case 'html':
 			return html( sourceConfig.selector );
