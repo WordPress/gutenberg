@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escapeRegExp, find, filter, map, debounce } from 'lodash';
+import { escapeRegExp, find, filter, map, debounce, every } from 'lodash';
 import 'element-closest';
 
 /**
@@ -147,17 +147,6 @@ function isTextNode( node ) {
 }
 
 /**
- * Is the node an element.
- *
- * @param {?Node} node The node to check.
- *
- * @return {boolean} True if the node is an element.
- */
-function isElement( node ) {
-	return node !== null && node.nodeType === window.Node.ELEMENT_NODE;
-}
-
-/**
  * Return the node only if it is a text node, otherwise return null.
  *
  * @param {?Node} node The node to filter.
@@ -256,40 +245,25 @@ export class Autocomplete extends Component {
 			selection.focusNode === range.endContainer &&
 			selection.focusOffset <= range.endOffset;
 
-		const tempContainer = document.createElement( 'div' );
-		tempContainer.innerHTML = renderToString( replacement );
+		const tokenWrapper = document.createElement( 'span' );
+		tokenWrapper.innerHTML = renderToString( replacement );
 
-		const isSingleNode = tempContainer.childNodes.length === 1;
-		let wrapper;
-		if ( isSingleNode && isTextNode( tempContainer.childNodes[ 0 ] ) ) {
-			// This represents a simple, textual, and editable autocompletion.
+		// Remember the completer in case the user wants to edit the token.
+		tokenWrapper.dataset.autocompleter = completerName;
 
-			wrapper = document.createElement( 'span' );
-			while ( tempContainer.childNodes.length > 0 ) {
-				wrapper.appendChild( tempContainer.firstChild );
-			}
+		// Add classes for general and completer-specific styling.
+		tokenWrapper.classList.add( 'autocomplete-token' );
+		tokenWrapper.classList.add( `autocomplete-token-${ completerName }` );
 
-			// Remember the completer in case the user wants to edit the token.
-			wrapper.dataset.autocompleter = completerName;
-
-			// Add classes for general and completer-specific styling.
-			wrapper.classList.add( 'autocomplete-token' );
-			wrapper.classList.add( `autocomplete-token-${ completerName }` );
-		} else {
-			// This represents a custom autocompletion and is marked readonly,
-			// allowing it to be deleted but not edited.
-
-			if ( isSingleNode && isElement( tempContainer.childNodes[ 0 ] ) ) {
-				wrapper = tempContainer.childNodes[ 0 ];
-			} else {
-				wrapper = tempContainer;
-			}
+		if ( ! every( tokenWrapper.childNodes, isTextNode ) ) {
+			// This represents an autocompletion with arbitrary structure
+			// and is marked readonly, allowing it to be deleted but not edited.
 
 			// Explicitly communicate we intend this as a readonly token.
-			wrapper.classList.add( 'readonly-token' );
+			tokenWrapper.classList.add( 'readonly-token' );
 
 			// Make new token readonly.
-			wrapper.contentEditable = false;
+			tokenWrapper.contentEditable = false;
 		}
 
 		const existingTokenWrapper = this.getTokenWrapperNode( range.startContainer );
@@ -298,12 +272,12 @@ export class Autocomplete extends Component {
 			 * If we're within an existing token, we want to replace it rather
 			 * than inserting a completion within a completion.
 			 */
-			existingTokenWrapper.parentNode.replaceChild( wrapper, existingTokenWrapper );
+			existingTokenWrapper.parentNode.replaceChild( tokenWrapper, existingTokenWrapper );
 		} else {
-			range.insertNode( wrapper );
+			range.insertNode( tokenWrapper );
 		}
 
-		range.setStartAfter( wrapper );
+		range.setStartAfter( tokenWrapper );
 		range.deleteContents();
 
 		if ( shouldSetCursor ) {
@@ -317,11 +291,11 @@ export class Autocomplete extends Component {
 			 * adding and removing them as necessary as the keyboard is used to
 			 * move the cursor in and out of boundaries.
 			 */
-			wrapper.parentNode.insertBefore(
+			tokenWrapper.parentNode.insertBefore(
 				document.createTextNode( '\uFEFF' ),
-				wrapper.nextSibling
+				tokenWrapper.nextSibling
 			);
-			newCursorPosition.setStartAfter( wrapper.nextSibling );
+			newCursorPosition.setStartAfter( tokenWrapper.nextSibling );
 			selection.addRange( newCursorPosition );
 		}
 	}

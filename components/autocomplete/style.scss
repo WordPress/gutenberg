@@ -35,7 +35,7 @@
 	}
 }
 
-.autocomplete-token {
+.autocomplete-token:not(.readonly-token) {
 	border: 1px solid $light-gray-800;
 	background: $light-gray-300;
 	// Set the color since a some selected rich text colors
@@ -43,4 +43,8 @@
 	color: #444;
 	border-radius: 10px;
 	padding: 2px 4px;
+}
+
+.readonly-token[data-mce-selected] {
+	background: $blue-medium-highlight;
 }
