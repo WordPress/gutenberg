@@ -49,6 +49,18 @@ describe( 'ThemeSupportCheck', () => {
 		expect( wrapper.type() ).toBe( null );
 	} );
 
+	it( 'should not render if post-thumbnails is limited and false is passed for postType', () => {
+		const themeSupports = {
+			'post-thumbnails': [ 'post' ],
+		};
+		const supportKeys = 'post-thumbnails';
+		const wrapper = shallow( <ThemeSupportCheck
+			supportKeys={ supportKeys }
+			postType={ false }
+			themeSupports={ themeSupports }>foobar</ThemeSupportCheck> );
+		expect( wrapper.type() ).toBe( null );
+	} );
+
 	it( 'should not render if theme doesn\'t support post-thumbnails', () => {
 		const themeSupports = {
 			'post-thumbnails': false,

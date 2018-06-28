@@ -23,9 +23,6 @@ export function ThemeSupportCheck( { themeSupports, children, postType, supportK
 			// within `supported`. If `postType` isn't passed, then the check
 			// should fail.
 			if ( 'post-thumbnails' === key && isArray( supported ) ) {
-				if ( ! postType ) {
-					return false;
-				}
 				return includes( supported, postType );
 			}
 			return supported;
