@@ -14,7 +14,9 @@ Each completer declares:
 * Raw option data.
 * How to render an option's label.
 * An option's keywords, words that will be used to match an option with user input.
-* What the completion of an option looks like, including whether it should be inserted in the text or used to replace the current block.
+* What the completion of an option looks like, including:
+  * The kind of completion. Is it an editable, text-based completion or a non-editable completion containing HTML structure?
+  * How it should be inserted. Should it be inserted in the text or used to replace the current block?
 
 In addition, a completer may optionally declare:
 
@@ -77,6 +79,11 @@ There are currently two supported actions:
 * "insert-at-caret" - Insert the `value` into the text (the default completion action).
 * "replace" - Replace the current block with the block specified in the `value` property.
 
+An inserted completion is treated one of two ways, depending on its content:
+
+1. A text-only completion is inserted as a styled editable token. The purpose is to satisfy use cases like simple user mentions (e.g., "@username").
+2. A completion containing HTML is inserted as a non-editable token. This supports the creation of completers that insert arbitrary HTML content.
+
 #### allowNode
 
 A function that takes a text node and returns a boolean indicating whether the completer should be considered for that node.
@@ -107,7 +114,29 @@ Whether to apply debouncing for the autocompleter. Set to true to enable debounc
 
 ### Examples
 
-The following is a contrived completer for fresh fruit.
+#### Editable completions
+
+Here is a contrived completer for feelings. It yields editable tokens like "!resolute".
+
+```jsx
+const fruitCompleter = {
+	name: 'feeling',
+	// The prefix that triggers this completer
+	triggerPrefix: '!',
+	// The option data
+	options: [ 'happy', 'hopeful', 'resolute' ],
+	// Returns a simple, text-only label
+	getOptionLabel: option => option,
+	// Declares that options should be matched by their text
+	getOptionKeywords: option => [ option ],
+	// Declares completions should be inserted as text
+	getOptionCompletion: option => '!' + option,
+};
+```
+
+#### Structured, non-editable completions
+
+The following is a contrived completer for fresh fruit. It yields an `<abbr>` element with a `title` attribute.
 
 ```jsx
 const fruitCompleter = {
