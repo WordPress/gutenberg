@@ -142,7 +142,7 @@ wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-data-align', withDa
 Adding blocks is easy enough, removing them is as easy. Plugin or theme authors have the possibility to "unregister" blocks.
 
 ```js
-// myplugin.js
+// myp-lugin.js
 
 wp.blocks.unregisterBlockType( 'core/verse' );
 ```
@@ -151,16 +151,16 @@ and load this script in the Editor
 
 ```php
 <?php
-// myplugin.php
+// my-plugin.php
 
-function myplugin_blacklist_blocks() {
+function my_plugin_blacklist_blocks() {
 	wp_enqueue_script(
-		'myplugin-blacklist-blocks',
-		plugins_url( 'myplugin.js', __FILE__ ),
+		'my-plugin-blacklist-blocks',
+		plugins_url( 'my-plugin.js', __FILE__ ),
 		array( 'wp-blocks' )
 	);
 }
-add_action( 'enqueue_block_editor_assets', 'myplugin_blacklist_blocks' );
+add_action( 'enqueue_block_editor_assets', 'my_plugin_blacklist_blocks' );
 ```
 
 ### Using a whitelist
@@ -168,7 +168,8 @@ add_action( 'enqueue_block_editor_assets', 'myplugin_blacklist_blocks' );
 If you want to disable all blocks except a whitelisted list, you can adapt the script above like so:
 
 ```js
-// myplugin.js
+// my-plugin.js
+
 var allowedBlocks = [
 	'core/paragraph',
 	'core/image',
@@ -188,10 +189,40 @@ wp.blocks.getBlockTypes().forEach( function( blockType ) {
 On the server, you can filter the list of blocks shown in the inserter using the `allowed_block_types` filter. You can return either true (all block types supported), false (no block types supported), or an array of block type names to allow. You can also use the second provided param `$post` to filter block types based on its content.
 
 ```php
-add_filter( 'allowed_block_types', function( $allowed_block_types, $post ) {
-	if ( $post->post_type === 'post' ) {
+<?php
+// my-plugin.php
+
+function my_plugin_allowed_block_types( $allowed_block_types, $post ) {
+	if ( $post->post_type !== 'post' ) {
 	    return $allowed_block_types;
 	}
-	return [ 'core/paragraph' ];
-}, 10, 2 );
+	return array( 'core/paragraph' );
+}
+
+add_filter( 'allowed_block_types', 'my_plugin_allowed_block_types', 10, 2 );
+```
+
+## Managing block categories
+
+It is possible to filter the list of default block categories using the `block_categories` filter. You can do it on the server by implementing a function which returns a list of categories. It is going to be used during blocks registration and to group blocks in the inserter. You can also use the second provided param `$post` to generate a different list depending on the post's content.
+
+```php
+<?php
+// my-plugin.php
+
+function my_plugin_block_categories( $categories, $post ) {
+	if ( $post->post_type !== 'post' ) {
+		return $categories;
+	}
+	return array_merge(
+		$categories,
+		array(
+			array(
+				'slug' => 'my-category',
+				'title' => __( 'My category', 'my-plugin' ),
+			),
+		)
+	);
+}
+add_filter( 'block_categories', 'my_plugin_block_categories', 10, 2 );
 ```

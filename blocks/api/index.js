@@ -20,7 +20,10 @@ export {
 	getSaveElement,
 } from './serializer';
 export { isValidBlock } from './validation';
-export { getCategories } from './categories';
+export {
+	getCategories,
+	setCategories,
+} from './categories';
 export {
 	registerBlockType,
 	unregisterBlockType,
