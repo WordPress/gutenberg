@@ -1147,7 +1147,18 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// Initialize the editor.
 	$gutenberg_theme_support = get_theme_support( 'gutenberg' );
 	$align_wide              = get_theme_support( 'align-wide' );
-	$color_palette           = get_theme_support( 'editor-color-palette' );
+	$color_palette           = current( (array) get_theme_support( 'editor-color-palette' ) );
+
+	// Backcompat for Color Palette set as multiple parameters.
+	if ( is_string( $color_palette ) || isset( $color_palette['color'] ) ) {
+		$color_palette = get_theme_support( 'editor-color-palette' );
+		wp_add_inline_script(
+			'wp-edit-post',
+			'console.warn( "' .
+				__( 'Setting colors using multiple parameters is deprecated. Please pass a single parameter with an array of colors. See https://wordpress.org/gutenberg/handbook/extensibility/theme-support/ for details.', 'gutenberg' ) .
+			'");'
+		);
+	}
 
 	// Backcompat for Color Palette set through `gutenberg` array.
 	if ( empty( $color_palette ) && ! empty( $gutenberg_theme_support[0]['colors'] ) ) {
