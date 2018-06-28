@@ -31,9 +31,6 @@ describe( 'SharedBlockDeleteButton', () => {
 			/>
 		);
 
-		const text = wrapper.find( 'IconButton' ).children().text();
-		expect( text ).toEqual( 'Delete Shared Block' );
-
 		wrapper.find( 'IconButton' ).simulate( 'click' );
 		expect( onDelete ).toHaveBeenCalledWith( 123 );
 	} );
