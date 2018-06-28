@@ -66,6 +66,10 @@ Used internally by the default block (paragraph) to exclude the attributes from 
 
 Used to filters an individual transform result from block transformation. All of the original blocks are passed, since transformations are many-to-many, not one-to-one.
 
+#### `blocks.getBlockAttributes`
+
+Called immediately after the default parsing of a block's attributes and before validation to allow a plugin to manipulate attribute values in time for validation and/or the initial values rendering of the block in the editor.
+
 #### `editor.BlockEdit`
 
 Used to modify the block's `edit` component. It receives the original block `BlockEdit` component and returns a new wrapped component.
