@@ -1,14 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { Component, createRef } from '@wordpress/element';
+import {
+	Component,
+	createRef,
+	createHigherOrderComponent,
+} from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
 import { focus } from '@wordpress/dom';
 
 const { TAB } = keycodes;
 
-const withConstrainedTabbing = ( WrappedComponent ) => {
-	return class extends Component {
+const withConstrainedTabbing = createHigherOrderComponent(
+	( WrappedComponent ) => class extends Component {
 		constructor() {
 			super( ...arguments );
 
@@ -51,7 +55,8 @@ const withConstrainedTabbing = ( WrappedComponent ) => {
 			);
 			/* eslint-enable jsx-a11y/no-static-element-interactions */
 		}
-	};
-};
+	},
+	'withConstrainedTabbing'
+);
 
 export default withConstrainedTabbing;
