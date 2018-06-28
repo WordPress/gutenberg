@@ -176,7 +176,7 @@ class ImageEdit extends Component {
 	}
 
 	render() {
-		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, noticeOperations, noticeUI, toggleSelection } = this.props;
+		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, noticeOperations, noticeUI, toggleSelection, isRTL } = this.props;
 		const { url, alt, caption, align, id, href, width, height } = attributes;
 
 		const controls = (
@@ -346,6 +346,35 @@ class ImageEdit extends Component {
 							const minWidth = imageWidth < imageHeight ? MIN_SIZE : MIN_SIZE * ratio;
 							const minHeight = imageHeight < imageWidth ? MIN_SIZE : MIN_SIZE / ratio;
 
+							let showRightHandle = false;
+							let showLeftHandle = false;
+
+							/* eslint-disable no-lonely-if */
+							// See https://github.com/WordPress/gutenberg/issues/7584.
+							if ( align === 'center' ) {
+								// When the image is centered, show both handles.
+								showRightHandle = true;
+								showLeftHandle = true;
+							} else if ( isRTL ) {
+								// In RTL mode the image is on the right by default.
+								// Show the right handle and hide the left handle only when it is aligned left.
+								// Otherwise always show the left handle.
+								if ( align === 'left' ) {
+									showRightHandle = true;
+								} else {
+									showLeftHandle = true;
+								}
+							} else {
+								// Show the left handle and hide the right handle only when the image is aligned right.
+								// Otherwise always show the right handle.
+								if ( align === 'right' ) {
+									showLeftHandle = true;
+								} else {
+									showRightHandle = true;
+								}
+							}
+							/* eslint-enable no-lonely-if */
+
 							return (
 								<Fragment>
 									{ getInspectorControls( imageWidth, imageHeight ) }
@@ -362,12 +391,16 @@ class ImageEdit extends Component {
 										maxHeight={ maxWidth / ratio }
 										lockAspectRatio
 										handleClasses={ {
-											topRight: 'wp-block-image__resize-handler-top-right',
-											bottomRight: 'wp-block-image__resize-handler-bottom-right',
-											topLeft: 'wp-block-image__resize-handler-top-left',
-											bottomLeft: 'wp-block-image__resize-handler-bottom-left',
+											right: 'wp-block-image__resize-handler-right',
+											bottom: 'wp-block-image__resize-handler-bottom',
+											left: 'wp-block-image__resize-handler-left',
 										} }
-										enable={ { top: false, right: true, bottom: false, left: false, topRight: true, bottomRight: true, bottomLeft: true, topLeft: true } }
+										enable={ {
+											top: false,
+											right: showRightHandle,
+											bottom: true,
+											left: showLeftHandle,
+										} }
 										onResizeStart={ () => {
 											toggleSelection( false );
 										} }
@@ -408,11 +441,12 @@ export default compose( [
 		const { getMedia } = select( 'core' );
 		const { getEditorSettings } = select( 'core/editor' );
 		const { id } = props.attributes;
-		const { maxWidth } = getEditorSettings();
+		const { maxWidth, isRTL } = getEditorSettings();
 
 		return {
 			image: id ? getMedia( id ) : null,
 			maxWidth,
+			isRTL,
 		};
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
