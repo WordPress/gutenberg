@@ -633,8 +633,8 @@ export class RichText extends Component {
 			afterRange.setStart( selectionRange.endContainer, selectionRange.endOffset );
 			afterRange.setEnd( rootNode, dom.nodeIndex( rootNode.lastChild ) + 1 );
 
-			const beforeFragment = beforeRange.extractContents();
-			const afterFragment = afterRange.extractContents();
+			const beforeFragment = beforeRange.cloneContents();
+			const afterFragment = afterRange.cloneContents();
 
 			const { format } = this.props;
 			before = domToFormat( filterEmptyNodes( beforeFragment.childNodes ), format, this.editor );
