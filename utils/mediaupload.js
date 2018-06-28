@@ -122,6 +122,7 @@ export function mediaUpload( {
 					link: savedMedia.link,
 					title: savedMedia.title.raw,
 					url: savedMedia.source_url,
+					sizes: get( savedMedia, [ 'media_details', 'sizes' ], {} ),
 				};
 				setAndUpdateFiles( idx, mediaObject );
 			},
