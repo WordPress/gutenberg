@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { isSharedBlock } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 
-export function SharedBlockSettings( { sharedBlock, onConvertToStatic, onConvertToShared, itemsRole } ) {
+export function SharedBlockConvertButton( { sharedBlock, onConvertToStatic, onConvertToShared, itemsRole } ) {
 	return (
 		<Fragment>
 			{ ! sharedBlock && (
@@ -64,4 +64,4 @@ export default compose( [
 			},
 		};
 	} ),
-] )( SharedBlockSettings );
+] )( SharedBlockConvertButton );
