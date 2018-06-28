@@ -1,7 +1,7 @@
 /**
  * Node dependencies
  */
-const lodash = require( 'lodash' );
+const { kebabCase } = require( 'lodash' );
 
 /**
  * Generates the manifest for the given namespaces.
@@ -18,7 +18,7 @@ module.exports = function( parsedNamespaces ) {
 		parent: 'reference',
 	} ].concat(
 		Object.values( parsedNamespaces ).map( ( parsedNamespace ) => {
-			const slug = lodash.kebabCase( parsedNamespace.name );
+			const slug = kebabCase( parsedNamespace.name );
 			return {
 				title: parsedNamespace.title,
 				slug: 'packages-data-' + slug,
