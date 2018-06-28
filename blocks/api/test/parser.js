@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { attr } from 'hpq';
+
+/**
  * Internal dependencies
  */
 import {
@@ -9,6 +14,7 @@ import {
 	getAttributesAndInnerBlocksFromDeprecatedVersion,
 	default as parse,
 	parseWithAttributeSchema,
+	toBooleanAttributeMatcher,
 } from '../parser';
 import {
 	registerBlockType,
@@ -52,6 +58,42 @@ describe( 'block parser', () => {
 		setUnknownTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
+		} );
+	} );
+
+	describe( 'toBooleanAttributeMatcher()', () => {
+		const originalMatcher = attr( 'disabled' );
+		const enhancedMatcher = toBooleanAttributeMatcher( originalMatcher );
+
+		it( 'should return a matcher returning false on unset attribute', () => {
+			const node = document.createElement( 'input' );
+
+			expect( originalMatcher( node ) ).toBe( undefined );
+			expect( enhancedMatcher( node ) ).toBe( false );
+		} );
+
+		it( 'should return a matcher returning true on implicit empty string attribute value', () => {
+			const node = document.createElement( 'input' );
+			node.disabled = true;
+
+			expect( originalMatcher( node ) ).toBe( '' );
+			expect( enhancedMatcher( node ) ).toBe( true );
+		} );
+
+		it( 'should return a matcher returning true on explicit empty string attribute value', () => {
+			const node = document.createElement( 'input' );
+			node.setAttribute( 'disabled', '' );
+
+			expect( originalMatcher( node ) ).toBe( '' );
+			expect( enhancedMatcher( node ) ).toBe( true );
+		} );
+
+		it( 'should return a matcher returning true on explicit string attribute value', () => {
+			const node = document.createElement( 'input' );
+			node.setAttribute( 'disabled', 'disabled' );
+
+			expect( originalMatcher( node ) ).toBe( 'disabled' );
+			expect( enhancedMatcher( node ) ).toBe( true );
 		} );
 	} );
 
@@ -122,6 +164,19 @@ describe( 'block parser', () => {
 		it( 'should return the matcher\'s true boolean attribute value', () => {
 			const value = parseWithAttributeSchema(
 				'<audio src="#" loop>',
+				{
+					type: 'boolean',
+					source: 'attribute',
+					selector: 'audio',
+					attribute: 'loop',
+				},
+			);
+			expect( value ).toBe( true );
+		} );
+
+		it( 'should return the matcher\'s true boolean attribute value on explicit attribute value', () => {
+			const value = parseWithAttributeSchema(
+				'<audio src="#" loop="loop">',
 				{
 					type: 'boolean',
 					source: 'attribute',

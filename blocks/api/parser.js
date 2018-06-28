@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { parse as hpqParse } from 'hpq';
-import { castArray, mapValues, omit } from 'lodash';
+import { flow, castArray, mapValues, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,6 +18,35 @@ import { createBlock } from './factory';
 import { isValidBlock } from './validation';
 import { getCommentDelimitedContent } from './serializer';
 import { attr, prop, html, text, query, node, children } from './matchers';
+
+/**
+ * Higher-order hpq matcher which enhances an attribute matcher to return true
+ * or false depending on whether the original matcher returns undefined. This
+ * is useful for boolean attributes (e.g. disabled) whose attribute values may
+ * be technically falsey (empty string), though their mere presence should be
+ * enough to infer as true.
+ *
+ * @param {Function} matcher Original hpq matcher.
+ *
+ * @return {Function} Enhanced hpq matcher.
+ */
+export const toBooleanAttributeMatcher = ( matcher ) => flow( [
+	matcher,
+	// Expected values from `attr( 'disabled' )`:
+	//
+	// <input>
+	// - Value:       `undefined`
+	// - Transformed: `false`
+	//
+	// <input disabled>
+	// - Value:       `''`
+	// - Transformed: `true`
+	//
+	// <input disabled="disabled">
+	// - Value:       `'disabled'`
+	// - Transformed: `true`
+	( value ) => value !== undefined,
+] );
 
 /**
  * Returns value coerced to the specified JSON schema type string.
@@ -68,7 +97,12 @@ export function asType( value, type ) {
 export function matcherFromSource( sourceConfig ) {
 	switch ( sourceConfig.source ) {
 		case 'attribute':
-			return attr( sourceConfig.selector, sourceConfig.attribute );
+			let matcher = attr( sourceConfig.selector, sourceConfig.attribute );
+			if ( sourceConfig.type === 'boolean' ) {
+				matcher = toBooleanAttributeMatcher( matcher );
+			}
+
+			return matcher;
 		case 'property':
 			return prop( sourceConfig.selector, sourceConfig.property );
 		case 'html':
@@ -98,14 +132,7 @@ export function matcherFromSource( sourceConfig ) {
  * @return {*} Attribute value.
  */
 export function parseWithAttributeSchema( innerHTML, attributeSchema ) {
-	const attributeValue = hpqParse( innerHTML, matcherFromSource( attributeSchema ) );
-	// HTML attributes without a defined value (e.g. <audio loop>) are parsed
-	// to a value of '' (empty string), so return `true` if we know this should
-	// be boolean.
-	if ( 'attribute' === attributeSchema.source && 'boolean' === attributeSchema.type ) {
-		return '' === attributeValue;
-	}
-	return attributeValue;
+	return hpqParse( innerHTML, matcherFromSource( attributeSchema ) );
 }
 
 /**
