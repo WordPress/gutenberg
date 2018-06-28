@@ -168,7 +168,7 @@
 		"predev": "npm run check-engines",
 		"dev": "npm run build:packages && concurrently \"cross-env webpack --watch\" \"npm run dev:packages\"",
 		"dev:packages": "node ./bin/packages/watch.js",
-		"docs:generate-data-reference": "node docs/data/tool",
+		"docs:build": "node docs/tool",
 		"fixtures:clean": "rimraf \"core-blocks/test/fixtures/*.+(json|serialized.html)\"",
 		"fixtures:server-registered": "docker-compose run -w /var/www/html/wp-content/plugins/gutenberg --rm wordpress ./bin/get-server-blocks.php > core-blocks/test/server-registered.json",
 		"fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
