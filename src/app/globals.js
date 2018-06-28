@@ -1,6 +1,6 @@
 /** @format */
 
-import { createElement } from '@gutenberg/element';
+import { createElement } from '@wordpress/element';
 
 global.wp = {
 	element: {
