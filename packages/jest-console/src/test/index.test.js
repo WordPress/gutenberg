@@ -8,7 +8,7 @@ import { forEach } from 'lodash';
 /**
  * Internal dependencies
  */
-import '..';
+import '../matchers';
 
 describe( 'jest-console', () => {
 	forEach(
