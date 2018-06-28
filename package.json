@@ -160,8 +160,8 @@
 	"scripts": {
 		"prebuild": "npm run check-engines",
 		"clean:packages": "rimraf ./packages/*/build ./packages/*/build-module",
-		"prebuild:packages": "npm run clean:packages && INCLUDE_PACKAGES=babel-plugin-import-jsx-pragma node ./bin/packages/build.js",
-		"build:packages": "TRANSFORM_JSX_PRAGMA=1 EXCLUDE_PACKAGES=babel-plugin-import-jsx-pragma node ./bin/packages/build.js",
+		"prebuild:packages": "npm run clean:packages && cross-env INCLUDE_PACKAGES=babel-plugin-import-jsx-pragma node ./bin/packages/build.js",
+		"build:packages": "cross-env TRANSFORM_JSX_PRAGMA=1 EXCLUDE_PACKAGES=babel-plugin-import-jsx-pragma node ./bin/packages/build.js",
 		"build": "npm run build:packages && cross-env NODE_ENV=production webpack",
 		"check-engines": "check-node-version --package",
 		"ci": "concurrently \"npm run lint && npm run build\" \"npm run test-unit:coverage-ci\"",
