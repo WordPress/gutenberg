@@ -233,7 +233,7 @@ Returns an action object used to request meta box update.
 
 ### metaBoxUpdatesSuccess
 
-Returns an action object used signal a successfull meta box update.
+Returns an action object used signal a successful meta box update.
 
 ### setMetaBoxSavedData
 

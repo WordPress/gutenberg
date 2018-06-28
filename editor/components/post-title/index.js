@@ -10,7 +10,8 @@ import { get } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
-import { keycodes, decodeEntities } from '@wordpress/utils';
+import { decodeEntities } from '@wordpress/utils';
+import { ENTER } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { KeyboardShortcuts, withInstanceId, withFocusOutside } from '@wordpress/components';
 
@@ -25,7 +26,6 @@ import PostTypeSupportCheck from '../post-type-support-check';
  * Constants
  */
 const REGEXP_NEWLINES = /[\r\n]+/g;
-const { ENTER } = keycodes;
 
 class PostTitle extends Component {
 	constructor() {

@@ -8,7 +8,7 @@ import { escapeRegExp, find, filter, map, debounce } from 'lodash';
  * WordPress dependencies
  */
 import { Component, compose, renderToString } from '@wordpress/element';
-import { keycodes } from '@wordpress/utils';
+import { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT, SPACE } from '@wordpress/keycodes';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
 /**
@@ -20,8 +20,6 @@ import Button from '../button';
 import Popover from '../popover';
 import withInstanceId from '../higher-order/with-instance-id';
 import withSpokenMessages from '../higher-order/with-spoken-messages';
-
-const { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT, SPACE } = keycodes;
 
 /**
  * A raw completer option.

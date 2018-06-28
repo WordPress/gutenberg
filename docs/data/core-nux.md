@@ -1,4 +1,4 @@
-# **core/nux**: The NUX module Data
+# **core/nux**: The NUX (New User Experience) module Data
 
 ## Selectors 
 
@@ -12,6 +12,18 @@ guide that they have been added to.
 
  * state: Global application state.
  * id: The tip to query.
+
+### areTipsEnabled
+
+Returns whether or not tips are globally enabled.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+Whether tips are globally enabled.
 
 ## Actions
 
@@ -37,3 +49,7 @@ dismissed tip will not show again.
 
 Returns an action object that, when dispatched, prevents all tips from
 showing again.
+
+### enableTips
+
+Returns an action object that, when dispatched, makes all tips show again.

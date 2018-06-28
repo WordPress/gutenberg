@@ -1842,3 +1842,18 @@ export function getSupportedBlocks( state, uid, globallyEnabledBlockTypes ) {
 export function getEditorSettings( state ) {
 	return state.settings;
 }
+
+/*
+ * Returns the editor settings.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} The editor settings object
+ */
+export function getTokenSettings( state, name ) {
+	if ( ! name ) {
+		return state.tokens;
+	}
+
+	return state.tokens[ name ];
+}

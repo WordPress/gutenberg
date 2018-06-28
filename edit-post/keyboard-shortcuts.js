@@ -1,9 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { keycodes } from '@wordpress/utils';
-
-const { rawShortcut, displayShortcut } = keycodes;
+import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 
 export default {
 	toggleEditorMode: {

@@ -123,7 +123,7 @@ describe( 'InserterMenu', () => {
 			/>
 		);
 
-		const visibleBlocks = wrapper.find( '.editor-inserter__item' );
+		const visibleBlocks = wrapper.find( '.editor-block-types-list__item' );
 		expect( visibleBlocks ).toHaveLength( 0 );
 
 		const noResultsMessage = wrapper.find( '.editor-inserter__no-results' );
@@ -142,7 +142,7 @@ describe( 'InserterMenu', () => {
 			/>
 		);
 
-		const visibleBlocks = wrapper.find( '.editor-inserter__item' );
+		const visibleBlocks = wrapper.find( '.editor-block-types-list__item' );
 		expect( visibleBlocks ).toHaveLength( 3 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Text' );
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Advanced Text' );
@@ -162,7 +162,7 @@ describe( 'InserterMenu', () => {
 			/>
 		);
 
-		const visibleBlocks = wrapper.find( '.editor-inserter__item' );
+		const visibleBlocks = wrapper.find( '.editor-block-types-list__item' );
 		expect( visibleBlocks ).toHaveLength( 2 );
 	} );
 
@@ -187,7 +187,7 @@ describe( 'InserterMenu', () => {
 		const activeCategory = wrapper.find( '.components-panel__body.is-opened > .components-panel__body-title' );
 		expect( activeCategory.text() ).toBe( 'Embeds' );
 
-		const visibleBlocks = wrapper.find( '.editor-inserter__item' );
+		const visibleBlocks = wrapper.find( '.editor-block-types-list__item' );
 		expect( visibleBlocks ).toHaveLength( 2 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'YouTube' );
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'A Text Embed' );
@@ -217,7 +217,7 @@ describe( 'InserterMenu', () => {
 		const activeCategory = wrapper.find( '.components-panel__body.is-opened > .components-panel__body-title' );
 		expect( activeCategory.text() ).toBe( 'Shared' );
 
-		const visibleBlocks = wrapper.find( '.editor-inserter__item' );
+		const visibleBlocks = wrapper.find( '.editor-block-types-list__item' );
 		expect( visibleBlocks ).toHaveLength( 1 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'My shared block' );
 
@@ -246,7 +246,7 @@ describe( 'InserterMenu', () => {
 		const activeCategory = wrapper.find( '.components-panel__body.is-opened > .components-panel__body-title' );
 		expect( activeCategory.text() ).toBe( 'Common Blocks' );
 
-		const visibleBlocks = wrapper.find( '.editor-inserter__item' );
+		const visibleBlocks = wrapper.find( '.editor-block-types-list__item' );
 		expect( visibleBlocks ).toHaveLength( 3 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Text' );
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Advanced Text' );
@@ -272,7 +272,7 @@ describe( 'InserterMenu', () => {
 			.filterWhere( ( node ) => node.text() === 'Layout Elements' );
 		layoutTab.simulate( 'click' );
 
-		const disabledBlocks = wrapper.find( '.editor-inserter__item[disabled=true]' );
+		const disabledBlocks = wrapper.find( '.editor-block-types-list__item[disabled=true]' );
 		expect( disabledBlocks ).toHaveLength( 1 );
 		expect( disabledBlocks.at( 0 ).text() ).toBe( 'More' );
 	} );
@@ -301,7 +301,7 @@ describe( 'InserterMenu', () => {
 		expect( matchingCategories.at( 1 ).text() ).toBe( 'Embeds' );
 
 		// Find blocks across panels
-		const visibleBlocks = wrapper.find( '.editor-inserter__item' );
+		const visibleBlocks = wrapper.find( '.editor-block-types-list__item' );
 		expect( visibleBlocks ).toHaveLength( 3 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Text' );
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Advanced Text' );
@@ -335,7 +335,7 @@ describe( 'InserterMenu', () => {
 		expect( matchingCategories.at( 1 ).text() ).toBe( 'Embeds' );
 
 		// Find blocks across panels
-		const visibleBlocks = wrapper.find( '.editor-inserter__item' );
+		const visibleBlocks = wrapper.find( '.editor-block-types-list__item' );
 		expect( visibleBlocks ).toHaveLength( 3 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Text' );
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Advanced Text' );

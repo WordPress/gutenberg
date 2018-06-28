@@ -9,15 +9,13 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Component, createElement } from '@wordpress/element';
-import { keycodes } from '@wordpress/utils';
+import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import { diffAriaProps, pickAriaProps } from './aria';
 import { valueToString } from './format';
-
-const { BACKSPACE, DELETE } = keycodes;
 
 /**
  * Determines whether we need a fix to provide `input` events for contenteditable.

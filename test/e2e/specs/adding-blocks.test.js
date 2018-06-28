@@ -49,7 +49,7 @@ describe( 'adding blocks', () => {
 		await page.keyboard.type( 'Quote block' );
 
 		// Using the regular inserter
-		await insertBlock( 'code' );
+		await insertBlock( 'Code' );
 		await page.keyboard.type( 'Code block' );
 
 		// Unselect blocks to avoid conflicts with the inbetween inserter
