@@ -7,7 +7,7 @@ import { focus } from '@wordpress/dom';
 
 const { TAB } = keycodes;
 
-const withFocusContain = ( WrappedComponent ) => {
+const withConstrainedTabbing = ( WrappedComponent ) => {
 	return class extends Component {
 		constructor() {
 			super( ...arguments );
@@ -54,4 +54,4 @@ const withFocusContain = ( WrappedComponent ) => {
 	};
 };
 
-export default withFocusContain;
+export default withConstrainedTabbing;
