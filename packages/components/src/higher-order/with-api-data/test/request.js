@@ -16,7 +16,7 @@ import request, {
 
 describe( 'request', () => {
 	const actualResponse = {
-		json: () => {},
+		json: () => ( {} ),
 		headers: {
 			connection: 'Keep-Alive',
 			'content-type': 'text/plain; charset=utf-8',
@@ -77,7 +77,10 @@ describe( 'request', () => {
 
 			return awaitResponse.then( ( data ) => {
 				expect( fetch ).toHaveBeenCalled();
-				expect( data ).toEqual( actualResponse );
+				expect( data ).toEqual( {
+					headers: actualResponse.headers,
+					body: {},
+				} );
 			} );
 		} );
 	} );
@@ -134,7 +137,10 @@ describe( 'request', () => {
 
 			return awaitResponse.then( ( data ) => {
 				expect( fetch ).toHaveBeenCalled();
-				expect( data ).toEqual( actualResponse );
+				expect( data ).toEqual( {
+					headers: actualResponse.headers,
+					body: {},
+				} );
 			} );
 		} );
 
@@ -146,7 +152,10 @@ describe( 'request', () => {
 
 			return awaitResponse.then( ( data ) => {
 				expect( fetch ).toHaveBeenCalled();
-				expect( data ).toEqual( actualResponse );
+				expect( data ).toEqual( {
+					headers: actualResponse.headers,
+					body: {},
+				} );
 			} );
 		} );
 	} );
