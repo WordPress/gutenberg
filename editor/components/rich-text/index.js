@@ -695,20 +695,9 @@ export class RichText extends Component {
 		}
 	}
 
-	updateContent() {
-		// Do not trigger a change event coming from the TinyMCE undo manager.
-		// Our global state is already up-to-date.
-		this.editor.undoManager.ignore( () => {
-			const bookmark = this.editor.selection.getBookmark( 2, true );
-
-			this.savedContent = this.props.value;
-			this.setContent( this.savedContent );
-			this.editor.selection.moveToBookmark( bookmark );
-		} );
-	}
-
 	setContent( content ) {
 		const { format } = this.props;
+		this.savedContent = content;
 		this.editor.setContent( valueToString( content, format ) );
 	}
 
@@ -739,7 +728,7 @@ export class RichText extends Component {
 			! isEqual( this.props.value, prevProps.value ) &&
 			! isEqual( this.props.value, this.savedContent )
 		) {
-			this.updateContent();
+			this.setContent( this.props.value );
 		}
 
 		if ( 'development' === process.env.NODE_ENV ) {
@@ -829,7 +818,7 @@ export class RichText extends Component {
 	 * @param {?Array} blocks blocks to insert at the split position
 	 */
 	restoreContentAndSplit( before, after, blocks = [] ) {
-		this.updateContent();
+		this.setContent( this.props.value );
 		this.props.onSplit( before, after, ...blocks );
 	}
 
