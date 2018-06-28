@@ -983,6 +983,45 @@ function get_autosave_newer_than_post_save( $post ) {
 }
 
 /**
+ * Returns all the block categories.
+ *
+ * @since 2.2.0
+ *
+ * @param  WP_Post $post Post object.
+ * @return Object[] Block categories.
+ */
+function get_block_categories( $post ) {
+	$default_categories = array(
+		array(
+			'slug'  => 'common',
+			'title' => __( 'Common Blocks', 'gutenberg' ),
+		),
+		array(
+			'slug'  => 'formatting',
+			'title' => __( 'Formatting', 'gutenberg' ),
+		),
+		array(
+			'slug'  => 'layout',
+			'title' => __( 'Layout Elements', 'gutenberg' ),
+		),
+		array(
+			'slug'  => 'widgets',
+			'title' => __( 'Widgets', 'gutenberg' ),
+		),
+		array(
+			'slug'  => 'embed',
+			'title' => __( 'Embeds', 'gutenberg' ),
+		),
+		array(
+			'slug'  => 'shared',
+			'title' => __( 'Shared Blocks', 'gutenberg' ),
+		),
+	);
+
+	return apply_filters( 'block_categories', $default_categories, $post );
+}
+
+/**
  * Scripts & Styles.
  *
  * Enqueues the needed scripts and styles when visiting the top-level page of
@@ -1040,6 +1079,12 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	wp_add_inline_script(
 		'wp-api-request',
 		sprintf( 'wp.apiRequest.use( wp.apiRequest.createPreloadingMiddleware( %s ) );', wp_json_encode( $preload_data ) ),
+		'after'
+	);
+
+	wp_add_inline_script(
+		'wp-blocks',
+		sprintf( 'wp.blocks.setCategories( %s );', wp_json_encode( get_block_categories( $post ) ) ),
 		'after'
 	);
 

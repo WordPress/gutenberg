@@ -189,9 +189,30 @@ On the server, you can filter the list of blocks shown in the inserter using the
 
 ```php
 add_filter( 'allowed_block_types', function( $allowed_block_types, $post ) {
-	if ( $post->post_type === 'post' ) {
+	if ( $post->post_type !== 'post' ) {
 	    return $allowed_block_types;
 	}
-	return [ 'core/paragraph' ];
+	return array( 'core/paragraph' );
+}, 10, 2 );
+```
+
+## Managing block categories
+
+It is possible to filter the list of default block categories using the `block_categories` filter. You can do it on the server by implementing a function which returns a list of categories. It is going to be used during blocks registration and to group blocks in the inserter. You can also use the second provided param `$post` to generate a different list depending on the post's content.
+
+```php
+add_filter( 'block_categories', function( $categories, $post ) {
+	if ( $post->post_type !== 'post' ) {
+		return $categories;
+	}
+	return array_merge(
+		$categories,
+		array(
+			array(
+				'slug' => 'my-category',
+				'title' => __( 'My category', 'my-plugin' ),
+			),
+		)
+	);
 }, 10, 2 );
 ```

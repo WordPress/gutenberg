@@ -80,10 +80,8 @@ export const fallbackBlockName = createBlockNameSetterReducer( 'SET_FALLBACK_BLO
  * @return {Object} Updated state.
  */
 export function categories( state = DEFAULT_CATEGORIES, action ) {
-	if ( action.type === 'ADD_CATEGORIES' ) {
-		const addedSlugs = map( action.categories, ( category ) => category.slug );
-		const previousState = filter( state, ( category ) => addedSlugs.indexOf( category.slug ) === -1 );
-		return [ ...previousState, ...action.categories ];
+	if ( action.type === 'SET_CATEGORIES' ) {
+		return action.categories || [];
 	}
 
 	return state;
