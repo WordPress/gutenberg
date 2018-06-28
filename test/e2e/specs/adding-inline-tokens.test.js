@@ -43,18 +43,5 @@ describe( 'adding inline tokens', () => {
 		// Check the content.
 		const regex = new RegExp( '<!-- wp:paragraph -->\\s*<p>a\\u00A0<img class="wp-image-\\d+" style="width:10px" src="[^"]+\\/' + filename + '\\.png" alt="" \\/><\\/p>\\s*<!-- \\/wp:paragraph -->' );
 		expect( await getHTMLFromCodeEditor() ).toMatch( regex );
-
-		// Open the media modal again by inserting inline image
-		await insertBlock( 'Inline Image' );
-
-		// Confirm deletion.
-		page.on( 'dialog', async ( dialog ) => {
-			await dialog.accept();
-		} );
-
-		// Wait for media modal to appear and delete image.
-		await page.waitForSelector( '.media-modal li.attachment' );
-		await page.click( '.media-modal li.attachment' );
-		await page.click( '.media-modal button.delete-attachment' );
 	} );
 } );
