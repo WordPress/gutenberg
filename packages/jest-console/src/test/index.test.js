@@ -23,7 +23,7 @@ describe( 'jest-console', () => {
 				const matcherNameWith = `${ matcherName }With`;
 				const message = `This is ${ methodName }!`;
 
-				test( '${ matcherName } works', () => {
+				test( `${ matcherName } works`, () => {
 					console[ methodName ]( message );
 
 					expect( console )[ matcherName ]();

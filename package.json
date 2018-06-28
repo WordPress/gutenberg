@@ -75,6 +75,7 @@
 		"@wordpress/babel-preset-default": "file:packages/babel-preset-default",
 		"@wordpress/browserslist-config": "file:packages/browserslist-config",
 		"@wordpress/custom-templated-path-webpack-plugin": "file:packages/custom-templated-path-webpack-plugin",
+		"@wordpress/jest-console": "file:packages/jest-console",
 		"@wordpress/jest-preset-default": "file:packages/jest-preset-default",
 		"@wordpress/library-export-default-webpack-plugin": "file:packages/library-export-default-webpack-plugin",
 		"@wordpress/npm-package-json-lint-config": "file:packages/npm-package-json-lint-config",
