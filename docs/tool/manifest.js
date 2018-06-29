@@ -13,7 +13,7 @@ const { kebabCase } = require( 'lodash' );
 module.exports = function( parsedNamespaces ) {
 	return [ {
 		title: 'Data Package Reference',
-		slug: 'packages-data',
+		slug: 'data',
 		markdown_source: 'https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/README.md',
 		parent: null,
 	} ].concat(
@@ -21,9 +21,9 @@ module.exports = function( parsedNamespaces ) {
 			const slug = kebabCase( parsedNamespace.name );
 			return {
 				title: parsedNamespace.title,
-				slug: 'packages-data-' + slug,
+				slug: 'data-' + slug,
 				markdown_source: 'https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/' + slug + '.md',
-				parent: 'packages-data',
+				parent: 'data',
 			};
 		} )
 	);
