@@ -668,8 +668,10 @@ describe( 'effects', () => {
 				} );
 			} );
 
-			it( 'should handle an API error', () => {
-				const promise = Promise.reject( {} );
+			it( 'should handle an API error', ( done ) => {
+				const promise = Promise.reject( {
+					json: () => Promise.reject(),
+				} );
 				apiFetch.mockReturnValue = promise;
 				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
 
@@ -678,15 +680,20 @@ describe( 'effects', () => {
 
 				handler( fetchSharedBlocks(), store );
 
-				return promise.catch( () => {
-					expect( dispatch ).toHaveBeenCalledWith( {
-						type: 'FETCH_SHARED_BLOCKS_FAILURE',
-						error: {
-							code: 'unknown_error',
-							message: 'An unknown error occurred.',
-						},
+				promise
+					.catch( ( response ) => response.json().catch( () => ( {} ) ) )
+					.then( () => {
+						process.nextTick( () => {
+							expect( dispatch ).toHaveBeenCalledWith( {
+								type: 'FETCH_SHARED_BLOCKS_FAILURE',
+								error: {
+									code: 'unknown_error',
+									message: 'An unknown error occurred.',
+								},
+							} );
+							done();
+						} );
 					} );
-				} );
 			} );
 		} );
 
@@ -737,8 +744,10 @@ describe( 'effects', () => {
 				} );
 			} );
 
-			it( 'should handle an API error', () => {
-				const promise = Promise.reject( {} );
+			it( 'should handle an API error', ( done ) => {
+				const promise = Promise.reject( {
+					json: () => Promise.resolve(),
+				} );
 				apiFetch.mockReturnValue = promise;
 				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
 
@@ -755,12 +764,17 @@ describe( 'effects', () => {
 
 				handler( saveSharedBlock( 123 ), store );
 
-				return promise.catch( () => {
-					expect( dispatch ).toHaveBeenCalledWith( {
-						type: 'SAVE_SHARED_BLOCK_FAILURE',
-						id: 123,
+				promise
+					.catch( ( response ) => response.json() )
+					.then( () => {
+						process.nextTick( () => {
+							expect( dispatch ).toHaveBeenCalledWith( {
+								type: 'SAVE_SHARED_BLOCK_FAILURE',
+								id: 123,
+							} );
+							done();
+						} );
 					} );
-				} );
 			} );
 		} );
 
@@ -806,8 +820,10 @@ describe( 'effects', () => {
 				} );
 			} );
 
-			it( 'should handle an API error', () => {
-				const promise = Promise.reject( {} );
+			it( 'should handle an API error', ( done ) => {
+				const promise = Promise.reject( {
+					json: () => Promise.resolve(),
+				} );
 				apiFetch.mockReturnValue = promise;
 				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
 
@@ -824,13 +840,18 @@ describe( 'effects', () => {
 
 				handler( deleteSharedBlock( 123 ), store );
 
-				return promise.catch( () => {
-					expect( dispatch ).toHaveBeenCalledWith( {
-						type: 'DELETE_SHARED_BLOCK_FAILURE',
-						id: 123,
-						optimist: expect.any( Object ),
+				promise
+					.catch( ( response ) => response.json() )
+					.then( () => {
+						process.nextTick( () => {
+							expect( dispatch ).toHaveBeenCalledWith( {
+								type: 'DELETE_SHARED_BLOCK_FAILURE',
+								id: 123,
+								optimist: expect.any( Object ),
+							} );
+							done();
+						} );
 					} );
-				} );
 			} );
 
 			it( 'should not save shared blocks with temporary IDs', () => {
