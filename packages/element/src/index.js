@@ -218,12 +218,23 @@ export function createHigherOrderComponent( mapComponentToEnhancedComponent,
 	modifierName,
 ) {
 	return ( OriginalComponent ) => {
-		const WrappedComponent = forwardRef(
+		const ForwardRefComponent = forwardRef(
 			( props, ref ) => {
-				const { forwardedRef = ref, ...rest } = props;
-				return <OriginalComponent { ...rest } forwardedRef={ forwardedRef } />;
+				return <OriginalComponent
+					{ ...props }
+					forwardedRef={ props.forwardedRef || ref }
+				/>;
 			}
 		);
+
+		const WrappedComponent = OriginalComponent.prototype instanceof Component ?
+			class extends OriginalComponent {
+				render() {
+					return <ForwardRefComponent { ...this.props } />;
+				}
+			} :
+			ForwardRefComponent;
+
 		const EnhancedComponent = mapComponentToEnhancedComponent( WrappedComponent );
 		const { displayName = OriginalComponent.name || 'Component' } = OriginalComponent;
 		EnhancedComponent.displayName = `${ upperFirst( camelCase( modifierName ) ) }(${ displayName })`;
