@@ -12,6 +12,10 @@ import {
 	InspectorControls,
 } from '@wordpress/editor';
 
+function getDownloadButtonHelp( checked ) {
+	return checked ? __( 'The download button is shown.' ) : __( 'The download button is hidden.' );
+}
+
 export default class FileBlockInspector extends Component {
 	render() {
 		const {
@@ -43,16 +47,15 @@ export default class FileBlockInspector extends Component {
 							onChange={ changeLinkDestinationOption }
 						/>
 						<ToggleControl
-							label={ __( 'Open in new window' ) }
+							label={ __( 'Open in New Window' ) }
 							checked={ openInNewWindow }
 							onChange={ changeOpenInNewWindow }
 						/>
 					</PanelBody>
-				</InspectorControls>
-				<InspectorControls>
-					<PanelBody title={ __( 'Download Button' ) }>
+					<PanelBody title={ __( 'Download Button Settings' ) }>
 						<ToggleControl
-							label={ __( 'Show button' ) }
+							label={ __( 'Show Download Button' ) }
+							help={ getDownloadButtonHelp }
 							checked={ showDownloadButton }
 							onChange={ changeShowDownloadButton }
 						/>
