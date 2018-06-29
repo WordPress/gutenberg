@@ -208,5 +208,11 @@
 		"slug": "resources",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/outreach\/resources.md",
 		"parent": "outreach"
+	},
+	{
+		"title": "Packages",
+		"slug": "packages",
+		"markdown_source":  "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/packages.md",
+		"parent": null
 	}
 ]
