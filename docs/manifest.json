@@ -211,44 +211,44 @@
 	},
 	{
 		"title": "Data Package Reference",
-		"slug": "packages-data",
+		"slug": "data",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/README.md",
-		"parent": "reference"
+		"parent": null
 	},
 	{
 		"title": "WordPress Core Data",
-		"slug": "packages-data-core",
+		"slug": "data-core",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/core.md",
-		"parent": "packages-data"
+		"parent": "data"
 	},
 	{
 		"title": "Block Types Data",
-		"slug": "packages-data-core-blocks",
+		"slug": "data-core-blocks",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/core-blocks.md",
-		"parent": "packages-data"
+		"parent": "data"
 	},
 	{
 		"title": "The Editor's Data",
-		"slug": "packages-data-core-editor",
+		"slug": "data-core-editor",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/core-editor.md",
-		"parent": "packages-data"
+		"parent": "data"
 	},
 	{
 		"title": "The Editor's UI Data",
-		"slug": "packages-data-core-edit-post",
+		"slug": "data-core-edit-post",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/core-edit-post.md",
-		"parent": "packages-data"
+		"parent": "data"
 	},
 	{
 		"title": "The viewport module Data",
-		"slug": "packages-data-core-viewport",
+		"slug": "data-core-viewport",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/core-viewport.md",
-		"parent": "packages-data"
+		"parent": "data"
 	},
 	{
 		"title": "The NUX (New User Experience) module Data",
-		"slug": "packages-data-core-nux",
+		"slug": "data-core-nux",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/core-nux.md",
-		"parent": "packages-data"
+		"parent": "data"
 	}
 ]
