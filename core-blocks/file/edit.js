@@ -192,6 +192,7 @@ class FileEdit extends Component {
 						/>
 						{ showDownloadButton &&
 							<div className={ `${ className }__button-richtext-wrapper` }>
+								{ /* Using RichText here instead of PlainText so that it can be styled like a button */ }
 								<RichText
 									tagName="div" // must be block-level or else cursor disappears
 									className={ `${ className }__button` }
