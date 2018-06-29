@@ -30,18 +30,7 @@ class FileEdit extends Component {
 	constructor() {
 		super( ...arguments );
 
-		const {
-			showDownloadButton = true,
-			buttonText = __( 'Download' ),
-		} = this.props.attributes;
-
 		this.onSelectFile = this.onSelectFile.bind( this );
-
-		// Initialize default values if undefined
-		this.props.setAttributes( {
-			showDownloadButton,
-			buttonText,
-		} );
 
 		this.state = {
 			showCopyConfirmation: false,

@@ -47,11 +47,13 @@ export const settings = {
 		},
 		showDownloadButton: {
 			type: 'boolean',
+			default: true,
 		},
 		buttonText: {
 			type: 'string',
 			source: 'text',
 			selector: 'a[download]',
+			default: __( 'Download' ),
 		},
 		id: {
 			type: 'number',
