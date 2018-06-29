@@ -43,13 +43,13 @@ export function getMimeTypesArray( wpMimeTypesObject ) {
  *
  *	TODO: future enhancement to add an upload indicator.
  *
- * @param   {Object}   $0                   Parameters object passed to the function.
- * @param   {string}   $0.allowedType       The type of media that can be uploaded.
- * @param   {?Object}  $0.additionalData    Additional data to include in the request.
- * @param   {Array}    $0.filesList         List of files.
- * @param   {?number}  $0.maxUploadFileSize Maximum upload size in bytes allowed for the site.
- * @param   {Function} $0.onError           Function called when an error happens.
- * @param   {Function} $0.onFileChange      Function called each time a file or a temporary representation of the file is available.
+ * @param   {Object}       $0                   Parameters object passed to the function.
+ * @param   {string|Array} $0.allowedType       The type of media that can be uploaded.
+ * @param   {?Object}      $0.additionalData    Additional data to include in the request.
+ * @param   {Array}        $0.filesList         List of files.
+ * @param   {?number}      $0.maxUploadFileSize Maximum upload size in bytes allowed for the site.
+ * @param   {Function}     $0.onError           Function called when an error happens.
+ * @param   {Function}     $0.onFileChange      Function called each time a file or a temporary representation of the file is available.
  */
 export function mediaUpload( {
 	allowedType,
@@ -69,7 +69,12 @@ export function mediaUpload( {
 	};
 
 	// Allowed type specified by consumer
-	const isAllowedType = ( fileType ) => startsWith( fileType, `${ allowedType }/` );
+	const isAllowedType = ( fileType ) => {
+		if ( typeof allowedType === 'string' ) {
+			allowedType = [ allowedType ];
+		}
+		return allowedType.some( ( type ) => startsWith( fileType, `${ type }/` ) );
+	};
 
 	// Allowed types for the current WP_User
 	const allowedMimeTypesForUser = getMimeTypesArray( get( window, [ '_wpMediaSettings', 'allowedMimeTypes' ] ) );
@@ -118,6 +123,7 @@ export function mediaUpload( {
 					caption: get( savedMedia, [ 'caption', 'raw' ], '' ),
 					id: savedMedia.id,
 					link: savedMedia.link,
+					mime_type: savedMedia.mime_type,
 					url: savedMedia.source_url,
 				};
 				setAndUpdateFiles( idx, mediaObject );
