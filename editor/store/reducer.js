@@ -1042,19 +1042,22 @@ export const blockListSettings = ( state = {}, action ) => {
 		}
 		case 'UPDATE_BLOCK_LIST_SETTINGS': {
 			const { id } = action;
-			if ( id && ! action.settings ) {
-				return omit( state, id );
+			if ( ! action.settings ) {
+				if ( state.hasOwnProperty( id ) ) {
+					return omit( state, id );
+				}
+
+				return state;
 			}
-			const blockSettings = state[ id ];
-			const updateIsRequired = ! isEqual( blockSettings, action.settings );
-			if ( updateIsRequired ) {
-				return {
-					...state,
-					[ id ]: {
-						...action.settings,
-					},
-				};
+
+			if ( isEqual( state[ id ], action.settings ) ) {
+				return state;
 			}
+
+			return {
+				...state,
+				[ id ]: action.settings,
+			};
 		}
 	}
 	return state;
