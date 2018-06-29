@@ -1,0 +1,5 @@
+.wp-block-image {
+	figcaption {
+		@include caption-style();
+	}
+}

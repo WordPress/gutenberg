@@ -278,3 +278,15 @@
 		right: $sidebar-width;
 	}
 }
+
+
+/**
+ * Styles that are reused verbatim in a few places
+ */
+
+@mixin caption-style() {
+	margin-top: 0.5em;
+	color: $dark-gray-300;
+	text-align: center;
+	font-size: $default-font-size;
+}
