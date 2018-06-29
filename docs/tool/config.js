@@ -70,12 +70,12 @@ module.exports = {
 	dataDocsOutput: path.resolve( __dirname, '../data' ),
 
 	packages: {
-		...npmReadyPackages.reduce( ( memo, pkg ) => {
-			memo[ pkg ] = { isNpmReady: true };
+		...npmReadyPackages.reduce( ( memo, packageName ) => {
+			memo[ packageName ] = { isNpmReady: true };
 			return memo;
 		}, {} ),
-		...gutenbergPackages.reduce( ( memo, pkg ) => {
-			memo[ pkg ] = { isNpmReady: false };
+		...gutenbergPackages.reduce( ( memo, packageName ) => {
+			memo[ packageName ] = { isNpmReady: false };
 			return memo;
 		}, {} ),
 	},
