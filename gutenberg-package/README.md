@@ -41,19 +41,23 @@ npm install @frontkom/gutenberg
 
 ### Dependencies
 
-Some of the Gutenberg features depend of the [TinyMCE](https://www.tinymce.com/) and Gutenberg editor expects to find tinymce *plugins*, *themes* and *skins* on project root. Assuming you add tinymce to your node_modules we suggest to use webpack and [CopyWebpackPlugin](https://github.com/webpack-contrib/copy-webpack-plugin) to handle with that.
+Some of the Gutenberg features depend of the [TinyMCE](https://www.tinymce.com/) text editor and Gutenberg editor expects to find tinymce *plugins*, *themes* and *skins* on the project root. Assuming that you added tinymce to your *node_modules*, we suggest to use webpack and [CopyWebpackPlugin](https://github.com/webpack-contrib/copy-webpack-plugin) to handle with that.
 
-```
+```js
 // webpack.config.js
-...
+const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
+
+module.exports = {
+   ...
     plugins: [
         new CopyWebpackPlugin( [
-            { from: 'node_modules/tinymce/plugins', to: `${ distPath.js }plugins` },
-            { from: 'node_modules/tinymce/themes', to: `${ distPath.js }themes` },
-            { from: 'node_modules/tinymce/skins', to: `${ distPath.js }skins` },
+            { from: 'node_modules/tinymce/plugins', to: `${ your_root_path }/plugins` },
+            { from: 'node_modules/tinymce/themes', to: `${ your_root_path }/themes` },
+            { from: 'node_modules/tinymce/skins', to: `${ your_root_path }/skins` },
         ], {} ),
     ],
-...
+   ...
+}
 ```
 
 ## Global variables 
