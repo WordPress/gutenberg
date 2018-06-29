@@ -8,6 +8,7 @@ This package is based on [Gutenberg v3.1.0](https://github.com/WordPress/gutenbe
 
 ## Table of contents
 * [Installation](#installation)
+    * [Dependencies](#dependencies)
 * [Global variables](#global-variables)
     * [apiRequest](#apirequest)
         * [Post Types](#post-types)
@@ -37,6 +38,23 @@ npm install @frontkom/gutenberg
 ```
 
 [↑ Go up to Table of contents](#table-of-contents)
+
+### Dependencies
+
+Some of the Gutenberg features depend of the [TinyMCE](https://www.tinymce.com/) and Gutenberg editor expects to find tinymce *plugins*, *themes* and *skins* on project root. Assuming you add tinymce to your node_modules we suggest to use webpack and [CopyWebpackPlugin](https://github.com/webpack-contrib/copy-webpack-plugin) to handle with that.
+
+```
+// webpack.config.js
+...
+    plugins: [
+        new CopyWebpackPlugin( [
+            { from: 'node_modules/tinymce/plugins', to: `${ distPath.js }plugins` },
+            { from: 'node_modules/tinymce/themes', to: `${ distPath.js }themes` },
+            { from: 'node_modules/tinymce/skins', to: `${ distPath.js }skins` },
+        ], {} ),
+    ],
+...
+```
 
 ## Global variables 
 
@@ -421,6 +439,7 @@ const postBlock = storypage.blocks.post;
 blocks.registerBlockType( postBlock.name, postBlock.settings );
 ```
 
+We are trying to provide new types of blocks: **auto posts** and **hand-picked posts** which are experimental for now. Theose blocks are dynamic and the render must be implemented server-side. 
 
 [↑ Go up to Table of contents](#table-of-contents)
 
@@ -499,4 +518,3 @@ plugins.registerPlugin( 'plugin-document-sidebar', {
 ```
 
 [↑ Go up to Table of contents](#table-of-contents)
-

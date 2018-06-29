@@ -166,7 +166,7 @@ class PostEdit extends Component {
 		if ( type === 'auto' && postResults && postResults !== prevProps.postResults && postResults.data ) {
 			const postRes = postResults.data[ 0 ];
 
-			attributes.id = postRes.id;
+			attributes.id = parseInt( postRes.id );
 			attributes.title = [ postRes.title.rendered ];
 			attributes.link = postRes.link;
 			attributes.mediaId = postRes.featured_media;
@@ -262,12 +262,12 @@ class PostEdit extends Component {
 							</ButtonGroup>
 						</div>
 						{
-							( type === 'withid' || true ) &&
+							( type === 'withid' ) &&
 							<TextControl
 								placeholder={ __( 'Post id' ) }
 								value={ id }
 								onChange={ ( nextId ) => {
-									setAttributes( { id: nextId } );
+									setAttributes( { id: parseInt( nextId ) } );
 								} }
 							/>
 						}

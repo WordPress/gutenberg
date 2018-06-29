@@ -88,22 +88,14 @@ export const settings = {
 
 	attributes: blockAttributes,
 
-	supports: {
-		html: false,
-	},
-
 	edit,
 
-	save() {
-		return null;
-	},
-
-	/*save( { attributes, className } ) {
+	save( { attributes, className } ) {
 		const {
 			title,
 			link,
 			mediaUrl,
-			type,
+			// type,
 			hasImage,
 			hasParallax,
 			dimRatio,
@@ -113,10 +105,9 @@ export const settings = {
 			customFontSize,
 		} = attributes;
 
-		if ( type !== 'static' ) {
+		/* if ( type !== 'static' ) {
 			return null;
-		}
-
+		} */
 
 		// Image
 		const imageStyle = backgroundImageStyles( mediaUrl );
@@ -161,5 +152,5 @@ export const settings = {
 		);
 
 		return ( link ? <a href={ link }>{ post }</a> : post );
-	},*/
+	},
 };

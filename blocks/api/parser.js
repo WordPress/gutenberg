@@ -136,6 +136,9 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 		case 'query':
 			value = parseWithAttributeSchema( innerHTML, attributeSchema );
 
+			/**
+			 * @frontkom/gutenberg
+			 */
 			// get values for data attr as object
 			const data = get( attributeSchema.query, [ 'data' ] );
 
