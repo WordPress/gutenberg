@@ -17,6 +17,8 @@ import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { diffAriaProps, pickAriaProps } from './aria';
 import { valueToString } from './format';
 
+const { InputEvent } = window;
+
 /**
  * Determines whether we need a fix to provide `input` events for contenteditable.
  *
@@ -93,6 +95,78 @@ function applyInternetExplorerInputFix( editorNode ) {
 		editorNode.removeEventListener( 'textinput', mapTextInputEvent );
 		document.removeEventListener( 'keyup', mapDeletionKeyUpEvents, true );
 	};
+}
+
+/**
+ * Makes sure an input event is dispatched when a Backspace changes the selection anchor.
+ *
+ * This function is a fix for the case in multiple browsers (at least Chrome and Firefox)
+ * where a Backspace deletes the last character of a nested element and the nested element
+ * itself but dispatches no input event. This fix listens for a Backspace keydown and
+ * manually dispatches an input event on keyup if the selection anchor is different between
+ * keyup and keydown and there's been no input event.
+ *
+ * @param {Element} editorNode The root editor node.
+ *
+ * @return {Function} A function to remove the fix.
+ */
+function applyBackspaceInputFix( editorNode ) {
+	let dispatchedInput;
+	let keyDownAnchorNode;
+
+	editorNode.addEventListener( 'keydown', handleKeyDown, true );
+	return () => editorNode.removeEventListener( 'keydown', handleKeyDown, true );
+
+	/**
+	 * Begins listening for input and keyup on Backspace keydown.
+	 *
+	 * @param {KeyboardEvent} event The keydown event.
+	 */
+	function handleKeyDown( event ) {
+		if ( event.keyCode === BACKSPACE && event.repeat ) {
+			// Only apply the fix for the first keydown before keyup.
+			return;
+		}
+
+		dispatchedInput = false;
+		keyDownAnchorNode = window.getSelection().anchorNode;
+
+		document.addEventListener( 'input', noteInput, true );
+		document.addEventListener( 'keyup', fixInputOnKeyUp, true );
+	}
+
+	/**
+	 * Remembers if an input event was dispatched.
+	 */
+	function noteInput() {
+		dispatchedInput = true;
+	}
+
+	/**
+	 * Manually dispatches an input event if needed on Backspace keyup.
+	 *
+	 * @param {KeyboardEvent} event The keyup event.
+	 */
+	function fixInputOnKeyUp( event ) {
+		if ( event.keyCode !== BACKSPACE ) {
+			return;
+		}
+
+		document.removeEventListener( 'input', noteInput, true );
+		document.removeEventListener( 'keyup', fixInputOnKeyUp, true );
+
+		const selectionAnchorChanged = window.getSelection().anchorNode !== keyDownAnchorNode;
+
+		// If the selection anchor changed, the Backspace likely modified the content,
+		// and if we haven't seen a corresponding `input` event, dispatch one.
+		if ( selectionAnchorChanged && ! dispatchedInput && InputEvent ) {
+			event.target.dispatchEvent(
+				// NOTE: We can rely on the InputEvent constructor because the IE11
+				// contenteditable `input` fix already dispatches `input` for backspace.
+				new InputEvent( 'input', { bubbles: true } )
+			);
+		}
+	}
 }
 
 const IS_PLACEHOLDER_VISIBLE_ATTR_NAME = 'data-is-placeholder-visible';
@@ -195,6 +269,15 @@ export default class TinyMCE extends Component {
 
 		if ( editorNode && needsInternetExplorerInputFix( editorNode ) ) {
 			this.removeInternetExplorerInputFix = applyInternetExplorerInputFix( editorNode );
+		}
+
+		if ( this.removeBackspaceInputFix ) {
+			this.removeBackspaceInputFix();
+			this.removeBackspaceInputFix = null;
+		}
+
+		if ( editorNode ) {
+			this.removeBackspaceInputFix = applyBackspaceInputFix( editorNode );
 		}
 	}
 
