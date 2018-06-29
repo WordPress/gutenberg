@@ -5,6 +5,37 @@ const path = require( 'path' );
 
 const root = path.resolve( __dirname, '../../' );
 
+// These are packages published to NPM as their own node modules.
+const npmReadyPackages = [
+	'api-request',
+	'babel-plugin-import-jsx-pragam',
+	'blob',
+	'core-data',
+	'data',
+	'date',
+	'deprecated',
+	'dom',
+	'element',
+	'keycodes',
+	'library-export-default-webpack-plugin',
+	'plugins',
+	'postcss-themes',
+	'shortcode',
+];
+
+// These are internal-only packages (for now), not yet published as standalone
+// node modules.
+const gutenbergPackages = [
+	'blocks',
+	'components',
+	'core-blocks',
+	'edit-post',
+	'editor',
+	'nux',
+	'utils',
+	'viewport',
+];
+
 module.exports = {
 	dataNamespaces: {
 		core: {
@@ -39,10 +70,19 @@ module.exports = {
 			actions: [ path.resolve( root, 'nux/store/actions.js' ) ],
 		},
 	},
-
 	dataDocsOutput: path.resolve( __dirname, '../data' ),
 
-	rootManifest: path.resolve( __dirname, '../root-manifest.json' ),
+	packages: {
+		...npmReadyPackages.reduce( ( memo, packageName ) => {
+			memo[ packageName ] = { isNpmReady: true };
+			return memo;
+		}, {} ),
+		...gutenbergPackages.reduce( ( memo, packageName ) => {
+			memo[ packageName ] = { isNpmReady: false };
+			return memo;
+		}, {} ),
+	},
 
+	rootManifest: path.resolve( __dirname, '../root-manifest.json' ),
 	manifestOutput: path.resolve( __dirname, '../manifest.json' ),
 };
