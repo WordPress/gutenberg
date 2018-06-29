@@ -25,6 +25,9 @@ export const settings = {
 	keywords: [ __( 'document' ), __( 'pdf' ) ],
 
 	attributes: {
+		id: {
+			type: 'number',
+		},
 		href: {
 			type: 'string',
 		},
@@ -33,12 +36,14 @@ export const settings = {
 			source: 'text',
 			selector: 'a:not([download])',
 		},
+		// Differs to the href when the block is configured to link to the attachment page
 		textLinkHref: {
 			type: 'string',
 			source: 'attribute',
 			selector: 'a:not([download])',
 			attribute: 'href',
 		},
+		// e.g. `_blank` when the block is configured to open in a new window
 		openInNewWindow: {
 			type: 'string',
 			source: 'attribute',
@@ -49,14 +54,11 @@ export const settings = {
 			type: 'boolean',
 			default: true,
 		},
-		buttonText: {
+		downloadButtonText: {
 			type: 'string',
 			source: 'text',
 			selector: 'a[download]',
 			default: __( 'Download' ),
-		},
-		id: {
-			type: 'number',
 		},
 	},
 
@@ -141,7 +143,7 @@ export const settings = {
 			textLinkHref,
 			openInNewWindow,
 			showDownloadButton,
-			buttonText,
+			downloadButtonText,
 		} = attributes;
 
 		return ( href &&
@@ -160,7 +162,7 @@ export const settings = {
 						href={ href }
 						className="wp-block-file__button"
 						download={ fileName }>
-						{ buttonText }
+						{ downloadButtonText }
 					</a>
 				}
 			</div>

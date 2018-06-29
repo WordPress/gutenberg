@@ -125,7 +125,7 @@ class FileEdit extends Component {
 			textLinkHref,
 			openInNewWindow,
 			showDownloadButton,
-			buttonText,
+			downloadButtonText,
 			id,
 		} = attributes;
 		const { showCopyConfirmation } = this.state;
@@ -196,12 +196,12 @@ class FileEdit extends Component {
 								<RichText
 									tagName="div" // must be block-level or else cursor disappears
 									className={ `${ className }__button` }
-									value={ buttonText }
+									value={ downloadButtonText }
 									formattingControls={ [] } // disable controls
 									placeholder={ __( 'Add text…' ) }
 									keepPlaceholderOnFocus
 									multiline="false"
-									onChange={ ( text ) => setAttributes( { buttonText: text } ) }
+									onChange={ ( text ) => setAttributes( { downloadButtonText: text } ) }
 								/>
 							</div>
 						}
