@@ -88,8 +88,8 @@ class ClipboardButton extends Component {
 		// This causes documentHasSelection() in the copy-handler component to
 		// mistakenly override the ClipboardButton, and copy a serialized string
 		// of the current block instead.
-		const focusOnCopyEventTarget = ( e ) => {
-			e.target.focus();
+		const focusOnCopyEventTarget = ( event ) => {
+			event.target.focus();
 		};
 
 		return (
