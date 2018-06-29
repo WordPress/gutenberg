@@ -161,8 +161,8 @@ class ParagraphBlock extends Component {
 		} = this.props;
 
 		if ( after ) {
-			// After content should be appended to the set of spread blocks as
-			// a new paragraph block to insert after.
+			// Append "After" content as a new paragraph block to the end of
+			// any other blocks being inserted after the current paragraph.
 			blocks.push( createBlock( name, { content: after } ) );
 		}
 
