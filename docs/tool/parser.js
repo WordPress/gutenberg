@@ -6,7 +6,7 @@ const fs = require( 'fs' );
 /**
  * External dependencies
  */
-const lodash = require( 'lodash' );
+const { last } = require( 'lodash' );
 const espree = require( 'espree' );
 const doctrine = require( 'doctrine' );
 
@@ -38,7 +38,7 @@ module.exports = function( config ) {
 						node.leadingComments.length !== 0
 					) {
 						const docBlock = doctrine.parse(
-							lodash.last( node.leadingComments ).value,
+							last( node.leadingComments ).value,
 							{ unwrap: true, recoverable: true }
 						);
 						const func = {

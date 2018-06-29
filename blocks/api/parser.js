@@ -98,7 +98,14 @@ export function matcherFromSource( sourceConfig ) {
  * @return {*} Attribute value.
  */
 export function parseWithAttributeSchema( innerHTML, attributeSchema ) {
-	return hpqParse( innerHTML, matcherFromSource( attributeSchema ) );
+	const attributeValue = hpqParse( innerHTML, matcherFromSource( attributeSchema ) );
+	// HTML attributes without a defined value (e.g. <audio loop>) are parsed
+	// to a value of '' (empty string), so return `true` if we know this should
+	// be boolean.
+	if ( 'attribute' === attributeSchema.source && 'boolean' === attributeSchema.type ) {
+		return '' === attributeValue;
+	}
+	return attributeValue;
 }
 
 /**
@@ -129,6 +136,9 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 		case 'query':
 			value = parseWithAttributeSchema( innerHTML, attributeSchema );
 
+			/**
+			 * @frontkom/gutenberg
+			 */
 			// get values for data attr as object
 			const data = get( attributeSchema.query, [ 'data' ] );
 

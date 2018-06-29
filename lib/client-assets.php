@@ -155,6 +155,13 @@ function gutenberg_register_scripts_and_styles() {
 		true
 	);
 	wp_register_script(
+		'wp-keycodes',
+		gutenberg_url( 'build/keycodes/index.js' ),
+		array( 'lodash' ),
+		filemtime( gutenberg_dir_path() . 'build/keycodes/index.js' ),
+		true
+	);
+	wp_register_script(
 		'wp-data',
 		gutenberg_url( 'build/data/index.js' ),
 		array( 'wp-deprecated', 'wp-element', 'wp-is-shallow-equal', 'lodash' ),
@@ -185,8 +192,15 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-utils',
 		gutenberg_url( 'build/utils/index.js' ),
-		array( 'lodash', 'wp-blob', 'wp-deprecated', 'wp-api-request', 'wp-i18n' ),
+		array( 'lodash', 'wp-blob', 'wp-deprecated', 'wp-api-request', 'wp-i18n', 'wp-keycodes' ),
 		filemtime( gutenberg_dir_path() . 'build/utils/index.js' ),
+		true
+	);
+	wp_register_script(
+		'wp-shortcode',
+		gutenberg_url( 'build/shortcode/index.js' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'build/shortcode/index.js' ),
 		true
 	);
 	wp_add_inline_script( 'wp-utils', 'var originalUtils = window.wp && window.wp.utils ? window.wp.utils : {};', 'before' );
@@ -244,6 +258,7 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-hooks',
 			'wp-i18n',
 			'wp-is-shallow-equal',
+			'wp-keycodes',
 			'wp-utils',
 		),
 		filemtime( gutenberg_dir_path() . 'build/components/index.js' ),
@@ -252,7 +267,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-blocks',
 		gutenberg_url( 'build/blocks/index.js' ),
-		array( 'wp-blob', 'wp-deprecated', 'wp-dom', 'wp-element', 'wp-hooks', 'wp-i18n', 'shortcode', 'wp-data', 'lodash' ),
+		array( 'wp-blob', 'wp-deprecated', 'wp-dom', 'wp-element', 'wp-hooks', 'wp-i18n', 'wp-shortcode', 'wp-data', 'lodash' ),
 		filemtime( gutenberg_dir_path() . 'build/blocks/index.js' ),
 		true
 	);
@@ -284,6 +299,7 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-element',
 			'wp-editor',
 			'wp-i18n',
+			'wp-keycodes',
 			'wp-utils',
 			'wp-viewport',
 			'wp-api-request',
@@ -387,6 +403,7 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-deprecated',
 			'wp-dom',
 			'wp-i18n',
+			'wp-keycodes',
 			'wp-element',
 			'wp-plugins',
 			'wp-utils',
@@ -419,9 +436,9 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-element',
 			'wp-embed',
 			'wp-i18n',
+			'wp-keycodes',
 			'wp-plugins',
 			'wp-viewport',
-			'wp-utils',
 		),
 		filemtime( gutenberg_dir_path() . 'build/edit-post/index.js' ),
 		true

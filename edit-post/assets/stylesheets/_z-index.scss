@@ -18,7 +18,6 @@ $z-layers: (
 	'.edit-post-meta-boxes-area.is-loading:before': 1,
 	'.edit-post-meta-boxes-area .spinner': 5,
 	'.editor-block-contextual-toolbar': 21,
-	'.editor-block-switcher__menu': 5,
 	'.components-popover__close': 5,
 	'.editor-block-list__insertion-point': 5,
 	'.core-blocks-gallery-item__inline-menu': 20,
@@ -30,7 +29,7 @@ $z-layers: (
 	// Side UI active buttons
 	'.editor-block-settings-remove': 1,
 	'.editor-block-mover__control': 1,
-	
+
 	// Should have lower index than anything else positioned inside the block containers
 	'.editor-block-list__block-draggable': 0,
 

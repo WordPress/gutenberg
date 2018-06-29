@@ -8,7 +8,6 @@ import { noop } from 'lodash';
  */
 import {
 	Component,
-	createElement,
 	Fragment,
 	RawHTML,
 } from '../';

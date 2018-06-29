@@ -10,7 +10,6 @@ import { flowRight, without, mapValues, overEvery } from 'lodash';
 import {
 	Component,
 	compose,
-	createElement,
 	createHigherOrderComponent,
 	pure,
 } from '@wordpress/element';
