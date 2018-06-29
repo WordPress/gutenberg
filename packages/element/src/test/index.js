@@ -15,7 +15,6 @@ import {
 	switchChildrenNodeName,
 	RawHTML,
 	pure,
-	createRef,
 	compose,
 } from '../';
 
@@ -185,24 +184,55 @@ describe( 'element', () => {
 			expect( TestComponent.displayName ).toBe( 'WithTest(CustomDisplayName)' );
 		} );
 		it( 'should forward the ref to the wrapped component', () => {
-			function SomeComponent() {
-				return <div />;
-			}
+			const LeafComponent = (props) => {
+					return <input type="text" ref={ props.forwardedRef } />;
+			};
 			const TestComponent = compose(
 				createHigherOrderComponent(
-					( OriginalComponent ) => OriginalComponent,
+					( OriginalComponent ) => {
+						return class extends Component {
+							render() {
+								return <OriginalComponent ref={ this.props.forwardedRef } />;
+							}
+						};
+					},
 					'withTest'
 				),
 				createHigherOrderComponent(
 					( OriginalComponent ) => OriginalComponent,
 					'withTest2'
 				)
-			)( SomeComponent );
-			const testRef = createRef();
-			const element = TestRenderer.create( <TestComponent ref={ testRef } /> );
-			const elementInstance = element.root.findByType( SomeComponent );
-			expect( elementInstance.props.forwardedRef ).toBe( testRef );
-		} )
+			)( LeafComponent );
+			class MainComponent extends Component {
+				constructor() {
+					super( ...arguments );
+					this.input = null;
+				}
+				componentDidMount() {
+					console.log(this.input);
+					this.input.focus();
+				}
+				render() {
+					return <TestComponent ref={ el => this.input = el } />;
+				}
+			}
+			let focused = false;
+			TestRenderer.create(
+				<MainComponent />,
+				{
+					createNodeMock: ( element ) => {
+						if ( element.type === 'input' ) {
+							//mock focus function
+							return {
+								focus: () => {
+									focused = true;
+								}
+							}
+						}
+					}
+				} );
+			console.assert( focused === true );
+		} );
 	} );
 
 	describe( 'RawHTML', () => {
