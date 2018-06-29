@@ -212,6 +212,21 @@ export class RichText extends Component {
 		this.editor.shortcuts.add( rawShortcut.primary( 'z' ), '', 'Undo' );
 		this.editor.shortcuts.add( rawShortcut.primaryShift( 'z' ), '', 'Redo' );
 
+		// Bind directly to the document, since properties assigned to TinyMCE
+		// events are lost when accessed during bubbled handlers. This must be
+		// captured _before_ TinyMCE's internal handling of arrow keys, which
+		// would otherwise already have moved the caret position. This is why
+		// it is bound to the capture phase.
+		//
+		// Note: This is ideally a temporary measure, only needed so long as
+		// TinyMCE inaccurately prevents default around inline boundaries.
+		// Ideally we rely on the defaultPrevented property to stop WritingFlow
+		// from transitioning.
+		//
+		// See: https://github.com/tinymce/tinymce/issues/4476
+		// See: WritingFlow#onKeyDown
+		this.editor.dom.doc.addEventListener( 'keydown', this.onHorizontalNavigationKeyDown, true );
+
 		// Remove TinyMCE Core shortcut for consistency with global editor
 		// shortcuts. Also clashes with Mac browsers.
 		this.editor.shortcuts.remove( 'meta+y', '', 'Redo' );
@@ -450,6 +465,7 @@ export class RichText extends Component {
 			left: position.left - containerPosition.left + ( position.width / 2 ),
 		};
 	}
+
 	/**
 	 * Handles a horizontal navigation key down event to stop propagation if it
 	 * can be inferred that it will be handled by TinyMCE (notably transitions
@@ -458,6 +474,12 @@ export class RichText extends Component {
 	 * @param {KeyboardEvent} event Keydown event.
 	 */
 	onHorizontalNavigationKeyDown( event ) {
+		const { keyCode } = event;
+		const isHorizontalNavigation = keyCode === LEFT || keyCode === RIGHT;
+		if ( ! isHorizontalNavigation ) {
+			return;
+		}
+
 		const { focusNode, focusOffset } = window.getSelection();
 		const { nodeType, nodeValue } = focusNode;
 
@@ -491,7 +513,7 @@ export class RichText extends Component {
 		}
 
 		if ( nodeValue[ offset ] === TINYMCE_ZWSP ) {
-			event.stopPropagation();
+			event._navigationHandled = true;
 		}
 	}
 
@@ -531,11 +553,6 @@ export class RichText extends Component {
 			// that we stop other handlers (e.g. ones registered by TinyMCE) from
 			// also handling this event.
 			event.stopImmediatePropagation();
-		}
-
-		const isHorizontalNavigation = keyCode === LEFT || keyCode === RIGHT;
-		if ( isHorizontalNavigation ) {
-			this.onHorizontalNavigationKeyDown( event );
 		}
 
 		// If we click shift+Enter on inline RichTexts, we avoid creating two contenteditables
