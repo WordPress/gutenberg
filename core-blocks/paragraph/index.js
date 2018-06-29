@@ -166,7 +166,7 @@ class ParagraphBlock extends Component {
 			blocks.push( createBlock( name, { content: after } ) );
 		}
 
-		if ( blocks.length ) {
+		if ( blocks.length && insertBlocksAfter ) {
 			insertBlocksAfter( blocks );
 		}
 
