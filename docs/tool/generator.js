@@ -17,7 +17,7 @@ function generateTableOfContent( parsedNamespaces ) {
 		'# Data Module Reference',
 		'',
 		Object.values( parsedNamespaces ).map( ( parsedNamespace ) => {
-			return ` - [**${ parsedNamespace.name }**: ${ parsedNamespace.title }](../../docs/data/${ kebabCase( parsedNamespace.name ) }.md)`;
+			return ` - [**${ parsedNamespace.name }**: ${ parsedNamespace.title }](../../docs/data/data-${ kebabCase( parsedNamespace.name ) }.md)`;
 		} ).join( '\n' ),
 	].join( '\n' );
 }
@@ -87,7 +87,7 @@ module.exports = function( parsedNamespaces, rootFolder ) {
 	Object.values( parsedNamespaces ).forEach( ( parsedNamespace ) => {
 		const namespaceDocs = generateNamespaceDocs( parsedNamespace );
 		fs.writeFileSync(
-			path.join( rootFolder, kebabCase( parsedNamespace.name ) + '.md' ),
+			path.join( rootFolder, 'data-' + kebabCase( parsedNamespace.name ) + '.md' ),
 			namespaceDocs
 		);
 	} );
