@@ -39,7 +39,7 @@ function request( options ) {
 		};
 
 		const parseResponse = ( response ) => {
-			return parse ? response.json() : response;
+			return parse ? response.json().catch( () => response ) : response;
 		};
 
 		return responsePromise

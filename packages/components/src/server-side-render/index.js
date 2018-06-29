@@ -63,13 +63,16 @@ export class ServerSideRender extends Component {
 				}
 			} )
 			.catch( ( response ) => {
-				const failResponse = {
-					error: true,
-					errorMsg: response.json().message || __( 'Unknown error' ),
+				const updateStateWithFailedResponse = ( body ) => {
+					const failResponse = {
+						error: true,
+						errorMsg: ( body && body.message ) || __( 'Unknown error' ),
+					};
+					if ( this.isStillMounted ) {
+						this.setState( { response: failResponse } );
+					}
 				};
-				if ( this.isStillMounted ) {
-					this.setState( { response: failResponse } );
-				}
+				response.json().then( updateStateWithFailedResponse, () => updateStateWithFailedResponse() );
 			} );
 	}
 

@@ -16,7 +16,7 @@ import request, {
 
 describe( 'request', () => {
 	const actualResponse = {
-		json: () => ( {} ),
+		json: () => Promise.resolve( {} ),
 		headers: {
 			connection: 'Keep-Alive',
 			'content-type': 'text/plain; charset=utf-8',

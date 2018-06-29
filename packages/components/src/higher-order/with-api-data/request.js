@@ -62,10 +62,10 @@ export function getCachedResponse( request ) {
 export function getResponseFromNetwork( request ) {
 	const promise = fetch( { ...request, parse: false } )
 		.then( ( response ) => {
-			return {
-				body: response.json(),
+			return response.json().then( ( body ) => ( {
+				body: body,
 				headers: response.headers,
-			};
+			} ) );
 		} );
 
 	if ( isRequestMethod( request, 'GET' ) ) {
