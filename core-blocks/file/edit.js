@@ -78,6 +78,15 @@ class FileEdit extends Component {
 
 	render() {
 		const {
+			className,
+			isSelected,
+			attributes,
+			setAttributes,
+			noticeUI,
+			noticeOperations,
+			media,
+		} = this.props;
+		const {
 			fileName,
 			href,
 			textLinkHref,
@@ -85,15 +94,7 @@ class FileEdit extends Component {
 			showDownloadButton,
 			buttonText,
 			id,
-		} = this.props.attributes;
-		const {
-			className,
-			isSelected,
-			setAttributes,
-			noticeUI,
-			noticeOperations,
-			media,
-		} = this.props;
+		} = attributes;
 		const { showCopyConfirmation } = this.state;
 		const attachmentPage = media && media.link;
 
