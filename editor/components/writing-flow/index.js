@@ -188,13 +188,9 @@ class WritingFlow extends Component {
 	onKeyDown( event ) {
 		const { hasMultiSelection, onMultiSelect, blocks } = this.props;
 
-		// If navigation has already been handled (e.g. TinyMCE inline
-		// boundaries), abort. Ideally this uses Event#defaultPrevented. This
-		// is currently not possible because TinyMCE will misreport an event
-		// default as prevented on outside edges of inline boundaries.
-		//
-		// See: https://github.com/tinymce/tinymce/issues/4476
-		if ( event.nativeEvent._navigationHandled ) {
+		// Aobrt if navigation has already been handled (e.g. TinyMCE inline
+		// boundaries).
+		if ( event.nativeEvent.defaultPrevented ) {
 			return;
 		}
 
