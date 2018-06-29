@@ -15,7 +15,7 @@ export const settings = {
 
 	description: __( 'The Playlist block allows you to embed playlist files and play them back using a Core playlist.' ),
 
-	icon: 'format-audio',
+	icon: 'playlist-video',
 
 	category: 'common',
 
