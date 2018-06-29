@@ -15,13 +15,14 @@ import {
 export default class FileBlockInspector extends Component {
 	render() {
 		const {
+			hrefs,
 			openInNewWindow,
 			showDownloadButton,
 			changeLinkDestinationOption,
 			changeOpenInNewWindow,
 			changeShowDownloadButton,
 		} = this.props;
-		const { href, textLinkHref, attachmentPage } = this.props.hrefs;
+		const { href, textLinkHref, attachmentPage } = hrefs;
 
 		const linkDestinationOptions = ( () => {
 			if ( attachmentPage ) {
