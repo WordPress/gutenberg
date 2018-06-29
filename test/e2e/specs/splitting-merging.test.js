@@ -7,7 +7,8 @@ import {
 	newDesktopBrowserPage,
 	insertBlock,
 	getHTMLFromCodeEditor,
-	switchToEditor,
+	pressTimes,
+	pressWithModifier,
 } from '../support/utils';
 
 describe( 'splitting and merging blocks', () => {
@@ -21,18 +22,13 @@ describe( 'splitting and merging blocks', () => {
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'FirstSecond' );
 
-		//Move caret between 'First' and 'Second' and press Enter to split paragraph blocks
-		for ( let i = 0; i < 6; i++ ) {
-			await page.keyboard.press( 'ArrowLeft' );
-		}
+		// Move caret between 'First' and 'Second' and press Enter to split
+		// paragraph blocks
+		await pressTimes( 'ArrowLeft', 6 );
 		await page.keyboard.press( 'Enter' );
 
 		// Assert that there are now two paragraph blocks with correct content
-		let textEditorContent = await getHTMLFromCodeEditor();
-		expect( textEditorContent ).toMatchSnapshot();
-
-		// Switch to Visual Editor to continue testing
-		await switchToEditor( 'Visual' );
+		expect( await getHTMLFromCodeEditor() ).toMatchSnapshot();
 
 		// Press Backspace to merge paragraph blocks
 		await page.click( '.is-selected' );
@@ -41,9 +37,26 @@ describe( 'splitting and merging blocks', () => {
 
 		// Ensure that caret position is correctly placed at the between point.
 		await page.keyboard.type( 'Between' );
+		expect( await getHTMLFromCodeEditor() ).toMatchSnapshot();
+		// Workaround: When transitioning back from Code to Visual, the caret
+		// is placed at the beginning of the selected paragraph. Ideally this
+		// should persist selection between modes.
+		await pressTimes( 'ArrowRight', 5 ); // After "First"
+		await pressTimes( 'Delete', 7 ); // Delete "Between"
 
-		// Assert that there is now one paragraph with correct content
-		textEditorContent = await getHTMLFromCodeEditor();
-		expect( textEditorContent ).toMatchSnapshot();
+		// Edge case: Without ensuring that the editor still has focus when
+		// restoring a bookmark, the caret may be inadvertently moved back to
+		// an inline boundary after a split occurs.
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.down( 'Shift' );
+		await pressTimes( 'ArrowRight', 5 );
+		await page.keyboard.up( 'Shift' );
+		await pressWithModifier( 'mod', 'b' );
+		// Collapse selection, still within inline boundary.
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'BeforeSecond:' );
+
+		expect( await getHTMLFromCodeEditor() ).toMatchSnapshot();
 	} );
 } );
