@@ -467,16 +467,24 @@ export class RichText extends Component {
 
 		const isReverse = event.keyCode === LEFT;
 
+		// Look to previous character for ZWSP if navigating in reverse.
 		let offset = focusOffset;
 		if ( isReverse ) {
 			offset--;
 		}
 
-		// [WORKAROUND]: When in a new paragraph in a new inline boundary node,
-		// while typing the zero-width space occurs as the first child instead
-		// of at the end of the inline boundary where the caret is. This should
-		// only be exempt when focusNode is not _only_ the ZWSP, which occurs
-		// when caret is placed on the right outside edge of inline boundary.
+		// Workaround: In a new inline boundary node, the zero-width space
+		// wrongly lingers at the beginning of the node, rather than following
+		// the caret. If we are at the extent of the inline boundary, but the
+		// ZWSP exists at the beginning, consider as though it were to be
+		// handled as a transition outside the inline boundary.
+		//
+		// Since this condition could also be satisfied in the case that we're
+		// on the right edge of an inline boundary -- where the ZWSP exists as
+		// as an otherwise empty focus node -- ensure that the focus node is
+		// non-empty.
+		//
+		// See: https://github.com/tinymce/tinymce/issues/4472
 		if ( ! isReverse && focusOffset === nodeValue.length &&
 				nodeValue.length > 1 && nodeValue[ 0 ] === TINYMCE_ZWSP ) {
 			offset = 0;
