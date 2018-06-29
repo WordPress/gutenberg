@@ -89,17 +89,21 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
 
     @ReactProp(name = "text")
     public void setText(ReactAztecText view, ReadableMap inputMap) {
-        view.setIsSettingTextFromJS(true);
         if (!inputMap.hasKey("eventCount")) {
-            view.fromHtml(inputMap.getString("text"));
+            setTextfromJS(view, inputMap.getString("text"));
         } else {
             // Don't think there is necessity of this branch, but justin case we want to
             // force a 2nd setText from JS side to Native, just set a high eventCount
             int eventCount = inputMap.getInt("eventCount");
             if (view.mNativeEventCount < eventCount) {
-                view.fromHtml(inputMap.getString("text"));
+                setTextfromJS(view, inputMap.getString("text"));
             }
         }
+    }
+
+    private void setTextfromJS(ReactAztecText view, String text) {
+        view.setIsSettingTextFromJS(true);
+        view.fromHtml(text);
         view.setIsSettingTextFromJS(false);
     }
 
