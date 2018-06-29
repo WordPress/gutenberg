@@ -90,6 +90,7 @@
 		"concurrently": "3.5.0",
 		"core-js": "2.5.7",
 		"cross-env": "3.2.4",
+		"deasync": "0.1.13",
 		"deep-freeze": "0.0.1",
 		"doctrine": "2.1.0",
 		"eslint": "4.16.0",

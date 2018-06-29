@@ -14,7 +14,8 @@ $datepicker__muted-color: #ccc;
 $datepicker__navigation-disabled-color: lighten($datepicker__muted-color, 10%);
 $datepicker__border-color: $light-gray-500;
 
-@import '~react-datepicker/src/stylesheets/datepicker';
+// Lerna hoist packages, so can't reference with ~
+@import '../../../../node_modules/react-datepicker/src/stylesheets/datepicker';
 
 .react-datepicker__month-container {
 	float: none;
