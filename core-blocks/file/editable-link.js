@@ -7,6 +7,9 @@ export default class FileBlockEditableLink extends Component {
 	constructor() {
 		super( ...arguments );
 
+		this.copyLinkToClipboard = this.copyLinkToClipboard.bind( this );
+		this.showPlaceholderIfEmptyString = this.showPlaceholderIfEmptyString.bind( this );
+
 		this.state = {
 			showPlaceholder: ! this.props.text,
 		};
@@ -18,49 +21,44 @@ export default class FileBlockEditableLink extends Component {
 		}
 	}
 
+	copyLinkToClipboard( event ) {
+		const selectedText = document.getSelection().toString();
+		const htmlLink = `<a href="${ this.props.href }">${ selectedText }</a>`;
+		event.clipboardData.setData( 'text/plain', selectedText );
+		event.clipboardData.setData( 'text/html', htmlLink );
+	}
+
+	forcePlainTextPaste( event ) {
+		event.preventDefault();
+
+		const selection = document.getSelection();
+		const clipboard = event.clipboardData.getData( 'text/plain' ).replace( /[\n\r]/g, '' );
+		const textNode = document.createTextNode( clipboard );
+
+		selection.getRangeAt( 0 ).insertNode( textNode );
+		selection.collapseToEnd();
+	}
+
+	showPlaceholderIfEmptyString( event ) {
+		this.setState( { showPlaceholder: event.target.innerText === '' } );
+	}
+
 	render() {
 		const { className, placeholder, text, href, updateFileName } = this.props;
 		const { showPlaceholder } = this.state;
-
-		const copyLinkToClipboard = ( e ) => {
-			const selectedText = document.getSelection().toString();
-			const htmlLink = `<a href="${ href }">${ selectedText }</a>`;
-			e.clipboardData.setData( 'text/plain', selectedText );
-			e.clipboardData.setData( 'text/html', htmlLink );
-		};
-
-		const forcePlainTextPaste = ( e ) => {
-			e.preventDefault();
-
-			const selection = document.getSelection();
-			const clipboard =
-				e.clipboardData.getData( 'text/plain' ).replace( /[\n\r]/g, '' );
-			const textNode = document.createTextNode( clipboard );
-
-			selection.getRangeAt( 0 ).insertNode( textNode );
-			selection.collapseToEnd();
-		};
-
-		const showPlaceholderIfEmptyString = ( e ) => {
-			if ( e.target.innerText === '' ) {
-				this.setState( { showPlaceholder: true } );
-			} else {
-				this.setState( { showPlaceholder: false } );
-			}
-		};
 
 		return (
 			<Fragment>
 				<a
 					aria-label={ placeholder }
 					className={ `${ className }__textlink` }
-					contentEditable={ true }
 					href={ href }
-					onBlur={ ( e ) => updateFileName( e.target.innerText ) }
-					onInput={ showPlaceholderIfEmptyString }
-					onCopy={ copyLinkToClipboard }
-					onCut={ copyLinkToClipboard }
-					onPaste={ forcePlainTextPaste }
+					onBlur={ ( event ) => updateFileName( event.target.innerText ) }
+					onInput={ this.showPlaceholderIfEmptyString }
+					onCopy={ this.copyLinkToClipboard }
+					onCut={ this.copyLinkToClipboard }
+					onPaste={ this.forcePlainTextPaste }
+					contentEditable
 				>
 					{ text }
 				</a>
@@ -69,7 +67,7 @@ export default class FileBlockEditableLink extends Component {
 					/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 					<span
 						className={ `${ className }__textlink-placeholder` }
-						onClick={ ( e ) => e.target.previousSibling.focus() }
+						onClick={ ( event ) => event.target.previousSibling.focus() }
 					>
 						{ placeholder }
 					</span>
