@@ -44,7 +44,7 @@ export const settings = {
 			attribute: 'href',
 		},
 		// e.g. `_blank` when the block is configured to open in a new window
-		openInNewWindow: {
+		textLinkTarget: {
 			type: 'string',
 			source: 'attribute',
 			selector: 'a:not([download])',
@@ -141,7 +141,7 @@ export const settings = {
 			href,
 			fileName,
 			textLinkHref,
-			openInNewWindow,
+			textLinkTarget,
 			showDownloadButton,
 			downloadButtonText,
 		} = attributes;
@@ -151,8 +151,8 @@ export const settings = {
 				{ fileName &&
 					<a
 						href={ textLinkHref }
-						target={ openInNewWindow }
-						rel={ openInNewWindow ? 'noreferrer noopener' : false }
+						target={ textLinkTarget }
+						rel={ textLinkTarget ? 'noreferrer noopener' : false }
 					>
 						{ fileName }
 					</a>

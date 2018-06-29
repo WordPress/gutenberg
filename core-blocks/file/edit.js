@@ -101,7 +101,7 @@ class FileEdit extends Component {
 
 	changeOpenInNewWindow( newValue ) {
 		this.props.setAttributes( {
-			openInNewWindow: newValue ? '_blank' : false,
+			textLinkTarget: newValue ? '_blank' : false,
 		} );
 	}
 
@@ -123,7 +123,7 @@ class FileEdit extends Component {
 			fileName,
 			href,
 			textLinkHref,
-			openInNewWindow,
+			textLinkTarget,
 			showDownloadButton,
 			downloadButtonText,
 			id,
@@ -157,7 +157,7 @@ class FileEdit extends Component {
 				<FileBlockInspector
 					hrefs={ { href, textLinkHref, attachmentPage } }
 					{ ...{
-						openInNewWindow,
+						openInNewWindow: !! textLinkTarget,
 						showDownloadButton,
 						changeLinkDestinationOption: this.changeLinkDestinationOption,
 						changeOpenInNewWindow: this.changeOpenInNewWindow,
