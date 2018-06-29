@@ -4,7 +4,7 @@ import {requireNativeComponent, ViewPropTypes} from 'react-native';
 var aztex = {
   name: 'AztecView',
   propTypes: {
-    text: PropTypes.string,
+    text: PropTypes.object,
     color: PropTypes.string,
     maxImagesWidth: PropTypes.number,
     minImagesWidth: PropTypes.number,

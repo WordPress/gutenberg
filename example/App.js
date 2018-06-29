@@ -30,7 +30,7 @@ export default class example extends React.Component {
                     <RCTAztecView
                          {...this.props}
                          style={[styles.aztec_editor, {minHeight: myMinHeight}]}
-                         text = {this.state.text}
+                         text = {{text: this.state.text}}
                          onContentSizeChange= {(event) => {
                               this.setState({height: event.nativeEvent.contentSize.height});
                           }}
