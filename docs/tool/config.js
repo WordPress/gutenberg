@@ -5,6 +5,7 @@ const path = require( 'path' );
 
 const root = path.resolve( __dirname, '../../' );
 
+// These are packages published to NPM as their own node modules.
 const npmReadyPackages = [
 	'api-request',
 	'babel-plugin-import-jsx-pragam',
@@ -22,6 +23,8 @@ const npmReadyPackages = [
 	'shortcode',
 ];
 
+// These are internal-only packages (for now), not yet published as standalone
+// node modules.
 const gutenbergPackages = [
 	'blocks',
 	'components',
