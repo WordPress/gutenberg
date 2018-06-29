@@ -25,7 +25,7 @@ import {
 	getScrollContainer,
 } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
-import { BACKSPACE, DELETE, ENTER, rawShortcut } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, rawShortcut } from '@wordpress/keycodes';
 import { withInstanceId, withSafeTimeout, Slot } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { rawHandler } from '@wordpress/blocks';
@@ -45,6 +45,22 @@ import { domToFormat, valueToString } from './format';
 import TokenUI from './tokens/ui';
 
 /**
+ * Browser dependencies
+ */
+
+const { Node } = window;
+
+/**
+ * Zero-width space character used by TinyMCE as a caret landing point for
+ * inline boundary nodes.
+ *
+ * @see tinymce/src/core/main/ts/text/Zwsp.ts
+ *
+ * @type {string}
+ */
+const TINYMCE_ZWSP = '\uFEFF';
+
+/**
  * Returns true if the node is the inline node boundary. This is used in node
  * filtering prevent the inline boundary from being included in the split which
  * occurs while within but at the end of an inline node, since TinyMCE includes
@@ -58,7 +74,7 @@ import TokenUI from './tokens/ui';
  */
 export function isEmptyInlineBoundary( node ) {
 	const text = node.nodeName === 'A' ? node.innerText : node.textContent;
-	return text === '\uFEFF';
+	return text === TINYMCE_ZWSP;
 }
 
 /**
@@ -112,6 +128,7 @@ export class RichText extends Component {
 		this.onChange = this.onChange.bind( this );
 		this.onNewBlock = this.onNewBlock.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
+		this.onHorizontalNavigationKeyDown = this.onHorizontalNavigationKeyDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onKeyUp = this.onKeyUp.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
@@ -194,6 +211,21 @@ export class RichText extends Component {
 		this.editor.shortcuts.add( rawShortcut.access( 'x' ), '', () => this.changeFormats( { code: ! this.state.formats.code } ) );
 		this.editor.shortcuts.add( rawShortcut.primary( 'z' ), '', 'Undo' );
 		this.editor.shortcuts.add( rawShortcut.primaryShift( 'z' ), '', 'Redo' );
+
+		// Bind directly to the document, since properties assigned to TinyMCE
+		// events are lost when accessed during bubbled handlers. This must be
+		// captured _before_ TinyMCE's internal handling of arrow keys, which
+		// would otherwise already have moved the caret position. This is why
+		// it is bound to the capture phase.
+		//
+		// Note: This is ideally a temporary measure, only needed so long as
+		// TinyMCE inaccurately prevents default around inline boundaries.
+		// Ideally we rely on the defaultPrevented property to stop WritingFlow
+		// from transitioning.
+		//
+		// See: https://github.com/tinymce/tinymce/issues/4476
+		// See: WritingFlow#onKeyDown
+		this.editor.dom.doc.addEventListener( 'keydown', this.onHorizontalNavigationKeyDown, true );
 
 		// Remove TinyMCE Core shortcut for consistency with global editor
 		// shortcuts. Also clashes with Mac browsers.
@@ -435,6 +467,57 @@ export class RichText extends Component {
 	}
 
 	/**
+	 * Handles a horizontal navigation key down event to stop propagation if it
+	 * can be inferred that it will be handled by TinyMCE (notably transitions
+	 * out of an inline boundary node).
+	 *
+	 * @param {KeyboardEvent} event Keydown event.
+	 */
+	onHorizontalNavigationKeyDown( event ) {
+		const { keyCode } = event;
+		const isHorizontalNavigation = keyCode === LEFT || keyCode === RIGHT;
+		if ( ! isHorizontalNavigation ) {
+			return;
+		}
+
+		const { focusNode, focusOffset } = window.getSelection();
+		const { nodeType, nodeValue } = focusNode;
+
+		if ( nodeType !== Node.TEXT_NODE ) {
+			return;
+		}
+
+		const isReverse = event.keyCode === LEFT;
+
+		// Look to previous character for ZWSP if navigating in reverse.
+		let offset = focusOffset;
+		if ( isReverse ) {
+			offset--;
+		}
+
+		// Workaround: In a new inline boundary node, the zero-width space
+		// wrongly lingers at the beginning of the node, rather than following
+		// the caret. If we are at the extent of the inline boundary, but the
+		// ZWSP exists at the beginning, consider as though it were to be
+		// handled as a transition outside the inline boundary.
+		//
+		// Since this condition could also be satisfied in the case that we're
+		// on the right edge of an inline boundary -- where the ZWSP exists as
+		// as an otherwise empty focus node -- ensure that the focus node is
+		// non-empty.
+		//
+		// See: https://github.com/tinymce/tinymce/issues/4472
+		if ( ! isReverse && focusOffset === nodeValue.length &&
+				nodeValue.length > 1 && nodeValue[ 0 ] === TINYMCE_ZWSP ) {
+			offset = 0;
+		}
+
+		if ( nodeValue[ offset ] === TINYMCE_ZWSP ) {
+			event._navigationHandled = true;
+		}
+	}
+
+	/**
 	 * Handles a keydown event from TinyMCE.
 	 *
 	 * @param {KeydownEvent} event The keydown event as triggered by TinyMCE.
@@ -442,10 +525,11 @@ export class RichText extends Component {
 	onKeyDown( event ) {
 		const dom = this.editor.dom;
 		const rootNode = this.editor.getBody();
+		const { keyCode } = event;
 
 		if (
-			( event.keyCode === BACKSPACE && isHorizontalEdge( rootNode, true ) ) ||
-			( event.keyCode === DELETE && isHorizontalEdge( rootNode, false ) )
+			( keyCode === BACKSPACE && isHorizontalEdge( rootNode, true ) ) ||
+			( keyCode === DELETE && isHorizontalEdge( rootNode, false ) )
 		) {
 			if ( ! this.props.onMerge && ! this.props.onRemove ) {
 				return;
@@ -453,7 +537,7 @@ export class RichText extends Component {
 
 			this.onCreateUndoLevel();
 
-			const forward = event.keyCode === DELETE;
+			const forward = keyCode === DELETE;
 
 			if ( this.props.onMerge ) {
 				this.props.onMerge( forward );
@@ -473,7 +557,7 @@ export class RichText extends Component {
 
 		// If we click shift+Enter on inline RichTexts, we avoid creating two contenteditables
 		// We also split the content and call the onSplit prop if provided.
-		if ( event.keyCode === ENTER ) {
+		if ( keyCode === ENTER ) {
 			if ( this.props.multiline ) {
 				if ( ! this.props.onSplit ) {
 					return;
