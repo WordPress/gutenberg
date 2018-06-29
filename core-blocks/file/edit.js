@@ -1,4 +1,9 @@
 /**
+ * External depedencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -98,10 +103,9 @@ class FileEdit extends Component {
 		const { showCopyConfirmation } = this.state;
 		const attachmentPage = media && media.link;
 
-		const classNames = [
-			className,
-			this.isBlobURL( href ) ? 'is-transient' : '',
-		].join( ' ' );
+		const classes = classnames( className, {
+			'is-transient': this.isBlobURL( href ),
+		} );
 
 		const confirmCopyURL = () => {
 			this.setState( { showCopyConfirmation: true } );
@@ -169,7 +173,7 @@ class FileEdit extends Component {
 						/>
 					</Toolbar>
 				</BlockControls>
-				<div className={ classNames }>
+				<div className={ classes }>
 					<div>
 						<FileBlockEditableLink
 							className={ className }
