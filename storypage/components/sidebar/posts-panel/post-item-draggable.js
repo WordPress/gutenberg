@@ -26,9 +26,12 @@ class PostItemDraggable extends Component {
 		if ( ! this.state.block.uid ) {
 			// create a new block
 			const block = createBlock( 'storypage/post', {
+				id: post.id,
 				title: [ post.title.rendered ],
-				id: post.featured_media,
 				link: post.link,
+				mediaId: post.featured_media,
+				categoryId: post.categories[ 0 ],
+				type: 'withid',
 				layout: '',
 			} );
 

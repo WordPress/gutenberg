@@ -24,10 +24,28 @@ import edit, {
 import './style.scss';
 
 const blockAttributes = {
-	url: {
+	id: { 			// post.id
+		type: 'number',
+	},
+	title: { 		// post.title
+		type: 'array',
+		source: 'children',
+		selector: 'p',
+	},
+	link: { 		// post.link
 		type: 'string',
 	},
-	id: { // mediaId
+	mediaId: { 		// post media.id
+		type: 'number',
+	},
+	mediaUrl: { 	// post media.url
+		type: 'string',
+	},
+	type: {
+		type: 'string',
+		default: 'static',
+	},
+	categoryId: {
 		type: 'number',
 	},
 	hasImage: {
@@ -42,12 +60,6 @@ const blockAttributes = {
 		type: 'number',
 		default: 0,
 	},
-	title: { // content
-		type: 'array',
-		source: 'children',
-		selector: 'p',
-		default: [],
-	},
 	textColor: {
 		type: 'string',
 	},
@@ -60,9 +72,6 @@ const blockAttributes = {
 	},
 	customFontSize: {
 		type: 'number',
-	},
-	link: {
-		type: 'string',
 	},
 };
 
@@ -83,20 +92,25 @@ export const settings = {
 
 	save( { attributes, className } ) {
 		const {
-			url,
+			title,
+			link,
+			mediaUrl,
+			// type,
 			hasImage,
 			hasParallax,
 			dimRatio,
-			title,
 			textColor,
 			customTextColor,
 			fontSize,
 			customFontSize,
-			link,
 		} = attributes;
 
+		/* if ( type !== 'static' ) {
+			return null;
+		} */
+
 		// Image
-		const imageStyle = backgroundImageStyles( url );
+		const imageStyle = backgroundImageStyles( mediaUrl );
 		const imageClasses = classnames(
 			'wp-block-cover-image',
 			dimRatioToClass( dimRatio ),
@@ -123,10 +137,10 @@ export const settings = {
 		const post = (
 			<div className={ className }>
 				{ hasImage &&
-					<div
-						className={ imageClasses }
-						style={ imageStyle }
-					></div>
+				<div
+					className={ imageClasses }
+					style={ imageStyle }
+				></div>
 				}
 				<RichText.Content
 					tagName="p"

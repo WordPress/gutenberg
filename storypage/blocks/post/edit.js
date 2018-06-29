@@ -2,7 +2,8 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { find } from 'lodash';
+import { isUndefined, pickBy, find, map } from 'lodash';
+import { stringify } from 'querystringify';
 
 /**
  * WordPress dependencies
@@ -14,13 +15,18 @@ import {
 	compose,
 } from '@wordpress/element';
 import {
+	ButtonGroup,
+	Button,
+	CategorySelect,
 	FontSizePicker,
 	IconButton,
 	PanelBody,
 	RangeControl,
+	TextControl,
 	ToggleControl,
 	Toolbar,
 	withFallbackStyles,
+	withAPIData,
 } from '@wordpress/components';
 import {
 	withColors,
@@ -37,7 +43,6 @@ import { withSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-// import '../../core-blocks/cover-image/editor.scss';
 import './editor.scss';
 
 const { getComputedStyle } = window;
@@ -75,6 +80,21 @@ const FONT_SIZES = [
 	},
 ];
 
+const POST_TYPES = [
+	{
+		name: __( 'Auto' ),
+		slug: 'auto',
+	},
+	{
+		name: __( 'With id' ),
+		slug: 'withid',
+	},
+	{
+		name: __( 'Static' ),
+		slug: 'static',
+	},
+];
+
 class PostEdit extends Component {
 	constructor() {
 		super( ...arguments );
@@ -82,15 +102,14 @@ class PostEdit extends Component {
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.toggleImage = this.toggleImage.bind( this );
 		this.toggleParallax = this.toggleParallax.bind( this );
-		this.setDimRatio = this.setDimRatio.bind( this );
 		this.getFontSize = this.getFontSize.bind( this );
 		this.setFontSize = this.setFontSize.bind( this );
 	}
 
 	onSelectImage( media ) {
 		this.props.setAttributes( {
-			url: media.url,
-			id: media.id,
+			mediaUrl: media.url,
+			mediaId: media.id,
 		} );
 	}
 
@@ -100,10 +119,6 @@ class PostEdit extends Component {
 
 	toggleParallax() {
 		this.props.setAttributes( { hasParallax: ! this.props.attributes.hasParallax } );
-	}
-
-	setDimRatio( ratio ) {
-		this.props.setAttributes( { dimRatio: ratio } );
 	}
 
 	getFontSize() {
@@ -136,11 +151,33 @@ class PostEdit extends Component {
 		} );
 	}
 
-	componentWillReceiveProps( { image, url } ) {
-		if ( image && ! url ) {
-			this.props.setAttributes( {
-				url: image.source_url,
-			} );
+	componentDidUpdate( prevProps ) {
+		const { post, media, postResults, setAttributes } = this.props;
+		const { type } = this.props.attributes;
+
+		const attributes = {};
+
+		if ( type === 'withid' && post && post !== prevProps.post ) {
+			attributes.title = [ post.title.rendered ];
+			attributes.link = post.link;
+			attributes.mediaId = post.featured_media;
+		}
+
+		if ( type === 'auto' && postResults && postResults !== prevProps.postResults && postResults.data ) {
+			const postRes = postResults.data[ 0 ];
+
+			attributes.id = parseInt( postRes.id );
+			attributes.title = [ postRes.title.rendered ];
+			attributes.link = postRes.link;
+			attributes.mediaId = postRes.featured_media;
+		}
+
+		if ( media && media !== prevProps.media ) {
+			attributes.mediaUrl = media.source_url;
+		}
+
+		if ( attributes ) {
+			setAttributes( attributes );
 		}
 	}
 
@@ -152,19 +189,23 @@ class PostEdit extends Component {
 			textColor,
 			setTextColor,
 			fallbackFontSize,
+			categories,
 		} = this.props;
 
 		const {
-			url,
-			title,
 			id,
+			title,
+			mediaUrl,
+			mediaId,
+			type,
+			categoryId,
 			hasImage,
 			hasParallax,
 			dimRatio,
 			placeholder,
 		} = attributes;
 
-		const imageStyle = backgroundImageStyles( url );
+		const imageStyle = backgroundImageStyles( mediaUrl );
 		const imageClasses = classnames(
 			'wp-block-cover-image',
 			dimRatioToClass( dimRatio ),
@@ -184,7 +225,7 @@ class PostEdit extends Component {
 							<MediaUpload
 								onSelect={ this.onSelectImage }
 								type="image"
-								value={ id }
+								value={ mediaId }
 								render={ ( { open } ) => (
 									<IconButton
 										className="components-toolbar__control"
@@ -198,13 +239,60 @@ class PostEdit extends Component {
 					</Toolbar>
 				</BlockControls>
 				<InspectorControls>
-					<PanelBody title={ __( 'Post Image Settings' ) }>
+					<PanelBody title={ __( 'Post Settings' ) }>
+						<div className="components-post-type-picker__buttons">
+							<ButtonGroup aria-label={ __( 'Column width' ) }>
+								{
+									map( POST_TYPES, ( { name, slug } ) => {
+										return (
+											<Button
+												key={ slug }
+												isLarge
+												isPrimary={ type === slug }
+												aria-pressed={ type === slug }
+												onClick={ ( ) => {
+													setAttributes( { type: slug } );
+												} }
+											>
+												{ name }
+											</Button>
+										);
+									} )
+								}
+							</ButtonGroup>
+						</div>
+						{
+							( type === 'withid' ) &&
+							<TextControl
+								placeholder={ __( 'Post id' ) }
+								value={ id }
+								onChange={ ( nextId ) => {
+									setAttributes( { id: parseInt( nextId ) } );
+								} }
+							/>
+						}
+
+						{
+							type === 'auto' &&
+							<CategorySelect
+								key="query-controls-category-select"
+								categoriesList={ categories }
+								label={ __( 'Last from (category)' ) }
+								noOptionLabel={ __( 'All' ) }
+								selectedCategoryId={ categoryId }
+								onChange={ ( nextCategory ) => {
+									setAttributes( { categoryId: nextCategory } );
+								} }
+							/>
+						}
+					</PanelBody>
+					<PanelBody title={ __( 'Image Settings' ) }>
 						<ToggleControl
 							label={ __( 'Show image' ) }
 							checked={ !! hasImage }
 							onChange={ this.toggleImage }
 						/>
-						{ !! url && hasImage && (
+						{ !! mediaUrl && hasImage && (
 							<Fragment>
 								<ToggleControl
 									label={ __( 'Fixed Background' ) }
@@ -214,7 +302,9 @@ class PostEdit extends Component {
 								<RangeControl
 									label={ __( 'Background Dimness' ) }
 									value={ dimRatio }
-									onChange={ this.setDimRatio }
+									onChange={ ( ratio ) => {
+										setAttributes( { dimRatio: ratio } );
+									} }
 									min={ 0 }
 									max={ 100 }
 									step={ 10 }
@@ -251,9 +341,10 @@ class PostEdit extends Component {
 					fontSize: fontSize ? fontSize + 'px' : undefined,
 				} }
 				value={ title }
-				onChange={ ( nextContent ) => {
+				onChange={ ( value ) => {
 					setAttributes( {
-						title: nextContent,
+						title: value,
+						type: 'static',
 					} );
 				} }
 				placeholder={ placeholder || __( 'Add text or type' ) }
@@ -262,7 +353,7 @@ class PostEdit extends Component {
 			/>
 		);
 
-		if ( ! url ) {
+		if ( ! mediaUrl ) {
 			return (
 				<div className={ className }>
 					{ controls }
@@ -288,7 +379,7 @@ class PostEdit extends Component {
 				{ controls }
 				{ hasImage &&
 					<div
-						data-url={ url }
+						data-url={ mediaUrl }
 						style={ imageStyle }
 						className={ imageClasses }
 					></div>
@@ -301,20 +392,52 @@ class PostEdit extends Component {
 
 export default compose(
 	withSelect( ( select, props ) => {
-		const { getMedia } = select( 'core' );
-		const { id } = props.attributes;
+		const { getMedia, getCategories, getEntityRecord } = select( 'core' );
+		const { attributes } = props;
+
+		const res = {};
+
+		switch ( attributes.type ) {
+			case 'auto':
+				res.categories = getCategories();
+				break;
+			case 'withid':
+				if ( attributes.id ) {
+					res.post = getEntityRecord( 'postType', 'post', attributes.id );
+
+					if ( res.post ) {
+						attributes.mediaId = res.post.featured_media;
+					}
+				}
+				break;
+		}
+
+		if ( attributes.mediaId ) {
+			res.media = getMedia( attributes.mediaId );
+		}
+
+		return res;
+	} ),
+	withColors( { textColor: 'color' } ),
+	FallbackStyles,
+	withAPIData( ( props ) => {
+		if ( props.attributes.type === 'auto' ) {
+			const postQuery = stringify( pickBy( {
+				category_id: props.attributes.categoryId,
+				order: 'desc',
+				orderby: 'date',
+				per_page: 1,
+			}, ( value ) => ! isUndefined( value ) ) );
+
+			return {
+				postResults: `/wp/v2/posts?${ postQuery }`,
+			};
+		}
 
 		return {
-			image: id ? getMedia( id ) : null,
+			postResults: null,
 		};
 	} ),
-	withColors( ( getColor, setColor, { attributes } ) => {
-		return {
-			textColor: getColor( attributes.textColor, attributes.customTextColor, 'color' ),
-			setTextColor: setColor( 'textColor', 'customTextColor' ),
-		};
-	} ),
-	FallbackStyles,
 )( PostEdit );
 
 export function dimRatioToClass( ratio ) {
