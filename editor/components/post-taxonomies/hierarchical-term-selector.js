@@ -103,35 +103,36 @@ class HierarchicalTermSelector extends Component {
 			return;
 		}
 
-		const findOrCreatePromise = new Promise( ( resolve, reject ) => {
-			this.setState( {
-				adding: true,
-			} );
-			// Tries to create a term or fetch it if it already exists
-			const basePath = wp.api.getTaxonomyRoute( this.props.slug );
-			this.addRequest = fetch( {
-				path: `/wp/v2/${ basePath }`,
-				method: 'POST',
-				data: {
-					name: formName,
-					parent: formParent ? formParent : undefined,
-				},
-			} );
-			this.addRequest
-				.then( resolve, ( xhr ) => {
-					const errorCode = xhr.responseJSON && xhr.responseJSON.code;
+		this.setState( {
+			adding: true,
+		} );
+		const basePath = wp.api.getTaxonomyRoute( this.props.slug );
+		this.addRequest = fetch( {
+			path: `/wp/v2/${ basePath }`,
+			method: 'POST',
+			data: {
+				name: formName,
+				parent: formParent ? formParent : undefined,
+			},
+		} );
+		// Tries to create a term or fetch it if it already exists
+		const findOrCreatePromise = this.addRequest
+			.catch( ( response ) => {
+				return response.then( response.json() ).then( ( body ) => {
+					const errorCode = body.code;
 					if ( errorCode === 'term_exists' ) {
 						// search the new category created since last fetch
 						this.addRequest = fetch( {
 							path: `/wp/v2/${ basePath }?${ stringify( { ...DEFAULT_QUERY, parent: formParent || 0, search: formName } ) }`,
 						} );
-						return this.addRequest.then( ( searchResult ) => {
-							resolve( this.findTerm( searchResult, formParent, formName ) );
-						}, reject );
+						return this.addRequest
+							.then( ( searchResult ) => {
+								return this.findTerm( searchResult, formParent, formName );
+							} );
 					}
-					reject( xhr );
+					return Promise.reject( response );
 				} );
-		} );
+			} );
 		findOrCreatePromise
 			.then( ( term ) => {
 				const hasTerm = !! find( this.state.availableTerms, ( availableTerm ) => availableTerm.id === term.id );

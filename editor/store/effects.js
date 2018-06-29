@@ -94,6 +94,25 @@ export function removeProvisionalBlock( action, store ) {
 	}
 }
 
+/**
+ * Utilitiy used get an error object from a network response.
+ *
+ * @param {Object} response Response.
+ *
+ * @return {Promise} Error object promise.
+ */
+export const getErrorFromResponse = ( response ) => {
+	const getErrorFromBody = ( body ) => {
+		return body || {
+			code: 'unknown_error',
+			message: __( 'An unknown error occurred.' ),
+		};
+	};
+	return response.json()
+		.then( getErrorFromBody )
+		.catch( () => getErrorFromBody() );
+};
+
 export default {
 	REQUEST_POST_UPDATE( action, store ) {
 		const { dispatch, getState } = store;
@@ -175,46 +194,42 @@ export default {
 			} );
 		}
 
-		request.then(
-			( newPost ) => {
-				const reset = isAutosave ? resetAutosave : resetPost;
-				dispatch( reset( newPost ) );
+		request
+			.then(
+				( newPost ) => {
+					const reset = isAutosave ? resetAutosave : resetPost;
+					dispatch( reset( newPost ) );
 
-				// An autosave may be processed by the server as a regular save
-				// when its update is requested by the author and the post was
-				// draft or auto-draft.
-				const isRevision = newPost.id !== post.id;
+					// An autosave may be processed by the server as a regular save
+					// when its update is requested by the author and the post was
+					// draft or auto-draft.
+					const isRevision = newPost.id !== post.id;
 
-				dispatch( {
-					type: 'REQUEST_POST_UPDATE_SUCCESS',
-					previousPost: post,
-					post: newPost,
-					optimist: {
+					dispatch( {
+						type: 'REQUEST_POST_UPDATE_SUCCESS',
+						previousPost: post,
+						post: newPost,
+						optimist: {
 						// Note: REVERT is not a failure case here. Rather, it
 						// is simply reversing the assumption that the updates
 						// were applied to the post proper, such that the post
 						// treated as having unsaved changes.
-						type: isRevision ? REVERT : COMMIT,
-						id: POST_UPDATE_TRANSACTION_ID,
-					},
-					isAutosave,
-				} );
-			},
-			( error ) => {
-				error = get( error, [ 'responseJSON' ], {
-					code: 'unknown_error',
-					message: __( 'An unknown error occurred.' ),
-				} );
-
-				dispatch( {
-					type: 'REQUEST_POST_UPDATE_FAILURE',
-					optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
-					post,
-					edits,
-					error,
-				} );
-			},
-		);
+							type: isRevision ? REVERT : COMMIT,
+							id: POST_UPDATE_TRANSACTION_ID,
+						},
+						isAutosave,
+					} );
+				} )
+			.catch( ( response ) =>
+				getErrorFromResponse( response )
+					.then( ( error ) => dispatch( {
+						type: 'REQUEST_POST_UPDATE_FAILURE',
+						optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
+						post,
+						edits,
+						error,
+					} ) )
+			);
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
 		const { previousPost, post, isAutosave } = action;
@@ -302,25 +317,22 @@ export default {
 		const { postId } = action;
 		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( getState() ) );
 		dispatch( removeNotice( TRASH_POST_NOTICE_ID ) );
-		fetch( { path: `/wp/v2/${ basePath }/${ postId }`, method: 'DELETE' } ).then(
-			() => {
+		fetch( { path: `/wp/v2/${ basePath }/${ postId }`, method: 'DELETE' } )
+			.then( () => {
 				const post = getCurrentPost( getState() );
 
 				// TODO: This should be an updatePost action (updating subsets of post properties),
 				// But right now editPost is tied with change detection.
 				dispatch( resetPost( { ...post, status: 'trash' } ) );
-			},
-			( err ) => {
-				dispatch( {
-					...action,
-					type: 'TRASH_POST_FAILURE',
-					error: get( err, [ 'responseJSON' ], {
-						code: 'unknown_error',
-						message: __( 'An unknown error occurred.' ),
-					} ),
-				} );
-			}
-		);
+			} )
+			.catch( ( response ) =>
+				getErrorFromResponse( response )
+					.then( ( error ) => dispatch( {
+						...action,
+						type: 'TRASH_POST_FAILURE',
+						error,
+					} ) )
+			);
 	},
 	TRASH_POST_FAILURE( action, store ) {
 		const message = action.error.message && action.error.code !== 'unknown_error' ? action.error.message : __( 'Trashing failed' );
@@ -486,8 +498,8 @@ export default {
 			result = fetch( { path: `/wp/v2/${ basePath }?per_page=-1` } );
 		}
 
-		result.then(
-			( sharedBlockOrBlocks ) => {
+		result
+			.then( ( sharedBlockOrBlocks ) => {
 				dispatch( receiveSharedBlocks( map(
 					castArray( sharedBlockOrBlocks ),
 					( sharedBlock ) => ( {
@@ -500,18 +512,15 @@ export default {
 					type: 'FETCH_SHARED_BLOCKS_SUCCESS',
 					id,
 				} );
-			},
-			( error ) => {
-				dispatch( {
-					type: 'FETCH_SHARED_BLOCKS_FAILURE',
-					id,
-					error: error.responseJSON || {
-						code: 'unknown_error',
-						message: __( 'An unknown error occurred.' ),
-					},
-				} );
-			}
-		);
+			} )
+			.catch( ( response ) =>
+				getErrorFromResponse( response )
+					.then( ( error ) => dispatch( {
+						type: 'FETCH_SHARED_BLOCKS_FAILURE',
+						id,
+						error,
+					} ) )
+			);
 	},
 	RECEIVE_SHARED_BLOCKS( action ) {
 		return receiveBlocks( map( action.results, 'parsedBlock' ) );
@@ -536,8 +545,8 @@ export default {
 		const path = isTemporary ? `/wp/v2/${ basePath }` : `/wp/v2/${ basePath }/${ id }`;
 		const method = isTemporary ? 'POST' : 'PUT';
 
-		fetch( { path, data, method } ).then(
-			( updatedSharedBlock ) => {
+		fetch( { path, data, method } )
+			.then( ( updatedSharedBlock ) => {
 				dispatch( {
 					type: 'SAVE_SHARED_BLOCK_SUCCESS',
 					updatedId: updatedSharedBlock.id,
@@ -545,16 +554,17 @@ export default {
 				} );
 				const message = isTemporary ? __( 'Block created.' ) : __( 'Block updated.' );
 				dispatch( createSuccessNotice( message, { id: SHARED_BLOCK_NOTICE_ID } ) );
-			},
-			( error ) => {
-				dispatch( { type: 'SAVE_SHARED_BLOCK_FAILURE', id } );
-				const message = __( 'An unknown error occurred.' );
-				dispatch( createErrorNotice( get( error.responseJSON, [ 'message' ], message ), {
-					id: SHARED_BLOCK_NOTICE_ID,
-					spokenMessage: message,
-				} ) );
-			}
-		);
+			} )
+			.catch( ( response ) =>
+				getErrorFromResponse( response )
+					.then( ( error ) => {
+						dispatch( { type: 'SAVE_SHARED_BLOCK_FAILURE', id } );
+						dispatch( createErrorNotice( error.message, {
+							id: SHARED_BLOCK_NOTICE_ID,
+							spokenMessage: error.message,
+						} ) );
+					} )
+			);
 	},
 	DELETE_SHARED_BLOCK( action, store ) {
 		// TODO: these are potentially undefined, this fix is in place
@@ -592,8 +602,8 @@ export default {
 			sharedBlock.uid,
 		] ) );
 
-		fetch( { path: `/wp/v2/${ basePath }/${ id }`, method: 'DELETE' } ).then(
-			() => {
+		fetch( { path: `/wp/v2/${ basePath }/${ id }`, method: 'DELETE' } )
+			.then( () => {
 				dispatch( {
 					type: 'DELETE_SHARED_BLOCK_SUCCESS',
 					id,
@@ -601,20 +611,21 @@ export default {
 				} );
 				const message = __( 'Block deleted.' );
 				dispatch( createSuccessNotice( message, { id: SHARED_BLOCK_NOTICE_ID } ) );
-			},
-			( error ) => {
-				dispatch( {
-					type: 'DELETE_SHARED_BLOCK_FAILURE',
-					id,
-					optimist: { type: REVERT, id: transactionId },
-				} );
-				const message = __( 'An unknown error occurred.' );
-				dispatch( createErrorNotice( get( error.responseJSON, [ 'message' ], message ), {
-					id: SHARED_BLOCK_NOTICE_ID,
-					spokenMessage: message,
-				} ) );
-			}
-		);
+			} )
+			.catch( ( response ) =>
+				getErrorFromResponse( response )
+					.then( ( error ) => {
+						dispatch( {
+							type: 'DELETE_SHARED_BLOCK_FAILURE',
+							id,
+							optimist: { type: REVERT, id: transactionId },
+						} );
+						dispatch( createErrorNotice( error.message, {
+							id: SHARED_BLOCK_NOTICE_ID,
+							spokenMessage: error.message,
+						} ) );
+					} )
+			);
 	},
 	CONVERT_BLOCK_TO_STATIC( action, store ) {
 		const state = store.getState();

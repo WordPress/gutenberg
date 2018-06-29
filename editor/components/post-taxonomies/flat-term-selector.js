@@ -105,27 +105,28 @@ class FlatTermSelector extends Component {
 	}
 
 	findOrCreateTerm( termName ) {
-		return new Promise( ( resolve, reject ) => {
-			// Tries to create a term or fetch it if it already exists
-			const basePath = wp.api.getTaxonomyRoute( this.props.slug );
-			fetch( {
-				path: `/wp/v2/${ basePath }`,
-				method: 'POST',
-				data: { name: termName },
-			} ).then( resolve, ( xhr ) => {
-				const errorCode = xhr.responseJSON && xhr.responseJSON.code;
+		const basePath = wp.api.getTaxonomyRoute( this.props.slug );
+		// Tries to create a term or fetch it if it already exists
+		return fetch( {
+			path: `/wp/v2/${ basePath }`,
+			method: 'POST',
+			data: { name: termName },
+		} ).catch( ( response ) =>
+			response.json().then( ( body ) => {
+				console.log( body );
+				const errorCode = body.code;
 				if ( errorCode === 'term_exists' ) {
 					// search the new category created since last fetch
 					this.addRequest = fetch( {
 						path: `/wp/v2/${ basePath }?${ stringify( { ...DEFAULT_QUERY, search: termName } ) }`,
 					} );
 					return this.addRequest.then( ( searchResult ) => {
-						resolve( find( searchResult, ( result ) => isSameTermName( result.name, termName ) ) );
-					}, reject );
+						return find( searchResult, ( result ) => isSameTermName( result.name, termName ) );
+					} );
 				}
-				reject( xhr );
-			} );
-		} );
+				return Promise.reject( response );
+			} )
+		);
 	}
 
 	onChange( termNames ) {

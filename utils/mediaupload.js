@@ -113,8 +113,8 @@ export function mediaUpload( {
 		filesSet.push( { url: window.URL.createObjectURL( mediaFile ) } );
 		onFileChange( filesSet );
 
-		return createMediaFromFile( mediaFile, additionalData ).then(
-			( savedMedia ) => {
+		return createMediaFromFile( mediaFile, additionalData )
+			.then( ( savedMedia ) => {
 				const mediaObject = {
 					alt: savedMedia.alt_text,
 					caption: get( savedMedia, [ 'caption', 'raw' ], '' ),
@@ -128,27 +128,28 @@ export function mediaUpload( {
 					mediaObject.mediaDetails.sizes = get( savedMedia, [ 'media_details', 'sizes' ], {} );
 				}
 				setAndUpdateFiles( idx, mediaObject );
-			},
-			( response ) => {
-				// Reset to empty on failure.
-				setAndUpdateFiles( idx, null );
-				let message;
-				if ( has( response, [ 'responseJSON', 'message' ] ) ) {
-					message = get( response, [ 'responseJSON', 'message' ] );
-				} else {
-					message = sprintf(
-						// translators: %s: file name
-						__( 'Error while uploading file %s to the media library.' ),
-						mediaFile.name
-					);
-				}
-				onError( {
-					code: 'GENERAL',
-					message,
-					file: mediaFile,
-				} );
-			}
-		);
+			} )
+			.catch( ( response ) =>
+				response.json().catch( () => ( {} ) ).then( ( body ) => {
+					// Reset to empty on failure.
+					setAndUpdateFiles( idx, null );
+					let message;
+					if ( has( body, [ 'message' ] ) ) {
+						message = get( body, [ 'message' ] );
+					} else {
+						message = sprintf(
+							// translators: %s: file name
+							__( 'Error while uploading file %s to the media library.' ),
+							mediaFile.name
+						);
+					}
+					onError( {
+						code: 'GENERAL',
+						message,
+						file: mediaFile,
+					} );
+				} )
+			);
 	} );
 }
 
