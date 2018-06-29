@@ -92,7 +92,7 @@ class PlaylistEdit extends Component {
 		if ( editing ) {
 			return (
 				<Placeholder
-					icon="playlist-video"
+					icon="media-audio"
 					label={ __( 'Audio/Video Playlist' ) }
 					instructions={ __( 'Select audio or video files from your library, or upload a new ones' ) }
 					className={ className }>
