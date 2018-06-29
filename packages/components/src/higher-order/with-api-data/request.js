@@ -7,7 +7,7 @@ import { mapKeys } from 'lodash';
 /**
  * WordPress dependencies
  */
-import fetch from '@wordpress/fetch';
+import apiFetch from '@wordpress/api-fetch';
 
 export const getStablePath = memoize( ( path ) => {
 	const [ base, query ] = path.split( '?' );
@@ -60,7 +60,7 @@ export function getCachedResponse( request ) {
 }
 
 export function getResponseFromNetwork( request ) {
-	const promise = fetch( { ...request, parse: false } )
+	const promise = apiFetch( { ...request, parse: false } )
 		.then( ( response ) => {
 			return response.json().then( ( body ) => ( {
 				body: body,

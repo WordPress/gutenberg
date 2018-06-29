@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import fetch from '@wordpress/fetch';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -9,13 +9,13 @@ import fetch from '@wordpress/fetch';
 import { getCategories, getEntityRecord, getEntityRecords } from '../resolvers';
 import { receiveTerms, receiveEntityRecords, addEntities } from '../actions';
 
-jest.mock( '@wordpress/fetch' );
+jest.mock( '@wordpress/api-fetch' );
 
 describe( 'getCategories', () => {
 	const CATEGORIES = [ { id: 1 } ];
 
 	beforeAll( () => {
-		fetch.mockImplementation( ( options ) => {
+		apiFetch.mockImplementation( ( options ) => {
 			if ( options.path === '/wp/v2/categories?per_page=-1' ) {
 				return Promise.resolve( CATEGORIES );
 			}
@@ -39,7 +39,7 @@ describe( 'getEntityRecord', () => {
 	const POST = { id: 10, title: 'test' };
 
 	beforeAll( () => {
-		fetch.mockImplementation( ( options ) => {
+		apiFetch.mockImplementation( ( options ) => {
 			if ( options.path === '/wp/v2/types/post?context=edit' ) {
 				return Promise.resolve( POST_TYPE );
 			}
@@ -85,7 +85,7 @@ describe( 'getEntityRecords', () => {
 	};
 
 	beforeAll( () => {
-		fetch.mockImplementation( ( options ) => {
+		apiFetch.mockImplementation( ( options ) => {
 			if ( options.path === '/wp/v2/types?context=edit' ) {
 				return Promise.resolve( POST_TYPES );
 			}

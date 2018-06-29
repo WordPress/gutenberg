@@ -11,7 +11,7 @@ import {
 	RawHTML,
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import fetch from '@wordpress/fetch';
+import apiFetch from '@wordpress/api-fetch';
 import httpBuildQuery from 'http-build-query';
 
 /**
@@ -56,7 +56,7 @@ export class ServerSideRender extends Component {
 
 		const path = rendererPathWithAttributes( block, attributes );
 
-		return fetch( { path } )
+		return apiFetch( { path } )
 			.then( ( response ) => {
 				if ( this.isStillMounted && response && response.rendered ) {
 					this.setState( { response: response.rendered } );

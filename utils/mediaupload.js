@@ -11,7 +11,7 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * WordPress dependencies
  */
-import fetch from '@wordpress/fetch';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Browsers may use unexpected mime types, and they differ from browser to browser.
@@ -164,7 +164,7 @@ function createMediaFromFile( file, additionalData ) {
 	const data = new window.FormData();
 	data.append( 'file', file, file.name || file.type.replace( '/', '.' ) );
 	forEach( additionalData, ( ( value, key ) => data.append( key, value ) ) );
-	return fetch( {
+	return apiFetch( {
 		path: '/wp/v2/media',
 		body: data,
 		method: 'POST',

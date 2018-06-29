@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import fetch from '@wordpress/fetch';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
 * A user mentions completer.
@@ -17,7 +17,7 @@ export default {
 		if ( search ) {
 			payload = '?search=' + encodeURIComponent( search );
 		}
-		return fetch( { path: '/wp/v2/users' + payload } );
+		return apiFetch( { path: '/wp/v2/users' + payload } );
 	},
 	isDebounced: true,
 	getOptionKeywords( user ) {

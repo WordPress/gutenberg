@@ -13,7 +13,7 @@ function registerMiddleware( middleware ) {
 	middlewares.push( middleware );
 }
 
-function request( options ) {
+function apiFetch( options ) {
 	const raw = ( nextOptions ) => {
 		const { url, path, body, data, parse = true, ...remainingOptions } = nextOptions;
 		const headers = remainingOptions.headers || {};
@@ -60,10 +60,10 @@ function request( options ) {
 	return next( options );
 }
 
-request.use = registerMiddleware;
+apiFetch.use = registerMiddleware;
 
-request.createNonceMiddleware = createNonceMiddleware;
-request.createPreloadingMiddleware = createPreloadingMiddleware;
-request.createRootURLMiddleware = createRootURLMiddleware;
+apiFetch.createNonceMiddleware = createNonceMiddleware;
+apiFetch.createPreloadingMiddleware = createPreloadingMiddleware;
+apiFetch.createRootURLMiddleware = createRootURLMiddleware;
 
-export default request;
+export default apiFetch;

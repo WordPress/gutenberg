@@ -12,7 +12,7 @@ import { Component } from '@wordpress/element';
 import { FormTokenField, withAPIData } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import fetch from '@wordpress/fetch';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Module constants
@@ -77,7 +77,7 @@ class FlatTermSelector extends Component {
 	fetchTerms( params = {} ) {
 		const query = { ...DEFAULT_QUERY, ...params };
 		const basePath = wp.api.getTaxonomyRoute( this.props.slug );
-		const request = fetch( { path: `/wp/v2/${ basePath }?${ stringify( query ) }` } );
+		const request = apiFetch( { path: `/wp/v2/${ basePath }?${ stringify( query ) }` } );
 		request.then( ( terms ) => {
 			this.setState( ( state ) => ( {
 				availableTerms: state.availableTerms.concat(
@@ -107,17 +107,16 @@ class FlatTermSelector extends Component {
 	findOrCreateTerm( termName ) {
 		const basePath = wp.api.getTaxonomyRoute( this.props.slug );
 		// Tries to create a term or fetch it if it already exists
-		return fetch( {
+		return apiFetch( {
 			path: `/wp/v2/${ basePath }`,
 			method: 'POST',
 			data: { name: termName },
 		} ).catch( ( response ) =>
 			response.json().then( ( body ) => {
-				console.log( body );
 				const errorCode = body.code;
 				if ( errorCode === 'term_exists' ) {
 					// search the new category created since last fetch
-					this.addRequest = fetch( {
+					this.addRequest = apiFetch( {
 						path: `/wp/v2/${ basePath }?${ stringify( { ...DEFAULT_QUERY, search: termName } ) }`,
 					} );
 					return this.addRequest.then( ( searchResult ) => {

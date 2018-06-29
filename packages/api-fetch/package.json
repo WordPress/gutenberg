@@ -1,5 +1,5 @@
 {
-	"name": "@wordpress/fetch",
+	"name": "@wordpress/api-fetch",
 	"version": "1.0.0-alpha.1",
 	"description": "Utility to call WordPress REST APIs",
 	"author": "The WordPress Contributors",
@@ -9,7 +9,7 @@
 		"rest-api",
 		"fetch"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/fetch/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/api-fetch/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git"

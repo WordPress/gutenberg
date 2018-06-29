@@ -85,7 +85,7 @@ const entryPointNames = [
 
 const gutenbergPackages = [
 	'a11y',
-	'api-request',
+	'api-fetch',
 	'blob',
 	'compose',
 	'core-data',
@@ -95,7 +95,6 @@ const gutenbergPackages = [
 	'dom',
 	'dom-ready',
 	'element',
-	'fetch',
 	'hooks',
 	'html-entities',
 	'i18n',
@@ -230,9 +229,9 @@ const config = {
 			},
 		} ),
 		new LibraryExportDefaultPlugin( [
+			'api-fetch',
 			'deprecated',
 			'dom-ready',
-			'fetch',
 			'is-shallow-equal',
 		].map( camelCaseDash ) ),
 	],

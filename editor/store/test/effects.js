@@ -12,7 +12,7 @@ import {
 	registerBlockType,
 	createBlock,
 } from '@wordpress/blocks';
-import fetch from '@wordpress/fetch';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -589,7 +589,7 @@ describe( 'effects', () => {
 			const handler = effects.FETCH_SHARED_BLOCKS;
 
 			afterEach( () => {
-				jest.unmock( '@wordpress/fetch' );
+				jest.unmock( '@wordpress/api-fetch' );
 			} );
 
 			it( 'should fetch multiple shared blocks', () => {
@@ -600,7 +600,7 @@ describe( 'effects', () => {
 						content: '<!-- wp:test-block {"name":"Big Bird"} /-->',
 					},
 				] );
-				fetch.mockReturnValue = promise;
+				apiFetch.mockReturnValue = promise;
 				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
 
 				const dispatch = jest.fn();
@@ -637,7 +637,7 @@ describe( 'effects', () => {
 					title: 'My cool block',
 					content: '<!-- wp:test-block {"name":"Big Bird"} /-->',
 				} );
-				fetch.mockReturnValue = promise;
+				apiFetch.mockReturnValue = promise;
 				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
 
 				const dispatch = jest.fn();
@@ -670,7 +670,7 @@ describe( 'effects', () => {
 
 			it( 'should handle an API error', () => {
 				const promise = Promise.reject( {} );
-				fetch.mockReturnValue = promise;
+				apiFetch.mockReturnValue = promise;
 				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
 
 				const dispatch = jest.fn();
@@ -711,7 +711,7 @@ describe( 'effects', () => {
 
 			it( 'should save a shared block and swap its id', () => {
 				const promise = Promise.resolve( { id: 456 } );
-				fetch.mockReturnValue = promise;
+				apiFetch.mockReturnValue = promise;
 
 				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
 
@@ -739,7 +739,7 @@ describe( 'effects', () => {
 
 			it( 'should handle an API error', () => {
 				const promise = Promise.reject( {} );
-				fetch.mockReturnValue = promise;
+				apiFetch.mockReturnValue = promise;
 				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
 
 				const sharedBlock = { id: 123, title: 'My cool block' };
@@ -769,7 +769,7 @@ describe( 'effects', () => {
 
 			it( 'should delete a shared block', () => {
 				const promise = Promise.resolve( {} );
-				fetch.mockReturnValue = promise;
+				apiFetch.mockReturnValue = promise;
 				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
 
 				const associatedBlock = createBlock( 'core/block', { ref: 123 } );
@@ -808,7 +808,7 @@ describe( 'effects', () => {
 
 			it( 'should handle an API error', () => {
 				const promise = Promise.reject( {} );
-				fetch.mockReturnValue = promise;
+				apiFetch.mockReturnValue = promise;
 				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
 
 				const sharedBlock = { id: 123, title: 'My cool block' };

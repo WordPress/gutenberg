@@ -74,7 +74,7 @@ registerStore( 'my-shop', {
 
 	resolvers: {
 		async getPrice( state, item ) {
-			const price = await fetch( { path: '/wp/v2/prices/' + item } );
+			const price = await apiFetch( { path: '/wp/v2/prices/' + item } );
 			dispatch( 'my-shop' ).setPrice( item, price );
 		},
 	},
