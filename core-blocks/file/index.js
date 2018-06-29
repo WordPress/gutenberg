@@ -29,15 +29,18 @@ export const settings = {
 			type: 'string',
 		},
 		fileName: {
+			type: 'string',
 			source: 'text',
 			selector: 'a:not([download])',
 		},
 		textLinkHref: {
+			type: 'string',
 			source: 'attribute',
 			selector: 'a:not([download])',
 			attribute: 'href',
 		},
 		openInNewWindow: {
+			type: 'string',
 			source: 'attribute',
 			selector: 'a:not([download])',
 			attribute: 'target',
@@ -46,6 +49,7 @@ export const settings = {
 			type: 'boolean',
 		},
 		buttonText: {
+			type: 'string',
 			source: 'text',
 			selector: 'a[download]',
 		},
