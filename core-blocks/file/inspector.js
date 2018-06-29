@@ -24,15 +24,13 @@ export default class FileBlockInspector extends Component {
 		} = this.props;
 		const { href, textLinkHref, attachmentPage } = hrefs;
 
-		const linkDestinationOptions = ( () => {
-			if ( attachmentPage ) {
-				return [
-					{ value: href, label: __( 'Media File' ) },
-					{ value: attachmentPage, label: __( 'Attachment Page' ) },
-				];
-			}
-			return [ { value: href, label: __( 'URL' ) } ];
-		} )();
+		let linkDestinationOptions = [ { value: href, label: __( 'URL' ) } ];
+		if ( attachmentPage ) {
+			linkDestinationOptions = [
+				{ value: href, label: __( 'Media File' ) },
+				{ value: attachmentPage, label: __( 'Attachment Page' ) },
+			];
+		}
 
 		return (
 			<Fragment>
