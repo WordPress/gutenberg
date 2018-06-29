@@ -213,7 +213,7 @@
 		"title": "Data Package Reference",
 		"slug": "packages-data",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/README.md",
-		"parent": "reference"
+		"parent": null
 	},
 	{
 		"title": "WordPress Core Data",

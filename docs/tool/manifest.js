@@ -15,7 +15,7 @@ module.exports = function( parsedNamespaces ) {
 		title: 'Data Package Reference',
 		slug: 'packages-data',
 		markdown_source: 'https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/README.md',
-		parent: 'reference',
+		parent: null,
 	} ].concat(
 		Object.values( parsedNamespaces ).map( ( parsedNamespace ) => {
 			const slug = kebabCase( parsedNamespace.name );
