@@ -36,6 +36,11 @@ class FileEdit extends Component {
 		super( ...arguments );
 
 		this.onSelectFile = this.onSelectFile.bind( this );
+		this.confirmCopyURL = this.confirmCopyURL.bind( this );
+		this.resetCopyConfirmation = this.resetCopyConfirmation.bind( this );
+		this.changeLinkDestinationOption = this.changeLinkDestinationOption.bind( this );
+		this.changeOpenInNewWindow = this.changeOpenInNewWindow.bind( this );
+		this.changeShowDownloadButton = this.changeShowDownloadButton.bind( this );
 
 		this.state = {
 			showCopyConfirmation: false,
@@ -81,6 +86,29 @@ class FileEdit extends Component {
 		return url.indexOf( 'blob:' ) === 0;
 	}
 
+	confirmCopyURL() {
+		this.setState( { showCopyConfirmation: true } );
+	}
+
+	resetCopyConfirmation() {
+		this.setState( { showCopyConfirmation: false } );
+	}
+
+	changeLinkDestinationOption( newHref ) {
+		// Choose Media File or Attachment Page (when file is in Media Library)
+		this.props.setAttributes( { textLinkHref: newHref } );
+	}
+
+	changeOpenInNewWindow( newValue ) {
+		this.props.setAttributes( {
+			openInNewWindow: newValue ? '_blank' : false,
+		} );
+	}
+
+	changeShowDownloadButton( newValue ) {
+		this.props.setAttributes( { showDownloadButton: newValue } );
+	}
+
 	render() {
 		const {
 			className,
@@ -107,26 +135,6 @@ class FileEdit extends Component {
 			'is-transient': this.isBlobURL( href ),
 		} );
 
-		const confirmCopyURL = () => {
-			this.setState( { showCopyConfirmation: true } );
-		};
-		const resetCopyConfirmation = () => {
-			this.setState( { showCopyConfirmation: false } );
-		};
-
-		// Choose Media File or Attachment Page (when file is in Media Library)
-		const changeLinkDestinationOption = ( newHref ) => {
-			setAttributes( { textLinkHref: newHref } );
-		};
-		const changeOpenInNewWindow = ( newValue ) => {
-			setAttributes( {
-				openInNewWindow: newValue ? '_blank' : false,
-			} );
-		};
-		const changeShowDownloadButton = ( newValue ) => {
-			setAttributes( { showDownloadButton: newValue } );
-		};
-
 		if ( ! href ) {
 			return (
 				<MediaPlaceholder
@@ -151,9 +159,9 @@ class FileEdit extends Component {
 					{ ...{
 						openInNewWindow,
 						showDownloadButton,
-						changeLinkDestinationOption,
-						changeOpenInNewWindow,
-						changeShowDownloadButton,
+						changeLinkDestinationOption: this.changeLinkDestinationOption,
+						changeOpenInNewWindow: this.changeOpenInNewWindow,
+						changeShowDownloadButton: this.changeShowDownloadButton,
 					} }
 				/>
 				<BlockControls>
@@ -202,8 +210,8 @@ class FileEdit extends Component {
 							isDefault
 							text={ href }
 							className={ `${ className }__copy-url-button` }
-							onCopy={ confirmCopyURL }
-							onFinishCopy={ resetCopyConfirmation }
+							onCopy={ this.confirmCopyURL }
+							onFinishCopy={ this.resetCopyConfirmation }
 						>
 							{ showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy URL' ) }
 						</ClipboardButton>
