@@ -70,9 +70,7 @@ export function mediaUpload( {
 
 	// Allowed type specified by consumer
 	const isAllowedType = ( fileType ) => {
-		if ( typeof allowedType === 'string' ) {
-			allowedType = [ allowedType ];
-		}
+		allowedType = [].concat( allowedType );
 		return allowedType.some( ( type ) => startsWith( fileType, `${ type }/` ) );
 	};
 
