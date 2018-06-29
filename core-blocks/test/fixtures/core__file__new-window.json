@@ -7,9 +7,9 @@
             "href": "http://localhost:8888/wp-content/uploads/2018/05/keycodes.js",
             "fileName": "6546",
             "textLinkHref": "http://localhost:8888/wp-content/uploads/2018/05/keycodes.js",
-            "openInNewWindow": "_blank",
+            "textLinkTarget": "_blank",
             "showDownloadButton": true,
-            "buttonText": "Download",
+            "downloadButtonText": "Download",
             "id": 176
         },
         "innerBlocks": [],

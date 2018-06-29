@@ -6,7 +6,7 @@
         "attributes": {
             "href": "http://localhost:8888/wp-content/uploads/2018/05/keycodes.js",
             "showDownloadButton": true,
-            "buttonText": "Download",
+            "downloadButtonText": "Download",
             "id": 176
         },
         "innerBlocks": [],
