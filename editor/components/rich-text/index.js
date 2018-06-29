@@ -657,17 +657,20 @@ export class RichText extends Component {
 	 * @param {Object} context The context for splitting.
 	 */
 	splitContent( blocks = [], context = {} ) {
-		if ( ! this.props.onSplit ) {
+		const { onSplit } = this.props;
+		if ( ! onSplit ) {
 			return;
 		}
 
-		const { dom } = this.editor;
 		const rootNode = this.editor.getBody();
-		const beforeRange = dom.createRng();
-		const afterRange = dom.createRng();
-		const selectionRange = this.editor.selection.getRng();
 
+		let before, after;
 		if ( rootNode.childNodes.length ) {
+			const { dom } = this.editor;
+			const beforeRange = dom.createRng();
+			const afterRange = dom.createRng();
+			const selectionRange = this.editor.selection.getRng();
+
 			beforeRange.setStart( rootNode, 0 );
 			beforeRange.setEnd( selectionRange.startContainer, selectionRange.startOffset );
 
@@ -678,20 +681,32 @@ export class RichText extends Component {
 			const afterFragment = afterRange.extractContents();
 
 			const { format } = this.props;
-			let before = domToFormat( filterEmptyNodes( beforeFragment.childNodes ), format, this.editor );
-			let after = domToFormat( filterEmptyNodes( afterFragment.childNodes ), format, this.editor );
-
-			if ( context.paste ) {
-				before = this.isEmpty( before ) ? null : before;
-				after = this.isEmpty( after ) ? null : after;
-			}
-
-			this.restoreContentAndSplit( before, after, blocks );
-		} else if ( context.paste ) {
-			this.restoreContentAndSplit( null, null, blocks );
+			before = domToFormat( filterEmptyNodes( beforeFragment.childNodes ), format, this.editor );
+			after = domToFormat( filterEmptyNodes( afterFragment.childNodes ), format, this.editor );
 		} else {
-			this.restoreContentAndSplit( [], [], blocks );
+			before = [];
+			after = [];
 		}
+
+		// In case split occurs at the trailing or leading edge of the field,
+		// assume that the before/after values respectively reflect the current
+		// value. This also provides an opportunity for the parent component to
+		// determine whether the before/after value has changed using a trivial
+		//  strict equality operation.
+		if ( this.isEmpty( after ) ) {
+			before = this.props.value;
+		} else if ( this.isEmpty( before ) ) {
+			after = this.props.value;
+		}
+
+		// If pasting and the split would result in no content other than the
+		// pasted blocks, remove the before and after blocks.
+		if ( context.paste ) {
+			before = this.isEmpty( before ) ? null : before;
+			after = this.isEmpty( after ) ? null : after;
+		}
+
+		this.restoreContentAndSplit( before, after, blocks );
 	}
 
 	onNewBlock() {
