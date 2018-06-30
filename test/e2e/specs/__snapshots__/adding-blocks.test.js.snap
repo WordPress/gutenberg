@@ -6,7 +6,7 @@ exports[`adding blocks Should insert content using the placeholder and the regul
 <!-- /wp:paragraph -->
 
 <!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>Quote block</p></blockquote>
+<blockquote class=\\"wp-block-quote\\"><p>Quote block</p><cite>Quote citation</cite></blockquote>
 <!-- /wp:quote -->
 
 <!-- wp:image -->
@@ -24,7 +24,7 @@ exports[`adding blocks Should insert content using the placeholder and the regul
 <!-- /wp:paragraph -->
 
 <!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>Quote block</p></blockquote>
+<blockquote class=\\"wp-block-quote\\"><p>Quote block</p><cite>Quote citation</cite></blockquote>
 <!-- /wp:quote -->"
 `;
 
@@ -38,7 +38,7 @@ exports[`adding blocks Should insert content using the placeholder and the regul
 <!-- /wp:paragraph -->
 
 <!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>Quote block</p></blockquote>
+<blockquote class=\\"wp-block-quote\\"><p>Quote block</p><cite>Quote citation</cite></blockquote>
 <!-- /wp:quote -->
 
 <!-- wp:preformatted -->
