@@ -818,9 +818,7 @@ export class RichText extends Component {
 			case 'string':
 				return this.editor.getContent();
 			default:
-				return this.editor.dom.isEmpty( this.editor.getBody() ) ?
-					[] :
-					domToFormat( this.editor.getBody().childNodes || [], 'element', this.editor );
+				return domToFormat( this.editor.getBody().childNodes || [], 'element', this.editor );
 		}
 	}
 
