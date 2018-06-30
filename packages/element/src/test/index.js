@@ -209,7 +209,6 @@ describe( 'element', () => {
 					this.input = null;
 				}
 				componentDidMount() {
-					console.log(this.input);
 					this.input.focus();
 				}
 				render() {
@@ -292,19 +291,22 @@ describe( 'element', () => {
 					return <p>{ ++i }</p>;
 				}
 			} );
-			const wrapper = TestRenderer.create( <MyComp /> );
-			wrapper.update(<MyComp />); // Updating with same props doesn't rerender
-			expect( wrapper.toJSON().children[0] ).toBe( '1' );
-			wrapper.update( <MyComp a /> ); // New prop should trigger a rerender
-			expect( wrapper.toJSON().children[0] ).toBe( '2' );
-			wrapper.update( <MyComp a /> ); // Keeping the same prop value should not rerender
-			expect( wrapper.toJSON().children[0] ).toBe( '2' );
-			wrapper.update( <MyComp b /> ); // Changing the prop value should rerender
-			expect( wrapper.toJSON().children[0] ).toBe( '3' );
-			wrapper.root.instance.setState( { a: 1 } ); // New state value should trigger a rerender
-			expect( wrapper.toJSON().children[0] ).toBe( '4' );
-			wrapper.root.instance.setState( { a: 1 } ); // Keeping the same state value should not trigger a rerender
-			expect( wrapper.toJSON().children[0] ).toBe( '4' );
+			const element = TestRenderer.create( <MyComp /> );
+			//traverse tree to get the wrapped component instance
+			const wrappedComponent = element.root.find(node => node.instance !== null);
+
+			element.update(<MyComp />); // Updating with same props doesn't rerender
+			expect( element.toJSON().children[0] ).toBe( '1' );
+			element.update( <MyComp a /> ); // New prop should trigger a rerender
+			expect( element.toJSON().children[0] ).toBe( '2' );
+			element.update( <MyComp a /> ); // Keeping the same prop value should not rerender
+			expect( element.toJSON().children[0] ).toBe( '2' );
+			element.update( <MyComp b /> ); // Changing the prop value should rerender
+			expect( element.toJSON().children[0] ).toBe( '3' );
+			wrappedComponent.instance.setState( { a: 1 } ); // New state value should trigger a rerender
+			expect( element.toJSON().children[0] ).toBe( '4' );
+			wrappedComponent.instance.setState( { a: 1 } ); // Keeping the same state value should not trigger a rerender
+			expect( element.toJSON().children[0] ).toBe( '4' );
 		} );
 	} );
 } );
