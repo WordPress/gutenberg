@@ -50,8 +50,8 @@ export const setColorValue = ( colors, colorAttributeName, customColorAttributeN
 	( colorValue ) => {
 		const colorObj = find( colors, { color: colorValue } );
 		setAttributes( {
-			[ colorAttributeName ]: colorObj && colorObj.name ? colorObj.name : undefined,
-			[ customColorAttributeName ]: colorObj && colorObj.name ? undefined : colorValue,
+			[ colorAttributeName ]: colorObj && ( colorObj.slug || colorObj.name ) ? colorObj.slug || colorObj.name : undefined,
+			[ customColorAttributeName ]: colorObj && ( colorObj.slug || colorObj.name ) ? undefined : colorValue,
 		} );
 	};
 
