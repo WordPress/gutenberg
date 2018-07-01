@@ -130,7 +130,9 @@ export const settings = {
 					return files.length !== 1 && every( files, ( file ) => file.type.indexOf( 'image/' ) === 0 );
 				},
 				transform( files, onChange ) {
-					const block = createBlock( 'core/gallery' );
+					const block = createBlock( 'core/gallery', {
+						images: files.map( ( file ) => ( { url: window.URL.createObjectURL( file ) } ) ),
+					} );
 					editorMediaUpload( {
 						filesList: files,
 						onFileChange: ( images ) => onChange( block.uid, { images } ),
