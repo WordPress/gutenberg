@@ -5,7 +5,7 @@ const phpegjs = require( 'phpegjs' );
 const fs = require( 'fs' );
 const path = require( 'path' );
 
-const peg = fs.readFileSync( 'blocks/api/post.pegjs', 'utf8' );
+const peg = fs.readFileSync( 'packages/spec-parser/grammar.pegjs', 'utf8' );
 
 const parser = pegjs.generate(
 	peg,

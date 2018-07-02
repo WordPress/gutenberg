@@ -1,0 +1,28 @@
+{
+	"name": "@wordpress/spec-parser",
+	"version": "1.0.0-alpha.1",
+	"description": "Parser for WordPress posts",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"parser"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/spec-parser/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"devDependencies": {
+		"pegjs": "0.10.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"build": "pegjs -o ./index.js ./grammar.pegjs"
+	}
+}

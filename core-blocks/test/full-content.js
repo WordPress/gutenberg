@@ -10,12 +10,12 @@ import { format } from 'util';
  * WordPress dependencies
  */
 import { getBlockTypes, parse, serialize } from '@wordpress/blocks';
+import { parse as grammarParse } from '@wordpress/spec-parser';
 
 /**
  * Internal dependencies
  */
 import { registerCoreBlocks } from '../';
-import { parse as grammarParse } from '../../blocks/api/post.pegjs';
 
 const fixturesDir = path.join( __dirname, 'fixtures' );
 

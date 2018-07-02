@@ -10,11 +10,11 @@ import { flow, castArray, mapValues, omit, stubFalse } from 'lodash';
 import { autop } from '@wordpress/autop';
 import { applyFilters } from '@wordpress/hooks';
 import deprecated from '@wordpress/deprecated';
+import { parse as grammarParse } from '@wordpress/spec-parser';
 
 /**
  * Internal dependencies
  */
-import { parse as grammarParse } from './post-parser';
 import { getBlockType, getUnknownTypeHandlerName } from './registration';
 import { createBlock } from './factory';
 import { isValidBlock } from './validation';
@@ -365,7 +365,7 @@ export function createBlockWithFallback( blockNode ) {
  *
  * @return {Function} An implementation which parses the post content.
  */
-export const createParse = ( parseImplementation ) =>
+const createParse = ( parseImplementation ) =>
 	( content ) => parseImplementation( content ).reduce( ( memo, blockNode ) => {
 		const block = createBlockWithFallback( blockNode );
 		if ( block ) {
