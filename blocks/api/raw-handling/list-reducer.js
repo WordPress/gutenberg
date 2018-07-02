@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { unwrap } from '@wordpress/utils';
+import { unwrap } from '@wordpress/dom';
 
 function isList( node ) {
 	return node.nodeName === 'OL' || node.nodeName === 'UL';

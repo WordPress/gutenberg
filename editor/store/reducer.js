@@ -31,7 +31,7 @@ import { combineReducers } from '@wordpress/data';
  */
 import withHistory from '../utils/with-history';
 import withChangeDetection from '../utils/with-change-detection';
-import { PREFERENCES_DEFAULTS } from './defaults';
+import { PREFERENCES_DEFAULTS, EDITOR_SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
 
 /**
@@ -200,7 +200,7 @@ const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
  * Handles the following state keys:
  *  - edits: an object describing changes to be made to the current post, in
  *           the format accepted by the WP REST API
- *  - blocksByUid: post content blocks keyed by UID
+ *  - blocksByUID: post content blocks keyed by UID
  *  - blockOrder: object where each key is a UID, its value an array of uids
  *                representing the order of its inner blocks
  *
@@ -217,15 +217,15 @@ export const editor = flow( [
 	// Track undo history, starting at editor initialization.
 	withHistory( {
 		resetTypes: [ 'SETUP_EDITOR_STATE' ],
-		ignoreTypes: [ 'RECEIVE_BLOCKS' ],
+		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
 		shouldOverwriteState,
 	} ),
 
 	// Track whether changes exist, resetting at each post save. Relies on
 	// editor initialization firing post reset as an effect.
 	withChangeDetection( {
-		resetTypes: [ 'SETUP_EDITOR_STATE', 'UPDATE_POST' ],
-		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST' ],
+		resetTypes: [ 'SETUP_EDITOR_STATE', 'REQUEST_POST_UPDATE_START' ],
+		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
 	} ),
 ] )( {
 	edits( state = {}, action ) {
@@ -254,6 +254,9 @@ export const editor = flow( [
 
 				return state;
 
+			case 'DIRTY_ARTIFICIALLY':
+				return { ...state };
+
 			case 'UPDATE_POST':
 			case 'RESET_POST':
 				const getCanonicalValue = action.type === 'UPDATE_POST' ?
@@ -277,7 +280,7 @@ export const editor = flow( [
 		return state;
 	},
 
-	blocksByUid( state = {}, action ) {
+	blocksByUID( state = {}, action ) {
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
 			case 'SETUP_EDITOR_STATE':
@@ -779,16 +782,30 @@ export function isInsertionPointVisible( state = false, action ) {
  */
 export function template( state = { isValid: true }, action ) {
 	switch ( action.type ) {
-		case 'SETUP_EDITOR':
-			return {
-				...state,
-				template: action.settings.template,
-				lock: action.settings.templateLock,
-			};
 		case 'SET_TEMPLATE_VALIDITY':
 			return {
 				...state,
 				isValid: action.isValid,
+			};
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning the editor setting.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function settings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
+	switch ( action.type ) {
+		case 'UPDATE_EDITOR_SETTINGS':
+			return {
+				...state,
+				...action.settings,
 			};
 	}
 
@@ -852,11 +869,12 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
  */
 export function saving( state = {}, action ) {
 	switch ( action.type ) {
-		case 'REQUEST_POST_UPDATE':
+		case 'REQUEST_POST_UPDATE_START':
 			return {
 				requesting: true,
 				successful: false,
 				error: null,
+				isAutosave: action.isAutosave,
 			};
 
 		case 'REQUEST_POST_UPDATE_SUCCESS':
@@ -1023,24 +1041,85 @@ export const blockListSettings = ( state = {}, action ) => {
 			return omit( state, action.uids );
 		}
 		case 'UPDATE_BLOCK_LIST_SETTINGS': {
-			const { id, settings } = action;
-			if ( id && ! settings ) {
-				return omit( state, id );
+			const { id } = action;
+			if ( ! action.settings ) {
+				if ( state.hasOwnProperty( id ) ) {
+					return omit( state, id );
+				}
+
+				return state;
 			}
-			const blockSettings = state[ id ];
-			const updateIsRequired = ! isEqual( blockSettings, settings );
-			if ( updateIsRequired ) {
-				return {
-					...state,
-					[ id ]: {
-						...settings,
-					},
-				};
+
+			if ( isEqual( state[ id ], action.settings ) ) {
+				return state;
 			}
+
+			return {
+				...state,
+				[ id ]: action.settings,
+			};
 		}
 	}
 	return state;
 };
+
+/**
+ * Reducer returning the most recent autosave.
+ *
+ * @param  {Object} state  The autosave object.
+ * @param  {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function autosave( state = null, action ) {
+	switch ( action.type ) {
+		case 'RESET_AUTOSAVE':
+			const { post } = action;
+			const [ title, excerpt, content ] = [
+				'title',
+				'excerpt',
+				'content',
+			].map( ( field ) => getPostRawValue( post[ field ] ) );
+
+			return {
+				title,
+				excerpt,
+				content,
+				preview_link: post.preview_link,
+			};
+
+		case 'REQUEST_POST_UPDATE':
+			// Invalidate known preview link when autosave starts.
+			if ( state && action.options.autosave ) {
+				return omit( state, 'preview_link' );
+			}
+			break;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer managing the block types
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function tokens( state = {}, action ) {
+	switch ( action.type ) {
+		case 'REGISTER_TOKEN':
+			return {
+				...state,
+				[ action.name ]: action.settings,
+			};
+		case 'UNREGISTER_TOKEN':
+			return omit( state, action.name );
+	}
+
+	return state;
+}
 
 export default optimist( combineReducers( {
 	editor,
@@ -1056,4 +1135,7 @@ export default optimist( combineReducers( {
 	notices,
 	sharedBlocks,
 	template,
+	autosave,
+	settings,
+	tokens,
 } ) );

@@ -44,7 +44,7 @@ export const settings = {
 		/* translators: Block title modifier */
 		__( '%1$s (%2$s)' ),
 		__( 'Columns' ),
-		__( 'Experimental' )
+		__( 'beta' )
 	),
 
 	icon: 'columns',
@@ -58,7 +58,7 @@ export const settings = {
 		},
 	},
 
-	description: __( 'A multi-column layout of content.' ),
+	description: __( 'Add a block that displays content in multiple columns, then add whatever content blocks you\'d like.' ),
 
 	supports: {
 		align: [ 'wide', 'full' ],

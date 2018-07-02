@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { attr } from 'hpq';
+
+/**
  * Internal dependencies
  */
 import {
@@ -9,6 +14,7 @@ import {
 	getAttributesAndInnerBlocksFromDeprecatedVersion,
 	default as parse,
 	parseWithAttributeSchema,
+	toBooleanAttributeMatcher,
 } from '../parser';
 import {
 	registerBlockType,
@@ -16,6 +22,8 @@ import {
 	getBlockTypes,
 	setUnknownTypeHandlerName,
 } from '../registration';
+import { createBlock } from '../factory';
+import serialize from '../serializer';
 
 describe( 'block parser', () => {
 	const defaultBlockSettings = {
@@ -42,14 +50,50 @@ describe( 'block parser', () => {
 	};
 
 	beforeAll( () => {
-		// Load all hooks that modify blocks
-		require( 'editor/hooks' );
+		// Initialize the block store.
+		require( '../../store' );
 	} );
 
 	afterEach( () => {
 		setUnknownTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
+		} );
+	} );
+
+	describe( 'toBooleanAttributeMatcher()', () => {
+		const originalMatcher = attr( 'disabled' );
+		const enhancedMatcher = toBooleanAttributeMatcher( originalMatcher );
+
+		it( 'should return a matcher returning false on unset attribute', () => {
+			const node = document.createElement( 'input' );
+
+			expect( originalMatcher( node ) ).toBe( undefined );
+			expect( enhancedMatcher( node ) ).toBe( false );
+		} );
+
+		it( 'should return a matcher returning true on implicit empty string attribute value', () => {
+			const node = document.createElement( 'input' );
+			node.disabled = true;
+
+			expect( originalMatcher( node ) ).toBe( '' );
+			expect( enhancedMatcher( node ) ).toBe( true );
+		} );
+
+		it( 'should return a matcher returning true on explicit empty string attribute value', () => {
+			const node = document.createElement( 'input' );
+			node.setAttribute( 'disabled', '' );
+
+			expect( originalMatcher( node ) ).toBe( '' );
+			expect( enhancedMatcher( node ) ).toBe( true );
+		} );
+
+		it( 'should return a matcher returning true on explicit string attribute value', () => {
+			const node = document.createElement( 'input' );
+			node.setAttribute( 'disabled', 'disabled' );
+
+			expect( originalMatcher( node ) ).toBe( 'disabled' );
+			expect( enhancedMatcher( node ) ).toBe( true );
 		} );
 	} );
 
@@ -102,6 +146,58 @@ describe( 'block parser', () => {
 				},
 			);
 			expect( value ).toBe( 'chicken' );
+		} );
+
+		it( 'should return the matcher\'s string attribute value', () => {
+			const value = parseWithAttributeSchema(
+				'<audio src="#" loop>',
+				{
+					type: 'string',
+					source: 'attribute',
+					selector: 'audio',
+					attribute: 'src',
+				},
+			);
+			expect( value ).toBe( '#' );
+		} );
+
+		it( 'should return the matcher\'s true boolean attribute value', () => {
+			const value = parseWithAttributeSchema(
+				'<audio src="#" loop>',
+				{
+					type: 'boolean',
+					source: 'attribute',
+					selector: 'audio',
+					attribute: 'loop',
+				},
+			);
+			expect( value ).toBe( true );
+		} );
+
+		it( 'should return the matcher\'s true boolean attribute value on explicit attribute value', () => {
+			const value = parseWithAttributeSchema(
+				'<audio src="#" loop="loop">',
+				{
+					type: 'boolean',
+					source: 'attribute',
+					selector: 'audio',
+					attribute: 'loop',
+				},
+			);
+			expect( value ).toBe( true );
+		} );
+
+		it( 'should return the matcher\'s false boolean attribute value', () => {
+			const value = parseWithAttributeSchema(
+				'<audio src="#" autoplay>',
+				{
+					type: 'boolean',
+					source: 'attribute',
+					selector: 'audio',
+					attribute: 'loop',
+				},
+			);
+			expect( value ).toBe( false );
 		} );
 	} );
 
@@ -235,7 +331,7 @@ describe( 'block parser', () => {
 						},
 					],
 				},
-				'<span class="wp-block-test-block">Bananas</span>',
+				'<span>Bananas</span>',
 				{},
 			);
 			expect( attributesAndInnerBlocks.attributes ).toEqual( { fruit: 'Bananas' } );
@@ -260,7 +356,7 @@ describe( 'block parser', () => {
 						},
 					],
 				},
-				'<span class="wp-block-test-block">Bananas</span>',
+				'<span>Bananas</span>',
 				{},
 				[ {
 					name: 'core/test-block',
@@ -301,7 +397,7 @@ describe( 'block parser', () => {
 						},
 					],
 				},
-				'<span class="wp-block-test-block">Bananas</span>',
+				'<span>Bananas</span>',
 				{},
 			);
 
@@ -396,7 +492,7 @@ describe( 'block parser', () => {
 
 			const block = createBlockWithFallback( {
 				blockName: 'core/test-block',
-				innerHTML: '<span class="wp-block-test-block">Bananas</span>',
+				innerHTML: '<span>Bananas</span>',
 				attrs: { fruit: 'Bananas' },
 			} );
 			expect( block.name ).toEqual( 'core/test-block' );
@@ -570,6 +666,25 @@ describe( 'block parser', () => {
 			expect( parsed.map( ( { name } ) => name ) ).toEqual( [
 				'core/test-block', 'core/void-block',
 			] );
+		} );
+
+		it( 'should parse with unicode escaped returned to original representation', () => {
+			registerBlockType( 'core/code', {
+				category: 'common',
+				title: 'Code Block',
+				attributes: {
+					content: {
+						type: 'string',
+					},
+				},
+				save: ( { attributes } ) => attributes.content,
+			} );
+
+			const content = '$foo = "My \"escaped\" text.";';
+			const block = createBlock( 'core/code', { content } );
+			const serialized = serialize( block );
+			const parsed = parse( serialized );
+			expect( parsed[ 0 ].attributes.content ).toBe( content );
 		} );
 	} );
 } );

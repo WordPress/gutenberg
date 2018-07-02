@@ -6,8 +6,6 @@ import { get, isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { withEditorSettings } from '@wordpress/blocks';
-import { compose } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 
 export function PageAttributesCheck( { availableTemplates, postType, children } ) {
@@ -21,21 +19,12 @@ export function PageAttributesCheck( { availableTemplates, postType, children } 
 	return children;
 }
 
-const applyWithSelect = withSelect( ( select ) => {
-	const { getEditedPostAttribute } = select( 'core/editor' );
+export default withSelect( ( select ) => {
+	const { getEditedPostAttribute, getEditorSettings } = select( 'core/editor' );
 	const { getPostType } = select( 'core' );
+	const { availableTemplates } = getEditorSettings();
 	return {
 		postType: getPostType( getEditedPostAttribute( 'type' ) ),
+		availableTemplates,
 	};
-} );
-
-const applyWithEditorSettings = withEditorSettings(
-	( settings ) => ( {
-		availableTemplates: settings.availableTemplates,
-	} )
-);
-
-export default compose( [
-	applyWithSelect,
-	applyWithEditorSettings,
-] )( PageAttributesCheck );
+} )( PageAttributesCheck );

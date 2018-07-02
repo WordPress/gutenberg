@@ -35,22 +35,23 @@ describe( 'PostAuthorCheck', () => {
 		],
 	};
 
-	const user = {
-		data: {
-			post_type_capabilities: {
-				publish_posts: true,
-			},
-		},
-	};
-
 	it( 'should not render anything if users unknown', () => {
-		const wrapper = shallow( <PostAuthorCheck authors={ [] } user={ user }>authors</PostAuthorCheck> );
+		const wrapper = shallow( <PostAuthorCheck authors={ [] } hasAssignAuthorAction={ true }>authors</PostAuthorCheck> );
 		expect( wrapper.type() ).toBe( null );
 	} );
 
 	it( 'should not render anything if single user', () => {
 		const wrapper = shallow(
-			<PostAuthorCheck authors={ users.data.slice( 0, 1 ) } user={ user }>
+			<PostAuthorCheck authors={ users.data.slice( 0, 1 ) } hasAssignAuthorAction={ true }>
+				authors
+			</PostAuthorCheck>
+		);
+		expect( wrapper.type() ).toBe( null );
+	} );
+
+	it( 'should not render anything if doesn\'t have author action', () => {
+		const wrapper = shallow(
+			<PostAuthorCheck authors={ users } hasAssignAuthorAction={ false }>
 				authors
 			</PostAuthorCheck>
 		);
@@ -59,7 +60,7 @@ describe( 'PostAuthorCheck', () => {
 
 	it( 'should render  control', () => {
 		const wrapper = shallow(
-			<PostAuthorCheck authors={ users } user={ user }>
+			<PostAuthorCheck authors={ users } hasAssignAuthorAction={ true }>
 				authors
 			</PostAuthorCheck>
 		);

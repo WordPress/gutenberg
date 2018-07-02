@@ -6,7 +6,7 @@ import { filter, isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createBlock, getDefaultBlockName, withEditorSettings } from '@wordpress/blocks';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { compose } from '@wordpress/element';
 import { IconButton } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -23,9 +23,12 @@ function InserterWithShortcuts( { items, isLocked, onInsert } ) {
 		return null;
 	}
 
-	const itemsWithoutDefaultBlock = filter( items, ( item ) =>
-		item.name !== getDefaultBlockName() || ! isEmpty( item.initialAttributes )
-	).slice( 0, 3 );
+	const itemsWithoutDefaultBlock = filter( items, ( item ) => {
+		return ! item.isDisabled && (
+			item.name !== getDefaultBlockName() ||
+			! isEmpty( item.initialAttributes )
+		);
+	} ).slice( 0, 3 );
 
 	return (
 		<div className="editor-inserter-with-shortcuts">
@@ -34,9 +37,10 @@ function InserterWithShortcuts( { items, isLocked, onInsert } ) {
 					key={ item.id }
 					className="editor-inserter-with-shortcuts__block"
 					onClick={ () => onInsert( item ) }
+					// translators: %s: block title/name to be added
 					label={ sprintf( __( 'Add %s' ), item.title ) }
 					icon={ (
-						<BlockIcon icon={ item.icon } />
+						<BlockIcon icon={ item.icon && item.icon.src } />
 					) }
 				/>
 			) ) }
@@ -45,19 +49,12 @@ function InserterWithShortcuts( { items, isLocked, onInsert } ) {
 }
 
 export default compose(
-	withEditorSettings( ( settings ) => {
-		const { templateLock, allowedBlockTypes } = settings;
-
+	withSelect( ( select, { rootUID } ) => {
+		const { getEditorSettings, getInserterItems } = select( 'core/editor' );
+		const { templateLock } = getEditorSettings();
 		return {
+			items: getInserterItems( rootUID ),
 			isLocked: !! templateLock,
-			allowedBlockTypes,
-		};
-	} ),
-	withSelect( ( select, { allowedBlockTypes, rootUID } ) => {
-		const { getFrecentInserterItems, getSupportedBlocks } = select( 'core/editor' );
-		const supportedBlocks = getSupportedBlocks( rootUID, allowedBlockTypes );
-		return {
-			items: getFrecentInserterItems( supportedBlocks, 4 ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {

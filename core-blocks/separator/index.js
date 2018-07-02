@@ -8,19 +8,26 @@ import { createBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import './style.scss';
+import './theme.scss';
 
 export const name = 'core/separator';
 
 export const settings = {
 	title: __( 'Separator' ),
 
-	description: __( 'Use the separator to indicate a thematic change in the content.' ),
+	description: __( 'Insert a horizontal line where you want to create a break between ideas.' ),
 
 	icon: 'minus',
 
 	category: 'layout',
 
 	keywords: [ __( 'horizontal-line' ), 'hr', __( 'divider' ) ],
+
+	styles: [
+		{ name: 'default', label: __( 'Short Line' ), isDefault: true },
+		{ name: 'wide', label: __( 'Wide Line' ) },
+		{ name: 'dots', label: __( 'Dots' ) },
+	],
 
 	transforms: {
 		from: [

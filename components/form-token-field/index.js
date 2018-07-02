@@ -57,13 +57,15 @@ class FormTokenField extends Component {
 		}
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		if ( nextProps.disabled && this.state.isActive ) {
-			this.setState( {
-				isActive: false,
-				incompleteTokenValue: '',
-			} );
+	static getDerivedStateFromProps( props, state ) {
+		if ( ! props.disabled || ! state.isActive ) {
+			return null;
 		}
+
+		return {
+			isActive: false,
+			incompleteTokenValue: '',
+		};
 	}
 
 	bindInput( ref ) {
@@ -94,7 +96,7 @@ class FormTokenField extends Component {
 
 	onBlur() {
 		if ( this.inputHasValidValue() ) {
-			this.setState( { isActive: false }, this.addCurrentToken );
+			this.setState( { isActive: false } );
 		} else {
 			this.setState( initialState );
 		}
@@ -106,9 +108,6 @@ class FormTokenField extends Component {
 		switch ( event.keyCode ) {
 			case 8: // backspace (delete to left)
 				preventDefault = this.handleDeleteKey( this.deleteTokenBeforeInput );
-				break;
-			case 9: // tab
-				preventDefault = this.addCurrentToken();
 				break;
 			case 13: // enter/return
 				preventDefault = this.addCurrentToken();
@@ -510,14 +509,14 @@ class FormTokenField extends Component {
 			disabled,
 			placeholder = __( 'Add item.' ),
 			instanceId,
+			className,
 		} = this.props;
-		const classes = classnames( 'components-form-token-field', {
+		const classes = classnames( className, 'components-form-token-field', {
 			'is-active': this.state.isActive,
 			'is-disabled': disabled,
 		} );
 
 		let tokenFieldProps = {
-			ref: 'main',
 			className: classes,
 			tabIndex: '-1',
 		};

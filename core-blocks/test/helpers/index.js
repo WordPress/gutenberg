@@ -12,6 +12,8 @@ import {
 	getBlockType,
 	registerBlockType,
 } from '@wordpress/blocks';
+// Requiredd to register the editor's store
+import '@wordpress/editor';
 
 // Hack to avoid the wrapping HoCs.
 import { BlockEdit } from '../../../editor/components/block-edit';
@@ -29,7 +31,6 @@ export const blockEditRender = ( name, settings ) => {
 			attributes={ block.attributes }
 			setAttributes={ noop }
 			user={ {} }
-			createInnerBlockList={ noop }
 		/>
 	);
 };

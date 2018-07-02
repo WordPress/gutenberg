@@ -1,14 +1,3 @@
-// Output overrides for each scheme
-// Almost all schemes use only one color swatch, a few have exceptions to ensure usability
-@include admin-scheme-color-overrides( 'fresh', $scheme-fresh__spot-color, $scheme-fresh__spot-color );
-@include admin-scheme-color-overrides( 'light', $scheme-light__spot-color, $scheme-light__spot-color );
-@include admin-scheme-color-overrides( 'blue', $scheme-blue__spot-color, $scheme-blue__spot-color );
-@include admin-scheme-color-overrides( 'coffee', $scheme-coffee__spot-color, $scheme-coffee__spot-color );
-@include admin-scheme-color-overrides( 'ectoplasm', $scheme-ectoplasm__spot-color, $scheme-ectoplasm__spot-color );
-@include admin-scheme-color-overrides( 'midnight', $scheme-midnight__spot-color, $scheme-midnight__spot-color-2 ); // exception to ensure usability
-@include admin-scheme-color-overrides( 'ocean', $scheme-ocean__spot-color, $scheme-ocean__spot-color );
-@include admin-scheme-color-overrides( 'sunrise', $scheme-sunrise__spot-color, $scheme-sunrise__spot-color-2 ); // exception to ensure usability
-
 // Fade animations
 @keyframes animate_fade {
 	from {
@@ -46,6 +35,12 @@
 	100% {
 		transform: translateX( 0% );
 	}
+}
+
+// In order to use mix-blend-mode, this element needs to have an explicitly set background-color
+// We scope it to .wp-toolbar to be wp-admin only, to prevent bleed into other implementations
+html.wp-toolbar {
+	background: $white;
 }
 
 body.gutenberg-editor-page {
@@ -126,7 +121,8 @@ body.gutenberg-editor-page {
 // @todo submit as upstream patch as well
 .edit-post-sidebar,
 .editor-post-publish-panel,
-.editor-block-list__block {
+.editor-block-list__block,
+.components-popover {
 	.input-control, // upstream name is .regular-text
 	input[type=text],
 	input[type=search],
@@ -174,26 +170,46 @@ body.gutenberg-editor-page {
 .editor-block-list__block {
 	input,
 	textarea {
+		// use opacity to work in various editor styles
 		&::-webkit-input-placeholder {
-			color: $dark-gray-300;
+			color: $dark-opacity-100;
 		}
 		&::-moz-placeholder {
-			color: $dark-gray-300;
+			color: $dark-opacity-100;
 		}
 		&:-ms-input-placeholder {
-			color: $dark-gray-300;
+			color: $dark-opacity-100;
 		}
 		&:-moz-placeholder {
-			color: $dark-gray-300;
+			color: $dark-opacity-100;
+		}
+
+		.is-dark-theme & {
+			&::-webkit-input-placeholder {
+				color: $light-opacity-300;
+			}
+			&::-moz-placeholder {
+				color: $light-opacity-300;
+			}
+			&:-ms-input-placeholder {
+				color: $light-opacity-300;
+			}
+			&:-moz-placeholder {
+				color: $light-opacity-300;
+			}
 		}
 	}
 }
 
-@keyframes fade-in {
-	from {
-		opacity: 0;
-	}
-	to {
-		opacity: 1;
-	}
+// Style the TinyMCE table resize handles
+.ephox-snooker-resizer-rows {
+	cursor: row-resize;
+}
+
+.ephox-snooker-resizer-cols {
+	cursor: col-resize;
+}
+
+.ephox-snooker-resizer-bar-dragging {
+	background: $blue-medium-500;
 }

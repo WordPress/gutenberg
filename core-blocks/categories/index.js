@@ -6,16 +6,15 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import './editor.scss';
 import './style.scss';
-import CategoriesBlock from './block';
+import edit from './edit';
 
 export const name = 'core/categories';
 
 export const settings = {
 	title: __( 'Categories' ),
 
-	description: __( 'Shows a list of your site\'s categories.' ),
+	description: __( 'Display a list of all your site\'s categories.' ),
 
 	icon: 'list-view',
 
@@ -50,7 +49,7 @@ export const settings = {
 		}
 	},
 
-	edit: CategoriesBlock,
+	edit,
 
 	save() {
 		return null;

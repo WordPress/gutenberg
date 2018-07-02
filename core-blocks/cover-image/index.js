@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { IconButton, PanelBody, RangeControl, ToggleControl, Toolbar } from '@wordpress/components';
+import { IconButton, PanelBody, RangeControl, ToggleControl, Toolbar, withNotices } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
@@ -15,7 +15,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	BlockAlignmentToolbar,
-	ImagePlaceholder,
+	MediaPlaceholder,
 	MediaUpload,
 	AlignmentToolbar,
 	RichText,
@@ -63,7 +63,7 @@ export const name = 'core/cover-image';
 export const settings = {
 	title: __( 'Cover Image' ),
 
-	description: __( 'Cover Image is a bold image block with an optional title.' ),
+	description: __( 'Add a full-width image, and layer text over it — great for headers.' ),
 
 	icon: 'cover-image',
 
@@ -99,10 +99,16 @@ export const settings = {
 		}
 	},
 
-	edit( { attributes, setAttributes, isSelected, className } ) {
+	edit: withNotices( ( { attributes, setAttributes, isSelected, className, noticeOperations, noticeUI } ) => {
 		const { url, title, align, contentAlign, id, hasParallax, dimRatio } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
-		const onSelectImage = ( media ) => setAttributes( { url: media.url, id: media.id } );
+		const onSelectImage = ( media ) => {
+			if ( ! media || ! media.url ) {
+				setAttributes( { url: undefined, id: undefined } );
+				return;
+			}
+			setAttributes( { url: media.url, id: media.id } );
+		};
 		const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
 		const setDimRatio = ( ratio ) => setAttributes( { dimRatio: ratio } );
 
@@ -183,8 +189,18 @@ export const settings = {
 			return (
 				<Fragment>
 					{ controls }
-					<ImagePlaceholder
-						{ ...{ className, icon, label, onSelectImage } }
+					<MediaPlaceholder
+						icon={ icon }
+						className={ className }
+						labels={ {
+							title: label,
+							name: __( 'an image' ),
+						} }
+						onSelect={ onSelectImage }
+						accept="image/*"
+						type="image"
+						notices={ noticeUI }
+						onError={ noticeOperations.createErrorNotice }
 					/>
 				</Fragment>
 			);
@@ -211,7 +227,7 @@ export const settings = {
 				</div>
 			</Fragment>
 		);
-	},
+	} ),
 
 	save( { attributes, className } ) {
 		const { url, title, hasParallax, dimRatio, align, contentAlign } = attributes;

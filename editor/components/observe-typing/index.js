@@ -8,10 +8,9 @@ import { includes } from 'lodash';
  */
 import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { isTextField, keycodes } from '@wordpress/utils';
+import { isTextField } from '@wordpress/dom';
+import { UP, RIGHT, DOWN, LEFT, ENTER, BACKSPACE } from '@wordpress/keycodes';
 import { withSafeTimeout } from '@wordpress/components';
-
-const { UP, RIGHT, DOWN, LEFT, ENTER, BACKSPACE } = keycodes;
 
 /**
  * Set of key codes upon which typing is to be initiated on a keydown event.

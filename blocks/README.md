@@ -232,10 +232,13 @@ editor interface where blocks are implemented.
 - `title: string` - A human-readable
   [localized](https://codex.wordpress.org/I18n_for_WordPress_Developers#Handling_JavaScript_files)
   label for the block. Shown in the block inserter.
-- `icon: string | WPElement | Function` - Slug of the
+- `icon: string | WPElement | Function | Object` - Slug of the
   [Dashicon](https://developer.wordpress.org/resource/dashicons/#awards)
   to be shown in the control's button, or an element (or function returning an
   element) if you choose to render your own SVG.
+  An object can also be passed, in this case, icon, as specified above, should be included in the src property.
+  Besides src the object can contain background and foreground colors, this colors will appear with the icon
+  when they are applicable e.g.: in the inserter.
 - `attributes: Object | Function` - An object of attribute schemas, where the
   keys of the object define the shape of attributes, and each value an object
   schema describing the `type`, `default` (optional), and

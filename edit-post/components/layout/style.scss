@@ -10,6 +10,7 @@
 		position: sticky;
 		top: $header-height;
 		right: 0;
+		color: $dark-gray-900;
 
 		@include break-small {
 			position: fixed;

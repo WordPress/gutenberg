@@ -7,7 +7,6 @@ import { flow, pick } from 'lodash';
  * WordPress Dependencies
  */
 import { createElement, Component } from '@wordpress/element';
-import { EditorSettings } from '@wordpress/blocks';
 import {
 	APIProvider,
 	DropZoneProvider,
@@ -26,33 +25,25 @@ class EditorProvider extends Component {
 
 		// Assume that we don't need to initialize in the case of an error recovery.
 		if ( ! props.recovery ) {
-			this.props.setupEditor( props.post, {
-				...EditorSettings.defaultSettings,
-				...this.props.settings,
-			} );
+			this.props.updateEditorSettings( props.settings );
+			this.props.setupEditor( props.post, props.settings.autosave );
+		}
+	}
+
+	componentDidUpdate( prevProps ) {
+		if ( this.props.settings !== prevProps.settings ) {
+			this.props.updateEditorSettings( this.props.settings );
 		}
 	}
 
 	render() {
 		const {
 			children,
-			settings,
 			undo,
 			redo,
 			createUndoLevel,
 		} = this.props;
 		const providers = [
-			// Editor settings provider
-			[
-				EditorSettings.Provider,
-				{
-					value: {
-						...EditorSettings.defaultSettings,
-						...settings,
-					},
-				},
-			],
-
 			// RichText provider:
 			//
 			//  - context.onUndo
@@ -111,6 +102,7 @@ class EditorProvider extends Component {
 export default withDispatch( ( dispatch ) => {
 	const {
 		setupEditor,
+		updateEditorSettings,
 		undo,
 		redo,
 		createUndoLevel,
@@ -120,5 +112,6 @@ export default withDispatch( ( dispatch ) => {
 		undo,
 		redo,
 		createUndoLevel,
+		updateEditorSettings,
 	};
 } )( EditorProvider );

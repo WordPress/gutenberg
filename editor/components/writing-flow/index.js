@@ -1,22 +1,23 @@
 /**
  * External dependencies
  */
-import { overEvery, find, findLast, reverse } from 'lodash';
+import { overEvery, find, findLast, reverse, first, last } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Component, compose } from '@wordpress/element';
 import {
-	keycodes,
-	focus,
-	isTextField,
 	computeCaretRect,
+	focus,
 	isHorizontalEdge,
+	isTextField,
 	isVerticalEdge,
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
-} from '@wordpress/utils';
+	isEntirelySelected,
+} from '@wordpress/dom';
+import { UP, DOWN, LEFT, RIGHT, isKeyboardEvent } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
@@ -26,13 +27,8 @@ import './style.scss';
 import {
 	isBlockFocusStop,
 	isInSameBlock,
+	hasInnerBlocksContext,
 } from '../../utils/dom';
-
-/**
- * Module Constants
- */
-
-const { UP, DOWN, LEFT, RIGHT } = keycodes;
 
 /**
  * Given an element, returns true if the element is a tabbable text field, or
@@ -104,9 +100,20 @@ class WritingFlow extends Component {
 				return false;
 			}
 
-			// Prefer text fields, but settle for block focus stop.
-			if ( ! isTextField( node ) && ! isBlockFocusStop( node ) ) {
+			// Prefer text fields...
+			if ( isTextField( node ) ) {
+				return true;
+			}
+
+			// ...but settle for block focus stop.
+			if ( ! isBlockFocusStop( node ) ) {
 				return false;
+			}
+
+			// If element contains inner blocks, stop immediately at its focus
+			// wrapper.
+			if ( hasInnerBlocksContext( node ) ) {
+				return true;
 			}
 
 			// If navigating out of a block (in reverse), don't consider its
@@ -175,11 +182,21 @@ class WritingFlow extends Component {
 	 */
 	isTabbableEdge( target, isReverse ) {
 		const closestTabbable = this.getClosestTabbable( target, isReverse );
-		return ! isInSameBlock( target, closestTabbable );
+		return ! closestTabbable || ! isInSameBlock( target, closestTabbable );
 	}
 
 	onKeyDown( event ) {
-		const { hasMultiSelection } = this.props;
+		const { hasMultiSelection, onMultiSelect, blocks } = this.props;
+
+		// If navigation has already been handled (e.g. TinyMCE inline
+		// boundaries), abort. Ideally this uses Event#defaultPrevented. This
+		// is currently not possible because TinyMCE will misreport an event
+		// default as prevented on outside edges of inline boundaries.
+		//
+		// See: https://github.com/tinymce/tinymce/issues/4476
+		if ( event.nativeEvent._navigationHandled ) {
+			return;
+		}
 
 		const { keyCode, target } = event;
 		const isUp = keyCode === UP;
@@ -201,6 +218,25 @@ class WritingFlow extends Component {
 		}
 
 		if ( ! isNav ) {
+			// Set immediately before the meta+a combination can be pressed.
+			if ( isKeyboardEvent.primary( event ) ) {
+				this.isEntirelySelected = isEntirelySelected( target );
+			}
+
+			if ( isKeyboardEvent.primary( event, 'a' ) ) {
+				// When the target is contentEditable, selection will already
+				// have been set by TinyMCE earlier in this call stack. We need
+				// check the previous result, otherwise all blocks will be
+				// selected right away.
+				if ( target.isContentEditable ? this.isEntirelySelected : isEntirelySelected( target ) ) {
+					onMultiSelect( first( blocks ), last( blocks ) );
+					event.preventDefault();
+				}
+
+				// Set in case the meta key doesn't get released.
+				this.isEntirelySelected = isEntirelySelected( target );
+			}
+
 			return;
 		}
 
@@ -278,6 +314,7 @@ export default compose( [
 			getFirstMultiSelectedBlockUid,
 			getLastMultiSelectedBlockUid,
 			hasMultiSelection,
+			getBlockOrder,
 		} = select( 'core/editor' );
 
 		const selectedBlockUID = getSelectedBlockUID();
@@ -292,6 +329,7 @@ export default compose( [
 			selectedFirstUid: getFirstMultiSelectedBlockUid(),
 			selectedLastUid: getLastMultiSelectedBlockUid(),
 			hasMultiSelection: hasMultiSelection(),
+			blocks: getBlockOrder(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

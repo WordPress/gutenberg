@@ -7,7 +7,7 @@ import { find, get, includes, union } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { withInstanceId } from '@wordpress/components';
+import { withInstanceId, Button } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -57,9 +57,9 @@ function PostFormat( { onUpdatePostFormat, postFormat = 'standard', supportedFor
 				{ suggestion && suggestion.id !== postFormat && (
 					<div className="editor-post-format__suggestion">
 						{ __( 'Suggestion:' ) }{ ' ' }
-						<button className="button-link" onClick={ () => onUpdatePostFormat( suggestion.id ) }>
+						<Button isLink onClick={ () => onUpdatePostFormat( suggestion.id ) }>
 							{ suggestion.caption }
-						</button>
+						</Button>
 					</div>
 				) }
 			</div>

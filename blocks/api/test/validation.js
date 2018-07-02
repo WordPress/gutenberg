@@ -29,6 +29,10 @@ describe( 'validation', () => {
 		category: 'common',
 		title: 'block title',
 	};
+	beforeAll( () => {
+		// Initialize the block store
+		require( '../../store' );
+	} );
 
 	afterEach( () => {
 		setUnknownTypeHandlerName( undefined );

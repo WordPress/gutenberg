@@ -3,12 +3,13 @@
 // value is designed to work with).
 
 $z-layers: (
+	'.editor-block-list__block-edit:before': 0,
 	'.editor-block-switcher__arrow': 1,
-	'.editor-block-list__block-edit:before': -1,
 	'.editor-block-list__block .wp-block-more:before': -1,
 	'.editor-block-list__block {core/image aligned left or right}': 20,
 	'.editor-block-list__block {core/image aligned wide or fullwide}': 20,
 	'.freeform-toolbar': 10,
+	'.editor-block-list__breadcrumb': 1,
 	'.editor-warning': 1,
 	'.components-form-toggle__input': 1,
 	'.editor-inserter__tabs': 1,
@@ -17,17 +18,17 @@ $z-layers: (
 	'.edit-post-meta-boxes-area.is-loading:before': 1,
 	'.edit-post-meta-boxes-area .spinner': 5,
 	'.editor-block-contextual-toolbar': 21,
-	'.editor-block-switcher__menu': 5,
 	'.components-popover__close': 5,
 	'.editor-block-list__insertion-point': 5,
-	'.editor-format-toolbar__link-modal': 81, // should appear above block controls
-	'.editor-format-toolbar__link-container': 81, // link suggestions should also
-	'.blocks-gallery-item__inline-menu': 20,
-	'.editor-block-settings-menu__popover': 21, // Below the header, but above the block toolbar
+	'.core-blocks-gallery-item__inline-menu': 20,
 	'.editor-url-input__suggestions': 30,
 	'.edit-post-header': 30,
-	'.blocks-button__inline-link .editor-url-input__suggestions': 6, // URL suggestions for button block above sibling inserter
+	'.core-blocks-button__inline-link .editor-url-input__suggestions': 6, // URL suggestions for button block above sibling inserter
 	'.wp-block-image__resize-handlers': 1, // Resize handlers above sibling inserter
+
+	// Side UI active buttons
+	'.editor-block-settings-remove': 1,
+	'.editor-block-mover__control': 1,
 
 	// Should have lower index than anything else positioned inside the block containers
 	'.editor-block-list__block-draggable': 0,
@@ -46,6 +47,10 @@ $z-layers: (
 	// Block controls, particularly in nested contexts, floats aside block and
 	// should overlap most block content.
 	'.editor-block-list__block.is-{selected,hovered} .editor-block-{settings-menu,mover}': 80,
+
+	// Small screen inner blocks overlay must be displayed above drop zone,
+	// settings menu, and movers.
+	'.editor-inner-blocks__small-screen-overlay:after': 120,
 
 	// Show sidebar above wp-admin navigation bar for mobile viewports:
 	// #wpadminbar { z-index: 99999 }
@@ -71,6 +76,12 @@ $z-layers: (
 	'.components-autocomplete__results': 1000000,
 
 	'.skip-to-selected-block': 100000,
+
+	// Show NUX tips above popovers, wp-admin menus, submenus, and sidebar:
+	'.nux-dot-tip': 1000001,
+
+	// Show tooltips above NUX tips, wp-admin menus, submenus, and sidebar:
+	'.components-tooltip': 1000002
 );
 
 @function z-index( $key ) {

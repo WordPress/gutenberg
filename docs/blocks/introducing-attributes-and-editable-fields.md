@@ -52,6 +52,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
 		var content = props.attributes.content;
 
 		return el( RichText.Content, {
+			tagName: 'p',
 			className: props.className,
 			value: content
 		} );
@@ -99,7 +100,11 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 		const { content } = attributes;
 
 		return (
-			<RichText.Content className={ className } value={ content } />
+			<RichText.Content 
+				tagName="p" 
+				className={ className } 
+				value={ content } 
+			/>
 		);
 	},
 } );

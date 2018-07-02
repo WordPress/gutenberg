@@ -8,18 +8,14 @@ import { cond, matchesProperty } from 'lodash';
  */
 import { NavigableMenu, KeyboardShortcuts } from '@wordpress/components';
 import { Component, findDOMNode } from '@wordpress/element';
-import { focus, keycodes } from '@wordpress/utils';
+import { focus } from '@wordpress/dom';
+import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Browser dependencies
  */
 
 const { Node, getSelection } = window;
-
-/**
- * Module Constants
- */
-const { ESCAPE } = keycodes;
 
 class NavigableToolbar extends Component {
 	constructor() {

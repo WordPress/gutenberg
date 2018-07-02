@@ -27,7 +27,7 @@ function TemplateValidationNotice( { isValid, ...props } ) {
 		<Notice className="editor-template-validation-notice" isDismissible={ false } status="warning">
 			<p>{ __( 'The content of your post doesn\'t match the template assigned to your post type.' ) }</p>
 			<div>
-				<Button className="button" onClick={ props.resetTemplateValidity }>{ __( 'Keep it as is' ) }</Button>
+				<Button isDefault onClick={ props.resetTemplateValidity }>{ __( 'Keep it as is' ) }</Button>
 				<Button onClick={ confirmSynchronization } isPrimary>{ __( 'Reset the template' ) }</Button>
 			</div>
 		</Notice>

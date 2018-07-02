@@ -2,8 +2,13 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { Fragment } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
-import { RichText } from '@wordpress/editor';
+import {
+	RichText,
+	BlockControls,
+	AlignmentToolbar,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -14,21 +19,26 @@ import './style.scss';
 export const name = 'core/subhead';
 
 export const settings = {
-	title: __( 'Subhead' ),
+	title: __( 'Subheading' ),
 
-	description: __( 'Explanatory text under the main heading of an article.' ),
+	description: __( 'What\'s a subhead? Smaller than a headline, bigger than basic text.' ),
 
 	icon: 'text',
 
 	category: 'common',
 
-	useOnce: true,
+	supports: {
+		multiple: false,
+	},
 
 	attributes: {
 		content: {
 			type: 'array',
 			source: 'children',
 			selector: 'p',
+		},
+		align: {
+			type: 'string',
 		},
 	},
 
@@ -58,30 +68,42 @@ export const settings = {
 	},
 
 	edit( { attributes, setAttributes, className } ) {
-		const { content, placeholder } = attributes;
+		const { align, content, placeholder } = attributes;
 
 		return (
-			<RichText
-				tagName="p"
-				value={ content }
-				onChange={ ( nextContent ) => {
-					setAttributes( {
-						content: nextContent,
-					} );
-				} }
-				className={ className }
-				placeholder={ placeholder || __( 'Write subhead…' ) }
-			/>
+			<Fragment>
+				<BlockControls>
+					<AlignmentToolbar
+						value={ align }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { align: nextAlign } );
+						} }
+					/>
+				</BlockControls>
+				<RichText
+					tagName="p"
+					value={ content }
+					onChange={ ( nextContent ) => {
+						setAttributes( {
+							content: nextContent,
+						} );
+					} }
+					style={ { textAlign: align } }
+					className={ className }
+					placeholder={ placeholder || __( 'Write subheading…' ) }
+				/>
+			</Fragment>
 		);
 	},
 
 	save( { attributes, className } ) {
-		const { content } = attributes;
+		const { align, content } = attributes;
 
 		return (
 			<RichText.Content
 				tagName="p"
 				className={ className }
+				style={ { textAlign: align } }
 				value={ content }
 			/>
 		);

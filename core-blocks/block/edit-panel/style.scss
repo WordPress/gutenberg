@@ -1,4 +1,4 @@
-.shared-block-edit-panel {
+.editor-block-list__layout .shared-block-edit-panel {
 	align-items: center;
 	background: $light-gray-100;
 	color: $dark-gray-500;
@@ -6,10 +6,16 @@
 	flex-wrap: wrap;
 	font-family: $default-font;
 	font-size: $default-font-size;
-	margin: 0 (-$block-padding);
-	padding: 10px $block-padding;
 	position: relative;
 	top: $block-padding;
+	margin: 0 (-$parent-block-padding);
+	padding: 10px $parent-block-padding;
+
+	// Show a smaller padding when nested.
+	.editor-block-list__layout & {
+		margin: 0 (-$block-padding);
+		padding: 10px $block-padding;
+	}
 
 	.shared-block-edit-panel__spinner {
 		margin: 0 5px;
@@ -32,8 +38,7 @@
 		margin: #{ $item-spacing / 2 } 0 $item-spacing;
 	}
 
-	// Needs specificity to override the margin-bottom set by .button
-	.wp-core-ui & .shared-block-edit-panel__button {
+	.components-button.shared-block-edit-panel__button {
 		margin: 0 5px 0 0;
 	}
 
@@ -44,7 +49,7 @@
 			margin: 0;
 		}
 
-		.wp-core-ui & .shared-block-edit-panel__button {
+		.components-button.shared-block-edit-panel__button {
 			margin: 0 0 0 5px;
 		}
 	}

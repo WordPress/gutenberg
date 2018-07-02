@@ -26,6 +26,7 @@ import { withViewportMatch } from '@wordpress/viewport';
  * Internal dependencies
  */
 import './style.scss';
+import BrowserURL from '../browser-url';
 import BlockSidebar from '../sidebar/block-sidebar';
 import DocumentSidebar from '../sidebar/document-sidebar';
 import Header from '../header';
@@ -35,6 +36,8 @@ import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
 import MetaBoxes from '../meta-boxes';
 import { getMetaBoxContainer } from '../../utils/meta-boxes';
 import Sidebar from '../sidebar';
+import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
+import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 
 function Layout( {
 	mode,
@@ -58,6 +61,7 @@ function Layout( {
 	return (
 		<div className={ className }>
 			<DocumentTitle />
+			<BrowserURL />
 			<UnsavedChangesWarning forceIsDirty={ () => {
 				return some( metaBoxes, ( metaBox, location ) => {
 					return metaBox.isActive &&
@@ -84,6 +88,8 @@ function Layout( {
 					onClose={ closePublishSidebar }
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }
+					PrePublishExtension={ PluginPrePublishPanel.Slot }
+					PostPublishExtension={ PluginPostPublishPanel.Slot }
 				/>
 			) }
 			<DocumentSidebar />

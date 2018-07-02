@@ -1,16 +1,29 @@
 /**
  * External dependencies.
  */
-import { isEqual, isObject, map } from 'lodash';
+import { isEqual } from 'lodash';
 
 /**
- * WordPress dependencies
+ * WordPress dependencies.
  */
 import {
 	Component,
 	RawHTML,
 } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
+import apiRequest from '@wordpress/api-request';
+import httpBuildQuery from 'http-build-query';
+
+/**
+ * Internal dependencies.
+ */
+import Placeholder from '../placeholder';
+import Spinner from '../spinner';
+
+export function rendererPathWithAttributes( block, attributes = null ) {
+	return `/gutenberg/v1/block-renderer/${ block }?context=edit` +
+			( null !== attributes ? '&' + httpBuildQuery( { attributes } ) : '' );
+}
 
 export class ServerSideRender extends Component {
 	constructor( props ) {
@@ -21,45 +34,58 @@ export class ServerSideRender extends Component {
 	}
 
 	componentDidMount() {
+		this.isStillMounted = true;
 		this.fetch( this.props );
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		if ( ! isEqual( nextProps, this.props ) ) {
-			this.fetch( nextProps );
+	componentWillUnmount() {
+		this.isStillMounted = false;
+	}
+
+	componentDidUpdate( prevProps ) {
+		if ( ! isEqual( prevProps, this.props ) ) {
+			this.fetch( this.props );
 		}
 	}
 
 	fetch( props ) {
-		this.setState( { response: null } );
-		const { block, attributes } = props;
+		if ( null !== this.state.response ) {
+			this.setState( { response: null } );
+		}
+		const { block, attributes = null } = props;
 
-		const path = '/gutenberg/v1/block-renderer/' + block + '?context=edit&' + this.getQueryUrlFromObject( { attributes } );
+		const path = rendererPathWithAttributes( block, attributes );
 
-		return wp.apiRequest( { path: path } ).then( ( response ) => {
-			if ( response && response.rendered ) {
+		return apiRequest( { path } ).fail( ( response ) => {
+			const failResponse = {
+				error: true,
+				errorMsg: response.responseJSON.message || __( 'Unknown error' ),
+			};
+			if ( this.isStillMounted ) {
+				this.setState( { response: failResponse } );
+			}
+		} ).done( ( response ) => {
+			if ( this.isStillMounted && response && response.rendered ) {
 				this.setState( { response: response.rendered } );
 			}
 		} );
 	}
 
-	getQueryUrlFromObject( obj, prefix ) {
-		return map( obj, ( paramValue, paramName ) => {
-			const key = prefix ? prefix + '[' + paramName + ']' : paramName,
-				value = obj[ paramName ];
-			return isObject( paramValue ) ? this.getQueryUrlFromObject( value, key ) :
-				encodeURIComponent( key ) + '=' + encodeURIComponent( value );
-		} ).join( '&' );
-	}
-
 	render() {
 		const response = this.state.response;
-		if ( ! response || ! response.length ) {
+		if ( ! response ) {
 			return (
-				<div key="loading" className="wp-block-embed is-loading">
-
-					<p>{ __( 'Loading...' ) }</p>
-				</div>
+				<Placeholder><Spinner /></Placeholder>
+			);
+		} else if ( response.error ) {
+			// translators: %s: error message describing the problem
+			const errorMessage = sprintf( __( 'Error loading block: %s' ), response.errorMsg );
+			return (
+				<Placeholder>{ errorMessage }</Placeholder>
+			);
+		} else if ( ! response.length ) {
+			return (
+				<Placeholder>{ __( 'No results found.' ) }</Placeholder>
 			);
 		}
 

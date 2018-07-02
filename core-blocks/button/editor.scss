@@ -15,10 +15,11 @@
 
 	.editor-rich-text__tinymce {
 		cursor: text;
+		line-height: 1;
 	}
 }
 
-.blocks-button__inline-link {
+.core-blocks-button__inline-link {
 	background: #fff;
 	display: flex;
 	flex-wrap: wrap;
@@ -36,7 +37,7 @@
 
 	.editor-url-input__suggestions {
 		width: $blocks-button__link-input-width - $icon-button-size - $icon-button-size;
-		z-index: z-index( '.blocks-button__inline-link .editor-url-input__suggestions' );
+		z-index: z-index( '.core-blocks-button__inline-link .editor-url-input__suggestions' );
 	}
 
 	> .dashicon {

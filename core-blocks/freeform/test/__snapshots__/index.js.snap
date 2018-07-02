@@ -8,7 +8,7 @@ Array [
     id="toolbar-undefined"
   />,
   <div
-    class="wp-block-freeform blocks-rich-text__tinymce"
+    class="wp-block-freeform core-blocks-rich-text__tinymce"
     id="editor-undefined"
   />,
 ]

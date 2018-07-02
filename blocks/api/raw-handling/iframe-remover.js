@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { remove } from '@wordpress/utils';
+import { remove } from '@wordpress/dom';
 
 /**
  * Removes iframes.

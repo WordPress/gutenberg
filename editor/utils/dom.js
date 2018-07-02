@@ -52,3 +52,15 @@ export function isBlockFocusStop( element ) {
 export function isInSameBlock( a, b ) {
 	return a.closest( '[data-block]' ) === b.closest( '[data-block]' );
 }
+
+/**
+ * Returns true if the given HTMLElement contains inner blocks (an InnerBlocks
+ * element).
+ *
+ * @param {HTMLElement} element Element to test.
+ *
+ * @return {boolean} Whether element contains inner blocks.
+ */
+export function hasInnerBlocksContext( element ) {
+	return !! element.querySelector( '.editor-block-list__layout' );
+}

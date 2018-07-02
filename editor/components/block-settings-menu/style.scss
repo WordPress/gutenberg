@@ -1,12 +1,8 @@
 .editor-block-settings-menu {
-	opacity: 0;
-
-	&.is-visible {
-		@include fade_in;
-	}
+	line-height: 1;
 }
 
-// The Blocks "More" Menu ellipsis icon button
+// The Blocks "More" Menu ellipsis icon button, and trash button
 .editor-block-settings-remove,
 .editor-block-settings-menu__toggle {
 	justify-content: center;
@@ -14,14 +10,35 @@
 	width: $block-side-ui-width;
 	height: $block-side-ui-width;
 	border-radius: $button-style__radius-roundrect;
+	opacity: 0;
+
+	// use opacity to work in various editor styles
+	color: $dark-opacity-500;
+
+	&.is-visible {
+		@include fade_in;
+	}
+
+	.is-dark-theme & {
+		color: $light-opacity-500;
+	}
 
 	// Apply a background in nested contexts, only on desktop
 	@include break-small() {
 		.editor-block-list__layout .editor-block-list__layout & {
 			background: $white;
-			border-color: $light-gray-500;
-			border-style: solid;
-			border-width: 1px;
+			box-shadow: inset 0 0 0 1px $light-gray-500;
+			color: $dark-gray-500; // always show dark gray in nested contexts
+
+			&:first-child {
+				margin-bottom: -1px;
+			}
+
+			&:hover,
+			&:active,
+			&:focus {
+				z-index: z-index( '.editor-block-settings-remove' );
+			}
 		}
 	}
 }
@@ -29,11 +46,9 @@
 .editor-block-settings-menu__toggle .dashicon {
 	transform: rotate( 90deg );
 }
-	
+
 // Popout menu
 .editor-block-settings-menu__popover {
-	z-index: z-index( '.editor-block-settings-menu__popover' );
-
 	&:before,
 	&:after {
 		margin-left: 2px;
@@ -72,9 +87,8 @@
 		cursor: pointer;
 		@include menu-style__neutral;
 
-		&:hover,
-		&:focus,
-		&:not(:disabled):hover {
+		&:hover:not(:disabled):not([aria-disabled="true"]),
+		&:focus:not(:disabled):not([aria-disabled="true"]) {
 			@include menu-style__focus;
 		}
 

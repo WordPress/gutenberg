@@ -76,13 +76,11 @@ class Sandbox extends Component {
 			return;
 		}
 
-		// sandboxing video content needs to explicitly set the height of the sandbox
-		// based on a 16:9 ratio for the content to be responsive
-		const heightCalculation = 'video' === this.props.type ? 'clientBoundingRect.width / 16 * 9' : 'clientBoundingRect.height';
-
 		const observeAndResizeJS = `
 			( function() {
 				var observer;
+				var aspectRatio = false;
+				var iframe = false;
 
 				if ( ! window.MutationObserver || ! document.body || ! window.parent ) {
 					return;
@@ -90,10 +88,22 @@ class Sandbox extends Component {
 
 				function sendResize() {
 					var clientBoundingRect = document.body.getBoundingClientRect();
+					var height = aspectRatio ? Math.ceil( clientBoundingRect.width / aspectRatio ) : clientBoundingRect.height;
+
+					if ( iframe && aspectRatio ) {
+						// This is embedded content delivered in an iframe with a fixed aspect ratio,
+						// so set the height correctly and stop processing. The DOM mutation will trigger
+						// another event and the resize message will get posted.
+						if ( iframe.height != height ) {
+							iframe.height = height;
+							return;
+						}
+					}
+
 					window.parent.postMessage( {
 						action: 'resize',
 						width: clientBoundingRect.width,
-						height: ${ heightCalculation }
+						height: height,
 					}, '*' );
 				}
 
@@ -129,18 +139,30 @@ class Sandbox extends Component {
 				document.body.style.width = '100%';
 				document.body.setAttribute( 'data-resizable-iframe-connected', '' );
 
+				// Make embedded content in an iframe with a fixed size responsive,
+				// keeping the correct aspect ratio.
+				var potentialIframe = document.body.children[0];
+				if ( 'DIV' === potentialIframe.tagName || 'SPAN' === potentialIframe.tagName ) {
+						potentialIframe = potentialIframe.children[0];
+					}
+				if ( 'IFRAME' === potentialIframe.tagName ) {
+					if ( potentialIframe.width ) {
+						iframe = potentialIframe;
+						aspectRatio = potentialIframe.width / potentialIframe.height;
+						potentialIframe.width = '100%';
+					}
+				}					
+
 				sendResize();
+
+				// Resize events can change the width of elements with 100% width, but we don't
+				// get an DOM mutations for that, so do the resize when the window is resized, too.
+				window.addEventListener( 'resize', sendResize, true );
 		} )();`;
 
 		const style = `
 			body {
 				margin: 0;
-			}
-			body.video,
-			body.video > div,
-			body.video > div > iframe {
-				width: 100%;
-				height: 100%;
 			}
 			body > div > iframe {
 				width: 100%;

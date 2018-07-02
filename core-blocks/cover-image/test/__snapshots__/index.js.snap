@@ -2,7 +2,7 @@
 
 exports[`core/cover-image block edit matches snapshot 1`] = `
 <div
-  class="components-placeholder wp-block-cover-image"
+  class="components-placeholder editor-media-placeholder wp-block-cover-image"
 >
   <div
     class="components-placeholder__label"
@@ -26,7 +26,7 @@ exports[`core/cover-image block edit matches snapshot 1`] = `
   <div
     class="components-placeholder__instructions"
   >
-    Drag image here or add from media library
+    Drag an image, upload a new one or select a file from your library.
   </div>
   <div
     class="components-placeholder__fieldset"
@@ -62,7 +62,7 @@ exports[`core/cover-image block edit matches snapshot 1`] = `
       class="components-form-file-upload"
     >
       <button
-        class="components-button components-icon-button wp-block-image__upload-button button button-large"
+        class="components-button components-icon-button editor-media-placeholder__upload-button is-button is-default is-large"
         type="button"
       >
         <svg

@@ -2,7 +2,7 @@
 
 exports[`core/list block edit matches snapshot 1`] = `
 <div
-  class="blocks-list editor-rich-text"
+  class="core-blocks-list editor-rich-text"
 >
   <div>
     <div>
@@ -17,6 +17,7 @@ exports[`core/list block edit matches snapshot 1`] = `
           class="editor-rich-text__tinymce"
           contenteditable="true"
           data-is-placeholder-visible="true"
+          role="textbox"
         />
         <ul
           class="editor-rich-text__tinymce"

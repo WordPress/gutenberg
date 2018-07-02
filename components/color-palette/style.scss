@@ -144,3 +144,8 @@ $color-palette-circle-spacing: 14px;
 
 	background-clip: content-box, content-box, content-box, content-box, content-box, content-box, padding-box, padding-box, padding-box, padding-box, padding-box, padding-box;
 }
+
+.components-color-palette__picker:not(.is-mobile) .components-popover__content {
+	// ChromePicker has a hardcoded width of 225px, so we need to override the popover min-width.
+	min-width: 225px;
+}

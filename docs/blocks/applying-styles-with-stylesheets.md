@@ -100,7 +100,7 @@ function gutenberg_boilerplate_block() {
 	wp_register_style(
 		'gutenberg-boilerplate-es5-step02',
 		plugins_url( 'step-02/style.css', __FILE__ ),
-		array( 'wp-blocks' ),
+		array(),
 		filemtime( plugin_dir_path( __FILE__ ) . 'step-02/style.css' )
 	);
 

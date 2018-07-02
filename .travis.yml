@@ -20,6 +20,7 @@ cache:
 
 before_install:
   - nvm install && nvm use
+  - npm install npm -g
 
 branches:
   only:

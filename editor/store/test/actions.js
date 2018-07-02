@@ -30,7 +30,6 @@ import {
 	savePost,
 	trashPost,
 	mergeBlocks,
-	autosave,
 	redo,
 	undo,
 	removeBlocks,
@@ -49,12 +48,12 @@ describe( 'actions', () => {
 	describe( 'setupEditor', () => {
 		it( 'should return the SETUP_EDITOR action', () => {
 			const post = {};
-			const settings = {};
-			const result = setupEditor( post, settings );
+			const autosave = {};
+			const result = setupEditor( post, autosave );
 			expect( result ).toEqual( {
 				type: 'SETUP_EDITOR',
 				post,
-				settings,
+				autosave,
 			} );
 		} );
 	} );
@@ -245,6 +244,14 @@ describe( 'actions', () => {
 		it( 'should return REQUEST_POST_UPDATE action', () => {
 			expect( savePost() ).toEqual( {
 				type: 'REQUEST_POST_UPDATE',
+				options: {},
+			} );
+		} );
+
+		it( 'should pass through options argument', () => {
+			expect( savePost( { autosave: true } ) ).toEqual( {
+				type: 'REQUEST_POST_UPDATE',
+				options: { autosave: true },
 			} );
 		} );
 	} );
@@ -268,14 +275,6 @@ describe( 'actions', () => {
 			expect( mergeBlocks( blockAUid, blockBUid ) ).toEqual( {
 				type: 'MERGE_BLOCKS',
 				blocks: [ blockAUid, blockBUid ],
-			} );
-		} );
-	} );
-
-	describe( 'autosave', () => {
-		it( 'should return AUTOSAVE action', () => {
-			expect( autosave() ).toEqual( {
-				type: 'AUTOSAVE',
 			} );
 		} );
 	} );
@@ -469,43 +468,48 @@ describe( 'actions', () => {
 		} );
 
 		it( 'should take an optional id argument', () => {
-			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-			expect( fetchSharedBlocks( id ) ).toEqual( {
+			expect( fetchSharedBlocks( 123 ) ).toEqual( {
 				type: 'FETCH_SHARED_BLOCKS',
-				id,
+				id: 123,
 			} );
 		} );
 	} );
 
 	describe( 'saveSharedBlock', () => {
-		const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-		expect( saveSharedBlock( id ) ).toEqual( {
-			type: 'SAVE_SHARED_BLOCK',
-			id,
+		it( 'should return the SAVE_SHARED_BLOCK action', () => {
+			expect( saveSharedBlock( 123 ) ).toEqual( {
+				type: 'SAVE_SHARED_BLOCK',
+				id: 123,
+			} );
 		} );
 	} );
 
 	describe( 'deleteSharedBlock', () => {
-		const id = 123;
-		expect( deleteSharedBlock( id ) ).toEqual( {
-			type: 'DELETE_SHARED_BLOCK',
-			id,
+		it( 'should return the DELETE_SHARED_BLOCK action', () => {
+			expect( deleteSharedBlock( 123 ) ).toEqual( {
+				type: 'DELETE_SHARED_BLOCK',
+				id: 123,
+			} );
 		} );
 	} );
 
 	describe( 'convertBlockToStatic', () => {
-		const uid = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-		expect( convertBlockToStatic( uid ) ).toEqual( {
-			type: 'CONVERT_BLOCK_TO_STATIC',
-			uid,
+		it( 'should return the CONVERT_BLOCK_TO_STATIC action', () => {
+			const uid = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			expect( convertBlockToStatic( uid ) ).toEqual( {
+				type: 'CONVERT_BLOCK_TO_STATIC',
+				uid,
+			} );
 		} );
 	} );
 
 	describe( 'convertBlockToShared', () => {
-		const uid = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-		expect( convertBlockToShared( uid ) ).toEqual( {
-			type: 'CONVERT_BLOCK_TO_SHARED',
-			uid,
+		it( 'should return the CONVERT_BLOCK_TO_SHARED action', () => {
+			const uid = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			expect( convertBlockToShared( uid ) ).toEqual( {
+				type: 'CONVERT_BLOCK_TO_SHARED',
+				uid,
+			} );
 		} );
 	} );
 

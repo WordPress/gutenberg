@@ -9,7 +9,7 @@ import Textarea from 'react-autosize-textarea';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/utils';
 import { Component, compose, Fragment } from '@wordpress/element';
-import { parse, withEditorSettings } from '@wordpress/blocks';
+import { parse } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withInstanceId } from '@wordpress/components';
 
@@ -17,6 +17,21 @@ import { withInstanceId } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
+
+/**
+ * Returns the PostTextEditor state given a set of props.
+ *
+ * @param {Object} props Component props.
+ *
+ * @return {Object} State object.
+ */
+function computeDerivedState( props ) {
+	return {
+		persistedValue: props.value,
+		value: props.value,
+		isDirty: false,
+	};
+}
 
 class PostTextEditor extends Component {
 	constructor() {
@@ -32,12 +47,14 @@ class PostTextEditor extends Component {
 		};
 	}
 
-	componentWillReceiveProps( nextProps ) {
+	static getDerivedPropsFromState( props, state ) {
 		// If we receive a new value while we're editing (but before we've made
 		// changes), go ahead and clobber the local state
-		if ( this.props.value !== nextProps.value && this.state.value && ! this.state.isDirty ) {
-			this.setState( { value: nextProps.value } );
+		if ( state.persistedValue !== props.value && ! state.isDirty ) {
+			return computeDerivedState( props );
 		}
+
+		return null;
 	}
 
 	startEditing() {
@@ -85,9 +102,14 @@ class PostTextEditor extends Component {
 }
 
 export default compose( [
-	withSelect( ( select ) => ( {
-		value: select( 'core/editor' ).getEditedPostContent(),
-	} ) ),
+	withSelect( ( select ) => {
+		const { getEditedPostContent, getEditorSettings } = select( 'core/editor' );
+		const { bodyPlaceholder } = getEditorSettings();
+		return {
+			value: getEditedPostContent(),
+			placeholder: bodyPlaceholder,
+		};
+	} ),
 	withDispatch( ( dispatch ) => {
 		const { editPost, resetBlocks, checkTemplateValidity } = dispatch( 'core/editor' );
 		return {
@@ -100,8 +122,5 @@ export default compose( [
 			},
 		};
 	} ),
-	withEditorSettings( ( settings ) => ( {
-		placeholder: settings.bodyPlaceholder,
-	} ) ),
 	withInstanceId,
 ] )( PostTextEditor );

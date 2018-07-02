@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import classnames from 'classnames';
 import { get } from 'lodash';
 
 /**
@@ -8,9 +9,10 @@ import { get } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/element';
-import { getDefaultBlockName, withEditorSettings } from '@wordpress/blocks';
+import { getDefaultBlockName } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { DotTip } from '@wordpress/nux';
 
 /**
  * Internal dependencies
@@ -28,6 +30,7 @@ export function DefaultBlockAppender( {
 	placeholder,
 	layout,
 	rootUID,
+	hasTip,
 } ) {
 	if ( isLocked || ! isVisible ) {
 		return null;
@@ -38,7 +41,9 @@ export function DefaultBlockAppender( {
 	return (
 		<div
 			data-root-uid={ rootUID || '' }
-			className="editor-default-block-appender">
+			className={ classnames( 'editor-default-block-appender', {
+				'has-tip': hasTip,
+			} ) }>
 			<BlockDropZone rootUID={ rootUID } layout={ layout } />
 			<input
 				role="button"
@@ -52,23 +57,30 @@ export function DefaultBlockAppender( {
 				value={ showPrompt ? value : '' }
 			/>
 			<InserterWithShortcuts rootUID={ rootUID } layout={ layout } />
-			<Inserter position="top right" />
+			<Inserter position="top right">
+				<DotTip id="core/editor.inserter">
+					{ __( 'Welcome to the wonderful world of blocks! Click the “+” (“Add block”) button to add a new block. There are blocks available for all kind of content: you can insert text, headings, images, lists, and lots more!' ) }
+				</DotTip>
+			</Inserter>
 		</div>
 	);
 }
 export default compose(
 	withSelect( ( select, ownProps ) => {
-		const {
-			getBlockCount,
-			getBlock,
-		} = select( 'core/editor' );
+		const { getBlockCount, getBlock, getEditorSettings } = select( 'core/editor' );
+		const { isTipVisible } = select( 'core/nux' );
+
 		const isEmpty = ! getBlockCount( ownProps.rootUID );
 		const lastBlock = getBlock( ownProps.lastBlockUID );
 		const isLastBlockDefault = get( lastBlock, [ 'name' ] ) === getDefaultBlockName();
+		const { templateLock, bodyPlaceholder } = getEditorSettings();
 
 		return {
 			isVisible: isEmpty || ! isLastBlockDefault,
 			showPrompt: isEmpty,
+			isLocked: !! templateLock,
+			placeholder: bodyPlaceholder,
+			hasTip: isTipVisible( 'core/editor.inserter' ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
@@ -76,9 +88,12 @@ export default compose(
 			insertDefaultBlock,
 			startTyping,
 		} = dispatch( 'core/editor' );
+
+		const { dismissTip } = dispatch( 'core/nux' );
+
 		return {
 			onAppend() {
-				const { layout, rootUID } = ownProps;
+				const { layout, rootUID, hasTip } = ownProps;
 
 				let attributes;
 				if ( layout ) {
@@ -87,15 +102,11 @@ export default compose(
 
 				insertDefaultBlock( attributes, rootUID );
 				startTyping();
-			},
-		};
-	} ),
-	withEditorSettings( ( settings ) => {
-		const { templateLock, bodyPlaceholder } = settings;
 
-		return {
-			isLocked: !! templateLock,
-			placeholder: bodyPlaceholder,
+				if ( hasTip ) {
+					dismissTip( 'core/editor.inserter' );
+				}
+			},
 		};
 	} ),
 )( DefaultBlockAppender );

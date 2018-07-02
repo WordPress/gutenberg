@@ -33,6 +33,21 @@ export function getBlockDefaultClassName( blockName ) {
 }
 
 /**
+ * Returns the block's default menu item classname from its name.
+ *
+ * @param {string} blockName The block name.
+ *
+ * @return {string} The block's default menu item class.
+ */
+export function getBlockMenuDefaultClassName( blockName ) {
+	// Generated HTML classes for blocks follow the `editor-block-list-item-{name}` nomenclature.
+	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (used in 'core-embed/').
+	const className = 'editor-block-list-item-' + blockName.replace( /\//, '-' ).replace( /^core-/, '' );
+
+	return applyFilters( 'blocks.getBlockMenuDefaultClassName', className, blockName );
+}
+
+/**
  * Given a block type containing a save render implementation and attributes, returns the
  * enhanced element to be saved or string when raw HTML expected.
  *
@@ -149,12 +164,29 @@ export function getCommentAttributes( allAttributes, blockType ) {
 	return attributes;
 }
 
-export function serializeAttributes( attrs ) {
-	return JSON.stringify( attrs )
-		.replace( /--/g, '\\u002d\\u002d' ) // don't break HTML comments
-		.replace( /</g, '\\u003c' ) // don't break standard-non-compliant tools
-		.replace( />/g, '\\u003e' ) // ibid
-		.replace( /&/g, '\\u0026' ); // ibid
+/**
+ * Given an attributes object, returns a string in the serialized attributes
+ * format prepared for post content.
+ *
+ * @param {Object} attributes Attributes object.
+ *
+ * @return {string} Serialized attributes.
+ */
+export function serializeAttributes( attributes ) {
+	return JSON.stringify( attributes )
+		// Don't break HTML comments.
+		.replace( /--/g, '\\u002d\\u002d' )
+
+		// Don't break non-standard-compliant tools.
+		.replace( /</g, '\\u003c' )
+		.replace( />/g, '\\u003e' )
+		.replace( /&/g, '\\u0026' )
+
+		// Bypass server stripslashes behavior which would unescape stringify's
+		// escaping of quotation mark.
+		//
+		// See: https://developer.wordpress.org/reference/functions/wp_kses_stripslashes/
+		.replace( /\\"/g, '\\u0022' );
 }
 
 /**

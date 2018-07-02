@@ -3,7 +3,7 @@
  */
 import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { withState, SandBox, CodeEditor } from '@wordpress/components';
+import { withState, Disabled, SandBox, CodeEditor } from '@wordpress/components';
 import { getPhrasingContentSchema } from '@wordpress/blocks';
 import { BlockControls } from '@wordpress/editor';
 
@@ -17,7 +17,7 @@ export const name = 'core/html';
 export const settings = {
 	title: __( 'Custom HTML' ),
 
-	description: __( 'Add custom HTML code and preview it right here in the editor.' ),
+	description: __( 'Add your own HTML (and view it right here as you edit!).' ),
 
 	icon: 'html',
 
@@ -61,35 +61,39 @@ export const settings = {
 	},
 
 	edit: withState( {
-		preview: false,
-	} )( ( { attributes, setAttributes, setState, isSelected, toggleSelection, preview } ) => (
+		isPreview: false,
+	} )( ( { attributes, setAttributes, setState, isSelected, toggleSelection, isPreview } ) => (
 		<div className="wp-block-html">
 			<BlockControls>
 				<div className="components-toolbar">
 					<button
-						className={ `components-tab-button ${ ! preview ? 'is-active' : '' }` }
-						onClick={ () => setState( { preview: false } ) }
+						className={ `components-tab-button ${ ! isPreview ? 'is-active' : '' }` }
+						onClick={ () => setState( { isPreview: false } ) }
 					>
 						<span>HTML</span>
 					</button>
 					<button
-						className={ `components-tab-button ${ preview ? 'is-active' : '' }` }
-						onClick={ () => setState( { preview: true } ) }
+						className={ `components-tab-button ${ isPreview ? 'is-active' : '' }` }
+						onClick={ () => setState( { isPreview: true } ) }
 					>
 						<span>{ __( 'Preview' ) }</span>
 					</button>
 				</div>
 			</BlockControls>
-			{ preview ? (
-				<SandBox html={ attributes.content } />
-			) : (
-				<CodeEditor
-					value={ attributes.content }
-					focus={ isSelected }
-					onFocus={ toggleSelection }
-					onChange={ ( content ) => setAttributes( { content } ) }
-				/>
-			) }
+			<Disabled.Consumer>
+				{ ( isDisabled ) => (
+					( isPreview || isDisabled ) ? (
+						<SandBox html={ attributes.content } />
+					) : (
+						<CodeEditor
+							value={ attributes.content }
+							focus={ isSelected }
+							onFocus={ toggleSelection }
+							onChange={ ( content ) => setAttributes( { content } ) }
+						/>
+					)
+				) }
+			</Disabled.Consumer>
 		</div>
 	) ),
 

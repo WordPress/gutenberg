@@ -76,11 +76,11 @@
 	color: $dark-gray-900;
 	@include menu-style__neutral;
 
-	&:focus {
+	&:focus:not(:disabled):not([aria-disabled="true"]) {
 		@include menu-style__focus;
 	}
 
-	.dashicon {
+	.components-panel__arrow {
 		position: absolute;
 		right: $item-spacing;
 		top: 50%;
@@ -96,6 +96,11 @@
 		margin-top: -10px;
 	}
 	/* rtl:end:ignore */
+}
+
+.components-panel__icon {
+	color: $dark-gray-500;
+	margin: -2px 6px -2px 0;
 }
 
 .components-panel__body-toggle-icon {

@@ -29,7 +29,7 @@
 	flex-grow: 1;
 }
 
-.wp-core-ui .editor-post-publish-panel__toggle.button-primary {
+.components-button.editor-post-publish-panel__toggle.is-primary {
 	display: inline-flex;
 	align-items: center;
 
@@ -72,7 +72,7 @@
 	border-top: none;
 }
 
-.wp-core-ui .post-publish-panel__postpublish-buttons {
+.post-publish-panel__postpublish-buttons {
 	display: flex;
 	align-content: space-between;
 

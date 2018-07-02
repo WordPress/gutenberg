@@ -19,18 +19,18 @@ export default function MoreEdit( { attributes, setAttributes } ) {
 	const value = customText !== undefined ? customText : defaultText;
 
 	return (
-		<View className={ styles[ 'blocks-more-container' ] }>
-			<View className={ styles[ 'blocks-more-sub-container' ] }>
-				<Text className={ styles[ 'blocks-more-left-marker' ] }>&lt;!--</Text>
+		<View className={ styles[ 'core-blocks-more__container' ] }>
+			<View className={ styles[ 'core-blocks-more__sub-container' ] }>
+				<Text className={ styles[ 'core-blocks-more__left-marker' ] }>&lt;!--</Text>
 				<PlainText
-					className={ styles[ 'blocks-more-plain-text' ] }
+					className={ styles[ 'core-blocks-more__plain-text' ] }
 					value={ value }
 					multiline={ true }
 					underlineColorAndroid="transparent"
 					onChange={ ( newValue ) => setAttributes( { customText: newValue } ) }
 					placeholder={ defaultText }
 				/>
-				<Text className={ styles[ 'blocks-more-right-marker' ] }>--&gt;</Text>
+				<Text className={ styles[ 'core-blocks-more__right-marker' ] }>--&gt;</Text>
 			</View>
 		</View> );
 }

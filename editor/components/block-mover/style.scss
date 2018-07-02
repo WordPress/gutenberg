@@ -14,17 +14,27 @@
 	border: none;
 	outline: none;
 	background: none;
-	color: $dark-gray-300;
 	cursor: pointer;
 	padding: 0;
 	width: $block-side-ui-width;
 	height: $block-side-ui-width;	// the side UI can be no taller than 2 * $block-side-ui-width, which matches the height of a line of text
 	border-radius: $button-style__radius-roundrect;
 
+	// use opacity to work in various editor styles
+	color: $dark-opacity-300;
+
+	.is-dark-theme & {
+		color: $light-opacity-300;
+	}
+
 	&[aria-disabled="true"] {
 		cursor: default;
-		color: $light-gray-300;
 		pointer-events: none;
+		color: $dark-opacity-light-300; // use opacity to work in various editor styles
+
+		.is-dark-theme & {
+			color: $light-opacity-light-300;
+		}
 	}
 
 	svg {
@@ -37,15 +47,17 @@
 	@include break-small() {
 		.editor-block-list__layout .editor-block-list__layout & {
 			background: $white;
-			border-color: $light-gray-500;
-			border-style: solid;
-			border-width: 1px;
+			box-shadow: inset 0 0 0 1px $light-gray-500;
 
 			&:first-child {
-				border-width: 1px 1px 0 1px;
+				margin-bottom: -1px;
 			}
-			&:last-child {
-				border-width: 0 1px 1px 1px;
+		
+			&:hover,
+			&:active,
+			&:focus {
+				// Buttons are stacked with overlapping border to look like a unit, so elevate on interactions.
+				z-index: z-index( '.editor-block-mover__control' );
 			}
 		}
 	}

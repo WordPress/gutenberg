@@ -22,6 +22,9 @@ export function Button( props, ref ) {
 		isSmall,
 		isToggled,
 		isBusy,
+		isDefault,
+		isLink,
+		isDestructive,
 		className,
 		disabled,
 		focus,
@@ -29,12 +32,15 @@ export function Button( props, ref ) {
 	} = props;
 
 	const classes = classnames( 'components-button', className, {
-		button: ( isPrimary || isLarge || isSmall ),
-		'button-primary': isPrimary,
-		'button-large': isLarge,
-		'button-small': isSmall,
+		'is-button': isDefault || isPrimary || isLarge || isSmall,
+		'is-default': isDefault || isLarge || isSmall,
+		'is-primary': isPrimary,
+		'is-large': isLarge,
+		'is-small': isSmall,
 		'is-toggled': isToggled,
 		'is-busy': isBusy,
+		'is-link': isLink,
+		'is-destructive': isDestructive,
 	} );
 
 	const tag = href !== undefined && ! disabled ? 'a' : 'button';

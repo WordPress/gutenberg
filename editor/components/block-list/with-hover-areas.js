@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Component, findDOMNode, createHigherOrderComponent } from '@wordpress/element';
-import { withEditorSettings } from '@wordpress/blocks';
+import { withSelect } from '@wordpress/data';
 
 const withHoverAreas = createHigherOrderComponent( ( WrappedComponent ) => {
 	class WithHoverAreasComponent extends Component {
@@ -58,9 +58,9 @@ const withHoverAreas = createHigherOrderComponent( ( WrappedComponent ) => {
 		}
 	}
 
-	return withEditorSettings( ( { isRTL } ) => {
+	return withSelect( ( select ) => {
 		return {
-			isRTL,
+			isRTL: select( 'core/editor' ).getEditorSettings().isRTL,
 		};
 	} )( WithHoverAreasComponent );
 } );

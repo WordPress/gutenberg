@@ -5,7 +5,7 @@ exports[`core/pullquote block edit matches snapshot 1`] = `
   class="wp-block-pullquote"
 >
   <div
-    class="blocks-pullquote__content editor-rich-text"
+    class="core-blocks-pullquote__content editor-rich-text"
   >
     <div>
       <div>

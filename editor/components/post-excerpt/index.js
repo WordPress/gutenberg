@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { ExternalLink, withInstanceId } from '@wordpress/components';
+import { ExternalLink, TextareaControl } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/element';
 
@@ -11,17 +11,13 @@ import { compose } from '@wordpress/element';
  */
 import './style.scss';
 
-function PostExcerpt( { excerpt, onUpdateExcerpt, instanceId } ) {
-	const id = `editor-post-excerpt-${ instanceId }`;
-	const onChange = ( event ) => onUpdateExcerpt( event.target.value );
-
+function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
 	return (
-		<div>
-			<label key="label" htmlFor={ id }>{ __( 'Write an excerpt (optional)' ) }</label>
-			<textarea
-				id={ id }
+		<div className="editor-post-excerpt">
+			<TextareaControl
+				label={ __( 'Write an excerpt (optional)' ) }
 				className="editor-post-excerpt__textarea"
-				onChange={ onChange }
+				onChange={ ( value ) => onUpdateExcerpt( value ) }
 				value={ excerpt }
 			/>
 			<ExternalLink href="https://codex.wordpress.org/Excerpt">
@@ -34,7 +30,7 @@ function PostExcerpt( { excerpt, onUpdateExcerpt, instanceId } ) {
 export default compose( [
 	withSelect( ( select ) => {
 		return {
-			excerpt: select( 'core/editor' ).getEditedPostExcerpt(),
+			excerpt: select( 'core/editor' ).getEditedPostAttribute( 'excerpt' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
@@ -42,5 +38,4 @@ export default compose( [
 			dispatch( 'core/editor' ).editPost( { excerpt } );
 		},
 	} ) ),
-	withInstanceId,
 ] )( PostExcerpt );

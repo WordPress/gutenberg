@@ -11,12 +11,13 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
 import { FormTokenField, withAPIData } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
+import apiRequest from '@wordpress/api-request';
 
 /**
  * Module constants
  */
 const DEFAULT_QUERY = {
-	per_page: 100,
+	per_page: -1,
 	orderby: 'count',
 	order: 'desc',
 	_fields: 'id,name',
@@ -66,16 +67,16 @@ class FlatTermSelector extends Component {
 		invoke( this.searchRequest, [ 'abort' ] );
 	}
 
-	componentWillReceiveProps( newProps ) {
-		if ( newProps.terms !== this.props.terms ) {
-			this.updateSelectedTerms( newProps.terms );
+	componentDidUpdate( prevProps ) {
+		if ( prevProps.terms !== this.props.terms ) {
+			this.updateSelectedTerms( this.props.terms );
 		}
 	}
 
 	fetchTerms( params = {} ) {
 		const query = { ...DEFAULT_QUERY, ...params };
 		const basePath = wp.api.getTaxonomyRoute( this.props.slug );
-		const request = wp.apiRequest( { path: `/wp/v2/${ basePath }?${ stringify( query ) }` } );
+		const request = apiRequest( { path: `/wp/v2/${ basePath }?${ stringify( query ) }` } );
 		request.then( ( terms ) => {
 			this.setState( ( state ) => ( {
 				availableTerms: state.availableTerms.concat(
@@ -106,7 +107,7 @@ class FlatTermSelector extends Component {
 		return new Promise( ( resolve, reject ) => {
 			// Tries to create a term or fetch it if it already exists
 			const basePath = wp.api.getTaxonomyRoute( this.props.slug );
-			wp.apiRequest( {
+			apiRequest( {
 				path: `/wp/v2/${ basePath }`,
 				method: 'POST',
 				data: { name: termName },
@@ -114,7 +115,7 @@ class FlatTermSelector extends Component {
 				const errorCode = xhr.responseJSON && xhr.responseJSON.code;
 				if ( errorCode === 'term_exists' ) {
 					// search the new category created since last fetch
-					this.addRequest = wp.apiRequest( {
+					this.addRequest = apiRequest( {
 						path: `/wp/v2/${ basePath }?${ stringify( { ...DEFAULT_QUERY, search: termName } ) }`,
 					} );
 					return this.addRequest.then( ( searchResult ) => {
@@ -157,7 +158,12 @@ class FlatTermSelector extends Component {
 	}
 
 	render() {
-		const { slug, taxonomy } = this.props;
+		const { slug, taxonomy, hasAssignAction } = this.props;
+
+		if ( ! hasAssignAction ) {
+			return null;
+		}
+
 		const { loading, availableTerms, selectedTerms } = this.state;
 		const termNames = availableTerms.map( ( term ) => term.name );
 		const newTermPlaceholderLabel = get(
@@ -202,7 +208,10 @@ export default compose(
 		};
 	} ),
 	withSelect( ( select, ownProps ) => {
+		const { getCurrentPost } = select( 'core/editor' );
 		return {
+			hasCreateAction: get( getCurrentPost(), [ '_links', 'wp:action-create-' + ownProps.restBase ], false ),
+			hasAssignAction: get( getCurrentPost(), [ '_links', 'wp:action-assign-' + ownProps.restBase ], false ),
 			terms: select( 'core/editor' ).getEditedPostAttribute( ownProps.restBase ),
 		};
 	} ),

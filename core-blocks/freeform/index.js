@@ -7,15 +7,14 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import './editor.scss';
-import OldEditor from './old-editor';
+import edit from './edit';
 
 export const name = 'core/freeform';
 
 export const settings = {
 	title: __( 'Classic' ),
 
-	description: __( 'The classic editor, in block form.' ),
+	description: __( 'It\'s the classic WordPress editor and it\'s a block! Drop the editor right in.' ),
 
 	icon: 'editor-kitchensink',
 
@@ -33,7 +32,7 @@ export const settings = {
 		customClassName: false,
 	},
 
-	edit: OldEditor,
+	edit,
 
 	save( { attributes } ) {
 		const { content } = attributes;

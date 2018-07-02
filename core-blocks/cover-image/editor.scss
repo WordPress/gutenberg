@@ -21,11 +21,11 @@
 		color: inherit;
 	}
 
-	&.has-left-content .block-rich-text__inline-toolbar {
+	&.has-left-content .editor-rich-text__inline-toolbar {
 		justify-content: flex-start;
 	}
 
-	&.has-right-content .block-rich-text__inline-toolbar{
+	&.has-right-content .editor-rich-text__inline-toolbar{
 		justify-content: flex-end;
 	}
 }

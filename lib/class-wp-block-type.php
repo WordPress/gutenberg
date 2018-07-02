@@ -169,4 +169,23 @@ class WP_Block_Type {
 			$this->$property_name = $property_value;
 		}
 	}
+
+	/**
+	 * Get all available block attributes including possible layout attribute from Columns block.
+	 *
+	 * @return array Array of attributes.
+	 */
+	public function get_attributes() {
+		return is_array( $this->attributes ) ?
+			array_merge( $this->attributes, array(
+				'layout' => array(
+					'type' => 'string',
+				),
+			) ) :
+			array(
+				'layout' => array(
+					'type' => 'string',
+				),
+			);
+	}
 }

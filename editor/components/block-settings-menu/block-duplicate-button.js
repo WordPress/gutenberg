@@ -10,12 +10,11 @@ import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { cloneBlock, getBlockType, withEditorSettings } from '@wordpress/blocks';
+import { cloneBlock, hasBlockSupport } from '@wordpress/blocks';
 
 export function BlockDuplicateButton( { blocks, onDuplicate, onClick = noop, isLocked, small = false, role } ) {
 	const canDuplicate = every( blocks, ( block ) => {
-		const type = getBlockType( block.name );
-		return ! type.useOnce;
+		return hasBlockSupport( block.name, 'multiple', true );
 	} );
 	if ( isLocked || ! canDuplicate ) {
 		return null;
@@ -37,10 +36,15 @@ export function BlockDuplicateButton( { blocks, onDuplicate, onClick = noop, isL
 }
 
 export default compose(
-	withSelect( ( select, { uids, rootUID } ) => ( {
-		blocks: select( 'core/editor' ).getBlocksByUID( uids ),
-		index: select( 'core/editor' ).getBlockIndex( last( castArray( uids ) ), rootUID ),
-	} ) ),
+	withSelect( ( select, { uids, rootUID } ) => {
+		const { getBlocksByUID, getBlockIndex, getEditorSettings } = select( 'core/editor' );
+		const { templateLock } = getEditorSettings();
+		return {
+			blocks: getBlocksByUID( uids ),
+			index: getBlockIndex( last( castArray( uids ) ), rootUID ),
+			isLocked: !! templateLock,
+		};
+	} ),
 	withDispatch( ( dispatch, { blocks, index, rootUID } ) => ( {
 		onDuplicate() {
 			const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
@@ -54,11 +58,4 @@ export default compose(
 			}
 		},
 	} ) ),
-	withEditorSettings( ( settings ) => {
-		const { templateLock } = settings;
-
-		return {
-			isLocked: !! templateLock,
-		};
-	} ),
 )( BlockDuplicateButton );

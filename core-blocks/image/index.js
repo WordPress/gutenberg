@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -9,13 +14,13 @@ import {
 	getPhrasingContentSchema,
 } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
+import { createBlobURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import './editor.scss';
-import ImageBlock from './block';
+import edit from './edit';
 
 export const name = 'core/image';
 
@@ -61,7 +66,7 @@ const blockAttributes = {
 const imageSchema = {
 	img: {
 		attributes: [ 'src', 'alt' ],
-		classes: [ 'alignleft', 'aligncenter', 'alignright', 'alignnone' ],
+		classes: [ 'alignleft', 'aligncenter', 'alignright', 'alignnone', /^wp-image-\d+$/ ],
 	},
 };
 
@@ -84,7 +89,7 @@ const schema = {
 export const settings = {
 	title: __( 'Image' ),
 
-	description: __( 'Worth a thousand words.' ),
+	description: __( 'They\'re worth 1,000 words! Insert a single image.' ),
 
 	icon: 'format-image',
 
@@ -101,10 +106,15 @@ export const settings = {
 				isMatch: ( node ) => node.nodeName === 'FIGURE' && !! node.querySelector( 'img' ),
 				schema,
 				transform: ( node ) => {
-					const matches = /align(left|center|right)/.exec( node.className );
-					const align = matches ? matches[ 1 ] : undefined;
+					// Search both figure and image classes. Alignment could be
+					// set on either. ID is set on the image.
+					const className = node.className + ' ' + node.querySelector( 'img' ).className;
+					const alignMatches = /(?:^|\s)align(left|center|right)(?:$|\s)/.exec( className );
+					const align = alignMatches ? alignMatches[ 1 ] : undefined;
+					const idMatches = /(?:^|\s)wp-image-(\d+)(?:$|\s)/.exec( className );
+					const id = idMatches ? idMatches[ 1 ] : undefined;
 					const blockType = getBlockType( 'core/image' );
-					const attributes = getBlockAttributes( blockType, node.outerHTML, { align } );
+					const attributes = getBlockAttributes( blockType, node.outerHTML, { align, id } );
 					return createBlock( 'core/image', attributes );
 				},
 			},
@@ -119,7 +129,7 @@ export const settings = {
 					// It's already done as part of the `componentDidMount`
 					// int the image block
 					const block = createBlock( 'core/image', {
-						url: window.URL.createObjectURL( file ),
+						url: createBlobURL( file ),
 					} );
 
 					return block;
@@ -180,10 +190,15 @@ export const settings = {
 		}
 	},
 
-	edit: ImageBlock,
+	edit,
 
 	save( { attributes } ) {
 		const { url, alt, caption, align, href, width, height, id } = attributes;
+
+		const classes = classnames( {
+			[ `align${ align }` ]: align,
+			'is-resized': width || height,
+		} );
 
 		const image = (
 			<img
@@ -196,7 +211,7 @@ export const settings = {
 		);
 
 		return (
-			<figure className={ align ? `align${ align }` : null }>
+			<figure className={ classes }>
 				{ href ? <a href={ href }>{ image }</a> : image }
 				{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
 			</figure>
@@ -204,6 +219,29 @@ export const settings = {
 	},
 
 	deprecated: [
+		{
+			attributes: blockAttributes,
+			save( { attributes } ) {
+				const { url, alt, caption, align, href, width, height, id } = attributes;
+
+				const image = (
+					<img
+						src={ url }
+						alt={ alt }
+						className={ id ? `wp-image-${ id }` : null }
+						width={ width }
+						height={ height }
+					/>
+				);
+
+				return (
+					<figure className={ align ? `align${ align }` : null } >
+						{ href ? <a href={ href }>{ image }</a> : image }
+						{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
+					</figure>
+				);
+			},
+		},
 		{
 			attributes: blockAttributes,
 			save( { attributes } ) {

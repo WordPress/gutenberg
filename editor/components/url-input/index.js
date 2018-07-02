@@ -10,11 +10,11 @@ import { stringify } from 'querystringify';
  * WordPress dependencies
  */
 import { __, sprintf, _n } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
-import { keycodes, decodeEntities } from '@wordpress/utils';
-import { Spinner, withInstanceId, withSpokenMessages } from '@wordpress/components';
-
-const { UP, DOWN, ENTER } = keycodes;
+import { Component, Fragment } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/utils';
+import { UP, DOWN, ENTER } from '@wordpress/keycodes';
+import { Spinner, withInstanceId, withSpokenMessages, Popover } from '@wordpress/components';
+import apiRequest from '@wordpress/api-request';
 
 // Since URLInput is rendered in the context of other inputs, but should be
 // considered a separate modal node, prevent keyboard events from propagating
@@ -68,7 +68,7 @@ class UrlInput extends Component {
 			selectedSuggestion: null,
 			loading: true,
 		} );
-		this.suggestionsRequest = wp.apiRequest( {
+		this.suggestionsRequest = apiRequest( {
 			path: `/wp/v2/posts?${ stringify( {
 				search: value,
 				per_page: 20,
@@ -179,57 +179,60 @@ class UrlInput extends Component {
 	}
 
 	render() {
-		const { value = '', instanceId } = this.props;
+		const { value = '', autoFocus = true, instanceId } = this.props;
 		const { showSuggestions, posts, selectedSuggestion, loading } = this.state;
 		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
-			<div className="editor-url-input">
-				<input
-					autoFocus
-					type="text"
-					aria-label={ __( 'URL' ) }
-					required
-					value={ value }
-					onChange={ this.onChange }
-					onInput={ stopEventPropagation }
-					placeholder={ __( 'Paste URL or type' ) }
-					onKeyDown={ this.onKeyDown }
-					role="combobox"
-					aria-expanded={ showSuggestions }
-					aria-autocomplete="list"
-					aria-owns={ `editor-url-input-suggestions-${ instanceId }` }
-					aria-activedescendant={ selectedSuggestion !== null ? `editor-url-input-suggestion-${ instanceId }-${ selectedSuggestion }` : undefined }
-				/>
+			<Fragment>
+				<div className="editor-url-input">
+					<input
+						autoFocus={ autoFocus }
+						type="text"
+						aria-label={ __( 'URL' ) }
+						required
+						value={ value }
+						onChange={ this.onChange }
+						onInput={ stopEventPropagation }
+						placeholder={ __( 'Paste URL or type' ) }
+						onKeyDown={ this.onKeyDown }
+						role="combobox"
+						aria-expanded={ showSuggestions }
+						aria-autocomplete="list"
+						aria-owns={ `editor-url-input-suggestions-${ instanceId }` }
+						aria-activedescendant={ selectedSuggestion !== null ? `editor-url-input-suggestion-${ instanceId }-${ selectedSuggestion }` : undefined }
+					/>
 
-				{ ( loading ) && <Spinner /> }
+					{ ( loading ) && <Spinner /> }
+				</div>
 
 				{ showSuggestions && !! posts.length &&
-					<div
-						id={ `editor-url-input-suggestions-${ instanceId }` }
-						tabIndex="-1"
-						className="editor-url-input__suggestions"
-						ref={ this.bindListNode }
-						role="listbox"
-					>
-						{ posts.map( ( post, index ) => (
-							<button
-								key={ post.id }
-								role="option"
-								tabIndex="-1"
-								id={ `editor-url-input-suggestion-${ instanceId }-${ index }` }
-								ref={ this.bindSuggestionNode( index ) }
-								className={ classnames( 'editor-url-input__suggestion', {
-									'is-selected': index === selectedSuggestion,
-								} ) }
-								onClick={ () => this.selectLink( post.link ) }
-								aria-selected={ index === selectedSuggestion }
-							>
-								{ decodeEntities( post.title.rendered ) || __( '(no title)' ) }
-							</button>
-						) ) }
-					</div>
+					<Popover position="bottom" noArrow focusOnMount={ false }>
+						<div
+							className="editor-url-input__suggestions"
+							id={ `editor-url-input-suggestions-${ instanceId }` }
+							ref={ this.bindListNode }
+							role="listbox"
+						>
+							{ posts.map( ( post, index ) => (
+								<button
+									key={ post.id }
+									role="option"
+									tabIndex="-1"
+									id={ `editor-url-input-suggestion-${ instanceId }-${ index }` }
+									ref={ this.bindSuggestionNode( index ) }
+									className={ classnames( 'editor-url-input__suggestion', {
+										'is-selected': index === selectedSuggestion,
+									} ) }
+									onClick={ () => this.selectLink( post.link ) }
+									aria-selected={ index === selectedSuggestion }
+								>
+									{ decodeEntities( post.title.rendered ) || __( '(no title)' ) }
+								</button>
+							) ) }
+						</div>
+					</Popover>
 				}
-			</div>
+			</Fragment>
 		);
 		/* eslint-enable jsx-a11y/no-autofocus */
 	}

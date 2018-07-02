@@ -9,6 +9,7 @@ import { reduce, some } from 'lodash';
 import { select, subscribe } from '@wordpress/data';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
+import apiRequest from '@wordpress/api-request';
 
 /**
  * Internal dependencies
@@ -52,12 +53,24 @@ const effects = {
 		}, {} );
 		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
 
-		// Saving metaboxes when saving posts
-		subscribe( onChangeListener( select( 'core/editor' ).isSavingPost, ( isSavingPost ) => {
-			if ( ! isSavingPost ) {
+		let wasSavingPost = select( 'core/editor' ).isSavingPost();
+		let wasAutosavingPost = select( 'core/editor' ).isAutosavingPost();
+		// Save metaboxes when performing a full save on the post.
+		subscribe( () => {
+			const isSavingPost = select( 'core/editor' ).isSavingPost();
+			const isAutosavingPost = select( 'core/editor' ).isAutosavingPost();
+
+			// Save metaboxes on save completion when past save wasn't an autosave.
+			const shouldTriggerMetaboxesSave = wasSavingPost && ! wasAutosavingPost && ! isSavingPost && ! isAutosavingPost;
+
+			// Save current state for next inspection.
+			wasSavingPost = isSavingPost;
+			wasAutosavingPost = isAutosavingPost;
+
+			if ( shouldTriggerMetaboxesSave ) {
 				store.dispatch( requestMetaBoxUpdates() );
 			}
-		} ) );
+		} );
 	},
 	REQUEST_META_BOX_UPDATES( action, store ) {
 		const state = store.getState();
@@ -98,7 +111,7 @@ const effects = {
 		additionalData.forEach( ( [ key, value ] ) => formData.append( key, value ) );
 
 		// Save the metaboxes
-		wp.apiRequest( {
+		apiRequest( {
 			url: window._wpMetaBoxUrl,
 			method: 'POST',
 			processData: false,
@@ -127,25 +140,28 @@ const effects = {
 			} )
 		);
 
-		// Collapse sidebar when viewport shrinks.
-		subscribe( onChangeListener(
-			() => select( 'core/viewport' ).isViewportMatch( '< medium' ),
-			( () => {
-				// contains the sidebar we close when going to viewport sizes lower than medium.
-				// This allows to reopen it when going again to viewport sizes greater than medium.
-				let sidebarToReOpenOnExpand = null;
-				return ( isSmall ) => {
-					if ( isSmall ) {
-						sidebarToReOpenOnExpand = getActiveGeneralSidebarName( store.getState() );
-						if ( sidebarToReOpenOnExpand ) {
-							store.dispatch( closeGeneralSidebar() );
-						}
-					} else if ( sidebarToReOpenOnExpand && ! getActiveGeneralSidebarName( store.getState() ) ) {
-						store.dispatch( openGeneralSidebar( sidebarToReOpenOnExpand ) );
+		const isMobileViewPort = () => select( 'core/viewport' ).isViewportMatch( '< medium' );
+		const adjustSidebar = ( () => {
+			// contains the sidebar we close when going to viewport sizes lower than medium.
+			// This allows to reopen it when going again to viewport sizes greater than medium.
+			let sidebarToReOpenOnExpand = null;
+			return ( isSmall ) => {
+				if ( isSmall ) {
+					sidebarToReOpenOnExpand = getActiveGeneralSidebarName( store.getState() );
+					if ( sidebarToReOpenOnExpand ) {
+						store.dispatch( closeGeneralSidebar() );
 					}
-				};
-			} )()
-		) );
+				} else if ( sidebarToReOpenOnExpand && ! getActiveGeneralSidebarName( store.getState() ) ) {
+					store.dispatch( openGeneralSidebar( sidebarToReOpenOnExpand ) );
+				}
+			};
+		} )();
+
+		adjustSidebar( isMobileViewPort() );
+
+		// Collapse sidebar when viewport shrinks.
+		// Reopen sidebar it if viewport expands and it was closed because of a previous shrink.
+		subscribe( onChangeListener( isMobileViewPort, adjustSidebar ) );
 	},
 
 };

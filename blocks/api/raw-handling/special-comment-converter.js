@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { remove, replace } from '@wordpress/utils';
+import { remove, replace } from '@wordpress/dom';
 
 /**
  * Browser dependencies

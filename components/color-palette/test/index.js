@@ -44,7 +44,7 @@ describe( 'ColorPalette', () => {
 	} );
 
 	test( 'should call onClick with undefined, when the clearButton onClick is triggered', () => {
-		const clearButton = wrapper.find( '.button-link.components-color-palette__clear' );
+		const clearButton = wrapper.find( '.components-color-palette__clear' );
 
 		expect( clearButton ).toHaveLength( 1 );
 

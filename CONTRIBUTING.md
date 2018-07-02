@@ -1,12 +1,20 @@
 # Contributing
 
+Thank you for thinking about contributing to WordPress' Gutenberg project! If you're unsure of anything, know that you're 💯 welcome to submit an issue or pull request on any topic. The worst that can happen is that you'll be politely directed to the best location to ask your question, or to change something in your pull request. We appreciate any sort of contribution, and don't want a wall of rules to get in the way of that.
+
+As with all WordPress projects, we want to ensure a welcoming environment for everyone. With that in mind, all contributors are expected to follow our [Code of Conduct](CODE_OF_CONDUCT.md).
+
+Before contributing, we encourage you to read our [Contributing Policy](CONTRIBUTING.md) (you're here already!) and our [Handbook](https://wordpress.org/gutenberg/handbook/). If you have any questions on any of these, please open an issue so we can help clarify them.
+
+All WordPress projects are [licensed under the GPLv2+](LICENSE.md), and all contributions to Gutenberg will be released under the GPLv2+ license. You maintain copyright over any contribution you make, and by submitting a pull request, you are agreeing to release that contribution under the GPLv2+ license.
+
 ## Getting Started
 
 Gutenberg is a Node.js-based project, built primarily in JavaScript.
 
-The easiest way to get started is by running the Local Environment setup script, `./bin/setup-local-env.sh`. This will check if you have everything installed and updated, and help you download any extra tools you need.
+The easiest way to get started (on MacOS, Linux, or Windows 10 with the Linux Subsystem) is by running the Local Environment setup script, `./bin/setup-local-env.sh`. This will check if you have everything installed and updated, and help you download any extra tools you need.
 
-If you prefer to set things up manually, be sure to have <a href="https://nodejs.org/en/">Node.js installed first</a>. You should be running a Node version matching the [current active LTS release](https://github.com/nodejs/Release#release-schedule) or newer for this plugin to work correctly. You can check your Node.js version by typing `node -v` in the Terminal prompt.
+For other version of Windows, or if you prefer to set things up manually, be sure to have <a href="https://nodejs.org/en/">Node.js installed first</a>. You should be running a Node version matching the [current active LTS release](https://github.com/nodejs/Release#release-schedule) or newer for this plugin to work correctly. You can check your Node.js version by typing `node -v` in the Terminal prompt.
 
 You should also have the latest release of <a href="https://npmjs.org">npm installed</a>, npm is a separate project from Node.js and is updated frequently. If you've just installed Node.js which includes a version of npm within the installation you most likely will need to also update your npm install. To update npm, type this into your terminal: `npm install npm@latest -g`
 
@@ -56,6 +64,46 @@ The workflow is documented in greater detail in the [repository management](./do
 
 Gutenberg contains both PHP and JavaScript code, and encourages testing and code style linting for both. It also incorporates end-to-end testing using [Google Puppeteer](https://developers.google.com/web/tools/puppeteer/). You can find out more details in [Testing Overview document](./docs/reference/testing-overview.md).
 
+## Releasing packages
+
+This repository uses [lerna](https://lernajs.io) to manage Gutenberg modules and publish them as packages to `npm`. Lerna automatically releases all the outdated packages. To check which packages are outdated and will be released, type `npm run publish:check`.
+
+If you have the ability to publish packages, you _must_ have [2FA enabled](https://docs.npmjs.com/getting-started/using-two-factor-authentication) on your npmjs.com account.
+
+### Before releasing
+
+Confirm that you're logged into `npm`, by running `npm whoami`. If you're not logged in, run `npm adduser` to login.
+
+If you're publishing a new package, ensure that its `package.json` file contains the correct `publishConfig` settings:
+
+```json
+	"publishConfig": {
+		"access": "public"
+	}
+```
+
+### Development release
+
+Run the following command to release a dev version of the outdated packages, replacing "123456" with your 2FA code. Make sure you're using a freshly generated 2FA code, rather than one that's about to timeout. This is a little cumbersome, but helps to prevent the release process from dying mid-deploy.
+
+```bash
+NPM_CONFIG_OTP=123456 npm run publish:dev
+```
+
+Lerna will ask you which version number you want to choose for each package. For a `dev` release, you'll more likely want to choose the "prerelease" option. Repeat the same for all the outdated packages and confirm your version updates.
+
+Lerna will then publish to `npm`, commit the `package.json` changes and create the git tags.
+
+### Production release
+
+To release a production version for the outdated packages, run the following command, replacing "123456" with your (freshly generated, as above) 2FA code:
+
+```bash
+NPM_CONFIG_OTP=123456 npm run publish:prod
+```
+
+Choose the correct version (minor, major or patch) and confirm your choices and let Lerna do its magic.
+
 ## How Designers Can Contribute
 
 If you'd like to contribute to the design or front-end, feel free to contribute to tickets labelled <a href="https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+label%3ADesign">Design</a>. We could use your thoughtful replies, mockups, animatics, sketches, doodles. Proposed changes are best done as minimal and specific iterations on the work that precedes it so we can compare. If you use <a href="https://www.sketchapp.com/">Sketch</a>, you can grab <a href="https://cloudup.com/cMPXM8Va2cy">the source file for the mockups</a> (updated April 6th).
@@ -72,10 +120,10 @@ Please see [SECURITY.md](./SECURITY.md).
 
 ## Localizing Gutenberg Plugin
 
-To translate Gutenburg in your locale or language, [select your locale here](https://translate.wordpress.org/projects/wp-plugins/gutenberg) and translate *Development* (which contains the plugin's string) and/or *Development Readme* (please translate what you see in the Details tab of the [plugin page](https://wordpress.org/plugins/gutenberg/)).
+To translate Gutenberg in your locale or language, [select your locale here](https://translate.wordpress.org/projects/wp-plugins/gutenberg) and translate *Development* (which contains the plugin's string) and/or *Development Readme* (please translate what you see in the Details tab of the [plugin page](https://wordpress.org/plugins/gutenberg/)).
 
 A Global Translation Editor (GTE) or Project Translation Editor (PTE) with suitable rights will process your translations in due time.
 
 Language packs are automatically generated once 95% of the plugin's strings are translated and approved for a locale.
 
-The eventual inclusion of Gutenburg into WordPress core means that more than 51% of WordPress installations running a translated WordPress installation will have Gutenburg's translated strings compiled into the core language pack as well.
+The eventual inclusion of Gutenberg into WordPress core means that more than 51% of WordPress installations running a translated WordPress installation will have Gutenberg's translated strings compiled into the core language pack as well.

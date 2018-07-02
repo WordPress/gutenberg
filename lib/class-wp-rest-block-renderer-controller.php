@@ -55,7 +55,7 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 							'description'          => sprintf( __( 'Attributes for %s block', 'gutenberg' ), $block_type->name ),
 							'type'                 => 'object',
 							'additionalProperties' => false,
-							'properties'           => $block_type->attributes,
+							'properties'           => $block_type->get_attributes(),
 						),
 						'post_id'    => array(
 							'description' => __( 'ID of the post context.', 'gutenberg' ),

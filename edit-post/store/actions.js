@@ -47,7 +47,7 @@ export function closePublishSidebar() {
 }
 
 /**
- * Returns an action object used in signalling that the user toggles the publish sidebar
+ * Returns an action object used in signalling that the user toggles the publish sidebar.
  *
  * @return {Object} Action object
  */
@@ -73,7 +73,7 @@ export function toggleGeneralSidebarEditorPanel( panel ) {
 /**
  * Returns an action object used to toggle a feature flag.
  *
- * @param {string} feature Featurre name.
+ * @param {string} feature Feature name.
  *
  * @return {Object} Action object.
  */
@@ -88,6 +88,20 @@ export function switchEditorMode( mode ) {
 	return {
 		type: 'SWITCH_MODE',
 		mode,
+	};
+}
+
+/**
+ * Returns an action object used to toggle a plugin name flag.
+ *
+ * @param {string} pluginName Plugin name.
+ *
+ * @return {Object} Action object.
+ */
+export function togglePinnedPluginItem( pluginName ) {
+	return {
+		type: 'TOGGLE_PINNED_PLUGIN_ITEM',
+		pluginName,
 	};
 }
 
@@ -125,7 +139,7 @@ export function requestMetaBoxUpdates() {
 }
 
 /**
- * Returns an action object used signal a successfull meta nox update.
+ * Returns an action object used signal a successful meta box update.
  *
  * @return {Object} Action object.
  */
@@ -136,7 +150,7 @@ export function metaBoxUpdatesSuccess() {
 }
 
 /**
- * Returns an action object used set the saved meta boxes data.
+ * Returns an action object used to set the saved meta boxes data.
  * This is used to check if the meta boxes have been touched when leaving the editor.
  *
  * @param   {Object} dataPerLocation Meta Boxes Data per location.

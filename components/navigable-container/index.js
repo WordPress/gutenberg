@@ -7,12 +7,8 @@ import { omit, noop, includes } from 'lodash';
  * WordPress Dependencies
  */
 import { Component } from '@wordpress/element';
-import { focus, keycodes } from '@wordpress/utils';
-
-/**
- * Module constants
- */
-const { UP, DOWN, LEFT, RIGHT, TAB } = keycodes;
+import { focus } from '@wordpress/dom';
+import { UP, DOWN, LEFT, RIGHT, TAB } from '@wordpress/keycodes';
 
 function cycleValue( value, total, offset ) {
 	const nextValue = value + offset;

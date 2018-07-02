@@ -94,3 +94,9 @@ This list is manually curated to include valuable contributions by volunteers th
 | @Cloud887 |
 | @hblackett |
 | @vishalkakadiya |
+| @c-shultz |
+| @nfmohit-wpmudev |
+| @noisysocks | @noisysocks |
+| @omarreiss | @omarreiss |
+| @hedgefield | @hedgefield |
+| @hideokamoto | @hideokamoto |

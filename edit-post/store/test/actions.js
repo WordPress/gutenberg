@@ -9,6 +9,7 @@ import {
 	closePublishSidebar,
 	togglePublishSidebar,
 	toggleFeature,
+	togglePinnedPluginItem,
 	requestMetaBoxUpdates,
 	initializeMetaBoxState,
 } from '../actions';
@@ -72,6 +73,17 @@ describe( 'actions', () => {
 			expect( toggleFeature( feature ) ).toEqual( {
 				type: 'TOGGLE_FEATURE',
 				feature,
+			} );
+		} );
+	} );
+
+	describe( 'togglePinnedPluginItem', () => {
+		it( 'should return TOGGLE_PINNED_PLUGIN_ITEM action', () => {
+			const pluginName = 'foo/bar';
+
+			expect( togglePinnedPluginItem( pluginName ) ).toEqual( {
+				type: 'TOGGLE_PINNED_PLUGIN_ITEM',
+				pluginName,
 			} );
 		} );
 	} );
