@@ -53,7 +53,8 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 				}
 			}
 
-			$author_url = get_comment_author_url( $comment );
+			$list_items_markup .= '<div class="comment-data"';
+			$author_url         = get_comment_author_url( $comment );
 			if ( empty( $author_url ) && ! empty( $comment->user_id ) ) {
 				$author_url = get_author_posts_url( $comment->user_id );
 			}
@@ -76,7 +77,7 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 			if ( $attributes['displayExcerpt'] ) {
 				$list_items_markup .= '<div class="wp-block-latest-comments__comment-excerpt">' . wpautop( get_comment_excerpt( $comment ) ) . '</div>';
 			}
-			$list_items_markup .= '</li>';
+			$list_items_markup .= '</div></li>';
 		}
 	}
 

@@ -16,8 +16,7 @@
 		list-style: none;
 		clear: both;
 
-		.wp-block-latest-comments__comment-excerpt,
-		.wp-block-latest-comments__comment-timestamp {
+		.comment-data {
 			margin-left: 52px;
 		}
 	}
@@ -34,17 +33,13 @@
 	}
 
 	.recentcomments {
-		line-height: 2;
+		line-height: 2.2;
 	}
 
 	&.has-timestamps,
 	&.has-excerpts {
 		.recentcomments {
 			line-height: 1.5;
-		}
-
-		.avatar {
-			margin-bottom: 20px;
 		}
 	}
 }
