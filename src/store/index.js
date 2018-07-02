@@ -5,7 +5,7 @@
 
 // Gutenberg imports
 import { registerCoreBlocks } from '@gutenberg/core-blocks';
-import { createBlock } from '@gutenberg/blocks';
+import { parse } from '@gutenberg/blocks';
 
 import { createStore } from 'redux';
 import { reducer } from './reducers';
@@ -26,13 +26,23 @@ export type StateType = {
 
 registerCoreBlocks();
 
-const codeBlockInstance = createBlock( 'core/code', {
-	content: 'if name == "World":\n    return "Hello World"\nelse:\n    return "Hello Pony"',
-} );
+const initialCodeBlockHtml = `
+<!-- wp:code -->
+<pre><code>if name == "World":
+    return "Hello World"
+else:
+    return "Hello Pony"</code></pre>
+<!-- /wp:code -->
+`;
 
-const moreBlockInstance = createBlock( 'core/more', {
-	customText: undefined,
-} );
+const initialMoreBlockHtml = `
+<!-- wp:more -->
+<!--more-->
+<!-- /wp:more -->
+`;
+
+const codeBlockInstance = parse( initialCodeBlockHtml )[ 0 ];
+const moreBlockInstance = parse( initialMoreBlockHtml )[ 0 ];
 
 const initialState: StateType = {
 	// TODO: get blocks list block state should be externalized (shared with Gutenberg at some point?).
