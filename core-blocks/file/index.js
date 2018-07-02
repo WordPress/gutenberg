@@ -16,7 +16,7 @@ export const name = 'core/file';
 export const settings = {
 	title: __( 'File' ),
 
-	description: __( 'Link to a file.' ),
+	description: __( 'Add a link to a file that visitors can download.' ),
 
 	icon: 'media-default',
 
