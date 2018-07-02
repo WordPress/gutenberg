@@ -15,6 +15,19 @@ This document is a checklist for building and releasing a new version of Gutenbe
 * Check that there's no work-in-progress that's just about to land. [Inform committers in `#core-editor` on Slack](https://make.wordpress.org/chat/) to hold off on merging any changes until after the release process is complete.
 * Merge the version bump PR.
 
+### For Patch Releases Done via `git cherry-pick`
+
+If you're creating a bugfix release which is cherry-picked instead of tagged from `master` (example: https://github.com/WordPress/gutenberg/compare/v3.1.0…v3.1.1), you should go about things a bit differently:
+
+1. Check out the last release (for example: `git checkout v3.1.0`).
+2. Cherry-pick commits (in chronological order) with `git cherry-pick [SHA]`.
+3. Tag this release and push it to GitHub:
+```bash
+git tag v3.1.1
+git push origin v3.1.1
+```
+4. Create a merge PR against master that only bumps the version number in `gutenberg.php`, `package.json`, and `package-lock.json`.
+
 ## Build the Release
 
 Note: The `1.x.0` notation `git` and `svn` commands should be replaced with the version number of the new release.
