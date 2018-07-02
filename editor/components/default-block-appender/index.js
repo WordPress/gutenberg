@@ -67,18 +67,18 @@ export function DefaultBlockAppender( {
 }
 export default compose(
 	withSelect( ( select, ownProps ) => {
-		const { getBlockCount, getBlock, getEditorSettings } = select( 'core/editor' );
+		const { getBlockCount, getBlock, getEditorSettings, getTemplateLock } = select( 'core/editor' );
 		const { isTipVisible } = select( 'core/nux' );
 
 		const isEmpty = ! getBlockCount( ownProps.rootUID );
 		const lastBlock = getBlock( ownProps.lastBlockUID );
 		const isLastBlockDefault = get( lastBlock, [ 'name' ] ) === getDefaultBlockName();
-		const { templateLock, bodyPlaceholder } = getEditorSettings();
+		const { bodyPlaceholder } = getEditorSettings();
 
 		return {
 			isVisible: isEmpty || ! isLastBlockDefault,
 			showPrompt: isEmpty,
-			isLocked: !! templateLock,
+			isLocked: !! getTemplateLock( ownProps.rootUID ),
 			placeholder: bodyPlaceholder,
 			hasTip: isTipVisible( 'core/editor.inserter' ),
 		};
