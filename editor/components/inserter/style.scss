@@ -82,6 +82,10 @@ $block-inserter-search-height: 38px;
 	position: relative;
 	z-index: 1; // Necessary for the stacked card below parent blocks to show up.
 
+	&:focus {
+		outline: 1px dotted $dark-gray-500;
+	}
+
 	@include break-medium {
 		height: $block-inserter-content-height + $block-inserter-tabs-height;
 	}
