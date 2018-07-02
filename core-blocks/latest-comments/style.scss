@@ -15,7 +15,8 @@
 		min-height: 36px;
 		list-style: none;
 
-		.wp-block-latest-comments__comment-excerpt {
+		.wp-block-latest-comments__comment-excerpt,
+		.wp-block-latest-comments__comment-timestamp {
 			margin-left: 52px;
 		}
 	}
@@ -32,13 +33,13 @@
 	}
 
 	.recentcomments {
-		line-height: 2.3;
+		line-height: 2;
 	}
 
 	&.has-timestamps,
 	&.has-excerpts {
 		.recentcomments {
-			line-height: 1.2;
+			line-height: 1.5;
 		}
 
 	}
@@ -56,5 +57,5 @@
 	height: 40px;
 	width: 40px;
 	border-radius: 24px;
-	margin-right: 12px;
+	margin: 0 12px 20px 0;
 }
