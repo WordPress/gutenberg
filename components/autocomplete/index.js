@@ -208,7 +208,6 @@ export class Autocomplete extends Component {
 			suppress: undefined,
 			open: undefined,
 			query: undefined,
-			range: undefined,
 			filteredOptions: [],
 		};
 	}
@@ -333,16 +332,25 @@ export class Autocomplete extends Component {
 
 	select( option ) {
 		const { onReplace } = this.props;
-		const { open, range, query } = this.state;
+		const { open, query } = this.state;
 		const { getOptionCompletion, name: completerName } = open || {};
 
 		if ( option.isDisabled ) {
 			return;
 		}
 
-		this.reset();
-
 		if ( getOptionCompletion ) {
+			/**
+			 * We have to find the completion range on-demand because we have observed the editor
+			 * to occasionally replace text nodes referred to by saved ranges. This changed the
+			 * ranges to refer to a text node's parent rather than the node itself and resulted
+			 * in incorrectly inserted completions.
+			 */
+			const range = this.getLatestCompletionRange();
+			if ( ! range ) {
+				return;
+			}
+
 			const completion = getOptionCompletion( option.value, range, query );
 
 			const { action, value } =
@@ -364,6 +372,8 @@ export class Autocomplete extends Component {
 				}
 			}
 		}
+
+		this.reset();
 	}
 
 	reset() {
@@ -396,6 +406,35 @@ export class Autocomplete extends Component {
 			};
 		}
 		return null;
+	}
+
+	/**
+	 * Gets the current completion range based on the cursor and the list of completers.
+	 *
+	 * The purpose of this function is to get the current completion range.
+	 * Originally, we saved the completion range when we identified the completer to use,
+	 * but we found that the editor occasionally replaces text nodes included by the range which
+	 * caused the range to refer to a parent element and not to the intended text nodes.
+	 * This resulted in incorrect insertion of completion results.
+	 *
+	 * @return {?Range} A DOM range representing the current completion range, if one exists.
+	 * @private
+	 */
+	getLatestCompletionRange() {
+		const contentEditableDescendant = this.node && this.node.querySelector( '[contenteditable=true]' );
+		if ( ! contentEditableDescendant ) {
+			return null;
+		}
+
+		const cursor = this.getCursor( contentEditableDescendant );
+		const { open } = this.state;
+
+		if ( ! cursor || ! open ) {
+			return null;
+		}
+
+		const { range = null } = this.findMatch( contentEditableDescendant, cursor, [ open ], open ) || {};
+		return range;
 	}
 
 	// this method is separate so it can be overridden in tests
@@ -568,7 +607,7 @@ export class Autocomplete extends Component {
 
 		// look for the trigger prefix and search query just before the cursor location
 		const match = this.findMatch( container, cursor, completers, wasOpen );
-		const { open, query, range } = match || {};
+		const { open, query } = match || {};
 		// asynchronously load the options for the open completer
 		if ( open && ( ! wasOpen || open.idx !== wasOpen.idx || query !== wasQuery ) ) {
 			if ( open.isDebounced ) {
@@ -585,7 +624,7 @@ export class Autocomplete extends Component {
 		const suppress = ( open && wasSuppress === open.idx ) ? wasSuppress : undefined;
 		// update the state
 		if ( wasOpen || open ) {
-			this.setState( { selectedIndex: 0, filteredOptions, suppress, search, open, query, range } );
+			this.setState( { selectedIndex: 0, filteredOptions, suppress, search, open, query } );
 		}
 		// announce the count of filtered options but only if they have loaded
 		if ( open && this.state[ 'options_' + open.idx ] ) {
@@ -678,7 +717,7 @@ export class Autocomplete extends Component {
 	}
 
 	getWordRect() {
-		const { range } = this.state;
+		const range = this.getLatestCompletionRange();
 		if ( ! range ) {
 			return;
 		}
