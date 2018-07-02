@@ -1,10 +1,5 @@
 .editor-block-settings-menu {
 	line-height: 1;
-	opacity: 0;
-
-	&.is-visible {
-		@include fade_in;
-	}
 }
 
 // The Blocks "More" Menu ellipsis icon button, and trash button
@@ -15,9 +10,14 @@
 	width: $block-side-ui-width;
 	height: $block-side-ui-width;
 	border-radius: $button-style__radius-roundrect;
+	opacity: 0;
 
 	// use opacity to work in various editor styles
 	color: $dark-opacity-500;
+
+	&.is-visible {
+		@include fade_in;
+	}
 
 	.is-dark-theme & {
 		color: $light-opacity-500;
@@ -29,10 +29,10 @@
 			background: $white;
 			box-shadow: inset 0 0 0 1px $light-gray-500;
 			color: $dark-gray-500; // always show dark gray in nested contexts
-	
+
 			&:first-child {
 				margin-bottom: -1px;
-			}	
+			}
 
 			&:hover,
 			&:active,

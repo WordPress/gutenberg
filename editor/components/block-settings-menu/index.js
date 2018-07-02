@@ -60,17 +60,14 @@ export class BlockSettingsMenu extends Component {
 		const firstBlockUID = blockUIDs[ 0 ];
 
 		return (
-			<div
-				className={ classnames( 'editor-block-settings-menu', {
-					'is-visible': isFocused || ! isHidden,
-				} ) }
-			>
+			<div className="editor-block-settings-menu">
 				<Dropdown
 					contentClassName="editor-block-settings-menu__popover"
 					position="bottom left"
 					renderToggle={ ( { onToggle, isOpen } ) => {
 						const toggleClassname = classnames( 'editor-block-settings-menu__toggle', {
 							'is-opened': isOpen,
+							'is-visible': isFocused || isOpen || ! isHidden,
 						} );
 						const label = isOpen ? __( 'Hide Options' ) : __( 'More Options' );
 

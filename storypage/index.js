@@ -1,8 +1,14 @@
 /**
+ * External dependencies
+ */
+import { reject } from 'lodash';
+
+/**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { dispatch, registerActions } from '@wordpress/data';
-import { SUGGESTED_PANEL, SHARED_PANEL } from '@wordpress/blocks';
+import { DEFAULT_CATEGORIES, SUGGESTED_PANEL, SHARED_PANEL } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -12,7 +18,7 @@ import * as components from './components';
 
 const category = {
 	slug: 'storypage',
-	title: 'StoryPage Blocks',
+	title: __( 'StoryPage Blocks' ),
 };
 
 // Registering new actions
@@ -24,7 +30,7 @@ registerActions( 'core/blocks', {
 
 	// 'addCategories' and 'removeCategories'
 	// to handle with categories
-	addCategories: ( categories, atTheEnd = true ) => ( {
+	/*addCategories: ( categories, atTheEnd = true ) => ( {
 		type: 'ADD_CATEGORIES',
 		categories,
 		atTheEnd,
@@ -32,7 +38,7 @@ registerActions( 'core/blocks', {
 	removeCategories: ( categories ) => ( {
 		type: 'REMOVE_CATEGORIES',
 		categories,
-	} ),
+	} ),*/
 
 	// 'hideInserterMenuPanel' and 'hideInserterMenuPanel'
 	// to handle with inserter menu panels
@@ -47,10 +53,17 @@ registerActions( 'core/blocks', {
 } );
 
 // Removing 'widgets' category
-dispatch( 'core/blocks' ).removeCategories( [ 'widgets' ] );
+// dispatch( 'core/blocks' ).removeCategories( [ 'widgets' ] );
 
 // Adding 'StoryPage Blocks' category
-dispatch( 'core/blocks' ).addCategories( [ category ], false );
+// dispatch( 'core/blocks' ).addCategories( [ category ], false );
+// 
+const categories = [
+	category,
+	...reject( DEFAULT_CATEGORIES, { slug: 'widgets' } ),
+];
+
+dispatch( 'core/blocks' ).setCategories( categories );
 
 // Hidding 'shared' and suggested panels
 dispatch( 'core/blocks' ).hideInserterMenuPanel( SHARED_PANEL );

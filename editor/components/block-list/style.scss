@@ -744,6 +744,7 @@
 		opacity: 0;
 		pointer-events: none;
 
+		&:hover,
 		&.is-visible {
 			opacity: 1;
 			pointer-events: auto;
