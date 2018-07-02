@@ -52,15 +52,15 @@ class FileEdit extends Component {
 
 		// Upload a file drag-and-dropped into the editor
 		if ( this.isBlobURL( href ) ) {
-			getBlobByURL( href )
-				.then( ( file ) => {
-					editorMediaUpload( {
-						allowedType: '*',
-						filesList: [ file ],
-						onFileChange: ( [ media ] ) => this.onSelectFile( media ),
-					} );
-					revokeBlobURL( href );
-				} );
+			const file = getBlobByURL( href );
+
+			editorMediaUpload( {
+				allowedType: '*',
+				filesList: [ file ],
+				onFileChange: ( [ media ] ) => this.onSelectFile( media ),
+			} );
+
+			revokeBlobURL( href );
 		}
 	}
 
