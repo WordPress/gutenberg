@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { IconButton, PanelBody, RangeControl, ToggleControl, Toolbar } from '@wordpress/components';
+import { IconButton, PanelBody, RangeControl, ToggleControl, Toolbar, withNotices } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
@@ -99,10 +99,16 @@ export const settings = {
 		}
 	},
 
-	edit( { attributes, setAttributes, isSelected, className } ) {
+	edit: withNotices( ( { attributes, setAttributes, isSelected, className, noticeOperations, noticeUI } ) => {
 		const { url, title, align, contentAlign, id, hasParallax, dimRatio } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
-		const onSelectImage = ( media ) => setAttributes( { url: media.url, id: media.id } );
+		const onSelectImage = ( media ) => {
+			if ( ! media || ! media.url ) {
+				setAttributes( { url: undefined, id: undefined } );
+				return;
+			}
+			setAttributes( { url: media.url, id: media.id } );
+		};
 		const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
 		const setDimRatio = ( ratio ) => setAttributes( { dimRatio: ratio } );
 
@@ -193,6 +199,8 @@ export const settings = {
 						onSelect={ onSelectImage }
 						accept="image/*"
 						type="image"
+						notices={ noticeUI }
+						onError={ noticeOperations.createErrorNotice }
 					/>
 				</Fragment>
 			);
@@ -219,7 +227,7 @@ export const settings = {
 				</div>
 			</Fragment>
 		);
-	},
+	} ),
 
 	save( { attributes, className } ) {
 		const { url, title, hasParallax, dimRatio, align, contentAlign } = attributes;

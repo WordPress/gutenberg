@@ -17,7 +17,7 @@ import {
 	placeCaretAtVerticalEdge,
 	isEntirelySelected,
 } from '@wordpress/dom';
-import { keycodes } from '@wordpress/utils';
+import { UP, DOWN, LEFT, RIGHT, isKeyboardEvent } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
@@ -29,12 +29,6 @@ import {
 	isInSameBlock,
 	hasInnerBlocksContext,
 } from '../../utils/dom';
-
-/**
- * Module Constants
- */
-
-const { UP, DOWN, LEFT, RIGHT, isKeyboardEvent } = keycodes;
 
 /**
  * Given an element, returns true if the element is a tabbable text field, or
@@ -193,6 +187,16 @@ class WritingFlow extends Component {
 
 	onKeyDown( event ) {
 		const { hasMultiSelection, onMultiSelect, blocks } = this.props;
+
+		// If navigation has already been handled (e.g. TinyMCE inline
+		// boundaries), abort. Ideally this uses Event#defaultPrevented. This
+		// is currently not possible because TinyMCE will misreport an event
+		// default as prevented on outside edges of inline boundaries.
+		//
+		// See: https://github.com/tinymce/tinymce/issues/4476
+		if ( event.nativeEvent._navigationHandled ) {
+			return;
+		}
 
 		const { keyCode, target } = event;
 		const isUp = keyCode === UP;

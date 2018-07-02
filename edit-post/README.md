@@ -6,7 +6,7 @@ Refer to [the plugins module documentation](../plugins/) for more information.
 
 ## Plugin Components
 
-The following components can be used with the `registerPlugin` ([see documentation](../plugins)) API.
+The following components can be used with the `registerPlugin` ([see documentation](../packages/plugins)) API.
 They can be found in the global variable `wp.editPost` when defining `wp-edit-post` as a script dependency.
 
 ### `PluginSidebar`

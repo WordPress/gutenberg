@@ -69,6 +69,23 @@ export function isValidIcon( icon ) {
 }
 
 /**
+ * Function that returns true if the background and foreground colors of the icon are unreadable.
+ *
+ * @param {*} icon  Parameter to be checked.
+ *
+ * @return {boolean} True if the background and foreground colors of the icon are unreadable.
+ */
+
+export function isIconUnreadable( icon ) {
+	return !! ( icon && icon.background && icon.foreground ) &&
+		! tinycolor.isReadable(
+			tinycolor( icon.background ),
+			tinycolor( icon.foreground ),
+			{ level: 'AA', size: 'large' }
+		);
+}
+
+/**
  * Function that receives an icon as set by the blocks during the registration
  * and returns a new icon object that is normalized so we can rely on just on possible icon structure
  * in the codebase.

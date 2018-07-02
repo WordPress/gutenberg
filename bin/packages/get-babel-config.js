@@ -19,6 +19,14 @@ const plugins = map( babelDefaultConfig.plugins, ( plugin ) => {
 	return plugin;
 } );
 
+if ( process.env.TRANSFORM_JSX_PRAGMA ) {
+	plugins.push( [ require( '../../packages/babel-plugin-import-jsx-pragma' ).default, {
+		scopeVariable: 'createElement',
+		source: '@wordpress/element',
+		isDefault: false,
+	} ] );
+}
+
 const babelConfigs = {
 	main: Object.assign(
 		{},

@@ -1,11 +1,16 @@
 /**
+ * External dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dropdown, Dashicon, IconButton, Toolbar, NavigableMenu } from '@wordpress/components';
-import { getBlockType, getPossibleBlockTransformations, switchToBlockType } from '@wordpress/blocks';
-import { compose } from '@wordpress/element';
-import { keycodes } from '@wordpress/utils';
+import { Dropdown, IconButton, Toolbar, PanelBody } from '@wordpress/components';
+import { getBlockType, getPossibleBlockTransformations, switchToBlockType, hasChildBlocks } from '@wordpress/blocks';
+import { compose, Component, Fragment } from '@wordpress/element';
+import { DOWN } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
@@ -13,87 +18,112 @@ import { withSelect, withDispatch } from '@wordpress/data';
  */
 import './style.scss';
 import BlockIcon from '../block-icon';
+import BlockStyles from '../block-styles';
+import BlockPreview from '../block-preview';
+import BlockTypesList from '../block-types-list';
 
-/**
- * Module Constants
- */
-const { DOWN } = keycodes;
-
-export function BlockSwitcher( { blocks, onTransform, isLocked } ) {
-	const allowedBlocks = getPossibleBlockTransformations( blocks );
-
-	if ( isLocked || ! allowedBlocks.length ) {
-		return null;
+export class BlockSwitcher extends Component {
+	constructor() {
+		super( ...arguments );
+		this.state = {
+			hoveredClassName: null,
+		};
+		this.onHoverClassName = this.onHoverClassName.bind( this );
 	}
 
-	const sourceBlockName = blocks[ 0 ].name;
-	const blockType = getBlockType( sourceBlockName );
+	onHoverClassName( className ) {
+		this.setState( { hoveredClassName: className } );
+	}
 
-	return (
-		<Dropdown
-			className="editor-block-switcher"
-			contentClassName="editor-block-switcher__popover"
-			renderToggle={ ( { onToggle, isOpen } ) => {
-				const openOnArrowDown = ( event ) => {
-					if ( ! isOpen && event.keyCode === DOWN ) {
-						event.preventDefault();
-						event.stopPropagation();
-						onToggle();
-					}
-				};
-				const label = __( 'Change block type' );
+	render() {
+		const { blocks, onTransform, isLocked } = this.props;
+		const { hoveredClassName } = this.state;
 
-				return (
-					<Toolbar>
-						<IconButton
-							className="editor-block-switcher__toggle"
-							icon={ <BlockIcon icon={ blockType.icon && blockType.icon.src } /> }
-							onClick={ onToggle }
-							aria-haspopup="true"
-							aria-expanded={ isOpen }
-							label={ label }
-							tooltip={ label }
-							onKeyDown={ openOnArrowDown }
-						>
-							<Dashicon icon="arrow-down" />
-						</IconButton>
-					</Toolbar>
-				);
-			} }
-			renderContent={ ( { onClose } ) => (
-				<div>
-					<span
-						className="editor-block-switcher__menu-title"
-					>
-						{ __( 'Transform into:' ) }
-					</span>
-					<NavigableMenu
-						role="menu"
-						aria-label={ __( 'Block types' ) }
-					>
-						{ allowedBlocks.map( ( { name, title, icon } ) => (
+		if ( ! blocks || ! blocks.length ) {
+			return null;
+		}
+
+		const allowedBlocks = getPossibleBlockTransformations( blocks );
+		const sourceBlockName = blocks[ 0 ].name;
+		const blockType = getBlockType( sourceBlockName );
+		const hasStyles = blocks.length === 1 && get( blockType, [ 'styles' ], [] ).length !== 0;
+
+		if ( ! hasStyles && ( ! allowedBlocks.length || isLocked ) ) {
+			return null;
+		}
+
+		return (
+			<Dropdown
+				position="bottom right"
+				className="editor-block-switcher"
+				contentClassName="editor-block-switcher__popover"
+				renderToggle={ ( { onToggle, isOpen } ) => {
+					const openOnArrowDown = ( event ) => {
+						if ( ! isOpen && event.keyCode === DOWN ) {
+							event.preventDefault();
+							event.stopPropagation();
+							onToggle();
+						}
+					};
+					const label = __( 'Change block type' );
+
+					return (
+						<Toolbar>
 							<IconButton
-								key={ name }
-								onClick={ () => {
-									onTransform( blocks, name );
-									onClose();
-								} }
-								className="editor-block-switcher__menu-item"
-								icon={ (
-									<span className="editor-block-switcher__block-icon">
-										<BlockIcon icon={ icon && icon.src } />
-									</span>
-								) }
-								role="menuitem"
+								className="editor-block-switcher__toggle"
+								onClick={ onToggle }
+								aria-haspopup="true"
+								aria-expanded={ isOpen }
+								label={ label }
+								tooltip={ label }
+								onKeyDown={ openOnArrowDown }
 							>
-								{ title }
+								<BlockIcon icon={ blockType.icon && blockType.icon.src } showColors />
 							</IconButton>
-						) ) }
-					</NavigableMenu>
-				</div>
-			) }
-		/>
-	);
+						</Toolbar>
+					);
+				} }
+				renderContent={ ( { onClose } ) => (
+					<Fragment>
+						{ hasStyles &&
+							<PanelBody
+								title={ __( 'Block Styles' ) }
+								initialOpen
+							>
+								<BlockStyles uid={ blocks[ 0 ].uid } onSwitch={ onClose } onHoverClassName={ this.onHoverClassName } />
+							</PanelBody>
+						}
+						{ allowedBlocks.length !== 0 && ! isLocked &&
+							<PanelBody
+								title={ __( 'Transform To:' ) }
+								initialOpen
+							>
+								<BlockTypesList
+									items={ allowedBlocks.map( ( destinationBlockType ) => ( {
+										id: destinationBlockType.name,
+										icon: destinationBlockType.icon,
+										title: destinationBlockType.title,
+										hasChildBlocks: hasChildBlocks( destinationBlockType.name ),
+									} ) ) }
+									onSelect={ ( item ) => {
+										onTransform( blocks, item.id );
+										onClose();
+									} }
+								/>
+							</PanelBody>
+						}
+
+						{ ( hoveredClassName !== null ) &&
+							<BlockPreview
+								name={ blocks[ 0 ].name }
+								attributes={ { ...blocks[ 0 ].attributes, className: hoveredClassName } }
+							/>
+						}
+					</Fragment>
+				) }
+			/>
+		);
+	}
 }
 
 export default compose(

@@ -53,6 +53,8 @@ $block-side-ui-clearance: 2px; // space between side UI and block
 $block-side-ui-padding: $block-side-ui-width + $block-side-ui-clearance; // total space used to accommodate side UI
 $block-parent-side-ui-clearance: $parent-block-padding - $block-padding; // space between side UI and block on top level blocks
 
+$block-container-side-padding: $block-side-ui-width + $block-padding + 2 * $block-side-ui-clearance;
+
 // Buttons & UI Widgets
 $button-style__radius-roundrect: 4px;
 $button-style__radius-round: 50%;
