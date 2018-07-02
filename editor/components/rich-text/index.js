@@ -212,21 +212,6 @@ export class RichText extends Component {
 		this.editor.shortcuts.add( rawShortcut.primary( 'z' ), '', 'Undo' );
 		this.editor.shortcuts.add( rawShortcut.primaryShift( 'z' ), '', 'Redo' );
 
-		// Bind directly to the document, since properties assigned to TinyMCE
-		// events are lost when accessed during bubbled handlers. This must be
-		// captured _before_ TinyMCE's internal handling of arrow keys, which
-		// would otherwise already have moved the caret position. This is why
-		// it is bound to the capture phase.
-		//
-		// Note: This is ideally a temporary measure, only needed so long as
-		// TinyMCE inaccurately prevents default around inline boundaries.
-		// Ideally we rely on the defaultPrevented property to stop WritingFlow
-		// from transitioning.
-		//
-		// See: https://github.com/tinymce/tinymce/issues/4476
-		// See: WritingFlow#onKeyDown
-		this.editor.dom.doc.addEventListener( 'keydown', this.onHorizontalNavigationKeyDown, true );
-
 		// Remove TinyMCE Core shortcut for consistency with global editor
 		// shortcuts. Also clashes with Mac browsers.
 		this.editor.shortcuts.remove( 'meta+y', '', 'Redo' );
@@ -467,53 +452,46 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Handles a horizontal navigation key down event to stop propagation if it
-	 * can be inferred that it will be handled by TinyMCE (notably transitions
-	 * out of an inline boundary node).
+	 * Handles a horizontal navigation key down event to handle the case where
+	 * TinyMCE attempts to preventDefault when on the outside edge of an inline
+	 * boundary when arrowing _away_ from the boundary, not within it. Replaces
+	 * the TinyMCE event `preventDefault` behavior with a noop, such that those
+	 * relying on `defaultPrevented` are not misinformed about the arrow event.
 	 *
-	 * @param {KeyboardEvent} event Keydown event.
+	 * If TinyMCE#4476 is resolved, this handling may be removed.
+	 *
+	 * @see https://github.com/tinymce/tinymce/issues/4476
+	 *
+	 * @param {tinymce.EditorEvent<KeyboardEvent>} event Keydown event.
 	 */
 	onHorizontalNavigationKeyDown( event ) {
-		const { keyCode } = event;
-		const isHorizontalNavigation = keyCode === LEFT || keyCode === RIGHT;
-		if ( ! isHorizontalNavigation ) {
-			return;
-		}
-
-		const { focusNode, focusOffset } = window.getSelection();
+		const { focusNode } = window.getSelection();
 		const { nodeType, nodeValue } = focusNode;
 
 		if ( nodeType !== Node.TEXT_NODE ) {
 			return;
 		}
 
-		const isReverse = event.keyCode === LEFT;
-
-		// Look to previous character for ZWSP if navigating in reverse.
-		let offset = focusOffset;
-		if ( isReverse ) {
-			offset--;
+		if ( nodeValue.length !== 1 || nodeValue[ 0 ] !== TINYMCE_ZWSP ) {
+			return;
 		}
 
-		// Workaround: In a new inline boundary node, the zero-width space
-		// wrongly lingers at the beginning of the node, rather than following
-		// the caret. If we are at the extent of the inline boundary, but the
-		// ZWSP exists at the beginning, consider as though it were to be
-		// handled as a transition outside the inline boundary.
-		//
-		// Since this condition could also be satisfied in the case that we're
-		// on the right edge of an inline boundary -- where the ZWSP exists as
-		// as an otherwise empty focus node -- ensure that the focus node is
-		// non-empty.
-		//
-		// See: https://github.com/tinymce/tinymce/issues/4472
-		if ( ! isReverse && focusOffset === nodeValue.length &&
-				nodeValue.length > 1 && nodeValue[ 0 ] === TINYMCE_ZWSP ) {
-			offset = 0;
-		}
+		const { keyCode } = event;
 
-		if ( nodeValue[ offset ] === TINYMCE_ZWSP ) {
-			event._navigationHandled = true;
+		// Consider to be moving away from inline boundary based on:
+		//
+		// 1. Within a text fragment consisting only of ZWSP.
+		// 2. If in reverse, there is no previous sibling. If forward, there is
+		//    no next sibling (i.e. end of node).
+		const isReverse = keyCode === LEFT;
+		const edgeSibling = isReverse ? 'previousSibling' : 'nextSibling';
+		if ( ! focusNode[ edgeSibling ] ) {
+			// Note: This is not reassigning on the native event, rather the
+			// "fixed" TinyMCE copy, which proxies its preventDefault to the
+			// native event. By reassigning here, we're effectively preventing
+			// the proxied call on the native event, but not otherwise mutating
+			// the original event object.
+			event.preventDefault = noop;
 		}
 	}
 
@@ -553,6 +531,11 @@ export class RichText extends Component {
 			// that we stop other handlers (e.g. ones registered by TinyMCE) from
 			// also handling this event.
 			event.stopImmediatePropagation();
+		}
+
+		const isHorizontalNavigation = keyCode === LEFT || keyCode === RIGHT;
+		if ( isHorizontalNavigation ) {
+			this.onHorizontalNavigationKeyDown( event );
 		}
 
 		// If we click shift+Enter on inline RichTexts, we avoid creating two contenteditables

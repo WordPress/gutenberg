@@ -82,7 +82,20 @@ describe( 'adding blocks', () => {
 		await page.keyboard.up( 'Shift' );
 		await pressWithModifier( 'mod', 'b' );
 
-		// Arrow left from selected bold should traverse into first.
+		// Arrow left from selected bold should collapse to before the inline
+		// boundary. Arrow once more to traverse into first paragraph.
+		//
+		// See native behavior example: http://fiddle.tinymce.com/kvgaab
+		//
+		//  1. Select all of second paragraph, end to beginning
+		//  2. Press ArrowLeft
+		//  3. Type
+		//  4. Note that text is not bolded
+		//
+		// This is technically different than how other word processors treat
+		// the collapse while a bolded segment is selected, but our behavior
+		// is consistent with TinyMCE.
+		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.type( 'After' );
 
