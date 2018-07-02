@@ -98,6 +98,58 @@ export {
 } from './internalApi.js';
 ```
 
+### Variable Naming
+
+Gutenberg inherits [WordPress' naming conventions of camel-casing](https://make.wordpress.org/core/handbook/best-practices/coding-standards/javascript/#naming-conventions):
+
+>Variable and function names should be full words, using camel case with a lowercase first letter. This is an area where this standard differs from the WordPress PHP coding standards.
+>
+>Constructors intended for use with `new` should have a capital first letter (UpperCamelCase).
+
+However, Gutenberg is more specific about its handling of abbreviations, acronyms, constants, and the ES2015 class construct.
+
+#### Abbreviations and Acronyms
+
+[*Abbreviations*](https://en.wikipedia.org/wiki/Abbreviation) must be written as camel case, with an initial capitalized letter followed by lowercase letters.
+
+[*Acronyms*](https://en.wikipedia.org/wiki/Acronym) must be written with each of its composing letters capitalized. This is intended to reflect that each letter of the acronym is a proper word in its expanded form.
+
+**Examples:**
+
+```js
+// "Id" is an abbreviation of "Identifier":
+const userId = 1;
+
+// "DOM" is an acronym of "Document Object Model":
+const currentDOMDocument = window.document;
+```
+
+#### Class Definition
+
+A [`class` definition](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes) must use the UpperCamelCase convention, regardless of whether it is intended to be used with `new` construction.
+
+**Example:**
+
+```js
+class Earth {
+	static addHuman( human ) {
+		Earth.humans.push( human );
+	}
+
+	static getHumans() {
+		return Earth.humans;
+	}
+}
+
+Earth.humans = [];
+```
+
+#### Constants
+
+An exception to camel case is made for constant values which are never intended to be reassigned or mutated. Such variables must use the [SCREAMING_SNAKE_CASE convention](https://en.wikipedia.org/wiki/Snake_case).
+
+In almost all cases, a constant should be defined in the top-most scope of a file. It is important to note that [JavaScript's `const` assignment](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/const) is conceptually more limited than what is implied here, where a value assigned by `const` in JavaScript can in-fact be mutated, and is only protected against reassignment. A constant as defined in these coding guidelines applies only to values which are expected to never change, and is a strategy for developers to communicate intent moreso than it is a technical restriction.
+
 ## PHP
 
 We use
