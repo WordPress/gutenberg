@@ -1,7 +1,5 @@
 /** @format */
 
-import './globals';
-
 import renderer from 'react-test-renderer';
 
 import App from './App';
