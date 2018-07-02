@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { View, Text, TouchableWithoutFeedback } from 'react-native';
+import RCTAztecView from 'react-native-aztec';
 import Toolbar from './toolbar';
 
 import type { BlockType } from '../store/';
@@ -19,9 +20,24 @@ type PropsType = BlockType & {
 	onToolbarButtonPressed: ( button: number, uid: string ) => void,
 	onBlockHolderPressed: ( uid: string ) => void,
 };
-type StateType = { selected: boolean, focused: boolean };
+type StateType = {
+	selected: boolean,
+	focused: boolean,
+	aztecHeight: number,
+};
+
+const _minHeight = 50;
 
 export default class BlockHolder extends React.Component<PropsType, StateType> {
+	constructor( props: PropsType ) {
+		super( props );
+		this.state = {
+			selected: false,
+			focused: false,
+			aztecHeight: _minHeight,
+		};
+	}
+
 	renderToolbarIfBlockFocused() {
 		if ( this.props.focused ) {
 			return (
@@ -51,6 +67,29 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 					setAttributes={ ( attrs ) => this.props.onChange( this.props.uid, attrs ) }
 					isSelected={ this.props.focused }
 					style={ style }
+				/>
+			);
+		} else if ( this.props.name === 'aztec' ) {
+			return (
+				<RCTAztecView
+					accessibilityLabel="aztec-view"
+					style={ [
+						styles[ 'aztec-editor' ],
+						{ minHeight: Math.max( _minHeight, this.state.aztecHeight ) },
+					] }
+					text={ { text: this.props.attributes.content, eventCount: this.props.attributes.eventCount } }
+					onContentSizeChange={ ( event ) => {
+						this.setState( { ...this.state, aztecHeight: event.nativeEvent.contentSize.height } );
+					} }
+					onChange={ ( event ) => {
+						this.props.onChange( this.props.uid, {
+							...this.props.attributes,
+							content: event.nativeEvent.text,
+							eventCount: event.nativeEvent.eventCount,
+						} );
+					} }
+					color={ 'black' }
+					maxImagesWidth={ 200 }
 				/>
 			);
 		}

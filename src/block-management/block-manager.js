@@ -23,6 +23,7 @@ export type BlockListType = {
 	moveBlockDownAction: string => mixed,
 	deleteBlockAction: string => mixed,
 	blocks: Array<BlockType>,
+	aztechtml: string,
 	refresh: boolean,
 };
 
@@ -84,6 +85,8 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				const blockType = getBlockType( block.name );
 				if ( blockType ) {
 					return serialize( [ block ] ) + '\n\n';
+				} else if ( block.name === 'aztec' ) {
+					return '<aztec>' + block.attributes.content + '</aztec>\n\n';
 				}
 
 				return '<span>' + block.attributes.content + '</span>\n\n';

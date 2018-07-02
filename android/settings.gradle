@@ -1,4 +1,6 @@
 rootProject.name = 'gutenberg'
+include ':react-native-aztec'
+project(':react-native-aztec').projectDir = new File(rootProject.projectDir, '../react-native-aztec/android')
 include ':react-native-recyclerview-list'
 project(':react-native-recyclerview-list').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-recyclerview-list/android')
 

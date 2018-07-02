@@ -9,6 +9,7 @@
       {
         "cwd": "babelrc",
         "alias": {
+          "react-native-aztec": "./react-native-aztec",
           "@wordpress/blocks": "./blocks",
           "@wordpress/editor": "./editor",
           "@wordpress/element": "./element",

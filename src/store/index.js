@@ -50,6 +50,16 @@ const initialState: StateType = {
 	blocks: [
 		{
 			uid: '0',
+			name: 'aztec',
+			isValid: true,
+			attributes: {
+				content: 'This is text rendered <b>in Aztec!</b>',
+			},
+			innerBlocks: [],
+			focused: false,
+		},
+		{
+			uid: '1',
 			name: 'title',
 			isValid: true,
 			attributes: {
@@ -59,7 +69,7 @@ const initialState: StateType = {
 			focused: false,
 		},
 		{
-			uid: '1',
+			uid: '2',
 			name: 'paragraph',
 			isValid: true,
 			attributes: {
@@ -70,7 +80,7 @@ const initialState: StateType = {
 			focused: false,
 		},
 		{
-			uid: '2',
+			uid: '3',
 			name: 'paragraph',
 			isValid: true,
 			attributes: {
@@ -83,7 +93,7 @@ const initialState: StateType = {
 		{ ...codeBlockInstance, focused: false },
 		{ ...moreBlockInstance, focused: false },
 		{
-			uid: '4',
+			uid: '5',
 			name: 'paragraph',
 			isValid: true,
 			attributes: {

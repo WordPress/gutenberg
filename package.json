@@ -47,7 +47,7 @@
     "test:debug": "cross-env NODE_ENV=test node --inspect-brk node_modules/jest/bin/jest.js --runInBand --verbose --config jest.config.js",
     "flow": "flow",
     "prettier": "prettier-eslint --write $npm_package_config_jsfiles $npm_package_config_scssfiles",
-    "clean": "yarn test --clearCache; watchman watch-del-all; rm -rf node_modules; rm -f yarn.lock; rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/jest_*",
+    "clean": "yarn cache clean; yarn test --clearCache; watchman watch-del-all; rm -rf node_modules; rm -f yarn.lock; rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/jest_*",
     "clean:install": "yarn clean; yarn",
     "lint": "eslint $npm_package_config_jsfiles",
     "lint:fix": "eslint $npm_package_config_jsfiles --fix"
