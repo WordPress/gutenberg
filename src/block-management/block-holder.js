@@ -77,7 +77,7 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 						styles[ 'aztec-editor' ],
 						{ minHeight: Math.max( _minHeight, this.state.aztecHeight ) },
 					] }
-					text={ this.props.attributes.content }
+					text={ { text: this.props.attributes.content, eventCount: this.props.attributes.eventCount } }
 					onContentSizeChange={ ( event ) => {
 						this.setState( { ...this.state, aztecHeight: event.nativeEvent.contentSize.height } );
 					} }
@@ -85,6 +85,7 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 						this.props.onChange( this.props.uid, {
 							...this.props.attributes,
 							content: event.nativeEvent.text,
+							eventCount: event.nativeEvent.eventCount,
 						} );
 					} }
 					color={ 'black' }
