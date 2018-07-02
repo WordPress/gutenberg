@@ -10,7 +10,7 @@ import { focus } from '@wordpress/dom';
  */
 import './style.scss';
 import withFocusReturn from '../higher-order/with-focus-return';
-import withFocusContain from '../higher-order/with-focus-contain';
+import withConstrainedTabbing from '../higher-order/with-constrained-tabbing';
 import withGlobalEvents from '../higher-order/with-global-events';
 import withFocusOutside from '../higher-order/with-focus-outside';
 
@@ -131,7 +131,7 @@ class ModalFrame extends Component {
 
 export default compose( [
 	withFocusReturn,
-	withFocusContain,
+	withConstrainedTabbing,
 	withFocusOutside,
 	withGlobalEvents( {
 		keydown: 'handleKeyDown',
