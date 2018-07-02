@@ -6,14 +6,13 @@ import {
 	newPost,
 	newDesktopBrowserPage,
 	getHTMLFromCodeEditor,
+	pressWithModifier,
+	pressTimes,
 } from '../support/utils';
 
 describe( 'adding blocks', () => {
-	beforeAll( async () => {
-		await newDesktopBrowserPage();
-	} );
-
 	beforeEach( async () => {
+		await newDesktopBrowserPage();
 		await newPost();
 	} );
 
@@ -61,6 +60,62 @@ describe( 'adding blocks', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		activeElementText = await page.evaluate( () => document.activeElement.textContent );
 		expect( activeElementText ).toBe( 'First paragraph' );
+
+		expect( await getHTMLFromCodeEditor() ).toMatchSnapshot();
+	} );
+
+	it( 'should navigate around inline boundaries', async () => {
+		// Add demo content
+		await page.click( '.editor-default-block-appender__content' );
+		await page.keyboard.type( 'First' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Second' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Third' );
+
+		// Navigate to second paragraph
+		await pressTimes( 'ArrowLeft', 6 );
+
+		// Bold second paragraph text
+		await page.keyboard.down( 'Shift' );
+		await pressTimes( 'ArrowLeft', 6 );
+		await page.keyboard.up( 'Shift' );
+		await pressWithModifier( 'mod', 'b' );
+
+		// Arrow left from selected bold should traverse into first.
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.type( 'After' );
+
+		// Arrow right from end of first should traverse to second, *BEFORE*
+		// the bolded text. Another press should move within inline boundary.
+		await pressTimes( 'ArrowRight', 2 );
+		await page.keyboard.type( 'Inside' );
+
+		// Arrow left from end of beginning of inline boundary should move to
+		// the outside of the inline boundary.
+		await pressTimes( 'ArrowLeft', 6 );
+		await page.keyboard.press( 'ArrowLeft' ); // Separate for emphasis.
+		await page.keyboard.type( 'Before' );
+
+		// Likewise, test at the end of the inline boundary for same effect.
+		await page.keyboard.press( 'ArrowRight' ); // Move inside
+		await pressTimes( 'ArrowRight', 12 );
+		await page.keyboard.type( 'Inside' );
+		await page.keyboard.press( 'ArrowRight' );
+
+		// Edge case: Verify that workaround to test for ZWSP at beginning of
+		// focus node does not take effect when on the right edge of inline
+		// boundary (thus preventing traversing to the next block by arrow).
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowLeft' );
+
+		// Should be after the inline boundary again.
+		await page.keyboard.type( 'After' );
+
+		// Finally, ensure that ArrowRight from end of unbolded text moves to
+		// the last paragraph
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( 'Before' );
 
 		expect( await getHTMLFromCodeEditor() ).toMatchSnapshot();
 	} );

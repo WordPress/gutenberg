@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, reduce, size, castArray, first, last, noop } from 'lodash';
+import { get, reduce, size, castArray, first, last } from 'lodash';
 import tinymce from 'tinymce';
 
 /**
@@ -15,7 +15,7 @@ import {
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
 } from '@wordpress/dom';
-import { keycodes } from '@wordpress/utils';
+import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import {
 	createBlock,
 	cloneBlock,
@@ -50,9 +50,6 @@ import IgnoreNestedEvents from './ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
 import withHoverAreas from './with-hover-areas';
-import { createInnerBlockList } from '../../utils/block-list';
-
-const { BACKSPACE, DELETE, ENTER } = keycodes;
 
 export class BlockListBlock extends Component {
 	constructor() {
@@ -75,7 +72,6 @@ export class BlockListBlock extends Component {
 		this.onDragStart = this.onDragStart.bind( this );
 		this.onDragEnd = this.onDragEnd.bind( this );
 		this.selectOnOpen = this.selectOnOpen.bind( this );
-		this.createInnerBlockList = this.createInnerBlockList.bind( this );
 		this.hadTouchStart = false;
 
 		this.state = {
@@ -85,38 +81,17 @@ export class BlockListBlock extends Component {
 		};
 	}
 
-	createInnerBlockList( uid ) {
-		return createInnerBlockList( uid );
-	}
-
-	/**
-	 * Provides context for descendent components for use in block rendering.
-	 *
-	 * @return {Object} Child context.
-	 */
-	getChildContext() {
-		// Blocks may render their own BlockEdit, in which case we must provide
-		// a mechanism for them to create their own InnerBlockList. BlockEdit
-		// is defined in `@wordpress/blocks`, so to avoid a circular dependency
-		// we inject this function via context.
-		return {
-			createInnerBlockList: this.createInnerBlockList,
-		};
-	}
-
 	componentDidMount() {
 		if ( this.props.isSelected ) {
 			this.focusTabbable();
 		}
 	}
 
-	componentWillReceiveProps( newProps ) {
-		if ( newProps.isTypingWithinBlock || newProps.isSelected ) {
+	componentDidUpdate( prevProps ) {
+		if ( this.props.isTypingWithinBlock || this.props.isSelected ) {
 			this.hideHoverEffects();
 		}
-	}
 
-	componentDidUpdate( prevProps ) {
 		if ( this.props.isSelected && ! prevProps.isSelected ) {
 			this.focusTabbable();
 		}
@@ -231,10 +206,10 @@ export class BlockListBlock extends Component {
 	 * @see https://developer.mozilla.org/en-US/docs/Web/Events/mouseenter
 	 */
 	maybeHover() {
-		const { isMultiSelected, isSelected } = this.props;
+		const { isPartOfMultiSelection, isSelected } = this.props;
 		const { isHovered } = this.state;
 
-		if ( isHovered || isMultiSelected || isSelected ||
+		if ( isHovered || isPartOfMultiSelection || isSelected ||
 				this.props.isMultiSelecting || this.hadTouchStart ) {
 			return;
 		}
@@ -283,7 +258,7 @@ export class BlockListBlock extends Component {
 	 * @return {void}
 	 */
 	onFocus() {
-		if ( ! this.props.isSelected && ! this.props.isMultiSelected ) {
+		if ( ! this.props.isSelected && ! this.props.isPartOfMultiSelection ) {
 			this.props.onSelect();
 		}
 	}
@@ -327,7 +302,7 @@ export class BlockListBlock extends Component {
 			// onFocus excludes blocks involved in a multiselection, as
 			// focus can be incurred by starting a multiselection (focus
 			// moved to first block's multi-controls).
-			if ( this.props.isMultiSelected ) {
+			if ( this.props.isPartOfMultiSelection ) {
 				this.props.onSelect();
 			}
 		}
@@ -403,13 +378,14 @@ export class BlockListBlock extends Component {
 			rootUID,
 			layout,
 			isSelected,
-			isMultiSelected,
+			isPartOfMultiSelection,
 			isFirstMultiSelected,
 			isTypingWithinBlock,
 			isMultiSelecting,
 			hoverArea,
 			isLargeViewport,
 			isEmptyDefaultBlock,
+			isMovable,
 			isPreviousBlockADefaultEmptyBlock,
 			hasSelectedInnerBlock,
 		} = this.props;
@@ -427,8 +403,8 @@ export class BlockListBlock extends Component {
 		const showSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
 		const shouldAppearSelected = ! showSideInserter && ( isSelected || hasSelectedInnerBlock ) && ! isTypingWithinBlock;
 		// We render block movers and block settings to keep them tabbale even if hidden
-		const shouldRenderMovers = ( isSelected || hoverArea === 'left' ) && ! showEmptyBlockSideInserter && ! isMultiSelecting && ! isMultiSelected && ! isTypingWithinBlock;
-		const shouldRenderBlockSettings = ( isSelected || hoverArea === 'right' ) && ! isMultiSelecting && ! isMultiSelected && ! isTypingWithinBlock;
+		const shouldRenderMovers = ( isSelected || hoverArea === 'left' ) && ! showEmptyBlockSideInserter && ! isMultiSelecting && ! isPartOfMultiSelection && ! isTypingWithinBlock;
+		const shouldRenderBlockSettings = ( isSelected || hoverArea === 'right' ) && ! isMultiSelecting && ! isPartOfMultiSelection && ! isTypingWithinBlock;
 		const shouldShowBreadcrumb = isHovered && ! isEmptyDefaultBlock;
 		const shouldShowContextualToolbar = ! showSideInserter && isSelected && ! isTypingWithinBlock && isValid && ( ! hasFixedToolbar || ! isLargeViewport );
 		const shouldShowMobileToolbar = shouldAppearSelected;
@@ -437,14 +413,14 @@ export class BlockListBlock extends Component {
 		// Insertion point can only be made visible when the side inserter is
 		// not present, and either the block is at the extent of a selection or
 		// is the first block in the top-level list rendering.
-		const shouldShowInsertionPoint = ( isMultiSelected && isFirst ) || ! isMultiSelected;
+		const shouldShowInsertionPoint = ( isPartOfMultiSelection && isFirst ) || ! isPartOfMultiSelection;
 		const canShowInBetweenInserter = ! isEmptyDefaultBlock && ! isPreviousBlockADefaultEmptyBlock;
 
 		// Generate the wrapper class names handling the different states of the block.
 		const wrapperClassName = classnames( 'editor-block-list__block', {
 			'has-warning': ! isValid || !! error,
 			'is-selected': shouldAppearSelected,
-			'is-multi-selected': isMultiSelected,
+			'is-multi-selected': isPartOfMultiSelection,
 			'is-hovered': isHovered && ! isEmptyDefaultBlock,
 			'is-shared': isSharedBlock( blockType ),
 			'is-hidden': dragging,
@@ -493,7 +469,7 @@ export class BlockListBlock extends Component {
 				] }
 				{ ...wrapperProps }
 			>
-				{ ! isMultiSelected && (
+				{ ! isPartOfMultiSelection && isMovable && (
 					<BlockDraggable
 						rootUID={ rootUID }
 						index={ order }
@@ -511,6 +487,7 @@ export class BlockListBlock extends Component {
 						rootUID={ rootUID }
 						layout={ layout }
 						canShowInserter={ canShowInBetweenInserter }
+						onInsert={ this.hideHoverEffects }
 					/>
 				) }
 				<BlockDropZone
@@ -607,6 +584,7 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 		getPreviousBlockUid,
 		getNextBlockUid,
 		getBlock,
+		isAncestorMultiSelected,
 		isBlockMultiSelected,
 		isFirstMultiSelectedBlock,
 		isMultiSelecting,
@@ -625,10 +603,9 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 	const block = getBlock( uid );
 	const previousBlockUid = getPreviousBlockUid( uid );
 	const previousBlock = getBlock( previousBlockUid );
-
 	return {
 		nextBlockUid: getNextBlockUid( uid ),
-		isMultiSelected: isBlockMultiSelected( uid ),
+		isPartOfMultiSelection: isBlockMultiSelected( uid ) || isAncestorMultiSelected( uid ),
 		isFirstMultiSelected: isFirstMultiSelectedBlock( uid ),
 		isMultiSelecting: isMultiSelecting(),
 		hasSelectedInnerBlock: isParentOfSelectedBlock,
@@ -642,6 +619,7 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 		initialPosition: getSelectedBlocksInitialCaretPosition(),
 		isEmptyDefaultBlock: block && isUnmodifiedDefaultBlock( block ),
 		isPreviousBlockADefaultEmptyBlock: previousBlock && isUnmodifiedDefaultBlock( previousBlock ),
+		isMovable: 'all' !== templateLock,
 		isLocked: !! templateLock,
 		previousBlockUid,
 		block,
@@ -695,10 +673,6 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 		},
 	};
 } );
-
-BlockListBlock.childContextTypes = {
-	createInnerBlockList: noop,
-};
 
 export default compose(
 	applyWithSelect,

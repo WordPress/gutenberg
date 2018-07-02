@@ -56,11 +56,11 @@ class PostPermalink extends Component {
 	}
 
 	render() {
-		const { isNew, previewLink, isEditable, samplePermalink, isPublished } = this.props;
+		const { isNew, postLink, isEditable, samplePermalink, isPublished } = this.props;
 		const { isCopied, isEditingPermalink } = this.state;
 		const ariaLabel = isCopied ? __( 'Permalink copied' ) : __( 'Copy the permalink' );
 
-		if ( isNew || ! previewLink ) {
+		if ( isNew || ! postLink ) {
 			return null;
 		}
 
@@ -80,7 +80,7 @@ class PostPermalink extends Component {
 				{ ! isEditingPermalink &&
 					<Button
 						className="editor-post-permalink__link"
-						href={ ! isPublished ? previewLink : samplePermalink }
+						href={ ! isPublished ? postLink : samplePermalink }
 						target="_blank"
 						ref={ ( permalinkButton ) => this.permalinkButton = permalinkButton }
 					>
@@ -123,10 +123,19 @@ class PostPermalink extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { isEditedPostNew, isPermalinkEditable, getEditedPostPreviewLink, getPermalink, isCurrentPostPublished } = select( 'core/editor' );
+		const {
+			isEditedPostNew,
+			isPermalinkEditable,
+			getCurrentPost,
+			getPermalink,
+			isCurrentPostPublished,
+		} = select( 'core/editor' );
+
+		const { link } = getCurrentPost();
+
 		return {
 			isNew: isEditedPostNew(),
-			previewLink: getEditedPostPreviewLink(),
+			postLink: link,
 			isEditable: isPermalinkEditable(),
 			samplePermalink: getPermalink(),
 			isPublished: isCurrentPostPublished(),

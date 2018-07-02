@@ -67,9 +67,9 @@ class FlatTermSelector extends Component {
 		invoke( this.searchRequest, [ 'abort' ] );
 	}
 
-	componentWillReceiveProps( newProps ) {
-		if ( newProps.terms !== this.props.terms ) {
-			this.updateSelectedTerms( newProps.terms );
+	componentDidUpdate( prevProps ) {
+		if ( prevProps.terms !== this.props.terms ) {
+			this.updateSelectedTerms( this.props.terms );
 		}
 	}
 

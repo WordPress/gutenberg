@@ -1,14 +1,12 @@
 /**
  * External dependencies
  */
-import { castArray, get, isString } from 'lodash';
-import classnames from 'classnames';
+import { castArray, get, isString, isEmpty, omit } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
-import { Toolbar } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
 import {
@@ -49,10 +47,6 @@ const blockAttributes = {
 	align: {
 		type: 'string',
 	},
-	style: {
-		type: 'number',
-		default: 1,
-	},
 };
 
 export const name = 'core/quote';
@@ -65,16 +59,24 @@ export const settings = {
 
 	attributes: blockAttributes,
 
+	styles: [
+		{ name: 'default', label: __( 'Regular' ), isDefault: true },
+		{ name: 'large', label: __( 'Large' ) },
+	],
+
 	transforms: {
 		from: [
 			{
 				type: 'block',
+				isMultiBlock: true,
 				blocks: [ 'core/paragraph' ],
-				transform: ( { content } ) => {
+				transform: ( attributes ) => {
+					const items = attributes.map( ( { content } ) => content );
+					const hasItems = ! items.every( isEmpty );
 					return createBlock( 'core/quote', {
-						value: [
-							{ children: <p key="1">{ content }</p> },
-						],
+						value: hasItems ?
+							items.map( ( content, index ) => ( { children: <p key={ index }>{ content }</p> } ) ) :
+							[],
 					} );
 				},
 			},
@@ -176,20 +178,11 @@ export const settings = {
 	},
 
 	edit( { attributes, setAttributes, isSelected, mergeBlocks, onReplace, className } ) {
-		const { align, value, citation, style } = attributes;
-		const containerClassname = classnames( className, style === 2 ? 'is-large' : '' );
+		const { align, value, citation } = attributes;
 
 		return (
 			<Fragment>
 				<BlockControls>
-					<Toolbar controls={ [ 1, 2 ].map( ( variation ) => ( {
-						icon: 1 === variation ? 'format-quote' : 'testimonial',
-						title: sprintf( __( 'Quote style %d' ), variation ),
-						isActive: Number( style ) === variation,
-						onClick() {
-							setAttributes( { style: variation } );
-						},
-					} ) ) } />
 					<AlignmentToolbar
 						value={ align }
 						onChange={ ( nextAlign ) => {
@@ -197,10 +190,7 @@ export const settings = {
 						} }
 					/>
 				</BlockControls>
-				<blockquote
-					className={ containerClassname }
-					style={ { textAlign: align } }
-				>
+				<blockquote className={ className } style={ { textAlign: align } }>
 					<RichText
 						multiline="p"
 						value={ toRichTextValue( value ) }
@@ -238,13 +228,10 @@ export const settings = {
 	},
 
 	save( { attributes } ) {
-		const { align, value, citation, style } = attributes;
+		const { align, value, citation } = attributes;
 
 		return (
-			<blockquote
-				className={ style === 2 ? 'is-large' : '' }
-				style={ { textAlign: align ? align : null } }
-			>
+			<blockquote style={ { textAlign: align ? align : null } }>
 				<RichText.Content value={ toRichTextValue( value ) } />
 				{ citation && citation.length > 0 && <RichText.Content tagName="cite" value={ citation } /> }
 			</blockquote>
@@ -255,10 +242,48 @@ export const settings = {
 		{
 			attributes: {
 				...blockAttributes,
+				style: {
+					type: 'number',
+					default: 1,
+				},
+			},
+
+			migrate( attributes ) {
+				if ( attributes.style === 2 ) {
+					return {
+						...omit( attributes, [ 'style' ] ),
+						className: attributes.className ? attributes.className + ' is-style-large' : 'is-style-large',
+					};
+				}
+
+				return attributes;
+			},
+
+			save( { attributes } ) {
+				const { align, value, citation, style } = attributes;
+
+				return (
+					<blockquote
+						className={ style === 2 ? 'is-large' : '' }
+						style={ { textAlign: align ? align : null } }
+					>
+						<RichText.Content value={ toRichTextValue( value ) } />
+						{ citation && citation.length > 0 && <RichText.Content tagName="cite" value={ citation } /> }
+					</blockquote>
+				);
+			},
+		},
+		{
+			attributes: {
+				...blockAttributes,
 				citation: {
 					type: 'array',
 					source: 'children',
 					selector: 'footer',
+				},
+				style: {
+					type: 'number',
+					default: 1,
 				},
 			},
 

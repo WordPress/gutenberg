@@ -34,6 +34,7 @@ import {
 	convertBlockToStatic,
 	convertBlockToShared,
 	setTemplateValidity,
+	editPost,
 } from '../actions';
 import effects, {
 	removeProvisionalBlock,
@@ -260,6 +261,16 @@ describe( 'effects', () => {
 	describe( '.REQUEST_POST_UPDATE_SUCCESS', () => {
 		const handler = effects.REQUEST_POST_UPDATE_SUCCESS;
 
+		function createGetState( hasLingeringEdits = false ) {
+			let state = reducer( undefined, {} );
+			if ( hasLingeringEdits ) {
+				state = reducer( state, editPost( { edited: true } ) );
+			}
+
+			const getState = () => state;
+			return getState;
+		}
+
 		const defaultPost = {
 			id: 1,
 			title: {
@@ -280,7 +291,7 @@ describe( 'effects', () => {
 
 		it( 'should dispatch notices when publishing or scheduling a post', () => {
 			const dispatch = jest.fn();
-			const store = { dispatch };
+			const store = { dispatch, getState: createGetState() };
 
 			const previousPost = getDraftPost();
 			const post = getPublishedPost();
@@ -302,7 +313,7 @@ describe( 'effects', () => {
 
 		it( 'should dispatch notices when reverting a published post to a draft', () => {
 			const dispatch = jest.fn();
-			const store = { dispatch };
+			const store = { dispatch, getState: createGetState() };
 
 			const previousPost = getPublishedPost();
 			const post = getDraftPost();
@@ -328,7 +339,7 @@ describe( 'effects', () => {
 
 		it( 'should dispatch notices when just updating a published post again', () => {
 			const dispatch = jest.fn();
-			const store = { dispatch };
+			const store = { dispatch, getState: createGetState() };
 
 			const previousPost = getPublishedPost();
 			const post = getPublishedPost();
@@ -350,7 +361,7 @@ describe( 'effects', () => {
 
 		it( 'should do nothing if the updated post was autosaved', () => {
 			const dispatch = jest.fn();
-			const store = { dispatch };
+			const store = { dispatch, getState: createGetState() };
 
 			const previousPost = getPublishedPost();
 			const post = { ...getPublishedPost(), id: defaultPost.id + 1 };
@@ -358,6 +369,19 @@ describe( 'effects', () => {
 			handler( { post, previousPost, isAutosave: true }, store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 0 );
+		} );
+
+		it( 'should dispatch dirtying action if edits linger after autosave', () => {
+			const dispatch = jest.fn();
+			const store = { dispatch, getState: createGetState( true ) };
+
+			const previousPost = getPublishedPost();
+			const post = { ...getPublishedPost(), id: defaultPost.id + 1 };
+
+			handler( { post, previousPost, isAutosave: true }, store );
+
+			expect( dispatch ).toHaveBeenCalledTimes( 1 );
+			expect( dispatch ).toHaveBeenCalledWith( { type: 'DIRTY_ARTIFICIALLY' } );
 		} );
 	} );
 
@@ -531,7 +555,7 @@ describe( 'effects', () => {
 
 			expect( result ).toEqual( [
 				setTemplateValidity( true ),
-				setupEditorState( post, [], { title: 'A History of Pork', status: 'draft' } ),
+				setupEditorState( post, [], { title: 'A History of Pork' } ),
 			] );
 		} );
 	} );

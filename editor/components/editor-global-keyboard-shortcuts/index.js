@@ -9,9 +9,7 @@ import { first, last } from 'lodash';
 import { Component, Fragment, compose } from '@wordpress/element';
 import { KeyboardShortcuts } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { keycodes } from '@wordpress/utils';
-
-const { rawShortcut } = keycodes;
+import { rawShortcut } from '@wordpress/keycodes';
 
 class EditorGlobalKeyboardShortcuts extends Component {
 	constructor() {

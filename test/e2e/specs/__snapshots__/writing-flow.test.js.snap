@@ -21,3 +21,17 @@ exports[`adding blocks Should navigate inner blocks with arrow keys 1`] = `
 <p>Second paragraph</p>
 <!-- /wp:paragraph -->"
 `;
+
+exports[`adding blocks should navigate around inline boundaries 1`] = `
+"<!-- wp:paragraph -->
+<p>FirstAfter</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Before<strong>InsideSecondInside</strong>After</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>BeforeThird</p>
+<!-- /wp:paragraph -->"
+`;

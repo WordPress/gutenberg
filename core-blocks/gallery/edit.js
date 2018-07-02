@@ -149,9 +149,9 @@ class GalleryEdit extends Component {
 		} );
 	}
 
-	componentWillReceiveProps( nextProps ) {
+	componentDidUpdate( prevProps ) {
 		// Deselect images when deselecting the block
-		if ( ! nextProps.isSelected && this.props.isSelected ) {
+		if ( ! this.props.isSelected && prevProps.isSelected ) {
 			this.setState( {
 				selectedImage: null,
 				captionSelected: false,
@@ -211,9 +211,8 @@ class GalleryEdit extends Component {
 						onSelect={ this.onSelectImages }
 						accept="image/*"
 						type="image"
-						disableMaxUploadErrorMessages
 						multiple
-						additionalNotices={ noticeUI }
+						notices={ noticeUI }
 						onError={ noticeOperations.createErrorNotice }
 					/>
 				</Fragment>

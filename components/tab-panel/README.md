@@ -91,6 +91,14 @@ The class to add to the active tab
 - Required: No
 - Default: `is-active`
 
+### initialTabName
+
+Optionally provide a tab name for a tab to be selected upon mounting of component. If this prop is not set, the first tab will be selected by default.
+
+- Type: `String`
+- Required: No
+- Default: none
+
 ### children
 
 A function which renders the tabviews given the selected tab. The function is passed a `tabName` as an argument.

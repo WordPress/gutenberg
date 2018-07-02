@@ -217,15 +217,15 @@ export const editor = flow( [
 	// Track undo history, starting at editor initialization.
 	withHistory( {
 		resetTypes: [ 'SETUP_EDITOR_STATE' ],
-		ignoreTypes: [ 'RECEIVE_BLOCKS' ],
+		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
 		shouldOverwriteState,
 	} ),
 
 	// Track whether changes exist, resetting at each post save. Relies on
 	// editor initialization firing post reset as an effect.
 	withChangeDetection( {
-		resetTypes: [ 'SETUP_EDITOR_STATE', 'UPDATE_POST' ],
-		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST' ],
+		resetTypes: [ 'SETUP_EDITOR_STATE', 'REQUEST_POST_UPDATE_START' ],
+		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
 	} ),
 ] )( {
 	edits( state = {}, action ) {
@@ -253,6 +253,9 @@ export const editor = flow( [
 				}
 
 				return state;
+
+			case 'DIRTY_ARTIFICIALLY':
+				return { ...state };
 
 			case 'UPDATE_POST':
 			case 'RESET_POST':
@@ -559,16 +562,6 @@ export function currentPost( state = {}, action ) {
 			}
 
 			return mapValues( post, getPostRawValue );
-
-		case 'RESET_AUTOSAVE':
-			// A post is no longer auto-draft (now draft) when autosave occurs.
-			if ( state.status === 'auto-draft' ) {
-				return {
-					...state,
-					status: 'draft',
-				};
-			}
-			break;
 	}
 
 	return state;
@@ -1049,19 +1042,22 @@ export const blockListSettings = ( state = {}, action ) => {
 		}
 		case 'UPDATE_BLOCK_LIST_SETTINGS': {
 			const { id } = action;
-			if ( id && ! action.settings ) {
-				return omit( state, id );
+			if ( ! action.settings ) {
+				if ( state.hasOwnProperty( id ) ) {
+					return omit( state, id );
+				}
+
+				return state;
 			}
-			const blockSettings = state[ id ];
-			const updateIsRequired = ! isEqual( blockSettings, action.settings );
-			if ( updateIsRequired ) {
-				return {
-					...state,
-					[ id ]: {
-						...action.settings,
-					},
-				};
+
+			if ( isEqual( state[ id ], action.settings ) ) {
+				return state;
 			}
+
+			return {
+				...state,
+				[ id ]: action.settings,
+			};
 		}
 	}
 	return state;
@@ -1085,7 +1081,41 @@ export function autosave( state = null, action ) {
 				'content',
 			].map( ( field ) => getPostRawValue( post[ field ] ) );
 
-			return { title, excerpt, content };
+			return {
+				title,
+				excerpt,
+				content,
+				preview_link: post.preview_link,
+			};
+
+		case 'REQUEST_POST_UPDATE':
+			// Invalidate known preview link when autosave starts.
+			if ( state && action.options.autosave ) {
+				return omit( state, 'preview_link' );
+			}
+			break;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer managing the block types
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function tokens( state = {}, action ) {
+	switch ( action.type ) {
+		case 'REGISTER_TOKEN':
+			return {
+				...state,
+				[ action.name ]: action.settings,
+			};
+		case 'UNREGISTER_TOKEN':
+			return omit( state, action.name );
 	}
 
 	return state;
@@ -1107,4 +1137,5 @@ export default optimist( combineReducers( {
 	template,
 	autosave,
 	settings,
+	tokens,
 } ) );
