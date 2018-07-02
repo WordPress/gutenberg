@@ -212,12 +212,13 @@ class ParagraphBlock extends Component {
 				</InspectorControls>
 				<RichText
 					tagName="p"
-					className={ classnames( 'wp-block-paragraph', className, {
-						'has-background': backgroundColor.value,
-						'has-drop-cap': dropCap,
-						[ backgroundColor.class ]: backgroundColor.class,
-						[ textColor.class ]: textColor.class,
-					} ) }
+					className={ classnames( 'wp-block-paragraph',
+						className, {
+							'has-background': backgroundColor.value,
+							'has-drop-cap': dropCap,
+							[ backgroundColor.class ]: backgroundColor.class,
+							[ textColor.class ]: textColor.class,
+						} ) }
 					style={ {
 						backgroundColor: backgroundColor.class ? undefined : backgroundColor.value,
 						color: textColor.class ? undefined : textColor.value,
