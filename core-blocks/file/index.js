@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { createBlobURL } from '@wordpress/utils';
+import { createBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
 
 /**

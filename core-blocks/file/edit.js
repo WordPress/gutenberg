@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { getBlobByURL, revokeBlobURL } from '@wordpress/utils';
+import { getBlobByURL, revokeBlobURL } from '@wordpress/blob';
 import {
 	ClipboardButton,
 	IconButton,
