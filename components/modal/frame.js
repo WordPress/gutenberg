@@ -121,7 +121,7 @@ class ModalFrame extends Component {
 				ref={ this.containerRef }
 				role={ role }
 				aria-label={ contentLabel }
-				aria-labelledby={ labelledby }
+				aria-labelledby={ contentLabel ? null : labelledby }
 				aria-describedby={ describedby }>
 				{ children }
 			</div>
