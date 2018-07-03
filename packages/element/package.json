@@ -17,8 +17,8 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"main": "build/index",
-	"module": "build-module/index",
+	"main": "build/index.js",
+	"module": "build-module/index.js",
 	"dependencies": {
 		"@wordpress/deprecated": "^1.0.0-alpha.2",
 		"@wordpress/is-shallow-equal": "1.0.2",
