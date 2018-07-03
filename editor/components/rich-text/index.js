@@ -513,8 +513,6 @@ export class RichText extends Component {
 				return;
 			}
 
-			this.onCreateUndoLevel();
-
 			const forward = keyCode === DELETE;
 
 			if ( this.props.onMerge ) {
@@ -557,7 +555,6 @@ export class RichText extends Component {
 				}
 
 				event.preventDefault();
-				this.onCreateUndoLevel();
 
 				const childNodes = Array.from( rootNode.childNodes );
 				const index = dom.nodeIndex( selectedNode );
@@ -571,7 +568,6 @@ export class RichText extends Component {
 				this.restoreContentAndSplit( before, after );
 			} else {
 				event.preventDefault();
-				this.onCreateUndoLevel();
 
 				if ( event.shiftKey || ! this.props.onSplit ) {
 					this.editor.execCommand( 'InsertLineBreak', false, event );
