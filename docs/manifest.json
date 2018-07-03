@@ -222,9 +222,9 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/babel-plugin-import-jsx-pragam",
-		"slug": "packages-babel-plugin-import-jsx-pragam",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/babel-plugin-import-jsx-pragam/README.md",
+		"title": "@wordpress/babel-plugin-import-jsx-pragma",
+		"slug": "packages-babel-plugin-import-jsx-pragma",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/babel-plugin-import-jsx-pragma/README.md",
 		"parent": "packages"
 	},
 	{
