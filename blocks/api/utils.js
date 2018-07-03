@@ -25,22 +25,15 @@ import { createBlock } from './factory';
 const ICON_COLORS = [ '#191e23', '#f8f9f9' ];
 
 /**
- * Determines whether the block is a default block
- * and its attributes are equal to the default attributes
+ * Determines whether the block's attributes are equal to the default attributes
  * which means the block is unmodified.
  *
- * @param  {WPBlock} block Block Object
+ * @param {WPBlock} block Block Object.
  *
- * @return {boolean}       Whether the block is an unmodified default block
+ * @return {boolean} Whether the block is an unmodified block.
  */
-export function isUnmodifiedDefaultBlock( block ) {
-	const defaultBlockName = getDefaultBlockName();
-	if ( block.name !== defaultBlockName ) {
-		return false;
-	}
-
-	const newDefaultBlock = createBlock( defaultBlockName );
-
+export function isUnmodifiedBlock( block ) {
+	const newDefaultBlock = createBlock( block.name );
 	const attributeKeys = applyFilters( 'blocks.isUnmodifiedDefaultBlock.attributes', [
 		...keys( newDefaultBlock.attributes ),
 		...keys( block.attributes ),
@@ -49,6 +42,23 @@ export function isUnmodifiedDefaultBlock( block ) {
 	return every( attributeKeys, ( key ) =>
 		isEqual( newDefaultBlock.attributes[ key ], block.attributes[ key ] )
 	);
+}
+
+/**
+ * Determines whether the block is a default block and its attributes are equal
+ * to the default attributes which means the block is unmodified.
+ *
+ * @param {WPBlock} block Block Object.
+ *
+ * @return {boolean} Whether the block is an unmodified default block.
+ */
+export function isUnmodifiedDefaultBlock( block ) {
+	const defaultBlockName = getDefaultBlockName();
+	if ( block.name !== defaultBlockName ) {
+		return false;
+	}
+
+	return isUnmodifiedBlock( block );
 }
 
 /**

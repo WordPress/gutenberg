@@ -42,6 +42,7 @@ export {
 	hasChildBlocks,
 } from './registration';
 export {
+	isUnmodifiedBlock,
 	isUnmodifiedDefaultBlock,
 	normalizeIconObject,
 	isValidIcon,
