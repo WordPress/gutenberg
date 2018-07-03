@@ -277,16 +277,37 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 			this.state = {};
 		}
 
-		static getDerivedStateFromProps( props ) {
+		static getDerivedStateFromProps( props, prevState ) {
+			// New state is only required to be generated if either the props
+			// have changed or on a subscription callback from the store.
+			const hasPropsChanged = ! isShallowEqual( props, prevState.props );
+			if ( ! prevState.fromStoreUpdate && ! hasPropsChanged ) {
+				return null;
+			}
+
 			// A constant value is used as the fallback since it can be more
 			// efficiently shallow compared in case component is repeatedly
 			// rendered without its own merge props.
-			const mergeProps = (
+			let mergeProps = (
 				mapStateToProps( select, props ) ||
 				DEFAULT_MERGE_PROPS
 			);
 
-			return { mergeProps };
+			// To avoid incurring a second isShallowEqual when determining
+			// whether to render as update, reset mergeProps to the prevState
+			// value if it is unchanging. This allows shouldComponentUpdate to
+			// be a trivial strict equality comparison, leveraging the fact
+			// that props will be referentially equal to prevState.props if
+			// getDerivedStateFromProps is called by consequence of setState.
+			if ( isShallowEqual( mergeProps, prevState.mergeProps ) ) {
+				mergeProps = prevState.mergeProps;
+			}
+
+			return {
+				mergeProps,
+				props,
+				fromStoreUpdate: false,
+			};
 		}
 
 		componentDidMount() {
@@ -300,8 +321,8 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 
 		shouldComponentUpdate( nextProps, nextState ) {
 			return (
-				! isShallowEqual( this.props, nextProps ) ||
-				! isShallowEqual( this.state.mergeProps, nextState.mergeProps )
+				this.state.props !== nextState.props ||
+				this.state.mergeProps !== nextState.mergeProps
 			);
 		}
 
@@ -316,7 +337,9 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 				// to the component, including state changes.
 				//
 				// See: https://reactjs.org/blog/2018/05/23/react-v-16-4.html#bugfix-for-getderivedstatefromprops
-				this.setState( () => ( {} ) );
+				this.setState( {
+					fromStoreUpdate: true,
+				} );
 			} );
 		}
 

@@ -529,6 +529,64 @@ describe( 'withSelect', () => {
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
 	} );
 
+	it( 'should not run selection if props have not changed', () => {
+		store = registerReducer( 'unchanging', ( state = {} ) => state );
+
+		registerSelectors( 'unchanging', {
+			getState: ( state ) => state,
+		} );
+
+		const mapSelectToProps = jest.fn();
+
+		const OriginalComponent = jest.fn().mockImplementation( () => <div /> );
+
+		const Component = compose( [
+			withSelect( mapSelectToProps ),
+		] )( OriginalComponent );
+
+		const Parent = ( props ) => <Component propName={ props.propName } />;
+
+		wrapper = mount( <Parent propName="foo" /> );
+
+		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
+		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
+
+		wrapper.setProps( { propName: 'foo' } );
+
+		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
+		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'should not run selection if state has changed but merge props the same', () => {
+		store = registerReducer( 'demo', () => ( {} ) );
+
+		registerSelectors( 'demo', {
+			getUnchangingValue: () => 10,
+		} );
+
+		registerActions( 'demo', {
+			update: () => ( { type: 'update' } ),
+		} );
+
+		const mapSelectToProps = jest.fn().mockImplementation( ( _select ) => ( {
+			value: _select( 'demo' ).getUnchangingValue(),
+		} ) );
+
+		const OriginalComponent = jest.fn().mockImplementation( () => <div /> );
+
+		const Component = withSelect( mapSelectToProps )( OriginalComponent );
+
+		wrapper = mount( <Component /> );
+
+		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
+		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
+
+		dispatch( 'demo' ).update();
+
+		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
+		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
+	} );
+
 	it( 'should render if props have changed but not state', () => {
 		store = registerReducer( 'unchanging', ( state = {} ) => state );
 
