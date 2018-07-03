@@ -52,6 +52,13 @@ import ImageSize from './image-size';
  */
 const MIN_SIZE = 20;
 
+const LINK_DESTINATION_OPTIONS = {
+	MEDIA_FILE: 'MEDIA_FILE',
+	ATTACHMENT_PAGE: 'ATTACHMENT_PAGE',
+	CUSTOM_HREF: 'CUSTOM_HREF',
+	NONE: 'NONE',
+};
+
 class ImageEdit extends Component {
 	constructor() {
 		super( ...arguments );
@@ -60,11 +67,12 @@ class ImageEdit extends Component {
 		this.onFocusCaption = this.onFocusCaption.bind( this );
 		this.onImageClick = this.onImageClick.bind( this );
 		this.onSelectImage = this.onSelectImage.bind( this );
-		this.onSetHref = this.onSetHref.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.updateWidth = this.updateWidth.bind( this );
 		this.updateHeight = this.updateHeight.bind( this );
 		this.updateDimensions = this.updateDimensions.bind( this );
+		this.onSetCustomHref = this.onSetCustomHref.bind( this );
+		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 
 		this.state = {
 			captionFocused: false,
@@ -122,7 +130,26 @@ class ImageEdit extends Component {
 		} );
 	}
 
-	onSetHref( value ) {
+	onSetLinkDestination( value ) {
+		let href;
+
+		if ( value === LINK_DESTINATION_OPTIONS.NONE ) {
+			href = '';
+		} else if ( value === LINK_DESTINATION_OPTIONS.MEDIA_FILE ) {
+			href = this.props.attributes.url;
+		} else if ( value === LINK_DESTINATION_OPTIONS.ATTACHMENT_PAGE ) {
+			href = this.props.image && this.props.image.link;
+		} else {
+			href = this.props.attributes.href;
+		}
+
+		this.props.setAttributes( {
+			linkDestination: value,
+			href,
+		} );
+	}
+
+	onSetCustomHref( value ) {
 		this.props.setAttributes( { href: value } );
 	}
 
@@ -176,28 +203,17 @@ class ImageEdit extends Component {
 	}
 
 	getLinkDestinationOptions() {
-		const {
-			attributes,
-			image,
-		} = this.props;
-
-		const mediaFileUrl = attributes.url;
-		const attachmentPageUrl = image && image.link;
-
-		if ( ! mediaFileUrl || ! attachmentPageUrl ) {
-			return;
-		}
-
 		return [
-			{ value: '', label: __( 'None' ) },
-			{ value: mediaFileUrl, label: __( 'Media File' ) },
-			{ value: attachmentPageUrl, label: __( 'Attachment Page' ) },
+			{ value: LINK_DESTINATION_OPTIONS.MEDIA_FILE, label: __( 'Media File' ) },
+			{ value: LINK_DESTINATION_OPTIONS.ATTACHMENT_PAGE, label: __( 'Attachment Page' ) },
+			{ value: LINK_DESTINATION_OPTIONS.CUSTOM_HREF, label: __( 'Custom URL' ) },
+			{ value: LINK_DESTINATION_OPTIONS.NONE, label: __( 'None' ) },
 		];
 	}
 
 	render() {
 		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, noticeOperations, noticeUI, toggleSelection, isRTL } = this.props;
-		const { url, alt, caption, align, id, href, width, height } = attributes;
+		const { url, alt, caption, align, id, href, linkDestination, width, height } = attributes;
 
 		const controls = (
 			<BlockControls>
@@ -220,7 +236,7 @@ class ImageEdit extends Component {
 							/>
 						) }
 					/>
-					<UrlInputButton onChange={ this.onSetHref } url={ href } />
+					<UrlInputButton onChange={ this.onSetCustomHref } url={ href } />
 				</Toolbar>
 			</BlockControls>
 		);
@@ -252,7 +268,6 @@ class ImageEdit extends Component {
 			'is-focused': isSelected,
 		} );
 
-		const linkDestinationOptions = this.getLinkDestinationOptions();
 		const availableSizes = this.getAvailableSizes();
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
 
@@ -265,12 +280,18 @@ class ImageEdit extends Component {
 						onChange={ this.updateAlt }
 						help={ __( 'Describe the purpose of the image. Leave empty if the image is not a key part of the content.' ) }
 					/>
-					{ linkDestinationOptions && (
-						<SelectControl
-							label={ __( 'Link to' ) }
+					<SelectControl
+						label={ __( 'Link to' ) }
+						value={ linkDestination }
+						options={ this.getLinkDestinationOptions() }
+						onChange={ this.onSetLinkDestination }
+					/>
+					{ linkDestination === LINK_DESTINATION_OPTIONS.CUSTOM_HREF && (
+						<TextControl
+							label={ __( 'Custom URL' ) }
 							value={ href }
-							options={ linkDestinationOptions }
-							onChange={ this.onSetHref }
+							onChange={ this.onSetCustomHref }
+							placeholder="http://"
 						/>
 					) }
 					{ ! isEmpty( availableSizes ) && (

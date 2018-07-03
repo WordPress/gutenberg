@@ -61,6 +61,9 @@ const blockAttributes = {
 	height: {
 		type: 'number',
 	},
+	linkDestination: {
+		type: 'string',
+	},
 };
 
 const imageSchema = {
