@@ -111,10 +111,6 @@ class Modal extends Component {
 			overlayClassName,
 			className,
 			onRequestClose,
-			style: {
-				content,
-				overlay,
-			},
 			title,
 			icon,
 			closeButtonLabel,
@@ -127,10 +123,8 @@ class Modal extends Component {
 				className={ classnames(
 					'components-modal__screen-overlay',
 					overlayClassName
-				) }
-				style={ overlay }>
+				) }>
 				<ModalFrame
-					style={ content }
 					className={ classnames(
 						'components-modal__frame',
 						className

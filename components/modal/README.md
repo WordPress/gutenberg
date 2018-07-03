@@ -140,20 +140,6 @@ If this property is added, it will determine whether the modal requests to close
 - Required: No
 - Default: true
 
-### style.content
-
-If this property is added, it will add inline styles to the modal content `div`.
-
-- Type: `Object`
-- Required: No
-
-### style.overlay
-
-If this property is added, it will add inline styles to the modal overlay `div`.
-
-- Type: `Object`
-- Required: No
-
 ### className
 
 If this property is added, it will an additional class name to the modal content `div`.
