@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Component, compose, createRef } from '@wordpress/element';
-import { keycodes } from '@wordpress/utils';
+import { ESCAPE } from '@wordpress/keycodes';
 import { focus } from '@wordpress/dom';
 
 /**
@@ -17,10 +17,6 @@ import './style.scss';
 import withFocusReturn from '../higher-order/with-focus-return';
 import withConstrainedTabbing from '../higher-order/with-constrained-tabbing';
 import withGlobalEvents from '../higher-order/with-global-events';
-
-const {
-	ESCAPE,
-} = keycodes;
 
 class ModalFrame extends Component {
 	constructor() {
