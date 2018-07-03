@@ -133,7 +133,7 @@ class Modal extends Component {
 					) }
 					onRequestClose={ onRequestClose }
 					aria={ {
-						labelledby: this.headingId,
+						labelledby: title ? this.headingId : null,
 						describedby: aria.describedby,
 					} }
 					{ ...otherProps } >
