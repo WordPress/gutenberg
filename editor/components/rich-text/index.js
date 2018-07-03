@@ -681,21 +681,34 @@ export class RichText extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
+		const { tagName, value } = this.props;
+
 		// The `savedContent` var allows us to avoid updating the content right after an `onChange` call
 		if (
 			!! this.editor &&
-			this.props.tagName === prevProps.tagName &&
-			this.props.value !== prevProps.value &&
-			this.props.value !== this.savedContent
+			tagName === prevProps.tagName &&
+			value !== prevProps.value &&
+			value !== this.savedContent
 		) {
 			this.setContent( this.props.value );
 		}
 
+		// Note: Environment condition must be independent for it to be dropped
+		// in dead code elimination with webpack.DefinePlugin.
 		if ( 'development' === process.env.NODE_ENV ) {
+			/* eslint-disable no-console */
+			if ( value !== prevProps.value && isEqual( value, prevProps.value ) ) {
+				console.error( 'RichText value reference changed while being deeply equal to `prevProps.value`. This will incur wasted effort to update the RichText field.' );
+			}
+
+			if ( value !== this.savedContent && isEqual( value, this.savedContent ) ) {
+				console.error( 'RichText value reference changed while being deeply equal to `this.savedContent`. This will incur wasted effort to update the RichText field.' );
+			}
+
 			if ( ! isEqual( this.props.formatters, prevProps.formatters ) ) {
-				// eslint-disable-next-line no-console
 				console.error( 'Formatters passed via `formatters` prop will only be registered once. Formatters can be enabled/disabled via the `formattingControls` prop.' );
 			}
+			/* eslint-enable no-console */
 		}
 	}
 
