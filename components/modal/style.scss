@@ -96,5 +96,4 @@
 	height: calc( 100% - #{ $header-height } - #{ $admin-bar-height } );
 	overflow: auto;
 	padding: $panel-padding;
-	z-index: z-index( '.components-modal__content' );
 }
