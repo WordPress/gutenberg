@@ -38,13 +38,13 @@ export function getMimeTypesArray( wpMimeTypesObject ) {
 }
 
 /**
- *	Media Upload is used by audio, image, gallery and video blocks to handle uploading a media file
- *	when a file upload button is activated.
+ *	Media Upload is used by audio, image, gallery, video, and file blocks to
+ *	handle uploading a media file when a file upload button is activated.
  *
  *	TODO: future enhancement to add an upload indicator.
  *
  * @param   {Object}   $0                   Parameters object passed to the function.
- * @param   {string}   $0.allowedType       The type of media that can be uploaded.
+ * @param   {string}   $0.allowedType       The type of media that can be uploaded, or '*' to allow all.
  * @param   {?Object}  $0.additionalData    Additional data to include in the request.
  * @param   {Array}    $0.filesList         List of files.
  * @param   {?number}  $0.maxUploadFileSize Maximum upload size in bytes allowed for the site.
@@ -69,7 +69,9 @@ export function mediaUpload( {
 	};
 
 	// Allowed type specified by consumer
-	const isAllowedType = ( fileType ) => startsWith( fileType, `${ allowedType }/` );
+	const isAllowedType = ( fileType ) => {
+		return ( allowedType === '*' ) || startsWith( fileType, `${ allowedType }/` );
+	};
 
 	// Allowed types for the current WP_User
 	const allowedMimeTypesForUser = getMimeTypesArray( get( window, [ '_wpMediaSettings', 'allowedMimeTypes' ] ) );
@@ -118,6 +120,7 @@ export function mediaUpload( {
 					caption: get( savedMedia, [ 'caption', 'raw' ], '' ),
 					id: savedMedia.id,
 					link: savedMedia.link,
+					title: savedMedia.title.raw,
 					url: savedMedia.source_url,
 				};
 				setAndUpdateFiles( idx, mediaObject );

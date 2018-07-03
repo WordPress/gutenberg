@@ -23,6 +23,7 @@ import * as code from './code';
 import * as columns from './columns';
 import * as coverImage from './cover-image';
 import * as embed from './embed';
+import * as file from './file';
 import * as freeform from './freeform';
 import * as html from './html';
 import * as latestPosts from './latest-posts';
@@ -63,6 +64,7 @@ export const registerCoreBlocks = () => {
 		embed,
 		...embed.common,
 		...embed.others,
+		file,
 		freeform,
 		html,
 		latestPosts,
