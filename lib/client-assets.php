@@ -1165,11 +1165,10 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	}
 
 	if ( ! empty( $gutenberg_theme_support ) ) {
-		wp_add_inline_script(
-			'wp-edit-post',
-			'console.warn( "' .
-				__( 'Adding theme support using the `gutenberg` array is deprecated. See https://wordpress.org/gutenberg/handbook/extensibility/theme-support/ for details.', 'gutenberg' ) .
-			'");'
+		_doing_it_wrong(
+			'add_theme_support()',
+			__( 'Adding theme support using the `gutenberg` array is deprecated. See https://wordpress.org/gutenberg/handbook/extensibility/theme-support/ for details.', 'gutenberg' ),
+			'2.0.0'
 		);
 	}
 
