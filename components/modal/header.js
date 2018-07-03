@@ -22,9 +22,11 @@ const ModalHeader = ( { icon, title, onClose, closeLabel } ) => {
 						{ icon }
 					</span>
 				}
-				<h1 className="components-modal__header-heading" >
-					{ title }
-				</h1>
+				{ title &&
+					<h1 className="components-modal__header-heading">
+						{ title }
+					</h1>
+				}
 			</div>
 			<IconButton
 				onClick={ onClose }
