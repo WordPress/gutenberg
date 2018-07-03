@@ -230,7 +230,7 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 	// ... block properties go here
 
 	save( props ) {
-		return <p>{ props.attributes.title }</div>;
+		return <p>{ props.attributes.title }</p>;
 	},
 
 	deprecated: [
