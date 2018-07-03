@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop } from 'lodash';
+import { noop, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,10 +22,12 @@ let parentElement,
 	openModalCount = 0;
 
 class Modal extends Component {
-	constructor() {
-		super( ...arguments );
+	constructor( props ) {
+		super( props );
 
 		this.prepareDOM();
+
+		this.headingId = uniqueId( props.aria.labelledby );
 	}
 
 	/**
@@ -115,6 +117,7 @@ class Modal extends Component {
 			icon,
 			closeButtonLabel,
 			children,
+			aria,
 			...otherProps
 		} = this.props;
 
@@ -129,11 +132,16 @@ class Modal extends Component {
 						className
 					) }
 					onRequestClose={ onRequestClose }
+					aria={ {
+						labelledby: this.headingId,
+						describedby: aria.describedby,
+					} }
 					{ ...otherProps } >
 					<ModalHeader
 						closeLabel={ closeButtonLabel }
 						onClose={ onRequestClose }
 						title={ title }
+						headingId={ this.headingId }
 						icon={ icon } />
 					<div
 						className={ 'components-modal__content' }>
