@@ -115,7 +115,7 @@ export function mediaUpload( {
 
 		return createMediaFromFile( mediaFile, additionalData ).then(
 			( savedMedia ) => {
-				let mediaObject = {
+				const mediaObject = {
 					alt: savedMedia.alt_text,
 					caption: get( savedMedia, [ 'caption', 'raw' ], '' ),
 					id: savedMedia.id,
