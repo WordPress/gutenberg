@@ -36,7 +36,6 @@ import {
 	MediaPlaceholder,
 	MediaUpload,
 	BlockAlignmentToolbar,
-	UrlInputButton,
 	editorMediaUpload,
 } from '@wordpress/editor';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -53,10 +52,10 @@ import ImageSize from './image-size';
 const MIN_SIZE = 20;
 
 const LINK_DESTINATION_OPTIONS = {
+	NONE: 'NONE',
 	MEDIA_FILE: 'MEDIA_FILE',
 	ATTACHMENT_PAGE: 'ATTACHMENT_PAGE',
 	CUSTOM_HREF: 'CUSTOM_HREF',
-	NONE: 'NONE',
 };
 
 class ImageEdit extends Component {
@@ -204,10 +203,10 @@ class ImageEdit extends Component {
 
 	getLinkDestinationOptions() {
 		return [
+			{ value: LINK_DESTINATION_OPTIONS.NONE, label: __( 'None' ) },
 			{ value: LINK_DESTINATION_OPTIONS.MEDIA_FILE, label: __( 'Media File' ) },
 			{ value: LINK_DESTINATION_OPTIONS.ATTACHMENT_PAGE, label: __( 'Attachment Page' ) },
 			{ value: LINK_DESTINATION_OPTIONS.CUSTOM_HREF, label: __( 'Custom URL' ) },
-			{ value: LINK_DESTINATION_OPTIONS.NONE, label: __( 'None' ) },
 		];
 	}
 
@@ -236,7 +235,6 @@ class ImageEdit extends Component {
 							/>
 						) }
 					/>
-					<UrlInputButton onChange={ this.onSetCustomHref } url={ href } />
 				</Toolbar>
 			</BlockControls>
 		);
