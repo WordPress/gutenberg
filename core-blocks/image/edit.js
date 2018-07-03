@@ -175,6 +175,26 @@ class ImageEdit extends Component {
 		return get( this.props.image, [ 'media_details', 'sizes' ], {} );
 	}
 
+	getLinkDestinationOptions() {
+		const {
+			attributes,
+			image,
+		} = this.props;
+
+		const mediaFileUrl = attributes.url;
+		const attachmentPageUrl = image && image.link;
+
+		if ( ! mediaFileUrl || ! attachmentPageUrl ) {
+			return;
+		}
+
+		return [
+			{ value: '', label: __( 'None' ) },
+			{ value: mediaFileUrl, label: __( 'Media File' ) },
+			{ value: attachmentPageUrl, label: __( 'Attachment Page' ) },
+		];
+	}
+
 	render() {
 		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, noticeOperations, noticeUI, toggleSelection, isRTL } = this.props;
 		const { url, alt, caption, align, id, href, width, height } = attributes;
@@ -205,8 +225,6 @@ class ImageEdit extends Component {
 			</BlockControls>
 		);
 
-		const availableSizes = this.getAvailableSizes();
-
 		if ( ! url ) {
 			return (
 				<Fragment>
@@ -234,6 +252,8 @@ class ImageEdit extends Component {
 			'is-focused': isSelected,
 		} );
 
+		const linkDestinationOptions = this.getLinkDestinationOptions();
+		const availableSizes = this.getAvailableSizes();
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
 
 		const getInspectorControls = ( imageWidth, imageHeight ) => (
@@ -245,6 +265,14 @@ class ImageEdit extends Component {
 						onChange={ this.updateAlt }
 						help={ __( 'Describe the purpose of the image. Leave empty if the image is not a key part of the content.' ) }
 					/>
+					{ linkDestinationOptions && (
+						<SelectControl
+							label={ __( 'Link to' ) }
+							value={ href }
+							options={ linkDestinationOptions }
+							onChange={ this.onSetHref }
+						/>
+					) }
 					{ ! isEmpty( availableSizes ) && (
 						<SelectControl
 							label={ __( 'Source Type' ) }
