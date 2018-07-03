@@ -378,19 +378,24 @@
 	// Left
 	&[data-align="left"] {
 		.editor-block-list__block-edit {	// This is in the editor only, on the frontend, the img should be floated
+			/*!rtl:begin:ignore*/
 			float: left;
 			margin-right: 2em;
+			/*!rtl:end:ignore*/
 		}
 	}
 
 	// Right
 	&[data-align="right"] {
 		.editor-block-list__block-edit {	// This is in the editor only, on the frontend, the img should be floated
+			/*!rtl:begin:ignore*/
 			float: right;
 			margin-left: 2em;
+			/*!rtl:end:ignore*/
 		}
 
 		.editor-block-toolbar {
+			/*!rtl:ignore*/
 			float: right;
 		}
 	}
@@ -878,9 +883,19 @@
 	left: 0;
 
 	.editor-block-list__block[data-align="right"] & {
+		/*!rtl:begin:ignore*/
 		left: auto;
 		right: 0;
+		/*!rtl:end:ignore*/
 	}
+
+	.editor-block-list__block[data-align="left"] & {
+		/*!rtl:begin:ignore*/
+		right: auto;
+		left: 0;
+		/*!rtl:end:ignore*/
+	}
+
 
 	@include break-small() {
 		width: auto;
