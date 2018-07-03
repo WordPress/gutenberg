@@ -7,57 +7,70 @@ import { noop, get } from 'lodash';
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { compose } from '@wordpress/element';
+import { compose, Component, createRef } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import PublishButtonLabel from './label';
-
-export function PostPublishButton( {
-	isSaving,
-	onStatusChange,
-	onSave,
-	isBeingScheduled,
-	visibility,
-	isPublishable,
-	isSaveable,
-	hasPublishAction,
-	onSubmit = noop,
-	forceIsSaving,
-} ) {
-	const isButtonEnabled = isPublishable && isSaveable;
-
-	let publishStatus;
-	if ( ! hasPublishAction ) {
-		publishStatus = 'pending';
-	} else if ( isBeingScheduled ) {
-		publishStatus = 'future';
-	} else if ( visibility === 'private' ) {
-		publishStatus = 'private';
-	} else {
-		publishStatus = 'publish';
+export class PostPublishButton extends Component {
+	constructor( props ) {
+		super( props );
+		this.buttonNode = createRef();
+	}
+	componentDidMount() {
+		if ( this.props.focusOnMount ) {
+			this.buttonNode.current.focus();
+		}
 	}
 
-	const onClick = () => {
-		onSubmit();
-		onStatusChange( publishStatus );
-		onSave();
-	};
+	render() {
+		const {
+			isSaving,
+			onStatusChange,
+			onSave,
+			isBeingScheduled,
+			visibility,
+			isPublishable,
+			isSaveable,
+			hasPublishAction,
+			onSubmit = noop,
+			forceIsSaving,
+		} = this.props;
+		const isButtonEnabled = isPublishable && isSaveable;
 
-	return (
-		<Button
-			className="editor-post-publish-button"
-			isPrimary
-			isLarge
-			onClick={ onClick }
-			disabled={ ! isButtonEnabled }
-			isBusy={ isSaving }
-		>
-			<PublishButtonLabel forceIsSaving={ forceIsSaving } />
-		</Button>
-	);
+		let publishStatus;
+		if ( ! hasPublishAction ) {
+			publishStatus = 'pending';
+		} else if ( isBeingScheduled ) {
+			publishStatus = 'future';
+		} else if ( visibility === 'private' ) {
+			publishStatus = 'private';
+		} else {
+			publishStatus = 'publish';
+		}
+
+		const onClick = () => {
+			onSubmit();
+			onStatusChange( publishStatus );
+			onSave();
+		};
+
+		return (
+			<Button
+				ref={ this.buttonNode }
+				className="editor-post-publish-button"
+				isPrimary
+				isLarge
+				onClick={ onClick }
+				disabled={ ! isButtonEnabled }
+				isBusy={ isSaving }
+			>
+				<PublishButtonLabel forceIsSaving={ forceIsSaving } />
+			</Button>
+		);
+	}
 }
 
 export default compose( [
