@@ -65,7 +65,7 @@ function generateNamespaceDocs( parsedNamespace ) {
 	return [
 		`# **${ parsedNamespace.name }**: ${ parsedNamespace.title }`,
 		'',
-		'## Selectors ',
+		'## Selectors',
 		'',
 		( parsedNamespace.selectors.map( generateFunctionDocs ) ).join( '\n\n' ),
 		'',
