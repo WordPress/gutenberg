@@ -57,10 +57,12 @@ describe( 'withGlobalEvents', () => {
 		}
 	} );
 
-	function mountEnhancedComponent( props ) {
+	function mountEnhancedComponent( props = {} ) {
 		const EnhancedComponent = withGlobalEvents( {
 			resize: 'handleResize',
 		} )( OriginalComponent );
+
+		props.ref = () => {};
 
 		wrapper = TestRenderer.create( <EnhancedComponent { ...props }>Hello</EnhancedComponent> );
 	}
