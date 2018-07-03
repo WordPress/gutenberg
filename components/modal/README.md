@@ -58,14 +58,15 @@ class MyModalWrapper extends Component {
 		return (
 			<Fragment>
 				<button onClick={ this.openModal }>Open Modal</button>
-				<Modal
-					title="This is my modal"
-					onRequestClose={ this.closeModal }
-					isOpen={ this.state.isOpen }>
-					<button onClick={ this.closeModal }>
-						My custom close button
-					</button>
-				</Modal>
+				{ this.state.isOpen ? 
+                    <Modal
+                        title="This is my modal"
+                        onRequestClose={ this.closeModal }>
+                        <button onClick={ this.closeModal }>
+                            My custom close button
+                        </button>
+                    </Modal> 
+                    : null }
 			</Fragment>
 		);
 	}

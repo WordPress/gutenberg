@@ -54,41 +54,30 @@ class Modal extends Component {
 	}
 
 	/**
-	 * Opens or closes the modal based on whether the isOpen prop changed.
-	 *
-	 * @param {Object} prevProps The previous props.
-	 */
-	componentDidUpdate( prevProps ) {
-		const openStateChanged = this.props.isOpen !== prevProps.isOpen;
-		if ( openStateChanged && ! prevProps.isOpen ) {
-			this.openModal();
-		} else if ( openStateChanged && prevProps.isOpen ) {
-			this.closeModal();
-		}
-	}
-
-	/**
-	 * Closes the modal if it is open before unmount.
-	 */
-	componentWillUnmount() {
-		const { isOpen } = this.props;
-		if ( isOpen ) {
-			this.closeModal();
-		}
-		this.cleanDOM();
-	}
-
-	/**
 	 * Appends the modal's node to the DOM, so the portal can render the
 	 * modal in it. Also calls the openFirstModal when this is the first modal to be
 	 * opened.
 	 */
-	openModal() {
+	componentDidMount() {
 		openModalCount++;
 
 		if ( openModalCount === 1 ) {
 			this.openFirstModal();
 		}
+	}
+
+	/**
+	 * Removes the modal's node from the DOM. Also calls closeLastModal when this is
+	 * the last modal to be closed.
+	 */
+	componentWillUnmount() {
+		openModalCount--;
+
+		if ( openModalCount === 0 ) {
+			this.closeLastModal();
+		}
+
+		this.cleanDOM();
 	}
 
 	/**
@@ -101,18 +90,6 @@ class Modal extends Component {
 	openFirstModal() {
 		ariaHelper.hideApp( parentElement );
 		document.body.classList.add( this.props.bodyOpenClassName );
-	}
-
-	/**
-	 * Removes the modal's node from the DOM. Also calls closeLastModal when this is
-	 * the last modal to be closed.
-	 */
-	closeModal() {
-		openModalCount--;
-
-		if ( openModalCount === 0 ) {
-			this.closeLastModal();
-		}
 	}
 
 	/**
@@ -131,7 +108,6 @@ class Modal extends Component {
 	 */
 	render() {
 		const {
-			isOpen,
 			overlayClassName,
 			className,
 			onRequestClose,
@@ -145,10 +121,6 @@ class Modal extends Component {
 			children,
 			...otherProps
 		} = this.props;
-
-		if ( ! isOpen ) {
-			return null;
-		}
 
 		return createPortal(
 			<div
