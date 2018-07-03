@@ -265,38 +265,41 @@ export class Autocomplete extends Component {
 			tokenWrapper.contentEditable = false;
 		}
 
-		const existingTokenWrapper = this.getTokenWrapperNode( range.startContainer );
-		if ( existingTokenWrapper ) {
-			/**
-			 * If we're within an existing token, we want to replace it rather
-			 * than inserting a completion within a completion.
-			 */
-			existingTokenWrapper.parentNode.replaceChild( tokenWrapper, existingTokenWrapper );
-		} else {
-			range.insertNode( tokenWrapper );
-		}
+		// Wrap insertions as a transaction so insertions can be integrated with undo stacks.
+		this.props.transactInsertion( () => {
+			const existingTokenWrapper = this.getTokenWrapperNode( range.startContainer );
+			if ( existingTokenWrapper ) {
+				/**
+				 * If we're within an existing token, we want to replace it rather
+				 * than inserting a completion within a completion.
+				 */
+				existingTokenWrapper.parentNode.replaceChild( tokenWrapper, existingTokenWrapper );
+			} else {
+				range.insertNode( tokenWrapper );
+			}
 
-		range.setStartAfter( tokenWrapper );
-		range.deleteContents();
+			range.setStartAfter( tokenWrapper );
+			range.deleteContents();
 
-		if ( shouldSetCursor ) {
-			selection.removeAllRanges();
+			if ( shouldSetCursor ) {
+				selection.removeAllRanges();
 
-			const newCursorPosition = document.createRange();
+				const newCursorPosition = document.createRange();
 
-			/**
-			 * Add a zero-width non-breaking space (ZWNBSP) so we can place cursor
-			 * after. TinyMCE handles ZWNBSP's nicely around token boundaries,
-			 * adding and removing them as necessary as the keyboard is used to
-			 * move the cursor in and out of boundaries.
-			 */
-			tokenWrapper.parentNode.insertBefore(
-				document.createTextNode( '\uFEFF' ),
-				tokenWrapper.nextSibling
-			);
-			newCursorPosition.setStartAfter( tokenWrapper.nextSibling );
-			selection.addRange( newCursorPosition );
-		}
+				/**
+				 * Add a zero-width non-breaking space (ZWNBSP) so we can place cursor
+				 * after. TinyMCE handles ZWNBSP's nicely around token boundaries,
+				 * adding and removing them as necessary as the keyboard is used to
+				 * move the cursor in and out of boundaries.
+				 */
+				tokenWrapper.parentNode.insertBefore(
+					document.createTextNode( '\uFEFF' ),
+					tokenWrapper.nextSibling
+				);
+				newCursorPosition.setStartAfter( tokenWrapper.nextSibling );
+				selection.addRange( newCursorPosition );
+			}
+		} );
 	}
 
 	/**
@@ -803,6 +806,12 @@ export class Autocomplete extends Component {
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}
 }
+
+Autocomplete.defaultProps = {
+	transactInsertion( f ) {
+		f();
+	},
+};
 
 export default compose( [
 	withSpokenMessages,

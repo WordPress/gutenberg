@@ -120,6 +120,7 @@ export class RichText extends Component {
 		this.onPaste = this.onPaste.bind( this );
 		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
 		this.setFocusedElement = this.setFocusedElement.bind( this );
+		this.transactAutocompletion = this.transactAutocompletion.bind( this );
 
 		this.state = {
 			formats: {},
@@ -536,6 +537,20 @@ export class RichText extends Component {
 		}
 	}
 
+	/**
+	 * Takes a function to insert an autocompletion and runs it as an undoable action.
+	 *
+	 * @param {Function} insertCompletion A function that inserts a completion.
+	 * @private
+	 */
+	transactAutocompletion( insertCompletion ) {
+		if ( this.editor ) {
+			this.editor.undoManager.transact( insertCompletion );
+		} else {
+			insertCompletion();
+		}
+	}
+
 	scrollToRect( rect ) {
 		const { top: caretTop } = rect;
 		const container = getScrollContainer( this.editor.getBody() );
@@ -892,7 +907,11 @@ export class RichText extends Component {
 						containerRef={ this.containerRef }
 					/>
 				}
-				<Autocomplete onReplace={ this.props.onReplace } completers={ autocompleters }>
+				<Autocomplete
+					completers={ autocompleters }
+					onReplace={ this.props.onReplace }
+					transactInsertion={ this.transactAutocompletion }
+				>
 					{ ( { isExpanded, listBoxId, activeId } ) => (
 						<Fragment>
 							<TinyMCE
