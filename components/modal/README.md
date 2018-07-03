@@ -12,7 +12,6 @@ Render a screen overlay with a modal on top.
 	<Modal
 		title="My Modal"
 		onRequestClose={ closeFunction }
-		isOpen={ openState }
 		aria={ {
 		    describedby: "modal-description",
 		} }
@@ -58,15 +57,15 @@ class MyModalWrapper extends Component {
 		return (
 			<Fragment>
 				<button onClick={ this.openModal }>Open Modal</button>
-				{ this.state.isOpen ? 
-                    <Modal
-                        title="This is my modal"
-                        onRequestClose={ this.closeModal }>
-                        <button onClick={ this.closeModal }>
-                            My custom close button
-                        </button>
-                    </Modal> 
-                    : null }
+				{ this.state.isOpen ?
+					<Modal
+						title="This is my modal"
+						onRequestClose={ this.closeModal }>
+						<button onClick={ this.closeModal }>
+						    My custom close button
+						</button>
+					</Modal> 
+					: null }
 			</Fragment>
 		);
 	}
