@@ -124,7 +124,7 @@ export function mediaUpload( {
 					url: savedMedia.source_url,
 					mediaDetails: {},
 				};
-				if ( has( savedMedia, ['media_details', 'sizes'] ) ) {
+				if ( has( savedMedia, [ 'media_details', 'sizes' ] ) ) {
 					mediaObject.mediaDetails.sizes = get( savedMedia, [ 'media_details', 'sizes' ], {} );
 				}
 				setAndUpdateFiles( idx, mediaObject );
