@@ -119,30 +119,27 @@ class Modal extends Component {
 		} = this.props;
 
 		return createPortal(
-			<div className="components-modal__screen-overlay">
-				<div
+			<div className={ classnames(
+				'components-modal__screen-overlay',
+				overlayClassName
+			) }>
+				<ModalFrame
 					className={ classnames(
-						'components-modal__screen-visible-overlay',
-						overlayClassName
-					) }>
-					<ModalFrame
-						className={ classnames(
-							'components-modal__frame',
-							className
-						) }
-						onRequestClose={ onRequestClose }
-						{ ...otherProps } >
-						<ModalHeader
-							closeLabel={ closeButtonLabel }
-							onClose={ onRequestClose }
-							title={ title }
-							icon={ icon } />
-						<div
-							className={ 'components-modal__content' }>
-							{ children }
-						</div>
-					</ModalFrame>
-				</div>
+						'components-modal__frame',
+						className
+					) }
+					onRequestClose={ onRequestClose }
+					{ ...otherProps } >
+					<ModalHeader
+						closeLabel={ closeButtonLabel }
+						onClose={ onRequestClose }
+						title={ title }
+						icon={ icon } />
+					<div
+						className={ 'components-modal__content' }>
+						{ children }
+					</div>
+				</ModalFrame>
 			</div>,
 			this.node
 		);

@@ -5,27 +5,8 @@
 	right: 0;
 	bottom: 0;
 	left: 0;
-	z-index: z-index( '.components-modal__screen-overlay' );
-}
-
-// The scrim behind the modal window.
-.components-modal__screen-visible-overlay {
-	position: fixed;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
 	background-color: rgba( $white, .4 );
-
-	// On mobile the main content area has to scroll, otherwise you can invoke the overscroll bounce on the non-scrolling container.
-	@include break-small {
-		position: fixed;
-		top: $admin-bar-height-big;
-	}
-
-	@include break-medium() {
-		top: $admin-bar-height;
-	}
+	z-index: z-index( '.components-modal__screen-overlay' );
 }
 
 // The modal window element.
