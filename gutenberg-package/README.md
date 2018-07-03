@@ -362,19 +362,19 @@ data.dispatch( 'core/blocks' ).hideInserterMenuPanel( SHARED_PANEL );
 data.dispatch( 'core/blocks' ).hideInserterMenuPanel( SUGGESTED_PANEL );
 ```
 
-Also, **Gutenberg by Frontkom** added `addCategories` and `removeCategories` actions so you can manage blocks categories.
+Also, you can manage blocks categories using `getCategories` selector and `setCategories` action:
 
 ```js
+import { reject } from 'lodash';
 import { data } from '@frontkom/gutenberg';
 
 // Removing 'widgets' category
-data.dispatch( 'core/blocks' ).removeCategories( [ 'widgets' ] );
+data.select( 'core/blocks' ).getCategories();
 
-// Adding 'StoryPage Blocks' category
-data.dispatch( 'core/blocks' ).addCategories( [ {
-    slug: 'storypage',
-    title: 'StoryPage Blocks',
-} ] );
+const categories = reject( select( 'core/blocks' ).getCategories(), { slug: 'widgets' } )
+
+data.dispatch( 'core/blocks' ).setCategories( categories );
+
 ```
 
 [↑ Go up to Table of contents](#table-of-contents)
