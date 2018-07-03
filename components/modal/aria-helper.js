@@ -3,6 +3,14 @@
  */
 import { forEach } from 'lodash';
 
+const LIVE_REGION_ARIA_ROLES = new Set( [
+	'alert',
+	'status',
+	'log',
+	'marquee',
+	'timer',
+] );
+
 let hiddenElements = [],
 	isHidden = false;
 
@@ -45,19 +53,12 @@ export function hideApp( unhiddenElement ) {
  * @return {boolean} Whether the element should not be hidden from screen-readers.
  */
 export function elementShouldBeHidden( element ) {
-	const liveRegionAriaRoles = [
-		'alert',
-		'status',
-		'log',
-		'marquee',
-		'timer',
-	];
 	const role = element.getAttribute( 'role' );
 	return ! (
 		element.tagName === 'SCRIPT' ||
 		element.hasAttribute( 'aria-hidden' ) ||
 		element.hasAttribute( 'aria-live' ) ||
-		liveRegionAriaRoles.includes( role )
+		LIVE_REGION_ARIA_ROLES.has( role )
 	);
 }
 
