@@ -188,6 +188,12 @@ class WritingFlow extends Component {
 	onKeyDown( event ) {
 		const { hasMultiSelection, onMultiSelect, blocks } = this.props;
 
+		// Aobrt if navigation has already been handled (e.g. TinyMCE inline
+		// boundaries).
+		if ( event.nativeEvent.defaultPrevented ) {
+			return;
+		}
+
 		const { keyCode, target } = event;
 		const isUp = keyCode === UP;
 		const isDown = keyCode === DOWN;

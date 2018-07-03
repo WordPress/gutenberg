@@ -30,12 +30,12 @@ import {
 } from '@wordpress/components';
 import {
 	withColors,
-	PostTypeSupportCheck,
 	BlockControls,
-	MediaPlaceholder,
 	InspectorControls,
+	MediaPlaceholder,
 	MediaUpload,
 	PanelColor,
+	PostTypeSupportCheck,
 	RichText,
 } from '@wordpress/editor';
 import { withSelect } from '@wordpress/data';
@@ -264,8 +264,8 @@ class PostEdit extends Component {
 						{
 							( type === 'withid' ) &&
 							<TextControl
-								placeholder={ __( 'Post id' ) }
 								value={ id }
+								label={ __( 'Post id' ) }
 								onChange={ ( nextId ) => {
 									setAttributes( { id: parseInt( nextId ) } );
 								} }

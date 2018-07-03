@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, map, keyBy, omit } from 'lodash';
+import { keyBy, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -88,22 +88,8 @@ export const fallbackBlockName = createBlockNameSetterReducer( 'SET_FALLBACK_BLO
  * @return {Object} Updated state.
  */
 export function categories( state = DEFAULT_CATEGORIES, action ) {
-	switch ( action.type ) {
-		case 'ADD_CATEGORIES':
-			const addedSlugs = map( action.categories, ( category ) => category.slug );
-			const previousState = filter( state, ( category ) => addedSlugs.indexOf( category.slug ) === -1 );
-
-			if ( !! action.atTheEnd ) {
-				return [ ...previousState, ...action.categories ];
-			}
-
-			return [ ...action.categories, ...previousState ];
-		/*
-		 * @frontkom/gutenberg 0.2.0
-		 */
-		case 'REMOVE_CATEGORIES':
-			const nextState = filter( state, ( category ) => action.categories.indexOf( category.slug ) === -1 );
-			return [ ...nextState ];
+	if ( action.type === 'SET_CATEGORIES' ) {
+		return action.categories || [];
 	}
 
 	return state;

@@ -25,7 +25,7 @@ import {
 	getScrollContainer,
 } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
-import { BACKSPACE, DELETE, ENTER, rawShortcut } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, rawShortcut } from '@wordpress/keycodes';
 import { withInstanceId, withSafeTimeout, Slot } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { rawHandler } from '@wordpress/blocks';
@@ -45,6 +45,22 @@ import { domToFormat, valueToString } from './format';
 import TokenUI from './tokens/ui';
 
 /**
+ * Browser dependencies
+ */
+
+const { Node } = window;
+
+/**
+ * Zero-width space character used by TinyMCE as a caret landing point for
+ * inline boundary nodes.
+ *
+ * @see tinymce/src/core/main/ts/text/Zwsp.ts
+ *
+ * @type {string}
+ */
+const TINYMCE_ZWSP = '\uFEFF';
+
+/**
  * Returns true if the node is the inline node boundary. This is used in node
  * filtering prevent the inline boundary from being included in the split which
  * occurs while within but at the end of an inline node, since TinyMCE includes
@@ -58,7 +74,7 @@ import TokenUI from './tokens/ui';
  */
 export function isEmptyInlineBoundary( node ) {
 	const text = node.nodeName === 'A' ? node.innerText : node.textContent;
-	return text === '\uFEFF';
+	return text === TINYMCE_ZWSP;
 }
 
 /**
@@ -112,6 +128,7 @@ export class RichText extends Component {
 		this.onChange = this.onChange.bind( this );
 		this.onNewBlock = this.onNewBlock.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
+		this.onHorizontalNavigationKeyDown = this.onHorizontalNavigationKeyDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onKeyUp = this.onKeyUp.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
@@ -435,6 +452,50 @@ export class RichText extends Component {
 	}
 
 	/**
+	 * Handles a horizontal navigation key down event to handle the case where
+	 * TinyMCE attempts to preventDefault when on the outside edge of an inline
+	 * boundary when arrowing _away_ from the boundary, not within it. Replaces
+	 * the TinyMCE event `preventDefault` behavior with a noop, such that those
+	 * relying on `defaultPrevented` are not misinformed about the arrow event.
+	 *
+	 * If TinyMCE#4476 is resolved, this handling may be removed.
+	 *
+	 * @see https://github.com/tinymce/tinymce/issues/4476
+	 *
+	 * @param {tinymce.EditorEvent<KeyboardEvent>} event Keydown event.
+	 */
+	onHorizontalNavigationKeyDown( event ) {
+		const { focusNode } = window.getSelection();
+		const { nodeType, nodeValue } = focusNode;
+
+		if ( nodeType !== Node.TEXT_NODE ) {
+			return;
+		}
+
+		if ( nodeValue.length !== 1 || nodeValue[ 0 ] !== TINYMCE_ZWSP ) {
+			return;
+		}
+
+		const { keyCode } = event;
+
+		// Consider to be moving away from inline boundary based on:
+		//
+		// 1. Within a text fragment consisting only of ZWSP.
+		// 2. If in reverse, there is no previous sibling. If forward, there is
+		//    no next sibling (i.e. end of node).
+		const isReverse = keyCode === LEFT;
+		const edgeSibling = isReverse ? 'previousSibling' : 'nextSibling';
+		if ( ! focusNode[ edgeSibling ] ) {
+			// Note: This is not reassigning on the native event, rather the
+			// "fixed" TinyMCE copy, which proxies its preventDefault to the
+			// native event. By reassigning here, we're effectively preventing
+			// the proxied call on the native event, but not otherwise mutating
+			// the original event object.
+			event.preventDefault = noop;
+		}
+	}
+
+	/**
 	 * Handles a keydown event from TinyMCE.
 	 *
 	 * @param {KeydownEvent} event The keydown event as triggered by TinyMCE.
@@ -442,10 +503,11 @@ export class RichText extends Component {
 	onKeyDown( event ) {
 		const dom = this.editor.dom;
 		const rootNode = this.editor.getBody();
+		const { keyCode } = event;
 
 		if (
-			( event.keyCode === BACKSPACE && isHorizontalEdge( rootNode, true ) ) ||
-			( event.keyCode === DELETE && isHorizontalEdge( rootNode, false ) )
+			( keyCode === BACKSPACE && isHorizontalEdge( rootNode, true ) ) ||
+			( keyCode === DELETE && isHorizontalEdge( rootNode, false ) )
 		) {
 			if ( ! this.props.onMerge && ! this.props.onRemove ) {
 				return;
@@ -453,7 +515,7 @@ export class RichText extends Component {
 
 			this.onCreateUndoLevel();
 
-			const forward = event.keyCode === DELETE;
+			const forward = keyCode === DELETE;
 
 			if ( this.props.onMerge ) {
 				this.props.onMerge( forward );
@@ -471,9 +533,14 @@ export class RichText extends Component {
 			event.stopImmediatePropagation();
 		}
 
+		const isHorizontalNavigation = keyCode === LEFT || keyCode === RIGHT;
+		if ( isHorizontalNavigation ) {
+			this.onHorizontalNavigationKeyDown( event );
+		}
+
 		// If we click shift+Enter on inline RichTexts, we avoid creating two contenteditables
 		// We also split the content and call the onSplit prop if provided.
-		if ( event.keyCode === ENTER ) {
+		if ( keyCode === ENTER ) {
 			if ( this.props.multiline ) {
 				if ( ! this.props.onSplit ) {
 					return;
@@ -573,17 +640,20 @@ export class RichText extends Component {
 	 * @param {Object} context The context for splitting.
 	 */
 	splitContent( blocks = [], context = {} ) {
-		if ( ! this.props.onSplit ) {
+		const { onSplit } = this.props;
+		if ( ! onSplit ) {
 			return;
 		}
 
-		const { dom } = this.editor;
 		const rootNode = this.editor.getBody();
-		const beforeRange = dom.createRng();
-		const afterRange = dom.createRng();
-		const selectionRange = this.editor.selection.getRng();
 
+		let before, after;
 		if ( rootNode.childNodes.length ) {
+			const { dom } = this.editor;
+			const beforeRange = dom.createRng();
+			const afterRange = dom.createRng();
+			const selectionRange = this.editor.selection.getRng();
+
 			beforeRange.setStart( rootNode, 0 );
 			beforeRange.setEnd( selectionRange.startContainer, selectionRange.startOffset );
 
@@ -594,20 +664,32 @@ export class RichText extends Component {
 			const afterFragment = afterRange.extractContents();
 
 			const { format } = this.props;
-			let before = domToFormat( filterEmptyNodes( beforeFragment.childNodes ), format, this.editor );
-			let after = domToFormat( filterEmptyNodes( afterFragment.childNodes ), format, this.editor );
-
-			if ( context.paste ) {
-				before = this.isEmpty( before ) ? null : before;
-				after = this.isEmpty( after ) ? null : after;
-			}
-
-			this.restoreContentAndSplit( before, after, blocks );
-		} else if ( context.paste ) {
-			this.restoreContentAndSplit( null, null, blocks );
+			before = domToFormat( filterEmptyNodes( beforeFragment.childNodes ), format, this.editor );
+			after = domToFormat( filterEmptyNodes( afterFragment.childNodes ), format, this.editor );
 		} else {
-			this.restoreContentAndSplit( [], [], blocks );
+			before = [];
+			after = [];
 		}
+
+		// In case split occurs at the trailing or leading edge of the field,
+		// assume that the before/after values respectively reflect the current
+		// value. This also provides an opportunity for the parent component to
+		// determine whether the before/after value has changed using a trivial
+		//  strict equality operation.
+		if ( this.isEmpty( after ) ) {
+			before = this.props.value;
+		} else if ( this.isEmpty( before ) ) {
+			after = this.props.value;
+		}
+
+		// If pasting and the split would result in no content other than the
+		// pasted blocks, remove the before and after blocks.
+		if ( context.paste ) {
+			before = this.isEmpty( before ) ? null : before;
+			after = this.isEmpty( after ) ? null : after;
+		}
+
+		this.restoreContentAndSplit( before, after, blocks );
 	}
 
 	onNewBlock() {

@@ -1,0 +1,49 @@
+.wp-block-storypage-section {
+	position: relative;
+    background-size: cover;
+    background-position: 50%;
+    min-height: 430px;
+    width: 100%;
+    margin: 0 0 1.5em;
+    // display: flex;
+    // justify-content: center;
+    // align-items: center;
+
+    &.has-parallax {
+		background-attachment: fixed;
+	}
+
+    &.has-background-dim:before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
+		background-color: rgba( #000, 0.5 );
+	}
+
+	&.has-background-dim {
+		.wp-block-storypage-section-content {
+			position: absolute;
+			top: 0;
+			left: 0;
+			bottom: 0;
+			right: 0;			
+			z-index: 1;
+		}
+	}
+
+	@for $i from 1 through 10 {
+		&.has-background-dim.has-background-dim-#{ $i * 10 }:before {
+			background-color: rgba( #000, $i * 0.1 );
+		}
+	}
+	
+	&.has-max-width {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+
+}

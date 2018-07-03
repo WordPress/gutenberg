@@ -18,9 +18,13 @@ export {
 	getBlockDefaultClassName,
 	getBlockMenuDefaultClassName,
 	getSaveElement,
+	getSaveContent,
 } from './serializer';
 export { isValidBlock } from './validation';
-export { getCategories } from './categories';
+export {
+	getCategories,
+	setCategories,
+} from './categories';
 export {
 	SUGGESTED_PANEL,
 	SHARED_PANEL,

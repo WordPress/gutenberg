@@ -139,6 +139,19 @@ been saved.
 
 Object of key value pairs comprising unsaved edits.
 
+### getCurrentPostAttribute
+
+Returns an attribute value of the saved post.
+
+*Parameters*
+
+ * state: Global application state.
+ * attributeName: Post attribute name.
+
+*Returns*
+
+Post attribute value.
+
 ### getEditedPostAttribute
 
 Returns a single attribute of the post being edited, preferring the unsaved
@@ -153,6 +166,20 @@ saved state of the post.
 *Returns*
 
 Post attribute value.
+
+### getAutosaveAttribute
+
+Returns an attribute value of the current autosave revision for a post, or
+null if there is no autosave for the post.
+
+*Parameters*
+
+ * state: Global application state.
+ * attributeName: Autosave attribute name.
+
+*Returns*
+
+Autosave attribute value.
 
 ### getEditedPostVisibility
 
@@ -304,18 +331,6 @@ Gets the document title to be used.
 *Returns*
 
 Document title.
-
-### getEditedPostPreviewLink
-
-Returns a URL to preview the post being edited.
-
-*Parameters*
-
- * state: Global application state.
-
-*Returns*
-
-Preview URL.
 
 ### getBlockName
 
@@ -1028,6 +1043,18 @@ Returns the editor settings.
 
 The editor settings object
 
+### getTokenSettings
+
+Returns the editor settings.
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+The editor settings object
+
 ## Actions
 
 ### setupEditor
@@ -1057,6 +1084,15 @@ post has been received, by initialization or autosave.
 *Parameters*
 
  * post: Autosave post object.
+
+### updatePost
+
+Returns an action object used in signalling that a patch of updates for the
+latest version of the post have been received.
+
+*Parameters*
+
+ * edits: Updated post fields.
 
 ### setupEditorState
 

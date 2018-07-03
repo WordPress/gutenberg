@@ -80,3 +80,11 @@ Returns an action object used to set the fallback block name.
 *Parameters*
 
  * name: Block name.
+
+### setCategories
+
+Returns an action object used to set block categories.
+
+*Parameters*
+
+ * categories: Block categories.
