@@ -1191,23 +1191,6 @@ JS;
 }
 
 /**
- * Ensure the editor module is loaded before third party plugins.
- *
- * Remove this in Gutenberg 3.1
- */
-function polyfill_blocks_module_in_scripts() {
-	if ( ! is_gutenberg_page() ) {
-		return;
-	}
-
-	wp_enqueue_script( 'wp-editor' );
-}
-
-add_action( 'enqueue_block_editor_assets', 'polyfill_blocks_module_in_scripts', 9 );
-add_action( 'enqueue_block_assets', 'polyfill_blocks_module_in_scripts', 9 );
-
-
-/**
  * This helper function ensures, that every item in $color_palette has a slug.
  *
  * @access public
