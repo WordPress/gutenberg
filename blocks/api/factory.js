@@ -6,6 +6,7 @@ import {
 	every,
 	reduce,
 	castArray,
+	find,
 	findIndex,
 	includes,
 	isObjectLike,
@@ -27,15 +28,18 @@ import { getBlockType, getBlockTypes } from './registration';
 /**
  * Returns a block object given its type and attributes.
  *
- * @param {string} name            Block name.
- * @param {Object} blockAttributes Block attributes.
- * @param {?Array} innerBlocks     Nested blocks.
+ * @param {string}  name            Block name.
+ * @param {Object}  blockAttributes Block attributes.
+ * @param {?Array}  innerBlocks     Nested blocks.
+ * @param {?Object} blockType       Block type definition.
  *
  * @return {Object} Block object.
  */
-export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
+export function createBlock( name, blockAttributes = {}, innerBlocks = [], blockType = undefined ) {
 	// Get the type definition associated with a registered block.
-	const blockType = getBlockType( name );
+	if ( undefined === blockType ) {
+		blockType = getBlockType( name );
+	}
 
 	// Ensure attributes contains only values defined by block type, and merge
 	// default values for missing attributes.
@@ -204,22 +208,27 @@ export function findTransform( transforms, predicate ) {
  * If no block name is provided, returns transforms for all blocks. A normal
  * transform object includes `blockName` as a property.
  *
- * @param {string}  direction Transform direction ("to", "from").
- * @param {?string} blockName Optional block name.
+ * @param {string}  direction  Transform direction ("to", "from").
+ * @param {?string} blockName  Optional block name.
+ * @param {?Array}  blockTypes Block types to get transforms from.
  *
  * @return {Array} Block transforms for direction.
  */
-export function getBlockTransforms( direction, blockName ) {
+export function getBlockTransforms( direction, blockName, blockTypes ) {
+	if ( blockTypes === undefined ) {
+		blockTypes = getBlockTypes();
+	}
 	// When retrieving transforms for all block types, recurse into self.
 	if ( blockName === undefined ) {
 		return flatMap(
-			getBlockTypes(),
-			( { name } ) => getBlockTransforms( direction, name )
+			blockTypes,
+			( { name } ) => getBlockTransforms( direction, name, blockTypes )
 		);
 	}
 
 	// Validate that block type exists and has array of direction.
-	const { transforms } = getBlockType( blockName ) || {};
+	const blockType = find( blockTypes, { name: blockName } );
+	const { transforms } = blockType || {};
 	if ( ! transforms || ! Array.isArray( transforms[ direction ] ) ) {
 		return [];
 	}

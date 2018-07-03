@@ -9,7 +9,7 @@ import 'element-closest';
  * Internal dependencies
  */
 import { createBlock, getBlockTransforms, findTransform } from '../factory';
-import { getBlockType } from '../registration';
+import { getBlockType, getBlockTypes } from '../registration';
 import { getBlockAttributes, parseWithGrammar } from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import specialCommentConverter from './special-comment-converter';
@@ -126,7 +126,7 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 
 	// An array of HTML strings and block objects. The blocks replace matched
 	// shortcodes.
-	const pieces = shortcodeConverter( HTML );
+	const pieces = shortcodeConverter( HTML, 0, getBlockTransforms( 'from' ), getBlockTypes() );
 
 	// The call to shortcodeConverter will always return more than one element
 	// if shortcodes are matched. The reason is when shortcodes are matched
