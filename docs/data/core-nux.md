@@ -1,6 +1,6 @@
 # **core/nux**: The NUX (New User Experience) module Data
 
-## Selectors 
+## Selectors
 
 ### isTipVisible
 
