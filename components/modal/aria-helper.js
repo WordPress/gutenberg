@@ -8,8 +8,8 @@ let hiddenElements = [],
 
 /**
  * Hides all elements in the body element from screen-readers except
- * the provided element, script elements and elements that already have
- * an `aria-hidden="true"` attribute.
+ * the provided element and elements that should not be hidden from
+ * screen-readers.
  *
  * The reason we do this is because `aria-modal="true"` currently is bugged
  * in Safari, and support is spotty in other browsers overall. In the future
@@ -25,16 +25,40 @@ export function hideApp( unhiddenElement ) {
 	const elements = document.body.children;
 	forEach( elements, ( element ) => {
 		if (
-			element === unhiddenElement ||
-			element.tagName === 'SCRIPT' ||
-			element.hasAttribute( 'aria-hidden', 'true' )
+			element === unhiddenElement
 		) {
 			return;
 		}
-		element.setAttribute( 'aria-hidden', 'true' );
-		hiddenElements.push( element );
+		if ( elementShouldBeHidden( element ) ) {
+			element.setAttribute( 'aria-hidden', 'true' );
+			hiddenElements.push( element );
+		}
 	} );
 	isHidden = true;
+}
+
+/**
+ * Determines if the passed element should not be hidden from screen readers.
+ *
+ * @param {HTMLElement} element The element that should be checked.
+ *
+ * @return {boolean} Whether the element should not be hidden from screen-readers.
+ */
+export function elementShouldBeHidden( element ) {
+	const liveRegionAriaRoles = [
+		'alert',
+		'status',
+		'log',
+		'marquee',
+		'timer',
+	];
+	const role = element.getAttribute( 'role' );
+	return ! (
+		element.tagName === 'SCRIPT' ||
+		element.hasAttribute( 'aria-hidden' ) ||
+		element.hasAttribute( 'aria-live' ) ||
+		liveRegionAriaRoles.includes( role )
+	);
 }
 
 /**
