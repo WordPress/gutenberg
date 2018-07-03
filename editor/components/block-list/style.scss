@@ -369,7 +369,7 @@
 			}
 		}
 
-		// The padding collapses, but the outline is still 1px to compensate for.
+		// Keep a 1px margin to compensate for the border/outline.
 		.editor-block-contextual-toolbar {
 			margin-bottom: 1px;
 		}
@@ -377,7 +377,8 @@
 
 	// Left
 	&[data-align="left"] {
-		.editor-block-list__block-edit {	// This is in the editor only, on the frontend, the img should be floated
+		// This is in the editor only; the image should be floated on the frontend.
+		.editor-block-list__block-edit {
 			/*!rtl:begin:ignore*/
 			float: left;
 			margin-right: 2em;
