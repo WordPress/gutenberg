@@ -62,7 +62,7 @@ class ModalFrame extends Component {
 	/**
 	 * Callback function called when a key is pressed.
 	 *
-	 * @param {Object} event Key down event.
+	 * @param {KeyboardEvent} event Key down event.
 	 */
 	handleKeyDown( event ) {
 		if ( event.keyCode === ESCAPE ) {
