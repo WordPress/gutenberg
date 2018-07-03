@@ -1,6 +1,6 @@
 # **core/edit-post**: The Editor's UI Data
 
-## Selectors 
+## Selectors
 
 ### getEditorMode
 
@@ -110,7 +110,7 @@ Is active.
 
 ### isPluginItemPinned
 
-Returns true if the the plugin item is pinned to the header.
+Returns true if the plugin item is pinned to the header.
 When the value is not set it defaults to true.
 
 *Parameters*
@@ -149,7 +149,7 @@ State of meta box at specified location.
 
 ### isSavingMetaBoxes
 
-Returns true if the the Meta Boxes are being saved.
+Returns true if the Meta Boxes are being saved.
 
 *Parameters*
 
