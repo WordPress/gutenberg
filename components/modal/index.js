@@ -162,10 +162,6 @@ Modal.defaultProps = {
 	focusOnMount: true,
 	shouldCloseOnEsc: true,
 	shouldCloseOnClickOutside: true,
-	style: {
-		content: null,
-		overlay: null,
-	},
 	/* accessibility */
 	aria: {
 		labelledby: 'modal-heading',
