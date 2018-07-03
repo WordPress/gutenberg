@@ -27,7 +27,7 @@ class Modal extends Component {
 
 		this.prepareDOM();
 
-		this.headingId = uniqueId( props.aria.labelledby );
+		this.setHeadingId( props );
 	}
 
 	/**
@@ -49,6 +49,16 @@ class Modal extends Component {
 	}
 
 	/**
+	 * Sets the heading id to the aria.labelledby prop or a unique id when
+	 * the prop is unavailable.
+	 *
+	 * @param {Object} props The component's props.
+	 */
+	setHeadingId( props ) {
+		this.headingId = props.aria.labelledby || uniqueId( 'modal-heading-' );
+	}
+
+	/**
 	 * Removes the specific mounting point for this modal from the DOM.
 	 */
 	cleanDOM() {
@@ -65,6 +75,17 @@ class Modal extends Component {
 
 		if ( openModalCount === 1 ) {
 			this.openFirstModal();
+		}
+	}
+
+	/**
+	 * Updates headingId when the aria.labelledby prop has changed.
+	 *
+	 * @param {Object} nextProps The component's next props.
+	 */
+	componentWillReceiveProps( nextProps ) {
+		if ( this.props.aria.labelledby !== nextProps.aria.labelledby ) {
+			this.setHeadingId( nextProps );
 		}
 	}
 
@@ -164,7 +185,7 @@ Modal.defaultProps = {
 	shouldCloseOnClickOutside: true,
 	/* accessibility */
 	aria: {
-		labelledby: 'modal-heading',
+		labelledby: null,
 		describedby: null,
 	},
 };
