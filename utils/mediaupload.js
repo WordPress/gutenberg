@@ -115,15 +115,18 @@ export function mediaUpload( {
 
 		return createMediaFromFile( mediaFile, additionalData ).then(
 			( savedMedia ) => {
-				const mediaObject = {
+				let mediaObject = {
 					alt: savedMedia.alt_text,
 					caption: get( savedMedia, [ 'caption', 'raw' ], '' ),
 					id: savedMedia.id,
 					link: savedMedia.link,
 					title: savedMedia.title.raw,
 					url: savedMedia.source_url,
-					sizes: get( savedMedia, [ 'media_details', 'sizes' ], {} ),
+					mediaDetails: {},
 				};
+				if ( has( savedMedia, ['media_details', 'sizes'] ) ) {
+					mediaObject.mediaDetails.sizes = get( savedMedia, [ 'media_details', 'sizes' ], {} );
+				}
 				setAndUpdateFiles( idx, mediaObject );
 			},
 			( response ) => {
