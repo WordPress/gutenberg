@@ -49,7 +49,7 @@ No. [TinyMCE](https://www.tinymce.com/) is one of the best tools for enabling ri
 
 Gutenberg will work in modern browsers, and Internet Explorer 11.
 
-Our [list of supported browsers can be found in this configuration file](https://github.com/WordPress/packages/blob/master/packages/browserslist-config/index.js). By "modern browsers" we generally mean the *current and past two versions* of each major browser.
+Our [list of supported browsers can be found in the Make WordPress handbook](https://make.wordpress.org/core/handbook/best-practices/browser-support/). By "modern browsers" we generally mean the *current and past two versions* of each major browser.
 
 ## How do I make my own block?
 
