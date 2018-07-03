@@ -10,19 +10,23 @@ To opt-in for one of these features, call `add_theme_support` in the `functions.
 function mytheme_setup_theme_supported_features() {
 	add_theme_support( 'editor-color-palette',
 		array(
-			'name' => 'strong magenta',
+			'name' => __( 'strong magenta', 'themeLangDomain' ),
+			'slug' => 'strong-magenta',
 			'color' => '#a156b4',
 		),
 		array(
-			'name' => 'light grayish magenta',
+			'name' => __( 'light grayish magenta', 'themeLangDomain' ),
+			'slug' => 'light-grayish-magenta',
 			'color' => '#d0a5db',
 		),
 		array(
-			'name' => 'very light gray',
+			'name' => __( 'very light gray', 'themeLangDomain' ),
+			'slug' => 'very-light-gray',
 			'color' => '#eee',
 		),
 		array(
-			'name' => 'very dark gray',
+			'name' => __( 'very dark gray', 'themeLangDomain' ),
+			'slug' => 'very-dark-gray',
 			'color' => '#444',
 		)
 	);
@@ -48,19 +52,23 @@ Different blocks have the possibility of customizing colors. Gutenberg provides 
 ```php
 add_theme_support( 'editor-color-palette',
 	array(
-		'name' => 'strong magenta',
+		'name' => __( 'strong magenta', 'themeLangDomain' ),
+		'slug' => 'strong-magenta',
 		'color' => '#a156b4',
 	),
 	array(
-		'name' => 'light grayish magenta',
+		'name' => __( 'light grayish magenta', 'themeLangDomain' ),
+		'slug' => 'light-grayish-magenta',
 		'color' => '#d0a5db',
 	),
 	array(
-		'name' => 'very light gray',
+		'name' => __( 'very light gray', 'themeLangDomain' ),
+		'slug' => 'very-light-gray',
 		'color' => '#eee',
 	),
 	array(
-		'name' => 'very dark gray',
+		'name' => __( 'very dark gray', 'themeLangDomain' ),
+		'slug' => 'very-dark-gray',
 		'color' => '#444',
 	)
 );
