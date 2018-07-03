@@ -142,6 +142,10 @@ export default class TinyMCE extends Component {
 		// while cleaning for destroy, since removal is handled by React. It
 		// does so by substituting the container to be removed.
 		this.editor.container = document.createDocumentFragment();
+		// This hack prevents TinyMCE from executing the `save` method. It is
+		// not needed for Gutenberg and will result in errors because it
+		// triggers a `nodechange` event.
+		this.editor.bodyElement = null;
 		this.editor.destroy();
 		delete this.editor;
 	}
