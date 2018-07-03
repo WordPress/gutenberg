@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * WordPress dependencies
  */
-import { createElement } from '@wordpress/element';
+import { createSimpleElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -59,8 +59,8 @@ describe( 'elementToString', () => {
 	} );
 
 	test( 'should return the HTML content ', () => {
-		const element = createElement( 'div', { className: 'container' },
-			createElement( 'strong', {}, 'content' )
+		const element = createSimpleElement( 'div', { className: 'container' },
+			createSimpleElement( 'strong', {}, 'content' )
 		);
 		expect( elementToString( element ) ).toBe( '<div class="container"><strong>content</strong></div>' );
 	} );

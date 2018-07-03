@@ -7,23 +7,23 @@
             "content": [
                 {
                     "type": "thead",
-                    "children": {
+                    "children": [ {
                         "type": "tr",
                         "children": [
                             {
                                 "type": "th",
-                                "children": "Version"
+                                "children": [ "Version" ]
                             },
                             {
                                 "type": "th",
-                                "children": "Musician"
+                                "children": [ "Musician" ]
                             },
                             {
                                 "type": "th",
-                                "children": "Date"
+                                "children": [ "Date" ]
                             }
                         ]
-                    }
+                    } ]
                 },
                 {
                     "type": "tbody",
@@ -33,21 +33,21 @@
                             "children": [
                                 {
                                     "type": "td",
-                                    "children": {
+                                    "children": [ {
                                         "type": "a",
                                         "attributes": {
                                             "href": "https://wordpress.org/news/2003/05/wordpress-now-available/"
                                         },
-                                        "children": ".70"
-                                    }
+                                        "children": [ ".70" ]
+                                    } ]
                                 },
                                 {
                                     "type": "td",
-                                    "children": "No musician chosen."
+                                    "children": [ "No musician chosen." ]
                                 },
                                 {
                                     "type": "td",
-                                    "children": "May 27, 2003"
+                                    "children": [ "May 27, 2003" ]
                                 }
                             ]
                         },
@@ -56,21 +56,21 @@
                             "children": [
                                 {
                                     "type": "td",
-                                    "children": {
+                                    "children": [ {
                                         "type": "a",
                                         "attributes": {
                                             "href": "https://wordpress.org/news/2004/01/wordpress-10/"
                                         },
-                                        "children": "1.0"
-                                    }
+                                        "children": [ "1.0" ]
+                                    } ]
                                 },
                                 {
                                     "type": "td",
-                                    "children": "Miles Davis"
+                                    "children": [ "Miles Davis" ]
                                 },
                                 {
                                     "type": "td",
-                                    "children": "January 3, 2004"
+                                    "children": [ "January 3, 2004" ]
                                 }
                             ]
                         },
@@ -86,17 +86,17 @@
                                             "attributes": {
                                                 "href": "https://codex.wordpress.org/WordPress_Versions"
                                             },
-                                            "children": "the full list"
+                                            "children": [ "the full list" ]
                                         }
                                     ]
                                 },
                                 {
                                     "type": "td",
-                                    "children": "…"
+                                    "children": [ "…" ]
                                 },
                                 {
                                     "type": "td",
-                                    "children": "…"
+                                    "children": [ "…" ]
                                 }
                             ]
                         },
@@ -105,21 +105,21 @@
                             "children": [
                                 {
                                     "type": "td",
-                                    "children": {
+                                    "children": [ {
                                         "type": "a",
                                         "attributes": {
                                             "href": "https://wordpress.org/news/2015/12/clifford/"
                                         },
-                                        "children": "4.4"
-                                    }
+                                        "children": [ "4.4" ]
+                                    } ]
                                 },
                                 {
                                     "type": "td",
-                                    "children": "Clifford Brown"
+                                    "children": [ "Clifford Brown" ]
                                 },
                                 {
                                     "type": "td",
-                                    "children": "December 8, 2015"
+                                    "children": [ "December 8, 2015" ]
                                 }
                             ]
                         },
@@ -128,21 +128,21 @@
                             "children": [
                                 {
                                     "type": "td",
-                                    "children": {
+                                    "children": [ {
                                         "type": "a",
                                         "attributes": {
                                             "href": "https://wordpress.org/news/2016/04/coleman/"
                                         },
-                                        "children": "4.5"
-                                    }
+                                        "children": [ "4.5" ]
+                                    } ]
                                 },
                                 {
                                     "type": "td",
-                                    "children": "Coleman Hawkins"
+                                    "children": [ "Coleman Hawkins" ]
                                 },
                                 {
                                     "type": "td",
-                                    "children": "April 12, 2016"
+                                    "children": [ "April 12, 2016" ]
                                 }
                             ]
                         },
@@ -151,21 +151,21 @@
                             "children": [
                                 {
                                     "type": "td",
-                                    "children": {
+                                    "children": [ {
                                         "type": "a",
                                         "attributes": {
                                             "href": "https://wordpress.org/news/2016/08/pepper/"
                                         },
-                                        "children": "4.6"
-                                    }
+                                        "children": [ "4.6" ]
+                                    } ]
                                 },
                                 {
                                     "type": "td",
-                                    "children": "Pepper Adams"
+                                    "children": [ "Pepper Adams" ]
                                 },
                                 {
                                     "type": "td",
-                                    "children": "August 16, 2016"
+                                    "children": [ "August 16, 2016" ]
                                 }
                             ]
                         },
@@ -174,21 +174,21 @@
                             "children": [
                                 {
                                     "type": "td",
-                                    "children": {
+                                    "children": [ {
                                         "type": "a",
                                         "attributes": {
                                             "href": "https://wordpress.org/news/2016/12/vaughan/"
                                         },
-                                        "children": "4.7"
-                                    }
+                                        "children": [ "4.7" ]
+                                    } ]
                                 },
                                 {
                                     "type": "td",
-                                    "children": "Sarah Vaughan"
+                                    "children": [ "Sarah Vaughan" ]
                                 },
                                 {
                                     "type": "td",
-                                    "children": "December 6, 2016"
+                                    "children": [ "December 6, 2016" ]
                                 }
                             ]
                         }

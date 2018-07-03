@@ -19,6 +19,7 @@ import {
 	flowRight,
 	isString,
 	upperFirst,
+	omit,
 } from 'lodash';
 
 /**
@@ -44,6 +45,24 @@ import serialize from './serialize';
  * @return {WPElement} Element.
  */
 export { createElement };
+
+/**
+ * Creates a simplified element representation.
+ *
+ * @param {string} type
+ * @param {Object} props
+ * @param {Array?} children
+ *
+ * @return {Object} Element.
+ */
+export function createSimpleElement( type, props, ...children ) {
+	return {
+		type, props: {
+			...omit( props, [ 'key' ] ),
+			children,
+		},
+	};
+}
 
 /**
  * Returns an object tracking a reference to a rendered element via its

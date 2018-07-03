@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, keys, isEqual, isFunction, isString } from 'lodash';
+import { every, keys, isEqual, isFunction, isString, omit } from 'lodash';
 import { default as tinycolor, mostReadable } from 'tinycolor2';
 
 /**

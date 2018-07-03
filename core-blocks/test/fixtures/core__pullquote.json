@@ -8,13 +8,9 @@
                 {
                     "children": {
                         "type": "p",
-                        "key": null,
-                        "ref": null,
                         "props": {
-                            "children": "Testing pullquote block..."
-                        },
-                        "_owner": null,
-                        "_store": {}
+                            "children": [ "Testing pullquote block..." ]
+                        }
                     }
                 }
             ],
