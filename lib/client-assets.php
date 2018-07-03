@@ -1155,7 +1155,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		_doing_it_wrong(
 			'add_theme_support()',
 			__( 'Setting colors using multiple parameters is deprecated. Please pass a single parameter with an array of colors. See https://wordpress.org/gutenberg/handbook/extensibility/theme-support/ for details.', 'gutenberg' ),
-			'3.2.0'
+			'3.4.0'
 		);
 	}
 
@@ -1168,7 +1168,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		_doing_it_wrong(
 			'add_theme_support()',
 			__( 'Adding theme support using the `gutenberg` array is deprecated. See https://wordpress.org/gutenberg/handbook/extensibility/theme-support/ for details.', 'gutenberg' ),
-			'2.0.0'
+			'3.4.0'
 		);
 	}
 
