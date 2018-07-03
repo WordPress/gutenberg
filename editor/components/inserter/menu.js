@@ -207,7 +207,13 @@ export class InserterMenu extends Component {
 					onChange={ this.onChangeSearchInput }
 				/>
 
-				<div className="editor-inserter__results" ref={ this.inserterResults }>
+				<div
+					className="editor-inserter__results"
+					ref={ this.inserterResults }
+					tabIndex="0"
+					role="region"
+					aria-label={ __( 'Available block types' ) }
+				>
 					<InserterResultsPortal.Slot fillProps={ { filterValue } } />
 
 					<ChildBlocks

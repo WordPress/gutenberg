@@ -1,27 +1,14 @@
 /**
- * Node dependencies
+ * External dependencies
  */
+const glob = require( 'glob' ).sync;
 const path = require( 'path' );
 
 const root = path.resolve( __dirname, '../../' );
 
 // These are packages published to NPM as their own node modules.
-const npmReadyPackages = [
-	'api-request',
-	'babel-plugin-import-jsx-pragam',
-	'blob',
-	'core-data',
-	'data',
-	'date',
-	'deprecated',
-	'dom',
-	'element',
-	'keycodes',
-	'library-export-default-webpack-plugin',
-	'plugins',
-	'postcss-themes',
-	'shortcode',
-];
+const npmReadyPackages = glob( 'packages/*/package.json' )
+	.map( ( fileName ) => fileName.split( '/' )[ 1 ] );
 
 // These are internal-only packages (for now), not yet published as standalone
 // node modules.

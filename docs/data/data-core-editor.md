@@ -784,10 +784,12 @@ Block Template
 ### getTemplateLock
 
 Returns the defined block template lock
+in the context of a given root block or in the global context.
 
 *Parameters*
 
  * state: null
+ * rootUID: Block UID.
 
 *Returns*
 
