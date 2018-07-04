@@ -31,41 +31,6 @@ class Modal extends Component {
 	}
 
 	/**
-	 * Prepares the DOM for the modals to be rendered.
-	 *
-	 * Every modal is mounted in a separate div appended to a parent div
-	 * that is appended to the document body.
-	 *
-	 * The parent div will be created if it does not yet exist, and the
-	 * separate div for this specific modal will be appended to that.
-	 */
-	prepareDOM() {
-		if ( ! parentElement ) {
-			parentElement = document.createElement( 'div' );
-			document.body.appendChild( parentElement );
-		}
-		this.node = document.createElement( 'div' );
-		parentElement.appendChild( this.node );
-	}
-
-	/**
-	 * Sets the heading id to the aria.labelledby prop or a unique id when
-	 * the prop is unavailable.
-	 *
-	 * @param {Object} props The component's props.
-	 */
-	setHeadingId( props ) {
-		this.headingId = props.aria.labelledby || uniqueId( 'modal-heading-' );
-	}
-
-	/**
-	 * Removes the specific mounting point for this modal from the DOM.
-	 */
-	cleanDOM() {
-		parentElement.removeChild( this.node );
-	}
-
-	/**
 	 * Appends the modal's node to the DOM, so the portal can render the
 	 * modal in it. Also calls the openFirstModal when this is the first modal to be
 	 * opened.
@@ -101,6 +66,41 @@ class Modal extends Component {
 		}
 
 		this.cleanDOM();
+	}
+
+	/**
+	 * Prepares the DOM for the modals to be rendered.
+	 *
+	 * Every modal is mounted in a separate div appended to a parent div
+	 * that is appended to the document body.
+	 *
+	 * The parent div will be created if it does not yet exist, and the
+	 * separate div for this specific modal will be appended to that.
+	 */
+	prepareDOM() {
+		if ( ! parentElement ) {
+			parentElement = document.createElement( 'div' );
+			document.body.appendChild( parentElement );
+		}
+		this.node = document.createElement( 'div' );
+		parentElement.appendChild( this.node );
+	}
+
+	/**
+	 * Sets the heading id to the aria.labelledby prop or a unique id when
+	 * the prop is unavailable.
+	 *
+	 * @param {Object} props The component's props.
+	 */
+	setHeadingId( props ) {
+		this.headingId = props.aria.labelledby || uniqueId( 'modal-heading-' );
+	}
+
+	/**
+	 * Removes the specific mounting point for this modal from the DOM.
+	 */
+	cleanDOM() {
+		parentElement.removeChild( this.node );
 	}
 
 	/**
