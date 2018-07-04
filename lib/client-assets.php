@@ -648,14 +648,14 @@ function gutenberg_register_vendor_scripts() {
  * Retrieves a unique and reasonably short and human-friendly filename for a
  * vendor script based on a URL and the script handle.
  *
- * @param  string $src    Full URL of the external script.
  * @param  string $handle The name of the script.
+ * @param  string $src    Full URL of the external script.
  *
  * @return string         Script filename suitable for local caching.
  *
  * @since 0.1.0
  */
-function gutenberg_vendor_script_filename( $src, $handle = '' ) {
+function gutenberg_vendor_script_filename( $handle, $src ) {
 	$match_tinymce_plugin = preg_match(
 		'@tinymce.*/plugins/([^/]+)/plugin(\.min)?\.js$@',
 		$src,
@@ -668,8 +668,7 @@ function gutenberg_vendor_script_filename( $src, $handle = '' ) {
 		$filename = basename( $src );
 		$match    = preg_match(
 			'/^'
-			. '(?P<prefix>.*?)'
-			. '(?P<ignore>\.development|\.production)?'
+			. '(?P<ignore>.*?)'
 			. '(?P<suffix>\.min)?'
 			. '(?P<extension>\.js)'
 			. '(?P<extra>.*)'
@@ -678,13 +677,7 @@ function gutenberg_vendor_script_filename( $src, $handle = '' ) {
 			$filename_pieces
 		);
 
-		if ( $handle ) {
-			$prefix = $handle;
-		} elseif ( $match ) {
-			$prefix = $filename_pieces['prefix'];
-		} else {
-			$prefix = $filename;
-		}
+		$prefix = $handle;
 		$suffix = $match ? $filename_pieces['suffix'] : '';
 	}
 
@@ -710,7 +703,7 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
 		return;
 	}
 
-	$filename = gutenberg_vendor_script_filename( $src, $handle );
+	$filename = gutenberg_vendor_script_filename( $handle, $src );
 
 	if ( defined( 'GUTENBERG_LIST_VENDOR_ASSETS' ) && GUTENBERG_LIST_VENDOR_ASSETS ) {
 		echo "$src|$filename\n";
