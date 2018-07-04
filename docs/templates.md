@@ -96,10 +96,13 @@ $template = array(
 		'placeholder' => 'Add a root-level paragraph',
 	) ),
 	array( 'core/columns', array(), array(
-		array( 'core/image', array( 'layout' => 'column-1' ) ),
-		array( 'core/paragraph', array(
-			'placeholder' => 'Add a inner paragraph',
-			'layout' => 'column-2'
+		array( 'core/column', array(), array(
+			array( 'core/image', array() ),
+		) ),
+		array( 'core/column', array(), array(
+			array( 'core/paragraph', array(
+				'placeholder' => 'Add a inner paragraph'
+			) ),
 		) ),
 	) )
 );
