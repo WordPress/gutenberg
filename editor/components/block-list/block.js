@@ -515,6 +515,7 @@ export class BlockListBlock extends Component {
 					/>
 				) }
 				{ shouldShowBreadcrumb && <BlockBreadcrumb uid={ uid } isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' } /> }
+				{ shouldShowContextualToolbar && <BlockContextualToolbar /> }
 				{ isFirstMultiSelected && <BlockMultiControls rootUID={ rootUID } /> }
 				<IgnoreNestedEvents
 					ref={ this.bindBlockNode }
@@ -523,7 +524,6 @@ export class BlockListBlock extends Component {
 					className="editor-block-list__block-edit"
 					data-block={ uid }
 				>
-					{ shouldShowContextualToolbar && <BlockContextualToolbar /> }
 					<BlockCrashBoundary onError={ this.onBlockError }>
 						{ isValid && mode === 'visual' && (
 							<BlockEdit
