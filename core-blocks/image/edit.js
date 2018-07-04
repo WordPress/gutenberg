@@ -284,14 +284,13 @@ class ImageEdit extends Component {
 						options={ this.getLinkDestinationOptions() }
 						onChange={ this.onSetLinkDestination }
 					/>
-					{ linkDestination === LINK_DESTINATION_OPTIONS.CUSTOM_HREF && (
-						<TextControl
-							label={ __( 'Custom URL' ) }
-							value={ href }
-							onChange={ this.onSetCustomHref }
-							placeholder="http://"
-						/>
-					) }
+					<TextControl
+						label={ __( 'Custom URL' ) }
+						value={ href }
+						onChange={ this.onSetCustomHref }
+						placeholder="http://"
+						disabled={ linkDestination !== LINK_DESTINATION_OPTIONS.CUSTOM_HREF }
+					/>
 					{ ! isEmpty( availableSizes ) && (
 						<SelectControl
 							label={ __( 'Source Type' ) }
