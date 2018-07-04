@@ -30,6 +30,7 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
  * Internal dependencies
  */
 import serialize from './serialize';
+import { RawHTML } from './index-common';
 
 /**
  * Returns a new element of given type. Type can be either a string tag name or
@@ -233,14 +234,7 @@ export function createHigherOrderComponent( mapComponentToEnhancedComponent, mod
  *
  * @return {WPElement} Dangerously-rendering element.
  */
-export function RawHTML( { children, ...props } ) {
-	// The DIV wrapper will be stripped by serializer, unless there are
-	// non-children props present.
-	return createElement( 'div', {
-		dangerouslySetInnerHTML: { __html: children },
-		...props,
-	} );
-}
+export { RawHTML };
 
 /**
  * Given a component returns the enhanced component augmented with a component
