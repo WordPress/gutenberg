@@ -4,7 +4,7 @@
         "name": "core/list",
         "isValid": true,
         "attributes": {
-            "nodeName": "UL",
+            "ordered": false,
             "values": [
                 {
                     "type": "li",
