@@ -12,10 +12,11 @@ import { Component, createPortal } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import './style.scss';
 import ModalFrame from './frame';
 import ModalHeader from './header';
 import * as ariaHelper from './aria-helper';
-import './style.scss';
+import withInstanceId from '../with-instance-id';
 
 // Used to count the number of open modals.
 let parentElement,
@@ -26,8 +27,6 @@ class Modal extends Component {
 		super( props );
 
 		this.prepareDOM();
-
-		this.setHeadingId( props );
 	}
 
 	/**
@@ -40,17 +39,6 @@ class Modal extends Component {
 
 		if ( openModalCount === 1 ) {
 			this.openFirstModal();
-		}
-	}
-
-	/**
-	 * Updates headingId when the aria.labelledby prop has changed.
-	 *
-	 * @param {Object} nextProps The component's next props.
-	 */
-	componentWillReceiveProps( nextProps ) {
-		if ( this.props.aria.labelledby !== nextProps.aria.labelledby ) {
-			this.setHeadingId( nextProps );
 		}
 	}
 
@@ -84,16 +72,6 @@ class Modal extends Component {
 		}
 		this.node = document.createElement( 'div' );
 		parentElement.appendChild( this.node );
-	}
-
-	/**
-	 * Sets the heading id to the aria.labelledby prop or a unique id when
-	 * the prop is unavailable.
-	 *
-	 * @param {Object} props The component's props.
-	 */
-	setHeadingId( props ) {
-		this.headingId = props.aria.labelledby || uniqueId( 'modal-heading-' );
 	}
 
 	/**
@@ -139,8 +117,14 @@ class Modal extends Component {
 			closeButtonLabel,
 			children,
 			aria,
+			instanceId,
 			...otherProps
 		} = this.props;
+
+		const headingId = (
+			aria.labelledby ||
+			'components-modal-header-' + instanceId
+		);
 
 		return createPortal(
 			<div className={ classnames(
@@ -154,7 +138,7 @@ class Modal extends Component {
 					) }
 					onRequestClose={ onRequestClose }
 					aria={ {
-						labelledby: title ? this.headingId : null,
+						labelledby: title ? headingId : null,
 						describedby: aria.describedby,
 					} }
 					{ ...otherProps } >
@@ -162,7 +146,7 @@ class Modal extends Component {
 						closeLabel={ closeButtonLabel }
 						onClose={ onRequestClose }
 						title={ title }
-						headingId={ this.headingId }
+						headingId={ headingId }
 						icon={ icon } />
 					<div
 						className={ 'components-modal__content' }>
@@ -190,4 +174,4 @@ Modal.defaultProps = {
 	},
 };
 
-export default Modal;
+export default withInstanceId( Modal );
