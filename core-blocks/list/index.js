@@ -174,7 +174,7 @@ export const settings = {
 					default: 'UL',
 				},
 			},
-			migrate( { attributes } ) {
+			migrate( attributes ) {
 				const { nodeName, ...migratedAttributes } = attributes;
 
 				return {

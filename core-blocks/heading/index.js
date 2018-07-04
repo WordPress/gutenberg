@@ -143,7 +143,7 @@ export const settings = {
 					default: 'H2',
 				},
 			},
-			migrate( { attributes } ) {
+			migrate( attributes ) {
 				const { nodeName, ...migratedAttributes } = attributes;
 
 				return {
