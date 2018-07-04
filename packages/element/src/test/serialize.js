@@ -566,12 +566,15 @@ describe( 'renderStyle()', () => {
 		expect( result ).toBe( '--myBackgroundColor:palegoldenrod' );
 	} );
 
-	it( 'should not kebab-case properties with a vendor prefix', () => {
+	it( 'should -kebab-case style properties with a vendor prefix', () => {
 		const result = renderStyle( {
-			'-webkit-overflow-scrolling': 'touch',
+			msTransform: 'none',
+			OTransform: 'none',
+			MozTransform: 'none',
+			WebkitTransform: 'none',
 		} );
 
-		expect( result ).toBe( '-webkit-overflow-scrolling:touch' );
+		expect( result ).toBe( '-ms-transform:none;-o-transform:none;-moz-transform:none;-webkit-transform:none' );
 	} );
 
 	describe( 'value unit', () => {
