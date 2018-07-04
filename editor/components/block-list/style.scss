@@ -142,7 +142,7 @@
 	.editor-default-block-appender__content,
 	.editor-block-list__block .editor-block-list__block-edit,
 	.editor-block-list__layout .editor-block-list__block .editor-block-list__block-edit,
-	.editor-block-list__layout .editor-default-block-appender .editor-default-block-appender__content { // Explicitly target nested blocks, as those need to override the preceeding rule.
+	.editor-block-list__layout .editor-default-block-appender .editor-default-block-appender__content { // Explicitly target nested blocks, as those need to override the preceding rule.
 		margin-top: $block-padding * 2 + $block-spacing;
 		margin-bottom: $block-padding * 2 + $block-spacing;
 	}
@@ -407,7 +407,7 @@
 			float: left;
 		}
 
-		// There is no side UI clearance on fullwide elements, so they are simply not draggable on the sides
+		// There is no side UI clearance on full-wide elements, so they are simply not draggable on the sides
 		> .editor-block-list__block-draggable {
 			left: 0;
 			right: 0;
@@ -441,7 +441,7 @@
 		> .editor-block-settings-menu {
 			right: -$block-padding + $block-side-ui-clearance;
 		}
-	
+
 		// Position mover
 		> .editor-block-mover {
 			left: -$block-padding + $border-width;
@@ -471,7 +471,8 @@
 				margin-right: -$block-side-ui-padding - $block-padding;
 			}
 
-			// This explicitly sets the width of the block, to override the fit-content from the image block.
+			// This explicitly sets the width of the block, to override
+			// `width: fit-content` from the image block.
 			figure {
 				width: 100%;
 			}
@@ -525,12 +526,12 @@
 
 
 /**
- * Left and right side UI, & Unified toolbar on Mobile
+ * Left and right side UI; Unified toolbar on Mobile
  */
 
 .editor-block-list__block {
 
-	// Left and right
+	// Left and right block settings and mover.
 	> .editor-block-settings-menu,
 	> .editor-block-mover {
 		position: absolute;
@@ -546,7 +547,7 @@
 		top: -$block-padding - $border-width;
 	}
 
-	// Elevate when selected or hovered
+	// Elevate when block is selected or hovered.
 	@include break-small() {
 		&.is-multi-selected,
 		&.is-selected,
