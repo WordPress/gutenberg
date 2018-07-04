@@ -141,7 +141,8 @@
 	// This allows margins to collapse, which gives a better representation of how it looks on the frontend.
 	.editor-default-block-appender__content,
 	.editor-block-list__block .editor-block-list__block-edit,
-	.editor-block-list__layout .editor-block-list__block .editor-block-list__block-edit { // Explicitly target nested blocks, as those need to override the preceeding rule.
+	.editor-block-list__layout .editor-block-list__block .editor-block-list__block-edit,
+	.editor-block-list__layout .editor-default-block-appender .editor-default-block-appender__content { // Explicitly target nested blocks, as those need to override the preceeding rule.
 		margin-top: $block-padding * 2 + $block-spacing;
 		margin-bottom: $block-padding * 2 + $block-spacing;
 	}
@@ -183,33 +184,6 @@
 	 }
 
 	/**
-	 * Warnings
-	 */
-
-	&.has-warning .editor-block-list__block-edit {
-		position: relative;
-		min-height: 250px;
-		max-height: 500px;
-		overflow: hidden;
-
-		> :not( .editor-warning ) {
-			pointer-events: none;
-			user-select: none;
-		}
-	}
-
-	&.has-warning .editor-block-list__block-edit:after {
-		content: '';
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
-		background-color: rgba( $white, 0.6 );
-		background-image: linear-gradient( to bottom, transparent, $white );
-	}
-
-	/**
 	 * Block outline layout
 	 */
 
@@ -229,8 +203,6 @@
 			left: -$parent-block-padding;
 			top: -$block-padding;
 			bottom: -$block-padding;
-			right: -$block-padding;
-			left: -$block-padding;
 
 			// Show wider padding for top level blocks.
 			@include break-small() {
@@ -309,10 +281,10 @@
 
 	// Warnings
 	 &.has-warning .editor-block-list__block-edit {
-		position: relative;
+		//position: relative;
 		min-height: 250px;
 		max-height: 500px;
-		overflow: hidden;
+		//overflow: hidden;
 
 		> :not( .editor-warning ) {
 			pointer-events: none;
@@ -416,7 +388,7 @@
 		> .editor-block-mover,
 		> .editor-block-settings-menu {
 			// This moves the menu up by the height of the button + border + padding.
-			top: -$block-side-ui-width - $block-padding - $border-width;
+			top: -$block-side-ui-width - $block-padding - $block-side-ui-clearance;
 			bottom: auto;
 			min-height: 0;
 			height: auto;
@@ -433,8 +405,7 @@
 		}
 
 		> .editor-block-settings-menu {
-			right: $parent-block-padding;
-			width: $block-side-ui-width * 2;
+			width: $block-side-ui-width;
 			flex-direction: row;
 		}
 
@@ -472,6 +443,13 @@
 		> .editor-block-list__breadcrumb {
 			right: -$block-padding;
 		}
+
+		// Position ellipsis.
+		> .editor-block-settings-menu {
+			right: -$block-padding + $block-side-ui-clearance;
+			width: $block-side-ui-width;
+			flex-direction: row;
+		}
 	}
 
 	// Full-wide
@@ -508,6 +486,13 @@
 			right: 0;
 			border-left-width: 0;
 			border-right-width: 0;
+		}
+
+		// Position ellipsis.
+		> .editor-block-settings-menu {
+			right: $block-side-ui-clearance;
+			width: $block-side-ui-width;
+			flex-direction: row;
 		}
 	}
 
@@ -854,17 +839,17 @@
 	}
 
 	// Make block toolbar full width on mobile.
-	margin-left: -$block-padding - $border-width;
-	margin-right: -$block-padding - $border-width;
+	margin-left: -$border-width;
+	margin-right: -$border-width;
 
 	@include break-small() {
-		margin-left: -$parent-block-padding - $border-width;
-		margin-right: -$parent-block-padding - $border-width;
+		margin-left: -$parent-block-padding - $parent-block-padding - $border-width;
+		margin-right: -$parent-block-padding - $parent-block-padding - $border-width;
 
 		// Position toolbar for nested contexts.
 		.editor-block-list__block & {
-			margin-left: -$block-padding - $border-width;
-			margin-right: -$block-padding - $border-width;
+			margin-left: -$parent-block-padding - $block-padding - $border-width;
+			margin-right: -$parent-block-padding - $block-padding - $border-width;
 		}
 
 		// Except for wide elements, this causes a horizontal scrollbar.

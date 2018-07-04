@@ -2,12 +2,16 @@
 	position: relative;
 	padding: 50px 0;
 
-	.editor-default-block-appender__content, // The default appender should match a single paragraph.
+	input[type="text"].editor-default-block-appender__content, // The default appender should match a single paragraph. Needs specificity.
 	&,
 	& p {
 		font-family: $editor-font;
 		font-size: $editor-font-size;
 		line-height: $editor-line-height;
+	}
+
+	&,
+	& p {
 		color: $dark-gray-700;
 	}
 
