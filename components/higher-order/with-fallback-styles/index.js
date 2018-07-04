@@ -54,7 +54,7 @@ export default ( mapNodeToProps ) => createHigherOrderComponent(
 				const wrappedComponent = <WrappedComponent { ...this.props } { ...this.state.fallbackStyles } />;
 				return this.props.node ? wrappedComponent : <div ref={ this.bindRef }> { wrappedComponent } </div>;
 			}
-		}
+		};
 	},
 	'withFallbackStyles'
 );
