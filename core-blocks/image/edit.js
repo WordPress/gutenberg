@@ -50,13 +50,10 @@ import ImageSize from './image-size';
  * Module constants
  */
 const MIN_SIZE = 20;
-
-const LINK_DESTINATION_OPTIONS = {
-	NONE: 'NONE',
-	MEDIA_FILE: 'MEDIA_FILE',
-	ATTACHMENT_PAGE: 'ATTACHMENT_PAGE',
-	CUSTOM_HREF: 'CUSTOM_HREF',
-};
+const LINK_DESTINATION_NONE = 'none';
+const LINK_DESTINATION_MEDIA = 'media';
+const LINK_DESTINATION_ATTACHMENT = 'attachment';
+const LINK_DESTINATION_CUSTOM = 'custom';
 
 class ImageEdit extends Component {
 	constructor() {
@@ -132,11 +129,11 @@ class ImageEdit extends Component {
 	onSetLinkDestination( value ) {
 		let href;
 
-		if ( value === LINK_DESTINATION_OPTIONS.NONE ) {
+		if ( value === LINK_DESTINATION_NONE ) {
 			href = '';
-		} else if ( value === LINK_DESTINATION_OPTIONS.MEDIA_FILE ) {
+		} else if ( value === LINK_DESTINATION_MEDIA ) {
 			href = this.props.attributes.url;
-		} else if ( value === LINK_DESTINATION_OPTIONS.ATTACHMENT_PAGE ) {
+		} else if ( value === LINK_DESTINATION_ATTACHMENT ) {
 			href = this.props.image && this.props.image.link;
 		} else {
 			href = this.props.attributes.href;
@@ -203,10 +200,10 @@ class ImageEdit extends Component {
 
 	getLinkDestinationOptions() {
 		return [
-			{ value: LINK_DESTINATION_OPTIONS.NONE, label: __( 'None' ) },
-			{ value: LINK_DESTINATION_OPTIONS.MEDIA_FILE, label: __( 'Media File' ) },
-			{ value: LINK_DESTINATION_OPTIONS.ATTACHMENT_PAGE, label: __( 'Attachment Page' ) },
-			{ value: LINK_DESTINATION_OPTIONS.CUSTOM_HREF, label: __( 'Custom URL' ) },
+			{ value: LINK_DESTINATION_NONE, label: __( 'None' ) },
+			{ value: LINK_DESTINATION_MEDIA, label: __( 'Media File' ) },
+			{ value: LINK_DESTINATION_ATTACHMENT, label: __( 'Attachment Page' ) },
+			{ value: LINK_DESTINATION_CUSTOM, label: __( 'Custom URL' ) },
 		];
 	}
 
@@ -268,7 +265,7 @@ class ImageEdit extends Component {
 
 		const availableSizes = this.getAvailableSizes();
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
-		const isCustomHrefDisabled = linkDestination !== LINK_DESTINATION_OPTIONS.CUSTOM_HREF;
+		const isLinkUrlInputDisabled = linkDestination !== LINK_DESTINATION_CUSTOM;
 
 		const getInspectorControls = ( imageWidth, imageHeight ) => (
 			<InspectorControls>
@@ -353,8 +350,8 @@ class ImageEdit extends Component {
 						label={ __( 'Link URL' ) }
 						value={ href }
 						onChange={ this.onSetCustomHref }
-						placeholder={ ! isCustomHrefDisabled && 'http://' }
-						disabled={ isCustomHrefDisabled }
+						placeholder={ ! isLinkUrlInputDisabled && 'http://' }
+						disabled={ isLinkUrlInputDisabled }
 					/>
 				</PanelBody>
 			</InspectorControls>
