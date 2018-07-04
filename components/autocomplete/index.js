@@ -265,8 +265,6 @@ export class Autocomplete extends Component {
 			return;
 		}
 
-		this.reset();
-
 		if ( getOptionCompletion ) {
 			const completion = getOptionCompletion( option.value, range, query );
 
@@ -289,10 +287,20 @@ export class Autocomplete extends Component {
 				}
 			}
 		}
+
+		// Reset autocomplete state after insertion rather than before
+		// so insertion events don't cause the completion menu to redisplay.
+		this.reset();
 	}
 
 	reset() {
-		this.setState( this.constructor.getInitialState() );
+		const isMounted = !! this.node;
+
+		// Autocompletions may replace the block containing this component,
+		// so we make sure it is mounted before resetting the state.
+		if ( isMounted ) {
+			this.setState( this.constructor.getInitialState() );
+		}
 	}
 
 	resetWhenSuppressed() {
