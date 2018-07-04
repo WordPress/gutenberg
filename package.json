@@ -36,7 +36,7 @@
     "sprintf-js": "^1.1.1"
   },
   "scripts": {
-    "check-gb-unused-babelrc": "cd gutenberg/; git ls-files --error-unmatch .babelrc 2>/dev/null; ss=$?; cd ..; (if [ \"$ss\" -gt 0 ]; then (exit 0); else (echo \"'.babelrc' is tracked in Gutenberg, cannot overwrite!\"; exit 1); fi)",
+    "check-gb-unused-babelrc": "cd gutenberg/; git ls-files --error-unmatch .babelrc 2>/dev/null; tracked=$?; cd ..; (if [ \"$tracked\" -gt 0 ]; then (exit 0); else (echo \"'.babelrc' is tracked in Gutenberg, cannot overwrite!\"; exit 1); fi)",
     "bypass-gb-babel": "echo '{\"presets\": [\"@wordpress/default\"]}' > gutenberg/.babelrc",
     "pre-build": "yarn check-gb-unused-babelrc && yarn bypass-gb-babel",
     "start": "yarn pre-build && yarn react-native start",
