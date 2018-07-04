@@ -55,7 +55,12 @@ function withGlobalEvents( eventTypesToHandlers ) {
 
 			handleRef( el ) {
 				this.wrappedRef = el;
-				this.props.forwardedRef( el );
+				// Any component using `withGlobalEvents` that is not setting a `ref`
+				// will cause `this.props.forwardedRef` to be `null`, so we need this
+				// check.
+				if ( this.props.forwardedRef ) {
+					this.props.forwardedRef( el );
+				}
 			}
 
 			render() {
