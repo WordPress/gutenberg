@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop, uniqueId } from 'lodash';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,7 +16,7 @@ import './style.scss';
 import ModalFrame from './frame';
 import ModalHeader from './header';
 import * as ariaHelper from './aria-helper';
-import withInstanceId from '../with-instance-id';
+import withInstanceId from '../higher-order/with-instance-id';
 
 // Used to count the number of open modals.
 let parentElement,
