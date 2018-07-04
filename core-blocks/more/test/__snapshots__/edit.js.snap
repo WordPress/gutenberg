@@ -4,7 +4,7 @@ exports[`core/more/edit should match snapshot when noTeaser is false 1`] = `
 <React.Fragment>
   <IfBlockEditSelected(InspectorControlsFill)>
     <PanelBody>
-      <_class
+      <WithInstanceId(ToggleControl)
         checked={false}
         label="Hide the teaser before the \\"More\\" tag"
         onChange={[Function]}
@@ -28,7 +28,7 @@ exports[`core/more/edit should match snapshot when noTeaser is true 1`] = `
 <React.Fragment>
   <IfBlockEditSelected(InspectorControlsFill)>
     <PanelBody>
-      <_class
+      <WithInstanceId(ToggleControl)
         checked={true}
         label="Hide the teaser before the \\"More\\" tag"
         onChange={[Function]}
