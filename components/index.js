@@ -27,6 +27,7 @@ export { default as KeyboardShortcuts } from './keyboard-shortcuts';
 export { default as MenuGroup } from './menu-group';
 export { default as MenuItem } from './menu-item';
 export { default as MenuItemsChoice } from './menu-items-choice';
+export { default as Modal } from './modal';
 export { default as ScrollLock } from './scroll-lock';
 export { NavigableMenu, TabbableContainer } from './navigable-container';
 export { default as Notice } from './notice';

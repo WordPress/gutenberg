@@ -8,7 +8,7 @@ import { forEach } from 'lodash';
  */
 import {
 	Component,
-	createRef,
+	forwardRef,
 	createHigherOrderComponent,
 } from '@wordpress/element';
 
@@ -26,13 +26,12 @@ const listener = new Listener();
 
 function withGlobalEvents( eventTypesToHandlers ) {
 	return createHigherOrderComponent( ( WrappedComponent ) => {
-		return class extends Component {
+		class Wrapper extends Component {
 			constructor() {
 				super( ...arguments );
 
 				this.handleEvent = this.handleEvent.bind( this );
-
-				this.ref = createRef();
+				this.handleRef = this.handleRef.bind( this );
 			}
 
 			componentDidMount() {
@@ -49,15 +48,24 @@ function withGlobalEvents( eventTypesToHandlers ) {
 
 			handleEvent( event ) {
 				const handler = eventTypesToHandlers[ event.type ];
-				if ( typeof this.ref.current[ handler ] === 'function' ) {
-					this.ref.current[ handler ]( event );
+				if ( typeof this.wrappedRef[ handler ] === 'function' ) {
+					this.wrappedRef[ handler ]( event );
 				}
 			}
 
-			render() {
-				return <WrappedComponent ref={ this.ref } { ...this.props } />;
+			handleRef( el ) {
+				this.wrappedRef = el;
+				this.props.forwardedRef( el );
 			}
-		};
+
+			render() {
+				return <WrappedComponent { ...this.props } ref={ this.handleRef } />;
+			}
+		}
+
+		return forwardRef( ( props, ref ) => {
+			return <Wrapper { ...props } forwardedRef={ ref } />;
+		} );
 	}, 'withGlobalEvents' );
 }
 
