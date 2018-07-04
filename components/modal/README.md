@@ -15,10 +15,8 @@ Render a screen overlay with a modal on top.
 		aria={ {
 		    describedby: "modal-description",
 		} }
-		>
-		<ModalContent>
-			<p id="modal-description">This modal is meant to be awesome!</p>
-		</ModalContent>
+	>
+		<p id="modal-description">This modal is meant to be awesome!</p>
 	</Modal>
 ```
 
