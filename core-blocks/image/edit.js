@@ -279,19 +279,6 @@ class ImageEdit extends Component {
 						onChange={ this.updateAlt }
 						help={ __( 'Describe the purpose of the image. Leave empty if the image is not a key part of the content.' ) }
 					/>
-					<SelectControl
-						label={ __( 'Link to' ) }
-						value={ linkDestination }
-						options={ this.getLinkDestinationOptions() }
-						onChange={ this.onSetLinkDestination }
-					/>
-					<TextControl
-						label={ __( 'Custom URL' ) }
-						value={ href }
-						onChange={ this.onSetCustomHref }
-						placeholder={ ! isCustomHrefDisabled && 'http://' }
-						disabled={ isCustomHrefDisabled }
-					/>
 					{ ! isEmpty( availableSizes ) && (
 						<SelectControl
 							label={ __( 'Source Type' ) }
@@ -354,6 +341,21 @@ class ImageEdit extends Component {
 							</Button>
 						</div>
 					</div>
+				</PanelBody>
+				<PanelBody title={ __( 'Link Settings' ) }>
+					<SelectControl
+						label={ __( 'Link To' ) }
+						value={ linkDestination }
+						options={ this.getLinkDestinationOptions() }
+						onChange={ this.onSetLinkDestination }
+					/>
+					<TextControl
+						label={ __( 'Link URL' ) }
+						value={ href }
+						onChange={ this.onSetCustomHref }
+						placeholder={ ! isCustomHrefDisabled && 'http://' }
+						disabled={ isCustomHrefDisabled }
+					/>
 				</PanelBody>
 			</InspectorControls>
 		);
