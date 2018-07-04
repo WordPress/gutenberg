@@ -350,7 +350,7 @@ class ImageEdit extends Component {
 						label={ __( 'Link URL' ) }
 						value={ href }
 						onChange={ this.onSetCustomHref }
-						placeholder={ ! isLinkUrlInputDisabled && 'http://' }
+						placeholder={ ! isLinkUrlInputDisabled && 'https://' }
 						disabled={ isLinkUrlInputDisabled }
 					/>
 				</PanelBody>
