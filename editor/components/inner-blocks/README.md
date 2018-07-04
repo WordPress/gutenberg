@@ -44,6 +44,66 @@ _Note:_ Since the save step will automatically apply props to the element return
 
 ### `InnerBlocks`
 
+### `allowedBlocks`
+* **Type:** `Array<String>`
+
+Allowed blocks prop should contain an array of strings, each string should contain the identifier of a block. When allowedBlocks is set it is only possible to insert blocks part of the set specified in the array.
+```jsx
+const ALLOWED_BLOCKS = [ 'core/image', 'core/paragraph' ];
+...
+<InnerBlocks
+    allowedBlocks={ ALLOWED_BLOCKS }
+/>
+```
+The previous code block creates an InnerBlocks area where only images and paragraphs can be inserted.
+
+Child blocks are not excluded. Even if allowed blocks don't specify the child block, the child block will still appear on the inserter.
+
+```jsx
+const ALLOWED_BLOCKS = [];
+...
+<InnerBlocks
+    allowedBlocks={ ALLOWED_BLOCKS }
+/>
+```
+The previous code block restricts all the blocks, so only child blocks can be inserted. If no child blocks are available it will not be possible to insert any block.
+
+### `template`
+* **Type:** `Array<Array<Object>>`
+
+The template is defined as a list of block items. Such blocks can have predefined attributes, placeholder, content, etc.... Block templates allow specifying a default initial state for an InnerBlocks area.
+More information about templates can be found in [template docs](https://wordpress.org/gutenberg/handbook/templates/).
+
+```jsx
+const TEMPLATE = [ 'core/columns', {}, [
+    [ 'core/column', {}, [
+        [ 'core/image' ],
+    ] ],
+    [ 'core/column', {}, [
+        [ 'core/paragraph', { placeholder: 'Enter side content...' } ],
+    ] ],
+] ];
+...
+<InnerBlocks
+    template={ TEMPLATE }
+/>
+```
+The previous example creates an InnerBlocks area containing two columns one with an image and the other with a paragraph.
+
+### `templateLock`
+* **Type:** `String|Boolean`
+
+Template lock of InnerBlocks is equivalent to what is offered for [CPT templates locking](https://wordpress.org/gutenberg/handbook/templates/#locking).
+It allows locking the InnerBlocks area with the template that was set.
+*Options:*
+
+- `all` — prevents all operations. It is not possible to insert new blocks. Move existing blocks or delete them.
+- `insert` — prevents inserting new blocks, but allows moving or removing existing ones.
+- `false` — prevents locking from being applied to an InnerBlocks area even if a parent block contains locking.
+
+If locking is not set in an InnerBlocks area the locking of the parent InnerBlocks area is used, if we are on a top level block the locking will be the general one (the one set on the CPT template).
+* **Type:** `Array<String>`
+
 #### `layouts`
 
 * **Type:** `Array<Object>|Object`
