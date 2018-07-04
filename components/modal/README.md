@@ -18,7 +18,7 @@ Render a screen overlay with a modal on top.
 		>
 		<ModalContent>
 			<p id="modal-description">This modal is meant to be awesome!</p>
-		</ModalConent>
+		</ModalContent>
 	</Modal>
 ```
 
