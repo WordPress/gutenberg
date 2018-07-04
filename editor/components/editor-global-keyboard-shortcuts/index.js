@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { first, last } from 'lodash';
+import { first, last, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,9 +9,7 @@ import { first, last } from 'lodash';
 import { Component, Fragment, compose } from '@wordpress/element';
 import { KeyboardShortcuts } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { keycodes } from '@wordpress/utils';
-
-const { rawShortcut } = keycodes;
+import { rawShortcut } from '@wordpress/keycodes';
 
 class EditorGlobalKeyboardShortcuts extends Component {
 	constructor() {
@@ -98,16 +96,17 @@ export default compose( [
 			getBlockOrder,
 			getMultiSelectedBlockUids,
 			hasMultiSelection,
-			getEditorSettings,
 			isEditedPostDirty,
+			getBlockRootUID,
+			getTemplateLock,
 		} = select( 'core/editor' );
-		const { templateLock } = getEditorSettings();
+		const multiSelectedBlockUids = getMultiSelectedBlockUids();
 
 		return {
 			uids: getBlockOrder(),
-			multiSelectedBlockUids: getMultiSelectedBlockUids(),
+			multiSelectedBlockUids,
 			hasMultiSelection: hasMultiSelection(),
-			isLocked: !! templateLock,
+			isLocked: some( multiSelectedBlockUids, ( uid ) => !! getTemplateLock( getBlockRootUID( uid ) ) ),
 			isDirty: isEditedPostDirty(),
 		};
 	} ),

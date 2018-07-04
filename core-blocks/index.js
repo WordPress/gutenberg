@@ -21,8 +21,10 @@ import * as button from './button';
 import * as categories from './categories';
 import * as code from './code';
 import * as columns from './columns';
+import * as column from './columns/column';
 import * as coverImage from './cover-image';
 import * as embed from './embed';
+import * as file from './file';
 import * as freeform from './freeform';
 import * as html from './html';
 import * as latestPosts from './latest-posts';
@@ -59,10 +61,12 @@ export const registerCoreBlocks = () => {
 		categories,
 		code,
 		columns,
+		column,
 		coverImage,
 		embed,
 		...embed.common,
 		...embed.others,
+		file,
 		freeform,
 		html,
 		latestPosts,

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flow, noop } from 'lodash';
+import { castArray, flow, noop, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,17 +16,19 @@ export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, role, .
 		return null;
 	}
 
-	const label = __( 'Remove' );
+	const label = __( 'Remove Block' );
 
 	return (
 		<IconButton
-			className="editor-block-settings-remove"
+			className="editor-block-settings-menu__control"
 			onClick={ flow( onRemove, onClick ) }
 			icon="trash"
 			label={ label }
 			role={ role }
 			{ ...props }
-		/>
+		>
+			{ label }
+		</IconButton>
 	);
 }
 
@@ -36,11 +38,14 @@ export default compose(
 			dispatch( 'core/editor' ).removeBlocks( uids );
 		},
 	} ) ),
-	withSelect( ( select ) => {
-		const { templateLock } = select( 'core/editor' ).getEditorSettings();
-
+	withSelect( ( select, { uids } ) => {
+		const { getBlockRootUID, getTemplateLock } = select( 'core/editor' );
 		return {
-			isLocked: !! templateLock,
+			isLocked: some( castArray( uids ), ( uid ) => {
+				const rootUID = getBlockRootUID( uid );
+				const templateLock = getTemplateLock( rootUID );
+				return templateLock === 'all';
+			} ),
 		};
 	} ),
 )( BlockRemoveButton );

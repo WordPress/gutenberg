@@ -6,13 +6,21 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import { getPostEditURL, BrowserURL } from '../';
+import { getPostEditURL, getPostTrashedURL, BrowserURL } from '../';
 
 describe( 'getPostEditURL', () => {
 	it( 'should generate relative path with post and action arguments', () => {
 		const url = getPostEditURL( 1 );
 
 		expect( url ).toBe( 'post.php?post=1&action=edit' );
+	} );
+} );
+
+describe( 'getPostTrashedURL', () => {
+	it( 'should generate relative path with post and action arguments', () => {
+		const url = getPostTrashedURL( 1, 'page' );
+
+		expect( url ).toBe( 'edit.php?trashed=1&post_type=page&ids=1' );
 	} );
 } );
 

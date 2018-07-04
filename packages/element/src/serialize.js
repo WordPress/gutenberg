@@ -28,7 +28,12 @@
 /**
  * External dependencies
  */
-import { isEmpty, castArray, omit, kebabCase } from 'lodash';
+import { flowRight, isEmpty, castArray, omit, startsWith, kebabCase } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -220,6 +225,46 @@ const CSS_PROPERTIES_SUPPORTS_UNITLESS = new Set( [
 ] );
 
 /**
+ * Returns a string with ampersands escaped. Note that this is an imperfect
+ * implementation, where only ampersands which do not appear as a pattern of
+ * named, decimal, or hexadecimal character references are escaped. Invalid
+ * named references (i.e. ambiguous ampersand) are are still permitted.
+ *
+ * @link https://w3c.github.io/html/syntax.html#character-references
+ * @link https://w3c.github.io/html/syntax.html#ambiguous-ampersand
+ * @link https://w3c.github.io/html/syntax.html#named-character-references
+ *
+ * @param {string} value Original string.
+ *
+ * @return {string} Escaped string.
+ */
+export function escapeAmpersand( value ) {
+	return value.replace( /&(?!([a-z0-9]+|#[0-9]+|#x[a-f0-9]+);)/gi, '&amp;' );
+}
+
+/**
+ * Returns a string with quotation marks replaced.
+ *
+ * @param {string} value Original string.
+ *
+ * @return {string} Escaped string.
+ */
+export function escapeQuotationMark( value ) {
+	return value.replace( /"/g, '&quot;' );
+}
+
+/**
+ * Returns a string with less-than sign replaced.
+ *
+ * @param {string} value Original string.
+ *
+ * @return {string} Escaped string.
+ */
+export function escapeLessThan( value ) {
+	return value.replace( /</g, '&lt;' );
+}
+
+/**
  * Returns an escaped attribute value.
  *
  * @link https://w3c.github.io/html/syntax.html#elements-attributes
@@ -231,15 +276,15 @@ const CSS_PROPERTIES_SUPPORTS_UNITLESS = new Set( [
  *
  * @return {string} Escaped attribute value.
  */
-function escapeAttribute( value ) {
-	return value.replace( /&/g, '&amp;' ).replace( /"/g, '&quot;' );
-}
+export const escapeAttribute = flowRight( [
+	escapeAmpersand,
+	escapeQuotationMark,
+] );
 
 /**
  * Returns an escaped HTML element value.
  *
  * @link https://w3c.github.io/html/syntax.html#writing-html-documents-elements
- * @link https://w3c.github.io/html/syntax.html#ambiguous-ampersand
  *
  * "the text must not contain the character U+003C LESS-THAN SIGN (<) or an
  * ambiguous ampersand."
@@ -248,9 +293,10 @@ function escapeAttribute( value ) {
  *
  * @return {string} Escaped HTML element value.
  */
-function escapeHTML( value ) {
-	return value.replace( /&/g, '&amp;' ).replace( /</g, '&lt;' );
-}
+export const escapeHTML = flowRight( [
+	escapeAmpersand,
+	escapeLessThan,
+] );
 
 /**
  * Returns true if the specified string is prefixed by one of an array of
@@ -314,6 +360,23 @@ function getNormalAttributeName( attribute ) {
 }
 
 /**
+ * Returns the normal form of the style property name for HTML. Converts
+ * property names to kebab-case (e.g. 'backgroundColor' → 'background-color'),
+ * unless the property name begins with a '-' (e.g. '-webkit-overflow-scroll').
+ *
+ * @param {string} property Property name.
+ *
+ * @return {string} Normalized property name.
+ */
+function getNormalStylePropertyName( property ) {
+	if ( startsWith( property, '-' ) ) {
+		return property;
+	}
+
+	return kebabCase( property );
+}
+
+/**
  * Returns the normal form of the style property value for HTML. Appends a
  * default pixel unit if numeric, not a unitless property, and not zero.
  *
@@ -322,7 +385,7 @@ function getNormalAttributeName( attribute ) {
  *
  * @return {*} Normalized property value.
  */
-function getNormalStyleValue( property, value ) {
+function getNormalStylePropertyValue( property, value ) {
 	if ( typeof value === 'number' && 0 !== value &&
 			! CSS_PROPERTIES_SUPPORTS_UNITLESS.has( property ) ) {
 		return value + 'px';
@@ -443,6 +506,11 @@ export function renderComponent( Component, props, context = {} ) {
 
 	if ( typeof instance.componentWillMount === 'function' ) {
 		instance.componentWillMount();
+		deprecated( 'componentWillMount', {
+			version: '3.3',
+			alternative: 'the constructor',
+			plugin: 'Gutenberg',
+		} );
 	}
 
 	if ( typeof instance.getChildContext === 'function' ) {
@@ -558,7 +626,9 @@ export function renderStyle( style ) {
 			result = '';
 		}
 
-		result += kebabCase( property ) + ':' + getNormalStyleValue( property, value );
+		const normalName = getNormalStylePropertyName( property );
+		const normalValue = getNormalStylePropertyValue( property, value );
+		result += normalName + ':' + normalValue;
 	}
 
 	return result;

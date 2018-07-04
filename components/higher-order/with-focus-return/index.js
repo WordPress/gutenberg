@@ -20,9 +20,6 @@ function withFocusReturn( WrappedComponent ) {
 
 			this.setIsFocusedTrue = () => this.isFocused = true;
 			this.setIsFocusedFalse = () => this.isFocused = false;
-		}
-
-		componentWillMount() {
 			this.activeElementOnMount = document.activeElement;
 		}
 

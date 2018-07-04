@@ -2,7 +2,12 @@
  * Internal dependencies
  */
 import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage, toggleMoreMenuItem } from '../support/utils';
+import {
+	clickOnMoreMenuItem,
+	openDocumentSettingsSidebar,
+	newPost,
+	newDesktopBrowserPage,
+} from '../support/utils';
 import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
 describe( 'Using Plugins API', () => {
@@ -17,17 +22,28 @@ describe( 'Using Plugins API', () => {
 		await deactivatePlugin( 'gutenberg-test-plugin-plugins-api' );
 	} );
 
-	it( 'Should open plugins sidebar using More Menu item and render content', async () => {
-		await toggleMoreMenuItem( 'My title plugin' );
+	describe( 'Post Status Info', () => {
+		it( 'Should render post status info inside Document Setting sidebar', async () => {
+			await openDocumentSettingsSidebar();
 
-		const pluginSidebarContent = await page.$eval( '.edit-post-sidebar', ( el ) => el.innerHTML );
-		expect( pluginSidebarContent ).toMatchSnapshot();
+			const pluginPostStatusInfoText = await page.$eval( '.edit-post-post-status .my-post-status-info-plugin', ( el ) => el.innerText );
+			expect( pluginPostStatusInfoText ).toBe( 'My post status info' );
+		} );
 	} );
 
-	it( 'Should close plugins sidebar using More Menu item', async () => {
-		await toggleMoreMenuItem( 'My title plugin' );
+	describe( 'Sidebar', () => {
+		it( 'Should open plugins sidebar using More Menu item and render content', async () => {
+			await clickOnMoreMenuItem( 'Sidebar title plugin' );
 
-		const pluginSidebar = await page.$( '.edit-post-sidebar' );
-		expect( pluginSidebar ).toBeNull();
+			const pluginSidebarContent = await page.$eval( '.edit-post-sidebar', ( el ) => el.innerHTML );
+			expect( pluginSidebarContent ).toMatchSnapshot();
+		} );
+
+		it( 'Should close plugins sidebar using More Menu item', async () => {
+			await clickOnMoreMenuItem( 'Sidebar title plugin' );
+
+			const pluginSidebar = await page.$( '.edit-post-sidebar' );
+			expect( pluginSidebar ).toBeNull();
+		} );
 	} );
 } );

@@ -12,7 +12,7 @@
 	}
 }
 
-.wp-block-quote:not(.is-large) {
+.wp-block-quote:not(.is-large):not(.is-style-large) {
 	border-left: 4px solid $black;
 	padding-left: 1em;
 }

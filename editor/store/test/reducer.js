@@ -1273,24 +1273,6 @@ describe( 'state', () => {
 				status: 'publish',
 			} );
 		} );
-
-		it( 'should set status to draft if autosave reset while auto-draft', () => {
-			const original = deepFreeze( { title: '', status: 'auto-draft' } );
-
-			const state = currentPost( original, {
-				type: 'RESET_AUTOSAVE',
-				edits: {
-					title: 'Hello world',
-					content: '',
-					excerpt: '',
-				},
-			} );
-
-			expect( state ).toEqual( {
-				title: '',
-				status: 'draft',
-			} );
-		} );
 	} );
 
 	describe( 'isInsertionPointVisible', () => {
@@ -2203,76 +2185,128 @@ describe( 'state', () => {
 	describe( 'blockListSettings', () => {
 		it( 'should add new settings', () => {
 			const original = deepFreeze( {} );
+
 			const state = blockListSettings( original, {
 				type: 'UPDATE_BLOCK_LIST_SETTINGS',
-				id: 'chicken',
+				id: '9db792c6-a25a-495d-adbd-97d56a4c4189',
 				settings: {
-					chicken: 'ribs',
+					allowedBlocks: [ 'core/paragraph' ],
 				},
 			} );
+
 			expect( state ).toEqual( {
-				chicken: {
-					chicken: 'ribs',
+				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
+					allowedBlocks: [ 'core/paragraph' ],
 				},
 			} );
+		} );
+
+		it( 'should return same reference if updated as the same', () => {
+			const original = deepFreeze( {
+				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
+					allowedBlocks: [ 'core/paragraph' ],
+				},
+			} );
+
+			const state = blockListSettings( original, {
+				type: 'UPDATE_BLOCK_LIST_SETTINGS',
+				id: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				settings: {
+					allowedBlocks: [ 'core/paragraph' ],
+				},
+			} );
+
+			expect( state ).toBe( original );
+		} );
+
+		it( 'should return same reference if updated settings not assigned and id not exists', () => {
+			const original = deepFreeze( {} );
+
+			const state = blockListSettings( original, {
+				type: 'UPDATE_BLOCK_LIST_SETTINGS',
+				id: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+			} );
+
+			expect( state ).toBe( original );
 		} );
 
 		it( 'should update the settings of a block', () => {
 			const original = deepFreeze( {
-				chicken: {
-					chicken: 'ribs',
+				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
+					allowedBlocks: [ 'core/paragraph' ],
 				},
-				otherBlock: {
-					setting1: true,
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
+					allowedBlocks: true,
 				},
 			} );
+
 			const state = blockListSettings( original, {
 				type: 'UPDATE_BLOCK_LIST_SETTINGS',
-				id: 'chicken',
+				id: '9db792c6-a25a-495d-adbd-97d56a4c4189',
 				settings: {
-					ribs: 'not-chicken',
+					allowedBlocks: [ 'core/list' ],
 				},
 			} );
+
 			expect( state ).toEqual( {
-				chicken: {
-					ribs: 'not-chicken',
+				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
+					allowedBlocks: [ 'core/list' ],
 				},
-				otherBlock: {
-					setting1: true,
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
+					allowedBlocks: true,
 				},
 			} );
 		} );
 
+		it( 'should remove existing settings if updated settings not assigned', () => {
+			const original = deepFreeze( {
+				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
+					allowedBlocks: [ 'core/paragraph' ],
+				},
+			} );
+
+			const state = blockListSettings( original, {
+				type: 'UPDATE_BLOCK_LIST_SETTINGS',
+				id: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+			} );
+
+			expect( state ).toEqual( {} );
+		} );
+
 		it( 'should remove the settings of a block when it is replaced', () => {
 			const original = deepFreeze( {
-				chicken: {
-					chicken: 'ribs',
+				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
+					allowedBlocks: [ 'core/paragraph' ],
 				},
-				otherBlock: {
-					setting1: true,
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
+					allowedBlocks: true,
 				},
 			} );
+
 			const state = blockListSettings( original, {
 				type: 'REPLACE_BLOCKS',
-				uids: [ 'otherBlock' ],
+				uids: [ 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' ],
 			} );
+
 			expect( state ).toEqual( {
-				chicken: {
-					chicken: 'ribs',
+				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
+					allowedBlocks: [ 'core/paragraph' ],
 				},
 			} );
 		} );
 
 		it( 'should remove the settings of a block when it is removed', () => {
 			const original = deepFreeze( {
-				otherBlock: {
-					setting1: true,
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
+					allowedBlocks: true,
 				},
 			} );
+
 			const state = blockListSettings( original, {
-				type: 'REPLACE_BLOCKS',
-				uids: [ 'otherBlock' ],
+				type: 'REMOVE_BLOCKS',
+				uids: [ 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' ],
 			} );
+
 			expect( state ).toEqual( {} );
 		} );
 	} );
@@ -2298,6 +2332,7 @@ describe( 'state', () => {
 						raw: 'The Excerpt',
 					},
 					status: 'draft',
+					preview_link: 'https://wordpress.org/?p=1&preview=true',
 				},
 			} );
 
@@ -2305,6 +2340,7 @@ describe( 'state', () => {
 				title: 'The Title',
 				content: 'The Content',
 				excerpt: 'The Excerpt',
+				preview_link: 'https://wordpress.org/?p=1&preview=true',
 			} );
 		} );
 	} );

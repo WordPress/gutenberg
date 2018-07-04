@@ -25,7 +25,7 @@ import {
 	getScrollContainer,
 } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
-import { keycodes } from '@wordpress/utils';
+import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, rawShortcut } from '@wordpress/keycodes';
 import { withInstanceId, withSafeTimeout, Slot } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { rawHandler } from '@wordpress/blocks';
@@ -42,8 +42,23 @@ import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
 import { domToFormat, valueToString } from './format';
+import TokenUI from './tokens/ui';
 
-const { BACKSPACE, DELETE, ENTER, rawShortcut } = keycodes;
+/**
+ * Browser dependencies
+ */
+
+const { Node } = window;
+
+/**
+ * Zero-width space character used by TinyMCE as a caret landing point for
+ * inline boundary nodes.
+ *
+ * @see tinymce/src/core/main/ts/text/Zwsp.ts
+ *
+ * @type {string}
+ */
+const TINYMCE_ZWSP = '\uFEFF';
 
 /**
  * Returns true if the node is the inline node boundary. This is used in node
@@ -59,7 +74,7 @@ const { BACKSPACE, DELETE, ENTER, rawShortcut } = keycodes;
  */
 export function isEmptyInlineBoundary( node ) {
 	const text = node.nodeName === 'A' ? node.innerText : node.textContent;
-	return text === '\uFEFF';
+	return text === TINYMCE_ZWSP;
 }
 
 /**
@@ -113,6 +128,7 @@ export class RichText extends Component {
 		this.onChange = this.onChange.bind( this );
 		this.onNewBlock = this.onNewBlock.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
+		this.onHorizontalNavigationKeyDown = this.onHorizontalNavigationKeyDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onKeyUp = this.onKeyUp.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
@@ -415,24 +431,47 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Calculates the relative position where the link toolbar should be.
+	 * Handles a horizontal navigation key down event to handle the case where
+	 * TinyMCE attempts to preventDefault when on the outside edge of an inline
+	 * boundary when arrowing _away_ from the boundary, not within it. Replaces
+	 * the TinyMCE event `preventDefault` behavior with a noop, such that those
+	 * relying on `defaultPrevented` are not misinformed about the arrow event.
 	 *
-	 * Based on the selection of the text inside this element a position is
-	 * calculated where the toolbar should be. This can be used downstream to
-	 * absolutely position the toolbar.
+	 * If TinyMCE#4476 is resolved, this handling may be removed.
 	 *
-	 * @param {DOMRect} position Caret range rectangle.
+	 * @see https://github.com/tinymce/tinymce/issues/4476
 	 *
-	 * @return {{top: number, left: number}} The desired position of the toolbar.
+	 * @param {tinymce.EditorEvent<KeyboardEvent>} event Keydown event.
 	 */
-	getFocusPosition( position ) {
-		// The container is relatively positioned.
-		const containerPosition = this.containerRef.current.getBoundingClientRect();
+	onHorizontalNavigationKeyDown( event ) {
+		const { focusNode } = window.getSelection();
+		const { nodeType, nodeValue } = focusNode;
 
-		return {
-			top: position.top - containerPosition.top + position.height,
-			left: position.left - containerPosition.left + ( position.width / 2 ),
-		};
+		if ( nodeType !== Node.TEXT_NODE ) {
+			return;
+		}
+
+		if ( nodeValue.length !== 1 || nodeValue[ 0 ] !== TINYMCE_ZWSP ) {
+			return;
+		}
+
+		const { keyCode } = event;
+
+		// Consider to be moving away from inline boundary based on:
+		//
+		// 1. Within a text fragment consisting only of ZWSP.
+		// 2. If in reverse, there is no previous sibling. If forward, there is
+		//    no next sibling (i.e. end of node).
+		const isReverse = keyCode === LEFT;
+		const edgeSibling = isReverse ? 'previousSibling' : 'nextSibling';
+		if ( ! focusNode[ edgeSibling ] ) {
+			// Note: This is not reassigning on the native event, rather the
+			// "fixed" TinyMCE copy, which proxies its preventDefault to the
+			// native event. By reassigning here, we're effectively preventing
+			// the proxied call on the native event, but not otherwise mutating
+			// the original event object.
+			event.preventDefault = noop;
+		}
 	}
 
 	/**
@@ -443,18 +482,17 @@ export class RichText extends Component {
 	onKeyDown( event ) {
 		const dom = this.editor.dom;
 		const rootNode = this.editor.getBody();
+		const { keyCode } = event;
 
 		if (
-			( event.keyCode === BACKSPACE && isHorizontalEdge( rootNode, true ) ) ||
-			( event.keyCode === DELETE && isHorizontalEdge( rootNode, false ) )
+			( keyCode === BACKSPACE && isHorizontalEdge( rootNode, true ) ) ||
+			( keyCode === DELETE && isHorizontalEdge( rootNode, false ) )
 		) {
 			if ( ! this.props.onMerge && ! this.props.onRemove ) {
 				return;
 			}
 
-			this.onCreateUndoLevel();
-
-			const forward = event.keyCode === DELETE;
+			const forward = keyCode === DELETE;
 
 			if ( this.props.onMerge ) {
 				this.props.onMerge( forward );
@@ -472,9 +510,14 @@ export class RichText extends Component {
 			event.stopImmediatePropagation();
 		}
 
+		const isHorizontalNavigation = keyCode === LEFT || keyCode === RIGHT;
+		if ( isHorizontalNavigation ) {
+			this.onHorizontalNavigationKeyDown( event );
+		}
+
 		// If we click shift+Enter on inline RichTexts, we avoid creating two contenteditables
 		// We also split the content and call the onSplit prop if provided.
-		if ( event.keyCode === ENTER ) {
+		if ( keyCode === ENTER ) {
 			if ( this.props.multiline ) {
 				if ( ! this.props.onSplit ) {
 					return;
@@ -491,7 +534,6 @@ export class RichText extends Component {
 				}
 
 				event.preventDefault();
-				this.onCreateUndoLevel();
 
 				const childNodes = Array.from( rootNode.childNodes );
 				const index = dom.nodeIndex( selectedNode );
@@ -505,7 +547,6 @@ export class RichText extends Component {
 				this.restoreContentAndSplit( before, after );
 			} else {
 				event.preventDefault();
-				this.onCreateUndoLevel();
 
 				if ( event.shiftKey || ! this.props.onSplit ) {
 					this.editor.execCommand( 'InsertLineBreak', false, event );
@@ -574,17 +615,20 @@ export class RichText extends Component {
 	 * @param {Object} context The context for splitting.
 	 */
 	splitContent( blocks = [], context = {} ) {
-		if ( ! this.props.onSplit ) {
+		const { onSplit } = this.props;
+		if ( ! onSplit ) {
 			return;
 		}
 
-		const { dom } = this.editor;
 		const rootNode = this.editor.getBody();
-		const beforeRange = dom.createRng();
-		const afterRange = dom.createRng();
-		const selectionRange = this.editor.selection.getRng();
 
+		let before, after;
 		if ( rootNode.childNodes.length ) {
+			const { dom } = this.editor;
+			const beforeRange = dom.createRng();
+			const afterRange = dom.createRng();
+			const selectionRange = this.editor.selection.getRng();
+
 			beforeRange.setStart( rootNode, 0 );
 			beforeRange.setEnd( selectionRange.startContainer, selectionRange.startOffset );
 
@@ -595,20 +639,32 @@ export class RichText extends Component {
 			const afterFragment = afterRange.extractContents();
 
 			const { format } = this.props;
-			let before = domToFormat( filterEmptyNodes( beforeFragment.childNodes ), format, this.editor );
-			let after = domToFormat( filterEmptyNodes( afterFragment.childNodes ), format, this.editor );
-
-			if ( context.paste ) {
-				before = this.isEmpty( before ) ? null : before;
-				after = this.isEmpty( after ) ? null : after;
-			}
-
-			this.restoreContentAndSplit( before, after, blocks );
-		} else if ( context.paste ) {
-			this.restoreContentAndSplit( null, null, blocks );
+			before = domToFormat( filterEmptyNodes( beforeFragment.childNodes ), format, this.editor );
+			after = domToFormat( filterEmptyNodes( afterFragment.childNodes ), format, this.editor );
 		} else {
-			this.restoreContentAndSplit( [], [], blocks );
+			before = [];
+			after = [];
 		}
+
+		// In case split occurs at the trailing or leading edge of the field,
+		// assume that the before/after values respectively reflect the current
+		// value. This also provides an opportunity for the parent component to
+		// determine whether the before/after value has changed using a trivial
+		//  strict equality operation.
+		if ( this.isEmpty( after ) ) {
+			before = this.props.value;
+		} else if ( this.isEmpty( before ) ) {
+			after = this.props.value;
+		}
+
+		// If pasting and the split would result in no content other than the
+		// pasted blocks, remove the before and after blocks.
+		if ( context.paste ) {
+			before = this.isEmpty( before ) ? null : before;
+			after = this.isEmpty( after ) ? null : after;
+		}
+
+		this.restoreContentAndSplit( before, after, blocks );
 	}
 
 	onNewBlock() {
@@ -675,20 +731,19 @@ export class RichText extends Component {
 			return accFormats;
 		}, {} );
 
-		let rect;
-		const selectedAnchor = find( parents, ( node ) => node.tagName === 'A' );
-		if ( selectedAnchor ) {
-			// If we selected a link, position the Link UI below the link
-			rect = selectedAnchor.getBoundingClientRect();
-		} else {
-			// Otherwise, position the Link UI below the cursor or text selection
-			rect = getRectangleFromRange( this.editor.selection.getRng() );
-		}
-		const focusPosition = this.getFocusPosition( rect );
-
-		this.setState( { formats, focusPosition, selectedNodeId: this.state.selectedNodeId + 1 } );
+		this.setState( { formats, selectedNodeId: this.state.selectedNodeId + 1 } );
 
 		if ( this.props.isViewportSmall ) {
+			let rect;
+			const selectedAnchor = find( parents, ( node ) => node.tagName === 'A' );
+			if ( selectedAnchor ) {
+				// If we selected a link, position the Link UI below the link
+				rect = selectedAnchor.getBoundingClientRect();
+			} else {
+				// Otherwise, position the Link UI below the cursor or text selection
+				rect = getRectangleFromRange( this.editor.selection.getRng() );
+			}
+
 			// Originally called on `focusin`, that hook turned out to be
 			// premature. On `nodechange` we can work with the finalized TinyMCE
 			// instance and scroll to proper position.
@@ -696,21 +751,22 @@ export class RichText extends Component {
 		}
 	}
 
-	updateContent() {
-		// Do not trigger a change event coming from the TinyMCE undo manager.
-		// Our global state is already up-to-date.
-		this.editor.undoManager.ignore( () => {
-			const bookmark = this.editor.selection.getBookmark( 2, true );
-
-			this.savedContent = this.props.value;
-			this.setContent( this.savedContent );
-			this.editor.selection.moveToBookmark( bookmark );
-		} );
-	}
-
 	setContent( content ) {
 		const { format } = this.props;
+
+		// If editor has focus while content is being set, save the selection
+		// and restore caret position after content is set.
+		let bookmark;
+		if ( this.editor.hasFocus() ) {
+			bookmark = this.editor.selection.getBookmark( 2, true );
+		}
+
+		this.savedContent = content;
 		this.editor.setContent( valueToString( content, format ) );
+
+		if ( bookmark ) {
+			this.editor.selection.moveToBookmark( bookmark );
+		}
 	}
 
 	getContent() {
@@ -720,9 +776,7 @@ export class RichText extends Component {
 			case 'string':
 				return this.editor.getContent();
 			default:
-				return this.editor.dom.isEmpty( this.editor.getBody() ) ?
-					[] :
-					domToFormat( this.editor.getBody().childNodes || [], 'element', this.editor );
+				return domToFormat( this.editor.getBody().childNodes || [], 'element', this.editor );
 		}
 	}
 
@@ -740,13 +794,11 @@ export class RichText extends Component {
 			! isEqual( this.props.value, prevProps.value ) &&
 			! isEqual( this.props.value, this.savedContent )
 		) {
-			this.updateContent();
+			this.setContent( this.props.value );
 		}
-	}
 
-	componentWillReceiveProps( nextProps ) {
 		if ( 'development' === process.env.NODE_ENV ) {
-			if ( ! isEqual( this.props.formatters, nextProps.formatters ) ) {
+			if ( ! isEqual( this.props.formatters, prevProps.formatters ) ) {
 				// eslint-disable-next-line no-console
 				console.error( 'Formatters passed via `formatters` prop will only be registered once. Formatters can be enabled/disabled via the `formattingControls` prop.' );
 			}
@@ -832,7 +884,7 @@ export class RichText extends Component {
 	 * @param {?Array} blocks blocks to insert at the split position
 	 */
 	restoreContentAndSplit( before, after, blocks = [] ) {
-		this.updateContent();
+		this.setContent( this.props.value );
 		this.props.onSplit( before, after, ...blocks );
 	}
 
@@ -854,7 +906,7 @@ export class RichText extends Component {
 			format,
 		} = this.props;
 
-		const ariaProps = { 'aria-multiline': true, ...pickAriaProps( this.props ) };
+		const ariaProps = pickAriaProps( this.props );
 
 		// Generating a key that includes `tagName` ensures that if the tag
 		// changes, we unmount and destroy the previous TinyMCE element, then
@@ -866,7 +918,6 @@ export class RichText extends Component {
 		const formatToolbar = (
 			<FormatToolbar
 				selectedNodeId={ this.state.selectedNodeId }
-				focusPosition={ this.state.focusPosition }
 				formats={ this.state.formats }
 				onChange={ this.changeFormats }
 				enabledControls={ formattingControls }
@@ -889,6 +940,12 @@ export class RichText extends Component {
 						{ formatToolbar }
 					</div>
 				) }
+				{ isSelected &&
+					<TokenUI
+						editor={ this.editor }
+						containerRef={ this.containerRef }
+					/>
+				}
 				<Autocomplete onReplace={ this.props.onReplace } completers={ autocompleters }>
 					{ ( { isExpanded, listBoxId, activeId } ) => (
 						<Fragment>

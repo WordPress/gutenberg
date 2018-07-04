@@ -12,7 +12,8 @@ In a block's `edit` implementation, simply render `InnerBlocks`, optionally with
 Then, in the `save` implementation, render `InnerBlocks.Content`. This will be replaced automatically with the content of the nested blocks.
 
 ```jsx
-import { registerBlockType, InnerBlocks } from '@wordpress/blocks';
+import { registerBlockType } from '@wordpress/blocks';
+import { InnerBlocks } from '@wordpress/editor';
 
 registerBlockType( 'my-plugin/my-block', {
 	// ...

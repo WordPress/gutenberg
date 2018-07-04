@@ -244,6 +244,14 @@ describe( 'actions', () => {
 		it( 'should return REQUEST_POST_UPDATE action', () => {
 			expect( savePost() ).toEqual( {
 				type: 'REQUEST_POST_UPDATE',
+				options: {},
+			} );
+		} );
+
+		it( 'should pass through options argument', () => {
+			expect( savePost( { autosave: true } ) ).toEqual( {
+				type: 'REQUEST_POST_UPDATE',
+				options: { autosave: true },
 			} );
 		} );
 	} );

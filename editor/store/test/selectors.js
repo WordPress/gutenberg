@@ -28,7 +28,6 @@ const {
 	getCurrentPostType,
 	getPostEdits,
 	getDocumentTitle,
-	getEditedPostExcerpt,
 	getEditedPostVisibility,
 	isCurrentPostPending,
 	isCurrentPostPublished,
@@ -40,7 +39,6 @@ const {
 	hasAutosave,
 	isEditedPostEmpty,
 	isEditedPostBeingScheduled,
-	getEditedPostPreviewLink,
 	getBlockDependantsCacheBust,
 	getBlockName,
 	getBlock,
@@ -50,7 +48,9 @@ const {
 	getSelectedBlock,
 	getSelectedBlockUID,
 	getBlockRootUID,
+	getCurrentPostAttribute,
 	getEditedPostAttribute,
+	getAutosaveAttribute,
 	getGlobalBlockCount,
 	getMultiSelectedBlockUids,
 	getMultiSelectedBlocks,
@@ -365,10 +365,43 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'getCurrentPostAttribute', () => {
+		it( 'should return undefined for an attribute which does not exist', () => {
+			const state = {
+				currentPost: {},
+			};
+
+			expect( getCurrentPostAttribute( state, 'foo' ) ).toBeUndefined();
+		} );
+
+		it( 'should return undefined for object prototype member', () => {
+			const state = {
+				currentPost: {},
+			};
+
+			expect( getCurrentPostAttribute( state, 'valueOf' ) ).toBeUndefined();
+		} );
+
+		it( 'should return the value of an attribute', () => {
+			const state = {
+				currentPost: {
+					title: 'Hello World',
+				},
+			};
+
+			expect( getCurrentPostAttribute( state, 'title' ) ).toBe( 'Hello World' );
+		} );
+	} );
+
 	describe( 'getEditedPostAttribute', () => {
 		it( 'should return the current post\'s slug if no edits have been made', () => {
 			const state = {
 				currentPost: { slug: 'post slug' },
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
 			};
 
 			expect( getEditedPostAttribute( state, 'slug' ) ).toBe( 'post slug' );
@@ -418,6 +451,55 @@ describe( 'selectors', () => {
 
 			expect( getEditedPostAttribute( state, 'title' ) ).toBe( 'youcha' );
 		} );
+
+		it( 'should return undefined for object prototype member', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
+			};
+
+			expect( getEditedPostAttribute( state, 'valueOf' ) ).toBeUndefined();
+		} );
+	} );
+
+	describe( 'getAutosaveAttribute', () => {
+		it( 'returns null if there is no autosave', () => {
+			const state = {
+				autosave: null,
+			};
+
+			expect( getAutosaveAttribute( state, 'title' ) ).toBeNull();
+		} );
+
+		it( 'returns undefined for an attribute which is not set', () => {
+			const state = {
+				autosave: {},
+			};
+
+			expect( getAutosaveAttribute( state, 'foo' ) ).toBeUndefined();
+		} );
+
+		it( 'returns undefined for object prototype member', () => {
+			const state = {
+				autosave: {},
+			};
+
+			expect( getAutosaveAttribute( state, 'valueOf' ) ).toBeUndefined();
+		} );
+
+		it( 'returns the attribute value', () => {
+			const state = {
+				autosave: {
+					title: 'Hello World',
+				},
+			};
+
+			expect( getAutosaveAttribute( state, 'title' ) ).toBe( 'Hello World' );
+		} );
 	} );
 
 	describe( 'getCurrentPostLastRevisionId', () => {
@@ -432,8 +514,12 @@ describe( 'selectors', () => {
 		it( 'should return the last revision ID', () => {
 			const state = {
 				currentPost: {
-					revisions: {
-						last_id: 123,
+					_links: {
+						'predecessor-version': [
+							{
+								id: 123,
+							},
+						],
 					},
 				},
 			};
@@ -454,8 +540,12 @@ describe( 'selectors', () => {
 		it( 'should return the number of revisions', () => {
 			const state = {
 				currentPost: {
-					revisions: {
-						count: 5,
+					_links: {
+						'version-history': [
+							{
+								count: 5,
+							},
+						],
 					},
 				},
 			};
@@ -578,40 +668,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( getDocumentTitle( state ) ).toBe( __( '(Untitled)' ) );
-		} );
-	} );
-
-	describe( 'getEditedPostExcerpt', () => {
-		it( 'should return the post saved excerpt if the excerpt is not edited', () => {
-			const state = {
-				currentPost: {
-					excerpt: 'sassel',
-				},
-				editor: {
-					present: {
-						edits: { status: 'private' },
-					},
-				},
-			};
-
-			expect( getEditedPostExcerpt( state ) ).toBe( 'sassel' );
-			expect( console ).toHaveWarned();
-		} );
-
-		it( 'should return the edited excerpt', () => {
-			const state = {
-				currentPost: {
-					excerpt: 'sassel',
-				},
-				editor: {
-					present: {
-						edits: { excerpt: 'youcha' },
-					},
-				},
-			};
-
-			expect( getEditedPostExcerpt( state ) ).toBe( 'youcha' );
-			expect( console ).toHaveWarned();
 		} );
 	} );
 
@@ -1254,26 +1310,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( isEditedPostBeingScheduled( state ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'getEditedPostPreviewLink', () => {
-		it( 'should return null if the post has not link yet', () => {
-			const state = {
-				currentPost: {},
-			};
-
-			expect( getEditedPostPreviewLink( state ) ).toBeNull();
-		} );
-
-		it( 'should return the correct url when the post object has a preview_link', () => {
-			const state = {
-				currentPost: {
-					preview_link: 'https://andalouses.com/?p=1&preview=true',
-				},
-			};
-
-			expect( getEditedPostPreviewLink( state ) ).toBe( 'https://andalouses.com/?p=1&preview=true' );
 		} );
 	} );
 
@@ -2964,7 +3000,7 @@ describe( 'selectors', () => {
 				},
 				blockListSettings: {
 					block1: {
-						supportedBlocks: [ 'core/test-block-c' ],
+						allowedBlocks: [ 'core/test-block-c' ],
 					},
 				},
 				settings: {},
@@ -2983,7 +3019,7 @@ describe( 'selectors', () => {
 				},
 				blockListSettings: {
 					block1: {
-						supportedBlocks: [ 'core/test-block-b' ],
+						allowedBlocks: [ 'core/test-block-b' ],
 					},
 				},
 				settings: {},
@@ -3002,7 +3038,7 @@ describe( 'selectors', () => {
 				},
 				blockListSettings: {
 					block1: {
-						supportedBlocks: [],
+						allowedBlocks: [],
 					},
 				},
 				settings: {},
@@ -3570,12 +3606,51 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getTemplateLock', () => {
-		it( 'should return the template object', () => {
+		it( 'should return the general template lock if no uid was set', () => {
 			const state = {
 				settings: { templateLock: 'all' },
 			};
 
 			expect( getTemplateLock( state ) ).toBe( 'all' );
+		} );
+
+		it( 'should return null if the specified uid was not found ', () => {
+			const state = {
+				settings: { templateLock: 'all' },
+				blockListSettings: {
+					chicken: {
+						templateLock: 'insert',
+					},
+				},
+			};
+
+			expect( getTemplateLock( state, 'ribs' ) ).toBe( null );
+		} );
+
+		it( 'should return null if template lock was not set on the specified block', () => {
+			const state = {
+				settings: { templateLock: 'all' },
+				blockListSettings: {
+					chicken: {
+						test: 'tes1t',
+					},
+				},
+			};
+
+			expect( getTemplateLock( state, 'ribs' ) ).toBe( null );
+		} );
+
+		it( 'should return the template lock for the specified uid', () => {
+			const state = {
+				settings: { templateLock: 'all' },
+				blockListSettings: {
+					chicken: {
+						templateLock: 'insert',
+					},
+				},
+			};
+
+			expect( getTemplateLock( state, 'chicken' ) ).toBe( 'insert' );
 		} );
 	} );
 
@@ -3583,6 +3658,11 @@ describe( 'selectors', () => {
 		it( 'should be false if there is no permalink', () => {
 			const state = {
 				currentPost: { permalink_template: '' },
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
 			};
 
 			expect( isPermalinkEditable( state ) ).toBe( false );
@@ -3591,6 +3671,11 @@ describe( 'selectors', () => {
 		it( 'should be false if the permalink is not of an editable kind', () => {
 			const state = {
 				currentPost: { permalink_template: 'http://foo.test/bar/%baz%/' },
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
 			};
 
 			expect( isPermalinkEditable( state ) ).toBe( false );
@@ -3599,6 +3684,11 @@ describe( 'selectors', () => {
 		it( 'should be true if the permalink has %postname%', () => {
 			const state = {
 				currentPost: { permalink_template: 'http://foo.test/bar/%postname%/' },
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
 			};
 
 			expect( isPermalinkEditable( state ) ).toBe( true );
@@ -3607,6 +3697,11 @@ describe( 'selectors', () => {
 		it( 'should be true if the permalink has %pagename%', () => {
 			const state = {
 				currentPost: { permalink_template: 'http://foo.test/bar/%pagename%/' },
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
 			};
 
 			expect( isPermalinkEditable( state ) ).toBe( true );
@@ -3618,6 +3713,11 @@ describe( 'selectors', () => {
 			const url = 'http://foo.test/?post=1';
 			const state = {
 				currentPost: { permalink_template: url },
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
 			};
 
 			expect( getPermalink( state ) ).toBe( url );
@@ -3628,6 +3728,11 @@ describe( 'selectors', () => {
 				currentPost: {
 					permalink_template: 'http://foo.test/bar/%postname%/',
 					slug: 'baz',
+				},
+				editor: {
+					present: {
+						edits: {},
+					},
 				},
 			};
 
@@ -3647,6 +3752,11 @@ describe( 'selectors', () => {
 					permalink_template: 'http://foo.test/bar/%postname%/',
 					slug: 'baz',
 				},
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
 			};
 
 			expect( getPermalinkParts( state ) ).toEqual( parts );
@@ -3661,6 +3771,11 @@ describe( 'selectors', () => {
 				currentPost: {
 					permalink_template: 'http://foo.test/?post=1',
 					slug: 'baz',
+				},
+				editor: {
+					present: {
+						edits: {},
+					},
 				},
 			};
 

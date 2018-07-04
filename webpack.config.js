@@ -142,21 +142,23 @@ const entryPointNames = [
 	'editor',
 	'utils',
 	'viewport',
-	'plugins',
 	'edit-post',
 	'core-blocks',
 	'nux',
 ];
 
 const gutenbergPackages = [
+	'api-request',
 	'blob',
+	'core-data',
 	'data',
 	'date',
 	'deprecated',
 	'dom',
 	'element',
-	'api-request',
-	'core-data',
+	'keycodes',
+	'plugins',
+	'shortcode',
 ];
 
 const wordPressPackages = [

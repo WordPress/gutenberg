@@ -24,6 +24,7 @@ export function Button( props, ref ) {
 		isBusy,
 		isDefault,
 		isLink,
+		isDestructive,
 		className,
 		disabled,
 		focus,
@@ -39,6 +40,7 @@ export function Button( props, ref ) {
 		'is-toggled': isToggled,
 		'is-busy': isBusy,
 		'is-link': isLink,
+		'is-destructive': isDestructive,
 	} );
 
 	const tag = href !== undefined && ! disabled ? 'a' : 'button';
