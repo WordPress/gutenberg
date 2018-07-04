@@ -1,9 +1,20 @@
-//
-//  RNTAztecView.swift
-//  RNTAztecView
-//
-//  Created by diego on 04/07/2018.
-//  Copyright © 2018 Automattic Inc. All rights reserved.
-//
-
+//import Aztec
 import Foundation
+
+@objc (RCTAztecView)
+class RCTAztecView: RCTViewManager {
+    @objc override func view() -> UIView {
+        /*
+        let view = Aztec.TextView.init(
+        defaultFont: .systemFont(ofSize: 12),
+        defaultParagraphStyle: .default,
+        defaultMissingImage: UIImage())
+ */
+        let view = UITextView()
+
+        view.backgroundColor = .blue
+        view.text = "Hello world!"
+
+        return view
+    }
+}

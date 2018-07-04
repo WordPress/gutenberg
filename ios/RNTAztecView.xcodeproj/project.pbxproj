@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F121467D20ED2F81003DD17B /* RNTAztecView.m in Sources */ = {isa = PBXBuildFile; fileRef = F121467C20ED2F81003DD17B /* RNTAztecView.m */; };
 		F13BF4A020ECF5450047D3F9 /* RNTAztecView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F13BF49F20ECF5450047D3F9 /* RNTAztecView.swift */; };
-		F145CFD12087D1B6006C159A /* RCTAztecView.m in Sources */ = {isa = PBXBuildFile; fileRef = F145CFD02087D1B6006C159A /* RCTAztecView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,10 +24,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		F1017BCE20ED1B1A002B1024 /* libReact.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReact.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		F121467C20ED2F81003DD17B /* RNTAztecView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNTAztecView.m; sourceTree = "<group>"; };
 		F13BF49E20ECF5440047D3F9 /* RNTAztecView-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RNTAztecView-Bridging-Header.h"; sourceTree = "<group>"; };
 		F13BF49F20ECF5450047D3F9 /* RNTAztecView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNTAztecView.swift; sourceTree = "<group>"; };
 		F145CFC62087D16A006C159A /* libRNTAztecView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNTAztecView.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		F145CFD02087D1B6006C159A /* RCTAztecView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RCTAztecView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,8 +62,8 @@
 		F145CFC82087D16A006C159A /* RNTAztecView */ = {
 			isa = PBXGroup;
 			children = (
-				F145CFD02087D1B6006C159A /* RCTAztecView.m */,
 				F13BF49E20ECF5440047D3F9 /* RNTAztecView-Bridging-Header.h */,
+				F121467C20ED2F81003DD17B /* RNTAztecView.m */,
 				F13BF49F20ECF5450047D3F9 /* RNTAztecView.swift */,
 			);
 			path = RNTAztecView;
@@ -71,6 +72,7 @@
 		F145CFF92087D497006C159A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F1017BCE20ED1B1A002B1024 /* libReact.a */,
 			);
 			path = Frameworks;
 			sourceTree = "<group>";
@@ -133,8 +135,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F145CFD12087D1B6006C159A /* RCTAztecView.m in Sources */,
 				F13BF4A020ECF5450047D3F9 /* RNTAztecView.swift in Sources */,
+				F121467D20ED2F81003DD17B /* RNTAztecView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
