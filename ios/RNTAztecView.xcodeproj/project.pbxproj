@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F13BF4A020ECF5450047D3F9 /* RNTAztecView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F13BF49F20ECF5450047D3F9 /* RNTAztecView.swift */; };
 		F145CFD12087D1B6006C159A /* RCTAztecView.m in Sources */ = {isa = PBXBuildFile; fileRef = F145CFD02087D1B6006C159A /* RCTAztecView.m */; };
 /* End PBXBuildFile section */
 
@@ -23,6 +24,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		F13BF49E20ECF5440047D3F9 /* RNTAztecView-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RNTAztecView-Bridging-Header.h"; sourceTree = "<group>"; };
+		F13BF49F20ECF5450047D3F9 /* RNTAztecView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNTAztecView.swift; sourceTree = "<group>"; };
 		F145CFC62087D16A006C159A /* libRNTAztecView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNTAztecView.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		F145CFD02087D1B6006C159A /* RCTAztecView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RCTAztecView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -59,6 +62,8 @@
 			isa = PBXGroup;
 			children = (
 				F145CFD02087D1B6006C159A /* RCTAztecView.m */,
+				F13BF49E20ECF5440047D3F9 /* RNTAztecView-Bridging-Header.h */,
+				F13BF49F20ECF5450047D3F9 /* RNTAztecView.swift */,
 			);
 			path = RNTAztecView;
 			sourceTree = "<group>";
@@ -102,7 +107,7 @@
 				TargetAttributes = {
 					F145CFC52087D16A006C159A = {
 						CreatedOnToolsVersion = 9.3;
-						LastSwiftMigration = 0930;
+						LastSwiftMigration = 0940;
 					};
 				};
 			};
@@ -129,6 +134,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F145CFD12087D1B6006C159A /* RCTAztecView.m in Sources */,
+				F13BF4A020ECF5450047D3F9 /* RNTAztecView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -263,6 +269,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "RNTAztecView/RNTAztecView-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -283,6 +290,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "RNTAztecView/RNTAztecView-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
