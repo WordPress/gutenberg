@@ -19,6 +19,7 @@ import {
 	flowRight,
 	isString,
 	upperFirst,
+	noop,
 } from 'lodash';
 
 /**
@@ -228,7 +229,7 @@ export function createHigherOrderComponent( mapComponentToEnhancedComponent,
 						ref={ forwardedRef }
 					/>;
 				}
-				return <WrappedComponent { ...props } forwardedRef={ forwardedRef } />;
+				return <WrappedComponent { ...props } forwardedRef={ forwardedRef || noop } />;
 			}
 		);
 		const { displayName = OriginalComponent.name || 'Component' } = OriginalComponent;
