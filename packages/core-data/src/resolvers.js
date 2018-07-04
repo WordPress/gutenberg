@@ -37,6 +37,15 @@ export async function* getAuthors() {
 }
 
 /**
+ * Request a single author from the REST API.
+ */
+export async function* getAuthor( state, id = '' ) {
+	const users = await apiRequest( { path: `/wp/v2/users/${id}?who=authors&per_page=100` } );
+	yield receiveUserQuery( 'author', users );
+}
+
+
+/**
  * Requests an entity's record from the REST API.
  *
  * @param {Object} state  State tree
