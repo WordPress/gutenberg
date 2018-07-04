@@ -65,6 +65,9 @@ $z-layers: (
 	// #adminmenuwrap { z-index: 9990 }
 	'.components-notice-list': 9989,
 
+	// Show modal under the wp-admin menus and the popover
+	'.components-modal__screen-overlay': 100000,
+
 	// Show popovers above wp-admin menus and submenus and sidebar:
 	// #adminmenuwrap { z-index: 9990 }
 	'.components-popover': 1000000,

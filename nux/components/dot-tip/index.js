@@ -50,7 +50,6 @@ export class DotTip extends Component {
 				focusOnMount="container"
 				role="dialog"
 				aria-label={ __( 'Gutenberg tips' ) }
-				onClose={ onDismiss }
 				onClick={ ( event ) => event.stopPropagation() }
 			>
 				<p>{ children }</p>

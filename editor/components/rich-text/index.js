@@ -431,27 +431,6 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Calculates the relative position where the link toolbar should be.
-	 *
-	 * Based on the selection of the text inside this element a position is
-	 * calculated where the toolbar should be. This can be used downstream to
-	 * absolutely position the toolbar.
-	 *
-	 * @param {DOMRect} position Caret range rectangle.
-	 *
-	 * @return {{top: number, left: number}} The desired position of the toolbar.
-	 */
-	getFocusPosition( position ) {
-		// The container is relatively positioned.
-		const containerPosition = this.containerRef.current.getBoundingClientRect();
-
-		return {
-			top: position.top - containerPosition.top + position.height,
-			left: position.left - containerPosition.left + ( position.width / 2 ),
-		};
-	}
-
-	/**
 	 * Handles a horizontal navigation key down event to handle the case where
 	 * TinyMCE attempts to preventDefault when on the outside edge of an inline
 	 * boundary when arrowing _away_ from the boundary, not within it. Replaces
@@ -513,8 +492,6 @@ export class RichText extends Component {
 				return;
 			}
 
-			this.onCreateUndoLevel();
-
 			const forward = keyCode === DELETE;
 
 			if ( this.props.onMerge ) {
@@ -557,7 +534,6 @@ export class RichText extends Component {
 				}
 
 				event.preventDefault();
-				this.onCreateUndoLevel();
 
 				const childNodes = Array.from( rootNode.childNodes );
 				const index = dom.nodeIndex( selectedNode );
@@ -571,7 +547,6 @@ export class RichText extends Component {
 				this.restoreContentAndSplit( before, after );
 			} else {
 				event.preventDefault();
-				this.onCreateUndoLevel();
 
 				if ( event.shiftKey || ! this.props.onSplit ) {
 					this.editor.execCommand( 'InsertLineBreak', false, event );
@@ -756,20 +731,19 @@ export class RichText extends Component {
 			return accFormats;
 		}, {} );
 
-		let rect;
-		const selectedAnchor = find( parents, ( node ) => node.tagName === 'A' );
-		if ( selectedAnchor ) {
-			// If we selected a link, position the Link UI below the link
-			rect = selectedAnchor.getBoundingClientRect();
-		} else {
-			// Otherwise, position the Link UI below the cursor or text selection
-			rect = getRectangleFromRange( this.editor.selection.getRng() );
-		}
-		const focusPosition = this.getFocusPosition( rect );
-
-		this.setState( { formats, focusPosition, selectedNodeId: this.state.selectedNodeId + 1 } );
+		this.setState( { formats, selectedNodeId: this.state.selectedNodeId + 1 } );
 
 		if ( this.props.isViewportSmall ) {
+			let rect;
+			const selectedAnchor = find( parents, ( node ) => node.tagName === 'A' );
+			if ( selectedAnchor ) {
+				// If we selected a link, position the Link UI below the link
+				rect = selectedAnchor.getBoundingClientRect();
+			} else {
+				// Otherwise, position the Link UI below the cursor or text selection
+				rect = getRectangleFromRange( this.editor.selection.getRng() );
+			}
+
 			// Originally called on `focusin`, that hook turned out to be
 			// premature. On `nodechange` we can work with the finalized TinyMCE
 			// instance and scroll to proper position.
@@ -777,21 +751,22 @@ export class RichText extends Component {
 		}
 	}
 
-	updateContent() {
-		// Do not trigger a change event coming from the TinyMCE undo manager.
-		// Our global state is already up-to-date.
-		this.editor.undoManager.ignore( () => {
-			const bookmark = this.editor.selection.getBookmark( 2, true );
-
-			this.savedContent = this.props.value;
-			this.setContent( this.savedContent );
-			this.editor.selection.moveToBookmark( bookmark );
-		} );
-	}
-
 	setContent( content ) {
 		const { format } = this.props;
+
+		// If editor has focus while content is being set, save the selection
+		// and restore caret position after content is set.
+		let bookmark;
+		if ( this.editor.hasFocus() ) {
+			bookmark = this.editor.selection.getBookmark( 2, true );
+		}
+
+		this.savedContent = content;
 		this.editor.setContent( valueToString( content, format ) );
+
+		if ( bookmark ) {
+			this.editor.selection.moveToBookmark( bookmark );
+		}
 	}
 
 	getContent() {
@@ -801,9 +776,7 @@ export class RichText extends Component {
 			case 'string':
 				return this.editor.getContent();
 			default:
-				return this.editor.dom.isEmpty( this.editor.getBody() ) ?
-					[] :
-					domToFormat( this.editor.getBody().childNodes || [], 'element', this.editor );
+				return domToFormat( this.editor.getBody().childNodes || [], 'element', this.editor );
 		}
 	}
 
@@ -821,7 +794,7 @@ export class RichText extends Component {
 			! isEqual( this.props.value, prevProps.value ) &&
 			! isEqual( this.props.value, this.savedContent )
 		) {
-			this.updateContent();
+			this.setContent( this.props.value );
 		}
 
 		if ( 'development' === process.env.NODE_ENV ) {
@@ -911,7 +884,7 @@ export class RichText extends Component {
 	 * @param {?Array} blocks blocks to insert at the split position
 	 */
 	restoreContentAndSplit( before, after, blocks = [] ) {
-		this.updateContent();
+		this.setContent( this.props.value );
 		this.props.onSplit( before, after, ...blocks );
 	}
 
@@ -945,7 +918,6 @@ export class RichText extends Component {
 		const formatToolbar = (
 			<FormatToolbar
 				selectedNodeId={ this.state.selectedNodeId }
-				focusPosition={ this.state.focusPosition }
 				formats={ this.state.formats }
 				onChange={ this.changeFormats }
 				enabledControls={ formattingControls }

@@ -7,13 +7,21 @@ exports[`adding blocks Should navigate inner blocks with arrow keys 1`] = `
 
 <!-- wp:columns -->
 <div class=\\"wp-block-columns has-2-columns\\">
-	<!-- wp:paragraph {\\"layout\\":\\"column-1\\"} -->
-	<p class=\\"layout-column-1\\">First column paragraph</p>
-	<!-- /wp:paragraph -->
+	<!-- wp:column -->
+	<div class=\\"wp-block-column\\">
+		<!-- wp:paragraph -->
+		<p>First column paragraph</p>
+		<!-- /wp:paragraph -->
+	</div>
+	<!-- /wp:column -->
 
-	<!-- wp:paragraph {\\"layout\\":\\"column-2\\"} -->
-	<p class=\\"layout-column-2\\">Second column paragraph</p>
-	<!-- /wp:paragraph -->
+	<!-- wp:column -->
+	<div class=\\"wp-block-column\\">
+		<!-- wp:paragraph -->
+		<p>Second column paragraph</p>
+		<!-- /wp:paragraph -->
+	</div>
+	<!-- /wp:column -->
 </div>
 <!-- /wp:columns -->
 
