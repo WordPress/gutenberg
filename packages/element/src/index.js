@@ -221,11 +221,14 @@ export function createHigherOrderComponent( mapComponentToEnhancedComponent,
 		const WrappedComponent = mapComponentToEnhancedComponent( OriginalComponent );
 		const EnhancedComponent = forwardRef(
 			( props, ref ) => {
-				const forwardedRef = ref !== null ? ref : props.forwardedRef;
-				return <WrappedComponent
-					{ ...props }
-					forwardedRef={ forwardedRef }
-				/>;
+				const forwardedRef = props.forwardedRef || ref;
+				if ( ref === null ) {
+					return <WrappedComponent
+						{ ...props }
+						ref={ forwardedRef }
+					/>;
+				}
+				return <WrappedComponent { ...props } forwardedRef={ forwardedRef } />;
 			}
 		);
 		const { displayName = OriginalComponent.name || 'Component' } = OriginalComponent;

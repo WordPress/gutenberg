@@ -14,6 +14,7 @@ import {
 	renderToString,
 	switchChildrenNodeName,
 	RawHTML,
+	forwardRef,
 	pure,
 	compose,
 } from '../';
@@ -184,9 +185,10 @@ describe( 'element', () => {
 			expect( TestComponent.displayName ).toBe( 'WithTest(CustomDisplayName)' );
 		} );
 		it( 'should forward the ref to the wrapped component', () => {
-			const LeafComponent = (props) => {
-					return <input type="text" ref={ props.forwardedRef } />;
-			};
+			const LeafComponent = forwardRef( ( props, ref ) => {
+				const forwardedRef = props.forwardedRef || null;
+				return <input type="text" ref={ ref || forwardedRef }/>;
+			} );
 			const TestComponent = compose(
 				createHigherOrderComponent(
 					( OriginalComponent ) => {
@@ -207,12 +209,18 @@ describe( 'element', () => {
 				constructor() {
 					super( ...arguments );
 					this.input = null;
+					this.setInput = this.setInput.bind( this );
 				}
 				componentDidMount() {
 					this.input.focus();
 				}
+
+				setInput( el ) {
+					this.input = el;
+				}
+
 				render() {
-					return <TestComponent ref={ el => this.input = el } />;
+					return <TestComponent ref={ this.setInput } />;
 				}
 			}
 			let focused = false;
@@ -302,42 +310,6 @@ describe( 'element', () => {
 			element.update( <MyComp a /> ); // Keeping the same prop value should not rerender
 			expect( element.toJSON().children[0] ).toBe( '2' );
 			element.update( <MyComp b /> ); // Changing the prop value should rerender
-			expect( element.toJSON().children[0] ).toBe( '3' );
-			wrappedComponent.instance.setState( { a: 1 } ); // New state value should trigger a rerender
-			expect( element.toJSON().children[0] ).toBe( '4' );
-			wrappedComponent.instance.setState( { a: 1 } ); // Keeping the same state value should not trigger a rerender
-			expect( element.toJSON().children[0] ).toBe( '4' );
-		} );
-
-		it( 'should not matter where pure is implemented via compose' +
-			' receiving a class component', () => {
-			let i = 0;
-			class MyComp extends Component {
-				constructor() {
-					super( ...arguments );
-					this.state = {};
-				}
-				render() {
-					return <p>{ ++i }</p>
-				}
-			}
-			const TestComp = compose([
-				pure,
-				createHigherOrderComponent(
-					( OriginalComponent ) => OriginalComponent,
-					'withTest2'
-				),
-			] )( MyComp );
-			const element = TestRenderer.create( <TestComp /> );
-			//traverse tree to get the wrapped component instance
-			const wrappedComponent = element.root.find( node => node.instance !== null );
-			element.update(<TestComp />); // Updating with same props doesn't rerender
-			expect( element.toJSON().children[0] ).toBe( '1' );
-			element.update( <TestComp a /> ); // New prop should trigger a rerender
-			expect( element.toJSON().children[0] ).toBe( '2' );
-			element.update( <TestComp a /> ); // Keeping the same prop value should not rerender
-			expect( element.toJSON().children[0] ).toBe( '2' );
-			element.update( <TestComp b /> ); // Changing the prop value should rerender
 			expect( element.toJSON().children[0] ).toBe( '3' );
 			wrappedComponent.instance.setState( { a: 1 } ); // New state value should trigger a rerender
 			expect( element.toJSON().children[0] ).toBe( '4' );
