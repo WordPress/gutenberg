@@ -281,10 +281,7 @@
 
 	// Warnings
 	 &.has-warning .editor-block-list__block-edit {
-		//position: relative;
 		min-height: 250px;
-		max-height: 500px;
-		//overflow: hidden;
 
 		> :not( .editor-warning ) {
 			pointer-events: none;
@@ -400,10 +397,6 @@
 			}
 		}
 
-		> .editor-block-mover {
-			left: $parent-block-padding;
-		}
-
 		> .editor-block-settings-menu {
 			width: $block-side-ui-width;
 			flex-direction: row;
@@ -447,8 +440,11 @@
 		// Position ellipsis.
 		> .editor-block-settings-menu {
 			right: -$block-padding + $block-side-ui-clearance;
-			width: $block-side-ui-width;
-			flex-direction: row;
+		}
+	
+		// Position mover
+		> .editor-block-mover {
+			left: -$block-padding + $border-width;
 		}
 	}
 
@@ -491,8 +487,11 @@
 		// Position ellipsis.
 		> .editor-block-settings-menu {
 			right: $block-side-ui-clearance;
-			width: $block-side-ui-width;
-			flex-direction: row;
+		}
+
+		// Position mover
+		> .editor-block-mover {
+			left: $border-width;
 		}
 	}
 
@@ -670,7 +669,7 @@
 		}
 	}
 
-	// sth
+	// Reset negative margins on mobile for full-width.
 	&[data-align="full"] .editor-block-list__block-mobile-toolbar {
 		margin-left: 0;
 		margin-right: 0;
@@ -807,7 +806,7 @@
 	white-space: nowrap;
 	text-align: left;
 	pointer-events: none;
-	height: $block-toolbar-height;
+	//height: $block-toolbar-height;
 
 	// Position toolbar below the block on mobile.
 	position: absolute;
