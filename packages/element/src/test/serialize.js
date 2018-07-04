@@ -558,6 +558,22 @@ describe( 'renderStyle()', () => {
 		expect( result ).toBe( 'color:red;background-color:green' );
 	} );
 
+	it( 'should not kebab-case custom properties', () => {
+		const result = renderStyle( {
+			'--myBackgroundColor': 'palegoldenrod',
+		} );
+
+		expect( result ).toBe( '--myBackgroundColor:palegoldenrod' );
+	} );
+
+	it( 'should not kebab-case properties with a vendor prefix', () => {
+		const result = renderStyle( {
+			'-webkit-overflow-scrolling': 'touch',
+		} );
+
+		expect( result ).toBe( '-webkit-overflow-scrolling:touch' );
+	} );
+
 	describe( 'value unit', () => {
 		it( 'should not render zero unit', () => {
 			const result = renderStyle( {
