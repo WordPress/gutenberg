@@ -116,9 +116,9 @@ export const settings = {
 					const align = alignMatches ? alignMatches[ 1 ] : undefined;
 					const idMatches = /(?:^|\s)wp-image-(\d+)(?:$|\s)/.exec( className );
 					const id = idMatches ? idMatches[ 1 ] : undefined;
-					const anchorEl = node.querySelector( 'a' );
-					const linkDestination = anchorEl && anchorEl.href ? 'custom' : undefined;
-					const href = anchorEl && anchorEl.href ? anchorEl.href : undefined;
+					const anchorElement = node.querySelector( 'a' );
+					const linkDestination = anchorElement && anchorElement.href ? 'custom' : undefined;
+					const href = anchorElement && anchorElement.href ? anchorElement.href : undefined;
 					const blockType = getBlockType( 'core/image' );
 					const attributes = getBlockAttributes( blockType, node.outerHTML, { align, id, linkDestination, href } );
 					return createBlock( 'core/image', attributes );
