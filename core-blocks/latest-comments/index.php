@@ -43,7 +43,7 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 		_prime_post_caches( $post_ids, strpos( get_option( 'permalink_structure' ), '%category%' ), false );
 
 		foreach ( $comments as $comment ) {
-			$list_items_markup .= '<li class="recentcomments">';
+			$list_items_markup .= '<li class="latestcomments">';
 			if ( $attributes['displayAvatar'] ) {
 				$avatar = get_avatar( $comment, 48, '', '', array(
 					'class' => 'wp-block-latest-comments__comment-avatar',
@@ -112,15 +112,15 @@ register_block_type( 'core/latest-comments', array(
 		),
 		'displayAvatar'    => array(
 			'type'    => 'boolean',
-			'default' => false,
+			'default' => true,
 		),
 		'displayExcerpt'   => array(
 			'type'    => 'boolean',
-			'default' => false,
+			'default' => true,
 		),
 		'displayTimestamp' => array(
 			'type'    => 'boolean',
-			'default' => false,
+			'default' => true,
 		),
 		'align'            => array(
 			'type'    => 'string',

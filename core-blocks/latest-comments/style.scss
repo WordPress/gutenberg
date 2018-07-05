@@ -1,14 +1,10 @@
 .wp-block-latest-comments {
 	padding-left: 2.5em;
 
-	&__comment-timestamp {
-		color: $dark-gray-100;
-		font-size: 12px;
-		padding: 0 2px;
-	}
-
 	li {
 		line-height: 1.1;
+		margin-bottom: 1em;
+		font-size: 15px;
 	}
 
 	&.has-avatars > li {
@@ -20,32 +16,29 @@
 		}
 	}
 
-	&__comment-timestamp {
-		display: block;
-		padding-top: 8px;
-	}
-
-	.wp-block-latest-comments__comment-excerpt p {
-		font-size: 14px;
-		line-height: 1.8;
-		margin: 5px 0 20px;
-	}
-
-	.recentcomments {
+	.latestcomments {
 		line-height: 2.2;
 	}
 
 	&.has-timestamps,
 	&.has-excerpts {
-		.recentcomments {
+		.latestcomments {
 			line-height: 1.5;
 		}
 	}
 }
 
-.wp-block-latest-comments > li {
-	margin-bottom: 1em;
-	font-size: 15px;
+.wp-block-latest-comments__comment-excerpt p {
+	font-size: 14px;
+	line-height: 1.8;
+	margin: 5px 0 20px;
+}
+
+.wp-block-latest-comments__comment-timestamp {
+	color: $dark-gray-100;
+	font-size: 12px;
+	padding: 8px 2px 0 0;
+	display: block;
 }
 
 .wp-block-latest-comments .avatar,

@@ -9,7 +9,6 @@ import {
 	ServerSideRender,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
 import {
 	InspectorControls,
 	BlockAlignmentToolbar,
@@ -24,7 +23,7 @@ import './editor.scss';
 const MIN_COMMENTS = 1;
 const MAX_COMMENTS = 100;
 
-class latestComments extends Component {
+class LatestComments extends Component {
 	constructor() {
 		super( ...arguments );
 		this.toggleHandler = this.toggleHandler.bind( this );
@@ -52,7 +51,7 @@ class latestComments extends Component {
 
 		return (
 			<Fragment>
-				<BlockControls key="controls">
+				<BlockControls>
 					<BlockAlignmentToolbar
 						value={ align }
 						onChange={ ( nextAlign ) => {
@@ -61,40 +60,41 @@ class latestComments extends Component {
 						controls={ [ 'left', 'center', 'right', 'wide', 'full' ] }
 					/>
 				</BlockControls>
-				<InspectorControls key="inspector">
-					<PanelBody title={ __( 'Latest Comments Settings' ) } />
+				<InspectorControls>
+					<PanelBody title={ __( 'Latest Comments Settings' ) }>
 
-					<ToggleControl
-						label={ __( 'Display avatar' ) }
-						checked={ displayAvatar }
-						onChange={ this.toggleHandler( 'displayAvatar' ) }
-					/>
+						<ToggleControl
+							label={ __( 'Display avatar' ) }
+							checked={ displayAvatar }
+							onChange={ this.toggleHandler( 'displayAvatar' ) }
+						/>
 
-					<ToggleControl
-						label={ __( 'Display timestamp' ) }
-						checked={ displayTimestamp }
-						onChange={ this.toggleHandler( 'displayTimestamp' ) }
-					/>
+						<ToggleControl
+							label={ __( 'Display timestamp' ) }
+							checked={ displayTimestamp }
+							onChange={ this.toggleHandler( 'displayTimestamp' ) }
+						/>
 
-					<ToggleControl
-						label={ __( 'Display excerpt' ) }
-						checked={ this.props.attributes.displayExcerpt }
-						onChange={ this.toggleHandler( 'displayExcerpt' ) }
-					/>
+						<ToggleControl
+							label={ __( 'Display excerpt' ) }
+							checked={ this.props.attributes.displayExcerpt }
+							onChange={ this.toggleHandler( 'displayExcerpt' ) }
+						/>
 
-					<RangeControl
-						label={ __( 'Number of comments to show' ) }
-						value={ this.props.attributes.commentsToShow }
-						onChange={ ( value ) => this.changeCommentsToShow( value ) }
-						min={ MIN_COMMENTS }
-						max={ MAX_COMMENTS }
-					/>
+						<RangeControl
+							label={ __( 'Number of comments to show' ) }
+							value={ this.props.attributes.commentsToShow }
+							onChange={ ( value ) => this.changeCommentsToShow( value ) }
+							min={ MIN_COMMENTS }
+							max={ MAX_COMMENTS }
+						/>
+					</PanelBody>
 
 				</InspectorControls>
-				<ServerSideRender key="latest-comments" block="core/latest-comments" attributes={ this.props.attributes } />
+				<ServerSideRender block="core/latest-comments" attributes={ this.props.attributes } />
 			</Fragment>
 		);
 	}
 }
 
-export default latestComments;
+export default LatestComments;

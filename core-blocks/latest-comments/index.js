@@ -26,13 +26,6 @@ export const settings = {
 		html: false,
 	},
 
-	defaultAttributes: {
-		commentsToShow: 5,
-		displayAvatar: true,
-		displayExcerpt: true,
-		displayTimestamp: true,
-	},
-
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
 		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
