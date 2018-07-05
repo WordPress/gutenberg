@@ -59,8 +59,6 @@
   },
   "dependencies": {
     "@wordpress/autop": "^1.0.6",
-    "@wordpress/data": "^1.0.0-alpha.1",
-    "@wordpress/element": "^1.0.0-alpha.1",
     "@wordpress/hooks": "^1.2.0",
     "@wordpress/i18n": "^1.1.0",
     "@wordpress/is-shallow-equal": "^1.0.1",

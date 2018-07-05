@@ -59,6 +59,9 @@
 <PROJECT_ROOT>/node_modules/metro/.*
 <PROJECT_ROOT>/node_modules/react-native/.*
 
+; Ignore the node_modules folders in GB packages
+<PROJECT_ROOT>/gutenberg/packages/element/node_modules/.*
+
 [include]
 
 [libs]
@@ -84,6 +87,7 @@ module.name_mapper='^[./a-zA-Z0-9$_-]+\.\(bmp\|gif\|jpg\|jpeg\|png\|psd\|svg\|we
 module.name_mapper='@gutenberg' -> '<PROJECT_ROOT>/gutenberg'
 module.name_mapper='@wordpress/data' -> '<PROJECT_ROOT>/gutenberg/packages/data'
 module.name_mapper='@wordpress/element' -> '<PROJECT_ROOT>/gutenberg/packages/element'
+module.name_mapper='@wordpress/deprecated' -> '<PROJECT_ROOT>/gutenberg/packages/deprecated'
 
 ; mock/ignore style files
 module.name_mapper='.*\(.scss\)' -> 'empty/object'
