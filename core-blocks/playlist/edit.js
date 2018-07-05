@@ -94,7 +94,7 @@ class PlaylistEdit extends Component {
 				<Placeholder
 					icon="media-audio"
 					label={ __( 'Audio/Video Playlist' ) }
-					instructions={ __( 'Select audio or video files from your library, or upload a new ones' ) }
+					instructions={ __( 'Select audio or video files from your library, or upload a new ones.' ) }
 					className={ className }>
 					<FormFileUpload
 						isLarge
