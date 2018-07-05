@@ -256,7 +256,7 @@ function gutenberg_add_target_schema_to_links( $response, $post, $request ) {
 					'type'       => 'object',
 					'properties' => array(
 						'unfiltered_html' => array(
-						'type' => 'boolean',
+							'type' => 'boolean',
 						),
 					),
 				),
