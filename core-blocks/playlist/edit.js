@@ -101,7 +101,7 @@ class PlaylistEdit extends Component {
 						multiple
 						className="wp-block-playlist__upload-button"
 						onChange={ this.uploadFromFiles }
-						accept="audiovideo"
+						accept="audio/*,video/*"
 					>
 						{ __( 'Upload' ) }
 					</FormFileUpload>
