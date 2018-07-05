@@ -87,26 +87,27 @@ export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
 /**
  * Returns a boolean indicating whether a transform is valid
  *
- * @param {string} direction is this a 'from' or 'to' transform
- * @param {string} sourceName the name of the source block
- * @param {boolean} isMultiBlock have multiple blocks been selected?
  * @param {Object} transform the transform object to validate
+ * @param {string} direction is this a 'from' or 'to' transform
+ * @param {Object} sourceBlock the name of the source block
+ * @param {boolean} isMultiBlock have multiple blocks been selected?
  *
  * @return {boolean} Is the transform valid?
  */
-const isValidTransform = ( direction, sourceName, isMultiBlock, transform ) => {
-	const isValidMultiBlockTransform = ! isMultiBlock || transform.isMultiBlock;
-	if ( ! isValidMultiBlockTransform ) {
+const isValidTransformForSource = ( transform, direction, sourceBlock, isMultiBlock ) => {
+	const isValidForMultiBlocks = ! isMultiBlock || transform.isMultiBlock;
+	if ( ! isValidForMultiBlocks ) {
 		return false;
 	}
 
-	const isValidTransformType = transform.type === 'block';
-	if ( ! isValidTransformType ) {
+	const isValidType = transform.type === 'block';
+	if ( ! isValidType ) {
 		return false;
 	}
 
-	const isValidTransformForSourceName = direction !== 'from' || transform.blocks.indexOf( sourceName ) !== -1;
-	if ( ! isValidTransformForSourceName ) {
+	// Check is the transform's block name matches the source block only if this is a transform 'from'
+	const isValidForSourceName = direction !== 'from' || transform.blocks.indexOf( sourceBlock.name ) !== -1;
+	if ( ! isValidForSourceName ) {
 		return false;
 	}
 
@@ -118,17 +119,17 @@ const isValidTransform = ( direction, sourceName, isMultiBlock, transform ) => {
  * given transformation is able to execute in the situation specified in the
  * params.
  *
- * @param {string}  sourceName   Block name.
+ * @param {Object}  sourceBlock  Source block.
  * @param {boolean} isMultiBlock Array of possible block transformations.
  *
  * @return {Function} Predicate that receives a block type.
  */
-const blockContainsValidFromTransform = ( sourceName, isMultiBlock = false ) => ( blockType ) => {
+const blockContainsValidFromTransform = ( sourceBlock, isMultiBlock = false ) => ( blockType ) => {
 	const fromTransforms = getBlockTransforms( 'from', blockType.name );
 
 	return !! findTransform(
 		fromTransforms,
-		( transform ) => isValidTransform( 'from', sourceName, isMultiBlock, transform )
+		( transform ) => isValidTransformForSource( transform, 'from', sourceBlock, isMultiBlock )
 	);
 };
 
@@ -155,14 +156,14 @@ export function getPossibleBlockTransformations( blocks ) {
 	// Compute the block that have a from transformation able to transfer blocks passed as argument.
 	const blocksToBeTransformedFrom = filter(
 		getBlockTypes(),
-		blockContainsValidFromTransform( sourceBlockName, isMultiBlock ),
+		blockContainsValidFromTransform( sourceBlock, isMultiBlock ),
 	).map( ( type ) => type.name );
 
 	const blockType = getBlockType( sourceBlockName );
 	const transformsTo = getBlockTransforms( 'to', blockType.name );
 	const validTransformsTo = filter(
 		transformsTo,
-		( transform ) => isValidTransform( 'to', sourceBlockName, isMultiBlock, transform )
+		( transform ) => isValidTransformForSource( transform, 'to', sourceBlock, isMultiBlock )
 	);
 
 	// Generate list of block transformations using the supplied "transforms to".
