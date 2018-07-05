@@ -85,20 +85,33 @@ export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
 }
 
 /**
- * Returns a predicate that receives a transformation and returns true if the
- * given transformation is able to execute in the situation specified in the
- * params.
+ * Returns a boolean indicating whether a transform is valid
  *
- * @param {string}  sourceName   Block name.
- * @param {boolean} isMultiBlock Array of possible block transformations.
+ * @param {string} direction is this a 'from' or 'to' transform
+ * @param {string} sourceName the name of the source block
+ * @param {boolean} isMultiBlock have multiple blocks been selected?
+ * @param {Object} transform the transform object to validate
  *
- * @return {Function} Predicate that receives a block type.
+ * @return {boolean} Is the transform valid?
  */
-const isTransformForBlockSource = ( sourceName, isMultiBlock = false ) => ( transform ) => (
-	transform.type === 'block' &&
-	transform.blocks.indexOf( sourceName ) !== -1 &&
-	( ! isMultiBlock || transform.isMultiBlock )
-);
+const isValidTransform = ( direction, sourceName, isMultiBlock, transform ) => {
+	const isValidMultiBlockTransform = ! isMultiBlock || transform.isMultiBlock;
+	if ( ! isValidMultiBlockTransform ) {
+		return false;
+	}
+
+	const isValidTransformType = transform.type === 'block';
+	if ( ! isValidTransformType ) {
+		return false;
+	}
+
+	const isValidTransformForSourceName = direction !== 'from' || transform.blocks.indexOf( sourceName ) !== -1;
+	if ( ! isValidTransformForSourceName ) {
+		return false;
+	}
+
+	return true;
+};
 
 /**
  * Returns a predicate that receives a transformation and returns true if the
@@ -115,7 +128,7 @@ const blockContainsValidFromTransform = ( sourceName, isMultiBlock = false ) => 
 
 	return !! findTransform(
 		fromTransforms,
-		isTransformForBlockSource( sourceName, isMultiBlock )
+		( transform ) => isValidTransform( 'from', sourceName, isMultiBlock, transform )
 	);
 };
 
@@ -147,10 +160,14 @@ export function getPossibleBlockTransformations( blocks ) {
 
 	const blockType = getBlockType( sourceBlockName );
 	const transformsTo = getBlockTransforms( 'to', blockType.name );
+	const validTransformsTo = filter(
+		transformsTo,
+		( transform ) => isValidTransform( 'to', sourceBlockName, isMultiBlock, transform )
+	);
 
 	// Generate list of block transformations using the supplied "transforms to".
 	const blocksToBeTransformedTo = flatMap(
-		isMultiBlock ? filter( transformsTo, 'isMultiBlock' ) : transformsTo,
+		validTransformsTo,
 		( transformation ) => transformation.blocks
 	);
 
