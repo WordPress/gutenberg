@@ -103,10 +103,8 @@ Template locking allows locking the `InnerBlocks` area for the current template.
 If locking is not set in an `InnerBlocks` area: the locking of the parent `InnerBlocks` area is used.
 
 If the block is a top level block: the locking of the Custom Post Type is used.
-* **Type:** `Array<String>`
 
-#### `layouts`
-
+### `layouts`
 * **Type:** `Array<Object>|Object`
 
 To achieve distinct arrangements of nested blocks, you may assign layout as an array of objects, or an object. When assigned, a user will be provided with the option to move blocks between layouts, and the rendered output will assign a layout-specific class which can be used in your block stylesheet to effect the visual arrangement of nested blocks.
