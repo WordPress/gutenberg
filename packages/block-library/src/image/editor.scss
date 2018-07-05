@@ -2,21 +2,24 @@
 	position: relative;
 	margin: 0;
 
-	img {
-		display: block;
-		width: 100%;
-	}
-
-	&.is-resized img {
-		height: 100%;
-	}
-
 	&.is-transient img {
 		@include loading_fade;
 	}
 
 	figcaption img {
 		display: inline;
+	}
+}
+
+// This is necessary for the editor resize handles to accurately work on a non floated small non resized image.
+.wp-block-image {
+	.wp-block-image__resizer {
+		display: inline-block;
+
+		img {
+			display: block;
+			width: 100%;
+		}
 	}
 }
 
@@ -101,5 +104,45 @@
 
 	@include break-small() {
 		margin: -$border-width;
+	}
+}
+
+// Although the float markup is different in the editor compared to the frontend,
+// this CSS uses the same technique to allow floats in a wide images context.
+// That is, the block retains its centering and max-width, and a child inside
+// is floated instead of the block itself.
+[data-type="core/image"][data-align="center"],
+[data-type="core/image"][data-align="left"],
+[data-type="core/image"][data-align="right"] {
+	.editor-block-list__block-edit {
+		figure {
+			margin: 0;
+			display: table;
+		}
+
+		// This maps to the figcaption on the frontend.
+		.editor-rich-text {
+			display: table-caption;
+			caption-side: bottom;
+		}
+	}
+}
+
+[data-type="core/image"][data-align="wide"],
+[data-type="core/image"][data-align="full"] {
+	figure img {
+		width: 100%;
+	}
+}
+
+// This is similar to above but for resized unfloated images only, where the markup is different.
+[data-type="core/image"] .editor-block-list__block-edit figure:not(.alignfull):not(.alignwide) {
+	margin: 0;
+	display: table;
+
+	// This maps to the figcaption on the frontend.
+	.editor-rich-text {
+		display: table-caption;
+		caption-side: bottom;
 	}
 }

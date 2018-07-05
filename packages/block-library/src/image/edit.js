@@ -432,6 +432,7 @@ class ImageEdit extends Component {
 								<Fragment>
 									{ getInspectorControls( imageWidth, imageHeight ) }
 									<ResizableBox
+										className="wp-block-image__resizer"
 										size={
 											width && height ? {
 												width,
