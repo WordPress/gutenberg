@@ -16,6 +16,7 @@ import {
 	default as parsePegjs,
 	parseWithAttributeSchema,
 	toBooleanAttributeMatcher,
+	createParse,
 } from '../parser';
 import { parse as grammarParsePreGenerated } from '../post-grammar-parser-pre-generated';
 import {
@@ -26,25 +27,6 @@ import {
 } from '../registration';
 import { createBlock } from '../factory';
 import serialize from '../serializer';
-
-/**
- * Parses the post content with a gremmar pre-generated from PegJS and returns a list of blocks.
- * It's otherwise identical to parseWithGrammar from parser.js
- * TODO: find a better way to avoid re-defining this function.
- *
- * @param {string} content The post content.
- *
- * @return {Array} Block list.
- */
-export function parsePreGenerated( content ) {
-	return grammarParsePreGenerated( content ).reduce( ( memo, blockNode ) => {
-		const block = createBlockWithFallback( blockNode );
-		if ( block ) {
-			memo.push( block );
-		}
-		return memo;
-	}, [] );
-}
 
 describe( 'block parser', () => {
 	const defaultBlockSettings = {
@@ -572,6 +554,7 @@ describe( 'block parser', () => {
 		testCases( parsePegjs );
 
 		// run the test cases using the pre-generated parser
+		const parsePreGenerated = createParse( grammarParsePreGenerated );
 		testCases( parsePreGenerated );
 
 		// encapsulate the test cases so we can run them multiple time but with a different parse() function
