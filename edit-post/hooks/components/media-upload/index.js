@@ -150,7 +150,7 @@ const slimImageObject = ( img ) => {
 };
 
 // the playlist object contains attributes required for render. These will be used for playlist
-const playlistItemObject = ( playlistMedia ) => {
+const slimPlaylistItemObject = ( playlistMedia ) => {
 	const attrSet = [ 'sizes', 'mime', 'type', 'subtype', 'id', 'url', 'link', 'caption', 'album', 'artist', 'image', 'title' ];
 	return pick( playlistMedia, attrSet );
 };
@@ -251,7 +251,7 @@ class MediaUpload extends Component {
 
 		if ( multiple ) {
 			if ( playlist ) {
-				onSelect( selectedImages.models.map( ( model ) => playlistItemObject( model.toJSON() ) ) );
+				onSelect( selectedImages.models.map( ( model ) => slimPlaylistItemObject( model.toJSON() ) ) );
 			}
 			onSelect( selectedImages.models.map( ( model ) => this.processMediaCaption( slimImageObject( model.toJSON() ) ) ) );
 		} else {
