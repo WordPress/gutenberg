@@ -18,11 +18,38 @@ import './editor.scss';
 class VideoEdit extends Component {
 	constructor() {
 		super( ...arguments );
+		this.onFocusCaption = this.onFocusCaption.bind( this );
+		this.onVideoClick = this.onVideoClick.bind( this );
 		// edit component has its own src in the state so it can be edited
 		// without setting the actual value outside of the edit UI
 		this.state = {
 			editing: ! this.props.attributes.src,
+			captionFocused: false,
 		};
+	}
+
+	componentWillReceiveProps( { isSelected } ) {
+		if ( ! isSelected && this.props.isSelected && this.state.captionFocused ) {
+			this.setState( {
+				captionFocused: false,
+			} );
+		}
+	}
+
+	onFocusCaption() {
+		if ( ! this.state.captionFocused ) {
+			this.setState( {
+				captionFocused: true,
+			} );
+		}
+	}
+
+	onVideoClick() {
+		if ( this.state.captionFocused ) {
+			this.setState( {
+				captionFocused: false,
+			} );
+		}
 	}
 
 	render() {
@@ -87,13 +114,15 @@ class VideoEdit extends Component {
 					</Toolbar>
 				</BlockControls>
 				<figure className={ className }>
-					<video controls src={ src } />
+					<video controls src={ src } onClick={ this.onVideoClick } />
 					{ ( ( caption && caption.length ) || !! isSelected ) && (
 						<RichText
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
 							value={ caption }
+							onFocus={ this.onFocusCaption }
 							onChange={ ( value ) => setAttributes( { caption: value } ) }
+							isSelected={ this.state.captionFocused }
 							inlineToolbar
 						/>
 					) }

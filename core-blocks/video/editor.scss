@@ -1,3 +1,8 @@
 .editor-block-list__block[data-align="center"] {
 	text-align: center;
 }
+
+.wp-block-video .editor-rich-text__inline-toolbar {
+	position: relative;
+	top: 0;
+}
