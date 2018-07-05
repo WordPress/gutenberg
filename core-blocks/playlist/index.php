@@ -41,7 +41,7 @@ function register_block_core_playlist() {
 				'type'    => 'boolean',
 				'default' => true,
 			),
-			'artists'   => array(
+			'showArtists'   => array(
 				'type'    => 'boolean',
 				'default' => true,
 			),
