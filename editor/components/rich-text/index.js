@@ -212,21 +212,6 @@ export class RichText extends Component {
 		this.editor.shortcuts.add( rawShortcut.primary( 'z' ), '', 'Undo' );
 		this.editor.shortcuts.add( rawShortcut.primaryShift( 'z' ), '', 'Redo' );
 
-		// Bind directly to the document, since properties assigned to TinyMCE
-		// events are lost when accessed during bubbled handlers. This must be
-		// captured _before_ TinyMCE's internal handling of arrow keys, which
-		// would otherwise already have moved the caret position. This is why
-		// it is bound to the capture phase.
-		//
-		// Note: This is ideally a temporary measure, only needed so long as
-		// TinyMCE inaccurately prevents default around inline boundaries.
-		// Ideally we rely on the defaultPrevented property to stop WritingFlow
-		// from transitioning.
-		//
-		// See: https://github.com/tinymce/tinymce/issues/4476
-		// See: WritingFlow#onKeyDown
-		this.editor.dom.doc.addEventListener( 'keydown', this.onHorizontalNavigationKeyDown, true );
-
 		// Remove TinyMCE Core shortcut for consistency with global editor
 		// shortcuts. Also clashes with Mac browsers.
 		this.editor.shortcuts.remove( 'meta+y', '', 'Redo' );
@@ -446,74 +431,46 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Calculates the relative position where the link toolbar should be.
+	 * Handles a horizontal navigation key down event to handle the case where
+	 * TinyMCE attempts to preventDefault when on the outside edge of an inline
+	 * boundary when arrowing _away_ from the boundary, not within it. Replaces
+	 * the TinyMCE event `preventDefault` behavior with a noop, such that those
+	 * relying on `defaultPrevented` are not misinformed about the arrow event.
 	 *
-	 * Based on the selection of the text inside this element a position is
-	 * calculated where the toolbar should be. This can be used downstream to
-	 * absolutely position the toolbar.
+	 * If TinyMCE#4476 is resolved, this handling may be removed.
 	 *
-	 * @param {DOMRect} position Caret range rectangle.
+	 * @see https://github.com/tinymce/tinymce/issues/4476
 	 *
-	 * @return {{top: number, left: number}} The desired position of the toolbar.
-	 */
-	getFocusPosition( position ) {
-		// The container is relatively positioned.
-		const containerPosition = this.containerRef.current.getBoundingClientRect();
-
-		return {
-			top: position.top - containerPosition.top + position.height,
-			left: position.left - containerPosition.left + ( position.width / 2 ),
-		};
-	}
-
-	/**
-	 * Handles a horizontal navigation key down event to stop propagation if it
-	 * can be inferred that it will be handled by TinyMCE (notably transitions
-	 * out of an inline boundary node).
-	 *
-	 * @param {KeyboardEvent} event Keydown event.
+	 * @param {tinymce.EditorEvent<KeyboardEvent>} event Keydown event.
 	 */
 	onHorizontalNavigationKeyDown( event ) {
-		const { keyCode } = event;
-		const isHorizontalNavigation = keyCode === LEFT || keyCode === RIGHT;
-		if ( ! isHorizontalNavigation ) {
-			return;
-		}
-
-		const { focusNode, focusOffset } = window.getSelection();
+		const { focusNode } = window.getSelection();
 		const { nodeType, nodeValue } = focusNode;
 
 		if ( nodeType !== Node.TEXT_NODE ) {
 			return;
 		}
 
-		const isReverse = event.keyCode === LEFT;
-
-		// Look to previous character for ZWSP if navigating in reverse.
-		let offset = focusOffset;
-		if ( isReverse ) {
-			offset--;
+		if ( nodeValue.length !== 1 || nodeValue[ 0 ] !== TINYMCE_ZWSP ) {
+			return;
 		}
 
-		// Workaround: In a new inline boundary node, the zero-width space
-		// wrongly lingers at the beginning of the node, rather than following
-		// the caret. If we are at the extent of the inline boundary, but the
-		// ZWSP exists at the beginning, consider as though it were to be
-		// handled as a transition outside the inline boundary.
-		//
-		// Since this condition could also be satisfied in the case that we're
-		// on the right edge of an inline boundary -- where the ZWSP exists as
-		// as an otherwise empty focus node -- ensure that the focus node is
-		// non-empty.
-		//
-		// See: https://github.com/tinymce/tinymce/issues/4472
-		if ( ! isReverse && focusOffset === nodeValue.length &&
-				nodeValue.length > 1 && nodeValue[ 0 ] === TINYMCE_ZWSP ) {
-			offset = 0;
-		}
+		const { keyCode } = event;
 
-		if ( nodeValue[ offset ] === TINYMCE_ZWSP ) {
-			event._navigationHandled = true;
+		// Consider to be moving away from inline boundary based on:
+		//
+		// 1. Within a text fragment consisting only of ZWSP.
+		// 2. If in reverse, there is no previous sibling. If forward, there is
+		//    no next sibling (i.e. end of node).
+		const isReverse = keyCode === LEFT;
+		const edgeSibling = isReverse ? 'previousSibling' : 'nextSibling';
+		if ( ! focusNode[ edgeSibling ] ) {
+			// Note: This is not reassigning on the native event, rather the
+			// "fixed" TinyMCE copy, which proxies its preventDefault to the
+			// native event. By reassigning here, we're effectively preventing
+			// the proxied call on the native event, but not otherwise mutating
+			// the original event object.
+			event.preventDefault = noop;
 		}
 	}
 
@@ -535,8 +492,6 @@ export class RichText extends Component {
 				return;
 			}
 
-			this.onCreateUndoLevel();
-
 			const forward = keyCode === DELETE;
 
 			if ( this.props.onMerge ) {
@@ -553,6 +508,11 @@ export class RichText extends Component {
 			// that we stop other handlers (e.g. ones registered by TinyMCE) from
 			// also handling this event.
 			event.stopImmediatePropagation();
+		}
+
+		const isHorizontalNavigation = keyCode === LEFT || keyCode === RIGHT;
+		if ( isHorizontalNavigation ) {
+			this.onHorizontalNavigationKeyDown( event );
 		}
 
 		// If we click shift+Enter on inline RichTexts, we avoid creating two contenteditables
@@ -574,7 +534,6 @@ export class RichText extends Component {
 				}
 
 				event.preventDefault();
-				this.onCreateUndoLevel();
 
 				const childNodes = Array.from( rootNode.childNodes );
 				const index = dom.nodeIndex( selectedNode );
@@ -588,7 +547,6 @@ export class RichText extends Component {
 				this.restoreContentAndSplit( before, after );
 			} else {
 				event.preventDefault();
-				this.onCreateUndoLevel();
 
 				if ( event.shiftKey || ! this.props.onSplit ) {
 					this.editor.execCommand( 'InsertLineBreak', false, event );
@@ -773,20 +731,19 @@ export class RichText extends Component {
 			return accFormats;
 		}, {} );
 
-		let rect;
-		const selectedAnchor = find( parents, ( node ) => node.tagName === 'A' );
-		if ( selectedAnchor ) {
-			// If we selected a link, position the Link UI below the link
-			rect = selectedAnchor.getBoundingClientRect();
-		} else {
-			// Otherwise, position the Link UI below the cursor or text selection
-			rect = getRectangleFromRange( this.editor.selection.getRng() );
-		}
-		const focusPosition = this.getFocusPosition( rect );
-
-		this.setState( { formats, focusPosition, selectedNodeId: this.state.selectedNodeId + 1 } );
+		this.setState( { formats, selectedNodeId: this.state.selectedNodeId + 1 } );
 
 		if ( this.props.isViewportSmall ) {
+			let rect;
+			const selectedAnchor = find( parents, ( node ) => node.tagName === 'A' );
+			if ( selectedAnchor ) {
+				// If we selected a link, position the Link UI below the link
+				rect = selectedAnchor.getBoundingClientRect();
+			} else {
+				// Otherwise, position the Link UI below the cursor or text selection
+				rect = getRectangleFromRange( this.editor.selection.getRng() );
+			}
+
 			// Originally called on `focusin`, that hook turned out to be
 			// premature. On `nodechange` we can work with the finalized TinyMCE
 			// instance and scroll to proper position.
@@ -794,21 +751,22 @@ export class RichText extends Component {
 		}
 	}
 
-	updateContent() {
-		// Do not trigger a change event coming from the TinyMCE undo manager.
-		// Our global state is already up-to-date.
-		this.editor.undoManager.ignore( () => {
-			const bookmark = this.editor.selection.getBookmark( 2, true );
-
-			this.savedContent = this.props.value;
-			this.setContent( this.savedContent );
-			this.editor.selection.moveToBookmark( bookmark );
-		} );
-	}
-
 	setContent( content ) {
 		const { format } = this.props;
+
+		// If editor has focus while content is being set, save the selection
+		// and restore caret position after content is set.
+		let bookmark;
+		if ( this.editor.hasFocus() ) {
+			bookmark = this.editor.selection.getBookmark( 2, true );
+		}
+
+		this.savedContent = content;
 		this.editor.setContent( valueToString( content, format ) );
+
+		if ( bookmark ) {
+			this.editor.selection.moveToBookmark( bookmark );
+		}
 	}
 
 	getContent() {
@@ -818,9 +776,7 @@ export class RichText extends Component {
 			case 'string':
 				return this.editor.getContent();
 			default:
-				return this.editor.dom.isEmpty( this.editor.getBody() ) ?
-					[] :
-					domToFormat( this.editor.getBody().childNodes || [], 'element', this.editor );
+				return domToFormat( this.editor.getBody().childNodes || [], 'element', this.editor );
 		}
 	}
 
@@ -838,7 +794,7 @@ export class RichText extends Component {
 			! isEqual( this.props.value, prevProps.value ) &&
 			! isEqual( this.props.value, this.savedContent )
 		) {
-			this.updateContent();
+			this.setContent( this.props.value );
 		}
 
 		if ( 'development' === process.env.NODE_ENV ) {
@@ -928,7 +884,7 @@ export class RichText extends Component {
 	 * @param {?Array} blocks blocks to insert at the split position
 	 */
 	restoreContentAndSplit( before, after, blocks = [] ) {
-		this.updateContent();
+		this.setContent( this.props.value );
 		this.props.onSplit( before, after, ...blocks );
 	}
 
@@ -962,7 +918,6 @@ export class RichText extends Component {
 		const formatToolbar = (
 			<FormatToolbar
 				selectedNodeId={ this.state.selectedNodeId }
-				focusPosition={ this.state.focusPosition }
 				formats={ this.state.formats }
 				onChange={ this.changeFormats }
 				enabledControls={ formattingControls }

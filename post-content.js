@@ -25,7 +25,7 @@ window._wpGutenbergDefaultPost = {
 			'<p>Headings are separate blocks as well, which helps with the outline and organization of your content.</p>',
 			'<!-- /wp:paragraph -->',
 
-			'<!-- wp:heading -->',
+			'<!-- wp:heading {"level":2} -->',
 			'<h2>A Picture is worth a Thousand Words</h2>',
 			'<!-- /wp:heading -->',
 
@@ -41,7 +41,7 @@ window._wpGutenbergDefaultPost = {
 			'<p>Try selecting and removing or editing the caption, now you don\'t have to be careful about selecting the image or other text by mistake and ruining the presentation.</p>',
 			'<!-- /wp:paragraph -->',
 
-			'<!-- wp:heading -->',
+			'<!-- wp:heading {"level":2} -->',
 			'<h2>The <em>Inserter</em> Tool</h2>',
 			'<!-- /wp:heading -->',
 
@@ -61,7 +61,7 @@ window._wpGutenbergDefaultPost = {
 			'<hr class="wp-block-separator" />',
 			'<!-- /wp:separator -->',
 
-			'<!-- wp:heading -->',
+			'<!-- wp:heading {"level":2} -->',
 			'<h2>Visual Editing</h2>',
 			'<!-- /wp:heading -->',
 
@@ -93,7 +93,7 @@ window._wpGutenbergDefaultPost = {
 			'<p>You can change the amount of columns in your galleries by dragging a slider in the block inspector in the sidebar.</p>',
 			'<!-- /wp:paragraph -->',
 
-			'<!-- wp:heading -->',
+			'<!-- wp:heading {"level":2} -->',
 			'<h2>Media Rich</h2>',
 			'<!-- /wp:heading -->',
 

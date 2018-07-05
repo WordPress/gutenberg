@@ -28,7 +28,9 @@ describe( 'adding blocks', () => {
 		await page.keyboard.type( 'First column paragraph' );
 
 		// Arrow down should navigate through layouts in columns block (to
-		// its default appender).
+		// its default appender). Two key presses are required since the first
+		// will land user on the Column wrapper block.
+		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.type( 'Second column paragraph' );
 
@@ -42,15 +44,23 @@ describe( 'adding blocks', () => {
 		activeElementText = await page.evaluate( () => document.activeElement.textContent );
 		expect( activeElementText ).toBe( 'Second column paragraph' );
 
-		// Arrow up in inner blocks should navigate through text fields.
+		// Arrow up in inner blocks should navigate through (1) column wrapper,
+		// (2) text fields.
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
 		activeElementText = await page.evaluate( () => document.activeElement.textContent );
 		expect( activeElementText ).toBe( 'First column paragraph' );
 
-		// Arrow up from first text field in nested context focuses wrapper
-		// before escaping out.
+		// Arrow up from first text field in nested context focuses column and
+		// columns wrappers before escaping out.
+		let activeElementBlockType;
 		await page.keyboard.press( 'ArrowUp' );
-		const activeElementBlockType = await page.evaluate( () => (
+		activeElementBlockType = await page.evaluate( () => (
+			document.activeElement.getAttribute( 'data-type' )
+		) );
+		expect( activeElementBlockType ).toBe( 'core/column' );
+		await page.keyboard.press( 'ArrowUp' );
+		activeElementBlockType = await page.evaluate( () => (
 			document.activeElement.getAttribute( 'data-type' )
 		) );
 		expect( activeElementBlockType ).toBe( 'core/columns' );
@@ -82,7 +92,20 @@ describe( 'adding blocks', () => {
 		await page.keyboard.up( 'Shift' );
 		await pressWithModifier( 'mod', 'b' );
 
-		// Arrow left from selected bold should traverse into first.
+		// Arrow left from selected bold should collapse to before the inline
+		// boundary. Arrow once more to traverse into first paragraph.
+		//
+		// See native behavior example: http://fiddle.tinymce.com/kvgaab
+		//
+		//  1. Select all of second paragraph, end to beginning
+		//  2. Press ArrowLeft
+		//  3. Type
+		//  4. Note that text is not bolded
+		//
+		// This is technically different than how other word processors treat
+		// the collapse while a bolded segment is selected, but our behavior
+		// is consistent with TinyMCE.
+		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.type( 'After' );
 

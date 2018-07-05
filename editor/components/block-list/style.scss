@@ -369,7 +369,7 @@
 			}
 		}
 
-		// The padding collapses, but the outline is still 1px to compensate for.
+		// Keep a 1px margin to compensate for the border/outline.
 		.editor-block-contextual-toolbar {
 			margin-bottom: 1px;
 		}
@@ -377,20 +377,27 @@
 
 	// Left
 	&[data-align="left"] {
-		.editor-block-list__block-edit {	// This is in the editor only, on the frontend, the img should be floated
+		// This is in the editor only; the image should be floated on the frontend.
+		.editor-block-list__block-edit {
+			/*!rtl:begin:ignore*/
 			float: left;
 			margin-right: 2em;
+			/*!rtl:end:ignore*/
 		}
 	}
 
 	// Right
 	&[data-align="right"] {
-		.editor-block-list__block-edit {	// This is in the editor only, on the frontend, the img should be floated
+		// This is in the editor only; the image should be floated on the frontend.
+		.editor-block-list__block-edit {
+			/*!rtl:begin:ignore*/
 			float: right;
 			margin-left: 2em;
+			/*!rtl:end:ignore*/
 		}
 
 		.editor-block-toolbar {
+			/*!rtl:ignore*/
 			float: right;
 		}
 	}
@@ -406,7 +413,8 @@
 		// Mover and settings above
 		> .editor-block-mover,
 		> .editor-block-settings-menu {
-			top: -$block-side-ui-width - $border-width; // This moves the menu up by the height of the button + border.
+			// This moves the menu up by the height of the button + border.
+			top: -$block-side-ui-width - $border-width;
 			bottom: auto;
 			min-height: 0;
 			height: auto;
@@ -542,8 +550,9 @@
 		position: absolute;
 		top: 0;
 		width: $block-side-ui-width + $block-side-ui-clearance;
-		height: 100%; // stretch to fill half of the available space to increase hoverable area
-		max-height: $block-side-ui-width * 4; // stretch to fill half of the available space to increase hoverable area
+		// stretch to fill half of the available space to increase hoverable area
+		height: 100%;
+		max-height: $block-side-ui-width * 4;
 	}
 
 	// Elevate when selected or hovered
@@ -609,7 +618,8 @@
 	.editor-block-list__block-mobile-toolbar {
 		display: flex;
 		flex-direction: row;
-		margin-top: $item-spacing + $block-toolbar-height; // Make room for the height of the block toolbar above.
+		// Make room for the height of the block toolbar above.
+		margin-top: $item-spacing + $block-toolbar-height;
 		margin-right: -$block-padding;
 		margin-bottom: -$block-padding - $border-width;
 		margin-left: -$block-padding;
@@ -679,7 +689,7 @@
  */
 .editor-block-list .editor-inserter {
 	margin: $item-spacing;
-	cursor: move;/* Fallback for IE/Edge < 14 */
+	cursor: move; // Fallback for IE/Edge < 14
 	cursor: grab;
 }
 
@@ -710,7 +720,8 @@
 	bottom: auto;
 	left: 0;
 	right: 0;
-	height: $block-padding * 2; // Matches the whole empty space between two blocks
+	// Matches the whole empty space between two blocks
+	height: $block-padding * 2;
 	justify-content: center;
 
 	// Show a clickable plus.
@@ -744,6 +755,7 @@
 		opacity: 0;
 		pointer-events: none;
 
+		&:hover,
 		&.is-visible {
 			opacity: 1;
 			pointer-events: auto;
@@ -755,7 +767,8 @@
 	> .editor-block-list__insertion-point {
 		position: absolute;
 		top: -$block-padding - $block-spacing / 2;
-		height: $block-padding * 2; // Matches the whole empty space between two blocks
+		// Matches the whole empty space between two blocks
+		height: $block-padding * 2;
 		bottom: auto;
 		left: -$border-width;
 		right: -$border-width;
@@ -877,9 +890,19 @@
 	left: 0;
 
 	.editor-block-list__block[data-align="right"] & {
+		/*!rtl:begin:ignore*/
 		left: auto;
 		right: 0;
+		/*!rtl:end:ignore*/
 	}
+
+	.editor-block-list__block[data-align="left"] & {
+		/*!rtl:begin:ignore*/
+		right: auto;
+		left: 0;
+		/*!rtl:end:ignore*/
+	}
+
 
 	@include break-small() {
 		width: auto;

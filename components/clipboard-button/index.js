@@ -83,8 +83,17 @@ class ClipboardButton extends Component {
 		const classes = classnames( 'components-clipboard-button', className );
 		const ComponentToUse = icon ? IconButton : Button;
 
+		// Workaround for inconsistent behavior in Safari, where <textarea> is not
+		// the document.activeElement at the moment when the copy event fires.
+		// This causes documentHasSelection() in the copy-handler component to
+		// mistakenly override the ClipboardButton, and copy a serialized string
+		// of the current block instead.
+		const focusOnCopyEventTarget = ( event ) => {
+			event.target.focus();
+		};
+
 		return (
-			<span ref={ this.bindContainer }>
+			<span ref={ this.bindContainer } onCopy={ focusOnCopyEventTarget }>
 				<ComponentToUse { ...buttonProps } className={ classes }>
 					{ children }
 				</ComponentToUse>

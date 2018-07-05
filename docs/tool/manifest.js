@@ -19,23 +19,23 @@ module.exports = function( parsedNamespaces, packagesConfig ) {
 		parent: null,
 	} ].concat(
 		Object.values( parsedNamespaces ).map( ( parsedNamespace ) => {
-			const slug = kebabCase( parsedNamespace.name );
+			const slug = `data-${ kebabCase( parsedNamespace.name ) }`;
 			return {
 				title: parsedNamespace.title,
-				slug: `data-${ slug }`,
+				slug,
 				markdown_source: `https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/${ slug }.md`,
 				parent: 'data',
 			};
 		} )
 	);
 
-	const packagesManifest = Object.entries( packagesConfig ).map( ( [ packageSlug, config ] ) => {
+	const packagesManifest = Object.entries( packagesConfig ).map( ( [ folderName, config ] ) => {
 		const path = config.isNpmReady === false ?
-			`https://raw.githubusercontent.com/WordPress/gutenberg/master/${ packageSlug }/README.md` :
-			`https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/${ packageSlug }/README.md`;
+			`https://raw.githubusercontent.com/WordPress/gutenberg/master/${ folderName }/README.md` :
+			`https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/${ folderName }/README.md`;
 		return {
-			title: `@wordpress/${ packageSlug }`,
-			slug: `packages-${ packageSlug }`,
+			title: `@wordpress/${ folderName }`,
+			slug: `packages-${ folderName }`,
 			markdown_source: path,
 			parent: 'packages',
 		};

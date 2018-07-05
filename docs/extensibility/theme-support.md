@@ -8,24 +8,28 @@ To opt-in for one of these features, call `add_theme_support` in the `functions.
 
 ```php
 function mytheme_setup_theme_supported_features() {
-	add_theme_support( 'editor-color-palette',
+	add_theme_support( 'editor-color-palette', array(
 		array(
-			'name' => 'strong magenta',
+			'name' => __( 'strong magenta', 'themeLangDomain' ),
+			'slug' => 'strong-magenta',
 			'color' => '#a156b4',
 		),
 		array(
-			'name' => 'light grayish magenta',
+			'name' => __( 'light grayish magenta', 'themeLangDomain' ),
+			'slug' => 'light-grayish-magenta',
 			'color' => '#d0a5db',
 		),
 		array(
-			'name' => 'very light gray',
+			'name' => __( 'very light gray', 'themeLangDomain' ),
+			'slug' => 'very-light-gray',
 			'color' => '#eee',
 		),
 		array(
-			'name' => 'very dark gray',
+			'name' => __( 'very dark gray', 'themeLangDomain' ),
+			'slug' => 'very-dark-gray',
 			'color' => '#444',
-		)
-	);
+		),
+	) );
 }
 
 add_action( 'after_setup_theme', 'mytheme_setup_theme_supported_features' );
@@ -46,24 +50,28 @@ add_theme_support( 'align-wide' );
 Different blocks have the possibility of customizing colors. Gutenberg provides a default palette, but a theme can overwrite it and provide its own:
 
 ```php
-add_theme_support( 'editor-color-palette',
+add_theme_support( 'editor-color-palette', array(
 	array(
-		'name' => 'strong magenta',
+		'name' => __( 'strong magenta', 'themeLangDomain' ),
+		'slug' => 'strong-magenta',
 		'color' => '#a156b4',
 	),
 	array(
-		'name' => 'light grayish magenta',
+		'name' => __( 'light grayish magenta', 'themeLangDomain' ),
+		'slug' => 'light-grayish-magenta',
 		'color' => '#d0a5db',
 	),
 	array(
-		'name' => 'very light gray',
+		'name' => __( 'very light gray', 'themeLangDomain' ),
+		'slug' => 'very-light-gray',
 		'color' => '#eee',
 	),
 	array(
-		'name' => 'very dark gray',
+		'name' => __( 'very dark gray', 'themeLangDomain' ),
+		'slug' => 'very-dark-gray',
 		'color' => '#444',
-	)
-);
+	),
+) );
 ```
 
 The colors will be shown in order on the palette, and there's no limit to how many can be specified.

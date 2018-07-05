@@ -2,13 +2,14 @@
  * External dependencies
  */
 import { parse as hpqParse } from 'hpq';
-import { flow, castArray, mapValues, omit } from 'lodash';
+import { flow, castArray, mapValues, omit, stubFalse } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { autop } from '@wordpress/autop';
 import { applyFilters } from '@wordpress/hooks';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -105,6 +106,12 @@ export function matcherFromSource( sourceConfig ) {
 
 			return matcher;
 		case 'property':
+			deprecated( '`property` source', {
+				version: '3.4',
+				alternative: 'equivalent `text`, `html`, or `attribute` source, or comment attribute',
+				plugin: 'Gutenberg',
+			} );
+
 			return prop( sourceConfig.selector, sourceConfig.property );
 		case 'html':
 			return html( sourceConfig.selector );
@@ -193,57 +200,80 @@ export function getBlockAttributes( blockType, innerHTML, attributes ) {
 }
 
 /**
- * Attempt to parse the innerHTML using using a supplied `deprecated`
- * definition.
+ * Given a block object, returns a new copy of the block with any applicable
+ * deprecated migrations applied, or the original block if it was both valid
+ * and no eligible migrations exist.
  *
- * @param {?Object} blockType   Block type.
- * @param {string}  innerHTML   Raw block content.
- * @param {?Object} attributes  Known block attributes (from delimiters).
- * @param {?Array}  innerBlocks Array of innerBlocks.
+ * @param {WPBlock} block Original block object.
  *
- * @return {Object} Block attributes.
+ * @return {WPBlock} Migrated block object.
  */
-export function getAttributesAndInnerBlocksFromDeprecatedVersion( blockType, innerHTML, attributes, innerBlocks ) {
-	// Not all blocks need a deprecated definition so avoid unnecessary computational cycles
-	// as early as possible when `deprecated` property is not supplied.
-	if ( ! blockType.deprecated || ! blockType.deprecated.length ) {
-		return;
+export function getMigratedBlock( block ) {
+	const blockType = getBlockType( block.name );
+
+	const { deprecated: deprecatedDefinitions } = blockType;
+	if ( ! deprecatedDefinitions || ! deprecatedDefinitions.length ) {
+		return block;
 	}
 
-	// There is no notion of version numbers for blocks. Instead, deprecated versions
-	// are defined implicitly as successive array entries containing the relevant definitions
-	// for handling each block variation. In order to validate a provided source, it has
-	// to attempt to parse each array entry at a time.
-	for ( let i = 0; i < blockType.deprecated.length; i++ ) {
-		const deprecatedBlockType = {
-			...omit( blockType, [ 'attributes', 'save', 'supports' ] ), // Parsing/Serialization properties
-			...blockType.deprecated[ i ],
+	const { originalContent, attributes, innerBlocks } = block;
+
+	for ( let i = 0; i < deprecatedDefinitions.length; i++ ) {
+		// A block can opt into a migration even if the block is valid by
+		// defining isEligible on its deprecation. If the block is both valid
+		// and does not opt to migrate, skip.
+		const { isEligible = stubFalse } = deprecatedDefinitions[ i ];
+		if ( block.isValid && ! isEligible( attributes, innerBlocks ) ) {
+			continue;
+		}
+
+		// Block type properties which could impact either serialization or
+		// parsing are not considered in the deprecated block type by default,
+		// and must be explicitly provided.
+		const deprecatedBlockType = Object.assign(
+			omit( blockType, [ 'attributes', 'save', 'supports' ] ),
+			deprecatedDefinitions[ i ]
+		);
+
+		let migratedAttributes = getBlockAttributes(
+			deprecatedBlockType,
+			originalContent,
+			attributes
+		);
+
+		// Ignore the deprecation if it produces a block which is not valid.
+		const isValid = isValidBlock(
+			originalContent,
+			deprecatedBlockType,
+			migratedAttributes
+		);
+
+		if ( ! isValid ) {
+			continue;
+		}
+
+		block = {
+			...block,
+			isValid: true,
 		};
 
-		try {
-			// Handle migration of older attributes into current version if necessary.
-			const deprecatedBlockAttributes = getBlockAttributes( deprecatedBlockType, innerHTML, attributes );
+		let migratedInnerBlocks = innerBlocks;
 
-			// Attempt to validate the parsed block. Ignore if the the validation step fails.
-			const isValid = isValidBlock( innerHTML, deprecatedBlockType, deprecatedBlockAttributes );
-			if ( isValid ) {
-				const migratedBlockAttributesAndInnerBlocks = deprecatedBlockType.migrate &&
-					deprecatedBlockType.migrate( deprecatedBlockAttributes, innerBlocks );
-
-				if ( migratedBlockAttributesAndInnerBlocks ) {
-					const [
-						migratedAttributes,
-						migratedInnerBlocks = innerBlocks,
-					] = castArray( migratedBlockAttributesAndInnerBlocks );
-					return { attributes: migratedAttributes, innerBlocks: migratedInnerBlocks };
-				}
-
-				return { attributes: deprecatedBlockAttributes, innerBlocks };
-			}
-		} catch ( error ) {
-			// Ignore error, it means this deprecated version is invalid.
+		// A block may provide custom behavior to assign new attributes and/or
+		// inner blocks.
+		const { migrate } = deprecatedBlockType;
+		if ( migrate ) {
+			( [
+				migratedAttributes = attributes,
+				migratedInnerBlocks = innerBlocks,
+			] = castArray( migrate( migratedAttributes, innerBlocks ) ) );
 		}
+
+		block.attributes = migratedAttributes;
+		block.innerBlocks = migratedInnerBlocks;
 	}
+
+	return block;
 }
 
 /**
@@ -305,7 +335,7 @@ export function createBlockWithFallback( blockNode ) {
 		return;
 	}
 
-	const block = createBlock(
+	let block = createBlock(
 		name,
 		getBlockAttributes( blockType, innerHTML, attributes ),
 		innerBlocks
@@ -323,20 +353,7 @@ export function createBlockWithFallback( blockNode ) {
 	// invalid, or future serialization attempt results in an error.
 	block.originalContent = innerHTML;
 
-	// When the block is invalid, attempt to parse it using a deprecated definition.
-	// This enables blocks to modify its attributes and markup structure without
-	// invalidating content written in previous formats.
-	if ( ! block.isValid ) {
-		const attributesAndInnerBlocksParsedWithDeprecatedVersion = getAttributesAndInnerBlocksFromDeprecatedVersion(
-			blockType, innerHTML, attributes, block.innerBlocks
-		);
-
-		if ( attributesAndInnerBlocksParsedWithDeprecatedVersion ) {
-			block.isValid = true;
-			block.attributes = attributesAndInnerBlocksParsedWithDeprecatedVersion.attributes;
-			block.innerBlocks = attributesAndInnerBlocksParsedWithDeprecatedVersion.innerBlocks || [];
-		}
-	}
+	block = getMigratedBlock( block );
 
 	return block;
 }
