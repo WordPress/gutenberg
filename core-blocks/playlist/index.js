@@ -25,6 +25,7 @@ export const settings = {
 		},
 		type: {
 			type: 'string',
+			default: 'audio',
 		},
 		artists: {
 			type: 'boolean',

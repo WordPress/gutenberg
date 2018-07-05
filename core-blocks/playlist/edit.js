@@ -103,7 +103,7 @@ class PlaylistEdit extends Component {
 					</FormFileUpload>
 					<MediaUpload
 						onSelect={ onSelectMedia }
-						type="audio"
+						type={ type }
 						multiple
 						playlist
 						value={ this.props.attributes.ids }
