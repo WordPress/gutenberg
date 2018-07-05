@@ -130,7 +130,7 @@ class ImageEdit extends Component {
 		let href;
 
 		if ( value === LINK_DESTINATION_NONE ) {
-			href = '';
+			href = undefined;
 		} else if ( value === LINK_DESTINATION_MEDIA ) {
 			href = this.props.attributes.url;
 		} else if ( value === LINK_DESTINATION_ATTACHMENT ) {
@@ -348,7 +348,7 @@ class ImageEdit extends Component {
 					/>
 					<TextControl
 						label={ __( 'Link URL' ) }
-						value={ href }
+						value={ href || '' }
 						onChange={ this.onSetCustomHref }
 						placeholder={ ! isLinkUrlInputDisabled && 'https://' }
 						disabled={ isLinkUrlInputDisabled }
