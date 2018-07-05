@@ -36,6 +36,7 @@ function register_block_core_playlist() {
 			),
 			'type'      => array(
 				'type' => 'string',
+				'default' => 'audio',
 			),
 			'tracklist' => array(
 				'type'    => 'boolean',
