@@ -42,8 +42,6 @@ _Note:_ Because the save step will automatically apply props to the element retu
 
 ## Props
 
-### `InnerBlocks`
-
 ### `allowedBlocks`
 * **Type:** `Array<String>`
 
