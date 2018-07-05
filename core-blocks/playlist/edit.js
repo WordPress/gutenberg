@@ -73,10 +73,6 @@ class PlaylistEdit extends Component {
 		const { attributes, setAttributes, className } = this.props;
 		const { isEditing } = this.state;
 		const { tracklist, artists, images, style, type } = attributes;
-		const styleOptions = [
-			{ value: 'light', label: __( 'Light' ) },
-			{ value: 'dark', label: __( 'Dark' ) },
-		];
 
 		const onSelectMedia = ( media ) => {
 			//check if there are returned media items and set attributes when there are
@@ -168,7 +164,10 @@ class PlaylistEdit extends Component {
 							label={ __( 'Playlist Style' ) }
 							value={ style }
 							onChange={ this.toggleAttribute( 'style' ) }
-							options={ styleOptions }
+							options={ [
+								{ value: 'light', label: __( 'Light' ) },
+								{ value: 'dark', label: __( 'Dark' ) },
+							] }
 						/>
 					</PanelBody>
 				</InspectorControls>
