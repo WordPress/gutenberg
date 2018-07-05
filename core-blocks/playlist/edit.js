@@ -72,7 +72,7 @@ class PlaylistEdit extends Component {
 	render() {
 		const { attributes, setAttributes, className } = this.props;
 		const { isEditing } = this.state;
-		const { tracklist, artists, images, style, type } = attributes;
+		const { tracklist, showArtists, images, style, type } = attributes;
 
 		const onSelectMedia = ( media ) => {
 			//check if there are returned media items and set attributes when there are
@@ -152,8 +152,8 @@ class PlaylistEdit extends Component {
 						/>
 						<CheckboxControl
 							label={ __( 'Show Artist Name in Tracklist' ) }
-							onChange={ this.toggleAttribute( 'artists' ) }
-							checked={ artists }
+							onChange={ this.toggleAttribute( 'showArtists' ) }
+							checked={ showArtists }
 						/>
 						<CheckboxControl
 							label={ __( 'Show Images' ) }
