@@ -121,7 +121,7 @@ export function mediaUpload( {
 					caption: get( savedMedia, [ 'caption', 'raw' ], '' ),
 					id: savedMedia.id,
 					link: savedMedia.link,
-					mime_type: savedMedia.mime_type,
+					mimeType: savedMedia.mime_type,
 					title: savedMedia.title.raw,
 					url: savedMedia.source_url,
 					mediaDetails: {},
