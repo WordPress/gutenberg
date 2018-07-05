@@ -101,21 +101,23 @@ const isTransformForBlockSource = ( sourceName, isMultiBlock = false ) => ( tran
 );
 
 /**
- * Returns a predicate that receives a block type and returns true if the given
- * block type contains a transformation able to execute in the situation
- * specified in the params.
+ * Returns a predicate that receives a transformation and returns true if the
+ * given transformation is able to execute in the situation specified in the
+ * params.
  *
  * @param {string}  sourceName   Block name.
  * @param {boolean} isMultiBlock Array of possible block transformations.
  *
  * @return {Function} Predicate that receives a block type.
  */
-const createIsTypeTransformableFrom = ( sourceName, isMultiBlock = false ) => ( blockType ) => (
-	!! findTransform(
-		getBlockTransforms( 'from', blockType.name ),
+const blockContainsValidFromTransform = ( sourceName, isMultiBlock = false ) => ( blockType ) => {
+	const fromTransforms = getBlockTransforms( 'from', blockType.name );
+
+	return !! findTransform(
+		fromTransforms,
 		isTransformForBlockSource( sourceName, isMultiBlock )
-	)
-);
+	);
+};
 
 /**
  * Returns an array of possible block transformations that could happen on the
@@ -140,7 +142,7 @@ export function getPossibleBlockTransformations( blocks ) {
 	// Compute the block that have a from transformation able to transfer blocks passed as argument.
 	const blocksToBeTransformedFrom = filter(
 		getBlockTypes(),
-		createIsTypeTransformableFrom( sourceBlockName, isMultiBlock ),
+		blockContainsValidFromTransform( sourceBlockName, isMultiBlock ),
 	).map( ( type ) => type.name );
 
 	const blockType = getBlockType( sourceBlockName );
