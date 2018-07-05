@@ -1,26 +1,19 @@
-$empty-paragraph-height: $text-editor-font-size * 4;
-
 .editor-default-block-appender {
 	input[type=text].editor-default-block-appender__content { // needs specificity
 		border: none;
 		background: none;
 		box-shadow: none;
 		display: block;
-		margin: 0;
+		margin-left: 0;
+		margin-right: 0;
 		max-width: none; // fixes a bleed issue from the admin
-		padding: $block-padding;
-		font-size: $editor-font-size;
-		font-family: $editor-font;
 		cursor: text;
 		width: 100%;
-		font-family: $editor-font;
 		outline: 1px solid transparent;
 		transition: 0.2s outline;
 
-		// match the height of an empty paragraph
-		// to prevent margins from collapsing we add 1px padding top and bottom to both .editor-block-list__block and .editor-block-list__block-edit (coming to a total of 4px extra)
-		// @todo: revisit when we allow margins to collapse
-		height: $empty-paragraph-height + 4px;
+		// Emulate the dimensions of a paragraph block.
+		padding: 0 #{ $block-padding + $border-width };
 
 		// use opacity to work in various editor styles
 		color: $dark-opacity-300;
@@ -30,7 +23,7 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 		}
 	}
 
-	// Show quick insertion icons faded until hover
+	// Show quick insertion icons faded until hover.
 	.editor-inserter-with-shortcuts {
 		opacity: .5;
 		transition: opacity 0.2s;
@@ -49,7 +42,7 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 		opacity: 1;
 	}
 
-	// Show the inserter if mousing over or there is a tip
+	// Show the inserter if mousing over or there is a tip.
 	&:not( .has-tip ) {
 		.editor-inserter__toggle:not( [aria-expanded="true"] ) {
 			opacity: 0;
@@ -60,18 +53,32 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 		}
 	}
 
-	// Dropzone
+	// Dropzone.
 	.components-drop-zone__content-icon {
 		display: none;
 	}
 }
 
-// Left side inserter icon
+// Quick shortcuts, left and right.
+.editor-block-list__empty-block-inserter, // Empty paragraph
+.editor-default-block-appender .editor-inserter, // Empty appender
+.editor-inserter-with-shortcuts { // Right side quick shortcuts
+	position: absolute;
+	top: 0;
+
+	// Change the size of the buttons to match that of the default paragraph height.
+	.components-icon-button {
+		width: $block-side-ui-width;
+		height: $block-side-ui-width;
+		padding: 4px;
+		margin-right: 12px;
+	}
+}
+
+// Left side.
 .editor-block-list__empty-block-inserter,
 .editor-default-block-appender .editor-inserter {
-	position: absolute;
-	top: $item-spacing;
-	right: $item-spacing;	// show on the right on mobile
+	right: $item-spacing; // Show to the right on mobile.
 
 	@include break-small {
 		left: -$block-side-ui-width - $block-padding - $block-side-ui-clearance;
@@ -87,7 +94,6 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 		border-radius: 50%;
 		width: $block-side-ui-width;
 		height: $block-side-ui-width;
-		top: 4px;
 		padding: 4px;
 
 		// use opacity to work in various editor styles
@@ -101,12 +107,11 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 	}
 }
 
-// Quick block insertion icons on the right
+// Quick block insertion icons on the right side.
 .editor-inserter-with-shortcuts {
-	position: absolute;
-	top: $item-spacing;
 	right: $block-padding;
-	display: none;
+	display: none; // Don't show on mobile.
+	z-index: z-index( '.editor-inserter-with-shortcuts' ); // Elevate above the sibling inserter.
 
 	@include break-small {
 		right: 0;

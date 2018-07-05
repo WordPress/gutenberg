@@ -360,17 +360,23 @@ function getNormalAttributeName( attribute ) {
 }
 
 /**
- * Returns the normal form of the style property name for HTML. Converts
- * property names to kebab-case (e.g. 'backgroundColor' → 'background-color'),
- * unless the property name begins with a '-' (e.g. '-webkit-overflow-scroll').
+ * Returns the normal form of the style property name for HTML.
+ *
+ * - Converts property names to kebab-case, e.g. 'backgroundColor' → 'background-color'
+ * - Leaves custom attributes alone, e.g. '--myBackgroundColor' → '--myBackgroundColor'
+ * - Converts vendor-prefixed property names to -kebab-case, e.g. 'MozTransform' → '-moz-transform'
  *
  * @param {string} property Property name.
  *
  * @return {string} Normalized property name.
  */
 function getNormalStylePropertyName( property ) {
-	if ( startsWith( property, '-' ) ) {
+	if ( startsWith( property, '--' ) ) {
 		return property;
+	}
+
+	if ( hasPrefix( property, [ 'ms', 'O', 'Moz', 'Webkit' ] ) ) {
+		return '-' + kebabCase( property );
 	}
 
 	return kebabCase( property );

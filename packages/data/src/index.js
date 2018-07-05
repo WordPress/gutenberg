@@ -266,27 +266,36 @@ export function dispatch( reducerKey ) {
  * @return {Component} Enhanced component with merged state data props.
  */
 export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( WrappedComponent ) => {
+	/**
+	 * Default merge props. A constant value is used as the fallback since it
+	 * can be more efficiently shallow compared in case component is repeatedly
+ 	 * rendered without its own merge props.
+	 *
+	 * @type {Object}
+	 */
 	const DEFAULT_MERGE_PROPS = {};
 
+	/**
+	 * Given a props object, returns the next merge props by mapStateToProps.
+	 *
+	 * @param {Object} props Props to pass as argument to mapStateToProps.
+	 *
+	 * @return {Object} Props to merge into rendered wrapped element.
+	 */
+	function getNextMergeProps( props ) {
+		return (
+			mapStateToProps( select, props ) ||
+			DEFAULT_MERGE_PROPS
+		);
+	}
+
 	return class ComponentWithSelect extends Component {
-		constructor() {
-			super( ...arguments );
+		constructor( props ) {
+			super( props );
 
 			this.subscribe();
 
-			this.state = {};
-		}
-
-		static getDerivedStateFromProps( props ) {
-			// A constant value is used as the fallback since it can be more
-			// efficiently shallow compared in case component is repeatedly
-			// rendered without its own merge props.
-			const mergeProps = (
-				mapStateToProps( select, props ) ||
-				DEFAULT_MERGE_PROPS
-			);
-
-			return { mergeProps };
+			this.mergeProps = getNextMergeProps( props );
 		}
 
 		componentDidMount() {
@@ -298,11 +307,28 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 			this.unsubscribe();
 		}
 
-		shouldComponentUpdate( nextProps, nextState ) {
-			return (
-				! isShallowEqual( this.props, nextProps ) ||
-				! isShallowEqual( this.state.mergeProps, nextState.mergeProps )
-			);
+		shouldComponentUpdate( nextProps ) {
+			// This implementation of shouldComponentUpdate is only intended
+			// to handle incoming props changes. Changes effected via state
+			// changes are reflected by the subscribe handler's forceUpdate.
+			if ( isShallowEqual( this.props, nextProps ) ) {
+				return false;
+			}
+
+			// Regardless of whether merge props are changing, the component
+			// will need to render if props are different. But if the merge
+			// props change as a result of the incoming props, they should be
+			// reflected as such in the next render.
+			const nextMergeProps = getNextMergeProps( nextProps );
+			if ( ! isShallowEqual( this.mergeProps, nextMergeProps ) ) {
+				// Yes, this is a side effect. Yes, side effects don't belong
+				// in shouldComponentUpdate. This is not a typical component in
+				// that it is very much a hot code path, and will employ any
+				// and all gymnastics necessary for optimal performance.
+				this.mergeProps = nextMergeProps;
+			}
+
+			return true;
 		}
 
 		subscribe() {
@@ -311,17 +337,22 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 					return;
 				}
 
-				// Trigger an update. Behavior of `getDerivedStateFromProps` as
-				// of React 16.4.0 is such that it will be called by any update
-				// to the component, including state changes.
-				//
-				// See: https://reactjs.org/blog/2018/05/23/react-v-16-4.html#bugfix-for-getderivedstatefromprops
-				this.setState( () => ( {} ) );
+				const nextMergeProps = getNextMergeProps( this.props );
+				if ( isShallowEqual( this.mergeProps, nextMergeProps ) ) {
+					return;
+				}
+
+				this.mergeProps = nextMergeProps;
+
+				// forceUpdate is used to intentionally bypass the default
+				// behavior of shouldComponentUpdate, which in this component
+				// is specifically designed to handle only props changes.
+				this.forceUpdate();
 			} );
 		}
 
 		render() {
-			return <WrappedComponent { ...this.props } { ...this.state.mergeProps } />;
+			return <WrappedComponent { ...this.props } { ...this.mergeProps } />;
 		}
 	};
 }, 'withSelect' );

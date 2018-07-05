@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createHigherOrderComponent } from '@wordpress/element';
 
 /**
  * A Higher Order Component used to be provide a unique instance ID by
@@ -11,7 +11,7 @@ import { Component } from '@wordpress/element';
  *
  * @return {Component} Component with an instanceId prop.
  */
-function withInstanceId( WrappedComponent ) {
+export default createHigherOrderComponent( ( WrappedComponent ) => {
 	let instances = 0;
 
 	return class extends Component {
@@ -26,6 +26,4 @@ function withInstanceId( WrappedComponent ) {
 			);
 		}
 	};
-}
-
-export default withInstanceId;
+}, 'withInstanceId' );

@@ -100,8 +100,8 @@ class ButtonEdit extends Component {
 							}
 						) }
 						style={ {
-							backgroundColor: backgroundColor.class ? undefined : backgroundColor.value,
-							color: textColor.class ? undefined : textColor.value,
+							backgroundColor: backgroundColor.value,
+							color: textColor.value,
 						} }
 						keepPlaceholderOnFocus
 					/>
