@@ -1,14 +1,13 @@
 /**
  * External dependencies
  */
-import { noop, get } from 'lodash';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
 import { Component, compose } from '@wordpress/element';
-import { withAPIData } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -27,13 +26,10 @@ export class BlockEdit extends Component {
 	}
 
 	getChildContext() {
-		const { user } = this.props;
+		const { canUserUseUnfilteredHTML } = this.props;
 
 		return {
-			canUserUseUnfilteredHTML: get( user.data, [
-				'capabilities',
-				'unfiltered_html',
-			], false ),
+			canUserUseUnfilteredHTML,
 		};
 	}
 
@@ -72,8 +68,6 @@ BlockEdit.childContextTypes = {
 export default compose( [
 	withSelect( ( select ) => ( {
 		postType: select( 'core/editor' ).getEditedPostAttribute( 'type' ),
-	} ) ),
-	withAPIData( ( { postType } ) => ( {
-		user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
+		canUserUseUnfilteredHTML: select( 'core/editor' ).canUserUseUnfilteredHTML(),
 	} ) ),
 ] )( BlockEdit );
