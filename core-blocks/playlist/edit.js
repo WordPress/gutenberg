@@ -53,7 +53,7 @@ class PlaylistEdit extends Component {
 			allowedType: [ 'audio', 'video' ],
 			filesList: files,
 			onFileChange: ( media ) => {
-				if ( media && media[ 0 ].mime_type ) {
+				if ( media.length > 0 && media[ 0 ].mime_type ) {
 					const type = media[ 0 ].mime_type.split( '/' )[ 0 ];
 					const ids = JSON.stringify( media.map( ( item ) => item.id ) );
 					setAttributes( { ids, type } );
