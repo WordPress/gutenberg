@@ -1,4 +1,6 @@
 .editor-block-mover {
+	min-height: $empty-paragraph-height;
+
 	opacity: 0;
 
 	&.is-visible {

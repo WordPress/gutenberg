@@ -14,7 +14,7 @@ const getManifest = require( './manifest' );
 const parsedModules = parser( config.dataNamespaces );
 generator( parsedModules, config.dataDocsOutput );
 const rootManifest = require( config.rootManifest );
-const dataModuleManifest = getManifest( parsedModules );
+const dataModuleManifest = getManifest( parsedModules, config.packages );
 
 fs.writeFileSync(
 	config.manifestOutput,

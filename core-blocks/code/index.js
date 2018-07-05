@@ -23,9 +23,8 @@ export const settings = {
 	attributes: {
 		content: {
 			type: 'string',
-			source: 'property',
+			source: 'text',
 			selector: 'code',
-			property: 'textContent',
 		},
 	},
 

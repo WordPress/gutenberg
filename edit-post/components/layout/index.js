@@ -7,7 +7,7 @@ import { some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Popover, ScrollLock, navigateRegions } from '@wordpress/components';
+import { Button, Popover, ScrollLock, navigateRegions } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	AutosaveMonitor,
@@ -18,7 +18,7 @@ import {
 	PreserveScrollInReorder,
 } from '@wordpress/editor';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/element';
+import { compose, Fragment } from '@wordpress/element';
 import { PluginArea } from '@wordpress/plugins';
 import { withViewportMatch } from '@wordpress/viewport';
 
@@ -46,6 +46,7 @@ function Layout( {
 	publishSidebarOpened,
 	hasFixedToolbar,
 	closePublishSidebar,
+	togglePublishSidebar,
 	metaBoxes,
 	hasActiveMetaboxes,
 	isSaving,
@@ -58,6 +59,11 @@ function Layout( {
 		'has-fixed-toolbar': hasFixedToolbar,
 	} );
 
+	const publishLandmarkProps = {
+		role: 'region',
+		'aria-label': __( 'Publish' ),
+		tabIndex: -1,
+	};
 	return (
 		<div className={ className }>
 			<DocumentTitle />
@@ -83,21 +89,36 @@ function Layout( {
 					<MetaBoxes location="advanced" />
 				</div>
 			</div>
-			{ publishSidebarOpened && (
+			{ publishSidebarOpened ? (
 				<PostPublishPanel
+					{ ...publishLandmarkProps }
 					onClose={ closePublishSidebar }
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }
 					PrePublishExtension={ PluginPrePublishPanel.Slot }
 					PostPublishExtension={ PluginPostPublishPanel.Slot }
 				/>
+			) : (
+				<Fragment>
+					<div className="edit-post-toggle-publish-panel" { ...publishLandmarkProps }>
+						<Button
+							isDefault
+							type="button"
+							className="edit-post-toggle-publish-panel__button"
+							onClick={ togglePublishSidebar }
+							aria-expanded={ false }
+						>
+							{ __( 'Open publish panel' ) }
+						</Button>
+					</div>
+					<DocumentSidebar />
+					<BlockSidebar />
+					<Sidebar.Slot />
+					{
+						isMobileViewport && sidebarIsOpened && <ScrollLock />
+					}
+				</Fragment>
 			) }
-			<DocumentSidebar />
-			<BlockSidebar />
-			<Sidebar.Slot />
-			{
-				isMobileViewport && sidebarIsOpened && <ScrollLock />
-			}
 			<Popover.Slot />
 			<PluginArea />
 		</div>
@@ -115,9 +136,13 @@ export default compose(
 		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 	} ) ),
-	withDispatch( ( dispatch ) => ( {
-		closePublishSidebar: dispatch( 'core/edit-post' ).closePublishSidebar,
-	} ) ),
+	withDispatch( ( dispatch ) => {
+		const { closePublishSidebar, togglePublishSidebar } = dispatch( 'core/edit-post' );
+		return {
+			closePublishSidebar,
+			togglePublishSidebar,
+		};
+	} ),
 	navigateRegions,
 	withViewportMatch( { isMobileViewport: '< small' } ),
 )( Layout );

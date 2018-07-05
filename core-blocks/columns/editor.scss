@@ -1,6 +1,7 @@
 // These margins make sure that nested blocks stack/overlay with the parent block chrome
 // This is sort of an experiment at making sure the editor looks as much like the end result as possible
 // Potentially the rules here can apply to all nested blocks and enable stacking, in which case it should be moved elsewhere
+// When using CSS grid, margins do not collapse on the container.
 .wp-block-columns .editor-block-list__layout {
 	margin-left: 0;
 	margin-right: 0;
@@ -31,17 +32,29 @@
 	}
 }
 
+// Flex container margins do not collapse: https://www.w3.org/TR/css-flexbox-1/#flex-containers.
+// Therefore, let's at least not add any additional margins here.
+.editor-block-list__layout .editor-block-list__block[data-type="core/columns"] > .editor-block-list__block-edit,
+.editor-block-list__layout .editor-block-list__block[data-type="core/column"] > .editor-block-list__block-edit {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
 .wp-block-columns {
 	display: block;
 
-	.editor-inner-blocks {
-		display: grid;
-		grid-auto-flow: dense;
-	}
+	> .editor-inner-blocks > .editor-block-list__layout {
+		display: flex;
 
-	@for $i from 2 through 6 {
-		&.has-#{ $i }-columns .editor-inner-blocks {
-			grid-auto-columns: #{ 100% / $i };
+		> [data-type="core/column"] {
+			display: flex;
+			flex-direction: column;
+			flex: 1;
+			width: 0;
+
+			.editor-block-list__block-edit {
+				flex-basis: 100%;
+			}
 		}
 	}
 }

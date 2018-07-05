@@ -43,6 +43,7 @@ class EditorProvider extends Component {
 			redo,
 			createUndoLevel,
 		} = this.props;
+
 		const providers = [
 			// RichText provider:
 			//

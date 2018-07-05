@@ -42,7 +42,12 @@ export function doBlocksMatchTemplate( blocks = [], template = [] ) {
  *
  * @return {Array}          Updated Block list.
  */
-export function synchronizeBlocksWithTemplate( blocks = [], template = [] ) {
+export function synchronizeBlocksWithTemplate( blocks = [], template ) {
+	// If no template is provided, return blocks unmodified.
+	if ( ! template ) {
+		return blocks;
+	}
+
 	return map( template, ( [ name, attributes, innerBlocksTemplate ], index ) => {
 		const block = blocks[ index ];
 

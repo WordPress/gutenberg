@@ -455,6 +455,40 @@ export function getScrollContainer( node ) {
 }
 
 /**
+ * Returns the closest positioned element, or null under any of the conditions
+ * of the offsetParent specification. Unlike offsetParent, this function is not
+ * limited to HTMLElement and accepts any Node (e.g. Node.TEXT_NODE).
+ *
+ * @see https://drafts.csswg.org/cssom-view/#dom-htmlelement-offsetparent
+ *
+ * @param {Node} node Node from which to find offset parent.
+ *
+ * @return {?Node} Offset parent.
+ */
+export function getOffsetParent( node ) {
+	// Cannot retrieve computed style or offset parent only anything other than
+	// an element node, so find the closest element node.
+	let closestElement;
+	while ( ( closestElement = node.parentNode ) ) {
+		if ( closestElement.nodeType === ELEMENT_NODE ) {
+			break;
+		}
+	}
+
+	if ( ! closestElement ) {
+		return null;
+	}
+
+	// If the closest element is already positioned, return it, as offsetParent
+	// does not otherwise consider the node itself.
+	if ( getComputedStyle( closestElement ).position !== 'static' ) {
+		return closestElement;
+	}
+
+	return closestElement.offsetParent;
+}
+
+/**
  * Given two DOM nodes, replaces the former with the latter in the DOM.
  *
  * @param {Element} processedNode Node to be removed.

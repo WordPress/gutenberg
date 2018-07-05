@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { times } from 'lodash';
+import { times, property, omit } from 'lodash';
 import classnames from 'classnames';
 import memoize from 'memize';
 
@@ -11,6 +11,7 @@ import memoize from 'memize';
 import { __, sprintf } from '@wordpress/i18n';
 import { PanelBody, RangeControl } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
+import { createBlock } from '@wordpress/blocks';
 import {
 	InspectorControls,
 	InnerBlocks,
@@ -22,6 +23,8 @@ import {
 import './style.scss';
 import './editor.scss';
 
+const ALLOWED_BLOCKS = [ 'core/column' ];
+
 /**
  * Returns the layouts configuration for a given number of columns.
  *
@@ -29,12 +32,8 @@ import './editor.scss';
  *
  * @return {Object[]} Columns layout configuration.
  */
-const getColumnLayouts = memoize( ( columns ) => {
-	return times( columns, ( n ) => ( {
-		name: `column-${ n + 1 }`,
-		label: sprintf( __( 'Column %d' ), n + 1 ),
-		icon: 'columns',
-	} ) );
+const getColumnsTemplate = memoize( ( columns ) => {
+	return times( columns, () => [ 'core/column' ] );
 } );
 
 export const name = 'core/columns';
@@ -64,6 +63,65 @@ export const settings = {
 		align: [ 'wide', 'full' ],
 	},
 
+	deprecated: [
+		{
+			attributes: {
+				columns: {
+					type: 'number',
+					default: 2,
+				},
+			},
+			isEligible( attributes, innerBlocks ) {
+				return innerBlocks.some( property( [ 'attributes', 'layout' ] ) );
+			},
+			migrate( attributes, innerBlocks ) {
+				function withoutLayout( block ) {
+					return {
+						...block,
+						attributes: omit( block.attributes, [ 'layout' ] ),
+					};
+				}
+
+				const columns = innerBlocks.reduce( ( result, innerBlock ) => {
+					const { layout } = innerBlock.attributes;
+
+					let columnIndex, columnMatch;
+					if ( layout && ( columnMatch = layout.match( /^column-(\d+)$/ ) ) ) {
+						columnIndex = Number( columnMatch[ 1 ] ) - 1;
+					} else {
+						columnIndex = 0;
+					}
+
+					if ( ! result[ columnIndex ] ) {
+						result[ columnIndex ] = [];
+					}
+
+					result[ columnIndex ].push( withoutLayout( innerBlock ) );
+
+					return result;
+				}, [] );
+
+				const migratedInnerBlocks = columns.map( ( columnBlocks ) => (
+					createBlock( 'core/column', {}, columnBlocks )
+				) );
+
+				return [
+					attributes,
+					migratedInnerBlocks,
+				];
+			},
+			save( { attributes } ) {
+				const { columns } = attributes;
+
+				return (
+					<div className={ `has-${ columns }-columns` }>
+						<InnerBlocks.Content />
+					</div>
+				);
+			},
+		},
+	],
+
 	edit( { attributes, setAttributes, className } ) {
 		const { columns } = attributes;
 		const classes = classnames( className, `has-${ columns }-columns` );
@@ -86,7 +144,10 @@ export const settings = {
 					</PanelBody>
 				</InspectorControls>
 				<div className={ classes }>
-					<InnerBlocks layouts={ getColumnLayouts( columns ) } />
+					<InnerBlocks
+						template={ getColumnsTemplate( columns ) }
+						templateLock="all"
+						allowedBlocks={ ALLOWED_BLOCKS } />
 				</div>
 			</Fragment>
 		);

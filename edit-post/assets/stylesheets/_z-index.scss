@@ -20,6 +20,7 @@ $z-layers: (
 	'.editor-block-contextual-toolbar': 21,
 	'.components-popover__close': 5,
 	'.editor-block-list__insertion-point': 5,
+	'.editor-inserter-with-shortcuts': 5,
 	'.core-blocks-gallery-item__inline-menu': 20,
 	'.editor-url-input__suggestions': 30,
 	'.edit-post-header': 30,
@@ -65,6 +66,9 @@ $z-layers: (
 	// #adminmenuwrap { z-index: 9990 }
 	'.components-notice-list': 9989,
 
+	// Show modal under the wp-admin menus and the popover
+	'.components-modal__screen-overlay': 100000,
+
 	// Show popovers above wp-admin menus and submenus and sidebar:
 	// #adminmenuwrap { z-index: 9990 }
 	'.components-popover': 1000000,
@@ -76,6 +80,7 @@ $z-layers: (
 	'.components-autocomplete__results': 1000000,
 
 	'.skip-to-selected-block': 100000,
+	'.edit-post-toggle-publish-panel': 100000,
 
 	// Show NUX tips above popovers, wp-admin menus, submenus, and sidebar:
 	'.nux-dot-tip': 1000001,

@@ -210,45 +210,183 @@
 		"parent": "outreach"
 	},
 	{
-		"title": "Data Package Reference",
+		"title": "Packages",
+		"slug": "packages",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/packages.md",
+		"parent": null
+	},
+	{
+		"title": "@wordpress/api-request",
+		"slug": "packages-api-request",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/api-request/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/babel-plugin-import-jsx-pragma",
+		"slug": "packages-babel-plugin-import-jsx-pragma",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/babel-plugin-import-jsx-pragma/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/blob",
+		"slug": "packages-blob",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/blob/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/core-data",
+		"slug": "packages-core-data",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/core-data/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/data",
 		"slug": "packages-data",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/data/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/date",
+		"slug": "packages-date",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/date/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/deprecated",
+		"slug": "packages-deprecated",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/deprecated/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/dom",
+		"slug": "packages-dom",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/dom/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/element",
+		"slug": "packages-element",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/element/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/keycodes",
+		"slug": "packages-keycodes",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/keycodes/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/library-export-default-webpack-plugin",
+		"slug": "packages-library-export-default-webpack-plugin",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/library-export-default-webpack-plugin/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/plugins",
+		"slug": "packages-plugins",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/plugins/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/postcss-themes",
+		"slug": "packages-postcss-themes",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/postcss-themes/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/shortcode",
+		"slug": "packages-shortcode",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/shortcode/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/blocks",
+		"slug": "packages-blocks",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/blocks/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/components",
+		"slug": "packages-components",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/components/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/core-blocks",
+		"slug": "packages-core-blocks",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/core-blocks/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/edit-post",
+		"slug": "packages-edit-post",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/edit-post/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/editor",
+		"slug": "packages-editor",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/editor/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/nux",
+		"slug": "packages-nux",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/nux/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/utils",
+		"slug": "packages-utils",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/utils/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/viewport",
+		"slug": "packages-viewport",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/viewport/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "Data Package Reference",
+		"slug": "data",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/README.md",
-		"parent": "reference"
+		"parent": null
 	},
 	{
 		"title": "WordPress Core Data",
-		"slug": "packages-data-core",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/core.md",
-		"parent": "packages-data"
+		"slug": "data-core",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core.md",
+		"parent": "data"
 	},
 	{
 		"title": "Block Types Data",
-		"slug": "packages-data-core-blocks",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/core-blocks.md",
-		"parent": "packages-data"
+		"slug": "data-core-blocks",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-blocks.md",
+		"parent": "data"
 	},
 	{
 		"title": "The Editor's Data",
-		"slug": "packages-data-core-editor",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/core-editor.md",
-		"parent": "packages-data"
+		"slug": "data-core-editor",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-editor.md",
+		"parent": "data"
 	},
 	{
 		"title": "The Editor's UI Data",
-		"slug": "packages-data-core-edit-post",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/core-edit-post.md",
-		"parent": "packages-data"
+		"slug": "data-core-edit-post",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-edit-post.md",
+		"parent": "data"
 	},
 	{
 		"title": "The viewport module Data",
-		"slug": "packages-data-core-viewport",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/core-viewport.md",
-		"parent": "packages-data"
+		"slug": "data-core-viewport",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-viewport.md",
+		"parent": "data"
 	},
 	{
 		"title": "The NUX (New User Experience) module Data",
-		"slug": "packages-data-core-nux",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/core-nux.md",
-		"parent": "packages-data"
+		"slug": "data-core-nux",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-nux.md",
+		"parent": "data"
 	}
 ]

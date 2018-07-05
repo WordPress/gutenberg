@@ -931,6 +931,30 @@ export function isBlockMultiSelected( state, uid ) {
 }
 
 /**
+ * Returns true if an ancestor of the block is multi-selected and false otherwise.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} uid   Block unique ID.
+ *
+ * @return {boolean} Whether an ancestor of the block is in multi-selection set.
+ */
+export const isAncestorMultiSelected = createSelector(
+	( state, uid ) => {
+		let ancestorUid = uid;
+		let isMultiSelected = false;
+		while ( ancestorUid && ! isMultiSelected ) {
+			ancestorUid = getBlockRootUID( state, ancestorUid );
+			isMultiSelected = isBlockMultiSelected( state, ancestorUid );
+		}
+		return isMultiSelected;
+	},
+	( state ) => [
+		state.editor.present.blockOrder,
+		state.blockSelection.start,
+		state.blockSelection.end,
+	],
+);
+/**
  * Returns the unique ID of the block which begins the multi-selection set, or
  * null if there is no multi-selection.
  *
@@ -1168,12 +1192,22 @@ export function getTemplate( state ) {
 
 /**
  * Returns the defined block template lock
+ * in the context of a given root block or in the global context.
  *
  * @param {boolean} state
+ * @param {?string} rootUID Block UID.
+ *
  * @return {?string}        Block Template Lock
  */
-export function getTemplateLock( state ) {
-	return state.settings.templateLock;
+export function getTemplateLock( state, rootUID ) {
+	if ( ! rootUID ) {
+		return state.settings.templateLock;
+	}
+	const blockListSettings = getBlockListSettings( state, rootUID );
+	if ( ! blockListSettings ) {
+		return null;
+	}
+	return blockListSettings.templateLock;
 }
 
 /**
@@ -1334,20 +1368,20 @@ export const canInsertBlockType = createSelector(
 			return false;
 		}
 
-		const { allowedBlockTypes, templateLock } = getEditorSettings( state );
+		const { allowedBlockTypes } = getEditorSettings( state );
 
 		const isBlockAllowedInEditor = checkAllowList( allowedBlockTypes, blockName, true );
 		if ( ! isBlockAllowedInEditor ) {
 			return false;
 		}
 
-		const isEditorLocked = !! templateLock;
-		if ( isEditorLocked ) {
+		const isLocked = !! getTemplateLock( state, parentUID );
+		if ( isLocked ) {
 			return false;
 		}
 
 		const parentBlockListSettings = getBlockListSettings( state, parentUID );
-		const parentAllowedBlocks = get( parentBlockListSettings, [ 'supportedBlocks' ] );
+		const parentAllowedBlocks = get( parentBlockListSettings, [ 'allowedBlocks' ] );
 		const hasParentAllowedBlock = checkAllowList( parentAllowedBlocks, blockName );
 
 		const blockAllowedParentBlocks = blockType.parent;

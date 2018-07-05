@@ -558,6 +558,25 @@ describe( 'renderStyle()', () => {
 		expect( result ).toBe( 'color:red;background-color:green' );
 	} );
 
+	it( 'should not kebab-case custom properties', () => {
+		const result = renderStyle( {
+			'--myBackgroundColor': 'palegoldenrod',
+		} );
+
+		expect( result ).toBe( '--myBackgroundColor:palegoldenrod' );
+	} );
+
+	it( 'should -kebab-case style properties with a vendor prefix', () => {
+		const result = renderStyle( {
+			msTransform: 'none',
+			OTransform: 'none',
+			MozTransform: 'none',
+			WebkitTransform: 'none',
+		} );
+
+		expect( result ).toBe( '-ms-transform:none;-o-transform:none;-moz-transform:none;-webkit-transform:none' );
+	} );
+
 	describe( 'value unit', () => {
 		it( 'should not render zero unit', () => {
 			const result = renderStyle( {
