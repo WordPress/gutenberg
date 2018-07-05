@@ -250,7 +250,7 @@ class MediaUpload extends Component {
 		}
 
 		if ( playlist ) {
-			onSelect( selectedImages.models.map( ( model ) => playlistItemObject( model.toJSON() ) ) );
+			onSelect( selectedImages.models.map( ( model ) => slimPlaylistItemObject( model.toJSON() ) ) );
 		} else if ( multiple ) {
 			onSelect( selectedImages.models.map( ( model ) => this.processMediaCaption( slimImageObject( model.toJSON() ) ) ) );
 		} else {
