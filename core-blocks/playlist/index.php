@@ -6,7 +6,7 @@
  */
 
 /**
- * Renders the `core/playlist` block on server.
+ * Renders the `core/playlist` block on the server.
  *
  * @param array $attributes The block attributes.
  *
