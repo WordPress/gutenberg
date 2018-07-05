@@ -8,14 +8,12 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { keycodes } from '@wordpress/utils';
+import { ENTER, ESCAPE, UP, DOWN, SPACE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import EnhancedAutocomplete, { Autocomplete } from '../';
-
-const { ENTER, ESCAPE, UP, DOWN, SPACE } = keycodes;
 
 jest.useFakeTimers();
 
@@ -161,6 +159,7 @@ describe( 'Autocomplete', () => {
 		options,
 		getOptionLabel: ( option ) => option.label,
 		getOptionKeywords: ( option ) => option.keywords,
+		isOptionDisabled: ( option ) => option.isDisabled,
 	};
 
 	const slashCompleter = {
@@ -435,6 +434,43 @@ describe( 'Autocomplete', () => {
 			} );
 		} );
 
+		it( 'set the disabled attribute on results', ( done ) => {
+			const wrapper = makeAutocompleter( [
+				{
+					...slashCompleter,
+					options: [
+						{
+							id: 1,
+							label: 'Bananas',
+							keywords: [ 'fruit' ],
+							isDisabled: true,
+						},
+						{
+							id: 2,
+							label: 'Apple',
+							keywords: [ 'fruit' ],
+							isDisabled: false,
+						},
+					],
+				},
+			] );
+			expectInitialState( wrapper );
+			// simulate typing '/'
+			simulateInput( wrapper, [ par( tx( '/' ) ) ] );
+			// wait for async popover display
+			process.nextTick( () => {
+				wrapper.update();
+
+				const firstItem = wrapper.find( 'button.components-autocomplete__result' ).at( 0 ).getDOMNode();
+				expect( firstItem.hasAttribute( 'disabled' ) ).toBe( true );
+
+				const secondItem = wrapper.find( 'button.components-autocomplete__result' ).at( 1 ).getDOMNode();
+				expect( secondItem.hasAttribute( 'disabled' ) ).toBe( false );
+
+				done();
+			} );
+		} );
+
 		it( 'navigates options by arrow keys', ( done ) => {
 			const wrapper = makeAutocompleter( [ slashCompleter ] );
 			// listen to keydown events on the editor to see if it gets them
@@ -585,6 +621,58 @@ describe( 'Autocomplete', () => {
 				simulateKeydown( wrapper, ENTER );
 				expectInitialState( wrapper );
 				expect( getOptionCompletion ).toHaveBeenCalled();
+				// the editor should not have gotten the event
+				expect( editorKeydown ).not.toHaveBeenCalled();
+				done();
+			} );
+		} );
+
+		it( 'does not select when option is disabled', ( done ) => {
+			const getOptionCompletion = jest.fn();
+			const testOptions = [
+				{
+					id: 1,
+					label: 'Bananas',
+					keywords: [ 'fruit' ],
+					isDisabled: true,
+				},
+				{
+					id: 2,
+					label: 'Apple',
+					keywords: [ 'fruit' ],
+					isDisabled: false,
+				},
+			];
+			const wrapper = makeAutocompleter( [ { ...slashCompleter, getOptionCompletion, options: testOptions } ] );
+			// listen to keydown events on the editor to see if it gets them
+			const editorKeydown = jest.fn();
+			const fakeEditor = wrapper.getDOMNode().querySelector( '.fake-editor' );
+			fakeEditor.addEventListener( 'keydown', editorKeydown, false );
+			expectInitialState( wrapper );
+			// the menu is not open so press enter and see if the editor gets it
+			expect( editorKeydown ).not.toHaveBeenCalled();
+			simulateKeydown( wrapper, ENTER );
+			expect( editorKeydown ).toHaveBeenCalledTimes( 1 );
+			// clear the call count
+			editorKeydown.mockClear();
+			// simulate typing '/'
+			simulateInput( wrapper, [ par( tx( '/' ) ) ] );
+			// wait for async popover display
+			process.nextTick( () => {
+				wrapper.update();
+				// menu should be open with all options
+				expect( wrapper.state( 'open' ) ).toBeDefined();
+				expect( wrapper.state( 'selectedIndex' ) ).toBe( 0 );
+				expect( wrapper.state( 'query' ) ).toEqual( '' );
+				expect( wrapper.state( 'search' ) ).toEqual( /(?:\b|\s|^)/i );
+				expect( wrapper.state( 'filteredOptions' ) ).toEqual( [
+					{ key: '0-0', value: testOptions[ 0 ], label: 'Bananas', keywords: [ 'fruit' ], isDisabled: true },
+					{ key: '0-1', value: testOptions[ 1 ], label: 'Apple', keywords: [ 'fruit' ], isDisabled: false },
+				] );
+				// pressing enter should NOT reset and NOT call getOptionCompletion
+				simulateKeydown( wrapper, ENTER );
+				expect( wrapper.state( 'open' ) ).toBeDefined();
+				expect( getOptionCompletion ).not.toHaveBeenCalled();
 				// the editor should not have gotten the event
 				expect( editorKeydown ).not.toHaveBeenCalled();
 				done();

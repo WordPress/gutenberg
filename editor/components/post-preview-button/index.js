@@ -8,32 +8,41 @@ import { get } from 'lodash';
  */
 import { Component, compose } from '@wordpress/element';
 import { Button, ifCondition } from '@wordpress/components';
-import { _x } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { DotTip } from '@wordpress/nux';
 
 export class PostPreviewButton extends Component {
 	constructor() {
 		super( ...arguments );
 
 		this.saveForPreview = this.saveForPreview.bind( this );
-
-		this.state = {
-			isAwaitingSave: false,
-		};
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		const { modified, link } = nextProps;
-		const { isAwaitingSave } = this.state;
-		const hasFinishedSaving = (
-			isAwaitingSave &&
-			modified !== this.props.modified
-		);
+	componentDidUpdate( prevProps ) {
+		const { previewLink } = this.props;
 
-		if ( hasFinishedSaving && this.previewWindow ) {
-			this.previewWindow.location = link;
-			this.setState( { isAwaitingSave: false } );
+		// This relies on the window being responsible to unset itself when
+		// navigation occurs or a new preview window is opened, to avoid
+		// unintentional forceful redirects.
+		if ( previewLink && previewLink !== prevProps.previewLink ) {
+			this.setPreviewWindowLink( previewLink );
 		}
+	}
+
+	/**
+	 * Sets the preview window's location to the given URL, if a preview window
+	 * exists and is not already at that location.
+	 *
+	 * @param {string} url URL to assign as preview window location.
+	 */
+	setPreviewWindowLink( url ) {
+		const { previewWindow } = this;
+		if ( ! previewWindow || previewWindow.location.href === url ) {
+			return;
+		}
+
+		previewWindow.location = url;
 	}
 
 	getWindowTarget() {
@@ -43,6 +52,7 @@ export class PostPreviewButton extends Component {
 
 	saveForPreview( event ) {
 		const { isDirty, isNew } = this.props;
+
 		// Let default link behavior occur if no changes to saved post
 		if ( ! isDirty && ! isNew ) {
 			return;
@@ -50,9 +60,6 @@ export class PostPreviewButton extends Component {
 
 		// Save post prior to opening window
 		this.props.autosave();
-		this.setState( {
-			isAwaitingSave: true,
-		} );
 
 		// Open a popup, BUT: Set it to a blank page until save completes. This
 		// is necessary because popups can only be opened in response to user
@@ -62,10 +69,6 @@ export class PostPreviewButton extends Component {
 			'about:blank',
 			this.getWindowTarget()
 		);
-
-		// When popup is closed, delete reference to avoid later assignment of
-		// location in a post update.
-		this.previewWindow.onbeforeunload = () => delete this.previewWindow;
 
 		const markup = `
 			<div>
@@ -92,21 +95,28 @@ export class PostPreviewButton extends Component {
 
 		this.previewWindow.document.write( markup );
 		this.previewWindow.document.close();
+
+		// When popup is closed or redirected by setPreviewWindowLink, delete
+		// reference to avoid later assignment of location in a post update.
+		this.previewWindow.onbeforeunload = () => delete this.previewWindow;
 	}
 
 	render() {
-		const { link, isSaveable } = this.props;
+		const { currentPostLink, isSaveable } = this.props;
 
 		return (
 			<Button
 				className="editor-post-preview"
 				isLarge
-				href={ link }
+				href={ currentPostLink }
 				onClick={ this.saveForPreview }
 				target={ this.getWindowTarget() }
 				disabled={ ! isSaveable }
 			>
 				{ _x( 'Preview', 'imperative verb' ) }
+				<DotTip id="core/editor.preview">
+					{ __( 'Click ‘Preview’ to load a preview of this page, so you can make sure you’re happy with your blocks.' ) }
+				</DotTip>
 			</Button>
 		);
 	}
@@ -116,7 +126,8 @@ export default compose( [
 	withSelect( ( select ) => {
 		const {
 			getCurrentPostId,
-			getEditedPostPreviewLink,
+			getCurrentPostAttribute,
+			getAutosaveAttribute,
 			getEditedPostAttribute,
 			isEditedPostDirty,
 			isEditedPostNew,
@@ -128,12 +139,12 @@ export default compose( [
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 		return {
 			postId: getCurrentPostId(),
-			link: getEditedPostPreviewLink(),
+			currentPostLink: getCurrentPostAttribute( 'link' ),
+			previewLink: getAutosaveAttribute( 'preview_link' ),
 			isDirty: isEditedPostDirty(),
 			isNew: isEditedPostNew(),
 			isSaveable: isEditedPostSaveable(),
 			isViewable: get( postType, [ 'viewable' ], false ),
-			modified: getEditedPostAttribute( 'modified' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {

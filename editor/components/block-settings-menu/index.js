@@ -17,11 +17,12 @@ import { withDispatch } from '@wordpress/data';
  */
 import './style.scss';
 import BlockModeToggle from './block-mode-toggle';
-import BlockRemoveButton from './block-remove-button';
 import BlockDuplicateButton from './block-duplicate-button';
-import BlockTransformations from './block-transformations';
-import SharedBlockSettings from './shared-block-settings';
+import BlockRemoveButton from './block-remove-button';
+import SharedBlockConvertButton from './shared-block-convert-button';
+import SharedBlockDeleteButton from './shared-block-delete-button';
 import UnknownConverter from './unknown-converter';
+import _BlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 
 export class BlockSettingsMenu extends Component {
 	constructor() {
@@ -51,7 +52,6 @@ export class BlockSettingsMenu extends Component {
 			onSelect,
 			focus,
 			rootUID,
-			renderBlockMenu = ( { children } ) => children,
 			isHidden,
 		} = this.props;
 		const { isFocused } = this.state;
@@ -60,18 +60,16 @@ export class BlockSettingsMenu extends Component {
 		const firstBlockUID = blockUIDs[ 0 ];
 
 		return (
-			<div
-				className={ classnames( 'editor-block-settings-menu', {
-					'is-visible': isFocused || ! isHidden,
-				} ) }
-			>
+			<div className="editor-block-settings-menu">
 				<Dropdown
 					contentClassName="editor-block-settings-menu__popover"
 					position="bottom left"
 					renderToggle={ ( { onToggle, isOpen } ) => {
 						const toggleClassname = classnames( 'editor-block-settings-menu__toggle', {
 							'is-opened': isOpen,
+							'is-visible': isFocused || isOpen || ! isHidden,
 						} );
+						const label = isOpen ? __( 'Hide Options' ) : __( 'More Options' );
 
 						return (
 							<IconButton
@@ -83,7 +81,7 @@ export class BlockSettingsMenu extends Component {
 									onToggle();
 								} }
 								icon="ellipsis"
-								label={ __( 'More Options' ) }
+								label={ label }
 								aria-expanded={ isOpen }
 								focus={ focus }
 								onFocus={ this.onFocus }
@@ -94,20 +92,16 @@ export class BlockSettingsMenu extends Component {
 					renderContent={ ( { onClose } ) => (
 						// Should this just use a DropdownMenu instead of a DropDown ?
 						<NavigableMenu className="editor-block-settings-menu__content">
-							{ renderBlockMenu( { onClose, children: [
-								count === 1 && <BlockModeToggle key="mode-toggle" uid={ firstBlockUID } onToggle={ onClose } role="menuitem" />,
-								count === 1 && <UnknownConverter key="unknown-converter" uid={ firstBlockUID } role="menuitem" />,
-								<BlockDuplicateButton key="duplicate" uids={ uids } rootUID={ rootUID } role="menuitem" />,
-								count === 1 && <SharedBlockSettings key="shared-block" uid={ firstBlockUID } onToggle={ onClose } itemsRole="menuitem" />,
-								<BlockTransformations key="transformations" uids={ uids } onClick={ onClose } itemsRole="menuitem" />,
-							] } ) }
+							<_BlockSettingsMenuFirstItem.Slot fillProps={ { onClose } } />
+							{ count === 1 && <BlockModeToggle uid={ firstBlockUID } onToggle={ onClose } role="menuitem" /> }
+							{ count === 1 && <UnknownConverter uid={ firstBlockUID } role="menuitem" /> }
+							<BlockDuplicateButton uids={ uids } rootUID={ rootUID } role="menuitem" />
+							{ count === 1 && <SharedBlockConvertButton uid={ firstBlockUID } onToggle={ onClose } itemsRole="menuitem" /> }
+							<div className="editor-block-settings-menu__separator" />
+							{ count === 1 && <SharedBlockDeleteButton uid={ firstBlockUID } onToggle={ onClose } itemsRole="menuitem" /> }
+							<BlockRemoveButton uids={ uids } role="menuitem" />
 						</NavigableMenu>
 					) }
-				/>
-				<BlockRemoveButton
-					uids={ uids }
-					onFocus={ this.onFocus }
-					onBlur={ this.onBlur }
 				/>
 			</div>
 		);

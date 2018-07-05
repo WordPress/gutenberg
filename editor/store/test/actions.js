@@ -48,10 +48,12 @@ describe( 'actions', () => {
 	describe( 'setupEditor', () => {
 		it( 'should return the SETUP_EDITOR action', () => {
 			const post = {};
-			const result = setupEditor( post );
+			const autosave = {};
+			const result = setupEditor( post, autosave );
 			expect( result ).toEqual( {
 				type: 'SETUP_EDITOR',
 				post,
+				autosave,
 			} );
 		} );
 	} );
@@ -242,6 +244,14 @@ describe( 'actions', () => {
 		it( 'should return REQUEST_POST_UPDATE action', () => {
 			expect( savePost() ).toEqual( {
 				type: 'REQUEST_POST_UPDATE',
+				options: {},
+			} );
+		} );
+
+		it( 'should pass through options argument', () => {
+			expect( savePost( { autosave: true } ) ).toEqual( {
+				type: 'REQUEST_POST_UPDATE',
+				options: { autosave: true },
 			} );
 		} );
 	} );

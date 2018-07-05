@@ -10,15 +10,13 @@ import { __ } from '@wordpress/i18n';
 import { Dashicon, IconButton, withSafeTimeout } from '@wordpress/components';
 import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { keycodes } from '@wordpress/utils';
+import { displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import PostSwitchToDraftButton from '../post-switch-to-draft-button';
-
-const { displayShortcut } = keycodes;
 
 /**
  * Component showing whether the post is saved or not and displaying save links.

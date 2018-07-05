@@ -32,15 +32,15 @@ $shadow-below-only: 0 5px 10px rgba( $dark-gray-900, .1 ), 0 2px 2px rgba( $dark
 
 // Editor Widths
 $sidebar-width: 280px;
-$text-editor-max-width: 760px;	// @todo: merge with variable below
-$content-width: 636px;	// @todo: leverage theme $content_width variable
+$content-width: 610px; // For the visual width, subtract 30px (2 * $block-padding + 2px borders). This comes to 580px, which is optimized for 70 characters.
 
 // Block UI
+$border-width: 1px;
 $block-controls-height: 36px;
 $icon-button-size: 36px;
 $icon-button-size-small: 24px;
 $inserter-tabs-height: 36px;
-$block-toolbar-height: 37px;
+$block-toolbar-height: $block-controls-height + $border-width;
 
 // Blocks
 $parent-block-padding: 28px; // padding of top level blocks, should be larger than $block-padding, otherwise a user can't select the parent from a child
@@ -51,6 +51,8 @@ $block-side-ui-width: 28px; // width of the side UI, matches half matches half o
 $block-side-ui-clearance: 2px; // space between side UI and block
 $block-side-ui-padding: $block-side-ui-width + $block-side-ui-clearance; // total space used to accommodate side UI
 $block-parent-side-ui-clearance: $parent-block-padding - $block-padding; // space between side UI and block on top level blocks
+
+$block-container-side-padding: $block-side-ui-width + $block-padding + 2 * $block-side-ui-clearance;
 
 // Buttons & UI Widgets
 $button-style__radius-roundrect: 4px;

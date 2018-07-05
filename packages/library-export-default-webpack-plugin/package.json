@@ -1,8 +1,8 @@
 {
 	"name": "@wordpress/library-export-default-webpack-plugin",
-	"version": "1.0.0-alpha.0",
+	"version": "1.0.0-alpha.2",
 	"description": "Webpack plugin for exporting default property for selected libraries",
-	"author": "WordPress",
+	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",

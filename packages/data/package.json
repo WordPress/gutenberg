@@ -1,8 +1,8 @@
 {
 	"name": "@wordpress/data",
-	"version": "1.0.0-alpha.0",
+	"version": "1.0.0-alpha.2",
 	"description": "Data module for WordPress",
-	"author": "WordPress",
+	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
@@ -20,8 +20,8 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"@wordpress/deprecated": "^1.0.0-alpha.0",
-		"@wordpress/element": "^1.0.0-alpha.0",
+		"@wordpress/deprecated": "^1.0.0-alpha.2",
+		"@wordpress/element": "^1.0.0-alpha.2",
 		"@wordpress/is-shallow-equal": "1.0.2",
 		"equivalent-key-map": "0.2.0",
 		"lodash": "4.17.5",

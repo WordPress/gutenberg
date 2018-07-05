@@ -39,6 +39,10 @@ module.exports = {
 				message: 'Path access on WordPress dependencies is not allowed.',
 			},
 			{
+				selector: 'ImportDeclaration[source.value=/^api-request$/]',
+				message: 'Use @wordpress/api-request as import path instead.',
+			},
+			{
 				selector: 'ImportDeclaration[source.value=/^blob$/]',
 				message: 'Use @wordpress/blob as import path instead.',
 			},
@@ -75,6 +79,10 @@ module.exports = {
 				message: 'Use @wordpress/element as import path instead.',
 			},
 			{
+				selector: 'ImportDeclaration[source.value=/^keycodes$/]',
+				message: 'Use @wordpress/keycodes as import path instead.',
+			},
+			{
 				selector: 'ImportDeclaration[source.value=/^utils$/]',
 				message: 'Use @wordpress/utils as import path instead.',
 			},
@@ -97,6 +105,10 @@ module.exports = {
 			{
 				"selector": "ImportDeclaration[source.value=/^core-blocks$/]",
 				"message": "Use @wordpress/core-blocks as import path instead."
+			},
+			{
+				"selector": "ImportDeclaration[source.value=/^nux$/]",
+				"message": "Use @wordpress/nux as import path instead."
 			},
 			{
 				selector: 'CallExpression[callee.name="deprecated"] Property[key.name="version"][value.value=/' + majorMinorRegExp + '/]',

@@ -78,10 +78,9 @@ export function withFilteredAutocompleters( Autocomplete ) {
 			let nextCompleters = completers;
 			const lastFilteredCompletersProp = nextCompleters;
 
-			// Todo: Rename filter
-			if ( hasFilter( 'blocks.Autocomplete.completers' ) ) {
+			if ( hasFilter( 'editor.Autocomplete.completers' ) ) {
 				nextCompleters = applyFilters(
-					'blocks.Autocomplete.completers',
+					'editor.Autocomplete.completers',
 					// Provide copies so filters may directly modify them.
 					nextCompleters && nextCompleters.map( clone ),
 					blockName,

@@ -11,7 +11,7 @@ import {
 	withSpokenMessages,
 	Popover,
 } from '@wordpress/components';
-import { keycodes } from '@wordpress/utils';
+import { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER, displayShortcut } from '@wordpress/keycodes';
 import { prependHTTP } from '@wordpress/url';
 
 /**
@@ -20,8 +20,6 @@ import { prependHTTP } from '@wordpress/url';
 import './style.scss';
 import UrlInput from '../../url-input';
 import { filterURLForDisplay } from '../../../utils/url';
-
-const { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER, displayShortcut } = keycodes;
 
 const FORMATTING_CONTROLS = [
 	{
@@ -56,14 +54,26 @@ const DEFAULT_CONTROLS = [ 'bold', 'italic', 'strikethrough', 'link' ];
 // Stop the key event from propagating up to maybeStartTyping in BlockListBlock
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 
+/**
+ * Returns the Format Toolbar state given a set of props.
+ *
+ * @param {Object} props Component props.
+ *
+ * @return {Object} State object.
+ */
+function computeDerivedState( props ) {
+	return {
+		selectedNodeId: props.selectedNodeId,
+		settingsVisible: false,
+		opensInNewWindow: !! props.formats.link && !! props.formats.link.target,
+		linkValue: '',
+	};
+}
+
 class FormatToolbar extends Component {
 	constructor() {
 		super( ...arguments );
-		this.state = {
-			settingsVisible: false,
-			opensInNewWindow: false,
-			linkValue: '',
-		};
+		this.state = {};
 
 		this.addLink = this.addLink.bind( this );
 		this.editLink = this.editLink.bind( this );
@@ -93,14 +103,12 @@ class FormatToolbar extends Component {
 		}
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		if ( this.props.selectedNodeId !== nextProps.selectedNodeId ) {
-			this.setState( {
-				settingsVisible: false,
-				opensInNewWindow: !! nextProps.formats.link && !! nextProps.formats.link.target,
-				linkValue: '',
-			} );
+	static getDerivedStateFromProps( props, state ) {
+		if ( state.selectedNodeId !== props.selectedNodeId ) {
+			return computeDerivedState( props );
 		}
+
+		return null;
 	}
 
 	onChangeLinkValue( value ) {
@@ -211,7 +219,7 @@ class FormatToolbar extends Component {
 						<div className="editor-format-toolbar__link-container" style={ { ...focusPosition } }>
 							<Popover
 								position="bottom center"
-								focusOnMount={ !! isAddingLink }
+								focusOnMount={ isAddingLink ? 'firstElement' : false }
 								key={ selectedNodeId /* Used to force rerender on change */ }
 							>
 								{ isAddingLink && (

@@ -278,21 +278,33 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 		$this->assertTrue( in_array( 'standard', $result['theme_supports']['formats'] ) );
 	}
 
-	public function test_get_items_who_author_query() {
-		wp_set_current_user( $this->administrator );
-		// First request should include subscriber in the set.
-		$request = new WP_REST_Request( 'GET', '/wp/v2/users' );
-		$request->set_param( 'search', 'subscriber' );
-		$response = rest_get_server()->dispatch( $request );
-		$this->assertEquals( 200, $response->get_status() );
-		$this->assertCount( 1, $response->get_data() );
-		// Second request should exclude subscriber.
-		$request = new WP_REST_Request( 'GET', '/wp/v2/users' );
-		$request->set_param( 'who', 'authors' );
-		$request->set_param( 'search', 'subscriber' );
-		$response = rest_get_server()->dispatch( $request );
-		$this->assertEquals( 200, $response->get_status() );
-		$this->assertCount( 0, $response->get_data() );
+	public function test_theme_supports_post_thumbnails_false() {
+		remove_theme_support( 'post-thumbnails' );
+		$request  = new WP_REST_Request( 'GET', '/' );
+		$response = rest_do_request( $request );
+		$result   = $response->get_data();
+		$this->assertTrue( isset( $result['theme_supports'] ) );
+		$this->assertFalse( isset( $result['theme_supports']['post-thumbnails'] ) );
+	}
+
+	public function test_theme_supports_post_thumbnails_true() {
+		remove_theme_support( 'post-thumbnails' );
+		add_theme_support( 'post-thumbnails' );
+		$request  = new WP_REST_Request( 'GET', '/' );
+		$response = rest_do_request( $request );
+		$result   = $response->get_data();
+		$this->assertTrue( isset( $result['theme_supports'] ) );
+		$this->assertEquals( true, $result['theme_supports']['post-thumbnails'] );
+	}
+
+	public function test_theme_supports_post_thumbnails_array() {
+		remove_theme_support( 'post-thumbnails' );
+		add_theme_support( 'post-thumbnails', array( 'post' ) );
+		$request  = new WP_REST_Request( 'GET', '/' );
+		$response = rest_do_request( $request );
+		$result   = $response->get_data();
+		$this->assertTrue( isset( $result['theme_supports'] ) );
+		$this->assertEquals( array( 'post' ), $result['theme_supports']['post-thumbnails'] );
 	}
 
 	public function test_get_taxonomies_context_edit() {
@@ -374,20 +386,6 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 		$this->assertEquals( 'so-awesome', $data['slug'] );
 	}
 
-	/**
-	 * Any user with 'edit_posts' on a show_in_rest post type
-	 * can view authors. Others (e.g. subscribers) cannot.
-	 */
-	public function test_get_items_who_unauthorized_query() {
-		wp_set_current_user( $this->subscriber );
-		$request = new WP_REST_Request( 'GET', '/wp/v2/users' );
-		$request->set_param( 'who', 'authors' );
-		$response = rest_get_server()->dispatch( $request );
-		$this->assertEquals( 403, $response->get_status() );
-		$data = $response->get_data();
-		$this->assertEquals( 'rest_forbidden_who', $data['code'] );
-	}
-
 	public function test_get_items_unbounded_per_page() {
 		wp_set_current_user( $this->author );
 		$request = new WP_REST_Request( 'GET', '/wp/v2/users' );
@@ -446,18 +444,26 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 		$this->assertEquals( 'rest_forbidden_per_page', $data['code'] );
 	}
 
-	public function test_get_page_edit_context_includes_preview() {
-		wp_set_current_user( $this->editor );
-		$page_id = $this->factory->post->create( array(
-			'post_type'   => 'page',
-			'post_status' => 'draft',
-		) );
-		$page    = get_post( $page_id );
-		$request = new WP_REST_Request( 'GET', '/wp/v2/pages/' . $page_id );
-		$request->set_param( 'context', 'edit' );
+	public function test_get_post_links_predecessor_version() {
+		$post_id = $this->factory->post->create();
+		wp_update_post(
+			array(
+				'post_content' => 'This content is marvelous.',
+				'ID'           => $post_id,
+			)
+		);
+		$revisions  = wp_get_post_revisions( $post_id );
+		$revision_1 = array_pop( $revisions );
+
+		$request  = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', $post_id ) );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertEquals( 200, $response->get_status() );
-		$data = $response->get_data();
-		$this->assertEquals( get_preview_post_link( $page ), $data['preview_link'] );
+
+		$links = $response->get_links();
+
+		$this->assertEquals( rest_url( '/wp/v2/posts/' . $post_id . '/revisions' ), $links['version-history'][0]['href'] );
+		$this->assertEquals( 1, $links['version-history'][0]['attributes']['count'] );
+
+		$this->assertEquals( rest_url( '/wp/v2/posts/' . $post_id . '/revisions/' . $revision_1->ID ), $links['predecessor-version'][0]['href'] );
+		$this->assertEquals( $revision_1->ID, $links['predecessor-version'][0]['attributes']['id'] );
 	}
 }

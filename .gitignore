@@ -2,7 +2,6 @@
 build
 build-module
 coverage
-/hooks
 node_modules
 gutenberg.zip
 languages/gutenberg.pot

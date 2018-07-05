@@ -339,6 +339,48 @@ function gutenberg_add_target_schema_to_links( $response, $post, $request ) {
 }
 
 /**
+ * Include revisions data on post response links.
+ *
+ * @see https://core.trac.wordpress.org/ticket/44321
+ *
+ * @param WP_REST_Response $response WP REST API response of a post.
+ * @param WP_Post          $post The post being returned.
+ * @param WP_REST_Request  $request WP REST API request.
+ * @return WP_REST_Response Response containing the new links.
+ */
+function gutenberg_add_revisions_data_to_links( $response, $post, $request ) {
+
+	$new_links  = array();
+	$orig_links = $response->get_links();
+
+	if ( ! empty( $orig_links['version-history'] ) ) {
+		$version_history_link = array_shift( $orig_links['version-history'] );
+		// 'version-history' already exists and we don't want to duplicate it.
+		$response->remove_link( 'version-history' );
+
+		$revisions       = wp_get_post_revisions( $post->ID, array( 'fields' => 'ids' ) );
+		$revisions_count = count( $revisions );
+
+		$new_links['version-history'] = array(
+			'href'  => $version_history_link['href'],
+			'count' => $revisions_count,
+		);
+
+		if ( $revisions_count > 0 ) {
+			$last_revision = array_shift( $revisions );
+
+			$new_links['predecessor-version'] = array(
+				'href' => $version_history_link['href'] . '/' . $last_revision,
+				'id'   => $last_revision,
+			);
+		}
+	}
+
+	$response->add_links( $new_links );
+	return $response;
+}
+
+/**
  * Whenever a post type is registered, ensure we're hooked into it's WP REST API response.
  *
  * @param string $post_type The newly registered post type.
@@ -348,6 +390,7 @@ function gutenberg_register_post_prepare_functions( $post_type ) {
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_permalink_template_to_posts', 10, 3 );
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_block_format_to_post_content', 10, 3 );
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_target_schema_to_links', 10, 3 );
+	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_revisions_data_to_links', 10, 3 );
 	add_filter( "rest_{$post_type}_collection_params", 'gutenberg_filter_post_collection_parameters', 10, 2 );
 	add_filter( "rest_{$post_type}_query", 'gutenberg_filter_post_query_arguments', 10, 2 );
 	return $post_type;
@@ -364,118 +407,6 @@ function gutenberg_register_taxonomy_prepare_functions( $taxonomy ) {
 	add_filter( "rest_{$taxonomy}_query", 'gutenberg_filter_term_query_arguments', 10, 2 );
 }
 add_filter( 'registered_taxonomy', 'gutenberg_register_taxonomy_prepare_functions' );
-
-/**
- * Includes the value for the 'viewable' attribute of a post type resource.
- *
- * @see https://core.trac.wordpress.org/ticket/43739
- *
- * @param object $post_type Post type response object.
- * @return boolean Whether or not the post type can be viewed.
- */
-function gutenberg_get_post_type_viewable( $post_type ) {
-	return is_post_type_viewable( $post_type['slug'] );
-}
-
-/**
- * Adds the 'viewable' attribute to the REST API response of a post type.
- *
- * @see https://core.trac.wordpress.org/ticket/43739
- */
-function gutenberg_register_rest_api_post_type_viewable() {
-	register_rest_field( 'type',
-		'viewable',
-		array(
-			'get_callback' => 'gutenberg_get_post_type_viewable',
-			'schema'       => array(
-				'description' => __( 'Whether or not the post type can be viewed', 'gutenberg' ),
-				'type'        => 'boolean',
-				'context'     => array( 'edit' ),
-				'readonly'    => true,
-			),
-		)
-	);
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_type_viewable' );
-
-/**
- * Gets revisions details for the selected post.
- *
- * @since 1.6.0
- *
- * @param array $post The post object from the response.
- * @return array|null Revisions details or null when no revisions present.
- */
-function gutenberg_get_post_revisions( $post ) {
-	$revisions       = wp_get_post_revisions( $post['id'] );
-	$revisions_count = count( $revisions );
-	if ( 0 === $revisions_count ) {
-		return null;
-	}
-
-	$last_revision = array_shift( $revisions );
-
-	return array(
-		'count'   => $revisions_count,
-		'last_id' => $last_revision->ID,
-	);
-}
-
-/**
- * Adds the custom field `revisions` to the REST API response of post.
- *
- * TODO: This is a temporary solution. Next step would be to find a solution that is limited to the editor.
- *
- * @since 1.6.0
- */
-function gutenberg_register_rest_api_post_revisions() {
-	register_rest_field( get_post_types( '', 'names' ),
-		'revisions',
-		array(
-			'get_callback' => 'gutenberg_get_post_revisions',
-		)
-	);
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_revisions' );
-
-/**
- * Get the preview link for the post object.
- *
- * @see https://github.com/WordPress/gutenberg/issues/4555
- *
- * @param WP_Post $post Post object.
- * @return string
- */
-function gutenberg_get_post_preview_link( $post ) {
-	return get_preview_post_link( $post['id'] );
-}
-
-/**
- * Adds the 'preview_link' attribute to the REST API response of a post.
- *
- * @see https://github.com/WordPress/gutenberg/issues/4555
- */
-function gutenberg_register_rest_api_post_preview_link() {
-	foreach ( get_post_types( array( 'show_in_rest' => true ), 'names' ) as $post_type ) {
-		if ( ! is_post_type_viewable( $post_type ) ) {
-			continue;
-		}
-		register_rest_field( $post_type,
-			'preview_link',
-			array(
-				'get_callback' => 'gutenberg_get_post_preview_link',
-				'schema'       => array(
-					'description' => __( 'Preview link for the post.', 'gutenberg' ),
-					'type'        => 'string',
-					'format'      => 'uri',
-					'context'     => array( 'edit' ),
-					'readonly'    => true,
-				),
-			)
-		);
-	}
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_preview_link' );
 
 /**
  * Ensure that the wp-json index contains the 'theme-supports' setting as
@@ -497,8 +428,11 @@ function gutenberg_ensure_wp_json_has_theme_supports( $response ) {
 		$site_info['theme_supports']['formats'] = $formats;
 	}
 	if ( ! array_key_exists( 'post-thumbnails', $site_info['theme_supports'] ) ) {
-		if ( get_theme_support( 'post-thumbnails' ) ) {
-			$site_info['theme_supports']['post-thumbnails'] = true;
+		$post_thumbnails = get_theme_support( 'post-thumbnails' );
+		if ( $post_thumbnails ) {
+			// $post_thumbnails can contain a nested array of post types.
+			// e.g. array( array( 'post', 'page' ) ).
+			$site_info['theme_supports']['post-thumbnails'] = is_array( $post_thumbnails ) ? $post_thumbnails[0] : true;
 		}
 	}
 	$response->set_data( $site_info );
@@ -515,26 +449,16 @@ add_filter( 'rest_index', 'gutenberg_ensure_wp_json_has_theme_supports' );
  */
 function gutenberg_handle_early_callback_checks( $response, $handler, $request ) {
 	if ( 0 === strpos( $request->get_route(), '/wp/v2/' ) ) {
-		$can_view_authors    = false;
 		$can_unbounded_query = false;
 		$types               = get_post_types( array( 'show_in_rest' => true ), 'objects' );
 		foreach ( $types as $type ) {
 			if ( current_user_can( $type->cap->edit_posts ) ) {
 				$can_unbounded_query = true;
-				if ( post_type_supports( $type->name, 'author' ) ) {
-					$can_view_authors = true;
-				}
 			}
 		}
 		if ( $request['per_page'] < 0 ) {
 			if ( ! $can_unbounded_query ) {
 				return new WP_Error( 'rest_forbidden_per_page', __( 'Sorry, you are not allowed make unbounded queries.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
-			}
-		}
-		if ( '/wp/v2/users' === $request->get_route()
-			&& ! empty( $request['who'] ) && 'authors' === $request['who'] ) {
-			if ( ! $can_view_authors ) {
-				return new WP_Error( 'rest_forbidden_who', __( 'Sorry, you are not allowed to query users by this parameter.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
 			}
 		}
 	}
@@ -633,7 +557,6 @@ function gutenberg_filter_term_query_arguments( $prepared_args, $request ) {
 /**
  * Include additional query parameters on the user query endpoint.
  *
- * @see https://core.trac.wordpress.org/ticket/42202
  * @see https://core.trac.wordpress.org/ticket/43998
  *
  * @param array $query_params JSON Schema-formatted collection parameters.
@@ -646,37 +569,9 @@ function gutenberg_filter_user_collection_parameters( $query_params ) {
 		// Default sanitize callback is 'absint', which won't work in our case.
 		$query_params['per_page']['sanitize_callback'] = 'rest_sanitize_request_arg';
 	}
-	// Support for 'who' query param.
-	$query_params['who'] = array(
-		'description' => __( 'Limit result set to users who are considered authors.', 'gutenberg' ),
-		'type'        => 'string',
-		'enum'        => array(
-			'authors',
-		),
-	);
 	return $query_params;
 }
 add_filter( 'rest_user_collection_params', 'gutenberg_filter_user_collection_parameters' );
-
-/**
- * Filter user collection query parameters to include specific behavior.
- *
- * @see https://core.trac.wordpress.org/ticket/42202
- *
- * @param array           $prepared_args Array of arguments for WP_User_Query.
- * @param WP_REST_Request $request       The current request.
- * @return array
- */
-function gutenberg_filter_user_query_arguments( $prepared_args, $request ) {
-	if ( ! empty( $request['who'] ) && 'authors' === $request['who'] ) {
-		$prepared_args['who'] = 'authors';
-		if ( isset( $prepared_args['has_published_posts'] ) ) {
-			unset( $prepared_args['has_published_posts'] );
-		}
-	}
-	return $prepared_args;
-}
-add_filter( 'rest_user_query', 'gutenberg_filter_user_query_arguments', 10, 2 );
 
 /**
  * Overload taxonomy and term permission handling to address our new necessary behavior.

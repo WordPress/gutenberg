@@ -1,7 +1,7 @@
 /**
  * External dependencies.
  */
-import { isEqual, isPlainObject, map } from 'lodash';
+import { isEqual } from 'lodash';
 
 /**
  * WordPress dependencies.
@@ -12,12 +12,18 @@ import {
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import apiRequest from '@wordpress/api-request';
+import httpBuildQuery from 'http-build-query';
 
 /**
  * Internal dependencies.
  */
 import Placeholder from '../placeholder';
 import Spinner from '../spinner';
+
+export function rendererPathWithAttributes( block, attributes = null ) {
+	return `/gutenberg/v1/block-renderer/${ block }?context=edit` +
+			( null !== attributes ? '&' + httpBuildQuery( { attributes } ) : '' );
+}
 
 export class ServerSideRender extends Component {
 	constructor( props ) {
@@ -36,9 +42,9 @@ export class ServerSideRender extends Component {
 		this.isStillMounted = false;
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		if ( ! isEqual( nextProps, this.props ) ) {
-			this.fetch( nextProps );
+	componentDidUpdate( prevProps ) {
+		if ( ! isEqual( prevProps, this.props ) ) {
+			this.fetch( this.props );
 		}
 	}
 
@@ -46,9 +52,9 @@ export class ServerSideRender extends Component {
 		if ( null !== this.state.response ) {
 			this.setState( { response: null } );
 		}
-		const { block, attributes } = props;
+		const { block, attributes = null } = props;
 
-		const path = '/gutenberg/v1/block-renderer/' + block + '?context=edit&' + this.getQueryUrlFromObject( { attributes } );
+		const path = rendererPathWithAttributes( block, attributes );
 
 		return apiRequest( { path } ).fail( ( response ) => {
 			const failResponse = {
@@ -65,14 +71,6 @@ export class ServerSideRender extends Component {
 		} );
 	}
 
-	getQueryUrlFromObject( obj, prefix ) {
-		return map( obj, ( paramValue, paramName ) => {
-			const key = prefix ? prefix + '[' + paramName + ']' : paramName;
-			return isPlainObject( paramValue ) ? this.getQueryUrlFromObject( paramValue, key ) :
-				encodeURIComponent( key ) + '=' + encodeURIComponent( paramValue );
-		} ).join( '&' );
-	}
-
 	render() {
 		const response = this.state.response;
 		if ( ! response ) {
@@ -80,8 +78,10 @@ export class ServerSideRender extends Component {
 				<Placeholder><Spinner /></Placeholder>
 			);
 		} else if ( response.error ) {
+			// translators: %s: error message describing the problem
+			const errorMessage = sprintf( __( 'Error loading block: %s' ), response.errorMsg );
 			return (
-				<Placeholder>{ sprintf( __( 'Error loading block: %s' ), response.errorMsg ) }</Placeholder>
+				<Placeholder>{ errorMessage }</Placeholder>
 			);
 		} else if ( ! response.length ) {
 			return (

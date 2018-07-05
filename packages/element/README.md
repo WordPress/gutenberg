@@ -45,9 +45,9 @@ Refer to the [official React Quick Start guide](https://reactjs.org/docs/hello-w
 
 ## Why React?
 
-At the risk of igniting debate surrounding any single "best" front-end framework, the choice to use any tool should be motivated specifically to serve the requirements of the system. In modeling the concept of a [block](../blocks/README.md), we observe the following technical requirements:
+At the risk of igniting debate surrounding any single "best" front-end framework, the choice to use any tool should be motivated specifically to serve the requirements of the system. In modeling the concept of a [block](../../blocks/README.md), we observe the following technical requirements:
 
-- An understanding of a block in terms of its underlying values (in the [random image example](../blocks/README.md#example), a category)
+- An understanding of a block in terms of its underlying values (in the [random image example](../../blocks/README.md#example), a category)
 - A means to describe the UI of a block given these values
 
 At its most basic, React provides a simple input / output mechanism. __Given a set of inputs ("props"), a developer describes the output to be shown on the page.__ This is most elegantly observed in its [function components](https://reactjs.org/docs/components-and-props.html#functional-and-class-components). React serves the role of reconciling the desired output with the current state of the page.
@@ -64,10 +64,12 @@ If you've configured [Babel](http://babeljs.io/) for your project, you can opt i
 {
 	"plugins": [
 		[ "transform-react-jsx", {
-			"pragma": "wp.element.createElement"
+			"pragma": "createElement"
 		} ]
 	]
 }
 ```
+
+This assumes that you will import the `createElement` function in any file where you use JSX. Alternatively, consider using the [`@wordpress/babel-plugin-import-jsx-pragma` Babel plugin](https://www.npmjs.com/package/@wordpress/babel-plugin-import-jsx-pragma) to automate the import of this function.
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

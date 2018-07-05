@@ -11,10 +11,10 @@ import { stringify } from 'querystringify';
  */
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { Component, Fragment } from '@wordpress/element';
-import { keycodes, decodeEntities } from '@wordpress/utils';
+import { decodeEntities } from '@wordpress/utils';
+import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 import { Spinner, withInstanceId, withSpokenMessages, Popover } from '@wordpress/components';
-
-const { UP, DOWN, ENTER } = keycodes;
+import apiRequest from '@wordpress/api-request';
 
 // Since URLInput is rendered in the context of other inputs, but should be
 // considered a separate modal node, prevent keyboard events from propagating
@@ -68,7 +68,7 @@ class UrlInput extends Component {
 			selectedSuggestion: null,
 			loading: true,
 		} );
-		this.suggestionsRequest = wp.apiRequest( {
+		this.suggestionsRequest = apiRequest( {
 			path: `/wp/v2/posts?${ stringify( {
 				search: value,
 				per_page: 20,

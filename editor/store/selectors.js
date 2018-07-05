@@ -155,7 +155,7 @@ export function getCurrentPostId( state ) {
  * @return {number} Number of revisions.
  */
 export function getCurrentPostRevisionsCount( state ) {
-	return get( getCurrentPost( state ), [ 'revisions', 'count' ], 0 );
+	return get( getCurrentPost( state ), [ '_links', 'version-history', 0, 'count' ], 0 );
 }
 
 /**
@@ -167,7 +167,7 @@ export function getCurrentPostRevisionsCount( state ) {
  * @return {?number} ID of the last revision.
  */
 export function getCurrentPostLastRevisionId( state ) {
-	return get( getCurrentPost( state ), [ 'revisions', 'last_id' ], null );
+	return get( getCurrentPost( state ), [ '_links', 'predecessor-version', 0, 'id' ], null );
 }
 
 /**
@@ -179,7 +179,22 @@ export function getCurrentPostLastRevisionId( state ) {
  * @return {Object} Object of key value pairs comprising unsaved edits.
  */
 export function getPostEdits( state ) {
-	return get( state, [ 'editor', 'present', 'edits' ], {} );
+	return state.editor.present.edits;
+}
+
+/**
+ * Returns an attribute value of the saved post.
+ *
+ * @param {Object} state         Global application state.
+ * @param {string} attributeName Post attribute name.
+ *
+ * @return {*} Post attribute value.
+ */
+export function getCurrentPostAttribute( state, attributeName ) {
+	const post = getCurrentPost( state );
+	if ( post.hasOwnProperty( attributeName ) ) {
+		return post[ attributeName ];
+	}
 }
 
 /**
@@ -201,9 +216,31 @@ export function getEditedPostAttribute( state, attributeName ) {
 			return getEditedPostContent( state );
 	}
 
-	return edits[ attributeName ] === undefined ?
-		state.currentPost[ attributeName ] :
-		edits[ attributeName ];
+	if ( ! edits.hasOwnProperty( attributeName ) ) {
+		return getCurrentPostAttribute( state, attributeName );
+	}
+
+	return edits[ attributeName ];
+}
+
+/**
+ * Returns an attribute value of the current autosave revision for a post, or
+ * null if there is no autosave for the post.
+ *
+ * @param {Object} state         Global application state.
+ * @param {string} attributeName Autosave attribute name.
+ *
+ * @return {*} Autosave attribute value.
+ */
+export function getAutosaveAttribute( state, attributeName ) {
+	if ( ! hasAutosave( state ) ) {
+		return null;
+	}
+
+	const autosave = getAutosave( state );
+	if ( autosave.hasOwnProperty( attributeName ) ) {
+		return autosave[ attributeName ];
+	}
 }
 
 /**
@@ -345,9 +382,23 @@ export function isEditedPostAutosaveable( state ) {
 	}
 
 	// If the title, excerpt or content has changed, the post is autosaveable.
+	const autosave = getAutosave( state );
 	return [ 'title', 'excerpt', 'content' ].some( ( field ) => (
-		state.autosave[ field ] !== getEditedPostAttribute( state, field )
+		autosave[ field ] !== getEditedPostAttribute( state, field )
 	) );
+}
+
+/**
+ * Returns the current autosave, or null if one is not set (i.e. if the post
+ * has yet to be autosaved, or has been saved or published since the last
+ * autosave).
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {?Object} Current autosave, if exists.
+ */
+export function getAutosave( state ) {
+	return state.autosave;
 }
 
 /**
@@ -358,7 +409,7 @@ export function isEditedPostAutosaveable( state ) {
  * @return {boolean} Whether there is an existing autosave.
  */
 export function hasAutosave( state ) {
-	return !! state.autosave;
+	return !! getAutosave( state );
 }
 
 /**
@@ -391,35 +442,6 @@ export function getDocumentTitle( state ) {
 		title = isCleanNewPost( state ) ? __( 'New post' ) : __( '(Untitled)' );
 	}
 	return title;
-}
-
-/**
- * Returns the raw excerpt of the post being edited, preferring the unsaved
- * value if different than the saved post.
- *
- * @param {Object} state Global application state.
- *
- * @return {string} Raw post excerpt.
- */
-export function getEditedPostExcerpt( state ) {
-	deprecated( 'getEditedPostExcerpt', {
-		version: '3.1',
-		alternative: 'getEditedPostAttribute( state, \'excerpt\' )',
-		plugin: 'Gutenberg',
-	} );
-
-	return getEditedPostAttribute( state, 'excerpt' );
-}
-
-/**
- * Returns a URL to preview the post being edited.
- *
- * @param {Object} state Global application state.
- *
- * @return {string} Preview URL.
- */
-export function getEditedPostPreviewLink( state ) {
-	return getCurrentPost( state ).preview_link || null;
 }
 
 /**
@@ -909,6 +931,30 @@ export function isBlockMultiSelected( state, uid ) {
 }
 
 /**
+ * Returns true if an ancestor of the block is multi-selected and false otherwise.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} uid   Block unique ID.
+ *
+ * @return {boolean} Whether an ancestor of the block is in multi-selection set.
+ */
+export const isAncestorMultiSelected = createSelector(
+	( state, uid ) => {
+		let ancestorUid = uid;
+		let isMultiSelected = false;
+		while ( ancestorUid && ! isMultiSelected ) {
+			ancestorUid = getBlockRootUID( state, ancestorUid );
+			isMultiSelected = isBlockMultiSelected( state, ancestorUid );
+		}
+		return isMultiSelected;
+	},
+	( state ) => [
+		state.editor.present.blockOrder,
+		state.blockSelection.start,
+		state.blockSelection.end,
+	],
+);
+/**
  * Returns the unique ID of the block which begins the multi-selection set, or
  * null if there is no multi-selection.
  *
@@ -1325,7 +1371,7 @@ export const canInsertBlockType = createSelector(
 		}
 
 		const parentBlockListSettings = getBlockListSettings( state, parentUID );
-		const parentAllowedBlocks = get( parentBlockListSettings, [ 'supportedBlocks' ] );
+		const parentAllowedBlocks = get( parentBlockListSettings, [ 'allowedBlocks' ] );
 		const hasParentAllowedBlock = checkAllowList( parentAllowedBlocks, blockName );
 
 		const blockAllowedParentBlocks = blockType.parent;
@@ -1460,7 +1506,7 @@ export const getInserterItems = createSelector(
 			const id = blockType.name;
 
 			let isDisabled = false;
-			if ( blockType.useOnce ) {
+			if ( ! hasBlockSupport( blockType.name, 'multiple', true ) ) {
 				isDisabled = some( getBlocks( state ), { name: blockType.name } );
 			}
 
@@ -1819,4 +1865,19 @@ export function getSupportedBlocks( state, uid, globallyEnabledBlockTypes ) {
  */
 export function getEditorSettings( state ) {
 	return state.settings;
+}
+
+/*
+ * Returns the editor settings.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} The editor settings object
+ */
+export function getTokenSettings( state, name ) {
+	if ( ! name ) {
+		return state.tokens;
+	}
+
+	return state.tokens[ name ];
 }

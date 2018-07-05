@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { clone } from 'lodash';
+import { clone, once } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,6 +17,8 @@ import { blockAutocompleter, userAutocompleter } from '../components';
 
 const defaultAutocompleters = [ userAutocompleter ];
 
+const fetchSharedBlocks = once( () => dispatch( 'core/editor' ).fetchSharedBlocks() );
+
 function setDefaultCompleters( completers, blockName ) {
 	if ( ! completers ) {
 		// Provide copies so filters may directly modify them.
@@ -31,14 +33,14 @@ function setDefaultCompleters( completers, blockName ) {
 			 * once we have a way for completers to Promise options while
 			 * store-based data dependencies are being resolved.
 			 */
-			dispatch( 'core/editor' ).fetchSharedBlocks();
+			fetchSharedBlocks();
 		}
 	}
 	return completers;
 }
 
 addFilter(
-	'blocks.Autocomplete.completers',
-	'blocks/autocompleters/set-default-completers',
+	'editor.Autocomplete.completers',
+	'editor/autocompleters/set-default-completers',
 	setDefaultCompleters
 );

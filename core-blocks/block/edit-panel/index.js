@@ -4,17 +4,12 @@
 import { Button, withInstanceId } from '@wordpress/components';
 import { Component, Fragment, createRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { keycodes } from '@wordpress/utils';
+import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-
-/**
- * Module constants
- */
-const { ESCAPE } = keycodes;
 
 class SharedBlockEditPanel extends Component {
 	constructor() {

@@ -45,7 +45,7 @@ div.components-toolbar {
 	width: $icon-button-size;
 	height: $icon-button-size;
 
-	// unset icon button styles
+	// Unset icon button styles
 	&:active,
 	&:not( [aria-disabled="true"] ):hover,
 	&:not( [aria-disabled="true"] ):focus {
@@ -55,7 +55,7 @@ div.components-toolbar {
 		border: none;
 	}
 
-	// disabled
+	// Disabled
 	&:disabled {
 		cursor: default;
 	}
@@ -66,7 +66,7 @@ div.components-toolbar {
 		border-radius: $button-style__radius-roundrect;
 	}
 
-	// subscript for numbered icon buttons, like headings
+	// Subscript for numbered icon buttons, like headings
 	&[data-subscript] svg {
 		padding: 4px 8px 4px 0;
 	}
@@ -81,13 +81,17 @@ div.components-toolbar {
 		bottom: 8px;
 	}
 
-	// hover style
+	// Assign hover style to child element, not the button itself
+	&:not( :disabled ):not([aria-disabled="true"]):hover {
+		box-shadow: none;
+	}
+
 	&:not( :disabled ).is-active > svg,
 	&:not( :disabled ):hover > svg {
 		@include formatting-button-style__hover;
 	}
 
-	// active & toggled style
+	// Active & toggled style
 	&:not(:disabled).is-active > svg {
 		@include formatting-button-style__active;
 	}
@@ -96,7 +100,7 @@ div.components-toolbar {
 		color: $white;
 	}
 
-	// focus style
+	// Focus style
 	&:not(:disabled):focus > svg {
 		@include formatting-button-style__focus;
 	}

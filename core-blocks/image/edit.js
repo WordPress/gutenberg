@@ -73,22 +73,20 @@ class ImageEdit extends Component {
 
 	componentDidMount() {
 		const { attributes, setAttributes } = this.props;
-		const { id, url = '', alt: fileName } = attributes;
+		const { id, url = '' } = attributes;
 
 		if ( ! id && url.indexOf( 'blob:' ) === 0 ) {
-			getBlobByURL( url )
-				.then(
-					( file ) => {
-						file.name = fileName;
-						editorMediaUpload( {
-							filesList: [ file ],
-							onFileChange: ( [ image ] ) => {
-								setAttributes( { ...image } );
-							},
-							allowedType: 'image',
-						} );
-					}
-				);
+			const file = getBlobByURL( url );
+
+			if ( file ) {
+				editorMediaUpload( {
+					filesList: [ file ],
+					onFileChange: ( [ image ] ) => {
+						setAttributes( { ...image } );
+					},
+					allowedType: 'image',
+				} );
+			}
 		}
 	}
 
@@ -99,10 +97,8 @@ class ImageEdit extends Component {
 		if ( ! prevID && prevUrl.indexOf( 'blob:' ) === 0 && id && url.indexOf( 'blob:' ) === -1 ) {
 			revokeBlobURL( url );
 		}
-	}
 
-	componentWillReceiveProps( { isSelected } ) {
-		if ( ! isSelected && this.props.isSelected && this.state.captionFocused ) {
+		if ( ! this.props.isSelected && prevProps.isSelected && this.state.captionFocused ) {
 			this.setState( {
 				captionFocused: false,
 			} );
@@ -110,7 +106,7 @@ class ImageEdit extends Component {
 	}
 
 	onSelectImage( media ) {
-		if ( ! media ) {
+		if ( ! media || ! media.url ) {
 			this.props.setAttributes( {
 				url: undefined,
 				alt: undefined,
@@ -180,7 +176,7 @@ class ImageEdit extends Component {
 	}
 
 	render() {
-		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, noticeOperations, noticeUI, toggleSelection } = this.props;
+		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, noticeOperations, noticeUI, toggleSelection, isRTL } = this.props;
 		const { url, alt, caption, align, id, href, width, height } = attributes;
 
 		const controls = (
@@ -320,7 +316,6 @@ class ImageEdit extends Component {
 		return (
 			<Fragment>
 				{ controls }
-				{ noticeUI }
 				<figure className={ classes }>
 					<ImageSize src={ url } dirtynessTrigger={ align }>
 						{ ( sizes ) => {
@@ -351,6 +346,35 @@ class ImageEdit extends Component {
 							const minWidth = imageWidth < imageHeight ? MIN_SIZE : MIN_SIZE * ratio;
 							const minHeight = imageHeight < imageWidth ? MIN_SIZE : MIN_SIZE / ratio;
 
+							let showRightHandle = false;
+							let showLeftHandle = false;
+
+							/* eslint-disable no-lonely-if */
+							// See https://github.com/WordPress/gutenberg/issues/7584.
+							if ( align === 'center' ) {
+								// When the image is centered, show both handles.
+								showRightHandle = true;
+								showLeftHandle = true;
+							} else if ( isRTL ) {
+								// In RTL mode the image is on the right by default.
+								// Show the right handle and hide the left handle only when it is aligned left.
+								// Otherwise always show the left handle.
+								if ( align === 'left' ) {
+									showRightHandle = true;
+								} else {
+									showLeftHandle = true;
+								}
+							} else {
+								// Show the left handle and hide the right handle only when the image is aligned right.
+								// Otherwise always show the right handle.
+								if ( align === 'right' ) {
+									showLeftHandle = true;
+								} else {
+									showRightHandle = true;
+								}
+							}
+							/* eslint-enable no-lonely-if */
+
 							return (
 								<Fragment>
 									{ getInspectorControls( imageWidth, imageHeight ) }
@@ -367,12 +391,16 @@ class ImageEdit extends Component {
 										maxHeight={ maxWidth / ratio }
 										lockAspectRatio
 										handleClasses={ {
-											topRight: 'wp-block-image__resize-handler-top-right',
-											bottomRight: 'wp-block-image__resize-handler-bottom-right',
-											topLeft: 'wp-block-image__resize-handler-top-left',
-											bottomLeft: 'wp-block-image__resize-handler-bottom-left',
+											right: 'wp-block-image__resize-handler-right',
+											bottom: 'wp-block-image__resize-handler-bottom',
+											left: 'wp-block-image__resize-handler-left',
 										} }
-										enable={ { top: false, right: true, bottom: false, left: false, topRight: true, bottomRight: true, bottomLeft: true, topLeft: true } }
+										enable={ {
+											top: false,
+											right: showRightHandle,
+											bottom: true,
+											left: showLeftHandle,
+										} }
 										onResizeStart={ () => {
 											toggleSelection( false );
 										} }
@@ -413,11 +441,12 @@ export default compose( [
 		const { getMedia } = select( 'core' );
 		const { getEditorSettings } = select( 'core/editor' );
 		const { id } = props.attributes;
-		const { maxWidth } = getEditorSettings();
+		const { maxWidth, isRTL } = getEditorSettings();
 
 		return {
 			image: id ? getMedia( id ) : null,
 			maxWidth,
+			isRTL,
 		};
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),

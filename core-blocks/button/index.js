@@ -77,19 +77,21 @@ export const settings = {
 	attributes: blockAttributes,
 
 	getEditWrapperProps( attributes ) {
-		const { align, clear } = attributes;
+		const { align } = attributes;
 		const props = { 'data-resized': true };
 
 		if ( 'left' === align || 'right' === align || 'center' === align ) {
 			props[ 'data-align' ] = align;
 		}
 
-		if ( clear ) {
-			props[ 'data-clear' ] = 'true';
-		}
-
 		return props;
 	},
+
+	styles: [
+		{ name: 'default', label: __( 'Rounded' ), isDefault: true },
+		{ name: 'outline', label: __( 'Outline' ) },
+		{ name: 'squared', label: __( 'Squared' ) },
+	],
 
 	edit,
 
