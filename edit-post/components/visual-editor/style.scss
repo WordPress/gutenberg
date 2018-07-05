@@ -2,11 +2,16 @@
 	position: relative;
 	padding: 50px 0;
 
+	input[type="text"].editor-default-block-appender__content, // The default appender should match a single paragraph. Needs specificity.
 	&,
 	& p {
 		font-family: $editor-font;
 		font-size: $editor-font-size;
 		line-height: $editor-line-height;
+	}
+
+	&,
+	& p {
 		color: $dark-gray-700;
 	}
 
@@ -50,11 +55,28 @@
 			margin-right: -$block-side-ui-width;
 		}
 
-		&[data-align="full"] > .editor-block-contextual-toolbar,
-		&[data-align="wide"] > .editor-block-contextual-toolbar { // Don't affect nested block toolbars.
-			max-width: $content-width + $parent-block-padding; // Add 1px border left and right.
-			margin-left: auto;
-			margin-right: auto;
+		// Center the block toolbar on wide and full-wide blocks.
+		// Use specific selector to not affect nested block toolbars.
+		&[data-align="wide"] > .editor-block-contextual-toolbar,
+		&[data-align="full"] > .editor-block-contextual-toolbar {
+			width: calc( 100% + #{ ( $parent-block-padding * 4 ) + $border-width + $border-width } ); // Matches the negative margins applied to parent blocks.
+			height: 0px; // This collapses the container to an invisible element without margin.
+			text-align: center;
+
+			.editor-block-toolbar {
+				max-width: $content-width + $block-padding + $block-padding;
+				width: 100%;
+				position: relative;
+			}
+		}
+
+		// The centering math changes when a fullwide image doesn't have block padding.
+		&[data-align="full"] > .editor-block-contextual-toolbar {
+			width: calc( 100% + #{ ( $parent-block-padding * 2 ) + ( $block-padding * 2 ) } ); // Matches the negative margins applied to non-parent blocks, except for borders which are gone in fullwide.
+		
+			.editor-block-toolbar {
+				max-width: $content-width - $border-width - $border-width;
+			}
 		}
 	}
 
