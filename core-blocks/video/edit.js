@@ -126,12 +126,7 @@ class VideoEdit extends Component {
 					</PanelBody>
 				</InspectorControls>
 				<figure className={ className }>
-					<video
-						controls={ controls }
-						src={ src }
-						loop={ loop }
-						muted={ muted }
-					/>
+					<video controls src={ src } />
 					{ ( ( caption && caption.length ) || !! isSelected ) && (
 						<RichText
 							tagName="figcaption"

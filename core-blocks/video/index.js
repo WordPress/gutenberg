@@ -87,7 +87,7 @@ export const settings = {
 						muted={ muted }
 					/>
 				) }
-				{ caption && caption.length > 0 && (
+				{ caption && caption.length && (
 					<RichText.Content tagName="figcaption" value={ caption } />
 				) }
 			</figure>
