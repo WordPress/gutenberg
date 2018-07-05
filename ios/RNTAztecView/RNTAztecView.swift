@@ -1,20 +1,17 @@
-//import Aztec
 import Foundation
 
-@objc (RCTAztecView)
-class RCTAztecView: RCTViewManager {
+@objc (RCTAztecViewManager)
+class RCTAztecViewManager: RCTViewManager {
+    
     @objc override func view() -> UIView {
-        /*
-        let view = Aztec.TextView.init(
-        defaultFont: .systemFont(ofSize: 12),
-        defaultParagraphStyle: .default,
-        defaultMissingImage: UIImage())
- */
-        let view = UITextView()
+        let view = GutenbergTextView(
+            defaultFont: .systemFont(ofSize: 12),
+            defaultParagraphStyle: .default,
+            defaultMissingImage: UIImage())
 
-        view.backgroundColor = .blue
+        view.backgroundColor = .cyan
         view.text = "Hello world!"
-
+        
         return view
     }
 }

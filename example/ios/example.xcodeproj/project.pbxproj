@@ -27,6 +27,7 @@
 		ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADBDB9271DFEBF0700ED6528 /* libRCTBlob.a */; };
 		F16E377220ED1D6900E81F5B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F16E377120ED1D6900E81F5B /* AppDelegate.swift */; };
 		F17923DF20890AA0002FE09B /* libRNTAztecView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F17923DE20890A85002FE09B /* libRNTAztecView.a */; };
+		F1A879A920EE6E7300FABD31 /* Aztec.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1A879A820EE6E7300FABD31 /* Aztec.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -340,6 +341,7 @@
 		F16E377020ED1D6900E81F5B /* example-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "example-Bridging-Header.h"; sourceTree = "<group>"; };
 		F16E377120ED1D6900E81F5B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = example/AppDelegate.swift; sourceTree = "<group>"; };
 		F17923D920890A85002FE09B /* RNTAztecView.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNTAztecView.xcodeproj; path = ../../ios/RNTAztecView.xcodeproj; sourceTree = "<group>"; };
+		F1A879A820EE6E7300FABD31 /* Aztec.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Aztec.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -355,6 +357,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F1A879A920EE6E7300FABD31 /* Aztec.framework in Frameworks */,
 				ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */,
 				5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */,
 				146834051AC3E58100842450 /* libReact.a in Frameworks */,
@@ -496,6 +499,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F1A879A820EE6E7300FABD31 /* Aztec.framework */,
 				2D16E6891FA4F8E400B85C8A /* libReact.a */,
 			);
 			name = Frameworks;
