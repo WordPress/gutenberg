@@ -1,18 +1,13 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, withAPIData } from '@wordpress/components';
+import { IconButton } from '@wordpress/components';
 import { getUnknownTypeHandlerName, rawHandler, serialize } from '@wordpress/blocks';
 import { compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
-export function UnknownConverter( { block, onReplace, small, user, role } ) {
+export function UnknownConverter( { block, onReplace, small, canUserUseUnfilteredHTML, role } ) {
 	if ( ! block || getUnknownTypeHandlerName() !== block.name ) {
 		return null;
 	}
@@ -23,7 +18,7 @@ export function UnknownConverter( { block, onReplace, small, user, role } ) {
 		onReplace( block.uid, rawHandler( {
 			HTML: serialize( block ),
 			mode: 'BLOCKS',
-			canUserUseUnfilteredHTML: get( user, [ 'data', 'capabilities', 'unfiltered_html' ], false ),
+			canUserUseUnfilteredHTML,
 		} ) );
 	};
 
@@ -42,16 +37,14 @@ export function UnknownConverter( { block, onReplace, small, user, role } ) {
 
 export default compose(
 	withSelect( ( select, { uid } ) => {
-		const { getBlock, getCurrentPostType } = select( 'core/editor' );
+		const { canUserUseUnfilteredHTML, getBlock, getCurrentPostType } = select( 'core/editor' );
 		return {
 			block: getBlock( uid ),
 			postType: getCurrentPostType(),
+			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
 		onReplace: dispatch( 'core/editor' ).replaceBlocks,
-	} ) ),
-	withAPIData( ( { postType } ) => ( {
-		user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
 	} ) ),
 )( UnknownConverter );
