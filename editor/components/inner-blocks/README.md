@@ -109,7 +109,7 @@ If the block is a top level block: the locking of the Custom Post Type is used.
 
 To achieve distinct arrangements of nested blocks, you may assign layout as an array of objects, or an object. When assigned, a user will be provided with the option to move blocks between layouts, and the rendered output will assign a layout-specific class which can be used in your block stylesheet to effect the visual arrangement of nested blocks.
 
-Because `InnerBlocks.Content` will generate a single continuous flow of block markup for nested content, it may be advisable to use [CSS Grid Layout](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Grid_Layout) to assign layout positions. Be aware that CSS grid is [not suported in legacy browsers](https://caniuse.com/#feat=css-grid), and therefore you should consider how this might impact your block's appearance when viewed on the front end of a site in such browsers.
+Because `InnerBlocks.Content` will generate a single continuous flow of block markup for nested content, it may be advisable to use [CSS Grid Layout](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Grid_Layout) to assign layout positions. Be aware that CSS grid is [not supported in legacy browsers](https://caniuse.com/#feat=css-grid), and therefore you should consider how this might impact your block's appearance when viewed on the front end of a site in such browsers.
 
 Layouts can be assigned either as an object (ungrouped layouts) or an array of objects (grouped layouts). These are documented below.
 
