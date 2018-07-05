@@ -319,7 +319,7 @@ describe( 'block factory', () => {
 			expect( availableBlocks[ 0 ].name ).toBe( 'core/updated-text-block' );
 		} );
 
-		it( 'should show multiple possible transformations"', () => {
+		it( 'should show multiple possible transformations', () => {
 			registerBlockType( 'core/updated-text-block', {
 				attributes: {
 					value: {
@@ -337,6 +337,88 @@ describe( 'block factory', () => {
 						blocks: [ 'core/another-text-block' ],
 						transform: noop,
 						isMultiBlock: true,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+			registerBlockType( 'core/another-text-block', defaultBlockSettings );
+
+			const block = createBlock( 'core/updated-text-block', {
+				value: 'chicken',
+			} );
+
+			const availableBlocks = getPossibleBlockTransformations( [ block ] );
+
+			expect( availableBlocks ).toHaveLength( 2 );
+			expect( availableBlocks[ 0 ].name ).toBe( 'core/text-block' );
+			expect( availableBlocks[ 1 ].name ).toBe( 'core/another-text-block' );
+		} );
+
+		it( 'should show multiple possible transformations when multiple blocks have a matching `from` transform', () => {
+			registerBlockType( 'core/updated-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					from: [ {
+						type: 'block',
+						blocks: [ 'core/text-block' ],
+						transform: noop,
+						isMultiBlock: false,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/another-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					from: [ {
+						type: 'block',
+						blocks: [ 'core/text-block' ],
+						transform: noop,
+						isMultiBlock: true,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'another text block',
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const block = createBlock( 'core/text-block', {
+				value: 'chicken',
+			} );
+
+			const availableBlocks = getPossibleBlockTransformations( [ block ] );
+
+			expect( availableBlocks ).toHaveLength( 2 );
+			expect( availableBlocks[ 0 ].name ).toBe( 'core/updated-text-block' );
+			expect( availableBlocks[ 1 ].name ).toBe( 'core/another-text-block' );
+		} );
+
+		it( 'should show multiple possible transformations for a single `to` transform object with multiple blocks', () => {
+			registerBlockType( 'core/updated-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [ {
+						type: 'block',
+						blocks: [ 'core/text-block', 'core/another-text-block' ],
+						transform: noop,
 					} ],
 				},
 				save: noop,
