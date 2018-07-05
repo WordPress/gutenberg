@@ -103,7 +103,7 @@ const getPlaylistDetailsMediaFrame = () => {
 					type: 'audio',
 					collectionType: 'playlist',
 					title: wp.media.view.l10n.addToPlaylistTitle,
-				}	),
+				} ),
 
 				new wp.media.controller.Library( {
 					id: 'video-playlist',
