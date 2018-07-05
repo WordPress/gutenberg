@@ -26,7 +26,7 @@ import {
 import './editor.scss';
 
 class PlaylistEdit extends Component {
-	constructor() {
+	constructor( attributes ) {
 		super( ...arguments );
 
 		this.initializePlaylist = this.initializePlaylist.bind( this );
@@ -35,7 +35,7 @@ class PlaylistEdit extends Component {
 
 		// check for if ids is set to determine edit state
 		this.state = {
-			editing: ! this.props.attributes.ids,
+			isEditing: ! attributes.ids,
 		};
 	}
 
@@ -57,7 +57,7 @@ class PlaylistEdit extends Component {
 					const type = media[ 0 ].mime_type.split( '/' )[ 0 ];
 					const ids = JSON.stringify( media.map( ( item ) => item.id ) );
 					setAttributes( { ids, type } );
-					this.setState( { editing: false } );
+					this.setState( { isEditing: false } );
 				}
 			},
 		} );
@@ -71,7 +71,7 @@ class PlaylistEdit extends Component {
 
 	render() {
 		const { attributes, setAttributes, className } = this.props;
-		const { editing } = this.state;
+		const { isEditing } = this.state;
 		const { tracklist, artists, images, style, type } = attributes;
 		const styleOptions = [
 			{ value: 'light', label: __( 'Light' ) },
@@ -83,13 +83,13 @@ class PlaylistEdit extends Component {
 			if ( media && media[ 0 ].url ) {
 				const ids = JSON.stringify( media.map( ( item ) => item.id ) );
 				setAttributes( { tracklist, artists, images, ids, type: media[ 0 ].type } );
-				this.setState( { editing: false } );
+				this.setState( { isEditing: false } );
 			}
 		};
 
 		const mediaIds = this.props.attributes.ids && this.props.attributes.ids.replace( /^\[(.+)\]$/, '$1' ).split( ',' );
 
-		if ( editing ) {
+		if ( isEditing ) {
 			return (
 				<Placeholder
 					icon="media-audio"
