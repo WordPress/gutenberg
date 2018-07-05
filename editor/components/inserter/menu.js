@@ -310,12 +310,15 @@ export default compose(
 			const { insertionPoint, onClose, selectedBlock } = ownProps;
 			const { index, rootUID, layout } = insertionPoint;
 			const { name, initialAttributes } = item;
+
 			const insertedBlock = createBlock( name, { ...initialAttributes, layout } );
+
 			if ( selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
 				dispatch( 'core/editor' ).replaceBlocks( selectedBlock.uid, insertedBlock );
 			} else {
 				dispatch( 'core/editor' ).insertBlock( insertedBlock, index, rootUID );
 			}
+
 			if ( onClose ) {
 				onClose();
 			}
