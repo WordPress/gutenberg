@@ -33,17 +33,12 @@ class InnerBlocks extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { template, block } = this.props;
+		const { template } = this.props;
 
 		this.updateNestedSettings();
 
 		const hasTemplateChanged = ! isEqual( template, prevProps.template );
-		const isTemplateInnerBlockMismatch = (
-			template &&
-			block.innerBlocks.length !== template.length
-		);
-
-		if ( hasTemplateChanged || isTemplateInnerBlockMismatch ) {
+		if ( hasTemplateChanged ) {
 			this.synchronizeBlocksWithTemplate();
 		}
 	}
