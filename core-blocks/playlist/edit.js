@@ -31,7 +31,7 @@ class PlaylistEdit extends Component {
 
 		this.initializePlaylist = this.initializePlaylist.bind( this );
 		this.uploadFromFiles = this.uploadFromFiles.bind( this );
-		this.addFiles = this.addFiles.bind( this );
+		this.onUploadFiles = this.onUploadFiles.bind( this );
 
 		// check for if ids is set to determine edit state
 		this.state = {
@@ -44,10 +44,10 @@ class PlaylistEdit extends Component {
 	}
 
 	uploadFromFiles( event ) {
-		this.addFiles( event.target.files );
+		this.onUploadFiles( event.target.files );
 	}
 
-	addFiles( files ) {
+	onUploadFiles( files ) {
 		const { setAttributes } = this.props;
 		editorMediaUpload( {
 			allowedType: [ 'audio', 'video' ],
@@ -82,7 +82,7 @@ class PlaylistEdit extends Component {
 			//check if there are returned media items and set attributes when there are
 			if ( media && media[ 0 ].url ) {
 				const ids = JSON.stringify( media.map( ( item ) => item.id ) );
-				setAttributes( { tracklist, artists, images, ids, type: media[ 0 ].type } );
+				setAttributes( { ids, type: media[ 0 ].type } );
 				this.setState( { isEditing: false } );
 			}
 		};
