@@ -9,6 +9,7 @@ import { filter, every } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import { RichText, editorMediaUpload } from '@wordpress/editor';
+import { createBlobURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -132,7 +133,7 @@ export const settings = {
 				},
 				transform( files, onChange ) {
 					const block = createBlock( 'core/gallery', {
-						images: files.map( ( file ) => ( { url: window.URL.createObjectURL( file ) } ) ),
+						images: files.map( ( file ) => ( { url: createBlobURL( file ) } ) ),
 					} );
 					editorMediaUpload( {
 						filesList: files,
