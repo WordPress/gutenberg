@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { has } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -42,11 +42,11 @@ export function HTMLConverter( { block, onReplace, small, canUserUseUnfilteredHT
 
 export default compose(
 	withSelect( ( select, { uid } ) => {
-		const { getBlock, getCurrentPostType, getCurrentPost } = select( 'core/editor' );
+		const { getBlock, getCurrentPostType, canUserUseUnfilteredHTML } = select( 'core/editor' );
 		return {
 			block: getBlock( uid ),
 			postType: getCurrentPostType(),
-			canUserUseUnfilteredHTML: get( getCurrentPost(), [ '_links', 'wp:action-unfiltered_html' ], false ),
+			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {

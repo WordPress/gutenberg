@@ -1891,3 +1891,14 @@ export function getTokenSettings( state, name ) {
 
 	return state.tokens[ name ];
 }
+
+/*
+ * Returns whether or not the user has the unfiltered_html capability
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} whether the user can or can't post unfiltered HTML
+ */
+export function canUserUseUnfilteredHTML( state ) {
+	return has( getCurrentPost( state ), [ '_links', 'wp:action-unfiltered_html' ] );
+}
