@@ -1,7 +1,7 @@
 import Aztec
 import Foundation
 
-class GutenbergTextView: Aztec.TextView {
+class RCTAztecView: Aztec.TextView {
     @objc var onContentSizeChange: RCTBubblingEventBlock? = nil
     
     // MARK - View Height: Match to content height

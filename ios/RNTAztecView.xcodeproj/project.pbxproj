@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F121467D20ED2F81003DD17B /* RNTAztecView.m in Sources */ = {isa = PBXBuildFile; fileRef = F121467C20ED2F81003DD17B /* RNTAztecView.m */; };
-		F13BF4A020ECF5450047D3F9 /* RNTAztecView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F13BF49F20ECF5450047D3F9 /* RNTAztecView.swift */; };
+		F121467D20ED2F81003DD17B /* RNTAztecViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F121467C20ED2F81003DD17B /* RNTAztecViewManager.m */; };
+		F13BF4A020ECF5450047D3F9 /* RNTAztecViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F13BF49F20ECF5450047D3F9 /* RNTAztecViewManager.swift */; };
 		F166A38020EE6DF3008E7C9F /* Aztec.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F166A37B20EE6DD7008E7C9F /* Aztec.framework */; };
 		F1A879D020EE90C000FABD31 /* GutenbergTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A879CF20EE90C000FABD31 /* GutenbergTextView.swift */; };
 /* End PBXBuildFile section */
@@ -51,9 +51,9 @@
 
 /* Begin PBXFileReference section */
 		F1017BCE20ED1B1A002B1024 /* libReact.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReact.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		F121467C20ED2F81003DD17B /* RNTAztecView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNTAztecView.m; sourceTree = "<group>"; };
+		F121467C20ED2F81003DD17B /* RNTAztecViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNTAztecViewManager.m; sourceTree = "<group>"; };
 		F13BF49E20ECF5440047D3F9 /* RNTAztecView-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RNTAztecView-Bridging-Header.h"; sourceTree = "<group>"; };
-		F13BF49F20ECF5450047D3F9 /* RNTAztecView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNTAztecView.swift; sourceTree = "<group>"; };
+		F13BF49F20ECF5450047D3F9 /* RNTAztecViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNTAztecViewManager.swift; sourceTree = "<group>"; };
 		F145CFC62087D16A006C159A /* libRNTAztecView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNTAztecView.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		F166A37420EE6DD7008E7C9F /* Aztec.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Aztec.xcodeproj; path = "Carthage/Checkouts/AztecEditor-iOS/Aztec.xcodeproj"; sourceTree = SOURCE_ROOT; };
 		F1A879CF20EE90C000FABD31 /* GutenbergTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GutenbergTextView.swift; sourceTree = "<group>"; };
@@ -93,8 +93,8 @@
 			isa = PBXGroup;
 			children = (
 				F13BF49E20ECF5440047D3F9 /* RNTAztecView-Bridging-Header.h */,
-				F121467C20ED2F81003DD17B /* RNTAztecView.m */,
-				F13BF49F20ECF5450047D3F9 /* RNTAztecView.swift */,
+				F121467C20ED2F81003DD17B /* RNTAztecViewManager.m */,
+				F13BF49F20ECF5450047D3F9 /* RNTAztecViewManager.swift */,
 				F1A879CF20EE90C000FABD31 /* GutenbergTextView.swift */,
 			);
 			path = RNTAztecView;
@@ -207,9 +207,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F13BF4A020ECF5450047D3F9 /* RNTAztecView.swift in Sources */,
+				F13BF4A020ECF5450047D3F9 /* RNTAztecViewManager.swift in Sources */,
 				F1A879D020EE90C000FABD31 /* GutenbergTextView.swift in Sources */,
-				F121467D20ED2F81003DD17B /* RNTAztecView.m in Sources */,
+				F121467D20ED2F81003DD17B /* RNTAztecViewManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

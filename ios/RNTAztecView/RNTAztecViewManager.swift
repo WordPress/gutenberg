@@ -4,7 +4,7 @@ import Foundation
 class RCTAztecViewManager: RCTViewManager {
     
     @objc override func view() -> UIView {
-        let view = GutenbergTextView(
+        let view = RCTAztecView(
             defaultFont: .systemFont(ofSize: 12),
             defaultParagraphStyle: .default,
             defaultMissingImage: UIImage())
