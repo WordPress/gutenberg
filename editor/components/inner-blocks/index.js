@@ -22,8 +22,13 @@ import BlockList from '../block-list';
 import { withBlockEditContext } from '../block-edit/context';
 
 class InnerBlocks extends Component {
-	componentDidMount() {
+	constructor() {
+		super( ...arguments );
+
 		this.updateNestedSettings();
+	}
+
+	componentDidMount() {
 		this.synchronizeBlocksWithTemplate();
 	}
 
