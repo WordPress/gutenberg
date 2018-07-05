@@ -247,6 +247,22 @@ function gutenberg_add_target_schema_to_links( $response, $post, $request ) {
 			);
 		}
 	}
+	if ( 'edit' === $request['context'] && current_user_can( 'unfiltered_html' ) ) {
+		$new_links['https://api.w.org/action-unfiltered_html'] = array(
+			array(
+				'title'        => __( 'The current user can post HTML markup and JavaScript.', 'gutenberg' ),
+				'href'         => $orig_href,
+				'targetSchema' => array(
+					'type'       => 'object',
+					'properties' => array(
+						'unfiltered_html' => array(
+						'type' => 'boolean',
+						),
+					),
+				),
+			),
+		);
+	}
 	if ( 'edit' === $request['context'] ) {
 		if ( current_user_can( $post_type->cap->publish_posts ) ) {
 			$new_links['https://api.w.org/action-publish'] = array(
