@@ -298,6 +298,7 @@ class ImageEdit extends Component {
 								label={ __( 'Width' ) }
 								value={ width !== undefined ? width : '' }
 								placeholder={ imageWidth }
+								min={ 1 }
 								onChange={ this.updateWidth }
 							/>
 							<TextControl
@@ -306,6 +307,7 @@ class ImageEdit extends Component {
 								label={ __( 'Height' ) }
 								value={ height !== undefined ? height : '' }
 								placeholder={ imageHeight }
+								min={ 1 }
 								onChange={ this.updateHeight }
 							/>
 						</div>
