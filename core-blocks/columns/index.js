@@ -23,6 +23,8 @@ import {
 import './style.scss';
 import './editor.scss';
 
+const ALLOWED_BLOCKS = [ 'core/column' ];
+
 /**
  * Returns the layouts configuration for a given number of columns.
  *
@@ -145,7 +147,7 @@ export const settings = {
 					<InnerBlocks
 						template={ getColumnsTemplate( columns ) }
 						templateLock="all"
-						allowedBlocks={ [ 'core/column' ] } />
+						allowedBlocks={ ALLOWED_BLOCKS } />
 				</div>
 			</Fragment>
 		);

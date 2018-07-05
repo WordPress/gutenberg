@@ -74,7 +74,6 @@ class NavigableToolbar extends Component {
 			<NavigableMenu
 				orientation="horizontal"
 				role="toolbar"
-				deep
 				ref={ this.bindNode }
 				onKeyDown={ this.switchOnKeyDown }
 				{ ...props }

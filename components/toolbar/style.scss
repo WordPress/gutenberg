@@ -7,7 +7,12 @@
 
 div.components-toolbar {
 	&> div {
-		display: inline-flex;
+		// IE11 does not support `position: sticky`, or Flex very well, so use block.
+		display: inline-block;
+		@supports ( position: sticky ) {
+			display: inline-flex;
+		}
+
 		margin: 0;
 	}
 

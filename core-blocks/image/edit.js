@@ -36,7 +36,6 @@ import {
 	MediaPlaceholder,
 	MediaUpload,
 	BlockAlignmentToolbar,
-	UrlInputButton,
 	editorMediaUpload,
 } from '@wordpress/editor';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -51,6 +50,10 @@ import ImageSize from './image-size';
  * Module constants
  */
 const MIN_SIZE = 20;
+const LINK_DESTINATION_NONE = 'none';
+const LINK_DESTINATION_MEDIA = 'media';
+const LINK_DESTINATION_ATTACHMENT = 'attachment';
+const LINK_DESTINATION_CUSTOM = 'custom';
 
 class ImageEdit extends Component {
 	constructor() {
@@ -60,11 +63,12 @@ class ImageEdit extends Component {
 		this.onFocusCaption = this.onFocusCaption.bind( this );
 		this.onImageClick = this.onImageClick.bind( this );
 		this.onSelectImage = this.onSelectImage.bind( this );
-		this.onSetHref = this.onSetHref.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.updateWidth = this.updateWidth.bind( this );
 		this.updateHeight = this.updateHeight.bind( this );
 		this.updateDimensions = this.updateDimensions.bind( this );
+		this.onSetCustomHref = this.onSetCustomHref.bind( this );
+		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 
 		this.state = {
 			captionFocused: false,
@@ -122,7 +126,26 @@ class ImageEdit extends Component {
 		} );
 	}
 
-	onSetHref( value ) {
+	onSetLinkDestination( value ) {
+		let href;
+
+		if ( value === LINK_DESTINATION_NONE ) {
+			href = undefined;
+		} else if ( value === LINK_DESTINATION_MEDIA ) {
+			href = this.props.attributes.url;
+		} else if ( value === LINK_DESTINATION_ATTACHMENT ) {
+			href = this.props.image && this.props.image.link;
+		} else {
+			href = this.props.attributes.href;
+		}
+
+		this.props.setAttributes( {
+			linkDestination: value,
+			href,
+		} );
+	}
+
+	onSetCustomHref( value ) {
 		this.props.setAttributes( { href: value } );
 	}
 
@@ -175,9 +198,18 @@ class ImageEdit extends Component {
 		return get( this.props.image, [ 'media_details', 'sizes' ], {} );
 	}
 
+	getLinkDestinationOptions() {
+		return [
+			{ value: LINK_DESTINATION_NONE, label: __( 'None' ) },
+			{ value: LINK_DESTINATION_MEDIA, label: __( 'Media File' ) },
+			{ value: LINK_DESTINATION_ATTACHMENT, label: __( 'Attachment Page' ) },
+			{ value: LINK_DESTINATION_CUSTOM, label: __( 'Custom URL' ) },
+		];
+	}
+
 	render() {
 		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, noticeOperations, noticeUI, toggleSelection, isRTL } = this.props;
-		const { url, alt, caption, align, id, href, width, height } = attributes;
+		const { url, alt, caption, align, id, href, linkDestination, width, height } = attributes;
 
 		const controls = (
 			<BlockControls>
@@ -200,12 +232,9 @@ class ImageEdit extends Component {
 							/>
 						) }
 					/>
-					<UrlInputButton onChange={ this.onSetHref } url={ href } />
 				</Toolbar>
 			</BlockControls>
 		);
-
-		const availableSizes = this.getAvailableSizes();
 
 		if ( ! url ) {
 			return (
@@ -234,7 +263,9 @@ class ImageEdit extends Component {
 			'is-focused': isSelected,
 		} );
 
+		const availableSizes = this.getAvailableSizes();
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
+		const isLinkUrlInputDisabled = linkDestination !== LINK_DESTINATION_CUSTOM;
 
 		const getInspectorControls = ( imageWidth, imageHeight ) => (
 			<InspectorControls>
@@ -267,6 +298,7 @@ class ImageEdit extends Component {
 								label={ __( 'Width' ) }
 								value={ width !== undefined ? width : '' }
 								placeholder={ imageWidth }
+								min={ 1 }
 								onChange={ this.updateWidth }
 							/>
 							<TextControl
@@ -275,6 +307,7 @@ class ImageEdit extends Component {
 								label={ __( 'Height' ) }
 								value={ height !== undefined ? height : '' }
 								placeholder={ imageHeight }
+								min={ 1 }
 								onChange={ this.updateHeight }
 							/>
 						</div>
@@ -307,6 +340,21 @@ class ImageEdit extends Component {
 							</Button>
 						</div>
 					</div>
+				</PanelBody>
+				<PanelBody title={ __( 'Link Settings' ) }>
+					<SelectControl
+						label={ __( 'Link To' ) }
+						value={ linkDestination }
+						options={ this.getLinkDestinationOptions() }
+						onChange={ this.onSetLinkDestination }
+					/>
+					<TextControl
+						label={ __( 'Link URL' ) }
+						value={ href || '' }
+						onChange={ this.onSetCustomHref }
+						placeholder={ ! isLinkUrlInputDisabled && 'https://' }
+						disabled={ isLinkUrlInputDisabled }
+					/>
 				</PanelBody>
 			</InspectorControls>
 		);

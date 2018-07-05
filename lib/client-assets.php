@@ -1210,7 +1210,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		);
 	}
 
-	if ( ! empty( $color_palette ) ) {
+	if ( false !== $color_palette ) {
 		$editor_settings['colors'] = editor_color_palette_slugs( $color_palette );
 	}
 
