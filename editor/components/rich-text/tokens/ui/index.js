@@ -10,7 +10,7 @@ import { withSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import './style.scss';
-import { InserterResultsPortal } from '../../../inserter';
+import InserterResultsPortal from '../../../inserter/results-portal';
 
 class TokenUI extends Component {
 	constructor() {

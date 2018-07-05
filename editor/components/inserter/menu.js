@@ -27,7 +27,12 @@ import {
 	PanelBody,
 	withSafeTimeout,
 } from '@wordpress/components';
-import { getCategories, isSharedBlock } from '@wordpress/blocks';
+import {
+	createBlock,
+	getCategories,
+	isSharedBlock,
+	isUnmodifiedDefaultBlock,
+} from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 
 /**
@@ -276,22 +281,45 @@ export class InserterMenu extends Component {
 }
 
 export default compose(
-	withSelect( ( select, { rootUID } ) => {
+	withSelect( ( select ) => {
 		const {
 			getChildBlockNames,
 		} = select( 'core/blocks' );
 		const {
+			getBlockInsertionPoint,
 			getBlockName,
+			getInserterItems,
+			getSelectedBlock,
 		} = select( 'core/editor' );
+		const insertionPoint = getBlockInsertionPoint();
+		const { rootUID } = insertionPoint;
 		const rootBlockName = getBlockName( rootUID );
 		return {
+			insertionPoint,
+			items: getInserterItems( rootUID ),
 			rootChildBlocks: getChildBlockNames( rootBlockName ),
+			rootUID,
+			selectedBlock: getSelectedBlock(),
 		};
 	} ),
-	withDispatch( ( dispatch ) => ( {
+	withDispatch( ( dispatch, ownProps ) => ( {
 		fetchSharedBlocks: dispatch( 'core/editor' ).fetchSharedBlocks,
 		showInsertionPoint: dispatch( 'core/editor' ).showInsertionPoint,
 		hideInsertionPoint: dispatch( 'core/editor' ).hideInsertionPoint,
+		onSelect: ( item ) => {
+			const { insertionPoint, onClose, selectedBlock } = ownProps;
+			const { index, rootUID, layout } = insertionPoint;
+			const { name, initialAttributes } = item;
+			const insertedBlock = createBlock( name, { ...initialAttributes, layout } );
+			if ( selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
+				dispatch( 'core/editor' ).replaceBlocks( selectedBlock.uid, insertedBlock );
+			} else {
+				dispatch( 'core/editor' ).insertBlock( insertedBlock, index, rootUID );
+			}
+			if ( onClose ) {
+				onClose();
+			}
+		},
 	} ) ),
 	withSpokenMessages,
 	withInstanceId,
