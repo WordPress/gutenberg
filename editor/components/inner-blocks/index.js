@@ -28,9 +28,12 @@ class InnerBlocks extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { template, block } = this.props;
+		const { template, templateLock, block } = this.props;
 
 		this.updateNestedSettings();
+		if ( templateLock !== 'all' && block.innerBlocks && block.innerBlocks.length > 0 ) {
+			return;
+		}
 
 		const hasTemplateChanged = ! isEqual( template, prevProps.template );
 		const isTemplateInnerBlockMismatch = (
