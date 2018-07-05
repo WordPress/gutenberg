@@ -76,7 +76,6 @@ export const settings = {
 	save( { attributes } ) {
 		const { autoplay, caption, controls, loop, muted, src } = attributes;
 		return (
-
 			<figure>
 				{ src && (
 					<video
@@ -87,7 +86,7 @@ export const settings = {
 						muted={ muted }
 					/>
 				) }
-				{ caption && caption.length && (
+				{ caption && caption.length > 0 && (
 					<RichText.Content tagName="figcaption" value={ caption } />
 				) }
 			</figure>

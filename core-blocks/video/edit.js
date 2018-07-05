@@ -102,16 +102,11 @@ class VideoEdit extends Component {
 					</Toolbar>
 				</BlockControls>
 				<InspectorControls>
-					<PanelBody title={ __( 'Playback Controls' ) }>
+					<PanelBody title={ __( 'Video Options' ) }>
 						<ToggleControl
 							label={ __( 'Autoplay' ) }
 							onChange={ this.toggleAttribute( 'autoplay' ) }
 							checked={ autoplay }
-						/>
-						<ToggleControl
-							label={ __( 'Controls' ) }
-							onChange={ this.toggleAttribute( 'controls' ) }
-							checked={ controls }
 						/>
 						<ToggleControl
 							label={ __( 'Loop' ) }
@@ -122,6 +117,11 @@ class VideoEdit extends Component {
 							label={ __( 'Muted' ) }
 							onChange={ this.toggleAttribute( 'muted' ) }
 							checked={ muted }
+						/>
+						<ToggleControl
+							label={ __( 'Playback Controls' ) }
+							onChange={ this.toggleAttribute( 'controls' ) }
+							checked={ controls }
 						/>
 					</PanelBody>
 				</InspectorControls>
