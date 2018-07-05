@@ -105,6 +105,7 @@ class AudioEdit extends Component {
 					<SelectControl
 						label={ __( 'Preload' ) }
 						value={ undefined !== preload ? preload : 'none' }
+						// `undefined` is required for the preload attribute to be unset.
 						onChange={ ( value ) => setAttributes( { preload: 'none' !== value ? value : undefined } ) }
 						options={ [
 							{ value: 'auto', label: __( 'Auto' ) },
