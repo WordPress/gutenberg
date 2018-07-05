@@ -113,7 +113,8 @@ class PlaylistEdit extends Component {
 								icon="edit"
 								label={ __( 'Media Library' ) }
 								onClick={ open }
-							> { __( 'Media Library' ) }
+							>
+								{ __( 'Media Library' ) }
 							</IconButton>
 						) }
 					/>
