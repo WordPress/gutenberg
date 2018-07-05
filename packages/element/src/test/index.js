@@ -189,6 +189,7 @@ describe( 'element', () => {
 				const forwardedRef = props.forwardedRef || null;
 				return <input type="text" ref={ ref || forwardedRef }/>;
 			} );
+			LeafComponent.displayName = 'LeafComponent';
 			const TestComponent = compose(
 				createHigherOrderComponent(
 					( OriginalComponent ) => {
@@ -201,9 +202,29 @@ describe( 'element', () => {
 					'withTest'
 				),
 				createHigherOrderComponent(
-					( OriginalComponent ) => OriginalComponent,
+					( OriginalComponent ) => props => <OriginalComponent { ...props } />,
 					'withTest2'
-				)
+				),
+			)( LeafComponent );
+			// this verifies that if a HOC not passing a ref is in the compose chain,
+			// things still work.
+			const TestComponentReversed = compose(
+				createHigherOrderComponent(
+					( OriginalComponent ) => props => {
+						return <OriginalComponent { ...props } />;
+					},
+					'withTest2'
+				),
+				createHigherOrderComponent(
+					( OriginalComponent ) => {
+						return class extends Component {
+							render() {
+								return <OriginalComponent ref={ this.props.forwardedRef } />;
+							}
+						};
+					},
+					'withTest'
+				),
 			)( LeafComponent );
 			class MainComponent extends Component {
 				constructor() {
@@ -212,7 +233,9 @@ describe( 'element', () => {
 					this.setInput = this.setInput.bind( this );
 				}
 				componentDidMount() {
-					this.input.focus();
+					if ( this.input.focus ) {
+						this.input.focus();
+					}
 				}
 
 				setInput( el ) {
@@ -223,22 +246,30 @@ describe( 'element', () => {
 					return <TestComponent ref={ this.setInput } />;
 				}
 			}
+			class MainComponentReversed extends MainComponent {
+				render() {
+					return <TestComponentReversed ref={ this.setInput } />;
+				}
+			}
 			let focused = false;
-			TestRenderer.create(
-				<MainComponent />,
+			const NODE_MOCK = {
+				createNodeMock: ( element ) =>
 				{
-					createNodeMock: ( element ) => {
-						if ( element.type === 'input' ) {
-							//mock focus function
-							return {
-								focus: () => {
-									focused = true;
-								}
+					if ( element.type === 'input' ) {
+						//mock focus function
+						return {
+							focus: () => {
+								focused = true;
 							}
 						}
 					}
-				} );
-			console.assert( focused === true );
+				}
+			};
+			TestRenderer.create( <MainComponent />, NODE_MOCK );
+			expect( focused ).toBe( true );
+			focused = false;
+			TestRenderer.create( <MainComponentReversed/>, NODE_MOCK );
+			expect( focused ).toBe( true );
 		} );
 	} );
 
