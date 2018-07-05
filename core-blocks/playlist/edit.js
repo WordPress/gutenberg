@@ -122,7 +122,6 @@ class PlaylistEdit extends Component {
 			);
 		}
 
-		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<Fragment>
 				<BlockControls>
@@ -181,7 +180,6 @@ class PlaylistEdit extends Component {
 				</figure>
 			</Fragment>
 		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}
 }
 
