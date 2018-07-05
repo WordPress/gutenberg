@@ -25,9 +25,11 @@ export function PostSchedule( { date, onUpdateDate } ) {
 		<DateTimePicker
 			key="date-time-picker"
 			currentDate={ date }
+			utcOffset={ settings.timezone.offset }
 			onChange={ onUpdateDate }
 			locale={ settings.l10n.locale }
 			is12Hour={ is12HourTime }
+			showTodayButton
 		/>
 	);
 }

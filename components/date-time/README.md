@@ -26,9 +26,11 @@ function selectTime( date, onUpdateDate ) {
 	return (
 		<DateTimePicker
 		    currentDate={ date }
+		    utcOffset={ settings.timezone.offset }
 		    onChange={ onUpdateDate }
 		    locale={ settings.l10n.locale }
 		    is12Hour={ is12HourTime }
+		    showTodayButton
 		    />
 	);
 }
@@ -53,6 +55,13 @@ The function called when a new date or time has been selected. It is passed the 
 - Required: No
 - Default: `noop`
 
+### utcOffset
+
+The offset of current timezone. This prop is required if `showTodayButton` is true.
+
+- Type: `integer`
+- Required: No
+
 ### locale
 
 The localization for the display of the date and time.
@@ -63,6 +72,13 @@ The localization for the display of the date and time.
 ### is12Hour
 
 Whether the current timezone is a 12 hour time.
+
+- Type: `bool`
+- Required: No
+
+### showTodayButton
+
+Whether to display the "Today" button in the date-picker.
 
 - Type: `bool`
 - Required: No
