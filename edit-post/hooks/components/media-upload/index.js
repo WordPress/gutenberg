@@ -135,7 +135,7 @@ const getPlaylistDetailsMediaFrame = () => {
 					type: 'video',
 					collectionType: 'playlist',
 					title: wp.media.view.l10n.addToVideoPlaylistTitle,
-				}	),
+				} ),
 
 			] );
 		},
