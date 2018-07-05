@@ -223,12 +223,6 @@ export function createHigherOrderComponent( mapComponentToEnhancedComponent,
 		const EnhancedComponent = forwardRef(
 			( props, ref ) => {
 				const forwardedRef = props.forwardedRef || ref;
-				if ( ref !== null ) {
-					return <WrappedComponent
-						{ ...props }
-						forwardedRef={ forwardedRef }
-					/>;
-				}
 				return <WrappedComponent { ...props } forwardedRef={ forwardedRef || noop } />;
 			}
 		);
