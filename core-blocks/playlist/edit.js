@@ -106,7 +106,7 @@ class PlaylistEdit extends Component {
 						type={ type }
 						multiple
 						playlist
-						value={ this.props.attributes.ids }
+						value={ mediaIds }
 						render={ ( { open } ) => (
 							<IconButton
 								isLarge
