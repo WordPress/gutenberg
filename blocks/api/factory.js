@@ -12,6 +12,7 @@ import {
 	filter,
 	first,
 	flatMap,
+	uniq,
 } from 'lodash';
 
 /**
@@ -124,19 +125,19 @@ const isPossibleTransformForSource = ( transform, direction, sourceBlock, isMult
 };
 
 /**
- * Returns the names of the blocks that the source block can be transformed
- * into, based on 'from' transforms on other blocks.
+ * Returns block types that the source block can be transformed into, based on
+ * 'from' transforms on other blocks.
  *
  * @param {Object}  sourceBlock  The instance of the source block.
  * @param {boolean} isMultiBlock Have multiple blocks been selected?
  *
- * @return {Array} An array of block names
+ * @return {Array} Block types that the source block can be transformed into
  */
-const getPossibleFromTransformsForSource = ( sourceBlock, isMultiBlock = false ) => {
+const getBlockTypesForPossibleFromTransforms = ( sourceBlock, isMultiBlock = false ) => {
 	const allBlockTypes = getBlockTypes();
 
 	// filter all blocks to find those with a 'from' transform
-	const blocksWithPossibleFromTransforms = filter(
+	const blockTypesWithPossibleFromTransforms = filter(
 		allBlockTypes,
 		( blockType ) => {
 			const fromTransforms = getBlockTransforms( 'from', blockType.name );
@@ -148,19 +149,19 @@ const getPossibleFromTransformsForSource = ( sourceBlock, isMultiBlock = false )
 		},
 	);
 
-	return blocksWithPossibleFromTransforms.map( ( type ) => type.name );
+	return blockTypesWithPossibleFromTransforms;
 };
 
 /**
- * Returns the names of blocks that the source block can be transformed
- * into, based on its own 'to' transforms
+ * Returns block types that the source block can be transformed into, based on
+ * its own 'to' transforms
  *
  * @param {Object} sourceBlock The instance of the source block
  * @param {boolean} isMultiBlock Have multiple blocks been selected?
  *
- * @return {Array} An array of block names that the source can transform into
+ * @return {Array} Block types that the source can transform into
  */
-const getPossibleToTransformsForSource = ( sourceBlock, isMultiBlock = false ) => {
+const getBlockTypesForPossibleToTransforms = ( sourceBlock, isMultiBlock = false ) => {
 	const blockType = getBlockType( sourceBlock.name );
 	const transformsTo = getBlockTransforms( 'to', blockType.name );
 
@@ -171,10 +172,12 @@ const getPossibleToTransformsForSource = ( sourceBlock, isMultiBlock = false ) =
 	);
 
 	// Build a list of block names using the possible 'to' transforms
-	return flatMap(
+	const blockNames = flatMap(
 		possibleTransforms,
 		( transformation ) => transformation.blocks
 	);
+
+	return blockNames.map( ( name ) => getBlockType( name ) );
 };
 
 /**
@@ -195,20 +198,13 @@ export function getPossibleBlockTransformations( blocks ) {
 		return [];
 	}
 
-	const blocksToBeTransformedFrom = getPossibleFromTransformsForSource( sourceBlock, isMultiBlock );
-	const blocksToBeTransformedTo = getPossibleToTransformsForSource( sourceBlock, isMultiBlock );
+	const blockTypesForFromTransforms = getBlockTypesForPossibleFromTransforms( sourceBlock, isMultiBlock );
+	const blockTypesForToTransforms = getBlockTypesForPossibleToTransforms( sourceBlock, isMultiBlock );
 
-	// Returns a unique list of available block transformations.
-	return reduce( [
-		...blocksToBeTransformedFrom,
-		...blocksToBeTransformedTo,
-	], ( result, name ) => {
-		const transformBlockType = getBlockType( name );
-		if ( transformBlockType && ! includes( result, transformBlockType ) ) {
-			result.push( transformBlockType );
-		}
-		return result;
-	}, [] );
+	return uniq( [
+		...blockTypesForFromTransforms,
+		...blockTypesForToTransforms,
+	] );
 }
 
 /**
