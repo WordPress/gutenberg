@@ -39,4 +39,35 @@ export function setupHearthbeatPostLocking() {
 			}
 		}
 	} );
+
+	// Unlock the post when the window is closed or exited.
+	$(window).on( 'unload.edit-post', function( event ) {
+
+		// Make sure we process only the main document unload.
+		if ( event.target && event.target.nodeName != '#document' ) {
+			return;
+		}
+
+		var postID = $('#post_ID').val();
+		var postLock = $('#active_post_lock').val();
+
+		if ( ! postID || ! postLock ) {
+			return;
+		}
+
+		var data = {
+			action: 'wp-remove-post-lock',
+			_wpnonce: $('#_wpnonce').val(),
+			post_ID: postID,
+			active_post_lock: postLock
+		};
+
+		$.post({
+			async: false,
+			data: data,
+			url: ajaxurl
+		});
+	});
+
+
 }
