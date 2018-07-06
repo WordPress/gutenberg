@@ -1,5 +1,5 @@
+/* global ajaxurl */
 export function setupHearthbeatPostLocking() {
-
 	/**
 	 * Configure Heartbeat post locks.
 	 *
@@ -41,33 +41,30 @@ export function setupHearthbeatPostLocking() {
 	} );
 
 	// Unlock the post when the window is closed or exited.
-	$(window).on( 'unload.edit-post', function( event ) {
+	jQuery( window ).on( 'unload.edit-post', function( event ) {
+		const postID = jQuery( '#post_ID' ).val();
+		const postLock = jQuery( '#active_post_lock' ).val();
 
 		// Make sure we process only the main document unload.
-		if ( event.target && event.target.nodeName != '#document' ) {
+		if ( event.target && event.target.nodeName !== '#document' ) {
 			return;
 		}
-
-		var postID = $('#post_ID').val();
-		var postLock = $('#active_post_lock').val();
 
 		if ( ! postID || ! postLock ) {
 			return;
 		}
 
-		var data = {
+		const data = {
 			action: 'wp-remove-post-lock',
-			_wpnonce: $('#_wpnonce').val(),
+			_wpnonce: jQuery( '#_wpnonce' ).val(),
 			post_ID: postID,
-			active_post_lock: postLock
+			active_post_lock: postLock,
 		};
 
-		$.post({
+		jQuery.post( {
 			async: false,
 			data: data,
-			url: ajaxurl
-		});
-	});
-
-
+			url: ajaxurl,
+		} );
+	} );
 }
