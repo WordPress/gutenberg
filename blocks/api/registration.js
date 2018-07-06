@@ -17,6 +17,8 @@ import deprecated from '@wordpress/deprecated';
  */
 import { isIconUnreadable, isValidIcon, normalizeIconObject } from './utils';
 
+const forwardRefSymbol = Symbol.for('react.forward_ref');
+
 /**
  * Defined behavior of a block type.
  *
@@ -101,10 +103,14 @@ export function registerBlockType( name, settings ) {
 		return;
 	}
 	if ( 'edit' in settings && ! isFunction( settings.edit ) ) {
-		console.error(
-			'The "edit" property must be a valid function.'
-		);
-		return;
+		if ( settings.edit.$$typeof && settings.edit.$$typeof === forwardRefSymbol && isFunction( settings.edit.render ) ) {
+			//set the edit to the actual function
+		} else {
+			console.error(
+				'The "edit" property must be a valid function.'
+			);
+			return;
+		}
 	}
 	if ( 'keywords' in settings && settings.keywords.length > 3 ) {
 		console.error(
