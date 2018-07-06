@@ -66,5 +66,11 @@ describe( 'Multi-block selection', () => {
 
 		// No selection
 		await expectMultiSelected( blocks, false );
+
+		// Select all via double shortcut.
+		await page.click( firstBlockSelector );
+		await pressWithModifier( 'Mod', 'a' );
+		await pressWithModifier( 'Mod', 'a' );
+		await expectMultiSelected( blocks, true );
 	} );
 } );
