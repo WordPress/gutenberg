@@ -1,4 +1,4 @@
-export function setupHearthbeat() {
+export function setupHearthbeatPostLocking() {
 
 	/**
 	 * Configure Heartbeat post locks.
