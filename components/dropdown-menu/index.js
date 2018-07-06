@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { keycodes } from '@wordpress/utils';
+import { DOWN } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -16,8 +16,6 @@ import IconButton from '../icon-button';
 import Dashicon from '../dashicon';
 import Dropdown from '../dropdown';
 import { NavigableMenu } from '../navigable-container';
-
-const { DOWN } = keycodes;
 
 function DropdownMenu( {
 	icon = 'menu',
@@ -54,6 +52,7 @@ function DropdownMenu( {
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
 						label={ label }
+						tooltip={ label }
 					>
 						<Dashicon icon="arrow-down" />
 					</IconButton>

@@ -4,9 +4,10 @@ BEFORE POSTING YOUR ISSUE:
 - Try to add as much detail as possible. Be specific!
 - Please add the version of Gutenberg you are using in the description.
 - If you're requesting a new feature, explain why you'd like it to be added.
-- Search this repository for the issue and whether it has been fixed or reported already.
+- Search this repository for issues and pull requests and whether it has been fixed or reported already.
 - Ensure you are using the latest code before logging bugs.
 - Disable all plugins to ensure it's not a plugin conflict issue.
+- To report a security issue, please visit the WordPress HackerOne program: https://hackerone.com/wordpress.
 -->
 
 ## Issue Overview

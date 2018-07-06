@@ -231,15 +231,18 @@ editor interface where blocks are implemented.
 
 - `title: string` - A human-readable
   [localized](https://codex.wordpress.org/I18n_for_WordPress_Developers#Handling_JavaScript_files)
-  label for the block. Shown in the block picker.
-- `icon: string | WPElement | Function` - Slug of the
+  label for the block. Shown in the block inserter.
+- `icon: string | WPElement | Function | Object` - Slug of the
   [Dashicon](https://developer.wordpress.org/resource/dashicons/#awards)
   to be shown in the control's button, or an element (or function returning an
   element) if you choose to render your own SVG.
+  An object can also be passed, in this case, icon, as specified above, should be included in the src property.
+  Besides src the object can contain background and foreground colors, this colors will appear with the icon
+  when they are applicable e.g.: in the inserter.
 - `attributes: Object | Function` - An object of attribute schemas, where the
   keys of the object define the shape of attributes, and each value an object
   schema describing the `type`, `default` (optional), and
-  [`source`](https://wordpress.org/gutenberg/handbook/reference/attributes/)
+  [`source`](https://wordpress.org/gutenberg/handbook/block-api/attributes/)
   (optional) of the attribute. If `source` is omitted, the attribute is
   serialized into the block's comment delimiters. Alternatively, define
   `attributes` as a function which returns the attributes object.
@@ -250,9 +253,9 @@ editor interface where blocks are implemented.
   editor. A block can update its own state in response to events using the
   `setAttributes` function, passing an object of properties to be applied as a
   partial update.
-- `save( { attributes: Object } ): WPElement | String` - Returns an element
-  describing the markup of a block to be saved in the published content. This
-  function is called before save and when switching to an editor's HTML view.
+- `save( { attributes: Object } ): WPElement` - Returns an element describing
+  the markup of a block to be saved in the published content. This function is
+  called before save and when switching to an editor's HTML view.
 - `keywords` - An optional array of keywords used to filter the block list.
 
 ### `wp.blocks.getBlockType( name: string )`
@@ -263,121 +266,3 @@ Returns type definitions associated with a registered block.
 
 Returns settings associated with a registered control.
 
-## Components
-
-Because many blocks share the same complex behaviors, the following components
-are made available to simplify implementations of your block's `edit` function.
-
-### `BlockControls`
-
-When returned by your block's `edit` implementation, renders a toolbar of icon
-buttons. This is useful for block-level modifications to be made available when
-a block is selected. For example, if your block supports alignment, you may
-want to display alignment options in the selected block's toolbar.
-
-Because the toolbar should only be shown when the block is selected, it is
-important that a `BlockControls` element is only returned when the block's
-`focus` prop is
-[truthy](https://developer.mozilla.org/en-US/docs/Glossary/Truthy),
-meaning that focus is currently within the block.
-
-Example:
-
-```js
-( function( blocks, element ) {
-	var el = element.createElement,
-		BlockControls = blocks.BlockControls,
-		AlignmentToolbar = blocks.AlignmentToolbar;
-
-	function edit( props ) {
-		return [
-			// Controls: (only visible when focused)
-			props.focus && (
-				el( BlockControls, { key: 'controls' },
-					el( AlignmentToolbar, {
-						value: props.align,
-						onChange: function( nextAlign ) {
-							props.setAttributes( { align: nextAlign } )
-						}
-					} )
-				)
-			),
-
-			// Block content: (with alignment as attribute)
-			el( 'p', { key: 'text', style: { textAlign: props.align } },
-				'Hello World!'
-			),
-		];
-	}
-} )(
-	window.wp.blocks,
-	window.wp.element
-);
-```
-
-Note in this example that we render `AlignmentToolbar` as a child of the
-`BlockControls` element. This is another pre-configured component you can use
-to simplify block text alignment.
-
-Alternatively, you can create your own toolbar controls by passing an array of
-`controls` as a prop to the `BlockControls` component. Each control should be
-an object with the following properties:
-
-- `icon: string` - Slug of the Dashicon to be shown in the control's toolbar button
-- `title: string` - A human-readable localized text to be shown as the tooltip label of the control's button
-- `subscript: ?string` - Optional text to be shown adjacent the button icon as subscript (for example, heading levels)
-- `isActive: ?boolean` - Whether the control should be considered active / selected. Defaults to `false`.
-
-To create divisions between sets of controls within the same `BlockControls`
-element, passing `controls` instead as a nested array (array of arrays of
-objects). A divider will be shown between each set of controls.
-
-### `Editable`
-
-Render a rich
-[`contenteditable` input](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content),
-providing users the option to add emphasis to content or links to content. It
-behaves similarly to a
-[controlled component](https://facebook.github.io/react/docs/forms.html#controlled-components),
-except that `onChange` is triggered less frequently than would be expected from
-a traditional `input` field, usually when the user exits the field.
-
-The following properties (non-exhaustive list) are made available:
-
-- `value: string` - Markup value of the editable field. Only valid markup is
-  allowed, as determined by `inline` value and available controls.
-- `onChange: Function` - Callback handler when the value of the field changes,
-  passing the new value as its only argument.
-- `placeholder: string` - A text hint to be shown to the user when the field
-  value is empty, similar to the
-  [`input` and `textarea` attribute of the same name](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/HTML5_updates#The_placeholder_attribute).
-- `multiline: String` - A tag name to use for the tag that should be inserted
-  when Enter is pressed.  For example: `li` in a list block, and `p` for a
-	block that can contain multiple paragraphs.  The default is that only inline
-	elements are allowed to be used in inserted into the text, effectively
-  disabling the behavior of the "Enter" key.
-
-Example:
-
-```js
-( function( blocks, element ) {
-	var el = element.createElement,
-		Editable = blocks.Editable;
-
-	function edit( props ) {
-		function onChange( value ) {
-			props.setAttributes( { text: value } );
-		}
-
-		return el( Editable, {
-			value: props.attributes.text,
-			onChange: onChange
-		} );
-	}
-
-	// blocks.registerBlockType( ..., { edit: edit, ... } );
-} )(
-	window.wp.blocks,
-	window.wp.element
-);
-```

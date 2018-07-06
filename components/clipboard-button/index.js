@@ -12,7 +12,8 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { Button } from '../';
+import IconButton from '../icon-button';
+import Button from '../button';
 
 class ClipboardButton extends Component {
 	constructor() {
@@ -38,6 +39,7 @@ class ClipboardButton extends Component {
 	componentWillUnmount() {
 		this.clipboard.destroy();
 		delete this.clipboard;
+		clearTimeout( this.onCopyTimeout );
 	}
 
 	bindContainer( container ) {
@@ -50,9 +52,17 @@ class ClipboardButton extends Component {
 		// kept within the rendered node.
 		args.clearSelection();
 
-		const { onCopy } = this.props;
+		const { onCopy, onFinishCopy } = this.props;
 		if ( onCopy ) {
 			onCopy();
+			// For convenience and consistency, ClipboardButton offers to call
+			// a secondary callback with delay. This is useful to reset
+			// consumers' state, e.g. to revert a label from "Copied" to
+			// "Copy".
+			if ( onFinishCopy ) {
+				clearTimeout( this.onCopyTimeout );
+				this.onCopyTimeout = setTimeout( onFinishCopy, 4000 );
+			}
 		}
 	}
 
@@ -68,14 +78,25 @@ class ClipboardButton extends Component {
 	render() {
 		// Disable reason: Exclude from spread props passed to Button
 		// eslint-disable-next-line no-unused-vars
-		const { className, children, onCopy, text, ...buttonProps } = this.props;
+		const { className, children, onCopy, onFinishCopy, text, ...buttonProps } = this.props;
+		const { icon } = buttonProps;
 		const classes = classnames( 'components-clipboard-button', className );
+		const ComponentToUse = icon ? IconButton : Button;
+
+		// Workaround for inconsistent behavior in Safari, where <textarea> is not
+		// the document.activeElement at the moment when the copy event fires.
+		// This causes documentHasSelection() in the copy-handler component to
+		// mistakenly override the ClipboardButton, and copy a serialized string
+		// of the current block instead.
+		const focusOnCopyEventTarget = ( event ) => {
+			event.target.focus();
+		};
 
 		return (
-			<span ref={ this.bindContainer }>
-				<Button { ...buttonProps } className={ classes }>
+			<span ref={ this.bindContainer } onCopy={ focusOnCopyEventTarget }>
+				<ComponentToUse { ...buttonProps } className={ classes }>
 					{ children }
-				</Button>
+				</ComponentToUse>
 			</span>
 		);
 	}

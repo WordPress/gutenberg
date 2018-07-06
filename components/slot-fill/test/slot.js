@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { mount } from 'enzyme';
+import { isEmpty } from 'lodash';
 
 /**
  * Internal dependencies
@@ -40,7 +41,7 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div></div>' );
+		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation"></div>' );
 	} );
 
 	it( 'should render a string Fill', () => {
@@ -53,7 +54,7 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div>content</div>' );
+		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation">content</div>' );
 	} );
 
 	it( 'should render a Fill containing an element', () => {
@@ -66,7 +67,7 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div><span></span></div>' );
+		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation"><span></span></div>' );
 	} );
 
 	it( 'should render a Fill containing an array', () => {
@@ -79,7 +80,64 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div><span></span><div></div>text</div>' );
+		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation"><span></span><div></div>text</div>' );
+	} );
+
+	it( 'calls the functions passed as the Slot\'s fillProps in the Fill', () => {
+		const onClose = jest.fn();
+
+		const element = mount(
+			<Provider>
+				<Slot name="chicken" fillProps={ { onClose } } />
+				<Fill name="chicken">
+					{ ( props ) => {
+						return (
+							<button onClick={ props.onClose }>Click me</button>
+						);
+					} }
+				</Fill>
+			</Provider>
+		);
+
+		element.find( 'button' ).simulate( 'click' );
+
+		expect( onClose ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'should render empty Fills without HTML wrapper when render props used', () => {
+		const element = mount(
+			<Provider>
+				<Slot name="chicken">
+					{ ( fills ) => ( ! isEmpty( fills ) && (
+						<blockquote>
+							{ fills }
+						</blockquote>
+					) ) }
+				</Slot>
+				<Fill name="chicken" />
+			</Provider>
+		);
+
+		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation"></div>' );
+	} );
+
+	it( 'should render a string Fill with HTML wrapper when render props used', () => {
+		const element = mount(
+			<Provider>
+				<Slot name="chicken">
+					{ ( fills ) => ( fills && (
+						<blockquote>
+							{ fills }
+						</blockquote>
+					) ) }
+				</Slot>
+				<Fill name="chicken">
+					content
+				</Fill>
+			</Provider>
+		);
+
+		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation"><blockquote>content</blockquote></div>' );
 	} );
 
 	it( 'should re-render Slot when not bubbling virtually', () => {
@@ -90,11 +148,11 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div>1</div>' );
+		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation">1</div>' );
 
 		element.find( 'button' ).simulate( 'click' );
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div>2</div>' );
+		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation">2</div>' );
 	} );
 
 	it( 'should render in expected order', () => {
@@ -127,6 +185,6 @@ describe( 'Slot', () => {
 			],
 		} );
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div>firstsecond</div>' );
+		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation">firstsecond</div>' );
 	} );
 } );

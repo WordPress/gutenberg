@@ -17,20 +17,20 @@ define( 'ABSPATH', $abspath ? $abspath : dirname( dirname( dirname( dirname( dir
 define( 'WPINC', 'wp-includes' );
 define( 'WP_SETUP_CONFIG', true );
 define( 'WP_USE_THEMES', false );
-require_once( ABSPATH . WPINC . '/load.php' );
-require_once( ABSPATH . WPINC . '/default-constants.php' );
+require_once ABSPATH . WPINC . '/load.php';
+require_once ABSPATH . WPINC . '/default-constants.php';
 wp_fix_server_vars();
 wp_initial_constants();
-require_once( ABSPATH . WPINC . '/functions.php' );
+require_once ABSPATH . WPINC . '/functions.php';
 wp_load_translations_early();
 wp_set_lang_dir();
-require_once( dirname( dirname( __FILE__ ) ) . '/lib/blocks.php' );
-require_once( dirname( dirname( __FILE__ ) ) . '/lib/class-wp-block-type-registry.php' );
-require_once( dirname( dirname( __FILE__ ) ) . '/lib/class-wp-block-type.php' );
-require_once( dirname( dirname( __FILE__ ) ) . '/lib/client-assets.php' );
+require_once dirname( dirname( __FILE__ ) ) . '/lib/blocks.php';
+require_once dirname( dirname( __FILE__ ) ) . '/lib/class-wp-block-type-registry.php';
+require_once dirname( dirname( __FILE__ ) ) . '/lib/class-wp-block-type.php';
+require_once dirname( dirname( __FILE__ ) ) . '/lib/client-assets.php';
 
 // Register server-side code for individual blocks.
-foreach ( glob( dirname( dirname( __FILE__ ) ) . '/blocks/library/*/index.php' ) as $block_logic ) {
+foreach ( glob( dirname( dirname( __FILE__ ) ) . '/core-blocks/*/index.php' ) as $block_logic ) {
 	require_once $block_logic;
 }
 

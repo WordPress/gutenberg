@@ -1,26 +1,8 @@
-/**
- * External dependencies
- */
-import moment from 'moment-timezone';
-import 'moment-timezone/moment-timezone-utils';
-
-/**
- * WordPress dependencies
- */
-import { render, unmountComponentAtNode } from '@wordpress/element';
-import { settings as dateSettings } from '@wordpress/date';
-
-/**
- * Internal dependencies
- */
-import './assets/stylesheets/main.scss';
-import Layout from './edit-post/layout';
-import { EditorProvider, ErrorBoundary } from './components';
-import { initializeMetaBoxState } from './store/actions';
+import './store';
 import { setupHearthbeat } from './utils/heartbeat';
 
 export * from './components';
-import store from './store'; // Registers the state tree
+export * from './utils';
 
 // Configure moment globally
 moment.locale( dateSettings.l10n.locale );

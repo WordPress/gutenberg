@@ -1,92 +1,54 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import {
 	getBlockType,
-	getUnknownTypeHandlerName,
 	createBlock,
+	rawHandler,
 } from '@wordpress/blocks';
+import { withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { replaceBlock } from '../../store/actions';
 import Warning from '../warning';
 
-function InvalidBlockWarning( { ignoreInvalid, switchToBlockType } ) {
-	const htmlBlockName = 'core/html';
-	const defaultBlockType = getBlockType( getUnknownTypeHandlerName() );
-	const htmlBlockType = getBlockType( htmlBlockName );
-	const switchTo = ( blockType ) => () => switchToBlockType( blockType );
+function InvalidBlockWarning( { convertToHTML, convertToBlocks } ) {
+	const hasHTMLBlock = !! getBlockType( 'core/html' );
 
 	return (
-		<Warning>
-			<p>{ defaultBlockType && htmlBlockType && sprintf( __(
-				'This block appears to have been modified externally. ' +
-				'Overwrite the external changes or Convert to %s or %s to keep ' +
-				'your changes.'
-			), defaultBlockType.title, htmlBlockType.title ) }</p>
-			<p>
-				<Button
-					onClick={ ignoreInvalid }
-					isLarge
-				>
-					{ sprintf( __( 'Overwrite' ) ) }
-				</Button>
-				{ defaultBlockType && (
-					<Button
-						onClick={ switchTo( defaultBlockType ) }
-						isLarge
-					>
-						{
-							/* translators: Revert invalid block to another block type */
-							sprintf( __( 'Convert to %s' ), defaultBlockType.title )
-						}
+		<Warning
+			actions={ [
+				<Button key="convert" onClick={ convertToBlocks } isLarge isPrimary={ ! hasHTMLBlock }>
+					{ __( 'Convert to Blocks' ) }
+				</Button>,
+				hasHTMLBlock && (
+					<Button key="edit" onClick={ convertToHTML } isLarge isPrimary>
+						{ __( 'Edit as HTML' ) }
 					</Button>
-				) }
-
-				{ htmlBlockType && (
-					<Button
-						onClick={ switchTo( htmlBlockType ) }
-						isLarge
-					>
-						{
-							sprintf( __( 'Edit as HTML block' ) )
-						}
-					</Button>
-				) }
-			</p>
+				),
+			] }
+		>
+			{ __( 'This block appears to have been modified externally.' ) }
 		</Warning>
 	);
 }
 
-export default connect(
-	null,
-	( dispatch, ownProps ) => {
-		return {
-			ignoreInvalid() {
-				const { block } = ownProps;
-				const { name, attributes } = block;
-				const nextBlock = createBlock( name, attributes );
-				dispatch( replaceBlock( block.uid, nextBlock ) );
-			},
-			switchToBlockType( blockType ) {
-				const { block } = ownProps;
-				if ( blockType && block ) {
-					const nextBlock = createBlock( blockType.name, {
-						content: block.originalContent,
-					} );
-
-					dispatch( replaceBlock( block.uid, nextBlock ) );
-				}
-			},
-		};
-	}
-)( InvalidBlockWarning );
+export default withDispatch( ( dispatch, { block } ) => {
+	const { replaceBlock } = dispatch( 'core/editor' );
+	return {
+		convertToHTML() {
+			replaceBlock( block.uid, createBlock( 'core/html', {
+				content: block.originalContent,
+			} ) );
+		},
+		convertToBlocks() {
+			replaceBlock( block.uid, rawHandler( {
+				HTML: block.originalContent,
+				mode: 'BLOCKS',
+			} ) );
+		},
+	};
+} )( InvalidBlockWarning );

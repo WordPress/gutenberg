@@ -1,33 +1,38 @@
 .document-outline {
 	margin: 20px 0;
+
+	ul {
+		margin: 0;
+		padding: 0;
+	}
 }
 
 .document-outline__item {
 	display: flex;
 	margin: 4px 0;
 
-	.document-outline__emdash::before {
+	.document-outline__emdash:before {
 		color: $light-gray-500;
 		margin-right: 4px;
 	}
 
-	&.is-h2 .document-outline__emdash::before {
+	&.is-h2 .document-outline__emdash:before {
 		content: '—';
 	}
 
-	&.is-h3 .document-outline__emdash::before {
+	&.is-h3 .document-outline__emdash:before {
 		content: '——';
 	}
 
-	&.is-h4 .document-outline__emdash::before {
+	&.is-h4 .document-outline__emdash:before {
 		content: '———';
 	}
 
-	&.is-h5 .document-outline__emdash::before {
+	&.is-h5 .document-outline__emdash:before {
 		content: '————';
 	}
 
-	&.is-h6 .document-outline__emdash::before {
+	&.is-h6 .document-outline__emdash:before {
 		content: '—————';
 	}
 }
@@ -50,8 +55,8 @@
 	background: $light-gray-500;
 	color: $dark-gray-800;
 	border-radius: 3px;
-	font-size: 12px;
-	padding: 2px 6px;
+	font-size: $default-font-size;
+	padding: 1px 6px;
 	margin-right: 4px;
 
 	.is-invalid & {

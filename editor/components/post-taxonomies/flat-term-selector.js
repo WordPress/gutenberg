@@ -1,29 +1,29 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
-import { unescape as unescapeString, find, throttle } from 'lodash';
+import { isEmpty, get, unescape as unescapeString, find, throttle, uniqBy, invoke } from 'lodash';
+import { stringify } from 'querystring';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
-import { FormTokenField } from '@wordpress/components';
+import { __, _x, sprintf } from '@wordpress/i18n';
+import { Component, compose } from '@wordpress/element';
+import { FormTokenField, withAPIData } from '@wordpress/components';
+import { withSelect, withDispatch } from '@wordpress/data';
+import apiRequest from '@wordpress/api-request';
 
 /**
- * Internal dependencies
+ * Module constants
  */
-import { getEditedPostAttribute } from '../../store/selectors';
-import { editPost } from '../../store/actions';
-
 const DEFAULT_QUERY = {
-	per_page: 100,
+	per_page: -1,
 	orderby: 'count',
 	order: 'desc',
-	_fields: [ 'id', 'name' ],
+	_fields: 'id,name',
 };
 const MAX_TERMS_SUGGESTIONS = 20;
+const isSameTermName = ( termA, termB ) => termA.toLowerCase() === termB.toLowerCase();
 
 class FlatTermSelector extends Component {
 	constructor() {
@@ -39,9 +39,12 @@ class FlatTermSelector extends Component {
 	}
 
 	componentDidMount() {
-		if ( this.props.terms ) {
+		if ( ! isEmpty( this.props.terms ) ) {
 			this.setState( { loading: false } );
-			this.initRequest = this.fetchTerms( { include: this.props.terms } );
+			this.initRequest = this.fetchTerms( {
+				include: this.props.terms.join( ',' ),
+				per_page: 100,
+			} );
 			this.initRequest.then(
 				() => {
 					this.setState( { loading: false } );
@@ -60,22 +63,20 @@ class FlatTermSelector extends Component {
 	}
 
 	componentWillUnmount() {
-		this.initRequest.abort();
-		if ( this.searchRequest ) {
-			this.searchRequest.abort();
-		}
+		invoke( this.initRequest, [ 'abort' ] );
+		invoke( this.searchRequest, [ 'abort' ] );
 	}
 
-	componentWillReceiveProps( newProps ) {
-		if ( newProps.terms !== this.props.terms ) {
-			this.updateSelectedTerms( newProps.terms );
+	componentDidUpdate( prevProps ) {
+		if ( prevProps.terms !== this.props.terms ) {
+			this.updateSelectedTerms( this.props.terms );
 		}
 	}
 
 	fetchTerms( params = {} ) {
 		const query = { ...DEFAULT_QUERY, ...params };
-		const Collection = wp.api.getTaxonomyCollection( this.props.slug );
-		const request = new Collection().fetch( { data: query } );
+		const basePath = wp.api.getTaxonomyRoute( this.props.slug );
+		const request = apiRequest( { path: `/wp/v2/${ basePath }?${ stringify( query ) }` } );
 		request.then( ( terms ) => {
 			this.setState( ( state ) => ( {
 				availableTerms: state.availableTerms.concat(
@@ -89,10 +90,14 @@ class FlatTermSelector extends Component {
 	}
 
 	updateSelectedTerms( terms = [] ) {
-		const selectedTerms = terms.map( ( termId ) => {
+		const selectedTerms = terms.reduce( ( result, termId ) => {
 			const termObject = find( this.state.availableTerms, ( term ) => term.id === termId );
-			return termObject ? termObject.name : '';
-		} );
+			if ( termObject ) {
+				result.push( termObject.name );
+			}
+
+			return result;
+		}, [] );
 		this.setState( {
 			selectedTerms,
 		} );
@@ -101,94 +106,120 @@ class FlatTermSelector extends Component {
 	findOrCreateTerm( termName ) {
 		return new Promise( ( resolve, reject ) => {
 			// Tries to create a term or fetch it if it already exists
-			const Model = wp.api.getTaxonomyModel( this.props.slug );
-			new Model( { name: termName } ).save()
-				.then( resolve, ( xhr ) => {
-					const errorCode = xhr.responseJSON && xhr.responseJSON.code;
-					if ( errorCode === 'term_exists' ) {
-						return new Model( { id: xhr.responseJSON.data } )
-							.fetch().then( resolve, reject );
-					}
-					reject( xhr );
-				} );
+			const basePath = wp.api.getTaxonomyRoute( this.props.slug );
+			apiRequest( {
+				path: `/wp/v2/${ basePath }`,
+				method: 'POST',
+				data: { name: termName },
+			} ).then( resolve, ( xhr ) => {
+				const errorCode = xhr.responseJSON && xhr.responseJSON.code;
+				if ( errorCode === 'term_exists' ) {
+					// search the new category created since last fetch
+					this.addRequest = apiRequest( {
+						path: `/wp/v2/${ basePath }?${ stringify( { ...DEFAULT_QUERY, search: termName } ) }`,
+					} );
+					return this.addRequest.then( ( searchResult ) => {
+						resolve( find( searchResult, ( result ) => isSameTermName( result.name, termName ) ) );
+					}, reject );
+				}
+				reject( xhr );
+			} );
 		} );
 	}
 
 	onChange( termNames ) {
-		this.setState( { selectedTerms: termNames } );
-		const newTermNames = termNames.filter( ( termName ) =>
-			! find( this.state.availableTerms, ( term ) => term.name === termName )
+		const uniqueTerms = uniqBy( termNames, ( term ) => term.toLowerCase() );
+		this.setState( { selectedTerms: uniqueTerms } );
+		const newTermNames = uniqueTerms.filter( ( termName ) =>
+			! find( this.state.availableTerms, ( term ) => isSameTermName( term.name, termName ) )
 		);
 		const termNamesToIds = ( names, availableTerms ) => {
 			return names
 				.map( ( termName ) =>
-					find( availableTerms, ( term ) => term.name === termName ).id
+					find( availableTerms, ( term ) => isSameTermName( term.name, termName ) ).id
 				);
 		};
 
 		if ( newTermNames.length === 0 ) {
-			return this.props.onUpdateTerms( termNamesToIds( termNames, this.state.availableTerms ), this.props.restBase );
+			return this.props.onUpdateTerms( termNamesToIds( uniqueTerms, this.state.availableTerms ), this.props.restBase );
 		}
 		Promise
 			.all( newTermNames.map( this.findOrCreateTerm ) )
 			.then( ( newTerms ) => {
 				const newAvailableTerms = this.state.availableTerms.concat( newTerms );
 				this.setState( { availableTerms: newAvailableTerms } );
-				return this.props.onUpdateTerms( termNamesToIds( termNames, newAvailableTerms ), this.props.restBase );
+				return this.props.onUpdateTerms( termNamesToIds( uniqueTerms, newAvailableTerms ), this.props.restBase );
 			} );
 	}
 
 	searchTerms( search = '' ) {
-		if ( this.searchRequest ) {
-			this.searchRequest.abort();
-		}
+		invoke( this.searchRequest, [ 'abort' ] );
 		this.searchRequest = this.fetchTerms( { search } );
 	}
 
 	render() {
-		const { loading, availableTerms, selectedTerms } = this.state;
-		const { label, slug } = this.props;
-		const termNames = availableTerms.map( ( term ) => term.name );
+		const { slug, taxonomy, hasAssignAction } = this.props;
 
-		const newTermPlaceholderLabel = slug === 'post_tag' ? __( 'Add New Tag' ) : __( 'Add New Term' );
-		const termAddedLabel = slug === 'post_tag' ? __( 'Tag added' ) : __( 'Term added' );
-		const termRemovedLabel = slug === 'post_tag' ? __( 'Tag removed' ) : __( 'Term removed' );
-		const removeTermLabel = slug === 'post_tag' ? __( 'Remove Tag: %s' ) : __( 'Remove Term: %s' );
+		if ( ! hasAssignAction ) {
+			return null;
+		}
+
+		const { loading, availableTerms, selectedTerms } = this.state;
+		const termNames = availableTerms.map( ( term ) => term.name );
+		const newTermPlaceholderLabel = get(
+			taxonomy,
+			[ 'data', 'labels', 'add_new_item' ],
+			slug === 'post_tag' ? __( 'Add New Tag' ) : __( 'Add New Term' )
+		);
+		const singularName = get(
+			taxonomy,
+			[ 'data', 'labels', 'singular_name' ],
+			slug === 'post_tag' ? __( 'Tag' ) : __( 'Term' )
+		);
+		const termAddedLabel = sprintf( _x( '%s added', 'term' ), singularName );
+		const termRemovedLabel = sprintf( _x( '%s removed', 'term' ), singularName );
+		const removeTermLabel = sprintf( _x( 'Remove %s', 'term' ), singularName );
 
 		return (
-			<div className="editor-post-taxonomies__flat-terms-selector">
-				<h3 className="editor-post-taxonomies__flat-terms-selector-title">{ label }</h3>
-				<FormTokenField
-					value={ selectedTerms }
-					displayTransform={ unescapeString }
-					suggestions={ termNames }
-					onChange={ this.onChange }
-					onInputChange={ this.searchTerms }
-					maxSuggestions={ MAX_TERMS_SUGGESTIONS }
-					disabled={ loading }
-					placeholder={ newTermPlaceholderLabel }
-					messages={ {
-						added: termAddedLabel,
-						removed: termRemovedLabel,
-						remove: removeTermLabel,
-					} }
-				/>
-			</div>
+			<FormTokenField
+				value={ selectedTerms }
+				displayTransform={ unescapeString }
+				suggestions={ termNames }
+				onChange={ this.onChange }
+				onInputChange={ this.searchTerms }
+				maxSuggestions={ MAX_TERMS_SUGGESTIONS }
+				disabled={ loading }
+				placeholder={ newTermPlaceholderLabel }
+				messages={ {
+					added: termAddedLabel,
+					removed: termRemovedLabel,
+					remove: removeTermLabel,
+				} }
+			/>
 		);
 	}
 }
 
-export default connect(
-	( state, ownProps ) => {
+export default compose(
+	withAPIData( ( props ) => {
+		const { slug } = props;
 		return {
-			terms: getEditedPostAttribute( state, ownProps.restBase ),
+			taxonomy: `/wp/v2/taxonomies/${ slug }?context=edit`,
 		};
-	},
-	( dispatch ) => {
+	} ),
+	withSelect( ( select, ownProps ) => {
+		const { getCurrentPost } = select( 'core/editor' );
+		return {
+			hasCreateAction: get( getCurrentPost(), [ '_links', 'wp:action-create-' + ownProps.restBase ], false ),
+			hasAssignAction: get( getCurrentPost(), [ '_links', 'wp:action-assign-' + ownProps.restBase ], false ),
+			terms: select( 'core/editor' ).getEditedPostAttribute( ownProps.restBase ),
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
 		return {
 			onUpdateTerms( terms, restBase ) {
-				dispatch( editPost( { [ restBase ]: terms } ) );
+				dispatch( 'core/editor' ).editPost( { [ restBase ]: terms } );
 			},
 		};
-	}
+	} )
 )( FlatTermSelector );

@@ -6,7 +6,8 @@ import { mapValues, reduce, forEach, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, getWrapperDisplayName } from '@wordpress/element';
+import { Component, createHigherOrderComponent } from '@wordpress/element';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -14,36 +15,30 @@ import { Component, getWrapperDisplayName } from '@wordpress/element';
 import request, { getCachedResponse } from './request';
 import { getRoute } from './routes';
 
-export default ( mapPropsToData ) => ( WrappedComponent ) => {
+export default ( mapPropsToData ) => createHigherOrderComponent( ( WrappedComponent ) => {
 	class APIDataComponent extends Component {
 		constructor( props, context ) {
 			super( ...arguments );
-
-			this.state = {
-				dataProps: {},
-			};
-
 			this.schema = context.getAPISchema();
 			this.routeHelpers = mapValues( {
 				type: context.getAPIPostTypeRestBaseMapping(),
 				taxonomy: context.getAPITaxonomyRestBaseMapping(),
 			}, ( mapping ) => ( key ) => mapping[ key ] );
-		}
-
-		componentWillMount() {
+			this.state = {
+				dataProps: this.applyMapping( props ),
+			};
 			this.isStillMounted = true;
-			this.applyMapping( this.props );
 		}
 
 		componentDidMount() {
 			this.initializeFetchable( {} );
 		}
 
-		componentWillReceiveProps( nextProps ) {
-			this.applyMapping( nextProps );
-		}
-
 		componentDidUpdate( prevProps, prevState ) {
+			if ( ! isShallowEqual( prevProps, this.props ) ) {
+				const dataProps = this.applyMapping( this.props, this.state.dataProps );
+				this.setState( { dataProps } );
+			}
 			this.initializeFetchable( prevState.dataProps );
 		}
 
@@ -139,28 +134,34 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 				[ this.getPendingKey( method ) ]: true,
 			} );
 
-			request( { path, method } ).then( ( response ) => {
-				this.setIntoDataProp( propName, {
-					[ this.getPendingKey( method ) ]: false,
+			request( { path, method } )
+				// [Success] Set the data prop:
+				.then( ( response ) => ( {
 					[ this.getResponseDataKey( method ) ]: response.body,
-				} );
-			} ).catch( ( error ) => {
-				this.setIntoDataProp( propName, {
+				} ) )
+
+				// [Failure] Set the error prop:
+				.catch( ( error ) => ( {
 					[ this.getErrorResponseKey( method ) ]: error,
+				} ) )
+
+				// Always reset loading prop:
+				.then( ( nextDataProp ) => {
+					this.setIntoDataProp( propName, {
+						[ this.getPendingKey( method ) ]: false,
+						...nextDataProp,
+					} );
 				} );
-			} );
 		}
 
-		applyMapping( props ) {
-			const { dataProps } = this.state;
-
+		applyMapping( props, previousDataProps = {} ) {
 			const mapping = mapPropsToData( props, this.routeHelpers );
 			const nextDataProps = reduce( mapping, ( result, path, propName ) => {
 				// Skip if mapping already assigned into state data props
-				// Exmaple: Component updates with one new prop and other
+				// Example: Component updates with one new prop and other
 				// previously existing; previously existing should not be
 				// clobbered or re-trigger fetch
-				const dataProp = dataProps[ propName ];
+				const dataProp = previousDataProps[ propName ];
 				if ( dataProp && dataProp.path === path ) {
 					result[ propName ] = dataProp;
 					return result;
@@ -174,7 +175,7 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 				}
 
 				route.methods.forEach( ( method ) => {
-					// Add request initiater into data props
+					// Add request initiator into data props
 					const requestKey = this.getRequestKey( method );
 					result[ propName ][ requestKey ] = this.request.bind(
 						this,
@@ -201,7 +202,7 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 				return result;
 			}, {} );
 
-			this.setState( () => ( { dataProps: nextDataProps } ) );
+			return nextDataProps;
 		}
 
 		render() {
@@ -213,8 +214,6 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 		}
 	}
 
-	APIDataComponent.displayName = getWrapperDisplayName( WrappedComponent, 'apiData' );
-
 	APIDataComponent.contextTypes = {
 		getAPISchema: noop,
 		getAPIPostTypeRestBaseMapping: noop,
@@ -222,4 +221,4 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 	};
 
 	return APIDataComponent;
-};
+}, 'withAPIData' );

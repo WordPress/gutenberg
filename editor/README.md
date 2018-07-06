@@ -12,3 +12,114 @@ Such a crucial step is handled by the grammar parsing which takes the serialized
 The *visual editor* is thus a component that contains and renders the list of block nodes from the internal state into the page. This removes any trace of imperative handling when it comes to finding a block and manipulating a block. As a matter of fact, the visual editor or the text editor are just two different—equally valid—views of the same representation of state. The internal representation of the post content is updated as blocks are updated and it is serialized back to be saved in `post_content`.
 
 Individual blocks are handled by the `VisualBlock` component, which attaches event handlers and renders the `edit` function of a block definition to the document with the corresponding attributes and local state. The `edit` function is the markup shape of a component while in editing mode.
+
+## Components
+
+Because many blocks share the same complex behaviors, reusable components
+are made available to simplify implementations of your block's `edit` function.
+
+### `BlockControls`
+
+When returned by your block's `edit` implementation, renders a toolbar of icon
+buttons. This is useful for block-level modifications to be made available when
+a block is selected. For example, if your block supports alignment, you may
+want to display alignment options in the selected block's toolbar.
+
+Example:
+
+```js
+( function( editor, element ) {
+	var el = element.createElement,
+		BlockControls = editor.BlockControls,
+		AlignmentToolbar = editor.AlignmentToolbar;
+
+	function edit( props ) {
+		return [
+			// Controls: (only visible when block is selected)
+			el( BlockControls, { key: 'controls' },
+				el( AlignmentToolbar, {
+					value: props.align,
+					onChange: function( nextAlign ) {
+						props.setAttributes( { align: nextAlign } )
+					}
+				} )
+			),
+
+			// Block content: (with alignment as attribute)
+			el( 'p', { key: 'text', style: { textAlign: props.align } },
+				'Hello World!'
+			),
+		];
+	}
+} )(
+	window.wp.editor,
+	window.wp.element
+);
+```
+
+Note in this example that we render `AlignmentToolbar` as a child of the
+`BlockControls` element. This is another pre-configured component you can use
+to simplify block text alignment.
+
+Alternatively, you can create your own toolbar controls by passing an array of
+`controls` as a prop to the `BlockControls` component. Each control should be
+an object with the following properties:
+
+- `icon: string` - Slug of the Dashicon to be shown in the control's toolbar button
+- `title: string` - A human-readable localized text to be shown as the tooltip label of the control's button
+- `subscript: ?string` - Optional text to be shown adjacent the button icon as subscript (for example, heading levels)
+- `isActive: ?boolean` - Whether the control should be considered active / selected. Defaults to `false`.
+
+To create divisions between sets of controls within the same `BlockControls`
+element, passing `controls` instead as a nested array (array of arrays of
+objects). A divider will be shown between each set of controls.
+
+### `RichText`
+
+Render a rich
+[`contenteditable` input](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content),
+providing users the option to add emphasis to content or links to content. It
+behaves similarly to a
+[controlled component](https://facebook.github.io/react/docs/forms.html#controlled-components),
+except that `onChange` is triggered less frequently than would be expected from
+a traditional `input` field, usually when the user exits the field.
+
+The following properties (non-exhaustive list) are made available:
+
+- `value: string` - Markup value of the field. Only valid markup is
+  allowed, as determined by `inline` value and available controls.
+- `onChange: Function` - Callback handler when the value of the field changes,
+  passing the new value as its only argument.
+- `placeholder: string` - A text hint to be shown to the user when the field
+  value is empty, similar to the
+  [`input` and `textarea` attribute of the same name](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/HTML5_updates#The_placeholder_attribute).
+- `multiline: String` - A tag name to use for the tag that should be inserted
+  when Enter is pressed.  For example: `li` in a list block, and `p` for a
+	block that can contain multiple paragraphs.  The default is that only inline
+	elements are allowed to be used in inserted into the text, effectively
+  disabling the behavior of the "Enter" key.
+
+Example:
+
+```js
+( function( editor, element ) {
+	var el = element.createElement,
+		RichText = editor.RichText;
+
+	function edit( props ) {
+		function onChange( value ) {
+			props.setAttributes( { text: value } );
+		}
+
+		return el( RichText, {
+			value: props.attributes.text,
+			onChange: onChange
+		} );
+	}
+
+	// blocks.registerBlockType( ..., { edit: edit, ... } );
+} )(
+	window.wp.editor,
+	window.wp.element
+);
+```

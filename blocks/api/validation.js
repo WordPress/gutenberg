@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { tokenize } from 'simple-html-tokenizer';
-import { xor, fromPairs, isEqual, includes } from 'lodash';
+import { xor, fromPairs, isEqual, includes, stubTrue } from 'lodash';
 
 /**
  * Internal dependencies
@@ -37,9 +37,11 @@ const REGEXP_STYLE_URL_TYPE = /^url\s*\(['"\s]*(.*?)['"\s]*\)$/;
  * See: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#boolean-attributes
  * Extracted from: https://html.spec.whatwg.org/multipage/indices.html#attributes-3
  *
- * [ ...document.querySelectorAll( '#attributes-1 > tbody > tr' ) ]
+ * Object.keys( [ ...document.querySelectorAll( '#attributes-1 > tbody > tr' ) ]
  *     .filter( ( tr ) => tr.lastChild.textContent.indexOf( 'Boolean attribute' ) !== -1 )
- *     .map( ( tr ) => tr.firstChild.textContent.trim() )
+ *     .reduce( ( result, tr ) => Object.assign( result, {
+ *         [ tr.firstChild.textContent.trim() ]: true
+ *     } ), {} ) ).sort();
  *
  * @type {Array}
  */
@@ -65,7 +67,6 @@ const BOOLEAN_ATTRIBUTES = [
 	'nomodule',
 	'novalidate',
 	'open',
-	'open',
 	'playsinline',
 	'readonly',
 	'required',
@@ -82,35 +83,36 @@ const BOOLEAN_ATTRIBUTES = [
  * See: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#enumerated-attribute
  * Extracted from: https://html.spec.whatwg.org/multipage/indices.html#attributes-3
  *
- * [ ...document.querySelectorAll( '#attributes-1 > tbody > tr' ) ]
- *     filter( ( tr ) => /("(.+?)";?\s*)+/.test( tr.lastChild.textContent ) )
- *     .map( ( tr ) => tr.firstChild.textContent.trim() )
+ * Object.keys( [ ...document.querySelectorAll( '#attributes-1 > tbody > tr' ) ]
+ *     .filter( ( tr ) => /^("(.+?)";?\s*)+/.test( tr.lastChild.textContent.trim() ) )
+ *     .reduce( ( result, tr ) => Object.assign( result, {
+ *         [ tr.firstChild.textContent.trim() ]: true
+ *     } ), {} ) ).sort();
  *
  * @type {Array}
  */
 const ENUMERATED_ATTRIBUTES = [
+	'autocapitalize',
 	'autocomplete',
+	'charset',
 	'contenteditable',
 	'crossorigin',
-	'dir',
+	'decoding',
 	'dir',
 	'draggable',
 	'enctype',
 	'formenctype',
 	'formmethod',
+	'http-equiv',
 	'inputmode',
 	'kind',
 	'method',
 	'preload',
-	'sandbox',
 	'scope',
 	'shape',
 	'spellcheck',
-	'step',
 	'translate',
 	'type',
-	'type',
-	'workertype',
 	'wrap',
 ];
 
@@ -132,8 +134,9 @@ const log = ( () => {
 	/**
 	 * Creates a logger with block validation prefix.
 	 *
-	 * @param  {Function} logger Original logger function
-	 * @return {Function}        Augmented logger function
+	 * @param {Function} logger Original logger function.
+	 *
+	 * @return {Function} Augmented logger function.
 	 */
 	function createLogger( logger ) {
 		// In test environments, pre-process the sprintf message to improve
@@ -159,8 +162,9 @@ const log = ( () => {
  * Given a specified string, returns an array of strings split by consecutive
  * whitespace, ignoring leading or trailing whitespace.
  *
- * @param  {String}   text Original text
- * @return {String[]}      Text pieces split on whitespace
+ * @param {string} text Original text.
+ *
+ * @return {string[]} Text pieces split on whitespace.
  */
 export function getTextPiecesSplitOnWhitespace( text ) {
 	return text.trim().split( REGEXP_WHITESPACE );
@@ -170,8 +174,9 @@ export function getTextPiecesSplitOnWhitespace( text ) {
  * Given a specified string, returns a new trimmed string where all consecutive
  * whitespace is collapsed to a single space.
  *
- * @param  {String} text Original text
- * @return {String}      Trimmed text with consecutive whitespace collapsed
+ * @param {string} text Original text.
+ *
+ * @return {string} Trimmed text with consecutive whitespace collapsed.
  */
 export function getTextWithCollapsedWhitespace( text ) {
 	return getTextPiecesSplitOnWhitespace( text ).join( ' ' );
@@ -184,8 +189,9 @@ export function getTextWithCollapsedWhitespace( text ) {
  *
  * @see MEANINGFUL_ATTRIBUTES
  *
- * @param  {Object}  token StartTag token
- * @return {Array[]}       Attribute pairs
+ * @param {Object} token StartTag token.
+ *
+ * @return {Array[]} Attribute pairs.
  */
 export function getMeaningfulAttributePairs( token ) {
 	return token.attributes.filter( ( pair ) => {
@@ -202,9 +208,10 @@ export function getMeaningfulAttributePairs( token ) {
  * Returns true if two text tokens (with `chars` property) are equivalent, or
  * false otherwise.
  *
- * @param  {Object}  actual   Actual token
- * @param  {Object}  expected Expected token
- * @return {Boolean}          Whether two text tokens are equivalent
+ * @param {Object} actual   Actual token.
+ * @param {Object} expected Expected token.
+ *
+ * @return {boolean} Whether two text tokens are equivalent.
  */
 export function isEqualTextTokensWithCollapsedWhitespace( actual, expected ) {
 	// This is an overly simplified whitespace comparison. The specification is
@@ -224,8 +231,9 @@ export function isEqualTextTokensWithCollapsedWhitespace( actual, expected ) {
  * Given a style value, returns a normalized style value for strict equality
  * comparison.
  *
- * @param  {String} value Style value
- * @return {String}       Normalized style value
+ * @param {string} value Style value.
+ *
+ * @return {string} Normalized style value.
  */
 export function getNormalizedStyleValue( value ) {
 	return value
@@ -236,8 +244,9 @@ export function getNormalizedStyleValue( value ) {
 /**
  * Given a style attribute string, returns an object of style properties.
  *
- * @param  {String} text Style attribute
- * @return {Object}      Style properties
+ * @param {string} text Style attribute.
+ *
+ * @return {Object} Style properties.
  */
 export function getStyleProperties( text ) {
 	const pairs = text
@@ -274,15 +283,19 @@ export const isEqualAttributesOfName = {
 	style: ( actual, expected ) => {
 		return isEqual( ...[ actual, expected ].map( getStyleProperties ) );
 	},
+	// For each boolean attribute, mere presence of attribute in both is enough
+	// to assume equivalence.
+	...fromPairs( BOOLEAN_ATTRIBUTES.map( ( attribute ) => [ attribute, stubTrue ] ) ),
 };
 
 /**
  * Given two sets of attribute tuples, returns true if the attribute sets are
- * equivalent
+ * equivalent.
  *
- * @param  {Array[]} actual   Actual attributes tuples
- * @param  {Array[]} expected Expected attributes tuples
- * @return {Boolean}          Whether attributes are equivalent
+ * @param {Array[]} actual   Actual attributes tuples.
+ * @param {Array[]} expected Expected attributes tuples.
+ *
+ * @return {boolean} Whether attributes are equivalent.
  */
 export function isEqualTagAttributePairs( actual, expected ) {
 	// Attributes is tokenized as tuples. Their lengths should match. This also
@@ -349,8 +362,9 @@ export const isEqualTokensOfType = {
  *
  * Mutates the tokens array.
  *
- * @param  {Object[]} tokens Set of tokens to search
- * @return {Object}          Next non-whitespace token
+ * @param {Object[]} tokens Set of tokens to search.
+ *
+ * @return {Object} Next non-whitespace token.
  */
 export function getNextNonWhitespaceToken( tokens ) {
 	let token;
@@ -369,9 +383,10 @@ export function getNextNonWhitespaceToken( tokens ) {
  * Returns true if there is given HTML strings are effectively equivalent, or
  * false otherwise.
  *
- * @param  {String}  actual Actual HTML string
- * @param  {String}  expected Expected HTML string
- * @return {Boolean}   Whether HTML strings are equivalent
+ * @param {string} actual Actual HTML string.
+ * @param {string} expected Expected HTML string.
+ *
+ * @return {boolean} Whether HTML strings are equivalent.
  */
 export function isEquivalentHTML( actual, expected ) {
 	// Tokenize input content and reserialized save content
@@ -401,7 +416,7 @@ export function isEquivalentHTML( actual, expected ) {
 		}
 	}
 
-	while ( ( expectedToken = getNextNonWhitespaceToken( expectedTokens ) ) ) {
+	if ( ( expectedToken = getNextNonWhitespaceToken( expectedTokens ) ) ) {
 		// If any non-whitespace tokens remain in expected token set, this
 		// indicates inequality
 		log.warning( 'Expected %o, instead saw end of content.', expectedToken );
@@ -418,10 +433,11 @@ export function isEquivalentHTML( actual, expected ) {
  *
  * Logs to console in development environments when invalid.
  *
- * @param  {String}  innerHTML  Original block content
- * @param  {String}  blockType  Block type
- * @param  {Object}  attributes Parsed block attributes
- * @return {Boolean}            Whether block is valid
+ * @param {string} innerHTML  Original block content.
+ * @param {string} blockType  Block type.
+ * @param {Object} attributes Parsed block attributes.
+ *
+ * @return {boolean} Whether block is valid.
  */
 export function isValidBlock( innerHTML, blockType, attributes ) {
 	let saveContent;

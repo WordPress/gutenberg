@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import apiRequest from '@wordpress/api-request';
+
+/**
  * Internal dependencies
  */
 import request, {
@@ -25,15 +30,13 @@ describe( 'request', () => {
 		),
 	};
 
-	let wpApiRequest;
 	beforeEach( () => {
 		getStablePath.clear();
 		for ( const key in cache ) {
 			delete cache[ key ];
 		}
 
-		wpApiRequest = wp.apiRequest;
-		wp.apiRequest = jest.fn( () => ( {
+		apiRequest.mockReturnValue = {
 			// jQuery.Deferred aren't true promises, particularly in their
 			// treatment of resolved arguments. $.ajax will spread resolved
 			// arguments, but this is not valid for Promise (only single).
@@ -43,14 +46,10 @@ describe( 'request', () => {
 				'success',
 				xhr
 			) ),
-		} ) );
+		};
 	} );
 
-	afterEach( () => {
-		wp.apiRequest = wpApiRequest;
-	} );
-
-	describe( 'getResponseHeaders()', () =>{
+	describe( 'getResponseHeaders()', () => {
 		it( 'returns tuples of array headers', () => {
 			expect( getResponseHeaders( xhr ) ).toEqual( [
 				[ 'connection', 'Keep-Alive' ],
@@ -97,7 +96,7 @@ describe( 'request', () => {
 			} );
 
 			return awaitResponse.then( ( data ) => {
-				expect( wp.apiRequest ).toHaveBeenCalled();
+				expect( apiRequest ).toHaveBeenCalled();
 				expect( data ).toEqual( actualResponse );
 			} );
 		} );
@@ -129,6 +128,10 @@ describe( 'request', () => {
 	} );
 
 	describe( 'request()', () => {
+		beforeEach( () => {
+			apiRequest.mockClear();
+		} );
+
 		it( 'should try from cache for GET', () => {
 			cache[ getStablePath( '/wp?c=5&a=5&b=5' ) ] = actualResponse;
 			const awaitResponse = request( {
@@ -137,7 +140,7 @@ describe( 'request', () => {
 			} );
 
 			return awaitResponse.then( ( data ) => {
-				expect( wp.apiRequest ).not.toHaveBeenCalled();
+				expect( apiRequest ).not.toHaveBeenCalled();
 				expect( data ).toEqual( actualResponse );
 			} );
 		} );
@@ -150,7 +153,7 @@ describe( 'request', () => {
 			} );
 
 			return awaitResponse.then( ( data ) => {
-				expect( wp.apiRequest ).toHaveBeenCalled();
+				expect( apiRequest ).toHaveBeenCalled();
 				expect( data ).toEqual( actualResponse );
 			} );
 		} );
@@ -162,7 +165,7 @@ describe( 'request', () => {
 			} );
 
 			return awaitResponse.then( ( data ) => {
-				expect( wp.apiRequest ).toHaveBeenCalled();
+				expect( apiRequest ).toHaveBeenCalled();
 				expect( data ).toEqual( actualResponse );
 			} );
 		} );

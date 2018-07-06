@@ -1,21 +1,33 @@
 /**
+ * External dependencies
+ */
+import { cond, matchesProperty } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { NavigableMenu, KeyboardShortcuts } from '@wordpress/components';
 import { Component, findDOMNode } from '@wordpress/element';
-import { focus, keycodes } from '@wordpress/utils';
+import { focus } from '@wordpress/dom';
+import { ESCAPE } from '@wordpress/keycodes';
 
 /**
- * Module Constants
+ * Browser dependencies
  */
-const { ESCAPE } = keycodes;
+
+const { Node, getSelection } = window;
 
 class NavigableToolbar extends Component {
 	constructor() {
 		super( ...arguments );
+
 		this.bindNode = this.bindNode.bind( this );
 		this.focusToolbar = this.focusToolbar.bind( this );
-		this.onToolbarKeyDown = this.onToolbarKeyDown.bind( this );
+		this.focusSelection = this.focusSelection.bind( this );
+
+		this.switchOnKeyDown = cond( [
+			[ matchesProperty( [ 'keyCode' ], ESCAPE ), this.focusSelection ],
+		] );
 	}
 
 	bindNode( ref ) {
@@ -32,17 +44,27 @@ class NavigableToolbar extends Component {
 		}
 	}
 
-	onToolbarKeyDown( event ) {
-		if ( event.keyCode !== ESCAPE ) {
+	/**
+	 * Programmatically shifts focus to the element where the current selection
+	 * exists, if there is a selection.
+	 */
+	focusSelection() {
+		// Ensure that a selection exists.
+		const selection = getSelection();
+		if ( ! selection ) {
 			return;
 		}
 
-		// Is there a better way to focus the selected block
-		// TODO: separate focused/selected block state and use Redux actions instead
-		const selectedBlock = document.querySelector( '.editor-block-list__block.is-selected .editor-block-list__block-edit' );
-		if ( !! selectedBlock ) {
-			event.stopPropagation();
-			selectedBlock.focus();
+		// Focus node may be a text node, which cannot be focused directly.
+		// Find its parent element instead.
+		const { focusNode } = selection;
+		let focusElement = focusNode;
+		if ( focusElement.nodeType !== Node.ELEMENT_NODE ) {
+			focusElement = focusElement.parentElement;
+		}
+
+		if ( focusElement ) {
+			focusElement.focus();
 		}
 	}
 
@@ -52,14 +74,14 @@ class NavigableToolbar extends Component {
 			<NavigableMenu
 				orientation="horizontal"
 				role="toolbar"
-				deep
 				ref={ this.bindNode }
-				onKeyDown={ this.onToolbarKeyDown }
+				onKeyDown={ this.switchOnKeyDown }
 				{ ...props }
 			>
 				<KeyboardShortcuts
 					bindGlobal
-					eventName="keyup"
+					// Use the same event that TinyMCE uses in the Classic block for its own `alt+f10` shortcut.
+					eventName="keydown"
 					shortcuts={ {
 						'alt+f10': this.focusToolbar,
 					} }

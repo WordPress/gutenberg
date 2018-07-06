@@ -1,15 +1,12 @@
 /**
- * WordPress Dependeencies
+ * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
-import withFocusReturn from '../higher-order/with-focus-return';
 import Popover from '../popover';
-
-const FocusManaged = withFocusReturn( ( { children } ) => children );
 
 class Dropdown extends Component {
 	constructor() {
@@ -31,10 +28,10 @@ class Dropdown extends Component {
 		}
 	}
 
-	componentWillUpdate( nextProps, nextState ) {
-		const { isOpen } = nextState;
-		const { onToggle } = nextProps;
-		if ( this.state.isOpen !== isOpen && onToggle ) {
+	componentDidUpdate( prevProps, prevState ) {
+		const { isOpen } = this.state;
+		const { onToggle } = this.props;
+		if ( prevState.isOpen !== isOpen && onToggle ) {
 			onToggle( isOpen );
 		}
 	}
@@ -68,23 +65,32 @@ class Dropdown extends Component {
 			className,
 			contentClassName,
 			expandOnMobile,
+			headerTitle,
 		} = this.props;
+
 		const args = { isOpen, onToggle: this.toggle, onClose: this.close };
+
 		return (
 			<div className={ className } ref={ this.bindContainer }>
-				{ renderToggle( args ) }
-				<Popover
-					className={ contentClassName }
-					isOpen={ isOpen }
-					position={ position }
-					onClose={ this.close }
-					onClickOutside={ this.clickOutside }
-					expandOnMobile={ expandOnMobile }
-				>
-					<FocusManaged>
-						{ renderContent( args ) }
-					</FocusManaged>
-				</Popover>
+				{ /**
+				   * This seemingly redundant wrapper node avoids root return
+				   * element styling impacting popover positioning.
+				   */ }
+				<div>
+					{ renderToggle( args ) }
+					{ isOpen && (
+						<Popover
+							className={ contentClassName }
+							position={ position }
+							onClose={ this.close }
+							onClickOutside={ this.clickOutside }
+							expandOnMobile={ expandOnMobile }
+							headerTitle={ headerTitle }
+						>
+							{ renderContent( args ) }
+						</Popover>
+					) }
+				</div>
 			</div>
 		);
 	}

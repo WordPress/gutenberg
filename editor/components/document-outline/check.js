@@ -1,26 +1,23 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import { filter } from 'lodash';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { getBlocks } from '../../store/selectors';
+import { withSelect } from '@wordpress/data';
 
 function DocumentOutlineCheck( { blocks, children } ) {
 	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );
 
-	if ( headings.length <= 1 ) {
+	if ( headings.length < 1 ) {
 		return null;
 	}
 
 	return children;
 }
 
-export default connect(
-	( state ) => ( {
-		blocks: getBlocks( state ),
-	} )
-)( DocumentOutlineCheck );
+export default withSelect( ( select ) => ( {
+	blocks: select( 'core/editor' ).getBlocks(),
+} ) )( DocumentOutlineCheck );

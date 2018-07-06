@@ -3,21 +3,28 @@
 # Exit if any command fails
 set -e
 
+# Include useful functions
+. "$(dirname "$0")/includes.sh"
+
 # Change to the expected directory
-cd "$(dirname "$0")/../docker"
+cd "$(dirname "$0")/.."
 
-# Launch the WordPress docker
-docker-compose up -d
+# Check Node and NVM are installed
+. "$(dirname "$0")/install-node-nvm.sh"
 
-# Wait until the docker containers are setup properely
-echo "Attempting to connect to wordpress"
-until $(curl -L http://localhost:8888 -so - | grep -q "WordPress"); do
-    printf '.'
-    sleep 5
-done
+# Check Docker is installed and running
+. "$(dirname "$0")/install-docker.sh"
 
-# Install WordPress
-docker run -it --rm --volumes-from wordpress-dev --network container:wordpress-dev wordpress:cli core install --url=localhost:8888 --title=Gutenberg --admin_user=admin --admin_password=password --admin_email=test@test.com
+! read -d '' GUTENBERG <<"EOT"
+,⁻⁻⁻·       .                 |
+|  ،⁓’.   . |---  ,---. ,---. |---. ,---. ,---. ,---.
+|   | |   | |     |---' |   | |   | |---' |     |   |
+`---' `---' `---’ `---’ '   ` `---' `---’ `     `---|
+                                                `---'
+EOT
 
-# Activate Gutenberg
-docker run -it --rm --volumes-from wordpress-dev --network container:wordpress-dev wordpress:cli plugin activate gutenberg
+CURRENT_URL=$(docker-compose run -T --rm cli option get siteurl)
+
+echo -e "\nWelcome to...\n"
+echo -e "\033[95m$GUTENBERG\033[0m"
+echo -e "Run $(action_format "npm run dev"), then open $(action_format "$CURRENT_URL") to get started!"

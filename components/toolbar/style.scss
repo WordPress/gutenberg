@@ -7,7 +7,12 @@
 
 div.components-toolbar {
 	&> div {
-		display: inline-flex;
+		// IE11 does not support `position: sticky`, or Flex very well, so use block.
+		display: inline-block;
+		@supports ( position: sticky ) {
+			display: inline-flex;
+		}
+
 		margin: 0;
 	}
 
@@ -45,6 +50,17 @@ div.components-toolbar {
 	width: $icon-button-size;
 	height: $icon-button-size;
 
+	// Unset icon button styles
+	&:active,
+	&:not( [aria-disabled="true"] ):hover,
+	&:not( [aria-disabled="true"] ):focus {
+		outline: none;
+		box-shadow: none;
+		background: none;
+		border: none;
+	}
+
+	// Disabled
 	&:disabled {
 		cursor: default;
 	}
@@ -55,56 +71,43 @@ div.components-toolbar {
 		border-radius: $button-style__radius-roundrect;
 	}
 
-	// subscript for numbered icon buttons, like headings
+	// Subscript for numbered icon buttons, like headings
 	&[data-subscript] svg {
-		padding: 4px 8px 4px 0px;
+		padding: 4px 8px 4px 0;
 	}
 
 	&[data-subscript]:after {
 		content: attr( data-subscript );
 		font-family: $default-font;
 		font-size: $default-font-size;
-		font-weight: bold;
+		font-weight: 600;
 		position: absolute;
 		right: 8px;
 		bottom: 8px;
 	}
 
-	// special hover style
-	&:not(:disabled) {
-		&.is-active > svg,
-		&:hover > svg {
-			box-shadow: inset 0 0 0 1px $dark-gray-500;
-		}
-	}
-
-	// special active style
-	&.is-active {
-		color: $white;
-		> svg {
-			background: $dark-gray-500;
-		}
-	}
-
-	// focus style
-	&:focus {
-		outline: none;
+	// Assign hover style to child element, not the button itself
+	&:not( :disabled ):not([aria-disabled="true"]):hover {
 		box-shadow: none;
-		background: none;
 	}
 
-	&:focus > svg {
-		@include button-style__focus-active;
-	}
-	&:focus:hover > svg {
-		@include button-style__focus-active;
+	&:not( :disabled ).is-active > svg,
+	&:not( :disabled ):hover > svg {
+		@include formatting-button-style__hover;
 	}
 
-	// active focus style
-	&.is-active:focus > svg {
-		background: $dark-gray-500;
+	// Active & toggled style
+	&:not(:disabled).is-active > svg {
+		@include formatting-button-style__active;
+	}
+
+	&:not(:disabled).is-active[data-subscript]:after {
 		color: $white;
-		box-shadow: inset 0 0 0 1px $dark-gray-500, inset 0 0 0 2px $white;
+	}
+
+	// Focus style
+	&:not(:disabled):focus > svg {
+		@include formatting-button-style__focus;
 	}
 }
 

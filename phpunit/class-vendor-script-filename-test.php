@@ -10,16 +10,12 @@ class Vendor_Script_Filename_Test extends WP_UnitTestCase {
 		return array(
 			// Development mode scripts.
 			array(
-				'https://unpkg.com/react@next/umd/react.development.js',
+				'https://unpkg.com/react@16.4.1/umd/react.development.js',
 				'react.HASH.js',
 			),
 			array(
-				'https://unpkg.com/react-dom@next/umd/react-dom.development.js',
+				'https://unpkg.com/react-dom@16.4.1/umd/react-dom.development.js',
 				'react-dom.HASH.js',
-			),
-			array(
-				'https://unpkg.com/react-dom@next/umd/react-dom-server.development.js',
-				'react-dom-server.HASH.js',
 			),
 			array(
 				'https://fiddle.azurewebsites.net/tinymce/nightly/tinymce.js',
@@ -31,16 +27,12 @@ class Vendor_Script_Filename_Test extends WP_UnitTestCase {
 			),
 			// Production mode scripts.
 			array(
-				'https://unpkg.com/react@next/umd/react.production.min.js',
+				'https://unpkg.com/react@16.4.1/umd/react.production.min.js',
 				'react.min.HASH.js',
 			),
 			array(
-				'https://unpkg.com/react-dom@next/umd/react-dom.production.min.js',
+				'https://unpkg.com/react-dom@16.4.1/umd/react-dom.production.min.js',
 				'react-dom.min.HASH.js',
-			),
-			array(
-				'https://unpkg.com/react-dom@next/umd/react-dom-server.production.min.js',
-				'react-dom-server.min.HASH.js',
 			),
 			array(
 				'https://fiddle.azurewebsites.net/tinymce/nightly/tinymce.min.js',

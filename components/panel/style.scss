@@ -22,7 +22,7 @@
 	border-bottom: 1px solid $light-gray-500;
 
 	h3 {
-		margin: 0 0 .5em 0;
+		margin: 0 0 .5em;
 	}
 
 	&.is-opened {
@@ -63,7 +63,7 @@
 }
 .components-panel__body.is-opened > .components-panel__body-title {
 	margin: -1 * $panel-padding;
-	margin-bottom: 0;
+	margin-bottom: 5px;
 }
 
 .components-panel__body-toggle.components-button {
@@ -73,8 +73,14 @@
 	width: 100%;
 	font-weight: 600;
 	text-align: left;
+	color: $dark-gray-900;
+	@include menu-style__neutral;
 
-	.dashicon {
+	&:focus:not(:disabled):not([aria-disabled="true"]) {
+		@include menu-style__focus;
+	}
+
+	.components-panel__arrow {
 		position: absolute;
 		right: $item-spacing;
 		top: 50%;
@@ -90,6 +96,11 @@
 		margin-top: -10px;
 	}
 	/* rtl:end:ignore */
+}
+
+.components-panel__icon {
+	color: $dark-gray-500;
+	margin: -2px 6px -2px 0;
 }
 
 .components-panel__body-toggle-icon {
@@ -126,7 +137,8 @@
 		max-width: 75%;
 	}
 
-	&:empty {
+	&:empty,
+	&:first-of-type {
 		margin-top: 0;
 	}
 }

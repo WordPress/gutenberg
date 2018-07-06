@@ -1,28 +1,45 @@
 /**
  * External Dependencies
  */
-import { connect } from 'react-redux';
+import { get } from 'lodash';
 
 /**
  * WordPress Dependencies
  */
-import { Button, Dashicon } from '@wordpress/components';
+import { Button } from '@wordpress/components';
+import { compose } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { withSelect } from '@wordpress/data';
+import { DotTip } from '@wordpress/nux';
 
 /**
  * Internal Dependencies
  */
-import PostPublishButtonLabel from '../post-publish-button/label';
-import {
-	isSavingPost,
-	isEditedPostSaveable,
-	isEditedPostPublishable,
-	isCurrentPostPublished,
-} from '../../store/selectors';
+import PostPublishButton from '../post-publish-button';
 
-function PostPublishPanelToggle( { isSaving, isPublishable, isSaveable, isPublished, onToggle, isOpen } ) {
+export function PostPublishPanelToggle( {
+	hasPublishAction,
+	isSaving,
+	isPublishable,
+	isSaveable,
+	isPublished,
+	isBeingScheduled,
+	isPending,
+	isScheduled,
+	onToggle,
+	isOpen,
+	forceIsDirty,
+	forceIsSaving,
+} ) {
 	const isButtonEnabled = (
-		! isSaving && isPublishable && isSaveable
+		! isSaving && ! forceIsSaving && isPublishable && isSaveable
 	) || isPublished;
+
+	const showToggle = ! isPublished && ! ( isScheduled && isBeingScheduled ) && ! ( isPending && ! hasPublishAction );
+
+	if ( ! showToggle ) {
+		return <PostPublishButton forceIsDirty={ forceIsDirty } forceIsSaving={ forceIsSaving } />;
+	}
 
 	return (
 		<Button
@@ -33,17 +50,37 @@ function PostPublishPanelToggle( { isSaving, isPublishable, isSaveable, isPublis
 			disabled={ ! isButtonEnabled }
 			isBusy={ isSaving && isPublished }
 		>
-			<PostPublishButtonLabel />
-			<Dashicon icon="arrow-down" />
+			{ isBeingScheduled ? __( 'Schedule…' ) : __( 'Publish…' ) }
+			<DotTip id="core/editor.publish">
+				{ __( 'Finished writing? That’s great, let’s get this published right now. Just click ‘Publish’ and you’re good to go.' ) }
+			</DotTip>
 		</Button>
 	);
 }
 
-export default connect(
-	( state ) => ( {
-		isSaving: isSavingPost( state ),
-		isSaveable: isEditedPostSaveable( state ),
-		isPublishable: isEditedPostPublishable( state ),
-		isPublished: isCurrentPostPublished( state ),
+export default compose( [
+	withSelect( ( select ) => {
+		const {
+			isSavingPost,
+			isEditedPostSaveable,
+			isEditedPostPublishable,
+			isCurrentPostPending,
+			isCurrentPostPublished,
+			isEditedPostBeingScheduled,
+			isCurrentPostScheduled,
+			getCurrentPost,
+			getCurrentPostType,
+		} = select( 'core/editor' );
+		return {
+			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
+			isSaving: isSavingPost(),
+			isSaveable: isEditedPostSaveable(),
+			isPublishable: isEditedPostPublishable(),
+			isPending: isCurrentPostPending(),
+			isPublished: isCurrentPostPublished(),
+			isScheduled: isCurrentPostScheduled(),
+			isBeingScheduled: isEditedPostBeingScheduled(),
+			postType: getCurrentPostType(),
+		};
 	} ),
-)( PostPublishPanelToggle );
+] )( PostPublishPanelToggle );

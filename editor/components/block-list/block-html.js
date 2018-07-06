@@ -1,21 +1,16 @@
-/**
- * WordPress Dependencies
- */
-import { isEqual } from 'lodash';
-import { Component } from '@wordpress/element';
-import { getBlockAttributes, getBlockContent, getBlockType, isValidBlock } from '@wordpress/blocks';
 
 /**
  * External Dependencies
  */
-import { connect } from 'react-redux';
 import TextareaAutosize from 'react-autosize-textarea';
+import { isEqual } from 'lodash';
 
 /**
- * Internal Dependencies
+ * WordPress Dependencies
  */
-import { updateBlock } from '../../store/actions';
-import { getBlock } from '../../store/selectors';
+import { Component, compose } from '@wordpress/element';
+import { getBlockAttributes, getBlockContent, getBlockType, isValidBlock } from '@wordpress/blocks';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 class BlockHTML extends Component {
 	constructor( props ) {
@@ -27,10 +22,10 @@ class BlockHTML extends Component {
 		};
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		if ( ! isEqual( nextProps.block.attributes, this.props.block.attributes ) ) {
+	componentDidUpdate( prevProps ) {
+		if ( ! isEqual( this.props.block.attributes, prevProps.block.attributes ) ) {
 			this.setState( {
-				html: getBlockContent( nextProps.block ),
+				html: getBlockContent( this.props.block ),
 			} );
 		}
 	}
@@ -59,13 +54,13 @@ class BlockHTML extends Component {
 	}
 }
 
-export default connect(
-	( state, ownProps ) => ( {
-		block: getBlock( state, ownProps.uid ),
-	} ),
-	{
+export default compose( [
+	withSelect( ( select, ownProps ) => ( {
+		block: select( 'core/editor' ).getBlock( ownProps.uid ),
+	} ) ),
+	withDispatch( ( dispatch ) => ( {
 		onChange( uid, attributes, originalContent, isValid ) {
-			return updateBlock( uid, { attributes, originalContent, isValid } );
+			dispatch( 'core/editor' ).updateBlock( uid, { attributes, originalContent, isValid } );
 		},
-	}
-)( BlockHTML );
+	} ) ),
+] )( BlockHTML );

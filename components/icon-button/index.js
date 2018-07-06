@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isString } from 'lodash';
+import { isString, isArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -21,8 +21,25 @@ import Dashicon from '../dashicon';
 // is common to apply a ref to the button element (only supported in class)
 class IconButton extends Component {
 	render() {
-		const { icon, children, label, className, tooltip, focus, ...additionalProps } = this.props;
+		const { icon, children, label, className, tooltip, focus, shortcut, ...additionalProps } = this.props;
 		const classes = classnames( 'components-icon-button', className );
+		const tooltipText = tooltip || label;
+
+		// Should show the tooltip if...
+		const showTooltip = (
+			// an explicit tooltip is passed or...
+			tooltip ||
+			// there's a shortcut or...
+			shortcut ||
+			(
+				// there's a label and...
+				!! label &&
+				// the children are empty and...
+				( ! children || ( isArray( children ) && ! children.length ) ) &&
+				// the tooltip is not explicitly disabled.
+				false !== tooltip
+			)
+		);
 
 		let element = (
 			<Button { ...additionalProps } aria-label={ label } className={ classes } focus={ focus }>
@@ -31,8 +48,12 @@ class IconButton extends Component {
 			</Button>
 		);
 
-		if ( label && ! children && false !== tooltip ) {
-			element = <Tooltip text={ tooltip || label }>{ element }</Tooltip>;
+		if ( showTooltip ) {
+			element = (
+				<Tooltip text={ tooltipText } shortcut={ shortcut }>
+					{ element }
+				</Tooltip>
+			);
 		}
 
 		return element;

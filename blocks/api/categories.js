@@ -1,30 +1,22 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { dispatch, select } from '@wordpress/data';
 
 /**
- * Block categories.
+ * Returns all the block categories.
  *
- * Group blocks together based on common traits
- * The block "inserter" relies on these to present the list blocks
- *
- * @var {Array} categories
- */
-const categories = [
-	{ slug: 'common', title: __( 'Common Blocks' ) },
-	{ slug: 'formatting', title: __( 'Formatting' ) },
-	{ slug: 'layout', title: __( 'Layout Blocks' ) },
-	{ slug: 'widgets', title: __( 'Widgets' ) },
-	{ slug: 'embed', title: __( 'Embed' ) },
-	{ slug: 'reusable-blocks', title: __( 'Saved Blocks' ) },
-];
-
-/**
- * Returns all the block categories
- *
- * @return {Array} Block categories
+ * @return {Object[]} Block categories.
  */
 export function getCategories() {
-	return categories;
+	return select( 'core/blocks' ).getCategories();
+}
+
+/**
+ * Sets the block categories.
+ *
+ * @param {Object[]} categories Block categories.
+ */
+export function setCategories( categories ) {
+	dispatch( 'core/blocks' ).setCategories( categories );
 }

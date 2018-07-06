@@ -1,154 +1,199 @@
 {
-  "name": "gutenberg",
-  "version": "1.9.0",
-  "description": "A new WordPress editor experience",
-  "main": "build/app.js",
-  "repository": "git+https://github.com/WordPress/gutenberg.git",
-  "author": "The WordPress Contributors",
-  "license": "GPL-2.0+",
-  "keywords": [
-    "WordPress",
-    "editor"
-  ],
-  "engines": {
-    "node": ">=8.0.0",
-    "npm": ">=5.0.0"
-  },
-  "dependencies": {
-    "@wordpress/a11y": "0.1.0-beta.1",
-    "@wordpress/hooks": "1.0.1",
-    "@wordpress/url": "0.1.0-beta.1",
-    "classnames": "2.2.5",
-    "clipboard": "1.7.1",
-    "dom-react": "2.2.0",
-    "dom-scroll-into-view": "1.2.1",
-    "element-closest": "2.0.2",
-    "escape-string-regexp": "1.0.5",
-    "hpq": "1.2.0",
-    "jed": "1.1.1",
-    "jquery": "3.2.1",
-    "js-beautify": "1.6.14",
-    "lodash": "4.17.4",
-    "memize": "1.0.4",
-    "moment": "2.18.1",
-    "moment-timezone": "0.5.13",
-    "mousetrap": "1.6.1",
-    "prop-types": "15.5.10",
-    "querystringify": "1.0.0",
-    "re-resizable": "4.0.3",
-    "react": "16.2.0",
-    "react-autosize-textarea": "2.0.0",
-    "react-click-outside": "2.3.1",
-    "react-color": "2.13.4",
-    "react-datepicker": "0.61.0",
-    "react-dom": "16.2.0",
-    "react-redux": "5.0.6",
-    "redux": "3.7.2",
-    "redux-multi": "0.1.12",
-    "redux-optimist": "0.0.2",
-    "refx": "2.1.0",
-    "rememo": "2.3.3",
-    "showdown": "1.7.4",
-    "simple-html-tokenizer": "0.4.1",
-    "tinycolor2": "1.4.1",
-    "uuid": "3.1.0"
-  },
-  "devDependencies": {
-    "autoprefixer": "6.7.7",
-    "babel-core": "6.26.0",
-    "babel-eslint": "8.0.3",
-    "babel-jest": "22.0.1",
-    "babel-loader": "7.1.2",
-    "babel-plugin-lodash": "3.2.11",
-    "babel-plugin-transform-object-rest-spread": "6.26.0",
-    "babel-plugin-transform-react-jsx": "6.24.1",
-    "babel-plugin-transform-runtime": "6.23.0",
-    "babel-preset-env": "1.6.0",
-    "babel-traverse": "6.26.0",
-    "check-node-version": "3.1.1",
-    "codecov": "3.0.0",
-    "concurrently": "3.5.0",
-    "cross-env": "3.2.4",
-    "cypress": "1.1.4",
-    "deep-freeze": "0.0.1",
-    "enzyme": "3.2.0",
-    "enzyme-adapter-react-16": "1.1.0",
-    "eslint": "4.9.0",
-    "eslint-config-wordpress": "2.0.0",
-    "eslint-plugin-jest": "21.5.0",
-    "eslint-plugin-jsx-a11y": "6.0.2",
-    "eslint-plugin-react": "7.5.1",
-    "expose-loader": "0.7.3",
-    "extract-text-webpack-plugin": "3.0.0",
-    "gettext-parser": "1.3.0",
-    "jest": "22.0.1",
-    "jest-enzyme": "4.0.1",
-    "node-sass": "4.7.2",
-    "pegjs": "0.10.0",
-    "pegjs-loader": "0.5.4",
-    "phpegjs": "1.0.0-beta7",
-    "postcss-loader": "2.0.6",
-    "prismjs": "1.6.0",
-    "raw-loader": "0.5.1",
-    "react-markdown": "2.5.0",
-    "react-test-renderer": "16.0.0",
-    "sass-loader": "6.0.6",
-    "sass-variables-loader": "0.1.3",
-    "sprintf-js": "1.1.1",
-    "style-loader": "0.18.2",
-    "tinymce": "4.7.2",
-    "webpack": "3.10.0",
-    "webpack-rtl-plugin": "github:yoavf/webpack-rtl-plugin#develop"
-  },
-  "jest": {
-    "collectCoverageFrom": [
-      "(blocks|components|date|editor|element|i18n|data|utils)/**/*.js"
-    ],
-    "coveragePathIgnorePatterns": [
-      "<rootDir>/[^/]+/build/index.js"
-    ],
-    "coverageDirectory": "coverage",
-    "moduleNameMapper": {
-      "\\.(scss|css)$": "<rootDir>/test/unit/style-mock.js",
-      "@wordpress\\/(blocks|components|date|editor|element|i18n|data|utils)": "$1"
-    },
-    "modulePaths": [
-      "<rootDir>"
-    ],
-    "setupFiles": [
-      "<rootDir>/test/unit/setup-globals.js",
-      "<rootDir>/test/unit/setup-wp-aliases.js"
-    ],
-    "setupTestFrameworkScriptFile": "<rootDir>/test/unit/setup-test-framework.js",
-    "testMatch": [
-      "<rootDir>/(blocks|components|date|editor|element|i18n|data|utils)/**/test/*.js"
-    ],
-    "timers": "fake",
-    "transform": {
-      "^.+\\.jsx?$": "babel-jest",
-      "\\.pegjs$": "<rootDir>/test/unit/pegjs-transform.js"
-    },
-    "verbose": true
-  },
-  "scripts": {
-    "prebuild": "check-node-version --package",
-    "build": "cross-env BABEL_ENV=default NODE_ENV=production webpack",
-    "gettext-strings": "cross-env BABEL_ENV=gettext webpack",
-    "lint": "eslint .",
-    "predev": "check-node-version --package",
-    "dev": "cross-env BABEL_ENV=default webpack --watch",
-    "test": "npm run lint && npm run test-unit",
-    "ci": "concurrently \"npm run lint && npm run build\" \"npm run test-unit:coverage-ci\"",
-    "fixtures:clean": "rimraf \"blocks/test/fixtures/*.+(json|serialized.html)\"",
-    "fixtures:server-registered": "./bin/get-server-blocks.php > blocks/test/server-registered.json",
-    "fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
-    "fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
-    "package-plugin": "./bin/build-plugin-zip.sh",
-    "test-unit": "jest",
-    "test-unit:coverage": "jest --coverage",
-    "test-unit:coverage-ci": "jest --coverage --maxWorkers 1 && codecov",
-    "test-unit:watch": "jest --watch",
-    "test-e2e": "cypress run --browser chrome",
-    "test-e2e:watch": "cypress open"
-  }
+	"name": "gutenberg",
+	"version": "3.2.0",
+	"private": true,
+	"description": "A new WordPress editor experience",
+	"repository": "git+https://github.com/WordPress/gutenberg.git",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"WordPress",
+		"editor"
+	],
+	"engines": {
+		"node": ">=8.0.0",
+		"npm": ">=6.0.0"
+	},
+	"dependencies": {
+		"@wordpress/a11y": "1.0.6",
+		"@wordpress/autop": "1.0.4",
+		"@wordpress/dom-ready": "1.0.4",
+		"@wordpress/hooks": "1.1.6",
+		"@wordpress/i18n": "1.1.0",
+		"@wordpress/is-shallow-equal": "1.0.2",
+		"@wordpress/url": "1.1.0",
+		"@wordpress/wordcount": "1.0.2",
+		"classnames": "2.2.5",
+		"clipboard": "1.7.1",
+		"dom-react": "2.2.1",
+		"dom-scroll-into-view": "1.2.1",
+		"element-closest": "2.0.2",
+		"equivalent-key-map": "0.2.0",
+		"escape-string-regexp": "1.0.5",
+		"eslint-plugin-wordpress": "git://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#1774343f6226052a46b081e01db3fca8793cc9f1",
+		"hpq": "1.2.0",
+		"http-build-query": "0.7.0",
+		"jquery": "3.3.1",
+		"js-beautify": "1.6.14",
+		"lerna": "2.11.0",
+		"lodash": "4.17.5",
+		"memize": "1.0.5",
+		"moment": "2.22.1",
+		"moment-timezone": "0.5.16",
+		"mousetrap": "1.6.2",
+		"prop-types": "15.5.10",
+		"querystringify": "1.0.0",
+		"re-resizable": "4.4.8",
+		"react": "16.4.1",
+		"react-autosize-textarea": "3.0.2",
+		"react-click-outside": "2.3.1",
+		"react-color": "2.13.4",
+		"react-datepicker": "1.4.1",
+		"react-dom": "16.4.1",
+		"redux": "3.7.2",
+		"redux-multi": "0.1.12",
+		"redux-optimist": "1.0.0",
+		"refx": "3.0.0",
+		"rememo": "3.0.0",
+		"showdown": "1.8.6",
+		"simple-html-tokenizer": "0.4.1",
+		"tinycolor2": "1.4.1",
+		"tinymce": "4.7.2",
+		"uuid": "3.1.0"
+	},
+	"devDependencies": {
+		"@wordpress/babel-plugin-makepot": "1.0.1",
+		"@wordpress/babel-preset-default": "1.3.0",
+		"@wordpress/browserslist-config": "2.1.4",
+		"@wordpress/custom-templated-path-webpack-plugin": "1.0.2",
+		"@wordpress/jest-preset-default": "1.0.6",
+		"@wordpress/scripts": "1.2.0",
+		"autoprefixer": "8.2.0",
+		"babel-core": "6.26.0",
+		"babel-eslint": "8.0.3",
+		"babel-loader": "7.1.4",
+		"babel-plugin-transform-async-generator-functions": "6.24.1",
+		"check-node-version": "3.1.1",
+		"codecov": "3.0.2",
+		"concurrently": "3.5.0",
+		"core-js": "2.5.3",
+		"cross-env": "3.2.4",
+		"deep-freeze": "0.0.1",
+		"doctrine": "2.1.0",
+		"eslint": "4.16.0",
+		"eslint-config-wordpress": "2.0.0",
+		"eslint-plugin-jest": "21.5.0",
+		"eslint-plugin-jsx-a11y": "6.0.2",
+		"eslint-plugin-react": "7.7.0",
+		"espree": "3.5.4",
+		"extract-text-webpack-plugin": "4.0.0-beta.0",
+		"node-sass": "git://github.com/sass/node-sass.git#v4.7.0",
+		"pegjs": "0.10.0",
+		"pegjs-loader": "0.5.4",
+		"phpegjs": "1.0.0-beta7",
+		"postcss-color-function": "4.0.1",
+		"postcss-loader": "2.1.3",
+		"puppeteer": "1.2.0",
+		"raw-loader": "0.5.1",
+		"react-test-renderer": "16.4.1",
+		"sass-loader": "6.0.7",
+		"sprintf-js": "1.1.1",
+		"style-loader": "0.20.3",
+		"webpack": "4.8.3",
+		"webpack-cli": "2.1.3",
+		"webpack-livereload-plugin": "2.1.1",
+		"webpack-rtl-plugin": "github:yoavf/webpack-rtl-plugin#develop"
+	},
+	"babel": {
+		"presets": [
+			"@wordpress/default"
+		],
+		"plugins": [
+			[
+				"./packages/babel-plugin-import-jsx-pragma",
+				{
+					"scopeVariable": "createElement",
+					"source": "@wordpress/element",
+					"isDefault": false
+				}
+			],
+			[
+				"babel-plugin-transform-react-jsx",
+				{
+					"pragma": "createElement"
+				}
+			]
+		],
+		"env": {
+			"production": {
+				"plugins": [
+					[
+						"@wordpress/babel-plugin-makepot",
+						{
+							"output": "languages/gutenberg.pot"
+						}
+					]
+				]
+			}
+		}
+	},
+	"npmPackageJsonLintConfig": {
+		"extends": "@wordpress/npm-package-json-lint-config",
+		"rules": {
+			"require-publishConfig": "error",
+			"valid-values-author": [
+				"error",
+				[
+					"The WordPress Contributors"
+				]
+			],
+			"valid-values-publishConfig": [
+				"error",
+				[
+					{
+						"access": "public"
+					}
+				]
+			]
+		}
+	},
+	"scripts": {
+		"prebuild": "npm run check-engines",
+		"clean:packages": "rimraf ./packages/*/build ./packages/*/build-module",
+		"prebuild:packages": "npm run clean:packages && cross-env INCLUDE_PACKAGES=babel-plugin-import-jsx-pragma SKIP_JSX_PRAGMA_TRANSFORM=1 node ./bin/packages/build.js",
+		"build:packages": "cross-env EXCLUDE_PACKAGES=babel-plugin-import-jsx-pragma node ./bin/packages/build.js",
+		"build": "npm run build:packages && cross-env NODE_ENV=production webpack",
+		"check-engines": "check-node-version --package",
+		"ci": "concurrently \"npm run lint && npm run build\" \"npm run test-unit:coverage-ci\"",
+		"predev": "npm run check-engines",
+		"dev": "npm run build:packages && concurrently \"cross-env webpack --watch\" \"npm run dev:packages\"",
+		"dev:packages": "node ./bin/packages/watch.js",
+		"docs:build": "node docs/tool",
+		"fixtures:clean": "rimraf \"core-blocks/test/fixtures/*.+(json|serialized.html)\"",
+		"fixtures:server-registered": "docker-compose run -w /var/www/html/wp-content/plugins/gutenberg --rm wordpress ./bin/get-server-blocks.php > core-blocks/test/server-registered.json",
+		"fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
+		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
+		"lint": "npm run lint-js && npm run lint-pkg-json",
+		"lint-js": "eslint .",
+		"lint-js:fix": "eslint . --fix",
+		"lint-php": "docker-compose run --rm composer run-script lint",
+		"lint-pkg-json": "wp-scripts lint-pkg-json ./packages",
+		"package-plugin": "./bin/build-plugin-zip.sh",
+		"postinstall": "lerna bootstrap --hoist && npm run build:packages",
+		"pot-to-php": "./bin/pot-to-php.js",
+		"publish:check": "lerna updated",
+		"publish:dev": "lerna publish --npm-tag next",
+		"publish:prod": "lerna publish",
+		"test": "npm run lint && npm run test-unit",
+		"test-e2e": "wp-scripts test-unit-js --config test/e2e/jest.config.json --runInBand",
+		"test-e2e:watch": "npm run test-e2e -- --watch",
+		"test-php": "npm run lint-php && npm run test-unit-php",
+		"test-unit": "wp-scripts test-unit-js --config test/unit/jest.config.json",
+		"test-unit:coverage": "npm run test-unit -- --coverage",
+		"test-unit:coverage-ci": "npm run test-unit -- --coverage --maxWorkers 1 && codecov",
+		"test-unit:update": "npm run test-unit -- --updateSnapshot",
+		"test-unit:watch": "npm run test-unit -- --watch",
+		"test-unit-php": "docker-compose run --rm wordpress_phpunit phpunit",
+		"test-unit-php-multisite": "docker-compose run -e WP_MULTISITE=1 --rm wordpress_phpunit phpunit"
+	}
 }

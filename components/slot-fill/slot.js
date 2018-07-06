@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop, map, isString } from 'lodash';
+import { noop, map, isString, isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -27,15 +27,15 @@ class Slot extends Component {
 		unregisterSlot( this.props.name, this );
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		const { name } = nextProps;
+	componentDidUpdate( prevProps ) {
+		const { name } = this.props;
 		const {
 			unregisterSlot = noop,
 			registerSlot = noop,
 		} = this.context;
 
-		if ( this.props.name !== name ) {
-			unregisterSlot( this.props.name );
+		if ( prevProps.name !== name ) {
+			unregisterSlot( prevProps.name );
 			registerSlot( name, this );
 		}
 	}
@@ -45,25 +45,30 @@ class Slot extends Component {
 	}
 
 	render() {
-		const { name, bubblesVirtually = false } = this.props;
+		const { children, name, bubblesVirtually = false, fillProps = {} } = this.props;
 		const { getFills = noop } = this.context;
 
 		if ( bubblesVirtually ) {
 			return <div ref={ this.bindNode } />;
 		}
 
+		const fills = map( getFills( name ), ( fill ) => {
+			const fillKey = fill.occurrence;
+			const fillChildren = isFunction( fill.props.children ) ? fill.props.children( fillProps ) : fill.props.children;
+
+			return Children.map( fillChildren, ( child, childIndex ) => {
+				if ( ! child || isString( child ) ) {
+					return child;
+				}
+
+				const childKey = `${ fillKey }---${ child.key || childIndex }`;
+				return cloneElement( child, { key: childKey } );
+			} );
+		} );
+
 		return (
-			<div ref={ this.bindNode }>
-				{ map( getFills( name ), ( fill ) => {
-					const fillKey = fill.occurrence;
-					return Children.map( fill.props.children, ( child, childIndex ) => {
-						if ( ! child || isString( child ) ) {
-							return child;
-						}
-						const childKey = `${ fillKey }---${ child.key || childIndex }`;
-						return cloneElement( child, { key: childKey } );
-					} );
-				} ) }
+			<div ref={ this.bindNode } role="presentation">
+				{ isFunction( children ) ? children( fills.filter( Boolean ) ) : fills }
 			</div>
 		);
 	}

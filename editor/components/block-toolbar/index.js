@@ -1,44 +1,36 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress Dependencies
  */
-import { Slot } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal Dependencies
  */
 import './style.scss';
 import BlockSwitcher from '../block-switcher';
-import { getBlockMode, getSelectedBlock } from '../../store/selectors';
+import BlockControls from '../block-controls';
+import BlockFormatControls from '../block-format-controls';
 
 function BlockToolbar( { block, mode } ) {
-	if ( ! block || ! block.isValid ) {
+	if ( ! block || ! block.isValid || mode !== 'visual' ) {
 		return null;
 	}
 
-	// Disable reason: Toolbar itself is non-interactive, but must capture
-	// bubbling events from children to determine focus shift intents.
-	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<div className="editor-block-toolbar">
-			{ mode === 'visual' && [
-				<BlockSwitcher key="switcher" uids={ [ block.uid ] } />,
-				<Slot key="slot" name="Formatting.Toolbar" />,
-			] }
+			<BlockSwitcher uids={ [ block.uid ] } />
+			<BlockControls.Slot />
+			<BlockFormatControls.Slot />
 		</div>
 	);
-	/* eslint-enable jsx-a11y/no-static-element-interactions */
 }
 
-export default connect( ( state ) => {
-	const block = getSelectedBlock( state );
+export default withSelect( ( select ) => {
+	const { getSelectedBlock, getBlockMode } = select( 'core/editor' );
+	const block = getSelectedBlock();
 
-	return ( {
+	return {
 		block,
-		mode: block ? getBlockMode( state, block.uid ) : null,
-	} );
+		mode: block ? getBlockMode( block.uid ) : null,
+	};
 } )( BlockToolbar );

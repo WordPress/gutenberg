@@ -61,5 +61,11 @@ describe( 'IconButton', () => {
 			expect( iconButton.name() ).toBe( 'Button' );
 			expect( iconButton.prop( 'aria-label' ) ).toBe( 'WordPress' );
 		} );
+
+		it( 'should show the tooltip for empty children', () => {
+			const iconButton = shallow( <IconButton label="WordPress" children={ [] } /> );
+			expect( iconButton.name() ).toBe( 'Tooltip' );
+			expect( iconButton.prop( 'text' ) ).toBe( 'WordPress' );
+		} );
 	} );
 } );

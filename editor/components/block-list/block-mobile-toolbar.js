@@ -1,18 +1,23 @@
 /**
+ * WordPress dependencies
+ */
+import { ifViewportMatches } from '@wordpress/viewport';
+
+/**
  * Internal dependencies
  */
 import BlockMover from '../block-mover';
-import BlockDeleteButton from '../block-settings-menu/block-delete-button';
 import BlockSettingsMenu from '../block-settings-menu';
+import VisualEditorInserter from '../inserter';
 
-function BlockMobileToolbar( { uid } ) {
+function BlockMobileToolbar( { rootUID, uid } ) {
 	return (
 		<div className="editor-block-list__block-mobile-toolbar">
+			<VisualEditorInserter />
 			<BlockMover uids={ [ uid ] } />
-			<BlockDeleteButton uids={ [ uid ] } small />
-			<BlockSettingsMenu uids={ [ uid ] } />
+			<BlockSettingsMenu rootUID={ rootUID } uids={ [ uid ] } />
 		</div>
 	);
 }
 
-export default BlockMobileToolbar;
+export default ifViewportMatches( '< small' )( BlockMobileToolbar );
