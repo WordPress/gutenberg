@@ -151,6 +151,32 @@ const getValidFromTransformsForSource = ( sourceBlock, isMultiBlock = false ) =>
 };
 
 /**
+ * Returns the names of blocks that the source block can be transformed
+ * into, based on its own 'to' transforms
+ *
+ * @param {Object} sourceBlock The instance of the source block
+ * @param {boolean} isMultiBlock Have multiple blocks been selected?
+ *
+ * @return {Array} An array of block names
+ */
+const getValidToTransformsForSource = ( sourceBlock, isMultiBlock = false ) => {
+	const blockType = getBlockType( sourceBlock.name );
+	const transformsTo = getBlockTransforms( 'to', blockType.name );
+
+	// filter all 'to' transforms to find those that are valid
+	const validTransformsTo = filter(
+		transformsTo,
+		( transform ) => isValidTransformForSource( transform, 'to', sourceBlock, isMultiBlock )
+	);
+
+	// Build a list of block names using the valid 'to' transforms
+	return flatMap(
+		validTransformsTo,
+		( transformation ) => transformation.blocks
+	);
+};
+
+/**
  * Returns an array of possible block transformations that could happen on the
  * set of blocks received as argument.
  *
@@ -164,26 +190,12 @@ export function getPossibleBlockTransformations( blocks ) {
 		return [];
 	}
 	const isMultiBlock = blocks.length > 1;
-	const sourceBlockName = sourceBlock.name;
-
-	if ( isMultiBlock && ! every( blocks, { name: sourceBlockName } ) ) {
+	if ( isMultiBlock && ! every( blocks, { name: sourceBlock.name } ) ) {
 		return [];
 	}
 
 	const blocksToBeTransformedFrom = getValidFromTransformsForSource( sourceBlock, isMultiBlock );
-
-	const blockType = getBlockType( sourceBlockName );
-	const transformsTo = getBlockTransforms( 'to', blockType.name );
-	const validTransformsTo = filter(
-		transformsTo,
-		( transform ) => isValidTransformForSource( transform, 'to', sourceBlock, isMultiBlock )
-	);
-
-	// Generate list of block transformations using the supplied "transforms to".
-	const blocksToBeTransformedTo = flatMap(
-		validTransformsTo,
-		( transformation ) => transformation.blocks
-	);
+	const blocksToBeTransformedTo = getValidToTransformsForSource( sourceBlock, isMultiBlock );
 
 	// Returns a unique list of available block transformations.
 	return reduce( [
