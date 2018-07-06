@@ -123,7 +123,7 @@ describe( 'PostPreviewButton', () => {
 			assertForPreview( {
 				isAutosaveable: true,
 				previewLink: 'https://wordpress.org/?p=1&preview=true',
-			}, 'https://wordpress.org/?p=1&preview=true', true );
+			}, 'about:blank', true );
 		} );
 
 		it( 'should save for autosaveable post without preview link', () => {
