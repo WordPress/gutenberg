@@ -628,6 +628,75 @@ describe( 'block factory', () => {
 
 			expect( availableBlocks ).toEqual( [] );
 		} );
+
+		it( 'for a non multiblock transform, the canTransform function receives the source block\'s attributes object as its first argument', () => {
+			const canTransform = jest.fn();
+
+			registerBlockType( 'core/updated-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [ {
+						type: 'block',
+						blocks: [ 'core/text-block' ],
+						transform: noop,
+						canTransform,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const block = createBlock( 'core/updated-text-block', {
+				value: 'ribs',
+			} );
+
+			getPossibleBlockTransformations( [ block ] );
+
+			expect( canTransform ).toHaveBeenCalledWith( { value: 'ribs' } );
+		} );
+
+		it( 'for a multiblock transform, the canTransform function receives an array containing every source block\'s attributes as its first argument', () => {
+			const canTransform = jest.fn();
+
+			registerBlockType( 'core/updated-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [ {
+						type: 'block',
+						blocks: [ 'core/text-block' ],
+						transform: noop,
+						isMultiBlock: true,
+						canTransform,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const meatBlock = createBlock( 'core/updated-text-block', {
+				value: 'ribs',
+			} );
+
+			const cheeseBlock = createBlock( 'core/updated-text-block', {
+				value: 'halloumi',
+			} );
+
+			getPossibleBlockTransformations( [ meatBlock, cheeseBlock ] );
+
+			expect( canTransform ).toHaveBeenCalledWith( [ { value: 'ribs' }, { value: 'halloumi' } ] );
+		} );
 	} );
 
 	describe( 'switchToBlockType()', () => {
