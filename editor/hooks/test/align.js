@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { mount } from 'enzyme';
 import { noop } from 'lodash';
 import renderer from 'react-test-renderer';
 
@@ -121,9 +120,8 @@ describe( 'align', () => {
 				/>
 			);
 			// when there's only one child, `rendered` in the tree is an object not an array.
-			expect( wrapper.toTree().rendered ).toBeInstanceOf(Object);
+			expect( wrapper.toTree().rendered ).toBeInstanceOf( Object );
 		} );
-
 
 		it( 'should render toolbar controls if valid alignments', () => {
 			registerBlockType( 'core/foo', {
@@ -174,7 +172,7 @@ describe( 'align', () => {
 				/>
 			);
 			expect( wrapper.toTree().rendered.props.wrapperProps ).toEqual( {
-				'data-align': 'left'
+				'data-align': 'left',
 			} );
 		} );
 
