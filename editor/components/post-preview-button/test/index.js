@@ -60,13 +60,14 @@ describe( 'PostPreviewButton', () => {
 					isSaveable
 					modified="2017-08-03T15:05:50" />
 			);
-			wrapper.instance().previewWindow = { location: {} };
+
+			const previewWindow = { location: {} };
+
+			wrapper.instance().previewWindow = previewWindow;
 
 			wrapper.setProps( { previewLink: 'https://wordpress.org/?p=1' } );
 
-			expect(
-				wrapper.instance().previewWindow.location
-			).toBe( 'https://wordpress.org/?p=1' );
+			expect( previewWindow.location ).toBe( 'https://wordpress.org/?p=1' );
 		} );
 	} );
 
