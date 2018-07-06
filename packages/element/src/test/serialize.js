@@ -9,8 +9,8 @@ import { noop } from 'lodash';
 import {
 	Component,
 	Fragment,
-	RawHTML,
-} from '../';
+} from '../api';
+import { RawHTML } from '../components';
 import serialize, {
 	escapeAmpersand,
 	escapeQuotationMark,

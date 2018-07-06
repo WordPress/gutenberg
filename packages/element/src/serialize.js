@@ -38,7 +38,8 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import { Fragment, RawHTML } from './';
+import { Fragment } from './api';
+import { RawHTML } from './components';
 
 /**
  * Valid attribute types.
