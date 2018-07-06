@@ -38,7 +38,12 @@ export class PostPreviewButton extends Component {
 	 */
 	setPreviewWindowLink( url ) {
 		const { previewWindow } = this;
-		if ( previewWindow ) {
+
+		// Once popup redirect is evaluated, even if already closed, delete
+		// reference to avoid later assignment of location in a post update.
+		delete this.previewWindow;
+
+		if ( previewWindow && ! previewWindow.closed ) {
 			previewWindow.location = url;
 		}
 	}
@@ -74,12 +79,6 @@ export class PostPreviewButton extends Component {
 			isAutosaveable ? 'about:blank' : previewLink,
 			this.getWindowTarget()
 		);
-
-		// When popup is closed or redirected by setPreviewWindowLink, delete
-		// reference to avoid later assignment of location in a post update.
-		this.previewWindow.onbeforeunload = () => {
-			delete this.previewWindow;
-		};
 
 		if ( ! isAutosaveable ) {
 			return;
