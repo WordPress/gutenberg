@@ -475,7 +475,7 @@ describe( 'block factory', () => {
 			expect( availableBlocks[ 1 ].name ).toBe( 'core/another-text-block' );
 		} );
 
-		it( 'should show multiple possible transformations for a single `to` transform object with multiple blocks', () => {
+		it( 'should show multiple possible transformations for a single `to` transform object with multiple block names', () => {
 			registerBlockType( 'core/updated-text-block', {
 				attributes: {
 					value: {
