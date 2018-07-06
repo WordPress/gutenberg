@@ -20,6 +20,7 @@ import org.wordpress.aztec.plugins.IToolbarButton;
 import org.wordpress.aztec.plugins.shortcodes.AudioShortcodePlugin;
 import org.wordpress.aztec.plugins.shortcodes.CaptionShortcodePlugin;
 import org.wordpress.aztec.plugins.shortcodes.VideoShortcodePlugin;
+import org.wordpress.aztec.plugins.wpcomments.HiddenGutenbergPlugin;
 import org.wordpress.aztec.plugins.wpcomments.WordPressCommentsPlugin;
 import org.wordpress.aztec.plugins.wpcomments.toolbar.MoreToolbarButton;
 
@@ -50,6 +51,7 @@ public class ReactAztecText extends AztecText {
         addPlugin(new CaptionShortcodePlugin(this));
         addPlugin(new VideoShortcodePlugin());
         addPlugin(new AudioShortcodePlugin());
+        addPlugin(new HiddenGutenbergPlugin(this));
         addPlugin(new CssUnderlinePlugin());
         this.setImageGetter(new GlideImageLoader(reactContext));
         this.setVideoThumbnailGetter(new GlideVideoThumbnailLoader(reactContext));
