@@ -188,12 +188,6 @@ class WritingFlow extends Component {
 	onKeyDown( event ) {
 		const { hasMultiSelection, onMultiSelect, blocks } = this.props;
 
-		// Aobrt if navigation has already been handled (e.g. TinyMCE inline
-		// boundaries).
-		if ( event.nativeEvent.defaultPrevented ) {
-			return;
-		}
-
 		const { keyCode, target } = event;
 		const isUp = keyCode === UP;
 		const isDown = keyCode === DOWN;
@@ -204,15 +198,11 @@ class WritingFlow extends Component {
 		const isVertical = isUp || isDown;
 		const isNav = isHorizontal || isVertical;
 		const isShift = event.shiftKey;
-
 		const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
 
-		if ( ! isVertical ) {
-			this.verticalRect = null;
-		} else if ( ! this.verticalRect ) {
-			this.verticalRect = computeCaretRect( target );
-		}
-
+		// This logic inside this condition needs to be checked before
+		// the check for event.nativeEvent.defaultPrevented.
+		// The logic handles meta+a keypress and this event is default prevented by TinyMCE.
 		if ( ! isNav ) {
 			// Set immediately before the meta+a combination can be pressed.
 			if ( isKeyboardEvent.primary( event ) ) {
@@ -234,6 +224,18 @@ class WritingFlow extends Component {
 			}
 
 			return;
+		}
+
+		// Abort if navigation has already been handled (e.g. TinyMCE inline
+		// boundaries).
+		if ( event.nativeEvent.defaultPrevented ) {
+			return;
+		}
+
+		if ( ! isVertical ) {
+			this.verticalRect = null;
+		} else if ( ! this.verticalRect ) {
+			this.verticalRect = computeCaretRect( target );
 		}
 
 		if ( isShift && ( hasMultiSelection || (
