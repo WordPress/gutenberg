@@ -3,6 +3,7 @@
  */
 import { mount } from 'enzyme';
 import { noop } from 'lodash';
+import renderer from 'react-test-renderer';
 
 /**
  * WordPress dependencies
@@ -112,20 +113,19 @@ describe( 'align', () => {
 				<div { ...wrapperProps } />
 			) );
 
-			const wrapper = mount(
+			const wrapper = renderer.create(
 				<EnhancedComponent
 					name="core/foo"
 					attributes={ {} }
 					isSelected
 				/>
 			);
-
-			expect( wrapper.children() ).toHaveLength( 1 );
+			// when there's only one child, `rendered` in the tree is an object not an array.
+			expect( wrapper.toTree().rendered ).toBeInstanceOf(Object);
 		} );
 
-		// Skipped temporarily until Enzyme publishes new version that works with React 16.3.0 APIs.
-		// eslint-disable-next-line jest/no-disabled-tests
-		it.skip( 'should render toolbar controls if valid alignments', () => {
+
+		it( 'should render toolbar controls if valid alignments', () => {
 			registerBlockType( 'core/foo', {
 				...blockSettings,
 				supports: {
@@ -138,15 +138,14 @@ describe( 'align', () => {
 				<div { ...wrapperProps } />
 			) );
 
-			const wrapper = mount(
+			const wrapper = renderer.create(
 				<EnhancedComponent
 					name="core/foo"
 					attributes={ {} }
 					isSelected
 				/>
 			);
-
-			expect( wrapper.children() ).toHaveLength( 2 );
+			expect( wrapper.toTree().rendered ).toHaveLength( 2 );
 		} );
 	} );
 
@@ -164,7 +163,7 @@ describe( 'align', () => {
 				<div { ...wrapperProps } />
 			) );
 
-			const wrapper = mount(
+			const wrapper = renderer.create(
 				<EnhancedComponent
 					block={ {
 						name: 'core/foo',
@@ -174,9 +173,8 @@ describe( 'align', () => {
 					} }
 				/>
 			);
-
-			expect( wrapper.childAt( 0 ).prop( 'wrapperProps' ) ).toEqual( {
-				'data-align': 'left',
+			expect( wrapper.toTree().rendered.props.wrapperProps ).toEqual( {
+				'data-align': 'left'
 			} );
 		} );
 
@@ -193,7 +191,7 @@ describe( 'align', () => {
 				<div { ...wrapperProps } />
 			) );
 
-			const wrapper = mount(
+			const wrapper = renderer.create(
 				<EnhancedComponent
 					block={ {
 						name: 'core/foo',
@@ -204,7 +202,7 @@ describe( 'align', () => {
 				/>
 			);
 
-			expect( wrapper.childAt( 0 ).prop( 'wrapperProps' ) ).toBeUndefined();
+			expect( wrapper.toTree().props.wrapperProps ).toBeUndefined();
 		} );
 	} );
 
