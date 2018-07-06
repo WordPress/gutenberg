@@ -123,22 +123,31 @@ const isValidTransformForSource = ( transform, direction, sourceBlock, isMultiBl
 };
 
 /**
- * Returns a predicate that receives a transformation and returns true if the
- * given transformation is able to execute in the situation specified in the
- * params.
+ * Returns the names of the blocks that the source block can be transformed
+ * into, based on 'from' transforms on other blocks.
  *
  * @param {Object}  sourceBlock  Source block.
  * @param {boolean} isMultiBlock Array of possible block transformations.
  *
- * @return {Function} Predicate that receives a block type.
+ * @return {Array} An array of block names
  */
-const blockContainsValidFromTransform = ( sourceBlock, isMultiBlock = false ) => ( blockType ) => {
-	const fromTransforms = getBlockTransforms( 'from', blockType.name );
+const getValidFromTransformsForSource = ( sourceBlock, isMultiBlock = false ) => {
+	const allBlockTypes = getBlockTypes();
 
-	return !! findTransform(
-		fromTransforms,
-		( transform ) => isValidTransformForSource( transform, 'from', sourceBlock, isMultiBlock )
+	// filter all blocks to find those with a valid 'from' transform
+	const blocksWithValidFromTransforms = filter(
+		allBlockTypes,
+		( blockType ) => {
+			const fromTransforms = getBlockTransforms( 'from', blockType.name );
+
+			return !! findTransform(
+				fromTransforms,
+				( transform ) => isValidTransformForSource( transform, 'from', sourceBlock, isMultiBlock )
+			);
+		},
 	);
+
+	return blocksWithValidFromTransforms.map( ( type ) => type.name );
 };
 
 /**
@@ -161,11 +170,7 @@ export function getPossibleBlockTransformations( blocks ) {
 		return [];
 	}
 
-	// Compute the block that have a from transformation able to transfer blocks passed as argument.
-	const blocksToBeTransformedFrom = filter(
-		getBlockTypes(),
-		blockContainsValidFromTransform( sourceBlock, isMultiBlock ),
-	).map( ( type ) => type.name );
+	const blocksToBeTransformedFrom = getValidFromTransformsForSource( sourceBlock, isMultiBlock );
 
 	const blockType = getBlockType( sourceBlockName );
 	const transformsTo = getBlockTransforms( 'to', blockType.name );
