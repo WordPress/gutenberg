@@ -307,25 +307,27 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 			this.unsubscribe();
 		}
 
-		shouldComponentUpdate( nextProps ) {
-			// This implementation of shouldComponentUpdate is only intended
-			// to handle incoming props changes. Changes effected via state
-			// changes are reflected by the subscribe handler's forceUpdate.
-			if ( isShallowEqual( this.props, nextProps ) ) {
+		shouldComponentUpdate( nextProps, nextState ) {
+			const hasPropsChanged = ! isShallowEqual( this.props, nextProps );
+
+			// Only render if props have changed or merge props have been updated
+			// from the store subscriber.
+			if ( this.state === nextState && ! hasPropsChanged ) {
 				return false;
 			}
 
-			// Regardless of whether merge props are changing, the component
-			// will need to render if props are different. But if the merge
-			// props change as a result of the incoming props, they should be
-			// reflected as such in the next render.
-			const nextMergeProps = getNextMergeProps( nextProps );
-			if ( ! isShallowEqual( this.mergeProps, nextMergeProps ) ) {
-				// Yes, this is a side effect. Yes, side effects don't belong
-				// in shouldComponentUpdate. This is not a typical component in
-				// that it is very much a hot code path, and will employ any
-				// and all gymnastics necessary for optimal performance.
-				this.mergeProps = nextMergeProps;
+			// If merge props change as a result of the incoming props, they
+			// should be reflected as such in the upcoming render.
+			if ( hasPropsChanged ) {
+				const nextMergeProps = getNextMergeProps( nextProps );
+				if ( ! isShallowEqual( this.mergeProps, nextMergeProps ) ) {
+					// Side effects are typically discouraged in lifecycle methods, but
+					// this component is heavily used and this is the most performant
+					// code we've found thus far.
+					// Prior efforts to use `getDerivedStateFromProps` have demonstrated
+					// miserable performance.
+					this.mergeProps = nextMergeProps;
+				}
 			}
 
 			return true;
@@ -344,10 +346,15 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 
 				this.mergeProps = nextMergeProps;
 
-				// forceUpdate is used to intentionally bypass the default
-				// behavior of shouldComponentUpdate, which in this component
-				// is specifically designed to handle only props changes.
-				this.forceUpdate();
+				// Schedule an update. Merge props are not assigned to state
+				// because derivation of merge props from incoming props occurs
+				// within shouldComponentUpdate, where setState is not allowed.
+				// setState is used here instead of forceUpdate because forceUpdate
+				// bypasses shouldComponentUpdate altogether, which isn't desireable
+				// if both state and props change within the same render.
+				// Unfortunately this requires that next merge props are generated
+				// twice.
+				this.setState( {} );
 			} );
 		}
 
