@@ -220,15 +220,13 @@ export function createHigherOrderComponent( mapComponentToEnhancedComponent,
 ) {
 	return ( OriginalComponent ) => {
 		const WrappedComponent = mapComponentToEnhancedComponent( OriginalComponent );
-		const EnhancedComponent = forwardRef(
-			( props, ref ) => {
-				const forwardedRef = props.forwardedRef || ref;
-				return <WrappedComponent { ...props } forwardedRef={ forwardedRef || noop } />;
-			}
-		);
+		const EnhancedComponent = ( props, ref ) => {
+			const forwardedRef = props.forwardedRef || ref;
+			return <WrappedComponent { ...props } forwardedRef={ forwardedRef || noop } />;
+		};
 		const { displayName = OriginalComponent.name || 'Component' } = OriginalComponent;
 		EnhancedComponent.displayName = `${ upperFirst( camelCase( modifierName ) ) }(${ displayName })`;
-		return EnhancedComponent;
+		return forwardRef( EnhancedComponent );
 	};
 }
 
