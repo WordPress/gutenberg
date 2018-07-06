@@ -13,10 +13,12 @@ import {
 	asType,
 	createBlockWithFallback,
 	getMigratedBlock,
-	default as parse,
+	default as parsePegjs,
 	parseWithAttributeSchema,
 	toBooleanAttributeMatcher,
+	createParse,
 } from '../parser';
+import { parse as grammarParsePreGenerated } from '../post-grammar-parser-pre-generated';
 import {
 	registerBlockType,
 	unregisterBlockType,
@@ -547,7 +549,19 @@ describe( 'block parser', () => {
 		} );
 	} );
 
-	describe( 'parse()', () => {
+	describe( 'parse() of pegjs parser', () => {
+		// run the test cases using the PegJS defined parser
+		testCases( parsePegjs );
+	} );
+
+	describe( 'parse() of pre-generated parser', () => {
+		// run the test cases using the pre-generated parser
+		const parsePreGenerated = createParse( grammarParsePreGenerated );
+		testCases( parsePreGenerated );
+	} );
+
+	// encapsulate the test cases so we can run them multiple time but with a different parse() function
+	function testCases( parse ) {
 		it( 'should parse the post content, including block attributes', () => {
 			registerBlockType( 'core/test-block', {
 				attributes: {
@@ -730,5 +744,5 @@ describe( 'block parser', () => {
 			const parsed = parse( serialized );
 			expect( parsed[ 0 ].attributes.content ).toBe( content );
 		} );
-	} );
+	}
 } );

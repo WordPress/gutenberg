@@ -10,6 +10,7 @@ import {
  * Internal dependencies
  */
 import serialize from './serialize';
+import { RawHTML } from './index-common';
 
 /**
  * Returns a new element of given type. Type can be either a string tag name or
@@ -38,3 +39,15 @@ export { Component };
  * @return {string} HTML.
  */
 export { serialize as renderToString };
+
+/**
+ * Component used as equivalent of Fragment with unescaped HTML, in cases where
+ * it is desirable to render dangerous HTML without needing a wrapper element.
+ * To preserve additional props, a `div` wrapper _will_ be created if any props
+ * aside from `children` are passed.
+ *
+ * @param {string} props.children HTML to render.
+ *
+ * @return {WPElement} Dangerously-rendering element.
+ */
+export { RawHTML };
