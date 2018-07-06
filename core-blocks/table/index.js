@@ -10,13 +10,13 @@ import classnames from 'classnames';
 import { Fragment } from '@wordpress/element';
 import { getPhrasingContentSchema } from '@wordpress/blocks';
 import {
-	BlockControls,
 	BlockAlignmentToolbar,
 	RichText,
 	InspectorControls,
 } from '@wordpress/editor';
 
 import {
+	BaseControl,
 	PanelBody,
 	ToggleControl,
 } from '@wordpress/components';
@@ -120,12 +120,6 @@ export const settings = {
 
 		return (
 			<Fragment>
-				<BlockControls>
-					<BlockAlignmentToolbar
-						value={ attributes.align }
-						onChange={ updateAlignment }
-					/>
-				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'Table Settings' ) } className="blocks-table-settings">
 						<ToggleControl
@@ -133,6 +127,16 @@ export const settings = {
 							checked={ !! hasFixedLayout }
 							onChange={ toggleFixedLayout }
 						/>
+						<BaseControl
+							label={ __( 'Alignment' ) }
+							id="inspector-block-alignment"
+							className="components-block-alignment"
+						>
+							<BlockAlignmentToolbar
+								value={ attributes.align }
+								onChange={ updateAlignment }
+							/>
+						</BaseControl>
 					</PanelBody>
 				</InspectorControls>
 				<TableBlock

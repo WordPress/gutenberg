@@ -1,13 +1,24 @@
 /**
+ * External dependencies
+ */
+import { find } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Component, Fragment } from '@wordpress/element';
 import { Toolbar, DropdownMenu } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
+	AlignmentToolbar,
 	BlockControls,
 	RichText,
 } from '@wordpress/editor';
+
+/**
+ * Internal dependencies
+ */
+import { domToFormat } from '../../editor/components/rich-text/format';
 
 function isTableSelected( editor ) {
 	return editor.dom.getParent(
@@ -74,6 +85,7 @@ export default class TableBlock extends Component {
 	constructor() {
 		super();
 		this.handleSetup = this.handleSetup.bind( this );
+		this.alignText = this.alignText.bind( this );
 		this.state = {
 			editor: null,
 		};
@@ -86,7 +98,44 @@ export default class TableBlock extends Component {
 				selectFirstCell( editor );
 			}
 		} );
+
+		// Update the alignment toolbar to match the CSS `text-align`
+		// property of the current table cell.
+		editor.on( 'nodechange', ( { selectionChange, parents } ) => {
+			if ( document.activeElement !== editor.getBody() ) {
+				return;
+			}
+			if ( selectionChange ) {
+				const selectedCell = find( parents, ( node ) => node.tagName === 'TD' || node.tagName === 'TH' );
+				const textAlign = selectedCell ? selectedCell.style.textAlign : null;
+				this.setState( { textAlign } );
+			}
+		} );
+
 		this.setState( { editor } );
+	}
+
+	/**
+	 * Sets the CSS `text-align` property of the current table cell.
+	 *
+	 * @param {string} nextAlign The next `text-align` value to set.
+	 */
+	alignText( nextAlign ) {
+		const { editor } = this.state;
+		const { onChange } = this.props;
+		const currentNode = editor.selection.getNode();
+		const tableCell = editor.dom.getParent( currentNode, ( parentNode ) => parentNode.tagName === 'TD' || parentNode.tagName === 'TH' );
+
+		if ( tableCell ) {
+			// If `nextAlign` is undefined, set the `textAlign` value to an empty
+			// string in order to update both the CSS `text-align` property on the
+			// current table cell and the current state value.
+			const textAlign = nextAlign ? nextAlign : '';
+			editor.dom.setStyle( tableCell, 'text-align', textAlign );
+			const content = domToFormat( editor.getBody().childNodes || [], 'element', editor );
+			onChange( content );
+			this.setState( { textAlign } );
+		}
 	}
 
 	render() {
@@ -118,6 +167,10 @@ export default class TableBlock extends Component {
 								} ) ) }
 						/>
 					</Toolbar>
+					<AlignmentToolbar
+						value={ this.state.textAlign }
+						onChange={ this.alignText }
+					/>
 				</BlockControls>
 			</Fragment>
 		);
