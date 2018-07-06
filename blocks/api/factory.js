@@ -95,11 +95,13 @@ export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
  * @return {boolean} Is the transform valid?
  */
 const isValidTransformForSource = ( transform, direction, sourceBlock, isMultiBlock ) => {
+	// If multiple blocks are selected, only multi block transforms are valid
 	const isValidForMultiBlocks = ! isMultiBlock || transform.isMultiBlock;
 	if ( ! isValidForMultiBlocks ) {
 		return false;
 	}
 
+	// Only consider transforms from and to blocks as valid
 	const isValidType = transform.type === 'block';
 	if ( ! isValidType ) {
 		return false;
@@ -108,6 +110,12 @@ const isValidTransformForSource = ( transform, direction, sourceBlock, isMultiBl
 	// Check is the transform's block name matches the source block only if this is a transform 'from'
 	const isValidForSourceName = direction !== 'from' || transform.blocks.indexOf( sourceBlock.name ) !== -1;
 	if ( ! isValidForSourceName ) {
+		return false;
+	}
+
+	// If the transform has a `canTransform` function specified, check that it returns true
+	const canTransform = ! transform.canTransform || !! transform.canTransform( sourceBlock.attributes );
+	if ( ! canTransform ) {
 		return false;
 	}
 

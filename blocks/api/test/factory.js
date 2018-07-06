@@ -506,6 +506,128 @@ describe( 'block factory', () => {
 			expect( availableBlocks[ 0 ].name ).toBe( 'core/text-block' );
 			expect( availableBlocks[ 1 ].name ).toBe( 'core/another-text-block' );
 		} );
+
+		it( 'returns a single transformation for a "from" transform that has a `canTransform` function returning `true`', () => {
+			registerBlockType( 'core/updated-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					from: [ {
+						type: 'block',
+						blocks: [ 'core/text-block' ],
+						transform: noop,
+						canTransform: () => true,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const block = createBlock( 'core/text-block', {
+				value: 'chicken',
+			} );
+
+			const availableBlocks = getPossibleBlockTransformations( [ block ] );
+
+			expect( availableBlocks ).toHaveLength( 1 );
+			expect( availableBlocks[ 0 ].name ).toBe( 'core/updated-text-block' );
+		} );
+
+		it( 'returns no transformations for a "from" transform with a `canTransform` function returning `false`', () => {
+			registerBlockType( 'core/updated-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					from: [ {
+						type: 'block',
+						blocks: [ 'core/text-block' ],
+						transform: noop,
+						canTransform: () => false,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const block = createBlock( 'core/text-block', {
+				value: 'chicken',
+			} );
+
+			const availableBlocks = getPossibleBlockTransformations( [ block ] );
+
+			expect( availableBlocks ).toEqual( [] );
+		} );
+
+		it( 'returns a single transformation for a "to" transform that has a `canTransform` function returning `true`', () => {
+			registerBlockType( 'core/updated-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [ {
+						type: 'block',
+						blocks: [ 'core/text-block' ],
+						transform: noop,
+						canTransform: () => true,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const block = createBlock( 'core/updated-text-block', {
+				value: 'ribs',
+			} );
+
+			const availableBlocks = getPossibleBlockTransformations( [ block ] );
+
+			expect( availableBlocks ).toHaveLength( 1 );
+			expect( availableBlocks[ 0 ].name ).toBe( 'core/text-block' );
+		} );
+
+		it( 'returns no transformations for a "to" transform with a `canTransform` function returning `false`', () => {
+			registerBlockType( 'core/updated-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [ {
+						type: 'block',
+						blocks: [ 'core/text-block' ],
+						transform: noop,
+						canTransform: () => false,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const block = createBlock( 'core/updated-text-block', {
+				value: 'ribs',
+			} );
+
+			const availableBlocks = getPossibleBlockTransformations( [ block ] );
+
+			expect( availableBlocks ).toEqual( [] );
+		} );
 	} );
 
 	describe( 'switchToBlockType()', () => {
