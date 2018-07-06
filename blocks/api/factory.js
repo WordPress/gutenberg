@@ -85,31 +85,32 @@ export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
 }
 
 /**
- * Returns a boolean indicating whether a transform is valid
+ * Returns a boolean indicating whether a transform is possible based on
+ * various bits of context
  *
- * @param {Object} transform the transform object to validate
- * @param {string} direction is this a 'from' or 'to' transform
- * @param {Object} sourceBlock the name of the source block
- * @param {boolean} isMultiBlock have multiple blocks been selected?
+ * @param {Object} transform The transform object to validate
+ * @param {string} direction Is this a 'from' or 'to' transform
+ * @param {Object} sourceBlock The name of the source block
+ * @param {boolean} isMultiBlock Have multiple blocks been selected?
  *
- * @return {boolean} Is the transform valid?
+ * @return {boolean} Is the transform possible?
  */
-const isValidTransformForSource = ( transform, direction, sourceBlock, isMultiBlock ) => {
-	// If multiple blocks are selected, only multi block transforms are valid
+const isPossibleTransformForSource = ( transform, direction, sourceBlock, isMultiBlock ) => {
+	// If multiple blocks are selected, only multi block transforms are allowed
 	const isValidForMultiBlocks = ! isMultiBlock || transform.isMultiBlock;
 	if ( ! isValidForMultiBlocks ) {
 		return false;
 	}
 
-	// Only consider transforms from and to blocks as valid
-	const isValidType = transform.type === 'block';
-	if ( ! isValidType ) {
+	// Only consider 'block' type transforms as valid
+	const isBlockType = transform.type === 'block';
+	if ( ! isBlockType ) {
 		return false;
 	}
 
-	// Check is the transform's block name matches the source block only if this is a transform 'from'
-	const isValidForSourceName = direction !== 'from' || transform.blocks.indexOf( sourceBlock.name ) !== -1;
-	if ( ! isValidForSourceName ) {
+	// Check if the transform's block name matches the source block only if this is a transform 'from'
+	const hasMatchingName = direction !== 'from' || transform.blocks.indexOf( sourceBlock.name ) !== -1;
+	if ( ! hasMatchingName ) {
 		return false;
 	}
 
@@ -126,28 +127,28 @@ const isValidTransformForSource = ( transform, direction, sourceBlock, isMultiBl
  * Returns the names of the blocks that the source block can be transformed
  * into, based on 'from' transforms on other blocks.
  *
- * @param {Object}  sourceBlock  Source block.
- * @param {boolean} isMultiBlock Array of possible block transformations.
+ * @param {Object}  sourceBlock  The instance of the source block.
+ * @param {boolean} isMultiBlock Have multiple blocks been selected?
  *
  * @return {Array} An array of block names
  */
-const getValidFromTransformsForSource = ( sourceBlock, isMultiBlock = false ) => {
+const getPossibleFromTransformsForSource = ( sourceBlock, isMultiBlock = false ) => {
 	const allBlockTypes = getBlockTypes();
 
-	// filter all blocks to find those with a valid 'from' transform
-	const blocksWithValidFromTransforms = filter(
+	// filter all blocks to find those with a 'from' transform
+	const blocksWithPossibleFromTransforms = filter(
 		allBlockTypes,
 		( blockType ) => {
 			const fromTransforms = getBlockTransforms( 'from', blockType.name );
 
 			return !! findTransform(
 				fromTransforms,
-				( transform ) => isValidTransformForSource( transform, 'from', sourceBlock, isMultiBlock )
+				( transform ) => isPossibleTransformForSource( transform, 'from', sourceBlock, isMultiBlock )
 			);
 		},
 	);
 
-	return blocksWithValidFromTransforms.map( ( type ) => type.name );
+	return blocksWithPossibleFromTransforms.map( ( type ) => type.name );
 };
 
 /**
@@ -157,21 +158,21 @@ const getValidFromTransformsForSource = ( sourceBlock, isMultiBlock = false ) =>
  * @param {Object} sourceBlock The instance of the source block
  * @param {boolean} isMultiBlock Have multiple blocks been selected?
  *
- * @return {Array} An array of block names
+ * @return {Array} An array of block names that the source can transform into
  */
-const getValidToTransformsForSource = ( sourceBlock, isMultiBlock = false ) => {
+const getPossibleToTransformsForSource = ( sourceBlock, isMultiBlock = false ) => {
 	const blockType = getBlockType( sourceBlock.name );
 	const transformsTo = getBlockTransforms( 'to', blockType.name );
 
-	// filter all 'to' transforms to find those that are valid
-	const validTransformsTo = filter(
+	// filter all 'to' transforms to find those that are possible
+	const possibleTransforms = filter(
 		transformsTo,
-		( transform ) => isValidTransformForSource( transform, 'to', sourceBlock, isMultiBlock )
+		( transform ) => isPossibleTransformForSource( transform, 'to', sourceBlock, isMultiBlock )
 	);
 
-	// Build a list of block names using the valid 'to' transforms
+	// Build a list of block names using the possible 'to' transforms
 	return flatMap(
-		validTransformsTo,
+		possibleTransforms,
 		( transformation ) => transformation.blocks
 	);
 };
@@ -194,8 +195,8 @@ export function getPossibleBlockTransformations( blocks ) {
 		return [];
 	}
 
-	const blocksToBeTransformedFrom = getValidFromTransformsForSource( sourceBlock, isMultiBlock );
-	const blocksToBeTransformedTo = getValidToTransformsForSource( sourceBlock, isMultiBlock );
+	const blocksToBeTransformedFrom = getPossibleFromTransformsForSource( sourceBlock, isMultiBlock );
+	const blocksToBeTransformedTo = getPossibleToTransformsForSource( sourceBlock, isMultiBlock );
 
 	// Returns a unique list of available block transformations.
 	return reduce( [
