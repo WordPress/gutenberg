@@ -18,12 +18,12 @@ describe( 'core/more/edit', () => {
 		attributes.noTeaser = false;
 	} );
 	test( 'should match snapshot when noTeaser is false', () => {
-		const wrapper = ShallowRenderer.render( <MoreEdit attributes={ attributes } /> );
+		ShallowRenderer.render( <MoreEdit attributes={ attributes } /> );
 		expect( ShallowRenderer.getRenderOutput() ).toMatchSnapshot();
 	} );
 	test( 'should match snapshot when noTeaser is true', () => {
 		attributes.noTeaser = true;
-		const wrapper = ShallowRenderer.render( <MoreEdit attributes={ attributes } /> );
+		ShallowRenderer.render( <MoreEdit attributes={ attributes } /> );
 		expect( ShallowRenderer.getRenderOutput() ).toMatchSnapshot();
 	} );
 } );
