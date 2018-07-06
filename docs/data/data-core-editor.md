@@ -871,24 +871,6 @@ Returns the user notices array.
 
 List of notices.
 
-### getFrecentInserterItems
-
-Returns a list of items which the user is likely to want to insert. These
-are ordered by 'frecency', which is a heuristic that combines block usage
-frequency and recency.
-
-https://en.wikipedia.org/wiki/Frecency
-
-*Parameters*
-
- * state: Global application state.
- * allowedBlockTypes: Allowed block types, or true/false to enable/disable all types.
- * maximum: Number of items to return.
-
-*Returns*
-
-Items that appear in the 'Recent' tab.
-
 ### isSavingSharedBlock
 
 Returns whether or not the shared block with the given ID is being saved.
@@ -1028,10 +1010,6 @@ Returns the Block List settings of a block if any.
 *Returns*
 
 Block settings of the block if set.
-
-### getSupportedBlocks
-
-eslint-disable-next-line no-unused-vars
 
 ### getEditorSettings
 
