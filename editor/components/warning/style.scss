@@ -15,34 +15,39 @@
 	flex-direction: row;
 	justify-content: space-between;
 	flex-wrap: nowrap;
-
-	padding: $block-padding;
 	background-color: $white;
 	border: 1px solid $light-gray-500;
 	text-align: left;
+
+	// Bigger padding on mobile where blocks are edge to edge.
+	padding: $block-padding $parent-block-padding 0 $parent-block-padding;
+	@include break-small() {
+		padding: $block-padding $block-padding 0 $block-padding;
+	}
 
 	.editor-warning__message {
 		line-height: $default-line-height;
 		font-family: $default-font;
 		font-size: $default-font-size;
-		margin: 0;
+		margin: 0 0 $block-padding 0;
 	}
-}
 
+	.editor-warning__contents {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		align-items: center;
+		width: 100%;
+	}
 
-.editor-warning__contents {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	flex-wrap: wrap;
-	align-items: center;
-	width: 100%;
-}
-.editor-warning__actions {
-	display: flex;
-}
-
-.editor-warning__action {
-	margin: 0 6px 0 0;
-	margin-left: 0;
+	.editor-warning__actions {
+		display: flex;
+		margin: 0 0 $block-padding 0;
+	}
+	
+	.editor-warning__action {
+		margin: 0 6px 0 0;
+		margin-left: 0;
+	}
 }
