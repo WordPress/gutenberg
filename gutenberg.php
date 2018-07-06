@@ -410,3 +410,15 @@ add_action( 'admin_print_scripts-edit.php', 'gutenberg_replace_default_add_new_b
 function gutenberg_add_admin_body_class( $classes ) {
 	return "$classes gutenberg-editor-page";
 }
+
+/**
+ * Ensure heartbeat interval is low enough to work for post locking.
+ *
+ * @param  array $settings Settings.
+ * @return array           Filtered settings.
+ */
+function wp_heartbeat_settings_gutenberg( $settings ) {
+    $settings['interval'] = 15;
+    return $settings;
+}
+add_filter( 'heartbeat_settings', 'wp_heartbeat_settings_gutenberg' );
