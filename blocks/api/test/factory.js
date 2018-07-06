@@ -251,7 +251,7 @@ describe( 'block factory', () => {
 			expect( availableBlocks[ 0 ].name ).toBe( 'core/text-block' );
 		} );
 
-		it( 'should not show a transformation if multiple blocks are passed and the transformation is not multi block', () => {
+		it( 'should not show a transformation if multiple blocks are passed and the transformation is not multi block (for a "from" transform)', () => {
 			registerBlockType( 'core/updated-text-block', {
 				attributes: {
 					value: {
@@ -284,7 +284,40 @@ describe( 'block factory', () => {
 			expect( availableBlocks ).toEqual( [] );
 		} );
 
-		it( 'should show a transformation as available if multiple blocks are passed and the transformation accepts multiple blocks', () => {
+		it( 'should not show a transformation if multiple blocks are passed and the transformation is not multi block (for a "to" transform)', () => {
+			registerBlockType( 'core/text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [ {
+						type: 'block',
+						blocks: [ 'core/updated-text-block' ],
+						transform: noop,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/updated-text-block', defaultBlockSettings );
+
+			const block1 = createBlock( 'core/text-block', {
+				value: 'chicken',
+			} );
+
+			const block2 = createBlock( 'core/text-block', {
+				value: 'ribs',
+			} );
+
+			const availableBlocks = getPossibleBlockTransformations( [ block1, block2 ] );
+
+			expect( availableBlocks ).toEqual( [] );
+		} );
+
+		it( 'should show a transformation as available if multiple blocks are passed and the transformation accepts multiple blocks (for a "from" transform)', () => {
 			registerBlockType( 'core/updated-text-block', {
 				attributes: {
 					value: {
@@ -304,6 +337,41 @@ describe( 'block factory', () => {
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const block1 = createBlock( 'core/text-block', {
+				value: 'chicken',
+			} );
+
+			const block2 = createBlock( 'core/text-block', {
+				value: 'ribs',
+			} );
+
+			const availableBlocks = getPossibleBlockTransformations( [ block1, block2 ] );
+
+			expect( availableBlocks ).toHaveLength( 1 );
+			expect( availableBlocks[ 0 ].name ).toBe( 'core/updated-text-block' );
+		} );
+
+		it( 'should show a transformation as available if multiple blocks are passed and the transformation accepts multiple blocks (for a "to" transform)', () => {
+			registerBlockType( 'core/text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [ {
+						type: 'block',
+						blocks: [ 'core/updated-text-block' ],
+						transform: noop,
+						isMultiBlock: true,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/updated-text-block', defaultBlockSettings );
 
 			const block1 = createBlock( 'core/text-block', {
 				value: 'chicken',
