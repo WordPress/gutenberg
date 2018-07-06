@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { createBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
+import { select } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -112,6 +113,14 @@ export const settings = {
 			{
 				type: 'block',
 				blocks: [ 'core/audio' ],
+				canTransform: ( { id } ) => {
+					if ( ! id ) {
+						return false;
+					}
+					const { getMedia } = select( 'core' );
+					const media = getMedia( id );
+					return media && media.mime_type.indexOf( 'audio' ) > -1;
+				},
 				transform: ( attributes ) => {
 					return createBlock( 'core/audio', {
 						src: attributes.href,
@@ -123,6 +132,14 @@ export const settings = {
 			{
 				type: 'block',
 				blocks: [ 'core/video' ],
+				canTransform: ( { id } ) => {
+					if ( ! id ) {
+						return false;
+					}
+					const { getMedia } = select( 'core' );
+					const media = getMedia( id );
+					return media && media.mime_type.indexOf( 'video' ) > -1;
+				},
 				transform: ( attributes ) => {
 					return createBlock( 'core/video', {
 						src: attributes.href,
