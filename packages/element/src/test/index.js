@@ -132,7 +132,7 @@ describe( 'element', () => {
 				( OriginalComponent ) => OriginalComponent,
 				'withTest'
 			)( () => <div /> );
-			expect( TestComponent.displayName ).toBe( 'WithTest(Component)' );
+			expect( TestComponent.render.displayName ).toBe( 'WithTest(Component)' );
 		} );
 
 		it( 'should use camel case starting with upper for wrapper prefix ', () => {
@@ -141,7 +141,7 @@ describe( 'element', () => {
 				'with-one-two_threeFOUR'
 			)( () => <div /> );
 
-			expect( TestComponent.displayName ).toBe( 'WithOneTwoThreeFour(Component)' );
+			expect( TestComponent.render.displayName ).toBe( 'WithOneTwoThreeFour(Component)' );
 		} );
 
 		it( 'should use function name', () => {
@@ -153,7 +153,7 @@ describe( 'element', () => {
 				'withTest'
 			)( SomeComponent );
 
-			expect( TestComponent.displayName ).toBe( 'WithTest(SomeComponent)' );
+			expect( TestComponent.render.displayName ).toBe( 'WithTest(SomeComponent)' );
 		} );
 
 		it( 'should use component class name', () => {
@@ -167,7 +167,7 @@ describe( 'element', () => {
 				'withTest'
 			)( SomeAnotherComponent );
 
-			expect( TestComponent.displayName ).toBe( 'WithTest(SomeAnotherComponent)' );
+			expect( TestComponent.render.displayName ).toBe( 'WithTest(SomeAnotherComponent)' );
 		} );
 
 		it( 'should use displayName property', () => {
@@ -182,7 +182,7 @@ describe( 'element', () => {
 				'withTest'
 			)( SomeYetAnotherComponent );
 
-			expect( TestComponent.displayName ).toBe( 'WithTest(CustomDisplayName)' );
+			expect( TestComponent.render.displayName ).toBe( 'WithTest(CustomDisplayName)' );
 		} );
 		it( 'should forward the ref to the wrapped component', () => {
 			const LeafComponent = forwardRef( ( props, ref ) => {
