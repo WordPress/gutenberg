@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow, mount } from 'enzyme';
+import { shallow } from 'enzyme';
 import TestRenderer from 'react-test-renderer';
 /**
  * Internal dependencies
@@ -187,7 +187,7 @@ describe( 'element', () => {
 		it( 'should forward the ref to the wrapped component', () => {
 			const LeafComponent = forwardRef( ( props, ref ) => {
 				const forwardedRef = props.forwardedRef || null;
-				return <input type="text" ref={ ref || forwardedRef }/>;
+				return <input type="text" ref={ ref || forwardedRef } />;
 			} );
 			LeafComponent.displayName = 'LeafComponent';
 			const TestComponent = compose(
@@ -202,7 +202,7 @@ describe( 'element', () => {
 					'withTest'
 				),
 				createHigherOrderComponent(
-					( OriginalComponent ) => props => <OriginalComponent { ...props } />,
+					( OriginalComponent ) => ( props ) => <OriginalComponent { ...props } />,
 					'withTest2'
 				),
 			)( LeafComponent );
@@ -210,7 +210,7 @@ describe( 'element', () => {
 			// things still work.
 			const TestComponentReversed = compose(
 				createHigherOrderComponent(
-					( OriginalComponent ) => props => {
+					( OriginalComponent ) => ( props ) => {
 						return <OriginalComponent { ...props } />;
 					},
 					'withTest2'
@@ -253,22 +253,21 @@ describe( 'element', () => {
 			}
 			let focused = false;
 			const NODE_MOCK = {
-				createNodeMock: ( element ) =>
-				{
+				createNodeMock: ( element ) => {
 					if ( element.type === 'input' ) {
 						//mock focus function
 						return {
 							focus: () => {
 								focused = true;
-							}
-						}
+							},
+						};
 					}
-				}
+				},
 			};
 			TestRenderer.create( <MainComponent />, NODE_MOCK );
 			expect( focused ).toBe( true );
 			focused = false;
-			TestRenderer.create( <MainComponentReversed/>, NODE_MOCK );
+			TestRenderer.create( <MainComponentReversed />, NODE_MOCK );
 			expect( focused ).toBe( true );
 		} );
 	} );
@@ -309,14 +308,14 @@ describe( 'element', () => {
 				return <p>{ ++i }</p>;
 			} );
 			const wrapper = TestRenderer.create( <MyComp /> );
-			wrapper.update(<MyComp />); // Updating with same props doesn't rerender
-			expect( wrapper.toJSON().children[0] ).toBe( '1' );
+			wrapper.update( <MyComp /> ); // Updating with same props doesn't rerender
+			expect( wrapper.toJSON().children[ 0 ] ).toBe( '1' );
 			wrapper.update( <MyComp a /> ); // New prop should trigger a rerender
-			expect( wrapper.toJSON().children[0] ).toBe( '2' );
+			expect( wrapper.toJSON().children[ 0 ] ).toBe( '2' );
 			wrapper.update( <MyComp a /> ); // Keeping the same prop value should not rerender
-			expect( wrapper.toJSON().children[0] ).toBe( '2' );
+			expect( wrapper.toJSON().children[ 0 ] ).toBe( '2' );
 			wrapper.update( <MyComp b /> ); // Changing the prop value should rerender
-			expect( wrapper.toJSON().children[0] ).toBe( '3' );
+			expect( wrapper.toJSON().children[ 0 ] ).toBe( '3' );
 		} );
 
 		it( 'class component should rerender if the props or state change', () => {
@@ -332,20 +331,20 @@ describe( 'element', () => {
 			} );
 			const element = TestRenderer.create( <MyComp /> );
 			//traverse tree to get the wrapped component instance
-			const wrappedComponent = element.root.find(node => node.instance !== null);
+			const wrappedComponent = element.root.find( ( node ) => node.instance !== null );
 
-			element.update(<MyComp />); // Updating with same props doesn't rerender
-			expect( element.toJSON().children[0] ).toBe( '1' );
+			element.update( <MyComp /> ); // Updating with same props doesn't rerender
+			expect( element.toJSON().children[ 0 ] ).toBe( '1' );
 			element.update( <MyComp a /> ); // New prop should trigger a rerender
-			expect( element.toJSON().children[0] ).toBe( '2' );
+			expect( element.toJSON().children[ 0 ] ).toBe( '2' );
 			element.update( <MyComp a /> ); // Keeping the same prop value should not rerender
-			expect( element.toJSON().children[0] ).toBe( '2' );
+			expect( element.toJSON().children[ 0 ] ).toBe( '2' );
 			element.update( <MyComp b /> ); // Changing the prop value should rerender
-			expect( element.toJSON().children[0] ).toBe( '3' );
+			expect( element.toJSON().children[ 0 ] ).toBe( '3' );
 			wrappedComponent.instance.setState( { a: 1 } ); // New state value should trigger a rerender
-			expect( element.toJSON().children[0] ).toBe( '4' );
+			expect( element.toJSON().children[ 0 ] ).toBe( '4' );
 			wrappedComponent.instance.setState( { a: 1 } ); // Keeping the same state value should not trigger a rerender
-			expect( element.toJSON().children[0] ).toBe( '4' );
+			expect( element.toJSON().children[ 0 ] ).toBe( '4' );
 		} );
 	} );
 } );

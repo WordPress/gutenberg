@@ -17,7 +17,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import { isIconUnreadable, isValidIcon, normalizeIconObject } from './utils';
 
-const forwardRefSymbol = Symbol.for('react.forward_ref');
+const forwardRefSymbol = Symbol.for( 'react.forward_ref' );
 
 /**
  * Defined behavior of a block type.
