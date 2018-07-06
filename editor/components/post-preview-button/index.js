@@ -16,7 +16,7 @@ export class PostPreviewButton extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.saveForPreview = this.saveForPreview.bind( this );
+		this.openPreviewWindow = this.openPreviewWindow.bind( this );
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -25,7 +25,7 @@ export class PostPreviewButton extends Component {
 		// This relies on the window being responsible to unset itself when
 		// navigation occurs or a new preview window is opened, to avoid
 		// unintentional forceful redirects.
-		if ( previewLink && previewLink !== prevProps.previewLink ) {
+		if ( previewLink && ! prevProps.previewLink ) {
 			this.setPreviewWindowLink( previewLink );
 		}
 	}
@@ -38,11 +38,14 @@ export class PostPreviewButton extends Component {
 	 */
 	setPreviewWindowLink( url ) {
 		const { previewWindow } = this;
-		if ( ! previewWindow || previewWindow.location.href === url ) {
-			return;
-		}
 
-		previewWindow.location = url;
+		// Once popup redirect is evaluated, even if already closed, delete
+		// reference to avoid later assignment of location in a post update.
+		delete this.previewWindow;
+
+		if ( previewWindow && ! previewWindow.closed ) {
+			previewWindow.location = url;
+		}
 	}
 
 	getWindowTarget() {
@@ -50,28 +53,41 @@ export class PostPreviewButton extends Component {
 		return `wp-preview-${ postId }`;
 	}
 
-	saveForPreview( event ) {
-		const { isDirty, isNew } = this.props;
+	/**
+	 * Handles a click event to open a popup window and prevent default click
+	 * behavior if the post is either autosaveable or has a previously assigned
+	 * preview link to be shown in the popup window target. Triggers autosave
+	 * if post is autosaveable.
+	 *
+	 * @param {MouseEvent} event Click event from preview button click.
+	 */
+	openPreviewWindow( event ) {
+		const { isAutosaveable, previewLink } = this.props;
 
-		// Let default link behavior occur if no changes to saved post
-		if ( ! isDirty && ! isNew ) {
+		// If there are no changes to autosave, we cannot perform the save, but
+		// if there is an existing preview link (e.g. previous published post
+		// autosave), it should be reused as the popup destination.
+		if ( ! isAutosaveable && ! previewLink ) {
 			return;
 		}
-
-		// Save post prior to opening window
-		this.props.autosave();
 
 		// Open a popup, BUT: Set it to a blank page until save completes. This
 		// is necessary because popups can only be opened in response to user
 		// interaction (click), but we must still wait for the post to save.
 		event.preventDefault();
 		this.previewWindow = window.open(
-			'about:blank',
+			isAutosaveable ? 'about:blank' : previewLink,
 			this.getWindowTarget()
 		);
 
+		if ( ! isAutosaveable ) {
+			return;
+		}
+
+		this.props.autosave();
+
 		const markup = `
-			<div>
+			<div class="editor-post-preview-button__interstitial-message">
 				<p>Please wait&hellip;</p>
 				<p>Generating preview.</p>
 			</div>
@@ -79,7 +95,7 @@ export class PostPreviewButton extends Component {
 				body {
 					margin: 0;
 				}
-				div {
+				.editor-post-preview-button__interstitial-message {
 					display: flex;
 					flex-direction: column;
 					align-items: center;
@@ -95,10 +111,6 @@ export class PostPreviewButton extends Component {
 
 		this.previewWindow.document.write( markup );
 		this.previewWindow.document.close();
-
-		// When popup is closed or redirected by setPreviewWindowLink, delete
-		// reference to avoid later assignment of location in a post update.
-		this.previewWindow.onbeforeunload = () => delete this.previewWindow;
 	}
 
 	render() {
@@ -109,7 +121,7 @@ export class PostPreviewButton extends Component {
 				className="editor-post-preview"
 				isLarge
 				href={ currentPostLink }
-				onClick={ this.saveForPreview }
+				onClick={ this.openPreviewWindow }
 				target={ this.getWindowTarget() }
 				disabled={ ! isSaveable }
 			>
@@ -132,6 +144,7 @@ export default compose( [
 			isEditedPostDirty,
 			isEditedPostNew,
 			isEditedPostSaveable,
+			isEditedPostAutosaveable,
 		} = select( 'core/editor' );
 		const {
 			getPostType,
@@ -144,6 +157,7 @@ export default compose( [
 			isDirty: isEditedPostDirty(),
 			isNew: isEditedPostNew(),
 			isSaveable: isEditedPostSaveable(),
+			isAutosaveable: isEditedPostAutosaveable(),
 			isViewable: get( postType, [ 'viewable' ], false ),
 		};
 	} ),

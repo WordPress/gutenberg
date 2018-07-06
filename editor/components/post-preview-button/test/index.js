@@ -20,26 +20,6 @@ describe( 'PostPreviewButton', () => {
 			expect( setter ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should do nothing if the preview window is already at url location', () => {
-			const url = 'https://wordpress.org';
-			const setter = jest.fn();
-			const wrapper = shallow( <PostPreviewButton /> );
-			wrapper.instance().previewWindow = {
-				get location() {
-					return {
-						href: url,
-					};
-				},
-				set location( value ) {
-					setter( value );
-				},
-			};
-
-			wrapper.instance().setPreviewWindowLink( url );
-
-			expect( setter ).not.toHaveBeenCalled();
-		} );
-
 		it( 'set preview window location to url', () => {
 			const url = 'https://wordpress.org';
 			const setter = jest.fn();
@@ -80,18 +60,19 @@ describe( 'PostPreviewButton', () => {
 					isSaveable
 					modified="2017-08-03T15:05:50" />
 			);
-			wrapper.instance().previewWindow = { location: {} };
+
+			const previewWindow = { location: {} };
+
+			wrapper.instance().previewWindow = previewWindow;
 
 			wrapper.setProps( { previewLink: 'https://wordpress.org/?p=1' } );
 
-			expect(
-				wrapper.instance().previewWindow.location
-			).toBe( 'https://wordpress.org/?p=1' );
+			expect( previewWindow.location ).toBe( 'https://wordpress.org/?p=1' );
 		} );
 	} );
 
-	describe( 'saveForPreview()', () => {
-		function assertForSave( props, isExpectingSave ) {
+	describe( 'openPreviewWindow()', () => {
+		function assertForPreview( props, expectedPreviewURL, isExpectingSave ) {
 			const autosave = jest.fn();
 			const preventDefault = jest.fn();
 			const windowOpen = window.open;
@@ -105,50 +86,59 @@ describe( 'PostPreviewButton', () => {
 			} );
 
 			const wrapper = shallow(
-				<PostPreviewButton { ...props } autosave={ autosave } />
+				<PostPreviewButton
+					postId={ 1 }
+					{ ...props }
+					autosave={ autosave }
+				/>
 			);
 
 			wrapper.simulate( 'click', { preventDefault } );
 
-			if ( isExpectingSave ) {
-				expect( autosave ).toHaveBeenCalled();
+			if ( expectedPreviewURL ) {
 				expect( preventDefault ).toHaveBeenCalled();
-				expect( window.open ).toHaveBeenCalled();
-				expect( wrapper.instance().previewWindow.document.write ).toHaveBeenCalled();
+				expect( window.open ).toHaveBeenCalledWith( expectedPreviewURL, 'wp-preview-1' );
 			} else {
-				expect( autosave ).not.toHaveBeenCalled();
 				expect( preventDefault ).not.toHaveBeenCalled();
 				expect( window.open ).not.toHaveBeenCalled();
 			}
 
 			window.open = windowOpen;
+
+			expect( autosave.mock.calls ).toHaveLength( isExpectingSave ? 1 : 0 );
+			if ( isExpectingSave ) {
+				expect( wrapper.instance().previewWindow.document.write ).toHaveBeenCalled();
+			}
+
+			return wrapper;
 		}
 
-		it( 'should do nothing if not dirty for saved post', () => {
-			assertForSave( {
-				postId: 1,
-				isNew: false,
-				isDirty: false,
-				isSaveable: true,
-			}, false );
+		it( 'should do nothing if neither autosaveable nor preview link available', () => {
+			assertForPreview( {
+				isAutosaveable: false,
+				previewLink: undefined,
+			}, null, false );
 		} );
 
-		it( 'should save if not dirty for new post', () => {
-			assertForSave( {
-				postId: 1,
-				isNew: true,
-				isDirty: false,
-				isSaveable: true,
-			}, true );
+		it( 'should save for autosaveable post with preview link', () => {
+			assertForPreview( {
+				isAutosaveable: true,
+				previewLink: 'https://wordpress.org/?p=1&preview=true',
+			}, 'about:blank', true );
 		} );
 
-		it( 'should open a popup window', () => {
-			assertForSave( {
-				postId: 1,
-				isNew: true,
-				isDirty: true,
-				isSaveable: true,
-			}, true );
+		it( 'should save for autosaveable post without preview link', () => {
+			assertForPreview( {
+				isAutosaveable: true,
+				previewLink: undefined,
+			}, 'about:blank', true );
+		} );
+
+		it( 'should not save but open a popup window if not autosaveable but preview link available', () => {
+			assertForPreview( {
+				isAutosaveable: false,
+				previewLink: 'https://wordpress.org/?p=1&preview=true',
+			}, 'https://wordpress.org/?p=1&preview=true', false );
 		} );
 	} );
 

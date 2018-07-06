@@ -14,7 +14,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import { parse as grammarParse } from './post.pegjs';
+import { parse as grammarParse } from './post-parser';
 import { getBlockType, getUnknownTypeHandlerName } from './registration';
 import { createBlock } from './factory';
 import { isValidBlock } from './validation';
@@ -359,20 +359,28 @@ export function createBlockWithFallback( blockNode ) {
 }
 
 /**
- * Parses the post content with a PegJS grammar and returns a list of blocks.
+ * Creates a parse implementation for the post content which returns a list of blocks.
  *
- * @param {string} content The post content.
+ * @param {Function} parseImplementation Parse implementation.
  *
- * @return {Array} Block list.
+ * @return {Function} An implementation which parses the post content.
  */
-export function parseWithGrammar( content ) {
-	return grammarParse( content ).reduce( ( memo, blockNode ) => {
+export const createParse = ( parseImplementation ) =>
+	( content ) => parseImplementation( content ).reduce( ( memo, blockNode ) => {
 		const block = createBlockWithFallback( blockNode );
 		if ( block ) {
 			memo.push( block );
 		}
 		return memo;
 	}, [] );
-}
+
+/**
+ * Parses the post content with a PegJS grammar and returns a list of blocks.
+ *
+ * @param {string} content The post content.
+ *
+ * @return {Array} Block list.
+ */
+export const parseWithGrammar = createParse( grammarParse );
 
 export default parseWithGrammar;

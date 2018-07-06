@@ -26,6 +26,7 @@ import {
  */
 import './editor.scss';
 import './style.scss';
+import './theme.scss';
 import TableBlock from './table-block';
 
 const tableContentSchema = {

@@ -9,6 +9,7 @@ import { filter, every } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import { RichText, editorMediaUpload } from '@wordpress/editor';
+import { createBlobURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -125,12 +126,15 @@ export const settings = {
 				},
 			},
 			{
+				// When created by drag and dropping multiple files on an insertion point
 				type: 'files',
 				isMatch( files ) {
 					return files.length !== 1 && every( files, ( file ) => file.type.indexOf( 'image/' ) === 0 );
 				},
 				transform( files, onChange ) {
-					const block = createBlock( 'core/gallery' );
+					const block = createBlock( 'core/gallery', {
+						images: files.map( ( file ) => ( { url: createBlobURL( file ) } ) ),
+					} );
 					editorMediaUpload( {
 						filesList: files,
 						onFileChange: ( images ) => onChange( block.uid, { images } ),
