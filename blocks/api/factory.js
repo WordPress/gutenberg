@@ -131,12 +131,12 @@ const isPossibleTransformForSource = ( transform, direction, sourceBlock, isMult
  * @param {Object}  sourceBlock  The instance of the source block.
  * @param {boolean} isMultiBlock Have multiple blocks been selected?
  *
- * @return {Array} Block types that the source block can be transformed into
+ * @return {Array} Block types that the source block can be transformed into.
  */
 const getBlockTypesForPossibleFromTransforms = ( sourceBlock, isMultiBlock = false ) => {
 	const allBlockTypes = getBlockTypes();
 
-	// filter all blocks to find those with a 'from' transform
+	// filter all blocks to find those with a 'from' transform.
 	const blockTypesWithPossibleFromTransforms = filter(
 		allBlockTypes,
 		( blockType ) => {
@@ -154,39 +154,40 @@ const getBlockTypesForPossibleFromTransforms = ( sourceBlock, isMultiBlock = fal
 
 /**
  * Returns block types that the source block can be transformed into, based on
- * its own 'to' transforms
+ * its own 'to' transforms.
  *
- * @param {Object} sourceBlock The instance of the source block
+ * @param {Object} sourceBlock The instance of the source block.
  * @param {boolean} isMultiBlock Have multiple blocks been selected?
  *
- * @return {Array} Block types that the source can transform into
+ * @return {Array} Block types that the source can be transformed into.
  */
 const getBlockTypesForPossibleToTransforms = ( sourceBlock, isMultiBlock = false ) => {
 	const blockType = getBlockType( sourceBlock.name );
 	const transformsTo = getBlockTransforms( 'to', blockType.name );
 
-	// filter all 'to' transforms to find those that are possible
+	// filter all 'to' transforms to find those that are possible.
 	const possibleTransforms = filter(
 		transformsTo,
 		( transform ) => isPossibleTransformForSource( transform, 'to', sourceBlock, isMultiBlock )
 	);
 
-	// Build a list of block names using the possible 'to' transforms
+	// Build a list of block names using the possible 'to' transforms.
 	const blockNames = flatMap(
 		possibleTransforms,
 		( transformation ) => transformation.blocks
 	);
 
+	// Map block names to block types.
 	return blockNames.map( ( name ) => getBlockType( name ) );
 };
 
 /**
- * Returns an array of possible block transformations that could happen on the
- * set of blocks received as argument.
+ * Returns an array of block types that the set of blocks received as argument
+ * can be transformed into.
  *
  * @param {Array} blocks Blocks array.
  *
- * @return {Array} Array of possible block transformations.
+ * @return {Array} block types that the blocks argument can be transformed to.
  */
 export function getPossibleBlockTransformations( blocks ) {
 	const sourceBlock = first( blocks );
