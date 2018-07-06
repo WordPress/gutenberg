@@ -513,6 +513,10 @@ export default {
 		const { dispatch } = store;
 
 		const data = { title, content };
+		if ( isNaN( id ) ) {
+			data.status = 'publish';
+			// TODO: set slug as well
+		}
 		const path = `/wp/v2/${ basePath }`;
 		const method = 'POST';
 
