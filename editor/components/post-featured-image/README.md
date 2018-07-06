@@ -2,7 +2,7 @@ PostFeaturedImage
 ===========
 
 PostFeaturedImage is a React component used to render the Post Featured Image selection tool.
-It includes a filter `editor.PostFeaturedImage` that enables developers to replace or extend it.
+It includes a `wp.hooks` filter `editor.PostFeaturedImage` that enables developers to replace or extend it.
 
 ## Examples
 Replace the contents of the panel:
