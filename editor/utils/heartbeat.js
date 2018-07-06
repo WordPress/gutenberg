@@ -1,12 +1,4 @@
 export function setupHearthbeat() {
-	/**
-	 * Configure heartbeat to refresh the wp-api nonce, keeping the editor authorization intact.
-	 */
-	window.jQuery( document ).on( 'heartbeat-tick', ( event, response ) => {
-		if ( response[ 'rest-nonce' ] ) {
-			window.wpApiSettings.nonce = response[ 'rest-nonce' ];
-		}
-	} );
 
 	/**
 	 * Configure Heartbeat post locks.
