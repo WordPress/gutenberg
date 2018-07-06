@@ -31,7 +31,6 @@
 		"enzyme": "^3.3.0",
 		"enzyme-adapter-react-16": "^1.1.1",
 		"jest-enzyme": "^4.0.2",
-		"jest-serializer-ansi": "^1.0.3",
 		"pegjs": "0.10.0"
 	},
 	"peerDependencies": {

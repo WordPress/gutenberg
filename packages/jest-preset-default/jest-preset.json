@@ -15,9 +15,6 @@
 		"<rootDir>/node_modules/@wordpress/jest-preset-default/scripts/setup-globals.js"
 	],
 	"setupTestFrameworkScriptFile": "<rootDir>/node_modules/@wordpress/jest-preset-default/scripts/setup-test-framework.js",
-	"snapshotSerializers": [
-		"jest-serializer-ansi"
-	],
 	"testMatch": [
 		"**/__tests__/**/*.js",
 		"**/?(*.)(spec|test).js",
