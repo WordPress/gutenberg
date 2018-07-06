@@ -310,8 +310,8 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 		shouldComponentUpdate( nextProps, nextState ) {
 			const hasPropsChanged = ! isShallowEqual( this.props, nextProps );
 
-			// Only render if result of props change or merge props update
-			// from store subscriber.
+			// Only render if props have changed or merge props have been updated
+			// from the store subscriber.
 			if ( this.state === nextState && ! hasPropsChanged ) {
 				return false;
 			}
@@ -321,10 +321,11 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 			if ( hasPropsChanged ) {
 				const nextMergeProps = getNextMergeProps( nextProps );
 				if ( ! isShallowEqual( this.mergeProps, nextMergeProps ) ) {
-					// While side effects are typically discouraged in this
-					// lifecycle methods, this component is very much on a hot
-					// code path. Prior efforts to use getDerivedStateFromProps
-					// have demonstrated miserable performance.
+					// Side effects are typically discouraged in lifecycle methods, but
+					// this component is heavily used and this is the most performant
+					// code we've found thus far.
+					// Prior efforts to use `getDerivedStateFromProps` have demonstrated
+					// miserable performance.
 					this.mergeProps = nextMergeProps;
 				}
 			}
@@ -348,11 +349,11 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 				// Schedule an update. Merge props are not assigned to state
 				// because derivation of merge props from incoming props occurs
 				// within shouldComponentUpdate, where setState is not allowed.
-				// setState is used here instead of forceUpdate because via the
-				// latter, shouldComponentUpdate will be bypassed altogether.
-				// This isn't desireable if both state and props change within
-				// within the same render. Unfortunately this will also require
-				// that next merge props are generated twice.
+				// setState is used here instead of forceUpdate because forceUpdate
+				// bypasses shouldComponentUpdate altogether, which isn't desireable
+				// if both state and props change within the same render.
+				// Unfortunately this requires that next merge props are generated
+				// twice.
 				this.setState( {} );
 			} );
 		}
