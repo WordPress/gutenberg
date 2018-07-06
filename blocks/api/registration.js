@@ -57,6 +57,15 @@ const POST_FORMAT_BLOCK_MAP = {
 	video: 'core/video',
 };
 
+const isEditPropValid = ( settings ) => {
+	return 'edit' in settings && (
+		isFunction( settings.edit ) || (
+			settings.edit.$$typeof &&
+			settings.edit.$$typeof === forwardRefSymbol &&
+			isFunction( settings.edit.render )
+		) );
+};
+
 /**
  * Registers a new block provided a unique name and an object defining its
  * behavior. Once registered, the block is made available as an option to any
@@ -102,15 +111,11 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
-	if ( 'edit' in settings && ! isFunction( settings.edit ) ) {
-		if ( settings.edit.$$typeof && settings.edit.$$typeof === forwardRefSymbol && isFunction( settings.edit.render ) ) {
-			//set the edit to the actual function
-		} else {
-			console.error(
-				'The "edit" property must be a valid function.'
-			);
-			return;
-		}
+	if ( ! isEditPropValid( settings ) ) {
+		console.error(
+			'The "edit" property must be a valid function.'
+		);
+		return;
 	}
 	if ( 'keywords' in settings && settings.keywords.length > 3 ) {
 		console.error(
