@@ -26,6 +26,7 @@ import apiRequest from '@wordpress/api-request';
  */
 import './style.scss';
 import './editor.scss';
+import './theme.scss';
 
 // These embeds do not work in sandboxes
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];

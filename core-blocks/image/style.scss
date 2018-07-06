@@ -1,13 +1,6 @@
 .wp-block-image {
 	width: fit-content;
 
-	figcaption {
-		margin-top: 0.5em;
-		color: $dark-gray-300;
-		text-align: center;
-		font-size: $default-font-size;
-	}
-
 	&.aligncenter {
 		display: block;
 		margin-left: auto;
