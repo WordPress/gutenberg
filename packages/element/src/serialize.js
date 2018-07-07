@@ -224,6 +224,8 @@ const CSS_PROPERTIES_SUPPORTS_UNITLESS = new Set( [
 	'zoom',
 ] );
 
+const forwardRefSymbol = Symbol.for( 'react.forward_ref' );
+
 /**
  * Returns a string with ampersands escaped. Note that this is an imperfect
  * implementation, where only ampersands which do not appear as a pattern of
@@ -454,6 +456,11 @@ export function renderElement( element, context = {} ) {
 			}
 
 			return renderElement( tagName( props, context ), context );
+
+		case 'object':
+			if ( tagName.$$typeof && tagName.$$typeof === forwardRefSymbol ) {
+				return renderElement( tagName.render( props, context ), context );
+			}
 	}
 
 	return '';
