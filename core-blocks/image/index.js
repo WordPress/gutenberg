@@ -49,6 +49,18 @@ const blockAttributes = {
 		selector: 'figure > a',
 		attribute: 'href',
 	},
+	rel: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'figure > a',
+		attribute: 'rel',
+	},
+	linkClasses: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'figure > a',
+		attribute: 'class',
+	},
 	id: {
 		type: 'number',
 	},
@@ -80,7 +92,7 @@ const schema = {
 		children: {
 			...imageSchema,
 			a: {
-				attributes: [ 'href' ],
+				attributes: [ 'linkClasses', 'href', 'rel' ],
 				children: imageSchema,
 			},
 			figcaption: {
@@ -120,8 +132,10 @@ export const settings = {
 					const anchorElement = node.querySelector( 'a' );
 					const linkDestination = anchorElement && anchorElement.href ? 'custom' : undefined;
 					const href = anchorElement && anchorElement.href ? anchorElement.href : undefined;
+					const rel = anchorElement && anchorElement.rel ? anchorElement.rel : undefined;
+					const linkClasses = anchorElement && anchorElement.className ? anchorElement.className : undefined;
 					const blockType = getBlockType( 'core/image' );
-					const attributes = getBlockAttributes( blockType, node.outerHTML, { align, id, linkDestination, href } );
+					const attributes = getBlockAttributes( blockType, node.outerHTML, { align, id, linkDestination, href, rel, linkClasses } );
 					return createBlock( 'core/image', attributes );
 				},
 			},
@@ -169,6 +183,18 @@ export const settings = {
 						attribute: 'href',
 						selector: 'a',
 					},
+					rel: {
+						type: 'string',
+						source: 'attribute',
+						attribute: 'rel',
+						selector: 'a',
+					},
+					linkClasses: {
+						type: 'string',
+						source: 'attribute',
+						attribute: 'class',
+						selector: 'a',
+					},
 					id: {
 						type: 'number',
 						shortcode: ( { named: { id } } ) => {
@@ -200,7 +226,7 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { url, alt, caption, align, href, width, height, id } = attributes;
+		const { url, alt, caption, align, href, rel, linkClasses, width, height, id } = attributes;
 
 		const classes = classnames( {
 			[ `align${ align }` ]: align,
@@ -219,13 +245,41 @@ export const settings = {
 
 		return (
 			<figure className={ classes }>
-				{ href ? <a href={ href }>{ image }</a> : image }
+				{ href ? <a className={ linkClasses } href={ href } rel={ rel ? rel : null }>{ image }</a> : image }
 				{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
 			</figure>
 		);
 	},
 
 	deprecated: [
+		{
+			attributes: blockAttributes,
+			save( { attributes } ) {
+				const { url, alt, caption, align, href, width, height, id } = attributes;
+
+				const classes = classnames( {
+					[ `align${ align }` ]: align,
+					'is-resized': width || height,
+				} );
+
+				const image = (
+					<img
+						src={ url }
+						alt={ alt }
+						className={ id ? `wp-image-${ id }` : null }
+						width={ width }
+						height={ height }
+					/>
+				);
+
+				return (
+					<figure className={ classes }>
+						{ href ? <a href={ href }>{ image }</a> : image }
+						{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
+					</figure>
+				);
+			},
+		},
 		{
 			attributes: blockAttributes,
 			save( { attributes } ) {

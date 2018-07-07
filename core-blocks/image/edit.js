@@ -68,6 +68,8 @@ class ImageEdit extends Component {
 		this.updateHeight = this.updateHeight.bind( this );
 		this.updateDimensions = this.updateDimensions.bind( this );
 		this.onSetCustomHref = this.onSetCustomHref.bind( this );
+		this.onSetLinkClasses = this.onSetLinkClasses.bind( this );
+		this.onSetLinkRel = this.onSetLinkRel.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 
 		this.state = {
@@ -149,6 +151,14 @@ class ImageEdit extends Component {
 		this.props.setAttributes( { href: value } );
 	}
 
+	onSetLinkClasses( value ) {
+		this.props.setAttributes( { linkClasses: value } );
+	}
+
+	onSetLinkRel( value ) {
+		this.props.setAttributes( { rel: value } );
+	}
+
 	onFocusCaption() {
 		if ( ! this.state.captionFocused ) {
 			this.setState( {
@@ -209,7 +219,7 @@ class ImageEdit extends Component {
 
 	render() {
 		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, noticeOperations, noticeUI, toggleSelection, isRTL } = this.props;
-		const { url, alt, caption, align, id, href, linkDestination, width, height } = attributes;
+		const { url, alt, caption, align, id, href, rel, linkClasses, linkDestination, width, height } = attributes;
 
 		const controls = (
 			<BlockControls>
@@ -353,6 +363,18 @@ class ImageEdit extends Component {
 						value={ href || '' }
 						onChange={ this.onSetCustomHref }
 						placeholder={ ! isLinkUrlInputDisabled && 'https://' }
+						disabled={ isLinkUrlInputDisabled }
+					/>
+					<TextControl
+						label={ __( 'Link Classes' ) }
+						value={ linkClasses || '' }
+						onChange={ this.onSetLinkClasses }
+						disabled={ isLinkUrlInputDisabled }
+					/>
+					<TextControl
+						label={ __( 'Link Rel' ) }
+						value={ rel || '' }
+						onChange={ this.onSetLinkRel }
 						disabled={ isLinkUrlInputDisabled }
 					/>
 				</PanelBody>
