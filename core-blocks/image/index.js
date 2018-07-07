@@ -55,7 +55,7 @@ const blockAttributes = {
 		selector: 'figure > a',
 		attribute: 'rel',
 	},
-	linkClasses: {
+	linkClass: {
 		type: 'string',
 		source: 'attribute',
 		selector: 'figure > a',
@@ -92,7 +92,7 @@ const schema = {
 		children: {
 			...imageSchema,
 			a: {
-				attributes: [ 'linkClasses', 'href', 'rel' ],
+				attributes: [ 'linkClass', 'href', 'rel' ],
 				children: imageSchema,
 			},
 			figcaption: {
@@ -133,9 +133,9 @@ export const settings = {
 					const linkDestination = anchorElement && anchorElement.href ? 'custom' : undefined;
 					const href = anchorElement && anchorElement.href ? anchorElement.href : undefined;
 					const rel = anchorElement && anchorElement.rel ? anchorElement.rel : undefined;
-					const linkClasses = anchorElement && anchorElement.className ? anchorElement.className : undefined;
+					const linkClass = anchorElement && anchorElement.className ? anchorElement.className : undefined;
 					const blockType = getBlockType( 'core/image' );
-					const attributes = getBlockAttributes( blockType, node.outerHTML, { align, id, linkDestination, href, rel, linkClasses } );
+					const attributes = getBlockAttributes( blockType, node.outerHTML, { align, id, linkDestination, href, rel, linkClass } );
 					return createBlock( 'core/image', attributes );
 				},
 			},
@@ -189,7 +189,7 @@ export const settings = {
 						attribute: 'rel',
 						selector: 'a',
 					},
-					linkClasses: {
+					linkClass: {
 						type: 'string',
 						source: 'attribute',
 						attribute: 'class',
@@ -226,7 +226,7 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { url, alt, caption, align, href, rel, linkClasses, width, height, id } = attributes;
+		const { url, alt, caption, align, href, rel, linkClass, width, height, id } = attributes;
 
 		const classes = classnames( {
 			[ `align${ align }` ]: align,
@@ -245,7 +245,7 @@ export const settings = {
 
 		return (
 			<figure className={ classes }>
-				{ href ? <a className={ linkClasses } href={ href } rel={ rel ? rel : null }>{ image }</a> : image }
+				{ href ? <a className={ linkClass } href={ href } rel={ rel ? rel : null }>{ image }</a> : image }
 				{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
 			</figure>
 		);

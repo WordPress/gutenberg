@@ -68,7 +68,7 @@ class ImageEdit extends Component {
 		this.updateHeight = this.updateHeight.bind( this );
 		this.updateDimensions = this.updateDimensions.bind( this );
 		this.onSetCustomHref = this.onSetCustomHref.bind( this );
-		this.onSetLinkClasses = this.onSetLinkClasses.bind( this );
+		this.onSetlinkClass = this.onSetlinkClass.bind( this );
 		this.onSetLinkRel = this.onSetLinkRel.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 
@@ -151,8 +151,8 @@ class ImageEdit extends Component {
 		this.props.setAttributes( { href: value } );
 	}
 
-	onSetLinkClasses( value ) {
-		this.props.setAttributes( { linkClasses: value } );
+	onSetlinkClass( value ) {
+		this.props.setAttributes( { linkClass: value } );
 	}
 
 	onSetLinkRel( value ) {
@@ -219,7 +219,7 @@ class ImageEdit extends Component {
 
 	render() {
 		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, noticeOperations, noticeUI, toggleSelection, isRTL } = this.props;
-		const { url, alt, caption, align, id, href, rel, linkClasses, linkDestination, width, height } = attributes;
+		const { url, alt, caption, align, id, href, rel, linkClass, linkDestination, width, height } = attributes;
 
 		const controls = (
 			<BlockControls>
@@ -366,16 +366,16 @@ class ImageEdit extends Component {
 						disabled={ isLinkUrlInputDisabled }
 					/>
 					<TextControl
-						label={ __( 'Link Classes' ) }
-						value={ linkClasses || '' }
-						onChange={ this.onSetLinkClasses }
-						disabled={ isLinkUrlInputDisabled }
+						label={ __( 'Link CSS Class' ) }
+						value={ linkClass || '' }
+						onChange={ this.onSetlinkClass }
+						disabled={ linkDestination === LINK_DESTINATION_NONE ? true : false  }
 					/>
 					<TextControl
 						label={ __( 'Link Rel' ) }
 						value={ rel || '' }
 						onChange={ this.onSetLinkRel }
-						disabled={ isLinkUrlInputDisabled }
+						disabled={ linkDestination === LINK_DESTINATION_NONE ? true : false  }
 					/>
 				</PanelBody>
 			</InspectorControls>
