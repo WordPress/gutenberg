@@ -369,13 +369,13 @@ class ImageEdit extends Component {
 						label={ __( 'Link CSS Class' ) }
 						value={ linkClass || '' }
 						onChange={ this.onSetlinkClass }
-						disabled={ linkDestination === LINK_DESTINATION_NONE ? true : false  }
+						disabled={ linkDestination === LINK_DESTINATION_NONE ? true : false }
 					/>
 					<TextControl
 						label={ __( 'Link Rel' ) }
 						value={ rel || '' }
 						onChange={ this.onSetLinkRel }
-						disabled={ linkDestination === LINK_DESTINATION_NONE ? true : false  }
+						disabled={ linkDestination === LINK_DESTINATION_NONE ? true : false }
 					/>
 				</PanelBody>
 			</InspectorControls>
