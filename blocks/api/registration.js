@@ -58,12 +58,12 @@ const POST_FORMAT_BLOCK_MAP = {
 };
 
 const isEditPropValid = ( settings ) => {
-	return 'edit' in settings && (
+	return ! ( 'edit' in settings ) || ( 'edit' in settings && (
 		isFunction( settings.edit ) || (
 			settings.edit.$$typeof &&
 			settings.edit.$$typeof === forwardRefSymbol &&
 			isFunction( settings.edit.render )
-		) );
+		) ) );
 };
 
 /**
