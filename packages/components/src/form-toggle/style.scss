@@ -27,7 +27,6 @@ $toggle-border-width: 2px;
 		content: '';
 		display: inline-block;
 		vertical-align: top;
-		box-sizing: border-box;
 		background-color: $white;
 		border: $toggle-border-width solid $dark-gray-300;
 		width: $toggle-width;
