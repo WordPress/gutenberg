@@ -62,10 +62,11 @@ function makeAutocompleterWithUtils( completers, {
 	AutocompleteComponent = Autocomplete,
 	onReplace = noop,
 } = {} ) {
-	const wrapper = TestUtils.renderIntoDocument(
-		<AutocompleteComponent instanceId="1"
-													 completers={ completers }
-													 onReplace={ onReplace }
+	return TestUtils.renderIntoDocument(
+		<AutocompleteComponent
+			instanceId="1"
+			completers={ completers }
+			onReplace={ onReplace }
 		>
 			{ ( { isExpanded, listBoxId, activeId } ) => (
 				<FakeEditor
@@ -77,7 +78,6 @@ function makeAutocompleterWithUtils( completers, {
 			) }
 		</AutocompleteComponent>
 	);
-	return wrapper;
 }
 
 /**
@@ -154,7 +154,7 @@ function simulateInputForUtils( wrapper, nodeList, cursorPosition ) {
 	TestUtils.Simulate.input(
 		fakeEditor,
 		{
-			target: fakeEditor
+			target: fakeEditor,
 		}
 	);
 }
@@ -629,7 +629,7 @@ describe( 'Autocomplete', () => {
 			// reason.  Without this, wrapper would end up with the value of null.
 			class Enhanced extends Component {
 				render() {
-					return <EnhancedAutocomplete { ...this.props } />
+					return <EnhancedAutocomplete { ...this.props } />;
 				}
 			}
 
