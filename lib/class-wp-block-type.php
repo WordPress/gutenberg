@@ -136,7 +136,18 @@ class WP_Block_Type {
 
 			if ( isset( $attributes[ $attribute_name ] ) ) {
 				$is_valid = rest_validate_value_from_schema( $attributes[ $attribute_name ], $schema );
-				if ( ! is_wp_error( $is_valid ) ) {
+
+				if ( is_wp_error( $is_valid ) ) {
+					_doing_it_wrong(
+						__FUNCTION__,
+						sprintf(
+							__( 'The value of %1$s attribute %2$s' ),
+							'<code>' . $attribute_name . '</code>',
+							$is_valid->get_error_message()
+						),
+						'3.2.0'
+					);
+				} else {
 					$value = rest_sanitize_value_from_schema( $attributes[ $attribute_name ], $schema );
 				}
 			}
