@@ -1,7 +1,9 @@
 /**
  * External dependencies
  */
-import { shallow, mount } from 'enzyme';
+import { shallow } from 'enzyme';
+import TestUtils from 'react-dom/test-utils';
+import ReactDOM from 'react-dom';
 import { noop } from 'lodash';
 
 /**
@@ -30,22 +32,26 @@ describe( 'Popover', () => {
 		} );
 
 		it( 'should add window events', () => {
-			wrapper = mount( <Popover /> );
+			wrapper = TestUtils.renderIntoDocument( <Popover /> );
 			expect( Popover.prototype.toggleWindowEvents ).toHaveBeenCalledWith( true );
 			expect( Popover.prototype.computePopoverPosition ).toHaveBeenCalled();
 		} );
 
 		it( 'should remove window events', () => {
-			wrapper = mount( <Popover /> );
-			wrapper.unmount();
+			wrapper = TestUtils.renderIntoDocument( <Popover /> );
+			/* eslint-disable react/no-find-dom-node */
+			ReactDOM.unmountComponentAtNode( ReactDOM.findDOMNode( wrapper ).parentNode );
+			/* eslint-enable react/no-find-dom-node */
 
 			expect( Popover.prototype.toggleWindowEvents ).toHaveBeenCalledWith( false );
 		} );
 
 		it( 'should set offset and forced positions on changed position', () => {
-			wrapper = mount( <Popover /> );
+			const node = document.createElement( 'div' );
+			wrapper = ReactDOM.render( <Popover />, node );
 			jest.clearAllMocks();
-			wrapper.setProps( { position: 'bottom right' } );
+
+			ReactDOM.render( <Popover position={ 'bottom right' } />, node );
 
 			expect( Popover.prototype.toggleWindowEvents ).not.toHaveBeenCalled();
 			expect( Popover.prototype.computePopoverPosition ).toHaveBeenCalled();
@@ -60,10 +66,13 @@ describe( 'Popover', () => {
 			// An ideal test here would mount with an input child and focus the
 			// child, but in context of JSDOM the inputs are not visible and
 			// are therefore skipped as tabbable, defaulting to popover.
-			wrapper = mount( <Popover /> );
+			wrapper = TestUtils.renderIntoDocument( <Popover /> );
 
 			setTimeout( () => {
-				const content = wrapper.find( '.components-popover__content' ).getDOMNode();
+				const content = TestUtils.findRenderedDOMComponentWithClass(
+					wrapper,
+					'components-popover__content'
+				);
 				expect( document.activeElement ).toBe( content );
 				done();
 			} );
@@ -74,7 +83,7 @@ describe( 'Popover', () => {
 		it( 'should allow focus-on-open behavior to be disabled', ( done ) => {
 			const activeElement = document.activeElement;
 
-			wrapper = mount( <Popover focusOnMount={ false } /> );
+			wrapper = TestUtils.renderIntoDocument( <Popover focusOnMount={ false } /> );
 
 			setTimeout( () => {
 				expect( document.activeElement ).toBe( activeElement );
