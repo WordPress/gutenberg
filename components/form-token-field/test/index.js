@@ -276,4 +276,4 @@ describe( 'FormTokenField', function() {
 			expect( wrapper.state.tokens ).toEqual( [ 'bar' ] );
 		} );
 	} );
-}, 'FormTokenField' );
+} );
