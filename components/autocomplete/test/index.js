@@ -3,6 +3,7 @@
  */
 import { mount } from 'enzyme';
 import { noop } from 'lodash';
+import TestUtils from 'react-dom/test-utils';
 
 /**
  * WordPress dependencies
@@ -57,6 +58,28 @@ function makeAutocompleter( completers, {
 	);
 }
 
+function makeAutocompleterWithUtils( completers, {
+	AutocompleteComponent = Autocomplete,
+	onReplace = noop,
+} = {} ) {
+	const wrapper = TestUtils.renderIntoDocument(
+		<AutocompleteComponent instanceId="1"
+													 completers={ completers }
+													 onReplace={ onReplace }
+		>
+			{ ( { isExpanded, listBoxId, activeId } ) => (
+				<FakeEditor
+					aria-autocomplete="list"
+					aria-expanded={ isExpanded }
+					aria-owns={ listBoxId }
+					aria-activedescendant={ activeId }
+				/>
+			) }
+		</AutocompleteComponent>
+	);
+	return wrapper;
+}
+
 /**
  * Create a text node.
  *
@@ -105,6 +128,35 @@ function simulateInput( wrapper, nodeList, cursorPosition ) {
 		target: fakeEditor,
 	} );
 	wrapper.update();
+}
+
+/**
+ * Same as simulateInput except configured for use with React.TestUtils
+ * @param {*}              wrapper        Wrapper around react node
+ *                                        containing  a FakeEditor.
+ * @param {Array.<Node>}   nodeList       Array of dom nodes.
+ * @param {Array.<number>} cursorPosition Array specifying the child indexes and
+ *                                        offset of the cursor.
+ */
+function simulateInputForUtils( wrapper, nodeList, cursorPosition ) {
+	// update the editor content
+	const fakeEditor = TestUtils.findRenderedDOMComponentWithClass(
+		wrapper,
+		'fake-editor'
+	);
+	fakeEditor.innerHTML = '';
+	nodeList.forEach( ( element ) => fakeEditor.appendChild( element ) );
+	if ( cursorPosition && cursorPosition.length >= 1 ) {
+		fakeEditor.setAttribute( 'data-cursor', cursorPosition.join( ',' ) );
+	} else {
+		fakeEditor.removeAttribute( 'data-cursor' );
+	}
+	TestUtils.Simulate.input(
+		fakeEditor,
+		{
+			target: fakeEditor
+		}
+	);
 }
 
 /**
@@ -573,12 +625,24 @@ describe( 'Autocomplete', () => {
 
 		it( 'closes by blur', () => {
 			jest.spyOn( Autocomplete.prototype, 'handleFocusOutside' );
+			// required because TestUtils doesn't handle stateless components for some
+			// reason.  Without this, wrapper would end up with the value of null.
+			class Enhanced extends Component {
+				render() {
+					return <EnhancedAutocomplete { ...this.props } />
+				}
+			}
 
-			const wrapper = makeAutocompleter( [], {
-				AutocompleteComponent: EnhancedAutocomplete,
+			const wrapper = makeAutocompleterWithUtils( [], {
+				AutocompleteComponent: Enhanced,
 			} );
-			simulateInput( wrapper, [ par( tx( '/' ) ) ] );
-			wrapper.find( '.fake-editor' ).simulate( 'blur' );
+			simulateInputForUtils( wrapper, [ par( tx( '/' ) ) ] );
+			TestUtils.Simulate.blur(
+				TestUtils.findRenderedDOMComponentWithClass(
+					wrapper,
+					'fake-editor'
+				)
+			);
 
 			jest.runAllTimers();
 
