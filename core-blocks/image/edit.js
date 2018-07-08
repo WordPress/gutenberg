@@ -276,6 +276,7 @@ class ImageEdit extends Component {
 		const availableSizes = this.getAvailableSizes();
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
 		const isLinkUrlInputDisabled = linkDestination !== LINK_DESTINATION_CUSTOM;
+		const isLinkDestinationNone = linkDestination === LINK_DESTINATION_NONE;
 
 		const getInspectorControls = ( imageWidth, imageHeight ) => (
 			<InspectorControls>
@@ -369,13 +370,13 @@ class ImageEdit extends Component {
 						label={ __( 'Link CSS Class' ) }
 						value={ linkClass || '' }
 						onChange={ this.onSetlinkClass }
-						disabled={ linkDestination === LINK_DESTINATION_NONE ? true : false }
+						disabled={ isLinkDestinationNone }
 					/>
 					<TextControl
 						label={ __( 'Link Rel' ) }
 						value={ rel || '' }
 						onChange={ this.onSetLinkRel }
-						disabled={ linkDestination === LINK_DESTINATION_NONE ? true : false }
+						disabled={ isLinkDestinationNone }
 					/>
 				</PanelBody>
 			</InspectorControls>
