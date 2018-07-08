@@ -200,7 +200,7 @@ describe( 'FormTokenField', function() {
 			expect( getSelectedSuggestion() ).toEqual( [ 'th', 'at' ] );
 
 			const hoverSuggestion = wrapperElement()
-				.querySelectorAll( '.components-form-token-field__suggestion' )[3]; // 'with'
+				.querySelectorAll( '.components-form-token-field__suggestion' )[ 3 ]; // 'with'
 			expect( getSuggestionNodeText( hoverSuggestion ) ).toEqual( [ 'wi', 'th' ] );
 
 			// before sending a hover event, we need to wait for
