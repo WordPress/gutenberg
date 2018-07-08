@@ -1,22 +1,37 @@
 /**
  * External dependencies
  */
-import { mount } from 'enzyme';
+import TestUtils from 'react-dom/test-utils';
 
 /**
  * Internal dependencies
  */
 import Dropdown from '../';
+import Popover from '../../popover';
 
 describe( 'Dropdown', () => {
-	const expectPopoverVisible = ( wrapper, visible ) => expect( wrapper.find( 'Popover' ) ).toHaveLength( visible ? 1 : 0 );
+	const expectPopoverVisible = ( wrapper, visible ) => {
+		expect(
+			TestUtils.scryRenderedComponentsWithType( wrapper, Popover ) )
+			.toHaveLength( visible ? 1 : 0 );
+	};
+	const buttonElement = ( wrapper ) => TestUtils.findRenderedDOMComponentWithTag(
+		wrapper,
+		'button'
+	);
+	const openCloseElement = ( wrapper, className ) => TestUtils
+		.findRenderedDOMComponentWithClass( wrapper, className );
 
 	it( 'should toggle the dropdown properly', () => {
 		const expectButtonExpanded = ( wrapper, expanded ) => {
-			expect( wrapper.find( 'button' ) ).toHaveLength( 1 );
-			expect( wrapper.find( 'button' ) ).toHaveProp( 'aria-expanded', expanded );
+			expect(
+				TestUtils.scryRenderedDOMComponentsWithTag( wrapper, 'button' ) )
+				.toHaveLength( 1 );
+			expect(
+				buttonElement( wrapper ).getAttribute( 'aria-expanded' )
+			).toBe( expanded.toString() );
 		};
-		const wrapper = mount( <Dropdown
+		const wrapper = TestUtils.renderIntoDocument( <Dropdown
 			className="container"
 			contentClassName="content"
 			renderToggle={ ( { isOpen, onToggle } ) => (
@@ -28,15 +43,14 @@ describe( 'Dropdown', () => {
 		expectButtonExpanded( wrapper, false );
 		expectPopoverVisible( wrapper, false );
 
-		wrapper.find( 'button' ).simulate( 'click' );
-		wrapper.update();
+		TestUtils.Simulate.click( buttonElement( wrapper ) );
 
 		expectButtonExpanded( wrapper, true );
 		expectPopoverVisible( wrapper, true );
 	} );
 
 	it( 'should close the dropdown when calling onClose', () => {
-		const wrapper = mount( <Dropdown
+		const wrapper = TestUtils.renderIntoDocument( <Dropdown
 			className="container"
 			contentClassName="content"
 			renderToggle={ ( { isOpen, onToggle, onClose } ) => [
@@ -48,13 +62,11 @@ describe( 'Dropdown', () => {
 
 		expectPopoverVisible( wrapper, false );
 
-		wrapper.find( '.open' ).simulate( 'click' );
-		wrapper.update();
+		TestUtils.Simulate.click( openCloseElement( wrapper, 'open' ) );
 
 		expectPopoverVisible( wrapper, true );
 
-		wrapper.find( '.close' ).simulate( 'click' );
-		wrapper.update();
+		TestUtils.Simulate.click( openCloseElement( wrapper, 'close' ) );
 
 		expectPopoverVisible( wrapper, false );
 	} );
