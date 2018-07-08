@@ -33,6 +33,10 @@ function RangeControl( {
 	const onChangeValue = ( event ) => onChange( Number( event.target.value ) );
 	const initialSliderValue = isFinite( value ) ? value : initialPosition || '';
 
+	// remove any fowardedRef that may be in here.
+	const forwardedProps = Object.assign( {}, ...props );
+	delete( forwardedProps.forwardedRef );
+
 	return (
 		<BaseControl
 			label={ label }
@@ -48,7 +52,7 @@ function RangeControl( {
 				value={ initialSliderValue }
 				onChange={ onChangeValue }
 				aria-describedby={ !! help ? id + '__help' : undefined }
-				{ ...props } />
+				{ ...forwardedProps } />
 			{ afterIcon && <Dashicon icon={ afterIcon } /> }
 			<input
 				className="components-range-control__number"
@@ -56,7 +60,7 @@ function RangeControl( {
 				onChange={ onChangeValue }
 				aria-label={ label }
 				value={ value }
-				{ ...props }
+				{ ...forwardedProps }
 			/>
 			{ allowReset &&
 				<Button onClick={ () => onChange() } disabled={ value === undefined }>
