@@ -141,7 +141,8 @@ class WP_Block_Type {
 					_doing_it_wrong(
 						__FUNCTION__,
 						sprintf(
-							__( 'The value of %1$s attribute %2$s' ),
+							/* translators: 1: the attribute name, 2: the error message returned by `rest_validate_value_from_schema` which is usually something like "is not of type string." */
+							__( 'The value of %1$s attribute %2$s', 'gutenberg' ),
 							'<code>' . $attribute_name . '</code>',
 							$is_valid->get_error_message()
 						),
