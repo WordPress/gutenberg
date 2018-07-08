@@ -17,7 +17,7 @@ import { Dashicon } from '@wordpress/components';
 describe( 'RangeControl', () => {
 	class TestWrapper extends Component {
 		render() {
-			return <RangeControl { ...this.props } />
+			return <RangeControl { ...this.props } />;
 		}
 	}
 
@@ -42,13 +42,13 @@ describe( 'RangeControl', () => {
 			TestUtils.Simulate.change(
 				rangeInputElement(),
 				{
-					target: { value: '5' }
+					target: { value: '5' },
 				}
 			);
 			TestUtils.Simulate.change(
 				numberInputElement(),
 				{
-					target: { value: '10' }
+					target: { value: '10' },
 				}
 			);
 
@@ -58,8 +58,8 @@ describe( 'RangeControl', () => {
 
 		it( 'renders with icons', () => {
 			let wrapper, icons;
-			const iconElements = ( wrapper ) => TestUtils
-				.scryRenderedComponentsWithType( wrapper, Dashicon );
+			const iconElements = ( component ) => TestUtils
+				.scryRenderedComponentsWithType( component, Dashicon );
 			wrapper = getWrapper();
 			icons = iconElements( wrapper );
 			expect( icons ).toHaveLength( 0 );
