@@ -18,7 +18,7 @@ function FixedToolbarToggle( { onToggle, isActive } ) {
 			isSelected={ isActive }
 			onClick={ onToggle }
 		>
-			{ __( 'Fix Toolbar to Top' ) }
+			{ __( 'Stick Toolbar to Top' ) }
 		</MenuItem>
 	);
 }
