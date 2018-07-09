@@ -3142,6 +3142,64 @@ describe( 'selectors', () => {
 			] );
 		} );
 
+		it( 'should correctly cache the return values', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUID: {
+							block1: { name: 'core/test-block-a' },
+							block2: { name: 'core/test-block-a' },
+						},
+						blockOrder: {},
+						edits: {},
+					},
+				},
+				sharedBlocks: {
+					data: {
+						1: { uid: 'block1', title: 'Shared Block 1' },
+						2: { uid: 'block1', title: 'Shared Block 2' },
+					},
+				},
+				currentPost: {},
+				preferences: {
+					insertUsage: {},
+				},
+				blockListSettings: {},
+				settings: {},
+			};
+
+			const stateSecondBlockRestricted = {
+				...state,
+				blockListSettings: {
+					block2: {
+						allowedBlocks: [ 'core/test-block-b' ],
+					},
+				},
+			};
+
+			const firstBlockFirstCall = getInserterItems( state, 'block1' );
+			const firstBlockSecondCall = getInserterItems( stateSecondBlockRestricted, 'block1' );
+			expect( firstBlockFirstCall ).toBe( firstBlockSecondCall );
+			expect( firstBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
+				'core/test-block-b',
+				'core/test-block-a',
+				'core/block/1',
+				'core/block/2',
+			] );
+
+			const secondBlockFirstCall = getInserterItems( state, 'block2' );
+			const secondBlockSecondCall = getInserterItems( stateSecondBlockRestricted, 'block2' );
+			expect( secondBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
+				'core/test-block-b',
+				'core/test-block-a',
+				'core/block/1',
+				'core/block/2',
+			] );
+			expect( secondBlockSecondCall.map( ( item ) => item.id ) ).toEqual( [
+				'core/test-block-b',
+			] );
+		} );
+
 		it( 'should set isDisabled when a block with `multiple: false` has been used', () => {
 			const state = {
 				editor: {
