@@ -80,6 +80,7 @@
 		"cross-env": "3.2.4",
 		"deep-freeze": "0.0.1",
 		"doctrine": "2.1.0",
+		"downshift": "2.0.7",
 		"eslint": "4.16.0",
 		"eslint-config-wordpress": "2.0.0",
 		"eslint-plugin-jest": "21.5.0",

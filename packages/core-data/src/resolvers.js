@@ -32,8 +32,19 @@ export async function* getCategories() {
  * Requests authors from the REST API.
  */
 export async function* getAuthors() {
-	const users = await apiRequest( { path: '/wp/v2/users/?who=authors&per_page=-1' } );
+	const users = await apiRequest( { path: '/wp/v2/users/?who=authors&per_page=100' } );
 	yield receiveUserQuery( 'authors', users );
+}
+
+/**
+ * Requests author details from the REST API.
+ *
+ * @param {Object} state  State tree
+ * @param {number} id Author id.
+ */
+export async function* getAuthor( state, id ) {
+	const author = await apiRequest( { path: `/wp/v2/users/${ id }` } );
+	yield receiveUserQuery( 'author', author );
 }
 
 /**
