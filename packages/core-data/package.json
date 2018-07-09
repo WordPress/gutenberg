@@ -20,9 +20,9 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"@wordpress/api-request": "file:../api-request",
-		"@wordpress/data": "file:../data",
-		"lodash": "4.17.10",
+		"@wordpress/api-request": "^1.0.0-alpha.2",
+		"@wordpress/data": "^1.0.0-alpha.2",
+		"lodash": "4.17.5",
 		"rememo": "3.0.0"
 	},
 	"publishConfig": {

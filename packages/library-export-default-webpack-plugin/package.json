@@ -19,7 +19,7 @@
 	},
 	"main": "build/index.js",
 	"dependencies": {
-		"lodash": "4.17.10",
+		"lodash": "4.17.5",
 		"webpack-sources": "1.1.0"
 	},
 	"devDependencies": {
