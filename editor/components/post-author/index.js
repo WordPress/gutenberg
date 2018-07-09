@@ -58,47 +58,48 @@ export class PostAuthor extends Component {
 		}
 
 		if ( authors.length < 50 ) {
-			selector = <select
-							id={ selectId }
-							value={ postAuthorId }
-							className="editor-post-author__select"
-						>
-							{ authors.map( ( author ) => (
-								<option key={ author.id } value={ author.id }>{ author.name }</option>
-							) ) }
-						</select>;
+			selector =
+				<select
+					id={ selectId }
+					value={ postAuthorId }
+					className="editor-post-author__select"
+				>
+					{ authors.map( ( author ) => (
+						<option key={ author.id } value={ author.id }>{ author.name }</option>
+					) ) }
+				</select>;
 		} else {
-			selector = <Autocomplete
-							id={ selectId }
-							source={ authors }
-							minLength={ 2 }
-							showAllValues={ true }
-							defaultValue={ postAuthor && postAuthor[0] ? postAuthor[0].name : '' }
-							autoselect={ true }
-							displayMenu='overlay'
-							onConfirm={ this.setAuthorId }
-							source={ debounce( this.suggestAuthor, 300 ) }
-							showNoResultsFound={ false }
-							tStatusQueryTooShort={ ( minQueryLength ) =>
-								__( `Type in ${ minQueryLength } or more characters for results` ) }
-							tStatusNoResults={ () => __( 'No search results' ) }
-							tStatusSelectedOption={ ( selectedOption, length ) => __( `${ selectedOption } (1 of ${ length }) is selected` ) }
-							tStatusResults={ ( length, contentSelectedOption ) => {
-								const words = {
-									result: ( length === 1 ) ? __( 'result' ) : __( 'results' ),
-									is: ( length === 1 ) ? __( 'is' ) : __( 'are' ),
-								};
-								return <span>{ length } { words.result } { words.is } available. { contentSelectedOption }</span>;
-							} }
+			selector =
+				<Autocomplete
+					id={ selectId }
+					minLength={ 2 }
+					showAllValues={ true }
+					defaultValue={ postAuthor && postAuthor[ 0 ] ? postAuthor[ 0 ].name : '' }
+					autoselect={ true }
+					displayMenu="overlay"
+					onConfirm={ this.setAuthorId }
+					source={ debounce( this.suggestAuthor, 300 ) }
+					showNoResultsFound={ false }
+					tStatusQueryTooShort={ ( minQueryLength ) =>
+						__( `Type in ${ minQueryLength } or more characters for results` ) }
+					tStatusNoResults={ () => __( 'No search results' ) }
+					tStatusSelectedOption={ ( selectedOption, length ) => __( `${ selectedOption } (1 of ${ length }) is selected` ) }
+					tStatusResults={ ( length, contentSelectedOption ) => {
+						const words = {
+							result: ( length === 1 ) ? __( 'result' ) : __( 'results' ),
+							is: ( length === 1 ) ? __( 'is' ) : __( 'are' ),
+						};
+						return <span>{ length } { words.result } { words.is } available. { contentSelectedOption }</span>;
+					} }
 
-						/>;
+				/>;
 		}
 
 		/* eslint-disable jsx-a11y/no-onchange */
 		return (
 			<PostAuthorCheck>
 				<label htmlFor={ selectId }>{ __( 'Author' ) }</label>
-				{ postAuthor[0] && selector }
+				{ postAuthor[ 0 ] && selector }
 			</PostAuthorCheck>
 		);
 		/* eslint-enable jsx-a11y/no-onchange */
