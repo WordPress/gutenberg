@@ -88,11 +88,11 @@ export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
 
 /**
  * Returns a boolean indicating whether a transform is possible based on
- * various bits of context
+ * various bits of context.
  *
- * @param {Object} transform The transform object to validate
- * @param {string} direction Is this a 'from' or 'to' transform
- * @param {Array} blocks The blocks to transform from
+ * @param {Object} transform The transform object to validate.
+ * @param {string} direction Is this a 'from' or 'to' transform.
+ * @param {Array} blocks The blocks to transform from.
  * @param {boolean} isMultiBlock Have multiple blocks been selected?
  *
  * @return {boolean} Is the transform possible?
@@ -104,25 +104,25 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 	const isMultiBlock = blocks.length > 1;
 	const sourceBlock = first( blocks );
 
-	// If multiple blocks are selected, only multi block transforms are allowed
+	// If multiple blocks are selected, only multi block transforms are allowed.
 	const isValidForMultiBlocks = ! isMultiBlock || transform.isMultiBlock;
 	if ( ! isValidForMultiBlocks ) {
 		return false;
 	}
 
-	// Only consider 'block' type transforms as valid
+	// Only consider 'block' type transforms as valid.
 	const isBlockType = transform.type === 'block';
 	if ( ! isBlockType ) {
 		return false;
 	}
 
-	// Check if the transform's block name matches the source block only if this is a transform 'from'
+	// Check if the transform's block name matches the source block only if this is a transform 'from'.
 	const hasMatchingName = direction !== 'from' || transform.blocks.indexOf( sourceBlock.name ) !== -1;
 	if ( ! hasMatchingName ) {
 		return false;
 	}
 
-	// If the transform has a `canTransform` function specified, check that it returns true
+	// If the transform has a `canTransform` function specified, check that it returns true.
 	if ( isFunction( transform.canTransform ) ) {
 		const attributes = transform.isMultiBlock ? blocks.map( ( block ) => block.attributes ) : sourceBlock.attributes;
 		if ( ! transform.canTransform( attributes ) ) {
@@ -137,7 +137,7 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
  * Returns block types that the 'blocks' can be transformed into, based on
  * 'from' transforms on other blocks.
  *
- * @param {Array}  blocks  The blocks to transform from
+ * @param {Array}  blocks  The blocks to transform from.
  * @param {boolean} isMultiBlock Have multiple blocks been selected?
  *
  * @return {Array} Block types that the blocks can be transformed into.
@@ -205,7 +205,7 @@ const getBlockTypesForPossibleToTransforms = ( blocks ) => {
  *
  * @param {Array} blocks Blocks array.
  *
- * @return {Array} block types that the blocks argument can be transformed to.
+ * @return {Array} Block types that the blocks argument can be transformed to.
  */
 export function getPossibleBlockTransformations( blocks ) {
 	if ( isEmpty( blocks ) ) {
