@@ -15,7 +15,7 @@ import PostAuthorCheck from './check';
 /**
  * External dependencies
  */
-import Autocomplete from 'accessible-autocomplete/react'
+import Autocomplete from 'accessible-autocomplete/react';
 
 import './accessible-autocomplete.css';
 import { findWhere, debounce } from 'underscore';
@@ -52,6 +52,10 @@ export class PostAuthor extends Component {
 		const { postAuthorId, postAuthor, instanceId, authors } = this.props;
 		const selectId = 'post-author-selector-' + instanceId;
 		let selector;
+
+		if ( ! postAuthor ) {
+			return null;
+		}
 
 		if ( authors.length < 50 ) {
 			selector = <select
