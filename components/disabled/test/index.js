@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import { mount } from 'enzyme';
+import TestUtils from 'react-dom/test-utils';
+
+/**
+ * WordPress dependencies
+ */
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -53,13 +58,11 @@ describe( 'Disabled', () => {
 
 	const Form = () => <form><input /><div contentEditable tabIndex="0" /></form>;
 
-	// Skipped temporarily until Enzyme publishes new version that works with React 16.3.0 APIs.
-	// eslint-disable-next-line jest/no-disabled-tests
-	test.skip( 'will disable all fields', () => {
-		const wrapper = mount( <Disabled><Form /></Disabled> );
+	it( 'will disable all fields', () => {
+		const wrapper = TestUtils.renderIntoDocument( <Disabled><Form /></Disabled> );
 
-		const input = wrapper.find( 'input' ).getDOMNode();
-		const div = wrapper.find( '[contentEditable]' ).getDOMNode();
+		const input = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'input' );
+		const div = TestUtils.scryRenderedDOMComponentsWithTag( wrapper, 'div' )[ 1 ];
 
 		expect( input.hasAttribute( 'disabled' ) ).toBe( true );
 		expect( div.getAttribute( 'contenteditable' ) ).toBe( 'false' );
@@ -67,23 +70,30 @@ describe( 'Disabled', () => {
 		expect( div.hasAttribute( 'disabled' ) ).toBe( false );
 	} );
 
-	// Skipped temporarily until Enzyme publishes new version that works with React 16.3.0 APIs.
-	// eslint-disable-next-line jest/no-disabled-tests
-	test.skip( 'should cleanly un-disable via reconciliation', () => {
+	it( 'should cleanly un-disable via reconciliation', () => {
 		// If this test suddenly starts failing, it means React has become
 		// smarter about reusing children into grandfather element when the
 		// parent is dropped, so we'd need to find another way to restore
 		// original form state.
-		function MaybeDisable( { isDisabled = true } ) {
-			const element = <Form />;
-			return isDisabled ? <Disabled>{ element }</Disabled> : element;
+		// Using state for this test for easier manipulation of the child props.
+		class MaybeDisable extends Component {
+			constructor() {
+				super( ...arguments );
+				this.state = { isDisabled: true };
+			}
+
+			render() {
+				return this.state.isDisabled ?
+					<Disabled><Form /></Disabled> :
+					<Form />;
+			}
 		}
 
-		const wrapper = mount( <MaybeDisable /> );
-		wrapper.setProps( { isDisabled: false } );
+		const wrapper = TestUtils.renderIntoDocument( <MaybeDisable /> );
+		wrapper.setState( { isDisabled: false } );
 
-		const input = wrapper.find( 'input' ).getDOMNode();
-		const div = wrapper.find( '[contentEditable]' ).getDOMNode();
+		const input = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'input' );
+		const div = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'div' );
 
 		expect( input.hasAttribute( 'disabled' ) ).toBe( false );
 		expect( div.getAttribute( 'contenteditable' ) ).toBe( 'true' );
@@ -100,28 +110,28 @@ describe( 'Disabled', () => {
 	//  https://github.com/jsdom/jsdom/issues/639
 
 	describe( 'Consumer', () => {
-		function DisabledStatus() {
-			return (
-				<p>
-					<Disabled.Consumer>
-						{ ( isDisabled ) => isDisabled ? 'Disabled' : 'Not disabled' }
-					</Disabled.Consumer>
-				</p>
-			);
+		class DisabledStatus extends Component {
+			render() {
+				return (
+					<p>
+						<Disabled.Consumer>
+							{ ( isDisabled ) => isDisabled ? 'Disabled' : 'Not disabled' }
+						</Disabled.Consumer>
+					</p>
+				);
+			}
 		}
 
-		// Skipped temporarily until Enzyme publishes new version that works with React 16.3.0 APIs.
-		// eslint-disable-next-line jest/no-disabled-tests
-		test.skip( 'lets components know that they\'re disabled via context', () => {
-			const wrapper = mount( <Disabled><DisabledStatus /></Disabled> );
-			expect( wrapper.text() ).toBe( 'Disabled' );
+		test( 'lets components know that they\'re disabled via context', () => {
+			const wrapper = TestUtils.renderIntoDocument( <Disabled><DisabledStatus /></Disabled> );
+			const wrapperElement = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'p' );
+			expect( wrapperElement.textContent ).toBe( 'Disabled' );
 		} );
 
-		// Skipped temporarily until Enzyme publishes new version that works with React 16.3.0 APIs.
-		// eslint-disable-next-line jest/no-disabled-tests
-		test.skip( 'lets components know that they\'re not disabled via context', () => {
-			const wrapper = mount( <DisabledStatus /> );
-			expect( wrapper.text() ).toBe( 'Not disabled' );
+		test( 'lets components know that they\'re not disabled via context', () => {
+			const wrapper = TestUtils.renderIntoDocument( <DisabledStatus /> );
+			const wrapperElement = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'p' );
+			expect( wrapperElement.textContent ).toBe( 'Not disabled' );
 		} );
 	} );
 } );
