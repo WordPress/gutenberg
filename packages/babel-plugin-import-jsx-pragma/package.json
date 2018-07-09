@@ -22,7 +22,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"devDependencies": {
-		"babel-core": "6.26.0",
+		"babel-core": "^6.26.3",
 		"babel-plugin-syntax-jsx": "^6.18.0"
 	},
 	"publishConfig": {

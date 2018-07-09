@@ -2,6 +2,7 @@
  * External dependencies
  */
 const { isArray, map } = require( 'lodash' );
+const babelPluginTransformReactJSX = require( 'babel-plugin-transform-react-jsx' );
 const babelPresetEnv = require( 'babel-preset-env' );
 
 /**
@@ -9,10 +10,17 @@ const babelPresetEnv = require( 'babel-preset-env' );
  */
 const babelDefaultConfig = require( '@wordpress/babel-preset-default' );
 
-const plugins = babelDefaultConfig.plugins;
+const plugins = map( babelDefaultConfig.plugins, ( plugin ) => {
+	if ( isArray( plugin ) && plugin[ 0 ] === babelPluginTransformReactJSX ) {
+		// TODO: It should become the default value when all modules are moved to packages.
+		return [ babelPluginTransformReactJSX, { pragma: 'createElement' } ];
+	}
+
+	return plugin;
+} );
 
 if ( ! process.env.SKIP_JSX_PRAGMA_TRANSFORM ) {
-	plugins.push( [ require( '@wordpress/babel-plugin-import-jsx-pragma' ).default, {
+	plugins.push( [ require( '../../packages/babel-plugin-import-jsx-pragma' ).default, {
 		scopeVariable: 'createElement',
 		source: '@wordpress/element',
 		isDefault: false,

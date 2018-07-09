@@ -1,13 +1,10 @@
 {
-	"command": {
+	"lerna": "2.11.0",
+	"commands": {
 		"publish": {
 			"message": "chore(release): publish"
 		}
 	},
-	"ignoreChanges": [
-		"**/benchmark/*.js",
-		"**/test/**"
-	],
 	"packages": [
 		"packages/*"
 	],
