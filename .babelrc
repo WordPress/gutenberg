@@ -22,6 +22,8 @@
         ]
       }
     ],
+    "transform-async-to-generator",
+    "transform-async-generator-functions",
     "react-native-classname-to-style",
     [
       "react-native-platform-specific-extensions",
