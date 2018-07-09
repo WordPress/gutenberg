@@ -16,8 +16,8 @@ import { Component } from '@wordpress/element';
  */
 import withFilters from '..';
 
-const assertExpectedHtml = ( wrapper, containerTag, expectedHTML ) => {
-	const element = TestUtils.findRenderedDOMComponentWithTag( wrapper, containerTag );
+const assertExpectedHtml = ( wrapper, expectedHTML ) => {
+	const element = ReactDOM.findDOMNode( wrapper );
 	expect( element.outerHTML ).toBe( expectedHTML );
 };
 
@@ -116,7 +116,6 @@ describe( 'withFilters', () => {
 		expect( spy ).toHaveBeenCalledTimes( 1 );
 		assertExpectedHtml(
 			wrapper,
-			'blockquote',
 			'<blockquote><div>Spied component</div></blockquote>'
 		);
 	} );
@@ -146,7 +145,6 @@ describe( 'withFilters', () => {
 		expect( spy ).toHaveBeenCalledTimes( 1 );
 		assertExpectedHtml(
 			wrapper,
-			'blockquote',
 			'<blockquote><div>Spied component</div></blockquote>'
 		);
 	} );
@@ -185,7 +183,6 @@ describe( 'withFilters', () => {
 		expect( spy ).toHaveBeenCalledTimes( 1 );
 		assertExpectedHtml(
 			wrapper,
-			'section',
 			'<section><blockquote><div>Spied component</div></blockquote></section>'
 		);
 	} );
@@ -220,7 +217,6 @@ describe( 'withFilters', () => {
 		expect( spy ).toHaveBeenCalledTimes( 2 );
 		assertExpectedHtml(
 			wrapper,
-			'div',
 			'<div>Spied component</div>'
 		);
 	} );
@@ -255,7 +251,6 @@ describe( 'withFilters', () => {
 		expect( spy ).toHaveBeenCalledTimes( 2 );
 		assertExpectedHtml(
 			wrapper,
-			'section',
 			'<section><blockquote><div>Spied component</div></blockquote><blockquote><div>Spied component</div></blockquote></section>'
 		);
 	} );
