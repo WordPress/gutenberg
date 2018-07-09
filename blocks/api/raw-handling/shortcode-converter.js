@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { some, castArray, first, mapValues, pickBy, includes } from 'lodash';
+import { castArray, find, first, includes, mapValues, pickBy, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,14 +11,10 @@ import { regexp, next } from '@wordpress/shortcode';
 /**
  * Internal dependencies
  */
-import { createBlock, getBlockTransforms, findTransform } from '../factory';
-import { getBlockType } from '../registration';
+import { createBlock, findTransform } from '../factory';
 import { getBlockAttributes } from '../parser';
 
-function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0 ) {
-	// Get all matches.
-	const transformsFrom = getBlockTransforms( 'from' );
-
+function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0, transformsFrom = [], blockTypes = [] ) {
 	const transformation = findTransform( transformsFrom, ( transform ) => (
 		transform.type === 'shortcode' &&
 		some( castArray( transform.tag ), ( tag ) => regexp( tag ).test( HTML ) )
@@ -31,7 +27,7 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0 ) {
 	const transformTags = castArray( transformation.tag );
 	const transformTag = first( transformTags );
 
-	let match;
+	let blockType, match;
 
 	if ( ( match = next( transformTag, HTML, lastIndex ) ) ) {
 		const beforeHTML = HTML.substr( 0, match.index );
@@ -58,16 +54,19 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0 ) {
 			( schema ) => schema.shortcode( match.shortcode.attrs, match ),
 		);
 
+		blockType = find( blockTypes, { name: transformation.blockName } );
 		const block = createBlock(
 			transformation.blockName,
 			getBlockAttributes(
 				{
-					...getBlockType( transformation.blockName ),
+					...blockType,
 					attributes: transformation.attributes,
 				},
 				match.shortcode.content,
 				attributes,
-			)
+			),
+			[],
+			blockType
 		);
 
 		return [
