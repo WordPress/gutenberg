@@ -16,12 +16,13 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
  - The `wp.editor.MediaPlaceholder` component `onSelectUrl` prop has been renamed to `onSelectURL`.
  - The `wp.editor.UrlInput` component has been renamed to `wp.editor.URLInput`.
  - The Text Columns block has been removed. Please use the Columns block instead.
+ - `InnerBlocks` grouped layout is removed. Use intermediary nested inner blocks instead. See Columns / Column block for reference implementation.
 
 ## 3.4.0
 
  - `focusOnMount` prop in the `Popover` component has been changed from `Boolean`-only to an enum-style property that accepts `"firstElement"`, `"container"`, or `false`. Please convert any `<Popover focusOnMount />` usage to `<Popover focusOnMount="firstElement" />`.
  - `wp.utils.keycodes` utilities are removed. Please use `wp.keycodes` instead.
- -  Block `id` prop in `edit` function removed. Please use block `clientId` prop instead.
+ - Block `id` prop in `edit` function removed. Please use block `clientId` prop instead.
 
 ## 3.3.0
 
