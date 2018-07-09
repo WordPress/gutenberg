@@ -13,7 +13,7 @@ import {
 	isValidElement,
 	StrictMode,
 } from 'react';
-import { isString } from 'lodash';
+import { flatMap, isArray, isString } from 'lodash';
 
 export { Children };
 
@@ -132,4 +132,25 @@ export function switchChildrenNodeName( children, nodeName ) {
 		const { children: childrenProp, ...props } = elt.props;
 		return createElement( nodeName, { key: index, ...props }, childrenProp );
 	} );
+}
+
+/**
+ * Function that returns an array of all the text elements
+ * descendants of the element passed.
+ *
+ * @param {?Array|string|WPElement} element Element object, a string representing a text node
+ *                                          or an array of nodes.
+ *
+ * @return {?Array} An array of all text nodes present on the tree of the element passed.
+ */
+export function getTextElements( element ) {
+	if ( isString( element ) ) {
+		return element;
+	}
+	if ( isArray( element ) ) {
+		return flatMap( element, ( child ) => getTextElements( child ) );
+	}
+	if ( element && element.props && element.props.children ) {
+		return getTextElements( element.props.children );
+	}
 }

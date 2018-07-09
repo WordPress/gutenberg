@@ -8,7 +8,7 @@ import { includes } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { createBlobURL } from '@wordpress/blob';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, children } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
 
 /**
@@ -97,7 +97,7 @@ export const settings = {
 				transform: ( attributes ) => {
 					return createBlock( 'core/file', {
 						href: attributes.src,
-						fileName: attributes.caption && attributes.caption.join(),
+						fileName: attributes.caption && children.toText( attributes.caption ),
 						textLinkHref: attributes.src,
 						id: attributes.id,
 					} );
@@ -109,7 +109,7 @@ export const settings = {
 				transform: ( attributes ) => {
 					return createBlock( 'core/file', {
 						href: attributes.src,
-						fileName: attributes.caption && attributes.caption.join(),
+						fileName: attributes.caption && children.toText( attributes.caption ),
 						textLinkHref: attributes.src,
 						id: attributes.id,
 					} );
@@ -121,7 +121,7 @@ export const settings = {
 				transform: ( attributes ) => {
 					return createBlock( 'core/file', {
 						href: attributes.url,
-						fileName: attributes.caption && attributes.caption.join(),
+						fileName: attributes.caption && children.toText( attributes.caption ),
 						textLinkHref: attributes.url,
 						id: attributes.id,
 					} );
