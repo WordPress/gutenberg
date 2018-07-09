@@ -267,6 +267,47 @@ transforms: {
 ```
 {% end %}
 
+An optional `isMatch` function can be specified on a transform object. This provides an opportunity to perform additional checks on whether a transform should be possible. Returning `false` from this function will prevent the transform from being displayed as an option to the user.
+
+{% codetabs %}
+{% ES5 %}
+```js
+transforms: {
+    to: [
+        {
+            type: 'block',
+			blocks: [ 'core/paragraph' ],
+			isMatch: function( attribute ) {
+				return attributes.isText;
+			},
+            transform: function( content ) {
+                return createBlock( 'core/paragraph', {
+                    content,
+                } );
+            },
+        },
+    ],
+},
+```
+{% ESNext %}
+```js
+transforms: {
+    to: [
+        {
+            type: 'block',
+			blocks: [ 'core/paragraph' ],
+			isMatch: ( { isText } ) => isText,
+            transform: ( { content } ) => {
+                return createBlock( 'core/paragraph', {
+                    content,
+                } );
+            },
+        },
+    ],
+},
+```
+{% end %}
+
 To control the priority with which a transform is applied, define a `priority` numeric property on your transform object, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 
