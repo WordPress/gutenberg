@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/babel-plugin-import-jsx-pragma",
-	"version": "1.0.0-alpha.1",
+	"version": "1.0.0-alpha.2",
 	"description": "Babel transform plugin for automatically injecting an import to be used as the pragma for the React JSX Transform plugin.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -22,7 +22,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"devDependencies": {
-		"babel-core": "^6.26.3",
+		"babel-core": "6.26.0",
 		"babel-plugin-syntax-jsx": "^6.18.0"
 	},
 	"publishConfig": {

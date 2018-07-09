@@ -9,6 +9,7 @@ import { RichText } from '@wordpress/editor';
  * Internal dependencies
  */
 import './editor.scss';
+import './theme.scss';
 
 export const name = 'core/preformatted';
 

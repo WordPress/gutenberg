@@ -25,12 +25,10 @@ import createSelector from 'rememo';
 import { serialize, getBlockType, getBlockTypes, hasBlockSupport, hasChildBlocks } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { moment } from '@wordpress/date';
-import deprecated from '@wordpress/deprecated';
 
 /***
  * Module constants
  */
-const MAX_RECENT_BLOCKS = 9;
 export const POST_UPDATE_TRANSACTION_ID = 'post-update';
 const PERMALINK_POSTNAME_REGEX = /%(?:postname|pagename)%/;
 export const INSERTER_UTILITY_HIGH = 3;
@@ -931,6 +929,30 @@ export function isBlockMultiSelected( state, uid ) {
 }
 
 /**
+ * Returns true if an ancestor of the block is multi-selected and false otherwise.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} uid   Block unique ID.
+ *
+ * @return {boolean} Whether an ancestor of the block is in multi-selection set.
+ */
+export const isAncestorMultiSelected = createSelector(
+	( state, uid ) => {
+		let ancestorUid = uid;
+		let isMultiSelected = false;
+		while ( ancestorUid && ! isMultiSelected ) {
+			ancestorUid = getBlockRootUID( state, ancestorUid );
+			isMultiSelected = isBlockMultiSelected( state, ancestorUid );
+		}
+		return isMultiSelected;
+	},
+	( state ) => [
+		state.editor.present.blockOrder,
+		state.blockSelection.start,
+		state.blockSelection.end,
+	],
+);
+/**
  * Returns the unique ID of the block which begins the multi-selection set, or
  * null if there is no multi-selection.
  *
@@ -1168,12 +1190,22 @@ export function getTemplate( state ) {
 
 /**
  * Returns the defined block template lock
+ * in the context of a given root block or in the global context.
  *
  * @param {boolean} state
+ * @param {?string} rootUID Block UID.
+ *
  * @return {?string}        Block Template Lock
  */
-export function getTemplateLock( state ) {
-	return state.settings.templateLock;
+export function getTemplateLock( state, rootUID ) {
+	if ( ! rootUID ) {
+		return state.settings.templateLock;
+	}
+	const blockListSettings = getBlockListSettings( state, rootUID );
+	if ( ! blockListSettings ) {
+		return null;
+	}
+	return blockListSettings.templateLock;
 }
 
 /**
@@ -1334,20 +1366,20 @@ export const canInsertBlockType = createSelector(
 			return false;
 		}
 
-		const { allowedBlockTypes, templateLock } = getEditorSettings( state );
+		const { allowedBlockTypes } = getEditorSettings( state );
 
 		const isBlockAllowedInEditor = checkAllowList( allowedBlockTypes, blockName, true );
 		if ( ! isBlockAllowedInEditor ) {
 			return false;
 		}
 
-		const isEditorLocked = !! templateLock;
-		if ( isEditorLocked ) {
+		const isLocked = !! getTemplateLock( state, parentUID );
+		if ( isLocked ) {
 			return false;
 		}
 
 		const parentBlockListSettings = getBlockListSettings( state, parentUID );
-		const parentAllowedBlocks = get( parentBlockListSettings, [ 'supportedBlocks' ] );
+		const parentAllowedBlocks = get( parentBlockListSettings, [ 'allowedBlocks' ] );
 		const hasParentAllowedBlock = checkAllowList( parentAllowedBlocks, blockName );
 
 		const blockAllowedParentBlocks = blockType.parent;
@@ -1426,18 +1458,6 @@ function getInsertUsage( state, id ) {
  */
 export const getInserterItems = createSelector(
 	( state, parentUID = null ) => {
-		/**
-		 * The second argument used to be {boolean|array} allowedBlockTypes but it is no
-		 * longer necessary.
-		 */
-		if ( isBoolean( parentUID ) || isArray( parentUID ) ) {
-			deprecated( 'allowedBlockTypes', {
-				version: '3.2',
-				plugin: 'Gutenberg',
-			} );
-			parentUID = null;
-		}
-
 		const calculateUtility = ( category, count, isContextual ) => {
 			if ( isContextual ) {
 				return INSERTER_UTILITY_HIGH;
@@ -1575,32 +1595,6 @@ export const getInserterItems = createSelector(
 		getBlockTypes(),
 	],
 );
-
-/**
- * Returns a list of items which the user is likely to want to insert. These
- * are ordered by 'frecency', which is a heuristic that combines block usage
- * frequency and recency.
- *
- * https://en.wikipedia.org/wiki/Frecency
- *
- * @param {Object}           state             Global application state.
- * @param {string[]|boolean} allowedBlockTypes Allowed block types, or true/false to enable/disable all types.
- * @param {number}           maximum           Number of items to return.
- *
- * @return {Editor.InserterItem[]} Items that appear in the 'Recent' tab.
- */
-export function getFrecentInserterItems( state, allowedBlockTypes, maximum = MAX_RECENT_BLOCKS ) {
-	deprecated( 'getFrecentInserterItems', {
-		version: '3.2',
-		alternative: 'getInserterItems',
-		plugin: 'Gutenberg',
-	} );
-
-	const items = getInserterItems( state, allowedBlockTypes );
-	const usefulItems = items.filter( ( item ) => item.utility > 0 );
-	const sortedItems = orderBy( usefulItems, [ 'utility', 'frecency' ], [ 'desc', 'desc' ] );
-	return sortedItems.slice( 0, maximum );
-}
 
 /**
  * Returns the shared block with the given ID.
@@ -1809,29 +1803,6 @@ export function getBlockListSettings( state, uid ) {
 	return state.blockListSettings[ uid ];
 }
 
-/**
- * Determines the blocks that can be nested inside a given block. Or globally if a block is not specified.
- *
- * @param {Object}           state                     Global application state.
- * @param {?string}          uid                       Block UID.
- * @param {string[]|boolean} globallyEnabledBlockTypes Globally enabled block types, or true/false to enable/disable all types.
- *
- * @return {string[]|boolean} Blocks that can be nested inside the block with the specified uid, or true/false to enable/disable all types.
- */
-// Disable reason: We have to accept `globallyEnabledBlockTypes` so as to be backwards compatible
-// eslint-disable-next-line no-unused-vars
-export function getSupportedBlocks( state, uid, globallyEnabledBlockTypes ) {
-	deprecated( 'getSupportedBlocks', {
-		version: '3.2',
-		alternative: 'canInsertBlockType',
-		plugin: 'Gutenberg',
-	} );
-
-	return getBlockTypes()
-		.filter( ( blockType ) => canInsertBlockType( state, blockType.name, uid ) )
-		.map( ( blockType ) => blockType.name );
-}
-
 /*
  * Returns the editor settings.
  *
@@ -1841,4 +1812,19 @@ export function getSupportedBlocks( state, uid, globallyEnabledBlockTypes ) {
  */
 export function getEditorSettings( state ) {
 	return state.settings;
+}
+
+/*
+ * Returns the editor settings.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} The editor settings object
+ */
+export function getTokenSettings( state, name ) {
+	if ( ! name ) {
+		return state.tokens;
+	}
+
+	return state.tokens[ name ];
 }

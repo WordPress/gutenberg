@@ -10,23 +10,9 @@ describe( 'adding blocks', () => {
 		await newPost();
 	} );
 
-	/**
-	 * Given a Puppeteer ElementHandle, clicks below its bounding box.
-	 *
-	 * @param {Puppeteer.ElementHandle} elementHandle Element handle.
-	 *
-	 * @return {Promise} Promise resolving when click occurs.
-	 */
-	async function clickBelow( elementHandle ) {
-		const box = await elementHandle.boundingBox();
-		const x = box.x + ( box.width / 2 );
-		const y = box.y + box.height + 1;
-		return page.mouse.click( x, y );
-	}
-
 	it( 'Should insert content using the placeholder and the regular inserter', async () => {
 		// Click below editor to focus last field (block appender)
-		await clickBelow( await page.$( '.editor-default-block-appender' ) );
+		await page.click( '.editor-writing-flow__click-redirect' );
 		expect( await page.$( '[data-type="core/paragraph"]' ) ).not.toBeNull();
 
 		// Up to return back to title. Assumes that appender results in focus
@@ -49,7 +35,7 @@ describe( 'adding blocks', () => {
 		await page.keyboard.type( 'Quote block' );
 
 		// Using the regular inserter
-		await insertBlock( 'code' );
+		await insertBlock( 'Code' );
 		await page.keyboard.type( 'Code block' );
 
 		// Unselect blocks to avoid conflicts with the inbetween inserter

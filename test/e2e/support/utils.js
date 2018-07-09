@@ -4,6 +4,11 @@
 import { join } from 'path';
 import { URL } from 'url';
 
+/**
+ * External dependencies
+ */
+import { times } from 'lodash';
+
 const {
 	WP_BASE_URL = 'http://localhost:8888',
 	WP_USERNAME = 'admin',
@@ -25,6 +30,21 @@ const MOD_KEY = process.platform === 'darwin' ? 'Meta' : 'Control';
  * @type {RegExp}
  */
 const REGEXP_ZWSP = /[\u200B\u200C\u200D\uFEFF]/;
+
+/**
+ * Given an array of functions, each returning a promise, performs all
+ * promises in sequence (waterfall) order.
+ *
+ * @param {Function[]} sequence Array of promise creators.
+ *
+ * @return {Promise} Promise resolving once all in the sequence complete.
+ */
+async function promiseSequence( sequence ) {
+	return sequence.reduce(
+		( current, next ) => current.then( next ),
+		Promise.resolve()
+	);
+}
 
 export function getUrl( WPPath, query = '' ) {
 	const url = new URL( WP_BASE_URL );
@@ -164,10 +184,9 @@ export async function insertBlock( searchTerm ) {
 	// Waiting here is necessary because sometimes the inserter takes more time to
 	// render than Puppeteer takes to complete the 'click' action
 	await page.waitForSelector( '.editor-inserter__menu' );
+	// Filter and reveal buttons.
 	await page.keyboard.type( searchTerm );
-	await page.keyboard.press( 'Tab' );
-	await page.keyboard.press( 'Tab' );
-	await page.keyboard.press( 'Enter' );
+	await page.click( `button[aria-label="${ searchTerm }"]` );
 }
 
 /**
@@ -231,6 +250,18 @@ export async function openDocumentSettingsSidebar() {
 	if ( openButton ) {
 		await page.click( openButton );
 	}
+}
+
+/**
+ * Presses the given keyboard key a number of times in sequence.
+ *
+ * @param {string} key   Key to press.
+ * @param {number} count Number of times to press.
+ *
+ * @return {Promise} Promise resolving when key presses complete.
+ */
+export async function pressTimes( key, count ) {
+	return promiseSequence( times( count, () => () => page.keyboard.press( key ) ) );
 }
 
 export async function clearLocalStorage() {

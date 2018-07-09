@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual, pick } from 'lodash';
+import { pick, isEqual, map } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -12,6 +12,7 @@ import { withViewportMatch } from '@wordpress/viewport';
 import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { synchronizeBlocksWithTemplate } from '@wordpress/blocks';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -21,31 +22,59 @@ import BlockList from '../block-list';
 import { withBlockEditContext } from '../block-edit/context';
 
 class InnerBlocks extends Component {
-	componentWillReceiveProps( nextProps ) {
-		this.updateNestedSettings( {
-			supportedBlocks: nextProps.allowedBlocks,
-		} );
+	constructor() {
+		super( ...arguments );
+
+		this.updateNestedSettings();
 	}
 
 	componentDidMount() {
-		this.updateNestedSettings( {
-			supportedBlocks: this.props.allowedBlocks,
-		} );
-		this.insertTemplateBlocks( this.props.template );
+		this.synchronizeBlocksWithTemplate();
 	}
 
-	insertTemplateBlocks( template ) {
-		const { block, insertBlocks } = this.props;
-		if ( template && ! block.innerBlocks.length ) {
-			// synchronizeBlocksWithTemplate( [], template ) parses the template structure,
-			// and returns/creates the necessary blocks to represent it.
-			insertBlocks( synchronizeBlocksWithTemplate( [], template ) );
+	componentDidUpdate( prevProps ) {
+		const { template } = this.props;
+
+		this.updateNestedSettings();
+
+		const hasTemplateChanged = ! isEqual( template, prevProps.template );
+		if ( hasTemplateChanged ) {
+			this.synchronizeBlocksWithTemplate();
 		}
 	}
 
-	updateNestedSettings( newSettings ) {
-		if ( ! isEqual( this.props.blockListSettings, newSettings ) ) {
-			this.props.updateNestedSettings( newSettings );
+	/**
+	 * Called on mount or when a mismatch exists between the templates and
+	 * inner blocks, synchronizes inner blocks with the template, replacing
+	 * current blocks.
+	 */
+	synchronizeBlocksWithTemplate() {
+		const { template, block, replaceInnerBlocks } = this.props;
+		const { innerBlocks } = block;
+
+		// Synchronize with templates. If the next set differs, replace.
+		const nextBlocks = synchronizeBlocksWithTemplate( innerBlocks, template );
+		if ( ! isEqual( nextBlocks, innerBlocks	) ) {
+			replaceInnerBlocks( nextBlocks );
+		}
+	}
+
+	updateNestedSettings() {
+		const {
+			blockListSettings,
+			allowedBlocks,
+			templateLock,
+			parentLock,
+			updateNestedSettings,
+		} = this.props;
+
+		const newSettings = {
+			allowedBlocks,
+			templateLock: templateLock === undefined ? parentLock : templateLock,
+		};
+
+		if ( ! isShallowEqual( blockListSettings, newSettings ) ) {
+			updateNestedSettings( newSettings );
 		}
 	}
 
@@ -54,6 +83,7 @@ class InnerBlocks extends Component {
 			uid,
 			layouts,
 			allowedBlocks,
+			templateLock,
 			template,
 			isSmallScreen,
 			isSelectedBlockInRoot,
@@ -67,7 +97,7 @@ class InnerBlocks extends Component {
 			<div className={ classes }>
 				<BlockList
 					rootUID={ uid }
-					{ ...{ layouts, allowedBlocks, template } }
+					{ ...{ layouts, allowedBlocks, templateLock, template } }
 				/>
 			</div>
 		);
@@ -83,22 +113,34 @@ InnerBlocks = compose( [
 			hasSelectedInnerBlock,
 			getBlock,
 			getBlockListSettings,
+			getBlockRootUID,
+			getTemplateLock,
 		} = select( 'core/editor' );
 		const { uid } = ownProps;
-
+		const parentUID = getBlockRootUID( uid );
 		return {
 			isSelectedBlockInRoot: isBlockSelected( uid ) || hasSelectedInnerBlock( uid ),
 			block: getBlock( uid ),
 			blockListSettings: getBlockListSettings( uid ),
+			parentLock: getTemplateLock( parentUID ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
-		const { insertBlocks, updateBlockListSettings } = dispatch( 'core/editor' );
-		const { uid } = ownProps;
+		const {
+			replaceBlocks,
+			insertBlocks,
+			updateBlockListSettings,
+		} = dispatch( 'core/editor' );
+		const { block, uid } = ownProps;
 
 		return {
-			insertBlocks( blocks ) {
-				dispatch( insertBlocks( blocks, undefined, uid ) );
+			replaceInnerBlocks( blocks ) {
+				const uids = map( block.innerBlocks, 'uid' );
+				if ( uids.length ) {
+					replaceBlocks( uids, blocks );
+				} else {
+					insertBlocks( blocks, undefined, uid );
+				}
 			},
 			updateNestedSettings( settings ) {
 				dispatch( updateBlockListSettings( uid, settings ) );

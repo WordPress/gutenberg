@@ -983,6 +983,45 @@ function get_autosave_newer_than_post_save( $post ) {
 }
 
 /**
+ * Returns all the block categories.
+ *
+ * @since 2.2.0
+ *
+ * @param  WP_Post $post Post object.
+ * @return Object[] Block categories.
+ */
+function get_block_categories( $post ) {
+	$default_categories = array(
+		array(
+			'slug'  => 'common',
+			'title' => __( 'Common Blocks', 'gutenberg' ),
+		),
+		array(
+			'slug'  => 'formatting',
+			'title' => __( 'Formatting', 'gutenberg' ),
+		),
+		array(
+			'slug'  => 'layout',
+			'title' => __( 'Layout Elements', 'gutenberg' ),
+		),
+		array(
+			'slug'  => 'widgets',
+			'title' => __( 'Widgets', 'gutenberg' ),
+		),
+		array(
+			'slug'  => 'embed',
+			'title' => __( 'Embeds', 'gutenberg' ),
+		),
+		array(
+			'slug'  => 'shared',
+			'title' => __( 'Shared Blocks', 'gutenberg' ),
+		),
+	);
+
+	return apply_filters( 'block_categories', $default_categories, $post );
+}
+
+/**
  * Scripts & Styles.
  *
  * Enqueues the needed scripts and styles when visiting the top-level page of
@@ -1040,6 +1079,12 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	wp_add_inline_script(
 		'wp-api-request',
 		sprintf( 'wp.apiRequest.use( wp.apiRequest.createPreloadingMiddleware( %s ) );', wp_json_encode( $preload_data ) ),
+		'after'
+	);
+
+	wp_add_inline_script(
+		'wp-blocks',
+		sprintf( 'wp.blocks.setCategories( %s );', wp_json_encode( get_block_categories( $post ) ) ),
 		'after'
 	);
 
@@ -1102,7 +1147,18 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// Initialize the editor.
 	$gutenberg_theme_support = get_theme_support( 'gutenberg' );
 	$align_wide              = get_theme_support( 'align-wide' );
-	$color_palette           = get_theme_support( 'editor-color-palette' );
+	$color_palette           = (array) get_theme_support( 'editor-color-palette' );
+
+	// Backcompat for Color Palette set as multiple parameters.
+	if ( isset( $color_palette[0] ) && ( is_string( $color_palette[0] ) || isset( $color_palette[0]['color'] ) ) ) {
+		_doing_it_wrong(
+			'add_theme_support()',
+			__( 'Setting colors using multiple parameters is deprecated. Please pass a single parameter with an array of colors. See https://wordpress.org/gutenberg/handbook/extensibility/theme-support/ for details.', 'gutenberg' ),
+			'3.4.0'
+		);
+	} else {
+		$color_palette = current( $color_palette );
+	}
 
 	// Backcompat for Color Palette set through `gutenberg` array.
 	if ( empty( $color_palette ) && ! empty( $gutenberg_theme_support[0]['colors'] ) ) {
@@ -1110,11 +1166,10 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	}
 
 	if ( ! empty( $gutenberg_theme_support ) ) {
-		wp_add_inline_script(
-			'wp-edit-post',
-			'console.warn( "' .
-				__( 'Adding theme support using the `gutenberg` array is deprecated. See https://wordpress.org/gutenberg/handbook/extensibility/theme-support/ for details.', 'gutenberg' ) .
-			'");'
+		_doing_it_wrong(
+			'add_theme_support()',
+			__( 'Adding theme support using the `gutenberg` array is deprecated. See https://wordpress.org/gutenberg/handbook/extensibility/theme-support/ for details.', 'gutenberg' ),
+			'3.4.0'
 		);
 	}
 
@@ -1156,8 +1211,8 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		);
 	}
 
-	if ( ! empty( $color_palette ) ) {
-		$editor_settings['colors'] = $color_palette;
+	if ( false !== $color_palette ) {
+		$editor_settings['colors'] = editor_color_palette_slugs( $color_palette );
 	}
 
 	if ( ! empty( $post_type_object->template ) ) {
@@ -1205,4 +1260,35 @@ JS;
 	 * @since 0.4.0
 	 */
 	do_action( 'enqueue_block_editor_assets' );
+}
+
+/**
+ * This helper function ensures, that every item in $color_palette has a slug.
+ *
+ * @access public
+ * @param array $color_palette The color palette registered with theme_support.
+ * @return array $new_color_palette The color palette with slugs added where needed
+ */
+function editor_color_palette_slugs( $color_palette ) {
+	$new_color_palette = array();
+	$is_doing_it_wrong = false;
+
+	foreach ( $color_palette as $color ) {
+		if ( ! isset( $color['slug'] ) ) {
+			$color['slug']     = esc_js( $color['name'] );
+			$is_doing_it_wrong = true;
+		}
+
+		$new_color_palette[] = $color;
+	}
+
+	if ( $is_doing_it_wrong ) {
+		_doing_it_wrong(
+			'add_theme_support()',
+			__( 'Each color in the "editor-color-palette" should have a slug defined.', 'gutenberg' ),
+			'3.2.0'
+		);
+	}
+
+	return $new_color_palette;
 }

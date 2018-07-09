@@ -28,7 +28,7 @@
 /**
  * External dependencies
  */
-import { flowRight, isEmpty, castArray, omit, kebabCase } from 'lodash';
+import { flowRight, isEmpty, castArray, omit, startsWith, kebabCase } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -360,6 +360,29 @@ function getNormalAttributeName( attribute ) {
 }
 
 /**
+ * Returns the normal form of the style property name for HTML.
+ *
+ * - Converts property names to kebab-case, e.g. 'backgroundColor' → 'background-color'
+ * - Leaves custom attributes alone, e.g. '--myBackgroundColor' → '--myBackgroundColor'
+ * - Converts vendor-prefixed property names to -kebab-case, e.g. 'MozTransform' → '-moz-transform'
+ *
+ * @param {string} property Property name.
+ *
+ * @return {string} Normalized property name.
+ */
+function getNormalStylePropertyName( property ) {
+	if ( startsWith( property, '--' ) ) {
+		return property;
+	}
+
+	if ( hasPrefix( property, [ 'ms', 'O', 'Moz', 'Webkit' ] ) ) {
+		return '-' + kebabCase( property );
+	}
+
+	return kebabCase( property );
+}
+
+/**
  * Returns the normal form of the style property value for HTML. Appends a
  * default pixel unit if numeric, not a unitless property, and not zero.
  *
@@ -368,7 +391,7 @@ function getNormalAttributeName( attribute ) {
  *
  * @return {*} Normalized property value.
  */
-function getNormalStyleValue( property, value ) {
+function getNormalStylePropertyValue( property, value ) {
 	if ( typeof value === 'number' && 0 !== value &&
 			! CSS_PROPERTIES_SUPPORTS_UNITLESS.has( property ) ) {
 		return value + 'px';
@@ -609,7 +632,9 @@ export function renderStyle( style ) {
 			result = '';
 		}
 
-		result += kebabCase( property ) + ':' + getNormalStyleValue( property, value );
+		const normalName = getNormalStylePropertyName( property );
+		const normalValue = getNormalStylePropertyValue( property, value );
+		result += normalName + ':' + normalValue;
 	}
 
 	return result;

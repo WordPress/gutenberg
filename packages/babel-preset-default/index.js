@@ -14,7 +14,7 @@ module.exports = {
 	plugins: [
 		require( 'babel-plugin-transform-object-rest-spread' ),
 		[ require( 'babel-plugin-transform-react-jsx' ), {
-			pragma: 'wp.element.createElement',
+			pragma: 'createElement',
 		} ],
 		require( 'babel-plugin-transform-async-generator-functions' ),
 		! isTestEnv && require( 'babel-plugin-transform-runtime' ),

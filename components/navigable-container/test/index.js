@@ -45,39 +45,6 @@ describe( 'NavigableMenu', () => {
 	it( 'vertical: should navigate by up and down', () => {
 		let currentIndex = 0;
 		const wrapper = mount( (
-			<NavigableMenu onNavigate={ ( index ) => currentIndex = index }>
-				<button id="btn1">One</button>
-				<button id="btn2">Two</button>
-				<button id="btn3">Three</button>
-			</NavigableMenu >
-		) );
-
-		simulateVisible( wrapper, '*' );
-
-		const container = wrapper.find( 'div' );
-		wrapper.getDOMNode().querySelector( '#btn1' ).focus();
-
-		// Navigate options
-		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
-			const interaction = fireKeyDown( container, keyCode );
-			expect( currentIndex ).toBe( expectedActiveIndex );
-			expect( interaction.stopped ).toBe( expectedStop );
-		}
-
-		assertKeyDown( DOWN, 1, true );
-		assertKeyDown( DOWN, 2, true );
-		assertKeyDown( DOWN, 0, true );
-		assertKeyDown( UP, 2, true );
-		assertKeyDown( UP, 1, true );
-		assertKeyDown( UP, 0, true );
-		assertKeyDown( LEFT, 0, false );
-		assertKeyDown( RIGHT, 0, false );
-		assertKeyDown( SPACE, 0, false );
-	} );
-
-	it( 'vertical: should navigate by up and down, and skip deep candidates', () => {
-		let currentIndex = 0;
-		const wrapper = mount( (
 			<NavigableMenu orientation="vertical" onNavigate={ ( index ) => currentIndex = index }>
 				<span tabIndex="-1" id="btn1">One</span>
 				<span tabIndex="-1" id="btn2">Two</span>
@@ -85,43 +52,7 @@ describe( 'NavigableMenu', () => {
 					<span id="btn-deep" tabIndex="-1">Deep</span>
 				</span>
 				<span tabIndex="-1" id="btn3">Three</span>
-			</NavigableMenu >
-		) );
-
-		simulateVisible( wrapper, '*' );
-
-		const container = wrapper.find( 'div' );
-		wrapper.getDOMNode().querySelector( '#btn1' ).focus();
-
-		// Navigate options
-		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
-			const interaction = fireKeyDown( container, keyCode, false );
-			expect( currentIndex ).toBe( expectedActiveIndex );
-			expect( interaction.stopped ).toBe( expectedStop );
-		}
-
-		assertKeyDown( DOWN, 1, true );
-		assertKeyDown( DOWN, 2, true );
-		assertKeyDown( DOWN, 0, true );
-		assertKeyDown( UP, 2, true );
-		assertKeyDown( UP, 1, true );
-		assertKeyDown( UP, 0, true );
-		assertKeyDown( LEFT, 0, false );
-		assertKeyDown( RIGHT, 0, false );
-		assertKeyDown( SPACE, 0, false );
-	} );
-
-	it( 'vertical: should navigate by up and down, and explore deep candidates', () => {
-		let currentIndex = 0;
-		const wrapper = mount( (
-			<NavigableMenu deep={ true } orientation="vertical" onNavigate={ ( index ) => currentIndex = index }>
-				<span tabIndex="-1" id="btn1">One</span>
-				<span tabIndex="-1" id="btn2">Two</span>
-				<span id="btn-deep-wrapper">
-					<span id="btn-deep" tabIndex="-1">Deep</span>
-				</span>
-				<span tabIndex="-1" id="btn3">Three</span>
-			</NavigableMenu >
+			</NavigableMenu>
 		) );
 
 		simulateVisible( wrapper, '*' );
@@ -156,7 +87,7 @@ describe( 'NavigableMenu', () => {
 				<span tabIndex="-1" id="btn1">One</span>
 				<span tabIndex="-1" id="btn2">Two</span>
 				<span tabIndex="-1" id="btn3">Three</span>
-			</NavigableMenu >
+			</NavigableMenu>
 		) );
 
 		simulateVisible( wrapper, '*' );
@@ -186,82 +117,13 @@ describe( 'NavigableMenu', () => {
 		let currentIndex = 0;
 		const wrapper = mount( (
 			<NavigableMenu orientation="horizontal" onNavigate={ ( index ) => currentIndex = index }>
-				<button id="btn1">One</button>
-				<button id="btn2">Two</button>
-				<button id="btn3">Three</button>
-			</NavigableMenu >
-		) );
-
-		simulateVisible( wrapper, '*' );
-
-		const container = wrapper.find( 'div' );
-		wrapper.getDOMNode().querySelector( '#btn1' ).focus();
-
-		// Navigate options
-		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
-			const interaction = fireKeyDown( container, keyCode, false );
-			expect( currentIndex ).toBe( expectedActiveIndex );
-			expect( interaction.stopped ).toBe( expectedStop );
-		}
-
-		assertKeyDown( RIGHT, 1, true );
-		assertKeyDown( RIGHT, 2, true );
-		assertKeyDown( RIGHT, 0, true );
-		assertKeyDown( LEFT, 2, true );
-		assertKeyDown( LEFT, 1, true );
-		assertKeyDown( LEFT, 0, true );
-		assertKeyDown( UP, 0, false );
-		assertKeyDown( DOWN, 0, false );
-		assertKeyDown( SPACE, 0, false );
-	} );
-
-	it( 'horizontal: should navigate by left and right, and skip deep candidates', () => {
-		let currentIndex = 0;
-		const wrapper = mount( (
-			<NavigableMenu orientation="horizontal" onNavigate={ ( index ) => currentIndex = index }>
 				<span tabIndex="-1" id="btn1">One</span>
 				<span tabIndex="-1" id="btn2">Two</span>
 				<span id="btn-deep-wrapper">
 					<span id="btn-deep" tabIndex="-1">Deep</span>
 				</span>
 				<span tabIndex="-1" id="btn3">Three</span>
-			</NavigableMenu >
-		) );
-
-		simulateVisible( wrapper, '*' );
-
-		const container = wrapper.find( 'div' );
-		wrapper.getDOMNode().querySelector( '#btn1' ).focus();
-
-		// Navigate options
-		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
-			const interaction = fireKeyDown( container, keyCode, false );
-			expect( currentIndex ).toBe( expectedActiveIndex );
-			expect( interaction.stopped ).toBe( expectedStop );
-		}
-
-		assertKeyDown( RIGHT, 1, true );
-		assertKeyDown( RIGHT, 2, true );
-		assertKeyDown( RIGHT, 0, true );
-		assertKeyDown( LEFT, 2, true );
-		assertKeyDown( LEFT, 1, true );
-		assertKeyDown( LEFT, 0, true );
-		assertKeyDown( UP, 0, false );
-		assertKeyDown( DOWN, 0, false );
-		assertKeyDown( SPACE, 0, false );
-	} );
-
-	it( 'horizontal: should navigate by left and right, and explore deep candidates', () => {
-		let currentIndex = 0;
-		const wrapper = mount( (
-			<NavigableMenu deep={ true } orientation="horizontal" onNavigate={ ( index ) => currentIndex = index }>
-				<span tabIndex="-1" id="btn1">One</span>
-				<span tabIndex="-1" id="btn2">Two</span>
-				<span id="btn-deep-wrapper">
-					<span id="btn-deep" tabIndex="-1">Deep</span>
-				</span>
-				<span tabIndex="-1" id="btn3">Three</span>
-			</NavigableMenu >
+			</NavigableMenu>
 		) );
 
 		simulateVisible( wrapper, '*' );
@@ -296,7 +158,7 @@ describe( 'NavigableMenu', () => {
 				<span tabIndex="-1" id="btn1">One</span>
 				<span tabIndex="-1" id="btn2">Two</span>
 				<span tabIndex="-1" id="btn3">Three</span>
-			</NavigableMenu >
+			</NavigableMenu>
 		) );
 
 		simulateVisible( wrapper, '*' );
@@ -329,7 +191,7 @@ describe( 'NavigableMenu', () => {
 				<button id="btn1">One</button>
 				<button id="btn2">Two</button>
 				<button id="btn3">Three</button>
-			</NavigableMenu >
+			</NavigableMenu>
 		) );
 
 		simulateVisible( wrapper, '*' );
@@ -366,78 +228,12 @@ describe( 'TabbableContainer', () => {
 		const wrapper = mount( (
 			<TabbableContainer className="wrapper" onNavigate={ ( index ) => currentIndex = index }>
 				<div className="section" id="section1" tabIndex="0">Section One</div>
-				<div className="section" id="section2a" tabIndex="0">Section Two</div>
-				<div className="section" id="section2b" tabIndex="-1">Section to Skip</div>
-				<div className="section" id="section3" tabIndex="0">Section Three</div>
-			</TabbableContainer >
-		) );
-
-		simulateVisible( wrapper, '*' );
-
-		const container = wrapper.find( 'div.wrapper' );
-		wrapper.getDOMNode().querySelector( '#section1' ).focus();
-
-		// Navigate options
-		function assertKeyDown( keyCode, shiftKey, expectedActiveIndex, expectedStop ) {
-			const interaction = fireKeyDown( container, keyCode, shiftKey );
-			expect( currentIndex ).toBe( expectedActiveIndex );
-			expect( interaction.stopped ).toBe( expectedStop );
-		}
-
-		assertKeyDown( TAB, false, 1, true );
-		assertKeyDown( TAB, false, 2, true );
-		assertKeyDown( TAB, false, 0, true );
-		assertKeyDown( TAB, true, 2, true );
-		assertKeyDown( TAB, true, 1, true );
-		assertKeyDown( TAB, true, 0, true );
-		assertKeyDown( SPACE, false, 0, false );
-	} );
-
-	it( 'should navigate by keypresses and overlook deep candidates', () => {
-		let currentIndex = 0;
-		const wrapper = mount( (
-			<TabbableContainer className="wrapper" onNavigate={ ( index ) => currentIndex = index }>
-				<div className="section" id="section1" tabIndex="0">Section One</div>
-				<div className="section" id="section2" tabIndex="0">Section Two</div>
-				<div className="deep-section">
-					<div className="section" id="section-deep" tabIndex="0">Section to Skip</div>
-				</div>
-				<div className="section" id="section3" tabIndex="0">Section Three</div>
-			</TabbableContainer >
-		) );
-
-		simulateVisible( wrapper, '*' );
-
-		const container = wrapper.find( 'div.wrapper' );
-		wrapper.getDOMNode().querySelector( '#section1' ).focus();
-
-		// Navigate options
-		function assertKeyDown( keyCode, shiftKey, expectedActiveIndex, expectedStop ) {
-			const interaction = fireKeyDown( container, keyCode, shiftKey );
-			expect( currentIndex ).toBe( expectedActiveIndex );
-			expect( interaction.stopped ).toBe( expectedStop );
-		}
-
-		assertKeyDown( TAB, false, 1, true );
-		assertKeyDown( TAB, false, 2, true );
-		assertKeyDown( TAB, false, 0, true );
-		assertKeyDown( TAB, true, 2, true );
-		assertKeyDown( TAB, true, 1, true );
-		assertKeyDown( TAB, true, 0, true );
-		assertKeyDown( SPACE, false, 0, false );
-	} );
-
-	it( 'should navigate by keypresses and explore deep candidates', () => {
-		let currentIndex = 0;
-		const wrapper = mount( (
-			<TabbableContainer deep={ true } className="wrapper" onNavigate={ ( index ) => currentIndex = index }>
-				<div className="section" id="section1" tabIndex="0">Section One</div>
 				<div className="section" id="section2" tabIndex="0">Section Two</div>
 				<div className="deep-section-wrapper">
 					<div className="section" id="section-deep" tabIndex="0">Section to <strong>not</strong> skip</div>
 				</div>
 				<div className="section" id="section3" tabIndex="0">Section Three</div>
-			</TabbableContainer >
+			</TabbableContainer>
 		) );
 
 		simulateVisible( wrapper, '*' );
@@ -470,7 +266,7 @@ describe( 'TabbableContainer', () => {
 				<div className="section" id="section1" tabIndex="0">Section One</div>
 				<div className="section" id="section2" tabIndex="0">Section Two</div>
 				<div className="section" id="section3" tabIndex="0">Section Three</div>
-			</TabbableContainer >
+			</TabbableContainer>
 		) );
 
 		simulateVisible( wrapper, '*' );

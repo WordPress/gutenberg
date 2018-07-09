@@ -1042,19 +1042,22 @@ export const blockListSettings = ( state = {}, action ) => {
 		}
 		case 'UPDATE_BLOCK_LIST_SETTINGS': {
 			const { id } = action;
-			if ( id && ! action.settings ) {
-				return omit( state, id );
+			if ( ! action.settings ) {
+				if ( state.hasOwnProperty( id ) ) {
+					return omit( state, id );
+				}
+
+				return state;
 			}
-			const blockSettings = state[ id ];
-			const updateIsRequired = ! isEqual( blockSettings, action.settings );
-			if ( updateIsRequired ) {
-				return {
-					...state,
-					[ id ]: {
-						...action.settings,
-					},
-				};
+
+			if ( isEqual( state[ id ], action.settings ) ) {
+				return state;
 			}
+
+			return {
+				...state,
+				[ id ]: action.settings,
+			};
 		}
 	}
 	return state;
@@ -1096,6 +1099,28 @@ export function autosave( state = null, action ) {
 	return state;
 }
 
+/**
+ * Reducer managing the block types
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function tokens( state = {}, action ) {
+	switch ( action.type ) {
+		case 'REGISTER_TOKEN':
+			return {
+				...state,
+				[ action.name ]: action.settings,
+			};
+		case 'UNREGISTER_TOKEN':
+			return omit( state, action.name );
+	}
+
+	return state;
+}
+
 export default optimist( combineReducers( {
 	editor,
 	currentPost,
@@ -1112,4 +1137,5 @@ export default optimist( combineReducers( {
 	template,
 	autosave,
 	settings,
+	tokens,
 } ) );

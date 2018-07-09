@@ -15,7 +15,7 @@ function EditorHistoryRedo( { hasRedo, redo } ) {
 			shortcut={ displayShortcut.primaryShift( 'z' ) }
 			disabled={ ! hasRedo }
 			onClick={ redo }
-			className="editor-history__undo"
+			className="editor-history__redo"
 		/>
 	);
 }

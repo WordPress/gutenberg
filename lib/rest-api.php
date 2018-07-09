@@ -428,8 +428,11 @@ function gutenberg_ensure_wp_json_has_theme_supports( $response ) {
 		$site_info['theme_supports']['formats'] = $formats;
 	}
 	if ( ! array_key_exists( 'post-thumbnails', $site_info['theme_supports'] ) ) {
-		if ( get_theme_support( 'post-thumbnails' ) ) {
-			$site_info['theme_supports']['post-thumbnails'] = true;
+		$post_thumbnails = get_theme_support( 'post-thumbnails' );
+		if ( $post_thumbnails ) {
+			// $post_thumbnails can contain a nested array of post types.
+			// e.g. array( array( 'post', 'page' ) ).
+			$site_info['theme_supports']['post-thumbnails'] = is_array( $post_thumbnails ) ? $post_thumbnails[0] : true;
 		}
 	}
 	$response->set_data( $site_info );

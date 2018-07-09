@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress Dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createHigherOrderComponent } from '@wordpress/element';
 
 /**
  * Internal Dependencies
@@ -14,67 +14,67 @@ import { Component } from '@wordpress/element';
 import './style.scss';
 import KeyboardShortcuts from '../../keyboard-shortcuts';
 
-function navigateRegions( WrappedComponent ) {
-	return class extends Component {
-		constructor() {
-			super( ...arguments );
-			this.bindContainer = this.bindContainer.bind( this );
-			this.focusNextRegion = this.focusRegion.bind( this, 1 );
-			this.focusPreviousRegion = this.focusRegion.bind( this, -1 );
-			this.onClick = this.onClick.bind( this );
-			this.state = {
-				isFocusingRegions: false,
-			};
-		}
-
-		bindContainer( ref ) {
-			this.container = ref;
-		}
-
-		focusRegion( offset ) {
-			const regions = [ ...this.container.querySelectorAll( '[role="region"]' ) ];
-			if ( ! regions.length ) {
-				return;
-			}
-			let nextRegion = regions[ 0 ];
-			const selectedIndex = regions.indexOf( document.activeElement );
-			if ( selectedIndex !== -1 ) {
-				let nextIndex = selectedIndex + offset;
-				nextIndex = nextIndex === -1 ? regions.length - 1 : nextIndex;
-				nextIndex = nextIndex === regions.length ? 0 : nextIndex;
-				nextRegion = regions[ nextIndex ];
+export default createHigherOrderComponent(
+	( WrappedComponent ) => {
+		return class extends Component {
+			constructor() {
+				super( ...arguments );
+				this.bindContainer = this.bindContainer.bind( this );
+				this.focusNextRegion = this.focusRegion.bind( this, 1 );
+				this.focusPreviousRegion = this.focusRegion.bind( this, -1 );
+				this.onClick = this.onClick.bind( this );
+				this.state = {
+					isFocusingRegions: false,
+				};
 			}
 
-			nextRegion.focus();
-			this.setState( { isFocusingRegions: true } );
-		}
+			bindContainer( ref ) {
+				this.container = ref;
+			}
 
-		onClick() {
-			this.setState( { isFocusingRegions: false } );
-		}
+			focusRegion( offset ) {
+				const regions = [ ...this.container.querySelectorAll( '[role="region"]' ) ];
+				if ( ! regions.length ) {
+					return;
+				}
+				let nextRegion = regions[ 0 ];
+				const selectedIndex = regions.indexOf( document.activeElement );
+				if ( selectedIndex !== -1 ) {
+					let nextIndex = selectedIndex + offset;
+					nextIndex = nextIndex === -1 ? regions.length - 1 : nextIndex;
+					nextIndex = nextIndex === regions.length ? 0 : nextIndex;
+					nextRegion = regions[ nextIndex ];
+				}
 
-		render() {
-			const className = classnames( 'components-navigate-regions', {
-				'is-focusing-regions': this.state.isFocusingRegions,
-			} );
+				nextRegion.focus();
+				this.setState( { isFocusingRegions: true } );
+			}
 
-			// Disable reason: Clicking the editor should dismiss the regions focus style
-			/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-			return (
-				<div ref={ this.bindContainer } className={ className } onClick={ this.onClick }>
-					<KeyboardShortcuts
-						bindGlobal
-						shortcuts={ {
-							'ctrl+`': this.focusNextRegion,
-							'ctrl+shift+`': this.focusPreviousRegion,
-						} }
-					/>
-					<WrappedComponent { ...this.props } />
-				</div>
-			);
-			/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-		}
-	};
-}
+			onClick() {
+				this.setState( { isFocusingRegions: false } );
+			}
 
-export default navigateRegions;
+			render() {
+				const className = classnames( 'components-navigate-regions', {
+					'is-focusing-regions': this.state.isFocusingRegions,
+				} );
+
+				// Disable reason: Clicking the editor should dismiss the regions focus style
+				/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
+				return (
+					<div ref={ this.bindContainer } className={ className } onClick={ this.onClick }>
+						<KeyboardShortcuts
+							bindGlobal
+							shortcuts={ {
+								'ctrl+`': this.focusNextRegion,
+								'ctrl+shift+`': this.focusPreviousRegion,
+							} }
+						/>
+						<WrappedComponent { ...this.props } />
+					</div>
+				);
+				/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
+			}
+		};
+	}, 'navigateRegions'
+);
