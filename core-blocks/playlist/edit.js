@@ -1,4 +1,10 @@
 /**
+ * External Dependencies
+ */
+
+import { get, every } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -53,7 +59,13 @@ class PlaylistEdit extends Component {
 			allowedType: [ 'audio', 'video' ],
 			filesList: files,
 			onFileChange: ( media ) => {
-				if ( media.length > 0 && media[ 0 ].mimeType ) {
+				const firstType = get( files, [ 0, 'mimeType' ] );
+				const isConsistentType = !! firstType && every( files, ( filesMedia ) => filesMedia.mimeType === firstType );
+				if ( ! isConsistentType ) {
+					console.log( 'I cannot let you do that. Error notice will go here.' );
+					setAttributes( { ids: null, type: null } );
+				} else if ( media.length > 0 && media[ 0 ].mimeType ) {
+					//validate type for playlists
 					const type = media[ 0 ].mimeType.split( '/' )[ 0 ];
 					const ids = JSON.stringify( media.map( ( item ) => item.id ) );
 					setAttributes( { ids, type } );
