@@ -71,6 +71,7 @@
 		"uuid": "3.1.0"
 	},
 	"devDependencies": {
+		"@babel/core": "^7.0.0-beta.52",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:packages/babel-plugin-import-jsx-pragma",
 		"@wordpress/babel-plugin-makepot": "file:packages/babel-plugin-makepot",
 		"@wordpress/babel-preset-default": "file:packages/babel-preset-default",
@@ -83,7 +84,6 @@
 		"@wordpress/postcss-themes": "file:packages/postcss-themes",
 		"@wordpress/scripts": "file:packages/scripts",
 		"autoprefixer": "8.2.0",
-		"babel-core": "6.26.0",
 		"babel-eslint": "8.0.3",
 		"babel-loader": "7.1.4",
 		"chalk": "2.4.1",
@@ -123,33 +123,6 @@
 		"webpack-cli": "2.1.3",
 		"webpack-livereload-plugin": "2.1.1",
 		"webpack-rtl-plugin": "github:yoavf/webpack-rtl-plugin#develop"
-	},
-	"babel": {
-		"presets": [
-			"@wordpress/babel-preset-default"
-		],
-		"plugins": [
-			[
-				"@wordpress/babel-plugin-import-jsx-pragma",
-				{
-					"scopeVariable": "createElement",
-					"source": "@wordpress/element",
-					"isDefault": false
-				}
-			]
-		],
-		"env": {
-			"production": {
-				"plugins": [
-					[
-						"@wordpress/babel-plugin-makepot",
-						{
-							"output": "languages/gutenberg.pot"
-						}
-					]
-				]
-			}
-		}
 	},
 	"npmPackageJsonLintConfig": {
 		"extends": "@wordpress/npm-package-json-lint-config",

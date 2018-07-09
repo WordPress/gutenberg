@@ -3,7 +3,8 @@
 	"coveragePathIgnorePatterns": [
 		"/node_modules/",
 		"<rootDir>/.*/build/",
-		"<rootDir>/.*/build-module/"
+		"<rootDir>/.*/build-module/",
+		"<rootDir>/packages/.*/benchmark/"
 	],
 	"moduleNameMapper": {
 		"\\.(scss|css)$": "<rootDir>/node_modules/@wordpress/jest-preset-default/scripts/style-mock.js"
@@ -21,9 +22,5 @@
 		"**/test/*.js"
 	],
 	"timers": "fake",
-	"transform": {
-		"^.+\\.jsx?$": "babel-jest",
-		"\\.pegjs$": "<rootDir>/node_modules/@wordpress/jest-preset-default/scripts/pegjs-transform.js"
-	},
 	"verbose": true
 }

@@ -22,8 +22,8 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"devDependencies": {
-		"babel-core": "6.26.0",
-		"babel-plugin-syntax-jsx": "^6.18.0"
+		"@babel/core": "^7.0.0-beta.52",
+		"@babel/plugin-syntax-jsx": "^7.0.0-beta.52"
 	},
 	"publishConfig": {
 		"access": "public"
