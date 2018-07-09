@@ -21,7 +21,7 @@
 	"module": "build-module/index.js",
 	"dependencies": {
 		"element-closest": "2.0.2",
-		"lodash": "4.17.5",
+		"lodash": "4.17.10",
 		"tinymce": "4.7.2"
 	},
 	"publishConfig": {

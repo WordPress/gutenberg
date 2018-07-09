@@ -1,9 +1,15 @@
 /**
+ * External dependencies
+ */
+import { includes } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { createBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
+import { select } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -112,6 +118,14 @@ export const settings = {
 			{
 				type: 'block',
 				blocks: [ 'core/audio' ],
+				isMatch: ( { id } ) => {
+					if ( ! id ) {
+						return false;
+					}
+					const { getMedia } = select( 'core' );
+					const media = getMedia( id );
+					return !! media && includes( media.mime_type, 'audio' );
+				},
 				transform: ( attributes ) => {
 					return createBlock( 'core/audio', {
 						src: attributes.href,
@@ -123,6 +137,14 @@ export const settings = {
 			{
 				type: 'block',
 				blocks: [ 'core/video' ],
+				isMatch: ( { id } ) => {
+					if ( ! id ) {
+						return false;
+					}
+					const { getMedia } = select( 'core' );
+					const media = getMedia( id );
+					return !! media && includes( media.mime_type, 'video' );
+				},
 				transform: ( attributes ) => {
 					return createBlock( 'core/video', {
 						src: attributes.href,
