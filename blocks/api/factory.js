@@ -97,10 +97,11 @@ export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
  *
  * @return {boolean} Is the transform possible?
  */
-const isPossibleTransformForSource = ( transform, direction, blocks, isMultiBlock ) => {
+const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 	if ( isEmpty( blocks ) ) {
 		return false;
 	}
+	const isMultiBlock = blocks.length > 1;
 	const sourceBlock = first( blocks );
 
 	// If multiple blocks are selected, only multi block transforms are allowed
@@ -141,7 +142,7 @@ const isPossibleTransformForSource = ( transform, direction, blocks, isMultiBloc
  *
  * @return {Array} Block types that the blocks can be transformed into.
  */
-const getBlockTypesForPossibleFromTransforms = ( blocks, isMultiBlock = false ) => {
+const getBlockTypesForPossibleFromTransforms = ( blocks ) => {
 	if ( isEmpty( blocks ) ) {
 		return [];
 	}
@@ -156,7 +157,7 @@ const getBlockTypesForPossibleFromTransforms = ( blocks, isMultiBlock = false ) 
 
 			return !! findTransform(
 				fromTransforms,
-				( transform ) => isPossibleTransformForSource( transform, 'from', blocks, isMultiBlock )
+				( transform ) => isPossibleTransformForSource( transform, 'from', blocks )
 			);
 		},
 	);
@@ -173,7 +174,7 @@ const getBlockTypesForPossibleFromTransforms = ( blocks, isMultiBlock = false ) 
  *
  * @return {Array} Block types that the source can be transformed into.
  */
-const getBlockTypesForPossibleToTransforms = ( blocks, isMultiBlock = false ) => {
+const getBlockTypesForPossibleToTransforms = ( blocks ) => {
 	if ( isEmpty( blocks ) ) {
 		return [];
 	}
@@ -185,7 +186,7 @@ const getBlockTypesForPossibleToTransforms = ( blocks, isMultiBlock = false ) =>
 	// filter all 'to' transforms to find those that are possible.
 	const possibleTransforms = filter(
 		transformsTo,
-		( transform ) => isPossibleTransformForSource( transform, 'to', blocks, isMultiBlock )
+		( transform ) => isPossibleTransformForSource( transform, 'to', blocks )
 	);
 
 	// Build a list of block names using the possible 'to' transforms.
@@ -217,8 +218,8 @@ export function getPossibleBlockTransformations( blocks ) {
 		return [];
 	}
 
-	const blockTypesForFromTransforms = getBlockTypesForPossibleFromTransforms( blocks, isMultiBlock );
-	const blockTypesForToTransforms = getBlockTypesForPossibleToTransforms( blocks, isMultiBlock );
+	const blockTypesForFromTransforms = getBlockTypesForPossibleFromTransforms( blocks );
+	const blockTypesForToTransforms = getBlockTypesForPossibleToTransforms( blocks );
 
 	return uniq( [
 		...blockTypesForFromTransforms,
