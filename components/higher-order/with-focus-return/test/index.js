@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow, mount } from 'enzyme';
+import renderer from 'react-test-renderer';
 
 /**
  * WordPress dependencies
@@ -36,24 +36,24 @@ describe( 'withFocusReturn()', () => {
 		} );
 
 		it( 'should render a basic Test component inside the HOC', () => {
-			const renderedComposite = shallow( <Composite /> );
-			const wrappedElement = renderedComposite.find( 'Test' );
-			const wrappedElementShallow = wrappedElement.shallow();
-			expect( wrappedElementShallow.hasClass( 'test' ) ).toBe( true );
-			expect( wrappedElementShallow.type() ).toBe( 'div' );
-			expect( wrappedElementShallow.text() ).toBe( 'Testing' );
+			const renderedComposite = renderer.create( <Composite /> );
+			const wrappedElement = renderedComposite.root.findByType( Test );
+			const wrappedElementShallow = wrappedElement.children[0];
+			expect( wrappedElementShallow.props.className ).toBe( 'test' );
+			expect( wrappedElementShallow.type ).toBe( 'div' );
+			expect( wrappedElementShallow.children[0] ).toBe( 'Testing' );
 		} );
 
 		it( 'should pass additional props through to the wrapped element', () => {
-			const renderedComposite = shallow( <Composite test="test" /> );
-			const wrappedElement = renderedComposite.find( 'Test' );
+			const renderedComposite = renderer.create( <Composite test="test" /> );
+			const wrappedElement = renderedComposite.root.findByType( Test );
 			// Ensure that the wrapped Test element has the appropriate props.
-			expect( wrappedElement.props().test ).toBe( 'test' );
+			expect( wrappedElement.props.test ).toBe( 'test' );
 		} );
 
 		it( 'should not switch focus back to the bound focus element', () => {
-			const mountedComposite = mount( <Composite /> );
-			expect( mountedComposite.instance().activeElementOnMount ).toBe( activeElement );
+			const mountedComposite = renderer.create( <Composite /> );
+			expect( mountedComposite.root.findByType( Composite ).instance.activeElementOnMount ).toBe( activeElement );
 
 			// Change activeElement.
 			switchFocusTo.focus();
@@ -65,8 +65,8 @@ describe( 'withFocusReturn()', () => {
 		} );
 
 		it( 'should return focus to element associated with HOC', () => {
-			const mountedComposite = mount( <Composite /> );
-			expect( mountedComposite.instance().activeElementOnMount ).toBe( activeElement );
+			const mountedComposite = renderer.create( <Composite /> );
+			expect( mountedComposite.root.findByType( Composite ).instance.activeElementOnMount ).toBe( activeElement );
 
 			// Change activeElement.
 			document.activeElement.blur();
