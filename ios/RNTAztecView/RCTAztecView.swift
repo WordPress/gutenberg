@@ -7,12 +7,7 @@ class RCTAztecView: Aztec.TextView {
     // MARK - View Height: Match to content height
     
     override var contentSize: CGSize {
-        get {
-            return super.contentSize
-        }
-        
-        set {
-            super.contentSize = newValue
+        didSet {
             contentSizeChanged()
         }
     }
