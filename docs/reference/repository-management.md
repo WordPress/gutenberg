@@ -23,16 +23,14 @@ Any issues that are irrelevant or not actionable should be closed, because they 
 
 ### Labels
 
-To better organize the issue backlog, all issues should have [one or more labels](https://github.com/WordPress/gutenberg/labels). Here are some you might commonly see:
+To better organize both bugs and ideas: 
 
-- [Accessibility](https://github.com/WordPress/gutenberg/labels/Accessibility) - Changes that impact accessibility and need corresponding review (e.g. markup changes).
-- [Needs Design Feedback](https://github.com/WordPress/gutenberg/labels/Needs%20Design%20Feedback) - Changes that modify the design or user experience in some way and need sign-off.
-- [[Type] Bug](https://github.com/WordPress/gutenberg/labels/%5BType%5D%20Bug) - An existing feature is broken in some way.
-- [[Type] Enhancement](https://github.com/WordPress/gutenberg/labels/%5BType%5D%20Enhancement) - Gutenberg would be better with this improvement added.
-- [[Type] Plugin / Extension Conflict](https://github.com/WordPress/gutenberg/labels/%5BType%5D%20Plugin%20%2F%20Extension%20Conflict) - Documentation of a conflict between Gutenberg and a plugin or extension. The plugin author should be informed and provided documentation on how to address.
-- [[Status] Needs More Info](https://github.com/WordPress/gutenberg/labels/%5BStatus%5D%20Needs%20More%20Info) - The issue needs more information in order to be actionable and relevant. Typically this requires follow-up from the original reporter.
+- Each issue should have a focus area and type label.
+- Each pull request should have a focus area. Type and status labels are encouraged when applicable.
+- Action-based labels are applied as needed and start with “Needs”.
+- High priority issues should have an assignee or be in an active milestone.
 
-[Check out the label directory](https://github.com/WordPress/gutenberg/labels) for a listing of all labels.
+See the [labels list](https://github.com/WordPress/gutenberg/labels) for descriptions.
 
 ### Milestones
 
