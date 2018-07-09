@@ -17,7 +17,9 @@ import { Component } from '@wordpress/element';
 import withFilters from '..';
 
 const assertExpectedHtml = ( wrapper, expectedHTML ) => {
+	/* eslint-disable react/no-find-dom-node */
 	const element = ReactDOM.findDOMNode( wrapper );
+	/* eslint-enable react/no-find-dom-node */
 	expect( element.outerHTML ).toBe( expectedHTML );
 };
 
