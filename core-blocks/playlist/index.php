@@ -15,6 +15,8 @@
 function render_block_core_playlist( $attributes ) {
 	$attributes['ids'] = json_decode( $attributes['ids'] );
 	$attributes['artists'] = $attributes['showArtists'];
+	$attributes['tracknumbers'] = $attributes['showTrackNumbers'];
+
 
 	$classes = empty( $attributes['align'] ) ? 'wp-block-playlist' : 'wp-block-playlist align' . $attributes['align'];
 	$html    = sprintf( '<figure class="%s">%s</figure>',
@@ -44,6 +46,10 @@ function register_block_core_playlist() {
 				'default' => true,
 			),
 			'showArtists'   => array(
+				'type'    => 'boolean',
+				'default' => true,
+			),
+			'showTrackNumbers'   => array(
 				'type'    => 'boolean',
 				'default' => true,
 			),

@@ -27,6 +27,10 @@ export const settings = {
 			type: 'string',
 			default: 'audio',
 		},
+		showTrackNumbers: {
+			type: 'boolean',
+			default: true,
+		},
 		showArtists: {
 			type: 'boolean',
 			default: true,
