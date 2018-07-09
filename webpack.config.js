@@ -12,7 +12,7 @@ const { basename } = require( 'path' );
  * WordPress dependencies
  */
 const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
-const LibraryExportDefaultPlugin = require( './packages/library-export-default-webpack-plugin' );
+const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-webpack-plugin' );
 
 // Main CSS loader for everything but blocks..
 const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
@@ -42,7 +42,7 @@ const extractConfig = {
 			loader: 'postcss-loader',
 			options: {
 				plugins: [
-					require( './packages/postcss-themes' )( {
+					require( '@wordpress/postcss-themes' )( {
 						defaults: {
 							primary: '#0085ba',
 							secondary: '#11a0d2',
@@ -148,6 +148,7 @@ const entryPointNames = [
 ];
 
 const gutenbergPackages = [
+	'a11y',
 	'api-request',
 	'blob',
 	'core-data',
@@ -155,18 +156,14 @@ const gutenbergPackages = [
 	'date',
 	'deprecated',
 	'dom',
-	'element',
-	'keycodes',
-	'plugins',
-	'shortcode',
-];
-
-const wordPressPackages = [
-	'a11y',
 	'dom-ready',
+	'element',
 	'hooks',
 	'i18n',
 	'is-shallow-equal',
+	'keycodes',
+	'plugins',
+	'shortcode',
 ];
 
 const externals = {
@@ -182,7 +179,6 @@ const externals = {
 [
 	...entryPointNames,
 	...gutenbergPackages,
-	...wordPressPackages,
 ].forEach( ( name ) => {
 	externals[ `@wordpress/${ name }` ] = {
 		this: [ 'wp', camelCaseDash( name ) ],
@@ -203,11 +199,6 @@ const config = {
 			memo[ name ] = `./packages/${ packageName }`;
 			return memo;
 		}, {} ),
-		wordPressPackages.reduce( ( memo, packageName ) => {
-			const name = camelCaseDash( packageName );
-			memo[ name ] = `./node_modules/@wordpress/${ packageName }`;
-			return memo;
-		}, {} )
 	),
 	output: {
 		filename: './build/[basename]/index.js',
@@ -298,7 +289,12 @@ const config = {
 				return path;
 			},
 		} ),
-		new LibraryExportDefaultPlugin( [ 'deprecated', 'dom-ready', 'api-request' ].map( camelCaseDash ) ),
+		new LibraryExportDefaultPlugin( [
+			'api-request',
+			'deprecated',
+			'dom-ready',
+			'is-shallow-equal',
+		].map( camelCaseDash ) ),
 	],
 	stats: {
 		children: false,

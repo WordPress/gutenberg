@@ -21,14 +21,14 @@
 	"module": "build-module/index.js",
 	"react-native": "build/index",
 	"dependencies": {
-		"@wordpress/deprecated": "^1.0.0-alpha.2",
-		"@wordpress/is-shallow-equal": "1.0.2",
-		"lodash": "4.17.5",
+		"@wordpress/deprecated": "file:../deprecated",
+		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+		"lodash": "4.17.10",
 		"react": "16.4.1",
 		"react-dom": "16.4.1"
 	},
 	"devDependencies": {
-		"enzyme": "3.3.0"
+		"enzyme": "^3.3.0"
 	},
 	"publishConfig": {
 		"access": "public"
