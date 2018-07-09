@@ -7,6 +7,7 @@ import { registerCoreBlocks } from '@wordpress/core-blocks';
  * Internal dependencies
  */
 import segmentHTMLToShortcodeBlock from '../shortcode-converter';
+import { createBlock } from '../../factory';
 
 describe( 'segmentHTMLToShortcodeBlock', () => {
 	beforeAll( () => {
@@ -24,16 +25,11 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 		expect( transformed[ 0 ] ).toBe( `<p>Foo</p>
 
 ` );
+		const expectedBlock = createBlock( 'core/shortcode', {
+			text: '[foo bar="apple"]',
+		} );
 		// uuid will always be random.
-		const expectedBlock = {
-			attributes: {
-				text: '[foo bar="apple"]',
-			},
-			innerBlocks: [],
-			isValid: true,
-			name: 'core/shortcode',
-			uid: transformed[ 1 ].uid,
-		};
+		expectedBlock.uid = transformed[ 1 ].uid;
 		expect( transformed[ 1 ] ).toEqual( expectedBlock );
 		expect( transformed[ 2 ] ).toBe( `
 
