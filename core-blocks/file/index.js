@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { includes } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -119,7 +124,7 @@ export const settings = {
 					}
 					const { getMedia } = select( 'core' );
 					const media = getMedia( id );
-					return media && media.mime_type.indexOf( 'audio' ) > -1;
+					return !! media && includes( media.mime_type, 'audio' );
 				},
 				transform: ( attributes ) => {
 					return createBlock( 'core/audio', {
@@ -138,7 +143,7 @@ export const settings = {
 					}
 					const { getMedia } = select( 'core' );
 					const media = getMedia( id );
-					return media && media.mime_type.indexOf( 'video' ) > -1;
+					return !! media && includes( media.mime_type, 'video' );
 				},
 				transform: ( attributes ) => {
 					return createBlock( 'core/video', {
