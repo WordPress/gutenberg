@@ -13,7 +13,7 @@ export const name = 'core/playlist';
 export const settings = {
 	title: __( 'Playlist' ),
 
-	description: __( 'The Playlist block allows you to embed playlist files and play them back using a Core playlist.' ),
+	description: __( 'The Playlist block allows you to embed playlist files.' ),
 
 	icon: 'format-audio',
 
