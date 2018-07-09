@@ -19,7 +19,7 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
-	"react-native": "build/index",
+	"react-native": "src/index",
 	"dependencies": {
 		"@wordpress/deprecated": "^1.0.0-alpha.2",
 		"@wordpress/is-shallow-equal": "1.0.2",
