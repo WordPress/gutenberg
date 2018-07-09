@@ -19,7 +19,6 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
-	"react-native": "build/index",
 	"dependencies": {
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
