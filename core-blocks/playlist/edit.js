@@ -32,7 +32,7 @@ import {
 import './editor.scss';
 
 class PlaylistEdit extends Component {
-	constructor( attributes ) {
+	constructor() {
 		super( ...arguments );
 
 		this.initializePlaylist = this.initializePlaylist.bind( this );
@@ -41,7 +41,7 @@ class PlaylistEdit extends Component {
 
 		// check for if ids is set to determine edit state
 		this.state = {
-			isEditing: ! attributes.ids,
+			isEditing: ! this.props.attributes.ids,
 		};
 	}
 
