@@ -27,6 +27,12 @@ describe( 'withFocusReturn()', () => {
 		const activeElement = document.createElement( 'button' );
 		const switchFocusTo = document.createElement( 'input' );
 
+		const getInstance = ( wrapper ) => {
+			return wrapper.root.find(
+				( node ) => node.instance instanceof Component
+			).instance;
+		};
+
 		beforeEach( () => {
 			activeElement.focus();
 		} );
@@ -38,10 +44,10 @@ describe( 'withFocusReturn()', () => {
 		it( 'should render a basic Test component inside the HOC', () => {
 			const renderedComposite = renderer.create( <Composite /> );
 			const wrappedElement = renderedComposite.root.findByType( Test );
-			const wrappedElementShallow = wrappedElement.children[0];
+			const wrappedElementShallow = wrappedElement.children[ 0 ];
 			expect( wrappedElementShallow.props.className ).toBe( 'test' );
 			expect( wrappedElementShallow.type ).toBe( 'div' );
-			expect( wrappedElementShallow.children[0] ).toBe( 'Testing' );
+			expect( wrappedElementShallow.children[ 0 ] ).toBe( 'Testing' );
 		} );
 
 		it( 'should pass additional props through to the wrapped element', () => {
@@ -53,7 +59,8 @@ describe( 'withFocusReturn()', () => {
 
 		it( 'should not switch focus back to the bound focus element', () => {
 			const mountedComposite = renderer.create( <Composite /> );
-			expect( mountedComposite.root.findByType( Composite ).instance.activeElementOnMount ).toBe( activeElement );
+
+			expect( getInstance( mountedComposite ).activeElementOnMount ).toBe( activeElement );
 
 			// Change activeElement.
 			switchFocusTo.focus();
@@ -66,7 +73,7 @@ describe( 'withFocusReturn()', () => {
 
 		it( 'should return focus to element associated with HOC', () => {
 			const mountedComposite = renderer.create( <Composite /> );
-			expect( mountedComposite.root.findByType( Composite ).instance.activeElementOnMount ).toBe( activeElement );
+			expect( getInstance( mountedComposite ).activeElementOnMount ).toBe( activeElement );
 
 			// Change activeElement.
 			document.activeElement.blur();
