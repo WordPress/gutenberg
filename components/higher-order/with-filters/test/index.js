@@ -58,7 +58,6 @@ describe( 'withFilters', () => {
 		shallowWrapper = shallow( <EnhancedComponent /> );
 
 		expect( shallowWrapper.html() ).toBe( '<div>My component</div>' );
-		shallowWrapper.unmount();
 	} );
 
 	it( 'should display a component overridden by the filter', () => {
