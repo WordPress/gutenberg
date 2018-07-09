@@ -152,6 +152,16 @@ class Earth {
 Earth.humans = [];
 ```
 
+All `@wordpress/element` Components, including stateless function components, should be named using Class Definition naming rules, both for consistency and to reflect the fact that a component may need to be transitioned from a function to a class without breaking compatibility.
+
+**Examples:**
+
+```js
+class MyComponent extends Component {}
+
+function MyComponent() {}
+```
+
 #### Constants
 
 An exception to camel case is made for constant values which are never intended to be reassigned or mutated. Such variables must use the [SCREAMING_SNAKE_CASE convention](https://en.wikipedia.org/wiki/Snake_case).
