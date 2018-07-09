@@ -507,7 +507,7 @@ describe( 'block factory', () => {
 			expect( availableBlocks[ 1 ].name ).toBe( 'core/another-text-block' );
 		} );
 
-		it( 'returns a single transformation for a "from" transform that has a `canTransform` function returning `true`', () => {
+		it( 'returns a single transformation for a "from" transform that has a `isMatch` function returning `true`', () => {
 			registerBlockType( 'core/updated-text-block', {
 				attributes: {
 					value: {
@@ -519,7 +519,7 @@ describe( 'block factory', () => {
 						type: 'block',
 						blocks: [ 'core/text-block' ],
 						transform: noop,
-						canTransform: () => true,
+						isMatch: () => true,
 					} ],
 				},
 				save: noop,
@@ -538,7 +538,7 @@ describe( 'block factory', () => {
 			expect( availableBlocks[ 0 ].name ).toBe( 'core/updated-text-block' );
 		} );
 
-		it( 'returns no transformations for a "from" transform with a `canTransform` function returning `false`', () => {
+		it( 'returns no transformations for a "from" transform with a `isMatch` function returning `false`', () => {
 			registerBlockType( 'core/updated-text-block', {
 				attributes: {
 					value: {
@@ -550,7 +550,7 @@ describe( 'block factory', () => {
 						type: 'block',
 						blocks: [ 'core/text-block' ],
 						transform: noop,
-						canTransform: () => false,
+						isMatch: () => false,
 					} ],
 				},
 				save: noop,
@@ -568,7 +568,7 @@ describe( 'block factory', () => {
 			expect( availableBlocks ).toEqual( [] );
 		} );
 
-		it( 'returns a single transformation for a "to" transform that has a `canTransform` function returning `true`', () => {
+		it( 'returns a single transformation for a "to" transform that has a `isMatch` function returning `true`', () => {
 			registerBlockType( 'core/updated-text-block', {
 				attributes: {
 					value: {
@@ -580,7 +580,7 @@ describe( 'block factory', () => {
 						type: 'block',
 						blocks: [ 'core/text-block' ],
 						transform: noop,
-						canTransform: () => true,
+						isMatch: () => true,
 					} ],
 				},
 				save: noop,
@@ -599,7 +599,7 @@ describe( 'block factory', () => {
 			expect( availableBlocks[ 0 ].name ).toBe( 'core/text-block' );
 		} );
 
-		it( 'returns no transformations for a "to" transform with a `canTransform` function returning `false`', () => {
+		it( 'returns no transformations for a "to" transform with a `isMatch` function returning `false`', () => {
 			registerBlockType( 'core/updated-text-block', {
 				attributes: {
 					value: {
@@ -611,7 +611,7 @@ describe( 'block factory', () => {
 						type: 'block',
 						blocks: [ 'core/text-block' ],
 						transform: noop,
-						canTransform: () => false,
+						isMatch: () => false,
 					} ],
 				},
 				save: noop,
@@ -629,8 +629,8 @@ describe( 'block factory', () => {
 			expect( availableBlocks ).toEqual( [] );
 		} );
 
-		it( 'for a non multiblock transform, the canTransform function receives the source block\'s attributes object as its first argument', () => {
-			const canTransform = jest.fn();
+		it( 'for a non multiblock transform, the isMatch function receives the source block\'s attributes object as its first argument', () => {
+			const isMatch = jest.fn();
 
 			registerBlockType( 'core/updated-text-block', {
 				attributes: {
@@ -643,7 +643,7 @@ describe( 'block factory', () => {
 						type: 'block',
 						blocks: [ 'core/text-block' ],
 						transform: noop,
-						canTransform,
+						isMatch,
 					} ],
 				},
 				save: noop,
@@ -658,11 +658,11 @@ describe( 'block factory', () => {
 
 			getPossibleBlockTransformations( [ block ] );
 
-			expect( canTransform ).toHaveBeenCalledWith( { value: 'ribs' } );
+			expect( isMatch ).toHaveBeenCalledWith( { value: 'ribs' } );
 		} );
 
-		it( 'for a multiblock transform, the canTransform function receives an array containing every source block\'s attributes as its first argument', () => {
-			const canTransform = jest.fn();
+		it( 'for a multiblock transform, the isMatch function receives an array containing every source block\'s attributes as its first argument', () => {
+			const isMatch = jest.fn();
 
 			registerBlockType( 'core/updated-text-block', {
 				attributes: {
@@ -676,7 +676,7 @@ describe( 'block factory', () => {
 						blocks: [ 'core/text-block' ],
 						transform: noop,
 						isMultiBlock: true,
-						canTransform,
+						isMatch,
 					} ],
 				},
 				save: noop,
@@ -695,7 +695,7 @@ describe( 'block factory', () => {
 
 			getPossibleBlockTransformations( [ meatBlock, cheeseBlock ] );
 
-			expect( canTransform ).toHaveBeenCalledWith( [ { value: 'ribs' }, { value: 'halloumi' } ] );
+			expect( isMatch ).toHaveBeenCalledWith( [ { value: 'ribs' }, { value: 'halloumi' } ] );
 		} );
 	} );
 

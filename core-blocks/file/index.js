@@ -118,7 +118,7 @@ export const settings = {
 			{
 				type: 'block',
 				blocks: [ 'core/audio' ],
-				canTransform: ( { id } ) => {
+				isMatch: ( { id } ) => {
 					if ( ! id ) {
 						return false;
 					}
@@ -137,7 +137,7 @@ export const settings = {
 			{
 				type: 'block',
 				blocks: [ 'core/video' ],
-				canTransform: ( { id } ) => {
+				isMatch: ( { id } ) => {
 					if ( ! id ) {
 						return false;
 					}

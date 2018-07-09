@@ -122,10 +122,10 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 		return false;
 	}
 
-	// If the transform has a `canTransform` function specified, check that it returns true.
-	if ( isFunction( transform.canTransform ) ) {
+	// If the transform has a `isMatch` function specified, check that it returns true.
+	if ( isFunction( transform.isMatch ) ) {
 		const attributes = transform.isMultiBlock ? blocks.map( ( block ) => block.attributes ) : sourceBlock.attributes;
-		if ( ! transform.canTransform( attributes ) ) {
+		if ( ! transform.isMatch( attributes ) ) {
 			return false;
 		}
 	}
