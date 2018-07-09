@@ -2,7 +2,6 @@
  * External dependencies
  */
 import renderer from 'react-test-renderer';
-import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
