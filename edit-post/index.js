@@ -79,3 +79,4 @@ export { default as PluginPostStatusInfo } from './components/sidebar/plugin-pos
 export { default as PluginPrePublishPanel } from './components/sidebar/plugin-pre-publish-panel';
 export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
 export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';
+export { default as SidebarExtender } from './components/sidebar/sidebar-extender';

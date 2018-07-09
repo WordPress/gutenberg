@@ -13,6 +13,7 @@ import { withPluginContext } from '@wordpress/plugins';
 import PinnedPlugins from '../../header/pinned-plugins';
 import Sidebar from '../';
 import SidebarHeader from '../sidebar-header';
+import SidebarExtender from '../sidebar-extender';
 
 /**
  * Renders the plugin sidebar component.
@@ -67,6 +68,7 @@ function PluginSidebar( props ) {
 				</SidebarHeader>
 				<Panel>
 					{ children }
+					<SidebarExtender.Slot />
 				</Panel>
 			</Sidebar>
 		</Fragment>
