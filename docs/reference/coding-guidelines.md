@@ -114,6 +114,8 @@ However, Gutenberg is more specific about its handling of abbreviations, acronym
 
 [*Acronyms*](https://en.wikipedia.org/wiki/Acronym) must be written with each of its composing letters capitalized. This is intended to reflect that each letter of the acronym is a proper word in its expanded form.
 
+If an abbreviation or an acronym occurs at the start of a variable name, it must be written to respect the camelcase naming rules covering the first letter of a variable or class definition. For variable assignment, this means writing the abbreviation entirely as lowercase. For class definitions, its initial letter should be capitalized.
+
 **Examples:**
 
 ```js
@@ -122,6 +124,12 @@ const userId = 1;
 
 // "DOM" is an acronym of "Document Object Model":
 const currentDOMDocument = window.document;
+
+// Acronyms and abbreviations at the start of a variable name are consistent
+// with camelcase rules covering the first letter of a variable or class.
+const domDocument = window.document;
+class DOMDocument {}
+class IdCollection {}
 ```
 
 #### Class Definition
