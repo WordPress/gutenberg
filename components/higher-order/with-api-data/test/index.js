@@ -1,13 +1,35 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import renderer from 'react-test-renderer';
 import { identity, fromPairs } from 'lodash';
+import PropTypes from 'prop-types';
 
 /**
  * Internal dependencies
  */
 import withAPIData from '../';
+
+/**
+ * WordPress dependencies
+ */
+import { Component } from '@wordpress/element';
+
+class PassContext extends Component {
+	getChildContext() {
+		return this.props.value;
+	}
+
+	render() {
+		return this.props.children;
+	}
+}
+
+PassContext.childContextTypes = {
+	getAPISchema: PropTypes.any,
+	getAPIPostTypeRestBaseMapping: PropTypes.any,
+	getAPITaxonomyRestBaseMapping: PropTypes.any,
+};
 
 jest.mock( '../request', () => {
 	const request = jest.fn( ( { path } ) => {
@@ -52,6 +74,8 @@ describe( 'withAPIData()', () => {
 		},
 	};
 
+	let TestComponent, context;
+
 	function getWrapper( mapPropsToData, props ) {
 		if ( ! mapPropsToData ) {
 			mapPropsToData = () => ( {
@@ -59,34 +83,41 @@ describe( 'withAPIData()', () => {
 			} );
 		}
 
-		const Component = withAPIData( mapPropsToData )( () => '' );
-
-		return shallow( <Component { ...props } />, {
-			lifecycleExperimental: true,
-			context: {
-				getAPISchema: () => schema,
-				getAPIPostTypeRestBaseMapping: identity,
-				getAPITaxonomyRestBaseMapping: identity,
-			},
-		} );
+		TestComponent = withAPIData( mapPropsToData )( () => '' );
+		context = {
+			getAPISchema: () => schema,
+			getAPIPostTypeRestBaseMapping: identity,
+			getAPITaxonomyRestBaseMapping: identity,
+		};
+		return renderer.create( getTestComponent( context, props ) );
 	}
+
+	function getTestComponent( contextValues, props ) {
+		return (
+			<PassContext value={ contextValues }>
+				<TestComponent { ...props } />
+			</PassContext>
+		);
+	}
+
+	const getDataProps = ( wrapper ) => {
+		return wrapper.toTree().rendered.instance.state.dataProps;
+	};
 
 	it( 'should initialize fetchables on mount', ( done ) => {
 		const wrapper = getWrapper();
 
-		const dataProps = wrapper.state( 'dataProps' );
-		expect( Object.keys( dataProps ) ).toEqual( [ 'revisions' ] );
-		expect( Object.keys( dataProps.revisions ) ).toEqual( [
+		expect( Object.keys( getDataProps( wrapper ) ) ).toEqual( [ 'revisions' ] );
+		expect( Object.keys( getDataProps( wrapper ).revisions ) ).toEqual( [
 			'get',
 			'isLoading',
 			'path',
 		] );
-		expect( dataProps.revisions.isLoading ).toBe( true );
+		expect( getDataProps( wrapper ).revisions.isLoading ).toBe( true );
 
 		process.nextTick( () => {
-			expect( wrapper.state( 'dataProps' ).revisions.isLoading ).toBe( false );
-			expect( wrapper.state( 'dataProps' ).revisions.data ).toEqual( {} );
-
+			expect( getDataProps( wrapper ).revisions.isLoading ).toBe( false );
+			expect( getDataProps( wrapper ).revisions.data ).toEqual( {} );
 			done();
 		} );
 	} );
@@ -97,9 +128,9 @@ describe( 'withAPIData()', () => {
 		} ) );
 
 		process.nextTick( () => {
-			expect( wrapper.state( 'dataProps' ).users.isLoading ).toBe( false );
-			expect( wrapper.state( 'dataProps' ).users ).not.toHaveProperty( 'data' );
-			expect( wrapper.state( 'dataProps' ).users.error.code ).toBe( 'rest_forbidden_context' );
+			expect( getDataProps( wrapper ).users.isLoading ).toBe( false );
+			expect( getDataProps( wrapper ).users ).not.toHaveProperty( 'data' );
+			expect( getDataProps( wrapper ).users.error.code ).toBe( 'rest_forbidden_context' );
 
 			done();
 		} );
@@ -110,19 +141,18 @@ describe( 'withAPIData()', () => {
 			page: '/wp/v2/pages/10',
 		} ) );
 
-		const dataProps = wrapper.state( 'dataProps' );
-		expect( Object.keys( dataProps ) ).toEqual( [ 'page' ] );
-		expect( Object.keys( dataProps.page ) ).toEqual( expect.arrayContaining( [
+		expect( Object.keys( getDataProps( wrapper ) ) ).toEqual( [ 'page' ] );
+		expect( Object.keys( getDataProps( wrapper ).page ) ).toEqual( expect.arrayContaining( [
 			'get',
 			'isLoading',
 			'path',
 			'data',
 		] ) );
-		expect( dataProps.page.isLoading ).toBe( false );
-		expect( wrapper.state( 'dataProps' ).page.data ).toEqual( { title: 'OK!' } );
+		expect( getDataProps( wrapper ).page.isLoading ).toBe( false );
+		expect( getDataProps( wrapper ).page.data ).toEqual( { title: 'OK!' } );
 
 		process.nextTick( () => {
-			expect( wrapper.state( 'dataProps' ).page.isLoading ).toBe( false );
+			expect( getDataProps( wrapper ).page.isLoading ).toBe( false );
 
 			done();
 		} );
@@ -133,10 +163,9 @@ describe( 'withAPIData()', () => {
 			unknown: '/wp/v2/unknown/route',
 		} ) );
 
-		const dataProps = wrapper.state( 'dataProps' );
-		expect( Object.keys( dataProps ) ).toEqual( [ 'unknown' ] );
-		expect( Object.keys( dataProps.unknown ) ).toEqual( [] );
-		expect( wrapper.prop( 'unknown' ) ).toEqual( {} );
+		expect( Object.keys( getDataProps( wrapper ) ) ).toEqual( [ 'unknown' ] );
+		expect( Object.keys( getDataProps( wrapper ).unknown ) ).toEqual( [] );
+		expect( wrapper.toTree().rendered.rendered.props.unknown ).toEqual( {} );
 	} );
 
 	it( 'should include full gamut of method available properties', () => {
@@ -144,9 +173,8 @@ describe( 'withAPIData()', () => {
 			page: '/wp/v2/pages/5',
 		} ) );
 
-		const dataProps = wrapper.state( 'dataProps' );
-		expect( Object.keys( dataProps ) ).toEqual( [ 'page' ] );
-		expect( Object.keys( dataProps.page ) ).toEqual( [
+		expect( Object.keys( getDataProps( wrapper ) ) ).toEqual( [ 'page' ] );
+		expect( Object.keys( getDataProps( wrapper ).page ) ).toEqual( [
 			'get',
 			'isLoading',
 			'path',
@@ -159,11 +187,11 @@ describe( 'withAPIData()', () => {
 			'delete',
 			'isDeleting',
 		] );
-		expect( dataProps.page.isLoading ).toBe( true );
-		expect( dataProps.page.isCreating ).toBe( false );
-		expect( dataProps.page.isSaving ).toBe( false );
-		expect( dataProps.page.isPatching ).toBe( false );
-		expect( dataProps.page.isDeleting ).toBe( false );
+		expect( getDataProps( wrapper ).page.isLoading ).toBe( true );
+		expect( getDataProps( wrapper ).page.isCreating ).toBe( false );
+		expect( getDataProps( wrapper ).page.isSaving ).toBe( false );
+		expect( getDataProps( wrapper ).page.isPatching ).toBe( false );
+		expect( getDataProps( wrapper ).page.isDeleting ).toBe( false );
 	} );
 
 	it( 'should not clobber existing data when receiving new props', ( done ) => {
@@ -176,12 +204,11 @@ describe( 'withAPIData()', () => {
 		);
 
 		process.nextTick( () => {
-			wrapper.setProps( { pages: [ 1, 2 ] } );
+			wrapper.update( getTestComponent( context, { pages: [ 1, 2 ] } ) );
 
-			const dataProps = wrapper.state( 'dataProps' );
-			expect( dataProps.page1.isLoading ).toBe( false );
-			expect( dataProps.page1.data ).toEqual( {} );
-			expect( dataProps.page2.isLoading ).toBe( true );
+			expect( getDataProps( wrapper ).page1.isLoading ).toBe( false );
+			expect( getDataProps( wrapper ).page1.data ).toEqual( {} );
+			expect( getDataProps( wrapper ).page2.isLoading ).toBe( true );
 
 			done();
 		} );
@@ -197,11 +224,10 @@ describe( 'withAPIData()', () => {
 		);
 
 		process.nextTick( () => {
-			wrapper.setProps( { pages: [ 2 ] } );
+			wrapper.update( getTestComponent( context, { pages: [ 2 ] } ) );
 
-			const dataProps = wrapper.state( 'dataProps' );
-			expect( dataProps ).not.toHaveProperty( 'page1' );
-			expect( dataProps ).toHaveProperty( 'page2' );
+			expect( getDataProps( wrapper ) ).not.toHaveProperty( 'page1' );
+			expect( getDataProps( wrapper ) ).toHaveProperty( 'page2' );
 
 			done();
 		} );
@@ -216,9 +242,9 @@ describe( 'withAPIData()', () => {
 		);
 
 		process.nextTick( () => {
-			expect( wrapper.state( 'dataProps' ).page.isLoading ).toBe( false );
-			wrapper.setProps( { pageId: 7 } );
-			expect( wrapper.state( 'dataProps' ).page.isLoading ).toBe( true );
+			expect( getDataProps( wrapper ).page.isLoading ).toBe( false );
+			wrapper.update( getTestComponent( context, { pageId: 7 } ) );
+			expect( getDataProps( wrapper ).page.isLoading ).toBe( true );
 
 			done();
 		} );
