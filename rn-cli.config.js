@@ -9,7 +9,9 @@ enm.canvas = __dirname + '/__mocks__/nodejsMock.js';
 module.exports = {
 	extraNodeModules: enm,
 	getBlacklistRE: function() {
-		// blacklist the GB packages we want to consume from NPM (online) directly
+		// Blacklist the GB packages we want to consume from NPM (online) directly.
+		// On the other hand, GB packages that are loaded from the source tree directly
+		// are automagically resolved by Metro so, there is no list of them anywhere.
 		return blacklist( [
 			/gutenberg\/packages\/(autop|data|deprecated|hooks|i18n|is-shallow-equal)\/.*/,
 		] );
