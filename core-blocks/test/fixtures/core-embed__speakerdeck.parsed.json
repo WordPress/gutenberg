@@ -1,0 +1,14 @@
+[
+    {
+        "blockName": "core-embed/speakerdeck",
+        "attrs": {
+            "url": "https://speakerdeck.com/"
+        },
+        "innerBlocks": [],
+        "innerHTML": "\n<figure class=\"wp-block-embed-speakerdeck wp-block-embed\">\n    https://speakerdeck.com/\n    <figcaption>Embedded content from speakerdeck</figcaption>\n</figure>\n"
+    },
+    {
+        "attrs": {},
+        "innerHTML": "\n"
+    }
+]
