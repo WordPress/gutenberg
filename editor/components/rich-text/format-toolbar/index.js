@@ -10,6 +10,7 @@ import {
 	Toolbar,
 	withSpokenMessages,
 	Popover,
+	ExternalLink,
 } from '@wordpress/components';
 import { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER, displayShortcut } from '@wordpress/keycodes';
 import { prependHTTP } from '@wordpress/url';
@@ -255,13 +256,12 @@ class FormatToolbar extends Component {
 										onKeyPress={ stopKeyPropagation }
 									>
 										<div className="editor-format-toolbar__link-modal-line">
-											<a
+											<ExternalLink
 												className="editor-format-toolbar__link-value"
 												href={ formats.link.value }
-												target="_blank"
 											>
 												{ formats.link.value && filterURLForDisplay( decodeURI( formats.link.value ) ) }
-											</a>
+											</ExternalLink>
 											<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
 											<IconButton
 												className="editor-format-toolbar__link-settings-toggle"
