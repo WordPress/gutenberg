@@ -278,7 +278,7 @@ class ImageEdit extends Component {
 					/>
 					{ ! isEmpty( availableSizes ) && (
 						<SelectControl
-							label={ __( 'Source Type' ) }
+							label={ __( 'Image Size' ) }
 							value={ url }
 							options={ map( availableSizes, ( size, name ) => ( {
 								value: size.source_url,
