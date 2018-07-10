@@ -60,7 +60,7 @@ fi
 # Check if the current node version is up to date.
 if [ "$TRAVIS" != "true" ] && [ "$(nvm current)" != "$(nvm version-remote --lts)" ]; then
 	echo -e $(warning_message "Node version does not match the latest long term support version. Please run this command to install and use it:" )
-	echo -e $(warning_message "$(action_format "nvm install; nvm use")" )
+	echo -e $(warning_message "$(action_format "nvm install")" )
 	echo -e $(warning_message "After that, re-run the setup script to continue." )
 	exit 1
 fi
