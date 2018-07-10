@@ -553,8 +553,8 @@ export class BlockListBlock extends Component {
 							clientId={ clientId }
 						/>
 					) }
+					{ !! error && <BlockCrashWarning /> }
 				</IgnoreNestedEvents>
-				{ !! error && <BlockCrashWarning /> }
 				{ showEmptyBlockSideInserter && (
 					<Fragment>
 						<div className="editor-block-list__side-inserter">
