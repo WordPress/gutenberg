@@ -20,7 +20,13 @@ This will build the Android library (via `gradle`) and example app, then launch 
 
 ## iOS: Run the example app
 
-Simply do:
+Before being able to run the Example App, you'll need to install [Carthage](https://github.com/Carthage/Carthage) and the dependencies for this project:
+```
+cd ios
+carthage bootstrap --platform iOS
+```
+
+Then go back to the root directory of the project and do:
 ```
 $ cd example/
 $ yarn clean:install
