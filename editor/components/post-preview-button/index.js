@@ -124,6 +124,7 @@ export class PostPreviewButton extends Component {
 				href={ currentPostLink }
 				onClick={ this.openPreviewWindow }
 				target={ this.getWindowTarget() }
+				isExternalLink={ true }
 				disabled={ ! isSaveable }
 			>
 				{ _x( 'Preview', 'imperative verb' ) }
