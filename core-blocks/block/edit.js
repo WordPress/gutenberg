@@ -28,11 +28,19 @@ class SharedBlockEdit extends Component {
 		this.setTitle = this.setTitle.bind( this );
 		this.save = this.save.bind( this );
 
-		this.state = {
-			isEditing: !! ( sharedBlock && sharedBlock.isTemporary ),
-			title: null,
-			changedAttributes: null,
-		};
+		if ( sharedBlock && sharedBlock.isTemporary ) {
+			this.state = {
+				isEditing: true,
+				title: sharedBlock.title,
+				changedAttributes: {},
+			};
+		} else {
+			this.state = {
+				isEditing: false,
+				title: null,
+				changedAttributes: null,
+			};
+		}
 	}
 
 	componentDidMount() {
