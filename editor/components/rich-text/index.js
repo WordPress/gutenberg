@@ -357,7 +357,7 @@ export class RichText extends Component {
 			plainText: this.pastedPlainText,
 			mode,
 			tagName: this.props.tagName,
-			canUserUseUnfilteredHTML: this.context.canUserUseUnfilteredHTML,
+			canUserUseUnfilteredHTML: this.props.canUserUseUnfilteredHTML,
 		} );
 
 		if ( typeof content === 'string' ) {
@@ -986,7 +986,6 @@ export class RichText extends Component {
 RichText.contextTypes = {
 	onUndo: noop,
 	onRedo: noop,
-	canUserUseUnfilteredHTML: noop,
 	onCreateUndoLevel: noop,
 };
 
@@ -1009,6 +1008,7 @@ const RichTextContainer = compose( [
 				isSelected: context.isSelected,
 			};
 		}
+
 		// Ensures that only one RichText component can be focused.
 		return {
 			isSelected: context.isSelected && context.focusedElement === ownProps.instanceId,
@@ -1017,9 +1017,11 @@ const RichTextContainer = compose( [
 	} ),
 	withSelect( ( select ) => {
 		const { isViewportMatch = identity } = select( 'core/viewport' ) || {};
+		const { canUserUseUnfilteredHTML } = select( 'core/editor' );
 
 		return {
 			isViewportSmall: isViewportMatch( '< small' ),
+			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
 		};
 	} ),
 	withSafeTimeout,
