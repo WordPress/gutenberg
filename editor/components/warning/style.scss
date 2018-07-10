@@ -3,25 +3,57 @@
 	position: absolute;
 	top: 0;
 	display: flex;
-	flex-direction: column;
-	justify-content: space-around;
-	align-items: center;
+	flex-direction: row;
+	justify-content: space-between;
+	flex-wrap: nowrap;
+	left: 50%;
+	transform: translateX( -50% );
+	width: 100%;
 	max-width: 780px;
-	width: calc( 100% - #{ $parent-block-padding * 2 + $block-padding * 2 } );
 	padding: 20px;
+	padding-bottom: 10px;
 	background-color: $white;
 	border: 1px solid $light-gray-500;
-	text-align: center;
+	text-align: left;
 	line-height: $default-line-height;
 	font-family: $default-font;
 	font-size: $default-font-size;
 }
 
+.editor-warning__contents {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	width: 100%;
+}
+
+.editor-warning__message {
+	padding-bottom: 15px;
+	padding-top: 5px;
+	padding-right: 20px;
+}
+
 .editor-warning__actions {
 	display: flex;
-	margin-top: 20px;
 }
 
 .editor-warning__action {
 	margin: 0 #{ $item-spacing / 2 } 5px;
+	margin-left: 0;
+}
+
+.editor-warning__hidden-menu {
+	padding: 5px;
+}
+
+.editor-warning__hidden-menu .components-dropdown-menu__menu-item {
+	margin-left: 20px;
+	width: calc( 100% - 20px );
+}
+
+.editor-warning__hidden-label {
+	color: $dark-gray-500;
+	padding: 5px;
+	margin: 0;
 }

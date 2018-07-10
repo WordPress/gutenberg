@@ -289,6 +289,14 @@
 		}
 	}
 
+	&.has-warning .editor-block-list__block-edit > div {
+		border: 1px solid $light-gray-500;
+	}
+
+	&.has-warning .editor-block-list__block-edit > div:first-child {
+		padding: 10px;
+	}
+
 	&.has-warning .editor-block-list__block-edit:after {
 		content: '';
 		position: absolute;
@@ -296,8 +304,7 @@
 		right: 0;
 		bottom: 0;
 		left: 0;
-		background-color: rgba( $white, 0.6 );
-		background-image: linear-gradient( to bottom, transparent, $white );
+		background-image: linear-gradient( rgba( $light-gray-500, 0.6 ), rgba( $light-gray-500, 0.6 ) );
 	}
 
 	// Appender
