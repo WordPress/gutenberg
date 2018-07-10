@@ -141,7 +141,8 @@ describe( 'InserterMenu', () => {
 
 		const activeCategory = wrapper.root.find( ( node ) => {
 			return node.props.className &&
-				node.props.className.includes( 'components-panel__body is-opened' );
+				node.props.className.includes( 'components-panel__body' ) &&
+				node.props.className.includes( 'is-opened' );
 		} ).find( ( node ) => {
 			return node.props.className &&
 				node.props.className.includes( 'components-panel__body-title' );
