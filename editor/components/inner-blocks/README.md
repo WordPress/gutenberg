@@ -73,14 +73,14 @@ The template is defined as a list of block items. Such blocks can have predefine
 More information about templates can be found in [template docs](https://wordpress.org/gutenberg/handbook/templates/).
 
 ```jsx
-const TEMPLATE = [ 'core/columns', {}, [
+const TEMPLATE = [ [ 'core/columns', {}, [
     [ 'core/column', {}, [
         [ 'core/image' ],
     ] ],
     [ 'core/column', {}, [
         [ 'core/paragraph', { placeholder: 'Enter side content...' } ],
     ] ],
-] ];
+] ] ];
 ...
 <InnerBlocks
     template={ TEMPLATE }
