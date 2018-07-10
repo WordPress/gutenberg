@@ -26,7 +26,7 @@ function BlockInvalidWarning( { convertToHTML, convertToBlocks } ) {
 				</Button>,
 				hasHTMLBlock && (
 					<Button key="edit" onClick={ convertToHTML } isLarge isPrimary>
-						{ __( 'Edit as HTML' ) }
+						{ __( 'Keep as HTML' ) }
 					</Button>
 				),
 			] }
