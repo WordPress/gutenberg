@@ -1,3 +1,8 @@
+## Unreleased (2.0.0)
+
+- Breaking: Updated code to work with Babel 7 ([#7832](https://github.com/WordPress/gutenberg/pull/7832))
+- Moved `@WordPress/packages` repository to `@WordPress/gutenberg` ([#7805](https://github.com/WordPress/gutenberg/pull/7805))
+
 ## 1.3.0 (2018-05-22)
 
 - Added support for async generator functions ([#126](https://github.com/WordPress/packages/pull/126))

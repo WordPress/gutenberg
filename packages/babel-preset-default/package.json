@@ -15,16 +15,16 @@
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git"
 	},
-	"files": [
-		"build",
-		"build-module"
-	],
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
 		"node": ">=8"
 	},
+	"files": [
+		"build",
+		"build-module"
+	],
 	"dependencies": {
 		"@babel/plugin-proposal-async-generator-functions": "^7.0.0-beta.52",
 		"@babel/plugin-proposal-object-rest-spread": "^7.0.0-beta.52",

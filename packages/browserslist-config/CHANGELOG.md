@@ -1,3 +1,7 @@
+## Unreleased (2.2.0)
+
+- Moved `@WordPress/packages` repository to `@WordPress/gutenberg` ([#7805](https://github.com/WordPress/gutenberg/pull/7805))
+
 ## 2.1.4 (2018-05-18)
 
 - Fix: Standardized `package.json` format  ([#119](https://github.com/WordPress/packages/pull/119))
