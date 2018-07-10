@@ -8,6 +8,12 @@ import classnames from 'classnames';
  */
 import { createElement, forwardRef } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import './style.scss';
+import ExternalLink from '../external-link';
+
 export function Button( props, ref ) {
 	const {
 		href,
@@ -20,6 +26,7 @@ export function Button( props, ref ) {
 		isDefault,
 		isLink,
 		isDestructive,
+		isExternalLink,
 		className,
 		disabled,
 		focus,
@@ -38,8 +45,16 @@ export function Button( props, ref ) {
 		'is-destructive': isDestructive,
 	} );
 
-	const tag = href !== undefined && ! disabled ? 'a' : 'button';
-	const tagProps = tag === 'a' ? { href, target } : { type: 'button', disabled };
+	let tag;
+	let tagProps;
+
+	if ( href !== undefined && ! disabled ) {
+		tag = !! isExternalLink ? ExternalLink : 'a';
+		tagProps = { href, target };
+	} else {
+		tag = 'button';
+		tagProps = { type: 'button', disabled };
+	}
 
 	return createElement( tag, {
 		...tagProps,
