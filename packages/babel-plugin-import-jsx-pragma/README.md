@@ -65,7 +65,7 @@ _Type:_ String
 
 The module from which the scope variable is to be imported when missing.
 
-### `isDefautl`
+### `isDefault`
 
 _Type:_ Boolean
 
