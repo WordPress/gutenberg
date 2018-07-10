@@ -4,6 +4,12 @@
 		"(blocks|components|editor|utils|edit-post|viewport|core-blocks|nux)/**/*.js",
 		"packages/**/*.js"
 	],
+	"coveragePathIgnorePatterns": [
+		"/node_modules/",
+		"<rootDir>/.*/build/",
+		"<rootDir>/.*/build-module/",
+		"<rootDir>/packages/.*/benchmark/"
+	],
 	"moduleNameMapper": {
 		"@wordpress\\/(blocks|components|editor|utils|edit-post|viewport|core-blocks|nux)$": "$1",
 		"@wordpress\\/(.*)$": "packages/$1/src"

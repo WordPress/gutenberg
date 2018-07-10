@@ -19,11 +19,18 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"files": [
+		"build",
+		"build-module"
+	],
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"devDependencies": {
 		"@babel/core": "7.0.0-beta.52",
 		"@babel/plugin-syntax-jsx": "^7.0.0-beta.52"
+	},
+	"peerDependencies": {
+		"@babel/core": "^7.0.0-beta.52"
 	},
 	"publishConfig": {
 		"access": "public"

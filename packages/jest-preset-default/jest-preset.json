@@ -3,8 +3,7 @@
 	"coveragePathIgnorePatterns": [
 		"/node_modules/",
 		"<rootDir>/.*/build/",
-		"<rootDir>/.*/build-module/",
-		"<rootDir>/packages/.*/benchmark/"
+		"<rootDir>/.*/build-module/"
 	],
 	"moduleNameMapper": {
 		"\\.(scss|css)$": "<rootDir>/node_modules/@wordpress/jest-preset-default/scripts/style-mock.js"
@@ -22,5 +21,8 @@
 		"**/test/*.js"
 	],
 	"timers": "fake",
+	"transform": {
+		"^.+\\.jsx?$": "babel-jest"
+	},
 	"verbose": true
 }

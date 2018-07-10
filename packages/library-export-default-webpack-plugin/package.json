@@ -17,6 +17,10 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"files": [
+		"build",
+		"build-module"
+	],
 	"main": "build/index.js",
 	"dependencies": {
 		"lodash": "4.17.10",
