@@ -48,6 +48,12 @@ export const settings = {
 			selector: 'audio',
 			attribute: 'loop',
 		},
+		preload: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'audio',
+			attribute: 'preload',
+		},
 	},
 
 	supports: {
@@ -57,10 +63,10 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { autoplay, caption, loop, src } = attributes;
+		const { autoplay, caption, loop, preload, src } = attributes;
 		return (
 			<figure>
-				<audio controls="controls" src={ src } autoPlay={ autoplay } loop={ loop } />
+				<audio controls="controls" src={ src } autoPlay={ autoplay } loop={ loop } preload={ preload } />
 				{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
 			</figure>
 		);
