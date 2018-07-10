@@ -25,6 +25,7 @@
 		5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADBDB9271DFEBF0700ED6528 /* libRCTBlob.a */; };
+		F1663A4E20F49DB400DC4C03 /* Aztec.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1A879A820EE6E7300FABD31 /* Aztec.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		F16E377220ED1D6900E81F5B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F16E377120ED1D6900E81F5B /* AppDelegate.swift */; };
 		F17923DF20890AA0002FE09B /* libRNTAztecView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F17923DE20890A85002FE09B /* libRNTAztecView.a */; };
 		F1A879A920EE6E7300FABD31 /* Aztec.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1A879A820EE6E7300FABD31 /* Aztec.framework */; };
@@ -312,6 +313,19 @@
 			remoteInfo = RNTAztecView;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F1663A2820F49D8C00DC4C03 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				F1663A4E20F49DB400DC4C03 /* Aztec.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		008F07F21AC5B25A0029DE68 /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
@@ -621,6 +635,7 @@
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
+				F1663A2820F49D8C00DC4C03 /* CopyFiles */,
 			);
 			buildRules = (
 			);
