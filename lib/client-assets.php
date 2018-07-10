@@ -185,7 +185,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_add_inline_script(
 		'wp-dom',
 		gutenberg_get_script_polyfill( array(
-			'document.contains' => 'node-contains',
+			'document.contains' => 'wp-polyfill-node-contains',
 		) ),
 		'before'
 	);
@@ -274,8 +274,8 @@ function gutenberg_register_scripts_and_styles() {
 	wp_add_inline_script(
 		'wp-blocks',
 		gutenberg_get_script_polyfill( array(
-			'\'Promise\' in window' => 'promise',
-			'\'fetch\' in window'   => 'fetch',
+			'\'Promise\' in window' => 'wp-polyfill-promise',
+			'\'fetch\' in window'   => 'wp-polyfill-fetch',
 		) ),
 		'before'
 	);
@@ -445,7 +445,7 @@ function gutenberg_register_scripts_and_styles() {
 	);
 	wp_add_inline_script(
 		'wp-edit-post',
-		gutenberg_get_script_polyfill( array( 'window.FormData && window.FormData.prototype.keys' => 'formdata' ) ),
+		gutenberg_get_script_polyfill( array( 'window.FormData && window.FormData.prototype.keys' => 'wp-polyfill-formdata' ) ),
 		'before'
 	);
 
