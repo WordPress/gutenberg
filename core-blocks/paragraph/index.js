@@ -24,10 +24,10 @@ import {
 	withColors,
 	AlignmentToolbar,
 	BlockControls,
-	ContrastChecker,
 	InspectorControls,
-	PanelColor,
+	PanelColorSettings,
 	RichText,
+	ContrastChecker,
 } from '@wordpress/editor';
 import {
 	createBlock,
@@ -235,27 +235,36 @@ class ParagraphBlock extends Component {
 							help={ this.getDropCapHelp }
 						/>
 					</PanelBody>
-					<PanelColor
-						colorValue={ backgroundColor.value }
+					<PanelColorSettings
+						title={ __( 'Color Settings' ) }
 						initialOpen={ false }
-						title={ __( 'Background Color' ) }
-						onChange={ setBackgroundColor }
-					/>
-					<PanelColor
-						colorValue={ textColor.value }
-						initialOpen={ false }
-						title={ __( 'Text Color' ) }
-						onChange={ setTextColor }
-					/>
-					<ContrastChecker
-						textColor={ textColor.value }
-						backgroundColor={ backgroundColor.value }
-						{ ...{
-							fontSize,
-							fallbackBackgroundColor,
-							fallbackTextColor,
-						} }
-					/>
+						colorSettings={ [
+							{
+								value: backgroundColor.value,
+								onChange: setBackgroundColor,
+								label: __( 'Background Color' ),
+								// translators: %s: The name of the color e.g: "vivid red" or color hex code if name is not available e.g: "#f00".
+								colorIndicatorAriaLabel: __( '(current background color: %s)' ),
+							},
+							{
+								value: textColor.value,
+								onChange: setTextColor,
+								label: __( 'Text Color' ),
+								// translators: %s: The name of the color e.g: "vivid red" or color hex code if name is not available e.g: "#f00".
+								colorIndicatorAriaLabel: __( '(current text color: %s)' ),
+							},
+						] }
+					>
+						<ContrastChecker
+							{ ...{
+								fontSize,
+								textColor: textColor.value,
+								backgroundColor: backgroundColor.value,
+								fallbackTextColor,
+								fallbackBackgroundColor,
+							} }
+						/>
+					</PanelColorSettings>
 				</InspectorControls>
 				<RichText
 					tagName="p"

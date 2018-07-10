@@ -15,6 +15,7 @@ export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
 export { default as InspectorControls } from './inspector-controls';
 export { default as PanelColor } from './panel-color';
+export { default as PanelColorSettings } from './panel-color-settings';
 export { default as PlainText } from './plain-text';
 export { default as RichText } from './rich-text';
 export { default as RichTextProvider } from './rich-text/provider';

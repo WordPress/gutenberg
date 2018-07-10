@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PanelColorSettings matches the snapshot 1`] = `
+<PanelBody
+  className="editor-panel-color-settings"
+  title={
+    <TextWithColorIndicators
+      className="editor-panel-color-settings__panel-title"
+      colorSettings={
+        Array [
+          Object {
+            "colorIndicatorAriaLabel": "black",
+            "label": "black color",
+            "onChange": [Function],
+            "value": "#000",
+          },
+          Object {
+            "colorIndicatorAriaLabel": "nearly black",
+            "label": "nearly black color",
+            "onChange": [Function],
+            "value": "#111",
+          },
+        ]
+      }
+    >
+      Test Title
+    </TextWithColorIndicators>
+  }
+>
+  <ColorPaletteControl
+    colorIndicatorAriaLabel="black"
+    key="0"
+    label="black color"
+    onChange={[Function]}
+    value="#000"
+  />
+  <ColorPaletteControl
+    colorIndicatorAriaLabel="nearly black"
+    key="1"
+    label="nearly black color"
+    onChange={[Function]}
+    value="#111"
+  />
+</PanelBody>
+`;

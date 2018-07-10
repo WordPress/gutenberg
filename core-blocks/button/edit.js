@@ -7,7 +7,11 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, Fragment } from '@wordpress/element';
+import {
+	Component,
+	Fragment,
+} from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 import {
 	Dashicon,
 	IconButton,
@@ -19,7 +23,7 @@ import {
 	ContrastChecker,
 	InspectorControls,
 	withColors,
-	PanelColor,
+	PanelColorSettings,
 } from '@wordpress/editor';
 
 /**
@@ -29,15 +33,17 @@ import './editor.scss';
 
 const { getComputedStyle } = window;
 
-const ContrastCheckerWithFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
+const FallbackStyles = withFallbackStyles( ( node, ownProps ) => {
 	const { textColor, backgroundColor } = ownProps;
+	const backgroundColorValue = backgroundColor && backgroundColor.value;
+	const textColorValue = textColor && textColor.value;
 	//avoid the use of querySelector if textColor color is known and verify if node is available.
-	const textNode = ! textColor && node ? node.querySelector( '[contenteditable="true"]' ) : null;
+	const textNode = ! textColorValue && node ? node.querySelector( '[contenteditable="true"]' ) : null;
 	return {
-		fallbackBackgroundColor: backgroundColor || ! node ? undefined : getComputedStyle( node ).backgroundColor,
-		fallbackTextColor: textColor || ! textNode ? undefined : getComputedStyle( textNode ).color,
+		fallbackBackgroundColor: backgroundColorValue || ! node ? undefined : getComputedStyle( node ).backgroundColor,
+		fallbackTextColor: textColorValue || ! textNode ? undefined : getComputedStyle( textNode ).color,
 	};
-} )( ContrastChecker );
+} );
 
 class ButtonEdit extends Component {
 	constructor() {
@@ -60,6 +66,8 @@ class ButtonEdit extends Component {
 			textColor,
 			setBackgroundColor,
 			setTextColor,
+			fallbackBackgroundColor,
+			fallbackTextColor,
 			setAttributes,
 			isSelected,
 			className,
@@ -95,22 +103,35 @@ class ButtonEdit extends Component {
 						keepPlaceholderOnFocus
 					/>
 					<InspectorControls>
-						<PanelColor
-							colorValue={ backgroundColor.value }
-							title={ __( 'Background Color' ) }
-							onChange={ setBackgroundColor }
-						/>
-						<PanelColor
-							colorValue={ textColor.value }
-							title={ __( 'Text Color' ) }
-							onChange={ setTextColor }
-						/>
-						{ this.nodeRef && <ContrastCheckerWithFallbackStyles
-							node={ this.nodeRef }
-							textColor={ textColor.value }
-							backgroundColor={ backgroundColor.value }
-							isLargeText={ true }
-						/> }
+						<PanelColorSettings
+							title={ __( 'Color Settings' ) }
+							colorSettings={ [
+								{
+									value: backgroundColor.value,
+									onChange: setBackgroundColor,
+									label: __( 'Background Color' ),
+									// translators: %s: The name of the color e.g: "vivid red" or color hex code if name is not available e.g: "#f00".
+									colorIndicatorAriaLabel: __( '(current background color: %s)' ),
+								},
+								{
+									value: textColor.value,
+									onChange: setTextColor,
+									label: __( 'Text Color' ),
+									// translators: %s: The name of the color e.g: "vivid red" or color hex code if name is not available e.g: "#f00".
+									colorIndicatorAriaLabel: __( '(current text color: %s)' ),
+								},
+							] }
+						>
+							<ContrastChecker
+								{ ...{
+									isLargeText: true,
+									textColor: textColor.value,
+									backgroundColor: backgroundColor.value,
+									fallbackBackgroundColor,
+									fallbackTextColor,
+								} }
+							/>
+						</PanelColorSettings>
 					</InspectorControls>
 				</span>
 				{ isSelected && (
@@ -130,4 +151,7 @@ class ButtonEdit extends Component {
 	}
 }
 
-export default withColors( 'backgroundColor', { textColor: 'color' } )( ButtonEdit );
+export default compose( [
+	withColors( 'backgroundColor', { textColor: 'color' } ),
+	FallbackStyles,
+] )( ButtonEdit );

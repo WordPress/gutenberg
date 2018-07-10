@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { shallow, mount } from 'enzyme';
 
 /**
  * Internal dependencies
@@ -16,18 +16,14 @@ describe( 'PanelColor', () => {
 	} );
 
 	it( 'should have color when provided', () => {
-		const wrapper = shallow( <PanelColor colorValue="red" title="sample title" /> );
+		const wrapper = mount( <PanelColor colorValue="red" title="sample title" /> );
 
-		expect( wrapper.prop( 'title' ) ).toContainEqual(
-			<span className="components-panel__color-area" aria-label="(current color: red)" key="color" style={ { background: 'red' } } />
-		);
+		expect( wrapper.find( '[ariaLabel]' ).first().prop( 'ariaLabel' ) ).toBe( '(current color: red)' );
 	} );
 
 	it( 'should use color name in area label if provided', () => {
-		const wrapper = shallow( <PanelColor colorValue="#f00" colorName="red" title="sample title" /> );
+		const wrapper = mount( <PanelColor colorValue="#f00" colorName="red" title="sample title" /> );
 
-		expect( wrapper.prop( 'title' ) ).toContainEqual(
-			<span className="components-panel__color-area" aria-label="(current color: red)" key="color" style={ { background: '#f00' } } />
-		);
+		expect( wrapper.find( '[ariaLabel]' ).first().prop( 'ariaLabel' ) ).toBe( '(current color: red)' );
 	} );
 } );

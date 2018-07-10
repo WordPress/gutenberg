@@ -1,0 +1,13 @@
+.editor-panel-color-settings {
+	.component-color-indicator {
+		vertical-align: text-bottom;
+	}
+
+	&__panel-title .component-color-indicator {
+		display: inline-block;
+	}
+
+	&.is-opened &__panel-title .component-color-indicator {
+		display: none;
+	}
+}
