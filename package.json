@@ -151,7 +151,7 @@
 		"build:packages": "cross-env EXCLUDE_PACKAGES=babel-plugin-import-jsx-pragma node ./bin/packages/build.js",
 		"build": "npm run build:packages && cross-env NODE_ENV=production webpack",
 		"check-engines": "check-node-version --package",
-		"ci": "concurrently \"npm run lint && npm run build\" \"npm run test-unit:coverage-ci\"",
+		"ci": "concurrently \"npm run lint\" \"npm run test-unit:coverage-ci\"",
 		"predev": "npm run check-engines",
 		"dev": "npm run build:packages && concurrently \"cross-env webpack --watch\" \"npm run dev:packages\"",
 		"dev:packages": "node ./bin/packages/watch.js",
