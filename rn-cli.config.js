@@ -10,7 +10,9 @@ module.exports = {
 	extraNodeModules: enm,
 	getBlacklistRE: function() {
 		// blacklist the GB packages we want to consume from NPM (online) directly
-		return blacklist( [ /gutenberg\/packages\/(autop|hooks|i18n|is-shallow-equal)\/.*/ ] );
+		return blacklist( [
+			/gutenberg\/packages\/(autop|data|deprecated|hooks|i18n|is-shallow-equal)\/.*/,
+		] );
 	},
 	getTransformModulePath() {
 		return require.resolve( './sass-transformer.js' );
