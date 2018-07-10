@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { mount, shallow } from 'enzyme';
+import { shallow } from 'enzyme';
+import TestUtils from 'react-dom/test-utils';
 
 /**
  * WordPress dependencies
@@ -103,17 +104,12 @@ describe( 'Button', () => {
 		} );
 	} );
 
-	// Disable reason: This test is desirable, but unsupported by Enzyme in
-	// the current version, as it depends on features new to React in 16.3.0.
-	//
-	// eslint-disable-next-line jest/no-disabled-tests
-	describe.skip( 'ref forwarding', () => {
+	describe( 'ref forwarding', () => {
 		it( 'should enable access to DOM element', () => {
 			const ref = createRef();
 
-			mount( <ButtonWithForwardedRef ref={ ref } /> );
-
-			expect( ref.current.nodeName ).toBe( 'button' );
+			TestUtils.renderIntoDocument( <ButtonWithForwardedRef ref={ ref } /> );
+			expect( ref.current.type ).toBe( 'button' );
 		} );
 	} );
 } );

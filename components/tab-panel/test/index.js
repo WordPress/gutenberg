@@ -88,4 +88,37 @@ describe( 'TabPanel', () => {
 			expect( getActiveView().text() ).toBe( 'alpha' );
 		} );
 	} );
+
+	it( 'should render with a tab initially selected by prop initialTabIndex', () => {
+		const wrapper = mount(
+			<TabPanel
+				className="test-panel"
+				activeClass="active-tab"
+				initialTabName="beta"
+				tabs={
+					[
+						{
+							name: 'alpha',
+							title: 'Alpha',
+							className: 'alpha',
+						},
+						{
+							name: 'beta',
+							title: 'Beta',
+							className: 'beta',
+						},
+					]
+				}
+			>
+				{
+					( tabName ) => {
+						return <p tabIndex="0" className={ tabName + '-view' }>{ tabName }</p>;
+					}
+				}
+			</TabPanel>
+		);
+
+		const getActiveTab = () => wrapper.find( 'button.active-tab' );
+		expect( getActiveTab().text() ).toBe( 'Beta' );
+	} );
 } );

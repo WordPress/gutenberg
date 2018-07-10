@@ -12,6 +12,7 @@ import { RichText } from '@wordpress/editor';
  * Internal dependencies
  */
 import './style.scss';
+import './theme.scss';
 import edit from './edit';
 
 export const name = 'core/video';
@@ -19,7 +20,7 @@ export const name = 'core/video';
 export const settings = {
 	title: __( 'Video' ),
 
-	description: __( 'Embed an video file and a simple video player.' ),
+	description: __( 'Embed a video file and a simple video player.' ),
 
 	icon: 'format-video',
 

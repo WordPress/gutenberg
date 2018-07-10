@@ -7,20 +7,18 @@ import { shallow } from 'enzyme';
  * WordPress dependencies
  */
 import { registerCoreBlocks } from '@wordpress/core-blocks';
-import { keycodes } from '@wordpress/utils';
+import { DOWN } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import { BlockSwitcher } from '../';
 
-const { DOWN } = keycodes;
-
 describe( 'BlockSwitcher', () => {
 	const headingBlock1 = {
 		attributes: {
 			content: [ 'How are you?' ],
-			nodeName: 'H2',
+			level: 2,
 		},
 		isValid: true,
 		name: 'core/heading',
@@ -31,7 +29,6 @@ describe( 'BlockSwitcher', () => {
 	const textBlock = {
 		attributes: {
 			content: [ 'I am great!' ],
-			nodeName: 'P',
 		},
 		isValid: true,
 		name: 'core/text',
@@ -42,7 +39,7 @@ describe( 'BlockSwitcher', () => {
 	const headingBlock2 = {
 		attributes: {
 			content: [ 'I am the greatest!' ],
-			nodeName: 'H3',
+			level: 3,
 		},
 		isValid: true,
 		name: 'core/text',
@@ -136,22 +133,11 @@ describe( 'BlockSwitcher', () => {
 		} );
 
 		describe( '.renderContent', () => {
-			const onCloseStub = jest.fn();
-
-			const getIconButtons = () => {
-				const content = shallow( getDropdown().props().renderContent( { onClose: onCloseStub } ) );
-				return content.find( 'IconButton' );
-			};
-
-			test( 'should create the iconButtons for the chosen block. A heading block will have 3 items', () => {
-				expect( getIconButtons() ).toHaveLength( 3 );
-			} );
-
-			test( 'should simulate the click event by closing the switcher and causing a block transform on iconButtons.', () => {
-				getIconButtons().first().simulate( 'click' );
-
-				expect( onCloseStub ).toHaveBeenCalledTimes( 1 );
-				expect( onTransformStub ).toHaveBeenCalledTimes( 1 );
+			test( 'should create the transform items for the chosen block. A heading block will have 3 items', () => {
+				const onCloseStub = jest.fn();
+				const content = shallow( <div>{ getDropdown().props().renderContent( { onClose: onCloseStub } ) }</div> );
+				const blockList = content.find( 'BlockTypesList' );
+				expect( blockList.prop( 'items' ) ).toHaveLength( 3 );
 			} );
 		} );
 	} );

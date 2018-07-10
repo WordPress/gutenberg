@@ -23,9 +23,12 @@ function InserterWithShortcuts( { items, isLocked, onInsert } ) {
 		return null;
 	}
 
-	const itemsWithoutDefaultBlock = filter( items, ( item ) =>
-		item.name !== getDefaultBlockName() || ! isEmpty( item.initialAttributes )
-	).slice( 0, 3 );
+	const itemsWithoutDefaultBlock = filter( items, ( item ) => {
+		return ! item.isDisabled && (
+			item.name !== getDefaultBlockName() ||
+			! isEmpty( item.initialAttributes )
+		);
+	} ).slice( 0, 3 );
 
 	return (
 		<div className="editor-inserter-with-shortcuts">
@@ -34,9 +37,10 @@ function InserterWithShortcuts( { items, isLocked, onInsert } ) {
 					key={ item.id }
 					className="editor-inserter-with-shortcuts__block"
 					onClick={ () => onInsert( item ) }
+					// translators: %s: block title/name to be added
 					label={ sprintf( __( 'Add %s' ), item.title ) }
 					icon={ (
-						<BlockIcon icon={ item.icon } />
+						<BlockIcon icon={ item.icon && item.icon.src } />
 					) }
 				/>
 			) ) }
@@ -46,12 +50,10 @@ function InserterWithShortcuts( { items, isLocked, onInsert } ) {
 
 export default compose(
 	withSelect( ( select, { rootUID } ) => {
-		const { getEditorSettings, getFrecentInserterItems, getSupportedBlocks } = select( 'core/editor' );
-		const { templateLock, allowedBlockTypes } = getEditorSettings();
-		const supportedBlocks = getSupportedBlocks( rootUID, allowedBlockTypes );
+		const { getInserterItems, getTemplateLock } = select( 'core/editor' );
 		return {
-			items: getFrecentInserterItems( supportedBlocks, 4 ),
-			isLocked: !! templateLock,
+			items: getInserterItems( rootUID ),
+			isLocked: !! getTemplateLock( rootUID ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {

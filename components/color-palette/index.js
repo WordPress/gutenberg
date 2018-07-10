@@ -31,13 +31,21 @@ export default function ColorPalette( { colors, disableCustomColors = false, val
 
 				return (
 					<div key={ color } className="components-color-palette__item-wrapper">
-						<Tooltip text={ name || sprintf( __( 'Color code: %s' ), color ) }>
+						<Tooltip
+							text={ name ||
+								// translators: %s: color hex code e.g: "#f00".
+								sprintf( __( 'Color code: %s' ), color )
+							}>
 							<button
 								type="button"
 								className={ className }
 								style={ style }
 								onClick={ applyOrUnset( color ) }
-								aria-label={ name ? sprintf( __( 'Color: %s' ), name ) : sprintf( __( 'Color code: %s' ), color ) }
+								aria-label={ name ?
+									// translators: %s: The name of the color e.g: "vivid red".
+									sprintf( __( 'Color: %s' ), name ) :
+									// translators: %s: color hex code e.g: "#f00".
+									sprintf( __( 'Color code: %s' ), color ) }
 								aria-pressed={ value === color }
 							/>
 						</Tooltip>

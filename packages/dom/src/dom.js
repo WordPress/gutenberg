@@ -396,6 +396,40 @@ export function documentHasSelection() {
 }
 
 /**
+ * Check whether the contents of the element have been entirely selected.
+ * Returns true if there is no possibility of selection.
+ *
+ * @param {Element} element The element to check.
+ *
+ * @return {boolean} True if entirely selected, false if not.
+ */
+export function isEntirelySelected( element ) {
+	if ( includes( [ 'INPUT', 'TEXTAREA' ], element.nodeName ) ) {
+		return element.selectionStart === 0 && element.value.length === element.selectionEnd;
+	}
+
+	if ( ! element.isContentEditable ) {
+		return true;
+	}
+
+	const selection = window.getSelection();
+	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+
+	if ( ! range ) {
+		return true;
+	}
+
+	const { startContainer, endContainer, startOffset, endOffset } = range;
+
+	return (
+		startContainer === element &&
+		endContainer === element &&
+		startOffset === 0 &&
+		endOffset === element.childNodes.length
+	);
+}
+
+/**
  * Given a DOM node, finds the closest scrollable container node.
  *
  * @param {Element} node Node from which to start.
@@ -418,6 +452,40 @@ export function getScrollContainer( node ) {
 
 	// Continue traversing
 	return getScrollContainer( node.parentNode );
+}
+
+/**
+ * Returns the closest positioned element, or null under any of the conditions
+ * of the offsetParent specification. Unlike offsetParent, this function is not
+ * limited to HTMLElement and accepts any Node (e.g. Node.TEXT_NODE).
+ *
+ * @see https://drafts.csswg.org/cssom-view/#dom-htmlelement-offsetparent
+ *
+ * @param {Node} node Node from which to find offset parent.
+ *
+ * @return {?Node} Offset parent.
+ */
+export function getOffsetParent( node ) {
+	// Cannot retrieve computed style or offset parent only anything other than
+	// an element node, so find the closest element node.
+	let closestElement;
+	while ( ( closestElement = node.parentNode ) ) {
+		if ( closestElement.nodeType === ELEMENT_NODE ) {
+			break;
+		}
+	}
+
+	if ( ! closestElement ) {
+		return null;
+	}
+
+	// If the closest element is already positioned, return it, as offsetParent
+	// does not otherwise consider the node itself.
+	if ( getComputedStyle( closestElement ).position !== 'static' ) {
+		return closestElement;
+	}
+
+	return closestElement.offsetParent;
 }
 
 /**

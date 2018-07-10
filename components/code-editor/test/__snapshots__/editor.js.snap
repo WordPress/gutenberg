@@ -2,6 +2,6 @@
 
 exports[`CodeEditor should render without an error 1`] = `
 <textarea
-  value="<b>wowee</b>"
+  defaultValue="<b>wowee</b>"
 />
 `;

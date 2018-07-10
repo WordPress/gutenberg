@@ -151,6 +151,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 				className={ className }
 				style={ { textAlign: alignment } }
 				value={ content }
+				tagName="p"
 			/>
 		);
 	},

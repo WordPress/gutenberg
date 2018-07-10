@@ -6,7 +6,6 @@ import {
 	setDefaultBlockName,
 	setUnknownTypeHandlerName,
 } from '@wordpress/blocks';
-import { deprecated } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -22,8 +21,10 @@ import * as button from './button';
 import * as categories from './categories';
 import * as code from './code';
 import * as columns from './columns';
+import * as column from './columns/column';
 import * as coverImage from './cover-image';
 import * as embed from './embed';
+import * as file from './file';
 import * as freeform from './freeform';
 import * as html from './html';
 import * as latestPosts from './latest-posts';
@@ -60,10 +61,12 @@ export const registerCoreBlocks = () => {
 		categories,
 		code,
 		columns,
+		column,
 		coverImage,
 		embed,
 		...embed.common,
 		...embed.others,
+		file,
 		freeform,
 		html,
 		latestPosts,
@@ -85,14 +88,4 @@ export const registerCoreBlocks = () => {
 
 	setDefaultBlockName( paragraph.name );
 	setUnknownTypeHandlerName( freeform.name );
-};
-
-// Backwards compatibility
-wp.blocks.registerCoreBlocks = () => {
-	deprecated( 'wp.blocks.registerCoreBlocks', {
-		version: '3.0',
-		alternative: 'wp.coreBlocks.registerCoreBlocks',
-		plugin: 'Gutenberg',
-	} );
-	registerCoreBlocks();
 };

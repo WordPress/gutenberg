@@ -1,4 +1,9 @@
 /**
+ * External Dependencies
+ */
+import { forOwn } from 'lodash';
+
+/**
  * WordPress Dependencies
  */
 import {
@@ -16,6 +21,8 @@ import reducer from './reducer';
 import applyMiddlewares from './middlewares';
 import * as selectors from './selectors';
 import * as actions from './actions';
+import * as tokens from '../components/rich-text/core-tokens';
+import { validateTokenSettings } from '../components/rich-text/tokens';
 
 /**
  * Module Constants
@@ -30,5 +37,13 @@ loadAndPersist( store, reducer, 'preferences', STORAGE_KEY );
 
 registerSelectors( MODULE_KEY, selectors );
 registerActions( MODULE_KEY, actions );
+
+forOwn( tokens, ( { name, settings } ) => {
+	settings = validateTokenSettings( name, settings, store.getState() );
+
+	if ( settings ) {
+		store.dispatch( actions.registerToken( name, settings ) );
+	}
+} );
 
 export default store;

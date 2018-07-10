@@ -16,19 +16,40 @@
 	padding-right: 20px;
 
 	@include break-large() {
-		padding-left: calc( 50% - #{ $text-editor-max-width / 2 } );
-		padding-right: calc( 50% - #{ $text-editor-max-width / 2 } );
+		padding-left: calc( 50% - #{ $content-width / 2 } );
+		padding-right: calc( 50% - #{ $content-width / 2 } );
 	}
 
 	.edit-post-post-text-editor__toolbar {
 		width: 100%;
-		max-width: $text-editor-max-width;
+		max-width: $content-width;
 		margin: 0 auto;
 	}
 
 	// Always show outlines in code editor
-	.editor-post-title div {
-		border: 1px solid $light-gray-500;
+	.editor-post-title__block {
+		textarea {
+			border: 1px solid $light-gray-500;
+			margin-bottom: 4px;
+		}
+
+		textarea:hover,
+		&.is-selected textarea {
+			box-shadow: 0 0 0 1px $light-gray-500;
+		}
+	}
+
+	.editor-post-permalink {
+		left: 0;
+		right: 0;
+		margin-top: -6px;
+	}
+
+	@include break-small() {
+		.editor-post-title,
+		.editor-post-title__block {
+			padding: 0;
+		}
 	}
 
 	.editor-post-text-editor {

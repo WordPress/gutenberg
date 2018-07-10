@@ -15,16 +15,3 @@
 		background-color: $light-gray-300;
 	}
 }
-
-// Style the resize handles
-.ephox-snooker-resizer-rows {
-	cursor: row-resize;
-}
-
-.ephox-snooker-resizer-cols {
-	cursor: col-resize;
-}
-
-.ephox-snooker-resizer-bar-dragging {
-	background: $blue-medium-500;
-}

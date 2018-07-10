@@ -1,7 +1,4 @@
 .wp-block-pullquote {
-	border-top: 4px solid $dark-gray-500;
-	border-bottom: 4px solid $dark-gray-500;
-	color: $dark-gray-600;
 	padding: 3em 0;
 	text-align: center;
 
@@ -21,9 +18,6 @@
 
 	cite,
 	footer {
-		color: $dark-gray-600;
 		position: relative;
-		text-transform: uppercase;
-		font-size: $default-font-size;
 	}
 }

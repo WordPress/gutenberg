@@ -1,7 +1,11 @@
 // These margins make sure that nested blocks stack/overlay with the parent block chrome
 // This is sort of an experiment at making sure the editor looks as much like the end result as possible
 // Potentially the rules here can apply to all nested blocks and enable stacking, in which case it should be moved elsewhere
+// When using CSS grid, margins do not collapse on the container.
 .wp-block-columns .editor-block-list__layout {
+	margin-left: 0;
+	margin-right: 0;
+
 	&:first-child {
 		margin-left: -$block-padding;
 	}
@@ -12,16 +16,6 @@
 	// This max-width is used to constrain the main editor column, it should not cascade into columns
 	.editor-block-list__block {
 		max-width: none;
-	}
-}
-
-// Wide: show no left/right margin on wide, so they stack with the column side UI
-.editor-block-list__block[data-align="wide"] .wp-block-columns .editor-block-list__layout {
-	&:first-child {
-		margin-left: 0;
-	}
-	&:last-child {
-		margin-right: 0;
 	}
 }
 
@@ -38,17 +32,29 @@
 	}
 }
 
-// Hide appender shortcuts in columns
-// @todo This essentially duplicates the mobile styles for the appender component
-// It would be nice to be able to use element queries in that component instead https://github.com/tomhodgins/element-queries-spec
-.wp-block-columns {
-	.editor-inserter-with-shortcuts {
-		display: none;
-	}
+// Flex container margins do not collapse: https://www.w3.org/TR/css-flexbox-1/#flex-containers.
+// Therefore, let's at least not add any additional margins here.
+.editor-block-list__layout .editor-block-list__block[data-type="core/columns"] > .editor-block-list__block-edit,
+.editor-block-list__layout .editor-block-list__block[data-type="core/column"] > .editor-block-list__block-edit {
+	margin-top: 0;
+	margin-bottom: 0;
+}
 
-	.editor-block-list__empty-block-inserter,
-	.editor-default-block-appender .editor-inserter {
-		left: auto;
-		right: $item-spacing;
+.wp-block-columns {
+	display: block;
+
+	> .editor-inner-blocks > .editor-block-list__layout {
+		display: flex;
+
+		> [data-type="core/column"] {
+			display: flex;
+			flex-direction: column;
+			flex: 1;
+			width: 0;
+
+			.editor-block-list__block-edit {
+				flex-basis: 100%;
+			}
+		}
 	}
 }

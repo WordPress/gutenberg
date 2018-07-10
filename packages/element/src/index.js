@@ -10,6 +10,8 @@ import {
 	cloneElement,
 	Children,
 	Fragment,
+	isValidElement,
+	StrictMode,
 } from 'react';
 import { render, findDOMNode, createPortal, unmountComponentAtNode } from 'react-dom';
 import {
@@ -28,6 +30,7 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
  * Internal dependencies
  */
 import serialize from './serialize';
+import { RawHTML } from './index-common';
 
 /**
  * Returns a new element of given type. Type can be either a string tag name or
@@ -105,6 +108,8 @@ export { findDOMNode };
 
 export { Children };
 
+export { StrictMode };
+
 /**
  * A component which renders its children without any wrapping element.
  */
@@ -118,6 +123,15 @@ export { Fragment };
  * @return {Object} Context object.
  */
 export { createContext };
+
+/**
+ * Checks if an object is a valid WPElement
+ *
+ * @param {Object} objectToCheck The object to be checked.
+ *
+ * @return {boolean} true if objectToTest is a valid WPElement and false otherwise.
+ */
+export { isValidElement };
 
 /**
  * Creates a portal into which a component can be rendered.
@@ -220,14 +234,7 @@ export function createHigherOrderComponent( mapComponentToEnhancedComponent, mod
  *
  * @return {WPElement} Dangerously-rendering element.
  */
-export function RawHTML( { children, ...props } ) {
-	// The DIV wrapper will be stripped by serializer, unless there are
-	// non-children props present.
-	return createElement( 'div', {
-		dangerouslySetInnerHTML: { __html: children },
-		...props,
-	} );
-}
+export { RawHTML };
 
 /**
  * Given a component returns the enhanced component augmented with a component

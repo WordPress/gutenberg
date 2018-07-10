@@ -1,13 +1,6 @@
 .wp-block-image {
 	width: fit-content;
 
-	figcaption {
-		margin-top: 0.5em;
-		color: $dark-gray-300;
-		text-align: center;
-		font-size: $default-font-size;
-	}
-
 	&.aligncenter {
 		display: block;
 		margin-left: auto;
@@ -29,5 +22,12 @@
 		img {
 			max-width: none;
 		}
+	}
+
+	// Supply caption styles to images, even if the theme hasn't opted in.
+	// Reason being: the new markup, figcaptions, are not likely to be styled in the majority of existing themes,
+	// so we supply the styles so as to not appear broken or unstyled in those.
+	figcaption {
+		@include caption-style();
 	}
 }

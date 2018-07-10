@@ -7,12 +7,16 @@
  */
 import { createSlotFill, PanelRow } from '@wordpress/components';
 
-export const { Fill: PluginPostStatusInfo, Slot } = createSlotFill( 'PluginPostStatusInfo' );
+export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
 
-PluginPostStatusInfo.Slot = () => (
-	<PanelRow>
-		<Slot />
-	</PanelRow>
+const PluginPostStatusInfo = ( { children, className } ) => (
+	<Fill>
+		<PanelRow className={ className }>
+			{ children }
+		</PanelRow>
+	</Fill>
 );
+
+PluginPostStatusInfo.Slot = Slot;
 
 export default PluginPostStatusInfo;

@@ -1,7 +1,7 @@
 withHistory
 ===========
 
-`withHistory` is a [Redux higher-order reducer](http://redux.js.org/docs/recipes/reducers/ReusingReducerLogic.html#customizing-behavior-with-higher-order-reducers) for tracking the history of a reducer state over time. The enhanced reducer returned from `withHistory` will return an object shape with properties `past`, `present`, and `future`. The `present` value maintains the current value of state returned from the original reducer. Past and future are respectively maintained as arrays of state values occuring previously and future (if history undone).
+`withHistory` is a [Redux higher-order reducer](http://redux.js.org/docs/recipes/reducers/ReusingReducerLogic.html#customizing-behavior-with-higher-order-reducers) for tracking the history of a reducer state over time. The enhanced reducer returned from `withHistory` will return an object shape with properties `past`, `present`, and `future`. The `present` value maintains the current value of state returned from the original reducer. Past and future are respectively maintained as arrays of state values occurring previously and future (if history undone).
 
 Leveraging a `resetTypes` option, this can be used to mark intervals at which a state history should be reset, emptying the values of the `past` and `future` arrays.
 

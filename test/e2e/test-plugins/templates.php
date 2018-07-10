@@ -28,12 +28,23 @@ function gutenberg_test_templates_register_book_type() {
 				'core/columns',
 				array(),
 				array(
-					array( 'core/image', array( 'layout' => 'column-1' ) ),
 					array(
-						'core/paragraph',
+						'core/column',
+						array(),
 						array(
-							'placeholder' => 'Add a inner paragraph',
-							'layout' => 'column-2',
+							array( 'core/image' ),
+						),
+					),
+					array(
+						'core/column',
+						array(),
+						array(
+							array(
+								'core/paragraph',
+								array(
+									'placeholder' => 'Add a inner paragraph',
+								),
+							),
 						),
 					),
 				),

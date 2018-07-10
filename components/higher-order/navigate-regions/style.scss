@@ -7,6 +7,7 @@
 		left: 0;
 		right: 0;
 		pointer-events: none;
-		border: 4px solid $blue-medium-400;
+		outline: 4px solid transparent; // Shown in Windows High Contrast mode.
+		@include region_focus( .1s );
 	}
 }

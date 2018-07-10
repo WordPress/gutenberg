@@ -31,7 +31,7 @@ export function PageTemplate( { availableTemplates, selectedTemplate, instanceId
 				onBlur={ onEventUpdate }
 				onChange={ onEventUpdate }
 			>
-				{ map( { '': __( 'Default template' ), ...availableTemplates }, ( templateName, templateSlug ) => (
+				{ map( availableTemplates, ( templateName, templateSlug ) => (
 					<option key={ templateSlug } value={ templateSlug }>{ templateName }</option>
 				) ) }
 			</select>

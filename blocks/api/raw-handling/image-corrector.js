@@ -1,12 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { createBlobURL } from '@wordpress/utils';
+import { createBlobURL } from '@wordpress/blob';
 
 /**
  * Browser dependencies
  */
-const { atob, Blob } = window;
+const { atob, File } = window;
 
 export default function( node ) {
 	if ( node.nodeName !== 'IMG' ) {
@@ -43,9 +43,10 @@ export default function( node ) {
 			uint8Array[ i ] = decoded.charCodeAt( i );
 		}
 
-		const blob = new Blob( [ uint8Array ], { type } );
+		const name = type.replace( '/', '.' );
+		const file = new File( [ uint8Array ], name, { type } );
 
-		node.src = createBlobURL( blob );
+		node.src = createBlobURL( file );
 	}
 
 	// Remove trackers and hardly visible images.

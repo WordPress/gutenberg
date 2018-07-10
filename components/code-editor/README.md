@@ -57,7 +57,7 @@ editor. It is passed the new value as an argument.
 
 ### settings
 
-The settings object used to intialize the WordPress code editor. The object contains all of the settings for the editor, including specific settings for CodeMirror. This object is passed into `wp.codeEditor.intialize()`. If you do not specify a settings object, `window._wpGutenbergCodeEditorSettings` will be used instead.
+The settings object used to initialize the WordPress code editor. The object contains all of the settings for the editor, including specific settings for CodeMirror. This object is passed into `wp.codeEditor.initialize()`. If you do not specify a settings object, `window._wpGutenbergCodeEditorSettings` will be used instead.
 
 If you are extending `window._wpGutenbergCodeEditorSettings` make sure to clone the object using `Object.assign` or something similar instead of modifying it directly so the default settings remain the same.
 
@@ -76,7 +76,7 @@ const settings = Object.assign(  {
 
 ### editorRef
 
-A reference to the instance of CodeMirror intiailized when the editor is loaded so that it can be dynamically updated from a parent component.
+A reference to the instance of CodeMirror initialized when the editor is loaded so that it can be dynamically updated from a parent component.
 
 `editorRef={ ( ref ) => this.editorInstance = ref }`
 

@@ -18,15 +18,6 @@ A callback invoked when the menu navigates to one of its children passing the in
 - Type: `Function`
 - Required: No
 
-### deep
-
-A boolean to look for navigable children in the direct children or any descendant. True means that any descendant can be considered navigable, and false means only direct children are considered.
-
-- Type: `Boolean`
-- Required: No
-- default: false
-
-
 ### cycle
 
 A boolean which tells the component whether or not to cycle from the end back to the beginning and vice versa.

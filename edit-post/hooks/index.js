@@ -1,6 +1,6 @@
 /**
  * Internal dependencies
  */
-import './blocks';
+import './components';
 import './more-menu';
-import './validate-use-once';
+import './validate-multiple-use';

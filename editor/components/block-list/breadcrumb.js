@@ -1,15 +1,9 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { compose, Component } from '@wordpress/element';
-import { IconButton, Toolbar } from '@wordpress/components';
-import { withDispatch, withSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { compose, Component, Fragment } from '@wordpress/element';
+import { Toolbar } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -53,22 +47,16 @@ export class BlockBreadcrumb extends Component {
 	}
 
 	render( ) {
-		const { uid, rootUID, selectRootBlock, isHidden } = this.props;
-		const { isFocused } = this.state;
+		const { uid, rootUID } = this.props;
 
 		return (
-			<div className={ classnames( 'editor-block-list__breadcrumb', {
-				'is-visible': ! isHidden || isFocused,
-			} ) }>
+			<div className={ 'editor-block-list__breadcrumb' }>
 				<Toolbar>
 					{ rootUID && (
-						<IconButton
-							onClick={ selectRootBlock }
-							onFocus={ this.onFocus }
-							onBlur={ this.onBlur }
-							label={ __( 'Select parent block' ) }
-							icon="arrow-left-alt"
-						/>
+						<Fragment>
+							<BlockTitle uid={ rootUID } />
+							<span className="editor-block-list__descendant-arrow" />
+						</Fragment>
 					) }
 					<BlockTitle uid={ uid } />
 				</Toolbar>
@@ -84,14 +72,6 @@ export default compose( [
 
 		return {
 			rootUID: getBlockRootUID( uid ),
-		};
-	} ),
-	withDispatch( ( dispatch, ownProps ) => {
-		const { rootUID } = ownProps;
-		const { selectBlock } = dispatch( 'core/editor' );
-
-		return {
-			selectRootBlock: () => selectBlock( rootUID ),
 		};
 	} ),
 ] )( BlockBreadcrumb );

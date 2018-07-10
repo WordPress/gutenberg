@@ -1,12 +1,8 @@
 /**
- * External dependencies
- */
-import { filter, sortBy, once, flow } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { createBlock, getBlockTypes, hasBlockSupport } from '@wordpress/blocks';
+import { select } from '@wordpress/data';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -14,46 +10,88 @@ import { createBlock, getBlockTypes, hasBlockSupport } from '@wordpress/blocks';
 import './style.scss';
 import BlockIcon from '../block-icon';
 
-function filterBlockTypes( blockTypes ) {
-	// Exclude blocks that don't support being shown in the inserter
-	return filter( blockTypes, ( blockType ) => hasBlockSupport( blockType, 'inserter', true ) );
-}
-
-function sortBlockTypes( blockTypes ) {
-	// Prioritize blocks in the common common category
-	return sortBy( blockTypes, ( { category } ) => 'common' !== category );
+/**
+ * Get the UID of the parent where a newly inserted block would be placed.
+ *
+ * @return {string} The UID of the parent where a newly inserted block would be placed.
+ */
+function defaultGetBlockInsertionParentUID() {
+	return select( 'core/editor' ).getBlockInsertionPoint().rootUID;
 }
 
 /**
- * A blocks repeater for replacing the current block with a selected block type.
+ * Get the inserter items for the specified parent block.
  *
- * @type {Completer}
+ * @param {string} parentUID The UID of the block for which to retrieve inserter items.
+ *
+ * @return {Array<Editor.InserterItem>} The inserter items for the specified parent.
  */
-export default {
-	name: 'blocks',
-	className: 'editor-autocompleters__block',
-	triggerPrefix: '/',
-	options: once( function options() {
-		return Promise.resolve( flow( filterBlockTypes, sortBlockTypes )( getBlockTypes() ) );
-	} ),
-	getOptionKeywords( blockSettings ) {
-		const { title, keywords = [] } = blockSettings;
-		return [ ...keywords, title ];
-	},
-	getOptionLabel( blockSettings ) {
-		const { icon, title } = blockSettings;
-		return [
-			<BlockIcon key="icon" icon={ icon } />,
-			title,
-		];
-	},
-	allowContext( before, after ) {
-		return ! ( /\S/.test( before.toString() ) || /\S/.test( after.toString() ) );
-	},
-	getOptionCompletion( blockData ) {
-		return {
-			action: 'replace',
-			value: createBlock( blockData.name ),
-		};
-	},
-};
+function defaultGetInserterItems( parentUID ) {
+	return select( 'core/editor' ).getInserterItems( parentUID );
+}
+
+/**
+ * Get the name of the currently selected block.
+ *
+ * @return {string?} The name of the currently selected block or `null` if no block is selected.
+ */
+function defaultGetSelectedBlockName() {
+	const selectedBlock = select( 'core/editor' ).getSelectedBlock();
+	return selectedBlock ? selectedBlock.name : null;
+}
+
+/**
+ * Creates a blocks repeater for replacing the current block with a selected block type.
+ *
+ * @return {Completer} A blocks completer.
+ */
+export function createBlockCompleter( {
+	// Allow store-based selectors to be overridden for unit test.
+	getBlockInsertionParentUID = defaultGetBlockInsertionParentUID,
+	getInserterItems = defaultGetInserterItems,
+	getSelectedBlockName = defaultGetSelectedBlockName,
+} = {} ) {
+	return {
+		name: 'blocks',
+		className: 'editor-autocompleters__block',
+		triggerPrefix: '/',
+		options() {
+			const selectedBlockName = getSelectedBlockName();
+			return getInserterItems( getBlockInsertionParentUID() ).filter(
+				// Avoid offering to replace the current block with a block of the same type.
+				( inserterItem ) => selectedBlockName !== inserterItem.name
+			);
+		},
+		getOptionKeywords( inserterItem ) {
+			const { title, keywords = [] } = inserterItem;
+			return [ ...keywords, title ];
+		},
+		getOptionLabel( inserterItem ) {
+			const { icon, title } = inserterItem;
+			return [
+				<BlockIcon key="icon" icon={ icon && icon.src } />,
+				title,
+			];
+		},
+		allowContext( before, after ) {
+			return ! ( /\S/.test( before.toString() ) || /\S/.test( after.toString() ) );
+		},
+		getOptionCompletion( inserterItem ) {
+			const { name, initialAttributes } = inserterItem;
+			return {
+				action: 'replace',
+				value: createBlock( name, initialAttributes ),
+			};
+		},
+		isOptionDisabled( inserterItem ) {
+			return inserterItem.isDisabled;
+		},
+	};
+}
+
+/**
+ * Creates a blocks repeater for replacing the current block with a selected block type.
+ *
+ * @return {Completer} A blocks completer.
+ */
+export default createBlockCompleter();

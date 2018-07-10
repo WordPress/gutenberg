@@ -16,10 +16,15 @@ export {
 	default as serialize,
 	getBlockContent,
 	getBlockDefaultClassName,
+	getBlockMenuDefaultClassName,
 	getSaveElement,
+	getSaveContent,
 } from './serializer';
 export { isValidBlock } from './validation';
-export { getCategories } from './categories';
+export {
+	getCategories,
+	setCategories,
+} from './categories';
 export {
 	registerBlockType,
 	unregisterBlockType,
@@ -33,9 +38,13 @@ export {
 	getBlockSupport,
 	hasBlockSupport,
 	isSharedBlock,
+	getChildBlockNames,
+	hasChildBlocks,
 } from './registration';
 export {
 	isUnmodifiedDefaultBlock,
+	normalizeIconObject,
+	isValidIcon,
 } from './utils';
 export {
 	doBlocksMatchTemplate,

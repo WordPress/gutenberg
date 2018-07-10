@@ -12,6 +12,16 @@ exports[`splitting and merging blocks Should split and merge paragraph blocks us
 
 exports[`splitting and merging blocks Should split and merge paragraph blocks using Enter and Backspace 2`] = `
 "<!-- wp:paragraph -->
-<p>FirstSecond</p>
+<p>FirstBetweenSecond</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`splitting and merging blocks Should split and merge paragraph blocks using Enter and Backspace 3`] = `
+"<!-- wp:paragraph -->
+<p><strong>First</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>BeforeSecond:Second</p>
 <!-- /wp:paragraph -->"
 `;

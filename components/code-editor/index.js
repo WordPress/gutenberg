@@ -21,7 +21,7 @@ function loadScript() {
 		}
 
 		const script = document.createElement( 'script' );
-		script.src = `/wp-admin/load-scripts.php?load=${ handles.join( ',' ) }`;
+		script.src = `${ wpApiSettings.schema.url }/wp-admin/load-scripts.php?load=${ handles.join( ',' ) }`;
 		script.onload = resolve;
 		script.onerror = reject;
 
@@ -35,7 +35,7 @@ function loadStyle() {
 
 		const style = document.createElement( 'link' );
 		style.rel = 'stylesheet';
-		style.href = `/wp-admin/load-styles.php?load=${ handles.join( ',' ) }`;
+		style.href = `${ wpApiSettings.schema.url }/wp-admin/load-styles.php?load=${ handles.join( ',' ) }`;
 		style.onload = resolve;
 		style.onerror = reject;
 

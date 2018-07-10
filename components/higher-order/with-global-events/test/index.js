@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mount } from 'enzyme';
+import TestRenderer from 'react-test-renderer';
 
 /**
  * External dependencies
@@ -57,25 +57,29 @@ describe( 'withGlobalEvents', () => {
 		}
 	} );
 
-	function mountEnhancedComponent( props ) {
+	function mountEnhancedComponent( props = {} ) {
 		const EnhancedComponent = withGlobalEvents( {
 			resize: 'handleResize',
 		} )( OriginalComponent );
 
-		wrapper = mount( <EnhancedComponent { ...props }>Hello</EnhancedComponent> );
+		props.ref = () => {};
+
+		wrapper = TestRenderer.create( <EnhancedComponent { ...props }>Hello</EnhancedComponent> );
 	}
 
 	it( 'renders with original component', () => {
 		mountEnhancedComponent();
 
-		expect( wrapper.childAt( 0 ).childAt( 0 ).type() ).toBe( 'div' );
-		expect( wrapper.childAt( 0 ).text() ).toBe( 'Hello' );
+		expect( wrapper.root.findByType( 'div' ).children[ 0 ] ).toBe( 'Hello' );
 	} );
 
 	it( 'binds events from passed object', () => {
 		mountEnhancedComponent();
 
-		expect( Listener._instance.add ).toHaveBeenCalledWith( 'resize', wrapper.instance() );
+		// Get the HOC wrapper instance
+		const hocInstance = wrapper.root.findByType( OriginalComponent ).parent.instance;
+
+		expect( Listener._instance.add ).toHaveBeenCalledWith( 'resize', hocInstance );
 	} );
 
 	it( 'handles events', () => {

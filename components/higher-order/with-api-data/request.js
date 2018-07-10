@@ -4,6 +4,11 @@
 import memoize from 'memize';
 import { mapKeys } from 'lodash';
 
+/**
+ * WordPress dependencies
+ */
+import apiRequest from '@wordpress/api-request';
+
 export const getStablePath = memoize( ( path ) => {
 	const [ base, query ] = path.split( '?' );
 	if ( ! query ) {
@@ -75,7 +80,7 @@ export function getCachedResponse( request ) {
 }
 
 export function getResponseFromNetwork( request ) {
-	const promise = wp.apiRequest( request )
+	const promise = apiRequest( request )
 		.then( ( body, status, xhr ) => {
 			return {
 				body,

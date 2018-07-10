@@ -52,9 +52,10 @@ class UrlInputButton extends Component {
 				/>
 				{ expanded &&
 					<form
-						className="editor-format-toolbar__link-modal"
-						onSubmit={ this.submitLink }>
-						<div className="editor-format-toolbar__link-modal-line">
+						className="editor-url-input__button-modal"
+						onSubmit={ this.submitLink }
+					>
+						<div className="editor-url-input__button-modal-line">
 							<IconButton
 								className="editor-url-input__back"
 								icon="arrow-left-alt"

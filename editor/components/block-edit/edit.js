@@ -36,4 +36,4 @@ export const Edit = ( props ) => {
 	);
 };
 
-export default withFilters( 'blocks.BlockEdit' )( Edit );
+export default withFilters( 'editor.BlockEdit' )( Edit );

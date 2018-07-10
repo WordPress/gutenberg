@@ -23,7 +23,7 @@ describe( 'Autocomplete', () => {
 	let wrapper = null;
 
 	afterEach( () => {
-		removeFilter( 'blocks.Autocomplete.completers', 'test/autocompleters-hook' );
+		removeFilter( 'editor.Autocomplete.completers', 'test/autocompleters-hook' );
 
 		if ( wrapper ) {
 			wrapper.unmount();
@@ -34,7 +34,7 @@ describe( 'Autocomplete', () => {
 	it( 'filters supplied completers when next focused', () => {
 		const completersFilter = jest.fn();
 		addFilter(
-			'blocks.Autocomplete.completers',
+			'editor.Autocomplete.completers',
 			'test/autocompleters-hook',
 			completersFilter
 		);
@@ -55,7 +55,7 @@ describe( 'Autocomplete', () => {
 
 		const completersFilter = jest.fn();
 		addFilter(
-			'blocks.Autocomplete.completers',
+			'editor.Autocomplete.completers',
 			'test/autocompleters-hook',
 			completersFilter
 		);
@@ -70,7 +70,7 @@ describe( 'Autocomplete', () => {
 	it( 'provides copies of completers to filter', () => {
 		const completersFilter = jest.fn();
 		addFilter(
-			'blocks.Autocomplete.completers',
+			'editor.Autocomplete.completers',
 			'test/autocompleters-hook',
 			completersFilter
 		);
@@ -91,7 +91,7 @@ describe( 'Autocomplete', () => {
 		const expectedFilteredCompleters = [ {}, {} ];
 		const completersFilter = jest.fn( () => expectedFilteredCompleters );
 		addFilter(
-			'blocks.Autocomplete.completers',
+			'editor.Autocomplete.completers',
 			'test/autocompleters-hook',
 			completersFilter
 		);

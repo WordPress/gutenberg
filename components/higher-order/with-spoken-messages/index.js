@@ -6,7 +6,7 @@ import { debounce } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createHigherOrderComponent } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
 
 /**
@@ -17,7 +17,7 @@ import { speak } from '@wordpress/a11y';
  *
  * @return {Component} Component with an instanceId prop.
  */
-function withSpokenMessages( WrappedComponent ) {
+export default createHigherOrderComponent( ( WrappedComponent ) => {
 	return class extends Component {
 		constructor() {
 			super( ...arguments );
@@ -41,6 +41,4 @@ function withSpokenMessages( WrappedComponent ) {
 			);
 		}
 	};
-}
-
-export default withSpokenMessages;
+}, 'withSpokenMessages' );

@@ -2,20 +2,29 @@
  * External dependencies
  */
 import { find, kebabCase } from 'lodash';
+import deprecated from '@wordpress/deprecated';
 
 /**
- * Returns the color value based on an array of named colors and the namedColor or the customColor value.
+ * Returns the color value based on an array of named colors and the definedColor or the customColor value.
  *
- * @param {Array}   colors      Array of color objects containing the "name" and "color" value as properties.
- * @param {?string} namedColor  A string containing the color name.
- * @param {?string} customColor A string containing the customColor value.
+ * @param {Array}   colors        Array of color objects containing the "name", "slug" and "color" value as properties.
+ * @param {?string} definedColor  A string containing the color slug.
+ * @param {?string} customColor   A string containing the customColor value.
  *
- * @return {?string} If namedColor is passed and the name is found in colors it returns the color for that name.
+ * @return {?string} If definedColor is passed and the name is found in colors it returns the color for that name.
  * 					 Otherwise, the customColor parameter is returned.
  */
-export const getColorValue = ( colors, namedColor, customColor ) => {
-	if ( namedColor ) {
-		const colorObj = find( colors, { name: namedColor } );
+export const getColorValue = ( colors, definedColor, customColor ) => {
+	if ( definedColor ) {
+		let colorObj = find( colors, { slug: definedColor } );
+
+		if ( typeof colorObj === 'undefined' && typeof ( colorObj = find( colors, { name: definedColor } ) ) !== 'undefined' ) {
+			deprecated( 'Using color objects without slugs', {
+				version: '3.4',
+				hint: 'You might want to re-select the color if you have saved in previous versions. The frontend is unaffected by this deprecation.',
+			} );
+		}
+
 		return colorObj && colorObj.color;
 	}
 	if ( customColor ) {
@@ -39,7 +48,7 @@ export const getColorName = ( colors, colorValue ) => {
 /**
  * Returns a function that receives the color value and sets it using the attribute for named colors or for custom colors.
  *
- * @param {Array}  colors                   Array of color objects containing the "name" and "color" value as properties.
+ * @param {Array}  colors                   Array of color objects containing the "name", "slug" and "color" value as properties.
  * @param {string} colorAttributeName       Name of the attribute where named colors are stored.
  * @param {string} customColorAttributeName Name of the attribute where custom colors are stored.
  * @param {string} setAttributes            A function that receives an object with the attributes to set.
@@ -50,8 +59,8 @@ export const setColorValue = ( colors, colorAttributeName, customColorAttributeN
 	( colorValue ) => {
 		const colorObj = find( colors, { color: colorValue } );
 		setAttributes( {
-			[ colorAttributeName ]: colorObj && colorObj.name ? colorObj.name : undefined,
-			[ customColorAttributeName ]: colorObj && colorObj.name ? undefined : colorValue,
+			[ colorAttributeName ]: colorObj && colorObj.slug ? colorObj.slug : undefined,
+			[ customColorAttributeName ]: colorObj && colorObj.slug ? undefined : colorValue,
 		} );
 	};
 

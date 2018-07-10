@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+import { attr } from 'hpq';
+import deepFreeze from 'deep-freeze';
+
+/**
  * Internal dependencies
  */
 import {
@@ -6,16 +12,21 @@ import {
 	getBlockAttributes,
 	asType,
 	createBlockWithFallback,
-	getAttributesAndInnerBlocksFromDeprecatedVersion,
-	default as parse,
+	getMigratedBlock,
+	default as parsePegjs,
 	parseWithAttributeSchema,
+	toBooleanAttributeMatcher,
+	createParse,
 } from '../parser';
+import { parse as grammarParsePreGenerated } from '../post-grammar-parser-pre-generated';
 import {
 	registerBlockType,
 	unregisterBlockType,
 	getBlockTypes,
 	setUnknownTypeHandlerName,
 } from '../registration';
+import { createBlock } from '../factory';
+import serialize from '../serializer';
 
 describe( 'block parser', () => {
 	const defaultBlockSettings = {
@@ -50,6 +61,42 @@ describe( 'block parser', () => {
 		setUnknownTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
+		} );
+	} );
+
+	describe( 'toBooleanAttributeMatcher()', () => {
+		const originalMatcher = attr( 'disabled' );
+		const enhancedMatcher = toBooleanAttributeMatcher( originalMatcher );
+
+		it( 'should return a matcher returning false on unset attribute', () => {
+			const node = document.createElement( 'input' );
+
+			expect( originalMatcher( node ) ).toBe( undefined );
+			expect( enhancedMatcher( node ) ).toBe( false );
+		} );
+
+		it( 'should return a matcher returning true on implicit empty string attribute value', () => {
+			const node = document.createElement( 'input' );
+			node.disabled = true;
+
+			expect( originalMatcher( node ) ).toBe( '' );
+			expect( enhancedMatcher( node ) ).toBe( true );
+		} );
+
+		it( 'should return a matcher returning true on explicit empty string attribute value', () => {
+			const node = document.createElement( 'input' );
+			node.setAttribute( 'disabled', '' );
+
+			expect( originalMatcher( node ) ).toBe( '' );
+			expect( enhancedMatcher( node ) ).toBe( true );
+		} );
+
+		it( 'should return a matcher returning true on explicit string attribute value', () => {
+			const node = document.createElement( 'input' );
+			node.setAttribute( 'disabled', 'disabled' );
+
+			expect( originalMatcher( node ) ).toBe( 'disabled' );
+			expect( enhancedMatcher( node ) ).toBe( true );
 		} );
 	} );
 
@@ -102,6 +149,58 @@ describe( 'block parser', () => {
 				},
 			);
 			expect( value ).toBe( 'chicken' );
+		} );
+
+		it( 'should return the matcher\'s string attribute value', () => {
+			const value = parseWithAttributeSchema(
+				'<audio src="#" loop>',
+				{
+					type: 'string',
+					source: 'attribute',
+					selector: 'audio',
+					attribute: 'src',
+				},
+			);
+			expect( value ).toBe( '#' );
+		} );
+
+		it( 'should return the matcher\'s true boolean attribute value', () => {
+			const value = parseWithAttributeSchema(
+				'<audio src="#" loop>',
+				{
+					type: 'boolean',
+					source: 'attribute',
+					selector: 'audio',
+					attribute: 'loop',
+				},
+			);
+			expect( value ).toBe( true );
+		} );
+
+		it( 'should return the matcher\'s true boolean attribute value on explicit attribute value', () => {
+			const value = parseWithAttributeSchema(
+				'<audio src="#" loop="loop">',
+				{
+					type: 'boolean',
+					source: 'attribute',
+					selector: 'audio',
+					attribute: 'loop',
+				},
+			);
+			expect( value ).toBe( true );
+		} );
+
+		it( 'should return the matcher\'s false boolean attribute value', () => {
+			const value = parseWithAttributeSchema(
+				'<audio src="#" autoplay>',
+				{
+					type: 'boolean',
+					source: 'attribute',
+					selector: 'audio',
+					attribute: 'loop',
+				},
+			);
+			expect( value ).toBe( false );
 		} );
 	} );
 
@@ -185,130 +284,173 @@ describe( 'block parser', () => {
 		} );
 	} );
 
-	describe( 'getAttributesAndInnerBlocksFromDeprecatedVersion', () => {
-		it( 'should return undefined if the block has no deprecated versions', () => {
-			const attributesAndInnerBlocks = getAttributesAndInnerBlocksFromDeprecatedVersion(
-				defaultBlockSettings,
-				'<span class="wp-block-test-block">Bananas</span>',
-				{},
-			);
-			expect( attributesAndInnerBlocks ).toBeUndefined();
+	describe( 'getMigratedBlock', () => {
+		it( 'should return the original block if it has no deprecated versions', () => {
+			const block = deepFreeze( {
+				name: 'core/test-block',
+				attributes: {},
+				originalContent: '<span class="wp-block-test-block">Bananas</span>',
+				isValid: false,
+			} );
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			const migratedBlock = getMigratedBlock( block );
+
+			expect( migratedBlock ).toBe( block );
 		} );
 
-		it( 'should return undefined if no valid deprecated version found', () => {
-			const attributesAndInnerBlocks = getAttributesAndInnerBlocksFromDeprecatedVersion(
-				{
-					name: 'core/test-block',
-					...defaultBlockSettings,
-					deprecated: [
-						{
-							save() {
-								return 'nothing';
-							},
+		it( 'should return the original block if no valid deprecated version found', () => {
+			const block = deepFreeze( {
+				name: 'core/test-block',
+				attributes: {},
+				originalContent: '<span class="wp-block-test-block">Bananas</span>',
+				isValid: false,
+			} );
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				deprecated: [
+					{
+						save() {
+							return 'nothing';
 						},
-					],
-				},
-				'<span class="wp-block-test-block">Bananas</span>',
-				{},
-			);
-			expect( attributesAndInnerBlocks ).toBeUndefined();
+					},
+				],
+			} );
+
+			const migratedBlock = getMigratedBlock( block );
+
+			expect( migratedBlock ).toBe( block );
 			expect( console ).toHaveErrored();
 			expect( console ).toHaveWarned();
 		} );
 
-		it( 'should return the attributes parsed by the deprecated version', () => {
-			const attributesAndInnerBlocks = getAttributesAndInnerBlocksFromDeprecatedVersion(
-				{
-					name: 'core/test-block',
-					...defaultBlockSettings,
-					save: ( props ) => <div>{ props.attributes.fruit }</div>,
-					deprecated: [
-						{
-							attributes: {
-								fruit: {
-									type: 'string',
-									source: 'text',
-									selector: 'span',
-								},
+		it( 'should return with attributes parsed by the deprecated version', () => {
+			const block = deepFreeze( {
+				name: 'core/test-block',
+				attributes: {},
+				originalContent: '<span>Bananas</span>',
+				isValid: false,
+			} );
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				save: ( props ) => <div>{ props.attributes.fruit }</div>,
+				deprecated: [
+					{
+						attributes: {
+							fruit: {
+								type: 'string',
+								source: 'text',
+								selector: 'span',
 							},
-							save: ( props ) => <span>{ props.attributes.fruit }</span>,
 						},
-					],
-				},
-				'<span>Bananas</span>',
-				{},
-			);
-			expect( attributesAndInnerBlocks.attributes ).toEqual( { fruit: 'Bananas' } );
-		} );
+						save: ( props ) => <span>{ props.attributes.fruit }</span>,
+					},
+				],
+			} );
 
-		it( 'should return the innerBlocks if they are passed', () => {
-			const attributesAndInnerBlocks = getAttributesAndInnerBlocksFromDeprecatedVersion(
-				{
-					name: 'core/test-block',
-					...defaultBlockSettings,
-					save: ( props ) => <div>{ props.attributes.fruit }</div>,
-					deprecated: [
-						{
-							attributes: {
-								fruit: {
-									type: 'string',
-									source: 'text',
-									selector: 'span',
-								},
-							},
-							save: ( props ) => <span>{ props.attributes.fruit }</span>,
-						},
-					],
-				},
-				'<span>Bananas</span>',
-				{},
-				[ {
-					name: 'core/test-block',
-					attributes: { aaa: 'bbb' },
-				} ]
-			);
+			const migratedBlock = getMigratedBlock( block );
 
-			expect( attributesAndInnerBlocks.innerBlocks ).toHaveLength( 1 );
-			expect( attributesAndInnerBlocks.innerBlocks[ 0 ].name ).toEqual( 'core/test-block' );
-			expect( attributesAndInnerBlocks.innerBlocks[ 0 ].attributes ).toEqual( { aaa: 'bbb' } );
+			expect( migratedBlock.attributes ).toEqual( { fruit: 'Bananas' } );
 		} );
 
 		it( 'should be able to migrate attributes and innerBlocks', () => {
-			const attributesAndInnerBlocks = getAttributesAndInnerBlocksFromDeprecatedVersion(
-				{
-					name: 'core/test-block',
-					...defaultBlockSettings,
-					save: ( props ) => <div>{ props.attributes.fruit }</div>,
-					deprecated: [
-						{
-							attributes: {
-								fruit: {
-									type: 'string',
-									source: 'text',
-									selector: 'span',
-								},
-							},
-							save: ( props ) => <span>{ props.attributes.fruit }</span>,
-							migrate: ( attributes ) => {
-								return [
-									{ newFruit: attributes.fruit },
-									[ {
-										name: 'core/test-block',
-										attributes: { aaa: 'bbb' },
-									} ],
-								];
+			const block = deepFreeze( {
+				name: 'core/test-block',
+				attributes: {},
+				originalContent: '<span>Bananas</span>',
+				isValid: false,
+			} );
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				save: ( props ) => <div>{ props.attributes.fruit }</div>,
+				deprecated: [
+					{
+						attributes: {
+							fruit: {
+								type: 'string',
+								source: 'text',
+								selector: 'span',
 							},
 						},
-					],
-				},
-				'<span>Bananas</span>',
-				{},
-			);
+						save: ( props ) => <span>{ props.attributes.fruit }</span>,
+						migrate: ( attributes ) => {
+							return [
+								{ newFruit: attributes.fruit },
+								[ {
+									name: 'core/test-block',
+									attributes: { aaa: 'bbb' },
+								} ],
+							];
+						},
+					},
+				],
+			} );
 
-			expect( attributesAndInnerBlocks.attributes ).toEqual( { newFruit: 'Bananas' } );
-			expect( attributesAndInnerBlocks.innerBlocks ).toHaveLength( 1 );
-			expect( attributesAndInnerBlocks.innerBlocks[ 0 ].name ).toEqual( 'core/test-block' );
-			expect( attributesAndInnerBlocks.innerBlocks[ 0 ].attributes ).toEqual( { aaa: 'bbb' } );
+			const migratedBlock = getMigratedBlock( block );
+
+			expect( migratedBlock.attributes ).toEqual( { newFruit: 'Bananas' } );
+			expect( migratedBlock.innerBlocks ).toHaveLength( 1 );
+			expect( migratedBlock.innerBlocks[ 0 ].name ).toEqual( 'core/test-block' );
+			expect( migratedBlock.innerBlocks[ 0 ].attributes ).toEqual( { aaa: 'bbb' } );
+		} );
+
+		it( 'should ignore valid uneligible blocks', () => {
+			const block = deepFreeze( {
+				name: 'core/test-block',
+				attributes: {
+					fruit: 'Bananas',
+				},
+				originalContent: 'Bananas',
+				isValid: true,
+			} );
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				deprecated: [
+					{
+						attributes: defaultBlockSettings.attributes,
+						save: defaultBlockSettings.save,
+						migrate( attributes ) {
+							return {
+								fruit: attributes.fruit + '!',
+							};
+						},
+					},
+				],
+			} );
+
+			const migratedBlock = getMigratedBlock( block );
+
+			expect( migratedBlock.attributes ).toEqual( { fruit: 'Bananas' } );
+		} );
+
+		it( 'should allow opt-in eligibility of valid block', () => {
+			const block = deepFreeze( {
+				name: 'core/test-block',
+				attributes: {
+					fruit: 'Bananas',
+				},
+				originalContent: 'Bananas',
+				isValid: true,
+			} );
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				deprecated: [
+					{
+						attributes: defaultBlockSettings.attributes,
+						save: defaultBlockSettings.save,
+						isEligible: () => true,
+						migrate( attributes ) {
+							return {
+								fruit: attributes.fruit + '!',
+							};
+						},
+					},
+				],
+			} );
+
+			const migratedBlock = getMigratedBlock( block );
+
+			expect( migratedBlock.attributes ).toEqual( { fruit: 'Bananas!' } );
 		} );
 	} );
 
@@ -407,7 +549,19 @@ describe( 'block parser', () => {
 		} );
 	} );
 
-	describe( 'parse()', () => {
+	describe( 'parse() of pegjs parser', () => {
+		// run the test cases using the PegJS defined parser
+		testCases( parsePegjs );
+	} );
+
+	describe( 'parse() of pre-generated parser', () => {
+		// run the test cases using the pre-generated parser
+		const parsePreGenerated = createParse( grammarParsePreGenerated );
+		testCases( parsePreGenerated );
+	} );
+
+	// encapsulate the test cases so we can run them multiple time but with a different parse() function
+	function testCases( parse ) {
 		it( 'should parse the post content, including block attributes', () => {
 			registerBlockType( 'core/test-block', {
 				attributes: {
@@ -571,5 +725,24 @@ describe( 'block parser', () => {
 				'core/test-block', 'core/void-block',
 			] );
 		} );
-	} );
+
+		it( 'should parse with unicode escaped returned to original representation', () => {
+			registerBlockType( 'core/code', {
+				category: 'common',
+				title: 'Code Block',
+				attributes: {
+					content: {
+						type: 'string',
+					},
+				},
+				save: ( { attributes } ) => attributes.content,
+			} );
+
+			const content = '$foo = "My \"escaped\" text.";';
+			const block = createBlock( 'core/code', { content } );
+			const serialized = serialize( block );
+			const parsed = parse( serialized );
+			expect( parsed[ 0 ].attributes.content ).toBe( content );
+		} );
+	}
 } );

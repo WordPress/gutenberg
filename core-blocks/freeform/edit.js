@@ -3,14 +3,12 @@
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { keycodes } from '@wordpress/utils';
+import { BACKSPACE, DELETE, F10 } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
-
-const { BACKSPACE, DELETE, F10 } = keycodes;
 
 function isTmceEmpty( editor ) {
 	// When tinyMce is empty the content seems to be:

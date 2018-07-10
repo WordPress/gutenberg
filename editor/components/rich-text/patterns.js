@@ -7,14 +7,8 @@ import { filter, escapeRegExp, groupBy, drop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { keycodes } from '@wordpress/utils';
+import { ESCAPE, ENTER, SPACE, BACKSPACE } from '@wordpress/keycodes';
 import { getBlockTransforms, findTransform } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
-
-const { ESCAPE, ENTER, SPACE, BACKSPACE } = keycodes;
 
 export default function( editor ) {
 	const getContent = this.getContent.bind( this );

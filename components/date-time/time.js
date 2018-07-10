@@ -39,13 +39,13 @@ class TimePicker extends Component {
 		this.syncState( this.props );
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		const { currentTime, is12Hour } = nextProps;
+	componentDidUpdate( prevProps ) {
+		const { currentTime, is12Hour } = this.props;
 		if (
-			currentTime !== this.props.currentTime ||
-			is12Hour !== this.props.is12Hour
+			currentTime !== prevProps.currentTime ||
+			is12Hour !== prevProps.is12Hour
 		) {
-			this.syncState( nextProps );
+			this.syncState( this.props );
 		}
 	}
 

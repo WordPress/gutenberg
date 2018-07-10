@@ -45,7 +45,7 @@ className of the global container
 
 ### contentClassName
 
-If you want to target the dropdown menu for styling purposes, you need to provide a contentClassName because it's not being rendered as a children of the container nodee.
+If you want to target the dropdown menu for styling purposes, you need to provide a contentClassName because it's not being rendered as a children of the container node.
 
 - Type: `String`
 - Required: No

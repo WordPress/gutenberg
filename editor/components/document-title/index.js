@@ -14,22 +14,22 @@ class DocumentTitle extends Component {
 		this.originalDocumentTitle = document.title;
 	}
 
-	setDocumentTitle( title ) {
-		document.title = title + ' | ' + this.originalDocumentTitle;
-	}
-
 	componentDidMount() {
 		this.setDocumentTitle( this.props.title );
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		if ( nextProps.title !== this.props.title ) {
-			this.setDocumentTitle( nextProps.title );
+	componentDidUpdate( prevProps ) {
+		if ( prevProps.title !== this.props.title ) {
+			this.setDocumentTitle( this.props.title );
 		}
 	}
 
 	componentWillUnmount() {
 		document.title = this.originalDocumentTitle;
+	}
+
+	setDocumentTitle( title ) {
+		document.title = title + ' | ' + this.originalDocumentTitle;
 	}
 
 	render() {

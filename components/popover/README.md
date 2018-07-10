@@ -53,15 +53,19 @@ The component accepts the following props. Props not included in this set will b
 
 ### focusOnMount
 
-By default, the popover will receive focus when it mounts. To suppress this behavior, assign `focusOnMount` to `false`. This should only be assigned when an appropriately accessible substitute behavior exists.
+By default, the *first tabblable element* in the popover will receive focus when it mounts. This is the same as setting `focusOnMount` to `"firstElement"`. If you want to focus the container instead, you can set `focusOnMount` to `"container"`.
 
-- Type: `Boolean`
+Set this prop to `false` to disable focus changing entirely. This should only be set when an appropriately accessible substitute behavior exists.
+
+**Deprecation notice:** Before Gutenberg 3.2 this value was `Boolean` and the value `true` was equivalent to `"firstElement"`. This behaviour is deprecated and will cause a console warning message.
+
+- Type: `String` or `Boolean`
 - Required: No
-- Default: `true`
+- Default: `"firstElement"`
 
 ### position
 
-The direction in which the popover should open relative to its parent node. Specify y- and x-axis as a space-separated string. Supports `"top"`, `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
+The direction in which the popover should open relative to its parent node. Specify y- and x-axis as a space-separated string. Supports `"top"`, `"middle"`, `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
 
 - Type: `String`
 - Required: No
@@ -103,9 +107,23 @@ Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to 
  - Required: No
  - Default: `false`
 
- ## headerTitle
+ ### headerTitle
 
  Set this to customize the text that is shown in popover's header when it is fullscreen on mobile.
 
  - Type: `String`
  - Required: No
+
+ ### noArrow
+
+ Set this to hide the arrow which visually indicates what the popover is anchored to. Note that the arrow will not display if `position` is set to `"middle center"`.
+
+ - Type: `Boolean`
+ - Required: No
+ - Default: `false`
+
+## Methods
+
+### refresh
+
+Calling `refresh()` will force the Popover to recalculate its size and position. This is useful when a DOM change causes the anchor node to change position.

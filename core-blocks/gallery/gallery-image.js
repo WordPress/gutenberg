@@ -9,14 +9,9 @@ import classnames from 'classnames';
 import { Component } from '@wordpress/element';
 import { IconButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { keycodes } from '@wordpress/utils';
+import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { withSelect } from '@wordpress/data';
 import { RichText } from '@wordpress/editor';
-
-/**
- * Module constants
- */
-const { BACKSPACE, DELETE } = keycodes;
 
 class GalleryImage extends Component {
 	constructor() {
@@ -71,7 +66,8 @@ class GalleryImage extends Component {
 		}
 	}
 
-	componentWillReceiveProps( { isSelected, image, url } ) {
+	componentDidUpdate( prevProps ) {
+		const { isSelected, image, url } = this.props;
 		if ( image && ! url ) {
 			this.props.setAttributes( {
 				url: image.source_url,
@@ -81,7 +77,7 @@ class GalleryImage extends Component {
 
 		// unselect the caption so when the user selects other image and comeback
 		// the caption is not immediately selected
-		if ( this.state.captionSelected && ! isSelected && this.props.isSelected ) {
+		if ( this.state.captionSelected && ! isSelected && prevProps.isSelected ) {
 			this.setState( {
 				captionSelected: false,
 			} );
@@ -134,7 +130,7 @@ class GalleryImage extends Component {
 						value={ caption }
 						isSelected={ this.state.captionSelected }
 						onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-						onFocus={ this.onSelectCaption }
+						unstableOnFocus={ this.onSelectCaption }
 						inlineToolbar
 					/>
 				) : null }

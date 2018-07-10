@@ -19,6 +19,7 @@ import {
 	BlockAlignmentToolbar,
 	RichText,
 } from '@wordpress/editor';
+import apiRequest from '@wordpress/api-request';
 
 /**
  * Internal dependencies
@@ -30,7 +31,7 @@ import './editor.scss';
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
 // Caches the embed API calls, so if blocks get transformed, or deleted and added again, we don't spam the API.
-const wpEmbedAPI = memoize( ( url ) => wp.apiRequest( { path: `/oembed/1.0/proxy?${ stringify( { url } ) }` } ) );
+const wpEmbedAPI = memoize( ( url ) => apiRequest( { path: `/oembed/1.0/proxy?${ stringify( { url } ) }` } ) );
 
 const matchesPatterns = ( url, patterns = [] ) => {
 	return patterns.some( ( pattern ) => {
@@ -101,7 +102,7 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 				};
 			}
 
-			componentWillMount() {
+			componentDidMount() {
 				this.doServerSideRender();
 			}
 
@@ -208,6 +209,7 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 				}
 
 				if ( ! html ) {
+					// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
 					const label = sprintf( __( '%s URL' ), title );
 
 					return (
@@ -236,6 +238,7 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 
 				const parsedUrl = parse( url );
 				const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedUrl.host.replace( /^www\./, '' ) );
+				// translators: %s: host providing embed content e.g: www.youtube.com
 				const iframeTitle = sprintf( __( 'Embedded content from %s' ), parsedUrl.host );
 				const embedWrapper = 'wp-embed' === type ? (
 					<div
@@ -255,7 +258,7 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 				return (
 					<Fragment>
 						{ controls }
-						<figure className={ classnames( className, { 'is-video': 'video' === type } ) }>
+						<figure className={ classnames( className, 'wp-block-embed', { 'is-video': 'video' === type } ) }>
 							{ ( cannotPreview ) ? (
 								<Placeholder icon={ icon } label={ __( 'Embed URL' ) }>
 									<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>

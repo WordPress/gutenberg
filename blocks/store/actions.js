@@ -58,3 +58,17 @@ export function setFallbackBlockName( name ) {
 		name,
 	};
 }
+
+/**
+ * Returns an action object used to set block categories.
+ *
+ * @param {Object[]} categories Block categories.
+ *
+ * @return {Object} Action object.
+ */
+export function setCategories( categories ) {
+	return {
+		type: 'SET_CATEGORIES',
+		categories,
+	};
+}

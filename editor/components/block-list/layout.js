@@ -18,6 +18,7 @@ import 'element-closest';
  */
 import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -193,7 +194,7 @@ class BlockListLayout extends Component {
 			layout,
 			isGroupedByLayout,
 			rootUID,
-			renderBlockMenu,
+			canInsertDefaultBlock,
 		} = this.props;
 
 		let defaultLayout;
@@ -219,30 +220,33 @@ class BlockListLayout extends Component {
 						layout={ defaultLayout }
 						isFirst={ blockIndex === 0 }
 						isLast={ blockIndex === blockUIDs.length - 1 }
-						renderBlockMenu={ renderBlockMenu }
 					/>
 				) ) }
-				<IgnoreNestedEvents childHandledEvents={ [ 'onFocus', 'onClick', 'onKeyDown' ] }>
-					<DefaultBlockAppender
-						rootUID={ rootUID }
-						lastBlockUID={ last( blockUIDs ) }
-						layout={ defaultLayout }
-					/>
-				</IgnoreNestedEvents>
+				{ canInsertDefaultBlock && (
+					<IgnoreNestedEvents childHandledEvents={ [ 'onFocus', 'onClick', 'onKeyDown' ] }>
+						<DefaultBlockAppender
+							rootUID={ rootUID }
+							lastBlockUID={ last( blockUIDs ) }
+							layout={ defaultLayout }
+						/>
+					</IgnoreNestedEvents>
+				) }
 			</div>
 		);
 	}
 }
 
 export default compose( [
-	withSelect( ( select ) => {
+	withSelect( ( select, ownProps ) => {
 		const {
 			isSelectionEnabled,
 			isMultiSelecting,
 			getMultiSelectedBlocksStartUid,
 			getMultiSelectedBlocksEndUid,
 			getBlockSelectionStart,
+			canInsertBlockType,
 		} = select( 'core/editor' );
+		const { rootUID } = ownProps;
 
 		return {
 			selectionStart: getMultiSelectedBlocksStartUid(),
@@ -250,6 +254,7 @@ export default compose( [
 			selectionStartUID: getBlockSelectionStart(),
 			isSelectionEnabled: isSelectionEnabled(),
 			isMultiSelecting: isMultiSelecting(),
+			canInsertDefaultBlock: canInsertBlockType( getDefaultBlockName(), rootUID ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

@@ -38,7 +38,13 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
   <WithSelect(WithDispatch(InserterWithShortcuts)) />
   <WithSelect(WithDispatch(Inserter))
     position="top right"
-  />
+  >
+    <WithSafeTimeout(WithSelect(WithDispatch(DotTip)))
+      id="core/editor.inserter"
+    >
+      Welcome to the wonderful world of blocks! Click the “+” (“Add block”) button to add a new block. There are blocks available for all kind of content: you can insert text, headings, images, lists, and lots more!
+    </WithSafeTimeout(WithSelect(WithDispatch(DotTip)))>
+  </WithSelect(WithDispatch(Inserter))>
 </div>
 `;
 
@@ -62,7 +68,13 @@ exports[`DefaultBlockAppender should match snapshot 1`] = `
   <WithSelect(WithDispatch(InserterWithShortcuts)) />
   <WithSelect(WithDispatch(Inserter))
     position="top right"
-  />
+  >
+    <WithSafeTimeout(WithSelect(WithDispatch(DotTip)))
+      id="core/editor.inserter"
+    >
+      Welcome to the wonderful world of blocks! Click the “+” (“Add block”) button to add a new block. There are blocks available for all kind of content: you can insert text, headings, images, lists, and lots more!
+    </WithSafeTimeout(WithSelect(WithDispatch(DotTip)))>
+  </WithSelect(WithDispatch(Inserter))>
 </div>
 `;
 
@@ -86,6 +98,12 @@ exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
   <WithSelect(WithDispatch(InserterWithShortcuts)) />
   <WithSelect(WithDispatch(Inserter))
     position="top right"
-  />
+  >
+    <WithSafeTimeout(WithSelect(WithDispatch(DotTip)))
+      id="core/editor.inserter"
+    >
+      Welcome to the wonderful world of blocks! Click the “+” (“Add block”) button to add a new block. There are blocks available for all kind of content: you can insert text, headings, images, lists, and lots more!
+    </WithSafeTimeout(WithSelect(WithDispatch(DotTip)))>
+  </WithSelect(WithDispatch(Inserter))>
 </div>
 `;

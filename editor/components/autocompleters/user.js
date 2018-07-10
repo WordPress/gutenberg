@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import apiRequest from '@wordpress/api-request';
+
+/**
 * A user mentions completer.
 *
 * @type {Completer}
@@ -12,7 +17,7 @@ export default {
 		if ( search ) {
 			payload = '?search=' + encodeURIComponent( search );
 		}
-		return wp.apiRequest( { path: '/wp/v2/users' + payload } );
+		return apiRequest( { path: '/wp/v2/users' + payload } );
 	},
 	isDebounced: true,
 	getOptionKeywords( user ) {

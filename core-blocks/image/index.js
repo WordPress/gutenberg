@@ -14,6 +14,7 @@ import {
 	getPhrasingContentSchema,
 } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
+import { createBlobURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -59,6 +60,10 @@ const blockAttributes = {
 	},
 	height: {
 		type: 'number',
+	},
+	linkDestination: {
+		type: 'string',
+		default: 'none',
 	},
 };
 
@@ -112,8 +117,11 @@ export const settings = {
 					const align = alignMatches ? alignMatches[ 1 ] : undefined;
 					const idMatches = /(?:^|\s)wp-image-(\d+)(?:$|\s)/.exec( className );
 					const id = idMatches ? idMatches[ 1 ] : undefined;
+					const anchorElement = node.querySelector( 'a' );
+					const linkDestination = anchorElement && anchorElement.href ? 'custom' : undefined;
+					const href = anchorElement && anchorElement.href ? anchorElement.href : undefined;
 					const blockType = getBlockType( 'core/image' );
-					const attributes = getBlockAttributes( blockType, node.outerHTML, { align, id } );
+					const attributes = getBlockAttributes( blockType, node.outerHTML, { align, id, linkDestination, href } );
 					return createBlock( 'core/image', attributes );
 				},
 			},
@@ -128,7 +136,7 @@ export const settings = {
 					// It's already done as part of the `componentDidMount`
 					// int the image block
 					const block = createBlock( 'core/image', {
-						url: window.URL.createObjectURL( file ),
+						url: createBlobURL( file ),
 					} );
 
 					return block;
@@ -194,8 +202,9 @@ export const settings = {
 	save( { attributes } ) {
 		const { url, alt, caption, align, href, width, height, id } = attributes;
 
-		const classes = classnames( align ? `align${ align }` : null, {
-			'is-resized': !! width || !! height,
+		const classes = classnames( {
+			[ `align${ align }` ]: align,
+			'is-resized': width || height,
 		} );
 
 		const image = (

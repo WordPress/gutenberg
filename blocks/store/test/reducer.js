@@ -99,18 +99,17 @@ describe( 'categories', () => {
 		expect( categories( undefined, {} ) ).toEqual( DEFAULT_CATEGORIES );
 	} );
 
-	it( 'should add add a new category', () => {
+	it( 'should override categories', () => {
 		const original = deepFreeze( [
 			{ slug: 'chicken', title: 'Chicken' },
 		] );
 
 		const state = categories( original, {
-			type: 'ADD_CATEGORIES',
+			type: 'SET_CATEGORIES',
 			categories: [ { slug: 'wings', title: 'Wings' } ],
 		} );
 
 		expect( state ).toEqual( [
-			{ slug: 'chicken', title: 'Chicken' },
 			{ slug: 'wings', title: 'Wings' },
 		] );
 	} );

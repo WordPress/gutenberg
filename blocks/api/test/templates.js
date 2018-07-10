@@ -166,6 +166,14 @@ describe( 'templates', () => {
 			] );
 		} );
 
+		it( 'should return original blocks if no template provided', () => {
+			let template;
+			const block1 = createBlock( 'core/test-block' );
+			const block2 = createBlock( 'core/test-block' );
+			const blockList = [ block1, block2 ];
+			expect( synchronizeBlocksWithTemplate( blockList, template ) ).toBe( blockList );
+		} );
+
 		it( 'should remove blocks if extra blocks are found', () => {
 			const template = [
 				[ 'core/test-block' ],

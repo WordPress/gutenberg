@@ -10,50 +10,61 @@ class Vendor_Script_Filename_Test extends WP_UnitTestCase {
 		return array(
 			// Development mode scripts.
 			array(
-				'https://unpkg.com/react@16.3.2/umd/react.development.js',
-				'react.HASH.js',
+				'react-handle',
+				'https://unpkg.com/react@16.4.1/umd/react.development.js',
+				'react-handle.HASH.js',
 			),
 			array(
-				'https://unpkg.com/react-dom@16.3.2/umd/react-dom.development.js',
-				'react-dom.HASH.js',
+				'react-dom-handle',
+				'https://unpkg.com/react-dom@16.4.1/umd/react-dom.development.js',
+				'react-dom-handle.HASH.js',
 			),
 			array(
+				'tinymce-handle',
 				'https://fiddle.azurewebsites.net/tinymce/nightly/tinymce.js',
-				'tinymce.HASH.js',
+				'tinymce-handle.HASH.js',
 			),
 			array(
+				'tinymce-plugin-handle',
 				'https://fiddle.azurewebsites.net/tinymce/nightly/plugins/lists/plugin.js',
 				'tinymce-plugin-lists.HASH.js',
 			),
 			// Production mode scripts.
 			array(
-				'https://unpkg.com/react@16.3.2/umd/react.production.min.js',
-				'react.min.HASH.js',
+				'react-handle',
+				'https://unpkg.com/react@16.4.1/umd/react.production.min.js',
+				'react-handle.min.HASH.js',
 			),
 			array(
-				'https://unpkg.com/react-dom@16.3.2/umd/react-dom.production.min.js',
-				'react-dom.min.HASH.js',
+				'react-dom-handle',
+				'https://unpkg.com/react-dom@16.4.1/umd/react-dom.production.min.js',
+				'react-dom-handle.min.HASH.js',
 			),
 			array(
+				'tinymce-handle',
 				'https://fiddle.azurewebsites.net/tinymce/nightly/tinymce.min.js',
-				'tinymce.min.HASH.js',
+				'tinymce-handle.min.HASH.js',
 			),
 			array(
+				'tinymce-plugin-handle',
 				'https://fiddle.azurewebsites.net/tinymce/nightly/plugins/lists/plugin.min.js',
 				'tinymce-plugin-lists.min.HASH.js',
 			),
 			// Other cases.
 			array(
+				'something-handle',
 				'http://localhost/something.js?querystring',
-				'something.HASH.js',
+				'something-handle.HASH.js',
 			),
 			array(
+				'something-handle',
 				'http://localhost/something.min.js?querystring',
-				'something.min.HASH.js',
+				'something-handle.min.HASH.js',
 			),
 			array(
+				'idkwhatthisis-handle',
 				'http://localhost/idkwhatthisis',
-				'idkwhatthisis.HASH.js',
+				'idkwhatthisis-handle.HASH.js',
 			),
 		);
 	}
@@ -61,9 +72,9 @@ class Vendor_Script_Filename_Test extends WP_UnitTestCase {
 	/**
 	 * @dataProvider vendor_script_filename_cases
 	 */
-	function test_gutenberg_vendor_script_filename( $url, $expected_filename_pattern ) {
+	function test_gutenberg_vendor_script_filename( $handle, $url, $expected_filename_pattern ) {
 		$hash                    = substr( md5( $url ), 0, 8 );
-		$actual_filename         = gutenberg_vendor_script_filename( $url );
+		$actual_filename         = gutenberg_vendor_script_filename( $handle, $url );
 		$actual_filename_pattern = str_replace( $hash, 'HASH', $actual_filename );
 		$this->assertEquals(
 			$expected_filename_pattern,

@@ -12,7 +12,7 @@
                 },
                 " Tool"
             ],
-            "nodeName": "H2"
+            "level": 2
         },
         "innerBlocks": [],
         "originalContent": "<h2>The <em>Inserter</em> Tool</h2>"

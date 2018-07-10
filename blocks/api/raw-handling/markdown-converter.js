@@ -10,6 +10,7 @@ const converter = new showdown.Converter( {
 	literalMidWordUnderscores: true,
 	omitExtraWLInCodeBlocks: true,
 	simpleLineBreaks: true,
+	strikethrough: true,
 } );
 
 /**

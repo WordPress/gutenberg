@@ -44,9 +44,9 @@ We put issues into [milestones](https://github.com/wordpress/gutenberg/milestone
 - [Merge Proposal: Rest API](https://github.com/WordPress/gutenberg/milestone/39): All issues related to merge proposal for the Rest API
 - [Merge Proposal: Accessibility](https://github.com/WordPress/gutenberg/milestone/43): All accessibility issues related to merge proposal.
 - [Merge Proposal: Media](https://github.com/WordPress/gutenberg/milestone/42): All issues related to merge proposal for the media component.
-- [Merge Proposal: Documentation](https://github.com/WordPress/gutenberg/milestone/50): All issues related to documenation for the merge proposal.
+- [Merge Proposal: Documentation](https://github.com/WordPress/gutenberg/milestone/50): All issues related to documentation for the merge proposal.
 - [Merge Proposal: i18n](https://github.com/WordPress/gutenberg/milestone/49): All translation issues for the merge proposal.
-- [Merge Proposal: Customziation](https://github.com/WordPress/gutenberg/milestone/44): All Customization issues for the merge proposal.
+- [Merge Proposal: Customization](https://github.com/WordPress/gutenberg/milestone/44): All Customization issues for the merge proposal.
 - [Merge Proposal: Plugin](https://github.com/WordPress/gutenberg/milestone/48): All plugin and extensibility issues for the merge proposal.
 - [Merge Proposal: Back Compat](https://github.com/WordPress/gutenberg/milestone/47): All back compatibility issues for the merge proposal.
 - [Merge Proposal: Themes](https://github.com/WordPress/gutenberg/milestone/48): All theme issues for the merge proposal.

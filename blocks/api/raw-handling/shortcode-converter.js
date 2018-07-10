@@ -4,16 +4,16 @@
 import { some, castArray, first, mapValues, pickBy, includes } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { regexp, next } from '@wordpress/shortcode';
+
+/**
  * Internal dependencies
  */
 import { createBlock, getBlockTransforms, findTransform } from '../factory';
 import { getBlockType } from '../registration';
 import { getBlockAttributes } from '../parser';
-
-/**
- * Browser dependencies
- */
-const { shortcode } = window.wp;
 
 function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0 ) {
 	// Get all matches.
@@ -21,7 +21,7 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0 ) {
 
 	const transformation = findTransform( transformsFrom, ( transform ) => (
 		transform.type === 'shortcode' &&
-		some( castArray( transform.tag ), ( tag ) => shortcode.regexp( tag ).test( HTML ) )
+		some( castArray( transform.tag ), ( tag ) => regexp( tag ).test( HTML ) )
 	) );
 
 	if ( ! transformation ) {
@@ -33,7 +33,7 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0 ) {
 
 	let match;
 
-	if ( ( match = shortcode.next( transformTag, HTML, lastIndex ) ) ) {
+	if ( ( match = next( transformTag, HTML, lastIndex ) ) ) {
 		const beforeHTML = HTML.substr( 0, match.index );
 
 		lastIndex = match.index + match.content.length;

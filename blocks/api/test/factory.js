@@ -251,7 +251,7 @@ describe( 'block factory', () => {
 			expect( availableBlocks[ 0 ].name ).toBe( 'core/text-block' );
 		} );
 
-		it( 'should not show a transformation if multiple blocks are passed and the transformation is not multi block', () => {
+		it( 'should not show a transformation if multiple blocks are passed and the transformation is not multi block (for a "from" transform)', () => {
 			registerBlockType( 'core/updated-text-block', {
 				attributes: {
 					value: {
@@ -284,7 +284,40 @@ describe( 'block factory', () => {
 			expect( availableBlocks ).toEqual( [] );
 		} );
 
-		it( 'should show a transformation as available if multiple blocks are passed and the transformation accepts multiple blocks', () => {
+		it( 'should not show a transformation if multiple blocks are passed and the transformation is not multi block (for a "to" transform)', () => {
+			registerBlockType( 'core/text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [ {
+						type: 'block',
+						blocks: [ 'core/updated-text-block' ],
+						transform: noop,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/updated-text-block', defaultBlockSettings );
+
+			const block1 = createBlock( 'core/text-block', {
+				value: 'chicken',
+			} );
+
+			const block2 = createBlock( 'core/text-block', {
+				value: 'ribs',
+			} );
+
+			const availableBlocks = getPossibleBlockTransformations( [ block1, block2 ] );
+
+			expect( availableBlocks ).toEqual( [] );
+		} );
+
+		it( 'should show a transformation as available if multiple blocks are passed and the transformation accepts multiple blocks (for a "from" transform)', () => {
 			registerBlockType( 'core/updated-text-block', {
 				attributes: {
 					value: {
@@ -319,7 +352,42 @@ describe( 'block factory', () => {
 			expect( availableBlocks[ 0 ].name ).toBe( 'core/updated-text-block' );
 		} );
 
-		it( 'should show multiple possible transformations"', () => {
+		it( 'should show a transformation as available if multiple blocks are passed and the transformation accepts multiple blocks (for a "to" transform)', () => {
+			registerBlockType( 'core/text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [ {
+						type: 'block',
+						blocks: [ 'core/updated-text-block' ],
+						transform: noop,
+						isMultiBlock: true,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/updated-text-block', defaultBlockSettings );
+
+			const block1 = createBlock( 'core/text-block', {
+				value: 'chicken',
+			} );
+
+			const block2 = createBlock( 'core/text-block', {
+				value: 'ribs',
+			} );
+
+			const availableBlocks = getPossibleBlockTransformations( [ block1, block2 ] );
+
+			expect( availableBlocks ).toHaveLength( 1 );
+			expect( availableBlocks[ 0 ].name ).toBe( 'core/updated-text-block' );
+		} );
+
+		it( 'should show multiple possible transformations', () => {
 			registerBlockType( 'core/updated-text-block', {
 				attributes: {
 					value: {
@@ -355,6 +423,279 @@ describe( 'block factory', () => {
 			expect( availableBlocks ).toHaveLength( 2 );
 			expect( availableBlocks[ 0 ].name ).toBe( 'core/text-block' );
 			expect( availableBlocks[ 1 ].name ).toBe( 'core/another-text-block' );
+		} );
+
+		it( 'should show multiple possible transformations when multiple blocks have a matching `from` transform', () => {
+			registerBlockType( 'core/updated-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					from: [ {
+						type: 'block',
+						blocks: [ 'core/text-block' ],
+						transform: noop,
+						isMultiBlock: false,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/another-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					from: [ {
+						type: 'block',
+						blocks: [ 'core/text-block' ],
+						transform: noop,
+						isMultiBlock: true,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'another text block',
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const block = createBlock( 'core/text-block', {
+				value: 'chicken',
+			} );
+
+			const availableBlocks = getPossibleBlockTransformations( [ block ] );
+
+			expect( availableBlocks ).toHaveLength( 2 );
+			expect( availableBlocks[ 0 ].name ).toBe( 'core/updated-text-block' );
+			expect( availableBlocks[ 1 ].name ).toBe( 'core/another-text-block' );
+		} );
+
+		it( 'should show multiple possible transformations for a single `to` transform object with multiple block names', () => {
+			registerBlockType( 'core/updated-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [ {
+						type: 'block',
+						blocks: [ 'core/text-block', 'core/another-text-block' ],
+						transform: noop,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+			registerBlockType( 'core/another-text-block', defaultBlockSettings );
+
+			const block = createBlock( 'core/updated-text-block', {
+				value: 'chicken',
+			} );
+
+			const availableBlocks = getPossibleBlockTransformations( [ block ] );
+
+			expect( availableBlocks ).toHaveLength( 2 );
+			expect( availableBlocks[ 0 ].name ).toBe( 'core/text-block' );
+			expect( availableBlocks[ 1 ].name ).toBe( 'core/another-text-block' );
+		} );
+
+		it( 'returns a single transformation for a "from" transform that has a `isMatch` function returning `true`', () => {
+			registerBlockType( 'core/updated-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					from: [ {
+						type: 'block',
+						blocks: [ 'core/text-block' ],
+						transform: noop,
+						isMatch: () => true,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const block = createBlock( 'core/text-block', {
+				value: 'chicken',
+			} );
+
+			const availableBlocks = getPossibleBlockTransformations( [ block ] );
+
+			expect( availableBlocks ).toHaveLength( 1 );
+			expect( availableBlocks[ 0 ].name ).toBe( 'core/updated-text-block' );
+		} );
+
+		it( 'returns no transformations for a "from" transform with a `isMatch` function returning `false`', () => {
+			registerBlockType( 'core/updated-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					from: [ {
+						type: 'block',
+						blocks: [ 'core/text-block' ],
+						transform: noop,
+						isMatch: () => false,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const block = createBlock( 'core/text-block', {
+				value: 'chicken',
+			} );
+
+			const availableBlocks = getPossibleBlockTransformations( [ block ] );
+
+			expect( availableBlocks ).toEqual( [] );
+		} );
+
+		it( 'returns a single transformation for a "to" transform that has a `isMatch` function returning `true`', () => {
+			registerBlockType( 'core/updated-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [ {
+						type: 'block',
+						blocks: [ 'core/text-block' ],
+						transform: noop,
+						isMatch: () => true,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const block = createBlock( 'core/updated-text-block', {
+				value: 'ribs',
+			} );
+
+			const availableBlocks = getPossibleBlockTransformations( [ block ] );
+
+			expect( availableBlocks ).toHaveLength( 1 );
+			expect( availableBlocks[ 0 ].name ).toBe( 'core/text-block' );
+		} );
+
+		it( 'returns no transformations for a "to" transform with a `isMatch` function returning `false`', () => {
+			registerBlockType( 'core/updated-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [ {
+						type: 'block',
+						blocks: [ 'core/text-block' ],
+						transform: noop,
+						isMatch: () => false,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const block = createBlock( 'core/updated-text-block', {
+				value: 'ribs',
+			} );
+
+			const availableBlocks = getPossibleBlockTransformations( [ block ] );
+
+			expect( availableBlocks ).toEqual( [] );
+		} );
+
+		it( 'for a non multiblock transform, the isMatch function receives the source block\'s attributes object as its first argument', () => {
+			const isMatch = jest.fn();
+
+			registerBlockType( 'core/updated-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [ {
+						type: 'block',
+						blocks: [ 'core/text-block' ],
+						transform: noop,
+						isMatch,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const block = createBlock( 'core/updated-text-block', {
+				value: 'ribs',
+			} );
+
+			getPossibleBlockTransformations( [ block ] );
+
+			expect( isMatch ).toHaveBeenCalledWith( { value: 'ribs' } );
+		} );
+
+		it( 'for a multiblock transform, the isMatch function receives an array containing every source block\'s attributes as its first argument', () => {
+			const isMatch = jest.fn();
+
+			registerBlockType( 'core/updated-text-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [ {
+						type: 'block',
+						blocks: [ 'core/text-block' ],
+						transform: noop,
+						isMultiBlock: true,
+						isMatch,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const meatBlock = createBlock( 'core/updated-text-block', {
+				value: 'ribs',
+			} );
+
+			const cheeseBlock = createBlock( 'core/updated-text-block', {
+				value: 'halloumi',
+			} );
+
+			getPossibleBlockTransformations( [ meatBlock, cheeseBlock ] );
+
+			expect( isMatch ).toHaveBeenCalledWith( [ { value: 'ribs' }, { value: 'halloumi' } ] );
 		} );
 	} );
 

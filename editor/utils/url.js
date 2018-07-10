@@ -4,18 +4,9 @@
 import { addQueryArgs } from '@wordpress/url';
 
 /**
- * Returns the Post's Edit URL.
- *
- * @param {number} postId Post ID.
- *
- * @return {string} Post edit URL.
- */
-export function getPostEditUrl( postId ) {
-	return getWPAdminURL( 'post.php', { post: postId, action: 'edit' } );
-}
-
-/**
  * Returns the URL of a WPAdmin Page.
+ *
+ * TODO: This should be moved to a module less specific to the editor.
  *
  * @param {string} page  Page to navigate to.
  * @param {Object} query Query Args.

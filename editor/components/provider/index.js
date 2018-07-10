@@ -26,7 +26,7 @@ class EditorProvider extends Component {
 		// Assume that we don't need to initialize in the case of an error recovery.
 		if ( ! props.recovery ) {
 			this.props.updateEditorSettings( props.settings );
-			this.props.setupEditor( props.post );
+			this.props.setupEditor( props.post, props.settings.autosave );
 		}
 	}
 
@@ -43,6 +43,7 @@ class EditorProvider extends Component {
 			redo,
 			createUndoLevel,
 		} = this.props;
+
 		const providers = [
 			// RichText provider:
 			//

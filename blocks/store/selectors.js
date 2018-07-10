@@ -2,6 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
+import { filter, includes, map } from 'lodash';
 
 /**
  * Returns all the available block types.
@@ -61,3 +62,37 @@ export function getDefaultBlockName( state ) {
 export function getFallbackBlockName( state ) {
 	return state.fallbackBlockName;
 }
+
+/**
+ * Returns an array with the child blocks of a given block.
+ *
+ * @param {Object} state     Data state.
+ * @param {string} blockName Block type name.
+ *
+ * @return {Array} Array of child block names.
+ */
+export const getChildBlockNames = createSelector(
+	( state, blockName ) => {
+		return map(
+			filter( state.blockTypes, ( blockType ) => {
+				return includes( blockType.parent, blockName );
+			} ),
+			( { name } ) => name
+		);
+	},
+	( state ) => [
+		state.blockTypes,
+	]
+);
+
+/**
+ * Returns a boolean indicating if a block has child blocks or not.
+ *
+ * @param {Object} state     Data state.
+ * @param {string} blockName Block type name.
+ *
+ * @return {boolean} True if a block contains child blocks and false otherwise.
+ */
+export const hasChildBlocks = ( state, blockName ) => {
+	return getChildBlockNames( state, blockName ).length > 0;
+};

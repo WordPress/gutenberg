@@ -7,3 +7,7 @@ coverage:
     patch: off
 
 comment: false
+
+ignore:
+  - "packages/is-shallow-equal/benchmark/*"
+  

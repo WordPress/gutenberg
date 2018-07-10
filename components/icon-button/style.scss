@@ -21,7 +21,7 @@
 		outline: none;
 	}
 
-	&:not( :disabled ):not( [aria-disabled="true"] ):hover {
+	&:not( :disabled ):not( [aria-disabled="true"] ):not( .is-default ):hover {
 		@include button-style__hover;
 	}
 

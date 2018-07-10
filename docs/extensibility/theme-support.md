@@ -8,24 +8,28 @@ To opt-in for one of these features, call `add_theme_support` in the `functions.
 
 ```php
 function mytheme_setup_theme_supported_features() {
-	add_theme_support( 'editor-color-palette',
+	add_theme_support( 'editor-color-palette', array(
 		array(
-			'name' => 'strong magenta',
+			'name' => __( 'strong magenta', 'themeLangDomain' ),
+			'slug' => 'strong-magenta',
 			'color' => '#a156b4',
 		),
 		array(
-			'name' => 'light grayish magenta',
+			'name' => __( 'light grayish magenta', 'themeLangDomain' ),
+			'slug' => 'light-grayish-magenta',
 			'color' => '#d0a5db',
 		),
 		array(
-			'name' => 'very light gray',
+			'name' => __( 'very light gray', 'themeLangDomain' ),
+			'slug' => 'very-light-gray',
 			'color' => '#eee',
 		),
 		array(
-			'name' => 'very dark gray',
+			'name' => __( 'very dark gray', 'themeLangDomain' ),
+			'slug' => 'very-dark-gray',
 			'color' => '#444',
-		)
-	);
+		),
+	) );
 }
 
 add_action( 'after_setup_theme', 'mytheme_setup_theme_supported_features' );
@@ -46,24 +50,28 @@ add_theme_support( 'align-wide' );
 Different blocks have the possibility of customizing colors. Gutenberg provides a default palette, but a theme can overwrite it and provide its own:
 
 ```php
-add_theme_support( 'editor-color-palette',
+add_theme_support( 'editor-color-palette', array(
 	array(
-		'name' => 'strong magenta',
+		'name' => __( 'strong magenta', 'themeLangDomain' ),
+		'slug' => 'strong-magenta',
 		'color' => '#a156b4',
 	),
 	array(
-		'name' => 'light grayish magenta',
+		'name' => __( 'light grayish magenta', 'themeLangDomain' ),
+		'slug' => 'light-grayish-magenta',
 		'color' => '#d0a5db',
 	),
 	array(
-		'name' => 'very light gray',
+		'name' => __( 'very light gray', 'themeLangDomain' ),
+		'slug' => 'very-light-gray',
 		'color' => '#eee',
 	),
 	array(
-		'name' => 'very dark gray',
+		'name' => __( 'very dark gray', 'themeLangDomain' ),
+		'slug' => 'very-dark-gray',
 		'color' => '#444',
-	)
-);
+	),
+) );
 ```
 
 The colors will be shown in order on the palette, and there's no limit to how many can be specified.
@@ -131,7 +139,7 @@ To change the main column width of the editor, add the following CSS to `style-e
 
 ```css
 /* Main column width */
-body.gutenberg-editor-page .editor-post-title,
+body.gutenberg-editor-page .editor-post-title__block,
 body.gutenberg-editor-page .editor-default-block-appender,
 body.gutenberg-editor-page .editor-block-list__block {
 	max-width: 720px;
@@ -151,3 +159,11 @@ body.gutenberg-editor-page .editor-block-list__block[data-align="full"] {
 You can use those editor widths to match those in your theme. You can use any CSS width unit, including `%` or `px`.
 
 Further reading: [Applying Styles with Stylesheets](https://wordpress.org/gutenberg/handbook/blocks/applying-styles-with-stylesheets/).
+
+## Default block styles
+
+Core blocks include default styles. The styles are enqueued for editing but are not enqueued for viewing unless the theme opts-in to the core styles. If you'd like to use default styles in your theme, add theme support for `wp-block-styles`:
+
+```php
+add_theme_support( 'wp-block-styles' );
+```

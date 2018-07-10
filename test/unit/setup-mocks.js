@@ -14,3 +14,12 @@ jest.mock( '../../components/button', () => {
 		}
 	};
 } );
+
+jest.mock( '@wordpress/api-request', () => {
+	const apiRequest = jest.fn( () => {
+		return apiRequest.mockReturnValue;
+	} );
+	apiRequest.mockReturnValue = 'mock this value by overriding apiRequest.mockReturnValue';
+
+	return apiRequest;
+} );
