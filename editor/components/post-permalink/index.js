@@ -84,6 +84,7 @@ class PostPermalink extends Component {
 						href={ ! isPublished ? postLink : samplePermalink }
 						target="_blank"
 						ref={ ( permalinkButton ) => this.permalinkButton = permalinkButton }
+						isExternalLink
 					>
 						{ decodeURI( samplePermalink ) }
 						&lrm;

@@ -183,6 +183,10 @@
 	}
 
 	.components-external-link__icon {
+		margin: 2px 0 0 4px;
+	}
+
+	&.is-button .components-external-link__icon {
 		margin: 6px 0 0 4px;
 	}
 }
