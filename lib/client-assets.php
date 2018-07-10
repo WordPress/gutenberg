@@ -1231,6 +1231,14 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 } )();
 JS;
 
+	/**
+	 * Filters the Gutenberg Editor Settings
+	 *
+	 * @param array $editor_settings The default Gutenberg Editor Settings
+	 *
+	 */
+	$editor_settings = apply_filters( 'editor_settings', $editor_settings );
+
 	$script = sprintf( $init_script, wp_json_encode( $editor_settings ), $post->post_type, $post->ID );
 	wp_add_inline_script( 'wp-edit-post', $script );
 
