@@ -15,7 +15,7 @@ import { withDispatch } from '@wordpress/data';
  */
 import Warning from '../warning';
 
-function InvalidBlockWarning( { convertToHTML, convertToBlocks } ) {
+function BlockInvalidWarning( { convertToHTML, convertToBlocks } ) {
 	const hasHTMLBlock = !! getBlockType( 'core/html' );
 
 	return (
@@ -51,4 +51,4 @@ export default withDispatch( ( dispatch, { block } ) => {
 			} ) );
 		},
 	};
-} )( InvalidBlockWarning );
+} )( BlockInvalidWarning );
