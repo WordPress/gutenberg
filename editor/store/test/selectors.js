@@ -16,6 +16,7 @@ import { moment } from '@wordpress/date';
 import * as selectors from '../selectors';
 
 const {
+	canUserUseUnfilteredHTML,
 	hasEditorUndo,
 	hasEditorRedo,
 	isEditedPostNew,
@@ -3807,6 +3808,27 @@ describe( 'selectors', () => {
 			};
 
 			expect( getBlockListSettings( state, 'chicken' ) ).toBe( undefined );
+		} );
+	} );
+
+	describe( 'canUserUseUnfilteredHTML', () => {
+		it( 'should return true if the _links object contains the property wp:action-unfiltered_html', () => {
+			const state = {
+				currentPost: {
+					_links: {
+						'wp:action-unfiltered_html': [],
+					},
+				},
+			};
+			expect( canUserUseUnfilteredHTML( state ) ).toBe( true );
+		} );
+		it( 'should return false if the _links object doesnt contain the property wp:action-unfiltered_html', () => {
+			const state = {
+				currentPost: {
+					_links: {},
+				},
+			};
+			expect( canUserUseUnfilteredHTML( state ) ).toBe( false );
 		} );
 	} );
 } );
