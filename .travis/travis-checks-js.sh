@@ -19,11 +19,6 @@ if [ "$CHECK_CORRECTNESS" = true ] ; then
 fi
 
 if [ "$CHECK_TESTS" = true ] ; then
-  # build the Gutenberg packages
-  pushd gutenberg
-  npm i || pFail
-  popd
-
   # we'll run the tests twich (once for each platform) if the platform env var is not set
   if [[ -z "${TEST_RN_PLATFORM}" ]] ; then
     TEST_RN_PLATFORM=android npm test || pFail

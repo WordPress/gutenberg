@@ -28,14 +28,6 @@ Before running the demo app, you need to download and install the project depend
 npm install
 ```
 
-The Gutenberg packages need to be installed and built. This is done via the following commands:
-
-```
-pushd gutenberg
-npm install
-popd
-```
-
 ## Run
 
 Note: the most recent and complete version of this guide is available [here](https://github.com/react-community/create-react-native-app/blob/master/react-native-scripts/template/README.md).
