@@ -9,7 +9,8 @@
 		"**/test/**"
 	],
 	"packages": [
-		"packages/*"
+		"packages/*",
+		"core-blocks/paragraph"
 	],
 	"version": "independent"
 }

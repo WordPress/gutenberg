@@ -1,0 +1,39 @@
+{
+	"name": "@wordpress/paragraph",
+	"version": "1.0.0-alpha.1",
+	"description": "Paragraph Block for WordPress",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"paragraph",
+		"block"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/core-blocks/paragraph/",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"dependencies": {
+		"@wordpress/components": "file:../packages/element",
+		"@wordpress/editor": "file:../packages/editor",
+		"@wordpress/element": "file:../packages/element",
+		"@wordpress/i18n": "file:../packages/i18n",
+		"classnames": "2.2.5",
+		"lodash": "4.17.10",
+		"react": "16.4.1",
+		"react-dom": "16.4.1"
+	},
+	"devDependencies": {
+		"enzyme": "^3.3.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}
