@@ -1,14 +1,15 @@
-.wp-block-latest-comments.alignright {
-	margin: 0 7em 2em;
-}
-.wp-block-latest-comments.alignleft {
-	margin-right: 2em;
-}
-
 .wp-block-latest-comments {
+	&.alignleft {
+		margin-right: 2em;
+	}
+
+	&.alignright {
+		margin: 0 7em 2em;
+	}
+
 	a {
-		pointer-events: none;
 		cursor: default;
+		pointer-events: none;
 	}
 
 	.has-avatars img {
@@ -20,8 +21,8 @@
 	.wp-block-latest-comments__comment-excerpt p {
 		font-size: 14px;
 		line-height: 1.8;
-		padding-top: 0;
 		margin: 5px 0 20px;
+		padding-top: 0;
 	}
 
 	.wp-block-latest-comments {

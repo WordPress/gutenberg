@@ -26,11 +26,13 @@ const MAX_COMMENTS = 100;
 class LatestComments extends Component {
 	constructor() {
 		super( ...arguments );
-		this.toggleHandler = this.toggleHandler.bind( this );
-		this.changeCommentsToShow = this.changeCommentsToShow.bind( this );
+
+		this.setAlignment = this.setAlignment.bind( this );
+		this.setCommentsToShow = this.setCommentsToShow.bind( this );
+		this.toggleAttribute = this.toggleAttribute.bind( this );
 	}
 
-	toggleHandler( propName ) {
+	toggleAttribute( propName ) {
 		return () => {
 			const value = this.props.attributes[ propName ];
 			const { setAttributes } = this.props;
@@ -39,59 +41,65 @@ class LatestComments extends Component {
 		};
 	}
 
-	changeCommentsToShow( commentsToShow ) {
+	setAlignment( nextAlign ) {
+		const { setAttributes } = this.props;
+
+		setAttributes( { align: nextAlign } );
+	}
+
+	setCommentsToShow( commentsToShow ) {
 		const { setAttributes } = this.props;
 
 		setAttributes( { commentsToShow: parseInt( commentsToShow, 10 ) || 0 } );
 	}
 
 	render() {
-		const { setAttributes } = this.props;
-		const { align, displayAvatar, displayTimestamp } = this.props.attributes;
+		const {
+			align,
+			commentsToShow,
+			displayAvatar,
+			displayExcerpt,
+			displayTimestamp,
+		} = this.props.attributes;
 
 		return (
 			<Fragment>
 				<BlockControls>
 					<BlockAlignmentToolbar
 						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
-						controls={ [ 'left', 'center', 'right', 'wide', 'full' ] }
+						onChange={ this.setAlignment }
 					/>
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'Latest Comments Settings' ) }>
-
 						<ToggleControl
 							label={ __( 'Display avatar' ) }
 							checked={ displayAvatar }
-							onChange={ this.toggleHandler( 'displayAvatar' ) }
+							onChange={ this.toggleAttribute( 'displayAvatar' ) }
 						/>
-
 						<ToggleControl
-							label={ __( 'Display timestamp' ) }
+							label={ __( 'Display date/time' ) }
 							checked={ displayTimestamp }
-							onChange={ this.toggleHandler( 'displayTimestamp' ) }
+							onChange={ this.toggleAttribute( 'displayTimestamp' ) }
 						/>
-
 						<ToggleControl
 							label={ __( 'Display excerpt' ) }
-							checked={ this.props.attributes.displayExcerpt }
-							onChange={ this.toggleHandler( 'displayExcerpt' ) }
+							checked={ displayExcerpt }
+							onChange={ this.toggleAttribute( 'displayExcerpt' ) }
 						/>
-
 						<RangeControl
 							label={ __( 'Number of comments to show' ) }
-							value={ this.props.attributes.commentsToShow }
-							onChange={ ( value ) => this.changeCommentsToShow( value ) }
+							value={ commentsToShow }
+							onChange={ ( value ) => this.setCommentsToShow( value ) }
 							min={ MIN_COMMENTS }
 							max={ MAX_COMMENTS }
 						/>
 					</PanelBody>
-
 				</InspectorControls>
-				<ServerSideRender block="core/latest-comments" attributes={ this.props.attributes } />
+				<ServerSideRender
+					block="core/latest-comments"
+					attributes={ this.props.attributes }
+				/>
 			</Fragment>
 		);
 	}

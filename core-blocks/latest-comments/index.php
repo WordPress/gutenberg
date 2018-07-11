@@ -5,6 +5,8 @@
  * @package gutenberg
  */
 
+$DEFAULT_COMMENTS_TO_SHOW = 5;
+
 /**
  * Renders the `core/latest-comments` block on server.
  *
@@ -13,19 +15,19 @@
  * @return string Returns the post content with latest comments added.
  */
 function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
-
 	// Basic attribute validation.
+	if (
+		! isset( $attributes['align'] ) ||
+		! in_array( $attributes['align'], array( 'center', 'left', 'right', 'wide', 'full' ), true )
+	) {
+		$attributes['align'] = null;
+	}
 	if (
 		! is_numeric( $attributes['commentsToShow'] ) ||
 		$attributes['commentsToShow'] < 0 ||
 		$attributes['commentsToShow'] > 100
 	) {
-		$attributes['commentsToShow'] = 5;
-	}
-
-	$align = 'center';
-	if ( isset( $attributes['align'] ) && in_array( $attributes['align'], array( 'left', 'right', 'wide', 'full' ), true ) ) {
-		$align = $attributes['align'];
+		$attributes['commentsToShow'] = $DEFAULT_COMMENTS_TO_SHOW;
 	}
 
 	/** This filter is documented in wp-includes/widgets/class-wp-widget-recent-comments.php */
@@ -37,7 +39,6 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 
 	$list_items_markup = '';
 	if ( ! empty( $comments ) ) {
-
 		// Prime cache for associated posts. This is copied from \WP_Widget_Recent_Comments::widget().
 		$post_ids = array_unique( wp_list_pluck( $comments, 'comment_post_ID' ) );
 		_prime_post_caches( $post_ids, strpos( get_option( 'permalink_structure' ), '%category%' ), false );
@@ -81,7 +82,10 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 		}
 	}
 
-	$class = "wp-block-latest-comments align{$align}";
+	$class = 'wp-block-latest-comments';
+	if ( $attributes['align'] ) {
+		$class .= " align{$attributes['align']}";
+	}
 	if ( $attributes['displayAvatar'] ) {
 		$class .= ' has-avatars';
 	}
@@ -102,19 +106,19 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 }
 
 register_block_type( 'core/latest-comments', array(
-	'attributes'      => array(
-		'className'        => array(
+	'attributes' => array(
+		'className' => array(
 			'type' => 'string',
 		),
-		'commentsToShow'   => array(
+		'commentsToShow' => array(
 			'type'    => 'number',
-			'default' => 5,
+			'default' => $DEFAULT_COMMENTS_TO_SHOW,
 		),
-		'displayAvatar'    => array(
+		'displayAvatar' => array(
 			'type'    => 'boolean',
 			'default' => true,
 		),
-		'displayExcerpt'   => array(
+		'displayExcerpt' => array(
 			'type'    => 'boolean',
 			'default' => true,
 		),
@@ -122,9 +126,8 @@ register_block_type( 'core/latest-comments', array(
 			'type'    => 'boolean',
 			'default' => true,
 		),
-		'align'            => array(
+		'align' => array(
 			'type'    => 'string',
-			'default' => 'center',
 		),
 	),
 	'render_callback' => 'gutenberg_render_block_core_latest_comments',
