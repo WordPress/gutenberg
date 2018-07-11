@@ -278,9 +278,12 @@
  */
 
 .editor-block-list__layout .editor-block-list__block {
+	&.has-warning {
+		min-height: $block-padding + $block-spacing;
+	}
 
 	// Warnings
-	 &.has-warning .editor-block-list__block-edit {
+	&.has-warning .editor-block-list__block-edit {
 		min-height: 250px;
 
 		> :not( .editor-warning ) {
