@@ -143,7 +143,7 @@ export function string( options ) {
  *
  * @return {RegExp} Shortcode RegExp.
  */
-export const regexp = ( tag ) => {
+export function regexp( tag ) {
 	return new RegExp( '\\[(\\[?)(' + tag + ')(?![\\w-])([^\\]\\/]*(?:\\/(?!\\])[^\\]\\/]*)*?)(?:(\\/)\\]|\\](?:([^\\[]*(?:\\[(?!\\/\\2\\])[^\\[]*)*)(\\[\\/\\2\\]))?)(\\]?)', 'g' );
 };
 
