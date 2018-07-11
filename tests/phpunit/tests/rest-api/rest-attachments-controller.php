@@ -1211,6 +1211,50 @@ class WP_Test_REST_Attachments_Controller extends WP_Test_REST_Post_Type_Control
 		}
 	}
 
+	public function test_links_exist() {
+
+		wp_set_current_user( self::$editor_id );
+
+		$post = self::factory()->attachment->create( array( 'post_author' => self::$editor_id ) );
+		$this->assertGreaterThan( 0, $post );
+
+		$request = new WP_REST_Request( 'GET', "/wp/v2/media/{$post}" );
+		$request->set_query_params( array( 'context' => 'edit' ) );
+
+		$response = rest_get_server()->dispatch( $request );
+		$links    = $response->get_links();
+
+		$this->assertArrayHasKey( 'self', $links );
+	}
+
+	public function test_publish_action_ldo_not_registered() {
+
+		$response = rest_get_server()->dispatch( new WP_REST_Request( 'OPTIONS', '/wp/v2/media' ) );
+		$data     = $response->get_data();
+		$schema   = $data['schema'];
+
+		$this->assertArrayHasKey( 'links', $schema );
+		$publish = wp_list_filter( $schema['links'], array( 'rel' => 'https://api.w.org/action-publish' ) );
+
+		$this->assertCount( 0, $publish, 'LDO not found on schema.' );
+	}
+
+	public function test_publish_action_link_does_not_exists() {
+
+		wp_set_current_user( self::$editor_id );
+
+		$post = self::factory()->attachment->create( array( 'post_author' => self::$editor_id ) );
+		$this->assertGreaterThan( 0, $post );
+
+		$request = new WP_REST_Request( 'GET', "/wp/v2/media/{$post}" );
+		$request->set_query_params( array( 'context' => 'edit' ) );
+
+		$response = rest_get_server()->dispatch( $request );
+		$links    = $response->get_links();
+
+		$this->assertArrayNotHasKey( 'https://api.w.org/action-publish', $links );
+	}
+
 	public function tearDown() {
 		parent::tearDown();
 		if ( file_exists( $this->test_file ) ) {
