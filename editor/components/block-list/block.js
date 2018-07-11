@@ -3,7 +3,6 @@
  */
 import classnames from 'classnames';
 import { get, reduce, size, castArray, first, last } from 'lodash';
-import tinymce from 'tinymce';
 
 /**
  * WordPress dependencies
@@ -149,17 +148,8 @@ export class BlockListBlock extends Component {
 
 		// In reverse case, need to explicitly place caret position.
 		if ( isReverse ) {
-			// Special case RichText component because the placeCaret utilities
-			// aren't working correctly. When merging two paragraph blocks, the
-			// focus is not moved to the correct position.
-			const editor = tinymce.get( target.getAttribute( 'id' ) );
-			if ( editor ) {
-				editor.selection.select( editor.getBody(), true );
-				editor.selection.collapse( false );
-			} else {
-				placeCaretAtHorizontalEdge( target, true );
-				placeCaretAtVerticalEdge( target, true );
-			}
+			placeCaretAtHorizontalEdge( target, true );
+			placeCaretAtVerticalEdge( target, true );
 		}
 	}
 
