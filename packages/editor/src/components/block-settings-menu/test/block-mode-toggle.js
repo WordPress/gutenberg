@@ -24,9 +24,10 @@ describe( 'BlockModeToggle', () => {
 				mode="visual"
 			/>
 		);
-		const text = wrapper.find( 'MenuItem' ).first().prop( 'children' );
+		const button = wrapper.find( 'MenuItem' ).first();
 
-		expect( text ).toEqual( 'Edit as HTML' );
+		expect( button.prop( 'children' ) ).toEqual( 'Edit as HTML' );
+		expect( button.prop( 'disabled' ) ).toBe( false );
 	} );
 
 	it( 'should render the Visual mode button', () => {
@@ -36,8 +37,22 @@ describe( 'BlockModeToggle', () => {
 				mode="html"
 			/>
 		);
-		const text = wrapper.find( 'MenuItem' ).first().prop( 'children' );
+		const button = wrapper.find( 'MenuItem' ).first();
 
-		expect( text ).toEqual( 'Edit visually' );
+		expect( button.prop( 'children' ) ).toEqual( 'Edit visually' );
+		expect( button.prop( 'disabled' ) ).toBe( false );
+	} );
+
+	it( 'should render a disabled button', () => {
+		const wrapper = shallow(
+			<BlockModeToggle
+				blockType={ { supports: { html: true } } }
+				mode="html"
+				enabled={ false }
+			/>
+		);
+		const button = wrapper.find( 'MenuItem' ).first();
+
+		expect( button.prop( 'disabled' ) ).toBe( true );
 	} );
 } );

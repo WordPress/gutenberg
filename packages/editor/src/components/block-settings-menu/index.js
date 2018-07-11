@@ -66,6 +66,7 @@ export class BlockSettingsMenu extends Component {
 			onSelect,
 			focus,
 			isHidden,
+			canEdit,
 			onDuplicate,
 			onRemove,
 			canDuplicate,
@@ -142,6 +143,7 @@ export class BlockSettingsMenu extends Component {
 								<BlockModeToggle
 									clientId={ firstBlockClientId }
 									onToggle={ onClose }
+									enabled={ canEdit }
 								/>
 							) }
 							{ count === 1 && (

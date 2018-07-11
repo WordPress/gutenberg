@@ -500,6 +500,7 @@ export class BlockListBlock extends Component {
 						clientIds={ clientId }
 						rootClientId={ rootClientId }
 						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'right' || isTypingWithinBlock }
+						canEdit={ isValid }
 					/>
 				) }
 				{ shouldShowBreadcrumb && (

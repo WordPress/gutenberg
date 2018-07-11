@@ -12,7 +12,7 @@ import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
-export function BlockModeToggle( { blockType, mode, onToggleMode, small = false } ) {
+export function BlockModeToggle( { blockType, mode, onToggleMode, small = false, enabled = true } ) {
 	if ( ! hasBlockSupport( blockType, 'html', true ) ) {
 		return null;
 	}
@@ -25,6 +25,7 @@ export function BlockModeToggle( { blockType, mode, onToggleMode, small = false 
 		<MenuItem
 			className="editor-block-settings-menu__control"
 			onClick={ onToggleMode }
+			disabled={ ! enabled }
 			icon="html"
 			label={ small ? label : undefined }
 		>
