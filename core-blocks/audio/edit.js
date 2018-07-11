@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	IconButton,
 	PanelBody,
+	SelectControl,
 	Toolbar,
 	ToggleControl,
 	withNotices,
@@ -41,7 +42,7 @@ class AudioEdit extends Component {
 	}
 
 	render() {
-		const { autoplay, caption, loop, src } = this.props.attributes;
+		const { autoplay, caption, loop, preload, src } = this.props.attributes;
 		const { setAttributes, isSelected, className, noticeOperations, noticeUI } = this.props;
 		const { editing } = this.state;
 		const switchToEditing = () => {
@@ -102,7 +103,7 @@ class AudioEdit extends Component {
 					</Toolbar>
 				</BlockControls>
 				<InspectorControls>
-					<PanelBody title={ __( 'Playback Controls' ) }>
+					<PanelBody>
 						<ToggleControl
 							label={ __( 'Autoplay' ) }
 							onChange={ this.toggleAttribute( 'autoplay' ) }
@@ -112,6 +113,17 @@ class AudioEdit extends Component {
 							label={ __( 'Loop' ) }
 							onChange={ this.toggleAttribute( 'loop' ) }
 							checked={ loop }
+						/>
+						<SelectControl
+							label={ __( 'Preload' ) }
+							value={ undefined !== preload ? preload : 'none' }
+							// `undefined` is required for the preload attribute to be unset.
+							onChange={ ( value ) => setAttributes( { preload: ( 'none' !== value ) ? value : undefined } ) }
+							options={ [
+								{ value: 'auto', label: __( 'Auto' ) },
+								{ value: 'metadata', label: __( 'Metadata' ) },
+								{ value: 'none', label: __( 'None' ) },
+							] }
 						/>
 					</PanelBody>
 				</InspectorControls>
