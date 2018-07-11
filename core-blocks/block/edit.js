@@ -29,12 +29,14 @@ class SharedBlockEdit extends Component {
 		this.save = this.save.bind( this );
 
 		if ( sharedBlock && sharedBlock.isTemporary ) {
+			// Start in edit mode when we're working with a newly created shared block
 			this.state = {
 				isEditing: true,
 				title: sharedBlock.title,
 				changedAttributes: {},
 			};
 		} else {
+			// Start in preview mode when we're working with an existing shared block
 			this.state = {
 				isEditing: false,
 				title: null,
