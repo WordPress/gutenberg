@@ -7,12 +7,15 @@ import { first, last } from 'lodash';
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import BlockMover from '../block-mover';
 import BlockSettingsMenu from '../block-settings-menu';
+import NavigableToolbar from '../navigable-toolbar';
+import BlockSwitcher from '../block-switcher';
 
 function BlockListMultiControls( { multiSelectedBlockUids, rootUID, isSelecting, isFirst, isLast } ) {
 	if ( isSelecting ) {
@@ -20,6 +23,13 @@ function BlockListMultiControls( { multiSelectedBlockUids, rootUID, isSelecting,
 	}
 
 	return [
+		<NavigableToolbar
+			className="editor-block-contextual-toolbar"
+			aria-label={ __( 'Block Toolbar' ) }
+			key="toolbar"
+		>
+			<BlockSwitcher uids={ multiSelectedBlockUids } />
+		</NavigableToolbar>,
 		<BlockMover
 			key="mover"
 			rootUID={ rootUID }
