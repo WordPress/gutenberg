@@ -5,7 +5,7 @@ import '../support/bootstrap';
 import {
 	newPost,
 	newDesktopBrowserPage,
-	getHTMLFromCodeEditor,
+	getEditedPostContent,
 	pressWithModifier,
 	pressTimes,
 } from '../support/utils';
@@ -71,7 +71,7 @@ describe( 'adding blocks', () => {
 		activeElementText = await page.evaluate( () => document.activeElement.textContent );
 		expect( activeElementText ).toBe( 'First paragraph' );
 
-		expect( await getHTMLFromCodeEditor() ).toMatchSnapshot();
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should navigate around inline boundaries', async () => {
@@ -140,6 +140,6 @@ describe( 'adding blocks', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( 'Before' );
 
-		expect( await getHTMLFromCodeEditor() ).toMatchSnapshot();
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );
