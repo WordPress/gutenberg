@@ -41,7 +41,7 @@ describe( 'adding inline tokens', () => {
 		await page.click( '.media-modal button.media-button-select' );
 
 		// Check the content.
-		const regex = new RegExp( '<!-- wp:paragraph -->\\s*<p>a\\u00A0<img class="wp-image-\\d+" style="width:10px" src="[^"]+\\/' + filename + '\\.png" alt="" \\/><\\/p>\\s*<!-- \\/wp:paragraph -->' );
+		const regex = new RegExp( '<!-- wp:paragraph -->\\s*<p>a\\u00A0<img class="wp-image-\\d+" style="width:10px" src="[^"]+\\/' + filename + '\\.png" alt=""\\/><\\/p>\\s*<!-- \\/wp:paragraph -->' );
 		expect( await getEditedPostContent() ).toMatch( regex );
 	} );
 } );
