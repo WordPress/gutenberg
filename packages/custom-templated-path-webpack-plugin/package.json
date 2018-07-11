@@ -27,7 +27,7 @@
 		"escape-string-regexp": "^1.0.5"
 	},
 	"devDependencies": {
-		"webpack": "4.8.3"
+		"webpack": "^4.8.3"
 	},
 	"peerDependencies": {
 		"webpack": "^4.0.0"

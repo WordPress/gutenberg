@@ -22,8 +22,8 @@
 	"dependencies": {
 		"@wordpress/api-request": "file:../api-request",
 		"@wordpress/data": "file:../data",
-		"lodash": "4.17.10",
-		"rememo": "3.0.0"
+		"lodash": "^4.17.10",
+		"rememo": "^3.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

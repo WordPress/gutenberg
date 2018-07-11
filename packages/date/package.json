@@ -19,8 +19,8 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"moment": "2.22.1",
-		"moment-timezone": "0.5.16"
+		"moment": "^2.22.1",
+		"moment-timezone": "^0.5.16"
 	},
 	"publishConfig": {
 		"access": "public"

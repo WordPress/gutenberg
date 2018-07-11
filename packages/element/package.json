@@ -23,9 +23,9 @@
 	"dependencies": {
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
-		"lodash": "4.17.10",
-		"react": "16.4.1",
-		"react-dom": "16.4.1"
+		"lodash": "^4.17.10",
+		"react": "^16.4.1",
+		"react-dom": "^16.4.1"
 	},
 	"devDependencies": {
 		"enzyme": "^3.3.0"
