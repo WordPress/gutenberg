@@ -51,7 +51,7 @@ export const settings = {
 							bottom: 'core-blocks-spacer__resize-handler-bottom',
 						} }
 						enable={ {
-							top: true,
+							top: false,
 							right: false,
 							bottom: true,
 							left: false,
