@@ -1068,11 +1068,21 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		sprintf( '/wp/v2/users/me?post_type=%s&context=edit', $post_type ),
 	);
 
+	// Ensure the global $post remains the same after
+	// API data is preloaded. Because API preloading
+	// can call the_content and other filters, callbacks
+	// can unexpectedly modify $post resulting in issues
+	// like https://github.com/WordPress/gutenberg/issues/7468.
+	$backup_global_post = $post;
+
 	$preload_data = array_reduce(
 		$preload_paths,
 		'gutenberg_preload_api_request',
 		array()
 	);
+
+	// Restore the global $post as it was before API preloading.
+	$post = $backup_global_post;
 
 	wp_add_inline_script(
 		'wp-api-request',
