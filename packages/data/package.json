@@ -24,12 +24,12 @@
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/element": "file:../element",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
-		"equivalent-key-map": "0.2.0",
-		"lodash": "4.17.10",
-		"redux": "3.7.2"
+		"equivalent-key-map": "^0.2.0",
+		"lodash": "^4.17.10",
+		"redux": "^3.7.2"
 	},
 	"devDependencies": {
-		"deep-freeze": "0.0.1",
+		"deep-freeze": "^0.0.1",
 		"enzyme": "^3.3.0"
 	},
 	"publishConfig": {

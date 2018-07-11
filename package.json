@@ -71,6 +71,7 @@
 		"uuid": "3.1.0"
 	},
 	"devDependencies": {
+		"@babel/core": "7.0.0-beta.52",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:packages/babel-plugin-import-jsx-pragma",
 		"@wordpress/babel-plugin-makepot": "file:packages/babel-plugin-makepot",
 		"@wordpress/babel-preset-default": "file:packages/babel-preset-default",
@@ -83,14 +84,13 @@
 		"@wordpress/postcss-themes": "file:packages/postcss-themes",
 		"@wordpress/scripts": "file:packages/scripts",
 		"autoprefixer": "8.2.0",
-		"babel-core": "6.26.0",
 		"babel-eslint": "8.0.3",
-		"babel-loader": "7.1.4",
+		"babel-loader": "8.0.0-beta.4",
 		"chalk": "2.4.1",
 		"check-node-version": "3.1.1",
 		"codecov": "3.0.2",
 		"concurrently": "3.5.0",
-		"core-js": "2.5.3",
+		"core-js": "2.5.7",
 		"cross-env": "3.2.4",
 		"deep-freeze": "0.0.1",
 		"doctrine": "2.1.0",
@@ -124,33 +124,6 @@
 		"webpack-livereload-plugin": "2.1.1",
 		"webpack-rtl-plugin": "github:yoavf/webpack-rtl-plugin#develop"
 	},
-	"babel": {
-		"presets": [
-			"@wordpress/babel-preset-default"
-		],
-		"plugins": [
-			[
-				"@wordpress/babel-plugin-import-jsx-pragma",
-				{
-					"scopeVariable": "createElement",
-					"source": "@wordpress/element",
-					"isDefault": false
-				}
-			]
-		],
-		"env": {
-			"production": {
-				"plugins": [
-					[
-						"@wordpress/babel-plugin-makepot",
-						{
-							"output": "languages/gutenberg.pot"
-						}
-					]
-				]
-			}
-		}
-	},
 	"npmPackageJsonLintConfig": {
 		"extends": "@wordpress/npm-package-json-lint-config",
 		"rules": {
@@ -178,7 +151,7 @@
 		"build:packages": "cross-env EXCLUDE_PACKAGES=babel-plugin-import-jsx-pragma node ./bin/packages/build.js",
 		"build": "npm run build:packages && cross-env NODE_ENV=production webpack",
 		"check-engines": "check-node-version --package",
-		"ci": "concurrently \"npm run lint && npm run build\" \"npm run test-unit:coverage-ci\"",
+		"ci": "concurrently \"npm run lint\" \"npm run test-unit:coverage-ci\"",
 		"predev": "npm run check-engines",
 		"dev": "npm run build:packages && concurrently \"cross-env webpack --watch\" \"npm run dev:packages\"",
 		"dev:packages": "node ./bin/packages/watch.js",

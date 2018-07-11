@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { transform } from 'babel-core';
-import traverse from 'babel-traverse';
+import { transformSync } from '@babel/core';
+import traverse from '@babel/traverse';
 
 /**
  * Internal dependencies
@@ -46,7 +46,7 @@ describe( 'babel-plugin', () => {
 	describe( '.getTranslatorComment()', () => {
 		function getCommentFromString( string ) {
 			let comment;
-			traverse( transform( string ).ast, {
+			traverse( transformSync( string, { ast: true } ).ast, {
 				CallExpression( path ) {
 					comment = getTranslatorComment( path );
 				},
@@ -95,7 +95,7 @@ describe( 'babel-plugin', () => {
 	describe( '.getNodeAsString()', () => {
 		function getNodeAsStringFromArgument( source ) {
 			let string;
-			traverse( transform( source ).ast, {
+			traverse( transformSync( source, { ast: true } ).ast, {
 				CallExpression( path ) {
 					string = getNodeAsString( path.node.arguments[ 0 ] );
 				},
