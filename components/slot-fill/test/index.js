@@ -1,5 +1,5 @@
 /**
- * External dependecies
+ * External dependencies
  */
 import { shallow } from 'enzyme';
 
