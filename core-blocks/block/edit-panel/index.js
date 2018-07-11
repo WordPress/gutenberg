@@ -89,21 +89,12 @@ class SharedBlockEditPanel extends Component {
 						/>
 						<Button
 							type="submit"
-							isPrimary
 							isLarge
 							isBusy={ isSaving }
 							disabled={ ! title || isSaving }
 							className="shared-block-edit-panel__button"
 						>
 							{ __( 'Save' ) }
-						</Button>
-						<Button
-							isLarge
-							disabled={ isSaving }
-							className="shared-block-edit-panel__button"
-							onClick={ onCancel }
-						>
-							{ __( 'Cancel' ) }
 						</Button>
 					</form>
 				) }
