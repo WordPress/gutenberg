@@ -2467,7 +2467,7 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'geteBlockMode', () => {
+	describe( 'getBlockMode', () => {
 		it( 'should return "visual" if unset', () => {
 			const state = {
 				blocksMode: {},

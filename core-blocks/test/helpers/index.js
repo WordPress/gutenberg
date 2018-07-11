@@ -1,5 +1,5 @@
 /**
- * External dependencie
+ * External dependencies
  */
 import { render } from 'enzyme';
 import { noop } from 'lodash';

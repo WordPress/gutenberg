@@ -9,7 +9,7 @@ import { shallow } from 'enzyme';
 import { SharedBlockConvertButton } from '../shared-block-convert-button';
 
 describe( 'SharedBlockConvertButton', () => {
-	it( 'should not render when isVisble false', () => {
+	it( 'should not render when isVisible false', () => {
 		const wrapper = shallow(
 			<SharedBlockConvertButton isVisible={ false } />
 		);

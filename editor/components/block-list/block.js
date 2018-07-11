@@ -119,7 +119,7 @@ export class BlockListBlock extends Component {
 	}
 
 	/**
-	 * When a block becomces selected, transition focus to an inner tabbable.
+	 * When a block becomes selected, transition focus to an inner tabbable.
 	 */
 	focusTabbable() {
 		const { initialPosition } = this.props;

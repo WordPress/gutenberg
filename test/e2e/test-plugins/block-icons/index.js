@@ -101,7 +101,7 @@
 		category: 'common',
 
 		edit: function() {
-			return el( 'div', { className: 'test-dash-icon-colorss', style: { outline: '1px solid gray', padding: 5 } },
+			return el( 'div', { className: 'test-dash-icon-colors', style: { outline: '1px solid gray', padding: 5 } },
 				el(
 					InnerBlocks,
 					{
