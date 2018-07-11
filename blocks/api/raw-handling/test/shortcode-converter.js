@@ -96,8 +96,8 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 			text: '[foo four]',
 		} );
 		// uid will always be random.
-		fourthExpectedBlock.uid = transformed[ 5 ].uid;
-		expect( transformed[ 5 ] ).toEqual( fourthExpectedBlock );
+		fourthExpectedBlock.uid = transformed[ 7 ].uid;
+		expect( transformed[ 7 ] ).toEqual( fourthExpectedBlock );
 		expect( transformed[ 8 ] ).toEqual( '</p>' );
 		expect( transformed ).toHaveLength( 9 );
 	} );
