@@ -7,25 +7,16 @@ import { getUnknownTypeHandlerName, rawHandler, serialize } from '@wordpress/blo
 import { compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
-export function UnknownConverter( { block, onReplace, small, canUserUseUnfilteredHTML, role } ) {
-	if ( ! block || getUnknownTypeHandlerName() !== block.name ) {
+export function UnknownConverter( { shouldRender, onClick, small, role } ) {
+	if ( ! shouldRender ) {
 		return null;
 	}
 
 	const label = __( 'Convert to Blocks' );
-
-	const convertToBlocks = () => {
-		onReplace( block.uid, rawHandler( {
-			HTML: serialize( block ),
-			mode: 'BLOCKS',
-			canUserUseUnfilteredHTML,
-		} ) );
-	};
-
 	return (
 		<IconButton
 			className="editor-block-settings-menu__control"
-			onClick={ convertToBlocks }
+			onClick={ onClick }
 			icon="screenoptions"
 			label={ small ? label : undefined }
 			role={ role }
@@ -37,14 +28,22 @@ export function UnknownConverter( { block, onReplace, small, canUserUseUnfiltere
 
 export default compose(
 	withSelect( ( select, { uid } ) => {
-		const { canUserUseUnfilteredHTML, getBlock, getCurrentPostType } = select( 'core/editor' );
+		const { canUserUseUnfilteredHTML, getBlock } = select( 'core/editor' );
+		const block = getBlock( uid );
 		return {
-			block: getBlock( uid ),
-			postType: getCurrentPostType(),
+			block,
 			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
+			shouldRender: ( block && block.name === getUnknownTypeHandlerName() )
 		};
 	} ),
-	withDispatch( ( dispatch ) => ( {
-		onReplace: dispatch( 'core/editor' ).replaceBlocks,
+	withDispatch( ( dispatch, { block, canUserUseUnfilteredHTML } ) => ( {
+		onClick: () => dispatch( 'core/editor' ).replaceBlocks(
+			block.uid,
+			rawHandler( {
+				HTML: serialize( block ),
+				mode: 'BLOCKS',
+				canUserUseUnfilteredHTML,
+			} )
+		),
 	} ) ),
 )( UnknownConverter );
