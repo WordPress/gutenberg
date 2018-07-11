@@ -12,7 +12,7 @@ export function HTMLConverter( { block, onReplace, small, canUserUseUnfilteredHT
 		return null;
 	}
 
-	const label = __( 'Convert to blocks' );
+	const label = __( 'Convert to Blocks' );
 
 	const convertToBlocks = () => {
 		onReplace( block.uid, rawHandler( {

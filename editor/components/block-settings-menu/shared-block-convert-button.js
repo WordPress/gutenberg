@@ -12,10 +12,20 @@ import { __ } from '@wordpress/i18n';
 import { isSharedBlock } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 
-export function SharedBlockConvertButton( { sharedBlock, onConvertToStatic, onConvertToShared, itemsRole } ) {
+export function SharedBlockConvertButton( {
+	isVisible,
+	isStaticBlock,
+	onConvertToStatic,
+	onConvertToShared,
+	itemsRole,
+} ) {
+	if ( ! isVisible ) {
+		return null;
+	}
+
 	return (
 		<Fragment>
-			{ ! sharedBlock && (
+			{ isStaticBlock && (
 				<IconButton
 					className="editor-block-settings-menu__control"
 					icon="controls-repeat"
@@ -25,7 +35,7 @@ export function SharedBlockConvertButton( { sharedBlock, onConvertToStatic, onCo
 					{ __( 'Convert to Shared Block' ) }
 				</IconButton>
 			) }
-			{ sharedBlock && (
+			{ ! isStaticBlock && (
 				<IconButton
 					className="editor-block-settings-menu__control"
 					icon="controls-repeat"
@@ -42,9 +52,18 @@ export function SharedBlockConvertButton( { sharedBlock, onConvertToStatic, onCo
 export default compose( [
 	withSelect( ( select, { uid } ) => {
 		const { getBlock, getSharedBlock } = select( 'core/editor' );
+		const { getFallbackBlockName } = select( 'core/blocks' );
+
 		const block = getBlock( uid );
+		if ( ! block ) {
+			return { isVisible: false };
+		}
+
 		return {
-			sharedBlock: block && isSharedBlock( block ) ? getSharedBlock( block.attributes.ref ) : null,
+			// Hide 'Convert to Shared Block' on Classic blocks. Showing it causes a
+			// confusing UX, because of its similarity to the 'Convert to Blocks' button.
+			isVisible: block.name !== getFallbackBlockName(),
+			isStaticBlock: ! isSharedBlock( block ) || ! getSharedBlock( block.attributes.ref ),
 		};
 	} ),
 	withDispatch( ( dispatch, { uid, onToggle = noop } ) => {
