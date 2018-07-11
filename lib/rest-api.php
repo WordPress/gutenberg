@@ -19,6 +19,9 @@ function gutenberg_register_rest_routes() {
 	$controller = new WP_REST_Block_Renderer_Controller();
 	$controller->register_routes();
 
+	$controller = new WP_REST_Search_Controller();
+	$controller->register_routes();
+
 	foreach ( get_post_types( array( 'show_in_rest' => true ), 'objects' ) as $post_type ) {
 		$class = ! empty( $post_type->rest_controller_class ) ? $post_type->rest_controller_class : 'WP_REST_Posts_Controller';
 
