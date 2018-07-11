@@ -193,7 +193,7 @@ describe( 'InserterMenu', () => {
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'A Text Embed' );
 
 		const noResultsMessage = wrapper.find( '.editor-inserter__no-results' );
-		expect( noResultsMessage ).toBeEmpty();
+		expect( noResultsMessage ).not.toExist();
 	} );
 
 	it( 'should show shared items in the shared tab', () => {
@@ -222,7 +222,7 @@ describe( 'InserterMenu', () => {
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'My shared block' );
 
 		const noResultsMessage = wrapper.find( '.editor-inserter__no-results' );
-		expect( noResultsMessage ).toBeEmpty();
+		expect( noResultsMessage ).not.toExist();
 	} );
 
 	it( 'should show the common category blocks', () => {
@@ -253,7 +253,7 @@ describe( 'InserterMenu', () => {
 		expect( visibleBlocks.at( 2 ).text() ).toBe( 'Some Other Block' );
 
 		const noResultsMessage = wrapper.find( '.editor-inserter__no-results' );
-		expect( noResultsMessage ).toBeEmpty();
+		expect( noResultsMessage ).not.toExist();
 	} );
 
 	it( 'should disable items with `isDisabled`', () => {
@@ -308,7 +308,7 @@ describe( 'InserterMenu', () => {
 		expect( visibleBlocks.at( 2 ).text() ).toBe( 'A Text Embed' );
 
 		const noResultsMessage = wrapper.find( '.editor-inserter__no-results' );
-		expect( noResultsMessage ).toBeEmpty();
+		expect( noResultsMessage ).not.toExist();
 	} );
 
 	it( 'should trim whitespace of search terms', () => {

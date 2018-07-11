@@ -11,9 +11,10 @@ import plugin from '../src';
 describe( 'babel-plugin-import-jsx-pragma', () => {
 	function getTransformedCode( source, options = {} ) {
 		const { code } = transformSync( source, {
+			configFile: false,
 			plugins: [
 				[ plugin, options ],
-				'syntax-jsx',
+				'@babel/plugin-syntax-jsx',
 			],
 		} );
 
@@ -28,7 +29,7 @@ describe( 'babel-plugin-import-jsx-pragma', () => {
 	} );
 
 	it( 'does nothing if there scope variable already imported', () => {
-		const original = 'import React from "react";let foo = <bar />;';
+		const original = 'import React from "react";\nlet foo = <bar />;';
 		const string = getTransformedCode( original );
 
 		expect( string ).toBe( original );

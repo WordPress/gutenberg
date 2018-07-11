@@ -12,7 +12,7 @@
 	],
 	"moduleNameMapper": {
 		"@wordpress\\/(blocks|components|editor|utils|edit-post|viewport|core-blocks|nux)$": "$1",
-		"@wordpress\\/(.*)$": "packages/$1/src"
+		"@wordpress\\/(a-z0-9-)$": "packages/$1/src"
 	},
 	"preset": "@wordpress/jest-preset-default",
 	"setupFiles": [

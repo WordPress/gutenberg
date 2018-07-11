@@ -13,7 +13,7 @@ describe( 'SharedBlockConvertButton', () => {
 		const wrapper = shallow(
 			<SharedBlockConvertButton isVisible={ false } />
 		);
-		expect( wrapper.children() ).toBeEmpty();
+		expect( wrapper.children() ).not.toExist();
 	} );
 
 	it( 'should allow converting a static block to a shared block', () => {
