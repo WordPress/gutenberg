@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import {
 	IconButton,
+	PanelBody,
 	SelectControl,
 	Toolbar,
 	ToggleControl,
@@ -102,27 +103,29 @@ class AudioEdit extends Component {
 					</Toolbar>
 				</BlockControls>
 				<InspectorControls>
-					<SelectControl
-						label={ __( 'Preload' ) }
-						value={ undefined !== preload ? preload : 'none' }
-						// `undefined` is required for the preload attribute to be unset.
-						onChange={ ( value ) => setAttributes( { preload: 'none' !== value ? value : undefined } ) }
-						options={ [
-							{ value: 'auto', label: __( 'Auto' ) },
-							{ value: 'metadata', label: __( 'Metadata' ) },
-							{ value: 'none', label: __( 'None' ) },
-						] }
-					/>
-					<ToggleControl
-						label={ __( 'Autoplay' ) }
-						onChange={ this.toggleAttribute( 'autoplay' ) }
-						checked={ autoplay }
-					/>
-					<ToggleControl
-						label={ __( 'Loop' ) }
-						onChange={ this.toggleAttribute( 'loop' ) }
-						checked={ loop }
-					/>
+					<PanelBody>
+						<ToggleControl
+							label={ __( 'Autoplay' ) }
+							onChange={ this.toggleAttribute( 'autoplay' ) }
+							checked={ autoplay }
+						/>
+						<ToggleControl
+							label={ __( 'Loop' ) }
+							onChange={ this.toggleAttribute( 'loop' ) }
+							checked={ loop }
+						/>
+						<SelectControl
+							label={ __( 'Preload' ) }
+							value={ undefined !== preload ? preload : 'none' }
+							// `undefined` is required for the preload attribute to be unset.
+							onChange={ ( value ) => setAttributes( { preload: 'none' !== value ? value : undefined } ) }
+							options={ [
+								{ value: 'auto', label: __( 'Auto' ) },
+								{ value: 'metadata', label: __( 'Metadata' ) },
+								{ value: 'none', label: __( 'None' ) },
+							] }
+						/>
+					</PanelBody>
 				</InspectorControls>
 				<figure className={ className }>
 					<audio controls="controls" src={ src } />
