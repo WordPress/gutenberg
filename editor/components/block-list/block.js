@@ -326,7 +326,7 @@ export class BlockListBlock extends Component {
 			case ENTER:
 				// Insert default block after current block if enter and event
 				// not already handled by descendant.
-				this.props.onInsertDefaultBlock( this.props.order + 1 );
+				this.props.onInsertDefaultBlockAfter();
 				event.preventDefault();
 				break;
 
@@ -655,7 +655,10 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 			blocks = blocks.map( ( block ) => cloneBlock( block, { layout } ) );
 			insertBlocks( blocks, index, rootUID );
 		},
-		onInsertDefaultBlock: insertDefaultBlock,
+		onInsertDefaultBlockAfter() {
+			const { order, rootUID } = ownProps;
+			insertDefaultBlock( {}, rootUID, order + 1 );
+		},
 		onRemove( uid ) {
 			removeBlock( uid );
 		},
