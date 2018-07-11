@@ -49,8 +49,13 @@ export function Button( props, ref ) {
 	let tagProps;
 
 	if ( href !== undefined && ! disabled ) {
-		tag = !! isExternalLink ? ExternalLink : 'a';
-		tagProps = { href, target };
+		if ( isExternalLink ) {
+			tag = ExternalLink;
+			tagProps = { href, target, iconClassName: 'components-button__icon' };
+		} else {
+			tag = 'a';
+			tagProps = { href, target };
+		}
 	} else {
 		tag = 'button';
 		tagProps = { type: 'button', disabled };

@@ -182,11 +182,11 @@
 		font-size: 11px;
 	}
 
-	.components-external-link__icon {
+	&__icon {
 		margin: 2px 0 0 4px;
 	}
 
-	&.is-button .components-external-link__icon {
+	&.is-button &__icon {
 		align-self: center;
 		margin-top: 1px;
 	}
