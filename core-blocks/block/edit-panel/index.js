@@ -23,9 +23,6 @@ class SharedBlockEditPanel extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		if ( ! this.props.isSelected ) {
-			this.props.onCancel();
-		}
 		// Select the input text only once when the form opens.
 		if ( ! prevProps.isEditing && this.props.isEditing ) {
 			this.titleField.current.select();
