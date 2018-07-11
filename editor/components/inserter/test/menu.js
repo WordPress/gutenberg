@@ -2,7 +2,8 @@
  * External dependencies
  */
 import { noop } from 'lodash';
-import renderer from 'react-test-renderer';
+import TestUtils from 'react-dom/test-utils';
+import ReactDOM from 'react-dom';
 
 /**
  * Internal dependencies
@@ -90,352 +91,240 @@ const items = [
 	sharedItem,
 ];
 
-const mockEvent = {
-	preventDefault: () => true,
-	change: ( value ) => {
-		return { target: { value } };
-	},
+const defaultProps = {
+	position: 'top center',
+	instanceID: 1,
+	items: items,
+	debouncedSpeak: noop,
+	fetchSharedBlocks: noop,
+	setTimeout: noop,
 };
 
-const initializeMenuStateAndReturnWrapper = () => {
-	const wrapper = renderer.create(
-		<InserterMenu
-			position={ 'top center' }
-			instanceId={ 1 }
-			items={ items }
-			debouncedSpeak={ noop }
-			fetchSharedBlocks={ noop }
-			setTimeout={ noop }
-		/>
+let wrapper;
+
+const setWrapperForProps = ( propOverrides ) => {
+	wrapper = TestUtils.renderIntoDocument(
+		<InserterMenu { ...defaultProps } { ...propOverrides } />
 	);
-	const activeTabs = wrapper.root.findAll( ( node ) => {
-		return node.props.className &&
-			node.props.className === 'components-panel__body is-opened';
-	} );
+};
+
+const initializeMenuDefaultStateAndReturnElement = ( propOverrides ) => {
+	setWrapperForProps( propOverrides );
+	/* eslint-disable react/no-find-dom-node */
+	return ReactDOM.findDOMNode( wrapper );
+	/* eslint-enable react/no-find-dom-node */
+};
+
+const initializeAllClosedMenuStateAndReturnElement = ( propOverrides ) => {
+	const element = initializeMenuDefaultStateAndReturnElement( propOverrides );
+	const activeTabs = element.querySelectorAll(
+		'.components-panel__body.is-opened button.components-panel__body-toggle'
+	);
 	activeTabs.forEach( ( tab ) => {
-		const toggleButton = tab.find( ( node ) => {
-			return node.type === 'button' &&
-				node.props.className.includes( 'components-button' );
-		} );
-		toggleButton.props.onClick( mockEvent );
+		TestUtils.Simulate.click( tab );
 	} );
-	return wrapper;
+	return element;
+};
+
+const assertNoResultsMessageToBePresent = ( element ) => {
+	const noResultsMessage = element.querySelector(
+		'.editor-inserter__no-results'
+	);
+	expect( noResultsMessage.textContent ).toEqual( 'No blocks found.' );
+};
+
+const assertNoResultsMessageNotToBePresent = ( element ) => {
+	const noResultsMessage = element.querySelector(
+		'.editor-inserter__no-results'
+	);
+	expect( noResultsMessage ).toBe( null );
+};
+
+const assertOpenedPanels = ( element, expectedOpen = 0 ) => {
+	expect( element.querySelectorAll( '.components-panel__body.is-opened ' ) )
+		.toHaveLength( expectedOpen );
+};
+
+const getTabButtonWithContent = ( element, content ) => {
+	let foundButton;
+	const buttons = element.querySelectorAll( '.components-button' );
+	buttons.forEach( ( button ) => {
+		if ( button.textContent === content ) {
+			foundButton = button;
+		}
+	} );
+	return foundButton;
+};
+
+const performSearchWithText = ( element, searchText ) => {
+	const searchElement = element.querySelector( '.editor-inserter__search' );
+	TestUtils.Simulate.change( searchElement, { target: { value: searchText } } );
 };
 
 describe( 'InserterMenu', () => {
-	// NOTE: Due to https://github.com/airbnb/enzyme/issues/1174, some of the selectors passed through to
-	// wrapper.find have had to be strengthened (and the filterWhere strengthened also), otherwise two
-	// results would be returned even though only one was in the DOM.
-
 	it( 'should show the suggested tab by default', () => {
-		const wrapper = renderer.create(
-			<InserterMenu
-				position={ 'top center' }
-				instanceId={ 1 }
-				items={ items }
-				debouncedSpeak={ noop }
-				fetchSharedBlocks={ noop }
-				setTimeout={ noop }
-			/>
+		const element = initializeMenuDefaultStateAndReturnElement();
+		const activeCategory = element.querySelector(
+			'.components-panel__body.is-opened > .components-panel__body-title'
 		);
-
-		const activeCategory = wrapper.root.find( ( node ) => {
-			return node.props.className &&
-				node.props.className.includes( 'components-panel__body' ) &&
-				node.props.className.includes( 'is-opened' );
-		} ).find( ( node ) => {
-			return node.props.className &&
-				node.props.className.includes( 'components-panel__body-title' );
-		} ).find( ( node ) => {
-			return node.type === 'button';
-		} );
-
-		expect( activeCategory.props.children.includes( 'Most Used' ) ).toBe( true );
+		expect( activeCategory.textContent ).toBe( 'Most Used' );
 	} );
 
 	it( 'should show nothing if there are no items', () => {
-		const wrapper = renderer.create(
-			<InserterMenu
-				position={ 'top center' }
-				instanceId={ 1 }
-				items={ [] }
-				debouncedSpeak={ noop }
-				fetchSharedBlocks={ noop }
-				setTimeout={ noop }
-			/>
+		const element = initializeMenuDefaultStateAndReturnElement(
+			{ items: [] }
+		);
+		const visibleBlocks = element.querySelector(
+			'.editor-block-types-list__item'
 		);
 
-		const visibleBlocks = () => wrapper.root.find( ( node ) => {
-			return node.props.className &&
-				node.props.className.includes( 'editor-block-types-list__item' );
-		} );
-		// find will throw an error if it can't find the item.
-		expect( visibleBlocks ).toThrow();
+		expect( visibleBlocks ).toBe( null );
 
-		const noResultsMessage = wrapper.root.find( ( node ) => {
-			return node.props.className &&
-				node.props.className.includes( 'editor-inserter__no-results' );
-		} );
-		expect( noResultsMessage.children ).toHaveLength( 1 );
-		expect( noResultsMessage.children[ 0 ] ).toEqual( 'No blocks found.' );
+		assertNoResultsMessageToBePresent( element );
 	} );
 
 	it( 'should show only high utility items in the suggested tab', () => {
-		const wrapper = renderer.create(
-			<InserterMenu
-				position={ 'top center' }
-				instanceId={ 1 }
-				items={ items }
-				debouncedSpeak={ noop }
-				fetchSharedBlocks={ noop }
-				setTimeout={ noop }
-			/>
+		const element = initializeMenuDefaultStateAndReturnElement();
+		const visibleBlocks = element.querySelectorAll(
+			'.editor-block-types-list__item-title'
 		);
-
-		const visibleBlocks = wrapper.root.findAll( ( node ) => {
-			return node.props.className &&
-				node.props.className === 'editor-block-types-list__item-title';
-		} );
 		expect( visibleBlocks ).toHaveLength( 3 );
-		expect( visibleBlocks[ 0 ].children[ 0 ] ).toEqual( 'Text' );
-		expect( visibleBlocks[ 1 ].children[ 0 ] ).toEqual( 'Advanced Text' );
-		expect( visibleBlocks[ 2 ].children[ 0 ] ).toEqual( 'Some Other Block' );
+		expect( visibleBlocks[ 0 ].textContent ).toEqual( 'Text' );
+		expect( visibleBlocks[ 1 ].textContent ).toEqual( 'Advanced Text' );
+		expect( visibleBlocks[ 2 ].textContent ).toEqual( 'Some Other Block' );
 	} );
 
 	it( 'should limit the number of items shown in the suggested tab', () => {
-		const wrapper = renderer.create(
-			<InserterMenu
-				position={ 'top center' }
-				instanceId={ 1 }
-				items={ items }
-				debouncedSpeak={ noop }
-				fetchSharedBlocks={ noop }
-				maxSuggestedItems={ 2 }
-				setTimeout={ noop }
-			/>
+		const element = initializeMenuDefaultStateAndReturnElement(
+			{ maxSuggestedItems: 2 }
 		);
-
-		const visibleBlocks = wrapper.root.findAll( ( node ) => {
-			return node.props.className &&
-				node.props.className.includes( 'editor-block-types-list__list-item' );
-		} );
+		const visibleBlocks = element.querySelectorAll(
+			'.editor-block-types-list__list-item'
+		);
 		expect( visibleBlocks ).toHaveLength( 2 );
 	} );
 
 	it( 'should show items from the embed category in the embed tab', () => {
-		const wrapper = initializeMenuStateAndReturnWrapper();
+		const element = initializeAllClosedMenuStateAndReturnElement();
+		const embedTab = getTabButtonWithContent( element, 'Embeds' );
 
-		const embedTab = wrapper.root.find( ( node ) => {
-			return node.type === 'button' && node.children[ 1 ] === 'Embeds';
-		} );
+		TestUtils.Simulate.click( embedTab );
 
-		embedTab.props.onClick( mockEvent );
+		assertOpenedPanels( element, 1 );
 
-		wrapper.root.find( ( node ) => {
-			return node.props.className &&
-				node.props.className === 'components-panel__body is-opened' &&
-				node.find( ( childNode ) => {
-					return childNode.type === 'button' && childNode.children[ 1 ] === 'Embeds';
-				} );
-		} );
-
-		const visibleBlocks = wrapper.root.findAll( ( node ) => {
-			return node.props.className &&
-				node.props.className === 'editor-block-types-list__item-title';
-		} );
+		const visibleBlocks = element.querySelectorAll(
+			'.editor-block-types-list__item-title'
+		);
 
 		expect( visibleBlocks ).toHaveLength( 2 );
-		expect( visibleBlocks[ 0 ].children[ 0 ] ).toBe( 'YouTube' );
-		expect( visibleBlocks[ 1 ].children[ 0 ] ).toBe( 'A Text Embed' );
+		expect( visibleBlocks[ 0 ].textContent ).toBe( 'YouTube' );
+		expect( visibleBlocks[ 1 ].textContent ).toBe( 'A Text Embed' );
 
-		const noResultsMessage = () => wrapper.root.find( ( node ) => {
-			return node.props.className &&
-				node.props.className === 'editor-inserter__no-results';
-		} );
-		expect( noResultsMessage ).toThrow();
+		assertNoResultsMessageNotToBePresent( element );
 	} );
 
 	it( 'should show shared items in the shared tab', () => {
-		const wrapper = initializeMenuStateAndReturnWrapper();
+		const element = initializeAllClosedMenuStateAndReturnElement();
+		const sharedTab = getTabButtonWithContent( element, 'Shared' );
 
-		const sharedTab = wrapper.root.find( ( node ) => {
-			return node.type === 'button' && node.children[ 2 ] === 'Shared';
-		} );
+		TestUtils.Simulate.click( sharedTab );
 
-		sharedTab.props.onClick( mockEvent );
+		assertOpenedPanels( element, 1 );
 
-		wrapper.root.find( ( node ) => {
-			return node.props.className &&
-				node.props.className === 'components-panel__body is-opened' &&
-				node.find( ( childNode ) => {
-					return childNode.type === 'button' && childNode.children[ 2 ] === 'Shared';
-				} );
-		} );
-
-		const visibleBlocks = wrapper.root.findAll( ( node ) => {
-			return node.props.className &&
-				node.props.className === 'editor-block-types-list__item-title';
-		} );
+		const visibleBlocks = element.querySelectorAll(
+			'.editor-block-types-list__item-title'
+		);
 
 		expect( visibleBlocks ).toHaveLength( 1 );
-		expect( visibleBlocks[ 0 ].children[ 0 ] ).toBe( 'My shared block' );
+		expect( visibleBlocks[ 0 ].textContent ).toBe( 'My shared block' );
 
-		const noResultsMessage = () => wrapper.root.find( ( node ) => {
-			return node.props.className &&
-				node.props.className === 'editor-inserter__no-results';
-		} );
-		expect( noResultsMessage ).toThrow();
+		assertNoResultsMessageNotToBePresent( element );
 	} );
 
 	it( 'should show the common category blocks', () => {
-		const wrapper = initializeMenuStateAndReturnWrapper();
+		const element = initializeAllClosedMenuStateAndReturnElement();
+		const commonBlocksTab = getTabButtonWithContent( element, 'Common Blocks' );
 
-		const commonBlocksTab = wrapper.root.find( ( node ) => {
-			return node.type === 'button' && node.children[ 1 ] === 'Common Blocks';
-		} );
+		TestUtils.Simulate.click( commonBlocksTab );
 
-		commonBlocksTab.props.onClick( mockEvent );
+		assertOpenedPanels( element, 1 );
 
-		wrapper.root.find( ( node ) => {
-			return node.props.className &&
-				node.props.className === 'components-panel__body is-opened' &&
-				node.find( ( childNode ) => {
-					return childNode.type === 'button' && childNode.children[ 1 ] === 'Common Blocks';
-				} );
-		} );
-
-		const visibleBlocks = wrapper.root.findAll( ( node ) => {
-			return node.props.className &&
-				node.props.className === 'editor-block-types-list__item-title';
-		} );
+		const visibleBlocks = element.querySelectorAll(
+			'.editor-block-types-list__item-title'
+		);
 
 		expect( visibleBlocks ).toHaveLength( 3 );
-		expect( visibleBlocks[ 0 ].children[ 0 ] ).toBe( 'Text' );
-		expect( visibleBlocks[ 1 ].children[ 0 ] ).toBe( 'Advanced Text' );
-		expect( visibleBlocks[ 2 ].children[ 0 ] ).toBe( 'Some Other Block' );
+		expect( visibleBlocks[ 0 ].textContent ).toBe( 'Text' );
+		expect( visibleBlocks[ 1 ].textContent ).toBe( 'Advanced Text' );
+		expect( visibleBlocks[ 2 ].textContent ).toBe( 'Some Other Block' );
 
-		const noResultsMessage = () => wrapper.root.find( ( node ) => {
-			return node.props.className &&
-				node.props.className === 'editor-inserter__no-results';
-		} );
-		expect( noResultsMessage ).toThrow();
+		assertNoResultsMessageNotToBePresent( element );
 	} );
 
 	it( 'should disable items with `isDisabled`', () => {
-		const wrapper = renderer.create(
-			<InserterMenu
-				position={ 'top center' }
-				instanceId={ 1 }
-				items={ items }
-				debouncedSpeak={ noop }
-				fetchSharedBlocks={ noop }
-				setTimeout={ noop }
-			/>
+		const element = initializeMenuDefaultStateAndReturnElement();
+		const layoutTab = getTabButtonWithContent( element, 'Layout Elements' );
+
+		TestUtils.Simulate.click( layoutTab );
+
+		const disabledBlocks = element.querySelectorAll(
+			'.editor-block-types-list__item[disabled]'
 		);
-		const layoutTab = wrapper.root.find( ( node ) => {
 
-			return node.type === 'button' && node.children[ 1 ] === 'Layout Elements';
-		} );
-
-		layoutTab.props.onClick( mockEvent );
-
-		const disabledBlocks = wrapper.root.findAll( ( node ) => {
-			return node.props.className &&
-				node.props.className.includes( 'editor-block-types-list__item' ) &&
-				node.props.disabled;
-		} );
 		expect( disabledBlocks ).toHaveLength( 1 );
-		expect( disabledBlocks[ 0 ].children[ 1 ].children[ 0 ] ).toBe( 'More' );
+		expect( disabledBlocks[ 0 ].textContent ).toBe( 'More' );
 	} );
 
 	it( 'should allow searching for items', () => {
-		const wrapper = renderer.create(
-			<InserterMenu
-				position={ 'top center' }
-				instanceId={ 1 }
-				items={ items }
-				debouncedSpeak={ noop }
-				fetchSharedBlocks={ noop }
-				setTimeout={ noop }
-			/>
+		const element = initializeMenuDefaultStateAndReturnElement();
+		performSearchWithText( element, 'text' );
+
+		assertOpenedPanels( element, 2 );
+
+		const matchingCategories = element.querySelectorAll(
+			'.components-panel__body-toggle'
 		);
-		wrapper.root.find( ( node ) => {
-			return node.props.className &&
-				node.props.className === 'editor-inserter__search';
-		} ).props.onChange( mockEvent.change( 'text' ) );
 
-		// Two panels
-		const panels = wrapper.root.findAll( ( node ) => {
-			return node.props.className &&
-				node.props.className.includes( 'components-panel__body ' );
-		} );
-		expect( panels ).toHaveLength( 2 );
-
-		// Matching panels expand
-		const matchingCategories = wrapper.root.findAll( ( node ) => {
-			return node.props.className &&
-				node.props.className === 'components-panel__body-toggle';
-		} );
 		expect( matchingCategories ).toHaveLength( 2 );
-		expect( matchingCategories[ 0 ].children[ 0 ].children[ 1 ] ).toBe( 'Common Blocks' );
-		expect( matchingCategories[ 1 ].children[ 0 ].children[ 1 ] ).toBe( 'Embeds' );
+		expect( matchingCategories[ 0 ].textContent ).toBe( 'Common Blocks' );
+		expect( matchingCategories[ 1 ].textContent ).toBe( 'Embeds' );
 
-		const visibleBlocks = wrapper.root.findAll( ( node ) => {
-			return node.props.className &&
-				node.props.className === 'editor-block-types-list__item-title';
-		} );
+		const visibleBlocks = element.querySelectorAll(
+			'.editor-block-types-list__item-title'
+		);
+
 		expect( visibleBlocks ).toHaveLength( 3 );
-		expect( visibleBlocks[ 0 ].children[ 0 ] ).toBe( 'Text' );
-		expect( visibleBlocks[ 1 ].children[ 0 ] ).toBe( 'Advanced Text' );
-		expect( visibleBlocks[ 2 ].children[ 0 ] ).toBe( 'A Text Embed' );
+		expect( visibleBlocks[ 0 ].textContent ).toBe( 'Text' );
+		expect( visibleBlocks[ 1 ].textContent ).toBe( 'Advanced Text' );
+		expect( visibleBlocks[ 2 ].textContent ).toBe( 'A Text Embed' );
 
-		const noResultsMessage = () => wrapper.root.find( ( node ) => {
-			return node.props.className &&
-				node.props.className === 'editor-inserter__no-results';
-		} );
-		expect( noResultsMessage ).toThrow();
+		assertNoResultsMessageNotToBePresent( element );
 	} );
 
 	it( 'should trim whitespace of search terms', () => {
-		const wrapper = renderer.create(
-			<InserterMenu
-				position={ 'top center' }
-				instanceId={ 1 }
-				items={ items }
-				debouncedSpeak={ noop }
-				fetchSharedBlocks={ noop }
-				setTimeout={ noop }
-			/>
+		const element = initializeMenuDefaultStateAndReturnElement();
+		performSearchWithText( element, ' text' );
+
+		assertOpenedPanels( element, 2 );
+
+		const matchingCategories = element.querySelectorAll(
+			'.components-panel__body-toggle'
 		);
-		wrapper.root.find( ( node ) => {
-			return node.props.className &&
-				node.props.className === 'editor-inserter__search';
-		} ).props.onChange( mockEvent.change( ' text' ) );
 
-		// Two panels
-		const panels = wrapper.root.findAll( ( node ) => {
-			return node.props.className &&
-				node.props.className.includes( 'components-panel__body ' );
-		} );
-		expect( panels ).toHaveLength( 2 );
-
-		// Matching panels expand
-		const matchingCategories = wrapper.root.findAll( ( node ) => {
-			return node.props.className &&
-				node.props.className === 'components-panel__body-toggle';
-		} );
 		expect( matchingCategories ).toHaveLength( 2 );
-		expect( matchingCategories[ 0 ].children[ 0 ].children[ 1 ] ).toBe( 'Common Blocks' );
-		expect( matchingCategories[ 1 ].children[ 0 ].children[ 1 ] ).toBe( 'Embeds' );
+		expect( matchingCategories[ 0 ].textContent ).toBe( 'Common Blocks' );
+		expect( matchingCategories[ 1 ].textContent ).toBe( 'Embeds' );
 
-		const visibleBlocks = wrapper.root.findAll( ( node ) => {
-			return node.props.className &&
-				node.props.className === 'editor-block-types-list__item-title';
-		} );
+		const visibleBlocks = element.querySelectorAll(
+			'.editor-block-types-list__item-title'
+		);
+
 		expect( visibleBlocks ).toHaveLength( 3 );
-		expect( visibleBlocks[ 0 ].children[ 0 ] ).toBe( 'Text' );
-		expect( visibleBlocks[ 1 ].children[ 0 ] ).toBe( 'Advanced Text' );
-		expect( visibleBlocks[ 2 ].children[ 0 ] ).toBe( 'A Text Embed' );
+		expect( visibleBlocks[ 0 ].textContent ).toBe( 'Text' );
+		expect( visibleBlocks[ 1 ].textContent ).toBe( 'Advanced Text' );
+		expect( visibleBlocks[ 2 ].textContent ).toBe( 'A Text Embed' );
+
+		assertNoResultsMessageNotToBePresent( element );
 	} );
 } );
 
