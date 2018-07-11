@@ -21,8 +21,7 @@ import BlockDuplicateButton from './block-duplicate-button';
 import BlockRemoveButton from './block-remove-button';
 import SharedBlockConvertButton from './shared-block-convert-button';
 import SharedBlockDeleteButton from './shared-block-delete-button';
-import UnknownConverter from './unknown-converter';
-import HTMLConverter from './html-converter';
+import { HTMLConverter, UnknownConverter } from './converters';
 import _BlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 
 export class BlockSettingsMenu extends Component {
