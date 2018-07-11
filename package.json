@@ -104,7 +104,7 @@
 		"glob": "7.1.2",
 		"lerna": "3.0.0-beta.21",
 		"mkdirp": "0.5.1",
-		"node-sass": "git://github.com/sass/node-sass.git#v4.7.0",
+		"node-sass": "4.9.2",
 		"path-type": "3.0.0",
 		"pegjs": "0.10.0",
 		"pegjs-loader": "0.5.4",
