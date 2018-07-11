@@ -1584,7 +1584,7 @@ export const getInserterItems = createSelector(
 			[ 'desc', 'desc' ]
 		);
 	},
-	( state, editorAllowedBlockTypes, parentUID ) => [
+	( state, parentUID ) => [
 		state.blockListSettings[ parentUID ],
 		state.editor.present.blockOrder,
 		state.editor.present.blocksByUID,
