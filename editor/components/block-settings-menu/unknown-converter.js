@@ -17,7 +17,7 @@ export function UnknownConverter( { block, onReplace, small, user, role } ) {
 		return null;
 	}
 
-	const label = __( 'Convert to blocks' );
+	const label = __( 'Convert to Blocks' );
 
 	const convertToBlocks = () => {
 		onReplace( block.uid, rawHandler( {
