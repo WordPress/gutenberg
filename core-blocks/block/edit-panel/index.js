@@ -23,6 +23,9 @@ class SharedBlockEditPanel extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
+		if ( ! this.props.isSelected ) {
+			this.props.onCancel();
+		}
 		// Select the input text only once when the form opens.
 		if ( ! prevProps.isEditing && this.props.isEditing ) {
 			this.titleField.current.select();
@@ -50,7 +53,7 @@ class SharedBlockEditPanel extends Component {
 	}
 
 	render() {
-		const { isEditing, title, isSaving, onEdit, onCancel, instanceId } = this.props;
+		const { isEditing, title, isSaving, onEdit, instanceId } = this.props;
 
 		return (
 			<Fragment>
@@ -89,21 +92,12 @@ class SharedBlockEditPanel extends Component {
 						/>
 						<Button
 							type="submit"
-							isPrimary
 							isLarge
 							isBusy={ isSaving }
 							disabled={ ! title || isSaving }
 							className="shared-block-edit-panel__button"
 						>
 							{ __( 'Save' ) }
-						</Button>
-						<Button
-							isLarge
-							disabled={ isSaving }
-							className="shared-block-edit-panel__button"
-							onClick={ onCancel }
-						>
-							{ __( 'Cancel' ) }
 						</Button>
 					</form>
 				) }

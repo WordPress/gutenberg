@@ -51,6 +51,12 @@ class SharedBlockEdit extends Component {
 		}
 	}
 
+	componentDidUpdate( prevProps ) {
+		if ( prevProps.isSelected && ! this.props.isSelected ) {
+			this.stopEditing();
+		}
+	}
+
 	startEditing() {
 		const { sharedBlock } = this.props;
 
@@ -127,6 +133,7 @@ class SharedBlockEdit extends Component {
 				{ element }
 				{ ( isSelected || isEditing ) && (
 					<SharedBlockEditPanel
+						isSelected={ isSelected }
 						isEditing={ isEditing }
 						title={ title !== null ? title : sharedBlock.title }
 						isSaving={ isSaving && ! sharedBlock.isTemporary }
