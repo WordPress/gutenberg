@@ -40,7 +40,7 @@
 		left: 0;
 		visibility: hidden;
 
-		// use opacity to work in various editor styles
+		// Use opacity to work in various editor styles.
 		background-color: $dark-opacity-light-200;
 
 		.is-dark-theme & {
@@ -223,7 +223,7 @@
 	// Selected style
 	&.is-selected-parent > .editor-block-list__block-edit:before,
 	&.is-selected > .editor-block-list__block-edit:before {
-		// use opacity to work in various editor styles
+		// Use opacity to work in various editor styles.
 		outline: $border-width solid $dark-opacity-light-500;
 
 		.is-dark-theme & {
@@ -259,7 +259,7 @@
 	&.is-multi-selected .editor-block-list__block-edit:before {
 		background: $blue-medium-highlight;
 
-		// use opacity to work in various editor styles
+		// Use opacity to work in various editor styles.
 		mix-blend-mode: multiply;
 
 		// Collapse extra vertical padding on selection
@@ -284,30 +284,36 @@
 
 	// Warnings
 	&.has-warning .editor-block-list__block-edit {
-		min-height: 250px;
-
 		> :not( .editor-warning ) {
 			pointer-events: none;
 			user-select: none;
 		}
 	}
 
-	&.has-warning .editor-block-list__block-edit > div {
-		border: 1px solid $light-gray-500;
-	}
+	&.has-warning:not( .is-hovered ) .editor-block-list__block-edit:before {
+		// Use opacity to work in various editor styles.
+		outline-color: $dark-opacity-light-500;
 
-	&.has-warning .editor-block-list__block-edit > div:first-child {
-		padding: 10px;
+		.is-dark-theme & {
+			outline-color: $light-opacity-light-500;
+		}
 	}
 
 	&.has-warning .editor-block-list__block-edit:after {
 		content: '';
 		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
-		background-image: linear-gradient( rgba( $light-gray-500, 0.6 ), rgba( $light-gray-500, 0.6 ) );
+		background-color: rgba( $light-gray-100, .8 );
+
+		top: -$block-padding;
+		bottom: -$block-padding;
+		right: -$parent-block-padding;
+		left: -$parent-block-padding;
+
+		// Position for nested blocks
+		.editor-block-list__block & {
+			right: -$block-padding;
+			left: -$block-padding;
+		}
 	}
 
 	// Appender
@@ -324,7 +330,7 @@
 
 	// Shared blocks
 	&.is-shared > .editor-block-list__block-edit:before {
-		// use opacity to work in various editor styles
+		// Use opacity to work in various editor styles.
 		outline: $border-width dashed $dark-opacity-light-500;
 
 		.is-dark-theme & {

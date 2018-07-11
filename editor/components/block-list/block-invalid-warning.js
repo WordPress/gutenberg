@@ -31,7 +31,7 @@ function BlockInvalidWarning( { convertToHTML, convertToBlocks } ) {
 				),
 			] }
 		>
-			{ __( 'This block appears to have been modified externally.' ) }
+			{ __( 'This block has been modified externally.' ) }
 		</Warning>
 	);
 }

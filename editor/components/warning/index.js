@@ -12,7 +12,7 @@ function Warning( { actions, children } ) {
 	return (
 		<div className="editor-warning">
 			<div className="editor-warning__contents">
-				<div className="editor-warning__message">{ children }</div>
+				<p className="editor-warning__message">{ children }</p>
 
 				{ Children.count( actions ) > 0 && (
 					<div className="editor-warning__actions">
