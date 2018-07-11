@@ -5,12 +5,14 @@ import Foundation
 public class RCTAztecViewManager: RCTViewManager {
     
     let attachmentDelegate: Aztec.TextViewAttachmentDelegate
+    let imageProvider: Aztec.TextViewAttachmentImageProvider
     
     /// Customize the initializer to set up the Aztec delegate methods.
     /// Then the example app should implement RCTBridgeDelegate
     /// Then the example app should initialize this class and pass it to the bridge (since this class inherits from RCTBridgeModule
-    public required init(attachmentDelegate: Aztec.TextViewAttachmentDelegate) {
+    public required init(attachmentDelegate: Aztec.TextViewAttachmentDelegate, imageProvider: TextViewAttachmentImageProvider) {
         self.attachmentDelegate = attachmentDelegate
+        self.imageProvider = imageProvider
         
         super.init()
     }
@@ -25,9 +27,8 @@ public class RCTAztecViewManager: RCTViewManager {
         view.backgroundColor = .cyan
         view.text = "Hello world!"
         
-        bridge.uiManager.rootView(forReactTag: view.reactTag) { (view) in
-            print(view ?? "nil")
-        }
+        view.textAttachmentDelegate = attachmentDelegate
+        view.registerAttachmentImageProvider(imageProvider)
         
         return view
     }

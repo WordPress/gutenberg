@@ -9,6 +9,8 @@
 #ifndef RCTAztecViewManager_h
 #define RCTAztecViewManager_h
 
-class RCTAztecViewManager;
+#import <React/RCTEventEmitter.h>
+#import <React/RCTUIManager.h>
+#import <React/RCTViewManager.h>
 
 #endif /* RCTAztecViewManager_h */

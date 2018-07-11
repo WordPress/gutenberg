@@ -26,6 +26,7 @@
 		F1663A4E20F49DB400DC4C03 /* Aztec.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1A879A820EE6E7300FABD31 /* Aztec.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		F1663A8320F4D0D500DC4C03 /* BridgeDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1663A8220F4D0D500DC4C03 /* BridgeDelegate.swift */; };
 		F16E377220ED1D6900E81F5B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F16E377120ED1D6900E81F5B /* AppDelegate.swift */; };
+		F176BCA620F65CB300CDC4E9 /* MediaProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F176BCA520F65CB300CDC4E9 /* MediaProvider.swift */; };
 		F17923DF20890AA0002FE09B /* libRNTAztecView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F17923DE20890A85002FE09B /* libRNTAztecView.a */; };
 		F1A879A920EE6E7300FABD31 /* Aztec.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1A879A820EE6E7300FABD31 /* Aztec.framework */; };
 /* End PBXBuildFile section */
@@ -351,6 +352,7 @@
 		F1663A8220F4D0D500DC4C03 /* BridgeDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BridgeDelegate.swift; path = example/BridgeDelegate.swift; sourceTree = "<group>"; };
 		F16E377020ED1D6900E81F5B /* example-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "example-Bridging-Header.h"; sourceTree = "<group>"; };
 		F16E377120ED1D6900E81F5B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = example/AppDelegate.swift; sourceTree = "<group>"; };
+		F176BCA520F65CB300CDC4E9 /* MediaProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MediaProvider.swift; path = example/MediaProvider.swift; sourceTree = "<group>"; };
 		F17923D920890A85002FE09B /* RNTAztecView.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNTAztecView.xcodeproj; path = ../../ios/RNTAztecView.xcodeproj; sourceTree = "<group>"; };
 		F1A879A820EE6E7300FABD31 /* Aztec.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Aztec.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -477,6 +479,7 @@
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				F16E377020ED1D6900E81F5B /* example-Bridging-Header.h */,
 				F16E377120ED1D6900E81F5B /* AppDelegate.swift */,
+				F176BCA520F65CB300CDC4E9 /* MediaProvider.swift */,
 				F1663A8220F4D0D500DC4C03 /* BridgeDelegate.swift */,
 			);
 			name = example;
@@ -1053,6 +1056,7 @@
 			files = (
 				F16E377220ED1D6900E81F5B /* AppDelegate.swift in Sources */,
 				F1663A8320F4D0D500DC4C03 /* BridgeDelegate.swift in Sources */,
+				F176BCA620F65CB300CDC4E9 /* MediaProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

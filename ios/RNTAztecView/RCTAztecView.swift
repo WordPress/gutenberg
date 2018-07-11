@@ -41,14 +41,13 @@ class RCTAztecView: Aztec.TextView {
         return [name: size]
     }
     
-    // MARK: - Set & get Contents
+    // MARK: - RN Properties
     
-    @objc func setContents(_ contents: NSString) {
-        super.setHTML(contents as String)
-    }
-    
-    @objc func getContents() -> NSString {
-        return super.getHTML() as NSString
+    @objc
+    func setContents(_ contents: NSDictionary) {
+        let html = contents["text"] as? String ?? ""
+        
+        setHTML(html)
     }
 }
 

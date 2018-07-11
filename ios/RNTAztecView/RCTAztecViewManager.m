@@ -1,6 +1,11 @@
+#import "RCTAztecViewManager.h"
+#import "RNTAztecView-Swift.h"
 #import <React/RCTViewManager.h>
 
-@interface RCT_EXTERN_REMAP_MODULE(RCTAztecView, RCTAztecViewManager, RCTViewManager)
-//RCT_REMAP_VIEW_PROPERTY(text, contents, NSString)
+@implementation RCTAztecViewManager (RCTExternModule)
+RCT_EXPORT_MODULE(RCTAztecView)
+
+RCT_REMAP_VIEW_PROPERTY(text, contents, NSDictionary)
 RCT_EXPORT_VIEW_PROPERTY(onContentSizeChange, RCTBubblingEventBlock)
+
 @end

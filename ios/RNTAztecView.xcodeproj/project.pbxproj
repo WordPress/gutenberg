@@ -9,8 +9,6 @@
 /* Begin PBXBuildFile section */
 		F121467D20ED2F81003DD17B /* RCTAztecViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F121467C20ED2F81003DD17B /* RCTAztecViewManager.m */; };
 		F13BF4A020ECF5450047D3F9 /* RCTAztecViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F13BF49F20ECF5450047D3F9 /* RCTAztecViewManager.swift */; };
-		F1663A8B20F4DA8900DC4C03 /* RCTAztecView-Bridging-Header.h in Headers */ = {isa = PBXBuildFile; fileRef = F13BF49E20ECF5440047D3F9 /* RCTAztecView-Bridging-Header.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		F1663A8C20F4DA8900DC4C03 /* RCTAztecViewManager.h in Headers */ = {isa = PBXBuildFile; fileRef = F1663A8720F4D9B500DC4C03 /* RCTAztecViewManager.h */; };
 		F166A38020EE6DF3008E7C9F /* Aztec.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F166A37B20EE6DD7008E7C9F /* Aztec.framework */; };
 		F1A879D020EE90C000FABD31 /* RCTAztecView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A879CF20EE90C000FABD31 /* RCTAztecView.swift */; };
 /* End PBXBuildFile section */
@@ -131,18 +129,6 @@
 		};
 /* End PBXGroup section */
 
-/* Begin PBXHeadersBuildPhase section */
-		F1663A8A20F4DA7A00DC4C03 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				F1663A8B20F4DA8900DC4C03 /* RCTAztecView-Bridging-Header.h in Headers */,
-				F1663A8C20F4DA8900DC4C03 /* RCTAztecViewManager.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXHeadersBuildPhase section */
-
 /* Begin PBXNativeTarget section */
 		F145CFC52087D16A006C159A /* RNTAztecView */ = {
 			isa = PBXNativeTarget;
@@ -151,7 +137,6 @@
 				F145CFC22087D16A006C159A /* Sources */,
 				F145CFC32087D16A006C159A /* Frameworks */,
 				F145CFC42087D16A006C159A /* CopyFiles */,
-				F1663A8A20F4DA7A00DC4C03 /* Headers */,
 			);
 			buildRules = (
 			);
