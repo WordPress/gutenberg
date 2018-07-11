@@ -1,4 +1,4 @@
-## Unreleased (1.1.0)
+## 1.1.0 (Unreleased)
 
 - Moved `@WordPress/packages` repository to `@WordPress/gutenberg` ([#7805](https://github.com/WordPress/gutenberg/pull/7805))
 

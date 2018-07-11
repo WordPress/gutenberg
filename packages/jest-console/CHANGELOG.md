@@ -1,4 +1,4 @@
-## Unreleased (2.0.0)
+## 2.0.0 (Unreleased)
 
 - Breaking: Add new API methods `toHaveInformed`, `toHaveInformedWith`, `toHaveLogged` and `toHaveLoggedWith` ([#137](https://github.com/WordPress/packages/pull/137)). If the code under test calls `console.log` or `console.info` it will fail, unless one of the newly introduced methods is explicitly used to verify it.
 - Breaking: Updated code to work with Babel 7 ([#7832](https://github.com/WordPress/gutenberg/pull/7832))

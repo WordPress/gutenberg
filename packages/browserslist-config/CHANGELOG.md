@@ -1,4 +1,4 @@
-## Unreleased (2.2.0)
+## 2.2.0 (Unreleased)
 
 - Moved `@WordPress/packages` repository to `@WordPress/gutenberg` ([#7805](https://github.com/WordPress/gutenberg/pull/7805))
 
