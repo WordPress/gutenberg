@@ -168,6 +168,14 @@ export const settings = {
 			{
 				type: 'block',
 				blocks: [ 'core/image' ],
+				isMatch: ( { id } ) => {
+					if ( ! id ) {
+						return false;
+					}
+					const { getMedia } = select( 'core' );
+					const media = getMedia( id );
+					return !! media && includes( media.mime_type, 'image' );
+				},
 				transform: ( attributes ) => {
 					return createBlock( 'core/image', {
 						url: attributes.href,
