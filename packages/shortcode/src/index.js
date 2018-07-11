@@ -145,7 +145,7 @@ export function string( options ) {
  */
 export function regexp( tag ) {
 	return new RegExp( '\\[(\\[?)(' + tag + ')(?![\\w-])([^\\]\\/]*(?:\\/(?!\\])[^\\]\\/]*)*?)(?:(\\/)\\]|\\](?:([^\\[]*(?:\\[(?!\\/\\2\\])[^\\[]*)*)(\\[\\/\\2\\]))?)(\\]?)', 'g' );
-};
+}
 
 /**
  * Parse shortcode attributes.
