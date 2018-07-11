@@ -71,6 +71,13 @@ describe( 'adding blocks', () => {
 		await pressTimes( 'Delete', 6 );
 		await page.keyboard.type( ' text' );
 
+		// Ensure newline preservation in shortcode block.
+		// See: https://github.com/WordPress/gutenberg/issues/4456
+		await insertBlock( 'Shortcode' );
+		await page.keyboard.type( '[myshortcode]With multiple' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'lines preserved[/myshortcode]' );
+
 		// Unselect blocks to avoid conflicts with the inbetween inserter
 		await page.click( '.editor-post-title__input' );
 
