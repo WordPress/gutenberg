@@ -1,13 +1,7 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
-import { Component, compose } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,21 +9,15 @@ import { Component, compose } from '@wordpress/element';
 import Edit from './edit';
 import { BlockEditContextProvider } from './context';
 
-export class BlockEdit extends Component {
+class BlockEdit extends Component {
 	constructor( props ) {
 		super( props );
+
 		this.setFocusedElement = this.setFocusedElement.bind( this );
+
 		this.state = {
 			focusedElement: null,
 			setFocusedElement: this.setFocusedElement,
-		};
-	}
-
-	getChildContext() {
-		const { canUserUseUnfilteredHTML } = this.props;
-
-		return {
-			canUserUseUnfilteredHTML,
 		};
 	}
 
@@ -61,13 +49,4 @@ export class BlockEdit extends Component {
 	}
 }
 
-BlockEdit.childContextTypes = {
-	canUserUseUnfilteredHTML: noop,
-};
-
-export default compose( [
-	withSelect( ( select ) => ( {
-		postType: select( 'core/editor' ).getEditedPostAttribute( 'type' ),
-		canUserUseUnfilteredHTML: select( 'core/editor' ).canUserUseUnfilteredHTML(),
-	} ) ),
-] )( BlockEdit );
+export default BlockEdit;
