@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Button with href and isExternalLink properties matches the snapshot when isExternalLink is false 1`] = `
+<a
+  className="components-button"
+  href="https://wordpress.org/"
+/>
+`;
+
+exports[`Button with href and isExternalLink properties matches the snapshot when isExternalLink is true 1`] = `
+<ExternalLink
+  className="components-button"
+  href="https://wordpress.org/"
+/>
+`;
