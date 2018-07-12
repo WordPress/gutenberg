@@ -1,18 +1,10 @@
 .wp-block-latest-comments {
-	&.alignleft {
-		margin-right: 2em;
-	}
-
-	&.alignright {
-		margin: 0 7em 2em;
-	}
-
 	a {
 		cursor: default;
 		pointer-events: none;
 	}
 
-	.has-avatars img {
+	&.has-avatars .avatar {
 		margin-right: 10px;
 	}
 }
@@ -25,9 +17,7 @@
 		padding-top: 0;
 	}
 
-	.wp-block-latest-comments {
-		.has-avatars > li {
-			min-height: 36px;
-		}
+	.wp-block-latest-comments.has-avatars .wp-block-latest-comments__comment {
+		min-height: 36px;
 	}
 }
