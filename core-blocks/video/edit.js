@@ -102,7 +102,7 @@ class VideoEdit extends Component {
 					</Toolbar>
 				</BlockControls>
 				<InspectorControls>
-					<PanelBody title={ __( 'Video Options' ) }>
+					<PanelBody title={ __( 'Video Settings' ) }>
 						<ToggleControl
 							label={ __( 'Autoplay' ) }
 							onChange={ this.toggleAttribute( 'autoplay' ) }
