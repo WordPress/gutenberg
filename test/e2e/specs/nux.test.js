@@ -21,10 +21,12 @@ describe( 'New User Experience (NUX)', () => {
 	beforeEach( async () => {
 		await newDesktopBrowserPage();
 		await newPost( undefined, false );
+	} );
 
+	afterEach( async () => {
 		// Clear localStorage tips so they aren't persisted for the next test.
 		await clearLocalStorage();
-		await page.reload();
+		await page.goto( 'about:blank' );
 	} );
 
 	it( 'should show tips to a first-time user', async () => {
@@ -81,10 +83,16 @@ describe( 'New User Experience (NUX)', () => {
 	} );
 
 	it( 'should toggle tips when the "Show tips" menu item is clicked', async () => {
+		// Tips should be enabled at first.
+		let nuxTipElements = await page.$$( '.nux-dot-tip' );
+		expect( nuxTipElements ).toHaveLength( 1 );
+
+		// The "Show Tips" button is a checkmark/toggle button and it's enabled
+		// by default. Clicking on it disables the tips.
 		await clickOnMoreMenuItem( 'Show Tips' );
 
 		// Should disable tips from appearing.
-		let nuxTipElements = await page.$$( '.nux-dot-tip' );
+		nuxTipElements = await page.$$( '.nux-dot-tip' );
 		expect( nuxTipElements ).toHaveLength( 0 );
 
 		// Tips should be disabled in localStorage as well.
@@ -147,7 +155,7 @@ describe( 'New User Experience (NUX)', () => {
 	// https://github.com/WordPress/gutenberg/issues/7753 is fixed.
 	// See: https://github.com/WordPress/gutenberg/issues/7753#issuecomment-403952816
 	it.skip( 'should show tips if "Show tips" was disabled on a draft and then enabled', async () => {
-		// Disable tips.
+		// Click the "Show tips" button (enabled by default) to disable tips.
 		await clickOnMoreMenuItem( 'Show Tips' );
 
 		// Let's type something so there's content in this post.
