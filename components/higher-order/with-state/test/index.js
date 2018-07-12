@@ -1,12 +1,28 @@
 /**
  * External dependencies
  */
-import { mount } from 'enzyme';
+import TestUtils from 'react-dom/test-utils';
 
 /**
  * Internal dependencies
  */
 import withState from '../';
+
+/**
+ * WordPress dependencies
+ */
+import { Component } from '@wordpress/element';
+
+// this is needed because TestUtils does not accept a stateless component.
+// anything run through a HOC ends up as a stateless component.
+const getTestComponent = ( WrappedComponent ) => {
+	class TestComponent extends Component {
+		render() {
+			return <WrappedComponent { ...this.props } />;
+		}
+	}
+	return <TestComponent />;
+};
 
 describe( 'withState', () => {
 	it( 'should pass initial state and allow updates', () => {
@@ -16,10 +32,11 @@ describe( 'withState', () => {
 			</button>
 		) );
 
-		const wrapper = mount( <EnhancedComponent /> );
+		const wrapper = TestUtils.renderIntoDocument( getTestComponent( EnhancedComponent ) );
+		const buttonElement = () => TestUtils.findRenderedDOMComponentWithTag( wrapper, 'button' );
 
-		expect( wrapper.html() ).toBe( '<button>0</button>' );
-		wrapper.find( 'button' ).simulate( 'click' );
-		expect( wrapper.html() ).toBe( '<button>1</button>' );
+		expect( buttonElement().outerHTML ).toBe( '<button>0</button>' );
+		TestUtils.Simulate.click( buttonElement() );
+		expect( buttonElement().outerHTML ).toBe( '<button>1</button>' );
 	} );
 } );
