@@ -14,9 +14,7 @@ import { Component } from '@wordpress/element';
 import withFocusOutside from '../';
 import ReactDOM from 'react-dom';
 
-jest.useFakeTimers();
-
-let wrapper, callback;
+let wrapper, onFocusOutside;
 
 describe( 'withFocusOutside', () => {
 	const EnhancedComponent = withFocusOutside(
@@ -47,15 +45,15 @@ describe( 'withFocusOutside', () => {
 		return <TestComponent />;
 	};
 
-	const simulateEvent = ( event, position = 0 ) => {
+	const simulateEvent = ( event, index = 0 ) => {
 		const element = TestUtils.scryRenderedDOMComponentsWithTag( wrapper, 'input' );
-		TestUtils.Simulate[ event ]( element[ position ] );
+		TestUtils.Simulate[ event ]( element[ index ] );
 	};
 
 	beforeEach( () => {
-		callback = jest.fn();
+		onFocusOutside = jest.fn();
 		wrapper = TestUtils.renderIntoDocument(
-			getTestComponent( EnhancedComponent, { onFocusOutside: callback } )
+			getTestComponent( EnhancedComponent, { onFocusOutside } )
 		);
 	} );
 
@@ -66,7 +64,7 @@ describe( 'withFocusOutside', () => {
 
 		jest.runAllTimers();
 
-		expect( callback ).not.toHaveBeenCalled();
+		expect( onFocusOutside ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should not call handler if focus transitions via click to button', () => {
@@ -81,7 +79,7 @@ describe( 'withFocusOutside', () => {
 
 		jest.runAllTimers();
 
-		expect( callback ).not.toHaveBeenCalled();
+		expect( onFocusOutside ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should call handler if focus doesn\'t shift to element within component', () => {
@@ -90,7 +88,7 @@ describe( 'withFocusOutside', () => {
 
 		jest.runAllTimers();
 
-		expect( callback ).toHaveBeenCalled();
+		expect( onFocusOutside ).toHaveBeenCalled();
 	} );
 
 	it( 'should cancel check when unmounting while queued', () => {
@@ -103,6 +101,6 @@ describe( 'withFocusOutside', () => {
 
 		jest.runAllTimers();
 
-		expect( callback ).not.toHaveBeenCalled();
+		expect( onFocusOutside ).not.toHaveBeenCalled();
 	} );
 } );
