@@ -61,7 +61,8 @@ function Layout( {
 
 	const publishLandmarkProps = {
 		role: 'region',
-		'aria-label': __( 'Publish' ),
+		/* translators: accessibility text for the publish landmark region. */
+		'aria-label': __( 'Editor publish' ),
 		tabIndex: -1,
 	};
 	return (
@@ -76,7 +77,13 @@ function Layout( {
 			} } />
 			<AutosaveMonitor />
 			<Header />
-			<div className="edit-post-layout__content" role="region" aria-label={ __( 'Editor content' ) } tabIndex="-1">
+			<div
+				className="edit-post-layout__content"
+				role="region"
+				/* translators: accessibility text for the content landmark region. */
+				aria-label={ __( 'Editor content' ) }
+				tabIndex="-1"
+			>
 				<EditorNotices />
 				<PreserveScrollInReorder />
 				<EditorModeKeyboardShortcuts />
