@@ -2,12 +2,19 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, Toolbar, withNotices } from '@wordpress/components';
+import {
+	IconButton,
+	PanelBody,
+	Toolbar,
+	ToggleControl,
+	withNotices,
+} from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
 import {
+	BlockControls,
+	InspectorControls,
 	MediaPlaceholder,
 	RichText,
-	BlockControls,
 } from '@wordpress/editor';
 
 /**
@@ -23,10 +30,18 @@ class VideoEdit extends Component {
 		this.state = {
 			editing: ! this.props.attributes.src,
 		};
+
+		this.toggleAttribute = this.toggleAttribute.bind( this );
+	}
+
+	toggleAttribute( attribute ) {
+		return ( newValue ) => {
+			this.props.setAttributes( { [ attribute ]: newValue } );
+		};
 	}
 
 	render() {
-		const { caption, src } = this.props.attributes;
+		const { autoplay, caption, controls, loop, muted, src } = this.props.attributes;
 		const { setAttributes, isSelected, className, noticeOperations, noticeUI } = this.props;
 		const { editing } = this.state;
 		const switchToEditing = () => {
@@ -86,6 +101,30 @@ class VideoEdit extends Component {
 						/>
 					</Toolbar>
 				</BlockControls>
+				<InspectorControls>
+					<PanelBody title={ __( 'Video Options' ) }>
+						<ToggleControl
+							label={ __( 'Autoplay' ) }
+							onChange={ this.toggleAttribute( 'autoplay' ) }
+							checked={ autoplay }
+						/>
+						<ToggleControl
+							label={ __( 'Loop' ) }
+							onChange={ this.toggleAttribute( 'loop' ) }
+							checked={ loop }
+						/>
+						<ToggleControl
+							label={ __( 'Muted' ) }
+							onChange={ this.toggleAttribute( 'muted' ) }
+							checked={ muted }
+						/>
+						<ToggleControl
+							label={ __( 'Playback Controls' ) }
+							onChange={ this.toggleAttribute( 'controls' ) }
+							checked={ controls }
+						/>
+					</PanelBody>
+				</InspectorControls>
 				<figure className={ className }>
 					<video controls src={ src } />
 					{ ( ( caption && caption.length ) || !! isSelected ) && (
