@@ -39,32 +39,11 @@ class FakeEditor extends Component {
 
 function makeAutocompleter( completers, {
 	AutocompleteComponent = Autocomplete,
+	mountImplementation = mount,
 	onReplace = noop,
 } = {} ) {
-	return mount(
+	return mountImplementation(
 		<AutocompleteComponent instanceId="1"
-			completers={ completers }
-			onReplace={ onReplace }
-		>
-			{ ( { isExpanded, listBoxId, activeId } ) => (
-				<FakeEditor
-					aria-autocomplete="list"
-					aria-expanded={ isExpanded }
-					aria-owns={ listBoxId }
-					aria-activedescendant={ activeId }
-				/>
-			) }
-		</AutocompleteComponent>
-	);
-}
-
-function makeAutocompleterWithUtils( completers, {
-	AutocompleteComponent = Autocomplete,
-	onReplace = noop,
-} = {} ) {
-	return TestUtils.renderIntoDocument(
-		<AutocompleteComponent
-			instanceId="1"
 			completers={ completers }
 			onReplace={ onReplace }
 		>
@@ -633,8 +612,9 @@ describe( 'Autocomplete', () => {
 				}
 			}
 
-			const wrapper = makeAutocompleterWithUtils( [], {
+			const wrapper = makeAutocompleter( [], {
 				AutocompleteComponent: Enhanced,
+				mountImplementation: TestUtils.renderIntoDocument,
 			} );
 			simulateInputForUtils( wrapper, [ par( tx( '/' ) ) ] );
 			TestUtils.Simulate.blur(
