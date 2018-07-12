@@ -3,10 +3,9 @@
  */
 import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Disabled, SandBox, CodeEditor } from '@wordpress/components';
+import { withState, Disabled, SandBox, CodeEditor } from '@wordpress/components';
 import { getPhrasingContentSchema } from '@wordpress/blocks';
 import { BlockControls } from '@wordpress/editor';
-import { withState } from '@wordpress/compose';
 
 /**
  * Internal dependencies

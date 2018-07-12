@@ -6,7 +6,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { withGlobalEvents } from '@wordpress/compose';
+import { withGlobalEvents } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 
 class ImageSize extends Component {

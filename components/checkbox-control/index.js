@@ -1,12 +1,8 @@
 /**
- * External dependencies
- */
-import { withInstanceId } from '@wordpress/compose';
-
-/**
  * Internal dependencies
  */
 import BaseControl from '../base-control';
+import withInstanceId from '../higher-order/with-instance-id';
 import './style.scss';
 
 function CheckboxControl( { label, className, heading, checked, help, instanceId, onChange, ...props } ) {

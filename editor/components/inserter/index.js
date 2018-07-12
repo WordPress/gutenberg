@@ -4,9 +4,8 @@
 import { __ } from '@wordpress/i18n';
 import { Dropdown, IconButton } from '@wordpress/components';
 import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies

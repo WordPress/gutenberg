@@ -1,9 +1,9 @@
 /**
  * WordPress Dependencies
  */
-import { createSlotFill, withFocusReturn } from '@wordpress/components';
+import { createSlotFill, ifCondition, withFocusReturn } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
-import { ifCondition, compose } from '@wordpress/compose';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal Dependencies

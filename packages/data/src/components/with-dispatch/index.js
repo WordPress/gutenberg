@@ -6,12 +6,17 @@ import { mapValues } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createHigherOrderComponent } from '@wordpress/element';
-import { pure, compose, remountOnPropChange } from '@wordpress/compose';
+import {
+	Component,
+	compose,
+	createHigherOrderComponent,
+	pure,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+import remountOnPropChange from '../remountOnPropChange';
 import { RegistryConsumer } from '../registry-provider';
 
 /**

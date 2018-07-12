@@ -7,9 +7,8 @@ import { noop, get } from 'lodash';
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { Component, createRef } from '@wordpress/element';
+import { compose, Component, createRef } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies

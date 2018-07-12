@@ -1,10 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { ClipboardButton } from '@wordpress/components';
+import { ClipboardButton, withState } from '@wordpress/components';
+import { compose } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { withState, compose } from '@wordpress/compose';
 
 function CopyContentMenuItem( { editedPostContent, hasCopied, setState } ) {
 	return (

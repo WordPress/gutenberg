@@ -7,11 +7,11 @@ import { partial, noop, find } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
+import { default as withInstanceId } from '../higher-order/with-instance-id';
 import { NavigableMenu } from '../navigable-container';
 
 const TabButton = ( { tabId, onClick, children, selected, ...rest } ) => (

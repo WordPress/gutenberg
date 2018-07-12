@@ -8,11 +8,10 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton } from '@wordpress/components';
+import { IconButton, withInstanceId } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
-import { Component } from '@wordpress/element';
+import { compose, Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { withInstanceId, compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies

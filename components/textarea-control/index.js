@@ -1,12 +1,8 @@
 /**
- * WordPress dependencies
- */
-import { withInstanceId } from '@wordpress/compose';
-
-/**
  * Internal dependencies
  */
 import BaseControl from '../base-control';
+import withInstanceId from '../higher-order/with-instance-id';
 import './style.scss';
 
 function TextareaControl( { label, value, help, instanceId, onChange, rows = 4, className, ...props } ) {

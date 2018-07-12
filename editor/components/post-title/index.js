@@ -9,12 +9,11 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/utils';
 import { ENTER } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { KeyboardShortcuts, withFocusOutside } from '@wordpress/components';
-import { withInstanceId, compose } from '@wordpress/compose';
+import { KeyboardShortcuts, withInstanceId, withFocusOutside } from '@wordpress/components';
 
 /**
  * Internal dependencies

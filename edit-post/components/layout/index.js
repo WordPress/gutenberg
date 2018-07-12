@@ -18,10 +18,9 @@ import {
 	PreserveScrollInReorder,
 } from '@wordpress/editor';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { Fragment } from '@wordpress/element';
+import { compose, Fragment } from '@wordpress/element';
 import { PluginArea } from '@wordpress/plugins';
 import { withViewportMatch } from '@wordpress/viewport';
-import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies

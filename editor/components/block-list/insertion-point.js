@@ -8,10 +8,9 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
-import { Component } from '@wordpress/element';
-import { IconButton } from '@wordpress/components';
+import { Component, compose } from '@wordpress/element';
+import { ifCondition, IconButton } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { ifCondition, compose } from '@wordpress/compose';
 
 class BlockInsertionPoint extends Component {
 	constructor() {

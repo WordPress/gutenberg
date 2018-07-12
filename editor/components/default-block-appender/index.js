@@ -8,7 +8,7 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { compose } from '@wordpress/compose';
+import { compose } from '@wordpress/element';
 import { getDefaultBlockName } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';

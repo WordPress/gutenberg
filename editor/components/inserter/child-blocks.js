@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
+import { compose } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import { ifCondition, compose } from '@wordpress/compose';
+import { ifCondition } from '@wordpress/components';
 
 /**
  * Internal dependencies

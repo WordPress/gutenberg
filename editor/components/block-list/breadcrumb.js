@@ -1,10 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
+import { compose, Component, Fragment } from '@wordpress/element';
 import { Toolbar } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies

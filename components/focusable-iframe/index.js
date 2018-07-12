@@ -7,7 +7,11 @@ import { omit } from 'lodash';
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
-import { withGlobalEvents } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import withGlobalEvents from '../higher-order/with-global-events';
 
 /**
  * Browser dependencies

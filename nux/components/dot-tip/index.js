@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { compose, withSafeTimeout } from '@wordpress/compose';
-import { Popover, Button, IconButton } from '@wordpress/components';
+import { compose } from '@wordpress/element';
+import { Popover, Button, IconButton, withSafeTimeout } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 

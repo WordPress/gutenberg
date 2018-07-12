@@ -8,7 +8,7 @@ import { get } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Button, Spinner, ResponsiveWrapper, withFilters } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
+import { compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 /**

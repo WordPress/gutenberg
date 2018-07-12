@@ -17,7 +17,7 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import { Component, Fragment, RawHTML, createRef } from '@wordpress/element';
+import { Component, Fragment, compose, RawHTML, createRef } from '@wordpress/element';
 import {
 	isHorizontalEdge,
 	getRectangleFromRange,
@@ -25,10 +25,9 @@ import {
 } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
 import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, rawShortcut } from '@wordpress/keycodes';
-import { Slot } from '@wordpress/components';
+import { withInstanceId, withSafeTimeout, Slot } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { rawHandler } from '@wordpress/blocks';
-import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies

@@ -2,12 +2,12 @@
  * WordPress dependencies
  */
 import { Component, renderToString, createRef } from '@wordpress/element';
-import { withGlobalEvents } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import FocusableIframe from '../focusable-iframe';
+import withGlobalEvents from '../higher-order/with-global-events';
 
 class Sandbox extends Component {
 	constructor() {
@@ -151,7 +151,7 @@ class Sandbox extends Component {
 						aspectRatio = potentialIframe.width / potentialIframe.height;
 						potentialIframe.width = '100%';
 					}
-				}
+				}					
 
 				sendResize();
 

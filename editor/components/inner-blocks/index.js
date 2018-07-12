@@ -9,11 +9,10 @@ import classnames from 'classnames';
  */
 import { withContext } from '@wordpress/components';
 import { withViewportMatch } from '@wordpress/viewport';
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { synchronizeBlocksWithTemplate } from '@wordpress/blocks';
 import isShallowEqual from '@wordpress/is-shallow-equal';
-import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies

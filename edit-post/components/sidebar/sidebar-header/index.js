@@ -6,8 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
-import { compose } from '@wordpress/compose';
+import { Fragment, compose } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';

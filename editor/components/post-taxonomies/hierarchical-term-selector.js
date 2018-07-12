@@ -8,12 +8,11 @@ import { stringify } from 'querystring';
  * WordPress dependencies
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
-import { TreeSelect, withAPIData, withSpokenMessages, Button } from '@wordpress/components';
+import { Component, compose } from '@wordpress/element';
+import { TreeSelect, withAPIData, withInstanceId, withSpokenMessages, Button } from '@wordpress/components';
 import { buildTermsTree } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';
 import apiRequest from '@wordpress/api-request';
-import { withInstanceId, compose } from '@wordpress/compose';
 
 /**
  * Module Constants

@@ -8,13 +8,13 @@ import classnames from 'classnames';
  */
 import { Children } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
-import { withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import { NavigableMenu } from '../navigable-container';
+import withInstanceId from '../higher-order/with-instance-id';
 
 export function MenuGroup( {
 	children,

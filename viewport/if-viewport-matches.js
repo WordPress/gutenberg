@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent } from '@wordpress/element';
-import { ifCondition, compose } from '@wordpress/compose';
+import { compose, createHigherOrderComponent } from '@wordpress/element';
+import { ifCondition } from '@wordpress/components';
 
 /**
  * Internal dependencies

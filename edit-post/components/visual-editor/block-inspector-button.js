@@ -9,7 +9,7 @@ import { flow, noop } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { IconButton, withSpokenMessages } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { compose } from '@wordpress/element';
 
 export function BlockInspectorButton( {
 	areAdvancedSettingsOpened,

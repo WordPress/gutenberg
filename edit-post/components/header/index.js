@@ -9,7 +9,7 @@ import {
 	PostPublishPanelToggle,
 } from '@wordpress/editor';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { compose } from '@wordpress/element';
 import { DotTip } from '@wordpress/nux';
 
 /**

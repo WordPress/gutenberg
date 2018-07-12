@@ -16,10 +16,9 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { getDefaultBlockName } from '@wordpress/blocks';
-import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies

@@ -3,7 +3,7 @@
  */
 import { NoticeList } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal dependencies

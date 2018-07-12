@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { PostTaxonomies as PostTaxonomiesForm, PostTaxonomiesCheck } from '@wordpress/editor';
-import { compose } from '@wordpress/compose';
+import { compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 /**

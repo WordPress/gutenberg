@@ -1,12 +1,8 @@
 /**
- * WordPress dependencies
- */
-import { withInstanceId } from '@wordpress/compose';
-
-/**
  * Internal dependencies
  */
 import BaseControl from '../base-control';
+import withInstanceId from '../higher-order/with-instance-id';
 import './style.scss';
 
 function TextControl( { label, value, help, className, instanceId, onChange, type = 'text', ...props } ) {

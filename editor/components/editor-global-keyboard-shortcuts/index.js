@@ -6,11 +6,10 @@ import { first, last, some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
+import { Component, Fragment, compose } from '@wordpress/element';
 import { KeyboardShortcuts } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { rawShortcut } from '@wordpress/keycodes';
-import { compose } from '@wordpress/compose';
 
 class EditorGlobalKeyboardShortcuts extends Component {
 	constructor() {

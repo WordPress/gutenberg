@@ -6,12 +6,11 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { Button } from '@wordpress/components';
+import { Component, compose } from '@wordpress/element';
+import { Button, ifCondition } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { DotTip } from '@wordpress/nux';
-import { ifCondition, compose } from '@wordpress/compose';
 
 export class PostPreviewButton extends Component {
 	constructor() {

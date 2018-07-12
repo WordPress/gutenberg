@@ -8,11 +8,11 @@ import classnames from 'classnames';
  * WordPress Dependencies
  */
 import { Component } from '@wordpress/element';
-import { withSafeTimeout } from '@wordpress/compose';
 
 /**
  * Internal Dependencies
  */
+import withSafeTimeout from '../higher-order/with-safe-timeout';
 import './style.scss';
 
 const dragImageClass = 'components-draggable__invisible-drag-image';

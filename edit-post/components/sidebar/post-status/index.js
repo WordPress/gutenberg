@@ -3,9 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
-import { Fragment } from '@wordpress/element';
+import { compose, Fragment } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
 
 /**
  * Internal Dependencies

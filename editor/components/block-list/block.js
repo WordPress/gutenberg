@@ -8,7 +8,7 @@ import tinymce from 'tinymce';
 /**
  * WordPress dependencies
  */
-import { Component, findDOMNode, Fragment } from '@wordpress/element';
+import { Component, findDOMNode, Fragment, compose } from '@wordpress/element';
 import {
 	focus,
 	isTextField,
@@ -28,7 +28,6 @@ import { withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
-import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies

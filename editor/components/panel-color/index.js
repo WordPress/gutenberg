@@ -6,8 +6,8 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { PanelColor as PanelColorComponent } from '@wordpress/components';
-import { ifCondition, compose } from '@wordpress/compose';
+import { ifCondition, PanelColor as PanelColorComponent } from '@wordpress/components';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal dependencies

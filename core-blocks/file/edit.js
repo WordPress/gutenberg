@@ -15,7 +15,7 @@ import {
 	withNotices,
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
-import { Component, Fragment } from '@wordpress/element';
+import { Component, compose, Fragment } from '@wordpress/element';
 import {
 	MediaUpload,
 	MediaPlaceholder,
@@ -23,7 +23,6 @@ import {
 	RichText,
 	editorMediaUpload,
 } from '@wordpress/editor';
-import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies

@@ -6,9 +6,8 @@ import { filter, identity, includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
+import { compose, Fragment } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies

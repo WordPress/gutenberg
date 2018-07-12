@@ -7,7 +7,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
  * WordPress Dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { compose } from '@wordpress/compose';
+import { compose } from '@wordpress/element';
 import { MenuItem } from '@wordpress/components';
 
 function TipsToggle( { onToggle, isActive } ) {

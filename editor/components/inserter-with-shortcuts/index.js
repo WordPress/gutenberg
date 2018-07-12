@@ -7,7 +7,7 @@ import { filter, isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
-import { compose } from '@wordpress/compose';
+import { compose } from '@wordpress/element';
 import { IconButton } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
