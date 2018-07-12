@@ -151,9 +151,8 @@ class VideoEdit extends Component {
 						/>
 						<SelectControl
 							label={ __( 'Preload' ) }
-							value={ undefined !== preload ? preload : 'metadata' }
-							// `undefined` is required for the preload attribute to be unset.
-							onChange={ ( value ) => setAttributes( { preload: ( 'metadata' !== value ) ? value : undefined } ) }
+							value={ preload }
+							onChange={ ( value ) => setAttributes( { preload: value } ) }
 							options={ [
 								{ value: 'auto', label: __( 'Auto' ) },
 								{ value: 'metadata', label: __( 'Metadata' ) },
