@@ -11,6 +11,7 @@ export { loadAndPersist, withRehydration } from './persist';
 export { default as withSelect } from './components/with-select';
 export { default as withDispatch } from './components/with-dispatch';
 export { default as RegistryProvider } from './components/registry-provider';
+export { createRegistry } from './registry';
 
 /**
  * The combineReducers helper function turns an object whose values are different
