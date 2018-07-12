@@ -8,11 +8,14 @@
                 "Some ",
                 {
                     "type": "em",
-                    "children": "preformatted"
+                    "children": [
+                        "preformatted"
+                    ]
                 },
                 " text...",
                 {
-                    "type": "br"
+                    "type": "br",
+                    "children": []
                 },
                 "And more!"
             ]

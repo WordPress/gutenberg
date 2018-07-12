@@ -8,7 +8,9 @@
                 "The ",
                 {
                     "type": "em",
-                    "children": "Inserter"
+                    "children": [
+                        "Inserter"
+                    ]
                 },
                 " Tool"
             ],

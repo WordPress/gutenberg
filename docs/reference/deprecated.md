@@ -17,6 +17,7 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
  - The `wp.editor.UrlInput` component has been renamed to `wp.editor.URLInput`.
  - The Text Columns block has been removed. Please use the Columns block instead.
  - `InnerBlocks` grouped layout is removed. Use intermediary nested inner blocks instead. See Columns / Column block for reference implementation.
+ - `RichText` explicit `element` format removed. Please use the compatible `children` format instead.
 
 ## 3.4.0
 

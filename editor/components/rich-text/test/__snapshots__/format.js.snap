@@ -10,6 +10,27 @@ exports[`createTinyMCEElement should render a TinyMCE element 1`] = `
 </div>
 `;
 
+exports[`domToBlockChildren should return the corresponding element  1`] = `
+Array [
+  Object {
+    "props": Object {
+      "children": Array [
+        Object {
+          "props": Object {
+            "children": Array [
+              "content",
+            ],
+          },
+          "type": "strong",
+        },
+      ],
+      "class": "container",
+    },
+    "type": "div",
+  },
+]
+`;
+
 exports[`domToElement should return the corresponding element  1`] = `
 Array [
   <div
