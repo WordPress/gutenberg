@@ -144,17 +144,23 @@ export async function switchToEditor( mode ) {
 	await button.click( 'button' );
 }
 
-export async function getHTMLFromCodeEditor() {
-	await switchToEditor( 'Code' );
-	const textEditorContent = await page.$eval( '.editor-post-text-editor', ( element ) => element.value );
-	await switchToEditor( 'Visual' );
+/**
+ * Returns a promise which resolves with the edited post content (HTML string).
+ *
+ * @return {Promise} Promise resolving with post content markup.
+ */
+export async function getEditedPostContent() {
+	const content = await page.evaluate( () => {
+		const { select } = window.wp.data;
+		return select( 'core/editor' ).getEditedPostContent();
+	} );
 
 	// Globally guard against zero-width characters.
-	if ( REGEXP_ZWSP.test( textEditorContent ) ) {
+	if ( REGEXP_ZWSP.test( content ) ) {
 		throw new Error( 'Unexpected zero-width space character in editor content.' );
 	}
 
-	return textEditorContent;
+	return content;
 }
 
 /**

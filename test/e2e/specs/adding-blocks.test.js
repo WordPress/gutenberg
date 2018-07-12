@@ -2,7 +2,12 @@
  * Internal dependencies
  */
 import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage, insertBlock } from '../support/utils';
+import {
+	newPost,
+	newDesktopBrowserPage,
+	insertBlock,
+	getEditedPostContent,
+} from '../support/utils';
 
 describe( 'adding blocks', () => {
 	beforeAll( async () => {
@@ -34,6 +39,22 @@ describe( 'adding blocks', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Quote block' );
 
+		// Arrow down into default appender.
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+
+		// Focus should be moved to block focus boundary on a block which does
+		// not have its own inputs (e.g. image). Proceeding to press enter will
+		// append the default block. Pressing backspace on the focused block
+		// will remove it.
+		await page.keyboard.type( '/image' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
 		// Using the regular inserter
 		await insertBlock( 'Code' );
 		await page.keyboard.type( 'Code block' );
@@ -53,9 +74,6 @@ describe( 'adding blocks', () => {
 		const codeEditorButton = ( await page.$x( '//button[contains(text(), \'Code Editor\')]' ) )[ 0 ];
 		await codeEditorButton.click( 'button' );
 
-		// Assertions
-		const textEditorContent = await page.$eval( '.editor-post-text-editor', ( element ) => element.value );
-
-		expect( textEditorContent ).toMatchSnapshot();
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );
