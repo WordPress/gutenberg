@@ -9,6 +9,7 @@ import classnames from 'classnames';
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
+import { withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -17,7 +18,6 @@ import './style.scss';
 import Token from './token';
 import TokenInput from './token-input';
 import SuggestionsList from './suggestions-list';
-import withInstanceId from '../higher-order/with-instance-id';
 import withSpokenMessages from '../higher-order/with-spoken-messages';
 
 const initialState = {

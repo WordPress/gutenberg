@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { Component, compose } from '@wordpress/element';
+import { Component } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 export class AutosaveMonitor extends Component {

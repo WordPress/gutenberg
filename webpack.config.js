@@ -151,6 +151,7 @@ const gutenbergPackages = [
 	'a11y',
 	'api-request',
 	'blob',
+	'compose',
 	'core-data',
 	'data',
 	'date',

@@ -8,9 +8,10 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import { Component, compose, renderToString } from '@wordpress/element';
+import { Component, renderToString } from '@wordpress/element';
 import { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT, SPACE } from '@wordpress/keycodes';
 import { __, _n, sprintf } from '@wordpress/i18n';
+import { withInstanceId, compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -19,7 +20,6 @@ import './style.scss';
 import withFocusOutside from '../higher-order/with-focus-outside';
 import Button from '../button';
 import Popover from '../popover';
-import withInstanceId from '../higher-order/with-instance-id';
 import withSpokenMessages from '../higher-order/with-spoken-messages';
 
 /**

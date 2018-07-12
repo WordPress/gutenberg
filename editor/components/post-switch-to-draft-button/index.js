@@ -4,7 +4,7 @@
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 
 function PostSwitchToDraftButton( { isSaving, isPublished, onClick } ) {
 	if ( ! isPublished ) {

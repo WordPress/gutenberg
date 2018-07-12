@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 

@@ -3,9 +3,10 @@
  */
 import { IconButton, Panel } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { compose, Fragment } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withPluginContext } from '@wordpress/plugins';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies

@@ -6,9 +6,10 @@ import { find, get, isFunction, isString, kebabCase, reduce, upperFirst } from '
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent, Component, compose } from '@wordpress/element';
+import { createHigherOrderComponent, Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
