@@ -21,10 +21,7 @@
 	"engines": {
 		"node": ">=8"
 	},
-	"files": [
-		"build",
-		"build-module"
-	],
+	"files": [ "index.js" ],
 	"dependencies": {
 		"@babel/plugin-proposal-async-generator-functions": "^7.0.0-beta.52",
 		"@babel/plugin-proposal-object-rest-spread": "^7.0.0-beta.52",
