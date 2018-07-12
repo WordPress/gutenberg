@@ -8,7 +8,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import BlockConverter from './block-converter';
+import BlockConvertButton from './block-convert-button';
 
 export default compose(
 	withSelect( ( select, { uid } ) => {
@@ -30,4 +30,4 @@ export default compose(
 			} ),
 		),
 	} ) ),
-)( BlockConverter );
+)( BlockConvertButton );
