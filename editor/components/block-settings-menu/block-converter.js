@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
 
-export default function ConvertToBlocks( { shouldRender, onClick, small, role } ) {
+export default function BlockConverter( { shouldRender, onClick, small, role } ) {
 	if ( ! shouldRender ) {
 		return null;
 	}
