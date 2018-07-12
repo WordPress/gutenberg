@@ -1035,6 +1035,18 @@ Returns the editor settings.
 
 The editor settings object
 
+### canUserUseUnfilteredHTML
+
+Returns whether or not the user has the unfiltered_html capability.
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+Whether the user can or can't post unfiltered HTML.
+
 ## Actions
 
 ### setupEditor

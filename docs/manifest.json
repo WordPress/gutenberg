@@ -216,9 +216,21 @@
 		"parent": null
 	},
 	{
+		"title": "@wordpress/a11y",
+		"slug": "packages-a11y",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/a11y/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/api-request",
 		"slug": "packages-api-request",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/api-request/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/autop",
+		"slug": "packages-autop",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/autop/README.md",
 		"parent": "packages"
 	},
 	{
@@ -228,15 +240,39 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/babel-plugin-makepot",
+		"slug": "packages-babel-plugin-makepot",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/babel-plugin-makepot/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/babel-preset-default",
+		"slug": "packages-babel-preset-default",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/babel-preset-default/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/blob",
 		"slug": "packages-blob",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/blob/README.md",
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/browserslist-config",
+		"slug": "packages-browserslist-config",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/browserslist-config/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/core-data",
 		"slug": "packages-core-data",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/core-data/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/custom-templated-path-webpack-plugin",
+		"slug": "packages-custom-templated-path-webpack-plugin",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/custom-templated-path-webpack-plugin/README.md",
 		"parent": "packages"
 	},
 	{
@@ -258,6 +294,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/dom-ready",
+		"slug": "packages-dom-ready",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/dom-ready/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/dom",
 		"slug": "packages-dom",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/dom/README.md",
@@ -267,6 +309,36 @@
 		"title": "@wordpress/element",
 		"slug": "packages-element",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/element/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/hooks",
+		"slug": "packages-hooks",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/hooks/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/i18n",
+		"slug": "packages-i18n",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/i18n/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/is-shallow-equal",
+		"slug": "packages-is-shallow-equal",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/is-shallow-equal/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/jest-console",
+		"slug": "packages-jest-console",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/jest-console/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/jest-preset-default",
+		"slug": "packages-jest-preset-default",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/jest-preset-default/README.md",
 		"parent": "packages"
 	},
 	{
@@ -282,6 +354,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/npm-package-json-lint-config",
+		"slug": "packages-npm-package-json-lint-config",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/npm-package-json-lint-config/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/plugins",
 		"slug": "packages-plugins",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/plugins/README.md",
@@ -294,9 +372,27 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/scripts",
+		"slug": "packages-scripts",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/scripts/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/shortcode",
 		"slug": "packages-shortcode",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/shortcode/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/url",
+		"slug": "packages-url",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/url/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/wordcount",
+		"slug": "packages-wordcount",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/wordcount/README.md",
 		"parent": "packages"
 	},
 	{
