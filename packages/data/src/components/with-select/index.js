@@ -10,6 +10,7 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 /**
  * Internal dependencies
  */
+import remountOnPropChange from '../remountOnPropChange';
 import { RegistryConsumer } from '../registry-provider';
 
 /**
@@ -46,7 +47,7 @@ const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( WrappedC
 		);
 	}
 
-	class ComponentWithSelect extends Component {
+	const ComponentWithSelect = remountOnPropChange( 'registry' )( class extends Component {
 		constructor( props ) {
 			super( props );
 
@@ -120,7 +121,7 @@ const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( WrappedC
 		render() {
 			return <WrappedComponent { ...this.props.ownProps } { ...this.mergeProps } />;
 		}
-	}
+	} );
 
 	return ( ownProps ) => (
 		<RegistryConsumer>

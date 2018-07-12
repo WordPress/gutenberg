@@ -16,6 +16,7 @@ import {
 /**
  * Internal dependencies
  */
+import remountOnPropChange from '../remountOnPropChange';
 import { RegistryConsumer } from '../registry-provider';
 
 /**
@@ -34,7 +35,7 @@ const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent(
 	compose( [
 		pure,
 		( WrappedComponent ) => {
-			class ComponentWithDispatch extends Component {
+			const ComponentWithDispatch = remountOnPropChange( 'registry' )( class extends Component {
 				constructor( props ) {
 					super( ...arguments );
 
@@ -70,7 +71,7 @@ const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent(
 				render() {
 					return <WrappedComponent { ...this.props.ownProps } { ...this.proxyProps } />;
 				}
-			}
+			} );
 
 			return ( ownProps ) => (
 				<RegistryConsumer>
