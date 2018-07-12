@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mount } from 'enzyme';
+import renderer from 'react-test-renderer';
 
 /**
  * WordPress dependencies
@@ -20,9 +20,9 @@ describe( 'ifViewportMatches()', () => {
 	it( 'should not render if query does not match', () => {
 		dispatch( 'core/viewport' ).setIsMatching( { '> wide': false } );
 		const EnhancedComponent = ifViewportMatches( '> wide' )( Component );
-		const wrapper = mount( <EnhancedComponent /> );
+		const wrapper = renderer.create( <EnhancedComponent /> );
 
-		expect( wrapper.find( Component ) ).toHaveLength( 0 );
+		expect( wrapper.root.findAllByType( Component ) ).toHaveLength( 0 );
 
 		wrapper.unmount();
 	} );
@@ -30,9 +30,8 @@ describe( 'ifViewportMatches()', () => {
 	it( 'should render if query does match', () => {
 		dispatch( 'core/viewport' ).setIsMatching( { '> wide': true } );
 		const EnhancedComponent = ifViewportMatches( '> wide' )( Component );
-		const wrapper = mount( <EnhancedComponent /> );
-
-		expect( wrapper.find( Component ).childAt( 0 ).type() ).toBe( 'div' );
+		const wrapper = renderer.create( <EnhancedComponent /> );
+		expect( wrapper.root.findByType( Component ).children[ 0 ].type ).toBe( 'div' );
 
 		wrapper.unmount();
 	} );
