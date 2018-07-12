@@ -8,10 +8,11 @@ import { stringify } from 'querystring';
  * WordPress dependencies
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { Component, compose } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { FormTokenField, withAPIData } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import apiRequest from '@wordpress/api-request';
+import { compose } from '@wordpress/compose';
 
 /**
  * Module constants

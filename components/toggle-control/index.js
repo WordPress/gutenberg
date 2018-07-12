@@ -7,12 +7,12 @@ import { isFunction } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import FormToggle from '../form-toggle';
-import withInstanceId from '../higher-order/with-instance-id';
+import { withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
+import FormToggle from '../form-toggle';
 import BaseControl from './../base-control';
 import './style.scss';
 

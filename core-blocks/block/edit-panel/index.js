@@ -1,10 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { Button, withInstanceId } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { Component, Fragment, createRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { ESCAPE } from '@wordpress/keycodes';
+import { withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies

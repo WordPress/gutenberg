@@ -15,7 +15,7 @@ import {
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, compose, Fragment } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import { getBlobByURL, revokeBlobURL } from '@wordpress/blob';
 import {
 	Button,
@@ -39,6 +39,7 @@ import {
 	editorMediaUpload,
 } from '@wordpress/editor';
 import { withViewportMatch } from '@wordpress/viewport';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies

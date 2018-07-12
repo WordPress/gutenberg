@@ -16,9 +16,10 @@ import {
 import { Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { Warning } from '@wordpress/editor';
-import { compose, createHigherOrderComponent } from '@wordpress/element';
+import { createHigherOrderComponent } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
+import { compose } from '@wordpress/compose';
 
 const enhance = compose(
 	/*
