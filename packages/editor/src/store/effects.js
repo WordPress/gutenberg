@@ -42,11 +42,10 @@ import {
 } from './selectors';
 import {
 	fetchReusableBlocks,
-	saveReusableBlocks,
+	saveReusableBlock,
 	deleteReusableBlocks,
 	convertBlockToReusable,
 	convertBlockToStatic,
-	receiveReusableBlocks,
 } from './effects/reusable-blocks';
 import {
 	requestPostUpdate,
@@ -200,12 +199,11 @@ export default {
 		fetchReusableBlocks( action, store );
 	},
 	SAVE_REUSABLE_BLOCK: ( action, store ) => {
-		saveReusableBlocks( action, store );
+		saveReusableBlock( action, store );
 	},
 	DELETE_REUSABLE_BLOCK: ( action, store ) => {
 		deleteReusableBlocks( action, store );
 	},
-	RECEIVE_REUSABLE_BLOCKS: receiveReusableBlocks,
 	CONVERT_BLOCK_TO_STATIC: convertBlockToStatic,
 	CONVERT_BLOCK_TO_REUSABLE: convertBlockToReusable,
 	CREATE_NOTICE( { notice: { content, spokenMessage } } ) {

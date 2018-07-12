@@ -6,7 +6,7 @@ import { forOwn } from 'lodash';
 /**
  * WordPress Dependencies
  */
-import { registerStore } from '@wordpress/data';
+import { defaultRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -23,20 +23,22 @@ import { validateTokenSettings } from '../components/rich-text/tokens';
  */
 const MODULE_KEY = 'core/editor';
 
-const store = registerStore( MODULE_KEY, {
-	reducer,
-	selectors,
-	actions,
-	persist: [ 'preferences' ],
-} );
-applyMiddlewares( store );
+export function createStore( registry ) {
+	const store = registry.registerStore( MODULE_KEY, {
+		reducer,
+		selectors,
+		actions,
+		persist: [ 'preferences' ],
+	} );
+	applyMiddlewares( store );
 
-forOwn( tokens, ( { name, settings } ) => {
-	settings = validateTokenSettings( name, settings, store.getState() );
+	forOwn( tokens, ( { name, settings } ) => {
+		settings = validateTokenSettings( name, settings, store.getState() );
 
-	if ( settings ) {
-		store.dispatch( actions.registerToken( name, settings ) );
-	}
-} );
+		if ( settings ) {
+			store.dispatch( actions.registerToken( name, settings ) );
+		}
+	} );
+}
 
-export default store;
+export default createStore( defaultRegistry );

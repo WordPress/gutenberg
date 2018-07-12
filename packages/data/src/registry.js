@@ -144,7 +144,7 @@ export function createRegistry( storeConfigs = {} ) {
 			enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__( { name: reducerKey, instanceId: reducerKey } ) );
 		}
 		const store = createStore( reducer, flowRight( enhancers ) );
-		namespaces[ reducerKey ] = { store, reducer };
+		namespaces[ reducerKey ] = { store, reducer, _cloneConfig: { reducer } };
 
 		// Customize subscribe behavior to call listeners only on effective change,
 		// not on every dispatch.
@@ -175,6 +175,7 @@ export function createRegistry( storeConfigs = {} ) {
 		const store = namespaces[ reducerKey ].store;
 		const createStateSelector = ( selector ) => ( ...args ) => selector( store.getState(), ...args );
 		namespaces[ reducerKey ].selectors = mapValues( newSelectors, createStateSelector );
+		namespaces[ reducerKey ]._cloneConfig.selectors = newSelectors;
 	}
 
 	/**
@@ -253,6 +254,7 @@ export function createRegistry( storeConfigs = {} ) {
 		};
 
 		namespaces[ reducerKey ].selectors = mapValues( namespaces[ reducerKey ].selectors, createResolver );
+		namespaces[ reducerKey ]._cloneConfig.resolvers = newResolvers;
 	}
 
 	/**
@@ -266,6 +268,7 @@ export function createRegistry( storeConfigs = {} ) {
 		const store = namespaces[ reducerKey ].store;
 		const createBoundAction = ( action ) => ( ...args ) => store.dispatch( action( ...args ) );
 		namespaces[ reducerKey ].actions = mapValues( newActions, createBoundAction );
+		namespaces[ reducerKey ]._cloneConfig.actions = newActions;
 	}
 
 	/**
@@ -368,6 +371,11 @@ export function createRegistry( storeConfigs = {} ) {
 		} );
 	}
 
+	function clone() {
+		const storeCloneConfigs = mapValues( namespaces, '_cloneConfig' );
+		return createRegistry( storeCloneConfigs );
+	}
+
 	let registry = {
 		registerReducer,
 		registerSelectors,
@@ -379,6 +387,7 @@ export function createRegistry( storeConfigs = {} ) {
 		dispatch,
 		setupPersistence,
 		use,
+		clone,
 	};
 
 	/**

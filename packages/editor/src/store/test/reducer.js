@@ -1844,31 +1844,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should update a reusable block', () => {
-			const initialState = {
-				data: {
-					123: { clientId: '', title: '' },
-				},
-				isFetching: {},
-				isSaving: {},
-			};
-
-			const state = reusableBlocks( initialState, {
-				type: 'UPDATE_REUSABLE_BLOCK_TITLE',
-				id: 123,
-				title: 'My block',
-			} );
-
-			expect( state ).toEqual( {
-				data: {
-					123: { clientId: '', title: 'My block' },
-				},
-				isFetching: {},
-				isSaving: {},
-			} );
-		} );
-
-		it( "should update the reusable block's id if it was temporary", () => {
+		it( 'should update the reusable block\'s id if it was temporary', () => {
 			const initialState = {
 				data: {
 					reusable1: { clientId: '', title: '' },

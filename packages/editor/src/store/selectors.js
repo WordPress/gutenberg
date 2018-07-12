@@ -1604,12 +1604,7 @@ export const getInserterItems = createSelector(
 				return false;
 			}
 
-			const referencedBlock = getBlock( state, reusableBlock.clientId );
-			if ( ! referencedBlock ) {
-				return false;
-			}
-
-			const referencedBlockType = getBlockType( referencedBlock.name );
+			const referencedBlockType = getBlockType( reusableBlock.blockName );
 			if ( ! referencedBlockType ) {
 				return false;
 			}
@@ -1624,8 +1619,7 @@ export const getInserterItems = createSelector(
 		const buildReusableBlockInserterItem = ( reusableBlock ) => {
 			const id = `core/block/${ reusableBlock.id }`;
 
-			const referencedBlock = getBlock( state, reusableBlock.clientId );
-			const referencedBlockType = getBlockType( referencedBlock.name );
+			const referencedBlockType = getBlockType( reusableBlock.blockName );
 
 			const { time, count = 0 } = getInsertUsage( state, id ) || {};
 			const utility = calculateUtility( 'reusable', count, false );

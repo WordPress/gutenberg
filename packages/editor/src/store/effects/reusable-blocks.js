@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, map, uniqueId } from 'lodash';
+import { map, uniqueId } from 'lodash';
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
 
 /**
@@ -15,6 +15,7 @@ import {
 	isReusableBlock,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+import { select } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -26,11 +27,9 @@ import {
 	createErrorNotice,
 	removeBlocks,
 	replaceBlock,
-	receiveBlocks,
-	saveReusableBlock,
+	saveReusableBlock as saveReusableBlockAction,
 } from '../actions';
 import {
-	getReusableBlock,
 	getBlock,
 	getBlocks,
 } from '../selectors';
@@ -47,7 +46,6 @@ const REUSABLE_BLOCK_NOTICE_ID = 'REUSABLE_BLOCK_NOTICE_ID';
  * @param {Object} store   Redux Store.
  */
 export const fetchReusableBlocks = async ( action, store ) => {
-	const { id } = action;
 	const { dispatch } = store;
 
 	// TODO: these are potentially undefined, this fix is in place
@@ -57,43 +55,36 @@ export const fetchReusableBlocks = async ( action, store ) => {
 		return;
 	}
 
-	let result;
-	if ( id ) {
-		result = apiFetch( { path: `/wp/v2/${ postType.rest_base }/${ id }` } );
-	} else {
-		result = apiFetch( { path: `/wp/v2/${ postType.rest_base }?per_page=-1` } );
-	}
-
 	try {
-		const reusableBlockOrBlocks = await result;
+		const reusableBlocks = await apiFetch( {
+			path: `/wp/v2/${ postType.rest_base }?context=edit&per_page=-1`,
+		} );
 		dispatch( receiveReusableBlocksAction( map(
-			castArray( reusableBlockOrBlocks ),
+			reusableBlocks,
 			( reusableBlock ) => ( {
 				reusableBlock,
-				parsedBlock: parse( reusableBlock.content )[ 0 ],
+				parsedBlock: parse( reusableBlock.content.raw )[ 0 ],
 			} )
 		) ) );
 
 		dispatch( {
 			type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
-			id,
 		} );
 	} catch ( error ) {
 		dispatch( {
 			type: 'FETCH_REUSABLE_BLOCKS_FAILURE',
-			id,
 			error,
 		} );
 	}
 };
 
 /**
- * Save Reusable Blocks Effect Handler.
+ * Save Reusable Block Effect Handler.
  *
  * @param {Object} action  action object.
  * @param {Object} store   Redux Store.
  */
-export const saveReusableBlocks = async ( action, store ) => {
+export const saveReusableBlock = async ( action, store ) => {
 	// TODO: these are potentially undefined, this fix is in place
 	// until there is a filter to not use reusable blocks if undefined
 	const postType = await resolveSelector( 'core', 'getPostType', 'wp_block' );
@@ -101,16 +92,13 @@ export const saveReusableBlocks = async ( action, store ) => {
 		return;
 	}
 
-	const { id } = action;
+	const { reusableBlock, content } = action;
+	const { id, title } = reusableBlock;
 	const { dispatch } = store;
-	const state = store.getState();
-	const { clientId, title, isTemporary } = getReusableBlock( state, id );
-	const { name, attributes, innerBlocks } = getBlock( state, clientId );
-	const content = serialize( createBlock( name, attributes, innerBlocks ) );
 
-	const data = isTemporary ? { title, content } : { id, title, content };
-	const path = isTemporary ? `/wp/v2/${ postType.rest_base }` : `/wp/v2/${ postType.rest_base }/${ id }`;
-	const method = isTemporary ? 'POST' : 'PUT';
+	const data = { title, content, status: 'publish' };
+	const path = `/wp/v2/${ postType.rest_base }`;
+	const method = 'POST';
 
 	try {
 		const updatedReusableBlock = await apiFetch( { path, data, method } );
@@ -119,7 +107,7 @@ export const saveReusableBlocks = async ( action, store ) => {
 			updatedId: updatedReusableBlock.id,
 			id,
 		} );
-		const message = isTemporary ? __( 'Block created.' ) : __( 'Block updated.' );
+		const message = __( 'Block created.' );
 		dispatch( createSuccessNotice( message, { id: REUSABLE_BLOCK_NOTICE_ID } ) );
 	} catch ( error ) {
 		dispatch( { type: 'SAVE_REUSABLE_BLOCK_FAILURE', id } );
@@ -147,16 +135,11 @@ export const deleteReusableBlocks = async ( action, store ) => {
 	const { id } = action;
 	const { getState, dispatch } = store;
 
-	// Don't allow a reusable block with a temporary ID to be deleted
-	const reusableBlock = getReusableBlock( getState(), id );
-	if ( ! reusableBlock || reusableBlock.isTemporary ) {
-		return;
-	}
-
-	// Remove any other blocks that reference this reusable block
+	// Remove any blocks that reference this reusable block
 	const allBlocks = getBlocks( getState() );
 	const associatedBlocks = allBlocks.filter( ( block ) => isReusableBlock( block ) && block.attributes.ref === id );
 	const associatedBlockClientIds = associatedBlocks.map( ( block ) => block.clientId );
+	dispatch( removeBlocks( associatedBlockClientIds ) );
 
 	const transactionId = uniqueId();
 
@@ -166,14 +149,11 @@ export const deleteReusableBlocks = async ( action, store ) => {
 		optimist: { type: BEGIN, id: transactionId },
 	} );
 
-	// Remove the parsed block.
-	dispatch( removeBlocks( [
-		...associatedBlockClientIds,
-		reusableBlock.clientId,
-	] ) );
-
 	try {
-		await apiFetch( { path: `/wp/v2/${ postType.rest_base }/${ id }`, method: 'DELETE' } );
+		await apiFetch( {
+			path: `/wp/v2/${ postType.rest_base }/${ id }?force=true`,
+			method: 'DELETE',
+		} );
 		dispatch( {
 			type: 'DELETE_REUSABLE_BLOCK_SUCCESS',
 			id,
@@ -195,16 +175,6 @@ export const deleteReusableBlocks = async ( action, store ) => {
 };
 
 /**
- * Receive Reusable Blocks Effect Handler.
- *
- * @param {Object} action  action object.
- * @return {Object} receive blocks action
- */
-export const receiveReusableBlocks = ( action ) => {
-	return receiveBlocks( map( action.results, 'parsedBlock' ) );
-};
-
-/**
  * Convert a reusable block to a static block effect handler
  *
  * @param {Object} action  action object.
@@ -213,9 +183,9 @@ export const receiveReusableBlocks = ( action ) => {
 export const convertBlockToStatic = ( action, store ) => {
 	const state = store.getState();
 	const oldBlock = getBlock( state, action.clientId );
-	const reusableBlock = getReusableBlock( state, oldBlock.attributes.ref );
-	const referencedBlock = getBlock( state, reusableBlock.clientId );
-	const newBlock = createBlock( referencedBlock.name, referencedBlock.attributes );
+	const { getEntityRecord } = select( 'core' );
+	const reusableBlock = getEntityRecord( 'postType', 'wp_block', oldBlock.attributes.ref );
+	const [ newBlock ] = parse( reusableBlock.content.raw );
 	store.dispatch( replaceBlock( oldBlock.clientId, newBlock ) );
 };
 
@@ -229,6 +199,7 @@ export const convertBlockToReusable = ( action, store ) => {
 	const { getState, dispatch } = store;
 
 	const parsedBlock = getBlock( getState(), action.clientId );
+	const content = serialize( parsedBlock );
 	const reusableBlock = {
 		id: uniqueId( 'reusable' ),
 		clientId: parsedBlock.clientId,
@@ -240,7 +211,7 @@ export const convertBlockToReusable = ( action, store ) => {
 		parsedBlock,
 	} ] ) );
 
-	dispatch( saveReusableBlock( reusableBlock.id ) );
+	dispatch( saveReusableBlockAction( reusableBlock, content ) );
 
 	dispatch( replaceBlock(
 		parsedBlock.clientId,
@@ -249,7 +220,4 @@ export const convertBlockToReusable = ( action, store ) => {
 			layout: parsedBlock.attributes.layout,
 		} )
 	) );
-
-	// Re-add the original block to the store, since replaceBlock() will have removed it
-	dispatch( receiveBlocks( [ parsedBlock ] ) );
 };

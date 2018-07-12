@@ -216,7 +216,7 @@ export const editor = flow( [
 	// Track undo history, starting at editor initialization.
 	withHistory( {
 		resetTypes: [ 'SETUP_EDITOR_STATE' ],
-		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
+		ignoreTypes: [ 'RESET_POST', 'UPDATE_POST' ],
 		shouldOverwriteState,
 	} ),
 
@@ -224,7 +224,7 @@ export const editor = flow( [
 	// editor initialization firing post reset as an effect.
 	withChangeDetection( {
 		resetTypes: [ 'SETUP_EDITOR_STATE', 'REQUEST_POST_UPDATE_START' ],
-		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
+		ignoreTypes: [ 'RESET_POST', 'UPDATE_POST' ],
 	} ),
 ] )( {
 	edits( state = {}, action ) {
@@ -284,12 +284,6 @@ export const editor = flow( [
 			case 'RESET_BLOCKS':
 			case 'SETUP_EDITOR_STATE':
 				return getFlattenedBlocks( action.blocks );
-
-			case 'RECEIVE_BLOCKS':
-				return {
-					...state,
-					...getFlattenedBlocks( action.blocks ),
-				};
 
 			case 'UPDATE_BLOCK_ATTRIBUTES':
 				// Ignore updates if block isn't known
@@ -408,12 +402,6 @@ export const editor = flow( [
 			case 'RESET_BLOCKS':
 			case 'SETUP_EDITOR_STATE':
 				return mapBlockOrder( action.blocks );
-
-			case 'RECEIVE_BLOCKS':
-				return {
-					...state,
-					...omit( mapBlockOrder( action.blocks ), '' ),
-				};
 
 			case 'INSERT_BLOCKS': {
 				const { rootClientId = '', blocks } = action;
@@ -881,10 +869,11 @@ export const reusableBlocks = combineReducers( {
 		switch ( action.type ) {
 			case 'RECEIVE_REUSABLE_BLOCKS': {
 				return reduce( action.results, ( nextState, result ) => {
-					const { id, title } = result.reusableBlock;
-					const { clientId } = result.parsedBlock;
+					const { id } = result.reusableBlock;
+					const title = getPostRawValue( result.reusableBlock.title );
+					const { name: blockName } = result.parsedBlock;
 
-					const value = { clientId, title };
+					const value = { blockName, title };
 
 					if ( ! isEqual( nextState[ id ], value ) ) {
 						if ( nextState === state ) {
@@ -896,22 +885,6 @@ export const reusableBlocks = combineReducers( {
 
 					return nextState;
 				}, state );
-			}
-
-			case 'UPDATE_REUSABLE_BLOCK_TITLE': {
-				const { id, title } = action;
-
-				if ( ! state[ id ] || state[ id ].title === title ) {
-					return state;
-				}
-
-				return {
-					...state,
-					[ id ]: {
-						...state[ id ],
-						title,
-					},
-				};
 			}
 
 			case 'SAVE_REUSABLE_BLOCK_SUCCESS': {
@@ -930,48 +903,6 @@ export const reusableBlocks = combineReducers( {
 			}
 
 			case 'REMOVE_REUSABLE_BLOCK': {
-				const { id } = action;
-				return omit( state, id );
-			}
-		}
-
-		return state;
-	},
-
-	isFetching( state = {}, action ) {
-		switch ( action.type ) {
-			case 'FETCH_REUSABLE_BLOCKS': {
-				const { id } = action;
-				if ( ! id ) {
-					return state;
-				}
-
-				return {
-					...state,
-					[ id ]: true,
-				};
-			}
-
-			case 'FETCH_REUSABLE_BLOCKS_SUCCESS':
-			case 'FETCH_REUSABLE_BLOCKS_FAILURE': {
-				const { id } = action;
-				return omit( state, id );
-			}
-		}
-
-		return state;
-	},
-
-	isSaving( state = {}, action ) {
-		switch ( action.type ) {
-			case 'SAVE_REUSABLE_BLOCK':
-				return {
-					...state,
-					[ action.id ]: true,
-				};
-
-			case 'SAVE_REUSABLE_BLOCK_SUCCESS':
-			case 'SAVE_REUSABLE_BLOCK_FAILURE': {
 				const { id } = action;
 				return omit( state, id );
 			}

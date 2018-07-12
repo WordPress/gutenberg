@@ -1,11 +1,17 @@
 /**
+ * External dependencies
+ */
+import { over, compact } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
 import { Component, Fragment, createRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { ESCAPE } from '@wordpress/keycodes';
-import { withInstanceId } from '@wordpress/compose';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { withInstanceId, compose } from '@wordpress/compose';
 
 class ReusableBlockEditPanel extends Component {
 	constructor() {
@@ -115,4 +121,33 @@ class ReusableBlockEditPanel extends Component {
 	}
 }
 
-export default withInstanceId( ReusableBlockEditPanel );
+export default compose( [
+	withInstanceId,
+	withSelect( ( select ) => {
+		const { getEditedPostAttribute } = select( 'core/editor' );
+
+		return {
+			title: getEditedPostAttribute( 'title' ),
+		};
+	} ),
+	withDispatch( ( dispatch, ownProps ) => {
+		const {
+			editPost,
+			undoAll,
+			savePost,
+			clearSelectedBlock,
+		} = dispatch( 'core/editor' );
+
+		const withClearAndFinish = ( fn ) => over( compact( [
+			clearSelectedBlock,
+			ownProps.onFinishedEditing,
+			fn,
+		] ) );
+
+		return {
+			onChangeTitle: ( title ) => editPost( { title } ),
+			onSave: withClearAndFinish( savePost ),
+			onCancel: withClearAndFinish( undoAll ),
+		};
+	} ),
+] )( ReusableBlockEditPanel );

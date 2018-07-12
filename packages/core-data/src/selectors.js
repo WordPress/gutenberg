@@ -177,6 +177,10 @@ export function getEntityRecord( state, kind, name, key ) {
 	return get( state.entities.data, [ kind, name, 'items', key ] );
 }
 
+export function isRequestingEntityRecord( ...args ) {
+	return isResolving( 'getEntityRecord', ...args );
+}
+
 /**
  * Returns the Entity's records.
  *

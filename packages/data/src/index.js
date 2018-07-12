@@ -17,7 +17,7 @@ export {
 	restrictPersistence,
 	setPersistenceStorage,
 } from './deprecated';
-export { plugins };
+export { plugins, defaultRegistry };
 
 /**
  * The combineReducers helper function turns an object whose values are different

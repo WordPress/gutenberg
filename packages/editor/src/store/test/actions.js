@@ -466,20 +466,12 @@ describe( 'actions', () => {
 				type: 'FETCH_REUSABLE_BLOCKS',
 			} );
 		} );
-
-		it( 'should take an optional id argument', () => {
-			expect( fetchReusableBlocks( 123 ) ).toEqual( {
-				type: 'FETCH_REUSABLE_BLOCKS',
-				id: 123,
-			} );
-		} );
 	} );
 
 	describe( 'saveReusableBlock', () => {
 		it( 'should return the SAVE_REUSABLE_BLOCK action', () => {
-			expect( saveReusableBlock( 123 ) ).toEqual( {
+			expect( saveReusableBlock() ).toEqual( {
 				type: 'SAVE_REUSABLE_BLOCK',
-				id: 123,
 			} );
 		} );
 	} );
