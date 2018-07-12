@@ -5,6 +5,10 @@
  * @package gutenberg
  */
 
+// Used to get `_draft_or_post_title`, which prevents empty-title posts from
+// appearing with no title.
+require_once( ABSPATH . 'wp-admin/includes/template.php' );
+
 $DEFAULT_COMMENTS_TO_SHOW = 5;
 
 /**
@@ -30,7 +34,7 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 		$attributes['commentsToShow'] = $DEFAULT_COMMENTS_TO_SHOW;
 	}
 
-	/** This filter is documented in wp-includes/widgets/class-wp-widget-recent-comments.php */
+	// This filter is documented in wp-includes/widgets/class-wp-widget-recent-comments.php
 	$comments = get_comments( apply_filters( 'widget_comments_args', array(
 		'number'      => $attributes['commentsToShow'],
 		'status'      => 'approve',
@@ -44,7 +48,7 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 		_prime_post_caches( $post_ids, strpos( get_option( 'permalink_structure' ), '%category%' ), false );
 
 		foreach ( $comments as $comment ) {
-			$list_items_markup .= '<li class="latestcomments">';
+			$list_items_markup .= '<li class="wp-block-latest-comments__comment">';
 			if ( $attributes['displayAvatar'] ) {
 				$avatar = get_avatar( $comment, 48, '', '', array(
 					'class' => 'wp-block-latest-comments__comment-avatar',
@@ -54,19 +58,28 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 				}
 			}
 
-			$list_items_markup .= '<div class="comment-data"';
+			$list_items_markup .= '<article>';
+			$list_items_markup .= '<footer class="wp-block-latest-comments__comment-meta">';
 			$author_url         = get_comment_author_url( $comment );
 			if ( empty( $author_url ) && ! empty( $comment->user_id ) ) {
 				$author_url = get_author_posts_url( $comment->user_id );
 			}
+
+			$author_markup = '';
 			if ( $author_url ) {
-				$list_items_markup .= '<a class="wp-block-latest-comments__comment-author" href="' . esc_url( $author_url ) . '">' . get_comment_author( $comment ) . '</a>';
+				$author_markup .= '<a class="wp-block-latest-comments__comment-author" href="' . esc_url( $author_url ) . '">' . get_comment_author( $comment ) . '</a>';
 			} else {
-				$list_items_markup .= '<a class="wp-block-latest-comments__comment-author">' . get_comment_author( $comment ) . '</a>';
+				$author_markup .= '<span class="wp-block-latest-comments__comment-author">' . get_comment_author( $comment ) . '</span>';
 			}
 
-			$list_items_markup .= __( ' on ', 'gutenberg' );
-			$list_items_markup .= '<a class="wp-block-latest-comments__comment-link" href="' . esc_url( get_comment_link( $comment ) ) . '">' . get_the_title( $comment->comment_post_ID ) . '</a>';
+			$post_title = '<a class="wp-block-latest-comments__comment-link" href="' . esc_url( get_comment_link( $comment ) ) . '">' . esc_html ( _draft_or_post_title( $comment->comment_post_ID ) ) . '</a>';
+
+			$list_items_markup .= sprintf(
+				/* translators: 1: author name (inside <a> or <span> tag, based on if they have a URL), 2: post title related to this comment */
+				__( '%1$s on %2$s' ),
+				$author_markup,
+				$post_title
+			);
 
 			if ( $attributes['displayTimestamp'] ) {
 				$list_items_markup .= sprintf(
@@ -75,10 +88,11 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 					esc_html( get_comment_date( '', $comment ) )
 				);
 			}
+			$list_items_markup .= '</footer>';
 			if ( $attributes['displayExcerpt'] ) {
 				$list_items_markup .= '<div class="wp-block-latest-comments__comment-excerpt">' . wpautop( get_comment_excerpt( $comment ) ) . '</div>';
 			}
-			$list_items_markup .= '</div></li>';
+			$list_items_markup .= '</article></li>';
 		}
 	}
 
@@ -97,7 +111,7 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 	}
 
 	$block_content = sprintf(
-		'<ul class="%1$s">%2$s</ul>',
+		'<ol class="%1$s">%2$s</ol>',
 		esc_attr( $class ),
 		$list_items_markup
 	);

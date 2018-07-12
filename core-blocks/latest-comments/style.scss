@@ -1,30 +1,21 @@
-.wp-block-latest-comments {
-	padding-left: 2.5em;
+.wp-block-latest-comments__comment {
+	font-size: 15px;
+	line-height: 1.1;
+	margin-bottom: 1em;
 
-	li {
-		line-height: 1.1;
-		margin-bottom: 1em;
-		font-size: 15px;
-	}
-
-	&.has-avatars > li {
+	.has-avatars & {
 		min-height: 36px;
 		list-style: none;
 
-		.comment-data {
+		.wp-block-latest-comments__comment-meta,
+		.wp-block-latest-comments__comment-excerpt {
 			margin-left: 52px;
 		}
 	}
 
-	.latestcomments {
-		line-height: 2.2;
-	}
-
-	&.has-timestamps,
-	&.has-excerpts {
-		.latestcomments {
-			line-height: 1.5;
-		}
+	.has-excerpts &,
+	.has-timestamps & {
+		line-height: 1.5;
 	}
 }
 
@@ -36,17 +27,16 @@
 
 .wp-block-latest-comments__comment-timestamp {
 	color: $dark-gray-100;
-	font-size: 12px;
-	padding: 8px 2px 0 0;
 	display: block;
+	font-size: 12px;
 }
 
 .wp-block-latest-comments .avatar,
 .wp-block-latest-comments__comment-avatar {
+	border-radius: 24px;
 	display: block;
 	float: left;
 	height: 40px;
-	width: 40px;
-	border-radius: 24px;
 	margin-right: 12px;
+	width: 40px;
 }
