@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	IconButton,
 	PanelBody,
+	SelectControl,
 	Toolbar,
 	ToggleControl,
 	withNotices,
@@ -73,7 +74,7 @@ class VideoEdit extends Component {
 	}
 
 	render() {
-		const { autoplay, caption, controls, loop, muted, src } = this.props.attributes;
+		const { autoplay, caption, controls, loop, muted, preload, src } = this.props.attributes;
 		const { setAttributes, isSelected, className, noticeOperations, noticeUI } = this.props;
 		const { editing } = this.state;
 		const switchToEditing = () => {
@@ -147,6 +148,17 @@ class VideoEdit extends Component {
 							label={ __( 'Playback Controls' ) }
 							onChange={ this.toggleAttribute( 'controls' ) }
 							checked={ controls }
+						/>
+						<SelectControl
+							label={ __( 'Preload' ) }
+							value={ undefined !== preload ? preload : 'metadata' }
+							// `undefined` is required for the preload attribute to be unset.
+							onChange={ ( value ) => setAttributes( { preload: ( 'metadata' !== value ) ? value : undefined } ) }
+							options={ [
+								{ value: 'auto', label: __( 'Auto' ) },
+								{ value: 'metadata', label: __( 'Metadata' ) },
+								{ value: 'none', label: __( 'None' ) },
+							] }
 						/>
 					</PanelBody>
 				</InspectorControls>
