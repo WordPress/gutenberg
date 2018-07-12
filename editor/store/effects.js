@@ -21,6 +21,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import apiRequest from '@wordpress/api-request';
+import { doAction } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -177,6 +178,14 @@ export default {
 
 		request.then(
 			( newPost ) => {
+				/**
+				 * Fires when a post is successfully updated.
+				 *
+				 * @param {Object}  newPost    The updated post object as returned from the REST API.
+				 * @param {boolean} isAutosave Whether this was an an autosave.
+				 */
+				doAction( 'editor.effects.postUpdated', newPost, isAutosave );
+
 				const reset = isAutosave ? resetAutosave : resetPost;
 				dispatch( reset( newPost ) );
 
