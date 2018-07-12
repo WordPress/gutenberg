@@ -27,7 +27,7 @@ import {
 	PanelBody,
 	withSafeTimeout,
 } from '@wordpress/components';
-import { getCategories, isSharedBlock } from '@wordpress/blocks';
+import { getCategories, isSharedBlock, isUnmodifiedBlock } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 
 /**
@@ -183,10 +183,11 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
-		const { instanceId, onSelect, rootUID } = this.props;
+		const { instanceId, onSelect, rootUID, selectedBlock } = this.props;
 		const { childItems, filterValue, hoveredItem, suggestedItems, sharedItems, itemsPerCategory, openPanels } = this.state;
 		const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
 		const isSearching = !! filterValue;
+		const isSelectedBlockModified = selectedBlock && ! isUnmodifiedBlock( selectedBlock );
 
 		// Disable reason: The inserter menu is a modal display, not one which
 		// is always visible, and one which already incurs this behavior of
@@ -214,7 +215,7 @@ export class InserterMenu extends Component {
 					role="region"
 					aria-label={ __( 'Available block types' ) }
 				>
-					<InserterResultsPortal.Slot fillProps={ { filterValue } } />
+					{ isSelectedBlockModified && <InserterResultsPortal.Slot fillProps={ { filterValue } } /> }
 
 					<ChildBlocks
 						rootUID={ rootUID }
@@ -261,6 +262,7 @@ export class InserterMenu extends Component {
 							<BlockTypesList items={ sharedItems } onSelect={ onSelect } onHover={ this.onHover } />
 						</PanelBody>
 					) }
+					{ ! isSelectedBlockModified && <InserterResultsPortal.Slot fillProps={ { filterValue } } /> }
 					{ isEmpty( suggestedItems ) && isEmpty( sharedItems ) && isEmpty( itemsPerCategory ) && (
 						<p className="editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
 					) }

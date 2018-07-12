@@ -38,6 +38,7 @@ class Inserter extends Component {
 			children,
 			onInsertBlock,
 			rootUID,
+			selectedBlock,
 		} = this.props;
 
 		if ( items.length === 0 ) {
@@ -71,7 +72,14 @@ class Inserter extends Component {
 						onClose();
 					};
 
-					return <InserterMenu items={ items } onSelect={ onSelect } rootUID={ rootUID } />;
+					return (
+						<InserterMenu
+							items={ items }
+							onSelect={ onSelect }
+							rootUID={ rootUID }
+							selectedBlock={ selectedBlock }
+						/>
+					);
 				} }
 			/>
 		);
