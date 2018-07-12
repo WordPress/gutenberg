@@ -113,6 +113,18 @@ export const settings = {
 					} );
 				},
 			},
+			{
+				type: 'block',
+				blocks: [ 'core/image' ],
+				transform: ( attributes ) => {
+					return createBlock( 'core/file', {
+						href: attributes.url,
+						fileName: attributes.caption && attributes.caption.join(),
+						textLinkHref: attributes.url,
+						id: attributes.id,
+					} );
+				},
+			},
 		],
 		to: [
 			{
@@ -148,6 +160,25 @@ export const settings = {
 				transform: ( attributes ) => {
 					return createBlock( 'core/video', {
 						src: attributes.href,
+						caption: [ attributes.fileName ],
+						id: attributes.id,
+					} );
+				},
+			},
+			{
+				type: 'block',
+				blocks: [ 'core/image' ],
+				isMatch: ( { id } ) => {
+					if ( ! id ) {
+						return false;
+					}
+					const { getMedia } = select( 'core' );
+					const media = getMedia( id );
+					return !! media && includes( media.mime_type, 'image' );
+				},
+				transform: ( attributes ) => {
+					return createBlock( 'core/image', {
+						url: attributes.href,
 						caption: [ attributes.fileName ],
 						id: attributes.id,
 					} );
