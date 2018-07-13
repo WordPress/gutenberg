@@ -58,8 +58,8 @@ class LatestComments extends Component {
 			align,
 			commentsToShow,
 			displayAvatar,
+			displayDate,
 			displayExcerpt,
-			displayTimestamp,
 		} = this.props.attributes;
 
 		return (
@@ -78,9 +78,9 @@ class LatestComments extends Component {
 							onChange={ this.toggleAttribute( 'displayAvatar' ) }
 						/>
 						<ToggleControl
-							label={ __( 'Display date/time' ) }
-							checked={ displayTimestamp }
-							onChange={ this.toggleAttribute( 'displayTimestamp' ) }
+							label={ __( 'Display date' ) }
+							checked={ displayDate }
+							onChange={ this.toggleAttribute( 'displayDate' ) }
 						/>
 						<ToggleControl
 							label={ __( 'Display excerpt' ) }
@@ -88,7 +88,7 @@ class LatestComments extends Component {
 							onChange={ this.toggleAttribute( 'displayExcerpt' ) }
 						/>
 						<RangeControl
-							label={ __( 'Number of comments to show' ) }
+							label={ __( 'Number of comments' ) }
 							value={ commentsToShow }
 							onChange={ ( value ) => this.setCommentsToShow( value ) }
 							min={ MIN_COMMENTS }

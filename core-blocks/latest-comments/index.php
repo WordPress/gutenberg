@@ -9,7 +9,7 @@
 // appearing with no title.
 require_once( ABSPATH . 'wp-admin/includes/template.php' );
 
-$DEFAULT_COMMENTS_TO_SHOW = 5;
+$default_comments_to_show = 5;
 
 /**
  * Renders the `core/latest-comments` block on server.
@@ -31,7 +31,7 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 		$attributes['commentsToShow'] < 0 ||
 		$attributes['commentsToShow'] > 100
 	) {
-		$attributes['commentsToShow'] = $DEFAULT_COMMENTS_TO_SHOW;
+		$attributes['commentsToShow'] = $default_comments_to_show;
 	}
 
 	// This filter is documented in wp-includes/widgets/class-wp-widget-recent-comments.php.
@@ -81,11 +81,11 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 				$post_title
 			);
 
-			if ( $attributes['displayTimestamp'] ) {
+			if ( $attributes['displayDate'] ) {
 				$list_items_markup .= sprintf(
-					'<time datetime="%1$s" class="wp-block-latest-comments__comment-timestamp">%2$s</time>',
+					'<time datetime="%1$s" class="wp-block-latest-comments__comment-date">%2$s</time>',
 					esc_attr( get_comment_date( 'c', $comment ) ),
-					esc_html( get_comment_date( '', $comment ) )
+					date_i18n( get_option( 'date_format' ), get_comment_date( 'U', $comment ) )
 				);
 			}
 			$list_items_markup .= '</footer>';
@@ -103,8 +103,8 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 	if ( $attributes['displayAvatar'] ) {
 		$class .= ' has-avatars';
 	}
-	if ( $attributes['displayTimestamp'] ) {
-		$class .= ' has-timestamps';
+	if ( $attributes['displayDate'] ) {
+		$class .= ' has-dates';
 	}
 	if ( $attributes['displayExcerpt'] ) {
 		$class .= ' has-excerpts';
@@ -120,28 +120,28 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 }
 
 register_block_type( 'core/latest-comments', array(
-	'attributes' => array(
-		'className' => array(
+	'attributes'      => array(
+		'className'        => array(
 			'type' => 'string',
 		),
-		'commentsToShow' => array(
+		'commentsToShow'   => array(
 			'type'    => 'number',
-			'default' => $DEFAULT_COMMENTS_TO_SHOW,
+			'default' => $default_comments_to_show,
 		),
-		'displayAvatar' => array(
+		'displayAvatar'    => array(
 			'type'    => 'boolean',
 			'default' => true,
 		),
-		'displayExcerpt' => array(
+		'displayDate' => array(
 			'type'    => 'boolean',
 			'default' => true,
 		),
-		'displayTimestamp' => array(
+		'displayExcerpt'   => array(
 			'type'    => 'boolean',
 			'default' => true,
 		),
-		'align' => array(
-			'type'    => 'string',
+		'align'            => array(
+			'type' => 'string',
 		),
 	),
 	'render_callback' => 'gutenberg_render_block_core_latest_comments',
