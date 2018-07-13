@@ -5,7 +5,9 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
   className="editor-default-block-appender"
   data-root-uid=""
 >
-  <WithDispatch(WithSelect(BlockDropZone)) />
+  <div
+    id="mockBlockDropZone"
+  />
   <input
     aria-label="Add block"
     className="editor-default-block-appender__content"
@@ -38,16 +40,12 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
     type="text"
     value="Write your story"
   />
-  <WithSelect(WithDispatch(InserterWithShortcuts)) />
-  <WithSelect(WithDispatch(Inserter))
-    position="top right"
-  >
-    <WithSafeTimeout(WithSelect(WithDispatch(DotTip)))
-      id="core/editor.inserter"
-    >
-      Welcome to the wonderful world of blocks! Click the “+” (“Add block”) button to add a new block. There are blocks available for all kind of content: you can insert text, headings, images, lists, and lots more!
-    </WithSafeTimeout(WithSelect(WithDispatch(DotTip)))>
-  </WithSelect(WithDispatch(Inserter))>
+  <div
+    id="mockInserterWithShortcuts"
+  />
+  <div
+    id="mockInserter"
+  />
 </div>
 `;
 
@@ -56,7 +54,9 @@ exports[`DefaultBlockAppender should match snapshot 1`] = `
   className="editor-default-block-appender"
   data-root-uid=""
 >
-  <WithDispatch(WithSelect(BlockDropZone)) />
+  <div
+    id="mockBlockDropZone"
+  />
   <input
     aria-label="Add block"
     className="editor-default-block-appender__content"
@@ -68,16 +68,12 @@ exports[`DefaultBlockAppender should match snapshot 1`] = `
     type="text"
     value="Write your story"
   />
-  <WithSelect(WithDispatch(InserterWithShortcuts)) />
-  <WithSelect(WithDispatch(Inserter))
-    position="top right"
-  >
-    <WithSafeTimeout(WithSelect(WithDispatch(DotTip)))
-      id="core/editor.inserter"
-    >
-      Welcome to the wonderful world of blocks! Click the “+” (“Add block”) button to add a new block. There are blocks available for all kind of content: you can insert text, headings, images, lists, and lots more!
-    </WithSafeTimeout(WithSelect(WithDispatch(DotTip)))>
-  </WithSelect(WithDispatch(Inserter))>
+  <div
+    id="mockInserterWithShortcuts"
+  />
+  <div
+    id="mockInserter"
+  />
 </div>
 `;
 
@@ -86,7 +82,9 @@ exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
   className="editor-default-block-appender"
   data-root-uid=""
 >
-  <WithDispatch(WithSelect(BlockDropZone)) />
+  <div
+    id="mockBlockDropZone"
+  />
   <input
     aria-label="Add block"
     className="editor-default-block-appender__content"
@@ -98,15 +96,11 @@ exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
     type="text"
     value=""
   />
-  <WithSelect(WithDispatch(InserterWithShortcuts)) />
-  <WithSelect(WithDispatch(Inserter))
-    position="top right"
-  >
-    <WithSafeTimeout(WithSelect(WithDispatch(DotTip)))
-      id="core/editor.inserter"
-    >
-      Welcome to the wonderful world of blocks! Click the “+” (“Add block”) button to add a new block. There are blocks available for all kind of content: you can insert text, headings, images, lists, and lots more!
-    </WithSafeTimeout(WithSelect(WithDispatch(DotTip)))>
-  </WithSelect(WithDispatch(Inserter))>
+  <div
+    id="mockInserterWithShortcuts"
+  />
+  <div
+    id="mockInserter"
+  />
 </div>
 `;

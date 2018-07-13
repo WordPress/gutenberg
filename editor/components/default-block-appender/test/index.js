@@ -1,12 +1,34 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import Shallow from 'react-test-renderer/shallow';
+import renderer from 'react-test-renderer';
+
+/**
+ * WordPress dependencies
+ */
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { DefaultBlockAppender } from '../';
+
+const shallowRenderer = new Shallow();
+
+function mockNamedComponent( mockName ) {
+	class TestComponent extends Component {
+		render() {
+			return <div id={ "mock" + mockName } />;
+		}
+	}
+	TestComponent.displayName = 'mock' + mockName;
+	return () => <TestComponent />;
+};
+
+jest.mock( '../../block-drop-zone', () => mockNamedComponent( 'BlockDropZone' ) );
+jest.mock( '../../inserter-with-shortcuts', () => mockNamedComponent( 'InserterWithShortcuts' ) );
+jest.mock( '../../inserter', () => mockNamedComponent( 'Inserter' ) );
 
 describe( 'DefaultBlockAppender', () => {
 	const expectOnAppendCalled = ( onAppend ) => {
@@ -15,34 +37,34 @@ describe( 'DefaultBlockAppender', () => {
 	};
 
 	it( 'should render nothing if not visible', () => {
-		const wrapper = shallow( <DefaultBlockAppender /> );
+		shallowRenderer.render( <DefaultBlockAppender /> );
 
-		expect( wrapper.type() ).toBe( null );
+		expect( shallowRenderer.getRenderOutput() ).toBe( null );
 	} );
 
 	it( 'should match snapshot', () => {
 		const onAppend = jest.fn();
-		const wrapper = shallow( <DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt /> );
+		const wrapper = renderer.create( <DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt /> );
 
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
 	it( 'should append a default block when input clicked', () => {
 		const onAppend = jest.fn();
-		const wrapper = shallow( <DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt /> );
-		const input = wrapper.find( 'input.editor-default-block-appender__content' );
+		const wrapper = renderer.create( <DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt /> );
+		const input = wrapper.root.findByType( 'input' );
 
-		expect( input.prop( 'value' ) ).toEqual( 'Write your story' );
-		input.simulate( 'click' );
+		expect( input.props.value ).toEqual( 'Write your story' );
+		input.props.onClick();
 
 		expectOnAppendCalled( onAppend );
 	} );
 
 	it( 'should append a default block when input focused', () => {
 		const onAppend = jest.fn();
-		const wrapper = shallow( <DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt /> );
+		const wrapper = renderer.create( <DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt /> );
 
-		wrapper.find( 'input.editor-default-block-appender__content' ).simulate( 'focus' );
+		wrapper.root.findByType( 'input' ).props.onFocus();
 
 		expect( wrapper ).toMatchSnapshot();
 
@@ -51,10 +73,10 @@ describe( 'DefaultBlockAppender', () => {
 
 	it( 'should optionally show without prompt', () => {
 		const onAppend = jest.fn();
-		const wrapper = shallow( <DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt={ false } /> );
-		const input = wrapper.find( 'input.editor-default-block-appender__content' );
+		const wrapper = renderer.create( <DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt={ false } /> );
+		const input = wrapper.root.findByType( 'input' );
 
-		expect( input.prop( 'value' ) ).toEqual( '' );
+		expect( input.props.value ).toEqual( '' );
 
 		expect( wrapper ).toMatchSnapshot();
 	} );
