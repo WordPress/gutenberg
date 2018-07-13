@@ -1,7 +1,9 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import Shallow from 'react-test-renderer/shallow';
+
+const shallowRenderer = new Shallow();
 
 /**
  * Internal dependencies
@@ -14,14 +16,14 @@ describe( 'MultiBlocksSwitcher', () => {
 		const selectedBlockUids = [
 			'an-uid',
 		];
-		const wrapper = shallow(
+		shallowRenderer.render(
 			<MultiBlocksSwitcher
 				isMultiBlockSelection={ isMultiBlockSelection }
 				selectedBlockUids={ selectedBlockUids }
 			/>
 		);
 
-		expect( wrapper.html() ).toBeNull();
+		expect( shallowRenderer.getRenderOutput() ).toBeNull();
 	} );
 
 	test( 'should return a BlockSwitcher element matching the snapshot.', () => {
@@ -30,13 +32,13 @@ describe( 'MultiBlocksSwitcher', () => {
 			'an-uid',
 			'another-uid',
 		];
-		const wrapper = shallow(
+		shallowRenderer.render(
 			<MultiBlocksSwitcher
 				isMultiBlockSelection={ isMultiBlockSelection }
 				selectedBlockUids={ selectedBlockUids }
 			/>
 		);
 
-		expect( wrapper ).toMatchSnapshot();
+		expect( shallowRenderer.getRenderOutput() ).toMatchSnapshot();
 	} );
 } );
