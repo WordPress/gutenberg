@@ -231,7 +231,7 @@ function gutenberg_register_scripts_and_styles() {
 			'"DOMRect" in this && ( function( DOMRect ) {' .
 				'try { return new DOMRect(); }' .
 				'catch (e) { return false; }' .
-			'}(this.DOMRect))' => 'wp-polyfill-domrect',
+			'}(this.DOMRect))'  => 'wp-polyfill-domrect',
 		) ),
 		'before'
 	);
