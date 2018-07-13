@@ -10,11 +10,27 @@ import {
 } from '../support/utils';
 
 describe( 'New User Experience (NUX)', () => {
-	const NUMBER_OF_TIPS = 4;
+	async function clickAllTips( page ) {
+		// Click through all available tips.
+		const tips = await getTips( page );
+		const numberOfTips = tips.tipIds.length;
 
-	async function getTipsLocalStorage( page ) {
+		for ( let i = 1; i < numberOfTips; i++ ) {
+			await page.click( '.nux-dot-tip .components-button.is-link' );
+		}
+
+		return { numberOfTips, tips };
+	}
+
+	async function getTips( page ) {
 		return await page.evaluate( () => {
-			return JSON.parse( window.localStorage.GUTENBERG_NUX_1 );
+			return wp.data.select( 'core/nux' ).getAssociatedGuide( 'core/editor.inserter' );
+		} );
+	}
+
+	async function getTipsEnabled( page ) {
+		return await page.evaluate( () => {
+			return wp.data.select( 'core/nux' ).areTipsEnabled();
 		} );
 	}
 
@@ -26,7 +42,6 @@ describe( 'New User Experience (NUX)', () => {
 	afterEach( async () => {
 		// Clear localStorage tips so they aren't persisted for the next test.
 		await clearLocalStorage();
-		await page.goto( 'about:blank' );
 	} );
 
 	it( 'should show tips to a first-time user', async () => {
@@ -41,9 +56,7 @@ describe( 'New User Experience (NUX)', () => {
 	} );
 
 	it( 'should show "Got it" once all tips have been displayed', async () => {
-		for ( let i = 1; i < NUMBER_OF_TIPS; i++ ) {
-			await page.click( '.nux-dot-tip .components-button.is-link' );
-		}
+		await clickAllTips( page );
 
 		// Make sure "Got it" button appears on the last tip.
 		const gotItButton = await page.$x( '//button[contains(text(), \'Got it\')]' );
@@ -58,22 +71,20 @@ describe( 'New User Experience (NUX)', () => {
 
 		// Tips should not be marked as disabled, but when the user has seen all
 		// of the available tips, they will not appear.
-		const nuxTipsLocalStorage = await getTipsLocalStorage( page );
-		expect( nuxTipsLocalStorage.areTipsEnabled ).toEqual( true );
-		expect( Object.keys( nuxTipsLocalStorage.dismissedTips ) ).toHaveLength( NUMBER_OF_TIPS );
+		const areTipsEnabled = await getTipsEnabled( page );
+		expect( areTipsEnabled ).toEqual( true );
 	} );
 
-	it( 'should dismiss tips if "disable tips" button is clicked', async () => {
+	it( 'should hide and disable tips if "disable tips" button is clicked', async () => {
 		await page.click( '.nux-dot-tip__disable' );
 
 		// Verify no more tips are visible on the page.
 		let nuxTipElements = await page.$$( '.nux-dot-tip' );
 		expect( nuxTipElements ).toHaveLength( 0 );
 
-		// We should be disabling the tips using localStorage so they don't appear
-		// again.
-		const nuxTipsLocalStorage = await getTipsLocalStorage( page );
-		expect( nuxTipsLocalStorage.areTipsEnabled ).toEqual( false );
+		// We should be disabling the tips so they don't appear again.
+		const areTipsEnabled = await getTipsEnabled( page );
+		expect( areTipsEnabled ).toEqual( false );
 
 		// Refresh the page; tips should not show because they were disabled.
 		await page.reload();
@@ -96,8 +107,8 @@ describe( 'New User Experience (NUX)', () => {
 		expect( nuxTipElements ).toHaveLength( 0 );
 
 		// Tips should be disabled in localStorage as well.
-		let nuxTipsLocalStorage = await getTipsLocalStorage( page );
-		expect( nuxTipsLocalStorage.areTipsEnabled ).toEqual( false );
+		let areTipsEnabled = await getTipsEnabled( page );
+		expect( areTipsEnabled ).toEqual( false );
 
 		// Click again to re-enable tips; they should appear.
 		await clickOnMoreMenuItem( 'Show Tips' );
@@ -105,17 +116,14 @@ describe( 'New User Experience (NUX)', () => {
 		nuxTipElements = await page.$$( '.nux-dot-tip' );
 		expect( nuxTipElements ).toHaveLength( 1 );
 
-		nuxTipsLocalStorage = await getTipsLocalStorage( page );
-		expect( nuxTipsLocalStorage.areTipsEnabled ).toEqual( true );
+		areTipsEnabled = await getTipsEnabled( page );
+		expect( areTipsEnabled ).toEqual( true );
 	} );
 
 	// TODO: This test should be enabled once
 	// https://github.com/WordPress/gutenberg/issues/7458 is fixed.
 	it.skip( 'should show tips as disabled if all tips have been shown', async () => {
-		// Clicks through all tips.
-		for ( let i = 1; i <= NUMBER_OF_TIPS; i++ ) {
-			await page.click( '.nux-dot-tip .components-button.is-link' );
-		}
+		await clickAllTips( page );
 
 		// Open the "More" menu to check the "Show Tips" element.
 		await page.click( '.edit-post-more-menu [aria-label="More"]' );
@@ -127,10 +135,7 @@ describe( 'New User Experience (NUX)', () => {
 	// TODO: This test should be enabled once
 	// https://github.com/WordPress/gutenberg/issues/7458 is fixed.
 	it.skip( 'should reset tips if all tips have been shown and show tips was unchecked', async () => {
-		// Clicks through all tips.
-		for ( let i = 1; i <= NUMBER_OF_TIPS; i++ ) {
-			await page.click( '.nux-dot-tip .components-button.is-link' );
-		}
+		const { numberOfTips } = await clickAllTips( page );
 
 		// Click again to re-enable tips; they should appear.
 		await clickOnMoreMenuItem( 'Show Tips' );
@@ -145,10 +150,14 @@ describe( 'New User Experience (NUX)', () => {
 		const nuxTipElements = await page.$$( '.nux-dot-tip' );
 		expect( nuxTipElements ).toHaveLength( 1 );
 
-		// Dismissed tips should be reset.
-		const nuxTipsLocalStorage = await getTipsLocalStorage( page );
-		expect( nuxTipsLocalStorage.areTipsEnabled ).toEqual( true );
-		expect( Object.keys( nuxTipsLocalStorage.dismissedTips ) ).toHaveLength( 0 );
+		// Tips should be enabled again.
+		const areTipsEnabled = await getTipsEnabled( page );
+		expect( areTipsEnabled ).toEqual( true );
+
+		// Dismissed tips should be reset and ready to be shown again.
+		const resetTips = await getTips( page );
+		const newNumberOfTips = resetTips.tipIds.length;
+		expect( newNumberOfTips ).toHaveLength( numberOfTips );
 	} );
 
 	// TODO: This test should be enabled once
