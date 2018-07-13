@@ -1,8 +1,9 @@
 /**
  * External dependencies
  */
-import { mount } from 'enzyme';
 import { noop } from 'lodash';
+import TestUtils from 'react-dom/test-utils';
+import ReactDOM from 'react-dom';
 
 /**
  * Internal dependencies
@@ -90,256 +91,238 @@ const items = [
 	sharedItem,
 ];
 
+const DEFAULT_PROPS = {
+	position: 'top center',
+	instanceID: 1,
+	items: items,
+	debouncedSpeak: noop,
+	fetchSharedBlocks: noop,
+	setTimeout: noop,
+};
+
+const getWrapperForProps = ( propOverrides ) => {
+	return TestUtils.renderIntoDocument(
+		<InserterMenu { ...DEFAULT_PROPS } { ...propOverrides } />
+	);
+};
+
+const initializeMenuDefaultStateAndReturnElement = ( propOverrides ) => {
+	const wrapper = getWrapperForProps( propOverrides );
+	/* eslint-disable react/no-find-dom-node */
+	return ReactDOM.findDOMNode( wrapper );
+	/* eslint-enable react/no-find-dom-node */
+};
+
+const initializeAllClosedMenuStateAndReturnElement = ( propOverrides ) => {
+	const element = initializeMenuDefaultStateAndReturnElement( propOverrides );
+	const activeTabs = element.querySelectorAll(
+		'.components-panel__body.is-opened button.components-panel__body-toggle'
+	);
+	activeTabs.forEach( ( tab ) => {
+		TestUtils.Simulate.click( tab );
+	} );
+	return element;
+};
+
+const assertNoResultsMessageToBePresent = ( element ) => {
+	const noResultsMessage = element.querySelector(
+		'.editor-inserter__no-results'
+	);
+	expect( noResultsMessage.textContent ).toEqual( 'No blocks found.' );
+};
+
+const assertNoResultsMessageNotToBePresent = ( element ) => {
+	const noResultsMessage = element.querySelector(
+		'.editor-inserter__no-results'
+	);
+	expect( noResultsMessage ).toBe( null );
+};
+
+const assertOpenedPanels = ( element, expectedOpen = 0 ) => {
+	expect( element.querySelectorAll( '.components-panel__body.is-opened ' ) )
+		.toHaveLength( expectedOpen );
+};
+
+const getTabButtonWithContent = ( element, content ) => {
+	let foundButton;
+	const buttons = element.querySelectorAll( '.components-button' );
+	buttons.forEach( ( button ) => {
+		if ( button.textContent === content ) {
+			foundButton = button;
+		}
+	} );
+	return foundButton;
+};
+
+const performSearchWithText = ( element, searchText ) => {
+	const searchElement = element.querySelector( '.editor-inserter__search' );
+	TestUtils.Simulate.change( searchElement, { target: { value: searchText } } );
+};
+
 describe( 'InserterMenu', () => {
-	// NOTE: Due to https://github.com/airbnb/enzyme/issues/1174, some of the selectors passed through to
-	// wrapper.find have had to be strengthened (and the filterWhere strengthened also), otherwise two
-	// results would be returned even though only one was in the DOM.
-
 	it( 'should show the suggested tab by default', () => {
-		const wrapper = mount(
-			<InserterMenu
-				position={ 'top center' }
-				instanceId={ 1 }
-				items={ items }
-				debouncedSpeak={ noop }
-				fetchSharedBlocks={ noop }
-				setTimeout={ noop }
-			/>
+		const element = initializeMenuDefaultStateAndReturnElement();
+		const activeCategory = element.querySelector(
+			'.components-panel__body.is-opened > .components-panel__body-title'
 		);
-
-		const activeCategory = wrapper.find( '.components-panel__body.is-opened > .components-panel__body-title' );
-		expect( activeCategory.text() ).toBe( 'Most Used' );
+		expect( activeCategory.textContent ).toBe( 'Most Used' );
 	} );
 
 	it( 'should show nothing if there are no items', () => {
-		const wrapper = mount(
-			<InserterMenu
-				position={ 'top center' }
-				instanceId={ 1 }
-				items={ [] }
-				debouncedSpeak={ noop }
-				fetchSharedBlocks={ noop }
-				setTimeout={ noop }
-			/>
+		const element = initializeMenuDefaultStateAndReturnElement(
+			{ items: [] }
+		);
+		const visibleBlocks = element.querySelector(
+			'.editor-block-types-list__item'
 		);
 
-		const visibleBlocks = wrapper.find( '.editor-block-types-list__item' );
-		expect( visibleBlocks ).toHaveLength( 0 );
+		expect( visibleBlocks ).toBe( null );
 
-		const noResultsMessage = wrapper.find( '.editor-inserter__no-results' );
-		expect( noResultsMessage ).toHaveLength( 1 );
+		assertNoResultsMessageToBePresent( element );
 	} );
 
 	it( 'should show only high utility items in the suggested tab', () => {
-		const wrapper = mount(
-			<InserterMenu
-				position={ 'top center' }
-				instanceId={ 1 }
-				items={ items }
-				debouncedSpeak={ noop }
-				fetchSharedBlocks={ noop }
-				setTimeout={ noop }
-			/>
+		const element = initializeMenuDefaultStateAndReturnElement();
+		const visibleBlocks = element.querySelectorAll(
+			'.editor-block-types-list__item-title'
 		);
-
-		const visibleBlocks = wrapper.find( '.editor-block-types-list__item' );
 		expect( visibleBlocks ).toHaveLength( 3 );
-		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Text' );
-		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Advanced Text' );
-		expect( visibleBlocks.at( 2 ).text() ).toBe( 'Some Other Block' );
+		expect( visibleBlocks[ 0 ].textContent ).toEqual( 'Text' );
+		expect( visibleBlocks[ 1 ].textContent ).toEqual( 'Advanced Text' );
+		expect( visibleBlocks[ 2 ].textContent ).toEqual( 'Some Other Block' );
 	} );
 
 	it( 'should limit the number of items shown in the suggested tab', () => {
-		const wrapper = mount(
-			<InserterMenu
-				position={ 'top center' }
-				instanceId={ 1 }
-				items={ items }
-				debouncedSpeak={ noop }
-				fetchSharedBlocks={ noop }
-				maxSuggestedItems={ 2 }
-				setTimeout={ noop }
-			/>
+		const element = initializeMenuDefaultStateAndReturnElement(
+			{ maxSuggestedItems: 2 }
 		);
-
-		const visibleBlocks = wrapper.find( '.editor-block-types-list__item' );
+		const visibleBlocks = element.querySelectorAll(
+			'.editor-block-types-list__list-item'
+		);
 		expect( visibleBlocks ).toHaveLength( 2 );
 	} );
 
 	it( 'should show items from the embed category in the embed tab', () => {
-		const wrapper = mount(
-			<InserterMenu
-				position={ 'top center' }
-				instanceId={ 1 }
-				items={ items }
-				debouncedSpeak={ noop }
-				fetchSharedBlocks={ noop }
-				setTimeout={ noop }
-			/>
+		const element = initializeAllClosedMenuStateAndReturnElement();
+		const embedTab = getTabButtonWithContent( element, 'Embeds' );
+
+		TestUtils.Simulate.click( embedTab );
+
+		assertOpenedPanels( element, 1 );
+
+		const visibleBlocks = element.querySelectorAll(
+			'.editor-block-types-list__item-title'
 		);
-		const activeTabs = wrapper.find( '.components-panel__body.is-opened button.components-panel__body-toggle' );
-		activeTabs.forEach( ( tab ) => tab.simulate( 'click' ) );
 
-		const embedTab = wrapper.find( '.components-panel__body button.components-panel__body-toggle' )
-			.filterWhere( ( node ) => node.text() === 'Embeds' );
-		embedTab.simulate( 'click' );
-
-		const activeCategory = wrapper.find( '.components-panel__body.is-opened > .components-panel__body-title' );
-		expect( activeCategory.text() ).toBe( 'Embeds' );
-
-		const visibleBlocks = wrapper.find( '.editor-block-types-list__item' );
 		expect( visibleBlocks ).toHaveLength( 2 );
-		expect( visibleBlocks.at( 0 ).text() ).toBe( 'YouTube' );
-		expect( visibleBlocks.at( 1 ).text() ).toBe( 'A Text Embed' );
+		expect( visibleBlocks[ 0 ].textContent ).toBe( 'YouTube' );
+		expect( visibleBlocks[ 1 ].textContent ).toBe( 'A Text Embed' );
 
-		const noResultsMessage = wrapper.find( '.editor-inserter__no-results' );
-		expect( noResultsMessage ).not.toExist();
+		assertNoResultsMessageNotToBePresent( element );
 	} );
 
 	it( 'should show shared items in the shared tab', () => {
-		const wrapper = mount(
-			<InserterMenu
-				position={ 'top center' }
-				instanceId={ 1 }
-				items={ items }
-				debouncedSpeak={ noop }
-				fetchSharedBlocks={ noop }
-				setTimeout={ noop }
-			/>
+		const element = initializeAllClosedMenuStateAndReturnElement();
+		const sharedTab = getTabButtonWithContent( element, 'Shared' );
+
+		TestUtils.Simulate.click( sharedTab );
+
+		assertOpenedPanels( element, 1 );
+
+		const visibleBlocks = element.querySelectorAll(
+			'.editor-block-types-list__item-title'
 		);
-		const activeTabs = wrapper.find( '.components-panel__body.is-opened button.components-panel__body-toggle' );
-		activeTabs.forEach( ( tab ) => tab.simulate( 'click' ) );
 
-		const embedTab = wrapper.find( '.components-panel__body button.components-panel__body-toggle' )
-			.filterWhere( ( node ) => node.text() === 'Shared' );
-		embedTab.simulate( 'click' );
-
-		const activeCategory = wrapper.find( '.components-panel__body.is-opened > .components-panel__body-title' );
-		expect( activeCategory.text() ).toBe( 'Shared' );
-
-		const visibleBlocks = wrapper.find( '.editor-block-types-list__item' );
 		expect( visibleBlocks ).toHaveLength( 1 );
-		expect( visibleBlocks.at( 0 ).text() ).toBe( 'My shared block' );
+		expect( visibleBlocks[ 0 ].textContent ).toBe( 'My shared block' );
 
-		const noResultsMessage = wrapper.find( '.editor-inserter__no-results' );
-		expect( noResultsMessage ).not.toExist();
+		assertNoResultsMessageNotToBePresent( element );
 	} );
 
 	it( 'should show the common category blocks', () => {
-		const wrapper = mount(
-			<InserterMenu
-				position={ 'top center' }
-				instanceId={ 1 }
-				items={ items }
-				debouncedSpeak={ noop }
-				fetchSharedBlocks={ noop }
-				setTimeout={ noop }
-			/>
+		const element = initializeAllClosedMenuStateAndReturnElement();
+		const commonBlocksTab = getTabButtonWithContent( element, 'Common Blocks' );
+
+		TestUtils.Simulate.click( commonBlocksTab );
+
+		assertOpenedPanels( element, 1 );
+
+		const visibleBlocks = element.querySelectorAll(
+			'.editor-block-types-list__item-title'
 		);
-		const activeTabs = wrapper.find( '.components-panel__body.is-opened button.components-panel__body-toggle' );
-		activeTabs.forEach( ( tab ) => tab.simulate( 'click' ) );
 
-		const blocksTab = wrapper.find( '.components-panel__body button.components-panel__body-toggle' )
-			.filterWhere( ( node ) => node.text() === 'Common Blocks' );
-		blocksTab.simulate( 'click' );
-
-		const activeCategory = wrapper.find( '.components-panel__body.is-opened > .components-panel__body-title' );
-		expect( activeCategory.text() ).toBe( 'Common Blocks' );
-
-		const visibleBlocks = wrapper.find( '.editor-block-types-list__item' );
 		expect( visibleBlocks ).toHaveLength( 3 );
-		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Text' );
-		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Advanced Text' );
-		expect( visibleBlocks.at( 2 ).text() ).toBe( 'Some Other Block' );
+		expect( visibleBlocks[ 0 ].textContent ).toBe( 'Text' );
+		expect( visibleBlocks[ 1 ].textContent ).toBe( 'Advanced Text' );
+		expect( visibleBlocks[ 2 ].textContent ).toBe( 'Some Other Block' );
 
-		const noResultsMessage = wrapper.find( '.editor-inserter__no-results' );
-		expect( noResultsMessage ).not.toExist();
+		assertNoResultsMessageNotToBePresent( element );
 	} );
 
 	it( 'should disable items with `isDisabled`', () => {
-		const wrapper = mount(
-			<InserterMenu
-				position={ 'top center' }
-				instanceId={ 1 }
-				items={ items }
-				debouncedSpeak={ noop }
-				fetchSharedBlocks={ noop }
-				setTimeout={ noop }
-			/>
+		const element = initializeMenuDefaultStateAndReturnElement();
+		const layoutTab = getTabButtonWithContent( element, 'Layout Elements' );
+
+		TestUtils.Simulate.click( layoutTab );
+
+		const disabledBlocks = element.querySelectorAll(
+			'.editor-block-types-list__item[disabled]'
 		);
 
-		const layoutTab = wrapper.find( '.components-panel__body button.components-panel__body-toggle' )
-			.filterWhere( ( node ) => node.text() === 'Layout Elements' );
-		layoutTab.simulate( 'click' );
-
-		const disabledBlocks = wrapper.find( '.editor-block-types-list__item[disabled=true]' );
 		expect( disabledBlocks ).toHaveLength( 1 );
-		expect( disabledBlocks.at( 0 ).text() ).toBe( 'More' );
+		expect( disabledBlocks[ 0 ].textContent ).toBe( 'More' );
 	} );
 
 	it( 'should allow searching for items', () => {
-		const wrapper = mount(
-			<InserterMenu
-				position={ 'top center' }
-				instanceId={ 1 }
-				items={ items }
-				debouncedSpeak={ noop }
-				fetchSharedBlocks={ noop }
-				setTimeout={ noop }
-			/>
+		const element = initializeMenuDefaultStateAndReturnElement();
+		performSearchWithText( element, 'text' );
+
+		assertOpenedPanels( element, 2 );
+
+		const matchingCategories = element.querySelectorAll(
+			'.components-panel__body-toggle'
 		);
-		wrapper.find( '.editor-inserter__search' ).simulate( 'change', { target: { value: 'text' } } );
 
-		// Two panels
-		const panels = wrapper.find( '.editor-inserter__results .components-panel__body' );
-		expect( panels ).toHaveLength( 2 );
-
-		// Matching panels expand
-		const matchingCategories = wrapper.find( '.components-panel__body.is-opened > .components-panel__body-title' );
 		expect( matchingCategories ).toHaveLength( 2 );
-		expect( matchingCategories.at( 0 ).text() ).toBe( 'Common Blocks' );
-		expect( matchingCategories.at( 1 ).text() ).toBe( 'Embeds' );
+		expect( matchingCategories[ 0 ].textContent ).toBe( 'Common Blocks' );
+		expect( matchingCategories[ 1 ].textContent ).toBe( 'Embeds' );
 
-		// Find blocks across panels
-		const visibleBlocks = wrapper.find( '.editor-block-types-list__item' );
+		const visibleBlocks = element.querySelectorAll(
+			'.editor-block-types-list__item-title'
+		);
+
 		expect( visibleBlocks ).toHaveLength( 3 );
-		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Text' );
-		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Advanced Text' );
-		expect( visibleBlocks.at( 2 ).text() ).toBe( 'A Text Embed' );
+		expect( visibleBlocks[ 0 ].textContent ).toBe( 'Text' );
+		expect( visibleBlocks[ 1 ].textContent ).toBe( 'Advanced Text' );
+		expect( visibleBlocks[ 2 ].textContent ).toBe( 'A Text Embed' );
 
-		const noResultsMessage = wrapper.find( '.editor-inserter__no-results' );
-		expect( noResultsMessage ).not.toExist();
+		assertNoResultsMessageNotToBePresent( element );
 	} );
 
 	it( 'should trim whitespace of search terms', () => {
-		const wrapper = mount(
-			<InserterMenu
-				position={ 'top center' }
-				instanceId={ 1 }
-				items={ items }
-				debouncedSpeak={ noop }
-				fetchSharedBlocks={ noop }
-				setTimeout={ noop }
-			/>
+		const element = initializeMenuDefaultStateAndReturnElement();
+		performSearchWithText( element, ' text' );
+
+		assertOpenedPanels( element, 2 );
+
+		const matchingCategories = element.querySelectorAll(
+			'.components-panel__body-toggle'
 		);
-		wrapper.find( '.editor-inserter__search' ).simulate( 'change', { target: { value: ' text' } } );
 
-		// Two panels
-		const panels = wrapper.find( '.editor-inserter__results .components-panel__body' );
-		expect( panels ).toHaveLength( 2 );
-
-		// Matching panels expand
-		const matchingCategories = wrapper.find( '.components-panel__body.is-opened > .components-panel__body-title' );
 		expect( matchingCategories ).toHaveLength( 2 );
-		expect( matchingCategories.at( 0 ).text() ).toBe( 'Common Blocks' );
-		expect( matchingCategories.at( 1 ).text() ).toBe( 'Embeds' );
+		expect( matchingCategories[ 0 ].textContent ).toBe( 'Common Blocks' );
+		expect( matchingCategories[ 1 ].textContent ).toBe( 'Embeds' );
 
-		// Find blocks across panels
-		const visibleBlocks = wrapper.find( '.editor-block-types-list__item' );
+		const visibleBlocks = element.querySelectorAll(
+			'.editor-block-types-list__item-title'
+		);
+
 		expect( visibleBlocks ).toHaveLength( 3 );
-		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Text' );
-		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Advanced Text' );
-		expect( visibleBlocks.at( 2 ).text() ).toBe( 'A Text Embed' );
+		expect( visibleBlocks[ 0 ].textContent ).toBe( 'Text' );
+		expect( visibleBlocks[ 1 ].textContent ).toBe( 'Advanced Text' );
+		expect( visibleBlocks[ 2 ].textContent ).toBe( 'A Text Embed' );
+
+		assertNoResultsMessageNotToBePresent( element );
 	} );
 } );
 
