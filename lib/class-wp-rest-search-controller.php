@@ -65,8 +65,6 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 		$this->namespace = 'gutenberg/v1';
 		$this->rest_base = 'search';
 
-		$post_search_handler = new WP_REST_Post_Search_Handler();
-
 		foreach ( $search_handlers as $search_handler ) {
 			if ( ! $search_handler instanceof WP_REST_Search_Handler ) {
 
