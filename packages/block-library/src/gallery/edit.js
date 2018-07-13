@@ -2,6 +2,7 @@
  * External Dependencies
  */
 import { filter, pick } from 'lodash';
+import Sortable from './sortable';
 
 /**
  * WordPress dependencies
@@ -235,8 +236,11 @@ class GalleryEdit extends Component {
 					</PanelBody>
 				</InspectorControls>
 				{ noticeUI }
-				<ul className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
-					{ dropZone }
+				<Sortable className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }
+					items={ images }
+					onSortEnd={ ( images ) => this.props.setAttributes( { images } ) }
+					dropZone={ dropZone }
+				>
 					{ images.map( ( img, index ) => (
 						<li className="blocks-gallery-item" key={ img.id || img.url }>
 							<GalleryImage
@@ -265,7 +269,7 @@ class GalleryEdit extends Component {
 							</FormFileUpload>
 						</li>
 					}
-				</ul>
+				</Sortable>
 			</Fragment>
 		);
 	}
