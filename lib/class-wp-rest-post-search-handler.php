@@ -19,11 +19,13 @@ class WP_REST_Post_Search_Handler extends WP_REST_Search_Handler {
 	 * @since 3.3.0
 	 */
 	public function __construct() {
-		$this->type     = 'post';
-		$this->subtypes = array_values( get_post_types( array(
+		$this->type = 'post';
+
+		// Support all public post types except attachments.
+		$this->subtypes = array_diff( array_values( get_post_types( array(
 			'public'       => true,
 			'show_in_rest' => true,
-		), 'names' ) );
+		), 'names' ) ), array( 'attachment' ) );
 	}
 
 	/**
