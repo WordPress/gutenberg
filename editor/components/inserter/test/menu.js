@@ -91,7 +91,7 @@ const items = [
 	sharedItem,
 ];
 
-const defaultProps = {
+const DEFAULT_PROPS = {
 	position: 'top center',
 	instanceID: 1,
 	items: items,
@@ -100,16 +100,14 @@ const defaultProps = {
 	setTimeout: noop,
 };
 
-let wrapper;
-
-const setWrapperForProps = ( propOverrides ) => {
-	wrapper = TestUtils.renderIntoDocument(
-		<InserterMenu { ...defaultProps } { ...propOverrides } />
+const getWrapperForProps = ( propOverrides ) => {
+	return TestUtils.renderIntoDocument(
+		<InserterMenu { ...DEFAULT_PROPS } { ...propOverrides } />
 	);
 };
 
 const initializeMenuDefaultStateAndReturnElement = ( propOverrides ) => {
-	setWrapperForProps( propOverrides );
+	const wrapper = getWrapperForProps( propOverrides );
 	/* eslint-disable react/no-find-dom-node */
 	return ReactDOM.findDOMNode( wrapper );
 	/* eslint-enable react/no-find-dom-node */
