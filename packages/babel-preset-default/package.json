@@ -22,8 +22,7 @@
 		"node": ">=8"
 	},
 	"files": [
-		"build",
-		"build-module"
+		"index.js"
 	],
 	"dependencies": {
 		"@babel/plugin-proposal-async-generator-functions": "^7.0.0-beta.52",
