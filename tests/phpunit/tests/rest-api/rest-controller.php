@@ -190,4 +190,27 @@ class WP_Test_REST_Controller extends WP_Test_REST_TestCase {
 
 		$this->assertEquals( 'a', $args['somedefault']['default'] );
 	}
+
+	public function test_get_fields_for_response() {
+		$controller = new WP_REST_Test_Controller();
+		$request    = new WP_REST_Request( 'GET', '/wp/v2/testroute' );
+		$fields     = $controller->get_fields_for_response( $request );
+		$this->assertEquals( array(
+			'somestring',
+			'someinteger',
+			'someboolean',
+			'someurl',
+			'somedate',
+			'someemail',
+			'someenum',
+			'someargoptions',
+			'somedefault',
+		), $fields );
+		$request->set_param( '_fields', 'somestring,someinteger' );
+		$fields = $controller->get_fields_for_response( $request );
+		$this->assertEquals( array(
+			'somestring',
+			'someinteger',
+		), $fields );
+	}
 }

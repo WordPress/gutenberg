@@ -335,6 +335,26 @@ class WP_Test_REST_Pages_Controller extends WP_Test_REST_Post_Type_Controller_Te
 
 	}
 
+	public function test_prepare_item_limit_fields() {
+		wp_set_current_user( self::$editor_id );
+		$page_id  = $this->factory->post->create(
+			array(
+				'post_status' => 'publish',
+				'post_type'   => 'page',
+			)
+		);
+		$endpoint = new WP_REST_Posts_Controller( 'page' );
+		$request  = new WP_REST_Request( 'GET', sprintf( '/wp/v2/pages/%d', $page_id ) );
+		$request->set_param( 'context', 'edit' );
+		$request->set_param( '_fields', 'id,slug' );
+		$obj      = get_post( $page_id );
+		$response = $endpoint->prepare_item_for_response( $obj, $request );
+		$this->assertEquals( array(
+			'id',
+			'slug',
+		), array_keys( $response->get_data() ) );
+	}
+
 	public function test_get_pages_params() {
 		$this->factory->post->create_many( 8, array(
 			'post_type' => 'page',

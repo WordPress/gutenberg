@@ -795,6 +795,20 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$this->check_comment_data( $data, 'edit', $response->get_links() );
 	}
 
+	public function test_prepare_item_limit_fields() {
+		wp_set_current_user( self::$admin_id );
+		$endpoint = new WP_REST_Comments_Controller;
+		$request  = new WP_REST_Request( 'GET', sprintf( '/wp/v2/comments/%d', self::$approved_id ) );
+		$request->set_param( 'context', 'edit' );
+		$request->set_param( '_fields', 'id,status' );
+		$obj      = get_comment( self::$approved_id );
+		$response = $endpoint->prepare_item_for_response( $obj, $request );
+		$this->assertEquals( array(
+			'id',
+			'status',
+		), array_keys( $response->get_data() ) );
+	}
+
 	public function test_get_comment_author_avatar_urls() {
 		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/comments/%d', self::$approved_id ) );
 

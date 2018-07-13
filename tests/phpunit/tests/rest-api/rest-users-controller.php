@@ -763,6 +763,19 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 		$this->check_get_user_response( $data, 'edit' );
 	}
 
+	public function test_prepare_item_limit_fields() {
+		wp_set_current_user( self::$user );
+		$request = new WP_REST_Request;
+		$request->set_param( 'context', 'edit' );
+		$request->set_param( '_fields', 'id,name' );
+		$user     = get_user_by( 'id', get_current_user_id() );
+		$response = $this->endpoint->prepare_item_for_response( $user, $request );
+		$this->assertEquals( array(
+			'id',
+			'name',
+		), array_keys( $response->get_data() ) );
+	}
+
 	public function test_get_user_avatar_urls() {
 		wp_set_current_user( self::$user );
 

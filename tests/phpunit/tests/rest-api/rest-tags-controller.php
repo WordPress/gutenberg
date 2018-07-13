@@ -925,6 +925,18 @@ class WP_Test_REST_Tags_Controller extends WP_Test_REST_Controller_Testcase {
 		$this->check_taxonomy_term( $term, $data, $response->get_links() );
 	}
 
+	public function test_prepare_item_limit_fields() {
+		$request  = new WP_REST_Request;
+		$endpoint = new WP_REST_Terms_Controller( 'post_tag' );
+		$request->set_param( '_fields', 'id,name' );
+		$term     = get_term_by( 'id', $this->factory->tag->create(), 'post_tag' );
+		$response = $endpoint->prepare_item_for_response( $term, $request );
+		$this->assertEquals( array(
+			'id',
+			'name',
+		), array_keys( $response->get_data() ) );
+	}
+
 	public function test_get_item_schema() {
 		$request = new WP_REST_Request( 'OPTIONS', '/wp/v2/tags' );
 		$response = $this->server->dispatch( $request );

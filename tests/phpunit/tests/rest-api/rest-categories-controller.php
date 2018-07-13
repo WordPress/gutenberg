@@ -827,6 +827,18 @@ class WP_Test_REST_Categories_Controller extends WP_Test_REST_Controller_Testcas
 		$this->check_taxonomy_term( $term, $data, $response->get_links() );
 	}
 
+	public function test_prepare_item_limit_fields() {
+		$request  = new WP_REST_Request;
+		$endpoint = new WP_REST_Terms_Controller( 'category' );
+		$request->set_param( '_fields', 'id,name' );
+		$term     = get_term( 1, 'category' );
+		$response = $endpoint->prepare_item_for_response( $term, $request );
+		$this->assertEquals( array(
+			'id',
+			'name',
+		), array_keys( $response->get_data() ) );
+	}
+
 	public function test_prepare_taxonomy_term_child() {
 		$child = $this->factory->category->create( array(
 			'parent' => 1,

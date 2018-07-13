@@ -129,6 +129,19 @@ class WP_Test_REST_Post_Statuses_Controller extends WP_Test_REST_Controller_Test
 		$this->check_post_status_obj( $obj, $data->get_data(), $data->get_links() );
 	}
 
+	public function test_prepare_item_limit_fields() {
+		$obj      = get_post_status_object( 'publish' );
+		$request  = new WP_REST_Request;
+		$endpoint = new WP_REST_Post_Statuses_Controller;
+		$request->set_param( 'context', 'edit' );
+		$request->set_param( '_fields', 'id,name' );
+		$response = $endpoint->prepare_item_for_response( $obj, $request );
+		$this->assertEquals( array(
+			// 'id' doesn't exist in this context.
+			'name',
+		), array_keys( $response->get_data() ) );
+	}
+
 	public function test_get_item_schema() {
 		$request = new WP_REST_Request( 'OPTIONS', '/wp/v2/statuses' );
 		$response = $this->server->dispatch( $request );

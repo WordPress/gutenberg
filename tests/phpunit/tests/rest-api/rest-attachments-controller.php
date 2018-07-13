@@ -1074,6 +1074,27 @@ class WP_Test_REST_Attachments_Controller extends WP_Test_REST_Post_Type_Control
 		$this->check_post_data( $attachment, $data, 'embed', $response->get_links() );
 	}
 
+	public function test_prepare_item_limit_fields() {
+		$attachment_id = $this->factory->attachment->create_object(
+			$this->test_file, 0, array(
+				'post_mime_type' => 'image/jpeg',
+				'post_excerpt'   => 'A sample caption',
+				'post_author'    => self::$editor_id,
+			)
+		);
+		wp_set_current_user( self::$editor_id );
+		$endpoint = new WP_REST_Attachments_Controller( 'post' );
+		$request  = new WP_REST_Request( 'GET', sprintf( '/wp/v2/media/%d', $attachment_id ) );
+		$request->set_param( 'context', 'edit' );
+		$request->set_param( '_fields', 'id,slug' );
+		$obj      = get_post( $attachment_id );
+		$response = $endpoint->prepare_item_for_response( $obj, $request );
+		$this->assertEquals( array(
+			'id',
+			'slug',
+		), array_keys( $response->get_data() ) );
+	}
+
 	public function test_get_item_schema() {
 		$request = new WP_REST_Request( 'OPTIONS', '/wp/v2/media' );
 		$response = $this->server->dispatch( $request );

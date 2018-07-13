@@ -223,6 +223,20 @@ class WP_Test_REST_Revisions_Controller extends WP_Test_REST_Controller_Testcase
 		$this->check_get_revision_response( $response, $this->revision_1 );
 	}
 
+	public function test_prepare_item_limit_fields() {
+		wp_set_current_user( self::$editor_id );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/posts/' . self::$post_id . '/revisions/' . $this->revision_id1 );
+		$endpoint = new WP_REST_Revisions_Controller( 'post' );
+		$request->set_param( 'context', 'edit' );
+		$request->set_param( '_fields', 'id,slug' );
+		$revision = get_post( $this->revision_id1 );
+		$response = $endpoint->prepare_item_for_response( $revision, $request );
+		$this->assertEquals( array(
+			'id',
+			'slug',
+		), array_keys( $response->get_data() ) );
+	}
+
 	public function test_get_item_schema() {
 		$request = new WP_REST_Request( 'OPTIONS', '/wp/v2/posts/' . self::$post_id . '/revisions' );
 		$response = $this->server->dispatch( $request );
