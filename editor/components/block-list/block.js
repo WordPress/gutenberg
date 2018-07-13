@@ -404,7 +404,7 @@ export class BlockListBlock extends Component {
 		const shouldRenderMovers = ( isSelected || hoverArea === 'left' ) && ! showEmptyBlockSideInserter && ! isMultiSelecting && ! isPartOfMultiSelection && ! isTypingWithinBlock;
 		const shouldRenderBlockSettings = ( isSelected || hoverArea === 'right' ) && ! isMultiSelecting && ! isPartOfMultiSelection && ! isTypingWithinBlock;
 		const shouldShowBreadcrumb = isHovered && ! isEmptyDefaultBlock;
-		const shouldShowContextualToolbar = ! showSideInserter && isSelected && ! isTypingWithinBlock && isValid && ( ! hasFixedToolbar || ! isLargeViewport );
+		const shouldShowContextualToolbar = ! showSideInserter && ( ( isSelected && ! isTypingWithinBlock && isValid ) || isFirstMultiSelected ) && ( ! hasFixedToolbar || ! isLargeViewport );
 		const shouldShowMobileToolbar = shouldAppearSelected;
 		const { error, dragging } = this.state;
 

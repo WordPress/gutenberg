@@ -6,7 +6,7 @@ import { castArray, get, some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { Dropdown, IconButton, Toolbar, PanelBody } from '@wordpress/components';
 import { getBlockType, getPossibleBlockTransformations, switchToBlockType, hasChildBlocks } from '@wordpress/blocks';
 import { compose, Component, Fragment } from '@wordpress/element';
@@ -65,7 +65,7 @@ export class BlockSwitcher extends Component {
 							onToggle();
 						}
 					};
-					const label = __( 'Change block type' );
+					const label = sprintf( _n( 'Change block type', 'Change type of %d blocks', blocks.length ), blocks.length );
 
 					return (
 						<Toolbar>
