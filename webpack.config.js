@@ -4,6 +4,7 @@
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
 const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
+const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 
 const { get } = require( 'lodash' );
 const { basename } = require( 'path' );
@@ -235,6 +236,9 @@ const config = {
 			'deprecated',
 			'dom-ready',
 		].map( camelCaseDash ) ),
+		new CopyWebpackPlugin( [
+			{ from: 'polyfills/*.js', to: 'build' },
+		] ),
 	],
 	stats: {
 		children: false,

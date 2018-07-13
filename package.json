@@ -87,6 +87,7 @@
 		"check-node-version": "3.1.1",
 		"codecov": "3.0.2",
 		"concurrently": "3.5.0",
+		"copy-webpack-plugin": "4.5.2",
 		"core-js": "2.5.7",
 		"cross-env": "3.2.4",
 		"deasync": "0.1.13",
