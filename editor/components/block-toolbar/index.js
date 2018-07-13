@@ -12,21 +12,14 @@ import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
 
 function BlockToolbar( { block, mode, selectedBlockUIDs } ) {
-	if ( selectedBlockUIDs.length > 1 ) {
-		return (
-			<div className="editor-block-toolbar">
-				<BlockSwitcher uids={ selectedBlockUIDs } />
-			</div>
-		);
-	}
 
-	if ( ! block || ! block.isValid || 'visual' !== mode) {
+	if ( selectedBlockUIDs.length < 2 && ( ! block || ! block.isValid || 'visual' !== mode ) ) {
 		return null;
 	}
 
 	return (
 		<div className="editor-block-toolbar">
-			<BlockSwitcher uids={ [ block.uid ] } />
+			<BlockSwitcher uids={ selectedBlockUIDs.length > 1 ? selectedBlockUIDs : [ block.uid ] } />
 			<BlockControls.Slot />
 			<BlockFormatControls.Slot />
 		</div>
