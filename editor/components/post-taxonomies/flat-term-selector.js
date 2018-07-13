@@ -111,21 +111,19 @@ class FlatTermSelector extends Component {
 			path: `/wp/v2/${ basePath }`,
 			method: 'POST',
 			data: { name: termName },
-		} ).catch( ( response ) =>
-			response.json().then( ( body ) => {
-				const errorCode = body.code;
-				if ( errorCode === 'term_exists' ) {
-					// search the new category created since last fetch
-					this.addRequest = apiFetch( {
-						path: `/wp/v2/${ basePath }?${ stringify( { ...DEFAULT_QUERY, search: termName } ) }`,
-					} );
-					return this.addRequest.then( ( searchResult ) => {
-						return find( searchResult, ( result ) => isSameTermName( result.name, termName ) );
-					} );
-				}
-				return Promise.reject( response );
-			} )
-		);
+		} ).catch( ( error ) => {
+			const errorCode = error.code;
+			if ( errorCode === 'term_exists' ) {
+				// search the new category created since last fetch
+				this.addRequest = apiFetch( {
+					path: `/wp/v2/${ basePath }?${ stringify( { ...DEFAULT_QUERY, search: termName } ) }`,
+				} );
+				return this.addRequest.then( ( searchResult ) => {
+					return find( searchResult, ( result ) => isSameTermName( result.name, termName ) );
+				} );
+			}
+			return Promise.reject( error );
+		} );
 	}
 
 	onChange( termNames ) {

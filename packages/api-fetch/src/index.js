@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import createNonceMiddleware from './middlewares/nonce';
@@ -39,12 +44,33 @@ function apiFetch( options ) {
 		};
 
 		const parseResponse = ( response ) => {
-			return parse ? response.json().catch( () => response ) : response;
+			return parse ? response.json() : response;
 		};
 
 		return responsePromise
 			.then( checkStatus )
-			.then( parseResponse );
+			.then( parseResponse )
+			.catch( ( response ) => {
+				if ( ! parse ) {
+					Promise.reject( response );
+				}
+
+				return response.json()
+					.then( ( error ) => {
+						const unknownError = {
+							code: 'unknown_error',
+							message: __( 'An unknown error occurred.' ),
+						};
+
+						return Promise.reject( error || unknownError );
+					} )
+					.catch( () => {
+						return Promise.reject( {
+							code: 'invalid_json',
+							message: __( 'The response is not a valid JSON response.' ),
+						} );
+					} );
+			} );
 	};
 	const steps = [
 		...middlewares,

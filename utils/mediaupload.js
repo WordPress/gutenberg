@@ -129,27 +129,25 @@ export function mediaUpload( {
 				}
 				setAndUpdateFiles( idx, mediaObject );
 			} )
-			.catch( ( response ) =>
-				response.json().catch( () => ( {} ) ).then( ( body ) => {
-					// Reset to empty on failure.
-					setAndUpdateFiles( idx, null );
-					let message;
-					if ( has( body, [ 'message' ] ) ) {
-						message = get( body, [ 'message' ] );
-					} else {
-						message = sprintf(
-							// translators: %s: file name
-							__( 'Error while uploading file %s to the media library.' ),
-							mediaFile.name
-						);
-					}
-					onError( {
-						code: 'GENERAL',
-						message,
-						file: mediaFile,
-					} );
-				} )
-			);
+			.catch( ( error ) => {
+				// Reset to empty on failure.
+				setAndUpdateFiles( idx, null );
+				let message;
+				if ( has( error, [ 'message' ] ) ) {
+					message = get( error, [ 'message' ] );
+				} else {
+					message = sprintf(
+						// translators: %s: file name
+						__( 'Error while uploading file %s to the media library.' ),
+						mediaFile.name
+					);
+				}
+				onError( {
+					code: 'GENERAL',
+					message,
+					file: mediaFile,
+				} );
+			} );
 	} );
 }
 

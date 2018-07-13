@@ -94,25 +94,6 @@ export function removeProvisionalBlock( action, store ) {
 	}
 }
 
-/**
- * Utilitiy used get an error object from a network response.
- *
- * @param {Object} response Response.
- *
- * @return {Promise} Error object promise.
- */
-export const getErrorFromResponse = ( response ) => {
-	const getErrorFromBody = ( body ) => {
-		return body || {
-			code: 'unknown_error',
-			message: __( 'An unknown error occurred.' ),
-		};
-	};
-	return response.json()
-		.then( getErrorFromBody )
-		.catch( () => getErrorFromBody() );
-};
-
 export default {
 	REQUEST_POST_UPDATE( action, store ) {
 		const { dispatch, getState } = store;
@@ -220,16 +201,13 @@ export default {
 						isAutosave,
 					} );
 				} )
-			.catch( ( response ) =>
-				getErrorFromResponse( response )
-					.then( ( error ) => dispatch( {
-						type: 'REQUEST_POST_UPDATE_FAILURE',
-						optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
-						post,
-						edits,
-						error,
-					} ) )
-			);
+			.catch( ( error ) => dispatch( {
+				type: 'REQUEST_POST_UPDATE_FAILURE',
+				optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
+				post,
+				edits,
+				error,
+			} ) );
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
 		const { previousPost, post, isAutosave } = action;
@@ -325,14 +303,11 @@ export default {
 				// But right now editPost is tied with change detection.
 				dispatch( resetPost( { ...post, status: 'trash' } ) );
 			} )
-			.catch( ( response ) =>
-				getErrorFromResponse( response )
-					.then( ( error ) => dispatch( {
-						...action,
-						type: 'TRASH_POST_FAILURE',
-						error,
-					} ) )
-			);
+			.catch( ( error ) => dispatch( {
+				...action,
+				type: 'TRASH_POST_FAILURE',
+				error,
+			} ) );
 	},
 	TRASH_POST_FAILURE( action, store ) {
 		const message = action.error.message && action.error.code !== 'unknown_error' ? action.error.message : __( 'Trashing failed' );
@@ -513,14 +488,11 @@ export default {
 					id,
 				} );
 			} )
-			.catch( ( response ) =>
-				getErrorFromResponse( response )
-					.then( ( error ) => dispatch( {
-						type: 'FETCH_SHARED_BLOCKS_FAILURE',
-						id,
-						error,
-					} ) )
-			);
+			.catch( ( error ) => dispatch( {
+				type: 'FETCH_SHARED_BLOCKS_FAILURE',
+				id,
+				error,
+			} ) );
 	},
 	RECEIVE_SHARED_BLOCKS( action ) {
 		return receiveBlocks( map( action.results, 'parsedBlock' ) );
@@ -555,16 +527,13 @@ export default {
 				const message = isTemporary ? __( 'Block created.' ) : __( 'Block updated.' );
 				dispatch( createSuccessNotice( message, { id: SHARED_BLOCK_NOTICE_ID } ) );
 			} )
-			.catch( ( response ) =>
-				getErrorFromResponse( response )
-					.then( ( error ) => {
-						dispatch( { type: 'SAVE_SHARED_BLOCK_FAILURE', id } );
-						dispatch( createErrorNotice( error.message, {
-							id: SHARED_BLOCK_NOTICE_ID,
-							spokenMessage: error.message,
-						} ) );
-					} )
-			);
+			.catch( ( error ) => {
+				dispatch( { type: 'SAVE_SHARED_BLOCK_FAILURE', id } );
+				dispatch( createErrorNotice( error.message, {
+					id: SHARED_BLOCK_NOTICE_ID,
+					spokenMessage: error.message,
+				} ) );
+			} );
 	},
 	DELETE_SHARED_BLOCK( action, store ) {
 		// TODO: these are potentially undefined, this fix is in place
@@ -612,20 +581,17 @@ export default {
 				const message = __( 'Block deleted.' );
 				dispatch( createSuccessNotice( message, { id: SHARED_BLOCK_NOTICE_ID } ) );
 			} )
-			.catch( ( response ) =>
-				getErrorFromResponse( response )
-					.then( ( error ) => {
-						dispatch( {
-							type: 'DELETE_SHARED_BLOCK_FAILURE',
-							id,
-							optimist: { type: REVERT, id: transactionId },
-						} );
-						dispatch( createErrorNotice( error.message, {
-							id: SHARED_BLOCK_NOTICE_ID,
-							spokenMessage: error.message,
-						} ) );
-					} )
-			);
+			.catch( ( error ) => {
+				dispatch( {
+					type: 'DELETE_SHARED_BLOCK_FAILURE',
+					id,
+					optimist: { type: REVERT, id: transactionId },
+				} );
+				dispatch( createErrorNotice( error.message, {
+					id: SHARED_BLOCK_NOTICE_ID,
+					spokenMessage: error.message,
+				} ) );
+			} );
 	},
 	CONVERT_BLOCK_TO_STATIC( action, store ) {
 		const state = store.getState();

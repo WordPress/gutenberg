@@ -117,21 +117,19 @@ class HierarchicalTermSelector extends Component {
 		} );
 		// Tries to create a term or fetch it if it already exists
 		const findOrCreatePromise = this.addRequest
-			.catch( ( response ) => {
-				return response.then( response.json() ).then( ( body ) => {
-					const errorCode = body.code;
-					if ( errorCode === 'term_exists' ) {
-						// search the new category created since last fetch
-						this.addRequest = apiFetch( {
-							path: `/wp/v2/${ basePath }?${ stringify( { ...DEFAULT_QUERY, parent: formParent || 0, search: formName } ) }`,
+			.catch( ( error ) => {
+				const errorCode = error.code;
+				if ( errorCode === 'term_exists' ) {
+					// search the new category created since last fetch
+					this.addRequest = apiFetch( {
+						path: `/wp/v2/${ basePath }?${ stringify( { ...DEFAULT_QUERY, parent: formParent || 0, search: formName } ) }`,
+					} );
+					return this.addRequest
+						.then( ( searchResult ) => {
+							return this.findTerm( searchResult, formParent, formName );
 						} );
-						return this.addRequest
-							.then( ( searchResult ) => {
-								return this.findTerm( searchResult, formParent, formName );
-							} );
-					}
-					return Promise.reject( response );
-				} );
+				}
+				return Promise.reject( error );
 			} );
 		findOrCreatePromise
 			.then( ( term ) => {
