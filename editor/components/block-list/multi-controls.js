@@ -7,14 +7,12 @@ import { first, last } from 'lodash';
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import BlockMover from '../block-mover';
 import BlockSettingsMenu from '../block-settings-menu';
-import BlockSwitcher from '../block-switcher';
 
 function BlockListMultiControls( { multiSelectedBlockUids, rootUID, isSelecting, isFirst, isLast } ) {
 	if ( isSelecting ) {

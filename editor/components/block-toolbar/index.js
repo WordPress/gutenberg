@@ -12,7 +12,6 @@ import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
 
 function BlockToolbar( { block, mode, selectedBlockUIDs } ) {
-
 	if ( selectedBlockUIDs.length < 2 && ( ! block || ! block.isValid || 'visual' !== mode ) ) {
 		return null;
 	}
