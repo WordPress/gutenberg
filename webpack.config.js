@@ -100,6 +100,13 @@ const extractConfig = {
 								button: '#d1864a',
 								outlines: '#837425',
 							},
+							'admin-color-woo': {
+								primary: '#95588a',
+								secondary: '#95588a',
+								toggle: '#95588a',
+								button: '#95588a',
+								outlines: '#95588a',
+							},
 						},
 					} ),
 					require( 'autoprefixer' ),
