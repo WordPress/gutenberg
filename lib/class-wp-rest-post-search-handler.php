@@ -55,9 +55,10 @@ class WP_REST_Post_Search_Handler extends WP_REST_Object_Search_Handler {
 			'fields'              => 'ids',
 		);
 
-		// If a search term is given, add it and order by relevance.
 		if ( ! empty( $request['search'] ) ) {
-			$query_args['s']       = $request['search'];
+			$query_args['s'] = $request['search'];
+
+			// Posts can only be sorted by relevance when a search term is given, so ensure that here.
 			$query_args['orderby'] = 'relevance';
 			$query_args['order']   = 'DESC';
 		}
