@@ -73,11 +73,11 @@ function apiFetch( options ) {
 			} );
 	};
 	const steps = [
-		...middlewares,
-		namespaceEndpointMiddleware,
-		httpV1Middleware,
 		raw,
-	].reverse();
+		httpV1Middleware,
+		namespaceEndpointMiddleware,
+		...middlewares,
+	];
 	const next = ( nextOptions ) => {
 		const nextMiddleware = steps.pop();
 		return nextMiddleware( nextOptions, next );
