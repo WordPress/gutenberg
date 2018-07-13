@@ -1,3 +1,4 @@
+import { doAction } from '@wordpress/hooks';
 /**
  * Object map tracking messages which have been logged, for use in ensuring a
  * message is only logged once.
@@ -29,6 +30,20 @@ export default function deprecated( feature, { version, alternative, plugin, lin
 	if ( message in logged ) {
 		return;
 	}
+
+	/**
+	 * Fires whenever a deprecated feature is encountered
+	 *
+	 * @param {string}  feature             Name of the deprecated feature.
+	 * @param {?Object} options             Personalisation options
+	 * @param {?string} options.version     Version in which the feature will be removed.
+	 * @param {?string} options.alternative Feature to use instead
+	 * @param {?string} options.plugin      Plugin name if it's a plugin feature
+	 * @param {?string} options.link        Link to documentation
+	 * @param {?string} options.hint        Additional message to help transition away from the deprecated feature.
+	 * @param {?string} message				Message sent to console.warn
+	 */
+	doAction( 'wp.deprecated', feature, options, message );
 
 	// eslint-disable-next-line no-console
 	console.warn( message );
