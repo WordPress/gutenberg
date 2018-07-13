@@ -14,7 +14,7 @@ import {
 	StrictMode,
 } from 'react';
 import { render, findDOMNode, createPortal, unmountComponentAtNode } from 'react-dom';
-import { 	isString } from 'lodash';
+import { isString } from 'lodash';
 
 /**
  * Internal dependencies
