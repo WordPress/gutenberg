@@ -121,26 +121,26 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 
 register_block_type( 'core/latest-comments', array(
 	'attributes'      => array(
-		'className'        => array(
+		'className'      => array(
 			'type' => 'string',
 		),
-		'commentsToShow'   => array(
+		'commentsToShow' => array(
 			'type'    => 'number',
 			'default' => $default_comments_to_show,
 		),
-		'displayAvatar'    => array(
+		'displayAvatar'  => array(
 			'type'    => 'boolean',
 			'default' => true,
 		),
-		'displayDate' => array(
+		'displayDate'    => array(
 			'type'    => 'boolean',
 			'default' => true,
 		),
-		'displayExcerpt'   => array(
+		'displayExcerpt' => array(
 			'type'    => 'boolean',
 			'default' => true,
 		),
-		'align'            => array(
+		'align'          => array(
 			'type' => 'string',
 		),
 	),
