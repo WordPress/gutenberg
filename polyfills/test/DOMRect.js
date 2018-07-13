@@ -1,3 +1,4 @@
+// Use `require` because the polyfill uses `module.exports` to provide itself for unit test.
 const { DOMRect } = require( '../DOMRect' );
 
 describe( 'DOMRect', function() {
