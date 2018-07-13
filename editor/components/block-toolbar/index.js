@@ -8,17 +8,26 @@ import { withSelect } from '@wordpress/data';
  */
 import './style.scss';
 import BlockSwitcher from '../block-switcher';
+import MultiBlocksSwitcher from '../block-switcher/multi-blocks-switcher';
 import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
 
-function BlockToolbar( { block, mode, selectedBlockUIDs } ) {
-	if ( selectedBlockUIDs.length < 2 && ( ! block || ! block.isValid || 'visual' !== mode ) ) {
+function BlockToolbar( { blockUIDs, isValid, mode } ) {
+	if ( blockUIDs.length > 1 ) {
+		return (
+			<div className="editor-block-toolbar">
+				<MultiBlocksSwitcher />
+			</div>
+		);
+	}
+
+	if ( ! isValid || 'visual' !== mode ) {
 		return null;
 	}
 
 	return (
 		<div className="editor-block-toolbar">
-			<BlockSwitcher uids={ selectedBlockUIDs.length > 1 ? selectedBlockUIDs : [ block.uid ] } />
+			<BlockSwitcher uids={ blockUIDs } />
 			<BlockControls.Slot />
 			<BlockFormatControls.Slot />
 		</div>
@@ -28,11 +37,11 @@ function BlockToolbar( { block, mode, selectedBlockUIDs } ) {
 export default withSelect( ( select ) => {
 	const { getSelectedBlock, getBlockMode, getMultiSelectedBlockUids } = select( 'core/editor' );
 	const block = getSelectedBlock();
-	const selectedBlockUIDs = getMultiSelectedBlockUids();
+	const blockUIDs = block ? [ block.uid ] : getMultiSelectedBlockUids();
 
 	return {
-		block,
+		blockUIDs,
+		isValid: block ? block.isValid : null,
 		mode: block ? getBlockMode( block.uid ) : null,
-		selectedBlockUIDs,
 	};
 } )( BlockToolbar );
