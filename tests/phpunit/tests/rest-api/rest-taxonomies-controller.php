@@ -62,6 +62,23 @@ class WP_Test_REST_Taxonomies_Controller extends WP_Test_REST_Controller_Testcas
 		$this->assertEquals( 'tags', $data['post_tag']['rest_base'] );
 	}
 
+	public function test_get_items_context_edit() {
+		wp_set_current_user( self::$contributor_id );
+		$request    = new WP_REST_Request( 'GET', '/wp/v2/taxonomies' );
+		$request->set_param( 'context', 'edit' );
+		$response   = rest_get_server()->dispatch( $request );
+		$data       = $response->get_data();
+		$taxonomies = $this->get_public_taxonomies( get_taxonomies( '', 'objects' ) );
+		$this->assertEquals( count( $taxonomies ), count( $data ) );
+		$this->assertEquals( 'Categories', $data['category']['name'] );
+		$this->assertEquals( 'category', $data['category']['slug'] );
+		$this->assertEquals( true, $data['category']['hierarchical'] );
+		$this->assertEquals( 'Tags', $data['post_tag']['name'] );
+		$this->assertEquals( 'post_tag', $data['post_tag']['slug'] );
+		$this->assertEquals( false, $data['post_tag']['hierarchical'] );
+		$this->assertEquals( 'tags', $data['post_tag']['rest_base'] );
+	}
+
 	public function test_get_items_invalid_permission_for_context() {
 		wp_set_current_user( 0 );
 		$request = new WP_REST_Request( 'GET', '/wp/v2/taxonomies' );

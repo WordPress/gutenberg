@@ -13,22 +13,36 @@ class WP_Test_REST_Tags_Controller extends WP_Test_REST_Controller_Testcase {
 	protected static $superadmin;
 	protected static $administrator;
 	protected static $editor;
+	protected static $contributor;
 	protected static $subscriber;
 
 	public static function wpSetUpBeforeClass( $factory ) {
-		self::$superadmin = $factory->user->create( array(
-			'role'       => 'administrator',
-			'user_login' => 'superadmin',
-		) );
-		self::$administrator = $factory->user->create( array(
-			'role' => 'administrator',
-		) );
-		self::$editor = $factory->user->create( array(
-			'role' => 'editor',
-		) );
-		self::$subscriber = $factory->user->create( array(
-			'role' => 'subscriber',
-		) );
+		self::$superadmin    = $factory->user->create(
+			array(
+				'role'       => 'administrator',
+				'user_login' => 'superadmin',
+			)
+		);
+		self::$administrator = $factory->user->create(
+			array(
+				'role' => 'administrator',
+			)
+		);
+		self::$editor        = $factory->user->create(
+			array(
+				'role' => 'editor',
+			)
+		);
+		self::$contributor   = $factory->user->create(
+			array(
+				'role' => 'contributor',
+			)
+		);
+		self::$subscriber    = $factory->user->create(
+			array(
+				'role' => 'subscriber',
+			)
+		);
 		if ( is_multisite() ) {
 			update_site_option( 'site_admins', array( 'superadmin' ) );
 		}
@@ -555,6 +569,22 @@ class WP_Test_REST_Tags_Controller extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( 201, $response->get_status() );
 		$headers = $response->get_headers();
 		$data = $response->get_data();
+		$this->assertContains( '/wp/v2/tags/' . $data['id'], $headers['Location'] );
+		$this->assertEquals( 'My Awesome Term', $data['name'] );
+		$this->assertEquals( 'This term is so awesome.', $data['description'] );
+		$this->assertEquals( 'so-awesome', $data['slug'] );
+	}
+
+	public function test_create_item_contributor() {
+		wp_set_current_user( self::$contributor );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/tags' );
+		$request->set_param( 'name', 'My Awesome Term' );
+		$request->set_param( 'description', 'This term is so awesome.' );
+		$request->set_param( 'slug', 'so-awesome' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertEquals( 201, $response->get_status() );
+		$headers = $response->get_headers();
+		$data    = $response->get_data();
 		$this->assertContains( '/wp/v2/tags/' . $data['id'], $headers['Location'] );
 		$this->assertEquals( 'My Awesome Term', $data['name'] );
 		$this->assertEquals( 'This term is so awesome.', $data['description'] );
