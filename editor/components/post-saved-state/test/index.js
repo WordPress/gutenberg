@@ -1,7 +1,10 @@
 /**
  * External dependencies
  */
+import Shallow from 'react-test-renderer/shallow';
 import { shallow } from 'enzyme';
+
+const shallowRenderer = new Shallow();
 
 /**
  * Internal dependencies
@@ -34,9 +37,9 @@ describe( 'PostSavedState', () => {
 	} );
 
 	it( 'returns a switch to draft link if the post is published', () => {
-		const wrapper = shallow( <PostSavedState isPublished /> );
+		shallowRenderer.render( <PostSavedState isPublished /> );
 
-		expect( wrapper ).toMatchSnapshot();
+		expect( shallowRenderer.getRenderOutput() ).toMatchSnapshot();
 	} );
 
 	it( 'should return Saved text if not new and not dirty', () => {
