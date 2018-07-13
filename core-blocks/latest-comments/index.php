@@ -34,7 +34,7 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 		$attributes['commentsToShow'] = $DEFAULT_COMMENTS_TO_SHOW;
 	}
 
-	// This filter is documented in wp-includes/widgets/class-wp-widget-recent-comments.php
+	// This filter is documented in wp-includes/widgets/class-wp-widget-recent-comments.php.
 	$comments = get_comments( apply_filters( 'widget_comments_args', array(
 		'number'      => $attributes['commentsToShow'],
 		'status'      => 'approve',
@@ -43,7 +43,7 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 
 	$list_items_markup = '';
 	if ( ! empty( $comments ) ) {
-		// Prime cache for associated posts. This is copied from \WP_Widget_Recent_Comments::widget().
+		// Prime the cache for associated posts. This is copied from \WP_Widget_Recent_Comments::widget().
 		$post_ids = array_unique( wp_list_pluck( $comments, 'comment_post_ID' ) );
 		_prime_post_caches( $post_ids, strpos( get_option( 'permalink_structure' ), '%category%' ), false );
 
@@ -72,11 +72,11 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 				$author_markup .= '<span class="wp-block-latest-comments__comment-author">' . get_comment_author( $comment ) . '</span>';
 			}
 
-			$post_title = '<a class="wp-block-latest-comments__comment-link" href="' . esc_url( get_comment_link( $comment ) ) . '">' . esc_html ( _draft_or_post_title( $comment->comment_post_ID ) ) . '</a>';
+			$post_title = '<a class="wp-block-latest-comments__comment-link" href="' . esc_url( get_comment_link( $comment ) ) . '">' . esc_html( _draft_or_post_title( $comment->comment_post_ID ) ) . '</a>';
 
 			$list_items_markup .= sprintf(
 				/* translators: 1: author name (inside <a> or <span> tag, based on if they have a URL), 2: post title related to this comment */
-				__( '%1$s on %2$s' ),
+				__( '%1$s on %2$s', 'gutenberg' ),
 				$author_markup,
 				$post_title
 			);
