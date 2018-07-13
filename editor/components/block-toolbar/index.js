@@ -11,8 +11,16 @@ import BlockSwitcher from '../block-switcher';
 import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
 
-function BlockToolbar( { block, mode } ) {
-	if ( ! block || ! block.isValid || mode !== 'visual' ) {
+function BlockToolbar( { block, mode, selectedBlockUIDs } ) {
+	if ( selectedBlockUIDs.length > 1 ) {
+		return (
+			<div className="editor-block-toolbar">
+				<BlockSwitcher uids={ selectedBlockUIDs } />
+			</div>
+		);
+	}
+
+	if ( ! block || ! block.isValid || 'visual' !== mode) {
 		return null;
 	}
 
@@ -26,11 +34,13 @@ function BlockToolbar( { block, mode } ) {
 }
 
 export default withSelect( ( select ) => {
-	const { getSelectedBlock, getBlockMode } = select( 'core/editor' );
+	const { getSelectedBlock, getBlockMode, getMultiSelectedBlockUids } = select( 'core/editor' );
 	const block = getSelectedBlock();
+	const selectedBlockUIDs = getMultiSelectedBlockUids();
 
 	return {
 		block,
 		mode: block ? getBlockMode( block.uid ) : null,
+		selectedBlockUIDs,
 	};
 } )( BlockToolbar );

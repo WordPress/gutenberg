@@ -42,6 +42,7 @@ import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
 import BlockBreadcrumb from './breadcrumb';
 import BlockContextualToolbar from './block-contextual-toolbar';
+import BlockToolbar from '../block-toolbar';
 import BlockMultiControls from './multi-controls';
 import BlockMobileToolbar from './block-mobile-toolbar';
 import BlockInsertionPoint from './insertion-point';
@@ -408,6 +409,7 @@ export class BlockListBlock extends Component {
 		const shouldRenderBlockSettings = ( isSelected || hoverArea === 'right' ) && ! isMultiSelecting && ! isPartOfMultiSelection && ! isTypingWithinBlock;
 		const shouldShowBreadcrumb = isHovered && ! isEmptyDefaultBlock;
 		const shouldShowContextualToolbar = ! showSideInserter && isSelected && ! isTypingWithinBlock && isValid && ( ! hasFixedToolbar || ! isLargeViewport );
+		const shouldShowMultiBlockToolbar = ! showSideInserter && isFirstMultiSelected && ( ! hasFixedToolbar || ! isLargeViewport );
 		const shouldShowMobileToolbar = shouldAppearSelected;
 		const { error, dragging } = this.state;
 
@@ -516,6 +518,7 @@ export class BlockListBlock extends Component {
 				) }
 				{ shouldShowBreadcrumb && <BlockBreadcrumb uid={ uid } isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' } /> }
 				{ shouldShowContextualToolbar && <BlockContextualToolbar /> }
+				{ shouldShowMultiBlockToolbar && <BlockContextualToolbar /> }
 				{ isFirstMultiSelected && <BlockMultiControls rootUID={ rootUID } /> }
 				<IgnoreNestedEvents
 					ref={ this.bindBlockNode }
