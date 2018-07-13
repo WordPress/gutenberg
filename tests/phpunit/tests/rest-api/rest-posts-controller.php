@@ -1090,6 +1090,8 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertEquals( $replies_url, $links['replies'][0]['href'] );
 
 		$this->assertEquals( rest_url( '/wp/v2/posts/' . self::$post_id . '/revisions' ), $links['version-history'][0]['href'] );
+		$this->assertEquals( 0, $links['version-history'][0]['attributes']['count'] );
+		$this->assertFalse( isset( $links['predecessor-version'] ) );
 
 		$attachments_url = rest_url( '/wp/v2/media' );
 		$attachments_url = add_query_arg( 'parent', self::$post_id, $attachments_url );
@@ -1115,6 +1117,28 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 
 		$category_url = add_query_arg( 'post', self::$post_id, rest_url( '/wp/v2/categories' ) );
 		$this->assertEquals( $category_url, $cat_link['href'] );
+	}
+
+	public function test_get_item_links_predecessor() {
+		wp_update_post(
+			array(
+				'post_content' => 'This content is marvelous.',
+				'ID'           => self::$post_id,
+			)
+		);
+		$revisions  = wp_get_post_revisions( self::$post_id );
+		$revision_1 = array_pop( $revisions );
+
+		$request  = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$links = $response->get_links();
+
+		$this->assertEquals( rest_url( '/wp/v2/posts/' . self::$post_id . '/revisions' ), $links['version-history'][0]['href'] );
+		$this->assertEquals( 1, $links['version-history'][0]['attributes']['count'] );
+
+		$this->assertEquals( rest_url( '/wp/v2/posts/' . self::$post_id . '/revisions/' . $revision_1->ID ), $links['predecessor-version'][0]['href'] );
+		$this->assertEquals( $revision_1->ID, $links['predecessor-version'][0]['attributes']['id'] );
 	}
 
 	public function test_get_item_links_no_author() {
