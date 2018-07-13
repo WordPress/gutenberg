@@ -6,8 +6,8 @@ import { mapValues } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createHigherOrderComponent } from '@wordpress/element';
-import { pure, compose, remountOnPropChange } from '@wordpress/compose';
+import { Component } from '@wordpress/element';
+import { pure, compose, remountOnPropChange, createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies

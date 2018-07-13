@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent, Component } from '@wordpress/element';
+import { Component } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import createHigherOrderComponent from '../create-higher-order-component';
 
 /**
  * Higher-order component creator, creating a new component that remounts

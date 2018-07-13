@@ -1,8 +1,12 @@
 /**
+ * WordPress dependencies
+ */
+import { Component } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
-import { createHigherOrderComponent } from '../create-higher-order-component';
-import { Component } from './';
+import { createHigherOrderComponent } from '../';
 
 describe( 'createHigherOrderComponent', () => {
 	it( 'should use default name for anonymous function', () => {

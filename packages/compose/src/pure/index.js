@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import isShallowEqual from '@wordpress/is-shallow-equal';
-import { createHigherOrderComponent, Component } from '@wordpress/element';
+import { Component } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import createHigherOrderComponent from '../create-higher-order-component';
 
 /**
  * Given a component returns the enhanced component augmented with a component

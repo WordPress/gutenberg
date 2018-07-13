@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { Component, createHigherOrderComponent } from '@wordpress/element';
+import { Component } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import createHigherOrderComponent from '../create-higher-order-component';
 
 /**
  * A Higher Order Component used to be provide a unique instance ID by

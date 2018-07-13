@@ -6,8 +6,9 @@ import { debounce, uniqueId } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createHigherOrderComponent } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { addAction, applyFilters, removeAction } from '@wordpress/hooks';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 const ANIMATION_FRAME_PERIOD = 16;
 

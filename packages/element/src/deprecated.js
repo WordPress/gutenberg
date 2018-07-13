@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flowRight } from 'lodash';
+import { flowRight, upperFirst, camelCase } from 'lodash';
 import { Component } from 'react';
 
 /**
@@ -10,10 +10,20 @@ import { Component } from 'react';
 import deprecated from '@wordpress/deprecated';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
-/**
- * Internal dependencies
- */
-import createHigherOrderComponent from './create-higher-order-component';
+export function createHigherOrderComponent( mapComponentToEnhancedComponent, modifierName ) {
+	deprecated( 'wp.element.createHigherOrderComponent', {
+		version: '3.5',
+		alternative: 'wp.compose.createHigherOrderComponent',
+	} );
+
+	return ( OriginalComponent ) => {
+		const EnhancedComponent = mapComponentToEnhancedComponent( OriginalComponent );
+		const { displayName = OriginalComponent.name || 'Component' } = OriginalComponent;
+		EnhancedComponent.displayName = `${ upperFirst( camelCase( modifierName ) ) }(${ displayName })`;
+
+		return EnhancedComponent;
+	};
+}
 
 export const compose = ( ...args ) => {
 	deprecated( 'wp.element.compose', {
@@ -24,7 +34,7 @@ export const compose = ( ...args ) => {
 	return flowRight( ...args );
 };
 
-export const pure = createHigherOrderComponent( ( Wrapped ) => {
+export const pure = ( Wrapped ) => {
 	deprecated( 'wp.element.pure', {
 		version: '3.5',
 		alternative: 'wp.compose.pure',
@@ -47,4 +57,4 @@ export const pure = createHigherOrderComponent( ( Wrapped ) => {
 			return <Wrapped { ...this.props } />;
 		}
 	};
-}, 'pure' );
+};

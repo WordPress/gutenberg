@@ -6,7 +6,8 @@ import { includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createHigherOrderComponent } from '@wordpress/element';
+import { Component } from '@wordpress/element';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Input types which are classified as button types, for use in considering

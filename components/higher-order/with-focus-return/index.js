@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { Component, createHigherOrderComponent } from '@wordpress/element';
+import { Component } from '@wordpress/element';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Higher Order Component used to be used to wrap disposable elements like

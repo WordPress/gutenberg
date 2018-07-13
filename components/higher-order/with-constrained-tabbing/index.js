@@ -1,11 +1,8 @@
 /**
  * WordPress dependencies
  */
-import {
-	Component,
-	createRef,
-	createHigherOrderComponent,
-} from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
+import { createHigherOrderComponent } from '@wordpress/compose';
 import { keycodes } from '@wordpress/utils';
 import { focus } from '@wordpress/dom';
 

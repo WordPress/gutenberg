@@ -6,15 +6,12 @@ import { forEach } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	Component,
-	forwardRef,
-	createHigherOrderComponent,
-} from '@wordpress/element';
+import { Component, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+import createHigherOrderComponent from '../create-higher-order-component';
 import Listener from './listener';
 
 /**

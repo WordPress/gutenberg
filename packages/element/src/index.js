@@ -21,7 +21,6 @@ import { isString } from 'lodash';
  */
 import serialize from './serialize';
 import { RawHTML } from './index-common';
-export { default as createHigherOrderComponent } from './create-higher-order-component';
 export * from './deprecated';
 
 /**

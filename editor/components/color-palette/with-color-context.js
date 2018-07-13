@@ -7,7 +7,7 @@ import { isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent } from '@wordpress/element';
+import { createHigherOrderComponent } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 
 export default createHigherOrderComponent(

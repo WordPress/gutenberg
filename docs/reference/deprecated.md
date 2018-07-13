@@ -9,6 +9,7 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
  - `wp.components.withState` has been removed. Please use `wp.compose.withState` instead.
  - `wp.element.pure` has been removed. Please use `wp.compose.pure` instead.
  - `wp.element.compose` has been removed. Please use `wp.compose.compose` instead.
+ - `wp.element.createHigherOrderComponent` has been removed. Please use `wp.compose.createHigherOrderComponent` instead.
 
 ## 3.4.0
 

@@ -6,8 +6,9 @@ import { debounce } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createHigherOrderComponent } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * A Higher Order Component used to be provide a unique instance ID by

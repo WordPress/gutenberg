@@ -1,12 +1,9 @@
 /**
  * WordPress dependencies
  */
-import {
-	Component,
-	createHigherOrderComponent,
-} from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
-import { remountOnPropChange } from '@wordpress/compose';
+import { remountOnPropChange, createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies

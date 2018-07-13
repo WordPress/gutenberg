@@ -6,7 +6,8 @@ import { mapValues, reduce, forEach, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createHigherOrderComponent } from '@wordpress/element';
+import { Component } from '@wordpress/element';
+import { createHigherOrderComponent } from '@wordpress/compose';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**

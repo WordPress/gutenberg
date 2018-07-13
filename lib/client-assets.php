@@ -533,7 +533,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-plugins',
 		gutenberg_url( 'build/plugins/index.js' ),
-		array( 'lodash', 'wp-element', 'wp-hooks' ),
+		array( 'lodash', 'wp-element', 'wp-hooks', 'wp-compose' ),
 		filemtime( gutenberg_dir_path() . 'build/plugins/index.js' )
 	);
 
