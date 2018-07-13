@@ -57,14 +57,26 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 	 * Constructor.
 	 *
 	 * @since 3.3.0
+	 *
+	 * @param array $search_handlers List of search handlers to use in the controller. Each search
+	 *                               handler instance must extend the `WP_REST_Search_Handler` class.
 	 */
-	public function __construct() {
+	public function __construct( array $search_handlers ) {
 		$this->namespace = 'gutenberg/v1';
 		$this->rest_base = 'search';
 
 		$post_search_handler = new WP_REST_Post_Search_Handler();
 
-		$this->search_handlers[ $post_search_handler->get_type() ] = $post_search_handler;
+		foreach ( $search_handlers as $search_handler ) {
+			if ( ! $search_handler instanceof WP_REST_Search_Handler ) {
+
+				/* translators: %s: PHP class name */
+				_doing_it_wrong( __METHOD__, sprintf( __( 'REST search handlers must extend the %s class.', 'gutenberg' ), 'WP_REST_Search_Handler' ), '3.3.0' );
+				continue;
+			}
+
+			$this->search_handlers[ $search_handler->get_type() ] = $search_handler;
+		}
 	}
 
 	/**
@@ -118,11 +130,11 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 
 		$result = $handler->search_items( $request );
 
-		if ( ! isset( $result[ WP_REST_Object_Search_Handler::RESULT_IDS ] ) || ! is_array( $result[ WP_REST_Object_Search_Handler::RESULT_IDS ] ) || ! isset( $result[ WP_REST_Object_Search_Handler::RESULT_TOTAL ] ) ) {
+		if ( ! isset( $result[ WP_REST_Search_Handler::RESULT_IDS ] ) || ! is_array( $result[ WP_REST_Search_Handler::RESULT_IDS ] ) || ! isset( $result[ WP_REST_Search_Handler::RESULT_TOTAL ] ) ) {
 			return new WP_Error( 'rest_search_handler_error', __( 'Internal search handler error.', 'gutenberg' ), array( 'status' => 500 ) );
 		}
 
-		$ids = array_map( 'absint', $result[ WP_REST_Object_Search_Handler::RESULT_IDS ] );
+		$ids = array_map( 'absint', $result[ WP_REST_Search_Handler::RESULT_IDS ] );
 
 		$results = array();
 		foreach ( $ids as $id ) {
@@ -130,7 +142,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 			$results[] = $this->prepare_response_for_collection( $data );
 		}
 
-		$total     = (int) $result[ WP_REST_Object_Search_Handler::RESULT_TOTAL ];
+		$total     = (int) $result[ WP_REST_Search_Handler::RESULT_TOTAL ];
 		$page      = (int) $request['page'];
 		$per_page  = (int) $request['per_page'];
 		$max_pages = ceil( $total / $per_page );
@@ -339,7 +351,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 	 * @since 3.3.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
-	 * @return WP_REST_Object_Search_Handler|WP_Error Search handler for the request type, or WP_Error object on failure.
+	 * @return WP_REST_Search_Handler|WP_Error Search handler for the request type, or WP_Error object on failure.
 	 */
 	protected function get_search_handler( $request ) {
 		$type = $request->get_param( self::PROP_TYPE );

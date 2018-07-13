@@ -11,7 +11,7 @@
  *
  * @since 3.3.0
  */
-class WP_REST_Post_Search_Handler extends WP_REST_Object_Search_Handler {
+class WP_REST_Post_Search_Handler extends WP_REST_Search_Handler {
 
 	/**
 	 * Constructor.
@@ -32,8 +32,8 @@ class WP_REST_Post_Search_Handler extends WP_REST_Object_Search_Handler {
 	 * @since 3.3.0
 	 *
 	 * @param WP_REST_Request $request Full REST request.
-	 * @return array Associative array containing an `WP_REST_Object_Search_Handler::RESULT_IDS` containing
-	 *               an array of found IDs and `WP_REST_Object_Search_Handler::RESULT_TOTAL` containing the
+	 * @return array Associative array containing an `WP_REST_Search_Handler::RESULT_IDS` containing
+	 *               an array of found IDs and `WP_REST_Search_Handler::RESULT_TOTAL` containing the
 	 *               total count for the matching search results.
 	 */
 	public function search_items( WP_REST_Request $request ) {
@@ -68,8 +68,8 @@ class WP_REST_Post_Search_Handler extends WP_REST_Object_Search_Handler {
 		$total     = $query->found_posts;
 
 		return array(
-			WP_REST_Object_Search_Handler::RESULT_IDS   => $found_ids,
-			WP_REST_Object_Search_Handler::RESULT_TOTAL => $total,
+			self::RESULT_IDS   => $found_ids,
+			self::RESULT_TOTAL => $total,
 		);
 	}
 

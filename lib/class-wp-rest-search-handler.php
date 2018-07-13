@@ -1,6 +1,6 @@
 <?php
 /**
- * REST API: WP_REST_Object_Search_Handler class
+ * REST API: WP_REST_Search_Handler class
  *
  * @package gutenberg
  * @since 3.3.0
@@ -11,7 +11,7 @@
  *
  * @since 3.3.0
  */
-abstract class WP_REST_Object_Search_Handler {
+abstract class WP_REST_Search_Handler {
 
 	/**
 	 * Field containing the IDs in the search result.
@@ -67,8 +67,8 @@ abstract class WP_REST_Object_Search_Handler {
 	 * @since 3.3.0
 	 *
 	 * @param WP_REST_Request $request Full REST request.
-	 * @return array Associative array containing an `WP_REST_Object_Search_Handler::RESULT_IDS` containing
-	 *               an array of found IDs and `WP_REST_Object_Search_Handler::RESULT_TOTAL` containing the
+	 * @return array Associative array containing an `WP_REST_Search_Handler::RESULT_IDS` containing
+	 *               an array of found IDs and `WP_REST_Search_Handler::RESULT_TOTAL` containing the
 	 *               total count for the matching search results.
 	 */
 	abstract public function search_items( WP_REST_Request $request );

@@ -16,7 +16,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require dirname( __FILE__ ) . '/class-wp-rest-autosaves-controller.php';
 	require dirname( __FILE__ ) . '/class-wp-rest-block-renderer-controller.php';
 	require dirname( __FILE__ ) . '/class-wp-rest-search-controller.php';
-	require dirname( __FILE__ ) . '/class-wp-rest-object-search-handler.php';
+	require dirname( __FILE__ ) . '/class-wp-rest-search-handler.php';
 	require dirname( __FILE__ ) . '/class-wp-rest-post-search-handler.php';
 	require dirname( __FILE__ ) . '/rest-api.php';
 }
