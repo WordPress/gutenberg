@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isFinite } from 'lodash';
+import { isFinite, isEmpty } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -32,9 +32,10 @@ function RangeControl( {
 	const id = `inspector-range-control-${ instanceId }`;
 	const onChangeValue = ( event ) => onChange( Number( event.target.value ) );
 	const initialSliderValue = isFinite( value ) ? value : initialPosition || '';
-
-	// remove any fowardedRef that may be in here.
-	const forwardedProps = Object.assign( {}, ...props );
+	// remove any forwardedRef that may be in here.
+	const forwardedProps = ! isEmpty( props ) ?
+		Object.assign( {}, ...props ) :
+		props;
 	delete( forwardedProps.forwardedRef );
 
 	return (
