@@ -44,15 +44,9 @@ class WP_REST_Post_Search_Handler extends WP_REST_Object_Search_Handler {
 			$post_types = $this->subtypes;
 		}
 
-		// Get the public post statuses as only those should be searched.
-		$post_statuses = array_values( get_post_stati( array(
-			'public'   => true,
-			'internal' => false,
-		), 'names' ) );
-
 		$query_args = array(
 			'post_type'           => $post_types,
-			'post_status'         => $post_statuses,
+			'post_status'         => 'publish',
 			'paged'               => (int) $request['page'],
 			'posts_per_page'      => (int) $request['per_page'],
 			'orderby'             => 'ID',
