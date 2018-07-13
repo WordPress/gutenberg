@@ -108,6 +108,18 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
+	 * Search through all content with a low limit.
+	 */
+	public function test_get_items_with_limit() {
+		$response = $this->do_request_with_params( array(
+			'per_page' => 3,
+		) );
+
+		$this->assertEquals( 200, $response->get_status() );
+		$this->assertEquals( 3, count( $response->get_data() ) );
+	}
+
+	/**
 	 * Search through posts of any post type.
 	 */
 	public function test_get_items_search_type_post() {
@@ -352,15 +364,105 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
+	 * Test getting items directly with a custom search handler.
+	 */
+	public function test_custom_search_handler_get_items() {
+		$controller = new WP_REST_Search_Controller( array( new WP_REST_Dummy_Search_Handler( 10 ) ) );
+
+		$request  = $this->get_request( array(
+			'page'     => 1,
+			'per_page' => 10,
+			'type'     => 'dummy',
+			'subtype'  => array( WP_REST_Search_Controller::TYPE_ANY ),
+		) );
+		$response = $controller->get_items( $request );
+		$this->assertEqualSets( range( 1, 10 ), wp_list_pluck( $response->get_data(), 'id' ) );
+
+		$request  = $this->get_request( array(
+			'page'     => 1,
+			'per_page' => 10,
+			'type'     => 'dummy',
+			'subtype'  => array( 'dummy_first_type' ),
+		) );
+		$response = $controller->get_items( $request );
+		$this->assertEqualSets( range( 1, 5 ), wp_list_pluck( $response->get_data(), 'id' ) );
+	}
+
+	/**
+	 * Test preparing an item directly with a custom search handler.
+	 */
+	public function test_custom_search_handler_prepare_item() {
+		$controller = new WP_REST_Search_Controller( array( new WP_REST_Dummy_Search_Handler( 10 ) ) );
+
+		$request  = $this->get_request( array(
+			'type'    => 'dummy',
+			'subtype' => array( WP_REST_Search_Controller::TYPE_ANY ),
+		) );
+		$response = $controller->prepare_item_for_response( 1, $request );
+		$data     = $response->get_data();
+		$this->assertEquals( array(
+			'id',
+			'title',
+			'url',
+			'type',
+			'subtype',
+		), array_keys( $data ) );
+	}
+
+	/**
+	 * Test preparing an item directly with a custom search handler with limited fields.
+	 */
+	public function test_custom_search_handler_prepare_item_limit_fields() {
+		if ( ! method_exists( 'WP_REST_Controller', 'get_fields_for_response' ) ) {
+			$this->markTestSkipped( 'Limiting fields requires the WP_REST_Controller::get_fields_for_response() method.' );
+		}
+
+		$controller = new WP_REST_Search_Controller( array( new WP_REST_Dummy_Search_Handler( 10 ) ) );
+
+		$request  = $this->get_request( array(
+			'type'    => 'dummy',
+			'subtype' => array( WP_REST_Search_Controller::TYPE_ANY ),
+			'_fields' => 'id,title',
+		) );
+		$response = $controller->prepare_item_for_response( 1, $request );
+		$data     = $response->get_data();
+		$this->assertEquals( array(
+			'id',
+			'title',
+		), array_keys( $data ) );
+	}
+
+	/**
+	 * Test getting the collection params directly with a custom search handler.
+	 */
+	public function test_custom_search_handler_get_collection_params() {
+		$controller = new WP_REST_Search_Controller( array( new WP_REST_Dummy_Search_Handler( 10 ) ) );
+
+		$params = $controller->get_collection_params();
+		$this->assertEquals( 'dummy', $params[ WP_REST_Search_Controller::PROP_TYPE ]['default'] );
+		$this->assertEqualSets( array( 'dummy' ), $params[ WP_REST_Search_Controller::PROP_TYPE ]['enum'] );
+		$this->assertEqualSets( array( 'dummy_first_type', 'dummy_second_type', WP_REST_Search_Controller::TYPE_ANY ), $params[ WP_REST_Search_Controller::PROP_SUBTYPE ]['items']['enum'] );
+	}
+
+	/**
 	 * Perform a REST request to our search endpoint with given parameters.
 	 */
 	private function do_request_with_params( $params = array(), $method = 'GET' ) {
+		$request = $this->get_request( $params, $method );
+
+		return rest_get_server()->dispatch( $request );
+	}
+
+	/**
+	 * Get a REST request object for given parameters.
+	 */
+	private function get_request( $params = array(), $method = 'GET' ) {
 		$request = new WP_REST_Request( $method, '/gutenberg/v1/search' );
 
 		foreach ( $params as $param => $value ) {
 			$request->set_param( $param, $value );
 		}
 
-		return rest_get_server()->dispatch( $request );
+		return $request;
 	}
 }
