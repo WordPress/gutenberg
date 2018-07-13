@@ -19,12 +19,12 @@ const shallowRenderer = new Shallow();
 function mockNamedComponent( mockName ) {
 	class TestComponent extends Component {
 		render() {
-			return <div id={ "mock" + mockName } />;
+			return <div id={ 'mock' + mockName } />;
 		}
 	}
 	TestComponent.displayName = 'mock' + mockName;
 	return () => <TestComponent />;
-};
+}
 
 jest.mock( '../../block-drop-zone', () => mockNamedComponent( 'BlockDropZone' ) );
 jest.mock( '../../inserter-with-shortcuts', () => mockNamedComponent( 'InserterWithShortcuts' ) );

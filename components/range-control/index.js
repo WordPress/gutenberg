@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isFinite, isEmpty } from 'lodash';
+import { isFinite } from 'lodash';
 import classnames from 'classnames';
 
 /**
