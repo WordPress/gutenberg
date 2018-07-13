@@ -32,10 +32,11 @@ function RangeControl( {
 	const id = `inspector-range-control-${ instanceId }`;
 	const onChangeValue = ( event ) => onChange( Number( event.target.value ) );
 	const initialSliderValue = isFinite( value ) ? value : initialPosition || '';
-	// remove any forwardedRef that may be in here.
-	const forwardedProps = ! isEmpty( props ) ?
-		Object.assign( {}, ...props ) :
-		props;
+
+	// remove any forwardedRef that may be in here.  This is because leaf
+	// components cannot have non native props with camelCase and it'll throw a
+	// warning if present.
+	const forwardedProps = { ...props };
 	delete( forwardedProps.forwardedRef );
 
 	return (
