@@ -22,12 +22,14 @@ apiFetch( { path: '/wp/v2/posts' } ).then( posts => {
 
 ### Middlewares
 
-the `api-fetch` package supports middlewares. Middlewares are functions you can use to wrap the `wp.apiFetch` calls to perform any pre/post process to the API requests.
+the `api-fetch` package supports middlewares. Middlewares are functions you can use to wrap the `apiFetch` calls to perform any pre/post process to the API requests.
 
 **Example**
 
 ```js
-wp.apiFetch.use( ( options, next ) => {
+import apiFetch from '@wordpress/api-fetch';
+
+apiFetch.use( ( options, next ) => {
 	const start = Date.now();
 	const result = next( options );
 	result.then( () => {
@@ -37,6 +39,26 @@ wp.apiFetch.use( ( options, next ) => {
 } );
 ```
 
+### Built-in middlewares
+
 The `api-fetch` package provides built-in middlewares you can use to provide a `nonce` and a custom `rootURL`.
+
+**Nonce middleware**
+
+```js
+import apiFetch from '@wordpress/api-fetch';
+
+const nonce = "nonce value";
+apiFetch.use( apiFetch.createNonceMiddleware( nonce ) );
+```
+
+**Root URL middleware**
+
+```js
+import apiFetch from '@wordpress/api-fetch';
+
+const rootURL = "http://my-wordpress-site/wp-json/";
+apiFetch.use( apiFetch.createRootURLMiddleware( nonce ) );
+```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

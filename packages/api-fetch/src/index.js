@@ -52,7 +52,7 @@ function apiFetch( options ) {
 			.then( parseResponse )
 			.catch( ( response ) => {
 				if ( ! parse ) {
-					Promise.reject( response );
+					return Promise.reject( response );
 				}
 
 				return response.json()
