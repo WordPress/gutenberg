@@ -7,7 +7,6 @@ import { shallow } from 'enzyme';
  * Internal dependencies
  */
 import {
-	Component,
 	createElement,
 	concatChildren,
 	renderToString,

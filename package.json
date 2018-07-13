@@ -19,6 +19,7 @@
 		"@wordpress/api-request": "file:packages/api-request",
 		"@wordpress/autop": "file:packages/autop",
 		"@wordpress/blob": "file:packages/blob",
+		"@wordpress/compose": "file:packages/compose",
 		"@wordpress/core-data": "file:packages/core-data",
 		"@wordpress/data": "file:packages/data",
 		"@wordpress/date": "file:packages/date",

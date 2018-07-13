@@ -21,10 +21,11 @@
 	"module": "build-module/index.js",
 	"dependencies": {
 		"@wordpress/element": "file:../element",
-		"@wordpress/is-shallow-equal": "file:packages/is-shallow-equal",
+		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"lodash": "^4.17.10"
 	},
 	"devDependencies": {
+		"@wordpress/jest-console": "file:packages/jest-console",
 		"enzyme": "3.3.0",
 		"react-dom": "16.4.1",
 		"react-test-renderer": "16.4.1"
