@@ -33,7 +33,7 @@ function render_block_core_rss( $attributes ) {
 
 	if ( is_wp_error( $rss ) ) {
 		if ( is_admin() || current_user_can( 'manage_options' ) ) {
-			return '<p><strong>' . __( 'RSS Error:', 'gutenberg' ) . '</strong> ' . $rss->get_error_message() . '</p>';
+			return '<div class="components-placeholder"><div class="notice notice-error"><strong>' . __( 'RSS Error:', 'gutenberg' ) . '</strong> ' . $rss->get_error_message() . '</div></div>';
 		}
 		return;
 	}
@@ -41,7 +41,7 @@ function render_block_core_rss( $attributes ) {
 	if ( ! $rss->get_item_quantity() ) {
 		$rss->__destruct();
 		unset( $rss );
-		return '<ul><li>' . __( 'An error has occurred, which probably means the feed is down. Try again later.', 'gutenberg' ) . '</li></ul>';
+		return '<div class="components-placeholder"><div class="notice notice-error">' . __( 'An error has occurred, which probably means the feed is down. Try again later.', 'gutenberg' ) . '</div></div>';
 	}
 
 	$items = (int) $attributes['postsToShow'];
