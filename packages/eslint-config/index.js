@@ -2,13 +2,12 @@ module.exports = {
 	parser: 'babel-eslint',
 	extends: [
 		'wordpress',
-		'plugin:wordpress/esnext',
+		'./configs/esnext.js',
 		'plugin:react/recommended',
 		'plugin:jsx-a11y/recommended',
 	],
 	env: {
 		browser: false,
-		es6: true,
 		node: true,
 	},
 	parserOptions: {
@@ -22,7 +21,6 @@ module.exports = {
 		document: true,
 	},
 	plugins: [
-		'wordpress',
 		'react',
 		'jsx-a11y',
 	],
