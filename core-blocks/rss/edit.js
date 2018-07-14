@@ -25,7 +25,7 @@ import {
 import './editor.scss';
 
 const DEFAULT_MIN_ITEMS = 1;
-const DEFAULT_MAX_ITEMS = 20;
+const DEFAULT_MAX_ITEMS = 10;
 
 class RSSEdit extends Component {
 	constructor() {
@@ -57,10 +57,13 @@ class RSSEdit extends Component {
 
 	render() {
 		const {
+			columns,
 			displayAuthor,
 			displayExcerpt,
 			displayDate,
+			excerptLength,
 			feedURL,
+			postLayout,
 			postsToShow,
 		} = this.props.attributes;
 		const { setAttributes } = this.props;
@@ -88,6 +91,21 @@ class RSSEdit extends Component {
 			);
 		}
 
+		const layoutControls = [
+			{
+				icon: 'list-view',
+				title: __( 'List View' ),
+				onClick: () => setAttributes( { postLayout: 'list' } ),
+				isActive: postLayout === 'list',
+			},
+			{
+				icon: 'grid-view',
+				title: __( 'Grid View' ),
+				onClick: () => setAttributes( { postLayout: 'grid' } ),
+				isActive: postLayout === 'grid',
+			},
+		];
+
 		return (
 			<Fragment>
 				<BlockControls>
@@ -99,6 +117,7 @@ class RSSEdit extends Component {
 							icon="edit"
 						/>
 					</Toolbar>
+					<Toolbar controls={ layoutControls } />
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'RSS Settings' ) }>
@@ -124,6 +143,25 @@ class RSSEdit extends Component {
 							checked={ displayExcerpt }
 							onChange={ this.toggleAttribute( 'displayExcerpt' ) }
 						/>
+						{ displayExcerpt &&
+							<RangeControl
+								label={ __( 'Max length of the excerpt' ) }
+								value={ excerptLength }
+								onChange={ ( value ) => setAttributes( { excerptLength: value } ) }
+								min={ 0 }
+								max={ 100 }
+								step={ 5 }
+							/>
+						}
+						{ postLayout === 'grid' &&
+							<RangeControl
+								label={ __( 'Columns' ) }
+								value={ columns }
+								onChange={ ( value ) => setAttributes( { columns: value } ) }
+								min={ 2 }
+								max={ 6 }
+							/>
+						}
 					</PanelBody>
 				</InspectorControls>
 				<ServerSideRender

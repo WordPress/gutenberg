@@ -24,11 +24,6 @@ function render_block_core_rss( $attributes ) {
 		$url = substr( $url, 1 );
 	}
 
-	// self-url destruction sequence.
-	if ( in_array( untrailingslashit( $url ), array( site_url(), home_url() ) ) ) {
-		return '<div class="components-placeholder"><div class="notice notice-error"><strong>' . __( 'Use `Latest Posts` for this domain', 'gutenberg' ) . '</strong></div></div>';
-	}
-
 	$rss = fetch_feed( $url );
 
 	if ( is_wp_error( $rss ) ) {
@@ -45,7 +40,7 @@ function render_block_core_rss( $attributes ) {
 	}
 
 	$items = (int) $attributes['postsToShow'];
-	if ( $items < 1 || 20 < $items ) {
+	if ( $items < 1 || 10 < $items ) {
 		$items = 5;
 	}
 
@@ -94,7 +89,7 @@ function render_block_core_rss( $attributes ) {
 		$excerpt = '';
 		if ( $attributes['displayExcerpt'] ) {
 			$excerpt = @html_entity_decode( $item->get_description(), ENT_QUOTES, get_option( 'blog_charset' ) );
-			$excerpt = esc_attr( wp_trim_words( $excerpt, 55, ' [&hellip;]' ) );
+			$excerpt = esc_attr( wp_trim_words( $excerpt, $attributes['excerptLength'], ' [&hellip;]' ) );
 
 			// Change existing [...] to [&hellip;].
 			if ( '[...]' == substr( $excerpt, -5 ) ) {
@@ -107,7 +102,11 @@ function render_block_core_rss( $attributes ) {
 		$list_items .= "<li class='wp-block-rss__item'>{$title}{$date}{$author}{$excerpt}</li>";
 	}
 
-	$list_items_markup = "<ul class='wp-block-rss'>{$list_items}</ul>";
+	$columns_class = 'grid' === $attributes['postLayout'] ? 'columns-' . $attributes['columns'] . ' ' : '';
+	$is_grid       = 'grid' === $attributes['postLayout'] ? 'is-grid' : '';
+
+	$list_items_markup = "<ul class='wp-block-rss {$columns_class}{$is_grid}'>{$list_items}</ul>";
+
 	$rss->__destruct();
 	unset( $rss );
 	return $list_items_markup;
@@ -119,6 +118,14 @@ function render_block_core_rss( $attributes ) {
 function register_block_core_rss() {
 	register_block_type( 'core/rss', array(
 		'attributes'      => array(
+			'columns'        => array(
+				'type'    => 'number',
+				'default' => 2,
+			),
+			'postLayout'     => array(
+				'type'    => 'string',
+				'default' => 'list',
+			),
 			'feedURL'        => array(
 				'type' => 'string',
 			),
@@ -134,6 +141,10 @@ function register_block_core_rss() {
 			),
 			'displayDate'    => array(
 				'type' => 'boolean',
+			),
+			'excerptLength'  => array(
+				'type'    => 'number',
+				'default' => 55,
 			),
 		),
 		'render_callback' => 'render_block_core_rss',
