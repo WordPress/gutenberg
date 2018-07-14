@@ -26,7 +26,7 @@ function render_block_core_rss( $attributes ) {
 
 	// self-url destruction sequence.
 	if ( in_array( untrailingslashit( $url ), array( site_url(), home_url() ) ) ) {
-		return 'self-url destruction sequence.';
+		return '<div class="components-placeholder"><div class="notice notice-error"><strong>' . __( 'Use `Latest Posts` for this domain', 'gutenberg' ) . '</strong></div></div>';
 	}
 
 	$rss = fetch_feed( $url );
@@ -107,7 +107,7 @@ function render_block_core_rss( $attributes ) {
 		$list_items .= "<li class='wp-block-rss__item'>{$title}{$date}{$author}{$excerpt}</li>";
 	}
 
-	$list_items_markup = "<ul>{$list_items}</ul>";
+	$list_items_markup = "<ul class='wp-block-rss'>{$list_items}</ul>";
 	$rss->__destruct();
 	unset( $rss );
 	return $list_items_markup;

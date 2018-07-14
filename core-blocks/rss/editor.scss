@@ -1,1 +1,6 @@
-
+.gutenberg .wp-block-rss {
+	padding-left: 2.5em;
+	&.is-grid {
+		padding-left: 0;
+	}
+}
