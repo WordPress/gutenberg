@@ -58,7 +58,7 @@ class RSSEdit extends Component {
 	render() {
 		const {
 			displayAuthor,
-			displayContent,
+			displayExcerpt,
 			displayDate,
 			feedURL,
 			postsToShow,
@@ -69,7 +69,6 @@ class RSSEdit extends Component {
 			return (
 				<Placeholder
 					icon="rss"
-					instructions={ __( 'Paste URL to RSS feed.' ) }
 					label="RSS"
 				>
 					<form onSubmit={ this.onSubmitURL }>
@@ -116,14 +115,14 @@ class RSSEdit extends Component {
 							onChange={ this.toggleAttribute( 'displayAuthor' ) }
 						/>
 						<ToggleControl
-							label={ __( 'Display content' ) }
-							checked={ displayContent }
-							onChange={ this.toggleAttribute( 'displayContent' ) }
-						/>
-						<ToggleControl
 							label={ __( 'Display date' ) }
 							checked={ displayDate }
 							onChange={ this.toggleAttribute( 'displayDate' ) }
+						/>
+						<ToggleControl
+							label={ __( 'Display excerpt' ) }
+							checked={ displayExcerpt }
+							onChange={ this.toggleAttribute( 'displayExcerpt' ) }
 						/>
 					</PanelBody>
 				</InspectorControls>

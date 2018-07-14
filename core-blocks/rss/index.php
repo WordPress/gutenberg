@@ -82,29 +82,29 @@ function render_block_core_rss( $attributes ) {
 			}
 		}
 
-		$summary = '';
-		if ( $attributes['displayContent'] ) {
-			$summary = @html_entity_decode( $item->get_description(), ENT_QUOTES, get_option( 'blog_charset' ) );
-			$summary = esc_attr( wp_trim_words( $summary, 55, ' [&hellip;]' ) );
-
-			// Change existing [...] to [&hellip;].
-			if ( '[...]' == substr( $summary, -5 ) ) {
-				$summary = substr( $summary, 0, -5 ) . '[&hellip;]';
-			}
-
-			$summary = '<div class="wp-block-rss__item-summary">' . esc_html( $summary ) . '</div>';
-		}
-
 		$author = '';
 		if ( $attributes['displayAuthor'] ) {
 			$author = $item->get_author();
 			if ( is_object( $author ) ) {
 				$author = $author->get_name();
-				$author = '<span class="wp-block-rss__item-author">' . esc_html( strip_tags( $author ) ) . '</span>';
+				$author = '<span class="wp-block-rss__item-author">' . __( 'By', 'gutenberg' ) . ' ' . esc_html( strip_tags( $author ) ) . '</span>';
 			}
 		}
 
-		$list_items .= "<li class='wp-block-rss__item'>{$title}{$date}{$author}{$summary}</li>";
+		$excerpt = '';
+		if ( $attributes['displayExcerpt'] ) {
+			$excerpt = @html_entity_decode( $item->get_description(), ENT_QUOTES, get_option( 'blog_charset' ) );
+			$excerpt = esc_attr( wp_trim_words( $excerpt, 55, ' [&hellip;]' ) );
+
+			// Change existing [...] to [&hellip;].
+			if ( '[...]' == substr( $excerpt, -5 ) ) {
+				$excerpt = substr( $excerpt, 0, -5 ) . '[&hellip;]';
+			}
+
+			$excerpt = '<div class="wp-block-rss__item-excerpt">' . esc_html( $excerpt ) . '</div>';
+		}
+
+		$list_items .= "<li class='wp-block-rss__item'>{$title}{$date}{$author}{$excerpt}</li>";
 	}
 
 	$list_items_markup = "<ul>{$list_items}</ul>";
@@ -126,17 +126,14 @@ function register_block_core_rss() {
 				'type'    => 'number',
 				'default' => 5,
 			),
-			'displayContent' => array(
-				'type'    => 'boolean',
-				'default' => false,
+			'displayExcerpt' => array(
+				'type' => 'boolean',
 			),
 			'displayAuthor'  => array(
-				'type'    => 'boolean',
-				'default' => true,
+				'type' => 'boolean',
 			),
 			'displayDate'    => array(
-				'type'    => 'boolean',
-				'default' => true,
+				'type' => 'boolean',
 			),
 		),
 		'render_callback' => 'render_block_core_rss',
