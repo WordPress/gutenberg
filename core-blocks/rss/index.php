@@ -24,6 +24,11 @@ function render_block_core_rss( $attributes ) {
 		$url = substr( $url, 1 );
 	}
 
+	// self-url destruction sequence.
+	if ( in_array( untrailingslashit( $url ), array( site_url(), home_url() ) ) ) {
+		return '<div class="components-placeholder"><div class="notice notice-error"><strong>' . __( 'Use `Latest Posts` block for this domain', 'gutenberg' ) . '</strong></div></div>';
+	}
+
 	$rss = fetch_feed( $url );
 
 	if ( is_wp_error( $rss ) ) {
@@ -88,7 +93,7 @@ function render_block_core_rss( $attributes ) {
 
 		$excerpt = '';
 		if ( $attributes['displayExcerpt'] ) {
-			$excerpt = @html_entity_decode( $item->get_description(), ENT_QUOTES, get_option( 'blog_charset' ) );
+			$excerpt = @html_entity_decode( $item->get_content(), ENT_QUOTES, get_option( 'blog_charset' ) );
 			$excerpt = esc_attr( wp_trim_words( $excerpt, $attributes['excerptLength'], ' [&hellip;]' ) );
 
 			// Change existing [...] to [&hellip;].
