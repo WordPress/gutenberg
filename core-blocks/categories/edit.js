@@ -8,6 +8,8 @@ import { __ } from '@wordpress/i18n';
 import { times, unescape } from 'lodash';
 import {
 	InspectorControls,
+	BlockControls,
+	BlockAlignmentToolbar,
 } from '@wordpress/editor';
 
 /**
@@ -142,8 +144,8 @@ class CategoriesEdit extends Component {
 	}
 
 	render() {
-		const { attributes, isRequesting } = this.props;
-		const { displayAsDropdown, showHierarchy, showPostCounts } = attributes;
+		const { attributes, setAttributes, isRequesting } = this.props;
+		const { align, displayAsDropdown, showHierarchy, showPostCounts } = attributes;
 
 		const inspectorControls = (
 			<InspectorControls>
@@ -184,6 +186,15 @@ class CategoriesEdit extends Component {
 		return (
 			<Fragment>
 				{ inspectorControls }
+				<BlockControls>
+					<BlockAlignmentToolbar
+						value={ align }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { align: nextAlign } );
+						} }
+						controls={ [ 'left', 'center', 'right', 'full' ] }
+					/>
+				</BlockControls>
 				<div className={ this.props.className }>
 					{
 						displayAsDropdown ?

@@ -33,11 +33,20 @@ export const settings = {
 			type: 'boolean',
 			default: false,
 		},
+		align: {
+			type: 'string',
+		},
 	},
 
 	supports: {
 		html: false,
-		align: true,
+	},
+
+	getEditWrapperProps( attributes ) {
+		const { align } = attributes;
+		if ( 'left' === align || 'right' === align || 'full' === align ) {
+			return { 'data-align': align };
+		}
 	},
 
 	edit,
