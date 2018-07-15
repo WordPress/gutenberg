@@ -15,6 +15,7 @@
 
 	h2 {
 		font-size: 1.95em;
+		line-height: 1.4;
 	}
 
 	h3 {
@@ -31,5 +32,16 @@
 
 	h6 {
 		font-size: 0.8em;
+	}
+
+	// Adjust line spacing for larger headings.
+	h1.editor-rich-text__tinymce,
+	h2.editor-rich-text__tinymce,
+	h3.editor-rich-text__tinymce {
+		line-height: 1.4;
+	}
+
+	h4.editor-rich-text__tinymce {
+		line-height: 1.5;
 	}
 }
