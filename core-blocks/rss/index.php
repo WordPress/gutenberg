@@ -6,6 +6,19 @@
  */
 
 /**
+ * Renders the rss error message.
+ *
+ * @param string $message RSS error message.
+ * @return string|void Void if renders on frontend.
+ */
+function render_rss_error_message( $message ) {
+	if ( ! is_admin() ) {
+		return;
+	}
+	return '<div class="components-placeholder"><div class="notice notice-alt notice-error">' . $message . '</div></div>';
+}
+
+/**
  * Renders the `core/rss` block on server.
  *
  * @param array $attributes The block attributes.
@@ -26,22 +39,19 @@ function render_block_core_rss( $attributes ) {
 
 	// self-url destruction sequence.
 	if ( in_array( untrailingslashit( $url ), array( site_url(), home_url() ) ) ) {
-		return '<div class="components-placeholder"><div class="notice notice-error"><strong>' . __( 'Use `Latest Posts` block for this domain', 'gutenberg' ) . '</strong></div></div>';
+		render_rss_error_message( __( 'Use \'Latest Posts\' block for this domain', 'gutenberg' ) );
 	}
 
 	$rss = fetch_feed( $url );
 
 	if ( is_wp_error( $rss ) ) {
-		if ( is_admin() || current_user_can( 'manage_options' ) ) {
-			return '<div class="components-placeholder"><div class="notice notice-error"><strong>' . __( 'RSS Error:', 'gutenberg' ) . '</strong> ' . $rss->get_error_message() . '</div></div>';
-		}
-		return;
+		return render_rss_error_message( '<strong>' . __( 'RSS Error:', 'gutenberg' ) . '</strong> ' . $rss->get_error_message() );
 	}
 
 	if ( ! $rss->get_item_quantity() ) {
 		$rss->__destruct();
 		unset( $rss );
-		return '<div class="components-placeholder"><div class="notice notice-error">' . __( 'An error has occurred, which probably means the feed is down. Try again later.', 'gutenberg' ) . '</div></div>';
+		return render_rss_error_message( __( 'An error has occurred, which probably means the feed is down. Try again later.', 'gutenberg' ) );
 	}
 
 	$items = (int) $attributes['postsToShow'];
@@ -93,7 +103,7 @@ function render_block_core_rss( $attributes ) {
 
 		$excerpt = '';
 		if ( $attributes['displayExcerpt'] ) {
-			$excerpt = @html_entity_decode( $item->get_content(), ENT_QUOTES, get_option( 'blog_charset' ) );
+			$excerpt = @html_entity_decode( $item->get_description(), ENT_QUOTES, get_option( 'blog_charset' ) );
 			$excerpt = esc_attr( wp_trim_words( $excerpt, $attributes['excerptLength'], ' [&hellip;]' ) );
 
 			// Change existing [...] to [&hellip;].
