@@ -83,6 +83,10 @@ const entryPointNames = [
 	'nux',
 ];
 
+if ( process.env.GUTENBERG_ENV === 'standalone' ) {
+	entryPointNames.push( 'standalone' );
+}
+
 const gutenbergPackages = [
 	'a11y',
 	'api-fetch',
@@ -246,6 +250,25 @@ if ( config.mode !== 'production' ) {
 
 if ( config.mode === 'development' ) {
 	config.plugins.push( new LiveReloadPlugin( { port: process.env.GUTENBERG_LIVE_RELOAD_PORT || 35729 } ) );
+}
+
+//Experimental Standalone Sandbox!
+if ( process.env.GUTENBERG_ENV === 'standalone' ) {
+	const CleanWebpackPlugin = require( 'clean-webpack-plugin' );
+	const HtmlWebpackPlugin = require( 'html-webpack-plugin' );
+	config.plugins.push( new CleanWebpackPlugin( [ 'build/standalone' ], { verbose: true } ) );
+	config.plugins.push( new HtmlWebpackPlugin( { template: './standalone/index.html' } ) );
+	config.devServer = {
+		contentBase: './build/standalone',
+	};
+	config.devtool = 'source-map';
+	config.externals = [];
+	const path = require( 'path' );
+	const alias = Object.assign( {}, config.resolve.alias, {
+		'@wordpress/core-blocks': path.resolve( __dirname, 'build/core-blocks' ),
+		'@wordpress/editor': path.resolve( __dirname, 'build/editor' ),
+	} );
+	config.resolve.alias = alias;
 }
 
 module.exports = config;
