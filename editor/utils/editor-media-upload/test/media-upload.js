@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { mediaUpload, getMimeTypesArray } from '../mediaupload';
+import { mediaUpload, getMimeTypesArray } from '../media-upload';
 
 const invalidMediaObj = {
 	url: 'https://cldup.com/uuUqE_dXzy.jpg',
