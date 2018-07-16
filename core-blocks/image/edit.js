@@ -266,7 +266,7 @@ class ImageEdit extends Component {
 
 		const availableSizes = this.getAvailableSizes();
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
-		const isLinkUrlInputDisabled = linkDestination !== LINK_DESTINATION_CUSTOM;
+		const isLinkURLInputDisabled = linkDestination !== LINK_DESTINATION_CUSTOM;
 
 		const getInspectorControls = ( imageWidth, imageHeight ) => (
 			<InspectorControls>
@@ -353,8 +353,8 @@ class ImageEdit extends Component {
 						label={ __( 'Link URL' ) }
 						value={ href || '' }
 						onChange={ this.onSetCustomHref }
-						placeholder={ ! isLinkUrlInputDisabled && 'https://' }
-						disabled={ isLinkUrlInputDisabled }
+						placeholder={ ! isLinkURLInputDisabled && 'https://' }
+						disabled={ isLinkURLInputDisabled }
 					/>
 				</PanelBody>
 			</InspectorControls>
