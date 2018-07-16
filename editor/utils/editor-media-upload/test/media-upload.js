@@ -30,6 +30,7 @@ describe( 'mediaUpload', () => {
 
 	it( 'should call error handler with the correct error object if file size is greater than the maximum', () => {
 		const onError = jest.fn();
+
 		mediaUpload( {
 			allowedType: 'image',
 			filesList: [ validMediaObj ],
@@ -46,14 +47,14 @@ describe( 'mediaUpload', () => {
 
 	it( 'should call error handler with the correct error object if file type is not allowed for user', () => {
 		const onError = jest.fn();
-		global._wpMediaSettings = {
-			allowedMimeTypes: { aac: 'audio/aac' },
-		};
+		const allowedMimeTypes = { aac: 'audio/aac' };
+
 		mediaUpload( {
 			allowedType: 'image',
 			filesList: [ validMediaObj ],
 			onFileChange: onFileChangeSpy,
 			onError,
+			allowedMimeTypes,
 		} );
 		expect( onError ).toBeCalledWith( {
 			code: 'MIME_TYPE_NOT_ALLOWED_FOR_USER',

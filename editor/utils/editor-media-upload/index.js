@@ -7,7 +7,11 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { select } from '@wordpress/data';
-import { mediaUpload } from '@wordpress/utils';
+
+/**
+ * Internal dependencies
+ */
+import { mediaUpload } from './media-upload';
 
 /**
  * Upload a media file when the file upload button is activated.
@@ -15,7 +19,6 @@ import { mediaUpload } from '@wordpress/utils';
  *
  * @param   {Object}   $0                   Parameters object passed to the function.
  * @param   {string}   $0.allowedType       The type of media that can be uploaded, or '*' to allow all.
- * @param   {?Object}  $0.additionalData    Additional data to include in the request.
  * @param   {Array}    $0.filesList         List of files.
  * @param   {?number}  $0.maxUploadFileSize Maximum upload size in bytes allowed for the site.
  * @param   {Function} $0.onError           Function called when an error happens.
@@ -28,16 +31,22 @@ export default function editorMediaUpload( {
 	onError = noop,
 	onFileChange,
 } ) {
-	const postId = select( 'core/editor' ).getCurrentPostId();
+	const {
+		getCurrentPostId,
+		getEditorSettings,
+	} = select( 'core/editor' );
+	const allowedMimeTypes = getEditorSettings().allowedMimeTypes;
+	maxUploadFileSize = maxUploadFileSize || getEditorSettings().maxUploadFileSize;
 
 	mediaUpload( {
 		allowedType,
 		filesList,
 		onFileChange,
 		additionalData: {
-			post: postId,
+			post: getCurrentPostId(),
 		},
 		maxUploadFileSize,
 		onError: ( { message } ) => onError( message ),
+		allowedMimeTypes,
 	} );
 }

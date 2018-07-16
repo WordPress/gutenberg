@@ -7,10 +7,6 @@ import { compact, flatMap, forEach, get, has, includes, map, noop, startsWith } 
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * WordPress dependencies
- */
 import apiRequest from '@wordpress/api-request';
 
 /**
@@ -50,14 +46,16 @@ export function getMimeTypesArray( wpMimeTypesObject ) {
  * @param   {?number}  $0.maxUploadFileSize Maximum upload size in bytes allowed for the site.
  * @param   {Function} $0.onError           Function called when an error happens.
  * @param   {Function} $0.onFileChange      Function called each time a file or a temporary representation of the file is available.
+ * @param   {?Object} $0.allowedMimeTypes   List of allowed mime types and file extensions.
  */
 export function mediaUpload( {
 	allowedType,
 	additionalData = {},
 	filesList,
-	maxUploadFileSize = get( window, [ '_wpMediaSettings', 'maxUploadSize' ], 0 ),
+	maxUploadFileSize,
 	onError = noop,
 	onFileChange,
+	allowedMimeTypes = null,
 } ) {
 	// Cast filesList to array
 	const files = [ ...filesList ];
@@ -74,7 +72,7 @@ export function mediaUpload( {
 	};
 
 	// Allowed types for the current WP_User
-	const allowedMimeTypesForUser = getMimeTypesArray( get( window, [ '_wpMediaSettings', 'allowedMimeTypes' ] ) );
+	const allowedMimeTypesForUser = getMimeTypesArray( allowedMimeTypes );
 	const isAllowedMimeTypeForUser = ( fileType ) => {
 		return includes( allowedMimeTypesForUser, fileType );
 	};

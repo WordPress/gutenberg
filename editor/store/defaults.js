@@ -81,4 +81,10 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 
 	// Allowed block types for the editor, defaulting to true (all supported).
 	allowedBlockTypes: true,
+
+	// Maximum upload size in bytes allowed for the site.
+	maxUploadFileSize: 0,
+
+	// List of allowed mime types and file extensions.
+	allowedMimeTypes: null,
 };
