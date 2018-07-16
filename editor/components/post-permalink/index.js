@@ -48,7 +48,7 @@ class PostPermalink extends Component {
 	componentDidUpdate( prevProps, prevState ) {
 		// If we've just stopped editing the permalink, focus on the new permalink.
 		if ( prevState.isEditingPermalink && ! this.state.isEditingPermalink ) {
-			this.permalinkButton.focus();
+			this.linkElement.focus();
 		}
 	}
 
@@ -83,7 +83,7 @@ class PostPermalink extends Component {
 						className="editor-post-permalink__link"
 						href={ ! isPublished ? postLink : samplePermalink }
 						target="_blank"
-						ref={ ( permalinkButton ) => this.permalinkButton = permalinkButton }
+						ref={ ( linkElement ) => this.linkElement = linkElement }
 					>
 						{ decodeURI( samplePermalink ) }
 						&lrm;
