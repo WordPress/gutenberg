@@ -23,8 +23,10 @@ public class RCTAztecViewManager: RCTViewManager {
             defaultFont: .systemFont(ofSize: 12),
             defaultParagraphStyle: .default,
             defaultMissingImage: UIImage())
-
-        view.backgroundColor = .cyan
+        
+        view.isScrollEnabled = true
+        
+        view.backgroundColor = .yellow
         view.text = "Hello world!"
         
         view.textAttachmentDelegate = attachmentDelegate

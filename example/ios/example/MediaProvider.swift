@@ -4,21 +4,24 @@ import Foundation
 class MediaProvider: Aztec.TextViewAttachmentDelegate {
     
     func textView(_ textView: TextView, attachment: NSTextAttachment, imageAt url: URL, onSuccess success: @escaping (UIImage) -> Void, onFailure failure: @escaping () -> Void) {
-        
-        let image = UIImage(named: "aztec")!
-        
-        success(image)
+    
+        DispatchQueue.main.async {
+            let image = UIImage(named: "aztec")!
+            
+            success(image)
+        }
     }
     
     func textView(_ textView: TextView, urlFor imageAttachment: ImageAttachment) -> URL? {
-        return URL(string: "")
+        return URL(string: "www.google.com")
     }
     
     func textView(_ textView: TextView, placeholderFor attachment: NSTextAttachment) -> UIImage {
-        return UIImage()
+        return UIImage(named: "aztec")!
     }
     
     func textView(_ textView: TextView, deletedAttachment attachment: MediaAttachment) {
+        textView.setNeedsDisplay()
     }
     
     func textView(_ textView: TextView, selected attachment: NSTextAttachment, atPosition position: CGPoint) {
@@ -42,8 +45,15 @@ extension MediaProvider: Aztec.TextViewAttachmentImageProvider {
     func textView(_ textView: TextView, imageFor attachment: NSTextAttachment, with size: CGSize) -> UIImage? {
         let image = UIImage(named: "aztec")!
         
-        return image
+        return imageWithImage(image: image, scaledToSize: size)
     }
     
+    func imageWithImage(image:UIImage, scaledToSize newSize:CGSize) -> UIImage{
+        UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0);
+        image.draw(in: CGRect(origin: CGPoint.zero, size: CGSize(width: newSize.width, height: newSize.height)))
+        let newImage:UIImage = UIGraphicsGetImageFromCurrentImageContext()!
+        UIGraphicsEndImageContext()
+        return newImage
+    }
     
 }
