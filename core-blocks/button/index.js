@@ -77,17 +77,17 @@ export const settings = {
 
 		return props;
 	},
-  
+
 	supports: {
 		align: true,
 	},
-  
-  styles: [
+
+	styles: [
 		{ name: 'default', label: __( 'Rounded' ), isDefault: true },
 		{ name: 'outline', label: __( 'Outline' ) },
 		{ name: 'squared', label: __( 'Squared' ) },
 	],
-  
+
 	edit,
 
 	save( { attributes } ) {
