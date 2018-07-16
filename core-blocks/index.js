@@ -16,6 +16,7 @@ import * as image from './image';
 import * as heading from './heading';
 import * as quote from './quote';
 import * as gallery from './gallery';
+import * as archives from './archives';
 import * as audio from './audio';
 import * as button from './button';
 import * as categories from './categories';
@@ -56,6 +57,7 @@ export const registerCoreBlocks = () => {
 
 		// Register all remaining core blocks.
 		shortcode,
+		archives,
 		audio,
 		button,
 		categories,
