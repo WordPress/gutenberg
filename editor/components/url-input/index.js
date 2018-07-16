@@ -11,7 +11,7 @@ import { stringify } from 'querystringify';
  */
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { Component, Fragment } from '@wordpress/element';
-import { decodeEntities } from '@wordpress/utils';
+import { decodeEntities } from '@wordpress/entities';
 import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 import { Spinner, withSpokenMessages, Popover } from '@wordpress/components';
 import apiRequest from '@wordpress/api-request';

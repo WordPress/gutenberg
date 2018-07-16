@@ -10,7 +10,7 @@ import { get } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { decodeEntities } from '@wordpress/utils';
+import { decodeEntities } from '@wordpress/entities';
 import { ENTER } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { KeyboardShortcuts, withFocusOutside } from '@wordpress/components';

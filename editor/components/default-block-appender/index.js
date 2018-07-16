@@ -10,7 +10,7 @@ import { get } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
 import { getDefaultBlockName } from '@wordpress/blocks';
-import { decodeEntities } from '@wordpress/utils';
+import { decodeEntities } from '@wordpress/entities';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { DotTip } from '@wordpress/nux';
 
