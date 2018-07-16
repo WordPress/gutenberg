@@ -56,11 +56,103 @@ const getGalleryDetailsMediaFrame = () => {
 	} );
 };
 
+const getPlaylistDetailsMediaFrame = () => {
+	/**
+	 * Custom Playlist details frame.
+	 *
+	 * @link https://github.com/xwp/wp-core-media-widgets/blob/905edbccfc2a623b73a93dac803c5335519d7837/wp-admin/js/widgets/media-gallery-widget.js
+	 * @class PlaylistDetailsMediaFrame
+	 * @constructor
+	 */
+	return wp.media.view.MediaFrame.Post.extend( {
+
+		/**
+		 * Create the default states.
+		 *
+		 * @return {void}
+		 */
+		createStates: function createStates() {
+			this.states.add( [
+				new wp.media.controller.Library( {
+					id: 'playlist',
+					title: wp.media.view.l10n.createPlaylistTitle,
+					priority: 60,
+					toolbar: 'main-playlist',
+					filterable: 'uploaded',
+					multiple: 'add',
+					editable: false,
+
+					library: wp.media.query( _.defaults( {
+						type: 'audio',
+					}, this.options.library ) ),
+				} ),
+
+				new wp.media.controller.CollectionEdit( {
+					type: 'audio',
+					collectionType: 'playlist',
+					title: wp.media.view.l10n.editPlaylistTitle,
+					library: this.options.selection,
+					SettingsView: wp.media.view.Settings.Playlist,
+					editing: this.options.editing,
+					menu: 'playlist',
+					dragInfoText: wp.media.view.l10n.playlistDragInfo,
+					dragInfo: true,
+				} ),
+
+				new wp.media.controller.CollectionAdd( {
+					type: 'audio',
+					collectionType: 'playlist',
+					title: wp.media.view.l10n.addToPlaylistTitle,
+				} ),
+
+				new wp.media.controller.Library( {
+					id: 'video-playlist',
+					title: wp.media.view.l10n.createVideoPlaylistTitle,
+					priority: 60,
+					toolbar: 'main-video-playlist',
+					filterable: 'uploaded',
+					multiple: 'add',
+					editable: false,
+
+					library: wp.media.query( _.defaults( {
+						type: 'video',
+					}, this.options.library ) ),
+				} ),
+
+				new wp.media.controller.CollectionEdit( {
+					type: 'video',
+					collectionType: 'playlist',
+					title: wp.media.view.l10n.editVideoPlaylistTitle,
+					library: this.options.selection,
+					editing: this.options.editing,
+					SettingsView: wp.media.view.Settings.Playlist,
+					menu: 'video-playlist',
+					dragInfoText: wp.media.view.l10n.videoPlaylistDragInfo,
+					dragInfo: false,
+				} ),
+
+				new wp.media.controller.CollectionAdd( {
+					type: 'video',
+					collectionType: 'playlist',
+					title: wp.media.view.l10n.addToVideoPlaylistTitle,
+				} ),
+
+			] );
+		},
+	} );
+};
+
 // the media library image object contains numerous attributes
 // we only need this set to display the image in the library
 const slimImageObject = ( img ) => {
-	const attrSet = [ 'sizes', 'mime', 'type', 'subtype', 'id', 'url', 'alt', 'link', 'caption' ];
-	return pick( img, attrSet );
+	const attributeSet = [ 'sizes', 'mime', 'type', 'subtype', 'id', 'url', 'alt', 'link', 'caption' ];
+	return pick( img, attributeSet );
+};
+
+// the playlist object contains attributes required for render. These will be used for playlist
+const slimPlaylistItemObject = ( playlistMedia ) => {
+	const attributeSet = [ 'sizes', 'mime', 'type', 'subtype', 'id', 'url', 'link', 'caption', 'album', 'artist', 'image', 'title' ];
+	return pick( playlistMedia, attributeSet );
 };
 
 const getAttachmentsCollection = ( ids ) => {
@@ -75,7 +167,7 @@ const getAttachmentsCollection = ( ids ) => {
 };
 
 class MediaUpload extends Component {
-	constructor( { multiple = false, type, gallery = false, title = __( 'Select or Upload Media' ), modalClass, value } ) {
+	constructor( { multiple = false, type, gallery = false, playlist = false, title = __( 'Select or Upload Media' ), modalClass, value } ) {
 		super( ...arguments );
 		this.openModal = this.openModal.bind( this );
 		this.onOpen = this.onOpen.bind( this );
@@ -115,6 +207,24 @@ class MediaUpload extends Component {
 			this.frame = wp.media( frameConfig );
 		}
 
+		if ( playlist ) {
+			const PlaylistDetailsMediaFrame = getPlaylistDetailsMediaFrame();
+			if ( type === 'video' ) {
+				this.frame = new PlaylistDetailsMediaFrame( {
+					frame: 'select',
+					mimeType: 'video',
+					state: 'video-playlist',
+				} );
+			} else {
+				this.frame = new PlaylistDetailsMediaFrame( {
+					frame: 'select',
+					mimeType: 'audio',
+					state: 'playlist',
+				} );
+			}
+			wp.media.frame = this.frame;
+		}
+
 		if ( modalClass ) {
 			this.frame.$el.addClass( modalClass );
 		}
@@ -131,7 +241,7 @@ class MediaUpload extends Component {
 	}
 
 	onUpdate( selections ) {
-		const { onSelect, multiple = false } = this.props;
+		const { onSelect, multiple = false, playlist = false } = this.props;
 		const state = this.frame.state();
 		const selectedImages = selections || state.get( 'selection' );
 
@@ -139,7 +249,9 @@ class MediaUpload extends Component {
 			return;
 		}
 
-		if ( multiple ) {
+		if ( playlist ) {
+			onSelect( selectedImages.models.map( ( model ) => slimPlaylistItemObject( model.toJSON() ) ) );
+		} else if ( multiple ) {
 			onSelect( selectedImages.models.map( ( model ) => this.processMediaCaption( slimImageObject( model.toJSON() ) ) ) );
 		} else {
 			onSelect( this.processMediaCaption( slimImageObject( ( selectedImages.models[ 0 ].toJSON() ) ) ) );
@@ -197,4 +309,3 @@ class MediaUpload extends Component {
 }
 
 export default MediaUpload;
-

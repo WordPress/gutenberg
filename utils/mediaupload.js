@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { compact, flatMap, forEach, get, has, includes, map, noop, startsWith } from 'lodash';
+import { compact, flatMap, forEach, get, has, includes, map, noop, startsWith, castArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -70,7 +70,8 @@ export function mediaUpload( {
 
 	// Allowed type specified by consumer
 	const isAllowedType = ( fileType ) => {
-		return ( allowedType === '*' ) || startsWith( fileType, `${ allowedType }/` );
+		allowedType = [].concat( allowedType );
+		return castArray( allowedType ).some( ( type ) => startsWith( fileType, `${ type }/` ) );
 	};
 
 	// Allowed types for the current WP_User
@@ -120,6 +121,7 @@ export function mediaUpload( {
 					caption: get( savedMedia, [ 'caption', 'raw' ], '' ),
 					id: savedMedia.id,
 					link: savedMedia.link,
+					mimeType: savedMedia.mime_type,
 					title: savedMedia.title.raw,
 					url: savedMedia.source_url,
 					mediaDetails: {},
