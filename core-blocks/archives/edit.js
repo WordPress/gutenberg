@@ -19,7 +19,7 @@ import {
 	BlockControls,
 } from '@wordpress/editor';
 
-class ArchivesBlock extends Component {
+class ArchivesEdit extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -82,4 +82,4 @@ class ArchivesBlock extends Component {
 	}
 }
 
-export default ArchivesBlock;
+export default ArchivesEdit;

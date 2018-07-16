@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import ArchivesBlock from './block';
+import edit from './edit';
 export const name = 'core/archives';
 
 export const settings = {
@@ -29,7 +29,7 @@ export const settings = {
 		}
 	},
 
-	edit: ArchivesBlock,
+	edit,
 
 	save() {
 		// Handled by PHP.
