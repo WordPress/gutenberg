@@ -7,7 +7,6 @@ import { map } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Fragment } from '@wordpress/element';
 import {
 	RichText,
 } from '@wordpress/editor';
@@ -62,35 +61,33 @@ export const settings = {
 		const { value, citation } = attributes;
 
 		return (
-			<Fragment>
-				<blockquote className={ className }>
+			<blockquote className={ className }>
+				<RichText
+					multiline="p"
+					value={ toRichTextValue( value ) }
+					onChange={
+						( nextValue ) => setAttributes( {
+							value: fromRichTextValue( nextValue ),
+						} )
+					}
+					/* translators: the text of the quotation */
+					placeholder={ __( 'Write quote…' ) }
+					wrapperClassName="core-blocks-pullquote__content"
+				/>
+				{ ( citation || isSelected ) && (
 					<RichText
-						multiline="p"
-						value={ toRichTextValue( value ) }
+						tagName="cite"
+						value={ citation }
+						/* translators: the individual or entity quoted */
+						placeholder={ __( 'Write citation…' ) }
 						onChange={
-							( nextValue ) => setAttributes( {
-								value: fromRichTextValue( nextValue ),
+							( nextCitation ) => setAttributes( {
+								citation: nextCitation,
 							} )
 						}
-						/* translators: the text of the quotation */
-						placeholder={ __( 'Write quote…' ) }
-						wrapperClassName="core-blocks-pullquote__content"
 					/>
-					{ ( citation || isSelected ) && (
-						<RichText
-							tagName="cite"
-							value={ citation }
-							/* translators: the individual or entity quoted */
-							placeholder={ __( 'Write citation…' ) }
-							onChange={
-								( nextCitation ) => setAttributes( {
-									citation: nextCitation,
-								} )
-							}
-						/>
-					) }
-				</blockquote>
-			</Fragment>
+				) }
+			</blockquote>
 		);
 	},
 
@@ -113,13 +110,17 @@ export const settings = {
 				source: 'children',
 				selector: 'footer',
 			},
+			align: {
+				type: 'string',
+				default: 'none',
+			},
 		},
 
 		save( { attributes } ) {
-			const { value, citation } = attributes;
+			const { value, citation, align } = attributes;
 
 			return (
-				<blockquote>
+				<blockquote className={ `align${ align }` }>
 					<RichText.Content value={ toRichTextValue( value ) } />
 					{ citation && citation.length > 0 && <RichText.Content tagName="footer" value={ citation } /> }
 				</blockquote>

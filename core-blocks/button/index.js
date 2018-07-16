@@ -72,6 +72,12 @@ export const settings = {
 
 	attributes: blockAttributes,
 
+	getEditWrapperProps() {
+		const props = { 'data-resized': true };
+
+		return props;
+	},
+
 	supports: {
 		align: true,
 	},
@@ -127,10 +133,14 @@ export const settings = {
 			textColor: {
 				type: 'string',
 			},
+			align: {
+				type: 'string',
+				default: 'none',
+			},
 		},
 
 		save( { attributes } ) {
-			const { url, text, title, color, textColor } = attributes;
+			const { url, text, title, align, color, textColor } = attributes;
 
 			const buttonStyle = {
 				backgroundColor: color,
@@ -140,7 +150,7 @@ export const settings = {
 			const linkClass = 'wp-block-button__link';
 
 			return (
-				<div>
+				<div className={ `align${ align }` }>
 					<RichText.Content
 						tagName="a"
 						className={ linkClass }
@@ -163,13 +173,17 @@ export const settings = {
 			textColor: {
 				type: 'string',
 			},
+			align: {
+				type: 'string',
+				default: 'none',
+			},
 		},
 
 		save( { attributes } ) {
-			const { url, text, title, color, textColor } = attributes;
+			const { url, text, title, align, color, textColor } = attributes;
 
 			return (
-				<div style={ { backgroundColor: color } }>
+				<div className={ `align${ align }` } style={ { backgroundColor: color } }>
 					<RichText.Content
 						tagName="a"
 						href={ url }

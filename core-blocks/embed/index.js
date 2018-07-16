@@ -180,12 +180,10 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 
 				if ( fetching ) {
 					return (
-						<Fragment>
-							<div className="wp-block-embed is-loading">
-								<Spinner />
-								<p>{ __( 'Embedding…' ) }</p>
-							</div>
-						</Fragment>
+						<div className="wp-block-embed is-loading">
+							<Spinner />
+							<p>{ __( 'Embedding…' ) }</p>
+						</div>
 					);
 				}
 
@@ -193,25 +191,23 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 					const label = sprintf( __( '%s URL' ), title );
 
 					return (
-						<Fragment>
-							<Placeholder icon={ icon } label={ label } className="wp-block-embed">
-								<form onSubmit={ this.doServerSideRender }>
-									<input
-										type="url"
-										value={ url || '' }
-										className="components-placeholder__input"
-										aria-label={ label }
-										placeholder={ __( 'Enter URL to embed here…' ) }
-										onChange={ ( event ) => setAttributes( { url: event.target.value } ) } />
-									<Button
-										isLarge
-										type="submit">
-										{ __( 'Embed' ) }
-									</Button>
-									{ error && <p className="components-placeholder__error">{ __( 'Sorry, we could not embed that content.' ) }</p> }
-								</form>
-							</Placeholder>
-						</Fragment>
+						<Placeholder icon={ icon } label={ label } className="wp-block-embed">
+							<form onSubmit={ this.doServerSideRender }>
+								<input
+									type="url"
+									value={ url || '' }
+									className="components-placeholder__input"
+									aria-label={ label }
+									placeholder={ __( 'Enter URL to embed here…' ) }
+									onChange={ ( event ) => setAttributes( { url: event.target.value } ) } />
+								<Button
+									isLarge
+									type="submit">
+									{ __( 'Embed' ) }
+								</Button>
+								{ error && <p className="components-placeholder__error">{ __( 'Sorry, we could not embed that content.' ) }</p> }
+							</form>
+						</Placeholder>
 					);
 				}
 

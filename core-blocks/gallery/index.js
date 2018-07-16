@@ -196,12 +196,16 @@ export const settings = {
 					...blockAttributes.images,
 					selector: 'div.wp-block-gallery figure.blocks-gallery-image img',
 				},
+				align: {
+					type: 'string',
+					default: 'none',
+				},
 			},
 
 			save( { attributes } ) {
-				const { images, columns = defaultColumnsNumber( attributes ), imageCrop, linkTo } = attributes;
+				const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
 				return (
-					<div className={ `columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
+					<div className={ `align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
 						{ images.map( ( image ) => {
 							let href;
 
