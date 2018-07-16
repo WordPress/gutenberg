@@ -1,14 +1,7 @@
-/* eslint-disable no-console */
-
 /**
  * Internal dependencies
  */
 import { mediaUpload, getMimeTypesArray } from '../mediaupload';
-
-// mediaUpload is passed the onImagesChange function
-// so we can stub that out have it pass the data to
-// console.error to check if proper thing is called
-const onFileChange = ( obj ) => console.error( obj );
 
 const invalidMediaObj = {
 	url: 'https://cldup.com/uuUqE_dXzy.jpg',
@@ -23,26 +16,16 @@ const validMediaObj = {
 };
 
 describe( 'mediaUpload', () => {
-	const originalConsoleError = console.error;
-	const originalGetUserSetting = window.getUserSetting;
-
-	beforeEach( () => {
-		console.error = jest.fn();
-	} );
-
-	afterEach( () => {
-		console.error = originalConsoleError;
-		window.getUserSetting = originalGetUserSetting;
-	} );
+	const onFileChangeSpy = jest.fn();
 
 	it( 'should do nothing on no files', () => {
-		mediaUpload( { filesList: [ ], onFileChange, allowedType: 'image' } );
-		expect( console.error ).not.toHaveBeenCalled();
+		mediaUpload( { filesList: [ ], onFileChange: onFileChangeSpy, allowedType: 'image' } );
+		expect( onFileChangeSpy ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should do nothing on invalid image type', () => {
-		mediaUpload( { filesList: [ invalidMediaObj ], onFileChange, allowedType: 'image' } );
-		expect( console.error ).not.toHaveBeenCalled();
+		mediaUpload( { filesList: [ invalidMediaObj ], onFileChange: onFileChangeSpy, allowedType: 'image' } );
+		expect( onFileChangeSpy ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should call error handler with the correct error object if file size is greater than the maximum', () => {
@@ -50,7 +33,7 @@ describe( 'mediaUpload', () => {
 		mediaUpload( {
 			allowedType: 'image',
 			filesList: [ validMediaObj ],
-			onFileChange,
+			onFileChange: onFileChangeSpy,
 			maxUploadFileSize: 512,
 			onError,
 		} );
@@ -69,7 +52,7 @@ describe( 'mediaUpload', () => {
 		mediaUpload( {
 			allowedType: 'image',
 			filesList: [ validMediaObj ],
-			onFileChange,
+			onFileChange: onFileChangeSpy,
 			onError,
 		} );
 		expect( onError ).toBeCalledWith( {
