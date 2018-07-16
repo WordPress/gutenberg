@@ -93,7 +93,6 @@ const items = [
 
 const DEFAULT_PROPS = {
 	position: 'top center',
-	instanceID: 1,
 	items: items,
 	debouncedSpeak: noop,
 	fetchSharedBlocks: noop,
