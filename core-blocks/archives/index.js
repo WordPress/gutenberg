@@ -18,8 +18,6 @@ export const settings = {
 
 	category: 'widgets',
 
-	keywords: [ __( 'archives' ) ],
-
 	supports: {
 		html: false,
 	},
