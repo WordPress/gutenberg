@@ -141,7 +141,6 @@ const entryPointNames = [
 	'components',
 	'editor',
 	'utils',
-	'viewport',
 	'edit-post',
 	'core-blocks',
 	'nux',
@@ -165,6 +164,7 @@ const gutenbergPackages = [
 	'keycodes',
 	'plugins',
 	'shortcode',
+	'viewport',
 ];
 
 const externals = {
