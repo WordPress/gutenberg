@@ -54,8 +54,8 @@ describe( 'Shared Blocks', () => {
 		);
 
 		// Select all of the text in the title field by triple-clicking on it. We
-		// triple-click because, on Mac, Mod+A doesn't work. This should be
-		// unnecessary when [TODO: create issue] is fixed
+		// triple-click because, on Mac, Mod+A doesn't work. This step can be removed
+		// when https://github.com/WordPress/gutenberg/issues/7972 is fixed
 		await page.click( '.shared-block-edit-panel__title', { clickCount: 3 } );
 
 		// Give the shared block a title
