@@ -10,8 +10,12 @@ import { stringify } from 'querystringify';
 import { __ } from '@wordpress/i18n';
 import { TreeSelect, withAPIData } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
-import { buildTermsTree } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { buildTermsTree } from '../../utils/terms';
 
 export function PageAttributesParent( { parent, postType, items, onUpdateParent } ) {
 	const isHierarchical = get( postType, [ 'hierarchical' ], false );

@@ -10,6 +10,7 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
  - `wp.element.pure` has been removed. Please use `wp.compose.pure` instead.
  - `wp.element.compose` has been removed. Please use `wp.compose.compose` instead.
  - `wp.element.createHigherOrderComponent` has been removed. Please use `wp.compose.createHigherOrderComponent` instead.
+ - `wp.utils.buildTermsTree` has been removed.
 
 ## 3.4.0
 
