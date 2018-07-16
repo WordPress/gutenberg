@@ -1,5 +1,5 @@
 module.exports = [
-	require( '@wordpress/postcss-themes' )( {
+	require( '../../packages/postcss-themes/src/index' )( {
 		defaults: {
 			primary: '#0085ba',
 			secondary: '#11a0d2',
