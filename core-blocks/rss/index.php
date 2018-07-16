@@ -23,7 +23,7 @@ function render_rss_error_message( $message ) {
  *
  * @param array $attributes The block attributes.
  *
- * @return string Returns the post content with received rss posts.
+ * @return string Returns the block content with received rss items.
  */
 function render_block_core_rss( $attributes ) {
 
@@ -54,7 +54,7 @@ function render_block_core_rss( $attributes ) {
 		return render_rss_error_message( __( 'An error has occurred, which probably means the feed is down. Try again later.', 'gutenberg' ) );
 	}
 
-	$items = (int) $attributes['postsToShow'];
+	$items = (int) $attributes['itemsToShow'];
 	if ( $items < 1 || 10 < $items ) {
 		$items = 5;
 	}
@@ -85,7 +85,7 @@ function render_block_core_rss( $attributes ) {
 
 			if ( $date ) {
 				$date = sprintf(
-					'<time datetime="%1$s" class="wp-block-rss__item-post-date">%2$s</time>',
+					'<time datetime="%1$s" class="wp-block-rss__item-publish-date">%2$s</time>',
 					date_i18n( get_option( 'c' ), $date ),
 					date_i18n( get_option( 'date_format' ), $date )
 				);
@@ -117,8 +117,8 @@ function render_block_core_rss( $attributes ) {
 		$list_items .= "<li class='wp-block-rss__item'>{$title}{$date}{$author}{$excerpt}</li>";
 	}
 
-	$columns_class = 'grid' === $attributes['postLayout'] ? 'columns-' . $attributes['columns'] . ' ' : '';
-	$is_grid       = 'grid' === $attributes['postLayout'] ? 'is-grid' : '';
+	$columns_class = 'grid' === $attributes['blockLayout'] ? 'columns-' . $attributes['columns'] . ' ' : '';
+	$is_grid       = 'grid' === $attributes['blockLayout'] ? 'is-grid' : '';
 
 	$list_items_markup = "<ul class='wp-block-rss {$columns_class}{$is_grid}'>{$list_items}</ul>";
 
@@ -137,14 +137,14 @@ function register_block_core_rss() {
 				'type'    => 'number',
 				'default' => 2,
 			),
-			'postLayout'     => array(
+			'blockLayout'     => array(
 				'type'    => 'string',
 				'default' => 'list',
 			),
 			'feedURL'        => array(
 				'type' => 'string',
 			),
-			'postsToShow'    => array(
+			'itemsToShow'    => array(
 				'type'    => 'number',
 				'default' => 5,
 			),

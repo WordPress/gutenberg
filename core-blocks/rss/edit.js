@@ -64,8 +64,8 @@ class RSSEdit extends Component {
 			displayDate,
 			excerptLength,
 			feedURL,
-			postLayout,
-			postsToShow,
+			blockLayout,
+			itemsToShow,
 		} = this.props.attributes;
 		const { setAttributes } = this.props;
 
@@ -96,14 +96,14 @@ class RSSEdit extends Component {
 			{
 				icon: 'list-view',
 				title: __( 'List View' ),
-				onClick: () => setAttributes( { postLayout: 'list' } ),
-				isActive: postLayout === 'list',
+				onClick: () => setAttributes( { blockLayout: 'list' } ),
+				isActive: blockLayout === 'list',
 			},
 			{
 				icon: 'grid-view',
 				title: __( 'Grid View' ),
-				onClick: () => setAttributes( { postLayout: 'grid' } ),
-				isActive: postLayout === 'grid',
+				onClick: () => setAttributes( { blockLayout: 'grid' } ),
+				isActive: blockLayout === 'grid',
 			},
 		];
 
@@ -124,8 +124,8 @@ class RSSEdit extends Component {
 					<PanelBody title={ __( 'RSS Settings' ) }>
 						<RangeControl
 							label={ __( 'Number of items' ) }
-							value={ postsToShow }
-							onChange={ ( value ) => setAttributes( { postsToShow: value } ) }
+							value={ itemsToShow }
+							onChange={ ( value ) => setAttributes( { itemsToShow: value } ) }
 							min={ DEFAULT_MIN_ITEMS }
 							max={ DEFAULT_MAX_ITEMS }
 						/>
@@ -154,7 +154,7 @@ class RSSEdit extends Component {
 								step={ 5 }
 							/>
 						}
-						{ postLayout === 'grid' &&
+						{ blockLayout === 'grid' &&
 							<RangeControl
 								label={ __( 'Columns' ) }
 								value={ columns }
