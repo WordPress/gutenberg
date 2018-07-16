@@ -1,10 +1,23 @@
 # Mobile Gutenberg
 
-Note: The project is at an early stage project, it's not yet ready for integration.
+Note: The project is at an early stage phase, it's not yet ready for integration.
 
-This is the mobile version of Gutenberg, targeting Android and iOS. It's a React Native library bootstrapped by CRNA.
+This is the mobile version of Gutenberg, targeting Android and iOS. It's a React Native library bootstrapped by CRNA and now ejected.
 
 ## Getting Started
+
+### Prerequisities
+
+For a developer experience closer to the one the project maintainers current have, make sure you have the following tools installed:
+
+* git
+* [nvm](https://github.com/creationix/nvm)
+* Node.js and npm (use nvm to install them)
+* yarn (`npm install -g yarn`)
+* [AndroidStudio](https://developer.android.com/studio/) to be able to compile the Android version of the app
+* [Xcode](https://developer.apple.com/xcode/) to be able to compile the iOS app
+
+Note that the OS platform used by the maintainers is macOS but the tools and setup should be usable in other platforms too.
 
 ### Clone the project
 
@@ -13,91 +26,97 @@ This is the mobile version of Gutenberg, targeting Android and iOS. It's a React
 $ git clone --recurse-submodules https://github.com/automattic/gutenberg-mobile
 ```
 
-* Or if you already have the project cloned, init the `gutenberg` submodule:
+* Or if you already have the project cloned, initialize and update the submodules:
 ```
-$ cd gutenberg
 $ git submodule init
 $ git submodule update
 ```
 
-### Set up
+## Set up
 
 Before running the demo app, you need to download and install the project dependencies. This is done via the following command:
 
 ```
-npm install
+yarn install
 ```
 
 ## Run
 
 Note: the most recent and complete version of this guide is available [here](https://github.com/react-community/create-react-native-app/blob/master/react-native-scripts/template/README.md).
 
-### `npm start`
-
-Runs your app in development mode.
-
-Open it in the [Expo app](https://expo.io) on your phone to view it. It will reload if you save edits to your files, and you will see build errors and logs in the terminal.
-
-Sometimes you may need to reset or clear the React Native packager's cache. To do so, you can pass the `--reset-cache` flag to the start script:
-
 ```
-npm start -- --reset-cache
+yarn start
 ```
 
-#### `npm test`
+Runs the packager (Metro) in development mode. The packager stays running to serve the app bundle to the clients that request it.
 
-Runs the [jest](https://github.com/facebook/jest) test runner on your tests.
+With the packager running, open another terminal window and use the following command to compile and run the Android app:
 
-To run `jest` with debugger support, start it with the following CLI command:
 ```
-NODE_ENV=test node --inspect-brk node_modules/.bin/jest --runInBand
+yarn android
 ```
 
-Append `--config <jest config json file>` to specify a config file other than the default.
+The app should now open in a connected device or a running emulator and fetch the JavaScript code from the running packager.
+
+To compile and run the iOS variant of the app, use:
+
+```
+yarn ios
+```
+
+which will attempt to open your app in the iOS Simulator if you're on a Mac and have it installed.
+
+### When things seem crazy
+
+Some times, and especially when tweaking anything in the `package.json`, Babel configuration (`.babelrc`) or the Jest configuration (`jest.config.js`), your changes might seem to not take effect as expected. On those times, you might need to clean various caches before starting the packager. To do that, run the script: `yarn start:reset`. Other times, you might want to reinstall the NPM packages from scratch and the `yarn clean:install` script can be handy.
+
+## Test
+
+Use the following command to run the test suite:
+
+```
+yarn test
+```
+
+It will run the [jest](https://github.com/facebook/jest) test runner on your tests. The tests are running on the desktop against Node.js.
+
+To run the tests with debugger support, start it with the following CLI command:
+
+```
+yarn test:debug
+```
 
 Then, open `chrome://inspect` in Chrome to attach the debugger (look into the "Remote Target" section). While testing/developing, feel free to springle `debugger` statements anywhere in the code that you'd like the debugger to break.
 
-#### `npm run ios`
-
-Like `npm start`, but also attempts to open your app in the iOS Simulator if you're on a Mac and have it installed.
-
-#### `npm run android`
-
-Like `npm start`, but also attempts to open your app on a connected Android device or emulator. Requires an installation of Android build tools (see [React Native docs](https://facebook.github.io/react-native/docs/getting-started.html) for detailed setup). We also recommend installing Genymotion as your Android emulator. Once you've finished setting up the native build environment, there are two options for making the right copy of `adb` available to Create React Native App:
-
-#### `npm run flow`
-
-Flow is a static type checker for JavaScript code. Flow checks JavaScript code for errors through static type annotations. These types allow you to tell Flow how you want your code to work, and Flow will make sure it does work that way.
-
 ## Writing and Running Tests
 
-This project is set up to use [jest](https://facebook.github.io/jest/) for tests. You can configure whatever testing strategy you like, but jest works out of the box. Create test files in directories called `__tests__` or with the `.test` extension to have the files loaded by jest. See the [the template project](https://github.com/react-community/create-react-native-app/blob/master/react-native-scripts/template/App.test.js) for an example test. The [jest documentation](https://facebook.github.io/jest/docs/en/getting-started.html) is also a wonderful resource, as is the [React Native testing tutorial](https://facebook.github.io/jest/docs/en/tutorial-react-native.html).
+This project is set up to use [jest](https://facebook.github.io/jest/) for tests. You can configure whatever testing strategy you like, but jest works out of the box. Create test files in directories called `__tests__` or with the `.test.js` extension to have the files loaded by jest. See the [the template project](https://github.com/react-community/create-react-native-app/blob/master/react-native-scripts/template/App.test.js) for an example test. The [jest documentation](https://facebook.github.io/jest/docs/en/getting-started.html) is also a wonderful resource, as is the [React Native testing tutorial](https://facebook.github.io/jest/docs/en/tutorial-react-native.html).
 
 
-## Code style
+## Static analysis and code style
 
-Run the style checker with this command that lists the files having at least one style violation:
-```
-$ npm run prettier:check
-```
+The project includes a linter (`eslint`) to perform codestyle and static analysis of the code. The configuration used it the same as [the one in the Gutenerg project](https://github.com/WordPress/gutenberg/blob/master/eslint/config.js). To perform the check, run:
 
-Fix style violations:
 ```
-$ npm run prettier
+yarn lint
 ```
 
-## Linter
+To have the linter also _fix_ the violations run: `yarn lint:fix`.
 
-Note: our linter configuration does some style checking as well. Run the linter to list errors and warnings:
+In parallel to `eslint` the project uses `Prettier` for codestyling. Run:
+
 ```
-$ npm run lint
+yarn prettier
+```
+to enforce the style. This will modify the source files to make them comform to the rules.
+
+`Flow` is used as a static type checker for JavaScript code. Flow checks JavaScript code for errors through static type annotations. These types allow you to tell Flow how you want your code to work, and Flow will make sure it does work that way. To perform the check run:
+
+```
+yarn flow
 ```
 
-It's capable of fixing _some_ of the lint warnings and errors:
-```
-$ npm run lint:fix
-```
-
+You might want to use Visual Studio Code as an editor. The project includes the configuration needed to use the above codestyle and lint tools automatically.
 
 ## License
 
