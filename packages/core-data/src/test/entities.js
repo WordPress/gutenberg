@@ -80,7 +80,7 @@ describe( 'getKindEntities', () => {
 		const fulfillment = getKindEntities( state, 'postType' );
 		const received = ( await fulfillment.next() ).value;
 		expect( received ).toEqual( addEntities( [ {
-			baseUrl: '/wp/v2/posts',
+			baseURL: '/wp/v2/posts',
 			kind: 'postType',
 			name: 'post',
 		} ] ) );

@@ -50,7 +50,7 @@ export async function* getEntityRecord( state, kind, name, key ) {
 	if ( ! entity ) {
 		return;
 	}
-	const record = await apiRequest( { path: `${ entity.baseUrl }/${ key }?context=edit` } );
+	const record = await apiRequest( { path: `${ entity.baseURL }/${ key }?context=edit` } );
 	yield receiveEntityRecords( kind, name, record );
 }
 
@@ -67,7 +67,7 @@ export async function* getEntityRecords( state, kind, name ) {
 	if ( ! entity ) {
 		return;
 	}
-	const records = await apiRequest( { path: `${ entity.baseUrl }?context=edit` } );
+	const records = await apiRequest( { path: `${ entity.baseURL }?context=edit` } );
 	yield receiveEntityRecords( kind, name, Object.values( records ) );
 }
 

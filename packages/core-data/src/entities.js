@@ -15,9 +15,9 @@ import { getEntitiesByKind } from './selectors';
 import { addEntities } from './actions';
 
 export const defaultEntities = [
-	{ name: 'postType', kind: 'root', key: 'slug', baseUrl: '/wp/v2/types' },
-	{ name: 'media', kind: 'root', baseUrl: '/wp/v2/media', plural: 'mediaItems' },
-	{ name: 'taxonomy', kind: 'root', key: 'slug', baseUrl: '/wp/v2/taxonomies', plural: 'taxonomies' },
+	{ name: 'postType', kind: 'root', key: 'slug', baseURL: '/wp/v2/types' },
+	{ name: 'media', kind: 'root', baseURL: '/wp/v2/media', plural: 'mediaItems' },
+	{ name: 'taxonomy', kind: 'root', key: 'slug', baseURL: '/wp/v2/taxonomies', plural: 'taxonomies' },
 ];
 
 export const kinds = [
@@ -34,7 +34,7 @@ async function loadPostTypeEntities() {
 	return map( postTypes, ( postType, name ) => {
 		return {
 			kind: 'postType',
-			baseUrl: '/wp/v2/' + postType.rest_base,
+			baseURL: '/wp/v2/' + postType.rest_base,
 			name,
 		};
 	} );
