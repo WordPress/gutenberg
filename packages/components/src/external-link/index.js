@@ -32,7 +32,7 @@ export function ExternalLink( { href, children, className, rel = '', ...addition
 					__( '(opens in a new window)' )
 				}
 			</span>
-			<Dashicon icon="external" />
+			<Dashicon icon="external" className="components-external-link__icon" />
 		</a>
 	);
 }
