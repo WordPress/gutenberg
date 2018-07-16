@@ -50,12 +50,12 @@ class ArchivesBlock extends Component {
 			<InspectorControls key="inspector">
 				<PanelBody title={ __( 'Archives Settings' ) }>
 					<ToggleControl
-						label={ __( 'Show post counts' ) }
+						label={ __( 'Show Post Counts' ) }
 						checked={ showPostCounts }
 						onChange={ this.toggleShowPostCounts }
 					/>
 					<ToggleControl
-						label={ __( 'Display as dropdown' ) }
+						label={ __( 'Display as Dropdown' ) }
 						checked={ displayAsDropdown }
 						onChange={ this.toggleDisplayAsDropdown }
 					/>
