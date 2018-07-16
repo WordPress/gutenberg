@@ -24,7 +24,7 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 
 	return (
 		<Fragment>
-			<InspectorControls key="inspector">
+			<InspectorControls>
 				<PanelBody title={ __( 'Archives Settings' ) }>
 					<ToggleControl
 						label={ __( 'Show Post Counts' ) }
@@ -38,7 +38,7 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<BlockControls key="controls">
+			<BlockControls>
 				<BlockAlignmentToolbar
 					value={ align }
 					onChange={ ( nextAlign ) => {
@@ -48,7 +48,7 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 				/>
 			</BlockControls>
 			<Disabled>
-				<ServerSideRender key="archives" block="core/archives" attributes={ attributes } />
+				<ServerSideRender block="core/archives" attributes={ attributes } />
 			</Disabled>
 		</Fragment>
 	);
