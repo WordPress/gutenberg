@@ -9,8 +9,8 @@ import classnames from 'classnames';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { ClipboardButton, Button } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
+import { ClipboardButton, Button, ExternalLink } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -79,7 +79,7 @@ class PostPermalink extends Component {
 				<span className="editor-post-permalink__label">{ __( 'Permalink:' ) }</span>
 
 				{ ! isEditingPermalink &&
-					<Button
+					<ExternalLink
 						className="editor-post-permalink__link"
 						href={ ! isPublished ? postLink : samplePermalink }
 						target="_blank"
@@ -87,7 +87,7 @@ class PostPermalink extends Component {
 					>
 						{ decodeURI( samplePermalink ) }
 						&lrm;
-					</Button>
+					</ExternalLink>
 				}
 
 				{ isEditingPermalink &&
