@@ -57,6 +57,7 @@ class GalleryEdit extends Component {
 		this.setImageAttributes = this.setImageAttributes.bind( this );
 		this.addFiles = this.addFiles.bind( this );
 		this.uploadFromFiles = this.uploadFromFiles.bind( this );
+		this.onSortEnd = this.onSortEnd.bind( this );
 
 		this.state = {
 			selectedImage: null,
@@ -153,6 +154,10 @@ class GalleryEdit extends Component {
 		}
 	}
 
+	onSortEnd( images ) {
+		this.props.setAttributes( { images } );
+	}
+
 	render() {
 		const { attributes, isSelected, className, noticeOperations, noticeUI } = this.props;
 		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
@@ -238,7 +243,7 @@ class GalleryEdit extends Component {
 				{ noticeUI }
 				<Sortable className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }
 					items={ images }
-					onSortEnd={ ( images ) => this.props.setAttributes( { images } ) }
+					onSortEnd={ this.onSortEnd }
 					dropZone={ dropZone }
 				>
 					{ images.map( ( img, index ) => (
