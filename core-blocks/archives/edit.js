@@ -19,29 +19,25 @@ import {
 	BlockControls,
 } from '@wordpress/editor';
 
-export default function ArchivesEdit( { attributes, isSelected, setAttributes } ) {
+export default function ArchivesEdit( { attributes, setAttributes } ) {
 	const { align, showPostCounts, displayAsDropdown } = attributes;
-
-	const inspectorControls = isSelected && (
-		<InspectorControls key="inspector">
-			<PanelBody title={ __( 'Archives Settings' ) }>
-				<ToggleControl
-					label={ __( 'Show Post Counts' ) }
-					checked={ showPostCounts }
-					onChange={ () => setAttributes( { showPostCounts: ! showPostCounts } ) }
-				/>
-				<ToggleControl
-					label={ __( 'Display as Dropdown' ) }
-					checked={ displayAsDropdown }
-					onChange={ () => setAttributes( { displayAsDropdown: ! displayAsDropdown } ) }
-				/>
-			</PanelBody>
-		</InspectorControls>
-	);
 
 	return (
 		<Fragment>
-			{ inspectorControls }
+			<InspectorControls key="inspector">
+				<PanelBody title={ __( 'Archives Settings' ) }>
+					<ToggleControl
+						label={ __( 'Show Post Counts' ) }
+						checked={ showPostCounts }
+						onChange={ () => setAttributes( { showPostCounts: ! showPostCounts } ) }
+					/>
+					<ToggleControl
+						label={ __( 'Display as Dropdown' ) }
+						checked={ displayAsDropdown }
+						onChange={ () => setAttributes( { displayAsDropdown: ! displayAsDropdown } ) }
+					/>
+				</PanelBody>
+			</InspectorControls>
 			<BlockControls key="controls">
 				<BlockAlignmentToolbar
 					value={ align }
