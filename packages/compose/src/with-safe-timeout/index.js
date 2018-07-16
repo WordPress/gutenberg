@@ -6,7 +6,12 @@ import { without } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent, Component } from '@wordpress/element';
+import { Component } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import createHigherOrderComponent from '../create-higher-order-component';
 
 /**
  * Browser dependencies

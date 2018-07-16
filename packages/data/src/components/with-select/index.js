@@ -1,16 +1,13 @@
 /**
  * WordPress dependencies
  */
-import {
-	Component,
-	createHigherOrderComponent,
-} from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
+import { remountOnPropChange, createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import remountOnPropChange from '../remountOnPropChange';
 import { RegistryConsumer } from '../registry-provider';
 
 /**

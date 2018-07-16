@@ -6,7 +6,7 @@ import TestRenderer from 'react-test-renderer';
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies

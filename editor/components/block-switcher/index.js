@@ -9,9 +9,10 @@ import { castArray, get, some } from 'lodash';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { Dropdown, IconButton, Toolbar, PanelBody } from '@wordpress/components';
 import { getBlockType, getPossibleBlockTransformations, switchToBlockType, hasChildBlocks } from '@wordpress/blocks';
-import { compose, Component, Fragment } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import { DOWN } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies

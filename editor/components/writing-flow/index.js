@@ -6,7 +6,7 @@ import { overEvery, find, findLast, reverse, first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, compose } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import {
 	computeCaretRect,
 	focus,
@@ -19,6 +19,7 @@ import {
 } from '@wordpress/dom';
 import { UP, DOWN, LEFT, RIGHT, isKeyboardEvent } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies

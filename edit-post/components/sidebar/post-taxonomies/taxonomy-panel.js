@@ -6,7 +6,7 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 import { PanelBody } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 

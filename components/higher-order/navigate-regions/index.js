@@ -6,7 +6,8 @@ import classnames from 'classnames';
 /**
  * WordPress Dependencies
  */
-import { Component, createHigherOrderComponent } from '@wordpress/element';
+import { Component } from '@wordpress/element';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal Dependencies

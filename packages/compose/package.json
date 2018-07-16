@@ -1,0 +1,35 @@
+{
+	"name": "@wordpress/compose",
+	"version": "1.0.0-beta.0",
+	"description": "WordPress Higher Order components",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"React",
+		"hoc"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/compose/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"dependencies": {
+		"@wordpress/element": "file:../element",
+		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+		"lodash": "^4.17.10"
+	},
+	"devDependencies": {
+		"enzyme": "^3.3.0",
+		"react-dom": "^16.4.1",
+		"react-test-renderer": "^16.4.1"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

@@ -19,6 +19,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
+		"@wordpress/compose": "file:../compose",
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",
 		"lodash": "^4.17.10"

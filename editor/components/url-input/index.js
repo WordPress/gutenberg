@@ -13,8 +13,9 @@ import { __, sprintf, _n } from '@wordpress/i18n';
 import { Component, Fragment } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/utils';
 import { UP, DOWN, ENTER } from '@wordpress/keycodes';
-import { Spinner, withInstanceId, withSpokenMessages, Popover } from '@wordpress/components';
+import { Spinner, withSpokenMessages, Popover } from '@wordpress/components';
 import apiRequest from '@wordpress/api-request';
+import { withInstanceId } from '@wordpress/compose';
 
 // Since URLInput is rendered in the context of other inputs, but should be
 // considered a separate modal node, prevent keyboard events from propagating

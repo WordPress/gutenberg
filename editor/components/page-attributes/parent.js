@@ -9,7 +9,7 @@ import { stringify } from 'querystringify';
  */
 import { __ } from '@wordpress/i18n';
 import { TreeSelect, withAPIData } from '@wordpress/components';
-import { compose } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 import { buildTermsTree } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';
 

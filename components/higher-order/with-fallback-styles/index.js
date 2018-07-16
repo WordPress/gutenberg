@@ -6,7 +6,8 @@ import { every, isEqual } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createHigherOrderComponent } from '@wordpress/element';
+import { Component } from '@wordpress/element';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 export default ( mapNodeToProps ) => createHigherOrderComponent(
 	( WrappedComponent ) => {

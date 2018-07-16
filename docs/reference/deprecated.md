@@ -1,5 +1,16 @@
 Gutenberg's deprecation policy is intended to support backwards-compatibility for two minor releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
 
+## 3.5.0
+
+ - `wp.components.ifCondition` has been removed. Please use `wp.compose.ifCondition` instead.
+ - `wp.components.withGlobalEvents` has been removed. Please use `wp.compose.withGlobalEvents` instead.
+ - `wp.components.withInstanceId` has been removed. Please use `wp.compose.withInstanceId` instead.
+ - `wp.components.withSafeTimeout` has been removed. Please use `wp.compose.withSafeTimeout` instead.
+ - `wp.components.withState` has been removed. Please use `wp.compose.withState` instead.
+ - `wp.element.pure` has been removed. Please use `wp.compose.pure` instead.
+ - `wp.element.compose` has been removed. Please use `wp.compose.compose` instead.
+ - `wp.element.createHigherOrderComponent` has been removed. Please use `wp.compose.createHigherOrderComponent` instead.
+
 ## 3.4.0
 
  - `focusOnMount` prop in the `Popover` component has been changed from `Boolean`-only to an enum-style property that accepts `"firstElement"`, `"container"`, or `false`. Please convert any `<Popover focusOnMount />` usage to `<Popover focusOnMount="firstElement" />`.

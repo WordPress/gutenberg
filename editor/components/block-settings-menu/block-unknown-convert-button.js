@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { getUnknownTypeHandlerName, rawHandler, serialize } from '@wordpress/blocks';
-import { compose } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 /**

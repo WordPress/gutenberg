@@ -8,12 +8,12 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { BaseControl, Button, Dashicon } from '../';
-import withInstanceId from '../higher-order/with-instance-id';
 import './style.scss';
 
 function RangeControl( {

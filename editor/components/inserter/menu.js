@@ -20,15 +20,14 @@ import scrollIntoView from 'dom-scroll-into-view';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, compose, findDOMNode, createRef } from '@wordpress/element';
+import { Component, findDOMNode, createRef } from '@wordpress/element';
 import {
-	withInstanceId,
 	withSpokenMessages,
 	PanelBody,
-	withSafeTimeout,
 } from '@wordpress/components';
 import { getCategories, isSharedBlock } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
+import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
 
 /**
  * Internal dependencies

@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 
 export function BlockModeToggle( { blockType, mode, onToggleMode, small = false, role } ) {
 	if ( ! hasBlockSupport( blockType, 'html', true ) ) {
