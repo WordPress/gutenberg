@@ -23,6 +23,13 @@ class SharedBlockEditPanel extends Component {
 		this.handleTitleKeyDown = this.handleTitleKeyDown.bind( this );
 	}
 
+	componentDidMount() {
+		// Select the input text when the form opens.
+		if ( this.props.isEditing && this.titleField.current ) {
+			this.titleField.current.select();
+		}
+	}
+
 	componentDidUpdate( prevProps ) {
 		// Select the input text only once when the form opens.
 		if ( ! prevProps.isEditing && this.props.isEditing ) {
