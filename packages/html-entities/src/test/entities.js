@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { decodeEntities } from '../entities';
+import { decodeEntities } from '../';
 
 describe( 'decodeEntities', () => {
 	it( 'should not change html with no entities', () => {

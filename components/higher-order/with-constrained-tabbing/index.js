@@ -3,10 +3,8 @@
  */
 import { Component, createRef } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { keycodes } from '@wordpress/utils';
+import { TAB } from '@wordpress/keycodes';
 import { focus } from '@wordpress/dom';
-
-const { TAB } = keycodes;
 
 const withConstrainedTabbing = createHigherOrderComponent(
 	( WrappedComponent ) => class extends Component {

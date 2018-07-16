@@ -27,6 +27,7 @@
 		"@wordpress/dom": "file:packages/dom",
 		"@wordpress/dom-ready": "file:packages/dom-ready",
 		"@wordpress/element": "file:packages/element",
+		"@wordpress/html-entities": "file:packages/html-entities",
 		"@wordpress/hooks": "file:packages/hooks",
 		"@wordpress/i18n": "file:packages/i18n",
 		"@wordpress/is-shallow-equal": "file:packages/is-shallow-equal",

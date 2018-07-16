@@ -159,6 +159,7 @@ const gutenbergPackages = [
 	'dom-ready',
 	'element',
 	'hooks',
+	'html-entities',
 	'i18n',
 	'is-shallow-equal',
 	'keycodes',
