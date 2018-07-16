@@ -4,14 +4,15 @@
 import { Component, Fragment } from '@wordpress/element';
 import {
 	Button,
+	Disabled,
 	IconButton,
 	PanelBody,
-	Toolbar,
 	Placeholder,
 	RangeControl,
 	ServerSideRender,
 	TextControl,
 	ToggleControl,
+	Toolbar,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
@@ -164,10 +165,12 @@ class RSSEdit extends Component {
 						}
 					</PanelBody>
 				</InspectorControls>
-				<ServerSideRender
-					block="core/rss"
-					attributes={ this.props.attributes }
-				/>
+				<Disabled>
+					<ServerSideRender
+						block="core/rss"
+						attributes={ this.props.attributes }
+					/>
+				</Disabled>
 			</Fragment>
 		);
 	}
