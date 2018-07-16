@@ -6,6 +6,7 @@ import {
 	PanelBody,
 	ServerSideRender,
 	ToggleControl,
+	Disabled,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -17,8 +18,6 @@ import {
 	BlockAlignmentToolbar,
 	BlockControls,
 } from '@wordpress/editor';
-
-import './editor.scss';
 
 class ArchivesBlock extends Component {
 	constructor() {
@@ -75,7 +74,9 @@ class ArchivesBlock extends Component {
 						controls={ [ 'left', 'center', 'right' ] }
 					/>
 				</BlockControls>
-				<ServerSideRender key="archives" block="core/archives" attributes={ attributes } />
+				<Disabled>
+					<ServerSideRender key="archives" block="core/archives" attributes={ attributes } />
+				</Disabled>
 			</Fragment>
 		);
 	}
