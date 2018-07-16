@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 import {
 	PanelBody,
 	ServerSideRender,
@@ -19,67 +19,41 @@ import {
 	BlockControls,
 } from '@wordpress/editor';
 
-class ArchivesEdit extends Component {
-	constructor() {
-		super( ...arguments );
+export default function ArchivesEdit( { attributes, isSelected, setAttributes } ) {
+	const { align, showPostCounts, displayAsDropdown } = attributes;
 
-		this.toggleShowPostCounts = this.toggleShowPostCounts.bind( this );
-		this.toggleDisplayAsDropdown = this.toggleDisplayAsDropdown.bind( this );
-	}
+	const inspectorControls = isSelected && (
+		<InspectorControls key="inspector">
+			<PanelBody title={ __( 'Archives Settings' ) }>
+				<ToggleControl
+					label={ __( 'Show Post Counts' ) }
+					checked={ showPostCounts }
+					onChange={ () => setAttributes( { showPostCounts: ! showPostCounts } ) }
+				/>
+				<ToggleControl
+					label={ __( 'Display as Dropdown' ) }
+					checked={ displayAsDropdown }
+					onChange={ () => setAttributes( { displayAsDropdown: ! displayAsDropdown } ) }
+				/>
+			</PanelBody>
+		</InspectorControls>
+	);
 
-	toggleShowPostCounts() {
-		const { attributes, setAttributes } = this.props;
-		const { showPostCounts } = attributes;
-
-		setAttributes( { showPostCounts: ! showPostCounts } );
-	}
-
-	toggleDisplayAsDropdown() {
-		const { attributes, setAttributes } = this.props;
-		const { displayAsDropdown } = attributes;
-
-		setAttributes( { displayAsDropdown: ! displayAsDropdown } );
-	}
-
-	render() {
-		const { attributes, isSelected, setAttributes } = this.props;
-		const { align, showPostCounts, displayAsDropdown } = attributes;
-
-		const inspectorControls = isSelected && (
-			<InspectorControls key="inspector">
-				<PanelBody title={ __( 'Archives Settings' ) }>
-					<ToggleControl
-						label={ __( 'Show Post Counts' ) }
-						checked={ showPostCounts }
-						onChange={ this.toggleShowPostCounts }
-					/>
-					<ToggleControl
-						label={ __( 'Display as Dropdown' ) }
-						checked={ displayAsDropdown }
-						onChange={ this.toggleDisplayAsDropdown }
-					/>
-				</PanelBody>
-			</InspectorControls>
-		);
-
-		return (
-			<Fragment>
-				{ inspectorControls }
-				<BlockControls key="controls">
-					<BlockAlignmentToolbar
-						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
-						controls={ [ 'left', 'center', 'right' ] }
-					/>
-				</BlockControls>
-				<Disabled>
-					<ServerSideRender key="archives" block="core/archives" attributes={ attributes } />
-				</Disabled>
-			</Fragment>
-		);
-	}
+	return (
+		<Fragment>
+			{ inspectorControls }
+			<BlockControls key="controls">
+				<BlockAlignmentToolbar
+					value={ align }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { align: nextAlign } );
+					} }
+					controls={ [ 'left', 'center', 'right' ] }
+				/>
+			</BlockControls>
+			<Disabled>
+				<ServerSideRender key="archives" block="core/archives" attributes={ attributes } />
+			</Disabled>
+		</Fragment>
+	);
 }
-
-export default ArchivesEdit;
