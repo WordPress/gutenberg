@@ -25,9 +25,9 @@
 		"lodash": "^4.17.10"
 	},
 	"devDependencies": {
-		"enzyme": "3.3.0",
-		"react-dom": "16.4.1",
-		"react-test-renderer": "16.4.1"
+		"enzyme": "^3.3.0",
+		"react-dom": "^16.4.1",
+		"react-test-renderer": "^16.4.1"
 	},
 	"publishConfig": {
 		"access": "public"
