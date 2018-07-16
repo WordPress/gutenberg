@@ -80,8 +80,17 @@ function buildStyle( packagePath ) {
 	const builtSass = sass.renderSync( {
 		file: styleFile,
 		includePaths: [ path.resolve( __dirname, '../../edit-post/assets/stylesheets' ) ],
-		data: '@import "colors"; @import "breakpoints"; @import "variables"; @import "mixins"; @import "animations";@import "z-index";' +
-			fs.readFileSync( styleFile, 'utf8' ),
+		data: (
+			[
+				'colors',
+				'breakpoints',
+				'variables',
+				'mixins',
+				'animations',
+				'z-index',
+			].map( ( imported ) => `@import "${ imported }";` ).join( ' ' )	+
+			fs.readFileSync( styleFile, 'utf8' )
+		),
 	} );
 
 	const postCSSSync = ( callback ) => {
@@ -91,7 +100,7 @@ function buildStyle( packagePath ) {
 	};
 
 	const result = deasync( postCSSSync )();
-	fs.writeFileSync( outputFile, result.css, () => true );
+	fs.writeFileSync( outputFile, result.css );
 }
 
 /**
