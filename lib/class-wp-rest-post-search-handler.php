@@ -51,18 +51,12 @@ class WP_REST_Post_Search_Handler extends WP_REST_Search_Handler {
 			'post_status'         => 'publish',
 			'paged'               => (int) $request['page'],
 			'posts_per_page'      => (int) $request['per_page'],
-			'orderby'             => 'ID',
-			'order'               => 'DESC',
 			'ignore_sticky_posts' => true,
 			'fields'              => 'ids',
 		);
 
 		if ( ! empty( $request['search'] ) ) {
 			$query_args['s'] = $request['search'];
-
-			// Posts can only be sorted by relevance when a search term is given, so ensure that here.
-			$query_args['orderby'] = 'relevance';
-			$query_args['order']   = 'DESC';
 		}
 
 		$query     = new WP_Query();
