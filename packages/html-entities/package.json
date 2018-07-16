@@ -1,14 +1,15 @@
 {
-	"name": "@wordpress/entities",
+	"name": "@wordpress/html-entities",
 	"version": "1.0.0-alpha.3",
-	"description": "Entities utils for WordPress",
+	"description": "HTML entities utils for WordPress",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"html",
 		"entities"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/entities/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/html-entities/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git"

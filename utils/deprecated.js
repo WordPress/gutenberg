@@ -7,7 +7,7 @@ import { groupBy } from 'lodash';
  * WordPress dependencies
  */
 import * as keycodesSource from '@wordpress/keycodes';
-import { decodeEntities as decodeEntitiesSource } from '@wordpress/entities';
+import { decodeEntities as decodeEntitiesSource } from '@wordpress/html-entities';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -42,7 +42,7 @@ export function buildTermsTree( flatTerms ) {
 export function decodeEntities( html ) {
 	deprecated( 'wp.utils.decodeEntities', {
 		version: '3.5',
-		alternative: 'wp.entities.decodeEntities',
+		alternative: 'wp.htmlEntities.decodeEntities',
 		plugin: 'Gutenberg',
 	} );
 	return decodeEntitiesSource( html );
