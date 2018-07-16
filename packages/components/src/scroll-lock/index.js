@@ -4,11 +4,6 @@
 import { Component } from '@wordpress/element';
 
 /**
- * Internal dependencies
- */
-import './index.scss';
-
-/**
  * Creates a ScrollLock component bound to the specified document.
  *
  * This function creates a ScrollLock component for the specified document
