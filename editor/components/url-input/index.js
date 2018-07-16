@@ -16,13 +16,14 @@ import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 import { Spinner, withSpokenMessages, Popover } from '@wordpress/components';
 import { withInstanceId } from '@wordpress/compose';
 import apiFetch from '@wordpress/api-fetch';
+import deprecated from '@wordpress/deprecated';
 
 // Since URLInput is rendered in the context of other inputs, but should be
 // considered a separate modal node, prevent keyboard events from propagating
 // as being considered from the input.
 const stopEventPropagation = ( event ) => event.stopPropagation();
 
-class UrlInput extends Component {
+class URLInput extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onChange = this.onChange.bind( this );
@@ -239,4 +240,21 @@ class UrlInput extends Component {
 	}
 }
 
-export default withSpokenMessages( withInstanceId( UrlInput ) );
+export class UrlInput extends Component {
+	constructor() {
+		super( ...arguments );
+
+		deprecated( 'wp.editor.UrlInput', {
+			alternative: 'wp.editor.URLInput',
+			plugin: 'Gutenberg',
+			version: 'v3.5',
+			hint: 'The component has been renamed.',
+		} );
+	}
+
+	render() {
+		return <URLInput { ...this.props } />;
+	}
+}
+
+export default withSpokenMessages( withInstanceId( URLInput ) );

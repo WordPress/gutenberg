@@ -10,13 +10,14 @@ import './style.scss';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { IconButton } from '@wordpress/components';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
-import UrlInput from './';
+import URLInput from './';
 
-class UrlInputButton extends Component {
+class URLInputButton extends Component {
 	constructor() {
 		super( ...arguments );
 		this.toggle = this.toggle.bind( this );
@@ -62,7 +63,7 @@ class UrlInputButton extends Component {
 								label={ __( 'Close' ) }
 								onClick={ this.toggle }
 							/>
-							<UrlInput value={ url || '' } onChange={ onChange } />
+							<URLInput value={ url || '' } onChange={ onChange } />
 							<IconButton
 								icon="editor-break"
 								label={ __( 'Submit' ) }
@@ -76,4 +77,17 @@ class UrlInputButton extends Component {
 	}
 }
 
-export default UrlInputButton;
+export class UrlInputButton extends URLInputButton {
+	constructor() {
+		super( ...arguments );
+
+		deprecated( 'wp.editor.UrlInputButton', {
+			alternative: 'wp.editor.URLInputButton',
+			plugin: 'Gutenberg',
+			version: 'v3.4',
+			hint: 'The component has been renamed.',
+		} );
+	}
+}
+
+export default URLInputButton;

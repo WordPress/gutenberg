@@ -13,7 +13,8 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
  - `wp.utils.buildTermsTree` has been removed.
  - `wp.utils.decodeEntities` has been removed. Please use `wp.htmlEntities.decodeEntities` instead.
  - All references to a block's `uid` have been replaced with equivalent props and selectors for `clientId`.
- - The `MediaPlaceholder` component `onSelectUrl` prop has been renamed to `onSelectURL`.
+ - The `wp.editor.MediaPlaceholder` component `onSelectUrl` prop has been renamed to `onSelectURL`.
+ - The `wp.editor.UrlInput` component has been renamed to `wp.editor.URLInput`.
 
 ## 3.4.0
 
