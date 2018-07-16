@@ -75,7 +75,7 @@ class ArchivesBlock extends Component {
 						controls={ [ 'left', 'center', 'right' ] }
 					/>
 				</BlockControls>
-				<ServerSideRender key="archives" block="core/archives" attributes={ this.props.attributes } />
+				<ServerSideRender key="archives" block="core/archives" attributes={ attributes } />
 			</Fragment>
 		);
 	}
