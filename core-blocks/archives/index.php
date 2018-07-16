@@ -57,6 +57,12 @@ function render_block_core_archives( $attributes ) {
 		$block_content = '<label class="screen-reader-text" for="' . $dropdown_id . '">' . $title . '</label>
 	<select id="' . $dropdown_id . '" name="archive-dropdown" onchange="document.location.href=this.options[this.selectedIndex].value;">
 	<option value="">' . $label . '</option>' . $archives . '</select>';
+
+		$block_content = sprintf(
+			'<div class="%1$s">%2$s</div>',
+			esc_attr( $class ),
+			$block_content
+		);
 	} else {
 
 		/** This filter is documented in wp-includes/widgets/class-wp-widget-archives.php */
@@ -68,13 +74,13 @@ function render_block_core_archives( $attributes ) {
 		$archives_args['echo'] = 0;
 
 		$block_content = wp_get_archives( $archives_args );
-	}
 
-	$block_content = sprintf(
-		'<div class="%1$s">%2$s</div>',
-		esc_attr( $class ),
-		$block_content
-	);
+		$block_content = sprintf(
+			'<ul class="%1$s">%2$s</ul>',
+			esc_attr( $class ),
+			$block_content
+		);
+	}
 
 	return $block_content;
 }
