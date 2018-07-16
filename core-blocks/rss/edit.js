@@ -58,13 +58,13 @@ class RSSEdit extends Component {
 
 	render() {
 		const {
+			blockLayout,
 			columns,
 			displayAuthor,
 			displayExcerpt,
 			displayDate,
 			excerptLength,
 			feedURL,
-			blockLayout,
 			itemsToShow,
 		} = this.props.attributes;
 		const { setAttributes } = this.props;

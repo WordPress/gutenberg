@@ -39,7 +39,7 @@ function render_block_core_rss( $attributes ) {
 
 	// self-url destruction sequence.
 	if ( in_array( untrailingslashit( $url ), array( site_url(), home_url() ) ) ) {
-		render_rss_error_message( __( 'Use \'Latest Posts\' block for this domain', 'gutenberg' ) );
+		return render_rss_error_message( __( 'Use \'Latest Posts\' block for this domain', 'gutenberg' ) );
 	}
 
 	$rss = fetch_feed( $url );
