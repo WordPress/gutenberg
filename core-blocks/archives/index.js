@@ -7,12 +7,13 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import edit from './edit';
+
 export const name = 'core/archives';
 
 export const settings = {
 	title: __( 'Archives' ),
 
-	description: __( 'This block displays a monthly archive of your site’s Posts.' ),
+	description: __( 'Display a monthly archive of your site’s Posts.' ),
 
 	icon: 'calendar-alt',
 
