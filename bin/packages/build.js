@@ -6,12 +6,12 @@
  */
 
 /**
- * External Dependenceis
+ * External dependencies
  */
 const fs = require( 'fs' );
 const path = require( 'path' );
 const glob = require( 'glob' );
-const babel = require( 'babel-core' );
+const babel = require( '@babel/core' );
 const chalk = require( 'chalk' );
 const mkdirp = require( 'mkdirp' );
 

@@ -7,28 +7,30 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
-const withContext = ( contextName ) => ( mapSettingsToProps ) => ( OriginalComponent ) => {
-	class WrappedComponent extends Component {
-		render() {
-			const extraProps = mapSettingsToProps ?
-				mapSettingsToProps( this.context[ contextName ], this.props ) :
-				{ [ contextName ]: this.context[ contextName ] };
+export default ( contextName ) => ( mapSettingsToProps ) => createHigherOrderComponent(
+	( OriginalComponent ) => {
+		class WrappedComponent extends Component {
+			render() {
+				const extraProps = mapSettingsToProps ?
+					mapSettingsToProps( this.context[ contextName ], this.props ) :
+					{ [ contextName ]: this.context[ contextName ] };
 
-			return (
-				<OriginalComponent
-					{ ...this.props }
-					{ ...extraProps }
-				/>
-			);
+				return (
+					<OriginalComponent
+						{ ...this.props }
+						{ ...extraProps }
+					/>
+				);
+			}
 		}
-	}
 
-	WrappedComponent.contextTypes = {
-		[ contextName ]: noop,
-	};
+		WrappedComponent.contextTypes = {
+			[ contextName ]: noop,
+		};
 
-	return WrappedComponent;
-};
-
-export default withContext;
+		return WrappedComponent;
+	},
+	'withContext'
+);

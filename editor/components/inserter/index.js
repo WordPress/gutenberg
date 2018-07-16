@@ -4,13 +4,16 @@
 import { __ } from '@wordpress/i18n';
 import { Dropdown, IconButton } from '@wordpress/components';
 import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
-import { Component, compose } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import InserterMenu from './menu';
+
+export { default as InserterResultsPortal } from './results-portal';
 
 class Inserter extends Component {
 	constructor() {
@@ -21,12 +24,6 @@ class Inserter extends Component {
 
 	onToggle( isOpen ) {
 		const { onToggle } = this.props;
-
-		if ( isOpen ) {
-			this.props.showInsertionPoint();
-		} else {
-			this.props.hideInsertionPoint();
-		}
 
 		// Surface toggle callback to parent component
 		if ( onToggle ) {
@@ -101,8 +98,6 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {
-		showInsertionPoint: dispatch( 'core/editor' ).showInsertionPoint,
-		hideInsertionPoint: dispatch( 'core/editor' ).hideInsertionPoint,
 		onInsertBlock: ( item ) => {
 			const { insertionPoint, selectedBlock } = ownProps;
 			const { index, rootUID, layout } = insertionPoint;

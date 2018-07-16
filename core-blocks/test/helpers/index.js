@@ -1,5 +1,5 @@
 /**
- * External dependencie
+ * External dependencies
  */
 import { render } from 'enzyme';
 import { noop } from 'lodash';
@@ -12,11 +12,7 @@ import {
 	getBlockType,
 	registerBlockType,
 } from '@wordpress/blocks';
-// Requiredd to register the editor's store
-import '@wordpress/editor';
-
-// Hack to avoid the wrapping HoCs.
-import { BlockEdit } from '../../../editor/components/block-edit';
+import { BlockEdit } from '@wordpress/editor';
 
 export const blockEditRender = ( name, settings ) => {
 	if ( ! getBlockType( name ) ) {
@@ -31,7 +27,6 @@ export const blockEditRender = ( name, settings ) => {
 			attributes={ block.attributes }
 			setAttributes={ noop }
 			user={ {} }
-			createInnerBlockList={ noop }
 		/>
 	);
 };

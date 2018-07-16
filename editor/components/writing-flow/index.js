@@ -6,7 +6,7 @@ import { overEvery, find, findLast, reverse, first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, compose } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import {
 	computeCaretRect,
 	focus,
@@ -17,8 +17,9 @@ import {
 	placeCaretAtVerticalEdge,
 	isEntirelySelected,
 } from '@wordpress/dom';
-import { keycodes } from '@wordpress/utils';
+import { UP, DOWN, LEFT, RIGHT, isKeyboardEvent } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -29,12 +30,6 @@ import {
 	isInSameBlock,
 	hasInnerBlocksContext,
 } from '../../utils/dom';
-
-/**
- * Module Constants
- */
-
-const { UP, DOWN, LEFT, RIGHT, isKeyboardEvent } = keycodes;
 
 /**
  * Given an element, returns true if the element is a tabbable text field, or
@@ -204,15 +199,11 @@ class WritingFlow extends Component {
 		const isVertical = isUp || isDown;
 		const isNav = isHorizontal || isVertical;
 		const isShift = event.shiftKey;
-
 		const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
 
-		if ( ! isVertical ) {
-			this.verticalRect = null;
-		} else if ( ! this.verticalRect ) {
-			this.verticalRect = computeCaretRect( target );
-		}
-
+		// This logic inside this condition needs to be checked before
+		// the check for event.nativeEvent.defaultPrevented.
+		// The logic handles meta+a keypress and this event is default prevented by TinyMCE.
 		if ( ! isNav ) {
 			// Set immediately before the meta+a combination can be pressed.
 			if ( isKeyboardEvent.primary( event ) ) {
@@ -234,6 +225,18 @@ class WritingFlow extends Component {
 			}
 
 			return;
+		}
+
+		// Abort if navigation has already been handled (e.g. TinyMCE inline
+		// boundaries).
+		if ( event.nativeEvent.defaultPrevented ) {
+			return;
+		}
+
+		if ( ! isVertical ) {
+			this.verticalRect = null;
+		} else if ( ! this.verticalRect ) {
+			this.verticalRect = computeCaretRect( target );
 		}
 
 		if ( isShift && ( hasMultiSelection || (

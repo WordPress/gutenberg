@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/api-request",
-	"version": "1.0.0-alpha.1",
+	"version": "1.0.0-alpha.3",
 	"description": "Utility to call WordPress REST APIs",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,7 +20,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"jquery": "3.3.1"
+		"jquery": "^3.3.1"
 	},
 	"publishConfig": {
 		"access": "public"

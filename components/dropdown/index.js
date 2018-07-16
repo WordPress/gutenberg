@@ -1,10 +1,10 @@
 /**
- * WordPress Dependeencies
+ * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 import Popover from '../popover';
 
@@ -28,10 +28,10 @@ class Dropdown extends Component {
 		}
 	}
 
-	componentWillUpdate( nextProps, nextState ) {
-		const { isOpen } = nextState;
-		const { onToggle } = nextProps;
-		if ( this.state.isOpen !== isOpen && onToggle ) {
+	componentDidUpdate( prevProps, prevState ) {
+		const { isOpen } = this.state;
+		const { onToggle } = this.props;
+		if ( prevState.isOpen !== isOpen && onToggle ) {
 			onToggle( isOpen );
 		}
 	}

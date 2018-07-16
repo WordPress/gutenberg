@@ -8,8 +8,9 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 import { focus } from '@wordpress/dom';
-import { keycodes } from '@wordpress/utils';
+import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -17,14 +18,13 @@ import { keycodes } from '@wordpress/utils';
 import './style.scss';
 import { computePopoverPosition } from './utils';
 import withFocusReturn from '../higher-order/with-focus-return';
+import withConstrainedTabbing from '../higher-order/with-constrained-tabbing';
 import PopoverDetectOutside from './detect-outside';
 import IconButton from '../icon-button';
 import ScrollLock from '../scroll-lock';
 import { Slot, Fill } from '../slot-fill';
 
-const FocusManaged = withFocusReturn( ( { children } ) => children );
-
-const { ESCAPE } = keycodes;
+const FocusManaged = withConstrainedTabbing( withFocusReturn( ( { children } ) => children ) );
 
 /**
  * Name of slot in which popover should fill.
@@ -60,9 +60,8 @@ class Popover extends Component {
 	}
 
 	componentDidMount() {
-		const popoverSize = this.updatePopoverSize();
-		this.computePopoverPosition( popoverSize );
 		this.toggleWindowEvents( true );
+		this.refresh();
 		this.focus();
 	}
 
@@ -91,13 +90,23 @@ class Popover extends Component {
 		this.rafHandle = window.requestAnimationFrame( () => this.computePopoverPosition() );
 	}
 
+	refresh() {
+		const popoverSize = this.updatePopoverSize();
+		this.computePopoverPosition( popoverSize );
+	}
+
 	focus() {
-		const { focusOnMount = true } = this.props;
-		if ( ! focusOnMount ) {
-			return;
+		const { focusOnMount } = this.props;
+
+		if ( focusOnMount === true ) {
+			deprecated( 'focusOnMount={ true }', {
+				version: '3.4',
+				alternative: 'focusOnMount="firstElement"',
+				plugin: 'Gutenberg',
+			} );
 		}
 
-		if ( ! this.contentNode.current ) {
+		if ( ! focusOnMount || ! this.contentNode.current ) {
 			return;
 		}
 
@@ -105,10 +114,26 @@ class Popover extends Component {
 		// Related https://stackoverflow.com/questions/35522220/react-ref-with-focus-doesnt-work-without-settimeout-my-example
 		const focusNode = ( domNode ) => setTimeout( () => domNode.focus() );
 
-		// Find first tabbable node within content and shift focus, falling
-		// back to the popover panel itself.
-		const firstTabbable = focus.tabbable.find( this.contentNode.current )[ 0 ];
-		focusNode( firstTabbable ? firstTabbable : this.contentNode.current );
+		// Boolean values for focusOnMount deprecated in 3.2–remove
+		// `focusOnMount === true` check in 3.4.
+		if ( focusOnMount === 'firstElement' || focusOnMount === true ) {
+			// Find first tabbable node within content and shift focus, falling
+			// back to the popover panel itself.
+			const firstTabbable = focus.tabbable.find( this.contentNode.current )[ 0 ];
+			focusNode( firstTabbable ? firstTabbable : this.contentNode.current );
+
+			return;
+		}
+
+		if ( focusOnMount === 'container' ) {
+			// Focus the popover panel itself so items in the popover are easily
+			// accessed via keyboard navigation.
+			focusNode( this.contentNode.current );
+
+			return;
+		}
+
+		window.console.warn( `<Popover> component: focusOnMount argument "${ focusOnMount }" not recognized.` );
 	}
 
 	getAnchorRect() {
@@ -191,7 +216,7 @@ class Popover extends Component {
 			children,
 			className,
 			onClickOutside = onClose,
-			noArrow = false,
+			noArrow,
 			// Disable reason: We generate the `...contentProps` rest as remainder
 			// of props which aren't explicitly handled by this component.
 			/* eslint-disable no-unused-vars */
@@ -265,9 +290,9 @@ class Popover extends Component {
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
 
-		// Apply focus return behavior except when default focus on open
-		// behavior is disabled.
-		if ( false !== focusOnMount ) {
+		// Apply focus to element as long as focusOnMount is truthy; false is
+		// the only "disabled" value.
+		if ( focusOnMount ) {
 			content = <FocusManaged>{ content }</FocusManaged>;
 		}
 
@@ -284,6 +309,11 @@ class Popover extends Component {
 		</span>;
 	}
 }
+
+Popover.defaultProps = {
+	focusOnMount: 'firstElement',
+	noArrow: false,
+};
 
 const PopoverContainer = Popover;
 

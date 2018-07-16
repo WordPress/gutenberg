@@ -8,7 +8,7 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { compose } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 import { getDefaultBlockName } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -59,7 +59,7 @@ export function DefaultBlockAppender( {
 			<InserterWithShortcuts rootUID={ rootUID } layout={ layout } />
 			<Inserter position="top right">
 				<DotTip id="core/editor.inserter">
-					{ __( 'Welcome to the wonderful world of blocks! Click ‘Add block’ to insert different kinds of content—text, images, quotes, video, lists, and much more.' ) }
+					{ __( 'Welcome to the wonderful world of blocks! Click the “+” (“Add block”) button to add a new block. There are blocks available for all kind of content: you can insert text, headings, images, lists, and lots more!' ) }
 				</DotTip>
 			</Inserter>
 		</div>
@@ -67,18 +67,18 @@ export function DefaultBlockAppender( {
 }
 export default compose(
 	withSelect( ( select, ownProps ) => {
-		const { getBlockCount, getBlock, getEditorSettings } = select( 'core/editor' );
+		const { getBlockCount, getBlock, getEditorSettings, getTemplateLock } = select( 'core/editor' );
 		const { isTipVisible } = select( 'core/nux' );
 
 		const isEmpty = ! getBlockCount( ownProps.rootUID );
 		const lastBlock = getBlock( ownProps.lastBlockUID );
 		const isLastBlockDefault = get( lastBlock, [ 'name' ] ) === getDefaultBlockName();
-		const { templateLock, bodyPlaceholder } = getEditorSettings();
+		const { bodyPlaceholder } = getEditorSettings();
 
 		return {
 			isVisible: isEmpty || ! isLastBlockDefault,
 			showPrompt: isEmpty,
-			isLocked: !! templateLock,
+			isLocked: !! getTemplateLock( ownProps.rootUID ),
 			placeholder: bodyPlaceholder,
 			hasTip: isTipVisible( 'core/editor.inserter' ),
 		};

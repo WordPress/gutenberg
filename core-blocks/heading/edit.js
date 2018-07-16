@@ -1,7 +1,11 @@
 /**
+ * External dependencies
+ */
+import { range } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-
 import { __, sprintf } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 import { PanelBody, Toolbar } from '@wordpress/components';
@@ -21,33 +25,29 @@ export default function HeadingEdit( {
 	onReplace,
 	className,
 } ) {
-	const { align, content, nodeName, placeholder } = attributes;
+	const { align, content, level, placeholder } = attributes;
+	const tagName = 'h' + level;
+
+	function createLevelControl( targetLevel ) {
+		return {
+			icon: 'heading',
+			// translators: %s: heading level e.g: "1", "2", "3"
+			title: sprintf( __( 'Heading %d' ), targetLevel ),
+			isActive: targetLevel === level,
+			onClick: () => setAttributes( { level: targetLevel } ),
+			subscript: String( targetLevel ),
+		};
+	}
 
 	return (
 		<Fragment>
 			<BlockControls>
-				<Toolbar
-					controls={ '234'.split( '' ).map( ( level ) => ( {
-						icon: 'heading',
-						title: sprintf( __( 'Heading %s' ), level ),
-						isActive: 'H' + level === nodeName,
-						onClick: () => setAttributes( { nodeName: 'H' + level } ),
-						subscript: level,
-					} ) ) }
-				/>
+				<Toolbar controls={ range( 2, 5 ).map( createLevelControl ) } />
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Heading Settings' ) }>
 					<p>{ __( 'Level' ) }</p>
-					<Toolbar
-						controls={ '123456'.split( '' ).map( ( level ) => ( {
-							icon: 'heading',
-							title: sprintf( __( 'Heading %s' ), level ),
-							isActive: 'H' + level === nodeName,
-							onClick: () => setAttributes( { nodeName: 'H' + level } ),
-							subscript: level,
-						} ) ) }
-					/>
+					<Toolbar controls={ range( 1, 7 ).map( createLevelControl ) } />
 					<p>{ __( 'Text Alignment' ) }</p>
 					<AlignmentToolbar
 						value={ align }
@@ -59,7 +59,7 @@ export default function HeadingEdit( {
 			</InspectorControls>
 			<RichText
 				wrapperClassName="wp-block-heading"
-				tagName={ nodeName.toLowerCase() }
+				tagName={ tagName }
 				value={ content }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				onMerge={ mergeBlocks }

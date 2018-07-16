@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Higher Order Component used to be used to wrap disposable elements like
@@ -13,42 +14,39 @@ import { Component } from '@wordpress/element';
  *
  * @return {Component} Component with the focus restauration behaviour.
  */
-function withFocusReturn( WrappedComponent ) {
-	return class extends Component {
-		constructor() {
-			super( ...arguments );
+export default createHigherOrderComponent(
+	( WrappedComponent ) => {
+		return class extends Component {
+			constructor() {
+				super( ...arguments );
 
-			this.setIsFocusedTrue = () => this.isFocused = true;
-			this.setIsFocusedFalse = () => this.isFocused = false;
-		}
-
-		componentWillMount() {
-			this.activeElementOnMount = document.activeElement;
-		}
-
-		componentWillUnmount() {
-			const { activeElementOnMount, isFocused } = this;
-			if ( ! activeElementOnMount ) {
-				return;
+				this.setIsFocusedTrue = () => this.isFocused = true;
+				this.setIsFocusedFalse = () => this.isFocused = false;
+				this.activeElementOnMount = document.activeElement;
 			}
 
-			const { body, activeElement } = document;
-			if ( isFocused || null === activeElement || body === activeElement ) {
-				activeElementOnMount.focus();
+			componentWillUnmount() {
+				const { activeElementOnMount, isFocused } = this;
+				if ( ! activeElementOnMount ) {
+					return;
+				}
+
+				const { body, activeElement } = document;
+				if ( isFocused || null === activeElement || body === activeElement ) {
+					activeElementOnMount.focus();
+				}
 			}
-		}
 
-		render() {
-			return (
-				<div
-					onFocus={ this.setIsFocusedTrue }
-					onBlur={ this.setIsFocusedFalse }
-				>
-					<WrappedComponent { ...this.props } />
-				</div>
-			);
-		}
-	};
-}
-
-export default withFocusReturn;
+			render() {
+				return (
+					<div
+						onFocus={ this.setIsFocusedTrue }
+						onBlur={ this.setIsFocusedFalse }
+					>
+						<WrappedComponent { ...this.props } />
+					</div>
+				);
+			}
+		};
+	}, 'withFocusReturn'
+);

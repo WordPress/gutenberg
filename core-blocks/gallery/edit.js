@@ -87,7 +87,7 @@ class GalleryEdit extends Component {
 
 	onSelectImages( images ) {
 		this.props.setAttributes( {
-			images: images.map( ( image ) => pick( image, [ 'alt', 'caption', 'id', 'url' ] ) ),
+			images: images.map( ( image ) => pick( image, [ 'alt', 'caption', 'id', 'link', 'url' ] ) ),
 		} );
 	}
 
@@ -143,9 +143,9 @@ class GalleryEdit extends Component {
 		} );
 	}
 
-	componentWillReceiveProps( nextProps ) {
+	componentDidUpdate( prevProps ) {
 		// Deselect images when deselecting the block
-		if ( ! nextProps.isSelected && this.props.isSelected ) {
+		if ( ! this.props.isSelected && prevProps.isSelected ) {
 			this.setState( {
 				selectedImage: null,
 				captionSelected: false,
@@ -253,7 +253,7 @@ class GalleryEdit extends Component {
 						</li>
 					) ) }
 					{ isSelected &&
-						<li className="blocks-gallery-item">
+						<li className="blocks-gallery-item has-add-item-button">
 							<FormFileUpload
 								multiple
 								isLarge

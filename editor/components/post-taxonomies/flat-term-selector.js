@@ -8,10 +8,11 @@ import { stringify } from 'querystring';
  * WordPress dependencies
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { Component, compose } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { FormTokenField, withAPIData } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import apiRequest from '@wordpress/api-request';
+import { compose } from '@wordpress/compose';
 
 /**
  * Module constants
@@ -67,9 +68,9 @@ class FlatTermSelector extends Component {
 		invoke( this.searchRequest, [ 'abort' ] );
 	}
 
-	componentWillReceiveProps( newProps ) {
-		if ( newProps.terms !== this.props.terms ) {
-			this.updateSelectedTerms( newProps.terms );
+	componentDidUpdate( prevProps ) {
+		if ( prevProps.terms !== this.props.terms ) {
+			this.updateSelectedTerms( this.props.terms );
 		}
 	}
 

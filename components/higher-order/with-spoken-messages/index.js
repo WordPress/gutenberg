@@ -8,6 +8,7 @@ import { debounce } from 'lodash';
  */
 import { Component } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * A Higher Order Component used to be provide a unique instance ID by
@@ -17,7 +18,7 @@ import { speak } from '@wordpress/a11y';
  *
  * @return {Component} Component with an instanceId prop.
  */
-function withSpokenMessages( WrappedComponent ) {
+export default createHigherOrderComponent( ( WrappedComponent ) => {
 	return class extends Component {
 		constructor() {
 			super( ...arguments );
@@ -41,6 +42,4 @@ function withSpokenMessages( WrappedComponent ) {
 			);
 		}
 	};
-}
-
-export default withSpokenMessages;
+}, 'withSpokenMessages' );

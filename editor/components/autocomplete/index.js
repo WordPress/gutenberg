@@ -7,7 +7,8 @@ import { clone } from 'lodash';
  * WordPress dependencies
  */
 import { applyFilters, hasFilter } from '@wordpress/hooks';
-import { Component, compose } from '@wordpress/element';
+import { Component } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 import { Autocomplete as OriginalAutocomplete } from '@wordpress/components';
 
 /**
@@ -78,10 +79,9 @@ export function withFilteredAutocompleters( Autocomplete ) {
 			let nextCompleters = completers;
 			const lastFilteredCompletersProp = nextCompleters;
 
-			// Todo: Rename filter
-			if ( hasFilter( 'blocks.Autocomplete.completers' ) ) {
+			if ( hasFilter( 'editor.Autocomplete.completers' ) ) {
 				nextCompleters = applyFilters(
-					'blocks.Autocomplete.completers',
+					'editor.Autocomplete.completers',
 					// Provide copies so filters may directly modify them.
 					nextCompleters && nextCompleters.map( clone ),
 					blockName,

@@ -6,13 +6,11 @@ import { includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, compose } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { isTextField } from '@wordpress/dom';
-import { keycodes } from '@wordpress/utils';
-import { withSafeTimeout } from '@wordpress/components';
-
-const { UP, RIGHT, DOWN, LEFT, ENTER, BACKSPACE } = keycodes;
+import { UP, RIGHT, DOWN, LEFT, ENTER, BACKSPACE } from '@wordpress/keycodes';
+import { withSafeTimeout, compose } from '@wordpress/compose';
 
 /**
  * Set of key codes upon which typing is to be initiated on a keydown event.

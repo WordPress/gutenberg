@@ -2,7 +2,13 @@
  * Internal dependencies
  */
 import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage, pressWithModifier } from '../support/utils';
+import {
+	newPost,
+	newDesktopBrowserPage,
+	pressWithModifier,
+	ensureSidebarOpened,
+	publishPost,
+} from '../support/utils';
 
 describe( 'Change detection', () => {
 	let handleInterceptedRequest, hadInterceptedSave;
@@ -83,7 +89,47 @@ describe( 'Change detection', () => {
 			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
 		] );
 
-		// Still dirty after an autosave.
+		// Autosave draft as same user should do full save, i.e. not dirty.
+		await assertIsDirty( false );
+	} );
+
+	it( 'Should prompt to confirm unsaved changes for autosaved draft for non-content fields', async () => {
+		await page.type( '.editor-post-title__input', 'Hello World' );
+
+		// Toggle post as sticky (not persisted for autosave).
+		await ensureSidebarOpened();
+		await page.click( '[id^="post-sticky-toggle-"]' );
+
+		// Force autosave to occur immediately.
+		await Promise.all( [
+			page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() ),
+			page.waitForSelector( '.editor-post-saved-state.is-autosaving' ),
+			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
+		] );
+
+		await assertIsDirty( true );
+	} );
+
+	it( 'Should prompt to confirm unsaved changes for autosaved published post', async () => {
+		await page.type( '.editor-post-title__input', 'Hello World' );
+
+		await publishPost();
+
+		// Close publish panel.
+		await Promise.all( [
+			page.waitForFunction( () => ! document.querySelector( '.editor-post-publish-panel' ) ),
+			page.click( '.editor-post-publish-panel__header button' ),
+		] );
+
+		// Should be dirty after autosave change of published post.
+		await page.type( '.editor-post-title__input', '!' );
+
+		await Promise.all( [
+			page.waitForSelector( '.editor-post-publish-button.is-busy' ),
+			page.waitForSelector( '.editor-post-publish-button:not( .is-busy )' ),
+			page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() ),
+		] );
+
 		await assertIsDirty( true );
 	} );
 

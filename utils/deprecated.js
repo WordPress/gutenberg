@@ -1,70 +1,59 @@
 /**
  * WordPress dependencies
  */
-import * as blob from '@wordpress/blob';
-import * as dom from '@wordpress/dom';
-import originalDeprecated from '@wordpress/deprecated';
+import * as keycodesSource from '@wordpress/keycodes';
+import deprecated from '@wordpress/deprecated';
 
-const wrapFunction = ( source, sourceName, version ) =>
-	( functionName ) => ( ...args ) => {
-		originalDeprecated( `wp.utils.${ functionName }`, {
-			version,
-			alternative: `wp.${ sourceName }.${ functionName }`,
-			plugin: 'Gutenberg',
+/**
+ * External dependencies
+ */
+import { groupBy } from 'lodash';
+
+/**
+ * Returns terms in a tree form.
+ *
+ * @param {Array} flatTerms  Array of terms in flat format.
+ *
+ * @return {Array} Array of terms in tree format.
+ */
+export function buildTermsTree( flatTerms ) {
+	deprecated( 'wp.utils.buildTermsTree', {
+		version: '3.5',
+		plugin: 'Gutenberg',
+	} );
+	const termsByParent = groupBy( flatTerms, 'parent' );
+	const fillWithChildren = ( terms ) => {
+		return terms.map( ( term ) => {
+			const children = termsByParent[ term.id ];
+			return {
+				...term,
+				children: children && children.length ?
+					fillWithChildren( children ) :
+					[],
+			};
 		} );
-		return source[ functionName ]( ...args );
 	};
 
-// blob
-const wrapBlobFunction = wrapFunction( blob, 'blob', '3.2' );
-export const createBlobURL = wrapBlobFunction( 'createBlobURL' );
-export const getBlobByURL = wrapBlobFunction( 'getBlobByURL' );
-export const revokeBlobURL = wrapBlobFunction( 'revokeBlobURL' );
+	return fillWithChildren( termsByParent[ '0' ] || [] );
+}
 
-// dom
-const wrapDomFunction = wrapFunction( dom, 'dom', '3.1' );
-export const computeCaretRect = wrapDomFunction( 'computeCaretRect' );
-export const documentHasSelection = wrapDomFunction( 'documentHasSelection' );
-export const focus = {
-	focusable: {
-		find: wrapFunction( dom.focus.focusable, 'dom.focus.focusable', '3.1' )( 'find' ),
-	},
-	tabbable: {
-		find: wrapFunction( dom.focus.tabbable, 'dom.focus.tabbable', '3.1' )( 'find' ),
-		isTabbableIndex: wrapFunction( dom.focus.tabbable, 'dom.focus.tabbable', '3.1' )( 'isTabbableIndex' ),
-	},
+// keycodes
+const wrapKeycodeFunction = ( source, functionName ) => ( ...args ) => {
+	deprecated( `wp.utils.keycodes.${ functionName }`, {
+		version: '3.4',
+		alternative: `wp.keycodes.${ functionName }`,
+		plugin: 'Gutenberg',
+	} );
+	return source( ...args );
 };
-export const getRectangleFromRange = wrapDomFunction( 'getRectangleFromRange' );
-export const getScrollContainer = wrapDomFunction( 'getScrollContainer' );
-export const insertAfter = wrapDomFunction( 'insertAfter' );
-export const isHorizontalEdge = wrapDomFunction( 'isHorizontalEdge' );
-export const isTextField = wrapDomFunction( 'isTextField' );
-export const isVerticalEdge = wrapDomFunction( 'isVerticalEdge' );
-export const placeCaretAtHorizontalEdge = wrapDomFunction( 'placeCaretAtHorizontalEdge' );
-export const placeCaretAtVerticalEdge = wrapDomFunction( 'placeCaretAtVerticalEdge' );
-export const remove = wrapDomFunction( 'remove' );
-export const replace = wrapDomFunction( 'replace' );
-export const replaceTag = wrapDomFunction( 'replaceTag' );
-export const unwrap = wrapDomFunction( 'unwrap' );
 
-// deprecated
-export function deprecated( ...params ) {
-	originalDeprecated( 'wp.utils.deprecated', {
-		version: '3.2',
-		alternative: 'wp.deprecated',
-		plugin: 'Gutenberg',
-	} );
+const keycodes = { ...keycodesSource, rawShortcut: {}, displayShortcut: {}, isKeyboardEvent: {} };
+const modifiers = [ 'primary', 'primaryShift', 'secondary', 'access' ];
+keycodes.isMacOS = wrapKeycodeFunction( keycodes.isMacOS, 'isMacOS' );
+modifiers.forEach( ( modifier ) => {
+	keycodes.rawShortcut[ modifier ] = wrapKeycodeFunction( keycodesSource.rawShortcut[ modifier ], 'rawShortcut.' + modifier );
+	keycodes.displayShortcut[ modifier ] = wrapKeycodeFunction( keycodesSource.displayShortcut[ modifier ], 'displayShortcut.' + modifier );
+	keycodes.isKeyboardEvent[ modifier ] = wrapKeycodeFunction( keycodesSource.isKeyboardEvent[ modifier ], 'isKeyboardEvent.' + modifier );
+} );
 
-	return originalDeprecated( ...params );
-}
-
-// viewport
-export function isExtraSmall() {
-	originalDeprecated( 'wp.utils.isExtraSmall', {
-		version: '3.1',
-		alternative: 'wp.viewport.isExtraSmall',
-		plugin: 'Gutenberg',
-	} );
-
-	return window && window.innerWidth < 782;
-}
+export { keycodes };

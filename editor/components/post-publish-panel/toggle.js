@@ -7,7 +7,7 @@ import { get } from 'lodash';
  * WordPress Dependencies
  */
 import { Button } from '@wordpress/components';
-import { compose } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
 import { DotTip } from '@wordpress/nux';
@@ -17,7 +17,7 @@ import { DotTip } from '@wordpress/nux';
  */
 import PostPublishButton from '../post-publish-button';
 
-function PostPublishPanelToggle( {
+export function PostPublishPanelToggle( {
 	hasPublishAction,
 	isSaving,
 	isPublishable,

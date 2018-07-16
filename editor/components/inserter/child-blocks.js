@@ -1,15 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import { ifCondition } from '@wordpress/components';
+import { ifCondition, compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import ItemList from './item-list';
+import BlockTypesList from '../block-types-list';
 import BlockIcon from '../block-icon';
 
 function ChildBlocks( { rootBlockIcon, rootBlockTitle, items, ...props } ) {
@@ -17,21 +16,11 @@ function ChildBlocks( { rootBlockIcon, rootBlockTitle, items, ...props } ) {
 		<div className="editor-inserter__child-blocks">
 			{ ( rootBlockIcon || rootBlockTitle ) && (
 				<div className="editor-inserter__parent-block-header">
-					{ rootBlockIcon && (
-						<div
-							style={ {
-								backgroundColor: rootBlockIcon.background,
-								color: rootBlockIcon.foreground,
-							} }
-							className="editor-inserter__parent-block-icon"
-						>
-							<BlockIcon icon={ rootBlockIcon.src } />
-						</div>
-					) }
+					<BlockIcon icon={ rootBlockIcon } showColors />
 					{ rootBlockTitle && <h2>{ rootBlockTitle }</h2> }
 				</div>
 			) }
-			<ItemList items={ items } { ...props } />
+			<BlockTypesList items={ items } { ...props } />
 		</div>
 	);
 }

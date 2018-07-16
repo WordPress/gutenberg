@@ -7,7 +7,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import withInstanceId from '../higher-order/with-instance-id';
+import { withInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**

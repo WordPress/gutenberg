@@ -2,13 +2,15 @@
  * External dependencies
  */
 import { filter, map } from 'lodash';
-import { mount } from 'enzyme';
+import TestUtils from 'react-dom/test-utils';
+import ReactDOM from 'react-dom';
 
 /**
  * Internal dependencies
  */
 import fixtures from './lib/fixtures';
 import TokenFieldWrapper from './lib/token-field-wrapper';
+import TokenInput from '../token-input';
 
 /**
  * Module variables
@@ -30,54 +32,57 @@ const charCodes = {
 };
 
 describe( 'FormTokenField', function() {
-	let wrapper, textInputNode;
+	let wrapper, wrapperElement, textInputElement, textInputComponent;
 
 	function setText( text ) {
-		textInputNode.simulate( 'change', { target: { value: text } } );
+		TestUtils.Simulate.change(
+			textInputElement(),
+			{
+				target: {
+					value: text,
+				},
+			}
+		);
 	}
 
 	function sendKeyDown( keyCode, shiftKey ) {
-		wrapper.simulate( 'keyDown', {
-			keyCode: keyCode,
-			shiftKey: ! ! shiftKey,
-		} );
+		TestUtils.Simulate.keyDown(
+			wrapperElement(),
+			{
+				keyCode: keyCode,
+				shiftKey: ! ! shiftKey,
+			}
+		);
 	}
 
 	function sendKeyPress( charCode ) {
-		wrapper.simulate( 'keyPress', {
-			charCode: charCode,
-		} );
-	}
-
-	function getNodeInnerHtml( node ) {
-		const div = document.createElement( 'div' );
-		div.innerHTML = node.html();
-		return div.firstChild.innerHTML;
+		TestUtils.Simulate.keyPress(
+			wrapperElement(),
+			{ charCode: charCode }
+		);
 	}
 
 	function getTokensHTML() {
-		const textNodes = wrapper.find( '.components-form-token-field__token-text span[aria-hidden]' );
-
-		return textNodes.map( getNodeInnerHtml );
+		const textNodes = wrapperElement().querySelectorAll( '.components-form-token-field__token-text span[aria-hidden]' );
+		return map( textNodes, ( node ) => node.innerHTML );
 	}
 
 	function getSuggestionsText( selector ) {
-		const suggestionNodes = wrapper.find( selector || '.components-form-token-field__suggestion' );
+		const suggestionNodes = wrapperElement().querySelectorAll( selector || '.components-form-token-field__suggestion' );
 
-		return suggestionNodes.map( getSuggestionNodeText );
+		return map( suggestionNodes, getSuggestionNodeText );
 	}
 
 	function getSuggestionNodeText( node ) {
-		if ( ! node.find( 'span' ).length ) {
-			return getNodeInnerHtml( node );
+		if ( ! node.querySelector( 'span' ) ) {
+			return node.outerHTML;
 		}
 
 		// This suggestion is part of a partial match; return up to three
 		// sections of the suggestion (before match, match, and after
 		// match)
 		const div = document.createElement( 'div' );
-		div.innerHTML = node.find( 'span' ).html();
-
+		div.innerHTML = node.querySelector( 'span' ).outerHTML;
 		return map(
 			filter(
 				div.firstChild.childNodes,
@@ -94,14 +99,26 @@ describe( 'FormTokenField', function() {
 	}
 
 	beforeEach( function() {
-		wrapper = mount( <TokenFieldWrapper /> );
-		textInputNode = wrapper.find( '.components-form-token-field__input' );
-		textInputNode.simulate( 'focus' );
+		wrapper = TestUtils.renderIntoDocument(
+			<TokenFieldWrapper />,
+		);
+		/* eslint-disable react/no-find-dom-node */
+		wrapperElement = () => ReactDOM.findDOMNode( wrapper );
+		textInputElement = () => TestUtils.findRenderedDOMComponentWithClass(
+			wrapper,
+			'components-form-token-field__input'
+		);
+		textInputComponent = () => TestUtils.findRenderedComponentWithType(
+			wrapper,
+			TokenInput
+		);
+		/* eslint-enable react/no-find-dom-node */
+		TestUtils.Simulate.focus( textInputElement() );
 	} );
 
 	describe( 'displaying tokens', function() {
 		it( 'should render default tokens', function() {
-			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'foo', 'bar' ] );
+			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar' ] );
 		} );
 
 		it( 'should display tokens with escaped special characters properly', function() {
@@ -182,20 +199,21 @@ describe( 'FormTokenField', function() {
 			sendKeyDown( keyCodes.downArrow ); // 'that'
 			expect( getSelectedSuggestion() ).toEqual( [ 'th', 'at' ] );
 
-			const hoverSuggestion = wrapper.find( '.components-form-token-field__suggestion' ).at( 3 ); // 'with'
+			const hoverSuggestion = wrapperElement()
+				.querySelectorAll( '.components-form-token-field__suggestion' )[ 3 ]; // 'with'
 			expect( getSuggestionNodeText( hoverSuggestion ) ).toEqual( [ 'wi', 'th' ] );
 
 			// before sending a hover event, we need to wait for
 			// SuggestionList#_scrollingIntoView to become false
 			jest.runTimersToTime( 100 );
 
-			hoverSuggestion.simulate( 'mouseEnter' );
+			TestUtils.Simulate.mouseEnter( hoverSuggestion );
 			expect( getSelectedSuggestion() ).toEqual( [ 'wi', 'th' ] );
 			sendKeyDown( keyCodes.upArrow );
 			expect( getSelectedSuggestion() ).toEqual( [ 'th', 'is' ] );
 			sendKeyDown( keyCodes.upArrow );
 			expect( getSelectedSuggestion() ).toEqual( [ 'th', 'at' ] );
-			hoverSuggestion.simulate( 'click' );
+			TestUtils.Simulate.click( hoverSuggestion );
 			expect( getSelectedSuggestion() ).toBe( null );
 			expect( getTokensHTML() ).toEqual( [ 'foo', 'bar', 'with' ] );
 		} );
@@ -204,56 +222,58 @@ describe( 'FormTokenField', function() {
 	describe( 'adding tokens', function() {
 		it( 'should not allow adding blank tokens with Tab', function() {
 			sendKeyDown( keyCodes.tab );
-			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'foo', 'bar' ] );
+			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar' ] );
 		} );
 
 		it( 'should not allow adding whitespace tokens with Tab', function() {
 			setText( '   ' );
 			sendKeyDown( keyCodes.tab );
-			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'foo', 'bar' ] );
+			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar' ] );
 		} );
 
 		it( 'should add a token when Enter pressed', function() {
 			setText( 'baz' );
 			sendKeyDown( keyCodes.enter );
-			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'foo', 'bar', 'baz' ] );
-			expect( textInputNode.prop( 'value' ) ).toBe( '' );
+			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar', 'baz' ] );
+			const textNode = textInputComponent();
+			expect( textNode.props.value ).toBe( '' );
 		} );
 
 		it( 'should not allow adding blank tokens with Enter', function() {
 			sendKeyDown( keyCodes.enter );
-			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'foo', 'bar' ] );
+			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar' ] );
 		} );
 
 		it( 'should not allow adding whitespace tokens with Enter', function() {
 			setText( '   ' );
 			sendKeyDown( keyCodes.enter );
-			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'foo', 'bar' ] );
+			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar' ] );
 		} );
 
 		it( 'should not allow adding whitespace tokens with comma', function() {
 			setText( '   ' );
 			sendKeyPress( charCodes.comma );
-			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'foo', 'bar' ] );
+			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar' ] );
 		} );
 
 		it( 'should add a token when comma pressed', function() {
 			setText( 'baz' );
 			sendKeyPress( charCodes.comma );
-			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'foo', 'bar', 'baz' ] );
+			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar', 'baz' ] );
 		} );
 
 		it( 'should trim token values when adding', function() {
 			setText( '  baz  ' );
 			sendKeyDown( keyCodes.enter );
-			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'foo', 'bar', 'baz' ] );
+			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar', 'baz' ] );
 		} );
 	} );
 
 	describe( 'removing tokens', function() {
 		it( 'should remove tokens when X icon clicked', function() {
-			wrapper.find( '.components-form-token-field__remove-token' ).first().simulate( 'click' );
-			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'bar' ] );
+			const forClickNode = wrapperElement().querySelector( '.components-form-token-field__remove-token' ).firstChild;
+			TestUtils.Simulate.click( forClickNode );
+			expect( wrapper.state.tokens ).toEqual( [ 'bar' ] );
 		} );
 	} );
 } );

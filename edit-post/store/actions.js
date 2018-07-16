@@ -139,7 +139,7 @@ export function requestMetaBoxUpdates() {
 }
 
 /**
- * Returns an action object used signal a successfull meta box update.
+ * Returns an action object used signal a successful meta box update.
  *
  * @return {Object} Action object.
  */

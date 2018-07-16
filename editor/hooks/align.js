@@ -7,7 +7,7 @@ import { assign, includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent } from '@wordpress/element';
+import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport, getBlockSupport } from '@wordpress/blocks';
 
@@ -97,7 +97,7 @@ export const withToolbarControls = createHigherOrderComponent( ( BlockEdit ) => 
  * @param  {Function} BlockListBlock Original component
  * @return {Function}                Wrapped component
  */
-export const withAlign = createHigherOrderComponent( ( BlockListBlock ) => {
+export const withDataAlign = createHigherOrderComponent( ( BlockListBlock ) => {
 	return ( props ) => {
 		const { align } = props.block.attributes;
 		const validAlignments = getBlockValidAlignments( props.block.name );
@@ -109,7 +109,7 @@ export const withAlign = createHigherOrderComponent( ( BlockListBlock ) => {
 
 		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
 	};
-}, 'withAlign' );
+}, 'withDataAlign' );
 
 /**
  * Override props assigned to save component to inject alignment class name if
@@ -131,7 +131,7 @@ export function addAssignedAlign( props, blockType, attributes ) {
 }
 
 addFilter( 'blocks.registerBlockType', 'core/align/addAttribute', addAttribute );
-addFilter( 'editor.BlockListBlock', 'core/align/withAlign', withAlign );
-addFilter( 'blocks.BlockEdit', 'core/align/withToolbarControls', withToolbarControls );
+addFilter( 'editor.BlockListBlock', 'core/editor/align/with-data-align', withDataAlign );
+addFilter( 'editor.BlockEdit', 'core/editor/align/with-toolbar-controls', withToolbarControls );
 addFilter( 'blocks.getSaveContent.extraProps', 'core/align/addAssignedAlign', addAssignedAlign );
 

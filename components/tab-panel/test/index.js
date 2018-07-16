@@ -1,91 +1,151 @@
 /**
  * External dependencies
  */
-import { mount } from 'enzyme';
+import TestUtils from 'react-dom/test-utils';
 
 /**
  * Internal dependencies
  */
 import TabPanel from '../';
 
+/**
+ * WordPress dependencies
+ */
+import { Component } from '@wordpress/element';
+
 describe( 'TabPanel', () => {
+	const getElementByClass = ( wrapper, className ) => {
+		return TestUtils.findRenderedDOMComponentWithClass( wrapper, className );
+	};
+
+	const getElementsByClass = ( wrapper, className ) => {
+		return TestUtils
+			.scryRenderedDOMComponentsWithClass( wrapper, className );
+	};
+
+	const elementClick = ( element ) => {
+		TestUtils.Simulate.click( element );
+	};
+
+	// this is needed because TestUtils does not accept a stateless component.
+	// anything run through a HOC ends up as a stateless component.
+	const getTestComponent = ( WrappedComponent, props ) => {
+		class TestComponent extends Component {
+			render() {
+				return <WrappedComponent { ...props } />;
+			}
+		}
+		return <TestComponent />;
+	};
+
 	describe( 'basic rendering', () => {
 		it( 'should render a tabpanel, and clicking should change tabs', () => {
-			const wrapper = mount(
-				<TabPanel className="test-panel"
-					activeClass="active-tab"
-					tabs={
-						[
-							{
-								name: 'alpha',
-								title: 'Alpha',
-								className: 'alpha',
-							},
-							{
-								name: 'beta',
-								title: 'Beta',
-								className: 'beta',
-							},
-							{
-								name: 'gamma',
-								title: 'Gamma',
-								className: 'gamma',
-							},
-						]
-					}
-				>
+			const props = {
+				className: 'test-panel',
+				activeClass: 'active-tab',
+				tabs: [
 					{
-						( tabName ) => {
-							return <p tabIndex="0" className={ tabName + '-view' }>{ tabName }</p>;
-						}
-					}
-				</TabPanel>
+						name: 'alpha',
+						title: 'Alpha',
+						className: 'alpha',
+					},
+					{
+						name: 'beta',
+						title: 'Beta',
+						className: 'beta',
+					},
+					{
+						name: 'gamma',
+						title: 'Gamma',
+						className: 'gamma',
+					},
+				],
+				children: ( tabName ) => {
+					return <p tabIndex="0" className={ tabName + '-view' }>{ tabName }</p>;
+				},
+			};
+
+			const wrapper = TestUtils.renderIntoDocument(
+				getTestComponent( TabPanel, props )
 			);
 
-			const alphaTab = wrapper.find( 'button.alpha' );
-			const betaTab = wrapper.find( 'button.beta' );
-			const gammaTab = wrapper.find( 'button.gamma' );
+			const alphaTab = getElementByClass( wrapper, 'alpha' );
+			const betaTab = getElementByClass( wrapper, 'beta' );
+			const gammaTab = getElementByClass( wrapper, 'gamma' );
 
-			const getAlphaView = () => wrapper.find( 'p.alpha-view' );
-			const getBetaView = () => wrapper.find( 'p.beta-view' );
-			const getGammaView = () => wrapper.find( 'p.gamma-view' );
+			const getAlphaViews = () => getElementsByClass( wrapper, 'alpha-view' );
+			const getBetaViews = () => getElementsByClass( wrapper, 'beta-view' );
+			const getGammaViews = () => getElementsByClass( wrapper, 'gamma-view' );
 
-			const getActiveTab = () => wrapper.find( 'button.active-tab' );
-			const getActiveView = () => wrapper.find( 'div[role="tabpanel"]' );
+			const getActiveTab = () => getElementByClass( wrapper, 'active-tab' );
+			const getActiveView = () => getElementByClass( wrapper, 'components-tab-panel__tab-content' ).firstChild.textContent;
 
-			expect( getActiveTab().text() ).toBe( 'Alpha' );
-			expect( getAlphaView() ).toHaveLength( 1 );
-			expect( getBetaView() ).toHaveLength( 0 );
-			expect( getGammaView() ).toHaveLength( 0 );
-			expect( getActiveView().text() ).toBe( 'alpha' );
+			expect( getActiveTab().innerHTML ).toBe( 'Alpha' );
+			expect( getAlphaViews() ).toHaveLength( 1 );
+			expect( getBetaViews() ).toHaveLength( 0 );
+			expect( getGammaViews() ).toHaveLength( 0 );
+			expect( getActiveView() ).toBe( 'alpha' );
 
-			betaTab.simulate( 'click' );
-			expect( getActiveTab().text() ).toBe( 'Beta' );
-			expect( getAlphaView() ).toHaveLength( 0 );
-			expect( getBetaView() ).toHaveLength( 1 );
-			expect( getGammaView() ).toHaveLength( 0 );
-			expect( getActiveView().text() ).toBe( 'beta' );
+			elementClick( betaTab );
 
-			betaTab.simulate( 'click' );
-			expect( getActiveTab().text() ).toBe( 'Beta' );
-			expect( getAlphaView() ).toHaveLength( 0 );
-			expect( getBetaView() ).toHaveLength( 1 );
-			expect( getGammaView() ).toHaveLength( 0 );
-			expect( getActiveView().text() ).toBe( 'beta' );
+			expect( getActiveTab().innerHTML ).toBe( 'Beta' );
+			expect( getAlphaViews() ).toHaveLength( 0 );
+			expect( getBetaViews() ).toHaveLength( 1 );
+			expect( getGammaViews() ).toHaveLength( 0 );
+			expect( getActiveView() ).toBe( 'beta' );
 
-			gammaTab.simulate( 'click' );
-			expect( getActiveTab().text() ).toBe( 'Gamma' );
-			expect( getAlphaView() ).toHaveLength( 0 );
-			expect( getBetaView() ).toHaveLength( 0 );
-			expect( getGammaView() ).toHaveLength( 1 );
-			expect( getActiveView().text() ).toBe( 'gamma' );
+			elementClick( betaTab );
 
-			alphaTab.simulate( 'click' );
-			expect( getActiveTab().text() ).toBe( 'Alpha' );
-			expect( getAlphaView() ).toHaveLength( 1 );
-			expect( getBetaView() ).toHaveLength( 0 );
-			expect( getGammaView() ).toHaveLength( 0 );
-			expect( getActiveView().text() ).toBe( 'alpha' );
+			expect( getActiveTab().innerHTML ).toBe( 'Beta' );
+			expect( getAlphaViews() ).toHaveLength( 0 );
+			expect( getBetaViews() ).toHaveLength( 1 );
+			expect( getGammaViews() ).toHaveLength( 0 );
+			expect( getActiveView() ).toBe( 'beta' );
+
+			elementClick( gammaTab );
+
+			expect( getActiveTab().innerHTML ).toBe( 'Gamma' );
+			expect( getAlphaViews() ).toHaveLength( 0 );
+			expect( getBetaViews() ).toHaveLength( 0 );
+			expect( getGammaViews() ).toHaveLength( 1 );
+			expect( getActiveView() ).toBe( 'gamma' );
+
+			elementClick( alphaTab );
+
+			expect( getActiveTab().innerHTML ).toBe( 'Alpha' );
+			expect( getAlphaViews() ).toHaveLength( 1 );
+			expect( getBetaViews() ).toHaveLength( 0 );
+			expect( getGammaViews() ).toHaveLength( 0 );
+			expect( getActiveView() ).toBe( 'alpha' );
 		} );
+	} );
+
+	it( 'should render with a tab initially selected by prop initialTabIndex', () => {
+		const props = {
+			className: 'test-panel',
+			activeClass: 'active-tab',
+			initialTabName: 'beta',
+			tabs: [
+				{
+					name: 'alpha',
+					title: 'Alpha',
+					className: 'alpha',
+				},
+				{
+					name: 'beta',
+					title: 'Beta',
+					className: 'beta',
+				},
+			],
+			children: ( tabName ) => {
+				return <p tabIndex="0" className={ tabName + '-view' }>{ tabName }</p>;
+			},
+		};
+		const wrapper = TestUtils.renderIntoDocument(
+			getTestComponent( TabPanel, props )
+		);
+
+		const getActiveTab = () => getElementByClass( wrapper, 'active-tab' );
+		expect( getActiveTab().innerHTML ).toBe( 'Beta' );
 	} );
 } );

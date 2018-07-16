@@ -8,7 +8,8 @@ import { isEqual } from 'lodash';
 /**
  * WordPress Dependencies
  */
-import { Component, compose } from '@wordpress/element';
+import { Component } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 import { getBlockAttributes, getBlockContent, getBlockType, isValidBlock } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -22,10 +23,10 @@ class BlockHTML extends Component {
 		};
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		if ( ! isEqual( nextProps.block.attributes, this.props.block.attributes ) ) {
+	componentDidUpdate( prevProps ) {
+		if ( ! isEqual( this.props.block.attributes, prevProps.block.attributes ) ) {
 			this.setState( {
-				html: getBlockContent( nextProps.block ),
+				html: getBlockContent( this.props.block ),
 			} );
 		}
 	}

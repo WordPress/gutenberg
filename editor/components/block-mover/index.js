@@ -8,10 +8,11 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, withInstanceId } from '@wordpress/components';
+import { IconButton } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
-import { compose, Component } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { withInstanceId, compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -107,15 +108,14 @@ export class BlockMover extends Component {
 
 export default compose(
 	withSelect( ( select, { uids, rootUID } ) => {
-		const { getBlock, getBlockIndex, getEditorSettings } = select( 'core/editor' );
+		const { getBlock, getBlockIndex, getTemplateLock } = select( 'core/editor' );
 		const firstUID = first( castArray( uids ) );
 		const block = getBlock( firstUID );
-		const { templateLock } = getEditorSettings();
 
 		return {
 			firstIndex: getBlockIndex( firstUID, rootUID ),
 			blockType: block ? getBlockType( block.name ) : null,
-			isLocked: templateLock === 'all',
+			isLocked: getTemplateLock( rootUID ) === 'all',
 		};
 	} ),
 	withDispatch( ( dispatch, { uids, rootUID } ) => {

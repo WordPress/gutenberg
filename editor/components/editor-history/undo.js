@@ -4,10 +4,8 @@
 import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/element';
-import { keycodes } from '@wordpress/utils';
-
-const { displayShortcut } = keycodes;
+import { compose } from '@wordpress/compose';
+import { displayShortcut } from '@wordpress/keycodes';
 
 function EditorHistoryUndo( { hasUndo, undo } ) {
 	return (

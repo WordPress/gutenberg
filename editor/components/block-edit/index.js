@@ -1,14 +1,7 @@
 /**
- * External dependencies
- */
-import { noop, get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
-import { Component, compose } from '@wordpress/element';
-import { withContext, withAPIData } from '@wordpress/components';
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -16,30 +9,15 @@ import { withContext, withAPIData } from '@wordpress/components';
 import Edit from './edit';
 import { BlockEditContextProvider } from './context';
 
-export class BlockEdit extends Component {
+class BlockEdit extends Component {
 	constructor( props ) {
 		super( props );
+
 		this.setFocusedElement = this.setFocusedElement.bind( this );
+
 		this.state = {
 			focusedElement: null,
 			setFocusedElement: this.setFocusedElement,
-		};
-	}
-
-	getChildContext() {
-		const {
-			id: uid,
-			user,
-			createInnerBlockList,
-		} = this.props;
-
-		return {
-			uid,
-			BlockList: createInnerBlockList( uid ),
-			canUserUseUnfilteredHTML: get( user.data, [
-				'capabilities',
-				'unfiltered_html',
-			], false ),
 		};
 	}
 
@@ -52,18 +30,13 @@ export class BlockEdit extends Component {
 		} );
 	}
 
-	static getDerivedStateFromProps( { name, isSelected }, prevState ) {
-		if (
-			name === prevState.name &&
-			isSelected === prevState.isSelected
-		) {
-			return null;
-		}
+	static getDerivedStateFromProps( props ) {
+		const { id, name, isSelected } = props;
 
 		return {
-			...prevState,
 			name,
 			isSelected,
+			uid: id,
 		};
 	}
 
@@ -76,18 +49,4 @@ export class BlockEdit extends Component {
 	}
 }
 
-BlockEdit.childContextTypes = {
-	uid: noop,
-	BlockList: noop,
-	canUserUseUnfilteredHTML: noop,
-};
-
-export default compose( [
-	withSelect( ( select ) => ( {
-		postType: select( 'core/editor' ).getEditedPostAttribute( 'type' ),
-	} ) ),
-	withAPIData( ( { postType } ) => ( {
-		user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
-	} ) ),
-	withContext( 'createInnerBlockList' )(),
-] )( BlockEdit );
+export default BlockEdit;

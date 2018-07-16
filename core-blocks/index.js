@@ -16,13 +16,16 @@ import * as image from './image';
 import * as heading from './heading';
 import * as quote from './quote';
 import * as gallery from './gallery';
+import * as archives from './archives';
 import * as audio from './audio';
 import * as button from './button';
 import * as categories from './categories';
 import * as code from './code';
 import * as columns from './columns';
+import * as column from './columns/column';
 import * as coverImage from './cover-image';
 import * as embed from './embed';
+import * as file from './file';
 import * as freeform from './freeform';
 import * as html from './html';
 import * as latestPosts from './latest-posts';
@@ -54,15 +57,18 @@ export const registerCoreBlocks = () => {
 
 		// Register all remaining core blocks.
 		shortcode,
+		archives,
 		audio,
 		button,
 		categories,
 		code,
 		columns,
+		column,
 		coverImage,
 		embed,
 		...embed.common,
 		...embed.others,
+		file,
 		freeform,
 		html,
 		latestPosts,

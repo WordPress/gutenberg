@@ -28,7 +28,7 @@ class SelectAllDetection extends Component {
 	render() {
 		return (
 			<div>
-				<KeyboardShorcuts shortcuts={ {
+				<KeyboardShortcuts shortcuts={ {
 					'mod+a': this.setAllSelected,
 				} } />
 				Combination pressed? { isAllSelected ? 'Yes' : 'No' }

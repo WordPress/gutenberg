@@ -11,18 +11,33 @@ import blockCompleter, { createBlockCompleter } from '../block';
 describe( 'block', () => {
 	it( 'should retrieve block options for current insertion point', () => {
 		const expectedOptions = [ {}, {}, {} ];
-		const mockGetBlockInsertionPoint = jest.fn( () => 'expected-insertion-point' );
+		const mockGetBlockInsertionParentUID = jest.fn( () => 'expected-insertion-point' );
 		const mockGetInserterItems = jest.fn( () => expectedOptions );
 
 		const completer = createBlockCompleter( {
-			getBlockInsertionPoint: mockGetBlockInsertionPoint,
+			getBlockInsertionParentUID: mockGetBlockInsertionParentUID,
 			getInserterItems: mockGetInserterItems,
+			getSelectedBlockName: () => 'non-existent-block-name',
 		} );
 
 		const actualOptions = completer.options();
-		expect( mockGetBlockInsertionPoint ).toHaveBeenCalled();
+		expect( mockGetBlockInsertionParentUID ).toHaveBeenCalled();
 		expect( mockGetInserterItems ).toHaveBeenCalledWith( 'expected-insertion-point' );
-		expect( actualOptions ).toBe( expectedOptions );
+		expect( actualOptions ).toEqual( expectedOptions );
+	} );
+
+	it( 'should exclude the currently selected block from the options', () => {
+		const option1 = { name: 'block-1' };
+		const option2CurrentlySelected = { name: 'block-2-currently-selected' };
+		const option3 = { name: 'block-3' };
+
+		const completer = createBlockCompleter( {
+			getBlockInsertionParentUID: () => 'ignored',
+			getInserterItems: () => [ option1, option2CurrentlySelected, option3 ],
+			getSelectedBlockName: () => 'block-2-currently-selected',
+		} );
+
+		expect( completer.options() ).toEqual( [ option1, option3 ] );
 	} );
 
 	it( 'should derive option keywords from block keywords and block title', () => {

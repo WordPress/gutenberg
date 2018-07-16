@@ -1,7 +1,9 @@
 /**
  * External dependencies
  */
-import { shallow, mount } from 'enzyme';
+import { shallow } from 'enzyme';
+import TestUtils from 'react-dom/test-utils';
+import ReactDOM from 'react-dom';
 
 /**
  * Internal dependencies
@@ -57,11 +59,21 @@ describe( 'UrlInputButton', () => {
 		expect( wrapper.state().expanded ).toBe( false );
 	} );
 	it( 'should close the form when user submits it', () => {
-		const wrapper = mount( <UrlInputButton /> );
-		clickEditLink( wrapper );
-		expect( wrapper.state().expanded ).toBe( true );
-		wrapper.find( 'form' ).simulate( 'submit' );
-		expect( wrapper.state().expanded ).toBe( false );
-		wrapper.unmount();
+		const wrapper = TestUtils.renderIntoDocument( <UrlInputButton /> );
+		const buttonElement = () => TestUtils.findRenderedDOMComponentWithClass(
+			wrapper,
+			'components-toolbar__control'
+		);
+		const formElement = () => TestUtils.findRenderedDOMComponentWithTag(
+			wrapper,
+			'form'
+		);
+		TestUtils.Simulate.click( buttonElement() );
+		expect( wrapper.state.expanded ).toBe( true );
+		TestUtils.Simulate.submit( formElement() );
+		expect( wrapper.state.expanded ).toBe( false );
+		/* eslint-disable react/no-find-dom-node */
+		ReactDOM.unmountComponentAtNode( ReactDOM.findDOMNode( wrapper ).parentNode );
+		/* eslint-enable react/no-find-dom-node */
 	} );
 } );

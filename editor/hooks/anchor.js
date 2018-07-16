@@ -6,11 +6,12 @@ import { assign } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent, Fragment } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -104,5 +105,5 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 }
 
 addFilter( 'blocks.registerBlockType', 'core/anchor/attribute', addAttribute );
-addFilter( 'blocks.BlockEdit', 'core/anchor/inspector-control', withInspectorControl );
+addFilter( 'editor.BlockEdit', 'core/editor/anchor/with-inspector-control', withInspectorControl );
 addFilter( 'blocks.getSaveContent.extraProps', 'core/anchor/save-props', addSaveProps );

@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { Component, findDOMNode, createHigherOrderComponent } from '@wordpress/element';
+import { Component, findDOMNode } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 const withHoverAreas = createHigherOrderComponent( ( WrappedComponent ) => {
 	class WithHoverAreasComponent extends Component {

@@ -14,8 +14,9 @@ import {
 	getBlockTransforms,
 	findTransform,
 } from '@wordpress/blocks';
-import { compose, Component } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -137,11 +138,10 @@ export default compose(
 			},
 		};
 	} ),
-	withSelect( ( select ) => {
-		const { templateLock } = select( 'core/editor' ).getEditorSettings();
-
+	withSelect( ( select, { rootUID } ) => {
+		const { getTemplateLock } = select( 'core/editor' );
 		return {
-			isLocked: !! templateLock,
+			isLocked: !! getTemplateLock( rootUID ),
 		};
 	} )
 )( BlockDropZone );

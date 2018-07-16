@@ -9,6 +9,7 @@ import classnames from 'classnames';
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
+import { withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -17,7 +18,6 @@ import './style.scss';
 import Token from './token';
 import TokenInput from './token-input';
 import SuggestionsList from './suggestions-list';
-import withInstanceId from '../higher-order/with-instance-id';
 import withSpokenMessages from '../higher-order/with-spoken-messages';
 
 const initialState = {
@@ -57,13 +57,15 @@ class FormTokenField extends Component {
 		}
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		if ( nextProps.disabled && this.state.isActive ) {
-			this.setState( {
-				isActive: false,
-				incompleteTokenValue: '',
-			} );
+	static getDerivedStateFromProps( props, state ) {
+		if ( ! props.disabled || ! state.isActive ) {
+			return null;
 		}
+
+		return {
+			isActive: false,
+			incompleteTokenValue: '',
+		};
 	}
 
 	bindInput( ref ) {
@@ -515,7 +517,6 @@ class FormTokenField extends Component {
 		} );
 
 		let tokenFieldProps = {
-			ref: 'main',
 			className: classes,
 			tabIndex: '-1',
 		};

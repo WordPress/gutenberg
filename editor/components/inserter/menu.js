@@ -20,23 +20,23 @@ import scrollIntoView from 'dom-scroll-into-view';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, compose, findDOMNode, createRef } from '@wordpress/element';
+import { Component, findDOMNode, createRef } from '@wordpress/element';
 import {
-	withInstanceId,
 	withSpokenMessages,
 	PanelBody,
-	withSafeTimeout,
 } from '@wordpress/components';
 import { getCategories, isSharedBlock } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
+import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import BlockPreview from '../block-preview';
-import ItemList from './item-list';
+import BlockTypesList from '../block-types-list';
 import ChildBlocks from './child-blocks';
+import InserterResultsPortal from './results-portal';
 
 const MAX_SUGGESTED_ITEMS = 9;
 
@@ -95,6 +95,12 @@ export class InserterMenu extends Component {
 		this.setState( {
 			hoveredItem: item,
 		} );
+
+		if ( item ) {
+			this.props.showInsertionPoint();
+		} else {
+			this.props.hideInsertionPoint();
+		}
 	}
 
 	bindPanel( name ) {
@@ -200,7 +206,15 @@ export class InserterMenu extends Component {
 					onChange={ this.onChangeSearchInput }
 				/>
 
-				<div className="editor-inserter__results" ref={ this.inserterResults }>
+				<div
+					className="editor-inserter__results"
+					ref={ this.inserterResults }
+					tabIndex="0"
+					role="region"
+					aria-label={ __( 'Available block types' ) }
+				>
+					<InserterResultsPortal.Slot fillProps={ { filterValue } } />
+
 					<ChildBlocks
 						rootUID={ rootUID }
 						items={ childItems }
@@ -215,7 +229,7 @@ export class InserterMenu extends Component {
 							onToggle={ this.onTogglePanel( 'suggested' ) }
 							ref={ this.bindPanel( 'suggested' ) }
 						>
-							<ItemList items={ suggestedItems } onSelect={ onSelect } onHover={ this.onHover } />
+							<BlockTypesList items={ suggestedItems } onSelect={ onSelect } onHover={ this.onHover } />
 						</PanelBody>
 					}
 					{ map( getCategories(), ( category ) => {
@@ -231,7 +245,7 @@ export class InserterMenu extends Component {
 								onToggle={ this.onTogglePanel( category.slug ) }
 								ref={ this.bindPanel( category.slug ) }
 							>
-								<ItemList items={ categoryItems } onSelect={ onSelect } onHover={ this.onHover } />
+								<BlockTypesList items={ categoryItems } onSelect={ onSelect } onHover={ this.onHover } />
 							</PanelBody>
 						);
 					} ) }
@@ -243,7 +257,7 @@ export class InserterMenu extends Component {
 							icon="controls-repeat"
 							ref={ this.bindPanel( 'shared' ) }
 						>
-							<ItemList items={ sharedItems } onSelect={ onSelect } onHover={ this.onHover } />
+							<BlockTypesList items={ sharedItems } onSelect={ onSelect } onHover={ this.onHover } />
 						</PanelBody>
 					) }
 					{ isEmpty( suggestedItems ) && isEmpty( sharedItems ) && isEmpty( itemsPerCategory ) && (
@@ -275,6 +289,8 @@ export default compose(
 	} ),
 	withDispatch( ( dispatch ) => ( {
 		fetchSharedBlocks: dispatch( 'core/editor' ).fetchSharedBlocks,
+		showInsertionPoint: dispatch( 'core/editor' ).showInsertionPoint,
+		hideInsertionPoint: dispatch( 'core/editor' ).hideInsertionPoint,
 	} ) ),
 	withSpokenMessages,
 	withInstanceId,

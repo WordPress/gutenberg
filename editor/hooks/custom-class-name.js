@@ -1,17 +1,22 @@
 /**
  * External dependencies
  */
-import { assign } from 'lodash';
+import { assign, difference, compact } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent, Fragment } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { hasBlockSupport } from '@wordpress/blocks';
+import {
+	hasBlockSupport,
+	parseWithAttributeSchema,
+	getSaveContent,
+} from '@wordpress/blocks';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -93,6 +98,65 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 	return extraProps;
 }
 
+/**
+ * Given an HTML string, returns an array of class names assigned to the root
+ * element in the markup.
+ *
+ * @param {string} innerHTML Markup string from which to extract classes.
+ *
+ * @return {string[]} Array of class names assigned to the root element.
+ */
+export function getHTMLRootElementClasses( innerHTML ) {
+	innerHTML = `<div data-custom-class-name>${ innerHTML }</div>`;
+
+	const parsed = parseWithAttributeSchema( innerHTML, {
+		type: 'string',
+		source: 'attribute',
+		selector: '[data-custom-class-name] > *',
+		attribute: 'class',
+	} );
+
+	return parsed ? parsed.trim().split( /\s+/ ) : [];
+}
+
+/**
+ * Given a parsed set of block attributes, if the block supports custom class
+ * names and an unknown class (per the block's serialization behavior) is
+ * found, the unknown classes are treated as custom classes. This prevents the
+ * block from being considered as invalid.
+ *
+ * @param {Object} blockAttributes Original block attributes.
+ * @param {Object} blockType       Block type settings.
+ * @param {string} innerHTML       Original block markup.
+ *
+ * @return {Object} Filtered block attributes.
+ */
+export function addParsedDifference( blockAttributes, blockType, innerHTML ) {
+	if ( hasBlockSupport( blockType, 'customClassName', true ) ) {
+		// To determine difference, serialize block given the known set of
+		// attributes. If there are classes which are mismatched with the
+		// incoming HTML of the block, add to filtered result.
+		const serialized = getSaveContent( blockType, blockAttributes );
+		const classes = getHTMLRootElementClasses( serialized );
+		const parsedClasses = getHTMLRootElementClasses( innerHTML );
+		const customClasses = difference( parsedClasses, classes );
+
+		const filteredClassName = compact( [
+			blockAttributes.className,
+			...customClasses,
+		] ).join( ' ' );
+
+		if ( filteredClassName ) {
+			blockAttributes.className = filteredClassName;
+		} else {
+			delete blockAttributes.className;
+		}
+	}
+
+	return blockAttributes;
+}
+
 addFilter( 'blocks.registerBlockType', 'core/custom-class-name/attribute', addAttribute );
-addFilter( 'blocks.BlockEdit', 'core/custom-class-name/inspector-control', withInspectorControl );
+addFilter( 'editor.BlockEdit', 'core/editor/custom-class-name/with-inspector-control', withInspectorControl );
 addFilter( 'blocks.getSaveContent.extraProps', 'core/custom-class-name/save-props', addSaveProps );
+addFilter( 'blocks.getBlockAttributes', 'core/custom-class-name/addParsedDifference', addParsedDifference );

@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { guides, areTipsDisabled, dismissedTips } from '../reducer';
+import { guides, areTipsEnabled, dismissedTips } from '../reducer';
 
 describe( 'reducer', () => {
 	describe( 'guides', () => {
@@ -20,14 +20,21 @@ describe( 'reducer', () => {
 		} );
 	} );
 
-	describe( 'areTipsDisabled', () => {
-		it( 'should default to false', () => {
-			expect( areTipsDisabled( undefined, {} ) ).toBe( false );
+	describe( 'areTipsEnabled', () => {
+		it( 'should default to true', () => {
+			expect( areTipsEnabled( undefined, {} ) ).toBe( true );
 		} );
 
 		it( 'should flip when tips are disabled', () => {
-			const state = areTipsDisabled( false, {
+			const state = areTipsEnabled( true, {
 				type: 'DISABLE_TIPS',
+			} );
+			expect( state ).toBe( false );
+		} );
+
+		it( 'should flip when tips are enabled', () => {
+			const state = areTipsEnabled( false, {
+				type: 'ENABLE_TIPS',
 			} );
 			expect( state ).toBe( true );
 		} );
@@ -46,6 +53,16 @@ describe( 'reducer', () => {
 			expect( state ).toEqual( {
 				'test/tip': true,
 			} );
+		} );
+
+		it( 'should reset if tips are enabled', () => {
+			const initialState = {
+				'test/tip': true,
+			};
+			const state = dismissedTips( initialState, {
+				type: 'ENABLE_TIPS',
+			} );
+			expect( state ).toEqual( {} );
 		} );
 	} );
 } );

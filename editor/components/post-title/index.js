@@ -9,10 +9,12 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, compose } from '@wordpress/element';
-import { keycodes, decodeEntities } from '@wordpress/utils';
+import { Component } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/utils';
+import { ENTER } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { KeyboardShortcuts, withInstanceId, withFocusOutside } from '@wordpress/components';
+import { KeyboardShortcuts, withFocusOutside } from '@wordpress/components';
+import { withInstanceId, compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -25,7 +27,6 @@ import PostTypeSupportCheck from '../post-type-support-check';
  * Constants
  */
 const REGEXP_NEWLINES = /[\r\n]+/g;
-const { ENTER } = keycodes;
 
 class PostTitle extends Component {
 	constructor() {

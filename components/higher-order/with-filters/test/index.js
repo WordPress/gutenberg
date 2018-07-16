@@ -1,35 +1,63 @@
 /**
  * External dependencies
  */
-import { mount, shallow } from 'enzyme';
+import { shallow } from 'enzyme';
+import TestUtils from 'react-dom/test-utils';
+import ReactDOM from 'react-dom';
 
 /**
  * WordPress dependencies
  */
 import { addFilter, removeAllFilters, removeFilter } from '@wordpress/hooks';
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import withFilters from '..';
 
+const assertExpectedHtml = ( wrapper, expectedHTML ) => {
+	/* eslint-disable react/no-find-dom-node */
+	const element = ReactDOM.findDOMNode( wrapper );
+	/* eslint-enable react/no-find-dom-node */
+	expect( element.outerHTML ).toBe( expectedHTML );
+};
+
+// this is needed because TestUtils does not accept a stateless component.
+// anything run through a HOC ends up as a stateless component.
+const getTestComponent = ( WrappedComponent ) => {
+	class TestComponent extends Component {
+		render() {
+			return <WrappedComponent { ...this.props } />;
+		}
+	}
+	return <TestComponent />;
+};
+
 describe( 'withFilters', () => {
-	let wrapper;
+	let shallowWrapper, wrapper;
 
 	const hookName = 'EnhancedComponent';
 	const MyComponent = () => <div>My component</div>;
 
 	afterEach( () => {
-		wrapper.unmount();
+		if ( wrapper ) {
+			/* eslint-disable react/no-find-dom-node */
+			ReactDOM.unmountComponentAtNode( ReactDOM.findDOMNode( wrapper ).parentNode );
+		}
+		if ( shallowWrapper ) {
+			shallowWrapper.unmount();
+		}
+		/* eslint-enable react/no-find-dom-node */
 		removeAllFilters( hookName );
 	} );
 
 	it( 'should display original component when no filters applied', () => {
 		const EnhancedComponent = withFilters( hookName )( MyComponent );
 
-		wrapper = shallow( <EnhancedComponent /> );
+		shallowWrapper = shallow( <EnhancedComponent /> );
 
-		expect( wrapper.html() ).toBe( '<div>My component</div>' );
+		expect( shallowWrapper.html() ).toBe( '<div>My component</div>' );
 	} );
 
 	it( 'should display a component overridden by the filter', () => {
@@ -41,9 +69,9 @@ describe( 'withFilters', () => {
 		);
 		const EnhancedComponent = withFilters( hookName )( MyComponent );
 
-		wrapper = shallow( <EnhancedComponent /> );
+		shallowWrapper = shallow( <EnhancedComponent /> );
 
-		expect( wrapper.html() ).toBe( '<div>Overridden component</div>' );
+		expect( shallowWrapper.html() ).toBe( '<div>Overridden component</div>' );
 	} );
 
 	it( 'should display two components composed by the filter', () => {
@@ -60,9 +88,9 @@ describe( 'withFilters', () => {
 		);
 		const EnhancedComponent = withFilters( hookName )( MyComponent );
 
-		wrapper = shallow( <EnhancedComponent /> );
+		shallowWrapper = shallow( <EnhancedComponent /> );
 
-		expect( wrapper.html() ).toBe( '<div><div>My component</div><div>Composed component</div></div>' );
+		expect( shallowWrapper.html() ).toBe( '<div><div>My component</div><div>Composed component</div></div>' );
 	} );
 
 	it( 'should not re-render component when new filter added before component was mounted', () => {
@@ -82,12 +110,15 @@ describe( 'withFilters', () => {
 		);
 		const EnhancedComponent = withFilters( hookName )( SpiedComponent );
 
-		wrapper = mount( <EnhancedComponent /> );
+		wrapper = TestUtils.renderIntoDocument( getTestComponent( EnhancedComponent ) );
 
 		jest.runAllTimers();
 
 		expect( spy ).toHaveBeenCalledTimes( 1 );
-		expect( wrapper.html() ).toBe( '<blockquote><div>Spied component</div></blockquote>' );
+		assertExpectedHtml(
+			wrapper,
+			'<blockquote><div>Spied component</div></blockquote>'
+		);
 	} );
 
 	it( 'should re-render component once when new filter added after component was mounted', () => {
@@ -98,7 +129,7 @@ describe( 'withFilters', () => {
 		};
 		const EnhancedComponent = withFilters( hookName )( SpiedComponent );
 
-		wrapper = mount( <EnhancedComponent /> );
+		wrapper = TestUtils.renderIntoDocument( getTestComponent( EnhancedComponent ) );
 
 		spy.mockClear();
 		addFilter(
@@ -113,7 +144,10 @@ describe( 'withFilters', () => {
 		jest.runAllTimers();
 
 		expect( spy ).toHaveBeenCalledTimes( 1 );
-		expect( wrapper.html() ).toBe( '<blockquote><div>Spied component</div></blockquote>' );
+		assertExpectedHtml(
+			wrapper,
+			'<blockquote><div>Spied component</div></blockquote>'
+		);
 	} );
 
 	it( 'should re-render component once when two filters added in the same animation frame', () => {
@@ -123,7 +157,7 @@ describe( 'withFilters', () => {
 			return <div>Spied component</div>;
 		};
 		const EnhancedComponent = withFilters( hookName )( SpiedComponent );
-		wrapper = mount( <EnhancedComponent /> );
+		wrapper = TestUtils.renderIntoDocument( getTestComponent( EnhancedComponent ) );
 
 		spy.mockClear();
 
@@ -148,7 +182,10 @@ describe( 'withFilters', () => {
 		jest.runAllTimers();
 
 		expect( spy ).toHaveBeenCalledTimes( 1 );
-		expect( wrapper.html() ).toBe( '<section><blockquote><div>Spied component</div></blockquote></section>' );
+		assertExpectedHtml(
+			wrapper,
+			'<section><blockquote><div>Spied component</div></blockquote></section>'
+		);
 	} );
 
 	it( 'should re-render component twice when new filter added and removed in two different animation frames', () => {
@@ -158,7 +195,7 @@ describe( 'withFilters', () => {
 			return <div>Spied component</div>;
 		};
 		const EnhancedComponent = withFilters( hookName )( SpiedComponent );
-		wrapper = mount( <EnhancedComponent /> );
+		wrapper = TestUtils.renderIntoDocument( getTestComponent( EnhancedComponent ) );
 
 		spy.mockClear();
 		addFilter(
@@ -179,7 +216,10 @@ describe( 'withFilters', () => {
 		jest.runAllTimers();
 
 		expect( spy ).toHaveBeenCalledTimes( 2 );
-		expect( wrapper.html() ).toBe( '<div>Spied component</div>' );
+		assertExpectedHtml(
+			wrapper,
+			'<div>Spied component</div>'
+		);
 	} );
 
 	it( 'should re-render both components once each when one filter added', () => {
@@ -190,12 +230,12 @@ describe( 'withFilters', () => {
 		};
 		const EnhancedComponent = withFilters( hookName )( SpiedComponent );
 		const CombinedComponents = () => (
-			<div>
+			<section>
 				<EnhancedComponent />
 				<EnhancedComponent />
-			</div>
+			</section>
 		);
-		wrapper = mount( <CombinedComponents /> );
+		wrapper = TestUtils.renderIntoDocument( getTestComponent( CombinedComponents ) );
 
 		spy.mockClear();
 		addFilter(
@@ -210,6 +250,9 @@ describe( 'withFilters', () => {
 		jest.runAllTimers();
 
 		expect( spy ).toHaveBeenCalledTimes( 2 );
-		expect( wrapper.html() ).toBe( '<div><blockquote><div>Spied component</div></blockquote><blockquote><div>Spied component</div></blockquote></div>' );
+		assertExpectedHtml(
+			wrapper,
+			'<section><blockquote><div>Spied component</div></blockquote><blockquote><div>Spied component</div></blockquote></section>'
+		);
 	} );
 } );

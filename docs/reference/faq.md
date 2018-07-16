@@ -49,6 +49,8 @@ No. [TinyMCE](https://www.tinymce.com/) is one of the best tools for enabling ri
 
 Gutenberg will work in modern browsers, and Internet Explorer 11.
 
+Our [list of supported browsers can be found in the Make WordPress handbook](https://make.wordpress.org/core/handbook/best-practices/browser-support/). By "modern browsers" we generally mean the *current and past two versions* of each major browser.
+
 ## How do I make my own block?
 
 The API for creating blocks is a crucial aspect of the project. We are working on improved documentation and tutorials. Check out the [Creating Block Types](../../docs/blocks.md) section to get started.

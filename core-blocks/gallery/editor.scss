@@ -1,10 +1,17 @@
 .wp-block-gallery.components-placeholder {
 	margin: 0px;
 }
+
+// Allow gallery items to go edge to edge.
 .gutenberg .wp-block-gallery:not( .components-placeholder ) {
-	// Allow gallery items to go edge to edge.
 	margin-left: -8px;
 	margin-right: -8px;
+}
+
+// Don't use negative margins when full-wide.
+.gutenberg [data-align="full"] .wp-block-gallery:not( .components-placeholder ) {
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .blocks-gallery-item {
@@ -99,4 +106,15 @@
 	top: 50%;
 	left: 50%;
 	transform: translate( -50%, -50% );
+}
+
+// IE11 doesn't support object-fit or flex very well, so we inline-block.
+@media all and ( -ms-high-contrast: none ) {
+	*::-ms-backdrop, .blocks-gallery-item {
+		display: inline-block;
+	}
+
+	*::-ms-backdrop, .blocks-gallery-item img {
+		width: 100%;
+	}
 }

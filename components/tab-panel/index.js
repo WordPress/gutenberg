@@ -7,11 +7,11 @@ import { partial, noop, find } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import { withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import { default as withInstanceId } from '../higher-order/with-instance-id';
 import { NavigableMenu } from '../navigable-container';
 
 const TabButton = ( { tabId, onClick, children, selected, ...rest } ) => (
@@ -29,12 +29,13 @@ const TabButton = ( { tabId, onClick, children, selected, ...rest } ) => (
 class TabPanel extends Component {
 	constructor() {
 		super( ...arguments );
+		const { tabs, initialTabName } = this.props;
 
 		this.handleClick = this.handleClick.bind( this );
 		this.onNavigate = this.onNavigate.bind( this );
 
 		this.state = {
-			selected: this.props.tabs.length > 0 ? this.props.tabs[ 0 ].name : null,
+			selected: initialTabName || ( tabs.length > 0 ? tabs[ 0 ].name : null ),
 		};
 	}
 

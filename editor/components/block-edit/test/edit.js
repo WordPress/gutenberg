@@ -42,7 +42,7 @@ describe( 'Edit', () => {
 
 		const wrapper = shallow( <Edit name="core/test-block" /> );
 
-		expect( wrapper.find( edit ) ).toBePresent();
+		expect( wrapper.find( edit ) ).toExist();
 	} );
 
 	it( 'should use save implementation of block as fallback', () => {
@@ -55,7 +55,7 @@ describe( 'Edit', () => {
 
 		const wrapper = shallow( <Edit name="core/test-block" /> );
 
-		expect( wrapper.find( save ) ).toBePresent();
+		expect( wrapper.find( save ) ).toExist();
 	} );
 
 	it( 'should combine the default class name with a custom one', () => {

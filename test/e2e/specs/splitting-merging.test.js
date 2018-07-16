@@ -2,7 +2,14 @@
  * Internal dependencies
  */
 import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage, insertBlock } from '../support/utils';
+import {
+	newPost,
+	newDesktopBrowserPage,
+	insertBlock,
+	getEditedPostContent,
+	pressTimes,
+	pressWithModifier,
+} from '../support/utils';
 
 describe( 'splitting and merging blocks', () => {
 	beforeAll( async () => {
@@ -11,42 +18,40 @@ describe( 'splitting and merging blocks', () => {
 	} );
 
 	it( 'Should split and merge paragraph blocks using Enter and Backspace', async () => {
-		//Use regular inserter to add paragraph block and text
-		await insertBlock( 'paragraph' );
+		// Use regular inserter to add paragraph block and text
+		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'FirstSecond' );
 
-		//Move caret between 'First' and 'Second' and press Enter to split paragraph blocks
-		for ( let i = 0; i < 6; i++ ) {
-			await page.keyboard.press( 'ArrowLeft' );
-		}
+		// Move caret between 'First' and 'Second' and press Enter to split
+		// paragraph blocks
+		await pressTimes( 'ArrowLeft', 6 );
 		await page.keyboard.press( 'Enter' );
 
-		//Switch to Code Editor to check HTML output
-		await page.click( '.edit-post-more-menu [aria-label="More"]' );
-		let codeEditorButton = ( await page.$x( '//button[contains(text(), \'Code Editor\')]' ) )[ 0 ];
-		await codeEditorButton.click( 'button' );
+		// Assert that there are now two paragraph blocks with correct content
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		//Assert that there are now two paragraph blocks with correct content
-		let textEditorContent = await page.$eval( '.editor-post-text-editor', ( element ) => element.value );
-		expect( textEditorContent ).toMatchSnapshot();
-
-		//Switch to Visual Editor to continue testing
-		await page.click( '.edit-post-more-menu [aria-label="More"]' );
-		const visualEditorButton = ( await page.$x( '//button[contains(text(), \'Visual Editor\')]' ) )[ 0 ];
-		await visualEditorButton.click( 'button' );
-
-		//Press Backspace to merge paragraph blocks
-		await page.click( '.is-selected' );
-		await page.keyboard.press( 'Home' );
+		// Press Backspace to merge paragraph blocks
 		await page.keyboard.press( 'Backspace' );
 
-		//Switch to Code Editor to check HTML output
-		await page.click( '.edit-post-more-menu [aria-label="More"]' );
-		codeEditorButton = ( await page.$x( '//button[contains(text(), \'Code Editor\')]' ) )[ 0 ];
-		await codeEditorButton.click( 'button' );
+		// Ensure that caret position is correctly placed at the between point.
+		await page.keyboard.type( 'Between' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		//Assert that there is now one paragraph with correct content
-		textEditorContent = await page.$eval( '.editor-post-text-editor', ( element ) => element.value );
-		expect( textEditorContent ).toMatchSnapshot();
+		await pressTimes( 'Backspace', 7 ); // Delete "Between"
+
+		// Edge case: Without ensuring that the editor still has focus when
+		// restoring a bookmark, the caret may be inadvertently moved back to
+		// an inline boundary after a split occurs.
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.down( 'Shift' );
+		await pressTimes( 'ArrowRight', 5 );
+		await page.keyboard.up( 'Shift' );
+		await pressWithModifier( 'mod', 'b' );
+		// Collapse selection, still within inline boundary.
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'BeforeSecond:' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

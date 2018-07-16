@@ -1,22 +1,56 @@
 /**
  * External dependencies
  */
-import { mount } from 'enzyme';
+import TestUtils from 'react-dom/test-utils';
 
 /**
  * Internal dependencies
  */
 import RangeControl from '../';
 
+/**
+ * WordPress dependencies
+ */
+import { Component } from '@wordpress/element';
+import { Dashicon } from '@wordpress/components';
+
 describe( 'RangeControl', () => {
+	class TestWrapper extends Component {
+		render() {
+			return <RangeControl { ...this.props } />;
+		}
+	}
+
+	const getWrapper = ( props = {} ) => TestUtils.renderIntoDocument(
+		<TestWrapper { ...props } />
+	);
+
 	describe( '#render()', () => {
 		it( 'triggers change callback with numeric value', () => {
 			// Mount: With shallow, cannot find input child of BaseControl
 			const onChange = jest.fn();
-			const wrapper = mount( <RangeControl onChange={ onChange } /> );
+			const wrapper = getWrapper( { onChange } );
 
-			wrapper.find( 'input[type="range"]' ).simulate( 'change', { target: { value: '5' } } );
-			wrapper.find( 'input[type="number"]' ).simulate( 'change', { target: { value: '10' } } );
+			const rangeInputElement = () => TestUtils.findRenderedDOMComponentWithClass(
+				wrapper,
+				'components-range-control__slider'
+			);
+			const numberInputElement = () => TestUtils.findRenderedDOMComponentWithClass(
+				wrapper,
+				'components-range-control__number'
+			);
+			TestUtils.Simulate.change(
+				rangeInputElement(),
+				{
+					target: { value: '5' },
+				}
+			);
+			TestUtils.Simulate.change(
+				numberInputElement(),
+				{
+					target: { value: '10' },
+				}
+			);
 
 			expect( onChange ).toHaveBeenCalledWith( 5 );
 			expect( onChange ).toHaveBeenCalledWith( 10 );
@@ -24,25 +58,27 @@ describe( 'RangeControl', () => {
 
 		it( 'renders with icons', () => {
 			let wrapper, icons;
-
-			wrapper = mount( <RangeControl /> );
-			icons = wrapper.find( 'Dashicon' );
+			const iconElements = ( component ) => TestUtils
+				.scryRenderedComponentsWithType( component, Dashicon );
+			wrapper = getWrapper();
+			icons = iconElements( wrapper );
 			expect( icons ).toHaveLength( 0 );
 
-			wrapper = mount( <RangeControl beforeIcon="format-image" /> );
-			icons = wrapper.find( 'Dashicon' );
+			wrapper = getWrapper( { beforeIcon: 'format-image' } );
+			icons = iconElements( wrapper );
 			expect( icons ).toHaveLength( 1 );
-			expect( icons.at( 0 ).prop( 'icon' ) ).toBe( 'format-image' );
+			expect( icons[ 0 ].props.icon ).toBe( 'format-image' );
 
-			wrapper = mount(
-				<RangeControl
-					beforeIcon="format-image"
-					afterIcon="format-video" />
+			wrapper = getWrapper(
+				{
+					beforeIcon: 'format-image',
+					afterIcon: 'format-video',
+				}
 			);
-			icons = wrapper.find( 'Dashicon' );
+			icons = iconElements( wrapper );
 			expect( icons ).toHaveLength( 2 );
-			expect( icons.at( 0 ).prop( 'icon' ) ).toBe( 'format-image' );
-			expect( icons.at( 1 ).prop( 'icon' ) ).toBe( 'format-video' );
+			expect( icons[ 0 ].props.icon ).toBe( 'format-image' );
+			expect( icons[ 1 ].props.icon ).toBe( 'format-video' );
 		} );
 	} );
 } );

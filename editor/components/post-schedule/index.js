@@ -3,11 +3,7 @@
  */
 import { getSettings } from '@wordpress/date';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { compose } from '@wordpress/compose';
 import { DateTimePicker } from '@wordpress/components';
 
 export function PostSchedule( { date, onUpdateDate } ) {

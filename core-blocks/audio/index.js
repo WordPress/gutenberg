@@ -36,6 +36,24 @@ export const settings = {
 		id: {
 			type: 'number',
 		},
+		autoplay: {
+			type: 'boolean',
+			source: 'attribute',
+			selector: 'audio',
+			attribute: 'autoplay',
+		},
+		loop: {
+			type: 'boolean',
+			source: 'attribute',
+			selector: 'audio',
+			attribute: 'loop',
+		},
+		preload: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'audio',
+			attribute: 'preload',
+		},
 	},
 
 	supports: {
@@ -45,10 +63,10 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { src, caption } = attributes;
+		const { autoplay, caption, loop, preload, src } = attributes;
 		return (
 			<figure>
-				<audio controls="controls" src={ src } />
+				<audio controls="controls" src={ src } autoPlay={ autoplay } loop={ loop } preload={ preload } />
 				{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
 			</figure>
 		);

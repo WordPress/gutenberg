@@ -8,9 +8,10 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
-import { Component, compose } from '@wordpress/element';
-import { ifCondition, IconButton } from '@wordpress/components';
+import { Component } from '@wordpress/element';
+import { IconButton } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { ifCondition, compose } from '@wordpress/compose';
 
 class BlockInsertionPoint extends Component {
 	constructor() {
@@ -45,6 +46,9 @@ class BlockInsertionPoint extends Component {
 		props.insertDefaultBlock( { layout }, rootUID, index );
 		props.startTyping();
 		this.onBlurInserter();
+		if ( props.onInsert ) {
+			this.props.onInsert();
+		}
 	}
 
 	render() {
@@ -73,13 +77,16 @@ class BlockInsertionPoint extends Component {
 export default compose(
 	withSelect( ( select, { uid, rootUID, canShowInserter } ) => {
 		const {
+			canInsertBlockType,
 			getBlockIndex,
 			getBlockInsertionPoint,
 			getBlock,
 			isBlockInsertionPointVisible,
 			isTyping,
-			getEditorSettings,
 		} = select( 'core/editor' );
+		const {
+			getDefaultBlockName,
+		} = select( 'core/blocks' );
 		const blockIndex = uid ? getBlockIndex( uid, rootUID ) : -1;
 		const insertIndex = blockIndex;
 		const insertionPoint = getBlockInsertionPoint();
@@ -91,14 +98,15 @@ export default compose(
 			( ! block || ! isUnmodifiedDefaultBlock( block ) )
 		);
 
+		const defaultBlockName = getDefaultBlockName();
 		return {
-			templateLock: getEditorSettings().templateLock,
+			canInsertDefaultBlock: canInsertBlockType( defaultBlockName, rootUID ),
 			showInserter: ! isTyping() && canShowInserter,
 			index: insertIndex,
 			showInsertionPoint,
 		};
 	} ),
-	ifCondition( ( { templateLock } ) => ! templateLock ),
+	ifCondition( ( { canInsertDefaultBlock } ) => canInsertDefaultBlock ),
 	withDispatch( ( dispatch ) => {
 		const { insertDefaultBlock, startTyping } = dispatch( 'core/editor' );
 		return {

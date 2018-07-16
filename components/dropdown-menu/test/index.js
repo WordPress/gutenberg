@@ -1,19 +1,20 @@
 /**
  * External dependencies
  */
-import { shallow, mount } from 'enzyme';
+import { shallow } from 'enzyme';
+import TestUtils from 'react-dom/test-utils';
 
 /**
  * WordPress dependencies
  */
-import { keycodes } from '@wordpress/utils';
+import { DOWN } from '@wordpress/keycodes';
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import DropdownMenu from '../';
-
-const { DOWN } = keycodes;
+import Popover from '../../popover';
 
 describe( 'DropdownMenu', () => {
 	let controls;
@@ -56,16 +57,29 @@ describe( 'DropdownMenu', () => {
 		} );
 
 		it( 'should open menu on arrow down', () => {
-			const wrapper = mount( <DropdownMenu controls={ controls } /> );
-
+			// needed because TestUtils.renderIntoDocument returns null for stateless
+			// components
+			class Menu extends Component {
+				render() {
+					return <DropdownMenu { ...this.props } />;
+				}
+			}
+			const wrapper = TestUtils.renderIntoDocument( <Menu controls={ controls } /> );
+			const buttonElement = TestUtils.findRenderedDOMComponentWithClass(
+				wrapper,
+				'components-dropdown-menu__toggle'
+			);
 			// Close menu by keyup
-			wrapper.find( 'button.components-dropdown-menu__toggle' ).simulate( 'keydown', {
-				stopPropagation: () => {},
-				preventDefault: () => {},
-				keyCode: DOWN,
-			} );
+			TestUtils.Simulate.keyDown(
+				buttonElement,
+				{
+					stopPropagation: () => {},
+					preventDefault: () => {},
+					keyCode: DOWN,
+				}
+			);
 
-			expect( wrapper.find( 'Popover' ) ).toHaveLength( 1 );
+			expect( TestUtils.scryRenderedComponentsWithType( wrapper, Popover ) ).toHaveLength( 1 );
 		} );
 	} );
 } );

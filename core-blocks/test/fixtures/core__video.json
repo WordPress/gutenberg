@@ -4,10 +4,14 @@
         "name": "core/video",
         "isValid": true,
         "attributes": {
-            "src": "https://awesome-fake.video/file.mp4",
-            "caption": []
+            "autoplay": false,
+            "caption": [],
+            "controls": true,
+            "loop": false,
+            "muted": false,
+            "src": "https://awesome-fake.video/file.mp4"
         },
         "innerBlocks": [],
-        "originalContent": "<figure class=\"wp-block-video\"><video src=\"https://awesome-fake.video/file.mp4\" controls=\"\"></video></figure>"
+        "originalContent": "<figure class=\"wp-block-video\"><video controls src=\"https://awesome-fake.video/file.mp4\"></video></figure>"
     }
 ]

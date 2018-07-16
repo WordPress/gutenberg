@@ -1,20 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { Button, withInstanceId } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { Component, Fragment, createRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { keycodes } from '@wordpress/utils';
+import { ESCAPE } from '@wordpress/keycodes';
+import { withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-
-/**
- * Module constants
- */
-const { ESCAPE } = keycodes;
 
 class SharedBlockEditPanel extends Component {
 	constructor() {

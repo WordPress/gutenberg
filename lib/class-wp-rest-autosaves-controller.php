@@ -265,7 +265,17 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 	 * @return array Item schema data.
 	 */
 	public function get_item_schema() {
-		return $this->revisions_controller->get_item_schema();
+		$schema = $this->revisions_controller->get_item_schema();
+
+		$schema['properties']['preview_link'] = array(
+			'description' => __( 'Preview link for the post.', 'gutenberg' ),
+			'type'        => 'string',
+			'format'      => 'uri',
+			'context'     => array( 'edit' ),
+			'readonly'    => true,
+		);
+
+		return $schema;
 	}
 
 	/**
@@ -309,7 +319,7 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 
 			if ( ! $autosave_is_different ) {
 				wp_delete_post_revision( $old_autosave->ID );
-				return new WP_Error( 'rest_autosave_no_changes', __( 'There is nothing to save. The autosave and the post content are the same.', 'gutenberg' ) );
+				return new WP_Error( 'rest_autosave_no_changes', __( 'There is nothing to save. The autosave and the post content are the same.', 'gutenberg' ), array( 'status' => 400 ) );
 			}
 
 			/**
@@ -338,6 +348,24 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 	public function prepare_item_for_response( $post, $request ) {
 
 		$response = $this->revisions_controller->prepare_item_for_response( $post, $request );
+
+		$schema = $this->get_item_schema();
+
+		if ( ! empty( $schema['properties']['preview_link'] ) ) {
+			$parent_id          = wp_is_post_autosave( $post );
+			$preview_post_id    = false === $parent_id ? $post->ID : $parent_id;
+			$preview_query_args = array();
+
+			if ( false !== $parent_id ) {
+				$preview_query_args['preview_id']    = $parent_id;
+				$preview_query_args['preview_nonce'] = wp_create_nonce( 'post_preview_' . $parent_id );
+			}
+
+			$response->data['preview_link'] = get_preview_post_link( $preview_post_id, $preview_query_args );
+		}
+
+		$context        = ! empty( $request['context'] ) ? $request['context'] : 'view';
+		$response->data = $this->filter_response_by_context( $response->data, $context );
 
 		/**
 		 * Filters a revision returned from the API.

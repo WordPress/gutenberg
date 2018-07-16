@@ -7,18 +7,17 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dashicon, IconButton, withSafeTimeout } from '@wordpress/components';
-import { Component, compose } from '@wordpress/element';
+import { Dashicon, IconButton } from '@wordpress/components';
+import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { keycodes } from '@wordpress/utils';
+import { displayShortcut } from '@wordpress/keycodes';
+import { withSafeTimeout, compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import PostSwitchToDraftButton from '../post-switch-to-draft-button';
-
-const { displayShortcut } = keycodes;
 
 /**
  * Component showing whether the post is saved or not and displaying save links.

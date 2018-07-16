@@ -11,11 +11,11 @@ import { stringify } from 'querystringify';
  */
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { Component, Fragment } from '@wordpress/element';
-import { keycodes, decodeEntities } from '@wordpress/utils';
-import { Spinner, withInstanceId, withSpokenMessages, Popover } from '@wordpress/components';
+import { decodeEntities } from '@wordpress/utils';
+import { UP, DOWN, ENTER } from '@wordpress/keycodes';
+import { Spinner, withSpokenMessages, Popover } from '@wordpress/components';
 import apiRequest from '@wordpress/api-request';
-
-const { UP, DOWN, ENTER } = keycodes;
+import { withInstanceId } from '@wordpress/compose';
 
 // Since URLInput is rendered in the context of other inputs, but should be
 // considered a separate modal node, prevent keyboard events from propagating

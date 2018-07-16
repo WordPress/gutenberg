@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import deprecated from '@wordpress/deprecated';
-
-/**
  * External dependencies
  */
 import { get } from 'lodash';
@@ -45,25 +40,6 @@ export function withRehydration( reducer, reducerKey, storageKey ) {
 	};
 
 	return enhancedReducer;
-}
-
-/**
- * Export withRehydratation (a misspelling of withRehydration) for backwards
- * compatibility.
- *
- * @param {Function} reducer    The reducer to enhance.
- * @param {string}   reducerKey The reducer key to persist.
- * @param {string}   storageKey The storage key to use.
- *
- * @return {Function} Enhanced reducer.
- */
-export function withRehydratation( reducer, reducerKey, storageKey ) {
-	deprecated( 'wp.data.withRehydratation', {
-		version: '3.2',
-		alternative: 'wp.data.withRehydration',
-		plugin: 'Gutenberg',
-	} );
-	return withRehydration( reducer, reducerKey, storageKey );
 }
 
 /**

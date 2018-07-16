@@ -4,6 +4,7 @@
 	}
 
 	&[data-align="right"] {
+		/*!rtl:ignore*/
 		text-align: right;
 	}
 }
@@ -15,6 +16,7 @@
 
 	.editor-rich-text__tinymce {
 		cursor: text;
+		line-height: 1;
 	}
 }
 
