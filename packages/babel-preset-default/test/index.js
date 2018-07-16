@@ -1,15 +1,24 @@
+/**
+ * External dependencies
+ */
+import path from 'path';
+import { readFileSync } from 'fs';
+import { transform } from 'babel-core';
+
+/**
+ * Internal dependencies
+ */
+import babelPresetDefault from '../';
+
 describe( 'Babel preset default', () => {
-	async function* foo() {
-		await 1;
-		yield 2;
-	}
+	test( 'transpilation works properly', () => {
+		const input = readFileSync( path.join( __dirname, '/fixtures/input.js' ) );
 
-	test( 'support for async generator functions', async () => {
-		const generator = foo();
-
-		expect( await generator.next() ).toEqual( {
-			done: false,
-			value: 2,
+		const output = transform( input, {
+			configFile: false,
+			presets: [ babelPresetDefault ],
 		} );
+
+		expect( output.code ).toMatchSnapshot();
 	} );
 } );
