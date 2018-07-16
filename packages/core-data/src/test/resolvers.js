@@ -56,7 +56,7 @@ describe( 'getEntityRecord', () => {
 		const state = {
 			entities: {
 				config: [
-					{ name: 'postType', kind: 'root', baseUrl: '/wp/v2/types' },
+					{ name: 'postType', kind: 'root', baseURL: '/wp/v2/types' },
 				],
 			},
 		};
@@ -69,7 +69,7 @@ describe( 'getEntityRecord', () => {
 		const fulfillment = getEntityRecord( { entities: {} }, 'postType', 'post', 10 );
 		const receivedEntities = ( await fulfillment.next() ).value;
 		expect( receivedEntities ).toEqual( addEntities( [ {
-			baseUrl: '/wp/v2/posts',
+			baseURL: '/wp/v2/posts',
 			kind: 'postType',
 			name: 'post',
 		} ] ) );
@@ -96,7 +96,7 @@ describe( 'getEntityRecords', () => {
 		const state = {
 			entities: {
 				config: [
-					{ name: 'postType', kind: 'root', baseUrl: '/wp/v2/types' },
+					{ name: 'postType', kind: 'root', baseURL: '/wp/v2/types' },
 				],
 			},
 		};
