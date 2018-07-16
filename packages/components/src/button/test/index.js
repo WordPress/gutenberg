@@ -104,20 +104,6 @@ describe( 'Button', () => {
 		} );
 	} );
 
-	describe( 'with href and isExternalLink properties', () => {
-		it( 'matches the snapshot when isExternalLink is true', () => {
-			const wrapper = shallow( <Button href="https://wordpress.org/" isExternalLink /> );
-
-			expect( wrapper ).toMatchSnapshot();
-		} );
-
-		it( 'matches the snapshot when isExternalLink is false', () => {
-			const wrapper = shallow( <Button href="https://wordpress.org/" isExternalLink={ false } /> );
-
-			expect( wrapper ).toMatchSnapshot();
-		} );
-	} );
-
 	describe( 'ref forwarding', () => {
 		it( 'should enable access to DOM element', () => {
 			const ref = createRef();

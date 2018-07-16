@@ -12,7 +12,6 @@ import { createElement, forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import './style.scss';
-import ExternalLink from '../external-link';
 
 export function Button( props, ref ) {
 	const {
@@ -26,7 +25,6 @@ export function Button( props, ref ) {
 		isDefault,
 		isLink,
 		isDestructive,
-		isExternalLink,
 		className,
 		disabled,
 		focus,
@@ -45,21 +43,8 @@ export function Button( props, ref ) {
 		'is-destructive': isDestructive,
 	} );
 
-	let tag;
-	let tagProps;
-
-	if ( href !== undefined && ! disabled ) {
-		if ( isExternalLink ) {
-			tag = ExternalLink;
-			tagProps = { href, target, iconClassName: 'components-button__icon' };
-		} else {
-			tag = 'a';
-			tagProps = { href, target };
-		}
-	} else {
-		tag = 'button';
-		tagProps = { type: 'button', disabled };
-	}
+	const tag = href !== undefined && ! disabled ? 'a' : 'button';
+	const tagProps = tag === 'a' ? { href, target } : { type: 'button', disabled };
 
 	return createElement( tag, {
 		...tagProps,

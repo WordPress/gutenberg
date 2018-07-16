@@ -181,15 +181,6 @@
 		padding: 0 8px 1px;
 		font-size: 11px;
 	}
-
-	&__icon {
-		margin: 2px 0 0 4px;
-	}
-
-	&.is-button &__icon {
-		align-self: center;
-		margin-top: 1px;
-	}
 }
 
 @keyframes components-button__busy-animation {
