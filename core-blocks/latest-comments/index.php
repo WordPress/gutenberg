@@ -72,7 +72,9 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 				$author_markup .= '<span class="wp-block-latest-comments__comment-author">' . get_comment_author( $comment ) . '</span>';
 			}
 
-			$post_title = '<a class="wp-block-latest-comments__comment-link" href="' . esc_url( get_comment_link( $comment ) ) . '">' . esc_html( _draft_or_post_title( $comment->comment_post_ID ) ) . '</a>';
+			// `_draft_or_post_title` calls `esc_html()` so we don't need to wrap that call in
+			// `esc_html`.
+			$post_title = '<a class="wp-block-latest-comments__comment-link" href="' . esc_url( get_comment_link( $comment ) ) . '">' . _draft_or_post_title( $comment->comment_post_ID ) . '</a>';
 
 			$list_items_markup .= sprintf(
 				/* translators: 1: author name (inside <a> or <span> tag, based on if they have a URL), 2: post title related to this comment */
