@@ -23,7 +23,6 @@ const deasync = require( 'deasync' );
  */
 const getPackages = require( './get-packages' );
 const getBabelConfig = require( './get-babel-config' );
-const postCSSConfig = require( './post-css-config' );
 
 /**
  * Module Constants
@@ -94,7 +93,7 @@ function buildStyle( packagePath ) {
 	} );
 
 	const postCSSSync = ( callback ) => {
-		postcss( postCSSConfig )
+		postcss( require( './post-css-config' ) )
 			.process( builtSass.css, { from: 'src/app.css', to: 'dest/app.css' } )
 			.then( ( result ) => callback( null, result ) );
 	};
