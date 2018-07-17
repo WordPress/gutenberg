@@ -106,7 +106,7 @@ class FlatTermSelector extends Component {
 
 	findOrCreateTerm( termName ) {
 		const basePath = wp.api.getTaxonomyRoute( this.props.slug );
-		// Tries to create a term or fetch it if it already exists
+		// Tries to create a term or fetch it if it already exists.
 		return apiFetch( {
 			path: `/wp/v2/${ basePath }`,
 			method: 'POST',
@@ -114,7 +114,7 @@ class FlatTermSelector extends Component {
 		} ).catch( ( error ) => {
 			const errorCode = error.code;
 			if ( errorCode === 'term_exists' ) {
-				// search the new category created since last fetch
+				// If the terms exist, fetch it instead of creating a new one.
 				this.addRequest = apiFetch( {
 					path: `/wp/v2/${ basePath }?${ stringify( { ...DEFAULT_QUERY, search: termName } ) }`,
 				} );
