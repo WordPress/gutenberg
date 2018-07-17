@@ -30,7 +30,7 @@
 		display: inline-block;
 		width: 100%;
 		max-width: 100%;
-		margin: 2px 0 2px 8px;
+		margin: `2px 0 2px 8px;
 		padding: 0;
 		line-height: 24px;
 		background: inherit;
@@ -44,9 +44,9 @@
 			outline: none;
 			box-shadow: none;
 		}
-		.components-form-token-field__token + input[type="text"].components-form-token-field__input {
-			width: auto;
-		}
+	}
+	.components-form-token-field__token + input[type="text"].components-form-token-field__input {
+		width: auto;
 	}
 }
 
