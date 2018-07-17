@@ -1314,4 +1314,106 @@ class WP_Test_REST_Attachments_Controller extends WP_Test_REST_Post_Type_Control
 
 	}
 
+	/**
+	 * @ticket 43751
+	 * @group multisite
+	 * @group ms-required
+	 */
+	public function test_create_item_with_file_exceeds_multisite_max_filesize() {
+		wp_set_current_user( self::$author_id );
+		update_site_option( 'fileupload_maxk', 1 );
+		update_site_option( 'upload_space_check_disabled', false );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_file_params(
+			array(
+				'file' => array(
+					'error'    => '0',
+					'file'     => file_get_contents( $this->test_file ),
+					'name'     => 'canola.jpg',
+					'size'     => filesize( $this->test_file ),
+					'tmp_name' => $this->test_file,
+				),
+			)
+		);
+		$request->set_param( 'title', 'My title is very cool' );
+		$request->set_param( 'caption', 'This is a better caption.' );
+		$request->set_header( 'Content-MD5', md5_file( $this->test_file ) );
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_upload_file_too_big', $response, 400 );
+	}
+
+	/**
+	 * @ticket 43751
+	 * @group multisite
+	 * @group ms-required
+	 */
+	public function test_create_item_with_data_exceeds_multisite_max_filesize() {
+		wp_set_current_user( self::$author_id );
+		update_site_option( 'fileupload_maxk', 1 );
+		update_site_option( 'upload_space_check_disabled', false );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola.jpg' );
+		$request->set_body( file_get_contents( $this->test_file ) );
+		$request->set_param( 'title', 'My title is very cool' );
+		$request->set_param( 'caption', 'This is a better caption.' );
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_upload_file_too_big', $response, 400 );
+	}
+
+	/**
+	 * @ticket 43751
+	 * @group multisite
+	 * @group ms-required
+	 */
+	public function test_create_item_with_file_exceeds_multisite_site_upload_space() {
+		wp_set_current_user( self::$author_id );
+		add_filter( 'get_space_allowed', '__return_zero' );
+		update_site_option( 'upload_space_check_disabled', false );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_file_params(
+			array(
+				'file' => array(
+					'error'    => '0',
+					'file'     => file_get_contents( $this->test_file ),
+					'name'     => 'canola.jpg',
+					'size'     => filesize( $this->test_file ),
+					'tmp_name' => $this->test_file,
+				),
+			)
+		);
+		$request->set_param( 'title', 'My title is very cool' );
+		$request->set_param( 'caption', 'This is a better caption.' );
+		$request->set_header( 'Content-MD5', md5_file( $this->test_file ) );
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_upload_limited_space', $response, 400 );
+	}
+
+	/**
+	 * @ticket 43751
+	 * @group multisite
+	 * @group ms-required
+	 */
+	public function test_create_item_with_data_exceeds_multisite_site_upload_space() {
+		wp_set_current_user( self::$author_id );
+		add_filter( 'get_space_allowed', '__return_zero' );
+		update_site_option( 'upload_space_check_disabled', false );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola.jpg' );
+		$request->set_body( file_get_contents( $this->test_file ) );
+		$request->set_param( 'title', 'My title is very cool' );
+		$request->set_param( 'caption', 'This is a better caption.' );
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_upload_limited_space', $response, 400 );
+	}
+
 }
