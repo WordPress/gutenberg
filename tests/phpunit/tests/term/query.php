@@ -506,4 +506,68 @@ class Tests_Term_Query extends WP_UnitTestCase {
 		$this->assertSame( $expected, $found2 );
 		$this->assertSame( $expected, $found3 );
 	}
+
+	/**
+	 * @ticket 42691
+	 */
+	public function test_null_term_object_should_be_discarded() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$terms = self::factory()->term->create_many( 3, array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$this->term_id = $terms[1];
+
+		add_filter( 'get_term', array( $this, 'filter_term_to_null' ) );
+		$found = get_terms( array(
+			'taxonomy'   => 'wptests_tax',
+			'hide_empty' => false,
+		) );
+		remove_filter( 'get_term', array( $this, 'filter_term_to_null' ) );
+
+		$expected = array( $terms[0], $terms[2] );
+
+		$this->assertEqualSets( $expected, wp_list_pluck( $found, 'term_id' ) );
+	}
+
+	public function filter_term_to_null( $term ) {
+		if ( $this->term_id === $term->term_id ) {
+			return null;
+		}
+
+		return $term;
+	}
+
+	/**
+	 * @ticket 42691
+	 */
+	public function test_error_term_object_should_be_discarded() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$terms = self::factory()->term->create_many( 3, array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$this->term_id = $terms[1];
+
+		add_filter( 'get_term', array( $this, 'filter_term_to_wp_error' ) );
+		$found = get_terms( array(
+			'taxonomy'   => 'wptests_tax',
+			'hide_empty' => false,
+		) );
+		remove_filter( 'get_term', array( $this, 'filter_term_to_wp_error' ) );
+
+		$expected = array( $terms[0], $terms[2] );
+
+		$this->assertEqualSets( $expected, wp_list_pluck( $found, 'term_id' ) );
+	}
+
+	public function filter_term_to_wp_error( $term ) {
+		if ( $this->term_id === $term->term_id ) {
+			return new WP_Error( 'foo' );
+		}
+
+		return $term;
+	}
 }
