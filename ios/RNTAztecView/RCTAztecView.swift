@@ -5,13 +5,13 @@ class RCTAztecView: Aztec.TextView {
     @objc var onContentSizeChange: RCTBubblingEventBlock? = nil
     
     // MARK - View Height: Match to content height
-    
+
     override var contentSize: CGSize {
         didSet {
             contentSizeChanged()
         }
     }
-    
+
     func contentSizeChanged() {
         let newSize = contentSize
         
@@ -26,9 +26,7 @@ class RCTAztecView: Aztec.TextView {
     }
     
     func updateHeightToMatch(_ newHeight: CGFloat) {
-        
-        frame = CGRect(origin: frame.origin,
-                       size: CGSize(width: frame.width, height: newHeight))
+        bounds = CGRect(origin: .zero, size: CGSize(width: frame.width, height: newHeight))
     }
     
     // MARK: - Native-to-RN Value Packing Logic
@@ -40,15 +38,14 @@ class RCTAztecView: Aztec.TextView {
         
         return [name: size]
     }
+
+    // MARK: - RN Properties
     
-    // MARK: - Set & get Contents
-    
-    @objc func setContents(_ contents: NSString) {
-        super.setHTML(contents as String)
-    }
-    
-    @objc func getContents() -> NSString {
-        return super.getHTML() as NSString
+    @objc
+    func setContents(_ contents: NSDictionary) {
+        let html = contents["text"] as? String ?? ""
+        
+        setHTML(html)
     }
 }
 

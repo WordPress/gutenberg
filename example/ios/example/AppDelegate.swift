@@ -6,12 +6,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow?
     
+    let mediaProvider = MediaProvider()
+    
+    lazy var bridgeDelegate: BridgeDelegate = {
+        let sourceURL = RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index", fallbackResource: nil)!
+        
+        return BridgeDelegate(sourceURL: sourceURL, mediaProvider: self.mediaProvider)
+    }()
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
-        let jsCodeLocation = RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index", fallbackResource: nil)
+        let bridge = RCTBridge(delegate: bridgeDelegate, launchOptions: launchOptions)
+        let rootView = RCTRootView(bridge: bridge, moduleName: "example", initialProperties: nil)
         
-        let rootView = RCTRootView(bundleURL: jsCodeLocation, moduleName: "example", initialProperties: nil, launchOptions: launchOptions)
         rootView?.backgroundColor = .white
         
         window = UIWindow(frame: UIScreen.main.bounds)
