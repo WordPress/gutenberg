@@ -262,7 +262,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-element',
 		gutenberg_url( 'build/element/index.js' ),
-		array( 'react', 'react-dom', 'wp-is-shallow-equal', 'lodash' ),
+		array( 'react', 'react-dom', 'wp-is-shallow-equal', 'lodash', 'wp-deprecated' ),
 		filemtime( gutenberg_dir_path() . 'build/element/index.js' ),
 		true
 	);
