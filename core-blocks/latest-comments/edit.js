@@ -42,16 +42,12 @@ class LatestComments extends Component {
 		};
 	}
 
-	setAlignment( nextAlign ) {
-		const { setAttributes } = this.props;
-
-		setAttributes( { align: nextAlign } );
+	setAlignment( align ) {
+		this.props.setAttributes( { align } );
 	}
 
 	setCommentsToShow( commentsToShow ) {
-		const { setAttributes } = this.props;
-
-		setAttributes( { commentsToShow: parseInt( commentsToShow, 10 ) || 0 } );
+		this.props.setAttributes( { commentsToShow } );
 	}
 
 	render() {
