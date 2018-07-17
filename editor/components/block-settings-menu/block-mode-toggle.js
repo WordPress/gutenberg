@@ -35,18 +35,18 @@ export function BlockModeToggle( { blockType, mode, onToggleMode, small = false,
 }
 
 export default compose( [
-	withSelect( ( select, { uid } ) => {
+	withSelect( ( select, { clientId } ) => {
 		const { getBlock, getBlockMode } = select( 'core/editor' );
-		const block = getBlock( uid );
+		const block = getBlock( clientId );
 
 		return {
-			mode: getBlockMode( uid ),
+			mode: getBlockMode( clientId ),
 			blockType: block ? getBlockType( block.name ) : null,
 		};
 	} ),
-	withDispatch( ( dispatch, { onToggle = noop, uid } ) => ( {
+	withDispatch( ( dispatch, { onToggle = noop, clientId } ) => ( {
 		onToggleMode() {
-			dispatch( 'core/editor' ).toggleBlockMode( uid );
+			dispatch( 'core/editor' ).toggleBlockMode( clientId );
 			onToggle();
 		},
 	} ) ),

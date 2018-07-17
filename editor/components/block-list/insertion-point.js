@@ -42,8 +42,8 @@ class BlockInsertionPoint extends Component {
 	}
 
 	onClick() {
-		const { layout, rootUID, index, ...props } = this.props;
-		props.insertDefaultBlock( { layout }, rootUID, index );
+		const { layout, rootClientId, index, ...props } = this.props;
+		props.insertDefaultBlock( { layout }, rootClientId, index );
 		props.startTyping();
 		this.onBlurInserter();
 		if ( props.onInsert ) {
@@ -75,7 +75,7 @@ class BlockInsertionPoint extends Component {
 	}
 }
 export default compose(
-	withSelect( ( select, { uid, rootUID, canShowInserter } ) => {
+	withSelect( ( select, { clientId, rootClientId, canShowInserter } ) => {
 		const {
 			canInsertBlockType,
 			getBlockIndex,
@@ -87,20 +87,20 @@ export default compose(
 		const {
 			getDefaultBlockName,
 		} = select( 'core/blocks' );
-		const blockIndex = uid ? getBlockIndex( uid, rootUID ) : -1;
+		const blockIndex = clientId ? getBlockIndex( clientId, rootClientId ) : -1;
 		const insertIndex = blockIndex;
 		const insertionPoint = getBlockInsertionPoint();
-		const block = uid ? getBlock( uid ) : null;
+		const block = clientId ? getBlock( clientId ) : null;
 		const showInsertionPoint = (
 			isBlockInsertionPointVisible() &&
 			insertionPoint.index === insertIndex &&
-			insertionPoint.rootUID === rootUID &&
+			insertionPoint.rootClientId === rootClientId &&
 			( ! block || ! isUnmodifiedDefaultBlock( block ) )
 		);
 
 		const defaultBlockName = getDefaultBlockName();
 		return {
-			canInsertDefaultBlock: canInsertBlockType( defaultBlockName, rootUID ),
+			canInsertDefaultBlock: canInsertBlockType( defaultBlockName, rootClientId ),
 			showInserter: ! isTyping() && canShowInserter,
 			index: insertIndex,
 			showInsertionPoint,

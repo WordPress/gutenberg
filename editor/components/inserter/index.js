@@ -38,7 +38,7 @@ class Inserter extends Component {
 			title,
 			children,
 			onInsertBlock,
-			rootUID,
+			rootClientId,
 		} = this.props;
 
 		if ( items.length === 0 ) {
@@ -72,7 +72,13 @@ class Inserter extends Component {
 						onClose();
 					};
 
-					return <InserterMenu items={ items } onSelect={ onSelect } rootUID={ rootUID } />;
+					return (
+						<InserterMenu
+							items={ items }
+							onSelect={ onSelect }
+							rootClientId={ rootClientId }
+						/>
+					);
 				} }
 			/>
 		);
@@ -88,25 +94,25 @@ export default compose( [
 			getInserterItems,
 		} = select( 'core/editor' );
 		const insertionPoint = getBlockInsertionPoint();
-		const { rootUID } = insertionPoint;
+		const { rootClientId } = insertionPoint;
 		return {
 			title: getEditedPostAttribute( 'title' ),
 			insertionPoint,
 			selectedBlock: getSelectedBlock(),
-			items: getInserterItems( rootUID ),
-			rootUID,
+			items: getInserterItems( rootClientId ),
+			rootClientId,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {
 		onInsertBlock: ( item ) => {
 			const { insertionPoint, selectedBlock } = ownProps;
-			const { index, rootUID, layout } = insertionPoint;
+			const { index, rootClientId, layout } = insertionPoint;
 			const { name, initialAttributes } = item;
 			const insertedBlock = createBlock( name, { ...initialAttributes, layout } );
 			if ( selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
-				return dispatch( 'core/editor' ).replaceBlocks( selectedBlock.uid, insertedBlock );
+				return dispatch( 'core/editor' ).replaceBlocks( selectedBlock.clientId, insertedBlock );
 			}
-			return dispatch( 'core/editor' ).insertBlock( insertedBlock, index, rootUID );
+			return dispatch( 'core/editor' ).insertBlock( insertedBlock, index, rootClientId );
 		},
 	} ) ),
 ] )( Inserter );

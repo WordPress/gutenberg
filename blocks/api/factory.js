@@ -52,10 +52,14 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 		return result;
 	}, {} );
 
-	// Blocks are stored with a unique ID, the assigned type name,
-	// the block attributes, and their inner blocks.
+	const clientId = uuid();
+
+	// Blocks are stored with a unique ID, the assigned type name, the block
+	// attributes, and their inner blocks.
 	return {
-		uid: uuid(),
+		clientId,
+		// TODO: Remove from block interface in 3.5 "UID" deprecation.
+		uid: clientId,
 		name,
 		isValid: true,
 		attributes,
@@ -74,8 +78,12 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
  * @return {Object} A cloned block.
  */
 export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
+	const clientId = uuid();
+
 	return {
 		...block,
+		clientId,
+		// TODO: Remove from block interface in 3.5 "UID" deprecation.
 		uid: uuid(),
 		attributes: {
 			...block.attributes,
@@ -365,8 +373,8 @@ export function switchToBlockType( blocks, name ) {
 		const transformedBlock = {
 			...result,
 			// The first transformed block whose type matches the "destination"
-			// type gets to keep the existing UID of the first block.
-			uid: index === firstSwitchedBlock ? firstBlock.uid : result.uid,
+			// type gets to keep the existing client ID of the first block.
+			clientId: index === firstSwitchedBlock ? firstBlock.clientId : result.clientId,
 		};
 
 		/**

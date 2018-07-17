@@ -21,16 +21,16 @@ import { __ } from '@wordpress/i18n';
 import { compose, createHigherOrderComponent } from '@wordpress/compose';
 
 const enhance = compose(
-	/*
-	 * For blocks whose block type doesn't support `multiple`, provides the wrapped
-	 * component with `originalBlockUid` -- a reference to the first block of
-	 * the same type in the content -- if and only if that "original" block is
-	 * not the current one. Thus, an inexisting `originalBlockUid` prop signals
-	 * that the block is valid.
+	/**
+	 * For blocks whose block type doesn't support `multiple`, provides the
+	 * wrapped component with `originalBlockClientId` -- a reference to the
+	 * first block of the same type in the content -- if and only if that
+	 * "original" block is not the current one. Thus, an inexisting
+	 * `originalBlockClientId` prop signals that the block is valid.
 	 *
 	 * @param {Component} WrappedBlockEdit A filtered BlockEdit instance.
-	 * @return {Component}                 Enhanced component with merged state
-	 *                                     data props.
+	 *
+	 * @return {Component} Enhanced component with merged state data props.
 	 */
 	withSelect( ( select, block ) => {
 		const blocks = select( 'core/editor' ).getBlocks();
@@ -42,26 +42,26 @@ const enhance = compose(
 			return {};
 		}
 
-		// Otherwise, only pass `originalBlockUid` if it refers to a different
+		// Otherwise, only pass `originalBlockClientId` if it refers to a different
 		// block from the current one.
 		const firstOfSameType = find( blocks, ( { name } ) => block.name === name );
-		const isInvalid = firstOfSameType && firstOfSameType.uid !== block.id;
+		const isInvalid = firstOfSameType && firstOfSameType.clientId !== block.clientId;
 		return {
-			originalBlockUid: isInvalid && firstOfSameType.uid,
+			originalBlockClientId: isInvalid && firstOfSameType.clientId,
 		};
 	} ),
-	withDispatch( ( dispatch, { originalBlockUid } ) => ( {
-		selectFirst: () => dispatch( 'core/editor' ).selectBlock( originalBlockUid ),
+	withDispatch( ( dispatch, { originalBlockClientId } ) => ( {
+		selectFirst: () => dispatch( 'core/editor' ).selectBlock( originalBlockClientId ),
 	} ) ),
 );
 
 const withMultipleValidation = createHigherOrderComponent( ( BlockEdit ) => {
 	return enhance( ( {
-		originalBlockUid,
+		originalBlockClientId,
 		selectFirst,
 		...props
 	} ) => {
-		if ( ! originalBlockUid ) {
+		if ( ! originalBlockClientId ) {
 			return <BlockEdit { ...props } />;
 		}
 

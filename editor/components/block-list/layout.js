@@ -28,6 +28,7 @@ import './style.scss';
 import BlockListBlock from './block';
 import IgnoreNestedEvents from './ignore-nested-events';
 import DefaultBlockAppender from '../default-block-appender';
+import withDeprecatedUniqueId from '../with-deprecated-unique-id';
 
 class BlockListLayout extends Component {
 	constructor( props ) {
@@ -59,13 +60,13 @@ class BlockListLayout extends Component {
 		this.lastClientY = clientY;
 	}
 
-	setBlockRef( node, uid ) {
+	setBlockRef( node, clientId ) {
 		if ( node === null ) {
-			delete this.nodes[ uid ];
+			delete this.nodes[ clientId ];
 		} else {
 			this.nodes = {
 				...this.nodes,
-				[ uid ]: node,
+				[ clientId ]: node,
 			};
 		}
 	}
@@ -96,28 +97,28 @@ class BlockListLayout extends Component {
 	 * Binds event handlers to the document for tracking a pending multi-select
 	 * in response to a mousedown event occurring in a rendered block.
 	 *
-	 * @param {string} uid UID of the block where mousedown occurred.
+	 * @param {string} clientId Client ID of block where mousedown occurred.
 	 *
 	 * @return {void}
 	 */
-	onSelectionStart( uid ) {
+	onSelectionStart( clientId ) {
 		if ( ! this.props.isSelectionEnabled ) {
 			return;
 		}
 
-		const boundaries = this.nodes[ uid ].getBoundingClientRect();
+		const boundaries = this.nodes[ clientId ].getBoundingClientRect();
 
-		// Create a uid to Y coördinate map.
-		const uidToCoordMap = mapValues( this.nodes, ( node ) =>
+		// Create a clientId to Y coördinate map.
+		const clientIdToCoordMap = mapValues( this.nodes, ( node ) =>
 			node.getBoundingClientRect().top - boundaries.top );
 
-		// Cache a Y coördinate to uid map for use in `onPointerMove`.
-		this.coordMap = invert( uidToCoordMap );
+		// Cache a Y coördinate to clientId map for use in `onPointerMove`.
+		this.coordMap = invert( clientIdToCoordMap );
 		// Cache an array of the Y coördinates for use in `onPointerMove`.
 		// Sort the coördinates, as `this.nodes` will not necessarily reflect
 		// the current block sequence.
-		this.coordMapKeys = sortBy( Object.values( uidToCoordMap ) );
-		this.selectionAtStart = uid;
+		this.coordMapKeys = sortBy( Object.values( clientIdToCoordMap ) );
+		this.selectionAtStart = clientId;
 
 		window.addEventListener( 'mousemove', this.onPointerMove );
 		// Capture scroll on all elements.
@@ -128,12 +129,13 @@ class BlockListLayout extends Component {
 	/**
 	 * Handles multi-selection changes in response to pointer move.
 	 *
-	 * @param {string} uid Block under cursor in multi-select drag.
+	 * @param {string} clientId Client ID of block under cursor in multi-select
+	 *                          drag.
 	 */
-	onSelectionChange( uid ) {
+	onSelectionChange( clientId ) {
 		const { onMultiSelect, selectionStart, selectionEnd } = this.props;
 		const { selectionAtStart } = this;
-		const isAtStart = selectionAtStart === uid;
+		const isAtStart = selectionAtStart === clientId;
 
 		if ( ! selectionAtStart || ! this.props.isSelectionEnabled ) {
 			return;
@@ -146,8 +148,8 @@ class BlockListLayout extends Component {
 		}
 
 		// Expand multi-selection to block under cursor.
-		if ( ! isAtStart && selectionEnd !== uid ) {
-			onMultiSelect( selectionAtStart, uid );
+		if ( ! isAtStart && selectionEnd !== clientId ) {
+			onMultiSelect( selectionAtStart, clientId );
 		}
 	}
 
@@ -175,26 +177,26 @@ class BlockListLayout extends Component {
 		}
 	}
 
-	onShiftSelection( uid ) {
+	onShiftSelection( clientId ) {
 		if ( ! this.props.isSelectionEnabled ) {
 			return;
 		}
 
-		const { selectionStartUID, onMultiSelect, onSelect } = this.props;
+		const { selectionStartClientId, onMultiSelect, onSelect } = this.props;
 
-		if ( selectionStartUID ) {
-			onMultiSelect( selectionStartUID, uid );
+		if ( selectionStartClientId ) {
+			onMultiSelect( selectionStartClientId, clientId );
 		} else {
-			onSelect( uid );
+			onSelect( clientId );
 		}
 	}
 
 	render() {
 		const {
-			blockUIDs,
+			blockClientIds,
 			layout,
 			isGroupedByLayout,
-			rootUID,
+			rootClientId,
 			canInsertDefaultBlock,
 		} = this.props;
 
@@ -209,25 +211,25 @@ class BlockListLayout extends Component {
 
 		return (
 			<div className={ classes }>
-				{ map( blockUIDs, ( uid, blockIndex ) => (
+				{ map( blockClientIds, ( clientId, blockIndex ) => (
 					<BlockListBlock
-						key={ 'block-' + uid }
+						key={ 'block-' + clientId }
 						index={ blockIndex }
-						uid={ uid }
+						clientId={ clientId }
 						blockRef={ this.setBlockRef }
 						onSelectionStart={ this.onSelectionStart }
 						onShiftSelection={ this.onShiftSelection }
-						rootUID={ rootUID }
+						rootClientId={ rootClientId }
 						layout={ defaultLayout }
 						isFirst={ blockIndex === 0 }
-						isLast={ blockIndex === blockUIDs.length - 1 }
+						isLast={ blockIndex === blockClientIds.length - 1 }
 					/>
 				) ) }
 				{ canInsertDefaultBlock && (
 					<IgnoreNestedEvents childHandledEvents={ [ 'onFocus', 'onClick', 'onKeyDown' ] }>
 						<DefaultBlockAppender
-							rootUID={ rootUID }
-							lastBlockUID={ last( blockUIDs ) }
+							rootClientId={ rootClientId }
+							lastBlockClientId={ last( blockClientIds ) }
 							layout={ defaultLayout }
 						/>
 					</IgnoreNestedEvents>
@@ -238,24 +240,25 @@ class BlockListLayout extends Component {
 }
 
 export default compose( [
+	withDeprecatedUniqueId,
 	withSelect( ( select, ownProps ) => {
 		const {
 			isSelectionEnabled,
 			isMultiSelecting,
-			getMultiSelectedBlocksStartUid,
-			getMultiSelectedBlocksEndUid,
+			getMultiSelectedBlocksStartClientId,
+			getMultiSelectedBlocksEndClientId,
 			getBlockSelectionStart,
 			canInsertBlockType,
 		} = select( 'core/editor' );
-		const { rootUID } = ownProps;
+		const { rootClientId } = ownProps;
 
 		return {
-			selectionStart: getMultiSelectedBlocksStartUid(),
-			selectionEnd: getMultiSelectedBlocksEndUid(),
-			selectionStartUID: getBlockSelectionStart(),
+			selectionStart: getMultiSelectedBlocksStartClientId(),
+			selectionEnd: getMultiSelectedBlocksEndClientId(),
+			selectionStartClientId: getBlockSelectionStart(),
 			isSelectionEnabled: isSelectionEnabled(),
 			isMultiSelecting: isMultiSelecting(),
-			canInsertDefaultBlock: canInsertBlockType( getDefaultBlockName(), rootUID ),
+			canInsertDefaultBlock: canInsertBlockType( getDefaultBlockName(), rootClientId ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

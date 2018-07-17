@@ -16,8 +16,8 @@ import BlockTitle from '../block-title';
  * descends from a root block, a button is displayed enabling the user to select
  * the root block.
  *
- * @param {string}   props.uid             UID of block.
- * @param {string}   props.rootUID         UID of block's root.
+ * @param {string}   props.clientId        Client ID of block.
+ * @param {string}   props.rootClientId    Client ID of block's root.
  * @param {Function} props.selectRootBlock Callback to select root block.
  */
 export class BlockBreadcrumb extends Component {
@@ -48,18 +48,18 @@ export class BlockBreadcrumb extends Component {
 	}
 
 	render( ) {
-		const { uid, rootUID } = this.props;
+		const { clientId, rootClientId } = this.props;
 
 		return (
 			<div className={ 'editor-block-list__breadcrumb' }>
 				<Toolbar>
-					{ rootUID && (
+					{ rootClientId && (
 						<Fragment>
-							<BlockTitle uid={ rootUID } />
+							<BlockTitle clientId={ rootClientId } />
 							<span className="editor-block-list__descendant-arrow" />
 						</Fragment>
 					) }
-					<BlockTitle uid={ uid } />
+					<BlockTitle clientId={ clientId } />
 				</Toolbar>
 			</div>
 		);
@@ -68,11 +68,11 @@ export class BlockBreadcrumb extends Component {
 
 export default compose( [
 	withSelect( ( select, ownProps ) => {
-		const { getBlockRootUID } = select( 'core/editor' );
-		const { uid } = ownProps;
+		const { getBlockRootClientId } = select( 'core/editor' );
+		const { clientId } = ownProps;
 
 		return {
-			rootUID: getBlockRootUID( uid ),
+			rootClientId: getBlockRootClientId( clientId ),
 		};
 	} ),
 ] )( BlockBreadcrumb );

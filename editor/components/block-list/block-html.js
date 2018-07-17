@@ -35,7 +35,7 @@ class BlockHTML extends Component {
 		const blockType = getBlockType( this.props.block.name );
 		const attributes = getBlockAttributes( blockType, this.state.html, this.props.block.attributes );
 		const isValid = isValidBlock( this.state.html, blockType, attributes );
-		this.props.onChange( this.props.uid, attributes, this.state.html, isValid );
+		this.props.onChange( this.props.clientId, attributes, this.state.html, isValid );
 	}
 
 	onChange( event ) {
@@ -57,11 +57,11 @@ class BlockHTML extends Component {
 
 export default compose( [
 	withSelect( ( select, ownProps ) => ( {
-		block: select( 'core/editor' ).getBlock( ownProps.uid ),
+		block: select( 'core/editor' ).getBlock( ownProps.clientId ),
 	} ) ),
 	withDispatch( ( dispatch ) => ( {
-		onChange( uid, attributes, originalContent, isValid ) {
-			dispatch( 'core/editor' ).updateBlock( uid, { attributes, originalContent, isValid } );
+		onChange( clientId, attributes, originalContent, isValid ) {
+			dispatch( 'core/editor' ).updateBlock( clientId, { attributes, originalContent, isValid } );
 		},
 	} ) ),
 ] )( BlockHTML );

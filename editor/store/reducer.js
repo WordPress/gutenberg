@@ -52,23 +52,23 @@ export function getPostRawValue( value ) {
 
 /**
  * Given an array of blocks, returns an object where each key is a nesting
- * context, the value of which is an array of block UIDs existing within that
- * nesting context.
+ * context, the value of which is an array of block client IDs existing within
+ * that nesting context.
  *
- * @param {Array}   blocks  Blocks to map.
- * @param {?string} rootUID Assumed root UID.
+ * @param {Array}   blocks       Blocks to map.
+ * @param {?string} rootClientId Assumed root client ID.
  *
  * @return {Object} Block order map object.
  */
-function mapBlockOrder( blocks, rootUID = '' ) {
-	const result = { [ rootUID ]: [] };
+function mapBlockOrder( blocks, rootClientId = '' ) {
+	const result = { [ rootClientId ]: [] };
 
 	blocks.forEach( ( block ) => {
-		const { uid, innerBlocks } = block;
+		const { clientId, innerBlocks } = block;
 
-		result[ rootUID ].push( uid );
+		result[ rootClientId ].push( clientId );
 
-		Object.assign( result, mapBlockOrder( innerBlocks, uid ) );
+		Object.assign( result, mapBlockOrder( innerBlocks, clientId ) );
 	} );
 
 	return result;
@@ -76,8 +76,8 @@ function mapBlockOrder( blocks, rootUID = '' ) {
 
 /**
  * Given an array of blocks, returns an object containing all blocks, recursing
- * into inner blocks. Keys correspond to the block UID, the value of which is
- * the block object.
+ * into inner blocks. Keys correspond to the block client ID, the value of
+ * which is the block object.
  *
  * @param {Array} blocks Blocks to flatten.
  *
@@ -94,7 +94,7 @@ function getFlattenedBlocks( blocks ) {
 
 		stack.push( ...innerBlocks );
 
-		flattenedBlocks[ block.uid ] = block;
+		flattenedBlocks[ block.clientId ] = block;
 	}
 
 	return flattenedBlocks;
@@ -126,7 +126,7 @@ export function hasSameKeys( a, b ) {
 export function isUpdatingSameBlockAttribute( action, previousAction ) {
 	return (
 		action.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
-		action.uid === previousAction.uid &&
+		action.clientId === previousAction.clientId &&
 		hasSameKeys( action.attributes, previousAction.attributes )
 	);
 }
@@ -171,7 +171,7 @@ export function shouldOverwriteState( action, previousAction ) {
 
 /**
  * Higher-order reducer targeting the combined editor reducer, augmenting
- * block UIDs in remove action to include cascade of inner blocks.
+ * block client IDs in remove action to include cascade of inner blocks.
  *
  * @param {Function} reducer Original reducer function.
  *
@@ -179,15 +179,15 @@ export function shouldOverwriteState( action, previousAction ) {
  */
 const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
 	if ( state && action.type === 'REMOVE_BLOCKS' ) {
-		const uids = [ ...action.uids ];
+		const clientIds = [ ...action.clientIds ];
 
-		// For each removed UID, include its inner blocks in UIDs to remove,
+		// For each removed client ID, include its inner blocks to remove,
 		// recursing into those so long as inner blocks exist.
-		for ( let i = 0; i < uids.length; i++ ) {
-			uids.push( ...state.blockOrder[ uids[ i ] ] );
+		for ( let i = 0; i < clientIds.length; i++ ) {
+			clientIds.push( ...state.blockOrder[ clientIds[ i ] ] );
 		}
 
-		action = { ...action, uids };
+		action = { ...action, clientIds };
 	}
 
 	return reducer( state, action );
@@ -200,9 +200,9 @@ const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
  * Handles the following state keys:
  *  - edits: an object describing changes to be made to the current post, in
  *           the format accepted by the WP REST API
- *  - blocksByUID: post content blocks keyed by UID
- *  - blockOrder: object where each key is a UID, its value an array of uids
- *                representing the order of its inner blocks
+ *  - blocksByClientId: post content blocks keyed by client ID
+ *  - blockOrder: object where each key is a client ID, its value an array of
+ *                client IDs representing the order of its inner blocks
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
@@ -280,7 +280,7 @@ export const editor = flow( [
 		return state;
 	},
 
-	blocksByUID( state = {}, action ) {
+	blocksByClientId( state = {}, action ) {
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
 			case 'SETUP_EDITOR_STATE':
@@ -294,7 +294,7 @@ export const editor = flow( [
 
 			case 'UPDATE_BLOCK_ATTRIBUTES':
 				// Ignore updates if block isn't known
-				if ( ! state[ action.uid ] ) {
+				if ( ! state[ action.clientId ] ) {
 					return state;
 				}
 
@@ -302,7 +302,7 @@ export const editor = flow( [
 				const nextAttributes = reduce( action.attributes, ( result, value, key ) => {
 					if ( value !== result[ key ] ) {
 						// Avoid mutating original block by creating shallow clone
-						if ( result === state[ action.uid ].attributes ) {
+						if ( result === state[ action.clientId ].attributes ) {
 							result = { ...result };
 						}
 
@@ -310,35 +310,35 @@ export const editor = flow( [
 					}
 
 					return result;
-				}, state[ action.uid ].attributes );
+				}, state[ action.clientId ].attributes );
 
 				// Skip update if nothing has been changed. The reference will
 				// match the original block if `reduce` had no changed values.
-				if ( nextAttributes === state[ action.uid ].attributes ) {
+				if ( nextAttributes === state[ action.clientId ].attributes ) {
 					return state;
 				}
 
 				// Otherwise merge attributes into state
 				return {
 					...state,
-					[ action.uid ]: {
-						...state[ action.uid ],
+					[ action.clientId ]: {
+						...state[ action.clientId ],
 						attributes: nextAttributes,
 					},
 				};
 
 			case 'MOVE_BLOCK_TO_POSITION':
 				// Avoid creating a new instance if the layout didn't change.
-				if ( state[ action.uid ].attributes.layout === action.layout ) {
+				if ( state[ action.clientId ].attributes.layout === action.layout ) {
 					return state;
 				}
 
 				return {
 					...state,
-					[ action.uid ]: {
-						...state[ action.uid ],
+					[ action.clientId ]: {
+						...state[ action.clientId ],
 						attributes: {
-							...state[ action.uid ].attributes,
+							...state[ action.clientId ].attributes,
 							layout: action.layout,
 						},
 					},
@@ -346,14 +346,14 @@ export const editor = flow( [
 
 			case 'UPDATE_BLOCK':
 				// Ignore updates if block isn't known
-				if ( ! state[ action.uid ] ) {
+				if ( ! state[ action.clientId ] ) {
 					return state;
 				}
 
 				return {
 					...state,
-					[ action.uid ]: {
-						...state[ action.uid ],
+					[ action.clientId ]: {
+						...state[ action.clientId ],
 						...action.updates,
 					},
 				};
@@ -370,12 +370,12 @@ export const editor = flow( [
 				}
 
 				return {
-					...omit( state, action.uids ),
+					...omit( state, action.clientIds ),
 					...getFlattenedBlocks( action.blocks ),
 				};
 
 			case 'REMOVE_BLOCKS':
-				return omit( state, action.uids );
+				return omit( state, action.clientIds );
 
 			case 'SAVE_SHARED_BLOCK_SUCCESS': {
 				const { id, updatedId } = action;
@@ -417,77 +417,77 @@ export const editor = flow( [
 				};
 
 			case 'INSERT_BLOCKS': {
-				const { rootUID = '', blocks } = action;
-				const subState = state[ rootUID ] || [];
-				const mappedBlocks = mapBlockOrder( blocks, rootUID );
+				const { rootClientId = '', blocks } = action;
+				const subState = state[ rootClientId ] || [];
+				const mappedBlocks = mapBlockOrder( blocks, rootClientId );
 				const { index = subState.length } = action;
 
 				return {
 					...state,
 					...mappedBlocks,
-					[ rootUID ]: insertAt( subState, mappedBlocks[ rootUID ], index ),
+					[ rootClientId ]: insertAt( subState, mappedBlocks[ rootClientId ], index ),
 				};
 			}
 
 			case 'MOVE_BLOCK_TO_POSITION': {
-				const { fromRootUID = '', toRootUID = '', uid } = action;
-				const { index = state[ toRootUID ].length } = action;
+				const { fromRootClientId = '', toRootClientId = '', clientId } = action;
+				const { index = state[ toRootClientId ].length } = action;
 
 				// Moving inside the same parent block
-				if ( fromRootUID === toRootUID ) {
-					const subState = state[ toRootUID ];
-					const fromIndex = subState.indexOf( uid );
+				if ( fromRootClientId === toRootClientId ) {
+					const subState = state[ toRootClientId ];
+					const fromIndex = subState.indexOf( clientId );
 					return {
 						...state,
-						[ toRootUID ]: moveTo( state[ toRootUID ], fromIndex, index ),
+						[ toRootClientId ]: moveTo( state[ toRootClientId ], fromIndex, index ),
 					};
 				}
 
 				// Moving from a parent block to another
 				return {
 					...state,
-					[ fromRootUID ]: without( state[ fromRootUID ], uid ),
-					[ toRootUID ]: insertAt( state[ toRootUID ], uid, index ),
+					[ fromRootClientId ]: without( state[ fromRootClientId ], clientId ),
+					[ toRootClientId ]: insertAt( state[ toRootClientId ], clientId, index ),
 				};
 			}
 
 			case 'MOVE_BLOCKS_UP': {
-				const { uids, rootUID = '' } = action;
-				const firstUid = first( uids );
-				const subState = state[ rootUID ];
+				const { clientIds, rootClientId = '' } = action;
+				const firstClientId = first( clientIds );
+				const subState = state[ rootClientId ];
 
-				if ( ! subState.length || firstUid === first( subState ) ) {
+				if ( ! subState.length || firstClientId === first( subState ) ) {
 					return state;
 				}
 
-				const firstIndex = subState.indexOf( firstUid );
+				const firstIndex = subState.indexOf( firstClientId );
 
 				return {
 					...state,
-					[ rootUID ]: moveTo( subState, firstIndex, firstIndex - 1, uids.length ),
+					[ rootClientId ]: moveTo( subState, firstIndex, firstIndex - 1, clientIds.length ),
 				};
 			}
 
 			case 'MOVE_BLOCKS_DOWN': {
-				const { uids, rootUID = '' } = action;
-				const firstUid = first( uids );
-				const lastUid = last( uids );
-				const subState = state[ rootUID ];
+				const { clientIds, rootClientId = '' } = action;
+				const firstClientId = first( clientIds );
+				const lastClientId = last( clientIds );
+				const subState = state[ rootClientId ];
 
-				if ( ! subState.length || lastUid === last( subState ) ) {
+				if ( ! subState.length || lastClientId === last( subState ) ) {
 					return state;
 				}
 
-				const firstIndex = subState.indexOf( firstUid );
+				const firstIndex = subState.indexOf( firstClientId );
 
 				return {
 					...state,
-					[ rootUID ]: moveTo( subState, firstIndex, firstIndex + 1, uids.length ),
+					[ rootClientId ]: moveTo( subState, firstIndex, firstIndex + 1, clientIds.length ),
 				};
 			}
 
 			case 'REPLACE_BLOCKS': {
-				const { blocks, uids } = action;
+				const { blocks, clientIds } = action;
 				if ( ! blocks ) {
 					return state;
 				}
@@ -495,22 +495,22 @@ export const editor = flow( [
 				const mappedBlocks = mapBlockOrder( blocks );
 
 				return flow( [
-					( nextState ) => omit( nextState, uids ),
+					( nextState ) => omit( nextState, clientIds ),
 					( nextState ) => ( {
 						...nextState,
 						...omit( mappedBlocks, '' ),
 					} ),
 					( nextState ) => mapValues( nextState, ( subState ) => (
-						reduce( subState, ( result, uid ) => {
-							if ( uid === uids[ 0 ] ) {
+						reduce( subState, ( result, clientId ) => {
+							if ( clientId === clientIds[ 0 ] ) {
 								return [
 									...result,
 									...mappedBlocks[ '' ],
 								];
 							}
 
-							if ( uids.indexOf( uid ) === -1 ) {
-								result.push( uid );
+							if ( clientIds.indexOf( clientId ) === -1 ) {
+								result.push( clientId );
 							}
 
 							return result;
@@ -522,11 +522,11 @@ export const editor = flow( [
 			case 'REMOVE_BLOCKS':
 				return flow( [
 					// Remove inner block ordering for removed blocks
-					( nextState ) => omit( nextState, action.uids ),
+					( nextState ) => omit( nextState, action.clientIds ),
 
 					// Remove deleted blocks from other blocks' orderings
 					( nextState ) => mapValues( nextState, ( subState ) => (
-						without( subState, ...action.uids )
+						without( subState, ...action.clientIds )
 					) ),
 				] )( state );
 		}
@@ -643,25 +643,25 @@ export function blockSelection( state = {
 				initialPosition: null,
 			};
 		case 'SELECT_BLOCK':
-			if ( action.uid === state.start && action.uid === state.end ) {
+			if ( action.clientId === state.start && action.clientId === state.end ) {
 				return state;
 			}
 			return {
 				...state,
-				start: action.uid,
-				end: action.uid,
+				start: action.clientId,
+				end: action.clientId,
 				initialPosition: action.initialPosition,
 			};
 		case 'INSERT_BLOCKS':
 			return {
 				...state,
-				start: action.blocks[ 0 ].uid,
-				end: action.blocks[ 0 ].uid,
+				start: action.blocks[ 0 ].clientId,
+				end: action.blocks[ 0 ].clientId,
 				initialPosition: null,
 				isMultiSelecting: false,
 			};
 		case 'REMOVE_BLOCKS':
-			if ( ! action.uids || ! action.uids.length || action.uids.indexOf( state.start ) === -1 ) {
+			if ( ! action.clientIds || ! action.clientIds.length || action.clientIds.indexOf( state.start ) === -1 ) {
 				return state;
 			}
 			return {
@@ -672,18 +672,18 @@ export function blockSelection( state = {
 				isMultiSelecting: false,
 			};
 		case 'REPLACE_BLOCKS':
-			if ( action.uids.indexOf( state.start ) === -1 ) {
+			if ( action.clientIds.indexOf( state.start ) === -1 ) {
 				return state;
 			}
 
-			// If there is replacement block(s), assign first's UID as the next
-			// selected block. If empty replacement, reset to null.
-			const nextSelectedBlockUID = get( action.blocks, [ 0, 'uid' ], null );
+			// If there is replacement block(s), assign first's client ID as
+			// the next selected block. If empty replacement, reset to null.
+			const nextSelectedBlockClientId = get( action.blocks, [ 0, 'clientId' ], null );
 
 			return {
 				...state,
-				start: nextSelectedBlockUID,
-				end: nextSelectedBlockUID,
+				start: nextSelectedBlockClientId,
+				end: nextSelectedBlockClientId,
 				initialPosition: null,
 				isMultiSelecting: false,
 			};
@@ -698,20 +698,20 @@ export function blockSelection( state = {
 }
 
 /**
- * Reducer returning the UID of the provisional block. A provisional block is
- * one which is to be removed if it does not receive updates in the time until
- * the next selection or block reset.
+ * Reducer returning the client ID of the provisional block. A provisional
+ * block is one which is to be removed if it does not receive updates in the
+ * time until the next selection or block reset.
  *
  * @param {string} state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @return {string} Updated state.
  */
-export function provisionalBlockUID( state = null, action ) {
+export function provisionalBlockClientId( state = null, action ) {
 	switch ( action.type ) {
 		case 'INSERT_BLOCKS':
 			if ( action.isProvisional ) {
-				return first( action.blocks ).uid;
+				return first( action.blocks ).clientId;
 			}
 			break;
 
@@ -721,16 +721,16 @@ export function provisionalBlockUID( state = null, action ) {
 		case 'UPDATE_BLOCK_ATTRIBUTES':
 		case 'UPDATE_BLOCK':
 		case 'CONVERT_BLOCK_TO_SHARED':
-			const { uid } = action;
-			if ( uid === state ) {
+			const { clientId } = action;
+			if ( clientId === state ) {
 				return null;
 			}
 			break;
 
 		case 'REPLACE_BLOCKS':
 		case 'REMOVE_BLOCKS':
-			const { uids } = action;
-			if ( includes( uids, state ) ) {
+			const { clientIds } = action;
+			if ( includes( clientIds, state ) ) {
 				return null;
 			}
 			break;
@@ -741,10 +741,10 @@ export function provisionalBlockUID( state = null, action ) {
 
 export function blocksMode( state = {}, action ) {
 	if ( action.type === 'TOGGLE_BLOCK_MODE' ) {
-		const { uid } = action;
+		const { clientId } = action;
 		return {
 			...state,
-			[ uid ]: state[ uid ] && state[ uid ] === 'html' ? 'visual' : 'html',
+			[ clientId ]: state[ clientId ] && state[ clientId ] === 'html' ? 'visual' : 'html',
 		};
 	}
 
@@ -925,9 +925,9 @@ export const sharedBlocks = combineReducers( {
 			case 'RECEIVE_SHARED_BLOCKS': {
 				return reduce( action.results, ( nextState, result ) => {
 					const { id, title } = result.sharedBlock;
-					const { uid } = result.parsedBlock;
+					const { clientId } = result.parsedBlock;
 
-					const value = { uid, title };
+					const value = { clientId, title };
 
 					if ( ! isEqual( nextState[ id ], value ) ) {
 						if ( nextState === state ) {
@@ -1025,8 +1025,8 @@ export const sharedBlocks = combineReducers( {
 } );
 
 /**
- * Reducer that for each block uid stores an object that represents its nested settings.
- * E.g: what blocks can be nested inside a block.
+ * Reducer returning an object where each key is a block client ID, its value
+ * representing the settings for its nested blocks.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
@@ -1035,28 +1035,29 @@ export const sharedBlocks = combineReducers( {
  */
 export const blockListSettings = ( state = {}, action ) => {
 	switch ( action.type ) {
-		// even if the replaced blocks have the same uid our logic should correct the state.
+		// Even if the replaced blocks have the same client ID, our logic
+		// should correct the state.
 		case 'REPLACE_BLOCKS' :
 		case 'REMOVE_BLOCKS': {
-			return omit( state, action.uids );
+			return omit( state, action.clientIds );
 		}
 		case 'UPDATE_BLOCK_LIST_SETTINGS': {
-			const { id } = action;
+			const { clientId } = action;
 			if ( ! action.settings ) {
-				if ( state.hasOwnProperty( id ) ) {
-					return omit( state, id );
+				if ( state.hasOwnProperty( clientId ) ) {
+					return omit( state, clientId );
 				}
 
 				return state;
 			}
 
-			if ( isEqual( state[ id ], action.settings ) ) {
+			if ( isEqual( state[ clientId ], action.settings ) ) {
 				return state;
 			}
 
 			return {
 				...state,
-				[ id ]: action.settings,
+				[ clientId ]: action.settings,
 			};
 		}
 	}
@@ -1126,7 +1127,7 @@ export default optimist( combineReducers( {
 	currentPost,
 	isTyping,
 	blockSelection,
-	provisionalBlockUID,
+	provisionalBlockClientId,
 	blocksMode,
 	blockListSettings,
 	isInsertionPointVisible,
