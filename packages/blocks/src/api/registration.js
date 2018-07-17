@@ -8,7 +8,7 @@ import { get, isFunction, some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { applyFilters } from '@wordpress/hooks';
+import { applyFilters, addFilter } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
 
 /**
@@ -329,4 +329,26 @@ export const getChildBlockNames = ( blockName ) => {
  */
 export const hasChildBlocks = ( blockName ) => {
 	return select( 'core/blocks' ).hasChildBlocks( blockName );
+};
+
+/**
+ * Registers a new block style variation for the given block
+ *
+ * @param {string} blockName      Block type name.
+ * @param {Object} styleVariation Block style variation.
+ */
+export const registerBlockStyleVariation = ( blockName, styleVariation ) => {
+	addFilter( 'blocks.registerBlockType', blockName + '/' + styleVariation.name, ( settings, name ) => {
+		if ( blockName !== name ) {
+			return settings;
+		}
+
+		return {
+			...settings,
+			styles: [
+				...get( settings, [ 'styles' ], [] ),
+				styleVariation,
+			],
+		};
+	} );
 };

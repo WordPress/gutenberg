@@ -24,6 +24,7 @@ import {
 	hasBlockSupport,
 	isSharedBlock,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
+	registerBlockStyleVariation,
 } from '../registration';
 
 describe( 'blocks', () => {
@@ -593,6 +594,37 @@ describe( 'blocks', () => {
 		it( 'should return false for other blocks', () => {
 			const block = { name: 'core/paragraph' };
 			expect( isSharedBlock( block ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'registerBlockStyleVariation', () => {
+		afterEach( () => {
+			removeFilter( 'blocks.registerBlockType', 'my-plugin/block-without-styles/big' );
+			removeFilter( 'blocks.registerBlockType', 'my-plugin/block-without-styles/small' );
+		} );
+
+		it( 'should add styles', () => {
+			registerBlockStyleVariation( 'my-plugin/block-without-styles', { name: 'big', label: 'Big style' } );
+			const settings = registerBlockType( 'my-plugin/block-without-styles', defaultBlockSettings );
+
+			expect( settings.styles ).toEqual( [
+				{ name: 'big', label: 'Big style' },
+			] );
+		} );
+
+		it( 'should accumulate styles', () => {
+			registerBlockStyleVariation( 'my-plugin/block-without-styles', { name: 'small', label: 'Small style' } );
+			registerBlockStyleVariation( 'my-plugin/block-without-styles', { name: 'big', label: 'Big style' } );
+			const settings = registerBlockType( 'my-plugin/block-without-styles', {
+				...defaultBlockSettings,
+				styles: [ { name: 'normal', label: 'Normal style' } ],
+			} );
+
+			expect( settings.styles ).toEqual( [
+				{ name: 'normal', label: 'Normal style' },
+				{ name: 'small', label: 'Small style' },
+				{ name: 'big', label: 'Big style' },
+			] );
 		} );
 	} );
 } );
