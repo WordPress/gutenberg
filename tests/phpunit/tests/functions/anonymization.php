@@ -2,9 +2,9 @@
 /**
  * Test anonymization functions.
  *
- * @package WordPress
+ * @package WordPress\UnitTests
  *
- * @since 5.0.0
+ * @since 4.9.6
  */
 
 /**
@@ -13,7 +13,7 @@
  * @group functions.php
  * @group privacy
  *
- * @since 5.0.0
+ * @since 4.9.6
  */
 class Tests_Functions_Anonymization extends WP_UnitTestCase {
 	/**
@@ -42,7 +42,7 @@ class Tests_Functions_Anonymization extends WP_UnitTestCase {
 	/**
 	 * Provide test cases for `test_wp_privacy_anonymize_ip()`.
 	 *
-	 * @since 5.0.0 Moved from `Test_WP_Community_Events::data_get_unsafe_client_ip_anonymization()`.
+	 * @since 4.9.6 Moved from `Test_WP_Community_Events::data_get_unsafe_client_ip_anonymization()`.
 	 *
 	 * @return array {
 	 *     @type array {
@@ -212,14 +212,14 @@ class Tests_Functions_Anonymization extends WP_UnitTestCase {
 	 * Test email anonymization of `wp_privacy_anonymize_data()`.
 	 */
 	public function test_anonymize_email() {
-		$this->assertEquals( 'deleted@site.invalid', wp_privacy_anonymize_data( 'email', 'bar@example.com' ) );
+		$this->assertSame( '', wp_privacy_anonymize_data( 'email', 'bar@example.com' ) );
 	}
 
 	/**
 	 * Test url anonymization of `wp_privacy_anonymize_data()`.
 	 */
 	public function test_anonymize_url() {
-		$this->assertEquals( 'https://site.invalid', wp_privacy_anonymize_data( 'url', 'https://example.com/author/username' ) );
+		$this->assertSame( '', wp_privacy_anonymize_data( 'url', 'https://example.com/author/username' ) );
 	}
 
 	/**
@@ -244,4 +244,35 @@ class Tests_Functions_Anonymization extends WP_UnitTestCase {
 		$text = __( 'Four score and seven years ago' );
 		$this->assertEquals( 'This content was deleted by the author.', wp_privacy_anonymize_data( 'longtext', $text ) );
 	}
+
+	/**
+	 * Test text anonymization when a filter is added.
+	 *
+	 * @ticket 44141
+	 */
+	public function test_anonymize_with_filter() {
+		add_filter( 'wp_privacy_anonymize_data', array( $this, 'filter_wp_privacy_anonymize_data' ), 10, 3 );
+		$actual_url   = wp_privacy_anonymize_data( 'url', 'https://example.com/author/username' );
+		remove_filter( 'wp_privacy_anonymize_data', array( $this, 'filter_wp_privacy_anonymize_data' ), 10 );
+
+		$this->assertSame( 'http://local.host/why-this-was-removed', $actual_url );
+	}
+
+	/**
+	 * Change the anonymized value for URLs.
+	 *
+	 * @since 4.9.8
+	 *
+	 * @param string  $anonymous Anonymized data.
+	 * @param string  $type      Type of the data.
+	 * @param string  $data      Original data.
+	 * @return string $anonymous Anonymized data.
+	 */
+	public function filter_wp_privacy_anonymize_data( $anonymous, $type, $data ) {
+		if ( 'url' === $type && 'example.com' === parse_url( $data, PHP_URL_HOST ) ) {
+			return 'http://local.host/why-this-was-removed';
+		}
+		return $anonymous;
+	}
+
 }
