@@ -65,6 +65,12 @@ function gutenberg_menu() {
 
 	if ( current_user_can( 'edit_posts' ) ) {
 		$submenu['gutenberg'][] = array(
+			__( 'Support', 'gutenberg' ),
+			'edit_posts',
+			__( ' https://wordpress.org/support/plugin/gutenberg', 'gutenberg' ),
+		);
+
+		$submenu['gutenberg'][] = array(
 			__( 'Feedback', 'gutenberg' ),
 			'edit_posts',
 			'http://wordpressdotorg.polldaddy.com/s/gutenberg-support',
