@@ -7,6 +7,7 @@ import {
 	newDesktopBrowserPage,
 	insertBlock,
 	getEditedPostContent,
+	pressTimes,
 } from '../support/utils';
 
 describe( 'adding blocks', () => {
@@ -56,8 +57,19 @@ describe( 'adding blocks', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		// Using the regular inserter
-		await insertBlock( 'Code' );
-		await page.keyboard.type( 'Code block' );
+		await insertBlock( 'Preformatted' );
+		await page.keyboard.type( 'Pre block' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+
+		// Verify vertical traversal at offset. This has been buggy in the past
+		// where verticality on a blank newline would skip into previous block.
+		await page.keyboard.type( 'Foo' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
+		await pressTimes( 'ArrowRight', 3 );
+		await pressTimes( 'Delete', 6 );
+		await page.keyboard.type( ' text' );
 
 		// Unselect blocks to avoid conflicts with the inbetween inserter
 		await page.click( '.editor-post-title__input' );
