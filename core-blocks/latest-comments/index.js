@@ -29,6 +29,8 @@ export const settings = {
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
 
+		// TODO: Use consistent values across the app;
+		// see: https://github.com/WordPress/gutenberg/issues/7908.
 		if ( [ 'left', 'center', 'right', 'wide', 'full' ].includes( align ) ) {
 			return { 'data-align': align };
 		}

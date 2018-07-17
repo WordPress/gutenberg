@@ -1,12 +1,5 @@
-.wp-block-latest-comments {
-	a {
-		cursor: default;
-		pointer-events: none;
-	}
-
-	&.has-avatars .avatar {
-		margin-right: 10px;
-	}
+.wp-block-latest-comments.has-avatars .avatar {
+	margin-right: 10px;
 }
 
 .edit-post-visual-editor {
