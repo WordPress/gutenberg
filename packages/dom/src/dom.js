@@ -217,10 +217,15 @@ export function placeCaretAtHorizontalEdge( container, isReverse ) {
 		return;
 	}
 
+	// Select on extent child of the container, not the container itself. This
+	// avoids the selection always being `endOffset` of 1 when placed at end,
+	// where `startContainer`, `endContainer` would always be container itself.
+	const rangeTarget = container[ isReverse ? 'lastChild' : 'firstChild' ];
+
 	const selection = window.getSelection();
 	const range = document.createRange();
 
-	range.selectNodeContents( container );
+	range.selectNodeContents( rangeTarget );
 	range.collapse( ! isReverse );
 
 	selection.removeAllRanges();
