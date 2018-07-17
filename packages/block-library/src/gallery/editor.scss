@@ -77,6 +77,16 @@
 			border: $border-width solid $dark-gray-500;
 		}
 	}
+
+	.editor-rich-text .editor-rich-text__tinymce {
+		a {
+			color: #fff;
+		}
+
+		&:focus a[data-mce-selected] {
+			color: #007FAC;
+		}
+	}
 }
 
 .block-library-gallery-item__inline-menu {
