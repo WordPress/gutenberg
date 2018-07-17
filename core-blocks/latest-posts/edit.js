@@ -20,7 +20,7 @@ import {
 	withAPIData,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { dateI18n, getSettings, moment } from '@wordpress/date';
+import { dateI18n, getSettings, gmdate } from '@wordpress/date';
 import { decodeEntities } from '@wordpress/html-entities';
 import {
 	InspectorControls,
@@ -148,7 +148,7 @@ class LatestPostsEdit extends Component {
 						<li key={ i }>
 							<a href={ post.link } target="_blank">{ decodeEntities( post.title.rendered.trim() ) || __( '(Untitled)' ) }</a>
 							{ displayPostDate && post.date_gmt &&
-								<time dateTime={ moment( post.date_gmt ).utc().format() } className={ `${ this.props.className }__post-date` }>
+								<time dateTime={ gmdate( 'c', post.date_gmt ) } className={ `${ this.props.className }__post-date` }>
 									{ dateI18n( dateFormat, post.date_gmt ) }
 								</time>
 							}
