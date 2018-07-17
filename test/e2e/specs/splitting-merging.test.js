@@ -68,6 +68,6 @@ describe( 'splitting and merging blocks', () => {
 		await pressTimes( 'Backspace', 3 );
 		await page.keyboard.type( 'Bar' );
 
-		expect( await getHTMLFromCodeEditor() ).toMatchSnapshot();
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );
