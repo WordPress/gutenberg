@@ -35,7 +35,7 @@ export const settings = {
 		}
 	},
 
-	edit: edit,
+	edit,
 
 	save() {
 		return null;
