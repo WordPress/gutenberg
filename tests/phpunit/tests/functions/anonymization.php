@@ -212,14 +212,14 @@ class Tests_Functions_Anonymization extends WP_UnitTestCase {
 	 * Test email anonymization of `wp_privacy_anonymize_data()`.
 	 */
 	public function test_anonymize_email() {
-		$this->assertSame( '', wp_privacy_anonymize_data( 'email', 'bar@example.com' ) );
+		$this->assertSame( 'deleted@site.invalid', wp_privacy_anonymize_data( 'email', 'bar@example.com' ) );
 	}
 
 	/**
 	 * Test url anonymization of `wp_privacy_anonymize_data()`.
 	 */
 	public function test_anonymize_url() {
-		$this->assertSame( '', wp_privacy_anonymize_data( 'url', 'https://example.com/author/username' ) );
+		$this->assertSame( 'https://site.invalid', wp_privacy_anonymize_data( 'url', 'https://example.com/author/username' ) );
 	}
 
 	/**
