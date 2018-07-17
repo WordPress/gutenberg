@@ -176,31 +176,30 @@ export default {
 		}
 
 		request
-			.then(
-				( newPost ) => {
-					const reset = isAutosave ? resetAutosave : resetPost;
-					dispatch( reset( newPost ) );
+			.then( ( newPost ) => {
+				const reset = isAutosave ? resetAutosave : resetPost;
+				dispatch( reset( newPost ) );
 
-					// An autosave may be processed by the server as a regular save
-					// when its update is requested by the author and the post was
-					// draft or auto-draft.
-					const isRevision = newPost.id !== post.id;
+				// An autosave may be processed by the server as a regular save
+				// when its update is requested by the author and the post was
+				// draft or auto-draft.
+				const isRevision = newPost.id !== post.id;
 
-					dispatch( {
-						type: 'REQUEST_POST_UPDATE_SUCCESS',
-						previousPost: post,
-						post: newPost,
-						optimist: {
+				dispatch( {
+					type: 'REQUEST_POST_UPDATE_SUCCESS',
+					previousPost: post,
+					post: newPost,
+					optimist: {
 						// Note: REVERT is not a failure case here. Rather, it
 						// is simply reversing the assumption that the updates
 						// were applied to the post proper, such that the post
 						// treated as having unsaved changes.
-							type: isRevision ? REVERT : COMMIT,
-							id: POST_UPDATE_TRANSACTION_ID,
-						},
-						isAutosave,
-					} );
-				} )
+						type: isRevision ? REVERT : COMMIT,
+						id: POST_UPDATE_TRANSACTION_ID,
+					},
+					isAutosave,
+				} );
+			} )
 			.catch( ( error ) => dispatch( {
 				type: 'REQUEST_POST_UPDATE_FAILURE',
 				optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
