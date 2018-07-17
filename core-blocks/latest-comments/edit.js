@@ -90,7 +90,7 @@ class LatestComments extends Component {
 						<RangeControl
 							label={ __( 'Number of comments' ) }
 							value={ commentsToShow }
-							onChange={ ( value ) => this.setCommentsToShow( value ) }
+							onChange={ this.setCommentsToShow }
 							min={ MIN_COMMENTS }
 							max={ MAX_COMMENTS }
 						/>
