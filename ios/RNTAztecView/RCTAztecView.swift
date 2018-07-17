@@ -4,17 +4,24 @@ import Foundation
 class RCTAztecView: Aztec.TextView {
     @objc var onContentSizeChange: RCTBubblingEventBlock? = nil
     
+    private var previousContentSize: CGSize = .zero
+    
     // MARK - View Height: Match to content height
 
-    override var contentSize: CGSize {
-        didSet {
-            contentSizeChanged()
-        }
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        updateContentSizeInRN()
     }
 
-    func contentSizeChanged() {
+    func updateContentSizeInRN() {
         let newSize = contentSize
         
+        guard previousContentSize != newSize else {
+            return
+        }
+        
+        previousContentSize = newSize
         updateHeightToMatch(newSize.height)
         
         guard let onContentSizeChange = onContentSizeChange else {
