@@ -264,6 +264,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/compose",
+		"slug": "packages-compose",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/compose/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/core-data",
 		"slug": "packages-core-data",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/core-data/README.md",
@@ -315,6 +321,12 @@
 		"title": "@wordpress/hooks",
 		"slug": "packages-hooks",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/hooks/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/html-entities",
+		"slug": "packages-html-entities",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/html-entities/README.md",
 		"parent": "packages"
 	},
 	{
@@ -390,6 +402,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/viewport",
+		"slug": "packages-viewport",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/viewport/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/wordcount",
 		"slug": "packages-wordcount",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/wordcount/README.md",
@@ -432,18 +450,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/utils",
-		"slug": "packages-utils",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/utils/README.md",
-		"parent": "packages"
-	},
-	{
-		"title": "@wordpress/viewport",
-		"slug": "packages-viewport",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/viewport/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "Data Package Reference",
 		"slug": "data",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/README.md",
@@ -474,15 +480,15 @@
 		"parent": "data"
 	},
 	{
-		"title": "The viewport module Data",
-		"slug": "data-core-viewport",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-viewport.md",
+		"title": "The NUX (New User Experience) Data",
+		"slug": "data-core-nux",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-nux.md",
 		"parent": "data"
 	},
 	{
-		"title": "The NUX (New User Experience) module Data",
-		"slug": "data-core-nux",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-nux.md",
+		"title": "The Viewport Data",
+		"slug": "data-core-viewport",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-viewport.md",
 		"parent": "data"
 	}
 ]

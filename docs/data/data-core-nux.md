@@ -1,4 +1,4 @@
-# **core/nux**: The NUX (New User Experience) module Data
+# **core/nux**: The NUX (New User Experience) Data
 
 ## Selectors 
 

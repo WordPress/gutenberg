@@ -19,8 +19,6 @@ const gutenbergPackages = [
 	'edit-post',
 	'editor',
 	'nux',
-	'utils',
-	'viewport',
 ];
 
 module.exports = {
@@ -46,15 +44,15 @@ module.exports = {
 			selectors: [ path.resolve( root, 'edit-post/store/selectors.js' ) ],
 			actions: [ path.resolve( root, 'edit-post/store/actions.js' ) ],
 		},
-		'core/viewport': {
-			title: 'The viewport module Data',
-			selectors: [ path.resolve( root, 'viewport/store/selectors.js' ) ],
-			actions: [ path.resolve( root, 'viewport/store/actions.js' ) ],
-		},
 		'core/nux': {
-			title: 'The NUX (New User Experience) module Data',
+			title: 'The NUX (New User Experience) Data',
 			selectors: [ path.resolve( root, 'nux/store/selectors.js' ) ],
 			actions: [ path.resolve( root, 'nux/store/actions.js' ) ],
+		},
+		'core/viewport': {
+			title: 'The Viewport Data',
+			selectors: [ path.resolve( root, 'packages/viewport/src/store/selectors.js' ) ],
+			actions: [ path.resolve( root, 'packages/viewport/src/store/actions.js' ) ],
 		},
 	},
 	dataDocsOutput: path.resolve( __dirname, '../data' ),
