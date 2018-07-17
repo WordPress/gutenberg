@@ -668,7 +668,7 @@ describe( 'effects', () => {
 				} );
 			} );
 
-			it( 'should handle an API error', ( done ) => {
+			it( 'should handle an API error', () => {
 				const promise = Promise.reject( {
 					code: 'unknown_error',
 					message: 'An unknown error occurred.',
@@ -681,7 +681,7 @@ describe( 'effects', () => {
 
 				handler( fetchSharedBlocks(), store );
 
-				promise.catch( () => {
+				return promise.catch( () => {
 					process.nextTick( () => {
 						expect( dispatch ).toHaveBeenCalledWith( {
 							type: 'FETCH_SHARED_BLOCKS_FAILURE',
@@ -690,7 +690,6 @@ describe( 'effects', () => {
 								message: 'An unknown error occurred.',
 							},
 						} );
-						done();
 					} );
 				} );
 			} );
