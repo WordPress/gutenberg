@@ -35,16 +35,15 @@ module.exports = {
 		'no-restricted-syntax': [
 			'error',
 			// NOTE: We can't include the forward slash in our regex or
-			// we'll get a `SyntaxError`
-			// (Invalid regular expression: \ at end of pattern)
-			// here. That's why we use \\u002F in the regexs below.
+			// we'll get a `SyntaxError` (Invalid regular expression: \ at end of pattern)
+			// here. That's why we use \\u002F in the regexes below.
 			{
 				selector: 'ImportDeclaration[source.value=/^@wordpress\\u002F.+\\u002F/]',
 				message: 'Path access on WordPress dependencies is not allowed.',
 			},
 			{
-				selector: 'ImportDeclaration[source.value=/^api-request(\\u002F|$)/]',
-				message: 'Use @wordpress/api-request as import path instead.',
+				selector: 'ImportDeclaration[source.value=/^api-fetch(\\u002F|$)/]',
+				message: 'Use @wordpress/api-fetch as import path instead.',
 			},
 			{
 				selector: 'ImportDeclaration[source.value=/^blob(\\u002F|$)/]',
