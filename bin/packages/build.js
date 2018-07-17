@@ -14,6 +14,9 @@ const glob = require( 'glob' );
 const babel = require( '@babel/core' );
 const chalk = require( 'chalk' );
 const mkdirp = require( 'mkdirp' );
+const sass = require( 'node-sass' );
+const postcss = require( 'postcss' );
+const deasync = require( 'deasync' );
 
 /**
  * Internal dependencies
@@ -29,6 +32,7 @@ const SRC_DIR = 'src';
 const BUILD_DIR = {
 	main: 'build',
 	module: 'build-module',
+	style: 'build-style',
 };
 const DONE = chalk.reset.inverse.bold.green( ' DONE ' );
 
@@ -66,6 +70,36 @@ function getBuildPath( file, buildFolder ) {
 function buildFile( file, silent ) {
 	buildFileFor( file, silent, 'main' );
 	buildFileFor( file, silent, 'module' );
+}
+
+function buildStyle( packagePath ) {
+	const styleFile = path.resolve( packagePath, SRC_DIR, 'style.scss' );
+	const outputFile = path.resolve( packagePath, BUILD_DIR.style, 'style.css' );
+	mkdirp.sync( path.dirname( outputFile ) );
+	const builtSass = sass.renderSync( {
+		file: styleFile,
+		includePaths: [ path.resolve( __dirname, '../../edit-post/assets/stylesheets' ) ],
+		data: (
+			[
+				'colors',
+				'breakpoints',
+				'variables',
+				'mixins',
+				'animations',
+				'z-index',
+			].map( ( imported ) => `@import "${ imported }";` ).join( ' ' )	+
+			fs.readFileSync( styleFile, 'utf8' )
+		),
+	} );
+
+	const postCSSSync = ( callback ) => {
+		postcss( require( './post-css-config' ) )
+			.process( builtSass.css, { from: 'src/app.css', to: 'dest/app.css' } )
+			.then( ( result ) => callback( null, result ) );
+	};
+
+	const result = deasync( postCSSSync )();
+	fs.writeFileSync( outputFile, result.css );
 }
 
 /**
@@ -109,6 +143,13 @@ function buildPackage( packagePath ) {
 	process.stdout.write( `${ path.basename( packagePath ) }\n` );
 
 	files.forEach( ( file ) => buildFile( file, true ) );
+
+	// Building styles
+	const styleFile = path.resolve( srcDir, 'style.scss' );
+	if ( fs.existsSync( styleFile ) ) {
+		buildStyle( packagePath );
+	}
+
 	process.stdout.write( `${ DONE }\n` );
 }
 
