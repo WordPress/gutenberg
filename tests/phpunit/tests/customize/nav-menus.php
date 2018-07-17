@@ -292,6 +292,7 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 	 */
 	function test_search_available_items_query() {
 		$menus = new WP_Customize_Nav_Menus( $this->wp_customize );
+		do_action( 'customize_register', $this->wp_customize );
 
 		// Create posts.
 		$post_ids = array();
