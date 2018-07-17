@@ -1,6 +1,6 @@
 {
-	"name": "@wordpress/api-request",
-	"version": "1.0.0-alpha.3",
+	"name": "@wordpress/api-fetch",
+	"version": "1.0.0-alpha.1",
 	"description": "Utility to call WordPress REST APIs",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -9,7 +9,7 @@
 		"rest-api",
 		"fetch"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/api-request/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/api-fetch/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git"
@@ -20,6 +20,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
+		"@wordpress/i18n": "file:../i18n",
 		"jquery": "^3.3.1"
 	},
 	"publishConfig": {

@@ -11,8 +11,8 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { TreeSelect, withAPIData, withSpokenMessages, Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import apiRequest from '@wordpress/api-request';
 import { withInstanceId, compose } from '@wordpress/compose';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -103,35 +103,34 @@ class HierarchicalTermSelector extends Component {
 			return;
 		}
 
-		const findOrCreatePromise = new Promise( ( resolve, reject ) => {
-			this.setState( {
-				adding: true,
-			} );
-			// Tries to create a term or fetch it if it already exists
-			const basePath = wp.api.getTaxonomyRoute( this.props.slug );
-			this.addRequest = apiRequest( {
-				path: `/wp/v2/${ basePath }`,
-				method: 'POST',
-				data: {
-					name: formName,
-					parent: formParent ? formParent : undefined,
-				},
-			} );
-			this.addRequest
-				.then( resolve, ( xhr ) => {
-					const errorCode = xhr.responseJSON && xhr.responseJSON.code;
-					if ( errorCode === 'term_exists' ) {
-						// search the new category created since last fetch
-						this.addRequest = apiRequest( {
-							path: `/wp/v2/${ basePath }?${ stringify( { ...DEFAULT_QUERY, parent: formParent || 0, search: formName } ) }`,
-						} );
-						return this.addRequest.then( ( searchResult ) => {
-							resolve( this.findTerm( searchResult, formParent, formName ) );
-						}, reject );
-					}
-					reject( xhr );
-				} );
+		this.setState( {
+			adding: true,
 		} );
+		const basePath = wp.api.getTaxonomyRoute( this.props.slug );
+		this.addRequest = apiFetch( {
+			path: `/wp/v2/${ basePath }`,
+			method: 'POST',
+			data: {
+				name: formName,
+				parent: formParent ? formParent : undefined,
+			},
+		} );
+		// Tries to create a term or fetch it if it already exists
+		const findOrCreatePromise = this.addRequest
+			.catch( ( error ) => {
+				const errorCode = error.code;
+				if ( errorCode === 'term_exists' ) {
+					// search the new category created since last fetch
+					this.addRequest = apiFetch( {
+						path: `/wp/v2/${ basePath }?${ stringify( { ...DEFAULT_QUERY, parent: formParent || 0, search: formName } ) }`,
+					} );
+					return this.addRequest
+						.then( ( searchResult ) => {
+							return this.findTerm( searchResult, formParent, formName );
+						} );
+				}
+				return Promise.reject( error );
+			} );
 		findOrCreatePromise
 			.then( ( term ) => {
 				const hasTerm = !! find( this.state.availableTerms, ( availableTerm ) => availableTerm.id === term.id );
@@ -167,7 +166,7 @@ class HierarchicalTermSelector extends Component {
 
 	componentDidMount() {
 		const basePath = wp.api.getTaxonomyRoute( this.props.slug );
-		this.fetchRequest = apiRequest( { path: `/wp/v2/${ basePath }?${ stringify( DEFAULT_QUERY ) }` } );
+		this.fetchRequest = apiFetch( { path: `/wp/v2/${ basePath }?${ stringify( DEFAULT_QUERY ) }` } );
 		this.fetchRequest.then(
 			( terms ) => { // resolve
 				const availableTermsTree = buildTermsTree( terms );

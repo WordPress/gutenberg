@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import apiRequest from '@wordpress/api-request';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -52,7 +52,7 @@ describe( 'getKindEntities', () => {
 	};
 
 	beforeAll( () => {
-		apiRequest.mockImplementation( ( options ) => {
+		apiFetch.mockImplementation( ( options ) => {
 			if ( options.path === '/wp/v2/types?context=edit' ) {
 				return Promise.resolve( POST_TYPES );
 			}

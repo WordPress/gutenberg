@@ -39,8 +39,8 @@ module.exports = {
 				message: 'Path access on WordPress dependencies is not allowed.',
 			},
 			{
-				selector: 'ImportDeclaration[source.value=/^api-request$/]',
-				message: 'Use @wordpress/api-request as import path instead.',
+				selector: 'ImportDeclaration[source.value=/^api-fetch$/]',
+				message: 'Use @wordpress/api-fetch as import path instead.',
 			},
 			{
 				selector: 'ImportDeclaration[source.value=/^blob$/]',

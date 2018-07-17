@@ -17,19 +17,15 @@ const createNonceMiddleware = ( nonce ) => ( options, next ) => {
 		}
 	} );
 
-	// If ?_wpnonce=... is present, no need to add a nonce header.
-	let addNonceHeader = ! ( options.data && options.data._wpnonce );
 	let headers = options.headers || {};
-
 	// If an 'X-WP-Nonce' header (or any case-insensitive variation
 	// thereof) was specified, no need to add a nonce header.
-	if ( addNonceHeader ) {
-		for ( const headerName in headers ) {
-			if ( headers.hasOwnProperty( headerName ) ) {
-				if ( headerName.toLowerCase() === 'x-wp-nonce' ) {
-					addNonceHeader = false;
-					break;
-				}
+	let addNonceHeader = true;
+	for ( const headerName in headers ) {
+		if ( headers.hasOwnProperty( headerName ) ) {
+			if ( headerName.toLowerCase() === 'x-wp-nonce' ) {
+				addNonceHeader = false;
+				break;
 			}
 		}
 	}

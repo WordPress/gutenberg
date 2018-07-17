@@ -12,7 +12,7 @@ import {
 	registerBlockType,
 	createBlock,
 } from '@wordpress/blocks';
-import apiRequest from '@wordpress/api-request';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -589,7 +589,7 @@ describe( 'effects', () => {
 			const handler = effects.FETCH_SHARED_BLOCKS;
 
 			afterEach( () => {
-				jest.unmock( '@wordpress/api-request' );
+				jest.unmock( '@wordpress/api-fetch' );
 			} );
 
 			it( 'should fetch multiple shared blocks', () => {
@@ -600,7 +600,7 @@ describe( 'effects', () => {
 						content: '<!-- wp:test-block {"name":"Big Bird"} /-->',
 					},
 				] );
-				apiRequest.mockReturnValue = promise;
+				apiFetch.mockReturnValue = promise;
 				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
 
 				const dispatch = jest.fn();
@@ -637,7 +637,7 @@ describe( 'effects', () => {
 					title: 'My cool block',
 					content: '<!-- wp:test-block {"name":"Big Bird"} /-->',
 				} );
-				apiRequest.mockReturnValue = promise;
+				apiFetch.mockReturnValue = promise;
 				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
 
 				const dispatch = jest.fn();
@@ -669,8 +669,11 @@ describe( 'effects', () => {
 			} );
 
 			it( 'should handle an API error', () => {
-				const promise = Promise.reject( {} );
-				apiRequest.mockReturnValue = promise;
+				const promise = Promise.reject( {
+					code: 'unknown_error',
+					message: 'An unknown error occurred.',
+				} );
+				apiFetch.mockReturnValue = promise;
 				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
 
 				const dispatch = jest.fn();
@@ -679,12 +682,14 @@ describe( 'effects', () => {
 				handler( fetchSharedBlocks(), store );
 
 				return promise.catch( () => {
-					expect( dispatch ).toHaveBeenCalledWith( {
-						type: 'FETCH_SHARED_BLOCKS_FAILURE',
-						error: {
-							code: 'unknown_error',
-							message: 'An unknown error occurred.',
-						},
+					process.nextTick( () => {
+						expect( dispatch ).toHaveBeenCalledWith( {
+							type: 'FETCH_SHARED_BLOCKS_FAILURE',
+							error: {
+								code: 'unknown_error',
+								message: 'An unknown error occurred.',
+							},
+						} );
 					} );
 				} );
 			} );
@@ -711,7 +716,7 @@ describe( 'effects', () => {
 
 			it( 'should save a shared block and swap its id', () => {
 				const promise = Promise.resolve( { id: 456 } );
-				apiRequest.mockReturnValue = promise;
+				apiFetch.mockReturnValue = promise;
 
 				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
 
@@ -737,9 +742,9 @@ describe( 'effects', () => {
 				} );
 			} );
 
-			it( 'should handle an API error', () => {
+			it( 'should handle an API error', ( done ) => {
 				const promise = Promise.reject( {} );
-				apiRequest.mockReturnValue = promise;
+				apiFetch.mockReturnValue = promise;
 				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
 
 				const sharedBlock = { id: 123, title: 'My cool block' };
@@ -755,10 +760,13 @@ describe( 'effects', () => {
 
 				handler( saveSharedBlock( 123 ), store );
 
-				return promise.catch( () => {
-					expect( dispatch ).toHaveBeenCalledWith( {
-						type: 'SAVE_SHARED_BLOCK_FAILURE',
-						id: 123,
+				promise.catch( () => {
+					process.nextTick( () => {
+						expect( dispatch ).toHaveBeenCalledWith( {
+							type: 'SAVE_SHARED_BLOCK_FAILURE',
+							id: 123,
+						} );
+						done();
 					} );
 				} );
 			} );
@@ -769,7 +777,7 @@ describe( 'effects', () => {
 
 			it( 'should delete a shared block', () => {
 				const promise = Promise.resolve( {} );
-				apiRequest.mockReturnValue = promise;
+				apiFetch.mockReturnValue = promise;
 				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
 
 				const associatedBlock = createBlock( 'core/block', { ref: 123 } );
@@ -806,9 +814,9 @@ describe( 'effects', () => {
 				} );
 			} );
 
-			it( 'should handle an API error', () => {
+			it( 'should handle an API error', ( done ) => {
 				const promise = Promise.reject( {} );
-				apiRequest.mockReturnValue = promise;
+				apiFetch.mockReturnValue = promise;
 				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
 
 				const sharedBlock = { id: 123, title: 'My cool block' };
@@ -824,13 +832,17 @@ describe( 'effects', () => {
 
 				handler( deleteSharedBlock( 123 ), store );
 
-				return promise.catch( () => {
-					expect( dispatch ).toHaveBeenCalledWith( {
-						type: 'DELETE_SHARED_BLOCK_FAILURE',
-						id: 123,
-						optimist: expect.any( Object ),
+				promise
+					.catch( () => {
+						process.nextTick( () => {
+							expect( dispatch ).toHaveBeenCalledWith( {
+								type: 'DELETE_SHARED_BLOCK_FAILURE',
+								id: 123,
+								optimist: expect.any( Object ),
+							} );
+							done();
+						} );
 					} );
-				} );
 			} );
 
 			it( 'should not save shared blocks with temporary IDs', () => {

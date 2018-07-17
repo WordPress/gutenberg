@@ -6,10 +6,8 @@ function httpV1Middleware( options, next ) {
 				newOptions.headers = {};
 			}
 			newOptions.headers[ 'X-HTTP-Method-Override' ] = newOptions.method;
+			newOptions.headers[ 'Content-Type' ] = 'application/json';
 			newOptions.method = 'POST';
-
-			newOptions.contentType = 'application/json';
-			newOptions.data = JSON.stringify( newOptions.data );
 		}
 	}
 

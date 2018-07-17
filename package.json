@@ -16,7 +16,7 @@
 	},
 	"dependencies": {
 		"@wordpress/a11y": "file:packages/a11y",
-		"@wordpress/api-request": "file:packages/api-request",
+		"@wordpress/api-fetch": "file:packages/api-fetch",
 		"@wordpress/autop": "file:packages/autop",
 		"@wordpress/blob": "file:packages/blob",
 		"@wordpress/components": "file:packages/components",

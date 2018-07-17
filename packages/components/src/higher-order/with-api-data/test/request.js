@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import apiRequest from '@wordpress/api-request';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -9,7 +9,6 @@ import apiRequest from '@wordpress/api-request';
 import request, {
 	cache,
 	getStablePath,
-	getResponseHeaders,
 	getCachedResponse,
 	getResponseFromNetwork,
 	isRequestMethod,
@@ -17,17 +16,11 @@ import request, {
 
 describe( 'request', () => {
 	const actualResponse = {
-		body: {},
-		headers: [
-			[ 'connection', 'Keep-Alive' ],
-			[ 'content-type', 'text/plain; charset=utf-8' ],
-		],
-	};
-	const xhr = {
-		getAllResponseHeaders: () => (
-			'connection\u003a\u0020Keep-Alive\u000d\u000a' +
-			'content-type\u003a\u0020text/plain; charset=utf-8'
-		),
+		json: () => Promise.resolve( {} ),
+		headers: {
+			connection: 'Keep-Alive',
+			'content-type': 'text/plain; charset=utf-8',
+		},
 	};
 
 	beforeEach( () => {
@@ -36,26 +29,13 @@ describe( 'request', () => {
 			delete cache[ key ];
 		}
 
-		apiRequest.mockReturnValue = {
+		apiFetch.mockReturnValue = {
 			// jQuery.Deferred aren't true promises, particularly in their
 			// treatment of resolved arguments. $.ajax will spread resolved
 			// arguments, but this is not valid for Promise (only single).
 			// Instead, we emulate by invoking the callback manually.
-			then: ( callback ) => Promise.resolve( callback(
-				actualResponse.body,
-				'success',
-				xhr
-			) ),
+			then: ( callback ) => Promise.resolve( callback( actualResponse ) ),
 		};
-	} );
-
-	describe( 'getResponseHeaders()', () => {
-		it( 'returns tuples of array headers', () => {
-			expect( getResponseHeaders( xhr ) ).toEqual( [
-				[ 'connection', 'Keep-Alive' ],
-				[ 'content-type', 'text/plain; charset=utf-8' ],
-			] );
-		} );
 	} );
 
 	describe( 'getCachedResponse()', () => {
@@ -96,8 +76,11 @@ describe( 'request', () => {
 			} );
 
 			return awaitResponse.then( ( data ) => {
-				expect( apiRequest ).toHaveBeenCalled();
-				expect( data ).toEqual( actualResponse );
+				expect( apiFetch ).toHaveBeenCalled();
+				expect( data ).toEqual( {
+					headers: actualResponse.headers,
+					body: {},
+				} );
 			} );
 		} );
 	} );
@@ -129,7 +112,7 @@ describe( 'request', () => {
 
 	describe( 'request()', () => {
 		beforeEach( () => {
-			apiRequest.mockClear();
+			apiFetch.mockClear();
 		} );
 
 		it( 'should try from cache for GET', () => {
@@ -140,7 +123,7 @@ describe( 'request', () => {
 			} );
 
 			return awaitResponse.then( ( data ) => {
-				expect( apiRequest ).not.toHaveBeenCalled();
+				expect( apiFetch ).not.toHaveBeenCalled();
 				expect( data ).toEqual( actualResponse );
 			} );
 		} );
@@ -153,8 +136,11 @@ describe( 'request', () => {
 			} );
 
 			return awaitResponse.then( ( data ) => {
-				expect( apiRequest ).toHaveBeenCalled();
-				expect( data ).toEqual( actualResponse );
+				expect( apiFetch ).toHaveBeenCalled();
+				expect( data ).toEqual( {
+					headers: actualResponse.headers,
+					body: {},
+				} );
 			} );
 		} );
 
@@ -165,8 +151,11 @@ describe( 'request', () => {
 			} );
 
 			return awaitResponse.then( ( data ) => {
-				expect( apiRequest ).toHaveBeenCalled();
-				expect( data ).toEqual( actualResponse );
+				expect( apiFetch ).toHaveBeenCalled();
+				expect( data ).toEqual( {
+					headers: actualResponse.headers,
+					body: {},
+				} );
 			} );
 		} );
 	} );

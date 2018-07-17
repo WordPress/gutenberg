@@ -11,8 +11,8 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { FormTokenField, withAPIData } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import apiRequest from '@wordpress/api-request';
 import { compose } from '@wordpress/compose';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Module constants
@@ -77,7 +77,7 @@ class FlatTermSelector extends Component {
 	fetchTerms( params = {} ) {
 		const query = { ...DEFAULT_QUERY, ...params };
 		const basePath = wp.api.getTaxonomyRoute( this.props.slug );
-		const request = apiRequest( { path: `/wp/v2/${ basePath }?${ stringify( query ) }` } );
+		const request = apiFetch( { path: `/wp/v2/${ basePath }?${ stringify( query ) }` } );
 		request.then( ( terms ) => {
 			this.setState( ( state ) => ( {
 				availableTerms: state.availableTerms.concat(
@@ -105,26 +105,24 @@ class FlatTermSelector extends Component {
 	}
 
 	findOrCreateTerm( termName ) {
-		return new Promise( ( resolve, reject ) => {
-			// Tries to create a term or fetch it if it already exists
-			const basePath = wp.api.getTaxonomyRoute( this.props.slug );
-			apiRequest( {
-				path: `/wp/v2/${ basePath }`,
-				method: 'POST',
-				data: { name: termName },
-			} ).then( resolve, ( xhr ) => {
-				const errorCode = xhr.responseJSON && xhr.responseJSON.code;
-				if ( errorCode === 'term_exists' ) {
-					// search the new category created since last fetch
-					this.addRequest = apiRequest( {
-						path: `/wp/v2/${ basePath }?${ stringify( { ...DEFAULT_QUERY, search: termName } ) }`,
-					} );
-					return this.addRequest.then( ( searchResult ) => {
-						resolve( find( searchResult, ( result ) => isSameTermName( result.name, termName ) ) );
-					}, reject );
-				}
-				reject( xhr );
-			} );
+		const basePath = wp.api.getTaxonomyRoute( this.props.slug );
+		// Tries to create a term or fetch it if it already exists.
+		return apiFetch( {
+			path: `/wp/v2/${ basePath }`,
+			method: 'POST',
+			data: { name: termName },
+		} ).catch( ( error ) => {
+			const errorCode = error.code;
+			if ( errorCode === 'term_exists' ) {
+				// If the terms exist, fetch it instead of creating a new one.
+				this.addRequest = apiFetch( {
+					path: `/wp/v2/${ basePath }?${ stringify( { ...DEFAULT_QUERY, search: termName } ) }`,
+				} );
+				return this.addRequest.then( ( searchResult ) => {
+					return find( searchResult, ( result ) => isSameTermName( result.name, termName ) );
+				} );
+			}
+			return Promise.reject( error );
 		} );
 	}
 

@@ -20,7 +20,7 @@ import {
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
-import apiRequest from '@wordpress/api-request';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -159,7 +159,7 @@ export default {
 				parent: post.id,
 			};
 
-			request = apiRequest( {
+			request = apiFetch( {
 				path: `/wp/v2/${ basePath }/${ post.id }/autosaves`,
 				method: 'POST',
 				data: toSend,
@@ -168,15 +168,15 @@ export default {
 			dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
 			dispatch( removeNotice( AUTOSAVE_POST_NOTICE_ID ) );
 
-			request = apiRequest( {
+			request = apiFetch( {
 				path: `/wp/v2/${ basePath }/${ post.id }`,
 				method: 'PUT',
 				data: toSend,
 			} );
 		}
 
-		request.then(
-			( newPost ) => {
+		request
+			.then( ( newPost ) => {
 				const reset = isAutosave ? resetAutosave : resetPost;
 				dispatch( reset( newPost ) );
 
@@ -199,22 +199,14 @@ export default {
 					},
 					isAutosave,
 				} );
-			},
-			( error ) => {
-				error = get( error, [ 'responseJSON' ], {
-					code: 'unknown_error',
-					message: __( 'An unknown error occurred.' ),
-				} );
-
-				dispatch( {
-					type: 'REQUEST_POST_UPDATE_FAILURE',
-					optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
-					post,
-					edits,
-					error,
-				} );
-			},
-		);
+			} )
+			.catch( ( error ) => dispatch( {
+				type: 'REQUEST_POST_UPDATE_FAILURE',
+				optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
+				post,
+				edits,
+				error,
+			} ) );
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
 		const { previousPost, post, isAutosave } = action;
@@ -302,25 +294,19 @@ export default {
 		const { postId } = action;
 		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( getState() ) );
 		dispatch( removeNotice( TRASH_POST_NOTICE_ID ) );
-		apiRequest( { path: `/wp/v2/${ basePath }/${ postId }`, method: 'DELETE' } ).then(
-			() => {
+		apiFetch( { path: `/wp/v2/${ basePath }/${ postId }`, method: 'DELETE' } )
+			.then( () => {
 				const post = getCurrentPost( getState() );
 
 				// TODO: This should be an updatePost action (updating subsets of post properties),
 				// But right now editPost is tied with change detection.
 				dispatch( resetPost( { ...post, status: 'trash' } ) );
-			},
-			( err ) => {
-				dispatch( {
-					...action,
-					type: 'TRASH_POST_FAILURE',
-					error: get( err, [ 'responseJSON' ], {
-						code: 'unknown_error',
-						message: __( 'An unknown error occurred.' ),
-					} ),
-				} );
-			}
-		);
+			} )
+			.catch( ( error ) => dispatch( {
+				...action,
+				type: 'TRASH_POST_FAILURE',
+				error,
+			} ) );
 	},
 	TRASH_POST_FAILURE( action, store ) {
 		const message = action.error.message && action.error.code !== 'unknown_error' ? action.error.message : __( 'Trashing failed' );
@@ -337,7 +323,7 @@ export default {
 			context: 'edit',
 		};
 
-		apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }`, data } ).then(
+		apiFetch( { path: `/wp/v2/${ basePath }/${ post.id }`, data } ).then(
 			( newPost ) => {
 				dispatch( resetPost( newPost ) );
 			}
@@ -481,13 +467,13 @@ export default {
 
 		let result;
 		if ( id ) {
-			result = apiRequest( { path: `/wp/v2/${ basePath }/${ id }` } );
+			result = apiFetch( { path: `/wp/v2/${ basePath }/${ id }` } );
 		} else {
-			result = apiRequest( { path: `/wp/v2/${ basePath }?per_page=-1` } );
+			result = apiFetch( { path: `/wp/v2/${ basePath }?per_page=-1` } );
 		}
 
-		result.then(
-			( sharedBlockOrBlocks ) => {
+		result
+			.then( ( sharedBlockOrBlocks ) => {
 				dispatch( receiveSharedBlocks( map(
 					castArray( sharedBlockOrBlocks ),
 					( sharedBlock ) => ( {
@@ -500,18 +486,12 @@ export default {
 					type: 'FETCH_SHARED_BLOCKS_SUCCESS',
 					id,
 				} );
-			},
-			( error ) => {
-				dispatch( {
-					type: 'FETCH_SHARED_BLOCKS_FAILURE',
-					id,
-					error: error.responseJSON || {
-						code: 'unknown_error',
-						message: __( 'An unknown error occurred.' ),
-					},
-				} );
-			}
-		);
+			} )
+			.catch( ( error ) => dispatch( {
+				type: 'FETCH_SHARED_BLOCKS_FAILURE',
+				id,
+				error,
+			} ) );
 	},
 	RECEIVE_SHARED_BLOCKS( action ) {
 		return receiveBlocks( map( action.results, 'parsedBlock' ) );
@@ -536,8 +516,8 @@ export default {
 		const path = isTemporary ? `/wp/v2/${ basePath }` : `/wp/v2/${ basePath }/${ id }`;
 		const method = isTemporary ? 'POST' : 'PUT';
 
-		apiRequest( { path, data, method } ).then(
-			( updatedSharedBlock ) => {
+		apiFetch( { path, data, method } )
+			.then( ( updatedSharedBlock ) => {
 				dispatch( {
 					type: 'SAVE_SHARED_BLOCK_SUCCESS',
 					updatedId: updatedSharedBlock.id,
@@ -545,16 +525,14 @@ export default {
 				} );
 				const message = isTemporary ? __( 'Block created.' ) : __( 'Block updated.' );
 				dispatch( createSuccessNotice( message, { id: SHARED_BLOCK_NOTICE_ID } ) );
-			},
-			( error ) => {
+			} )
+			.catch( ( error ) => {
 				dispatch( { type: 'SAVE_SHARED_BLOCK_FAILURE', id } );
-				const message = __( 'An unknown error occurred.' );
-				dispatch( createErrorNotice( get( error.responseJSON, [ 'message' ], message ), {
+				dispatch( createErrorNotice( error.message, {
 					id: SHARED_BLOCK_NOTICE_ID,
-					spokenMessage: message,
+					spokenMessage: error.message,
 				} ) );
-			}
-		);
+			} );
 	},
 	DELETE_SHARED_BLOCK( action, store ) {
 		// TODO: these are potentially undefined, this fix is in place
@@ -592,8 +570,8 @@ export default {
 			sharedBlock.uid,
 		] ) );
 
-		apiRequest( { path: `/wp/v2/${ basePath }/${ id }`, method: 'DELETE' } ).then(
-			() => {
+		apiFetch( { path: `/wp/v2/${ basePath }/${ id }`, method: 'DELETE' } )
+			.then( () => {
 				dispatch( {
 					type: 'DELETE_SHARED_BLOCK_SUCCESS',
 					id,
@@ -601,20 +579,18 @@ export default {
 				} );
 				const message = __( 'Block deleted.' );
 				dispatch( createSuccessNotice( message, { id: SHARED_BLOCK_NOTICE_ID } ) );
-			},
-			( error ) => {
+			} )
+			.catch( ( error ) => {
 				dispatch( {
 					type: 'DELETE_SHARED_BLOCK_FAILURE',
 					id,
 					optimist: { type: REVERT, id: transactionId },
 				} );
-				const message = __( 'An unknown error occurred.' );
-				dispatch( createErrorNotice( get( error.responseJSON, [ 'message' ], message ), {
+				dispatch( createErrorNotice( error.message, {
 					id: SHARED_BLOCK_NOTICE_ID,
-					spokenMessage: message,
+					spokenMessage: error.message,
 				} ) );
-			}
-		);
+			} );
 	},
 	CONVERT_BLOCK_TO_STATIC( action, store ) {
 		const state = store.getState();

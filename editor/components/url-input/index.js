@@ -14,8 +14,8 @@ import { Component, Fragment } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 import { Spinner, withSpokenMessages, Popover } from '@wordpress/components';
-import apiRequest from '@wordpress/api-request';
 import { withInstanceId } from '@wordpress/compose';
+import apiFetch from '@wordpress/api-fetch';
 
 // Since URLInput is rendered in the context of other inputs, but should be
 // considered a separate modal node, prevent keyboard events from propagating
@@ -69,7 +69,7 @@ class UrlInput extends Component {
 			selectedSuggestion: null,
 			loading: true,
 		} );
-		this.suggestionsRequest = apiRequest( {
+		this.suggestionsRequest = apiFetch( {
 			path: `/wp/v2/posts?${ stringify( {
 				search: value,
 				per_page: 20,

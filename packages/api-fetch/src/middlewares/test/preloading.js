@@ -4,7 +4,7 @@
 import createPreloadingMiddleware from '../preloading';
 
 describe( 'Preloading Middleware', () => {
-	it( 'should return the preloaded data if provided', ( done ) => {
+	it( 'should return the preloaded data if provided', () => {
 		const body = {
 			status: 'this is the preloaded response',
 		};
@@ -20,9 +20,8 @@ describe( 'Preloading Middleware', () => {
 		};
 
 		const response = prelooadingMiddleware( requestOptions );
-		response.done( ( value ) => {
+		return response.then( ( value ) => {
 			expect( value ).toEqual( body );
-			done();
 		} );
 	} );
 
