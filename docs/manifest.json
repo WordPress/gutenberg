@@ -264,6 +264,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/components",
+		"slug": "packages-components",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/compose",
 		"slug": "packages-compose",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/compose/README.md",
@@ -417,12 +423,6 @@
 		"title": "@wordpress/blocks",
 		"slug": "packages-blocks",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/blocks/README.md",
-		"parent": "packages"
-	},
-	{
-		"title": "@wordpress/components",
-		"slug": "packages-components",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/components/README.md",
 		"parent": "packages"
 	},
 	{

@@ -14,7 +14,6 @@ const npmReadyPackages = glob( 'packages/*/package.json' )
 // node modules.
 const gutenbergPackages = [
 	'blocks',
-	'components',
 	'core-blocks',
 	'edit-post',
 	'editor',
