@@ -44,7 +44,10 @@ function apiFetch( options ) {
 		};
 
 		const parseResponse = ( response ) => {
-			return parse ? response.json() : response;
+			if ( parse ) {
+				return response.json ? response.json() : Promise.reject( response );
+			}
+			return response;
 		};
 
 		return responsePromise
@@ -53,6 +56,15 @@ function apiFetch( options ) {
 			.catch( ( response ) => {
 				if ( ! parse ) {
 					return Promise.reject( response );
+				}
+
+				const invalidJsonError = Promise.reject( {
+					code: 'invalid_json',
+					message: __( 'The response is not a valid JSON response.' ),
+				} );
+
+				if ( ! response.json ) {
+					return invalidJsonError;
 				}
 
 				return response.json()
@@ -64,12 +76,7 @@ function apiFetch( options ) {
 
 						return Promise.reject( error || unknownError );
 					} )
-					.catch( () => {
-						return Promise.reject( {
-							code: 'invalid_json',
-							message: __( 'The response is not a valid JSON response.' ),
-						} );
-					} );
+					.catch( () => invalidJsonError );
 			} );
 	};
 	const steps = [
