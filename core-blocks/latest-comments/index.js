@@ -6,7 +6,6 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies.
  */
-import { DEFAULT_CONTROLS } from 'editor/components/block-alignment-toolbar';
 import './style.scss';
 import edit from './edit';
 
@@ -30,7 +29,7 @@ export const settings = {
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
 
-		if ( DEFAULT_CONTROLS.includes( align ) ) {
+		if ( [ 'left', 'center', 'right', 'wide', 'full' ].includes( align ) ) {
 			return { 'data-align': align };
 		}
 	},

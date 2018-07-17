@@ -3,6 +3,7 @@
  */
 import { Component, Fragment } from '@wordpress/element';
 import {
+	Disabled,
 	PanelBody,
 	RangeControl,
 	ToggleControl,
@@ -96,10 +97,12 @@ class LatestComments extends Component {
 						/>
 					</PanelBody>
 				</InspectorControls>
-				<ServerSideRender
-					block="core/latest-comments"
-					attributes={ this.props.attributes }
-				/>
+				<Disabled>
+					<ServerSideRender
+						block="core/latest-comments"
+						attributes={ this.props.attributes }
+					/>
+				</Disabled>
 			</Fragment>
 		);
 	}
