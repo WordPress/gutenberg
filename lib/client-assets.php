@@ -268,6 +268,7 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-a11y',
 			'wp-api-request',
 			'wp-compose',
+			'wp-deprecated',
 			'wp-dom',
 			'wp-element',
 			'wp-html-entities',
