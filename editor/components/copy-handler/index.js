@@ -46,12 +46,12 @@ class CopyHandler extends Component {
 	}
 
 	onCut( event ) {
-		const { multiSelectedBlockUids } = this.props;
+		const { multiSelectedBlockClientIds } = this.props;
 
 		this.onCopy( event );
 
-		if ( multiSelectedBlockUids.length ) {
-			this.props.onRemove( multiSelectedBlockUids );
+		if ( multiSelectedBlockClientIds.length ) {
+			this.props.onRemove( multiSelectedBlockClientIds );
 		}
 	}
 
@@ -64,12 +64,12 @@ export default compose( [
 	withSelect( ( select ) => {
 		const {
 			getMultiSelectedBlocks,
-			getMultiSelectedBlockUids,
+			getMultiSelectedBlockClientIds,
 			getSelectedBlock,
 		} = select( 'core/editor' );
 		return {
 			multiSelectedBlocks: getMultiSelectedBlocks(),
-			multiSelectedBlockUids: getMultiSelectedBlockUids(),
+			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
 			selectedBlock: getSelectedBlock(),
 		};
 	} ),

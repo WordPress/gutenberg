@@ -40,12 +40,12 @@ export default withDispatch( ( dispatch, { block } ) => {
 	const { replaceBlock } = dispatch( 'core/editor' );
 	return {
 		convertToHTML() {
-			replaceBlock( block.uid, createBlock( 'core/html', {
+			replaceBlock( block.clientId, createBlock( 'core/html', {
 				content: block.originalContent,
 			} ) );
 		},
 		convertToBlocks() {
-			replaceBlock( block.uid, rawHandler( {
+			replaceBlock( block.clientId, rawHandler( {
 				HTML: block.originalContent,
 				mode: 'BLOCKS',
 			} ) );

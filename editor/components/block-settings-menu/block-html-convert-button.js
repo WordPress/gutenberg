@@ -11,9 +11,9 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import BlockConvertButton from './block-convert-button';
 
 export default compose(
-	withSelect( ( select, { uid } ) => {
+	withSelect( ( select, { clientId } ) => {
 		const { getBlock, canUserUseUnfilteredHTML } = select( 'core/editor' );
-		const block = getBlock( uid );
+		const block = getBlock( clientId );
 		return {
 			block,
 			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
@@ -22,7 +22,7 @@ export default compose(
 	} ),
 	withDispatch( ( dispatch, { block, canUserUseUnfilteredHTML } ) => ( {
 		onClick: () => dispatch( 'core/editor' ).replaceBlocks(
-			block.uid,
+			block.clientId,
 			rawHandler( {
 				HTML: getBlockContent( block ),
 				mode: 'BLOCKS',

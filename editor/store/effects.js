@@ -55,11 +55,11 @@ import {
 	isEditedPostSaveable,
 	getBlock,
 	getBlockCount,
-	getBlockRootUID,
+	getBlockRootClientId,
 	getBlocks,
 	getSharedBlock,
-	getPreviousBlockUid,
-	getProvisionalBlockUID,
+	getPreviousBlockClientId,
+	getProvisionalBlockClientId,
 	getSelectedBlock,
 	isBlockSelected,
 	getTemplate,
@@ -88,9 +88,9 @@ const SHARED_BLOCK_NOTICE_ID = 'SHARED_BLOCK_NOTICE_ID';
  */
 export function removeProvisionalBlock( action, store ) {
 	const state = store.getState();
-	const provisionalBlockUID = getProvisionalBlockUID( state );
-	if ( provisionalBlockUID && ! isBlockSelected( state, provisionalBlockUID ) ) {
-		return removeBlock( provisionalBlockUID, false );
+	const provisionalBlockClientId = getProvisionalBlockClientId( state );
+	if ( provisionalBlockClientId && ! isBlockSelected( state, provisionalBlockClientId ) ) {
+		return removeBlock( provisionalBlockClientId, false );
 	}
 }
 
@@ -332,14 +332,14 @@ export default {
 	MERGE_BLOCKS( action, store ) {
 		const { dispatch } = store;
 		const state = store.getState();
-		const [ blockAUid, blockBUid ] = action.blocks;
-		const blockA = getBlock( state, blockAUid );
-		const blockB = getBlock( state, blockBUid );
+		const [ firstBlockClientId, secondBlockClientId ] = action.blocks;
+		const blockA = getBlock( state, firstBlockClientId );
+		const blockB = getBlock( state, secondBlockClientId );
 		const blockType = getBlockType( blockA.name );
 
 		// Only focus the previous block if it's not mergeable
 		if ( ! blockType.merge ) {
-			dispatch( selectBlock( blockA.uid ) );
+			dispatch( selectBlock( blockA.clientId ) );
 			return;
 		}
 
@@ -360,9 +360,9 @@ export default {
 			blocksWithTheSameType[ 0 ].attributes
 		);
 
-		dispatch( selectBlock( blockA.uid, -1 ) );
+		dispatch( selectBlock( blockA.clientId, -1 ) );
 		dispatch( replaceBlocks(
-			[ blockA.uid, blockB.uid ],
+			[ blockA.clientId, blockB.clientId ],
 			[
 				{
 					...blockA,
@@ -508,8 +508,8 @@ export default {
 		const { dispatch } = store;
 		const state = store.getState();
 
-		const { uid, title, isTemporary } = getSharedBlock( state, id );
-		const { name, attributes, innerBlocks } = getBlock( state, uid );
+		const { clientId, title, isTemporary } = getSharedBlock( state, id );
+		const { name, attributes, innerBlocks } = getBlock( state, clientId );
 		const content = serialize( createBlock( name, attributes, innerBlocks ) );
 
 		const data = isTemporary ? { title, content } : { id, title, content };
@@ -554,7 +554,7 @@ export default {
 		// Remove any other blocks that reference this shared block
 		const allBlocks = getBlocks( getState() );
 		const associatedBlocks = allBlocks.filter( ( block ) => isSharedBlock( block ) && block.attributes.ref === id );
-		const associatedBlockUids = associatedBlocks.map( ( block ) => block.uid );
+		const associatedBlockClientIds = associatedBlocks.map( ( block ) => block.clientId );
 
 		const transactionId = uniqueId();
 
@@ -566,8 +566,8 @@ export default {
 
 		// Remove the parsed block.
 		dispatch( removeBlocks( [
-			...associatedBlockUids,
-			sharedBlock.uid,
+			...associatedBlockClientIds,
+			sharedBlock.clientId,
 		] ) );
 
 		apiFetch( { path: `/wp/v2/${ basePath }/${ id }`, method: 'DELETE' } )
@@ -594,19 +594,19 @@ export default {
 	},
 	CONVERT_BLOCK_TO_STATIC( action, store ) {
 		const state = store.getState();
-		const oldBlock = getBlock( state, action.uid );
+		const oldBlock = getBlock( state, action.clientId );
 		const sharedBlock = getSharedBlock( state, oldBlock.attributes.ref );
-		const referencedBlock = getBlock( state, sharedBlock.uid );
+		const referencedBlock = getBlock( state, sharedBlock.clientId );
 		const newBlock = createBlock( referencedBlock.name, referencedBlock.attributes );
-		store.dispatch( replaceBlock( oldBlock.uid, newBlock ) );
+		store.dispatch( replaceBlock( oldBlock.clientId, newBlock ) );
 	},
 	CONVERT_BLOCK_TO_SHARED( action, store ) {
 		const { getState, dispatch } = store;
 
-		const parsedBlock = getBlock( getState(), action.uid );
+		const parsedBlock = getBlock( getState(), action.clientId );
 		const sharedBlock = {
 			id: uniqueId( 'shared' ),
-			uid: parsedBlock.uid,
+			clientId: parsedBlock.clientId,
 			title: __( 'Untitled shared block' ),
 		};
 
@@ -618,7 +618,7 @@ export default {
 		dispatch( saveSharedBlock( sharedBlock.id ) );
 
 		dispatch( replaceBlock(
-			parsedBlock.uid,
+			parsedBlock.clientId,
 			createBlock( 'core/block', {
 				ref: sharedBlock.id,
 				layout: parsedBlock.attributes.layout,
@@ -656,24 +656,24 @@ export default {
 			return;
 		}
 
-		const firstRemovedBlockUID = action.uids[ 0 ];
+		const firstRemovedBlockClientId = action.clientIds[ 0 ];
 		const state = getState();
 		const currentSelectedBlock = getSelectedBlock( state );
 
 		// recreate the state before the block was removed.
 		const previousState = { ...state, editor: { present: last( state.editor.past ) } };
 
-		// rootUID of the removed block.
-		const rootUID = getBlockRootUID( previousState, firstRemovedBlockUID );
+		// rootClientId of the removed block.
+		const rootClientId = getBlockRootClientId( previousState, firstRemovedBlockClientId );
 
-		// UID of the block that was before the removed block
-		// or the rootUID if the removed block was the first amongst his siblings.
-		const blockUIDToSelect = getPreviousBlockUid( previousState, firstRemovedBlockUID ) || rootUID;
+		// Client ID of the block that was before the removed block or the
+		// rootClientId if the removed block was first amongst its siblings.
+		const blockClientIdToSelect = getPreviousBlockClientId( previousState, firstRemovedBlockClientId ) || rootClientId;
 
 		// Dispatch select block action if the currently selected block
 		// is not already the block we want to be selected.
-		if ( blockUIDToSelect !== currentSelectedBlock ) {
-			dispatch( selectBlock( blockUIDToSelect ) );
+		if ( blockClientIdToSelect !== currentSelectedBlock ) {
+			dispatch( selectBlock( blockClientIdToSelect ) );
 		}
 	},
 };

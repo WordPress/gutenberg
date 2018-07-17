@@ -49,17 +49,17 @@ describe( 'effects', () => {
 		const store = { getState: () => {} };
 
 		beforeAll( () => {
-			selectors.getProvisionalBlockUID = jest.spyOn( selectors, 'getProvisionalBlockUID' );
+			selectors.getProvisionalBlockClientId = jest.spyOn( selectors, 'getProvisionalBlockClientId' );
 			selectors.isBlockSelected = jest.spyOn( selectors, 'isBlockSelected' );
 		} );
 
 		beforeEach( () => {
-			selectors.getProvisionalBlockUID.mockReset();
+			selectors.getProvisionalBlockClientId.mockReset();
 			selectors.isBlockSelected.mockReset();
 		} );
 
 		afterAll( () => {
-			selectors.getProvisionalBlockUID.mockRestore();
+			selectors.getProvisionalBlockClientId.mockRestore();
 			selectors.isBlockSelected.mockRestore();
 		} );
 
@@ -70,16 +70,16 @@ describe( 'effects', () => {
 		} );
 
 		it( 'should return nothing if there is a provisional block and it is selected', () => {
-			selectors.getProvisionalBlockUID.mockReturnValue( 'chicken' );
-			selectors.isBlockSelected.mockImplementation( ( state, uid ) => uid === 'chicken' );
+			selectors.getProvisionalBlockClientId.mockReturnValue( 'chicken' );
+			selectors.isBlockSelected.mockImplementation( ( state, clientId ) => clientId === 'chicken' );
 			const action = removeProvisionalBlock( {}, store );
 
 			expect( action ).toBeUndefined();
 		} );
 
 		it( 'should return remove action for provisional block', () => {
-			selectors.getProvisionalBlockUID.mockReturnValue( 'chicken' );
-			selectors.isBlockSelected.mockImplementation( ( state, uid ) => uid === 'ribs' );
+			selectors.getProvisionalBlockClientId.mockReturnValue( 'chicken' );
+			selectors.isBlockSelected.mockImplementation( ( state, clientId ) => clientId === 'ribs' );
 			const action = removeProvisionalBlock( {}, store );
 
 			expect( action ).toEqual( removeBlock( 'chicken', false ) );
@@ -100,20 +100,20 @@ describe( 'effects', () => {
 		it( 'should only focus the blockA if the blockA has no merge function', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			const blockA = {
-				uid: 'chicken',
+				clientId: 'chicken',
 				name: 'core/test-block',
 			};
 			const blockB = {
-				uid: 'ribs',
+				clientId: 'ribs',
 				name: 'core/test-block',
 			};
-			selectors.getBlock = ( state, uid ) => {
-				return blockA.uid === uid ? blockA : blockB;
+			selectors.getBlock = ( state, clientId ) => {
+				return blockA.clientId === clientId ? blockA : blockB;
 			};
 
 			const dispatch = jest.fn();
 			const getState = () => ( {} );
-			handler( mergeBlocks( blockA.uid, blockB.uid ), { dispatch, getState } );
+			handler( mergeBlocks( blockA.clientId, blockB.clientId ), { dispatch, getState } );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( selectBlock( 'chicken' ) );
@@ -131,27 +131,27 @@ describe( 'effects', () => {
 				title: 'test block',
 			} );
 			const blockA = {
-				uid: 'chicken',
+				clientId: 'chicken',
 				name: 'core/test-block',
 				attributes: { content: 'chicken' },
 			};
 			const blockB = {
-				uid: 'ribs',
+				clientId: 'ribs',
 				name: 'core/test-block',
 				attributes: { content: 'ribs' },
 			};
-			selectors.getBlock = ( state, uid ) => {
-				return blockA.uid === uid ? blockA : blockB;
+			selectors.getBlock = ( state, clientId ) => {
+				return blockA.clientId === clientId ? blockA : blockB;
 			};
 			const dispatch = jest.fn();
 			const getState = () => ( {} );
-			handler( mergeBlocks( blockA.uid, blockB.uid ), { dispatch, getState } );
+			handler( mergeBlocks( blockA.clientId, blockB.clientId ), { dispatch, getState } );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
 			expect( dispatch ).toHaveBeenCalledWith( selectBlock( 'chicken', -1 ) );
 			expect( dispatch ).toHaveBeenCalledWith( {
 				...replaceBlocks( [ 'chicken', 'ribs' ], [ {
-					uid: 'chicken',
+					clientId: 'chicken',
 					name: 'core/test-block',
 					attributes: { content: 'chicken ribs' },
 				} ] ),
@@ -172,21 +172,21 @@ describe( 'effects', () => {
 			} );
 			registerBlockType( 'core/test-block-2', defaultBlockSettings );
 			const blockA = {
-				uid: 'chicken',
+				clientId: 'chicken',
 				name: 'core/test-block',
 				attributes: { content: 'chicken' },
 			};
 			const blockB = {
-				uid: 'ribs',
+				clientId: 'ribs',
 				name: 'core/test-block2',
 				attributes: { content: 'ribs' },
 			};
-			selectors.getBlock = ( state, uid ) => {
-				return blockA.uid === uid ? blockA : blockB;
+			selectors.getBlock = ( state, clientId ) => {
+				return blockA.clientId === clientId ? blockA : blockB;
 			};
 			const dispatch = jest.fn();
 			const getState = () => ( {} );
-			handler( mergeBlocks( blockA.uid, blockB.uid ), { dispatch, getState } );
+			handler( mergeBlocks( blockA.clientId, blockB.clientId ), { dispatch, getState } );
 
 			expect( dispatch ).not.toHaveBeenCalled();
 		} );
@@ -229,27 +229,27 @@ describe( 'effects', () => {
 				title: 'test block 2',
 			} );
 			const blockA = {
-				uid: 'chicken',
+				clientId: 'chicken',
 				name: 'core/test-block',
 				attributes: { content: 'chicken' },
 			};
 			const blockB = {
-				uid: 'ribs',
+				clientId: 'ribs',
 				name: 'core/test-block-2',
 				attributes: { content2: 'ribs' },
 			};
-			selectors.getBlock = ( state, uid ) => {
-				return blockA.uid === uid ? blockA : blockB;
+			selectors.getBlock = ( state, clientId ) => {
+				return blockA.clientId === clientId ? blockA : blockB;
 			};
 			const dispatch = jest.fn();
 			const getState = () => ( {} );
-			handler( mergeBlocks( blockA.uid, blockB.uid ), { dispatch, getState } );
+			handler( mergeBlocks( blockA.clientId, blockB.clientId ), { dispatch, getState } );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
 			// expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'chicken', { offset: -1 } ) );
 			expect( dispatch ).toHaveBeenCalledWith( {
 				...replaceBlocks( [ 'chicken', 'ribs' ], [ {
-					uid: 'chicken',
+					clientId: 'chicken',
 					name: 'core/test-block',
 					attributes: { content: 'chicken ribs' },
 				} ] ),
@@ -701,12 +701,12 @@ describe( 'effects', () => {
 			it( 'should receive parsed blocks', () => {
 				const action = receiveSharedBlocks( [
 					{
-						parsedBlock: { uid: 'broccoli' },
+						parsedBlock: { clientId: 'broccoli' },
 					},
 				] );
 
 				expect( handler( action ) ).toEqual( receiveBlocks( [
-					{ uid: 'broccoli' },
+					{ clientId: 'broccoli' },
 				] ) );
 			} );
 		} );
@@ -802,7 +802,7 @@ describe( 'effects', () => {
 				} );
 
 				expect( dispatch ).toHaveBeenCalledWith(
-					removeBlocks( [ associatedBlock.uid, parsedBlock.uid ] )
+					removeBlocks( [ associatedBlock.clientId, parsedBlock.clientId ] )
 				);
 
 				return promise.then( () => {
@@ -880,11 +880,11 @@ describe( 'effects', () => {
 				const dispatch = jest.fn();
 				const store = { getState: () => state, dispatch };
 
-				handler( convertBlockToStatic( associatedBlock.uid ), store );
+				handler( convertBlockToStatic( associatedBlock.clientId ), store );
 
 				expect( dispatch ).toHaveBeenCalledWith( {
 					type: 'REPLACE_BLOCKS',
-					uids: [ associatedBlock.uid ],
+					clientIds: [ associatedBlock.clientId ],
 					blocks: [
 						expect.objectContaining( {
 							name: 'core/test-block',
@@ -906,13 +906,13 @@ describe( 'effects', () => {
 				const dispatch = jest.fn();
 				const store = { getState: () => state, dispatch };
 
-				handler( convertBlockToShared( staticBlock.uid ), store );
+				handler( convertBlockToShared( staticBlock.clientId ), store );
 
 				expect( dispatch ).toHaveBeenCalledWith(
 					receiveSharedBlocks( [ {
 						sharedBlock: {
 							id: expect.stringMatching( /^shared/ ),
-							uid: staticBlock.uid,
+							clientId: staticBlock.clientId,
 							title: 'Untitled shared block',
 						},
 						parsedBlock: staticBlock,
@@ -925,7 +925,7 @@ describe( 'effects', () => {
 
 				expect( dispatch ).toHaveBeenCalledWith( {
 					type: 'REPLACE_BLOCKS',
-					uids: [ staticBlock.uid ],
+					clientIds: [ staticBlock.clientId ],
 					blocks: [
 						expect.objectContaining( {
 							name: 'core/block',

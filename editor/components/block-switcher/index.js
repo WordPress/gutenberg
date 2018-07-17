@@ -91,7 +91,11 @@ export class BlockSwitcher extends Component {
 								title={ __( 'Block Styles' ) }
 								initialOpen
 							>
-								<BlockStyles uid={ blocks[ 0 ].uid } onSwitch={ onClose } onHoverClassName={ this.onHoverClassName } />
+								<BlockStyles
+									clientId={ blocks[ 0 ].clientId }
+									onSwitch={ onClose }
+									onHoverClassName={ this.onHoverClassName }
+								/>
 							</PanelBody>
 						}
 						{ allowedBlocks.length !== 0 && ! isLocked &&
@@ -129,16 +133,19 @@ export class BlockSwitcher extends Component {
 
 export default compose(
 	withSelect( ( select, ownProps ) => {
-		const { getBlock, getBlockRootUID, getTemplateLock } = select( 'core/editor' );
+		const { getBlock, getBlockRootClientId, getTemplateLock } = select( 'core/editor' );
 		return {
-			blocks: ownProps.uids.map( getBlock ),
-			isLocked: some( castArray( ownProps.uids ), ( uid ) => !! getTemplateLock( getBlockRootUID( uid ) ) ),
+			blocks: ownProps.clientIds.map( getBlock ),
+			isLocked: some(
+				castArray( ownProps.clientIds ),
+				( clientId ) => !! getTemplateLock( getBlockRootClientId( clientId ) )
+			),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {
 		onTransform( blocks, name ) {
 			dispatch( 'core/editor' ).replaceBlocks(
-				ownProps.uids,
+				ownProps.clientIds,
 				switchToBlockType( blocks, name )
 			);
 		},

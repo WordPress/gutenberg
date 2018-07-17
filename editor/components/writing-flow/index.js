@@ -147,26 +147,31 @@ class WritingFlow extends Component {
 
 	expandSelection( isReverse ) {
 		const {
-			selectedBlockUID,
-			selectionStartUID,
-			selectionBeforeEndUID,
-			selectionAfterEndUID,
+			selectedBlockClientId,
+			selectionStartClientId,
+			selectionBeforeEndClientId,
+			selectionAfterEndClientId,
 		} = this.props;
 
-		const nextSelectionEndUID = isReverse ? selectionBeforeEndUID : selectionAfterEndUID;
+		const nextSelectionEndClientId = isReverse ?
+			selectionBeforeEndClientId :
+			selectionAfterEndClientId;
 
-		if ( nextSelectionEndUID ) {
-			this.props.onMultiSelect( selectionStartUID || selectedBlockUID, nextSelectionEndUID );
+		if ( nextSelectionEndClientId ) {
+			this.props.onMultiSelect(
+				selectionStartClientId || selectedBlockClientId,
+				nextSelectionEndClientId
+			);
 		}
 	}
 
 	moveSelection( isReverse ) {
-		const { selectedFirstUid, selectedLastUid } = this.props;
+		const { selectedFirstClientId, selectedLastClientId } = this.props;
 
-		const focusedBlockUid = isReverse ? selectedFirstUid : selectedLastUid;
+		const focusedBlockClientId = isReverse ? selectedFirstClientId : selectedLastClientId;
 
-		if ( focusedBlockUid ) {
-			this.props.onSelectBlock( focusedBlockUid );
+		if ( focusedBlockClientId ) {
+			this.props.onSelectBlock( focusedBlockClientId );
 		}
 	}
 
@@ -305,28 +310,28 @@ class WritingFlow extends Component {
 export default compose( [
 	withSelect( ( select ) => {
 		const {
-			getSelectedBlockUID,
-			getMultiSelectedBlocksStartUid,
-			getMultiSelectedBlocksEndUid,
-			getPreviousBlockUid,
-			getNextBlockUid,
-			getFirstMultiSelectedBlockUid,
-			getLastMultiSelectedBlockUid,
+			getSelectedBlockClientId,
+			getMultiSelectedBlocksStartClientId,
+			getMultiSelectedBlocksEndClientId,
+			getPreviousBlockClientId,
+			getNextBlockClientId,
+			getFirstMultiSelectedBlockClientId,
+			getLastMultiSelectedBlockClientId,
 			hasMultiSelection,
 			getBlockOrder,
 		} = select( 'core/editor' );
 
-		const selectedBlockUID = getSelectedBlockUID();
-		const selectionStartUID = getMultiSelectedBlocksStartUid();
-		const selectionEndUID = getMultiSelectedBlocksEndUid();
+		const selectedBlockClientId = getSelectedBlockClientId();
+		const selectionStartClientId = getMultiSelectedBlocksStartClientId();
+		const selectionEndClientId = getMultiSelectedBlocksEndClientId();
 
 		return {
-			selectedBlockUID,
-			selectionStartUID,
-			selectionBeforeEndUID: getPreviousBlockUid( selectionEndUID || selectedBlockUID ),
-			selectionAfterEndUID: getNextBlockUid( selectionEndUID || selectedBlockUID ),
-			selectedFirstUid: getFirstMultiSelectedBlockUid(),
-			selectedLastUid: getLastMultiSelectedBlockUid(),
+			selectedBlockClientId,
+			selectionStartClientId,
+			selectionBeforeEndClientId: getPreviousBlockClientId( selectionEndClientId || selectedBlockClientId ),
+			selectionAfterEndClientId: getNextBlockClientId( selectionEndClientId || selectedBlockClientId ),
+			selectedFirstClientId: getFirstMultiSelectedBlockClientId(),
+			selectedLastClientId: getLastMultiSelectedBlockClientId(),
 			hasMultiSelection: hasMultiSelection(),
 			blocks: getBlockOrder(),
 		};

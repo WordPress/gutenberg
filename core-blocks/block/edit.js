@@ -90,7 +90,7 @@ class SharedBlockEdit extends Component {
 			onUpdateTitle( title );
 		}
 
-		updateAttributes( block.uid, changedAttributes );
+		updateAttributes( block.clientId, changedAttributes );
 		onSave();
 
 		this.stopEditing();
@@ -112,7 +112,7 @@ class SharedBlockEdit extends Component {
 			<BlockEdit
 				{ ...this.props }
 				isSelected={ isEditing && isSelected }
-				id={ block.uid }
+				clientId={ block.clientId }
 				name={ block.name }
 				attributes={ { ...block.attributes, ...changedAttributes } }
 				setAttributes={ isEditing ? this.setAttributes : noop }
@@ -158,7 +158,7 @@ export default compose( [
 			sharedBlock,
 			isFetching: isFetchingSharedBlock( ref ),
 			isSaving: isSavingSharedBlock( ref ),
-			block: sharedBlock ? getBlock( sharedBlock.uid ) : null,
+			block: sharedBlock ? getBlock( sharedBlock.clientId ) : null,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {

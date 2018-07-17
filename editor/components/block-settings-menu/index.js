@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { IconButton, Dropdown, NavigableMenu } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -24,6 +25,7 @@ import SharedBlockDeleteButton from './shared-block-delete-button';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import BlockUnknownConvertButton from './block-unknown-convert-button';
 import _BlockSettingsMenuFirstItem from './block-settings-menu-first-item';
+import withDeprecatedUniqueId from '../with-deprecated-unique-id';
 
 export class BlockSettingsMenu extends Component {
 	constructor() {
@@ -49,16 +51,16 @@ export class BlockSettingsMenu extends Component {
 
 	render() {
 		const {
-			uids,
+			clientIds,
 			onSelect,
 			focus,
-			rootUID,
+			rootClientId,
 			isHidden,
 		} = this.props;
 		const { isFocused } = this.state;
-		const blockUIDs = castArray( uids );
-		const count = blockUIDs.length;
-		const firstBlockUID = blockUIDs[ 0 ];
+		const blockClientIds = castArray( clientIds );
+		const count = blockClientIds.length;
+		const firstBlockClientId = blockClientIds[ 0 ];
 
 		return (
 			<div className="editor-block-settings-menu">
@@ -77,7 +79,7 @@ export class BlockSettingsMenu extends Component {
 								className={ toggleClassname }
 								onClick={ () => {
 									if ( count === 1 ) {
-										onSelect( firstBlockUID );
+										onSelect( firstBlockClientId );
 									}
 									onToggle();
 								} }
@@ -94,14 +96,49 @@ export class BlockSettingsMenu extends Component {
 						// Should this just use a DropdownMenu instead of a DropDown ?
 						<NavigableMenu className="editor-block-settings-menu__content">
 							<_BlockSettingsMenuFirstItem.Slot fillProps={ { onClose } } />
-							{ count === 1 && <BlockModeToggle uid={ firstBlockUID } onToggle={ onClose } role="menuitem" /> }
-							{ count === 1 && <BlockUnknownConvertButton uid={ firstBlockUID } role="menuitem" /> }
-							{ count === 1 && <BlockHTMLConvertButton uid={ firstBlockUID } role="menuitem" /> }
-							<BlockDuplicateButton uids={ uids } rootUID={ rootUID } role="menuitem" />
-							{ count === 1 && <SharedBlockConvertButton uid={ firstBlockUID } onToggle={ onClose } itemsRole="menuitem" /> }
+							{ count === 1 && (
+								<BlockModeToggle
+									clientId={ firstBlockClientId }
+									onToggle={ onClose }
+									role="menuitem"
+								/>
+							) }
+							{ count === 1 && (
+								<BlockUnknownConvertButton
+									clientId={ firstBlockClientId }
+									role="menuitem"
+								/>
+							) }
+							{ count === 1 && (
+								<BlockHTMLConvertButton
+									clientId={ firstBlockClientId }
+									role="menuitem"
+								/>
+							) }
+							<BlockDuplicateButton
+								clientIds={ clientIds }
+								rootClientId={ rootClientId }
+								role="menuitem"
+							/>
+							{ count === 1 && (
+								<SharedBlockConvertButton
+									clientId={ firstBlockClientId }
+									onToggle={ onClose }
+									itemsRole="menuitem"
+								/>
+							) }
 							<div className="editor-block-settings-menu__separator" />
-							{ count === 1 && <SharedBlockDeleteButton uid={ firstBlockUID } onToggle={ onClose } itemsRole="menuitem" /> }
-							<BlockRemoveButton uids={ uids } role="menuitem" />
+							{ count === 1 && (
+								<SharedBlockDeleteButton
+									clientId={ firstBlockClientId }
+									onToggle={ onClose }
+									itemsRole="menuitem"
+								/>
+							) }
+							<BlockRemoveButton
+								clientIds={ clientIds }
+								role="menuitem"
+							/>
 						</NavigableMenu>
 					) }
 				/>
@@ -110,8 +147,11 @@ export class BlockSettingsMenu extends Component {
 	}
 }
 
-export default withDispatch( ( dispatch ) => ( {
-	onSelect( uid ) {
-		dispatch( 'core/editor' ).selectBlock( uid );
-	},
-} ) )( BlockSettingsMenu );
+export default compose( [
+	withDeprecatedUniqueId,
+	withDispatch( ( dispatch ) => ( {
+		onSelect( clientId ) {
+			dispatch( 'core/editor' ).selectBlock( clientId );
+		},
+	} ) ),
+] )( BlockSettingsMenu );

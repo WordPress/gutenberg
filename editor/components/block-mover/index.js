@@ -20,6 +20,7 @@ import { withInstanceId, compose } from '@wordpress/compose';
 import './style.scss';
 import { getBlockMoverDescription } from './mover-description';
 import { upArrow, downArrow } from './arrows';
+import withDeprecatedUniqueId from '../with-deprecated-unique-id';
 
 export class BlockMover extends Component {
 	constructor() {
@@ -44,9 +45,9 @@ export class BlockMover extends Component {
 	}
 
 	render() {
-		const { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex, isLocked, instanceId, isHidden } = this.props;
+		const { onMoveUp, onMoveDown, isFirst, isLast, clientIds, blockType, firstIndex, isLocked, instanceId, isHidden } = this.props;
 		const { isFocused } = this.state;
-		const blocksCount = castArray( uids ).length;
+		const blocksCount = castArray( clientIds ).length;
 		if ( isLocked ) {
 			return null;
 		}
@@ -107,22 +108,23 @@ export class BlockMover extends Component {
 }
 
 export default compose(
-	withSelect( ( select, { uids, rootUID } ) => {
+	withDeprecatedUniqueId,
+	withSelect( ( select, { clientIds, rootClientId } ) => {
 		const { getBlock, getBlockIndex, getTemplateLock } = select( 'core/editor' );
-		const firstUID = first( castArray( uids ) );
-		const block = getBlock( firstUID );
+		const firstClientId = first( castArray( clientIds ) );
+		const block = getBlock( firstClientId );
 
 		return {
-			firstIndex: getBlockIndex( firstUID, rootUID ),
+			firstIndex: getBlockIndex( firstClientId, rootClientId ),
 			blockType: block ? getBlockType( block.name ) : null,
-			isLocked: getTemplateLock( rootUID ) === 'all',
+			isLocked: getTemplateLock( rootClientId ) === 'all',
 		};
 	} ),
-	withDispatch( ( dispatch, { uids, rootUID } ) => {
+	withDispatch( ( dispatch, { clientIds, rootClientId } ) => {
 		const { moveBlocksDown, moveBlocksUp } = dispatch( 'core/editor' );
 		return {
-			onMoveDown: partial( moveBlocksDown, uids, rootUID ),
-			onMoveUp: partial( moveBlocksUp, uids, rootUID ),
+			onMoveDown: partial( moveBlocksDown, clientIds, rootClientId ),
+			onMoveUp: partial( moveBlocksUp, clientIds, rootClientId ),
 		};
 	} ),
 	withInstanceId,
