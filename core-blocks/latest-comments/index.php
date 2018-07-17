@@ -109,11 +109,18 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 	if ( $attributes['displayExcerpt'] ) {
 		$class .= ' has-excerpts';
 	}
+	if ( empty($comments) ) {
+		$class .= ' no-comments';
+	}
+	$classnames = esc_attr( $class );
 
-	$block_content = sprintf(
+	$block_content = ! empty( $comments ) ? sprintf(
 		'<ol class="%1$s">%2$s</ol>',
-		esc_attr( $class ),
+		$classnames,
 		$list_items_markup
+	) : sprintf( '<div class="%1$s">%2$s</div>',
+		$classnames,
+		__( 'No comments to show.', 'gutenberg' )
 	);
 
 	return $block_content;
