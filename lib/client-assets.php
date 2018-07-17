@@ -196,13 +196,6 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'build/dom/index.js' ),
 		true
 	);
-	wp_add_inline_script(
-		'wp-dom',
-		gutenberg_get_script_polyfill( array(
-			'document.contains' => 'wp-polyfill-node-contains',
-		) ),
-		'before'
-	);
 	wp_register_script(
 		'wp-utils',
 		gutenberg_url( 'build/utils/index.js' ),
@@ -285,14 +278,6 @@ function gutenberg_register_scripts_and_styles() {
 		array( 'wp-blob', 'wp-deprecated', 'wp-dom', 'wp-element', 'wp-hooks', 'wp-i18n', 'wp-shortcode', 'wp-data', 'lodash' ),
 		filemtime( gutenberg_dir_path() . 'build/blocks/index.js' ),
 		true
-	);
-	wp_add_inline_script(
-		'wp-blocks',
-		gutenberg_get_script_polyfill( array(
-			'\'Promise\' in window' => 'wp-polyfill-promise',
-			'\'fetch\' in window'   => 'wp-polyfill-fetch',
-		) ),
-		'before'
 	);
 	wp_register_script(
 		'wp-viewport',
@@ -461,11 +446,30 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'build/edit-post/index.js' ),
 		true
 	);
-	wp_add_inline_script(
-		'wp-edit-post',
-		gutenberg_get_script_polyfill( array( 'window.FormData && window.FormData.prototype.keys' => 'wp-polyfill-formdata' ) ),
-		'before'
-	);
+
+	gutenberg_register_polyfill( 'Node#contains', array(
+		'test'                  => 'document.contains',
+		'implementation_handle' => 'wp-polyfill-node-contains',
+	) );
+	gutenberg_enqueue_polyfill( 'Node#contains' );
+
+	gutenberg_register_polyfill( 'Promise', array(
+		'test'                  => '"Promise" in window',
+		'implementation_handle' => 'wp-polyfill-promise',
+	) );
+	gutenberg_enqueue_polyfill( 'Promise' );
+
+	gutenberg_register_polyfill( 'fetch', array(
+		'test'                  => '"fetch" in window',
+		'implementation_handle' => 'wp-polyfill-fetch',
+	) );
+	gutenberg_enqueue_polyfill( 'fetch' );
+
+	gutenberg_register_polyfill( 'FormData', array(
+		'test'                  => 'window.FormData && window.FormData.prototype.keys',
+		'implementation_handle' => 'wp-polyfill-formdata',
+	) );
+	gutenberg_enqueue_polyfill( 'FormData' );
 
 	// Editor Styles.
 	// This empty stylesheet is defined to ensure backwards compatibility.
@@ -1317,4 +1321,144 @@ function editor_color_palette_slugs( $color_palette ) {
 	}
 
 	return $new_color_palette;
+}
+
+define( 'GUTENBERG_POLYFILL_SCRIPT_HANDLE', 'wp-polyfills' );
+define( 'GUTENBERG_POLYFILL_FEATURE_TEST_PREFIX', 'wp-polyfill-test-' );
+
+/**
+ * Enqueues the root polyfill script.
+ */
+function gutenberg_enqueue_root_polyfill_script() {
+	wp_register_script( GUTENBERG_POLYFILL_SCRIPT_HANDLE, '' );
+	wp_enqueue_script( GUTENBERG_POLYFILL_SCRIPT_HANDLE );
+}
+add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_root_polyfill_script', -9999 );
+add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_root_polyfill_script', -9999 );
+
+/**
+ * Prints polyfills before any other scripts are printed.
+ *
+ * @todo Find out why a few scripts are actually printed earlier. They appear to be emoji-related.
+ */
+function gutenberg_print_polyfills() {
+	remove_action( 'wp_print_scripts', 'gutenberg_print_polyfills', -9999 );
+
+	// TODO: Consider printing only when other scripts are queued.
+	if ( wp_script_is( GUTENBERG_POLYFILL_SCRIPT_HANDLE ) ) {
+		// TODO: Support late script binding by generating feature test and conditional includes here.
+		global $wp_scripts;
+
+		// Print polyfills before any other scripts.
+		wp_print_scripts( GUTENBERG_POLYFILL_SCRIPT_HANDLE );
+	}
+}
+add_action( 'wp_print_scripts', 'gutenberg_print_polyfills', -9999 );
+
+/**
+ * Registers a polyfill.
+ *
+ * @param string $handle The handle for this polyfill.
+ * @param array  $args {
+ *     An args array. This is used instead of a series of regular params to allow
+ *     flexibility for future additions like supporting src and version for the
+ *     implementation or even specifying browser versions to which the polyfill applies.
+ *
+ *     @type string $test                  A JavaScript expression that tests for presence of the
+ *                                         feature supplied by the polyfill.
+ *     @type string $implementation_handle The implementation's script handle.
+ *     @type array  $deps                  Optional. Polyfills required by this polyfill.
+ * }
+ *
+ * @return boolean Whether or not registration was successful.
+ */
+function gutenberg_register_polyfill( $handle, $args ) {
+	global $wp_scripts;
+
+	$test                  = $args['test'];
+	$implementation_handle = $args['implementation_handle'];
+	$deps                  = isset( $args['deps'] ) ? $args['deps'] : array();
+
+	$feature_test_handle = GUTENBERG_POLYFILL_FEATURE_TEST_PREFIX . $handle;
+
+	if (
+		! wp_script_is( GUTENBERG_POLYFILL_SCRIPT_HANDLE, 'registered' ) ||
+		wp_script_is( GUTENBERG_POLYFILL_SCRIPT_HANDLE, 'done' ) ||
+		wp_script_is( $feature_test_handle, 'registered' ) ||
+		! wp_script_is( $implementation_handle, 'registered' )
+	) {
+		return false;
+	}
+
+	$polyfill_deps = array();
+	foreach ( $deps as $dep_handle ) {
+		$polyfill_deps[] = GUTENBERG_POLYFILL_FEATURE_TEST_PREFIX . $dep_handle;
+	}
+
+	$registration_result = wp_register_script(
+		$feature_test_handle,
+		// TODO: Replace this with an empty string once inline scripts are printed for sourceless scripts: https://core.trac.wordpress.org/ticket/44551.
+		gutenberg_url( 'temp-polyfill-stub.js' ),
+		$polyfill_deps
+	);
+
+	if ( ! $registration_result ) {
+		return false;
+	}
+
+	$polyfill_url                    = esc_url( $wp_scripts->registered[ $implementation_handle ]->src );
+	$conditional_polyfill_expression =
+		// Test presence of feature and append polyfill on any failures.
+		// Cautious viewers may balk at the `document.write`. Its caveat
+		// of synchronous mid-stream blocking write is exactly the behavior
+		// we need though.
+		"( $test ) || document.write( '<script src=\"$polyfill_url\"></scr' + 'ipt>' );";
+
+	wp_add_inline_script( $feature_test_handle, $conditional_polyfill_expression );
+
+	return true;
+}
+
+/**
+ * Enqueues a polyfill
+ *
+ * @param string $handle The polyfill handle.
+ *
+ * @todo Support param for registration args, allowing one-step registration and enqueuing.
+ */
+function gutenberg_enqueue_polyfill( $handle ) {
+	global $wp_scripts;
+	$feature_test_handle = GUTENBERG_POLYFILL_FEATURE_TEST_PREFIX . $handle;
+
+	if (
+		wp_script_is( GUTENBERG_POLYFILL_SCRIPT_HANDLE ) &&
+		wp_script_is( $feature_test_handle, 'registered' )
+	) {
+		$wp_scripts->registered[ GUTENBERG_POLYFILL_SCRIPT_HANDLE ]->deps[] = $feature_test_handle;
+	}
+}
+
+/**
+ * Deregisters a polyfill.
+ *
+ * @param string $handle The polyfill handle.
+ */
+function gutenberg_deregister_polyfill( $handle ) {
+	$feature_test_handle = GUTENBERG_POLYFILL_FEATURE_TEST_PREFIX . $handle;
+	wp_deregister_script( $feature_test_handle );
+}
+
+/**
+ * Dequeues a polyfill.
+ *
+ * @param string $handle The polyfill handle.
+ */
+function gutenberg_dequeue_polyfill( $handle ) {
+	global $wp_scripts;
+	$feature_test_handle = GUTENBERG_POLYFILL_FEATURE_TEST_PREFIX . $handle;
+
+	if ( wp_script_is( GUTENBERG_POLYFILL_SCRIPT_HANDLE ) ) {
+		$polyfill_handle_obj       = $wp_scripts->registered[ GUTENBERG_POLYFILL_SCRIPT_HANDLE ]->deps;
+		$polyfill_handle_obj->deps = preg_grep( "/$feature_test_handle/", $polyfill_handle_obj->deps, PREG_GREP_INVERT );
+	}
 }
