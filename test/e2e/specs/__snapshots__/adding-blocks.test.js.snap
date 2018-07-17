@@ -47,7 +47,7 @@ exports[`adding blocks Should insert content using the placeholder and the regul
 </blockquote>
 <!-- /wp:quote -->
 
-<!-- wp:code -->
-<pre class=\\"wp-block-code\\"><code>Code block</code></pre>
-<!-- /wp:code -->"
+<!-- wp:preformatted -->
+<pre class=\\"wp-block-preformatted\\">Pre text<br/><br/>Foo</pre>
+<!-- /wp:preformatted -->"
 `;
