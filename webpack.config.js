@@ -102,6 +102,7 @@ const gutenbergPackages = [
 	'keycodes',
 	'plugins',
 	'shortcode',
+	'spec-parser',
 	'viewport',
 ];
 

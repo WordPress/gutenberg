@@ -23,6 +23,6 @@
 		"access": "public"
 	},
 	"scripts": {
-		"build": "pegjs -o ./index.js ./grammar.pegjs"
+		"build": "pegjs --format umd -o ./index.js ./grammar.pegjs"
 	}
 }
