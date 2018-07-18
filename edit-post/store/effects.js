@@ -115,6 +115,7 @@ const effects = {
 			url: window._wpMetaBoxUrl,
 			method: 'POST',
 			body: formData,
+			parse: false,
 		} )
 			.then( () => store.dispatch( metaBoxUpdatesSuccess() ) );
 	},
