@@ -147,7 +147,7 @@ const config = {
 		filename: './build/[basename]/index.js',
 		path: __dirname,
 		library: [ 'wp', '[name]' ],
-		libraryTarget: 'this',
+		libraryTarget: 'window', // TODO can't merge with this value. `this` is undefined in "use strict". So this.wp will throw an error from the browser context
 	},
 	externals,
 	resolve: {

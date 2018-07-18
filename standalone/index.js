@@ -2,12 +2,13 @@ import { Component } from '@wordpress/element';
 import '@wordpress/data';
 import '@wordpress/core-data';
 /**
- * TODO: core-blocks in are throwing an error because this is undefined. This can happen in strict mode, since that
- * safeguards against accidental assignment to window, when calling a class init incorrectly
+ * If we see an error being thrown because `this` is undefined
  *
  * this.wp=this.wp||{},this.wp.coreBlocks=function(e){
  *
- * See where this code is generated. I can't find it in the src code, likely generated from a script?
+ * try updating
+ *
+ * config.output.libraryTarget = 'window';
  *
  */
 import { registerCoreBlocks } from '@wordpress/core-blocks';
