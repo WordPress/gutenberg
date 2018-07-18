@@ -10,6 +10,7 @@ import classnames from 'classnames';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { withInstanceId } from '@wordpress/compose';
+import { BACKSPACE, ENTER, UP, DOWN, LEFT, RIGHT, SPACE, DELETE, ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -105,31 +106,35 @@ class FormTokenField extends Component {
 		let preventDefault = false;
 
 		switch ( event.keyCode ) {
-			case 8: // backspace (delete to left)
+			case BACKSPACE:
 				preventDefault = this.handleDeleteKey( this.deleteTokenBeforeInput );
 				break;
-			case 13: // enter/return
+			case ENTER:
 				preventDefault = this.addCurrentToken();
 				break;
-			case 37: // left arrow
+			case LEFT:
 				preventDefault = this.handleLeftArrowKey();
 				break;
-			case 38: // up arrow
+			case UP:
 				preventDefault = this.handleUpArrowKey();
 				break;
-			case 39: // right arrow
+			case RIGHT:
 				preventDefault = this.handleRightArrowKey();
 				break;
-			case 40: // down arrow
+			case DOWN:
 				preventDefault = this.handleDownArrowKey();
 				break;
-			case 46: // delete (to right)
+			case DELETE:
 				preventDefault = this.handleDeleteKey( this.deleteTokenAfterInput );
 				break;
-			case 32: // space
+			case SPACE:
 				if ( this.props.tokenizeOnSpace ) {
 					preventDefault = this.addCurrentToken();
 				}
+				break;
+			case ESCAPE:
+				preventDefault = this.handleEscapeKey();
+				event.stopPropagation();
 				break;
 			default:
 				break;
@@ -251,8 +256,16 @@ class FormTokenField extends Component {
 	}
 
 	handleUpArrowKey() {
-		this.setState( ( state ) => ( {
-			selectedSuggestionIndex: Math.max( ( state.selectedSuggestionIndex || 0 ) - 1, 0 ),
+		this.setState( ( state, props ) => ( {
+			selectedSuggestionIndex: (
+				( state.selectedSuggestionIndex === 0 ? this.getMatchingSuggestions(
+					state.incompleteTokenValue,
+					props.suggestions,
+					props.value,
+					props.maxSuggestions,
+					props.saveTransform
+				).length : state.selectedSuggestionIndex ) - 1
+			),
 			selectedSuggestionScroll: true,
 		} ) );
 
@@ -261,19 +274,23 @@ class FormTokenField extends Component {
 
 	handleDownArrowKey() {
 		this.setState( ( state, props ) => ( {
-			selectedSuggestionIndex: Math.min(
-				( state.selectedSuggestionIndex + 1 ) || 0,
-				this.getMatchingSuggestions(
+			selectedSuggestionIndex: (
+				( state.selectedSuggestionIndex + 1 ) % this.getMatchingSuggestions(
 					state.incompleteTokenValue,
 					props.suggestions,
 					props.value,
 					props.maxSuggestions,
 					props.saveTransform
-				).length - 1
+				).length
 			),
 			selectedSuggestionScroll: true,
 		} ) );
 
+		return true; // preventDefault
+	}
+
+	handleEscapeKey() {
+		this.setState( initialState );
 		return true; // preventDefault
 	}
 
