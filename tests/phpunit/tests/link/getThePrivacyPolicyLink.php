@@ -71,7 +71,8 @@ class Tests_Link_GetThePrivacyPolicyLink extends WP_UnitTestCase {
 
 	/**
 	 * The function should return a valid link if a privacy policy page has been
-	 * created and set as the `wp_page_for_privacy_policy`.
+	 * created and set as the `wp_page_for_privacy_policy`. The post title should
+	 * be used as the link text.
 	 */
 	public function test_get_the_privacy_policy_link_should_return_valid_link_when_privacy_page_set() {
 		update_option( 'wp_page_for_privacy_policy', self::$privacy_policy_page_id );
@@ -80,7 +81,7 @@ class Tests_Link_GetThePrivacyPolicyLink extends WP_UnitTestCase {
 
 		$this->assertStringStartsWith( '<a', $actual_link );
 		$this->assertContains( self::$privacy_policy_url, $actual_link );
-		$this->assertStringEndsWith( '</a>', $actual_link );
+		$this->assertStringEndsWith( '>' . WP_TESTS_DOMAIN . ' Privacy Policy</a>', $actual_link );
 	}
 
 	/**
@@ -105,6 +106,25 @@ class Tests_Link_GetThePrivacyPolicyLink extends WP_UnitTestCase {
 		$actual_link = get_the_privacy_policy_link( self::$before, self::$after );
 
 		$this->assertSame( '', $actual_link );
+	}
+
+	/**
+	 * The function should return an empty string when there is an empty page title
+	 * for the privacy policy.
+	 *
+	 * @ticket 44192
+	 */
+	public function test_function_should_return_empty_string_when_privacy_page_title_empty() {
+		$nameless_page_id = $this->factory->post->create(
+			array(
+				'post_type'  => 'page',
+				'post_title' => '',
+			)
+		);
+
+		update_option( 'wp_page_for_privacy_policy', $nameless_page_id );
+
+		$this->assertSame( '', get_the_privacy_policy_link( self::$before, self::$after ) );
 	}
 
 	/**
