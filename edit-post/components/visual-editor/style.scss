@@ -73,7 +73,7 @@
 		// The centering math changes when a fullwide image doesn't have block padding.
 		&[data-align="full"] > .editor-block-contextual-toolbar {
 			width: calc( 100% + #{ ( $parent-block-padding * 2 ) + ( $block-padding * 2 ) } ); // Matches the negative margins applied to non-parent blocks, except for borders which are gone in fullwide.
-		
+
 			.editor-block-toolbar {
 				max-width: $content-width - $border-width - $border-width;
 			}
@@ -136,7 +136,7 @@
 	margin-right: auto;
 	position: relative;
 
-	&[data-root-uid=""] .editor-default-block-appender__content:hover {
+	&[data-root-client-id=""] .editor-default-block-appender__content:hover {
 		// Outline on root-level default block appender is redundant with the
 		// WritingFlow click redirector.
 		outline: 1px solid transparent;

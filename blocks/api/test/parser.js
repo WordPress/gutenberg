@@ -592,7 +592,7 @@ describe( 'block parser', () => {
 				url: 'http://google.com',
 				chicken: 'ribs & \'wings\'',
 			} );
-			expect( typeof parsed[ 0 ].uid ).toBe( 'string' );
+			expect( typeof parsed[ 0 ].clientId ).toBe( 'string' );
 		} );
 
 		it( 'should parse empty post content', () => {
@@ -625,7 +625,7 @@ describe( 'block parser', () => {
 			expect( parsed[ 0 ].attributes ).toEqual( {
 				content: 'Ribs',
 			} );
-			expect( typeof parsed[ 0 ].uid ).toBe( 'string' );
+			expect( typeof parsed[ 0 ].clientId ).toBe( 'string' );
 		} );
 
 		it( 'should add the core namespace to un-namespaced blocks', () => {

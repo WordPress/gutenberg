@@ -3,7 +3,6 @@
  */
 import classnames from 'classnames';
 import {
-	last,
 	isEqual,
 	forEach,
 	merge,
@@ -18,7 +17,7 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import { Component, Fragment, compose, RawHTML, createRef } from '@wordpress/element';
+import { Component, Fragment, RawHTML, createRef } from '@wordpress/element';
 import {
 	isHorizontalEdge,
 	getRectangleFromRange,
@@ -26,9 +25,10 @@ import {
 } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
 import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, rawShortcut } from '@wordpress/keycodes';
-import { withInstanceId, withSafeTimeout, Slot } from '@wordpress/components';
+import { Slot } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { rawHandler } from '@wordpress/blocks';
+import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -126,7 +126,6 @@ export class RichText extends Component {
 		this.onSetup = this.onSetup.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onChange = this.onChange.bind( this );
-		this.onNewBlock = this.onNewBlock.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
 		this.onHorizontalNavigationKeyDown = this.onHorizontalNavigationKeyDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
@@ -176,7 +175,6 @@ export class RichText extends Component {
 		this.editor = editor;
 
 		editor.on( 'init', this.onInit );
-		editor.on( 'NewBlock', this.onNewBlock );
 		editor.on( 'nodechange', this.onNodeChange );
 		editor.on( 'keydown', this.onKeyDown );
 		editor.on( 'keyup', this.onKeyUp );
@@ -357,7 +355,7 @@ export class RichText extends Component {
 			plainText: this.pastedPlainText,
 			mode,
 			tagName: this.props.tagName,
-			canUserUseUnfilteredHTML: this.context.canUserUseUnfilteredHTML,
+			canUserUseUnfilteredHTML: this.props.canUserUseUnfilteredHTML,
 		} );
 
 		if ( typeof content === 'string' ) {
@@ -667,55 +665,6 @@ export class RichText extends Component {
 		this.restoreContentAndSplit( before, after, blocks );
 	}
 
-	onNewBlock() {
-		if ( this.props.multiline !== 'p' || ! this.props.onSplit ) {
-			return;
-		}
-
-		// Getting the content before and after the cursor
-		const childNodes = Array.from( this.editor.getBody().childNodes );
-		let selectedChild = this.editor.selection.getStart();
-		while ( childNodes.indexOf( selectedChild ) === -1 && selectedChild.parentNode ) {
-			selectedChild = selectedChild.parentNode;
-		}
-		const splitIndex = childNodes.indexOf( selectedChild );
-		if ( splitIndex === -1 ) {
-			return;
-		}
-		const beforeNodes = childNodes.slice( 0, splitIndex );
-		const lastNodeBeforeCursor = last( beforeNodes );
-		// Avoid splitting on single enter
-		if (
-			! lastNodeBeforeCursor ||
-			beforeNodes.length < 2 ||
-			!! lastNodeBeforeCursor.textContent
-		) {
-			return;
-		}
-
-		const before = beforeNodes.slice( 0, beforeNodes.length - 1 );
-
-		// Removing empty nodes from the beginning of the "after"
-		// avoids empty paragraphs at the beginning of newly created blocks.
-		const after = childNodes.slice( splitIndex ).reduce( ( memo, node ) => {
-			if ( ! memo.length && ! node.textContent ) {
-				return memo;
-			}
-
-			memo.push( node );
-			return memo;
-		}, [] );
-
-		// Splitting into two blocks
-		this.setContent( this.props.value );
-
-		const { format } = this.props;
-		this.restoreContentAndSplit(
-			domToFormat( before, format, this.editor ),
-			domToFormat( after, format, this.editor )
-		);
-	}
-
 	onNodeChange( { parents } ) {
 		if ( document.activeElement !== this.editor.getBody() ) {
 			return;
@@ -986,7 +935,6 @@ export class RichText extends Component {
 RichText.contextTypes = {
 	onUndo: noop,
 	onRedo: noop,
-	canUserUseUnfilteredHTML: noop,
 	onCreateUndoLevel: noop,
 };
 
@@ -1009,6 +957,7 @@ const RichTextContainer = compose( [
 				isSelected: context.isSelected,
 			};
 		}
+
 		// Ensures that only one RichText component can be focused.
 		return {
 			isSelected: context.isSelected && context.focusedElement === ownProps.instanceId,
@@ -1017,9 +966,11 @@ const RichTextContainer = compose( [
 	} ),
 	withSelect( ( select ) => {
 		const { isViewportMatch = identity } = select( 'core/viewport' ) || {};
+		const { canUserUseUnfilteredHTML } = select( 'core/editor' );
 
 		return {
 			isViewportSmall: isViewportMatch( '< small' ),
+			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
 		};
 	} ),
 	withSafeTimeout,

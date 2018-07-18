@@ -81,12 +81,12 @@ describe( 'actions', () => {
 
 	describe( 'updateBlockAttributes', () => {
 		it( 'should return the UPDATE_BLOCK_ATTRIBUTES action', () => {
-			const uid = 'my-uid';
+			const clientId = 'myclientid';
 			const attributes = {};
-			const result = updateBlockAttributes( uid, attributes );
+			const result = updateBlockAttributes( clientId, attributes );
 			expect( result ).toEqual( {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				uid,
+				clientId,
 				attributes,
 			} );
 		} );
@@ -94,12 +94,12 @@ describe( 'actions', () => {
 
 	describe( 'updateBlock', () => {
 		it( 'should return the UPDATE_BLOCK action', () => {
-			const uid = 'myuid';
+			const clientId = 'myclientid';
 			const updates = {};
-			const result = updateBlock( uid, updates );
+			const result = updateBlock( clientId, updates );
 			expect( result ).toEqual( {
 				type: 'UPDATE_BLOCK',
-				uid,
+				clientId,
 				updates,
 			} );
 		} );
@@ -107,12 +107,12 @@ describe( 'actions', () => {
 
 	describe( 'selectBlock', () => {
 		it( 'should return the SELECT_BLOCK action', () => {
-			const uid = 'my-uid';
-			const result = selectBlock( uid, -1 );
+			const clientId = 'myclientid';
+			const result = selectBlock( clientId, -1 );
 			expect( result ).toEqual( {
 				type: 'SELECT_BLOCK',
 				initialPosition: -1,
-				uid,
+				clientId,
 			} );
 		} );
 	} );
@@ -155,12 +155,12 @@ describe( 'actions', () => {
 	describe( 'replaceBlock', () => {
 		it( 'should return the REPLACE_BLOCKS action', () => {
 			const block = {
-				uid: 'ribs',
+				clientId: 'ribs',
 			};
 
 			expect( replaceBlock( [ 'chicken' ], block ) ).toEqual( {
 				type: 'REPLACE_BLOCKS',
-				uids: [ 'chicken' ],
+				clientIds: [ 'chicken' ],
 				blocks: [ block ],
 				time: expect.any( Number ),
 			} );
@@ -170,12 +170,12 @@ describe( 'actions', () => {
 	describe( 'replaceBlocks', () => {
 		it( 'should return the REPLACE_BLOCKS action', () => {
 			const blocks = [ {
-				uid: 'ribs',
+				clientId: 'ribs',
 			} ];
 
 			expect( replaceBlocks( [ 'chicken' ], blocks ) ).toEqual( {
 				type: 'REPLACE_BLOCKS',
-				uids: [ 'chicken' ],
+				clientIds: [ 'chicken' ],
 				blocks,
 				time: expect.any( Number ),
 			} );
@@ -185,14 +185,14 @@ describe( 'actions', () => {
 	describe( 'insertBlock', () => {
 		it( 'should return the INSERT_BLOCKS action', () => {
 			const block = {
-				uid: 'ribs',
+				clientId: 'ribs',
 			};
 			const index = 5;
-			expect( insertBlock( block, index, 'test_uid' ) ).toEqual( {
+			expect( insertBlock( block, index, 'testclientid' ) ).toEqual( {
 				type: 'INSERT_BLOCKS',
 				blocks: [ block ],
 				index,
-				rootUID: 'test_uid',
+				rootClientId: 'testclientid',
 				time: expect.any( Number ),
 			} );
 		} );
@@ -201,14 +201,14 @@ describe( 'actions', () => {
 	describe( 'insertBlocks', () => {
 		it( 'should return the INSERT_BLOCKS action', () => {
 			const blocks = [ {
-				uid: 'ribs',
+				clientId: 'ribs',
 			} ];
 			const index = 3;
-			expect( insertBlocks( blocks, index, 'test_uid' ) ).toEqual( {
+			expect( insertBlocks( blocks, index, 'testclientid' ) ).toEqual( {
 				type: 'INSERT_BLOCKS',
 				blocks,
 				index,
-				rootUID: 'test_uid',
+				rootClientId: 'testclientid',
 				time: expect.any( Number ),
 			} );
 		} );
@@ -270,11 +270,11 @@ describe( 'actions', () => {
 
 	describe( 'mergeBlocks', () => {
 		it( 'should return MERGE_BLOCKS action', () => {
-			const blockAUid = 'blockA';
-			const blockBUid = 'blockB';
-			expect( mergeBlocks( blockAUid, blockBUid ) ).toEqual( {
+			const firstBlockClientId = 'blockA';
+			const secondBlockClientId = 'blockB';
+			expect( mergeBlocks( firstBlockClientId, secondBlockClientId ) ).toEqual( {
 				type: 'MERGE_BLOCKS',
-				blocks: [ blockAUid, blockBUid ],
+				blocks: [ firstBlockClientId, secondBlockClientId ],
 			} );
 		} );
 	} );
@@ -297,10 +297,10 @@ describe( 'actions', () => {
 
 	describe( 'removeBlocks', () => {
 		it( 'should return REMOVE_BLOCKS action', () => {
-			const uids = [ 'uid' ];
-			expect( removeBlocks( uids ) ).toEqual( {
+			const clientIds = [ 'clientId' ];
+			expect( removeBlocks( clientIds ) ).toEqual( {
 				type: 'REMOVE_BLOCKS',
-				uids,
+				clientIds,
 				selectPrevious: true,
 			} );
 		} );
@@ -308,18 +308,18 @@ describe( 'actions', () => {
 
 	describe( 'removeBlock', () => {
 		it( 'should return REMOVE_BLOCKS action', () => {
-			const uid = 'my-uid';
-			expect( removeBlock( uid ) ).toEqual( {
+			const clientId = 'myclientid';
+			expect( removeBlock( clientId ) ).toEqual( {
 				type: 'REMOVE_BLOCKS',
-				uids: [
-					uid,
+				clientIds: [
+					clientId,
 				],
 				selectPrevious: true,
 			} );
-			expect( removeBlock( uid, false ) ).toEqual( {
+			expect( removeBlock( clientId, false ) ).toEqual( {
 				type: 'REMOVE_BLOCKS',
-				uids: [
-					uid,
+				clientIds: [
+					clientId,
 				],
 				selectPrevious: false,
 			} );
@@ -328,10 +328,10 @@ describe( 'actions', () => {
 
 	describe( 'toggleBlockMode', () => {
 		it( 'should return TOGGLE_BLOCK_MODE action', () => {
-			const uid = 'my-uid';
-			expect( toggleBlockMode( uid ) ).toEqual( {
+			const clientId = 'myclientid';
+			expect( toggleBlockMode( clientId ) ).toEqual( {
 				type: 'TOGGLE_BLOCK_MODE',
-				uid,
+				clientId,
 			} );
 		} );
 	} );
@@ -495,20 +495,20 @@ describe( 'actions', () => {
 
 	describe( 'convertBlockToStatic', () => {
 		it( 'should return the CONVERT_BLOCK_TO_STATIC action', () => {
-			const uid = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-			expect( convertBlockToStatic( uid ) ).toEqual( {
+			const clientId = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			expect( convertBlockToStatic( clientId ) ).toEqual( {
 				type: 'CONVERT_BLOCK_TO_STATIC',
-				uid,
+				clientId,
 			} );
 		} );
 	} );
 
 	describe( 'convertBlockToShared', () => {
 		it( 'should return the CONVERT_BLOCK_TO_SHARED action', () => {
-			const uid = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-			expect( convertBlockToShared( uid ) ).toEqual( {
+			const clientId = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			expect( convertBlockToShared( clientId ) ).toEqual( {
 				type: 'CONVERT_BLOCK_TO_SHARED',
-				uid,
+				clientId,
 			} );
 		} );
 	} );
@@ -540,7 +540,7 @@ describe( 'actions', () => {
 		it( 'should return the UPDATE_BLOCK_LIST_SETTINGS with undefined settings', () => {
 			expect( updateBlockListSettings( 'chicken' ) ).toEqual( {
 				type: 'UPDATE_BLOCK_LIST_SETTINGS',
-				id: 'chicken',
+				clientId: 'chicken',
 				settings: undefined,
 			} );
 		} );
@@ -548,7 +548,7 @@ describe( 'actions', () => {
 		it( 'should return the UPDATE_BLOCK_LIST_SETTINGS action with the passed settings', () => {
 			expect( updateBlockListSettings( 'chicken', { chicken: 'ribs' } ) ).toEqual( {
 				type: 'UPDATE_BLOCK_LIST_SETTINGS',
-				id: 'chicken',
+				clientId: 'chicken',
 				settings: { chicken: 'ribs' },
 			} );
 		} );

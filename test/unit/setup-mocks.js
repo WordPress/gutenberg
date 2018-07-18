@@ -4,8 +4,8 @@
 //
 // See: https://github.com/airbnb/enzyme/issues/1604
 // See: https://github.com/airbnb/enzyme/pull/1592/files
-jest.mock( '../../components/button', () => {
-	const { Button: RawButton } = require.requireActual( '../../components/button' );
+jest.mock( '../../packages/components/src/button', () => {
+	const { Button: RawButton } = require.requireActual( '../../packages/components/src/button' );
 	const { Component } = require( 'react' );
 
 	return class Button extends Component {
@@ -15,11 +15,11 @@ jest.mock( '../../components/button', () => {
 	};
 } );
 
-jest.mock( '@wordpress/api-request', () => {
-	const apiRequest = jest.fn( () => {
-		return apiRequest.mockReturnValue;
+jest.mock( '@wordpress/api-fetch', () => {
+	const apiFetch = jest.fn( () => {
+		return apiFetch.mockReturnValue;
 	} );
-	apiRequest.mockReturnValue = 'mock this value by overriding apiRequest.mockReturnValue';
+	apiFetch.mockReturnValue = 'mock this value by overriding apiFetch.mockReturnValue';
 
-	return apiRequest;
+	return apiFetch;
 } );

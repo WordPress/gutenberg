@@ -144,17 +144,23 @@ export async function switchToEditor( mode ) {
 	await button.click( 'button' );
 }
 
-export async function getHTMLFromCodeEditor() {
-	await switchToEditor( 'Code' );
-	const textEditorContent = await page.$eval( '.editor-post-text-editor', ( element ) => element.value );
-	await switchToEditor( 'Visual' );
+/**
+ * Returns a promise which resolves with the edited post content (HTML string).
+ *
+ * @return {Promise} Promise resolving with post content markup.
+ */
+export async function getEditedPostContent() {
+	const content = await page.evaluate( () => {
+		const { select } = window.wp.data;
+		return select( 'core/editor' ).getEditedPostContent();
+	} );
 
 	// Globally guard against zero-width characters.
-	if ( REGEXP_ZWSP.test( textEditorContent ) ) {
+	if ( REGEXP_ZWSP.test( content ) ) {
 		throw new Error( 'Unexpected zero-width space character in editor content.' );
 	}
 
-	return textEditorContent;
+	return content;
 }
 
 /**
@@ -174,18 +180,26 @@ export async function ensureSidebarOpened() {
 }
 
 /**
+ * Search for block in the global inserter
+ *
+ * @param {string} searchTerm The text to search the inserter for.
+ */
+export async function searchForBlock( searchTerm ) {
+	await page.click( '.edit-post-header [aria-label="Add block"]' );
+	// Waiting here is necessary because sometimes the inserter takes more time to
+	// render than Puppeteer takes to complete the 'click' action
+	await page.waitForSelector( '.editor-inserter__menu' );
+	await page.keyboard.type( searchTerm );
+}
+
+/**
  * Opens the inserter, searches for the given term, then selects the first
  * result that appears.
  *
  * @param {string} searchTerm The text to search the inserter for.
  */
 export async function insertBlock( searchTerm ) {
-	await page.click( '.edit-post-header [aria-label="Add block"]' );
-	// Waiting here is necessary because sometimes the inserter takes more time to
-	// render than Puppeteer takes to complete the 'click' action
-	await page.waitForSelector( '.editor-inserter__menu' );
-	// Filter and reveal buttons.
-	await page.keyboard.type( searchTerm );
+	await searchForBlock( searchTerm );
 	await page.click( `button[aria-label="${ searchTerm }"]` );
 }
 
@@ -245,7 +259,7 @@ export async function publishPost() {
  * Clicks on the button in the header which opens Document Settings sidebar when it is closed.
  */
 export async function openDocumentSettingsSidebar() {
-	const openButton = await page.$( '.edit-post-header__settings button[aria-label="Settings"][aria-expaned="false"]' );
+	const openButton = await page.$( '.edit-post-header__settings button[aria-label="Settings"][aria-expanded="false"]' );
 
 	if ( openButton ) {
 		await page.click( openButton );

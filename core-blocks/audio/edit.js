@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	IconButton,
 	PanelBody,
+	SelectControl,
 	Toolbar,
 	ToggleControl,
 	withNotices,
@@ -32,6 +33,7 @@ class AudioEdit extends Component {
 		};
 
 		this.toggleAttribute = this.toggleAttribute.bind( this );
+		this.onSelectURL = this.onSelectURL.bind( this );
 	}
 
 	toggleAttribute( attribute ) {
@@ -40,8 +42,21 @@ class AudioEdit extends Component {
 		};
 	}
 
+	onSelectURL( newSrc ) {
+		const { attributes, setAttributes } = this.props;
+		const { src } = attributes;
+
+		// Set the block's src from the edit component's state, and switch off
+		// the editing UI.
+		if ( newSrc !== src ) {
+			setAttributes( { src: newSrc, id: undefined } );
+		}
+
+		this.setState( { editing: false } );
+	}
+
 	render() {
-		const { autoplay, caption, loop, src } = this.props.attributes;
+		const { autoplay, caption, loop, preload, src } = this.props.attributes;
 		const { setAttributes, isSelected, className, noticeOperations, noticeUI } = this.props;
 		const { editing } = this.state;
 		const switchToEditing = () => {
@@ -60,14 +75,6 @@ class AudioEdit extends Component {
 			setAttributes( { src: media.url, id: media.id } );
 			this.setState( { src: media.url, editing: false } );
 		};
-		const onSelectUrl = ( newSrc ) => {
-			// set the block's src from the edit component's state, and switch off the editing UI
-			if ( newSrc !== src ) {
-				setAttributes( { src: newSrc, id: undefined } );
-			}
-			this.setState( { editing: false } );
-		};
-
 		if ( editing ) {
 			return (
 				<MediaPlaceholder
@@ -78,7 +85,7 @@ class AudioEdit extends Component {
 					} }
 					className={ className }
 					onSelect={ onSelectAudio }
-					onSelectUrl={ onSelectUrl }
+					onSelectURL={ this.onSelectURL }
 					accept="audio/*"
 					type="audio"
 					value={ this.props.attributes }
@@ -102,7 +109,7 @@ class AudioEdit extends Component {
 					</Toolbar>
 				</BlockControls>
 				<InspectorControls>
-					<PanelBody title={ __( 'Playback Controls' ) }>
+					<PanelBody>
 						<ToggleControl
 							label={ __( 'Autoplay' ) }
 							onChange={ this.toggleAttribute( 'autoplay' ) }
@@ -112,6 +119,17 @@ class AudioEdit extends Component {
 							label={ __( 'Loop' ) }
 							onChange={ this.toggleAttribute( 'loop' ) }
 							checked={ loop }
+						/>
+						<SelectControl
+							label={ __( 'Preload' ) }
+							value={ undefined !== preload ? preload : 'none' }
+							// `undefined` is required for the preload attribute to be unset.
+							onChange={ ( value ) => setAttributes( { preload: ( 'none' !== value ) ? value : undefined } ) }
+							options={ [
+								{ value: 'auto', label: __( 'Auto' ) },
+								{ value: 'metadata', label: __( 'Metadata' ) },
+								{ value: 'none', label: __( 'None' ) },
+							] }
 						/>
 					</PanelBody>
 				</InspectorControls>

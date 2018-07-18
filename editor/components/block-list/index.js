@@ -21,13 +21,13 @@ import BlockListLayout from './layout';
 
 const UngroupedLayoutBlockList = withSelect(
 	( select, ownProps ) => ( {
-		blockUIDs: select( 'core/editor' ).getBlockOrder( ownProps.rootUID ),
+		blockClientIds: select( 'core/editor' ).getBlockOrder( ownProps.rootClientId ),
 	} )
 )( BlockListLayout );
 
 const GroupedLayoutBlockList = withSelect(
 	( select, ownProps ) => ( {
-		blocks: select( 'core/editor' ).getBlocks( ownProps.rootUID ),
+		blocks: select( 'core/editor' ).getBlocks( ownProps.rootClientId ),
 	} ),
 )( ( {
 	blocks,
@@ -35,9 +35,9 @@ const GroupedLayoutBlockList = withSelect(
 	...props
 } ) => map( layouts, ( layout ) => {
 	// Filter blocks assigned to layout when rendering grouped layouts.
-	const layoutBlockUIDs = reduce( blocks, ( result, block ) => {
+	const layoutBlockClientIds = reduce( blocks, ( result, block ) => {
 		if ( get( block, [ 'attributes', 'layout' ] ) === layout.name ) {
-			result.push( block.uid );
+			result.push( block.clientId );
 		}
 
 		return result;
@@ -48,7 +48,7 @@ const GroupedLayoutBlockList = withSelect(
 			key={ layout.name }
 			layout={ layout.name }
 			isGroupedByLayout
-			blockUIDs={ layoutBlockUIDs }
+			blockClientIds={ layoutBlockClientIds }
 			{ ...props }
 		/>
 	);

@@ -6,7 +6,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 import { IconButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { isSharedBlock } from '@wordpress/blocks';
@@ -31,9 +31,9 @@ export function SharedBlockDeleteButton( { sharedBlock, onDelete, itemsRole } ) 
 }
 
 export default compose( [
-	withSelect( ( select, { uid } ) => {
+	withSelect( ( select, { clientId } ) => {
 		const { getBlock, getSharedBlock } = select( 'core/editor' );
-		const block = getBlock( uid );
+		const block = getBlock( clientId );
 		return {
 			sharedBlock: block && isSharedBlock( block ) ? getSharedBlock( block.attributes.ref ) : null,
 		};

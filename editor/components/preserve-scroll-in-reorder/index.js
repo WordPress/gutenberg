@@ -37,10 +37,10 @@ class PreserveScrollInReorder extends Component {
 	}
 
 	/**
-	 * Given the block UID of the start of the selection, saves the block's
-	 * top offset as an instance property before a reorder is to occur.
+	 * Given the block client ID of the start of the selection, saves the
+	 * block's top offset as an instance property before a reorder is to occur.
 	 *
-	 * @param {string} selectionStart UID of selected block.
+	 * @param {string} selectionStart Client ID of selected block.
 	 *
 	 * @return {number?} The scroll offset.
 	 */

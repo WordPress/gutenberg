@@ -30,13 +30,13 @@ function PostPublishPanelPrepublish( {
 			{ hasPublishAction && (
 				<Fragment>
 					<PanelBody initialOpen={ false } title={ [
-						__( 'Visibility: ' ),
+						__( 'Visibility:' ),
 						<span className="editor-post-publish-panel__link" key="label"><PostVisibilityLabel /></span>,
 					] }>
 						<PostVisibility />
 					</PanelBody>
 					<PanelBody initialOpen={ false } title={ [
-						__( 'Publish: ' ),
+						__( 'Publish:' ),
 						<span className="editor-post-publish-panel__link" key="label"><PostScheduleLabel /></span>,
 					] }>
 						<PostSchedule />

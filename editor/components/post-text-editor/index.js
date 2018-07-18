@@ -7,11 +7,11 @@ import Textarea from 'react-autosize-textarea';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { decodeEntities } from '@wordpress/utils';
-import { Component, compose, Fragment } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
+import { Component, Fragment } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { withInstanceId } from '@wordpress/components';
+import { withInstanceId, compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies

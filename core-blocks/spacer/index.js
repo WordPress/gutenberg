@@ -9,7 +9,8 @@ import ResizableBox from 're-resizable';
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/editor';
-import { BaseControl, PanelBody, withInstanceId } from '@wordpress/components';
+import { BaseControl, PanelBody } from '@wordpress/components';
+import { withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -51,7 +52,7 @@ export const settings = {
 							bottom: 'core-blocks-spacer__resize-handler-bottom',
 						} }
 						enable={ {
-							top: true,
+							top: false,
 							right: false,
 							bottom: true,
 							left: false,

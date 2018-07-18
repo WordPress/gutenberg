@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { getBlockType } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
@@ -135,8 +135,8 @@ function BlockStyles( {
 }
 
 export default compose( [
-	withSelect( ( select, { uid } ) => {
-		const block = select( 'core/editor' ).getBlock( uid );
+	withSelect( ( select, { clientId } ) => {
+		const block = select( 'core/editor' ).getBlock( clientId );
 
 		return {
 			name: block.name,
@@ -145,10 +145,12 @@ export default compose( [
 			styles: get( getBlockType( block.name ), [ 'styles' ] ),
 		};
 	} ),
-	withDispatch( ( dispatch, { uid } ) => {
+	withDispatch( ( dispatch, { clientId } ) => {
 		return {
 			onChangeClassName( newClassName ) {
-				dispatch( 'core/editor' ).updateBlockAttributes( uid, { className: newClassName } );
+				dispatch( 'core/editor' ).updateBlockAttributes( clientId, {
+					className: newClassName,
+				} );
 			},
 		};
 	} ),

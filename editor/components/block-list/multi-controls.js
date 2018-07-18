@@ -14,7 +14,13 @@ import { withSelect } from '@wordpress/data';
 import BlockMover from '../block-mover';
 import BlockSettingsMenu from '../block-settings-menu';
 
-function BlockListMultiControls( { multiSelectedBlockUids, rootUID, isSelecting, isFirst, isLast } ) {
+function BlockListMultiControls( {
+	multiSelectedBlockClientIds,
+	clientId,
+	isSelecting,
+	isFirst,
+	isLast,
+} ) {
 	if ( isSelecting ) {
 		return null;
 	}
@@ -22,33 +28,33 @@ function BlockListMultiControls( { multiSelectedBlockUids, rootUID, isSelecting,
 	return [
 		<BlockMover
 			key="mover"
-			rootUID={ rootUID }
-			uids={ multiSelectedBlockUids }
+			clientId={ clientId }
+			clientIds={ multiSelectedBlockClientIds }
 			isFirst={ isFirst }
 			isLast={ isLast }
 		/>,
 		<BlockSettingsMenu
 			key="menu"
-			rootUID={ rootUID }
-			uids={ multiSelectedBlockUids }
+			clientId={ clientId }
+			clientIds={ multiSelectedBlockClientIds }
 			focus
 		/>,
 	];
 }
 
-export default withSelect( ( select, { rootUID } ) => {
+export default withSelect( ( select, { clientId } ) => {
 	const {
-		getMultiSelectedBlockUids,
+		getMultiSelectedBlockClientIds,
 		isMultiSelecting,
 		getBlockIndex,
 		getBlockCount,
 	} = select( 'core/editor' );
-	const uids = getMultiSelectedBlockUids();
-	const firstIndex = getBlockIndex( first( uids ), rootUID );
-	const lastIndex = getBlockIndex( last( uids ), rootUID );
+	const clientIds = getMultiSelectedBlockClientIds();
+	const firstIndex = getBlockIndex( first( clientIds ), clientId );
+	const lastIndex = getBlockIndex( last( clientIds ), clientId );
 
 	return {
-		multiSelectedBlockUids: uids,
+		multiSelectedBlockClientIds: clientIds,
 		isSelecting: isMultiSelecting(),
 		isFirst: firstIndex === 0,
 		isLast: lastIndex + 1 === getBlockCount(),
