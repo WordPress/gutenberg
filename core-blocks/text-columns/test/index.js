@@ -9,5 +9,9 @@ describe( 'core/text-columns', () => {
 		const wrapper = blockEditRender( name, settings );
 
 		expect( wrapper ).toMatchSnapshot();
+		expect( console ).toHaveWarnedWith(
+			'The Text Columns block is deprecated and will be removed from Gutenberg in a future version. ' +
+			'Please use the Columns block instead.'
+		);
 	} );
 } );

@@ -15,6 +15,7 @@ import {
 	InspectorControls,
 	RichText,
 } from '@wordpress/editor';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -25,6 +26,9 @@ import './editor.scss';
 export const name = 'core/text-columns';
 
 export const settings = {
+	// Use an empty parent array to indicate this block should no longer be available for insertion.
+	parent: [],
+
 	title: __( 'Text Columns' ),
 
 	description: __( 'Add text, and display it in two or more columns. Like a newspaper! This block is experimental.' ),
@@ -63,6 +67,12 @@ export const settings = {
 
 	edit: ( ( { attributes, setAttributes, className } ) => {
 		const { width, content, columns } = attributes;
+
+		deprecated( 'The Text Columns block', {
+			version: 'a future version',
+			alternative: 'the Columns block',
+			plugin: 'Gutenberg',
+		} );
 
 		return (
 			<Fragment>
