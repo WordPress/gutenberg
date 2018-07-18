@@ -337,7 +337,7 @@ export const hasChildBlocks = ( blockName ) => {
  * @param {string} blockName      Name of block (example: “core/latest-posts”).
  * @param {Object} styleVariation Object containing `name` which is the class name applied to the block and `label` which identifies the variation to the user.
  */
-export const registerBlockStyleVariation = ( blockName, styleVariation ) => {
+export const registerBlockStyle = ( blockName, styleVariation ) => {
 	addFilter( 'blocks.registerBlockType', blockName + '/' + styleVariation.name, ( settings, name ) => {
 		if ( blockName !== name ) {
 			return settings;
