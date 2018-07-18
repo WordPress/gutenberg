@@ -338,7 +338,7 @@ export const hasChildBlocks = ( blockName ) => {
  * @param {Object} styleVariation Object containing `name` which is the class name applied to the block and `label` which identifies the variation to the user.
  */
 export const registerBlockStyle = ( blockName, styleVariation ) => {
-	addFilter( 'blocks.registerBlockType', blockName + '/' + styleVariation.name, ( settings, name ) => {
+	addFilter( 'blocks.registerBlockType', `${ blockName }/${ styleVariation.name }`, ( settings, name ) => {
 		if ( blockName !== name ) {
 			return settings;
 		}
