@@ -267,6 +267,10 @@ if ( process.env.GUTENBERG_ENV === 'standalone' ) {
 	const alias = Object.assign( {}, config.resolve.alias, {
 		'@wordpress/core-blocks': path.resolve( __dirname, 'build/core-blocks' ),
 		'@wordpress/editor': path.resolve( __dirname, 'build/editor' ),
+		'@wordpress/components': path.resolve( __dirname, 'build/components' ),
+		'@wordpress/viewports': path.resolve( __dirname, 'build/viewports' ),
+		'@wordpress/blocks': path.resolve( __dirname, 'build/blocks' ),
+
 	} );
 	config.resolve.alias = alias;
 }
