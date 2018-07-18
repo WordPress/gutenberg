@@ -50,7 +50,7 @@ class SharedBlockEditPanel extends Component {
 	}
 
 	render() {
-		const { isEditing, title, isSaving, onEdit, onCancel, instanceId } = this.props;
+		const { isEditing, title, isSaving, onEdit, instanceId } = this.props;
 
 		return (
 			<Fragment>
