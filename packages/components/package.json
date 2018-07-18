@@ -25,7 +25,7 @@
 	"module": "build-module/index.js",
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",
-		"@wordpress/api-request": "file:../api-request",
+		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
