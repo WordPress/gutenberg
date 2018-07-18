@@ -168,6 +168,10 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'build/compose/index.js' ),
 		true
 	);
+	wp_add_inline_script(
+		'wp-compose',
+		sprintf( 'window._wpSiteURL = %s;', json_encode( site_url() ) )
+	);
 	wp_register_script(
 		'wp-keycodes',
 		gutenberg_url( 'build/keycodes/index.js' ),

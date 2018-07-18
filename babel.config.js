@@ -12,6 +12,27 @@ module.exports = function( api ) {
 					isDefault: false,
 				},
 			],
+			[
+				'@wordpress/babel-plugin-async-load',
+				{
+					siteURLSource: '_wpSiteURL',
+					components: [
+						{
+							module: '@wordpress/components',
+							component: 'CodeEditor',
+							scripts: [
+								'wp-codemirror',
+								'code-editor',
+								'htmlhint',
+								'htmlhint-kses',
+								'csslint',
+								'jshint',
+							],
+							styles: [ 'wp-codemirror', 'code-editor' ],
+						},
+					],
+				},
+			],
 		],
 		env: {
 			production: {

@@ -69,6 +69,7 @@
 	},
 	"devDependencies": {
 		"@babel/core": "7.0.0-beta.52",
+		"@wordpress/babel-plugin-async-load": "file:packages/babel-plugin-async-load",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:packages/babel-plugin-import-jsx-pragma",
 		"@wordpress/babel-plugin-makepot": "file:packages/babel-plugin-makepot",
 		"@wordpress/babel-preset-default": "file:packages/babel-preset-default",

@@ -11,6 +11,7 @@ export { default as withGlobalEvents } from './with-global-events';
 export { default as withInstanceId } from './with-instance-id';
 export { default as withSafeTimeout } from './with-safe-timeout';
 export { default as withState } from './with-state';
+export { default as lazyLoad } from './lazy-load';
 
 /**
  * Composes multiple higher-order components into a single higher-order component. Performs right-to-left function
