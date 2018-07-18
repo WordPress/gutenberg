@@ -60,6 +60,7 @@
     "lint:fix": "eslint $npm_package_config_jsfiles --fix"
   },
   "dependencies": {
+    "@babel/runtime": "^7.0.0-beta.54",
     "@wordpress/autop": "^1.0.6",
     "@wordpress/deprecated": "^1.0.0-alpha.2",
     "@wordpress/hooks": "^1.2.0",
