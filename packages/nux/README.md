@@ -1,11 +1,18 @@
-NUX (New User eXperience)
-=========================
+# @wordpress/nux
 
-The NUX module exposes components, and `wp.data` methods useful for onboarding a new user to the WordPress admin interface. Specifically, it exposes _tips_ and _guides_.
+The NUX (New User eXperience) module exposes components, and `wp.data` methods useful for onboarding a new user to the WordPress admin interface. Specifically, it exposes _tips_ and _guides_.
 
 A _tip_ is a component that points to an element in the UI and contains text that explains the element's functionality. The user can dismiss a tip, in which case it never shows again. The user can also disable tips entirely. Information about tips is persisted between sessions using `localStorage`.
 
 A _guide_ allows a series of of tips to be presented to the user one by one. When a user dismisses a tip that is in a guide, the next tip in the guide is shown.
+
+## Installation
+
+Install the module
+
+```bash
+npm install @wordpress/nux --save
+```
 
 ## DotTip
 

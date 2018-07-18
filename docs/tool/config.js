@@ -17,7 +17,6 @@ const gutenbergPackages = [
 	'core-blocks',
 	'edit-post',
 	'editor',
-	'nux',
 ];
 
 module.exports = {
@@ -45,8 +44,8 @@ module.exports = {
 		},
 		'core/nux': {
 			title: 'The NUX (New User Experience) Data',
-			selectors: [ path.resolve( root, 'nux/store/selectors.js' ) ],
-			actions: [ path.resolve( root, 'nux/store/actions.js' ) ],
+			selectors: [ path.resolve( root, 'packages/nux/src/store/selectors.js' ) ],
+			actions: [ path.resolve( root, 'packages/nux/src/store/actions.js' ) ],
 		},
 		'core/viewport': {
 			title: 'The Viewport Data',

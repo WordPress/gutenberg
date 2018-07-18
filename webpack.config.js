@@ -80,7 +80,6 @@ const entryPointNames = [
 	'utils',
 	'edit-post',
 	'core-blocks',
-	'nux',
 ];
 
 const gutenbergPackages = [
@@ -101,6 +100,7 @@ const gutenbergPackages = [
 	'i18n',
 	'is-shallow-equal',
 	'keycodes',
+	'nux',
 	'plugins',
 	'shortcode',
 	'viewport',

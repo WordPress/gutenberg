@@ -6,11 +6,6 @@ import { Popover, Button, IconButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 
-/**
- * Internal dependencies
- */
-import './style.scss';
-
 export function DotTip( {
 	children,
 	isVisible,
