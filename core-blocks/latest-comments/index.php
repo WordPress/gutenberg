@@ -9,8 +9,6 @@
 // appearing with no title.
 require_once( ABSPATH . 'wp-admin/includes/template.php' );
 
-$default_comments_to_show = 5;
-
 /**
  * Renders the `core/latest-comments` block on server.
  *
