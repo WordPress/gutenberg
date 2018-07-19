@@ -50,10 +50,13 @@ module.exports = {
 				message: 'Use @wordpress/blob as import path instead.',
 			},
 			{
-				selector: 'ImportDeclaration[source.value=/^blocks(\\u002F|$)/]',
-				message: 'Use @wordpress/blocks as import path instead.',
+				selector: 'ImportDeclaration[source.value=/^block-serialization-spec-parser(\\u002F|$)/]',
+				message: 'Use @wordpress/block-serialization-spec-parser as import path instead.',
 			},
 			{
+				selector: 'ImportDeclaration[source.value=/^blocks(\\u002F|$)/]',
+				message: 'Use @wordpress/blocks as import path instead.',
+			},{
 				selector: 'ImportDeclaration[source.value=/^components(\\u002F|$)/]',
 				message: 'Use @wordpress/components as import path instead.',
 			},

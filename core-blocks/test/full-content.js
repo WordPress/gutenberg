@@ -10,7 +10,7 @@ import { format } from 'util';
  * WordPress dependencies
  */
 import { getBlockTypes, parse, serialize } from '@wordpress/blocks';
-import { parse as grammarParse } from '@wordpress/spec-parser';
+import { parse as grammarParse } from '@wordpress/block-serialization-spec-parser';
 
 /**
  * Internal dependencies

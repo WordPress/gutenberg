@@ -87,6 +87,7 @@ const gutenbergPackages = [
 	'a11y',
 	'api-fetch',
 	'blob',
+	'block-serialization-spec-parser',
 	'compose',
 	'core-data',
 	'data',
@@ -102,7 +103,6 @@ const gutenbergPackages = [
 	'keycodes',
 	'plugins',
 	'shortcode',
-	'spec-parser',
 	'viewport',
 ];
 
@@ -160,7 +160,10 @@ const config = {
 		rules: [
 			{
 				test: /\.js$/,
-				exclude: /node_modules/,
+				exclude: [
+					/block-serialization-spec-parser/,
+					/node_modules/,
+				],
 				use: 'babel-loader',
 			},
 			{

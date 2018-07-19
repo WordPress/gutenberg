@@ -2,7 +2,7 @@
 const parser = require( '../node_modules/pegjs/lib/parser.js' );
 const fs = require( 'fs' );
 const path = require( 'path' );
-const grammarSource = fs.readFileSync( './packages/spec-parser/grammar.pegjs', 'utf8' );
+const grammarSource = fs.readFileSync( './packages/block-serialization-spec-parser/grammar.pegjs', 'utf8' );
 const grammar = parser.parse( grammarSource );
 
 function escape( text ) {

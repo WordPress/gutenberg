@@ -10,7 +10,7 @@ import { flow, castArray, mapValues, omit, stubFalse } from 'lodash';
 import { autop } from '@wordpress/autop';
 import { applyFilters } from '@wordpress/hooks';
 import deprecated from '@wordpress/deprecated';
-import { parse as grammarParse } from '@wordpress/spec-parser';
+import { parse as grammarParse } from '@wordpress/block-serialization-spec-parser';
 
 /**
  * Internal dependencies

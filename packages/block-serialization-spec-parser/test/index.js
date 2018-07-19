@@ -3,7 +3,7 @@
  */
 import { parse } from "../";
 
-describe("spec-parser", () => {
+describe("block-serialization-spec-parser", () => {
 	test("parse() works properly", () => {
 		const result = parse(
 			"<!-- wp:core/more --><!--more--><!-- /wp:core/more -->"
