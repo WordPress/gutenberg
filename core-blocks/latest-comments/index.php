@@ -9,7 +9,7 @@
 // appearing with no title.
 require_once( ABSPATH . 'wp-admin/includes/template.php' );
 
-$default_comments_to_show = 5;
+define( 'GUTENBERG_LATEST_COMMENTS_BLOCK_DEFAULT_TO_SHOW', 5 );
 
 /**
  * Renders the `core/latest-comments` block on server.
@@ -26,12 +26,13 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 	) {
 		$attributes['align'] = null;
 	}
+
 	if (
 		! is_numeric( $attributes['commentsToShow'] ) ||
 		$attributes['commentsToShow'] < 0 ||
 		$attributes['commentsToShow'] > 100
 	) {
-		$attributes['commentsToShow'] = $default_comments_to_show;
+		$attributes['commentsToShow'] = GUTENBERG_LATEST_COMMENTS_BLOCK_DEFAULT_TO_SHOW;
 	}
 
 	// This filter is documented in wp-includes/widgets/class-wp-widget-recent-comments.php.
@@ -135,7 +136,7 @@ register_block_type( 'core/latest-comments', array(
 		),
 		'commentsToShow' => array(
 			'type'    => 'number',
-			'default' => $default_comments_to_show,
+			'default' => GUTENBERG_LATEST_COMMENTS_BLOCK_DEFAULT_TO_SHOW,
 		),
 		'displayAvatar'  => array(
 			'type'    => 'boolean',

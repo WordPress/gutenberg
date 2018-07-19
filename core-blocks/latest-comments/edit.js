@@ -21,7 +21,17 @@ import {
  */
 import './editor.scss';
 
+/**
+ * Minimum number of comments a user can show using this block.
+ *
+ * @type {number}
+ */
 const MIN_COMMENTS = 1;
+/**
+ * Maximum number of comments a user can show using this block.
+ *
+ * @type {number}
+ */
 const MAX_COMMENTS = 100;
 
 class LatestComments extends Component {
@@ -30,10 +40,16 @@ class LatestComments extends Component {
 
 		this.setAlignment = this.setAlignment.bind( this );
 		this.setCommentsToShow = this.setCommentsToShow.bind( this );
-		this.toggleAttribute = this.toggleAttribute.bind( this );
+
+		// Create toggles for each attribute; we create them here rather than
+		// passing `this.createToggleAttribute( 'displayAvatar' )` directly to
+		// `onChange` to avoid re-renders.
+		this.toggleDisplayAvatar = this.createToggleAttribute( 'displayAvatar' );
+		this.toggleDisplayDate = this.createToggleAttribute( 'displayDate' );
+		this.toggleDisplayExcerpt = this.createToggleAttribute( 'displayExcerpt' );
 	}
 
-	toggleAttribute( propName ) {
+	createToggleAttribute( propName ) {
 		return () => {
 			const value = this.props.attributes[ propName ];
 			const { setAttributes } = this.props;
@@ -72,17 +88,17 @@ class LatestComments extends Component {
 						<ToggleControl
 							label={ __( 'Display avatar' ) }
 							checked={ displayAvatar }
-							onChange={ this.toggleAttribute( 'displayAvatar' ) }
+							onChange={ this.toggleDisplayAvatar }
 						/>
 						<ToggleControl
 							label={ __( 'Display date' ) }
 							checked={ displayDate }
-							onChange={ this.toggleAttribute( 'displayDate' ) }
+							onChange={ this.toggleDisplayDate }
 						/>
 						<ToggleControl
 							label={ __( 'Display excerpt' ) }
 							checked={ displayExcerpt }
-							onChange={ this.toggleAttribute( 'displayExcerpt' ) }
+							onChange={ this.toggleDisplayExcerpt }
 						/>
 						<RangeControl
 							label={ __( 'Number of comments' ) }
