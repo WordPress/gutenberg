@@ -26,16 +26,39 @@ const stopEventPropagation = ( event ) => event.stopPropagation();
 class URLInput extends Component {
 	constructor() {
 		super( ...arguments );
+
 		this.onChange = this.onChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.bindListNode = this.bindListNode.bind( this );
 		this.updateSuggestions = throttle( this.updateSuggestions.bind( this ), 200 );
+
 		this.suggestionNodes = [];
+
 		this.state = {
 			posts: [],
 			showSuggestions: false,
 			selectedSuggestion: null,
 		};
+	}
+
+	componentDidUpdate() {
+		const { showSuggestions, selectedSuggestion } = this.state;
+		// only have to worry about scrolling selected suggestion into view
+		// when already expanded
+		if ( showSuggestions && selectedSuggestion !== null && ! this.scrollingIntoView ) {
+			this.scrollingIntoView = true;
+			scrollIntoView( this.suggestionNodes[ selectedSuggestion ], this.listNode, {
+				onlyScrollIfNeeded: true,
+			} );
+
+			setTimeout( () => {
+				this.scrollingIntoView = false;
+			}, 100 );
+		}
+	}
+
+	componentWillUnmount() {
+		delete this.suggestionsRequest;
 	}
 
 	bindListNode( ref ) {
@@ -49,10 +72,6 @@ class URLInput extends Component {
 	}
 
 	updateSuggestions( value ) {
-		if ( this.suggestionsRequest ) {
-			this.suggestionsRequest.abort();
-		}
-
 		// Show the suggestions after typing at least 2 characters
 		// and also for URLs
 		if ( value.length < 2 || /^https?:/.test( value ) ) {
@@ -70,7 +89,8 @@ class URLInput extends Component {
 			selectedSuggestion: null,
 			loading: true,
 		} );
-		this.suggestionsRequest = apiFetch( {
+
+		const request = apiFetch( {
 			path: `/wp/v2/posts?${ stringify( {
 				search: value,
 				per_page: 20,
@@ -78,33 +98,37 @@ class URLInput extends Component {
 			} ) }`,
 		} );
 
-		this.suggestionsRequest
-			.then(
-				( posts ) => {
-					this.setState( {
-						posts,
-						loading: false,
-					} );
+		request.then( ( posts ) => {
+			// A fetch Promise doesn't have an abort option. It's mimicked by
+			// comparing the request reference in on the instance, which is
+			// reset or deleted on subsequent requests or unmounting.
+			if ( this.suggestionsRequest !== request ) {
+				return;
+			}
 
-					if ( !! posts.length ) {
-						this.props.debouncedSpeak( sprintf( _n(
-							'%d result found, use up and down arrow keys to navigate.',
-							'%d results found, use up and down arrow keys to navigate.',
-							posts.length
-						), posts.length ), 'assertive' );
-					} else {
-						this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
-					}
-				},
-				( xhr ) => {
-					if ( xhr.statusText === 'abort' ) {
-						return;
-					}
-					this.setState( {
-						loading: false,
-					} );
-				}
-			);
+			this.setState( {
+				posts,
+				loading: false,
+			} );
+
+			if ( !! posts.length ) {
+				this.props.debouncedSpeak( sprintf( _n(
+					'%d result found, use up and down arrow keys to navigate.',
+					'%d results found, use up and down arrow keys to navigate.',
+					posts.length
+				), posts.length ), 'assertive' );
+			} else {
+				this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
+			}
+		} ).catch( () => {
+			if ( this.suggestionsRequest === request ) {
+				this.setState( {
+					loading: false,
+				} );
+			}
+		} );
+
+		this.suggestionsRequest = request;
 	}
 
 	onChange( event ) {
@@ -156,28 +180,6 @@ class URLInput extends Component {
 			selectedSuggestion: null,
 			showSuggestions: false,
 		} );
-	}
-
-	componentWillUnmount() {
-		if ( this.suggestionsRequest ) {
-			this.suggestionsRequest.abort();
-		}
-	}
-
-	componentDidUpdate() {
-		const { showSuggestions, selectedSuggestion } = this.state;
-		// only have to worry about scrolling selected suggestion into view
-		// when already expanded
-		if ( showSuggestions && selectedSuggestion !== null && ! this.scrollingIntoView ) {
-			this.scrollingIntoView = true;
-			scrollIntoView( this.suggestionNodes[ selectedSuggestion ], this.listNode, {
-				onlyScrollIfNeeded: true,
-			} );
-
-			setTimeout( () => {
-				this.scrollingIntoView = false;
-			}, 100 );
-		}
 	}
 
 	render() {
