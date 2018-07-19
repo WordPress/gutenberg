@@ -21,5 +21,8 @@
 	"react-native": "src/index",
 	"publishConfig": {
 		"access": "public"
+	},
+	"dependencies": {
+		"@babel/runtime": "^7.0.0-beta.52"
 	}
 }

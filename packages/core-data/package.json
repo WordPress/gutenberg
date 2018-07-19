@@ -20,6 +20,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
+		"@babel/runtime": "^7.0.0-beta.52",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/data": "file:../data",
 		"lodash": "^4.17.10",
