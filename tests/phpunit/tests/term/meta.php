@@ -6,6 +6,13 @@
  * @ticket 10142
  */
 class Tests_Term_Meta extends WP_UnitTestCase {
+
+	private $last_register_meta_call = array(
+		'object_type' => '',
+		'meta_key'    => '',
+		'args'        => array(),
+	);
+
 	public function setUp() {
 		parent::setUp();
 		register_taxonomy( 'wptests_tax', 'post' );
@@ -440,5 +447,66 @@ class Tests_Term_Meta extends WP_UnitTestCase {
 
 	public static function set_cache_results( $q ) {
 		$q->set( 'cache_results', true );
+	}
+
+	/**
+	 * @ticket 38323
+	 * @dataProvider data_register_term_meta
+	 */
+	public function test_register_term_meta( $taxonomy, $meta_key, $args ) {
+		add_filter( 'register_meta_args', array( $this, 'filter_register_meta_args_set_last_register_meta_call' ), 10, 4 );
+
+		register_term_meta( $taxonomy, $meta_key, $args );
+
+		$args['object_subtype'] = $taxonomy;
+
+		// Reset global so subsequent data tests do not get polluted.
+		$GLOBALS['wp_meta_keys'] = array();
+
+		$this->assertEquals( 'term', $this->last_register_meta_call['object_type'] );
+		$this->assertEquals( $meta_key, $this->last_register_meta_call['meta_key'] );
+		$this->assertEquals( $args, $this->last_register_meta_call['args'] );
+	}
+
+	public function data_register_term_meta() {
+		return array(
+			array( 'wptests_tax', 'registered_key1', array( 'single' => true ) ),
+			array( 'category', 'registered_key2', array() ),
+			array( '', 'registered_key3', array( 'sanitize_callback' => 'absint' ) ),
+		);
+	}
+
+	public function filter_register_meta_args_set_last_register_meta_call( $args, $defaults, $object_type, $meta_key ) {
+		$this->last_register_meta_call['object_type'] = $object_type;
+		$this->last_register_meta_call['meta_key']    = $meta_key;
+		$this->last_register_meta_call['args']        = $args;
+
+		return $args;
+	}
+
+	/**
+	 * @ticket 38323
+	 * @dataProvider data_unregister_term_meta
+	 */
+	public function test_unregister_term_meta( $taxonomy, $meta_key ) {
+		global $wp_meta_keys;
+
+		register_term_meta( $taxonomy, $meta_key, array() );
+		unregister_term_meta( $taxonomy, $meta_key );
+
+		$actual = $wp_meta_keys;
+
+		// Reset global so subsequent data tests do not get polluted.
+		$wp_meta_keys = array();
+
+		$this->assertEmpty( $actual );
+	}
+
+	public function data_unregister_term_meta() {
+		return array(
+			array( 'wptests_tax', 'registered_key1' ),
+			array( 'category', 'registered_key2' ),
+			array( '', 'registered_key3' ),
+		);
 	}
 }

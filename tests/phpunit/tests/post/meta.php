@@ -5,6 +5,13 @@
  * @group meta
  */
 class Tests_Post_Meta extends WP_UnitTestCase {
+
+	private $last_register_meta_call = array(
+		'object_type' => '',
+		'meta_key'    => '',
+		'args'        => array(),
+	);
+
 	function setUp() {
 		parent::setUp();
 
@@ -237,4 +244,65 @@ class Tests_Post_Meta extends WP_UnitTestCase {
 		$this->assertEquals($funky_meta, get_post_meta($this->post_id, 'test_funky_post_meta', true));
 
 	}
+
+	/**
+	 * @ticket 38323
+	 * @dataProvider data_register_post_meta
+	 */
+	public function test_register_post_meta( $post_type, $meta_key, $args ) {
+		add_filter( 'register_meta_args', array( $this, 'filter_register_meta_args_set_last_register_meta_call' ), 10, 4 );
+
+		register_post_meta( $post_type, $meta_key, $args );
+
+		$args['object_subtype'] = $post_type;
+
+		// Reset global so subsequent data tests do not get polluted.
+		$GLOBALS['wp_meta_keys'] = array();
+
+		$this->assertEquals( 'post', $this->last_register_meta_call['object_type'] );
+		$this->assertEquals( $meta_key, $this->last_register_meta_call['meta_key'] );
+		$this->assertEquals( $args, $this->last_register_meta_call['args'] );
+	}
+
+	public function data_register_post_meta() {
+		return array(
+			array( 'post', 'registered_key1', array( 'single' => true ) ),
+			array( 'page', 'registered_key2', array() ),
+			array( '', 'registered_key3', array( 'sanitize_callback' => 'absint' ) ),
+		);
+	}
+
+	public function filter_register_meta_args_set_last_register_meta_call( $args, $defaults, $object_type, $meta_key ) {
+		$this->last_register_meta_call['object_type'] = $object_type;
+		$this->last_register_meta_call['meta_key']    = $meta_key;
+		$this->last_register_meta_call['args']        = $args;
+
+		return $args;
+	}
+
+	/**
+	 * @ticket 38323
+	 * @dataProvider data_unregister_post_meta
+	 */
+	public function test_unregister_post_meta( $post_type, $meta_key ) {
+		global $wp_meta_keys;
+
+		register_post_meta( $post_type, $meta_key, array() );
+		unregister_post_meta( $post_type, $meta_key );
+
+		$actual = $wp_meta_keys;
+
+		// Reset global so subsequent data tests do not get polluted.
+		$wp_meta_keys = array();
+
+		$this->assertEmpty( $actual );
+	}
+
+	public function data_unregister_post_meta() {
+		return array(
+			array( 'post', 'registered_key1' ),
+			array( 'page', 'registered_key2' ),
+			array( '', 'registered_key3' ),
+		);
+  	}
 }
