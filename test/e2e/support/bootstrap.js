@@ -3,10 +3,15 @@
  */
 import puppeteer from 'puppeteer';
 
-const { PUPPETEER_HEADLESS, PUPPETEER_SLOWMO } = process.env;
+/**
+ * Node dependencies
+ */
+import { visitAdmin } from './utils';
+
+const { PUPPETEER_HEADLESS, PUPPETEER_SLOWMO, PUPPETEER_TIMEOUT } = process.env;
 
 // The Jest timeout is increased because these tests are a bit slow
-jest.setTimeout( 100000 );
+jest.setTimeout( PUPPETEER_TIMEOUT || 100000 );
 
 beforeAll( async () => {
 	global.browser = await puppeteer.launch( {
@@ -16,5 +21,20 @@ beforeAll( async () => {
 } );
 
 afterAll( async () => {
+	page.on( 'dialog', ( dialog ) => {
+		dialog.accept();
+	} );
+
+	await visitAdmin( 'edit.php' );
+
+	const bulkSelector = await page.$( '#bulk-action-selector-top' );
+	if ( bulkSelector ) {
+		await page.waitForSelector( '#cb-select-all-1' );
+		await page.click( '#cb-select-all-1' );
+		await page.select( '#bulk-action-selector-top', 'trash' );
+		await page.click( '#doaction' );
+		await page.waitForNavigation();
+	}
+
 	await browser.close();
 } );
