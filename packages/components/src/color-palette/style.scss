@@ -118,7 +118,6 @@ $color-palette-circle-spacing: 14px;
 }
 
 .components-color-palette__custom-color .components-color-palette__custom-color-gradient:before {
-	box-sizing: border-box;
 	content: '';
 	filter: blur( 6px ) saturate( 0.7 ) brightness( 1.1 );
 	display: block;
