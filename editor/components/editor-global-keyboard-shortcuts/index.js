@@ -24,9 +24,9 @@ class EditorGlobalKeyboardShortcuts extends Component {
 	}
 
 	selectAll( event ) {
-		const { uids, onMultiSelect } = this.props;
+		const { clientIds, onMultiSelect } = this.props;
 		event.preventDefault();
-		onMultiSelect( first( uids ), last( uids ) );
+		onMultiSelect( first( clientIds ), last( clientIds ) );
 	}
 
 	undoOrRedo( event ) {
@@ -47,11 +47,11 @@ class EditorGlobalKeyboardShortcuts extends Component {
 	}
 
 	deleteSelectedBlocks( event ) {
-		const { multiSelectedBlockUids, onRemove, isLocked } = this.props;
-		if ( multiSelectedBlockUids.length ) {
+		const { multiSelectedBlockClientIds, onRemove, isLocked } = this.props;
+		if ( multiSelectedBlockClientIds.length ) {
 			event.preventDefault();
 			if ( ! isLocked ) {
-				onRemove( multiSelectedBlockUids );
+				onRemove( multiSelectedBlockClientIds );
 			}
 		}
 	}
@@ -95,19 +95,22 @@ export default compose( [
 	withSelect( ( select ) => {
 		const {
 			getBlockOrder,
-			getMultiSelectedBlockUids,
+			getMultiSelectedBlockClientIds,
 			hasMultiSelection,
 			isEditedPostDirty,
-			getBlockRootUID,
+			getBlockRootClientId,
 			getTemplateLock,
 		} = select( 'core/editor' );
-		const multiSelectedBlockUids = getMultiSelectedBlockUids();
+		const multiSelectedBlockClientIds = getMultiSelectedBlockClientIds();
 
 		return {
-			uids: getBlockOrder(),
-			multiSelectedBlockUids,
+			clientIds: getBlockOrder(),
+			multiSelectedBlockClientIds,
 			hasMultiSelection: hasMultiSelection(),
-			isLocked: some( multiSelectedBlockUids, ( uid ) => !! getTemplateLock( getBlockRootUID( uid ) ) ),
+			isLocked: some(
+				multiSelectedBlockClientIds,
+				( clientId ) => !! getTemplateLock( getBlockRootClientId( clientId ) )
+			),
 			isDirty: isEditedPostDirty(),
 		};
 	} ),

@@ -36,24 +36,32 @@ export function BlockDuplicateButton( { blocks, onDuplicate, onClick = noop, isL
 }
 
 export default compose(
-	withSelect( ( select, { uids, rootUID } ) => {
-		const { getBlocksByUID, getBlockIndex, getTemplateLock } = select( 'core/editor' );
+	withSelect( ( select, { clientIds, rootClientId } ) => {
+		const {
+			getBlocksByClientId,
+			getBlockIndex,
+			getTemplateLock,
+		} = select( 'core/editor' );
+
 		return {
-			blocks: getBlocksByUID( uids ),
-			index: getBlockIndex( last( castArray( uids ) ), rootUID ),
-			isLocked: !! getTemplateLock( rootUID ),
+			blocks: getBlocksByClientId( clientIds ),
+			index: getBlockIndex( last( castArray( clientIds ) ), rootClientId ),
+			isLocked: !! getTemplateLock( rootClientId ),
 		};
 	} ),
-	withDispatch( ( dispatch, { blocks, index, rootUID } ) => ( {
+	withDispatch( ( dispatch, { blocks, index, rootClientId } ) => ( {
 		onDuplicate() {
 			const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
 			dispatch( 'core/editor' ).insertBlocks(
 				clonedBlocks,
 				index + 1,
-				rootUID
+				rootClientId
 			);
 			if ( clonedBlocks.length > 1 ) {
-				dispatch( 'core/editor' ).multiSelect( first( clonedBlocks ).uid, last( clonedBlocks ).uid );
+				dispatch( 'core/editor' ).multiSelect(
+					first( clonedBlocks ).clientId,
+					last( clonedBlocks ).clientId
+				);
 			}
 		},
 	} ) ),

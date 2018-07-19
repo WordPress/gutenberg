@@ -76,7 +76,7 @@ describe( 'block factory', () => {
 			expect( block.isValid ).toBe( true );
 			expect( block.innerBlocks ).toHaveLength( 1 );
 			expect( block.innerBlocks[ 0 ].name ).toBe( 'core/test-block' );
-			expect( typeof block.uid ).toBe( 'string' );
+			expect( typeof block.clientId ).toBe( 'string' );
 		} );
 	} );
 
@@ -114,8 +114,8 @@ describe( 'block factory', () => {
 				isDifferent: true,
 			} );
 			expect( clonedBlock.innerBlocks ).toHaveLength( 1 );
-			expect( typeof clonedBlock.uid ).toBe( 'string' );
-			expect( clonedBlock.uid ).not.toBe( block.uid );
+			expect( typeof clonedBlock.clientId ).toBe( 'string' );
+			expect( clonedBlock.clientId ).not.toBe( block.clientId );
 		} );
 
 		it( 'should replace inner blocks of the existing block', () => {
@@ -181,10 +181,10 @@ describe( 'block factory', () => {
 			const clonedBlock = cloneBlock( block );
 
 			expect( clonedBlock.innerBlocks ).toHaveLength( 2 );
-			expect( clonedBlock.innerBlocks[ 0 ].uid ).not.toBe( block.innerBlocks[ 0 ].uid );
+			expect( clonedBlock.innerBlocks[ 0 ].clientId ).not.toBe( block.innerBlocks[ 0 ].clientId );
 			expect( clonedBlock.innerBlocks[ 0 ].attributes ).not.toBe( block.innerBlocks[ 0 ].attributes );
 			expect( clonedBlock.innerBlocks[ 0 ].attributes ).toEqual( block.innerBlocks[ 0 ].attributes );
-			expect( clonedBlock.innerBlocks[ 1 ].uid ).not.toBe( block.innerBlocks[ 1 ].uid );
+			expect( clonedBlock.innerBlocks[ 1 ].clientId ).not.toBe( block.innerBlocks[ 1 ].clientId );
 			expect( clonedBlock.innerBlocks[ 1 ].attributes ).not.toBe( block.innerBlocks[ 1 ].attributes );
 			expect( clonedBlock.innerBlocks[ 1 ].attributes ).toEqual( block.innerBlocks[ 1 ].attributes );
 		} );
@@ -731,7 +731,7 @@ describe( 'block factory', () => {
 			const transformedBlocks = switchToBlockType( block, 'core/updated-text-block' );
 
 			expect( transformedBlocks ).toHaveLength( 1 );
-			expect( transformedBlocks[ 0 ] ).toHaveProperty( 'uid' );
+			expect( transformedBlocks[ 0 ] ).toHaveProperty( 'clientId' );
 			expect( transformedBlocks[ 0 ].name ).toBe( 'core/updated-text-block' );
 			expect( transformedBlocks[ 0 ].isValid ).toBe( true );
 			expect( transformedBlocks[ 0 ].attributes ).toEqual( {
@@ -770,7 +770,7 @@ describe( 'block factory', () => {
 			const transformedBlocks = switchToBlockType( block, 'core/updated-text-block' );
 
 			expect( transformedBlocks ).toHaveLength( 1 );
-			expect( transformedBlocks[ 0 ] ).toHaveProperty( 'uid' );
+			expect( transformedBlocks[ 0 ] ).toHaveProperty( 'clientId' );
 			expect( transformedBlocks[ 0 ].name ).toBe( 'core/updated-text-block' );
 			expect( transformedBlocks[ 0 ].isValid ).toBe( true );
 			expect( transformedBlocks[ 0 ].attributes ).toEqual( {
@@ -1028,15 +1028,15 @@ describe( 'block factory', () => {
 			// transformed block whose type matches the "destination" type gets
 			// to keep the existing block's UID.
 			expect( transformedBlocks ).toHaveLength( 2 );
-			expect( transformedBlocks[ 0 ] ).toHaveProperty( 'uid' );
-			expect( transformedBlocks[ 0 ].uid ).not.toBe( block.uid );
+			expect( transformedBlocks[ 0 ] ).toHaveProperty( 'clientId' );
+			expect( transformedBlocks[ 0 ].clientId ).not.toBe( block.clientId );
 			expect( transformedBlocks[ 0 ].name ).toBe( 'core/text-block' );
 			expect( transformedBlocks[ 0 ].isValid ).toBe( true );
 			expect( transformedBlocks[ 0 ].attributes ).toEqual( {
 				value: 'chicken ribs',
 			} );
-			expect( transformedBlocks[ 1 ].uid ).toBe( block.uid );
-			expect( transformedBlocks[ 1 ] ).toHaveProperty( 'uid' );
+			expect( transformedBlocks[ 1 ].clientId ).toBe( block.clientId );
+			expect( transformedBlocks[ 1 ] ).toHaveProperty( 'clientId' );
 			expect( transformedBlocks[ 1 ].name ).toBe( 'core/updated-text-block' );
 			expect( transformedBlocks[ 1 ].isValid ).toBe( true );
 			expect( transformedBlocks[ 1 ].attributes ).toEqual( {

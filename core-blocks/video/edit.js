@@ -32,12 +32,26 @@ class VideoEdit extends Component {
 		};
 
 		this.toggleAttribute = this.toggleAttribute.bind( this );
+		this.onSelectURL = this.onSelectURL.bind( this );
 	}
 
 	toggleAttribute( attribute ) {
 		return ( newValue ) => {
 			this.props.setAttributes( { [ attribute ]: newValue } );
 		};
+	}
+
+	onSelectURL( newSrc ) {
+		const { attributes, setAttributes } = this.props;
+		const { src } = attributes;
+
+		// Set the block's src from the edit component's state, and switch off
+		// the editing UI.
+		if ( newSrc !== src ) {
+			setAttributes( { src: newSrc, id: undefined } );
+		}
+
+		this.setState( { editing: false } );
 	}
 
 	render() {
@@ -60,13 +74,6 @@ class VideoEdit extends Component {
 			setAttributes( { src: media.url, id: media.id } );
 			this.setState( { src: media.url, editing: false } );
 		};
-		const onSelectUrl = ( newSrc ) => {
-			// set the block's src from the edit component's state, and switch off the editing UI
-			if ( newSrc !== src ) {
-				setAttributes( { src: newSrc, id: undefined } );
-			}
-			this.setState( { editing: false } );
-		};
 
 		if ( editing ) {
 			return (
@@ -78,7 +85,7 @@ class VideoEdit extends Component {
 					} }
 					className={ className }
 					onSelect={ onSelectVideo }
-					onSelectUrl={ onSelectUrl }
+					onSelectURL={ this.onSelectURL }
 					accept="video/*"
 					type="video"
 					value={ this.props.attributes }

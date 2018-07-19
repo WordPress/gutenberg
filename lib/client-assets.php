@@ -115,26 +115,33 @@ function gutenberg_register_scripts_and_styles() {
 	);
 
 	// Editor Scripts.
-	wp_deregister_script( 'wp-api-request' );
 	wp_register_script(
-		'wp-api-request',
-		gutenberg_url( 'build/api-request/index.js' ),
-		array(),
-		filemtime( gutenberg_dir_path() . 'build/api-request/index.js' ),
+		'wp-api-fetch',
+		gutenberg_url( 'build/api-fetch/index.js' ),
+		array( 'wp-i18n' ),
+		filemtime( gutenberg_dir_path() . 'build/api-fetch/index.js' ),
 		true
 	);
 	wp_add_inline_script(
-		'wp-api-request',
+		'wp-api-fetch',
+		gutenberg_get_script_polyfill( array(
+			'\'Promise\' in window' => 'wp-polyfill-promise',
+			'\'fetch\' in window'   => 'wp-polyfill-fetch',
+		) ),
+		'before'
+	);
+	wp_add_inline_script(
+		'wp-api-fetch',
 		sprintf(
-			'wp.apiRequest.use( wp.apiRequest.createNonceMiddleware( "%s" ) );',
+			'wp.apiFetch.use( wp.apiFetch.createNonceMiddleware( "%s" ) );',
 			( wp_installing() && ! is_multisite() ) ? '' : wp_create_nonce( 'wp_rest' )
 		),
 		'after'
 	);
 	wp_add_inline_script(
-		'wp-api-request',
+		'wp-api-fetch',
 		sprintf(
-			'wp.apiRequest.use( wp.apiRequest.createRootURLMiddleware( "%s" ) );',
+			'wp.apiFetch.use( wp.apiFetch.createRootURLMiddleware( "%s" ) );',
 			esc_url_raw( get_rest_url() )
 		),
 		'after'
@@ -169,6 +176,13 @@ function gutenberg_register_scripts_and_styles() {
 		true
 	);
 	wp_register_script(
+		'wp-html-entities',
+		gutenberg_url( 'build/html-entities/index.js' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'build/html-entities/index.js' ),
+		true
+	);
+	wp_register_script(
 		'wp-data',
 		gutenberg_url( 'build/data/index.js' ),
 		array( 'wp-deprecated', 'wp-element', 'wp-compose', 'wp-is-shallow-equal', 'lodash' ),
@@ -178,7 +192,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-core-data',
 		gutenberg_url( 'build/core-data/index.js' ),
-		array( 'wp-data', 'wp-api-request', 'lodash' ),
+		array( 'wp-data', 'wp-api-fetch', 'lodash' ),
 		filemtime( gutenberg_dir_path() . 'build/core-data/index.js' ),
 		true
 	);
@@ -187,6 +201,13 @@ function gutenberg_register_scripts_and_styles() {
 		gutenberg_url( 'build/dom/index.js' ),
 		array( 'wp-tinymce', 'lodash' ),
 		filemtime( gutenberg_dir_path() . 'build/dom/index.js' ),
+		true
+	);
+	wp_register_script(
+		'wp-block-serialization-spec-parser',
+		gutenberg_url( 'build/block-serialization-spec-parser/index.js' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'build/block-serialization-spec-parser/index.js' ),
 		true
 	);
 	wp_add_inline_script(
@@ -199,7 +220,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-utils',
 		gutenberg_url( 'build/utils/index.js' ),
-		array( 'lodash', 'wp-blob', 'wp-deprecated', 'wp-api-request', 'wp-i18n', 'wp-keycodes' ),
+		array( 'lodash', 'wp-api-fetch', 'wp-deprecated', 'wp-html-entities', 'wp-i18n', 'wp-keycodes' ),
 		filemtime( gutenberg_dir_path() . 'build/utils/index.js' ),
 		true
 	);
@@ -248,7 +269,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-element',
 		gutenberg_url( 'build/element/index.js' ),
-		array( 'react', 'react-dom', 'wp-utils', 'wp-is-shallow-equal', 'lodash' ),
+		array( 'react', 'react-dom', 'wp-is-shallow-equal', 'lodash', 'wp-deprecated' ),
 		filemtime( gutenberg_dir_path() . 'build/element/index.js' ),
 		true
 	);
@@ -259,15 +280,16 @@ function gutenberg_register_scripts_and_styles() {
 			'lodash',
 			'moment',
 			'wp-a11y',
-			'wp-api-request',
+			'wp-api-fetch',
 			'wp-compose',
+			'wp-deprecated',
 			'wp-dom',
 			'wp-element',
+			'wp-html-entities',
 			'wp-hooks',
 			'wp-i18n',
 			'wp-is-shallow-equal',
 			'wp-keycodes',
-			'wp-utils',
 		),
 		filemtime( gutenberg_dir_path() . 'build/components/index.js' ),
 		true
@@ -275,7 +297,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-blocks',
 		gutenberg_url( 'build/blocks/index.js' ),
-		array( 'wp-blob', 'wp-deprecated', 'wp-dom', 'wp-element', 'wp-hooks', 'wp-i18n', 'wp-shortcode', 'wp-data', 'lodash' ),
+		array( 'wp-blob', 'wp-deprecated', 'wp-dom', 'wp-element', 'wp-hooks', 'wp-i18n', 'wp-shortcode', 'wp-block-serialization-spec-parser', 'wp-data', 'lodash' ),
 		filemtime( gutenberg_dir_path() . 'build/blocks/index.js' ),
 		true
 	);
@@ -283,7 +305,6 @@ function gutenberg_register_scripts_and_styles() {
 		'wp-blocks',
 		gutenberg_get_script_polyfill( array(
 			'\'Promise\' in window' => 'wp-polyfill-promise',
-			'\'fetch\' in window'   => 'wp-polyfill-fetch',
 		) ),
 		'before'
 	);
@@ -307,11 +328,11 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-core-data',
 			'wp-element',
 			'wp-editor',
+			'wp-html-entities',
 			'wp-i18n',
 			'wp-keycodes',
-			'wp-utils',
 			'wp-viewport',
-			'wp-api-request',
+			'wp-api-fetch',
 		),
 		filemtime( gutenberg_dir_path() . 'build/core-blocks/index.js' ),
 		true
@@ -402,7 +423,7 @@ function gutenberg_register_scripts_and_styles() {
 			'postbox',
 			'wp-a11y',
 			'wp-api',
-			'wp-api-request',
+			'wp-api-fetch',
 			'wp-blob',
 			'wp-blocks',
 			'wp-components',
@@ -436,7 +457,7 @@ function gutenberg_register_scripts_and_styles() {
 			'media-models',
 			'media-views',
 			'wp-a11y',
-			'wp-api-request',
+			'wp-api-fetch',
 			'wp-components',
 			'wp-compose',
 			'wp-core-blocks',
@@ -815,11 +836,6 @@ function gutenberg_extend_wp_api_backbone_client() {
 		};
 JS;
 	wp_add_inline_script( 'wp-api', $script );
-	wp_localize_script( 'wp-api', 'wpApiSettings', array(
-		'root'          => esc_url_raw( get_rest_url() ),
-		'nonce'         => ( wp_installing() && ! is_multisite() ) ? '' : wp_create_nonce( 'wp_rest' ),
-		'versionString' => 'wp/v2/',
-	) );
 
 	// Localize the wp-api settings and schema.
 	$schema_response = rest_do_request( new WP_REST_Request( 'GET', '/' ) );
@@ -1096,8 +1112,8 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$post = $backup_global_post;
 
 	wp_add_inline_script(
-		'wp-api-request',
-		sprintf( 'wp.apiRequest.use( wp.apiRequest.createPreloadingMiddleware( %s ) );', wp_json_encode( $preload_data ) ),
+		'wp-api-fetch',
+		sprintf( 'wp.apiFetch.use( wp.apiFetch.createPreloadingMiddleware( %s ) );', wp_json_encode( $preload_data ) ),
 		'after'
 	);
 

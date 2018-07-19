@@ -72,7 +72,7 @@ export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupporte
 
 	// Select the corresponding block in the main editor
 	// when clicking on a heading item from the list.
-	const onSelectHeading = ( uid ) => onSelect( uid );
+	const onSelectHeading = ( clientId ) => onSelect( clientId );
 	const focusTitle = () => {
 		// Not great but it's the simplest way to focus the title right now.
 		const titleNode = document.querySelector( '.editor-post-title__input' );
@@ -115,7 +115,7 @@ export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupporte
 							key={ index }
 							level={ `H${ item.level }` }
 							isValid={ isValid }
-							onClick={ () => onSelectHeading( item.uid ) }
+							onClick={ () => onSelectHeading( item.clientId ) }
 							path={ item.path }
 						>
 							{ item.isEmpty ? emptyHeadingContent : item.attributes.content }

@@ -49,23 +49,23 @@ function InserterWithShortcuts( { items, isLocked, onInsert } ) {
 }
 
 export default compose(
-	withSelect( ( select, { rootUID } ) => {
+	withSelect( ( select, { rootClientId } ) => {
 		const { getInserterItems, getTemplateLock } = select( 'core/editor' );
 		return {
-			items: getInserterItems( rootUID ),
-			isLocked: !! getTemplateLock( rootUID ),
+			items: getInserterItems( rootClientId ),
+			isLocked: !! getTemplateLock( rootClientId ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
-		const { uid, rootUID, layout } = ownProps;
+		const { clientId, rootClientId, layout } = ownProps;
 
 		return {
 			onInsert( { name, initialAttributes } ) {
 				const block = createBlock( name, { ...initialAttributes, layout } );
-				if ( uid ) {
-					dispatch( 'core/editor' ).replaceBlocks( uid, block );
+				if ( clientId ) {
+					dispatch( 'core/editor' ).replaceBlocks( clientId, block );
 				} else {
-					dispatch( 'core/editor' ).insertBlock( block, undefined, rootUID );
+					dispatch( 'core/editor' ).insertBlock( block, undefined, rootClientId );
 				}
 			},
 		};

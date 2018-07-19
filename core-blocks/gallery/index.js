@@ -136,7 +136,7 @@ export const settings = {
 					} );
 					editorMediaUpload( {
 						filesList: files,
-						onFileChange: ( images ) => onChange( block.uid, { images } ),
+						onFileChange: ( images ) => onChange( block.clientId, { images } ),
 						allowedType: 'image',
 					} );
 					return block;

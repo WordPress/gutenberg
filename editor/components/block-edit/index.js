@@ -8,6 +8,7 @@ import { Component } from '@wordpress/element';
  */
 import Edit from './edit';
 import { BlockEditContextProvider } from './context';
+import withDeprecatedUniqueId from '../with-deprecated-unique-id';
 
 class BlockEdit extends Component {
 	constructor( props ) {
@@ -31,12 +32,12 @@ class BlockEdit extends Component {
 	}
 
 	static getDerivedStateFromProps( props ) {
-		const { id, name, isSelected } = props;
+		const { clientId, name, isSelected } = props;
 
 		return {
 			name,
 			isSelected,
-			uid: id,
+			clientId,
 		};
 	}
 
@@ -49,4 +50,4 @@ class BlockEdit extends Component {
 	}
 }
 
-export default BlockEdit;
+export default withDeprecatedUniqueId( BlockEdit );

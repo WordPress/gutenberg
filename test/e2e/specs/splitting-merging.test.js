@@ -12,7 +12,7 @@ import {
 } from '../support/utils';
 
 describe( 'splitting and merging blocks', () => {
-	beforeAll( async () => {
+	beforeEach( async () => {
 		await newDesktopBrowserPage();
 		await newPost();
 	} );
@@ -51,6 +51,22 @@ describe( 'splitting and merging blocks', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'BeforeSecond:' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'Should merge into inline boundary position', async () => {
+		// Regression Test: Caret should reset to end of inline boundary when
+		// backspacing to delete second paragraph.
+		await insertBlock( 'Paragraph' );
+		await pressWithModifier( 'mod', 'b' );
+		await page.keyboard.type( 'Foo' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Backspace' );
+
+		// Replace contents of first paragraph with "Bar".
+		await pressTimes( 'Backspace', 3 );
+		await page.keyboard.type( 'Bar' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

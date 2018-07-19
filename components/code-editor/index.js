@@ -8,8 +8,8 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import CodeEditor from './editor';
-import Placeholder from '../placeholder';
-import Spinner from '../spinner';
+import Placeholder from '../../packages/components/src/placeholder';
+import Spinner from '../../packages/components/src/spinner';
 
 function loadScript() {
 	return new Promise( ( resolve, reject ) => {

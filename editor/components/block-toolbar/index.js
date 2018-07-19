@@ -12,8 +12,8 @@ import MultiBlocksSwitcher from '../block-switcher/multi-blocks-switcher';
 import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
 
-function BlockToolbar( { blockUIDs, isValid, mode } ) {
-	if ( blockUIDs.length > 1 ) {
+function BlockToolbar( { blockClientIds, isValid, mode } ) {
+	if ( blockClientIds.length > 1 ) {
 		return (
 			<div className="editor-block-toolbar">
 				<MultiBlocksSwitcher />
@@ -27,7 +27,7 @@ function BlockToolbar( { blockUIDs, isValid, mode } ) {
 
 	return (
 		<div className="editor-block-toolbar">
-			<BlockSwitcher uids={ blockUIDs } />
+			<BlockSwitcher clientIds={ blockClientIds } />
 			<BlockControls.Slot />
 			<BlockFormatControls.Slot />
 		</div>
@@ -35,13 +35,19 @@ function BlockToolbar( { blockUIDs, isValid, mode } ) {
 }
 
 export default withSelect( ( select ) => {
-	const { getSelectedBlock, getBlockMode, getMultiSelectedBlockUids } = select( 'core/editor' );
+	const {
+		getSelectedBlock,
+		getBlockMode,
+		getMultiSelectedBlockClientIds,
+	} = select( 'core/editor' );
 	const block = getSelectedBlock();
-	const blockUIDs = block ? [ block.uid ] : getMultiSelectedBlockUids();
+	const blockClientIds = block ?
+		[ block.clientId ] :
+		getMultiSelectedBlockClientIds();
 
 	return {
-		blockUIDs,
+		blockClientIds,
 		isValid: block ? block.isValid : null,
-		mode: block ? getBlockMode( block.uid ) : null,
+		mode: block ? getBlockMode( block.clientId ) : null,
 	};
 } )( BlockToolbar );

@@ -27,14 +27,14 @@ function ChildBlocks( { rootBlockIcon, rootBlockTitle, items, ...props } ) {
 
 export default compose(
 	ifCondition( ( { items } ) => items && items.length > 0 ),
-	withSelect( ( select, { rootUID } ) => {
+	withSelect( ( select, { rootClientId } ) => {
 		const {
 			getBlockType,
 		} = select( 'core/blocks' );
 		const {
 			getBlockName,
 		} = select( 'core/editor' );
-		const rootBlockName = getBlockName( rootUID );
+		const rootBlockName = getBlockName( rootClientId );
 		const rootBlockType = getBlockType( rootBlockName );
 		return {
 			rootBlockTitle: rootBlockType && rootBlockType.title,

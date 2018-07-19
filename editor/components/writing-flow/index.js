@@ -32,6 +32,12 @@ import {
 } from '../../utils/dom';
 
 /**
+ * Browser constants
+ */
+
+const { getSelection } = window;
+
+/**
  * Given an element, returns true if the element is a tabbable text field, or
  * false otherwise.
  *
@@ -147,26 +153,31 @@ class WritingFlow extends Component {
 
 	expandSelection( isReverse ) {
 		const {
-			selectedBlockUID,
-			selectionStartUID,
-			selectionBeforeEndUID,
-			selectionAfterEndUID,
+			selectedBlockClientId,
+			selectionStartClientId,
+			selectionBeforeEndClientId,
+			selectionAfterEndClientId,
 		} = this.props;
 
-		const nextSelectionEndUID = isReverse ? selectionBeforeEndUID : selectionAfterEndUID;
+		const nextSelectionEndClientId = isReverse ?
+			selectionBeforeEndClientId :
+			selectionAfterEndClientId;
 
-		if ( nextSelectionEndUID ) {
-			this.props.onMultiSelect( selectionStartUID || selectedBlockUID, nextSelectionEndUID );
+		if ( nextSelectionEndClientId ) {
+			this.props.onMultiSelect(
+				selectionStartClientId || selectedBlockClientId,
+				nextSelectionEndClientId
+			);
 		}
 	}
 
 	moveSelection( isReverse ) {
-		const { selectedFirstUid, selectedLastUid } = this.props;
+		const { selectedFirstClientId, selectedLastClientId } = this.props;
 
-		const focusedBlockUid = isReverse ? selectedFirstUid : selectedLastUid;
+		const focusedBlockClientId = isReverse ? selectedFirstClientId : selectedLastClientId;
 
-		if ( focusedBlockUid ) {
-			this.props.onSelectBlock( focusedBlockUid );
+		if ( focusedBlockClientId ) {
+			this.props.onSelectBlock( focusedBlockClientId );
 		}
 	}
 
@@ -241,7 +252,7 @@ class WritingFlow extends Component {
 
 		if ( isShift && ( hasMultiSelection || (
 			this.isTabbableEdge( target, isReverse ) &&
-			isNavEdge( target, isReverse, true )
+			isNavEdge( target, isReverse )
 		) ) ) {
 			// Shift key is down, and there is multi selection or we're at the end of the current block.
 			this.expandSelection( isReverse );
@@ -250,14 +261,14 @@ class WritingFlow extends Component {
 			// Moving from block multi-selection to single block selection
 			this.moveSelection( isReverse );
 			event.preventDefault();
-		} else if ( isVertical && isVerticalEdge( target, isReverse, isShift ) ) {
+		} else if ( isVertical && isVerticalEdge( target, isReverse ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 
 			if ( closestTabbable ) {
 				placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
 				event.preventDefault();
 			}
-		} else if ( isHorizontal && isHorizontalEdge( target, isReverse, isShift ) ) {
+		} else if ( isHorizontal && getSelection().isCollapsed && isHorizontalEdge( target, isReverse ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtHorizontalEdge( closestTabbable, isReverse );
 			event.preventDefault();
@@ -305,28 +316,28 @@ class WritingFlow extends Component {
 export default compose( [
 	withSelect( ( select ) => {
 		const {
-			getSelectedBlockUID,
-			getMultiSelectedBlocksStartUid,
-			getMultiSelectedBlocksEndUid,
-			getPreviousBlockUid,
-			getNextBlockUid,
-			getFirstMultiSelectedBlockUid,
-			getLastMultiSelectedBlockUid,
+			getSelectedBlockClientId,
+			getMultiSelectedBlocksStartClientId,
+			getMultiSelectedBlocksEndClientId,
+			getPreviousBlockClientId,
+			getNextBlockClientId,
+			getFirstMultiSelectedBlockClientId,
+			getLastMultiSelectedBlockClientId,
 			hasMultiSelection,
 			getBlockOrder,
 		} = select( 'core/editor' );
 
-		const selectedBlockUID = getSelectedBlockUID();
-		const selectionStartUID = getMultiSelectedBlocksStartUid();
-		const selectionEndUID = getMultiSelectedBlocksEndUid();
+		const selectedBlockClientId = getSelectedBlockClientId();
+		const selectionStartClientId = getMultiSelectedBlocksStartClientId();
+		const selectionEndClientId = getMultiSelectedBlocksEndClientId();
 
 		return {
-			selectedBlockUID,
-			selectionStartUID,
-			selectionBeforeEndUID: getPreviousBlockUid( selectionEndUID || selectedBlockUID ),
-			selectionAfterEndUID: getNextBlockUid( selectionEndUID || selectedBlockUID ),
-			selectedFirstUid: getFirstMultiSelectedBlockUid(),
-			selectedLastUid: getLastMultiSelectedBlockUid(),
+			selectedBlockClientId,
+			selectionStartClientId,
+			selectionBeforeEndClientId: getPreviousBlockClientId( selectionEndClientId || selectedBlockClientId ),
+			selectionAfterEndClientId: getNextBlockClientId( selectionEndClientId || selectedBlockClientId ),
+			selectedFirstClientId: getFirstMultiSelectedBlockClientId(),
+			selectedLastClientId: getLastMultiSelectedBlockClientId(),
 			hasMultiSelection: hasMultiSelection(),
 			blocks: getBlockOrder(),
 		};

@@ -22,14 +22,7 @@ function render_block_core_block( $attributes ) {
 		return '';
 	}
 
-	$blocks = gutenberg_parse_blocks( $shared_block->post_content );
-
-	$block = array_shift( $blocks );
-	if ( ! $block ) {
-		return '';
-	}
-
-	return gutenberg_render_block( $block );
+	return do_blocks( $shared_block->post_content );
 }
 
 register_block_type( 'core/block', array(

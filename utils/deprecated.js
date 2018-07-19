@@ -1,13 +1,14 @@
 /**
- * WordPress dependencies
- */
-import * as keycodesSource from '@wordpress/keycodes';
-import deprecated from '@wordpress/deprecated';
-
-/**
  * External dependencies
  */
 import { groupBy } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import * as keycodesSource from '@wordpress/keycodes';
+import { decodeEntities as decodeEntitiesSource } from '@wordpress/html-entities';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Returns terms in a tree form.
@@ -35,6 +36,16 @@ export function buildTermsTree( flatTerms ) {
 	};
 
 	return fillWithChildren( termsByParent[ '0' ] || [] );
+}
+
+// entities
+export function decodeEntities( html ) {
+	deprecated( 'wp.utils.decodeEntities', {
+		version: '3.5',
+		alternative: 'wp.htmlEntities.decodeEntities',
+		plugin: 'Gutenberg',
+	} );
+	return decodeEntitiesSource( html );
 }
 
 // keycodes

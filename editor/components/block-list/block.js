@@ -3,7 +3,6 @@
  */
 import classnames from 'classnames';
 import { get, reduce, size, castArray, first, last } from 'lodash';
-import tinymce from 'tinymce';
 
 /**
  * WordPress dependencies
@@ -107,7 +106,7 @@ export class BlockListBlock extends Component {
 
 		this.wrapperNode = node;
 
-		this.props.blockRef( node, this.props.uid );
+		this.props.blockRef( node, this.props.clientId );
 	}
 
 	bindBlockNode( node ) {
@@ -149,24 +148,15 @@ export class BlockListBlock extends Component {
 
 		// In reverse case, need to explicitly place caret position.
 		if ( isReverse ) {
-			// Special case RichText component because the placeCaret utilities
-			// aren't working correctly. When merging two paragraph blocks, the
-			// focus is not moved to the correct position.
-			const editor = tinymce.get( target.getAttribute( 'id' ) );
-			if ( editor ) {
-				editor.selection.select( editor.getBody(), true );
-				editor.selection.collapse( false );
-			} else {
-				placeCaretAtHorizontalEdge( target, true );
-				placeCaretAtVerticalEdge( target, true );
-			}
+			placeCaretAtHorizontalEdge( target, true );
+			placeCaretAtVerticalEdge( target, true );
 		}
 	}
 
 	setAttributes( attributes ) {
 		const { block, onChange } = this.props;
 		const type = getBlockType( block.name );
-		onChange( block.uid, attributes );
+		onChange( block.clientId, attributes );
 
 		const metaAttributes = reduce( attributes, ( result, value, key ) => {
 			if ( get( type, [ 'attributes', key, 'source' ] ) === 'meta' ) {
@@ -229,20 +219,20 @@ export class BlockListBlock extends Component {
 	}
 
 	mergeBlocks( forward = false ) {
-		const { block, previousBlockUid, nextBlockUid, onMerge } = this.props;
+		const { block, previousBlockClientId, nextBlockClientId, onMerge } = this.props;
 
 		// Do nothing when it's the first block.
 		if (
-			( ! forward && ! previousBlockUid ) ||
-			( forward && ! nextBlockUid )
+			( ! forward && ! previousBlockClientId ) ||
+			( forward && ! nextBlockClientId )
 		) {
 			return;
 		}
 
 		if ( forward ) {
-			onMerge( block.uid, nextBlockUid );
+			onMerge( block.clientId, nextBlockClientId );
 		} else {
-			onMerge( previousBlockUid, block.uid );
+			onMerge( previousBlockClientId, block.clientId );
 		}
 	}
 
@@ -291,11 +281,11 @@ export class BlockListBlock extends Component {
 
 		if ( event.shiftKey ) {
 			if ( ! this.props.isSelected ) {
-				this.props.onShiftSelection( this.props.uid );
+				this.props.onShiftSelection( this.props.clientId );
 				event.preventDefault();
 			}
 		} else {
-			this.props.onSelectionStart( this.props.uid );
+			this.props.onSelectionStart( this.props.clientId );
 
 			// Allow user to escape out of a multi-selection to a singular
 			// selection of a block via click. This is handled here since
@@ -334,11 +324,11 @@ export class BlockListBlock extends Component {
 			case BACKSPACE:
 			case DELETE:
 				// Remove block on backspace.
-				const { uid, onRemove, previousBlockUid, onSelect } = this.props;
-				onRemove( uid );
+				const { clientId, onRemove, previousBlockClientId, onSelect } = this.props;
+				onRemove( clientId );
 
-				if ( previousBlockUid ) {
-					onSelect( previousBlockUid, -1 );
+				if ( previousBlockClientId ) {
+					onSelect( previousBlockClientId, -1 );
 				}
 				event.preventDefault();
 				break;
@@ -372,8 +362,8 @@ export class BlockListBlock extends Component {
 			isLocked,
 			isFirst,
 			isLast,
-			uid,
-			rootUID,
+			clientId,
+			rootClientId,
 			layout,
 			isSelected,
 			isPartOfMultiSelection,
@@ -437,7 +427,7 @@ export class BlockListBlock extends Component {
 				...blockType.getEditWrapperProps( block.attributes ),
 			};
 		}
-		const blockElementId = `block-${ uid }`;
+		const blockElementId = `block-${ clientId }`;
 
 		// Disable reasons:
 		//
@@ -471,9 +461,9 @@ export class BlockListBlock extends Component {
 			>
 				{ ! isPartOfMultiSelection && isMovable && (
 					<BlockDraggable
-						rootUID={ rootUID }
+						rootClientId={ rootClientId }
 						index={ order }
-						uid={ uid }
+						clientId={ clientId }
 						layout={ layout }
 						onDragStart={ this.onDragStart }
 						onDragEnd={ this.onDragEnd }
@@ -483,8 +473,8 @@ export class BlockListBlock extends Component {
 				) }
 				{ shouldShowInsertionPoint && (
 					<BlockInsertionPoint
-						uid={ uid }
-						rootUID={ rootUID }
+						clientId={ clientId }
+						rootClientId={ rootClientId }
 						layout={ layout }
 						canShowInserter={ canShowInBetweenInserter }
 						onInsert={ this.hideHoverEffects }
@@ -492,13 +482,13 @@ export class BlockListBlock extends Component {
 				) }
 				<BlockDropZone
 					index={ order }
-					rootUID={ rootUID }
+					rootClientId={ rootClientId }
 					layout={ layout }
 				/>
 				{ shouldRenderMovers && (
 					<BlockMover
-						uids={ uid }
-						rootUID={ rootUID }
+						clientIds={ clientId }
+						rootClientId={ rootClientId }
 						layout={ layout }
 						isFirst={ isFirst }
 						isLast={ isLast }
@@ -507,20 +497,27 @@ export class BlockListBlock extends Component {
 				) }
 				{ shouldRenderBlockSettings && (
 					<BlockSettingsMenu
-						uids={ uid }
-						rootUID={ rootUID }
+						clientIds={ clientId }
+						rootClientId={ rootClientId }
 						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'right' }
 					/>
 				) }
-				{ shouldShowBreadcrumb && <BlockBreadcrumb uid={ uid } isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' } /> }
+				{ shouldShowBreadcrumb && (
+					<BlockBreadcrumb
+						clientId={ clientId }
+						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }
+					/>
+				) }
 				{ shouldShowContextualToolbar && <BlockContextualToolbar /> }
-				{ isFirstMultiSelected && <BlockMultiControls rootUID={ rootUID } /> }
+				{ isFirstMultiSelected && (
+					<BlockMultiControls rootClientId={ rootClientId } />
+				) }
 				<IgnoreNestedEvents
 					ref={ this.bindBlockNode }
 					onDragStart={ this.preventDrag }
 					onMouseDown={ this.onPointerDown }
 					className="editor-block-list__block-edit"
-					data-block={ uid }
+					data-block={ clientId }
 				>
 					<BlockCrashBoundary onError={ this.onBlockError }>
 						{ isValid && mode === 'visual' && (
@@ -532,14 +529,13 @@ export class BlockListBlock extends Component {
 								insertBlocksAfter={ isLocked ? undefined : this.insertBlocksAfter }
 								onReplace={ isLocked ? undefined : onReplace }
 								mergeBlocks={ isLocked ? undefined : this.mergeBlocks }
-								clientId={ uid }
-								id={ uid }
+								clientId={ clientId }
 								isSelectionEnabled={ this.props.isSelectionEnabled }
 								toggleSelection={ this.props.toggleSelection }
 							/>
 						) }
 						{ isValid && mode === 'html' && (
-							<BlockHtml uid={ uid } />
+							<BlockHtml clientId={ clientId } />
 						) }
 						{ ! isValid && [
 							<div key="invalid-preview">
@@ -553,8 +549,8 @@ export class BlockListBlock extends Component {
 					</BlockCrashBoundary>
 					{ shouldShowMobileToolbar && (
 						<BlockMobileToolbar
-							rootUID={ rootUID }
-							uid={ uid }
+							rootClientId={ rootClientId }
+							clientId={ clientId }
 						/>
 					) }
 				</IgnoreNestedEvents>
@@ -562,7 +558,12 @@ export class BlockListBlock extends Component {
 				{ showEmptyBlockSideInserter && (
 					<Fragment>
 						<div className="editor-block-list__side-inserter">
-							<InserterWithShortcuts uid={ uid } rootUID={ rootUID } layout={ layout } onToggle={ this.selectOnOpen } />
+							<InserterWithShortcuts
+								clientId={ clientId }
+								rootClientId={ rootClientId }
+								layout={ layout }
+								onToggle={ this.selectOnOpen }
+							/>
 						</div>
 						<div className="editor-block-list__empty-block-inserter">
 							<Inserter
@@ -578,11 +579,11 @@ export class BlockListBlock extends Component {
 	}
 }
 
-const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
+const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 	const {
 		isBlockSelected,
-		getPreviousBlockUid,
-		getNextBlockUid,
+		getPreviousBlockClientId,
+		getNextBlockClientId,
 		getBlock,
 		isAncestorMultiSelected,
 		isBlockMultiSelected,
@@ -598,33 +599,33 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 		hasSelectedInnerBlock,
 		getTemplateLock,
 	} = select( 'core/editor' );
-	const isSelected = isBlockSelected( uid );
-	const isParentOfSelectedBlock = hasSelectedInnerBlock( uid );
+	const isSelected = isBlockSelected( clientId );
+	const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId );
 	const { hasFixedToolbar } = getEditorSettings();
-	const block = getBlock( uid );
-	const previousBlockUid = getPreviousBlockUid( uid );
-	const previousBlock = getBlock( previousBlockUid );
-	const templateLock = getTemplateLock( rootUID );
+	const block = getBlock( clientId );
+	const previousBlockClientId = getPreviousBlockClientId( clientId );
+	const previousBlock = getBlock( previousBlockClientId );
+	const templateLock = getTemplateLock( rootClientId );
 
 	return {
-		nextBlockUid: getNextBlockUid( uid ),
-		isPartOfMultiSelection: isBlockMultiSelected( uid ) || isAncestorMultiSelected( uid ),
-		isFirstMultiSelected: isFirstMultiSelectedBlock( uid ),
+		nextBlockClientId: getNextBlockClientId( clientId ),
+		isPartOfMultiSelection: isBlockMultiSelected( clientId ) || isAncestorMultiSelected( clientId ),
+		isFirstMultiSelected: isFirstMultiSelectedBlock( clientId ),
 		isMultiSelecting: isMultiSelecting(),
 		hasSelectedInnerBlock: isParentOfSelectedBlock,
 		// We only care about this prop when the block is selected
 		// Thus to avoid unnecessary rerenders we avoid updating the prop if the block is not selected.
 		isTypingWithinBlock: ( isSelected || isParentOfSelectedBlock ) && isTyping(),
-		order: getBlockIndex( uid, rootUID ),
+		order: getBlockIndex( clientId, rootClientId ),
 		meta: getEditedPostAttribute( 'meta' ),
-		mode: getBlockMode( uid ),
+		mode: getBlockMode( clientId ),
 		isSelectionEnabled: isSelectionEnabled(),
 		initialPosition: getSelectedBlocksInitialCaretPosition(),
 		isEmptyDefaultBlock: block && isUnmodifiedDefaultBlock( block ),
 		isPreviousBlockADefaultEmptyBlock: previousBlock && isUnmodifiedDefaultBlock( previousBlock ),
 		isMovable: 'all' !== templateLock,
 		isLocked: !! templateLock,
-		previousBlockUid,
+		previousBlockClientId,
 		block,
 		isSelected,
 		hasFixedToolbar,
@@ -645,23 +646,23 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 	} = dispatch( 'core/editor' );
 
 	return {
-		onChange( uid, attributes ) {
-			updateBlockAttributes( uid, attributes );
+		onChange( clientId, attributes ) {
+			updateBlockAttributes( clientId, attributes );
 		},
-		onSelect( uid = ownProps.uid, initialPosition ) {
-			selectBlock( uid, initialPosition );
+		onSelect( clientId = ownProps.clientId, initialPosition ) {
+			selectBlock( clientId, initialPosition );
 		},
 		onInsertBlocks( blocks, index ) {
-			const { rootUID, layout } = ownProps;
+			const { rootClientId, layout } = ownProps;
 			blocks = blocks.map( ( block ) => cloneBlock( block, { layout } ) );
-			insertBlocks( blocks, index, rootUID );
+			insertBlocks( blocks, index, rootClientId );
 		},
 		onInsertDefaultBlockAfter() {
-			const { order, rootUID } = ownProps;
-			insertDefaultBlock( {}, rootUID, order + 1 );
+			const { order, rootClientId } = ownProps;
+			insertDefaultBlock( {}, rootClientId, order + 1 );
 		},
-		onRemove( uid ) {
-			removeBlock( uid );
+		onRemove( clientId ) {
+			removeBlock( clientId );
 		},
 		onMerge( ...args ) {
 			mergeBlocks( ...args );
@@ -671,7 +672,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 			blocks = castArray( blocks ).map( ( block ) => (
 				cloneBlock( block, { layout } )
 			) );
-			replaceBlocks( [ ownProps.uid ], blocks );
+			replaceBlocks( [ ownProps.clientId ], blocks );
 		},
 		onMetaChange( meta ) {
 			editPost( { meta } );
