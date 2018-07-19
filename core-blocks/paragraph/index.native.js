@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { TextInput } from 'react-native';
 import classnames from 'classnames';
 import { isFinite, find, omit } from 'lodash';
 
@@ -11,6 +12,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	concatChildren,
 	Component,
+	compose,
 	Fragment,
 	RawHTML,
 } from '@wordpress/element';
@@ -30,27 +32,26 @@ import {
 	PanelColor,
 	RichText,
 } from '@wordpress/editor';
-import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
-import { compose } from '@wordpress/compose';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import './style.scss';
+// import './style.scss';
 
-const { getComputedStyle } = window;
+// const { getComputedStyle } = window;
 
-const FallbackStyles = withFallbackStyles( ( node, ownProps ) => {
-	const { textColor, backgroundColor, fontSize, customFontSize } = ownProps.attributes;
-	const editableNode = node.querySelector( '[contenteditable="true"]' );
-	//verify if editableNode is available, before using getComputedStyle.
-	const computedStyles = editableNode ? getComputedStyle( editableNode ) : null;
-	return {
-		fallbackBackgroundColor: backgroundColor || ! computedStyles ? undefined : computedStyles.backgroundColor,
-		fallbackTextColor: textColor || ! computedStyles ? undefined : computedStyles.color,
-		fallbackFontSize: fontSize || customFontSize || ! computedStyles ? undefined : parseInt( computedStyles.fontSize ) || undefined,
-	};
-} );
+// const FallbackStyles = withFallbackStyles( ( node, ownProps ) => {
+// 	const { textColor, backgroundColor, fontSize, customFontSize } = ownProps.attributes;
+// 	const editableNode = node.querySelector( '[contenteditable="true"]' );
+// 	//verify if editableNode is available, before using getComputedStyle.
+// 	const computedStyles = editableNode ? getComputedStyle( editableNode ) : null;
+// 	return {
+// 		fallbackBackgroundColor: backgroundColor || ! computedStyles ? undefined : computedStyles.backgroundColor,
+// 		fallbackTextColor: textColor || ! computedStyles ? undefined : computedStyles.color,
+// 		fallbackFontSize: fontSize || customFontSize || ! computedStyles ? undefined : parseInt( computedStyles.fontSize ) || undefined,
+// 	};
+// } );
 
 const FONT_SIZES = [
 	{
@@ -206,81 +207,90 @@ class ParagraphBlock extends Component {
 		} = attributes;
 
 		const fontSize = this.getFontSize();
-
+		console.log(content)
 		return (
-			<Fragment>
-				<BlockControls>
-					<AlignmentToolbar
-						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
-					/>
-				</BlockControls>
-				<InspectorControls>
-					<PanelBody title={ __( 'Text Settings' ) } className="blocks-font-size">
-						<FontSizePicker
-							fontSizes={ FONT_SIZES }
-							fallbackFontSize={ fallbackFontSize }
-							value={ fontSize }
-							onChange={ this.setFontSize }
-						/>
-						<ToggleControl
-							label={ __( 'Drop Cap' ) }
-							checked={ !! dropCap }
-							onChange={ this.toggleDropCap }
-							help={ this.getDropCapHelp }
-						/>
-					</PanelBody>
-					<PanelColor
-						colorValue={ backgroundColor.value }
-						initialOpen={ false }
-						title={ __( 'Background Color' ) }
-						onChange={ setBackgroundColor }
-					/>
-					<PanelColor
-						colorValue={ textColor.value }
-						initialOpen={ false }
-						title={ __( 'Text Color' ) }
-						onChange={ setTextColor }
-					/>
-					<ContrastChecker
-						textColor={ textColor.value }
-						backgroundColor={ backgroundColor.value }
-						{ ...{
-							fallbackBackgroundColor,
-							fallbackTextColor,
-						} }
-						isLargeText={ fontSize >= 18 }
-					/>
-				</InspectorControls>
-				<RichText
-					tagName="p"
-					className={ classnames( 'wp-block-paragraph', className, {
-						'has-background': backgroundColor.value,
-						'has-drop-cap': dropCap,
-						[ backgroundColor.class ]: backgroundColor.class,
-						[ textColor.class ]: textColor.class,
-					} ) }
-					style={ {
-						backgroundColor: backgroundColor.value,
-						color: textColor.value,
-						fontSize: fontSize ? fontSize + 'px' : undefined,
-						textAlign: align,
-					} }
-					value={ content }
-					onChange={ ( nextContent ) => {
-						setAttributes( {
-							content: nextContent,
-						} );
-					} }
-					onSplit={ this.splitBlock }
-					onMerge={ mergeBlocks }
-					onReplace={ this.onReplace }
-					onRemove={ () => onReplace( [] ) }
-					placeholder={ placeholder || __( 'Add text or type / to add content' ) }
-				/>
-			</Fragment>
+			// <Fragment>
+			// 	<BlockControls>
+			// 		<AlignmentToolbar
+			// 			value={ align }
+			// 			onChange={ ( nextAlign ) => {
+			// 				setAttributes( { align: nextAlign } );
+			// 			} }
+			// 		/>
+			// 	</BlockControls>
+			// 	<InspectorControls>
+			// 		<PanelBody title={ __( 'Text Settings' ) } className="blocks-font-size">
+			// 			<FontSizePicker
+			// 				fontSizes={ FONT_SIZES }
+			// 				fallbackFontSize={ fallbackFontSize }
+			// 				value={ fontSize }
+			// 				onChange={ this.setFontSize }
+			// 			/>
+			// 			<ToggleControl
+			// 				label={ __( 'Drop Cap' ) }
+			// 				checked={ !! dropCap }
+			// 				onChange={ this.toggleDropCap }
+			// 				help={ this.getDropCapHelp }
+			// 			/>
+			// 		</PanelBody>
+			// 		<PanelColor
+			// 			colorValue={ backgroundColor.value }
+			// 			initialOpen={ false }
+			// 			title={ __( 'Background Color' ) }
+			// 			onChange={ setBackgroundColor }
+			// 		/>
+			// 		<PanelColor
+			// 			colorValue={ textColor.value }
+			// 			initialOpen={ false }
+			// 			title={ __( 'Text Color' ) }
+			// 			onChange={ setTextColor }
+			// 		/>
+			// 		<ContrastChecker
+			// 			textColor={ textColor.value }
+			// 			backgroundColor={ backgroundColor.value }
+			// 			{ ...{
+			// 				fallbackBackgroundColor,
+			// 				fallbackTextColor,
+			// 			} }
+			// 			isLargeText={ fontSize >= 18 }
+			// 		/>
+			// 	</InspectorControls>
+			// 	<RichText
+			// 		tagName="p"
+			// 		className={ classnames( 'wp-block-paragraph', className, {
+			// 			'has-background': backgroundColor.value,
+			// 			'has-drop-cap': dropCap,
+			// 			[ backgroundColor.class ]: backgroundColor.class,
+			// 			[ textColor.class ]: textColor.class,
+			// 		} ) }
+			// 		style={ {
+			// 			backgroundColor: backgroundColor.value,
+			// 			color: textColor.value,
+			// 			fontSize: fontSize ? fontSize + 'px' : undefined,
+			// 			textAlign: align,
+			// 		} }
+			// 		value={ content }
+			// 		onChange={ ( nextContent ) => {
+			// 			setAttributes( {
+			// 				content: nextContent,
+			// 			} );
+			// 		} }
+			// 		onSplit={ this.splitBlock }
+			// 		onMerge={ mergeBlocks }
+			// 		onReplace={ this.onReplace }
+			// 		onRemove={ () => onReplace( [] ) }
+			// 		placeholder={ placeholder || __( 'Add text or type / to add content' ) }
+			// 	/>
+			// </Fragment>
+			<TextInput 
+				value={ content[0] } 
+				onChangeText={ ( nextContent ) => {
+					 			setAttributes( {
+					 				content: [nextContent],
+					 			} );
+							 } 
+						} 
+			/>
 		);
 	}
 }
@@ -342,22 +352,6 @@ export const settings = {
 	supports,
 
 	attributes: schema,
-
-	transforms: {
-		from: [
-			{
-				type: 'raw',
-				// Paragraph is a fallback and should be matched last.
-				priority: 20,
-				selector: 'p',
-				schema: {
-					p: {
-						children: getPhrasingContentSchema(),
-					},
-				},
-			},
-		],
-	},
 
 	deprecated: [
 		{
@@ -481,10 +475,9 @@ export const settings = {
 		}
 	},
 
-	edit: compose( [
-		withColors( 'backgroundColor', { textColor: 'color' } ),
-		FallbackStyles,
-	] )( ParagraphBlock ),
+	edit({ attributes, setAttributes, className }) {
+		return (<ParagraphBlock attributes={attributes} setAttributes={setAttributes} />)
+	},
 
 	save( { attributes } ) {
 		const {
@@ -517,14 +510,9 @@ export const settings = {
 			fontSize: fontSizeClass ? undefined : customFontSize,
 			textAlign: align,
 		};
-
+        console.log("Saving: " + content);
 		return (
-			<RichText.Content
-				tagName="p"
-				style={ styles }
-				className={ className ? className : undefined }
-				value={ content }
-			/>
+			<p>{content[0]}</p>			
 		);
 	},
 };
