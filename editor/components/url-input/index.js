@@ -32,7 +32,6 @@ class UrlInput extends Component {
 		this.updateSuggestions = throttle( this.updateSuggestions.bind( this ), 200 );
 
 		this.suggestionNodes = [];
-		this.suggestionsRequests = [];
 
 		this.state = {
 			posts: [],
@@ -58,7 +57,7 @@ class UrlInput extends Component {
 	}
 
 	componentWillUnmount() {
-		this.suggestionsRequests = [];
+		delete this.suggestionsRequest;
 	}
 
 	bindListNode( ref ) {
@@ -72,8 +71,6 @@ class UrlInput extends Component {
 	}
 
 	updateSuggestions( value ) {
-		this.suggestionsRequests = [];
-
 		// Show the suggestions after typing at least 2 characters
 		// and also for URLs
 		if ( value.length < 2 || /^https?:/.test( value ) ) {
@@ -102,9 +99,9 @@ class UrlInput extends Component {
 
 		request.then( ( posts ) => {
 			// A fetch Promise doesn't have an abort option. It's mimicked by
-			// detecting the request reference in an array which is reset on
-			// subsequent requests or unmounting.
-			if ( ! includes( this.suggestionsRequests, request ) ) {
+			// comparing the request reference in on the instance, which is
+			// reset or deleted on subsequent requests or unmounting.
+			if ( this.suggestionsRequest !== request ) {
 				return;
 			}
 
@@ -123,14 +120,14 @@ class UrlInput extends Component {
 				this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
 			}
 		} ).catch( () => {
-			if ( includes( this.suggestionsRequests, request ) ) {
+			if ( this.suggestionsRequest === request ) {
 				this.setState( {
 					loading: false,
 				} );
 			}
 		} );
 
-		this.suggestionsRequests.push( request );
+		this.suggestionsRequest = request;
 	}
 
 	onChange( event ) {
