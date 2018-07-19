@@ -1,0 +1,16 @@
+[
+    {
+        "blockName": "core/latest-comments",
+        "attrs": {
+            "displayAvatar": true,
+            "displayExcerpt": true,
+            "displayTimestamp": true
+        },
+        "innerBlocks": [],
+        "innerHTML": ""
+    },
+    {
+        "attrs": {},
+        "innerHTML": "\n"
+    }
+]
