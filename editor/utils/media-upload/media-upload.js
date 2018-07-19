@@ -6,8 +6,8 @@ import { compact, flatMap, forEach, get, has, includes, map, noop, startsWith } 
 /**
  * WordPress dependencies
  */
+import apiFetch from '@wordpress/api-fetch';
 import { __, sprintf } from '@wordpress/i18n';
-import apiRequest from '@wordpress/api-request';
 
 /**
  * Browsers may use unexpected mime types, and they differ from browser to browser.
@@ -111,8 +111,8 @@ export function mediaUpload( {
 		filesSet.push( { url: window.URL.createObjectURL( mediaFile ) } );
 		onFileChange( filesSet );
 
-		return createMediaFromFile( mediaFile, additionalData ).then(
-			( savedMedia ) => {
+		return createMediaFromFile( mediaFile, additionalData )
+			.then( ( savedMedia ) => {
 				const mediaObject = {
 					alt: savedMedia.alt_text,
 					caption: get( savedMedia, [ 'caption', 'raw' ], '' ),
@@ -126,13 +126,13 @@ export function mediaUpload( {
 					mediaObject.mediaDetails.sizes = get( savedMedia, [ 'media_details', 'sizes' ], {} );
 				}
 				setAndUpdateFiles( idx, mediaObject );
-			},
-			( response ) => {
+			} )
+			.catch( ( error ) => {
 				// Reset to empty on failure.
 				setAndUpdateFiles( idx, null );
 				let message;
-				if ( has( response, [ 'responseJSON', 'message' ] ) ) {
-					message = get( response, [ 'responseJSON', 'message' ] );
+				if ( has( error, [ 'message' ] ) ) {
+					message = get( error, [ 'message' ] );
 				} else {
 					message = sprintf(
 						// translators: %s: file name
@@ -145,8 +145,7 @@ export function mediaUpload( {
 					message,
 					file: mediaFile,
 				} );
-			}
-		);
+			} );
 	} );
 }
 
@@ -161,11 +160,9 @@ function createMediaFromFile( file, additionalData ) {
 	const data = new window.FormData();
 	data.append( 'file', file, file.name || file.type.replace( '/', '.' ) );
 	forEach( additionalData, ( ( value, key ) => data.append( key, value ) ) );
-	return apiRequest( {
+	return apiFetch( {
 		path: '/wp/v2/media',
-		data,
-		contentType: false,
-		processData: false,
+		body: data,
 		method: 'POST',
 	} );
 }
