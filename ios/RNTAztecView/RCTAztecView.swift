@@ -7,7 +7,7 @@ class RCTAztecView: Aztec.TextView {
     private var previousContentSize: CGSize = .zero
     
     // MARK - View Height: Match to content height
-
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         
@@ -15,25 +15,17 @@ class RCTAztecView: Aztec.TextView {
     }
 
     func updateContentSizeInRN() {
-        let newSize = contentSize
+        let newSize = sizeThatFits(frame.size)
         
-        guard previousContentSize != newSize else {
-            return
+        guard previousContentSize != newSize,
+            let onContentSizeChange = onContentSizeChange else {
+                return
         }
         
         previousContentSize = newSize
-        updateHeightToMatch(newSize.height)
-        
-        guard let onContentSizeChange = onContentSizeChange else {
-            return
-        }
         
         let body = packForRN(newSize, withName: "contentSize")
         onContentSizeChange(body)
-    }
-    
-    func updateHeightToMatch(_ newHeight: CGFloat) {
-        bounds = CGRect(origin: .zero, size: CGSize(width: frame.width, height: newHeight))
     }
     
     // MARK: - Native-to-RN Value Packing Logic
