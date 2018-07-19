@@ -12,6 +12,7 @@ import { __, sprintf } from '@wordpress/i18n';
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
+import { createBlobURL } from '@wordpress/blob';
 
 /**
  * Browsers may use unexpected mime types, and they differ from browser to browser.
@@ -110,7 +111,7 @@ export function mediaUpload( {
 
 		// Set temporary URL to create placeholder media file, this is replaced
 		// with final file from media gallery when upload is `done` below
-		filesSet.push( { url: window.URL.createObjectURL( mediaFile ) } );
+		filesSet.push( { url: createBlobURL( mediaFile ) } );
 		onFileChange( filesSet );
 
 		return createMediaFromFile( mediaFile, additionalData )
