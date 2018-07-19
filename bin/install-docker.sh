@@ -31,10 +31,9 @@ echo -e $(status_message "Starting Docker containers...")
 docker-compose up -d >/dev/null
 
 # Set up WordPress Development site.
+# Note: we don't bother installing the test site right now, because that's
+# done on every time `npm run test-e2e` is run.
 . "$(dirname "$0")/install-wordpress.sh"
-
-# Set up WordPress site used for end-to-end (e2e) tests.
-. "$(dirname "$0")/install-wordpress.sh" --e2e_tests
 
 # Install the PHPUnit test scaffolding.
 echo -e $(status_message "Installing PHPUnit test scaffolding...")

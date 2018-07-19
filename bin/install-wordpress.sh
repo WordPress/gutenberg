@@ -6,30 +6,31 @@ set -e
 # Gutenberg script includes.
 . "$(dirname "$0")/includes.sh"
 
+# These are the containers and values for the development site.
 CLI='cli'
 CONTAINER='wordpress'
-CONTAINER_SUFFIX=''
 SITE_TITLE='Gutenberg Dev'
 
+# If we're installing/re-installing the test site, change the containers used.
 if [ "$1" == '--e2e_tests' ]; then
-	CONTAINER_SUFFIX='_e2e_test'
-	CLI="$CLI$CONTAINER_SUFFIX"
+	CLI="${CLI}_e2e_tests"
+	CONTAINER="${CONTAINER}_e2e_tests"
 	SITE_TITLE='Gutenberg Testing'
 fi
 
 # Get the host port for the development WordPress container.
-HOST_PORT=$(docker-compose port $CONTAINER$CONTAINER_SUFFIX 80 | awk -F : '{printf $2}')
+HOST_PORT=$(docker-compose port $CONTAINER 80 | awk -F : '{printf $2}')
 
 # Wait until the Docker containers are running and the WordPress site is
 # responding to requests.
-echo -en $(status_message "Attempting to connect to WordPress in ($CONTAINER$CONTAINER_SUFFIX)...")
+echo -en $(status_message "Attempting to connect to WordPress ($SITE_TITLE)...")
 until $(curl -L http://localhost:$HOST_PORT -so - 2>&1 | grep -q "WordPress"); do
     echo -n '.'
     sleep 5
 done
 echo ''
 
-# Install WordPress
+# Install WordPress.
 echo -e $(status_message "Installing WordPress ($SITE_TITLE)...")
 docker-compose run --rm $CLI core install --title="$SITE_TITLE" --admin_user=admin --admin_password=password --admin_email=test@test.com --skip-email --url=http://localhost:$HOST_PORT >/dev/null
 # Check for WordPress updates, just in case the WordPress image isn't up to date.
@@ -45,10 +46,10 @@ fi
 # Reset the database so no posts/comments dirty up tests, if any exist.
 POSTS=$(docker-compose run --rm $CLI post list --format=ids)
 if [ "$POSTS" != '' ]; then
-	echo -e $(status_message "Resetting test database...")
+	echo -e $(status_message "Removing posts from database ($SITE_TITLE)...")
 	docker-compose run --rm $CLI post delete $POSTS --force --quiet
 fi
 
-# Activate Gutenberg
+# Activate Gutenberg.
 echo -e $(status_message "Activating Gutenberg ($SITE_TITLE)...")
 docker-compose run --rm $CLI plugin activate gutenberg >/dev/null
