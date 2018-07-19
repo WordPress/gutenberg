@@ -274,14 +274,6 @@ export class Autocomplete extends Component {
 				onReplace( [ value ] );
 			} else if ( 'insert-at-caret' === action ) {
 				this.insertCompletion( range, value );
-			} else if ( 'backcompat' === action ) {
-				// NOTE: This block should be removed once we no longer support the old completer interface.
-				const onSelect = value;
-				const deprecatedOptionObject = option.value;
-				const selectionResult = onSelect( deprecatedOptionObject.value, range, query );
-				if ( selectionResult !== undefined ) {
-					this.insertCompletion( range, selectionResult );
-				}
 			}
 		}
 
