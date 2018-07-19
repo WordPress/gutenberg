@@ -94,7 +94,7 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 	if ( $attributes['displayExcerpt'] ) {
 		$class .= ' has-excerpts';
 	}
-	if ( empty($comments) ) {
+	if ( empty( $comments ) ) {
 		$class .= ' no-comments';
 	}
 	$classnames = esc_attr( $class );
