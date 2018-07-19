@@ -15,6 +15,7 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
  - All references to a block's `uid` have been replaced with equivalent props and selectors for `clientId`.
  - The `wp.editor.MediaPlaceholder` component `onSelectUrl` prop has been renamed to `onSelectURL`.
  - The `wp.editor.UrlInput` component has been renamed to `wp.editor.URLInput`.
+ - The Text Columns block has been removed. Please use the Columns block instead.
 
 ## 3.4.0
 
