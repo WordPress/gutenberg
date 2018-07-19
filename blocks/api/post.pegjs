@@ -196,7 +196,7 @@ Block_Void
   }
 
 Block_Balanced
-  = s:Block_Start children:( $(!"<!--" .)+ / $(!Block_End .) / Block )* e:Block_End
+  = s:Block_Start children:( $(!"<!--" .)+ / Block / $(!Block_End .) )* e:Block_End
   {
     /** <?php
     list( $innerHTML, $innerBlocks ) = peg_array_partition( $children, 'is_string' );
