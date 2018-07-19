@@ -68,6 +68,11 @@
 		margin-top: $item-spacing;
 		margin-bottom: $item-spacing;
 		border-top: 1px solid $light-gray-500;
+
+		// Check if the separator is the last child in the node and if so, hide itself
+		&:last-child {
+			display: none;
+		}
 	}
 
 	.editor-block-settings-menu__title {
