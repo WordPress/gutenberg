@@ -240,6 +240,12 @@ class URLInput extends Component {
 	}
 }
 
+// TODO: As part of deprecation of UrlInput, the temporary passthrough
+// component needs access to the enhanced URLInput class, so it cannot be
+// enhanced as part of its export default. Once the temporary passthrough is
+// removed, this can be moved back to the export statement.
+URLInput = withSpokenMessages( withInstanceId( URLInput ) );
+
 export class UrlInput extends Component {
 	constructor() {
 		super( ...arguments );
@@ -257,4 +263,4 @@ export class UrlInput extends Component {
 	}
 }
 
-export default withSpokenMessages( withInstanceId( URLInput ) );
+export default URLInput;
