@@ -8,7 +8,7 @@ import { filter, every } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
-import { RichText, editorMediaUpload } from '@wordpress/editor';
+import { RichText, mediaUpload } from '@wordpress/editor';
 import { createBlobURL } from '@wordpress/blob';
 
 /**
@@ -135,7 +135,7 @@ export const settings = {
 					const block = createBlock( 'core/gallery', {
 						images: files.map( ( file ) => ( { url: createBlobURL( file ) } ) ),
 					} );
-					editorMediaUpload( {
+					mediaUpload( {
 						filesList: files,
 						onFileChange: ( images ) => onChange( block.clientId, { images } ),
 						allowedType: 'image',

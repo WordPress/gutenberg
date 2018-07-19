@@ -24,7 +24,7 @@ import { mediaUpload } from './media-upload';
  * @param   {Function} $0.onError           Function called when an error happens.
  * @param   {Function} $0.onFileChange      Function called each time a file or a temporary representation of the file is available.
  */
-export default function editorMediaUpload( {
+export default function( {
 	allowedType,
 	filesList,
 	maxUploadFileSize,

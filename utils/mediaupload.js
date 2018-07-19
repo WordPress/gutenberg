@@ -64,7 +64,7 @@ export function mediaUpload( {
 } ) {
 	deprecated( 'wp.utils.mediaUpload', {
 		version: '3.5',
-		alternative: 'wp.editor.editorMediaUpload',
+		alternative: 'wp.editor.mediaUpload',
 		plugin: 'Gutenberg',
 	} );
 

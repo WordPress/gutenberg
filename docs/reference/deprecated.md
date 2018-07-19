@@ -7,13 +7,14 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
  - `wp.components.withInstanceId` has been removed. Please use `wp.compose.withInstanceId` instead.
  - `wp.components.withSafeTimeout` has been removed. Please use `wp.compose.withSafeTimeout` instead.
  - `wp.components.withState` has been removed. Please use `wp.compose.withState` instead.
+ - `wp.editor.editorMediaUpload` has been removed. Please use `wp.editor.mediaUpload` instead.
  - `wp.element.pure` has been removed. Please use `wp.compose.pure` instead.
  - `wp.element.compose` has been removed. Please use `wp.compose.compose` instead.
  - `wp.element.createHigherOrderComponent` has been removed. Please use `wp.compose.createHigherOrderComponent` instead.
  - `wp.utils.buildTermsTree` has been removed.
  - `wp.utils.decodeEntities` has been removed. Please use `wp.htmlEntities.decodeEntities` instead.
  - `wp.utils.getMimeTypesArray` has been removed.
- - `wp.utils.mediaUpload` has been removed. Please use `wp.editor.editorMediaUpload` instead.
+ - `wp.utils.mediaUpload` has been removed. Please use `wp.editor.mediaUpload` instead.
  - `wp.utils.preloadImage` has been removed.
  - All references to a block's `uid` have been replaced with equivalent props and selectors for `clientId`.
  - The `wp.editor.MediaPlaceholder` component `onSelectUrl` prop has been renamed to `onSelectURL`.
