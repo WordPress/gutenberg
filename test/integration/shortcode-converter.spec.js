@@ -2,12 +2,12 @@
  * WordPress dependencies
  */
 import { registerCoreBlocks } from '@wordpress/core-blocks';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import segmentHTMLToShortcodeBlock from '../shortcode-converter';
-import { createBlock } from '../../factory';
+import segmentHTMLToShortcodeBlock from '../../packages/blocks/src/api/raw-handling/shortcode-converter';
 
 describe( 'segmentHTMLToShortcodeBlock', () => {
 	beforeAll( () => {

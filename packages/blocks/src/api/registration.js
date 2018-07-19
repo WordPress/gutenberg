@@ -55,6 +55,17 @@ const POST_FORMAT_BLOCK_MAP = {
 	video: 'core/video',
 };
 
+let serverSideBlockDefinitions = {};
+
+/**
+ * Set the server side block definition of blocks.
+ *
+ * @param {Object} definitions Server-side block definitions
+ */
+export function unstable__bootstrapServerSideBlockDefinitions( definitions ) { // eslint-disable-line camelcase
+	serverSideBlockDefinitions = definitions;
+}
+
 /**
  * Registers a new block provided a unique name and an object defining its
  * behavior. Once registered, the block is made available as an option to any
@@ -69,7 +80,7 @@ const POST_FORMAT_BLOCK_MAP = {
 export function registerBlockType( name, settings ) {
 	settings = {
 		name,
-		...get( window._wpBlocks, name ),
+		...get( serverSideBlockDefinitions, name ),
 		...settings,
 	};
 

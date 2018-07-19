@@ -1,4 +1,4 @@
-# Blocks
+# @wordpress/blocks
 
 "Block" is the abstract term used to describe units of markup that, composed
 together, form the content or layout of a webpage. The idea combines concepts
@@ -266,3 +266,5 @@ Returns type definitions associated with a registered block.
 
 Returns settings associated with a registered control.
 
+
+<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

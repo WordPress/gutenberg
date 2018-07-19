@@ -23,6 +23,7 @@ import {
 	getBlockSupport,
 	hasBlockSupport,
 	isSharedBlock,
+	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '../registration';
 
 describe( 'blocks', () => {
@@ -39,7 +40,7 @@ describe( 'blocks', () => {
 		} );
 		setUnknownTypeHandlerName( undefined );
 		setDefaultBlockName( undefined );
-		window._wpBlocks = {};
+		unstable__bootstrapServerSideBlockDefinitions( {} );
 	} );
 
 	describe( 'registerBlockType()', () => {
@@ -157,9 +158,9 @@ describe( 'blocks', () => {
 
 		it( 'should default to browser-initialized global attributes', () => {
 			const attributes = { ok: { type: 'boolean' } };
-			window._wpBlocks = {
+			unstable__bootstrapServerSideBlockDefinitions( {
 				'core/test-block-with-attributes': { attributes },
-			};
+			} );
 
 			const blockType = { settingName: 'settingValue', save: noop, category: 'common', title: 'block title' };
 			registerBlockType( 'core/test-block-with-attributes', blockType );

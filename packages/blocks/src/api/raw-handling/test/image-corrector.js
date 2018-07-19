@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { equal } from 'assert';
-
-/**
  * Internal dependencies
  */
 import imageCorrector from '../image-corrector';
@@ -13,12 +8,12 @@ describe( 'imageCorrector', () => {
 	it( 'should correct image source', () => {
 		const input = '<img src="file:LOW-RES.png">';
 		const output = '<img src="">';
-		equal( deepFilterHTML( input, [ imageCorrector ] ), output );
+		expect( deepFilterHTML( input, [ imageCorrector ] ) ).toEqual( output );
 	} );
 
 	it( 'should remove trackers', () => {
 		const input = '<img src="" height="1" width="1">';
 		const output = '';
-		equal( deepFilterHTML( input, [ imageCorrector ] ), output );
+		expect( deepFilterHTML( input, [ imageCorrector ] ) ).toEqual( output );
 	} );
 } );

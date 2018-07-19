@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { equal } from 'assert';
-
-/**
  * Internal dependencies
  */
 import blockquoteNormaliser from '../blockquote-normaliser';
@@ -13,6 +8,6 @@ describe( 'blockquoteNormaliser', () => {
 	it( 'should normalise blockquote', () => {
 		const input = '<blockquote>test</blockquote>';
 		const output = '<blockquote><p>test</p></blockquote>';
-		equal( deepFilterHTML( input, [ blockquoteNormaliser ] ), output );
+		expect( deepFilterHTML( input, [ blockquoteNormaliser ] ) ).toEqual( output );
 	} );
 } );

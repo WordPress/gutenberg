@@ -1,2 +1,7 @@
 // Bootstrap server-registered blocks
-global.window._wpBlocks = require( 'core-blocks/test/server-registered.json' );
+// eslint-disable-next-line camelcase
+import { unstable__bootstrapServerSideBlockDefinitions } from '@wordpress/blocks';
+
+unstable__bootstrapServerSideBlockDefinitions(
+	require( 'core-blocks/test/server-registered.json' )
+);

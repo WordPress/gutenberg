@@ -40,6 +40,7 @@ export {
 	isSharedBlock,
 	getChildBlockNames,
 	hasChildBlocks,
+	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from './registration';
 export {
 	isUnmodifiedDefaultBlock,

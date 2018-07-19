@@ -13,7 +13,6 @@ const npmReadyPackages = glob( 'packages/*/package.json' )
 // These are internal-only packages (for now), not yet published as standalone
 // node modules.
 const gutenbergPackages = [
-	'blocks',
 	'core-blocks',
 	'edit-post',
 	'editor',
@@ -29,8 +28,8 @@ module.exports = {
 		},
 		'core/blocks': {
 			title: 'Block Types Data',
-			selectors: [ path.resolve( root, 'blocks/store/selectors.js' ) ],
-			actions: [ path.resolve( root, 'blocks/store/actions.js' ) ],
+			selectors: [ path.resolve( root, 'packages/blocks/src/store/selectors.js' ) ],
+			actions: [ path.resolve( root, 'packages/blocks/src/store/actions.js' ) ],
 		},
 		'core/editor': {
 			title: 'The Editor\'s Data',

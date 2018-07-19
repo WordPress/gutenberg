@@ -9,7 +9,12 @@ import { format } from 'util';
 /**
  * WordPress dependencies
  */
-import { getBlockTypes, parse, serialize } from '@wordpress/blocks';
+import {
+	getBlockTypes,
+	parse,
+	serialize,
+	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
+} from '@wordpress/blocks';
 import { parse as grammarParse } from '@wordpress/block-serialization-spec-parser';
 
 /**
@@ -100,7 +105,7 @@ function normalizeParsedBlocks( blocks ) {
 
 describe( 'full post content fixture', () => {
 	beforeAll( () => {
-		window._wpBlocks = require( './server-registered.json' );
+		unstable__bootstrapServerSideBlockDefinitions( require( './server-registered.json' ) );
 
 		// Load all hooks that modify blocks
 		require( 'editor/hooks' );
