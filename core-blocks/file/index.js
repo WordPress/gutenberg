@@ -77,6 +77,9 @@ export const settings = {
 			{
 				type: 'files',
 				isMatch: ( files ) => files.length === 1,
+				// We define a lower priorty (higher number) than the default of 10. This
+				// ensures that the File block is only created as a fallback.
+				priority: 15,
 				transform: ( files ) => {
 					const file = files[ 0 ];
 					const blobURL = createBlobURL( file );
