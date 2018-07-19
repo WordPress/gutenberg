@@ -87,6 +87,7 @@ const gutenbergPackages = [
 	'a11y',
 	'api-fetch',
 	'blob',
+	'block-serialization-spec-parser',
 	'compose',
 	'core-data',
 	'data',
@@ -158,12 +159,11 @@ const config = {
 	module: {
 		rules: [
 			{
-				test: /\.pegjs/,
-				use: 'pegjs-loader',
-			},
-			{
 				test: /\.js$/,
-				exclude: /node_modules/,
+				exclude: [
+					/block-serialization-spec-parser/,
+					/node_modules/,
+				],
 				use: 'babel-loader',
 			},
 			{

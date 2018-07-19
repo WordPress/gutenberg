@@ -21,9 +21,6 @@
 		"<rootDir>/test/unit/setup-wp-aliases.js",
 		"<rootDir>/test/unit/setup-mocks.js"
 	],
-	"transform": {
-		"\\.pegjs$": "<rootDir>/test/unit/pegjs-transform.js"
-	},
 	"testPathIgnorePatterns": [
 		"/node_modules/",
 		"/test/e2e"
