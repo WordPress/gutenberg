@@ -17,7 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
         let bridge = RCTBridge(delegate: bridgeDelegate, launchOptions: launchOptions)
-        let rootView = RCTRootView(bridge: bridge, moduleName: "example", initialProperties: nil)
+        let rootView = RCTRootView(bridge: bridge, moduleName: "gutenberg", initialProperties: nil)
         
         rootView?.backgroundColor = .white
         
