@@ -9,7 +9,7 @@
 // appearing with no title.
 require_once( ABSPATH . 'wp-admin/includes/template.php' );
 
-define( 'GUTENBERG_LATEST_COMMENTS_BLOCK_DEFAULT_TO_SHOW', 5 );
+$default_comments_to_show = 5;
 
 /**
  * Renders the `core/latest-comments` block on server.
@@ -19,22 +19,6 @@ define( 'GUTENBERG_LATEST_COMMENTS_BLOCK_DEFAULT_TO_SHOW', 5 );
  * @return string Returns the post content with latest comments added.
  */
 function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
-	// Basic attribute validation.
-	if (
-		! isset( $attributes['align'] ) ||
-		! in_array( $attributes['align'], array( 'center', 'left', 'right', 'wide', 'full' ), true )
-	) {
-		$attributes['align'] = null;
-	}
-
-	if (
-		! is_numeric( $attributes['commentsToShow'] ) ||
-		$attributes['commentsToShow'] < 0 ||
-		$attributes['commentsToShow'] > 100
-	) {
-		$attributes['commentsToShow'] = GUTENBERG_LATEST_COMMENTS_BLOCK_DEFAULT_TO_SHOW;
-	}
-
 	// This filter is documented in wp-includes/widgets/class-wp-widget-recent-comments.php.
 	$comments = get_comments( apply_filters( 'widget_comments_args', array(
 		'number'      => $attributes['commentsToShow'],
@@ -112,7 +96,7 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 	if ( $attributes['displayExcerpt'] ) {
 		$class .= ' has-excerpts';
 	}
-	if ( empty( $comments ) ) {
+	if ( empty($comments) ) {
 		$class .= ' no-comments';
 	}
 	$classnames = esc_attr( $class );
@@ -136,7 +120,9 @@ register_block_type( 'core/latest-comments', array(
 		),
 		'commentsToShow' => array(
 			'type'    => 'number',
-			'default' => GUTENBERG_LATEST_COMMENTS_BLOCK_DEFAULT_TO_SHOW,
+			'default' => 5,
+			'minimum' => 1,
+			'maximum' => 100,
 		),
 		'displayAvatar'  => array(
 			'type'    => 'boolean',
@@ -152,6 +138,7 @@ register_block_type( 'core/latest-comments', array(
 		),
 		'align'          => array(
 			'type' => 'string',
+			'enum' => array( 'center', 'left', 'right', 'wide', 'full', '' ),
 		),
 	),
 	'render_callback' => 'gutenberg_render_block_core_latest_comments',
