@@ -83,6 +83,10 @@ const entryPointNames = [
 	'nux',
 ];
 
+if ( process.env.GUTENBERG_ENV === 'standalone' ) {
+	entryPointNames.push( 'standalone' );
+}
+
 const gutenbergPackages = [
 	'a11y',
 	'api-fetch',
@@ -144,7 +148,7 @@ const config = {
 		filename: './build/[basename]/index.js',
 		path: __dirname,
 		library: [ 'wp', '[name]' ],
-		libraryTarget: 'this',
+		libraryTarget: 'window', // TODO can't merge with this value. `this` is undefined in "use strict". So this.wp will throw an error from the browser context
 	},
 	externals,
 	resolve: {
@@ -246,6 +250,29 @@ if ( config.mode !== 'production' ) {
 
 if ( config.mode === 'development' ) {
 	config.plugins.push( new LiveReloadPlugin( { port: process.env.GUTENBERG_LIVE_RELOAD_PORT || 35729 } ) );
+}
+
+//Experimental Standalone Sandbox!
+if ( process.env.GUTENBERG_ENV === 'standalone' ) {
+	const CleanWebpackPlugin = require( 'clean-webpack-plugin' );
+	const HtmlWebpackPlugin = require( 'html-webpack-plugin' );
+	config.plugins.push( new CleanWebpackPlugin( [ 'build/standalone' ], { verbose: true } ) );
+	config.plugins.push( new HtmlWebpackPlugin( { template: './standalone/index.html' } ) );
+	config.devServer = {
+		contentBase: './build/standalone',
+	};
+	config.devtool = 'source-map';
+	config.externals = [];
+	const path = require( 'path' );
+	const alias = Object.assign( {}, config.resolve.alias, {
+		'@wordpress/core-blocks': path.resolve( __dirname, 'build/core-blocks' ),
+		'@wordpress/editor': path.resolve( __dirname, 'build/editor' ),
+		'@wordpress/components': path.resolve( __dirname, 'build/components' ),
+		'@wordpress/viewports': path.resolve( __dirname, 'build/viewports' ),
+		'@wordpress/blocks': path.resolve( __dirname, 'build/blocks' ),
+
+	} );
+	config.resolve.alias = alias;
 }
 
 module.exports = config;

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Standalone Sandbox Page!</title>
+	<script type="text/javascript">
+		window.wp = {};
+
+		// User settings used to persist store caches
+		window.userSettings = { uid: "dummy" };
+
+		// API globals
+		window.wpApiSettings = {
+			schema: {}
+		};
+		window.wp.api = {
+			getPostTypeRoute() {
+				return "/none";
+			}
+		};
+		window.wp.apiRequest = () => {
+			return Promise.reject("no API support yet");
+		};
+
+	</script>
+</head>
+<body>
+	<h1>Hello, World!</h1>
+</body>
+</html>
