@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { includes, throttle } from 'lodash';
+import { throttle } from 'lodash';
 import classnames from 'classnames';
 import scrollIntoView from 'dom-scroll-into-view';
 import { stringify } from 'querystringify';
