@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { throttle } from 'lodash';
+import { includes, throttle } from 'lodash';
 import classnames from 'classnames';
 import scrollIntoView from 'dom-scroll-into-view';
 import { stringify } from 'querystringify';
@@ -25,16 +25,40 @@ const stopEventPropagation = ( event ) => event.stopPropagation();
 class UrlInput extends Component {
 	constructor() {
 		super( ...arguments );
+
 		this.onChange = this.onChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.bindListNode = this.bindListNode.bind( this );
 		this.updateSuggestions = throttle( this.updateSuggestions.bind( this ), 200 );
+
 		this.suggestionNodes = [];
+		this.suggestionsRequests = [];
+
 		this.state = {
 			posts: [],
 			showSuggestions: false,
 			selectedSuggestion: null,
 		};
+	}
+
+	componentDidUpdate() {
+		const { showSuggestions, selectedSuggestion } = this.state;
+		// only have to worry about scrolling selected suggestion into view
+		// when already expanded
+		if ( showSuggestions && selectedSuggestion !== null && ! this.scrollingIntoView ) {
+			this.scrollingIntoView = true;
+			scrollIntoView( this.suggestionNodes[ selectedSuggestion ], this.listNode, {
+				onlyScrollIfNeeded: true,
+			} );
+
+			setTimeout( () => {
+				this.scrollingIntoView = false;
+			}, 100 );
+		}
+	}
+
+	componentWillUnmount() {
+		this.suggestionsRequests = [];
 	}
 
 	bindListNode( ref ) {
@@ -48,9 +72,7 @@ class UrlInput extends Component {
 	}
 
 	updateSuggestions( value ) {
-		if ( this.suggestionsRequest ) {
-			this.suggestionsRequest.abort();
-		}
+		this.suggestionsRequests = [];
 
 		// Show the suggestions after typing at least 2 characters
 		// and also for URLs
@@ -69,7 +91,8 @@ class UrlInput extends Component {
 			selectedSuggestion: null,
 			loading: true,
 		} );
-		this.suggestionsRequest = apiFetch( {
+
+		const request = apiFetch( {
 			path: `/wp/v2/posts?${ stringify( {
 				search: value,
 				per_page: 20,
@@ -77,33 +100,37 @@ class UrlInput extends Component {
 			} ) }`,
 		} );
 
-		this.suggestionsRequest
-			.then(
-				( posts ) => {
-					this.setState( {
-						posts,
-						loading: false,
-					} );
+		request.then( ( posts ) => {
+			// A fetch Promise doesn't have an abort option. It's mimicked by
+			// detecting the request reference in an array which is reset on
+			// subsequent requests or unmounting.
+			if ( ! includes( this.suggestionsRequests, request ) ) {
+				return;
+			}
 
-					if ( !! posts.length ) {
-						this.props.debouncedSpeak( sprintf( _n(
-							'%d result found, use up and down arrow keys to navigate.',
-							'%d results found, use up and down arrow keys to navigate.',
-							posts.length
-						), posts.length ), 'assertive' );
-					} else {
-						this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
-					}
-				},
-				( xhr ) => {
-					if ( xhr.statusText === 'abort' ) {
-						return;
-					}
-					this.setState( {
-						loading: false,
-					} );
-				}
-			);
+			this.setState( {
+				posts,
+				loading: false,
+			} );
+
+			if ( !! posts.length ) {
+				this.props.debouncedSpeak( sprintf( _n(
+					'%d result found, use up and down arrow keys to navigate.',
+					'%d results found, use up and down arrow keys to navigate.',
+					posts.length
+				), posts.length ), 'assertive' );
+			} else {
+				this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
+			}
+		} ).catch( () => {
+			if ( includes( this.suggestionsRequests, request ) ) {
+				this.setState( {
+					loading: false,
+				} );
+			}
+		} );
+
+		this.suggestionsRequests.push( request );
 	}
 
 	onChange( event ) {
@@ -155,28 +182,6 @@ class UrlInput extends Component {
 			selectedSuggestion: null,
 			showSuggestions: false,
 		} );
-	}
-
-	componentWillUnmount() {
-		if ( this.suggestionsRequest ) {
-			this.suggestionsRequest.abort();
-		}
-	}
-
-	componentDidUpdate() {
-		const { showSuggestions, selectedSuggestion } = this.state;
-		// only have to worry about scrolling selected suggestion into view
-		// when already expanded
-		if ( showSuggestions && selectedSuggestion !== null && ! this.scrollingIntoView ) {
-			this.scrollingIntoView = true;
-			scrollIntoView( this.suggestionNodes[ selectedSuggestion ], this.listNode, {
-				onlyScrollIfNeeded: true,
-			} );
-
-			setTimeout( () => {
-				this.scrollingIntoView = false;
-			}, 100 );
-		}
 	}
 
 	render() {
