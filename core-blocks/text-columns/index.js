@@ -26,8 +26,10 @@ import './editor.scss';
 export const name = 'core/text-columns';
 
 export const settings = {
-	// Use an empty parent array to indicate this block should no longer be available for insertion.
-	parent: [],
+	// Disable insertion as this block is deprecated and ultimately replaced by the Columns block.
+	supports: {
+		inserter: false,
+	},
 
 	title: __( 'Text Columns' ),
 
@@ -69,7 +71,6 @@ export const settings = {
 		const { width, content, columns } = attributes;
 
 		deprecated( 'The Text Columns block', {
-			version: 'a future version',
 			alternative: 'the Columns block',
 			plugin: 'Gutenberg',
 		} );
