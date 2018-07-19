@@ -248,10 +248,10 @@ class ParagraphBlock extends Component {
 						textColor={ textColor.value }
 						backgroundColor={ backgroundColor.value }
 						{ ...{
+							fontSize,
 							fallbackBackgroundColor,
 							fallbackTextColor,
 						} }
-						isLargeText={ fontSize >= 18 }
 					/>
 				</InspectorControls>
 				<RichText
