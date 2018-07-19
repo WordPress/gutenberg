@@ -161,7 +161,7 @@ function partition( predicate, list ) {
 //////////////////////////////////////////////////////
 
 Block_List
-  = pre:$(!Block .)*
+  = pre:$((!"<!--" .)+ / (!Block .))*
     bs:(b:Block html:$((!Block .)*) { /** <?php return array( $b, $html ); ?> **/ return [ b, html ] })*
     post:$(.*)
   { /** <?php return peg_join_blocks( $pre, $bs, $post ); ?> **/
@@ -196,7 +196,7 @@ Block_Void
   }
 
 Block_Balanced
-  = s:Block_Start children:(Block / $(!Block_End .))* e:Block_End
+  = s:Block_Start children:( $(!"<!--" .)+ / Block / $(!Block_End .) )* e:Block_End
   {
     /** <?php
     list( $innerHTML, $innerBlocks ) = peg_array_partition( $children, 'is_string' );
@@ -269,7 +269,12 @@ Core_Block_Name
   }
 
 Block_Name_Part
-  = $( [a-z][a-z0-9_-]* )
+  = "paragraph"
+  / "list"
+  / "heading"
+  / "image"
+  / "table"
+  / $( [a-z][a-z0-9_-]* )
 
 Block_Attributes
   "JSON-encoded attributes embedded in a block's opening comment"
