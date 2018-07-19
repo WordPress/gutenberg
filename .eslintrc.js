@@ -89,6 +89,10 @@ module.exports = {
 				message: 'Use @wordpress/keycodes as import path instead.',
 			},
 			{
+				selector: 'ImportDeclaration[source.value=/^nux(\\u002F|$)/]',
+				message: 'Use @wordpress/nux as import path instead.',
+			},
+			{
 				selector: 'ImportDeclaration[source.value=/^utils(\\u002F|$)/]',
 				message: 'Use @wordpress/utils as import path instead.',
 			},
@@ -111,10 +115,6 @@ module.exports = {
 			{
 				"selector": "ImportDeclaration[source.value=/^core-blocks$/]",
 				"message": "Use @wordpress/core-blocks as import path instead."
-			},
-			{
-				"selector": "ImportDeclaration[source.value=/^nux$/]",
-				"message": "Use @wordpress/nux as import path instead."
 			},
 			{
 				selector: 'CallExpression[callee.name="deprecated"] Property[key.name="version"][value.value=/' + majorMinorRegExp + '/]',
