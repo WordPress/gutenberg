@@ -310,6 +310,61 @@ transforms: {
 
 To control the priority with which a transform is applied, define a `priority` numeric property on your transform object, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
+A file can be dropped into the editor and transformed into a (specific) file block.
+
+{% codetabs %}
+{% ES5 %}
+```js
+transforms: {
+	from: [
+		{
+			type: 'files',
+			isMatch: ( files ) => files.length === 1,
+			// We define a lower priority (higher number) than the default of 10. This
+			// ensures that the File block is only created as a fallback.
+			priority: 15,
+			transform: function( files ) {
+				const file = files[ 0 ];
+				const blobURL = createBlobURL( file );
+
+				// File will be uploaded in componentDidMount()
+				return createBlock( 'core/file', {
+					href: blobURL,
+					fileName: file.name,
+					textLinkHref: blobURL,
+				} );
+			},
+		},
+	]
+}
+```
+{% ESNext %}
+```js
+transforms: {
+	from: [
+		{
+			type: 'files',
+			isMatch: ( files ) => files.length === 1,
+			// We define a lower priority (higher number) than the default of 10. This
+			// ensures that the File block is only created as a fallback.
+			priority: 15,
+			transform: ( files ) => {
+				const file = files[ 0 ];
+				const blobURL = createBlobURL( file );
+
+				// File will be uploaded in componentDidMount()
+				return createBlock( 'core/file', {
+					href: blobURL,
+					fileName: file.name,
+					textLinkHref: blobURL,
+				} );
+			},
+		},
+	]
+}
+```
+{% end %}
+
 
 #### parent (optional)
 
