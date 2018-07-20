@@ -565,6 +565,31 @@ export const getBlocks = createSelector(
 );
 
 /**
+ * Returns an array containing both top-level blocks
+ * and all blocks referenced by the existing top-level shared blocks.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Array} All top-level and referenced blocks.
+ */
+export const getBlocksTopLevelAndReferenced = createSelector(
+	( state ) => {
+		const topLevelBlocks = getBlocks( state );
+		const referencedBlocksIds = topLevelBlocks.map(
+			( block ) => block.name === 'core/block' ?
+				get( getSharedBlock( state, block.attributes.ref ), [ 'clientId' ], null ) :
+				null,
+		).filter( ( id ) => !! id );
+		const referencedBlocks = getBlocksByClientId( state, referencedBlocksIds );
+		return [ ...topLevelBlocks, ...referencedBlocks ];
+	},
+	( state ) => [
+		state.editor.present.blockOrder,
+		state.editor.present.blocksByClientId,
+	]
+);
+
+/**
  * Returns the total number of blocks, or the total number of blocks with a specific name in a post.
  * The number returned includes nested blocks.
  *
@@ -1546,7 +1571,7 @@ export const getInserterItems = createSelector(
 
 			let isDisabled = false;
 			if ( ! hasBlockSupport( blockType.name, 'multiple', true ) ) {
-				isDisabled = some( getBlocks( state ), { name: blockType.name } );
+				isDisabled = some( getBlocksTopLevelAndReferenced( state ), { name: blockType.name } );
 			}
 
 			const isContextual = isArray( blockType.parent );
