@@ -1,5 +1,32 @@
 <?php
 
+# Operations
+#
+#  - `add_freeform_output()`
+#  - `start_tracking_block()`
+#  - `close_block_and_add_as_inner_block()`
+#  - `close_block_and_add_to_output()`
+#
+# Stack data structure
+#  - block name, attrs, innerBlocks as list, innerHTML as text
+#  - start of block token
+#  - start of region inside block / length of opening token
+#
+
+class Block {
+    public $blockName;
+    public $attrs;
+    public $innerBlocks;
+    public $innerHtml;
+
+    function __construct( $name, $attrs, $innerBlocks, $innerHtml ) {
+        $this->blockName = $name;
+        $this->attrs = $attrs;
+        $this->innerBlocks = $innerBlocks;
+        $this->innerHtml = $innerHtml;
+    }
+}
+
 class MyParser {
     public $document;
     public $offset;
@@ -14,22 +41,29 @@ class MyParser {
     }
 
     function parse() {
+        $tic = microtime( true );
         do {
             # twiddle our thumbs
         } while ( $this->proceed() );
+        $toc = microtime( true );
 
-        return $this->output;
+        return array(
+            'parse' => $this->output,
+            'ms'    => 1000 * ( $toc - $tic ),
+            'mem'   => memory_get_peak_usage(),
+            'memR'  => memory_get_peak_usage( true ),
+        );
     }
 
     function proceed() {
         list( $token_type, $block_name, $attrs, $start_offset, $token_length ) = $this->next_token();
+        $stack_depth = count( $this->stack );
 
         switch ( $token_type ) {
             case 'no-more-tokens':
                 # if not in a block then flush output
-                if ( 0 === count( $this->stack ) ) {
+                if ( 0 === $stack_depth ) {
                     $this->add_freeform();
-                    $this->offset = strlen( $this->document );
                     return false;
                 }
 
@@ -43,10 +77,9 @@ class MyParser {
                 #  - assume an implicit closer (easiest when not nesting)
 
                 # for the easy case we'll assume and implicit closer
-                if ( 1 === count( $this->stack ) ) {
+                if ( 1 === $stack_depth ) {
                     $this->error( ' - treating as implicit closer' );
                     $this->pop_stack();
-                    $this->offset = strlen( $this->document );
                     return false;
                 }
 
@@ -58,32 +91,39 @@ class MyParser {
                 while ( 0 < count( $this->stack ) ) {
                     $this->pop_stack();
                 }
-                $this->offset = strlen( $this->document );
                 return false;
 
             case 'void-block':
                 # easy case is if we stumbled upon a void block
                 # in the top-level of the document
-                if ( 0 === count( $this->stack ) ) {
-                    $this->add_block( $block_name, $attrs, array(), '' );
+                if ( 0 === $stack_depth ) {
+                    $this->output[] = new Block( $block_name, $attrs, array(), '' );
                     $this->offset = $start_offset + $token_length;
                     return true;
                 }
 
                 # otherwise we found an inner block
-                $this->add_inner_block( $block_name, $attrs, array(), '' );
+                $this->add_inner_block( array(
+                    'block'        => new Block( $block_name, $attrs, array(), '' ),
+                    'token_start'  => $start_offset,
+                    'token_length' => $token_length,
+                ) );
                 $this->offset = $start_offset + $token_length;
                 return true;
 
             case 'block-opener':
-                $this->push_stack( $block_name, $attrs, $start_offset, $token_length );
+                $this->start_tracking_block( array(
+                    'block'        => new Block( $block_name, $attrs, array(), '' ),
+                    'token_start'  => $start_offset,
+                    'token_length' => $token_length,
+                ) );
                 $this->offset = $start_offset + $token_length;
                 return true;
 
             case 'block-closer':
                 # if we're missing an opener we're in trouble
                 # This is an error
-                if ( 0 === count( $this->stack ) ) {
+                if ( 0 === $stack_depth ) {
                     $this->error( 'found a closer with no opening block' );
                     $this->error( 'failed at offset ' . $start_offset );
 
@@ -92,12 +132,11 @@ class MyParser {
                     #  - assume _this_ is the opener
                     #  - give up and close out the document
                     $this->add_freeform();
-                    $this->offset = strlen( $this->document );
                     return false;
                 }
 
                 # if we're not nesting then this is easy - close the block
-                if ( 1 === count( $this->stack ) ) {
+                if ( 1 === $stack_depth ) {
                     $this->pop_stack( $start_offset );
                     $this->offset = $start_offset + $token_length;
                     return true;
@@ -105,12 +144,15 @@ class MyParser {
 
                 # otherwise we're nested and we have to close out the current
                 # block and add it as a new innerBlock to the parent
-                $block = array_pop( $this->stack );
+                $stack_top = array_pop( $this->stack );
+                $stack_top[ 'block' ]->innerHtml .= substr( $this->document, $stack_top[ 'prev_offset' ], $start_offset - $stack_top[ 'prev_offset' ] );
+                $stack_top[ 'prev_offset' ] = $start_offset + $token_length;
+
                 $this->add_inner_block( array(
-                    'blockName'   => $block[ 0 ],
-                    'attrs'       => $block[ 1 ],
-                    'innerBlocks' => $block[ 2 ],
-                    'innerHTML'   => substr( $this->document, $block[ 3 ] + $block[ 4 ], $start_offset - $block[ 3 ] - $block[ 4 ] ),
+                    'block'        => $stack_top[ 'block' ],
+                    'token_start'  => $stack_top[ 'token_start' ],
+                    'token_length' => $stack_top[ 'token_length' ],
+                    'last_offset'  => $start_offset + $token_length,
                 ) );
                 $this->offset = $start_offset + $token_length;
                 return true;
@@ -119,7 +161,6 @@ class MyParser {
                 # This is an error
                 $this->error( 'found unexpected token at offset ' . $this->offset );
                 $this->add_freeform();
-                $this->offset = strlen( $this->document );
                 return false;
         }
     }
@@ -169,43 +210,39 @@ class MyParser {
         return array( 'block-opener', $name, $attrs, $started_at, $length );
     }
 
-    function add_block( $block_name, $attrs, $inner_blocks, $inner_html ) {
-        $this->output[] = array(
-            'blockName'   => $block_name,
-            'attrs'       => $attrs,
-            'innerBlocks' => $inner_blocks,
-            'innerHTML'   => $inner_html,
-        );
-    }
-
     function add_freeform( $length = null ) {
         $this->output[] = isset( $length )
             ? self::freeform( substr( $this->document, $this->offset, $length ) )
             : self::freeform( substr( $this->document, $this->offset ) );
     }
 
-    function add_inner_block( $block ) {
-        # optimized way of pushing new block onto $inner_blocks of parent stack block
-        $this->stack[ count( $this->stack ) - 1 ][ 2 ][] = $block;
+    function add_inner_block( $args ) {
+        $stack_top = array_pop( $this->stack );
+        $stack_top[ 'block' ]->innerBlocks[] = $args[ 'block' ];
+        $stack_top[ 'block' ]->innerHtml .= substr( $this->document, $stack_top[ 'prev_offset' ], $args[ 'token_start' ] - $stack_top[ 'prev_offset' ] );
+        $stack_top[ 'prev_offset' ] = $args[ 'last_offset' ] ?: $args[ 'token_start' ] + $args[ 'token_length' ];
+
+        array_push( $this->stack, $stack_top );
     }
 
-    function push_stack( $block_name, $attrs, $start_offset, $length ) {
-        array_push( $this->stack, array( $block_name, $attrs, array(), $start_offset, $length ) );
+    function start_tracking_block( $args ) {
+        array_push( $this->stack, array(
+            'block'        => $args[ 'block' ],
+            'token_start'  => $args[ 'token_start' ],
+            'token_length' => $args[ 'token_length' ],
+            'prev_offset'  => $args[ 'token_start' ] + $args[ 'token_length' ],
+        ) );
     }
 
     function pop_stack( $end_offset = null ) {
-        list( $block_name, $attrs, $inner_blocks, $start_offset, $length ) = array_pop( $this->stack );
+        $stack_top = array_pop( $this->stack );
+        $prev_offset = $stack_top[ 'prev_offset' ];
 
-        $inner_html = isset( $end_offset )
-            ? substr( $this->document, $start_offset + $length, $end_offset - $start_offset - $length )
-            : substr( $this->document, $start_offset + $length );
+        $stack_top[ 'block' ]->innerHtml .= isset( $end_offset )
+            ? substr( $this->document, $prev_offset, $end_offset - $prev_offset )
+            : substr( $this->document, $prev_offset );
 
-        $this->output[] = array(
-            'blockName'   => $block_name,
-            'attrs'       => $attrs,
-            'innerBlocks' => $inner_blocks,
-            'innerHTML'   => $inner_html,
-        );
+        $this->output[] = $stack_top[ 'block' ];
     }
 
     function error( $message ) {
@@ -214,8 +251,8 @@ class MyParser {
 
     static function freeform( $s ) {
         return array(
-            'attrs'     => new stdClass(),
-            'innerHTML' => $s,
+            'attrs'      => new stdClass(),
+            'innerHtml' => $s,
         );
     }
 }
