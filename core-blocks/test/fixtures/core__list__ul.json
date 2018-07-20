@@ -8,23 +8,33 @@
             "values": [
                 {
                     "type": "li",
-                    "children": "Text & Headings"
+                    "children": [
+                        "Text & Headings"
+                    ]
                 },
                 {
                     "type": "li",
-                    "children": "Images & Videos"
+                    "children": [
+                        "Images & Videos"
+                    ]
                 },
                 {
                     "type": "li",
-                    "children": "Galleries"
+                    "children": [
+                        "Galleries"
+                    ]
                 },
                 {
                     "type": "li",
-                    "children": "Embeds, like YouTube, Tweets, or other WordPress posts."
+                    "children": [
+                        "Embeds, like YouTube, Tweets, or other WordPress posts."
+                    ]
                 },
                 {
                     "type": "li",
-                    "children": "Layout blocks, like Buttons, Hero Images, Separators, etc."
+                    "children": [
+                        "Layout blocks, like Buttons, Hero Images, Separators, etc."
+                    ]
                 },
                 {
                     "type": "li",
@@ -32,7 +42,9 @@
                         "And ",
                         {
                             "type": "em",
-                            "children": "Lists"
+                            "children": [
+                                "Lists"
+                            ]
                         },
                         " like this one of course :)"
                     ]

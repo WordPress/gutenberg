@@ -516,6 +516,12 @@ describe( 'renderAttributes()', () => {
 } );
 
 describe( 'renderStyle()', () => {
+	it( 'should return string verbatim', () => {
+		const result = renderStyle( 'color:red' );
+
+		expect( result ).toBe( 'color:red' );
+	} );
+
 	it( 'should return undefined if empty', () => {
 		const result = renderStyle( {} );
 

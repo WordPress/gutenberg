@@ -28,7 +28,15 @@
 /**
  * External dependencies
  */
-import { flowRight, isEmpty, castArray, omit, startsWith, kebabCase } from 'lodash';
+import {
+	flowRight,
+	isEmpty,
+	castArray,
+	omit,
+	startsWith,
+	kebabCase,
+	isPlainObject,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -618,6 +626,11 @@ export function renderAttributes( props ) {
  * @return {string} Style attribute value.
  */
 export function renderStyle( style ) {
+	// Only generate from object, e.g. tolerate string value.
+	if ( ! isPlainObject( style ) ) {
+		return style;
+	}
+
 	let result;
 
 	for ( const property in style ) {
