@@ -44,7 +44,7 @@ const {
 	getBlockName,
 	getBlock,
 	getBlocks,
-	getBlocksTopLevelAndReferenced,
+	getBlocksUnfolded,
 	getBlockCount,
 	hasSelectedBlock,
 	getSelectedBlock,
@@ -1732,7 +1732,7 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getBlocksTopLevelAndReferenced', () => {
+	describe( 'getBlocksUnfolded', () => {
 		it( 'should return the top level blocks and any block referenced by a existing top-level shared block', () => {
 			const state = {
 				currentPost: {},
@@ -1743,9 +1743,21 @@ describe( 'selectors', () => {
 							'uuid-4': { clientId: 'uuid-4', name: 'core/paragraph', attributes: {} },
 							'uuid-6': { clientId: 'uuid-6', name: 'core/paragraph', attributes: {} },
 							'uuid-8': { clientId: 'uuid-8', name: 'core/block', attributes: { ref: 1 } },
+							'uuid-10': { clientId: 'uuid-10', name: 'core/columns', attributes: { } },
+							'uuid-12': { clientId: 'uuid-12', name: 'core/column', attributes: { } },
+							'uuid-14': { clientId: 'uuid-14', name: 'core/column', attributes: { } },
+							'uuid-16': { clientId: 'uuid-16', name: 'core/quote', attributes: { } },
 						},
 						blockOrder: {
-							'': [ 'uuid-6', 'uuid-8' ],
+							'': [ 'uuid-6', 'uuid-8', 'uuid-10' ],
+							'uuid-2': [ ],
+							'uuid-4': [ ],
+							'uuid-6': [ ],
+							'uuid-8': [ ],
+							'uuid-10': [ 'uuid-12', 'uuid-14' ],
+							'uuid-12': [ 'uuid-16' ],
+							'uuid-14': [ ],
+							'uuid-16': [ ],
 						},
 						edits: {},
 					},
@@ -1757,10 +1769,21 @@ describe( 'selectors', () => {
 					},
 				},
 			};
-			expect( getBlocksTopLevelAndReferenced( state ) ).toEqual( [
+			expect( getBlocksUnfolded( state ) ).toEqual( [
 				{ clientId: 'uuid-6', name: 'core/paragraph', attributes: {}, innerBlocks: [] },
 				{ clientId: 'uuid-8', name: 'core/block', attributes: { ref: 1 }, innerBlocks: [] },
+				{ clientId: 'uuid-10', name: 'core/columns', attributes: { }, innerBlocks: [
+					{ clientId: 'uuid-12', name: 'core/column', attributes: { }, innerBlocks: [
+						{ clientId: 'uuid-16', name: 'core/quote', attributes: { }, innerBlocks: [] },
+					] },
+					{ clientId: 'uuid-14', name: 'core/column', attributes: { }, innerBlocks: [] },
+				] },
 				{ clientId: 'uuid-2', name: 'core/image', attributes: {}, innerBlocks: [] },
+				{ clientId: 'uuid-12', name: 'core/column', attributes: { }, innerBlocks: [
+					{ clientId: 'uuid-16', name: 'core/quote', attributes: { }, innerBlocks: [] },
+				] },
+				{ clientId: 'uuid-14', name: 'core/column', attributes: { }, innerBlocks: [] },
+				{ clientId: 'uuid-16', name: 'core/quote', attributes: { }, innerBlocks: [] },
 			] );
 		} );
 	} );
