@@ -17,7 +17,7 @@ import { registerCoreBlocks } from '@wordpress/core-blocks';
 describe( 'Blocks raw handling', () => {
 	beforeAll( () => {
 		// Load all hooks that modify blocks
-		require( 'editor/hooks' );
+		require( '../../packages/editor/src/hooks' );
 		registerCoreBlocks();
 	} );
 
