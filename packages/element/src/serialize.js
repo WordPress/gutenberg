@@ -39,11 +39,6 @@ import {
 } from 'lodash';
 
 /**
- * WordPress dependencies
- */
-import deprecated from '@wordpress/deprecated';
-
-/**
  * Internal dependencies
  */
 import { Fragment, RawHTML } from './';
@@ -517,15 +512,6 @@ export function renderNativeComponent( type, props, context = {} ) {
  */
 export function renderComponent( Component, props, context = {} ) {
 	const instance = new Component( props, context );
-
-	if ( typeof instance.componentWillMount === 'function' ) {
-		instance.componentWillMount();
-		deprecated( 'componentWillMount', {
-			version: '3.3',
-			alternative: 'the constructor',
-			plugin: 'Gutenberg',
-		} );
-	}
 
 	if ( typeof instance.getChildContext === 'function' ) {
 		Object.assign( context, instance.getChildContext() );
