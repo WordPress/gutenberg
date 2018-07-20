@@ -113,11 +113,12 @@ class MyParser {
                 return true;
 
             case 'block-opener':
-                $this->start_tracking_block(
+                array_push( $this->stack, new Frame(
                     new Block( $block_name, $attrs, array(), '' ),
                     $start_offset,
-                    $token_length
-                );
+                    $token_length,
+                    $start_offset + $token_length
+                ) );
                 $this->offset = $start_offset + $token_length;
                 return true;
 
@@ -222,15 +223,6 @@ class MyParser {
         $parent->block->innerBlocks[] = $block;
         $parent->block->innerHtml .= substr( $this->document, $parent->prev_offset, $token_start - $parent->prev_offset );
         $parent->prev_offset = $last_offset ?: $token_start + $token_length;
-    }
-
-    function start_tracking_block( Block $block, $token_start, $token_length ) {
-        array_push( $this->stack, new Frame(
-            $block,
-            $token_start,
-            $token_length,
-            $token_start + $token_length
-        ) );
     }
 
     function pop_stack( $end_offset = null ) {
