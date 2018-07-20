@@ -20,6 +20,9 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"dependencies": {
+		"@babel/runtime": "^7.0.0-beta.52"
+	},
 	"devDependencies": {
 		"benchmark": "^2.1.4",
 		"fbjs": "^0.8.16",
@@ -30,8 +33,5 @@
 	},
 	"publishConfig": {
 		"access": "public"
-	},
-	"dependencies": {
-		"@babel/runtime": "^7.0.0-beta.52"
 	}
 }

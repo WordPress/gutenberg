@@ -16,11 +16,6 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"files": [
-		"build",
-		"build-module",
-		"build-style"
-	],
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
