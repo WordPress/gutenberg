@@ -24,6 +24,7 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
  - `focusOnMount` prop in the `Popover` component has been changed from `Boolean`-only to an enum-style property that accepts `"firstElement"`, `"container"`, or `false`. Please convert any `<Popover focusOnMount />` usage to `<Popover focusOnMount="firstElement" />`.
  - `wp.utils.keycodes` utilities are removed. Please use `wp.keycodes` instead.
  - Block `id` prop in `edit` function removed. Please use block `clientId` prop instead.
+ - `property` source removed. Please use equivalent `text`, `html`, or `attribute` source, or comment attribute instead.
 
 ## 3.3.0
 
@@ -33,7 +34,6 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
  - `blocks.BlockEdit` filter removed. Please use `editor.BlockEdit` instead.
  - `blocks.BlockListBlock` filter removed. Please use `editor.BlockListBlock` instead.
  - `blocks.MediaUpload` filter removed. Please use `editor.MediaUpload` instead.
- - `property` source removed. Please use equivalent `text`, `html`, or `attribute` source, or comment attribute instead.
 
 ## 3.2.0
 

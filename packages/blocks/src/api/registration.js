@@ -3,14 +3,13 @@
 /**
  * External dependencies
  */
-import { get, set, isFunction, some } from 'lodash';
+import { get, isFunction, some } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { applyFilters } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -165,16 +164,6 @@ export function registerBlockType( name, settings ) {
 			`The icon background color ${ settings.icon.background } and the foreground color ${ settings.icon.foreground } are not readable together. ` +
 			'Please try to increase the brightness and/or contrast difference between background and foreground.'
 		);
-	}
-
-	if ( 'useOnce' in settings ) {
-		deprecated( 'useOnce', {
-			version: '3.3',
-			alternative: 'supports.multiple',
-			plugin: 'Gutenberg',
-			hint: 'useOnce property in the settings param passed to wp.block.registerBlockType.',
-		} );
-		set( settings, [ 'supports', 'multiple' ], ! settings.useOnce );
 	}
 
 	dispatch( 'core/blocks' ).addBlockTypes( settings );

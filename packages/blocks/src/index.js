@@ -7,6 +7,5 @@
 //
 // Blocks are inferred from the HTML source of a post through a parsing mechanism
 // and then stored as objects in state, from which it is then rendered for editing.
-import './deprecated-hooks';
 import './store';
 export * from './api';
