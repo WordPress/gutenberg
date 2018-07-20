@@ -12,11 +12,9 @@ import classnames from 'classnames';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Component, Fragment, renderToString } from '@wordpress/element';
-import { Button, Placeholder, Spinner, SandBox } from '@wordpress/components';
+import { Button, Placeholder, Spinner, SandBox, IconButton } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
-import {
-	RichText,
-} from '@wordpress/editor';
+import { RichText, BlockControls } from '@wordpress/editor';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
@@ -84,6 +82,7 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 				super( ...arguments );
 
 				this.doServerSideRender = this.doServerSideRender.bind( this );
+				this.switchBackToURLInput = this.switchBackToURLInput.bind( this );
 
 				this.state = {
 					html: '',
@@ -173,10 +172,24 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 					);
 			}
 
+			switchBackToURLInput() {
+				this.setState( { html: undefined } );
+			}
+
 			render() {
 				const { html, type, error, fetching } = this.state;
 				const { url, caption } = this.props.attributes;
 				const { setAttributes, isSelected, className } = this.props;
+				const controls = (
+					<BlockControls>
+						{ ( html && <IconButton
+							className="components-toolbar__control"
+							label={ __( 'Edit URL' ) }
+							icon="edit"
+							onClick={ this.switchBackToURLInput }
+						/> ) }
+					</BlockControls>
+				);
 
 				if ( fetching ) {
 					return (
@@ -233,6 +246,7 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 
 				return (
 					<Fragment>
+						{ controls }
 						<figure className={ classnames( className, 'wp-block-embed', { 'is-video': 'video' === type } ) }>
 							{ ( cannotPreview ) ? (
 								<Placeholder icon={ icon } label={ __( 'Embed URL' ) }>
