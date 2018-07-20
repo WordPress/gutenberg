@@ -24,7 +24,7 @@ public class RCTAztecViewManager: RCTViewManager {
             defaultParagraphStyle: .default,
             defaultMissingImage: UIImage())
         
-        view.isScrollEnabled = true
+        view.isScrollEnabled = false
         
         view.backgroundColor = .yellow
         view.text = "Hello world!"
