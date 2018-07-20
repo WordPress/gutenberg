@@ -40,6 +40,9 @@ const renderColorIndicators = ( colorSettings, colors ) => {
 	} );
 };
 
+// colorSettings is passed as an array of props so that it can be used for
+// mapping both ColorIndicator and ColorPaletteControl components. Passing
+// an array of components/nodes here wouldn't be feasible.
 export function PanelColorSettings( { title, colorSettings, colors, children, ...props } ) {
 	const className = 'editor-panel-color-settings';
 
