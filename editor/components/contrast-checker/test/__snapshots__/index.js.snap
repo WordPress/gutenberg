@@ -77,3 +77,79 @@ exports[`ContrastChecker should render messages when the textColor is valid, but
   </div>
 </ContrastChecker>
 `;
+
+exports[`ContrastChecker should take into consideration the font size passed 1`] = `
+<ContrastChecker
+  backgroundColor="#C44B4B"
+  fontSize={17}
+  textColor="#000000"
+>
+  <div
+    className="editor-contrast-checker"
+  >
+    <Notice
+      isDismissible={false}
+      status="warning"
+    >
+      <div
+        className="notice notice-alt notice-warning"
+      >
+        <p>
+          This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.
+        </p>
+      </div>
+    </Notice>
+  </div>
+</ContrastChecker>
+`;
+
+exports[`ContrastChecker should take into consideration wherever text is large or not 1`] = `
+<ContrastChecker
+  backgroundColor="#C44B4B"
+  isLargeText={false}
+  textColor="#000000"
+>
+  <div
+    className="editor-contrast-checker"
+  >
+    <Notice
+      isDismissible={false}
+      status="warning"
+    >
+      <div
+        className="notice notice-alt notice-warning"
+      >
+        <p>
+          This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.
+        </p>
+      </div>
+    </Notice>
+  </div>
+</ContrastChecker>
+`;
+
+exports[`ContrastChecker should use isLargeText to make decisions if both isLargeText and fontSize props are passed 1`] = `
+<ContrastChecker
+  backgroundColor="#C44B4B"
+  fontSize={18}
+  isLargeText={false}
+  textColor="#000000"
+>
+  <div
+    className="editor-contrast-checker"
+  >
+    <Notice
+      isDismissible={false}
+      status="warning"
+    >
+      <div
+        className="notice notice-alt notice-warning"
+      >
+        <p>
+          This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.
+        </p>
+      </div>
+    </Notice>
+  </div>
+</ContrastChecker>
+`;
