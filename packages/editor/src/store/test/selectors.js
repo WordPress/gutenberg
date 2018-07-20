@@ -44,6 +44,7 @@ const {
 	getBlockName,
 	getBlock,
 	getBlocks,
+	getBlocksTopLevelAndReferenced,
 	getBlockCount,
 	hasSelectedBlock,
 	getSelectedBlock,
@@ -1727,6 +1728,39 @@ describe( 'selectors', () => {
 			expect( getBlocks( state ) ).toEqual( [
 				{ clientId: 123, name: 'core/paragraph', attributes: {}, innerBlocks: [] },
 				{ clientId: 23, name: 'core/heading', attributes: {}, innerBlocks: [] },
+			] );
+		} );
+	} );
+
+	describe( 'getBlocksTopLevelAndReferenced', () => {
+		it( 'should return the top level blocks and any block referenced by a existing top-level shared block', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByClientId: {
+							'uuid-2': { clientId: 'uuid-2', name: 'core/image', attributes: {} },
+							'uuid-4': { clientId: 'uuid-4', name: 'core/paragraph', attributes: {} },
+							'uuid-6': { clientId: 'uuid-6', name: 'core/paragraph', attributes: {} },
+							'uuid-8': { clientId: 'uuid-8', name: 'core/block', attributes: { ref: 1 } },
+						},
+						blockOrder: {
+							'': [ 'uuid-6', 'uuid-8' ],
+						},
+						edits: {},
+					},
+				},
+				sharedBlocks: {
+					data: {
+						1: { clientId: 'uuid-2', title: 'SharedImage' },
+						3: { clientId: 'uuid-4', title: 'SharedParagraph' },
+					},
+				},
+			};
+			expect( getBlocksTopLevelAndReferenced( state ) ).toEqual( [
+				{ clientId: 'uuid-6', name: 'core/paragraph', attributes: {}, innerBlocks: [] },
+				{ clientId: 'uuid-8', name: 'core/block', attributes: { ref: 1 }, innerBlocks: [] },
+				{ clientId: 'uuid-2', name: 'core/image', attributes: {}, innerBlocks: [] },
 			] );
 		} );
 	} );
