@@ -487,14 +487,15 @@ add_filter( 'rest_request_before_callbacks', 'gutenberg_handle_early_callback_ch
  *
  * @see https://core.trac.wordpress.org/ticket/43998
  *
- * @param array  $query_params JSON Schema-formatted collection parameters.
- * @param string $post_type    Post type being accessed.
+ * @param array        $query_params JSON Schema-formatted collection parameters.
+ * @param WP_Post_Type $post_type    Post type object being accessed.
  * @return array
  */
 function gutenberg_filter_post_collection_parameters( $query_params, $post_type ) {
-	$post_types = array( 'page', 'wp_block' );
-	if ( in_array( $post_type->name, $post_types, true )
-		&& isset( $query_params['per_page'] ) ) {
+	if (
+		isset( $query_params['per_page'] ) &&
+		( $post_type->hierarchical || 'wp_block' === $post_type->name )
+	) {
 		// Change from '1' to '-1', which means unlimited.
 		$query_params['per_page']['minimum'] = -1;
 		// Default sanitize callback is 'absint', which won't work in our case.
@@ -513,8 +514,10 @@ function gutenberg_filter_post_collection_parameters( $query_params, $post_type 
  * @return array
  */
 function gutenberg_filter_post_query_arguments( $prepared_args, $request ) {
-	$post_types = array( 'page', 'wp_block' );
-	if ( in_array( $prepared_args['post_type'], $post_types, true ) ) {
+	if (
+		is_post_type_hierarchical( $prepared_args['post_type'] ) ||
+		'wp_block' === $prepared_args['post_type']
+	) {
 		// Avoid triggering 'rest_post_invalid_page_number' error
 		// which will need to be addressed in https://core.trac.wordpress.org/ticket/43998.
 		if ( -1 === $prepared_args['posts_per_page'] ) {
