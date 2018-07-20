@@ -113,6 +113,11 @@ class MyParser {
                 return true;
 
             case 'block-opener':
+                # we may have some HTML soup before the next block
+                if ( $start_offset > $this->offset ) {
+                    self::add_freeform( $start_offset - $this->offset );
+                }
+
                 array_push( $this->stack, new Frame(
                     new Block( $block_name, $attrs, array(), '' ),
                     $start_offset,
