@@ -9,11 +9,11 @@ exports[`PanelColorSettings matches the snapshot 1`] = `
     >
       Test Title
       <ColorIndicator
-        ariaLabel="black"
+        aria-label="black"
         colorValue="#000"
       />
       <ColorIndicator
-        ariaLabel="nearly black"
+        aria-label="nearly black"
         colorValue="#111"
       />
     </span>

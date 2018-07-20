@@ -24,13 +24,17 @@ const renderColorIndicators = ( colorSettings, colors ) => {
 			return null;
 		}
 
-		const colorName = getColorName( value, colors );
+		let ariaLabel;
+		if ( colorIndicatorAriaLabel ) {
+			const colorName = getColorName( colors, value );
+			ariaLabel = sprintf( colorIndicatorAriaLabel, colorName || value );
+		}
 
 		return (
 			<ColorIndicator
 				key={ index }
 				colorValue={ value }
-				ariaLabel={ sprintf( colorIndicatorAriaLabel, colorName || value ) }
+				aria-label={ ariaLabel }
 			/>
 		);
 	} );

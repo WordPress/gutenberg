@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow, mount } from 'enzyme';
+import { shallow } from 'enzyme';
 
 /**
  * Internal dependencies
@@ -13,17 +13,5 @@ describe( 'PanelColor', () => {
 		const wrapper = shallow( <PanelColor title="sample title" /> );
 
 		expect( wrapper ).toMatchSnapshot();
-	} );
-
-	it( 'should have color when provided', () => {
-		const wrapper = mount( <PanelColor colorValue="red" title="sample title" /> );
-
-		expect( wrapper.find( '[ariaLabel]' ).first().prop( 'ariaLabel' ) ).toBe( '(current color: red)' );
-	} );
-
-	it( 'should use color name in area label if provided', () => {
-		const wrapper = mount( <PanelColor colorValue="#f00" colorName="red" title="sample title" /> );
-
-		expect( wrapper.find( '[ariaLabel]' ).first().prop( 'ariaLabel' ) ).toBe( '(current color: red)' );
 	} );
 } );

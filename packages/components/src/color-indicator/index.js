@@ -8,11 +8,11 @@ import classnames from 'classnames';
  */
 import './style.scss';
 
-const ColorIndicator = ( { ariaLabel, colorValue, className } ) => (
+const ColorIndicator = ( { className, colorValue, ...props } ) => (
 	<span
 		className={ classnames( 'component-color-indicator', className ) }
-		aria-label={ ariaLabel }
 		style={ { background: colorValue } }
+		{ ...props }
 	/>
 );
 

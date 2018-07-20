@@ -21,7 +21,7 @@ function PanelColor( { colorValue, colorName, title, ...props } ) {
 					<ColorIndicator
 						key="color"
 						className="components-panel__color-indicator"
-						ariaLabel={ currentColorLabel }
+						aria-label={ currentColorLabel }
 						colorValue={ colorValue }
 					/>
 				),

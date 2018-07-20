@@ -14,7 +14,11 @@ import withColorContext from './with-color-context';
 import { getColorName } from '../colors';
 
 const ColorPaletteControl = withColorContext( ( { label, value, onChange, colorIndicatorAriaLabel, colors } ) => {
-	const colorName = getColorName( value, colors );
+	let ariaLabel;
+	if ( colorIndicatorAriaLabel ) {
+		const colorName = getColorName( colors, value );
+		ariaLabel = sprintf( colorIndicatorAriaLabel, colorName || value );
+	}
 
 	const labelElement = (
 		<Fragment>
@@ -22,7 +26,7 @@ const ColorPaletteControl = withColorContext( ( { label, value, onChange, colorI
 			{ value && (
 				<ColorIndicator
 					colorValue={ value }
-					ariaLabel={ sprintf( colorIndicatorAriaLabel, colorName || value ) }
+					aria-label={ ariaLabel }
 				/>
 			) }
 		</Fragment>
