@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/compose",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "WordPress Higher Order components",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
