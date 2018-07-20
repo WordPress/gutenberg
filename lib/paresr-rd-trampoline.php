@@ -169,7 +169,7 @@ class MyParser {
         $matches = null;
 
         $has_match = preg_match(
-            '/<!--\s+(?<closer>\/)?wp:(?<name>[a-z][a-z0-9_-]*)\s+(?<attrs>{(?:(?!}\s+-->).)+}\s+)?(?<void>\/)?-->/',
+            '/<!--\s+(?<closer>\/)?wp:(?<name>[a-z][a-z0-9_-]*)\s+(?<attrs>{(?:(?!}\s+-->).)+}\s+)?(?<void>\/)?-->/s',
             $this->document,
             $matches,
             PREG_OFFSET_CAPTURE,
