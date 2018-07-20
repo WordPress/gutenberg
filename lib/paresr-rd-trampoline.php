@@ -252,7 +252,7 @@ class MyParser {
 
     static function freeform( $s ) {
         return array(
-            'attrs'     => null,
+            'attrs'     => new stdClas(),
             'innerHTML' => $s,
         );
     }
