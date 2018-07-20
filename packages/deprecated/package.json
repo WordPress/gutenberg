@@ -18,7 +18,9 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
-	"react-native": "src/index",
+	"dependencies": {
+		"@babel/runtime": "^7.0.0-beta.52"
+	},
 	"publishConfig": {
 		"access": "public"
 	}
