@@ -4,13 +4,13 @@ class Block {
     public $blockName;
     public $attrs;
     public $innerBlocks;
-    public $innerHtml;
+    public $innerHTML;
 
-    function __construct( $name, $attrs, $innerBlocks, $innerHtml ) {
+    function __construct( $name, $attrs, $innerBlocks, $innerHTML ) {
         $this->blockName   = $name;
         $this->attrs       = $attrs;
         $this->innerBlocks = $innerBlocks;
-        $this->innerHtml   = $innerHtml;
+        $this->innerHTML   = $innerHTML;
     }
 }
 
@@ -147,7 +147,7 @@ class MyParser {
                 # otherwise we're nested and we have to close out the current
                 # block and add it as a new innerBlock to the parent
                 $stack_top = array_pop( $this->stack );
-                $stack_top->block->innerHtml .= substr( $this->document, $stack_top->prev_offset, $start_offset - $stack_top->prev_offset );
+                $stack_top->block->innerHTML .= substr( $this->document, $stack_top->prev_offset, $start_offset - $stack_top->prev_offset );
                 $stack_top->prev_offset = $start_offset + $token_length;
 
                 $this->add_inner_block(
@@ -171,7 +171,7 @@ class MyParser {
         $matches = null;
 
         $has_match = preg_match(
-            '/<!--\s+(?<closer>\/)?wp:(?<name>[a-z][a-z0-9_-]*)\s+(?<attrs>{(?:(?!}\s+-->).)+}\s+)?(?<void>\/)?-->/s',
+            '/<!--\s+(?<closer>\/)?wp:(?<namespace>[a-z][a-z0-9_-]*\/)?(?<name>[a-z][a-z0-9_-]*)\s+(?<attrs>{(?:(?!}\s+-->).)+}\s+)?(?<void>\/)?-->/s',
             $this->document,
             $matches,
             PREG_OFFSET_CAPTURE,
@@ -188,9 +188,10 @@ class MyParser {
         $length     = strlen( $match );
         $is_closer  = isset( $matches[ 'closer' ] ) && -1 !== $matches[ 'closer' ][ 1 ];
         $is_void    = isset( $matches[ 'void' ] ) && -1 !== $matches[ 'void' ][ 1 ];
-        $name       = $matches[ 'name' ][ 0 ];
+        $namespace  = isset( $matches[ 'namspace' ] ) && -1 !== $matches[ 'namespace' ][ 1 ] ? $matches[ 'namespace' ] : 'core/';
+        $name       = $namespace . $matches[ 'name' ][ 0 ];
         $has_attrs  = isset( $matches[ 'attrs' ] ) && -1 !== $matches[ 'attrs' ][ 1 ];
-        $attrs      = $has_attrs ? json_decode( $matches[ 'attrs' ][ 0 ] ) : new stdClass();
+        $attrs      = $has_attrs ? json_decode( $matches[ 'attrs' ][ 0 ] ) : null;
 
         # This state isn't allowed
         # This is an error
@@ -213,15 +214,19 @@ class MyParser {
     }
 
     function add_freeform( $length = null ) {
-        $this->output[] = isset( $length )
-            ? self::freeform( substr( $this->document, $this->offset, $length ) )
-            : self::freeform( substr( $this->document, $this->offset ) );
+        $length = $length ?? strlen( $this->document ) - $this->offset;
+
+        if ( 0 === $length ) {
+            return;
+        }
+
+        $this->output[] = self::freeform( substr( $this->document, $this->offset, $length ) );
     }
 
     function add_inner_block( Block $block, $token_start, $token_length, $last_offset = null ) {
         $parent = $this->stack[ count( $this->stack ) - 1 ];
         $parent->block->innerBlocks[] = $block;
-        $parent->block->innerHtml .= substr( $this->document, $parent->prev_offset, $token_start - $parent->prev_offset );
+        $parent->block->innerHTML .= substr( $this->document, $parent->prev_offset, $token_start - $parent->prev_offset );
         $parent->prev_offset = $last_offset ?: $token_start + $token_length;
     }
 
@@ -229,7 +234,7 @@ class MyParser {
         $stack_top = array_pop( $this->stack );
         $prev_offset = $stack_top->prev_offset;
 
-        $stack_top->block->innerHtml .= isset( $end_offset )
+        $stack_top->block->innerHTML .= isset( $end_offset )
             ? substr( $this->document, $prev_offset, $end_offset - $prev_offset )
             : substr( $this->document, $prev_offset );
 
@@ -242,8 +247,8 @@ class MyParser {
 
     static function freeform( $s ) {
         return array(
-            'attrs'      => new stdClass(),
-            'innerHtml' => $s,
+            'attrs'     => null,
+            'innerHTML' => $s,
         );
     }
 }
