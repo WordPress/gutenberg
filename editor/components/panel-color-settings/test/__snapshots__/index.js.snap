@@ -9,27 +9,25 @@ exports[`PanelColorSettings matches the snapshot 1`] = `
     >
       Test Title
       <ColorIndicator
-        aria-label="black"
+        aria-label="(border color: #000)"
         colorValue="#000"
       />
       <ColorIndicator
-        aria-label="nearly black"
+        aria-label="(background color: #111)"
         colorValue="#111"
       />
     </span>
   }
 >
   <WithColorContext(Component)
-    colorIndicatorAriaLabel="black"
     key="0"
-    label="black color"
+    label="border color"
     onChange={[Function]}
     value="#000"
   />
   <WithColorContext(Component)
-    colorIndicatorAriaLabel="nearly black"
     key="1"
-    label="nearly black color"
+    label="background color"
     onChange={[Function]}
     value="#111"
   />

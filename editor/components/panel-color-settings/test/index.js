@@ -19,14 +19,12 @@ describe( 'PanelColorSettings', () => {
 					{
 						value: '#000',
 						onChange: noop,
-						colorIndicatorAriaLabel: 'black',
-						label: 'black color',
+						label: 'border color',
 					},
 					{
 						value: '#111',
 						onChange: noop,
-						colorIndicatorAriaLabel: 'nearly black',
-						label: 'nearly black color',
+						label: 'background color',
 					},
 				] }
 			/>

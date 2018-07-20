@@ -243,15 +243,11 @@ class ParagraphBlock extends Component {
 								value: backgroundColor.value,
 								onChange: setBackgroundColor,
 								label: __( 'Background Color' ),
-								// translators: %s: The name of the color e.g: "vivid red" or color hex code if name is not available e.g: "#f00".
-								colorIndicatorAriaLabel: __( '(current background color: %s)' ),
 							},
 							{
 								value: textColor.value,
 								onChange: setTextColor,
 								label: __( 'Text Color' ),
-								// translators: %s: The name of the color e.g: "vivid red" or color hex code if name is not available e.g: "#f00".
-								colorIndicatorAriaLabel: __( '(current text color: %s)' ),
 							},
 						] }
 					>

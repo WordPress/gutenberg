@@ -3,7 +3,7 @@
  */
 import { BaseControl, ColorIndicator } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
-import { sprintf } from '@wordpress/i18n';
+import { sprintf, __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -13,12 +13,12 @@ import ColorPalette from './';
 import withColorContext from './with-color-context';
 import { getColorName } from '../colors';
 
-const ColorPaletteControl = withColorContext( ( { label, value, onChange, colorIndicatorAriaLabel, colors } ) => {
-	let ariaLabel;
-	if ( colorIndicatorAriaLabel ) {
-		const colorName = getColorName( colors, value );
-		ariaLabel = sprintf( colorIndicatorAriaLabel, colorName || value );
-	}
+// translators: first %s: The type of color (e.g. background color), second %s: the color name or value (e.g. red or #ff0000)
+const colorIndicatorAriaLabel = __( '(current %s: %s)' );
+
+const ColorPaletteControl = withColorContext( ( { label, value, onChange, colors } ) => {
+	const colorName = getColorName( colors, value );
+	const ariaLabel = sprintf( colorIndicatorAriaLabel, label.toLowerCase(), colorName || value );
 
 	const labelElement = (
 		<Fragment>

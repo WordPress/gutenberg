@@ -8,7 +8,7 @@ import { omit } from 'lodash';
  */
 import { PanelBody, ColorIndicator } from '@wordpress/components';
 import { ifCondition, compose } from '@wordpress/compose';
-import { sprintf } from '@wordpress/i18n';
+import { sprintf, __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -18,17 +18,17 @@ import ColorPaletteControl from '../color-palette/control';
 import withColorContext from '../color-palette/with-color-context';
 import { getColorName } from '../colors';
 
+// translators: first %s: The type of color (e.g. background color), second %s: the color name or value (e.g. red or #ff0000)
+const colorIndicatorAriaLabel = __( '(%s: %s)' );
+
 const renderColorIndicators = ( colorSettings, colors ) => {
-	return colorSettings.map( ( { value, colorIndicatorAriaLabel }, index ) => {
+	return colorSettings.map( ( { value, label }, index ) => {
 		if ( ! value ) {
 			return null;
 		}
 
-		let ariaLabel;
-		if ( colorIndicatorAriaLabel ) {
-			const colorName = getColorName( colors, value );
-			ariaLabel = sprintf( colorIndicatorAriaLabel, colorName || value );
-		}
+		const colorName = getColorName( colors, value );
+		const ariaLabel = sprintf( colorIndicatorAriaLabel, label.toLowerCase(), colorName || value );
 
 		return (
 			<ColorIndicator
