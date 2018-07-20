@@ -20,10 +20,24 @@ class Block {
     public $innerHtml;
 
     function __construct( $name, $attrs, $innerBlocks, $innerHtml ) {
-        $this->blockName = $name;
-        $this->attrs = $attrs;
+        $this->blockName   = $name;
+        $this->attrs       = $attrs;
         $this->innerBlocks = $innerBlocks;
-        $this->innerHtml = $innerHtml;
+        $this->innerHtml   = $innerHtml;
+    }
+}
+
+class Frame {
+    public $block;
+    public $token_start;
+    public $token_length;
+    public $prev_offset;
+
+    function __construct( $block, $token_start, $token_length, $prev_offset = null ) {
+        $this->block        = $block;
+        $this->token_start  = $token_start;
+        $this->token_length = $token_length;
+        $this->prev_offset  = isset( $prev_offset ) ? $prev_offset : $token_start + $token_length;
     }
 }
 
@@ -103,20 +117,20 @@ class MyParser {
                 }
 
                 # otherwise we found an inner block
-                $this->add_inner_block( array(
-                    'block'        => new Block( $block_name, $attrs, array(), '' ),
-                    'token_start'  => $start_offset,
-                    'token_length' => $token_length,
-                ) );
+                $this->add_inner_block(
+                    new Block( $block_name, $attrs, array(), '' ),
+                    $start_offset,
+                    $token_length
+                );
                 $this->offset = $start_offset + $token_length;
                 return true;
 
             case 'block-opener':
-                $this->start_tracking_block( array(
-                    'block'        => new Block( $block_name, $attrs, array(), '' ),
-                    'token_start'  => $start_offset,
-                    'token_length' => $token_length,
-                ) );
+                $this->start_tracking_block(
+                    new Block( $block_name, $attrs, array(), '' ),
+                    $start_offset,
+                    $token_length
+                );
                 $this->offset = $start_offset + $token_length;
                 return true;
 
@@ -145,15 +159,15 @@ class MyParser {
                 # otherwise we're nested and we have to close out the current
                 # block and add it as a new innerBlock to the parent
                 $stack_top = array_pop( $this->stack );
-                $stack_top[ 'block' ]->innerHtml .= substr( $this->document, $stack_top[ 'prev_offset' ], $start_offset - $stack_top[ 'prev_offset' ] );
-                $stack_top[ 'prev_offset' ] = $start_offset + $token_length;
+                $stack_top->block->innerHtml .= substr( $this->document, $stack_top->prev_offset, $start_offset - $stack_top->prev_offset );
+                $stack_top->prev_offset = $start_offset + $token_length;
 
-                $this->add_inner_block( array(
-                    'block'        => $stack_top[ 'block' ],
-                    'token_start'  => $stack_top[ 'token_start' ],
-                    'token_length' => $stack_top[ 'token_length' ],
-                    'last_offset'  => $start_offset + $token_length,
-                ) );
+                $this->add_inner_block(
+                    $stack_top->block,
+                    $stack_top->token_start,
+                    $stack_top->token_length,
+                    $start_offset + $token_length
+                );
                 $this->offset = $start_offset + $token_length;
                 return true;
 
@@ -216,33 +230,31 @@ class MyParser {
             : self::freeform( substr( $this->document, $this->offset ) );
     }
 
-    function add_inner_block( $args ) {
-        $stack_top = array_pop( $this->stack );
-        $stack_top[ 'block' ]->innerBlocks[] = $args[ 'block' ];
-        $stack_top[ 'block' ]->innerHtml .= substr( $this->document, $stack_top[ 'prev_offset' ], $args[ 'token_start' ] - $stack_top[ 'prev_offset' ] );
-        $stack_top[ 'prev_offset' ] = $args[ 'last_offset' ] ?: $args[ 'token_start' ] + $args[ 'token_length' ];
-
-        array_push( $this->stack, $stack_top );
+    function add_inner_block( $block, $token_start, $token_length, $last_offset = null ) {
+        $stack_top = $this->stack[ count( $this->stack ) - 1];
+        $stack_top->block->innerBlocks[] = $block;
+        $stack_top->block->innerHtml .= substr( $this->document, $stack_top->prev_offset, $token_start - $stack_top->prev_offset );
+        $stack_top->prev_offset = $last_offset ?: $token_start + $token_length;
     }
 
-    function start_tracking_block( $args ) {
-        array_push( $this->stack, array(
-            'block'        => $args[ 'block' ],
-            'token_start'  => $args[ 'token_start' ],
-            'token_length' => $args[ 'token_length' ],
-            'prev_offset'  => $args[ 'token_start' ] + $args[ 'token_length' ],
+    function start_tracking_block( $block, $token_start, $token_length ) {
+        array_push( $this->stack, new Frame(
+            $block,
+            $token_start,
+            $token_length,
+            $token_start + $token_length
         ) );
     }
 
     function pop_stack( $end_offset = null ) {
         $stack_top = array_pop( $this->stack );
-        $prev_offset = $stack_top[ 'prev_offset' ];
+        $prev_offset = $stack_top->prev_offset;
 
-        $stack_top[ 'block' ]->innerHtml .= isset( $end_offset )
+        $stack_top->block->innerHtml .= isset( $end_offset )
             ? substr( $this->document, $prev_offset, $end_offset - $prev_offset )
             : substr( $this->document, $prev_offset );
 
-        $this->output[] = $stack_top[ 'block' ];
+        $this->output[] = $stack_top->block;
     }
 
     function error( $message ) {
