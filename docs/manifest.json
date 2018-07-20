@@ -258,6 +258,18 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/block-serialization-spec-parser",
+		"slug": "packages-block-serialization-spec-parser",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/block-serialization-spec-parser/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/blocks",
+		"slug": "packages-blocks",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/blocks/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/browserslist-config",
 		"slug": "packages-browserslist-config",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/browserslist-config/README.md",
@@ -423,12 +435,6 @@
 		"title": "@wordpress/wordcount",
 		"slug": "packages-wordcount",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/wordcount/README.md",
-		"parent": "packages"
-	},
-	{
-		"title": "@wordpress/blocks",
-		"slug": "packages-blocks",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/blocks/README.md",
 		"parent": "packages"
 	},
 	{

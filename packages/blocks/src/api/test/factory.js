@@ -31,7 +31,7 @@ describe( 'block factory', () => {
 
 	beforeAll( () => {
 		// Load blocks store
-		require( 'blocks/store' );
+		require( '../../store' );
 	} );
 
 	afterEach( () => {
