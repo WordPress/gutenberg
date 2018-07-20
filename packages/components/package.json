@@ -1,0 +1,59 @@
+{
+	"name": "@wordpress/components",
+	"version": "1.0.0",
+	"description": "UI Compoonents for WordPress",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"components"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/components/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"files": [
+		"build",
+		"build-module",
+		"build-style"
+	],
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"dependencies": {
+		"@babel/runtime": "^7.0.0-beta.52",
+		"@wordpress/a11y": "file:../a11y",
+		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/deprecated": "file:../deprecated",
+		"@wordpress/dom": "file:../dom",
+		"@wordpress/element": "file:../element",
+		"@wordpress/hooks": "file:../hooks",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+		"@wordpress/keycodes": "file:../keycodes",
+		"classnames": "^2.2.5",
+		"clipboard": "^1.7.1",
+		"dom-scroll-into-view": "^1.2.1",
+		"http-build-query": "^0.7.0",
+		"lodash": "^4.17.10",
+		"memize": "^1.0.5",
+		"moment": "^2.22.1",
+		"mousetrap": "^1.6.2",
+		"react-click-outside": "^2.3.1",
+		"react-color": "^2.13.4",
+		"react-datepicker": "^1.4.1",
+		"rememo": "^3.0.0",
+		"uuid": "^3.1.0"
+	},
+	"devDependencies": {
+		"enzyme": "^3.3.0",
+		"react-test-renderer": "^16.4.1"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

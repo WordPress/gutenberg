@@ -16,11 +16,12 @@ const jestConfig = {
 };
 
 const hasBabelConfig = hasProjectFile( '.babelrc' ) ||
+	hasProjectFile( 'babel.config.js' ) ||
 	hasPackageProp( 'babel' );
 
 if ( ! hasBabelConfig ) {
 	jestConfig.transform = {
-		'^.+\\.js$': path.join( __dirname, 'babel-transform' ),
+		'^.+\\.jsx?$': path.join( __dirname, 'babel-transform' ),
 	};
 }
 

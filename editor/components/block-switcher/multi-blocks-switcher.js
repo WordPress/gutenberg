@@ -9,21 +9,21 @@ import { withSelect } from '@wordpress/data';
 import './style.scss';
 import BlockSwitcher from './';
 
-export function MultiBlocksSwitcher( { isMultiBlockSelection, selectedBlockUids } ) {
+export function MultiBlocksSwitcher( { isMultiBlockSelection, selectedBlockClientIds } ) {
 	if ( ! isMultiBlockSelection ) {
 		return null;
 	}
 	return (
-		<BlockSwitcher key="switcher" uids={ selectedBlockUids } />
+		<BlockSwitcher key="switcher" clientIds={ selectedBlockClientIds } />
 	);
 }
 
 export default withSelect(
 	( select ) => {
-		const selectedBlockUids = select( 'core/editor' ).getMultiSelectedBlockUids();
+		const selectedBlockClientIds = select( 'core/editor' ).getMultiSelectedBlockClientIds();
 		return {
-			isMultiBlockSelection: selectedBlockUids.length > 1,
-			selectedBlockUids,
+			isMultiBlockSelection: selectedBlockClientIds.length > 1,
+			selectedBlockClientIds,
 		};
 	}
 )( MultiBlocksSwitcher );

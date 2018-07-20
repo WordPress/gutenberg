@@ -15,7 +15,7 @@ import {
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, compose, Fragment } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import { getBlobByURL, revokeBlobURL } from '@wordpress/blob';
 import {
 	Button,
@@ -39,6 +39,7 @@ import {
 	editorMediaUpload,
 } from '@wordpress/editor';
 import { withViewportMatch } from '@wordpress/viewport';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -265,7 +266,7 @@ class ImageEdit extends Component {
 
 		const availableSizes = this.getAvailableSizes();
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
-		const isLinkUrlInputDisabled = linkDestination !== LINK_DESTINATION_CUSTOM;
+		const isLinkURLInputDisabled = linkDestination !== LINK_DESTINATION_CUSTOM;
 
 		const getInspectorControls = ( imageWidth, imageHeight ) => (
 			<InspectorControls>
@@ -278,7 +279,7 @@ class ImageEdit extends Component {
 					/>
 					{ ! isEmpty( availableSizes ) && (
 						<SelectControl
-							label={ __( 'Source Type' ) }
+							label={ __( 'Image Size' ) }
 							value={ url }
 							options={ map( availableSizes, ( size, name ) => ( {
 								value: size.source_url,
@@ -352,8 +353,8 @@ class ImageEdit extends Component {
 						label={ __( 'Link URL' ) }
 						value={ href || '' }
 						onChange={ this.onSetCustomHref }
-						placeholder={ ! isLinkUrlInputDisabled && 'https://' }
-						disabled={ isLinkUrlInputDisabled }
+						placeholder={ ! isLinkURLInputDisabled && 'https://' }
+						disabled={ isLinkURLInputDisabled }
 					/>
 				</PanelBody>
 			</InspectorControls>

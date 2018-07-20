@@ -11,7 +11,6 @@ import { __ } from '@wordpress/i18n';
 import {
 	concatChildren,
 	Component,
-	compose,
 	Fragment,
 	RawHTML,
 } from '@wordpress/element';
@@ -32,6 +31,7 @@ import {
 	RichText,
 } from '@wordpress/editor';
 import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies

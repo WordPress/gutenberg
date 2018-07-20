@@ -334,13 +334,13 @@ Document title.
 
 ### getBlockName
 
-Returns a block's name given its UID, or null if no block exists with the
-UID.
+Returns a block's name given its client ID, or null if no block exists with
+the client ID.
 
 *Parameters*
 
  * state: Editor state.
- * uid: Block unique ID.
+ * clientId: Block client ID.
 
 *Returns*
 
@@ -352,8 +352,8 @@ Returns the number of blocks currently present in the post.
 
 *Parameters*
 
- * state: Global application state.
- * rootUID: Optional root UID of block list.
+ * state: Editor state.
+ * rootClientId: Optional root client ID of block list.
 
 *Returns*
 
@@ -371,7 +371,7 @@ A selection is singular if its start and end match.
 
 *Returns*
 
-UID of block selection start.
+Client ID of block selection start.
 
 ### getBlockSelectionEnd
 
@@ -385,7 +385,7 @@ A selection is singular if its start and end match.
 
 *Returns*
 
-UID of block selection end.
+Client ID of block selection end.
 
 ### getSelectedBlockCount
 
@@ -411,18 +411,18 @@ Returns true if there is a single selected block, or false otherwise.
 
 Whether a single block is selected.
 
-### getSelectedBlockUID
+### getSelectedBlockClientId
 
-Returns the currently selected block UID, or null if there is no selected
-block.
+Returns the currently selected block client ID, or null if there is no
+selected block.
 
 *Parameters*
 
- * state: Global application state.
+ * state: Editor state.
 
 *Returns*
 
-Selected block UID.
+Selected block client ID.
 
 ### getSelectedBlock
 
@@ -436,63 +436,71 @@ Returns the currently selected block, or null if there is no selected block.
 
 Selected block.
 
-### getBlockRootUID
+### getBlockRootClientId
 
-Given a block UID, returns the root block from which the block is nested, an
-empty string for top-level blocks, or null if the block does not exist.
-
-*Parameters*
-
- * state: Global application state.
- * uid: Block from which to find root UID.
-
-*Returns*
-
-Root UID, if exists
-
-### getAdjacentBlockUid
-
-Returns the UID of the block adjacent one at the given reference startUID and modifier
-directionality. Defaults start UID to the selected block, and direction as
-next block. Returns null if there is no adjacent block.
+Given a block client ID, returns the root block from which the block is
+nested, an empty string for top-level blocks, or null if the block does not
+exist.
 
 *Parameters*
 
- * state: Global application state.
- * startUID: Optional UID of block from which to search.
- * modifier: Directionality multiplier (1 next, -1 previous).
+ * state: Editor state.
+ * clientId: Block from which to find root client ID.
 
 *Returns*
 
-Return the UID of the block, or null if none exists.
+Root client ID, if exists
 
-### getPreviousBlockUid
+### getAdjacentBlockClientId
 
-Returns the previous block's UID from the given reference startUID. Defaults start
-UID to the selected block. Returns null if there is no previous block.
+Returns the client ID of the block adjacent one at the given reference
+startClientId and modifier directionality. Defaults start startClientId to
+the selected block, and direction as next block. Returns null if there is no
+adjacent block.
 
 *Parameters*
 
- * state: Global application state.
- * startUID: Optional UID of block from which to search.
+ * state: Editor state.
+ * startClientId: Optional client ID of block from which to
+                               search.
+ * modifier: Directionality multiplier (1 next, -1
+                               previous).
 
 *Returns*
 
-Adjacent block's UID, or null if none exists.
+Return the client ID of the block, or null if none exists.
 
-### getNextBlockUid
+### getPreviousBlockClientId
 
-Returns the next block's UID from the given reference startUID. Defaults start UID
-to the selected block. Returns null if there is no next block.
+Returns the previous block's client ID from the given reference start ID.
+Defaults start to the selected block. Returns null if there is no previous
+block.
 
 *Parameters*
 
- * state: Global application state.
- * startUID: Optional UID of block from which to search.
+ * state: Editor state.
+ * startClientId: Optional client ID of block from which to
+                               search.
 
 *Returns*
 
-Adjacent block's UID, or null if none exists.
+Adjacent block's client ID, or null if none exists.
+
+### getNextBlockClientId
+
+Returns the next block's client ID from the given reference start ID.
+Defaults start to the selected block. Returns null if there is no next
+block.
+
+*Parameters*
+
+ * state: Editor state.
+ * startClientId: Optional client ID of block from which to
+                               search.
+
+*Returns*
+
+Adjacent block's client ID, or null if none exists.
 
 ### getSelectedBlocksInitialCaretPosition
 
@@ -507,42 +515,42 @@ This position is to used to position the caret properly when the selected block 
 
 Selected block.
 
-### getFirstMultiSelectedBlockUid
+### getFirstMultiSelectedBlockClientId
 
-Returns the unique ID of the first block in the multi-selection set, or null
+Returns the client ID of the first block in the multi-selection set, or null
 if there is no multi-selection.
 
 *Parameters*
 
- * state: Global application state.
+ * state: Editor state.
 
 *Returns*
 
-First unique block ID in the multi-selection set.
+First block client ID in the multi-selection set.
 
-### getLastMultiSelectedBlockUid
+### getLastMultiSelectedBlockClientId
 
-Returns the unique ID of the last block in the multi-selection set, or null
+Returns the client ID of the last block in the multi-selection set, or null
 if there is no multi-selection.
 
 *Parameters*
 
- * state: Global application state.
+ * state: Editor state.
 
 *Returns*
 
-Last unique block ID in the multi-selection set.
+Last block client ID in the multi-selection set.
 
 ### isFirstMultiSelectedBlock
 
 Returns true if a multi-selection exists, and the block corresponding to the
-specified unique ID is the first block of the multi-selection set, or false
+specified client ID is the first block of the multi-selection set, or false
 otherwise.
 
 *Parameters*
 
- * state: Global application state.
- * uid: Block unique ID.
+ * state: Editor state.
+ * clientId: Block client ID.
 
 *Returns*
 
@@ -550,76 +558,73 @@ Whether block is first in mult-selection.
 
 ### isBlockMultiSelected
 
-Returns true if the unique ID occurs within the block multi-selection, or
+Returns true if the client ID occurs within the block multi-selection, or
 false otherwise.
 
 *Parameters*
 
- * state: Global application state.
- * uid: Block unique ID.
+ * state: Editor state.
+ * clientId: Block client ID.
 
 *Returns*
 
 Whether block is in multi-selection set.
 
-### getMultiSelectedBlocksStartUid
+### getMultiSelectedBlocksStartClientId
 
-Returns the unique ID of the block which begins the multi-selection set, or
+Returns the client ID of the block which begins the multi-selection set, or
 null if there is no multi-selection.
 
-N.b.: This is not necessarily the first uid in the selection. See
-getFirstMultiSelectedBlockUid().
+This is not necessarily the first client ID in the selection.
 
 *Parameters*
 
- * state: Global application state.
+ * state: Editor state.
 
 *Returns*
 
-Unique ID of block beginning multi-selection.
+Client ID of block beginning multi-selection.
 
-### getMultiSelectedBlocksEndUid
+### getMultiSelectedBlocksEndClientId
 
-Returns the unique ID of the block which ends the multi-selection set, or
+Returns the client ID of the block which ends the multi-selection set, or
 null if there is no multi-selection.
 
-N.b.: This is not necessarily the last uid in the selection. See
-getLastMultiSelectedBlockUid().
+This is not necessarily the last client ID in the selection.
 
 *Parameters*
 
- * state: Global application state.
+ * state: Editor state.
 
 *Returns*
 
-Unique ID of block ending multi-selection.
+Client ID of block ending multi-selection.
 
 ### getBlockOrder
 
-Returns an array containing all block unique IDs of the post being edited,
-in the order they appear in the post. Optionally accepts a root UID of the
-block list for which the order should be returned, defaulting to the top-
-level block order.
+Returns an array containing all block client IDs in the editor in the order
+they appear. Optionally accepts a root client ID of the block list for which
+the order should be returned, defaulting to the top-level block order.
 
 *Parameters*
 
- * state: Global application state.
- * rootUID: Optional root UID of block list.
+ * state: Editor state.
+ * rootClientId: Optional root client ID of block list.
 
 *Returns*
 
-Ordered unique IDs of post blocks.
+Ordered client IDs of editor blocks.
 
 ### getBlockIndex
 
-Returns the index at which the block corresponding to the specified unique ID
-occurs within the post block order, or `-1` if the block does not exist.
+Returns the index at which the block corresponding to the specified client
+ID occurs within the block order, or `-1` if the block does not exist.
 
 *Parameters*
 
- * state: Global application state.
- * uid: Block unique ID.
- * rootUID: Optional root UID of block list.
+ * state: Editor state.
+ * clientId: Block client ID.
+ * rootClientId: Optional root client ID of block list.
 
 *Returns*
 
@@ -627,13 +632,13 @@ Index at which block exists in order.
 
 ### isBlockSelected
 
-Returns true if the block corresponding to the specified unique ID is
+Returns true if the block corresponding to the specified client ID is
 currently selected and no multi-selection exists, or false otherwise.
 
 *Parameters*
 
- * state: Global application state.
- * uid: Block unique ID.
+ * state: Editor state.
+ * clientId: Block client ID.
 
 *Returns*
 
@@ -645,8 +650,8 @@ Returns true if one of the block's inner blocks is selected.
 
 *Parameters*
 
- * state: Global application state.
- * uid: Block unique ID.
+ * state: Editor state.
+ * clientId: Block client ID.
 
 *Returns*
 
@@ -654,20 +659,20 @@ Whether the block as an inner block selected
 
 ### isBlockWithinSelection
 
-Returns true if the block corresponding to the specified unique ID is
+Returns true if the block corresponding to the specified client ID is
 currently selected but isn't the last of the selected blocks. Here "last"
 refers to the block sequence in the document, _not_ the sequence of
 multi-selection, which is why `state.blockSelection.end` isn't used.
 
 *Parameters*
 
- * state: Global application state.
- * uid: Block unique ID.
+ * state: Editor state.
+ * clientId: Block client ID.
 
 *Returns*
 
-Whether block is selected and not the last in
-                   the selection.
+Whether block is selected and not the last in the
+                  selection.
 
 ### hasMultiSelection
 
@@ -709,12 +714,13 @@ True if multi is disable, false if not.
 
 ### getBlockMode
 
-Returns thee block's editing mode.
+Returns the block's editing mode, defaulting to "visual" if not explicitly
+assigned.
 
 *Parameters*
 
- * state: Global application state.
- * uid: Block unique ID.
+ * state: Editor state.
+ * clientId: Block client ID.
 
 *Returns*
 
@@ -739,11 +745,12 @@ be placed. Defaults to the last index.
 
 *Parameters*
 
- * state: Global application state.
+ * state: Editor state.
 
 *Returns*
 
-Insertion point object with `rootUID`, `layout`, `index`
+Insertion point object with `rootClientId`, `layout`,
+`index`.
 
 ### isBlockInsertionPointVisible
 
@@ -783,13 +790,13 @@ Block Template
 
 ### getTemplateLock
 
-Returns the defined block template lock
-in the context of a given root block or in the global context.
+Returns the defined block template lock. Optionally accepts a root block
+client ID as context, otherwise defaulting to the global context.
 
 *Parameters*
 
- * state: null
- * rootUID: Block UID.
+ * state: Editor state.
+ * rootClientId: Optional block root client ID.
 
 *Returns*
 
@@ -936,9 +943,10 @@ Returns true if the post is being published, or false otherwise.
 
 Whether post is being published.
 
-### getProvisionalBlockUID
+### getProvisionalBlockClientId
 
-Returns the provisional block UID, or null if there is no provisional block.
+Returns the provisional block client ID, or null if there is no provisional
+block.
 
 *Parameters*
 
@@ -946,7 +954,7 @@ Returns the provisional block UID, or null if there is no provisional block.
 
 *Returns*
 
-Provisional block UID, if set.
+Provisional block client ID, if set.
 
 ### isPermalinkEditable
 
@@ -1000,12 +1008,12 @@ Whether predicate matches for some history.
 
 ### getBlockListSettings
 
-Returns the Block List settings of a block if any.
+Returns the Block List settings of a block, if any exist.
 
 *Parameters*
 
  * state: Editor state.
- * uid: Block UID.
+ * clientId: Block client ID.
 
 *Returns*
 
@@ -1034,6 +1042,18 @@ Returns the editor settings.
 *Returns*
 
 The editor settings object
+
+### canUserUseUnfilteredHTML
+
+Returns whether or not the user has the unfiltered_html capability.
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+Whether the user can or can't post unfiltered HTML.
 
 ## Actions
 
@@ -1107,22 +1127,35 @@ replacing.
 ### updateBlockAttributes
 
 Returns an action object used in signalling that the block attributes with
-the specified UID has been updated.
+the specified client ID has been updated.
 
 *Parameters*
 
- * uid: Block UID.
+ * clientId: Block client ID.
  * attributes: Block attributes to be merged.
 
 ### updateBlock
 
 Returns an action object used in signalling that the block with the
-specified UID has been updated.
+specified client ID has been updated.
 
 *Parameters*
 
- * uid: Block UID.
+ * clientId: Block client ID.
  * updates: Block attributes to be merged.
+
+### selectBlock
+
+Returns an action object used in signalling that the block with the
+specified client ID has been selected, optionally accepting a position
+value reflecting its selection directionality. An initialPosition of -1
+reflects a reverse selection.
+
+*Parameters*
+
+ * clientId: Block client ID.
+ * initialPosition: Optional initial position. Pass as -1 to
+                                 reflect reverse selection.
 
 ### toggleSelection
 
@@ -1140,7 +1173,7 @@ one or more replacement blocks.
 
 *Parameters*
 
- * uids: Block UID(s) to replace.
+ * clientIds: Block client ID(s) to replace.
  * blocks: Replacement block(s).
 
 ### replaceBlock
@@ -1150,7 +1183,7 @@ with one or more replacement blocks.
 
 *Parameters*
 
- * uid: Block UID(s) to replace.
+ * clientId: Block client ID to replace.
  * block: Replacement block(s).
 
 ### moveBlockToPosition
@@ -1160,10 +1193,10 @@ to a new index.
 
 *Parameters*
 
- * uid: The UID of the block.
- * fromRootUID: root UID source.
- * toRootUID: root UID destination.
- * layout: layout to move the block into.
+ * clientId: The client ID of the block.
+ * fromRootClientId: Root client ID source.
+ * toRootClientId: Root client ID destination.
+ * layout: Layout to move the block into.
  * index: The index to move the block into.
 
 ### insertBlock
@@ -1175,7 +1208,8 @@ inserted, optionally at a specific index respective a root block list.
 
  * block: Block object to insert.
  * index: Index at which block should be inserted.
- * rootUID: Optional root UID of block list to insert.
+ * rootClientId: Optional root client ID of block list on which
+                              to insert.
 
 ### insertBlocks
 
@@ -1186,7 +1220,8 @@ be inserted, optionally at a specific index respective a root block list.
 
  * blocks: Block objects to insert.
  * index: Index at which block should be inserted.
- * rootUID: Optional root UID of block list to insert.
+ * rootClientId: Optional root cliente ID of block list on
+                               which to insert.
 
 ### showInsertionPoint
 
@@ -1228,8 +1263,8 @@ Returns an action object used in signalling that two blocks should be merged
 
 *Parameters*
 
- * blockAUid: UID of the first block to merge.
- * blockBUid: UID of the second block to merge.
+ * firstBlockClientId: Client ID of the first block to merge.
+ * secondBlockClientId: Client ID of the second block to merge.
 
 ### autosave
 
@@ -1251,31 +1286,34 @@ be created.
 
 ### removeBlocks
 
-Returns an action object used in signalling that the blocks
-corresponding to the specified UID set are to be removed.
+Returns an action object used in signalling that the blocks corresponding to
+the set of specified client IDs are to be removed.
 
 *Parameters*
 
- * uids: Block UIDs.
- * selectPrevious: True if the previous block should be selected when a block is removed.
+ * clientIds: Client IDs of blocks to remove.
+ * selectPrevious: True if the previous block should be
+                                        selected when a block is removed.
 
 ### removeBlock
 
 Returns an action object used in signalling that the block with the
-specified UID is to be removed.
+specified client ID is to be removed.
 
 *Parameters*
 
- * uid: Block UID.
- * selectPrevious: True if the previous block should be selected when a block is removed.
+ * clientId: Client ID of block to remove.
+ * selectPrevious: True if the previous block should be
+                                selected when a block is removed.
 
 ### toggleBlockMode
 
-Returns an action object used to toggle the block editing mode (visual/html).
+Returns an action object used to toggle the block editing mode between
+visual and HTML modes.
 
 *Parameters*
 
- * uid: Block UID.
+ * clientId: Block client ID.
 
 ### startTyping
 
@@ -1359,7 +1397,7 @@ Returns an action object used to convert a shared block into a static block.
 
 *Parameters*
 
- * uid: The ID of the block to attach.
+ * clientId: The client ID of the block to attach.
 
 ### convertBlockToShared
 
@@ -1367,7 +1405,7 @@ Returns an action object used to convert a static block into a shared block.
 
 *Parameters*
 
- * uid: The ID of the block to detach.
+ * clientId: The client ID of the block to detach.
 
 ### insertDefaultBlock
 
@@ -1377,7 +1415,8 @@ type should be added to the block list.
 *Parameters*
 
  * attributes: Optional attributes of the block to assign.
- * rootUID: Optional root UID of block list to append.
+ * rootClientId: Optional root client ID of block list on which
+                              to append.
  * index: Optional index where to insert the default block
 
 ### updateBlockListSettings
@@ -1386,7 +1425,8 @@ Returns an action object that changes the nested settings of a given block.
 
 *Parameters*
 
- * id: UID of the block whose nested setting.
+ * clientId: Client ID of the block whose nested setting are
+                         being received.
  * settings: Object with the new settings for the nested block.
 
 ### updateEditorSettings

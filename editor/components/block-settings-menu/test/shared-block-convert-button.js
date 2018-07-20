@@ -9,19 +9,25 @@ import { shallow } from 'enzyme';
 import { SharedBlockConvertButton } from '../shared-block-convert-button';
 
 describe( 'SharedBlockConvertButton', () => {
+	it( 'should not render when isVisible false', () => {
+		const wrapper = shallow(
+			<SharedBlockConvertButton isVisible={ false } />
+		);
+		expect( wrapper.children() ).not.toExist();
+	} );
+
 	it( 'should allow converting a static block to a shared block', () => {
 		const onConvert = jest.fn();
 		const wrapper = shallow(
 			<SharedBlockConvertButton
-				sharedBlock={ null }
+				isVisible
+				isStaticBlock
 				onConvertToShared={ onConvert }
 			/>
 		);
-
-		const text = wrapper.find( 'IconButton' ).children().text();
-		expect( text ).toEqual( 'Convert to Shared Block' );
-
-		wrapper.find( 'IconButton' ).simulate( 'click' );
+		const button = wrapper.find( 'IconButton' ).first();
+		expect( button.children().text() ).toBe( 'Convert to Shared Block' );
+		button.simulate( 'click' );
 		expect( onConvert ).toHaveBeenCalled();
 	} );
 
@@ -29,15 +35,14 @@ describe( 'SharedBlockConvertButton', () => {
 		const onConvert = jest.fn();
 		const wrapper = shallow(
 			<SharedBlockConvertButton
-				sharedBlock={ {} }
+				isVisible
+				isStaticBlock={ false }
 				onConvertToStatic={ onConvert }
 			/>
 		);
-
-		const text = wrapper.find( 'IconButton' ).first().children().text();
-		expect( text ).toEqual( 'Convert to Regular Block' );
-
-		wrapper.find( 'IconButton' ).first().simulate( 'click' );
+		const button = wrapper.find( 'IconButton' ).first();
+		expect( button.children().text() ).toBe( 'Convert to Regular Block' );
+		button.simulate( 'click' );
 		expect( onConvert ).toHaveBeenCalled();
 	} );
 } );

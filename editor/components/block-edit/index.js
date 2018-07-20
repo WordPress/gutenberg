@@ -1,39 +1,24 @@
 /**
- * External dependencies
- */
-import { noop, get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
-import { Component, compose } from '@wordpress/element';
-import { withAPIData } from '@wordpress/components';
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import Edit from './edit';
 import { BlockEditContextProvider } from './context';
+import withDeprecatedUniqueId from '../with-deprecated-unique-id';
 
-export class BlockEdit extends Component {
+class BlockEdit extends Component {
 	constructor( props ) {
 		super( props );
+
 		this.setFocusedElement = this.setFocusedElement.bind( this );
+
 		this.state = {
 			focusedElement: null,
 			setFocusedElement: this.setFocusedElement,
-		};
-	}
-
-	getChildContext() {
-		const { user } = this.props;
-
-		return {
-			canUserUseUnfilteredHTML: get( user.data, [
-				'capabilities',
-				'unfiltered_html',
-			], false ),
 		};
 	}
 
@@ -47,12 +32,12 @@ export class BlockEdit extends Component {
 	}
 
 	static getDerivedStateFromProps( props ) {
-		const { id, name, isSelected } = props;
+		const { clientId, name, isSelected } = props;
 
 		return {
 			name,
 			isSelected,
-			uid: id,
+			clientId,
 		};
 	}
 
@@ -65,15 +50,4 @@ export class BlockEdit extends Component {
 	}
 }
 
-BlockEdit.childContextTypes = {
-	canUserUseUnfilteredHTML: noop,
-};
-
-export default compose( [
-	withSelect( ( select ) => ( {
-		postType: select( 'core/editor' ).getEditedPostAttribute( 'type' ),
-	} ) ),
-	withAPIData( ( { postType } ) => ( {
-		user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
-	} ) ),
-] )( BlockEdit );
+export default withDeprecatedUniqueId( BlockEdit );

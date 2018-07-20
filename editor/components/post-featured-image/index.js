@@ -7,8 +7,8 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button, Spinner, ResponsiveWrapper } from '@wordpress/components';
-import { compose } from '@wordpress/element';
+import { Button, Spinner, ResponsiveWrapper, withFilters } from '@wordpress/components';
+import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
@@ -114,4 +114,5 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 export default compose(
 	applyWithSelect,
 	applyWithDispatch,
+	withFilters( 'editor.PostFeaturedImage' ),
 )( PostFeaturedImage );

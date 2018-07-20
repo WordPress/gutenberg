@@ -9,10 +9,11 @@ import classnames from 'classnames';
  */
 import { withContext } from '@wordpress/components';
 import { withViewportMatch } from '@wordpress/viewport';
-import { Component, compose } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { synchronizeBlocksWithTemplate } from '@wordpress/blocks';
 import isShallowEqual from '@wordpress/is-shallow-equal';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -80,7 +81,7 @@ class InnerBlocks extends Component {
 
 	render() {
 		const {
-			uid,
+			clientId,
 			layouts,
 			allowedBlocks,
 			templateLock,
@@ -96,7 +97,7 @@ class InnerBlocks extends Component {
 		return (
 			<div className={ classes }>
 				<BlockList
-					rootUID={ uid }
+					rootClientId={ clientId }
 					{ ...{ layouts, allowedBlocks, templateLock, template } }
 				/>
 			</div>
@@ -105,7 +106,7 @@ class InnerBlocks extends Component {
 }
 
 InnerBlocks = compose( [
-	withBlockEditContext( ( context ) => pick( context, [ 'uid' ] ) ),
+	withBlockEditContext( ( context ) => pick( context, [ 'clientId' ] ) ),
 	withViewportMatch( { isSmallScreen: '< medium' } ),
 	withSelect( ( select, ownProps ) => {
 		const {
@@ -113,16 +114,16 @@ InnerBlocks = compose( [
 			hasSelectedInnerBlock,
 			getBlock,
 			getBlockListSettings,
-			getBlockRootUID,
+			getBlockRootClientId,
 			getTemplateLock,
 		} = select( 'core/editor' );
-		const { uid } = ownProps;
-		const parentUID = getBlockRootUID( uid );
+		const { clientId } = ownProps;
+		const parentClientId = getBlockRootClientId( clientId );
 		return {
-			isSelectedBlockInRoot: isBlockSelected( uid ) || hasSelectedInnerBlock( uid ),
-			block: getBlock( uid ),
-			blockListSettings: getBlockListSettings( uid ),
-			parentLock: getTemplateLock( parentUID ),
+			isSelectedBlockInRoot: isBlockSelected( clientId ) || hasSelectedInnerBlock( clientId ),
+			block: getBlock( clientId ),
+			blockListSettings: getBlockListSettings( clientId ),
+			parentLock: getTemplateLock( parentClientId ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
@@ -131,19 +132,19 @@ InnerBlocks = compose( [
 			insertBlocks,
 			updateBlockListSettings,
 		} = dispatch( 'core/editor' );
-		const { block, uid } = ownProps;
+		const { block, clientId } = ownProps;
 
 		return {
 			replaceInnerBlocks( blocks ) {
-				const uids = map( block.innerBlocks, 'uid' );
-				if ( uids.length ) {
-					replaceBlocks( uids, blocks );
+				const clientIds = map( block.innerBlocks, 'clientId' );
+				if ( clientIds.length ) {
+					replaceBlocks( clientIds, blocks );
 				} else {
-					insertBlocks( blocks, undefined, uid );
+					insertBlocks( blocks, undefined, clientId );
 				}
 			},
 			updateNestedSettings( settings ) {
-				dispatch( updateBlockListSettings( uid, settings ) );
+				dispatch( updateBlockListSettings( clientId, settings ) );
 			},
 		};
 	} ),

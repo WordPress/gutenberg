@@ -11,13 +11,13 @@ import { MultiBlocksSwitcher } from '../multi-blocks-switcher';
 describe( 'MultiBlocksSwitcher', () => {
 	test( 'should return null when the selection is not a multi block selection.', () => {
 		const isMultiBlockSelection = false;
-		const selectedBlockUids = [
-			'an-uid',
+		const selectedBlockClientIds = [
+			'clientid',
 		];
 		const wrapper = shallow(
 			<MultiBlocksSwitcher
 				isMultiBlockSelection={ isMultiBlockSelection }
-				selectedBlockUids={ selectedBlockUids }
+				selectedBlockClientIds={ selectedBlockClientIds }
 			/>
 		);
 
@@ -26,14 +26,14 @@ describe( 'MultiBlocksSwitcher', () => {
 
 	test( 'should return a BlockSwitcher element matching the snapshot.', () => {
 		const isMultiBlockSelection = true;
-		const selectedBlockUids = [
-			'an-uid',
-			'another-uid',
+		const selectedBlockClientIds = [
+			'clientid-1',
+			'clientid-2',
 		];
 		const wrapper = shallow(
 			<MultiBlocksSwitcher
 				isMultiBlockSelection={ isMultiBlockSelection }
-				selectedBlockUids={ selectedBlockUids }
+				selectedBlockClientIds={ selectedBlockClientIds }
 			/>
 		);
 

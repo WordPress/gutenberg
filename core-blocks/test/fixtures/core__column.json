@@ -1,12 +1,12 @@
 [
     {
-        "uid": "_uid_0",
+        "clientId": "_clientId_0",
         "name": "core/column",
         "isValid": true,
         "attributes": {},
         "innerBlocks": [
             {
-                "uid": "_uid_0",
+                "clientId": "_clientId_0",
                 "name": "core/paragraph",
                 "isValid": true,
                 "attributes": {
@@ -19,7 +19,7 @@
                 "originalContent": "<p>Column One, Paragraph One</p>"
             },
             {
-                "uid": "_uid_1",
+                "clientId": "_clientId_1",
                 "name": "core/paragraph",
                 "isValid": true,
                 "attributes": {

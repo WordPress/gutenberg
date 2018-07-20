@@ -2,12 +2,12 @@
 
 exports[`MultiBlocksSwitcher should return a BlockSwitcher element matching the snapshot. 1`] = `
 <WithSelect(WithDispatch(BlockSwitcher))
-  key="switcher"
-  uids={
+  clientIds={
     Array [
-      "an-uid",
-      "another-uid",
+      "clientid-1",
+      "clientid-2",
     ]
   }
+  key="switcher"
 />
 `;

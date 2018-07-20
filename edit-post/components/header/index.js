@@ -9,7 +9,7 @@ import {
 	PostPublishPanelToggle,
 } from '@wordpress/editor';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 import { DotTip } from '@wordpress/nux';
 
 /**
@@ -34,7 +34,8 @@ function Header( {
 	return (
 		<div
 			role="region"
-			aria-label={ __( 'Editor toolbar' ) }
+			/* translators: accessibility text for the top bar landmark region. */
+			aria-label={ __( 'Editor top bar' ) }
 			className="edit-post-header"
 			tabIndex="-1"
 		>

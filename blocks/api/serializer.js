@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { isEmpty, reduce, isObject, castArray, startsWith } from 'lodash';
-import { html as beautifyHtml } from 'js-beautify';
 
 /**
  * WordPress dependencies
@@ -190,22 +189,6 @@ export function serializeAttributes( attributes ) {
 }
 
 /**
- * Returns HTML markup processed by a markup beautifier configured for use in
- * block serialization.
- *
- * @param {string} content Original HTML.
- *
- * @return {string} Beautiful HTML.
- */
-export function getBeautifulContent( content ) {
-	return beautifyHtml( content, {
-		indent_inner_html: true,
-		indent_with_tabs: true,
-		wrap_line_length: 0,
-	} );
-}
-
-/**
  * Given a block object, returns the Block's Inner HTML markup.
  *
  * @param {Object} block Block Object.
@@ -228,7 +211,7 @@ export function getBlockContent( block ) {
 		} catch ( error ) {}
 	}
 
-	return getUnknownTypeHandlerName() === block.name || ! saveContent ? saveContent : getBeautifulContent( saveContent );
+	return saveContent;
 }
 
 /**

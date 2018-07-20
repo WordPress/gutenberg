@@ -6,11 +6,12 @@ import { noop, partial } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, Fragment, compose } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import { Placeholder, Spinner, Disabled } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { BlockEdit } from '@wordpress/editor';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -28,11 +29,21 @@ class SharedBlockEdit extends Component {
 		this.setTitle = this.setTitle.bind( this );
 		this.save = this.save.bind( this );
 
-		this.state = {
-			isEditing: !! ( sharedBlock && sharedBlock.isTemporary ),
-			title: null,
-			changedAttributes: null,
-		};
+		if ( sharedBlock && sharedBlock.isTemporary ) {
+			// Start in edit mode when we're working with a newly created shared block
+			this.state = {
+				isEditing: true,
+				title: sharedBlock.title,
+				changedAttributes: {},
+			};
+		} else {
+			// Start in preview mode when we're working with an existing shared block
+			this.state = {
+				isEditing: false,
+				title: null,
+				changedAttributes: null,
+			};
+		}
 	}
 
 	componentDidMount() {
@@ -79,7 +90,7 @@ class SharedBlockEdit extends Component {
 			onUpdateTitle( title );
 		}
 
-		updateAttributes( block.uid, changedAttributes );
+		updateAttributes( block.clientId, changedAttributes );
 		onSave();
 
 		this.stopEditing();
@@ -101,7 +112,7 @@ class SharedBlockEdit extends Component {
 			<BlockEdit
 				{ ...this.props }
 				isSelected={ isEditing && isSelected }
-				id={ block.uid }
+				clientId={ block.clientId }
 				name={ block.name }
 				attributes={ { ...block.attributes, ...changedAttributes } }
 				setAttributes={ isEditing ? this.setAttributes : noop }
@@ -147,7 +158,7 @@ export default compose( [
 			sharedBlock,
 			isFetching: isFetchingSharedBlock( ref ),
 			isSaving: isSavingSharedBlock( ref ),
-			block: sharedBlock ? getBlock( sharedBlock.uid ) : null,
+			block: sharedBlock ? getBlock( sharedBlock.clientId ) : null,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {

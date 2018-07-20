@@ -34,7 +34,7 @@ const DocumentSidebar = () => (
 			<PostExcerpt />
 			<DiscussionPanel />
 			<PageAttributes />
-			<MetaBoxes location="side" usePanel />
+			<MetaBoxes location="side" />
 		</Panel>
 	</Sidebar>
 );

@@ -8,7 +8,7 @@ import { castArray, flow, noop, some } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
-import { compose } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 
 export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, role, ...props } ) {
@@ -33,17 +33,21 @@ export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, role, .
 }
 
 export default compose(
-	withDispatch( ( dispatch, { uids } ) => ( {
+	withDispatch( ( dispatch, { clientIds } ) => ( {
 		onRemove() {
-			dispatch( 'core/editor' ).removeBlocks( uids );
+			dispatch( 'core/editor' ).removeBlocks( clientIds );
 		},
 	} ) ),
-	withSelect( ( select, { uids } ) => {
-		const { getBlockRootUID, getTemplateLock } = select( 'core/editor' );
+	withSelect( ( select, { clientIds } ) => {
+		const {
+			getBlockRootClientId,
+			getTemplateLock,
+		} = select( 'core/editor' );
+
 		return {
-			isLocked: some( castArray( uids ), ( uid ) => {
-				const rootUID = getBlockRootUID( uid );
-				const templateLock = getTemplateLock( rootUID );
+			isLocked: some( castArray( clientIds ), ( clientId ) => {
+				const rootClientId = getBlockRootClientId( clientId );
+				const templateLock = getTemplateLock( rootClientId );
 				return templateLock === 'all';
 			} ),
 		};
