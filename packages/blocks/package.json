@@ -19,6 +19,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
+		"@babel/runtime": "^7.0.0-beta.52",
 		"@wordpress/autop": "file:../autop",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/block-serialization-spec-parser": "file:../block-serialization-spec-parser",
