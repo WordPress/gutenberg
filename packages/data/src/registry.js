@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import {
 	flowRight,
 	without,
@@ -13,7 +13,14 @@ import {
 /**
  * WordPress dependencies
  */
+import createControlsMiddleware from '@wordpress/redux-routine';
 import deprecated from '@wordpress/deprecated';
+
+/**
+ * Internal dependencies
+ */
+import dataStore from './store';
+import { persistence } from './plugins';
 
 /**
  * An isolated orchestrator of store registrations.
@@ -36,12 +43,6 @@ import deprecated from '@wordpress/deprecated';
  *
  * @typedef {WPDataPlugin}
  */
-
-/**
- * Internal dependencies
- */
-import dataStore from './store';
-import { persistence } from './plugins';
 
 /**
  * Returns true if the given argument appears to be a dispatchable action.
@@ -138,13 +139,13 @@ export function createRegistry( storeConfigs = {} ) {
 	 * Registers a new sub-reducer to the global state and returns a Redux-like
 	 * store object.
 	 *
-	 * @param {string} reducerKey Reducer key.
-	 * @param {Object} reducer    Reducer function.
+	 * @param {string}           reducerKey Reducer key.
+	 * @param {Object}           reducer    Reducer function.
+	 * @param {?Array<Function>} enhancers  Optional store enhancers.
 	 *
 	 * @return {Object} Store Object.
 	 */
-	function registerReducer( reducerKey, reducer ) {
-		const enhancers = [];
+	function registerReducer( reducerKey, reducer, enhancers = [] ) {
 		if ( window.__REDUX_DEVTOOLS_EXTENSION__ ) {
 			enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__( { name: reducerKey, instanceId: reducerKey } ) );
 		}
@@ -223,20 +224,34 @@ export function createRegistry( storeConfigs = {} ) {
 				let fulfillment = resolver.fulfill( state, ...args );
 
 				// Attempt to normalize fulfillment as async iterable.
-				fulfillment = toAsyncIterable( fulfillment );
-				if ( ! isAsyncIterable( fulfillment ) ) {
-					finishResolution( reducerKey, selectorName, args );
-					return;
-				}
+				if ( isGenerator( fulfillment ) ) {
+					// Override original fulfillment to trigger resolution
+					// finish once deferred yielded result is completed.
+					const originalFulfillment = fulfillment;
+					fulfillment = ( function* () {
+						yield* originalFulfillment;
+						finishResolution( reducerKey, selectorName, args );
+					}() );
+				} else {
+					// Attempt to normalize fulfillment as async iterable.
+					fulfillment = toAsyncIterable( fulfillment );
+					if ( isAsyncIterable( fulfillment ) ) {
+						deprecated( 'Asynchronous iterable resolvers', {
+							alternative: 'synchronous generators with `controls` plugin',
+							plugin: 'Gutenberg',
+							version: '3.7',
+						} );
 
-				for await ( const maybeAction of fulfillment ) {
-				// Dispatch if it quacks like an action.
-					if ( isActionLike( maybeAction ) ) {
-						store.dispatch( maybeAction );
+						for await ( const maybeAction of fulfillment ) {
+							// Dispatch if it quacks like an action.
+							if ( isActionLike( maybeAction ) ) {
+								store.dispatch( maybeAction );
+							}
+						}
 					}
-				}
 
-				finishResolution( reducerKey, selectorName, args );
+					finishResolution( reducerKey, selectorName, args );
+				}
 			}
 
 			if ( typeof resolver.isFulfilled === 'function' ) {
@@ -286,7 +301,13 @@ export function createRegistry( storeConfigs = {} ) {
 			throw new TypeError( 'Must specify store reducer' );
 		}
 
-		const store = registerReducer( reducerKey, options.reducer );
+		let enhancers;
+		if ( options.controls ) {
+			const controlsMiddleware = createControlsMiddleware( options.controls );
+			enhancers = [ applyMiddleware( controlsMiddleware ) ];
+		}
+
+		const store = registerReducer( reducerKey, options.reducer, enhancers );
 
 		if ( options.actions ) {
 			registerActions( reducerKey, options.actions );

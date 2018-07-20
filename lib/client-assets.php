@@ -206,7 +206,14 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-data',
 		gutenberg_url( 'build/data/index.js' ),
-		array( 'wp-deprecated', 'wp-element', 'wp-compose', 'wp-is-shallow-equal', 'lodash' ),
+		array(
+			'wp-deprecated',
+			'wp-element',
+			'wp-compose',
+			'wp-is-shallow-equal',
+			'lodash',
+			'wp-redux-routine',
+		),
 		filemtime( gutenberg_dir_path() . 'build/data/index.js' ),
 		true
 	);
@@ -266,6 +273,13 @@ function gutenberg_register_scripts_and_styles() {
 		gutenberg_url( 'build/shortcode/index.js' ),
 		array(),
 		filemtime( gutenberg_dir_path() . 'build/shortcode/index.js' ),
+		true
+	);
+	wp_register_script(
+		'wp-redux-routine',
+		gutenberg_url( 'build/redux-routine/index.js' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'build/redux-routine/index.js' ),
 		true
 	);
 	wp_add_inline_script( 'wp-utils', 'var originalUtils = window.wp && window.wp.utils ? window.wp.utils : {};', 'before' );
