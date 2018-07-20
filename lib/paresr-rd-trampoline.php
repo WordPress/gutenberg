@@ -1,18 +1,5 @@
 <?php
 
-# Operations
-#
-#  - `add_freeform_output()`
-#  - `start_tracking_block()`
-#  - `close_block_and_add_as_inner_block()`
-#  - `close_block_and_add_to_output()`
-#
-# Stack data structure
-#  - block name, attrs, innerBlocks as list, innerHTML as text
-#  - start of block token
-#  - start of region inside block / length of opening token
-#
-
 class Block {
     public $blockName;
     public $attrs;
