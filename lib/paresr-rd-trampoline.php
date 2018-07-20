@@ -218,7 +218,7 @@ class MyParser {
     }
 
     function add_inner_block( Block $block, $token_start, $token_length, $last_offset = null ) {
-        $stack_top = $this->stack[ count( $this->stack ) - 1];
+        $stack_top = $this->stack[ count( $this->stack ) - 1 ];
         $stack_top->block->innerBlocks[] = $block;
         $stack_top->block->innerHtml .= substr( $this->document, $stack_top->prev_offset, $token_start - $stack_top->prev_offset );
         $stack_top->prev_offset = $last_offset ?: $token_start + $token_length;
