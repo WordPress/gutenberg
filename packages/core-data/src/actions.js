@@ -4,6 +4,22 @@
 import { castArray } from 'lodash';
 
 /**
+ * Given an apiFetch payload, returns an action object used in signalling that
+ * an API request should be issued. This can be used in tandem with the data
+ * module's `controls` option for asynchronous API request logic flows.
+ *
+ * @param {Object} options apiFetch options payload.
+ *
+ * @return {Object} Action object.
+ */
+export function fetchFromAPI( options ) {
+	return {
+		type: 'FETCH_FROM_API',
+		...options,
+	};
+}
+
+/**
  * Returns an action object used in signalling that terms have been received
  * for a given taxonomy.
  *
