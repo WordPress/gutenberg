@@ -319,7 +319,9 @@ transforms: {
 	from: [
 		{
 			type: 'files',
-			isMatch: ( files ) => files.length === 1,
+			isMatch: function ( files ) {
+				return files.length === 1
+			},
 			// We define a lower priority (higher number) than the default of 10. This
 			// ensures that the File block is only created as a fallback.
 			priority: 15,
