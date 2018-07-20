@@ -46,7 +46,7 @@ export const settings = {
 					text: {
 						type: 'string',
 						shortcode: ( attrs, { content } ) => {
-							return content;
+							return wp.oldEditor.removep( wp.oldEditor.autop( content ) );
 						},
 					},
 				},
