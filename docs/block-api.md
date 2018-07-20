@@ -128,7 +128,7 @@ attributes: {
 
 * **Type:** `Array`
 
-Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression or a raw DOM node.
+Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression, a file or a raw DOM node.
 
 For example, a paragraph block can be transformed into a heading block.
 
