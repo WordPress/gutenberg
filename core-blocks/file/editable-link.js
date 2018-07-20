@@ -2,23 +2,13 @@
  * WordPress dependencies
  */
 import { Component, Fragment } from '@wordpress/element';
+import { RichText } from '@wordpress/editor';
 
 export default class FileBlockEditableLink extends Component {
 	constructor() {
 		super( ...arguments );
 
 		this.copyLinkToClipboard = this.copyLinkToClipboard.bind( this );
-		this.showPlaceholderIfEmptyString = this.showPlaceholderIfEmptyString.bind( this );
-
-		this.state = {
-			showPlaceholder: ! this.props.text,
-		};
-	}
-
-	componentDidUpdate( prevProps ) {
-		if ( prevProps.text !== this.props.text ) {
-			this.setState( { showPlaceholder: ! this.props.text } );
-		}
 	}
 
 	copyLinkToClipboard( event ) {
@@ -39,13 +29,8 @@ export default class FileBlockEditableLink extends Component {
 		selection.collapseToEnd();
 	}
 
-	showPlaceholderIfEmptyString( event ) {
-		this.setState( { showPlaceholder: event.target.innerText === '' } );
-	}
-
 	render() {
 		const { className, placeholder, text, href, updateFileName } = this.props;
-		const { showPlaceholder } = this.state;
 
 		return (
 			<Fragment>
@@ -53,26 +38,21 @@ export default class FileBlockEditableLink extends Component {
 					aria-label={ placeholder }
 					className={ `${ className }__textlink` }
 					href={ href }
-					onBlur={ ( event ) => updateFileName( event.target.innerText ) }
-					onInput={ this.showPlaceholderIfEmptyString }
 					onCopy={ this.copyLinkToClipboard }
 					onCut={ this.copyLinkToClipboard }
 					onPaste={ this.forcePlainTextPaste }
-					contentEditable
 				>
-					{ text }
+					<RichText
+						wrapperClassName={ `${ className }__textlink-richtext` }
+						tagName="div" // must be block-level or else cursor disappears
+						value={ text }
+						multiline="false"
+						placeholder={ placeholder }
+						keepPlaceholderOnFocus
+						formattingControls={ [] } // disable controls
+						onChange={ ( fileName ) => updateFileName( fileName ) }
+					/>
 				</a>
-				{ showPlaceholder &&
-					// Disable reason: Only useful for mouse users
-					/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
-					<span
-						className={ `${ className }__textlink-placeholder` }
-						onClick={ ( event ) => event.target.previousSibling.focus() }
-					>
-						{ placeholder }
-					</span>
-					/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
-				}
 			</Fragment>
 		);
 	}

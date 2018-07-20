@@ -19,9 +19,8 @@
 		}
 	}
 
-	&__textlink-placeholder {
-		opacity: .5;
-		text-decoration: underline;
+	&__textlink-richtext {
+		display: inline-block
 	}
 
 	&__button-richtext-wrapper {
