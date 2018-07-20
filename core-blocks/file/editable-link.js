@@ -38,6 +38,7 @@ export default class FileBlockEditableLink extends Component {
 					aria-label={ placeholder }
 					className={ `${ className }__textlink` }
 					href={ href }
+					onClick={ ( event ) => event.preventDefault() }
 					onCopy={ this.copyLinkToClipboard }
 					onCut={ this.copyLinkToClipboard }
 					onPaste={ this.forcePlainTextPaste }
