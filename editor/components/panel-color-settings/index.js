@@ -16,19 +16,23 @@ import { ifCondition, compose } from '@wordpress/compose';
  */
 import './style.scss';
 import ColorPaletteControl from '../color-palette/control';
-import TextWithColorIndicators from '../text-with-color-indicators';
 import withColorContext from '../color-palette/with-color-context';
+import ColorIndicator from '../color-indicator';
 
 export function PanelColorSettings( { title, colorSettings, children, ...props } ) {
 	const className = 'editor-panel-color-settings';
 
 	const titleElement = (
-		<TextWithColorIndicators
-			className={ `${ className }__panel-title` }
-			colorSettings={ colorSettings }
-		>
+		<span className={ `${ className }__panel-title` }>
 			{ title }
-		</TextWithColorIndicators>
+			{ colorSettings.map( ( settings, index ) => (
+				<ColorIndicator
+					key={ index }
+					colorValue={ settings.value }
+					ariaLabel={ settings.colorIndicatorAriaLabel }
+				/>
+			) ) }
+		</span>
 	);
 
 	return (

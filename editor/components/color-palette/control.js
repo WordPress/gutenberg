@@ -1,27 +1,27 @@
 /**
- * External dependencies
- */
-import { pick } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { BaseControl } from '@wordpress/components';
+import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import './control.scss';
 import ColorPalette from './';
-import TextWithColorIndicators from '../text-with-color-indicators';
+import ColorIndicator from '../color-indicator';
 
-const ColorPaletteControl = ( { label, ...props } ) => {
+const ColorPaletteControl = ( { label, value, colorIndicatorAriaLabel, onChange } ) => {
 	const labelElement = (
-		<TextWithColorIndicators
-			colorSettings={ pick( props, [ 'value', 'colorIndicatorAriaLabel' ] ) }
-		>
+		<Fragment>
 			{ label }
-		</TextWithColorIndicators>
+			{ value && (
+				<ColorIndicator
+					colorValue={ value }
+					ariaLabel={ colorIndicatorAriaLabel }
+				/>
+			) }
+		</Fragment>
 	);
 
 	return (
@@ -30,7 +30,8 @@ const ColorPaletteControl = ( { label, ...props } ) => {
 			label={ labelElement }>
 			<ColorPalette
 				className="editor-color-palette-control__color-palette"
-				{ ...pick( props, [ 'value', 'onChange' ] ) }
+				value={ value }
+				onChange={ onChange }
 			/>
 		</BaseControl>
 	);
