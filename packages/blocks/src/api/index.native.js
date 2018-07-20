@@ -11,4 +11,5 @@ export {
 export {
 	registerBlockType,
 	getBlockType,
+	hasBlockSupport,
 } from './registration';
