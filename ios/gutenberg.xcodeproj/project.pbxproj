@@ -1276,6 +1276,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../react-native-aztec/example/iOS/example",
+					/usr/include/libxml2,
 				);
 				INFOPLIST_FILE = gutenberg/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1301,6 +1302,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../react-native-aztec/example/iOS/example",
+					/usr/include/libxml2,
 				);
 				INFOPLIST_FILE = gutenberg/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
