@@ -326,8 +326,8 @@ transforms: {
 			// ensures that the File block is only created as a fallback.
 			priority: 15,
 			transform: function( files ) {
-				const file = files[ 0 ];
-				const blobURL = createBlobURL( file );
+				var file = files[ 0 ];
+				var blobURL = createBlobURL( file );
 
 				// File will be uploaded in componentDidMount()
 				return createBlock( 'core/file', {
