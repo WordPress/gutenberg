@@ -1743,10 +1743,12 @@ describe( 'selectors', () => {
 							'uuid-4': { clientId: 'uuid-4', name: 'core/paragraph', attributes: {} },
 							'uuid-6': { clientId: 'uuid-6', name: 'core/paragraph', attributes: {} },
 							'uuid-8': { clientId: 'uuid-8', name: 'core/block', attributes: { ref: 1 } },
-							'uuid-10': { clientId: 'uuid-10', name: 'core/columns', attributes: { } },
-							'uuid-12': { clientId: 'uuid-12', name: 'core/column', attributes: { } },
-							'uuid-14': { clientId: 'uuid-14', name: 'core/column', attributes: { } },
-							'uuid-16': { clientId: 'uuid-16', name: 'core/quote', attributes: { } },
+							'uuid-10': { clientId: 'uuid-10', name: 'core/columns', attributes: {} },
+							'uuid-12': { clientId: 'uuid-12', name: 'core/column', attributes: {} },
+							'uuid-14': { clientId: 'uuid-14', name: 'core/column', attributes: {} },
+							'uuid-16': { clientId: 'uuid-16', name: 'core/quote', attributes: {} },
+							'uuid-18': { clientId: 'uuid-18', name: 'core/block', attributes: { ref: 5 } },
+							'uuid-20': { clientId: 'uuid-20', name: 'core/gallery', attributes: {} },
 						},
 						blockOrder: {
 							'': [ 'uuid-6', 'uuid-8', 'uuid-10' ],
@@ -1756,8 +1758,10 @@ describe( 'selectors', () => {
 							'uuid-8': [ ],
 							'uuid-10': [ 'uuid-12', 'uuid-14' ],
 							'uuid-12': [ 'uuid-16' ],
-							'uuid-14': [ ],
+							'uuid-14': [ 'uuid-18' ],
 							'uuid-16': [ ],
+							'uuid-18': [ ],
+							'uuid-20': [ ],
 						},
 						edits: {},
 					},
@@ -1766,6 +1770,7 @@ describe( 'selectors', () => {
 					data: {
 						1: { clientId: 'uuid-2', title: 'SharedImage' },
 						3: { clientId: 'uuid-4', title: 'SharedParagraph' },
+						5: { clientId: 'uuid-20', title: 'SharedGallery' },
 					},
 				},
 			};
@@ -1776,14 +1781,20 @@ describe( 'selectors', () => {
 					{ clientId: 'uuid-12', name: 'core/column', attributes: { }, innerBlocks: [
 						{ clientId: 'uuid-16', name: 'core/quote', attributes: { }, innerBlocks: [] },
 					] },
-					{ clientId: 'uuid-14', name: 'core/column', attributes: { }, innerBlocks: [] },
+					{ clientId: 'uuid-14', name: 'core/column', attributes: { }, innerBlocks: [
+						{ clientId: 'uuid-18', name: 'core/block', attributes: { ref: 5 }, innerBlocks: [] },
+					] },
 				] },
 				{ clientId: 'uuid-2', name: 'core/image', attributes: {}, innerBlocks: [] },
 				{ clientId: 'uuid-12', name: 'core/column', attributes: { }, innerBlocks: [
 					{ clientId: 'uuid-16', name: 'core/quote', attributes: { }, innerBlocks: [] },
 				] },
-				{ clientId: 'uuid-14', name: 'core/column', attributes: { }, innerBlocks: [] },
 				{ clientId: 'uuid-16', name: 'core/quote', attributes: { }, innerBlocks: [] },
+				{ clientId: 'uuid-14', name: 'core/column', attributes: { }, innerBlocks: [
+					{ clientId: 'uuid-18', name: 'core/block', attributes: { ref: 5 }, innerBlocks: [] },
+				] },
+				{ clientId: 'uuid-18', name: 'core/block', attributes: { ref: 5 }, innerBlocks: [] },
+				{ clientId: 'uuid-20', name: 'core/gallery', attributes: {}, innerBlocks: [] },
 			] );
 		} );
 	} );

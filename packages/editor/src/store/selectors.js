@@ -564,24 +564,35 @@ export const getBlocks = createSelector(
 	]
 );
 
+const unfoldBlockIds = ( state, block ) => {
+	const clientIds = [];
+	if ( block.name === 'core/block' ) {
+		clientIds.push( get( getSharedBlock( state, block.attributes.ref ), [ 'clientId' ], null ) );
+	}
+	if ( block.innerBlocks.length > 0 ) {
+		block.innerBlocks.map( ( innerBlock ) => {
+			clientIds.push( innerBlock.clientId );
+			clientIds.push( ...unfoldBlockIds( state, innerBlock ) );
+		} );
+	}
+	return clientIds.filter( ( id ) => !! id );
+};
+
 /**
- * Returns an array containing both top-level blocks
- * and all blocks referenced by the existing top-level shared blocks.
+ * Returns an array containing the top-level blocks,
+ * all blocks referenced by the existing top-level shared blocks,
+ * and all the inner blocks of existing top-level nested blocks.
  *
  * @param {Object} state Global application state.
  *
- * @return {Array} All top-level and referenced blocks.
+ * @return {Array} All top-level, referenced, and inner blocks.
  */
-export const getBlocksTopLevelAndReferenced = createSelector(
+export const getBlocksUnfolded = createSelector(
 	( state ) => {
 		const topLevelBlocks = getBlocks( state );
-		const referencedBlocksIds = topLevelBlocks.map(
-			( block ) => block.name === 'core/block' ?
-				get( getSharedBlock( state, block.attributes.ref ), [ 'clientId' ], null ) :
-				null,
-		).filter( ( id ) => !! id );
-		const referencedBlocks = getBlocksByClientId( state, referencedBlocksIds );
-		return [ ...topLevelBlocks, ...referencedBlocks ];
+		const clientIds = [];
+		topLevelBlocks.forEach( ( block ) => clientIds.push( ...unfoldBlockIds( state, block ) ) );
+		return [ ...topLevelBlocks, ...getBlocksByClientId( state, clientIds ) ];
 	},
 	( state ) => [
 		state.editor.present.blockOrder,
@@ -1571,7 +1582,7 @@ export const getInserterItems = createSelector(
 
 			let isDisabled = false;
 			if ( ! hasBlockSupport( blockType.name, 'multiple', true ) ) {
-				isDisabled = some( getBlocksTopLevelAndReferenced( state ), { name: blockType.name } );
+				isDisabled = some( getBlocksUnfolded( state ), { name: blockType.name } );
 			}
 
 			const isContextual = isArray( blockType.parent );
