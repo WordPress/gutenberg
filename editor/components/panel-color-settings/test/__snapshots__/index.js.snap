@@ -8,25 +8,25 @@ exports[`PanelColorSettings matches the snapshot 1`] = `
       className="editor-panel-color-settings__panel-title"
     >
       Test Title
-      <WithColorContext(Component)
+      <ColorIndicator
         ariaLabel="black"
         colorValue="#000"
       />
-      <WithColorContext(Component)
+      <ColorIndicator
         ariaLabel="nearly black"
         colorValue="#111"
       />
     </span>
   }
 >
-  <ColorPaletteControl
+  <WithColorContext(Component)
     colorIndicatorAriaLabel="black"
     key="0"
     label="black color"
     onChange={[Function]}
     value="#000"
   />
-  <ColorPaletteControl
+  <WithColorContext(Component)
     colorIndicatorAriaLabel="nearly black"
     key="1"
     label="nearly black color"

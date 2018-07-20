@@ -1,24 +1,28 @@
 /**
  * WordPress dependencies
  */
-import { BaseControl } from '@wordpress/components';
+import { BaseControl, ColorIndicator } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
+import { sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import './control.scss';
 import ColorPalette from './';
-import ColorIndicator from '../color-indicator';
+import withColorContext from './with-color-context';
+import { getColorName } from '../colors';
 
-const ColorPaletteControl = ( { label, value, colorIndicatorAriaLabel, onChange } ) => {
+const ColorPaletteControl = withColorContext( ( { label, value, onChange, colorIndicatorAriaLabel, colors } ) => {
+	const colorName = getColorName( value, colors );
+
 	const labelElement = (
 		<Fragment>
 			{ label }
 			{ value && (
 				<ColorIndicator
 					colorValue={ value }
-					ariaLabel={ colorIndicatorAriaLabel }
+					ariaLabel={ sprintf( colorIndicatorAriaLabel, colorName || value ) }
 				/>
 			) }
 		</Fragment>
@@ -35,6 +39,6 @@ const ColorPaletteControl = ( { label, value, colorIndicatorAriaLabel, onChange 
 			/>
 		</BaseControl>
 	);
-};
+} );
 
 export default ColorPaletteControl;

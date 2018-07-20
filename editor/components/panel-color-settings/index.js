@@ -6,10 +6,9 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	PanelBody,
-} from '@wordpress/components';
+import { PanelBody, ColorIndicator } from '@wordpress/components';
 import { ifCondition, compose } from '@wordpress/compose';
+import { sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -17,21 +16,33 @@ import { ifCondition, compose } from '@wordpress/compose';
 import './style.scss';
 import ColorPaletteControl from '../color-palette/control';
 import withColorContext from '../color-palette/with-color-context';
-import ColorIndicator from '../color-indicator';
+import { getColorName } from '../colors';
 
-export function PanelColorSettings( { title, colorSettings, children, ...props } ) {
+const renderColorIndicators = ( colorSettings, colors ) => {
+	return colorSettings.map( ( { value, colorIndicatorAriaLabel }, index ) => {
+		if ( ! value ) {
+			return null;
+		}
+
+		const colorName = getColorName( value, colors );
+
+		return (
+			<ColorIndicator
+				key={ index }
+				colorValue={ value }
+				ariaLabel={ sprintf( colorIndicatorAriaLabel, colorName || value ) }
+			/>
+		);
+	} );
+};
+
+export function PanelColorSettings( { title, colorSettings, colors, children, ...props } ) {
 	const className = 'editor-panel-color-settings';
 
 	const titleElement = (
 		<span className={ `${ className }__panel-title` }>
 			{ title }
-			{ colorSettings.map( ( settings, index ) => (
-				<ColorIndicator
-					key={ index }
-					colorValue={ settings.value }
-					ariaLabel={ settings.colorIndicatorAriaLabel }
-				/>
-			) ) }
+			{ renderColorIndicators( colorSettings, colors ) }
 		</span>
 	);
 
