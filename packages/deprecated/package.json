@@ -20,7 +20,7 @@
 	"module": "build-module/index.js",
 	"dependencies": {
 		"@babel/runtime-corejs2": "7.0.0-beta.56",
-		"@wordpress/hooks": "^1.3.1"
+		"@wordpress/hooks": "file:../hooks"
 	},
 	"publishConfig": {
 		"access": "public"
