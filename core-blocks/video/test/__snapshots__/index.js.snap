@@ -60,6 +60,7 @@ exports[`core/video block edit matches snapshot 1`] = `
     </div>
     <form>
       <input
+        aria-label="Video"
         class="components-placeholder__input"
         placeholder="Enter URL here…"
         type="url"
