@@ -54,12 +54,6 @@ services:
       - ./test/e2e/test-plugins:/var/www/html/wp-content/plugins/gutenberg-test-plugins
       - ./test/e2e/test-mu-plugins:/var/www/html/wp-content/mu-plugins
 
-  mysql_e2e_tests:
-    image: mysql:5.7
-    environment:
-      MYSQL_ROOT_PASSWORD: example
-      MYSQL_DATABASE: wordpress_e2e_tests
-
   cli_e2e_tests:
     image: wordpress:cli
     volumes:
