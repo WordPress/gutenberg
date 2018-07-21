@@ -19,6 +19,13 @@ export const logged = Object.create( null );
  * @param {?string} options.hint        Additional message to help transition away from the deprecated feature.
  */
 export default function deprecated( feature, { version, alternative, plugin, link, hint } = {} ) {
+	const options = {
+		version,
+		alternative,
+		plugin,
+		link,
+		hint,
+	};
 	const pluginMessage = plugin ? ` from ${ plugin }` : '';
 	const versionMessage = version ? `${ pluginMessage } in ${ version }` : '';
 	const useInsteadMessage = alternative ? ` Please use ${ alternative } instead.` : '';
