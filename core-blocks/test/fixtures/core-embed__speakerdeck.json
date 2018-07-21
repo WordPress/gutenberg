@@ -10,6 +10,6 @@
             ]
         },
         "innerBlocks": [],
-        "originalContent": "<figure class=\"wp-block-embed-speakerdeck wp-block-embed\">\n    https://speakerdeck.com/\n    <figcaption>Embedded content from speakerdeck</figcaption>\n</figure>"
+        "originalContent": "<figure class=\"wp-block-embed-speakerdeck wp-block-embed\">\n\thttps://speakerdeck.com/\n\t<figcaption>Embedded content from speakerdeck</figcaption>\n</figure>"
     }
 ]
