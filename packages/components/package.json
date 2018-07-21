@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "UI Compoonents for WordPress",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -16,11 +16,6 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"files": [
-		"build",
-		"build-module",
-		"build-style"
-	],
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
@@ -38,6 +33,7 @@
 		"classnames": "^2.2.5",
 		"clipboard": "^1.7.1",
 		"dom-scroll-into-view": "^1.2.1",
+		"element-closest": "^2.0.2",
 		"http-build-query": "^0.7.0",
 		"lodash": "^4.17.10",
 		"memize": "^1.0.5",

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
-import './store';
+export * from '../packages/nux/src';
 
-export { default as DotTip } from './components/dot-tip';
+import '../packages/nux/src/style.scss';

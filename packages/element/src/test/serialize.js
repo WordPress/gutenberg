@@ -353,7 +353,7 @@ describe( 'renderNativeComponent()', () => {
 } );
 
 describe( 'renderComponent()', () => {
-	it( 'calls constructor and componentWillMount', () => {
+	it( 'calls constructor', () => {
 		class Example extends Component {
 			constructor() {
 				super( ...arguments );
@@ -361,19 +361,14 @@ describe( 'renderComponent()', () => {
 				this.constructed = 'constructed';
 			}
 
-			componentWillMount() {
-				this.willMounted = 'willMounted';
-			}
-
 			render() {
-				return this.constructed + this.willMounted;
+				return this.constructed;
 			}
 		}
 
 		const result = renderComponent( Example, {} );
 
-		expect( console ).toHaveWarned();
-		expect( result ).toBe( 'constructedwillMounted' );
+		expect( result ).toBe( 'constructed' );
 	} );
 
 	it( 'does not call componentDidMount', () => {
@@ -516,6 +511,12 @@ describe( 'renderAttributes()', () => {
 } );
 
 describe( 'renderStyle()', () => {
+	it( 'should return string verbatim', () => {
+		const result = renderStyle( 'color:red' );
+
+		expect( result ).toBe( 'color:red' );
+	} );
+
 	it( 'should return undefined if empty', () => {
 		const result = renderStyle( {} );
 

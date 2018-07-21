@@ -222,9 +222,9 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/api-request",
-		"slug": "packages-api-request",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/api-request/README.md",
+		"title": "@wordpress/api-fetch",
+		"slug": "packages-api-fetch",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/api-fetch/README.md",
 		"parent": "packages"
 	},
 	{
@@ -255,6 +255,18 @@
 		"title": "@wordpress/blob",
 		"slug": "packages-blob",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/blob/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/block-serialization-spec-parser",
+		"slug": "packages-block-serialization-spec-parser",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/block-serialization-spec-parser/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/blocks",
+		"slug": "packages-blocks",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/blocks/README.md",
 		"parent": "packages"
 	},
 	{
@@ -378,6 +390,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/nux",
+		"slug": "packages-nux",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/nux/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/plugins",
 		"slug": "packages-plugins",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/plugins/README.md",
@@ -420,12 +438,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/blocks",
-		"slug": "packages-blocks",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/blocks/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/core-blocks",
 		"slug": "packages-core-blocks",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/core-blocks/README.md",
@@ -441,12 +453,6 @@
 		"title": "@wordpress/editor",
 		"slug": "packages-editor",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/editor/README.md",
-		"parent": "packages"
-	},
-	{
-		"title": "@wordpress/nux",
-		"slug": "packages-nux",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/nux/README.md",
 		"parent": "packages"
 	},
 	{

@@ -12,6 +12,7 @@ import {
  */
 import { createElement } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -34,6 +35,13 @@ const GroupedLayoutBlockList = withSelect(
 	layouts,
 	...props
 } ) => map( layouts, ( layout ) => {
+	deprecated( 'grouped layout', {
+		alternative: 'intermediary nested inner blocks',
+		version: '3.5',
+		plugin: 'Gutenberg',
+		hint: 'See core Columns / Column block for reference implementation',
+	} );
+
 	// Filter blocks assigned to layout when rendering grouped layouts.
 	const layoutBlockClientIds = reduce( blocks, ( result, block ) => {
 		if ( get( block, [ 'attributes', 'layout' ] ) === layout.name ) {

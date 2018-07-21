@@ -9,7 +9,6 @@ import { isFinite, find, omit } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import {
-	concatChildren,
 	Component,
 	Fragment,
 	RawHTML,
@@ -30,7 +29,11 @@ import {
 	PanelColor,
 	RichText,
 } from '@wordpress/editor';
-import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
+import {
+	createBlock,
+	getPhrasingContentSchema,
+	children,
+} from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
 
 /**
@@ -248,10 +251,10 @@ class ParagraphBlock extends Component {
 						textColor={ textColor.value }
 						backgroundColor={ backgroundColor.value }
 						{ ...{
+							fontSize,
 							fallbackBackgroundColor,
 							fallbackTextColor,
 						} }
-						isLargeText={ fontSize >= 18 }
 					/>
 				</InspectorControls>
 				<RichText
@@ -470,7 +473,10 @@ export const settings = {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: concatChildren( attributes.content, attributesToMerge.content ),
+			content: children.concat(
+				attributes.content,
+				attributesToMerge.content
+			),
 		};
 	},
 
