@@ -1,6 +1,16 @@
 <?php
 
-class Block {
+function rdt_parse( $document ) {
+    static $parser;
+
+    if ( ! isset( $parser ) ) {
+        $parser = new RDT_Parser();
+    }
+
+    return $parser->parse( $document );
+}
+
+class RDT_Block {
     public $blockName;
     public $attrs;
     public $innerBlocks;
@@ -14,7 +24,7 @@ class Block {
     }
 }
 
-class Frame {
+class RDT_Frame {
     public $block;
     public $token_start;
     public $token_length;
@@ -28,32 +38,23 @@ class Frame {
     }
 }
 
-class MyParser {
+class RDT_Parser {
     public $document;
     public $offset;
     public $output;
     public $stack;
 
-    function __construct( $document ) {
+    function parse( $document ) {
         $this->document = $document;
         $this->offset   = 0;
         $this->output   = array();
         $this->stack    = array();
-    }
 
-    function parse() {
-        $tic = microtime( true );
         do {
             # twiddle our thumbs
         } while ( $this->proceed() );
-        $toc = microtime( true );
 
-        return array(
-            'parse' => $this->output,
-            'ms'    => 1000 * ( $toc - $tic ),
-            'mem'   => memory_get_peak_usage(),
-            'memR'  => memory_get_peak_usage( true ),
-        );
+        return $this->output;
     }
 
     function proceed() {
@@ -77,10 +78,10 @@ class MyParser {
                 #  - treat it all as freeform text
                 #  - assume an implicit closer (easiest when not nesting)
 
-                # for the easy case we'll assume and implicit closer
+                # for the easy case we'll assume an implicit closer
                 if ( 1 === $stack_depth ) {
                     $this->error( ' - treating as implicit closer' );
-                    $this->pop_stack();
+                    $this->add_block_from_stack();
                     return false;
                 }
 
@@ -90,7 +91,7 @@ class MyParser {
                 $this->error( ' - multiple closers are missing' );
                 $this->error( ' - recursively collapsing stack of blocks' );
                 while ( 0 < count( $this->stack ) ) {
-                    $this->pop_stack();
+                    $this->add_block_from_stack();
                 }
                 return false;
 
@@ -98,14 +99,14 @@ class MyParser {
                 # easy case is if we stumbled upon a void block
                 # in the top-level of the document
                 if ( 0 === $stack_depth ) {
-                    $this->output[] = new Block( $block_name, $attrs, array(), '' );
+                    $this->output[] = new RDT_Block( $block_name, $attrs, array(), '' );
                     $this->offset = $start_offset + $token_length;
                     return true;
                 }
 
                 # otherwise we found an inner block
                 $this->add_inner_block(
-                    new Block( $block_name, $attrs, array(), '' ),
+                    new RDT_Block( $block_name, $attrs, array(), '' ),
                     $start_offset,
                     $token_length
                 );
@@ -118,8 +119,9 @@ class MyParser {
                     self::add_freeform( $start_offset - $this->offset );
                 }
 
-                array_push( $this->stack, new Frame(
-                    new Block( $block_name, $attrs, array(), '' ),
+                # track all newly-opened blocks on the stack
+                array_push( $this->stack, new RDT_Frame(
+                    new RDT_Block( $block_name, $attrs, array(), '' ),
                     $start_offset,
                     $token_length,
                     $start_offset + $token_length
@@ -144,7 +146,7 @@ class MyParser {
 
                 # if we're not nesting then this is easy - close the block
                 if ( 1 === $stack_depth ) {
-                    $this->pop_stack( $start_offset );
+                    $this->add_block_from_stack( $start_offset );
                     $this->offset = $start_offset + $token_length;
                     return true;
                 }
@@ -175,6 +177,12 @@ class MyParser {
     function next_token() {
         $matches = null;
 
+        # aye the magic
+        # we're using a single RegExp to tokenize the block comment delimiters
+        # we're also using a trick here because the only difference between a
+        # block opener and a block closer is the leading `/` before `wp:` (and
+        # a closer has no attributes). we can trap them both and process the
+        # match back in PHP to see which one it was.
         $has_match = preg_match(
             '/<!--\s+(?<closer>\/)?wp:(?<namespace>[a-z][a-z0-9_-]*\/)?(?<name>[a-z][a-z0-9_-]*)\s+(?<attrs>{(?:(?!}\s+-->).)+}\s+)?(?<void>\/)?-->/s',
             $this->document,
@@ -193,7 +201,8 @@ class MyParser {
         $length     = strlen( $match );
         $is_closer  = isset( $matches[ 'closer' ] ) && -1 !== $matches[ 'closer' ][ 1 ];
         $is_void    = isset( $matches[ 'void' ] ) && -1 !== $matches[ 'void' ][ 1 ];
-        $namespace  = isset( $matches[ 'namspace' ] ) && -1 !== $matches[ 'namespace' ][ 1 ] ? $matches[ 'namespace' ] : 'core/';
+        $namespace  = $matches[ 'namespace' ];
+        $namespace  = ( isset( $namespace ) && -1 !== $namespace[ 1 ] ) ? $namespace[ 0 ] : 'core/';
         $name       = $namespace . $matches[ 'name' ][ 0 ];
         $has_attrs  = isset( $matches[ 'attrs' ] ) && -1 !== $matches[ 'attrs' ][ 1 ];
         $attrs      = $has_attrs ? json_decode( $matches[ 'attrs' ][ 0 ] ) : null;
@@ -219,23 +228,26 @@ class MyParser {
     }
 
     function add_freeform( $length = null ) {
-        $length = $length ?? strlen( $this->document ) - $this->offset;
+        $length = $length ?: strlen( $this->document ) - $this->offset;
 
         if ( 0 === $length ) {
             return;
         }
 
-        $this->output[] = self::freeform( substr( $this->document, $this->offset, $length ) );
+        $this->output[] = array(
+            'attrs'     => new stdClass(),
+            'innerHTML' => substr( $this->document, $this->offset, $length ),
+        );
     }
 
-    function add_inner_block( Block $block, $token_start, $token_length, $last_offset = null ) {
+    function add_inner_block( RDT_Block $block, $token_start, $token_length, $last_offset = null ) {
         $parent = $this->stack[ count( $this->stack ) - 1 ];
         $parent->block->innerBlocks[] = $block;
         $parent->block->innerHTML .= substr( $this->document, $parent->prev_offset, $token_start - $parent->prev_offset );
         $parent->prev_offset = $last_offset ?: $token_start + $token_length;
     }
 
-    function pop_stack( $end_offset = null ) {
+    function add_block_from_stack( $end_offset = null ) {
         $stack_top = array_pop( $this->stack );
         $prev_offset = $stack_top->prev_offset;
 
@@ -247,13 +259,6 @@ class MyParser {
     }
 
     function error( $message ) {
-        error_log( $message );
-    }
-
-    static function freeform( $s ) {
-        return array(
-            'attrs'     => new stdClas(),
-            'innerHTML' => $s,
-        );
+        # silence is golden
     }
 }
