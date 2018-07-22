@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/browserslist-config",
 	"version": "2.2.0",
-	"description": "WordPress Browserslist Shared Config",
+	"description": "WordPress Browserslist shared configuration",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
