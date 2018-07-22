@@ -561,10 +561,10 @@ export const others = [
 		patterns: [ /^https?:\/\/(www\.)?smugmug\.com\/.+/i ],
 	},
 	{
-		name: 'core-embed/speaker',
+		name: 'core-embed/speakerdeck',
 		settings: getEmbedBlockSettings( {
-			title: 'Speaker',
-			icon: 'embed-audio',
+			title: 'Speaker Deck',
+			icon: 'embed-post',
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?speakerdeck\.com\/.+/i ],
 	},
