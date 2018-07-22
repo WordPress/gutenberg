@@ -7,11 +7,12 @@ import {
 	createRef,
 	forwardRef,
 	Component,
+	PureComponent,
 	cloneElement,
 	Children,
 	Fragment,
 	isValidElement,
-	StrictMode,
+	StrictMode
 } from 'react';
 import { render, findDOMNode, createPortal, unmountComponentAtNode } from 'react-dom';
 import { isString } from 'lodash';
@@ -22,6 +23,7 @@ import { isString } from 'lodash';
 import serialize from './serialize';
 import { RawHTML } from './index-common';
 export * from './deprecated';
+
 
 /**
  * Returns a new element of given type. Type can be either a string tag name or
@@ -78,6 +80,11 @@ export { unmountComponentAtNode };
  * A base class to create WordPress Components (Refs, state and lifecycle hooks)
  */
 export { Component };
+
+/**
+ * A base class to create WordPress Components with. (shouldComponentUpdate is handled automatically)
+ */
+export {PureComponent};
 
 /**
  * Creates a copy of an element with extended props.
@@ -195,3 +202,4 @@ export function switchChildrenNodeName( children, nodeName ) {
  * @return {WPElement} Dangerously-rendering element.
  */
 export { RawHTML };
+
