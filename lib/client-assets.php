@@ -201,7 +201,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-deprecated',
 		gutenberg_url( 'build/deprecated/index.js' ),
-		array(),
+		array( 'wp-hooks' ),
 		filemtime( gutenberg_dir_path() . 'build/deprecated/index.js' ),
 		true
 	);
