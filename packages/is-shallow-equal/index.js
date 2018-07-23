@@ -1,13 +1,12 @@
-/**
- * Internal dependencies
- */
-import isShallowEqualObjects from './objects';
-import isShallowEqualArrays from './arrays';
+'use strict';
 
 /**
- * Local variables
+ * Internal dependencies;
  */
-const { isArray } = Array;
+var isShallowEqualObjects = require( './objects' );
+var isShallowEqualArrays = require( './arrays' );
+
+var isArray = Array.isArray;
 
 /**
  * Returns true if the two arrays or objects are shallow equal, or false
@@ -30,4 +29,4 @@ function isShallowEqual( a, b ) {
 	return a === b;
 }
 
-export default isShallowEqual;
+module.exports = isShallowEqual;
