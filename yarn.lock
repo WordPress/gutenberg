@@ -445,7 +445,7 @@
     pirates "^4.0.0"
     source-map-support "^0.4.2"
 
-"@babel/runtime@^7.0.0-beta.54":
+"@babel/runtime@^7.0.0-beta.52":
   version "7.0.0-beta.54"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.0.0-beta.54.tgz#39ebb42723fe7ca4b3e1b00e967e80138d47cadf"
   dependencies:
@@ -520,8 +520,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.5.2.tgz#f19f05314d5421fe37e74153254201a7bf00a707"
 
 "@wordpress/autop@^1.0.6":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@wordpress/autop/-/autop-1.1.0.tgz#b0cc5bd8da51165b980fb90ccdc3d443e65927d1"
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@wordpress/autop/-/autop-1.1.1.tgz#00a4b91ef2feaf5dfb704383f2dd16b880604084"
+  dependencies:
+    "@babel/runtime" "^7.0.0-beta.52"
 
 "@wordpress/babel-preset-default@^1.1.2":
   version "1.3.0"
@@ -539,25 +541,32 @@
   resolved "https://registry.yarnpkg.com/@wordpress/browserslist-config/-/browserslist-config-2.2.0.tgz#7fcc77db40d4d846dbb158e485a6badc143c76d2"
 
 "@wordpress/deprecated@^1.0.0-alpha.2":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@wordpress/deprecated/-/deprecated-1.0.0.tgz#6f8e3a5982babac3c20421b8900b132f6d5f0756"
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@wordpress/deprecated/-/deprecated-1.0.1.tgz#8769d791b228022caef156dbbff0f21eb2b21f3e"
+  dependencies:
+    "@babel/runtime" "^7.0.0-beta.52"
 
-"@wordpress/hooks@^1.2.0":
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/@wordpress/hooks/-/hooks-1.3.0.tgz#cc15685635891ba98aa9733a00592dcae4b65c90"
+"@wordpress/hooks@^1.2.1":
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/@wordpress/hooks/-/hooks-1.3.1.tgz#1ee50c777938060a96b202e22ca2e902eacce335"
+  dependencies:
+    "@babel/runtime" "^7.0.0-beta.52"
 
 "@wordpress/i18n@^1.1.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@wordpress/i18n/-/i18n-1.2.0.tgz#b3d49a8925bff1307815a976c09dd2fa4471c79c"
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@wordpress/i18n/-/i18n-1.2.1.tgz#b5c7c52065db9fa13a3d1872ddb9a198bc8ea29a"
   dependencies:
+    "@babel/runtime" "^7.0.0-beta.52"
     gettext-parser "^1.3.1"
     jed "^1.1.1"
     lodash "^4.17.10"
     memize "^1.0.5"
 
 "@wordpress/is-shallow-equal@^1.0.1":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@wordpress/is-shallow-equal/-/is-shallow-equal-1.1.0.tgz#4a90b050e0858d13a1d9d5de030c295666ee0254"
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@wordpress/is-shallow-equal/-/is-shallow-equal-1.1.1.tgz#377db18206afe2a6e787862106c3ff5c27d65e36"
+  dependencies:
+    "@babel/runtime" "^7.0.0-beta.52"
 
 abab@^1.0.4:
   version "1.0.4"
@@ -3188,8 +3197,8 @@ extend-shallow@^3.0.0, extend-shallow@^3.0.2:
     is-extendable "^1.0.1"
 
 extend@^3.0.0, extend@~3.0.0, extend@~3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/extend/-/extend-3.0.1.tgz#a755ea7bc1adfcc5a31ce7e762dbaadc5e636444"
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/extend/-/extend-3.0.2.tgz#f8b1136b4071fbd8eb140aff858b1019ec2915fa"
 
 external-editor@^2.0.4:
   version "2.2.0"
