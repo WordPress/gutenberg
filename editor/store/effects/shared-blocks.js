@@ -104,7 +104,6 @@ export const saveSharedBlocks = async ( action, store ) => {
 	const { id } = action;
 	const { dispatch } = store;
 	const state = store.getState();
-
 	const { clientId, title, isTemporary } = getSharedBlock( state, id );
 	const { name, attributes, innerBlocks } = getBlock( state, clientId );
 	const content = serialize( createBlock( name, attributes, innerBlocks ) );
@@ -236,7 +235,7 @@ export const convertBlockToShared = ( action, store ) => {
 		title: __( 'Untitled shared block' ),
 	};
 
-	dispatch( receiveSharedBlocks( [ {
+	dispatch( receiveSharedBlocksAction( [ {
 		sharedBlock,
 		parsedBlock,
 	} ] ) );
