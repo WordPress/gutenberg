@@ -1,12 +1,17 @@
 /**
+ * External dependencies
+ */
+import { render } from 'enzyme';
+
+/**
  * Internal dependencies
  */
-import { name, settings } from '../';
-import { blockEditRender } from '../../test/helpers';
+import { getEmbedEdit } from '../';
 
 describe( 'core/embed', () => {
 	test( 'block edit matches snapshot', () => {
-		const wrapper = blockEditRender( name, settings );
+		const EmbedEdit = getEmbedEdit( 'Embed', 'embed-generic' );
+		const wrapper = render( <EmbedEdit attributes={ {} } /> );
 
 		expect( wrapper ).toMatchSnapshot();
 	} );

@@ -9,7 +9,8 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Component, compose, Fragment, renderToString } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
+import { Component, Fragment, renderToString } from '@wordpress/element';
 import { Button, Placeholder, Spinner, SandBox, IconButton, Toolbar } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 import { RichText, BlockControls } from '@wordpress/editor';
@@ -38,6 +39,198 @@ const findBlock = ( url ) => {
 	}
 	return 'core/embed';
 };
+
+export function getEmbedEdit( title, icon ) {
+	return class extends Component {
+		constructor() {
+			super( ...arguments );
+
+			this.setUrl = this.setUrl.bind( this );
+			this.processPreview = this.processPreview.bind( this );
+
+			this.state = {
+				html: this.props.preview ? this.props.preview.html : '',
+				type: this.props.attributes.type,
+				error: false,
+				fetching: !! this.props.attributes.url && ! this.props.preview,
+				providerName: '',
+				url: this.props.attributes.url,
+			};
+
+			if ( this.props.preview ) {
+				this.processPreview();
+			}
+		}
+
+		componentWillUnmount() {
+			// can't abort the fetch promise, so let it know we will unmount
+			this.unmounting = true;
+		}
+
+		componentDidUpdate( prevProps ) {
+			const hasPreview = undefined !== this.props.preview;
+			const hadPreview = undefined !== prevProps.preview;
+			if ( hasPreview && ! hadPreview ) {
+				this.processPreview();
+			}
+		}
+
+		getPhotoHtml( photo ) {
+			// 100% width for the preview so it fits nicely into the document, some "thumbnails" are
+			// acually the full size photo.
+			const photoPreview = <p><img src={ photo.thumbnail_url } alt={ photo.title } width="100%" /></p>;
+			return renderToString( photoPreview );
+		}
+
+		setUrl( event ) {
+			if ( event ) {
+				event.preventDefault();
+			}
+			const { url } = this.state;
+			const { setAttributes } = this.props;
+			if ( url === this.props.attributes.url ) {
+				// Don't change anything, otherwise we go into the 'fetching' state but never
+				// get new props, because the url has not changed.
+				return;
+			}
+			setAttributes( { url } );
+			this.setState( { fetching: true, error: false } );
+		}
+
+		processPreview() {
+			const { setAttributes, preview, previewIsFallback } = this.props;
+			const { url } = this.props.attributes;
+
+			if ( previewIsFallback ) {
+				// If the preview is false (not falsey, but actually false) then the embed request failed,
+				// so we cannot embed it.
+				this.setState( { fetching: false, error: true } );
+				return;
+			}
+
+			if ( undefined === url ) {
+				return;
+			}
+
+			const matchingBlock = findBlock( url );
+
+			// WordPress blocks can work on multiple sites, and so don't have patterns,
+			// so if we're in a WordPress block, assume the user has chosen it for a WordPress URL.
+			if ( 'core-embed/wordpress' !== this.props.name && 'core/embed' !== matchingBlock ) {
+				// At this point, we have discovered a more suitable block for this url, so transform it.
+				if ( this.props.name !== matchingBlock ) {
+					this.props.onReplace( createBlock( matchingBlock, { url } ) );
+					return;
+				}
+			}
+
+			// Some plugins only return HTML with no type info, so default this to 'rich'.
+			let { type = 'rich' } = preview;
+			// If we got a provider name from the API, use it for the slug, otherwise we use the title,
+			// because not all embed code gives us a provider name.
+			const { html, provider_name: providerName } = preview;
+			const providerNameSlug = kebabCase( toLower( '' !== providerName ? providerName : title ) );
+
+			// This indicates it's a WordPress embed, there aren't a set of URL patterns we can use to match WordPress URLs.
+			if ( includes( html, 'class="wp-embedded-content" data-secret' ) ) {
+				type = 'wp-embed';
+				// If this is not the WordPress embed block, transform it into one.
+				if ( this.props.name !== 'core-embed/wordpress' ) {
+					this.props.onReplace( createBlock( 'core-embed/wordpress', { url } ) );
+					return;
+				}
+			}
+
+			if ( html ) {
+				this.setState( { html, type, providerNameSlug } );
+				setAttributes( { type, providerNameSlug } );
+			} else if ( 'photo' === type ) {
+				this.setState( { html: this.getPhotoHtml( preview ), type, providerNameSlug } );
+				setAttributes( { type, providerNameSlug } );
+			}
+			this.setState( { fetching: false } );
+		}
+
+		render() {
+			const { html, type, error, fetching, url } = this.state;
+			const { caption } = this.props.attributes;
+			const { setAttributes, isSelected, className } = this.props;
+
+			if ( fetching ) {
+				return (
+					<div className="wp-block-embed is-loading">
+						<Spinner />
+						<p>{ __( 'Embedding…' ) }</p>
+					</div>
+				);
+			}
+
+			if ( ! html ) {
+				// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
+				const label = sprintf( __( '%s URL' ), title );
+
+				return (
+					<Placeholder icon={ icon } label={ label } className="wp-block-embed">
+						<form onSubmit={ this.setUrl }>
+							<input
+								type="url"
+								value={ url || '' }
+								className="components-placeholder__input"
+								aria-label={ label }
+								placeholder={ __( 'Enter URL to embed here…' ) }
+								onChange={ ( event ) => this.setState( { url: event.target.value } ) } />
+							<Button
+								isLarge
+								type="submit">
+								{ __( 'Embed' ) }
+							</Button>
+							{ error && <p className="components-placeholder__error">{ __( 'Sorry, we could not embed that content.' ) }</p> }
+						</form>
+					</Placeholder>
+				);
+			}
+
+			const parsedUrl = parse( url );
+			const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedUrl.host.replace( /^www\./, '' ) );
+			// translators: %s: host providing embed content e.g: www.youtube.com
+			const iframeTitle = sprintf( __( 'Embedded content from %s' ), parsedUrl.host );
+			const embedWrapper = 'wp-embed' === type ? (
+				<div
+					className="wp-block-embed__wrapper"
+					dangerouslySetInnerHTML={ { __html: html } }
+				/>
+			) : (
+				<div className="wp-block-embed__wrapper">
+					<SandBox
+						html={ html }
+						title={ iframeTitle }
+						type={ type }
+					/>
+				</div>
+			);
+
+			return (
+				<figure className={ classnames( className, 'wp-block-embed', { 'is-video': 'video' === type } ) }>
+					{ ( cannotPreview ) ? (
+						<Placeholder icon={ icon } label={ __( 'Embed URL' ) }>
+							<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
+							<p className="components-placeholder__error">{ __( 'Previews for this are unavailable in the editor, sorry!' ) }</p>
+						</Placeholder>
+					) : embedWrapper }
+					{ ( caption && caption.length > 0 ) || isSelected ? (
+						<RichText
+							tagName="figcaption"
+							placeholder={ __( 'Write caption…' ) }
+							value={ caption }
+							onChange={ ( value ) => setAttributes( { caption: value } ) }
+							inlineToolbar
+						/>
+					) : null }
+				</figure>
+			);
+		}
+	};
+}
 
 function getEmbedBlockSettings( { title, description, icon, category = 'embed', transforms, keywords = [] } ) {
 	// translators: %s: Name of service (e.g. VideoPress, YouTube)
@@ -75,227 +268,16 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 		edit: compose(
 			withSelect( ( select, ownProps ) => {
 				const { url } = ownProps.attributes;
-				// Preview is undefined if we don't know the status of it, false if it failed,
-				// otherwise it will be an object containing the embed response.
-				const preview = url ? select( 'core' ).getEmbedPreview( url ) : undefined;
+				const core = select( 'core' );
+				const { getEmbedPreview, isPreviewEmbedFallback } = core;
+				const preview = getEmbedPreview( url );
+				const previewIsFallback = isPreviewEmbedFallback( url );
 				return {
 					preview,
+					previewIsFallback,
 				};
 			} )
-		)( class extends Component {
-			constructor() {
-				super( ...arguments );
-
-				this.switchBackToURLInput = this.switchBackToURLInput.bind( this );
-				this.setUrl = this.setUrl.bind( this );
-				this.processPreview = this.processPreview.bind( this );
-
-				this.state = {
-					html: '',
-					type: '',
-					error: false,
-					fetching: false,
-					providerName: '',
-					url: '',
-				};
-			}
-
-			componentWillMount() {
-				if ( this.props.attributes.url ) {
-					// Loading from a saved block, set the state up and display the fetching UI.
-					this.setState( { fetching: true, url: this.props.attributes.url } );
-					if ( this.props.preview ) {
-						// Preview must have already been fetched prior to loading this block, so process it.
-						this.processPreview( this.props.preview, this.props.attributes.url );
-					}
-				}
-			}
-
-			componentWillUnmount() {
-				// can't abort the fetch promise, so let it know we will unmount
-				this.unmounting = true;
-			}
-
-			componentWillReceiveProps( nextProps ) {
-				const hasPreview = undefined !== nextProps.preview;
-				if ( hasPreview ) {
-					this.processPreview( nextProps.preview, nextProps.attributes.url );
-				}
-			}
-
-			getPhotoHtml( photo ) {
-				// 100% width for the preview so it fits nicely into the document, some "thumbnails" are
-				// acually the full size photo.
-				const photoPreview = <p><img src={ photo.thumbnail_url } alt={ photo.title } width="100%" /></p>;
-				return renderToString( photoPreview );
-			}
-
-			setUrl( event ) {
-				if ( event ) {
-					event.preventDefault();
-				}
-				const { url } = this.state;
-				const { setAttributes } = this.props;
-				if ( url === this.props.attributes.url ) {
-					// Don't change anything, otherwise we go into the 'fetching' state but never
-					// get new props, because the url has not changed.
-					return;
-				}
-				setAttributes( { url } );
-				this.setState( { fetching: true, error: false } );
-			}
-
-			processPreview( obj, url ) {
-				const { setAttributes } = this.props;
-
-				if ( false === obj ) {
-					// If the preview is false (not falsey, but actually false) then the embed request failed,
-					// so we cannot embed it.
-					this.setState( { fetching: false, error: true } );
-					return;
-				}
-
-				if ( undefined === url ) {
-					return;
-				}
-
-				const matchingBlock = findBlock( url );
-
-				// WordPress blocks can work on multiple sites, and so don't have patterns,
-				// so if we're in a WordPress block, assume the user has chosen it for a WordPress URL.
-				if ( 'core-embed/wordpress' !== this.props.name && 'core/embed' !== matchingBlock ) {
-					// At this point, we have discovered a more suitable block for this url, so transform it.
-					if ( this.props.name !== matchingBlock ) {
-						this.props.onReplace( createBlock( matchingBlock, { url } ) );
-						return;
-					}
-				}
-
-				// Some plugins only return HTML with no type info, so default this to 'rich'.
-				let { type = 'rich' } = obj;
-				// If we got a provider name from the API, use it for the slug, otherwise we use the title,
-				// because not all embed code gives us a provider name.
-				const { html, provider_name: providerName } = obj;
-				const providerNameSlug = kebabCase( toLower( '' !== providerName ? providerName : title ) );
-
-				// This indicates it's a WordPress embed, there aren't a set of URL patterns we can use to match WordPress URLs.
-				if ( includes( html, 'class="wp-embedded-content" data-secret' ) ) {
-					type = 'wp-embed';
-					// If this is not the WordPress embed block, transform it into one.
-					if ( this.props.name !== 'core-embed/wordpress' ) {
-						this.props.onReplace( createBlock( 'core-embed/wordpress', { url } ) );
-						return;
-					}
-				}
-
-				if ( html ) {
-					this.setState( { html, type, providerNameSlug } );
-					setAttributes( { type, providerNameSlug } );
-				} else if ( 'photo' === type ) {
-					this.setState( { html: this.getPhotoHtml( obj ), type, providerNameSlug } );
-					setAttributes( { type, providerNameSlug } );
-				}
-				this.setState( { fetching: false } );
-			}
-
-			switchBackToURLInput() {
-				this.setState( { html: undefined } );
-			}
-
-			render() {
-				const { html, type, error, fetching, url } = this.state;
-				const { caption } = this.props.attributes;
-				const { setAttributes, isSelected, className } = this.props;
-				const controls = (
-					<BlockControls>
-						<Toolbar>
-							{ ( html && <IconButton
-								className="components-toolbar__control"
-								label={ __( 'Edit URL' ) }
-								icon="edit"
-								onClick={ this.switchBackToURLInput }
-							/> ) }
-						</Toolbar>
-					</BlockControls>
-				);
-
-				if ( fetching ) {
-					return (
-						<div className="wp-block-embed is-loading">
-							<Spinner />
-							<p>{ __( 'Embedding…' ) }</p>
-						</div>
-					);
-				}
-
-				if ( ! html ) {
-					// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
-					const label = sprintf( __( '%s URL' ), title );
-
-					return (
-						<Placeholder icon={ icon } label={ label } className="wp-block-embed">
-							<form onSubmit={ this.setUrl }>
-								<input
-									type="url"
-									value={ url || '' }
-									className="components-placeholder__input"
-									aria-label={ label }
-									placeholder={ __( 'Enter URL to embed here…' ) }
-									onChange={ ( event ) => this.setState( { url: event.target.value } ) } />
-								<Button
-									isLarge
-									type="submit">
-									{ __( 'Embed' ) }
-								</Button>
-								{ error && <p className="components-placeholder__error">{ __( 'Sorry, we could not embed that content.' ) }</p> }
-							</form>
-						</Placeholder>
-					);
-				}
-
-				const parsedUrl = parse( url );
-				const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedUrl.host.replace( /^www\./, '' ) );
-				// translators: %s: host providing embed content e.g: www.youtube.com
-				const iframeTitle = sprintf( __( 'Embedded content from %s' ), parsedUrl.host );
-				const embedWrapper = 'wp-embed' === type ? (
-					<div
-						className="wp-block-embed__wrapper"
-						dangerouslySetInnerHTML={ { __html: html } }
-					/>
-				) : (
-					<div className="wp-block-embed__wrapper">
-						<SandBox
-							html={ html }
-							title={ iframeTitle }
-							type={ type }
-						/>
-					</div>
-				);
-
-				return (
-					<Fragment>
-						{ controls }
-						<figure className={ classnames( className, 'wp-block-embed', { 'is-video': 'video' === type } ) }>
-							{ ( cannotPreview ) ? (
-								<Placeholder icon={ icon } label={ __( 'Embed URL' ) }>
-									<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
-									<p className="components-placeholder__error">{ __( 'Previews for this are unavailable in the editor, sorry!' ) }</p>
-								</Placeholder>
-							) : embedWrapper }
-							{ ( caption && caption.length > 0 ) || isSelected ? (
-								<RichText
-									tagName="figcaption"
-									placeholder={ __( 'Write caption…' ) }
-									value={ caption }
-									onChange={ ( value ) => setAttributes( { caption: value } ) }
-									inlineToolbar
-								/>
-							) : null }
-						</figure>
-					</Fragment>
-				);
-			}
-		} ),
+		)( getEmbedEdit( title, icon ) ),
 
 		save( { attributes } ) {
 			const { url, caption, type, providerNameSlug } = attributes;

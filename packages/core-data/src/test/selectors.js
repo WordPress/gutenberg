@@ -6,7 +6,14 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import { getTerms, isRequestingCategories, getEntityRecord, getEntityRecords, getEmbedPreview } from '../selectors';
+import {
+	getTerms,
+	isRequestingCategories,
+	getEntityRecord,
+	getEntityRecords,
+	getEmbedPreview,
+	isPreviewEmbedFallback,
+} from '../selectors';
 import { select } from '@wordpress/data';
 
 jest.mock( '@wordpress/data', () => {
@@ -152,13 +159,15 @@ describe( 'getEmbedPreview()', () => {
 		} );
 		expect( getEmbedPreview( state, 'http://example.com/' ) ).toEqual( { data: 42 } );
 	} );
+} );
 
-	it( 'returns false if the preview html is just a single link', () => {
+describe( 'isPreviewEmbedFallback()', () => {
+	it( 'returns true if the preview html is just a single link', () => {
 		const state = deepFreeze( {
 			embedPreviews: {
 				'http://example.com/': { html: '<a href="http://example.com/">http://example.com/</a>' },
 			},
 		} );
-		expect( getEmbedPreview( state, 'http://example.com/' ) ).toEqual( false );
+		expect( isPreviewEmbedFallback( state, 'http://example.com/' ) ).toEqual( true );
 	} );
 } );

@@ -175,21 +175,29 @@ export function getThemeSupports( state ) {
  * @param {Object} state    Data state.
  * @param {string} url      Embedded URL.
  *
- * @return {*} Undefined if the preview has not been fetched, false if the URL cannot be embedded, array of embed preview data if the preview has been fetched.
+ * @return {*} Undefined if the preview has not been fetched, otherwise, the preview fetched from the embed preview API.
  */
 export function getEmbedPreview( state, url ) {
+	return state.embedPreviews[ url ];
+}
+
+/**
+ * Determines if the returned preview is an oEmbed link fallback.
+ *
+ * WordPress can be configured to return a simple link to a URL if it is not embeddable.
+ * We need to be able to determine if a URL is embeddable or not, based on what we
+ * get back from the oEmbed preview API.
+ *
+ * @param {Object} state    Data state.
+ * @param {string} url      Embedded URL.
+ *
+ * @return {booleans} Is the preview for the URL an oEmbed link fallback.
+ */
+export function isPreviewEmbedFallback( state, url ) {
 	const preview = state.embedPreviews[ url ];
-
-	if ( ! preview ) {
-		return preview;
-	}
-
 	const oEmbedLinkCheck = '<a href="' + url + '">' + url + '</a>';
-
-	if ( oEmbedLinkCheck === preview.html ) {
-		// just a link to the url, it's oEmbed being helpful and creating a link for us, not actually embedding content
+	if ( ! preview ) {
 		return false;
 	}
-
-	return preview;
+	return preview.html === oEmbedLinkCheck;
 }
