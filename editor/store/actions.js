@@ -112,15 +112,20 @@ export function resetBlocks( blocks ) {
  * Returns an action object used in signalling that blocks have been received.
  * Unlike resetBlocks, these should be appended to the existing known set, not
  * replacing.
+ * If the new blocks that are being received are replacing existing blocks,
+ * during the action dispatch it is possible to specify existing blocks that
+ * are removed before adding the new ones.
  *
- * @param {Object[]} blocks Array of block objects.
+ * @param {Object[]}       blocks            Array of block objects.
+ * @param {?Array<string>} clientIdsToRemove Array of clientIds.
  *
  * @return {Object} Action object.
  */
-export function receiveBlocks( blocks ) {
+export function receiveBlocks( blocks, clientIdsToRemove = [] ) {
 	return {
 		type: 'RECEIVE_BLOCKS',
 		blocks,
+		clientIdsToRemove,
 	};
 }
 

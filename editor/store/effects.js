@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, includes, last, map, castArray, uniqueId, pick } from 'lodash';
+import { filter, get, includes, last, map, castArray, uniqueId, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -493,8 +493,27 @@ export default {
 				error,
 			} ) );
 	},
-	RECEIVE_SHARED_BLOCKS( action ) {
-		return receiveBlocks( map( action.results, 'parsedBlock' ) );
+	RECEIVE_SHARED_BLOCKS( action, { getState } ) {
+		const state = getState();
+		const markSharedBlock = ( blocks = [] ) => {
+			return map( blocks, ( block ) => {
+				const newBlock = {
+					...block,
+					isPartOfSharedBlock: true,
+				};
+				if ( block.innerBlocks ) {
+					newBlock.innerBlocks = markSharedBlock( block.innerBlocks );
+				}
+				return newBlock;
+			} );
+		};
+
+		const blocksToAdd = markSharedBlock( map( action.results,  'parsedBlock' ) )
+		const blocksToRemove = map(
+			filter( state.editor.present.blocksByClientId, 'isPartOfSharedBlock' ),
+			'clientId'
+		);
+		return receiveBlocks( blocksToAdd, blocksToRemove );
 	},
 	SAVE_SHARED_BLOCK( action, store ) {
 		// TODO: these are potentially undefined, this fix is in place
