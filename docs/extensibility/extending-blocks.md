@@ -10,6 +10,30 @@ To modify the behavior of existing blocks, Gutenberg exposes the following Filte
 
 Used to filter the block settings. It receives the block settings and the name of the block the registered block as arguments.
 
+_Example:_
+
+Ensure that List blocks are saved with the canonical generated class name (`wp-block-list`):
+
+```js
+function addListBlockClassName( settings, name ) {
+	if ( name !== 'core/list' ) {
+		return settings;
+	}
+
+	return Object.assign( {}, settings, {
+		supports: Object.assign( {}, settings.supports, {
+			className: true
+		} ),
+	} );
+}
+
+wp.hooks.addFilter(
+	'blocks.registerBlockType',
+	'my-plugin/class-names/list-block',
+	addListBlockClassName
+);
+```
+
 #### `blocks.getSaveElement`
 
 A filter that applies to the result of a block's `save` function. This filter is used to replace or extend the element, for example using `wp.element.cloneElement` to modify the element's props or replace its children, or returning an entirely new element.
