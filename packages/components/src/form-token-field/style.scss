@@ -28,7 +28,7 @@
 	// Token input
 	input[type="text"].components-form-token-field__input {
 		display: inline-block;
-		width: auto;
+		width: 100%;
 		max-width: 100%;
 		margin: 2px 0 2px 8px;
 		padding: 0;
@@ -44,6 +44,9 @@
 			outline: none;
 			box-shadow: none;
 		}
+	}
+	.components-form-token-field__token + input[type="text"].components-form-token-field__input {
+		width: auto;
 	}
 }
 
