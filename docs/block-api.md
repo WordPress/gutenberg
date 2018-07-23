@@ -310,7 +310,7 @@ transforms: {
 
 To control the priority with which a transform is applied, define a `priority` numeric property on your transform object, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
-A file can be dropped into the editor and transformed into a (specific) file block.
+A file can be dropped into the editor and converted into a block with a matching transform.
 
 {% codetabs %}
 {% ES5 %}
@@ -320,7 +320,7 @@ transforms: {
 		{
 			type: 'files',
 			isMatch: function ( files ) {
-				return files.length === 1
+				return files.length === 1;
 			},
 			// We define a lower priority (higher number) than the default of 10. This
 			// ensures that the File block is only created as a fallback.
