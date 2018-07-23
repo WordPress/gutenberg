@@ -44,7 +44,7 @@ const {
 	getBlockName,
 	getBlock,
 	getBlocks,
-	getBlocksUnfolded,
+	getBlockIdsUnfolded,
 	getBlockCount,
 	hasSelectedBlock,
 	getSelectedBlock,
@@ -1732,8 +1732,8 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getBlocksUnfolded', () => {
-		it( 'should return the top level blocks and any block referenced by a existing top-level shared block', () => {
+	describe( 'getBlockIdsUnfolded', () => {
+		it( 'should return the ids for top-level blocks, any block referenced by a existing top-level shared block, and children of nested blocks.', () => {
 			const state = {
 				currentPost: {},
 				editor: {
@@ -1774,27 +1774,16 @@ describe( 'selectors', () => {
 					},
 				},
 			};
-			expect( getBlocksUnfolded( state ) ).toEqual( [
-				{ clientId: 'uuid-6', name: 'core/paragraph', attributes: {}, innerBlocks: [] },
-				{ clientId: 'uuid-8', name: 'core/block', attributes: { ref: 1 }, innerBlocks: [] },
-				{ clientId: 'uuid-10', name: 'core/columns', attributes: { }, innerBlocks: [
-					{ clientId: 'uuid-12', name: 'core/column', attributes: { }, innerBlocks: [
-						{ clientId: 'uuid-16', name: 'core/quote', attributes: { }, innerBlocks: [] },
-					] },
-					{ clientId: 'uuid-14', name: 'core/column', attributes: { }, innerBlocks: [
-						{ clientId: 'uuid-18', name: 'core/block', attributes: { ref: 5 }, innerBlocks: [] },
-					] },
-				] },
-				{ clientId: 'uuid-2', name: 'core/image', attributes: {}, innerBlocks: [] },
-				{ clientId: 'uuid-12', name: 'core/column', attributes: { }, innerBlocks: [
-					{ clientId: 'uuid-16', name: 'core/quote', attributes: { }, innerBlocks: [] },
-				] },
-				{ clientId: 'uuid-16', name: 'core/quote', attributes: { }, innerBlocks: [] },
-				{ clientId: 'uuid-14', name: 'core/column', attributes: { }, innerBlocks: [
-					{ clientId: 'uuid-18', name: 'core/block', attributes: { ref: 5 }, innerBlocks: [] },
-				] },
-				{ clientId: 'uuid-18', name: 'core/block', attributes: { ref: 5 }, innerBlocks: [] },
-				{ clientId: 'uuid-20', name: 'core/gallery', attributes: {}, innerBlocks: [] },
+			expect( getBlockIdsUnfolded( state ) ).toEqual( [
+				'uuid-6',
+				'uuid-8',
+				'uuid-2',
+				'uuid-10',
+				'uuid-12',
+				'uuid-16',
+				'uuid-14',
+				'uuid-18',
+				'uuid-20',
 			] );
 		} );
 	} );
@@ -3284,7 +3273,7 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						blocksByClientId: {
-							block1: { name: 'core/test-block-b' },
+							block1: { clientId: 'block1', name: 'core/test-block-b' },
 						},
 						blockOrder: {
 							'': [ 'block1' ],

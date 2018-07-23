@@ -579,20 +579,23 @@ const unfoldBlockIds = ( state, block ) => {
 };
 
 /**
- * Returns an array containing the top-level blocks,
+ * Returns an array containing the ids of the top-level blocks,
  * all blocks referenced by the existing top-level shared blocks,
  * and all the inner blocks of existing top-level nested blocks.
  *
  * @param {Object} state Global application state.
  *
- * @return {Array} All top-level, referenced, and inner blocks.
+ * @return {Array} All ids of top-level, referenced, and inner blocks.
  */
-export const getBlocksUnfolded = createSelector(
+export const getBlockIdsUnfolded = createSelector(
 	( state ) => {
-		const topLevelBlocks = getBlocks( state );
 		const clientIds = [];
-		topLevelBlocks.forEach( ( block ) => clientIds.push( ...unfoldBlockIds( state, block ) ) );
-		return [ ...topLevelBlocks, ...getBlocksByClientId( state, clientIds ) ];
+		const topLevelBlocks = getBlocks( state );
+		topLevelBlocks.forEach( ( block ) => {
+			clientIds.push( block.clientId );
+			clientIds.push( ...unfoldBlockIds( state, block ) );
+		} );
+		return clientIds;
 	},
 	( state ) => [
 		state.editor.present.blockOrder,
@@ -1582,7 +1585,7 @@ export const getInserterItems = createSelector(
 
 			let isDisabled = false;
 			if ( ! hasBlockSupport( blockType.name, 'multiple', true ) ) {
-				isDisabled = some( getBlocksUnfolded( state ), { name: blockType.name } );
+				isDisabled = some( getBlocksByClientId( state, getBlockIdsUnfolded( state ) ), { name: blockType.name } );
 			}
 
 			const isContextual = isArray( blockType.parent );
