@@ -1,50 +1,33 @@
 /**
- * External dependencies
- */
-import { createStore } from 'redux';
-
-/**
  * Internal dependencies
  */
-import { loadAndPersist, withRehydration } from '../persist';
+import { getPersistenceStorage, restrictPersistence } from '../persist';
+import { createRegistry } from '../registry';
 
-describe( 'loadAndPersist', () => {
-	const persistenceStorage = window.localStorage;
+describe( 'persiss registry', () => {
+	let registry;
+	beforeEach( () => {
+		registry = createRegistry();
+	} );
 
 	it( 'should load the initial value from the local storage integrating it into reducer default value.', () => {
 		const storageKey = 'dumbStorageKey';
-		persistenceStorage.setItem( storageKey, JSON.stringify( { chicken: true } ) );
-		const reducer = () => {
-			return {
-				preferences: { ribs: true },
-			};
-		};
-		const store = createStore( withRehydration( reducer, 'preferences', storageKey ) );
-		loadAndPersist(
-			store,
-			reducer,
-			'preferences',
-			storageKey,
-		);
-		expect( store.getState().preferences ).toEqual( { chicken: true, ribs: true } );
-	} );
+		const store = registry.registerStore( 'storeKey', {
+			reducer: ( state = { ribs: true } ) => {
+				return state;
+			},
+			persist: true,
+		} );
 
-	it( 'should not load the initial value from the local storage if the storage key is different.', () => {
-		const storageKey = 'dumbStorageKey';
-		persistenceStorage.setItem( storageKey, JSON.stringify( { chicken: true } ) );
-		const reducer = () => {
-			return {
-				preferences: { ribs: true },
-			};
-		};
-		const store = createStore( withRehydration( reducer, 'preferences', storageKey + 'change' ) );
-		loadAndPersist(
-			store,
-			reducer,
-			'preferences',
-			storageKey,
-		);
-		expect( store.getState().preferences ).toEqual( { ribs: true } );
+		getPersistenceStorage().setItem( storageKey, JSON.stringify( {
+			storeKey: {
+				chicken: true,
+			},
+		} ) );
+
+		registry.setupPersistence( storageKey );
+
+		expect( store.getState() ).toEqual( { chicken: true, ribs: true } );
 	} );
 
 	it( 'should persist to local storage once the state value changes', () => {
@@ -55,83 +38,67 @@ describe( 'loadAndPersist', () => {
 			}
 
 			if ( action.type === 'UPDATE' ) {
-				return {
-					preferences: { chicken: true },
-				};
+				return { chicken: true };
 			}
 
-			return {
-				preferences: { ribs: true },
-			};
+			return { ribs: true };
 		};
-		const store = createStore( withRehydration( reducer, 'preferences', storageKey ) );
-		loadAndPersist(
-			store,
+		const store = registry.registerStore( 'storeKey', {
 			reducer,
-			'preferences',
-			storageKey,
-		);
+			persist: true,
+		} );
+
+		registry.setupPersistence( storageKey );
+
 		store.dispatch( { type: 'UPDATE' } );
-		expect( JSON.parse( persistenceStorage.getItem( storageKey ) ) ).toEqual( { chicken: true } );
+		expect( JSON.parse( getPersistenceStorage().getItem( storageKey ) ) )
+			.toEqual( { storeKey: { chicken: true } } );
+	} );
+} );
+
+describe( 'restrictPersistence', () => {
+	it( 'should only serialize a sub reducer state', () => {
+		const reducer = restrictPersistence( () => {
+			return {
+				preferences: {
+					chicken: 'ribs',
+				},
+
+				a: 'b',
+			};
+		}, 'preferences' );
+
+		expect( reducer( undefined, { type: 'SERIALIZE' } ) ).toEqual( {
+			preferences: {
+				chicken: 'ribs',
+			},
+		} );
 	} );
 
-	it( 'should apply defaults to any missing properties on previously stored objects', () => {
-		const defaultsPreferences = {
-			counter: 41,
-		};
-		const storageKey = 'dumbStorageKey3';
-		const reducer = ( state = { preferences: defaultsPreferences }, action ) => {
-			if ( action.type === 'INCREMENT' ) {
-				return {
-					preferences: { counter: state.preferences.counter + 1 },
-				};
-			}
-			return state;
-		};
+	it( 'should merge the substate with the default value', () => {
+		const reducer = restrictPersistence( () => {
+			return {
+				preferences: {
+					chicken: true,
+				},
 
-		// store preferences without the `counter` default
-		persistenceStorage.setItem( storageKey, JSON.stringify( {} ) );
-
-		const store = createStore( withRehydration( reducer, 'preferences', storageKey ) );
-		loadAndPersist(
-			store,
-			reducer,
-			'preferences',
-			storageKey,
-		);
-		store.dispatch( { type: 'INCREMENT' } );
-
-		// the default should have been applied, as the `counter` was missing from the
-		// saved preferences, then the INCREMENT action should have taken effect to give us 42
-		expect( JSON.parse( persistenceStorage.getItem( storageKey ) ) ).toEqual( { counter: 42 } );
-	} );
-
-	it( 'should not override stored values with defaults', () => {
-		const defaultsPreferences = {
-			counter: 41,
-		};
-		const storageKey = 'dumbStorageKey4';
-		const reducer = ( state = { preferences: defaultsPreferences }, action ) => {
-			if ( action.type === 'INCREMENT' ) {
-				return {
-					preferences: { counter: state.preferences.counter + 1 },
-				};
-			}
-			return state;
-		};
-
-		persistenceStorage.setItem( storageKey, JSON.stringify( { counter: 1 } ) );
-
-		const store = createStore( withRehydration( reducer, 'preferences', storageKey ) );
-
-		loadAndPersist(
-			store,
-			reducer,
-			'preferences',
-			storageKey,
-		);
-		store.dispatch( { type: 'INCREMENT' } );
-
-		expect( JSON.parse( persistenceStorage.getItem( storageKey ) ) ).toEqual( { counter: 2 } );
+				a: 'b',
+			};
+		}, 'preferences' );
+		const state = reducer( undefined, { type: '@@init' } );
+		expect( reducer( {
+			preferences: {
+				ribs: true,
+			},
+		}, {
+			type: 'REDUX_REHYDRATE',
+			previousState: state,
+		} ) ).toEqual( {
+			a: 'b',
+			preferences: {
+				chicken: true,
+				ribs: true,
+			},
+		} );
 	} );
 } );
