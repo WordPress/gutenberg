@@ -12,6 +12,7 @@ import {
 	renderToString,
 	switchChildrenNodeName,
 	RawHTML,
+	PureComponent
 } from '../';
 
 describe( 'element', () => {
@@ -149,4 +150,10 @@ describe( 'element', () => {
 			expect( element.prop( 'children' ) ).toBe( undefined );
 		} );
 	} );
+
+	describe( 'PureComponent', () => {
+		it( 'Exports pure component', () => {
+			expect( typeof PureComponent ).toBe( 'function' );
+		});
+	});
 } );
