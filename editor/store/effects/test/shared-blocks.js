@@ -409,7 +409,7 @@ describe( 'shared blocks effects', () => {
 			convertBlockToShared( convertBlockToSharedAction( staticBlock.clientId ), store );
 
 			expect( dispatch ).toHaveBeenCalledWith(
-				receiveSharedBlocks( [ {
+				receiveSharedBlocksAction( [ {
 					sharedBlock: {
 						id: expect.stringMatching( /^shared/ ),
 						clientId: staticBlock.clientId,

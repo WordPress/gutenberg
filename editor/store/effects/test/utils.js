@@ -9,7 +9,7 @@ import { registerStore, select } from '@wordpress/data';
 import { resolveSelector } from '../utils';
 
 describe( 'resolveSelector', () => {
-	it( 'Should wait for selector resolution', () => {
+	it( 'Should wait for selector resolution', async () => {
 		registerStore( 'resolveStore', {
 			reducer: ( state = 'no', action ) => {
 				if ( action.type === 'resolve' ) {
@@ -33,12 +33,11 @@ describe( 'resolveSelector', () => {
 		} );
 
 		expect( select( 'resolveStore' ).selectAll( 'check' ) ).toBe( 'no' );
-		return resolveSelector( 'resolveStore', 'selectAll', 'check' ).then( ( value ) => {
-			expect( value ).toBe( 'yes' );
-		} );
+		const value = await resolveSelector( 'resolveStore', 'selectAll', 'check' );
+		expect( value ).toBe( 'yes' );
 	} );
 
-	it( 'Should resolve already resolved selectors', ( done ) => {
+	it( 'Should resolve already resolved selectors', async () => {
 		registerStore( 'resolveStore2', {
 			reducer: ( state = 'no', action ) => {
 				if ( action.type === 'resolve' ) {
@@ -59,16 +58,9 @@ describe( 'resolveSelector', () => {
 		} );
 
 		// Trigger resolution
-		select( 'resolveStore2' ).selectAll( 'check' );
-
-		setTimeout( () => {
-			expect( select( 'resolveStore2' ).selectAll( 'check' ) ).toBe( 'yes' );
-			resolveSelector( 'resolveStore2', 'selectAll', 'check' ).then( ( value ) => {
-				expect( value ).toBe( 'yes' );
-				done();
-			} );
-		}, 100 );
-
-		jest.runAllTimers();
+		const value = await resolveSelector( 'resolveStore', 'selectAll', 'check' );
+		expect( value ).toBe( 'yes' );
+		await resolveSelector( 'resolveStore2', 'selectAll', 'check' );
+		expect( value ).toBe( 'yes' );
 	} );
 } );
