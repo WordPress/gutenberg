@@ -36,7 +36,7 @@ import {
 	MediaPlaceholder,
 	MediaUpload,
 	BlockAlignmentToolbar,
-	editorMediaUpload,
+	mediaUpload,
 } from '@wordpress/editor';
 import { withViewportMatch } from '@wordpress/viewport';
 import { compose } from '@wordpress/compose';
@@ -84,7 +84,7 @@ class ImageEdit extends Component {
 			const file = getBlobByURL( url );
 
 			if ( file ) {
-				editorMediaUpload( {
+				mediaUpload( {
 					filesList: [ file ],
 					onFileChange: ( [ image ] ) => {
 						setAttributes( { ...image } );

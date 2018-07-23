@@ -227,7 +227,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-utils',
 		gutenberg_url( 'build/utils/index.js' ),
-		array( 'lodash', 'wp-api-fetch', 'wp-deprecated', 'wp-html-entities', 'wp-i18n', 'wp-keycodes' ),
+		array( 'lodash', 'wp-api-fetch', 'wp-deprecated', 'wp-html-entities', 'wp-i18n', 'wp-keycodes', 'wp-editor' ),
 		filemtime( gutenberg_dir_path() . 'build/utils/index.js' ),
 		true
 	);
@@ -458,7 +458,6 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-keycodes',
 			'wp-element',
 			'wp-plugins',
-			'wp-utils',
 			'wp-viewport',
 			'wp-tinymce',
 			'tinymce-latest-lists',
@@ -1093,6 +1092,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// https://github.com/WordPress/gutenberg/issues/5667.
 	add_filter( 'user_can_richedit', '__return_true' );
 
+	wp_enqueue_script( 'wp-utils' );
 	wp_enqueue_script( 'wp-edit-post' );
 
 	global $post;
@@ -1159,16 +1159,6 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 			) ) )
 		);
 	}
-
-	$max_upload_size = wp_max_upload_size();
-	if ( ! $max_upload_size ) {
-		$max_upload_size = 0;
-	}
-	// Initialize media settings.
-	wp_add_inline_script( 'wp-editor', 'window._wpMediaSettings = ' . wp_json_encode( array(
-		'maxUploadSize'    => $max_upload_size,
-		'allowedMimeTypes' => get_allowed_mime_types(),
-	) ), 'before' );
 
 	// Prepare Jed locale data.
 	$locale_data = gutenberg_get_jed_locale_data( 'gutenberg' );
@@ -1251,6 +1241,12 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'' => apply_filters( 'default_page_template_title', __( 'Default template', 'gutenberg' ), 'rest-api' ),
 	), $available_templates ) : $available_templates;
 
+	// Media settings.
+	$max_upload_size = wp_max_upload_size();
+	if ( ! $max_upload_size ) {
+		$max_upload_size = 0;
+	}
+
 	$editor_settings = array(
 		'alignWide'           => $align_wide || ! empty( $gutenberg_theme_support[0]['wide-images'] ), // Backcompat. Use `align-wide` outside of `gutenberg` array.
 		'availableTemplates'  => $available_templates,
@@ -1261,6 +1257,8 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'bodyPlaceholder'     => apply_filters( 'write_your_story', __( 'Write your story', 'gutenberg' ), $post ),
 		'isRTL'               => is_rtl(),
 		'autosaveInterval'    => 10,
+		'maxUploadFileSize'   => $max_upload_size,
+		'allowedMimeTypes'    => get_allowed_mime_types(),
 	);
 
 	$post_autosave = get_autosave_newer_than_post_save( $post );

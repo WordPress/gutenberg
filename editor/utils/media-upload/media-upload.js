@@ -6,10 +6,8 @@ import { compact, flatMap, forEach, get, has, includes, map, noop, startsWith } 
 /**
  * WordPress dependencies
  */
-import deprecated from '@wordpress/deprecated';
-import { __, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
-import { select } from '@wordpress/data';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Browsers may use unexpected mime types, and they differ from browser to browser.
@@ -25,11 +23,6 @@ import { select } from '@wordpress/data';
  * @return {?Array} An array of mime types or the parameter passed if it was "falsy".
  */
 export function getMimeTypesArray( wpMimeTypesObject ) {
-	deprecated( 'wp.utils.getMimeTypesArray', {
-		version: '3.6',
-		plugin: 'Gutenberg',
-	} );
-
 	if ( ! wpMimeTypesObject ) {
 		return wpMimeTypesObject;
 	}
@@ -53,6 +46,7 @@ export function getMimeTypesArray( wpMimeTypesObject ) {
  * @param   {?number}  $0.maxUploadFileSize Maximum upload size in bytes allowed for the site.
  * @param   {Function} $0.onError           Function called when an error happens.
  * @param   {Function} $0.onFileChange      Function called each time a file or a temporary representation of the file is available.
+ * @param   {?Object} $0.allowedMimeTypes   List of allowed mime types and file extensions.
  */
 export function mediaUpload( {
 	allowedType,
@@ -61,16 +55,8 @@ export function mediaUpload( {
 	maxUploadFileSize,
 	onError = noop,
 	onFileChange,
+	allowedMimeTypes = null,
 } ) {
-	deprecated( 'wp.utils.mediaUpload', {
-		version: '3.6',
-		alternative: 'wp.editor.mediaUpload',
-		plugin: 'Gutenberg',
-	} );
-
-	const editorSettings = select( 'core/editor' ).getSettings();
-	maxUploadFileSize = maxUploadFileSize || editorSettings.maxUploadFileSize;
-
 	// Cast filesList to array
 	const files = [ ...filesList ];
 
@@ -86,7 +72,7 @@ export function mediaUpload( {
 	};
 
 	// Allowed types for the current WP_User
-	const allowedMimeTypesForUser = getMimeTypesArray( editorSettings.allowedMimeTypes );
+	const allowedMimeTypesForUser = getMimeTypesArray( allowedMimeTypes );
 	const isAllowedMimeTypeForUser = ( fileType ) => {
 		return includes( allowedMimeTypesForUser, fileType );
 	};
@@ -178,26 +164,5 @@ function createMediaFromFile( file, additionalData ) {
 		path: '/wp/v2/media',
 		body: data,
 		method: 'POST',
-	} );
-}
-
-/**
- * Utility used to preload an image before displaying it.
- *
- * @param   {string}  url Image Url.
- * @return {Promise}     Promise resolved once the image is preloaded.
- */
-export function preloadImage( url ) {
-	deprecated( 'wp.utils.preloadImage', {
-		version: '3.6',
-		plugin: 'Gutenberg',
-	} );
-
-	return new Promise( ( resolve ) => {
-		const newImg = new window.Image();
-		newImg.onload = function() {
-			resolve( url );
-		};
-		newImg.src = url;
 	} );
 }

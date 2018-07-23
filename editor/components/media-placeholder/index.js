@@ -22,7 +22,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import './style.scss';
 import MediaUpload from '../media-upload';
-import editorMediaUpload from '../../utils/editor-media-upload';
+import { mediaUpload } from '../../utils/';
 
 class MediaPlaceholder extends Component {
 	constructor() {
@@ -84,7 +84,7 @@ class MediaPlaceholder extends Component {
 	onFilesUpload( files ) {
 		const { onSelect, type, multiple, onError } = this.props;
 		const setMedia = multiple ? onSelect : ( [ media ] ) => onSelect( media );
-		editorMediaUpload( {
+		mediaUpload( {
 			allowedType: type,
 			filesList: files,
 			onFileChange: setMedia,

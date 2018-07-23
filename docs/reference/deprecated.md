@@ -1,5 +1,12 @@
 Gutenberg's deprecation policy is intended to support backwards-compatibility for two minor releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
 
+## 3.6.0
+
+ - `wp.editor.editorMediaUpload` has been removed. Please use `wp.editor.mediaUpload` instead.
+ - `wp.utils.getMimeTypesArray` has been removed.
+ - `wp.utils.mediaUpload` has been removed. Please use `wp.editor.mediaUpload` instead.
+ - `wp.utils.preloadImage` has been removed.
+
 ## 3.5.0
 
  - `wp.components.ifCondition` has been removed. Please use `wp.compose.ifCondition` instead.

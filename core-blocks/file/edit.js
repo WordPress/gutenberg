@@ -21,7 +21,7 @@ import {
 	MediaPlaceholder,
 	BlockControls,
 	RichText,
-	editorMediaUpload,
+	mediaUpload,
 } from '@wordpress/editor';
 import { compose } from '@wordpress/compose';
 
@@ -55,7 +55,7 @@ class FileEdit extends Component {
 		if ( this.isBlobURL( href ) ) {
 			const file = getBlobByURL( href );
 
-			editorMediaUpload( {
+			mediaUpload( {
 				allowedType: '*',
 				filesList: [ file ],
 				onFileChange: ( [ media ] ) => this.onSelectFile( media ),
