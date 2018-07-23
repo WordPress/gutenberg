@@ -119,7 +119,9 @@ class Tooltip extends Component {
 	createToggleIsOver( eventName, isDelayed ) {
 		return ( event ) => {
 			// Preserve original child callback behavior
-			this.emitToChild( eventName, event );
+			if ( event.type !== 'mousedown' ) {
+				this.emitToChild( eventName, event );
+			}
 
 			// Mouse events behave unreliably in React for disabled elements,
 			// firing on mouseenter but not mouseleave.  Further, the default
@@ -165,6 +167,7 @@ class Tooltip extends Component {
 			ref: this.bindNode,
 			onMouseEnter: this.createToggleIsOver( 'onMouseEnter', true ),
 			onMouseLeave: this.createToggleIsOver( 'onMouseLeave' ),
+			onMouseDown: this.createToggleIsOver( 'onMouseDown' ),
 			onClick: this.createToggleIsOver( 'onClick' ),
 			onFocus: this.createToggleIsOver( 'onFocus' ),
 			onBlur: this.createToggleIsOver( 'onBlur' ),

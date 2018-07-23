@@ -67,6 +67,8 @@ export class BlockMover extends Component {
 					aria-disabled={ isFirst }
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
+					onMouseEnter={ this.onFocus }
+					onMouseLeave={ this.onBlur }
 				/>
 				<IconButton
 					className="editor-block-mover__control"
@@ -77,6 +79,8 @@ export class BlockMover extends Component {
 					aria-disabled={ isLast }
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
+					onMouseEnter={ this.onFocus }
+					onMouseLeave={ this.onBlur }
 				/>
 				<span id={ `editor-block-mover__up-description-${ instanceId }` } className="editor-block-mover__description">
 					{

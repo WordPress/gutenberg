@@ -28,6 +28,7 @@ exports[`MoreMenu should match snapshot 1`] = `
               onBlur={[Function]}
               onClick={[Function]}
               onFocus={[Function]}
+              onMouseDown={[Function]}
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
             >
@@ -38,6 +39,7 @@ exports[`MoreMenu should match snapshot 1`] = `
                 onBlur={[Function]}
                 onClick={[Function]}
                 onFocus={[Function]}
+                onMouseDown={[Function]}
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 type="button"

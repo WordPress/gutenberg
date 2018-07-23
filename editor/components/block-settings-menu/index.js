@@ -89,6 +89,8 @@ export class BlockSettingsMenu extends Component {
 								focus={ focus }
 								onFocus={ this.onFocus }
 								onBlur={ this.onBlur }
+								onMouseEnter={ this.onFocus }
+								onMouseLeave={ this.onBlur }
 							/>
 						);
 					} }
