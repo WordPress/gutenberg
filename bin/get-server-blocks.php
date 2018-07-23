@@ -19,6 +19,7 @@ define( 'WP_SETUP_CONFIG', true );
 define( 'WP_USE_THEMES', false );
 require_once ABSPATH . WPINC . '/load.php';
 require_once ABSPATH . WPINC . '/default-constants.php';
+require_once ABSPATH . WPINC . '/class-wp-walker.php';
 wp_fix_server_vars();
 wp_initial_constants();
 require_once ABSPATH . WPINC . '/functions.php';
