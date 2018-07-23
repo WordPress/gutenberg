@@ -47,15 +47,15 @@ const SHARED_BLOCK_NOTICE_ID = 'SHARED_BLOCK_NOTICE_ID';
  * @param {Object} store   Redux Store.
  */
 export const fetchSharedBlocks = async ( action, store ) => {
+	const { id } = action;
+	const { dispatch } = store;
+
 	// TODO: these are potentially undefined, this fix is in place
 	// until there is a filter to not use shared blocks if undefined
 	const postType = await resolveSelector( 'core', 'getPostType', 'wp_block' );
 	if ( ! postType ) {
 		return;
 	}
-
-	const { id } = action;
-	const { dispatch } = store;
 
 	let result;
 	if ( id ) {

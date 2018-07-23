@@ -86,9 +86,7 @@ export const requestPostUpdate = async ( action, store ) => {
 		id: post.id,
 	};
 
-	console.log( 'start' );
 	const postType = await resolveSelector( 'core', 'getPostType', getCurrentPostType( state ) );
-	console.log( 'end' );
 
 	dispatch( {
 		type: 'REQUEST_POST_UPDATE_START',
@@ -132,9 +130,7 @@ export const requestPostUpdate = async ( action, store ) => {
 	}
 
 	try {
-		console.log( '2' );
 		const newPost = await request;
-		console.log( '3' );
 		const reset = isAutosave ? resetAutosave : resetPost;
 		dispatch( reset( newPost ) );
 
@@ -158,7 +154,6 @@ export const requestPostUpdate = async ( action, store ) => {
 			isAutosave,
 		} );
 	} catch ( error ) {
-		console.log( '4', error );
 		dispatch( {
 			type: 'REQUEST_POST_UPDATE_FAILURE',
 			optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
