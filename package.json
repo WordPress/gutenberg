@@ -45,7 +45,6 @@
 		"dom-react": "2.2.1",
 		"dom-scroll-into-view": "1.2.1",
 		"element-closest": "2.0.2",
-		"equivalent-key-map": "0.2.0",
 		"eslint-plugin-wordpress": "git://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#1774343f6226052a46b081e01db3fca8793cc9f1",
 		"jquery": "3.3.1",
 		"lodash": "4.17.10",
