@@ -163,6 +163,7 @@ const config = {
 				test: /\.js$/,
 				exclude: [
 					/block-serialization-spec-parser/,
+					/is-shallow-equal/,
 					/node_modules/,
 				],
 				use: 'babel-loader',
@@ -233,7 +234,6 @@ const config = {
 			'api-fetch',
 			'deprecated',
 			'dom-ready',
-			'is-shallow-equal',
 		].map( camelCaseDash ) ),
 	],
 	stats: {
