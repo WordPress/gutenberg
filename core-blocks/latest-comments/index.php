@@ -12,10 +12,13 @@
  * returned.
  *
  * Copied from `wp-admin/includes/template.php`, but we can't include that
- * because:
+ * file because:
  *
- * 1. it causes bugs
- * 2. it's in the admin; ideally we *shouldn't*
+ * 1. It causes bugs with test fixture generation and strange Docker 255 error
+ *    codes.
+ * 2. It's in the admin; ideally we *shouldn't* be including files from the
+ *    admin for a block's output. It's a very small/simple function as well,
+ *    so duplicating it isn't too terrible.
  *
  * @since 3.3.0
  *
