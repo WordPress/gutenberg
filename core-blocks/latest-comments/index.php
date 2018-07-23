@@ -5,9 +5,33 @@
  * @package gutenberg
  */
 
-// Used to get `_draft_or_post_title`, which prevents empty-title posts from
-// appearing with no title.
-require_once( ABSPATH . 'wp-admin/includes/template.php' );
+/**
+ * Get the post title.
+ *
+ * The post title is fetched and if it is blank then a default string is
+ * returned.
+ *
+ * Copied from `wp-admin/includes/template.php`, but we can't include that
+ * file because:
+ *
+ * 1. It causes bugs with test fixture generation and strange Docker 255 error
+ *    codes.
+ * 2. It's in the admin; ideally we *shouldn't* be including files from the
+ *    admin for a block's output. It's a very small/simple function as well,
+ *    so duplicating it isn't too terrible.
+ *
+ * @since 3.3.0
+ *
+ * @param int|WP_Post $post Optional. Post ID or WP_Post object. Default is global $post.
+ * @return string The post title if set; "(no title)" if no title is set.
+ */
+function gutenberg_draft_or_post_title( $post = 0 ) {
+	$title = get_the_title( $post );
+	if ( empty( $title ) ) {
+		$title = __( '(no title)', 'gutenberg' );
+	}
+	return esc_html( $title );
+}
 
 /**
  * Renders the `core/latest-comments` block on server.
@@ -57,7 +81,7 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 
 			// `_draft_or_post_title` calls `esc_html()` so we don't need to wrap that call in
 			// `esc_html`.
-			$post_title = '<a class="wp-block-latest-comments__comment-link" href="' . esc_url( get_comment_link( $comment ) ) . '">' . _draft_or_post_title( $comment->comment_post_ID ) . '</a>';
+			$post_title = '<a class="wp-block-latest-comments__comment-link" href="' . esc_url( get_comment_link( $comment ) ) . '">' . gutenberg_draft_or_post_title( $comment->comment_post_ID ) . '</a>';
 
 			$list_items_markup .= sprintf(
 				/* translators: 1: author name (inside <a> or <span> tag, based on if they have a URL), 2: post title related to this comment */
