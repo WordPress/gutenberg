@@ -18,7 +18,7 @@ const phrasingContentSchema = {
 	em: {},
 	del: {},
 	ins: {},
-	a: { attributes: [ 'href' ] },
+	a: { attributes: [ 'href', 'target' ] },
 	code: {},
 	abbr: { attributes: [ 'title' ] },
 	sub: {},
