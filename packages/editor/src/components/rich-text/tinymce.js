@@ -114,23 +114,23 @@ export default class TinyMCE extends Component {
 		return false;
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		this.configureIsPlaceholderVisible( nextProps.isPlaceholderVisible );
+	componentDidUpdate( prevProps ) {
+		this.configureIsPlaceholderVisible( this.props.isPlaceholderVisible );
 
-		if ( ! isEqual( this.props.style, nextProps.style ) ) {
+		if ( ! isEqual( prevProps.style, this.props.style ) ) {
 			this.editorNode.setAttribute( 'style', '' );
-			Object.assign( this.editorNode.style, nextProps.style );
+			Object.assign( this.editorNode.style, this.props.style );
 		}
 
-		if ( ! isEqual( this.props.className, nextProps.className ) ) {
-			this.editorNode.className = classnames( nextProps.className, 'editor-rich-text__tinymce' );
+		if ( ! isEqual( prevProps.className, this.props.className ) ) {
+			this.editorNode.className = classnames( this.props.className, 'editor-rich-text__tinymce' );
 		}
 
-		const { removedKeys, updatedKeys } = diffAriaProps( this.props, nextProps );
+		const { removedKeys, updatedKeys } = diffAriaProps( prevProps, this.props );
 		removedKeys.forEach( ( key ) =>
 			this.editorNode.removeAttribute( key ) );
 		updatedKeys.forEach( ( key ) =>
-			this.editorNode.setAttribute( key, nextProps[ key ] ) );
+			this.editorNode.setAttribute( key, this.props[ key ] ) );
 	}
 
 	componentWillUnmount() {
