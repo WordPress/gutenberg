@@ -18,11 +18,11 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"main": "index.js",
 	"files": [
 		"arrays.js",
 		"objects.js"
 	],
+	"main": "index.js",
 	"dependencies": {
 		"@babel/runtime": "^7.0.0-beta.52"
 	},
