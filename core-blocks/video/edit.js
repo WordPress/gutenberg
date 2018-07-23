@@ -38,7 +38,7 @@ class VideoEdit extends Component {
 	}
 
 	componentDidMount() {
-		const { attributes, setAttributes } = this.props;
+		const { attributes, noticeOperations, setAttributes } = this.props;
 		const { id, src = '' } = attributes;
 		if ( ! id && src.indexOf( 'blob:' ) === 0 ) {
 			const file = getBlobByURL( src );
@@ -47,6 +47,10 @@ class VideoEdit extends Component {
 					filesList: [ file ],
 					onFileChange: ( [ { url } ] ) => {
 						setAttributes( { src: url } );
+					},
+					onError: ( message ) => {
+						this.setState( { editing: true } );
+						noticeOperations.createErrorNotice( message );
 					},
 					allowedType: 'video',
 				} );
