@@ -95,7 +95,7 @@ describe( 'align', () => {
 				...blockSettings,
 				supports: {
 					align: true,
-					wideAlign: false,
+					alignWide: false,
 				},
 			} );
 			const validAlignments = getBlockValidAlignments( 'core/foo' );
@@ -128,7 +128,7 @@ describe( 'align', () => {
 				...blockSettings,
 				supports: {
 					align: true,
-					wideAlign: false,
+					alignWide: false,
 				},
 			} );
 
@@ -153,7 +153,7 @@ describe( 'align', () => {
 				...blockSettings,
 				supports: {
 					align: true,
-					wideAlign: false,
+					alignWide: false,
 				},
 			} );
 
@@ -181,7 +181,7 @@ describe( 'align', () => {
 				...blockSettings,
 				supports: {
 					align: true,
-					wideAlign: false,
+					alignWide: false,
 				},
 			} );
 

@@ -6,6 +6,7 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
  - `wp.utils.getMimeTypesArray` has been removed.
  - `wp.utils.mediaUpload` has been removed. Please use `wp.editor.mediaUpload` instead.
  - `wp.utils.preloadImage` has been removed.
+ - `supports.wideAlign` has been removed from the Block API. Please use `supports.alignWide` instead.
 
 ## 3.5.0
 
