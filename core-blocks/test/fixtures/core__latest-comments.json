@@ -3,7 +3,12 @@
         "clientId": "_clientId_0",
         "name": "core/latest-comments",
         "isValid": true,
-        "attributes": {},
+        "attributes": {
+            "commentsToShow": 5,
+            "displayAvatar": true,
+            "displayDate": true,
+            "displayExcerpt": true
+        },
         "innerBlocks": [],
         "originalContent": ""
     }
