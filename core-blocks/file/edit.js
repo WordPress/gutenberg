@@ -44,12 +44,14 @@ class FileEdit extends Component {
 		this.changeShowDownloadButton = this.changeShowDownloadButton.bind( this );
 
 		this.state = {
+			hasError: false,
 			showCopyConfirmation: false,
 		};
 	}
 
 	componentDidMount() {
-		const { href } = this.props.attributes;
+		const { attributes, noticeOperations } = this.props;
+		const { href } = attributes;
 
 		// Upload a file drag-and-dropped into the editor
 		if ( this.isBlobURL( href ) ) {
@@ -59,6 +61,10 @@ class FileEdit extends Component {
 				allowedType: '*',
 				filesList: [ file ],
 				onFileChange: ( [ media ] ) => this.onSelectFile( media ),
+				onError: ( message ) => {
+					this.setState( { hasError: true } );
+					noticeOperations.createErrorNotice( message );
+				},
 			} );
 
 			revokeBlobURL( href );
@@ -74,6 +80,7 @@ class FileEdit extends Component {
 
 	onSelectFile( media ) {
 		if ( media && media.url ) {
+			this.setState( { hasError: false } );
 			this.props.setAttributes( {
 				href: media.url,
 				fileName: media.title,
@@ -129,14 +136,10 @@ class FileEdit extends Component {
 			downloadButtonText,
 			id,
 		} = attributes;
-		const { showCopyConfirmation } = this.state;
+		const { hasError, showCopyConfirmation } = this.state;
 		const attachmentPage = media && media.link;
 
-		const classes = classnames( className, {
-			'is-transient': this.isBlobURL( href ),
-		} );
-
-		if ( ! href ) {
+		if ( ! href || hasError ) {
 			return (
 				<MediaPlaceholder
 					icon="media-default"
@@ -152,6 +155,10 @@ class FileEdit extends Component {
 				/>
 			);
 		}
+
+		const classes = classnames( className, {
+			'is-transient': this.isBlobURL( href ),
+		} );
 
 		return (
 			<Fragment>
