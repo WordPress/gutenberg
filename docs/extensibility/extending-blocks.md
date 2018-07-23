@@ -15,19 +15,23 @@ _Example:_
 Ensure that List blocks are saved with the canonical generated class name (`wp-block-list`):
 
 ```js
-addFilter( 'blocks.registerBlockType', 'my-plugin/class-names/list-block', ( settings, name ) => {
+function addListBlockClassName( settings, name ) {
 	if ( name !== 'core/list' ) {
 		return settings;
 	}
 
-	return {
-		...settings,
-		supports: {
-			...settings.supports,
-			className: true,
-		},
-	};
-} );
+	return Object.assign( {}, settings, {
+		supports: Object.assign( {}, settings.supports, {
+			className: true
+		} ),
+	} );
+}
+
+wp.hooks.addFilter(
+	'blocks.registerBlockType',
+	'my-plugin/class-names/list-block',
+	addListBlockClassName
+);
 ```
 
 #### `blocks.getSaveElement`
