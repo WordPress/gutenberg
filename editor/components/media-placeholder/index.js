@@ -126,9 +126,11 @@ class MediaPlaceholder extends Component {
 						<input
 							type="url"
 							className="components-placeholder__input"
+							aria-label={ labels.title }
 							placeholder={ __( 'Enter URL here…' ) }
 							onChange={ this.onChangeSrc }
-							value={ this.state.src } />
+							value={ this.state.src }
+						/>
 						<Button
 							isLarge
 							type="submit">
