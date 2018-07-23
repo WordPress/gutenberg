@@ -118,7 +118,7 @@ describe( 'getEmbedPreview', () => {
 	const UNEMBEDDABLE_URL = 'http://example.com/';
 
 	beforeAll( () => {
-		apiRequest.mockImplementation( ( options ) => {
+		apiFetch.mockImplementation( ( options ) => {
 			if ( options.path === `/oembed/1.0/proxy?${ stringify( { url: EMBEDDABLE_URL } ) }` ) {
 				return Promise.resolve( SUCCESSFUL_EMBED_RESPONSE );
 			}
