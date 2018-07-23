@@ -26,8 +26,8 @@ const BlockSettingsMenuPluginsGroupSlot = ( { fillProps, selectedBlocks } ) => {
 	);
 };
 
-BlockSettingsMenuPluginsGroup.Slot = withSelect( ( select, { fillProps: { uids } } ) => ( {
-	selectedBlocks: select( 'core/editor' ).getBlocksByUID( uids ),
+BlockSettingsMenuPluginsGroup.Slot = withSelect( ( select, { fillProps: { clientIds } } ) => ( {
+	selectedBlocks: select( 'core/editor' ).getBlocksByUID( clientIds ),
 } ) )( BlockSettingsMenuPluginsGroupSlot );
 
 export default BlockSettingsMenuPluginsGroup;
