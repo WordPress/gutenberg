@@ -54,7 +54,7 @@
     "prettier": "prettier-eslint --write $npm_package_config_jsfiles $npm_package_config_scssfiles",
     "clean": "yarn clean:setup; yarn clean:runtime",
     "clean:runtime": "yarn cache clean; yarn test --clearCache; watchman watch-del-all; rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/jest_*",
-    "clean:setup": "rm -rf node_modules; rm -f yarn.lock",
+    "clean:setup": "rm -rf node_modules",
     "clean:install": "yarn clean; yarn",
     "lint": "eslint $npm_package_config_jsfiles",
     "lint:fix": "eslint $npm_package_config_jsfiles --fix"
