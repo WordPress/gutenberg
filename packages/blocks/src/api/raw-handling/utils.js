@@ -197,7 +197,7 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 				if ( node.hasAttributes() ) {
 					// Strip invalid attributes.
 					Array.from( node.attributes ).forEach( ( { name } ) => {
-						if ( name !== 'class' && ! includes( attributes, name ) ) {
+						if ( name !== 'class' && name !== 'id' && ! includes( attributes, name ) ) {
 							node.removeAttribute( name );
 						}
 					} );

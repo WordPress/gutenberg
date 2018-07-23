@@ -109,14 +109,20 @@ describe( 'removeInvalidHTML', () => {
 		expect( removeInvalidHTML( input, schema ) ).toBe( output );
 	} );
 
+	it( 'should keep id attributes', () => {
+		const input = '<p id="foo">test</p>';
+		const output = '<p id="foo">test</p>';
+		expect( removeInvalidHTML( input, schema ) ).toBe( output );
+	} );
+
 	it( 'should remove multiple attributes', () => {
-		const input = '<p class="test" id="test">test</p>';
+		const input = '<p class="test" style="test">test</p>';
 		const output = '<p>test</p>';
 		expect( removeInvalidHTML( input, schema ) ).toBe( output );
 	} );
 
 	it( 'should deep remove attributes', () => {
-		const input = '<p class="test">test <em id="test">test</em></p>';
+		const input = '<p class="test">test <em style="test">test</em></p>';
 		const output = '<p>test <em>test</em></p>';
 		expect( removeInvalidHTML( input, schema ) ).toBe( output );
 	} );
