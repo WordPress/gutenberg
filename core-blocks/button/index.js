@@ -72,14 +72,9 @@ export const settings = {
 
 	attributes: blockAttributes,
 
-	getEditWrapperProps() {
-		const props = { 'data-resized': true };
-
-		return props;
-	},
-
 	supports: {
 		align: true,
+		wideAlign: false,
 	},
 
 	styles: [
