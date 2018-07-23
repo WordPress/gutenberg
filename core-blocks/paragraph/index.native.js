@@ -184,7 +184,7 @@ class ParagraphBlock extends Component {
 	}
 
 	render() {
-		const {
+		let {
 			attributes,
 			setAttributes,
 			mergeBlocks,
@@ -207,7 +207,9 @@ class ParagraphBlock extends Component {
 		} = attributes;
 
 		const fontSize = this.getFontSize();
-		console.log(content)
+		// fallback colors
+		backgroundColor = { name: 'white', value: '#ffffff' };
+		textColor = { name: 'black', value: '#000000' };
 		return (
 			// <Fragment>
 			// 	<BlockControls>
@@ -255,42 +257,33 @@ class ParagraphBlock extends Component {
 			// 			isLargeText={ fontSize >= 18 }
 			// 		/>
 			// 	</InspectorControls>
-			// 	<RichText
-			// 		tagName="p"
-			// 		className={ classnames( 'wp-block-paragraph', className, {
-			// 			'has-background': backgroundColor.value,
-			// 			'has-drop-cap': dropCap,
-			// 			[ backgroundColor.class ]: backgroundColor.class,
-			// 			[ textColor.class ]: textColor.class,
-			// 		} ) }
-			// 		style={ {
-			// 			backgroundColor: backgroundColor.value,
-			// 			color: textColor.value,
-			// 			fontSize: fontSize ? fontSize + 'px' : undefined,
-			// 			textAlign: align,
-			// 		} }
-			// 		value={ content }
-			// 		onChange={ ( nextContent ) => {
-			// 			setAttributes( {
-			// 				content: nextContent,
-			// 			} );
-			// 		} }
-			// 		onSplit={ this.splitBlock }
-			// 		onMerge={ mergeBlocks }
-			// 		onReplace={ this.onReplace }
-			// 		onRemove={ () => onReplace( [] ) }
-			// 		placeholder={ placeholder || __( 'Add text or type / to add content' ) }
-			// 	/>
-			// </Fragment>
-			<TextInput 
-				value={ content[0] } 
-				onChangeText={ ( nextContent ) => {
-					 			setAttributes( {
-					 				content: [nextContent],
-					 			} );
-							 } 
-						} 
-			/>
+				<RichText
+					tagName="p"
+					className={ classnames( 'wp-block-paragraph', className, {
+						'has-background': backgroundColor.value,
+						'has-drop-cap': dropCap,
+						[ backgroundColor.class ]: backgroundColor.class,
+						[ textColor.class ]: textColor.class,
+					} ) }
+					style={ {
+						backgroundColor: backgroundColor.value,
+						color: textColor.value,
+						fontSize: fontSize ? fontSize + 'px' : undefined,
+						textAlign: align,
+					} }
+					value={ content }
+					onChange={ ( nextContent ) => {
+						setAttributes( {
+							content: nextContent,
+						} );
+					} }
+					onSplit={ this.splitBlock }
+					onMerge={ mergeBlocks }
+					onReplace={ this.onReplace }
+					onRemove={ () => onReplace( [] ) }
+					placeholder={ placeholder || __( 'Add text or type / to add content' ) }
+				/>
+			// </Fragment>			
 		);
 	}
 }
@@ -510,7 +503,7 @@ export const settings = {
 			fontSize: fontSizeClass ? undefined : customFontSize,
 			textAlign: align,
 		};
-        console.log("Saving: " + content);
+        
 		return (
 			<p>{content[0]}</p>			
 		);
