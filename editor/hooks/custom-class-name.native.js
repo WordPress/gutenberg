@@ -8,11 +8,11 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { 
+import {
 	hasBlockSupport,
 	getSaveContent,
 	parseWithAttributeSchema,
- } from '@wordpress/blocks';
+} from '@wordpress/blocks';
 
 /**
  * Filters registered block settings, extending attributes with anchor using ID
