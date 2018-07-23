@@ -26,7 +26,7 @@ import { select } from '@wordpress/data';
  */
 export function getMimeTypesArray( wpMimeTypesObject ) {
 	deprecated( 'wp.utils.getMimeTypesArray', {
-		version: '3.5',
+		version: '3.6',
 		plugin: 'Gutenberg',
 	} );
 
@@ -63,7 +63,7 @@ export function mediaUpload( {
 	onFileChange,
 } ) {
 	deprecated( 'wp.utils.mediaUpload', {
-		version: '3.5',
+		version: '3.6',
 		alternative: 'wp.editor.mediaUpload',
 		plugin: 'Gutenberg',
 	} );
@@ -189,7 +189,7 @@ function createMediaFromFile( file, additionalData ) {
  */
 export function preloadImage( url ) {
 	deprecated( 'wp.utils.preloadImage', {
-		version: '3.5',
+		version: '3.6',
 		plugin: 'Gutenberg',
 	} );
 
