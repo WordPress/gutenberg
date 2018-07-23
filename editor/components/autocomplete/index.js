@@ -7,7 +7,8 @@ import { clone } from 'lodash';
  * WordPress dependencies
  */
 import { applyFilters, hasFilter } from '@wordpress/hooks';
-import { Component, compose } from '@wordpress/element';
+import { Component } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 import { Autocomplete as OriginalAutocomplete } from '@wordpress/components';
 
 /**

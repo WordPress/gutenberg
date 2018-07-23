@@ -14,7 +14,7 @@ import {
 	withFallbackStyles,
 } from '@wordpress/components';
 import {
-	UrlInput,
+	URLInput,
 	RichText,
 	BlockControls,
 	BlockAlignmentToolbar,
@@ -129,7 +129,7 @@ class ButtonEdit extends Component {
 						className="core-blocks-button__inline-link"
 						onSubmit={ ( event ) => event.preventDefault() }>
 						<Dashicon icon="admin-links" />
-						<UrlInput
+						<URLInput
 							value={ url }
 							onChange={ ( value ) => setAttributes( { url: value } ) }
 						/>

@@ -5,7 +5,7 @@ import '../support/bootstrap';
 import {
 	newPost,
 	newDesktopBrowserPage,
-	getHTMLFromCodeEditor,
+	getEditedPostContent,
 	pressWithModifier,
 	pressTimes,
 } from '../support/utils';
@@ -71,7 +71,7 @@ describe( 'adding blocks', () => {
 		activeElementText = await page.evaluate( () => document.activeElement.textContent );
 		expect( activeElementText ).toBe( 'First paragraph' );
 
-		expect( await getHTMLFromCodeEditor() ).toMatchSnapshot();
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should navigate around inline boundaries', async () => {
@@ -140,6 +140,24 @@ describe( 'adding blocks', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( 'Before' );
 
-		expect( await getHTMLFromCodeEditor() ).toMatchSnapshot();
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should clean TinyMCE content', async () => {
+		// Ensure no zero-width space character. Notably, this can occur when
+		// save occurs while at an inline boundary edge.
+		await page.click( '.editor-default-block-appender__content' );
+		await pressWithModifier( 'mod', 'b' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// When returning to Visual mode, backspace in selected block should
+		// reset to the provisional block.
+		await page.keyboard.press( 'Backspace' );
+
+		// Ensure no data-mce-selected. Notably, this can occur when content
+		// is saved while typing within an inline boundary.
+		await pressWithModifier( 'mod', 'b' );
+		await page.keyboard.type( 'Inside' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

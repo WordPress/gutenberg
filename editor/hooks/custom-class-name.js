@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent, Fragment } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -16,6 +16,7 @@ import {
 	parseWithAttributeSchema,
 	getSaveContent,
 } from '@wordpress/blocks';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies

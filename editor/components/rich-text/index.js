@@ -10,14 +10,13 @@ import {
 	find,
 	defer,
 	noop,
-	reject,
 } from 'lodash';
 import 'element-closest';
 
 /**
  * WordPress dependencies
  */
-import { Component, Fragment, compose, RawHTML, createRef } from '@wordpress/element';
+import { Component, Fragment, RawHTML, createRef } from '@wordpress/element';
 import {
 	isHorizontalEdge,
 	getRectangleFromRange,
@@ -25,9 +24,11 @@ import {
 } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
 import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, rawShortcut } from '@wordpress/keycodes';
-import { withInstanceId, withSafeTimeout, Slot } from '@wordpress/components';
+import { Slot } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
-import { rawHandler } from '@wordpress/blocks';
+import { rawHandler, children } from '@wordpress/blocks';
+import deprecated from '@wordpress/deprecated';
+import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -58,50 +59,6 @@ const { Node } = window;
  * @type {string}
  */
 const TINYMCE_ZWSP = '\uFEFF';
-
-/**
- * Returns true if the node is the inline node boundary. This is used in node
- * filtering prevent the inline boundary from being included in the split which
- * occurs while within but at the end of an inline node, since TinyMCE includes
- * a placeholder caret character at the end.
- *
- * @see https://github.com/tinymce/tinymce/blob/master/src/plugins/link/main/ts/core/Utils.ts
- *
- * @param {Node} node Node to test.
- *
- * @return {boolean} Whether node is inline boundary.
- */
-export function isEmptyInlineBoundary( node ) {
-	const text = node.nodeName === 'A' ? node.innerText : node.textContent;
-	return text === TINYMCE_ZWSP;
-}
-
-/**
- * Returns true if the node is empty, meaning it contains only the placeholder
- * caret character or is an empty text node.
- *
- * @param {Node} node Node to test.
- *
- * @return {boolean} Whether node is empty.
- */
-export function isEmptyNode( node ) {
-	return (
-		'' === node.nodeValue ||
-		isEmptyInlineBoundary( node )
-	);
-}
-
-/**
- * Given a set of Nodes, filters to set to exclude any empty nodes: those with
- * either empty text nodes or only including the inline boundary caret.
- *
- * @param {Node[]} childNodes Nodes to filter.
- *
- * @return {Node[]} Non-empty nodes.
- */
-export function filterEmptyNodes( childNodes ) {
-	return reject( childNodes, isEmptyNode );
-}
 
 export function getFormatProperties( formatName, parents ) {
 	switch ( formatName ) {
@@ -538,10 +495,10 @@ export class RichText extends Component {
 				const afterNodes = childNodes.slice( index + 1 );
 
 				const { format } = this.props;
-				const before = domToFormat( beforeNodes, format, this.editor );
-				const after = domToFormat( afterNodes, format, this.editor );
+				const before = domToFormat( beforeNodes, format );
+				const after = domToFormat( afterNodes, format );
 
-				this.restoreContentAndSplit( before, after );
+				this.props.onSplit( before, after );
 			} else {
 				event.preventDefault();
 
@@ -632,12 +589,12 @@ export class RichText extends Component {
 			afterRange.setStart( selectionRange.endContainer, selectionRange.endOffset );
 			afterRange.setEnd( rootNode, dom.nodeIndex( rootNode.lastChild ) + 1 );
 
-			const beforeFragment = beforeRange.extractContents();
-			const afterFragment = afterRange.extractContents();
+			const beforeFragment = beforeRange.cloneContents();
+			const afterFragment = afterRange.cloneContents();
 
 			const { format } = this.props;
-			before = domToFormat( filterEmptyNodes( beforeFragment.childNodes ), format, this.editor );
-			after = domToFormat( filterEmptyNodes( afterFragment.childNodes ), format, this.editor );
+			before = domToFormat( beforeFragment.childNodes, format );
+			after = domToFormat( afterFragment.childNodes, format );
 		} else {
 			before = [];
 			after = [];
@@ -661,7 +618,7 @@ export class RichText extends Component {
 			after = this.isEmpty( after ) ? null : after;
 		}
 
-		this.restoreContentAndSplit( before, after, blocks );
+		onSplit( before, after, ...blocks );
 	}
 
 	onNodeChange( { parents } ) {
@@ -720,12 +677,7 @@ export class RichText extends Component {
 	getContent() {
 		const { format } = this.props;
 
-		switch ( format ) {
-			case 'string':
-				return this.editor.getContent();
-			default:
-				return domToFormat( this.editor.getBody().childNodes || [], 'element', this.editor );
-		}
+		return domToFormat( this.editor.getBody().childNodes, format );
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -821,19 +773,6 @@ export class RichText extends Component {
 		this.setState( ( state ) => ( {
 			formats: merge( {}, state.formats, formats ),
 		} ) );
-	}
-
-	/**
-	 * Calling onSplit means we need to abort the change done by TinyMCE.
-	 * we need to call updateContent to restore the initial content before calling onSplit.
-	 *
-	 * @param {Array}  before content before the split position
-	 * @param {Array}  after  content after the split position
-	 * @param {?Array} blocks blocks to insert at the split position
-	 */
-	restoreContentAndSplit( before, after, blocks = [] ) {
-		this.setContent( this.props.value );
-		this.props.onSplit( before, after, ...blocks );
 	}
 
 	render() {
@@ -940,7 +879,7 @@ RichText.contextTypes = {
 RichText.defaultProps = {
 	formattingControls: DEFAULT_FORMATS,
 	formatters: [],
-	format: 'element',
+	format: 'children',
 };
 
 const RichTextContainer = compose( [
@@ -975,22 +914,39 @@ const RichTextContainer = compose( [
 	withSafeTimeout,
 ] )( RichText );
 
-RichTextContainer.Content = ( { value, format = 'element', tagName: Tag, ...props } ) => {
-	let children;
+RichTextContainer.Content = ( { value, format, tagName: Tag, ...props } ) => {
+	let content;
 	switch ( format ) {
 		case 'string':
-			children = <RawHTML>{ value }</RawHTML>;
+			content = <RawHTML>{ value }</RawHTML>;
 			break;
-		default:
-			children = value;
+
+		case 'element':
+			// NOTE: In removing this, ensure to remove also every related
+			// function from `format.js`, including the `dom-react` dependency.
+			deprecated( 'RichText `element` format', {
+				version: '3.5',
+				plugin: 'Gutenberg',
+				alternative: 'the compatible `children` format',
+			} );
+
+			content = value;
+			break;
+
+		case 'children':
+			content = <RawHTML>{ children.toHTML( value ) }</RawHTML>;
 			break;
 	}
 
 	if ( Tag ) {
-		return <Tag { ...props }>{ children }</Tag>;
+		return <Tag { ...props }>{ content }</Tag>;
 	}
 
-	return children;
+	return content;
+};
+
+RichTextContainer.Content.defaultProps = {
+	format: 'children',
 };
 
 export default RichTextContainer;

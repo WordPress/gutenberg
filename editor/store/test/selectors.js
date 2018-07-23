@@ -47,20 +47,20 @@ const {
 	getBlockCount,
 	hasSelectedBlock,
 	getSelectedBlock,
-	getSelectedBlockUID,
-	getBlockRootUID,
+	getSelectedBlockClientId,
+	getBlockRootClientId,
 	getCurrentPostAttribute,
 	getEditedPostAttribute,
 	getAutosaveAttribute,
 	getGlobalBlockCount,
-	getMultiSelectedBlockUids,
+	getMultiSelectedBlockClientIds,
 	getMultiSelectedBlocks,
-	getMultiSelectedBlocksStartUid,
-	getMultiSelectedBlocksEndUid,
+	getMultiSelectedBlocksStartClientId,
+	getMultiSelectedBlocksEndClientId,
 	getBlockOrder,
 	getBlockIndex,
-	getPreviousBlockUid,
-	getNextBlockUid,
+	getPreviousBlockClientId,
+	getNextBlockClientId,
 	isBlockSelected,
 	hasSelectedInnerBlock,
 	isBlockWithinSelection,
@@ -85,7 +85,7 @@ const {
 	isPublishingPost,
 	canInsertBlockType,
 	getInserterItems,
-	getProvisionalBlockUID,
+	getProvisionalBlockClientId,
 	isValidTemplate,
 	getTemplate,
 	getTemplateLock,
@@ -591,7 +591,7 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						edits: {},
-						blocksByUID: {},
+						blocksByClientId: {},
 						blockOrder: {},
 					},
 					isDirty: false,
@@ -635,7 +635,7 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						edits: {},
-						blocksByUID: {},
+						blocksByClientId: {},
 						blockOrder: {},
 					},
 					isDirty: false,
@@ -658,7 +658,7 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						edits: {},
-						blocksByUID: {},
+						blocksByClientId: {},
 						blockOrder: {},
 					},
 					isDirty: true,
@@ -973,7 +973,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {},
+						blocksByClientId: {},
 						blockOrder: {},
 						edits: {},
 					},
@@ -989,7 +989,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {},
+						blocksByClientId: {},
 						blockOrder: {},
 						edits: {},
 					},
@@ -1009,7 +1009,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {},
+						blocksByClientId: {},
 						blockOrder: {},
 						edits: {},
 					},
@@ -1027,7 +1027,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {},
+						blocksByClientId: {},
 						blockOrder: {},
 						edits: {},
 					},
@@ -1045,9 +1045,9 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {
+						blocksByClientId: {
 							123: {
-								uid: 123,
+								clientId: 123,
 								name: 'core/test-block',
 								attributes: {
 									text: '',
@@ -1073,7 +1073,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {},
+						blocksByClientId: {},
 						blockOrder: {},
 						edits: {},
 					},
@@ -1096,7 +1096,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {},
+						blocksByClientId: {},
 						blockOrder: {},
 						edits: {},
 					},
@@ -1115,7 +1115,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {},
+						blocksByClientId: {},
 						blockOrder: {},
 						edits: {
 							content: 'foo',
@@ -1144,7 +1144,7 @@ describe( 'selectors', () => {
 					const state = {
 						editor: {
 							present: {
-								blocksByUID: {},
+								blocksByClientId: {},
 								blockOrder: {},
 								edits: {
 									content: 'foo',
@@ -1217,7 +1217,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {},
+						blocksByClientId: {},
 						blockOrder: {},
 						edits: {},
 					},
@@ -1232,9 +1232,9 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {
+						blocksByClientId: {
 							123: {
-								uid: 123,
+								clientId: 123,
 								name: 'core/test-block',
 								attributes: {
 									text: '',
@@ -1257,7 +1257,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {},
+						blocksByClientId: {},
 						blockOrder: {},
 						edits: {},
 					},
@@ -1274,7 +1274,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {},
+						blocksByClientId: {},
 						blockOrder: {},
 						edits: {
 							content: 'sassel',
@@ -1315,7 +1315,7 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getBlockDependantsCacheBust', () => {
-		const rootBlock = { uid: 123, name: 'core/paragraph', attributes: {} };
+		const rootBlock = { clientId: 123, name: 'core/paragraph', attributes: {} };
 		const rootOrder = [ 123 ];
 
 		it( 'returns an unchanging reference', () => {
@@ -1325,7 +1325,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUID: {
+						blocksByClientId: {
 							123: rootBlock,
 						},
 						blockOrder: {
@@ -1341,7 +1341,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUID: {
+						blocksByClientId: {
 							123: rootBlock,
 						},
 						blockOrder: {
@@ -1363,7 +1363,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUID: {
+						blocksByClientId: {
 							123: rootBlock,
 						},
 						blockOrder: {
@@ -1379,9 +1379,9 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUID: {
+						blocksByClientId: {
 							123: rootBlock,
-							456: { uid: 456, name: 'core/paragraph', attributes: {} },
+							456: { clientId: 456, name: 'core/paragraph', attributes: {} },
 						},
 						blockOrder: {
 							'': rootOrder,
@@ -1400,14 +1400,14 @@ describe( 'selectors', () => {
 
 		it( 'returns an unchanging reference on unchanging inner block', () => {
 			const rootBlockOrder = [ 456 ];
-			const childBlock = { uid: 456, name: 'core/paragraph', attributes: {} };
+			const childBlock = { clientId: 456, name: 'core/paragraph', attributes: {} };
 			const childBlockOrder = [];
 
 			const state = {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUID: {
+						blocksByClientId: {
 							123: rootBlock,
 							456: childBlock,
 						},
@@ -1425,7 +1425,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUID: {
+						blocksByClientId: {
 							123: rootBlock,
 							456: childBlock,
 						},
@@ -1452,9 +1452,9 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUID: {
+						blocksByClientId: {
 							123: rootBlock,
-							456: { uid: 456, name: 'core/paragraph', attributes: {} },
+							456: { clientId: 456, name: 'core/paragraph', attributes: {} },
 						},
 						blockOrder: {
 							'': rootOrder,
@@ -1470,9 +1470,9 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUID: {
+						blocksByClientId: {
 							123: rootBlock,
-							456: { uid: 456, name: 'core/paragraph', attributes: { content: [ 'foo' ] } },
+							456: { clientId: 456, name: 'core/paragraph', attributes: { content: [ 'foo' ] } },
 						},
 						blockOrder: {
 							'': rootOrder,
@@ -1491,7 +1491,7 @@ describe( 'selectors', () => {
 
 		it( 'returns a new reference on updated grandchild inner block', () => {
 			const rootBlockOrder = [ 456 ];
-			const childBlock = { uid: 456, name: 'core/paragraph', attributes: {} };
+			const childBlock = { clientId: 456, name: 'core/paragraph', attributes: {} };
 			const childBlockOrder = [ 789 ];
 			const grandChildBlockOrder = [];
 
@@ -1499,10 +1499,10 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUID: {
+						blocksByClientId: {
 							123: rootBlock,
 							456: childBlock,
-							789: { uid: 789, name: 'core/paragraph', attributes: {} },
+							789: { clientId: 789, name: 'core/paragraph', attributes: {} },
 						},
 						blockOrder: {
 							'': rootOrder,
@@ -1519,10 +1519,10 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUID: {
+						blocksByClientId: {
 							123: rootBlock,
 							456: childBlock,
-							789: { uid: 789, name: 'core/paragraph', attributes: { content: [ 'foo' ] } },
+							789: { clientId: 789, name: 'core/paragraph', attributes: { content: [ 'foo' ] } },
 						},
 						blockOrder: {
 							'': rootOrder,
@@ -1542,12 +1542,12 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getBlockName', () => {
-		it( 'returns null if no block by uid', () => {
+		it( 'returns null if no block by clientId', () => {
 			const state = {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUID: {},
+						blocksByClientId: {},
 						blockOrder: {},
 						edits: {},
 					},
@@ -1564,9 +1564,9 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUID: {
+						blocksByClientId: {
 							'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
-								uid: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+								clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
 								name: 'core/paragraph',
 								attributes: {},
 							},
@@ -1592,8 +1592,8 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUID: {
-							123: { uid: 123, name: 'core/paragraph', attributes: {} },
+						blocksByClientId: {
+							123: { clientId: 123, name: 'core/paragraph', attributes: {} },
 						},
 						blockOrder: {
 							'': [ 123 ],
@@ -1605,7 +1605,7 @@ describe( 'selectors', () => {
 			};
 
 			expect( getBlock( state, 123 ) ).toEqual( {
-				uid: 123,
+				clientId: 123,
 				name: 'core/paragraph',
 				attributes: {},
 				innerBlocks: [],
@@ -1617,7 +1617,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUID: {},
+						blocksByClientId: {},
 						blockOrder: {},
 						edits: {},
 					},
@@ -1632,9 +1632,9 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUID: {
-							123: { uid: 123, name: 'core/paragraph', attributes: {} },
-							456: { uid: 456, name: 'core/paragraph', attributes: {} },
+						blocksByClientId: {
+							123: { clientId: 123, name: 'core/paragraph', attributes: {} },
+							456: { clientId: 456, name: 'core/paragraph', attributes: {} },
 						},
 						blockOrder: {
 							'': [ 123 ],
@@ -1647,11 +1647,11 @@ describe( 'selectors', () => {
 			};
 
 			expect( getBlock( state, 123 ) ).toEqual( {
-				uid: 123,
+				clientId: 123,
 				name: 'core/paragraph',
 				attributes: {},
 				innerBlocks: [ {
-					uid: 456,
+					clientId: 456,
 					name: 'core/paragraph',
 					attributes: {},
 					innerBlocks: [],
@@ -1681,8 +1681,8 @@ describe( 'selectors', () => {
 				},
 				editor: {
 					present: {
-						blocksByUID: {
-							123: { uid: 123, name: 'core/meta-block', attributes: {} },
+						blocksByClientId: {
+							123: { clientId: 123, name: 'core/meta-block', attributes: {} },
 						},
 						blockOrder: {
 							'': [ 123 ],
@@ -1694,7 +1694,7 @@ describe( 'selectors', () => {
 			};
 
 			expect( getBlock( state, 123 ) ).toEqual( {
-				uid: 123,
+				clientId: 123,
 				name: 'core/meta-block',
 				attributes: {
 					foo: 'bar',
@@ -1712,9 +1712,9 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUID: {
-							23: { uid: 23, name: 'core/heading', attributes: {} },
-							123: { uid: 123, name: 'core/paragraph', attributes: {} },
+						blocksByClientId: {
+							23: { clientId: 23, name: 'core/heading', attributes: {} },
+							123: { clientId: 123, name: 'core/paragraph', attributes: {} },
 						},
 						blockOrder: {
 							'': [ 123, 23 ],
@@ -1725,8 +1725,8 @@ describe( 'selectors', () => {
 			};
 
 			expect( getBlocks( state ) ).toEqual( [
-				{ uid: 123, name: 'core/paragraph', attributes: {}, innerBlocks: [] },
-				{ uid: 23, name: 'core/heading', attributes: {}, innerBlocks: [] },
+				{ clientId: 123, name: 'core/paragraph', attributes: {}, innerBlocks: [] },
+				{ clientId: 23, name: 'core/heading', attributes: {}, innerBlocks: [] },
 			] );
 		} );
 	} );
@@ -1736,9 +1736,9 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {
-							23: { uid: 23, name: 'core/heading', attributes: {} },
-							123: { uid: 123, name: 'core/paragraph', attributes: {} },
+						blocksByClientId: {
+							23: { clientId: 23, name: 'core/heading', attributes: {} },
+							123: { clientId: 123, name: 'core/paragraph', attributes: {} },
 						},
 						blockOrder: {
 							'': [ 123, 23 ],
@@ -1754,10 +1754,10 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {
-							123: { uid: 123, name: 'core/columns', attributes: {} },
-							456: { uid: 456, name: 'core/paragraph', attributes: {} },
-							789: { uid: 789, name: 'core/paragraph', attributes: {} },
+						blocksByClientId: {
+							123: { clientId: 123, name: 'core/columns', attributes: {} },
+							456: { clientId: 456, name: 'core/paragraph', attributes: {} },
+							789: { clientId: 789, name: 'core/paragraph', attributes: {} },
 						},
 						blockOrder: {
 							'': [ 123 ],
@@ -1811,9 +1811,9 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {
-							23: { uid: 23, name: 'core/heading', attributes: {} },
-							123: { uid: 123, name: 'core/paragraph', attributes: {} },
+						blocksByClientId: {
+							23: { clientId: 23, name: 'core/heading', attributes: {} },
+							123: { clientId: 123, name: 'core/paragraph', attributes: {} },
 						},
 					},
 				},
@@ -1826,11 +1826,11 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {
-							123: { uid: 123, name: 'core/columns', attributes: {} },
-							456: { uid: 456, name: 'core/paragraph', attributes: {} },
-							789: { uid: 789, name: 'core/paragraph', attributes: {} },
-							124: { uid: 123, name: 'core/heading', attributes: {} },
+						blocksByClientId: {
+							123: { clientId: 123, name: 'core/columns', attributes: {} },
+							456: { clientId: 456, name: 'core/paragraph', attributes: {} },
+							789: { clientId: 789, name: 'core/paragraph', attributes: {} },
+							124: { clientId: 123, name: 'core/heading', attributes: {} },
 						},
 					},
 				},
@@ -1843,7 +1843,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {
+						blocksByClientId: {
 						},
 					},
 				},
@@ -1853,13 +1853,13 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getSelectedBlockUID', () => {
+	describe( 'getSelectedBlockClientId', () => {
 		it( 'should return null if no block is selected', () => {
 			const state = {
 				blockSelection: { start: null, end: null },
 			};
 
-			expect( getSelectedBlockUID( state ) ).toBe( null );
+			expect( getSelectedBlockClientId( state ) ).toBe( null );
 		} );
 
 		it( 'should return null if there is multi selection', () => {
@@ -1867,15 +1867,15 @@ describe( 'selectors', () => {
 				blockSelection: { start: 23, end: 123 },
 			};
 
-			expect( getSelectedBlockUID( state ) ).toBe( null );
+			expect( getSelectedBlockClientId( state ) ).toBe( null );
 		} );
 
-		it( 'should return the selected block UID', () => {
+		it( 'should return the selected block ClientId', () => {
 			const state = {
 				blockSelection: { start: 23, end: 23 },
 			};
 
-			expect( getSelectedBlockUID( state ) ).toEqual( 23 );
+			expect( getSelectedBlockClientId( state ) ).toEqual( 23 );
 		} );
 	} );
 
@@ -1885,9 +1885,9 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUID: {
-							23: { uid: 23, name: 'core/heading', attributes: {} },
-							123: { uid: 123, name: 'core/paragraph', attributes: {} },
+						blocksByClientId: {
+							23: { clientId: 23, name: 'core/heading', attributes: {} },
+							123: { clientId: 123, name: 'core/paragraph', attributes: {} },
 						},
 						blockOrder: {
 							'': [ 23, 123 ],
@@ -1908,9 +1908,9 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUID: {
-							23: { uid: 23, name: 'core/heading', attributes: {} },
-							123: { uid: 123, name: 'core/paragraph', attributes: {} },
+						blocksByClientId: {
+							23: { clientId: 23, name: 'core/heading', attributes: {} },
+							123: { clientId: 123, name: 'core/paragraph', attributes: {} },
 						},
 						blockOrder: {
 							'': [ 23, 123 ],
@@ -1931,9 +1931,9 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUID: {
-							23: { uid: 23, name: 'core/heading', attributes: {} },
-							123: { uid: 123, name: 'core/paragraph', attributes: {} },
+						blocksByClientId: {
+							23: { clientId: 23, name: 'core/heading', attributes: {} },
+							123: { clientId: 123, name: 'core/paragraph', attributes: {} },
 						},
 						blockOrder: {
 							'': [ 23, 123 ],
@@ -1947,7 +1947,7 @@ describe( 'selectors', () => {
 			};
 
 			expect( getSelectedBlock( state ) ).toEqual( {
-				uid: 23,
+				clientId: 23,
 				name: 'core/heading',
 				attributes: {},
 				innerBlocks: [],
@@ -1955,7 +1955,7 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getBlockRootUID', () => {
+	describe( 'getBlockRootClientId', () => {
 		it( 'should return null if the block does not exist', () => {
 			const state = {
 				editor: {
@@ -1965,10 +1965,10 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getBlockRootUID( state, 56 ) ).toBeNull();
+			expect( getBlockRootClientId( state, 56 ) ).toBeNull();
 		} );
 
-		it( 'should return root UID relative the block UID', () => {
+		it( 'should return root ClientId relative the block ClientId', () => {
 			const state = {
 				editor: {
 					present: {
@@ -1980,11 +1980,11 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getBlockRootUID( state, 56 ) ).toBe( '123' );
+			expect( getBlockRootClientId( state, 56 ) ).toBe( '123' );
 		} );
 	} );
 
-	describe( 'getMultiSelectedBlockUids', () => {
+	describe( 'getMultiSelectedBlockClientIds', () => {
 		it( 'should return empty if there is no multi selection', () => {
 			const state = {
 				editor: {
@@ -1997,10 +1997,10 @@ describe( 'selectors', () => {
 				blockSelection: { start: null, end: null },
 			};
 
-			expect( getMultiSelectedBlockUids( state ) ).toEqual( [] );
+			expect( getMultiSelectedBlockClientIds( state ) ).toEqual( [] );
 		} );
 
-		it( 'should return selected block uids if there is multi selection', () => {
+		it( 'should return selected block clientIds if there is multi selection', () => {
 			const state = {
 				editor: {
 					present: {
@@ -2012,10 +2012,10 @@ describe( 'selectors', () => {
 				blockSelection: { start: 2, end: 4 },
 			};
 
-			expect( getMultiSelectedBlockUids( state ) ).toEqual( [ 4, 3, 2 ] );
+			expect( getMultiSelectedBlockClientIds( state ) ).toEqual( [ 4, 3, 2 ] );
 		} );
 
-		it( 'should return selected block uids if there is multi selection (nested context)', () => {
+		it( 'should return selected block clientIds if there is multi selection (nested context)', () => {
 			const state = {
 				editor: {
 					present: {
@@ -2028,7 +2028,7 @@ describe( 'selectors', () => {
 				blockSelection: { start: 7, end: 9 },
 			};
 
-			expect( getMultiSelectedBlockUids( state ) ).toEqual( [ 9, 8, 7 ] );
+			expect( getMultiSelectedBlockClientIds( state ) ).toEqual( [ 9, 8, 7 ] );
 		} );
 	} );
 
@@ -2037,7 +2037,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {},
+						blocksByClientId: {},
 						blockOrder: {},
 						edits: {},
 					},
@@ -2052,13 +2052,13 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getMultiSelectedBlocksStartUid', () => {
+	describe( 'getMultiSelectedBlocksStartClientId', () => {
 		it( 'returns null if there is no multi selection', () => {
 			const state = {
 				blockSelection: { start: null, end: null },
 			};
 
-			expect( getMultiSelectedBlocksStartUid( state ) ).toBeNull();
+			expect( getMultiSelectedBlocksStartClientId( state ) ).toBeNull();
 		} );
 
 		it( 'returns multi selection start', () => {
@@ -2066,17 +2066,17 @@ describe( 'selectors', () => {
 				blockSelection: { start: 2, end: 4 },
 			};
 
-			expect( getMultiSelectedBlocksStartUid( state ) ).toBe( 2 );
+			expect( getMultiSelectedBlocksStartClientId( state ) ).toBe( 2 );
 		} );
 	} );
 
-	describe( 'getMultiSelectedBlocksEndUid', () => {
+	describe( 'getMultiSelectedBlocksEndClientId', () => {
 		it( 'returns null if there is no multi selection', () => {
 			const state = {
 				blockSelection: { start: null, end: null },
 			};
 
-			expect( getMultiSelectedBlocksEndUid( state ) ).toBeNull();
+			expect( getMultiSelectedBlocksEndClientId( state ) ).toBeNull();
 		} );
 
 		it( 'returns multi selection end', () => {
@@ -2084,12 +2084,12 @@ describe( 'selectors', () => {
 				blockSelection: { start: 2, end: 4 },
 			};
 
-			expect( getMultiSelectedBlocksEndUid( state ) ).toBe( 4 );
+			expect( getMultiSelectedBlocksEndClientId( state ) ).toBe( 4 );
 		} );
 	} );
 
 	describe( 'getBlockOrder', () => {
-		it( 'should return the ordered block UIDs of top-level blocks by default', () => {
+		it( 'should return the ordered block ClientIds of top-level blocks by default', () => {
 			const state = {
 				editor: {
 					present: {
@@ -2103,7 +2103,7 @@ describe( 'selectors', () => {
 			expect( getBlockOrder( state ) ).toEqual( [ 123, 23 ] );
 		} );
 
-		it( 'should return the ordered block UIDs at a specified rootUID', () => {
+		it( 'should return the ordered block ClientIds at a specified rootClientId', () => {
 			const state = {
 				editor: {
 					present: {
@@ -2150,7 +2150,7 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getPreviousBlockUid', () => {
+	describe( 'getPreviousBlockClientId', () => {
 		it( 'should return the previous block', () => {
 			const state = {
 				editor: {
@@ -2162,7 +2162,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getPreviousBlockUid( state, 23 ) ).toEqual( 123 );
+			expect( getPreviousBlockClientId( state, 23 ) ).toEqual( 123 );
 		} );
 
 		it( 'should return the previous block (nested context)', () => {
@@ -2177,7 +2177,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getPreviousBlockUid( state, 56, '123' ) ).toEqual( 456 );
+			expect( getPreviousBlockClientId( state, 56, '123' ) ).toEqual( 456 );
 		} );
 
 		it( 'should return null for the first block', () => {
@@ -2191,7 +2191,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getPreviousBlockUid( state, 123 ) ).toBeNull();
+			expect( getPreviousBlockClientId( state, 123 ) ).toBeNull();
 		} );
 
 		it( 'should return null for the first block (nested context)', () => {
@@ -2206,11 +2206,11 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getPreviousBlockUid( state, 456, '123' ) ).toBeNull();
+			expect( getPreviousBlockClientId( state, 456, '123' ) ).toBeNull();
 		} );
 	} );
 
-	describe( 'getNextBlockUid', () => {
+	describe( 'getNextBlockClientId', () => {
 		it( 'should return the following block', () => {
 			const state = {
 				editor: {
@@ -2222,7 +2222,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getNextBlockUid( state, 123 ) ).toEqual( 23 );
+			expect( getNextBlockClientId( state, 123 ) ).toEqual( 23 );
 		} );
 
 		it( 'should return the following block (nested context)', () => {
@@ -2237,7 +2237,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getNextBlockUid( state, 456, '123' ) ).toEqual( 56 );
+			expect( getNextBlockClientId( state, 456, '123' ) ).toEqual( 56 );
 		} );
 
 		it( 'should return null for the last block', () => {
@@ -2251,7 +2251,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getNextBlockUid( state, 23 ) ).toBeNull();
+			expect( getNextBlockClientId( state, 23 ) ).toBeNull();
 		} );
 
 		it( 'should return null for the last block (nested context)', () => {
@@ -2266,7 +2266,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getNextBlockUid( state, 56, '123' ) ).toBeNull();
+			expect( getNextBlockClientId( state, 56, '123' ) ).toBeNull();
 		} );
 	} );
 
@@ -2297,7 +2297,7 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'hasSelectedInnerBlock', () => {
-		it( 'should return false if the selected block is a child of the given UID', () => {
+		it( 'should return false if the selected block is a child of the given ClientId', () => {
 			const state = {
 				blockSelection: { start: 5, end: 5 },
 				editor: {
@@ -2312,7 +2312,7 @@ describe( 'selectors', () => {
 			expect( hasSelectedInnerBlock( state, 4 ) ).toBe( false );
 		} );
 
-		it( 'should return true if the selected block is a child of the given UID', () => {
+		it( 'should return true if the selected block is a child of the given ClientId', () => {
 			const state = {
 				blockSelection: { start: 3, end: 3 },
 				editor: {
@@ -2467,7 +2467,7 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'geteBlockMode', () => {
+	describe( 'getBlockMode', () => {
 		it( 'should return "visual" if unset', () => {
 			const state = {
 				blocksMode: {},
@@ -2533,17 +2533,17 @@ describe( 'selectors', () => {
 				currentPost: {},
 				preferences: { mode: 'visual' },
 				blockSelection: {
-					start: 'uid1',
-					end: 'uid1',
+					start: 'clientId1',
+					end: 'clientId1',
 				},
 				editor: {
 					present: {
-						blocksByUID: {
-							uid1: { uid: 'uid1' },
+						blocksByClientId: {
+							clientId1: { clientId: 'clientId1' },
 						},
 						blockOrder: {
-							'': [ 'uid1' ],
-							uid1: [],
+							'': [ 'clientId1' ],
+							clientId1: [],
 						},
 						edits: {},
 					},
@@ -2552,6 +2552,8 @@ describe( 'selectors', () => {
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
+				rootClientId: undefined,
+				// TODO: To be removed in 3.5 "UID" deprecation.
 				rootUID: undefined,
 				layout: undefined,
 				index: 1,
@@ -2563,19 +2565,19 @@ describe( 'selectors', () => {
 				currentPost: {},
 				preferences: { mode: 'visual' },
 				blockSelection: {
-					start: 'uid2',
-					end: 'uid2',
+					start: 'clientId2',
+					end: 'clientId2',
 				},
 				editor: {
 					present: {
-						blocksByUID: {
-							uid1: { uid: 'uid1' },
-							uid2: { uid: 'uid2' },
+						blocksByClientId: {
+							clientId1: { clientId: 'clientId1' },
+							clientId2: { clientId: 'clientId2' },
 						},
 						blockOrder: {
-							'': [ 'uid1' ],
-							uid1: [ 'uid2' ],
-							uid2: [],
+							'': [ 'clientId1' ],
+							clientId1: [ 'clientId2' ],
+							clientId2: [],
 						},
 						edits: {},
 					},
@@ -2584,7 +2586,9 @@ describe( 'selectors', () => {
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
-				rootUID: 'uid1',
+				rootClientId: 'clientId1',
+				// TODO: To be removed in 3.5 "UID" deprecation.
+				rootUID: 'clientId1',
 				layout: undefined,
 				index: 1,
 			} );
@@ -2595,17 +2599,17 @@ describe( 'selectors', () => {
 				currentPost: {},
 				preferences: { mode: 'visual' },
 				blockSelection: {
-					start: 'uid1',
-					end: 'uid1',
+					start: 'clientId1',
+					end: 'clientId1',
 				},
 				editor: {
 					present: {
-						blocksByUID: {
-							uid1: { uid: 'uid1', attributes: { layout: 'wide' } },
+						blocksByClientId: {
+							clientId1: { clientId: 'clientId1', attributes: { layout: 'wide' } },
 						},
 						blockOrder: {
-							'': [ 'uid1' ],
-							uid1: [],
+							'': [ 'clientId1' ],
+							clientId1: [],
 						},
 						edits: {},
 					},
@@ -2614,30 +2618,32 @@ describe( 'selectors', () => {
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
+				rootClientId: undefined,
+				// TODO: To be removed in 3.5 "UID" deprecation.
 				rootUID: undefined,
 				layout: 'wide',
 				index: 1,
 			} );
 		} );
 
-		it( 'should return an object for the last multi selected uid', () => {
+		it( 'should return an object for the last multi selected clientId', () => {
 			const state = {
 				currentPost: {},
 				preferences: { mode: 'visual' },
 				blockSelection: {
-					start: 'uid1',
-					end: 'uid2',
+					start: 'clientId1',
+					end: 'clientId2',
 				},
 				editor: {
 					present: {
-						blocksByUID: {
-							uid1: { uid: 'uid1' },
-							uid2: { uid: 'uid2' },
+						blocksByClientId: {
+							clientId1: { clientId: 'clientId1' },
+							clientId2: { clientId: 'clientId2' },
 						},
 						blockOrder: {
-							'': [ 'uid1', 'uid2' ],
-							uid1: [],
-							uid2: [],
+							'': [ 'clientId1', 'clientId2' ],
+							clientId1: [],
+							clientId2: [],
 						},
 						edits: {},
 					},
@@ -2646,6 +2652,8 @@ describe( 'selectors', () => {
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
+				rootClientId: undefined,
+				// TODO: To be removed in 3.5 "UID" deprecation.
 				rootUID: undefined,
 				layout: undefined,
 				index: 2,
@@ -2662,14 +2670,14 @@ describe( 'selectors', () => {
 				},
 				editor: {
 					present: {
-						blocksByUID: {
-							uid1: { uid: 'uid1' },
-							uid2: { uid: 'uid2' },
+						blocksByClientId: {
+							clientId1: { clientId: 'clientId1' },
+							clientId2: { clientId: 'clientId2' },
 						},
 						blockOrder: {
-							'': [ 'uid1', 'uid2' ],
-							uid1: [],
-							uid2: [],
+							'': [ 'clientId1', 'clientId2' ],
+							clientId1: [],
+							clientId2: [],
 						},
 						edits: {},
 					},
@@ -2678,6 +2686,8 @@ describe( 'selectors', () => {
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
+				rootClientId: undefined,
+				// TODO: To be removed in 3.5 "UID" deprecation.
 				rootUID: undefined,
 				layout: undefined,
 				index: 2,
@@ -2767,7 +2777,7 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						blockOrder: {},
-						blocksByUID: {},
+						blocksByClientId: {},
 						edits: {},
 					},
 				},
@@ -2784,9 +2794,9 @@ describe( 'selectors', () => {
 						blockOrder: {
 							'': [ 123, 456 ],
 						},
-						blocksByUID: {
-							123: { uid: 123, name: 'core/image', attributes: {} },
-							456: { uid: 456, name: 'core/quote', attributes: {} },
+						blocksByClientId: {
+							123: { clientId: 123, name: 'core/image', attributes: {} },
+							456: { clientId: 456, name: 'core/quote', attributes: {} },
 						},
 						edits: {},
 					},
@@ -2804,8 +2814,8 @@ describe( 'selectors', () => {
 						blockOrder: {
 							'': [ 123 ],
 						},
-						blocksByUID: {
-							123: { uid: 123, name: 'core/image', attributes: {} },
+						blocksByClientId: {
+							123: { clientId: 123, name: 'core/image', attributes: {} },
 						},
 						edits: {},
 					},
@@ -2823,8 +2833,8 @@ describe( 'selectors', () => {
 						blockOrder: {
 							'': [ 456 ],
 						},
-						blocksByUID: {
-							456: { uid: 456, name: 'core/quote', attributes: {} },
+						blocksByClientId: {
+							456: { clientId: 456, name: 'core/quote', attributes: {} },
 						},
 						edits: {},
 					},
@@ -2842,8 +2852,8 @@ describe( 'selectors', () => {
 						blockOrder: {
 							'': [ 567 ],
 						},
-						blocksByUID: {
-							567: { uid: 567, name: 'core-embed/youtube', attributes: {} },
+						blocksByClientId: {
+							567: { clientId: 567, name: 'core-embed/youtube', attributes: {} },
 						},
 						edits: {},
 					},
@@ -2861,9 +2871,9 @@ describe( 'selectors', () => {
 						blockOrder: {
 							'': [ 456, 789 ],
 						},
-						blocksByUID: {
-							456: { uid: 456, name: 'core/quote', attributes: {} },
-							789: { uid: 789, name: 'core/paragraph', attributes: {} },
+						blocksByClientId: {
+							456: { clientId: 456, name: 'core/quote', attributes: {} },
+							789: { clientId: 789, name: 'core/paragraph', attributes: {} },
 						},
 						edits: {},
 					},
@@ -2893,7 +2903,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {},
+						blocksByClientId: {},
 					},
 				},
 				blockListSettings: {},
@@ -2906,7 +2916,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {},
+						blocksByClientId: {},
 					},
 				},
 				blockListSettings: {},
@@ -2921,7 +2931,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {},
+						blocksByClientId: {},
 					},
 				},
 				blockListSettings: {},
@@ -2936,7 +2946,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {},
+						blocksByClientId: {},
 					},
 				},
 				blockListSettings: {},
@@ -2951,7 +2961,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {},
+						blocksByClientId: {},
 					},
 				},
 				blockListSettings: {},
@@ -2964,7 +2974,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {
+						blocksByClientId: {
 							block1: { name: 'core/test-block-a' },
 						},
 					},
@@ -2979,7 +2989,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {
+						blocksByClientId: {
 							block1: { name: 'core/test-block-b' },
 						},
 					},
@@ -2994,7 +3004,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {
+						blocksByClientId: {
 							block1: { name: 'core/test-block-a' },
 						},
 					},
@@ -3013,7 +3023,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {
+						blocksByClientId: {
 							block1: { name: 'core/test-block-a' },
 						},
 					},
@@ -3032,7 +3042,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {
+						blocksByClientId: {
 							block1: { name: 'core/test-block-b' },
 						},
 					},
@@ -3053,7 +3063,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {
+						blocksByClientId: {
 							block1: { name: 'core/test-block-a' },
 						},
 						blockOrder: {},
@@ -3062,7 +3072,7 @@ describe( 'selectors', () => {
 				},
 				sharedBlocks: {
 					data: {
-						1: { uid: 'block1', title: 'Shared Block 1' },
+						1: { clientId: 'block1', title: 'Shared Block 1' },
 					},
 				},
 				currentPost: {},
@@ -3110,7 +3120,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {
+						blocksByClientId: {
 							block1: { name: 'core/test-block-a' },
 							block2: { name: 'core/test-block-a' },
 						},
@@ -3120,8 +3130,8 @@ describe( 'selectors', () => {
 				},
 				sharedBlocks: {
 					data: {
-						1: { uid: 'block1', title: 'Shared Block 1' },
-						2: { uid: 'block1', title: 'Shared Block 2' },
+						1: { clientId: 'block1', title: 'Shared Block 1' },
+						2: { clientId: 'block1', title: 'Shared Block 2' },
 					},
 				},
 				currentPost: {},
@@ -3147,7 +3157,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {
+						blocksByClientId: {
 							block1: { name: 'core/test-block-a' },
 							block2: { name: 'core/test-block-a' },
 						},
@@ -3157,8 +3167,8 @@ describe( 'selectors', () => {
 				},
 				sharedBlocks: {
 					data: {
-						1: { uid: 'block1', title: 'Shared Block 1' },
-						2: { uid: 'block1', title: 'Shared Block 2' },
+						1: { clientId: 'block1', title: 'Shared Block 1' },
+						2: { clientId: 'block1', title: 'Shared Block 2' },
 					},
 				},
 				currentPost: {},
@@ -3205,7 +3215,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {
+						blocksByClientId: {
 							block1: { name: 'core/test-block-b' },
 						},
 						blockOrder: {
@@ -3233,7 +3243,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {},
+						blocksByClientId: {},
 						blockOrder: {},
 						edits: {},
 					},
@@ -3257,7 +3267,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {},
+						blocksByClientId: {},
 						blockOrder: {},
 						edits: {},
 					},
@@ -3284,7 +3294,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUID: {
+						blocksByClientId: {
 							block1: { name: 'core/test-block-b' },
 						},
 						blockOrder: {
@@ -3315,7 +3325,7 @@ describe( 'selectors', () => {
 				sharedBlocks: {
 					data: {
 						8109: {
-							uid: 'foo',
+							clientId: 'foo',
 							title: 'My cool block',
 						},
 					},
@@ -3326,7 +3336,7 @@ describe( 'selectors', () => {
 			expect( actualSharedBlock ).toEqual( {
 				id: 8109,
 				isTemporary: false,
-				uid: 'foo',
+				clientId: 'foo',
 				title: 'My cool block',
 			} );
 		} );
@@ -3336,7 +3346,7 @@ describe( 'selectors', () => {
 				sharedBlocks: {
 					data: {
 						shared1: {
-							uid: 'foo',
+							clientId: 'foo',
 							title: 'My cool block',
 						},
 					},
@@ -3347,7 +3357,7 @@ describe( 'selectors', () => {
 			expect( actualSharedBlock ).toEqual( {
 				id: 'shared1',
 				isTemporary: true,
-				uid: 'foo',
+				clientId: 'foo',
 				title: 'My cool block',
 			} );
 		} );
@@ -3421,16 +3431,16 @@ describe( 'selectors', () => {
 			const state = {
 				sharedBlocks: {
 					data: {
-						123: { uid: 'carrot' },
-						shared1: { uid: 'broccoli' },
+						123: { clientId: 'carrot' },
+						shared1: { clientId: 'broccoli' },
 					},
 				},
 			};
 
 			const sharedBlocks = getSharedBlocks( state );
 			expect( sharedBlocks ).toEqual( [
-				{ id: 123, isTemporary: false, uid: 'carrot' },
-				{ id: 'shared1', isTemporary: true, uid: 'broccoli' },
+				{ id: 123, isTemporary: false, clientId: 'carrot' },
+				{ id: 'shared1', isTemporary: true, clientId: 'broccoli' },
 			] );
 		} );
 
@@ -3617,21 +3627,21 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getProvisionalBlockUID()', () => {
+	describe( 'getProvisionalBlockClientId()', () => {
 		it( 'should return null if not set', () => {
-			const provisionalBlockUID = getProvisionalBlockUID( {
-				provisionalBlockUID: null,
+			const provisionalBlockClientId = getProvisionalBlockClientId( {
+				provisionalBlockClientId: null,
 			} );
 
-			expect( provisionalBlockUID ).toBe( null );
+			expect( provisionalBlockClientId ).toBe( null );
 		} );
 
-		it( 'should return UID of provisional block', () => {
-			const provisionalBlockUID = getProvisionalBlockUID( {
-				provisionalBlockUID: 'chicken',
+		it( 'should return ClientId of provisional block', () => {
+			const provisionalBlockClientId = getProvisionalBlockClientId( {
+				provisionalBlockClientId: 'chicken',
 			} );
 
-			expect( provisionalBlockUID ).toBe( 'chicken' );
+			expect( provisionalBlockClientId ).toBe( 'chicken' );
 		} );
 	} );
 
@@ -3665,7 +3675,7 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getTemplateLock', () => {
-		it( 'should return the general template lock if no uid was set', () => {
+		it( 'should return the general template lock if no clientId was set', () => {
 			const state = {
 				settings: { templateLock: 'all' },
 			};
@@ -3673,7 +3683,7 @@ describe( 'selectors', () => {
 			expect( getTemplateLock( state ) ).toBe( 'all' );
 		} );
 
-		it( 'should return null if the specified uid was not found ', () => {
+		it( 'should return null if the specified clientId was not found ', () => {
 			const state = {
 				settings: { templateLock: 'all' },
 				blockListSettings: {
@@ -3699,7 +3709,7 @@ describe( 'selectors', () => {
 			expect( getTemplateLock( state, 'ribs' ) ).toBe( null );
 		} );
 
-		it( 'should return the template lock for the specified uid', () => {
+		it( 'should return the template lock for the specified clientId', () => {
 			const state = {
 				settings: { templateLock: 'all' },
 				blockListSettings: {

@@ -6,11 +6,12 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Fragment, compose } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 import { IconButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { isSharedBlock } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
 export function SharedBlockConvertButton( {
 	isVisible,
@@ -50,11 +51,11 @@ export function SharedBlockConvertButton( {
 }
 
 export default compose( [
-	withSelect( ( select, { uid } ) => {
+	withSelect( ( select, { clientId } ) => {
 		const { getBlock, getSharedBlock } = select( 'core/editor' );
 		const { getFallbackBlockName } = select( 'core/blocks' );
 
-		const block = getBlock( uid );
+		const block = getBlock( clientId );
 		if ( ! block ) {
 			return { isVisible: false };
 		}
@@ -66,7 +67,7 @@ export default compose( [
 			isStaticBlock: ! isSharedBlock( block ) || ! getSharedBlock( block.attributes.ref ),
 		};
 	} ),
-	withDispatch( ( dispatch, { uid, onToggle = noop } ) => {
+	withDispatch( ( dispatch, { clientId, onToggle = noop } ) => {
 		const {
 			convertBlockToShared,
 			convertBlockToStatic,
@@ -74,11 +75,11 @@ export default compose( [
 
 		return {
 			onConvertToStatic() {
-				convertBlockToStatic( uid );
+				convertBlockToStatic( clientId );
 				onToggle();
 			},
 			onConvertToShared() {
-				convertBlockToShared( uid );
+				convertBlockToShared( clientId );
 				onToggle();
 			},
 		};

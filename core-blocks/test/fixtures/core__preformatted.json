@@ -1,6 +1,6 @@
 [
     {
-        "uid": "_uid_0",
+        "clientId": "_clientId_0",
         "name": "core/preformatted",
         "isValid": true,
         "attributes": {
@@ -8,11 +8,14 @@
                 "Some ",
                 {
                     "type": "em",
-                    "children": "preformatted"
+                    "children": [
+                        "preformatted"
+                    ]
                 },
                 " text...",
                 {
-                    "type": "br"
+                    "type": "br",
+                    "children": []
                 },
                 "And more!"
             ]

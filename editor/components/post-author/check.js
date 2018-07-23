@@ -6,8 +6,7 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { withInstanceId } from '@wordpress/components';
-import { compose } from '@wordpress/element';
+import { withInstanceId, compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 
 /**

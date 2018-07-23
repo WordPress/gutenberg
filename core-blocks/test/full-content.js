@@ -9,13 +9,18 @@ import { format } from 'util';
 /**
  * WordPress dependencies
  */
-import { getBlockTypes, parse, serialize } from '@wordpress/blocks';
+import {
+	getBlockTypes,
+	parse,
+	serialize,
+	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
+} from '@wordpress/blocks';
+import { parse as grammarParse } from '@wordpress/block-serialization-spec-parser';
 
 /**
  * Internal dependencies
  */
 import { registerCoreBlocks } from '../';
-import { parse as grammarParse } from '../../blocks/api/post.pegjs';
 
 const fixturesDir = path.join( __dirname, 'fixtures' );
 
@@ -80,8 +85,10 @@ function normalizeParsedBlocks( blocks ) {
 		// values that equal `undefined` will be removed
 		block = JSON.parse( JSON.stringify( block ) );
 
-		// Change unique UIDs to a predictable value
-		block.uid = '_uid_' + index;
+		// Change client IDs to a predictable value
+		block.clientId = '_clientId_' + index;
+		// TODO: Remove in 3.5 "UID" deprecation.
+		delete block.uid;
 
 		// Walk each attribute and get a more concise representation of any
 		// React elements
@@ -98,7 +105,7 @@ function normalizeParsedBlocks( blocks ) {
 
 describe( 'full post content fixture', () => {
 	beforeAll( () => {
-		window._wpBlocks = require( './server-registered.json' );
+		unstable__bootstrapServerSideBlockDefinitions( require( './server-registered.json' ) );
 
 		// Load all hooks that modify blocks
 		require( 'editor/hooks' );

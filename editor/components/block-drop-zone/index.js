@@ -14,8 +14,9 @@ import {
 	getBlockTransforms,
 	findTransform,
 } from '@wordpress/blocks';
-import { compose, Component } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -64,10 +65,10 @@ class BlockDropZone extends Component {
 			return;
 		}
 
-		let uid, type, rootUID, fromIndex;
+		let clientId, type, rootClientId, fromIndex;
 
 		try {
-			( { uid, type, rootUID, fromIndex } = JSON.parse( event.dataTransfer.getData( 'text' ) ) );
+			( { clientId, type, rootClientId, fromIndex } = JSON.parse( event.dataTransfer.getData( 'text' ) ) );
 		} catch ( err ) {
 			return;
 		}
@@ -80,8 +81,8 @@ class BlockDropZone extends Component {
 
 		// If the block is kept at the same level and moved downwards, subtract
 		// to account for blocks shifting upward to occupy its old position.
-		const insertIndex = index && fromIndex < index && rootUID === this.props.rootUID ? positionIndex - 1 : positionIndex;
-		this.props.moveBlockToPosition( uid, rootUID, insertIndex );
+		const insertIndex = index && fromIndex < index && rootClientId === this.props.rootClientId ? positionIndex - 1 : positionIndex;
+		this.props.moveBlockToPosition( clientId, rootClientId, insertIndex );
 	}
 
 	render() {
@@ -114,7 +115,7 @@ export default compose(
 
 		return {
 			insertBlocks( blocks, insertIndex ) {
-				const { rootUID, layout } = ownProps;
+				const { rootClientId, layout } = ownProps;
 
 				if ( layout ) {
 					// A block's transform function may return a single
@@ -126,21 +127,21 @@ export default compose(
 					) );
 				}
 
-				insertBlocks( blocks, insertIndex, rootUID );
+				insertBlocks( blocks, insertIndex, rootClientId );
 			},
 			updateBlockAttributes( ...args ) {
 				updateBlockAttributes( ...args );
 			},
-			moveBlockToPosition( uid, fromRootUID, index ) {
-				const { rootUID, layout } = ownProps;
-				moveBlockToPosition( uid, fromRootUID, rootUID, layout, index );
+			moveBlockToPosition( clientId, fromRootClientId, index ) {
+				const { rootClientId, layout } = ownProps;
+				moveBlockToPosition( clientId, fromRootClientId, rootClientId, layout, index );
 			},
 		};
 	} ),
-	withSelect( ( select, { rootUID } ) => {
+	withSelect( ( select, { rootClientId } ) => {
 		const { getTemplateLock } = select( 'core/editor' );
 		return {
-			isLocked: !! getTemplateLock( rootUID ),
+			isLocked: !! getTemplateLock( rootClientId ),
 		};
 	} )
 )( BlockDropZone );

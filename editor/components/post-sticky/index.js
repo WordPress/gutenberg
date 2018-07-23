@@ -2,9 +2,9 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { FormToggle, withInstanceId } from '@wordpress/components';
-import { compose } from '@wordpress/element';
+import { FormToggle } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { withInstanceId, compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies

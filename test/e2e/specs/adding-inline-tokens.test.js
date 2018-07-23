@@ -10,7 +10,7 @@ import uuid from 'uuid/v4';
  * Internal dependencies
  */
 import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage, getHTMLFromCodeEditor, insertBlock } from '../support/utils';
+import { newPost, newDesktopBrowserPage, getEditedPostContent, insertBlock } from '../support/utils';
 
 describe( 'adding inline tokens', () => {
 	beforeAll( async () => {
@@ -41,7 +41,7 @@ describe( 'adding inline tokens', () => {
 		await page.click( '.media-modal button.media-button-select' );
 
 		// Check the content.
-		const regex = new RegExp( '<!-- wp:paragraph -->\\s*<p>a\\u00A0<img class="wp-image-\\d+" style="width:10px" src="[^"]+\\/' + filename + '\\.png" alt="" \\/><\\/p>\\s*<!-- \\/wp:paragraph -->' );
-		expect( await getHTMLFromCodeEditor() ).toMatch( regex );
+		const regex = new RegExp( '<!-- wp:paragraph -->\\s*<p>a\\u00A0<img class="wp-image-\\d+" style="width:\\s*10px;?" src="[^"]+\\/' + filename + '\\.png" alt=""\\/><\\/p>\\s*<!-- \\/wp:paragraph -->' );
+		expect( await getEditedPostContent() ).toMatch( regex );
 	} );
 } );

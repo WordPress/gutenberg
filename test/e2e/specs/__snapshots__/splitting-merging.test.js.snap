@@ -1,5 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`splitting and merging blocks Should merge into inline boundary position 1`] = `
+"<!-- wp:paragraph -->
+<p>Bar</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`splitting and merging blocks Should split and merge paragraph blocks using Enter and Backspace 1`] = `
 "<!-- wp:paragraph -->
 <p>First</p>

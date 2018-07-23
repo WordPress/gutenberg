@@ -1,5 +1,5 @@
 /**
- * External depedencies
+ * External dependencies
  */
 import classnames from 'classnames';
 
@@ -15,14 +15,15 @@ import {
 	withNotices,
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
-import { Component, compose, Fragment } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import {
 	MediaUpload,
 	MediaPlaceholder,
 	BlockControls,
 	RichText,
-	editorMediaUpload,
+	mediaUpload,
 } from '@wordpress/editor';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -54,7 +55,7 @@ class FileEdit extends Component {
 		if ( this.isBlobURL( href ) ) {
 			const file = getBlobByURL( href );
 
-			editorMediaUpload( {
+			mediaUpload( {
 				allowedType: '*',
 				filesList: [ file ],
 				onFileChange: ( [ media ] ) => this.onSelectFile( media ),

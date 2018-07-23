@@ -19,7 +19,7 @@ import {
 	BlockAlignmentToolbar,
 	RichText,
 } from '@wordpress/editor';
-import apiRequest from '@wordpress/api-request';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -31,7 +31,7 @@ import './editor.scss';
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
 // Caches the embed API calls, so if blocks get transformed, or deleted and added again, we don't spam the API.
-const wpEmbedAPI = memoize( ( url ) => apiRequest( { path: `/oembed/1.0/proxy?${ stringify( { url } ) }` } ) );
+const wpEmbedAPI = memoize( ( url ) => apiFetch( { path: `/oembed/1.0/proxy?${ stringify( { url } ) }` } ) );
 
 const matchesPatterns = ( url, patterns = [] ) => {
 	return patterns.some( ( pattern ) => {
@@ -561,10 +561,10 @@ export const others = [
 		patterns: [ /^https?:\/\/(www\.)?smugmug\.com\/.+/i ],
 	},
 	{
-		name: 'core-embed/speaker',
+		name: 'core-embed/speakerdeck',
 		settings: getEmbedBlockSettings( {
-			title: 'Speaker',
-			icon: 'embed-audio',
+			title: 'Speaker Deck',
+			icon: 'embed-post',
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?speakerdeck\.com\/.+/i ],
 	},

@@ -2,7 +2,13 @@
  * Internal dependencies
  */
 import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage, insertBlock } from '../support/utils';
+import {
+	newPost,
+	newDesktopBrowserPage,
+	insertBlock,
+	getEditedPostContent,
+	pressTimes,
+} from '../support/utils';
 
 describe( 'adding blocks', () => {
 	beforeAll( async () => {
@@ -34,9 +40,43 @@ describe( 'adding blocks', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Quote block' );
 
+		// Arrow down into default appender.
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+
+		// Focus should be moved to block focus boundary on a block which does
+		// not have its own inputs (e.g. image). Proceeding to press enter will
+		// append the default block. Pressing backspace on the focused block
+		// will remove it.
+		await page.keyboard.type( '/image' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
 		// Using the regular inserter
-		await insertBlock( 'Code' );
-		await page.keyboard.type( 'Code block' );
+		await insertBlock( 'Preformatted' );
+		await page.keyboard.type( 'Pre block' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+
+		// Verify vertical traversal at offset. This has been buggy in the past
+		// where verticality on a blank newline would skip into previous block.
+		await page.keyboard.type( 'Foo' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
+		await pressTimes( 'ArrowRight', 3 );
+		await pressTimes( 'Delete', 6 );
+		await page.keyboard.type( ' text' );
+
+		// Ensure newline preservation in shortcode block.
+		// See: https://github.com/WordPress/gutenberg/issues/4456
+		await insertBlock( 'Shortcode' );
+		await page.keyboard.type( '[myshortcode]With multiple' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'lines preserved[/myshortcode]' );
 
 		// Unselect blocks to avoid conflicts with the inbetween inserter
 		await page.click( '.editor-post-title__input' );
@@ -53,9 +93,6 @@ describe( 'adding blocks', () => {
 		const codeEditorButton = ( await page.$x( '//button[contains(text(), \'Code Editor\')]' ) )[ 0 ];
 		await codeEditorButton.click( 'button' );
 
-		// Assertions
-		const textEditorContent = await page.$eval( '.editor-post-text-editor', ( element ) => element.value );
-
-		expect( textEditorContent ).toMatchSnapshot();
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

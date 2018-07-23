@@ -88,6 +88,74 @@ describe( 'ContrastChecker', () => {
 		expect( componentWrapper ).toMatchSnapshot();
 	} );
 
+	test( 'should take into consideration wherever text is large or not', () => {
+		const componentWrapperSmallText = mount(
+			<ContrastChecker
+				backgroundColor="#C44B4B"
+				textColor="#000000"
+				isLargeText={ false }
+			/>
+		);
+
+		expect( componentWrapperSmallText ).toMatchSnapshot();
+
+		const componentWrapperLargeText = mount(
+			<ContrastChecker
+				backgroundColor="#C44B4B"
+				textColor="#000000"
+				isLargeText={ true }
+			/>
+		);
+
+		expect( componentWrapperLargeText.html() ).toBeNull();
+	} );
+
+	test( 'should take into consideration the font size passed', () => {
+		const componentWrapperSmallFontSize = mount(
+			<ContrastChecker
+				backgroundColor="#C44B4B"
+				textColor="#000000"
+				fontSize={ 17 }
+			/>
+		);
+
+		expect( componentWrapperSmallFontSize ).toMatchSnapshot();
+
+		const componentWrapperLargeText = mount(
+			<ContrastChecker
+				backgroundColor="#C44B4B"
+				textColor="#000000"
+				fontSize={ 18 }
+			/>
+		);
+
+		expect( componentWrapperLargeText.html() ).toBeNull();
+	} );
+
+	test( 'should use isLargeText to make decisions if both isLargeText and fontSize props are passed', () => {
+		const componentWrapper = mount(
+			<ContrastChecker
+				backgroundColor="#C44B4B"
+				textColor="#000000"
+				fontSize={ 17 }
+				isLargeText={ true }
+			/>
+		);
+
+		expect( componentWrapper.html() ).toBeNull();
+
+		const componentWrapperNoLargeText = mount(
+			<ContrastChecker
+				backgroundColor="#C44B4B"
+				textColor="#000000"
+				fontSize={ 18 }
+				isLargeText={ false }
+			/>
+		);
+
+		expect( componentWrapperNoLargeText ).toMatchSnapshot();
+	} );
+
 	test( 'should render null when the colors meet AA WCAG guidelines, with only fallback colors.', () => {
 		const componentWrapper = mount(
 			<ContrastChecker

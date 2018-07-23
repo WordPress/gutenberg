@@ -18,9 +18,10 @@ import {
 	PreserveScrollInReorder,
 } from '@wordpress/editor';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { compose, Fragment } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 import { PluginArea } from '@wordpress/plugins';
 import { withViewportMatch } from '@wordpress/viewport';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -61,7 +62,8 @@ function Layout( {
 
 	const publishLandmarkProps = {
 		role: 'region',
-		'aria-label': __( 'Publish' ),
+		/* translators: accessibility text for the publish landmark region. */
+		'aria-label': __( 'Editor publish' ),
 		tabIndex: -1,
 	};
 	return (
@@ -76,7 +78,13 @@ function Layout( {
 			} } />
 			<AutosaveMonitor />
 			<Header />
-			<div className="edit-post-layout__content" role="region" aria-label={ __( 'Editor content' ) } tabIndex="-1">
+			<div
+				className="edit-post-layout__content"
+				role="region"
+				/* translators: accessibility text for the content landmark region. */
+				aria-label={ __( 'Editor content' ) }
+				tabIndex="-1"
+			>
 				<EditorNotices />
 				<PreserveScrollInReorder />
 				<EditorModeKeyboardShortcuts />

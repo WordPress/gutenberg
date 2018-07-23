@@ -6,14 +6,15 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createContext, createHigherOrderComponent } from '@wordpress/element';
+import { createContext } from '@wordpress/element';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 const { Consumer, Provider } = createContext( {
 	name: '',
 	isSelected: false,
 	focusedElement: null,
 	setFocusedElement: noop,
-	uid: null,
+	clientId: null,
 } );
 
 export { Provider as BlockEditContextProvider };

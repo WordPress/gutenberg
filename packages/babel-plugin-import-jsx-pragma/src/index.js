@@ -53,7 +53,7 @@ export default function( babel ) {
 				const { scopeVariable, isDefault } = getOptions( state );
 
 				// Test that at least one import specifier exists matching the
-				// scope variable name. The module source is not verfied since
+				// scope variable name. The module source is not verified since
 				// we must avoid introducing a conflicting import name, even if
 				// the scope variable is referenced from a different source.
 				state.hasImportedScopeVariable = path.node.specifiers.some( ( specifier ) => {

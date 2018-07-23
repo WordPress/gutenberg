@@ -1,6 +1,6 @@
 [
     {
-        "uid": "_uid_0",
+        "clientId": "_clientId_0",
         "name": "core/subhead",
         "isValid": true,
         "attributes": {
@@ -8,7 +8,9 @@
                 "This is a ",
                 {
                     "type": "em",
-                    "children": "subhead"
+                    "children": [
+                        "subhead"
+                    ]
                 },
                 "."
             ]

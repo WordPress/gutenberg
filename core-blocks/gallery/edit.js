@@ -25,7 +25,7 @@ import {
 	MediaUpload,
 	MediaPlaceholder,
 	InspectorControls,
-	editorMediaUpload,
+	mediaUpload,
 } from '@wordpress/editor';
 
 /**
@@ -137,7 +137,7 @@ class GalleryEdit extends Component {
 	addFiles( files ) {
 		const currentImages = this.props.attributes.images || [];
 		const { noticeOperations, setAttributes } = this.props;
-		editorMediaUpload( {
+		mediaUpload( {
 			allowedType: 'image',
 			filesList: files,
 			onFileChange: ( images ) => {

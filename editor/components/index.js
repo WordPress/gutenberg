@@ -20,8 +20,8 @@ export { default as RichText } from './rich-text';
 export { default as RichTextProvider } from './rich-text/provider';
 export { default as MediaPlaceholder } from './media-placeholder';
 export { default as MediaUpload } from './media-upload';
-export { default as UrlInput } from './url-input';
-export { default as UrlInputButton } from './url-input/button';
+export { default as URLInput, UrlInput } from './url-input';
+export { default as URLInputButton, UrlInputButton } from './url-input/button';
 
 // Post Related Components
 export { default as AutosaveMonitor } from './autosave-monitor';

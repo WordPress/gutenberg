@@ -2,9 +2,9 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { withInstanceId } from '@wordpress/components';
-import { compose, Fragment } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { compose, withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies

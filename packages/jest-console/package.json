@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/jest-console",
-	"version": "1.0.7",
+	"version": "2.0.1",
 	"description": "Custom Jest matchers for the Console object",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -25,8 +25,9 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
+		"@babel/runtime": "^7.0.0-beta.52",
 		"jest-matcher-utils": "^22.4.3",
-		"lodash": "4.17.10"
+		"lodash": "^4.17.10"
 	},
 	"peerDependencies": {
 		"jest": ">=22"

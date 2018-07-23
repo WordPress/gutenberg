@@ -7,7 +7,7 @@ import { assign, includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent } from '@wordpress/element';
+import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport, getBlockSupport } from '@wordpress/blocks';
 
