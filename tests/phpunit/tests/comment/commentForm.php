@@ -80,4 +80,24 @@ class Tests_Comment_CommentForm extends WP_UnitTestCase {
 		unset( $defaults['submit_button'] );
 		return $defaults;
 	}
+
+	/**
+	 * @ticket 44126
+	 */
+	public function test_fields_should_include_cookies_consent() {
+		$p = self::factory()->post->create();
+
+		add_filter( 'option_show_comments_cookies_opt_in', '__return_true' );
+
+		$args = array(
+			'fields' => array(
+				'author' => 'Hello World!',
+			),
+		);
+		$form = get_echo( 'comment_form', array( $args, $p ) );
+
+		remove_filter( 'option_show_comments_cookies_opt_in', '__return_true' );
+
+		$this->assertRegExp( '|<p class="comment\-form\-cookies\-consent">.*?</p>|', $form );
+	}
 }
