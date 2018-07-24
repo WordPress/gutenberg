@@ -190,6 +190,7 @@ const pet = "Matt's dog";
 const pet = 'Matt’s dog';
 // Also good:
 const oddString = "She said 'This is odd.'";
+```
 
 You should use ES6 Template Strings over string concatenation whenever possible:
 
