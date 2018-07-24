@@ -82,7 +82,7 @@ window._wpGutenbergDefaultPost = {
 			'<!-- /wp:paragraph -->',
 
 			'<!-- wp:gallery {"columns":2} -->',
-			'<ul class="wp-block-gallery alignnone columns-2 is-cropped">',
+			'<ul class="wp-block-gallery columns-2 is-cropped">',
 			'<li class="blocks-gallery-item"><figure><img src="https://cldup.com/n0g6ME5VKC.jpg" alt="" /></figure></li>',
 			'<li class="blocks-gallery-item"><figure><img src="https://cldup.com/ZjESfxPI3R.jpg" alt="" /></figure></li>',
 			'<li class="blocks-gallery-item"><figure><img src="https://cldup.com/EKNF8xD2UM.jpg" alt="" /></figure></li>',
@@ -133,7 +133,7 @@ window._wpGutenbergDefaultPost = {
 			'<!-- /wp:paragraph -->',
 
 			'<!-- wp:pullquote -->',
-			'<blockquote class="wp-block-pullquote alignnone"><p>Code is Poetry</p><cite>The WordPress community</cite></blockquote>',
+			'<blockquote class="wp-block-pullquote"><p>Code is Poetry</p><cite>The WordPress community</cite></blockquote>',
 			'<!-- /wp:pullquote -->',
 
 			'<!-- wp:paragraph {"align":"center"} -->',
