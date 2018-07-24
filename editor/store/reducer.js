@@ -288,7 +288,7 @@ export const editor = flow( [
 
 			case 'RECEIVE_BLOCKS':
 				return {
-					...state,
+					...omit( state, action.clientIdsToRemove ),
 					...getFlattenedBlocks( action.blocks ),
 				};
 
@@ -405,6 +405,18 @@ export const editor = flow( [
 	},
 
 	blockOrder( state = {}, action ) {
+		const removeClientIdsFromState = ( initialState, clientIds ) => {
+			return flow( [
+				// Remove inner block ordering for removed blocks
+				( nextState ) => omit( nextState, clientIds ),
+
+				// Remove deleted blocks from other blocks' orderings
+				( nextState ) => mapValues( nextState, ( subState ) => (
+					without( subState, ...clientIds )
+				) ),
+			] )( initialState );
+		};
+
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
 			case 'SETUP_EDITOR_STATE':
@@ -412,7 +424,7 @@ export const editor = flow( [
 
 			case 'RECEIVE_BLOCKS':
 				return {
-					...state,
+					...removeClientIdsFromState( state, action.clientIdsToRemove ),
 					...omit( mapBlockOrder( action.blocks ), '' ),
 				};
 
@@ -520,15 +532,7 @@ export const editor = flow( [
 			}
 
 			case 'REMOVE_BLOCKS':
-				return flow( [
-					// Remove inner block ordering for removed blocks
-					( nextState ) => omit( nextState, action.clientIds ),
-
-					// Remove deleted blocks from other blocks' orderings
-					( nextState ) => mapValues( nextState, ( subState ) => (
-						without( subState, ...action.clientIds )
-					) ),
-				] )( state );
+				removeClientIdsFromState( state, action.clientIds );
 		}
 
 		return state;
