@@ -697,6 +697,20 @@ class WP_Test_REST_Attachments_Controller extends WP_Test_REST_Post_Type_Control
 		$this->assertEquals( '', $attachment['alt_text'] );
 	}
 
+	/**
+	 * @ticket 40861
+	 */
+	public function test_create_item_ensure_relative_path() {
+		wp_set_current_user( self::$author_id );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola.jpg' );
+		$request->set_body( file_get_contents( $this->test_file ) );
+		$response   = rest_get_server()->dispatch( $request );
+		$attachment = $response->get_data();
+		$this->assertNotContains( ABSPATH, get_post_meta( $attachment['id'], '_wp_attached_file', true ) );
+	}
+
 	public function test_update_item() {
 		wp_set_current_user( self::$editor_id );
 		$attachment_id = $this->factory->attachment->create_object( $this->test_file, 0, array(
