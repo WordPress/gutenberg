@@ -25,6 +25,13 @@ export default function( node, doc, schema ) {
 		node = replaceTag( node, 'strong', doc );
 	} else if ( node.nodeName === 'I' ) {
 		node = replaceTag( node, 'em', doc );
+	} else if ( node.nodeName === 'A' ) {
+		if ( node.target.toLowerCase() === '_blank' ) {
+			node.rel = 'noreferrer noopener';
+		} else {
+			node.removeAttribute( 'target' );
+			node.removeAttribute( 'rel' );
+		}
 	}
 
 	if (
