@@ -1,6 +1,6 @@
-# @wordpress/html-entities
+# HTML Entities
 
-HTML entities utils for WordPress.
+HTML entity utilities for WordPress.
 
 ## Installation
 

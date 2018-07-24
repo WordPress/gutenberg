@@ -1,6 +1,6 @@
-# @wordpress/dom-ready
+# DOM Ready
 
-Executes a function after the DOM has loaded.
+Execute callback after the DOM is loaded.
 
 ## Installation
 

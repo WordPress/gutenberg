@@ -1,4 +1,4 @@
-# @wordpress/autop
+# Autop
 
 JavaScript port of WordPress's automatic paragraph function `autop` and the `removep` reverse behavior.
 

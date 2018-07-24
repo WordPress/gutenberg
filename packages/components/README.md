@@ -1,5 +1,4 @@
-Components
-==========
+# Components
 
 This packages includes a library of generic WordPress components to be used for creating common UI elements shared between screens and features of the WordPress dashboard.
 

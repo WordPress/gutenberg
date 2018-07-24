@@ -1,4 +1,4 @@
-# @wordpress/blocks
+# Blocks
 
 "Block" is the abstract term used to describe units of markup that, composed
 together, form the content or layout of a webpage. The idea combines concepts

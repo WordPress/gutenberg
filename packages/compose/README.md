@@ -1,6 +1,6 @@
-# @wordpress/compose
+# Compose
 
-The `compose` package is a collection of handy [Higher Order Components](https://facebook.github.io/react/docs/higher-order-components.html) you can use to wrap your WordPress components and provide some basic features like: State, instanceId, pure...
+The `compose` package is a collection of handy [Higher Order Components](https://facebook.github.io/react/docs/higher-order-components.html) (HOCs) you can use to wrap your WordPress components and provide some basic features like: state, instance id, pure...
 
 ## Installation
 

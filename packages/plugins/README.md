@@ -1,4 +1,4 @@
-# @wordpress/plugins
+# Plugins
 
 Plugins module for WordPress.
 
