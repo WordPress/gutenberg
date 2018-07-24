@@ -277,14 +277,13 @@ export class RichText extends Component {
 		window.console.log( 'Received HTML:\n\n', HTML );
 		window.console.log( 'Received plain text:\n\n', this.pastedPlainText );
 
-		// There is a selection, check if a link is pasted.
+		// There is a selection, check if a URL is pasted.
 		if ( ! this.editor.selection.isCollapsed() ) {
 			const linkRegExp = /^(?:https?:)?\/\/\S+$/i;
 			const pastedText = event.content.replace( /<[^>]+>/g, '' ).trim();
-			const selectedText = this.editor.selection.getContent().replace( /<[^>]+>/g, '' ).trim();
 
-			// The pasted text is a link, and the selected text is not.
-			if ( linkRegExp.test( pastedText ) && ! linkRegExp.test( selectedText ) ) {
+			// A URL was pasted, turn the selection into a link
+			if ( linkRegExp.test( pastedText ) ) {
 				this.editor.execCommand( 'mceInsertLink', false, {
 					href: this.editor.dom.decode( pastedText ),
 				} );
