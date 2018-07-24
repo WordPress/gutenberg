@@ -372,6 +372,8 @@ inserter: false,
 multiple: false,
 ```
 
+Note: you should handle either the `id` prop or the `anchor` attribute in the return value of the `save` method.
+
 ## Edit and Save
 
 The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](../docs/block-api/block-edit-save.md).
