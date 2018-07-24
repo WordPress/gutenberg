@@ -27,10 +27,6 @@ export const settings = {
 
 	category: 'common',
 
-	supports: {
-		multiple: false,
-	},
-
 	attributes: {
 		content: {
 			type: 'array',
