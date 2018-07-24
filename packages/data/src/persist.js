@@ -1,5 +1,5 @@
 // Defaults to the local storage.
-let persistenceStorage = window.localStorage;
+let persistenceStorage;
 
 /**
  * Sets a different persistence storage.
@@ -8,6 +8,15 @@ let persistenceStorage = window.localStorage;
  */
 export function setPersistenceStorage( storage ) {
 	persistenceStorage = storage;
+}
+
+/**
+ * Get the persistence storage handler.
+ *
+ * @return {Object} Persistence storage.
+ */
+export function getPersistenceStorage() {
+	return persistenceStorage || window.localStorage;
 }
 
 /**
@@ -71,13 +80,4 @@ export function restrictPersistence( reducer, keyToPersist ) {
 
 		return nextState;
 	};
-}
-
-/**
- * Get the persistence storage handler.
- *
- * @return {Object} Persistence storage.
- */
-export function getPersistenceStorage() {
-	return persistenceStorage;
 }
