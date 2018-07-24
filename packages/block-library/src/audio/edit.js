@@ -44,8 +44,8 @@ class AudioEdit extends Component {
 			if ( file ) {
 				editorMediaUpload( {
 					filesList: [ file ],
-					onFileChange: ( [ { url } ] ) => {
-						setAttributes( { src: url } );
+					onFileChange: ( [ { id: mediaId, url } ] ) => {
+						setAttributes( { id: mediaId, src: url } );
 					},
 					onError: ( e ) => {
 						setAttributes( { src: undefined, id: undefined } );
