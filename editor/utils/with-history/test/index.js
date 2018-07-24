@@ -16,6 +16,8 @@ describe( 'withHistory', () => {
 			past: [],
 			present: 0,
 			future: [],
+			lastAction: null,
+			shouldCreateUndoLevel: false,
 		} );
 	} );
 
@@ -23,21 +25,26 @@ describe( 'withHistory', () => {
 		const reducer = withHistory()( counter );
 
 		let state;
+		const action = { type: 'INCREMENT' };
 		state = reducer( undefined, {} );
-		state = reducer( state, { type: 'INCREMENT' } );
+		state = reducer( state, action );
 
 		expect( state ).toEqual( {
 			past: [ 0 ],
 			present: 1,
 			future: [],
+			lastAction: action,
+			shouldCreateUndoLevel: false,
 		} );
 
-		state = reducer( state, { type: 'INCREMENT' } );
+		state = reducer( state, action );
 
 		expect( state ).toEqual( {
 			past: [ 0, 1 ],
 			present: 2,
 			future: [],
+			lastAction: action,
+			shouldCreateUndoLevel: false,
 		} );
 	} );
 
@@ -53,6 +60,8 @@ describe( 'withHistory', () => {
 			past: [],
 			present: 0,
 			future: [ 1 ],
+			lastAction: null,
+			shouldCreateUndoLevel: false,
 		} );
 	} );
 
@@ -76,6 +85,8 @@ describe( 'withHistory', () => {
 			past: [ 0 ],
 			present: 1,
 			future: [],
+			lastAction: null,
+			shouldCreateUndoLevel: false,
 		} );
 	} );
 
@@ -98,6 +109,8 @@ describe( 'withHistory', () => {
 			past: [],
 			present: 1,
 			future: [],
+			lastAction: null,
+			shouldCreateUndoLevel: false,
 		} );
 	} );
 
@@ -113,6 +126,8 @@ describe( 'withHistory', () => {
 			past: [ 0 ], // Needs at least one history
 			present: 2,
 			future: [],
+			lastAction: { type: 'INCREMENT' },
+			shouldCreateUndoLevel: false,
 		} );
 	} );
 
@@ -137,6 +152,8 @@ describe( 'withHistory', () => {
 			past: [ 0 ],
 			present: 1,
 			future: [],
+			lastAction: { type: 'INCREMENT' },
+			shouldCreateUndoLevel: false,
 		} );
 
 		state = reducer( state, { type: 'INCREMENT' } );
@@ -145,6 +162,8 @@ describe( 'withHistory', () => {
 			past: [ 0 ],
 			present: 2,
 			future: [],
+			lastAction: { type: 'INCREMENT' },
+			shouldCreateUndoLevel: false,
 		} );
 	} );
 
@@ -162,6 +181,8 @@ describe( 'withHistory', () => {
 			past: [ 0 ],
 			present: 1,
 			future: [],
+			lastAction: null,
+			shouldCreateUndoLevel: true,
 		} );
 
 		state = reducer( state, { type: 'INCREMENT' } );
@@ -170,6 +191,8 @@ describe( 'withHistory', () => {
 			past: [ 0, 1 ],
 			present: 2,
 			future: [],
+			lastAction: { type: 'INCREMENT' },
+			shouldCreateUndoLevel: false,
 		} );
 	} );
 } );
