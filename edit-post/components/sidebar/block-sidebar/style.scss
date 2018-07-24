@@ -10,6 +10,10 @@
 		color: $dark-gray-500;
 	}
 
+	> div:last-child {
+		margin-bottom: 0;
+	}
+
 	&:first-child {
 		border-top: 1px solid $light-gray-500;
 		margin-top: 16px;
