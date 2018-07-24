@@ -193,6 +193,7 @@ class FileEdit extends Component {
 						<RichText
 							wrapperClassName={ `${ className }__textlink` }
 							tagName="div" // must be block-level or else cursor disappears
+							format="string"
 							value={ fileName }
 							multiline="false"
 							placeholder={ __( 'Write file name…' ) }

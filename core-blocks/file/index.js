@@ -10,7 +10,6 @@ import { __ } from '@wordpress/i18n';
 import { createBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
-import { renderToString } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -203,15 +202,9 @@ export const settings = {
 			downloadButtonText,
 		} = attributes;
 
-		const showFileName = !! fileName && !! fileName.length;
-
-		// fileName value is set by a RichText component, so convert it to a
-		// string for use as an element attribute.
-		const downloadButtonFileName = renderToString( fileName );
-
 		return ( href &&
 			<div>
-				{ showFileName &&
+				{ fileName &&
 					<a
 						href={ textLinkHref }
 						target={ textLinkTarget }
@@ -224,7 +217,7 @@ export const settings = {
 					<a
 						href={ href }
 						className="wp-block-file__button"
-						download={ downloadButtonFileName }>
+						download={ fileName || '' }>
 						{ downloadButtonText }
 					</a>
 				}
