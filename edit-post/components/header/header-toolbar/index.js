@@ -30,11 +30,12 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport } ) {
 			className="edit-post-header-toolbar"
 			aria-label={ __( 'Editor Toolbar' ) }
 		>
-			<Inserter position="bottom right">
+			<div>
+				<Inserter position="bottom right" />
 				<DotTip id="core/editor.inserter">
 					{ __( 'Welcome to the wonderful world of blocks! Click the “+” (“Add block”) button to add a new block. There are blocks available for all kind of content: you can insert text, headings, images, lists, and lots more!' ) }
 				</DotTip>
-			</Inserter>
+			</div>
 			<EditorHistoryUndo />
 			<EditorHistoryRedo />
 			<TableOfContents />
