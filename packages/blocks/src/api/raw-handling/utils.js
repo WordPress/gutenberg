@@ -7,6 +7,7 @@ import { omit, mergeWith, includes, noop } from 'lodash';
  * WordPress dependencies
  */
 import { unwrap, insertAfter, remove } from '@wordpress/dom';
+import { hasBlockSupport } from '..';
 
 /**
  * Browser dependencies
@@ -67,7 +68,18 @@ export function isPhrasingContent( node ) {
  * @return {Object} A complete block content schema.
  */
 export function getBlockContentSchema( transforms ) {
-	const schemas = transforms.map( ( { schema } ) => schema );
+	const schemas = transforms.map( ( { blockName, schema } ) => {
+		// If the block supports the "anchor" functionality, it needs to keep its ID attribute.
+		if ( hasBlockSupport( blockName, 'anchor' ) ) {
+			for ( const tag in schema ) {
+				if ( ! schema[ tag ].attributes ) {
+					schema[ tag ].attributes = [];
+				}
+				schema[ tag ].attributes.push( 'id' );
+			}
+		}
+		return schema;
+	} );
 
 	return mergeWith( {}, ...schemas, ( objValue, srcValue, key ) => {
 		if ( key === 'children' ) {
@@ -197,7 +209,7 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 				if ( node.hasAttributes() ) {
 					// Strip invalid attributes.
 					Array.from( node.attributes ).forEach( ( { name } ) => {
-						if ( name !== 'class' && name !== 'id' && ! includes( attributes, name ) ) {
+						if ( name !== 'class' && ! includes( attributes, name ) ) {
 							node.removeAttribute( name );
 						}
 					} );
