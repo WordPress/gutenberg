@@ -9,8 +9,8 @@ import classnames from 'classnames';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { ClipboardButton, Button } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
+import { ClipboardButton, Button, ExternalLink } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -48,7 +48,7 @@ class PostPermalink extends Component {
 	componentDidUpdate( prevProps, prevState ) {
 		// If we've just stopped editing the permalink, focus on the new permalink.
 		if ( prevState.isEditingPermalink && ! this.state.isEditingPermalink ) {
-			this.permalinkButton.focus();
+			this.linkElement.focus();
 		}
 	}
 
@@ -79,15 +79,15 @@ class PostPermalink extends Component {
 				<span className="editor-post-permalink__label">{ __( 'Permalink:' ) }</span>
 
 				{ ! isEditingPermalink &&
-					<Button
+					<ExternalLink
 						className="editor-post-permalink__link"
 						href={ ! isPublished ? postLink : samplePermalink }
 						target="_blank"
-						ref={ ( permalinkButton ) => this.permalinkButton = permalinkButton }
+						ref={ ( linkElement ) => this.linkElement = linkElement }
 					>
 						{ decodeURI( samplePermalink ) }
 						&lrm;
-					</Button>
+					</ExternalLink>
 				}
 
 				{ isEditingPermalink &&

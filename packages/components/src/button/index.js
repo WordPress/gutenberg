@@ -8,6 +8,11 @@ import classnames from 'classnames';
  */
 import { createElement, forwardRef } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import './style.scss';
+
 export function Button( props, ref ) {
 	const {
 		href,
