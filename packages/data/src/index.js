@@ -12,6 +12,7 @@ export { default as withSelect } from './components/with-select';
 export { default as withDispatch } from './components/with-dispatch';
 export { default as RegistryProvider } from './components/registry-provider';
 export { createRegistry } from './registry';
+export { withRehydration, loadAndPersist } from './deprecated';
 
 /**
  * The combineReducers helper function turns an object whose values are different
