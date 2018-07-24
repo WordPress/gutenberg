@@ -10,9 +10,9 @@ import { createSlotFill } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 
-const { Fill: BlockSettingsMenuPluginsGroup, Slot } = createSlotFill( 'BlockSettingsMenuPluginsGroup' );
+const { Fill: PluginBlockSettingsMenuGroup, Slot } = createSlotFill( 'BlockSettingsMenuPluginsGroup' );
 
-const BlockSettingsMenuPluginsGroupSlot = ( { fillProps, selectedBlocks } ) => {
+const PluginBlockSettingsMenuGroupSlot = ( { fillProps, selectedBlocks } ) => {
 	selectedBlocks = map( selectedBlocks, ( block ) => block.name );
 	return (
 		<Slot fillProps={ { ...fillProps, selectedBlocks } } >
@@ -26,8 +26,8 @@ const BlockSettingsMenuPluginsGroupSlot = ( { fillProps, selectedBlocks } ) => {
 	);
 };
 
-BlockSettingsMenuPluginsGroup.Slot = withSelect( ( select, { fillProps: { clientIds } } ) => ( {
+PluginBlockSettingsMenuGroup.Slot = withSelect( ( select, { fillProps: { clientIds } } ) => ( {
 	selectedBlocks: select( 'core/editor' ).getBlocksByUID( clientIds ),
-} ) )( BlockSettingsMenuPluginsGroupSlot );
+} ) )( PluginBlockSettingsMenuGroupSlot );
 
-export default BlockSettingsMenuPluginsGroup;
+export default PluginBlockSettingsMenuGroup;

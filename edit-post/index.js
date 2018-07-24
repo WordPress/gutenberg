@@ -83,7 +83,8 @@ export function initializeEditor( id, postType, postId, settings, overridePost )
 	};
 }
 
-export { default as PluginBlockSettingsMenuItem } from './components/block-settings-menu';
+export { default as PluginBlockSettingsMenuItem } from './components/block-settings-menu/plugin-block-settings-menu-item';
+export { default as PluginBlockSettingsMenuGroup } from './components/block-settings-menu/plugin-block-settings-menu-group';
 export { default as PluginPostPublishPanel } from './components/sidebar/plugin-post-publish-panel';
 export { default as PluginPostStatusInfo } from './components/sidebar/plugin-post-status-info';
 export { default as PluginPrePublishPanel } from './components/sidebar/plugin-pre-publish-panel';
