@@ -203,13 +203,15 @@ export const settings = {
 			downloadButtonText,
 		} = attributes;
 
+		const showFileName = !! fileName && !! fileName.length;
+
 		// fileName value is set by a RichText component, so convert it to a
 		// string for use as an element attribute.
 		const downloadButtonFileName = renderToString( fileName );
 
 		return ( href &&
 			<div>
-				{ fileName &&
+				{ showFileName &&
 					<a
 						href={ textLinkHref }
 						target={ textLinkTarget }
