@@ -319,13 +319,13 @@ export function createRegistry( storeConfigs = {} ) {
 		const persistedString = persistenceStorage.getItem( storageKey );
 		if ( persistedString ) {
 			const persistedData = JSON.parse( persistedString );
-			Object.entries( namespaces ).forEach( ( [ reducerKey, { reducer, store, persist } ] ) => {
+			Object.entries( namespaces ).forEach( ( [ reducerKey, { store, persist } ] ) => {
 				if ( ! persist ) {
 					return;
 				}
 
 				const persistedState = {
-					...reducer( undefined, { type: '@@gutenberg/init' } ),
+					...store.getState(),
 					...get( persistedData, reducerKey ),
 				};
 
