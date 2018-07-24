@@ -1,6 +1,6 @@
-# @wordpress/url
+# URL
 
-A collection of utilities to manipulate URLs
+A collection of utilities to manipulate URLs.
 
 ## Installation
 

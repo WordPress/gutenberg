@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/viewport",
 	"version": "1.0.1",
-	"description": "Viewport module for WordPress",
+	"description": "Viewport module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [

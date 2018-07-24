@@ -1,4 +1,4 @@
-# @wordpress/block-serialization-spec-parser
+# Block Serialization Spec Parser
 
 This library contains the grammar file (`grammar.pegjs`) for WordPress posts which is a block serialization _specification_ which is used to generate the actual _parser_ which is also bundled in this package.
 

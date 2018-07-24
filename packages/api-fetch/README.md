@@ -1,6 +1,6 @@
-# @wordpress/api-fetch
+# API Fetch
 
-Wrapper around `window.fetch` to call WordPress REST APIs.
+Utility to make WordPress REST API requests. It's a wrapper around `window.fetch`.
 
 ## Installation
 

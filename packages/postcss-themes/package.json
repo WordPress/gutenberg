@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/postcss-themes",
 	"version": "1.0.1",
-	"description": "PostCSS plugin to generate theme colors",
+	"description": "PostCSS plugin to generate theme colors.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [

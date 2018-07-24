@@ -1,4 +1,4 @@
-# @wordpress/keycodes
+# Keycodes
 
 Keycodes utilities for WordPress, used to check the key pressed in events like `onKeyDown`. Contains keycodes constants for keyboard keys like `DOWN`, `UP`, `ENTER`, etc.
 

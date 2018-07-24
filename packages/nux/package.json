@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/nux",
 	"version": "1.0.0",
-	"description": "NUX (New User eXperience) module for WordPress",
+	"description": "NUX (New User eXperience) module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
