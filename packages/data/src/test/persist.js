@@ -56,7 +56,7 @@ describe( 'persiss registry', () => {
 			.toEqual( { storeKey: { chicken: true } } );
 	} );
 
-	it( 'should not trigger persistence if the value doesn\'t change', () => {
+	it( 'should not trigger persistence if the value doesn’t change', () => {
 		const storageKey = 'dumbStorageKey2';
 		let countCalls = 0;
 		const storage = {

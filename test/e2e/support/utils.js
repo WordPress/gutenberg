@@ -140,7 +140,7 @@ export async function waitForPageDimensions( width, height ) {
 
 export async function switchToEditor( mode ) {
 	await page.click( '.edit-post-more-menu [aria-label="More"]' );
-	const [ button ] = await page.$x( `//button[contains(text(), \'${ mode } Editor\')]` );
+	const [ button ] = await page.$x( `//button[contains(text(), '${ mode } Editor')]` );
 	await button.click( 'button' );
 }
 
@@ -229,7 +229,7 @@ export async function pressWithModifier( modifier, key ) {
  */
 export async function clickOnMoreMenuItem( buttonLabel ) {
 	await page.click( '.edit-post-more-menu [aria-label="More"]' );
-	const itemButton = ( await page.$x( `//button[contains(text(), \'${ buttonLabel }\')]` ) )[ 0 ];
+	const itemButton = ( await page.$x( `//button[contains(text(), '${ buttonLabel }')]` ) )[ 0 ];
 	await itemButton.click( 'button' );
 }
 

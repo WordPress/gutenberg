@@ -170,7 +170,11 @@ In almost all cases, a constant should be defined in the top-most scope of a fil
 
 ### Strings
 
-String literals should be declared with single-quotes *unless* the string itself contains a single-quote that would need to be escaped–in that case: use a double-quote. If the string contains a single-quote *and* a double-quote, you can use ES6 template strings to avoid escaping the quotes. In general, avoid backslash escaping quotes:
+String literals should be declared with single-quotes *unless* the string itself contains a single-quote that would need to be escaped–in that case: use a double-quote. If the string contains a single-quote *and* a double-quote, you can use ES6 template strings to avoid escaping the quotes.
+
+**Note:** The single-quote character (`'`) should never be used in place of an apostrophe (`’`) for words like `it’s` or `haven’t` in user-facing strings. For test code it's still encouraged to use a real apostrophe.
+
+In general, avoid backslash-escaping quotes:
 
 ```js
 // Bad:
@@ -180,18 +184,23 @@ const name = 'Matt';
 
 // Bad:
 const pet = 'Matt\'s dog';
-// Good:
+// Also bad (not using an apostrophe): 
 const pet = "Matt's dog";
+// Good:
+const pet = 'Matt’s dog';
+// Also good:
+const oddString = "She said 'This is odd.'";
+
+You should use ES6 Template Strings over string concatenation whenever possible:
+
+```js
+const name = 'Stacey';
 
 // Bad:
-const quotes = "I haven't a \"clue\".";
+alert( 'My name is ' + name + '.' );
 // Good:
-const quotes = `I haven't a "clue".`; 
+alert( `My name is ${ name }.` );
 ```
-
-This keeps strings as readable as possible.
-
-**Note:** Technically speaking, the single-quote character (`'`) should not be used in place of an apostrophe (`’`) for words like `it’s` or `haven’t`. That said, in many places, especially test code, the single-quote is used in place of an apostrophe for convenience.
 
 ## PHP
 

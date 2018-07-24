@@ -149,7 +149,7 @@ describe( 'block parser', () => {
 			expect( value ).toBe( 'chicken' );
 		} );
 
-		it( 'should return the matcher\'s string attribute value', () => {
+		it( 'should return the matcher’s string attribute value', () => {
 			const value = parseWithAttributeSchema(
 				'<audio src="#" loop>',
 				{
@@ -162,7 +162,7 @@ describe( 'block parser', () => {
 			expect( value ).toBe( '#' );
 		} );
 
-		it( 'should return the matcher\'s true boolean attribute value', () => {
+		it( 'should return the matcher’s true boolean attribute value', () => {
 			const value = parseWithAttributeSchema(
 				'<audio src="#" loop>',
 				{
@@ -175,7 +175,7 @@ describe( 'block parser', () => {
 			expect( value ).toBe( true );
 		} );
 
-		it( 'should return the matcher\'s true boolean attribute value on explicit attribute value', () => {
+		it( 'should return the matcher’s true boolean attribute value on explicit attribute value', () => {
 			const value = parseWithAttributeSchema(
 				'<audio src="#" loop="loop">',
 				{
@@ -188,7 +188,7 @@ describe( 'block parser', () => {
 			expect( value ).toBe( true );
 		} );
 
-		it( 'should return the matcher\'s false boolean attribute value', () => {
+		it( 'should return the matcher’s false boolean attribute value', () => {
 			const value = parseWithAttributeSchema(
 				'<audio src="#" autoplay>',
 				{

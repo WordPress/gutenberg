@@ -59,7 +59,7 @@ describe( 'New User Experience (NUX)', () => {
 		await clickAllTips( page );
 
 		// Make sure "Got it" button appears on the last tip.
-		const gotItButton = await page.$x( '//button[contains(text(), \'Got it\')]' );
+		const gotItButton = await page.$x( "//button[contains(text(), 'Got it')]" );
 		expect( gotItButton ).toHaveLength( 1 );
 
 		// Click the "Got it button".
