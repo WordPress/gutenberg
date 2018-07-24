@@ -1,13 +1,14 @@
 /**
  * Internal dependencies
  */
-import { getPersistenceStorage, restrictPersistence } from '../persist';
+import { getPersistenceStorage, setPersistenceStorage, restrictPersistence } from '../persist';
 import { createRegistry } from '../registry';
 
 describe( 'persiss registry', () => {
 	let registry;
 	beforeEach( () => {
 		registry = createRegistry();
+		setPersistenceStorage( window.localStorage );
 	} );
 
 	it( 'should load the initial value from the local storage integrating it into reducer default value.', () => {
@@ -53,6 +54,52 @@ describe( 'persiss registry', () => {
 		store.dispatch( { type: 'UPDATE' } );
 		expect( JSON.parse( getPersistenceStorage().getItem( storageKey ) ) )
 			.toEqual( { storeKey: { chicken: true } } );
+	} );
+
+	it( 'should not trigger persistence if the value doesn\'t change', () => {
+		const storageKey = 'dumbStorageKey2';
+		let countCalls = 0;
+		const storage = {
+			getItem() {
+				return this.item;
+			},
+			setItem( key, value ) {
+				countCalls++;
+				this.item = value;
+			},
+		};
+		setPersistenceStorage( storage );
+		const reducer = ( state = { ribs: true }, action ) => {
+			if ( action.type === 'UPDATE' ) {
+				return { chicken: true };
+			}
+
+			return state;
+		};
+		registry.registerStore( 'store1', {
+			reducer,
+			persist: true,
+			actions: {
+				update: () => ( { type: 'UPDATE' } ),
+			},
+		} );
+		registry.registerStore( 'store2', {
+			reducer,
+			actions: {
+				update: () => ( { type: 'UPDATE' } ),
+			},
+		} );
+		registry.setupPersistence( storageKey );
+
+		expect( countCalls ).toBe( 1 ); // Setup trigger initial persistence.
+
+		registry.dispatch( 'store1' ).update();
+
+		expect( countCalls ).toBe( 2 ); // Updating state trigger persistence.
+
+		registry.dispatch( 'store2' ).update();
+
+		expect( countCalls ).toBe( 2 ); // If the persisted state doesn't change, don't persist.
 	} );
 } );
 

@@ -47,6 +47,14 @@ export function restrictPersistence( reducer, keyToPersist ) {
 		const nextState = reducer( state, action );
 
 		if ( action.type === 'SERIALIZE' ) {
+			// Returning the same instance if the state is kept identical avoids reserializing again
+			if (
+				action.previousState &&
+				action.previousState[ keyToPersist ] === nextState[ keyToPersist ]
+			) {
+				return action.previousState;
+			}
+
 			return { [ keyToPersist ]: nextState[ keyToPersist ] };
 		}
 

@@ -5,6 +5,11 @@ import { createStore } from 'redux';
 import { flowRight, without, mapValues, overEvery, get } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import isShallowEqual from '@wordpress/is-shallow-equal';
+
+/**
  * Internal dependencies
  */
 import dataStore from './store';
@@ -334,20 +339,27 @@ export function createRegistry( storeConfigs = {} ) {
 			previousValue = persistedData;
 		}
 
-		// Persist updated preferences
-		subscribe( () => {
+		const triggerPersist = () => {
 			const newValue = Object.entries( namespaces )
 				.filter( ( [ , { persist } ] ) => persist )
 				.reduce( ( memo, [ reducerKey, { reducer, store } ] ) => {
-					memo[ reducerKey ] = reducer( store.getState(), { type: 'SERIALIZE' } );
+					memo[ reducerKey ] = reducer( store.getState(), {
+						type: 'SERIALIZE',
+						previousState: get( previousValue, reducerKey ),
+					} );
 					return memo;
 				}, {} );
 
-			if ( newValue !== previousValue ) {
+			if ( ! isShallowEqual( newValue, previousValue ) ) {
 				persistenceStorage.setItem( storageKey, JSON.stringify( newValue ) );
-				previousValue = newValue;
 			}
-		} );
+
+			previousValue = newValue;
+		};
+
+		// Persist updated preferences
+		subscribe( triggerPersist );
+		triggerPersist();
 	}
 
 	Object.entries( {
