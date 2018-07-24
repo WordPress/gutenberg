@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { createElement } from 'react';
+import { createElement } from './react';
 
 /**
  * Component used as equivalent of Fragment with unescaped HTML, in cases where
@@ -13,7 +13,7 @@ import { createElement } from 'react';
  *
  * @return {WPElement} Dangerously-rendering element.
  */
-export function RawHTML( { children, ...props } ) {
+export default function RawHTML( { children, ...props } ) {
 	// The DIV wrapper will be stripped by serializer, unless there are
 	// non-children props present.
 	return createElement( 'div', {
