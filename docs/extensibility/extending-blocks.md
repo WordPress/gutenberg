@@ -20,6 +20,8 @@ function addListBlockClassName( settings, name ) {
 		return settings;
 	}
 
+	// Note: Object.assign() isn't supported in Edge, Andriod and mobile Opera
+	// See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign#Browser_compatibility for an up to date list.
 	return Object.assign( {}, settings, {
 		supports: Object.assign( {}, settings.supports, {
 			className: true
