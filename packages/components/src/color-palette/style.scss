@@ -3,6 +3,7 @@ $color-palette-circle-spacing: 14px;
 
 .components-color-palette {
 	margin-right: -14px;
+	overflow: hidden;
 
 	.components-color-palette__clear {
 		float: right;
