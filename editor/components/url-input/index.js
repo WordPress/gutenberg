@@ -91,10 +91,10 @@ class URLInput extends Component {
 		} );
 
 		const request = apiFetch( {
-			path: `/wp/v2/posts?${ stringify( {
+			path: `/gutenberg/v1/search?${ stringify( {
 				search: value,
 				per_page: 20,
-				orderby: 'relevance',
+				type: 'post',
 			} ) }`,
 		} );
 
@@ -230,7 +230,7 @@ class URLInput extends Component {
 									onClick={ () => this.selectLink( post.link ) }
 									aria-selected={ index === selectedSuggestion }
 								>
-									{ decodeEntities( post.title.rendered ) || __( '(no title)' ) }
+									{ decodeEntities( post.title ) || __( '(no title)' ) }
 								</button>
 							) ) }
 						</div>
