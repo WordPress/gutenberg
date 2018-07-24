@@ -5,9 +5,15 @@ import { createStore } from 'redux';
 import { flowRight, without, mapValues, overEvery, get } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import isShallowEqual from '@wordpress/is-shallow-equal';
+
+/**
  * Internal dependencies
  */
 import dataStore from './store';
+import { withRehydration, getPersistenceStorage } from './persist';
 
 /**
  * Returns true if the given argument appears to be a dispatchable action.
@@ -95,18 +101,20 @@ export function createRegistry( storeConfigs = {} ) {
 	/**
 	 * Registers a new sub-reducer to the global state and returns a Redux-like store object.
 	 *
-	 * @param {string} reducerKey Reducer key.
-	 * @param {Object} reducer    Reducer function.
+	 * @param {string}  reducerKey  Reducer key.
+	 * @param {Object}  reducer     Reducer function.
+	 * @param {boolean} persist     Should the reducer be persisted.
 	 *
 	 * @return {Object} Store Object.
 	 */
-	function registerReducer( reducerKey, reducer ) {
+	function registerReducer( reducerKey, reducer, persist = false ) {
 		const enhancers = [];
 		if ( window.__REDUX_DEVTOOLS_EXTENSION__ ) {
 			enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__( { name: reducerKey, instanceId: reducerKey } ) );
 		}
+		reducer = persist ? withRehydration( reducer ) : reducer;
 		const store = createStore( reducer, flowRight( enhancers ) );
-		namespaces[ reducerKey ] = { store };
+		namespaces[ reducerKey ] = { store, reducer, persist };
 
 		// Customize subscribe behavior to call listeners only on effective change,
 		// not on every dispatch.
@@ -242,7 +250,7 @@ export function createRegistry( storeConfigs = {} ) {
 			throw new TypeError( 'Must specify store reducer' );
 		}
 
-		const store = registerReducer( reducerKey, options.reducer );
+		const store = registerReducer( reducerKey, options.reducer, options.persist );
 
 		if ( options.actions ) {
 			registerActions( reducerKey, options.actions );
@@ -298,6 +306,62 @@ export function createRegistry( storeConfigs = {} ) {
 		return get( namespaces, [ reducerKey, 'actions' ] );
 	}
 
+	/**
+	 * Setup persistence for the current registry.
+	 *
+	 * @param {string} storageKey The storage key.
+	 */
+	function setupPersistence( storageKey ) {
+		const persistenceStorage = getPersistenceStorage();
+
+		// Load initially persisted value
+		let previousValue = null;
+		const persistedString = persistenceStorage.getItem( storageKey );
+		if ( persistedString ) {
+			const persistedData = JSON.parse( persistedString );
+			Object.entries( namespaces ).forEach( ( [ reducerKey, { store, persist } ] ) => {
+				if ( ! persist ) {
+					return;
+				}
+
+				const persistedState = {
+					...store.getState(),
+					...get( persistedData, reducerKey ),
+				};
+
+				store.dispatch( {
+					type: 'REDUX_REHYDRATE',
+					payload: persistedState,
+				} );
+			} );
+
+			// Avoid initial save.
+			previousValue = persistedData;
+		}
+
+		const triggerPersist = () => {
+			const newValue = Object.entries( namespaces )
+				.filter( ( [ , { persist } ] ) => persist )
+				.reduce( ( memo, [ reducerKey, { reducer, store } ] ) => {
+					memo[ reducerKey ] = reducer( store.getState(), {
+						type: 'SERIALIZE',
+						previousState: get( previousValue, reducerKey ),
+					} );
+					return memo;
+				}, {} );
+
+			if ( ! isShallowEqual( newValue, previousValue ) ) {
+				persistenceStorage.setItem( storageKey, JSON.stringify( newValue ) );
+			}
+
+			previousValue = newValue;
+		};
+
+		// Persist updated preferences
+		subscribe( triggerPersist );
+		triggerPersist();
+	}
+
 	Object.entries( {
 		'core/data': dataStore,
 		...storeConfigs,
@@ -312,5 +376,6 @@ export function createRegistry( storeConfigs = {} ) {
 		subscribe,
 		select,
 		dispatch,
+		setupPersistence,
 	};
 }
