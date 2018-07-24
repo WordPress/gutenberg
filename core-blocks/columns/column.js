@@ -20,11 +20,16 @@ export const settings = {
 	icon: 'columns',
 
 	description: __( 'A single column within a columns block.' ),
-
+	attributes: {
+		template: {
+			type: 'array',
+		},
+	},
 	category: 'common',
 
-	edit() {
-		return <InnerBlocks templateLock={ false } />;
+	edit( { attributes }  ) {
+		const { template } = attributes
+		return <InnerBlocks templateLock={ false } template={template} />;
 	},
 
 	save() {
