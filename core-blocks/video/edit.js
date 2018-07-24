@@ -15,7 +15,9 @@ import {
 	InspectorControls,
 	MediaPlaceholder,
 	RichText,
+	editorMediaUpload,
 } from '@wordpress/editor';
+import { getBlobByURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -33,6 +35,27 @@ class VideoEdit extends Component {
 
 		this.toggleAttribute = this.toggleAttribute.bind( this );
 		this.onSelectURL = this.onSelectURL.bind( this );
+	}
+
+	componentDidMount() {
+		const { attributes, noticeOperations, setAttributes } = this.props;
+		const { id, src = '' } = attributes;
+		if ( ! id && src.indexOf( 'blob:' ) === 0 ) {
+			const file = getBlobByURL( src );
+			if ( file ) {
+				editorMediaUpload( {
+					filesList: [ file ],
+					onFileChange: ( [ { url } ] ) => {
+						setAttributes( { src: url } );
+					},
+					onError: ( message ) => {
+						this.setState( { editing: true } );
+						noticeOperations.createErrorNotice( message );
+					},
+					allowedType: 'video',
+				} );
+			}
+		}
 	}
 
 	toggleAttribute( attribute ) {

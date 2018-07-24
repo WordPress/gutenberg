@@ -7,6 +7,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import { RichText } from '@wordpress/editor';
+import { createBlock } from '@wordpress/blocks';
+import { createBlobURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -66,6 +68,27 @@ export const settings = {
 			selector: 'video',
 			attribute: 'src',
 		},
+	},
+
+	transforms: {
+		from: [
+			{
+				type: 'files',
+				isMatch( files ) {
+					return files.length === 1 && files[ 0 ].type.indexOf( 'video/' ) === 0;
+				},
+				transform( files ) {
+					const file = files[ 0 ];
+					// We don't need to upload the media directly here
+					// It's already done as part of the `componentDidMount`
+					// in the video block
+					const block = createBlock( 'core/video', {
+						src: createBlobURL( file ),
+					} );
+					return block;
+				},
+			},
+		],
 	},
 
 	supports: {
