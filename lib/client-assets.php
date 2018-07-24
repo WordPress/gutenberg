@@ -229,7 +229,7 @@ function gutenberg_register_scripts_and_styles() {
 		gutenberg_get_script_polyfill( array(
 			'document.contains'   => 'wp-polyfill-node-contains',
 			'"DOMRect" in this && ( function( DOMRect ) {' .
-				'try { return new DOMRect(); return true; }' .
+				'try { new DOMRect(); return true; }' .
 				'catch ( e ) { return false; }' .
 			'}( this.DOMRect ) )' => 'wp-polyfill-dom-rect',
 		) ),
