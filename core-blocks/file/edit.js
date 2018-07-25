@@ -30,7 +30,6 @@ import { compose } from '@wordpress/compose';
  */
 import './editor.scss';
 import FileBlockInspector from './inspector';
-import FileBlockEditableLink from './editable-link';
 
 class FileEdit extends Component {
 	constructor() {
@@ -191,12 +190,16 @@ class FileEdit extends Component {
 				</BlockControls>
 				<div className={ classes }>
 					<div>
-						<FileBlockEditableLink
-							className={ className }
+						<RichText
+							wrapperClassName={ `${ className }__textlink` }
+							tagName="div" // must be block-level or else cursor disappears
+							format="string"
+							value={ fileName }
+							multiline="false"
 							placeholder={ __( 'Write file name…' ) }
-							text={ fileName }
-							href={ textLinkHref }
-							updateFileName={ ( text ) => setAttributes( { fileName: text } ) }
+							keepPlaceholderOnFocus
+							formattingControls={ [] } // disable controls
+							onChange={ ( text ) => setAttributes( { fileName: text } ) }
 						/>
 						{ showDownloadButton &&
 							<div className={ `${ className }__button-richtext-wrapper` }>

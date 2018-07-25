@@ -217,7 +217,11 @@ export const settings = {
 					<a
 						href={ href }
 						className="wp-block-file__button"
-						download={ fileName }>
+						// ensure download attribute is still set when fileName
+						// is undefined. Using '' here as `true` still leaves
+						// the attribute unset.
+						download={ fileName || '' }
+					>
 						{ downloadButtonText }
 					</a>
 				}
