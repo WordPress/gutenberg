@@ -502,9 +502,9 @@ export const settings = {
 			fontSize: fontSizeClass ? undefined : customFontSize,
 			textAlign: align,
 		};
-        
+        console.log(content)
 		return (
-			<p>{content[0]}</p>			
+			<p>{ content }</p>			
 		);
 	},
 };
