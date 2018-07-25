@@ -128,8 +128,8 @@ describe( 'removeInvalidHTML', () => {
 	} );
 
 	it( 'should keep some attributes', () => {
-		const input = '<a href="#keep">test</a>';
-		const output = '<a href="#keep">test</a>';
+		const input = '<a href="#keep" target="_blank">test</a>';
+		const output = '<a href="#keep" target="_blank">test</a>';
 		expect( removeInvalidHTML( input, schema ) ).toBe( output );
 	} );
 
