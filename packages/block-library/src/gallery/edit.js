@@ -168,6 +168,23 @@ class GalleryEdit extends Component {
 			/>
 		);
 
+		const formFileUpload = (
+			isSelected &&
+				<li className="blocks-gallery-item has-add-item-button">
+					<FormFileUpload
+						multiple
+						isLarge
+						className="core-blocks-gallery-add-item-button"
+						onChange={ this.uploadFromFiles }
+						accept="image/*"
+						icon="insert"
+					>
+						{ __( 'Upload an image' ) }
+					</FormFileUpload>
+				</li>
+
+		);
+
 		const controls = (
 			<BlockControls>
 				{ !! images.length && (
@@ -244,7 +261,8 @@ class GalleryEdit extends Component {
 				<Sortable className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }
 					items={ images }
 					onSortEnd={ this.onSortEnd }
-					dropZone={ dropZone }
+					firstNode={ dropZone }
+					lastNode={ formFileUpload }
 				>
 					{ images.map( ( img, index ) => (
 						<li className="blocks-gallery-item" key={ img.id || img.url }>
@@ -260,20 +278,6 @@ class GalleryEdit extends Component {
 							/>
 						</li>
 					) ) }
-					{ isSelected &&
-						<li className="blocks-gallery-item has-add-item-button">
-							<FormFileUpload
-								multiple
-								isLarge
-								className="block-library-gallery-add-item-button"
-								onChange={ this.uploadFromFiles }
-								accept="image/*"
-								icon="insert"
-							>
-								{ __( 'Upload an image' ) }
-							</FormFileUpload>
-						</li>
-					}
 				</Sortable>
 			</Fragment>
 		);

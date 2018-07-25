@@ -18,15 +18,15 @@ class Sortable extends Component {
 	 * @return {function} the Container creator
      */
 	getSortableList() {
-		const { items, children, className, dropZone } = this.props;
+		const { items, children, className, firstNode, lastNode } = this.props;
 
 		//create the sortable container:
 		return SortableContainer( () => {
 			//loop through all available children
 			return (
 				<ul className={ `components-sortable ${ className }` }>
-					{ dropZone }
-					{ children[ 0 ].map( ( child, index ) => {
+					{ firstNode }
+					{ children.map( ( child, index ) => {
 						child.props.tabindex = '0';
 
 						//generate a SortableElement using the item and the child
@@ -44,6 +44,7 @@ class Sortable extends Component {
 							<SortableItem key={ `item-${ index }` } index={ index } item={ items[ index ] } />
 						);
 					} ) }
+					{ lastNode }
 				</ul>
 			);
 		} );
