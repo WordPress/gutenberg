@@ -2,7 +2,8 @@ import { TextInput } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, compose, RawHTML } from '@wordpress/element';
+import { withInstanceId } from '@wordpress/components';
 
 export class RichText extends Component {
 
@@ -43,4 +44,26 @@ export class RichText extends Component {
         
 }
 
-export default RichText;
+const RichTextContainer = compose( [
+	withInstanceId,
+] )( RichText );
+
+RichTextContainer.Content = ( { value, format = 'element', tagName: Tag, ...props } ) => {
+    let children;
+	switch ( format ) {
+		case 'string':
+			children = <RawHTML>{ value }</RawHTML>;
+			break;
+		default:
+			children = value;
+			break;
+	}
+
+	if ( Tag ) {
+		return <Tag>{ children }</Tag>;
+	}
+
+	return children;
+};
+
+export default RichTextContainer;
