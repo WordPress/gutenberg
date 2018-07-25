@@ -9,3 +9,4 @@
 // and then stored as objects in state, from which it is then rendered for editing.
 import './store';
 export * from './api';
+export { withBlockContentContext } from './block-content-provider';

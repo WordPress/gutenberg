@@ -1,17 +1,16 @@
 /**
  * External dependencies
  */
-import { pick, isEqual, map } from 'lodash';
+import { pick, identity, isEqual, map } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { withContext } from '@wordpress/components';
 import { withViewportMatch } from '@wordpress/viewport';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { synchronizeBlocksWithTemplate } from '@wordpress/blocks';
+import { synchronizeBlocksWithTemplate, withBlockContentContext } from '@wordpress/blocks';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { compose } from '@wordpress/compose';
 
@@ -149,10 +148,13 @@ InnerBlocks = compose( [
 	} ),
 ] )( InnerBlocks );
 
-InnerBlocks.Content = ( { BlockContent } ) => {
-	return <BlockContent />;
-};
-
-InnerBlocks.Content = withContext( 'BlockContent' )()( InnerBlocks.Content );
+InnerBlocks.Content = withBlockContentContext(
+	identity
+)(
+	( { BlockContent } ) => {
+		console.log( BlockContent );
+		return <BlockContent />;
+	}
+);
 
 export default InnerBlocks;
