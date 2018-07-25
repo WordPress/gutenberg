@@ -5,6 +5,7 @@ const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
 const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
+const postcss = require( 'postcss' );
 
 const { get } = require( 'lodash' );
 const { basename } = require( 'path' );
@@ -241,6 +242,18 @@ const config = {
 				from: `./packages/${ packageName }/build-style/*.css`,
 				to: `./build/${ packageName }/`,
 				flatten: true,
+				transform: ( content ) => {
+					if ( config.mode === 'production' ) {
+						return postcss( [
+							require( 'cssnano' )( {
+								preset: 'default',
+							} ),
+						] )
+							.process( content, { from: 'src/app.css', to: 'dest/app.css' } )
+							.then( ( result ) => result.css );
+					}
+					return content;
+				},
 			} ) )
 		),
 	],
