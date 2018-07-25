@@ -61,7 +61,9 @@ class Popover extends Component {
 	componentDidMount() {
 		this.toggleWindowEvents( true );
 		this.refresh();
-		this.focus();
+		setTimeout( () => {
+			this.focus();
+		}, 0 );
 	}
 
 	componentDidUpdate( prevProps ) {

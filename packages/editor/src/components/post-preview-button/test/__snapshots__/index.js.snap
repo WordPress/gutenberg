@@ -8,10 +8,10 @@ exports[`PostPreviewButton render() should match the snapshot 1`] = `
   onClick={[Function]}
 >
   Preview
-  <WithSafeTimeout(WithSelect(WithDispatch(DotTip)))
+  <WithSelect(WithDispatch(DotTip))
     id="core/editor.preview"
   >
     Click ‘Preview’ to load a preview of this page, so you can make sure you’re happy with your blocks.
-  </WithSafeTimeout(WithSelect(WithDispatch(DotTip)))>
+  </WithSelect(WithDispatch(DotTip))>
 </Button>
 `;
