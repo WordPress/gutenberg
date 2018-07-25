@@ -136,7 +136,10 @@ function buildFileFor( file, silent, environment ) {
 function buildPackage( packagePath ) {
 	const srcDir = path.resolve( packagePath, SRC_DIR );
 	const files = glob.sync( `${ srcDir }/**/*.js`, {
-		ignore: `${ srcDir }/**/test/**/*.js`,
+		ignore: [
+			`${ srcDir }/**/test/**/*.js`,
+			`${ srcDir }/**/__mocks__/**/*.js`,
+		],
 		nodir: true,
 	} );
 
