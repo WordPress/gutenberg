@@ -130,7 +130,7 @@ module.exports = {
 			},
 			{
 				selector: 'ImportDeclaration[source.value="lodash"] Identifier.imported[name="memoize"]',
-				message: 'Use memize instead of Lodash\'s memoize',
+				message: 'Use memize instead of Lodash’s memoize',
 			},
 			{
 				selector: 'CallExpression[callee.object.name="page"][callee.property.name="waitFor"]',

@@ -20,7 +20,7 @@ export const name = 'core/more';
 export const settings = {
 	title: __( 'More' ),
 
-	description: __( 'Want to show only part of this post on your blog\'s home page? Insert a "More" block where you want the split.' ),
+	description: __( 'Want to show only part of this post on your blog’s home page? Insert a "More" block where you want the split.' ),
 
 	icon: 'editor-insertmore',
 

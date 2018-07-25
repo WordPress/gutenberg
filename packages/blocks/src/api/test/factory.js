@@ -629,7 +629,7 @@ describe( 'block factory', () => {
 			expect( availableBlocks ).toEqual( [] );
 		} );
 
-		it( 'for a non multiblock transform, the isMatch function receives the source block\'s attributes object as its first argument', () => {
+		it( 'for a non multiblock transform, the isMatch function receives the source block’s attributes object as its first argument', () => {
 			const isMatch = jest.fn();
 
 			registerBlockType( 'core/updated-text-block', {
@@ -661,7 +661,7 @@ describe( 'block factory', () => {
 			expect( isMatch ).toHaveBeenCalledWith( { value: 'ribs' } );
 		} );
 
-		it( 'for a multiblock transform, the isMatch function receives an array containing every source block\'s attributes as its first argument', () => {
+		it( 'for a multiblock transform, the isMatch function receives an array containing every source block’s attributes as its first argument', () => {
 			const isMatch = jest.fn();
 
 			registerBlockType( 'core/updated-text-block', {

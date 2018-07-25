@@ -32,12 +32,12 @@ module.exports = {
 			actions: [ path.resolve( root, 'packages/blocks/src/store/actions.js' ) ],
 		},
 		'core/editor': {
-			title: 'The Editor\'s Data',
+			title: 'The Editor’s Data',
 			selectors: [ path.resolve( root, 'editor/store/selectors.js' ) ],
 			actions: [ path.resolve( root, 'editor/store/actions.js' ) ],
 		},
 		'core/edit-post': {
-			title: 'The Editor\'s UI Data',
+			title: 'The Editor’s UI Data',
 			selectors: [ path.resolve( root, 'edit-post/store/selectors.js' ) ],
 			actions: [ path.resolve( root, 'edit-post/store/actions.js' ) ],
 		},

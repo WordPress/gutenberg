@@ -76,7 +76,7 @@ done = 0;
 	str = `Look at this code\n\n<pre>${ code }</pre>\n\nIsn't that cool?`;
 
 	// Expected text after autop
-	let expected = '<p>Look at this code</p>\n<pre>' + code + '</pre>\n<p>Isn\'t that cool?</p>';
+	let expected = `<p>Look at this code</p>\n<pre>${ code }</pre>\n<p>Isn't that cool?</p>`;
 	expect( autop( str ).trim() ).toBe( expected );
 
 	// Make sure HTML breaks are maintained if manually inserted

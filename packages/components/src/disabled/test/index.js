@@ -122,13 +122,13 @@ describe( 'Disabled', () => {
 			}
 		}
 
-		test( 'lets components know that they\'re disabled via context', () => {
+		test( "lets components know that they're disabled via context", () => {
 			const wrapper = TestUtils.renderIntoDocument( <Disabled><DisabledStatus /></Disabled> );
 			const wrapperElement = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'p' );
 			expect( wrapperElement.textContent ).toBe( 'Disabled' );
 		} );
 
-		test( 'lets components know that they\'re not disabled via context', () => {
+		test( "lets components know that they're not disabled via context", () => {
 			const wrapper = TestUtils.renderIntoDocument( <DisabledStatus /> );
 			const wrapperElement = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'p' );
 			expect( wrapperElement.textContent ).toBe( 'Not disabled' );

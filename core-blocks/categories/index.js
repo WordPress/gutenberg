@@ -14,7 +14,7 @@ export const name = 'core/categories';
 export const settings = {
 	title: __( 'Categories' ),
 
-	description: __( 'Display a list of all your site\'s categories.' ),
+	description: __( 'Display a list of all your site’s categories.' ),
 
 	icon: 'list-view',
 

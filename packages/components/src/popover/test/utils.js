@@ -8,7 +8,7 @@ import {
 } from '../utils';
 
 describe( 'computePopoverYAxisPosition', () => {
-	it( 'should leave the position as is there\'s enought space', () => {
+	it( 'should leave the position as is there’s enought space', () => {
 		const anchorRect = {
 			top: 10,
 			left: 10,
@@ -30,7 +30,7 @@ describe( 'computePopoverYAxisPosition', () => {
 		} );
 	} );
 
-	it( 'should switch to bottom position if there\'s not enough space', () => {
+	it( "should switch to bottom position if there's not enough space", () => {
 		const anchorRect = {
 			top: 10,
 			left: 10,
@@ -52,7 +52,7 @@ describe( 'computePopoverYAxisPosition', () => {
 		} );
 	} );
 
-	it( 'should set a maxHeight if there\'s not enough space in any direction', () => {
+	it( "should set a maxHeight if there's not enough space in any direction", () => {
 		const anchorRect = {
 			top: 400,
 			left: 10,
@@ -98,7 +98,7 @@ describe( 'computePopoverYAxisPosition', () => {
 } );
 
 describe( 'computePopoverXAxisPosition', () => {
-	it( 'should leave the position as is there\'s enought space', () => {
+	it( 'should leave the position as is there’s enought space', () => {
 		const anchorRect = {
 			top: 10,
 			left: 10,
@@ -120,7 +120,7 @@ describe( 'computePopoverXAxisPosition', () => {
 		} );
 	} );
 
-	it( 'should switch to right position if there\'s not enough space', () => {
+	it( "should switch to right position if there's not enough space", () => {
 		const anchorRect = {
 			top: 10,
 			left: 10,
@@ -142,7 +142,7 @@ describe( 'computePopoverXAxisPosition', () => {
 		} );
 	} );
 
-	it( 'should set a maxWidth if there\'s not enough space in any direction', () => {
+	it( "should set a maxWidth if there's not enough space in any direction", () => {
 		const anchorRect = {
 			top: 10,
 			left: 400,
@@ -166,7 +166,7 @@ describe( 'computePopoverXAxisPosition', () => {
 } );
 
 describe( 'computePopoverPosition', () => {
-	it( 'should leave the position as is there\'s enought space', () => {
+	it( 'should leave the position as is there’s enought space', () => {
 		const anchorRect = {
 			top: 10,
 			left: 10,

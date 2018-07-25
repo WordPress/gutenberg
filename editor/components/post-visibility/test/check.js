@@ -11,7 +11,7 @@ import { PostVisibilityCheck } from '../check';
 describe( 'PostVisibilityCheck', () => {
 	const render = ( { canEdit } ) => ( canEdit ? 'yes' : 'no' );
 
-	it( 'should not render the edit link if the user doesn\'t have the right capability', () => {
+	it( "should not render the edit link if the user doesn't have the right capability", () => {
 		const wrapper = shallow( <PostVisibilityCheck hasPublishAction={ false } render={ render } /> );
 		expect( wrapper.text() ).toBe( 'no' );
 	} );

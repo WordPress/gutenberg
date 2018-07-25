@@ -39,7 +39,7 @@ describe( 'remountOnPropChange', () => {
 		count = 0;
 	} );
 
-	it( 'Should not remount the inner component if the prop value doesn\'t change', () => {
+	it( 'Should not remount the inner component if the prop value doesn’t change', () => {
 		const Wrapped = remountOnPropChange( 'monitor' )( MountCounter );
 		const testRenderer = TestRenderer.create(
 			<Wrapped monitor="unchanged" other="1" />

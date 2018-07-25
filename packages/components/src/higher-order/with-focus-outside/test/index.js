@@ -82,7 +82,7 @@ describe( 'withFocusOutside', () => {
 		expect( onFocusOutside ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should call handler if focus doesn\'t shift to element within component', () => {
+	it( 'should call handler if focus doesn’t shift to element within component', () => {
 		simulateEvent( 'focus' );
 		simulateEvent( 'blur' );
 

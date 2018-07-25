@@ -9,7 +9,7 @@ import { shallow } from 'enzyme';
 import { PostScheduleCheck } from '../check';
 
 describe( 'PostScheduleCheck', () => {
-	it( 'should not render anything if the user doesn\'t have the right capabilities', () => {
+	it( "should not render anything if the user doesn't have the right capabilities", () => {
 		const wrapper = shallow( <PostScheduleCheck hasPublishAction={ false } >yes</PostScheduleCheck> );
 		expect( wrapper.type() ).toBe( null );
 	} );

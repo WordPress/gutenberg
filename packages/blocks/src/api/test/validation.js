@@ -177,7 +177,7 @@ describe( 'validation', () => {
 			it( 'returns true if the same style', () => {
 				const isEqual = isEqualAttributesOfName.style(
 					'background-image: url( "https://wordpress.org/img.png" ); color: red;',
-					'color: red;   background-image: url(\'https://wordpress.org/img.png\n);'
+					"color: red;   background-image: url('https://wordpress.org/img.png\n);"
 				);
 
 				expect( isEqual ).toBe( true );
@@ -186,7 +186,7 @@ describe( 'validation', () => {
 			it( 'returns false if not same style', () => {
 				const isEqual = isEqualAttributesOfName.style(
 					'background-image: url( "https://wordpress.org/img.png" ); color: red;',
-					'color: red;  font-size: 13px; background-image: url(\'https://wordpress.org/img.png\');'
+					"color: red;  font-size: 13px; background-image: url('https://wordpress.org/img.png');"
 				);
 
 				expect( isEqual ).toBe( false );

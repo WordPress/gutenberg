@@ -73,7 +73,7 @@ describe( 'templates', () => {
 			expect( doBlocksMatchTemplate( blockList, template ) ).toBe( true );
 		} );
 
-		it( 'return false if the template length doesn\'t match the blocks length', () => {
+		it( "return false if the template length doesn't match the blocks length", () => {
 			const template = [
 				[ 'core/test-block' ],
 				[ 'core/test-block-2' ],
@@ -86,7 +86,7 @@ describe( 'templates', () => {
 			expect( doBlocksMatchTemplate( blockList, template ) ).toBe( false );
 		} );
 
-		it( 'return false if the nested template doesn\'t match the blocks', () => {
+		it( "return false if the nested template doesn't match the blocks", () => {
 			const template = [
 				[ 'core/test-block' ],
 				[ 'core/test-block-2', {}, [

@@ -83,7 +83,7 @@ describe( 'Slot', () => {
 		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation"><span></span><div></div>text</div>' );
 	} );
 
-	it( 'calls the functions passed as the Slot\'s fillProps in the Fill', () => {
+	it( 'calls the functions passed as the Slot’s fillProps in the Fill', () => {
 		const onClose = jest.fn();
 
 		const element = mount(
