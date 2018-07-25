@@ -206,7 +206,7 @@ class FormatToolbar extends Component {
 		const linkSettings = settingsVisible && (
 			<div className="editor-format-toolbar__link-modal-line editor-format-toolbar__link-settings">
 				<ToggleControl
-					label={ __( 'Open in new window' ) }
+					label={ __( 'Open in New Window' ) }
 					checked={ opensInNewWindow }
 					onChange={ this.setLinkTarget } />
 			</div>
