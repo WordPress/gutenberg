@@ -4,6 +4,7 @@
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
 const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
+const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 
 const { get } = require( 'lodash' );
 const { basename } = require( 'path' );
@@ -79,7 +80,6 @@ const entryPointNames = [
 	'utils',
 	'edit-post',
 	'core-blocks',
-	'nux',
 ];
 
 const gutenbergPackages = [
@@ -102,6 +102,7 @@ const gutenbergPackages = [
 	'i18n',
 	'is-shallow-equal',
 	'keycodes',
+	'nux',
 	'plugins',
 	'shortcode',
 	'viewport',
@@ -235,6 +236,13 @@ const config = {
 			'deprecated',
 			'dom-ready',
 		].map( camelCaseDash ) ),
+		new CopyWebpackPlugin(
+			gutenbergPackages.map( ( packageName ) => ( {
+				from: `./packages/${ packageName }/build-style/*.css`,
+				to: `./build/${ packageName }/`,
+				flatten: true,
+			} ) )
+		),
 	],
 	stats: {
 		children: false,
