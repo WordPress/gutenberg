@@ -52,7 +52,7 @@ class RCTAztecView: Aztec.TextView {
     // MARK: - Native-to-RN Value Packing Logic
     
     func packForRN(_ text: String, withName name: String) -> [AnyHashable: Any] {
-        return [name: text]
+        return [name: text, "eventCount": 1]
     }
     
     func packForRN(_ size: CGSize, withName name: String) -> [AnyHashable: Any] {
@@ -67,6 +67,10 @@ class RCTAztecView: Aztec.TextView {
     
     @objc
     func setContents(_ contents: NSDictionary) {
+        guard contents["eventCount"] == nil else {
+            return
+        }
+        
         let html = contents["text"] as? String ?? ""
         
         setHTML(html)
