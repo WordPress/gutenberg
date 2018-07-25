@@ -36,11 +36,18 @@ class Block_Type_Test extends WP_UnitTestCase {
 		$this->assertEquals( $attributes, json_decode( $output, true ) );
 	}
 
-	function test_render_for_static_block() {
+	function test_render_for_static_block_default() {
 		$block_type = new WP_Block_Type( 'core/dummy', array() );
 		$output     = $block_type->render();
 
 		$this->assertEquals( '', $output );
+	}
+
+	function test_render_for_static_block_with_content() {
+		$block_type = new WP_Block_Type( 'core/dummy', array() );
+		$output     = $block_type->render( array(), 'some dummy content' );
+
+		$this->assertEquals( 'some dummy content', $output );
 	}
 
 	function test_is_dynamic_for_static_block() {
@@ -55,6 +62,15 @@ class Block_Type_Test extends WP_UnitTestCase {
 		) );
 
 		$this->assertTrue( $block_type->is_dynamic() );
+	}
+
+	function test_dynamic_block_with_content() {
+		$block_type = new WP_Block_Type( 'core/dummy', array(
+			'render_callback' => array( $this, 'render_dummy_block_with_content' ),
+		) );
+		$output     = json_decode( $block_type->render( array(), 'hello world' ), true );
+		$this->assertEquals( 'hello world', $output['_content'] );
+		$this->assertEquals( 'core/dummy', $output['_block_name'] );
 	}
 
 	function test_prepare_attributes() {
@@ -99,8 +115,9 @@ class Block_Type_Test extends WP_UnitTestCase {
 		return json_encode( $attributes );
 	}
 
-	function render_dummy_block_with_content( $attributes, $content ) {
-		$attributes['_content'] = $content;
+	function render_dummy_block_with_content( $attributes, $content, $instance ) {
+		$attributes['_content']    = $content;
+		$attributes['_block_name'] = $instance->name;
 
 		return json_encode( $attributes );
 	}
