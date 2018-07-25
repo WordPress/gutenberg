@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "android": "react-native run-android",
+    "preinstall": "yarn install-aztec",
+    "install-aztec": "pushd ../ && (yarn install; popd;)",
     "preios": "pushd ../ && (yarn install-aztec-ios; popd;)",
     "ios": "react-native run-ios",
     "test": "jest",
