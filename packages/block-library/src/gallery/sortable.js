@@ -61,7 +61,7 @@ class Sortable extends Component {
 				items={ items }
 				onSortStart={ this.onSortStart }
 				onSortEnd={ this.onSortEnd }
-				pressDelay={ 300 }
+				distance={ 10 }
 			/>
 		);
 	}
