@@ -26,9 +26,7 @@ const DEFAULT_REMOVE_FEATURE_IMAGE_LABEL = __( 'Remove image' );
 function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onRemoveImage, media, postType } ) {
 	const postLabel = get( postType, [ 'labels' ], {} );
 
-	let mediaWidth,
-		mediaHeight,
-		mediaSourceUrl;
+	let mediaWidth, mediaHeight, mediaSourceUrl;
 	if ( media ) {
 		const mediaSize = applyFilters( 'editor.PostFeaturedImage.imageSize', 'post-thumbnail', media.id, currentPostId );
 		if ( has( media, [ 'media_details', 'sizes', mediaSize ] ) ) {
