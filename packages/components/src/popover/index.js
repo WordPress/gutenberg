@@ -61,6 +61,10 @@ class Popover extends Component {
 	componentDidMount() {
 		this.toggleWindowEvents( true );
 		this.refresh();
+		/*
+		 * Without the setTimeout, the dom node is not being focused. Related:
+		 * https://stackoverflow.com/questions/35522220/react-ref-with-focus-doesnt-work-without-settimeout-my-example
+		 */
 		setTimeout( () => {
 			this.focus();
 		}, 0 );
@@ -111,9 +115,7 @@ class Popover extends Component {
 			return;
 		}
 
-		// Without the setTimeout, the dom node is not being focused
-		// Related https://stackoverflow.com/questions/35522220/react-ref-with-focus-doesnt-work-without-settimeout-my-example
-		const focusNode = ( domNode ) => setTimeout( () => domNode.focus() );
+		const focusNode = ( domNode ) => domNode.focus();
 
 		// Boolean values for focusOnMount deprecated in 3.2–remove
 		// `focusOnMount === true` check in 3.4.
