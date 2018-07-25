@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Fragment } from '@wordpress/element';
+import { concatChildren, Fragment } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 import {
 	RichText,
@@ -67,7 +67,7 @@ export const settings = {
 		],
 	},
 
-	edit( { attributes, setAttributes, className } ) {
+	edit( { attributes, setAttributes, className, insertBlocksAfter, mergeBlocks } ) {
 		const { align, content, placeholder } = attributes;
 
 		return (
@@ -91,6 +91,18 @@ export const settings = {
 					style={ { textAlign: align } }
 					className={ className }
 					placeholder={ placeholder || __( 'Write subheading…' ) }
+					onMerge={ mergeBlocks }
+					onSplit={
+						insertBlocksAfter ?
+							( before, after, ...blocks ) => {
+								setAttributes( { content: before } );
+								insertBlocksAfter( [
+									...blocks,
+									createBlock( 'core/paragraph', { content: after } ),
+								] );
+							} :
+							undefined
+					}
 				/>
 			</Fragment>
 		);
@@ -107,5 +119,11 @@ export const settings = {
 				value={ content }
 			/>
 		);
+	},
+
+	merge( attributes, attributesToMerge ) {
+		return {
+			content: concatChildren( attributes.content, attributesToMerge.content ),
+		};
 	},
 };
