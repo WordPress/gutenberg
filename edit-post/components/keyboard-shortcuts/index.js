@@ -16,11 +16,23 @@ class EditorModeKeyboardShortcuts extends Component {
 		super( ...arguments );
 
 		this.toggleMode = this.toggleMode.bind( this );
+		this.toggleSidebar = this.toggleSidebar.bind( this );
 	}
 
 	toggleMode() {
 		const { mode, switchMode } = this.props;
 		switchMode( mode === 'visual' ? 'text' : 'visual' );
+	}
+
+	toggleSidebar( event ) {
+		event.preventDefault();
+
+		const { areAdvancedSettingsOpened, closeSidebar, openSidebar } = this.props;
+		if ( areAdvancedSettingsOpened ) {
+			closeSidebar();
+		} else {
+			openSidebar();
+		}
 	}
 
 	render() {
@@ -29,6 +41,7 @@ class EditorModeKeyboardShortcuts extends Component {
 				bindGlobal
 				shortcuts={ {
 					[ shortcuts.toggleEditorMode.value ]: this.toggleMode,
+					[ shortcuts.toggleSidebar.value ]: this.toggleSidebar,
 				} }
 			/>
 		);
@@ -36,16 +49,15 @@ class EditorModeKeyboardShortcuts extends Component {
 }
 
 export default compose( [
-	withSelect( ( select ) => {
-		return {
-			mode: select( 'core/edit-post' ).getEditorMode(),
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		return {
-			switchMode: ( mode ) => {
-				dispatch( 'core/edit-post' ).switchEditorMode( mode );
-			},
-		};
-	} ),
+	withSelect( ( select ) => ( {
+		mode: select( 'core/edit-post' ).getEditorMode(),
+		areAdvancedSettingsOpened: select( 'core/edit-post' ).getActiveGeneralSidebarName() === 'edit-post/block',
+	} ) ),
+	withDispatch( ( dispatch ) => ( {
+		switchMode: ( mode ) => {
+			dispatch( 'core/edit-post' ).switchEditorMode( mode );
+		},
+		openSidebar: () => dispatch( 'core/edit-post' ).openGeneralSidebar( 'edit-post/block' ),
+		closeSidebar: dispatch( 'core/edit-post' ).closeGeneralSidebar,
+	} ) ),
 ] )( EditorModeKeyboardShortcuts );

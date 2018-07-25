@@ -1,41 +1,28 @@
 /**
  * External dependencies
  */
-import { flow, noop, last, every, first, castArray } from 'lodash';
+import { castArray, first, last, every } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { IconButton } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { cloneBlock, hasBlockSupport } from '@wordpress/blocks';
+import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 
-export function BlockDuplicateButton( { blocks, onDuplicate, onClick = noop, isLocked, small = false, role } ) {
-	const canDuplicate = every( blocks, ( block ) => {
-		return hasBlockSupport( block.name, 'multiple', true );
-	} );
-	if ( isLocked || ! canDuplicate ) {
-		return null;
-	}
+const shortcuts = {
+	duplicate: {
+		raw: rawShortcut.primary( 'd' ),
+		display: displayShortcut.primary( 'd' ),
+	},
+	remove: {
+		raw: rawShortcut.primary( 'del' ),
+		display: displayShortcut.primary( 'del' ),
+	},
+};
 
-	const label = __( 'Duplicate' );
-
-	return (
-		<IconButton
-			className="editor-block-settings-menu__control"
-			onClick={ flow( onDuplicate, onClick ) }
-			icon="admin-page"
-			label={ small ? label : undefined }
-			role={ role }
-		>
-			{ ! small && label }
-		</IconButton>
-	);
-}
-
-export default compose(
+const withBlockSettingsActions = compose( [
 	withSelect( ( select, { clientIds, rootClientId } ) => {
 		const {
 			getBlocksByClientId,
@@ -43,14 +30,26 @@ export default compose(
 			getTemplateLock,
 		} = select( 'core/editor' );
 
+		const blocks = getBlocksByClientId( clientIds );
+
+		const canDuplicate = every( blocks, ( block ) => {
+			return !! block && hasBlockSupport( block.name, 'multiple', true );
+		} );
+
 		return {
-			blocks: getBlocksByClientId( clientIds ),
 			index: getBlockIndex( last( castArray( clientIds ) ), rootClientId ),
 			isLocked: !! getTemplateLock( rootClientId ),
+			blocks,
+			canDuplicate,
+			shortcuts,
 		};
 	} ),
-	withDispatch( ( dispatch, { blocks, index, rootClientId } ) => ( {
+	withDispatch( ( dispatch, { clientIds, rootClientId, blocks, index, isLocked, canDuplicate } ) => ( {
 		onDuplicate() {
+			if ( isLocked || ! canDuplicate ) {
+				return;
+			}
+
 			const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
 			dispatch( 'core/editor' ).insertBlocks(
 				clonedBlocks,
@@ -64,5 +63,10 @@ export default compose(
 				);
 			}
 		},
+		onRemove() {
+			dispatch( 'core/editor' ).removeBlocks( clientIds );
+		},
 	} ) ),
-)( BlockDuplicateButton );
+] );
+
+export default withBlockSettingsActions;

@@ -34,7 +34,7 @@ function VisualEditor() {
 				</ObserveTyping>
 			</WritingFlow>
 			<_BlockSettingsMenuFirstItem>
-				{ ( { onClose } ) => <BlockInspectorButton onClick={ onClose } role="menuitem" /> }
+				{ ( { onClose } ) => <BlockInspectorButton onClick={ onClose } /> }
 			</_BlockSettingsMenuFirstItem>
 			<_BlockSettingsMenuPluginsExtension>
 				{ ( { clientIds, onClose } ) => <PluginBlockSettingsMenuGroup.Slot fillProps={ { clientIds, onClose } } /> }

@@ -8,4 +8,8 @@ export default {
 		value: rawShortcut.secondary( 'm' ),
 		label: displayShortcut.secondary( 'm' ),
 	},
+	toggleSidebar: {
+		value: rawShortcut.primary( ',' ),
+		label: displayShortcut.primary( ',' ),
+	},
 };

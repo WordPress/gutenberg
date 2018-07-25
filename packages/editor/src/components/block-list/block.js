@@ -393,7 +393,7 @@ export class BlockListBlock extends Component {
 		const shouldAppearSelectedParent = ! showSideInserter && hasSelectedInnerBlock && ! isTypingWithinBlock;
 		// We render block movers and block settings to keep them tabbale even if hidden
 		const shouldRenderMovers = ( isSelected || hoverArea === 'left' ) && ! showEmptyBlockSideInserter && ! isMultiSelecting && ! isPartOfMultiSelection && ! isTypingWithinBlock;
-		const shouldRenderBlockSettings = ( isSelected || hoverArea === 'right' ) && ! isMultiSelecting && ! isPartOfMultiSelection && ! isTypingWithinBlock;
+		const shouldRenderBlockSettings = ( isSelected || hoverArea === 'right' ) && ! isMultiSelecting && ! isPartOfMultiSelection;
 		const shouldShowBreadcrumb = isHovered && ! isEmptyDefaultBlock;
 		const shouldShowContextualToolbar = ! showSideInserter && ( ( isSelected && ! isTypingWithinBlock && isValid ) || isFirstMultiSelected ) && ( ! hasFixedToolbar || ! isLargeViewport );
 		const shouldShowMobileToolbar = shouldAppearSelected;
@@ -499,7 +499,7 @@ export class BlockListBlock extends Component {
 					<BlockSettingsMenu
 						clientIds={ clientId }
 						rootClientId={ rootClientId }
-						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'right' }
+						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'right' || isTypingWithinBlock }
 					/>
 				) }
 				{ shouldShowBreadcrumb && (

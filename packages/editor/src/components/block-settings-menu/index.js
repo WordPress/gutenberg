@@ -9,17 +9,17 @@ import { castArray } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { IconButton, Dropdown, NavigableMenu } from '@wordpress/components';
+import { IconButton, Dropdown, NavigableMenu, MenuItem } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import BlockModeToggle from './block-mode-toggle';
-import BlockDuplicateButton from './block-duplicate-button';
-import BlockRemoveButton from './block-remove-button';
 import ReusableBlockConvertButton from './reusable-block-convert-button';
 import ReusableBlockDeleteButton from './reusable-block-delete-button';
+import withBlockSettingsActions from './with-block-settings-actions';
+import BlockSettingsKeyboardShortcuts from './keyboard-shortcuts';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import BlockUnknownConvertButton from './block-unknown-convert-button';
 import _BlockSettingsMenuFirstItem from './block-settings-menu-first-item';
@@ -52,8 +52,12 @@ export class BlockSettingsMenu extends Component {
 			clientIds,
 			onSelect,
 			focus,
-			rootClientId,
 			isHidden,
+			onDuplicate,
+			onRemove,
+			canDuplicate,
+			isLocked,
+			shortcuts,
 		} = this.props;
 		const { isFocused } = this.state;
 		const blockClientIds = castArray( clientIds );
@@ -62,6 +66,11 @@ export class BlockSettingsMenu extends Component {
 
 		return (
 			<div className="editor-block-settings-menu">
+				<BlockSettingsKeyboardShortcuts
+					onDuplicate={ onDuplicate }
+					onRemove={ onRemove }
+					shortcuts={ shortcuts }
+				/>
 				<Dropdown
 					contentClassName="editor-block-settings-menu__popover"
 					position="bottom left"
@@ -98,31 +107,32 @@ export class BlockSettingsMenu extends Component {
 								<BlockModeToggle
 									clientId={ firstBlockClientId }
 									onToggle={ onClose }
-									role="menuitem"
 								/>
 							) }
 							{ count === 1 && (
 								<BlockUnknownConvertButton
 									clientId={ firstBlockClientId }
-									role="menuitem"
 								/>
 							) }
 							{ count === 1 && (
 								<BlockHTMLConvertButton
 									clientId={ firstBlockClientId }
-									role="menuitem"
 								/>
 							) }
-							<BlockDuplicateButton
-								clientIds={ clientIds }
-								rootClientId={ rootClientId }
-								role="menuitem"
-							/>
+							{ ! isLocked && canDuplicate && (
+								<MenuItem
+									className="editor-block-settings-menu__control"
+									onClick={ onDuplicate }
+									icon="admin-page"
+									shortcut={ shortcuts.duplicate.display }
+								>
+									{ __( 'Duplicate' ) }
+								</MenuItem>
+							) }
 							{ count === 1 && (
 								<ReusableBlockConvertButton
 									clientId={ firstBlockClientId }
 									onToggle={ onClose }
-									itemsRole="menuitem"
 								/>
 							) }
 							<_BlockSettingsMenuPluginsExtension.Slot fillProps={ { clientIds, onClose } } />
@@ -131,13 +141,18 @@ export class BlockSettingsMenu extends Component {
 								<ReusableBlockDeleteButton
 									clientId={ firstBlockClientId }
 									onToggle={ onClose }
-									itemsRole="menuitem"
 								/>
 							) }
-							<BlockRemoveButton
-								clientIds={ clientIds }
-								role="menuitem"
-							/>
+							{ ! isLocked && (
+								<MenuItem
+									className="editor-block-settings-menu__control"
+									onClick={ onRemove }
+									icon="trash"
+									shortcut={ shortcuts.remove.display }
+								>
+									{ __( 'Remove Block' ) }
+								</MenuItem>
+							) }
 						</NavigableMenu>
 					) }
 				/>
@@ -146,8 +161,11 @@ export class BlockSettingsMenu extends Component {
 	}
 }
 
-export default withDispatch( ( dispatch ) => ( {
-	onSelect( clientId ) {
-		dispatch( 'core/editor' ).selectBlock( clientId );
-	},
-} ) )( BlockSettingsMenu );
+export default compose( [
+	withBlockSettingsActions,
+	withDispatch( ( dispatch ) => ( {
+		onSelect( clientId ) {
+			dispatch( 'core/editor' ).selectBlock( clientId );
+		},
+	} ) ),
+] )( BlockSettingsMenu );

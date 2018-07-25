@@ -25,7 +25,7 @@ describe( 'ReusableBlockConvertButton', () => {
 				onConvertToReusable={ onConvert }
 			/>
 		);
-		const button = wrapper.find( 'IconButton' ).first();
+		const button = wrapper.find( 'MenuItem' ).first();
 		expect( button.children().text() ).toBe( 'Add to Reusable Blocks' );
 		button.simulate( 'click' );
 		expect( onConvert ).toHaveBeenCalled();
@@ -40,7 +40,7 @@ describe( 'ReusableBlockConvertButton', () => {
 				onConvertToStatic={ onConvert }
 			/>
 		);
-		const button = wrapper.find( 'IconButton' ).first();
+		const button = wrapper.find( 'MenuItem' ).first();
 		expect( button.children().text() ).toBe( 'Convert to Regular Block' );
 		button.simulate( 'click' );
 		expect( onConvert ).toHaveBeenCalled();
