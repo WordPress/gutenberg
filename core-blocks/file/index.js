@@ -6,7 +6,7 @@ import { includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { createBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
@@ -64,7 +64,7 @@ export const settings = {
 			type: 'string',
 			source: 'text',
 			selector: 'a[download]',
-			default: __( 'Download' ),
+			default: _x( 'Download', 'button label' ),
 		},
 	},
 
