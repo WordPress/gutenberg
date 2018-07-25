@@ -128,7 +128,7 @@ attributes: {
 
 * **Type:** `Array`
 
-Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression or a raw DOM node.
+Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression, a file or a raw DOM node.
 
 For example, a paragraph block can be transformed into a heading block.
 
@@ -309,6 +309,63 @@ transforms: {
 {% end %}
 
 To control the priority with which a transform is applied, define a `priority` numeric property on your transform object, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
+
+A file can be dropped into the editor and converted into a block with a matching transform.
+
+{% codetabs %}
+{% ES5 %}
+```js
+transforms: {
+	from: [
+		{
+			type: 'files',
+			isMatch: function ( files ) {
+				return files.length === 1;
+			},
+			// We define a lower priority (higher number) than the default of 10. This
+			// ensures that the File block is only created as a fallback.
+			priority: 15,
+			transform: function( files ) {
+				var file = files[ 0 ];
+				var blobURL = createBlobURL( file );
+
+				// File will be uploaded in componentDidMount()
+				return createBlock( 'core/file', {
+					href: blobURL,
+					fileName: file.name,
+					textLinkHref: blobURL,
+				} );
+			},
+		},
+	]
+}
+```
+{% ESNext %}
+```js
+transforms: {
+	from: [
+		{
+			type: 'files',
+			isMatch: ( files ) => files.length === 1,
+			// We define a lower priority (higher number) than the default of 10. This
+			// ensures that the File block is only created as a fallback.
+			priority: 15,
+			transform: ( files ) => {
+				const file = files[ 0 ];
+				const blobURL = createBlobURL( file );
+
+				// File will be uploaded in componentDidMount()
+				return createBlock( 'core/file', {
+					href: blobURL,
+					fileName: file.name,
+					textLinkHref: blobURL,
+				} );
+			},
+		},
+	]
+}
+```
+{% end %}
 
 
 #### parent (optional)
