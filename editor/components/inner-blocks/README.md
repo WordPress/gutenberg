@@ -53,6 +53,7 @@ const ALLOWED_BLOCKS = [ 'core/image', 'core/paragraph' ];
     allowedBlocks={ ALLOWED_BLOCKS }
 />
 ```
+
 The previous code block creates an `InnerBlocks` area where only image and paragraph blocks can be inserted.
 
 Child blocks that have marked themselves as compatible are not excluded from the allowed blocks. Even if `allowedBlocks` doesn't specify a child block, a registered child block will still appear on the inserter for this block.
@@ -64,6 +65,7 @@ const ALLOWED_BLOCKS = [];
     allowedBlocks={ ALLOWED_BLOCKS }
 />
 ```
+
 The previous code block restricts all blocks, so only child blocks explicitly registered as compatible with this block can be inserted. If no child blocks are available: it will be impossible to insert any inner blocks.
 
 ### `template`
@@ -86,6 +88,7 @@ const TEMPLATE = [ [ 'core/columns', {}, [
     template={ TEMPLATE }
 />
 ```
+
 The previous example creates an InnerBlocks area containing two columns one with an image and the other with a paragraph.
 
 ### `templateLock`
@@ -94,10 +97,11 @@ The previous example creates an InnerBlocks area containing two columns one with
 Template locking of `InnerBlocks` is similar to [Custom Post Type templates locking](https://wordpress.org/gutenberg/handbook/templates/#locking).
 
 Template locking allows locking the `InnerBlocks` area for the current template.
+
 *Options:*
 
-- `all` — prevents all operations. It is not possible to insert new blocks. Move existing blocks or delete them.
-- `insert` — prevents inserting new blocks, but allows moving or removing existing ones.
+- `all` — prevents all operations. It is not possible to insert new blocks, move existing blocks, or delete them.
+- `insert` — prevents inserting or removing blocks, but allows moving existing ones.
 - `false` — prevents locking from being applied to an `InnerBlocks` area even if a parent block contains locking.
 
 If locking is not set in an `InnerBlocks` area: the locking of the parent `InnerBlocks` area is used.
