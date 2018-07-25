@@ -9,6 +9,8 @@ import { noop } from 'lodash';
  */
 import { DotTip } from '..';
 
+jest.mock( '../../../../../components/src/button' );
+
 describe( 'DotTip', () => {
 	it( 'should not render anything if invisible', () => {
 		const wrapper = shallow(

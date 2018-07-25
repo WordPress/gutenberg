@@ -16,7 +16,7 @@ import { ENTER, ESCAPE, UP, DOWN, SPACE } from '@wordpress/keycodes';
  */
 import EnhancedAutocomplete, { Autocomplete } from '../';
 
-jest.useFakeTimers();
+jest.mock( '../../button' );
 
 class FakeEditor extends Component {
 	// we want to change the editor contents manually so don't let react update it

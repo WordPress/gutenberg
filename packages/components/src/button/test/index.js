@@ -14,9 +14,6 @@ import { createRef } from '@wordpress/element';
  */
 import ButtonWithForwardedRef, { Button } from '../';
 
-// [TEMPORARY]: Only needed so long as Enzyme does not support React.forwardRef
-jest.unmock( '../' );
-
 describe( 'Button', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render a button element with only one class', () => {
