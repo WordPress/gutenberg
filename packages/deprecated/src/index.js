@@ -1,4 +1,8 @@
+/**
+ * WordPress dependencies
+ */
 import { doAction } from '@wordpress/hooks';
+
 /**
  * Object map tracking messages which have been logged, for use in ensuring a
  * message is only logged once.
@@ -18,14 +22,15 @@ export const logged = Object.create( null );
  * @param {?string} options.link        Link to documentation
  * @param {?string} options.hint        Additional message to help transition away from the deprecated feature.
  */
-export default function deprecated( feature, { version, alternative, plugin, link, hint } = {} ) {
-	const options = {
+export default function deprecated( feature, options = {} ) {
+	const {
 		version,
 		alternative,
 		plugin,
 		link,
 		hint,
-	};
+	} = options;
+
 	const pluginMessage = plugin ? ` from ${ plugin }` : '';
 	const versionMessage = version ? `${ pluginMessage } in ${ version }` : '';
 	const useInsteadMessage = alternative ? ` Please use ${ alternative } instead.` : '';
