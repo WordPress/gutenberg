@@ -13,7 +13,7 @@
     "clean-aztec": "pushd ../ && (yarn clean; popd;)",
     "clean-ios": "type xcodebuild &> /dev/null && (xcodebuild -project ./ios/example.xcodeproj -alltargets clean && rm -rf ./ios/build);",
     "clean-node": "rm -rf node_modules/;",
-    "clean:install": "yarn clean && yarn install-aztec && yarn install"
+    "clean:install": "yarn clean && yarn install"
   },
   "dependencies": {
     "react": "16.3.1",
