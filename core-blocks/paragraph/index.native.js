@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { TextInput } from 'react-native';
 import classnames from 'classnames';
 import { isFinite, find, omit } from 'lodash';
 
