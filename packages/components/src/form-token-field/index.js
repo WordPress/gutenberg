@@ -27,6 +27,7 @@ const initialState = {
 	isExpanded: false,
 	selectedSuggestionIndex: -1,
 	selectedSuggestionScroll: false,
+	showSuggestions: false,
 };
 
 class FormTokenField extends Component {
@@ -133,7 +134,7 @@ class FormTokenField extends Component {
 				}
 				break;
 			case ESCAPE:
-				preventDefault = this.handleEscapeKey();
+				preventDefault = this.handleEscapeKey( event );
 				event.stopPropagation();
 				break;
 			default:
@@ -193,6 +194,9 @@ class FormTokenField extends Component {
 		const separator = this.props.tokenizeOnSpace ? /[ ,\t]+/ : /[,\t]+/;
 		const items = text.split( separator );
 		const tokenValue = last( items ) || '';
+		const inputHasMinimumChars = tokenValue.trim().length > 1;
+		const matchingSuggestions = this.getMatchingSuggestions( tokenValue );
+		const hasVisibleSuggestions = inputHasMinimumChars && !! matchingSuggestions.length;
 
 		if ( items.length > 1 ) {
 			this.addNewTokens( items.slice( 0, -1 ) );
@@ -203,15 +207,16 @@ class FormTokenField extends Component {
 			selectedSuggestionIndex: -1,
 			selectedSuggestionScroll: false,
 			isExpanded: false,
+			showSuggestions: false,
 		} );
 
 		this.props.onInputChange( tokenValue );
 
-		const inputHasMinimumChars = tokenValue.trim().length > 1;
 		if ( inputHasMinimumChars ) {
-			const matchingSuggestions = this.getMatchingSuggestions( tokenValue );
-
-			this.setState( { isExpanded: !! matchingSuggestions.length } );
+			this.setState( {
+				isExpanded: hasVisibleSuggestions,
+				showSuggestions: hasVisibleSuggestions,
+			} );
 
 			if ( !! matchingSuggestions.length ) {
 				this.props.debouncedSpeak( sprintf( _n(
@@ -289,8 +294,14 @@ class FormTokenField extends Component {
 		return true; // preventDefault
 	}
 
-	handleEscapeKey() {
-		this.setState( initialState );
+	handleEscapeKey( event ) {
+		this.setState( {
+			incompleteTokenValue: event.target.value,
+			isExpanded: false,
+			selectedSuggestionIndex: -1,
+			selectedSuggestionScroll: false,
+			showSuggestions: false,
+		} );
 		return true; // preventDefault
 	}
 
@@ -379,6 +390,8 @@ class FormTokenField extends Component {
 			incompleteTokenValue: '',
 			selectedSuggestionIndex: -1,
 			selectedSuggestionScroll: false,
+			isExpanded: false,
+			showSuggestions: false,
 		} );
 
 		if ( this.state.isActive ) {
@@ -527,6 +540,7 @@ class FormTokenField extends Component {
 			instanceId,
 			className,
 		} = this.props;
+		const { showSuggestions } = this.state;
 		const classes = classnames( className, 'components-form-token-field', {
 			'is-active': this.state.isActive,
 			'is-disabled': disabled,
@@ -537,8 +551,6 @@ class FormTokenField extends Component {
 			tabIndex: '-1',
 		};
 		const matchingSuggestions = this.getMatchingSuggestions();
-		const inputHasMinimumChars = this.state.incompleteTokenValue.trim().length > 1;
-		const showSuggestions = inputHasMinimumChars && !! matchingSuggestions.length;
 
 		if ( ! disabled ) {
 			tokenFieldProps = Object.assign( {}, tokenFieldProps, {
