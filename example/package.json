@@ -4,9 +4,9 @@
   "description": "Example for running ponies",
   "main": "index.js",
   "scripts": {
-    "install-aztec": "pushd ../ && (yarn install; popd;)",
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "android": "react-native run-android",
+    "preios": "pushd ../ && (yarn install-aztec-ios; popd;)",
     "ios": "react-native run-ios",
     "test": "jest",
     "clean": "yarn clean-aztec; yarn clean-node; yarn clean-ios;",
