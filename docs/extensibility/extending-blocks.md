@@ -20,8 +20,8 @@ function addListBlockClassName( settings, name ) {
 		return settings;
 	}
 
-	return Object.assign( {}, settings, {
-		supports: Object.assign( {}, settings.supports, {
+	return lodash.assign( {}, settings, {
+		supports: lodash.assign( {}, settings.supports, {
 			className: true
 		} ),
 	} );
@@ -48,7 +48,7 @@ Adding a background by default to all blocks.
 
 ```js
 function addBackgroundColorStyle( props ) {
-	return Object.assign( props, { style: { backgroundColor: 'red' } } );
+	return lodash.assign( props, { style: { backgroundColor: 'red' } } );
 }
 
 wp.hooks.addFilter(
@@ -139,11 +139,11 @@ var el = wp.element.createElement;
 
 var withDataAlign = wp.compose.createHigherOrderComponent( function( BlockListBlock ) {
 	return function( props ) {
-		var newProps = Object.assign(
+		var newProps = lodash.assign(
 			{},
 			props,
 			{
-				wrapperProps: Object.assign(
+				wrapperProps: lodash.assign(
 					{},
 					props.wrapperProps,
 					{
