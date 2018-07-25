@@ -137,7 +137,7 @@ describe( 'block parser', () => {
 	} );
 
 	describe( 'parseWithAttributeSchema', () => {
-		it( "should return the matcher's attribute value", () => {
+		it( 'should return the matcher’s attribute value', () => {
 			const value = parseWithAttributeSchema(
 				'<div>chicken</div>',
 				{

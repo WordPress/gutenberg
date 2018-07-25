@@ -8,7 +8,7 @@ import {
 } from '../utils';
 
 describe( 'computePopoverYAxisPosition', () => {
-	it( "should leave the position as is there's enought space", () => {
+	it( 'should leave the position as is there’s enought space', () => {
 		const anchorRect = {
 			top: 10,
 			left: 10,
@@ -98,7 +98,7 @@ describe( 'computePopoverYAxisPosition', () => {
 } );
 
 describe( 'computePopoverXAxisPosition', () => {
-	it( "should leave the position as is there's enought space", () => {
+	it( 'should leave the position as is there’s enought space', () => {
 		const anchorRect = {
 			top: 10,
 			left: 10,
@@ -166,7 +166,7 @@ describe( 'computePopoverXAxisPosition', () => {
 } );
 
 describe( 'computePopoverPosition', () => {
-	it( "should leave the position as is there's enought space", () => {
+	it( 'should leave the position as is there’s enought space', () => {
 		const anchorRect = {
 			top: 10,
 			left: 10,

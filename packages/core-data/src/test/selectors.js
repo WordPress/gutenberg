@@ -67,7 +67,7 @@ describe( 'isRequestingCategories()', () => {
 } );
 
 describe( 'getEntityRecord', () => {
-	it( "should return undefined for unknown record's key", () => {
+	it( 'should return undefined for unknown record’s key', () => {
 		const state = deepFreeze( {
 			entities: {
 				data: {
