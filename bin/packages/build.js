@@ -75,6 +75,7 @@ function buildFile( file, silent ) {
 function buildStyle( packagePath ) {
 	const styleFile = path.resolve( packagePath, SRC_DIR, 'style.scss' );
 	const outputFile = path.resolve( packagePath, BUILD_DIR.style, 'style.css' );
+	const outputFileRTL = path.resolve( packagePath, BUILD_DIR.style, 'style-rtl.css' );
 	mkdirp.sync( path.dirname( outputFile ) );
 	const builtSass = sass.renderSync( {
 		file: styleFile,
@@ -98,8 +99,17 @@ function buildStyle( packagePath ) {
 			.then( ( result ) => callback( null, result ) );
 	};
 
+	const postCSSRTLSync = ( ltrCSS, callback ) => {
+		postcss( [ require( 'rtlcss' )() ] )
+			.process( ltrCSS, { from: 'src/app.css', to: 'dest/app.css' } )
+			.then( ( result ) => callback( null, result ) );
+	};
+
 	const result = deasync( postCSSSync )();
 	fs.writeFileSync( outputFile, result.css );
+
+	const resultRTL = deasync( postCSSRTLSync )( result );
+	fs.writeFileSync( outputFileRTL, resultRTL );
 }
 
 /**
