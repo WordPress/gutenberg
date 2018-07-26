@@ -38,9 +38,14 @@ cd gutenberg
 ```
 
 Then, run a setup script to check if docker and node are configured properly and starts the local WordPress instance. You may need to run this script multiple times if prompted.
-```
+```bash
 ./bin/setup-local-env.sh
-``` 
+```
+
+If you want to access the site via HTTPS, you can set up your local environment to use SSL:
+```bash
+./bin/setup-local-env.sh --ssl
+```
 
 If everything was successful, you'll see the following ascii art:
 ```

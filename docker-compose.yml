@@ -6,6 +6,7 @@ services:
     image: wordpress
     ports:
       - 8888:80
+      - 9999:443
     environment:
       WORDPRESS_DB_PASSWORD: example
       ABSPATH: /usr/src/wordpress/
@@ -14,6 +15,13 @@ services:
       - .:/var/www/html/wp-content/plugins/gutenberg
       - ./test/e2e/test-plugins:/var/www/html/wp-content/plugins/gutenberg-test-plugins
       - ./test/e2e/test-mu-plugins:/var/www/html/wp-content/mu-plugins
+    command: |
+      /bin/bash -c "
+        apt-get update && \
+        apt-get install -y --no-install-recommends ssl-cert && \
+        a2enmod ssl && \
+        a2ensite default-ssl && \
+        docker-entrypoint.sh apache2-foreground"
 
   cli:
     image: wordpress:cli
