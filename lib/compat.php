@@ -73,21 +73,19 @@ function _gutenberg_utf8_split( $str ) {
  * Disables wpautop behavior in classic editor when post contains blocks, to
  * prevent removep from invalidating paragraph blocks.
  *
- * @param  array $settings Original editor settings.
- * @return array           Filtered settings.
+ * @param  array  $settings  Original editor settings.
+ * @param  string $editor_id ID for the editor instance.
+ * @return array             Filtered settings.
  */
-function gutenberg_disable_editor_settings_wpautop( $settings ) {
+function gutenberg_disable_editor_settings_wpautop( $settings, $editor_id ) {
 	$post = get_post();
-	// _content_editor_dfw is a private setting only used on the main
-	// editor instance. We can use it as an identifier.
-	if ( isset( $settings['_content_editor_dfw'] )
-		&& is_object( $post ) && gutenberg_post_has_blocks( $post ) ) {
+	if ( 'content' === $editor_id && is_object( $post ) && gutenberg_post_has_blocks( $post ) ) {
 		$settings['wpautop'] = false;
 	}
 
 	return $settings;
 }
-add_filter( 'wp_editor_settings', 'gutenberg_disable_editor_settings_wpautop' );
+add_filter( 'wp_editor_settings', 'gutenberg_disable_editor_settings_wpautop', 10, 2 );
 
 /**
  * Add TinyMCE fixes for the Classic Editor.
