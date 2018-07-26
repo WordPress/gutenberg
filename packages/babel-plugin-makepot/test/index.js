@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { transform } from 'babel-core';
-import traverse from 'babel-traverse';
+import { transformSync } from '@babel/core';
+import traverse from '@babel/traverse';
 
 /**
  * Internal dependencies
@@ -46,7 +46,7 @@ describe( 'babel-plugin', () => {
 	describe( '.getTranslatorComment()', () => {
 		function getCommentFromString( string ) {
 			let comment;
-			traverse( transform( string ).ast, {
+			traverse( transformSync( string, { ast: true } ).ast, {
 				CallExpression( path ) {
 					comment = getTranslatorComment( path );
 				},
@@ -56,37 +56,37 @@ describe( 'babel-plugin', () => {
 		}
 
 		it( 'should not return translator comment on same line but after call expression', () => {
-			const comment = getCommentFromString( '__( \'Hello world\' ); // translators: Greeting' );
+			const comment = getCommentFromString( "__( 'Hello world' ); // translators: Greeting" );
 
 			expect( comment ).toBeUndefined();
 		} );
 
 		it( 'should return translator comment on leading comments', () => {
-			const comment = getCommentFromString( '// translators: Greeting\n__( \'Hello world\' );' );
+			const comment = getCommentFromString( "// translators: Greeting\n__( 'Hello world' );" );
 
 			expect( comment ).toBe( 'Greeting' );
 		} );
 
 		it( 'should be case insensitive to translator prefix', () => {
-			const comment = getCommentFromString( '// TrANslAtORs: Greeting\n__( \'Hello world\' );' );
+			const comment = getCommentFromString( "// TrANslAtORs: Greeting\n__( 'Hello world' );" );
 
 			expect( comment ).toBe( 'Greeting' );
 		} );
 
 		it( 'should traverse up parents until it encounters comment', () => {
-			const comment = getCommentFromString( '// translators: Greeting\nconst string = __( \'Hello world\' );' );
+			const comment = getCommentFromString( "// translators: Greeting\nconst string = __( 'Hello world' );" );
 
 			expect( comment ).toBe( 'Greeting' );
 		} );
 
 		it( 'should not consider comment if it does not end on same or previous line', () => {
-			const comment = getCommentFromString( '// translators: Greeting\n\n__( \'Hello world\' );' );
+			const comment = getCommentFromString( "// translators: Greeting\n\n__( 'Hello world' );" );
 
 			expect( comment ).toBeUndefined();
 		} );
 
 		it( 'should use multi-line comment starting many lines previous', () => {
-			const comment = getCommentFromString( '/* translators: Long comment\nspanning multiple \nlines */\nconst string = __( \'Hello world\' );' );
+			const comment = getCommentFromString( "/* translators: Long comment\nspanning multiple \nlines */\nconst string = __( 'Hello world' );" );
 
 			expect( comment ).toBe( 'Long comment spanning multiple lines' );
 		} );
@@ -95,7 +95,7 @@ describe( 'babel-plugin', () => {
 	describe( '.getNodeAsString()', () => {
 		function getNodeAsStringFromArgument( source ) {
 			let string;
-			traverse( transform( source ).ast, {
+			traverse( transformSync( source, { ast: true } ).ast, {
 				CallExpression( path ) {
 					string = getNodeAsString( path.node.arguments[ 0 ] );
 				},

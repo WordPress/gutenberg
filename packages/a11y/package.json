@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/a11y",
-	"version": "1.0.7",
-	"description": "Collection of JS modules and tools for WordPress development",
+	"version": "1.1.1",
+	"description": "Accessibility (a11y) utilities for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
@@ -20,6 +20,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
+		"@babel/runtime": "^7.0.0-beta.52",
 		"@wordpress/dom-ready": "file:../dom-ready"
 	},
 	"publishConfig": {

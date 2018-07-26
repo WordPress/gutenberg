@@ -1,6 +1,6 @@
-# @wordpress/shortcode
+# Shortcode
 
-Shortcode utils for WordPress.
+Shortcode module for WordPress.
 
 ## Installation
 

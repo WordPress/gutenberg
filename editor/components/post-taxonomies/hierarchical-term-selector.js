@@ -8,11 +8,16 @@ import { stringify } from 'querystring';
  * WordPress dependencies
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { Component, compose } from '@wordpress/element';
-import { TreeSelect, withAPIData, withInstanceId, withSpokenMessages, Button } from '@wordpress/components';
-import { buildTermsTree } from '@wordpress/utils';
+import { Component } from '@wordpress/element';
+import { TreeSelect, withSpokenMessages, Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import apiRequest from '@wordpress/api-request';
+import { withInstanceId, compose } from '@wordpress/compose';
+import apiFetch from '@wordpress/api-fetch';
+
+/**
+ * Internal dependencies
+ */
+import { buildTermsTree } from '../../utils/terms';
 
 /**
  * Module Constants
@@ -45,13 +50,13 @@ class HierarchicalTermSelector extends Component {
 	}
 
 	onChange( event ) {
-		const { onUpdateTerms, terms = [], restBase } = this.props;
+		const { onUpdateTerms, terms = [], taxonomy } = this.props;
 		const termId = parseInt( event.target.value, 10 );
 		const hasTerm = terms.indexOf( termId ) !== -1;
 		const newTerms = hasTerm ?
 			without( terms, termId ) :
 			[ ...terms, termId ];
-		onUpdateTerms( newTerms, restBase );
+		onUpdateTerms( newTerms, taxonomy.rest_base );
 	}
 
 	onChangeFormName( event ) {
@@ -78,7 +83,7 @@ class HierarchicalTermSelector extends Component {
 
 	onAddTerm( event ) {
 		event.preventDefault();
-		const { onUpdateTerms, restBase, terms, slug } = this.props;
+		const { onUpdateTerms, taxonomy, terms, slug } = this.props;
 		const { formName, formParent, adding, availableTerms } = this.state;
 		if ( formName === '' || adding ) {
 			return;
@@ -89,7 +94,7 @@ class HierarchicalTermSelector extends Component {
 		if ( existingTerm ) {
 			// if the term we are adding exists but is not selected select it
 			if ( ! some( terms, ( term ) => term === existingTerm.id ) ) {
-				onUpdateTerms( [ ...terms, existingTerm.id ], restBase );
+				onUpdateTerms( [ ...terms, existingTerm.id ], taxonomy.rest_base );
 			}
 			this.setState( {
 				formName: '',
@@ -98,35 +103,33 @@ class HierarchicalTermSelector extends Component {
 			return;
 		}
 
-		const findOrCreatePromise = new Promise( ( resolve, reject ) => {
-			this.setState( {
-				adding: true,
-			} );
-			// Tries to create a term or fetch it if it already exists
-			const basePath = wp.api.getTaxonomyRoute( this.props.slug );
-			this.addRequest = apiRequest( {
-				path: `/wp/v2/${ basePath }`,
-				method: 'POST',
-				data: {
-					name: formName,
-					parent: formParent ? formParent : undefined,
-				},
-			} );
-			this.addRequest
-				.then( resolve, ( xhr ) => {
-					const errorCode = xhr.responseJSON && xhr.responseJSON.code;
-					if ( errorCode === 'term_exists' ) {
-						// search the new category created since last fetch
-						this.addRequest = apiRequest( {
-							path: `/wp/v2/${ basePath }?${ stringify( { ...DEFAULT_QUERY, parent: formParent || 0, search: formName } ) }`,
-						} );
-						return this.addRequest.then( ( searchResult ) => {
-							resolve( this.findTerm( searchResult, formParent, formName ) );
-						}, reject );
-					}
-					reject( xhr );
-				} );
+		this.setState( {
+			adding: true,
 		} );
+		this.addRequest = apiFetch( {
+			path: `/wp/v2/${ taxonomy.rest_base }`,
+			method: 'POST',
+			data: {
+				name: formName,
+				parent: formParent ? formParent : undefined,
+			},
+		} );
+		// Tries to create a term or fetch it if it already exists
+		const findOrCreatePromise = this.addRequest
+			.catch( ( error ) => {
+				const errorCode = error.code;
+				if ( errorCode === 'term_exists' ) {
+					// search the new category created since last fetch
+					this.addRequest = apiFetch( {
+						path: `/wp/v2/${ taxonomy.rest_base }?${ stringify( { ...DEFAULT_QUERY, parent: formParent || 0, search: formName } ) }`,
+					} );
+					return this.addRequest
+						.then( ( searchResult ) => {
+							return this.findTerm( searchResult, formParent, formName );
+						} );
+				}
+				return Promise.reject( error );
+			} );
 		findOrCreatePromise
 			.then( ( term ) => {
 				const hasTerm = !! find( this.state.availableTerms, ( availableTerm ) => availableTerm.id === term.id );
@@ -148,7 +151,7 @@ class HierarchicalTermSelector extends Component {
 					availableTerms: newAvailableTerms,
 					availableTermsTree: buildTermsTree( newAvailableTerms ),
 				} );
-				onUpdateTerms( [ ...terms, term.id ], restBase );
+				onUpdateTerms( [ ...terms, term.id ], taxonomy.rest_base );
 			}, ( xhr ) => {
 				if ( xhr.statusText === 'abort' ) {
 					return;
@@ -161,8 +164,26 @@ class HierarchicalTermSelector extends Component {
 	}
 
 	componentDidMount() {
-		const basePath = wp.api.getTaxonomyRoute( this.props.slug );
-		this.fetchRequest = apiRequest( { path: `/wp/v2/${ basePath }?${ stringify( DEFAULT_QUERY ) }` } );
+		this.fetchTerms();
+	}
+
+	componentWillUnmount() {
+		invoke( this.fetchRequest, [ 'abort' ] );
+		invoke( this.addRequest, [ 'abort' ] );
+	}
+
+	componentDidUpdate( prevProps ) {
+		if ( this.props.taxonomy !== prevProps.taxonomy ) {
+			this.fetchTerms();
+		}
+	}
+
+	fetchTerms() {
+		const { taxonomy } = this.props;
+		if ( ! taxonomy ) {
+			return;
+		}
+		this.fetchRequest = apiFetch( { path: `/wp/v2/${ taxonomy.rest_base }?${ stringify( DEFAULT_QUERY ) }` } );
 		this.fetchRequest.then(
 			( terms ) => { // resolve
 				const availableTermsTree = buildTermsTree( terms );
@@ -184,11 +205,6 @@ class HierarchicalTermSelector extends Component {
 				} );
 			}
 		);
-	}
-
-	componentWillUnmount() {
-		invoke( this.fetchRequest, [ 'abort' ] );
-		invoke( this.addRequest, [ 'abort' ] );
 	}
 
 	renderTerms( renderedTerms ) {
@@ -302,18 +318,15 @@ class HierarchicalTermSelector extends Component {
 }
 
 export default compose( [
-	withAPIData( ( props ) => {
-		const { slug } = props;
-		return {
-			taxonomy: `/wp/v2/taxonomies/${ slug }?context=edit`,
-		};
-	} ),
-	withSelect( ( select, ownProps ) => {
+	withSelect( ( select, { slug } ) => {
 		const { getCurrentPost } = select( 'core/editor' );
+		const { getTaxonomy } = select( 'core' );
+		const taxonomy = getTaxonomy( slug );
 		return {
-			hasCreateAction: get( getCurrentPost(), [ '_links', 'wp:action-create-' + ownProps.restBase ], false ),
-			hasAssignAction: get( getCurrentPost(), [ '_links', 'wp:action-assign-' + ownProps.restBase ], false ),
-			terms: select( 'core/editor' ).getEditedPostAttribute( ownProps.restBase ),
+			hasCreateAction: taxonomy ? get( getCurrentPost(), [ '_links', 'wp:action-create-' + taxonomy.rest_base ], false ) : false,
+			hasAssignAction: taxonomy ? get( getCurrentPost(), [ '_links', 'wp:action-assign-' + taxonomy.rest_base ], false ) : false,
+			terms: taxonomy ? select( 'core/editor' ).getEditedPostAttribute( taxonomy.rest_base ) : [],
+			taxonomy,
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {

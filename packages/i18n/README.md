@@ -1,5 +1,4 @@
-@wordpress/i18n
-======
+# Internationalization (i18n)
 
 Internationalization utilities for client-side localization.
 

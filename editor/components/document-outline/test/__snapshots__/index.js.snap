@@ -12,7 +12,11 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
       onClick={[Function]}
       path={Array []}
     >
-      Heading parent
+      <Component
+        format="children"
+        tagName="span"
+        value="Heading parent"
+      />
     </TableOfContentsItem>
     <TableOfContentsItem
       isValid={true}
@@ -21,7 +25,11 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
       onClick={[Function]}
       path={Array []}
     >
-      Heading child
+      <Component
+        format="children"
+        tagName="span"
+        value="Heading child"
+      />
     </TableOfContentsItem>
   </ul>
 </div>
@@ -39,7 +47,11 @@ exports[`DocumentOutline header blocks present should render warnings for multip
       onClick={[Function]}
       path={Array []}
     >
-      Heading 1
+      <Component
+        format="children"
+        tagName="span"
+        value="Heading 1"
+      />
       <br
         key="incorrect-break-multiple-h1"
       />
@@ -56,7 +68,11 @@ exports[`DocumentOutline header blocks present should render warnings for multip
       onClick={[Function]}
       path={Array []}
     >
-      Heading 1
+      <Component
+        format="children"
+        tagName="span"
+        value="Heading 1"
+      />
       <br
         key="incorrect-break-multiple-h1"
       />

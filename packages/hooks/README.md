@@ -1,4 +1,4 @@
-# @wordpress/hooks
+# Hooks
 
 A lightweight & efficient EventManager for JavaScript.
 

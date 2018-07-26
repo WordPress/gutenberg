@@ -47,10 +47,9 @@ const withHistory = ( options = {} ) => ( reducer ) => {
 		past: [],
 		present: reducer( undefined, {} ),
 		future: [],
+		lastAction: null,
+		shouldCreateUndoLevel: false,
 	};
-
-	let lastAction;
-	let shouldCreateUndoLevel = false;
 
 	const {
 		resetTypes = [],
@@ -58,10 +57,8 @@ const withHistory = ( options = {} ) => ( reducer ) => {
 	} = options;
 
 	return ( state = initialState, action ) => {
-		const { past, present, future } = state;
+		const { past, present, future, lastAction, shouldCreateUndoLevel } = state;
 		const previousAction = lastAction;
-
-		lastAction = action;
 
 		switch ( action.type ) {
 			case 'UNDO':
@@ -74,6 +71,8 @@ const withHistory = ( options = {} ) => ( reducer ) => {
 					past: dropRight( past ),
 					present: last( past ),
 					future: [ present, ...future ],
+					lastAction: null,
+					shouldCreateUndoLevel: false,
 				};
 			case 'REDO':
 				// Can't redo if no future.
@@ -85,11 +84,16 @@ const withHistory = ( options = {} ) => ( reducer ) => {
 					past: [ ...past, present ],
 					present: first( future ),
 					future: drop( future ),
+					lastAction: null,
+					shouldCreateUndoLevel: false,
 				};
 
 			case 'CREATE_UNDO_LEVEL':
-				shouldCreateUndoLevel = true;
-				return state;
+				return {
+					...state,
+					lastAction: null,
+					shouldCreateUndoLevel: true,
+				};
 		}
 
 		const nextPresent = reducer( present, action );
@@ -99,6 +103,8 @@ const withHistory = ( options = {} ) => ( reducer ) => {
 				past: [],
 				present: nextPresent,
 				future: [],
+				lastAction: null,
+				shouldCreateUndoLevel: false,
 			};
 		}
 
@@ -108,18 +114,20 @@ const withHistory = ( options = {} ) => ( reducer ) => {
 
 		let nextPast = past;
 
-		shouldCreateUndoLevel = ! past.length || shouldCreateUndoLevel;
-
-		if ( shouldCreateUndoLevel || ! shouldOverwriteState( action, previousAction ) ) {
+		if (
+			shouldCreateUndoLevel ||
+			! past.length ||
+			! shouldOverwriteState( action, previousAction )
+		) {
 			nextPast = [ ...past, present ];
 		}
-
-		shouldCreateUndoLevel = false;
 
 		return {
 			past: nextPast,
 			present: nextPresent,
 			future: [],
+			shouldCreateUndoLevel: false,
+			lastAction: action,
 		};
 	};
 };

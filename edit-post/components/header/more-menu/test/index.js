@@ -8,6 +8,8 @@ import { mount } from 'enzyme';
  */
 import MoreMenu from '../index';
 
+jest.mock( '../../../../../packages/components/src/button' );
+
 describe( 'MoreMenu', () => {
 	it( 'should match snapshot', () => {
 		const wrapper = mount(

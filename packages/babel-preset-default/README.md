@@ -1,4 +1,4 @@
-# @wordpress/babel-preset-default
+# Babel Preset Default
 
 Default [Babel](https://babeljs.io/) preset for WordPress development.
 
@@ -29,7 +29,7 @@ babel script.js --presets @wordpress/default
 #### Via Node API
 
 ```js
-require( 'babel-core' ).transform( 'code', {
+require( '@babel/core' ).transform( 'code', {
   presets: [ '@wordpress/default' ]
 } );
 ```

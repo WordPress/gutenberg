@@ -23,7 +23,7 @@ describe( 'BlockSwitcher', () => {
 		isValid: true,
 		name: 'core/heading',
 		originalContent: '<h2>How are you?</h2>',
-		uid: 'a1303fd6-3e60-4fff-a770-0e0ea656c5b9',
+		clientId: 'a1303fd6-3e60-4fff-a770-0e0ea656c5b9',
 	};
 
 	const textBlock = {
@@ -33,7 +33,7 @@ describe( 'BlockSwitcher', () => {
 		isValid: true,
 		name: 'core/text',
 		originalContent: '<p>I am great!</p>',
-		uid: 'b1303fdb-3e60-43faf-a770-2e1ea656c5b8',
+		clientId: 'b1303fdb-3e60-43faf-a770-2e1ea656c5b8',
 	};
 
 	const headingBlock2 = {
@@ -44,7 +44,7 @@ describe( 'BlockSwitcher', () => {
 		isValid: true,
 		name: 'core/text',
 		originalContent: '<h3>I am the greatest!</h3>',
-		uid: 'c2403fd2-4e63-5ffa-b71c-1e0ea656c5b0',
+		clientId: 'c2403fd2-4e63-5ffa-b71c-1e0ea656c5b0',
 	};
 
 	beforeAll( () => {

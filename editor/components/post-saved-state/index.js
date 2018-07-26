@@ -7,10 +7,11 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dashicon, IconButton, withSafeTimeout } from '@wordpress/components';
-import { Component, compose } from '@wordpress/element';
+import { Dashicon, IconButton } from '@wordpress/components';
+import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
+import { withSafeTimeout, compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies

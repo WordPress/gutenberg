@@ -37,9 +37,9 @@ const TableOfContentsItem = ( {
 			{
 				// path is an array of nodes that are ancestors of the heading starting in the top level node.
 				// This mapping renders each ancestor to make it easier for the user to know where the headings are nested.
-				path.map( ( { uid }, index ) => (
+				path.map( ( { clientId }, index ) => (
 					<strong key={ index } className="document-outline__level">
-						<BlockTitle uid={ uid } />
+						<BlockTitle clientId={ clientId } />
 					</strong>
 				) )
 			}

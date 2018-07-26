@@ -7,12 +7,12 @@ import { omit } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { concatChildren } from '@wordpress/element';
 import {
 	createBlock,
 	getPhrasingContentSchema,
 	getBlockAttributes,
 	getBlockType,
+	children,
 } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
 
@@ -167,7 +167,10 @@ export const settings = {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: concatChildren( attributes.content, attributesToMerge.content ),
+			content: children.concat(
+				attributes.content,
+				attributesToMerge.content
+			),
 		};
 	},
 

@@ -18,7 +18,7 @@ describe( 'PostSticky', () => {
 		expect( wrapper.type() ).toBe( null );
 	} );
 
-	it( 'should not render anything if post doesn\'t support stickying', () => {
+	it( "should not render anything if post doesn't support stickying", () => {
 		const wrapper = shallow(
 			<PostStickyCheck postType="post" hasStickyAction={ false }>
 				Can Toggle Sticky

@@ -9,10 +9,13 @@ import deepFreeze from 'deep-freeze';
 import { getTerms, isRequestingCategories, getEntityRecord, getEntityRecords } from '../selectors';
 import { select } from '@wordpress/data';
 
-jest.mock( '@wordpress/data', () => ( {
-	...require.requireActual( '@wordpress/data' ),
-	select: jest.fn().mockReturnValue( {} ),
-} ) );
+jest.mock( '@wordpress/data', () => {
+	return {
+		select: jest.fn().mockReturnValue( {
+			isResolving: jest.fn().mockReturnValue( false ),
+		} ),
+	};
+} );
 
 describe( 'getTerms()', () => {
 	it( 'returns value of terms by taxonomy', () => {
@@ -31,10 +34,6 @@ describe( 'getTerms()', () => {
 } );
 
 describe( 'isRequestingCategories()', () => {
-	beforeAll( () => {
-		select( 'core/data' ).isResolving = jest.fn().mockReturnValue( false );
-	} );
-
 	afterAll( () => {
 		select( 'core/data' ).isResolving.mockRestore();
 	} );
@@ -68,7 +67,7 @@ describe( 'isRequestingCategories()', () => {
 } );
 
 describe( 'getEntityRecord', () => {
-	it( 'should return undefined for unknown record\'s key', () => {
+	it( 'should return undefined for unknown record’s key', () => {
 		const state = deepFreeze( {
 			entities: {
 				data: {
