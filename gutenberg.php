@@ -431,7 +431,7 @@ function gutenberg_add_admin_body_class( $classes ) {
  * @return array           Filtered settings.
  */
 function wp_heartbeat_settings_gutenberg( $settings ) {
-    $settings['interval'] = 15;
-    return $settings;
+	$settings['interval'] = 15;
+	return $settings;
 }
 add_filter( 'heartbeat_settings', 'wp_heartbeat_settings_gutenberg' );
