@@ -9,7 +9,6 @@
       {
         "cwd": "babelrc",
         "alias": {
-          "react-native-aztec": "./react-native-aztec",
           "@wordpress/editor": "./editor",
           "@gutenberg": "./gutenberg"
         },
