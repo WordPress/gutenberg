@@ -35,10 +35,16 @@ describe( 'classic editor', () => {
 <!-- /wp:paragraph -->
 
 This is another set of text`;
-		await page.keyboard.type( original );
+		await page.type( '#content', original );
+
+		const initialTextEditorContent = await page.$eval( '.wp-editor-area', ( element ) => element.value );
+		expect( initialTextEditorContent ).toEqual( original );
 
 		// Save the post so that TinyMCE loads with wpautop disabled.
-		await page.click( '#save-post' );
+		await Promise.all( [
+			page.waitForNavigation(),
+			page.click( '#save-post' ),
+		] );
 
 		// Switch to Visual mode.
 		await page.click( '#content-tmce' );
