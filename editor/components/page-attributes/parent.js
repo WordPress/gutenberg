@@ -62,9 +62,9 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 	};
 } );
 
-const applyWithAPIDataItems = withAPIData( ( props, { type } ) => {
-	const { postTypeSlug, postId } = props;
-	const isHierarchical = get( props, [ 'postType', 'hierarchical' ], false );
+const applyWithAPIDataItems = withAPIData( ( { postType, postId } ) => {
+	const isHierarchical = get( postType, [ 'hierarchical' ], false );
+	const restBase = get( postType, [ 'rest_base' ], false );
 	const queryString = stringify( {
 		context: 'edit',
 		per_page: -1,
@@ -74,7 +74,9 @@ const applyWithAPIDataItems = withAPIData( ( props, { type } ) => {
 		orderby: 'menu_order',
 		order: 'asc',
 	} );
-	return isHierarchical ? { items: `/wp/v2/${ type( postTypeSlug ) }?${ queryString }` } : {};
+	return isHierarchical && restBase ?
+		{ items: `/wp/v2/${ restBase }?${ queryString }` } :
+		{};
 } );
 
 export default compose( [

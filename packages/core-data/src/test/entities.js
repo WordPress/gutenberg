@@ -9,6 +9,8 @@ import apiFetch from '@wordpress/api-fetch';
 import { getMethodName, defaultEntities, getKindEntities } from '../entities';
 import { addEntities } from '../actions';
 
+jest.mock( '@wordpress/api-fetch' );
+
 describe( 'getMethodName', () => {
 	it( 'should return the right method name for an entity with the root kind', () => {
 		const methodName = getMethodName( 'root', 'postType' );

@@ -190,6 +190,7 @@ export function createRegistry( storeConfigs = {} ) {
 				// Attempt to normalize fulfillment as async iterable.
 				fulfillment = toAsyncIterable( fulfillment );
 				if ( ! isAsyncIterable( fulfillment ) ) {
+					finishResolution( reducerKey, selectorName, args );
 					return;
 				}
 

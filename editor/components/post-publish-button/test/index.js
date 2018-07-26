@@ -8,6 +8,8 @@ import { shallow } from 'enzyme';
  */
 import { PostPublishButton } from '../';
 
+jest.mock( '../../../../packages/components/src/button' );
+
 describe( 'PostPublishButton', () => {
 	describe( 'disabled', () => {
 		it( 'should be disabled if post is currently saving', () => {
