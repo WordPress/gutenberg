@@ -4,7 +4,8 @@
 import deprecated from './deprecated';
 
 // Components
-export { default as APIProvider } from './higher-order/with-api-data/provider';
+// eslint-disable-next-line camelcase
+export { default as APIProvider, unstable__setApiSettings } from './higher-order/with-api-data/provider';
 export { default as Autocomplete } from './autocomplete';
 export { default as BaseControl } from './base-control';
 export { default as Button } from './button';

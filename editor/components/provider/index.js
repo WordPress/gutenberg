@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flow, pick } from 'lodash';
+import { flow } from 'lodash';
 
 /**
  * WordPress Dependencies
@@ -75,13 +75,6 @@ class EditorProvider extends Component {
 			//  - context.getAPITaxonomyRestBaseMapping
 			[
 				APIProvider,
-				{
-					...wpApiSettings,
-					...pick( wp.api, [
-						'postTypeRestBaseMapping',
-						'taxonomyRestBaseMapping',
-					] ),
-				},
 			],
 
 			// DropZone provider:
