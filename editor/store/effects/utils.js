@@ -17,18 +17,17 @@ export function resolveSelector( namespace, selectorName, ...args ) {
 		const hasFinished = () => select( 'core/data' ).hasFinishedResolution( namespace, selectorName, args );
 		const getResult = () => select( namespace )[ selectorName ].apply( null, args );
 
+		// We need to trigger the selector (to trigger the resolver)
+		const result = getResult();
+		if ( hasFinished() ) {
+			return resolve( result );
+		}
+
 		const unsubscribe = subscribe( () => {
 			if ( hasFinished() ) {
 				unsubscribe();
 				resolve( getResult() );
 			}
 		} );
-
-		// We need to trigger the selector (to trigger the resolver)
-		const result = getResult();
-		if ( hasFinished() ) {
-			unsubscribe();
-			return resolve( result );
-		}
 	} );
 }
