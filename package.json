@@ -8,6 +8,7 @@
   },
   "devDependencies": {
     "@wordpress/babel-preset-default": "^1.1.2",
+    "@wordpress/block-serialization-spec-parser": "^1.0.0",
     "babel-eslint": "^8.2.2",
     "babel-plugin-react-native-classname-to-style": "^1.2.1",
     "babel-plugin-react-native-platform-specific-extensions": "^1.0.1",
@@ -61,6 +62,7 @@
   },
   "dependencies": {
     "@wordpress/autop": "^1.0.6",
+    "@wordpress/compose": "^1.0.1",
     "@wordpress/deprecated": "^1.0.0-alpha.2",
     "@wordpress/hooks": "^1.2.1",
     "@wordpress/i18n": "^1.1.0",

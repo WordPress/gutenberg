@@ -3,7 +3,7 @@
 import '../globals';
 
 import { registerCoreBlocks } from '@gutenberg/core-blocks';
-import { parse } from '@gutenberg/blocks';
+import { parse } from '@wordpress/blocks';
 
 registerCoreBlocks();
 
@@ -14,7 +14,7 @@ describe( 'Parser', () => {
 		else:
 			return "Hello Pony"`;
 
-	const originalCodeBlockHtml = `<pre><code>${ codeContent }</code></pre>`;
+	const originalCodeBlockHtml = `<pre class="wp-block-code"><code>${ codeContent }</code></pre>`;
 
 	const gbCodeBlockHtml = `
 		<!-- wp:code -->
