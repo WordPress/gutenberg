@@ -10,7 +10,7 @@ import { createSlotFill } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 
-const { Fill: PluginBlockSettingsMenuGroup, Slot } = createSlotFill( 'BlockSettingsMenuPluginsGroup' );
+const { Fill: PluginBlockSettingsMenuGroup, Slot } = createSlotFill( 'PluginBlockSettingsMenuGroup' );
 
 const PluginBlockSettingsMenuGroupSlot = ( { fillProps, selectedBlocks } ) => {
 	selectedBlocks = map( selectedBlocks, ( block ) => block.name );
