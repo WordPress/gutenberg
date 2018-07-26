@@ -61,7 +61,7 @@ function CustomHierarchicalTermSelector(OriginalHierarchicalTermSelector) {
 				<div>Custom HierarchicalTermSelector Term Selector</div>
 			);
 		} else {
-			return <OriginalFlatTermSelector {...props} />
+			return <OriginalHierarchicalTermSelector {...props} />
 		}
 	}
 };
