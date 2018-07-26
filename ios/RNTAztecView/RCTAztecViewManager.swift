@@ -25,10 +25,6 @@ public class RCTAztecViewManager: RCTViewManager {
             defaultMissingImage: UIImage())
         
         view.isScrollEnabled = false
-        
-        view.backgroundColor = .yellow
-        view.text = "Hello world!"
-        
         view.textAttachmentDelegate = attachmentDelegate
         view.registerAttachmentImageProvider(imageProvider)
         
