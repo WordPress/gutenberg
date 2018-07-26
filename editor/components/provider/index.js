@@ -75,13 +75,6 @@ class EditorProvider extends Component {
 			//  - context.getAPITaxonomyRestBaseMapping
 			[
 				APIProvider,
-				{
-					...wpApiSettings,
-					...pick( wp.api, [
-						'postTypeRestBaseMapping',
-						'taxonomyRestBaseMapping',
-					] ),
-				},
 			],
 
 			// DropZone provider:
