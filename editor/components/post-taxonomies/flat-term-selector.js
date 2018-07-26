@@ -9,7 +9,7 @@ import { stringify } from 'querystring';
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { FormTokenField, withAPIData } from '@wordpress/components';
+import { FormTokenField, withAPIData, withFilters } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import apiFetch from '@wordpress/api-fetch';
@@ -220,5 +220,6 @@ export default compose(
 				dispatch( 'core/editor' ).editPost( { [ restBase ]: terms } );
 			},
 		};
-	} )
+	} ),
+	withFilters( 'editor.FlatTermSelector' ),
 )( FlatTermSelector );
