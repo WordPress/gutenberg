@@ -52,7 +52,7 @@ export default compose(
 				// Prevents deletion if templateLock is "all" or "insert"
 				// (if a user can't insert blocks they shouldn't be able
 				// to remove them either)
-				return templateLock === 'all' || templateLock === 'insert';
+				return !! templateLock;
 			} ),
 		};
 	} ),
