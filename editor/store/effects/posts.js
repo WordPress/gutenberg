@@ -274,6 +274,11 @@ export const trashPost = async ( action, store ) => {
 	dispatch( removeNotice( TRASH_POST_NOTICE_ID ) );
 	try {
 		await apiFetch( { path: `/wp/v2/${ postType.rest_base }/${ postId }`, method: 'DELETE' } );
+		const post = getCurrentPost( getState() );
+
+		// TODO: This should be an updatePost action (updating subsets of post properties),
+		// But right now editPost is tied with change detection.
+		dispatch( resetPost( { ...post, status: 'trash' } ) );
 	} catch ( error ) {
 		dispatch( {
 			...action,
