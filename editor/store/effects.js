@@ -44,13 +44,13 @@ import {
 	getTemplateLock,
 } from './selectors';
 import {
-	fetchSharedBlocks,
-	saveSharedBlocks,
-	deleteSharedBlocks,
-	convertBlockToShared,
+	fetchReusableBlocks,
+	saveReusableBlocks,
+	deleteReusableBlocks,
+	convertBlockToReusable,
 	convertBlockToStatic,
-	receiveSharedBlocks,
-} from './effects/shared-blocks';
+	receiveReusableBlocks,
+} from './effects/reusable-blocks';
 import {
 	requestPostUpdate,
 	requestPostUpdateSuccess,
@@ -216,18 +216,18 @@ export default {
 
 		return setTemplateValidity( isValid );
 	},
-	FETCH_SHARED_BLOCKS: ( action, store ) => {
-		fetchSharedBlocks( action, store );
+	FETCH_REUSABLE_BLOCKS: ( action, store ) => {
+		fetchReusableBlocks( action, store );
 	},
-	SAVE_SHARED_BLOCK: ( action, store ) => {
-		saveSharedBlocks( action, store );
+	SAVE_REUSABLE_BLOCK: ( action, store ) => {
+		saveReusableBlocks( action, store );
 	},
-	DELETE_SHARED_BLOCK: ( action, store ) => {
-		deleteSharedBlocks( action, store );
+	DELETE_REUSABLE_BLOCK: ( action, store ) => {
+		deleteReusableBlocks( action, store );
 	},
-	RECEIVE_SHARED_BLOCKS: receiveSharedBlocks,
+	RECEIVE_REUSABLE_BLOCKS: receiveReusableBlocks,
 	CONVERT_BLOCK_TO_STATIC: convertBlockToStatic,
-	CONVERT_BLOCK_TO_SHARED: convertBlockToShared,
+	CONVERT_BLOCK_TO_REUSABLE: convertBlockToReusable,
 	CREATE_NOTICE( { notice: { content, spokenMessage } } ) {
 		const message = spokenMessage || content;
 		speak( message, 'assertive' );

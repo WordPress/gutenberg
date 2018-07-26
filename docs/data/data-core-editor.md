@@ -878,36 +878,36 @@ Returns the user notices array.
 
 List of notices.
 
-### isSavingSharedBlock
+### isSavingReusableBlock
 
-Returns whether or not the shared block with the given ID is being saved.
+Returns whether or not the reusable block with the given ID is being saved.
 
 *Parameters*
 
  * state: Global application state.
- * ref: The shared block's ID.
+ * ref: The reusable block's ID.
 
 *Returns*
 
-Whether or not the shared block is being saved.
+Whether or not the reusable block is being saved.
 
-### isFetchingSharedBlock
+### isFetchingReusableBlock
 
-Returns true if the shared block with the given ID is being fetched, or
+Returns true if the reusable block with the given ID is being fetched, or
 false otherwise.
 
 *Parameters*
 
  * state: Global application state.
- * ref: The shared block's ID.
+ * ref: The reusable block's ID.
 
 *Returns*
 
-Whether the shared block is being fetched.
+Whether the reusable block is being fetched.
 
-### getSharedBlocks
+### getReusableBlocks
 
-Returns an array of all shared blocks.
+Returns an array of all reusable blocks.
 
 *Parameters*
 
@@ -915,7 +915,7 @@ Returns an array of all shared blocks.
 
 *Returns*
 
-An array of all shared blocks.
+An array of all reusable blocks.
 
 ### getStateBeforeOptimisticTransaction
 
@@ -1343,65 +1343,65 @@ Returns an action object used to remove a notice.
 
  * id: The notice id.
 
-### fetchSharedBlocks
+### fetchReusableBlocks
 
-Returns an action object used to fetch a single shared block or all shared
-blocks from the REST API into the store.
+Returns an action object used to fetch a single reusable block or all
+reusable blocks from the REST API into the store.
 
 *Parameters*
 
- * id: If given, only a single shared block with this ID will
+ * id: If given, only a single reusable block with this ID will
                     be fetched.
 
-### receiveSharedBlocks
+### receiveReusableBlocks
 
-Returns an action object used in signalling that shared blocks have been
+Returns an action object used in signalling that reusable blocks have been
 received. `results` is an array of objects containing:
- - `sharedBlock` - Details about how the shared block is persisted.
+ - `reusableBlock` - Details about how the reusable block is persisted.
  - `parsedBlock` - The original block.
 
 *Parameters*
 
- * results: Shared blocks received.
+ * results: Reusable blocks received.
 
-### saveSharedBlock
+### saveReusableBlock
 
-Returns an action object used to save a shared block that's in the store to
+Returns an action object used to save a reusable block that's in the store to
 the REST API.
 
 *Parameters*
 
- * id: The ID of the shared block to save.
+ * id: The ID of the reusable block to save.
 
-### deleteSharedBlock
+### deleteReusableBlock
 
-Returns an action object used to delete a shared block via the REST API.
+Returns an action object used to delete a reusable block via the REST API.
 
 *Parameters*
 
- * id: The ID of the shared block to delete.
+ * id: The ID of the reusable block to delete.
 
-### updateSharedBlockTitle
+### updateReusableBlockTitle
 
-Returns an action object used in signalling that a shared block's title is
+Returns an action object used in signalling that a reusable block's title is
 to be updated.
 
 *Parameters*
 
- * id: The ID of the shared block to update.
+ * id: The ID of the reusable block to update.
  * title: The new title.
 
 ### convertBlockToStatic
 
-Returns an action object used to convert a shared block into a static block.
+Returns an action object used to convert a reusable block into a static block.
 
 *Parameters*
 
  * clientId: The client ID of the block to attach.
 
-### convertBlockToShared
+### convertBlockToReusable
 
-Returns an action object used to convert a static block into a shared block.
+Returns an action object used to convert a static block into a reusable block.
 
 *Parameters*
 

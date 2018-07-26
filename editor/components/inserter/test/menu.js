@@ -71,12 +71,12 @@ const textEmbedItem = {
 	utility: 0,
 };
 
-const sharedItem = {
+const reusableItem = {
 	id: 'core/block/123',
 	name: 'core/block',
 	initialAttributes: { ref: 123 },
-	title: 'My shared block',
-	category: 'shared',
+	title: 'My reusable block',
+	category: 'reusable',
 	isDisabled: false,
 	utility: 0,
 };
@@ -88,14 +88,14 @@ const items = [
 	moreItem,
 	youtubeItem,
 	textEmbedItem,
-	sharedItem,
+	reusableItem,
 ];
 
 const DEFAULT_PROPS = {
 	position: 'top center',
 	items: items,
 	debouncedSpeak: noop,
-	fetchSharedBlocks: noop,
+	fetchReusableBlocks: noop,
 	setTimeout: noop,
 };
 
@@ -220,11 +220,11 @@ describe( 'InserterMenu', () => {
 		assertNoResultsMessageNotToBePresent( element );
 	} );
 
-	it( 'should show shared items in the shared tab', () => {
+	it( 'should show reusable items in the reusable tab', () => {
 		const element = initializeAllClosedMenuStateAndReturnElement();
-		const sharedTab = getTabButtonWithContent( element, 'Shared' );
+		const reusableTab = getTabButtonWithContent( element, 'Reusable' );
 
-		TestUtils.Simulate.click( sharedTab );
+		TestUtils.Simulate.click( reusableTab );
 
 		assertOpenedPanels( element, 1 );
 
@@ -233,7 +233,7 @@ describe( 'InserterMenu', () => {
 		);
 
 		expect( visibleBlocks ).toHaveLength( 1 );
-		expect( visibleBlocks[ 0 ].textContent ).toBe( 'My shared block' );
+		expect( visibleBlocks[ 0 ].textContent ).toBe( 'My reusable block' );
 
 		assertNoResultsMessageNotToBePresent( element );
 	} );

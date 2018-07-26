@@ -596,86 +596,86 @@ export const createErrorNotice = partial( createNotice, 'error' );
 export const createWarningNotice = partial( createNotice, 'warning' );
 
 /**
- * Returns an action object used to fetch a single shared block or all shared
- * blocks from the REST API into the store.
+ * Returns an action object used to fetch a single reusable block or all
+ * reusable blocks from the REST API into the store.
  *
- * @param {?string} id If given, only a single shared block with this ID will
+ * @param {?string} id If given, only a single reusable block with this ID will
  *                     be fetched.
  *
  * @return {Object} Action object.
  */
-export function fetchSharedBlocks( id ) {
+export function fetchReusableBlocks( id ) {
 	return {
-		type: 'FETCH_SHARED_BLOCKS',
+		type: 'FETCH_REUSABLE_BLOCKS',
 		id,
 	};
 }
 
 /**
- * Returns an action object used in signalling that shared blocks have been
+ * Returns an action object used in signalling that reusable blocks have been
  * received. `results` is an array of objects containing:
- *  - `sharedBlock` - Details about how the shared block is persisted.
+ *  - `reusableBlock` - Details about how the reusable block is persisted.
  *  - `parsedBlock` - The original block.
  *
- * @param {Object[]} results Shared blocks received.
+ * @param {Object[]} results Reusable blocks received.
  *
  * @return {Object} Action object.
  */
-export function receiveSharedBlocks( results ) {
+export function receiveReusableBlocks( results ) {
 	return {
-		type: 'RECEIVE_SHARED_BLOCKS',
+		type: 'RECEIVE_REUSABLE_BLOCKS',
 		results,
 	};
 }
 
 /**
- * Returns an action object used to save a shared block that's in the store to
+ * Returns an action object used to save a reusable block that's in the store to
  * the REST API.
  *
- * @param {Object} id The ID of the shared block to save.
+ * @param {Object} id The ID of the reusable block to save.
  *
  * @return {Object} Action object.
  */
-export function saveSharedBlock( id ) {
+export function saveReusableBlock( id ) {
 	return {
-		type: 'SAVE_SHARED_BLOCK',
+		type: 'SAVE_REUSABLE_BLOCK',
 		id,
 	};
 }
 
 /**
- * Returns an action object used to delete a shared block via the REST API.
+ * Returns an action object used to delete a reusable block via the REST API.
  *
- * @param {number} id The ID of the shared block to delete.
+ * @param {number} id The ID of the reusable block to delete.
  *
  * @return {Object} Action object.
  */
-export function deleteSharedBlock( id ) {
+export function deleteReusableBlock( id ) {
 	return {
-		type: 'DELETE_SHARED_BLOCK',
+		type: 'DELETE_REUSABLE_BLOCK',
 		id,
 	};
 }
 
 /**
- * Returns an action object used in signalling that a shared block's title is
+ * Returns an action object used in signalling that a reusable block's title is
  * to be updated.
  *
- * @param {number} id    The ID of the shared block to update.
+ * @param {number} id    The ID of the reusable block to update.
  * @param {string} title The new title.
  *
  * @return {Object} Action object.
  */
-export function updateSharedBlockTitle( id, title ) {
+export function updateReusableBlockTitle( id, title ) {
 	return {
-		type: 'UPDATE_SHARED_BLOCK_TITLE',
+		type: 'UPDATE_REUSABLE_BLOCK_TITLE',
 		id,
 		title,
 	};
 }
 
 /**
- * Returns an action object used to convert a shared block into a static block.
+ * Returns an action object used to convert a reusable block into a static block.
  *
  * @param {string} clientId The client ID of the block to attach.
  *
@@ -689,15 +689,15 @@ export function convertBlockToStatic( clientId ) {
 }
 
 /**
- * Returns an action object used to convert a static block into a shared block.
+ * Returns an action object used to convert a static block into a reusable block.
  *
  * @param {string} clientId The client ID of the block to detach.
  *
  * @return {Object} Action object.
  */
-export function convertBlockToShared( clientId ) {
+export function convertBlockToReusable( clientId ) {
 	return {
-		type: 'CONVERT_BLOCK_TO_SHARED',
+		type: 'CONVERT_BLOCK_TO_REUSABLE',
 		clientId,
 	};
 }

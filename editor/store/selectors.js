@@ -1456,7 +1456,7 @@ function getInsertUsage( state, id ) {
 
 /**
  * Determines the items that appear in the the inserter. Includes both static
- * items (e.g. a regular block type) and dynamic items (e.g. a shared block).
+ * items (e.g. a regular block type) and dynamic items (e.g. a reusable block).
  *
  * Each item object contains what's necessary to display a button in the
  * inserter and handle its selection.
@@ -1560,12 +1560,12 @@ export const getInserterItems = createSelector(
 			};
 		};
 
-		const shouldIncludeSharedBlock = ( sharedBlock ) => {
+		const shouldIncludeReusableBlock = ( reusableBlock ) => {
 			if ( ! canInsertBlockType( state, 'core/block', parentClientId ) ) {
 				return false;
 			}
 
-			const referencedBlock = getBlock( state, sharedBlock.clientId );
+			const referencedBlock = getBlock( state, reusableBlock.clientId );
 			if ( ! referencedBlock ) {
 				return false;
 			}
@@ -1582,23 +1582,23 @@ export const getInserterItems = createSelector(
 			return true;
 		};
 
-		const buildSharedBlockInserterItem = ( sharedBlock ) => {
-			const id = `core/block/${ sharedBlock.id }`;
+		const buildReusableBlockInserterItem = ( reusableBlock ) => {
+			const id = `core/block/${ reusableBlock.id }`;
 
-			const referencedBlock = getBlock( state, sharedBlock.clientId );
+			const referencedBlock = getBlock( state, reusableBlock.clientId );
 			const referencedBlockType = getBlockType( referencedBlock.name );
 
 			const { time, count = 0 } = getInsertUsage( state, id ) || {};
-			const utility = calculateUtility( 'shared', count, false );
+			const utility = calculateUtility( 'reusable', count, false );
 			const frecency = calculateFrecency( time, count );
 
 			return {
 				id,
 				name: 'core/block',
-				initialAttributes: { ref: sharedBlock.id },
-				title: sharedBlock.title,
+				initialAttributes: { ref: reusableBlock.id },
+				title: reusableBlock.title,
 				icon: referencedBlockType.icon,
-				category: 'shared',
+				category: 'reusable',
 				keywords: [],
 				isDisabled: false,
 				utility,
@@ -1610,12 +1610,12 @@ export const getInserterItems = createSelector(
 			.filter( shouldIncludeBlockType )
 			.map( buildBlockTypeInserterItem );
 
-		const sharedBlockInserterItems = getSharedBlocks( state )
-			.filter( shouldIncludeSharedBlock )
-			.map( buildSharedBlockInserterItem );
+		const reusableBlockInserterItems = getReusableBlocks( state )
+			.filter( shouldIncludeReusableBlock )
+			.map( buildReusableBlockInserterItem );
 
 		return orderBy(
-			[ ...blockTypeInserterItems, ...sharedBlockInserterItems ],
+			[ ...blockTypeInserterItems, ...reusableBlockInserterItems ],
 			[ 'utility', 'frecency' ],
 			[ 'desc', 'desc' ]
 		);
@@ -1627,22 +1627,22 @@ export const getInserterItems = createSelector(
 		state.preferences.insertUsage,
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
-		state.sharedBlocks.data,
+		state.reusableBlocks.data,
 		getBlockTypes(),
 	],
 );
 
 /**
- * Returns the shared block with the given ID.
+ * Returns the reusable block with the given ID.
  *
  * @param {Object}        state Global application state.
- * @param {number|string} ref   The shared block's ID.
+ * @param {number|string} ref   The reusable block's ID.
  *
- * @return {Object} The shared block, or null if none exists.
+ * @return {Object} The reusable block, or null if none exists.
  */
-export const getSharedBlock = createSelector(
+export const getReusableBlock = createSelector(
 	( state, ref ) => {
-		const block = state.sharedBlocks.data[ ref ];
+		const block = state.reusableBlocks.data[ ref ];
 		if ( ! block ) {
 			return null;
 		}
@@ -1656,44 +1656,44 @@ export const getSharedBlock = createSelector(
 		};
 	},
 	( state, ref ) => [
-		state.sharedBlocks.data[ ref ],
+		state.reusableBlocks.data[ ref ],
 	],
 );
 
 /**
- * Returns whether or not the shared block with the given ID is being saved.
+ * Returns whether or not the reusable block with the given ID is being saved.
  *
  * @param {Object} state Global application state.
- * @param {string} ref   The shared block's ID.
+ * @param {string} ref   The reusable block's ID.
  *
- * @return {boolean} Whether or not the shared block is being saved.
+ * @return {boolean} Whether or not the reusable block is being saved.
  */
-export function isSavingSharedBlock( state, ref ) {
-	return state.sharedBlocks.isSaving[ ref ] || false;
+export function isSavingReusableBlock( state, ref ) {
+	return state.reusableBlocks.isSaving[ ref ] || false;
 }
 
 /**
- * Returns true if the shared block with the given ID is being fetched, or
+ * Returns true if the reusable block with the given ID is being fetched, or
  * false otherwise.
  *
  * @param {Object} state Global application state.
- * @param {string} ref   The shared block's ID.
+ * @param {string} ref   The reusable block's ID.
  *
- * @return {boolean} Whether the shared block is being fetched.
+ * @return {boolean} Whether the reusable block is being fetched.
  */
-export function isFetchingSharedBlock( state, ref ) {
-	return !! state.sharedBlocks.isFetching[ ref ];
+export function isFetchingReusableBlock( state, ref ) {
+	return !! state.reusableBlocks.isFetching[ ref ];
 }
 
 /**
- * Returns an array of all shared blocks.
+ * Returns an array of all reusable blocks.
  *
  * @param {Object} state Global application state.
  *
- * @return {Array} An array of all shared blocks.
+ * @return {Array} An array of all reusable blocks.
  */
-export function getSharedBlocks( state ) {
-	return map( state.sharedBlocks.data, ( value, ref ) => getSharedBlock( state, ref ) );
+export function getReusableBlocks( state ) {
+	return map( state.reusableBlocks.data, ( value, ref ) => getReusableBlock( state, ref ) );
 }
 
 /**

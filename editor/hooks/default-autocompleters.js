@@ -17,7 +17,7 @@ import { blockAutocompleter, userAutocompleter } from '../components';
 
 const defaultAutocompleters = [ userAutocompleter ];
 
-const fetchSharedBlocks = once( () => dispatch( 'core/editor' ).fetchSharedBlocks() );
+const fetchReusableBlocks = once( () => dispatch( 'core/editor' ).fetchReusableBlocks() );
 
 function setDefaultCompleters( completers, blockName ) {
 	if ( ! completers ) {
@@ -28,12 +28,12 @@ function setDefaultCompleters( completers, blockName ) {
 			completers.push( clone( blockAutocompleter ) );
 
 			/*
-			 * NOTE: This is a hack to help ensure shared blocks are loaded
+			 * NOTE: This is a hack to help ensure reusable blocks are loaded
 			 * so they may be included in the block completer. It can be removed
 			 * once we have a way for completers to Promise options while
 			 * store-based data dependencies are being resolved.
 			 */
-			fetchSharedBlocks();
+			fetchReusableBlocks();
 		}
 	}
 	return completers;

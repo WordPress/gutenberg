@@ -9,11 +9,11 @@ import { noop } from 'lodash';
 import { compose } from '@wordpress/compose';
 import { IconButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { isSharedBlock } from '@wordpress/blocks';
+import { isReusableBlock } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 
-export function SharedBlockDeleteButton( { sharedBlock, onDelete, itemsRole } ) {
-	if ( ! sharedBlock ) {
+export function ReusableBlockDeleteButton( { reusableBlock, onDelete, itemsRole } ) {
+	if ( ! reusableBlock ) {
 		return null;
 	}
 
@@ -21,26 +21,26 @@ export function SharedBlockDeleteButton( { sharedBlock, onDelete, itemsRole } ) 
 		<IconButton
 			className="editor-block-settings-menu__control"
 			icon="no"
-			disabled={ sharedBlock.isTemporary }
-			onClick={ () => onDelete( sharedBlock.id ) }
+			disabled={ reusableBlock.isTemporary }
+			onClick={ () => onDelete( reusableBlock.id ) }
 			role={ itemsRole }
 		>
-			{ __( 'Delete Shared Block' ) }
+			{ __( 'Delete Reusable Block' ) }
 		</IconButton>
 	);
 }
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const { getBlock, getSharedBlock } = select( 'core/editor' );
+		const { getBlock, getReusableBlock } = select( 'core/editor' );
 		const block = getBlock( clientId );
 		return {
-			sharedBlock: block && isSharedBlock( block ) ? getSharedBlock( block.attributes.ref ) : null,
+			reusableBlock: block && isReusableBlock( block ) ? getReusableBlock( block.attributes.ref ) : null,
 		};
 	} ),
 	withDispatch( ( dispatch, { onToggle = noop } ) => {
 		const {
-			deleteSharedBlock,
+			deleteReusableBlock,
 		} = dispatch( 'core/editor' );
 
 		return {
@@ -48,15 +48,15 @@ export default compose( [
 				// TODO: Make this a <Confirm /> component or similar
 				// eslint-disable-next-line no-alert
 				const hasConfirmed = window.confirm( __(
-					'Are you sure you want to delete this Shared Block?\n\n' +
+					'Are you sure you want to delete this Reusable Block?\n\n' +
 					'It will be permanently removed from all posts and pages that use it.'
 				) );
 
 				if ( hasConfirmed ) {
-					deleteSharedBlock( id );
+					deleteReusableBlock( id );
 					onToggle();
 				}
 			},
 		};
 	} ),
-] )( SharedBlockDeleteButton );
+] )( ReusableBlockDeleteButton );

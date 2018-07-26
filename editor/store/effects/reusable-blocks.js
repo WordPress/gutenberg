@@ -12,7 +12,7 @@ import {
 	parse,
 	serialize,
 	createBlock,
-	isSharedBlock,
+	isReusableBlock,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
@@ -21,16 +21,16 @@ import { __ } from '@wordpress/i18n';
  */
 import { resolveSelector } from './utils';
 import {
-	receiveSharedBlocks as receiveSharedBlocksAction,
+	receiveReusableBlocks as receiveReusableBlocksAction,
 	createSuccessNotice,
 	createErrorNotice,
 	removeBlocks,
 	replaceBlock,
 	receiveBlocks,
-	saveSharedBlock,
+	saveReusableBlock,
 } from '../actions';
 import {
-	getSharedBlock,
+	getReusableBlock,
 	getBlock,
 	getBlocks,
 } from '../selectors';
@@ -38,20 +38,20 @@ import {
 /**
  * Module Constants
  */
-const SHARED_BLOCK_NOTICE_ID = 'SHARED_BLOCK_NOTICE_ID';
+const REUSABLE_BLOCK_NOTICE_ID = 'REUSABLE_BLOCK_NOTICE_ID';
 
 /**
- * Fetch Shared Blocks Effect Handler.
+ * Fetch Reusable Blocks Effect Handler.
  *
  * @param {Object} action  action object.
  * @param {Object} store   Redux Store.
  */
-export const fetchSharedBlocks = async ( action, store ) => {
+export const fetchReusableBlocks = async ( action, store ) => {
 	const { id } = action;
 	const { dispatch } = store;
 
 	// TODO: these are potentially undefined, this fix is in place
-	// until there is a filter to not use shared blocks if undefined
+	// until there is a filter to not use reusable blocks if undefined
 	const postType = await resolveSelector( 'core', 'getPostType', 'wp_block' );
 	if ( ! postType ) {
 		return;
@@ -65,22 +65,22 @@ export const fetchSharedBlocks = async ( action, store ) => {
 	}
 
 	try {
-		const sharedBlockOrBlocks = await result;
-		dispatch( receiveSharedBlocksAction( map(
-			castArray( sharedBlockOrBlocks ),
-			( sharedBlock ) => ( {
-				sharedBlock,
-				parsedBlock: parse( sharedBlock.content )[ 0 ],
+		const reusableBlockOrBlocks = await result;
+		dispatch( receiveReusableBlocksAction( map(
+			castArray( reusableBlockOrBlocks ),
+			( reusableBlock ) => ( {
+				reusableBlock,
+				parsedBlock: parse( reusableBlock.content )[ 0 ],
 			} )
 		) ) );
 
 		dispatch( {
-			type: 'FETCH_SHARED_BLOCKS_SUCCESS',
+			type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
 			id,
 		} );
 	} catch ( error ) {
 		dispatch( {
-			type: 'FETCH_SHARED_BLOCKS_FAILURE',
+			type: 'FETCH_REUSABLE_BLOCKS_FAILURE',
 			id,
 			error,
 		} );
@@ -88,14 +88,14 @@ export const fetchSharedBlocks = async ( action, store ) => {
 };
 
 /**
- * Save Shared Blocks Effect Handler.
+ * Save Reusable Blocks Effect Handler.
  *
  * @param {Object} action  action object.
  * @param {Object} store   Redux Store.
  */
-export const saveSharedBlocks = async ( action, store ) => {
+export const saveReusableBlocks = async ( action, store ) => {
 	// TODO: these are potentially undefined, this fix is in place
-	// until there is a filter to not use shared blocks if undefined
+	// until there is a filter to not use reusable blocks if undefined
 	const postType = await resolveSelector( 'core', 'getPostType', 'wp_block' );
 	if ( ! postType ) {
 		return;
@@ -104,7 +104,7 @@ export const saveSharedBlocks = async ( action, store ) => {
 	const { id } = action;
 	const { dispatch } = store;
 	const state = store.getState();
-	const { clientId, title, isTemporary } = getSharedBlock( state, id );
+	const { clientId, title, isTemporary } = getReusableBlock( state, id );
 	const { name, attributes, innerBlocks } = getBlock( state, clientId );
 	const content = serialize( createBlock( name, attributes, innerBlocks ) );
 
@@ -113,32 +113,32 @@ export const saveSharedBlocks = async ( action, store ) => {
 	const method = isTemporary ? 'POST' : 'PUT';
 
 	try {
-		const updatedSharedBlock = await apiFetch( { path, data, method } );
+		const updatedReusableBlock = await apiFetch( { path, data, method } );
 		dispatch( {
-			type: 'SAVE_SHARED_BLOCK_SUCCESS',
-			updatedId: updatedSharedBlock.id,
+			type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
+			updatedId: updatedReusableBlock.id,
 			id,
 		} );
 		const message = isTemporary ? __( 'Block created.' ) : __( 'Block updated.' );
-		dispatch( createSuccessNotice( message, { id: SHARED_BLOCK_NOTICE_ID } ) );
+		dispatch( createSuccessNotice( message, { id: REUSABLE_BLOCK_NOTICE_ID } ) );
 	} catch ( error ) {
-		dispatch( { type: 'SAVE_SHARED_BLOCK_FAILURE', id } );
+		dispatch( { type: 'SAVE_REUSABLE_BLOCK_FAILURE', id } );
 		dispatch( createErrorNotice( error.message, {
-			id: SHARED_BLOCK_NOTICE_ID,
+			id: REUSABLE_BLOCK_NOTICE_ID,
 			spokenMessage: error.message,
 		} ) );
 	}
 };
 
 /**
- * Delete Shared Blocks Effect Handler.
+ * Delete Reusable Blocks Effect Handler.
  *
  * @param {Object} action  action object.
  * @param {Object} store   Redux Store.
  */
-export const deleteSharedBlocks = async ( action, store ) => {
+export const deleteReusableBlocks = async ( action, store ) => {
 	// TODO: these are potentially undefined, this fix is in place
-	// until there is a filter to not use shared blocks if undefined
+	// until there is a filter to not use reusable blocks if undefined
 	const postType = await resolveSelector( 'core', 'getPostType', 'wp_block' );
 	if ( ! postType ) {
 		return;
@@ -147,21 +147,21 @@ export const deleteSharedBlocks = async ( action, store ) => {
 	const { id } = action;
 	const { getState, dispatch } = store;
 
-	// Don't allow a shared block with a temporary ID to be deleted
-	const sharedBlock = getSharedBlock( getState(), id );
-	if ( ! sharedBlock || sharedBlock.isTemporary ) {
+	// Don't allow a reusable block with a temporary ID to be deleted
+	const reusableBlock = getReusableBlock( getState(), id );
+	if ( ! reusableBlock || reusableBlock.isTemporary ) {
 		return;
 	}
 
-	// Remove any other blocks that reference this shared block
+	// Remove any other blocks that reference this reusable block
 	const allBlocks = getBlocks( getState() );
-	const associatedBlocks = allBlocks.filter( ( block ) => isSharedBlock( block ) && block.attributes.ref === id );
+	const associatedBlocks = allBlocks.filter( ( block ) => isReusableBlock( block ) && block.attributes.ref === id );
 	const associatedBlockClientIds = associatedBlocks.map( ( block ) => block.clientId );
 
 	const transactionId = uniqueId();
 
 	dispatch( {
-		type: 'REMOVE_SHARED_BLOCK',
+		type: 'REMOVE_REUSABLE_BLOCK',
 		id,
 		optimist: { type: BEGIN, id: transactionId },
 	} );
@@ -169,43 +169,43 @@ export const deleteSharedBlocks = async ( action, store ) => {
 	// Remove the parsed block.
 	dispatch( removeBlocks( [
 		...associatedBlockClientIds,
-		sharedBlock.clientId,
+		reusableBlock.clientId,
 	] ) );
 
 	try {
 		await apiFetch( { path: `/wp/v2/${ postType.rest_base }/${ id }`, method: 'DELETE' } );
 		dispatch( {
-			type: 'DELETE_SHARED_BLOCK_SUCCESS',
+			type: 'DELETE_REUSABLE_BLOCK_SUCCESS',
 			id,
 			optimist: { type: COMMIT, id: transactionId },
 		} );
 		const message = __( 'Block deleted.' );
-		dispatch( createSuccessNotice( message, { id: SHARED_BLOCK_NOTICE_ID } ) );
+		dispatch( createSuccessNotice( message, { id: REUSABLE_BLOCK_NOTICE_ID } ) );
 	} catch ( error ) {
 		dispatch( {
-			type: 'DELETE_SHARED_BLOCK_FAILURE',
+			type: 'DELETE_REUSABLE_BLOCK_FAILURE',
 			id,
 			optimist: { type: REVERT, id: transactionId },
 		} );
 		dispatch( createErrorNotice( error.message, {
-			id: SHARED_BLOCK_NOTICE_ID,
+			id: REUSABLE_BLOCK_NOTICE_ID,
 			spokenMessage: error.message,
 		} ) );
 	}
 };
 
 /**
- * Receive Shared Blocks Effect Handler.
+ * Receive Reusable Blocks Effect Handler.
  *
  * @param {Object} action  action object.
  * @return {Object} receive blocks action
  */
-export const receiveSharedBlocks = ( action ) => {
+export const receiveReusableBlocks = ( action ) => {
 	return receiveBlocks( map( action.results, 'parsedBlock' ) );
 };
 
 /**
- * Convert a shared block to a static block effect handler
+ * Convert a reusable block to a static block effect handler
  *
  * @param {Object} action  action object.
  * @param {Object} store   Redux Store.
@@ -213,39 +213,39 @@ export const receiveSharedBlocks = ( action ) => {
 export const convertBlockToStatic = ( action, store ) => {
 	const state = store.getState();
 	const oldBlock = getBlock( state, action.clientId );
-	const sharedBlock = getSharedBlock( state, oldBlock.attributes.ref );
-	const referencedBlock = getBlock( state, sharedBlock.clientId );
+	const reusableBlock = getReusableBlock( state, oldBlock.attributes.ref );
+	const referencedBlock = getBlock( state, reusableBlock.clientId );
 	const newBlock = createBlock( referencedBlock.name, referencedBlock.attributes );
 	store.dispatch( replaceBlock( oldBlock.clientId, newBlock ) );
 };
 
 /**
- * Convert a static block to a shared block effect handler
+ * Convert a static block to a reusable block effect handler
  *
  * @param {Object} action  action object.
  * @param {Object} store   Redux Store.
  */
-export const convertBlockToShared = ( action, store ) => {
+export const convertBlockToReusable = ( action, store ) => {
 	const { getState, dispatch } = store;
 
 	const parsedBlock = getBlock( getState(), action.clientId );
-	const sharedBlock = {
-		id: uniqueId( 'shared' ),
+	const reusableBlock = {
+		id: uniqueId( 'reusable' ),
 		clientId: parsedBlock.clientId,
-		title: __( 'Untitled shared block' ),
+		title: __( 'Untitled reusable block' ),
 	};
 
-	dispatch( receiveSharedBlocksAction( [ {
-		sharedBlock,
+	dispatch( receiveReusableBlocksAction( [ {
+		reusableBlock,
 		parsedBlock,
 	} ] ) );
 
-	dispatch( saveSharedBlock( sharedBlock.id ) );
+	dispatch( saveReusableBlock( reusableBlock.id ) );
 
 	dispatch( replaceBlock(
 		parsedBlock.clientId,
 		createBlock( 'core/block', {
-			ref: sharedBlock.id,
+			ref: reusableBlock.id,
 			layout: parsedBlock.attributes.layout,
 		} )
 	) );

@@ -98,8 +98,8 @@
 		visibility: hidden;
 	}
 
-	.editor-block-list__block-edit .shared-block-edit-panel * {
-		z-index: z-index( '.editor-block-list__block-edit .shared-block-edit-panel *' );
+	.editor-block-list__block-edit .reusable-block-edit-panel * {
+		z-index: z-index( '.editor-block-list__block-edit .reusable-block-edit-panel *' );
 	}
 }
 
@@ -328,8 +328,8 @@
 		transition: opacity 0.2s;
 	}
 
-	// Shared blocks
-	&.is-shared > .editor-block-list__block-edit:before {
+	// Reusable blocks
+	&.is-reusable > .editor-block-list__block-edit:before {
 		// Use opacity to work in various editor styles.
 		outline: $border-width dashed $dark-opacity-light-500;
 

@@ -33,7 +33,7 @@ import {
 	provisionalBlockClientId,
 	blocksMode,
 	isInsertionPointVisible,
-	sharedBlocks,
+	reusableBlocks,
 	template,
 	blockListSettings,
 	autosave,
@@ -493,7 +493,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should update the shared block reference if the temporary id is swapped', () => {
+		it( 'should update the reusable block reference if the temporary id is swapped', () => {
 			const original = editor( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
@@ -508,7 +508,7 @@ describe( 'state', () => {
 			} );
 
 			const state = editor( deepFreeze( original ), {
-				type: 'SAVE_SHARED_BLOCK_SUCCESS',
+				type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
 				id: 'random-clientId',
 				updatedId: 3,
 			} );
@@ -1646,7 +1646,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should remove recorded shared blocks that are deleted', () => {
+		it( 'should remove recorded reusable blocks that are deleted', () => {
 			const initialState = {
 				insertUsage: {
 					'core/block/123': {
@@ -1658,7 +1658,7 @@ describe( 'state', () => {
 			};
 
 			const state = preferences( deepFreeze( initialState ), {
-				type: 'REMOVE_SHARED_BLOCK',
+				type: 'REMOVE_REUSABLE_BLOCK',
 				id: 123,
 			} );
 
@@ -1799,7 +1799,7 @@ describe( 'state', () => {
 		const PROVISIONAL_UPDATE_ACTION_TYPES = [
 			'UPDATE_BLOCK_ATTRIBUTES',
 			'UPDATE_BLOCK',
-			'CONVERT_BLOCK_TO_SHARED',
+			'CONVERT_BLOCK_TO_REUSABLE',
 		];
 
 		const PROVISIONAL_REPLACE_ACTION_TYPES = [
@@ -1911,9 +1911,9 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'sharedBlocks()', () => {
+	describe( 'reusableBlocks()', () => {
 		it( 'should start out empty', () => {
-			const state = sharedBlocks( undefined, {} );
+			const state = reusableBlocks( undefined, {} );
 			expect( state ).toEqual( {
 				data: {},
 				isFetching: {},
@@ -1921,11 +1921,11 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should add received shared blocks', () => {
-			const state = sharedBlocks( {}, {
-				type: 'RECEIVE_SHARED_BLOCKS',
+		it( 'should add received reusable blocks', () => {
+			const state = reusableBlocks( {}, {
+				type: 'RECEIVE_REUSABLE_BLOCKS',
 				results: [ {
-					sharedBlock: {
+					reusableBlock: {
 						id: 123,
 						title: 'My cool block',
 					},
@@ -1944,7 +1944,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should update a shared block', () => {
+		it( 'should update a reusable block', () => {
 			const initialState = {
 				data: {
 					123: { clientId: '', title: '' },
@@ -1953,8 +1953,8 @@ describe( 'state', () => {
 				isSaving: {},
 			};
 
-			const state = sharedBlocks( initialState, {
-				type: 'UPDATE_SHARED_BLOCK_TITLE',
+			const state = reusableBlocks( initialState, {
+				type: 'UPDATE_REUSABLE_BLOCK_TITLE',
 				id: 123,
 				title: 'My block',
 			} );
@@ -1968,17 +1968,17 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( "should update the shared block's id if it was temporary", () => {
+		it( "should update the reusable block's id if it was temporary", () => {
 			const initialState = {
 				data: {
-					shared1: { clientId: '', title: '' },
+					reusable1: { clientId: '', title: '' },
 				},
 				isSaving: {},
 			};
 
-			const state = sharedBlocks( initialState, {
-				type: 'SAVE_SHARED_BLOCK_SUCCESS',
-				id: 'shared1',
+			const state = reusableBlocks( initialState, {
+				type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
+				id: 'reusable1',
 				updatedId: 123,
 			} );
 
@@ -1991,7 +1991,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should remove a shared block', () => {
+		it( 'should remove a reusable block', () => {
 			const id = 123;
 			const initialState = {
 				data: {
@@ -2009,8 +2009,8 @@ describe( 'state', () => {
 				isSaving: {},
 			};
 
-			const state = sharedBlocks( deepFreeze( initialState ), {
-				type: 'REMOVE_SHARED_BLOCK',
+			const state = reusableBlocks( deepFreeze( initialState ), {
+				type: 'REMOVE_REUSABLE_BLOCK',
 				id,
 			} );
 
@@ -2021,7 +2021,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should indicate that a shared block is fetching', () => {
+		it( 'should indicate that a reusable block is fetching', () => {
 			const id = 123;
 			const initialState = {
 				data: {},
@@ -2029,8 +2029,8 @@ describe( 'state', () => {
 				isSaving: {},
 			};
 
-			const state = sharedBlocks( initialState, {
-				type: 'FETCH_SHARED_BLOCKS',
+			const state = reusableBlocks( initialState, {
+				type: 'FETCH_REUSABLE_BLOCKS',
 				id,
 			} );
 
@@ -2043,7 +2043,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should stop indicating that a shared block is saving when the fetch succeeded', () => {
+		it( 'should stop indicating that a reusable block is saving when the fetch succeeded', () => {
 			const id = 123;
 			const initialState = {
 				data: {
@@ -2055,8 +2055,8 @@ describe( 'state', () => {
 				isSaving: {},
 			};
 
-			const state = sharedBlocks( initialState, {
-				type: 'FETCH_SHARED_BLOCKS_SUCCESS',
+			const state = reusableBlocks( initialState, {
+				type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
 				id,
 				updatedId: id,
 			} );
@@ -2070,7 +2070,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should stop indicating that a shared block is fetching when there is an error', () => {
+		it( 'should stop indicating that a reusable block is fetching when there is an error', () => {
 			const id = 123;
 			const initialState = {
 				data: {},
@@ -2080,8 +2080,8 @@ describe( 'state', () => {
 				isSaving: {},
 			};
 
-			const state = sharedBlocks( initialState, {
-				type: 'FETCH_SHARED_BLOCKS_FAILURE',
+			const state = reusableBlocks( initialState, {
+				type: 'FETCH_REUSABLE_BLOCKS_FAILURE',
 				id,
 			} );
 
@@ -2092,7 +2092,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should indicate that a shared block is saving', () => {
+		it( 'should indicate that a reusable block is saving', () => {
 			const id = 123;
 			const initialState = {
 				data: {},
@@ -2100,8 +2100,8 @@ describe( 'state', () => {
 				isSaving: {},
 			};
 
-			const state = sharedBlocks( initialState, {
-				type: 'SAVE_SHARED_BLOCK',
+			const state = reusableBlocks( initialState, {
+				type: 'SAVE_REUSABLE_BLOCK',
 				id,
 			} );
 
@@ -2114,7 +2114,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should stop indicating that a shared block is saving when the save succeeded', () => {
+		it( 'should stop indicating that a reusable block is saving when the save succeeded', () => {
 			const id = 123;
 			const initialState = {
 				data: {
@@ -2126,8 +2126,8 @@ describe( 'state', () => {
 				},
 			};
 
-			const state = sharedBlocks( initialState, {
-				type: 'SAVE_SHARED_BLOCK_SUCCESS',
+			const state = reusableBlocks( initialState, {
+				type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
 				id,
 				updatedId: id,
 			} );
@@ -2141,7 +2141,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should stop indicating that a shared block is saving when there is an error', () => {
+		it( 'should stop indicating that a reusable block is saving when there is an error', () => {
 			const id = 123;
 			const initialState = {
 				data: {},
@@ -2151,8 +2151,8 @@ describe( 'state', () => {
 				},
 			};
 
-			const state = sharedBlocks( initialState, {
-				type: 'SAVE_SHARED_BLOCK_FAILURE',
+			const state = reusableBlocks( initialState, {
+				type: 'SAVE_REUSABLE_BLOCK_FAILURE',
 				id,
 			} );
 
