@@ -11,6 +11,7 @@ import {
 	getDefaultBlockName,
 	createBlock,
 } from '@wordpress/blocks';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Returns an action object used in signalling that editor has initialized with
@@ -765,4 +766,64 @@ export function unregisterToken( name ) {
 		type: 'UNREGISTER_TOKEN',
 		name,
 	};
+}
+
+export function fetchSharedBlocks( id ) {
+	deprecated( 'fetchSharedBlocks', {
+		alternative: 'fetchReusableBlocks',
+		version: '3.6',
+		plugin: 'Gutenberg',
+	} );
+
+	return fetchReusableBlocks( id );
+}
+
+export function receiveSharedBlocks( results ) {
+	deprecated( 'receiveSharedBlocks', {
+		alternative: 'receiveReusableBlocks',
+		version: '3.6',
+		plugin: 'Gutenberg',
+	} );
+
+	return receiveReusableBlocks( results );
+}
+
+export function saveSharedBlock( id ) {
+	deprecated( 'saveSharedBlock', {
+		alternative: 'saveReusableBlock',
+		version: '3.6',
+		plugin: 'Gutenberg',
+	} );
+
+	return saveReusableBlock( id );
+}
+
+export function deleteSharedBlock( id ) {
+	deprecated( 'deleteSharedBlock', {
+		alternative: 'deleteReusableBlock',
+		version: '3.6',
+		plugin: 'Gutenberg',
+	} );
+
+	return deleteReusableBlock( id );
+}
+
+export function updateSharedBlockTitle( id, title ) {
+	deprecated( 'updateSharedBlockTitle', {
+		alternative: 'updateReusableBlockTitle',
+		version: '3.6',
+		plugin: 'Gutenberg',
+	} );
+
+	return updateReusableBlockTitle( id, title );
+}
+
+export function convertBlockToSaved( clientId ) {
+	deprecated( 'convertBlockToSaved', {
+		alternative: 'convertBlockToReusable',
+		version: '3.6',
+		plugin: 'Gutenberg',
+	} );
+
+	return convertBlockToReusable( clientId );
 }

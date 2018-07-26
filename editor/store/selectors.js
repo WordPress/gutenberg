@@ -1996,3 +1996,43 @@ export function getProvisionalBlockUID( state ) {
 
 	return getProvisionalBlockClientId( state );
 }
+
+export function getSharedBlock( state, ref ) {
+	deprecated( 'getSharedBlock', {
+		alternative: 'getReusableBlock',
+		version: '3.6',
+		plugin: 'Gutenberg',
+	} );
+
+	return getReusableBlock( state, ref );
+}
+
+export function isSavingSharedBlock( state, ref ) {
+	deprecated( 'isSavingSharedBlock', {
+		alternative: 'isSavingReusableBlock',
+		version: '3.6',
+		plugin: 'Gutenberg',
+	} );
+
+	return isSavingReusableBlock( state, ref );
+}
+
+export function isFetchingSharedBlock( state, ref ) {
+	deprecated( 'isFetchingSharedBlock', {
+		alternative: 'isFetchingReusableBlock',
+		version: '3.6',
+		plugin: 'Gutenberg',
+	} );
+
+	return isFetchingReusableBlock( state, ref );
+}
+
+export function getSharedBlocks( state ) {
+	deprecated( 'getSharedBlocks', {
+		alternative: 'getReusableBlocks',
+		version: '3.6',
+		plugin: 'Gutenberg',
+	} );
+
+	return getReusableBlocks( state );
+}

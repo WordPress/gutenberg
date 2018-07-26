@@ -38,6 +38,7 @@ export {
 	getBlockSupport,
 	hasBlockSupport,
 	isReusableBlock,
+	isSharedBlock,
 	getChildBlockNames,
 	hasChildBlocks,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
