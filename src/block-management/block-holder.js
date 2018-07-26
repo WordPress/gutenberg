@@ -83,9 +83,7 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 						this.setState( { ...this.state, aztecHeight: event.nativeEvent.contentSize.height } );
 					} }
 					onChange={ ( event ) => {
-						console.log(event.nativeEvent.text),
-
-						this.setState( { ...this.state, eventCount: event.nativeEvent.eventCount } )
+						this.setState( { ...this.state, eventCount: event.nativeEvent.eventCount } );
 
 						this.props.onChange( this.props.uid, {
 							...this.props.attributes,
