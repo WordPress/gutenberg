@@ -293,7 +293,7 @@ class WritingFlow extends Component {
 		// bubbling events from children to determine focus transition intents.
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
-			<div className="editor-writing-flow">
+			<div className="editor-writing-flow" role="application">
 				<div
 					ref={ this.bindContainer }
 					onKeyDown={ this.onKeyDown }
