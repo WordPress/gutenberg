@@ -564,7 +564,17 @@ export const getBlocks = createSelector(
 	]
 );
 
-const unfoldBlockIds = ( state, block ) => {
+/**
+ * Given a block, returns an array containing all clientIds
+ * of referenced blocks (if it's a shared block)
+ * and innerBlocks.
+ *
+ * @param {Object} state Global application state.
+ * @param {Object} block The block whose ids we want to unfold.
+ *
+ * @return {Array} ids of referenced and inner blocks.
+ */
+const unfoldClientIds = ( state, block ) => {
 	const clientIds = [];
 	if ( block.name === 'core/block' ) {
 		clientIds.push( get( getSharedBlock( state, block.attributes.ref ), [ 'clientId' ], null ) );
@@ -572,28 +582,28 @@ const unfoldBlockIds = ( state, block ) => {
 	if ( block.innerBlocks.length > 0 ) {
 		block.innerBlocks.map( ( innerBlock ) => {
 			clientIds.push( innerBlock.clientId );
-			clientIds.push( ...unfoldBlockIds( state, innerBlock ) );
+			clientIds.push( ...unfoldClientIds( state, innerBlock ) );
 		} );
 	}
 	return clientIds.filter( ( id ) => !! id );
 };
 
 /**
- * Returns an array containing the ids of the top-level blocks,
- * all blocks referenced by the existing top-level shared blocks,
+ * Returns an array containing the clientIds of the top-level blocks,
+ * all blocks referenced by any shared block,
  * and all the inner blocks of existing top-level nested blocks.
  *
  * @param {Object} state Global application state.
  *
- * @return {Array} All ids of top-level, referenced, and inner blocks.
+ * @return {Array} ids of top-level, referenced, and inner blocks.
  */
-export const getBlockIdsUnfolded = createSelector(
+export const getClientIdsUnfolded = createSelector(
 	( state ) => {
 		const clientIds = [];
 		const topLevelBlocks = getBlocks( state );
 		topLevelBlocks.forEach( ( block ) => {
 			clientIds.push( block.clientId );
-			clientIds.push( ...unfoldBlockIds( state, block ) );
+			clientIds.push( ...unfoldClientIds( state, block ) );
 		} );
 		return clientIds;
 	},
@@ -1585,7 +1595,7 @@ export const getInserterItems = createSelector(
 
 			let isDisabled = false;
 			if ( ! hasBlockSupport( blockType.name, 'multiple', true ) ) {
-				isDisabled = some( getBlocksByClientId( state, getBlockIdsUnfolded( state ) ), { name: blockType.name } );
+				isDisabled = some( getBlocksByClientId( state, getClientIdsUnfolded( state ) ), { name: blockType.name } );
 			}
 
 			const isContextual = isArray( blockType.parent );

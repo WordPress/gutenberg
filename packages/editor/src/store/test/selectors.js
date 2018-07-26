@@ -44,8 +44,8 @@ const {
 	getBlockName,
 	getBlock,
 	getBlocks,
-	getBlockIdsUnfolded,
 	getBlockCount,
+	getClientIdsUnfolded,
 	hasSelectedBlock,
 	getSelectedBlock,
 	getSelectedBlockClientId,
@@ -1732,7 +1732,7 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getBlockIdsUnfolded', () => {
+	describe( 'getClientIdsUnfolded', () => {
 		it( 'should return the ids for top-level blocks, any block referenced by a existing top-level shared block, and children of nested blocks.', () => {
 			const state = {
 				currentPost: {},
@@ -1774,7 +1774,7 @@ describe( 'selectors', () => {
 					},
 				},
 			};
-			expect( getBlockIdsUnfolded( state ) ).toEqual( [
+			expect( getClientIdsUnfolded( state ) ).toEqual( [
 				'uuid-6',
 				'uuid-8',
 				'uuid-2',
