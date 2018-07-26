@@ -45,7 +45,7 @@ describe( 'Reusable Blocks', () => {
 
 		// Convert block to a reusable block
 		await page.click( 'button[aria-label="More Options"]' );
-		const convertButton = await page.waitForXPath( '//button[text()="Convert to Reusable Block"]' );
+		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable Blocks"]' );
 		await convertButton.click();
 
 		// Wait for creation to finish
@@ -91,7 +91,7 @@ describe( 'Reusable Blocks', () => {
 
 		// Convert block to a reusable block
 		await page.click( 'button[aria-label="More Options"]' );
-		const convertButton = await page.waitForXPath( '//button[text()="Convert to Reusable Block"]' );
+		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable Blocks"]' );
 		await convertButton.click();
 
 		// Wait for creation to finish
@@ -115,7 +115,7 @@ describe( 'Reusable Blocks', () => {
 			'.reusable-block-edit-panel__info',
 			( element ) => element.innerText
 		);
-		expect( title ).toBe( 'Untitled reusable block' );
+		expect( title ).toBe( 'Untitled Reusable Block' );
 	} );
 
 	it( 'can be inserted and edited', async () => {
@@ -188,7 +188,7 @@ describe( 'Reusable Blocks', () => {
 
 		// Delete the block and accept the confirmation dialog
 		await page.click( 'button[aria-label="More Options"]' );
-		const convertButton = await page.waitForXPath( '//button[text()="Delete Reusable Block"]' );
+		const convertButton = await page.waitForXPath( '//button[text()="Remove from Reusable Blocks"]' );
 		await Promise.all( [ waitForAndAcceptDialog(), convertButton.click() ] );
 
 		// Check that we have an empty post again

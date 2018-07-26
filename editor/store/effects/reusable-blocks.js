@@ -232,7 +232,7 @@ export const convertBlockToReusable = ( action, store ) => {
 	const reusableBlock = {
 		id: uniqueId( 'reusable' ),
 		clientId: parsedBlock.clientId,
-		title: __( 'Untitled reusable block' ),
+		title: __( 'Untitled Reusable Block' ),
 	};
 
 	dispatch( receiveReusableBlocksAction( [ {

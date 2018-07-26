@@ -413,7 +413,7 @@ describe( 'reusable blocks effects', () => {
 					reusableBlock: {
 						id: expect.stringMatching( /^reusable/ ),
 						clientId: staticBlock.clientId,
-						title: 'Untitled reusable block',
+						title: 'Untitled Reusable Block',
 					},
 					parsedBlock: staticBlock,
 				} ] )

@@ -6,6 +6,6 @@ exports[`ReusableBlockDeleteButton matches the snapshot 1`] = `
   icon="no"
   onClick={[Function]}
 >
-  Delete Reusable Block
+  Remove from Reusable Blocks
 </IconButton>
 `;

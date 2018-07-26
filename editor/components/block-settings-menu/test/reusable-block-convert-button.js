@@ -26,7 +26,7 @@ describe( 'ReusableBlockConvertButton', () => {
 			/>
 		);
 		const button = wrapper.find( 'IconButton' ).first();
-		expect( button.children().text() ).toBe( 'Convert to Reusable Block' );
+		expect( button.children().text() ).toBe( 'Add to Reusable Blocks' );
 		button.simulate( 'click' );
 		expect( onConvert ).toHaveBeenCalled();
 	} );

@@ -25,7 +25,7 @@ export function ReusableBlockDeleteButton( { reusableBlock, onDelete, itemsRole 
 			onClick={ () => onDelete( reusableBlock.id ) }
 			role={ itemsRole }
 		>
-			{ __( 'Delete Reusable Block' ) }
+			{ __( 'Remove from Reusable Blocks' ) }
 		</IconButton>
 	);
 }
