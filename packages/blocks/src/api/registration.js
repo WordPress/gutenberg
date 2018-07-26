@@ -8,7 +8,7 @@ import { get, isFunction, some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { applyFilters } from '@wordpress/hooks';
+import { applyFilters, addFilter } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
 
 /**
@@ -312,7 +312,7 @@ export function isSharedBlock( blockOrType ) {
 /**
  * Returns an array with the child blocks of a given block.
  *
- * @param {string} blockName Block type name.
+ * @param {string} blockName Name of block (example: “latest-posts”).
  *
  * @return {Array} Array of child block names.
  */
@@ -323,10 +323,32 @@ export const getChildBlockNames = ( blockName ) => {
 /**
  * Returns a boolean indicating if a block has child blocks or not.
  *
- * @param {string} blockName Block type name.
+ * @param {string} blockName Name of block (example: “latest-posts”).
  *
  * @return {boolean} True if a block contains child blocks and false otherwise.
  */
 export const hasChildBlocks = ( blockName ) => {
 	return select( 'core/blocks' ).hasChildBlocks( blockName );
+};
+
+/**
+ * Registers a new block style variation for the given block.
+ *
+ * @param {string} blockName      Name of block (example: “core/latest-posts”).
+ * @param {Object} styleVariation Object containing `name` which is the class name applied to the block and `label` which identifies the variation to the user.
+ */
+export const registerBlockStyle = ( blockName, styleVariation ) => {
+	addFilter( 'blocks.registerBlockType', `${ blockName }/${ styleVariation.name }`, ( settings, name ) => {
+		if ( blockName !== name ) {
+			return settings;
+		}
+
+		return {
+			...settings,
+			styles: [
+				...get( settings, [ 'styles' ], [] ),
+				styleVariation,
+			],
+		};
+	} );
 };
