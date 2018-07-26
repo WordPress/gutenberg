@@ -8,6 +8,8 @@ import { shallow } from 'enzyme';
  */
 import IconButton from '../';
 
+jest.mock( '../../button' );
+
 describe( 'IconButton', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render an top level element with only a class property', () => {
