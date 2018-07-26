@@ -26,10 +26,7 @@ export function PostTaxonomies( { postType, taxonomies, taxonomyWrapper = identi
 			<Fragment key={ `taxonomy-${ taxonomy.slug }` }>
 				{
 					taxonomyWrapper(
-						<TaxonomyComponent
-							restBase={ taxonomy.rest_base }
-							slug={ taxonomy.slug }
-						/>,
+						<TaxonomyComponent slug={ taxonomy.slug } />,
 						taxonomy
 					)
 				}

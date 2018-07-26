@@ -8,6 +8,8 @@ import { shallow } from 'enzyme';
  */
 import MenuItem from '../';
 
+jest.mock( '../../button' );
+
 describe( 'MenuItem', () => {
 	test( 'should match snapshot when only label provided', () => {
 		const wrapper = shallow(

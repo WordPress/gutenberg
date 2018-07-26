@@ -8,6 +8,8 @@ import { shallow, mount } from 'enzyme';
  */
 import PanelBody from '../body';
 
+jest.mock( '../../button' );
+
 describe( 'PanelBody', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render an empty div with the matching className', () => {

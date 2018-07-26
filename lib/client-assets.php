@@ -287,6 +287,7 @@ function gutenberg_register_scripts_and_styles() {
 			'lodash',
 			'moment',
 			'wp-a11y',
+			'wp-api',
 			'wp-api-fetch',
 			'wp-compose',
 			'wp-deprecated',
@@ -443,7 +444,6 @@ function gutenberg_register_scripts_and_styles() {
 			'lodash',
 			'postbox',
 			'wp-a11y',
-			'wp-api',
 			'wp-api-fetch',
 			'wp-blob',
 			'wp-blocks',
@@ -824,13 +824,17 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
 }
 
 /**
- * Extend wp-api Backbone client with methods to look up the REST API endpoints for all post types.
- *
- * This is temporary while waiting for #41111 in core.
- *
- * @link https://core.trac.wordpress.org/ticket/41111
+ * Provide the components script with the required config to make withAPIData work.
  */
-function gutenberg_extend_wp_api_backbone_client() {
+function gutenberg_prepare_wp_components_script() {
+	$schema_response = rest_do_request( new WP_REST_Request( 'GET', '/' ) );
+	if ( ! $schema_response->is_error() ) {
+		wp_add_inline_script( 'wp-components', sprintf(
+			'wpApiSettings.cacheSchema = true; wpApiSettings.schema = %s;',
+			wp_json_encode( $schema_response->get_data() )
+		), 'before' );
+	}
+
 	// Post Types Mapping.
 	$post_type_rest_base_mapping = array();
 	foreach ( get_post_types( array(), 'objects' ) as $post_type_object ) {
@@ -845,26 +849,15 @@ function gutenberg_extend_wp_api_backbone_client() {
 		$taxonomy_rest_base_mapping[ $taxonomy_object->name ] = $rest_base;
 	}
 
-	$script  = sprintf( 'wp.api.postTypeRestBaseMapping = %s;', wp_json_encode( $post_type_rest_base_mapping ) );
-	$script .= sprintf( 'wp.api.taxonomyRestBaseMapping = %s;', wp_json_encode( $taxonomy_rest_base_mapping ) );
-	$script .= <<<JS
-		wp.api.getPostTypeRoute = function( postType ) {
-			return wp.api.postTypeRestBaseMapping[ postType ];
-		};
-		wp.api.getTaxonomyRoute = function( taxonomy ) {
-			return wp.api.taxonomyRestBaseMapping[ taxonomy ];
-		};
-JS;
-	wp_add_inline_script( 'wp-api', $script );
-
-	// Localize the wp-api settings and schema.
-	$schema_response = rest_do_request( new WP_REST_Request( 'GET', '/' ) );
-	if ( ! $schema_response->is_error() ) {
-		wp_add_inline_script( 'wp-api', sprintf(
-			'wpApiSettings.cacheSchema = true; wpApiSettings.schema = %s;',
-			wp_json_encode( $schema_response->get_data() )
-		), 'before' );
-	}
+	wp_add_inline_script(
+		'wp-components',
+		sprintf(
+			'wp.components.unstable__setApiSettings( wpApiSettings.schema, %s, %s )',
+			wp_json_encode( $post_type_rest_base_mapping ),
+			wp_json_encode( $taxonomy_rest_base_mapping )
+		),
+		'after'
+	);
 }
 
 /**
@@ -1079,7 +1072,7 @@ function get_block_categories( $post ) {
 function gutenberg_editor_scripts_and_styles( $hook ) {
 	$is_demo = isset( $_GET['gutenberg-demo'] );
 
-	gutenberg_extend_wp_api_backbone_client();
+	gutenberg_prepare_wp_components_script();
 
 	// Enqueue heartbeat separately as an "optional" dependency of the editor.
 	// Heartbeat is used for automatic nonce refreshing, but some hosts choose

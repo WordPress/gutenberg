@@ -9,7 +9,7 @@ import { stringify } from 'querystring';
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { FormTokenField, withAPIData, withFilters } from '@wordpress/components';
+import { FormTokenField, withFilters } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import apiFetch from '@wordpress/api-fetch';
@@ -75,9 +75,9 @@ class FlatTermSelector extends Component {
 	}
 
 	fetchTerms( params = {} ) {
+		const { taxonomy } = this.props;
 		const query = { ...DEFAULT_QUERY, ...params };
-		const basePath = wp.api.getTaxonomyRoute( this.props.slug );
-		const request = apiFetch( { path: `/wp/v2/${ basePath }?${ stringify( query ) }` } );
+		const request = apiFetch( { path: `/wp/v2/${ taxonomy.rest_base }?${ stringify( query ) }` } );
 		request.then( ( terms ) => {
 			this.setState( ( state ) => ( {
 				availableTerms: state.availableTerms.concat(
@@ -105,10 +105,10 @@ class FlatTermSelector extends Component {
 	}
 
 	findOrCreateTerm( termName ) {
-		const basePath = wp.api.getTaxonomyRoute( this.props.slug );
+		const { taxonomy } = this.props;
 		// Tries to create a term or fetch it if it already exists.
 		return apiFetch( {
-			path: `/wp/v2/${ basePath }`,
+			path: `/wp/v2/${ taxonomy.rest_base }`,
 			method: 'POST',
 			data: { name: termName },
 		} ).catch( ( error ) => {
@@ -116,7 +116,7 @@ class FlatTermSelector extends Component {
 			if ( errorCode === 'term_exists' ) {
 				// If the terms exist, fetch it instead of creating a new one.
 				this.addRequest = apiFetch( {
-					path: `/wp/v2/${ basePath }?${ stringify( { ...DEFAULT_QUERY, search: termName } ) }`,
+					path: `/wp/v2/${ taxonomy.rest_base }?${ stringify( { ...DEFAULT_QUERY, search: termName } ) }`,
 				} );
 				return this.addRequest.then( ( searchResult ) => {
 					return find( searchResult, ( result ) => isSameTermName( result.name, termName ) );
@@ -140,14 +140,20 @@ class FlatTermSelector extends Component {
 		};
 
 		if ( newTermNames.length === 0 ) {
-			return this.props.onUpdateTerms( termNamesToIds( uniqueTerms, this.state.availableTerms ), this.props.restBase );
+			return this.props.onUpdateTerms(
+				termNamesToIds( uniqueTerms, this.state.availableTerms ),
+				this.props.taxonomy.rest_base
+			);
 		}
 		Promise
 			.all( newTermNames.map( this.findOrCreateTerm ) )
 			.then( ( newTerms ) => {
 				const newAvailableTerms = this.state.availableTerms.concat( newTerms );
 				this.setState( { availableTerms: newAvailableTerms } );
-				return this.props.onUpdateTerms( termNamesToIds( uniqueTerms, newAvailableTerms ), this.props.restBase );
+				return this.props.onUpdateTerms(
+					termNamesToIds( uniqueTerms, newAvailableTerms ),
+					this.props.taxonomy.rest_base
+				);
 			} );
 	}
 
@@ -200,18 +206,15 @@ class FlatTermSelector extends Component {
 }
 
 export default compose(
-	withAPIData( ( props ) => {
-		const { slug } = props;
-		return {
-			taxonomy: `/wp/v2/taxonomies/${ slug }?context=edit`,
-		};
-	} ),
-	withSelect( ( select, ownProps ) => {
+	withSelect( ( select, { slug } ) => {
 		const { getCurrentPost } = select( 'core/editor' );
+		const { getTaxonomy } = select( 'core' );
+		const taxonomy = getTaxonomy( slug );
 		return {
-			hasCreateAction: get( getCurrentPost(), [ '_links', 'wp:action-create-' + ownProps.restBase ], false ),
-			hasAssignAction: get( getCurrentPost(), [ '_links', 'wp:action-assign-' + ownProps.restBase ], false ),
-			terms: select( 'core/editor' ).getEditedPostAttribute( ownProps.restBase ),
+			hasCreateAction: taxonomy ? get( getCurrentPost(), [ '_links', 'wp:action-create-' + taxonomy.rest_base ], false ) : false,
+			hasAssignAction: taxonomy ? get( getCurrentPost(), [ '_links', 'wp:action-assign-' + taxonomy.rest_base ], false ) : false,
+			terms: taxonomy ? select( 'core/editor' ).getEditedPostAttribute( taxonomy.rest_base ) : [],
+			taxonomy,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

@@ -8,6 +8,8 @@ import { shallow } from 'enzyme';
  */
 import { PostPreviewButton } from '../';
 
+jest.mock( '../../../../packages/components/src/button' );
+
 describe( 'PostPreviewButton', () => {
 	describe( 'setPreviewWindowLink()', () => {
 		it( 'should do nothing if there is no preview window', () => {

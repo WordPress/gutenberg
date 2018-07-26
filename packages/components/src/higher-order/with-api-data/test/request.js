@@ -14,6 +14,8 @@ import request, {
 	isRequestMethod,
 } from '../request';
 
+jest.mock( '@wordpress/api-fetch' );
+
 describe( 'request', () => {
 	const actualResponse = {
 		json: () => Promise.resolve( {} ),

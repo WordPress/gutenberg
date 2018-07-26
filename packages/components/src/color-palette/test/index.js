@@ -8,6 +8,8 @@ import { shallow } from 'enzyme';
  */
 import ColorPalette from '../';
 
+jest.mock( '../../button' );
+
 describe( 'ColorPalette', () => {
 	const colors = [ { name: 'red', color: '#f00' }, { name: 'white', color: '#fff' }, { name: 'blue', color: '#00f' } ];
 	const currentColor = '#f00';
