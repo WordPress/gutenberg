@@ -95,6 +95,17 @@ public class ReactAztecText extends AztecText {
         setIntrinsicContentSize();
     }
 
+    // After the text changes inside an EditText, TextView checks if a layout() has been requested.
+    // If it has, it will not scroll the text to the end of the new text inserted, but wait for the
+    // next layout() to be called. However, we do not perform a layout() after a requestLayout(), so
+    // we need to override isLayoutRequested to force EditText to scroll to the end of the new text
+    // immediately.
+    // TODO: t6408636 verify if we should schedule a layout after a View does a requestLayout()
+    @Override
+    public boolean isLayoutRequested() {
+        return false;
+    }
+
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         onContentSizeChange();
