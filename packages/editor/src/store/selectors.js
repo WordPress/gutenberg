@@ -3,6 +3,7 @@
  */
 import {
 	castArray,
+	flatMap,
 	find,
 	first,
 	get,
@@ -599,13 +600,9 @@ const unfoldClientIds = ( state, block ) => {
  */
 export const getClientIdsUnfolded = createSelector(
 	( state ) => {
-		const clientIds = [];
 		const topLevelBlocks = getBlocks( state );
-		topLevelBlocks.forEach( ( block ) => {
-			clientIds.push( block.clientId );
-			clientIds.push( ...unfoldClientIds( state, block ) );
-		} );
-		return clientIds;
+		const getClientIdsFromBlock = ( block ) => [ block.clientId, ...unfoldClientIds( state, block ) ];
+		return flatMap( topLevelBlocks, getClientIdsFromBlock );
 	},
 	( state ) => [
 		state.editor.present.blockOrder,
