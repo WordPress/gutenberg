@@ -9,7 +9,7 @@ import { shallow } from 'enzyme';
 import { BlockModeToggle } from '../block-mode-toggle';
 
 describe( 'BlockModeToggle', () => {
-	it( 'should not render the HTML mode button if the block doesn\'t support it', () => {
+	it( "should not render the HTML mode button if the block doesn't support it", () => {
 		const wrapper = shallow(
 			<BlockModeToggle blockType={ { supports: { html: false } } } />
 		);

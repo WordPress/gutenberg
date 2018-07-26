@@ -26,17 +26,17 @@ function PostPublishPanelPrepublish( {
 	return (
 		<div className="editor-post-publish-panel__prepublish">
 			<div><strong>{ hasPublishAction ? __( 'Are you ready to publish?' ) : __( 'Are you ready to submit for review?' ) }</strong></div>
-			<p>{ hasPublishAction ? __( 'Here, you can do a last-minute check up of your settings below, before you publish.' ) : __( 'When you\'re ready, submit your work for review, and an Editor will be able to approve it for you.' ) }</p>
+			<p>{ hasPublishAction ? __( 'Here, you can do a last-minute check up of your settings below, before you publish.' ) : __( 'When you’re ready, submit your work for review, and an Editor will be able to approve it for you.' ) }</p>
 			{ hasPublishAction && (
 				<Fragment>
 					<PanelBody initialOpen={ false } title={ [
-						__( 'Visibility: ' ),
+						__( 'Visibility:' ),
 						<span className="editor-post-publish-panel__link" key="label"><PostVisibilityLabel /></span>,
 					] }>
 						<PostVisibility />
 					</PanelBody>
 					<PanelBody initialOpen={ false } title={ [
-						__( 'Publish: ' ),
+						__( 'Publish:' ),
 						<span className="editor-post-publish-panel__link" key="label"><PostScheduleLabel /></span>,
 					] }>
 						<PostSchedule />

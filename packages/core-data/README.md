@@ -1,5 +1,4 @@
-Core Data
-=========
+# Core Data
 
 Core Data is a [data module](../data) intended to simplify access to and manipulation of core WordPress entities. It registers its own store and provides a number of selectors which resolve data from the WordPress REST API automatically, along with dispatching action creators to manipulate data.
 

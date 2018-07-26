@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/library-export-default-webpack-plugin",
-	"version": "1.0.0-alpha.2",
-	"description": "Webpack plugin for exporting default property for selected libraries",
+	"version": "1.0.1",
+	"description": "Webpack plugin for exporting default property for selected libraries.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
@@ -17,14 +17,19 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"files": [
+		"build",
+		"build-module"
+	],
 	"main": "build/index.js",
 	"dependencies": {
-		"lodash": "4.17.5",
-		"webpack-sources": "1.1.0"
+		"@babel/runtime": "^7.0.0-beta.52",
+		"lodash": "^4.17.10",
+		"webpack-sources": "^1.1.0"
 	},
 	"devDependencies": {
-		"rimraf": "2.6.2",
-		"webpack": "4.8.3"
+		"rimraf": "^2.6.2",
+		"webpack": "^4.8.3"
 	},
 	"peerDependencies": {
 		"webpack": "^4.0.0"

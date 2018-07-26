@@ -6,11 +6,12 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, compose } from '@wordpress/element';
-import { Button, ifCondition } from '@wordpress/components';
+import { Component } from '@wordpress/element';
+import { Button } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { DotTip } from '@wordpress/nux';
+import { ifCondition, compose } from '@wordpress/compose';
 
 export class PostPreviewButton extends Component {
 	constructor() {
@@ -62,12 +63,16 @@ export class PostPreviewButton extends Component {
 	 * @param {MouseEvent} event Click event from preview button click.
 	 */
 	openPreviewWindow( event ) {
-		const { isAutosaveable, previewLink } = this.props;
+		const { isAutosaveable, previewLink, currentPostLink } = this.props;
 
 		// If there are no changes to autosave, we cannot perform the save, but
 		// if there is an existing preview link (e.g. previous published post
 		// autosave), it should be reused as the popup destination.
-		if ( ! isAutosaveable && ! previewLink ) {
+		if ( ! isAutosaveable && ! previewLink && currentPostLink ) {
+			this.previewWindow = window.open(
+				currentPostLink,
+				this.getWindowTarget()
+			);
 			return;
 		}
 
@@ -114,15 +119,13 @@ export class PostPreviewButton extends Component {
 	}
 
 	render() {
-		const { currentPostLink, isSaveable } = this.props;
+		const { isSaveable } = this.props;
 
 		return (
 			<Button
 				className="editor-post-preview"
 				isLarge
-				href={ currentPostLink }
 				onClick={ this.openPreviewWindow }
-				target={ this.getWindowTarget() }
 				disabled={ ! isSaveable }
 			>
 				{ _x( 'Preview', 'imperative verb' ) }

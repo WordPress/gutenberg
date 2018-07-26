@@ -11,29 +11,54 @@ import { stringify } from 'querystringify';
  */
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { Component, Fragment } from '@wordpress/element';
-import { decodeEntities } from '@wordpress/utils';
+import { decodeEntities } from '@wordpress/html-entities';
 import { UP, DOWN, ENTER } from '@wordpress/keycodes';
-import { Spinner, withInstanceId, withSpokenMessages, Popover } from '@wordpress/components';
-import apiRequest from '@wordpress/api-request';
+import { Spinner, withSpokenMessages, Popover } from '@wordpress/components';
+import { withInstanceId } from '@wordpress/compose';
+import apiFetch from '@wordpress/api-fetch';
+import deprecated from '@wordpress/deprecated';
 
 // Since URLInput is rendered in the context of other inputs, but should be
 // considered a separate modal node, prevent keyboard events from propagating
 // as being considered from the input.
 const stopEventPropagation = ( event ) => event.stopPropagation();
 
-class UrlInput extends Component {
+class URLInput extends Component {
 	constructor() {
 		super( ...arguments );
+
 		this.onChange = this.onChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.bindListNode = this.bindListNode.bind( this );
 		this.updateSuggestions = throttle( this.updateSuggestions.bind( this ), 200 );
+
 		this.suggestionNodes = [];
+
 		this.state = {
 			posts: [],
 			showSuggestions: false,
 			selectedSuggestion: null,
 		};
+	}
+
+	componentDidUpdate() {
+		const { showSuggestions, selectedSuggestion } = this.state;
+		// only have to worry about scrolling selected suggestion into view
+		// when already expanded
+		if ( showSuggestions && selectedSuggestion !== null && ! this.scrollingIntoView ) {
+			this.scrollingIntoView = true;
+			scrollIntoView( this.suggestionNodes[ selectedSuggestion ], this.listNode, {
+				onlyScrollIfNeeded: true,
+			} );
+
+			setTimeout( () => {
+				this.scrollingIntoView = false;
+			}, 100 );
+		}
+	}
+
+	componentWillUnmount() {
+		delete this.suggestionsRequest;
 	}
 
 	bindListNode( ref ) {
@@ -47,10 +72,6 @@ class UrlInput extends Component {
 	}
 
 	updateSuggestions( value ) {
-		if ( this.suggestionsRequest ) {
-			this.suggestionsRequest.abort();
-		}
-
 		// Show the suggestions after typing at least 2 characters
 		// and also for URLs
 		if ( value.length < 2 || /^https?:/.test( value ) ) {
@@ -68,41 +89,46 @@ class UrlInput extends Component {
 			selectedSuggestion: null,
 			loading: true,
 		} );
-		this.suggestionsRequest = apiRequest( {
-			path: `/wp/v2/posts?${ stringify( {
+
+		const request = apiFetch( {
+			path: `/gutenberg/v1/search?${ stringify( {
 				search: value,
 				per_page: 20,
-				orderby: 'relevance',
+				type: 'post',
 			} ) }`,
 		} );
 
-		this.suggestionsRequest
-			.then(
-				( posts ) => {
-					this.setState( {
-						posts,
-						loading: false,
-					} );
+		request.then( ( posts ) => {
+			// A fetch Promise doesn't have an abort option. It's mimicked by
+			// comparing the request reference in on the instance, which is
+			// reset or deleted on subsequent requests or unmounting.
+			if ( this.suggestionsRequest !== request ) {
+				return;
+			}
 
-					if ( !! posts.length ) {
-						this.props.debouncedSpeak( sprintf( _n(
-							'%d result found, use up and down arrow keys to navigate.',
-							'%d results found, use up and down arrow keys to navigate.',
-							posts.length
-						), posts.length ), 'assertive' );
-					} else {
-						this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
-					}
-				},
-				( xhr ) => {
-					if ( xhr.statusText === 'abort' ) {
-						return;
-					}
-					this.setState( {
-						loading: false,
-					} );
-				}
-			);
+			this.setState( {
+				posts,
+				loading: false,
+			} );
+
+			if ( !! posts.length ) {
+				this.props.debouncedSpeak( sprintf( _n(
+					'%d result found, use up and down arrow keys to navigate.',
+					'%d results found, use up and down arrow keys to navigate.',
+					posts.length
+				), posts.length ), 'assertive' );
+			} else {
+				this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
+			}
+		} ).catch( () => {
+			if ( this.suggestionsRequest === request ) {
+				this.setState( {
+					loading: false,
+				} );
+			}
+		} );
+
+		this.suggestionsRequest = request;
 	}
 
 	onChange( event ) {
@@ -156,28 +182,6 @@ class UrlInput extends Component {
 		} );
 	}
 
-	componentWillUnmount() {
-		if ( this.suggestionsRequest ) {
-			this.suggestionsRequest.abort();
-		}
-	}
-
-	componentDidUpdate() {
-		const { showSuggestions, selectedSuggestion } = this.state;
-		// only have to worry about scrolling selected suggestion into view
-		// when already expanded
-		if ( showSuggestions && selectedSuggestion !== null && ! this.scrollingIntoView ) {
-			this.scrollingIntoView = true;
-			scrollIntoView( this.suggestionNodes[ selectedSuggestion ], this.listNode, {
-				onlyScrollIfNeeded: true,
-			} );
-
-			setTimeout( () => {
-				this.scrollingIntoView = false;
-			}, 100 );
-		}
-	}
-
 	render() {
 		const { value = '', autoFocus = true, instanceId } = this.props;
 		const { showSuggestions, posts, selectedSuggestion, loading } = this.state;
@@ -226,7 +230,7 @@ class UrlInput extends Component {
 									onClick={ () => this.selectLink( post.link ) }
 									aria-selected={ index === selectedSuggestion }
 								>
-									{ decodeEntities( post.title.rendered ) || __( '(no title)' ) }
+									{ decodeEntities( post.title ) || __( '(no title)' ) }
 								</button>
 							) ) }
 						</div>
@@ -238,4 +242,27 @@ class UrlInput extends Component {
 	}
 }
 
-export default withSpokenMessages( withInstanceId( UrlInput ) );
+// TODO: As part of deprecation of UrlInput, the temporary passthrough
+// component needs access to the enhanced URLInput class, so it cannot be
+// enhanced as part of its export default. Once the temporary passthrough is
+// removed, this can be moved back to the export statement.
+URLInput = withSpokenMessages( withInstanceId( URLInput ) );
+
+export class UrlInput extends Component {
+	constructor() {
+		super( ...arguments );
+
+		deprecated( 'wp.editor.UrlInput', {
+			alternative: 'wp.editor.URLInput',
+			plugin: 'Gutenberg',
+			version: 'v3.5',
+			hint: 'The component has been renamed.',
+		} );
+	}
+
+	render() {
+		return <URLInput { ...this.props } />;
+	}
+}
+
+export default URLInput;

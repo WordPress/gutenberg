@@ -4,7 +4,7 @@
 import { Notice, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -25,7 +25,7 @@ function TemplateValidationNotice( { isValid, ...props } ) {
 
 	return (
 		<Notice className="editor-template-validation-notice" isDismissible={ false } status="warning">
-			<p>{ __( 'The content of your post doesn\'t match the template assigned to your post type.' ) }</p>
+			<p>{ __( 'The content of your post doesn’t match the template assigned to your post type.' ) }</p>
 			<div>
 				<Button isDefault onClick={ props.resetTemplateValidity }>{ __( 'Keep it as is' ) }</Button>
 				<Button onClick={ confirmSynchronization } isPrimary>{ __( 'Reset the template' ) }</Button>

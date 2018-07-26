@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/dom",
-	"version": "1.0.0-alpha.2",
-	"description": "DOM utils module for WordPress",
+	"version": "1.0.1",
+	"description": "DOM utilities module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
@@ -20,9 +20,10 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"element-closest": "2.0.2",
-		"lodash": "4.17.5",
-		"tinymce": "4.7.2"
+		"@babel/runtime": "^7.0.0-beta.52",
+		"element-closest": "^2.0.2",
+		"lodash": "^4.17.10",
+		"tinymce": "^4.7.2"
 	},
 	"publishConfig": {
 		"access": "public"

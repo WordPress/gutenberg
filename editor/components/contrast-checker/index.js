@@ -14,7 +14,14 @@ import { Notice } from '@wordpress/components';
  */
 import './style.scss';
 
-function ContrastChecker( { backgroundColor, textColor, isLargeText, fallbackBackgroundColor, fallbackTextColor } ) {
+function ContrastChecker( {
+	backgroundColor,
+	fallbackBackgroundColor,
+	fallbackTextColor,
+	fontSize,
+	isLargeText,
+	textColor,
+} ) {
 	if ( ! ( backgroundColor || fallbackBackgroundColor ) || ! ( textColor || fallbackTextColor ) ) {
 		return null;
 	}
@@ -25,7 +32,7 @@ function ContrastChecker( { backgroundColor, textColor, isLargeText, fallbackBac
 	if ( hasTransparency || tinycolor.isReadable(
 		tinyBackgroundColor,
 		tinyTextColor,
-		{ level: 'AA', size: ( isLargeText ? 'large' : 'small' ) }
+		{ level: 'AA', size: ( isLargeText || ( isLargeText !== false && fontSize >= 18 ) ? 'large' : 'small' ) }
 	) ) {
 		return null;
 	}

@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/core-data",
-	"version": "1.0.0-alpha.2",
-	"description": "Access to and manipulation of core WordPress entities",
+	"version": "1.0.1",
+	"description": "Access to and manipulation of core WordPress entities.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
@@ -20,10 +20,14 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"@wordpress/api-request": "^1.0.0-alpha.2",
-		"@wordpress/data": "^1.0.0-alpha.2",
-		"lodash": "4.17.5",
-		"rememo": "3.0.0"
+		"@babel/runtime": "^7.0.0-beta.52",
+		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/data": "file:../data",
+		"lodash": "^4.17.10",
+		"rememo": "^3.0.0"
+	},
+	"devDependencies": {
+		"deep-freeze": "^0.0.1"
 	},
 	"publishConfig": {
 		"access": "public"

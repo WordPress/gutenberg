@@ -1,6 +1,6 @@
 [
     {
-        "uid": "_uid_0",
+        "clientId": "_clientId_0",
         "name": "core/pullquote",
         "isValid": true,
         "attributes": {
@@ -8,46 +8,37 @@
                 {
                     "children": {
                         "type": "p",
-                        "key": null,
-                        "ref": null,
                         "props": {
                             "children": [
                                 "Paragraph ",
                                 {
                                     "type": "strong",
-                                    "key": "_domReact73",
-                                    "ref": null,
                                     "props": {
-                                        "children": "one"
-                                    },
-                                    "_owner": null,
-                                    "_store": {}
+                                        "children": [
+                                            "one"
+                                        ]
+                                    }
                                 }
                             ]
-                        },
-                        "_owner": null,
-                        "_store": {}
+                        }
                     }
                 },
                 {
                     "children": {
                         "type": "p",
-                        "key": null,
-                        "ref": null,
                         "props": {
-                            "children": "Paragraph two"
-                        },
-                        "_owner": null,
-                        "_store": {}
+                            "children": [
+                                "Paragraph two"
+                            ]
+                        }
                     }
                 }
             ],
             "citation": [
                 "by whomever"
-            ],
-            "align": "none"
+            ]
         },
         "innerBlocks": [],
-        "originalContent": "<blockquote class=\"wp-block-pullquote alignnone\">\n    <p>Paragraph <strong>one</strong></p>\n    <p>Paragraph two</p>\n    <cite>by whomever</cite>\n</blockquote>"
+        "originalContent": "<blockquote class=\"wp-block-pullquote\">\n    <p>Paragraph <strong>one</strong></p>\n    <p>Paragraph two</p>\n    <cite>by whomever</cite>\n</blockquote>"
     }
 ]

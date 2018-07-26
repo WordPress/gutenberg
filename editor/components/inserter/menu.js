@@ -20,15 +20,14 @@ import scrollIntoView from 'dom-scroll-into-view';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, compose, findDOMNode, createRef } from '@wordpress/element';
+import { Component, findDOMNode, createRef } from '@wordpress/element';
 import {
-	withInstanceId,
 	withSpokenMessages,
 	PanelBody,
-	withSafeTimeout,
 } from '@wordpress/components';
 import { getCategories, isSharedBlock } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
+import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -183,7 +182,7 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
-		const { instanceId, onSelect, rootUID } = this.props;
+		const { instanceId, onSelect, rootClientId } = this.props;
 		const { childItems, filterValue, hoveredItem, suggestedItems, sharedItems, itemsPerCategory, openPanels } = this.state;
 		const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
 		const isSearching = !! filterValue;
@@ -217,7 +216,7 @@ export class InserterMenu extends Component {
 					<InserterResultsPortal.Slot fillProps={ { filterValue } } />
 
 					<ChildBlocks
-						rootUID={ rootUID }
+						rootClientId={ rootClientId }
 						items={ childItems }
 						onSelect={ onSelect }
 						onHover={ this.onHover }
@@ -276,14 +275,14 @@ export class InserterMenu extends Component {
 }
 
 export default compose(
-	withSelect( ( select, { rootUID } ) => {
+	withSelect( ( select, { rootClientId } ) => {
 		const {
 			getChildBlockNames,
 		} = select( 'core/blocks' );
 		const {
 			getBlockName,
 		} = select( 'core/editor' );
-		const rootBlockName = getBlockName( rootUID );
+		const rootBlockName = getBlockName( rootClientId );
 		return {
 			rootChildBlocks: getChildBlockNames( rootBlockName ),
 		};

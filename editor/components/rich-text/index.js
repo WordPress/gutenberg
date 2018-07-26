@@ -3,7 +3,6 @@
  */
 import classnames from 'classnames';
 import {
-	last,
 	isEqual,
 	forEach,
 	merge,
@@ -11,14 +10,13 @@ import {
 	find,
 	defer,
 	noop,
-	reject,
 } from 'lodash';
 import 'element-closest';
 
 /**
  * WordPress dependencies
  */
-import { Component, Fragment, compose, RawHTML, createRef } from '@wordpress/element';
+import { Component, Fragment, RawHTML, createRef } from '@wordpress/element';
 import {
 	isHorizontalEdge,
 	getRectangleFromRange,
@@ -26,9 +24,11 @@ import {
 } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
 import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, rawShortcut } from '@wordpress/keycodes';
-import { withInstanceId, withSafeTimeout, Slot } from '@wordpress/components';
+import { Slot } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
-import { rawHandler } from '@wordpress/blocks';
+import { rawHandler, children } from '@wordpress/blocks';
+import deprecated from '@wordpress/deprecated';
+import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -60,50 +60,6 @@ const { Node } = window;
  */
 const TINYMCE_ZWSP = '\uFEFF';
 
-/**
- * Returns true if the node is the inline node boundary. This is used in node
- * filtering prevent the inline boundary from being included in the split which
- * occurs while within but at the end of an inline node, since TinyMCE includes
- * a placeholder caret character at the end.
- *
- * @see https://github.com/tinymce/tinymce/blob/master/src/plugins/link/main/ts/core/Utils.ts
- *
- * @param {Node} node Node to test.
- *
- * @return {boolean} Whether node is inline boundary.
- */
-export function isEmptyInlineBoundary( node ) {
-	const text = node.nodeName === 'A' ? node.innerText : node.textContent;
-	return text === TINYMCE_ZWSP;
-}
-
-/**
- * Returns true if the node is empty, meaning it contains only the placeholder
- * caret character or is an empty text node.
- *
- * @param {Node} node Node to test.
- *
- * @return {boolean} Whether node is empty.
- */
-export function isEmptyNode( node ) {
-	return (
-		'' === node.nodeValue ||
-		isEmptyInlineBoundary( node )
-	);
-}
-
-/**
- * Given a set of Nodes, filters to set to exclude any empty nodes: those with
- * either empty text nodes or only including the inline boundary caret.
- *
- * @param {Node[]} childNodes Nodes to filter.
- *
- * @return {Node[]} Non-empty nodes.
- */
-export function filterEmptyNodes( childNodes ) {
-	return reject( childNodes, isEmptyNode );
-}
-
 export function getFormatProperties( formatName, parents ) {
 	switch ( formatName ) {
 		case 'link' : {
@@ -126,7 +82,6 @@ export class RichText extends Component {
 		this.onSetup = this.onSetup.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onChange = this.onChange.bind( this );
-		this.onNewBlock = this.onNewBlock.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
 		this.onHorizontalNavigationKeyDown = this.onHorizontalNavigationKeyDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
@@ -176,7 +131,6 @@ export class RichText extends Component {
 		this.editor = editor;
 
 		editor.on( 'init', this.onInit );
-		editor.on( 'NewBlock', this.onNewBlock );
 		editor.on( 'nodechange', this.onNodeChange );
 		editor.on( 'keydown', this.onKeyDown );
 		editor.on( 'keyup', this.onKeyUp );
@@ -323,14 +277,13 @@ export class RichText extends Component {
 		window.console.log( 'Received HTML:\n\n', HTML );
 		window.console.log( 'Received plain text:\n\n', this.pastedPlainText );
 
-		// There is a selection, check if a link is pasted.
+		// There is a selection, check if a URL is pasted.
 		if ( ! this.editor.selection.isCollapsed() ) {
 			const linkRegExp = /^(?:https?:)?\/\/\S+$/i;
 			const pastedText = event.content.replace( /<[^>]+>/g, '' ).trim();
-			const selectedText = this.editor.selection.getContent().replace( /<[^>]+>/g, '' ).trim();
 
-			// The pasted text is a link, and the selected text is not.
-			if ( linkRegExp.test( pastedText ) && ! linkRegExp.test( selectedText ) ) {
+			// A URL was pasted, turn the selection into a link
+			if ( linkRegExp.test( pastedText ) ) {
 				this.editor.execCommand( 'mceInsertLink', false, {
 					href: this.editor.dom.decode( pastedText ),
 				} );
@@ -357,7 +310,7 @@ export class RichText extends Component {
 			plainText: this.pastedPlainText,
 			mode,
 			tagName: this.props.tagName,
-			canUserUseUnfilteredHTML: this.context.canUserUseUnfilteredHTML,
+			canUserUseUnfilteredHTML: this.props.canUserUseUnfilteredHTML,
 		} );
 
 		if ( typeof content === 'string' ) {
@@ -541,10 +494,10 @@ export class RichText extends Component {
 				const afterNodes = childNodes.slice( index + 1 );
 
 				const { format } = this.props;
-				const before = domToFormat( beforeNodes, format, this.editor );
-				const after = domToFormat( afterNodes, format, this.editor );
+				const before = domToFormat( beforeNodes, format );
+				const after = domToFormat( afterNodes, format );
 
-				this.restoreContentAndSplit( before, after );
+				this.props.onSplit( before, after );
 			} else {
 				event.preventDefault();
 
@@ -635,12 +588,12 @@ export class RichText extends Component {
 			afterRange.setStart( selectionRange.endContainer, selectionRange.endOffset );
 			afterRange.setEnd( rootNode, dom.nodeIndex( rootNode.lastChild ) + 1 );
 
-			const beforeFragment = beforeRange.extractContents();
-			const afterFragment = afterRange.extractContents();
+			const beforeFragment = beforeRange.cloneContents();
+			const afterFragment = afterRange.cloneContents();
 
 			const { format } = this.props;
-			before = domToFormat( filterEmptyNodes( beforeFragment.childNodes ), format, this.editor );
-			after = domToFormat( filterEmptyNodes( afterFragment.childNodes ), format, this.editor );
+			before = domToFormat( beforeFragment.childNodes, format );
+			after = domToFormat( afterFragment.childNodes, format );
 		} else {
 			before = [];
 			after = [];
@@ -664,56 +617,7 @@ export class RichText extends Component {
 			after = this.isEmpty( after ) ? null : after;
 		}
 
-		this.restoreContentAndSplit( before, after, blocks );
-	}
-
-	onNewBlock() {
-		if ( this.props.multiline !== 'p' || ! this.props.onSplit ) {
-			return;
-		}
-
-		// Getting the content before and after the cursor
-		const childNodes = Array.from( this.editor.getBody().childNodes );
-		let selectedChild = this.editor.selection.getStart();
-		while ( childNodes.indexOf( selectedChild ) === -1 && selectedChild.parentNode ) {
-			selectedChild = selectedChild.parentNode;
-		}
-		const splitIndex = childNodes.indexOf( selectedChild );
-		if ( splitIndex === -1 ) {
-			return;
-		}
-		const beforeNodes = childNodes.slice( 0, splitIndex );
-		const lastNodeBeforeCursor = last( beforeNodes );
-		// Avoid splitting on single enter
-		if (
-			! lastNodeBeforeCursor ||
-			beforeNodes.length < 2 ||
-			!! lastNodeBeforeCursor.textContent
-		) {
-			return;
-		}
-
-		const before = beforeNodes.slice( 0, beforeNodes.length - 1 );
-
-		// Removing empty nodes from the beginning of the "after"
-		// avoids empty paragraphs at the beginning of newly created blocks.
-		const after = childNodes.slice( splitIndex ).reduce( ( memo, node ) => {
-			if ( ! memo.length && ! node.textContent ) {
-				return memo;
-			}
-
-			memo.push( node );
-			return memo;
-		}, [] );
-
-		// Splitting into two blocks
-		this.setContent( this.props.value );
-
-		const { format } = this.props;
-		this.restoreContentAndSplit(
-			domToFormat( before, format, this.editor ),
-			domToFormat( after, format, this.editor )
-		);
+		onSplit( before, after, ...blocks );
 	}
 
 	onNodeChange( { parents } ) {
@@ -772,12 +676,7 @@ export class RichText extends Component {
 	getContent() {
 		const { format } = this.props;
 
-		switch ( format ) {
-			case 'string':
-				return this.editor.getContent();
-			default:
-				return domToFormat( this.editor.getBody().childNodes || [], 'element', this.editor );
-		}
+		return domToFormat( this.editor.getBody().childNodes, format );
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -873,19 +772,6 @@ export class RichText extends Component {
 		this.setState( ( state ) => ( {
 			formats: merge( {}, state.formats, formats ),
 		} ) );
-	}
-
-	/**
-	 * Calling onSplit means we need to abort the change done by TinyMCE.
-	 * we need to call updateContent to restore the initial content before calling onSplit.
-	 *
-	 * @param {Array}  before content before the split position
-	 * @param {Array}  after  content after the split position
-	 * @param {?Array} blocks blocks to insert at the split position
-	 */
-	restoreContentAndSplit( before, after, blocks = [] ) {
-		this.setContent( this.props.value );
-		this.props.onSplit( before, after, ...blocks );
 	}
 
 	render() {
@@ -986,14 +872,13 @@ export class RichText extends Component {
 RichText.contextTypes = {
 	onUndo: noop,
 	onRedo: noop,
-	canUserUseUnfilteredHTML: noop,
 	onCreateUndoLevel: noop,
 };
 
 RichText.defaultProps = {
 	formattingControls: DEFAULT_FORMATS,
 	formatters: [],
-	format: 'element',
+	format: 'children',
 };
 
 const RichTextContainer = compose( [
@@ -1009,6 +894,7 @@ const RichTextContainer = compose( [
 				isSelected: context.isSelected,
 			};
 		}
+
 		// Ensures that only one RichText component can be focused.
 		return {
 			isSelected: context.isSelected && context.focusedElement === ownProps.instanceId,
@@ -1017,30 +903,49 @@ const RichTextContainer = compose( [
 	} ),
 	withSelect( ( select ) => {
 		const { isViewportMatch = identity } = select( 'core/viewport' ) || {};
+		const { canUserUseUnfilteredHTML } = select( 'core/editor' );
 
 		return {
 			isViewportSmall: isViewportMatch( '< small' ),
+			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
 		};
 	} ),
 	withSafeTimeout,
 ] )( RichText );
 
-RichTextContainer.Content = ( { value, format = 'element', tagName: Tag, ...props } ) => {
-	let children;
+RichTextContainer.Content = ( { value, format, tagName: Tag, ...props } ) => {
+	let content;
 	switch ( format ) {
 		case 'string':
-			children = <RawHTML>{ value }</RawHTML>;
+			content = <RawHTML>{ value }</RawHTML>;
 			break;
-		default:
-			children = value;
+
+		case 'element':
+			// NOTE: In removing this, ensure to remove also every related
+			// function from `format.js`, including the `dom-react` dependency.
+			deprecated( 'RichText `element` format', {
+				version: '3.5',
+				plugin: 'Gutenberg',
+				alternative: 'the compatible `children` format',
+			} );
+
+			content = value;
+			break;
+
+		case 'children':
+			content = <RawHTML>{ children.toHTML( value ) }</RawHTML>;
 			break;
 	}
 
 	if ( Tag ) {
-		return <Tag { ...props }>{ children }</Tag>;
+		return <Tag { ...props }>{ content }</Tag>;
 	}
 
-	return children;
+	return content;
+};
+
+RichTextContainer.Content.defaultProps = {
+	format: 'children',
 };
 
 export default RichTextContainer;

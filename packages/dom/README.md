@@ -1,6 +1,6 @@
-# @wordpress/dom
+# DOM
 
-DOM utils module for WordPress.
+DOM utilities module for WordPress.
 
 ## Installation
 

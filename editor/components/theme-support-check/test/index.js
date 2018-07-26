@@ -9,7 +9,7 @@ import { shallow } from 'enzyme';
 import { ThemeSupportCheck } from '../index';
 
 describe( 'ThemeSupportCheck', () => {
-	it( 'should not render if there\'s no support check provided', () => {
+	it( "should not render if there's no support check provided", () => {
 		const wrapper = shallow( <ThemeSupportCheck>foobar</ThemeSupportCheck> );
 		expect( wrapper.type() ).toBe( null );
 	} );
@@ -37,7 +37,7 @@ describe( 'ThemeSupportCheck', () => {
 		expect( wrapper.type() ).not.toBe( null );
 	} );
 
-	it( 'should not render if post-thumbnails aren\'t supported for the post type', () => {
+	it( "should not render if post-thumbnails aren't supported for the post type", () => {
 		const themeSupports = {
 			'post-thumbnails': [ 'post' ],
 		};
@@ -61,7 +61,7 @@ describe( 'ThemeSupportCheck', () => {
 		expect( wrapper.type() ).toBe( null );
 	} );
 
-	it( 'should not render if theme doesn\'t support post-thumbnails', () => {
+	it( "should not render if theme doesn't support post-thumbnails", () => {
 		const themeSupports = {
 			'post-thumbnails': false,
 		};

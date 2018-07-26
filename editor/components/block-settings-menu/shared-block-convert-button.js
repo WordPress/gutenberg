@@ -6,16 +6,27 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Fragment, compose } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 import { IconButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { isSharedBlock } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
-export function SharedBlockConvertButton( { sharedBlock, onConvertToStatic, onConvertToShared, itemsRole } ) {
+export function SharedBlockConvertButton( {
+	isVisible,
+	isStaticBlock,
+	onConvertToStatic,
+	onConvertToShared,
+	itemsRole,
+} ) {
+	if ( ! isVisible ) {
+		return null;
+	}
+
 	return (
 		<Fragment>
-			{ ! sharedBlock && (
+			{ isStaticBlock && (
 				<IconButton
 					className="editor-block-settings-menu__control"
 					icon="controls-repeat"
@@ -25,7 +36,7 @@ export function SharedBlockConvertButton( { sharedBlock, onConvertToStatic, onCo
 					{ __( 'Convert to Shared Block' ) }
 				</IconButton>
 			) }
-			{ sharedBlock && (
+			{ ! isStaticBlock && (
 				<IconButton
 					className="editor-block-settings-menu__control"
 					icon="controls-repeat"
@@ -40,14 +51,23 @@ export function SharedBlockConvertButton( { sharedBlock, onConvertToStatic, onCo
 }
 
 export default compose( [
-	withSelect( ( select, { uid } ) => {
+	withSelect( ( select, { clientId } ) => {
 		const { getBlock, getSharedBlock } = select( 'core/editor' );
-		const block = getBlock( uid );
+		const { getFallbackBlockName } = select( 'core/blocks' );
+
+		const block = getBlock( clientId );
+		if ( ! block ) {
+			return { isVisible: false };
+		}
+
 		return {
-			sharedBlock: block && isSharedBlock( block ) ? getSharedBlock( block.attributes.ref ) : null,
+			// Hide 'Convert to Shared Block' on Classic blocks. Showing it causes a
+			// confusing UX, because of its similarity to the 'Convert to Blocks' button.
+			isVisible: block.name !== getFallbackBlockName(),
+			isStaticBlock: ! isSharedBlock( block ) || ! getSharedBlock( block.attributes.ref ),
 		};
 	} ),
-	withDispatch( ( dispatch, { uid, onToggle = noop } ) => {
+	withDispatch( ( dispatch, { clientId, onToggle = noop } ) => {
 		const {
 			convertBlockToShared,
 			convertBlockToStatic,
@@ -55,11 +75,11 @@ export default compose( [
 
 		return {
 			onConvertToStatic() {
-				convertBlockToStatic( uid );
+				convertBlockToStatic( clientId );
 				onToggle();
 			},
 			onConvertToShared() {
-				convertBlockToShared( uid );
+				convertBlockToShared( clientId );
 				onToggle();
 			},
 		};

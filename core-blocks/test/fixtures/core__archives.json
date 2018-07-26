@@ -1,0 +1,14 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/archives",
+        "isValid": true,
+        "attributes": {
+            "showPostCounts": false,
+            "displayAsDropdown": false,
+            "align": "none"
+        },
+        "innerBlocks": [],
+        "originalContent": ""
+    }
+]

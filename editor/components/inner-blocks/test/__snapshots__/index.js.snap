@@ -2,11 +2,9 @@
 
 exports[`InnerBlocks should force serialize for invalid block with inner blocks 1`] = `
 "<!-- wp:test-block -->
-<p>Invalid
-	<!-- wp:test-block -->
-	<p></p>
-	<!-- /wp:test-block -->
-</p>
+<p>Invalid<!-- wp:test-block -->
+<p></p>
+<!-- /wp:test-block --></p>
 <!-- /wp:test-block -->"
 `;
 

@@ -15,13 +15,14 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import MediaUpload from '../media-upload';
-import editorMediaUpload from '../../utils/editor-media-upload';
+import { mediaUpload } from '../../utils/';
 
 class MediaPlaceholder extends Component {
 	constructor() {
@@ -54,7 +55,25 @@ class MediaPlaceholder extends Component {
 	onSubmitSrc( event ) {
 		event.preventDefault();
 		if ( this.state.src ) {
-			this.props.onSelectUrl( this.state.src );
+			if ( this.props.onSelectUrl ) {
+				// TODO: In removing deprecation, ensure to simplify rendering
+				// to avoid checking for `onSelectUrl`. It also allows this
+				// function to be simplified to avoid truthiness test on
+				// `onSelectURL`, since it's required for the form invoking
+				// this function to be rendered at all.
+				deprecated( 'MediaPlaceholder `onSelectUrl` prop', {
+					alternative: '`onSelectURL` prop',
+					plugin: 'Gutenberg',
+					version: 'v3.5',
+					hint: 'The prop has been renamed.',
+				} );
+
+				this.props.onSelectUrl( this.state.src );
+			}
+
+			if ( this.props.onSelectURL ) {
+				this.props.onSelectURL( this.state.src );
+			}
 		}
 	}
 
@@ -65,7 +84,7 @@ class MediaPlaceholder extends Component {
 	onFilesUpload( files ) {
 		const { onSelect, type, multiple, onError } = this.props;
 		const setMedia = multiple ? onSelect : ( [ media ] ) => onSelect( media );
-		editorMediaUpload( {
+		mediaUpload( {
 			allowedType: type,
 			filesList: files,
 			onFileChange: setMedia,
@@ -82,6 +101,7 @@ class MediaPlaceholder extends Component {
 			labels,
 			onSelect,
 			value = {},
+			onSelectURL,
 			onSelectUrl,
 			onHTMLDrop = noop,
 			multiple = false,
@@ -101,14 +121,16 @@ class MediaPlaceholder extends Component {
 					onFilesDrop={ this.onFilesUpload }
 					onHTMLDrop={ onHTMLDrop }
 				/>
-				{ onSelectUrl && (
+				{ ( onSelectUrl || onSelectURL ) && (
 					<form onSubmit={ this.onSubmitSrc }>
 						<input
 							type="url"
 							className="components-placeholder__input"
+							aria-label={ labels.title }
 							placeholder={ __( 'Enter URL here…' ) }
 							onChange={ this.onChangeSrc }
-							value={ this.state.src } />
+							value={ this.state.src }
+						/>
 						<Button
 							isLarge
 							type="submit">

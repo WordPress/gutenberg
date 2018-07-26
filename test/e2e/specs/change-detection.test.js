@@ -192,7 +192,7 @@ describe( 'Change detection', () => {
 			pressWithModifier( 'Mod', 'S' ),
 
 			// Ensure save update fails and presents button.
-			page.waitForXPath( '//p[contains(text(), \'Updating failed\')]' ),
+			page.waitForXPath( "//p[contains(text(), 'Updating failed')]" ),
 			page.waitForSelector( '.editor-post-save-draft' ),
 		] );
 

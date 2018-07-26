@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/plugins",
-	"version": "1.0.0-alpha.2",
-	"description": "Plugins module for WordPress",
+	"version": "1.0.1",
+	"description": "Plugins module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
@@ -19,9 +19,11 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"@wordpress/element": "^1.0.0-alpha.2",
-		"@wordpress/hooks": "1.1.6",
-		"lodash": "4.17.5"
+		"@babel/runtime": "^7.0.0-beta.52",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/element": "file:../element",
+		"@wordpress/hooks": "file:../hooks",
+		"lodash": "^4.17.10"
 	},
 	"publishConfig": {
 		"access": "public"

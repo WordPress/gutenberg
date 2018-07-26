@@ -16,6 +16,7 @@ import * as image from './image';
 import * as heading from './heading';
 import * as quote from './quote';
 import * as gallery from './gallery';
+import * as archives from './archives';
 import * as audio from './audio';
 import * as button from './button';
 import * as categories from './categories';
@@ -27,6 +28,7 @@ import * as embed from './embed';
 import * as file from './file';
 import * as freeform from './freeform';
 import * as html from './html';
+import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
 import * as list from './list';
 import * as more from './more';
@@ -56,6 +58,7 @@ export const registerCoreBlocks = () => {
 
 		// Register all remaining core blocks.
 		shortcode,
+		archives,
 		audio,
 		button,
 		categories,
@@ -69,6 +72,7 @@ export const registerCoreBlocks = () => {
 		file,
 		freeform,
 		html,
+		latestComments,
 		latestPosts,
 		more,
 		nextpage,

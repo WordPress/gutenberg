@@ -6,7 +6,7 @@ import { find } from 'lodash';
 /**
  * WordPress dependencies
  */
-import apiRequest from '@wordpress/api-request';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -24,7 +24,7 @@ import { getKindEntities } from './entities';
  * progress.
  */
 export async function* getCategories() {
-	const categories = await apiRequest( { path: '/wp/v2/categories?per_page=-1' } );
+	const categories = await apiFetch( { path: '/wp/v2/categories?per_page=-1' } );
 	yield receiveTerms( 'categories', categories );
 }
 
@@ -32,7 +32,7 @@ export async function* getCategories() {
  * Requests authors from the REST API.
  */
 export async function* getAuthors() {
-	const users = await apiRequest( { path: '/wp/v2/users/?who=authors&per_page=-1' } );
+	const users = await apiFetch( { path: '/wp/v2/users/?who=authors&per_page=-1' } );
 	yield receiveUserQuery( 'authors', users );
 }
 
@@ -50,7 +50,7 @@ export async function* getEntityRecord( state, kind, name, key ) {
 	if ( ! entity ) {
 		return;
 	}
-	const record = await apiRequest( { path: `${ entity.baseUrl }/${ key }?context=edit` } );
+	const record = await apiFetch( { path: `${ entity.baseURL }/${ key }?context=edit` } );
 	yield receiveEntityRecords( kind, name, record );
 }
 
@@ -67,7 +67,7 @@ export async function* getEntityRecords( state, kind, name ) {
 	if ( ! entity ) {
 		return;
 	}
-	const records = await apiRequest( { path: `${ entity.baseUrl }?context=edit` } );
+	const records = await apiFetch( { path: `${ entity.baseURL }?context=edit` } );
 	yield receiveEntityRecords( kind, name, Object.values( records ) );
 }
 
@@ -75,6 +75,6 @@ export async function* getEntityRecords( state, kind, name ) {
  * Requests theme supports data from the index.
  */
 export async function* getThemeSupports() {
-	const index = await apiRequest( { path: '/' } );
+	const index = await apiFetch( { path: '/' } );
 	yield receiveThemeSupportsFromIndex( index );
 }

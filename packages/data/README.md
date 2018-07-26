@@ -1,4 +1,4 @@
-# @wordpress/data
+# Data
 
 WordPress' data module serves as a hub to manage application state for both plugins and WordPress itself, providing tools to manage data within and between distinct modules. It is designed as a modular pattern for organizing and sharing data: simple enough to satisfy the needs of a small plugin, while scalable to serve the requirements of a complex single-page application.
 
@@ -17,7 +17,7 @@ npm install @wordpress/data --save
 Use the `registerStore` function to add your own store to the centralized data registry. This function accepts two arguments: a name to identify the module, and an object with values describing how your state is represented, modified, and accessed. At a minimum, you must provide a reducer function describing the shape of your state and how it changes in response to actions dispatched to the store.
 
 ```js
-const { data, apiRequest } = wp;
+const { data, fetch } = wp;
 const { registerStore, dispatch } = data;
 
 const DEFAULT_STATE = {
@@ -74,7 +74,7 @@ registerStore( 'my-shop', {
 
 	resolvers: {
 		async getPrice( state, item ) {
-			const price = await apiRequest( { path: '/wp/v2/prices/' + item } );
+			const price = await apiFetch( { path: '/wp/v2/prices/' + item } );
 			dispatch( 'my-shop' ).setPrice( item, price );
 		},
 	},

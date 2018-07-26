@@ -10,6 +10,7 @@ import {
 	Toolbar,
 	withSpokenMessages,
 	Popover,
+	ExternalLink,
 } from '@wordpress/components';
 import { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER, displayShortcut } from '@wordpress/keycodes';
 import { prependHTTP } from '@wordpress/url';
@@ -19,7 +20,7 @@ import { prependHTTP } from '@wordpress/url';
  */
 import './style.scss';
 import PositionedAtSelection from './positioned-at-selection';
-import UrlInput from '../../url-input';
+import URLInput from '../../url-input';
 import { filterURLForDisplay } from '../../../utils/url';
 
 const FORMATTING_CONTROLS = [
@@ -232,7 +233,7 @@ class FormatToolbar extends Component {
 										onKeyDown={ this.onKeyDown }
 										onSubmit={ this.submitLink }>
 										<div className="editor-format-toolbar__link-modal-line">
-											<UrlInput value={ linkValue } onChange={ this.onChangeLinkValue } />
+											<URLInput value={ linkValue } onChange={ this.onChangeLinkValue } />
 											<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 											<IconButton
 												className="editor-format-toolbar__link-settings-toggle"
@@ -255,13 +256,12 @@ class FormatToolbar extends Component {
 										onKeyPress={ stopKeyPropagation }
 									>
 										<div className="editor-format-toolbar__link-modal-line">
-											<a
+											<ExternalLink
 												className="editor-format-toolbar__link-value"
 												href={ formats.link.value }
-												target="_blank"
 											>
 												{ formats.link.value && filterURLForDisplay( decodeURI( formats.link.value ) ) }
-											</a>
+											</ExternalLink>
 											<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
 											<IconButton
 												className="editor-format-toolbar__link-settings-toggle"

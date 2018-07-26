@@ -21,7 +21,7 @@ export const name = 'core/subhead';
 export const settings = {
 	title: __( 'Subheading' ),
 
-	description: __( 'What\'s a subhead? Smaller than a headline, bigger than basic text.' ),
+	description: __( 'What’s a subhead? Smaller than a headline, bigger than basic text.' ),
 
 	icon: 'text',
 

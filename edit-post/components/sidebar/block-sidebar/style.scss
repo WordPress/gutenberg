@@ -1,5 +1,6 @@
 .edit-post-block-sidebar__panel .components-panel__body {
 	border: none;
+	border-top: 1px solid $light-gray-500;
 	margin: 0 -16px;
 
 	.components-base-control {
@@ -11,7 +12,6 @@
 	}
 
 	&:first-child {
-		border-top: 1px solid $light-gray-500;
 		margin-top: 16px;
 	}
 

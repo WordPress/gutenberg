@@ -3,6 +3,12 @@
  */
 import { withSelect } from '@wordpress/data';
 import { getBlockType } from '@wordpress/blocks';
+import { compose } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import withDeprecatedUniqueId from '../with-deprecated-unique-id';
 
 /**
  * Renders the block's configured title as a string, or empty if the title
@@ -11,7 +17,7 @@ import { getBlockType } from '@wordpress/blocks';
  * @example
  *
  * ```jsx
- * <BlockTitle uid="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
+ * <BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
  * ```
  *
  * @param {?string} props.name Block name.
@@ -31,11 +37,14 @@ export function BlockTitle( { name } ) {
 	return blockType.title;
 }
 
-export default withSelect( ( select, ownProps ) => {
-	const { getBlockName } = select( 'core/editor' );
-	const { uid } = ownProps;
+export default compose( [
+	withDeprecatedUniqueId,
+	withSelect( ( select, ownProps ) => {
+		const { getBlockName } = select( 'core/editor' );
+		const { clientId } = ownProps;
 
-	return {
-		name: getBlockName( uid ),
-	};
-} )( BlockTitle );
+		return {
+			name: getBlockName( clientId ),
+		};
+	} ),
+] )( BlockTitle );

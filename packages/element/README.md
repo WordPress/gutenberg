@@ -1,4 +1,4 @@
-# @wordpress/element
+# Element
 
 Element is, quite simply, an abstraction layer atop [React](https://reactjs.org/).
 
