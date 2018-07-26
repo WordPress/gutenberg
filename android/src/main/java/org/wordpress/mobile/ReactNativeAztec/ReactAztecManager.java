@@ -20,6 +20,7 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.facebook.react.views.scroll.ScrollEvent;
 import com.facebook.react.views.scroll.ScrollEventType;
+import com.facebook.react.views.text.DefaultStyleValuesUtil;
 import com.facebook.react.views.textinput.ReactContentSizeChangedEvent;
 import com.facebook.react.views.textinput.ReactTextChangedEvent;
 import com.facebook.react.views.textinput.ReactTextInputEvent;
@@ -115,6 +116,20 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
         } catch (IllegalArgumentException e) {
         }
         view.setTextColor(newColor);
+    }
+
+    @ReactProp(name = "placeholder")
+    public void setPlaceholder(ReactAztecText view, @Nullable String placeholder) {
+        view.setHint(placeholder);
+    }
+
+    @ReactProp(name = "placeholderTextColor", customType = "Color")
+    public void setPlaceholderTextColor(ReactAztecText view, @Nullable Integer color) {
+        if (color == null) {
+            view.setHintTextColor(DefaultStyleValuesUtil.getDefaultTextColorHint(view.getContext()));
+        } else {
+            view.setHintTextColor(color);
+        }
     }
 
     @ReactProp(name = "maxImagesWidth")
