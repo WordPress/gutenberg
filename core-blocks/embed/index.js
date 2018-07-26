@@ -12,7 +12,7 @@ import classnames from 'classnames';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Component, Fragment, renderToString } from '@wordpress/element';
-import { Button, Placeholder, Spinner, SandBox, IconButton } from '@wordpress/components';
+import { Button, Placeholder, Spinner, SandBox, IconButton, Toolbar } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 import { RichText, BlockControls } from '@wordpress/editor';
 import apiFetch from '@wordpress/api-fetch';
@@ -182,12 +182,14 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 				const { setAttributes, isSelected, className } = this.props;
 				const controls = (
 					<BlockControls>
-						{ ( html && <IconButton
-							className="components-toolbar__control"
-							label={ __( 'Edit URL' ) }
-							icon="edit"
-							onClick={ this.switchBackToURLInput }
-						/> ) }
+						<Toolbar>
+							{ ( html && <IconButton
+								className="components-toolbar__control"
+								label={ __( 'Edit URL' ) }
+								icon="edit"
+								onClick={ this.switchBackToURLInput }
+							/> ) }
+						</Toolbar>
 					</BlockControls>
 				);
 
