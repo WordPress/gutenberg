@@ -16,3 +16,4 @@ export {
 	getBlockType,
 	hasBlockSupport,
 } from './registration';
+export { getPhrasingContentSchema } from './raw-handling';
