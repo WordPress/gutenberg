@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flow, pick } from 'lodash';
+import { flow } from 'lodash';
 
 /**
  * WordPress Dependencies
