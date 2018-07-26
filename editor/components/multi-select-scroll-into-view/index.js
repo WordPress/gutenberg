@@ -18,7 +18,7 @@ import { getBlockDOMNode } from '../../utils/dom';
 class MultiSelectScrollIntoView extends Component {
 	componentDidUpdate() {
 		// Relies on expectation that `componentDidUpdate` will only be called
-		// if value of `extentUID` changes.
+		// if value of `extentClientId` changes.
 		this.scrollIntoView();
 	}
 
@@ -29,12 +29,12 @@ class MultiSelectScrollIntoView extends Component {
 	 * @return {void}
 	 */
 	scrollIntoView() {
-		const { extentUID } = this.props;
-		if ( ! extentUID ) {
+		const { extentClientId } = this.props;
+		if ( ! extentClientId ) {
 			return;
 		}
 
-		const extentNode = getBlockDOMNode( extentUID );
+		const extentNode = getBlockDOMNode( extentClientId );
 		if ( ! extentNode ) {
 			return;
 		}
@@ -58,7 +58,9 @@ class MultiSelectScrollIntoView extends Component {
 }
 
 export default withSelect( ( select ) => {
+	const { getLastMultiSelectedBlockClientId } = select( 'core/editor' );
+
 	return {
-		extentUID: select( 'core/editor' ).getLastMultiSelectedBlockUid(),
+		extentClientId: getLastMultiSelectedBlockClientId(),
 	};
 } )( MultiSelectScrollIntoView );

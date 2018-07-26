@@ -49,7 +49,7 @@ describe( 'PostAuthorCheck', () => {
 		expect( wrapper.type() ).toBe( null );
 	} );
 
-	it( 'should not render anything if doesn\'t have author action', () => {
+	it( "should not render anything if doesn't have author action", () => {
 		const wrapper = shallow(
 			<PostAuthorCheck authors={ users } hasAssignAuthorAction={ false }>
 				authors
@@ -58,7 +58,7 @@ describe( 'PostAuthorCheck', () => {
 		expect( wrapper.type() ).toBe( null );
 	} );
 
-	it( 'should render  control', () => {
+	it( 'should render control', () => {
 		const wrapper = shallow(
 			<PostAuthorCheck authors={ users } hasAssignAuthorAction={ true }>
 				authors

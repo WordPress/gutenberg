@@ -4,29 +4,30 @@
 import 'element-closest';
 
 /**
- * Given a block UID, returns the corresponding DOM node for the block, if
- * exists. As much as possible, this helper should be avoided, and used only
+ * Given a block client ID, returns the corresponding DOM node for the block,
+ * if exists. As much as possible, this helper should be avoided, and used only
  * in cases where isolated behaviors need remote access to a block node.
  *
- * @param {string} uid Block UID.
+ * @param {string} clientId Block client ID.
  *
  * @return {Element} Block DOM node.
  */
-export function getBlockDOMNode( uid ) {
-	return document.querySelector( '[data-block="' + uid + '"]' );
+export function getBlockDOMNode( clientId ) {
+	return document.querySelector( '[data-block="' + clientId + '"]' );
 }
 
 /**
- * Given a block UID, returns the corresponding DOM node for the block focusable
- * wrapper, if exists. As much as possible, this helper should be avoided, and
- * used only in cases where isolated behaviors need remote access to a block node.
+ * Given a block client ID, returns the corresponding DOM node for the block
+ * focusable wrapper, if exists. As much as possible, this helper should be
+ * avoided, and used only in cases where isolated behaviors need remote access
+ * to a block node.
  *
- * @param {string} uid Block UID.
+ * @param {string} clientId Block client ID.
  *
  * @return {Element} Block DOM node.
  */
-export function getBlockFocusableWrapper( uid ) {
-	return getBlockDOMNode( uid ).closest( '.editor-block-list__block' );
+export function getBlockFocusableWrapper( clientId ) {
+	return getBlockDOMNode( clientId ).closest( '.editor-block-list__block' );
 }
 
 /**

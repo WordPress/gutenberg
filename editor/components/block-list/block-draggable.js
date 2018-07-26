@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { Draggable } from '@wordpress/components';
 
-function BlockDraggable( { rootUID, index, uid, layout, isDragging, ...props } ) {
+function BlockDraggable( { rootClientId, index, clientId, layout, isDragging, ...props } ) {
 	const className = classnames( 'editor-block-list__block-draggable', {
 		'is-visible': isDragging,
 	} );
@@ -16,8 +16,8 @@ function BlockDraggable( { rootUID, index, uid, layout, isDragging, ...props } )
 	const transferData = {
 		type: 'block',
 		fromIndex: index,
-		rootUID,
-		uid,
+		rootClientId,
+		clientId,
 		layout,
 	};
 

@@ -60,6 +60,7 @@ exports[`core/audio block edit matches snapshot 1`] = `
     </div>
     <form>
       <input
+        aria-label="Audio"
         class="components-placeholder__input"
         placeholder="Enter URL here…"
         type="url"

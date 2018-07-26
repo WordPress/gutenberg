@@ -10,12 +10,36 @@ To modify the behavior of existing blocks, Gutenberg exposes the following Filte
 
 Used to filter the block settings. It receives the block settings and the name of the block the registered block as arguments.
 
+_Example:_
+
+Ensure that List blocks are saved with the canonical generated class name (`wp-block-list`):
+
+```js
+function addListBlockClassName( settings, name ) {
+	if ( name !== 'core/list' ) {
+		return settings;
+	}
+
+	return Object.assign( {}, settings, {
+		supports: Object.assign( {}, settings.supports, {
+			className: true
+		} ),
+	} );
+}
+
+wp.hooks.addFilter(
+	'blocks.registerBlockType',
+	'my-plugin/class-names/list-block',
+	addListBlockClassName
+);
+```
+
 #### `blocks.getSaveElement`
 
 A filter that applies to the result of a block's `save` function. This filter is used to replace or extend the element, for example using `wp.element.cloneElement` to modify the element's props or replace its children, or returning an entirely new element.
 
 #### `blocks.getSaveContent.extraProps`
- 
+
 A filter that applies to all blocks returning a WP Element in the `save` function. This filter is used to add extra props to the root element of the `save` function. For example: to add a className, an id, or any valid prop for this element. It receives the current props of the `save` element, the block type and the block attributes as arguments.
 
 _Example:_
@@ -79,7 +103,7 @@ _Example:_
 ```js
 var el = wp.element.createElement;
 
-var withInspectorControls = wp.element.createHigherOrderComponent( function( BlockEdit ) {
+var withInspectorControls = wp.compose.createHigherOrderComponent( function( BlockEdit ) {
 	return function( props ) {
 		return el(
 			wp.element.Fragment,
@@ -113,7 +137,7 @@ _Example:_
 ```js
 var el = wp.element.createElement;
 
-var withDataAlign = wp.element.createHigherOrderComponent( function( BlockListBlock ) {
+var withDataAlign = wp.compose.createHigherOrderComponent( function( BlockListBlock ) {
 	return function( props ) {
 		var newProps = Object.assign(
 			{},
@@ -137,6 +161,20 @@ var withDataAlign = wp.element.createHigherOrderComponent( function( BlockListBl
 }, 'withAlign' );
 
 wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-data-align', withDataAlign );
+```
+
+### `editor.PostFeaturedImage.imageSize`
+
+Used to modify the image size displayed in the Post Featured Image component. It defaults to `'post-thumbnail'`, and will fail back to the `full` image size when the specified image size doesn't exist in the media object. It's modeled after the `admin_post_thumbnail_size` filter in the Classic Editor.
+
+_Example:_
+
+```
+var withImageSize = function( size, mediaId, postId ) {
+	return 'large';
+};
+
+wp.hooks.addFilter( 'editor.PostFeaturedImage.imageSize', 'my-plugin/with-image-size', withImageSize );
 ```
 
 ## Removing Blocks

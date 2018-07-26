@@ -1,6 +1,6 @@
-# @wordpress/wordcount
+# Word Count
 
-A utility to count words
+WordPress word count utility.
 
 ## Installation
 

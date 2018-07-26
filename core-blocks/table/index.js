@@ -10,8 +10,6 @@ import classnames from 'classnames';
 import { Fragment } from '@wordpress/element';
 import { getPhrasingContentSchema } from '@wordpress/blocks';
 import {
-	BlockControls,
-	BlockAlignmentToolbar,
 	RichText,
 	InspectorControls,
 } from '@wordpress/editor';
@@ -78,13 +76,14 @@ export const settings = {
 				</tbody>,
 			],
 		},
-		align: {
-			type: 'string',
-		},
 		hasFixedLayout: {
 			type: 'boolean',
 			default: false,
 		},
+	},
+
+	supports: {
+		align: true,
 	},
 
 	transforms: {
@@ -97,16 +96,8 @@ export const settings = {
 		],
 	},
 
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
-			return { 'data-align': align };
-		}
-	},
-
 	edit( { attributes, setAttributes, isSelected, className } ) {
 		const { content, hasFixedLayout } = attributes;
-		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const toggleFixedLayout = () => {
 			setAttributes( { hasFixedLayout: ! hasFixedLayout } );
 		};
@@ -120,12 +111,6 @@ export const settings = {
 
 		return (
 			<Fragment>
-				<BlockControls>
-					<BlockAlignmentToolbar
-						value={ attributes.align }
-						onChange={ updateAlignment }
-					/>
-				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'Table Settings' ) } className="blocks-table-settings">
 						<ToggleControl
@@ -148,11 +133,10 @@ export const settings = {
 	},
 
 	save( { attributes } ) {
-		const { content, align, hasFixedLayout } = attributes;
+		const { content, hasFixedLayout } = attributes;
 		const classes = classnames(
 			{
 				'has-fixed-layout': hasFixedLayout,
-				[ `align${ align }` ]: align,
 			},
 		);
 

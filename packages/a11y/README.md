@@ -1,6 +1,6 @@
-# @wordpress/a11y
+# Accessibility (a11y)
 
-Collection of JS modules for enhancing accessibility.
+Accessibility utilities for WordPress.
 
 ## Installation
 

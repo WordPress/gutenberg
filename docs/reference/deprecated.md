@@ -1,9 +1,38 @@
 Gutenberg's deprecation policy is intended to support backwards-compatibility for two minor releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
 
+## 3.6.0
+
+ - `wp.editor.editorMediaUpload` has been removed. Please use `wp.editor.mediaUpload` instead.
+ - `wp.utils.getMimeTypesArray` has been removed.
+ - `wp.utils.mediaUpload` has been removed. Please use `wp.editor.mediaUpload` instead.
+ - `wp.utils.preloadImage` has been removed.
+ - `supports.wideAlign` has been removed from the Block API. Please use `supports.alignWide` instead.
+
+## 3.5.0
+
+ - `wp.components.ifCondition` has been removed. Please use `wp.compose.ifCondition` instead.
+ - `wp.components.withGlobalEvents` has been removed. Please use `wp.compose.withGlobalEvents` instead.
+ - `wp.components.withInstanceId` has been removed. Please use `wp.compose.withInstanceId` instead.
+ - `wp.components.withSafeTimeout` has been removed. Please use `wp.compose.withSafeTimeout` instead.
+ - `wp.components.withState` has been removed. Please use `wp.compose.withState` instead.
+ - `wp.element.pure` has been removed. Please use `wp.compose.pure` instead.
+ - `wp.element.compose` has been removed. Please use `wp.compose.compose` instead.
+ - `wp.element.createHigherOrderComponent` has been removed. Please use `wp.compose.createHigherOrderComponent` instead.
+ - `wp.utils.buildTermsTree` has been removed.
+ - `wp.utils.decodeEntities` has been removed. Please use `wp.htmlEntities.decodeEntities` instead.
+ - All references to a block's `uid` have been replaced with equivalent props and selectors for `clientId`.
+ - The `wp.editor.MediaPlaceholder` component `onSelectUrl` prop has been renamed to `onSelectURL`.
+ - The `wp.editor.UrlInput` component has been renamed to `wp.editor.URLInput`.
+ - The Text Columns block has been removed. Please use the Columns block instead.
+ - `InnerBlocks` grouped layout is removed. Use intermediary nested inner blocks instead. See Columns / Column block for reference implementation.
+ - `RichText` explicit `element` format removed. Please use the compatible `children` format instead.
+
 ## 3.4.0
 
  - `focusOnMount` prop in the `Popover` component has been changed from `Boolean`-only to an enum-style property that accepts `"firstElement"`, `"container"`, or `false`. Please convert any `<Popover focusOnMount />` usage to `<Popover focusOnMount="firstElement" />`.
  - `wp.utils.keycodes` utilities are removed. Please use `wp.keycodes` instead.
+ - Block `id` prop in `edit` function removed. Please use block `clientId` prop instead.
+ - `property` source removed. Please use equivalent `text`, `html`, or `attribute` source, or comment attribute instead.
 
 ## 3.3.0
 
@@ -13,7 +42,6 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
  - `blocks.BlockEdit` filter removed. Please use `editor.BlockEdit` instead.
  - `blocks.BlockListBlock` filter removed. Please use `editor.BlockListBlock` instead.
  - `blocks.MediaUpload` filter removed. Please use `editor.MediaUpload` instead.
- - `property` source removed. Please use equivalent `text`, `html`, or `attribute` source, or comment attribute instead.
 
 ## 3.2.0
 

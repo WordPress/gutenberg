@@ -6,8 +6,9 @@ import { filter, identity, includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { compose, Fragment } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -25,10 +26,7 @@ export function PostTaxonomies( { postType, taxonomies, taxonomyWrapper = identi
 			<Fragment key={ `taxonomy-${ taxonomy.slug }` }>
 				{
 					taxonomyWrapper(
-						<TaxonomyComponent
-							restBase={ taxonomy.rest_base }
-							slug={ taxonomy.slug }
-						/>,
+						<TaxonomyComponent slug={ taxonomy.slug } />,
 						taxonomy
 					)
 				}

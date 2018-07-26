@@ -7,11 +7,8 @@ import { forOwn } from 'lodash';
  * WordPress Dependencies
  */
 import {
-	registerReducer,
-	registerSelectors,
-	registerActions,
-	withRehydration,
-	loadAndPersist,
+	registerStore,
+	restrictPersistence,
 } from '@wordpress/data';
 
 /**
@@ -27,16 +24,15 @@ import { validateTokenSettings } from '../components/rich-text/tokens';
 /**
  * Module Constants
  */
-const STORAGE_KEY = `GUTENBERG_PREFERENCES_${ window.userSettings.uid }`;
 const MODULE_KEY = 'core/editor';
 
-const store = applyMiddlewares(
-	registerReducer( MODULE_KEY, withRehydration( reducer, 'preferences', STORAGE_KEY ) )
-);
-loadAndPersist( store, reducer, 'preferences', STORAGE_KEY );
-
-registerSelectors( MODULE_KEY, selectors );
-registerActions( MODULE_KEY, actions );
+const store = registerStore( MODULE_KEY, {
+	reducer: restrictPersistence( reducer, 'preferences' ),
+	selectors,
+	actions,
+	persist: true,
+} );
+applyMiddlewares( store );
 
 forOwn( tokens, ( { name, settings } ) => {
 	settings = validateTokenSettings( name, settings, store.getState() );

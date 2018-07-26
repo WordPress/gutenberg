@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
- * Version: 3.2.0
+ * Version: 3.3.0
  * Author: Gutenberg Team
  *
  * @package gutenberg
@@ -64,6 +64,12 @@ function gutenberg_menu() {
 	);
 
 	if ( current_user_can( 'edit_posts' ) ) {
+		$submenu['gutenberg'][] = array(
+			__( 'Support', 'gutenberg' ),
+			'edit_posts',
+			__( 'https://wordpress.org/support/plugin/gutenberg', 'gutenberg' ),
+		);
+
 		$submenu['gutenberg'][] = array(
 			__( 'Feedback', 'gutenberg' ),
 			'edit_posts',

@@ -22,8 +22,7 @@
 	],
 	"timers": "fake",
 	"transform": {
-		"^.+\\.jsx?$": "babel-jest",
-		"\\.pegjs$": "<rootDir>/node_modules/@wordpress/jest-preset-default/scripts/pegjs-transform.js"
+		"^.+\\.jsx?$": "babel-jest"
 	},
 	"verbose": true
 }

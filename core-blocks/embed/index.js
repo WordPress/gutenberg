@@ -12,14 +12,10 @@ import classnames from 'classnames';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Component, Fragment, renderToString } from '@wordpress/element';
-import { Button, Placeholder, Spinner, SandBox } from '@wordpress/components';
+import { Button, Placeholder, Spinner, SandBox, IconButton, Toolbar } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
-import {
-	BlockControls,
-	BlockAlignmentToolbar,
-	RichText,
-} from '@wordpress/editor';
-import apiRequest from '@wordpress/api-request';
+import { RichText, BlockControls } from '@wordpress/editor';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -31,7 +27,7 @@ import './editor.scss';
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
 // Caches the embed API calls, so if blocks get transformed, or deleted and added again, we don't spam the API.
-const wpEmbedAPI = memoize( ( url ) => apiRequest( { path: `/oembed/1.0/proxy?${ stringify( { url } ) }` } ) );
+const wpEmbedAPI = memoize( ( url ) => apiFetch( { path: `/oembed/1.0/proxy?${ stringify( { url } ) }` } ) );
 
 const matchesPatterns = ( url, patterns = [] ) => {
 	return patterns.some( ( pattern ) => {
@@ -67,9 +63,6 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 				selector: 'figcaption',
 				default: [],
 			},
-			align: {
-				type: 'string',
-			},
 			type: {
 				type: 'string',
 			},
@@ -78,20 +71,18 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 			},
 		},
 
-		transforms,
-
-		getEditWrapperProps( attributes ) {
-			const { align } = attributes;
-			if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
-				return { 'data-align': align };
-			}
+		supports: {
+			align: true,
 		},
+
+		transforms,
 
 		edit: class extends Component {
 			constructor() {
 				super( ...arguments );
 
 				this.doServerSideRender = this.doServerSideRender.bind( this );
+				this.switchBackToURLInput = this.switchBackToURLInput.bind( this );
 
 				this.state = {
 					html: '',
@@ -181,30 +172,33 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 					);
 			}
 
+			switchBackToURLInput() {
+				this.setState( { html: undefined } );
+			}
+
 			render() {
 				const { html, type, error, fetching } = this.state;
-				const { align, url, caption } = this.props.attributes;
+				const { url, caption } = this.props.attributes;
 				const { setAttributes, isSelected, className } = this.props;
-				const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
-
 				const controls = (
 					<BlockControls>
-						<BlockAlignmentToolbar
-							value={ align }
-							onChange={ updateAlignment }
-						/>
+						<Toolbar>
+							{ ( html && <IconButton
+								className="components-toolbar__control"
+								label={ __( 'Edit URL' ) }
+								icon="edit"
+								onClick={ this.switchBackToURLInput }
+							/> ) }
+						</Toolbar>
 					</BlockControls>
 				);
 
 				if ( fetching ) {
 					return (
-						<Fragment>
-							{ controls }
-							<div className="wp-block-embed is-loading">
-								<Spinner />
-								<p>{ __( 'Embedding…' ) }</p>
-							</div>
-						</Fragment>
+						<div className="wp-block-embed is-loading">
+							<Spinner />
+							<p>{ __( 'Embedding…' ) }</p>
+						</div>
 					);
 				}
 
@@ -213,26 +207,23 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 					const label = sprintf( __( '%s URL' ), title );
 
 					return (
-						<Fragment>
-							{ controls }
-							<Placeholder icon={ icon } label={ label } className="wp-block-embed">
-								<form onSubmit={ this.doServerSideRender }>
-									<input
-										type="url"
-										value={ url || '' }
-										className="components-placeholder__input"
-										aria-label={ label }
-										placeholder={ __( 'Enter URL to embed here…' ) }
-										onChange={ ( event ) => setAttributes( { url: event.target.value } ) } />
-									<Button
-										isLarge
-										type="submit">
-										{ __( 'Embed' ) }
-									</Button>
-									{ error && <p className="components-placeholder__error">{ __( 'Sorry, we could not embed that content.' ) }</p> }
-								</form>
-							</Placeholder>
-						</Fragment>
+						<Placeholder icon={ icon } label={ label } className="wp-block-embed">
+							<form onSubmit={ this.doServerSideRender }>
+								<input
+									type="url"
+									value={ url || '' }
+									className="components-placeholder__input"
+									aria-label={ label }
+									placeholder={ __( 'Enter URL to embed here…' ) }
+									onChange={ ( event ) => setAttributes( { url: event.target.value } ) } />
+								<Button
+									isLarge
+									type="submit">
+									{ __( 'Embed' ) }
+								</Button>
+								{ error && <p className="components-placeholder__error">{ __( 'Sorry, we could not embed that content.' ) }</p> }
+							</form>
+						</Placeholder>
 					);
 				}
 
@@ -281,14 +272,13 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 		},
 
 		save( { attributes } ) {
-			const { url, caption, align, type, providerNameSlug } = attributes;
+			const { url, caption, type, providerNameSlug } = attributes;
 
 			if ( ! url ) {
 				return null;
 			}
 
 			const embedClassName = classnames( 'wp-block-embed', {
-				[ `align${ align }` ]: align,
 				[ `is-type-${ type }` ]: type,
 				[ `is-provider-${ providerNameSlug }` ]: providerNameSlug,
 			} );
@@ -561,10 +551,10 @@ export const others = [
 		patterns: [ /^https?:\/\/(www\.)?smugmug\.com\/.+/i ],
 	},
 	{
-		name: 'core-embed/speaker',
+		name: 'core-embed/speakerdeck',
 		settings: getEmbedBlockSettings( {
-			title: 'Speaker',
-			icon: 'embed-audio',
+			title: 'Speaker Deck',
+			icon: 'embed-post',
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?speakerdeck\.com\/.+/i ],
 	},

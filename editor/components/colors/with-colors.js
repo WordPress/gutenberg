@@ -1,20 +1,19 @@
 /**
  * External dependencies
  */
-import { find, get, isFunction, isString, kebabCase, reduce, upperFirst } from 'lodash';
+import { find, get, isString, kebabCase, reduce, upperFirst } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent, Component, compose } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import deprecated from '@wordpress/deprecated';
+import { compose, createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { getColorValue, getColorClass } from './utils';
-import withColorsDeprecated from './with-colors-deprecated';
 
 const DEFAULT_COLORS = [];
 
@@ -34,14 +33,6 @@ const DEFAULT_COLORS = [];
  * @return {Function} Higher-order component.
  */
 export default ( ...args ) => {
-	if ( isFunction( args[ 0 ] ) ) {
-		deprecated( 'Using withColors( mapGetSetColorToProps ) ', {
-			version: '3.3',
-			alternative: 'withColors( colorAttributeName, { secondColorAttributeName: \'color-context\' }, ... )',
-		} );
-		return withColorsDeprecated( args[ 0 ] );
-	}
-
 	const colorMap = reduce( args, ( colorObject, arg ) => {
 		return {
 			...colorObject,

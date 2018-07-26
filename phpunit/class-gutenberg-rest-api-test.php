@@ -131,6 +131,51 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Only returns wp:action-unfiltered_html when current user can use unfiltered HTML.
+	 * See https://codex.wordpress.org/Roles_and_Capabilities#Capability_vs._Role_Table
+	 */
+	function test_link_unfiltered_html() {
+		$post_id   = $this->factory->post->create();
+		$check_key = 'https://api.w.org/action-unfiltered_html';
+		// admins can in a single site, but can't in a multisite.
+		wp_set_current_user( $this->administrator );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+		if ( is_multisite() ) {
+			$this->assertFalse( isset( $links[ $check_key ] ) );
+		} else {
+			$this->assertTrue( isset( $links[ $check_key ] ) );
+		}
+		// authors can't.
+		wp_set_current_user( $this->author );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+		$this->assertFalse( isset( $links[ $check_key ] ) );
+		// editors can in a single site, but can't in a multisite.
+		wp_set_current_user( $this->editor );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+		if ( is_multisite() ) {
+			$this->assertFalse( isset( $links[ $check_key ] ) );
+		} else {
+			$this->assertTrue( isset( $links[ $check_key ] ) );
+		}
+		// contributors can't.
+		wp_set_current_user( $this->contributor );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+		$this->assertFalse( isset( $links[ $check_key ] ) );
+	}
+
+	/**
 	 * Only returns wp:action-assign-author when current user can assign author.
 	 */
 	function test_link_assign_author_only_appears_for_editor() {

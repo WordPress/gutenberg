@@ -9,7 +9,7 @@ import { shallow } from 'enzyme';
 import { PostPendingStatusCheck } from '../check';
 
 describe( 'PostPendingStatusCheck', () => {
-	it( 'should not render anything if the user doesn\'t have the right capabilities', () => {
+	it( "should not render anything if the user doesn't have the right capabilities", () => {
 		const wrapper = shallow(
 			<PostPendingStatusCheck hasPublishAction={ false }>
 				status

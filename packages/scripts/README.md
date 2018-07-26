@@ -1,6 +1,6 @@
-# @wordpress/scripts
+# Scripts
 
-A collection of JS scripts for WordPress development.
+Collection of JS scripts for WordPress development.
 
 ## Installation
 
