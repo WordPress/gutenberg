@@ -13,7 +13,7 @@ import type { BlockType } from '../store/';
 import styles from './block-holder.scss';
 
 // Gutenberg imports
-import { getBlockType } from '@gutenberg/blocks/api';
+import { getBlockType } from '@wordpress/blocks';
 
 type PropsType = BlockType & {
 	onChange: ( uid: string, attributes: mixed ) => void,

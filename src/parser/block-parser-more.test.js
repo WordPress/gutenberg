@@ -3,7 +3,7 @@
 import '../globals';
 
 import { registerCoreBlocks } from '@gutenberg/core-blocks';
-import { parse } from '@gutenberg/blocks';
+import { parse } from '@wordpress/blocks';
 
 registerCoreBlocks();
 
