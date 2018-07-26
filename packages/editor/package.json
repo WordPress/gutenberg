@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/editor",
 	"version": "1.0.0-alpha.1",
-	"description": "Building blocks for WordPress editors",
+	"description": "Building blocks for WordPress editors.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [

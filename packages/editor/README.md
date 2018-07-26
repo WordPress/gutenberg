@@ -1,5 +1,4 @@
-Editor: an overview
-===================
+# Editor
 
 The logic flow concerning the editor includes: inferring a block representation of the post content (parsing); describing the state of a post (representation); rendering of the post to the DOM (rendering); attaching controls to manipulate the content a.k.a blocks (UI).
 

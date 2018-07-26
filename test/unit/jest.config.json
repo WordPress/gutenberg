@@ -1,7 +1,7 @@
 {
 	"rootDir": "../../",
 	"collectCoverageFrom": [
-		"(editor|edit-post|core-blocks)/**/*.js",
+		"(edit-post|core-blocks)/**/*.js",
 		"packages/**/*.js"
 	],
 	"coveragePathIgnorePatterns": [
