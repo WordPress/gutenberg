@@ -16,9 +16,17 @@ if [ "$1" == '--e2e_tests' ]; then
 	CLI="${CLI}_e2e_tests"
 	CONTAINER="${CONTAINER}_e2e_tests"
 	SITE_TITLE='Gutenberg Testing'
+
+	if ! docker ps | grep -q $CONTAINER; then
+		echo -e $(error_message "WordPress e2e tests run in their own Docker container, but that container wasn't found.")
+		echo "Please restart your Docker containers by running 'docker-compose down && docker-compose up -d' or"
+		echo "by running './bin/setup-local-env.sh' again."
+		echo ""
+		exit 1
+	fi
 fi
 
-# Get the host port for the development WordPress container.
+# Get the host port for the WordPress container.
 HOST_PORT=$(docker-compose port $CONTAINER 80 | awk -F : '{printf $2}')
 
 # Wait until the Docker containers are running and the WordPress site is
