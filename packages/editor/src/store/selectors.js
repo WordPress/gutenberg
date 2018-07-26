@@ -576,10 +576,16 @@ export const getBlocks = createSelector(
  * @return {Array} ids of referenced and inner blocks.
  */
 const unfoldClientIds = ( state, block ) => {
-	const getClientIdsFromSharedBlock = ( globalState, sharedBlock ) =>
-		sharedBlock.name === 'core/block' ?
-			[ get( getSharedBlock( globalState, sharedBlock.attributes.ref ), [ 'clientId' ], null ) ] :
-			[ null ];
+	const getClientIdsFromSharedBlock = ( globalState, sharedBlock ) => {
+		if ( sharedBlock.name === 'core/block' ) {
+			const clientId = get( getSharedBlock( globalState, sharedBlock.attributes.ref ), [ 'clientId' ], null );
+			return [
+				clientId,
+				...unfoldClientIds( globalState, ...getBlocksByClientId( globalState, clientId ) ),
+			];
+		}
+		return [ null ];
+	};
 	const getClientIdsFromInnerBlock = ( globalState ) => ( innerBlock ) => [
 		innerBlock.clientId,
 		...unfoldClientIds( globalState, innerBlock ),

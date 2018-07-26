@@ -1749,9 +1749,14 @@ describe( 'selectors', () => {
 							'uuid-16': { clientId: 'uuid-16', name: 'core/quote', attributes: {} },
 							'uuid-18': { clientId: 'uuid-18', name: 'core/block', attributes: { ref: 5 } },
 							'uuid-20': { clientId: 'uuid-20', name: 'core/gallery', attributes: {} },
+							'uuid-22': { clientId: 'uuid-22', name: 'core/block', attributes: { ref: 7 } },
+							'uuid-24': { clientId: 'uuid-24', name: 'core/columns', attributes: { } },
+							'uuid-26': { clientId: 'uuid-26', name: 'core/column', attributes: { } },
+							'uuid-28': { clientId: 'uuid-28', name: 'core/column', attributes: { } },
+							'uuid-30': { clientId: 'uuid-30', name: 'core/paragraph', attributes: { } },
 						},
 						blockOrder: {
-							'': [ 'uuid-6', 'uuid-8', 'uuid-10' ],
+							'': [ 'uuid-6', 'uuid-8', 'uuid-10', 'uuid-22' ],
 							'uuid-2': [ ],
 							'uuid-4': [ ],
 							'uuid-6': [ ],
@@ -1762,6 +1767,10 @@ describe( 'selectors', () => {
 							'uuid-16': [ ],
 							'uuid-18': [ ],
 							'uuid-20': [ ],
+							'uuid-22': [ ],
+							'uuid-24': [ 'uuid-26', 'uuid-28' ],
+							'uuid-26': [ ],
+							'uuid-28': [ 'uuid-30' ],
 						},
 						edits: {},
 					},
@@ -1771,6 +1780,7 @@ describe( 'selectors', () => {
 						1: { clientId: 'uuid-2', title: 'SharedImage' },
 						3: { clientId: 'uuid-4', title: 'SharedParagraph' },
 						5: { clientId: 'uuid-20', title: 'SharedGallery' },
+						7: { clientId: 'uuid-24', title: 'SharedColumns' },
 					},
 				},
 			};
@@ -1784,6 +1794,11 @@ describe( 'selectors', () => {
 				'uuid-14',
 				'uuid-18',
 				'uuid-20',
+				'uuid-22',
+				'uuid-24',
+				'uuid-26',
+				'uuid-28',
+				'uuid-30',
 			] );
 		} );
 	} );
