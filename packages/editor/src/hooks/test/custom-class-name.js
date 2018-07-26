@@ -110,5 +110,45 @@ describe( 'custom className', () => {
 
 			expect( attributes.className ).toBeUndefined();
 		} );
+
+		it( 'should add a custom class name to an element without a class', () => {
+			const attributes = addParsedDifference(
+				{},
+				blockSettings,
+				'<div class="foo"></div>'
+			);
+
+			expect( attributes.className ).toBe( 'foo' );
+		} );
+
+		it( 'should remove the custom class and retain default class', () => {
+			const attributes = addParsedDifference(
+				{ className: 'default custom' },
+				blockSettings,
+				'<div class="default"></div>'
+			);
+
+			expect( attributes.className ).toBe( 'default' );
+		} );
+
+		it( 'should remove the custom class from an element originally without a class', () => {
+			const attributes = addParsedDifference(
+				{ className: 'foo' },
+				blockSettings,
+				'<div></div>'
+			);
+
+			expect( attributes.className ).toBeUndefined();
+		} );
+
+		it( 'should remove the custom classes and retain default and other custom class', () => {
+			const attributes = addParsedDifference(
+				{ className: 'default custom1 custom2 custom3' },
+				blockSettings,
+				'<div class="default custom1 custom3"></div>'
+			);
+
+			expect( attributes.className ).toBe( 'default custom1 custom3' );
+		} );
 	} );
 } );

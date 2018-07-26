@@ -136,15 +136,21 @@ export function addParsedDifference( blockAttributes, blockType, innerHTML ) {
 		// To determine difference, serialize block given the known set of
 		// attributes. If there are classes which are mismatched with the
 		// incoming HTML of the block, add to filtered result.
+		// If existing classes have been removed then ensure they don't appear in the output
 		const serialized = getSaveContent( blockType, blockAttributes );
+		const blockClasses = blockAttributes.className ? blockAttributes.className.split( ' ' ) : [];
 		const classes = getHTMLRootElementClasses( serialized );
 		const parsedClasses = getHTMLRootElementClasses( innerHTML );
 		const customClasses = difference( parsedClasses, classes );
 
-		const filteredClassName = compact( [
-			blockAttributes.className,
+		// The remaining classes consist of the block's current classes (with default classes removed if they don't already exist in the block)
+		// along with any custom classes, removing any class that doesn't appear in the innerHTML
+		const remaining = [
+			...classes.filter( ( item ) => blockClasses.indexOf( item ) !== -1 ),
 			...customClasses,
-		] ).join( ' ' );
+		].filter( ( item ) => parsedClasses.indexOf( item ) !== -1 );
+
+		const filteredClassName = compact( remaining ).join( ' ' );
 
 		if ( filteredClassName ) {
 			blockAttributes.className = filteredClassName;
