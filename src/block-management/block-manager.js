@@ -14,7 +14,7 @@ import type { BlockType } from '../store/';
 import styles from './block-manager.scss';
 
 // Gutenberg imports
-import { getBlockType, serialize } from '@gutenberg/blocks/api';
+import { getBlockType, serialize } from '@wordpress/blocks';
 
 export type BlockListType = {
 	onChange: ( uid: string, attributes: mixed ) => void,

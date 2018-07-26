@@ -5,7 +5,7 @@
 
 // Gutenberg imports
 import { registerCoreBlocks } from '@gutenberg/core-blocks';
-import { parse } from '@gutenberg/blocks';
+import { parse } from '@wordpress/blocks';
 
 import { createStore } from 'redux';
 import { reducer } from './reducers';
@@ -28,7 +28,7 @@ registerCoreBlocks();
 
 const initialCodeBlockHtml = `
 <!-- wp:code -->
-<pre><code>if name == "World":
+<pre class="wp-block-code"><code>if name == "World":
     return "Hello World"
 else:
     return "Hello Pony"</code></pre>

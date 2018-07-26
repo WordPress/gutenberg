@@ -536,15 +536,39 @@
     babel-plugin-transform-runtime "^6.23.0"
     babel-preset-env "^1.6.1"
 
+"@wordpress/block-serialization-spec-parser@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@wordpress/block-serialization-spec-parser/-/block-serialization-spec-parser-1.0.0.tgz#a51a9276421629d4be398dfcc9bab52e303c3403"
+
 "@wordpress/browserslist-config@^2.1.4":
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@wordpress/browserslist-config/-/browserslist-config-2.2.0.tgz#7fcc77db40d4d846dbb158e485a6badc143c76d2"
 
-"@wordpress/deprecated@^1.0.0-alpha.2":
+"@wordpress/compose@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@wordpress/compose/-/compose-1.0.1.tgz#fdfb24b27390ca97db432108c47188b4fc96dea8"
+  dependencies:
+    "@babel/runtime" "^7.0.0-beta.52"
+    "@wordpress/element" "^1.0.1"
+    "@wordpress/is-shallow-equal" "^1.1.1"
+    lodash "^4.17.10"
+
+"@wordpress/deprecated@^1.0.0-alpha.2", "@wordpress/deprecated@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@wordpress/deprecated/-/deprecated-1.0.1.tgz#8769d791b228022caef156dbbff0f21eb2b21f3e"
   dependencies:
     "@babel/runtime" "^7.0.0-beta.52"
+
+"@wordpress/element@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@wordpress/element/-/element-1.0.1.tgz#d9e31e437793655556816e6328bc67bfbecc4a27"
+  dependencies:
+    "@babel/runtime" "^7.0.0-beta.52"
+    "@wordpress/deprecated" "^1.0.1"
+    "@wordpress/is-shallow-equal" "^1.1.1"
+    lodash "^4.17.10"
+    react "^16.4.1"
+    react-dom "^16.4.1"
 
 "@wordpress/hooks@^1.2.1":
   version "1.3.1"
@@ -562,7 +586,7 @@
     lodash "^4.17.10"
     memize "^1.0.5"
 
-"@wordpress/is-shallow-equal@^1.0.1":
+"@wordpress/is-shallow-equal@^1.0.1", "@wordpress/is-shallow-equal@^1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@wordpress/is-shallow-equal/-/is-shallow-equal-1.1.1.tgz#377db18206afe2a6e787862106c3ff5c27d65e36"
   dependencies:
@@ -6208,7 +6232,7 @@ react-devtools-core@3.1.0:
     shell-quote "^1.6.1"
     ws "^2.0.3"
 
-react-dom@^16.2.0:
+react-dom@^16.2.0, react-dom@^16.4.1:
   version "16.4.1"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.4.1.tgz#7f8b0223b3a5fbe205116c56deb85de32685dad6"
   dependencies:
@@ -6368,6 +6392,15 @@ react@^0.14.0:
   dependencies:
     envify "^3.0.0"
     fbjs "^0.6.1"
+
+react@^16.4.1:
+  version "16.4.1"
+  resolved "https://registry.yarnpkg.com/react/-/react-16.4.1.tgz#de51ba5764b5dbcd1f9079037b862bd26b82fe32"
+  dependencies:
+    fbjs "^0.8.16"
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+    prop-types "^15.6.0"
 
 read-pkg-up@^1.0.1:
   version "1.0.1"

@@ -2,6 +2,7 @@
 
 import { createElement } from '@wordpress/element';
 import jsdom from 'jsdom-jscore';
+import jsdomLevel1Core from 'jsdom-jscore/lib/jsdom/level1/core';
 
 global.wp = {
 	element: {
@@ -18,3 +19,7 @@ doc.implementation.createHTMLDocument = function( html ) {
 
 // `hpq` depends on `document` be available globally
 global.document = doc;
+
+if ( ! global.window.Node ) {
+	global.window.Node = jsdomLevel1Core.dom.level1.core.Node;
+}
