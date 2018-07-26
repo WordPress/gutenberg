@@ -78,7 +78,9 @@ function _gutenberg_utf8_split( $str ) {
  */
 function gutenberg_disable_editor_settings_wpautop( $settings ) {
 	$post = get_post();
-	if ( is_object( $post ) && gutenberg_post_has_blocks( $post ) ) {
+	// _content_editor_dfw is a private setting only used on the main
+	// editor instance.
+	if ( is_object( $post ) && gutenberg_post_has_blocks( $post ) && isset( $settings['_content_editor_dfw'] ) ) {
 		$settings['wpautop'] = false;
 	}
 
