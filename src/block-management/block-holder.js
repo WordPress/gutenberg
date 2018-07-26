@@ -24,6 +24,7 @@ type StateType = {
 	selected: boolean,
 	focused: boolean,
 	aztecHeight: number,
+	eventCount: number,
 };
 
 const _minHeight = 50;
