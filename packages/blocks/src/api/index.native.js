@@ -17,3 +17,4 @@ export {
 	hasBlockSupport,
 } from './registration';
 export { getPhrasingContentSchema } from './raw-handling';
+export { default as children } from './children';

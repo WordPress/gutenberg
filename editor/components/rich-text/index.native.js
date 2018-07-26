@@ -1,16 +1,21 @@
 /**
  * External dependencies
  */
-import { Component, renderToString } from '@wordpress/element';
 import RCTAztecView from 'react-native-aztec';
-import { parse } from '@wordpress/blocks';
+import { parse, children } from '@wordpress/blocks';
+
+/**
+ * WordPress dependencies
+ */
+import { Component, RawHTML, renderToString } from '@wordpress/element';
+import { withInstanceId, compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  import styles from './style.scss';
 */
 
-export default class RichText extends Component {
+export class RichText extends Component {
 	constructor() {
 		super( ...arguments );
 		//console.log('RichText');
@@ -105,3 +110,44 @@ export default class RichText extends Component {
 		);
 	}
 }
+
+const RichTextContainer = compose( [
+	withInstanceId,
+] )( RichText );
+
+RichTextContainer.Content = ( { value, format, tagName: Tag, ...props } ) => {
+	let content;
+	switch ( format ) {
+		case 'string':
+			content = <RawHTML>{ value }</RawHTML>;
+			break;
+
+		case 'element':
+			// NOTE: In removing this, ensure to remove also every related
+			// function from `format.js`, including the `dom-react` dependency.
+			deprecated( 'RichText `element` format', {
+				version: '3.5',
+				plugin: 'Gutenberg',
+				alternative: 'the compatible `children` format',
+			} );
+
+			content = value;
+			break;
+
+		case 'children':
+			content = <RawHTML>{ children.toHTML( value ) }</RawHTML>;
+			break;
+	}
+
+	if ( Tag ) {
+		return <Tag { ...props }>{ content }</Tag>;
+	}
+
+	return content;
+};
+
+RichTextContainer.Content.defaultProps = {
+	format: 'children',
+};
+
+export default RichTextContainer;
