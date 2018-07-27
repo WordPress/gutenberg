@@ -89,7 +89,7 @@ Because it is a dynamic block it also needs a server component. The rendering ca
 <?php
 // block.php
 
-function my_plugin_render_block_latest_post( $attributes ) {
+function my_plugin_render_block_latest_post( $attributes, $content ) {
 	$recent_posts = wp_get_recent_posts( array(
 		'numberposts' => 1,
 		'post_status' => 'publish',
@@ -115,7 +115,7 @@ There are a few things to notice:
 
 * The edit function still shows a representation of the block in the editor's context (this could be very different from the rendered version, it's up to the block's author)
 * The save function just returns null because the rendering is performed server-side.
-* The server-side rendering is a function taking the block attributes as an argument and returning the markup (quite similar to shortcodes)
+* The server-side rendering is a function taking the block attributes and the block inner content as arguments, and returning the markup (quite similar to shortcodes)
 
 ## Live rendering in Gutenberg editor
 

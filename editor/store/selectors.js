@@ -22,10 +22,11 @@ import createSelector from 'rememo';
 /**
  * WordPress dependencies
  */
-import { serialize, getBlockType, getBlockTypes, hasBlockSupport, hasChildBlocks } from '@wordpress/blocks';
+import { serialize, getBlockType, getBlockTypes, hasBlockSupport, hasChildBlocks, getUnknownTypeHandlerName } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { moment } from '@wordpress/date';
 import deprecated from '@wordpress/deprecated';
+import { removep } from '@wordpress/autop';
 
 /***
  * Module constants
@@ -1352,7 +1353,13 @@ export const getEditedPostContent = createSelector(
 			return edits.content;
 		}
 
-		return serialize( getBlocks( state ) );
+		const blocks = getBlocks( state );
+
+		if ( blocks.length === 1 && blocks[ 0 ].name === getUnknownTypeHandlerName() ) {
+			return removep( serialize( blocks ) );
+		}
+
+		return serialize( blocks );
 	},
 	( state ) => [
 		state.editor.present.edits.content,
