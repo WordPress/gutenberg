@@ -73,6 +73,31 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				this.state.dataSource.splice( dataSourceBlockIndex, 1 );
 				this.props.deleteBlockAction( uid );
 				break;
+			case ToolbarButton.PLUS:
+				// TODO: implement creating a new block
+				// FIXME: it would be nice to pass the dataSourceBlockIndex here, 
+				// so in this way we know the new block should be inserted right after this one
+				// instead of being appended to the end.
+				
+				// this.props.createBlockAction( uid, dataSourceBlockIndex );
+
+				// this.state.dataSource.create
+				// TODO: create an unique id
+				const block = this.state.dataSource.get(this.state.dataSource.size() - 1);
+				const newId = block.uid + 1;
+				this.state.dataSource.push( {
+					uid: newId,
+					name: 'paragraph',
+					isValid: true,
+					attributes: {
+						content:
+							'This is a new paragraph block',
+					},
+					innerBlocks: [],
+					focused: false,
+				} );
+				this.props.createBlockAction( uid );
+				break;
 			case ToolbarButton.SETTINGS:
 				// TODO: implement settings
 				break;
