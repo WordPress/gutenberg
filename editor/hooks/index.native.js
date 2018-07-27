@@ -1,5 +1,5 @@
 /**
  * Internal dependencies
  */
-import './custom-class-name-native';
+import './custom-class-name';
 import './generated-class-name';
