@@ -330,6 +330,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/editor",
+		"slug": "packages-editor",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/editor/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/element",
 		"slug": "packages-element",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/element/README.md",
@@ -450,12 +456,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/editor",
-		"slug": "packages-editor",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/editor/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "Data Package Reference",
 		"slug": "data",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/README.md",
@@ -474,13 +474,13 @@
 		"parent": "data"
 	},
 	{
-		"title": "The Editor's Data",
+		"title": "The Editor’s Data",
 		"slug": "data-core-editor",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-editor.md",
 		"parent": "data"
 	},
 	{
-		"title": "The Editor's UI Data",
+		"title": "The Editor’s UI Data",
 		"slug": "data-core-edit-post",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-edit-post.md",
 		"parent": "data"

@@ -1,14 +1,14 @@
 <?php
 /**
- * Shared block rendering tests.
+ * Reusable block rendering tests.
  *
  * @package Gutenberg
  */
 
 /**
- * Tests shared block rendering.
+ * Tests reusable block rendering.
  */
-class Shared_Blocks_Render_Test extends WP_UnitTestCase {
+class Reusable_Blocks_Render_Test extends WP_UnitTestCase {
 	/**
 	 * Fake user ID.
 	 *
@@ -67,7 +67,7 @@ class Shared_Blocks_Render_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test rendering of a shared block.
+	 * Test rendering of a reusable block.
 	 */
 	public function test_render() {
 		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'core/block' );
@@ -76,7 +76,7 @@ class Shared_Blocks_Render_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test rendering of a shared block when 'ref' is missing, which should fail by
+	 * Test rendering of a reusable block when 'ref' is missing, which should fail by
 	 * rendering an empty string.
 	 */
 	public function test_ref_empty() {
@@ -86,7 +86,7 @@ class Shared_Blocks_Render_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test rendering of a shared block when 'ref' points to wrong post type, which
+	 * Test rendering of a reusable block when 'ref' points to wrong post type, which
 	 * should fail by rendering an empty string.
 	 */
 	public function test_ref_wrong_post_type() {

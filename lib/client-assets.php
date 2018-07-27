@@ -79,10 +79,24 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script( 'wp-tinymce', includes_url( 'js/tinymce/' ) . 'wp-tinymce.php', array() );
 
 	wp_register_script(
+		'wp-url',
+		gutenberg_url( 'build/url/index.js' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'build/url/index.js' ),
+		true
+	);
+	wp_register_script(
 		'wp-autop',
 		gutenberg_url( 'build/autop/index.js' ),
 		array(),
 		filemtime( gutenberg_dir_path() . 'build/autop/index.js' ),
+		true
+	);
+	wp_register_script(
+		'wp-wordcount',
+		gutenberg_url( 'build/wordcount/index.js' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'build/wordcount/index.js' ),
 		true
 	);
 	wp_register_script(
@@ -439,10 +453,6 @@ function gutenberg_register_scripts_and_styles() {
 		'wp-editor',
 		gutenberg_url( 'build/editor/index.js' ),
 		array(
-			'editor',
-			'jquery',
-			'lodash',
-			'postbox',
 			'wp-a11y',
 			'wp-api-fetch',
 			'wp-blob',
@@ -454,16 +464,21 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-date',
 			'wp-deprecated',
 			'wp-dom',
-			'wp-i18n',
-			'wp-keycodes',
 			'wp-element',
-			'wp-plugins',
+			'wp-hooks',
+			'wp-html-entities',
+			'wp-i18n',
+			'wp-is-shallow-equal',
+			'wp-keycodes',
+			'wp-nux',
+			'wp-url',
 			'wp-viewport',
+			'wp-wordcount',
+			'lodash',
 			'wp-tinymce',
 			'tinymce-latest-lists',
 			'tinymce-latest-paste',
 			'tinymce-latest-table',
-			'wp-nux',
 		),
 		filemtime( gutenberg_dir_path() . 'build/editor/index.js' )
 	);
@@ -474,9 +489,11 @@ function gutenberg_register_scripts_and_styles() {
 		array(
 			'jquery',
 			'lodash',
+			'postbox',
 			'media-models',
 			'media-views',
 			'wp-a11y',
+			'wp-api',
 			'wp-api-fetch',
 			'wp-components',
 			'wp-compose',
@@ -1051,8 +1068,8 @@ function get_block_categories( $post ) {
 			'title' => __( 'Embeds', 'gutenberg' ),
 		),
 		array(
-			'slug'  => 'shared',
-			'title' => __( 'Shared Blocks', 'gutenberg' ),
+			'slug'  => 'reusable',
+			'title' => __( 'Reusable Blocks', 'gutenberg' ),
 		),
 	);
 
@@ -1190,6 +1207,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$gutenberg_theme_support = get_theme_support( 'gutenberg' );
 	$align_wide              = get_theme_support( 'align-wide' );
 	$color_palette           = (array) get_theme_support( 'editor-color-palette' );
+	$font_sizes              = current( (array) get_theme_support( 'editor-font-sizes' ) );
 
 	// Backcompat for Color Palette set as multiple parameters.
 	if ( isset( $color_palette[0] ) && ( is_string( $color_palette[0] ) || isset( $color_palette[0]['color'] ) ) ) {
@@ -1263,6 +1281,10 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	if ( false !== $color_palette ) {
 		$editor_settings['colors'] = editor_color_palette_slugs( $color_palette );
+	}
+
+	if ( ! empty( $font_sizes ) ) {
+		$editor_settings['fontSizes'] = $font_sizes;
 	}
 
 	if ( ! empty( $post_type_object->template ) ) {
