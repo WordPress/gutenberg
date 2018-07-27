@@ -294,7 +294,7 @@ export function createBlockWithFallback( blockNode ) {
 	attributes = attributes || {};
 
 	// Trim content to avoid creation of intermediary freeform segments.
-	innerHTML = innerHTML.trim();
+	const originalUndelimitedContent = innerHTML = innerHTML.trim();
 
 	// Use type from block content, otherwise find unknown handler.
 	name = name || getUnknownTypeHandlerName();
@@ -341,11 +341,16 @@ export function createBlockWithFallback( blockNode ) {
 		innerBlocks
 	);
 
-	// Block validation assumes an idempotent operation from source block to serialized block
-	// provided there are no changes in attributes. The validation procedure thus compares the
-	// provided source value with the serialized output before there are any modifications to
-	// the block. When both match, the block is marked as valid.
-	if ( name !== fallbackBlock ) {
+	if ( name === fallbackBlock ) {
+		// Keep original name and attributes so they can be preserved in fallback serialization.
+		block.originalName = blockNode.blockName;
+		block.originalAttributes = attributes;
+		block.originalUndelimitedContent = originalUndelimitedContent;
+	} else {
+		// Block validation assumes an idempotent operation from source block to serialized block
+		// provided there are no changes in attributes. The validation procedure thus compares the
+		// provided source value with the serialized output before there are any modifications to
+		// the block. When both match, the block is marked as valid.
 		block.isValid = isValidBlock( innerHTML, blockType, block.attributes );
 	}
 

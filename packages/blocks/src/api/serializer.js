@@ -13,7 +13,7 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 /**
  * Internal dependencies
  */
-import { getBlockType, getUnknownTypeHandlerName } from './registration';
+import { getBlockType, getUnknownTypeHandlerName, hasBlockSupport } from './registration';
 import BlockContentProvider from '../block-content-provider';
 
 /**
@@ -255,18 +255,26 @@ export function getCommentDelimitedContent( rawBlockName, attributes, content ) 
  * @return {string} Serialized block.
  */
 export function serializeBlock( block ) {
-	const blockName = block.name;
-	const blockType = getBlockType( blockName );
-	const saveContent = getBlockContent( block );
-	const saveAttributes = getCommentAttributes( block.attributes, blockType );
+	const blockType = getBlockType( block.name );
 
-	switch ( blockName ) {
-		case getUnknownTypeHandlerName():
-			return saveContent;
-
-		default:
-			return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
+	let blockName;
+	let saveContent;
+	let saveAttributes;
+	if (
+		block.name === getUnknownTypeHandlerName() &&
+		hasBlockSupport( blockType, 'preserveOriginalContent', false )
+	) {
+		blockName = block.originalName;
+		// @todo: Support preservation of nested content.
+		saveContent = block.originalUndelimitedContent;
+		saveAttributes = block.originalAttributes;
+	} else {
+		blockName = block.name;
+		saveContent = getBlockContent( block );
+		saveAttributes = getCommentAttributes( block.attributes, blockType );
 	}
+
+	return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
 }
 
 /**

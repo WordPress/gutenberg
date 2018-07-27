@@ -42,6 +42,7 @@ import * as spacer from './spacer';
 import * as subhead from './subhead';
 import * as table from './table';
 import * as textColumns from './text-columns';
+import * as unknown from './unknown';
 import * as verse from './verse';
 import * as video from './video';
 
@@ -84,6 +85,7 @@ export const registerCoreBlocks = () => {
 		subhead,
 		table,
 		textColumns,
+		unknown,
 		verse,
 		video,
 	].forEach( ( { name, settings } ) => {
@@ -91,5 +93,5 @@ export const registerCoreBlocks = () => {
 	} );
 
 	setDefaultBlockName( paragraph.name );
-	setUnknownTypeHandlerName( freeform.name );
+	setUnknownTypeHandlerName( unknown.name );
 };
