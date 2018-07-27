@@ -108,6 +108,25 @@ export const reducer = (
 			blocks.splice( index, 1 );
 			return { blocks: blocks, refresh: ! state.refresh };
 		}
+		case ActionTypes.BLOCK.CREATE: {
+			// TODO create a new block here
+			// TODO we need to use a new method to generate unique ids for block placeholders
+			// TODO we need to set focused: true and search for the currently focused block and
+			// set that one to `focused: false`.
+			const newId = blocks[ blocks.length - 1 ].uid + 1;
+			blocks.push({
+				uid: newId,
+				name: 'paragraph',
+				isValid: true,
+				attributes: {
+					content:
+						'This is a new paragraph block',
+				},
+				innerBlocks: [],
+				focused: false,
+			});
+			return { blocks: blocks, refresh: ! state.refresh };
+		}
 		default:
 			return state;
 	}
