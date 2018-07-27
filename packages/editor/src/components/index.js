@@ -11,6 +11,7 @@ export { default as ColorPalette } from './color-palette';
 export { default as withColorContext } from './color-palette/with-color-context';
 export * from './colors';
 export { default as ContrastChecker } from './contrast-checker';
+export * from './font-sizes';
 export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
 export { default as InspectorControls } from './inspector-controls';
