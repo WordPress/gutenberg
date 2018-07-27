@@ -30,7 +30,9 @@ export class RichText extends Component {
 			clearTimeout( this.currentTimer );
 		}
 		this.lastEventCount = event.nativeEvent.eventCount;
-		this.lastContent = event.nativeEvent.text.replace( '<p>', '' ).replace( '</p>', '' );
+		const newContent = event.nativeEvent.text.replace( /<p>/gi, '' ).replace( /<\/p>/gi, '<br>' );
+		console.log(newContent);
+		this.lastContent = newContent;
 
 		this.currentTimer = setTimeout( function() {
 			// Create a React Tree from the new HTML
