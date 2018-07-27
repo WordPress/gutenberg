@@ -111,10 +111,6 @@ function is_gutenberg_page() {
 		return false;
 	}
 
-	if ( get_the_ID() == get_option( 'page_for_posts' ) && empty( $post->post_content ) ) {
-		return false;
-	}
-
 	return true;
 }
 

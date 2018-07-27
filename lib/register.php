@@ -269,6 +269,10 @@ function gutenberg_can_edit_post( $post ) {
 		return false;
 	}
 
+	if ( $post->ID == get_option( 'page_for_posts' ) && empty( $post->post_content ) ) {
+		return false;
+	}
+
 	if ( ! gutenberg_can_edit_post_type( $post->post_type ) ) {
 		return false;
 	}
