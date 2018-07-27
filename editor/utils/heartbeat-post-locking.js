@@ -1,4 +1,15 @@
 /* global ajaxurl */
+
+/**
+ * Internal dependencies
+ */
+import { createModal } from '../store/actions';
+
+/**
+ * WordPress dependencies
+ */
+import { element } from '@wordpress/element';
+
 export function setupHearthbeatPostLocking() {
 	/**
 	 * Configure Heartbeat post locks.
@@ -17,6 +28,13 @@ export function setupHearthbeatPostLocking() {
 			return;
 		}
 
+		// Check if the post is locked.
+		const { locked } = select( 'core/editor' ).getEditorSettings();
+		if ( locked ) {
+			console.log( 'LOCKED!' );
+		}
+		return
+
 		send.postId = postId;
 
 		if ( lock ) {
@@ -34,8 +52,11 @@ export function setupHearthbeatPostLocking() {
 			if ( received.lock_error ) {
 				// @todo suspend autosaving
 				// @todo Show "editing taken over" message.
+				const modalContent = wp.element.createElement( Greeting, { toWhom: 'World' } );
+				dispatch( 'core/editor' ).createModal( modalContent );
 			} else if ( received.new_lock ) {
 				jQuery( '#active_post_lock' ).val( received.new_lock );
+				dispatch( 'core/editor' ).removeModal();
 			}
 		}
 	} );

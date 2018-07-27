@@ -1261,6 +1261,34 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		);
 	}
 
+	// Check to see if the post is locked.
+	$user = null;
+	if ( $user_id = wp_check_post_lock( $post->ID ) ) {
+		$user = get_userdata( $user_id );
+	}
+
+	if ( $user ) {
+
+		/**
+		 * Filters whether to show the post locked dialog.
+		 *
+		 * Returning a falsey value to the filter will short-circuit displaying the dialog.
+		 *
+		 * @since 3.6.0
+		 *
+		 * @param bool         $display Whether to display the dialog. Default true.
+		 * @param WP_Post      $post    Post object.
+		 * @param WP_User|bool $user    WP_User object on success, false otherwise.
+		 */
+		if ( apply_filters( 'show_post_locked_dialog', true, $post, $user ) ) {
+			$locked = true;
+		}
+
+	} else {
+		$locked = false;
+	}
+	$editor_settings['locked'] = $locked;
+
 	if ( false !== $color_palette ) {
 		$editor_settings['colors'] = editor_color_palette_slugs( $color_palette );
 	}

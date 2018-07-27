@@ -919,6 +919,30 @@ export function notices( state = [], action ) {
 	return state;
 }
 
+export function modals( state = [], action ) {
+	switch ( action.type ) {
+		case 'CREATE_MODAL':
+			return [
+				...reject( state, { id: action.modal.id } ),
+				action.modal,
+			];
+
+		case 'REMOVE_MODAL':
+			const { modalId } = action;
+			const index = findIndex( state, { id: modalId } );
+			if ( index === -1 ) {
+				return state;
+			}
+
+			return [
+				...state.slice( 0, index ),
+				...state.slice( index + 1 ),
+			];
+	}
+
+	return state;
+}
+
 export const sharedBlocks = combineReducers( {
 	data( state = {}, action ) {
 		switch ( action.type ) {

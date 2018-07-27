@@ -590,6 +590,48 @@ export function removeNotice( id ) {
 	};
 }
 
+/**
+ * Returns an action object used to create a modal.
+ *
+ * @param {WPElement} content The modal content.
+ * @param {?Object}   options The modal options.  Available options:
+ *                              `id` (string; default auto-generated)
+ *                              `isDismissible` (boolean; default `true`).
+ *
+ * @return {Object} Action object.
+ */
+export function createModal( content, options = {} ) {
+	const {
+		id = uuid(),
+		isDismissible = true,
+		spokenMessage,
+	} = options;
+	return {
+		type: 'CREATE_MODAL',
+		modal: {
+			id,
+			status,
+			content,
+			isDismissible,
+			spokenMessage,
+		},
+	};
+}
+
+/**
+ * Returns an action object used to remove a modal.
+ *
+ * @param {string} id The modal id.
+ *
+ * @return {Object} Action object.
+ */
+export function removeModal( id ) {
+	return {
+		type: 'REMOVE_MODAL',
+		modalId: id,
+	};
+}
+
 export const createSuccessNotice = partial( createNotice, 'success' );
 export const createInfoNotice = partial( createNotice, 'info' );
 export const createErrorNotice = partial( createNotice, 'error' );
