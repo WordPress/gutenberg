@@ -17,7 +17,7 @@ import { registerCoreBlocks } from '@wordpress/core-blocks';
 describe( 'Blocks raw handling', () => {
 	beforeAll( () => {
 		// Load all hooks that modify blocks
-		require( 'editor/hooks' );
+		require( '../../packages/editor/src/hooks' );
 		registerCoreBlocks();
 	} );
 
@@ -38,7 +38,7 @@ describe( 'Blocks raw handling', () => {
 			mode: 'AUTO',
 		} ).map( getBlockContent ).join( '' );
 
-		expect( filtered ).toBe( '<ul>\n\t<li>one</li>\n\t<li>two</li>\n\t<li>three</li>\n</ul>' );
+		expect( filtered ).toBe( '<ul><li>one</li><li>two</li><li>three</li></ul>' );
 		expect( console ).toHaveLogged();
 	} );
 

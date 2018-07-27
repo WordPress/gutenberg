@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage, pressWithModifier, getHTMLFromCodeEditor } from '../support/utils';
+import { newPost, newDesktopBrowserPage, pressWithModifier, getEditedPostContent } from '../support/utils';
 
 describe( 'Formatting Controls', () => {
 	beforeAll( async () => {
@@ -29,7 +29,7 @@ describe( 'Formatting Controls', () => {
 		await pressWithModifier( 'Mod', 'b' );
 
 		// Check content
-		const content = await getHTMLFromCodeEditor();
+		const content = await getEditedPostContent();
 		expect( content ).toMatchSnapshot();
 	} );
 } );

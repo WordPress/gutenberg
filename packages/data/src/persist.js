@@ -1,10 +1,5 @@
-/**
- * External dependencies
- */
-import { get } from 'lodash';
-
 // Defaults to the local storage.
-let persistenceStorage = window.localStorage;
+let persistenceStorage;
 
 /**
  * Sets a different persistence storage.
@@ -16,66 +11,73 @@ export function setPersistenceStorage( storage ) {
 }
 
 /**
+ * Get the persistence storage handler.
+ *
+ * @return {Object} Persistence storage.
+ */
+export function getPersistenceStorage() {
+	return persistenceStorage || window.localStorage;
+}
+
+/**
  * Adds the rehydration behavior to redux reducers.
  *
  * @param {Function} reducer    The reducer to enhance.
- * @param {string}   reducerKey The reducer key to persist.
  * @param {string}   storageKey The storage key to use.
  *
  * @return {Function} Enhanced reducer.
  */
-export function withRehydration( reducer, reducerKey, storageKey ) {
+export function withRehydration( reducer ) {
 	// EnhancedReducer with auto-rehydration
 	const enhancedReducer = ( state, action ) => {
-		const nextState = reducer( state, action );
-
-		if ( action.type === 'REDUX_REHYDRATE' && action.storageKey === storageKey ) {
-			return {
-				...nextState,
-				[ reducerKey ]: action.payload,
-			};
+		if ( action.type === 'REDUX_REHYDRATE' ) {
+			return reducer( action.payload, {
+				...action,
+				previousState: state,
+			} );
 		}
 
-		return nextState;
+		return reducer( state, action );
 	};
 
 	return enhancedReducer;
 }
 
 /**
- * Loads the initial state and persist on changes.
+ * Higher-order reducer used to persist just one key from the reducer state.
  *
- * This should be executed after the reducer's registration.
+ * @param {function} reducer    Reducer function.
+ * @param {string} keyToPersist The reducer key to persist.
  *
- * @param {Object}   store      Store to enhance.
- * @param {Function} reducer    The reducer function. Used to get default values and to allow custom serialization by the reducers.
- * @param {string}   reducerKey The reducer key to persist (example: reducerKey.subReducerKey).
- * @param {string}   storageKey The storage key to use.
+ * @return {function} Updated reducer.
  */
-export function loadAndPersist( store, reducer, reducerKey, storageKey ) {
-	// Load initially persisted value
-	const persistedString = persistenceStorage.getItem( storageKey );
-	if ( persistedString ) {
-		const persistedState = {
-			...get( reducer( undefined, { type: '@@gutenberg/init' } ), reducerKey ),
-			...JSON.parse( persistedString ),
-		};
+export function restrictPersistence( reducer, keyToPersist ) {
+	return ( state, action ) => {
+		const nextState = reducer( state, action );
 
-		store.dispatch( {
-			type: 'REDUX_REHYDRATE',
-			payload: persistedState,
-			storageKey,
-		} );
-	}
+		if ( action.type === 'SERIALIZE' ) {
+			// Returning the same instance if the state is kept identical avoids reserializing again
+			if (
+				action.previousState &&
+				action.previousState[ keyToPersist ] === nextState[ keyToPersist ]
+			) {
+				return action.previousState;
+			}
 
-	// Persist updated preferences
-	let currentStateValue = get( store.getState(), reducerKey );
-	store.subscribe( () => {
-		const newStateValue = get( store.getState(), reducerKey );
-		if ( newStateValue !== currentStateValue ) {
-			currentStateValue = newStateValue;
-			const stateToSave = get( reducer( store.getState(), { type: 'SERIALIZE' } ), reducerKey );
-			persistenceStorage.setItem( storageKey, JSON.stringify( stateToSave ) );
+			return { [ keyToPersist ]: nextState[ keyToPersist ] };
 		}
-	} );
+
+		if ( action.type === 'REDUX_REHYDRATE' ) {
+			return {
+				...action.previousState,
+				...state,
+				[ keyToPersist ]: {
+					...action.previousState[ keyToPersist ],
+					...state[ keyToPersist ],
+				},
+			};
+		}
+
+		return nextState;
+	};
 }

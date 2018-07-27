@@ -177,8 +177,7 @@ function do_blocks( $content ) {
 			}
 		}
 
-		// Replace dynamic block with server-rendered output.
-		$rendered_content .= $block_type->render( $attributes );
+		$inner_content = '';
 
 		if ( ! $is_self_closing ) {
 			$end_tag_pattern = '/<!--\s+\/wp:' . str_replace( '/', '\/', preg_quote( $block_name ) ) . '\s+-->/';
@@ -192,8 +191,12 @@ function do_blocks( $content ) {
 			$end_tag    = $block_match_end[0][0];
 			$end_offset = $block_match_end[0][1];
 
-			$content = substr( $content, $end_offset + strlen( $end_tag ) );
+			$inner_content = substr( $content, 0, $end_offset );
+			$content       = substr( $content, $end_offset + strlen( $end_tag ) );
 		}
+
+		// Replace dynamic block with server-rendered output.
+		$rendered_content .= $block_type->render( $attributes, $inner_content );
 	}
 
 	// Append remaining unmatched content.

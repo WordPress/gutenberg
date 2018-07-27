@@ -6,13 +6,13 @@ import {
 	newPost,
 	newDesktopBrowserPage,
 	insertBlock,
-	getHTMLFromCodeEditor,
+	getEditedPostContent,
 	pressTimes,
 	pressWithModifier,
 } from '../support/utils';
 
 describe( 'splitting and merging blocks', () => {
-	beforeAll( async () => {
+	beforeEach( async () => {
 		await newDesktopBrowserPage();
 		await newPost();
 	} );
@@ -28,21 +28,16 @@ describe( 'splitting and merging blocks', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Assert that there are now two paragraph blocks with correct content
-		expect( await getHTMLFromCodeEditor() ).toMatchSnapshot();
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		// Press Backspace to merge paragraph blocks
-		await page.click( '.is-selected' );
-		await page.keyboard.press( 'Home' );
 		await page.keyboard.press( 'Backspace' );
 
 		// Ensure that caret position is correctly placed at the between point.
 		await page.keyboard.type( 'Between' );
-		expect( await getHTMLFromCodeEditor() ).toMatchSnapshot();
-		// Workaround: When transitioning back from Code to Visual, the caret
-		// is placed at the beginning of the selected paragraph. Ideally this
-		// should persist selection between modes.
-		await pressTimes( 'ArrowRight', 5 ); // After "First"
-		await pressTimes( 'Delete', 7 ); // Delete "Between"
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await pressTimes( 'Backspace', 7 ); // Delete "Between"
 
 		// Edge case: Without ensuring that the editor still has focus when
 		// restoring a bookmark, the caret may be inadvertently moved back to
@@ -57,6 +52,22 @@ describe( 'splitting and merging blocks', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'BeforeSecond:' );
 
-		expect( await getHTMLFromCodeEditor() ).toMatchSnapshot();
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'Should merge into inline boundary position', async () => {
+		// Regression Test: Caret should reset to end of inline boundary when
+		// backspacing to delete second paragraph.
+		await insertBlock( 'Paragraph' );
+		await pressWithModifier( 'mod', 'b' );
+		await page.keyboard.type( 'Foo' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Backspace' );
+
+		// Replace contents of first paragraph with "Bar".
+		await pressTimes( 'Backspace', 3 );
+		await page.keyboard.type( 'Bar' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

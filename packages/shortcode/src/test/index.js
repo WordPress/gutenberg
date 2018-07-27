@@ -136,7 +136,7 @@ describe( 'shortcode', () => {
 
 	describe( 'attrs', () => {
 		it( 'should return named attributes created with single, double, and no quotes', () => {
-			const result = attrs( 'param="foo" another=\'bar\' andagain=baz' );
+			const result = attrs( `param="foo" another='bar' andagain=baz` );
 			const expected = {
 				named: {
 					param: 'foo',
@@ -172,7 +172,7 @@ describe( 'shortcode', () => {
 		} );
 
 		it( 'should return numeric attributes created with single, double, and no quotes', () => {
-			const result = attrs( 'foo "bar" \'baz\'' );
+			const result = attrs( `foo "bar" 'baz'` );
 			const expected = {
 				named: {},
 				numeric: [ 'foo', 'bar', 'baz' ],
@@ -182,7 +182,7 @@ describe( 'shortcode', () => {
 		} );
 
 		it( 'should return mixed attributes created with single, double, and no quotes', () => {
-			const result = attrs( 'a="foo" b=\'bar\' c=baz foo "bar" \'baz\'' );
+			const result = attrs( `a="foo" b='bar' c=baz foo "bar" 'baz'` );
 			const expected = {
 				named: {
 					a: 'foo',

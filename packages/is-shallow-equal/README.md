@@ -1,4 +1,4 @@
-# @wordpress/is-shallow-equal
+# Is Shallow Equal
 
 A function for performing a shallow comparison between two objects or arrays. Two values have shallow equality when all of their members are strictly equal to the corresponding member of the other.
 

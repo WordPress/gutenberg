@@ -2,13 +2,22 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, Toolbar, withNotices } from '@wordpress/components';
+import {
+	IconButton,
+	PanelBody,
+	Toolbar,
+	ToggleControl,
+	withNotices,
+} from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
 import {
+	BlockControls,
+	InspectorControls,
 	MediaPlaceholder,
 	RichText,
-	BlockControls,
+	editorMediaUpload,
 } from '@wordpress/editor';
+import { getBlobByURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -23,10 +32,53 @@ class VideoEdit extends Component {
 		this.state = {
 			editing: ! this.props.attributes.src,
 		};
+
+		this.toggleAttribute = this.toggleAttribute.bind( this );
+		this.onSelectURL = this.onSelectURL.bind( this );
+	}
+
+	componentDidMount() {
+		const { attributes, noticeOperations, setAttributes } = this.props;
+		const { id, src = '' } = attributes;
+		if ( ! id && src.indexOf( 'blob:' ) === 0 ) {
+			const file = getBlobByURL( src );
+			if ( file ) {
+				editorMediaUpload( {
+					filesList: [ file ],
+					onFileChange: ( [ { url } ] ) => {
+						setAttributes( { src: url } );
+					},
+					onError: ( message ) => {
+						this.setState( { editing: true } );
+						noticeOperations.createErrorNotice( message );
+					},
+					allowedType: 'video',
+				} );
+			}
+		}
+	}
+
+	toggleAttribute( attribute ) {
+		return ( newValue ) => {
+			this.props.setAttributes( { [ attribute ]: newValue } );
+		};
+	}
+
+	onSelectURL( newSrc ) {
+		const { attributes, setAttributes } = this.props;
+		const { src } = attributes;
+
+		// Set the block's src from the edit component's state, and switch off
+		// the editing UI.
+		if ( newSrc !== src ) {
+			setAttributes( { src: newSrc, id: undefined } );
+		}
+
+		this.setState( { editing: false } );
 	}
 
 	render() {
-		const { caption, src } = this.props.attributes;
+		const { autoplay, caption, controls, loop, muted, src } = this.props.attributes;
 		const { setAttributes, isSelected, className, noticeOperations, noticeUI } = this.props;
 		const { editing } = this.state;
 		const switchToEditing = () => {
@@ -45,13 +97,6 @@ class VideoEdit extends Component {
 			setAttributes( { src: media.url, id: media.id } );
 			this.setState( { src: media.url, editing: false } );
 		};
-		const onSelectUrl = ( newSrc ) => {
-			// set the block's src from the edit component's state, and switch off the editing UI
-			if ( newSrc !== src ) {
-				setAttributes( { src: newSrc, id: undefined } );
-			}
-			this.setState( { editing: false } );
-		};
 
 		if ( editing ) {
 			return (
@@ -63,7 +108,7 @@ class VideoEdit extends Component {
 					} }
 					className={ className }
 					onSelect={ onSelectVideo }
-					onSelectUrl={ onSelectUrl }
+					onSelectURL={ this.onSelectURL }
 					accept="video/*"
 					type="video"
 					value={ this.props.attributes }
@@ -86,6 +131,30 @@ class VideoEdit extends Component {
 						/>
 					</Toolbar>
 				</BlockControls>
+				<InspectorControls>
+					<PanelBody title={ __( 'Video Settings' ) }>
+						<ToggleControl
+							label={ __( 'Autoplay' ) }
+							onChange={ this.toggleAttribute( 'autoplay' ) }
+							checked={ autoplay }
+						/>
+						<ToggleControl
+							label={ __( 'Loop' ) }
+							onChange={ this.toggleAttribute( 'loop' ) }
+							checked={ loop }
+						/>
+						<ToggleControl
+							label={ __( 'Muted' ) }
+							onChange={ this.toggleAttribute( 'muted' ) }
+							checked={ muted }
+						/>
+						<ToggleControl
+							label={ __( 'Playback Controls' ) }
+							onChange={ this.toggleAttribute( 'controls' ) }
+							checked={ controls }
+						/>
+					</PanelBody>
+				</InspectorControls>
 				<figure className={ className }>
 					<video controls src={ src } />
 					{ ( ( caption && caption.length ) || !! isSelected ) && (

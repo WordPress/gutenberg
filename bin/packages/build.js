@@ -11,9 +11,12 @@
 const fs = require( 'fs' );
 const path = require( 'path' );
 const glob = require( 'glob' );
-const babel = require( 'babel-core' );
+const babel = require( '@babel/core' );
 const chalk = require( 'chalk' );
 const mkdirp = require( 'mkdirp' );
+const sass = require( 'node-sass' );
+const postcss = require( 'postcss' );
+const deasync = require( 'deasync' );
 
 /**
  * Internal dependencies
@@ -29,6 +32,7 @@ const SRC_DIR = 'src';
 const BUILD_DIR = {
 	main: 'build',
 	module: 'build-module',
+	style: 'build-style',
 };
 const DONE = chalk.reset.inverse.bold.green( ' DONE ' );
 
@@ -68,6 +72,46 @@ function buildFile( file, silent ) {
 	buildFileFor( file, silent, 'module' );
 }
 
+function buildStyle( packagePath ) {
+	const styleFile = path.resolve( packagePath, SRC_DIR, 'style.scss' );
+	const outputFile = path.resolve( packagePath, BUILD_DIR.style, 'style.css' );
+	const outputFileRTL = path.resolve( packagePath, BUILD_DIR.style, 'style-rtl.css' );
+	mkdirp.sync( path.dirname( outputFile ) );
+	const builtSass = sass.renderSync( {
+		file: styleFile,
+		includePaths: [ path.resolve( __dirname, '../../edit-post/assets/stylesheets' ) ],
+		data: (
+			[
+				'colors',
+				'breakpoints',
+				'variables',
+				'mixins',
+				'animations',
+				'z-index',
+			].map( ( imported ) => `@import "${ imported }";` ).join( ' ' )	+
+			fs.readFileSync( styleFile, 'utf8' )
+		),
+	} );
+
+	const postCSSSync = ( callback ) => {
+		postcss( require( './post-css-config' ) )
+			.process( builtSass.css, { from: 'src/app.css', to: 'dest/app.css' } )
+			.then( ( result ) => callback( null, result ) );
+	};
+
+	const postCSSRTLSync = ( ltrCSS, callback ) => {
+		postcss( [ require( 'rtlcss' )() ] )
+			.process( ltrCSS, { from: 'src/app.css', to: 'dest/app.css' } )
+			.then( ( result ) => callback( null, result ) );
+	};
+
+	const result = deasync( postCSSSync )();
+	fs.writeFileSync( outputFile, result.css );
+
+	const resultRTL = deasync( postCSSRTLSync )( result );
+	fs.writeFileSync( outputFileRTL, resultRTL );
+}
+
 /**
  * Build a file for a specific environment
  *
@@ -102,13 +146,23 @@ function buildFileFor( file, silent, environment ) {
 function buildPackage( packagePath ) {
 	const srcDir = path.resolve( packagePath, SRC_DIR );
 	const files = glob.sync( `${ srcDir }/**/*.js`, {
-		ignore: `${ srcDir }/**/test/**/*.js`,
+		ignore: [
+			`${ srcDir }/**/test/**/*.js`,
+			`${ srcDir }/**/__mocks__/**/*.js`,
+		],
 		nodir: true,
 	} );
 
 	process.stdout.write( `${ path.basename( packagePath ) }\n` );
 
 	files.forEach( ( file ) => buildFile( file, true ) );
+
+	// Building styles
+	const styleFile = path.resolve( srcDir, 'style.scss' );
+	if ( fs.existsSync( styleFile ) ) {
+		buildStyle( packagePath );
+	}
+
 	process.stdout.write( `${ DONE }\n` );
 }
 

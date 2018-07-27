@@ -6,7 +6,7 @@ import {
 	newPost,
 	newDesktopBrowserPage,
 	pressWithModifier,
-	getHTMLFromCodeEditor,
+	getEditedPostContent,
 } from '../support/utils';
 
 describe( 'undo', () => {
@@ -31,7 +31,7 @@ describe( 'undo', () => {
 		await pressWithModifier( 'mod', 'z' ); // Strip 1st paragraph text
 		await pressWithModifier( 'mod', 'z' ); // Strip 1st paragraph block
 
-		expect( await getHTMLFromCodeEditor() ).toBe( '' );
+		expect( await getEditedPostContent() ).toBe( '' );
 
 		// Should have no more history.
 		const undoButton = await page.$( '.editor-history__undo:not( :disabled )' );

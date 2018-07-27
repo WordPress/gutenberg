@@ -1,4 +1,4 @@
-# @wordpress/date
+# Date
 
 Date module for WordPress.
 

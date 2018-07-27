@@ -36,6 +36,23 @@ class Block_Type_Test extends WP_UnitTestCase {
 		$this->assertEquals( $attributes, json_decode( $output, true ) );
 	}
 
+	function test_render_with_content() {
+		$attributes = array(
+			'foo' => 'bar',
+			'bar' => 'foo',
+		);
+
+		$content = 'baz';
+
+		$expected = array_merge( $attributes, array( '_content' => $content ) );
+
+		$block_type = new WP_Block_Type( 'core/dummy', array(
+			'render_callback' => array( $this, 'render_dummy_block_with_content' ),
+		) );
+		$output     = $block_type->render( $attributes, $content );
+		$this->assertEquals( $expected, json_decode( $output, true ) );
+	}
+
 	function test_render_for_static_block() {
 		$block_type = new WP_Block_Type( 'core/dummy', array() );
 		$output     = $block_type->render();

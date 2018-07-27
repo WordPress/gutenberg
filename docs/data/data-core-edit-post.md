@@ -1,4 +1,4 @@
-# **core/edit-post**: The Editor's UI Data
+# **core/edit-post**: The Editor’s UI Data
 
 ## Selectors 
 

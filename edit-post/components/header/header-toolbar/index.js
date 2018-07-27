@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 
@@ -15,7 +15,6 @@ import {
 	TableOfContents,
 	EditorHistoryRedo,
 	EditorHistoryUndo,
-	MultiBlocksSwitcher,
 	NavigableToolbar,
 } from '@wordpress/editor';
 
@@ -34,7 +33,6 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport } ) {
 			<EditorHistoryUndo />
 			<EditorHistoryRedo />
 			<TableOfContents />
-			<MultiBlocksSwitcher />
 			{ hasFixedToolbar && isLargeViewport && (
 				<div className="edit-post-header-toolbar__block-toolbar">
 					<BlockToolbar />
