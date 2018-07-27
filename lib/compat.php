@@ -173,10 +173,11 @@ function gutenberg_warn_classic_about_blocks() {
 		return;
 	}
 
-	$gutenberg_edit_link = $classic_edit_link = get_edit_post_link( $post->ID, 'raw' );
+	$gutenberg_edit_link = get_edit_post_link( $post->ID, 'raw' );
 
+	$classic_edit_link = $gutenberg_edit_link;
 	$classic_edit_link = add_query_arg( array(
-		'classic-editor' => '',
+		'classic-editor'     => '',
 		'hide-block-warning' => '',
 	), $classic_edit_link );
 
@@ -186,17 +187,12 @@ function gutenberg_warn_classic_about_blocks() {
 
 		// If there's only one revision, that won't help.
 		if ( count( $revisions ) > 1 ) {
-			reset( $revisions ); // Reset pointer for key()
+			reset( $revisions ); // Reset pointer for key().
 			$revisions_link = get_edit_post_link( key( $revisions ) );
 		}
 	}
-
 	?>
 		<style type="text/css">
-			/*
-			 * Styles copied from wp-admin/css/edit.css
-			 */
-
 			#blocks-in-post-dialog .notification-dialog {
 				width: 500px;
 				margin-left: -250px;
@@ -212,38 +208,33 @@ function gutenberg_warn_classic_about_blocks() {
 			#blocks-in-post-dialog .wp-tab-first {
 				outline: 0;
 			}
-
-
 		</style>
+
 		<div id="blocks-in-post-dialog" class="notification-dialog-wrap">
 			<div class="notification-dialog-background"></div>
 			<div class="notification-dialog">
 				<div class="blocks-in-post-message">
-					<p class="wp-tab-first" tabindex="0">
-						<?php
-							_e( 'This post was previously edited in the Gutenberg. While you can continue and edit in the Classic Editor, you may lose data or formatting from the Gutenberg version of this page.', 'gutenberg' );
-						?>
-					</p>
+					<p class="wp-tab-first" tabindex="0"><?php _e( 'This post was previously edited in the Gutenberg. While you can continue and edit in the Classic Editor, you may lose data or formatting from the Gutenberg version of this page.', 'gutenberg' ); ?></p>
 					<?php
-						if ( $revisions_link ) {
-							?>
-								<p><?php _e( 'To continue anyway, click the "Edit in Classic Editor" button. You can also find an earlier revision to edit by clicking the "Browse Revisions" button. Otherwise, press "Edit in Gutenberg" to keep this post in Gutenberg.', 'gutenberg' ); ?></p>
-							<?php
-						} else {
-							?>
-								<p><strong><?php _e( "Because this post doesn't have revisions, you won't be able to restore an earlier version of your content.", 'gutenberg' ); ?></strong></p>
-								<p><?php _e( 'To continue anyway, click the "Edit in Classic Editor" button. Otherwise, press "Edit in Gutenberg" to continue to Gutenberg, preserving your content and formatting.', 'gutenberg' ); ?></p>
-							<?php
-						}
+					if ( $revisions_link ) {
+						?>
+							<p><?php _e( 'To continue anyway, click the "Edit in Classic Editor" button. You can also find an earlier revision to edit by clicking the "Browse Revisions" button. Otherwise, press "Edit in Gutenberg" to keep this post in Gutenberg.', 'gutenberg' ); ?></p>
+						<?php
+					} else {
+						?>
+							<p><strong><?php _e( "Because this post doesn't have revisions, you won't be able to restore an earlier version of your content.", 'gutenberg' ); ?></strong></p>
+							<p><?php _e( 'To continue anyway, click the "Edit in Classic Editor" button. Otherwise, press "Edit in Gutenberg" to continue to Gutenberg, preserving your content and formatting.', 'gutenberg' ); ?></p>
+						<?php
+					}
 					?>
 					<p>
 						<a class="button" href="<?php echo esc_url( $classic_edit_link ); ?>"><?php _e( 'Edit in Classic Editor', 'gutenberg' ); ?></a>
 						<?php
-							if ( $revisions_link ) {
-								?>
-									<a class="button" href="<?php echo esc_url( $revisions_link ); ?>"><?php _e( 'Browse Revisions', 'gutenberg' ); ?></a>
-								<?php
-							}
+						if ( $revisions_link ) {
+							?>
+								<a class="button" href="<?php echo esc_url( $revisions_link ); ?>"><?php _e( 'Browse Revisions', 'gutenberg' ); ?></a>
+							<?php
+						}
 						?>
 						<a class="button button-primary" href="<?php echo esc_url( $gutenberg_edit_link ); ?>"><?php _e( 'Edit in Gutenberg', 'gutenberg' ); ?></a>
 					</p>
