@@ -5,6 +5,7 @@ export {
 	default as parse,
 	parseWithAttributeSchema,
 } from './parser';
+export { getPhrasingContentSchema } from './raw-handling';
 export {
 	default as serialize,
 	getBlockContent,
