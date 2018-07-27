@@ -433,13 +433,21 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
  * @return {boolean} True if the element is an text field, false if not.
  */
 export function isTextField( element ) {
-	const { nodeName, selectionStart, contentEditable } = element;
+	try {
+		const { nodeName, selectionStart, contentEditable } = element;
 
-	return (
-		( nodeName === 'INPUT' && selectionStart !== null ) ||
-		( nodeName === 'TEXTAREA' ) ||
-		contentEditable === 'true'
-	);
+		return (
+			( nodeName === 'INPUT' && selectionStart !== null ) ||
+			( nodeName === 'TEXTAREA' ) ||
+			contentEditable === 'true'
+		);
+	} catch ( error ) {
+		// Safari throws an exception (instead of `undefined`, like
+		// most other browsers) when trying to get selectionStart on
+		// non-text <input> elements that don't have the text
+		// selection API.
+		return false;
+	}
 }
 
 /**
