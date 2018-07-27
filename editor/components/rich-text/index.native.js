@@ -9,6 +9,7 @@ import { parse, children } from '@wordpress/blocks';
  */
 import { Component, RawHTML, renderToString } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies

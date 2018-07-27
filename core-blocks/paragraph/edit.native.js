@@ -56,7 +56,7 @@ class ParagraphBlock extends Component {
 	}
 }
 
-const ParagraphEdit = function ParagraphEdit( { attributes, setAttributes, className } ) {
+const ParagraphEdit = function ParagraphEdit( { attributes, setAttributes } ) {
 	return ( <ParagraphBlock attributes={ attributes } setAttributes={ setAttributes } /> );
 };
 
