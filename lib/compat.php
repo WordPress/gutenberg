@@ -147,3 +147,109 @@ function gutenberg_wpautop( $content ) {
 }
 remove_filter( 'the_content', 'wpautop' );
 add_filter( 'the_content', 'gutenberg_wpautop', 8 );
+
+/**
+ * Adds a warning to the Classic Editor when trying to edit a post containing blocks.
+ *
+ * @since 3.4.0
+ */
+function gutenberg_warn_classic_about_blocks() {
+	global $pagenow;
+
+	if ( ! in_array( $pagenow, array( 'post.php', 'post-new.php' ), true ) || ! isset( $_REQUEST['classic-editor'] ) ) {
+		return;
+	}
+
+	if ( isset( $_REQUEST['hide-block-warning'] ) ) {
+		return;
+	}
+
+	$post = get_post();
+	if ( ! $post ) {
+		return;
+	}
+
+	if ( ! gutenberg_post_has_blocks( $post ) ) {
+		return;
+	}
+
+	$gutenberg_edit_link = $classic_edit_link = get_edit_post_link( $post->ID, 'raw' );
+
+	$classic_edit_link = add_query_arg( array(
+		'classic-editor' => '',
+		'hide-block-warning' => '',
+	), $classic_edit_link );
+
+	$revisions_link = '';
+	if ( wp_revisions_enabled( $post ) ) {
+		$revisions = wp_get_post_revisions( $post );
+
+		// If there's only one revision, that won't help.
+		if ( count( $revisions ) > 1 ) {
+			reset( $revisions ); // Reset pointer for key()
+			$revisions_link = get_edit_post_link( key( $revisions ) );
+		}
+	}
+
+	?>
+		<style type="text/css">
+			/*
+			 * Styles copied from wp-admin/css/edit.css
+			 */
+
+			#blocks-in-post-dialog .notification-dialog {
+				width: 500px;
+				margin-left: -250px;
+			}
+			#blocks-in-post-dialog .blocks-in-post-message {
+				margin: 25px;
+			}
+
+			#blocks-in-post-dialog .post-locked-message a.button {
+				margin-right: 10px;
+			}
+
+			#blocks-in-post-dialog .wp-tab-first {
+				outline: 0;
+			}
+
+
+		</style>
+		<div id="blocks-in-post-dialog" class="notification-dialog-wrap">
+			<div class="notification-dialog-background"></div>
+			<div class="notification-dialog">
+				<div class="blocks-in-post-message">
+					<p class="wp-tab-first" tabindex="0">
+						<?php
+							_e( 'This post was previously edited in the Gutenberg. While you can continue and edit in the Classic Editor, you may lose data or formatting from the Gutenberg version of this page.', 'gutenberg' );
+						?>
+					</p>
+					<?php
+						if ( $revisions_link ) {
+							?>
+								<p><?php _e( 'To continue anyway, click the "Edit in Classic Editor" button. You can also find an earlier revision to edit by clicking the "Browse Revisions" button. Otherwise, press "Edit in Gutenberg" to keep this post in Gutenberg.', 'gutenberg' ); ?></p>
+							<?php
+						} else {
+							?>
+								<p><strong><?php _e( "Because this post doesn't have revisions, you won't be able to restore an earlier version of your content.", 'gutenberg' ); ?></strong></p>
+								<p><?php _e( 'To continue anyway, click the "Edit in Classic Editor" button. Otherwise, press "Edit in Gutenberg" to continue to Gutenberg, preserving your content and formatting.', 'gutenberg' ); ?></p>
+							<?php
+						}
+					?>
+					<p>
+						<a class="button" href="<?php echo esc_url( $classic_edit_link ); ?>"><?php _e( 'Edit in Classic Editor', 'gutenberg' ); ?></a>
+						<?php
+							if ( $revisions_link ) {
+								?>
+									<a class="button" href="<?php echo esc_url( $revisions_link ); ?>"><?php _e( 'Browse Revisions', 'gutenberg' ); ?></a>
+								<?php
+							}
+						?>
+						<a class="button button-primary" href="<?php echo esc_url( $gutenberg_edit_link ); ?>"><?php _e( 'Edit in Gutenberg', 'gutenberg' ); ?></a>
+					</p>
+				</div>
+			</div>
+		</div>
+	<?php
+}
+add_action( 'admin_footer', 'gutenberg_warn_classic_about_blocks' );
