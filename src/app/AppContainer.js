@@ -6,6 +6,7 @@ import {
 	moveBlockUpAction,
 	moveBlockDownAction,
 	deleteBlockAction,
+	createBlockAction,
 } from '../store/actions';
 import MainApp from './MainApp';
 
@@ -30,6 +31,9 @@ const mapDispatchToProps = ( dispatch, ownProps ) => {
 		},
 		deleteBlockAction: ( uid ) => {
 			dispatch( deleteBlockAction( uid ) );
+		},
+		createBlockAction: ( uid ) => {
+			dispatch( createBlockAction( uid ) );
 		},
 	};
 };
