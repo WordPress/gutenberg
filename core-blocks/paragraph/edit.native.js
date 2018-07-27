@@ -33,7 +33,6 @@ class ParagraphBlock extends Component {
 						{ minHeight: Math.max( _minHeight, attributes.aztecHeight !== null ? attributes.aztecHeight : 0 ) },
 					] }
 					onChange={ ( event ) => {
-						//console.log(event);
 						setAttributes( {
 							...this.props.attributes,
 							content: event.content,

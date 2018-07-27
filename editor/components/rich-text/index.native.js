@@ -11,16 +11,9 @@ import { Component, RawHTML, renderToString } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
 
-/**
- * Internal dependencies
- import styles from './style.scss';
-*/
-
 export class RichText extends Component {
 	constructor() {
 		super( ...arguments );
-		//console.log('RichText');
-		//console.log(...arguments)
 		this.onChange = this.onChange.bind( this );
 		this.onContentSizeChange = this.onContentSizeChange.bind( this );
 
@@ -36,8 +29,6 @@ export class RichText extends Component {
 		if ( !! this.currentTimer ) {
 			clearTimeout( this.currentTimer );
 		}
-		//console.log('onChange');
-		//console.log(event.nativeEvent);
 		this.lastEventCount = event.nativeEvent.eventCount;
 		this.lastContent = event.nativeEvent.text;
 
@@ -56,8 +47,6 @@ export class RichText extends Component {
 	 */
 
 	onContentSizeChange( event ) {
-		//console.log('onContentSizeChange');
-		//console.log(event.nativeEvent);
 		this.lastContentSizeHeight = event.nativeEvent.contentSize.height;
 		this.forceUpdate = true; // Set this to true and check it in shouldComponentUpdate to force re-render the component
 		this.props.onContentSizeChange( {
@@ -89,9 +78,6 @@ export class RichText extends Component {
 	}
 
 	render() {
-		//console.log('render');
-		//console.log(this.props);
-
 		// Save back to HTML from React tree
 		const html = renderToString( this.props.content.contentTree );
 		const {
