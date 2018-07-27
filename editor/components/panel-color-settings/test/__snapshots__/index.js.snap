@@ -19,13 +19,13 @@ exports[`PanelColorSettings matches the snapshot 1`] = `
     </span>
   }
 >
-  <WithColorContext(Component)
+  <WithColorContext(ColorPaletteControl)
     key="0"
     label="border color"
     onChange={[Function]}
     value="#000"
   />
-  <WithColorContext(Component)
+  <WithColorContext(ColorPaletteControl)
     key="1"
     label="background color"
     onChange={[Function]}

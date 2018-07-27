@@ -16,7 +16,7 @@ import { getColorName } from '../colors';
 // translators: first %s: The type of color (e.g. background color), second %s: the color name or value (e.g. red or #ff0000)
 const colorIndicatorAriaLabel = __( '(current %s: %s)' );
 
-const ColorPaletteControl = withColorContext( ( { label, value, onChange, colors } ) => {
+export function ColorPaletteControl( { label, value, onChange, colors } ) {
 	const colorName = getColorName( colors, value );
 	const ariaLabel = sprintf( colorIndicatorAriaLabel, label.toLowerCase(), colorName || value );
 
@@ -43,6 +43,6 @@ const ColorPaletteControl = withColorContext( ( { label, value, onChange, colors
 			/>
 		</BaseControl>
 	);
-} );
+}
 
-export default ColorPaletteControl;
+export default withColorContext( ColorPaletteControl );
