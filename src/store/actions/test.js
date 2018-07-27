@@ -33,7 +33,7 @@ describe( 'Store', () => {
 			expect( action.uid ).toEqual( '1' );
 		} );
 
-		it( 'should create an action to delete a block', () => {
+		it( 'should create an action to create a block', () => {
 			const action = actions.createBlockAction( '1' );
 			expect( action.type ).toBeDefined();
 			expect( action.type ).toEqual( ActionTypes.BLOCK.CREATE );
