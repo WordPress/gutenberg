@@ -232,6 +232,13 @@ function gutenberg_register_scripts_and_styles() {
 		true
 	);
 	wp_register_script(
+		'wp-code-editor',
+		gutenberg_url( 'build/code-editor/index.js' ),
+		array( 'wp-codemirror', 'jquery', 'lodash' ),
+		filemtime( gutenberg_dir_path() . 'build/code-editor/index.js' ),
+		true
+	);
+	wp_register_script(
 		'wp-shortcode',
 		gutenberg_url( 'build/shortcode/index.js' ),
 		array(),
@@ -504,6 +511,13 @@ function gutenberg_register_scripts_and_styles() {
 	// Editor Styles.
 	// This empty stylesheet is defined to ensure backwards compatibility.
 	wp_register_style( 'wp-blocks', false );
+
+	wp_register_style(
+		'wp-code-editor',
+		gutenberg_url( 'build/code-editor/style.css' ),
+		array( 'wp-codemirror' ),
+		filemtime( gutenberg_dir_path() . 'build/code-editor/style.css' )
+	);
 
 	wp_register_style(
 		'wp-editor-font',

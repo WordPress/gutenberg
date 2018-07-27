@@ -3,6 +3,7 @@
  */
 import { Component } from '@wordpress/element';
 import { UP, DOWN } from '@wordpress/keycodes';
+import { initialize } from '@wordpress/code-editor';
 
 class CodeEditor extends Component {
 	constructor() {
@@ -16,7 +17,7 @@ class CodeEditor extends Component {
 
 	componentDidMount() {
 		const settings = this.props.settings || window._wpGutenbergCodeEditorSettings;
-		const instance = wp.codeEditor.initialize( this.textarea, settings );
+		const instance = initialize( this.textarea, settings );
 		this.editor = instance.codemirror;
 
 		this.editor.on( 'focus', this.onFocus );

@@ -13,7 +13,7 @@ import Spinner from '../../packages/components/src/spinner';
 
 function loadScript() {
 	return new Promise( ( resolve, reject ) => {
-		const handles = [ 'wp-codemirror', 'code-editor', 'htmlhint', 'csslint', 'jshint' ];
+		const handles = [ 'wp-codemirror', 'wp-code-editor', 'htmlhint', 'csslint', 'jshint' ];
 
 		// Don't load htmlhint-kses unless we need it
 		if ( window._wpGutenbergCodeEditorSettings.htmlhint.kses ) {
@@ -31,7 +31,7 @@ function loadScript() {
 
 function loadStyle() {
 	return new Promise( ( resolve, reject ) => {
-		const handles = [ 'wp-codemirror', 'code-editor' ];
+		const handles = [ 'wp-codemirror', 'wp-code-editor' ];
 
 		const style = document.createElement( 'link' );
 		style.rel = 'stylesheet';

@@ -90,6 +90,7 @@ const gutenbergPackages = [
 	'blob',
 	'blocks',
 	'block-serialization-spec-parser',
+	'code-editor',
 	'compose',
 	'core-data',
 	'data',
@@ -117,6 +118,7 @@ const externals = {
 	jquery: 'jQuery',
 	lodash: 'lodash',
 	'lodash-es': 'lodash',
+	codemirror: 'wp.CodeMirror',
 };
 
 [
