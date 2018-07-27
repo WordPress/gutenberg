@@ -23,7 +23,7 @@ import {
 /**
  * WordPress dependencies
  */
-import { isSharedBlock } from '@wordpress/blocks';
+import { isReusableBlock } from '@wordpress/blocks';
 import { combineReducers } from '@wordpress/data';
 
 /**
@@ -377,10 +377,10 @@ export const editor = flow( [
 			case 'REMOVE_BLOCKS':
 				return omit( state, action.clientIds );
 
-			case 'SAVE_SHARED_BLOCK_SUCCESS': {
+			case 'SAVE_REUSABLE_BLOCK_SUCCESS': {
 				const { id, updatedId } = action;
 
-				// If a temporary shared block is saved, we swap the temporary id with the final one
+				// If a temporary reusable block is saved, we swap the temporary id with the final one
 				if ( id === updatedId ) {
 					return state;
 				}
@@ -720,7 +720,7 @@ export function provisionalBlockClientId( state = null, action ) {
 
 		case 'UPDATE_BLOCK_ATTRIBUTES':
 		case 'UPDATE_BLOCK':
-		case 'CONVERT_BLOCK_TO_SHARED':
+		case 'CONVERT_BLOCK_TO_REUSABLE':
 			const { clientId } = action;
 			if ( clientId === state ) {
 				return null;
@@ -830,7 +830,7 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 			return action.blocks.reduce( ( prevState, block ) => {
 				let id = block.name;
 				const insert = { name: block.name };
-				if ( isSharedBlock( block ) ) {
+				if ( isReusableBlock( block ) ) {
 					insert.ref = block.attributes.ref;
 					id += '/' + block.attributes.ref;
 				}
@@ -848,7 +848,7 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 				};
 			}, state );
 
-		case 'REMOVE_SHARED_BLOCK':
+		case 'REMOVE_REUSABLE_BLOCK':
 			return {
 				...state,
 				insertUsage: omitBy( state.insertUsage, ( { insert } ) => insert.ref === action.id ),
@@ -919,12 +919,12 @@ export function notices( state = [], action ) {
 	return state;
 }
 
-export const sharedBlocks = combineReducers( {
+export const reusableBlocks = combineReducers( {
 	data( state = {}, action ) {
 		switch ( action.type ) {
-			case 'RECEIVE_SHARED_BLOCKS': {
+			case 'RECEIVE_REUSABLE_BLOCKS': {
 				return reduce( action.results, ( nextState, result ) => {
-					const { id, title } = result.sharedBlock;
+					const { id, title } = result.reusableBlock;
 					const { clientId } = result.parsedBlock;
 
 					const value = { clientId, title };
@@ -941,7 +941,7 @@ export const sharedBlocks = combineReducers( {
 				}, state );
 			}
 
-			case 'UPDATE_SHARED_BLOCK_TITLE': {
+			case 'UPDATE_REUSABLE_BLOCK_TITLE': {
 				const { id, title } = action;
 
 				if ( ! state[ id ] || state[ id ].title === title ) {
@@ -957,10 +957,10 @@ export const sharedBlocks = combineReducers( {
 				};
 			}
 
-			case 'SAVE_SHARED_BLOCK_SUCCESS': {
+			case 'SAVE_REUSABLE_BLOCK_SUCCESS': {
 				const { id, updatedId } = action;
 
-				// If a temporary shared block is saved, we swap the temporary id with the final one
+				// If a temporary reusable block is saved, we swap the temporary id with the final one
 				if ( id === updatedId ) {
 					return state;
 				}
@@ -972,7 +972,7 @@ export const sharedBlocks = combineReducers( {
 				};
 			}
 
-			case 'REMOVE_SHARED_BLOCK': {
+			case 'REMOVE_REUSABLE_BLOCK': {
 				const { id } = action;
 				return omit( state, id );
 			}
@@ -983,7 +983,7 @@ export const sharedBlocks = combineReducers( {
 
 	isFetching( state = {}, action ) {
 		switch ( action.type ) {
-			case 'FETCH_SHARED_BLOCKS': {
+			case 'FETCH_REUSABLE_BLOCKS': {
 				const { id } = action;
 				if ( ! id ) {
 					return state;
@@ -995,8 +995,8 @@ export const sharedBlocks = combineReducers( {
 				};
 			}
 
-			case 'FETCH_SHARED_BLOCKS_SUCCESS':
-			case 'FETCH_SHARED_BLOCKS_FAILURE': {
+			case 'FETCH_REUSABLE_BLOCKS_SUCCESS':
+			case 'FETCH_REUSABLE_BLOCKS_FAILURE': {
 				const { id } = action;
 				return omit( state, id );
 			}
@@ -1007,14 +1007,14 @@ export const sharedBlocks = combineReducers( {
 
 	isSaving( state = {}, action ) {
 		switch ( action.type ) {
-			case 'SAVE_SHARED_BLOCK':
+			case 'SAVE_REUSABLE_BLOCK':
 				return {
 					...state,
 					[ action.id ]: true,
 				};
 
-			case 'SAVE_SHARED_BLOCK_SUCCESS':
-			case 'SAVE_SHARED_BLOCK_FAILURE': {
+			case 'SAVE_REUSABLE_BLOCK_SUCCESS':
+			case 'SAVE_REUSABLE_BLOCK_FAILURE': {
 				const { id } = action;
 				return omit( state, id );
 			}
@@ -1134,7 +1134,7 @@ export default optimist( combineReducers( {
 	preferences,
 	saving,
 	notices,
-	sharedBlocks,
+	reusableBlocks,
 	template,
 	autosave,
 	settings,

@@ -44,7 +44,7 @@ const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 /**
  * Request Post Update Effect handler
  *
- * @param {Object} action  the fetchSharedBlocks action object.
+ * @param {Object} action  the fetchReusableBlocks action object.
  * @param {Object} store   Redux Store.
  */
 export const requestPostUpdate = async ( action, store ) => {

@@ -19,7 +19,7 @@ function waitForAndAcceptDialog() {
 	} );
 }
 
-describe( 'Shared Blocks', () => {
+describe( 'Reusable Blocks', () => {
 	beforeAll( async () => {
 		await newDesktopBrowserPage();
 		await newPost();
@@ -43,9 +43,9 @@ describe( 'Shared Blocks', () => {
 		await page.mouse.move( 200, 300 );
 		await page.mouse.move( 250, 350 );
 
-		// Convert block to a shared block
+		// Convert block to a reusable block
 		await page.click( 'button[aria-label="More Options"]' );
-		const convertButton = await page.waitForXPath( '//button[text()="Convert to Shared Block"]' );
+		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable Blocks"]' );
 		await convertButton.click();
 
 		// Wait for creation to finish
@@ -56,25 +56,25 @@ describe( 'Shared Blocks', () => {
 		// Select all of the text in the title field by triple-clicking on it. We
 		// triple-click because, on Mac, Mod+A doesn't work. This step can be removed
 		// when https://github.com/WordPress/gutenberg/issues/7972 is fixed
-		await page.click( '.shared-block-edit-panel__title', { clickCount: 3 } );
+		await page.click( '.reusable-block-edit-panel__title', { clickCount: 3 } );
 
-		// Give the shared block a title
+		// Give the reusable block a title
 		await page.keyboard.type( 'Greeting block' );
 
-		// Save the shared block
+		// Save the reusable block
 		const [ saveButton ] = await page.$x( '//button[text()="Save"]' );
 		await saveButton.click();
 
 		// Wait for saving to finish
 		await page.waitForXPath( '//button[text()="Edit"]' );
 
-		// Check that we have a shared block on the page
+		// Check that we have a reusable block on the page
 		const block = await page.$( '.editor-block-list__block[data-type="core/block"]' );
 		expect( block ).not.toBeNull();
 
 		// Check that its title is displayed
 		const title = await page.$eval(
-			'.shared-block-edit-panel__info',
+			'.reusable-block-edit-panel__info',
 			( element ) => element.innerText
 		);
 		expect( title ).toBe( 'Greeting block' );
@@ -89,9 +89,9 @@ describe( 'Shared Blocks', () => {
 		await page.mouse.move( 200, 300 );
 		await page.mouse.move( 250, 350 );
 
-		// Convert block to a shared block
+		// Convert block to a reusable block
 		await page.click( 'button[aria-label="More Options"]' );
-		const convertButton = await page.waitForXPath( '//button[text()="Convert to Shared Block"]' );
+		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable Blocks"]' );
 		await convertButton.click();
 
 		// Wait for creation to finish
@@ -99,30 +99,30 @@ describe( 'Shared Blocks', () => {
 			'//*[contains(@class, "notice-success")]/*[text()="Block created."]'
 		);
 
-		// Save the shared block
+		// Save the reusable block
 		const [ saveButton ] = await page.$x( '//button[text()="Save"]' );
 		await saveButton.click();
 
 		// Wait for saving to finish
 		await page.waitForXPath( '//button[text()="Edit"]' );
 
-		// Check that we have a shared block on the page
+		// Check that we have a reusable block on the page
 		const block = await page.$( '.editor-block-list__block[data-type="core/block"]' );
 		expect( block ).not.toBeNull();
 
 		// Check that it is untitled
 		const title = await page.$eval(
-			'.shared-block-edit-panel__info',
+			'.reusable-block-edit-panel__info',
 			( element ) => element.innerText
 		);
-		expect( title ).toBe( 'Untitled shared block' );
+		expect( title ).toBe( 'Untitled Reusable Block' );
 	} );
 
 	it( 'can be inserted and edited', async () => {
-		// Insert the shared block we created above
+		// Insert the reusable block we created above
 		await insertBlock( 'Greeting block' );
 
-		// Put the shared block in edit mode
+		// Put the reusable block in edit mode
 		const [ editButton ] = await page.$x( '//button[text()="Edit"]' );
 		await editButton.click();
 
@@ -133,20 +133,20 @@ describe( 'Shared Blocks', () => {
 		await pressWithModifier( 'Shift', 'Tab' );
 		await page.keyboard.type( 'Oh! ' );
 
-		// Save the shared block
+		// Save the reusable block
 		const [ saveButton ] = await page.$x( '//button[text()="Save"]' );
 		await saveButton.click();
 
 		// Wait for saving to finish
 		await page.waitForXPath( '//button[text()="Edit"]' );
 
-		// Check that we have a shared block on the page
+		// Check that we have a reusable block on the page
 		const block = await page.$( '.editor-block-list__block[data-type="core/block"]' );
 		expect( block ).not.toBeNull();
 
 		// Check that its title is displayed
 		const title = await page.$eval(
-			'.shared-block-edit-panel__info',
+			'.reusable-block-edit-panel__info',
 			( element ) => element.innerText
 		);
 		expect( title ).toBe( 'Surprised greeting block' );
@@ -160,7 +160,7 @@ describe( 'Shared Blocks', () => {
 	} );
 
 	it( 'can be converted to a regular block', async () => {
-		// Insert the shared block we edited above
+		// Insert the reusable block we edited above
 		await insertBlock( 'Surprised greeting block' );
 
 		// Convert block to a regular block
@@ -183,12 +183,12 @@ describe( 'Shared Blocks', () => {
 	} );
 
 	it( 'can be deleted', async () => {
-		// Insert the shared block we edited above
+		// Insert the reusable block we edited above
 		await insertBlock( 'Surprised greeting block' );
 
 		// Delete the block and accept the confirmation dialog
 		await page.click( 'button[aria-label="More Options"]' );
-		const convertButton = await page.waitForXPath( '//button[text()="Delete Shared Block"]' );
+		const convertButton = await page.waitForXPath( '//button[text()="Remove from Reusable Blocks"]' );
 		await Promise.all( [ waitForAndAcceptDialog(), convertButton.click() ] );
 
 		// Check that we have an empty post again

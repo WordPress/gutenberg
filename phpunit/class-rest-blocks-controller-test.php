@@ -236,7 +236,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 	/**
 	 * Exhaustively check that each role either can or cannot create, edit,
-	 * update, and delete shared blocks.
+	 * update, and delete reusable blocks.
 	 *
 	 * @dataProvider data_capabilities
 	 */

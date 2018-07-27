@@ -18,7 +18,7 @@ export const DEFAULT_CATEGORIES = [
 	{ slug: 'layout', title: __( 'Layout Elements' ) },
 	{ slug: 'widgets', title: __( 'Widgets' ) },
 	{ slug: 'embed', title: __( 'Embeds' ) },
-	{ slug: 'shared', title: __( 'Shared Blocks' ) },
+	{ slug: 'reusable', title: __( 'Reusable Blocks' ) },
 ];
 
 /**

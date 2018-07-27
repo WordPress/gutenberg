@@ -19,7 +19,7 @@ import {
 	cloneBlock,
 	getBlockType,
 	getSaveElement,
-	isSharedBlock,
+	isReusableBlock,
 	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
@@ -412,7 +412,7 @@ export class BlockListBlock extends Component {
 			'is-multi-selected': isPartOfMultiSelection,
 			'is-selected-parent': shouldAppearSelectedParent,
 			'is-hovered': isHovered && ! isEmptyDefaultBlock,
-			'is-shared': isSharedBlock( blockType ),
+			'is-reusable': isReusableBlock( blockType ),
 			'is-hidden': dragging,
 			'is-typing': isTypingWithinBlock,
 		} );

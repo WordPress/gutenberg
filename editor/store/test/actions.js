@@ -5,11 +5,11 @@ import {
 	replaceBlocks,
 	startTyping,
 	stopTyping,
-	fetchSharedBlocks,
-	saveSharedBlock,
-	deleteSharedBlock,
+	fetchReusableBlocks,
+	saveReusableBlock,
+	deleteReusableBlock,
 	convertBlockToStatic,
-	convertBlockToShared,
+	convertBlockToReusable,
 	toggleSelection,
 	setupEditor,
 	resetPost,
@@ -460,34 +460,34 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'fetchSharedBlocks', () => {
-		it( 'should return the FETCH_SHARED_BLOCKS action', () => {
-			expect( fetchSharedBlocks() ).toEqual( {
-				type: 'FETCH_SHARED_BLOCKS',
+	describe( 'fetchReusableBlocks', () => {
+		it( 'should return the FETCH_REUSABLE_BLOCKS action', () => {
+			expect( fetchReusableBlocks() ).toEqual( {
+				type: 'FETCH_REUSABLE_BLOCKS',
 			} );
 		} );
 
 		it( 'should take an optional id argument', () => {
-			expect( fetchSharedBlocks( 123 ) ).toEqual( {
-				type: 'FETCH_SHARED_BLOCKS',
+			expect( fetchReusableBlocks( 123 ) ).toEqual( {
+				type: 'FETCH_REUSABLE_BLOCKS',
 				id: 123,
 			} );
 		} );
 	} );
 
-	describe( 'saveSharedBlock', () => {
-		it( 'should return the SAVE_SHARED_BLOCK action', () => {
-			expect( saveSharedBlock( 123 ) ).toEqual( {
-				type: 'SAVE_SHARED_BLOCK',
+	describe( 'saveReusableBlock', () => {
+		it( 'should return the SAVE_REUSABLE_BLOCK action', () => {
+			expect( saveReusableBlock( 123 ) ).toEqual( {
+				type: 'SAVE_REUSABLE_BLOCK',
 				id: 123,
 			} );
 		} );
 	} );
 
-	describe( 'deleteSharedBlock', () => {
-		it( 'should return the DELETE_SHARED_BLOCK action', () => {
-			expect( deleteSharedBlock( 123 ) ).toEqual( {
-				type: 'DELETE_SHARED_BLOCK',
+	describe( 'deleteReusableBlock', () => {
+		it( 'should return the DELETE_REUSABLE_BLOCK action', () => {
+			expect( deleteReusableBlock( 123 ) ).toEqual( {
+				type: 'DELETE_REUSABLE_BLOCK',
 				id: 123,
 			} );
 		} );
@@ -503,11 +503,11 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'convertBlockToShared', () => {
-		it( 'should return the CONVERT_BLOCK_TO_SHARED action', () => {
+	describe( 'convertBlockToReusable', () => {
+		it( 'should return the CONVERT_BLOCK_TO_REUSABLE action', () => {
 			const clientId = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-			expect( convertBlockToShared( clientId ) ).toEqual( {
-				type: 'CONVERT_BLOCK_TO_SHARED',
+			expect( convertBlockToReusable( clientId ) ).toEqual( {
+				type: 'CONVERT_BLOCK_TO_REUSABLE',
 				clientId,
 			} );
 		} );
