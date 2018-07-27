@@ -32,5 +32,13 @@ describe( 'Store', () => {
 			expect( action.type ).toEqual( ActionTypes.BLOCK.DELETE );
 			expect( action.uid ).toEqual( '1' );
 		} );
+
+		it( 'should create an action to delete a block', () => {
+			const action = actions.createBlockAction( '1' );
+			expect( action.type ).toBeDefined();
+			expect( action.type ).toEqual( ActionTypes.BLOCK.CREATE );
+			expect( action.uid ).toEqual( '1' );
+		} );
+
 	} );
 } );
