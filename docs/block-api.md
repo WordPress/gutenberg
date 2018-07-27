@@ -445,6 +445,13 @@ inserter: false,
 multiple: false,
 ```
 
+- `preserveOriginalContent` (default `false`): This flag is for fallback blocks and indicates whether the original block content should be saved instead of the fallback block's `save` output.
+
+```js
+// If this is the fallback block, preserve the original block content when saving.
+preserveOriginalContent: true,
+```
+
 ## Edit and Save
 
 The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](../docs/block-api/block-edit-save.md).
