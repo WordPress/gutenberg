@@ -1,4 +1,4 @@
-# **core/editor**: The Editor's Data
+# **core/editor**: The Editor’s Data
 
 ## Selectors 
 
