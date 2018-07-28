@@ -8,7 +8,8 @@
 		"/node_modules/",
 		"<rootDir>/.*/build/",
 		"<rootDir>/.*/build-module/",
-		"<rootDir>/packages/.*/benchmark/"
+		"<rootDir>/packages/.*/benchmark/",
+		"<rootDir>/packages/.*/test/"
 	],
 	"moduleNameMapper": {
 		"@wordpress\\/(components|edit-post|core-blocks)$": "$1",
