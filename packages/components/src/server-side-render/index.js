@@ -13,6 +13,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
+import { select } from '@wordpress/data';
 
 /**
  * Internal dependencies.
@@ -20,14 +21,15 @@ import { addQueryArgs } from '@wordpress/url';
 import Placeholder from '../placeholder';
 import Spinner from '../spinner';
 
-export function rendererPathWithAttributes( block, attributes = null ) {
+export function rendererPath( block, attributes = null, postId = null ) {
 	return addQueryArgs( `/gutenberg/v1/block-renderer/${ block }`, {
 		context: 'edit',
 		...( null !== attributes ? { attributes } : {} ),
+		...( null !== postId ? { post_id: postId } : {} ),
 	} );
 }
 
-export class ServerSideRender extends Component {
+class ServerSideRender extends Component {
 	constructor( props ) {
 		super( props );
 		this.state = {
@@ -54,9 +56,9 @@ export class ServerSideRender extends Component {
 		if ( null !== this.state.response ) {
 			this.setState( { response: null } );
 		}
-		const { block, attributes = null } = props;
+		const { block, attributes = null, postId } = props;
 
-		const path = rendererPathWithAttributes( block, attributes );
+		const path = rendererPath( block, attributes, postId );
 
 		return apiFetch( { path } )
 			.then( ( response ) => {
@@ -98,4 +100,24 @@ export class ServerSideRender extends Component {
 	}
 }
 
-export default ServerSideRender;
+/**
+ * A wrapper to inject the Post Id.
+ *
+ * @param {Object} $0            The params object.
+ * @param {string} $0.block      The block name to render.
+ * @param {string} $0.attributes The attributes with which to render the block.
+ *
+ * @return {WPElement} The ServerSideRender component.
+ */
+export default function( {
+	block,
+	attributes,
+} ) {
+	const { getCurrentPostId } = select( 'core/editor' );
+
+	return <ServerSideRender
+		postId={ getCurrentPostId() }
+		block={ block }
+		attributes={ attributes }
+	/>;
+}
