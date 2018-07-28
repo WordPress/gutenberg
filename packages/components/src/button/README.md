@@ -14,7 +14,7 @@ Renders a button with default style.
  */
 import { Button } from "@wordpress/components";
 
-export default function ClickMeButton() {
+function Example() {
 	return (
 		<Button isDefault>
 			Click me!
