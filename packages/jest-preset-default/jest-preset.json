@@ -23,7 +23,7 @@
 	],
 	"timers": "fake",
 	"transform": {
-		"^.+\\.jsx?$": "babel-jest"
+		"^.+\\.jsx?$": "<rootDir>/node_modules/babel-jest"
 	},
 	"verbose": true
 }
