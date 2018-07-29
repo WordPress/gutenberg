@@ -4,7 +4,7 @@ Dashicon
 ## Usage
 
 ```jsx
-function Example() {
+function MyDashicons() {
 	return (
 		<div>
 			<Dashicon icon="admin-home" />

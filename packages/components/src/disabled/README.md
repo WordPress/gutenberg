@@ -9,7 +9,6 @@ Assuming you have a form component, you can disable all form inputs by wrapping 
 
 ```jsx
 class ToggleDisable extends React.Component {
-
 	constructor() {
 		super( ...arguments );
 		this.state = {
@@ -27,7 +26,7 @@ class ToggleDisable extends React.Component {
 	render() {
 		const { isDisabled } = this.state;
 		
-		let input = <TextControl label="Input" />;
+		let input = <TextControl label="Input" onChange={ () => {} } />;
 		if ( isDisabled ) {
 			input = <Disabled>{ input }</Disabled>;
 		}

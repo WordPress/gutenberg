@@ -35,3 +35,24 @@ The function called when dragging ends.
 - Type: `Function`
 - Required: No
 - Default: `noop`
+
+## Usage
+
+```jsx
+function DraggablePanel() {
+	return (
+		<div id="draggable-panel">
+			<Panel header="Draggable panel" >
+				<PanelBody>
+					<Draggable
+						elementId="draggable-panel"
+						transferData={ { } }
+					>
+						<Dashicon icon="move" />
+					</Draggable>
+				</PanelBody>
+			</Panel>
+		</div>
+	);
+}
+```

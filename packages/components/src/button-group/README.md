@@ -4,7 +4,7 @@ ButtonGroup
 ## Usage
 
 ```jsx
-function Example() {
+function MyButtonGroup() {
 	return (
 		<ButtonGroup>
 			<Button isPrimary>Button 1</Button>
