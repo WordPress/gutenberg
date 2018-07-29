@@ -8,13 +8,16 @@ CheckboxControl component is used to generate a checkbox input field.
 
 Render an is author checkbox:
 ```jsx
-    <CheckboxControl
-        heading="User"
-        label="Is author"
-        help="Is the user a author or not?"
-        checked={ checked }
-        onChange={ onChange }
-    />
+function MyCheckboxControl() {
+	return (
+		<CheckboxControl
+			heading="User"
+			label="Is author"
+			help="Is the user a author or not?"
+			onChange={ () => {} }
+		/>
+	);
+}
 ```
 
 ## Props
