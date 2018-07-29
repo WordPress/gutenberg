@@ -8,17 +8,19 @@ BaseControl component is used to generate labels and help text for components ha
 
 Render a BaseControl for a textarea input:
 ```jsx
-	<BaseControl
-		id="textarea-1" 
-		label="Text"
-		help="Enter some text"
-	>
-        <textarea
-            id="textarea-1"
-            onChange={ onChangeValue }
-            value={ value }
-        />
-    </BaseControl>
+function MyBaseControl() {
+	return (
+		<BaseControl
+			id="textarea-1"
+			label="Text"
+			help="Enter some text"
+		>
+			<textarea
+				id="textarea-1"
+			/>
+		</BaseControl>
+    );
+}
 ```
 
 ## Props
