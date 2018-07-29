@@ -26,7 +26,7 @@ withState( {
 	return (
 		<div>
 			{ input }
-			<Button  isPrimary onClick={ toggleDisabled }>
+			<Button isPrimary onClick={ toggleDisabled }>
 				Toggle Disabled
 			</Button>
 		</div>
