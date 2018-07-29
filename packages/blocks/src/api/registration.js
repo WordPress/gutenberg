@@ -10,6 +10,7 @@ import { get, isFunction, some } from 'lodash';
  */
 import { applyFilters, addFilter } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -177,6 +178,11 @@ export function unregisterBlockType( name ) {
  * @param {string} name Block name.
  */
 export function setUnknownTypeHandlerName( name ) {
+	deprecated( 'setUnknownTypeHandlerName', {
+		plugin: 'Gutenberg',
+		version: '3.8',
+		alternative: 'setUnstructuredTypeHandlerName and setUnregisteredTypeHandlerName',
+	} );
 	dispatch( 'core/blocks' ).setFallbackBlockName( name );
 }
 
@@ -188,6 +194,44 @@ export function setUnknownTypeHandlerName( name ) {
  */
 export function getUnknownTypeHandlerName() {
 	return select( 'core/blocks' ).getFallbackBlockName();
+}
+
+/**
+ * Assigns name of block for handling non-block content.
+ *
+ * @param {string} name Block name.
+ */
+export function setUnstructuredTypeHandlerName( name ) {
+	dispatch( 'core/blocks' ).setUnstructuredFallbackBlockName( name );
+}
+
+/**
+ * Retrieves name of block handling non-block content, or undefined if no
+ * handler has been defined.
+ *
+ * @return {?string} Blog name.
+ */
+export function getUnstructuredTypeHandlerName() {
+	return select( 'core/blocks' ).getUnstructuredFallbackBlockName();
+}
+
+/**
+ * Assigns name of block handling unregistered block types.
+ *
+ * @param {string} name Block name.
+ */
+export function setUnregisteredTypeHandlerName( name ) {
+	dispatch( 'core/blocks' ).setUnregisteredFallbackBlockName( name );
+}
+
+/**
+ * Retrieves name of block handling unregistered block types, or undefined if no
+ * handler has been defined.
+ *
+ * @return {?string} Blog name.
+ */
+export function getUnregisteredTypeHandlerName() {
+	return select( 'core/blocks' ).getUnregisteredFallbackBlockName();
 }
 
 /**

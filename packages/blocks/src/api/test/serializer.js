@@ -18,7 +18,8 @@ import {
 	getBlockTypes,
 	registerBlockType,
 	unregisterBlockType,
-	setUnknownTypeHandlerName,
+	setUnstructuredTypeHandlerName,
+	setUnregisteredTypeHandlerName,
 } from '../registration';
 import { createBlock } from '../';
 
@@ -29,7 +30,8 @@ describe( 'block serializer', () => {
 	} );
 
 	afterEach( () => {
-		setUnknownTypeHandlerName( undefined );
+		setUnstructuredTypeHandlerName( undefined );
+		setUnregisteredTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
@@ -196,10 +198,10 @@ describe( 'block serializer', () => {
 	} );
 
 	describe( 'serializeBlock()', () => {
-		it( 'serializes the fallback block without comment delimiters', () => {
-			registerBlockType( 'core/unknown-block', {
+		it( 'serializes the unstructured fallback block without comment delimiters', () => {
+			registerBlockType( 'core/unstructured-block', {
 				category: 'common',
-				title: 'unknown block',
+				title: 'unstructured block',
 				attributes: {
 					fruit: {
 						type: 'string',
@@ -207,8 +209,26 @@ describe( 'block serializer', () => {
 				},
 				save: ( { attributes } ) => attributes.fruit,
 			} );
-			setUnknownTypeHandlerName( 'core/unknown-block' );
-			const block = createBlock( 'core/unknown-block', { fruit: 'Bananas' } );
+			setUnstructuredTypeHandlerName( 'core/unstructured-block' );
+			const block = createBlock( 'core/unstructured-block', { fruit: 'Bananas' } );
+
+			const content = serializeBlock( block );
+
+			expect( content ).toBe( 'Bananas' );
+		} );
+		it( 'serializes the unregistered fallback block without comment delimiters', () => {
+			registerBlockType( 'core/unregistered-block', {
+				category: 'common',
+				title: 'unregistered block',
+				attributes: {
+					fruit: {
+						type: 'string',
+					},
+				},
+				save: ( { attributes } ) => attributes.fruit,
+			} );
+			setUnregisteredTypeHandlerName( 'core/unregistered-block' );
+			const block = createBlock( 'core/unregistered-block', { fruit: 'Bananas' } );
 
 			const content = serializeBlock( block );
 

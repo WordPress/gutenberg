@@ -15,7 +15,12 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import { getBlockType, getUnknownTypeHandlerName } from './registration';
+import {
+	getBlockType,
+	getUnknownTypeHandlerName,
+	getUnstructuredTypeHandlerName,
+	getUnregisteredTypeHandlerName,
+} from './registration';
 import { createBlock } from './factory';
 import { isValidBlock } from './validation';
 import { getCommentDelimitedContent } from './serializer';
@@ -394,46 +399,57 @@ export function getMigratedBlock( block ) {
  * @return {?Object} An initialized block object (if possible).
  */
 export function createBlockWithFallback( blockNode ) {
+	const { blockName: originalName } = blockNode;
 	let {
-		blockName: name,
 		attrs: attributes,
 		innerBlocks = [],
 		innerHTML,
 	} = blockNode;
+	const fallbackBlock = getUnknownTypeHandlerName();
+	const unstructuredFallbackBlock = getUnstructuredTypeHandlerName();
+	const unregisteredFallbackBlock = getUnregisteredTypeHandlerName();
+	const isUnstructuredFallback = ( name ) => (
+		name === unstructuredFallbackBlock ||
+		name === fallbackBlock
+	);
+	const isFallbackBlock = ( name ) => (
+		name === unstructuredFallbackBlock ||
+		name === unregisteredFallbackBlock ||
+		name === fallbackBlock
+	);
 
 	attributes = attributes || {};
 
 	// Trim content to avoid creation of intermediary freeform segments.
-	innerHTML = innerHTML.trim();
+	const originalUndelimitedContent = innerHTML = innerHTML.trim();
 
 	// Use type from block content, otherwise find unknown handler.
-	name = name || getUnknownTypeHandlerName();
+	let name = originalName || unstructuredFallbackBlock || fallbackBlock;
 
 	// Convert 'core/text' blocks in existing content to 'core/paragraph'.
 	if ( 'core/text' === name || 'core/cover-text' === name ) {
 		name = 'core/paragraph';
 	}
 
-	// Try finding the type for known block name, else fall back again.
-	let blockType = getBlockType( name );
-
-	const fallbackBlock = getUnknownTypeHandlerName();
-
 	// Fallback content may be upgraded from classic editor expecting implicit
 	// automatic paragraphs, so preserve them. Assumes wpautop is idempotent,
 	// meaning there are no negative consequences to repeated autop calls.
-	if ( name === fallbackBlock ) {
+	if ( isUnstructuredFallback( name ) ) {
 		innerHTML = autop( innerHTML ).trim();
 	}
 
+	// Try finding the type for known block name, else fall back again.
+	let blockType = getBlockType( name );
+
 	if ( ! blockType ) {
 		// If detected as a block which is not registered, preserve comment
-		// delimiters in content of unknown type handler.
+		// delimiters in content of unregistered type handler.
 		if ( name ) {
 			innerHTML = getCommentDelimitedContent( name, attributes, innerHTML );
 		}
 
-		name = fallbackBlock;
+		name = unregisteredFallbackBlock || fallbackBlock;
+		attributes = { originalName, originalUndelimitedContent };
 		blockType = getBlockType( name );
 	}
 
@@ -441,7 +457,7 @@ export function createBlockWithFallback( blockNode ) {
 	innerBlocks = innerBlocks.map( createBlockWithFallback );
 
 	// Include in set only if type were determined.
-	if ( ! blockType || ( ! innerHTML && name === fallbackBlock ) ) {
+	if ( ! blockType || ( ! innerHTML && isFallbackBlock( name ) ) ) {
 		return;
 	}
 
@@ -455,7 +471,7 @@ export function createBlockWithFallback( blockNode ) {
 	// provided there are no changes in attributes. The validation procedure thus compares the
 	// provided source value with the serialized output before there are any modifications to
 	// the block. When both match, the block is marked as valid.
-	if ( name !== fallbackBlock ) {
+	if ( ! isFallbackBlock( name ) ) {
 		block.isValid = isValidBlock( innerHTML, blockType, block.attributes );
 	}
 

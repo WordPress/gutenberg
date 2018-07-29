@@ -20,7 +20,6 @@ import {
 	unregisterBlockType,
 	getBlockTypes,
 	getBlockType,
-	setUnknownTypeHandlerName,
 } from '../registration';
 
 describe( 'validation', () => {
@@ -35,7 +34,6 @@ describe( 'validation', () => {
 	} );
 
 	afterEach( () => {
-		setUnknownTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );

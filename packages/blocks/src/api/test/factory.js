@@ -15,7 +15,7 @@ import {
 	getBlockTransforms,
 	findTransform,
 } from '../factory';
-import { getBlockTypes, unregisterBlockType, setUnknownTypeHandlerName, registerBlockType } from '../registration';
+import { getBlockTypes, unregisterBlockType, registerBlockType } from '../registration';
 
 describe( 'block factory', () => {
 	const defaultBlockSettings = {
@@ -35,7 +35,6 @@ describe( 'block factory', () => {
 	} );
 
 	afterEach( () => {
-		setUnknownTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );

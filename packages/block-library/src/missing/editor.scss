@@ -1,0 +1,15 @@
+.editor-block-list__block[data-type="core/missing"] {
+	.editor-warning {
+		position: static;
+
+		// Round corners for a better visual separation between the warning border
+		// and the unrounded corners of the selected block outline.
+		border-radius: 4px;
+	}
+
+	.editor-warning__contents {
+		// Ensure action buttons display on the same line as the text.
+		flex-wrap: nowrap;
+		align-items: flex-start;
+	}
+}

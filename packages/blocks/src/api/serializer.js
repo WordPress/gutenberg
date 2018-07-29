@@ -13,7 +13,12 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 /**
  * Internal dependencies
  */
-import { getBlockType, getUnknownTypeHandlerName } from './registration';
+import {
+	getBlockType,
+	getUnknownTypeHandlerName,
+	getUnstructuredTypeHandlerName,
+	getUnregisteredTypeHandlerName,
+} from './registration';
 import BlockContentProvider from '../block-content-provider';
 
 /**
@@ -261,6 +266,8 @@ export function serializeBlock( block ) {
 	const saveAttributes = getCommentAttributes( block.attributes, blockType );
 
 	switch ( blockName ) {
+		case getUnstructuredTypeHandlerName():
+		case getUnregisteredTypeHandlerName():
 		case getUnknownTypeHandlerName():
 			return saveContent;
 

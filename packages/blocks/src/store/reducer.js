@@ -71,6 +71,9 @@ export const defaultBlockName = createBlockNameSetterReducer( 'SET_DEFAULT_BLOCK
 
 export const fallbackBlockName = createBlockNameSetterReducer( 'SET_FALLBACK_BLOCK_NAME' );
 
+export const nonblockFallbackBlockName = createBlockNameSetterReducer( 'SET_NONBLOCK_FALLBACK_BLOCK_NAME' );
+export const unregisteredFallbackBlockName = createBlockNameSetterReducer( 'SET_UNREGISTERED_FALLBACK_BLOCK_NAME' );
+
 /**
  * Reducer managing the categories
  *
@@ -91,5 +94,7 @@ export default combineReducers( {
 	blockTypes,
 	defaultBlockName,
 	fallbackBlockName,
+	nonblockFallbackBlockName,
+	unregisteredFallbackBlockName,
 	categories,
 } );

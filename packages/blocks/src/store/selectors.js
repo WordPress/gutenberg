@@ -64,6 +64,28 @@ export function getFallbackBlockName( state ) {
 }
 
 /**
+ * Returns the name of the block for handling non-block content.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {string?} Name of the block for handling non-block content.
+ */
+export function getUnstructuredFallbackBlockName( state ) {
+	return state.nonblockFallbackBlockName;
+}
+
+/**
+ * Returns the name of the block for handling unregistered blocks.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {string?} Name of the block for handling unregistered blocks.
+ */
+export function getUnregisteredFallbackBlockName( state ) {
+	return state.unregisteredFallbackBlockName;
+}
+
+/**
  * Returns an array with the child blocks of a given block.
  *
  * @param {Object} state     Data state.
