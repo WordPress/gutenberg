@@ -13,8 +13,8 @@ import { FocusableIframe } from '@wordpress/components';
 function MyIframe() {
 	return (
 		<FocusableIframe
-			src="https://example.com"
-			onFocus={ /* ... */ }
+			src="/"
+			onFocus={ () => console.log('iframe is focused') }
 		/>
 	);
 }
