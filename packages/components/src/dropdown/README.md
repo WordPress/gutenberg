@@ -9,7 +9,7 @@ and uses render props to render the button and the content.
 
 
 ```jsx
-import { Dropdown } from '@wordpress/components';
+import { Button, Dropdown } from '@wordpress/components';
 
 function MyDropdownMenu() {
 	return (
@@ -18,9 +18,9 @@ function MyDropdownMenu() {
 			contentClassName="my-popover-content-classname"
 			position="bottom right"
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<button onClick={ onToggle } aria-expanded={ isOpen }>
+				<Button isPrimary onClick={ onToggle } aria-expanded={ isOpen }>
 					Toggle Popover!
-				</button>
+				</Button>
 			) }
 			renderContent={ () => (
 				<div>
