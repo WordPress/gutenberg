@@ -8,28 +8,40 @@ Disabled is a component which disables descendant tabbable elements and prevents
 Assuming you have a form component, you can disable all form inputs by wrapping the form with `<Disabled>`.
 
 ```jsx
-const DisableToggleForm = withState( {
-	isDisabled: true,
-} )( ( { isDisabled, setState } ) => {
-	let form = <form><input /></form>;
+class ToggleDisable extends React.Component {
 
-	if ( isDisabled ) {
-		form = <Disabled>{ form }</Disabled>;
+	constructor() {
+		super( ...arguments );
+		this.state = {
+			isDisabled: false,
+		};
+		this.toggleDisabled = this.toggleDisabled.bind( this );
 	}
 
-	const toggleDisabled = setState( ( state ) => ( {
-		isDisabled: ! state.isDisabled,
-	} ) );
+	toggleDisabled() {
+		this.setState( state => ( {
+			isDisabled: ! state.isDisabled,
+		} ) );
+	};
 
-	return (
-		<div>
-			{ form }
-			<button onClick={ toggleDisabled }>
-				Toggle Disabled
-			</button>
-		</div>
-	);
-} )
+	render() {
+		const { isDisabled } = this.state;
+		
+		let input = <TextControl label="Input" />;
+		if ( isDisabled ) {
+			input = <Disabled>{ input }</Disabled>;
+		}
+		
+		return (
+			<div>
+				{ input }
+				<Button isPrimary onClick={ this.toggleDisabled }>
+					Toggle Disabled
+				</Button>
+			</div>
+		);
+	}
+}
 ```
 
 A component can detect if it has been wrapped in a `<Disabled>` by accessing its [context](https://reactjs.org/docs/context.html) using `Disabled.Consumer`.

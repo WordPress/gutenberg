@@ -1,7 +1,7 @@
 Dashicon
-===========
+========
 
-## Example
+## Usage
 
 ```jsx
 function Example() {

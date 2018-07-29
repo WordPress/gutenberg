@@ -1,7 +1,7 @@
 ButtonGroup
 ===========
 
-## Example
+## Usage
 
 ```jsx
 function Example() {
