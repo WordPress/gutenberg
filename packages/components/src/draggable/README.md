@@ -39,6 +39,8 @@ The function called when dragging ends.
 ## Usage
 
 ```jsx
+import { Dashicon, Draggable, Panel, PanelBody } from '@wordpress/components';
+
 function DraggablePanel() {
 	return (
 		<div id="draggable-panel">

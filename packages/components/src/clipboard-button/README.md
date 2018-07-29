@@ -4,25 +4,19 @@ ClipboardButton
 ## Usage
 
 ```jsx
-class MyClipboardButton extends React.Component {
-	constructor() {
-		super( ...arguments );
-		this.state = {
-			hasCopied: false,
-		};
-	}
+import { ClipboardButton } from '@wordpress/components';
+import { withState } from '@wordpress/compose';
 
-	render() {		
-		return (
-			<ClipboardButton
-				isPrimary
-				text="WordPress"
-				onCopy={ () => this.setState( { hasCopied: true } ) }
-				onFinishCopy={ () => this.setState( { hasCopied: false } ) }
-			>
-				{ this.state.hasCopied ? 'Copied!' : 'Copy Text' }
-			</ClipboardButton>
-		);
-	}
-}
+withState( {
+	hasCopied: false,
+} )( ( { hasCopied, setState } ) => ( 
+	<ClipboardButton
+		isPrimary
+		text="WordPress"
+		onCopy={ () => setState( { hasCopied: true } ) }
+		onFinishCopy={ () => setState( { hasCopied: false } ) }
+	>
+		{ hasCopied ? 'Copied!' : 'Copy Text' }
+	</ClipboardButton>
+) )
 ```

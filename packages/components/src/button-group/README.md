@@ -4,6 +4,8 @@ ButtonGroup
 ## Usage
 
 ```jsx
+import { Button, ButtonGroup } from '@wordpress/components';
+
 function MyButtonGroup() {
 	return (
 		<ButtonGroup>

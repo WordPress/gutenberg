@@ -8,6 +8,8 @@ CheckboxControl component is used to generate a checkbox input field.
 
 Render an is author checkbox:
 ```jsx
+import { CheckboxControl } from '@wordpress/components';
+
 function MyCheckboxControl() {
 	return (
 		<CheckboxControl

@@ -4,6 +4,8 @@ Dashicon
 ## Usage
 
 ```jsx
+import { Dashicon } from '@wordpress/components';
+
 function MyDashicons() {
 	return (
 		<div>
