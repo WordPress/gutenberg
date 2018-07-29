@@ -5,13 +5,18 @@
 ## Usage
 
 ```jsx
-import { DropZoneProvider, DropZone } from '@wordpress/components';
+import { DropZoneProvider, DropZone, Panel } from '@wordpress/components';
 
 function MyComponent() {
 	return (
 		<DropZoneProvider>
 			<div>
-				<DropZone onDrop={ () => console.log( 'do something' ) } />
+				Drop something here
+				<DropZone 
+					onFilesDrop={ () => console.log( 'do something' ) }
+					onHTMLDrop={ () => console.log( 'do something' ) }
+					onDrop={ () => console.log( 'do something' ) } 
+				/>
 			</div>
 		</DropZoneProvider>
 	);
