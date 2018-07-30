@@ -11,39 +11,45 @@ import {
  * Internal dependencies
  */
 import './style.scss';
-import * as paragraph from './paragraph';
-import * as image from './image';
-import * as heading from './heading';
-import * as quote from './quote';
-import * as gallery from './gallery';
-import * as archives from './archives';
-import * as audio from './audio';
-import * as button from './button';
-import * as categories from './categories';
-import * as code from './code';
-import * as columns from './columns';
-import * as column from './columns/column';
-import * as coverImage from './cover-image';
-import * as embed from './embed';
-import * as file from './file';
+import './editor.scss';
+import './theme.scss';
+import * as paragraph from '../packages/core-blocks/src/paragraph';
+import * as image from '../packages/core-blocks/src/image';
+import * as heading from '../packages/core-blocks/src/heading';
+import * as quote from '../packages/core-blocks/src/quote';
+import * as gallery from '../packages/core-blocks/src/gallery';
+import * as archives from '../packages/core-blocks/src/archives';
+import * as audio from '../packages/core-blocks/src/audio';
+import * as button from '../packages/core-blocks/src/button';
+import * as categories from '../packages/core-blocks/src/categories';
+import * as code from '../packages/core-blocks/src/code';
+import * as columns from '../packages/core-blocks/src/columns';
+import * as column from '../packages/core-blocks/src/columns/column';
+import * as coverImage from '../packages/core-blocks/src/cover-image';
+import * as embed from '../packages/core-blocks/src/embed';
+import * as file from '../packages/core-blocks/src/file';
+import * as latestComments from '../packages/core-blocks/src/latest-comments';
+import * as latestPosts from '../packages/core-blocks/src/latest-posts';
+import * as list from '../packages/core-blocks/src/list';
+import * as more from '../packages/core-blocks/src/more';
+import * as nextpage from '../packages/core-blocks/src/nextpage';
+import * as preformatted from '../packages/core-blocks/src/preformatted';
+import * as pullquote from '../packages/core-blocks/src/pullquote';
+import * as reusableBlock from '../packages/core-blocks/src/block';
+import * as separator from '../packages/core-blocks/src/separator';
+import * as shortcode from '../packages/core-blocks/src/shortcode';
+import * as spacer from '../packages/core-blocks/src/spacer';
+import * as subhead from '../packages/core-blocks/src/subhead';
+import * as table from '../packages/core-blocks/src/table';
+import * as textColumns from '../packages/core-blocks/src/text-columns';
+import * as verse from '../packages/core-blocks/src/verse';
+import * as video from '../packages/core-blocks/src/video';
+
+// The freeform block can't be moved to the "npm" packages folder because it requires the wp.oldEditor global.
 import * as freeform from './freeform';
+
+// The HTML block can't be moved to the "npm" packages folder because it requires the CodeEditor component.
 import * as html from './html';
-import * as latestComments from './latest-comments';
-import * as latestPosts from './latest-posts';
-import * as list from './list';
-import * as more from './more';
-import * as nextpage from './nextpage';
-import * as preformatted from './preformatted';
-import * as pullquote from './pullquote';
-import * as reusableBlock from './block';
-import * as separator from './separator';
-import * as shortcode from './shortcode';
-import * as spacer from './spacer';
-import * as subhead from './subhead';
-import * as table from './table';
-import * as textColumns from './text-columns';
-import * as verse from './verse';
-import * as video from './video';
 
 export const registerCoreBlocks = () => {
 	[

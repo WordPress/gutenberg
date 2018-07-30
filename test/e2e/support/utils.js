@@ -10,7 +10,7 @@ import { URL } from 'url';
 import { times, castArray } from 'lodash';
 
 const {
-	WP_BASE_URL = 'http://localhost:8889',
+	WP_BASE_URL = 'http://localhost:8888',
 	WP_USERNAME = 'admin',
 	WP_PASSWORD = 'password',
 } = process.env;

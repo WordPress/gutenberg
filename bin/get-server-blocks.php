@@ -33,6 +33,9 @@ require_once dirname( dirname( __FILE__ ) ) . '/lib/client-assets.php';
 foreach ( glob( dirname( dirname( __FILE__ ) ) . '/core-blocks/*/index.php' ) as $block_logic ) {
 	require_once $block_logic;
 }
+foreach ( glob( dirname( dirname( __FILE__ ) ) . '/packages/core-blocks/src/*/index.php' ) as $block_logic ) {
+	require_once $block_logic;
+}
 
 do_action( 'init' );
 

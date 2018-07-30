@@ -12,7 +12,6 @@ const npmReadyPackages = glob( 'packages/*/package.json' )
 
 // These are internal-only packages (for now), not yet published as standalone node modules.
 const gutenbergPackages = [
-	'core-blocks',
 	'edit-post',
 ];
 

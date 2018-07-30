@@ -37,3 +37,6 @@ require dirname( __FILE__ ) . '/register.php';
 foreach ( glob( dirname( __FILE__ ) . '/../core-blocks/*/index.php' ) as $block_logic ) {
 	require $block_logic;
 }
+foreach ( glob( dirname( __FILE__ ) . '/../packages/core-blocks/src/*/index.php' ) as $block_logic ) {
+	require $block_logic;
+}

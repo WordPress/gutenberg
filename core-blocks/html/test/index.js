@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { name, settings } from '../';
-import { blockEditRender } from '../../test/helpers';
+import { blockEditRender } from '../../../packages/core-blocks/src/test/helpers';
 
 describe( 'core/html', () => {
 	test( 'block edit matches snapshot', () => {
