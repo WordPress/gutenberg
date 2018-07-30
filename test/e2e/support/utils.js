@@ -86,31 +86,19 @@ export async function visitAdmin( adminPath, query ) {
 	}
 }
 
-export async function newPost( postType, disableTips = true ) {
+export async function newPost( { postType, viewport = 'large', enableTips = false } = {} ) {
 	await visitAdmin( 'post-new.php', postType ? 'post_type=' + postType : '' );
 
-	if ( disableTips ) {
+	setViewport( viewport );
+
+	const tipsEnabled = await page.evaluate( () => wp.data.select( 'core/nux' ).areTipsEnabled() );
+	if ( tipsEnabled && ! enableTips ) {
 		// Disable new user tips so that their UI doesn't get in the way
 		await page.evaluate( () => {
 			wp.data.dispatch( 'core/nux' ).disableTips();
 		} );
+		await page.reload();
 	}
-}
-
-export async function newDesktopBrowserPage() {
-	global.page = await browser.newPage();
-
-	page.on( 'pageerror', ( error ) => {
-		// Disable reason: `jest/globals` doesn't include `fail`, but it is
-		// part of the global context supplied by the underlying Jasmine:
-		//
-		//  https://jasmine.github.io/api/3.0/global.html#fail
-
-		// eslint-disable-next-line no-undef
-		fail( error );
-	} );
-
-	await setViewport( 'large' );
 }
 
 export async function setViewport( type ) {

@@ -1,18 +1,13 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
-import { clearLocalStorage, newPost, newDesktopBrowserPage, setViewport } from '../support/utils';
+import { clearLocalStorage, newPost, setViewport } from '../support/utils';
 
 const SIDEBAR_SELECTOR = '.edit-post-sidebar';
 const ACTIVE_SIDEBAR_TAB_SELECTOR = '.edit-post-sidebar__panel-tab.is-active';
 const ACTIVE_SIDEBAR_BUTTON_TEXT = 'Document';
 
-describe( 'Publishing', () => {
-	beforeAll( async () => {
-		await newDesktopBrowserPage();
-	} );
-
+describe.skip( 'Publishing', () => {
 	afterEach( async () => {
 		await clearLocalStorage();
 		await page.goto( 'about:blank' );
@@ -45,7 +40,7 @@ describe( 'Publishing', () => {
 
 	it( 'Should have the sidebar closed by default on mobile', async () => {
 		await setViewport( 'small' );
-		await newPost();
+		await newPost( { viewport: 'small' } );
 		const sidebar = await page.$( SIDEBAR_SELECTOR );
 		expect( sidebar ).toBeNull();
 	} );
@@ -66,8 +61,7 @@ describe( 'Publishing', () => {
 
 	it( 'Should reopen sidebar the sidebar when resizing from mobile to desktop if the sidebar was closed automatically', async () => {
 		await setViewport( 'large' );
-		await newPost();
-		await setViewport( 'small' );
+		await newPost( { viewport: 'small' } );
 
 		const sidebarsMobile = await page.$$( SIDEBAR_SELECTOR );
 		expect( sidebarsMobile ).toHaveLength( 0 );

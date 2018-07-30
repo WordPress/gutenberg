@@ -1,24 +1,12 @@
 /**
- * External dependencies
- */
-import puppeteer from 'puppeteer';
-
-/**
  * Node dependencies
  */
 import { visitAdmin } from './utils';
 
-const { PUPPETEER_HEADLESS, PUPPETEER_SLOWMO, PUPPETEER_TIMEOUT } = process.env;
+const { PUPPETEER_TIMEOUT } = process.env;
 
 // The Jest timeout is increased because these tests are a bit slow
 jest.setTimeout( PUPPETEER_TIMEOUT || 100000 );
-
-beforeAll( async () => {
-	global.browser = await puppeteer.launch( {
-		headless: PUPPETEER_HEADLESS !== 'false',
-		slowMo: parseInt( PUPPETEER_SLOWMO, 10 ) || 0,
-	} );
-} );
 
 // After every test run, delete all content created by the test. This ensures
 // other posts/comments/etc. aren't dirtying tests and tests don't depend on

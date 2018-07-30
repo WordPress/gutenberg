@@ -1,12 +1,10 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage, insertBlock, getEditedPostContent } from '../support/utils';
+import { newPost, insertBlock, getEditedPostContent } from '../support/utils';
 
-describe( 'adding blocks', () => {
+describe.skip( 'adding blocks', () => {
 	beforeAll( async () => {
-		await newDesktopBrowserPage();
 		await newPost();
 	} );
 

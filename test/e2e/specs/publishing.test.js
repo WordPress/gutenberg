@@ -1,18 +1,12 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
 import {
 	newPost,
-	newDesktopBrowserPage,
 	publishPost,
 } from '../support/utils';
 
 describe( 'Publishing', () => {
-	beforeAll( async () => {
-		await newDesktopBrowserPage();
-	} );
-
 	beforeEach( async () => {
 		await newPost();
 	} );

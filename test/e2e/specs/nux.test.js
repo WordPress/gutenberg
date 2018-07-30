@@ -1,15 +1,13 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
 import {
 	clearLocalStorage,
 	clickOnMoreMenuItem,
-	newDesktopBrowserPage,
 	newPost,
 } from '../support/utils';
 
-describe( 'New User Experience (NUX)', () => {
+describe.skip( 'New User Experience (NUX)', () => {
 	async function clickAllTips( page ) {
 		// Click through all available tips.
 		const tips = await getTips( page );
@@ -35,13 +33,9 @@ describe( 'New User Experience (NUX)', () => {
 	}
 
 	beforeEach( async () => {
-		await newDesktopBrowserPage();
-		await newPost( undefined, false );
-	} );
-
-	afterEach( async () => {
-		// Clear localStorage tips so they aren't persisted for the next test.
+		// Clear localStorage tips so they aren't used for the next test.
 		await clearLocalStorage();
+		await newPost( { enableTips: true } );
 	} );
 
 	it( 'should show tips to a first-time user', async () => {

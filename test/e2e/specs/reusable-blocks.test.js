@@ -1,10 +1,8 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
 import {
 	insertBlock,
-	newDesktopBrowserPage,
 	newPost,
 	pressWithModifier,
 	searchForBlock,
@@ -19,9 +17,8 @@ function waitForAndAcceptDialog() {
 	} );
 }
 
-describe( 'Reusable Blocks', () => {
+describe.skip( 'Reusable Blocks', () => {
 	beforeAll( async () => {
-		await newDesktopBrowserPage();
 		await newPost();
 	} );
 

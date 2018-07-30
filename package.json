@@ -94,6 +94,7 @@
 		"espree": "3.5.4",
 		"extract-text-webpack-plugin": "4.0.0-beta.0",
 		"glob": "7.1.2",
+		"jest-puppeteer": "3.2.1",
 		"lerna": "3.0.0-beta.21",
 		"mkdirp": "0.5.1",
 		"node-sass": "4.9.2",

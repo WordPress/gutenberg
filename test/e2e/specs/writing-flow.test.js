@@ -1,18 +1,15 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
 import {
 	newPost,
-	newDesktopBrowserPage,
 	getEditedPostContent,
 	pressWithModifier,
 	pressTimes,
 } from '../support/utils';
 
-describe( 'adding blocks', () => {
+describe.skip( 'adding blocks', () => {
 	beforeEach( async () => {
-		await newDesktopBrowserPage();
 		await newPost();
 	} );
 

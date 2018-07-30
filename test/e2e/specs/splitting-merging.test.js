@@ -1,19 +1,16 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
 import {
 	newPost,
-	newDesktopBrowserPage,
 	insertBlock,
 	getEditedPostContent,
 	pressTimes,
 	pressWithModifier,
 } from '../support/utils';
 
-describe( 'splitting and merging blocks', () => {
+describe.skip( 'splitting and merging blocks', () => {
 	beforeEach( async () => {
-		await newDesktopBrowserPage();
 		await newPost();
 	} );
 

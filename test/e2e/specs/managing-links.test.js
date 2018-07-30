@@ -1,12 +1,10 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage } from '../support/utils';
+import { newPost } from '../support/utils';
 
-describe( 'Managing links', () => {
+describe.skip( 'Managing links', () => {
 	beforeEach( async () => {
-		await newDesktopBrowserPage();
 		await newPost();
 	} );
 

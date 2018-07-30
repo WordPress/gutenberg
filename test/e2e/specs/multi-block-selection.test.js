@@ -1,12 +1,10 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage, pressWithModifier, insertBlock } from '../support/utils';
+import { newPost, pressWithModifier, insertBlock } from '../support/utils';
 
-describe( 'Multi-block selection', () => {
+describe.skip( 'Multi-block selection', () => {
 	beforeAll( async () => {
-		await newDesktopBrowserPage();
 		await newPost();
 	} );
 

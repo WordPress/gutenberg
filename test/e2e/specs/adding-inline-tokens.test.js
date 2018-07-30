@@ -9,12 +9,10 @@ import uuid from 'uuid/v4';
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage, getEditedPostContent, insertBlock } from '../support/utils';
+import { newPost, getEditedPostContent, insertBlock } from '../support/utils';
 
-describe( 'adding inline tokens', () => {
+describe.skip( 'adding inline tokens', () => {
 	beforeAll( async () => {
-		await newDesktopBrowserPage();
 		await newPost();
 	} );
 

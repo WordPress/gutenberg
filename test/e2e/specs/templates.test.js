@@ -1,19 +1,16 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
-import { clickOnMoreMenuItem, newPost, newDesktopBrowserPage } from '../support/utils';
+import { clickOnMoreMenuItem, newPost } from '../support/utils';
 import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
 describe( 'Using a CPT with a predefined template', () => {
 	beforeAll( async () => {
-		await newDesktopBrowserPage();
 		await activatePlugin( 'gutenberg-test-plugin-templates' );
-		await newPost( 'book' );
+		await newPost( { postType: 'book' } );
 	} );
 
 	afterAll( async () => {
-		await newDesktopBrowserPage();
 		await deactivatePlugin( 'gutenberg-test-plugin-templates' );
 	} );
 

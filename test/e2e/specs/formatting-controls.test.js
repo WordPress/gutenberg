@@ -1,14 +1,9 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage, pressWithModifier, getEditedPostContent } from '../support/utils';
+import { newPost, pressWithModifier, getEditedPostContent } from '../support/utils';
 
-describe( 'Formatting Controls', () => {
-	beforeAll( async () => {
-		await newDesktopBrowserPage();
-	} );
-
+describe.skip( 'Formatting Controls', () => {
 	beforeEach( async () => {
 		await newPost();
 	} );

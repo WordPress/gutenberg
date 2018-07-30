@@ -1,12 +1,10 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
-import { visitAdmin, newDesktopBrowserPage } from '../support/utils';
+import { visitAdmin } from '../support/utils';
 
 describe( 'classic editor', () => {
 	beforeAll( async () => {
-		await newDesktopBrowserPage();
 		await visitAdmin( 'post-new.php', 'classic-editor' );
 	} );
 

@@ -1,21 +1,15 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
 import {
 	newPost,
-	newDesktopBrowserPage,
 	pressWithModifier,
 	ensureSidebarOpened,
 	publishPost,
 } from '../support/utils';
 
-describe( 'Change detection', () => {
+describe.skip( 'Change detection', () => {
 	let handleInterceptedRequest, hadInterceptedSave;
-
-	beforeAll( async () => {
-		await newDesktopBrowserPage();
-	} );
 
 	beforeEach( async () => {
 		hadInterceptedSave = false;

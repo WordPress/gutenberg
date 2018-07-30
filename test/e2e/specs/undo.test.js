@@ -1,17 +1,14 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
 import {
 	newPost,
-	newDesktopBrowserPage,
 	pressWithModifier,
 	getEditedPostContent,
 } from '../support/utils';
 
-describe( 'undo', () => {
+describe.skip( 'undo', () => {
 	beforeAll( async () => {
-		await newDesktopBrowserPage();
 		await newPost();
 	} );
 

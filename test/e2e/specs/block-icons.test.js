@@ -1,10 +1,8 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
 import {
 	newPost,
-	newDesktopBrowserPage,
 	insertBlock,
 	searchForBlock,
 	selectBlockByClientId,
@@ -35,7 +33,7 @@ async function getFirstInserterIcon() {
 	return await getInnerHTML( INSERTER_ICON_SELECTOR );
 }
 
-describe( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
+describe.skip( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
 	const dashIconRegex = /<svg.*?class=".*?dashicons-cart.*?">.*?<\/svg>/;
 	const circleString = '<circle cx="10" cy="10" r="10" fill="red" stroke="blue" stroke-width="10"></circle>';
 	const svgIcon = `<svg width="20" height="20" viewBox="0 0 20 20">${ circleString }</svg>`;
@@ -56,7 +54,6 @@ describe( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
 	};
 
 	beforeAll( async () => {
-		await newDesktopBrowserPage();
 		await activatePlugin( 'gutenberg-test-block-icons' );
 		// accept the prompt if the post is "dirty"
 		await page.on( 'dialog', async ( dialog ) => {
