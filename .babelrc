@@ -8,8 +8,7 @@
       "module-resolver",
       {
         "cwd": "babelrc",
-        "alias": {
-          "@wordpress/editor": "./editor",
+        "alias": {          
           "@gutenberg": "./gutenberg"
         },
         "extensions": [
