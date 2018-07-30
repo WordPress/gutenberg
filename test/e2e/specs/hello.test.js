@@ -3,7 +3,7 @@
  */
 import { newPost } from '../support/utils';
 
-describe.skip( 'hello', () => {
+describe( 'hello', () => {
 	beforeAll( async () => {
 		await newPost();
 	} );

@@ -33,7 +33,7 @@ async function getFirstInserterIcon() {
 	return await getInnerHTML( INSERTER_ICON_SELECTOR );
 }
 
-describe.skip( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
+describe( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
 	const dashIconRegex = /<svg.*?class=".*?dashicons-cart.*?">.*?<\/svg>/;
 	const circleString = '<circle cx="10" cy="10" r="10" fill="red" stroke="blue" stroke-width="10"></circle>';
 	const svgIcon = `<svg width="20" height="20" viewBox="0 0 20 20">${ circleString }</svg>`;
@@ -53,14 +53,16 @@ describe.skip( 'Correctly Renders Block Icons on Inserter and Inspector', () => 
 		expect( iconHtml ).toMatch( dashIconRegex );
 	};
 
+	// accept the prompt if the post is "dirty"
+	const handleOnDialog = async ( dialog ) => {
+		if ( dialog ) {
+			await dialog.accept();
+		}
+	};
+
 	beforeAll( async () => {
 		await activatePlugin( 'gutenberg-test-block-icons' );
-		// accept the prompt if the post is "dirty"
-		await page.on( 'dialog', async ( dialog ) => {
-			if ( dialog ) {
-				await dialog.accept();
-			}
-		} );
+		await page.on( 'dialog', handleOnDialog );
 	} );
 
 	beforeEach( async () => {
@@ -68,6 +70,7 @@ describe.skip( 'Correctly Renders Block Icons on Inserter and Inspector', () => 
 	} );
 
 	afterAll( async () => {
+		page.removeListener( 'dialog', handleOnDialog );
 		await deactivatePlugin( 'gutenberg-test-block-icons' );
 	} );
 

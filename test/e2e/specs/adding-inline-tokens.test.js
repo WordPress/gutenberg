@@ -11,7 +11,7 @@ import uuid from 'uuid/v4';
  */
 import { newPost, getEditedPostContent, insertBlock } from '../support/utils';
 
-describe.skip( 'adding inline tokens', () => {
+describe( 'adding inline tokens', () => {
 	beforeAll( async () => {
 		await newPost();
 	} );

@@ -3,7 +3,7 @@
  */
 import { newPost, pressWithModifier, getEditedPostContent } from '../support/utils';
 
-describe.skip( 'Formatting Controls', () => {
+describe( 'Formatting Controls', () => {
 	beforeEach( async () => {
 		await newPost();
 	} );
