@@ -2,7 +2,7 @@
  * External dependencies
  */
 import RCTAztecView from 'react-native-aztec';
-import { parse, children } from '@wordpress/blocks';
+import { children } from '@wordpress/blocks';
 
 /**
  * WordPress dependencies
@@ -31,14 +31,11 @@ export class RichText extends Component {
 		}
 		this.lastEventCount = event.nativeEvent.eventCount;
 		const newContent = event.nativeEvent.text.replace( /<p>/gi, '' ).replace( /<\/p>/gi, '<br>' );
-		console.log(newContent);
 		this.lastContent = newContent;
 
 		this.currentTimer = setTimeout( function() {
-			// Create a React Tree from the new HTML
-			const newParaBlock = parse( '<!-- wp:paragraph --><p>' + this.lastContent + '</p><!-- /wp:paragraph -->' )[ 0 ];
 			this.props.onChange( {
-				content: newParaBlock.attributes.content,
+				content: this.lastContent,
 				eventCount: this.lastEventCount,
 			} );
 		}.bind( this ), 1000 );
