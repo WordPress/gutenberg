@@ -11,7 +11,7 @@ const createNonceMiddleware = ( nonce ) => ( options, next ) => {
 	 * Configure heartbeat to refresh the wp-api nonce, keeping the editor
 	 * authorization intact.
 	 */
-	addAction( 'heartbeat.tick', '@wordpress/api-fetch/createNonceMiddleware', ( response ) => {
+	addAction( 'heartbeat.tick', 'api-fetch/createNonceMiddleware', ( response ) => {
 		if ( response[ 'rest-nonce' ] ) {
 			usedNonce = response[ 'rest-nonce' ];
 		}
