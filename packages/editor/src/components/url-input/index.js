@@ -165,10 +165,10 @@ class URLInput extends Component {
 				break;
 			}
 			case ENTER: {
-				if ( this.state.selectedSuggestion ) {
+				if ( this.state.selectedSuggestion !== null ) {
 					event.stopPropagation();
 					const post = this.state.posts[ this.state.selectedSuggestion ];
-					this.selectLink( post.link );
+					this.selectLink( post.url );
 				}
 			}
 		}
@@ -227,7 +227,7 @@ class URLInput extends Component {
 									className={ classnames( 'editor-url-input__suggestion', {
 										'is-selected': index === selectedSuggestion,
 									} ) }
-									onClick={ () => this.selectLink( post.link ) }
+									onClick={ () => this.selectLink( post.url ) }
 									aria-selected={ index === selectedSuggestion }
 								>
 									{ decodeEntities( post.title ) || __( '(no title)' ) }
