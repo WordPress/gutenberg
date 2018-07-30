@@ -173,6 +173,8 @@ function gutenberg_warn_classic_about_blocks() {
 		return;
 	}
 
+	wp_enqueue_script( 'wp-santize' );
+
 	$gutenberg_edit_link = get_edit_post_link( $post->ID, 'raw' );
 
 	$classic_edit_link = $gutenberg_edit_link;
@@ -193,10 +195,6 @@ function gutenberg_warn_classic_about_blocks() {
 	}
 	?>
 		<style type="text/css">
-			#blocks-in-post-dialog .notification-dialog {
-				width: 500px;
-				margin-left: -250px;
-			}
 			#blocks-in-post-dialog .blocks-in-post-message {
 				margin: 25px;
 			}
@@ -205,8 +203,16 @@ function gutenberg_warn_classic_about_blocks() {
 				margin-right: 10px;
 			}
 
-			#blocks-in-post-dialog .wp-tab-first {
-				outline: 0;
+			@media only screen and (max-height: 480px), screen and (max-width: 450px) {
+				#blocks-in-post-dialog .notification-dialog {
+					width: 100%;
+					height: 100%;
+					max-height: 100%;
+					position: fixed;
+					top: 0;
+					margin: 0;
+					left: 0;
+				}
 			}
 		</style>
 
@@ -214,33 +220,93 @@ function gutenberg_warn_classic_about_blocks() {
 			<div class="notification-dialog-background"></div>
 			<div class="notification-dialog">
 				<div class="blocks-in-post-message">
-					<p class="wp-tab-first" tabindex="0"><?php _e( 'This post was previously edited in the Gutenberg. While you can continue and edit in the Classic Editor, you may lose data or formatting from the Gutenberg version of this page.', 'gutenberg' ); ?></p>
+					<h1><?php _e( 'Heads up!' ); ?></h1>
+					<p><?php _e( 'This post was previously edited in Gutenberg. You can continue in the Classic Editor, but you may lose data and formatting.', 'gutenberg' ); ?></p>
 					<?php
 					if ( $revisions_link ) {
 						?>
-							<p><?php _e( 'To continue anyway, click the "Edit in Classic Editor" button. You can also find an earlier revision to edit by clicking the "Browse Revisions" button. Otherwise, press "Edit in Gutenberg" to keep this post in Gutenberg.', 'gutenberg' ); ?></p>
+							<p><?php _e( 'You can also browse your previous revisions and restore a version of the page before it was edited in Gutenberg.', 'gutenberg' ); ?></p>
 						<?php
 					} else {
 						?>
-							<p><strong><?php _e( "Because this post doesn't have revisions, you won't be able to restore an earlier version of your content.", 'gutenberg' ); ?></strong></p>
-							<p><?php _e( 'To continue anyway, click the "Edit in Classic Editor" button. Otherwise, press "Edit in Gutenberg" to continue to Gutenberg, preserving your content and formatting.', 'gutenberg' ); ?></p>
+							<p><strong><?php _e( "Because this post does not have revisions, you will not be able to revert any changes you make in the Classic Editor.", 'gutenberg' ); ?></strong></p>
 						<?php
 					}
 					?>
 					<p>
-						<a class="button" href="<?php echo esc_url( $classic_edit_link ); ?>"><?php _e( 'Edit in Classic Editor', 'gutenberg' ); ?></a>
+					<a class="button button-primary blocks-in-post-gutenberg-button" title="<?php esc_attr_e( 'Open this post in the Gutenberg block editor' ); ?>" href="<?php echo esc_url( $gutenberg_edit_link ); ?>"><?php _e( 'Gutenberg', 'gutenberg' ); ?></a>
+					<a class="button" title="<?php esc_attr_e( 'Open this post in the classic editor' ); ?>" href="<?php echo esc_url( $classic_edit_link ); ?>"><?php _e( 'Classic Editor', 'gutenberg' ); ?></a>
 						<?php
 						if ( $revisions_link ) {
 							?>
-								<a class="button" href="<?php echo esc_url( $revisions_link ); ?>"><?php _e( 'Browse Revisions', 'gutenberg' ); ?></a>
+								<a class="button" title="<?php esc_attr_e( 'Open the revisions browser' ); ?>" href="<?php echo esc_url( $revisions_link ); ?>"><?php _e( 'Revisions', 'gutenberg' ); ?></a>
 							<?php
 						}
 						?>
-						<a class="button button-primary" href="<?php echo esc_url( $gutenberg_edit_link ); ?>"><?php _e( 'Edit in Gutenberg', 'gutenberg' ); ?></a>
 					</p>
 				</div>
 			</div>
 		</div>
+
+		<script type="text/javascript">
+			/* <![CDATA[ */
+			( function( $ ) {
+				var dialog = {};
+
+				dialog.init = function() {
+					// The modal
+					dialog.warning = $( '#blocks-in-post-dialog' );
+					// Get the links and buttons within the modal.
+					dialog.warningTabbables = dialog.warning.find( 'a, button' );
+
+					// Get the text within the modal.
+					dialog.rawMessage = dialog.warning.find( '.blocks-in-post-message' ).text();
+
+					// Hide all the #wpwrap content from assistive technologies.
+					$( '#wpwrap' ).attr( 'aria-hidden', 'true' );
+
+					// Detach the warning modal from its position and append it to the body.
+					$( document.body )
+						.addClass( 'modal-open' )
+						.append( dialog.warning.detach() );
+
+					// Reveal the modal and set focus on the Gutenberg button.
+					dialog.warning
+						.removeClass( 'hidden' )
+						.find( '.blocks-in-post-gutenberg-button' ).focus();
+
+					// Attach event handlers.
+					dialog.warningTabbables.on( 'keydown', dialog.constrainTabbing );
+
+					// Make screen readers announce the warning message after a short delay (necessary for some screen readers).
+					setTimeout( function() {
+						wp.a11y.speak( wp.sanitize.stripTags( dialog.rawMessage.replace( /\s+/g, ' ' ) ), 'assertive' );
+					}, 1000 );
+				};
+
+				dialog.constrainTabbing = function( event ) {
+					var firstTabbable, lastTabbable;
+
+					if ( 9 !== event.which ) {
+						return;
+					}
+
+					firstTabbable = dialog.warningTabbables.first()[0];
+					lastTabbable = dialog.warningTabbables.last()[0];
+
+					if ( lastTabbable === event.target && ! event.shiftKey ) {
+						firstTabbable.focus();
+						event.preventDefault();
+					} else if ( firstTabbable === event.target && event.shiftKey ) {
+						lastTabbable.focus();
+						event.preventDefault();
+					}
+				};
+
+				$( document ).ready( dialog.init );
+			} )( jQuery );
+			/* ]]> */
+		</script>
 	<?php
 }
 add_action( 'admin_footer', 'gutenberg_warn_classic_about_blocks' );
