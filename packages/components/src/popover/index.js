@@ -61,11 +61,14 @@ class Popover extends Component {
 	componentDidMount() {
 		this.toggleWindowEvents( true );
 		this.refresh();
+
 		/*
 		 * Without the setTimeout, the dom node is not being focused. Related:
 		 * https://stackoverflow.com/questions/35522220/react-ref-with-focus-doesnt-work-without-settimeout-my-example
+		 *
+		 * TODO: Treat the cause, not the symptom.
 		 */
-		setTimeout( () => {
+		this.focusTimeout = setTimeout( () => {
 			this.focus();
 		}, 0 );
 	}
@@ -78,6 +81,8 @@ class Popover extends Component {
 
 	componentWillUnmount() {
 		this.toggleWindowEvents( false );
+
+		clearTimeout( this.focusTimeout );
 	}
 
 	toggleWindowEvents( isListening ) {
@@ -115,15 +120,18 @@ class Popover extends Component {
 			return;
 		}
 
-		const focusNode = ( domNode ) => domNode.focus();
-
 		// Boolean values for focusOnMount deprecated in 3.2–remove
 		// `focusOnMount === true` check in 3.4.
 		if ( focusOnMount === 'firstElement' || focusOnMount === true ) {
 			// Find first tabbable node within content and shift focus, falling
 			// back to the popover panel itself.
 			const firstTabbable = focus.tabbable.find( this.contentNode.current )[ 0 ];
-			focusNode( firstTabbable ? firstTabbable : this.contentNode.current );
+
+			if ( firstTabbable ) {
+				firstTabbable.focus();
+			} else {
+				this.contentNode.current.focus();
+			}
 
 			return;
 		}
@@ -131,7 +139,7 @@ class Popover extends Component {
 		if ( focusOnMount === 'container' ) {
 			// Focus the popover panel itself so items in the popover are easily
 			// accessed via keyboard navigation.
-			focusNode( this.contentNode.current );
+			this.contentNode.current.focus();
 
 			return;
 		}
