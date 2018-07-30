@@ -390,6 +390,7 @@ function gutenberg_register_post_types() {
 			'singular_name' => 'Block',
 		),
 		'public'                => false,
+		'rewrite'               => false,
 		'show_in_rest'          => true,
 		'rest_base'             => 'blocks',
 		'rest_controller_class' => 'WP_REST_Blocks_Controller',
