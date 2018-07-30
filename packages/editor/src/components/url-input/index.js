@@ -4,7 +4,7 @@
 import { throttle } from 'lodash';
 import classnames from 'classnames';
 import scrollIntoView from 'dom-scroll-into-view';
-import { stringify } from 'querystringify';
+import httpBuildQuery from 'http-build-query';
 
 /**
  * WordPress dependencies
@@ -91,7 +91,7 @@ class URLInput extends Component {
 		} );
 
 		const request = apiFetch( {
-			path: `/gutenberg/v1/search?${ stringify( {
+			path: `/gutenberg/v1/search?${ httpBuildQuery( {
 				search: value,
 				per_page: 20,
 				type: 'post',

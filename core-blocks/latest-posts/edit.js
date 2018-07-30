@@ -4,7 +4,7 @@
 import { get, isUndefined, pickBy } from 'lodash';
 import moment from 'moment';
 import classnames from 'classnames';
-import { stringify } from 'querystringify';
+import httpBuildQuery from 'http-build-query';
 
 /**
  * WordPress dependencies
@@ -160,14 +160,14 @@ class LatestPostsEdit extends Component {
 
 export default withAPIData( ( props ) => {
 	const { postsToShow, order, orderBy, categories } = props.attributes;
-	const latestPostsQuery = stringify( pickBy( {
+	const latestPostsQuery = httpBuildQuery( pickBy( {
 		categories,
 		order,
 		orderby: orderBy,
 		per_page: postsToShow,
 		_fields: [ 'date_gmt', 'link', 'title' ],
 	}, ( value ) => ! isUndefined( value ) ) );
-	const categoriesListQuery = stringify( {
+	const categoriesListQuery = httpBuildQuery( {
 		per_page: 100,
 		_fields: [ 'id', 'name', 'parent' ],
 	} );

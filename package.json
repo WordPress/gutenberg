@@ -51,7 +51,6 @@
 		"moment": "2.22.1",
 		"moment-timezone": "0.5.16",
 		"prop-types": "15.5.10",
-		"querystringify": "1.0.0",
 		"re-resizable": "4.7.1",
 		"react": "16.4.1",
 		"react-dom": "16.4.1",

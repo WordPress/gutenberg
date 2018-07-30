@@ -3,7 +3,7 @@
  */
 import { parse } from 'url';
 import { includes, kebabCase, toLower } from 'lodash';
-import { stringify } from 'querystring';
+import httpBuildQuery from 'http-build-query';
 import memoize from 'memize';
 import classnames from 'classnames';
 
@@ -27,7 +27,7 @@ import './editor.scss';
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
 // Caches the embed API calls, so if blocks get transformed, or deleted and added again, we don't spam the API.
-const wpEmbedAPI = memoize( ( url ) => apiFetch( { path: `/oembed/1.0/proxy?${ stringify( { url } ) }` } ) );
+const wpEmbedAPI = memoize( ( url ) => apiFetch( { path: `/oembed/1.0/proxy?${ httpBuildQuery( { url } ) }` } ) );
 
 const matchesPatterns = ( url, patterns = [] ) => {
 	return patterns.some( ( pattern ) => {

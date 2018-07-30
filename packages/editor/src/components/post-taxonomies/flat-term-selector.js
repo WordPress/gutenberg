@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { isEmpty, get, unescape as unescapeString, find, throttle, uniqBy, invoke } from 'lodash';
-import { stringify } from 'querystring';
+import httpBuildQuery from 'http-build-query';
 
 /**
  * WordPress dependencies
@@ -77,7 +77,7 @@ class FlatTermSelector extends Component {
 	fetchTerms( params = {} ) {
 		const { taxonomy } = this.props;
 		const query = { ...DEFAULT_QUERY, ...params };
-		const request = apiFetch( { path: `/wp/v2/${ taxonomy.rest_base }?${ stringify( query ) }` } );
+		const request = apiFetch( { path: `/wp/v2/${ taxonomy.rest_base }?${ httpBuildQuery( query ) }` } );
 		request.then( ( terms ) => {
 			this.setState( ( state ) => ( {
 				availableTerms: state.availableTerms.concat(

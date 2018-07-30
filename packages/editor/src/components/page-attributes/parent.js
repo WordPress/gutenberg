@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { get } from 'lodash';
-import { stringify } from 'querystringify';
+import httpBuildQuery from 'http-build-query';
 
 /**
  * WordPress dependencies
@@ -65,7 +65,7 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 const applyWithAPIDataItems = withAPIData( ( { postType, postId } ) => {
 	const isHierarchical = get( postType, [ 'hierarchical' ], false );
 	const restBase = get( postType, [ 'rest_base' ], false );
-	const queryString = stringify( {
+	const queryString = httpBuildQuery( {
 		context: 'edit',
 		per_page: -1,
 		exclude: postId,
