@@ -162,6 +162,12 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 	}
 }
 
+// Un-collapse freeform block margins.
+.editor-block-list__block[data-type="core/freeform"] > .editor-block-list__block-edit {
+	padding-top: 0.1px;
+	padding-bottom: 0.1px;
+}
+
 // Overwrite inline styles.
 .freeform-toolbar .mce-tinymce-inline,
 .freeform-toolbar .mce-tinymce-inline > div,
