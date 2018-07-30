@@ -13,6 +13,7 @@ import {
 } from '@wordpress/element';
 import {
 	getColorClass,
+	getFontSizeClass,
 	RichText,
 } from '@wordpress/editor';
 import {
@@ -242,7 +243,7 @@ export const settings = {
 
 		const textClass = getColorClass( 'color', textColor );
 		const backgroundClass = getColorClass( 'background-color', backgroundColor );
-		const fontSizeClass = fontSize && `is-${ fontSize }-text`;
+		const fontSizeClass = getFontSizeClass( fontSize );
 
 		const className = classnames( {
 			'has-background': backgroundColor || customBackgroundColor,

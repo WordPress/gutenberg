@@ -15,7 +15,6 @@ const npmReadyPackages = glob( 'packages/*/package.json' )
 const gutenbergPackages = [
 	'core-blocks',
 	'edit-post',
-	'editor',
 ];
 
 module.exports = {
@@ -33,8 +32,8 @@ module.exports = {
 		},
 		'core/editor': {
 			title: 'The Editor’s Data',
-			selectors: [ path.resolve( root, 'editor/store/selectors.js' ) ],
-			actions: [ path.resolve( root, 'editor/store/actions.js' ) ],
+			selectors: [ path.resolve( root, 'packages/editor/src/store/selectors.js' ) ],
+			actions: [ path.resolve( root, 'packages/editor/src/store/actions.js' ) ],
 		},
 		'core/edit-post': {
 			title: 'The Editor’s UI Data',

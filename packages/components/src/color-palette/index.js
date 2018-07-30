@@ -17,16 +17,17 @@ import Button from '../button';
 import Dropdown from '../dropdown';
 import Tooltip from '../tooltip';
 
-export default function ColorPalette( { colors, disableCustomColors = false, value, onChange } ) {
+export default function ColorPalette( { colors, disableCustomColors = false, value, onChange, className } ) {
 	function applyOrUnset( color ) {
 		return () => onChange( value === color ? undefined : color );
 	}
 	const customColorPickerLabel = __( 'Custom color picker' );
+	const classes = classnames( 'components-color-palette', className );
 	return (
-		<div className="components-color-palette">
+		<div className={ classes }>
 			{ map( colors, ( { color, name } ) => {
 				const style = { color: color };
-				const className = classnames( 'components-color-palette__item', { 'is-active': value === color } );
+				const itemClasses = classnames( 'components-color-palette__item', { 'is-active': value === color } );
 
 				return (
 					<div key={ color } className="components-color-palette__item-wrapper">
@@ -37,7 +38,7 @@ export default function ColorPalette( { colors, disableCustomColors = false, val
 							}>
 							<button
 								type="button"
-								className={ className }
+								className={ itemClasses }
 								style={ style }
 								onClick={ applyOrUnset( color ) }
 								aria-label={ name ?

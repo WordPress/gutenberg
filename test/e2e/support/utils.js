@@ -10,7 +10,7 @@ import { URL } from 'url';
 import { times } from 'lodash';
 
 const {
-	WP_BASE_URL = 'http://localhost:8888',
+	WP_BASE_URL = 'http://localhost:8889',
 	WP_USERNAME = 'admin',
 	WP_PASSWORD = 'password',
 } = process.env;
@@ -253,6 +253,17 @@ export async function publishPost() {
 
 	// A success notice should show up
 	return page.waitForSelector( '.notice-success' );
+}
+
+/**
+ * Given the clientId of a block, selects the block on the editor.
+ *
+ * @param {string} clientId Identified of the block.
+ */
+export async function selectBlockByClientId( clientId ) {
+	await page.evaluate( ( id ) => {
+		wp.data.dispatch( 'core/editor' ).selectBlock( id );
+	}, clientId );
 }
 
 /**

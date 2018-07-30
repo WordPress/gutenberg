@@ -22,7 +22,7 @@ import {
 	getBlockTypes,
 	getBlockSupport,
 	hasBlockSupport,
-	isSharedBlock,
+	isReusableBlock,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 	registerBlockStyle,
 } from '../registration';
@@ -585,15 +585,15 @@ describe( 'blocks', () => {
 		} );
 	} );
 
-	describe( 'isSharedBlock', () => {
-		it( 'should return true for a shared block', () => {
+	describe( 'isReusableBlock', () => {
+		it( 'should return true for a reusable block', () => {
 			const block = { name: 'core/block' };
-			expect( isSharedBlock( block ) ).toBe( true );
+			expect( isReusableBlock( block ) ).toBe( true );
 		} );
 
 		it( 'should return false for other blocks', () => {
 			const block = { name: 'core/paragraph' };
-			expect( isSharedBlock( block ) ).toBe( false );
+			expect( isReusableBlock( block ) ).toBe( false );
 		} );
 	} );
 

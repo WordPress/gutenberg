@@ -90,6 +90,53 @@ Themes are responsible for creating the classes that apply the colors in differe
 
 The class name is built appending 'has-', followed by the class name *using* kebab case and ending with the context name.
 
+### Block Font Sizes:
+
+Blocks may allow the user to configure the font sizes they use, e.g., the paragraph block. Gutenberg provides a default set of font sizes, but a theme can overwrite it and provide its own:
+
+
+```php
+add_theme_support( 'editor-font-sizes', array(
+	array(
+		'name' => __( 'small', 'themeLangDomain' ),
+		'shortName' => __( 'S', 'themeLangDomain' ),
+		'size' => 12,
+		'slug' => 'small'
+	),
+	array(
+		'name' => __( 'regular', 'themeLangDomain' ),
+		'shortName' => __( 'M', 'themeLangDomain' ),
+		'size' => 16,
+		'slug' => 'regular'
+	),
+	array(
+		'name' => __( 'large', 'themeLangDomain' ),
+		'shortName' => __( 'L', 'themeLangDomain' ),
+		'size' => 36,
+		'slug' => 'large'
+	),
+	array(
+		'name' => __( 'larger', 'themeLangDomain' ),
+		'shortName' => __( 'XL', 'themeLangDomain' ),
+		'size' => 50,
+		'slug' => 'larger'
+	)
+) );
+```
+
+The font sizes are rendered on the font size picker in the order themes provide them.
+
+Themes are responsible for creating the classes that apply the correct font size styles.
+The class name is built appending 'has-', followed by the font size name *using* kebab case and ending with `-font-size`.
+
+As an example for the regular font size, a theme may provide the following class.
+
+```css
+.has-regular-font-size {
+    font-size: 16px;
+}
+```
+
 ### Disabling custom colors in block Color Palettes
 
 By default, the color palette offered to blocks, allows the user to select a custom color different from the editor or theme default colors.

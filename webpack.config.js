@@ -77,7 +77,6 @@ function camelCaseDash( string ) {
 
 const entryPointNames = [
 	'components',
-	'editor',
 	'utils',
 	'edit-post',
 	'core-blocks',
@@ -97,6 +96,7 @@ const gutenbergPackages = [
 	'deprecated',
 	'dom',
 	'dom-ready',
+	'editor',
 	'element',
 	'hooks',
 	'html-entities',
@@ -106,7 +106,9 @@ const gutenbergPackages = [
 	'nux',
 	'plugins',
 	'shortcode',
+	'url',
 	'viewport',
+	'wordcount',
 ];
 
 const externals = {
