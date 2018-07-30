@@ -169,10 +169,9 @@ function gutenberg_register_scripts_and_styles() {
 	);
 	wp_add_inline_script(
 		'wp-api-fetch',
-		'jQuery( document ).on( 'heartbeat-tick', function ( event, response ) { wp.hooks.doAction( 'heartbeat.tick', response ); } );',
+		'jQuery( document ).on( "heartbeat-tick", function ( event, response ) { wp.hooks.doAction( "heartbeat.tick", response ) } );',
 		'after'
 	);
-
 
 	wp_register_script(
 		'wp-deprecated',
