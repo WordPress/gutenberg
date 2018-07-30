@@ -444,6 +444,16 @@ describe( 'validation', () => {
 
 			expect( isEquivalent ).toBe( true );
 		} );
+
+		it( 'should return false if supplied malformed HTML', () => {
+			const isEquivalent = isEquivalentHTML(
+				'<blockquote class="wp-block-quote">fsdfsdfsd<p>fdsfsdfsdd</pfd fd fd></blockquote>',
+				'<blockquote class="wp-block-quote">fsdfsdfsd<p>fdsfsdfsdd</p></blockquote>',
+			);
+
+			expect( console ).toHaveWarned();
+			expect( isEquivalent ).toBe( false );
+		} );
 	} );
 
 	describe( 'isValidBlock()', () => {
