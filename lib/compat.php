@@ -233,7 +233,7 @@ function gutenberg_warn_classic_about_blocks() {
 			<div class="notification-dialog-background"></div>
 			<div class="notification-dialog">
 				<div class="blocks-in-post-message">
-					<h1><?php _e( 'Heads up!' ); ?></h1>
+					<h1><?php _e( 'Heads up!', 'gutenberg' ); ?></h1>
 					<p><?php _e( 'This post was previously edited in Gutenberg. You can continue in the Classic Editor, but you may lose data and formatting.', 'gutenberg' ); ?></p>
 					<?php
 					if ( $revisions_link ) {
@@ -242,17 +242,17 @@ function gutenberg_warn_classic_about_blocks() {
 						<?php
 					} else {
 						?>
-							<p><strong><?php _e( "Because this post does not have revisions, you will not be able to revert any changes you make in the Classic Editor.", 'gutenberg' ); ?></strong></p>
+							<p><strong><?php _e( 'Because this post does not have revisions, you will not be able to revert any changes you make in the Classic Editor.', 'gutenberg' ); ?></strong></p>
 						<?php
 					}
 					?>
 					<p>
-					<a class="button button-primary blocks-in-post-gutenberg-button" title="<?php esc_attr_e( 'Open this post in the Gutenberg block editor' ); ?>" href="<?php echo esc_url( $gutenberg_edit_link ); ?>"><?php _e( 'Gutenberg', 'gutenberg' ); ?></a>
-					<a class="button" title="<?php esc_attr_e( 'Open this post in the classic editor' ); ?>" href="<?php echo esc_url( $classic_edit_link ); ?>"><?php _e( 'Classic Editor', 'gutenberg' ); ?></a>
+					<a class="button button-primary blocks-in-post-gutenberg-button" title="<?php esc_attr_e( 'Open this post in the Gutenberg block editor', 'gutenberg' ); ?>" href="<?php echo esc_url( $gutenberg_edit_link ); ?>"><?php _e( 'Gutenberg', 'gutenberg' ); ?></a>
+					<a class="button" title="<?php esc_attr_e( 'Open this post in the classic editor', 'gutenberg' ); ?>" href="<?php echo esc_url( $classic_edit_link ); ?>"><?php _e( 'Classic Editor', 'gutenberg' ); ?></a>
 						<?php
 						if ( $revisions_link ) {
 							?>
-								<a class="button" title="<?php esc_attr_e( 'Open the revisions browser' ); ?>" href="<?php echo esc_url( $revisions_link ); ?>"><?php _e( 'Revisions', 'gutenberg' ); ?></a>
+								<a class="button" title="<?php esc_attr_e( 'Open the revisions browser', 'gutenberg' ); ?>" href="<?php echo esc_url( $revisions_link ); ?>"><?php _e( 'Revisions', 'gutenberg' ); ?></a>
 							<?php
 						}
 						?>
