@@ -148,12 +148,13 @@ function gutenberg_wpautop( $content ) {
 remove_filter( 'the_content', 'wpautop' );
 add_filter( 'the_content', 'gutenberg_wpautop', 8 );
 
+
 /**
- * Adds a warning to the Classic Editor when trying to edit a post containing blocks.
+ * Check if we need to load the block warning in the Classic Editor.
  *
  * @since 3.4.0
  */
-function gutenberg_warn_classic_about_blocks() {
+function gutenberg_check_if_classic_needs_warning_about_blocks() {
 	global $pagenow;
 
 	if ( ! in_array( $pagenow, array( 'post.php', 'post-new.php' ), true ) || ! isset( $_REQUEST['classic-editor'] ) ) {
@@ -173,7 +174,19 @@ function gutenberg_warn_classic_about_blocks() {
 		return;
 	}
 
-	wp_enqueue_script( 'wp-santize' );
+	wp_enqueue_script( 'wp-sanitize' );
+
+	add_action( 'admin_footer', 'gutenberg_warn_classic_about_blocks' );
+}
+add_action( 'admin_enqueue_scripts', 'gutenberg_check_if_classic_needs_warning_about_blocks' );
+
+/**
+ * Adds a warning to the Classic Editor when trying to edit a post containing blocks.
+ *
+ * @since 3.4.0
+ */
+function gutenberg_warn_classic_about_blocks() {
+	$post = get_post();
 
 	$gutenberg_edit_link = get_edit_post_link( $post->ID, 'raw' );
 
@@ -309,4 +322,3 @@ function gutenberg_warn_classic_about_blocks() {
 		</script>
 	<?php
 }
-add_action( 'admin_footer', 'gutenberg_warn_classic_about_blocks' );
