@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isFinite, find, omit } from 'lodash';
+import { isFinite, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,20 +14,22 @@ import {
 	RawHTML,
 } from '@wordpress/element';
 import {
-	FontSizePicker,
 	PanelBody,
 	ToggleControl,
 	withFallbackStyles,
 } from '@wordpress/components';
 import {
 	getColorClass,
+	getFontSizeClass,
 	withColors,
 	AlignmentToolbar,
 	BlockControls,
 	ContrastChecker,
+	FontSizePicker,
 	InspectorControls,
-	PanelColor,
+	PanelColorSettings,
 	RichText,
+	withFontSizes,
 } from '@wordpress/editor';
 import {
 	createBlock,
@@ -55,37 +57,12 @@ const FallbackStyles = withFallbackStyles( ( node, ownProps ) => {
 	};
 } );
 
-const FONT_SIZES = [
-	{
-		name: 'small',
-		shortName: 'S',
-		size: 14,
-	},
-	{
-		name: 'regular',
-		shortName: 'M',
-		size: 16,
-	},
-	{
-		name: 'large',
-		shortName: 'L',
-		size: 36,
-	},
-	{
-		name: 'larger',
-		shortName: 'XL',
-		size: 48,
-	},
-];
-
 class ParagraphBlock extends Component {
 	constructor() {
 		super( ...arguments );
 
 		this.onReplace = this.onReplace.bind( this );
 		this.toggleDropCap = this.toggleDropCap.bind( this );
-		this.getFontSize = this.getFontSize.bind( this );
-		this.setFontSize = this.setFontSize.bind( this );
 		this.splitBlock = this.splitBlock.bind( this );
 	}
 
@@ -110,36 +87,6 @@ class ParagraphBlock extends Component {
 
 	getDropCapHelp( checked ) {
 		return checked ? __( 'Showing large initial letter.' ) : __( 'Toggle to show a large initial letter.' );
-	}
-
-	getFontSize() {
-		const { customFontSize, fontSize } = this.props.attributes;
-		if ( fontSize ) {
-			const fontSizeObj = find( FONT_SIZES, { name: fontSize } );
-			if ( fontSizeObj ) {
-				return fontSizeObj.size;
-			}
-		}
-
-		if ( customFontSize ) {
-			return customFontSize;
-		}
-	}
-
-	setFontSize( fontSizeValue ) {
-		const { setAttributes } = this.props;
-		const thresholdFontSize = find( FONT_SIZES, { size: fontSizeValue } );
-		if ( thresholdFontSize ) {
-			setAttributes( {
-				fontSize: thresholdFontSize.name,
-				customFontSize: undefined,
-			} );
-			return;
-		}
-		setAttributes( {
-			fontSize: undefined,
-			customFontSize: fontSizeValue,
-		} );
 	}
 
 	/**
@@ -199,6 +146,8 @@ class ParagraphBlock extends Component {
 			fallbackBackgroundColor,
 			fallbackTextColor,
 			fallbackFontSize,
+			fontSize,
+			setFontSize,
 		} = this.props;
 
 		const {
@@ -207,8 +156,6 @@ class ParagraphBlock extends Component {
 			dropCap,
 			placeholder,
 		} = attributes;
-
-		const fontSize = this.getFontSize();
 
 		return (
 			<Fragment>
@@ -223,10 +170,9 @@ class ParagraphBlock extends Component {
 				<InspectorControls>
 					<PanelBody title={ __( 'Text Settings' ) } className="blocks-font-size">
 						<FontSizePicker
-							fontSizes={ FONT_SIZES }
 							fallbackFontSize={ fallbackFontSize }
-							value={ fontSize }
-							onChange={ this.setFontSize }
+							value={ fontSize.size }
+							onChange={ setFontSize }
 						/>
 						<ToggleControl
 							label={ __( 'Drop Cap' ) }
@@ -235,27 +181,32 @@ class ParagraphBlock extends Component {
 							help={ this.getDropCapHelp }
 						/>
 					</PanelBody>
-					<PanelColor
-						colorValue={ backgroundColor.value }
+					<PanelColorSettings
+						title={ __( 'Color Settings' ) }
 						initialOpen={ false }
-						title={ __( 'Background Color' ) }
-						onChange={ setBackgroundColor }
-					/>
-					<PanelColor
-						colorValue={ textColor.value }
-						initialOpen={ false }
-						title={ __( 'Text Color' ) }
-						onChange={ setTextColor }
-					/>
-					<ContrastChecker
-						textColor={ textColor.value }
-						backgroundColor={ backgroundColor.value }
-						{ ...{
-							fontSize,
-							fallbackBackgroundColor,
-							fallbackTextColor,
-						} }
-					/>
+						colorSettings={ [
+							{
+								value: backgroundColor.value,
+								onChange: setBackgroundColor,
+								label: __( 'Background Color' ),
+							},
+							{
+								value: textColor.value,
+								onChange: setTextColor,
+								label: __( 'Text Color' ),
+							},
+						] }
+					>
+						<ContrastChecker
+							{ ...{
+								textColor: textColor.value,
+								backgroundColor: backgroundColor.value,
+								fallbackTextColor,
+								fallbackBackgroundColor,
+							} }
+							fontSize={ fontSize.size }
+						/>
+					</PanelColorSettings>
 				</InspectorControls>
 				<RichText
 					tagName="p"
@@ -264,11 +215,12 @@ class ParagraphBlock extends Component {
 						'has-drop-cap': dropCap,
 						[ backgroundColor.class ]: backgroundColor.class,
 						[ textColor.class ]: textColor.class,
+						[ fontSize.class ]: fontSize.class,
 					} ) }
 					style={ {
 						backgroundColor: backgroundColor.value,
 						color: textColor.value,
-						fontSize: fontSize ? fontSize + 'px' : undefined,
+						fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
 						textAlign: align,
 					} }
 					value={ content }
@@ -489,6 +441,7 @@ export const settings = {
 
 	edit: compose( [
 		withColors( 'backgroundColor', { textColor: 'color' } ),
+		withFontSizes( 'fontSize' ),
 		FallbackStyles,
 	] )( ParagraphBlock ),
 
@@ -507,7 +460,7 @@ export const settings = {
 
 		const textClass = getColorClass( 'color', textColor );
 		const backgroundClass = getColorClass( 'background-color', backgroundColor );
-		const fontSizeClass = fontSize && `is-${ fontSize }-text`;
+		const fontSizeClass = getFontSizeClass( fontSize );
 
 		const className = classnames( {
 			'has-background': backgroundColor || customBackgroundColor,

@@ -12,7 +12,7 @@ import { withInstanceId } from '@wordpress/compose';
  */
 import './style.scss';
 
-class SharedBlockEditPanel extends Component {
+class ReusableBlockEditPanel extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -63,14 +63,14 @@ class SharedBlockEditPanel extends Component {
 		return (
 			<Fragment>
 				{ ( ! isEditing && ! isSaving ) && (
-					<div className="shared-block-edit-panel">
-						<b className="shared-block-edit-panel__info">
+					<div className="reusable-block-edit-panel">
+						<b className="reusable-block-edit-panel__info">
 							{ title }
 						</b>
 						<Button
 							ref={ this.editButton }
 							isLarge
-							className="shared-block-edit-panel__button"
+							className="reusable-block-edit-panel__button"
 							onClick={ onEdit }
 						>
 							{ __( 'Edit' ) }
@@ -78,10 +78,10 @@ class SharedBlockEditPanel extends Component {
 					</div>
 				) }
 				{ ( isEditing || isSaving ) && (
-					<form className="shared-block-edit-panel" onSubmit={ this.handleFormSubmit }>
+					<form className="reusable-block-edit-panel" onSubmit={ this.handleFormSubmit }>
 						<label
-							htmlFor={ `shared-block-edit-panel__title-${ instanceId }` }
-							className="shared-block-edit-panel__label"
+							htmlFor={ `reusable-block-edit-panel__title-${ instanceId }` }
+							className="reusable-block-edit-panel__label"
 						>
 							{ __( 'Name:' ) }
 						</label>
@@ -89,11 +89,11 @@ class SharedBlockEditPanel extends Component {
 							ref={ this.titleField }
 							type="text"
 							disabled={ isSaving }
-							className="shared-block-edit-panel__title"
+							className="reusable-block-edit-panel__title"
 							value={ title }
 							onChange={ this.handleTitleChange }
 							onKeyDown={ this.handleTitleKeyDown }
-							id={ `shared-block-edit-panel__title-${ instanceId }` }
+							id={ `reusable-block-edit-panel__title-${ instanceId }` }
 						/>
 						<Button
 							type="submit"
@@ -101,14 +101,14 @@ class SharedBlockEditPanel extends Component {
 							isLarge
 							isBusy={ isSaving }
 							disabled={ ! title || isSaving }
-							className="shared-block-edit-panel__button"
+							className="reusable-block-edit-panel__button"
 						>
 							{ __( 'Save' ) }
 						</Button>
 						<Button
 							isLarge
 							disabled={ isSaving }
-							className="shared-block-edit-panel__button"
+							className="reusable-block-edit-panel__button"
 							onClick={ onCancel }
 						>
 							{ __( 'Cancel' ) }
@@ -120,4 +120,4 @@ class SharedBlockEditPanel extends Component {
 	}
 }
 
-export default withInstanceId( SharedBlockEditPanel );
+export default withInstanceId( ReusableBlockEditPanel );

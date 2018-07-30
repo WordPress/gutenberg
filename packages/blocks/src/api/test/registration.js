@@ -22,8 +22,9 @@ import {
 	getBlockTypes,
 	getBlockSupport,
 	hasBlockSupport,
-	isSharedBlock,
+	isReusableBlock,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
+	registerBlockStyle,
 } from '../registration';
 
 describe( 'blocks', () => {
@@ -584,15 +585,46 @@ describe( 'blocks', () => {
 		} );
 	} );
 
-	describe( 'isSharedBlock', () => {
-		it( 'should return true for a shared block', () => {
+	describe( 'isReusableBlock', () => {
+		it( 'should return true for a reusable block', () => {
 			const block = { name: 'core/block' };
-			expect( isSharedBlock( block ) ).toBe( true );
+			expect( isReusableBlock( block ) ).toBe( true );
 		} );
 
 		it( 'should return false for other blocks', () => {
 			const block = { name: 'core/paragraph' };
-			expect( isSharedBlock( block ) ).toBe( false );
+			expect( isReusableBlock( block ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'registerBlockStyle', () => {
+		afterEach( () => {
+			removeFilter( 'blocks.registerBlockType', 'my-plugin/block-without-styles/big' );
+			removeFilter( 'blocks.registerBlockType', 'my-plugin/block-without-styles/small' );
+		} );
+
+		it( 'should add styles', () => {
+			registerBlockStyle( 'my-plugin/block-without-styles', { name: 'big', label: 'Big style' } );
+			const settings = registerBlockType( 'my-plugin/block-without-styles', defaultBlockSettings );
+
+			expect( settings.styles ).toEqual( [
+				{ name: 'big', label: 'Big style' },
+			] );
+		} );
+
+		it( 'should accumulate styles', () => {
+			registerBlockStyle( 'my-plugin/block-without-styles', { name: 'small', label: 'Small style' } );
+			registerBlockStyle( 'my-plugin/block-without-styles', { name: 'big', label: 'Big style' } );
+			const settings = registerBlockType( 'my-plugin/block-without-styles', {
+				...defaultBlockSettings,
+				styles: [ { name: 'normal', label: 'Normal style' } ],
+			} );
+
+			expect( settings.styles ).toEqual( [
+				{ name: 'normal', label: 'Normal style' },
+				{ name: 'small', label: 'Small style' },
+				{ name: 'big', label: 'Big style' },
+			] );
 		} );
 	} );
 } );

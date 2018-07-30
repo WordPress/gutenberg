@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { removep, autop } from '@wordpress/autop';
 import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Dashicon } from '@wordpress/components';
@@ -46,7 +47,7 @@ export const settings = {
 					text: {
 						type: 'string',
 						shortcode: ( attrs, { content } ) => {
-							return content;
+							return removep( autop( content ) );
 						},
 					},
 				},
