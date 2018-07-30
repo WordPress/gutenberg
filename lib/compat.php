@@ -233,12 +233,11 @@ function gutenberg_warn_classic_about_blocks() {
 			<div class="notification-dialog-background"></div>
 			<div class="notification-dialog">
 				<div class="blocks-in-post-message">
-					<h1><?php _e( 'Heads up!', 'gutenberg' ); ?></h1>
 					<p><?php _e( 'This post was previously edited in Gutenberg. You can continue in the Classic Editor, but you may lose data and formatting.', 'gutenberg' ); ?></p>
 					<?php
 					if ( $revisions_link ) {
 						?>
-							<p><?php _e( 'You can also browse your previous revisions and restore a version of the page before it was edited in Gutenberg.', 'gutenberg' ); ?></p>
+							<p><?php printf( __( 'You can also <a href="%s">browse previous revisions</a> and restore a version of the page before it was edited in Gutenberg.', 'gutenberg' ), esc_url( $revisions_link ) ); ?></p>
 						<?php
 					} else {
 						?>
@@ -247,15 +246,8 @@ function gutenberg_warn_classic_about_blocks() {
 					}
 					?>
 					<p>
-					<a class="button button-primary blocks-in-post-gutenberg-button" title="<?php esc_attr_e( 'Open this post in the Gutenberg block editor', 'gutenberg' ); ?>" href="<?php echo esc_url( $gutenberg_edit_link ); ?>"><?php _e( 'Gutenberg', 'gutenberg' ); ?></a>
-					<a class="button" title="<?php esc_attr_e( 'Open this post in the classic editor', 'gutenberg' ); ?>" href="<?php echo esc_url( $classic_edit_link ); ?>"><?php _e( 'Classic Editor', 'gutenberg' ); ?></a>
-						<?php
-						if ( $revisions_link ) {
-							?>
-								<a class="button" title="<?php esc_attr_e( 'Open the revisions browser', 'gutenberg' ); ?>" href="<?php echo esc_url( $revisions_link ); ?>"><?php _e( 'Revisions', 'gutenberg' ); ?></a>
-							<?php
-						}
-						?>
+						<a class="button button-primary blocks-in-post-gutenberg-button" title="<?php esc_attr_e( 'Open this post in the Gutenberg block editor', 'gutenberg' ); ?>" href="<?php echo esc_url( $gutenberg_edit_link ); ?>"><?php _e( 'Edit in Gutenberg', 'gutenberg' ); ?></a>
+						<a class="button" title="<?php esc_attr_e( 'Open this post in the classic editor', 'gutenberg' ); ?>" href="<?php echo esc_url( $classic_edit_link ); ?>"><?php _e( 'Edit in Classic Editor', 'gutenberg' ); ?></a>
 					</p>
 				</div>
 			</div>
