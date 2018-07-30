@@ -25,14 +25,14 @@ we can render custom markup or use the Original component as shown below.
 ```js
 const { addFilter } = wp.hooks;
 
-function CustomFlatTermSelector(OriginalFlatTermSelector) {
-	return (props) => {
+function CustomFlatTermSelector( OriginalFlatTermSelector ) {
+	return ( props ) => {
 		if ( props.slug === 'product-type' ) {
 			return (
 				<div>Custom Flat Term Selector</div>
 			);
 		} else {
-			return <OriginalFlatTermSelector {...props} />
+			return <OriginalFlatTermSelector { ...props } />
 		}
 	}
 };
@@ -54,14 +54,14 @@ we can render custom markup or use the Original component as shown below.
 ```js
 const { addFilter } = wp.hooks;
 
-function CustomHierarchicalTermSelector(OriginalHierarchicalTermSelector) {
-	return (props) => {
+function CustomHierarchicalTermSelector( OriginalHierarchicalTermSelector ) {
+	return ( props ) => {
 		if ( props.slug === 'product-category' ) {
 			return (
 				<div>Custom HierarchicalTermSelector Term Selector</div>
 			);
 		} else {
-			return <OriginalHierarchicalTermSelector {...props} />
+			return <OriginalHierarchicalTermSelector { ...props } />
 		}
 	}
 };
