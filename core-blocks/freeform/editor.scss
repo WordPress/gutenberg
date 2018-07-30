@@ -1,8 +1,4 @@
 .wp-block-freeform.core-blocks-rich-text__tinymce {
-	overflow: hidden;
-	margin: -4px;
-	padding: 4px;
-
 	p,
 	li {
 		line-height: $editor-line-height;
@@ -140,11 +136,10 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 
 .freeform-toolbar {
 	width: auto;
-	margin: #{ -$block-padding } #{ -$parent-block-padding };
-	margin-bottom: $block-padding;
-	position: sticky;
+	margin: 0 #{ -$parent-block-padding };
+	position: relative;
 	z-index: z-index( '.freeform-toolbar' );
-	top: 0;
+	top: #{ -1 * $block-padding };
 }
 
 .freeform-toolbar:empty {
@@ -160,12 +155,6 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 		line-height: 37px;
 		padding: $block-padding;
 	}
-}
-
-// Un-collapse freeform block margins.
-.editor-block-list__block[data-type="core/freeform"] > .editor-block-list__block-edit {
-	padding-top: 0.1px;
-	padding-bottom: 0.1px;
 }
 
 // Overwrite inline styles.
