@@ -237,7 +237,12 @@ function gutenberg_warn_classic_about_blocks() {
 					<?php
 					if ( $revisions_link ) {
 						?>
-							<p><?php printf( __( 'You can also <a href="%s">browse previous revisions</a> and restore a version of the page before it was edited in Gutenberg.', 'gutenberg' ), esc_url( $revisions_link ) ); ?></p>
+							<p>
+							<?php
+								/* translators: link to the post revisions page */
+								printf( __( 'You can also <a href="%s">browse previous revisions</a> and restore a version of the page before it was edited in Gutenberg.', 'gutenberg' ), esc_url( $revisions_link ) );
+							?>
+							</p>
 						<?php
 					} else {
 						?>
