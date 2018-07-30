@@ -245,7 +245,7 @@ class Popover extends Component {
 			'is-' + xAxis,
 			{
 				'is-mobile': isMobile,
-				'no-arrow': noArrow || ( xAxis === 'center' && yAxis === 'middle' ),
+				'is-without-arrow': noArrow || ( xAxis === 'center' && yAxis === 'middle' ),
 			}
 		);
 
