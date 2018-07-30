@@ -27,7 +27,6 @@ const initialState = {
 	isExpanded: false,
 	selectedSuggestionIndex: -1,
 	selectedSuggestionScroll: false,
-	showSuggestions: false,
 };
 
 class FormTokenField extends Component {
@@ -207,7 +206,6 @@ class FormTokenField extends Component {
 			selectedSuggestionIndex: -1,
 			selectedSuggestionScroll: false,
 			isExpanded: false,
-			showSuggestions: false,
 		} );
 
 		this.props.onInputChange( tokenValue );
@@ -215,7 +213,6 @@ class FormTokenField extends Component {
 		if ( inputHasMinimumChars ) {
 			this.setState( {
 				isExpanded: hasVisibleSuggestions,
-				showSuggestions: hasVisibleSuggestions,
 			} );
 
 			if ( !! matchingSuggestions.length ) {
@@ -300,7 +297,6 @@ class FormTokenField extends Component {
 			isExpanded: false,
 			selectedSuggestionIndex: -1,
 			selectedSuggestionScroll: false,
-			showSuggestions: false,
 		} );
 		return true; // preventDefault
 	}
@@ -391,7 +387,6 @@ class FormTokenField extends Component {
 			selectedSuggestionIndex: -1,
 			selectedSuggestionScroll: false,
 			isExpanded: false,
-			showSuggestions: false,
 		} );
 
 		if ( this.state.isActive ) {
@@ -540,7 +535,7 @@ class FormTokenField extends Component {
 			instanceId,
 			className,
 		} = this.props;
-		const { showSuggestions } = this.state;
+		const { isExpanded } = this.state;
 		const classes = classnames( className, 'components-form-token-field', {
 			'is-active': this.state.isActive,
 			'is-disabled': disabled,
@@ -578,7 +573,7 @@ class FormTokenField extends Component {
 					{ this.renderTokensAndInput() }
 				</div>
 
-				{ showSuggestions && (
+				{ isExpanded && (
 					<SuggestionsList
 						instanceId={ instanceId }
 						match={ this.props.saveTransform( this.state.incompleteTokenValue ) }

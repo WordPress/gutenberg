@@ -26,7 +26,7 @@ class TokenFieldWrapper extends Component {
 		this.state = {
 			tokenSuggestions: suggestions,
 			tokens: Object.freeze( [ 'foo', 'bar' ] ),
-			showSuggestions: false,
+			isExpanded: false,
 		};
 		this.onTokensChange = this.onTokensChange.bind( this );
 	}
@@ -34,7 +34,7 @@ class TokenFieldWrapper extends Component {
 	render() {
 		return (
 			<TokenField
-				suggestions={ this.state.showSuggestions ? this.state.tokenSuggestions : null }
+				suggestions={ this.state.isExpanded ? this.state.tokenSuggestions : null }
 				value={ this.state.tokens }
 				displayTransform={ unescapeAndFormatSpaces }
 				onChange={ this.onTokensChange }

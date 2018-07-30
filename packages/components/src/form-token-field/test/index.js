@@ -119,7 +119,7 @@ describe( 'FormTokenField', function() {
 	describe( 'displaying tokens', function() {
 		it( 'should render default tokens', function() {
 			wrapper.setState( {
-				showSuggestions: true,
+				isExpanded: true,
 			} );
 			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar' ] );
 		} );
@@ -127,7 +127,7 @@ describe( 'FormTokenField', function() {
 		it( 'should display tokens with escaped special characters properly', function() {
 			wrapper.setState( {
 				tokens: fixtures.specialTokens.textEscaped,
-				showSuggestions: true,
+				isExpanded: true,
 			} );
 			expect( getTokensHTML() ).toEqual( fixtures.specialTokens.htmlEscaped );
 		} );
@@ -141,7 +141,7 @@ describe( 'FormTokenField', function() {
 			// through unescaped to the HTML.
 			wrapper.setState( {
 				tokens: fixtures.specialTokens.textUnescaped,
-				showSuggestions: true,
+				isExpanded: true,
 			} );
 			expect( getTokensHTML() ).toEqual( fixtures.specialTokens.htmlUnescaped );
 		} );
@@ -150,7 +150,7 @@ describe( 'FormTokenField', function() {
 	describe( 'suggestions', function() {
 		it( 'should not render suggestions unless we type at least two characters', function() {
 			wrapper.setState( {
-				showSuggestions: true,
+				isExpanded: true,
 			} );
 			expect( getSuggestionsText() ).toEqual( [] );
 			setText( 'th' );
@@ -166,7 +166,7 @@ describe( 'FormTokenField', function() {
 
 		it( 'suggestions that begin with match are boosted', function() {
 			wrapper.setState( {
-				showSuggestions: true,
+				isExpanded: true,
 			} );
 			setText( 'so' );
 			expect( getSuggestionsText() ).toEqual( fixtures.matchingSuggestions.so );
@@ -175,7 +175,7 @@ describe( 'FormTokenField', function() {
 		it( 'should match against the unescaped values of suggestions with special characters', function() {
 			wrapper.setState( {
 				tokenSuggestions: fixtures.specialSuggestions.textUnescaped,
-				showSuggestions: true,
+				isExpanded: true,
 			} );
 			setText( '& S' );
 			expect( getSuggestionsText() ).toEqual( fixtures.specialSuggestions.matchAmpersandUnescaped );
@@ -184,7 +184,7 @@ describe( 'FormTokenField', function() {
 		it( 'should match against the unescaped values of suggestions with special characters (including spaces)', function() {
 			wrapper.setState( {
 				tokenSuggestions: fixtures.specialSuggestions.textUnescaped,
-				showSuggestions: true,
+				isExpanded: true,
 			} );
 			setText( 's &' );
 			expect( getSuggestionsText() ).toEqual( fixtures.specialSuggestions.matchAmpersandSequence );
@@ -194,14 +194,14 @@ describe( 'FormTokenField', function() {
 			setText( 'amp' );
 			wrapper.setState( {
 				tokenSuggestions: fixtures.specialSuggestions.textUnescaped,
-				showSuggestions: true,
+				isExpanded: true,
 			} );
 			expect( getSuggestionsText() ).toEqual( fixtures.specialSuggestions.matchAmpersandEscaped );
 		} );
 
 		it( 'should match suggestions even with trailing spaces', function() {
 			wrapper.setState( {
-				showSuggestions: true,
+				isExpanded: true,
 			} );
 			setText( '  at  ' );
 			expect( getSuggestionsText() ).toEqual( fixtures.matchingSuggestions.at );
@@ -209,7 +209,7 @@ describe( 'FormTokenField', function() {
 
 		it( 'should manage the selected suggestion based on both keyboard and mouse events', function() {
 			wrapper.setState( {
-				showSuggestions: true,
+				isExpanded: true,
 			} );
 			setText( 'th' );
 			expect( getSuggestionsText() ).toEqual( fixtures.matchingSuggestions.th );
