@@ -40,8 +40,8 @@ class EditorModeKeyboardShortcuts extends Component {
 			<KeyboardShortcuts
 				bindGlobal
 				shortcuts={ {
-					[ shortcuts.toggleEditorMode.value ]: this.toggleMode,
-					[ shortcuts.toggleSidebar.value ]: this.toggleSidebar,
+					[ shortcuts.toggleEditorMode.raw ]: this.toggleMode,
+					[ shortcuts.toggleSidebar.raw ]: this.toggleSidebar,
 				} }
 			/>
 		);
