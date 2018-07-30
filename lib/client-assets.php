@@ -1209,11 +1209,6 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$color_palette           = current( (array) get_theme_support( 'editor-color-palette' ) );
 	$font_sizes              = current( (array) get_theme_support( 'editor-font-sizes' ) );
 
-	// Backcompat for Color Palette set through `gutenberg` array.
-	if ( empty( $color_palette ) && ! empty( $gutenberg_theme_support[0]['colors'] ) ) {
-		$color_palette = $gutenberg_theme_support[0]['colors'];
-	}
-
 	/**
 	 * Filters the allowed block types for the editor, defaulting to true (all
 	 * block types supported).
@@ -1261,7 +1256,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	}
 
 	if ( false !== $color_palette ) {
-		$editor_settings['colors'] = editor_color_palette_slugs( $color_palette );
+		$editor_settings['colors'] = $color_palette;
 	}
 
 	if ( ! empty( $font_sizes ) ) {
@@ -1313,35 +1308,4 @@ JS;
 	 * @since 0.4.0
 	 */
 	do_action( 'enqueue_block_editor_assets' );
-}
-
-/**
- * This helper function ensures, that every item in $color_palette has a slug.
- *
- * @access public
- * @param array $color_palette The color palette registered with theme_support.
- * @return array $new_color_palette The color palette with slugs added where needed
- */
-function editor_color_palette_slugs( $color_palette ) {
-	$new_color_palette = array();
-	$is_doing_it_wrong = false;
-
-	foreach ( $color_palette as $color ) {
-		if ( ! isset( $color['slug'] ) ) {
-			$color['slug']     = esc_js( $color['name'] );
-			$is_doing_it_wrong = true;
-		}
-
-		$new_color_palette[] = $color;
-	}
-
-	if ( $is_doing_it_wrong ) {
-		_doing_it_wrong(
-			'add_theme_support()',
-			__( 'Each color in the "editor-color-palette" should have a slug defined.', 'gutenberg' ),
-			'3.2.0'
-		);
-	}
-
-	return $new_color_palette;
 }
