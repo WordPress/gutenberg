@@ -99,6 +99,12 @@ export async function newPost( { postType, viewport = 'large', enableTips = fals
 		} );
 		await page.reload();
 	}
+	if ( enableTips ) {
+		await page.evaluate( () => {
+			wp.data.dispatch( 'core/nux' ).enableTips();
+		} );
+		await page.reload();
+	}
 }
 
 export async function setViewport( type ) {

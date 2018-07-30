@@ -2,12 +2,11 @@
  * Internal dependencies
  */
 import {
-	clearLocalStorage,
 	clickOnMoreMenuItem,
 	newPost,
 } from '../support/utils';
 
-describe.skip( 'New User Experience (NUX)', () => {
+describe( 'New User Experience (NUX)', () => {
 	async function clickAllTips( page ) {
 		// Click through all available tips.
 		const tips = await getTips( page );
@@ -33,8 +32,6 @@ describe.skip( 'New User Experience (NUX)', () => {
 	}
 
 	beforeEach( async () => {
-		// Clear localStorage tips so they aren't used for the next test.
-		await clearLocalStorage();
 		await newPost( { enableTips: true } );
 	} );
 
