@@ -269,7 +269,8 @@ function gutenberg_can_edit_post( $post ) {
 		return false;
 	}
 
-	if ( $post->ID == get_option( 'page_for_posts' ) && empty( $post->post_content ) ) {
+	// Disable the editor if on the blog page and there is no content.
+	if ( absint( get_option( 'page_for_posts' ) ) === $post->ID && empty( $post->post_content ) ) {
 		return false;
 	}
 
