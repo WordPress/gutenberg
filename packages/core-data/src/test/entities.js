@@ -9,7 +9,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { getMethodName, defaultEntities, getKindEntities } from '../entities';
 import { addEntities } from '../actions';
 
-jest.mock( '@wordpress/api-fetch' );
+jest.mock( '@wordpress/api-fetch', () => jest.fn() );
 
 describe( 'getMethodName', () => {
 	it( 'should return the right method name for an entity with the root kind', () => {
