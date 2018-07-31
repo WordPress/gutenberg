@@ -208,3 +208,55 @@ function do_blocks( $content ) {
 	return $rendered_content;
 }
 add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode().
+
+/**
+ * Determine whether a post has a specific block. This test optimizes for
+ * performance rather than strict accuracy, detecting the pattern of a block type
+ * but not validating its structure. For strict accuracy, you should use the
+ * block parser on post content.
+ *
+ * @see gutenberg_parse_blocks()
+ *
+ * @since 3.4
+ *
+ * @param object $post Post.
+ * @param string $block_name Full Block name to look for.
+ * @return bool Whether the content contain the specified block.
+ */
+function gutenberg_post_has_block( $block_name, $post = null ) {
+
+	if ( $post === null ) {
+		global $post;
+	} else {
+		$post = get_post( $post );
+	}
+
+	return $post && gutenberg_content_has_block( $block_name, $post->post_content );
+}
+
+/**
+ * Determine whether a content string contains a specific block. This test
+ * optimizes for performance rather than strict accuracy, detecting the
+ * block type but not validating its structure. For strict accuracy,
+ * you should use the block parser on post content.
+ *
+ * @since 3.4
+ * @see gutenberg_parse_blocks()
+ *
+ * @param string $block_name Full Block name to look for.
+ * @param string $content Content to test. Fallback on the $post global's content in case it's missing.
+ * @return bool Whether the content contain the specified block.
+ */
+function gutenberg_content_has_block( $block_name, $content = null ) {
+	global $post;
+
+	if ( $content === null && isset( $post->post_content ) ) {
+		$content = $post->post_content;
+	}
+
+	if ( ! gutenberg_content_has_blocks( $content ) ) {
+		return false;
+	}
+
+	return false !== strpos( $content, '<!-- wp:' . $block_name . ' ' );
+}
