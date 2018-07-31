@@ -210,6 +210,204 @@
 		"parent": "outreach"
 	},
 	{
+		"title": "Components",
+		"slug": "components",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components.md",
+		"parent": null
+	},
+	{
+		"title": "Autocomplete",
+		"slug": "autocomplete",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/autocomplete/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "BaseControl",
+		"slug": "base-control",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/base-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Button",
+		"slug": "button",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/button/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "CheckboxControl",
+		"slug": "checkbox-control",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/checkbox-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "DateTime",
+		"slug": "date-time",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/date-time/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Disabled",
+		"slug": "disabled",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/disabled/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Draggable",
+		"slug": "draggable",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/draggable/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "DropZone",
+		"slug": "drop-zone",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/drop-zone/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "DropdownMenu",
+		"slug": "dropdown-menu",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/dropdown-menu/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Dropdown",
+		"slug": "dropdown",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/dropdown/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "FocusableIframe",
+		"slug": "focusable-iframe",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/focusable-iframe/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "FontSizePicker",
+		"slug": "font-size-picker",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/font-size-picker/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "FormTokenField",
+		"slug": "form-token-field",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/form-token-field/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "HigherOrder",
+		"slug": "higher-order",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/higher-order/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "KeyboardShortcuts",
+		"slug": "keyboard-shortcuts",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/keyboard-shortcuts/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Modal",
+		"slug": "modal",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/modal/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "NavigableContainer",
+		"slug": "navigable-container",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/navigable-container/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Notice",
+		"slug": "notice",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/notice/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Popover",
+		"slug": "popover",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/popover/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "RadioControl",
+		"slug": "radio-control",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/radio-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "RangeControl",
+		"slug": "range-control",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/range-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Sandbox",
+		"slug": "sandbox",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/sandbox/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ScrollLock",
+		"slug": "scroll-lock",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/scroll-lock/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "SelectControl",
+		"slug": "select-control",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/select-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ServerSideRender",
+		"slug": "server-side-render",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/server-side-render/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "SlotFill",
+		"slug": "slot-fill",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/slot-fill/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "TabPanel",
+		"slug": "tab-panel",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/tab-panel/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "TextControl",
+		"slug": "text-control",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/text-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "TextareaControl",
+		"slug": "textarea-control",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/textarea-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToggleControl",
+		"slug": "toggle-control",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/toggle-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Tooltip",
+		"slug": "tooltip",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/tooltip/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "TreeSelect",
+		"slug": "tree-select",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/tree-select/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Packages",
 		"slug": "packages",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/packages.md",
