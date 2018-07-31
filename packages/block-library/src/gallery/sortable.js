@@ -11,6 +11,9 @@ class Sortable extends Component {
 
 		this.onSortStart = this.onSortStart.bind( this );
 		this.onSortEnd = this.onSortEnd.bind( this );
+		this.state = {
+			justSorted: false,
+		};
 	}
 
 	/**
@@ -48,6 +51,21 @@ class Sortable extends Component {
 				</ul>
 			);
 		} );
+	}
+
+	shouldComponentUpdate( nextProps ) {
+		const should = nextProps.items.every( ( item, index ) => {
+			return this.props.items[ index ] === item;
+		} );
+		const justSorted = this.state.justSorted;
+		if ( justSorted ) {
+			this.setState( {
+				justSorted: false,
+			} );
+		}
+		const lengthChanged = nextProps.items.length !== this.props.items.length;
+
+		return should || justSorted || lengthChanged;
 	}
 
 	render() {
@@ -91,6 +109,9 @@ class Sortable extends Component {
 	onSortEnd( { oldIndex, newIndex } ) {
 		//create a new items array:
 		const _items = arrayMove( this.props.items, oldIndex, newIndex );
+		this.setState( {
+			justSorted: true,
+		} );
 
 		//and run the corresponding function in the upper-lever component:
 		if ( typeof ( this.props.onSortEnd ) === 'function' ) {
