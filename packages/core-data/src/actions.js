@@ -22,9 +22,9 @@ import {
  * @return {Object} Action object.
  */
 export function receiveTerms( taxonomy, terms ) {
-	deprecated( 'receiveTerms action', {
-		version: '3.6.0',
-		alternative: 'receiveEntityRecords action',
+	deprecated( 'wp.data.dispatch("core").receiveTerms', {
+		version: '13.6.0',
+		alternative: 'wp.data.dispatch("core").receiveEntityRecords',
 		plugin: 'Gutenberg',
 	} );
 	return {
