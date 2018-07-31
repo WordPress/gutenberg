@@ -29,17 +29,26 @@ module.exports = function( parsedNamespaces, packagesConfig ) {
 		} )
 	);
 
-	const packagesManifest = Object.entries( packagesConfig ).map( ( [ folderName, config ] ) => {
-		const path = config.isNpmReady === false ?
-			`https://raw.githubusercontent.com/WordPress/gutenberg/master/${ folderName }/README.md` :
-			`https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/${ folderName }/README.md`;
-		return {
-			title: `@wordpress/${ folderName }`,
-			slug: `packages-${ folderName }`,
-			markdown_source: path,
-			parent: 'packages',
-		};
-	} );
+	const packagesManifest = [
+		{
+			title: 'Packages',
+			slug: 'packages',
+			markdown_source: 'https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/packages.md',
+			parent: null,
+		},
+	].concat(
+		Object.entries( packagesConfig ).map( ( [ folderName, config ] ) => {
+			const path = config.isNpmReady === false ?
+				`https://raw.githubusercontent.com/WordPress/gutenberg/master/${ folderName }/README.md` :
+				`https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/${ folderName }/README.md`;
+			return {
+				title: `@wordpress/${ folderName }`,
+				slug: `packages-${ folderName }`,
+				markdown_source: path,
+				parent: 'packages',
+			};
+		} )
+	);
 
 	return packagesManifest.concat( dataManifest );
 };
