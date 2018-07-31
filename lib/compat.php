@@ -161,10 +161,6 @@ function gutenberg_check_if_classic_needs_warning_about_blocks() {
 		return;
 	}
 
-	if ( isset( $_REQUEST['hide-block-warning'] ) ) {
-		return;
-	}
-
 	$post = get_post();
 	if ( ! $post ) {
 		return;
@@ -174,6 +170,8 @@ function gutenberg_check_if_classic_needs_warning_about_blocks() {
 		return;
 	}
 
+	// Enqueue the JS we're going to need in the dialog.
+	wp_enqueue_script( 'wp-a11y' );
 	wp_enqueue_script( 'wp-sanitize' );
 
 	add_action( 'admin_footer', 'gutenberg_warn_classic_about_blocks' );
@@ -208,12 +206,8 @@ function gutenberg_warn_classic_about_blocks() {
 	}
 	?>
 		<style type="text/css">
-			#blocks-in-post-dialog .blocks-in-post-message {
-				margin: 25px;
-			}
-
-			#blocks-in-post-dialog .post-locked-message a.button {
-				margin-right: 10px;
+			#blocks-in-post-dialog .notification-dialog {
+				padding: 25px;
 			}
 
 			@media only screen and (max-height: 480px), screen and (max-width: 450px) {
@@ -250,11 +244,11 @@ function gutenberg_warn_classic_about_blocks() {
 						<?php
 					}
 					?>
-					<p>
-						<a class="button button-primary blocks-in-post-gutenberg-button" title="<?php esc_attr_e( 'Open this post in the Gutenberg block editor', 'gutenberg' ); ?>" href="<?php echo esc_url( $gutenberg_edit_link ); ?>"><?php _e( 'Edit in Gutenberg', 'gutenberg' ); ?></a>
-						<a class="button" title="<?php esc_attr_e( 'Open this post in the classic editor', 'gutenberg' ); ?>" href="<?php echo esc_url( $classic_edit_link ); ?>"><?php _e( 'Edit in Classic Editor', 'gutenberg' ); ?></a>
-					</p>
 				</div>
+				<p>
+					<a class="button button-primary blocks-in-post-gutenberg-button" title="<?php esc_attr_e( 'Open this post in the Gutenberg block editor', 'gutenberg' ); ?>" href="<?php echo esc_url( $gutenberg_edit_link ); ?>"><?php _e( 'Edit in Gutenberg', 'gutenberg' ); ?></a>
+					<button class="button blocks-in-post-classic-button" title="<?php esc_attr_e( 'Close this dialog, and edit the post in the classic editor', 'gutenberg' ); ?>"><?php _e( 'Continue to Classic Editor', 'gutenberg' ); ?></button>
+				</p>
 			</div>
 		</div>
 
@@ -287,6 +281,7 @@ function gutenberg_warn_classic_about_blocks() {
 
 					// Attach event handlers.
 					dialog.warningTabbables.on( 'keydown', dialog.constrainTabbing );
+					dialog.warning.on( 'click', '.blocks-in-post-classic-button', dialog.dismissWarning );
 
 					// Make screen readers announce the warning message after a short delay (necessary for some screen readers).
 					setTimeout( function() {
@@ -311,6 +306,13 @@ function gutenberg_warn_classic_about_blocks() {
 						lastTabbable.focus();
 						event.preventDefault();
 					}
+				};
+
+				dialog.dismissWarning = function() {
+					// Hide modal.
+					dialog.warning.remove();
+					$( '#wpwrap' ).removeAttr( 'aria-hidden' );
+					$( 'body' ).removeClass( 'modal-open' );
 				};
 
 				$( document ).ready( dialog.init );
