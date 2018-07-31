@@ -8,6 +8,7 @@ import { find } from 'lodash';
  */
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -25,6 +26,11 @@ import { getKindEntities } from './entities';
  * progress.
  */
 export async function* getCategories() {
+	deprecated( 'getCategories resolver', {
+		version: '3.6.0',
+		alternative: 'getEntityRecords resolver',
+		plugin: 'Gutenberg',
+	} );
 	const categories = await apiFetch( { path: '/wp/v2/categories?per_page=-1' } );
 	yield receiveTerms( 'categories', categories );
 }
