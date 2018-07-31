@@ -67,7 +67,7 @@ const blockShortcuts = {
 
 const slashInserterShortcuts = {
 	title: __( 'Slash inserter' ),
-	description: __( 'When adding a new block using the keyboard, use the slash inserter to quickly change the type of block.' ),
+	description: __( `Type '/' followed by a block name at the start of a new block to quickly change the type of block.` ),
 	shortcuts: [
 		{
 			key: '/',
@@ -93,8 +93,20 @@ const textFormattingShortcuts = {
 			description: __( 'Add a strikethrough to the selected text.' ),
 		},
 		{
+			key: displayShortcut.primary( 'u' ),
+			description: __( 'Underline the selected text.' ),
+		},
+		{
+			key: displayShortcut.access( 'x' ),
+			description: __( 'Display the selected text in a monospaced font suitable for code.' ),
+		},
+		{
 			key: displayShortcut.primary( 'k' ),
 			description: __( 'Convert the selected text into a link' ),
+		},
+		{
+			key: displayShortcut.access( 's' ),
+			description: __( 'Remove a link' ),
 		},
 	],
 };
