@@ -1,5 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`splitting and merging blocks Should delete an empty first line 1`] = `
+"<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`splitting and merging blocks Should merge into inline boundary position 1`] = `
 "<!-- wp:paragraph -->
 <p>Bar</p>
