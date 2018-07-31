@@ -1,0 +1,19 @@
+.editor-keyboard-shortcut-help {
+	&__shortcut-list {
+		display: flex;
+		flex-flow: row wrap;
+	}
+
+	&__shortcut-key {
+		display: inline-block;
+		width: 10rem;
+		text-align: right;
+		font-weight: bold;
+		margin-top: .5rem;
+	}
+
+	&__shortcut-description {
+		margin: .5rem 0 0 1rem;
+		width: calc(100% - 11rem);
+	}
+}
