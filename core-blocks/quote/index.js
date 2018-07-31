@@ -6,7 +6,7 @@ import { castArray, get, isString, isEmpty, omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
 import {
@@ -60,8 +60,8 @@ export const settings = {
 	attributes: blockAttributes,
 
 	styles: [
-		{ name: 'default', label: __( 'Regular' ), isDefault: true },
-		{ name: 'large', label: __( 'Large' ) },
+		{ name: 'default', label: _x( 'Regular', 'block style' ), isDefault: true },
+		{ name: 'large', label: _x( 'Large', 'block style' ) },
 	],
 
 	transforms: {
