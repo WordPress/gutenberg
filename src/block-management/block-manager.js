@@ -87,7 +87,6 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				// TODO: create an unique id
 				const block = this.state.dataSource.get(this.state.dataSource.size() - 1);
 				const newId = block.uid + 1
-				debugger;
 				this.state.dataSource.push(buildEmptyBlock(newId, 'paragraph'));
 				this.props.createBlockAction( uid );
 				break;
