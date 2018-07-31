@@ -2,54 +2,6 @@
 
 ## Selectors 
 
-### getTerms
-
-Returns all the available terms for the given taxonomy.
-
-*Parameters*
-
- * state: Data state.
- * taxonomy: Taxonomy name.
-
-### getCategories
-
-Returns all the available categories.
-
-*Parameters*
-
- * state: Data state.
-
-*Returns*
-
-Categories list.
-
-### isRequestingTerms
-
-Returns true if a request is in progress for terms data of a given taxonomy,
-or false otherwise.
-
-*Parameters*
-
- * state: Data state.
- * taxonomy: Taxonomy name.
-
-*Returns*
-
-Whether a request is in progress for taxonomy's terms.
-
-### isRequestingCategories
-
-Returns true if a request is in progress for categories data, or false
-otherwise.
-
-*Parameters*
-
- * state: Data state.
-
-*Returns*
-
-Whether a request is in progress for categories.
-
 ### getAuthors
 
 Returns all available authors.
@@ -117,16 +69,6 @@ Return theme supports data in the index.
 Index data.
 
 ## Actions
-
-### receiveTerms
-
-Returns an action object used in signalling that terms have been received
-for a given taxonomy.
-
-*Parameters*
-
- * taxonomy: Taxonomy name.
- * terms: Terms received.
 
 ### receiveUserQuery
 
