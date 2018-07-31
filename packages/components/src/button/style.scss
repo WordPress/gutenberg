@@ -61,7 +61,7 @@
 
 	&.is-primary {
 		background: color( theme( button ) );
-		border-color: color( theme( button ) shade( 20% ) ) color( theme( button ) shade( 25% ) ) color( theme( primary ) shade( 25% ) );
+		border-color: color( theme( button ) shade( 20% ) ) color( theme( button ) shade( 25% ) ) color( theme( button ) shade( 25% ) );
 		box-shadow: inset 0 -1px 0 color( theme( button ) shade( 25% ) );
 		color: $white;
 		text-decoration: none;

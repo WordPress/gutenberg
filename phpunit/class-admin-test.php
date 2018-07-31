@@ -76,6 +76,20 @@ class Admin_Test extends WP_UnitTestCase {
 		wp_set_current_user( self::$editor_user_id );
 		$this->assertTrue( gutenberg_can_edit_post( $generic_post_id ) );
 
+		$blog_page_without_content = self::factory()->post->create( array(
+			'post_title'   => 'Blog',
+			'post_content' => '',
+		) );
+		update_option( 'page_for_posts', $blog_page_without_content );
+		$this->assertFalse( gutenberg_can_edit_post( $blog_page_without_content ) );
+
+		$blog_page_with_content = self::factory()->post->create( array(
+			'post_title'   => 'Blog',
+			'post_content' => 'Hello World!',
+		) );
+		update_option( 'page_for_posts', $blog_page_with_content );
+		$this->assertTrue( gutenberg_can_edit_post( $blog_page_with_content ) );
+
 		add_filter( 'gutenberg_can_edit_post', '__return_false' );
 		$this->assertFalse( gutenberg_can_edit_post( $generic_post_id ) );
 		remove_filter( 'gutenberg_can_edit_post', '__return_false' );

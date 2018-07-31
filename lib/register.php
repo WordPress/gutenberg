@@ -278,6 +278,11 @@ function gutenberg_can_edit_post( $post ) {
 		$can_edit = false;
 	}
 
+	// Disable the editor if on the blog page and there is no content.
+	if ( $can_edit && absint( get_option( 'page_for_posts' ) ) === $post->ID && empty( $post->post_content ) ) {
+		$can_edit = false;
+	}
+
 	/**
 	 * Filter to allow plugins to enable/disable Gutenberg for particular post.
 	 *
