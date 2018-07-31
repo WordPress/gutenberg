@@ -9,6 +9,49 @@
  * Tests for WP_Block_Type
  */
 class Block_Type_Test extends WP_UnitTestCase {
+	function setUp() {
+		parent::setUp();
+	}
+
+	/**
+	 * Editor user ID.
+	 *
+	 * @var int
+	 */
+	protected static $editor_user_id;
+
+	/**
+	 * ID for a post containing blocks.
+	 *
+	 * @var int
+	 */
+	protected static $post_with_blocks;
+
+	/**
+	 * ID for a post without blocks.
+	 *
+	 * @var int
+	 */
+	protected static $post_without_blocks;
+
+	/**
+	 * Set up before class.
+	 */
+	public static function wpSetUpBeforeClass() {
+		self::$editor_user_id      = self::factory()->user->create( array(
+			'role' => 'editor',
+		) );
+		self::$post_with_blocks    = self::factory()->post->create( array(
+			'post_title'   => 'Example',
+			'post_content' => "<!-- wp:core/text {\"dropCap\":true} -->\n<p class=\"has-drop-cap\">Tester</p>\n<!-- /wp:core/text -->",
+		) );
+
+		self::$post_without_blocks = self::factory()->post->create( array(
+			'post_title'   => 'Example',
+			'post_content' => 'Tester',
+		) );
+	}
+
 	function test_set_props() {
 		$name = 'core/dummy';
 		$args = array(
@@ -110,6 +153,81 @@ class Block_Type_Test extends WP_UnitTestCase {
 			'wrongTypeDefaulted' => 'defaulted',
 			'missingDefaulted'   => 'define',
 		), $prepared_attributes );
+	}
+
+	function test_has_block_with_mixed_content() {
+		$mixed_post_content = 'before' .
+			'<!-- wp:core/dummy --><!-- /wp:core/dummy -->' .
+			'<!-- wp:core/dummy_atts {"value":"b1"} --><!-- /wp:core/dummy_atts -->' .
+			'<!-- wp:core/dummy-child -->
+			<p>testing the test</p>
+			<!-- /wp:core/dummy-child -->' .
+			'between' .
+			'<!-- wp:core/self-close-dummy /-->' .
+			'<!-- wp:custom/dummy {"value":"b2"} /-->' .
+			'after';
+
+		$this->assertTrue( gutenberg_content_has_block( 'core/dummy', $mixed_post_content ) );
+
+		$this->assertTrue( gutenberg_content_has_block( 'core/dummy_atts', $mixed_post_content ) );
+
+		$this->assertTrue( gutenberg_content_has_block( 'core/dummy-child', $mixed_post_content ) );
+
+		$this->assertTrue( gutenberg_content_has_block( 'core/self-close-dummy', $mixed_post_content ) );
+
+		$this->assertTrue( gutenberg_content_has_block( 'custom/dummy', $mixed_post_content ) );
+
+		// checking for a partial block name should fail.
+		$this->assertFalse( gutenberg_content_has_block( 'core/dumm', $mixed_post_content ) );
+
+		// checking for a wrong namespace should fail
+		$this->assertFalse( gutenberg_content_has_block( 'custom/dummy_atts', $mixed_post_content ) );
+
+		// checking for namespace only should not work. Or maybe ... ?
+		$this->assertFalse( gutenberg_content_has_block( 'core', $mixed_post_content ) );
+	}
+
+	function test_has_block_with_invalid_content() {
+		// some content with invalid HMTL comments and a single valid block
+		$invalid_content = 'before' .
+			'<!- - wp:core/weird-space --><!-- /wp:core/weird-space -->' .
+			'<!--wp:core/untrimmed-left --><!-- /wp:core/untrimmed -->' .
+			'<!-- wp:core/dummy --><!-- /wp:core/dummy -->' .
+			'<!-- wp:core/untrimmed-right--><!-- /wp:core/untrimmed2 -->' .
+			'after';
+
+		$this->assertFalse( gutenberg_post_has_block( 'core/text', self::$post_without_blocks ) );
+
+		$this->assertFalse( gutenberg_content_has_block( 'core/weird-space', $invalid_content ) );
+
+		$this->assertFalse( gutenberg_content_has_block( 'core/untrimmed-left', $invalid_content ) );
+
+		$this->assertFalse( gutenberg_content_has_block( 'core/untrimmed-right', $invalid_content ) );
+
+		$this->assertTrue( gutenberg_content_has_block( 'core/dummy', $invalid_content ) );
+	}
+
+	function test_post_has_block() {
+		$static_content = "<!-- wp:core/text {\"dropCap\":true} -->\n<p class=\"has-drop-cap\">Tester</p>\n<!-- /wp:core/text -->";
+
+		$this->assertTrue( gutenberg_post_has_block( 'core/text', self::$post_with_blocks ) );
+		// should fail for a non-existent block `custom/dummy`
+		$this->assertFalse( gutenberg_post_has_block( 'custom/dummy', self::$post_with_blocks ) );
+
+
+		$this->assertTrue( gutenberg_content_has_block( 'core/text', $static_content ) );
+		$this->assertFalse( gutenberg_content_has_block( 'custom/dummy', $static_content ) );
+
+		// this functions should not work without the second param until the $post global is set.
+		$this->assertFalse( gutenberg_content_has_block( 'core/text' ) );
+		$this->assertFalse( gutenberg_post_has_block( 'core/text' ) );
+
+		global $post;
+		$post = get_post( self::$post_with_blocks );
+
+		// check if the function correctly detects content from the $post global.
+		$this->assertTrue( gutenberg_content_has_block( 'core/text' ) );
+		$this->assertTrue( gutenberg_post_has_block( 'core/text' ) );
 	}
 
 	function render_dummy_block( $attributes ) {
