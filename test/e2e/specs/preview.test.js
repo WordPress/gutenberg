@@ -13,25 +13,18 @@ import {
 } from '../support/utils';
 
 describe( 'Preview', () => {
-
 	beforeEach( async () => {
 		await newPost();
 	} );
 
 	function sleep( time ) {
-		return new Promise( resolve => setTimeout( resolve, time ) );
+		return new Promise( ( resolve ) => setTimeout( resolve, time ) );
 	}
 
-	/**
-	 * Waits for the number of open tabs to change. Listening for `targetcreated` is not reliable
-	 * see: https://github.com/berstend/puppeteer-extra/issues/6
-	 * The listeners sometimes get called too late, and the test has carried on without getting
-	 * the target, and we end up with a crash.
-	 */
 	async function waitForTab( numTabs ) {
 		let tabs = await browser.pages();
 		while ( tabs.length === numTabs ) {
-			await sleep(100);
+			await sleep( 100 );
 			tabs = await browser.pages();
 		}
 	}
@@ -45,7 +38,7 @@ describe( 'Preview', () => {
 		await waitForTab( numberOfTabs );
 
 		openTabs = await browser.pages();
-		expect( openTabs.length ).toBe( 3 );
+		expect( openTabs ).toHaveLength( 3 );
 
 		const previewPage = openTabs[ openTabs.length - 1 ];
 		// Wait for the preview to load. We can't do interstitial detection here,
@@ -78,12 +71,12 @@ describe( 'Preview', () => {
 
 		let expectedPreviewURL = getUrl( '', `?p=${ postId }&preview=true` );
 		expect( previewPage.url() ).toBe( expectedPreviewURL );
-		
+
 		// Title in preview should match input.
 		let previewTitle = await previewPage.$eval( '.entry-title', ( node ) => node.textContent );
 		expect( previewTitle ).toBe( 'Hello World' );
 		await previewPage.close();
-		
+
 		// Return to editor to change title.
 		await editorPage.bringToFront();
 		await editorPage.type( '.editor-post-title__input', '!' );
