@@ -12,7 +12,7 @@
 /**
  * External dependencies
  */
-import { get, mapValues, includes } from 'lodash';
+import { get, mapValues, includes, capitalize } from 'lodash';
 
 export const BACKSPACE = 8;
 export const TAB = 9;
@@ -81,7 +81,7 @@ export const displayShortcut = mapValues( modifiers, ( modifier ) => {
 		};
 		const shortcut = [
 			...modifier( _isMac ).map( ( key ) => get( replacementKeyMap, key, key ) ),
-			character.toUpperCase(),
+			capitalize( character ),
 		].join( '+' );
 
 		// Because we use just the clover symbol for MacOS's "command" key, remove
