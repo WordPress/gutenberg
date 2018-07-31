@@ -53,9 +53,10 @@
     "test:debug": "yarn pre-build && cross-env NODE_ENV=test node --inspect-brk node_modules/jest/bin/jest.js --runInBand --verbose --config jest.config.js",
     "flow": "flow",
     "prettier": "prettier-eslint --write $npm_package_config_jsfiles $npm_package_config_scssfiles",
-    "clean": "yarn clean:setup; yarn clean:runtime",
+    "clean": "yarn clean:node; yarn clean:aztec; yarn clean:runtime;",
     "clean:runtime": "yarn cache clean; yarn test --clearCache; watchman watch-del-all; rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/jest_*",
-    "clean:setup": "rm -rf node_modules",
+    "clean:aztec": "pushd react-native-aztec && (yarn clean; pushd example && (yarn clean; popd); popd)",
+    "clean:node": "rm -rf node_modules",
     "clean:install": "yarn clean; yarn",
     "lint": "eslint $npm_package_config_jsfiles",
     "lint:fix": "eslint $npm_package_config_jsfiles --fix"
