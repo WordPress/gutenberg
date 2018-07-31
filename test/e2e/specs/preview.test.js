@@ -23,6 +23,21 @@ describe( 'Preview', () => {
 		await newPost();
 	} );
 
+	/**
+	 * Given a Puppeteer Page instance for a preview window, clicks Preview and
+	 * awaits the window navigation.
+	 *
+	 * @param {puppeteer.Page} previewPage Page on which to await navigation.
+	 *
+	 * @return {Promise} Promise resolving once navigation completes.
+	 */
+	function waitForPreviewNavigation( previewPage ) {
+		return Promise.all( [
+			previewPage.waitForNavigation(),
+			page.click( '.editor-post-preview' ),
+		] );
+	}
+
 	it( 'Should open a preview window for a new post', async () => {
 		const editorPage = page;
 
@@ -61,8 +76,7 @@ describe( 'Preview', () => {
 		// Return to editor to change title.
 		await editorPage.bringToFront();
 		await editorPage.type( '.editor-post-title__input', '!' );
-		await page.click( '.editor-post-preview' );
-		await previewPage.waitForNavigation();
+		await waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
 		previewTitle = await previewPage.$eval( '.entry-title', ( node ) => node.textContent );
@@ -71,8 +85,7 @@ describe( 'Preview', () => {
 		// Pressing preview without changes should bring same preview window to
 		// front and reload, but should not show interstitial.
 		await editorPage.bringToFront();
-		await page.click( '.editor-post-preview' );
-		await previewPage.waitForNavigation();
+		await waitForPreviewNavigation( previewPage );
 		previewTitle = await previewPage.$eval( '.entry-title', ( node ) => node.textContent );
 		expect( previewTitle ).toBe( 'Hello World!' );
 
@@ -85,15 +98,13 @@ describe( 'Preview', () => {
 			page.click( '.editor-post-publish-panel__header button' ),
 		] );
 		expectedPreviewURL = await editorPage.$eval( '.notice-success a', ( node ) => node.href );
-		await page.click( '.editor-post-preview' );
-		await previewPage.waitForNavigation();
+		await waitForPreviewNavigation( previewPage );
 		expect( previewPage.url() ).toBe( expectedPreviewURL );
 
 		// Return to editor to change title.
 		await editorPage.bringToFront();
 		await editorPage.type( '.editor-post-title__input', ' And more.' );
-		await page.click( '.editor-post-preview' );
-		await previewPage.waitForNavigation();
+		await waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
 		previewTitle = await previewPage.$eval( '.entry-title', ( node ) => node.textContent );
@@ -111,8 +122,7 @@ describe( 'Preview', () => {
 		//
 		// See: https://github.com/WordPress/gutenberg/issues/7561
 		await editorPage.bringToFront();
-		await page.click( '.editor-post-preview' );
-		await previewPage.waitForNavigation();
+		await waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
 		previewTitle = await previewPage.$eval( '.entry-title', ( node ) => node.textContent );
