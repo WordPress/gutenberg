@@ -78,25 +78,25 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 
 	fontSizes: [
 		{
-			name: __( 'small' ),
+			name: _x( 'small', 'font size name' ),
 			shortName: _x( 'S', 'font size short name' ),
 			size: 14,
 			slug: 'small',
 		},
 		{
-			name: __( 'regular' ),
+			name: _x( 'regular', 'font size name' ),
 			shortName: _x( 'M', 'font size short name' ),
 			size: 16,
 			slug: 'regular',
 		},
 		{
-			name: __( 'large' ),
+			name: _x( 'large', 'font size name' ),
 			shortName: _x( 'L', 'font size short name' ),
 			size: 36,
 			slug: 'large',
 		},
 		{
-			name: __( 'larger' ),
+			name: _x( 'larger', 'font size name' ),
 			shortName: _x( 'XL', 'font size short name' ),
 			size: 48,
 			slug: 'larger',
