@@ -63,5 +63,4 @@ jobs:
       env: WP_VERSION=latest
       script:
         - npm install || exit 1
-        - npm run build || exit 1
         - ./bin/run-e2e-tests.sh || exit 1
