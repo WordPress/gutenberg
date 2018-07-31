@@ -9,7 +9,38 @@ import { rawShortcut } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import shortcutConfig from './config';
+import {
+	globalShortcuts,
+	selectionShortcuts,
+	blockShortcuts,
+	slashInserterShortcuts,
+	textFormattingShortcuts,
+} from './config';
+
+const ShortcutList = ( { shortcuts } ) => (
+	<dl className="editor-keyboard-shortcut-help__shortcut-list">
+		{ shortcuts.map( ( { key, description }, index ) => (
+			<Fragment
+				key={ index }
+			>
+				<dt className="editor-keyboard-shortcut-help__shortcut-key">
+					{ key }
+				</dt>
+				<dd className="editor-keyboard-shortcut-help__shortcut-description">
+					{ description }
+				</dd>
+			</Fragment>
+		) ) }
+	</dl>
+);
+
+const ShortcutSection = ( { title, description, shortcuts } ) => (
+	<section>
+		<h2>{ title }</h2>
+		<p>{ description }</p>
+		<ShortcutList shortcuts={ shortcuts } />
+	</section>
+);
 
 class KeyboardShortcutHelpModal extends Component {
 	constructor( ...args ) {
@@ -40,18 +71,18 @@ class KeyboardShortcutHelpModal extends Component {
 				/>
 				{ this.state.isModalVisible && (
 					<Modal
+						className="editor-keyboard-shortcut-help"
 						title={ __( 'Keyboard Shortcuts' ) }
 						closeLabel={ __( 'Close' ) }
 						onRequestClose={ this.toggleModalVisibility }
 					>
-						<dl>
-							{ shortcutConfig.map( ( { key, description }, index ) => (
-								<Fragment key={ index }>
-									<dt>{ key }</dt>
-									<dd>{ description }</dd>
-								</Fragment>
-							) ) }
-						</dl>
+
+						<ShortcutSection { ...globalShortcuts } />
+						<ShortcutSection { ...selectionShortcuts } />
+						<ShortcutSection { ...blockShortcuts } />
+						<ShortcutSection { ...slashInserterShortcuts } />
+						<ShortcutSection { ...textFormattingShortcuts } />
+
 					</Modal>
 				) }
 			</Fragment>
