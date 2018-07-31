@@ -3,15 +3,17 @@
  */
 const glob = require( 'glob' ).sync;
 const path = require( 'path' );
+const { upperFirst, camelCase } = require( 'lodash' );
 
 const root = path.resolve( __dirname, '../../' );
+
+const baseRepoUrl = `https://raw.githubusercontent.com/WordPress/gutenberg/master/`;
 
 // These are packages published to NPM as their own node modules.
 const npmReadyPackages = glob( 'packages/*/package.json' )
 	.map( ( fileName ) => fileName.split( '/' )[ 1 ] );
 
-// These are internal-only packages (for now), not yet published as standalone
-// node modules.
+// These are internal-only packages (for now), not yet published as standalone node modules.
 const gutenbergPackages = [
 	'core-blocks',
 	'edit-post',
@@ -65,5 +67,23 @@ module.exports = {
 	},
 
 	rootManifest: path.resolve( __dirname, '../root-manifest.json' ),
+	componentsManifest: [
+		{
+			title: 'Components',
+			slug: 'components',
+			markdown_source: `${ baseRepoUrl }packages/components.md`,
+			parent: null,
+		},
+		...glob( 'packages/components/src/*/README.md' )
+			.map( ( filePath ) => {
+				const slug = filePath.split( '/' )[ 3 ];
+				return {
+					title: upperFirst( camelCase( slug ) ),
+					slug,
+					markdown_source: `${ baseRepoUrl }${ filePath }`,
+					parent: 'components',
+				};
+			} ),
+	],
 	manifestOutput: path.resolve( __dirname, '../manifest.json' ),
 };

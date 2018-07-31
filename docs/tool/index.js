@@ -18,5 +18,5 @@ const dataModuleManifest = getManifest( parsedModules, config.packages );
 
 fs.writeFileSync(
 	config.manifestOutput,
-	JSON.stringify( rootManifest.concat( dataModuleManifest ), undefined, '\t' )
+	JSON.stringify( rootManifest.concat( config.componentsManifest, dataModuleManifest ), undefined, '\t' )
 );
