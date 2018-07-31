@@ -7,7 +7,6 @@ import { keyBy, map, groupBy, flowRight } from 'lodash';
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -197,18 +196,6 @@ export const entities = ( state = {}, action ) => {
 		config: newConfig,
 	};
 };
-
-deprecated( 'terms reducer', {
-	version: '13.6.0',
-	alternative: 'entities reducer',
-	plugin: 'Gutenberg',
-} );
-
-deprecated( 'taxonomies reducer', {
-	version: '13.6.0',
-	alternative: 'entities reducer',
-	plugin: 'Gutenberg',
-} );
 
 export default combineReducers( {
 	terms,
