@@ -7,7 +7,7 @@ const SIDEBAR_SELECTOR = '.edit-post-sidebar';
 const ACTIVE_SIDEBAR_TAB_SELECTOR = '.edit-post-sidebar__panel-tab.is-active';
 const ACTIVE_SIDEBAR_BUTTON_TEXT = 'Document';
 
-describe.skip( 'Publishing', () => {
+describe( 'Publishing', () => {
 	afterEach( async () => {
 		await clearLocalStorage();
 		await page.goto( 'about:blank' );

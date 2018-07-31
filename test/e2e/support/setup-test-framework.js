@@ -1,12 +1,29 @@
 /**
- * Node dependencies
+ * External dependencies
  */
-import { visitAdmin } from './utils';
+import 'expect-puppeteer';
 
+/**
+ * Internal dependencies
+ */
+import {
+	clearLocalStorage,
+	disablePageDialogAccept,
+	enablePageDialogAccept,
+	visitAdmin,
+} from './utils';
+
+/**
+ * Environment variables
+ */
 const { PUPPETEER_TIMEOUT } = process.env;
 
 // The Jest timeout is increased because these tests are a bit slow
 jest.setTimeout( PUPPETEER_TIMEOUT || 100000 );
+
+beforeAll( async () => {
+	enablePageDialogAccept();
+} );
 
 // After every test run, delete all content created by the test. This ensures
 // other posts/comments/etc. aren't dirtying tests and tests don't depend on
@@ -20,16 +37,6 @@ jest.setTimeout( PUPPETEER_TIMEOUT || 100000 );
 // the global approach we could use `visitAdmin` before
 // `newDesktopBrowserPage()` is called.
 afterAll( async () => {
-	if ( ! global.page ) {
-		return;
-	}
-
-	// This accepts a page dialog that may appear when navigating away from
-	// Gutenberg to the admin, where we need to go to delete posts.
-	page.on( 'dialog', ( dialog ) => {
-		dialog.accept();
-	} );
-
 	// Visit `/wp-admin/edit.php` so we can see a list of posts and delete them.
 	await visitAdmin( 'edit.php' );
 
@@ -46,5 +53,6 @@ afterAll( async () => {
 		await page.waitForNavigation();
 	}
 
-	await browser.close();
+	disablePageDialogAccept();
+	await clearLocalStorage();
 } );

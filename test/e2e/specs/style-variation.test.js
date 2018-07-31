@@ -3,7 +3,7 @@
  */
 import { newPost, insertBlock, getEditedPostContent } from '../support/utils';
 
-describe.skip( 'adding blocks', () => {
+describe( 'adding blocks', () => {
 	beforeAll( async () => {
 		await newPost();
 	} );

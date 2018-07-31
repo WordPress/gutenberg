@@ -8,7 +8,7 @@ import {
 	publishPost,
 } from '../support/utils';
 
-describe.skip( 'Change detection', () => {
+describe( 'Change detection', () => {
 	let handleInterceptedRequest, hadInterceptedSave;
 
 	beforeEach( async () => {
@@ -26,8 +26,7 @@ describe.skip( 'Change detection', () => {
 	async function assertIsDirty( isDirty ) {
 		let hadDialog = false;
 
-		function handleOnDialog( dialog ) {
-			dialog.accept();
+		function handleOnDialog() {
 			hadDialog = true;
 		}
 

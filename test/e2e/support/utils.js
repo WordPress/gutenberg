@@ -97,7 +97,6 @@ export async function newPost( { postType, viewport = 'large', enableTips = fals
 		await page.evaluate( () => {
 			wp.data.dispatch( 'core/nux' ).disableTips();
 		} );
-		await page.reload();
 	}
 	if ( enableTips ) {
 		await page.evaluate( () => {
@@ -290,4 +289,24 @@ export async function pressTimes( key, count ) {
 
 export async function clearLocalStorage() {
 	await page.evaluate( () => window.localStorage.clear() );
+}
+
+async function acceptPageDialog( dialog ) {
+	await dialog.accept();
+}
+
+/**
+ * Enables even listener which accepts a page dialog which
+ * may appear when navigating away from Gutenberg.
+ */
+export function enablePageDialogAccept() {
+	page.on( 'dialog', acceptPageDialog );
+}
+
+/**
+ * Disables even listener which accepts a page dialog which
+ * may appear when navigating away from Gutenberg.
+ */
+export function disablePageDialogAccept() {
+	page.removeListener( 'dialog', acceptPageDialog );
 }

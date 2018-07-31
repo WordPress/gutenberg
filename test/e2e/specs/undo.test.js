@@ -7,7 +7,7 @@ import {
 	getEditedPostContent,
 } from '../support/utils';
 
-describe.skip( 'undo', () => {
+describe( 'undo', () => {
 	beforeAll( async () => {
 		await newPost();
 	} );

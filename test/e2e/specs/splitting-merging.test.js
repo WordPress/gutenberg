@@ -9,7 +9,7 @@ import {
 	pressWithModifier,
 } from '../support/utils';
 
-describe.skip( 'splitting and merging blocks', () => {
+describe( 'splitting and merging blocks', () => {
 	beforeEach( async () => {
 		await newPost();
 	} );

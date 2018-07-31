@@ -3,7 +3,7 @@
  */
 import { newPost } from '../support/utils';
 
-describe.skip( 'Managing links', () => {
+describe( 'Managing links', () => {
 	beforeEach( async () => {
 		await newPost();
 	} );

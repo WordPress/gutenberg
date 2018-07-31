@@ -53,16 +53,8 @@ describe( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
 		expect( iconHtml ).toMatch( dashIconRegex );
 	};
 
-	// accept the prompt if the post is "dirty"
-	const handleOnDialog = async ( dialog ) => {
-		if ( dialog ) {
-			await dialog.accept();
-		}
-	};
-
 	beforeAll( async () => {
 		await activatePlugin( 'gutenberg-test-block-icons' );
-		await page.on( 'dialog', handleOnDialog );
 	} );
 
 	beforeEach( async () => {
@@ -70,7 +62,6 @@ describe( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
 	} );
 
 	afterAll( async () => {
-		page.removeListener( 'dialog', handleOnDialog );
 		await deactivatePlugin( 'gutenberg-test-block-icons' );
 	} );
 

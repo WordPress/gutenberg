@@ -10,14 +10,11 @@ import {
 
 function waitForAndAcceptDialog() {
 	return new Promise( ( resolve ) => {
-		page.once( 'dialog', async ( dialog ) => {
-			await dialog.accept();
-			resolve();
-		} );
+		page.once( 'dialog', () => resolve() );
 	} );
 }
 
-describe.skip( 'Reusable Blocks', () => {
+describe( 'Reusable Blocks', () => {
 	beforeAll( async () => {
 		await newPost();
 	} );

@@ -4,7 +4,7 @@
 import { newPost } from '../support/utils';
 import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
-describe.skip( 'Using Hooks API', () => {
+describe( 'Using Hooks API', () => {
 	beforeAll( async () => {
 		await activatePlugin( 'gutenberg-test-hooks-api' );
 	} );

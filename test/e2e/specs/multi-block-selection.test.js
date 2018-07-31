@@ -3,7 +3,7 @@
  */
 import { newPost, pressWithModifier, insertBlock } from '../support/utils';
 
-describe.skip( 'Multi-block selection', () => {
+describe( 'Multi-block selection', () => {
 	beforeAll( async () => {
 		await newPost();
 	} );

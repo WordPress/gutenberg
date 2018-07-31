@@ -8,7 +8,7 @@ import {
 	pressTimes,
 } from '../support/utils';
 
-describe.skip( 'adding blocks', () => {
+describe( 'adding blocks', () => {
 	beforeEach( async () => {
 		await newPost();
 	} );
