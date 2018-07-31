@@ -76,7 +76,6 @@ describe( 'PostPreviewButton', () => {
 	describe( 'openPreviewWindow()', () => {
 		function assertForPreview( props, expectedPreviewURL, isExpectingSave ) {
 			const autosave = jest.fn();
-			const preventDefault = jest.fn();
 			const windowOpen = window.open;
 			window.open = jest.fn( () => {
 				return {
@@ -95,16 +94,11 @@ describe( 'PostPreviewButton', () => {
 				/>
 			);
 
-			wrapper.simulate( 'click', { preventDefault } );
+			wrapper.simulate( 'click' );
 
 			if ( expectedPreviewURL ) {
-				if ( expectedPreviewURL !== props.currentPostLink ) {
-					expect( preventDefault ).toHaveBeenCalled();
-				}
-
 				expect( window.open ).toHaveBeenCalledWith( expectedPreviewURL, 'wp-preview-1' );
 			} else {
-				expect( preventDefault ).not.toHaveBeenCalled();
 				expect( window.open ).not.toHaveBeenCalled();
 			}
 

@@ -55,14 +55,10 @@ export class PostPreviewButton extends Component {
 	}
 
 	/**
-	 * Handles a click event to open a popup window and prevent default click
-	 * behavior if the post is either autosaveable or has a previously assigned
-	 * preview link to be shown in the popup window target. Triggers autosave
-	 * if post is autosaveable.
-	 *
-	 * @param {MouseEvent} event Click event from preview button click.
+	 * Opens a popup window, navigating user to a preview of the current post.
+	 * Triggers autosave if post is autosaveable.
 	 */
-	openPreviewWindow( event ) {
+	openPreviewWindow() {
 		const { isAutosaveable, previewLink, currentPostLink } = this.props;
 
 		// If there are no changes to autosave, we cannot perform the save, but
@@ -79,7 +75,6 @@ export class PostPreviewButton extends Component {
 		// Open a popup, BUT: Set it to a blank page until save completes. This
 		// is necessary because popups can only be opened in response to user
 		// interaction (click), but we must still wait for the post to save.
-		event.preventDefault();
 		this.previewWindow = window.open(
 			isAutosaveable ? 'about:blank' : previewLink,
 			this.getWindowTarget()
