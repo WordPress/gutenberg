@@ -8,7 +8,7 @@ import { find, findIndex, reduce } from 'lodash';
 import ActionTypes from '../actions/ActionTypes';
 import type { StateType } from '../';
 import type { BlockActionType } from '../actions';
-import { buildEmptyBlock } from '../';
+import { buildEmptyBlock } from '../block-builder';
 
 function findBlock( blocks, uid: string ) {
 	return find( blocks, obj => {
@@ -115,6 +115,7 @@ export const reducer = (
 			// TODO we need to set focused: true and search for the currently focused block and
 			// set that one to `focused: false`.
 			const newId = blocks[ blocks.length - 1 ].uid + 1;
+			debugger;
 			blocks.push(buildEmptyBlock(newId, 'paragraph'));
 			return { blocks: blocks, refresh: ! state.refresh };
 		}

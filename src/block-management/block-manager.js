@@ -13,7 +13,7 @@ import type { BlockType } from '../store/';
 
 import styles from './block-manager.scss';
 
-import { buildEmptyBlock}  from '../store/';
+import { buildEmptyBlock }  from '../store/block-builder';
 
 // Gutenberg imports
 import { getBlockType, serialize } from '@wordpress/blocks';
@@ -86,7 +86,8 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				// this.state.dataSource.create
 				// TODO: create an unique id
 				const block = this.state.dataSource.get(this.state.dataSource.size() - 1);
-				const newId = block.uid + 1;
+				const newId = block.uid + 1
+				debugger;
 				this.state.dataSource.push(buildEmptyBlock(newId, 'paragraph'));
 				this.props.createBlockAction( uid );
 				break;

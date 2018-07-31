@@ -44,20 +44,6 @@ const initialMoreBlockHtml = `
 const codeBlockInstance = parse( initialCodeBlockHtml )[ 0 ];
 const moreBlockInstance = parse( initialMoreBlockHtml )[ 0 ];
 
-const emptyBlock: BlockType = {
-	isValid: true,
-	attributes: {
-		content: 'this is a new block',
-	},
-	innerBlocks: [],
-	focused: false,
-};
-
-export function buildEmptyBlock(uid, name) {
-	return {uid: uid, name: name, ...emptyBlock}
-}
-
-
 const initialState: StateType = {
 	// TODO: get blocks list block state should be externalized (shared with Gutenberg at some point?).
 	// If not it should be created from a string parsing (commented HTML to json).
