@@ -72,6 +72,11 @@ export function getCategories( state ) {
  * @return {boolean} Whether a request is in progress for taxonomy's terms.
  */
 export function isRequestingTerms( state, taxonomy ) {
+	deprecated( 'isRequestingTerms selector', {
+		version: '3.6.0',
+		alternative: 'getEntitiesByKind selector',
+		plugin: 'Gutenberg',
+	} );
 	return isResolving( 'getTerms', taxonomy );
 }
 
@@ -84,6 +89,11 @@ export function isRequestingTerms( state, taxonomy ) {
  * @return {boolean} Whether a request is in progress for categories.
  */
 export function isRequestingCategories() {
+	deprecated( 'isRequestingCategories selector', {
+		version: '3.6.0',
+		alternative: 'getEntitiesByKind selector',
+		plugin: 'Gutenberg',
+	} );
 	return isResolving( 'getCategories' );
 }
 
