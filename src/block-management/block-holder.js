@@ -24,6 +24,7 @@ type StateType = {
 	selected: boolean,
 	focused: boolean,
 	aztecHeight: number,
+	eventCount?: number,
 };
 
 const _minHeight = 50;
@@ -77,15 +78,16 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 						styles[ 'aztec-editor' ],
 						{ minHeight: Math.max( _minHeight, this.state.aztecHeight ) },
 					] }
-					text={ { text: this.props.attributes.content, eventCount: this.props.attributes.eventCount } }
+					text={ { text: this.props.attributes.content, eventCount: this.state.eventCount } }
 					onContentSizeChange={ ( event ) => {
 						this.setState( { ...this.state, aztecHeight: event.nativeEvent.contentSize.height } );
 					} }
 					onChange={ ( event ) => {
+						this.setState( { ...this.state, eventCount: event.nativeEvent.eventCount } );
+
 						this.props.onChange( this.props.uid, {
 							...this.props.attributes,
 							content: event.nativeEvent.text,
-							eventCount: event.nativeEvent.eventCount,
 						} );
 					} }
 					color={ 'black' }
