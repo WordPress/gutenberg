@@ -8,6 +8,7 @@ import {
 	WritingFlow,
 	ObserveTyping,
 	EditorGlobalKeyboardShortcuts,
+	KeyboardShortcutHelpModal,
 	BlockSelectionClearer,
 	MultiSelectScrollIntoView,
 	_BlockSettingsMenuFirstItem,
@@ -25,6 +26,7 @@ function VisualEditor() {
 	return (
 		<BlockSelectionClearer className="edit-post-visual-editor">
 			<EditorGlobalKeyboardShortcuts />
+			<KeyboardShortcutHelpModal />
 			<CopyHandler />
 			<MultiSelectScrollIntoView />
 			<WritingFlow>
