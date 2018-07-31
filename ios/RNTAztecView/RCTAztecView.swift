@@ -1,17 +1,45 @@
 import Aztec
 import Foundation
+import UIKit
 
 class RCTAztecView: Aztec.TextView {
     @objc var onChange: RCTBubblingEventBlock? = nil
     @objc var onContentSizeChange: RCTBubblingEventBlock? = nil
     
     private var previousContentSize: CGSize = .zero
-    
+
+    private lazy var placeholderLabel: UILabel = {
+        let label = UILabel(frame: .zero)
+        label.text = ""
+        label.sizeToFit()
+        return label
+    }()
+
+    override init(defaultFont: UIFont, defaultParagraphStyle: ParagraphStyle, defaultMissingImage: UIImage) {
+        super.init(defaultFont: defaultFont, defaultParagraphStyle: defaultParagraphStyle, defaultMissingImage: defaultMissingImage)
+        commonInit()
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        commonInit()
+    }
+
+    func commonInit() {
+        addSubview(placeholderLabel)
+        placeholderLabel.textAlignment = .natural
+        placeholderLabel.translatesAutoresizingMaskIntoConstraints = false
+        placeholderLabel.font = font
+        NSLayoutConstraint.activate([
+            placeholderLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: contentInset.left + textContainerInset.left + textContainer.lineFragmentPadding),
+            placeholderLabel.topAnchor.constraint(equalTo: topAnchor, constant: contentInset.top + textContainerInset.top)
+            ])
+    }
+
     // MARK - View Height: Match to content height
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        
         updateContentSizeInRN()
     }
 
@@ -33,7 +61,7 @@ class RCTAztecView: Aztec.TextView {
     
     open override func insertText(_ text: String) {
         super.insertText(text)
-        
+        updatePlaceholderVisibility()
         if let onChange = onChange {
             let text = packForRN(getHTML(), withName: "text")
             onChange(text)
@@ -42,7 +70,7 @@ class RCTAztecView: Aztec.TextView {
     
     open override func deleteBackward() {
         super.deleteBackward()
-        
+        updatePlaceholderVisibility()
         if let onChange = onChange {
             let text = packForRN(getHTML(), withName: "text")
             onChange(text)
@@ -74,6 +102,32 @@ class RCTAztecView: Aztec.TextView {
         let html = contents["text"] as? String ?? ""
         
         setHTML(html)
+        updatePlaceholderVisibility()
+    }
+
+    // MARK: - Placeholder
+
+    @objc var placeholder: String {
+        set {
+            placeholderLabel.text = newValue
+        }
+
+        get {
+            return placeholderLabel.text ?? ""
+        }
+    }
+
+    @objc var placeholderTextColor: UIColor {
+        set {
+            placeholderLabel.textColor = newValue
+        }
+        get {
+            return placeholderLabel.textColor
+        }
+    }
+
+    func updatePlaceholderVisibility() {
+        placeholderLabel.isHidden = !self.text.isEmpty
     }
 }
 
