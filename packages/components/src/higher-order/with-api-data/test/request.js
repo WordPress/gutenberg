@@ -14,7 +14,7 @@ import request, {
 	isRequestMethod,
 } from '../request';
 
-jest.mock( '@wordpress/api-fetch' );
+jest.mock( '@wordpress/api-fetch', () => jest.fn() );
 
 describe( 'request', () => {
 	const actualResponse = {
@@ -31,13 +31,7 @@ describe( 'request', () => {
 			delete cache[ key ];
 		}
 
-		apiFetch.mockReturnValue = {
-			// jQuery.Deferred aren't true promises, particularly in their
-			// treatment of resolved arguments. $.ajax will spread resolved
-			// arguments, but this is not valid for Promise (only single).
-			// Instead, we emulate by invoking the callback manually.
-			then: ( callback ) => Promise.resolve( callback( actualResponse ) ),
-		};
+		apiFetch.mockImplementation( () => Promise.resolve( actualResponse ) );
 	} );
 
 	describe( 'getCachedResponse()', () => {
