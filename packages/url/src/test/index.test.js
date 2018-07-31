@@ -24,6 +24,13 @@ describe( 'addQueryArgs', () => {
 
 		expect( addQueryArgs( url, args ) ).toBe( 'https://andalouses.example/beach?night=false&sun=true&sand=false' );
 	} );
+
+	test( 'should update args to an URL with array parameters', () => {
+		const url = 'https://andalouses.example/beach?time[]=10&time[]=11';
+		const args = { beach: [ 'sand', 'rock' ] };
+
+		expect( decodeURI( addQueryArgs( url, args ) ) ).toBe( 'https://andalouses.example/beach?time[0]=10&time[1]=11&beach[0]=sand&beach[1]=rock' );
+	} );
 } );
 
 describe( 'prependHTTP', () => {

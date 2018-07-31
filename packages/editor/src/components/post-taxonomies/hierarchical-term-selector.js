@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { get, unescape as unescapeString, without, find, some, invoke } from 'lodash';
-import httpBuildQuery from 'http-build-query';
 
 /**
  * WordPress dependencies
@@ -13,6 +12,7 @@ import { TreeSelect, withSpokenMessages, Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -121,7 +121,10 @@ class HierarchicalTermSelector extends Component {
 				if ( errorCode === 'term_exists' ) {
 					// search the new category created since last fetch
 					this.addRequest = apiFetch( {
-						path: `/wp/v2/${ taxonomy.rest_base }?${ httpBuildQuery( { ...DEFAULT_QUERY, parent: formParent || 0, search: formName } ) }`,
+						path: addQueryArgs(
+							`/wp/v2/${ taxonomy.rest_base }`,
+							{ ...DEFAULT_QUERY, parent: formParent || 0, search: formName }
+						),
 					} );
 					return this.addRequest
 						.then( ( searchResult ) => {
@@ -183,7 +186,9 @@ class HierarchicalTermSelector extends Component {
 		if ( ! taxonomy ) {
 			return;
 		}
-		this.fetchRequest = apiFetch( { path: `/wp/v2/${ taxonomy.rest_base }?${ httpBuildQuery( DEFAULT_QUERY ) }` } );
+		this.fetchRequest = apiFetch( {
+			path: addQueryArgs( `/wp/v2/${ taxonomy.rest_base }`, DEFAULT_QUERY ),
+		} );
 		this.fetchRequest.then(
 			( terms ) => { // resolve
 				const availableTermsTree = buildTermsTree( terms );

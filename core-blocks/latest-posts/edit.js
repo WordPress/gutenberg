@@ -4,7 +4,6 @@
 import { get, isUndefined, pickBy } from 'lodash';
 import moment from 'moment';
 import classnames from 'classnames';
-import httpBuildQuery from 'http-build-query';
 
 /**
  * WordPress dependencies
@@ -27,6 +26,7 @@ import {
 	BlockAlignmentToolbar,
 	BlockControls,
 } from '@wordpress/editor';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -160,19 +160,19 @@ class LatestPostsEdit extends Component {
 
 export default withAPIData( ( props ) => {
 	const { postsToShow, order, orderBy, categories } = props.attributes;
-	const latestPostsQuery = httpBuildQuery( pickBy( {
+	const latestPostsQuery = pickBy( {
 		categories,
 		order,
 		orderby: orderBy,
 		per_page: postsToShow,
 		_fields: [ 'date_gmt', 'link', 'title' ],
-	}, ( value ) => ! isUndefined( value ) ) );
-	const categoriesListQuery = httpBuildQuery( {
+	}, ( value ) => ! isUndefined( value ) );
+	const categoriesListQuery = {
 		per_page: 100,
 		_fields: [ 'id', 'name', 'parent' ],
-	} );
+	};
 	return {
-		latestPosts: `/wp/v2/posts?${ latestPostsQuery }`,
-		categoriesList: `/wp/v2/categories?${ categoriesListQuery }`,
+		latestPosts: addQueryArgs( '/wp/v2/posts', latestPostsQuery ),
+		categoriesList: addQueryArgs( '/wp/v2/categories', categoriesListQuery ),
 	};
 } )( LatestPostsEdit );
