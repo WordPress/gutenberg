@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { castArray } from 'lodash';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -21,6 +22,11 @@ import {
  * @return {Object} Action object.
  */
 export function receiveTerms( taxonomy, terms ) {
+	deprecated( 'receiveTerms action', {
+		version: '3.6.0',
+		alternative: 'receiveEntityRecords action',
+		plugin: 'Gutenberg',
+	} );
 	return {
 		type: 'RECEIVE_TERMS',
 		taxonomy,
