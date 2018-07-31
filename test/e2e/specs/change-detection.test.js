@@ -137,7 +137,7 @@ describe( 'Change detection', () => {
 	} );
 
 	it( 'Should prompt if content added without save', async () => {
-		await page.click( '.editor-default-block-appender' );
+		await page.click( '.editor-default-block-appender__content' );
 
 		await assertIsDirty( true );
 	} );
@@ -261,7 +261,7 @@ describe( 'Change detection', () => {
 		// Keyboard shortcut Ctrl+S save.
 		await pressWithModifier( 'Mod', 'S' );
 
-		await page.click( '.editor-default-block-appender' );
+		await page.click( '.editor-default-block-appender__content' );
 
 		// Allow save to complete. Disabling interception flushes pending.
 		await Promise.all( [

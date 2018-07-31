@@ -15,7 +15,7 @@ describe( 'Multi-block selection', () => {
 		const multiSelectedCssClass = 'is-multi-selected';
 
 		// Creating test blocks
-		await page.click( '.editor-default-block-appender' );
+		await page.click( '.editor-default-block-appender__content' );
 		await page.keyboard.type( 'First Paragraph' );
 		await insertBlock( 'Image' );
 		await insertBlock( 'Quote' );

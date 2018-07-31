@@ -161,7 +161,7 @@ describe( 'New User Experience (NUX)', () => {
 		// Let's type something so there's content in this post.
 		await page.click( '.editor-post-title__input' );
 		await page.keyboard.type( 'Post title' );
-		await page.click( '.editor-default-block-appender' );
+		await page.click( '.editor-default-block-appender__content' );
 		await page.keyboard.type( 'Post content goes here.' );
 		// Save the post as a draft.
 		await page.click( '.editor-post-save-draft' );

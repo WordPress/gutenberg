@@ -18,7 +18,7 @@ describe( 'adding inline tokens', () => {
 
 	it( 'Should insert inline image', async () => {
 		// Create a paragraph.
-		await page.click( '.editor-default-block-appender' );
+		await page.click( '.editor-default-block-appender__content' );
 		await page.keyboard.type( 'a ' );
 
 		await insertBlock( 'Inline Image', 'Inline Elements' );

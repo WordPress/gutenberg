@@ -24,7 +24,7 @@ describe( 'Managing links', () => {
 	it( 'Pressing Left and Esc in Link Dialog in "Fixed to Toolbar" mode', async () => {
 		await setFixedToolbar( true );
 
-		await page.click( '.editor-default-block-appender' );
+		await page.click( '.editor-default-block-appender__content' );
 		await page.keyboard.type( 'Text' );
 		await page.click( 'button[aria-label="Link"]' );
 
@@ -42,7 +42,7 @@ describe( 'Managing links', () => {
 	it( 'Pressing Left and Esc in Link Dialog in "Docked Toolbar" mode', async () => {
 		await setFixedToolbar( false );
 
-		await page.click( '.editor-default-block-appender' );
+		await page.click( '.editor-default-block-appender__content' );
 		await page.keyboard.type( 'Text' );
 
 		// we need to trigger isTyping = false
