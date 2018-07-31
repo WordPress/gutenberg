@@ -11,7 +11,6 @@ describe( 'Publishing', () => {
 	afterEach( async () => {
 		await clearLocalStorage();
 		await page.goto( 'about:blank' );
-		await setViewport( 'large' );
 	} );
 
 	it( 'Should have sidebar visible at the start with document sidebar active on desktop', async () => {
@@ -40,7 +39,7 @@ describe( 'Publishing', () => {
 
 	it( 'Should have the sidebar closed by default on mobile', async () => {
 		await setViewport( 'small' );
-		await newPost( { viewport: 'small' } );
+		await newPost();
 		const sidebar = await page.$( SIDEBAR_SELECTOR );
 		expect( sidebar ).toBeNull();
 	} );
@@ -61,7 +60,8 @@ describe( 'Publishing', () => {
 
 	it( 'Should reopen sidebar the sidebar when resizing from mobile to desktop if the sidebar was closed automatically', async () => {
 		await setViewport( 'large' );
-		await newPost( { viewport: 'small' } );
+		await newPost();
+		await setViewport( 'small' );
 
 		const sidebarsMobile = await page.$$( SIDEBAR_SELECTOR );
 		expect( sidebarsMobile ).toHaveLength( 0 );

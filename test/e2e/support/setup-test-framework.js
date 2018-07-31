@@ -10,6 +10,7 @@ import {
 	clearLocalStorage,
 	disablePageDialogAccept,
 	enablePageDialogAccept,
+	setViewport,
 	visitAdmin,
 } from './utils';
 
@@ -22,6 +23,7 @@ const { PUPPETEER_TIMEOUT } = process.env;
 jest.setTimeout( PUPPETEER_TIMEOUT || 100000 );
 
 beforeAll( async () => {
+	await setViewport( 'large' );
 	enablePageDialogAccept();
 } );
 

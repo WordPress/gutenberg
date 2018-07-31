@@ -86,10 +86,8 @@ export async function visitAdmin( adminPath, query ) {
 	}
 }
 
-export async function newPost( { postType, viewport = 'large', enableTips = false } = {} ) {
+export async function newPost( { postType, enableTips = false } = {} ) {
 	await visitAdmin( 'post-new.php', postType ? 'post_type=' + postType : '' );
-
-	setViewport( viewport );
 
 	const tipsEnabled = await page.evaluate( () => wp.data.select( 'core/nux' ).areTipsEnabled() );
 	if ( tipsEnabled && ! enableTips ) {
