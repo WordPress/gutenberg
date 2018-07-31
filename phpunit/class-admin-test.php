@@ -75,6 +75,14 @@ class Admin_Test extends WP_UnitTestCase {
 
 		wp_set_current_user( self::$editor_user_id );
 		$this->assertTrue( gutenberg_can_edit_post( $generic_post_id ) );
+
+		add_filter( 'gutenberg_can_edit_post', '__return_false' );
+		$this->assertFalse( gutenberg_can_edit_post( $generic_post_id ) );
+		remove_filter( 'gutenberg_can_edit_post', '__return_false' );
+
+		add_filter( 'gutenberg_can_edit_post', '__return_true' );
+		$this->assertTrue( gutenberg_can_edit_post( $restless_post_id ) );
+		remove_filter( 'gutenberg_can_edit_post', '__return_true' );
 	}
 
 	/**
