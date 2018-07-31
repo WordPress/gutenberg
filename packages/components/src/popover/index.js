@@ -8,7 +8,6 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
-import deprecated from '@wordpress/deprecated';
 import { focus } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
 
@@ -108,21 +107,11 @@ class Popover extends Component {
 	focus() {
 		const { focusOnMount } = this.props;
 
-		if ( focusOnMount === true ) {
-			deprecated( 'focusOnMount={ true }', {
-				version: '3.4',
-				alternative: 'focusOnMount="firstElement"',
-				plugin: 'Gutenberg',
-			} );
-		}
-
 		if ( ! focusOnMount || ! this.contentNode.current ) {
 			return;
 		}
 
-		// Boolean values for focusOnMount deprecated in 3.2–remove
-		// `focusOnMount === true` check in 3.4.
-		if ( focusOnMount === 'firstElement' || focusOnMount === true ) {
+		if ( focusOnMount === 'firstElement' ) {
 			// Find first tabbable node within content and shift focus, falling
 			// back to the popover panel itself.
 			const firstTabbable = focus.tabbable.find( this.contentNode.current )[ 0 ];
