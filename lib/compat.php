@@ -247,8 +247,8 @@ function gutenberg_warn_classic_about_blocks() {
 					?>
 				</div>
 				<p>
-					<a class="button button-primary blocks-in-post-gutenberg-button" title="<?php esc_attr_e( 'Open this post in the Gutenberg block editor', 'gutenberg' ); ?>" href="<?php echo esc_url( $gutenberg_edit_link ); ?>"><?php _e( 'Edit in Gutenberg', 'gutenberg' ); ?></a>
-					<button class="button blocks-in-post-classic-button" title="<?php esc_attr_e( 'Close this dialog, and edit the post in the classic editor', 'gutenberg' ); ?>"><?php _e( 'Continue to Classic Editor', 'gutenberg' ); ?></button>
+					<a class="button button-primary blocks-in-post-gutenberg-button" href="<?php echo esc_url( $gutenberg_edit_link ); ?>"><?php _e( 'Edit in Gutenberg', 'gutenberg' ); ?></a>
+					<button type="button" class="button blocks-in-post-classic-button"><?php _e( 'Continue to Classic Editor', 'gutenberg' ); ?></button>
 				</p>
 			</div>
 		</div>
