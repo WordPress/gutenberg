@@ -76,9 +76,13 @@ describe( 'PostPreviewButton', () => {
 	describe( 'openPreviewWindow()', () => {
 		function assertForPreview( props, expectedPreviewURL, isExpectingSave ) {
 			const autosave = jest.fn();
+			const setLocation = jest.fn();
 			const windowOpen = window.open;
 			window.open = jest.fn( () => {
 				return {
+					set location( url ) {
+						setLocation( url );
+					},
 					document: {
 						write: jest.fn(),
 						close: jest.fn(),
@@ -96,10 +100,12 @@ describe( 'PostPreviewButton', () => {
 
 			wrapper.simulate( 'click' );
 
+			expect( window.open ).toHaveBeenCalledWith( '', 'wp-preview-1' );
+
 			if ( expectedPreviewURL ) {
-				expect( window.open ).toHaveBeenCalledWith( expectedPreviewURL, 'wp-preview-1' );
+				expect( setLocation ).toHaveBeenCalledWith( expectedPreviewURL );
 			} else {
-				expect( window.open ).not.toHaveBeenCalled();
+				expect( setLocation ).not.toHaveBeenCalled();
 			}
 
 			window.open = windowOpen;
@@ -125,14 +131,14 @@ describe( 'PostPreviewButton', () => {
 			assertForPreview( {
 				isAutosaveable: true,
 				previewLink: 'https://wordpress.org/?p=1&preview=true',
-			}, 'about:blank', true );
+			}, null, true );
 		} );
 
 		it( 'should save for autosaveable post without preview link', () => {
 			assertForPreview( {
 				isAutosaveable: true,
 				previewLink: undefined,
-			}, 'about:blank', true );
+			}, null, true );
 		} );
 
 		it( 'should not save but open a popup window if not autosaveable but preview link available', () => {
