@@ -4,12 +4,12 @@
 	align-items: center;
 	margin-bottom: 0;
 
-	> div {
-		flex-grow: 1;
-	}
-
 	&.is-transient {
 		@include loading_fade;
+	}
+
+	&__content-wrapper {
+		flex-grow: 1;
 	}
 
 	&__textlink {
