@@ -10,7 +10,7 @@ import classnames from 'classnames';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
-import { Component, Fragment, renderToString } from '@wordpress/element';
+import { Component, renderToString } from '@wordpress/element';
 import { Button, Placeholder, Spinner, SandBox, IconButton, Toolbar } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 import { RichText, BlockControls } from '@wordpress/editor';
@@ -45,6 +45,7 @@ export function getEmbedEdit( title, icon ) {
 		constructor() {
 			super( ...arguments );
 
+			this.switchBackToURLInput = this.switchBackToURLInput.bind( this );
 			this.setUrl = this.setUrl.bind( this );
 			this.processPreview = this.processPreview.bind( this );
 
@@ -70,7 +71,9 @@ export function getEmbedEdit( title, icon ) {
 		componentDidUpdate( prevProps ) {
 			const hasPreview = undefined !== this.props.preview;
 			const hadPreview = undefined !== prevProps.preview;
-			if ( hasPreview && ! hadPreview ) {
+			// We had a preview, and the URL was edited, and the new URL already has a preview fetched.
+			const switchedPreview = this.props.preview && this.props.attributes.url !== prevProps.attributes.url;
+			if ( ( hasPreview && ! hadPreview ) || switchedPreview ) {
 				this.processPreview();
 			}
 		}
@@ -89,6 +92,12 @@ export function getEmbedEdit( title, icon ) {
 			const { url } = this.state;
 			const { setAttributes } = this.props;
 			if ( url === this.props.attributes.url ) {
+				if ( this.props.preview ) {
+					// Form has been submitted without changing the url, and we already have a preview,
+					// so process it again. Happens when the user clicks edit and then immediately
+					// clicks embed.
+					this.processPreview();
+				}
 				// Don't change anything, otherwise we go into the 'fetching' state but never
 				// get new props, because the url has not changed.
 				return;
@@ -151,10 +160,26 @@ export function getEmbedEdit( title, icon ) {
 			this.setState( { fetching: false } );
 		}
 
+		switchBackToURLInput() {
+			this.setState( { html: undefined } );
+		}
+
 		render() {
 			const { html, type, error, fetching, url } = this.state;
 			const { caption } = this.props.attributes;
 			const { setAttributes, isSelected, className } = this.props;
+			const controls = (
+				<BlockControls>
+					<Toolbar>
+						{ ( html && <IconButton
+							className="components-toolbar__control"
+							label={ __( 'Edit URL' ) }
+							icon="edit"
+							onClick={ this.switchBackToURLInput }
+						/> ) }
+					</Toolbar>
+				</BlockControls>
+			);
 
 			if ( fetching ) {
 				return (
@@ -211,6 +236,7 @@ export function getEmbedEdit( title, icon ) {
 
 			return (
 				<figure className={ classnames( className, 'wp-block-embed', { 'is-video': 'video' === type } ) }>
+					{ controls }
 					{ ( cannotPreview ) ? (
 						<Placeholder icon={ icon } label={ __( 'Embed URL' ) }>
 							<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
