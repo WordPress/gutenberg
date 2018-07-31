@@ -5,6 +5,8 @@ var aztex = {
   name: 'AztecView',
   propTypes: {
     text: PropTypes.object,
+    placeholder: PropTypes.string,
+    placeholderTextColor: PropTypes.number,
     color: PropTypes.string,
     maxImagesWidth: PropTypes.number,
     minImagesWidth: PropTypes.number,
