@@ -65,7 +65,7 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 const applyWithAPIDataItems = withAPIData( ( { postType, postId } ) => {
 	const isHierarchical = get( postType, [ 'hierarchical' ], false );
 	const restBase = get( postType, [ 'rest_base' ], false );
-	const queryString = {
+	const query = {
 		context: 'edit',
 		per_page: -1,
 		exclude: postId,
@@ -75,7 +75,7 @@ const applyWithAPIDataItems = withAPIData( ( { postType, postId } ) => {
 		order: 'asc',
 	};
 	return isHierarchical && restBase ?
-		{ items: addQueryArgs( `/wp/v2/${ restBase }`, queryString ) } :
+		{ items: addQueryArgs( `/wp/v2/${ restBase }`, query ) } :
 		{};
 } );
 
