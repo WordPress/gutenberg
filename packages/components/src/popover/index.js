@@ -99,6 +99,13 @@ class Popover extends Component {
 		this.rafHandle = window.requestAnimationFrame( () => this.computePopoverPosition() );
 	}
 
+	/**
+	 * Calling `refresh()` will force the Popover to recalculate its size and
+	 * position. This is useful when a DOM change causes the anchor node to change
+	 * position.
+	 *
+	 * @return {void}
+	 */
 	refresh() {
 		const popoverSize = this.updatePopoverSize();
 		this.computePopoverPosition( popoverSize );
