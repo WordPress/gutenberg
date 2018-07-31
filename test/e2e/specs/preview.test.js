@@ -47,7 +47,7 @@ describe( 'Preview', () => {
 					if ( lastPreviewPage ) {
 						// If a new preview tab is opened and there was a previous one, close
 						// the previous tab.
-						lastPreviewPage.close();
+						await lastPreviewPage.close();
 					}
 					resolve( targetPage );
 				}
@@ -57,14 +57,16 @@ describe( 'Preview', () => {
 		];
 
 		if ( lastPreviewPage ) {
-			race.push( new Promise( async ( resolve ) => {
-				async function onLastPreviewPageLoaded() {
-					await lastPreviewPage.reload();
-					resolve( lastPreviewPage );
-				}
-				lastPreviewPage.once( 'load', onLastPreviewPageLoaded );
-				eventHandlers.push( [ lastPreviewPage, 'load', onLastPreviewPageLoaded ] );
-			} ) );
+			race.push(
+				new Promise( async ( resolve ) => {
+					async function onLastPreviewPageLoaded() {
+						await lastPreviewPage.reload();
+						resolve( lastPreviewPage );
+					}
+					lastPreviewPage.once( 'load', onLastPreviewPageLoaded );
+					eventHandlers.push( [ lastPreviewPage, 'load', onLastPreviewPageLoaded ] );
+				} )
+			);
 		}
 
 		editorPage.click( '.editor-post-preview' );
@@ -74,17 +76,17 @@ describe( 'Preview', () => {
 		//  - An existing tab is reused and navigates.
 		const previewPage = await Promise.race( race );
 
-		if ( lastPreviewPage ) {
-			expect( previewPage ).toBe( lastPreviewPage );
-		}
-
 		// Since there may be lingering event handlers from whichever of the
 		// race candidates had lost, remove all handlers.
 		eventHandlers.forEach( ( [ target, event, handler ] ) => {
 			target.removeListener( event, handler );
 		} );
 
-		previewPage.bringToFront();
+		await previewPage.bringToFront();
+
+		if ( lastPreviewPage ) {
+			expect( previewPage ).toBe( lastPreviewPage );
+		}
 
 		return previewPage;
 	}
@@ -150,7 +152,7 @@ describe( 'Preview', () => {
 		await editorPage.type( '.editor-post-title__input', ' And more.' );
 
 		// Published preview should reuse same popup frame.
-		// TODO: Fix code to reuse the same frame!
+		// TODO: Fix an existing bug which opens a new tab.
 		previewPage = await getOpenedPreviewPage( editorPage );
 
 		// Title in preview should match updated input.

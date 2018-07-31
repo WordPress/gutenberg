@@ -28,7 +28,7 @@ describe( 'adding blocks', () => {
 		expect( await page.$( '[data-type="core/paragraph"]' ) ).toBeNull();
 
 		// Using the placeholder
-		await page.click( '.editor-default-block-appender__content)' );
+		await page.click( '.editor-default-block-appender__content' );
 		await page.keyboard.type( 'Paragraph block' );
 
 		// Using the slash command
