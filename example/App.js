@@ -30,7 +30,7 @@ export default class example extends React.Component {
                     <RCTAztecView
                          {...this.props}
                          style={[styles.aztec_editor, {minHeight: myMinHeight}]}
-                         text = {{text: "Ola"}}
+                         text = {{text: example_content()}}
                          placeholder = {'This is the placeholder text'}
                          placeholderTextColor = {'darkblue'} // See http://facebook.github.io/react-native/docs/colors
                          onContentSizeChange= {(event) => {
