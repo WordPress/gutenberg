@@ -38,7 +38,7 @@ export const deleteBlockAction: BlockActionType = uid => ( {
 	uid: uid,
 } );
 
-export const createBlockAction: BlockActionType = uid => ( {
+export const createBlockAction: BlockActionType = block => ( {
 	type: ActionTypes.BLOCK.CREATE,
-	uid: uid,
+	block: block,
 } );
