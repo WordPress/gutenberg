@@ -1095,9 +1095,9 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	global $wp_scripts;
 
-	// Add "wp-hooks" as dependency of "heartbeat"
+	// Add "wp-hooks" as dependency of "heartbeat".
 	$heartbeat_script = $wp_scripts->query( 'heartbeat', 'registered' );
-	if ( $heartbeat_script && !in_array( 'wp-hooks', $heartbeat_script->deps ) ) {
+	if ( $heartbeat_script && ! in_array( 'wp-hooks', $heartbeat_script->deps ) ) {
 		$heartbeat_script->deps[] = 'wp-hooks';
 	}
 
