@@ -23,10 +23,22 @@ function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
 	);
 }
 
+/**
+ * Wrapper function to filter the label property passed to the post excerpt Textareacontrol.
+ *
+ * @param {string} label The default label to be filtered.
+ * @return {string} The filtered string.
+ */
 function PostExcerptLabel( label ) {
 	return applyFilters( 'editor.post-excerpt.label', label );
 }
 
+/**
+ * Wrapper function to filter the internal text of the codex link in the post excerpt.
+ *
+ * @param {string} text The default text to be filtered.
+ * @return {string} The filtered string.
+ */
 function PostExcerptLinkText( text ) {
 	return applyFilters( 'editor.post-excerpt.link-text', text );
 }
