@@ -18,8 +18,8 @@ const TagsPanel = () => <PanelBody initialOpen={ true } title={ [
 	<FlatTermSelector slug={ 'post_tag' } />
 </PanelBody>;
 
-const MaybeTagsPanel = ( { hasTags } ) => {
-	if ( ! hasTags ) {
+const MaybeTagsPanel = ( { isPostTypeSupported, hasTags } ) => {
+	if ( ! isPostTypeSupported || hasTags ) {
 		return null;
 	}
 	return ( <TagsPanel /> );
@@ -29,8 +29,10 @@ export default compose( [
 	withSelect( ( select ) => {
 		const postType = select( 'core/editor' ).getCurrentPostType();
 		const tags = select( 'core' ).getTaxonomy( 'post_tag' );
+		const terms = select( 'core/editor' ).getEditedPostAttribute( tags.rest_base );
 		return {
-			hasTags: tags && tags.types.some( ( type ) => type === postType ),
+			hasTags: tags && terms && terms.length > 0,
+			isPostTypeSupported: tags && tags.types.some( ( type ) => type === postType ),
 		};
 	} ),
 ] )( MaybeTagsPanel );
