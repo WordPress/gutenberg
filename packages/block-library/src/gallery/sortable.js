@@ -1,6 +1,12 @@
-import { SortableContainer, SortableElement, arrayMove } from 'react-sortable-hoc';
+/**
+ * WordPress dependencies
+ */
+import { Component } from '@wordpress/element';
 
-const { Component } = wp.element;
+/**
+ * Internal dependencies
+ */
+import { SortableContainer, SortableElement, arrayMove } from 'react-sortable-hoc';
 
 class Sortable extends Component {
 	//constructor
