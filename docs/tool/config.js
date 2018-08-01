@@ -69,7 +69,7 @@ module.exports = {
 	rootManifest: path.resolve( __dirname, '../root-manifest.json' ),
 	componentsManifest: [
 		{
-			title: 'Components',
+			title: 'Components Package Reference',
 			slug: 'components',
 			markdown_source: `${ baseRepoUrl }packages/components.md`,
 			parent: null,
