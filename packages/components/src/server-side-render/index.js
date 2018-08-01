@@ -13,7 +13,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-import { select } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies.
@@ -100,24 +100,10 @@ class ServerSideRender extends Component {
 	}
 }
 
-/**
- * A wrapper to inject the Post Id.
- *
- * @param {Object} $0            The params object.
- * @param {string} $0.block      The block name to render.
- * @param {string} $0.attributes The attributes with which to render the block.
- *
- * @return {WPElement} The ServerSideRender component.
- */
-export default function( {
-	block,
-	attributes,
-} ) {
+export default withSelect( ( select ) => {
 	const { getCurrentPostId } = select( 'core/editor' );
 
-	return <ServerSideRender
-		postId={ getCurrentPostId() }
-		block={ block }
-		attributes={ attributes }
-	/>;
-}
+	return {
+		postId: getCurrentPostId(),
+	};
+} )( ServerSideRender );
