@@ -7,6 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -37,10 +38,12 @@ class PanelBody extends Component {
 	}
 
 	render() {
-		const { title, children, opened, className, icon } = this.props;
+		const { title: rawTitle, children, opened, className, icon } = this.props;
 		const isOpened = opened === undefined ? this.state.opened : opened;
 		const arrow = `arrow-${ isOpened ? 'up' : 'down' }`;
 		const classes = classnames( 'components-panel__body', className, { 'is-opened': isOpened } );
+
+		const title = applyFilters( 'components.panel.body.title', rawTitle );
 
 		return (
 			<div className={ classes }>

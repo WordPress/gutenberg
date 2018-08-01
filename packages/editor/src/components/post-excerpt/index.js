@@ -5,21 +5,30 @@ import { __ } from '@wordpress/i18n';
 import { ExternalLink, TextareaControl } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { applyFilters } from '@wordpress/hooks';
 
 function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
 	return (
 		<div className="editor-post-excerpt">
 			<TextareaControl
-				label={ __( 'Write an excerpt (optional)' ) }
+				label={ PostExcerptLabel( __( 'Write an excerpt (optional)' ) ) }
 				className="editor-post-excerpt__textarea"
 				onChange={ ( value ) => onUpdateExcerpt( value ) }
 				value={ excerpt }
 			/>
 			<ExternalLink href="https://codex.wordpress.org/Excerpt">
-				{ __( 'Learn more about manual excerpts' ) }
+				{ PostExcerptLinkText( __( 'Learn more about manual excerpts' ) ) }
 			</ExternalLink>
 		</div>
 	);
+}
+
+function PostExcerptLabel( label ) {
+	return applyFilters( 'editor.post-excerpt.label', label );
+}
+
+function PostExcerptLinkText( text ) {
+	return applyFilters( 'editor.post-excerpt.link-text', text );
 }
 
 export default compose( [
