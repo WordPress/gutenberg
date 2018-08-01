@@ -45,7 +45,7 @@ export class RichText extends Component {
 
 	onContentSizeChange( event ) {
 		const contentHeight = event.nativeEvent.contentSize.height;
-		this.forceUpdate = true; // Set this to true and check it in shouldComponentUpdate to force re-render the component
+		this.forceUpdate(); // force re-render the component skipping shouldComponentUpdate() See: https://reactjs.org/docs/react-component.html#forceupdate
 		this.props.onContentSizeChange( {
 			aztecHeight: contentHeight,
 		}
@@ -53,17 +53,12 @@ export class RichText extends Component {
 	}
 
 	shouldComponentUpdate( nextProps ) {
-		if ( this.forceUpdate ) {
-			this.forceUpdate = false;
-			return true;
-		}
-
 		// The check below allows us to avoid updating the content right after an `onChange` call
 		if ( nextProps.content.contentTree &&
 			nextProps.content.eventCount &&
 			this.lastContent && // first time the component is drawn with empty content `lastContent` is undefined
 			this.lastEventCount &&
-			nextProps.content.eventCount !== this.lastEventCount ) {
+			nextProps.content.contentTree.eventCount !== this.lastEventCount ) {
 			return false;
 		}
 
