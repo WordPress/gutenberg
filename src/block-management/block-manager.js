@@ -81,7 +81,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				// instead of being appended to the end.
 				// this.props.createBlockAction( uid, dataSourceBlockIndex );
 
-				// TODO: create an unique id, we're using 
+				// TODO: create an unique id, we're using this just for now
 				const block = this.state.dataSource.get(this.state.dataSource.size() - 1);
 				const newId = parseInt(block.uid) + 1
 
