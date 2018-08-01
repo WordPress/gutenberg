@@ -17,6 +17,27 @@ import {
 	textFormattingShortcuts,
 } from './config';
 
+const splitShortcutKey = ( shortcutKey ) => {
+	return shortcutKey
+		.split( /(\+|⌘)/ )
+		.filter( ( character ) => !! character )
+		.map( ( character, index ) => {
+			if ( character !== '+' ) {
+				return (
+					<kbd key={ index }>
+						{ character }
+					</kbd>
+				);
+			}
+
+			return (
+				<Fragment key={ index }>
+					{ character }
+				</Fragment>
+			);
+		} );
+};
+
 const ShortcutList = ( { shortcuts } ) => (
 	<dl className="editor-keyboard-shortcut-help__shortcut-list">
 		{ shortcuts.map( ( { key, description }, index ) => (
@@ -24,7 +45,7 @@ const ShortcutList = ( { shortcuts } ) => (
 				key={ index }
 			>
 				<dt className="editor-keyboard-shortcut-help__shortcut-key">
-					{ key }
+					{ splitShortcutKey( key ) }
 				</dt>
 				<dd className="editor-keyboard-shortcut-help__shortcut-description">
 					{ description }
