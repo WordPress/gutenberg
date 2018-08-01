@@ -16,6 +16,7 @@ import {
 	PostPublishPanel,
 	DocumentTitle,
 	PreserveScrollInReorder,
+	KeyboardShortcutHelpModal,
 } from '@wordpress/editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { Fragment } from '@wordpress/element';
@@ -88,6 +89,7 @@ function Layout( {
 				<EditorNotices />
 				<PreserveScrollInReorder />
 				<EditorModeKeyboardShortcuts />
+				<KeyboardShortcutHelpModal />
 				{ mode === 'text' && <TextEditor /> }
 				{ mode === 'visual' && <VisualEditor /> }
 				<div className="edit-post-layout__metaboxes">
