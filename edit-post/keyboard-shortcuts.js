@@ -9,7 +9,7 @@ export default {
 		display: displayShortcut.secondary( 'm' ),
 	},
 	toggleSidebar: {
-		raw: rawShortcut.primary( ',' ),
-		display: displayShortcut.primary( ',' ),
+		raw: rawShortcut.primaryShift( ',' ),
+		display: displayShortcut.primaryShift( ',' ),
 	},
 };
