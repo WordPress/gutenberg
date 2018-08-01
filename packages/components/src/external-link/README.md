@@ -7,7 +7,7 @@ import { ExternalLink } from '@wordpress/components';
 
 function MyExternalLink() {
 	return (
-		<ExternalLink href="https://wordpress.com">WordPress.com</ExternalLink>
+		<ExternalLink href="https://wordpress.org">WordPress.org</ExternalLink>
 	);
 }
 ```
