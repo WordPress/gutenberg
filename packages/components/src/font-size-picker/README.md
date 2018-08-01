@@ -25,8 +25,8 @@ withState( {
 			value={ fontSize }
 			onChange={ fontSize => setState( { fontSize } ) } 
 		/>
-	) 
-} )
+	); 
+} );
 ```
 
 ## Props
