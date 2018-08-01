@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, flow, noop, some } from 'lodash';
+import { castArray, flow, noop, some, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -25,7 +25,7 @@ export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, role, .
 			icon="trash"
 			label={ label }
 			role={ role }
-			{ ...props }
+			{ ...omit( props, 'clientIds' ) }
 		>
 			{ label }
 		</IconButton>

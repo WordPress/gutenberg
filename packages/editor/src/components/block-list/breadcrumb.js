@@ -47,7 +47,7 @@ export class BlockBreadcrumb extends Component {
 		} );
 	}
 
-	render( ) {
+	render() {
 		const { clientId, rootClientId } = this.props;
 
 		return (

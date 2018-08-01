@@ -9,7 +9,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { getCategories, getEntityRecord, getEntityRecords } from '../resolvers';
 import { receiveTerms, receiveEntityRecords, addEntities } from '../actions';
 
-jest.mock( '@wordpress/api-fetch' );
+jest.mock( '@wordpress/api-fetch', () => jest.fn() );
 
 describe( 'getCategories', () => {
 	const CATEGORIES = [ { id: 1 } ];

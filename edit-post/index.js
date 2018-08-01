@@ -67,13 +67,6 @@ export function initializeEditor( id, postType, postId, settings, overridePost )
 		hint: 'If paragraphs using this classes are opened in the editor new classes are automatically applied the post just needs to be saved. This is a global warning, shown regardless of whether the classes are used in the current post.',
 	} );
 
-	deprecated( 'block `id` prop in `edit` function', {
-		version: '3.4',
-		alternative: 'block `clientId` prop',
-		plugin: 'Gutenberg',
-		hint: 'This is a global warning, shown regardless of whether blocks exist using the deprecated prop.',
-	} );
-
 	registerCoreBlocks();
 
 	dispatch( 'core/nux' ).triggerGuide( [

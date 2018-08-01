@@ -38,6 +38,8 @@ import {
 } from '../../actions';
 import reducer from '../../reducer';
 
+jest.mock( '@wordpress/api-fetch', () => jest.fn() );
+
 describe( 'reusable blocks effects', () => {
 	beforeAll( () => {
 		registerBlockType( 'core/test-block', {

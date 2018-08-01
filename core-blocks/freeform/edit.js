@@ -51,13 +51,13 @@ export default class FreeformEdit extends Component {
 
 	componentWillUnmount() {
 		window.addEventListener( 'DOMContentLoaded', this.initialize );
-		wp.oldEditor.remove( `editor-${ this.props.id }` );
+		wp.oldEditor.remove( `editor-${ this.props.clientId }` );
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { id, attributes: { content } } = this.props;
+		const { clientId, attributes: { content } } = this.props;
 
-		const editor = window.tinymce.get( `editor-${ id }` );
+		const editor = window.tinymce.get( `editor-${ clientId }` );
 
 		if ( prevProps.attributes.content !== content ) {
 			editor.setContent( content || '' );
@@ -65,14 +65,14 @@ export default class FreeformEdit extends Component {
 	}
 
 	initialize() {
-		const { id } = this.props;
+		const { clientId } = this.props;
 		const { settings } = window.wpEditorL10n.tinymce;
-		wp.oldEditor.initialize( `editor-${ id }`, {
+		wp.oldEditor.initialize( `editor-${ clientId }`, {
 			tinymce: {
 				...settings,
 				inline: true,
 				content_css: false,
-				fixed_toolbar_container: `#toolbar-${ id }`,
+				fixed_toolbar_container: `#toolbar-${ clientId }`,
 				setup: this.onSetup,
 			},
 		} );
@@ -150,7 +150,7 @@ export default class FreeformEdit extends Component {
 	}
 
 	render() {
-		const { id } = this.props;
+		const { clientId } = this.props;
 
 		// Disable reason: the toolbar itself is non-interactive, but must capture
 		// events from the KeyboardShortcuts component to stop their propagation.
@@ -161,7 +161,7 @@ export default class FreeformEdit extends Component {
 			/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 			<div
 				key="toolbar"
-				id={ `toolbar-${ id }` }
+				id={ `toolbar-${ clientId }` }
 				ref={ ( ref ) => this.ref = ref }
 				className="freeform-toolbar"
 				onClick={ this.focus }
@@ -170,7 +170,7 @@ export default class FreeformEdit extends Component {
 			/>,
 			<div
 				key="editor"
-				id={ `editor-${ id }` }
+				id={ `editor-${ clientId }` }
 				className="wp-block-freeform core-blocks-rich-text__tinymce"
 			/>,
 		];

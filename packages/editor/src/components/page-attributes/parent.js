@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { get } from 'lodash';
-import { stringify } from 'querystringify';
 
 /**
  * WordPress dependencies
@@ -11,6 +10,7 @@ import { __ } from '@wordpress/i18n';
 import { TreeSelect, withAPIData } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -65,7 +65,7 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 const applyWithAPIDataItems = withAPIData( ( { postType, postId } ) => {
 	const isHierarchical = get( postType, [ 'hierarchical' ], false );
 	const restBase = get( postType, [ 'rest_base' ], false );
-	const queryString = stringify( {
+	const query = {
 		context: 'edit',
 		per_page: -1,
 		exclude: postId,
@@ -73,9 +73,9 @@ const applyWithAPIDataItems = withAPIData( ( { postType, postId } ) => {
 		_fields: [ 'id', 'parent', 'title' ],
 		orderby: 'menu_order',
 		order: 'asc',
-	} );
+	};
 	return isHierarchical && restBase ?
-		{ items: `/wp/v2/${ restBase }?${ queryString }` } :
+		{ items: addQueryArgs( `/wp/v2/${ restBase }`, query ) } :
 		{};
 } );
 

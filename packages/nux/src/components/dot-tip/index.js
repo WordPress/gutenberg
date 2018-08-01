@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { compose, withSafeTimeout } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 import { Popover, Button, IconButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -25,7 +25,11 @@ export function DotTip( {
 			focusOnMount="container"
 			role="dialog"
 			aria-label={ __( 'Gutenberg tips' ) }
-			onClick={ ( event ) => event.stopPropagation() }
+			onClick={ ( event ) => {
+				// Tips are often nested within buttons. We stop propagation so that clicking
+				// on a tip doesn't result in the button being clicked.
+				event.stopPropagation();
+			} }
 		>
 			<p>{ children }</p>
 			<p>
@@ -44,7 +48,6 @@ export function DotTip( {
 }
 
 export default compose(
-	withSafeTimeout,
 	withSelect( ( select, { id } ) => {
 		const { isTipVisible, getAssociatedGuide } = select( 'core/nux' );
 		const associatedGuide = getAssociatedGuide( id );
