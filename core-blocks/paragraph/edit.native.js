@@ -51,7 +51,6 @@ class ParagraphEdit extends Component {
 					}
 					}
 					placeholder={ placeholder || __( 'Add text or type / to add content' ) }
-					aria-label={ __( 'test' ) }
 				/>
 			</View>
 		);
