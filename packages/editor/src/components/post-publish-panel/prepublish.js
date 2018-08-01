@@ -18,7 +18,7 @@ import PostVisibility from '../post-visibility';
 import PostVisibilityLabel from '../post-visibility/label';
 import PostSchedule from '../post-schedule';
 import PostScheduleLabel from '../post-schedule/label';
-import FlatTermSelector from '../post-taxonomies/flat-term-selector';
+import MaybeTagsPanel from './maybe-tags-panel';
 
 function PostPublishPanelPrepublish( {
 	hasPublishAction,
@@ -42,15 +42,7 @@ function PostPublishPanelPrepublish( {
 					] }>
 						<PostSchedule />
 					</PanelBody>
-					<PanelBody initialOpen={ true } title={ [
-						<Dashicon key={ 'dashicon-lightbulb' } icon={ 'lightbulb' } />,
-						__( 'Tip:' ),
-						<span className="editor-post-publish-panel__link" key="label">{
-							__( 'Add tags to your post' )
-						}</span>,
-					] }>
-						<FlatTermSelector slug={ 'post_tag' } />
-					</PanelBody>
+					<MaybeTagsPanel />
 					{ children }
 				</Fragment>
 			) }
