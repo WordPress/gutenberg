@@ -5,22 +5,23 @@
 ## Usage
 
 ```jsx
-import { DropZoneProvider, DropZone, Panel } from '@wordpress/components';
+import { DropZoneProvider, DropZone } from '@wordpress/components';
+import { withState } from '@wordpress/compose';
 
-function MyComponent() {
-	return (
-		<DropZoneProvider>
-			<div>
-				Drop something here
-				<DropZone 
-					onFilesDrop={ () => console.log( 'do something' ) }
-					onHTMLDrop={ () => console.log( 'do something' ) }
-					onDrop={ () => console.log( 'do something' ) } 
-				/>
-			</div>
-		</DropZoneProvider>
-	);
-}
+withState( {
+	hasDropped: false,
+} )( ( { hasDropped, setState } ) => (
+	<DropZoneProvider>
+		<div>
+			{ hasDropped ? 'Dropped!' : 'Drop something here' }
+			<DropZone 
+				onFilesDrop={ () => setState( { hasDropped: true } ) }
+				onHTMLDrop={ () => setState( { hasDropped: true } )  }
+				onDrop={ () => setState( { hasDropped: true } ) } 
+			/>
+		</div>
+	</DropZoneProvider>
+) );
 ```
 
 ## Props
