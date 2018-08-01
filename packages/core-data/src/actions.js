@@ -4,6 +4,11 @@
 import { castArray } from 'lodash';
 
 /**
+ * Internal dependencies
+ */
+import { receiveQueriedItems } from './queried-data';
+
+/**
  * Returns an action object used in signalling that terms have been received
  * for a given taxonomy.
  *
@@ -56,13 +61,13 @@ export function addEntities( entities ) {
  * @param {string}       kind    Kind of the received entity.
  * @param {string}       name    Name of the received entity.
  * @param {Array|Object} records Records received.
+ * @param {?Object}      query  Query Object.
  *
  * @return {Object} Action object.
  */
-export function receiveEntityRecords( kind, name, records ) {
+export function receiveEntityRecords( kind, name, records, query ) {
 	return {
-		type: 'RECEIVE_ENTITY_RECORDS',
-		records: castArray( records ),
+		...receiveQueriedItems( records, query ),
 		kind,
 		name,
 	};
