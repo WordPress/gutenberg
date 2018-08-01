@@ -28,8 +28,10 @@ export class RichText extends Component {
 			clearTimeout( this.currentTimer );
 		}
 		this.lastEventCount = event.nativeEvent.eventCount;
-		const newContent = event.nativeEvent.text.replace( /<p>/gi, '' ).replace( /<\/p>/gi, '<br>' );
-		this.lastContent = newContent;
+		// The following method just cleans up any <p> tags produced by aztec and replaces them with a br tag
+		// This should be removed on a later version when aztec doesn't return the top tag of the text being edited
+		const contentWithoutP = event.nativeEvent.text.replace( /<p>/gi, '' ).replace( /<\/p>/gi, '<br>' );
+		this.lastContent = contentWithoutP;
 
 		this.currentTimer = setTimeout( function() {
 			this.props.onChange( {
