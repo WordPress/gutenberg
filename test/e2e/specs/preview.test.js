@@ -17,14 +17,11 @@ describe( 'Preview', () => {
 		await newPost();
 	} );
 
-	function sleep( time ) {
-		return new Promise( ( resolve ) => setTimeout( resolve, time ) );
-	}
-
-	async function waitForTab( numTabs ) {
+	async function waitForTab( openTabs ) {
+		const numTabs = openTabs.length;
 		let tabs = await browser.pages();
 		while ( tabs.length === numTabs ) {
-			await sleep( 100 );
+			await openTabs[1].waitFor( 100 );
 			tabs = await browser.pages();
 		}
 	}
@@ -35,7 +32,7 @@ describe( 'Preview', () => {
 		expect( numberOfTabs ).toBe( 2 );
 
 		editorPage.click( '.editor-post-preview' );
-		await waitForTab( numberOfTabs );
+		await waitForTab( openTabs );
 
 		openTabs = await browser.pages();
 		expect( openTabs ).toHaveLength( 3 );
