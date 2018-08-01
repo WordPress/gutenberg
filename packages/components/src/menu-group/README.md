@@ -3,13 +3,13 @@
 ## Usage
 
 ```jsx
-import { MenuGroup } from '@wordpress/components';
+import { MenuGroup, MenuItem } from '@wordpress/components';
 
 function MyMenuGroup() {
 	return (
 		<MenuGroup label="Settings">
-			<div>Setting 1</div>
-			<div>Setting 2</div>
+			<MenuItem>Setting 1</MenuItem>
+			<MenuItem>Setting 2</MenuItem>
 		</MenuGroup>
 	);
 }
