@@ -59,7 +59,7 @@ import { withState } from '@wordpress/compose';
 
 withState( {
 	tokens: [],
-	suggestions: ['Africa', 'America', 'Antarctica', 'Asia', 'Europe', 'Oceania'],
+	suggestions: [ 'Africa', 'America', 'Antarctica', 'Asia', 'Europe', 'Oceania' ],
 } )( ( { tokens, suggestions, setState } ) => ( 
 	<FormTokenField 
 		value={ tokens } 
