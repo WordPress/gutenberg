@@ -336,5 +336,5 @@ export default compose( [
 	} ) ),
 	withSpokenMessages,
 	withInstanceId,
-	withFilters( 'editor.HierarchicalTermSelector' ),
+	withFilters( 'editor.PostTaxonomies' ),
 ] )( HierarchicalTermSelector );
