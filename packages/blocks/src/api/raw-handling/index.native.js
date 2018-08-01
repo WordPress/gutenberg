@@ -1,5 +1,1 @@
-import {
-	getPhrasingContentSchema,
-} from './utils';
-
-export { getPhrasingContentSchema };
+export { getPhrasingContentSchema } from './phrasing-content';

@@ -8,7 +8,7 @@ const phrasingContentSchema = {
 	em: {},
 	del: {},
 	ins: {},
-	a: { attributes: [ 'href' ] },
+	a: { attributes: [ 'href', 'target', 'rel' ] },
 	code: {},
 	abbr: { attributes: [ 'title' ] },
 	sub: {},
@@ -33,4 +33,18 @@ const phrasingContentSchema = {
  */
 export function getPhrasingContentSchema() {
 	return phrasingContentSchema;
+}
+
+/**
+ * Find out whether or not the given node is phrasing content.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content
+ *
+ * @param {Element} node The node to test.
+ *
+ * @return {boolean} True if phrasing content, false if not.
+ */
+export function isPhrasingContent( node ) {
+	const tag = node.nodeName.toLowerCase();
+	return getPhrasingContentSchema().hasOwnProperty( tag ) || tag === 'span';
 }

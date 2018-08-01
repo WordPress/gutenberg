@@ -23,11 +23,11 @@ import figureContentReducer from './figure-content-reducer';
 import shortcodeConverter from './shortcode-converter';
 import markdownConverter from './markdown-converter';
 import iframeRemover from './iframe-remover';
+import { getPhrasingContentSchema } from './phrasing-content';
 import {
 	deepFilterHTML,
 	isPlain,
 	removeInvalidHTML,
-	getPhrasingContentSchema,
 	getBlockContentSchema,
 } from './utils';
 
