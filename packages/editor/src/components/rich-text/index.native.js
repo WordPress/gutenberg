@@ -16,7 +16,6 @@ export class RichText extends Component {
 		this.onChange = this.onChange.bind( this );
 		this.onContentSizeChange = this.onContentSizeChange.bind( this );
 
-		this.lastContentSizeHeight = -1;
 		this.lastEventCount = 0;
 	}
 
@@ -45,10 +44,10 @@ export class RichText extends Component {
 	 */
 
 	onContentSizeChange( event ) {
-		this.lastContentSizeHeight = event.nativeEvent.contentSize.height;
+		const contentHeight = event.nativeEvent.contentSize.height;
 		this.forceUpdate = true; // Set this to true and check it in shouldComponentUpdate to force re-render the component
 		this.props.onContentSizeChange( {
-			aztecHeight: this.lastContentSizeHeight,
+			aztecHeight: contentHeight,
 		}
 		);
 	}
