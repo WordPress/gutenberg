@@ -61,7 +61,7 @@ const blockShortcuts = {
 		},
 		{
 			key: '/',
-			description: __( `Type '/' on a new line followed by a block name to change the type of block.` ),
+			description: __( `Change the block type after adding a new paragraph.` ),
 		},
 	],
 };
