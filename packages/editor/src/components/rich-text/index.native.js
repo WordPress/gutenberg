@@ -2,13 +2,13 @@
  * External dependencies
  */
 import RCTAztecView from 'react-native-aztec';
-import { children } from '@wordpress/blocks';
 
 /**
  * WordPress dependencies
  */
 import { Component, RawHTML, renderToString } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
+import { children } from '@wordpress/blocks';
 
 export class RichText extends Component {
 	constructor() {
@@ -54,25 +54,21 @@ export class RichText extends Component {
 	}
 
 	shouldComponentUpdate( nextProps ) {
-		if ( !! this.forceUpdate ) {
+		if ( this.forceUpdate ) {
 			this.forceUpdate = false;
 			return true;
 		}
 
 		// The check below allows us to avoid updating the content right after an `onChange` call
-		if ( !! nextProps.content.contentTree &&
-			!! nextProps.content.eventCount &&
-			!! this.lastContent && // first time the component is drawn with empty content `lastContent` is undefined
-			!! this.lastEventCount &&
+		if ( nextProps.content.contentTree &&
+			nextProps.content.eventCount &&
+			this.lastContent && // first time the component is drawn with empty content `lastContent` is undefined
+			this.lastEventCount &&
 			nextProps.content.eventCount !== this.lastEventCount ) {
 			return false;
 		}
 
 		return true;
-	}
-
-	setForceUpdate( flag ) {
-		this.forceUpdate = !! flag;
 	}
 
 	render() {
