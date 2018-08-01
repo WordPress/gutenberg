@@ -26,9 +26,9 @@ class EditorModeKeyboardShortcuts extends Component {
 
 	toggleSidebar( event ) {
 		event.preventDefault();
+		const { isEditorSidebarOpen, closeSidebar, openSidebar } = this.props;
 
-		const { areAdvancedSettingsOpened, closeSidebar, openSidebar } = this.props;
-		if ( areAdvancedSettingsOpened ) {
+		if ( isEditorSidebarOpen ) {
 			closeSidebar();
 		} else {
 			openSidebar();
@@ -51,13 +51,17 @@ class EditorModeKeyboardShortcuts extends Component {
 export default compose( [
 	withSelect( ( select ) => ( {
 		mode: select( 'core/edit-post' ).getEditorMode(),
-		areAdvancedSettingsOpened: select( 'core/edit-post' ).getActiveGeneralSidebarName() === 'edit-post/block',
+		isEditorSidebarOpen: select( 'core/edit-post' ).isEditorSidebarOpened(),
+		hasBlockSelection: !! select( 'core/editor' ).getBlockSelectionStart(),
 	} ) ),
-	withDispatch( ( dispatch ) => ( {
+	withDispatch( ( dispatch, { hasBlockSelection } ) => ( {
 		switchMode: ( mode ) => {
 			dispatch( 'core/edit-post' ).switchEditorMode( mode );
 		},
-		openSidebar: () => dispatch( 'core/edit-post' ).openGeneralSidebar( 'edit-post/block' ),
+		openSidebar: () => {
+			const sidebarToOpen = hasBlockSelection ? 'edit-post/block' : 'edit-post/document';
+			dispatch( 'core/edit-post' ).openGeneralSidebar( sidebarToOpen );
+		},
 		closeSidebar: dispatch( 'core/edit-post' ).closeGeneralSidebar,
 	} ) ),
 ] )( EditorModeKeyboardShortcuts );
