@@ -13,7 +13,7 @@ function MyIframe() {
 	return (
 		<FocusableIframe
 			src="/"
-			onFocus={ () => console.log('iframe is focused') }
+			onFocus={ () => console.log( 'iframe is focused' ) }
 		/>
 	);
 }
