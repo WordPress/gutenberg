@@ -11,6 +11,11 @@ import {
 } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+/**
  * An isolated orchestrator of store registrations.
  *
  * @typedef {WPDataRegistry}
@@ -286,6 +291,11 @@ export function createRegistry( storeConfigs = {} ) {
 			throw new TypeError( 'Must specify store reducer' );
 		}
 
+		// REMOVEME: Deprecation: v3.7
+		if ( options.reducer.__keyToPersist ) {
+			options.persist = [ options.reducer.__keyToPersist ];
+		}
+
 		if ( options.middlewares ) {
 			options.enhancers = [
 				...( options.enhancers || [] ),
@@ -362,6 +372,22 @@ export function createRegistry( storeConfigs = {} ) {
 	}
 
 	/**
+	 * Setup persistence for the current registry.
+	 *
+	 * @param {string} storageKey The storage key.
+	 */
+	function setupPersistence( storageKey ) {
+		deprecated( 'data registry setupPersistence', {
+			alternative: 'wp.data.plugins.persistence.setStorageKey',
+			version: '3.7',
+			plugin: 'Gutenberg',
+			hint: 'See https://github.com/WordPress/gutenberg/pull/8341 for more details',
+		} );
+
+		plugins.persistence.setStorageKey( storageKey );
+	}
+
+	/**
 	 * Maps an object of function values to proxy invocation through to the
 	 * current internal representation of the registry, which may be enhanced
 	 * by plugins.
@@ -385,6 +411,7 @@ export function createRegistry( storeConfigs = {} ) {
 		subscribe,
 		select,
 		dispatch,
+		setupPersistence,
 		use,
 	};
 
