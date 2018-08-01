@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { parse, format } from 'url';
+import { parse, stringify } from 'qs';
 
 const EMAIL_REGEXP = /^(mailto:)?[a-z0-9._%+-]+@[a-z0-9][a-z0-9.-]*\.[a-z]{2,63}$/i;
 const USABLE_HREF_REGEXP = /^(?:[a-z]+:|#|\?|\.|\/)/i;
@@ -15,11 +15,11 @@ const USABLE_HREF_REGEXP = /^(?:[a-z]+:|#|\?|\.|\/)/i;
  * @return {string}       Updated URL
  */
 export function addQueryArgs( url, args ) {
-	const parsedURL = parse( url, true );
-	const query = { ...parsedURL.query, ...args };
-	delete parsedURL.search;
+	const queryStringIndex = url.indexOf( '?' );
+	const query = queryStringIndex !== -1 ? parse( url.substr( queryStringIndex + 1 ) ) : {};
+	const baseUrl = queryStringIndex !== -1 ? url.substr( 0, queryStringIndex ) : url;
 
-	return format( { ...parsedURL, query } );
+	return baseUrl + '?' + stringify( { ...query, ...args } );
 }
 
 /**

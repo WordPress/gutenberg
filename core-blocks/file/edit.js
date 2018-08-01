@@ -189,7 +189,7 @@ class FileEdit extends Component {
 					</Toolbar>
 				</BlockControls>
 				<div className={ classes }>
-					<div>
+					<div className={ `${ className }__content-wrapper` }>
 						<RichText
 							wrapperClassName={ `${ className }__textlink` }
 							tagName="div" // must be block-level or else cursor disappears
