@@ -2,18 +2,18 @@
  * External dependencies
  */
 import { createStore } from 'redux';
-import { flowRight, without, mapValues, overEvery, get } from 'lodash';
-
-/**
- * WordPress dependencies
- */
-import isShallowEqual from '@wordpress/is-shallow-equal';
+import {
+	flowRight,
+	without,
+	mapValues,
+	overEvery,
+	get,
+} from 'lodash';
 
 /**
  * Internal dependencies
  */
 import dataStore from './store';
-import { withRehydration, getPersistenceStorage } from './persist';
 
 /**
  * Returns true if the given argument appears to be a dispatchable action.
@@ -101,20 +101,18 @@ export function createRegistry( storeConfigs = {} ) {
 	/**
 	 * Registers a new sub-reducer to the global state and returns a Redux-like store object.
 	 *
-	 * @param {string}  reducerKey  Reducer key.
-	 * @param {Object}  reducer     Reducer function.
-	 * @param {boolean} persist     Should the reducer be persisted.
+	 * @param {string}     reducerKey  Reducer key.
+	 * @param {Object}     reducer     Reducer function.
 	 *
 	 * @return {Object} Store Object.
 	 */
-	function registerReducer( reducerKey, reducer, persist = false ) {
+	function registerReducer( reducerKey, reducer ) {
 		const enhancers = [];
 		if ( window.__REDUX_DEVTOOLS_EXTENSION__ ) {
 			enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__( { name: reducerKey, instanceId: reducerKey } ) );
 		}
-		reducer = persist ? withRehydration( reducer ) : reducer;
 		const store = createStore( reducer, flowRight( enhancers ) );
-		namespaces[ reducerKey ] = { store, reducer, persist };
+		namespaces[ reducerKey ] = { store, reducer };
 
 		// Customize subscribe behavior to call listeners only on effective change,
 		// not on every dispatch.
@@ -251,7 +249,7 @@ export function createRegistry( storeConfigs = {} ) {
 			throw new TypeError( 'Must specify store reducer' );
 		}
 
-		const store = registerReducer( reducerKey, options.reducer, options.persist );
+		const store = registerReducer( reducerKey, options.reducer );
 
 		if ( options.actions ) {
 			registerActions( reducerKey, options.actions );
@@ -307,68 +305,19 @@ export function createRegistry( storeConfigs = {} ) {
 		return get( namespaces, [ reducerKey, 'actions' ] );
 	}
 
-	/**
-	 * Setup persistence for the current registry.
-	 *
-	 * @param {string} storageKey The storage key.
-	 */
-	function setupPersistence( storageKey ) {
-		const persistenceStorage = getPersistenceStorage();
-
-		// Load initially persisted value
-		let previousValue = null;
-		const persistedString = persistenceStorage.getItem( storageKey );
-		if ( persistedString ) {
-			const persistedData = JSON.parse( persistedString );
-			Object.entries( namespaces ).forEach( ( [ reducerKey, { store, persist } ] ) => {
-				if ( ! persist ) {
-					return;
-				}
-
-				const persistedState = {
-					...store.getState(),
-					...get( persistedData, reducerKey ),
-				};
-
-				store.dispatch( {
-					type: 'REDUX_REHYDRATE',
-					payload: persistedState,
-				} );
-			} );
-
-			// Avoid initial save.
-			previousValue = persistedData;
-		}
-
-		const triggerPersist = () => {
-			const newValue = Object.entries( namespaces )
-				.filter( ( [ , { persist } ] ) => persist )
-				.reduce( ( memo, [ reducerKey, { reducer, store } ] ) => {
-					memo[ reducerKey ] = reducer( store.getState(), {
-						type: 'SERIALIZE',
-						previousState: get( previousValue, reducerKey ),
-					} );
-					return memo;
-				}, {} );
-
-			if ( ! isShallowEqual( newValue, previousValue ) ) {
-				persistenceStorage.setItem( storageKey, JSON.stringify( newValue ) );
+	function withPlugins( fns ) {
+		return mapValues( fns, ( fn, key ) => {
+			if ( typeof fn !== 'function' ) {
+				return fn;
 			}
 
-			previousValue = newValue;
-		};
-
-		// Persist updated preferences
-		subscribe( triggerPersist );
-		triggerPersist();
+			return function() {
+				return registry[ key ].apply( null, arguments );
+			};
+		} );
 	}
 
-	Object.entries( {
-		'core/data': dataStore,
-		...storeConfigs,
-	} ).map( ( [ name, config ] ) => registerStore( name, config ) );
-
-	return {
+	let registry = {
 		registerReducer,
 		registerSelectors,
 		registerResolvers,
@@ -377,6 +326,21 @@ export function createRegistry( storeConfigs = {} ) {
 		subscribe,
 		select,
 		dispatch,
-		setupPersistence,
+		namespaces,
+		use,
 	};
+
+	function use( plugin ) {
+		registry = {
+			...registry,
+			...plugin( registry ),
+		};
+	}
+
+	Object.entries( {
+		'core/data': dataStore,
+		...storeConfigs,
+	} ).map( ( [ name, config ] ) => registerStore( name, config ) );
+
+	return withPlugins( registry );
 }

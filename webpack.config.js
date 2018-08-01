@@ -92,6 +92,7 @@ const gutenbergPackages = [
 	'compose',
 	'core-data',
 	'data',
+	'data-plugin-persistence',
 	'date',
 	'deprecated',
 	'dom',
