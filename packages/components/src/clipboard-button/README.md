@@ -11,7 +11,7 @@ withState( {
 } )( ( { hasCopied, setState } ) => ( 
 	<ClipboardButton
 		isPrimary
-		text="WordPress"
+		text="Text to be copied."
 		onCopy={ () => setState( { hasCopied: true } ) }
 		onFinishCopy={ () => setState( { hasCopied: false } ) }
 	>
