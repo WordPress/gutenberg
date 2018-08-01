@@ -31,7 +31,7 @@ class ParagraphEdit extends Component {
 					content={ { contentTree: attributes.content, eventCount: attributes.eventCount } }
 					style={ {
 						...style,
-						minHeight: Math.max( minHeight, attributes.aztecHeight !== null ? attributes.aztecHeight : 0 ),
+						minHeight: Math.max( minHeight, typeof attributes.aztecHeight === 'undefined' ? 0 : attributes.aztecHeight ),
 					} }
 					onChange={ ( event ) => {
 						// Create a React Tree from the new HTML
