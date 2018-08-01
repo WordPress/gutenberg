@@ -2,6 +2,7 @@
 
 import * as actions from './';
 import ActionTypes from './ActionTypes';
+import { buildEmptyBlock }  from '../block-builder';
 
 describe( 'Store', () => {
 	describe( 'actions', () => {
@@ -34,10 +35,9 @@ describe( 'Store', () => {
 		} );
 
 		it( 'should create an action to create a block', () => {
-			const action = actions.createBlockAction( '1' );
-			expect( action.type ).toBeDefined();
+			const action = actions.createBlockAction( buildEmptyBlock('1', 'paragraph') );
 			expect( action.type ).toEqual( ActionTypes.BLOCK.CREATE );
-			expect( action.uid ).toEqual( '1' );
+			expect( action.block.uid ).toEqual( '1' );
 		} );
 
 	} );
