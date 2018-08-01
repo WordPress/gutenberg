@@ -8,17 +8,19 @@ CheckboxControl component is used to generate a checkbox input field.
 Render an is author checkbox:
 ```jsx
 import { CheckboxControl } from '@wordpress/components';
+import { withState } from '@wordpress/compose';
 
-function MyCheckboxControl() {
-	return (
-		<CheckboxControl
-			heading="User"
-			label="Is author"
-			help="Is the user a author or not?"
-			onChange={ () => {} }
-		/>
-	);
-}
+withState( {
+	isChecked: true,
+} )( ( { isChecked, setState } ) => ( 
+	<CheckboxControl
+		heading="User"
+		label="Is author"
+		help="Is the user a author or not?"
+		checked={ isChecked }
+		onChange={ ( isChecked ) => { setState( { isChecked } ) } }
+	/>
+) )
 ```
 
 ## Props
