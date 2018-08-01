@@ -10,9 +10,11 @@ import {
  */
 import * as code from './code';
 import * as more from './more';
+import * as paragraph from './paragraph';
 
 export const registerCoreBlocks = () => {
 	[
+		paragraph,
 		code,
 		more,
 	].forEach( ( { name, settings } ) => {
