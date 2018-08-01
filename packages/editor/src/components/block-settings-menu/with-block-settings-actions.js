@@ -13,8 +13,8 @@ import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 
 const shortcuts = {
 	duplicate: {
-		raw: rawShortcut.primary( 'd' ),
-		display: displayShortcut.primary( 'd' ),
+		raw: rawShortcut.primaryShift( 'd' ),
+		display: displayShortcut.primaryShift( 'd' ),
 	},
 	remove: {
 		raw: rawShortcut.primary( 'del' ),
