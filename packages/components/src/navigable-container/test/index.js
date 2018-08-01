@@ -32,7 +32,7 @@ function fireKeyDown( container, keyCode, shiftKey ) {
 		},
 		preventDefault: () => {},
 		nativeEvent: {
-			stopImmediatePropagation: () => { },
+			stopImmediatePropagation: () => {},
 		},
 		keyCode,
 		shiftKey,
