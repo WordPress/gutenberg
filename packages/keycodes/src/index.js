@@ -87,7 +87,7 @@ export const displayShortcut = mapValues( modifiers, ( modifier ) => {
 		// Because we use just the clover symbol for MacOS's "command" key, remove
 		// the key join character ("+") between it and the final character if that
 		// final character is alphanumeric. ⌘S looks nicer than ⌘+S.
-		return shortcut.replace( /⌘\+(.)$/g, '⌘$1' );
+		return shortcut.replace( /⌘\+(.+)$/g, '⌘$1' );
 	};
 } );
 

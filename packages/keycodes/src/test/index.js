@@ -22,9 +22,9 @@ describe( 'displayShortcut', () => {
 			expect( shortcut ).toEqual( '⌘M' );
 		} );
 
-		it( 'outputs command+Del on MacOS (when the provided key is not a single character)', () => {
+		it( 'outputs command Del on MacOS (works for multiple character keys)', () => {
 			const shortcut = displayShortcut.primary( 'del', isMacOSTrue );
-			expect( shortcut ).toEqual( '⌘+Del' );
+			expect( shortcut ).toEqual( '⌘Del' );
 		} );
 	} );
 
@@ -39,9 +39,9 @@ describe( 'displayShortcut', () => {
 			expect( shortcut ).toEqual( 'Shift+⌘M' );
 		} );
 
-		it( 'outputs shift+command+Del on MacOS (when the provided key is not a single character)', () => {
+		it( 'outputs shift+command Del on MacOS (works for multiple character keys)', () => {
 			const shortcut = displayShortcut.primaryShift( 'del', isMacOSTrue );
-			expect( shortcut ).toEqual( 'Shift+⌘+Del' );
+			expect( shortcut ).toEqual( 'Shift+⌘Del' );
 		} );
 	} );
 
