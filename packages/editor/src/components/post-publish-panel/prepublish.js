@@ -8,7 +8,7 @@ import { get } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
-import { Dashicon, PanelBody } from '@wordpress/components';
+import { PanelBody } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
 /**
