@@ -59,15 +59,9 @@ const blockShortcuts = {
 			key: displayShortcut.primary( 'd' ),
 			description: __( 'Duplicate the select block(s).' ),
 		},
-	],
-};
-
-const slashInserterShortcuts = {
-	title: __( 'Slash inserter' ),
-	shortcuts: [
 		{
 			key: '/',
-			description: __( 'Search for and change the type of block.' ),
+			description: __( `Type '/' on a new line followed by a block name to change the type of block.` ),
 		},
 	],
 };
@@ -84,16 +78,8 @@ const textFormattingShortcuts = {
 			description: __( 'Make the selected text italic.' ),
 		},
 		{
-			key: displayShortcut.access( 'd' ),
-			description: __( 'Add a strikethrough to the selected text.' ),
-		},
-		{
 			key: displayShortcut.primary( 'u' ),
 			description: __( 'Underline the selected text.' ),
-		},
-		{
-			key: displayShortcut.access( 'x' ),
-			description: __( 'Display the selected text in a monospaced font suitable for code.' ),
 		},
 		{
 			key: displayShortcut.primary( 'k' ),
@@ -103,6 +89,14 @@ const textFormattingShortcuts = {
 			key: displayShortcut.access( 's' ),
 			description: __( 'Remove a link' ),
 		},
+		{
+			key: displayShortcut.access( 'd' ),
+			description: __( 'Add a strikethrough to the selected text.' ),
+		},
+		{
+			key: displayShortcut.access( 'x' ),
+			description: __( 'Display the selected text in a monospaced font.' ),
+		},
 	],
 };
 
@@ -110,6 +104,5 @@ export {
 	globalShortcuts,
 	selectionShortcuts,
 	blockShortcuts,
-	slashInserterShortcuts,
 	textFormattingShortcuts,
 };

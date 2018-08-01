@@ -13,7 +13,6 @@ import {
 	globalShortcuts,
 	selectionShortcuts,
 	blockShortcuts,
-	slashInserterShortcuts,
 	textFormattingShortcuts,
 } from './config';
 
@@ -108,7 +107,6 @@ class KeyboardShortcutHelpModal extends Component {
 						<ShortcutSection { ...globalShortcuts } />
 						<ShortcutSection { ...selectionShortcuts } />
 						<ShortcutSection { ...blockShortcuts } />
-						<ShortcutSection { ...slashInserterShortcuts } />
 						<ShortcutSection { ...textFormattingShortcuts } />
 
 					</Modal>
