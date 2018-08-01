@@ -9,12 +9,7 @@ import { rawShortcut } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import {
-	globalShortcuts,
-	selectionShortcuts,
-	blockShortcuts,
-	textFormattingShortcuts,
-} from './config';
+import shortcutConfig from './config';
 
 const splitShortcutKey = ( shortcutKey ) => {
 	return shortcutKey
@@ -104,10 +99,9 @@ class KeyboardShortcutHelpModal extends Component {
 						onRequestClose={ this.toggleModalVisibility }
 					>
 
-						<ShortcutSection { ...globalShortcuts } />
-						<ShortcutSection { ...selectionShortcuts } />
-						<ShortcutSection { ...blockShortcuts } />
-						<ShortcutSection { ...textFormattingShortcuts } />
+						{ shortcutConfig.map( ( config, index ) => (
+							<ShortcutSection key={ index } { ...config } />
+						) ) }
 
 					</Modal>
 				) }

@@ -100,9 +100,9 @@ const textFormattingShortcuts = {
 	],
 };
 
-export {
+export default [
 	globalShortcuts,
 	selectionShortcuts,
 	blockShortcuts,
 	textFormattingShortcuts,
-};
+];
