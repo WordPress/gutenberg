@@ -42,7 +42,7 @@ const selectionShortcuts = {
 			description: __( 'Select all.' ),
 		},
 		{
-			key: 'escape',
+			key: 'Esc',
 			description: __( 'Clear selection.' ),
 		},
 	],

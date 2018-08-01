@@ -24,7 +24,10 @@ const splitShortcutKey = ( shortcutKey ) => {
 		.map( ( character, index ) => {
 			if ( character !== '+' ) {
 				return (
-					<kbd key={ index }>
+					<kbd
+						key={ index }
+						className="editor-keyboard-shortcut-help__shortcut-key"
+					>
 						{ character }
 					</kbd>
 				);
@@ -41,23 +44,28 @@ const splitShortcutKey = ( shortcutKey ) => {
 const ShortcutList = ( { shortcuts } ) => (
 	<dl className="editor-keyboard-shortcut-help__shortcut-list">
 		{ shortcuts.map( ( { key, description }, index ) => (
-			<Fragment
+			<div
+				className="editor-keyboard-shortcut-help__shortcut"
 				key={ index }
 			>
-				<dt className="editor-keyboard-shortcut-help__shortcut-key">
-					{ splitShortcutKey( key ) }
+				<dt className="editor-keyboard-shortcut-help__shortcut-term">
+					<kbd className="editor-keyboard-shortcut-help__shortcut-key-combination">
+						{ splitShortcutKey( key ) }
+					</kbd>
 				</dt>
 				<dd className="editor-keyboard-shortcut-help__shortcut-description">
 					{ description }
 				</dd>
-			</Fragment>
+			</div>
 		) ) }
 	</dl>
 );
 
 const ShortcutSection = ( { title, shortcuts } ) => (
-	<section>
-		<h2>{ title }</h2>
+	<section className="editor-keyboard-shortcut-help__section">
+		<h2 className="editor-keyboard-shortcut-help__section-title">
+			{ title }
+		</h2>
 		<ShortcutList shortcuts={ shortcuts } />
 	</section>
 );
