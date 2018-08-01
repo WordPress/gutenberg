@@ -167,11 +167,6 @@ function gutenberg_register_scripts_and_styles() {
 		),
 		'after'
 	);
-	wp_add_inline_script(
-		'wp-api-fetch',
-		'jQuery( document ).on( "heartbeat-tick", function ( event, response ) { wp.hooks.doAction( "heartbeat.tick", response ) } );',
-		'after'
-	);
 
 	wp_register_script(
 		'wp-deprecated',
@@ -1098,10 +1093,26 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	gutenberg_prepare_wp_components_script();
 
+	global $wp_scripts;
+
+	// Add "wp-hooks" as dependency of "heartbeat"
+	$heartbeat_script = $wp_scripts->query( 'heartbeat', 'registered' );
+	if ( $heartbeat_script && !in_array( 'wp-hooks', $heartbeat_script->deps ) ) {
+		$heartbeat_script->deps[] = 'wp-hooks';
+	}
+
 	// Enqueue heartbeat separately as an "optional" dependency of the editor.
 	// Heartbeat is used for automatic nonce refreshing, but some hosts choose
 	// to disable it outright.
 	wp_enqueue_script( 'heartbeat' );
+
+	// Transform a "heartbeat-tick" jQuery event into "heartbeat.tick" hook action.
+	// This removes the need of using jQuery for listening to the event.
+	wp_add_inline_script(
+		'heartbeat',
+		'jQuery( document ).on( "heartbeat-tick", function ( event, response ) { wp.hooks.doAction( "heartbeat.tick", response ) } );',
+		'after'
+	);
 
 	// Ignore Classic Editor's `rich_editing` user option, aka "Disable visual
 	// editor". Forcing this to be true guarantees that TinyMCE and its plugins
