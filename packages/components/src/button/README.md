@@ -39,5 +39,5 @@ Name | Type | Default | Description
 
 ## Related components
 
-* To group buttons together, use the `button-group` component.
-* To display an icon inside the button, use the `icon-button` component.
+* To group buttons together, use the `ButtonGroup` component.
+* To display an icon inside the button, use the `IconButton` component.
