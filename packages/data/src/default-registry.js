@@ -1,3 +1,7 @@
 import { createRegistry } from './registry';
 
-export default createRegistry();
+const registry = createRegistry();
+
+registry.use( 'persistence' );
+
+export default registry;

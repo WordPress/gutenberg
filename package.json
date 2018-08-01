@@ -25,7 +25,6 @@
 		"@wordpress/compose": "file:packages/compose",
 		"@wordpress/core-data": "file:packages/core-data",
 		"@wordpress/data": "file:packages/data",
-		"@wordpress/data-plugin-persistence": "file:packages/data-plugin-persistence",
 		"@wordpress/date": "file:packages/date",
 		"@wordpress/deprecated": "file:packages/deprecated",
 		"@wordpress/dom": "file:packages/dom",

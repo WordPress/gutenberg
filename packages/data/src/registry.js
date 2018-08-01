@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import {
 	flowRight,
 	without,
@@ -11,9 +11,32 @@ import {
 } from 'lodash';
 
 /**
+ * An isolated orchestrator of store registrations.
+ *
+ * @typedef {WPDataRegistry}
+ *
+ * @property {Function} registerReducer
+ * @property {Function} registerSelectors
+ * @property {Function} registerResolvers
+ * @property {Function} registerActions
+ * @property {Function} registerStore
+ * @property {Function} subscribe
+ * @property {Function} select
+ * @property {Function} dispatch
+ * @property {Function} use
+ */
+
+/**
+ * An object of registry function overrides.
+ *
+ * @typedef {WPDataPlugin}
+ */
+
+/**
  * Internal dependencies
  */
 import dataStore from './store';
+import * as plugins from './plugins';
 
 /**
  * Returns true if the given argument appears to be a dispatchable action.
@@ -87,6 +110,14 @@ export function toAsyncIterable( object ) {
 	}() );
 }
 
+/**
+ * Creates a new store registry, given an optional object of initial store
+ * configurations.
+ *
+ * @param {Object} storeConfigs Initial store configurations.
+ *
+ * @return {WPDataRegistry} Data registry.
+ */
 export function createRegistry( storeConfigs = {} ) {
 	const namespaces = {};
 	let listeners = [];
@@ -99,19 +130,25 @@ export function createRegistry( storeConfigs = {} ) {
 	}
 
 	/**
-	 * Registers a new sub-reducer to the global state and returns a Redux-like store object.
+	 * Registers a new sub-reducer to the global state and returns a Redux-like
+	 * store object.
 	 *
-	 * @param {string}     reducerKey  Reducer key.
-	 * @param {Object}     reducer     Reducer function.
+	 * @param {string}    reducerKey   Reducer key.
+	 * @param {Object}    reducer      Reducer function.
+	 * @param {*}         initialState Initial reducer state.
+	 * @param {?Function} enhancer     Store enhancer function.
 	 *
 	 * @return {Object} Store Object.
 	 */
-	function registerReducer( reducerKey, reducer ) {
+	function registerReducer( reducerKey, reducer, initialState, enhancer ) {
 		const enhancers = [];
+		if ( enhancer ) {
+			enhancers.push( enhancer );
+		}
 		if ( window.__REDUX_DEVTOOLS_EXTENSION__ ) {
 			enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__( { name: reducerKey, instanceId: reducerKey } ) );
 		}
-		const store = createStore( reducer, flowRight( enhancers ) );
+		const store = createStore( reducer, initialState, flowRight( enhancers ) );
 		namespaces[ reducerKey ] = { store, reducer };
 
 		// Customize subscribe behavior to call listeners only on effective change,
@@ -249,7 +286,26 @@ export function createRegistry( storeConfigs = {} ) {
 			throw new TypeError( 'Must specify store reducer' );
 		}
 
-		const store = registerReducer( reducerKey, options.reducer );
+		if ( options.middlewares ) {
+			options.enhancers = [
+				...( options.enhancers || [] ),
+				...options.middlewares.map( ( middleware ) => (
+					applyMiddleware( middleware )
+				) ),
+			];
+		}
+
+		let enhancer;
+		if ( options.enhancers ) {
+			enhancer = flowRight( options.enhancers );
+		}
+
+		const store = registerReducer(
+			reducerKey,
+			options.reducer,
+			options.initialState,
+			enhancer
+		);
 
 		if ( options.actions ) {
 			registerActions( reducerKey, options.actions );
@@ -305,15 +361,18 @@ export function createRegistry( storeConfigs = {} ) {
 		return get( namespaces, [ reducerKey, 'actions' ] );
 	}
 
+	/**
+	 * Maps an object of function values to proxy invocation through to the
+	 * current internal representation of the registry, which may be enhanced
+	 * by plugins.
+	 *
+	 * @param {Object<string,Function>} fns Object of function values.
+	 *
+	 * @return {Object<string,Function>} Object enhanced with plugin proxying.
+	 */
 	function withPlugins( fns ) {
-		return mapValues( fns, ( fn, key ) => {
-			if ( typeof fn !== 'function' ) {
-				return fn;
-			}
-
-			return function() {
-				return registry[ key ].apply( null, arguments );
-			};
+		return mapValues( fns, ( fn, key ) => function() {
+			return registry[ key ].apply( null, arguments );
 		} );
 	}
 
@@ -326,15 +385,28 @@ export function createRegistry( storeConfigs = {} ) {
 		subscribe,
 		select,
 		dispatch,
-		namespaces,
 		use,
 	};
 
+	/**
+	 * Enhances the registry with the prescribed set of overrides. Returns the
+	 * enhanced registry to enable plugin chaining.
+	 *
+	 * @param {WPDataPlugin} plugin Plugin by which to enhance.
+	 *
+	 * @return {WPDataRegistry} Enhanced registry.
+	 */
 	function use( plugin ) {
+		if ( typeof plugin === 'string' ) {
+			plugin = plugins[ plugin ];
+		}
+
 		registry = {
 			...registry,
 			...plugin( registry ),
 		};
+
+		return registry;
 	}
 
 	Object.entries( {

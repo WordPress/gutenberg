@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { applyMiddleware } from 'redux';
 import { castArray } from 'lodash';
 
 /**
@@ -51,6 +52,34 @@ describe( 'createRegistry', () => {
 			registry.dispatch( 'butcher' ).startSale( 'chicken' );
 			expect( registry.select( 'butcher' ).getPrice( 'chicken' ) ).toBe( 2 );
 			expect( registry.select( 'butcher' ).getPrice( 'ribs' ) ).toBe( 6 );
+		} );
+
+		it( 'should add middlewares array', () => {
+			const fn = jest.fn();
+			const middleware = () => () => fn;
+			const store = registry.registerStore( 'demo', {
+				reducer: () => null,
+				middlewares: [ middleware ],
+			} );
+
+			const action = { type: 'FOO' };
+			store.dispatch( action );
+
+			expect( fn ).toHaveBeenCalledWith( action );
+		} );
+
+		it( 'should add enhancers array', () => {
+			const fn = jest.fn();
+			const middleware = () => () => fn;
+			const store = registry.registerStore( 'demo', {
+				reducer: () => null,
+				enhancers: [ applyMiddleware( middleware ) ],
+			} );
+
+			const action = { type: 'FOO' };
+			store.dispatch( action );
+
+			expect( fn ).toHaveBeenCalledWith( action );
 		} );
 	} );
 

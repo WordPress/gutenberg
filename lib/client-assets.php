@@ -134,13 +134,6 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'build/is-shallow-equal/index.js' ),
 		true
 	);
-	wp_register_script(
-		'wp-data-plugin-persistence',
-		gutenberg_url( 'build/data-plugin-persistence/index.js' ),
-		array( 'wp-is-shallow-equal' ),
-		filemtime( gutenberg_dir_path() . 'build/data-plugin-persistence/index.js' ),
-		true
-	);
 
 	// Editor Scripts.
 	wp_register_script(
@@ -216,6 +209,22 @@ function gutenberg_register_scripts_and_styles() {
 		array( 'wp-deprecated', 'wp-element', 'wp-compose', 'wp-is-shallow-equal', 'lodash' ),
 		filemtime( gutenberg_dir_path() . 'build/data/index.js' ),
 		true
+	);
+	wp_add_inline_script(
+		'wp-data',
+		implode( "\n", array(
+			// TODO: Transferring old storage should be removed at v3.7.
+			'( function() {',
+			'	var userId = window.userSettings.uid;',
+			'	var oldStorageKey = "WP_EDIT_POST_DATA_" + userId;',
+			'	var storageKey = "WP_DATA_USER_" + userId;',
+			'	if ( localStorage[ oldStorageKey ] ) {',
+			'		localStorage[ storageKey ] = localStorage[ oldStorageKey ];',
+			'		delete localStorage[ oldStorageKey ];',
+			'	}',
+			'	wp.data.plugins.persistence.setStorageKey( storageKey );',
+			'} )()',
+		) )
 	);
 	wp_register_script(
 		'wp-core-data',
@@ -385,24 +394,10 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-nux',
 		gutenberg_url( 'build/nux/index.js' ),
-		array(
-			'lodash',
-			'wp-components',
-			'wp-compose',
-			'wp-data',
-			'wp-data-plugin-persistence',
-			'wp-element',
-			'wp-i18n',
-		),
+		array( 'wp-element', 'wp-components', 'wp-compose', 'wp-data', 'wp-i18n', 'lodash' ),
 		filemtime( gutenberg_dir_path() . 'build/nux/index.js' ),
 		true
 	);
-	wp_add_inline_script(
-		'wp-nux',
-		'wp.data.use( wp.dataPluginPersistence.createPersistencePlugin( "WP_EDIT_POST_DATA_" + window.userSettings.uid ) );',
-		'before'
-	);
-
 	// Loading the old editor and its config to ensure the classic block works as expected.
 	wp_add_inline_script(
 		'editor', 'window.wp.oldEditor = window.wp.editor;', 'after'
