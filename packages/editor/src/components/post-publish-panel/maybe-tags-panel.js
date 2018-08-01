@@ -29,7 +29,7 @@ export default compose( [
 	withSelect( ( select ) => {
 		const postType = select( 'core/editor' ).getCurrentPostType();
 		const tags = select( 'core' ).getTaxonomy( 'post_tag' );
-		const terms = select( 'core/editor' ).getEditedPostAttribute( tags.rest_base );
+		const terms = tags ? select( 'core/editor' ).getEditedPostAttribute( tags.rest_base ) : [];
 		return {
 			hasTags: tags && terms && terms.length > 0,
 			isPostTypeSupported: tags && tags.types.some( ( type ) => type === postType ),
