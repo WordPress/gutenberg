@@ -6,7 +6,6 @@ import { __ } from '@wordpress/i18n';
 
 const globalShortcuts = {
 	title: __( 'Global shortcuts' ),
-	description: __( 'Use these shortcuts anywhere.' ),
 	shortcuts: [
 		{
 			key: displayShortcut.primary( '?' ),
@@ -37,7 +36,6 @@ const globalShortcuts = {
 
 const selectionShortcuts = {
 	title: __( 'Selection shortcuts' ),
-	description: __( 'Shortcuts for selecting either text or blocks.' ),
 	shortcuts: [
 		{
 			key: displayShortcut.primary( 'a' ),
@@ -52,7 +50,6 @@ const selectionShortcuts = {
 
 const blockShortcuts = {
 	title: __( 'Block shortcuts' ),
-	description: __( 'Common shortcuts for use while editing blocks.' ),
 	shortcuts: [
 		{
 			key: displayShortcut.primary( 'del' ),
@@ -67,7 +64,6 @@ const blockShortcuts = {
 
 const slashInserterShortcuts = {
 	title: __( 'Slash inserter' ),
-	description: __( `Type '/' followed by a block name at the start of a new block to quickly change the type of block.` ),
 	shortcuts: [
 		{
 			key: '/',
@@ -78,7 +74,6 @@ const slashInserterShortcuts = {
 
 const textFormattingShortcuts = {
 	title: __( 'Text formatting' ),
-	description: __( 'Change the appearance of text.' ),
 	shortcuts: [
 		{
 			key: displayShortcut.primary( 'b' ),

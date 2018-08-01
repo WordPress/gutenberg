@@ -34,10 +34,9 @@ const ShortcutList = ( { shortcuts } ) => (
 	</dl>
 );
 
-const ShortcutSection = ( { title, description, shortcuts } ) => (
+const ShortcutSection = ( { title, shortcuts } ) => (
 	<section>
 		<h2>{ title }</h2>
-		<p>{ description }</p>
 		<ShortcutList shortcuts={ shortcuts } />
 	</section>
 );
