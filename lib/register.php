@@ -278,6 +278,16 @@ function gutenberg_can_edit_post( $post ) {
 		return false;
 	}
 
+	/**
+	 * Filter to allow plugins to enable/disable Gutenberg for particular posts.
+	 *
+	 * @param bool    $can_edit Whether the post can be edited or not.
+	 * @param WP_Post $post     The post being checked.
+	 */
+	if ( ! apply_filters( 'gutenberg_can_edit_post', true, $post ) ) {
+		return false;
+	}
+
 	return current_user_can( 'edit_post', $post->ID );
 }
 
