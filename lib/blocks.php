@@ -219,13 +219,13 @@ add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode().
  *
  * @since 3.4
  *
- * @param object $post Post.
  * @param string $block_name Full Block name to look for.
+ * @param object $post Post.
  * @return bool Whether the content contain the specified block.
  */
 function gutenberg_post_has_block( $block_name, $post = null ) {
 
-	if ( $post === null ) {
+	if ( null === $post ) {
 		global $post;
 	} else {
 		$post = get_post( $post );
@@ -250,7 +250,7 @@ function gutenberg_post_has_block( $block_name, $post = null ) {
 function gutenberg_content_has_block( $block_name, $content = null ) {
 	global $post;
 
-	if ( $content === null && isset( $post->post_content ) ) {
+	if ( null === $content && isset( $post->post_content ) ) {
 		$content = $post->post_content;
 	}
 

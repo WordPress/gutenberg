@@ -38,10 +38,11 @@ class Block_Type_Test extends WP_UnitTestCase {
 	 * Set up before class.
 	 */
 	public static function wpSetUpBeforeClass() {
-		self::$editor_user_id      = self::factory()->user->create( array(
+		self::$editor_user_id = self::factory()->user->create( array(
 			'role' => 'editor',
 		) );
-		self::$post_with_blocks    = self::factory()->post->create( array(
+
+		self::$post_with_blocks = self::factory()->post->create( array(
 			'post_title'   => 'Example',
 			'post_content' => "<!-- wp:core/text {\"dropCap\":true} -->\n<p class=\"has-drop-cap\">Tester</p>\n<!-- /wp:core/text -->",
 		) );
@@ -180,7 +181,7 @@ class Block_Type_Test extends WP_UnitTestCase {
 		// checking for a partial block name should fail.
 		$this->assertFalse( gutenberg_content_has_block( 'core/dumm', $mixed_post_content ) );
 
-		// checking for a wrong namespace should fail
+		// checking for a wrong namespace should fail.
 		$this->assertFalse( gutenberg_content_has_block( 'custom/dummy_atts', $mixed_post_content ) );
 
 		// checking for namespace only should not work. Or maybe ... ?
@@ -188,7 +189,7 @@ class Block_Type_Test extends WP_UnitTestCase {
 	}
 
 	function test_has_block_with_invalid_content() {
-		// some content with invalid HMTL comments and a single valid block
+		// some content with invalid HMTL comments and a single valid block.
 		$invalid_content = 'before' .
 			'<!- - wp:core/weird-space --><!-- /wp:core/weird-space -->' .
 			'<!--wp:core/untrimmed-left --><!-- /wp:core/untrimmed -->' .
@@ -211,9 +212,8 @@ class Block_Type_Test extends WP_UnitTestCase {
 		$static_content = "<!-- wp:core/text {\"dropCap\":true} -->\n<p class=\"has-drop-cap\">Tester</p>\n<!-- /wp:core/text -->";
 
 		$this->assertTrue( gutenberg_post_has_block( 'core/text', self::$post_with_blocks ) );
-		// should fail for a non-existent block `custom/dummy`
+		// should fail for a non-existent block `custom/dummy`.
 		$this->assertFalse( gutenberg_post_has_block( 'custom/dummy', self::$post_with_blocks ) );
-
 
 		$this->assertTrue( gutenberg_content_has_block( 'core/text', $static_content ) );
 		$this->assertFalse( gutenberg_content_has_block( 'custom/dummy', $static_content ) );
