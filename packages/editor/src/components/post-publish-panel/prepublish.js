@@ -8,7 +8,7 @@ import { get } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
-import { PanelBody } from '@wordpress/components';
+import { Dashicon, PanelBody } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
 /**
@@ -18,6 +18,7 @@ import PostVisibility from '../post-visibility';
 import PostVisibilityLabel from '../post-visibility/label';
 import PostSchedule from '../post-schedule';
 import PostScheduleLabel from '../post-schedule/label';
+import FlatTermSelector from '../post-taxonomies/flat-term-selector';
 
 function PostPublishPanelPrepublish( {
 	hasPublishAction,
@@ -40,6 +41,15 @@ function PostPublishPanelPrepublish( {
 						<span className="editor-post-publish-panel__link" key="label"><PostScheduleLabel /></span>,
 					] }>
 						<PostSchedule />
+					</PanelBody>
+					<PanelBody initialOpen={ true } title={ [
+						<Dashicon key={ 'dashicon-lightbulb' } icon={ 'lightbulb' } />,
+						__( 'Tip:' ),
+						<span className="editor-post-publish-panel__link" key="label">{
+							__( 'Add tags to your post' )
+						}</span>,
+					] }>
+						<FlatTermSelector slug={ 'post_tag' } />
 					</PanelBody>
 					{ children }
 				</Fragment>
