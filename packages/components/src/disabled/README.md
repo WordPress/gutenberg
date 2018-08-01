@@ -19,7 +19,7 @@ withState( {
 	}
 	
 	const toggleDisabled = () => {
-		setState( state => ( { isDisabled: ! state.isDisabled } ) );
+		setState( ( state ) => ( { isDisabled: ! state.isDisabled } ) );
 	};
 	
 	return (
