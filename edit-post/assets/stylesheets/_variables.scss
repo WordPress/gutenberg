@@ -56,6 +56,8 @@ $block-parent-side-ui-clearance: $parent-block-padding - $block-padding; // spac
 
 $block-container-side-padding: $block-side-ui-width + $block-padding + 2 * $block-side-ui-clearance;
 
+$default-block-margin: $block-padding * 2 + $block-spacing; // This is the default margin between blocks.
+
 // Buttons & UI Widgets
 $button-style__radius-roundrect: 4px;
 $button-style__radius-round: 50%;
