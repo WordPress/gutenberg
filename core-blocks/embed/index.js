@@ -8,7 +8,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
 import { Component, renderToString } from '@wordpress/element';
 import { Button, Placeholder, Spinner, SandBox, IconButton, Toolbar } from '@wordpress/components';
@@ -337,7 +337,7 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 export const name = 'core/embed';
 
 export const settings = getEmbedBlockSettings( {
-	title: __( 'Embed' ),
+	title: _x( 'Embed', 'block title' ),
 	description: __( 'The Embed block allows you to easily add videos, images, tweets, audio, and other content to your post or page.' ),
 	icon: 'embed-generic',
 	transforms: {
