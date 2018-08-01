@@ -22,11 +22,11 @@ we can render custom markup or use the Original component as shown below.
 ```js
 const { addFilter } = wp.hooks;
 
-function CustomFlatTermSelector( OriginalFlatTermSelector ) {
+function ProductTypeSelector( OriginalFlatTermSelector ) {
 	return ( props ) => {
 		if ( props.slug === 'product-type' ) {
 			return (
-				<div>Custom Flat Term Selector</div>
+				<div>Product Type Selector</div>
 			);
 		} else {
 			return <OriginalFlatTermSelector { ...props } />
@@ -37,6 +37,6 @@ function CustomFlatTermSelector( OriginalFlatTermSelector ) {
 addFilter(
 	'editor.PostTaxonomies',
 	'my-custom-plugin',
-	CustomFlatTermSelector
+	ProductTypeSelector
 );
 ```
