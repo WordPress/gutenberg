@@ -23,6 +23,7 @@ withState( {
 		<FontSizePicker 
 			fontSizes={ fontSizes } 
 			value={ fontSize }
+			fallbackFontSize={ fallbackFontSize }
 			onChange={ fontSize => setState( { fontSize } ) } 
 		/>
 	); 
