@@ -25,7 +25,11 @@ export function DotTip( {
 			focusOnMount="container"
 			role="dialog"
 			aria-label={ __( 'Gutenberg tips' ) }
-			onClick={ ( event ) => event.stopPropagation() }
+			onClick={ ( event ) => {
+				// Tips are often nested within buttons. We stop propagation so that clicking
+				// on a tip doesn't result in the button being clicked.
+				event.stopPropagation();
+			} }
 		>
 			<p>{ children }</p>
 			<p>

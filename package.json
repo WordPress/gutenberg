@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "3.3.0",
+	"version": "3.4.0",
 	"private": true,
 	"description": "A new WordPress editor experience",
 	"repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -51,8 +51,7 @@
 		"moment": "2.22.1",
 		"moment-timezone": "0.5.16",
 		"prop-types": "15.5.10",
-		"querystringify": "1.0.0",
-		"re-resizable": "4.4.8",
+		"re-resizable": "4.7.1",
 		"react": "16.4.1",
 		"react-dom": "16.4.1",
 		"redux": "3.7.2",

@@ -8,6 +8,10 @@
 		@include loading_fade;
 	}
 
+	&__content-wrapper {
+		flex-grow: 1;
+	}
+
 	&__textlink {
 		display: inline-block;
 		color: $blue-medium-700;

@@ -31,6 +31,7 @@
 	background: $dark-gray-500;
 	border: 4px solid transparent;
 	background-clip: padding-box;
+	box-sizing: border-box;
 }
 
 @mixin range-track() {
