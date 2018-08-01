@@ -1,5 +1,4 @@
-ExternalLink
-============
+# ExternalLink
 
 ## Usage
 

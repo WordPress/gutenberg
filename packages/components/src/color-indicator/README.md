@@ -1,5 +1,5 @@
-ColorIndicator
-==============
+# ColorIndicator
+
 ## Usage
 
 ```jsx

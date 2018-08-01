@@ -1,5 +1,4 @@
-Form Token Field
-===========
+# Form Token Field
 
 A `FormTokenField` is a field similar to the tags and categories fields in the interim editor chrome, or the "to" field in Mail on OS X. Tokens can be entered by typing them or selecting them from a list of suggested tokens.
 

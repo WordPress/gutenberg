@@ -1,5 +1,4 @@
-DateTimePicker
-=======
+# DateTimePicker
 
 DateTimePicker is a React component to render a calendar and clock for selecting a date and time. The calendar and clock components can be accessed individually using the `DatePicker` and `TimePicker` components respectively.
 

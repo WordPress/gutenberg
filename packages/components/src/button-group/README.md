@@ -1,5 +1,4 @@
-ButtonGroup
-===========
+# ButtonGroup
 
 ## Usage
 

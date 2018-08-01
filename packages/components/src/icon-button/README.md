@@ -1,5 +1,4 @@
-IconButton
-==========
+# IconButton
 
 ## Usage
 

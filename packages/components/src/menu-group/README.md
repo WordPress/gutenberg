@@ -1,5 +1,4 @@
-MenuGroup
-=========
+# MenuGroup
 
 ## Usage
 

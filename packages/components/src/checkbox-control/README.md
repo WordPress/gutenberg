@@ -1,5 +1,4 @@
-CheckboxControl
-=======
+# CheckboxControl
 
 CheckboxControl component is used to generate a checkbox input field.
 

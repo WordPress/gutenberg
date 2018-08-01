@@ -1,5 +1,4 @@
-BaseControl
-===========
+# BaseControl
 
 BaseControl component is used to generate labels and help text for components handling user inputs.
 

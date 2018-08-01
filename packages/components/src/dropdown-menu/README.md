@@ -1,5 +1,4 @@
-Dropdown Menu
-=============
+# Dropdown Menu
 
 Dropdown Menu is a React component to render an expandable menu of buttons. It is similar in purpose to a `<select>` element, with the distinction that it does not maintain a value. Instead, each option behaves as an action button.
 

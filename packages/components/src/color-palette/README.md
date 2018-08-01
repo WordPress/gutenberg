@@ -1,5 +1,4 @@
-ColorPalette
-============
+# ColorPalette
 
 ## Usage
 ```jsx

@@ -1,5 +1,4 @@
-MenuItem
-========
+# MenuItem
 
 ## Usage
 

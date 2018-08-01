@@ -1,5 +1,4 @@
-FormToggle
-==========
+# FormToggle
 
 ## Usage
 

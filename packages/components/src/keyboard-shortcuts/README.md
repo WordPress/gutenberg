@@ -1,5 +1,4 @@
-Keyboard Shortcuts
-==================
+# Keyboard Shortcuts
 
 `<KeyboardShortcuts />` is a component which handles keyboard sequences during the lifetime of the rendering element.
 

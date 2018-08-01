@@ -1,5 +1,4 @@
-Autocomplete
-============
+# Autocomplete
 
 This component is used to provide autocompletion support for a child input component.
 

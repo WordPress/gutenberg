@@ -1,5 +1,4 @@
-ClipboardButton
-===============
+# ClipboardButton
 
 ## Usage
 

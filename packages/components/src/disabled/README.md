@@ -1,5 +1,4 @@
-Disabled
-========
+# Disabled
 
 Disabled is a component which disables descendant tabbable elements and prevents pointer interaction.
 
