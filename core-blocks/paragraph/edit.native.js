@@ -1,24 +1,23 @@
+/**
+ * External dependencies
+ */
 import { View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	Component,
-} from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
-
 import { RichText } from '@wordpress/editor';
 
-const _minHeight = 50;
+const minHeight = 50;
 
-class ParagraphBlock extends Component {
+class ParagraphEdit extends Component {
 	render() {
 		const {
 			attributes,
 			setAttributes,
-			//className,
 			style,
 		} = this.props;
 
@@ -30,9 +29,10 @@ class ParagraphBlock extends Component {
 			<View>
 				<RichText
 					content={ { contentTree: attributes.content, eventCount: attributes.eventCount } }
-					style={ style, [
-						{ minHeight: Math.max( _minHeight, attributes.aztecHeight !== null ? attributes.aztecHeight : 0 ) },
-					] }
+					style={ {
+						...style,
+						minHeight: Math.max( minHeight, attributes.aztecHeight !== null ? attributes.aztecHeight : 0 ),
+					} }
 					onChange={ ( event ) => {
 						// Create a React Tree from the new HTML
 						const newParaBlock = parse( '<!-- wp:paragraph --><p>' + event.content + '</p><!-- /wp:paragraph -->' )[ 0 ];
@@ -57,9 +57,5 @@ class ParagraphBlock extends Component {
 		);
 	}
 }
-
-const ParagraphEdit = function ParagraphEdit( { attributes, setAttributes } ) {
-	return ( <ParagraphBlock attributes={ attributes } setAttributes={ setAttributes } /> );
-};
 
 export default ParagraphEdit;

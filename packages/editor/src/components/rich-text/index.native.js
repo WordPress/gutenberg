@@ -9,7 +9,6 @@ import { children } from '@wordpress/blocks';
  */
 import { Component, RawHTML, renderToString } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
-import deprecated from '@wordpress/deprecated';
 
 export class RichText extends Component {
 	constructor() {
@@ -106,18 +105,6 @@ RichTextContainer.Content = ( { value, format, tagName: Tag, ...props } ) => {
 	switch ( format ) {
 		case 'string':
 			content = <RawHTML>{ value }</RawHTML>;
-			break;
-
-		case 'element':
-			// NOTE: In removing this, ensure to remove also every related
-			// function from `format.js`, including the `dom-react` dependency.
-			deprecated( 'RichText `element` format', {
-				version: '3.5',
-				plugin: 'Gutenberg',
-				alternative: 'the compatible `children` format',
-			} );
-
-			content = value;
 			break;
 
 		case 'children':
