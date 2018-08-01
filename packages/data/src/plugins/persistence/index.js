@@ -30,7 +30,11 @@ let _storageKey = 'WP_DATA';
 export function getPersistedData() {
 	const { getStorage, getStorageKey } = plugin;
 	const persisted = getStorage().getItem( getStorageKey() );
-	return persisted ? JSON.parse( persisted ) : {};
+	try {
+		return JSON.parse( persisted );
+	} catch ( error ) {
+		return {};
+	}
 }
 
 /**
