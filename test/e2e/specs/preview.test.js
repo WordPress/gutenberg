@@ -19,7 +19,6 @@ describe( 'Preview', () => {
 
 	async function openPreviewPage( editorPage ) {
 		let openTabs = await browser.pages();
-		const numberOfTabs = openTabs.length;
 		expect( openTabs ).toHaveLength( 2 );
 		await editorPage.click( '.editor-post-preview' );
 
