@@ -79,10 +79,24 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script( 'wp-tinymce', includes_url( 'js/tinymce/' ) . 'wp-tinymce.php', array() );
 
 	wp_register_script(
+		'wp-url',
+		gutenberg_url( 'build/url/index.js' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'build/url/index.js' ),
+		true
+	);
+	wp_register_script(
 		'wp-autop',
 		gutenberg_url( 'build/autop/index.js' ),
 		array(),
 		filemtime( gutenberg_dir_path() . 'build/autop/index.js' ),
+		true
+	);
+	wp_register_script(
+		'wp-wordcount',
+		gutenberg_url( 'build/wordcount/index.js' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'build/wordcount/index.js' ),
 		true
 	);
 	wp_register_script(
@@ -227,7 +241,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-utils',
 		gutenberg_url( 'build/utils/index.js' ),
-		array( 'lodash', 'wp-api-fetch', 'wp-deprecated', 'wp-html-entities', 'wp-i18n', 'wp-keycodes', 'wp-editor' ),
+		array( 'lodash', 'wp-api-fetch', 'wp-deprecated', 'wp-html-entities', 'wp-i18n', 'wp-editor' ),
 		filemtime( gutenberg_dir_path() . 'build/utils/index.js' ),
 		true
 	);
@@ -293,11 +307,12 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-deprecated',
 			'wp-dom',
 			'wp-element',
-			'wp-html-entities',
 			'wp-hooks',
+			'wp-html-entities',
 			'wp-i18n',
 			'wp-is-shallow-equal',
 			'wp-keycodes',
+			'wp-url',
 		),
 		filemtime( gutenberg_dir_path() . 'build/components/index.js' ),
 		true
@@ -343,18 +358,19 @@ function gutenberg_register_scripts_and_styles() {
 		array(
 			'editor',
 			'lodash',
+			'wp-api-fetch',
 			'wp-blob',
 			'wp-blocks',
 			'wp-components',
 			'wp-compose',
 			'wp-core-data',
-			'wp-element',
 			'wp-editor',
+			'wp-element',
 			'wp-html-entities',
 			'wp-i18n',
 			'wp-keycodes',
+			'wp-url',
 			'wp-viewport',
-			'wp-api-fetch',
 		),
 		filemtime( gutenberg_dir_path() . 'build/core-blocks/index.js' ),
 		true
@@ -439,10 +455,10 @@ function gutenberg_register_scripts_and_styles() {
 		'wp-editor',
 		gutenberg_url( 'build/editor/index.js' ),
 		array(
-			'editor',
-			'jquery',
 			'lodash',
-			'postbox',
+			'tinymce-latest-lists',
+			'tinymce-latest-paste',
+			'tinymce-latest-table',
 			'wp-a11y',
 			'wp-api-fetch',
 			'wp-blob',
@@ -454,16 +470,17 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-date',
 			'wp-deprecated',
 			'wp-dom',
-			'wp-i18n',
-			'wp-keycodes',
 			'wp-element',
-			'wp-plugins',
-			'wp-viewport',
-			'wp-tinymce',
-			'tinymce-latest-lists',
-			'tinymce-latest-paste',
-			'tinymce-latest-table',
+			'wp-hooks',
+			'wp-html-entities',
+			'wp-i18n',
+			'wp-is-shallow-equal',
+			'wp-keycodes',
 			'wp-nux',
+			'wp-tinymce',
+			'wp-url',
+			'wp-viewport',
+			'wp-wordcount',
 		),
 		filemtime( gutenberg_dir_path() . 'build/editor/index.js' )
 	);
@@ -474,9 +491,11 @@ function gutenberg_register_scripts_and_styles() {
 		array(
 			'jquery',
 			'lodash',
+			'postbox',
 			'media-models',
 			'media-views',
 			'wp-a11y',
+			'wp-api',
 			'wp-api-fetch',
 			'wp-components',
 			'wp-compose',
@@ -1051,8 +1070,8 @@ function get_block_categories( $post ) {
 			'title' => __( 'Embeds', 'gutenberg' ),
 		),
 		array(
-			'slug'  => 'shared',
-			'title' => __( 'Shared Blocks', 'gutenberg' ),
+			'slug'  => 'reusable',
+			'title' => __( 'Reusable Blocks', 'gutenberg' ),
 		),
 	);
 
@@ -1189,31 +1208,8 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// Initialize the editor.
 	$gutenberg_theme_support = get_theme_support( 'gutenberg' );
 	$align_wide              = get_theme_support( 'align-wide' );
-	$color_palette           = (array) get_theme_support( 'editor-color-palette' );
-
-	// Backcompat for Color Palette set as multiple parameters.
-	if ( isset( $color_palette[0] ) && ( is_string( $color_palette[0] ) || isset( $color_palette[0]['color'] ) ) ) {
-		_doing_it_wrong(
-			'add_theme_support()',
-			__( 'Setting colors using multiple parameters is deprecated. Please pass a single parameter with an array of colors. See https://wordpress.org/gutenberg/handbook/extensibility/theme-support/ for details.', 'gutenberg' ),
-			'3.4.0'
-		);
-	} else {
-		$color_palette = current( $color_palette );
-	}
-
-	// Backcompat for Color Palette set through `gutenberg` array.
-	if ( empty( $color_palette ) && ! empty( $gutenberg_theme_support[0]['colors'] ) ) {
-		$color_palette = $gutenberg_theme_support[0]['colors'];
-	}
-
-	if ( ! empty( $gutenberg_theme_support ) ) {
-		_doing_it_wrong(
-			'add_theme_support()',
-			__( 'Adding theme support using the `gutenberg` array is deprecated. See https://wordpress.org/gutenberg/handbook/extensibility/theme-support/ for details.', 'gutenberg' ),
-			'3.4.0'
-		);
-	}
+	$color_palette           = current( (array) get_theme_support( 'editor-color-palette' ) );
+	$font_sizes              = current( (array) get_theme_support( 'editor-font-sizes' ) );
 
 	/**
 	 * Filters the allowed block types for the editor, defaulting to true (all
@@ -1290,7 +1286,11 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$editor_settings['locked'] = $locked;
 
 	if ( false !== $color_palette ) {
-		$editor_settings['colors'] = editor_color_palette_slugs( $color_palette );
+		$editor_settings['colors'] = $color_palette;
+	}
+
+	if ( ! empty( $font_sizes ) ) {
+		$editor_settings['fontSizes'] = $font_sizes;
 	}
 
 	if ( ! empty( $post_type_object->template ) ) {
@@ -1338,35 +1338,4 @@ JS;
 	 * @since 0.4.0
 	 */
 	do_action( 'enqueue_block_editor_assets' );
-}
-
-/**
- * This helper function ensures, that every item in $color_palette has a slug.
- *
- * @access public
- * @param array $color_palette The color palette registered with theme_support.
- * @return array $new_color_palette The color palette with slugs added where needed
- */
-function editor_color_palette_slugs( $color_palette ) {
-	$new_color_palette = array();
-	$is_doing_it_wrong = false;
-
-	foreach ( $color_palette as $color ) {
-		if ( ! isset( $color['slug'] ) ) {
-			$color['slug']     = esc_js( $color['name'] );
-			$is_doing_it_wrong = true;
-		}
-
-		$new_color_palette[] = $color;
-	}
-
-	if ( $is_doing_it_wrong ) {
-		_doing_it_wrong(
-			'add_theme_support()',
-			__( 'Each color in the "editor-color-palette" should have a slug defined.', 'gutenberg' ),
-			'3.2.0'
-		);
-	}
-
-	return $new_color_palette;
 }

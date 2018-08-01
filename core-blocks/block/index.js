@@ -11,8 +11,8 @@ import edit from './edit';
 export const name = 'core/block';
 
 export const settings = {
-	title: __( 'Shared Block' ),
-	category: 'shared',
+	title: __( 'Reusable Block' ),
+	category: 'reusable',
 
 	attributes: {
 		ref: {

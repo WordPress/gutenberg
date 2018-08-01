@@ -12,7 +12,7 @@ import {
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
-import httpBuildQuery from 'http-build-query';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies.
@@ -21,8 +21,10 @@ import Placeholder from '../placeholder';
 import Spinner from '../spinner';
 
 export function rendererPathWithAttributes( block, attributes = null ) {
-	return `/gutenberg/v1/block-renderer/${ block }?context=edit` +
-			( null !== attributes ? '&' + httpBuildQuery( { attributes } ) : '' );
+	return addQueryArgs( `/gutenberg/v1/block-renderer/${ block }`, {
+		context: 'edit',
+		...( null !== attributes ? { attributes } : {} ),
+	} );
 }
 
 export class ServerSideRender extends Component {

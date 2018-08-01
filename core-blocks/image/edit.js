@@ -272,7 +272,7 @@ class ImageEdit extends Component {
 			<InspectorControls>
 				<PanelBody title={ __( 'Image Settings' ) }>
 					<TextareaControl
-						label={ __( 'Textual Alternative' ) }
+						label={ __( 'Alt Text (Alternative Text)' ) }
 						value={ alt }
 						onChange={ this.updateAlt }
 						help={ __( 'Describe the purpose of the image. Leave empty if the image is not a key part of the content.' ) }
@@ -353,7 +353,7 @@ class ImageEdit extends Component {
 						label={ __( 'Link URL' ) }
 						value={ href || '' }
 						onChange={ this.onSetCustomHref }
-						placeholder={ ! isLinkURLInputDisabled && 'https://' }
+						placeholder={ ! isLinkURLInputDisabled ? 'https://' : undefined }
 						disabled={ isLinkURLInputDisabled }
 					/>
 				</PanelBody>

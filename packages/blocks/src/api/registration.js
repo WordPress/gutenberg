@@ -10,6 +10,7 @@ import { get, isFunction, some } from 'lodash';
  */
 import { applyFilters, addFilter } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -297,16 +298,26 @@ export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
 }
 
 /**
- * Determines whether or not the given block is a shared block. This is a
+ * Determines whether or not the given block is a reusable block. This is a
  * special block type that is used to point to a global block stored via the
  * API.
  *
  * @param {Object} blockOrType Block or Block Type to test.
  *
- * @return {boolean} Whether the given block is a shared block.
+ * @return {boolean} Whether the given block is a reusable block.
  */
-export function isSharedBlock( blockOrType ) {
+export function isReusableBlock( blockOrType ) {
 	return blockOrType.name === 'core/block';
+}
+
+export function isSharedBlock( blockOrType ) {
+	deprecated( 'isSharedBlock', {
+		alternative: 'isReusableBlock',
+		version: '3.6',
+		plugin: 'Gutenberg',
+	} );
+
+	return isReusableBlock( blockOrType );
 }
 
 /**

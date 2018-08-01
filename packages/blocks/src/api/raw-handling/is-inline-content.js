@@ -6,7 +6,7 @@ import { difference } from 'lodash';
 /**
  * Internal dependencies
  */
-import { isPhrasingContent } from './utils';
+import { isPhrasingContent } from './phrasing-content';
 
 /**
  * Checks if the given node should be considered inline content, optionally

@@ -256,6 +256,17 @@ export async function publishPost() {
 }
 
 /**
+ * Given the clientId of a block, selects the block on the editor.
+ *
+ * @param {string} clientId Identified of the block.
+ */
+export async function selectBlockByClientId( clientId ) {
+	await page.evaluate( ( id ) => {
+		wp.data.dispatch( 'core/editor' ).selectBlock( id );
+	}, clientId );
+}
+
+/**
  * Clicks on the button in the header which opens Document Settings sidebar when it is closed.
  */
 export async function openDocumentSettingsSidebar() {

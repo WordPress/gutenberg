@@ -12,7 +12,7 @@ $arrow-size: 8px;
 		bottom: 0;
 	}
 
-	&:not(.no-arrow):not(.is-mobile) {
+	&:not(.is-without-arrow):not(.is-mobile) {
 		margin-left: 2px;
 
 		&:before {
