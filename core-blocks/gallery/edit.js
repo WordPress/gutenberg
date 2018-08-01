@@ -2,6 +2,7 @@
  * External Dependencies
  */
 import { filter, pick } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -53,6 +54,7 @@ class GalleryEdit extends Component {
 		this.setLinkTo = this.setLinkTo.bind( this );
 		this.setColumnsNumber = this.setColumnsNumber.bind( this );
 		this.toggleImageCrop = this.toggleImageCrop.bind( this );
+		this.toggleCaptionStyle = this.toggleCaptionStyle.bind( this );
 		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.setImageAttributes = this.setImageAttributes.bind( this );
 		this.addFiles = this.addFiles.bind( this );
@@ -107,6 +109,16 @@ class GalleryEdit extends Component {
 		return checked ? __( 'Thumbnails are cropped to align.' ) : __( 'Thumbnails are not cropped.' );
 	}
 
+	toggleCaptionStyle() {
+		this.props.setAttributes( {
+			captionStyle: this.props.attributes.captionStyle === 'underneath' ? 'overlay' : 'underneath',
+		} );
+	}
+
+	getCaptionStyleHelp( checked ) {
+		return checked ? __( 'Captions are placed below images.' ) : __( 'Captions are not placed inside images.' );
+	}
+
 	setImageAttributes( index, attributes ) {
 		const { attributes: { images }, setAttributes } = this.props;
 		if ( ! images[ index ] ) {
@@ -155,7 +167,14 @@ class GalleryEdit extends Component {
 
 	render() {
 		const { attributes, isSelected, className, noticeOperations, noticeUI } = this.props;
-		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
+		const {
+			images,
+			columns = defaultColumnsNumber( attributes ),
+			align,
+			imageCrop,
+			captionStyle,
+			linkTo,
+		} = attributes;
 
 		const dropZone = (
 			<DropZone
@@ -209,6 +228,16 @@ class GalleryEdit extends Component {
 			);
 		}
 
+		const classes = classnames(
+			className,
+			`align${ align }`,
+			`columns-${ columns }`,
+			{
+				'is-cropped': imageCrop,
+				'has-captions-underneath': captionStyle === 'underneath',
+			},
+		);
+
 		return (
 			<Fragment>
 				{ controls }
@@ -227,6 +256,12 @@ class GalleryEdit extends Component {
 							onChange={ this.toggleImageCrop }
 							help={ this.getImageCropHelp }
 						/>
+						<ToggleControl
+							label={ __( 'Display Captions Below Images' ) }
+							checked={ captionStyle === 'underneath' }
+							onChange={ this.toggleCaptionStyle }
+							help={ this.getCaptionStyleHelp }
+						/>
 						<SelectControl
 							label={ __( 'Link to' ) }
 							value={ linkTo }
@@ -236,7 +271,7 @@ class GalleryEdit extends Component {
 					</PanelBody>
 				</InspectorControls>
 				{ noticeUI }
-				<ul className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
+				<ul className={ classes }>
 					{ dropZone }
 					{ images.map( ( img, index ) => (
 						<li className="blocks-gallery-item" key={ img.id || img.url }>

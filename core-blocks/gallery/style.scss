@@ -19,7 +19,8 @@
 			margin: 0;
 			height: 100%;
 			display: flex;
-			align-items: flex-end;
+			justify-content: flex-end;
+			flex-direction: column;
 		}
 
 		img {
@@ -29,15 +30,10 @@
 		}
 
 		figcaption {
-			position: absolute;
 			width: 100%;
-			max-height: 100%;
-			overflow: auto;
-			padding: 40px 10px 5px;
-			color: $white;
+			color: $dark-gray-100;
 			text-align: center;
 			font-size: $default-font-size;
-			background: linear-gradient( 0deg, rgba( $color: $black, $alpha: 0.7 ) 0, rgba($color: $black, $alpha: 0.3) 60%, transparent );
 	
 			img {
 				display: inline;
@@ -93,5 +89,19 @@
 	&.alignright {
 		max-width: $content-width / 2;
 		width: 100%;
+	}
+}
+
+.wp-block-gallery:not( .has-captions-underneath ) {
+	.blocks-gallery-image,
+	.blocks-gallery-item {
+		figcaption {
+			position: absolute;
+			max-height: 100%;
+			overflow: auto;
+			padding: 40px 10px 5px;
+			color: $white;
+			background: linear-gradient( 0deg, rgba( $color: $black, $alpha: 0.7 ) 0, rgba( $color: $black, $alpha: 0.3 ) 60%, transparent );
+		}
 	}
 }
