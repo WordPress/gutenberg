@@ -176,7 +176,6 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	renderItem( value: { item: BlockType, uid: string } ) {
-		console.log("about to render: " + value.item.uid);
 		return (
 			<BlockHolder
 				onToolbarButtonPressed={ this.onToolbarButtonPressed.bind( this ) }
