@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { applyMiddleware } from 'redux';
 import { castArray } from 'lodash';
 
 /**
