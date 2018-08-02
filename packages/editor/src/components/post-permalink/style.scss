@@ -9,16 +9,16 @@
 	white-space: nowrap;
 
 	// use opacity to work in various editor styles
-	border: 1px solid $dark-opacity-light-500;
+	border: $border-width solid $dark-opacity-light-500;
 	border-bottom: none;
 	background-clip: padding-box;
 
 	// put toolbar snugly to edge on mobile
-	margin-left: -$block-padding - 1px;	// stack borders
-	margin-right: -$block-padding - 1px;
+	margin-left: -$block-padding - $border-width;	// stack borders
+	margin-right: -$block-padding - $border-width;
 	@include break-small() {
-		margin-left: -1px;
-		margin-right: -1px;
+		margin-left: -$border-width;
+		margin-right: -$border-width;
 	}
 }
 

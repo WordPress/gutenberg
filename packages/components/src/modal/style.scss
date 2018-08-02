@@ -41,7 +41,7 @@
 		height: 70%;
 	}
 
-	border: 1px solid $light-gray-500;
+	border: $border-width solid $light-gray-500;
 	background-color: $white;
 	box-shadow: $shadow-modal;
 	outline: none;
@@ -50,7 +50,7 @@
 .components-modal__header {
 	box-sizing: border-box;
 	height: $header-height;
-	border-bottom: 1px solid $light-gray-500;
+	border-bottom: $border-width solid $light-gray-500;
 	padding: $item-spacing $item-spacing $item-spacing $panel-padding;
 	display: flex;
 	flex-direction: row;

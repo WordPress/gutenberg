@@ -7,7 +7,7 @@
 	td,
 	th {
 		padding: 0.5em;
-		border: 1px solid currentColor;
+		border: $border-width solid currentColor;
 	}
 
 	td[data-mce-selected="1"],

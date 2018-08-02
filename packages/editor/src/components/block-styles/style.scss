@@ -23,7 +23,7 @@
 }
 
 .editor-block-styles__item-preview {
-	outline: 1px solid transparent; // Shown in Windows High Contrast mode.
+	outline: $border-width solid transparent; // Shown in Windows High Contrast mode.
 	box-shadow: inset 0 0 0 1px rgba( $dark-gray-900, .2 );
 	overflow: hidden;
 	padding: 0;

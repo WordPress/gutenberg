@@ -1,7 +1,7 @@
 .edit-post-header {
 	height: $header-height;
 	padding: $item-spacing 2px;
-	border-bottom: 1px solid $light-gray-500;
+	border-bottom: $border-width solid $light-gray-500;
 	background: $white;
 	display: flex;
 	flex-direction: row;
@@ -66,7 +66,7 @@
 
 	&.is-toggled:hover,
 	&.is-toggled:focus {
-		box-shadow: 0 0 0 1px $dark-gray-500, inset 0 0 0 1px $white;
+		box-shadow: 0 0 0 $border-width $dark-gray-500, inset 0 0 0 $border-width $white;
 		color: $white;
 		background: $dark-gray-500;
 	}

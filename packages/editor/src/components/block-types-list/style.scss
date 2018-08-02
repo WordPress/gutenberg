@@ -22,7 +22,7 @@
 	background: transparent;
 	word-break: break-word;
 	border-radius: $button-style__radius-roundrect;
-	border: 1px solid transparent;
+	border: $border-width solid transparent;
 	transition: all 0.05s ease-in-out;
 
 	&:disabled {

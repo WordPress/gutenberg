@@ -146,7 +146,7 @@ body.gutenberg-editor-page {
 	input[type=number],
 	select,
 	textarea {
-		border: 1px solid $light-gray-700;
+		border: $border-width solid $light-gray-700;
 		font-family: $default-font;
 		font-size: $default-font-size;
 		padding: 6px 8px;

@@ -1,6 +1,6 @@
 .components-toolbar {
 	margin: 0;
-	border: 1px solid $light-gray-500;
+	border: $border-width solid $light-gray-500;
 	background-color: $white;
 	display: inline-flex;
 }

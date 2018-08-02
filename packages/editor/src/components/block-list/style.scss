@@ -358,7 +358,7 @@
 
 		// Keep a 1px margin to compensate for the border/outline.
 		.editor-block-contextual-toolbar {
-			margin-bottom: 1px;
+			margin-bottom: $border-width;
 		}
 	}
 
@@ -712,8 +712,7 @@
 
 .editor-block-list__insertion-point-indicator {
 	position: absolute;
-	// The 1px here should be $border-width but the SASS parser is not working properly.
-	top: calc( 50% - 1px );
+	top: calc( 50% - #{ $border-width } );
 	height: 2px;
 	left: 0;
 	right: 0;
@@ -832,7 +831,7 @@
 	right: 0;
 
 	// Paint the borders on the toolbar itself on mobile.
-	border-top: 1px solid $light-gray-500;
+	border-top: $border-width solid $light-gray-500;
 	.components-toolbar {
 		border-top: none;
 		border-bottom: none;
@@ -842,8 +841,8 @@
 	@include break-small() {
 		border-top: none;
 		.components-toolbar {
-			border-top: 1px solid $light-gray-500;
-			border-bottom: 1px solid $light-gray-500;
+			border-top: $border-width solid $light-gray-500;
+			border-bottom: $border-width solid $light-gray-500;
 		}
 	}
 
