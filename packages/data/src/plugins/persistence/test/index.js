@@ -2,129 +2,160 @@
  * Internal dependencies
  */
 import plugin, {
-	getPersistedData,
-	setPersistedData,
-	createPersistMiddleware,
+	createPersistenceInterface,
 	withInitialState,
 } from '../';
 import objectStorage from '../storage/object';
+import { createRegistry } from '../../../';
 
 describe( 'persistence', () => {
-	const registry = { registerStore: jest.fn() };
+	let registry, originalRegisterStore;
 
-	let _originalStorage;
 	beforeAll( () => {
-		_originalStorage = plugin.getStorage();
-		plugin.setStorage( objectStorage );
-
 		jest.spyOn( objectStorage, 'setItem' );
-	} );
-
-	afterAll( () => {
-		plugin.setStorage( _originalStorage );
 	} );
 
 	beforeEach( () => {
 		objectStorage.clear();
 		objectStorage.setItem.mockClear();
+
+		// Since the exposed `registerStore` is a proxying function, mimic
+		// intercept of original call by adding an initial plugin.
+		registry = createRegistry()
+			.use( ( originalRegistry ) => {
+				originalRegisterStore = jest.spyOn( originalRegistry, 'registerStore' );
+				return {};
+			} )
+			.use( plugin, { storage: objectStorage } );
 	} );
 
 	it( 'should not mutate options', () => {
 		const options = Object.freeze( { persist: true, reducer() {} } );
 
-		plugin( registry ).registerStore( 'test', options );
+		registry.registerStore( 'test', options );
 	} );
 
 	it( 'override values passed to registerStore', () => {
 		const options = { persist: true, reducer() {} };
 
-		plugin( registry ).registerStore( 'test', options );
+		registry.registerStore( 'test', options );
 
-		expect( registry.registerStore ).toHaveBeenCalledWith( 'test', {
+		expect( originalRegisterStore ).toHaveBeenCalledWith( 'test', {
 			persist: true,
 			middlewares: expect.arrayContaining( [ expect.any( Function ) ] ),
 			reducer: expect.any( Function ),
 		} );
 		// Replaced reducer:
-		expect( registry.registerStore.mock.calls[ 0 ][ 1 ].reducer ).not.toBe( options.reducer );
+		expect( originalRegisterStore.mock.calls[ 0 ][ 1 ].reducer ).not.toBe( options.reducer );
 	} );
 
-	describe( 'getPersistedData', () => {
-		it( 'returns an empty object if not set', () => {
-			const data = getPersistedData();
+	it( 'should not persist when state matches initial', () => {
+		// Caveat: State is compared by strict equality. This doesn't work for
+		// object types in rehydrating from persistence, since:
+		//   JSON.parse( {} ) !== JSON.parse( {} )
+		// It's more important for runtime to check equal-ness, which is
+		// expected to be reflected even for object types by reducer.
+		const state = 1;
+		const reducer = () => state;
 
-			expect( data ).toEqual( {} );
+		objectStorage.setItem( 'WP_DATA', JSON.stringify( { test: state } ) );
+		objectStorage.setItem.mockClear();
+
+		registry.registerStore( 'test', {
+			reducer,
+			persist: true,
+			actions: {
+				doNothing() {
+					return { type: 'NOTHING' };
+				},
+			},
 		} );
 
-		it( 'returns the current value', () => {
-			objectStorage.setItem( plugin.getStorageKey(), '{"test":{}}' );
-			const data = getPersistedData();
+		registry.dispatch( 'test' ).doNothing();
 
-			expect( data ).toEqual( { test: {} } );
-		} );
+		expect( objectStorage.setItem ).not.toHaveBeenCalled();
 	} );
 
-	describe( 'setPersistedData', () => {
-		it( 'sets JSON by object', () => {
-			setPersistedData( 'test', {} );
+	it( 'should persist when state changes', () => {
+		const initialState = { foo: 'bar', baz: 'qux' };
+		function reducer( state = initialState, action ) {
+			return action.nextState || state;
+		}
 
-			expect( objectStorage.setItem ).toHaveBeenCalledWith( 'WP_DATA', '{"test":{}}' );
+		registry.registerStore( 'test', {
+			reducer,
+			persist: true,
+			actions: {
+				setState( nextState ) {
+					return { type: 'SET_STATE', nextState };
+				},
+			},
 		} );
 
-		it( 'merges to existing', () => {
-			setPersistedData( 'test1', {} );
-			setPersistedData( 'test2', {} );
+		registry.dispatch( 'test' ).setState( { ok: true } );
 
-			expect( objectStorage.setItem ).toHaveBeenCalledWith( 'WP_DATA', '{"test1":{}}' );
-			expect( objectStorage.setItem ).toHaveBeenCalledWith( 'WP_DATA', '{"test1":{},"test2":{}}' );
-		} );
+		expect( objectStorage.setItem ).toHaveBeenCalledWith( 'WP_DATA', '{"test":{"ok":true}}' );
 	} );
 
-	describe( 'createPersistMiddleware', () => {
-		const state = { foo: 'bar', baz: 'qux' };
-		const store = {
-			getState: () => state,
-		};
+	it( 'should persist a subset of keys', () => {
+		const initialState = { foo: 'bar', baz: 'qux' };
+		function reducer( state = initialState, action ) {
+			return action.nextState || state;
+		}
 
-		it( 'should return a middleware function', () => {
-			const middleware = createPersistMiddleware( 'test', true );
-			const action = {};
-			const next = jest.fn().mockReturnValue( action );
-
-			const result = middleware( store )( next )( action );
-
-			expect( next ).toHaveBeenCalledWith( action );
-			expect( result ).toBe( action );
+		registry.registerStore( 'test', {
+			reducer,
+			persist: [ 'foo' ],
+			actions: {
+				setState( nextState ) {
+					return { type: 'SET_STATE', nextState };
+				},
+			},
 		} );
 
-		it( 'should not persist when state matches initial', () => {
-			const middleware = createPersistMiddleware( 'test', true, state );
-			const action = {};
-			const next = jest.fn();
+		registry.dispatch( 'test' ).setState( { foo: 1, baz: 2 } );
 
-			middleware( store )( next )( action );
+		expect( objectStorage.setItem ).toHaveBeenCalledWith( 'WP_DATA', '{"test":{"foo":1}}' );
+	} );
 
-			expect( objectStorage.setItem ).not.toHaveBeenCalled();
+	describe( 'createPersistenceInterface', () => {
+		const storage = objectStorage;
+		const storageKey = 'FOO';
+
+		let get, set;
+		beforeEach( () => {
+			( { get, set } = createPersistenceInterface( { storage, storageKey } ) );
 		} );
 
-		it( 'should persist when state changes', () => {
-			const middleware = createPersistMiddleware( 'test', true, {} );
-			const action = {};
-			const next = jest.fn();
+		describe( 'get', () => {
+			it( 'returns an empty object if not set', () => {
+				const data = get();
 
-			middleware( store )( next )( action );
+				expect( data ).toEqual( {} );
+			} );
 
-			expect( objectStorage.setItem ).toHaveBeenCalledWith( 'WP_DATA', '{"test":{"foo":"bar","baz":"qux"}}' );
+			it( 'returns the current value', () => {
+				objectStorage.setItem( storageKey, '{"test":{}}' );
+				const data = get();
+
+				expect( data ).toEqual( { test: {} } );
+			} );
 		} );
 
-		it( 'should persist a subset of keys', () => {
-			const middleware = createPersistMiddleware( 'test', [ 'foo' ], {} );
-			const action = {};
-			const next = jest.fn();
+		describe( 'set', () => {
+			it( 'sets JSON by object', () => {
+				set( 'test', {} );
 
-			middleware( store )( next )( action );
+				expect( objectStorage.setItem ).toHaveBeenCalledWith( storageKey, '{"test":{}}' );
+			} );
 
-			expect( objectStorage.setItem ).toHaveBeenCalledWith( 'WP_DATA', '{"test":{"foo":"bar"}}' );
+			it( 'merges to existing', () => {
+				set( 'test1', {} );
+				set( 'test2', {} );
+
+				expect( objectStorage.setItem ).toHaveBeenCalledWith( storageKey, '{"test1":{}}' );
+				expect( objectStorage.setItem ).toHaveBeenCalledWith( storageKey, '{"test1":{},"test2":{}}' );
+			} );
 		} );
 	} );
 

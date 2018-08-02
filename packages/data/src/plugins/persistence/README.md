@@ -10,7 +10,7 @@ By default, persistence occurs by [`localStorage`](https://developer.mozilla.org
 Call the `use` method on the default or your own registry to include the persistence plugin:
 
 ```js
-wp.data.use( 'persistence' );
+wp.data.use( 'persistence', { storageKey: 'example' } );
 ```
 
 Then, when registering a store, set a `persist` property as `true` (persist all state) or an array of state keys to persist.
@@ -23,22 +23,14 @@ wp.data.registerStore( 'my-plugin', {
 } );
 ```
 
-## API
+## Options
 
-### `setStorage`
+### `storage`
 
-Assign the persistent storage implementation. At minimum, this should implement `getItem` and `setItem` of the Web Storage API.
+Persistent storage implementation. This must at least implement `getItem` and `setItem` of the Web Storage API.
 
 See: https://developer.mozilla.org/en-US/docs/Web/API/Storage
 
-### `getStorage`
+### `storageKey`
 
-Returns the persistence storage handler.
-
-### `setStorageKey`
-
-Assigns the key on which to set in the persistent storage.
-
-### `getStorageKey`
-
-Returns the key on which to set in the persistent storage.
+The key on which to set in persistent storage.

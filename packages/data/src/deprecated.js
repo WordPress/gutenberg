@@ -11,7 +11,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import plugins from './plugins';
+import * as persistence from './plugins/persistence';
 
 /**
  * Adds the rehydration behavior to redux reducers.
@@ -63,12 +63,14 @@ export function loadAndPersist( store, reducer, reducerKey, storageKey ) {
 		hint: 'See https://github.com/WordPress/gutenberg/pull/8146 for more details',
 	} );
 
+	const persist = persistence.createPersistenceInterface( { storageKey } );
+
 	// Load initially persisted value
-	const persistedString = plugins.persistence.getStorage().getItem( storageKey );
-	if ( persistedString ) {
+	const persisted = persist.get();
+	if ( persisted ) {
 		const persistedState = {
 			...get( reducer( undefined, { type: '@@gutenberg/init' } ), reducerKey ),
-			...JSON.parse( persistedString ),
+			...JSON.parse( persisted ),
 		};
 
 		store.dispatch( {
@@ -85,7 +87,7 @@ export function loadAndPersist( store, reducer, reducerKey, storageKey ) {
 		if ( newStateValue !== currentStateValue ) {
 			currentStateValue = newStateValue;
 			const stateToSave = get( reducer( store.getState(), { type: 'SERIALIZE' } ), reducerKey );
-			plugins.persistence.getStorage().setItem( storageKey, JSON.stringify( stateToSave ) );
+			persist.set( stateToSave );
 		}
 	} );
 }
@@ -109,4 +111,26 @@ export function restrictPersistence( reducer, keyToPersist ) {
 	reducer.__deprecatedKeyToPersist = keyToPersist;
 
 	return reducer;
+}
+
+/**
+ * Sets a different persistence storage.
+ *
+ * @param {Object} storage Persistence storage.
+ */
+export function setPersistenceStorage( storage ) {
+	deprecated( 'wp.data.setPersistenceStorage', {
+		alternative: 'persistence plugin with storage option',
+		version: '3.7',
+		plugin: 'Gutenberg',
+		hint: 'See https://github.com/WordPress/gutenberg/pull/8341 for more details',
+	} );
+
+	const originalCreatePersistenceInterface = persistence.createPersistenceInterface;
+	persistence.createPersistenceInterface = ( options ) => {
+		originalCreatePersistenceInterface( {
+			storage,
+			...options,
+		} );
+	};
 }
