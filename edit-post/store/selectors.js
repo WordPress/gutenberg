@@ -97,6 +97,17 @@ export function isEditorSidebarPanelOpened( state, panel ) {
 }
 
 /**
+ * Returns true if a modal is active, or false otherwise.
+ *
+ * @param  {Object}  state Global application state.
+ * @param  {string}  modalName Modal name.
+ * @return {boolean}       Whether the modal is active.
+ */
+export function isModalActive( state, modalName ) {
+	return getPreference( state, 'activeModal' ) === modalName;
+}
+
+/**
  * Returns whether the given feature is enabled or not.
  *
  * @param {Object} state   Global application state.

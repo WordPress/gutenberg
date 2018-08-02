@@ -41,6 +41,16 @@ export const preferences = combineReducers( {
 
 		return state;
 	},
+	activeModal( state = PREFERENCES_DEFAULTS.activeModal, action ) {
+		switch ( action.type ) {
+			case 'OPEN_MODAL':
+				return action.name;
+			case 'CLOSE_MODAL':
+				return null;
+		}
+
+		return state;
+	},
 	panels( state = PREFERENCES_DEFAULTS.panels, action ) {
 		if ( action.type === 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL' ) {
 			return {

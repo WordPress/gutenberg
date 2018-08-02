@@ -19,6 +19,7 @@ describe( 'state', () => {
 
 			expect( state ).toEqual( {
 				activeGeneralSidebar: 'edit-post/document',
+				activeModal: null,
 				editorMode: 'visual',
 				panels: { 'post-status': true },
 				features: { fixedToolbar: false },
@@ -39,6 +40,7 @@ describe( 'state', () => {
 		it( 'should save activeGeneralSidebar default value when serializing if the value was edit-post/block', () => {
 			const state = preferences( {
 				activeGeneralSidebar: 'edit-post/block',
+				activeModal: null,
 				editorMode: 'visual',
 				panels: { 'post-status': true },
 				features: { fixedToolbar: false },
@@ -48,6 +50,7 @@ describe( 'state', () => {
 
 			expect( state ).toEqual( {
 				activeGeneralSidebar: 'edit-post/document',
+				activeModal: null,
 				editorMode: 'visual',
 				panels: { 'post-status': true },
 				features: { fixedToolbar: false },
@@ -96,6 +99,23 @@ describe( 'state', () => {
 			} );
 
 			expect( state.panels ).toEqual( { 'post-taxonomies': false } );
+		} );
+
+		it( 'should set the activeModal to the provided name', () => {
+			const state = preferences( deepFreeze( { activeModal: null } ), {
+				type: 'OPEN_MODAL',
+				name: 'test-modal',
+			} );
+
+			expect( state.activeModal ).toEqual( 'test-modal' );
+		} );
+
+		it( 'should set the activeModal to null', () => {
+			const state = preferences( deepFreeze( { activeModal: 'test-modal' } ), {
+				type: 'CLOSE_MODAL',
+			} );
+
+			expect( state.activeModal ).toBeNull();
 		} );
 
 		it( 'should return switched mode', () => {

@@ -23,6 +23,30 @@ export function closeGeneralSidebar() {
 }
 
 /**
+ * Returns an action object used in signalling that the user opened an editor sidebar.
+ *
+ * @param {string} name        Sidebar name to be opened.
+ * @return {Object}            Action object.
+ */
+export function openModal( name ) {
+	return {
+		type: 'OPEN_MODAL',
+		name,
+	};
+}
+
+/**
+ * Returns an action object signalling that the user closed the sidebar.
+ *
+ * @return {Object} Action object.
+ */
+export function closeModal() {
+	return {
+		type: 'CLOSE_MODAL',
+	};
+}
+
+/**
  * Returns an action object used in signalling that the user opened the publish
  * sidebar.
  *
