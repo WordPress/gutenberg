@@ -70,6 +70,12 @@ const ShortcutSection = ( { title, shortcuts } ) => (
 );
 
 export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
+	const title = (
+		<span className="editor-keyboard-shortcut-help__title">
+			{ __( 'Keyboard Shortcuts' ) }
+		</span>
+	);
+
 	return (
 		<Fragment>
 			<KeyboardShortcuts
@@ -81,7 +87,7 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 			{ isModalActive && (
 				<Modal
 					className="editor-keyboard-shortcut-help"
-					title={ __( 'Keyboard Shortcuts' ) }
+					title={ title }
 					closeLabel={ __( 'Close' ) }
 					onRequestClose={ toggleModal }
 				>

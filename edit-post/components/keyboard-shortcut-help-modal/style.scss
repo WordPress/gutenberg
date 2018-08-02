@@ -1,10 +1,17 @@
 .editor-keyboard-shortcut-help {
+	&__title {
+		font-size: 1rem;
+		font-weight: bold;
+	}
+
 	&__section {
 		margin: 0 0 2rem 0;
 	}
 
+
 	&__section-title {
-		font-size: inherit;
+		font-size: 0.9rem;
+		font-weight: bold;
 	}
 
 	&__shortcut {
