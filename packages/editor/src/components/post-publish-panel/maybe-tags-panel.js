@@ -28,9 +28,7 @@ class MaybeTagsPanel extends Component {
 	}
 
 	render() {
-		const { isPostTypeSupported } = this.props;
-		const { hadTags } = this.state;
-		if ( ! isPostTypeSupported || hadTags ) {
+		if ( this.state.hadTags ) {
 			return null;
 		}
 		return ( <TagsPanel /> );
@@ -40,12 +38,12 @@ class MaybeTagsPanel extends Component {
 export default compose(
 	withSelect( ( select ) => {
 		const postType = select( 'core/editor' ).getCurrentPostType();
-		const tags = select( 'core' ).getTaxonomy( 'post_tag' );
-		const terms = tags ? select( 'core/editor' ).getEditedPostAttribute( tags.rest_base ) : [];
+		const tagsTaxonomy = select( 'core' ).getTaxonomy( 'post_tag' );
 		return {
-			hasTags: tags && terms && terms.length > 0,
-			isPostTypeSupported: tags && tags.types.some( ( type ) => type === postType ),
+			areTagsFetched: tagsTaxonomy !== undefined,
+			isPostTypeSupported: tagsTaxonomy && tagsTaxonomy.types.some( ( type ) => type === postType ),
+			hasTags: tagsTaxonomy ? select( 'core/editor' ).getEditedPostAttribute( tagsTaxonomy.rest_base ).length > 0 : false,
 		};
 	} ),
-	ifCondition( ( { hasTags } ) => hasTags !== undefined ),
+	ifCondition( ( { areTagsFetched, isPostTypeSupported } ) => isPostTypeSupported && areTagsFetched ),
 )( MaybeTagsPanel );
