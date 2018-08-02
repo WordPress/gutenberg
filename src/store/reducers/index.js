@@ -8,7 +8,6 @@ import { find, findIndex, reduce } from 'lodash';
 import ActionTypes from '../actions/ActionTypes';
 import type { StateType } from '../';
 import type { BlockActionType } from '../actions';
-import { buildEmptyBlock } from '../block-builder';
 
 function findBlock( blocks, uid: string ) {
 	return find( blocks, obj => {

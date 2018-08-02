@@ -10,9 +10,8 @@ import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
 import type { BlockType } from '../store/';
 import styles from './block-manager.scss';
-import { buildEmptyBlock } from '../store/block-builder';
 // Gutenberg imports
-import { getBlockType, serialize } from '@wordpress/blocks';
+import { getBlockType, serialize, createBlock } from '@wordpress/blocks';
 
 export type BlockListType = {
 	onChange: ( uid: string, attributes: mixed ) => void,
@@ -78,13 +77,13 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				// instead of being appended to the end.
 				// this.props.createBlockAction( uid, dataSourceBlockIndex );
 
-				// TODO: create an unique id, we're using this just for now
-				const block = this.state.dataSource.get( this.state.dataSource.size() - 1 );
-				const newId = ( parseInt( block.uid ) + 1 ).toString();
-
-				const newBlock = buildEmptyBlock( newId, 'paragraph' );
+				// TODO: block type picker here instead of hardcoding a core/code block
+				const newBlock = createBlock( 'core/code', { content: 'new test text for a core/code block' } );
+				// TODO check supported blocks, update latest GB master to use core/paragraph as
+				// per https://github.com/WordPress/gutenberg/pull/8231
+				//const newBlock = createBlock( 'core/paragraph', { content: 'new test text for a core/paragraph block' } );
 				this.state.dataSource.push( newBlock );
-				this.props.createBlockAction( newId, newBlock );
+				this.props.createBlockAction( newBlock.uid, newBlock );
 				break;
 			case ToolbarButton.SETTINGS:
 				// TODO: implement settings
