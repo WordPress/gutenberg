@@ -380,6 +380,7 @@ export function createRegistry( storeConfigs = {} ) {
 				super();
 				this.methods = options.methods;
 				this.operations = options.operations;
+				this.mutations = options.mutations;
 				this.selectors = options.selectors || {};
 			}
 		}

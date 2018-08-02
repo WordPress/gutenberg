@@ -18,10 +18,11 @@ import { RegistryConsumer } from '../registry-provider';
  * @param {Function} mapSelectorsToProps Function called on every state change,
  *                                       expected to return object of props to
  *                                       merge with the component's own props.
- *
+ * @param {Function} [mapMutationsToProps] Function called which maps resource
+ *                                         mutations to event handle callbacks.
  * @return {Component} Enhanced component with merged state data props.
  */
-const withResources = ( apiName, mapSelectorsToProps ) => createHigherOrderComponent( ( WrappedComponent ) => {
+const withResources = ( apiName, mapSelectorsToProps, mapMutationsToProps ) => createHigherOrderComponent( ( WrappedComponent ) => {
 	/**
 	 * Default merge props. A constant value is used as the fallback since it
 	 * can be more efficiently shallow compared in case component is repeatedly
@@ -50,12 +51,21 @@ const withResources = ( apiName, mapSelectorsToProps ) => createHigherOrderCompo
 		getNextMergeProps( props ) {
 			const apiClient = props.registry.getApiClient( apiName );
 			let selectorProps = DEFAULT_MERGE_PROPS;
+			let mutationProps = {};
 
 			apiClient.setComponentData( this, ( selectors ) => {
 				selectorProps = mapSelectorsToProps( selectors, props.ownProps );
 			} );
 
-			return selectorProps;
+			if ( mapMutationsToProps ) {
+				const mutations = apiClient.getMutations();
+				mutationProps = mapMutationsToProps( mutations, this.props );
+			}
+
+			return {
+				...selectorProps,
+				...mutationProps,
+			};
 		}
 
 		componentDidMount() {
