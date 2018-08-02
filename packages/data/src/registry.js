@@ -41,7 +41,7 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import dataStore from './store';
-import * as plugins from './plugins';
+import { persistence } from './plugins';
 
 /**
  * Returns true if the given argument appears to be a dispatchable action.
@@ -387,7 +387,7 @@ export function createRegistry( storeConfigs = {} ) {
 			hint: 'See https://github.com/WordPress/gutenberg/pull/8341 for more details',
 		} );
 
-		registry.use( plugins.persistence, { storageKey } );
+		registry.use( persistence, { storageKey } );
 	}
 
 	/**
@@ -428,10 +428,6 @@ export function createRegistry( storeConfigs = {} ) {
 	 * @return {WPDataRegistry} Enhanced registry.
 	 */
 	function use( plugin, options ) {
-		if ( typeof plugin === 'string' ) {
-			plugin = plugins[ plugin ];
-		}
-
 		registry = {
 			...registry,
 			...plugin( registry, options ),

@@ -10,7 +10,7 @@ By default, persistence occurs by [`localStorage`](https://developer.mozilla.org
 Call the `use` method on the default or your own registry to include the persistence plugin:
 
 ```js
-wp.data.use( 'persistence', { storageKey: 'example' } );
+wp.data.use( wp.data.plugins.persistence, { storageKey: 'example' } );
 ```
 
 Then, when registering a store, set a `persist` property as `true` (persist all state) or an array of state keys to persist.
