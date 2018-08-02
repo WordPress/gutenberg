@@ -335,7 +335,7 @@ function the_gutenberg_metaboxes() {
 	 * @see https://github.com/WordPress/gutenberg/issues/6963
 	 */
 	if ( wp_script_is( 'wp-edit-post', 'done' ) ) {
-		printf( "<script type='text/javascript'>\n%s\n</script>\n", trim( implode( "\n", $script ), "\n" ) );
+		printf( "<script type='text/javascript'>\n%s\n</script>\n", trim( $script ) );
 	}
 
 	// Reset meta box data.
