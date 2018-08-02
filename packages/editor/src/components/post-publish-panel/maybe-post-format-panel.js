@@ -31,8 +31,12 @@ const PostFormatPanel = ( { suggestion, onUpdatePostFormat } ) => <PanelBody ini
 		__( 'Add a post format' )
 	}</span>,
 ] } >
-	<p>Your theme will be able to use them to display content differently.</p>
-	<p>It looks like you may want to use the <PostFormatSuggested suggestion={ suggestion } onUpdatePostFormat={ onUpdatePostFormat } /> format for this post.</p>
+	<p> { __( 'Your theme will be able to use them to display content differently.' ) } </p>
+	<p>
+		{ __( 'It looks like this post could use the following format type: ' ) }
+		<PostFormatSuggested suggestion={ suggestion } onUpdatePostFormat={ onUpdatePostFormat } />
+		.
+	</p>
 </PanelBody>;
 
 export default compose(
