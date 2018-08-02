@@ -10,6 +10,7 @@ import { rawShortcut } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import shortcutConfig from './config';
+import './style.scss';
 
 const splitShortcutKey = ( shortcutKey ) => {
 	return shortcutKey

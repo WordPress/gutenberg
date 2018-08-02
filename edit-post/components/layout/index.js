@@ -16,7 +16,6 @@ import {
 	PostPublishPanel,
 	DocumentTitle,
 	PreserveScrollInReorder,
-	KeyboardShortcutHelpModal,
 } from '@wordpress/editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { Fragment } from '@wordpress/element';
@@ -35,6 +34,7 @@ import Header from '../header';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
+import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import MetaBoxes from '../meta-boxes';
 import { getMetaBoxContainer } from '../../utils/meta-boxes';
 import Sidebar from '../sidebar';
