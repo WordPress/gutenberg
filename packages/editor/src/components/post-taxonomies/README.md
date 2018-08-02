@@ -35,7 +35,7 @@ function ProductTypeSelector( OriginalFlatTermSelector ) {
 };
 
 addFilter(
-	'editor.PostTaxonomies',
+	'editor.PostTaxonomyType',
 	'my-custom-plugin',
 	ProductTypeSelector
 );
