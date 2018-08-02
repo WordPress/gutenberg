@@ -104,7 +104,7 @@ export function isEditorSidebarPanelOpened( state, panel ) {
  * @return {boolean}       Whether the modal is active.
  */
 export function isModalActive( state, modalName ) {
-	return getPreference( state, 'activeModal' ) === modalName;
+	return state.activeModal === modalName;
 }
 
 /**

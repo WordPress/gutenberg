@@ -129,9 +129,7 @@ describe( 'selectors', () => {
 	describe( 'isModalActive', () => {
 		it( 'returns true if the provided name matches the value in the preferences activeModal property', () => {
 			const state = {
-				preferences: {
-					activeModal: 'test-modal',
-				},
+				activeModal: 'test-modal',
 			};
 
 			expect( isModalActive( state, 'test-modal' ) ).toBe( true );
@@ -139,9 +137,7 @@ describe( 'selectors', () => {
 
 		it( 'returns false if the provided name does not match the preferences activeModal property', () => {
 			const state = {
-				preferences: {
-					activeModal: 'something-else',
-				},
+				activeModal: 'something-else',
 			};
 
 			expect( isModalActive( state, 'test-modal' ) ).toBe( false );
