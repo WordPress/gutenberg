@@ -8,7 +8,7 @@ import { isEmpty, get, unescape as unescapeString, find, throttle, uniqBy, invok
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { FormTokenField } from '@wordpress/components';
+import { FormTokenField, withFilters } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import apiFetch from '@wordpress/api-fetch';
@@ -225,5 +225,6 @@ export default compose(
 				dispatch( 'core/editor' ).editPost( { [ restBase ]: terms } );
 			},
 		};
-	} )
+	} ),
+	withFilters( 'editor.PostTaxonomyType' ),
 )( FlatTermSelector );
