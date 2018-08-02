@@ -420,9 +420,9 @@ function gutenberg_add_revisions_data_to_links( $response, $post, $request ) {
  */
 function gutenberg_allow_null_date_gmt( $response, $post, $request ) {
 	if ( 'edit' === $request['context'] && '0000-00-00 00:00:00' === $post->post_date_gmt ) {
-		$response_data = $response->get_data();
+		$response_data             = $response->get_data();
 		$response_data['date_gmt'] = null;
-		$response->set_data($response_data);
+		$response->set_data( $response_data );
 	}
 
 	return $response;
