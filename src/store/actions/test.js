@@ -35,7 +35,7 @@ describe( 'Store', () => {
 		} );
 
 		it( 'should create an action to create a block', () => {
-			const action = actions.createBlockAction( buildEmptyBlock('1', 'paragraph') );
+			const action = actions.createBlockAction( '1', buildEmptyBlock('1', 'paragraph') );
 			expect( action.type ).toEqual( ActionTypes.BLOCK.CREATE );
 			expect( action.block.uid ).toEqual( '1' );
 		} );
