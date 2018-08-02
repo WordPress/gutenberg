@@ -324,10 +324,13 @@ function the_gutenberg_metaboxes() {
 	 * editor instance. If a cleaner solution can be imagined, please change
 	 * this, and try to get this data to load directly into the editor settings.
 	 */
-	wp_add_inline_script(
-		'wp-edit-post',
-		'window._wpLoadGutenbergEditor.then( function( editor ) { editor.initializeMetaBoxes( ' . wp_json_encode( $meta_box_data ) . ' ) } );'
-	);
+	$script = 'window._wpLoadGutenbergEditor.then( function( editor ) { editor.initializeMetaBoxes( ' . wp_json_encode( $meta_box_data ) . ' ) } );';
+
+	wp_add_inline_script( 'wp-edit-post', $script );
+
+	if ( wp_script_is( 'wp-edit-post', 'done' ) ) {
+		printf( "<script type='text/javascript'>\n%s\n</script>\n", trim( implode( "\n", $script ), "\n" ) );
+	}
 
 	// Reset meta box data.
 	$wp_meta_boxes = $_original_meta_boxes;
