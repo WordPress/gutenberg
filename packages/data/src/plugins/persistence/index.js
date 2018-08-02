@@ -70,11 +70,19 @@ export function createPersistenceInterface( options ) {
 	 */
 	function get() {
 		if ( data === undefined ) {
+			// If unset, getItem is expected to return null. Fall back to
+			// empty object.
 			const persisted = storage.getItem( storageKey );
-			try {
-				data = JSON.parse( persisted );
-			} catch ( error ) {
+			if ( persisted === null ) {
 				data = {};
+			} else {
+				try {
+					data = JSON.parse( persisted );
+				} catch ( error ) {
+					// Similarly, should any error be thrown during parse of
+					// the string (malformed JSON), fall back to empty object.
+					data = {};
+				}
 			}
 		}
 
