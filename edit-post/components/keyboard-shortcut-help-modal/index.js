@@ -25,7 +25,7 @@ const splitShortcutKey = ( shortcutKey ) => {
 				return (
 					<kbd
 						key={ index }
-						className="editor-keyboard-shortcut-help__shortcut-key"
+						className="edit-post-keyboard-shortcut-help__shortcut-key"
 					>
 						{ character }
 					</kbd>
@@ -41,18 +41,18 @@ const splitShortcutKey = ( shortcutKey ) => {
 };
 
 const ShortcutList = ( { shortcuts } ) => (
-	<dl className="editor-keyboard-shortcut-help__shortcut-list">
+	<dl className="edit-post-keyboard-shortcut-help__shortcut-list">
 		{ shortcuts.map( ( { key, description }, index ) => (
 			<div
-				className="editor-keyboard-shortcut-help__shortcut"
+				className="edit-post-keyboard-shortcut-help__shortcut"
 				key={ index }
 			>
-				<dt className="editor-keyboard-shortcut-help__shortcut-term">
-					<kbd className="editor-keyboard-shortcut-help__shortcut-key-combination">
+				<dt className="edit-post-keyboard-shortcut-help__shortcut-term">
+					<kbd className="edit-post-keyboard-shortcut-help__shortcut-key-combination">
 						{ splitShortcutKey( key ) }
 					</kbd>
 				</dt>
-				<dd className="editor-keyboard-shortcut-help__shortcut-description">
+				<dd className="edit-post-keyboard-shortcut-help__shortcut-description">
 					{ description }
 				</dd>
 			</div>
@@ -61,8 +61,8 @@ const ShortcutList = ( { shortcuts } ) => (
 );
 
 const ShortcutSection = ( { title, shortcuts } ) => (
-	<section className="editor-keyboard-shortcut-help__section">
-		<h2 className="editor-keyboard-shortcut-help__section-title">
+	<section className="edit-post-keyboard-shortcut-help__section">
+		<h2 className="edit-post-keyboard-shortcut-help__section-title">
 			{ title }
 		</h2>
 		<ShortcutList shortcuts={ shortcuts } />
@@ -71,7 +71,7 @@ const ShortcutSection = ( { title, shortcuts } ) => (
 
 export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 	const title = (
-		<span className="editor-keyboard-shortcut-help__title">
+		<span className="edit-post-keyboard-shortcut-help__title">
 			{ __( 'Keyboard Shortcuts' ) }
 		</span>
 	);
@@ -86,7 +86,7 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 			/>
 			{ isModalActive && (
 				<Modal
-					className="editor-keyboard-shortcut-help"
+					className="edit-post-keyboard-shortcut-help"
 					title={ title }
 					closeLabel={ __( 'Close' ) }
 					onRequestClose={ toggleModal }

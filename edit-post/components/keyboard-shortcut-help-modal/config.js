@@ -16,16 +16,16 @@ const globalShortcuts = {
 			description: __( 'Save your changes.' ),
 		},
 		{
-			key: displayShortcut.primaryShift( ',' ),
-			description: __( 'Show or hide the settings sidebar.' ),
-		},
-		{
 			key: displayShortcut.primary( 'z' ),
 			description: __( 'Undo your last changes.' ),
 		},
 		{
 			key: displayShortcut.primaryShift( 'z' ),
 			description: __( 'Redo your last undo.' ),
+		},
+		{
+			key: displayShortcut.primaryShift( ',' ),
+			description: __( 'Show or hide the settings sidebar.' ),
 		},
 		{
 			key: displayShortcut.secondary( 'm' ),
