@@ -10,12 +10,17 @@ import { Dashicon, PanelBody } from '@wordpress/components';
 import FlatTermSelector from '../post-taxonomies/flat-term-selector';
 
 const TagsPanel = () => <PanelBody initialOpen={ false } title={ [
-	<Dashicon key={ 'dashicon-lightbulb' } icon={ 'lightbulb' } />,
-	__( 'Tip:' ),
+	<Dashicon
+		key={ 'dashicon-lightbulb' }
+		icon={ 'lightbulb' }
+		className={ 'post-publish-panel__tip' }
+		size={ 18 }
+	/>,
 	<span className="editor-post-publish-panel__link" key="label">{
 		__( 'Add tags to your post' )
 	}</span>,
 ] }>
+	<p>Add a few tags to your posts so your readers will be able to find your posts more easily.</p>
 	<FlatTermSelector slug={ 'post_tag' } />
 </PanelBody>;
 

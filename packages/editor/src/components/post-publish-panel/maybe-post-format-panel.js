@@ -13,12 +13,17 @@ import PostFormat from '../post-format';
 const MaybePostFormatPanel = ( { currentPostFormat, suggestedPostFormat } ) => suggestedPostFormat &&
 	suggestedPostFormat !== currentPostFormat &&
 	<PanelBody initialOpen={ false } title={ [
-		<Dashicon key={ 'dashicon-lightbulb' } icon={ 'lightbulb' } />,
-		__( 'Tip:' ),
+		<Dashicon
+			key={ 'dashicon-lightbulb' }
+			icon={ 'lightbulb' }
+			className={ 'post-publish-panel__tip' }
+			size={ 18 }
+		/>,
 		<span className="editor-post-publish-panel__link" key="label">{
-			__( 'Choose a fitting post format' )
+			__( 'Add a post format' )
 		}</span>,
 	] } >
+		<p>Post formats are used to display different types of content differently.</p>
 		<PostFormat />
 	</PanelBody>;
 
