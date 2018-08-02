@@ -2,7 +2,8 @@
  * @format
  * @flow
  */
-import { BlockType } from './';
+
+ import type { BlockType } from './';
 
 const emptyBlock: BlockType = {
 	isValid: true,
