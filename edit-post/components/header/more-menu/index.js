@@ -12,6 +12,7 @@ import ModeSwitcher from '../mode-switcher';
 import FixedToolbarToggle from '../fixed-toolbar-toggle';
 import PluginMoreMenuGroup from '../plugins-more-menu-group';
 import TipsToggle from '../tips-toggle';
+import KeyboardShortcutsToggle from '../keyboard-shortcuts-toggle';
 
 const MoreMenu = () => (
 	<Dropdown
@@ -39,7 +40,9 @@ const MoreMenu = () => (
 				<MenuGroup
 					label={ __( 'Tools' ) }
 					filterName="editPost.MoreMenu.tools"
-				/>
+				>
+					<KeyboardShortcutsToggle />
+				</MenuGroup>
 			</div>
 		) }
 	/>
