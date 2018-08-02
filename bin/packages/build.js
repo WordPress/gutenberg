@@ -70,29 +70,47 @@ function getBuildPath( file, buildFolder ) {
 }
 
 /**
- * Build a file for the required environments (node and ES5)
+ * Given a list of scss and js filepaths, divide them into sets them and rebuild.
+ *
+ * @param {Array} files list of files to rebuild
+ */
+function buildFiles( files ) {
+	// Reduce files into a unique sets of javaScript files and scss packages.
+	const buildPaths = files.reduce( ( accumulator, filePath ) => {
+		if ( isJavaScriptFile( filePath ) ) {
+			accumulator.javaScriptFiles.add( filePath );
+		} else if ( isScssFile( filePath ) ) {
+			const pkgName = getPackageName( filePath );
+			const pkgPath = path.resolve( PACKAGES_DIR, pkgName );
+			accumulator.scssPackagePaths.add( pkgPath );
+		}
+		return accumulator;
+	}, { javaScriptFiles: new Set(), scssPackagePaths: new Set() } );
+
+	buildPaths.javaScriptFiles.forEach( buildJavaScriptFile );
+	buildPaths.scssPackagePaths.forEach( buildPackageStyles );
+}
+
+/**
+ * Build a javaScript file for the required environments (node and ES5)
  *
  * @param {string} file    File path to build
  * @param {boolean} silent Show logs
  */
-function buildFile( file, silent ) {
-	if ( isJavaScriptFile( file ) ) {
-		buildFileFor( file, silent, 'main' );
-		buildFileFor( file, silent, 'module' );
-	}
-
-	// when a scss file is provided, the entire css is rebuilt.
-	if ( isScssFile( file ) ) {
-		const pkgName = getPackageName( file );
-		const pkgPath = path.resolve( PACKAGES_DIR, pkgName );
-		buildStyle( pkgPath );
-	}
+function buildJavaScriptFile( file, silent ) {
+	buildFileFor( file, silent, 'main' );
+	buildFileFor( file, silent, 'module' );
 }
 
-function buildStyle( packagePath ) {
+/**
+ * Build a package's styles
+ *
+ * @param {string} packagePath The path to the package.
+ */
+function buildPackageStyles( packagePath ) {
 	const styleFile = path.resolve( packagePath, SRC_DIR, 'style.scss' );
 
-	// return early if the package has no style
+	// Return early if the package has no root style file.
 	if ( ! fs.existsSync( styleFile ) ) {
 		return;
 	}
@@ -168,7 +186,7 @@ function buildFileFor( file, silent, environment ) {
  */
 function buildPackage( packagePath ) {
 	const srcDir = path.resolve( packagePath, SRC_DIR );
-	const files = glob.sync( `${ srcDir }/**/*.js`, {
+	const javaScriptFiles = glob.sync( `${ srcDir }/**/*.js`, {
 		ignore: [
 			`${ srcDir }/**/test/**/*.js`,
 			`${ srcDir }/**/__mocks__/**/*.js`,
@@ -178,11 +196,11 @@ function buildPackage( packagePath ) {
 
 	process.stdout.write( `${ path.basename( packagePath ) }\n` );
 
-	// build javascript files individually
-	files.forEach( ( file ) => buildFile( file, true ) );
+	// Build js files individually.
+	javaScriptFiles.forEach( ( file ) => buildJavaScriptFile( file, true ) );
 
-	// build entire package css
-	buildStyle( packagePath );
+	// Build entire package css.
+	buildPackageStyles( packagePath );
 
 	process.stdout.write( `${ DONE }\n` );
 }
@@ -190,7 +208,7 @@ function buildPackage( packagePath ) {
 const files = process.argv.slice( 2 );
 
 if ( files.length ) {
-	files.forEach( buildFile );
+	buildFiles( files );
 } else {
 	process.stdout.write( chalk.inverse( '>> Building packages \n' ) );
 	getPackages()
