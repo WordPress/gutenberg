@@ -24,7 +24,7 @@ export type BlockListType = {
 	moveBlockUpAction: string => mixed,
 	moveBlockDownAction: string => mixed,
 	deleteBlockAction: string => mixed,
-	createBlockAction: BlockType,
+	createBlockAction: (string, BlockType) => mixed,
 	blocks: Array<BlockType>,
 	aztechtml: string,
 	refresh: boolean,
@@ -84,11 +84,11 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 				// TODO: create an unique id, we're using this just for now
 				const block = this.state.dataSource.get(this.state.dataSource.size() - 1);
-				const newId = parseInt(block.uid) + 1
+				const newId = (parseInt(block.uid) + 1).toString()
 
-				var newBlock = buildEmptyBlock(newId, 'paragraph')
-				this.state.dataSource.push(newBlock);
-				this.props.createBlockAction( newBlock );
+				var newBlock = buildEmptyBlock( newId, 'paragraph' )
+				this.state.dataSource.push( newBlock );
+				this.props.createBlockAction( newId, newBlock );
 				break;
 			case ToolbarButton.SETTINGS:
 				// TODO: implement settings
