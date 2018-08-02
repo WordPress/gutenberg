@@ -1,23 +1,23 @@
 PostTaxonomies
 ===========
 
-`PostTaxonomies` is a Gutenberg component used to render the Taxonomy Picker
-UI. It uses the FlatTermSelector or HierarchicalTermSelector components
+`PostTaxonomies` is a component used to render the taxonomy picker
+UI. It uses the `FlatTermSelector` or `HierarchicalTermSelector` components
 based on the value of the `hierarchical` argument specified in
 [register_taxonomy](https://codex.wordpress.org/Function_Reference/register_taxonomy).
 
-The output of the respective Taxonomy components can be customized using
-the Gutenberg Filter,
+The output of the respective taxonomy components can be customized using
+the following filter:
 
-* editor.PostTaxonomyType
+* `editor.PostTaxonomyType`
 
 This hook can be used to render alternative UI based on the needs of that
-Taxonomy.
+taxonomy.
 
 ## Custom Taxonomy Selector
 
 For example, to render alternative UI for the taxonomy `product-type`,
-we can render custom markup or use the Original component as shown below.
+we can render custom markup or use the original component as shown below.
 
 ```js
 var el = wp.element.createElement;
