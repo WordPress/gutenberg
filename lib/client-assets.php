@@ -1309,6 +1309,8 @@ JS;
 		'post' => $post->ID,
 	) );
 	wp_enqueue_editor();
+	wp_playlist_scripts( 'audio' );
+	wp_playlist_scripts( 'video' );
 
 	/**
 	 * Styles
