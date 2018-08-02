@@ -20,14 +20,21 @@ For example, to render alternative UI for the taxonomy `product-type`,
 we can render custom markup or use the Original component as shown below.
 
 ```js
-function customizeProductTypeSelector( OriginalFlatTermSelector ) {
-	return ( props ) => {
+var el = wp.element.createElement;
+
+function customizeProductTypeSelector( OriginalComponent ) {
+	return function( props ) {
 		if ( props.slug === 'product-type' ) {
-			return (
-				<div>Product Type Selector</div>
+			return el(
+				'div',
+				{},
+				'Product Type Selector'
 			);
 		} else {
-			return <OriginalFlatTermSelector { ...props } />
+			return el(
+				OriginalComponent,
+				props
+			);
 		}
 	}
 };
