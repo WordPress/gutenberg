@@ -12,7 +12,7 @@ import PostFormat from '../post-format';
 
 const MaybePostFormatPanel = ( { currentPostFormat, suggestedPostFormat } ) => suggestedPostFormat &&
 	suggestedPostFormat !== currentPostFormat &&
-	<PanelBody initialOpen={ true } title={ [
+	<PanelBody initialOpen={ false } title={ [
 		<Dashicon key={ 'dashicon-lightbulb' } icon={ 'lightbulb' } />,
 		__( 'Tip:' ),
 		<span className="editor-post-publish-panel__link" key="label">{

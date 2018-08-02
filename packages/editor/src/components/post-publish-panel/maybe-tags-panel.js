@@ -9,7 +9,7 @@ import { Dashicon, PanelBody } from '@wordpress/components';
 
 import FlatTermSelector from '../post-taxonomies/flat-term-selector';
 
-const TagsPanel = () => <PanelBody initialOpen={ true } title={ [
+const TagsPanel = () => <PanelBody initialOpen={ false } title={ [
 	<Dashicon key={ 'dashicon-lightbulb' } icon={ 'lightbulb' } />,
 	__( 'Tip:' ),
 	<span className="editor-post-publish-panel__link" key="label">{
