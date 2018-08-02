@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { createStore, applyMiddleware } from 'redux';
+import { createStore } from 'redux';
 import {
 	flowRight,
 	without,
@@ -138,22 +138,17 @@ export function createRegistry( storeConfigs = {} ) {
 	 * Registers a new sub-reducer to the global state and returns a Redux-like
 	 * store object.
 	 *
-	 * @param {string}    reducerKey   Reducer key.
-	 * @param {Object}    reducer      Reducer function.
-	 * @param {*}         initialState Initial reducer state.
-	 * @param {?Function} enhancer     Store enhancer function.
+	 * @param {string} reducerKey Reducer key.
+	 * @param {Object} reducer    Reducer function.
 	 *
 	 * @return {Object} Store Object.
 	 */
-	function registerReducer( reducerKey, reducer, initialState, enhancer ) {
+	function registerReducer( reducerKey, reducer ) {
 		const enhancers = [];
-		if ( enhancer ) {
-			enhancers.push( enhancer );
-		}
 		if ( window.__REDUX_DEVTOOLS_EXTENSION__ ) {
 			enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__( { name: reducerKey, instanceId: reducerKey } ) );
 		}
-		const store = createStore( reducer, initialState, flowRight( enhancers ) );
+		const store = createStore( reducer, flowRight( enhancers ) );
 		namespaces[ reducerKey ] = { store, reducer };
 
 		// Customize subscribe behavior to call listeners only on effective change,
@@ -296,29 +291,7 @@ export function createRegistry( storeConfigs = {} ) {
 			options.persist = [ options.reducer.__keyToPersist ];
 		}
 
-		if ( options.middlewares ) {
-			options = {
-				...options,
-				enhancers: [
-					...( options.enhancers || [] ),
-					...options.middlewares.map( ( middleware ) => (
-						applyMiddleware( middleware )
-					) ),
-				],
-			};
-		}
-
-		let enhancer;
-		if ( options.enhancers ) {
-			enhancer = flowRight( options.enhancers );
-		}
-
-		const store = registerReducer(
-			reducerKey,
-			options.reducer,
-			options.initialState,
-			enhancer
-		);
+		const store = registerReducer( reducerKey, options.reducer );
 
 		if ( options.actions ) {
 			registerActions( reducerKey, options.actions );
