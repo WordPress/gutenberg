@@ -109,7 +109,6 @@ export const reducer = (
 			return { blocks: blocks, refresh: ! state.refresh };
 		}
 		case ActionTypes.BLOCK.CREATE: {
-			// TODO we need to use a new method to generate unique ids for block placeholders
 			// TODO we need to set focused: true and search for the currently focused block and
 			// set that one to `focused: false`.
 			blocks.push(action.block);
