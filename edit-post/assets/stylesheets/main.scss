@@ -126,11 +126,7 @@ body.gutenberg-editor-page {
 	}
 
 	// Core blocks
-	.wp-block-button,
-	.wp-block-code,
-	.wp-block-categories,
-	.wp-block-cover-image,
-	.wp-block-embed {
+	[ class*="wp-block-" ] {
 		margin-top: $default-block-margin;
 		margin-bottom: $default-block-margin;
 	}
