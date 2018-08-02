@@ -31,7 +31,7 @@ const PostFormatPanel = ( { suggestion, onUpdatePostFormat } ) => <PanelBody ini
 		__( 'Add a post format' )
 	}</span>,
 ] } >
-	<p>Post formats are used to display different types of content differently.</p>
+	<p>Your theme will be able to use them to display content differently.</p>
 	<p>It looks like you may want to use the <PostFormatSuggested suggestion={ suggestion } onUpdatePostFormat={ onUpdatePostFormat } /> post format type for this post.</p>
 </PanelBody>;
 

@@ -20,7 +20,7 @@ const TagsPanel = () => <PanelBody initialOpen={ false } title={ [
 		__( 'Add tags to your post' )
 	}</span>,
 ] }>
-	<p>Add a few tags to your posts so your readers will be able to find your posts more easily.</p>
+	<p>Your readers will be able to find your posts more easily.</p>
 	<FlatTermSelector slug={ 'post_tag' } />
 </PanelBody>;
 
