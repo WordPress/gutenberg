@@ -9,8 +9,13 @@
 
 	&__shortcut {
 		display: flex;
-		margin-top: 1.2rem;
 		align-items: center;
+		padding: 0.6rem 0;
+		border-top: 1px solid $light-gray-500;;
+
+		&:last-child {
+			border-bottom: 1px solid $light-gray-500;
+		}
 	}
 
 	&__shortcut-term {
