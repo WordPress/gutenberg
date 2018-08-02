@@ -16,7 +16,7 @@ const globalShortcuts = {
 			description: __( 'Save your changes.' ),
 		},
 		{
-			key: displayShortcut.primary( ',' ),
+			key: displayShortcut.primaryShift( ',' ),
 			description: __( 'Show or hide the settings sidebar.' ),
 		},
 		{
@@ -39,7 +39,7 @@ const selectionShortcuts = {
 	shortcuts: [
 		{
 			key: displayShortcut.primary( 'a' ),
-			description: __( 'Select all.' ),
+			description: __( 'Select all text if typing, otherwise select all blocks.' ),
 		},
 		{
 			key: 'Esc',
@@ -53,11 +53,11 @@ const blockShortcuts = {
 	shortcuts: [
 		{
 			key: displayShortcut.primary( 'del' ),
-			description: __( 'Delete the select block(s).' ),
+			description: __( 'Delete the selected block(s).' ),
 		},
 		{
-			key: displayShortcut.primary( 'd' ),
-			description: __( 'Duplicate the select block(s).' ),
+			key: displayShortcut.primaryShift( 'd' ),
+			description: __( 'Duplicate the selected block(s).' ),
 		},
 		{
 			key: '/',
@@ -83,11 +83,11 @@ const textFormattingShortcuts = {
 		},
 		{
 			key: displayShortcut.primary( 'k' ),
-			description: __( 'Convert the selected text into a link' ),
+			description: __( 'Convert the selected text into a link.' ),
 		},
 		{
 			key: displayShortcut.access( 's' ),
-			description: __( 'Remove a link' ),
+			description: __( 'Remove a link.' ),
 		},
 		{
 			key: displayShortcut.access( 'd' ),
