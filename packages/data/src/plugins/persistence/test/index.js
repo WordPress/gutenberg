@@ -42,11 +42,30 @@ describe( 'persistence', () => {
 
 		expect( originalRegisterStore ).toHaveBeenCalledWith( 'test', {
 			persist: true,
-			middlewares: expect.arrayContaining( [ expect.any( Function ) ] ),
 			reducer: expect.any( Function ),
 		} );
 		// Replaced reducer:
 		expect( originalRegisterStore.mock.calls[ 0 ][ 1 ].reducer ).not.toBe( options.reducer );
+	} );
+
+	it( 'should not persist if option not passed', () => {
+		const initialState = { foo: 'bar', baz: 'qux' };
+		function reducer( state = initialState, action ) {
+			return action.nextState || state;
+		}
+
+		registry.registerStore( 'test', {
+			reducer,
+			actions: {
+				setState( nextState ) {
+					return { type: 'SET_STATE', nextState };
+				},
+			},
+		} );
+
+		registry.dispatch( 'test' ).setState( { ok: true } );
+
+		expect( objectStorage.setItem ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should not persist when state matches initial', () => {

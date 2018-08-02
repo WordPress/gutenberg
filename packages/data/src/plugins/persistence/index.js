@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pick } from 'lodash';
+import { pick, flow } from 'lodash';
 
 /**
  * Internal dependencies
@@ -107,23 +107,20 @@ export default function( registry, pluginOptions ) {
 	const persistence = createPersistenceInterface( pluginOptions );
 
 	/**
-	 * Creates a data middleware for a given reducer key, triggering its state to
-	 * be persisted when changed.
+	 * Creates an enhanced store dispatch function, triggering the state of the
+	 * given reducer key to be persisted when changed.
 	 *
-	 * @param {string}         reducerKey   Reducer key.
-	 * @param {?Array<string>} keys         Optional array of keys to use in saving
-	 *                                      only a subset of the new state.
-	 * @param {?*}             initialState Optional initial state.
+	 * @param {Function}       getState   Function which returns current state.
+	 * @param {string}         reducerKey Reducer key.
+	 * @param {?Array<string>} keys       Optional subset of keys to save.
 	 *
-	 * @return {Function} Data middleware.
+	 * @return {Function} Enhanced dispatch function.
 	 */
-	function createPersistMiddleware( reducerKey, keys, initialState ) {
-		let lastState = initialState;
+	function createPersistOnChange( getState, reducerKey, keys ) {
+		let lastState = getState();
 
-		return ( store ) => ( next ) => ( action ) => {
-			const result = next( action );
-
-			let state = store.getState();
+		return ( result ) => {
+			let state = getState();
 			if ( state !== lastState ) {
 				if ( Array.isArray( keys ) ) {
 					state = pick( state, keys );
@@ -139,24 +136,29 @@ export default function( registry, pluginOptions ) {
 
 	return {
 		registerStore( reducerKey, options ) {
-			if ( options.persist ) {
-				const initialState = persistence.get()[ reducerKey ];
-
-				options = {
-					...options,
-					middlewares: [
-						...( options.middlewares || [] ),
-						createPersistMiddleware(
-							reducerKey,
-							options.persist,
-							initialState
-						),
-					],
-					reducer: withInitialState( options.reducer, initialState ),
-				};
+			if ( ! options.persist ) {
+				return registry.registerStore( reducerKey, options );
 			}
 
-			return registry.registerStore( reducerKey, options );
+			const initialState = persistence.get()[ reducerKey ];
+
+			options = {
+				...options,
+				reducer: withInitialState( options.reducer, initialState ),
+			};
+
+			const store = registry.registerStore( reducerKey, options );
+
+			store.dispatch = flow( [
+				store.dispatch,
+				createPersistOnChange(
+					store.getState,
+					reducerKey,
+					options.persist
+				),
+			] );
+
+			return store;
 		},
 	};
 }
