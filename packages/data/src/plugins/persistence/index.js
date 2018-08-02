@@ -144,6 +144,15 @@ export default function( registry, pluginOptions ) {
 
 	return {
 		registerStore( reducerKey, options ) {
+			// REMOVEME: Deprecation: v3.7
+			if ( options.reducer.__deprecatedKeyToPersist ) {
+				options = {
+					...options,
+					persist: [ options.reducer.__deprecatedKeyToPersist ],
+				};
+				delete options.reducer.__deprecatedKeyToPersist;
+			}
+
 			if ( ! options.persist ) {
 				return registry.registerStore( reducerKey, options );
 			}

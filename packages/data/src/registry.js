@@ -286,11 +286,6 @@ export function createRegistry( storeConfigs = {} ) {
 			throw new TypeError( 'Must specify store reducer' );
 		}
 
-		// REMOVEME: Deprecation: v3.7
-		if ( options.reducer.__keyToPersist ) {
-			options.persist = [ options.reducer.__keyToPersist ];
-		}
-
 		const store = registerReducer( reducerKey, options.reducer );
 
 		if ( options.actions ) {
