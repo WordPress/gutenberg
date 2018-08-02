@@ -103,10 +103,13 @@ describe( 'Preview', () => {
 			editorPage.click( '.editor-post-publish-panel__header button' ),
 		] );
 		expectedPreviewURL = await editorPage.$eval( '.notice-success a', ( node ) => node.href );
-		// At this point, the preview page can lose its name, so we close it and open a fresh one
-		// so this test can complete.
+
+		// Workaround for unresolved race condition: sometimes we end up with two preview
+		// pages at this point, so close and reopen to let this test complete reliably.
+		// See https://github.com/WordPress/gutenberg/issues/8367
 		await previewPage.close();
 		previewPage = await openPreviewPage( editorPage );
+
 		expect( previewPage.url() ).toBe( expectedPreviewURL );
 
 		// Return to editor to change title.
