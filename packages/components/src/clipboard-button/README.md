@@ -6,7 +6,7 @@
 import { ClipboardButton } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
 
-withState( {
+const MyClipboardButton = withState( {
 	hasCopied: false,
 } )( ( { hasCopied, setState } ) => ( 
 	<ClipboardButton

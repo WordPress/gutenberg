@@ -5,7 +5,7 @@
 ```jsx
 import { Dashicon } from '@wordpress/components';
 
-function MyDashicons() {
+const MyDashicon = () => {
 	return (
 		<div>
 			<Dashicon icon="admin-home" />
