@@ -165,6 +165,11 @@ const config = {
 		rules: [
 			{
 				test: /\.js$/,
+				use: [ 'source-map-loader' ],
+				enforce: 'pre',
+			},
+			{
+				test: /\.js$/,
 				exclude: [
 					/block-serialization-spec-parser/,
 					/is-shallow-equal/,

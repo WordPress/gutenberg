@@ -123,10 +123,14 @@ function buildFileFor( file, silent, environment ) {
 	const buildDir = BUILD_DIR[ environment ];
 	const destPath = getBuildPath( file, buildDir );
 	const babelOptions = getBabelConfig( environment );
+	babelOptions.sourceMaps = true;
+	babelOptions.sourceFileName = file;
 
 	mkdirp.sync( path.dirname( destPath ) );
-	const transformed = babel.transformFileSync( file, babelOptions ).code;
-	fs.writeFileSync( destPath, transformed );
+	const transformed = babel.transformFileSync( file, babelOptions );
+	fs.writeFileSync( destPath + '.map', JSON.stringify( transformed.map ) );
+	fs.writeFileSync( destPath, transformed.code + '\n//# sourceMappingURL=' + path.basename( destPath ) + '.map' );
+
 	if ( ! silent ) {
 		process.stdout.write(
 			chalk.green( '  \u2022 ' ) +
