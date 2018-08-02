@@ -224,5 +224,5 @@ export default compose(
 			},
 		};
 	} ),
-	withFilters( 'editor.PostTaxonomies' ),
+	withFilters( 'editor.PostTaxonomyType' ),
 )( FlatTermSelector );
