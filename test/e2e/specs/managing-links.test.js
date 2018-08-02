@@ -46,9 +46,9 @@ describe( 'Managing links', () => {
 		await page.keyboard.type( 'Text' );
 
 		// we need to trigger isTyping = false
-		await page.mouse.move( 200, 300 );
-		await page.mouse.move( 250, 350 );
-
+		await page.mouse.move( 200, 300, { steps: 10 } );
+		await page.mouse.move( 250, 350, { steps: 10 } );
+		await page.waitForSelector( 'button[aria-label="Link"]' );
 		await page.click( 'button[aria-label="Link"]' );
 
 		// Typing "left" should not close the dialog

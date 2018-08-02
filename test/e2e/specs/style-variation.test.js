@@ -14,10 +14,11 @@ describe( 'adding blocks', () => {
 		await page.keyboard.type( 'Quote content' );
 
 		// we need to trigger isTyping = false
-		await page.mouse.move( 200, 300 );
-		await page.mouse.move( 250, 350 );
+		await page.mouse.move( 200, 300, { steps: 10 } );
+		await page.mouse.move( 250, 350, { steps: 10 } );
 
 		// Use a different style variation
+		await page.waitForSelector( 'button[aria-label="Change block type"]' );
 		await page.click( 'button[aria-label="Change block type"]' );
 		const styleVariations = await page.$$( '.editor-block-styles__item' );
 		await styleVariations[ 1 ].click();
