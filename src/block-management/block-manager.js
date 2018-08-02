@@ -8,13 +8,9 @@ import { Platform, Switch, Text, View, FlatList } from 'react-native';
 import RecyclerViewList, { DataSource } from 'react-native-recyclerview-list';
 import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
-
 import type { BlockType } from '../store/';
-
 import styles from './block-manager.scss';
-
-import { buildEmptyBlock }  from '../store/block-builder';
-
+import { buildEmptyBlock } from '../store/block-builder';
 // Gutenberg imports
 import { getBlockType, serialize } from '@wordpress/blocks';
 
@@ -24,7 +20,7 @@ export type BlockListType = {
 	moveBlockUpAction: string => mixed,
 	moveBlockDownAction: string => mixed,
 	deleteBlockAction: string => mixed,
-	createBlockAction: (string, BlockType) => mixed,
+	createBlockAction: ( string, BlockType ) => mixed,
 	blocks: Array<BlockType>,
 	aztechtml: string,
 	refresh: boolean,
@@ -77,16 +73,16 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				this.props.deleteBlockAction( uid );
 				break;
 			case ToolbarButton.PLUS:
-				// TODO: direct access insertion: it would be nice to pass the dataSourceBlockIndex here, 
+				// TODO: direct access insertion: it would be nice to pass the dataSourceBlockIndex here,
 				// so in this way we know the new block should be inserted right after this one
 				// instead of being appended to the end.
 				// this.props.createBlockAction( uid, dataSourceBlockIndex );
 
 				// TODO: create an unique id, we're using this just for now
-				const block = this.state.dataSource.get(this.state.dataSource.size() - 1);
-				const newId = (parseInt(block.uid) + 1).toString()
+				const block = this.state.dataSource.get( this.state.dataSource.size() - 1 );
+				const newId = ( parseInt( block.uid ) + 1 ).toString();
 
-				var newBlock = buildEmptyBlock( newId, 'paragraph' )
+				const newBlock = buildEmptyBlock( newId, 'paragraph' );
 				this.state.dataSource.push( newBlock );
 				this.props.createBlockAction( newId, newBlock );
 				break;
