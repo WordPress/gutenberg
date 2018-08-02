@@ -46,6 +46,14 @@ function getPackageName( file ) {
 	return path.relative( PACKAGES_DIR, file ).split( path.sep )[ 0 ];
 }
 
+const isJavaScriptFile = ( filepath ) => {
+	return /.\.js$/.test( filepath );
+};
+
+const isScssFile = ( filepath ) => {
+	return /.\.scss$/.test( filepath );
+};
+
 /**
  * Get Build Path for a specified file
  *
@@ -68,12 +76,27 @@ function getBuildPath( file, buildFolder ) {
  * @param {boolean} silent Show logs
  */
 function buildFile( file, silent ) {
-	buildFileFor( file, silent, 'main' );
-	buildFileFor( file, silent, 'module' );
+	if ( isJavaScriptFile( file ) ) {
+		buildFileFor( file, silent, 'main' );
+		buildFileFor( file, silent, 'module' );
+	}
+
+	// when a scss file is provided, the entire css is rebuilt.
+	if ( isScssFile( file ) ) {
+		const pkgName = getPackageName( file );
+		const pkgPath = path.resolve( PACKAGES_DIR, pkgName );
+		buildStyle( pkgPath );
+	}
 }
 
 function buildStyle( packagePath ) {
 	const styleFile = path.resolve( packagePath, SRC_DIR, 'style.scss' );
+
+	// return early if the package has no style
+	if ( ! fs.existsSync( styleFile ) ) {
+		return;
+	}
+
 	const outputFile = path.resolve( packagePath, BUILD_DIR.style, 'style.css' );
 	const outputFileRTL = path.resolve( packagePath, BUILD_DIR.style, 'style-rtl.css' );
 	mkdirp.sync( path.dirname( outputFile ) );
@@ -155,13 +178,11 @@ function buildPackage( packagePath ) {
 
 	process.stdout.write( `${ path.basename( packagePath ) }\n` );
 
+	// build javascript files individually
 	files.forEach( ( file ) => buildFile( file, true ) );
 
-	// Building styles
-	const styleFile = path.resolve( srcDir, 'style.scss' );
-	if ( fs.existsSync( styleFile ) ) {
-		buildStyle( packagePath );
-	}
+	// build entire package css
+	buildStyle( packagePath );
 
 	process.stdout.write( `${ DONE }\n` );
 }
