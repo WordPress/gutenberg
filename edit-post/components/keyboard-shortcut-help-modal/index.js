@@ -1,16 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 import { Modal, KeyboardShortcuts } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { rawShortcut } from '@wordpress/keycodes';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import shortcutConfig from './config';
 import './style.scss';
+
+const modalName = 'edit-post/keyboard-shortcut-help';
 
 const splitShortcutKey = ( shortcutKey ) => {
 	return shortcutKey
@@ -65,50 +69,45 @@ const ShortcutSection = ( { title, shortcuts } ) => (
 	</section>
 );
 
-class KeyboardShortcutHelpModal extends Component {
-	constructor( ...args ) {
-		super( ...args );
+export function KeyboardShortcutHelpModal( props ) {
+	return (
+		<Fragment>
+			<KeyboardShortcuts
+				bindGlobal
+				shortcuts={ {
+					[ rawShortcut.primary( '/' ) ]: props.toggleModal,
+				} }
+			/>
+			{ props.isModalActive && (
+				<Modal
+					className="editor-keyboard-shortcut-help"
+					title={ __( 'Keyboard Shortcuts' ) }
+					closeLabel={ __( 'Close' ) }
+					onRequestClose={ props.toggleModal }
+				>
 
-		this.toggleModalVisibility = this.toggleModalVisibility.bind( this );
+					{ shortcutConfig.map( ( config, index ) => (
+						<ShortcutSection key={ index } { ...config } />
+					) ) }
 
-		this.state = {
-			isModalVisible: false,
-		};
-	}
-
-	toggleModalVisibility() {
-		const isModalVisible = ! this.state.isModalVisible;
-		this.setState( {
-			isModalVisible,
-		} );
-	}
-
-	render() {
-		return (
-			<Fragment>
-				<KeyboardShortcuts
-					bindGlobal
-					shortcuts={ {
-						[ rawShortcut.primary( '/' ) ]: this.toggleModalVisibility,
-					} }
-				/>
-				{ this.state.isModalVisible && (
-					<Modal
-						className="editor-keyboard-shortcut-help"
-						title={ __( 'Keyboard Shortcuts' ) }
-						closeLabel={ __( 'Close' ) }
-						onRequestClose={ this.toggleModalVisibility }
-					>
-
-						{ shortcutConfig.map( ( config, index ) => (
-							<ShortcutSection key={ index } { ...config } />
-						) ) }
-
-					</Modal>
-				) }
-			</Fragment>
-		);
-	}
+				</Modal>
+			) }
+		</Fragment>
+	);
 }
 
-export default KeyboardShortcutHelpModal;
+export default compose( [
+	withSelect( ( select ) => ( {
+		isModalActive: select( 'core/edit-post' ).isModalActive( modalName ),
+	} ) ),
+	withDispatch( ( dispatch, { isModalActive } ) => {
+		const {
+			openModal,
+			closeModal,
+		} = dispatch( 'core/edit-post' );
+
+		return {
+			toggleModal: ( ) => isModalActive ? closeModal() : openModal( modalName ),
+		};
+	} ),
+] )( KeyboardShortcutHelpModal );
