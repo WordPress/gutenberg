@@ -1,11 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { Dashicon, Button } from '@wordpress/components';
 import { Component, Fragment, createRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { ESCAPE } from '@wordpress/keycodes';
 import { withInstanceId } from '@wordpress/compose';
+import { DotTip } from '@wordpress/nux';
 
 /**
  * Internal dependencies
@@ -65,7 +66,11 @@ class ReusableBlockEditPanel extends Component {
 				{ ( ! isEditing && ! isSaving ) && (
 					<div className="reusable-block-edit-panel">
 						<b className="reusable-block-edit-panel__info">
+							<Dashicon icon="controls-repeat" />
 							{ title }
+							<DotTip id="core/editor.reusableBlocks">
+								{ __( 'This is a reusable block. Changes made to this block will appear on every post and page that uses it. It’s a great way to re-use content.' ) }
+							</DotTip>
 						</b>
 						<Button
 							ref={ this.editButton }

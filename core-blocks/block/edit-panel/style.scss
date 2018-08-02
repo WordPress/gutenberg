@@ -17,12 +17,15 @@
 		padding: 10px $block-padding;
 	}
 
-	.reusable-block-edit-panel__spinner {
-		margin: 0 5px;
-	}
-
 	.reusable-block-edit-panel__info {
+		align-items: center;
+		display: flex;
 		margin-right: auto;
+		padding-right: 5px;
+
+		.dashicon {
+			margin-right: 5px;
+		}
 	}
 
 	.reusable-block-edit-panel__label {

@@ -416,3 +416,41 @@ add_action( 'admin_print_scripts-edit.php', 'gutenberg_replace_default_add_new_b
 function gutenberg_add_admin_body_class( $classes ) {
 	return "$classes gutenberg-editor-page";
 }
+
+/**
+ * Creates initial Gutenberg content when the plugin first activates. This
+ * consists of the default 'Gutenpride' reusable block.
+ *
+ * @since 3.5.0
+ */
+function gutenberg_install_defaults() {
+	$existing_sample_blocks = get_posts( array(
+		'name'      => 'gutenpride',
+		'post_type' => 'wp_block',
+	) );
+
+	if ( count( $existing_sample_blocks ) ) {
+		return;
+	}
+
+	$sample_block_content = sprintf(
+		"<!-- wp:paragraph {\"className\":\"wp-block-gutenpride\"} -->\n<p class=\"wp-block-gutenpride\">%s</p>\n<!-- /wp:paragraph -->",
+		sprintf(
+			/* translators: %s: a link that opens the Gutenberg product page */
+			__( '❤️ This post proudly created in %s', 'gutenberg' ),
+			sprintf(
+				'<a href="https://wordpress.org/gutenberg/">%s</a>',
+				__( 'Gutenberg', 'gutenberg' )
+			)
+		)
+	);
+
+	wp_insert_post( array(
+		'post_title'   => __( 'Gutenpride', 'gutenberg' ),
+		'post_content' => $sample_block_content,
+		'post_status'  => 'publish',
+		'post_type'    => 'wp_block',
+		'post_name'    => 'gutenpride',
+	) );
+}
+register_activation_hook( __FILE__, 'gutenberg_install_defaults' );
