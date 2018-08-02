@@ -2,8 +2,8 @@ let _objectStorage;
 
 const storage = {
 	getItem( key ) {
-		if ( ! _objectStorage ) {
-			return;
+		if ( ! _objectStorage || ! _objectStorage[ key ] ) {
+			return null;
 		}
 
 		return _objectStorage[ key ];
@@ -13,7 +13,7 @@ const storage = {
 			storage.clear();
 		}
 
-		_objectStorage[ key ] = value;
+		_objectStorage[ key ] = String( value );
 	},
 	clear() {
 		_objectStorage = Object.create( null );
