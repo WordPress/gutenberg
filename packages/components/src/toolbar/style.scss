@@ -68,7 +68,7 @@ div.components-toolbar {
 	& > svg {
 		padding: 5px;
 		box-sizing: content-box;
-		border-radius: $button-style__radius-roundrect;
+		border-radius: $radius-round-rectangle;
 	}
 
 	// Subscript for numbered icon buttons, like headings

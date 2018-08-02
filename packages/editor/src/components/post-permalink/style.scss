@@ -8,13 +8,13 @@
 	height: 40px;
 	white-space: nowrap;
 
-	// use opacity to work in various editor styles
+	// Use opacity to work in various editor styles.
 	border: $border-width solid $dark-opacity-light-500;
 	border-bottom: none;
 	background-clip: padding-box;
 
-	// put toolbar snugly to edge on mobile
-	margin-left: -$block-padding - $border-width;	// stack borders
+	// Put toolbar snugly to edge on mobile.
+	margin-left: -$block-padding - $border-width; // This hides the border off the edge of the screen.
 	margin-right: -$block-padding - $border-width;
 	@include break-small() {
 		margin-left: -$border-width;
@@ -55,7 +55,7 @@
 	display: inline-flex;
 	align-items: center;
 
-	// Higher specificity required to override core margin styles
+	// Higher specificity required to override core margin styles.
 	.editor-post-permalink-editor__save {
 		margin-left: auto;
 	}
