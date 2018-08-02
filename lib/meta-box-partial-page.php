@@ -328,6 +328,12 @@ function the_gutenberg_metaboxes() {
 
 	wp_add_inline_script( 'wp-edit-post', $script );
 
+	/**
+	 * When `wp-edit-post` is output in the `<head>`, the inline script needs to be manually printed. Otherwise,
+	 * metaboxes will not display because inline scripts for `wp-edit-post` will not be printed again after this point.
+	 *
+	 * @see https://github.com/WordPress/gutenberg/issues/6963
+	 */
 	if ( wp_script_is( 'wp-edit-post', 'done' ) ) {
 		printf( "<script type='text/javascript'>\n%s\n</script>\n", trim( implode( "\n", $script ), "\n" ) );
 	}
