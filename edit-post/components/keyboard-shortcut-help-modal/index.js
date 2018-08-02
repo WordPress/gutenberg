@@ -69,21 +69,21 @@ const ShortcutSection = ( { title, shortcuts } ) => (
 	</section>
 );
 
-export function KeyboardShortcutHelpModal( props ) {
+export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 	return (
 		<Fragment>
 			<KeyboardShortcuts
 				bindGlobal
 				shortcuts={ {
-					[ rawShortcut.primary( '/' ) ]: props.toggleModal,
+					[ rawShortcut.primary( '/' ) ]: toggleModal,
 				} }
 			/>
-			{ props.isModalActive && (
+			{ isModalActive && (
 				<Modal
 					className="editor-keyboard-shortcut-help"
 					title={ __( 'Keyboard Shortcuts' ) }
 					closeLabel={ __( 'Close' ) }
-					onRequestClose={ props.toggleModal }
+					onRequestClose={ toggleModal }
 				>
 
 					{ shortcutConfig.map( ( config, index ) => (
