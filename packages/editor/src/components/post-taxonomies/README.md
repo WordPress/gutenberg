@@ -9,7 +9,7 @@ based on the value of the `hierarchical` argument specified in
 The output of the respective Taxonomy components can be customized using
 the Gutenberg Filter,
 
-* editor.PostTaxonomies
+* editor.PostTaxonomyType
 
 This hook can be used to render alternative UI based on the needs of that
 Taxonomy.
@@ -20,9 +20,7 @@ For example, to render alternative UI for the taxonomy `product-type`,
 we can render custom markup or use the Original component as shown below.
 
 ```js
-const { addFilter } = wp.hooks;
-
-function ProductTypeSelector( OriginalFlatTermSelector ) {
+function customizeProductTypeSelector( OriginalFlatTermSelector ) {
 	return ( props ) => {
 		if ( props.slug === 'product-type' ) {
 			return (
@@ -34,9 +32,9 @@ function ProductTypeSelector( OriginalFlatTermSelector ) {
 	}
 };
 
-addFilter(
+wp.hooks.addFilter(
 	'editor.PostTaxonomyType',
 	'my-custom-plugin',
-	ProductTypeSelector
+	customizeProductTypeSelector
 );
 ```
