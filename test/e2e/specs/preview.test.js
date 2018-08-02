@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { last } from 'lodash';
 import { parse } from 'url';
 
 /**
@@ -19,16 +20,16 @@ describe( 'Preview', () => {
 
 	async function openPreviewPage( editorPage ) {
 		let openTabs = await browser.pages();
-		expect( openTabs ).toHaveLength( 2 );
+		const expectedTabsCount = openTabs.length + 1;
 		await editorPage.click( '.editor-post-preview' );
 
 		// Wait for the new tab to open.
-		while ( 3 !== openTabs.length ) {
-			await editorPage.waitFor( 250 );
+		while ( openTabs.length < expectedTabsCount ) {
+			await editorPage.waitFor( 1 );
 			openTabs = await browser.pages();
 		}
 
-		const previewPage = openTabs[ 2 ];
+		const previewPage = last( openTabs );
 		// Wait for the preview to load. We can't do interstitial detection here,
 		// because it might load too quickly for us to pick up, so we wait for
 		// the preview to load by waiting for the title to appear.

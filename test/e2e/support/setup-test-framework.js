@@ -22,23 +22,12 @@ const { PUPPETEER_TIMEOUT } = process.env;
 // The Jest timeout is increased because these tests are a bit slow
 jest.setTimeout( PUPPETEER_TIMEOUT || 100000 );
 
-beforeAll( async () => {
-	await setViewport( 'large' );
-	enablePageDialogAccept();
-} );
-
-// After every test run, delete all content created by the test. This ensures
+// Before every test suite run, delete all content created by the test. This ensures
 // other posts/comments/etc. aren't dirtying tests and tests don't depend on
 // each other's side-effects.
-//
-// Right now we run the cleanup _after_ each test but we may want to do
-// this in the `beforeAll` call instead, as mentioned here:
-// https://github.com/WordPress/gutenberg/pull/8041#discussion_r203940770
-//
-// We can't do that while we rely on the global page object, but if we ditched
-// the global approach we could use `visitAdmin` before
-// `newDesktopBrowserPage()` is called.
-afterAll( async () => {
+beforeAll( async () => {
+	enablePageDialogAccept();
+
 	// Visit `/wp-admin/edit.php` so we can see a list of posts and delete them.
 	await visitAdmin( 'edit.php' );
 
@@ -56,7 +45,13 @@ afterAll( async () => {
 			'//*[contains(@class, "updated notice")]/p[contains(text(), "moved to the Trash.")]'
 		);
 	}
+} );
 
-	disablePageDialogAccept();
+beforeEach( async () => {
 	await clearLocalStorage();
+	await setViewport( 'large' );
+} );
+
+afterAll( () => {
+	disablePageDialogAccept();
 } );

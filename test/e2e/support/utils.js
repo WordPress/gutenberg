@@ -89,17 +89,12 @@ export async function visitAdmin( adminPath, query ) {
 export async function newPost( { postType, enableTips = false } = {} ) {
 	await visitAdmin( 'post-new.php', postType ? 'post_type=' + postType : '' );
 
-	const tipsEnabled = await page.evaluate( () => wp.data.select( 'core/nux' ).areTipsEnabled() );
-	if ( tipsEnabled && ! enableTips ) {
-		// Disable new user tips so that their UI doesn't get in the way
-		await page.evaluate( () => {
-			wp.data.dispatch( 'core/nux' ).disableTips();
-		} );
-	}
+	await page.evaluate( ( _enableTips ) => {
+		const action = _enableTips ? 'enableTips' : 'disableTips';
+		wp.data.dispatch( 'core/nux' )[ action ]();
+	}, enableTips );
+
 	if ( enableTips ) {
-		await page.evaluate( () => {
-			wp.data.dispatch( 'core/nux' ).enableTips();
-		} );
 		await page.reload();
 	}
 }
@@ -289,6 +284,11 @@ export async function clearLocalStorage() {
 	await page.evaluate( () => window.localStorage.clear() );
 }
 
+/**
+ * Callback which automatically accepts dialog.
+ *
+ * @param {puppeteer.Dialog} dialog Dialog object dispatched by page via the 'dialog' event.
+ */
 async function acceptPageDialog( dialog ) {
 	await dialog.accept();
 }
