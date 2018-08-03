@@ -64,7 +64,7 @@ export class PostPreviewButton extends Component {
 		// Open a popup, BUT: Set it to a blank page until save completes. This
 		// is necessary because popups can only be opened in response to user
 		// interaction (click), but we must still wait for the post to save.
-		if ( ! this.previewWindow ) {
+		if ( ! this.previewWindow || this.previewWindow.closed ) {
 			this.previewWindow = window.open( '', this.getWindowTarget() );
 		}
 
