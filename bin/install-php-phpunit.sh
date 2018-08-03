@@ -95,7 +95,7 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
     source $HOME/.phpbrew/bashrc
     phpbrew use 5.2.17
     pear channel-discover pear.symfony-project.com
-    pear install pear.symfony-project.com/YAML-1.0.2
+    pear install symfony/YAML-1.0.2
 
     # manually go back to the system php, we can't use `phpbrew switch-off`
     # because we're running a version of php that phpbrew doesn't work with at this point
