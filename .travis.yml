@@ -54,7 +54,7 @@ jobs:
 
     - stage: test
       php: 7.1
-      env: WP_VERSION=latest SWITCH_TO_PHP=5.2
+      env: WP_VERSION=4.9.7 SWITCH_TO_PHP=5.2
       script:
         - ./bin/run-wp-unit-tests.sh
 
