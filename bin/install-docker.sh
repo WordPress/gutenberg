@@ -3,7 +3,7 @@
 # Exit if any command fails.
 set -e
 
-WP_VERSION=${WP_VERSION:latest}
+WP_VERSION=${WP_VERSION-latest}
 
 # Include useful functions.
 . "$(dirname "$0")/includes.sh"
