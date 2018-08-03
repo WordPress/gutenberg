@@ -78,12 +78,10 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				// this.props.createBlockAction( uid, dataSourceBlockIndex );
 
 				// TODO: block type picker here instead of hardcoding a core/code block
-				const newBlock = createBlock( 'core/code', { content: 'new test text for a core/code block' } );
-				// TODO check supported blocks, update latest GB master to use core/paragraph as
-				// per https://github.com/WordPress/gutenberg/pull/8231
-				//const newBlock = createBlock( 'core/paragraph', { content: 'new test text for a core/paragraph block' } );
-				this.state.dataSource.push( newBlock );
-				this.props.createBlockAction( newBlock.uid, newBlock );
+				const newBlock = createBlock( 'core/paragraph', { content: 'new test text for a core/paragraph block' } );
+				const newBlockWithFocusedState = { ...newBlock, focused: false }
+				this.state.dataSource.push( newBlockWithFocusedState );
+				this.props.createBlockAction( newBlockWithFocusedState.uid, newBlockWithFocusedState );
 				break;
 			case ToolbarButton.SETTINGS:
 				// TODO: implement settings
