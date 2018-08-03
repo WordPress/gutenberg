@@ -3,7 +3,7 @@ version: '3.1'
 services:
 
   wordpress:
-    image: wordpress
+    image: wordpress:4.9.7
     ports:
       - 8888:80
     environment:
@@ -41,7 +41,7 @@ services:
       - .:/app
 
   wordpress_e2e_tests:
-    image: wordpress
+    image: wordpress:4.9.7
     ports:
       - 8889:80
     environment:
