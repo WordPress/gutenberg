@@ -69,7 +69,7 @@ class ReusableBlockEditPanel extends Component {
 							<Dashicon icon="controls-repeat" />
 							{ title }
 							<DotTip id="core/editor.reusableBlocks">
-								{ __( 'This is a reusable block. Changes made to this block will appear on every post and page that uses it. It’s a great way to re-use content.' ) }
+								{ __( 'This is a Reusable Block: it adds this exact content anywhere it’s inserted. Use them for text, images, links, or any other kind of content. Update a Reusable Block on one page, and it automatically updates everywhere it appears – a handy time-saver for managing content you need to have in many places on your site.' ) }
 							</DotTip>
 						</b>
 						<Button
