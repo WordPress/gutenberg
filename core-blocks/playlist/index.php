@@ -34,34 +34,34 @@ function register_block_core_playlist() {
 		'render_callback' => 'render_block_core_playlist',
 		'attributes'      => array(
 			'ids'              => array(
-				'type' => 'string',
+						'type' 	  => 'string',
 			),
 			'type'             => array(
-				'type'    => 'string',
-				'default' => 'audio',
+						'type'    => 'string',
+						'default' => 'audio',
 			),
 			'tracklist'        => array(
-				'type'    => 'boolean',
-				'default' => true,
+						'type'    => 'boolean',
+						'default' => true,
 			),
 			'showArtists'      => array(
-				'type'    => 'boolean',
-				'default' => true,
+						'type'    => 'boolean',
+						'default' => true,
 			),
 			'showTrackNumbers' => array(
-				'type'    => 'boolean',
-				'default' => true,
+						'type'    => 'boolean',
+						'default' => true,
 			),
 			'images'           => array(
-				'type'    => 'boolean',
-				'default' => true,
+						'type'    => 'boolean',
+						'default' => true,
 			),
 			'style'            => array(
-				'type'    => 'string',
-				'default' => 'light',
+						'type'    => 'string',
+						'default' => 'light',
 			),
 			'align'            => array(
-				'type' => 'string',
+						'type' => 'string',
 			),
 		),
 	) );
