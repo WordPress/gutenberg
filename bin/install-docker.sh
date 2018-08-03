@@ -39,7 +39,7 @@ docker-compose up -d >/dev/null
 
 # Install the PHPUnit test scaffolding.
 echo -e $(status_message "Installing PHPUnit test scaffolding...")
-docker-compose run --rm wordpress_phpunit /app/bin/install-wp-tests.sh wordpress_test root example mysql $WP_VERSION false
+docker-compose run --rm wordpress_phpunit /app/bin/install-wp-tests.sh wordpress_test root example mysql $WP_VERSION false > /dev/null
 
 # Install Composer. This is only used to run WordPress Coding Standards checks.
 echo -e $(status_message "Installing and updating Composer modules...")

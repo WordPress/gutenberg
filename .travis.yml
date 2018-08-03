@@ -29,6 +29,7 @@ branches:
 jobs:
   include:
     - stage: test
+      env: WP_VERSION=4.9.7
       script:
         - npm install || exit 1
         - npm run ci || exit 1
@@ -59,6 +60,7 @@ jobs:
         - ./bin/run-wp-unit-tests.sh
 
     - stage: test
+      env: WP_VERSION=4.9.7
       script:
         - npm install || exit 1
         - npm run build || exit 1
