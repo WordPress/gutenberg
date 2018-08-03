@@ -3,7 +3,7 @@ version: '3.1'
 services:
 
   wordpress:
-    image: wordpress:4.9.7
+    image: wordpress:4.9.7 # This is required because 4.9.8 has a permissions bug, see: https://github.com/WordPress/gutenberg/issues/8418 and https://github.com/docker-library/wordpress/issues/322
     ports:
       - 8888:80
     environment:
@@ -41,7 +41,7 @@ services:
       - .:/app
 
   wordpress_e2e_tests:
-    image: wordpress:4.9.7
+    image: wordpress:4.9.7 # This is required because 4.9.8 has a permissions bug, see: https://github.com/WordPress/gutenberg/issues/8418 and https://github.com/docker-library/wordpress/issues/322
     ports:
       - 8889:80
     environment:
