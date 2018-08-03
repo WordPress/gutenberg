@@ -52,7 +52,9 @@ export async function* getEntityRecord( state, kind, name, key ) {
 		return;
 	}
 	const record = await apiFetch( { path: `${ entity.baseURL }/${ key }?context=edit` } );
-	yield receiveEntityRecords( kind, name, record );
+	yield receiveEntityRecords( kind, name, record, {
+		[ entity.key || 'id' ]: key,
+	} );
 }
 
 /**

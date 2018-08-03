@@ -62,7 +62,7 @@ describe( 'getEntityRecord', () => {
 		};
 		const fulfillment = getEntityRecord( state, 'root', 'postType', 'post' );
 		const received = ( await fulfillment.next() ).value;
-		expect( received ).toEqual( receiveEntityRecords( 'root', 'postType', POST_TYPE ) );
+		expect( received ).toEqual( receiveEntityRecords( 'root', 'postType', POST_TYPE, { id: 'post' } ) );
 	} );
 
 	it( 'loads the kind entities and yields with requested post type', async () => {
@@ -74,7 +74,7 @@ describe( 'getEntityRecord', () => {
 			name: 'post',
 		} ] ) );
 		const received = ( await fulfillment.next() ).value;
-		expect( received ).toEqual( receiveEntityRecords( 'postType', 'post', POST ) );
+		expect( received ).toEqual( receiveEntityRecords( 'postType', 'post', POST, { id: 10 } ) );
 	} );
 } );
 
