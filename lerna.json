@@ -1,10 +1,14 @@
 {
 	"command": {
 		"publish": {
+			"allowBranch": "master",
+			"conventionalCommits": true,
 			"message": "chore(release): publish"
 		}
 	},
 	"ignoreChanges": [
+		"**/*.md",
+		"**/__mocks__/**",
 		"**/benchmark/*.js",
 		"**/test/**"
 	],
