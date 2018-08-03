@@ -3,14 +3,20 @@
 /**
  * Internal dependencies
  */
-import { createModal } from '../store/actions';
+import { createModal } from '../../packages/editor/src/store/actions';
 
 /**
  * WordPress dependencies
  */
 import { element } from '@wordpress/element';
+import { dispatch, select } from '@wordpress/data';
+
 
 export function setupHearthbeatPostLocking() {
+	const {
+		getEditorSettings,
+	} = select( 'core/editor' );
+
 	/**
 	 * Configure Heartbeat post locks.
 	 *
@@ -29,11 +35,13 @@ export function setupHearthbeatPostLocking() {
 		}
 
 		// Check if the post is locked.
-		const { locked } = select( 'core/editor' ).getEditorSettings();
+		const { locked } = getEditorSettings();
 		if ( locked ) {
 			console.log( 'LOCKED!' );
+			const modalContent = wp.element.createElement( 'div', {},  'locked' );
+			dispatch( 'core/editor' ).createModal( modalContent );
+			return;
 		}
-		return
 
 		send.postId = postId;
 
@@ -87,5 +95,17 @@ export function setupHearthbeatPostLocking() {
 			data: data,
 			url: ajaxurl,
 		} );
+	} );
+
+	// Show the locked modal on load if the post is locked.
+	jQuery( window ).on( 'load', function() {
+		console.log( 'ready - settings', getEditorSettings() );
+		const { locked } = getEditorSettings();
+		console.log( 'locked?', locked );
+		if ( locked ) {
+			console.log( 'LOCKED!' );
+			const modalContent = wp.element.createElement( 'div', {},  'locked' );
+			dispatch( 'core/editor' ).createModal( modalContent );
+		}
 	} );
 }
