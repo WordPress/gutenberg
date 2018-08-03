@@ -1,4 +1,6 @@
-#!/usr/bin/env bash -e -x -v
+#!/usr/bin/env bash
+
+set -evx
 
 cd "$(dirname "$0")/../"
 
