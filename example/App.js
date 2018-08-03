@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {AppRegistry, StyleSheet, View, FlatList} from 'react-native';
+import {AppRegistry, StyleSheet, View, FlatList, KeyboardAvoidingView, SafeAreaView, Platform} from 'react-native';
 import {example_content} from './content';
 import RCTAztecView from 'react-native-aztec'
 
@@ -11,11 +11,11 @@ export default class example extends React.Component {
         this.state = {isShowingText: true, height: _minHeight, text: example_content()};
         console.log("a ver que tiene" + JSON.stringify(this.state));
     }
-
+    
     render() {
-        let myMinHeight = Math.max(_minHeight, this.state.height);
-        return (
-              <View style={styles.container}>
+        let myMinHeight = Math.max(_minHeight, this.state.height);        
+        const mainContent =  (          
+            <KeyboardAvoidingView style={styles.container} behavior="padding">
               <FlatList
                     data={[
                       {key: 'Stefanos'},
@@ -30,7 +30,7 @@ export default class example extends React.Component {
                     <RCTAztecView
                          {...this.props}
                          style={[styles.aztec_editor, {minHeight: myMinHeight}]}
-                         text = {{text: this.state.text}}
+                         text = {{text: example_content()}}
                          placeholder = {'This is the placeholder text'}
                          placeholderTextColor = {'darkblue'} // See http://facebook.github.io/react-native/docs/colors
                          onContentSizeChange= {(event) => {
@@ -42,8 +42,13 @@ export default class example extends React.Component {
                          maxImagesWidth = {200} />
                     }
                   />
-              </View>
-              );
+            </KeyboardAvoidingView>          
+        );
+        if (Platform.OS === "ios") {
+          return (<SafeAreaView style={{flex:1}}>{mainContent}</SafeAreaView>)
+        } else {
+          return mainContent
+        }
     }
 }
 
