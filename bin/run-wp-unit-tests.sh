@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -evx
-
 cd "$(dirname "$0")/../"
 
 export PATH="$HOME/.composer/vendor/bin:$PATH"
