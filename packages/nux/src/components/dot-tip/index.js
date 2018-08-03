@@ -8,6 +8,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 
 export function DotTip( {
 	children,
+	position = 'middle right',
 	isVisible,
 	hasNextTip,
 	onDismiss,
@@ -20,7 +21,7 @@ export function DotTip( {
 	return (
 		<Popover
 			className="nux-dot-tip"
-			position="middle right"
+			position={ position }
 			noArrow
 			focusOnMount="container"
 			role="dialog"

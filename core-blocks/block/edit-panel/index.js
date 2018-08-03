@@ -65,12 +65,14 @@ class ReusableBlockEditPanel extends Component {
 			<Fragment>
 				{ ( ! isEditing && ! isSaving ) && (
 					<div className="reusable-block-edit-panel">
-						<b className="reusable-block-edit-panel__info">
-							<Dashicon icon="controls-repeat" />
-							{ title }
-							<DotTip id="core/editor.reusableBlocks">
+						<span className="reusable-block-edit-panel__icon">
+							<DotTip id="core/editor.reusableBlocks" position="bottom right">
 								{ __( 'This is a Reusable Block: it adds this exact content anywhere it’s inserted. Use them for text, images, links, or any other kind of content. Update a Reusable Block on one page, and it automatically updates everywhere it appears – a handy time-saver for managing content you need to have in many places on your site.' ) }
 							</DotTip>
+							<Dashicon icon="controls-repeat" />
+						</span>
+						<b className="reusable-block-edit-panel__info">
+							{ title }
 						</b>
 						<Button
 							ref={ this.editButton }
