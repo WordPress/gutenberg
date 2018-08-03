@@ -13,10 +13,9 @@
  * @return string Playlist output. Empty string if the passed type is unsupported.
  */
 function render_block_core_playlist( $attributes ) {
-	$attributes['ids'] = json_decode( $attributes['ids'] );
-	$attributes['artists'] = $attributes['showArtists'];
+	$attributes['ids']          = json_decode( $attributes['ids'] );
+	$attributes['artists']      = $attributes['showArtists'];
 	$attributes['tracknumbers'] = $attributes['showTrackNumbers'];
-
 
 	$classes = empty( $attributes['align'] ) ? 'wp-block-playlist' : 'wp-block-playlist align' . $attributes['align'];
 	$html    = sprintf( '<figure class="%s">%s</figure>',
@@ -34,34 +33,34 @@ function register_block_core_playlist() {
 	register_block_type( 'core/playlist', array(
 		'render_callback' => 'render_block_core_playlist',
 		'attributes'      => array(
-			'ids'       => array(
+			'ids'              => array(
 				'type' => 'string',
 			),
-			'type'      => array(
-				'type' => 'string',
+			'type'             => array(
+				'type'    => 'string',
 				'default' => 'audio',
 			),
-			'tracklist' => array(
+			'tracklist'        => array(
 				'type'    => 'boolean',
 				'default' => true,
 			),
-			'showArtists'   => array(
+			'showArtists'      => array(
 				'type'    => 'boolean',
 				'default' => true,
 			),
-			'showTrackNumbers'   => array(
+			'showTrackNumbers' => array(
 				'type'    => 'boolean',
 				'default' => true,
 			),
-			'images'    => array(
+			'images'           => array(
 				'type'    => 'boolean',
 				'default' => true,
 			),
-			'style'     => array(
+			'style'            => array(
 				'type'    => 'string',
 				'default' => 'light',
 			),
-			'align'     => array(
+			'align'            => array(
 				'type' => 'string',
 			),
 		),
