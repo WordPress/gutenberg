@@ -210,6 +210,22 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'build/data/index.js' ),
 		true
 	);
+	wp_add_inline_script(
+		'wp-data',
+		implode( "\n", array(
+			// TODO: Transferring old storage should be removed at v3.7.
+			'( function() {',
+			'	var userId = window.userSettings.uid;',
+			'	var oldStorageKey = "WP_EDIT_POST_DATA_" + userId;',
+			'	var storageKey = "WP_DATA_USER_" + userId;',
+			'	if ( localStorage[ oldStorageKey ] ) {',
+			'		localStorage[ storageKey ] = localStorage[ oldStorageKey ];',
+			'		delete localStorage[ oldStorageKey ];',
+			'	}',
+			'	wp.data.use( wp.data.plugins.persistence, { storageKey: storageKey } );',
+			'} )()',
+		) )
+	);
 	wp_register_script(
 		'wp-core-data',
 		gutenberg_url( 'build/core-data/index.js' ),
