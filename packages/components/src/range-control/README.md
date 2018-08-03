@@ -1,5 +1,4 @@
-RangeControl
-=======
+# RangeControl
 
 RangeControl component is used to create range slider to input numerical values.
 
@@ -8,13 +7,20 @@ RangeControl component is used to create range slider to input numerical values.
 
 Render a user interface to select the number of columns between 2 and 10.
 ```jsx
+import { RadioControl } from '@wordpress/components';
+import { withState } from '@wordpress/compose';
+
+const MyRangeControl = withState( {
+	columns: 2,
+} )( ( { columns, setState } ) => ( 
     <RangeControl
         label="Columns"
         value={ columns }
-        onChange={ onChange }
+        onChange={ ( columns ) => setState( { columns } ) }
         min={ 2 }
         max={ 10 }
     />
+) );
 ```
 
 ## Props
