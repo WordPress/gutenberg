@@ -18,7 +18,7 @@ const MyColorPalette = withState( {
 		<ColorPalette 
 			colors={ colors } 
 			value={ color }
-			onChange={ color => setState( { color } ) } 
+			onChange={ ( color ) => setState( { color } ) } 
 		/>
 	) 
 } );
