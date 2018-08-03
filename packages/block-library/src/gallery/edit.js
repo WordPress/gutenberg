@@ -275,6 +275,7 @@ class GalleryEdit extends Component {
 								onSelect={ this.onSelectImage( index ) }
 								setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
 								caption={ img.caption }
+								tabIndex={ '0' }
 							/>
 						</li>
 					) ) }

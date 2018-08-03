@@ -36,8 +36,6 @@ class Sortable extends Component {
 				<ul className={ `components-sortable ${ className }` }>
 					{ firstNode }
 					{ children.map( ( child, index ) => {
-						child.props.tabindex = '0';
-
 						//generate a SortableElement using the item and the child
 						const SortableItem = SortableElement( () => {
 							return ( child );
