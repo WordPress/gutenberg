@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bash -x -v
 
 # Include useful functions
 . "$(dirname "$0")/includes.sh"
