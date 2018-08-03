@@ -8,12 +8,12 @@ import { Component } from '@wordpress/element';
  */
 import { SortableContainer, SortableElement, arrayMove } from 'react-sortable-hoc';
 
+const SortableItem = SortableElement( ( { children } ) => children );
+
 class Sortable extends Component {
 	//constructor
 	constructor() {
 		super( ...arguments );
-
-		this.focusIndex = null;
 
 		this.onSortStart = this.onSortStart.bind( this );
 		this.onSortEnd = this.onSortEnd.bind( this );
@@ -27,7 +27,7 @@ class Sortable extends Component {
 	 * @return {function} the Container creator
      */
 	getSortableList() {
-		const { items, children, className, firstNode, lastNode } = this.props;
+		const { children, className, firstNode, lastNode } = this.props;
 
 		//create the sortable container:
 		return SortableContainer( () => {
@@ -36,19 +36,11 @@ class Sortable extends Component {
 				<ul className={ `components-sortable ${ className }` }>
 					{ firstNode }
 					{ children.map( ( child, index ) => {
-						//generate a SortableElement using the item and the child
-						const SortableItem = SortableElement( () => {
-							return ( child );
-						} );
-
-						//set a temporary class so we can find it post-render:
-						if ( index === this.focusIndex ) {
-							child.props.class = `sortable-focus ${ child.props.className }`;
-						}
-
 						//display Sortable Element
 						return (
-							<SortableItem key={ `item-${ index }` } index={ index } item={ items[ index ] } />
+							<SortableItem key={ `item-${ index }` } index={ index }>
+								{ child }
+							</SortableItem>
 						);
 					} ) }
 					{ lastNode }
