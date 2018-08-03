@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e -x
 
 # Uses phpbrew to install older php versions on modern(ish) distros.
 # Installs the correct version of phpunit for the requested php
