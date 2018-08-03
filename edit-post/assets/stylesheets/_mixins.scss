@@ -164,7 +164,7 @@
 	outline-offset: -2px;
 }
 
-// Tabs, Inputs, Square buttons
+// Inputs
 @mixin input-style__neutral() {
 	outline-offset: -1px;
 	box-shadow: 0 0 0 transparent;
@@ -226,7 +226,7 @@
 @mixin editor-left( $selector ) {
 	#{$selector} {	/* Set left position when auto-fold is not on the body element. */
 		left: 0;
-		
+
 		@include break-medium() {
 			left: $admin-sidebar-width;
 		}

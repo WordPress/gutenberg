@@ -130,22 +130,34 @@ body.gutenberg-editor-page {
 	.input-control, // upstream name is .regular-text
 	input[type=text],
 	input[type=search],
-	input[type=radio],
 	input[type=tel],
 	input[type=time],
 	input[type=url],
 	input[type=week],
 	input[type=password],
-	input[type=checkbox],
-	input[type=color],
 	input[type=date],
 	input[type=datetime],
 	input[type=datetime-local],
 	input[type=email],
 	input[type=month],
 	input[type=number],
-	select,
 	textarea {
+		border: 1px solid $light-gray-700;
+		border-bottom-color: $dark-gray-500;
+		font-family: $default-font;
+		font-size: $default-font-size;
+		padding: 6px 8px;
+		@include input-style__neutral();
+
+		&:focus {
+			@include input-style__focus();
+		}
+	}
+
+	input[type=radio],
+	input[type=checkbox],
+	input[type=color],
+	select {
 		border: 1px solid $light-gray-700;
 		font-family: $default-font;
 		font-size: $default-font-size;
