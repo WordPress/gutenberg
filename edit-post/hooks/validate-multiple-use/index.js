@@ -69,7 +69,7 @@ const withMultipleValidation = createHigherOrderComponent( ( BlockEdit ) => {
 		const outboundType = getOutboundType( props.name );
 
 		return [
-			<div key="invalid-preview" style={ { minHeight: '100px' } }>
+			<div key="invalid-preview" style={ { minHeight: '60px' } }>
 				<BlockEdit key="block-edit" { ...props } />
 			</div>,
 			<Warning

@@ -9,12 +9,9 @@ The presence of a `href` prop determines whether an `anchor` element is rendered
 Renders a button with default style.
 
 ```jsx
-/**
- * WordPress dependencies
- */
 import { Button } from "@wordpress/components";
 
-export default function ClickMeButton() {
+function MyButton() {
 	return (
 		<Button isDefault>
 			Click me!
