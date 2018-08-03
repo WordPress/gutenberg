@@ -19,7 +19,7 @@ describe( 'mediaUpload', () => {
 	const onFileChangeSpy = jest.fn();
 
 	it( 'should do nothing on no files', () => {
-		mediaUpload( { filesList: [ ], onFileChange: onFileChangeSpy, allowedType: 'image' } );
+		mediaUpload( { filesList: [], onFileChange: onFileChangeSpy, allowedType: 'image' } );
 		expect( onFileChangeSpy ).not.toHaveBeenCalled();
 	} );
 

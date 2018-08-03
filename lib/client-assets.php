@@ -139,7 +139,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-api-fetch',
 		gutenberg_url( 'build/api-fetch/index.js' ),
-		array( 'wp-i18n' ),
+		array( 'wp-hooks', 'wp-i18n' ),
 		filemtime( gutenberg_dir_path() . 'build/api-fetch/index.js' ),
 		true
 	);
@@ -209,6 +209,22 @@ function gutenberg_register_scripts_and_styles() {
 		array( 'wp-deprecated', 'wp-element', 'wp-compose', 'wp-is-shallow-equal', 'lodash' ),
 		filemtime( gutenberg_dir_path() . 'build/data/index.js' ),
 		true
+	);
+	wp_add_inline_script(
+		'wp-data',
+		implode( "\n", array(
+			// TODO: Transferring old storage should be removed at v3.7.
+			'( function() {',
+			'	var userId = window.userSettings.uid;',
+			'	var oldStorageKey = "WP_EDIT_POST_DATA_" + userId;',
+			'	var storageKey = "WP_DATA_USER_" + userId;',
+			'	if ( localStorage[ oldStorageKey ] ) {',
+			'		localStorage[ storageKey ] = localStorage[ oldStorageKey ];',
+			'		delete localStorage[ oldStorageKey ];',
+			'	}',
+			'	wp.data.use( wp.data.plugins.persistence, { storageKey: storageKey } );',
+			'} )()',
+		) )
 	);
 	wp_register_script(
 		'wp-core-data',
@@ -307,11 +323,12 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-deprecated',
 			'wp-dom',
 			'wp-element',
-			'wp-html-entities',
 			'wp-hooks',
+			'wp-html-entities',
 			'wp-i18n',
 			'wp-is-shallow-equal',
 			'wp-keycodes',
+			'wp-url',
 		),
 		filemtime( gutenberg_dir_path() . 'build/components/index.js' ),
 		true
@@ -357,18 +374,19 @@ function gutenberg_register_scripts_and_styles() {
 		array(
 			'editor',
 			'lodash',
+			'wp-api-fetch',
 			'wp-blob',
 			'wp-blocks',
 			'wp-components',
 			'wp-compose',
 			'wp-core-data',
-			'wp-element',
 			'wp-editor',
+			'wp-element',
 			'wp-html-entities',
 			'wp-i18n',
 			'wp-keycodes',
+			'wp-url',
 			'wp-viewport',
-			'wp-api-fetch',
 		),
 		filemtime( gutenberg_dir_path() . 'build/core-blocks/index.js' ),
 		true
@@ -453,6 +471,10 @@ function gutenberg_register_scripts_and_styles() {
 		'wp-editor',
 		gutenberg_url( 'build/editor/index.js' ),
 		array(
+			'lodash',
+			'tinymce-latest-lists',
+			'tinymce-latest-paste',
+			'tinymce-latest-table',
 			'wp-a11y',
 			'wp-api-fetch',
 			'wp-blob',
@@ -471,14 +493,10 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-is-shallow-equal',
 			'wp-keycodes',
 			'wp-nux',
+			'wp-tinymce',
 			'wp-url',
 			'wp-viewport',
 			'wp-wordcount',
-			'lodash',
-			'wp-tinymce',
-			'tinymce-latest-lists',
-			'tinymce-latest-paste',
-			'tinymce-latest-table',
 		),
 		filemtime( gutenberg_dir_path() . 'build/editor/index.js' )
 	);
@@ -1091,10 +1109,26 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	gutenberg_prepare_wp_components_script();
 
+	global $wp_scripts;
+
+	// Add "wp-hooks" as dependency of "heartbeat".
+	$heartbeat_script = $wp_scripts->query( 'heartbeat', 'registered' );
+	if ( $heartbeat_script && ! in_array( 'wp-hooks', $heartbeat_script->deps ) ) {
+		$heartbeat_script->deps[] = 'wp-hooks';
+	}
+
 	// Enqueue heartbeat separately as an "optional" dependency of the editor.
 	// Heartbeat is used for automatic nonce refreshing, but some hosts choose
 	// to disable it outright.
 	wp_enqueue_script( 'heartbeat' );
+
+	// Transform a "heartbeat-tick" jQuery event into "heartbeat.tick" hook action.
+	// This removes the need of using jQuery for listening to the event.
+	wp_add_inline_script(
+		'heartbeat',
+		'jQuery( document ).on( "heartbeat-tick", function ( event, response ) { wp.hooks.doAction( "heartbeat.tick", response ) } );',
+		'after'
+	);
 
 	// Ignore Classic Editor's `rich_editing` user option, aka "Disable visual
 	// editor". Forcing this to be true guarantees that TinyMCE and its plugins

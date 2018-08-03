@@ -1,7 +1,8 @@
 /**
  * Internal dependencies
  */
-import { isEmpty, isPlain, removeInvalidHTML, getPhrasingContentSchema } from '../utils';
+import { getPhrasingContentSchema } from '../phrasing-content';
+import { isEmpty, isPlain, removeInvalidHTML } from '../utils';
 
 describe( 'isEmpty', () => {
 	function isEmptyHTML( HTML ) {

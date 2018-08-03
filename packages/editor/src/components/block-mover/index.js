@@ -47,7 +47,7 @@ export class BlockMover extends Component {
 		const { onMoveUp, onMoveDown, isFirst, isLast, clientIds, blockType, firstIndex, isLocked, instanceId, isHidden } = this.props;
 		const { isFocused } = this.state;
 		const blocksCount = castArray( clientIds ).length;
-		if ( isLocked ) {
+		if ( isLocked || ( isFirst && isLast ) ) {
 			return null;
 		}
 

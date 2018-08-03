@@ -32,12 +32,17 @@
 	}
 }
 
-// Flex container margins do not collapse: https://www.w3.org/TR/css-flexbox-1/#flex-containers.
+// This block has flex container children. Flex container margins do not collapse: https://www.w3.org/TR/css-flexbox-1/#flex-containers.
 // Therefore, let's at least not add any additional margins here.
+// The goal is for the editor to look more like the front-end.
 .editor-block-list__layout .editor-block-list__block[data-type="core/columns"] > .editor-block-list__block-edit,
 .editor-block-list__layout .editor-block-list__block[data-type="core/column"] > .editor-block-list__block-edit {
 	margin-top: 0;
 	margin-bottom: 0;
+
+	// This uncollapses margins on this parent container.
+	padding-top: 0.1px;
+	padding-bottom: 0.1px;
 }
 
 .wp-block-columns {

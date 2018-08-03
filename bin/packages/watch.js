@@ -24,7 +24,7 @@ const exists = ( filename ) => {
 
 // Exclude deceitful source-like files, such as editor swap files.
 const isSourceFile = ( filename ) => {
-	return /.\.js$/.test( filename );
+	return /.\.(js|scss)$/.test( filename );
 };
 
 const rebuild = ( filename ) => filesToBuild.set( filename, true );

@@ -4,7 +4,6 @@
 import { throttle } from 'lodash';
 import classnames from 'classnames';
 import scrollIntoView from 'dom-scroll-into-view';
-import { stringify } from 'querystringify';
 
 /**
  * WordPress dependencies
@@ -17,6 +16,7 @@ import { Spinner, withSpokenMessages, Popover } from '@wordpress/components';
 import { withInstanceId } from '@wordpress/compose';
 import apiFetch from '@wordpress/api-fetch';
 import deprecated from '@wordpress/deprecated';
+import { addQueryArgs } from '@wordpress/url';
 
 // Since URLInput is rendered in the context of other inputs, but should be
 // considered a separate modal node, prevent keyboard events from propagating
@@ -91,11 +91,11 @@ class URLInput extends Component {
 		} );
 
 		const request = apiFetch( {
-			path: `/gutenberg/v1/search?${ stringify( {
+			path: addQueryArgs( '/gutenberg/v1/search', {
 				search: value,
 				per_page: 20,
 				type: 'post',
-			} ) }`,
+			} ),
 		} );
 
 		request.then( ( posts ) => {

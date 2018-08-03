@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import jQuery from 'jquery';
+import { addAction } from '@wordpress/hooks';
 
 const createNonceMiddleware = ( nonce ) => ( options, next ) => {
 	let usedNonce = nonce;
@@ -11,7 +11,7 @@ const createNonceMiddleware = ( nonce ) => ( options, next ) => {
 	 * Configure heartbeat to refresh the wp-api nonce, keeping the editor
 	 * authorization intact.
 	 */
-	jQuery( document ).on( 'heartbeat-tick', ( event, response ) => {
+	addAction( 'heartbeat.tick', 'core/api-fetch/create-nonce-middleware', ( response ) => {
 		if ( response[ 'rest-nonce' ] ) {
 			usedNonce = response[ 'rest-nonce' ];
 		}
