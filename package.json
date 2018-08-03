@@ -107,6 +107,7 @@
 		"rimraf": "2.6.2",
 		"rtlcss": "2.4.0",
 		"sass-loader": "6.0.7",
+		"source-map-loader": "0.2.3",
 		"sprintf-js": "1.1.1",
 		"style-loader": "0.20.3",
 		"symlink-or-copy": "1.2.0",

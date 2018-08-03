@@ -1,5 +1,10 @@
 .wp-block-image {
 	width: fit-content;
+	max-width: 100%;
+
+	img {
+		max-width: 100%;
+	}
 
 	&.aligncenter {
 		display: block;
