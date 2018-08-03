@@ -11,7 +11,7 @@ Renders a button with default style.
 ```jsx
 import { Button } from "@wordpress/components";
 
-const MyButton = () => {
+const MyButton = () => (
 	<Button isDefault>
 		Click me!
 	</Button>
