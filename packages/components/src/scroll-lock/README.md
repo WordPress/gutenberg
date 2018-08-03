@@ -9,13 +9,22 @@ Declare scroll locking as part of modal UI.
 
 ```jsx
 import { ScrollLock } from '@wordpress/components';
+import { withState } from '@wordpress/compose';
 
-function Sidebar( { isMobile } ) {
+const MyScrollLock = withState( {
+	isScrollLocked: false,
+} )( ( { isScrollLocked, setState } ) => {
+	const toggleLock = () => {
+		setState( ( state ) => ( { isScrollLocked: ! state.isScrollLocked } ) );
+	};
 	return (
 		<div>
-			Sidebar Content!
-			{ isMobile && <ScrollLock /> }
+			<Button isDefault onClick={ toggleLock }>
+				Toggle scroll lock
+				{ isScrollLocked && <ScrollLock /> }
+			</Button>
+			<p>Scroll locked: <strong>{ isScrollLocked ? 'Yes' : 'No' }</strong></p>
 		</div>
 	);
-}
+} );
 ```
