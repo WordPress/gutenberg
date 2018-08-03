@@ -50,11 +50,7 @@ export function getEmbedEdit( title, icon ) {
 			this.processPreview = this.processPreview.bind( this );
 
 			this.state = {
-				html: this.props.preview ? this.props.preview.html : '',
-				type: this.props.attributes.type,
-				error: false,
 				fetching: !! this.props.attributes.url && ! this.props.preview,
-				providerName: '',
 				url: this.props.attributes.url,
 			};
 
@@ -103,7 +99,7 @@ export function getEmbedEdit( title, icon ) {
 				return;
 			}
 			setAttributes( { url } );
-			this.setState( { fetching: true, error: false } );
+			this.setState( { fetching: true } );
 		}
 
 		processPreview() {
@@ -111,9 +107,7 @@ export function getEmbedEdit( title, icon ) {
 			const { url } = this.props.attributes;
 
 			if ( previewIsFallback ) {
-				// If the preview is false (not falsey, but actually false) then the embed request failed,
-				// so we cannot embed it.
-				this.setState( { fetching: false, error: true } );
+				this.setState( { fetching: false } );
 				return;
 			}
 
@@ -150,11 +144,7 @@ export function getEmbedEdit( title, icon ) {
 				}
 			}
 
-			if ( html ) {
-				this.setState( { html, type, providerNameSlug } );
-				setAttributes( { type, providerNameSlug } );
-			} else if ( 'photo' === type ) {
-				this.setState( { html: this.getPhotoHtml( preview ), type, providerNameSlug } );
+			if ( html || 'photo' === type ) {
 				setAttributes( { type, providerNameSlug } );
 			}
 			this.setState( { fetching: false } );
@@ -165,9 +155,9 @@ export function getEmbedEdit( title, icon ) {
 		}
 
 		render() {
-			const { html, type, error, fetching, url } = this.state;
+			const { fetching, url } = this.state;
 			const { caption } = this.props.attributes;
-			const { setAttributes, isSelected, className } = this.props;
+			const { setAttributes, isSelected, className, preview, previewIsFallback } = this.props;
 			const controls = (
 				<BlockControls>
 					<Toolbar>
@@ -190,7 +180,7 @@ export function getEmbedEdit( title, icon ) {
 				);
 			}
 
-			if ( ! html ) {
+			if ( ! preview || previewIsFallback ) {
 				// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
 				const label = sprintf( __( '%s URL' ), title );
 
@@ -209,12 +199,14 @@ export function getEmbedEdit( title, icon ) {
 								type="submit">
 								{ __( 'Embed' ) }
 							</Button>
-							{ error && <p className="components-placeholder__error">{ __( 'Sorry, we could not embed that content.' ) }</p> }
+							{ previewIsFallback && <p className="components-placeholder__error">{ __( 'Sorry, we could not embed that content.' ) }</p> }
 						</form>
 					</Placeholder>
 				);
 			}
 
+			const { type } = preview;
+			const html = 'photo' === type ? this.getPhotoHtml( preview ) : preview.html;
 			const parsedUrl = parse( url );
 			const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedUrl.host.replace( /^www\./, '' ) );
 			// translators: %s: host providing embed content e.g: www.youtube.com
