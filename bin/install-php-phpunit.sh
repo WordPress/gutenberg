@@ -48,6 +48,7 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
     $HOME/php-utils-bin/phpbrew known --old
 
     # fetch the build tarballs manually
+    mkdir -p $HOME/.phpbrew/distfiles
     curl -L -o $HOME/.phpbrew/distfiles/php-5.2.17.tar.bz2 https://museum.php.net/php5/php-5.2.17.tar.bz2
     curl -L -o $HOME/.phpbrew/distfiles/php-5.3.29.tar.bz2 https://museum.php.net/php5/php-5.3.29.tar.bz2
 
