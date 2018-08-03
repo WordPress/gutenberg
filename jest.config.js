@@ -30,8 +30,7 @@ module.exports = {
 		'node',
 	],
 	moduleNameMapper: {
-		'@wordpress\\/(editor)$': '<rootDir>/gutenberg/$1',
-		'@wordpress\\/(blocks|data|element|deprecated)$': '<rootDir>/gutenberg/packages/$1/src/index',
+		'@wordpress\\/(blocks|data|element|deprecated|editor)$': '<rootDir>/gutenberg/packages/$1/src/index',
 		'@gutenberg': '<rootDir>/gutenberg',
 
 		// Mock the CSS modules. See https://facebook.github.io/jest/docs/en/webpack.html#handling-static-assets
