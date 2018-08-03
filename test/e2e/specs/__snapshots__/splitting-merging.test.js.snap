@@ -1,5 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`splitting and merging blocks Should remove empty paragraph block on backspace 1`] = `""`;
+
 exports[`splitting and merging blocks should delete an empty first line 1`] = `
 "<!-- wp:paragraph -->
 <p></p>
@@ -22,11 +24,7 @@ exports[`splitting and merging blocks should merge into inline boundary position
 <!-- /wp:paragraph -->"
 `;
 
-exports[`splitting and merging blocks should remove empty paragraph block on backspace 1`] = `
-"<!-- wp:paragraph -->
-<p></p>
-<!-- /wp:paragraph -->"
-`;
+exports[`splitting and merging blocks should remove empty paragraph block on backspace 1`] = `""`;
 
 exports[`splitting and merging blocks should split and merge paragraph blocks using Enter and Backspace 1`] = `
 "<!-- wp:paragraph -->

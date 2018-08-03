@@ -452,12 +452,20 @@ export class RichText extends Component {
 			return;
 		}
 
+		let isHandled = false;
+
 		if ( onMerge ) {
 			onMerge( ! isReverse );
-		} else if ( onRemove && this.isEmpty() ) {
+			isHandled = true;
+		}
+
+		if ( onRemove && this.isEmpty() ) {
 			onRemove( ! isReverse );
-		} else {
-			// Only prevent default behaviors if handled.
+			isHandled = true;
+		}
+
+		// Only prevent default behaviors if handled.
+		if ( ! isHandled ) {
 			return;
 		}
 

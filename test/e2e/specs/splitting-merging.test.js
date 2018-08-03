@@ -118,4 +118,15 @@ describe( 'splitting and merging blocks', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'Should remove empty paragraph block on backspace', async () => {
+		// Regression Test: In a sole empty paragraph, pressing backspace
+		// should remove the block.
+		//
+		// See: https://github.com/WordPress/gutenberg/pull/8306
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
