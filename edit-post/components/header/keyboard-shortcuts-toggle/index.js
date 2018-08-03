@@ -2,6 +2,7 @@
  * WordPress Dependencies
  */
 import { withSelect, withDispatch } from '@wordpress/data';
+import { displayShortcut } from '@wordpress/keycodes';
 
 /**
  * WordPress Dependencies
@@ -18,6 +19,7 @@ export function KeyboardShortcutsToggle( { toggleModal, isModalActive } ) {
 			icon={ isModalActive && 'yes' }
 			isSelected={ isModalActive }
 			onClick={ toggleModal }
+			shortcut={ displayShortcut.primary( 'k' ) }
 		>
 			{ __( 'Keyboard Shortcuts' ) }
 		</MenuItem>
