@@ -48,7 +48,7 @@ const MAX_SUGGESTED_ITEMS = 9;
  * @return {Array}             Filtered item list.
  */
 export const searchItems = ( items, searchTerm ) => {
-	const normalizedSearchTerm = searchTerm.toLowerCase().trim();
+	const normalizedSearchTerm = searchTerm.replace( /^\//, '' ).toLowerCase().trim();
 	const matchSearch = ( string ) => string.toLowerCase().indexOf( normalizedSearchTerm ) !== -1;
 
 	return items.filter( ( item ) =>

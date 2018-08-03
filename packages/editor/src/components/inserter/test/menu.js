@@ -337,4 +337,10 @@ describe( 'searchItems', () => {
 			[ youtubeItem ]
 		);
 	} );
+
+	it( 'should ignore a leading slash on a search term', () => {
+		expect( searchItems( items, '/GOOGL' ) ).toEqual(
+			[ youtubeItem ]
+		);
+	} );
 } );
