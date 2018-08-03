@@ -51,7 +51,8 @@ echo -e $(status_message "Installing WordPress...")
 # prevents permissions errors. See: https://github.com/WordPress/gutenberg/pull/8427#issuecomment-410232369
 docker-compose run --rm -u 33 $CLI core install --title="$SITE_TITLE" --admin_user=admin --admin_password=password --admin_email=test@test.com --skip-email --url=http://localhost:$HOST_PORT >/dev/null
 # Check for WordPress updates, just in case the WordPress image isn't up to date.
-docker-compose run --rm -u 33 $CLI core update >/dev/null
+# (Disabled until https://github.com/WordPress/gutenberg/issues/8445 is fixed.)
+# docker-compose run --rm -u 33 $CLI core update >/dev/null
 
 # If the 'wordpress' volume wasn't during the down/up earlier, but the post port has changed, we need to update it.
 CURRENT_URL=$(docker-compose run -T --rm $CLI option get siteurl)

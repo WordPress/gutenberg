@@ -3,7 +3,7 @@ version: '3.1'
 services:
 
   wordpress:
-    image: wordpress:4.9.7
+    image: wordpress:4.9.7 # Pinned to version 4.9.7 until https://github.com/WordPress/gutenberg/issues/8445 is fixed.
     ports:
       - 8888:80
     environment:
@@ -41,7 +41,7 @@ services:
       - .:/app
 
   wordpress_e2e_tests:
-    image: wordpress:4.9.7
+    image: wordpress:4.9.7 # Pinned to version 4.9.7 until https://github.com/WordPress/gutenberg/issues/8445 is fixed.
     ports:
       - 8889:80
     environment:
