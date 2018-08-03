@@ -79,7 +79,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 				// TODO: block type picker here instead of hardcoding a core/code block
 				const newBlock = createBlock( 'core/paragraph', { content: 'new test text for a core/paragraph block' } );
-				const newBlockWithFocusedState = { ...newBlock, focused: false }
+				const newBlockWithFocusedState = { ...newBlock, focused: false };
 				this.state.dataSource.push( newBlockWithFocusedState );
 				this.props.createBlockAction( newBlockWithFocusedState.uid, newBlockWithFocusedState );
 				break;
