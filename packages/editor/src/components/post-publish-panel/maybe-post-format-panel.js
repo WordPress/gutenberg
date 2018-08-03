@@ -9,7 +9,7 @@ import { find, get, includes, union } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { ifCondition, compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { Button, Dashicon, PanelBody } from '@wordpress/components';
+import { Button, PanelBody } from '@wordpress/components';
 
 /**
  * Internal dependencies.
@@ -21,12 +21,6 @@ const PostFormatSuggested = ( { suggestion, onUpdatePostFormat } ) => <Button is
 </Button>;
 
 const PostFormatPanel = ( { suggestion, onUpdatePostFormat } ) => <PanelBody initialOpen={ false } title={ [
-	<Dashicon
-		key={ 'dashicon-lightbulb' }
-		icon={ 'lightbulb' }
-		className={ 'post-publish-panel__tip' }
-		size={ 18 }
-	/>,
 	<span className="editor-post-publish-panel__link" key="label">{
 		__( 'Add a post format' )
 	}</span>,

@@ -5,17 +5,11 @@ import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { compose, ifCondition } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { Dashicon, PanelBody } from '@wordpress/components';
+import { PanelBody } from '@wordpress/components';
 
 import FlatTermSelector from '../post-taxonomies/flat-term-selector';
 
 const TagsPanel = () => <PanelBody initialOpen={ false } title={ [
-	<Dashicon
-		key={ 'dashicon-lightbulb' }
-		icon={ 'lightbulb' }
-		className={ 'post-publish-panel__tip' }
-		size={ 18 }
-	/>,
 	<span className="editor-post-publish-panel__link" key="label">{
 		__( 'Add tags to your post' )
 	}</span>,
