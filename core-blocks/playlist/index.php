@@ -61,7 +61,7 @@ function register_block_core_playlist() {
 						'default' => 'light',
 			),
 			'align'            => array(
-						'type' => 'string',
+						'type' 	  => 'string',
 			),
 		),
 	) );
