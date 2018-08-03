@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { assign, difference, compact } from 'lodash';
+import { assign, difference, omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -134,26 +134,17 @@ export function getHTMLRootElementClasses( innerHTML ) {
 export function addParsedDifference( blockAttributes, blockType, innerHTML ) {
 	if ( hasBlockSupport( blockType, 'customClassName', true ) ) {
 		// To determine difference, serialize block given the known set of
-		// attributes. If there are classes which are mismatched with the
-		// incoming HTML of the block, add to filtered result.
-		// If existing classes have been removed then ensure they don't appear in the output
-		const serialized = getSaveContent( blockType, blockAttributes );
-		const blockClasses = blockAttributes.className ? blockAttributes.className.split( ' ' ) : [];
-		const classes = getHTMLRootElementClasses( serialized );
-		const parsedClasses = getHTMLRootElementClasses( innerHTML );
-		const customClasses = difference( parsedClasses, classes );
+		// attributes, with the exception of `className`. This will determine
+		// the default set of classes. From there, any difference in innerHTML
+		// can be considered as custom classes.
+		const attributesSansClassName = omit( blockAttributes, [ 'className' ] );
+		const serialized = getSaveContent( blockType, attributesSansClassName );
+		const defaultClasses = getHTMLRootElementClasses( serialized );
+		const actualClasses = getHTMLRootElementClasses( innerHTML );
+		const customClasses = difference( actualClasses, defaultClasses );
 
-		// The remaining classes consist of the block's current classes (with default classes removed if they don't already exist in the block)
-		// along with any custom classes, removing any class that doesn't appear in the innerHTML
-		const remaining = [
-			...classes.filter( ( item ) => blockClasses.indexOf( item ) !== -1 ),
-			...customClasses,
-		].filter( ( item ) => parsedClasses.indexOf( item ) !== -1 );
-
-		const filteredClassName = compact( remaining ).join( ' ' );
-
-		if ( filteredClassName ) {
-			blockAttributes.className = filteredClassName;
+		if ( customClasses.length ) {
+			blockAttributes.className = customClasses.join( ' ' );
 		} else {
 			delete blockAttributes.className;
 		}
