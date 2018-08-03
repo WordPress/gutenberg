@@ -6,7 +6,7 @@ import apiFetch from '@wordpress/api-fetch';
 /**
  * External dependencies
  */
-import { stringify } from 'querystring';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -119,7 +119,7 @@ describe( 'getEmbedPreview', () => {
 
 	beforeAll( () => {
 		apiFetch.mockImplementation( ( options ) => {
-			if ( options.path === `/oembed/1.0/proxy?${ stringify( { url: EMBEDDABLE_URL } ) }` ) {
+			if ( options.path === addQueryArgs( '/oembed/1.0/proxy', { url: EMBEDDABLE_URL } ) ) {
 				return Promise.resolve( SUCCESSFUL_EMBED_RESPONSE );
 			}
 			throw 404;

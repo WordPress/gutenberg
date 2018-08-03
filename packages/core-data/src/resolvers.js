@@ -11,7 +11,7 @@ import apiFetch from '@wordpress/api-fetch';
 /**
  * External dependencies
  */
-import { stringify } from 'querystring';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -93,7 +93,7 @@ export async function* getThemeSupports() {
  */
 export async function* getEmbedPreview( state, url ) {
 	try {
-		const embedProxyResponse = await apiFetch( { path: `/oembed/1.0/proxy?${ stringify( { url } ) }` } );
+		const embedProxyResponse = await apiFetch( { path: addQueryArgs( '/oembed/1.0/proxy', { url } ) } );
 		yield receiveEmbedPreview( url, embedProxyResponse );
 	} catch ( error ) {
 		// Embed API 404s if the URL cannot be embedded, so we have to catch the error from the apiRequest here.
