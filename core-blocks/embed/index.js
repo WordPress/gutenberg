@@ -50,6 +50,7 @@ export function getEmbedEdit( title, icon ) {
 			this.processPreview = this.processPreview.bind( this );
 
 			this.state = {
+				editingURL: false,
 				fetching: !! this.props.attributes.url && ! this.props.preview,
 				url: this.props.attributes.url,
 			};
@@ -87,6 +88,7 @@ export function getEmbedEdit( title, icon ) {
 			}
 			const { url } = this.state;
 			const { setAttributes } = this.props;
+			this.setState( { editingURL: false } );
 			if ( url === this.props.attributes.url ) {
 				if ( this.props.preview ) {
 					// Form has been submitted without changing the url, and we already have a preview,
@@ -107,7 +109,7 @@ export function getEmbedEdit( title, icon ) {
 			const { url } = this.props.attributes;
 
 			if ( previewIsFallback ) {
-				this.setState( { fetching: false } );
+				this.setState( { fetching: false, editingURL: true } );
 				return;
 			}
 
@@ -151,17 +153,17 @@ export function getEmbedEdit( title, icon ) {
 		}
 
 		switchBackToURLInput() {
-			this.setState( { html: undefined } );
+			this.setState( { editingURL: true } );
 		}
 
 		render() {
-			const { fetching, url } = this.state;
-			const { caption } = this.props.attributes;
+			const { fetching, url, editingURL } = this.state;
+			const { caption, type } = this.props.attributes;
 			const { setAttributes, isSelected, className, preview, previewIsFallback } = this.props;
 			const controls = (
 				<BlockControls>
 					<Toolbar>
-						{ ( html && <IconButton
+						{ ( preview && ! previewIsFallback && <IconButton
 							className="components-toolbar__control"
 							label={ __( 'Edit URL' ) }
 							icon="edit"
@@ -180,7 +182,7 @@ export function getEmbedEdit( title, icon ) {
 				);
 			}
 
-			if ( ! preview || previewIsFallback ) {
+			if ( ! preview || previewIsFallback || editingURL ) {
 				// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
 				const label = sprintf( __( '%s URL' ), title );
 
@@ -205,7 +207,6 @@ export function getEmbedEdit( title, icon ) {
 				);
 			}
 
-			const { type } = preview;
 			const html = 'photo' === type ? this.getPhotoHtml( preview ) : preview.html;
 			const parsedUrl = parse( url );
 			const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedUrl.host.replace( /^www\./, '' ) );
