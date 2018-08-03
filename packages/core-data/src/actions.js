@@ -6,7 +6,10 @@ import { castArray } from 'lodash';
 /**
  * Internal dependencies
  */
-import { receiveQueriedItems } from './queried-data';
+import {
+	receiveItems,
+	receiveQueriedItems,
+} from './queried-data';
 
 /**
  * Returns an action object used in signalling that terms have been received
@@ -66,8 +69,15 @@ export function addEntities( entities ) {
  * @return {Object} Action object.
  */
 export function receiveEntityRecords( kind, name, records, query ) {
+	let action;
+	if ( query ) {
+		action = receiveQueriedItems( records, query );
+	} else {
+		action = receiveItems( records );
+	}
+
 	return {
-		...receiveQueriedItems( records, query ),
+		...action,
 		kind,
 		name,
 	};
