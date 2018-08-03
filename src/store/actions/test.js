@@ -2,7 +2,9 @@
 
 import * as actions from './';
 import ActionTypes from './ActionTypes';
-import { buildEmptyBlock }  from '../block-builder';
+// Gutenberg imports
+import { getBlockType, serialize, createBlock } from '@wordpress/blocks';
+import { registerCoreBlocks } from '@gutenberg/core-blocks';
 
 describe( 'Store', () => {
 	describe( 'actions', () => {
@@ -35,9 +37,10 @@ describe( 'Store', () => {
 		} );
 
 		it( 'should create an action to create a block', () => {
-			const action = actions.createBlockAction( '1', buildEmptyBlock('1', 'paragraph') );
+			registerCoreBlocks();
+			const newBlock = createBlock( 'core/code', { content: 'new test text for a core/code block' } );
+			const action = actions.createBlockAction( '1', newBlock );
 			expect( action.type ).toEqual( ActionTypes.BLOCK.CREATE );
-			expect( action.block.uid ).toEqual( '1' );
 		} );
 
 	} );
