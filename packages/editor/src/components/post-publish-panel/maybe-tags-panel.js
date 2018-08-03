@@ -10,6 +10,7 @@ import { PanelBody } from '@wordpress/components';
 import FlatTermSelector from '../post-taxonomies/flat-term-selector';
 
 const TagsPanel = () => <PanelBody initialOpen={ false } title={ [
+	__( 'Tip:' ),
 	<span className="editor-post-publish-panel__link" key="label">{
 		__( 'Add tags to your post' )
 	}</span>,

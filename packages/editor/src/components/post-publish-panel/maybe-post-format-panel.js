@@ -21,6 +21,7 @@ const PostFormatSuggested = ( { suggestion, onUpdatePostFormat } ) => <Button is
 </Button>;
 
 const PostFormatPanel = ( { suggestion, onUpdatePostFormat } ) => <PanelBody initialOpen={ false } title={ [
+	__( 'Tip:' ),
 	<span className="editor-post-publish-panel__link" key="label">{
 		__( 'Add a post format' )
 	}</span>,
