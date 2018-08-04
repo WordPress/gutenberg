@@ -113,7 +113,7 @@ class Block_Type_Test extends WP_UnitTestCase {
 	}
 
 	function test_prepare_array_attributes() {
-		$expectedResults = array(
+		$expected_results = array(
 			'correct'                   => array( 'z', 'y', 'x' ),
 			'correctDefaulted'          => array( 'a', 'b', 'c' ),
 			'arrayWithNumbers'          => array( 4, 5, 6 ),
@@ -137,20 +137,16 @@ class Block_Type_Test extends WP_UnitTestCase {
 			'attributes' => array(
 				'correct'                   => array(
 					'type'    => 'array',
-					'default' => array(
-						'a',
-						'b',
-						'c'
-					)
+					'default' => array( 'a', 'b', 'c' ),
 				),
 				'correctDefaulted'          => array(
 					'type'    => 'array',
-					'default' => array( 'a', 'b', 'c' )
+					'default' => array( 'a', 'b', 'c' ),
 				),
 				'arrayWithNumbers'          => array(
 					'type'  => 'array',
 					'items' => array(
-						'type' => 'number'
+						'type' => 'number',
 					),
 				),
 				'correctArrayWithEnum'      => array(
@@ -161,7 +157,7 @@ class Block_Type_Test extends WP_UnitTestCase {
 							'option1',
 							'option2',
 							'option3',
-						)
+						),
 					),
 				),
 				'missingDefaulted'          => array(
@@ -176,7 +172,7 @@ class Block_Type_Test extends WP_UnitTestCase {
 							'option1',
 							'option2',
 							'option3',
-						)
+						),
 					),
 				),
 				'wrongArrayWithDefaultEnum' => array(
@@ -191,16 +187,16 @@ class Block_Type_Test extends WP_UnitTestCase {
 							'option1',
 							'option2',
 							'option3',
-						)
+						),
 					),
 				),
 				'wrongType'                 => array(
 					'type' => 'array',
-				)
-			)
+				),
+			),
 		) );
 
-		$prepared_attributes = $block_type->prepare_attributes_for_render( $expectedResults );
+		$prepared_attributes = $block_type->prepare_attributes_for_render( $expected_results );
 
 		$this->assertEquals( array(
 			'correct'                   => array( 'z', 'y', 'x' ),

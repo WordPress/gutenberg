@@ -138,7 +138,7 @@ class WP_Block_Type {
 			// when an array attribute lacks an items entry, provide a default one which checks for the string type.
 			if ( 'array' === $this->attributes[ $attribute_name ]['type'] && ! isset( $schema['items'] ) ) {
 				$schema['items'] = array(
-					'type' => 'string'
+					'type' => 'string',
 				);
 			}
 
