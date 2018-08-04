@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { addQueryArgs } from '@wordpress/url';
+
+/**
  * Internal dependencies
  */
 import { withWeakMapCache } from '../utils';
@@ -47,13 +52,16 @@ export function getQueryParts( query ) {
 				break;
 
 			default:
-				// While it's not required to be one, for simplicity's sake
-				// mimic querystring encoding for stable key.
+				// While it could be any deterministic string, for simplicity's
+				// sake mimic querystring encoding for stable key.
+				//
+				// TODO: For consistency with PHP implementation, addQueryArgs
+				// should accept a key value pair, which may optimize its
+				// implementation for our use here, vs. iterating an object
+				// with only a single key.
 				parts.stableKey += (
 					( parts.stableKey ? '&' : '' ) +
-					encodeURIComponent( key ) +
-					'=' +
-					encodeURIComponent( value )
+					addQueryArgs( '', { [ key ]: value } ).slice( 1 )
 				);
 		}
 	}

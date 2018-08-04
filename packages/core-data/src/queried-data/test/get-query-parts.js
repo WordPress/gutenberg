@@ -26,6 +26,16 @@ describe( 'getQueryParts', () => {
 		} );
 	} );
 
+	it( 'encodes deep values', () => {
+		const parts = getQueryParts( { a: [ 1, 2 ] } );
+
+		expect( parts ).toEqual( {
+			page: 1,
+			perPage: 10,
+			stableKey: 'a%5B0%5D=1&a%5B1%5D=2',
+		} );
+	} );
+
 	it( 'encodes stable string key with page data normalized to number', () => {
 		const first = getQueryParts( { b: 2, page: 1, perPage: 10 } );
 		const second = getQueryParts( { b: 2, page: '1', perPage: '10' } );
