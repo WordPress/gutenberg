@@ -75,12 +75,15 @@ class Block_Type_Test extends WP_UnitTestCase {
 	}
 
 	function test_prepare_attributes() {
-		$attributes = array(
-			'correct'            => 'include',
+		$correct_attributes = array(
+			'correct'   => 'include',
+			/* missingDefaulted */
+			'undefined' => 'omit',
+		);
+
+		$wrong_attributes = array(
 			'wrongType'          => 5,
 			'wrongTypeDefaulted' => 5,
-			/* missingDefaulted */
-			'undefined'          => 'omit',
 		);
 
 		$block_type = new WP_Block_Type( 'core/dummy', array(
@@ -102,14 +105,26 @@ class Block_Type_Test extends WP_UnitTestCase {
 			),
 		) );
 
-		$prepared_attributes = $block_type->prepare_attributes_for_render( $attributes );
+		$prepared_correct_attributes = $block_type->prepare_attributes_for_render( $correct_attributes );
 
 		$this->assertEquals( array(
 			'correct'            => 'include',
 			'wrongType'          => null,
 			'wrongTypeDefaulted' => 'defaulted',
 			'missingDefaulted'   => 'define',
-		), $prepared_attributes );
+		), $prepared_correct_attributes );
+
+		// in for this case we are expecting a _doing_it_wrong notice since the attributes don't match their type.
+		$this->setExpectedIncorrectUsage( 'prepare_attributes_for_render' );
+
+		$prepared_incorrect_attributes = $block_type->prepare_attributes_for_render( $wrong_attributes );
+
+		$this->assertEquals( array(
+			'correct'            => null,
+			'wrongType'          => null,
+			'wrongTypeDefaulted' => 'defaulted',
+			'missingDefaulted'   => 'define',
+		), $prepared_incorrect_attributes );
 	}
 
 	function render_dummy_block( $attributes ) {
