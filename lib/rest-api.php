@@ -19,6 +19,20 @@ function gutenberg_register_rest_routes() {
 	$controller = new WP_REST_Block_Renderer_Controller();
 	$controller->register_routes();
 
+	/**
+	 * Filters the search handlers to use in the REST search controller.
+	 *
+	 * @since 3.3.0
+	 *
+	 * @param array $search_handlers List of search handlers to use in the controller. Each search
+	 *                               handler instance must extend the `WP_REST_Search_Handler` class.
+	 *                               Default is only a handler for posts.
+	 */
+	$search_handlers = apply_filters( 'wp_rest_search_handlers', array( new WP_REST_Post_Search_Handler() ) );
+
+	$controller = new WP_REST_Search_Controller( $search_handlers );
+	$controller->register_routes();
+
 	foreach ( get_post_types( array( 'show_in_rest' => true ), 'objects' ) as $post_type ) {
 		$class = ! empty( $post_type->rest_controller_class ) ? $post_type->rest_controller_class : 'WP_REST_Posts_Controller';
 
@@ -247,6 +261,22 @@ function gutenberg_add_target_schema_to_links( $response, $post, $request ) {
 			);
 		}
 	}
+	if ( 'edit' === $request['context'] && current_user_can( 'unfiltered_html' ) ) {
+		$new_links['https://api.w.org/action-unfiltered_html'] = array(
+			array(
+				'title'        => __( 'The current user can post HTML markup and JavaScript.', 'gutenberg' ),
+				'href'         => $orig_href,
+				'targetSchema' => array(
+					'type'       => 'object',
+					'properties' => array(
+						'unfiltered_html' => array(
+							'type' => 'boolean',
+						),
+					),
+				),
+			),
+		);
+	}
 	if ( 'edit' === $request['context'] ) {
 		if ( current_user_can( $post_type->cap->publish_posts ) ) {
 			$new_links['https://api.w.org/action-publish'] = array(
@@ -471,14 +501,15 @@ add_filter( 'rest_request_before_callbacks', 'gutenberg_handle_early_callback_ch
  *
  * @see https://core.trac.wordpress.org/ticket/43998
  *
- * @param array  $query_params JSON Schema-formatted collection parameters.
- * @param string $post_type    Post type being accessed.
+ * @param array        $query_params JSON Schema-formatted collection parameters.
+ * @param WP_Post_Type $post_type    Post type object being accessed.
  * @return array
  */
 function gutenberg_filter_post_collection_parameters( $query_params, $post_type ) {
-	$post_types = array( 'page', 'wp_block' );
-	if ( in_array( $post_type->name, $post_types, true )
-		&& isset( $query_params['per_page'] ) ) {
+	if (
+		isset( $query_params['per_page'] ) &&
+		( $post_type->hierarchical || 'wp_block' === $post_type->name )
+	) {
 		// Change from '1' to '-1', which means unlimited.
 		$query_params['per_page']['minimum'] = -1;
 		// Default sanitize callback is 'absint', which won't work in our case.
@@ -497,8 +528,10 @@ function gutenberg_filter_post_collection_parameters( $query_params, $post_type 
  * @return array
  */
 function gutenberg_filter_post_query_arguments( $prepared_args, $request ) {
-	$post_types = array( 'page', 'wp_block' );
-	if ( in_array( $prepared_args['post_type'], $post_types, true ) ) {
+	if (
+		is_post_type_hierarchical( $prepared_args['post_type'] ) ||
+		'wp_block' === $prepared_args['post_type']
+	) {
 		// Avoid triggering 'rest_post_invalid_page_number' error
 		// which will need to be addressed in https://core.trac.wordpress.org/ticket/43998.
 		if ( -1 === $prepared_args['posts_per_page'] ) {

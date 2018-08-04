@@ -161,7 +161,7 @@ export const settings = {
 								onChange={ toggleParallax }
 							/>
 							<RangeControl
-								label={ __( 'Background Dimness' ) }
+								label={ __( 'Background Opacity' ) }
 								value={ dimRatio }
 								onChange={ setDimRatio }
 								min={ 0 }

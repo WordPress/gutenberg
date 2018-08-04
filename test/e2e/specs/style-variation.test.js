@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage, insertBlock, getHTMLFromCodeEditor } from '../support/utils';
+import { newPost, newDesktopBrowserPage, insertBlock, getEditedPostContent } from '../support/utils';
 
 describe( 'adding blocks', () => {
 	beforeAll( async () => {
@@ -25,7 +25,7 @@ describe( 'adding blocks', () => {
 		await styleVariations[ 1 ].click();
 
 		// Check the content
-		const content = await getHTMLFromCodeEditor();
+		const content = await getEditedPostContent();
 		expect( content ).toMatchSnapshot();
 	} );
 } );

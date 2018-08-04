@@ -8,7 +8,12 @@
 		@include loading_fade;
 	}
 
+	&__content-wrapper {
+		flex-grow: 1;
+	}
+
 	&__textlink {
+		display: inline-block;
 		color: $blue-medium-700;
 		min-width: 1em;
 		text-decoration: underline;
@@ -17,11 +22,6 @@
 			box-shadow: none;
 			color: $blue-medium-700;
 		}
-	}
-
-	&__textlink-placeholder {
-		opacity: .5;
-		text-decoration: underline;
 	}
 
 	&__button-richtext-wrapper {

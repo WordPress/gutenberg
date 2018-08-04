@@ -4,7 +4,6 @@
 import { get, isUndefined, pickBy } from 'lodash';
 import moment from 'moment';
 import classnames from 'classnames';
-import { stringify } from 'querystringify';
 
 /**
  * WordPress dependencies
@@ -21,12 +20,13 @@ import {
 	withAPIData,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { decodeEntities } from '@wordpress/utils';
+import { decodeEntities } from '@wordpress/html-entities';
 import {
 	InspectorControls,
 	BlockAlignmentToolbar,
 	BlockControls,
 } from '@wordpress/editor';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -160,19 +160,19 @@ class LatestPostsEdit extends Component {
 
 export default withAPIData( ( props ) => {
 	const { postsToShow, order, orderBy, categories } = props.attributes;
-	const latestPostsQuery = stringify( pickBy( {
+	const latestPostsQuery = pickBy( {
 		categories,
 		order,
 		orderby: orderBy,
 		per_page: postsToShow,
 		_fields: [ 'date_gmt', 'link', 'title' ],
-	}, ( value ) => ! isUndefined( value ) ) );
-	const categoriesListQuery = stringify( {
+	}, ( value ) => ! isUndefined( value ) );
+	const categoriesListQuery = {
 		per_page: 100,
 		_fields: [ 'id', 'name', 'parent' ],
-	} );
+	};
 	return {
-		latestPosts: `/wp/v2/posts?${ latestPostsQuery }`,
-		categoriesList: `/wp/v2/categories?${ categoriesListQuery }`,
+		latestPosts: addQueryArgs( '/wp/v2/posts', latestPostsQuery ),
+		categoriesList: addQueryArgs( '/wp/v2/categories', categoriesListQuery ),
 	};
 } )( LatestPostsEdit );

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import Shallow from 'react-test-renderer/shallow';
+const ShallowRenderer = new Shallow();
 /**
  * Internal dependencies
  */
@@ -17,12 +18,12 @@ describe( 'core/more/edit', () => {
 		attributes.noTeaser = false;
 	} );
 	test( 'should match snapshot when noTeaser is false', () => {
-		const wrapper = shallow( <MoreEdit attributes={ attributes } /> );
-		expect( wrapper ).toMatchSnapshot();
+		ShallowRenderer.render( <MoreEdit attributes={ attributes } /> );
+		expect( ShallowRenderer.getRenderOutput() ).toMatchSnapshot();
 	} );
 	test( 'should match snapshot when noTeaser is true', () => {
 		attributes.noTeaser = true;
-		const wrapper = shallow( <MoreEdit attributes={ attributes } /> );
-		expect( wrapper ).toMatchSnapshot();
+		ShallowRenderer.render( <MoreEdit attributes={ attributes } /> );
+		expect( ShallowRenderer.getRenderOutput() ).toMatchSnapshot();
 	} );
 } );

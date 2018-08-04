@@ -1,26 +1,18 @@
 /**
  * External dependencies
  */
-const { isArray, map } = require( 'lodash' );
-const babelPluginTransformReactJSX = require( 'babel-plugin-transform-react-jsx' );
-const babelPresetEnv = require( 'babel-preset-env' );
+const { get, map } = require( 'lodash' );
+const babel = require( '@babel/core' );
 
 /**
  * WordPress dependencies
  */
-const babelDefaultConfig = require( '@wordpress/babel-preset-default' );
-
-const plugins = map( babelDefaultConfig.plugins, ( plugin ) => {
-	if ( isArray( plugin ) && plugin[ 0 ] === babelPluginTransformReactJSX ) {
-		// TODO: It should become the default value when all modules are moved to packages.
-		return [ babelPluginTransformReactJSX, { pragma: 'createElement' } ];
-	}
-
-	return plugin;
+const { options: babelDefaultConfig } = babel.loadPartialConfig( {
+	configFile: '@wordpress/babel-preset-default',
 } );
-
+const plugins = babelDefaultConfig.plugins;
 if ( ! process.env.SKIP_JSX_PRAGMA_TRANSFORM ) {
-	plugins.push( [ require( '../../packages/babel-plugin-import-jsx-pragma' ).default, {
+	plugins.push( [ '@wordpress/babel-plugin-import-jsx-pragma', {
 		scopeVariable: 'createElement',
 		source: '@wordpress/element',
 		isDefault: false,
@@ -32,13 +24,12 @@ const babelConfigs = {
 		{},
 		babelDefaultConfig,
 		{
-			babelrc: false,
 			plugins,
 			presets: map( babelDefaultConfig.presets, ( preset ) => {
-				if ( isArray( preset ) && preset[ 0 ] === babelPresetEnv ) {
-					return [ babelPresetEnv, Object.assign(
+				if ( get( preset, [ 'file', 'request' ] ) === '@babel/preset-env' ) {
+					return [ '@babel/preset-env', Object.assign(
 						{},
-						preset[ 1 ],
+						preset.options,
 						{ modules: 'commonjs' }
 					) ];
 				}
@@ -50,7 +41,6 @@ const babelConfigs = {
 		{},
 		babelDefaultConfig,
 		{
-			babelrc: false,
 			plugins,
 		}
 	),

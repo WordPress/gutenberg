@@ -4,6 +4,7 @@
 import { registerCoreBlocks } from '@wordpress/core-blocks';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import { dispatch } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -52,6 +53,14 @@ export function reinitializeEditor( postType, postId, target, settings, override
 export function initializeEditor( id, postType, postId, settings, overridePost ) {
 	const target = document.getElementById( id );
 	const reboot = reinitializeEditor.bind( null, postType, postId, target, settings, overridePost );
+
+	// Global deprecations which cannot otherwise be injected into known usage.
+	deprecated( 'paragraphs block class set is-small-text, ..., is-large-text', {
+		version: '3.6',
+		alternative: 'has-small-font-size, ..., has-large-font-size class set',
+		plugin: 'Gutenberg',
+		hint: 'If paragraphs using this classes are opened in the editor new classes are automatically applied the post just needs to be saved. This is a global warning, shown regardless of whether the classes are used in the current post.',
+	} );
 
 	registerCoreBlocks();
 

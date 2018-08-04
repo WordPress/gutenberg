@@ -10,7 +10,6 @@ $z-layers: (
 	'.editor-block-list__block {core/image aligned wide or fullwide}': 20,
 	'.freeform-toolbar': 10,
 	'.editor-block-list__breadcrumb': 1,
-	'.editor-warning': 1,
 	'.components-form-toggle__input': 1,
 	'.editor-inserter__tabs': 1,
 	'.editor-inserter__tab.is-active': 1,
@@ -21,6 +20,7 @@ $z-layers: (
 	'.components-popover__close': 5,
 	'.editor-block-list__insertion-point': 5,
 	'.editor-inserter-with-shortcuts': 5,
+	'.editor-warning': 6,
 	'.core-blocks-gallery-item__inline-menu': 20,
 	'.editor-url-input__suggestions': 30,
 	'.edit-post-header': 30,
@@ -39,7 +39,7 @@ $z-layers: (
 
 	// Should have higher index than the inset/underlay used for dragging
 	'.components-placeholder__fieldset': 1,
-	'.editor-block-list__block-edit .shared-block-edit-panel *': 1,
+	'.editor-block-list__block-edit .reusable-block-edit-panel *': 1,
 
 	// Show drop zone above most standard content, but below any overlays
 	'.components-drop-zone': 100,

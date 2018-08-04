@@ -17,19 +17,12 @@ function render_block_core_block( $attributes ) {
 		return '';
 	}
 
-	$shared_block = get_post( $attributes['ref'] );
-	if ( ! $shared_block || 'wp_block' !== $shared_block->post_type ) {
+	$reusable_block = get_post( $attributes['ref'] );
+	if ( ! $reusable_block || 'wp_block' !== $reusable_block->post_type ) {
 		return '';
 	}
 
-	$blocks = gutenberg_parse_blocks( $shared_block->post_content );
-
-	$block = array_shift( $blocks );
-	if ( ! $block ) {
-		return '';
-	}
-
-	return gutenberg_render_block( $block );
+	return do_blocks( $reusable_block->post_content );
 }
 
 register_block_type( 'core/block', array(

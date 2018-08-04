@@ -44,4 +44,29 @@ describe( 'reducer', () => {
 		// { test: { getFoo: EquivalentKeyMap( [] => false ) } }
 		expect( state.test.getFoo.get( [] ) ).toBe( false );
 	} );
+
+	it( 'different arguments should not conflict', () => {
+		const original = reducer( undefined, {
+			type: 'START_RESOLUTION',
+			reducerKey: 'test',
+			selectorName: 'getFoo',
+			args: [ 'post' ],
+		} );
+		let state = reducer( deepFreeze( original ), {
+			type: 'FINISH_RESOLUTION',
+			reducerKey: 'test',
+			selectorName: 'getFoo',
+			args: [ 'post' ],
+		} );
+		state = reducer( deepFreeze( state ), {
+			type: 'START_RESOLUTION',
+			reducerKey: 'test',
+			selectorName: 'getFoo',
+			args: [ 'block' ],
+		} );
+
+		// { test: { getFoo: EquivalentKeyMap( [] => false ) } }
+		expect( state.test.getFoo.get( [ 'post' ] ) ).toBe( false );
+		expect( state.test.getFoo.get( [ 'block' ] ) ).toBe( true );
+	} );
 } );

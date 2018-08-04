@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import apiRequest from '@wordpress/api-request';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -9,13 +9,13 @@ import apiRequest from '@wordpress/api-request';
 import { getCategories, getEntityRecord, getEntityRecords } from '../resolvers';
 import { receiveTerms, receiveEntityRecords, addEntities } from '../actions';
 
-jest.mock( '@wordpress/api-request' );
+jest.mock( '@wordpress/api-fetch', () => jest.fn() );
 
 describe( 'getCategories', () => {
 	const CATEGORIES = [ { id: 1 } ];
 
 	beforeAll( () => {
-		apiRequest.mockImplementation( ( options ) => {
+		apiFetch.mockImplementation( ( options ) => {
 			if ( options.path === '/wp/v2/categories?per_page=-1' ) {
 				return Promise.resolve( CATEGORIES );
 			}
@@ -39,7 +39,7 @@ describe( 'getEntityRecord', () => {
 	const POST = { id: 10, title: 'test' };
 
 	beforeAll( () => {
-		apiRequest.mockImplementation( ( options ) => {
+		apiFetch.mockImplementation( ( options ) => {
 			if ( options.path === '/wp/v2/types/post?context=edit' ) {
 				return Promise.resolve( POST_TYPE );
 			}
@@ -56,7 +56,7 @@ describe( 'getEntityRecord', () => {
 		const state = {
 			entities: {
 				config: [
-					{ name: 'postType', kind: 'root', baseUrl: '/wp/v2/types' },
+					{ name: 'postType', kind: 'root', baseURL: '/wp/v2/types' },
 				],
 			},
 		};
@@ -69,7 +69,7 @@ describe( 'getEntityRecord', () => {
 		const fulfillment = getEntityRecord( { entities: {} }, 'postType', 'post', 10 );
 		const receivedEntities = ( await fulfillment.next() ).value;
 		expect( receivedEntities ).toEqual( addEntities( [ {
-			baseUrl: '/wp/v2/posts',
+			baseURL: '/wp/v2/posts',
 			kind: 'postType',
 			name: 'post',
 		} ] ) );
@@ -85,7 +85,7 @@ describe( 'getEntityRecords', () => {
 	};
 
 	beforeAll( () => {
-		apiRequest.mockImplementation( ( options ) => {
+		apiFetch.mockImplementation( ( options ) => {
 			if ( options.path === '/wp/v2/types?context=edit' ) {
 				return Promise.resolve( POST_TYPES );
 			}
@@ -96,7 +96,7 @@ describe( 'getEntityRecords', () => {
 		const state = {
 			entities: {
 				config: [
-					{ name: 'postType', kind: 'root', baseUrl: '/wp/v2/types' },
+					{ name: 'postType', kind: 'root', baseURL: '/wp/v2/types' },
 				],
 			},
 		};

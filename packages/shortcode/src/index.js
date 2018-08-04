@@ -143,9 +143,9 @@ export function string( options ) {
  *
  * @return {RegExp} Shortcode RegExp.
  */
-export const regexp = memize( ( tag ) => {
+export function regexp( tag ) {
 	return new RegExp( '\\[(\\[?)(' + tag + ')(?![\\w-])([^\\]\\/]*(?:\\/(?!\\])[^\\]\\/]*)*?)(?:(\\/)\\]|\\](?:([^\\[]*(?:\\[(?!\\/\\2\\])[^\\[]*)*)(\\[\\/\\2\\]))?)(\\]?)', 'g' );
-} );
+}
 
 /**
  * Parse shortcode attributes.

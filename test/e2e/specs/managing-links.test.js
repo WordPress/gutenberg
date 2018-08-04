@@ -12,7 +12,7 @@ describe( 'Managing links', () => {
 
 	const setFixedToolbar = async ( b ) => {
 		await page.click( '.edit-post-more-menu button' );
-		const button = ( await page.$x( '//button[contains(text(), \'Fix Toolbar to Top\')]' ) )[ 0 ];
+		const button = ( await page.$x( "//button[contains(text(), 'Fix Toolbar to Top')]" ) )[ 0 ];
 		const buttonClassNameProperty = await button.getProperty( 'className' );
 		const buttonClassName = await buttonClassNameProperty.jsonValue();
 		const isSelected = buttonClassName.indexOf( 'is-selected' ) !== -1;

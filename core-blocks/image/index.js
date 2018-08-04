@@ -93,7 +93,7 @@ const schema = {
 export const settings = {
 	title: __( 'Image' ),
 
-	description: __( 'They\'re worth 1,000 words! Insert a single image.' ),
+	description: __( 'They’re worth 1,000 words! Insert a single image.' ),
 
 	icon: 'format-image',
 

@@ -7,21 +7,23 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, Fragment } from '@wordpress/element';
+import {
+	Component,
+	Fragment,
+} from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 import {
 	Dashicon,
 	IconButton,
 	withFallbackStyles,
 } from '@wordpress/components';
 import {
-	UrlInput,
+	URLInput,
 	RichText,
-	BlockControls,
-	BlockAlignmentToolbar,
 	ContrastChecker,
 	InspectorControls,
 	withColors,
-	PanelColor,
+	PanelColorSettings,
 } from '@wordpress/editor';
 
 /**
@@ -31,26 +33,23 @@ import './editor.scss';
 
 const { getComputedStyle } = window;
 
-const ContrastCheckerWithFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
+const FallbackStyles = withFallbackStyles( ( node, ownProps ) => {
 	const { textColor, backgroundColor } = ownProps;
+	const backgroundColorValue = backgroundColor && backgroundColor.value;
+	const textColorValue = textColor && textColor.value;
 	//avoid the use of querySelector if textColor color is known and verify if node is available.
-	const textNode = ! textColor && node ? node.querySelector( '[contenteditable="true"]' ) : null;
+	const textNode = ! textColorValue && node ? node.querySelector( '[contenteditable="true"]' ) : null;
 	return {
-		fallbackBackgroundColor: backgroundColor || ! node ? undefined : getComputedStyle( node ).backgroundColor,
-		fallbackTextColor: textColor || ! textNode ? undefined : getComputedStyle( textNode ).color,
+		fallbackBackgroundColor: backgroundColorValue || ! node ? undefined : getComputedStyle( node ).backgroundColor,
+		fallbackTextColor: textColorValue || ! textNode ? undefined : getComputedStyle( textNode ).color,
 	};
-} )( ContrastChecker );
+} );
 
 class ButtonEdit extends Component {
 	constructor() {
 		super( ...arguments );
 		this.nodeRef = null;
 		this.bindRef = this.bindRef.bind( this );
-		this.updateAlignment = this.updateAlignment.bind( this );
-	}
-
-	updateAlignment( nextAlign ) {
-		this.props.setAttributes( { align: nextAlign } );
 	}
 
 	bindRef( node ) {
@@ -67,6 +66,8 @@ class ButtonEdit extends Component {
 			textColor,
 			setBackgroundColor,
 			setTextColor,
+			fallbackBackgroundColor,
+			fallbackTextColor,
 			setAttributes,
 			isSelected,
 			className,
@@ -76,14 +77,10 @@ class ButtonEdit extends Component {
 			text,
 			url,
 			title,
-			align,
 		} = attributes;
 
 		return (
 			<Fragment>
-				<BlockControls>
-					<BlockAlignmentToolbar value={ align } onChange={ this.updateAlignment } />
-				</BlockControls>
 				<span className={ className } title={ title } ref={ this.bindRef }>
 					<RichText
 						tagName="span"
@@ -106,22 +103,31 @@ class ButtonEdit extends Component {
 						keepPlaceholderOnFocus
 					/>
 					<InspectorControls>
-						<PanelColor
-							colorValue={ backgroundColor.value }
-							title={ __( 'Background Color' ) }
-							onChange={ setBackgroundColor }
-						/>
-						<PanelColor
-							colorValue={ textColor.value }
-							title={ __( 'Text Color' ) }
-							onChange={ setTextColor }
-						/>
-						{ this.nodeRef && <ContrastCheckerWithFallbackStyles
-							node={ this.nodeRef }
-							textColor={ textColor.value }
-							backgroundColor={ backgroundColor.value }
-							isLargeText={ true }
-						/> }
+						<PanelColorSettings
+							title={ __( 'Color Settings' ) }
+							colorSettings={ [
+								{
+									value: backgroundColor.value,
+									onChange: setBackgroundColor,
+									label: __( 'Background Color' ),
+								},
+								{
+									value: textColor.value,
+									onChange: setTextColor,
+									label: __( 'Text Color' ),
+								},
+							] }
+						>
+							<ContrastChecker
+								{ ...{
+									isLargeText: true,
+									textColor: textColor.value,
+									backgroundColor: backgroundColor.value,
+									fallbackBackgroundColor,
+									fallbackTextColor,
+								} }
+							/>
+						</PanelColorSettings>
 					</InspectorControls>
 				</span>
 				{ isSelected && (
@@ -129,7 +135,7 @@ class ButtonEdit extends Component {
 						className="core-blocks-button__inline-link"
 						onSubmit={ ( event ) => event.preventDefault() }>
 						<Dashicon icon="admin-links" />
-						<UrlInput
+						<URLInput
 							value={ url }
 							onChange={ ( value ) => setAttributes( { url: value } ) }
 						/>
@@ -141,4 +147,7 @@ class ButtonEdit extends Component {
 	}
 }
 
-export default withColors( 'backgroundColor', { textColor: 'color' } )( ButtonEdit );
+export default compose( [
+	withColors( 'backgroundColor', { textColor: 'color' } ),
+	FallbackStyles,
+] )( ButtonEdit );
