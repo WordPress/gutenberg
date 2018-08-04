@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { createStore, applyMiddleware } from 'redux';
+import { createStore } from 'redux';
 import {
 	flowRight,
 	without,
@@ -13,7 +13,6 @@ import {
 /**
  * WordPress dependencies
  */
-import createControlsMiddleware from '@wordpress/redux-routine';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -139,13 +138,13 @@ export function createRegistry( storeConfigs = {} ) {
 	 * Registers a new sub-reducer to the global state and returns a Redux-like
 	 * store object.
 	 *
-	 * @param {string}           reducerKey Reducer key.
-	 * @param {Object}           reducer    Reducer function.
-	 * @param {?Array<Function>} enhancers  Optional store enhancers.
+	 * @param {string} reducerKey Reducer key.
+	 * @param {Object} reducer    Reducer function.
 	 *
 	 * @return {Object} Store Object.
 	 */
-	function registerReducer( reducerKey, reducer, enhancers = [] ) {
+	function registerReducer( reducerKey, reducer ) {
+		const enhancers = [];
 		if ( window.__REDUX_DEVTOOLS_EXTENSION__ ) {
 			enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__( { name: reducerKey, instanceId: reducerKey } ) );
 		}
@@ -301,13 +300,7 @@ export function createRegistry( storeConfigs = {} ) {
 			throw new TypeError( 'Must specify store reducer' );
 		}
 
-		let enhancers;
-		if ( options.controls ) {
-			const controlsMiddleware = createControlsMiddleware( options.controls );
-			enhancers = [ applyMiddleware( controlsMiddleware ) ];
-		}
-
-		const store = registerReducer( reducerKey, options.reducer, enhancers );
+		const store = registerReducer( reducerKey, options.reducer );
 
 		if ( options.actions ) {
 			registerActions( reducerKey, options.actions );

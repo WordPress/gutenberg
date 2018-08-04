@@ -229,7 +229,9 @@ function gutenberg_register_scripts_and_styles() {
 			'		localStorage[ storageKey ] = localStorage[ oldStorageKey ];',
 			'		delete localStorage[ oldStorageKey ];',
 			'	}',
-			'	wp.data.use( wp.data.plugins.persistence, { storageKey: storageKey } );',
+			'	wp.data',
+			'		.use( wp.data.plugins.persistence, { storageKey: storageKey } )',
+			'		.use( wp.data.plugins.controls );',
 			'} )()',
 		) )
 	);
