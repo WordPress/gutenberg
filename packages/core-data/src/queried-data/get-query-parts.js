@@ -43,7 +43,7 @@ export function getQueryParts( query ) {
 		switch ( key ) {
 			case 'page':
 			case 'perPage':
-				parts[ key ] = value;
+				parts[ key ] = Number( value );
 				break;
 
 			default:
