@@ -7,7 +7,7 @@
 ```jsx
 import { navigateRegions } from '@wordpress/components';
 
-const MyNavigateRegions = navigateRegions( 
+const MyLayout = navigateRegions( 
 	() => (
 		<div>
 			<div role="region" tabIndex="-1" aria-label="Header">Header</div>
