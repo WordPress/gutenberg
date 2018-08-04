@@ -1,3 +1,10 @@
+---
+example:
+	component: MySelectControl
+	lang: jsx
+	position: 0
+---
+
 # SelectControl
 
 SelectControl component is used to generate select input fields.
