@@ -7,15 +7,41 @@
 Wrap your original component with `withContext`, defining a key of context to receive and an optional mapping function.
 
 ```jsx
-function OriginalComponent( { favoriteColor } ) {
-	return <div>Your favorite color is: { favoriteColor }</div>;
+import PropTypes from 'prop-types';
+import { withContext } from '@wordpress/components';
+
+class Settings extends React.Component {
+	getChildContext() {
+		return { 
+			settings: {
+				favoriteColor: 'purple', 
+			},
+		};
+	}
+	
+	render() {
+		return this.props.children;
+	}
 }
 
-const EnhancedComponent = withContext( 'settings' )( ( settings ) => {
-	return {
-		favoriteColor: settings.favoriteColor
-	};
-} )( OriginalComponent );
+Settings.childContextTypes = {
+	settings: PropTypes.object,
+};
+
+const EnhancedComponent = withContext( 'settings' )(
+	( settings ) => {
+		console.log(settings);
+		return { favoriteColor: settings.favoriteColor } 
+	}
+)(
+	( { favoriteColor } ) => <div>Your favorite color is: { favoriteColor }</div>
+);
+
+const MyFavoriteColor = () => (
+	<Settings>
+		<EnhancedComponent />
+	</Settings>
+);
 ```
 
 The above example assumes that an ancestor component provides a `settings` context containing a key `favoriteColor`. When the enhanced component is rendered, the favorite color setting will be injected as a prop.
