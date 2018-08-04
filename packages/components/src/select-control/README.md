@@ -1,7 +1,3 @@
----
-example: MySelectControl
----
-
 # SelectControl
 
 SelectControl component is used to generate select input fields.
