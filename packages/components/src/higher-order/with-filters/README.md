@@ -7,14 +7,14 @@ Wrapping a component with `withFilters` provides a filtering capability controll
 ## Usage
 
 ```jsx
-import { withFilters, Button } from '@wordpress/components';
+import { withFilters } from '@wordpress/components';
 import { addFilter } from '@wordpress/hooks';
 
 const ComposedComponent = () => <div>Composed component</div>;
 
 addFilter(
 	'MyHookName',
-	'test/enhanced-component',
+	'example/filtered-component',
 	( FilteredComponent ) => () => (
 		<div>
 			<FilteredComponent />
