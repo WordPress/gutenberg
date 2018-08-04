@@ -15,7 +15,7 @@ const MyTextControl = withState( {
 	className: '',
 } )( ( { className, setState } ) => ( 
 	<TextControl
-		label={ 'Additional CSS Class' }
+		label="Additional CSS Class"
 		value={ className }
 		onChange={ ( className ) => setState( { className } ) }
 	/>
