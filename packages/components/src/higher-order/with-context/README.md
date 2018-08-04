@@ -34,7 +34,7 @@ const EnhancedComponent = withContext( 'settings' )(
 	( { favoriteColor } ) => <div>Your favorite color is: { favoriteColor }</div>
 );
 
-const MyFavoriteColor = () => (
+const MyComponentWithContext = () => (
 	<Settings>
 		<EnhancedComponent />
 	</Settings>

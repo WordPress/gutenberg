@@ -12,7 +12,7 @@ import { withState } from '@wordpress/compose';
 
 const ConstrainedTabbing = withConstrainedTabbing( ( { children } ) => children );
 
-const MyConstrainedTabbing = withState( {
+const MyComponentWithConstrainedTabbing = withState( {
 	isConstrainedTabbing: false,
 } )( ( { isConstrainedTabbing, setState } ) => { 
 	let form = (

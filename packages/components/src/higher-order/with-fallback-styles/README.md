@@ -7,7 +7,7 @@ import { withFallbackStyles, Button } from '@wordpress/components';
 
 const { getComputedStyle } = window;
 
-const MyButton = withFallbackStyles( ( node, ownProps ) => {
+const MyComponentWithFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
 	const buttonNode = node.querySelector( 'button' );
 	return {
 		fallbackBackgroundColor: getComputedStyle( buttonNode ).backgroundColor,

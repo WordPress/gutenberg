@@ -23,7 +23,7 @@ addFilter(
 	)
 );
 
-const MyFilteredComponent = withFilters( 'MyHookName' )( 
+const MyComponentWithFilters = withFilters( 'MyHookName' )( 
 	() => <div>My component</div> 
 );
 ```
