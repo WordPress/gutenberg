@@ -29,10 +29,7 @@ Settings.childContextTypes = {
 };
 
 const EnhancedComponent = withContext( 'settings' )(
-	( settings ) => {
-		console.log(settings);
-		return { favoriteColor: settings.favoriteColor } 
-	}
+	( settings ) => ( { favoriteColor: settings.favoriteColor } )
 )(
 	( { favoriteColor } ) => <div>Your favorite color is: { favoriteColor }</div>
 );
