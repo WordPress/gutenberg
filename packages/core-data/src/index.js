@@ -10,7 +10,6 @@ import reducer from './reducer';
 import * as selectors from './selectors';
 import * as actions from './actions';
 import * as resolvers from './resolvers';
-import * as controls from './controls';
 import { defaultEntities, getMethodName } from './entities';
 import { REDUCER_KEY } from './name';
 
@@ -27,7 +26,6 @@ const entitySelectors = createEntityRecordGetter( selectors );
 const store = registerStore( REDUCER_KEY, {
 	reducer,
 	actions,
-	controls,
 	selectors: { ...selectors, ...entitySelectors },
 	resolvers: { ...resolvers, ...entityResolvers },
 } );

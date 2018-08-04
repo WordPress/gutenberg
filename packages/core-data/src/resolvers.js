@@ -12,7 +12,6 @@ import apiFetch from '@wordpress/api-fetch';
  * Internal dependencies
  */
 import {
-	fetchFromAPI,
 	receiveTerms,
 	receiveUserQuery,
 	receiveEntityRecords,
@@ -24,16 +23,16 @@ import { getKindEntities } from './entities';
  * Requests categories from the REST API, yielding action objects on request
  * progress.
  */
-export function* getCategories() {
-	const categories = yield fetchFromAPI( { path: '/wp/v2/categories?per_page=-1' } );
+export async function* getCategories() {
+	const categories = await apiFetch( { path: '/wp/v2/categories?per_page=-1' } );
 	yield receiveTerms( 'categories', categories );
 }
 
 /**
  * Requests authors from the REST API.
  */
-export function* getAuthors() {
-	const users = yield fetchFromAPI( { path: '/wp/v2/users/?who=authors&per_page=-1' } );
+export async function* getAuthors() {
+	const users = await apiFetch( { path: '/wp/v2/users/?who=authors&per_page=-1' } );
 	yield receiveUserQuery( 'authors', users );
 }
 
@@ -75,7 +74,7 @@ export async function* getEntityRecords( state, kind, name ) {
 /**
  * Requests theme supports data from the index.
  */
-export function* getThemeSupports() {
-	const index = yield fetchFromAPI( { path: '/' } );
+export async function* getThemeSupports() {
+	const index = await apiFetch( { path: '/' } );
 	yield receiveThemeSupportsFromIndex( index );
 }

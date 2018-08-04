@@ -223,34 +223,20 @@ export function createRegistry( storeConfigs = {} ) {
 				let fulfillment = resolver.fulfill( state, ...args );
 
 				// Attempt to normalize fulfillment as async iterable.
-				if ( isGenerator( fulfillment ) ) {
-					// Override original fulfillment to trigger resolution
-					// finish once deferred yielded result is completed.
-					const originalFulfillment = fulfillment;
-					fulfillment = ( function* () {
-						yield* originalFulfillment;
-						finishResolution( reducerKey, selectorName, args );
-					}() );
-				} else {
-					// Attempt to normalize fulfillment as async iterable.
-					fulfillment = toAsyncIterable( fulfillment );
-					if ( isAsyncIterable( fulfillment ) ) {
-						deprecated( 'Asynchronous iterable resolvers', {
-							alternative: 'synchronous generators with `controls` plugin',
-							plugin: 'Gutenberg',
-							version: '3.7',
-						} );
-
-						for await ( const maybeAction of fulfillment ) {
-							// Dispatch if it quacks like an action.
-							if ( isActionLike( maybeAction ) ) {
-								store.dispatch( maybeAction );
-							}
-						}
-					}
-
+				fulfillment = toAsyncIterable( fulfillment );
+				if ( ! isAsyncIterable( fulfillment ) ) {
 					finishResolution( reducerKey, selectorName, args );
+					return;
 				}
+
+				for await ( const maybeAction of fulfillment ) {
+					// Dispatch if it quacks like an action.
+					if ( isActionLike( maybeAction ) ) {
+						store.dispatch( maybeAction );
+					}
+				}
+
+				finishResolution( reducerKey, selectorName, args );
 			}
 
 			if ( typeof resolver.isFulfilled === 'function' ) {
