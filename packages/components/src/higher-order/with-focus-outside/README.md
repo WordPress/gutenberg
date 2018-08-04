@@ -11,7 +11,7 @@ __Note:__ `withFocusOutside` must only be used to wrap the `Component` class.
 ```jsx
 import { withFocusOutside, TextControl } from '@wordpress/components';
 
-const MyEnhancedComponent = withFocusOutside(
+const MyComponentWithFocusOutside = withFocusOutside(
 	class extends React.Component {
 		handleFocusOutside() {
 			console.log( 'Focus outside' );
