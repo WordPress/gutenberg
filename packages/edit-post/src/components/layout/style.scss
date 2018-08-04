@@ -202,28 +202,40 @@
 }
 
 .edit-post-toggle-publish-panel {
-	position: absolute;
-	bottom: 0;
+	position: fixed;
+	top: -9999em;
+	bottom: auto;
+	left: auto;
 	right: 0;
 	z-index: z-index(".edit-post-toggle-publish-panel");
+	padding: 10px 10px 10px 0;
 	width: $sidebar-width;
-	height: 0;
-	overflow: hidden;
-	&:focus-within {
-		height: auto;
-		padding: 20px 0 0 0;
+
+	&:focus {
+		top: auto;
+		bottom: 0;
 	}
 
 	.edit-post-toggle-publish-panel__button {
-		float: right;
 		width: auto;
 		height: auto;
+		display: block;
 		font-size: 14px;
 		font-weight: 600;
+		margin: 0 0 0 auto;
 		padding: 15px 23px 14px;
 		line-height: normal;
 		text-decoration: none;
 		outline: none;
 		background: #f1f1f1;
+		color: theme( secondary );
+
+		&:focus {
+			position: fixed;
+			top: auto;
+			right: 10px;
+			bottom: 10px;
+			left: auto;
+		}
 	}
 }
