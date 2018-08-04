@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import isGenerator from './is-generator';
+import castError from './cast-error';
 
 /**
  * Creates a Redux middleware, given an object of controls where each key is an
@@ -32,9 +33,10 @@ export default function createMiddleware( controls = {} ) {
 
 				if ( routine instanceof Promise ) {
 					// Async control routine awaits resolution.
-					routine.then( ( result ) => {
-						step( action.next( result ).value );
-					} );
+					routine.then(
+						( result ) => step( action.next( result ).value ),
+						( error ) => action.throw( castError( error ) ),
+					);
 				} else if ( routine !== undefined ) {
 					// Sync control routine steps synchronously.
 					step( action.next( routine ).value );

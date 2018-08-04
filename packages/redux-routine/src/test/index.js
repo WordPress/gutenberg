@@ -60,6 +60,48 @@ describe( 'createMiddleware', () => {
 		} );
 	} );
 
+	it( 'should throw if promise rejects', ( done ) => {
+		const middleware = createMiddleware( {
+			WAIT_FAIL: () => new Promise( ( resolve, reject ) => {
+				setTimeout( () => reject( 'Message' ), 0 );
+			} ),
+		} );
+		const store = createStoreWithMiddleware( middleware );
+		function* createAction() {
+			try {
+				yield { type: 'WAIT_FAIL' };
+			} catch ( error ) {
+				expect( error.message ).toBe( 'Message' );
+				done();
+			}
+		}
+
+		store.dispatch( createAction() );
+
+		jest.runAllTimers();
+	} );
+
+	it( 'should throw if promise throws', ( done ) => {
+		const middleware = createMiddleware( {
+			WAIT_FAIL: () => new Promise( () => {
+				throw new Error( 'Message' );
+			} ),
+		} );
+		const store = createStoreWithMiddleware( middleware );
+		function* createAction() {
+			try {
+				yield { type: 'WAIT_FAIL' };
+			} catch ( error ) {
+				expect( error.message ).toBe( 'Message' );
+				done();
+			}
+		}
+
+		store.dispatch( createAction() );
+
+		jest.runAllTimers();
+	} );
+
 	it( 'assigns sync controlled return value into yield assignment', () => {
 		const middleware = createMiddleware( {
 			RETURN_TWO: () => 2,
