@@ -1,8 +1,5 @@
 ---
-example:
-	component: MySelectControl
-	lang: jsx
-	position: 0
+example: MySelectControl
 ---
 
 # SelectControl
