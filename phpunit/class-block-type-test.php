@@ -112,6 +112,114 @@ class Block_Type_Test extends WP_UnitTestCase {
 		), $prepared_attributes );
 	}
 
+	function test_prepare_array_attributes() {
+		$expectedResults = array(
+			'correct'                   => array( 'z', 'y', 'x' ),
+			'correctDefaulted'          => array( 'a', 'b', 'c' ),
+			'arrayWithNumbers'          => array( 4, 5, 6 ),
+			'correctArrayWithEnum'      => array(
+				'option1',
+				'option2',
+			),
+			'wrongArrayWithEnum'        => array(
+				'option1',
+				'unexistentOption',
+			),
+			'wrongArrayWithDefaultEnum' => array(
+				'option1',
+				'unexistentOption',
+			),
+			'wrongType'                 => 'abc',
+			'undefined'                 => 'omit',
+		);
+
+		$block_type = new WP_Block_Type( 'core/dummy', array(
+			'attributes' => array(
+				'correct'                   => array(
+					'type'    => 'array',
+					'default' => array(
+						'a',
+						'b',
+						'c'
+					)
+				),
+				'correctDefaulted'          => array(
+					'type'    => 'array',
+					'default' => array( 'a', 'b', 'c' )
+				),
+				'arrayWithNumbers'          => array(
+					'type'  => 'array',
+					'items' => array(
+						'type' => 'number'
+					),
+				),
+				'correctArrayWithEnum'      => array(
+					'type'  => 'array',
+					'items' => array(
+						'type' => 'string',
+						'enum' => array(
+							'option1',
+							'option2',
+							'option3',
+						)
+					),
+				),
+				'missingDefaulted'          => array(
+					'type'    => 'array',
+					'default' => array( 'b', 'c' ),
+				),
+				'wrongArrayWithEnum'        => array(
+					'type'  => 'array',
+					'items' => array(
+						'type' => 'string',
+						'enum' => array(
+							'option1',
+							'option2',
+							'option3',
+						)
+					),
+				),
+				'wrongArrayWithDefaultEnum' => array(
+					'type'    => 'array',
+					'default' => array(
+						'option1',
+						'option2',
+					),
+					'items'   => array(
+						'type' => 'string',
+						'enum' => array(
+							'option1',
+							'option2',
+							'option3',
+						)
+					),
+				),
+				'wrongType'                 => array(
+					'type' => 'array',
+				)
+			)
+		) );
+
+		$prepared_attributes = $block_type->prepare_attributes_for_render( $expectedResults );
+
+		$this->assertEquals( array(
+			'correct'                   => array( 'z', 'y', 'x' ),
+			'correctDefaulted'          => array( 'a', 'b', 'c' ),
+			'arrayWithNumbers'          => array( 4, 5, 6 ),
+			'missingDefaulted'          => array( 'b', 'c' ),
+			'correctArrayWithEnum'      => array(
+				'option1',
+				'option2',
+			),
+			'wrongArrayWithEnum'        => null,
+			'wrongArrayWithDefaultEnum' => array(
+				'option1',
+				'option2',
+			),
+			'wrongType'                 => array( 'abc' ),
+		), $prepared_attributes );
+	}
+
 	function render_dummy_block( $attributes ) {
 		return json_encode( $attributes );
 	}
