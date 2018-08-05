@@ -8,7 +8,7 @@ The following is a set of guidelines for contributing to the `@wordpress/compone
 
 Each component needs to include an example in its README.md file to demonstrate the usage of the component.
 
-These examples can be consumed automatically from other projects in order to visualize them in their documentation. In order to ensure these examples are extractable, compilable and renderable, they should be structured in the following way:
+These examples can be consumed automatically from other projects in order to visualize them in their documentation. To ensure these examples are extractable, compilable and renderable, they should be structured in the following way:
 
 * It has to be included in a `jsx` code block.
 * It has to work out-of-the-box. No additional code should be needed to have working the example.
