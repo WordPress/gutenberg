@@ -121,7 +121,7 @@ zip -r gutenberg.zip \
 	gutenberg.php \
 	lib/*.php \
 	core-blocks/*/*.php \
-	post-content.js \
+	post-content.php \
 	$vendor_scripts \
 	$build_files \
 	languages/gutenberg.pot \
