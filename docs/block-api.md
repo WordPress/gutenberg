@@ -396,7 +396,7 @@ align: true,
 align: [ 'left', 'right', 'full' ],
 ```
 
-- `alignWide` (default `true`): Gutenberg allows to enable [wide alignment](../docs/extensibility/theme-support.md#wide-alignment) for your theme. To disable this behavior for a single block, set this flag to `false`.
+- `alignWide` (default `true`): Gutenberg allows to enable [wide alignment](../docs/extensibility/theme-support#wide-alignment) for your theme. To disable this behavior for a single block, set this flag to `false`.
 
 ```js
 // Remove the support for wide alignment.
