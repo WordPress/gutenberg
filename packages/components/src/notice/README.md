@@ -17,7 +17,7 @@ const MyNotice = () => (
 For more complex markup, you can pass any JSX element:
 
 ```jsx
-const MyComplexNotice = () => (
+const MyNotice = () => (
 	<Notice status="error">
 		<p>An error occurred: <code>{ errorDetails }</code>.</p>
 	</Notice>

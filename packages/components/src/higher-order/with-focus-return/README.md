@@ -21,7 +21,7 @@ const EnhancedComponent = withFocusReturn(
 const MyComponentWithFocusReturn = withState( {
 	text: '',
 } )( ( { text, setState } ) => {
-	const unmount = (  ) => {
+	const unmount = () => {
 		document.activeElement.blur();
 		setState( { text: '' } );
 	}
