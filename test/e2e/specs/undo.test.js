@@ -24,14 +24,14 @@ describe( 'undo', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		await pressWithModifier( 'mod', 'z' ); // Strip 3rd paragraph text
-		await pressWithModifier( 'mod', 'z' ); // Strip 3rd paragraph block
-		await pressWithModifier( 'mod', 'z' ); // Strip 2nd paragraph text
-		await pressWithModifier( 'mod', 'z' ); // Strip 2nd paragraph block
-		await pressWithModifier( 'mod', 'z' ); // Strip 1st paragraph text
-		await pressWithModifier( 'mod', 'z' ); // Strip 1st paragraph block
+		await pressWithModifier( 'mod', 'z' ); // Undo 3rd paragraph text.
+		await pressWithModifier( 'mod', 'z' ); // Undo 3rd block.
+		await pressWithModifier( 'mod', 'z' ); // Undo 2nd paragraph text.
+		await pressWithModifier( 'mod', 'z' ); // Undo 2nd block.
+		await pressWithModifier( 'mod', 'z' ); // Undo 1st paragraph text.
+		await pressWithModifier( 'mod', 'z' ); // Undo 1st block.
 
-		// Should have no more history.
+		// After undoing every action, there should be no more undo history.
 		await page.waitForSelector( '.editor-history__undo:disabled' );
 
 		expect( await getEditedPostContent() ).toBe( '' );
