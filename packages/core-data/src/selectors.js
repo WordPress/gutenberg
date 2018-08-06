@@ -39,7 +39,7 @@ function isResolving( selectorName, ...args ) {
  */
 export function getTerms( state, taxonomy ) {
 	deprecated( 'wp.data.select("core").getTerms', {
-		version: '13.6.0',
+		version: '3.7.0',
 		alternative: 'wp.data.select("core").getEntityRecords',
 		plugin: 'Gutenberg',
 	} );
@@ -55,7 +55,7 @@ export function getTerms( state, taxonomy ) {
  */
 export function getCategories( state ) {
 	deprecated( 'wp.data.select("core").getCategories', {
-		version: '13.6.0',
+		version: '3.7.0',
 		alternative: 'wp.data.select("core").getEntityRecords',
 		plugin: 'Gutenberg',
 	} );
@@ -73,7 +73,7 @@ export function getCategories( state ) {
  */
 export function isRequestingTerms( state, taxonomy ) {
 	deprecated( 'wp.data.select("core").isRequestingTerms', {
-		version: '13.6.0',
+		version: '3.7.0',
 		alternative: 'wp.data.select("core").getEntitiesByKind',
 		plugin: 'Gutenberg',
 	} );
@@ -90,7 +90,7 @@ export function isRequestingTerms( state, taxonomy ) {
  */
 export function isRequestingCategories() {
 	deprecated( 'wp.data.select("core").isRequestingCategories', {
-		version: '13.6.0',
+		version: '3.7.0',
 		alternative: 'wp.data.select("core").getEntitiesByKind',
 		plugin: 'Gutenberg',
 	} );

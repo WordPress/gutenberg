@@ -23,7 +23,7 @@ import {
  */
 export function receiveTerms( taxonomy, terms ) {
 	deprecated( 'wp.data.dispatch("core").receiveTerms', {
-		version: '13.6.0',
+		version: '3.7.0',
 		alternative: 'wp.data.dispatch("core").receiveEntityRecords',
 		plugin: 'Gutenberg',
 	} );

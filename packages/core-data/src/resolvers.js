@@ -27,7 +27,7 @@ import { getKindEntities } from './entities';
  */
 export async function* getCategories() {
 	deprecated( 'getCategories resolver', {
-		version: '3.6.0',
+		version: '3.7.0',
 		alternative: 'getEntityRecords resolver',
 		plugin: 'Gutenberg',
 	} );
