@@ -9,6 +9,7 @@ import { mapValues, reduce, forEach, noop } from 'lodash';
 import { Component } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import isShallowEqual from '@wordpress/is-shallow-equal';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -17,6 +18,12 @@ import request, { getCachedResponse } from './request';
 import { getRoute } from './routes';
 
 export default ( mapPropsToData ) => createHigherOrderComponent( ( WrappedComponent ) => {
+	deprecated( 'wp.components.withAPIData', {
+		version: 3.7,
+		plugin: 'Gutenberg',
+		alternative: 'the Core Data Module or wp.apiFetch directly',
+	} );
+
 	class APIDataComponent extends Component {
 		constructor( props, context ) {
 			super( ...arguments );
