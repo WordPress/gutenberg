@@ -17,8 +17,12 @@ const shortcuts = {
 		display: displayShortcut.primaryShift( 'd' ),
 	},
 	remove: {
-		raw: rawShortcut.primary( 'del' ),
-		display: displayShortcut.primary( 'del' ),
+		raw: rawShortcut.primaryAlt( 'del' ),
+		display: displayShortcut.primaryAlt( 'del' ),
+	},
+	removeSecondary: {
+		raw: rawShortcut.primaryAlt( 'backspace' ),
+		display: displayShortcut.primaryAlt( 'backspace' ),
 	},
 };
 

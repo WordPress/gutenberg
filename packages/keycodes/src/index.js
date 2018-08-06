@@ -47,6 +47,7 @@ export function isMacOS( _window = window ) {
 const modifiers = {
 	primary: ( _isMac ) => _isMac() ? [ COMMAND ] : [ CTRL ],
 	primaryShift: ( _isMac ) => _isMac() ? [ SHIFT, COMMAND ] : [ CTRL, SHIFT ],
+	primaryAlt: ( _isMac ) => _isMac() ? [ ALT, COMMAND ] : [ CTRL, ALT ],
 	secondary: ( _isMac ) => _isMac() ? [ SHIFT, ALT, COMMAND ] : [ CTRL, SHIFT, ALT ],
 	access: ( _isMac ) => _isMac() ? [ CTRL, ALT ] : [ SHIFT, ALT ],
 };
