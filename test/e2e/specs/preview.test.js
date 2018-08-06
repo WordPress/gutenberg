@@ -107,7 +107,7 @@ describe( 'Preview', () => {
 
 		// Workaround for unresolved race condition: sometimes we end up with two preview
 		// pages at this point, so close and reopen to let this test complete reliably.
-		// See https://github.com/WordPress/gutenberg/issues/8367
+		// See: https://github.com/WordPress/gutenberg/issues/8367
 		await previewPage.close();
 		previewPage = await openPreviewPage( editorPage );
 
