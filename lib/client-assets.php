@@ -1190,9 +1190,21 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	// Prepopulate with some test content in demo.
 	if ( $is_new_post && $is_demo ) {
+		ob_start();
+		include gutenberg_dir_path() . 'post-content.php';
+		$demo_content = ob_get_clean();
+
 		wp_add_inline_script(
 			'wp-edit-post',
-			file_get_contents( gutenberg_dir_path() . 'post-content.js' )
+			sprintf(
+				'window._wpGutenbergDefaultPost = { title: %s, content: %s };',
+				wp_json_encode( array(
+					'raw' => __( 'Welcome to the Gutenberg Editor', 'gutenberg' ),
+				) ),
+				wp_json_encode( array(
+					'raw' => $demo_content,
+				) )
+			)
 		);
 	} elseif ( $is_new_post ) {
 		wp_add_inline_script(
