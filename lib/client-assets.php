@@ -210,10 +210,26 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'build/data/index.js' ),
 		true
 	);
+	wp_add_inline_script(
+		'wp-data',
+		implode( "\n", array(
+			// TODO: Transferring old storage should be removed at v3.7.
+			'( function() {',
+			'	var userId = window.userSettings.uid;',
+			'	var oldStorageKey = "WP_EDIT_POST_DATA_" + userId;',
+			'	var storageKey = "WP_DATA_USER_" + userId;',
+			'	if ( localStorage[ oldStorageKey ] ) {',
+			'		localStorage[ storageKey ] = localStorage[ oldStorageKey ];',
+			'		delete localStorage[ oldStorageKey ];',
+			'	}',
+			'	wp.data.use( wp.data.plugins.persistence, { storageKey: storageKey } );',
+			'} )()',
+		) )
+	);
 	wp_register_script(
 		'wp-core-data',
 		gutenberg_url( 'build/core-data/index.js' ),
-		array( 'wp-data', 'wp-api-fetch', 'lodash' ),
+		array( 'wp-data', 'wp-api-fetch', 'wp-url', 'lodash' ),
 		filemtime( gutenberg_dir_path() . 'build/core-data/index.js' ),
 		true
 	);
@@ -889,7 +905,7 @@ function gutenberg_prepare_wp_components_script() {
 function gutenberg_prepare_blocks_for_js() {
 	$block_registry = WP_Block_Type_Registry::get_instance();
 	$blocks         = array();
-	$keys_to_pick   = array( 'title', 'icon', 'category', 'keywords', 'supports', 'attributes' );
+	$keys_to_pick   = array( 'title', 'description', 'icon', 'category', 'keywords', 'supports', 'attributes' );
 
 	foreach ( $block_registry->get_all_registered() as $block_name => $block_type ) {
 		foreach ( $keys_to_pick as $key ) {
