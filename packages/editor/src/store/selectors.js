@@ -1874,6 +1874,18 @@ export function getTokenSettings( state, name ) {
 }
 
 /**
+ * Returns whether the post is locked.
+ *
+ * @param {Object} state   Global application state.
+ *
+ * @return {boolean} Is locked.
+ */
+export function isPostLocked( state ) {
+	console.log( 'isPostLocked?', !!state.locked, state );
+	return !! state.locked;
+}
+
+/**
  * Returns whether or not the user has the unfiltered_html capability.
  *
  * @param {Object} state Editor state.
