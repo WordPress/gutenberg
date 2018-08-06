@@ -38,6 +38,8 @@ wp.hooks.addFilter(
 
 A filter that applies to the result of a block's `save` function. This filter is used to replace or extend the element, for example using `wp.element.cloneElement` to modify the element's props or replace its children, or returning an entirely new element.
 
+Notably, while you _can_ modify a block's `save` result from a theme or plugin, this behavior won't persist when the theme or plugin is deactivated.
+
 _Example:_
 
 Include a custom data attribute on the Image Block `<img>` tag when the block attribute is set.
