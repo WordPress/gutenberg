@@ -120,6 +120,13 @@
 	"npmPackageJsonLintConfig": {
 		"extends": "@wordpress/npm-package-json-lint-config",
 		"rules": {
+			"description-format": [
+				"error",
+				{
+					"requireCapitalFirstLetter": true,
+					"requireEndingPeriod": true
+				}
+			],
 			"require-publishConfig": "error",
 			"valid-values-author": [
 				"error",
