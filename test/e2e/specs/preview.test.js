@@ -38,7 +38,7 @@ describe( 'Preview', () => {
 	}
 
 	/**
-	 * Given a Puppeteer Page instance for a preview window, clicks Preview and
+	 * Given a Puppeteer Page instance for a preview window, clicks Preview, and
 	 * awaits the window navigation.
 	 *
 	 * @param {puppeteer.Page} previewPage Page on which to await navigation.
@@ -46,9 +46,9 @@ describe( 'Preview', () => {
 	 * @return {Promise} Promise resolving once navigation completes.
 	 */
 	async function waitForPreviewNavigation( previewPage ) {
-		const previewNav = previewPage.waitForNavigation();
+		const nagivationCompleted = previewPage.waitForNavigation();
 		await page.click( '.editor-post-preview' );
-		return previewNav;
+		return nagivationCompleted;
 	}
 
 	it( 'Should open a preview window for a new post', async () => {
