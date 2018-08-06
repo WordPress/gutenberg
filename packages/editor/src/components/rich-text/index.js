@@ -449,18 +449,22 @@ export class RichText extends Component {
 
 			if ( this.props.onMerge ) {
 				this.props.onMerge( forward );
+
+				if ( ! forward ) {
+					// The content of this editor will be merged with the previous one.
+					// This editor will be destroyed, so prevent further handling of the event.
+					event.preventDefault();
+					event.stopImmediatePropagation();
+				}
 			}
 
 			if ( this.props.onRemove && this.isEmpty() ) {
 				this.props.onRemove( forward );
+
+				// This editor will be destroyed, so prevent further handling of the event.
+				event.preventDefault();
+				event.stopImmediatePropagation();
 			}
-
-			event.preventDefault();
-
-			// Calling onMerge() or onRemove() will destroy the editor, so it's important
-			// that we stop other handlers (e.g. ones registered by TinyMCE) from
-			// also handling this event.
-			event.stopImmediatePropagation();
 		}
 
 		const isHorizontalNavigation = keyCode === LEFT || keyCode === RIGHT;
