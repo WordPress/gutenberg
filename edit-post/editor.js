@@ -4,13 +4,13 @@
 import { withSelect } from '@wordpress/data';
 import { EditorProvider, ErrorBoundary } from '@wordpress/editor';
 import { StrictMode } from '@wordpress/element';
-
+import PostLockedModal from '../packages/components/src/post-locked-modal'
 /**
  * Internal dependencies
  */
 import Layout from './components/layout';
 
-function Editor( { settings, hasFixedToolbar, post, overridePost, onError, ...props } ) {
+function Editor( { settings, hasFixedToolbar, post, isLocked, overridePost, onError, ...props } ) {
 	if ( ! post ) {
 		return null;
 	}
@@ -26,6 +26,7 @@ function Editor( { settings, hasFixedToolbar, post, overridePost, onError, ...pr
 				<ErrorBoundary onError={ onError }>
 					<Layout />
 				</ErrorBoundary>
+				{ isLocked && <PostLockedModal /> }
 			</EditorProvider>
 		</StrictMode>
 	);
@@ -34,4 +35,5 @@ function Editor( { settings, hasFixedToolbar, post, overridePost, onError, ...pr
 export default withSelect( ( select, { postId, postType } ) => ( {
 	hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
 	post: select( 'core' ).getEntityRecord( 'postType', postType, postId ),
+	isLocked: select( 'core/editor' ).isPostLocked(),
 } ) )( Editor );
