@@ -11,7 +11,7 @@ import { searchItems } from './menu';
 
 const { Fill, Slot } = createSlotFill( 'InserterResultsPortal' );
 
-const InserterResultsPortal = ( { items, title, onSelect, onHover } ) => {
+const InserterResultsPortal = ( { items, title, onSelect, onHover, ...props } ) => {
 	return (
 		<Fill>
 			{ ( { filterValue } ) => {
@@ -24,6 +24,8 @@ const InserterResultsPortal = ( { items, title, onSelect, onHover } ) => {
 				return (
 					<PanelBody
 						title={ title }
+						{ ...props }
+						className="editor-inserter__results-portal"
 					>
 						<BlockTypesList items={ filteredItems } onSelect={ onSelect } onHover={ onHover } />
 					</PanelBody>

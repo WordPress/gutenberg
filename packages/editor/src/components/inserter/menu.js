@@ -212,7 +212,6 @@ export class InserterMenu extends Component {
 					role="region"
 					aria-label={ __( 'Available block types' ) }
 				>
-					<InserterResultsPortal.Slot fillProps={ { filterValue } } />
 
 					<ChildBlocks
 						rootClientId={ rootClientId }
@@ -231,6 +230,9 @@ export class InserterMenu extends Component {
 							<BlockTypesList items={ suggestedItems } onSelect={ onSelect } onHover={ this.onHover } />
 						</PanelBody>
 					}
+
+					<InserterResultsPortal.Slot fillProps={ { filterValue } } />
+
 					{ map( getCategories(), ( category ) => {
 						const categoryItems = itemsPerCategory[ category.slug ];
 						if ( ! categoryItems || ! categoryItems.length ) {
@@ -248,6 +250,7 @@ export class InserterMenu extends Component {
 							</PanelBody>
 						);
 					} ) }
+
 					{ !! reusableItems.length && (
 						<PanelBody
 							title={ __( 'Reusable' ) }

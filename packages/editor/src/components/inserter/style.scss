@@ -56,6 +56,10 @@ $block-inserter-search-height: 38px;
 	}
 }
 
+.editor-inserter__results-portal {
+	margin-top: -1px;
+}
+
 .editor-inserter__menu.is-bottom:after {
 	border-bottom-color: $white;
 }
@@ -100,11 +104,6 @@ $block-inserter-search-height: 38px;
 	// Don't show the top border on the first panel, let the Search border be the border.
 	[role="presentation"] + .components-panel__body {
 		border-top: none;
-	}
-
-	// Don't show the bottom border on the last panel, let the library itself show the border.
-	.components-panel__body:last-child {
-		border-bottom: none;
 	}
 }
 
