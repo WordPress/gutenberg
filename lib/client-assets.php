@@ -1291,7 +1291,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	// Check to see if the post is locked.
 	$user = null;
-	$user_id = wp_check_post_lock( $post->ID )
+	$user_id = wp_check_post_lock( $post->ID );
 	if ( $user_id ) {
 		$user = get_userdata( $user_id );
 	}
@@ -1312,6 +1312,8 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		if ( apply_filters( 'show_post_locked_dialog', true, $post, $user ) ) {
 			$locked = true;
 		}
+		$editor_settings['lockedUser'] = $user;
+
 	} else {
 		$locked = false;
 	}
