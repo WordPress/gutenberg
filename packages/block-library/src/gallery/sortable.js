@@ -11,7 +11,6 @@ import { SortableContainer, SortableElement, arrayMove } from 'react-sortable-ho
 const SortableItem = SortableElement( ( { children } ) => children );
 
 class Sortable extends Component {
-	//constructor
 	constructor() {
 		super( ...arguments );
 
@@ -23,9 +22,9 @@ class Sortable extends Component {
 	}
 
 	/**
-     * Get the sortable list:
+	 * Get the sortable list:
 	 * @return {function} the Container creator
-     */
+	 */
 	getSortableList() {
 		const { children, className, firstNode, lastNode } = this.props;
 
@@ -86,10 +85,10 @@ class Sortable extends Component {
 	/*************************************/
 
 	/**
-     * What to do on sort start ?
-     * @param {Object} object with access to the element, its index and the collection
+	 * What to do on sort start ?
+	 * @param {Object} object with access to the element, its index and the collection
 	 * @param {Event} event with the event info
-     */
+	 */
 	onSortStart( { node, index, collection }, event ) {
 		//run the corresponding function in the upper-lever component:
 		if ( typeof ( this.props.onSortStart ) === 'function' ) {
@@ -98,10 +97,10 @@ class Sortable extends Component {
 	}
 
 	/**
-     * What to do on sort end?
-     *
-     * @param {Object} object holding old and new indexes and the collection
-     */
+	 * What to do on sort end?
+	 *
+	 * @param {Object} object holding old and new indexes and the collection
+	 */
 	onSortEnd( { oldIndex, newIndex } ) {
 		//create a new items array:
 		const _items = arrayMove( this.props.items, oldIndex, newIndex );
