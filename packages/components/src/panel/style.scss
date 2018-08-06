@@ -1,6 +1,6 @@
 .components-panel {
 	background: $white;
-	border: 1px solid $light-gray-500;
+	border: $border-width solid $light-gray-500;
 
 	> .components-panel__header:first-child,
 	> .components-panel__body:first-child {
@@ -18,8 +18,8 @@
 }
 
 .components-panel__body {
-	border-top: 1px solid $light-gray-500;
-	border-bottom: 1px solid $light-gray-500;
+	border-top: $border-width solid $light-gray-500;
+	border-bottom: $border-width solid $light-gray-500;
 
 	h3 {
 		margin: 0 0 .5em;
@@ -37,8 +37,8 @@
 	background: $light-gray-300;
 	padding: 0 $panel-padding;
 	height: 50px;
-	border-top: 1px solid $light-gray-500;
-	border-bottom: 1px solid $light-gray-500;
+	border-top: $border-width solid $light-gray-500;
+	border-bottom: $border-width solid $light-gray-500;
 
 	h2 {
 		margin: 0;

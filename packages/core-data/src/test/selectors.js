@@ -80,7 +80,8 @@ describe( 'getEntityRecord', () => {
 				data: {
 					root: {
 						postType: {
-							byKey: {},
+							items: {},
+							queries: {},
 						},
 					},
 				},
@@ -95,9 +96,10 @@ describe( 'getEntityRecord', () => {
 				data: {
 					root: {
 						postType: {
-							byKey: {
+							items: {
 								post: { slug: 'post' },
 							},
+							queries: {},
 						},
 					},
 				},
@@ -108,19 +110,20 @@ describe( 'getEntityRecord', () => {
 } );
 
 describe( 'getEntityRecords', () => {
-	it( 'should return an empty array by default', () => {
+	it( 'should return an null by default', () => {
 		const state = deepFreeze( {
 			entities: {
 				data: {
 					root: {
 						postType: {
-							byKey: {},
+							items: {},
+							queries: {},
 						},
 					},
 				},
 			},
 		} );
-		expect( getEntityRecords( state, 'root', 'postType' ) ).toEqual( [] );
+		expect( getEntityRecords( state, 'root', 'postType' ) ).toBe( null );
 	} );
 
 	it( 'should return all the records', () => {
@@ -129,9 +132,12 @@ describe( 'getEntityRecords', () => {
 				data: {
 					root: {
 						postType: {
-							byKey: {
+							items: {
 								post: { slug: 'post' },
 								page: { slug: 'page' },
+							},
+							queries: {
+								'': [ 'post', 'page' ],
 							},
 						},
 					},

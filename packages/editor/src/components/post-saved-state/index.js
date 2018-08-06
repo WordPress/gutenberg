@@ -41,7 +41,7 @@ export class PostSavedState extends Component {
 	}
 
 	render() {
-		const { isNew, isPublished, isDirty, isSaving, isSaveable, onSave, isAutosaving } = this.props;
+		const { isNew, isScheduled, isPublished, isDirty, isSaving, isSaveable, onSave, isAutosaving } = this.props;
 		const { forceSavedMessage } = this.state;
 		if ( isSaving ) {
 			// TODO: Classes generation should be common across all return
@@ -59,7 +59,7 @@ export class PostSavedState extends Component {
 			);
 		}
 
-		if ( isPublished ) {
+		if ( isPublished || isScheduled ) {
 			return <PostSwitchToDraftButton />;
 		}
 
@@ -94,6 +94,7 @@ export default compose( [
 		const {
 			isEditedPostNew,
 			isCurrentPostPublished,
+			isCurrentPostScheduled,
 			isEditedPostDirty,
 			isSavingPost,
 			isEditedPostSaveable,
@@ -104,6 +105,7 @@ export default compose( [
 			post: getCurrentPost(),
 			isNew: isEditedPostNew(),
 			isPublished: isCurrentPostPublished(),
+			isScheduled: isCurrentPostScheduled(),
 			isDirty: forceIsDirty || isEditedPostDirty(),
 			isSaving: forceIsSaving || isSavingPost(),
 			isSaveable: isEditedPostSaveable(),

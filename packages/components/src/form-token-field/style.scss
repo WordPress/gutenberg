@@ -3,7 +3,7 @@
 	margin: 0;
 	padding: 0;
 	background-color: $white;
-	border: 1px solid $light-gray-700;
+	border: $border-width solid $light-gray-700;
 	color: $dark-gray-700;
 	cursor: text;
 
@@ -159,7 +159,7 @@
 	overflow-y: scroll;
 	transition: all .15s ease-in-out;
 	list-style: none;
-	border-top: 1px solid $dark-gray-300;
+	border-top: $border-width solid $dark-gray-300;
 	margin: 0;
 	padding-top: 3px;
 }

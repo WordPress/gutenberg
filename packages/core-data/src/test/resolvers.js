@@ -107,7 +107,7 @@ describe( 'getEntityRecords', () => {
 		};
 		const fulfillment = getEntityRecords( state, 'root', 'postType' );
 		const received = ( await fulfillment.next() ).value;
-		expect( received ).toEqual( receiveEntityRecords( 'root', 'postType', Object.values( POST_TYPES ) ) );
+		expect( received ).toEqual( receiveEntityRecords( 'root', 'postType', Object.values( POST_TYPES ), {} ) );
 	} );
 } );
 

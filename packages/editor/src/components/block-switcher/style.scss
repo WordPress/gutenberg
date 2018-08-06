@@ -37,7 +37,7 @@
 		position: relative;
 
 		.editor-block-preview {
-			border: 1px solid $light-gray-500;
+			border: $border-width solid $light-gray-500;
 			box-shadow: $shadow-popover;
 			background: $white;
 			position: absolute;
@@ -55,7 +55,7 @@
 	}
 
 	.components-panel__body + .components-panel__body {
-		border-top: 1px solid $light-gray-500;
+		border-top: $border-width solid $light-gray-500;
 	}
 }
 
