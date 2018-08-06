@@ -57,8 +57,6 @@ By default, the *first tabblable element* in the popover will receive focus when
 
 Set this prop to `false` to disable focus changing entirely. This should only be set when an appropriately accessible substitute behavior exists.
 
-**Deprecation notice:** Before Gutenberg 3.2 this value was `Boolean` and the value `true` was equivalent to `"firstElement"`. This behaviour is deprecated and will cause a console warning message.
-
 - Type: `String` or `Boolean`
 - Required: No
 - Default: `"firstElement"`

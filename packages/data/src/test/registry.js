@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray } from 'lodash';
+import { castArray, mapValues } from 'lodash';
 
 /**
  * Internal dependencies
@@ -470,6 +470,41 @@ describe( 'createRegistry', () => {
 			registry.dispatch( 'counter' ).increment(); // state = 1
 			registry.dispatch( 'counter' ).increment( 4 ); // state = 5
 			expect( store.getState() ).toBe( 5 );
+		} );
+	} );
+
+	describe( 'use', () => {
+		it( 'should pass through options object to plugin', () => {
+			const expectedOptions = {};
+			let actualOptions;
+
+			function plugin( _registry, options ) {
+				// The registry passed to a plugin is not the same as the one
+				// returned by createRegistry, as the former uses the internal
+				// representation of the object, the latter applying its
+				// function proxying.
+				expect( _registry ).toMatchObject(
+					mapValues( registry, () => expect.any( Function ) )
+				);
+
+				actualOptions = options;
+
+				return {};
+			}
+
+			registry.use( plugin, expectedOptions );
+
+			expect( actualOptions ).toBe( expectedOptions );
+		} );
+
+		it( 'should override base method', () => {
+			function plugin( _registry, options ) {
+				return { select: () => options.value };
+			}
+
+			registry.use( plugin, { value: 10 } );
+
+			expect( registry.select() ).toBe( 10 );
 		} );
 	} );
 } );

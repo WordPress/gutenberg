@@ -3,7 +3,7 @@
  */
 import { registerCoreBlocks } from '@wordpress/core-blocks';
 import { render, unmountComponentAtNode } from '@wordpress/element';
-import { dispatch, setupPersistence } from '@wordpress/data';
+import { dispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -14,11 +14,6 @@ import './hooks';
 import store from './store';
 import { initializeMetaBoxState } from './store/actions';
 import Editor from './editor';
-
-/**
- * Module Constants
- */
-const STORAGE_KEY = `WP_EDIT_POST_DATA_${ window.userSettings.uid }`;
 
 /**
  * Reinitializes the editor after the user chooses to reboot the editor after
@@ -67,13 +62,6 @@ export function initializeEditor( id, postType, postId, settings, overridePost )
 		hint: 'If paragraphs using this classes are opened in the editor new classes are automatically applied the post just needs to be saved. This is a global warning, shown regardless of whether the classes are used in the current post.',
 	} );
 
-	deprecated( 'block `id` prop in `edit` function', {
-		version: '3.4',
-		alternative: 'block `clientId` prop',
-		plugin: 'Gutenberg',
-		hint: 'This is a global warning, shown regardless of whether blocks exist using the deprecated prop.',
-	} );
-
 	registerCoreBlocks();
 
 	dispatch( 'core/nux' ).triggerGuide( [
@@ -100,5 +88,3 @@ export { default as PluginPostStatusInfo } from './components/sidebar/plugin-pos
 export { default as PluginPrePublishPanel } from './components/sidebar/plugin-pre-publish-panel';
 export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
 export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';
-
-setupPersistence( STORAGE_KEY );

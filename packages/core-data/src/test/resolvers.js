@@ -9,7 +9,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { getCategories, getEntityRecord, getEntityRecords } from '../resolvers';
 import { receiveTerms, receiveEntityRecords, addEntities } from '../actions';
 
-jest.mock( '@wordpress/api-fetch' );
+jest.mock( '@wordpress/api-fetch', () => jest.fn() );
 
 describe( 'getCategories', () => {
 	const CATEGORIES = [ { id: 1 } ];
@@ -102,6 +102,6 @@ describe( 'getEntityRecords', () => {
 		};
 		const fulfillment = getEntityRecords( state, 'root', 'postType' );
 		const received = ( await fulfillment.next() ).value;
-		expect( received ).toEqual( receiveEntityRecords( 'root', 'postType', Object.values( POST_TYPES ) ) );
+		expect( received ).toEqual( receiveEntityRecords( 'root', 'postType', Object.values( POST_TYPES ), {} ) );
 	} );
 } );

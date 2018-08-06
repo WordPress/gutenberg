@@ -269,6 +269,11 @@ function gutenberg_can_edit_post( $post ) {
 		return false;
 	}
 
+	// Disable the editor if on the blog page and there is no content.
+	if ( absint( get_option( 'page_for_posts' ) ) === $post->ID && empty( $post->post_content ) ) {
+		return false;
+	}
+
 	if ( ! gutenberg_can_edit_post_type( $post->post_type ) ) {
 		return false;
 	}
@@ -390,6 +395,7 @@ function gutenberg_register_post_types() {
 			'singular_name' => 'Block',
 		),
 		'public'                => false,
+		'rewrite'               => false,
 		'show_in_rest'          => true,
 		'rest_base'             => 'blocks',
 		'rest_controller_class' => 'WP_REST_Blocks_Controller',

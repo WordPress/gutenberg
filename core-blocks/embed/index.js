@@ -3,7 +3,6 @@
  */
 import { parse } from 'url';
 import { includes, kebabCase, toLower } from 'lodash';
-import { stringify } from 'querystring';
 import memoize from 'memize';
 import classnames from 'classnames';
 
@@ -16,6 +15,7 @@ import { Button, Placeholder, Spinner, SandBox, IconButton, Toolbar } from '@wor
 import { createBlock } from '@wordpress/blocks';
 import { RichText, BlockControls } from '@wordpress/editor';
 import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -27,7 +27,9 @@ import './editor.scss';
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
 // Caches the embed API calls, so if blocks get transformed, or deleted and added again, we don't spam the API.
-const wpEmbedAPI = memoize( ( url ) => apiFetch( { path: `/oembed/1.0/proxy?${ stringify( { url } ) }` } ) );
+const wpEmbedAPI = memoize( ( url ) =>
+	apiFetch( { path: addQueryArgs( '/oembed/1.0/proxy', { url } ) } )
+);
 
 const matchesPatterns = ( url, patterns = [] ) => {
 	return patterns.some( ( pattern ) => {
@@ -551,10 +553,10 @@ export const others = [
 		patterns: [ /^https?:\/\/(www\.)?smugmug\.com\/.+/i ],
 	},
 	{
-		name: 'core-embed/speakerdeck',
+		name: 'core-embed/speaker',
 		settings: getEmbedBlockSettings( {
-			title: 'Speaker Deck',
-			icon: 'embed-post',
+			title: 'Speaker',
+			icon: 'embed-audio',
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?speakerdeck\.com\/.+/i ],
 	},

@@ -60,6 +60,12 @@
 		"parent": "extensibility"
 	},
 	{
+		"title": "Extending Editor",
+		"slug": "extending-editor",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/extensibility/extending-editor.md",
+		"parent": "extensibility"
+	},
+	{
 		"title": "Meta Boxes",
 		"slug": "meta-box",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/extensibility/meta-box.md",

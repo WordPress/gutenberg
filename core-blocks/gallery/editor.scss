@@ -74,7 +74,7 @@
 
 		&:hover,
 		&:focus {
-			border: 1px solid #999;
+			border: $border-width solid $dark-gray-500;
 		}
 	}
 }

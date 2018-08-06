@@ -1,10 +1,9 @@
 /**
  * External dependencies
  */
-import { get, isUndefined, pickBy } from 'lodash';
+import { isUndefined, pickBy } from 'lodash';
 import moment from 'moment';
 import classnames from 'classnames';
-import { stringify } from 'querystringify';
 
 /**
  * WordPress dependencies
@@ -18,7 +17,6 @@ import {
 	Spinner,
 	ToggleControl,
 	Toolbar,
-	withAPIData,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -27,6 +25,7 @@ import {
 	BlockAlignmentToolbar,
 	BlockControls,
 } from '@wordpress/editor';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -50,8 +49,7 @@ class LatestPostsEdit extends Component {
 	}
 
 	render() {
-		const latestPosts = this.props.latestPosts.data;
-		const { attributes, categoriesList, setAttributes } = this.props;
+		const { attributes, categoriesList, setAttributes, latestPosts } = this.props;
 		const { displayPostDate, align, postLayout, columns, order, orderBy, categories, postsToShow } = attributes;
 
 		const inspectorControls = (
@@ -60,7 +58,7 @@ class LatestPostsEdit extends Component {
 					<QueryControls
 						{ ...{ order, orderBy } }
 						numberOfItems={ postsToShow }
-						categoriesList={ get( categoriesList, [ 'data' ], {} ) }
+						categoriesList={ categoriesList }
 						selectedCategoryId={ categories }
 						onOrderChange={ ( value ) => setAttributes( { order: value } ) }
 						onOrderByChange={ ( value ) => setAttributes( { orderBy: value } ) }
@@ -158,21 +156,20 @@ class LatestPostsEdit extends Component {
 	}
 }
 
-export default withAPIData( ( props ) => {
+export default withSelect( ( select, props ) => {
 	const { postsToShow, order, orderBy, categories } = props.attributes;
-	const latestPostsQuery = stringify( pickBy( {
+	const { getEntityRecords } = select( 'core' );
+	const latestPostsQuery = pickBy( {
 		categories,
 		order,
 		orderby: orderBy,
 		per_page: postsToShow,
-		_fields: [ 'date_gmt', 'link', 'title' ],
-	}, ( value ) => ! isUndefined( value ) ) );
-	const categoriesListQuery = stringify( {
+	}, ( value ) => ! isUndefined( value ) );
+	const categoriesListQuery = {
 		per_page: 100,
-		_fields: [ 'id', 'name', 'parent' ],
-	} );
+	};
 	return {
-		latestPosts: `/wp/v2/posts?${ latestPostsQuery }`,
-		categoriesList: `/wp/v2/categories?${ categoriesListQuery }`,
+		latestPosts: getEntityRecords( 'postType', 'post', latestPostsQuery ),
+		categoriesList: getEntityRecords( 'taxonomy', 'category', categoriesListQuery ),
 	};
 } )( LatestPostsEdit );
