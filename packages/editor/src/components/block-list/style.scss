@@ -190,8 +190,8 @@
 	.editor-block-list__block-edit {
 		position: relative;
 
-		&:before {
-			z-index: z-index( '.editor-block-list__block-edit:before' );
+		&::before {
+			z-index: z-index( '.editor-block-list__block-edit::before' );
 			content: '';
 			position: absolute;
 			outline: $border-width solid transparent;
@@ -212,7 +212,7 @@
 		}
 
 		// Show smaller padding for child blocks.
-		.editor-block-list__block-edit:before {
+		.editor-block-list__block-edit::before {
 			right: -$block-padding;
 			left: -$block-padding;
 			top: -$block-padding;
@@ -221,8 +221,8 @@
 	}
 
 	// Selected style
-	&.is-selected-parent > .editor-block-list__block-edit:before,
-	&.is-selected > .editor-block-list__block-edit:before {
+	&.is-selected-parent > .editor-block-list__block-edit::before,
+	&.is-selected > .editor-block-list__block-edit::before {
 		// Use opacity to work in various editor styles.
 		outline: $border-width solid $dark-opacity-light-500;
 
@@ -232,7 +232,7 @@
 	}
 
 	// Hover style
-	&.is-hovered > .editor-block-list__block-edit:before {
+	&.is-hovered > .editor-block-list__block-edit::before {
 		outline: $border-width solid theme( outlines );
 	}
 }
@@ -256,7 +256,7 @@
 		background-color: transparent;
 	}
 
-	&.is-multi-selected .editor-block-list__block-edit:before {
+	&.is-multi-selected .editor-block-list__block-edit::before {
 		background: $blue-medium-highlight;
 
 		// Use opacity to work in various editor styles.
@@ -290,7 +290,7 @@
 		}
 	}
 
-	&.has-warning:not( .is-hovered ) .editor-block-list__block-edit:before {
+	&.has-warning:not( .is-hovered ) .editor-block-list__block-edit::before {
 		// Use opacity to work in various editor styles.
 		outline-color: $dark-opacity-light-500;
 
@@ -351,7 +351,7 @@
 
 		// Hide block outline when an image is floated.
 		.editor-block-list__block-edit {
-			&:before {
+			&::before {
 				content: none;
 			}
 		}
@@ -408,7 +408,7 @@
 			width: auto;
 			z-index: inherit;
 
-			&:before {
+			&::before {
 				content: none;
 			}
 		}
@@ -494,7 +494,7 @@
 			}
 		}
 
-		> .editor-block-list__block-edit:before {
+		> .editor-block-list__block-edit::before {
 			left: 0;
 			right: 0;
 			border-left-width: 0;
@@ -988,7 +988,7 @@
 	}
 }
 
-.editor-block-list__descendant-arrow:before {
+.editor-block-list__descendant-arrow::before {
 	content: '→';
 	display: inline-block;
 	padding: 0 4px;
@@ -1005,7 +1005,7 @@
 		// the mouse cursor is technically outside the block.
 		// This improves usability by making it possible to click somewhat outside
 		// the block and select it. (eg. A fuzzy click target.)
-		&:before {
+		&::before {
 			bottom: 0;
 			content: '';
 			left: -$parent-block-padding - $block-padding;
@@ -1018,13 +1018,13 @@
 		// It should only applies to top-level blocks; applying this rule to
 		// nested blocks will result in difficult-to-use and possibly overlapping
 		// click targets.
-		& &:before {
+		& &::before {
 			left: 0;
 			right: 0;
 		}
 
 		// Don't use this for full-wide blocks, as there's no clearance to accommodate extra area on the side.
-		&[data-align="full"]:before {
+		&[data-align="full"]::before {
 			content: none;
 		}
 	}

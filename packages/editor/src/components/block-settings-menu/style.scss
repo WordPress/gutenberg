@@ -51,7 +51,7 @@
 
 // Popout menu
 .editor-block-settings-menu__popover {
-	&:before,
+	&::before,
 	&:after {
 		margin-left: 2px;
 	}
