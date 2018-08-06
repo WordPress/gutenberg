@@ -19,7 +19,7 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"level":2} -->
-<h2><?php _e( 'A Picture is worth a Thousand Words', 'gutenberg' ); ?></h2>
+<h2><?php _e( 'A Picture is Worth a Thousand Words', 'gutenberg' ); ?></h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
