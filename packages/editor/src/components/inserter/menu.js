@@ -230,6 +230,9 @@ export class InserterMenu extends Component {
 							<BlockTypesList items={ suggestedItems } onSelect={ onSelect } onHover={ this.onHover } />
 						</PanelBody>
 					}
+
+					<InserterResultsPortal.Slot fillProps={ { filterValue } } />
+
 					{ map( getCategories(), ( category ) => {
 						const categoryItems = itemsPerCategory[ category.slug ];
 						if ( ! categoryItems || ! categoryItems.length ) {
@@ -247,8 +250,6 @@ export class InserterMenu extends Component {
 							</PanelBody>
 						);
 					} ) }
-
-					<InserterResultsPortal.Slot fillProps={ { filterValue } } />
 
 					{ !! reusableItems.length && (
 						<PanelBody
