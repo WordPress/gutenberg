@@ -23,6 +23,7 @@
 		"@wordpress/blocks": "file:packages/blocks",
 		"@wordpress/components": "file:packages/components",
 		"@wordpress/compose": "file:packages/compose",
+		"@wordpress/core-blocks": "file:packages/core-blocks",
 		"@wordpress/core-data": "file:packages/core-data",
 		"@wordpress/data": "file:packages/data",
 		"@wordpress/date": "file:packages/date",
