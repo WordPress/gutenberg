@@ -140,7 +140,7 @@ add_filter( 'wp_refresh_nonces', 'gutenberg_add_rest_nonce_to_heartbeat_response
  * @return string          Paragraph-converted text if non-block content.
  */
 function gutenberg_wpautop( $content ) {
-	if ( gutenberg_content_has_blocks( $content ) ) {
+	if ( has_blocks( $content ) ) {
 		return $content;
 	}
 
