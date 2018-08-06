@@ -8,7 +8,7 @@ import { get, unescape as unescapeString, without, find, some, invoke } from 'lo
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { TreeSelect, withSpokenMessages, Button } from '@wordpress/components';
+import { TreeSelect, withSpokenMessages, withFilters, Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 import apiFetch from '@wordpress/api-fetch';
@@ -341,4 +341,5 @@ export default compose( [
 	} ) ),
 	withSpokenMessages,
 	withInstanceId,
+	withFilters( 'editor.PostTaxonomyType' ),
 ] )( HierarchicalTermSelector );
