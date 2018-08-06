@@ -19,7 +19,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"@babel/runtime": "^7.0.0-beta.52",
+		"@babel/runtime": "7.0.0-beta.55",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
