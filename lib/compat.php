@@ -79,7 +79,7 @@ function _gutenberg_utf8_split( $str ) {
  */
 function gutenberg_disable_editor_settings_wpautop( $settings, $editor_id ) {
 	$post = get_post();
-	if ( 'content' === $editor_id && is_object( $post ) && gutenberg_post_has_blocks( $post ) ) {
+	if ( 'content' === $editor_id && is_object( $post ) && has_blocks( $post ) ) {
 		$settings['wpautop'] = false;
 	}
 
@@ -167,7 +167,7 @@ function gutenberg_check_if_classic_needs_warning_about_blocks() {
 		return;
 	}
 
-	if ( ! gutenberg_post_has_blocks( $post ) ) {
+	if ( ! has_blocks( $post ) ) {
 		return;
 	}
 
