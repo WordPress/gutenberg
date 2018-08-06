@@ -135,6 +135,13 @@ class WP_Block_Type {
 		foreach ( $this->attributes as $attribute_name => $schema ) {
 			$value = null;
 
+			// when an array attribute lacks an items entry, provide a default one which checks for the string type.
+			if ( 'array' === $this->attributes[ $attribute_name ]['type'] && ! isset( $schema['items'] ) ) {
+				$schema['items'] = array(
+					'type' => 'string',
+				);
+			}
+
 			if ( isset( $attributes[ $attribute_name ] ) ) {
 				$is_valid = rest_validate_value_from_schema( $attributes[ $attribute_name ], $schema );
 				if ( ! is_wp_error( $is_valid ) ) {
