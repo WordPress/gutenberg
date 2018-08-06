@@ -66,13 +66,13 @@ export const fetchReusableBlocks = async ( action, store ) => {
 
 	try {
 		const reusableBlockOrBlocks = await result;
-		dispatch( receiveReusableBlocksAction( map(
+		dispatch( receiveReusableBlocksAction( await Promise.all( map(
 			castArray( reusableBlockOrBlocks ),
-			( reusableBlock ) => ( {
+			async ( reusableBlock ) => ( {
 				reusableBlock,
-				parsedBlock: parse( reusableBlock.content )[ 0 ],
+				parsedBlock: ( await parse( reusableBlock.content ) )[ 0 ],
 			} )
-		) ) );
+		) ) ) );
 
 		dispatch( {
 			type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',

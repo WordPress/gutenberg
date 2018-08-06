@@ -117,30 +117,33 @@ export default {
 			]
 		) );
 	},
-	SETUP_EDITOR( action, { getState } ) {
+	SETUP_EDITOR( action, { dispatch, getState } ) {
 		const { post, autosave } = action;
 		const state = getState();
 		const template = getTemplate( state );
 		const templateLock = getTemplateLock( state );
 
 		// Parse content as blocks
-		let blocks;
+		let waitForBlocks;
 		let isValidTemplate = true;
 		if ( post.content.raw ) {
-			blocks = parse( post.content.raw );
+			waitForBlocks = parse( post.content.raw );
 
-			// Unlocked templates are considered always valid because they act as default values only.
-			isValidTemplate = (
-				! template ||
-				templateLock !== 'all' ||
-				doBlocksMatchTemplate( blocks, template )
-			);
+			waitForBlocks.then( ( blocks ) => {
+				// Unlocked templates are considered always valid because they
+				// act as default values only.
+				isValidTemplate = (
+					! template ||
+					templateLock !== 'all' ||
+					doBlocksMatchTemplate( blocks, template )
+				);
+			} );
 		} else if ( template ) {
-			blocks = synchronizeBlocksWithTemplate( [], template );
+			waitForBlocks = Promise.resolve( synchronizeBlocksWithTemplate( [], template ) );
 		} else if ( getDefaultBlockForPostFormat( post.format ) ) {
-			blocks = [ createBlock( getDefaultBlockForPostFormat( post.format ) ) ];
+			waitForBlocks = Promise.resolve( [ createBlock( getDefaultBlockForPostFormat( post.format ) ) ] );
 		} else {
-			blocks = [];
+			waitForBlocks = Promise.resolve( [] );
 		}
 
 		// Include auto draft title in edits while not flagging post as dirty
@@ -166,11 +169,16 @@ export default {
 			);
 		}
 
-		return [
-			setTemplateValidity( isValidTemplate ),
-			setupEditorState( post, blocks, edits ),
-			...( autosaveAction ? [ autosaveAction ] : [] ),
-		];
+		if ( autosaveAction ) {
+			dispatch( autosaveAction );
+		}
+
+		waitForBlocks.then( ( blocks ) => {
+			// TODO: Do we need to always set template validity, if the default
+			// is true and in most cases it will already be valid?
+			dispatch( setTemplateValidity( isValidTemplate ) );
+			dispatch( setupEditorState( post, blocks, edits ) );
+		} );
 	},
 	SYNCHRONIZE_TEMPLATE( action, { getState } ) {
 		const state = getState();

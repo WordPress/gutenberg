@@ -21,9 +21,9 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch, { block, canUserUseUnfilteredHTML } ) => ( {
-		onClick: () => dispatch( 'core/editor' ).replaceBlocks(
+		onClick: async () => dispatch( 'core/editor' ).replaceBlocks(
 			block.clientId,
-			rawHandler( {
+			await rawHandler( {
 				HTML: getBlockContent( block ),
 				mode: 'BLOCKS',
 				canUserUseUnfilteredHTML,

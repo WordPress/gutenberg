@@ -47,8 +47,8 @@ class BlockDropZone extends Component {
 		}
 	}
 
-	onHTMLDrop( HTML, position ) {
-		const blocks = rawHandler( { HTML, mode: 'BLOCKS' } );
+	async onHTMLDrop( HTML, position ) {
+		const blocks = await rawHandler( { HTML, mode: 'BLOCKS' } );
 
 		if ( blocks.length ) {
 			this.props.insertBlocks( blocks, this.getInsertIndex( position ) );

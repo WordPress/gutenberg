@@ -34,9 +34,9 @@ class ParagraphEdit extends Component {
 						...style,
 						minHeight: Math.max( minHeight, typeof attributes.aztecHeight === 'undefined' ? 0 : attributes.aztecHeight ),
 					} }
-					onChange={ ( event ) => {
+					onChange={ async ( event ) => {
 						// Create a React Tree from the new HTML
-						const newParaBlock = parse( '<!-- wp:paragraph --><p>' + event.content + '</p><!-- /wp:paragraph -->' )[ 0 ];
+						const newParaBlock = await parse( '<!-- wp:paragraph --><p>' + event.content + '</p><!-- /wp:paragraph -->' )[ 0 ];
 						setAttributes( {
 							...this.props.attributes,
 							content: newParaBlock.attributes.content,

@@ -111,8 +111,8 @@ export default compose( [
 			onChange( content ) {
 				editPost( { content } );
 			},
-			onPersist( content ) {
-				resetBlocks( parse( content ) );
+			async onPersist( content ) {
+				resetBlocks( await parse( content ) );
 				checkTemplateValidity();
 			},
 		};
