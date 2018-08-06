@@ -29,13 +29,13 @@
 	// Always show outlines in code editor
 	.editor-post-title__block {
 		textarea {
-			border: 1px solid $light-gray-500;
+			border: $border-width solid $light-gray-500;
 			margin-bottom: 4px;
 		}
 
 		textarea:hover,
 		&.is-selected textarea {
-			box-shadow: 0 0 0 1px $light-gray-500;
+			box-shadow: 0 0 0 $border-width $light-gray-500;
 		}
 	}
 

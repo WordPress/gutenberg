@@ -14,7 +14,7 @@
 .editor-post-publish-panel__header {
 	padding-left: 16px;
 	height: $header-height;
-	border-bottom: 1px solid $light-gray-500;
+	border-bottom: $border-width solid $light-gray-500;
 	display: flex;
 	align-items: center;
 	align-content: space-between;
@@ -69,7 +69,7 @@
 }
 
 .post-publish-panel__postpublish .components-panel__body {
-	border-bottom: 1px solid $light-gray-500;
+	border-bottom: $border-width solid $light-gray-500;
 	border-top: none;
 }
 

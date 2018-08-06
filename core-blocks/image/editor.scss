@@ -97,9 +97,9 @@
 	position: absolute;
 	left: 0;
 	right: 0;
-	margin: -1px 0;
+	margin: -$border-width 0;
 
 	@include break-small() {
-		margin: -1px;
+		margin: -$border-width;
 	}
 }

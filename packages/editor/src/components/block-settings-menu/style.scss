@@ -11,7 +11,7 @@
 	padding: 0;
 	width: $block-side-ui-width;
 	height: $block-side-ui-width;
-	border-radius: $button-style__radius-roundrect;
+	border-radius: $radius-round-rectangle;
 	opacity: 0;
 
 	// use opacity to work in various editor styles
@@ -67,7 +67,7 @@
 	.editor-block-settings-menu__separator {
 		margin-top: $item-spacing;
 		margin-bottom: $item-spacing;
-		border-top: 1px solid $light-gray-500;
+		border-top: $border-width solid $light-gray-500;
 	}
 
 	.editor-block-settings-menu__title {

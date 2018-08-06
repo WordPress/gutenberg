@@ -138,7 +138,7 @@ $arrow-size: 8px;
 
 .components-popover__content {
 	box-shadow: $shadow-popover;
-	border: 1px solid $light-gray-500;
+	border: $border-width solid $light-gray-500;
 	background: $white;
 	height: 100%;
 
@@ -194,7 +194,7 @@ $arrow-size: 8px;
 .components-popover__header {
 	align-items: center;
 	background: $white;
-	border: 1px solid $light-gray-500;
+	border: $border-width solid $light-gray-500;
 	display: flex;
 	height: $panel-header-height;
 	justify-content: space-between;

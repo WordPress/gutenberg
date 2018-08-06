@@ -33,7 +33,7 @@
 }
 
 .editor-post-featured-image__toggle {
-	border: 1px dashed $light-gray-900;
+	border: $border-width dashed $light-gray-900;
 	background-color: $light-gray-300;
 	line-height: 20px;
 	padding: $item-spacing 0;
