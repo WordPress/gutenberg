@@ -172,7 +172,7 @@ class ImageEdit extends Component {
 
 	updateAlignment( nextAlign ) {
 		const extraUpdatedAttributes = [ 'wide', 'full' ].indexOf( nextAlign ) !== -1 ?
-			{ width: undefined, height: undefined, url: this.props.image.source_url } :
+			{ width: undefined, height: undefined, url: this.props.image ? this.props.image.source_url : this.props.attributes.url } :
 			{};
 		this.props.setAttributes( { ...extraUpdatedAttributes, align: nextAlign } );
 	}
