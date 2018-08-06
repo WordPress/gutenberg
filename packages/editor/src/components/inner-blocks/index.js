@@ -151,10 +151,7 @@ InnerBlocks = compose( [
 InnerBlocks.Content = withBlockContentContext(
 	identity
 )(
-	( { BlockContent } ) => {
-		console.log( BlockContent );
-		return <BlockContent />;
-	}
+	( { BlockContent } ) => <BlockContent />
 );
 
 export default InnerBlocks;

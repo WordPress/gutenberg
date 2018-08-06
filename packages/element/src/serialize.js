@@ -31,6 +31,7 @@
 import {
 	flowRight,
 	isEmpty,
+	isFunction,
 	castArray,
 	omit,
 	startsWith,
@@ -41,7 +42,11 @@ import {
 /**
  * Internal dependencies
  */
-import { Fragment, RawHTML } from './';
+import {
+	Fragment,
+	StrictMode,
+} from './react';
+import RawHTML from './raw-html';
 
 /**
  * Valid attribute types.
@@ -455,6 +460,7 @@ export function renderElement( element, context = {} ) {
 	const { type: tagName, props } = element;
 
 	switch ( tagName ) {
+		case StrictMode:
 		case Fragment:
 			return renderChildren( props.children, context );
 
@@ -469,8 +475,6 @@ export function renderElement( element, context = {} ) {
 				},
 				context
 			);
-		default:
-			throw new Error( tagName );
 	}
 
 	switch ( typeof tagName ) {
@@ -483,6 +487,19 @@ export function renderElement( element, context = {} ) {
 			}
 
 			return renderElement( tagName( props, context ), context );
+		case 'object':
+			if ( tagName === null ) {
+				return;
+			}
+
+			if ( tagName._context && props.children ) {
+				tagName._context._currentValue = props.value;
+				return renderChildren( props.children, context );
+			}
+
+			if ( tagName._currentValue && isFunction( props.children ) ) {
+				return renderElement( props.children( tagName._currentValue ), context );
+			}
 	}
 
 	return '';

@@ -39,6 +39,7 @@ describe( 'withContext', () => {
 		);
 
 		expect( wrapper.root.findByType( 'div' ).children[ 0 ] ).toBe( 'ok' );
+		expect( console ).toHaveWarned();
 	} );
 
 	it( 'should allow specifying a context getter mapping', () => {
