@@ -372,8 +372,8 @@ inserter: false,
 multiple: false,
 ```
 
-Note: you should handle either the `id` prop or the `anchor` attribute in the return value of the `save` method.
-
 ## Edit and Save
 
 The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](../docs/block-api/block-edit-save.md).
+
+Note: Some [block supports](#supports) — for example, `anchor` or `className` — apply their attributes by adding additional props on the element returned by `save`. This will work automatically for default HTML tag elements (`div`, etc). However, if the return value of your `save` is a custom component element, you will need to ensure that your custom component handles these props in order for the attributes to be persisted.
