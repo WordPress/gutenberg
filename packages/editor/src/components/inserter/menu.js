@@ -212,7 +212,6 @@ export class InserterMenu extends Component {
 					role="region"
 					aria-label={ __( 'Available block types' ) }
 				>
-					<InserterResultsPortal.Slot fillProps={ { filterValue } } />
 
 					<ChildBlocks
 						rootClientId={ rootClientId }
@@ -248,6 +247,9 @@ export class InserterMenu extends Component {
 							</PanelBody>
 						);
 					} ) }
+
+					<InserterResultsPortal.Slot fillProps={ { filterValue } } />
+
 					{ !! reusableItems.length && (
 						<PanelBody
 							title={ __( 'Reusable' ) }
