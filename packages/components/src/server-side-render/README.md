@@ -15,10 +15,13 @@ Render core/archives preview.
 ```jsx
 import { ServerSideRender } from '@wordpress/components';
 
-const MyServerSideRender = ( { attributes } ) => (
+const MyServerSideRender = () => (
 	<ServerSideRender
 		block="core/archives"
-		attributes={ attributes }
+		attributes={ {
+			showPostCounts: true,
+			displayAsDropdown: false, 
+		} }
 	/>
 );
 ```
