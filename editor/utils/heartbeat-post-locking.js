@@ -3,7 +3,7 @@
 /**
  * Internal dependencies
  */
-import { createModal } from '../../packages/editor/src/store/actions';
+import { lockPost } from '../../packages/editor/src/store/actions';
 
 /**
  * WordPress dependencies
@@ -35,11 +35,8 @@ export function setupHearthbeatPostLocking() {
 		}
 
 		// Check if the post is locked.
-		const { locked } = getEditorSettings();
+		const locked = select( 'core/editor' ).isPostLocked();
 		if ( locked ) {
-			console.log( 'LOCKED!' );
-			const modalContent = wp.element.createElement( 'div', {},  'locked' );
-			dispatch( 'core/editor' ).createModal( modalContent );
 			return;
 		}
 
@@ -60,11 +57,11 @@ export function setupHearthbeatPostLocking() {
 			if ( received.lock_error ) {
 				// @todo suspend autosaving
 				// @todo Show "editing taken over" message.
-				const modalContent = wp.element.createElement( Greeting, { toWhom: 'World' } );
-				dispatch( 'core/editor' ).createModal( modalContent );
+				dispatch( 'core/editor' ).lockPost( true );
 			} else if ( received.new_lock ) {
 				jQuery( '#active_post_lock' ).val( received.new_lock );
-				dispatch( 'core/editor' ).removeModal();
+
+				dispatch( 'core/editor' ).lockPost( false );
 			}
 		}
 	} );
@@ -99,13 +96,10 @@ export function setupHearthbeatPostLocking() {
 
 	// Show the locked modal on load if the post is locked.
 	jQuery( window ).on( 'load', function() {
-		console.log( 'ready - settings', getEditorSettings() );
-		const { locked } = getEditorSettings();
+		const locked = select( 'core/editor' ).isPostLocked();
 		console.log( 'locked?', locked );
 		if ( locked ) {
-			console.log( 'LOCKED!' );
-			const modalContent = wp.element.createElement( 'div', {},  'locked' );
-			dispatch( 'core/editor' ).createModal( modalContent );
+			dispatch( 'core/editor' ).lockPost( true );
 		}
 	} );
 }
