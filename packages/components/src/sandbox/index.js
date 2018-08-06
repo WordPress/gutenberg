@@ -145,7 +145,7 @@ class Sandbox extends Component {
 				if ( 'DIV' === potentialIframe.tagName || 'SPAN' === potentialIframe.tagName ) {
 						potentialIframe = potentialIframe.children[0];
 					}
-				if ( 'IFRAME' === potentialIframe.tagName ) {
+				if ( potentialIframe && 'IFRAME' === potentialIframe.tagName ) {
 					if ( potentialIframe.width ) {
 						iframe = potentialIframe;
 						aspectRatio = potentialIframe.width / potentialIframe.height;
