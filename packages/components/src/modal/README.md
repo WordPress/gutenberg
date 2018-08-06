@@ -137,6 +137,14 @@ If this property is added, it will determine whether the modal requests to close
 - Required: No
 - Default: true
 
+### showCloseIcon
+
+If this property is set to false, the modal will not display a close icon.
+
+- Type: `bool`
+- Required: No
+- Default: true
+
 ### className
 
 If this property is added, it will an additional class name to the modal content `div`.
