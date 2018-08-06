@@ -566,58 +566,24 @@ export const getBlocks = createSelector(
 );
 
 /**
- * Given a block, returns an array containing all clientIds
- * of referenced blocks (if it's a shared block)
- * and innerBlocks.
- *
- * @param {Object} state Global application state.
- * @param {Object} block The block whose ids we want to unfold.
- *
- * @return {Array} ids of referenced and inner blocks.
- */
-const unfoldClientIds = ( state, block ) => {
-	if ( ! block ) {
-		return [ null ];
-	}
-
-	const getClientIdsFromSharedBlock = ( globalState, sharedBlock ) => {
-		if ( sharedBlock.name === 'core/block' ) {
-			const clientId = get( getSharedBlock( globalState, sharedBlock.attributes.ref ), [ 'clientId' ], null );
-			return [
-				clientId,
-				...unfoldClientIds( globalState, ...getBlocksByClientId( globalState, clientId ) ),
-			];
-		}
-		return [ null ];
-	};
-	const getClientIdsFromInnerBlock = ( globalState ) => ( innerBlock ) => [
-		get( innerBlock, [ 'clientId' ], null ),
-		...unfoldClientIds( globalState, innerBlock ),
-	];
-	return [
-		...getClientIdsFromSharedBlock( state, block ),
-		...flatMap( block.innerBlocks, getClientIdsFromInnerBlock( state ) ),
-	].filter( ( id ) => !! id );
-};
-
-/**
- * Returns an array containing the clientIds of the top-level blocks,
- * all blocks referenced by any shared block,
- * and all the inner blocks of existing top-level nested blocks.
+ * Returns an array containing the clientIds of the top-level blocks
+ * and their descendants of any depth (for nested blocks).
  *
  * @param {Object} state Global application state.
  *
- * @return {Array} ids of top-level, referenced, and inner blocks.
+ * @return {Array} ids of top-level and descendant blocks.
  */
-export const getClientIdsUnfolded = createSelector(
+export const getClientIdsWithDescendants = createSelector(
 	( state ) => {
-		const topLevelBlocks = getBlocks( state );
-		const getClientIdsFromBlock = ( block ) => [ block.clientId, ...unfoldClientIds( state, block ) ];
-		return flatMap( topLevelBlocks, getClientIdsFromBlock );
+		const getDescendants = ( clientIds ) => flatMap( clientIds, ( clientId ) => {
+			const descendants = getBlockOrder( state, clientId );
+			return [ ...descendants, ...getDescendants( descendants ) ];
+		} );
+		const topLevelIds = getBlockOrder( state );
+		return [ ...topLevelIds, ...getDescendants( topLevelIds ) ];
 	},
 	( state ) => [
 		state.editor.present.blockOrder,
-		state.editor.present.blocksByClientId,
 	]
 );
 
@@ -1603,7 +1569,7 @@ export const getInserterItems = createSelector(
 
 			let isDisabled = false;
 			if ( ! hasBlockSupport( blockType.name, 'multiple', true ) ) {
-				isDisabled = some( getBlocksByClientId( state, getClientIdsUnfolded( state ) ), { name: blockType.name } );
+				isDisabled = some( getBlocksByClientId( state, getClientIdsWithDescendants( state ) ), { name: blockType.name } );
 			}
 
 			const isContextual = isArray( blockType.parent );
