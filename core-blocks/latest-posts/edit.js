@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, isUndefined, pickBy } from 'lodash';
+import { isUndefined, pickBy } from 'lodash';
 import moment from 'moment';
 import classnames from 'classnames';
 
