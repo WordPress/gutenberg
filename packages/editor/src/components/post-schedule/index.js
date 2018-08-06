@@ -38,7 +38,7 @@ export default compose( [
 	withDispatch( ( dispatch ) => {
 		return {
 			onUpdateDate( date, dateFloating = false ) {
-				dispatch( 'core/editor' ).editPost( { date, 'date_floating': dateFloating } );
+				dispatch( 'core/editor' ).editPost( { date, date_floating: dateFloating } );
 			},
 		};
 	} ),
