@@ -20,7 +20,7 @@ npm install @wordpress/nux --save
 
 See [the component's README][dot-tip-readme] for more information.
 
-[dot-tip-readme]: https://github.com/WordPress/gutenberg/tree/master/packages/src/nux/components/dot-tip/README.md
+[dot-tip-readme]: https://github.com/WordPress/gutenberg/tree/master/packages/nux/src/components/dot-tip/README.md
 
 ```jsx
 <button onClick={ ... }>
