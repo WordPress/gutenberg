@@ -95,6 +95,7 @@ class Admin_Test extends WP_UnitTestCase {
 	 * Tests gutenberg_post_has_blocks().
 	 *
 	 * @covers ::gutenberg_post_has_blocks
+	 * @expectedDeprecated gutenberg_post_has_blocks
 	 */
 	function test_gutenberg_post_has_blocks() {
 		$this->assertTrue( gutenberg_post_has_blocks( self::$post_with_blocks ) );
@@ -105,6 +106,7 @@ class Admin_Test extends WP_UnitTestCase {
 	 * Tests gutenberg_content_has_blocks().
 	 *
 	 * @covers ::gutenberg_content_has_blocks
+	 * @expectedDeprecated gutenberg_content_has_blocks
 	 */
 	function test_gutenberg_content_has_blocks() {
 		$content_with_blocks    = get_post_field( 'post_content', self::$post_with_blocks );
