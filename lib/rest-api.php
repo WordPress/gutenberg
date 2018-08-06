@@ -69,7 +69,7 @@ add_action( 'rest_api_init', 'gutenberg_add_date_floating_flag' );
  *
  * TODO: This is a temporary solution until a date_floating flag can be added to core
  *
- * @param WP_Post $current_post Post to determine floating date status for.
+ * @param WP_Post $rest_post Post to determine floating date status for.
  * @return bool
  */
 function gutenberg_get_date_floating_flag( $rest_post ) {
