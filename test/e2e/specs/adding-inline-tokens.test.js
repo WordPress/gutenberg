@@ -23,7 +23,7 @@ describe( 'adding inline tokens', () => {
 		await page.click( '.editor-default-block-appender' );
 		await page.keyboard.type( 'a ' );
 
-		await insertBlock( 'Inline Image' );
+		await insertBlock( 'Inline Image', 'Inline Elements' );
 
 		// Wait for media modal to appear and upload image.
 		await page.waitForSelector( '.media-modal input[type=file]' );
