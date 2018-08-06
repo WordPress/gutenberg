@@ -13,6 +13,7 @@ import { select } from '@wordpress/data';
  * Internal dependencies
  */
 import { REDUCER_KEY } from './name';
+import { getQueriedItems } from './queried-data';
 
 /**
  * Returns true if resolution is in progress for the core selector of the given
@@ -139,24 +140,26 @@ export function getEntity( state, kind, name ) {
  * @return {Object?} Record.
  */
 export function getEntityRecord( state, kind, name, key ) {
-	return get( state.entities.data, [ kind, name, 'byKey', key ] );
+	return get( state.entities.data, [ kind, name, 'items', key ] );
 }
 
 /**
  * Returns the Entity's records.
  *
- * @param {Object} state  State tree
- * @param {string} kind   Entity kind.
- * @param {string} name   Entity name.
+ * @param {Object}  state  State tree
+ * @param {string}  kind   Entity kind.
+ * @param {string}  name   Entity name.
+ * @param {?Object} query  Optional terms query.
  *
  * @return {Array} Records.
  */
-export const getEntityRecords = createSelector(
-	( state, kind, name ) => {
-		return Object.values( get( state.entities.data, [ kind, name, 'byKey' ] ) );
-	},
-	( state, kind, name ) => [ get( state.entities.data, [ kind, name, 'byKey' ] ) ]
-);
+export function getEntityRecords( state, kind, name, query ) {
+	const queriedState = get( state.entities.data, [ kind, name ] );
+	if ( ! queriedState ) {
+		return [];
+	}
+	return getQueriedItems( queriedState, query );
+}
 
 /**
  * Return theme supports data in the index.
