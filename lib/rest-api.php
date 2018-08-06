@@ -50,6 +50,23 @@ function gutenberg_register_rest_routes() {
 add_action( 'rest_api_init', 'gutenberg_register_rest_routes' );
 
 /**
+ * Register a new field on the REST API posts response for floating dates
+ *
+ * @see  https://core.trac.wordpress.org/ticket/39953
+ *
+ * TODO: This is a temporary solution until a date_floating flag can be added to core
+ */
+function gutenberg_add_date_floating_flag() {
+	$post_types = get_post_types( array( 'show_in_rest' => true ), 'names' );
+	register_rest_field( $post_types, 'date_floating', array(
+		'get_callback' => function() {
+			return (boolean) ( '0000-00-00 00:00:00' === get_post()->post_date_gmt ); },
+		)
+	);
+}
+add_action( 'rest_api_init', 'gutenberg_add_date_floating_flag' );
+
+/**
  * Make sure oEmbed REST Requests apply the WP Embed security mechanism for WordPress embeds.
  *
  * @see  https://core.trac.wordpress.org/ticket/32522
@@ -411,24 +428,6 @@ function gutenberg_add_revisions_data_to_links( $response, $post, $request ) {
 }
 
 /**
- * Ensure null value is returned for date_gmt on drafts without a date set
- *
- * @param  WP_REST_Response $response WP REST API response of a post.
- * @param  WP_Post          $post The post being returned.
- * @param  WP_REST_Request  $request WP REST API request.
- * @return WP_REST_Response Response containing correct date_gmt
- */
-function gutenberg_allow_null_date_gmt( $response, $post, $request ) {
-	if ( 'edit' === $request['context'] && '0000-00-00 00:00:00' === $post->post_date_gmt ) {
-		$response_data             = $response->get_data();
-		$response_data['date_gmt'] = null;
-		$response->set_data( $response_data );
-	}
-
-	return $response;
-}
-
-/**
  * Whenever a post type is registered, ensure we're hooked into it's WP REST API response.
  *
  * @param string $post_type The newly registered post type.
@@ -439,7 +438,6 @@ function gutenberg_register_post_prepare_functions( $post_type ) {
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_block_format_to_post_content', 10, 3 );
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_target_schema_to_links', 10, 3 );
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_revisions_data_to_links', 10, 3 );
-	add_filter( "rest_prepare_{$post_type}", 'gutenberg_allow_null_date_gmt', 10, 3 );
 	add_filter( "rest_{$post_type}_collection_params", 'gutenberg_filter_post_collection_parameters', 10, 2 );
 	add_filter( "rest_{$post_type}_query", 'gutenberg_filter_post_query_arguments', 10, 2 );
 	return $post_type;

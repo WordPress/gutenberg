@@ -32,12 +32,13 @@ export default compose( [
 	withSelect( ( select ) => {
 		return {
 			date: select( 'core/editor' ).getEditedPostAttribute( 'date' ),
+			dateFloating: select( 'core/editor' ).getEditedPostAttribute( 'date_floating' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
 		return {
-			onUpdateDate( date ) {
-				dispatch( 'core/editor' ).editPost( { date } );
+			onUpdateDate( date, dateFloating = false ) {
+				dispatch( 'core/editor' ).editPost( { date, 'date_floating': dateFloating } );
 			},
 		};
 	} ),
