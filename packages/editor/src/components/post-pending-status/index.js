@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { FormToggle } from '@wordpress/components';
+import { CheckboxControl } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 
@@ -12,7 +12,6 @@ import { withInstanceId, compose } from '@wordpress/compose';
 import PostPendingStatusCheck from './check';
 
 export function PostPendingStatus( { instanceId, status, onUpdateStatus } ) {
-	const pendingId = 'pending-toggle-' + instanceId;
 	const togglePendingStatus = () => {
 		const updatedStatus = status === 'pending' ? 'draft' : 'pending';
 		onUpdateStatus( updatedStatus );
@@ -20,9 +19,8 @@ export function PostPendingStatus( { instanceId, status, onUpdateStatus } ) {
 
 	return (
 		<PostPendingStatusCheck>
-			<label htmlFor={ pendingId }>{ __( 'Pending Review' ) }</label>
-			<FormToggle
-				id={ pendingId }
+			<CheckboxControl
+				label={ __( 'Pending Review' ) }
 				checked={ status === 'pending' }
 				onChange={ togglePendingStatus }
 			/>
