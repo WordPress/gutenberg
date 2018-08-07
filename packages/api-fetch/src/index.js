@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -77,6 +78,16 @@ function apiFetch( options ) {
 							code: 'unknown_error',
 							message: __( 'An unknown error occurred.' ),
 						};
+
+						if ( error.indexOf( 'Cloudflare Ray ID' ) >= 0 ) {
+							window.location.href = addQueryArgs(
+								window.location.href,
+								{
+									'classic-editor': '',
+									'cloudflare-error': '',
+								}
+							);
+						}
 
 						throw error || unknownError;
 					} );
