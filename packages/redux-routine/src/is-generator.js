@@ -9,7 +9,7 @@
  */
 export default function isGenerator( object ) {
 	return (
-		object &&
+		!! object &&
 		object[ Symbol.toStringTag ] === 'Generator'
 	);
 }

@@ -51,7 +51,6 @@ describe( 'createMiddleware', () => {
 		expect( store.getState() ).toBe( null );
 
 		jest.runAllTimers();
-		expect( store.getState() ).toBe( null );
 
 		// Promise resolution occurs on next tick.
 		process.nextTick( () => {
@@ -135,7 +134,6 @@ describe( 'createMiddleware', () => {
 		expect( store.getState() ).toBe( null );
 
 		jest.runAllTimers();
-		expect( store.getState() ).toBe( null );
 
 		process.nextTick( () => {
 			expect( store.getState() ).toBe( 2 );

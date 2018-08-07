@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/redux-routine",
 	"version": "1.0.0",
-	"description": "Redux middleware for generator coroutines",
+	"description": "Redux middleware for generator coroutines.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
