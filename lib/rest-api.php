@@ -104,6 +104,83 @@ function gutenberg_filter_oembed_result( $response, $handler, $request ) {
 add_filter( 'rest_request_after_callbacks', 'gutenberg_filter_oembed_result', 10, 3 );
 
 /**
+ * Add additional 'visibility' rest api field to taxonomies.
+ *
+ * Used so private taxonomies are not displayed in the UI.
+ *
+ * @see https://core.trac.wordpress.org/ticket/42707
+ */
+function gutenberg_add_taxonomy_visibility_field() {
+	register_rest_field(
+		'taxonomy',
+		'visibility',
+		array(
+			'get_callback' => 'gutenberg_get_taxonomy_visibility_data',
+			'schema'       => array(
+				'description' => __( 'The visibility settings for the taxonomy.', 'gutenberg' ),
+				'type'        => 'object',
+				'context'     => array( 'edit' ),
+				'readonly'    => true,
+				'properties'  => array(
+					'public'             => array(
+						'description' => __( 'Whether a taxonomy is intended for use publicly either via the admin interface or by front-end users.', 'gutenberg' ),
+						'type'        => 'boolean',
+					),
+					'publicly_queryable' => array(
+						'description' => __( 'Whether the taxonomy is publicly queryable.', 'gutenberg' ),
+						'type'        => 'boolean',
+					),
+					'show_ui'            => array(
+						'description' => __( 'Whether to generate a default UI for managing this taxonomy.', 'gutenberg' ),
+						'type'        => 'boolean',
+					),
+					'show_admin_column'  => array(
+						'description' => __( 'Whether to allow automatic creation of taxonomy columns on associated post-types table.', 'gutenberg' ),
+						'type'        => 'boolean',
+					),
+					'show_in_nav_menus'  => array(
+						'description' => __( 'Whether to make the taxonomy available for selection in navigation menus.', 'gutenberg' ),
+						'type'        => 'boolean',
+					),
+					'show_in_quick_edit' => array(
+						'description' => __( 'Whether to show the taxonomy in the quick/bulk edit panel.', 'gutenberg' ),
+						'type'        => 'boolean',
+					),
+				),
+			),
+		)
+	);
+}
+
+/**
+ * Gets taxonomy visibility property data.
+ *
+ * @see https://core.trac.wordpress.org/ticket/42707
+ *
+ * @param array $object Taxonomy data from REST API.
+ * @return array Array of taxonomy visibility data.
+ */
+function gutenberg_get_taxonomy_visibility_data( $object ) {
+	// Just return existing data for up-to-date Core.
+	if ( isset( $object['visibility'] ) ) {
+		return $object['visibility'];
+	}
+
+	$taxonomy = get_taxonomy( $object['slug'] );
+
+	return array(
+		'public'             => $taxonomy->public,
+		'publicly_queryable' => $taxonomy->publicly_queryable,
+		'show_ui'            => $taxonomy->show_ui,
+		'show_admin_column'  => $taxonomy->show_admin_column,
+		'show_in_nav_menus'  => $taxonomy->show_in_nav_menus,
+		'show_in_quick_edit' => $taxonomy->show_ui,
+	);
+}
+
+add_action( 'rest_api_init', 'gutenberg_add_taxonomy_visibility_field' );
+
+/**
  * Add a permalink template to posts in the post REST API response.
  *
  * @param WP_REST_Response $response WP REST API response of a post.
