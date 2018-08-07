@@ -441,13 +441,20 @@ export class RichText extends Component {
 				( keyCode === DELETE && isHorizontalEdge( rootNode, false ) )
 			)
 		) {
-			// These modifiers would not result in modification of text content,
-			// if they're pressed they should not cause merge or deletion of blocks.
-			if ( ( event.metaKey || event.ctrlKey || event.altKey ) && event.shiftKey ) {
+			if ( ! this.props.onMerge && ! this.props.onRemove ) {
 				return;
 			}
 
-			if ( ! this.props.onMerge && ! this.props.onRemove ) {
+			// These modifiers would not result in modification of text content,
+			// if they're pressed they should not cause merge or deletion of blocks.
+			// Returning here also allows further binding of these events.
+			const isMetaShiftPressed = event.metaKey && event.shiftKey;
+			const isCtrlShiftPressed = event.ctrlKey && event.shiftKey;
+			const isAltShiftPressed = event.ctrlKey && event.shiftKey;
+			const isMetaAltPressed = event.metaKey && event.altKey;
+			const isCtrlAltPressed = event.ctrlKey && event.altKey;
+
+			if ( isMetaShiftPressed || isCtrlShiftPressed || isAltShiftPressed || isMetaAltPressed || isCtrlAltPressed ) {
 				return;
 			}
 
