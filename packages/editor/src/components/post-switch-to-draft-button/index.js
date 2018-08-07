@@ -6,14 +6,20 @@ import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
-function PostSwitchToDraftButton( { isSaving, isPublished, onClick } ) {
-	if ( ! isPublished ) {
+function PostSwitchToDraftButton( { isSaving, isPublished, isScheduled, onClick } ) {
+	if ( ! isPublished && ! isScheduled ) {
 		return null;
 	}
 
 	const onSwitch = () => {
+		let alertMessage;
+		if ( isPublished ) {
+			alertMessage = __( 'Are you sure you want to unpublish this post?' );
+		} else if ( isScheduled ) {
+			alertMessage = __( 'Are you sure you want to unschedule this post?' );
+		}
 		// eslint-disable-next-line no-alert
-		if ( window.confirm( __( 'Are you sure you want to unpublish this post?' ) ) ) {
+		if ( window.confirm( alertMessage ) ) {
 			onClick();
 		}
 	};
@@ -32,10 +38,11 @@ function PostSwitchToDraftButton( { isSaving, isPublished, onClick } ) {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { isSavingPost, isCurrentPostPublished } = select( 'core/editor' );
+		const { isSavingPost, isCurrentPostPublished, isCurrentPostScheduled } = select( 'core/editor' );
 		return {
 			isSaving: isSavingPost(),
 			isPublished: isCurrentPostPublished(),
+			isScheduled: isCurrentPostScheduled(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

@@ -20,7 +20,7 @@
 	padding: 0;
 	width: $block-side-ui-width;
 	height: $block-side-ui-width;	// the side UI can be no taller than 2 * $block-side-ui-width, which matches the height of a line of text
-	border-radius: $button-style__radius-roundrect;
+	border-radius: $radius-round-rectangle;
 
 	// use opacity to work in various editor styles
 	color: $dark-opacity-300;

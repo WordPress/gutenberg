@@ -6,7 +6,7 @@ import { has } from 'lodash';
 /**
  * Internal dependencies
  */
-import { isPhrasingContent } from './utils';
+import { isPhrasingContent } from './phrasing-content';
 
 /**
  * Whether or not the given node is figure content.

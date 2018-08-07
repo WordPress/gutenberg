@@ -197,9 +197,14 @@ export async function searchForBlock( searchTerm ) {
  * result that appears.
  *
  * @param {string} searchTerm The text to search the inserter for.
+ * @param {string} panelName  The inserter panel to open (if it's closed by default).
  */
-export async function insertBlock( searchTerm ) {
+export async function insertBlock( searchTerm, panelName = null ) {
 	await searchForBlock( searchTerm );
+	if ( panelName ) {
+		const panelButton = ( await page.$x( `//button[contains(text(), '${ panelName }')]` ) )[ 0 ];
+		await panelButton.click();
+	}
 	await page.click( `button[aria-label="${ searchTerm }"]` );
 }
 

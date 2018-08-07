@@ -1,5 +1,4 @@
-Dropdown
-========
+# Dropdown
 
 Dropdown is a React component to render a button that opens a floating content modal when clicked.
 This components takes care of updating the state of the dropdown menu (opened/closed), handles closing the menu when clicking outside
@@ -9,7 +8,7 @@ and uses render props to render the button and the content.
 
 
 ```jsx
-import { Dropdown } from '@wordpress/components';
+import { Button, Dropdown } from '@wordpress/components';
 
 function MyDropdownMenu() {
 	return (
@@ -18,9 +17,9 @@ function MyDropdownMenu() {
 			contentClassName="my-popover-content-classname"
 			position="bottom right"
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<button onClick={ onToggle } aria-expanded={ isOpen }>
+				<Button isPrimary onClick={ onToggle } aria-expanded={ isOpen }>
 					Toggle Popover!
-				</button>
+				</Button>
 			) }
 			renderContent={ () => (
 				<div>

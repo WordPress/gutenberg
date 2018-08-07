@@ -8,17 +8,17 @@
 	height: 40px;
 	white-space: nowrap;
 
-	// use opacity to work in various editor styles
-	border: 1px solid $dark-opacity-light-500;
+	// Use opacity to work in various editor styles.
+	border: $border-width solid $dark-opacity-light-500;
 	border-bottom: none;
 	background-clip: padding-box;
 
-	// put toolbar snugly to edge on mobile
-	margin-left: -$block-padding - 1px;	// stack borders
-	margin-right: -$block-padding - 1px;
+	// Put toolbar snugly to edge on mobile.
+	margin-left: -$block-padding - $border-width; // This hides the border off the edge of the screen.
+	margin-right: -$block-padding - $border-width;
 	@include break-small() {
-		margin-left: -1px;
-		margin-right: -1px;
+		margin-left: -$border-width;
+		margin-right: -$border-width;
 	}
 }
 
@@ -55,7 +55,7 @@
 	display: inline-flex;
 	align-items: center;
 
-	// Higher specificity required to override core margin styles
+	// Higher specificity required to override core margin styles.
 	.editor-post-permalink-editor__save {
 		margin-left: auto;
 	}

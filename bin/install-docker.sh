@@ -3,6 +3,8 @@
 # Exit if any command fails.
 set -e
 
+WP_VERSION=${WP_VERSION-latest}
+
 # Include useful functions.
 . "$(dirname "$0")/includes.sh"
 
@@ -37,7 +39,7 @@ docker-compose up -d >/dev/null
 
 # Install the PHPUnit test scaffolding.
 echo -e $(status_message "Installing PHPUnit test scaffolding...")
-docker-compose run --rm wordpress_phpunit /app/bin/install-wp-tests.sh wordpress_test root example mysql latest false >/dev/null
+docker-compose run --rm wordpress_phpunit /app/bin/install-wp-tests.sh wordpress_test root example mysql $WP_VERSION false > /dev/null
 
 # Install Composer. This is only used to run WordPress Coding Standards checks.
 echo -e $(status_message "Installing and updating Composer modules...")

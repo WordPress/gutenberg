@@ -1,7 +1,8 @@
 /**
  * Internal dependencies
  */
-import { isPhrasingContent, isEmpty } from './utils';
+import { isEmpty } from './utils';
+import { isPhrasingContent } from './phrasing-content';
 
 /**
  * Browser dependencies

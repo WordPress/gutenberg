@@ -22,6 +22,7 @@ export const defaultEntities = [
 
 export const kinds = [
 	{ name: 'postType', loadEntities: loadPostTypeEntities },
+	{ name: 'taxonomy', loadEntities: loadTaxonomyEntities },
 ];
 
 /**
@@ -35,6 +36,22 @@ async function loadPostTypeEntities() {
 		return {
 			kind: 'postType',
 			baseURL: '/wp/v2/' + postType.rest_base,
+			name,
+		};
+	} );
+}
+
+/**
+ * Returns the list of the taxonomies entities.
+ *
+ * @return {Promise} Entities promise
+ */
+async function loadTaxonomyEntities() {
+	const taxonomies = await apiFetch( { path: '/wp/v2/taxonomies?context=edit' } );
+	return map( taxonomies, ( taxonomy, name ) => {
+		return {
+			kind: 'taxonomy',
+			baseURL: '/wp/v2/' + taxonomy.rest_base,
 			name,
 		};
 	} );

@@ -1,5 +1,4 @@
-Dropdown Menu
-=============
+# Dropdown Menu
 
 Dropdown Menu is a React component to render an expandable menu of buttons. It is similar in purpose to a `<select>` element, with the distinction that it does not maintain a value. Instead, each option behaves as an action button.
 
@@ -10,7 +9,7 @@ Render a Dropdown Menu with a set of controls:
 ```jsx
 import { DropdownMenu } from '@wordpress/components';
 
-function DirectionMenu( { onMove } ) {
+function DirectionMenu() {
 	return (
 		<DropdownMenu
 			icon="move"
@@ -19,22 +18,22 @@ function DirectionMenu( { onMove } ) {
 				{
 					title: 'Up',
 					icon: 'arrow-up-alt',
-					onClick: () => onMove( 'up' )
+					onClick: () => console.log( 'up' )
 				},
 				{
 					title: 'Right',
 					icon: 'arrow-right-alt',
-					onClick: () => onMove( 'right' )
+					onClick: () => console.log( 'right' )
 				},
 				{
 					title: 'Down',
 					icon: 'arrow-down-alt',
-					onClick: () => onMove( 'down' )
+					onClick: () => console.log( 'down' )
 				},
 				{
 					title: 'Left',
 					icon: 'arrow-left-alt',
-					onClick: () => onMove( 'left' )
+					onClick: () => console.log( 'left' )
 				},
 			] }
 		/>

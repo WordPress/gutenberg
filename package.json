@@ -38,6 +38,7 @@
 		"@wordpress/keycodes": "file:packages/keycodes",
 		"@wordpress/nux": "file:packages/nux",
 		"@wordpress/plugins": "file:packages/plugins",
+		"@wordpress/redux-routine": "file:packages/redux-routine",
 		"@wordpress/shortcode": "file:packages/shortcode",
 		"@wordpress/url": "file:packages/url",
 		"@wordpress/viewport": "file:packages/viewport",
@@ -109,6 +110,7 @@
 		"rimraf": "2.6.2",
 		"rtlcss": "2.4.0",
 		"sass-loader": "6.0.7",
+		"source-map-loader": "0.2.3",
 		"sprintf-js": "1.1.1",
 		"style-loader": "0.20.3",
 		"symlink-or-copy": "1.2.0",
@@ -121,6 +123,13 @@
 	"npmPackageJsonLintConfig": {
 		"extends": "@wordpress/npm-package-json-lint-config",
 		"rules": {
+			"description-format": [
+				"error",
+				{
+					"requireCapitalFirstLetter": true,
+					"requireEndingPeriod": true
+				}
+			],
 			"require-publishConfig": "error",
 			"valid-values-author": [
 				"error",

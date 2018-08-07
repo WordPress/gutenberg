@@ -105,6 +105,7 @@ const gutenbergPackages = [
 	'keycodes',
 	'nux',
 	'plugins',
+	'redux-routine',
 	'shortcode',
 	'url',
 	'viewport',
@@ -163,6 +164,11 @@ const config = {
 	},
 	module: {
 		rules: [
+			{
+				test: /\.js$/,
+				use: [ 'source-map-loader' ],
+				enforce: 'pre',
+			},
 			{
 				test: /\.js$/,
 				exclude: [
@@ -238,6 +244,7 @@ const config = {
 			'api-fetch',
 			'deprecated',
 			'dom-ready',
+			'redux-routine',
 		].map( camelCaseDash ) ),
 		new CopyWebpackPlugin(
 			gutenbergPackages.map( ( packageName ) => ( {
