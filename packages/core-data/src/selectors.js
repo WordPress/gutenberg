@@ -77,6 +77,18 @@ export function isRequestingCategories() {
 }
 
 /**
+ * Returns true if a request is in progress for embed preview data, or false
+ * otherwise.
+ *
+ * @param {string} url URL the preview would be for.
+ *
+ * @return {boolean} Whether a request is in progress for an embed preview.
+ */
+export function isRequestingEmbedPreview( state, url ) {
+	return isResolving( 'getEmbedPreview', url );
+}
+
+/**
  * Returns all available authors.
  *
  * @param {Object} state Data state.

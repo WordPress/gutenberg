@@ -14,7 +14,7 @@ import { Component, renderToString } from '@wordpress/element';
 import { Button, Placeholder, Spinner, SandBox, IconButton, Toolbar } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 import { RichText, BlockControls } from '@wordpress/editor';
-import { withSelect } from '@wordpress/data';
+import { withSelect, isRequesting } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -51,7 +51,6 @@ export function getEmbedEdit( title, icon ) {
 
 			this.state = {
 				editingURL: false,
-				fetching: !! this.props.attributes.url && ! this.props.preview,
 				url: this.props.attributes.url,
 			};
 
@@ -96,12 +95,8 @@ export function getEmbedEdit( title, icon ) {
 					// clicks embed.
 					this.processPreview();
 				}
-				// Don't change anything, otherwise we go into the 'fetching' state but never
-				// get new props, because the url has not changed.
-				return;
 			}
 			setAttributes( { url } );
-			this.setState( { fetching: true } );
 		}
 
 		processPreview() {
@@ -109,7 +104,7 @@ export function getEmbedEdit( title, icon ) {
 			const { url } = this.props.attributes;
 
 			if ( previewIsFallback ) {
-				this.setState( { fetching: false, editingURL: true } );
+				this.setState( { editingURL: true } );
 				return;
 			}
 
@@ -149,7 +144,6 @@ export function getEmbedEdit( title, icon ) {
 			if ( html || 'photo' === type ) {
 				setAttributes( { type, providerNameSlug } );
 			}
-			this.setState( { fetching: false } );
 		}
 
 		switchBackToURLInput() {
@@ -157,9 +151,9 @@ export function getEmbedEdit( title, icon ) {
 		}
 
 		render() {
-			const { fetching, url, editingURL } = this.state;
+			const { url, editingURL } = this.state;
 			const { caption, type } = this.props.attributes;
-			const { setAttributes, isSelected, className, preview, previewIsFallback } = this.props;
+			const { fetching, setAttributes, isSelected, className, preview, previewIsFallback } = this.props;
 			const controls = (
 				<BlockControls>
 					<Toolbar>
@@ -288,12 +282,14 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 			withSelect( ( select, ownProps ) => {
 				const { url } = ownProps.attributes;
 				const core = select( 'core' );
-				const { getEmbedPreview, isPreviewEmbedFallback } = core;
+				const { getEmbedPreview, isPreviewEmbedFallback, isRequestingEmbedPreview } = core;
 				const preview = getEmbedPreview( url );
 				const previewIsFallback = isPreviewEmbedFallback( url );
+				const fetching = isRequestingEmbedPreview( url );
 				return {
 					preview,
 					previewIsFallback,
+					fetching,
 				};
 			} )
 		)( getEmbedEdit( title, icon ) ),
