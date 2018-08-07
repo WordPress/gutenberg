@@ -47,7 +47,7 @@ import TokenUI from './tokens/ui';
  * Browser dependencies
  */
 
-const { Node } = window;
+const { Node, getSelection } = window;
 
 /**
  * Zero-width space character used by TinyMCE as a caret landing point for
@@ -396,7 +396,7 @@ export class RichText extends Component {
 	 * @param {tinymce.EditorEvent<KeyboardEvent>} event Keydown event.
 	 */
 	onHorizontalNavigationKeyDown( event ) {
-		const { focusNode } = window.getSelection();
+		const { focusNode } = getSelection();
 		const { nodeType, nodeValue } = focusNode;
 
 		if ( nodeType !== Node.TEXT_NODE ) {
@@ -437,7 +437,7 @@ export class RichText extends Component {
 		const { keyCode } = event;
 
 		if (
-			window.getSelection().isCollapsed && (
+			getSelection().isCollapsed && (
 				( keyCode === BACKSPACE && isHorizontalEdge( rootNode, true ) ) ||
 				( keyCode === DELETE && isHorizontalEdge( rootNode, false ) )
 			)
