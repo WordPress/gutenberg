@@ -8,7 +8,7 @@ const globalShortcuts = {
 	title: __( 'Global shortcuts' ),
 	shortcuts: [
 		{
-			key: displayShortcut.primary( '?' ),
+			key: displayShortcut.access( 'h' ),
 			description: __( 'Display this help.' ),
 		},
 		{

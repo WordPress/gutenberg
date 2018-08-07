@@ -81,7 +81,7 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 			<KeyboardShortcuts
 				bindGlobal
 				shortcuts={ {
-					[ rawShortcut.primary( '/' ) ]: toggleModal,
+					[ rawShortcut.access( 'h' ) ]: toggleModal,
 				} }
 			/>
 			{ isModalActive && (
@@ -113,7 +113,7 @@ export default compose( [
 		} = dispatch( 'core/edit-post' );
 
 		return {
-			toggleModal: ( ) => isModalActive ? closeModal() : openModal( modalName ),
+			toggleModal: () => isModalActive ? closeModal() : openModal( modalName ),
 		};
 	} ),
 ] )( KeyboardShortcutHelpModal );

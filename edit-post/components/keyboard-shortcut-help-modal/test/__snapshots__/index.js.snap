@@ -6,7 +6,7 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
     bindGlobal={true}
     shortcuts={
       Object {
-        "ctrl+/": [Function],
+        "shift+alt+h": [Function],
       }
     }
   />
@@ -28,7 +28,7 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
         Array [
           Object {
             "description": "Display this help.",
-            "key": "Ctrl+?",
+            "key": "Shift+Alt+H",
           },
           Object {
             "description": "Save your changes.",
@@ -136,7 +136,7 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is not a
     bindGlobal={true}
     shortcuts={
       Object {
-        "ctrl+/": [Function],
+        "shift+alt+h": [Function],
       }
     }
   />

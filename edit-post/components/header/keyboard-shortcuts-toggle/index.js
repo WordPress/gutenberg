@@ -19,7 +19,7 @@ export function KeyboardShortcutsToggle( { toggleModal, isModalActive } ) {
 			icon={ isModalActive && 'yes' }
 			isSelected={ isModalActive }
 			onClick={ toggleModal }
-			shortcut={ displayShortcut.primary( 'k' ) }
+			shortcut={ displayShortcut.access( 'h' ) }
 		>
 			{ __( 'Keyboard Shortcuts' ) }
 		</MenuItem>
