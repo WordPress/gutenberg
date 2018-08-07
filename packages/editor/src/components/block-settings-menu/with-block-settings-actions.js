@@ -18,7 +18,7 @@ const shortcuts = {
 	},
 	remove: {
 		raw: rawShortcut.primaryAlt( 'backspace' ),
-		display: displayShortcut.primaryAlt( 'backspace' ),
+		display: displayShortcut.primaryAlt( 'bksp' ),
 	},
 };
 
