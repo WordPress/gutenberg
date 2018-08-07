@@ -187,3 +187,7 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 .freeform-toolbar.has-advanced-toolbar .mce-toolbar-grp .mce-toolbar {
 	display: block;
 }
+
+.freeform-toolbar .mce-toolbar .mce-btn.mce-active i {
+	color: #555d66;
+}
