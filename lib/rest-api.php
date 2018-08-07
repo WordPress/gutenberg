@@ -41,10 +41,9 @@ function gutenberg_register_rest_routes() {
 			continue;
 		}
 
-		if ( post_type_supports( $post_type->name, 'revisions' ) ) {
-			$autosaves_controller = new WP_REST_Autosaves_Controller( $post_type->name );
-			$autosaves_controller->register_routes();
-		}
+		// Initialize the Autosaves controller.
+		$autosaves_controller = new WP_REST_Autosaves_Controller( $post_type->name );
+		$autosaves_controller->register_routes();
 	}
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_routes' );
