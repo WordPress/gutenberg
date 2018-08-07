@@ -9,12 +9,7 @@ export function BlockSettingsKeyboardShortcuts( { onDuplicate, onRemove, shortcu
 			bindGlobal
 			shortcuts={ {
 				[ shortcuts.duplicate.raw ]: onDuplicate,
-				[ shortcuts.remove.raw ]: () => {
-					onRemove();
-				},
-				[ shortcuts.removeSecondary.raw ]: () => {
-					onRemove();
-				},
+				[ shortcuts.remove.raw ]: onRemove,
 			} }
 		/>
 	);
