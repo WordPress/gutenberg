@@ -70,7 +70,7 @@
 		padding: 0 2px;
 		margin: 0 -2px;
 		border-radius: 2px;
-		box-shadow: 0 0 0 1px $blue-medium-100;
+		box-shadow: 0 0 0 $border-width $blue-medium-100;
 		background: $blue-medium-100;
 	}
 
@@ -115,8 +115,8 @@
 }
 
 .editor-block-list__layout .editor-block-list__block[data-type="core/freeform"] {
-	.editor-block-list__block-edit:before {
-		outline: 1px solid #e2e4e7;
+	.editor-block-list__block-edit::before {
+		outline: $border-width solid #e2e4e7;
 	}
 
 	// Don't show normal block toolbar
@@ -148,9 +148,9 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 .freeform-toolbar:empty {
 	height: $block-toolbar-height;
 	background: #f5f5f5;
-	border-bottom: 1px solid #e2e4e7;
+	border-bottom: $border-width solid #e2e4e7;
 
-	&:before {
+	&::before {
 		font-family: $default-font;
 		font-size: $default-font-size;
 		content: attr( data-placeholder );

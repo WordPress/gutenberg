@@ -1,3 +1,7 @@
+## 2.1.0 (Unreleased)
+
+- Updated dependencies: `jest`, `npm-package-json-lint` and `read-pkg-up`
+
 ## 2.0.0 (2018-07-12)
 
 - Breaking: Updated code to work with Babel 7 ([#7832](https://github.com/WordPress/gutenberg/pull/7832))

@@ -389,7 +389,7 @@ function gutenberg_replace_default_add_new_button() {
 			newbutton += '<a href="' + classicUrl + '"><?php echo esc_js( __( 'Classic Editor', 'gutenberg' ) ); ?></a></span></span><span class="page-title-action" style="display:none;"></span>';
 
 			button.insertAdjacentHTML( 'afterend', newbutton );
-			button.remove();
+			button.parentNode.removeChild( button );
 
 			var expander = document.getElementById( 'split-page-title-action' ).getElementsByClassName( 'expander' ).item( 0 );
 			var dropdown = expander.parentNode.querySelector( '.dropdown' );

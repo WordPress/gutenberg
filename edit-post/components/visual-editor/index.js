@@ -11,6 +11,7 @@ import {
 	BlockSelectionClearer,
 	MultiSelectScrollIntoView,
 	_BlockSettingsMenuFirstItem,
+	_BlockSettingsMenuPluginsExtension,
 } from '@wordpress/editor';
 
 /**
@@ -18,6 +19,7 @@ import {
  */
 import './style.scss';
 import BlockInspectorButton from './block-inspector-button';
+import PluginBlockSettingsMenuGroup from '../block-settings-menu/plugin-block-settings-menu-group';
 
 function VisualEditor() {
 	return (
@@ -34,6 +36,9 @@ function VisualEditor() {
 			<_BlockSettingsMenuFirstItem>
 				{ ( { onClose } ) => <BlockInspectorButton onClick={ onClose } role="menuitem" /> }
 			</_BlockSettingsMenuFirstItem>
+			<_BlockSettingsMenuPluginsExtension>
+				{ ( { clientIds, onClose } ) => <PluginBlockSettingsMenuGroup.Slot fillProps={ { clientIds, onClose } } /> }
+			</_BlockSettingsMenuPluginsExtension>
 		</BlockSelectionClearer>
 	);
 }

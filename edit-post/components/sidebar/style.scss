@@ -5,7 +5,7 @@
 	right: 0;
 	bottom: 0;
 	width: $sidebar-width;
-	border-left: 1px solid $light-gray-500;
+	border-left: $border-width solid $light-gray-500;
 	background: $light-gray-300;
 	color: $dark-gray-500;
 	height: 100vh;

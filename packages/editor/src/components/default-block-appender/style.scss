@@ -9,7 +9,7 @@
 		max-width: none; // fixes a bleed issue from the admin
 		cursor: text;
 		width: 100%;
-		outline: 1px solid transparent;
+		outline: $border-width solid transparent;
 		transition: 0.2s outline;
 
 		// Emulate the dimensions of a paragraph block.

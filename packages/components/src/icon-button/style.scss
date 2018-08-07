@@ -25,7 +25,7 @@
 		@include button-style__hover;
 	}
 
-	&:not( :disabled ):not( [aria-disabled="true"] ):active {
+	&:not( :disabled ):not( [aria-disabled="true"] ):not( .is-default ):active {
 		@include button-style__active;
 	}
 

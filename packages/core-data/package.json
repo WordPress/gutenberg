@@ -23,6 +23,8 @@
 		"@babel/runtime": "^7.0.0-beta.52",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/data": "file:../data",
+		"@wordpress/url": "file:../url",
+		"equivalent-key-map": "^0.2.1",
 		"lodash": "^4.17.10",
 		"rememo": "^3.0.0"
 	},

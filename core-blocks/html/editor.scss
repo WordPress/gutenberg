@@ -8,7 +8,7 @@
 
 	.CodeMirror {
 		border-radius: 4px;
-		border: 1px solid $light-gray-500;
+		border: $border-width solid $light-gray-500;
 		font-family: $editor-html-font;
 		font-size: $text-editor-font-size;
 		height: auto;

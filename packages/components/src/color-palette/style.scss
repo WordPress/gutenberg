@@ -61,7 +61,7 @@ $color-palette-circle-spacing: 14px;
 		outline: none;
 		&::after {
 			content: '';
-			border: 1px solid $dark-gray-400;
+			border: $border-width solid $dark-gray-400;
 			width: 32px;
 			height: 32px;
 			position: absolute;
@@ -86,7 +86,7 @@ $color-palette-circle-spacing: 14px;
 	left: 0;
 	bottom: 0;
 	right: 0;
-	&:before {
+	&::before {
 		position: absolute;
 		top: 0;
 		left: 0;
@@ -117,7 +117,7 @@ $color-palette-circle-spacing: 14px;
 	overflow: hidden;
 }
 
-.components-color-palette__custom-color .components-color-palette__custom-color-gradient:before {
+.components-color-palette__custom-color .components-color-palette__custom-color-gradient::before {
 	content: '';
 	filter: blur( 6px ) saturate( 0.7 ) brightness( 1.1 );
 	display: block;
