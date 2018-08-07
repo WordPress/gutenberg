@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { shallow } from 'enzyme';
+import { noop } from 'lodash';
 
 /**
  * Internal dependencies
@@ -28,7 +29,7 @@ describe( 'MenuItem', () => {
 				icon="wordpress"
 				isSelected={ true }
 				role="menuitemcheckbox"
-				onClick={ () => {} }
+				onClick={ noop }
 				shortcut="mod+shift+alt+w"
 			>
 				My item
@@ -43,7 +44,7 @@ describe( 'MenuItem', () => {
 			<MenuItem
 				className="my-class"
 				icon="wordpress"
-				onClick={ () => {} }
+				onClick={ noop }
 				shortcut="mod+shift+alt+w"
 			>
 				My item
