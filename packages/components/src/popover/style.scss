@@ -15,7 +15,7 @@ $arrow-size: 8px;
 	&:not(.is-without-arrow):not(.is-mobile) {
 		margin-left: 2px;
 
-		&:before {
+		&::before {
 			border: $arrow-size solid $light-gray-500;
 		}
 
@@ -23,7 +23,7 @@ $arrow-size: 8px;
 			border: $arrow-size solid $white;
 		}
 
-		&:before,
+		&::before,
 		&:after {
 			content: "";
 			position: absolute;
@@ -35,7 +35,7 @@ $arrow-size: 8px;
 		&.is-top {
 			margin-top: - $arrow-size;
 
-			&:before {
+			&::before {
 				bottom: - $arrow-size;
 			}
 
@@ -43,7 +43,7 @@ $arrow-size: 8px;
 				bottom: -6px;
 			}
 
-			&:before,
+			&::before,
 			&:after {
 				border-bottom: none;
 				border-left-color: transparent;
@@ -56,7 +56,7 @@ $arrow-size: 8px;
 		&.is-bottom {
 			margin-top: $arrow-size;
 
-			&:before {
+			&::before {
 				top: -$arrow-size;
 			}
 
@@ -64,7 +64,7 @@ $arrow-size: 8px;
 				top: -6px;
 			}
 
-			&:before,
+			&::before,
 			&:after {
 				border-bottom-style: solid;
 				border-left-color: transparent;
@@ -78,7 +78,7 @@ $arrow-size: 8px;
 			/*!rtl:begin:ignore*/
 			margin-left: -$arrow-size;
 
-			&:before {
+			&::before {
 				right: -$arrow-size;
 			}
 
@@ -86,7 +86,7 @@ $arrow-size: 8px;
 				right: -6px;
 			}
 
-			&:before,
+			&::before,
 			&:after {
 				border-bottom-color: transparent;
 				border-left-style: solid;
@@ -100,7 +100,7 @@ $arrow-size: 8px;
 			/*!rtl:begin:ignore*/
 			margin-left: $arrow-size;
 
-			&:before {
+			&::before {
 				left: -$arrow-size;
 			}
 
@@ -108,7 +108,7 @@ $arrow-size: 8px;
 				left: -6px;
 			}
 
-			&:before,
+			&::before,
 			&:after {
 				border-bottom-color: transparent;
 				border-left: none;

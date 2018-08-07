@@ -81,7 +81,7 @@ $toggle-border-width: 2px;
 			transform: translateX( $toggle-width - ( $toggle-border-width * 4 ) - ( $toggle-height - ( $toggle-border-width * 4 ) ) );
 		}
 
-		&:before {
+		&::before {
 			background-color: theme( toggle );
 			border: $toggle-border-width solid theme( toggle );
 		}

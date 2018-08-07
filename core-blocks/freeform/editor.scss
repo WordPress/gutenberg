@@ -115,7 +115,7 @@
 }
 
 .editor-block-list__layout .editor-block-list__block[data-type="core/freeform"] {
-	.editor-block-list__block-edit:before {
+	.editor-block-list__block-edit::before {
 		outline: $border-width solid #e2e4e7;
 	}
 
@@ -150,7 +150,7 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 	background: #f5f5f5;
 	border-bottom: $border-width solid #e2e4e7;
 
-	&:before {
+	&::before {
 		font-family: $default-font;
 		font-size: $default-font-size;
 		content: attr( data-placeholder );

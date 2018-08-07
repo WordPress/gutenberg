@@ -14,7 +14,7 @@
 		line-height: 1;
 		height: auto;
 
-		&:before {
+		&::before {
 			content: '\00b7 \00b7 \00b7';
 			color: $dark-gray-700;
 			font-size: 20px;

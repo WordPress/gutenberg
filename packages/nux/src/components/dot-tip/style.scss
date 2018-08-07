@@ -2,7 +2,7 @@ $dot-size: 8px; // Size of the indicator dot
 $dot-scale: 3;  // How much the pulse animation should scale up by in size
 
 .nux-dot-tip {
-	&:before,
+	&::before,
 	&:after {
 		border-radius: 100%;
 		content: ' ';
@@ -10,7 +10,7 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
 		position: absolute;
 	}
 
-	&:before {
+	&::before {
 		animation: nux-pulse 1.6s infinite cubic-bezier( 0.17, 0.67, 0.92, 0.62 );
 		background: rgba( $blue-medium-800, 0.9 );
 		height: $dot-size * $dot-scale;

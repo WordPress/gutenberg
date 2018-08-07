@@ -11,28 +11,28 @@
 	display: flex;
 	margin: 4px 0;
 
-	.document-outline__emdash:before {
+	.document-outline__emdash::before {
 		color: $light-gray-500;
 		margin-right: 4px;
 	}
 
-	&.is-h2 .document-outline__emdash:before {
+	&.is-h2 .document-outline__emdash::before {
 		content: '—';
 	}
 
-	&.is-h3 .document-outline__emdash:before {
+	&.is-h3 .document-outline__emdash::before {
 		content: '——';
 	}
 
-	&.is-h4 .document-outline__emdash:before {
+	&.is-h4 .document-outline__emdash::before {
 		content: '———';
 	}
 
-	&.is-h5 .document-outline__emdash:before {
+	&.is-h5 .document-outline__emdash::before {
 		content: '————';
 	}
 
-	&.is-h6 .document-outline__emdash:before {
+	&.is-h6 .document-outline__emdash::before {
 		content: '—————';
 	}
 }

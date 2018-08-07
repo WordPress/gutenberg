@@ -25,7 +25,7 @@ div.components-toolbar {
 			overflow: visible;
 		}
 
-		&.has-left-divider:before {
+		&.has-left-divider::before {
 			display: inline-block;
 			content: '';
 			box-sizing: content-box;
