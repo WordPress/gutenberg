@@ -437,8 +437,10 @@ export class RichText extends Component {
 		const { keyCode } = event;
 
 		if (
-			( keyCode === BACKSPACE && isHorizontalEdge( rootNode, true ) ) ||
-			( keyCode === DELETE && isHorizontalEdge( rootNode, false ) )
+			window.getSelection().isCollapsed && (
+				( keyCode === BACKSPACE && isHorizontalEdge( rootNode, true ) ) ||
+				( keyCode === DELETE && isHorizontalEdge( rootNode, false ) )
+			)
 		) {
 			if ( ! this.props.onMerge && ! this.props.onRemove ) {
 				return;
