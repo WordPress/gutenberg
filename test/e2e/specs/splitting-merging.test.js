@@ -87,4 +87,18 @@ describe( 'splitting and merging blocks', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'Should not merge paragraphs if the selection is not collapsed', async () => {
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'Foo' );
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'Bar' );
+
+		await page.keyboard.down( 'Shift' );
+		await pressTimes( 'ArrowLeft', 3 );
+		await page.keyboard.up( 'Shift' );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
