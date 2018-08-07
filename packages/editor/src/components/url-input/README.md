@@ -43,9 +43,9 @@ wp.blocks.registerBlockType( /* ... */, {
 		url: {
 			type: 'string'
 		},
-    text: {
-      type: 'string'
-    }
+		text: {
+			type: 'string'
+		}
 	},
 
 	edit: function( props ) {
@@ -77,9 +77,9 @@ registerBlockType( /* ... */, {
 		url: {
 			type: 'string',
 		},
-    text: {
-      type: 'string',
-    },
+		text: {
+			type: 'string',
+		},
 	},
 
 	edit( { className, attributes, setAttributes } ) {
