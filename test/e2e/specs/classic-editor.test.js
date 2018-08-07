@@ -10,14 +10,14 @@ describe( 'classic editor', () => {
 
 	it( 'Should work properly', async () => {
 		// Click visual editor
-		await page.click( '#content-tmce' );
-		await page.click( '#content_ifr' );
+		await expect( page ).toClick( '#content-tmce' );
+		await expect( page ).toClick( '#content_ifr' );
 
 		// type some random text
 		await page.keyboard.type( 'Typing in classic editor' );
 
 		// Switch to HTML mode
-		await page.click( '#content-html' );
+		await expect( page ).toClick( '#content-html' );
 
 		const textEditorContent = await page.$eval( '.wp-editor-area', ( element ) => element.value );
 		expect( textEditorContent ).toEqual( 'Typing in classic editor' );

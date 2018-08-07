@@ -14,7 +14,6 @@ describe( 'undo', () => {
 	} );
 
 	it( 'Should undo to expected level intervals', async () => {
-		await page.waitForSelector( '.editor-default-block-appender__content' );
 		await clickBlockAppender();
 
 		await page.keyboard.type( 'This' );

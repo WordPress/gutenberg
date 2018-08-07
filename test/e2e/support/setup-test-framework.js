@@ -22,6 +22,11 @@ const { PUPPETEER_TIMEOUT } = process.env;
 // The Jest timeout is increased because these tests are a bit slow
 jest.setTimeout( PUPPETEER_TIMEOUT || 100000 );
 
+async function setupBrowser() {
+	await clearLocalStorage();
+	await setViewport( 'large' );
+}
+
 // Before every test suite run, delete all content created by the test. This ensures
 // other posts/comments/etc. aren't dirtying tests and tests don't depend on
 // each other's side-effects.
@@ -45,11 +50,11 @@ beforeAll( async () => {
 			'//*[contains(@class, "updated notice")]/p[contains(text(), "moved to the Trash.")]'
 		);
 	}
+	await setupBrowser();
 } );
 
-beforeEach( async () => {
-	await clearLocalStorage();
-	await setViewport( 'large' );
+afterEach( async () => {
+	await setupBrowser();
 } );
 
 afterAll( () => {

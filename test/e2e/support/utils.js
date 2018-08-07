@@ -169,7 +169,7 @@ export async function ensureSidebarOpened() {
  * Clicks the default block appender.
  */
 export async function clickBlockAppender() {
-	await page.click( '.editor-default-block-appender__content' );
+	await expect( page ).toClick( '.editor-default-block-appender__content' );
 }
 
 /**
@@ -226,7 +226,7 @@ export async function pressWithModifier( modifier, key ) {
  * @param {string} buttonLabel The label to search the button for.
  */
 export async function clickOnMoreMenuItem( buttonLabel ) {
-	await page.click( '.edit-post-more-menu [aria-label="More"]' );
+	await expect( page ).toClick( '.edit-post-more-menu [aria-label="More"]' );
 	const itemButton = ( await page.$x( `//button[contains(text(), '${ buttonLabel }')]` ) )[ 0 ];
 	await itemButton.click( 'button' );
 }
