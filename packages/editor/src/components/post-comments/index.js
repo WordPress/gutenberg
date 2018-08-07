@@ -3,10 +3,10 @@
  */
 import { __ } from '@wordpress/i18n';
 import { CheckboxControl } from '@wordpress/components';
-import { withInstanceId, compose } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
-function PostComments( { commentStatus = 'open', instanceId, ...props } ) {
+function PostComments( { commentStatus = 'open', ...props } ) {
 	const onToggleComments = () => props.editPost( { comment_status: commentStatus === 'open' ? 'closed' : 'open' } );
 
 	return (
@@ -27,5 +27,4 @@ export default compose( [
 	withDispatch( ( dispatch ) => ( {
 		editPost: dispatch( 'core/editor' ).editPost,
 	} ) ),
-	withInstanceId,
 ] )( PostComments );

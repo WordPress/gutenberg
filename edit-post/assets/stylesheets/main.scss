@@ -129,22 +129,22 @@ body.gutenberg-editor-page {
 .editor-block-list__block,
 .components-popover {
 	.input-control, // Upstream name is `.regular-text`.
-	input[type=text],
-	input[type=search],
-	input[type=radio],
-	input[type=tel],
-	input[type=time],
-	input[type=url],
-	input[type=week],
-	input[type=password],
-	input[type=checkbox],
-	input[type=color],
-	input[type=date],
-	input[type=datetime],
-	input[type=datetime-local],
-	input[type=email],
-	input[type=month],
-	input[type=number],
+	input[type="text"],
+	input[type="search"],
+	input[type="radio"],
+	input[type="tel"],
+	input[type="time"],
+	input[type="url"],
+	input[type="week"],
+	input[type="password"],
+	input[type="checkbox"],
+	input[type="color"],
+	input[type="date"],
+	input[type="datetime"],
+	input[type="datetime-local"],
+	input[type="email"],
+	input[type="month"],
+	input[type="number"],
 	select,
 	textarea {
 		margin-top: 0; // These override a "margin: 1px" from core.
@@ -170,7 +170,7 @@ body.gutenberg-editor-page {
 		}
 	}
 
-	input[type=checkbox] {
+	input[type="checkbox"] {
 		border: $border-width + 1 solid $dark-gray-300;
 		border-radius: $radius-round-rectangle / 2;
 		margin-right: 12px;
@@ -182,15 +182,15 @@ body.gutenberg-editor-page {
 		}
 
 		&:checked {
-			background: theme( toggle );
-			border-color: theme( toggle );
+			background: theme(toggle);
+			border-color: theme(toggle);
 		}
 
 		&:checked:focus {
 			box-shadow: 0 0 0 2px $dark-gray-500;
 		}
 
-		&:before {
+		&::before {
 			margin: -4px 0 0 -5px;
 			color: $white;
 		}

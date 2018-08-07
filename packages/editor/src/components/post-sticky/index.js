@@ -4,14 +4,14 @@
 import { __ } from '@wordpress/i18n';
 import { CheckboxControl } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { withInstanceId, compose } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import PostStickyCheck from './check';
 
-export function PostSticky( { onUpdateSticky, postSticky = false, instanceId } ) {
+export function PostSticky( { onUpdateSticky, postSticky = false } ) {
 	return (
 		<PostStickyCheck>
 			<CheckboxControl
@@ -36,5 +36,4 @@ export default compose( [
 			},
 		};
 	} ),
-	withInstanceId,
 ] )( PostSticky );

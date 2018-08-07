@@ -4,9 +4,9 @@
 import { __ } from '@wordpress/i18n';
 import { CheckboxControl } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { withInstanceId, compose } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 
-function PostPingbacks( { pingStatus = 'open', instanceId, ...props } ) {
+function PostPingbacks( { pingStatus = 'open', ...props } ) {
 	const onTogglePingback = () => props.editPost( { ping_status: pingStatus === 'open' ? 'closed' : 'open' } );
 
 	return (
@@ -27,5 +27,4 @@ export default compose( [
 	withDispatch( ( dispatch ) => ( {
 		editPost: dispatch( 'core/editor' ).editPost,
 	} ) ),
-	withInstanceId,
 ] )( PostPingbacks );
