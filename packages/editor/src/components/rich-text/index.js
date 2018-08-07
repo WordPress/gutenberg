@@ -448,13 +448,12 @@ export class RichText extends Component {
 			// These modifiers would not result in modification of text content,
 			// if they're pressed they should not cause merge or deletion of blocks.
 			// Returning here also allows further binding of these events.
-			const isMetaShiftPressed = event.metaKey && event.shiftKey;
-			const isCtrlShiftPressed = event.ctrlKey && event.shiftKey;
-			const isAltShiftPressed = event.ctrlKey && event.shiftKey;
+			const isMetaShiftDeletePressed = event.metaKey && event.shiftKey && keyCode === DELETE;
+			const isCtrlShiftDeletePressed = event.ctrlKey && event.shiftKey && keyCode === DELETE;
+			const isCtrlAltDeletePressed = event.ctrlKey && event.altKey && keyCode === DELETE;
 			const isMetaAltPressed = event.metaKey && event.altKey;
-			const isCtrlAltPressed = event.ctrlKey && event.altKey;
 
-			if ( isMetaShiftPressed || isCtrlShiftPressed || isAltShiftPressed || isMetaAltPressed || isCtrlAltPressed ) {
+			if ( isMetaShiftDeletePressed || isCtrlShiftDeletePressed || isCtrlAltDeletePressed || isMetaAltPressed ) {
 				return;
 			}
 
