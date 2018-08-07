@@ -17,6 +17,7 @@ import {
 	receiveUserQuery,
 	receiveEntityRecords,
 	receiveThemeSupportsFromIndex,
+	receiveEmbedPreview,
 } from './actions';
 import { getKindEntities } from './entities';
 
@@ -83,4 +84,20 @@ export async function* getEntityRecords( state, kind, name, query = {} ) {
 export async function* getThemeSupports() {
 	const index = await apiFetch( { path: '/' } );
 	yield receiveThemeSupportsFromIndex( index );
+}
+
+/**
+ * Requests a preview from the from the Embed API.
+ *
+ * @param {Object} state State tree
+ * @param {string} url   URL to get the preview for.
+ */
+export async function* getEmbedPreview( state, url ) {
+	try {
+		const embedProxyResponse = await apiFetch( { path: addQueryArgs( '/oembed/1.0/proxy', { url } ) } );
+		yield receiveEmbedPreview( url, embedProxyResponse );
+	} catch ( error ) {
+		// Embed API 404s if the URL cannot be embedded, so we have to catch the error from the apiRequest here.
+		yield receiveEmbedPreview( url, false );
+	}
 }

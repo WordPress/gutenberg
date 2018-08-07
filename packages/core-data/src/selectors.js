@@ -25,7 +25,7 @@ import { getQueriedItems } from './queried-data';
  * @return {boolean} Whether resolution is in progress.
  */
 function isResolving( selectorName, ...args ) {
-	return select( 'core/data' ).isResolving( REDUCER_KEY, selectorName, ...args );
+	return select( 'core/data' ).isResolving( REDUCER_KEY, selectorName, args );
 }
 
 /**
@@ -74,6 +74,19 @@ export function isRequestingTerms( state, taxonomy ) {
  */
 export function isRequestingCategories() {
 	return isResolving( 'getCategories' );
+}
+
+/**
+ * Returns true if a request is in progress for embed preview data, or false
+ * otherwise.
+ *
+ * @param {Object} state Data state.
+ * @param {string} url   URL the preview would be for.
+ *
+ * @return {boolean} Whether a request is in progress for an embed preview.
+ */
+export function isRequestingEmbedPreview( state, url ) {
+	return isResolving( 'getEmbedPreview', url );
 }
 
 /**
@@ -170,4 +183,37 @@ export function getEntityRecords( state, kind, name, query ) {
  */
 export function getThemeSupports( state ) {
 	return state.themeSupports;
+}
+
+/**
+ * Returns the embed preview for the given URL.
+ *
+ * @param {Object} state    Data state.
+ * @param {string} url      Embedded URL.
+ *
+ * @return {*} Undefined if the preview has not been fetched, otherwise, the preview fetched from the embed preview API.
+ */
+export function getEmbedPreview( state, url ) {
+	return state.embedPreviews[ url ];
+}
+
+/**
+ * Determines if the returned preview is an oEmbed link fallback.
+ *
+ * WordPress can be configured to return a simple link to a URL if it is not embeddable.
+ * We need to be able to determine if a URL is embeddable or not, based on what we
+ * get back from the oEmbed preview API.
+ *
+ * @param {Object} state    Data state.
+ * @param {string} url      Embedded URL.
+ *
+ * @return {booleans} Is the preview for the URL an oEmbed link fallback.
+ */
+export function isPreviewEmbedFallback( state, url ) {
+	const preview = state.embedPreviews[ url ];
+	const oEmbedLinkCheck = '<a href="' + url + '">' + url + '</a>';
+	if ( ! preview ) {
+		return false;
+	}
+	return preview.html === oEmbedLinkCheck;
 }
