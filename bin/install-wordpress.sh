@@ -10,6 +10,7 @@ set -e
 CLI='cli'
 CONTAINER='wordpress'
 SITE_TITLE='Gutenberg Dev'
+WP_VERSION=${WP_VERSION-latest}
 
 # If we're installing/re-installing the test site, change the containers used.
 if [ "$1" == '--e2e_tests' ]; then
@@ -50,9 +51,11 @@ echo -e $(status_message "Installing WordPress...")
 # The `-u 33` flag tells Docker to run the command as a particular user and
 # prevents permissions errors. See: https://github.com/WordPress/gutenberg/pull/8427#issuecomment-410232369
 docker-compose run --rm -u 33 $CLI core install --title="$SITE_TITLE" --admin_user=admin --admin_password=password --admin_email=test@test.com --skip-email --url=http://localhost:$HOST_PORT >/dev/null
-# Check for WordPress updates, just in case the WordPress image isn't up to date.
-# (Disabled until https://github.com/WordPress/gutenberg/issues/8445 is fixed.)
-# docker-compose run --rm -u 33 $CLI core update >/dev/null
+
+if [ "$WP_VERSION" == "latest" ]; then
+	# Check for WordPress updates, to make sure we're running the very latest version.
+	docker-compose run --rm -u 33 $CLI core update >/dev/null
+fi
 
 # If the 'wordpress' volume wasn't during the down/up earlier, but the post port has changed, we need to update it.
 CURRENT_URL=$(docker-compose run -T --rm $CLI option get siteurl)

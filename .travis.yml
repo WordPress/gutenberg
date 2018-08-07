@@ -29,38 +29,38 @@ branches:
 jobs:
   include:
     - stage: test
-      env: WP_VERSION=4.9.7
+      env: WP_VERSION=latest
       script:
         - npm install || exit 1
         - npm run ci || exit 1
 
     - stage: test
-      env: WP_VERSION=4.9.7 DOCKER=true
+      env: WP_VERSION=latest DOCKER=true
       script:
         - ./bin/run-wp-unit-tests.sh
 
     - stage: test
       php: 5.6
-      env: WP_VERSION=4.9.7
+      env: WP_VERSION=latest
       script:
         - ./bin/run-wp-unit-tests.sh
       if: branch = master and type != "pull_request"
 
     - stage: test
       php: 7.1
-      env: WP_VERSION=4.9.7 SWITCH_TO_PHP=5.3
+      env: WP_VERSION=latest SWITCH_TO_PHP=5.3
       script:
         - ./bin/run-wp-unit-tests.sh
       if: branch = master and type != "pull_request"
 
     - stage: test
       php: 7.1
-      env: WP_VERSION=4.9.7 SWITCH_TO_PHP=5.2
+      env: WP_VERSION=latest SWITCH_TO_PHP=5.2
       script:
         - ./bin/run-wp-unit-tests.sh
 
     - stage: test
-      env: WP_VERSION=4.9.7
+      env: WP_VERSION=latest
       script:
         - npm install || exit 1
         - npm run build || exit 1
