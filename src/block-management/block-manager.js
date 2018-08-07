@@ -172,9 +172,15 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	renderHTML() {
+		const behavior = Platform.OS === 'ios' ? 'padding' : null;
 		return (
-			<KeyboardAvoidingView style={ styles.container } behavior="padding" enabled>
-				<TextInput multiline numberOfLines={ 0 } style={ styles.htmlView }>{ this.serializeToHtml() }</TextInput>
+			<KeyboardAvoidingView style={ { flex: 1 } } behavior={ behavior }>
+				<TextInput
+					multiline
+					numberOfLines={ 0 }
+					style={ styles.htmlView }>
+					{ this.serializeToHtml() }
+				</TextInput>
 			</KeyboardAvoidingView>
 		);
 	}
