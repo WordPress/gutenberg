@@ -25,6 +25,8 @@ class EditorModeKeyboardShortcuts extends Component {
 	}
 
 	toggleSidebar( event ) {
+		// This shortcut has no known clashes, but use preventDefault to prevent any
+		// obscure shortcuts from triggering.
 		event.preventDefault();
 		const { isEditorSidebarOpen, closeSidebar, openSidebar } = this.props;
 
