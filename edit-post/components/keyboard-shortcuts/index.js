@@ -57,10 +57,10 @@ export default compose( [
 		hasBlockSelection: !! select( 'core/editor' ).getBlockSelectionStart(),
 	} ) ),
 	withDispatch( ( dispatch, { hasBlockSelection } ) => ( {
-		switchMode: ( mode ) => {
+		switchMode( mode ) {
 			dispatch( 'core/edit-post' ).switchEditorMode( mode );
 		},
-		openSidebar: () => {
+		openSidebar() {
 			const sidebarToOpen = hasBlockSelection ? 'edit-post/block' : 'edit-post/document';
 			dispatch( 'core/edit-post' ).openGeneralSidebar( sidebarToOpen );
 		},
