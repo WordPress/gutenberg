@@ -9,7 +9,7 @@ import { castArray, first, last, every } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { IconButton, Dropdown, NavigableMenu, MenuItem } from '@wordpress/components';
+import { IconButton, Dropdown, NavigableMenu, MenuItem, KeyboardShortcuts } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { cloneBlock, hasBlockSupport } from '@wordpress/blocks';
@@ -21,7 +21,6 @@ import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 import BlockModeToggle from './block-mode-toggle';
 import ReusableBlockConvertButton from './reusable-block-convert-button';
 import ReusableBlockDeleteButton from './reusable-block-delete-button';
-import BlockSettingsKeyboardShortcuts from './keyboard-shortcuts';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import BlockUnknownConvertButton from './block-unknown-convert-button';
 import _BlockSettingsMenuFirstItem from './block-settings-menu-first-item';
@@ -78,10 +77,12 @@ export class BlockSettingsMenu extends Component {
 
 		return (
 			<div className="editor-block-settings-menu">
-				<BlockSettingsKeyboardShortcuts
-					onDuplicate={ onDuplicate }
-					onRemove={ onRemove }
-					shortcuts={ shortcuts }
+				<KeyboardShortcuts
+					bindGlobal
+					shortcuts={ {
+						[ shortcuts.duplicate.raw ]: onDuplicate,
+						[ shortcuts.remove.raw ]: onRemove,
+					} }
 				/>
 				<Dropdown
 					contentClassName="editor-block-settings-menu__popover"
