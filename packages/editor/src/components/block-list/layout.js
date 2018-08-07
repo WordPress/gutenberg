@@ -27,7 +27,6 @@ import { compose } from '@wordpress/compose';
 import BlockListBlock from './block';
 import IgnoreNestedEvents from './ignore-nested-events';
 import DefaultBlockAppender from '../default-block-appender';
-import withDeprecatedUniqueId from '../with-deprecated-unique-id';
 
 class BlockListLayout extends Component {
 	constructor( props ) {
@@ -239,7 +238,6 @@ class BlockListLayout extends Component {
 }
 
 export default compose( [
-	withDeprecatedUniqueId,
 	withSelect( ( select, ownProps ) => {
 		const {
 			isSelectionEnabled,
