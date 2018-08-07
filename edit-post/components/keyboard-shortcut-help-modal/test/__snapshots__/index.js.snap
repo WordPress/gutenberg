@@ -28,27 +28,61 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
         Array [
           Object {
             "description": "Display this help.",
-            "key": "Shift+Alt+H",
+            "keyCombination": Array [
+              "Shift",
+              "+",
+              "Alt",
+              "+",
+              "H",
+            ],
           },
           Object {
             "description": "Save your changes.",
-            "key": "Ctrl+S",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "S",
+            ],
           },
           Object {
             "description": "Undo your last changes.",
-            "key": "Ctrl+Z",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "Z",
+            ],
           },
           Object {
             "description": "Redo your last undo.",
-            "key": "Ctrl+Shift+Z",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "Shift",
+              "+",
+              "Z",
+            ],
           },
           Object {
             "description": "Show or hide the settings sidebar.",
-            "key": "Ctrl+Shift+,",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "Shift",
+              "+",
+              ",",
+            ],
           },
           Object {
             "description": "Switch between Visual Editor and Code Editor.",
-            "key": "Ctrl+Shift+Alt+M",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "Shift",
+              "+",
+              "Alt",
+              "+",
+              "M",
+            ],
           },
         ]
       }
@@ -60,11 +94,15 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
         Array [
           Object {
             "description": "Select all text if typing, otherwise select all blocks.",
-            "key": "Ctrl+A",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "A",
+            ],
           },
           Object {
             "description": "Clear selection.",
-            "key": "Esc",
+            "keyCombination": "Esc",
           },
         ]
       }
@@ -76,15 +114,25 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
         Array [
           Object {
             "description": "Delete the selected block(s).",
-            "key": "Ctrl+Del",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "Del",
+            ],
           },
           Object {
             "description": "Duplicate the selected block(s).",
-            "key": "Ctrl+Shift+D",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "Shift",
+              "+",
+              "D",
+            ],
           },
           Object {
             "description": "Change the block type after adding a new paragraph.",
-            "key": "/",
+            "keyCombination": "/",
           },
         ]
       }
@@ -96,31 +144,65 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
         Array [
           Object {
             "description": "Make the selected text bold.",
-            "key": "Ctrl+B",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "B",
+            ],
           },
           Object {
             "description": "Make the selected text italic.",
-            "key": "Ctrl+I",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "I",
+            ],
           },
           Object {
             "description": "Underline the selected text.",
-            "key": "Ctrl+U",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "U",
+            ],
           },
           Object {
             "description": "Convert the selected text into a link.",
-            "key": "Ctrl+K",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "K",
+            ],
           },
           Object {
             "description": "Remove a link.",
-            "key": "Shift+Alt+S",
+            "keyCombination": Array [
+              "Shift",
+              "+",
+              "Alt",
+              "+",
+              "S",
+            ],
           },
           Object {
             "description": "Add a strikethrough to the selected text.",
-            "key": "Shift+Alt+D",
+            "keyCombination": Array [
+              "Shift",
+              "+",
+              "Alt",
+              "+",
+              "D",
+            ],
           },
           Object {
             "description": "Display the selected text in a monospaced font.",
-            "key": "Shift+Alt+X",
+            "keyCombination": Array [
+              "Shift",
+              "+",
+              "Alt",
+              "+",
+              "X",
+            ],
           },
         ]
       }

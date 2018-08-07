@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isArray } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
@@ -16,40 +21,35 @@ import './style.scss';
 
 const modalName = 'edit-post/keyboard-shortcut-help';
 
-const splitShortcutKey = ( shortcutKey ) => {
-	return shortcutKey
-		.split( /(\+|⌘)/ )
-		.filter( ( character ) => !! character )
-		.map( ( character, index ) => {
-			if ( character !== '+' ) {
-				return (
-					<kbd
-						key={ index }
-						className="edit-post-keyboard-shortcut-help__shortcut-key"
-					>
-						{ character }
-					</kbd>
-				);
-			}
+const mapKeyCombination = ( keyCombination ) => keyCombination.map( ( character, index ) => {
+	if ( character === '+' ) {
+		return (
+			<Fragment key={ index }>
+				{ character }
+			</Fragment>
+		);
+	}
 
-			return (
-				<Fragment key={ index }>
-					{ character }
-				</Fragment>
-			);
-		} );
-};
+	return (
+		<kbd
+			key={ index }
+			className="edit-post-keyboard-shortcut-help__shortcut-key"
+		>
+			{ character }
+		</kbd>
+	);
+} );
 
 const ShortcutList = ( { shortcuts } ) => (
 	<dl className="edit-post-keyboard-shortcut-help__shortcut-list">
-		{ shortcuts.map( ( { key, description }, index ) => (
+		{ shortcuts.map( ( { keyCombination, description }, index ) => (
 			<div
 				className="edit-post-keyboard-shortcut-help__shortcut"
 				key={ index }
 			>
 				<dt className="edit-post-keyboard-shortcut-help__shortcut-term">
 					<kbd className="edit-post-keyboard-shortcut-help__shortcut-key-combination">
-						{ splitShortcutKey( key ) }
+						{ mapKeyCombination( isArray( keyCombination ) ? keyCombination : [ keyCombination ] ) }
 					</kbd>
 				</dt>
 				<dd className="edit-post-keyboard-shortcut-help__shortcut-description">
