@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { castArray } from 'lodash';
+import { castArray, first, last, every } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,7 +10,10 @@ import { castArray } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { IconButton, Dropdown, NavigableMenu, MenuItem } from '@wordpress/components';
-import { withDispatch } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
+import { cloneBlock, hasBlockSupport } from '@wordpress/blocks';
+import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -18,12 +21,22 @@ import { withDispatch } from '@wordpress/data';
 import BlockModeToggle from './block-mode-toggle';
 import ReusableBlockConvertButton from './reusable-block-convert-button';
 import ReusableBlockDeleteButton from './reusable-block-delete-button';
-import withBlockSettingsActions from './with-block-settings-actions';
 import BlockSettingsKeyboardShortcuts from './keyboard-shortcuts';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import BlockUnknownConvertButton from './block-unknown-convert-button';
 import _BlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import _BlockSettingsMenuPluginsExtension from './block-settings-menu-plugins-extension';
+
+const shortcuts = {
+	duplicate: {
+		raw: rawShortcut.primaryShift( 'd' ),
+		display: displayShortcut.primaryShift( 'd' ),
+	},
+	remove: {
+		raw: rawShortcut.primaryAlt( 'backspace' ),
+		display: displayShortcut.primaryAlt( 'bksp' ),
+	},
+};
 
 export class BlockSettingsMenu extends Component {
 	constructor() {
@@ -57,7 +70,6 @@ export class BlockSettingsMenu extends Component {
 			onRemove,
 			canDuplicate,
 			isLocked,
-			shortcuts,
 		} = this.props;
 		const { isFocused } = this.state;
 		const blockClientIds = castArray( clientIds );
@@ -162,10 +174,48 @@ export class BlockSettingsMenu extends Component {
 }
 
 export default compose( [
-	withBlockSettingsActions,
-	withDispatch( ( dispatch ) => ( {
-		onSelect( clientId ) {
-			dispatch( 'core/editor' ).selectBlock( clientId );
+	withSelect( ( select, { clientIds, rootClientId } ) => {
+		const {
+			getBlocksByClientId,
+			getBlockIndex,
+			getTemplateLock,
+		} = select( 'core/editor' );
+
+		const blocks = getBlocksByClientId( clientIds );
+
+		const canDuplicate = every( blocks, ( block ) => {
+			return !! block && hasBlockSupport( block.name, 'multiple', true );
+		} );
+
+		return {
+			index: getBlockIndex( last( castArray( clientIds ) ), rootClientId ),
+			isLocked: !! getTemplateLock( rootClientId ),
+			blocks,
+			canDuplicate,
+			shortcuts,
+		};
+	} ),
+	withDispatch( ( dispatch, { clientIds, rootClientId, blocks, index, isLocked, canDuplicate } ) => ( {
+		onDuplicate() {
+			if ( isLocked || ! canDuplicate ) {
+				return;
+			}
+
+			const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
+			dispatch( 'core/editor' ).insertBlocks(
+				clonedBlocks,
+				index + 1,
+				rootClientId
+			);
+			if ( clonedBlocks.length > 1 ) {
+				dispatch( 'core/editor' ).multiSelect(
+					first( clonedBlocks ).clientId,
+					last( clonedBlocks ).clientId
+				);
+			}
+		},
+		onRemove() {
+			dispatch( 'core/editor' ).removeBlocks( clientIds );
 		},
 	} ) ),
 ] )( BlockSettingsMenu );
