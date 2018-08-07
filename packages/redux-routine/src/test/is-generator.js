@@ -17,6 +17,18 @@ describe( 'isGenerator', () => {
 		} );
 	} );
 
+	it( 'should return false if an imposter!', () => {
+		const value = { next() {} };
+
+		expect( isGenerator( value ) ).toBe( false );
+	} );
+
+	it( 'should return false if an async generator', () => {
+		const value = ( async function* () {}() );
+
+		expect( isGenerator( value ) ).toBe( false );
+	} );
+
 	it( 'should return true if a generator', () => {
 		const value = ( function* () {}() );
 
