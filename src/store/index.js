@@ -5,10 +5,16 @@
 
 // Gutenberg imports
 import { registerCoreBlocks } from '@gutenberg/core-blocks';
-import { parse } from '@wordpress/blocks';
+import {
+	parse,
+	registerBlockType,
+	setUnknownTypeHandlerName,
+} from '@wordpress/blocks';
 
 import { createStore } from 'redux';
 import { reducer } from './reducers';
+
+import * as unknownBlock from '../block-types/unsupported-block.js';
 
 export type BlockType = {
 	uid: string,
@@ -25,6 +31,8 @@ export type StateType = {
 };
 
 registerCoreBlocks();
+registerBlockType( unknownBlock.name, unknownBlock.settings );
+setUnknownTypeHandlerName( unknownBlock.name );
 
 const initialCodeBlockHtml = `
 <!-- wp:code -->

@@ -6,6 +6,7 @@
 import React from 'react';
 import { View, Text, TouchableWithoutFeedback } from 'react-native';
 import RCTAztecView from 'react-native-aztec';
+import * as unsupportedBlock from '../block-types/unsupported-block.js';
 import Toolbar from './toolbar';
 
 import type { BlockType } from '../store/';
@@ -14,12 +15,14 @@ import styles from './block-holder.scss';
 
 // Gutenberg imports
 import { getBlockType } from '@wordpress/blocks';
+import { getUnknownTypeHandlerName } from '@wordpress/blocks';
 
 type PropsType = BlockType & {
 	onChange: ( uid: string, attributes: mixed ) => void,
 	onToolbarButtonPressed: ( button: number, uid: string ) => void,
 	onBlockHolderPressed: ( uid: string ) => void,
 };
+
 type StateType = {
 	selected: boolean,
 	focused: boolean,
@@ -51,7 +54,14 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 	}
 
 	getBlockForType() {
+		/*
+		if (!isSupported( this.props.name )) {
+			return <UnsupportedBlock />
+		}
+		*/
+
 		const blockType = getBlockType( this.props.name );
+
 		if ( blockType ) {
 			const Block = blockType.edit;
 
@@ -96,8 +106,22 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 			);
 		}
 
-		// Default block placeholder
-		return <Text>{ this.props.attributes.content }</Text>;
+		return this.getBlockForUnsupportedType();
+	}
+
+	getBlockForUnsupportedType() {
+		const fallbackBlockName = getUnknownTypeHandlerName();
+		const blockType = getBlockType( fallbackBlockName );
+		const Block = blockType.edit;
+
+		return (
+			<Block
+				attributes={ { ...this.props.attributes } }
+				// pass a curried version of onChanged with just one argument
+				setAttributes={ ( attrs ) => this.props.onChange( this.props.uid, attrs ) }
+				isSelected={ this.props.focused }
+			/>
+		);
 	}
 
 	render() {
