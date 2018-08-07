@@ -131,9 +131,9 @@ class URLInput extends Component {
 		this.suggestionsRequest = request;
 	}
 
-	onChange( event ) {
+	onChange( event, post = {} ) {
 		const inputValue = event.target.value;
-		this.props.onChange( inputValue );
+		this.props.onChange( inputValue, post );
 		this.updateSuggestions( inputValue );
 	}
 
@@ -168,14 +168,14 @@ class URLInput extends Component {
 				if ( this.state.selectedSuggestion !== null ) {
 					event.stopPropagation();
 					const post = this.state.posts[ this.state.selectedSuggestion ];
-					this.selectLink( post.url );
+					this.selectLink( post.url, post );
 				}
 			}
 		}
 	}
 
-	selectLink( link ) {
-		this.props.onChange( link );
+	selectLink( link, post ) {
+		this.props.onChange( link, post );
 		this.setState( {
 			selectedSuggestion: null,
 			showSuggestions: false,
@@ -227,7 +227,7 @@ class URLInput extends Component {
 									className={ classnames( 'editor-url-input__suggestion', {
 										'is-selected': index === selectedSuggestion,
 									} ) }
-									onClick={ () => this.selectLink( post.url ) }
+									onClick={ () => this.selectLink( post.url, post ) }
 									aria-selected={ index === selectedSuggestion }
 								>
 									{ decodeEntities( post.title ) || __( '(no title)' ) }
