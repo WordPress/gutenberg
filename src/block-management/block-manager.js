@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Platform, Switch, Text, View, FlatList } from 'react-native';
+import { Platform, Switch, Text, View, FlatList, TextInput, KeyboardAvoidingView } from 'react-native';
 import RecyclerViewList, { DataSource } from 'react-native-recyclerview-list';
 import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
@@ -152,7 +152,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 						onValueChange={ ( value ) => this.setState( { showHtml: value } ) }
 					/>
 				</View>
-				{ this.state.showHtml && <Text style={ styles.htmlView }>{ this.serializeToHtml() }</Text> }
+				{ this.state.showHtml && this.renderHTML() }
 				{ ! this.state.showHtml && list }
 			</View>
 		);
@@ -168,6 +168,14 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				uid={ value.uid }
 				{ ...value.item }
 			/>
+		);
+	}
+
+	renderHTML() {
+		return (
+			<KeyboardAvoidingView style={ styles.container } behavior="padding" enabled>
+				<TextInput multiline numberOfLines={ 0 } style={ styles.htmlView }>{ this.serializeToHtml() }</TextInput>
+			</KeyboardAvoidingView>
 		);
 	}
 }
