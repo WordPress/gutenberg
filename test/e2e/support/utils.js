@@ -166,6 +166,13 @@ export async function ensureSidebarOpened() {
 }
 
 /**
+ * Clicks the default block appender.
+ */
+export async function clickBlockAppender() {
+	await page.click( '.editor-default-block-appender__content' );
+}
+
+/**
  * Search for block in the global inserter
  *
  * @param {string} searchTerm The text to search the inserter for.

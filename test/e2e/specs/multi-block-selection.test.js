@@ -1,7 +1,12 @@
 /**
  * Internal dependencies
  */
-import { newPost, pressWithModifier, insertBlock } from '../support/utils';
+import {
+	clickBlockAppender,
+	insertBlock,
+	newPost,
+	pressWithModifier,
+} from '../support/utils';
 
 describe( 'Multi-block selection', () => {
 	beforeAll( async () => {
@@ -15,7 +20,7 @@ describe( 'Multi-block selection', () => {
 		const multiSelectedCssClass = 'is-multi-selected';
 
 		// Creating test blocks
-		await page.click( '.editor-default-block-appender__content' );
+		await clickBlockAppender();
 		await page.keyboard.type( 'First Paragraph' );
 		await insertBlock( 'Image' );
 		await insertBlock( 'Quote' );

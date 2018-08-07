@@ -9,7 +9,12 @@ import uuid from 'uuid/v4';
 /**
  * Internal dependencies
  */
-import { newPost, getEditedPostContent, insertBlock } from '../support/utils';
+import {
+	clickBlockAppender,
+	getEditedPostContent,
+	insertBlock,
+	newPost,
+} from '../support/utils';
 
 describe( 'adding inline tokens', () => {
 	beforeAll( async () => {
@@ -18,7 +23,7 @@ describe( 'adding inline tokens', () => {
 
 	it( 'Should insert inline image', async () => {
 		// Create a paragraph.
-		await page.click( '.editor-default-block-appender__content' );
+		await clickBlockAppender();
 		await page.keyboard.type( 'a ' );
 
 		await insertBlock( 'Inline Image', 'Inline Elements' );

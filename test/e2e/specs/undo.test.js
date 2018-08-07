@@ -2,9 +2,10 @@
  * Internal dependencies
  */
 import {
+	clickBlockAppender,
+	getEditedPostContent,
 	newPost,
 	pressWithModifier,
-	getEditedPostContent,
 } from '../support/utils';
 
 describe( 'undo', () => {
@@ -14,7 +15,7 @@ describe( 'undo', () => {
 
 	it( 'Should undo to expected level intervals', async () => {
 		await page.waitForSelector( '.editor-default-block-appender__content' );
-		await page.click( '.editor-default-block-appender__content' );
+		await clickBlockAppender();
 
 		await page.keyboard.type( 'This' );
 		await page.keyboard.press( 'Enter' );

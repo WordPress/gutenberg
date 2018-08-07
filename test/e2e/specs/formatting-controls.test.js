@@ -1,7 +1,12 @@
 /**
  * Internal dependencies
  */
-import { newPost, pressWithModifier, getEditedPostContent } from '../support/utils';
+import {
+	clickBlockAppender,
+	getEditedPostContent,
+	newPost,
+	pressWithModifier,
+} from '../support/utils';
 
 describe( 'Formatting Controls', () => {
 	beforeEach( async () => {
@@ -10,7 +15,7 @@ describe( 'Formatting Controls', () => {
 
 	it( 'Should apply the formatting controls', async () => {
 		// Creating a paragraph block with some content
-		await page.click( '.editor-default-block-appender__content' );
+		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph to be made "bold"' );
 
 		// Selecting some text
