@@ -14,7 +14,7 @@ import { Component, renderToString } from '@wordpress/element';
 import { Button, Placeholder, Spinner, SandBox, IconButton, Toolbar } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 import { RichText, BlockControls } from '@wordpress/editor';
-import { withSelect, isRequesting } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -47,16 +47,15 @@ export function getEmbedEdit( title, icon ) {
 
 			this.switchBackToURLInput = this.switchBackToURLInput.bind( this );
 			this.setUrl = this.setUrl.bind( this );
-			this.processPreview = this.processPreview.bind( this );
+			this.maybeSwitchBlock = this.maybeSwitchBlock.bind( this );
+			this.setAttributesFromPreview = this.setAttributesFromPreview.bind( this );
 
 			this.state = {
 				editingURL: false,
 				url: this.props.attributes.url,
 			};
 
-			if ( this.props.preview ) {
-				this.processPreview();
-			}
+			this.maybeSwitchBlock();
 		}
 
 		componentWillUnmount() {
@@ -69,8 +68,18 @@ export function getEmbedEdit( title, icon ) {
 			const hadPreview = undefined !== prevProps.preview;
 			// We had a preview, and the URL was edited, and the new URL already has a preview fetched.
 			const switchedPreview = this.props.preview && this.props.attributes.url !== prevProps.attributes.url;
+			const switchedURL = this.props.attributes.url !== prevProps.attributes.url;
+
+			if ( switchedURL && this.maybeSwitchBlock() ) {
+				return;
+			}
+
 			if ( ( hasPreview && ! hadPreview ) || switchedPreview ) {
-				this.processPreview();
+				if ( this.props.previewIsFallback ) {
+					this.setState( { editingURL: true } );
+					return;
+				}
+				this.setAttributesFromPreview();
 			}
 		}
 
@@ -88,28 +97,21 @@ export function getEmbedEdit( title, icon ) {
 			const { url } = this.state;
 			const { setAttributes } = this.props;
 			this.setState( { editingURL: false } );
-			if ( url === this.props.attributes.url ) {
-				if ( this.props.preview ) {
-					// Form has been submitted without changing the url, and we already have a preview,
-					// so process it again. Happens when the user clicks edit and then immediately
-					// clicks embed.
-					this.processPreview();
-				}
-			}
 			setAttributes( { url } );
 		}
 
-		processPreview() {
-			const { setAttributes, preview, previewIsFallback } = this.props;
+		/***
+		 * Maybe switches to a different embed block type, based on the URL
+		 * and the HTML in the preview.
+		 *
+		 * @return {boolean} Whether the block was switched.
+		 */
+		maybeSwitchBlock() {
+			const { preview } = this.props;
 			const { url } = this.props.attributes;
 
-			if ( previewIsFallback ) {
-				this.setState( { editingURL: true } );
-				return;
-			}
-
-			if ( undefined === url ) {
-				return;
+			if ( ! url ) {
+				return false;
 			}
 
 			const matchingBlock = findBlock( url );
@@ -120,9 +122,31 @@ export function getEmbedEdit( title, icon ) {
 				// At this point, we have discovered a more suitable block for this url, so transform it.
 				if ( this.props.name !== matchingBlock ) {
 					this.props.onReplace( createBlock( matchingBlock, { url } ) );
-					return;
+					return true;
 				}
 			}
+
+			if ( preview ) {
+				const { html } = preview;
+
+				// This indicates it's a WordPress embed, there aren't a set of URL patterns we can use to match WordPress URLs.
+				if ( includes( html, 'class="wp-embedded-content" data-secret' ) ) {
+					// If this is not the WordPress embed block, transform it into one.
+					if ( this.props.name !== 'core-embed/wordpress' ) {
+						this.props.onReplace( createBlock( 'core-embed/wordpress', { url } ) );
+						return true;
+					}
+				}
+			}
+
+			return false;
+		}
+
+		/***
+		 * Sets block attributes based on the preview data.
+		 */
+		setAttributesFromPreview() {
+			const { setAttributes, preview } = this.props;
 
 			// Some plugins only return HTML with no type info, so default this to 'rich'.
 			let { type = 'rich' } = preview;
@@ -131,14 +155,8 @@ export function getEmbedEdit( title, icon ) {
 			const { html, provider_name: providerName } = preview;
 			const providerNameSlug = kebabCase( toLower( '' !== providerName ? providerName : title ) );
 
-			// This indicates it's a WordPress embed, there aren't a set of URL patterns we can use to match WordPress URLs.
 			if ( includes( html, 'class="wp-embedded-content" data-secret' ) ) {
 				type = 'wp-embed';
-				// If this is not the WordPress embed block, transform it into one.
-				if ( this.props.name !== 'core-embed/wordpress' ) {
-					this.props.onReplace( createBlock( 'core-embed/wordpress', { url } ) );
-					return;
-				}
 			}
 
 			if ( html || 'photo' === type ) {
@@ -285,7 +303,7 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 				const { getEmbedPreview, isPreviewEmbedFallback, isRequestingEmbedPreview } = core;
 				const preview = getEmbedPreview( url );
 				const previewIsFallback = isPreviewEmbedFallback( url );
-				const fetching = isRequestingEmbedPreview( url );
+				const fetching = undefined !== url && isRequestingEmbedPreview( url );
 				return {
 					preview,
 					previewIsFallback,

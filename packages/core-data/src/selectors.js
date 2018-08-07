@@ -80,7 +80,8 @@ export function isRequestingCategories() {
  * Returns true if a request is in progress for embed preview data, or false
  * otherwise.
  *
- * @param {string} url URL the preview would be for.
+ * @param {Object} state Data state.
+ * @param {string} url   URL the preview would be for.
  *
  * @return {boolean} Whether a request is in progress for an embed preview.
  */
