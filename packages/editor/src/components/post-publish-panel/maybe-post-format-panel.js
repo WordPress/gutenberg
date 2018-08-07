@@ -6,7 +6,7 @@ import { find, get, includes, union } from 'lodash';
 /**
  * WordPress dependencies.
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { ifCondition, compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { Button, PanelBody } from '@wordpress/components';
@@ -16,23 +16,40 @@ import { Button, PanelBody } from '@wordpress/components';
  */
 import { POST_FORMATS } from '../post-format';
 
-const PostFormatSuggested = ( { suggestion, onUpdatePostFormat } ) => <Button isLink onClick={ () => onUpdatePostFormat( suggestion.id ) }>
-	{ suggestion.caption }
-</Button>;
+const PostFormatSuggested = ( { suggestion, suggestionText, onUpdatePostFormat } ) => (
+	<Button isLink onClick={ () => onUpdatePostFormat( suggestion.id ) }>
+		{ suggestionText }
+	</Button>
+);
 
-const PostFormatPanel = ( { suggestion, onUpdatePostFormat } ) => <PanelBody initialOpen={ false } title={ [
-	__( 'Tip:' ),
-	<span className="editor-post-publish-panel__link" key="label">{
-		__( 'Add a post format' )
-	}</span>,
-] } >
-	<p> { __( 'Your theme uses post formats -- styling tweaks that complement different kinds of content.' ) } </p>
-	<p>
-		{ __( 'The ' ) }
-		<PostFormatSuggested suggestion={ suggestion } onUpdatePostFormat={ onUpdatePostFormat } />
-		{ __( ' format would be great for this post.' ) }
-	</p>
-</PanelBody>;
+const PostFormatPanel = ( { suggestion, onUpdatePostFormat } ) => {
+	const panelBodyTitle = [
+		__( 'Tip:' ),
+		(
+			<span className="editor-post-publish-panel__link" key="label">
+				{ __( 'Add a post format' ) }
+			</span>
+		),
+	];
+
+	return (
+		<PanelBody initialOpen={ false } title={ panelBodyTitle } >
+			<p>
+				{ __( 'Your theme uses Post Formats. These offer styling tweaks that highlight different kinds of content–like images or videos.' ) }
+			</p>
+			<p>
+				<PostFormatSuggested
+					onUpdatePostFormat={ onUpdatePostFormat }
+					suggestion={ suggestion }
+					suggestionText={ sprintf(
+						__( 'Convert to "%1$s" format.' ),
+						suggestion.caption
+					) }
+				/>
+			</p>
+		</PanelBody>
+	);
+};
 
 export default compose(
 	withSelect( ( select ) => {

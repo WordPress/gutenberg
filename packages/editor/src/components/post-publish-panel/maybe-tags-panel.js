@@ -9,15 +9,25 @@ import { PanelBody } from '@wordpress/components';
 
 import FlatTermSelector from '../post-taxonomies/flat-term-selector';
 
-const TagsPanel = () => <PanelBody initialOpen={ false } title={ [
-	__( 'Tip:' ),
-	<span className="editor-post-publish-panel__link" key="label">{
-		__( 'Add tags to your post' )
-	}</span>,
-] }>
-	<p> { __( "Enter a few words that describe your post's subject to help interested readers find it." ) } </p>
-	<FlatTermSelector slug={ 'post_tag' } />
-</PanelBody>;
+const TagsPanel = () => {
+	const panelBodyTitle = [
+		__( 'Tip:' ),
+		(
+			<span className="editor-post-publish-panel__link" key="label">
+				{ __( 'Add tags to your post' ) }
+			</span>
+		),
+	];
+
+	return (
+		<PanelBody initialOpen={ false } title={ panelBodyTitle }>
+			<p>
+				{ __( 'Enter a few words that describe your post’s subject. This will help interested readers find it.' ) }
+			</p>
+			<FlatTermSelector slug={ 'post_tag' } />
+		</PanelBody>
+	);
+};
 
 class MaybeTagsPanel extends Component {
 	constructor( props ) {
@@ -31,7 +41,8 @@ class MaybeTagsPanel extends Component {
 		if ( this.state.hadTags ) {
 			return null;
 		}
-		return ( <TagsPanel /> );
+
+		return <TagsPanel />;
 	}
 }
 
