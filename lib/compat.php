@@ -365,7 +365,7 @@ function gutenberg_warn_classic_about_cloudflare() {
 					<p><?php _e( 'Your site uses Cloudflare, which provides a Web Application Firewall (WAF) to secure your site against attacks. Unfortunately, some of these WAF rules are incorrectly blocking legitimate access to your site, preventing Gutenberg from functioning correctly.', 'gutenberg' ); ?></p>
 					<p><?php _e( "We're working closely with Cloudflare to fix this issue, but in the mean time, you can work around it in one of two ways:", 'gutenberg' ); ?></p>
 					<ul>
-						<li><?php _e( 'If you have a Cloudflare Pro account, login to Cloudflare, visit the Firewall settings page, open the "Cloudflare Rule Set" details, open the "Cloudflare WordPress" ruleset, then set the rules "WP0025A" and "WP0025A" to "Disable".', 'gutenberg' ); ?></li>
+						<li><?php _e( 'If you have a Cloudflare Pro account, login to Cloudflare, visit the Firewall settings page, open the "Cloudflare Rule Set" details, open the "Cloudflare WordPress" ruleset, then set the rules "WP0025A" and "WP0025B" to "Disable".', 'gutenberg' ); ?></li>
 						<li>
 						<?php
 							printf(
