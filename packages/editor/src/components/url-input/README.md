@@ -20,9 +20,9 @@ Render a URL input that allows users to search for and select a post or enter an
   "type": "post",
   "url": "https://example.com/sample-page/",
   "_links": {
-    "self": [ { embeddable: true, href: "https://example.com/wp-json/wp/v2/pages/1" } ],
-    "about": [ { href: "https://example.com/wp-json/wp/v2/types/page" } ],
-    "collection": [ { href: "https://example.com/wp-json/gutenberg/v1/search" } ]
+    "self": [ { "embeddable": true, "href": "https://example.com/wp-json/wp/v2/pages/1" } ],
+    "about": [ { "href": "https://example.com/wp-json/wp/v2/types/page" } ],
+    "collection": [ { "href": "https://example.com/wp-json/gutenberg/v1/search" } ]
   }
 }
 ```
