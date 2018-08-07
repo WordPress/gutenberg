@@ -25,7 +25,7 @@ import { getQueriedItems } from './queried-data';
  * @return {boolean} Whether resolution is in progress.
  */
 function isResolving( selectorName, ...args ) {
-	return select( 'core/data' ).isResolving( REDUCER_KEY, selectorName, ...args );
+	return select( 'core/data' ).isResolving( REDUCER_KEY, selectorName, args );
 }
 
 /**
