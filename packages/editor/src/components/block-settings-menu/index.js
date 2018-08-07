@@ -205,27 +205,34 @@ export default compose( [
 			shortcuts,
 		};
 	} ),
-	withDispatch( ( dispatch, { clientIds, rootClientId, blocks, index, isLocked, canDuplicate } ) => ( {
-		onDuplicate() {
-			if ( isLocked || ! canDuplicate ) {
-				return;
-			}
+	withDispatch( ( dispatch, { clientIds, rootClientId, blocks, index, isLocked, canDuplicate } ) => {
+		const { insertBlocks, multiSelect, removeBlocks, selectBlock } = dispatch( 'core/editor' );
 
-			const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
-			dispatch( 'core/editor' ).insertBlocks(
-				clonedBlocks,
-				index + 1,
-				rootClientId
-			);
-			if ( clonedBlocks.length > 1 ) {
-				dispatch( 'core/editor' ).multiSelect(
-					first( clonedBlocks ).clientId,
-					last( clonedBlocks ).clientId
+		return {
+			onDuplicate() {
+				if ( isLocked || ! canDuplicate ) {
+					return;
+				}
+
+				const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
+				insertBlocks(
+					clonedBlocks,
+					index + 1,
+					rootClientId
 				);
-			}
-		},
-		onRemove() {
-			dispatch( 'core/editor' ).removeBlocks( clientIds );
-		},
-	} ) ),
+				if ( clonedBlocks.length > 1 ) {
+					multiSelect(
+						first( clonedBlocks ).clientId,
+						last( clonedBlocks ).clientId
+					);
+				}
+			},
+			onRemove() {
+				removeBlocks( clientIds );
+			},
+			onSelect( clientId ) {
+				selectBlock( clientId );
+			},
+		};
+	} ),
 ] )( BlockSettingsMenu );
