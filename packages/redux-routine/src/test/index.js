@@ -8,8 +8,6 @@ import { createStore, applyMiddleware } from 'redux';
  */
 import createMiddleware from '../';
 
-jest.useFakeTimers();
-
 describe( 'createMiddleware', () => {
 	function createStoreWithMiddleware( middleware ) {
 		const reducer = ( state = null, action ) => action.nextState || state;
