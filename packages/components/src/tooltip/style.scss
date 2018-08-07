@@ -1,7 +1,7 @@
 .components-tooltip.components-popover {
 	z-index: z-index( '.components-tooltip' );
 
-	&:before {
+	&::before {
 		border-color: transparent;
 	}
 

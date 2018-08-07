@@ -1,5 +1,5 @@
 // Link input
-$input-padding: 8px;
+$input-padding: 9px 8px;
 $input-size: 230px;
 
 .editor-block-list__block .editor-url-input,
@@ -14,6 +14,9 @@ $input-size: 230px;
 		width: 100%;
 		padding: $input-padding;
 		border: none;
+		border-radius: 0;
+		margin-left: 0;
+		margin-right: 0;
 
 		&::-ms-clear {
 			display: none;
@@ -63,7 +66,7 @@ $input-size: 230px;
 
 	&:focus,
 	&.is-selected {
-		background: color( theme( primary ) shade(15%) );
+		background: color( theme( primary ) shade( 15% ) );
 		color: $white;
 		outline: none;
 	}
@@ -71,7 +74,7 @@ $input-size: 230px;
 
 // Toolbar button
 .components-toolbar > .editor-url-input__button {
-	position: inherit;	// let the dialog position according to parent
+	position: inherit; // Let the dialog position according to parent.
 }
 
 .editor-url-input__button .editor-url-input__back {

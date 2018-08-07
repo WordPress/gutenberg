@@ -7,10 +7,9 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { TreeSelect, withAPIData } from '@wordpress/components';
+import { TreeSelect } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -20,7 +19,7 @@ import { buildTermsTree } from '../../utils/terms';
 export function PageAttributesParent( { parent, postType, items, onUpdateParent } ) {
 	const isHierarchical = get( postType, [ 'hierarchical' ], false );
 	const parentPageLabel = get( postType, [ 'labels', 'parent_item_colon' ] );
-	const pageItems = get( items, [ 'data' ], [] );
+	const pageItems = items || [];
 	if ( ! isHierarchical || ! parentPageLabel || ! pageItems.length ) {
 		return null;
 	}
@@ -42,14 +41,24 @@ export function PageAttributesParent( { parent, postType, items, onUpdateParent 
 }
 
 const applyWithSelect = withSelect( ( select ) => {
-	const { getPostType } = select( 'core' );
+	const { getPostType, getEntityRecords } = select( 'core' );
 	const { getCurrentPostId, getEditedPostAttribute } = select( 'core/editor' );
 	const postTypeSlug = getEditedPostAttribute( 'type' );
+	const postType = getPostType( postTypeSlug );
+	const postId = getCurrentPostId();
+	const isHierarchical = get( postType, [ 'hierarchical' ], false );
+	const query = {
+		per_page: -1,
+		exclude: postId,
+		parent_exclude: postId,
+		orderby: 'menu_order',
+		order: 'asc',
+	};
+
 	return {
-		postId: getCurrentPostId(),
 		parent: getEditedPostAttribute( 'parent' ),
-		postType: getPostType( postTypeSlug ),
-		postTypeSlug,
+		items: isHierarchical ? getEntityRecords( 'postType', postTypeSlug, query ) : [],
+		postType,
 	};
 } );
 
@@ -62,25 +71,7 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 	};
 } );
 
-const applyWithAPIDataItems = withAPIData( ( { postType, postId } ) => {
-	const isHierarchical = get( postType, [ 'hierarchical' ], false );
-	const restBase = get( postType, [ 'rest_base' ], false );
-	const query = {
-		context: 'edit',
-		per_page: -1,
-		exclude: postId,
-		parent_exclude: postId,
-		_fields: [ 'id', 'parent', 'title' ],
-		orderby: 'menu_order',
-		order: 'asc',
-	};
-	return isHierarchical && restBase ?
-		{ items: addQueryArgs( `/wp/v2/${ restBase }`, query ) } :
-		{};
-} );
-
 export default compose( [
 	applyWithSelect,
 	applyWithDispatch,
-	applyWithAPIDataItems,
 ] )( PageAttributesParent );

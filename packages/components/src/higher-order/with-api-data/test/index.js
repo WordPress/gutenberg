@@ -114,6 +114,7 @@ describe( 'withAPIData()', () => {
 			'path',
 		] );
 		expect( getDataProps( wrapper ).revisions.isLoading ).toBe( true );
+		expect( console ).toHaveWarned();
 
 		process.nextTick( () => {
 			expect( getDataProps( wrapper ).revisions.isLoading ).toBe( false );

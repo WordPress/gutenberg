@@ -24,6 +24,7 @@ import ReusableBlockDeleteButton from './reusable-block-delete-button';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import BlockUnknownConvertButton from './block-unknown-convert-button';
 import _BlockSettingsMenuFirstItem from './block-settings-menu-first-item';
+import _BlockSettingsMenuPluginsExtension from './block-settings-menu-plugins-extension';
 import withDeprecatedUniqueId from '../with-deprecated-unique-id';
 
 export class BlockSettingsMenu extends Component {
@@ -126,6 +127,7 @@ export class BlockSettingsMenu extends Component {
 									itemsRole="menuitem"
 								/>
 							) }
+							<_BlockSettingsMenuPluginsExtension.Slot fillProps={ { clientIds, onClose } } />
 							<div className="editor-block-settings-menu__separator" />
 							{ count === 1 && (
 								<ReusableBlockDeleteButton

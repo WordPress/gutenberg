@@ -29,7 +29,7 @@
 	#poststuff h3.hndle,
 	#poststuff .stuffbox > h3,
 	#poststuff h2.hndle { /* WordPress selectors yolo */
-		border-bottom: 1px solid $light-gray-500;
+		border-bottom: $border-width solid $light-gray-500;
 		box-sizing: border-box;
 		color: inherit;
 		font-weight: 600;
@@ -46,7 +46,7 @@
 	}
 
 	.postbox > .inside {
-		border-bottom: 1px solid $light-gray-500;
+		border-bottom: $border-width solid $light-gray-500;
 		color: inherit;
 		padding: 0 $block-padding $block-padding;
 		margin: 0;
@@ -57,7 +57,7 @@
 		width: 44px;
 	}
 
-	&.is-loading:before {
+	&.is-loading::before {
 		position: absolute;
 		top: 0;
 		left: 0;
@@ -65,7 +65,7 @@
 		bottom: 0;
 		content: '';
 		background: transparent;
-		z-index: z-index( '.edit-post-meta-boxes-area.is-loading:before');
+		z-index: z-index( '.edit-post-meta-boxes-area.is-loading::before');
 	}
 
 	.spinner {

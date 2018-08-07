@@ -3,9 +3,9 @@
 // value is designed to work with).
 
 $z-layers: (
-	'.editor-block-list__block-edit:before': 0,
+	'.editor-block-list__block-edit::before': 0,
 	'.editor-block-switcher__arrow': 1,
-	'.editor-block-list__block .wp-block-more:before': -1,
+	'.editor-block-list__block .wp-block-more::before': -1,
 	'.editor-block-list__block {core/image aligned left or right}': 20,
 	'.editor-block-list__block {core/image aligned wide or fullwide}': 20,
 	'.freeform-toolbar': 10,
@@ -14,7 +14,7 @@ $z-layers: (
 	'.editor-inserter__tabs': 1,
 	'.editor-inserter__tab.is-active': 1,
 	'.components-panel__header': 1,
-	'.edit-post-meta-boxes-area.is-loading:before': 1,
+	'.edit-post-meta-boxes-area.is-loading::before': 1,
 	'.edit-post-meta-boxes-area .spinner': 5,
 	'.editor-block-contextual-toolbar': 21,
 	'.components-popover__close': 5,

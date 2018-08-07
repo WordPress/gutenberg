@@ -69,6 +69,7 @@ class TokenUI extends Component {
 					items={ this.props.items }
 					onSelect={ this.onSelect }
 					onHover={ this.onHover }
+					initialOpen={ false }
 				/>
 				{ hovered &&
 					<div

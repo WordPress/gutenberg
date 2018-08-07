@@ -23,13 +23,13 @@
 	}
 
 	// Dashed line
-	&:before {
+	&::before {
 		content: '';
 		position: absolute;
 		top: calc( 50% );
 		left: 0;
 		right: 0;
 		border-top: 3px dashed $light-gray-700;
-		z-index: z-index( '.editor-block-list__block .wp-block-more:before' );
+		z-index: z-index( '.editor-block-list__block .wp-block-more::before' );
 	}
 }

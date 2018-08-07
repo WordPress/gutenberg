@@ -57,5 +57,5 @@ $block-parent-side-ui-clearance: $parent-block-padding - $block-padding; // spac
 $block-container-side-padding: $block-side-ui-width + $block-padding + 2 * $block-side-ui-clearance;
 
 // Buttons & UI Widgets
-$button-style__radius-roundrect: 4px;
-$button-style__radius-round: 50%;
+$radius-round-rectangle: 4px;
+$radius-round: 50%;

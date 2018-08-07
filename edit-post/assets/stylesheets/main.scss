@@ -79,7 +79,7 @@ body.gutenberg-editor-page {
 	box-sizing: border-box;
 
 	*,
-	*:before,
+	*::before,
 	*:after {
 		box-sizing: inherit;
 	}
@@ -146,7 +146,8 @@ body.gutenberg-editor-page {
 	input[type=number],
 	select,
 	textarea {
-		border: 1px solid $light-gray-700;
+		margin-top: 0; // These override a "margin: 1px" from core.
+		margin-bottom: 0;
 		font-family: $default-font;
 		font-size: $default-font-size;
 		padding: 6px 8px;
