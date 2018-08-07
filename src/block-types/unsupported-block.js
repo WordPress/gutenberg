@@ -10,6 +10,7 @@ import styles from '../block-management/block-holder.scss';
 
 // Gutenberg imports
 import { __ } from '@wordpress/i18n';
+import { RawHTML } from '@wordpress/element';
 
 export const name = 'gmobile/unsupported';
 
@@ -50,6 +51,6 @@ export const settings = {
 	save( { attributes }: Object ) {
 		const { content } = attributes;
 
-		return <Text>{ content }</Text>;
+		return <RawHTML>{ content }</RawHTML>;
 	},
 };

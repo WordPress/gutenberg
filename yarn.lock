@@ -559,6 +559,12 @@
   dependencies:
     "@babel/runtime" "^7.0.0-beta.52"
 
+"@wordpress/deprecated@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@wordpress/deprecated/-/deprecated-1.0.2.tgz#ac69168d55b790d797946ef2dfd2eeda13bf1c56"
+  dependencies:
+    "@babel/runtime" "^7.0.0-beta.52"
+
 "@wordpress/element@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@wordpress/element/-/element-1.0.1.tgz#d9e31e437793655556816e6328bc67bfbecc4a27"
@@ -566,6 +572,17 @@
     "@babel/runtime" "^7.0.0-beta.52"
     "@wordpress/deprecated" "^1.0.1"
     "@wordpress/is-shallow-equal" "^1.1.1"
+    lodash "^4.17.10"
+    react "^16.4.1"
+    react-dom "^16.4.1"
+
+"@wordpress/element@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@wordpress/element/-/element-1.0.2.tgz#1b2c8e245ce9e7d126d6521f2a93e69606d1c71c"
+  dependencies:
+    "@babel/runtime" "^7.0.0-beta.52"
+    "@wordpress/deprecated" "^1.0.2"
+    "@wordpress/is-shallow-equal" "^1.1.2"
     lodash "^4.17.10"
     react "^16.4.1"
     react-dom "^16.4.1"
@@ -589,6 +606,12 @@
 "@wordpress/is-shallow-equal@^1.0.1", "@wordpress/is-shallow-equal@^1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@wordpress/is-shallow-equal/-/is-shallow-equal-1.1.1.tgz#377db18206afe2a6e787862106c3ff5c27d65e36"
+  dependencies:
+    "@babel/runtime" "^7.0.0-beta.52"
+
+"@wordpress/is-shallow-equal@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@wordpress/is-shallow-equal/-/is-shallow-equal-1.1.2.tgz#360a3d06a5805148d05e00cf92e5e42360baf0a2"
   dependencies:
     "@babel/runtime" "^7.0.0-beta.52"
 

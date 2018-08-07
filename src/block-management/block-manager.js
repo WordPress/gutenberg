@@ -89,7 +89,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 					return '<aztec>' + block.attributes.content + '</aztec>\n\n';
 				}
 
-				return '<span>' + block.attributes.content + '</span>\n\n';
+				return blockType.save();
 			} )
 			.reduce( ( prevVal, value ) => {
 				return prevVal + value;
