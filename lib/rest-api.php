@@ -242,24 +242,6 @@ function gutenberg_add_target_schema_to_links( $response, $post, $request ) {
 	$orig_links = $response->get_links();
 	$post_type  = get_post_type_object( $post->post_type );
 	$orig_href  = ! empty( $orig_links['self'][0]['href'] ) ? $orig_links['self'][0]['href'] : null;
-	if ( 'edit' === $request['context'] && post_type_supports( $post_type->name, 'author' ) ) {
-		if ( current_user_can( $post_type->cap->edit_others_posts ) ) {
-			$new_links['https://api.w.org/action-assign-author'] = array(
-				array(
-					'title'        => __( 'The current user can change the author on this post.', 'gutenberg' ),
-					'href'         => $orig_href,
-					'targetSchema' => array(
-						'type'       => 'object',
-						'properties' => array(
-							'author' => array(
-								'type' => 'integer',
-							),
-						),
-					),
-				),
-			);
-		}
-	}
 	if ( 'edit' === $request['context'] && current_user_can( 'unfiltered_html' ) ) {
 		$new_links['https://api.w.org/action-unfiltered_html'] = array(
 			array(
@@ -276,134 +258,6 @@ function gutenberg_add_target_schema_to_links( $response, $post, $request ) {
 			),
 		);
 	}
-	if ( 'edit' === $request['context'] ) {
-		if ( current_user_can( $post_type->cap->publish_posts ) ) {
-			$new_links['https://api.w.org/action-publish'] = array(
-				array(
-					'title'        => __( 'The current user can publish this post.', 'gutenberg' ),
-					'href'         => $orig_href,
-					'targetSchema' => array(
-						'type'       => 'object',
-						'properties' => array(
-							'status' => array(
-								'type' => 'string',
-								'enum' => array( 'publish', 'future' ),
-							),
-						),
-					),
-				),
-			);
-		}
-	}
-	// Only Posts can be sticky.
-	if ( 'post' === $post->post_type && 'edit' === $request['context'] ) {
-		if ( current_user_can( $post_type->cap->edit_others_posts )
-			&& current_user_can( $post_type->cap->publish_posts ) ) {
-			$new_links['https://api.w.org/action-sticky'] = array(
-				array(
-					'title'        => __( 'The current user can sticky this post.', 'gutenberg' ),
-					'href'         => $orig_href,
-					'targetSchema' => array(
-						'type'       => 'object',
-						'properties' => array(
-							'sticky' => array(
-								'type' => 'boolean',
-							),
-						),
-					),
-				),
-			);
-		}
-	}
-	// Term assignment and creation.
-	if ( 'edit' === $request['context'] ) {
-		$taxonomies = get_object_taxonomies( $post_type->name, 'objects' );
-		foreach ( $taxonomies as $tax_obj ) {
-			if ( empty( $tax_obj->show_in_rest ) ) {
-				continue;
-			}
-			$rest_base = ! empty( $tax_obj->rest_base ) ? $tax_obj->rest_base : $tax_obj->name;
-			// 'edit_terms' is required to create hierarchical terms,
-			// but 'assign_terms' is required for non-hierarchical terms.
-			if ( ( is_taxonomy_hierarchical( $tax_obj->name )
-				&& current_user_can( $tax_obj->cap->edit_terms ) )
-				|| ( ! is_taxonomy_hierarchical( $tax_obj->name )
-				&& current_user_can( $tax_obj->cap->assign_terms ) ) ) {
-				$new_links[ 'https://api.w.org/action-create-' . $rest_base ] = array(
-					array(
-						'title'        => __( 'The current user can create terms.', 'gutenberg' ),
-						'href'         => $orig_href,
-						'targetSchema' => array(
-							'type'       => 'object',
-							'properties' => array(
-								$rest_base => array(
-									'type' => 'array',
-								),
-							),
-						),
-					),
-				);
-			}
-			if ( current_user_can( $tax_obj->cap->assign_terms ) ) {
-				$new_links[ 'https://api.w.org/action-assign-' . $rest_base ] = array(
-					array(
-						'title'        => __( 'The current user can assign terms.', 'gutenberg' ),
-						'href'         => $orig_href,
-						'targetSchema' => array(
-							'type'       => 'object',
-							'properties' => array(
-								$rest_base => array(
-									'type' => 'array',
-								),
-							),
-						),
-					),
-				);
-			}
-		}
-	}
-
-	$response->add_links( $new_links );
-	return $response;
-}
-
-/**
- * Include revisions data on post response links.
- *
- * @see https://core.trac.wordpress.org/ticket/44321
- *
- * @param WP_REST_Response $response WP REST API response of a post.
- * @param WP_Post          $post The post being returned.
- * @param WP_REST_Request  $request WP REST API request.
- * @return WP_REST_Response Response containing the new links.
- */
-function gutenberg_add_revisions_data_to_links( $response, $post, $request ) {
-
-	$new_links  = array();
-	$orig_links = $response->get_links();
-
-	if ( ! empty( $orig_links['version-history'] ) ) {
-		$version_history_link = array_shift( $orig_links['version-history'] );
-		// 'version-history' already exists and we don't want to duplicate it.
-		$response->remove_link( 'version-history' );
-
-		$revisions       = wp_get_post_revisions( $post->ID, array( 'fields' => 'ids' ) );
-		$revisions_count = count( $revisions );
-
-		$new_links['version-history'] = array(
-			'href'  => $version_history_link['href'],
-			'count' => $revisions_count,
-		);
-
-		if ( $revisions_count > 0 ) {
-			$last_revision = array_shift( $revisions );
-
-			$new_links['predecessor-version'] = array(
-				'href' => $version_history_link['href'] . '/' . $last_revision,
-				'id'   => $last_revision,
-			);
-		}
-	}
 
 	$response->add_links( $new_links );
 	return $response;
@@ -419,7 +273,6 @@ function gutenberg_register_post_prepare_functions( $post_type ) {
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_permalink_template_to_posts', 10, 3 );
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_block_format_to_post_content', 10, 3 );
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_target_schema_to_links', 10, 3 );
-	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_revisions_data_to_links', 10, 3 );
 	add_filter( "rest_{$post_type}_collection_params", 'gutenberg_filter_post_collection_parameters', 10, 2 );
 	add_filter( "rest_{$post_type}_query", 'gutenberg_filter_post_query_arguments', 10, 2 );
 	return $post_type;
