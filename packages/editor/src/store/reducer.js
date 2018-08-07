@@ -922,10 +922,10 @@ export function notices( state = [], action ) {
 export function locked( state = false, action ) {
 	switch ( action.type ) {
 		case 'LOCK_POST':
-			console.log( 'LOCK_POST', action );
+		case 'SETUP_EDITOR':
 			return {
 				...state,
-				isValid: action.lock,
+				locked: action.locked,
 			};
 	}
 

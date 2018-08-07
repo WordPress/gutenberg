@@ -4,13 +4,14 @@
 import { __ } from '@wordpress/i18n';
 import { Modal } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
+import { select } from '@wordpress/data';
 
 class PostLockedModal extends Component {
 	constructor() {
 		super( ...arguments );
 		this.state = {
 			isOpen: true,
-		}
+		};
 
 		this.openModal = this.openModal.bind( this );
 		this.closeModal = this.closeModal.bind( this );
@@ -29,41 +30,43 @@ class PostLockedModal extends Component {
 	}
 
 	render() {
+		const user = select( 'core/editor' ).getPostLockUser();
 		return (
 			<Fragment>
 				<button onClick={ this.openModal }>Open Modal</button>
-				{ this.state.isOpen ?
-					<Modal
-						title={ __( 'Post Locked' ) }
-						onRequestClose={ this.closeModal }
-						focusOnMount={ true }
-						shouldCloseOnClickOutside={ false }
-						shouldCloseOnEsc={ false }
-						showCloseIcon={ false }
-					>
-						<div>
-							{ __( 'Username is already editing this post. Do you want to take over?')}
-						</div>
-						<button
-							className="button"
-							onClick={ this.closeModal }
+				{
+					this.state.isOpen ?
+						<Modal
+							title={ user.data.display_name + __( ' is already editing this post. Do you want to take over?' ) }
+							onRequestClose={ this.closeModal }
+							focusOnMount={ true }
+							shouldCloseOnClickOutside={ false }
+							shouldCloseOnEsc={ false }
+							showCloseIcon={ false }
+							className="post-locked-modal"
 						>
-							Go back
-						</button>
-						<button
-							className="button"
-							onClick={ this.closeModal }
-						>
-							Preview
-						</button>
-						<button
-							className="button-primary"
-							onClick={ this.closeModal }
-						>
-							Take Over
-						</button>
-					</Modal>
-					: null }
+
+							<button
+								className="button"
+								onClick={ this.closeModal }
+							>
+								Go back
+							</button>
+							<button
+								className="button"
+								onClick={ this.closeModal }
+							>
+								Preview
+							</button>
+							<button
+								className="button-primary"
+								onClick={ this.closeModal }
+							>
+								Take Over
+							</button>
+						</Modal> :
+						null
+				}
 			</Fragment>
 		);
 	}

@@ -19,13 +19,15 @@ import deprecated from '@wordpress/deprecated';
  *
  * @param {Object}  post           Post object.
  * @param {Object}  autosaveStatus The Post's autosave status.
+ * @param {Object}  lockedUser     The Post's locked user, or false if not locked.
  *
  * @return {Object} Action object.
  */
-export function setupEditor( post, autosaveStatus ) {
+export function setupEditor( post, autosaveStatus, lockedUser ) {
 	return {
 		type: 'SETUP_EDITOR',
 		autosave: autosaveStatus,
+		locked: lockedUser,
 		post,
 	};
 }
@@ -594,15 +596,14 @@ export function removeNotice( id ) {
 /**
  * Returns an action object used to remove a modal.
  *
- * @param {boolean} lock The modal id.
+ * @param {boolean} locked Whether the editor should be locked.
  *
  * @return {Object} Action object.
  */
-export function lockPost( lock ) {
-	console.log( 'lockPost', lock );
+export function lockPost( locked ) {
 	return {
 		type: 'LOCK_POST',
-		lock
+		locked,
 	};
 }
 

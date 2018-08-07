@@ -1312,7 +1312,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		if ( apply_filters( 'show_post_locked_dialog', true, $post, $user ) ) {
 			$locked = true;
 		}
-		$editor_settings['lockedUser'] = $user;
+		$editor_settings['lockedUser'] = $locked ? $user : false;
 
 	} else {
 		$locked = false;

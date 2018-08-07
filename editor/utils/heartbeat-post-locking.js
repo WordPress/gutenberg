@@ -1,22 +1,11 @@
 /* global ajaxurl */
 
 /**
- * Internal dependencies
- */
-import { lockPost } from '../../packages/editor/src/store/actions';
-
-/**
  * WordPress dependencies
  */
-import { element } from '@wordpress/element';
 import { dispatch, select } from '@wordpress/data';
 
-
 export function setupHearthbeatPostLocking() {
-	const {
-		getEditorSettings,
-	} = select( 'core/editor' );
-
 	/**
 	 * Configure Heartbeat post locks.
 	 *
@@ -92,14 +81,5 @@ export function setupHearthbeatPostLocking() {
 			data: data,
 			url: ajaxurl,
 		} );
-	} );
-
-	// Show the locked modal on load if the post is locked.
-	jQuery( window ).on( 'load', function() {
-		const locked = select( 'core/editor' ).isPostLocked();
-		console.log( 'locked?', locked );
-		if ( locked ) {
-			dispatch( 'core/editor' ).lockPost( true );
-		}
 	} );
 }

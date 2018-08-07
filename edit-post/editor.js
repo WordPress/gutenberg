@@ -4,7 +4,7 @@
 import { withSelect } from '@wordpress/data';
 import { EditorProvider, ErrorBoundary } from '@wordpress/editor';
 import { StrictMode } from '@wordpress/element';
-import PostLockedModal from '../packages/components/src/post-locked-modal'
+import PostLockedModal from '../packages/components/src/post-locked-modal';
 /**
  * Internal dependencies
  */

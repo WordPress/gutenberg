@@ -1881,8 +1881,18 @@ export function getTokenSettings( state, name ) {
  * @return {boolean} Is locked.
  */
 export function isPostLocked( state ) {
-	console.log( 'isPostLocked?', !!state.locked, state );
-	return !! state.locked;
+	return !! state.locked.locked;
+}
+
+/**
+ * Returns whether the post lock user.
+ *
+ * @param {Object} state   Global application state.
+ *
+ * @return {Object} A user object.
+ */
+export function getPostLockUser( state ) {
+	return state.locked.locked;
 }
 
 /**
