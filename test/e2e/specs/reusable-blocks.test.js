@@ -29,8 +29,8 @@ describe( 'Reusable Blocks', () => {
 		// Remove all blocks from the post so that we're working with a clean slate
 		await page.evaluate( () => {
 			const blocks = wp.data.select( 'core/editor' ).getBlocks();
-			const uids = blocks.map( ( block ) => block.uid );
-			wp.data.dispatch( 'core/editor' ).removeBlocks( uids );
+			const clientIds = blocks.map( ( block ) => block.clientId );
+			wp.data.dispatch( 'core/editor' ).removeBlocks( clientIds );
 		} );
 	} );
 
