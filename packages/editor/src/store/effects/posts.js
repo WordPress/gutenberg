@@ -267,7 +267,7 @@ export const requestPostUpdateFailure = ( action, store ) => {
 			'cloudflare-error': '',
 		} );
 
-	const cloudflaredMessage = 	error && 'cloudflare_error' === error.code ?
+	const cloudflaredMessage = error && 'cloudflare_error' === error.code ?
 		<p>
 			{ noticeMessage }
 			<br />
