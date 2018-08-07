@@ -18,6 +18,7 @@
             ],
             "columns": 1,
             "imageCrop": true,
+            "captionStyle": "overlay",
             "linkTo": "none"
         },
         "innerBlocks": [],

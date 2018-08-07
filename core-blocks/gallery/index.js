@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { filter, every } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -58,6 +59,10 @@ const blockAttributes = {
 	imageCrop: {
 		type: 'boolean',
 		default: true,
+	},
+	captionStyle: {
+		type: 'string',
+		default: 'overlay',
 	},
 	linkTo: {
 		type: 'string',
@@ -160,9 +165,24 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { images, columns = defaultColumnsNumber( attributes ), imageCrop, linkTo } = attributes;
+		const {
+			images,
+			columns = defaultColumnsNumber( attributes ),
+			imageCrop,
+			captionStyle,
+			linkTo,
+		} = attributes;
+
+		const classes = classnames(
+			`columns-${ columns }`,
+			{
+				'is-cropped': imageCrop,
+				'has-captions-underneath': captionStyle === 'underneath',
+			},
+		);
+
 		return (
-			<ul className={ `columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
+			<ul className={ classes } >
 				{ images.map( ( image ) => {
 					let href;
 
