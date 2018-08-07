@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -17,6 +16,14 @@ const middlewares = [];
 
 function registerMiddleware( middleware ) {
 	middlewares.push( middleware );
+}
+
+function checkCloudflareError( error ) {
+	if ( error.indexOf( 'Cloudflare Ray ID' ) >= 0 ) {
+		throw {
+			code: 'cloudflare_error',
+		};
+	}
 }
 
 function apiFetch( options ) {
@@ -69,9 +76,15 @@ function apiFetch( options ) {
 					throw invalidJsonError;
 				}
 
+				const responseClone = response.clone();
+
 				return response.json()
 					.catch( () => {
-						throw invalidJsonError;
+						return responseClone.text()
+							.then( ( text ) => {
+								checkCloudflareError( text );
+								throw invalidJsonError;
+							} );
 					} )
 					.then( ( error ) => {
 						const unknownError = {
@@ -79,15 +92,7 @@ function apiFetch( options ) {
 							message: __( 'An unknown error occurred.' ),
 						};
 
-						if ( error.indexOf( 'Cloudflare Ray ID' ) >= 0 ) {
-							window.location.href = addQueryArgs(
-								window.location.href,
-								{
-									'classic-editor': '',
-									'cloudflare-error': '',
-								}
-							);
-						}
+						checkCloudflareError( error );
 
 						throw error || unknownError;
 					} );

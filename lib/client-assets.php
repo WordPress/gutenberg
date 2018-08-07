@@ -139,7 +139,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-api-fetch',
 		gutenberg_url( 'build/api-fetch/index.js' ),
-		array( 'wp-hooks', 'wp-i18n', 'wp-url' ),
+		array( 'wp-hooks', 'wp-i18n' ),
 		filemtime( gutenberg_dir_path() . 'build/api-fetch/index.js' ),
 		true
 	);

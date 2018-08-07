@@ -9,6 +9,7 @@ import { pick, includes } from 'lodash';
  */
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -256,7 +257,27 @@ export const requestPostUpdateFailure = ( action, store ) => {
 	const noticeMessage = ! isPublished && publishStatus.indexOf( edits.status ) !== -1 ?
 		messages[ edits.status ] :
 		__( 'Updating failed' );
-	dispatch( createErrorNotice( noticeMessage, { id: SAVE_POST_NOTICE_ID } ) );
+
+	const cloudflareDetailsLink = addQueryArgs(
+		'post.php',
+		{
+			post: post.id,
+			action: 'edit',
+			'classic-editor': '',
+			'cloudflare-error': '',
+		} );
+
+	const cloudflaredMessage = 	error && 'cloudflare_error' === error.code ?
+		<p>
+			{ noticeMessage }
+			<br />
+			{ __( 'Cloudflare is blocking REST API requests.' ) }
+			{ ' ' }
+			<a href={ cloudflareDetailsLink }>{ __( 'Learn More' ) } </a>
+		</p> :
+		noticeMessage;
+
+	dispatch( createErrorNotice( cloudflaredMessage, { id: SAVE_POST_NOTICE_ID } ) );
 };
 
 /**
