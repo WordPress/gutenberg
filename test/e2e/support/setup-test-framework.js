@@ -4,6 +4,11 @@
 import 'expect-puppeteer';
 
 /**
+ * WordPress dependencies
+ */
+import '@wordpress/jest-console';
+
+/**
  * Internal dependencies
  */
 import {
@@ -17,6 +22,19 @@ import {
  * Environment variables
  */
 const { PUPPETEER_TIMEOUT } = process.env;
+
+/**
+ * Set of console logging types observed to protect against unexpected yet
+ * handled (i.e. not catastrophic) errors or warnings. Each key corresponds
+ * to the Puppeteer ConsoleMessage type, its value the corresponding function
+ * on the console global object.
+ *
+ * @type {Object<string,string>}
+ */
+const OBSERVED_CONSOLE_MESSAGE_TYPES = {
+	warning: 'warn',
+	error: 'error',
+};
 
 /**
  * Array of page event tuples of [ eventName, handler ].
@@ -79,12 +97,44 @@ function removePageEvents() {
 	} );
 }
 
+/**
+ * Adds a page event handler to emit uncaught exception to process if one of
+ * the observed console logging types is encountered.
+ */
+function observeConsoleLogging() {
+	page.on( 'console', ( message ) => {
+		const type = message.type();
+		if ( ! OBSERVED_CONSOLE_MESSAGE_TYPES.hasOwnProperty( type ) ) {
+			return;
+		}
+
+		const text = message.text();
+
+		// An exception is made for _blanket_ deprecation warnings: Those
+		// which log regardless of whether a deprecated feature is in use.
+		if ( text.includes( 'This is a global warning' ) ) {
+			return;
+		}
+
+		const logFunction = OBSERVED_CONSOLE_MESSAGE_TYPES[ type ];
+
+		// Disable reason: We intentionally bubble up the console message
+		// which, unless the test explicitly anticipates the logging via
+		// @wordpress/jest-console matchers, will cause the intended test
+		// failure.
+
+		// eslint-disable-next-line no-console
+		console[ logFunction ]( text );
+	} );
+}
+
 // Before every test suite run, delete all content created by the test. This ensures
 // other posts/comments/etc. aren't dirtying tests and tests don't depend on
 // each other's side-effects.
 beforeAll( async () => {
 	capturePageEventsForTearDown();
 	enablePageDialogAccept();
+	observeConsoleLogging();
 
 	await trashExistingPosts();
 	await setupBrowser();
