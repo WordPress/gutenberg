@@ -79,12 +79,10 @@ function apiFetch( options ) {
 				const responseClone = response.clone();
 
 				return response.json()
-					.catch( () => {
-						return responseClone.text()
-							.then( ( text ) => {
-								checkCloudflareError( text );
-								throw invalidJsonError;
-							} );
+					.catch( async () => {
+						const text = await responseClone.text();
+						checkCloudflareError( text );
+						throw invalidJsonError;
 					} )
 					.then( ( error ) => {
 						const unknownError = {
