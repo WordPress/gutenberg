@@ -11,10 +11,10 @@ import FlatTermSelector from '../post-taxonomies/flat-term-selector';
 
 const TagsPanel = () => {
 	const panelBodyTitle = [
-		__( 'Tip:' ),
+		__( 'Suggestion:' ),
 		(
 			<span className="editor-post-publish-panel__link" key="label">
-				{ __( 'Add tags to your post' ) }
+				{ __( 'Add tags' ) }
 			</span>
 		),
 	];
@@ -22,7 +22,7 @@ const TagsPanel = () => {
 	return (
 		<PanelBody initialOpen={ false } title={ panelBodyTitle }>
 			<p>
-				{ __( 'Enter a few words that describe your post’s subject. This will help interested readers find it.' ) }
+				{ __( 'Tags help users and search engines navigate your site and find your content. Add a few keywords to describe your post.' ) }
 			</p>
 			<FlatTermSelector slug={ 'post_tag' } />
 		</PanelBody>
