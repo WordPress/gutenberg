@@ -11,7 +11,6 @@ import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { IconButton, Dropdown, NavigableMenu } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -25,7 +24,6 @@ import BlockHTMLConvertButton from './block-html-convert-button';
 import BlockUnknownConvertButton from './block-unknown-convert-button';
 import _BlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import _BlockSettingsMenuPluginsExtension from './block-settings-menu-plugins-extension';
-import withDeprecatedUniqueId from '../with-deprecated-unique-id';
 
 export class BlockSettingsMenu extends Component {
 	constructor() {
@@ -148,11 +146,8 @@ export class BlockSettingsMenu extends Component {
 	}
 }
 
-export default compose( [
-	withDeprecatedUniqueId,
-	withDispatch( ( dispatch ) => ( {
-		onSelect( clientId ) {
-			dispatch( 'core/editor' ).selectBlock( clientId );
-		},
-	} ) ),
-] )( BlockSettingsMenu );
+export default withDispatch( ( dispatch ) => ( {
+	onSelect( clientId ) {
+		dispatch( 'core/editor' ).selectBlock( clientId );
+	},
+} ) )( BlockSettingsMenu );

@@ -1185,9 +1185,7 @@ export function getBlockInsertionPoint( state ) {
 		index = getBlockOrder( state ).length;
 	}
 
-	// TODO: With deprecation of "UID" nomenclature in 3.5, ensure to remove
-	// the `rootUID` property here.
-	return { rootUID: rootClientId, rootClientId, layout, index };
+	return { rootClientId, layout, index };
 }
 
 /**
@@ -1882,126 +1880,6 @@ export function getTokenSettings( state, name ) {
  */
 export function canUserUseUnfilteredHTML( state ) {
 	return has( getCurrentPost( state ), [ '_links', 'wp:action-unfiltered_html' ] );
-}
-
-export function getAdjacentBlockUid( state, startUID, modifier ) {
-	deprecated( 'getAdjacentBlockUid', {
-		alternative: 'getAdjacentBlockClientId',
-		version: 'v3.5',
-		plugin: 'Gutenberg',
-	} );
-
-	return getAdjacentBlockClientId( state, startUID, modifier );
-}
-
-export function getBlockRootUID( state, uid ) {
-	deprecated( 'getBlockRootUID', {
-		alternative: 'getBlockRootClientId',
-		version: 'v3.5',
-		plugin: 'Gutenberg',
-	} );
-
-	return getBlockRootClientId( state, uid );
-}
-
-export function getSelectedBlockUID( state ) {
-	deprecated( 'getSelectedBlockUID', {
-		alternative: 'getSelectedBlockClientId',
-		version: 'v3.5',
-		plugin: 'Gutenberg',
-	} );
-
-	return getSelectedBlockClientId( state );
-}
-
-export function getBlocksByUID( state, uids ) {
-	deprecated( 'getBlocksByUID', {
-		alternative: 'getBlocksByClientId',
-		version: 'v3.5',
-		plugin: 'Gutenberg',
-	} );
-
-	return getBlocksByClientId( state, uids );
-}
-
-export function getPreviousBlockUid( state, startUID ) {
-	deprecated( 'getPreviousBlockUid', {
-		alternative: 'getPreviousBlockClientId',
-		version: 'v3.5',
-		plugin: 'Gutenberg',
-	} );
-
-	return getPreviousBlockClientId( state, startUID );
-}
-
-export function getNextBlockUid( state, startUID ) {
-	deprecated( 'getNextBlockUid', {
-		alternative: 'getNextBlockClientId',
-		version: 'v3.5',
-		plugin: 'Gutenberg',
-	} );
-
-	return getNextBlockClientId( state, startUID );
-}
-
-export function getMultiSelectedBlockUids( state ) {
-	deprecated( 'getMultiSelectedBlockUids', {
-		alternative: 'getMultiSelectedBlockClientIds',
-		version: 'v3.5',
-		plugin: 'Gutenberg',
-	} );
-
-	return getMultiSelectedBlockClientIds( state );
-}
-
-export function getFirstMultiSelectedBlockUid( state ) {
-	deprecated( 'getFirstMultiSelectedBlockUid', {
-		alternative: 'getFirstMultiSelectedBlockClientId',
-		version: 'v3.5',
-		plugin: 'Gutenberg',
-	} );
-
-	return getFirstMultiSelectedBlockClientId( state );
-}
-
-export function getLastMultiSelectedBlockUid( state ) {
-	deprecated( 'getLastMultiSelectedBlockUid', {
-		alternative: 'getLastMultiSelectedBlockClientId',
-		version: 'v3.5',
-		plugin: 'Gutenberg',
-	} );
-
-	return getLastMultiSelectedBlockClientId( state );
-}
-
-export function getMultiSelectedBlocksStartUid( state ) {
-	deprecated( 'getMultiSelectedBlocksStartUid', {
-		alternative: 'getMultiSelectedBlocksStartClientId',
-		version: 'v3.5',
-		plugin: 'Gutenberg',
-	} );
-
-	return getMultiSelectedBlocksStartClientId( state );
-}
-
-export function getMultiSelectedBlocksEndUid( state ) {
-	deprecated( 'getMultiSelectedBlocksEndUid', {
-		alternative: 'getMultiSelectedBlocksEndClientId',
-		version: 'v3.5',
-		plugin: 'Gutenberg',
-	} );
-
-	return getMultiSelectedBlocksEndClientId( state );
-}
-
-export function getProvisionalBlockUID( state ) {
-	deprecated( 'getProvisionalBlockUID', {
-		alternative: 'getProvisionalBlockClientId',
-		version: 'v3.5',
-		plugin: 'Gutenberg',
-	} );
-
-	return getProvisionalBlockClientId( state );
 }
 
 export function getSharedBlock( state, ref ) {

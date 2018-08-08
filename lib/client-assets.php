@@ -266,7 +266,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-utils',
 		gutenberg_url( 'build/utils/index.js' ),
-		array( 'lodash', 'wp-api-fetch', 'wp-deprecated', 'wp-html-entities', 'wp-i18n', 'wp-editor' ),
+		array( 'lodash', 'wp-api-fetch', 'wp-data', 'wp-deprecated', 'wp-i18n', 'wp-editor' ),
 		filemtime( gutenberg_dir_path() . 'build/utils/index.js' ),
 		true
 	);
@@ -322,7 +322,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-element',
 		gutenberg_url( 'build/element/index.js' ),
-		array( 'react', 'react-dom', 'wp-is-shallow-equal', 'lodash', 'wp-deprecated' ),
+		array( 'react', 'react-dom', 'lodash' ),
 		filemtime( gutenberg_dir_path() . 'build/element/index.js' ),
 		true
 	);
