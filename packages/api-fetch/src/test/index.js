@@ -32,6 +32,9 @@ describe( 'apiFetch', () => {
 					message: 'Bad Request',
 				} );
 			},
+			clone() {
+				return null;
+			},
 		} ) );
 
 		return apiFetch( { path: '/random' } ).catch( ( body ) => {
