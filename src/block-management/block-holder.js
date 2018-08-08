@@ -26,11 +26,7 @@ type PropsType = BlockType & {
 type StateType = {
 	selected: boolean,
 	focused: boolean,
-	aztecHeight: number,
-	eventCount?: number,
 };
-
-const _minHeight = 50;
 
 export default class BlockHolder extends React.Component<PropsType, StateType> {
 	constructor( props: PropsType ) {
@@ -38,7 +34,6 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 		this.state = {
 			selected: false,
 			focused: false,
-			aztecHeight: _minHeight,
 		};
 	}
 
@@ -68,6 +63,8 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 			let style;
 			if ( blockType.name === 'core/code' ) {
 				style = styles.block_code;
+			} else if ( blockType.name === 'core/paragraph' ) {
+				style = styles[ 'aztec_editor' ];
 			}
 
 			// TODO: setAttributes needs to change the state/attributes
@@ -75,33 +72,9 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 				<Block
 					attributes={ { ...this.props.attributes } }
 					// pass a curried version of onChanged with just one argument
-					setAttributes={ ( attrs ) => this.props.onChange( this.props.uid, attrs ) }
+					setAttributes={ ( attrs ) => this.props.onChange( this.props.uid, { ...this.props.attributes, ...attrs } ) }
 					isSelected={ this.props.focused }
 					style={ style }
-				/>
-			);
-		} else if ( this.props.name === 'aztec' ) {
-			return (
-				<RCTAztecView
-					accessibilityLabel="aztec-view"
-					style={ [
-						styles[ 'aztec-editor' ],
-						{ minHeight: Math.max( _minHeight, this.state.aztecHeight ) },
-					] }
-					text={ { text: this.props.attributes.content, eventCount: this.state.eventCount } }
-					onContentSizeChange={ ( event ) => {
-						this.setState( { ...this.state, aztecHeight: event.nativeEvent.contentSize.height } );
-					} }
-					onChange={ ( event ) => {
-						this.setState( { ...this.state, eventCount: event.nativeEvent.eventCount } );
-
-						this.props.onChange( this.props.uid, {
-							...this.props.attributes,
-							content: event.nativeEvent.text,
-						} );
-					} }
-					color={ 'black' }
-					maxImagesWidth={ 200 }
 				/>
 			);
 		}

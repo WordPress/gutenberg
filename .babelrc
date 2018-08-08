@@ -8,9 +8,7 @@
       "module-resolver",
       {
         "cwd": "babelrc",
-        "alias": {
-          "react-native-aztec": "./react-native-aztec",
-          "@wordpress/editor": "./editor",
+        "alias": {          
           "@gutenberg": "./gutenberg"
         },
         "extensions": [
