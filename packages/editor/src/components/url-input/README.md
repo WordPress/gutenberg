@@ -8,9 +8,9 @@ Render a URL input button that pops up an input to search for and select a post 
 
 *Required.* This should be set to the attribute (or component state) property used to store the URL.
 
-### `onChange( url: String, post: Object ): Function`
+### `onChange( url: String, ?post: Object ): Function`
 
-*Required.* Called when the value changes. The second parameter defaults to an empty object unless the user selects a post from the suggestions dropdown. In those cases the `post` parameter will look like this:
+*Required.* Called when the value changes. The second parameter is `null` unless the user selects a post from the suggestions dropdown. In those cases the `post` parameter will look like this:
 
 ```json
 {
@@ -49,7 +49,7 @@ wp.blocks.registerBlockType( /* ... */, {
 			className: props.className,
 			url: props.attributes.url,
 			onChange: function( url, post ) {
-				props.setAttributes( { url: url, text: post.title || 'Click here' } );
+				props.setAttributes( { url: url, text: (post && post.title) || 'Click here' } );
 			}
 		} );
 	},
@@ -82,7 +82,7 @@ registerBlockType( /* ... */, {
 		return (
 			<URLInputButton
 				url={ attributes.url }
-				onChange={ ( url, post ) => setAttributes( { url, text: post.title || 'Click here' } ) }
+				onChange={ ( url, post ) => setAttributes( { url, text: (post && post.title) || 'Click here' } ) }
 			/>
 		);
 	},
@@ -104,7 +104,7 @@ Renders the URL input normally wrapped by `URLInputButton`.
 
 *Required.* This should be set to the attribute (or component state) property used to store the URL.
 
-### `onChange( url: String, post: Object ): Function`
+### `onChange( url: String, ?post: Object ): Function`
 
 *Required.* Called when the value changes. This is the same as the `onChange` prop described above for `URLInputButton`.
 
@@ -134,7 +134,7 @@ wp.blocks.registerBlockType( /* ... */, {
 			className: props.className,
 			value: props.attributes.url,
 			onChange: function( url, post ) {
-				props.setAttributes( { url: url, text: post.title || 'Click here' } );
+				props.setAttributes( { url: url, text: (post && post.title) || 'Click here' } );
 			}
 		} );
 	},
@@ -168,7 +168,7 @@ registerBlockType( /* ... */, {
 			<URLInput
 				className={ className }
 				value={ attributes.url }
-				onChange={ ( url, post ) => setAttributes( { url, text: post.title || 'Click here' } ) }
+				onChange={ ( url, post ) => setAttributes( { url, text: (post && post.title) || 'Click here' } ) }
 			/>
 		);
 	},
