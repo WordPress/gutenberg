@@ -654,9 +654,27 @@
 		"parent": "components"
 	},
 	{
+		"title": "Panel",
+		"slug": "panel",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/panel/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Placeholder",
+		"slug": "placeholder",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/placeholder/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Popover",
 		"slug": "popover",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/popover/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "QueryControls",
+		"slug": "query-controls",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/query-controls/README.md",
 		"parent": "components"
 	},
 	{
@@ -669,6 +687,12 @@
 		"title": "RangeControl",
 		"slug": "range-control",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/range-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ResponsiveWrapper",
+		"slug": "responsive-wrapper",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/responsive-wrapper/README.md",
 		"parent": "components"
 	},
 	{
@@ -702,6 +726,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Spinner",
+		"slug": "spinner",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/spinner/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "TabPanel",
 		"slug": "tab-panel",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/tab-panel/README.md",
@@ -723,6 +753,12 @@
 		"title": "ToggleControl",
 		"slug": "toggle-control",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/toggle-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Toolbar",
+		"slug": "toolbar",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/toolbar/README.md",
 		"parent": "components"
 	},
 	{
