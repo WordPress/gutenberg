@@ -5,6 +5,12 @@ import { __ } from '@wordpress/i18n';
 import { Modal } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
 import { select } from '@wordpress/data';
+import {
+	PostPreviewButton,
+} from '@wordpress/editor';
+import './style.scss';
+import { addQueryArgs } from '@wordpress/url';
+import { getPostEditURL } from '../../../../edit-post/components/browser-url';
 
 class PostLockedModal extends Component {
 	constructor() {
@@ -14,7 +20,9 @@ class PostLockedModal extends Component {
 		};
 
 		this.openModal = this.openModal.bind( this );
-		this.closeModal = this.closeModal.bind( this );
+		this.takeOver = this.takeOver.bind( this );
+
+		this.takeover = __( ' admin has taken over and is currently editing. Your latest changes were saved as a revision. ' );
 	}
 
 	openModal() {
@@ -23,10 +31,21 @@ class PostLockedModal extends Component {
 		}
 	}
 
-	closeModal() {
-		if ( this.state.isOpen ) {
-			this.setState( { isOpen: false } );
-		}
+	takeOver() {
+		const { getCurrentPost, getEditorSettings } = select( 'core/editor' );
+		const { id } = getCurrentPost();
+		const { lockNonce } = getEditorSettings();
+		const unlockUrl = addQueryArgs( getPostEditURL(), {
+			'get-post-lock': '1',
+			'nonce': lockNonce,
+			lockKey: true,
+		} );
+
+		document.location = unlockUrl;
+	}
+
+	goBack() {
+		window.history.back();
 	}
 
 	render() {
@@ -48,19 +67,14 @@ class PostLockedModal extends Component {
 
 							<button
 								className="button"
-								onClick={ this.closeModal }
+								onClick={ this.goBack }
 							>
 								Go back
 							</button>
+							<PostPreviewButton />
 							<button
-								className="button"
-								onClick={ this.closeModal }
-							>
-								Preview
-							</button>
-							<button
-								className="button-primary"
-								onClick={ this.closeModal }
+								className="button button-primary"
+								onClick={ this.takeOver }
 							>
 								Take Over
 							</button>
