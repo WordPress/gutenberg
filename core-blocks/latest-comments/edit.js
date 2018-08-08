@@ -7,13 +7,13 @@ import {
 	PanelBody,
 	RangeControl,
 	ToggleControl,
-	ServerSideRender,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	InspectorControls,
 	BlockAlignmentToolbar,
 	BlockControls,
+	ServerSideRender,
 } from '@wordpress/editor';
 
 /**
