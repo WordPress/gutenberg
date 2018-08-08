@@ -27,10 +27,6 @@ Render a URL input button that pops up an input to search for and select a post 
 }
 ```
 
-### `autoFocus: Boolean`
-
-*Optional.* By default, the input will gain focus when it is rendered as typically it is used in combination with a `Popover`. If you are rendering the component all the time set this to `false`.
-
 ## Example
 
 {% codetabs %}
