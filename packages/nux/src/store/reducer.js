@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { union, without } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
@@ -19,6 +24,34 @@ export function guides( state = [], action ) {
 				...state,
 				action.tipIds,
 			];
+	}
+
+	return state;
+}
+
+/**
+ * Reducer that maps each tip to an array of DotTip component instance IDs that are
+ * displaying that tip. Tracking this allows us to only show one DotTip at a
+ * time per tip.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function tipInstanceIds( state = {}, action ) {
+	switch ( action.type ) {
+		case 'REGISTER_TIP_INSTANCE':
+			return {
+				...state,
+				[ action.tipId ]: union( state[ action.tipId ] || [], [ action.instanceId ] ),
+			};
+
+		case 'UNREGISTER_TIP_INSTANCE':
+			return {
+				...state,
+				[ action.tipId ]: without( state[ action.tipId ], action.instanceId ),
+			};
 	}
 
 	return state;
@@ -70,4 +103,4 @@ export function dismissedTips( state = {}, action ) {
 
 const preferences = combineReducers( { areTipsEnabled, dismissedTips } );
 
-export default combineReducers( { guides, preferences } );
+export default combineReducers( { guides, tipInstanceIds, preferences } );
