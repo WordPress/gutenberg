@@ -211,7 +211,7 @@ export function getEmbedEdit( title, icon ) {
 							<Button
 								isLarge
 								type="submit">
-								{ __( 'Embed' ) }
+								{ _x( 'Embed', 'button label' ) }
 							</Button>
 							{ previewIsFallback && <p className="components-placeholder__error">{ __( 'Sorry, we could not embed that content.' ) }</p> }
 						</form>
