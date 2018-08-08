@@ -42,7 +42,7 @@
 	svg {
 		width: $block-side-ui-width;
 		height: $block-side-ui-width;
-		padding: ( $block-side-ui-width - 18px ) / 2;	// this makes the SVG fill the whole available area, without scaling the artwork
+		padding: ($block-side-ui-width - 18px) / 2;	// this makes the SVG fill the whole available area, without scaling the artwork
 	}
 
 	// Apply a background in nested contexts, only on desktop
@@ -54,26 +54,26 @@
 			&:first-child {
 				margin-bottom: -1px;
 			}
-		
+
 			&:hover,
 			&:active,
 			&:focus {
 				// Buttons are stacked with overlapping border to look like a unit, so elevate on interactions.
-				z-index: z-index( '.editor-block-mover__control' );
+				z-index: z-index(".editor-block-mover__control");
 			}
 		}
 	}
 
 	// Hover, active and focus styles
-	&:not( :disabled ):not( [aria-disabled="true"] ):hover {
+	&:not(:disabled):not([aria-disabled="true"]):hover {
 		@include button-style__hover;
 	}
 
-	&:not( :disabled ):not( [aria-disabled="true"] ):active {
+	&:not(:disabled):not([aria-disabled="true"]):active {
 		@include button-style__active;
 	}
 
-	&:not( :disabled ):not( [aria-disabled="true"] ):focus {
+	&:not(:disabled):not([aria-disabled="true"]):focus {
 		@include button-style__focus-active;
 	}
 }

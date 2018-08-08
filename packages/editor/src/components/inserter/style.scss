@@ -31,7 +31,7 @@ $block-inserter-search-height: 38px;
 	cursor: pointer;
 	border: none;
 	outline: none;
-	transition: color .2s ease;
+	transition: color 0.2s ease;
 }
 
 .editor-inserter__menu {
@@ -60,7 +60,7 @@ $block-inserter-search-height: 38px;
 	margin-top: -1px;
 }
 
-.editor-inserter__menu.is-bottom:after {
+.editor-inserter__menu.is-bottom::after {
 	border-bottom-color: $white;
 }
 

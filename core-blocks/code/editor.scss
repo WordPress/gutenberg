@@ -2,7 +2,7 @@
 	font-family: $editor-html-font;
 	font-size: $text-editor-font-size;
 	color: $dark-gray-800;
-	padding: .8em 1.6em;
+	padding: 0.8em 1.6em;
 	border: $border-width solid $light-gray-500;
 	border-radius: 4px;
 }
@@ -33,7 +33,7 @@
 		cursor: default;
 	}
 
-	&> span {
+	& > span {
 		border: $border-width solid transparent;
 		padding: 0 6px;
 		box-sizing: content-box;

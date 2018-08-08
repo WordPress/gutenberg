@@ -10,7 +10,7 @@ $input-size: 230px;
 	position: relative;
 	padding: 1px;
 
-	input[type=text] {
+	input[type="text"] {
 		width: 100%;
 		padding: $input-padding;
 		border: none;
@@ -34,7 +34,7 @@ $input-size: 230px;
 // Suggestions
 .editor-url-input__suggestions {
 	max-height: 200px;
-	transition: all .15s ease-in-out;
+	transition: all 0.15s ease-in-out;
 	list-style: none;
 	padding: 4px 0;
 }
@@ -66,7 +66,7 @@ $input-size: 230px;
 
 	&:focus,
 	&.is-selected {
-		background: color( theme( primary ) shade( 15% ) );
+		background: color(theme(primary) shade(15%));
 		color: $white;
 		outline: none;
 	}
@@ -82,7 +82,7 @@ $input-size: 230px;
 	overflow: visible;
 
 	&::after {
-		content: '';
+		content: "";
 		position: absolute;
 		display: block;
 		width: 1px;

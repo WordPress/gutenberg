@@ -29,11 +29,11 @@
 	width: 16px !important;
 	height: 16px !important;
 	position: absolute;
-	background: theme( primary );
+	background: theme(primary);
 
 	.wp-block-image.is-focused & {
 		display: block;
-		z-index: z-index( '.wp-block-image__resize-handlers' );
+		z-index: z-index(".wp-block-image__resize-handlers");
 	}
 }
 

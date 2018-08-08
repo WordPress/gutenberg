@@ -110,7 +110,7 @@
 		margin: 15px auto;
 		outline: 0;
 		cursor: default;
-		border: 2px dashed rgb( 186, 186, 186 );
+		border: 2px dashed rgb(186, 186, 186);
 	}
 }
 
@@ -132,17 +132,17 @@
 
 
 div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
-    margin-top: 0;
-    padding-top: 0;
+	margin-top: 0;
+	padding-top: 0;
 }
 
 .freeform-toolbar {
 	width: auto;
 	margin: 0 #{ -$parent-block-padding };
 	position: sticky;
-	z-index: z-index( '.freeform-toolbar' );
+	z-index: z-index(".freeform-toolbar");
 	top: $block-padding;
-	transform: translateY( -$block-padding );
+	transform: translateY(-$block-padding);
 }
 
 .freeform-toolbar:empty {
@@ -153,7 +153,7 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 	&::before {
 		font-family: $default-font;
 		font-size: $default-font-size;
-		content: attr( data-placeholder );
+		content: attr(data-placeholder);
 		color: #555d66;
 		line-height: 37px;
 		padding: $block-padding;
