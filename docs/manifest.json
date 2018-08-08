@@ -84,6 +84,30 @@
 		"parent": "extensibility"
 	},
 	{
+		"title": "Design",
+		"slug": "design",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/design.md",
+		"parent": null
+	},
+	{
+		"title": "Design Patterns",
+		"slug": "design-patterns",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/design/design-patterns.md",
+		"parent": "design"
+	},
+	{
+		"title": "Block Design",
+		"slug": "block-design",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/design/block-design.md",
+		"parent": "design"
+	},
+	{
+		"title": "Design Resources",
+		"slug": "design-resources",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/design/design-resources.md",
+		"parent": "design"
+	},
+	{
 		"title": "Creating Block Types",
 		"slug": "blocks",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/blocks.md",
@@ -135,12 +159,6 @@
 		"title": "Glossary",
 		"slug": "glossary",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/reference/glossary.md",
-		"parent": "reference"
-	},
-	{
-		"title": "Design Principles",
-		"slug": "design-principles",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/reference/design-principles.md",
 		"parent": "reference"
 	},
 	{
