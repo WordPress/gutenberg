@@ -41,11 +41,11 @@ Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs
 
 ### `onMerge( forward: Boolean ): Function`
 
-*Optional.* Called when blocks can be merged. `forward` is true when merging with the next block, false when merging with the previous block.
+*Optional.* Called when blocks can be merged. `forward` is true when merging with the next block, false when merging with the previous block. The callback should return `true` if a merge is possible, or `false` otherwise. This is used in determining whether an empty field should be deleted instead of merged.
 
 ### `onRemove( forward: Boolean ): Function`
 
-*Optional.* Called when the block can be removed. `forward` is true when the selection is expected to move to the next block, false to the previous block.
+*Optional.* Called when the block can be removed. `forward` is true when the selection is expected to move to the next block, false to the previous block. Called when pressing Backspace or Delete on an empty field and only when `onMerge` explicitly returns `false` to indicate non-merge.
 
 ### `formattingControls: Array`
 
