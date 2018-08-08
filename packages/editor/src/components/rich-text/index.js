@@ -82,6 +82,7 @@ export class RichText extends Component {
 		this.onFocus = this.onFocus.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
+		this.onDeleteKeyDown = this.onDeleteKeyDown.bind( this );
 		this.onHorizontalNavigationKeyDown = this.onHorizontalNavigationKeyDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onKeyUp = this.onKeyUp.bind( this );
@@ -427,6 +428,56 @@ export class RichText extends Component {
 	}
 
 	/**
+	 * Handles a delete key down event to handle merge or removal for a
+	 * collapsed selection where caret is at directional edge: forward for a
+	 * delete key down, reverse for a backspace key down.
+	 *
+	 * @param {tinymce.EditorEvent<KeyboardEvent>} event Keydown event.
+	 */
+	onDeleteKeyDown( event ) {
+		const { onMerge, onRemove } = this.props;
+		if ( ! onMerge && ! onRemove ) {
+			return;
+		}
+
+		const { keyCode } = event;
+		const isReverse = keyCode === BACKSPACE;
+
+		// Only process delete if occurs at uncollapsed edge.
+		const isEdge = (
+			this.editor.selection.isCollapsed() &&
+			isHorizontalEdge( this.editor.getBody(), isReverse )
+		);
+		if ( ! isEdge ) {
+			return;
+		}
+
+		let isHandled = false;
+
+		if ( onMerge ) {
+			onMerge( ! isReverse );
+			isHandled = true;
+		}
+
+		if ( onRemove && this.isEmpty() ) {
+			onRemove( ! isReverse );
+			isHandled = true;
+		}
+
+		// Only prevent default behaviors if handled.
+		if ( ! isHandled ) {
+			return;
+		}
+
+		event.preventDefault();
+
+		// Calling onMerge() or onRemove() will destroy the editor, so it's
+		// important that we stop other handlers (e.g. ones registered by
+		// TinyMCE) from also handling this event.
+		event.stopImmediatePropagation();
+	}
+
+	/**
 	 * Handles a keydown event from TinyMCE.
 	 *
 	 * @param {KeydownEvent} event The keydown event as triggered by TinyMCE.
@@ -436,32 +487,9 @@ export class RichText extends Component {
 		const rootNode = this.editor.getBody();
 		const { keyCode } = event;
 
-		if (
-			getSelection().isCollapsed && (
-				( keyCode === BACKSPACE && isHorizontalEdge( rootNode, true ) ) ||
-				( keyCode === DELETE && isHorizontalEdge( rootNode, false ) )
-			)
-		) {
-			if ( ! this.props.onMerge && ! this.props.onRemove ) {
-				return;
-			}
-
-			const forward = keyCode === DELETE;
-
-			if ( this.props.onMerge ) {
-				this.props.onMerge( forward );
-			}
-
-			if ( this.props.onRemove && this.isEmpty() ) {
-				this.props.onRemove( forward );
-			}
-
-			event.preventDefault();
-
-			// Calling onMerge() or onRemove() will destroy the editor, so it's important
-			// that we stop other handlers (e.g. ones registered by TinyMCE) from
-			// also handling this event.
-			event.stopImmediatePropagation();
+		const isDelete = keyCode === DELETE || keyCode === BACKSPACE;
+		if ( isDelete ) {
+			this.onDeleteKeyDown( event );
 		}
 
 		const isHorizontalNavigation = keyCode === LEFT || keyCode === RIGHT;
