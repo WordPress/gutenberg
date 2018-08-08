@@ -445,38 +445,22 @@ export class RichText extends Component {
 				return;
 			}
 
-			// These modifiers would not result in modification of text content,
-			// if they're pressed they should not cause merge or deletion of blocks.
-			// Returning here also allows further binding of these events.
-			const isMetaShiftDeletePressed = event.metaKey && event.shiftKey && keyCode === DELETE;
-			const isCtrlShiftDeletePressed = event.ctrlKey && event.shiftKey && keyCode === DELETE;
-			const isCtrlAltDeletePressed = event.ctrlKey && event.altKey && keyCode === DELETE;
-			const isMetaAltPressed = event.metaKey && event.altKey;
-
-			if ( isMetaShiftDeletePressed || isCtrlShiftDeletePressed || isCtrlAltDeletePressed || isMetaAltPressed ) {
-				return;
-			}
-
 			const forward = keyCode === DELETE;
 
 			if ( this.props.onMerge ) {
 				this.props.onMerge( forward );
-
-				if ( ! forward ) {
-					// The content of this editor will be merged with the previous one.
-					// This editor will be destroyed, so prevent further handling of the event.
-					event.preventDefault();
-					event.stopImmediatePropagation();
-				}
 			}
 
 			if ( this.props.onRemove && this.isEmpty() ) {
 				this.props.onRemove( forward );
-
-				// This editor will be destroyed, so prevent further handling of the event.
-				event.preventDefault();
-				event.stopImmediatePropagation();
 			}
+
+			event.preventDefault();
+
+			// Calling onMerge() or onRemove() will destroy the editor, so it's important
+			// that we stop other handlers (e.g. ones registered by TinyMCE) from
+			// also handling this event.
+			event.stopImmediatePropagation();
 		}
 
 		const isHorizontalNavigation = keyCode === LEFT || keyCode === RIGHT;
