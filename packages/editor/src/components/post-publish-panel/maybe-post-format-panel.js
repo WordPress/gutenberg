@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get, includes, union } from 'lodash';
+import { find, get, includes } from 'lodash';
 
 /**
  * WordPress dependencies.
@@ -35,7 +35,7 @@ const PostFormatPanel = ( { suggestion, onUpdatePostFormat } ) => {
 	return (
 		<PanelBody initialOpen={ false } title={ panelBodyTitle } >
 			<p>
-				{ __( 'Your theme uses Post Formats. These offer styling tweaks that highlight different kinds of content–like images or videos.' ) }
+				{ __( 'Your theme uses Post Formats, styling tweaks that highlight different kinds of content like images or videos.' ) }
 			</p>
 			<p>
 				<PostFormatSuggested
