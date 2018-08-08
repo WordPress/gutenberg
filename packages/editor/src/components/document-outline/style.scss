@@ -17,23 +17,23 @@
 	}
 
 	&.is-h2 .document-outline__emdash::before {
-		content: '—';
+		content: "—";
 	}
 
 	&.is-h3 .document-outline__emdash::before {
-		content: '——';
+		content: "——";
 	}
 
 	&.is-h4 .document-outline__emdash::before {
-		content: '———';
+		content: "———";
 	}
 
 	&.is-h5 .document-outline__emdash::before {
-		content: '————';
+		content: "————";
 	}
 
 	&.is-h6 .document-outline__emdash::before {
-		content: '—————';
+		content: "—————";
 	}
 }
 

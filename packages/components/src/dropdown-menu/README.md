@@ -9,36 +9,34 @@ Render a Dropdown Menu with a set of controls:
 ```jsx
 import { DropdownMenu } from '@wordpress/components';
 
-function DirectionMenu() {
-	return (
-		<DropdownMenu
-			icon="move"
-			label="Select a direction"
-			controls={ [
-				{
-					title: 'Up',
-					icon: 'arrow-up-alt',
-					onClick: () => console.log( 'up' )
-				},
-				{
-					title: 'Right',
-					icon: 'arrow-right-alt',
-					onClick: () => console.log( 'right' )
-				},
-				{
-					title: 'Down',
-					icon: 'arrow-down-alt',
-					onClick: () => console.log( 'down' )
-				},
-				{
-					title: 'Left',
-					icon: 'arrow-left-alt',
-					onClick: () => console.log( 'left' )
-				},
-			] }
-		/>
-	);
-}
+const MyDropdownMenu = () => (
+	<DropdownMenu
+		icon="move"
+		label="Select a direction"
+		controls={ [
+			{
+				title: 'Up',
+				icon: 'arrow-up-alt',
+				onClick: () => console.log( 'up' )
+			},
+			{
+				title: 'Right',
+				icon: 'arrow-right-alt',
+				onClick: () => console.log( 'right' )
+			},
+			{
+				title: 'Down',
+				icon: 'arrow-down-alt',
+				onClick: () => console.log( 'down' )
+			},
+			{
+				title: 'Left',
+				icon: 'arrow-left-alt',
+				onClick: () => console.log( 'left' )
+			},
+		] }
+	/>
+);
 ```
 
 ## Props

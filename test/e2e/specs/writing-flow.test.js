@@ -1,18 +1,16 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
 import {
-	newPost,
-	newDesktopBrowserPage,
+	clickBlockAppender,
 	getEditedPostContent,
-	pressWithModifier,
+	newPost,
 	pressTimes,
+	pressWithModifier,
 } from '../support/utils';
 
 describe( 'adding blocks', () => {
 	beforeEach( async () => {
-		await newDesktopBrowserPage();
 		await newPost();
 	} );
 
@@ -20,7 +18,7 @@ describe( 'adding blocks', () => {
 		let activeElementText;
 
 		// Add demo content
-		await page.click( '.editor-default-block-appender__content' );
+		await clickBlockAppender();
 		await page.keyboard.type( 'First paragraph' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/columns' );
@@ -76,7 +74,7 @@ describe( 'adding blocks', () => {
 
 	it( 'should navigate around inline boundaries', async () => {
 		// Add demo content
-		await page.click( '.editor-default-block-appender__content' );
+		await clickBlockAppender();
 		await page.keyboard.type( 'First' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Second' );
@@ -146,7 +144,7 @@ describe( 'adding blocks', () => {
 	it( 'should clean TinyMCE content', async () => {
 		// Ensure no zero-width space character. Notably, this can occur when
 		// save occurs while at an inline boundary edge.
-		await page.click( '.editor-default-block-appender__content' );
+		await clickBlockAppender();
 		await pressWithModifier( 'mod', 'b' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 

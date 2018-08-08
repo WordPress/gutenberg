@@ -1,5 +1,4 @@
-TextControl
-=======
+# TextControl
 
 TextControl is normally used to generate text input fields. But can be used to generate other input types.
 
@@ -7,12 +6,20 @@ TextControl is normally used to generate text input fields. But can be used to g
 ## Usage
 
 Render a user interface to input the name of an additional css class.
+
 ```jsx
+import { TextControl } from '@wordpress/components';
+import { withState } from '@wordpress/compose';
+
+const MyTextControl = withState( {
+	className: '',
+} )( ( { className, setState } ) => ( 
 	<TextControl
-		label={ __( 'Additional CSS Class' ) }
+		label="Additional CSS Class"
 		value={ className }
-		onChange={ onChange }
+		onChange={ ( className ) => setState( { className } ) }
 	/>
+) );
 ```
 
 ## Props

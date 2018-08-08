@@ -10,7 +10,7 @@
 		margin: 0 -2px;
 		border-radius: 2px;
 		box-shadow: none;
-		background: rgba( 255, 255, 255, 0.3 );
+		background: rgba(255, 255, 255, 0.3);
 	}
 
 	.editor-rich-text strong {
@@ -25,7 +25,7 @@
 		justify-content: flex-start;
 	}
 
-	&.has-right-content .editor-rich-text__inline-toolbar{
+	&.has-right-content .editor-rich-text__inline-toolbar {
 		justify-content: flex-end;
 	}
 }

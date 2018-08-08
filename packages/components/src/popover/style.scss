@@ -2,7 +2,7 @@ $arrow-size: 8px;
 
 .components-popover {
 	position: fixed;
-	z-index: z-index( ".components-popover" );
+	z-index: z-index(".components-popover");
 	left: 50%;
 
 	&.is-mobile {
@@ -19,12 +19,12 @@ $arrow-size: 8px;
 			border: $arrow-size solid $light-gray-500;
 		}
 
-		&:after {
+		&::after {
 			border: $arrow-size solid $white;
 		}
 
 		&::before,
-		&:after {
+		&::after {
 			content: "";
 			position: absolute;
 			height: 0;
@@ -39,12 +39,12 @@ $arrow-size: 8px;
 				bottom: - $arrow-size;
 			}
 
-			&:after {
+			&::after {
 				bottom: -6px;
 			}
 
 			&::before,
-			&:after {
+			&::after {
 				border-bottom: none;
 				border-left-color: transparent;
 				border-right-color: transparent;
@@ -60,12 +60,12 @@ $arrow-size: 8px;
 				top: -$arrow-size;
 			}
 
-			&:after {
+			&::after {
 				top: -6px;
 			}
 
 			&::before,
-			&:after {
+			&::after {
 				border-bottom-style: solid;
 				border-left-color: transparent;
 				border-right-color: transparent;
@@ -82,12 +82,12 @@ $arrow-size: 8px;
 				right: -$arrow-size;
 			}
 
-			&:after {
+			&::after {
 				right: -6px;
 			}
 
 			&::before,
-			&:after {
+			&::after {
 				border-bottom-color: transparent;
 				border-left-style: solid;
 				border-right: none;
@@ -104,12 +104,12 @@ $arrow-size: 8px;
 				left: -$arrow-size;
 			}
 
-			&:after {
+			&::after {
 				left: -6px;
 			}
 
 			&::before,
-			&:after {
+			&::after {
 				border-bottom-color: transparent;
 				border-left: none;
 				border-right-style: solid;
@@ -126,7 +126,7 @@ $arrow-size: 8px;
 
 		&.is-bottom {
 			top: 100%;
-			z-index: z-index( ".components-popover.is-bottom" );
+			z-index: z-index(".components-popover.is-bottom");
 		}
 
 		&.is-middle {
@@ -143,7 +143,7 @@ $arrow-size: 8px;
 	height: 100%;
 
 	.components-popover.is-mobile & {
-		height: calc( 100% - #{ $panel-header-height } );
+		height: calc(100% - #{ $panel-header-height });
 		border-top: 0;
 	}
 
@@ -160,7 +160,7 @@ $arrow-size: 8px;
 
 	.components-popover:not(.is-mobile).is-center & {
 		left: 50%;
-		transform: translateX( -50% );
+		transform: translateX(-50%);
 	}
 
 	.components-popover:not(.is-mobile).is-right & {
@@ -209,5 +209,5 @@ $arrow-size: 8px;
 }
 
 .components-popover__close.components-icon-button {
-	z-index: z-index( '.components-popover__close' );
+	z-index: z-index(".components-popover__close");
 }

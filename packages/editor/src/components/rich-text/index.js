@@ -27,7 +27,6 @@ import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, rawShortcut } from '@wordpress/k
 import { Slot } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { rawHandler, children } from '@wordpress/blocks';
-import deprecated from '@wordpress/deprecated';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
 
 /**
@@ -919,18 +918,6 @@ RichTextContainer.Content = ( { value, format, tagName: Tag, ...props } ) => {
 	switch ( format ) {
 		case 'string':
 			content = <RawHTML>{ value }</RawHTML>;
-			break;
-
-		case 'element':
-			// NOTE: In removing this, ensure to remove also every related
-			// function from `format.js`, including the `dom-react` dependency.
-			deprecated( 'RichText `element` format', {
-				version: '3.5',
-				plugin: 'Gutenberg',
-				alternative: 'the compatible `children` format',
-			} );
-
-			content = value;
 			break;
 
 		case 'children':

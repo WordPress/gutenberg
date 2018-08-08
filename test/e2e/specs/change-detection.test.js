@@ -1,10 +1,9 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
 import {
+	clickBlockAppender,
 	newPost,
-	newDesktopBrowserPage,
 	pressWithModifier,
 	ensureSidebarOpened,
 	publishPost,
@@ -12,10 +11,6 @@ import {
 
 describe( 'Change detection', () => {
 	let handleInterceptedRequest, hadInterceptedSave;
-
-	beforeAll( async () => {
-		await newDesktopBrowserPage();
-	} );
 
 	beforeEach( async () => {
 		hadInterceptedSave = false;
@@ -32,8 +27,7 @@ describe( 'Change detection', () => {
 	async function assertIsDirty( isDirty ) {
 		let hadDialog = false;
 
-		function handleOnDialog( dialog ) {
-			dialog.accept();
+		function handleOnDialog() {
 			hadDialog = true;
 		}
 
@@ -144,7 +138,7 @@ describe( 'Change detection', () => {
 	} );
 
 	it( 'Should prompt if content added without save', async () => {
-		await page.click( '.editor-default-block-appender' );
+		await clickBlockAppender();
 
 		await assertIsDirty( true );
 	} );
@@ -268,7 +262,7 @@ describe( 'Change detection', () => {
 		// Keyboard shortcut Ctrl+S save.
 		await pressWithModifier( 'Mod', 'S' );
 
-		await page.click( '.editor-default-block-appender' );
+		await clickBlockAppender();
 
 		// Allow save to complete. Disabling interception flushes pending.
 		await Promise.all( [

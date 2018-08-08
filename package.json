@@ -60,7 +60,7 @@
 		"rememo": "3.0.0"
 	},
 	"devDependencies": {
-		"@babel/core": "7.0.0-beta.52",
+		"@babel/core": "7.0.0-beta.56",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:packages/babel-plugin-import-jsx-pragma",
 		"@wordpress/babel-plugin-makepot": "file:packages/babel-plugin-makepot",
 		"@wordpress/babel-preset-default": "file:packages/babel-preset-default",
@@ -94,7 +94,10 @@
 		"espree": "3.5.4",
 		"extract-text-webpack-plugin": "4.0.0-beta.0",
 		"glob": "7.1.2",
+		"husky": "0.14.3",
+		"jest-puppeteer": "3.2.1",
 		"lerna": "3.0.0-beta.21",
+		"lint-staged": "7.2.0",
 		"mkdirp": "0.5.1",
 		"node-sass": "4.9.2",
 		"path-type": "3.0.0",
@@ -111,6 +114,8 @@
 		"source-map-loader": "0.2.3",
 		"sprintf-js": "1.1.1",
 		"style-loader": "0.20.3",
+		"stylelint": "9.4.0",
+		"stylelint-config-wordpress": "13.0.0",
 		"symlink-or-copy": "1.2.0",
 		"uuid": "3.1.0",
 		"webpack": "4.8.3",
@@ -161,20 +166,23 @@
 		"fixtures:server-registered": "docker-compose run -w /var/www/html/wp-content/plugins/gutenberg --rm wordpress ./bin/get-server-blocks.php > core-blocks/test/server-registered.json",
 		"fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
-		"lint": "npm run lint-js && npm run lint-pkg-json",
+		"lint": "concurrently \"npm run lint-js\" \"npm run lint-pkg-json\" \"npm run lint-css\"",
 		"lint-js": "eslint .",
 		"lint-js:fix": "eslint . --fix",
 		"lint-php": "docker-compose run --rm composer run-script lint",
 		"lint-pkg-json": "wp-scripts lint-pkg-json ./packages",
+		"lint-css": "stylelint '**/*.scss'",
+		"lint-css:fix": "stylelint '**/*.scss' --fix",
 		"package-plugin": "./bin/build-plugin-zip.sh",
 		"postinstall": "npm run build:packages",
 		"pot-to-php": "./bin/pot-to-php.js",
+		"precommit": "lint-staged",
 		"publish:check": "npm run build:packages && lerna updated",
 		"publish:dev": "npm run build:packages && lerna publish --npm-tag next",
 		"publish:prod": "npm run build:packages && lerna publish",
 		"test": "npm run lint && npm run test-unit",
-		"pretest-e2e": "./bin/reset-e2e-tests.sh",
-		"test-e2e": "wp-scripts test-unit-js --config test/e2e/jest.config.json --runInBand",
+		"pretest-e2e": "concurrently \"./bin/reset-e2e-tests.sh\" \"npm run build\"",
+		"test-e2e": "cross-env JEST_PUPPETEER_CONFIG=test/e2e/puppeteer.config.js wp-scripts test-unit-js --config test/e2e/jest.config.json --runInBand",
 		"test-e2e:watch": "npm run test-e2e -- --watch",
 		"test-php": "npm run lint-php && npm run test-unit-php",
 		"test-unit": "wp-scripts test-unit-js --config test/unit/jest.config.json",
@@ -184,5 +192,16 @@
 		"test-unit:watch": "npm run test-unit -- --watch",
 		"test-unit-php": "docker-compose run --rm wordpress_phpunit phpunit",
 		"test-unit-php-multisite": "docker-compose run -e WP_MULTISITE=1 --rm wordpress_phpunit phpunit"
+	},
+	"lint-staged": {
+		"packages/*/package.json": [
+			"wp-scripts lint-pkg-json"
+		],
+		"*.js": [
+			"eslint"
+		],
+		"{docs/{root-manifest.json,tool/*.js},packages/{*/README.md,*/src/{actions,selectors}.js,components/src/*/README.md}}": [
+			"npm run docs:build"
+		]
 	}
 }

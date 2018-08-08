@@ -14,17 +14,52 @@ Out of the box, it includes:
 Consider a post component which displays a placeholder message while it loads, and the post's title once it becomes available:
 
 ```jsx
-function MyPost( { post } ) {
-	if ( post.isLoading || 'undefined' === typeof post.data ) {
-		return <div>Loading...</div>;
-	}
+import { withAPIData } from '@wordpress/components';
+import PropTypes from 'prop-types';
 
-	return <div>{ post.data.title.rendered }</div>;
+class Context extends React.Component {
+	getChildContext() {
+		return { 
+			getAPISchema: () => ( {
+				routes: {
+					'http://demo.wp-api.org/wp-json/wp/v2/posts/(?P<id>[\\d]+)': {
+						methods: [ 'GET' ],
+					},
+				},
+			} ) ,
+			getAPIPostTypeRestBaseMapping: () => {},
+			getAPITaxonomyRestBaseMapping: () => {},
+		};
+	}
+	
+	render() {
+		return this.props.children;
+	}
 }
 
-export default withAPIData( ( props, { type } ) => ( {
-	post: `/wp/v2/${ type( 'post' ) }/${ props.postId }`
-} ) )( MyPost );
+Context.childContextTypes = {
+	getAPISchema: PropTypes.func,
+	getAPIPostTypeRestBaseMapping: PropTypes.func,
+	getAPITaxonomyRestBaseMapping: PropTypes.func,
+};
+
+const MyPost = withAPIData( ( props, { type } ) => ( {
+	post: `http://demo.wp-api.org/wp-json/wp/v2/posts/${ props.postId }`
+} ) )( 
+	( { post } ) => {
+		if ( post.isLoading || 'undefined' === typeof post.data ) {
+			return <div>Loading...</div>;
+		}
+	
+		return <div>{ post.data.title.rendered }</div>;
+	}
+);
+
+const MyComponentWithAPIData = () => (
+	<Context>
+		<MyPost postId={ 1 } />
+	</Context>
+);
 ```
 
 ## Usage

@@ -15,6 +15,6 @@ body.is-dragging-components-draggable {
 	padding: 20px;
 	background: transparent;
 	pointer-events: none;
-	z-index: z-index( '.components-draggable__clone' );
+	z-index: z-index(".components-draggable__clone");
 	opacity: 0.8;
 }

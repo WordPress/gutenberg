@@ -37,6 +37,7 @@ describe( 'getTerms()', () => {
 			},
 		} );
 		expect( getTerms( state, 'categories' ) ).toEqual( [ { id: 1 } ] );
+		expect( console ).toHaveWarnedWith( 'wp.data.select("core").getTerms is deprecated and will be removed from Gutenberg in 3.7.0. Please use wp.data.select("core").getEntityRecords instead.' );
 	} );
 } );
 
@@ -58,6 +59,7 @@ describe( 'isRequestingCategories()', () => {
 	it( 'returns false if never requested', () => {
 		const result = isRequestingCategories();
 		expect( result ).toBe( false );
+		expect( console ).toHaveWarnedWith( 'wp.data.select("core").isRequestingCategories is deprecated and will be removed from Gutenberg in 3.7.0. Please use wp.data.select("core").getEntitiesByKind instead.' );
 	} );
 
 	it( 'returns false if categories resolution finished', () => {

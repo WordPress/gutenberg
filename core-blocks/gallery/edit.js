@@ -228,7 +228,7 @@ class GalleryEdit extends Component {
 							help={ this.getImageCropHelp }
 						/>
 						<SelectControl
-							label={ __( 'Link to' ) }
+							label={ __( 'Link To' ) }
 							value={ linkTo }
 							onChange={ this.setLinkTo }
 							options={ linkOptions }

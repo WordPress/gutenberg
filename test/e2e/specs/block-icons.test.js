@@ -1,10 +1,8 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
 import {
 	newPost,
-	newDesktopBrowserPage,
 	insertBlock,
 	searchForBlock,
 	selectBlockByClientId,
@@ -56,14 +54,7 @@ describe( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
 	};
 
 	beforeAll( async () => {
-		await newDesktopBrowserPage();
 		await activatePlugin( 'gutenberg-test-block-icons' );
-		// accept the prompt if the post is "dirty"
-		await page.on( 'dialog', async ( dialog ) => {
-			if ( dialog ) {
-				await dialog.accept();
-			}
-		} );
 	} );
 
 	beforeEach( async () => {

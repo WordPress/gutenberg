@@ -7,7 +7,7 @@ import { difference } from 'lodash';
  * WordPress dependencies
  */
 import { IconButton } from '@wordpress/components';
-import { compose } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies

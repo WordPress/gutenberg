@@ -1,21 +1,21 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage, pressWithModifier, getEditedPostContent } from '../support/utils';
+import {
+	clickBlockAppender,
+	getEditedPostContent,
+	newPost,
+	pressWithModifier,
+} from '../support/utils';
 
 describe( 'Formatting Controls', () => {
-	beforeAll( async () => {
-		await newDesktopBrowserPage();
-	} );
-
 	beforeEach( async () => {
 		await newPost();
 	} );
 
 	it( 'Should apply the formatting controls', async () => {
 		// Creating a paragraph block with some content
-		await page.click( '.editor-default-block-appender' );
+		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph to be made "bold"' );
 
 		// Selecting some text

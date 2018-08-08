@@ -9,19 +9,17 @@ Render a BaseControl for a textarea input:
 ```jsx
 import { BaseControl } from '@wordpress/components';
 
-function MyBaseControl() {
-	return (
-		<BaseControl
+const MyBaseControl = () => (
+	<BaseControl
+		id="textarea-1"
+		label="Text"
+		help="Enter some text"
+	>
+		<textarea
 			id="textarea-1"
-			label="Text"
-			help="Enter some text"
-		>
-			<textarea
-				id="textarea-1"
-			/>
-		</BaseControl>
-    );
-}
+		/>
+	</BaseControl>
+);
 ```
 
 ## Props

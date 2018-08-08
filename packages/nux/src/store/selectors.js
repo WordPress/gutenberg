@@ -41,27 +41,38 @@ export const getAssociatedGuide = createSelector(
 );
 
 /**
- * Determines whether or not the given tip is showing. Tips are hidden if they
- * are disabled, have been dismissed, or are not the current tip in any
- * guide that they have been added to.
+ * Determines whether the given tip or DotTip instance should be visible. Checks:
  *
- * @param {Object} state Global application state.
- * @param {string} id    The tip to query.
+ * - That all tips are enabled.
+ * - That the given tip has not been dismissed.
+ * - If the given tip is part of a guide, that the given tip is the current tip in the guide.
+ * - If instanceId is provided, that this is the first DotTip instance for the given tip.
  *
- * @return {boolean} Whether or not the given tip is showing.
+ * @param {Object}  state      Global application state.
+ * @param {string}  tipId      The tip to query.
+ * @param {?number} instanceId A number which uniquely identifies the DotTip instance.
+ *
+ * @return {boolean} Whether the given tip or Dottip instance should be shown.
  */
-export function isTipVisible( state, id ) {
+export function isTipVisible( state, tipId, instanceId ) {
 	if ( ! state.preferences.areTipsEnabled ) {
 		return false;
 	}
 
-	if ( state.preferences.dismissedTips[ id ] ) {
+	if ( state.preferences.dismissedTips[ tipId ] ) {
 		return false;
 	}
 
-	const associatedGuide = getAssociatedGuide( state, id );
-	if ( associatedGuide && associatedGuide.currentTipId !== id ) {
+	const associatedGuide = getAssociatedGuide( state, tipId );
+	if ( associatedGuide && associatedGuide.currentTipId !== tipId ) {
 		return false;
+	}
+
+	if ( instanceId ) {
+		const [ firstInstanceId ] = state.tipInstanceIds[ tipId ] || [];
+		if ( instanceId !== firstInstanceId ) {
+			return false;
+		}
 	}
 
 	return true;

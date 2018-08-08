@@ -266,8 +266,9 @@ export function placeCaretAtHorizontalEdge( container, isReverse ) {
 		return;
 	}
 
+	container.focus();
+
 	if ( ! container.isContentEditable ) {
-		container.focus();
 		return;
 	}
 
@@ -275,6 +276,12 @@ export function placeCaretAtHorizontalEdge( container, isReverse ) {
 	// avoids the selection always being `endOffset` of 1 when placed at end,
 	// where `startContainer`, `endContainer` would always be container itself.
 	const rangeTarget = container[ isReverse ? 'lastChild' : 'firstChild' ];
+
+	// If no range target, it implies that the container is empty. Focusing is
+	// sufficient for caret to be placed correctly.
+	if ( ! rangeTarget ) {
+		return;
+	}
 
 	const selection = window.getSelection();
 	const range = document.createRange();
@@ -284,8 +291,6 @@ export function placeCaretAtHorizontalEdge( container, isReverse ) {
 
 	selection.removeAllRanges();
 	selection.addRange( range );
-
-	container.focus();
 }
 
 /**

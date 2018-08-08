@@ -11,11 +11,11 @@
 .core-blocks-spacer__resize-handler-bottom {
 	display: none;
 	border-radius: 50%;
-	border: 2px solid white;
+	border: 2px solid $white;
 	width: 15px !important;
 	height: 15px !important;
 	position: absolute;
-	background: theme( primary );
+	background: theme(primary);
 	padding: 0 3px 3px 0;
 	cursor: se-resize;
 	left: 50% !important;

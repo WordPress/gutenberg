@@ -19,12 +19,12 @@ p {
 	// number of bugs in combination with `contenteditable` fields. The caret
 	// cannot be set around it, caret position calculation fails in Chrome, and
 	// typing at the end of the paragraph doesn't work.
-	&.has-drop-cap:not( :focus ):first-letter {
+	&.has-drop-cap:not(:focus)::first-letter {
 		float: left;
 		font-size: 8.4em;
 		line-height: 0.68;
 		font-weight: 100;
-		margin: .05em .1em 0 0;
+		margin: 0.05em 0.1em 0 0;
 		text-transform: uppercase;
 		font-style: normal;
 	}
