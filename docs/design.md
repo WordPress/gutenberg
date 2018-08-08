@@ -46,7 +46,8 @@ The initial phase of Gutenberg — as described in the the kickoff goal — is p
 
 That said, there isn’t any fixed limit to the kind of layout Gutenberg will be able to accomplish in the future. It’s very possible for Gutenberg to grow beyond the confines of post and page content, to include the whole page. For instance, one could think of a theme template as a comma separated list of blocks, like this:
 
-```{
+```
+{
 	'theme/header',
 	'theme/sidebar',
 	'core/content' {
