@@ -14,12 +14,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { withSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies.
- */
-import Placeholder from '../placeholder';
-import Spinner from '../spinner';
+import { Placeholder, Spinner } from '@wordpress/components';
 
 export function rendererPath( block, attributes = null, postId = null ) {
 	return addQueryArgs( `/gutenberg/v1/block-renderer/${ block }`, {
