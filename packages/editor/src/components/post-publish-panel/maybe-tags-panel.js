@@ -53,7 +53,7 @@ export default compose(
 		return {
 			areTagsFetched: tagsTaxonomy !== undefined,
 			isPostTypeSupported: tagsTaxonomy && tagsTaxonomy.types.some( ( type ) => type === postType ),
-			hasTags: tagsTaxonomy ? select( 'core/editor' ).getEditedPostAttribute( tagsTaxonomy.rest_base ).length > 0 : false,
+			hasTags: tagsTaxonomy && select( 'core/editor' ).getEditedPostAttribute( tagsTaxonomy.rest_base ).length,
 		};
 	} ),
 	ifCondition( ( { areTagsFetched, isPostTypeSupported } ) => isPostTypeSupported && areTagsFetched ),
