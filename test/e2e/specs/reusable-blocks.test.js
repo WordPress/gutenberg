@@ -1,10 +1,8 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
 import {
 	insertBlock,
-	newDesktopBrowserPage,
 	newPost,
 	pressWithModifier,
 	searchForBlock,
@@ -12,16 +10,12 @@ import {
 
 function waitForAndAcceptDialog() {
 	return new Promise( ( resolve ) => {
-		page.once( 'dialog', async ( dialog ) => {
-			await dialog.accept();
-			resolve();
-		} );
+		page.once( 'dialog', () => resolve() );
 	} );
 }
 
 describe( 'Reusable Blocks', () => {
 	beforeAll( async () => {
-		await newDesktopBrowserPage();
 		await newPost();
 	} );
 
@@ -40,10 +34,11 @@ describe( 'Reusable Blocks', () => {
 		await page.keyboard.type( 'Hello there!' );
 
 		// Trigger isTyping = false
-		await page.mouse.move( 200, 300 );
-		await page.mouse.move( 250, 350 );
+		await page.mouse.move( 200, 300, { steps: 10 } );
+		await page.mouse.move( 250, 350, { steps: 10 } );
 
 		// Convert block to a reusable block
+		await page.waitForSelector( 'button[aria-label="More Options"]' );
 		await page.click( 'button[aria-label="More Options"]' );
 		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable Blocks"]' );
 		await convertButton.click();
@@ -86,10 +81,11 @@ describe( 'Reusable Blocks', () => {
 		await page.keyboard.type( 'Hello there!' );
 
 		// Trigger isTyping = false
-		await page.mouse.move( 200, 300 );
-		await page.mouse.move( 250, 350 );
+		await page.mouse.move( 200, 300, { steps: 10 } );
+		await page.mouse.move( 250, 350, { steps: 10 } );
 
 		// Convert block to a reusable block
+		await page.waitForSelector( 'button[aria-label="More Options"]' );
 		await page.click( 'button[aria-label="More Options"]' );
 		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable Blocks"]' );
 		await convertButton.click();

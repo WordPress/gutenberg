@@ -1,10 +1,8 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
 import {
 	newPost,
-	newDesktopBrowserPage,
 	insertBlock,
 	getEditedPostContent,
 	pressTimes,
@@ -13,7 +11,6 @@ import {
 
 describe( 'splitting and merging blocks', () => {
 	beforeEach( async () => {
-		await newDesktopBrowserPage();
 		await newPost();
 	} );
 
