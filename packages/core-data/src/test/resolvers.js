@@ -31,6 +31,7 @@ describe( 'getCategories', () => {
 		const fulfillment = getCategories();
 		const received = ( await fulfillment.next() ).value;
 		expect( received ).toEqual( receiveTerms( 'categories', CATEGORIES ) );
+		expect( console ).toHaveWarnedWith( 'getCategories resolver is deprecated and will be removed from Gutenberg in 3.7.0. Please use getEntityRecords resolver instead.' );
 	} );
 } );
 
