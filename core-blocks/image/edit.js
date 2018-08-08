@@ -288,59 +288,61 @@ class ImageEdit extends Component {
 							onChange={ this.updateImageURL }
 						/>
 					) }
-					<div className="core-blocks-image__dimensions">
-						<p className="core-blocks-image__dimensions__row">
-							{ __( 'Image Dimensions' ) }
-						</p>
-						<div className="core-blocks-image__dimensions__row">
-							<TextControl
-								type="number"
-								className="core-blocks-image__dimensions__width"
-								label={ __( 'Width' ) }
-								value={ width !== undefined ? width : '' }
-								placeholder={ imageWidth }
-								min={ 1 }
-								onChange={ this.updateWidth }
-							/>
-							<TextControl
-								type="number"
-								className="core-blocks-image__dimensions__height"
-								label={ __( 'Height' ) }
-								value={ height !== undefined ? height : '' }
-								placeholder={ imageHeight }
-								min={ 1 }
-								onChange={ this.updateHeight }
-							/>
-						</div>
-						<div className="core-blocks-image__dimensions__row">
-							<ButtonGroup aria-label={ __( 'Image Size' ) }>
-								{ [ 25, 50, 75, 100 ].map( ( scale ) => {
-									const scaledWidth = Math.round( imageWidth * ( scale / 100 ) );
-									const scaledHeight = Math.round( imageHeight * ( scale / 100 ) );
+					{ isResizable && (
+						<div className="core-blocks-image__dimensions">
+							<p className="core-blocks-image__dimensions__row">
+								{ __( 'Image Dimensions' ) }
+							</p>
+							<div className="core-blocks-image__dimensions__row">
+								<TextControl
+									type="number"
+									className="core-blocks-image__dimensions__width"
+									label={ __( 'Width' ) }
+									value={ width !== undefined ? width : '' }
+									placeholder={ imageWidth }
+									min={ 1 }
+									onChange={ this.updateWidth }
+								/>
+								<TextControl
+									type="number"
+									className="core-blocks-image__dimensions__height"
+									label={ __( 'Height' ) }
+									value={ height !== undefined ? height : '' }
+									placeholder={ imageHeight }
+									min={ 1 }
+									onChange={ this.updateHeight }
+								/>
+							</div>
+							<div className="core-blocks-image__dimensions__row">
+								<ButtonGroup aria-label={ __( 'Image Size' ) }>
+									{ [ 25, 50, 75, 100 ].map( ( scale ) => {
+										const scaledWidth = Math.round( imageWidth * ( scale / 100 ) );
+										const scaledHeight = Math.round( imageHeight * ( scale / 100 ) );
 
-									const isCurrent = width === scaledWidth && height === scaledHeight;
+										const isCurrent = width === scaledWidth && height === scaledHeight;
 
-									return (
-										<Button
-											key={ scale }
-											isSmall
-											isPrimary={ isCurrent }
-											aria-pressed={ isCurrent }
-											onClick={ this.updateDimensions( scaledWidth, scaledHeight ) }
-										>
-											{ scale }%
-										</Button>
-									);
-								} ) }
-							</ButtonGroup>
-							<Button
-								isSmall
-								onClick={ this.updateDimensions() }
-							>
-								{ __( 'Reset' ) }
-							</Button>
+										return (
+											<Button
+												key={ scale }
+												isSmall
+												isPrimary={ isCurrent }
+												aria-pressed={ isCurrent }
+												onClick={ this.updateDimensions( scaledWidth, scaledHeight ) }
+											>
+												{ scale }%
+											</Button>
+										);
+									} ) }
+								</ButtonGroup>
+								<Button
+									isSmall
+									onClick={ this.updateDimensions() }
+								>
+									{ __( 'Reset' ) }
+								</Button>
+							</div>
 						</div>
-					</div>
+					) }
 				</PanelBody>
 				<PanelBody title={ __( 'Link Settings' ) }>
 					<SelectControl
@@ -382,9 +384,12 @@ class ImageEdit extends Component {
 
 							if ( ! isResizable || ! imageWidthWithinContainer ) {
 								return (
-									<div style={ { width, height } }>
-										{ img }
-									</div>
+									<Fragment>
+										{ getInspectorControls( imageWidth, imageHeight ) }
+										<div style={ { width, height } }>
+											{ img }
+										</div>
+									</Fragment>
 								);
 							}
 
