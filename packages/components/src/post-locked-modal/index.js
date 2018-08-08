@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Modal } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
 import { select } from '@wordpress/data';
@@ -19,28 +19,21 @@ class PostLockedModal extends Component {
 			isOpen: true,
 		};
 
-		this.openModal = this.openModal.bind( this );
-		this.takeOver = this.takeOver.bind( this );
+		this.takeOverPost = this.takeOverPost.bind( this );
 
-		this.takeover = __( ' admin has taken over and is currently editing. Your latest changes were saved as a revision. ' );
+		const user = select( 'core/editor' ).getPostLockUser();
+		this.takeover = sprintf( __( '%s has taken over and is currently editing. Your latest changes were saved as a revision.' ), user.data.display_name );
+		this.alreadyEditing = sprintf( __( '%s is already editing this post. Do you want to take over?' ), user.data.display_name );
 	}
 
-	openModal() {
-		if ( ! this.state.isOpen ) {
-			this.setState( { isOpen: true } );
-		}
-	}
-
-	takeOver() {
-		const { getCurrentPost, getEditorSettings } = select( 'core/editor' );
-		const { id } = getCurrentPost();
+	takeOverPost() {
+		const { getEditorSettings } = select( 'core/editor' );
 		const { lockNonce } = getEditorSettings();
 		const unlockUrl = addQueryArgs( getPostEditURL(), {
 			'get-post-lock': '1',
-			'nonce': lockNonce,
+			nonce: lockNonce,
 			lockKey: true,
 		} );
-
 		document.location = unlockUrl;
 	}
 
@@ -49,14 +42,12 @@ class PostLockedModal extends Component {
 	}
 
 	render() {
-		const user = select( 'core/editor' ).getPostLockUser();
 		return (
 			<Fragment>
-				<button onClick={ this.openModal }>Open Modal</button>
 				{
 					this.state.isOpen ?
 						<Modal
-							title={ user.data.display_name + __( ' is already editing this post. Do you want to take over?' ) }
+							title={ this.alreadyEditing }
 							onRequestClose={ this.closeModal }
 							focusOnMount={ true }
 							shouldCloseOnClickOutside={ false }
