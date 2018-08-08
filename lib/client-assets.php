@@ -1341,6 +1341,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 			$locked = true;
 		}
 		$editor_settings['lockedUser'] = $locked ? $user : false;
+		$editor_settings['lockNonce'] = wp_create_nonce( 'lock-post_' + $post->ID );
 
 	} else {
 		$locked = false;
