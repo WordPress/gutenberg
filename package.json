@@ -163,7 +163,7 @@
 		"fixtures:server-registered": "docker-compose run -w /var/www/html/wp-content/plugins/gutenberg --rm wordpress ./bin/get-server-blocks.php > core-blocks/test/server-registered.json",
 		"fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
-		"lint": "npm run lint-js && npm run lint-pkg-json && npm run lint-css",
+		"lint": "concurrently \"npm run lint-js\" \"npm run lint-pkg-json\" \"npm run lint-css\"",
 		"lint-js": "eslint .",
 		"lint-js:fix": "eslint . --fix",
 		"lint-php": "docker-compose run --rm composer run-script lint",
