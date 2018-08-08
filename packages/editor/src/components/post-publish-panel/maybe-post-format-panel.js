@@ -51,20 +51,18 @@ const PostFormatPanel = ( { suggestion, onUpdatePostFormat } ) => {
 	);
 };
 
+const getSuggestion = ( supportedFormats, suggestedPostFormat ) => {
+	const formats = POST_FORMATS.filter( ( format ) => includes( supportedFormats, format.id ) );
+	return find( formats, ( format ) => format.id === suggestedPostFormat );
+};
+
 export default compose(
 	withSelect( ( select ) => {
 		const { getEditedPostAttribute, getSuggestedPostFormat } = select( 'core/editor' );
-		const suggestedPostFormat = getSuggestedPostFormat();
-		const currentPostFormat = getEditedPostAttribute( 'format' );
-		const themeSupports = select( 'core' ).getThemeSupports();
-		// Ensure current format is always in the set.
-		// The current format may not be a format supported by the theme.
-		const supportedFormats = union( [ currentPostFormat ], get( themeSupports, [ 'formats' ], [] ) );
-		const formats = POST_FORMATS.filter( ( format ) => includes( supportedFormats, format.id ) );
-		const suggestion = find( formats, ( format ) => format.id === suggestedPostFormat );
+		const supportedFormats = get( select( 'core' ).getThemeSupports(), [ 'formats' ], [] );
 		return {
-			currentPostFormat,
-			suggestion,
+			currentPostFormat: getEditedPostAttribute( 'format' ),
+			suggestion: getSuggestion( supportedFormats, getSuggestedPostFormat() ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
