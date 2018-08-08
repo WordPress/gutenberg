@@ -101,4 +101,27 @@ describe( 'splitting and merging blocks', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should gracefully handle if placing caret in empty container', async () => {
+		// Regression Test: placeCaretAtHorizontalEdge previously did not
+		// account for contentEditables which have no children.
+		//
+		// See: https://github.com/WordPress/gutenberg/issues/8676
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'Foo' );
+
+		// The regression appeared to only affect paragraphs created while
+		// within an inline boundary.
+		await page.keyboard.down( 'Shift' );
+		await pressTimes( 'ArrowLeft', 3 );
+		await page.keyboard.up( 'Shift' );
+		await pressWithModifier( 'mod', 'b' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
