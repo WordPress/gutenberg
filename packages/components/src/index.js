@@ -1,8 +1,3 @@
-/**
- * Internal dependencies
- */
-import deprecated from './deprecated';
-
 // Components
 // eslint-disable-next-line camelcase
 export { default as APIProvider, unstable__setApiSettings } from './higher-order/with-api-data/provider';
@@ -73,9 +68,3 @@ export { default as withFocusOutside } from './higher-order/with-focus-outside';
 export { default as withFocusReturn } from './higher-order/with-focus-return';
 export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
-
-export const ifCondition = deprecated.ifCondition;
-export const withGlobalEvents = deprecated.withGlobalEvents;
-export const withInstanceId = deprecated.withInstanceId;
-export const withSafeTimeout = deprecated.withSafeTimeout;
-export const withState = deprecated.withState;

@@ -6,6 +6,16 @@ exports[`splitting and merging blocks should delete an empty first line 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`splitting and merging blocks should gracefully handle if placing caret in empty container 1`] = `
+"<!-- wp:paragraph -->
+<p><strong>Foo</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`splitting and merging blocks should merge into inline boundary position 1`] = `
 "<!-- wp:paragraph -->
 <p>Bar</p>

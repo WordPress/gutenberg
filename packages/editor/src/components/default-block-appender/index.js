@@ -20,7 +20,6 @@ import { DotTip } from '@wordpress/nux';
 import BlockDropZone from '../block-drop-zone';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
-import withDeprecatedUniqueId from '../with-deprecated-unique-id';
 
 export function DefaultBlockAppender( {
 	isLocked,
@@ -66,7 +65,6 @@ export function DefaultBlockAppender( {
 	);
 }
 export default compose(
-	withDeprecatedUniqueId,
 	withSelect( ( select, ownProps ) => {
 		const { getBlockCount, getBlock, getEditorSettings, getTemplateLock } = select( 'core/editor' );
 		const { isTipVisible } = select( 'core/nux' );

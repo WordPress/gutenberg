@@ -2553,8 +2553,6 @@ describe( 'selectors', () => {
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
-				// TODO: To be removed in 3.5 "UID" deprecation.
-				rootUID: undefined,
 				layout: undefined,
 				index: 1,
 			} );
@@ -2587,8 +2585,6 @@ describe( 'selectors', () => {
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: 'clientId1',
-				// TODO: To be removed in 3.5 "UID" deprecation.
-				rootUID: 'clientId1',
 				layout: undefined,
 				index: 1,
 			} );
@@ -2619,8 +2615,6 @@ describe( 'selectors', () => {
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
-				// TODO: To be removed in 3.5 "UID" deprecation.
-				rootUID: undefined,
 				layout: 'wide',
 				index: 1,
 			} );
@@ -2653,8 +2647,6 @@ describe( 'selectors', () => {
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
-				// TODO: To be removed in 3.5 "UID" deprecation.
-				rootUID: undefined,
 				layout: undefined,
 				index: 2,
 			} );
@@ -2687,8 +2679,6 @@ describe( 'selectors', () => {
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
-				// TODO: To be removed in 3.5 "UID" deprecation.
-				rootUID: undefined,
 				layout: undefined,
 				index: 2,
 			} );

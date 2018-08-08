@@ -41,10 +41,9 @@ function gutenberg_register_rest_routes() {
 			continue;
 		}
 
-		if ( post_type_supports( $post_type->name, 'revisions' ) ) {
-			$autosaves_controller = new WP_REST_Autosaves_Controller( $post_type->name );
-			$autosaves_controller->register_routes();
-		}
+		// Initialize the Autosaves controller.
+		$autosaves_controller = new WP_REST_Autosaves_Controller( $post_type->name );
+		$autosaves_controller->register_routes();
 	}
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_routes' );
@@ -243,24 +242,6 @@ function gutenberg_add_target_schema_to_links( $response, $post, $request ) {
 	$orig_links = $response->get_links();
 	$post_type  = get_post_type_object( $post->post_type );
 	$orig_href  = ! empty( $orig_links['self'][0]['href'] ) ? $orig_links['self'][0]['href'] : null;
-	if ( 'edit' === $request['context'] && post_type_supports( $post_type->name, 'author' ) ) {
-		if ( current_user_can( $post_type->cap->edit_others_posts ) ) {
-			$new_links['https://api.w.org/action-assign-author'] = array(
-				array(
-					'title'        => __( 'The current user can change the author on this post.', 'gutenberg' ),
-					'href'         => $orig_href,
-					'targetSchema' => array(
-						'type'       => 'object',
-						'properties' => array(
-							'author' => array(
-								'type' => 'integer',
-							),
-						),
-					),
-				),
-			);
-		}
-	}
 	if ( 'edit' === $request['context'] && current_user_can( 'unfiltered_html' ) ) {
 		$new_links['https://api.w.org/action-unfiltered_html'] = array(
 			array(
@@ -277,134 +258,6 @@ function gutenberg_add_target_schema_to_links( $response, $post, $request ) {
 			),
 		);
 	}
-	if ( 'edit' === $request['context'] ) {
-		if ( current_user_can( $post_type->cap->publish_posts ) ) {
-			$new_links['https://api.w.org/action-publish'] = array(
-				array(
-					'title'        => __( 'The current user can publish this post.', 'gutenberg' ),
-					'href'         => $orig_href,
-					'targetSchema' => array(
-						'type'       => 'object',
-						'properties' => array(
-							'status' => array(
-								'type' => 'string',
-								'enum' => array( 'publish', 'future' ),
-							),
-						),
-					),
-				),
-			);
-		}
-	}
-	// Only Posts can be sticky.
-	if ( 'post' === $post->post_type && 'edit' === $request['context'] ) {
-		if ( current_user_can( $post_type->cap->edit_others_posts )
-			&& current_user_can( $post_type->cap->publish_posts ) ) {
-			$new_links['https://api.w.org/action-sticky'] = array(
-				array(
-					'title'        => __( 'The current user can sticky this post.', 'gutenberg' ),
-					'href'         => $orig_href,
-					'targetSchema' => array(
-						'type'       => 'object',
-						'properties' => array(
-							'sticky' => array(
-								'type' => 'boolean',
-							),
-						),
-					),
-				),
-			);
-		}
-	}
-	// Term assignment and creation.
-	if ( 'edit' === $request['context'] ) {
-		$taxonomies = get_object_taxonomies( $post_type->name, 'objects' );
-		foreach ( $taxonomies as $tax_obj ) {
-			if ( empty( $tax_obj->show_in_rest ) ) {
-				continue;
-			}
-			$rest_base = ! empty( $tax_obj->rest_base ) ? $tax_obj->rest_base : $tax_obj->name;
-			// 'edit_terms' is required to create hierarchical terms,
-			// but 'assign_terms' is required for non-hierarchical terms.
-			if ( ( is_taxonomy_hierarchical( $tax_obj->name )
-				&& current_user_can( $tax_obj->cap->edit_terms ) )
-				|| ( ! is_taxonomy_hierarchical( $tax_obj->name )
-				&& current_user_can( $tax_obj->cap->assign_terms ) ) ) {
-				$new_links[ 'https://api.w.org/action-create-' . $rest_base ] = array(
-					array(
-						'title'        => __( 'The current user can create terms.', 'gutenberg' ),
-						'href'         => $orig_href,
-						'targetSchema' => array(
-							'type'       => 'object',
-							'properties' => array(
-								$rest_base => array(
-									'type' => 'array',
-								),
-							),
-						),
-					),
-				);
-			}
-			if ( current_user_can( $tax_obj->cap->assign_terms ) ) {
-				$new_links[ 'https://api.w.org/action-assign-' . $rest_base ] = array(
-					array(
-						'title'        => __( 'The current user can assign terms.', 'gutenberg' ),
-						'href'         => $orig_href,
-						'targetSchema' => array(
-							'type'       => 'object',
-							'properties' => array(
-								$rest_base => array(
-									'type' => 'array',
-								),
-							),
-						),
-					),
-				);
-			}
-		}
-	}
-
-	$response->add_links( $new_links );
-	return $response;
-}
-
-/**
- * Include revisions data on post response links.
- *
- * @see https://core.trac.wordpress.org/ticket/44321
- *
- * @param WP_REST_Response $response WP REST API response of a post.
- * @param WP_Post          $post The post being returned.
- * @param WP_REST_Request  $request WP REST API request.
- * @return WP_REST_Response Response containing the new links.
- */
-function gutenberg_add_revisions_data_to_links( $response, $post, $request ) {
-
-	$new_links  = array();
-	$orig_links = $response->get_links();
-
-	if ( ! empty( $orig_links['version-history'] ) ) {
-		$version_history_link = array_shift( $orig_links['version-history'] );
-		// 'version-history' already exists and we don't want to duplicate it.
-		$response->remove_link( 'version-history' );
-
-		$revisions       = wp_get_post_revisions( $post->ID, array( 'fields' => 'ids' ) );
-		$revisions_count = count( $revisions );
-
-		$new_links['version-history'] = array(
-			'href'  => $version_history_link['href'],
-			'count' => $revisions_count,
-		);
-
-		if ( $revisions_count > 0 ) {
-			$last_revision = array_shift( $revisions );
-
-			$new_links['predecessor-version'] = array(
-				'href' => $version_history_link['href'] . '/' . $last_revision,
-				'id'   => $last_revision,
-			);
-		}
-	}
 
 	$response->add_links( $new_links );
 	return $response;
@@ -420,7 +273,6 @@ function gutenberg_register_post_prepare_functions( $post_type ) {
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_permalink_template_to_posts', 10, 3 );
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_block_format_to_post_content', 10, 3 );
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_target_schema_to_links', 10, 3 );
-	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_revisions_data_to_links', 10, 3 );
 	add_filter( "rest_{$post_type}_collection_params", 'gutenberg_filter_post_collection_parameters', 10, 2 );
 	add_filter( "rest_{$post_type}_query", 'gutenberg_filter_post_query_arguments', 10, 2 );
 	return $post_type;
@@ -605,111 +457,3 @@ function gutenberg_filter_user_collection_parameters( $query_params ) {
 	return $query_params;
 }
 add_filter( 'rest_user_collection_params', 'gutenberg_filter_user_collection_parameters' );
-
-/**
- * Overload taxonomy and term permission handling to address our new necessary behavior.
- *
- * This is temporary code that will be removed once the Trac ticket lands in a release.
- *
- * @see https://core.trac.wordpress.org/ticket/44096
- *
- * @param WP_HTTP_Response $response Result to send to the client. Usually a WP_REST_Response.
- * @param WP_REST_Server   $handler  ResponseHandler instance (usually WP_REST_Server).
- * @param WP_REST_Request  $request  Request used to generate the response.
- * @return $response
- */
-function gutenberg_filter_request_after_callbacks( $response, $handler, $request ) {
-	$should_rerun_response = false;
-	if ( is_wp_error( $response ) ) {
-		// Handle GET /wp/v2/taxonomies?context=edit when user can assign_terms
-		// but not manage_terms.
-		if ( '/wp/v2/taxonomies' === $request->get_route()
-			&& is_array( $handler['permission_callback'] )
-			&& is_a( $handler['permission_callback'][0], 'WP_REST_Taxonomies_Controller' )
-			&& 'edit' === $request['context']
-			&& 'rest_cannot_view' === $response->get_error_code() ) {
-			if ( ! empty( $request['type'] ) ) {
-				$taxonomies = get_object_taxonomies( $request['type'], 'objects' );
-			} else {
-				$taxonomies = get_taxonomies( '', 'objects' );
-			}
-			foreach ( $taxonomies as $taxonomy ) {
-				if ( ! empty( $taxonomy->show_in_rest )
-					&& current_user_can( $taxonomy->cap->assign_terms ) ) {
-					$GLOBALS['Gutenberg_Temporary_Taxonomies_Controller'] = $handler['permission_callback'][0];
-
-					$handler['callback']   = 'gutenberg_taxonomies_controller_get_items';
-					$should_rerun_response = true;
-					break;
-				}
-			}
-		}
-		// Handle POST /wp/v2/tags (and non-hierarchical taxonomies) when user
-		// can assign_terms but not manage terms. Users should be able to create
-		// terms.
-		if ( 'rest_cannot_create' === $response->get_error_code()
-			&& is_array( $handler['permission_callback'] )
-			&& is_a( $handler['permission_callback'][0], 'WP_REST_Terms_Controller' ) ) {
-			$schema       = $handler['permission_callback'][0]->get_item_schema();
-			$taxonomy     = 'tag' === $schema['title'] ? 'post_tag' : $schema['title'];
-			$taxonomy_obj = get_taxonomy( $taxonomy );
-			if ( ! is_taxonomy_hierarchical( $taxonomy_obj->name )
-				&& current_user_can( $taxonomy_obj->cap->assign_terms ) ) {
-				$should_rerun_response = true;
-			}
-		}
-	}
-	// Re-run the response generation if we've decided we need to.
-	if ( $should_rerun_response ) {
-		$callback = $handler['callback'];
-		// Filter defined in class-wp-rest-server.php.
-		$dispatch_result = apply_filters( 'rest_dispatch_request', null, $request, $request->get_route(), $handler );
-
-		// Allow plugins to halt the request via this filter.
-		if ( null !== $dispatch_result ) {
-			$response = $dispatch_result;
-		} else {
-			$response = call_user_func( $callback, $request );
-		}
-	}
-	return $response;
-}
-add_filter( 'rest_request_after_callbacks', 'gutenberg_filter_request_after_callbacks', 10, 3 );
-
-/**
- * Overloaded version of WP_REST_Taxonomies_Controller::get_items()
- *
- * This is temporary code that will be removed once the Trac ticket lands in a release.
- *
- * @see https://core.trac.wordpress.org/ticket/44096
- *
- * @param WP_REST_Request $request Full details about the request.
- * @return WP_REST_Response Response object on success, or WP_Error object on failure.
- */
-function gutenberg_taxonomies_controller_get_items( $request ) {
-	$controller = $GLOBALS['Gutenberg_Temporary_Taxonomies_Controller'];
-	// Retrieve the controller of registered collection query parameters.
-	$registered = $controller->get_collection_params();
-
-	if ( isset( $registered['type'] ) && ! empty( $request['type'] ) ) {
-		$taxonomies = get_object_taxonomies( $request['type'], 'objects' );
-	} else {
-		$taxonomies = get_taxonomies( '', 'objects' );
-	}
-	$data = array();
-	foreach ( $taxonomies as $tax_type => $value ) {
-		if ( empty( $value->show_in_rest ) || ( 'edit' === $request['context'] && ! current_user_can( $value->cap->assign_terms ) ) ) {
-			continue;
-		}
-		$tax               = $controller->prepare_item_for_response( $value, $request );
-		$tax               = $controller->prepare_response_for_collection( $tax );
-		$data[ $tax_type ] = $tax;
-	}
-
-	if ( empty( $data ) ) {
-		// Response should still be returned as a JSON object when it is empty.
-		$data = (object) $data;
-	}
-
-	return rest_ensure_response( $data );
-}

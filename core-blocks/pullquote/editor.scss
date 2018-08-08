@@ -21,7 +21,7 @@
 	.editor-rich-text__tinymce[data-is-empty="true"]::before {
 		width: 100%;
 		left: 50%;
-		transform: translateX( -50% );
+		transform: translateX(-50%);
 	}
 
 	& > .core-blocks-pullquote__content .editor-rich-text__tinymce[data-is-empty="true"]::before,

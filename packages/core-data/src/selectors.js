@@ -8,6 +8,7 @@ import { map, find, get, filter } from 'lodash';
  * WordPress dependencies
  */
 import { select } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -37,6 +38,11 @@ function isResolving( selectorName, ...args ) {
  * @return {Array} Categories list.
  */
 export function getTerms( state, taxonomy ) {
+	deprecated( 'wp.data.select("core").getTerms', {
+		version: '3.7.0',
+		alternative: 'wp.data.select("core").getEntityRecords',
+		plugin: 'Gutenberg',
+	} );
 	return state.terms[ taxonomy ];
 }
 
@@ -48,6 +54,11 @@ export function getTerms( state, taxonomy ) {
  * @return {Array} Categories list.
  */
 export function getCategories( state ) {
+	deprecated( 'wp.data.select("core").getCategories', {
+		version: '3.7.0',
+		alternative: 'wp.data.select("core").getEntityRecords',
+		plugin: 'Gutenberg',
+	} );
 	return getTerms( state, 'categories' );
 }
 
@@ -61,6 +72,11 @@ export function getCategories( state ) {
  * @return {boolean} Whether a request is in progress for taxonomy's terms.
  */
 export function isRequestingTerms( state, taxonomy ) {
+	deprecated( 'wp.data.select("core").isRequestingTerms', {
+		version: '3.7.0',
+		alternative: 'wp.data.select("core").getEntitiesByKind',
+		plugin: 'Gutenberg',
+	} );
 	return isResolving( 'getTerms', taxonomy );
 }
 
@@ -73,6 +89,11 @@ export function isRequestingTerms( state, taxonomy ) {
  * @return {boolean} Whether a request is in progress for categories.
  */
 export function isRequestingCategories() {
+	deprecated( 'wp.data.select("core").isRequestingCategories', {
+		version: '3.7.0',
+		alternative: 'wp.data.select("core").getEntitiesByKind',
+		plugin: 'Gutenberg',
+	} );
 	return isResolving( 'getCategories' );
 }
 
