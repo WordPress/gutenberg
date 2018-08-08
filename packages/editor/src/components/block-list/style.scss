@@ -519,9 +519,9 @@
 
 	// Dropzones
 	.editor-block-drop-zone {
-		top: -4px;
-		bottom: -3px;
-		margin: 0 $block-padding;
+		top: 0;
+		bottom: -1px;
+		margin: 0 -$block-padding;
 	}
 
 	// Hide appender shortcuts in nested blocks
