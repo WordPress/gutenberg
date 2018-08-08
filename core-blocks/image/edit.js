@@ -121,7 +121,8 @@ class ImageEdit extends Component {
 			return;
 		}
 		this.props.setAttributes( {
-			...pick( media, [ 'alt', 'id', 'caption', 'url' ] ),
+			...pick( media, [ 'alt', 'id', 'caption' ] ),
+			url: media.sizes && media.sizes.large ? media.sizes.large.url || media.sizes.large.source_url : media.url,
 			width: undefined,
 			height: undefined,
 		} );

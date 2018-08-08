@@ -139,6 +139,10 @@ export function mediaUpload( {
 				if ( has( savedMedia, [ 'media_details', 'sizes' ] ) ) {
 					mediaObject.mediaDetails.sizes = get( savedMedia, [ 'media_details', 'sizes' ], {} );
 				}
+				const sizes = get( savedMedia, [ 'media_details', 'sizes' ] );
+				if ( sizes ) {
+					mediaObject.sizes = sizes;
+				}
 				setAndUpdateFiles( idx, mediaObject );
 			} )
 			.catch( ( error ) => {
