@@ -18,6 +18,7 @@ class ReusableBlockEditPanel extends Component {
 
 		this.titleField = createRef();
 		this.editButton = createRef();
+		this.editForm = createRef();
 		this.handleFormSubmit = this.handleFormSubmit.bind( this );
 		this.handleTitleChange = this.handleTitleChange.bind( this );
 		this.handleTitleKeyDown = this.handleTitleKeyDown.bind( this );
@@ -35,7 +36,7 @@ class ReusableBlockEditPanel extends Component {
 		if ( ! prevProps.isEditing && this.props.isEditing ) {
 			this.titleField.current.select();
 		}
-		// Move focus back to the Edit button after pressing the Escape key, Cancel, or Save.
+		// Move focus back to the Edit button after pressing the Escape key or after saving.
 		if ( ( prevProps.isEditing || prevProps.isSaving ) && ! this.props.isEditing && ! this.props.isSaving ) {
 			this.editButton.current.focus();
 		}
@@ -58,7 +59,7 @@ class ReusableBlockEditPanel extends Component {
 	}
 
 	render() {
-		const { isEditing, title, isSaving, onEdit, onCancel, instanceId } = this.props;
+		const { isEditing, title, isSaving, onEdit, instanceId } = this.props;
 
 		return (
 			<Fragment>
@@ -78,7 +79,11 @@ class ReusableBlockEditPanel extends Component {
 					</div>
 				) }
 				{ ( isEditing || isSaving ) && (
-					<form className="reusable-block-edit-panel" onSubmit={ this.handleFormSubmit }>
+					<form
+						className="reusable-block-edit-panel"
+						ref={ this.editForm }
+						onSubmit={ this.handleFormSubmit }
+					>
 						<label
 							htmlFor={ `reusable-block-edit-panel__title-${ instanceId }` }
 							className="reusable-block-edit-panel__label"
@@ -97,21 +102,12 @@ class ReusableBlockEditPanel extends Component {
 						/>
 						<Button
 							type="submit"
-							isPrimary
 							isLarge
 							isBusy={ isSaving }
 							disabled={ ! title || isSaving }
 							className="reusable-block-edit-panel__button"
 						>
 							{ __( 'Save' ) }
-						</Button>
-						<Button
-							isLarge
-							disabled={ isSaving }
-							className="reusable-block-edit-panel__button"
-							onClick={ onCancel }
-						>
-							{ __( 'Cancel' ) }
 						</Button>
 					</form>
 				) }

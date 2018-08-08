@@ -38,10 +38,6 @@
 		margin: #{ $item-spacing / 2 } 0 $item-spacing;
 	}
 
-	.components-button.reusable-block-edit-panel__button {
-		margin: 0 5px 0 0;
-	}
-
 	@include break-large() {
 		flex-wrap: nowrap;
 
