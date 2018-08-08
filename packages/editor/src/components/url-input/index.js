@@ -131,9 +131,9 @@ class URLInput extends Component {
 		this.suggestionsRequest = request;
 	}
 
-	onChange( event, post = {} ) {
+	onChange( event ) {
 		const inputValue = event.target.value;
-		this.props.onChange( inputValue, post );
+		this.props.onChange( inputValue );
 		this.updateSuggestions( inputValue );
 	}
 
