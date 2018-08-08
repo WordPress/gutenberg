@@ -154,6 +154,10 @@ Documentation is automatically synced from master to the [Gutenberg Documentatio
 
 To add a new documentation page, you'll have to create a Markdown file in the [docs](https://github.com/WordPress/gutenberg/tree/master/docs) folder and add an item to the [manifest file](https://github.com/WordPress/gutenberg/blob/master/docs/manifest.json).
 
+### `@wordpress/component`
+
+If you're contributing to the documentation of any component from the `@wordpress/component` package, take a look at its [guidelines for contributing](./packages/components/CONTRIBUTING.md). 
+
 ## Reporting Security Issues
 
 Please see [SECURITY.md](./SECURITY.md).

@@ -10,7 +10,7 @@ The component renders a series of buttons that allow the user to select predefin
 import { FontSizePicker } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
 
-withState( {
+const MyFontSizePicker = withState( {
 	fontSize: 16,
 } )( ( { fontSize, setState } ) => { 
 	const fontSizes = [

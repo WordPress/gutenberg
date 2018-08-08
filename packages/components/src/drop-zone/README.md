@@ -8,7 +8,7 @@
 import { DropZoneProvider, DropZone } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
 
-withState( {
+const MyDropZone = withState( {
 	hasDropped: false,
 } )( ( { hasDropped, setState } ) => (
 	<DropZoneProvider>
