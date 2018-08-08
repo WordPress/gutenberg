@@ -35,7 +35,7 @@ const PostFormatPanel = ( { suggestion, onUpdatePostFormat } ) => {
 	return (
 		<PanelBody initialOpen={ false } title={ panelBodyTitle } >
 			<p>
-				{ __( 'Your theme uses post formats to highlight different kinds of content like images or videos. Apply one to see this special styling' ) }
+				{ __( 'Your theme uses post formats to highlight different kinds of content, like images or videos. Apply a post format to see this special styling.' ) }
 			</p>
 			<p>
 				<PostFormatSuggested
