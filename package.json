@@ -197,6 +197,9 @@
 		"packages/*/package.json": [
 			"wp-scripts lint-pkg-json"
 		],
+		"*.scss": [
+			"stylelint"
+		],
 		"*.js": [
 			"eslint"
 		],
