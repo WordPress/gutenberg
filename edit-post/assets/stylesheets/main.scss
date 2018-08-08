@@ -73,10 +73,10 @@ body.gutenberg-editor-page {
 	ul#adminmenu > li.current > a.current::after {
 		border-right-color: $white;
 	}
-	
+
 	.media-frame select.attachment-filters:last-of-type {
-	    	width: auto;
-	    	max-width: 100%;
+		width: auto;
+		max-width: 100%;
 	}
 }
 
