@@ -369,7 +369,7 @@ function gutenberg_warn_classic_about_cloudflare() {
 						<li>
 						<?php
 							printf(
-								/* translators: link to a comment in the Gutenberg repo */
+								/* translators: %s: link to a comment in the Gutenberg repository */
 								__( 'For free Cloudflare accounts, you can <a href="%s">change the REST API URL</a>, to avoid triggering the WAF rules. Please be aware that this may cause issues with other plugins that use the REST API, and removes any other protection Cloudflare may be offering for the REST API.', 'gutenberg' ),
 								'https://github.com/WordPress/gutenberg/issues/2704#issuecomment-410582252'
 							);
@@ -379,7 +379,7 @@ function gutenberg_warn_classic_about_cloudflare() {
 					<p>
 					<?php
 						printf(
-							/* translators: link to an issue in the Gutenberg repo */
+							/* translators: %s link to an issue in the Gutenberg repository */
 							__( 'If neither of these options are possible for you, please <a href="%s">follow this issue for updates</a>. We hope to have this issue rectifed soon!', 'gutenberg' ),
 							'https://github.com/WordPress/gutenberg/issues/2704'
 						);
