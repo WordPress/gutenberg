@@ -8,7 +8,6 @@ import 'expect-puppeteer';
  */
 import {
 	clearLocalStorage,
-	disablePageDialogAccept,
 	enablePageDialogAccept,
 	setViewport,
 	visitAdmin,
@@ -18,6 +17,13 @@ import {
  * Environment variables
  */
 const { PUPPETEER_TIMEOUT } = process.env;
+
+/**
+ * Array of page event tuples of [ eventName, handler ].
+ *
+ * @type {Array}
+ */
+const pageEvents = [];
 
 // The Jest timeout is increased because these tests are a bit slow
 jest.setTimeout( PUPPETEER_TIMEOUT || 100000 );
@@ -54,10 +60,30 @@ async function trashExistingPosts() {
 	);
 }
 
+/**
+ * Adds an event listener to the page to handle additions of page event
+ * handlers, to assure that they are removed at test teardown.
+ */
+function capturePageEventsForTearDown() {
+	page.on( 'newListener', ( eventName, listener ) => {
+		pageEvents.push( [ eventName, listener ] );
+	} );
+}
+
+/**
+ * Removes all bound page event handlers.
+ */
+function removePageEvents() {
+	pageEvents.forEach( ( [ eventName, handler ] ) => {
+		page.removeListener( eventName, handler );
+	} );
+}
+
 // Before every test suite run, delete all content created by the test. This ensures
 // other posts/comments/etc. aren't dirtying tests and tests don't depend on
 // each other's side-effects.
 beforeAll( async () => {
+	capturePageEventsForTearDown();
 	enablePageDialogAccept();
 
 	await trashExistingPosts();
@@ -69,5 +95,5 @@ afterEach( async () => {
 } );
 
 afterAll( () => {
-	disablePageDialogAccept();
+	removePageEvents();
 } );
