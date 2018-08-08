@@ -19,7 +19,7 @@ function registerMiddleware( middleware ) {
 }
 
 function checkCloudflareError( error ) {
-	if ( error.indexOf && error.indexOf( 'Cloudflare Ray ID' ) >= 0 ) {
+	if ( typeof error === 'string' && error.indexOf( 'Cloudflare Ray ID' ) >= 0 ) {
 		throw {
 			code: 'cloudflare_error',
 		};
