@@ -16,8 +16,8 @@ import { Button, PanelBody } from '@wordpress/components';
  */
 import { POST_FORMATS } from '../post-format';
 
-const PostFormatSuggested = ( { suggestion, suggestionText, onUpdatePostFormat } ) => (
-	<Button isLink onClick={ () => onUpdatePostFormat( suggestion.id ) }>
+const PostFormatSuggested = ( { suggestedPostFormat, suggestionText, onUpdatePostFormat } ) => (
+	<Button isLink onClick={ () => onUpdatePostFormat( suggestedPostFormat ) }>
 		{ suggestionText }
 	</Button>
 );
@@ -40,7 +40,7 @@ const PostFormatPanel = ( { suggestion, onUpdatePostFormat } ) => {
 			<p>
 				<PostFormatSuggested
 					onUpdatePostFormat={ onUpdatePostFormat }
-					suggestion={ suggestion }
+					suggestedPostFormat={ suggestion.id }
 					suggestionText={ sprintf(
 						__( 'Convert to "%1$s" format.' ),
 						suggestion.caption
@@ -64,7 +64,6 @@ export default compose(
 		const suggestion = find( formats, ( format ) => format.id === suggestedPostFormat );
 		return {
 			currentPostFormat,
-			suggestedPostFormat,
 			suggestion,
 		};
 	} ),
@@ -73,5 +72,5 @@ export default compose(
 			dispatch( 'core/editor' ).editPost( { format: postFormat } );
 		},
 	} ) ),
-	ifCondition( ( { suggestedPostFormat, currentPostFormat } ) => suggestedPostFormat && suggestedPostFormat !== currentPostFormat ),
+	ifCondition( ( { suggestion, currentPostFormat } ) => suggestion && suggestion.id !== currentPostFormat ),
 )( PostFormatPanel );
