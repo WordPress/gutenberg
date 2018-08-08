@@ -11,7 +11,7 @@ export function setupHearthbeatPostLocking() {
 	 *
 	 * Used to lock editing of an object by only one user at a time.
 	 *
-	 * When the user does not send a heartbeat in a heartbeat-time
+	 * When the user does not send a heartbeat in a heartbeat-tick
 	 * the user is no longer editing and another user can start editing.
 	 */
 	jQuery( document ).on( 'heartbeat-send.refresh-lock', function( e, data ) {
@@ -23,7 +23,7 @@ export function setupHearthbeatPostLocking() {
 			return;
 		}
 
-		// Check if the post is locked.
+		// Check if the post is already locked by another user.
 		const locked = select( 'core/editor' ).isPostLocked();
 		if ( locked ) {
 			return;
