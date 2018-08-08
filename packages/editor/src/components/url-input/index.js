@@ -168,14 +168,14 @@ class URLInput extends Component {
 				if ( this.state.selectedSuggestion !== null ) {
 					event.stopPropagation();
 					const post = this.state.posts[ this.state.selectedSuggestion ];
-					this.selectLink( post.url, post );
+					this.selectLink( post );
 				}
 			}
 		}
 	}
 
-	selectLink( link, post ) {
-		this.props.onChange( link, post );
+	selectLink( post ) {
+		this.props.onChange( post.url, post );
 		this.setState( {
 			selectedSuggestion: null,
 			showSuggestions: false,
@@ -227,7 +227,7 @@ class URLInput extends Component {
 									className={ classnames( 'editor-url-input__suggestion', {
 										'is-selected': index === selectedSuggestion,
 									} ) }
-									onClick={ () => this.selectLink( post.url, post ) }
+									onClick={ () => this.selectLink( post ) }
 									aria-selected={ index === selectedSuggestion }
 								>
 									{ decodeEntities( post.title ) || __( '(no title)' ) }
