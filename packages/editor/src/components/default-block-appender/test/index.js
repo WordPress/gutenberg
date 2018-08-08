@@ -27,17 +27,6 @@ describe( 'DefaultBlockAppender', () => {
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
-	it( 'should append a default block when input clicked', () => {
-		const onAppend = jest.fn();
-		const wrapper = shallow( <DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt /> );
-		const input = wrapper.find( 'input.editor-default-block-appender__content' );
-
-		expect( input.prop( 'value' ) ).toEqual( 'Write your story' );
-		input.simulate( 'click' );
-
-		expectOnAppendCalled( onAppend );
-	} );
-
 	it( 'should append a default block when input focused', () => {
 		const onAppend = jest.fn();
 		const wrapper = shallow( <DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt /> );
