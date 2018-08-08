@@ -1,17 +1,14 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
 import {
 	newPost,
-	newDesktopBrowserPage,
 	getEditedPostContent,
 	insertBlock,
 } from '../support/utils';
 
 describe( 'adding blocks', () => {
 	beforeEach( async () => {
-		await newDesktopBrowserPage();
 		await newPost();
 	} );
 
