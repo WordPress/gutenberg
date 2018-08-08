@@ -204,8 +204,7 @@
 			"eslint"
 		],
 		"{docs/{root-manifest.json,tool/*.js},packages/{*/README.md,*/src/{actions,selectors}.js,components/src/*/README.md}}": [
-			"npm run docs:build",
-			"git add docs/manifest.json"
+			"npm run docs:build"
 		]
 	}
 }
