@@ -76,6 +76,12 @@ function apiFetch( options ) {
 					throw invalidJsonError;
 				}
 
+				/*
+				 * Response data is a stream, which will be consumed by the .json() call.
+				 * If we need to re-use this data to send to the Cloudflare error handler,
+				 * we need a clone of the original response, so the stream can be consumed
+				 * in the .text() call, instead.
+				 */
 				const responseClone = response.clone();
 
 				return response.json()
