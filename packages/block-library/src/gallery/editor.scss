@@ -80,11 +80,11 @@
 
 	.editor-rich-text .editor-rich-text__tinymce {
 		a {
-			color: #fff;
+			color: $white;
 		}
 
 		&:focus a[data-mce-selected] {
-			color: #007FAC;
+			color: rgba(0,0,0,0.2);
 		}
 	}
 }
