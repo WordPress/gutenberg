@@ -716,10 +716,7 @@ export function convertBlockToReusable( clientId ) {
 export function insertDefaultBlock( attributes, rootClientId, index ) {
 	const block = createBlock( getDefaultBlockName(), attributes );
 
-	return {
-		...insertBlock( block, index, rootClientId ),
-		isProvisional: true,
-	};
+	return insertBlock( block, index, rootClientId );
 }
 
 /**

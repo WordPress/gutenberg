@@ -1,6 +1,6 @@
 # **core/editor**: The Editor’s Data
 
-## Selectors 
+## Selectors
 
 ### hasEditorUndo
 
@@ -942,19 +942,6 @@ Returns true if the post is being published, or false otherwise.
 *Returns*
 
 Whether post is being published.
-
-### getProvisionalBlockClientId
-
-Returns the provisional block client ID, or null if there is no provisional
-block.
-
-*Parameters*
-
- * state: Editor state.
-
-*Returns*
-
-Provisional block client ID, if set.
 
 ### isPermalinkEditable
 
