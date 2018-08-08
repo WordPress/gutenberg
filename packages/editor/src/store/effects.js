@@ -27,7 +27,6 @@ import {
 	createWarningNotice,
 	insertBlock,
 	selectBlock,
-	removeBlock,
 	resetBlocks,
 	setTemplateValidity,
 } from './actions';
@@ -37,9 +36,7 @@ import {
 	getBlockRootClientId,
 	getBlocks,
 	getPreviousBlockClientId,
-	getProvisionalBlockClientId,
 	getSelectedBlock,
-	isBlockSelected,
 	getTemplate,
 	getTemplateLock,
 } from './selectors';
@@ -60,23 +57,6 @@ import {
 	refreshPost,
 	AUTOSAVE_POST_NOTICE_ID,
 } from './effects/posts';
-
-/**
- * Effect handler returning an action to remove the provisional block, if one
- * is set.
- *
- * @param {Object} action Action object.
- * @param {Object} store  Data store instance.
- *
- * @return {?Object} Remove action, if provisional block is set.
- */
-export function removeProvisionalBlock( action, store ) {
-	const state = store.getState();
-	const provisionalBlockClientId = getProvisionalBlockClientId( state );
-	if ( provisionalBlockClientId && ! isBlockSelected( state, provisionalBlockClientId ) ) {
-		return removeBlock( provisionalBlockClientId, false );
-	}
-}
 
 export default {
 	REQUEST_POST_UPDATE: ( action, store ) => {
@@ -243,12 +223,6 @@ export default {
 			return insertBlock( createBlock( blockName ) );
 		}
 	},
-
-	CLEAR_SELECTED_BLOCK: removeProvisionalBlock,
-
-	SELECT_BLOCK: removeProvisionalBlock,
-
-	MULTI_SELECT: removeProvisionalBlock,
 
 	REMOVE_BLOCKS( action, { getState, dispatch } ) {
 		// if the action says previous block should not be selected don't do anything.
