@@ -1436,3 +1436,4 @@ Returns an action object used in signalling that the editor settings have been u
 *Parameters*
 
  * settings: Updated settings
+ 
