@@ -92,7 +92,7 @@ describe( 'Change detection', () => {
 
 		// Toggle post as sticky (not persisted for autosave).
 		await ensureSidebarOpened();
-		await page.click( '[id^="post-sticky-toggle-"]' );
+		await page.click( '[id="inspector-checkbox-control-0"]' );
 
 		// Force autosave to occur immediately.
 		await Promise.all( [
