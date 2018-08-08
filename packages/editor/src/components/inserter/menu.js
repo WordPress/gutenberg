@@ -61,8 +61,8 @@ export const searchItems = ( items, searchTerm ) => {
  * Converts the search term into a normalized term, removing diacritics
  * and whitespace.
  *
- * @param {string} term		The search term to normalize
- * @return {string}				The normalized search term
+ * @param {string} term The search term to normalize
+ * @return {string} The normalized search term
  */
 export const normalizeTerm = ( term ) => {
 	term = deburr( term );
