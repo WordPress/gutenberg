@@ -14,7 +14,12 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
         "calls": Array [
           Array [],
         ],
-        "results": undefined,
+        "results": Array [
+          Object {
+            "isThrow": false,
+            "value": undefined,
+          },
+        ],
       }
     }
     onFocus={
@@ -22,7 +27,12 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
         "calls": Array [
           Array [],
         ],
-        "results": undefined,
+        "results": Array [
+          Object {
+            "isThrow": false,
+            "value": undefined,
+          },
+        ],
       }
     }
     onKeyDown={
@@ -30,7 +40,12 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
         "calls": Array [
           Array [],
         ],
-        "results": undefined,
+        "results": Array [
+          Object {
+            "isThrow": false,
+            "value": undefined,
+          },
+        ],
       }
     }
     readOnly={true}
