@@ -172,7 +172,7 @@ class ImageEdit extends Component {
 
 	updateAlignment( nextAlign ) {
 		const extraUpdatedAttributes = [ 'wide', 'full' ].indexOf( nextAlign ) !== -1 ?
-			{ width: undefined, height: undefined, url: this.props.image ? this.props.image.source_url : this.props.attributes.url } :
+			{ width: undefined, height: undefined } :
 			{};
 		this.props.setAttributes( { ...extraUpdatedAttributes, align: nextAlign } );
 	}
@@ -277,7 +277,7 @@ class ImageEdit extends Component {
 						onChange={ this.updateAlt }
 						help={ __( 'Describe the purpose of the image. Leave empty if the image is not a key part of the content.' ) }
 					/>
-					{ ! isEmpty( availableSizes ) && isResizable && (
+					{ ! isEmpty( availableSizes ) && (
 						<SelectControl
 							label={ __( 'Image Size' ) }
 							value={ url }
