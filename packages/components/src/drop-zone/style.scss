@@ -4,7 +4,7 @@
 	right: 0;
 	bottom: 0;
 	left: 0;
-	z-index: z-index( '.components-drop-zone' );
+	z-index: z-index(".components-drop-zone");
 	visibility: hidden;
 	opacity: 0;
 	transition: 0.3s opacity, 0.3s background-color, 0s visibility 0.3s;
@@ -18,7 +18,7 @@
 	}
 
 	&.is-dragging-over-element {
-		background-color: rgba( $blue-dark-900, 0.8 );
+		background-color: rgba($blue-dark-900, 0.8);
 
 		.components-drop-zone__content {
 			display: block;
@@ -31,8 +31,8 @@
 	top: 50%;
 	left: 0;
 	right: 0;
-	z-index: z-index( '.components-drop-zone__content' );
-	transform: translateY( -50% );
+	z-index: z-index(".components-drop-zone__content");
+	transform: translateY(-50%);
 	width: 100%;
 	text-align: center;
 	color: $white;
@@ -41,7 +41,7 @@
 }
 
 .components-drop-zone.is-dragging-over-element .components-drop-zone__content {
-	transform: translateY( -50% ) scale( 1.05 );
+	transform: translateY(-50%) scale(1.05);
 }
 
 .components-drop-zone__content-icon,

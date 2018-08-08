@@ -41,7 +41,7 @@
 		font-size: 14px;
 
 		.is-multi-selected & {
-			background: darken( $blue-medium-highlight, 15% );
+			background: darken($blue-medium-highlight, 15%);
 		}
 	}
 
@@ -50,7 +50,14 @@
 	}
 
 	&:focus {
-		b, i, strong, em, del, ins, sup, sub {
+		b,
+		i,
+		strong,
+		em,
+		del,
+		ins,
+		sup,
+		sub {
 			&[data-mce-selected] {
 				padding: 0 2px;
 				margin: 0 -2px;

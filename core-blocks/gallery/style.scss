@@ -2,7 +2,7 @@
 	display: flex;
 	flex-wrap: wrap;
 	list-style-type: none;
-	padding: 0px;
+	padding: 0;
 	// allow gallery items to go edge to edge
 	margin: 0 -8px 0 -8px;
 
@@ -37,8 +37,8 @@
 			color: $white;
 			text-align: center;
 			font-size: $default-font-size;
-			background: linear-gradient( 0deg, rgba( $color: $black, $alpha: 0.7 ) 0, rgba($color: $black, $alpha: 0.3) 60%, transparent );
-	
+			background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.7) 0, rgba($color: $black, $alpha: 0.3) 60%, transparent);
+
 			img {
 				display: inline;
 			}
@@ -61,7 +61,7 @@
 	// Responsive fallback value, 2 columns
 	& .blocks-gallery-image,
 	& .blocks-gallery-item {
-		width: calc( 100% / 2 - 16px );
+		width: calc(100% / 2 - 16px);
 	}
 
 	&.columns-1 .blocks-gallery-image,
@@ -73,7 +73,7 @@
 		@for $i from 3 through 8 {
 			&.columns-#{ $i } .blocks-gallery-image,
 			&.columns-#{ $i } .blocks-gallery-item {
-				width: calc(100% / #{ $i } - 16px );
+				width: calc(100% / #{ $i } - 16px);
 			}
 		}
 	}

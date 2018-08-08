@@ -1,11 +1,11 @@
 .component-color-indicator {
 	width: 25px;
 	height: 16px;
-	margin-left: .8rem;
-	border: 1px solid #DADADA;
+	margin-left: 0.8rem;
+	border: 1px solid #dadada;
 	display: inline-block;
 
 	& + & {
-		margin-left: .5rem;
+		margin-left: 0.5rem;
 	}
 }

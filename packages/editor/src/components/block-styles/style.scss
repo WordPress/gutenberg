@@ -24,7 +24,7 @@
 
 .editor-block-styles__item-preview {
 	outline: $border-width solid transparent; // Shown in Windows High Contrast mode.
-	box-shadow: inset 0 0 0 1px rgba( $dark-gray-900, .2 );
+	box-shadow: inset 0 0 0 1px rgba($dark-gray-900, 0.2);
 	overflow: hidden;
 	padding: 0;
 	text-align: initial;
@@ -33,7 +33,7 @@
 	height: 60px;
 
 	> * {
-		transform: scale( 0.7 );
+		transform: scale(0.7);
 		transform-origin: center center;
 		font-family: $editor-font;
 	}

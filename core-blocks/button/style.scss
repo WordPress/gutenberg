@@ -13,7 +13,7 @@ $blocks-button__line-height: $big-font-size + 6px;
 		font-size: $big-font-size;
 		line-height: $blocks-button__line-height;
 		margin: 0;
-		padding: ( $blocks-button__height - $blocks-button__line-height ) / 2 24px;
+		padding: ($blocks-button__height - $blocks-button__line-height) / 2 24px;
 		text-align: center;
 		text-decoration: none;
 		white-space: normal;
@@ -80,7 +80,7 @@ $blocks-button__line-height: $big-font-size + 6px;
 		}
 
 		&.has-very-light-gray-background-color {
-			border-color: #eeeeee;
+			border-color: #eee;
 		}
 
 		&.has-cyan-bluish-gray-background-color {

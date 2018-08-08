@@ -39,20 +39,20 @@
 			&:hover,
 			&:active,
 			&:focus {
-				z-index: z-index( '.editor-block-settings-remove' );
+				z-index: z-index(".editor-block-settings-remove");
 			}
 		}
 	}
 }
 
 .editor-block-settings-menu__toggle .dashicon {
-	transform: rotate( 90deg );
+	transform: rotate(90deg);
 }
 
 // Popout menu
 .editor-block-settings-menu__popover {
 	&::before,
-	&:after {
+	&::after {
 		margin-left: 2px;
 	}
 

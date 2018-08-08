@@ -38,7 +38,7 @@
 
 	.editor-url-input__suggestions {
 		width: $blocks-button__link-input-width - $icon-button-size - $icon-button-size;
-		z-index: z-index( '.core-blocks-button__inline-link .editor-url-input__suggestions' );
+		z-index: z-index(".core-blocks-button__inline-link .editor-url-input__suggestions");
 	}
 
 	> .dashicon {
@@ -49,7 +49,7 @@
 		color: $dark-gray-100;
 	}
 
-	.editor-url-input input[type=text]::placeholder {
+	.editor-url-input input[type="text"]::placeholder {
 		color: $dark-gray-100;
 	}
 
