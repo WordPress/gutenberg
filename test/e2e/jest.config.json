@@ -1,7 +1,11 @@
 {
 	"rootDir": "../../",
-	"preset": "@wordpress/jest-preset-default",
-	"setupFiles": [],
-	"testMatch": [ "<rootDir>/test/e2e/specs/**/(*.)(spec|test).js?(x)" ],
-	"timers": "real"
+	"preset": "jest-puppeteer",
+	"setupTestFrameworkScriptFile": "<rootDir>/test/e2e/support/setup-test-framework.js",
+	"testMatch": [
+		"<rootDir>/test/e2e/specs/**/(*.)test.js"
+	],
+	"transform": {
+		"^.+\\.jsx?$": "<rootDir>/node_modules/babel-jest"
+	}
 }

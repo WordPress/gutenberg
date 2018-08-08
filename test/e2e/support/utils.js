@@ -86,31 +86,17 @@ export async function visitAdmin( adminPath, query ) {
 	}
 }
 
-export async function newPost( postType, disableTips = true ) {
+export async function newPost( { postType, enableTips = false } = {} ) {
 	await visitAdmin( 'post-new.php', postType ? 'post_type=' + postType : '' );
 
-	if ( disableTips ) {
-		// Disable new user tips so that their UI doesn't get in the way
-		await page.evaluate( () => {
-			wp.data.dispatch( 'core/nux' ).disableTips();
-		} );
+	await page.evaluate( ( _enableTips ) => {
+		const action = _enableTips ? 'enableTips' : 'disableTips';
+		wp.data.dispatch( 'core/nux' )[ action ]();
+	}, enableTips );
+
+	if ( enableTips ) {
+		await page.reload();
 	}
-}
-
-export async function newDesktopBrowserPage() {
-	global.page = await browser.newPage();
-
-	page.on( 'pageerror', ( error ) => {
-		// Disable reason: `jest/globals` doesn't include `fail`, but it is
-		// part of the global context supplied by the underlying Jasmine:
-		//
-		//  https://jasmine.github.io/api/3.0/global.html#fail
-
-		// eslint-disable-next-line no-undef
-		fail( error );
-	} );
-
-	await setViewport( 'large' );
 }
 
 export async function setViewport( type ) {
@@ -180,6 +166,13 @@ export async function ensureSidebarOpened() {
 }
 
 /**
+ * Clicks the default block appender.
+ */
+export async function clickBlockAppender() {
+	await expect( page ).toClick( '.editor-default-block-appender__content' );
+}
+
+/**
  * Search for block in the global inserter
  *
  * @param {string} searchTerm The text to search the inserter for.
@@ -233,7 +226,7 @@ export async function pressWithModifier( modifier, key ) {
  * @param {string} buttonLabel The label to search the button for.
  */
 export async function clickOnMoreMenuItem( buttonLabel ) {
-	await page.click( '.edit-post-more-menu [aria-label="More"]' );
+	await expect( page ).toClick( '.edit-post-more-menu [aria-label="More"]' );
 	const itemButton = ( await page.$x( `//button[contains(text(), '${ buttonLabel }')]` ) )[ 0 ];
 	await itemButton.click( 'button' );
 }
@@ -296,4 +289,29 @@ export async function pressTimes( key, count ) {
 
 export async function clearLocalStorage() {
 	await page.evaluate( () => window.localStorage.clear() );
+}
+
+/**
+ * Callback which automatically accepts dialog.
+ *
+ * @param {puppeteer.Dialog} dialog Dialog object dispatched by page via the 'dialog' event.
+ */
+async function acceptPageDialog( dialog ) {
+	await dialog.accept();
+}
+
+/**
+ * Enables even listener which accepts a page dialog which
+ * may appear when navigating away from Gutenberg.
+ */
+export function enablePageDialogAccept() {
+	page.on( 'dialog', acceptPageDialog );
+}
+
+/**
+ * Disables even listener which accepts a page dialog which
+ * may appear when navigating away from Gutenberg.
+ */
+export function disablePageDialogAccept() {
+	page.removeListener( 'dialog', acceptPageDialog );
 }

@@ -1,12 +1,15 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage, pressWithModifier, insertBlock } from '../support/utils';
+import {
+	clickBlockAppender,
+	insertBlock,
+	newPost,
+	pressWithModifier,
+} from '../support/utils';
 
 describe( 'Multi-block selection', () => {
 	beforeAll( async () => {
-		await newDesktopBrowserPage();
 		await newPost();
 	} );
 
@@ -17,7 +20,7 @@ describe( 'Multi-block selection', () => {
 		const multiSelectedCssClass = 'is-multi-selected';
 
 		// Creating test blocks
-		await page.click( '.editor-default-block-appender' );
+		await clickBlockAppender();
 		await page.keyboard.type( 'First Paragraph' );
 		await insertBlock( 'Image' );
 		await insertBlock( 'Quote' );
