@@ -88,7 +88,6 @@ describe( 'deprecated', () => {
 	it( 'should do an action', () => {
 		deprecated( 'pork' );
 
-		expect( didAction( 'wp.deprecated' ) ).toBeTrue();
-
+		expect( didAction( 'wp.deprecated' ) ).toBeTruthy();
 	} );
 } );
