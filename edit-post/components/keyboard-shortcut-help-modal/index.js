@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isArray } from 'lodash';
+import { castArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -49,7 +49,7 @@ const ShortcutList = ( { shortcuts } ) => (
 			>
 				<dt className="edit-post-keyboard-shortcut-help__shortcut-term">
 					<kbd className="edit-post-keyboard-shortcut-help__shortcut-key-combination">
-						{ mapKeyCombination( isArray( keyCombination ) ? keyCombination : [ keyCombination ] ) }
+						{ mapKeyCombination( castArray( keyCombination ) ) }
 					</kbd>
 				</dt>
 				<dd className="edit-post-keyboard-shortcut-help__shortcut-description">
