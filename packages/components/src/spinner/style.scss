@@ -1,9 +1,9 @@
 @keyframes rotation {
   from {
-    transform: rotate(0deg) translateZ(0);
+    transform: rotate(0deg);
   }
   to {
-    transform: rotate(360deg) translateZ(0);
+    transform: rotate(360deg);
   }
 }
 
