@@ -72,6 +72,8 @@ export class BlockSettingsMenu extends Component {
 			isHidden,
 			onDuplicate,
 			onRemove,
+			onInsertBefore,
+			onInsertAfter,
 			canDuplicate,
 			isLocked,
 		} = this.props;
@@ -146,6 +148,20 @@ export class BlockSettingsMenu extends Component {
 									{ __( 'Duplicate' ) }
 								</MenuItem>
 							) }
+							<MenuItem
+								className="editor-block-settings-menu__control"
+								onClick={ onInsertBefore }
+								icon="insert-before"
+							>
+								{ __( 'Insert Before' ) }
+							</MenuItem>
+							<MenuItem
+								className="editor-block-settings-menu__control"
+								onClick={ onInsertAfter }
+								icon="insert-after"
+							>
+								{ __( 'Insert After' ) }
+							</MenuItem>
 							{ count === 1 && (
 								<BlockModeToggle
 									clientId={ firstBlockClientId }
@@ -199,15 +215,32 @@ export default compose( [
 		} );
 
 		return {
-			index: getBlockIndex( last( castArray( clientIds ) ), rootClientId ),
+			firstSelectedIndex: getBlockIndex( first( castArray( clientIds ) ), rootClientId ),
+			lastSelectedIndex: getBlockIndex( last( castArray( clientIds ) ), rootClientId ),
 			isLocked: !! getTemplateLock( rootClientId ),
 			blocks,
 			canDuplicate,
 			shortcuts,
 		};
 	} ),
-	withDispatch( ( dispatch, { clientIds, rootClientId, blocks, index, isLocked, canDuplicate } ) => {
-		const { insertBlocks, multiSelect, removeBlocks, selectBlock } = dispatch( 'core/editor' );
+	withDispatch( ( dispatch, props ) => {
+		const {
+			clientIds,
+			rootClientId,
+			blocks,
+			firstSelectedIndex,
+			lastSelectedIndex,
+			isLocked,
+			canDuplicate,
+		} = props;
+
+		const {
+			insertBlocks,
+			multiSelect,
+			removeBlocks,
+			selectBlock,
+			insertDefaultBlock,
+		} = dispatch( 'core/editor' );
 
 		return {
 			onDuplicate() {
@@ -218,7 +251,7 @@ export default compose( [
 				const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
 				insertBlocks(
 					clonedBlocks,
-					index + 1,
+					lastSelectedIndex + 1,
 					rootClientId
 				);
 				if ( clonedBlocks.length > 1 ) {
@@ -230,6 +263,12 @@ export default compose( [
 			},
 			onRemove() {
 				removeBlocks( clientIds );
+			},
+			onInsertBefore() {
+				insertDefaultBlock( {}, rootClientId, firstSelectedIndex );
+			},
+			onInsertAfter() {
+				insertDefaultBlock( {}, rootClientId, lastSelectedIndex + 1 );
 			},
 			onSelect( clientId ) {
 				selectBlock( clientId );
