@@ -37,3 +37,9 @@ export const deleteBlockAction: BlockActionType = uid => ( {
 	type: ActionTypes.BLOCK.DELETE,
 	uid: uid,
 } );
+
+export const parseBlocksAction: BlockActionType = payload => ( {
+	type: ActionTypes.BLOCK.PARSE,
+	uid: '',
+	payload: payload
+} );

@@ -22,6 +22,7 @@ export type BlockListType = {
 	moveBlockUpAction: string => mixed,
 	moveBlockDownAction: string => mixed,
 	deleteBlockAction: string => mixed,
+	parseBlocksAction: string => mixed,
 	blocks: Array<BlockType>,
 	aztechtml: string,
 	refresh: boolean,
@@ -30,7 +31,7 @@ export type BlockListType = {
 type PropsType = BlockListType;
 type StateType = {
 	dataSource: DataSource,
-	showHtml: boolean,
+	showHtml: boolean
 };
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
@@ -38,10 +39,16 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 	constructor( props: PropsType ) {
 		super( props );
+		this.html = ''
 		this.state = {
 			dataSource: new DataSource( this.props.blocks, ( item: BlockType ) => item.uid ),
-			showHtml: false,
+			showHtml: false
 		};
+		
+	}
+
+	componentDidMount() {
+		this.serializeToHtml()
 	}
 
 	onBlockHolderPressed( uid: string ) {
@@ -80,7 +87,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	serializeToHtml() {
-		return this.props.blocks
+		const parsedHTML = this.props.blocks
 			.map( ( block ) => {
 				const blockType = getBlockType( block.name );
 				if ( blockType ) {
@@ -94,6 +101,12 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			.reduce( ( prevVal, value ) => {
 				return prevVal + value;
 			}, '' );
+		this.html = parsedHTML
+	}
+
+	parseHTML() {
+		const html = this.html
+		this.props.parseBlocksAction(html)
 	}
 
 	componentDidUpdate() {
@@ -149,7 +162,15 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 						activeText={ 'On' }
 						inActiveText={ 'Off' }
 						value={ this.state.showHtml }
-						onValueChange={ ( value ) => this.setState( { showHtml: value } ) }
+						onValueChange={ ( value ) => {
+							if (value) {
+								this.serializeToHtml()
+							} else {
+								this.parseHTML()
+							}
+							
+							this.setState( { showHtml: value } ) 
+						} }
 					/>
 				</View>
 				{ this.state.showHtml && this.renderHTML() }
@@ -178,8 +199,10 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				<TextInput
 					multiline
 					numberOfLines={ 0 }
-					style={ styles.htmlView }>
-					{ this.serializeToHtml() }
+					style={ styles.htmlView }
+					onChangeText={(html) => this.html = html }
+				>
+				{ this.html }
 				</TextInput>
 			</KeyboardAvoidingView>
 		);
