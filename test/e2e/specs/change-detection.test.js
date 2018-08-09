@@ -196,6 +196,8 @@ describe( 'Change detection', () => {
 		await page.setOfflineMode( false );
 
 		await assertIsDirty( true );
+
+		expect( console ).toHaveErroredWith( 'Failed to load resource: net::ERR_INTERNET_DISCONNECTED' );
 	} );
 
 	it( 'Should prompt if changes and save is in-flight', async () => {

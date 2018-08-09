@@ -14,7 +14,7 @@ export function triggerGuide( tipIds ) {
 }
 
 /**
- * Returns an action object that, when dispathed, associates an instance of the
+ * Returns an action object that, when dispatched, associates an instance of the
  * DotTip component with a tip. This is usually done when the component mounts.
  * Tracking this lets us only show one DotTip at a time per tip.
  *
