@@ -22,7 +22,9 @@
                         "innerHTML": "\n\t\t<p>Column One, Paragraph Two</p>\n\t\t"
                     }
                 ],
-                "innerHTML": "\n\t<div class=\"wp-block-column\">\n\t\t\n\t\t\n\t</div>\n\t"
+                "innerHTML": "\n\t<div class=\"wp-block-column\">\n\t\t\n\t\t\n\t</div>\n\t",
+                "innerHTMLBeforeInnerBlocks": "\n\t<div class=\"wp-block-column\">\n\t\t",
+                "innerHTMLAfterInnerBlocks": "\n\t\t\n\t</div>\n\t"
             },
             {
                 "blockName": "core/column",
@@ -41,10 +43,14 @@
                         "innerHTML": "\n\t\t<p>Column Three, Paragraph One</p>\n\t\t"
                     }
                 ],
-                "innerHTML": "\n\t<div class=\"wp-block-column\">\n\t\t\n\t\t\n\t</div>\n\t"
+                "innerHTML": "\n\t<div class=\"wp-block-column\">\n\t\t\n\t\t\n\t</div>\n\t",
+                "innerHTMLBeforeInnerBlocks": "\n\t<div class=\"wp-block-column\">\n\t\t",
+                "innerHTMLAfterInnerBlocks": "\n\t\t\n\t</div>\n\t"
             }
         ],
-        "innerHTML": "\n<div class=\"wp-block-columns has-3-columns\">\n\t\n\t\n</div>\n"
+        "innerHTML": "\n<div class=\"wp-block-columns has-3-columns\">\n\t\n\t\n</div>\n",
+        "innerHTMLBeforeInnerBlocks": "\n<div class=\"wp-block-columns has-3-columns\">\n\t",
+        "innerHTMLAfterInnerBlocks": "\n\t\n</div>\n"
     },
     {
         "attrs": {},

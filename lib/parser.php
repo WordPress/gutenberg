@@ -266,14 +266,37 @@ class Gutenberg_PEG_Parser {
         );
         }
     private function peg_f4($s, $children, $e) {
-        list( $innerHTML, $innerBlocks ) = peg_array_partition( $children, 'is_string' );
+	    $innerHTMLBeforeInnerBlocks = array();
+	    $innerHTMLAfterInnerBlocks = array();
+	    $innerBlocks = array();
 
-        return array(
+	    $inner_found = false;
+	    foreach ( $children as $child ) {
+	    	if( is_string( $child ) ) {
+	    		if ( $inner_found ) {
+	    			$innerHTMLAfterInnerBlocks[] = $child;
+			    } else {
+				    $innerHTMLBeforeInnerBlocks[] = $child;
+			    }
+		    } else {
+	    		$innerBlocks[] = $child;
+	    		$inner_found = true;
+		    }
+	    }
+
+
+        $block = array(
           'blockName'  => $s['blockName'],
           'attrs'      => $s['attrs'],
           'innerBlocks'  => $innerBlocks,
-          'innerHTML'  => implode( '', $innerHTML ),
+          'innerHTML'  => implode( '', $innerHTMLBeforeInnerBlocks ) . implode( '', $innerHTMLAfterInnerBlocks ),
         );
+
+	    if( $inner_found ) {
+          $block['innerHTMLBeforeInnerBlocks']  = implode( '', $innerHTMLBeforeInnerBlocks );
+          $block['innerHTMLAfterInnerBlocks']  = implode( '', $innerHTMLAfterInnerBlocks );
+	    }
+	    return $block;
         }
     private function peg_f5($blockName, $attrs) {
         return array(

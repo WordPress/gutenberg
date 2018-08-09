@@ -108,6 +108,13 @@ function gutenberg_render_block( $block ) {
 		}
 	}
 
+	if ( isset( $block['innerBlocks'] )  && count( $block['innerBlocks'] ) ) {
+		$raw_content = $block['innerHTMLBeforeInnerBlocks'];
+		foreach ( $block['innerBlocks'] as $inner_block ) {
+			$raw_content .= gutenberg_render_block( $inner_block );
+		}
+		$raw_content .= $block['innerHTMLAfterInnerBlocks'];
+	}
 	if ( $raw_content ) {
 		return $raw_content;
 	}
