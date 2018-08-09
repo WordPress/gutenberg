@@ -53,6 +53,7 @@ export class BlockBreadcrumb extends Component {
 		return (
 			<div className={ 'editor-block-list__breadcrumb' }>
 				<Toolbar>
+					<div>:::&nbsp;&nbsp;</div>
 					{ rootClientId && (
 						<Fragment>
 							<BlockTitle clientId={ rootClientId } />
