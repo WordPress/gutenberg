@@ -14,7 +14,7 @@ exports[`core/button block edit matches snapshot 1`] = `
           <div
             class="components-autocomplete"
           >
-            <span
+            <div
               aria-autocomplete="list"
               aria-expanded="false"
               aria-label="Add text…"
@@ -24,11 +24,11 @@ exports[`core/button block edit matches snapshot 1`] = `
               data-is-placeholder-visible="true"
               role="textbox"
             />
-            <span
+            <div
               class="editor-rich-text__tinymce wp-block-button__link"
             >
               Add text…
-            </span>
+            </div>
           </div>
         </div>
       </div>

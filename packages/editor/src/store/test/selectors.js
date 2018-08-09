@@ -85,7 +85,6 @@ const {
 	isPublishingPost,
 	canInsertBlockType,
 	getInserterItems,
-	getProvisionalBlockClientId,
 	isValidTemplate,
 	getTemplate,
 	getTemplateLock,
@@ -3614,24 +3613,6 @@ describe( 'selectors', () => {
 			} );
 
 			expect( isPublishing ).toBe( true );
-		} );
-	} );
-
-	describe( 'getProvisionalBlockClientId()', () => {
-		it( 'should return null if not set', () => {
-			const provisionalBlockClientId = getProvisionalBlockClientId( {
-				provisionalBlockClientId: null,
-			} );
-
-			expect( provisionalBlockClientId ).toBe( null );
-		} );
-
-		it( 'should return ClientId of provisional block', () => {
-			const provisionalBlockClientId = getProvisionalBlockClientId( {
-				provisionalBlockClientId: 'chicken',
-			} );
-
-			expect( provisionalBlockClientId ).toBe( 'chicken' );
 		} );
 	} );
 

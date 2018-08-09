@@ -83,7 +83,6 @@ class ButtonEdit extends Component {
 			<Fragment>
 				<span className={ className } title={ title } ref={ this.bindRef }>
 					<RichText
-						tagName="span"
 						placeholder={ __( 'Add text…' ) }
 						value={ text }
 						onChange={ ( value ) => setAttributes( { text: value } ) }

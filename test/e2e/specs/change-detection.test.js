@@ -92,7 +92,9 @@ describe( 'Change detection', () => {
 
 		// Toggle post as sticky (not persisted for autosave).
 		await ensureSidebarOpened();
-		await page.click( '[id^="post-sticky-toggle-"]' );
+
+		const postStickyToggleButton = ( await page.$x( "//label[contains(text(), 'Stick to the Front Page')]" ) )[ 0 ];
+		await postStickyToggleButton.click( 'button' );
 
 		// Force autosave to occur immediately.
 		await Promise.all( [
@@ -194,6 +196,8 @@ describe( 'Change detection', () => {
 		await page.setOfflineMode( false );
 
 		await assertIsDirty( true );
+
+		expect( console ).toHaveErroredWith( 'Failed to load resource: net::ERR_INTERNET_DISCONNECTED' );
 	} );
 
 	it( 'Should prompt if changes and save is in-flight', async () => {

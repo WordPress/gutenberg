@@ -149,7 +149,7 @@ describe( 'adding blocks', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		// When returning to Visual mode, backspace in selected block should
-		// reset to the provisional block.
+		// reset to an unmodified default block.
 		await page.keyboard.press( 'Backspace' );
 
 		// Ensure no data-mce-selected. Notably, this can occur when content

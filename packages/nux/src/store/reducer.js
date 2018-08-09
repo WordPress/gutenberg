@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { union, without } from 'lodash';
+import { uniq, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -41,11 +41,13 @@ export function guides( state = [], action ) {
  */
 export function tipInstanceIds( state = {}, action ) {
 	switch ( action.type ) {
-		case 'REGISTER_TIP_INSTANCE':
+		case 'REGISTER_TIP_INSTANCE': {
+			const existingInstanceIds = state[ action.tipId ] || [];
 			return {
 				...state,
-				[ action.tipId ]: union( state[ action.tipId ] || [], [ action.instanceId ] ),
+				[ action.tipId ]: uniq( [ ...existingInstanceIds, action.instanceId ] ),
 			};
+		}
 
 		case 'UNREGISTER_TIP_INSTANCE':
 			return {

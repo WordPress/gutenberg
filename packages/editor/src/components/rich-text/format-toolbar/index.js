@@ -36,16 +36,16 @@ const FORMATTING_CONTROLS = [
 		format: 'italic',
 	},
 	{
-		icon: 'editor-strikethrough',
-		title: __( 'Strikethrough' ),
-		shortcut: displayShortcut.access( 'd' ),
-		format: 'strikethrough',
-	},
-	{
 		icon: 'admin-links',
 		title: __( 'Link' ),
 		shortcut: displayShortcut.primary( 'k' ),
 		format: 'link',
+	},
+	{
+		icon: 'editor-strikethrough',
+		title: __( 'Strikethrough' ),
+		shortcut: displayShortcut.access( 'd' ),
+		format: 'strikethrough',
 	},
 ];
 

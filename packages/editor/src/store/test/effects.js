@@ -21,60 +21,16 @@ import {
 	mergeBlocks,
 	replaceBlocks,
 	selectBlock,
-	removeBlock,
 	createErrorNotice,
 	setTemplateValidity,
 	editPost,
 } from '../actions';
-import effects, {
-	removeProvisionalBlock,
-} from '../effects';
+import effects from '../effects';
 import * as selectors from '../selectors';
 import reducer from '../reducer';
 
 describe( 'effects', () => {
 	const defaultBlockSettings = { save: () => 'Saved', category: 'common', title: 'block title' };
-
-	describe( 'removeProvisionalBlock()', () => {
-		const store = { getState: () => {} };
-
-		beforeAll( () => {
-			selectors.getProvisionalBlockClientId = jest.spyOn( selectors, 'getProvisionalBlockClientId' );
-			selectors.isBlockSelected = jest.spyOn( selectors, 'isBlockSelected' );
-		} );
-
-		beforeEach( () => {
-			selectors.getProvisionalBlockClientId.mockReset();
-			selectors.isBlockSelected.mockReset();
-		} );
-
-		afterAll( () => {
-			selectors.getProvisionalBlockClientId.mockRestore();
-			selectors.isBlockSelected.mockRestore();
-		} );
-
-		it( 'should return nothing if there is no provisional block', () => {
-			const action = removeProvisionalBlock( {}, store );
-
-			expect( action ).toBeUndefined();
-		} );
-
-		it( 'should return nothing if there is a provisional block and it is selected', () => {
-			selectors.getProvisionalBlockClientId.mockReturnValue( 'chicken' );
-			selectors.isBlockSelected.mockImplementation( ( state, clientId ) => clientId === 'chicken' );
-			const action = removeProvisionalBlock( {}, store );
-
-			expect( action ).toBeUndefined();
-		} );
-
-		it( 'should return remove action for provisional block', () => {
-			selectors.getProvisionalBlockClientId.mockReturnValue( 'chicken' );
-			selectors.isBlockSelected.mockImplementation( ( state, clientId ) => clientId === 'ribs' );
-			const action = removeProvisionalBlock( {}, store );
-
-			expect( action ).toEqual( removeBlock( 'chicken', false ) );
-		} );
-	} );
 
 	describe( '.MERGE_BLOCKS', () => {
 		const handler = effects.MERGE_BLOCKS;

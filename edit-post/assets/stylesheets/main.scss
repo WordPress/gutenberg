@@ -73,6 +73,11 @@ body.gutenberg-editor-page {
 	ul#adminmenu > li.current > a.current::after {
 		border-right-color: $white;
 	}
+
+	.media-frame select.attachment-filters:last-of-type {
+		width: auto;
+		max-width: 100%;
+	}
 }
 
 .gutenberg {
@@ -121,13 +126,14 @@ body.gutenberg-editor-page {
 	}
 }
 
-// Override core input styles to provide ones consistent with Gutenberg
-// @todo submit as upstream patch as well
+// Override core input styles to provide styles consistent with Gutenberg.
+// Upstream ticket for redesigned input and styles in general: https://core.trac.wordpress.org/ticket/44749
+// Upstream ticket for redesigned checkbox: https://core.trac.wordpress.org/ticket/35596
 .edit-post-sidebar,
 .editor-post-publish-panel,
 .editor-block-list__block,
 .components-popover {
-	.input-control, // upstream name is .regular-text
+	.input-control, // Upstream name is `.regular-text`.
 	input[type="text"],
 	input[type="search"],
 	input[type="radio"],
@@ -166,6 +172,32 @@ body.gutenberg-editor-page {
 			// Windows High Contrast mode will show this outline
 			outline: 2px solid transparent;
 			outline-offset: 0;
+		}
+	}
+
+	input[type="checkbox"] {
+		border: $border-width + 1 solid $dark-gray-300;
+		border-radius: $radius-round-rectangle / 2;
+		margin-right: 12px;
+		transition: none;
+
+		&:focus {
+			border-color: $dark-gray-300;
+			box-shadow: 0 0 0 1px $dark-gray-300;
+		}
+
+		&:checked {
+			background: theme(toggle);
+			border-color: theme(toggle);
+		}
+
+		&:checked:focus {
+			box-shadow: 0 0 0 2px $dark-gray-500;
+		}
+
+		&::before {
+			margin: -4px 0 0 -5px;
+			color: $white;
 		}
 	}
 }

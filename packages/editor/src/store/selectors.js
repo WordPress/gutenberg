@@ -1750,18 +1750,6 @@ export function isPublishingPost( state ) {
 }
 
 /**
- * Returns the provisional block client ID, or null if there is no provisional
- * block.
- *
- * @param {Object} state Editor state.
- *
- * @return {?string} Provisional block client ID, if set.
- */
-export function getProvisionalBlockClientId( state ) {
-	return state.provisionalBlockClientId;
-}
-
-/**
  * Returns whether the permalink is editable or not.
  *
  * @param {Object} state Editor state.
