@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/blob",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "Blob utilities for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
