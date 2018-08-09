@@ -26,8 +26,8 @@
 
 .editor-block-list__layout .editor-block-list__block-draggable {
 	position: absolute;
-	top: 0;
-	right: 0;
+	top: -14px; // TODO: review what breadcrumb component uses
+	right: -15px;
 	bottom: 0;
 	left: 0;
 	z-index: z-index(".editor-block-list__block-draggable");
