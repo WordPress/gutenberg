@@ -383,7 +383,7 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Handles a delete keydown event to handle merge or removal for collapsed
+	 * Handles a delete keyDown event to handle merge or removal for collapsed
 	 * selection where caret is at directional edge: forward for a delete key,
 	 * reverse for a backspace key.
 	 *
