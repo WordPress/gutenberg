@@ -38,7 +38,7 @@ export default class MoreEdit extends Component {
 		const toggleNoTeaser = () => setAttributes( { noTeaser: ! noTeaser } );
 		const { defaultText } = this.state;
 		const value = customText !== undefined ? customText : defaultText;
-		const inputLength = value.length + 1;
+		const inputLength = value.length * 3;
 
 		return (
 			<Fragment>
