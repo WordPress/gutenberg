@@ -19,7 +19,7 @@ import { compose } from '@wordpress/compose';
 import shortcutConfig from './config';
 import './style.scss';
 
-const modalName = 'edit-post/keyboard-shortcut-help';
+const MODAL_NAME = 'edit-post/keyboard-shortcut-help';
 
 const mapKeyCombination = ( keyCombination ) => keyCombination.map( ( character, index ) => {
 	if ( character === '+' ) {
@@ -104,7 +104,7 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 
 export default compose( [
 	withSelect( ( select ) => ( {
-		isModalActive: select( 'core/edit-post' ).isModalActive( modalName ),
+		isModalActive: select( 'core/edit-post' ).isModalActive( MODAL_NAME ),
 	} ) ),
 	withDispatch( ( dispatch, { isModalActive } ) => {
 		const {
@@ -113,7 +113,7 @@ export default compose( [
 		} = dispatch( 'core/edit-post' );
 
 		return {
-			toggleModal: () => isModalActive ? closeModal() : openModal( modalName ),
+			toggleModal: () => isModalActive ? closeModal() : openModal( MODAL_NAME ),
 		};
 	} ),
 ] )( KeyboardShortcutHelpModal );

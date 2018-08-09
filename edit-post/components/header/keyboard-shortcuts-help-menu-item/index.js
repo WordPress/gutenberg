@@ -1,4 +1,9 @@
 /**
+ * External Dependencies
+ */
+import { flow } from 'lodash';
+
+/**
  * WordPress Dependencies
  */
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -11,14 +16,12 @@ import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
 import { MenuItem } from '@wordpress/components';
 
-const modalName = 'edit-post/keyboard-shortcut-help';
+const MODAL_NAME = 'edit-post/keyboard-shortcut-help';
 
-export function KeyboardShortcutsToggle( { toggleModal, isModalActive } ) {
+export function KeyboardShortcutsHelpMenuItem( { toggleModal, onSelect } ) {
 	return (
 		<MenuItem
-			icon={ isModalActive && 'yes' }
-			isSelected={ isModalActive }
-			onClick={ toggleModal }
+			onClick={ flow( onSelect, toggleModal ) }
 			shortcut={ displayShortcut.access( 'h' ) }
 		>
 			{ __( 'Keyboard Shortcuts' ) }
@@ -28,7 +31,7 @@ export function KeyboardShortcutsToggle( { toggleModal, isModalActive } ) {
 
 export default compose( [
 	withSelect( ( select ) => ( {
-		isModalActive: select( 'core/edit-post' ).isModalActive( modalName ),
+		isModalActive: select( 'core/edit-post' ).isModalActive( MODAL_NAME ),
 	} ) ),
 	withDispatch( ( dispatch, { isModalActive } ) => {
 		const {
@@ -37,7 +40,7 @@ export default compose( [
 		} = dispatch( 'core/edit-post' );
 
 		return {
-			toggleModal: ( ) => isModalActive ? closeModal() : openModal( modalName ),
+			toggleModal: ( ) => isModalActive ? closeModal() : openModal( MODAL_NAME ),
 		};
 	} ),
-] )( KeyboardShortcutsToggle );
+] )( KeyboardShortcutsHelpMenuItem );
