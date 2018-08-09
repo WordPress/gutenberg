@@ -6,6 +6,7 @@ import {
 	insertBlock,
 	newPost,
 	pressWithModifier,
+	META_KEY,
 } from '../support/utils';
 
 describe( 'Multi-block selection', () => {
@@ -59,7 +60,7 @@ describe( 'Multi-block selection', () => {
 
 		// Multiselect via keyboard
 		await page.click( 'body' );
-		await pressWithModifier( 'Mod', 'a' );
+		await pressWithModifier( META_KEY, 'a' );
 
 		// Verify selection
 		await expectMultiSelected( blocks, true );
@@ -72,8 +73,8 @@ describe( 'Multi-block selection', () => {
 
 		// Select all via double shortcut.
 		await page.click( firstBlockSelector );
-		await pressWithModifier( 'Mod', 'a' );
-		await pressWithModifier( 'Mod', 'a' );
+		await pressWithModifier( META_KEY, 'a' );
+		await pressWithModifier( META_KEY, 'a' );
 		await expectMultiSelected( blocks, true );
 	} );
 } );

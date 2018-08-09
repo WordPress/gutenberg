@@ -7,6 +7,7 @@ import {
 	newPost,
 	pressTimes,
 	pressWithModifier,
+	META_KEY,
 } from '../support/utils';
 
 describe( 'adding blocks', () => {
@@ -88,7 +89,7 @@ describe( 'adding blocks', () => {
 		await page.keyboard.down( 'Shift' );
 		await pressTimes( 'ArrowLeft', 6 );
 		await page.keyboard.up( 'Shift' );
-		await pressWithModifier( 'mod', 'b' );
+		await pressWithModifier( META_KEY, 'b' );
 
 		// Arrow left from selected bold should collapse to before the inline
 		// boundary. Arrow once more to traverse into first paragraph.
@@ -145,7 +146,7 @@ describe( 'adding blocks', () => {
 		// Ensure no zero-width space character. Notably, this can occur when
 		// save occurs while at an inline boundary edge.
 		await clickBlockAppender();
-		await pressWithModifier( 'mod', 'b' );
+		await pressWithModifier( META_KEY, 'b' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		// When returning to Visual mode, backspace in selected block should
@@ -154,7 +155,7 @@ describe( 'adding blocks', () => {
 
 		// Ensure no data-mce-selected. Notably, this can occur when content
 		// is saved while typing within an inline boundary.
-		await pressWithModifier( 'mod', 'b' );
+		await pressWithModifier( META_KEY, 'b' );
 		await page.keyboard.type( 'Inside' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
