@@ -27,6 +27,8 @@ Render a URL input button that pops up an input to search for and select a post 
 }
 ```
 
+This prop is passed directly to the `URLInput` component.
+
 ## Example
 
 {% codetabs %}
@@ -96,7 +98,7 @@ registerBlockType( /* ... */, {
 
 # `URLInput`
 
-Renders the URL input normally wrapped by `URLInputButton`.
+Renders the URL input field used by the `URLInputButton` component. It can be used directly to display the input field in different ways such as in a `Popover` or inline.
 
 ## Properties
 
@@ -106,11 +108,28 @@ Renders the URL input normally wrapped by `URLInputButton`.
 
 ### `onChange( url: String, ?post: Object ): Function`
 
-*Required.* Called when the value changes. This is the same as the `onChange` prop described above for `URLInputButton`.
+*Required.* Called when the value changes. The second parameter is `null` unless the user selects a post from the suggestions dropdown. In those cases the `post` parameter will look like this:
+
+```json
+{
+  "id": 1,
+  "subtype": "page",
+  "title": "Sample Page",
+  "type": "post",
+  "url": "https://example.com/sample-page/",
+  "_links": {
+    "self": [ { "embeddable": true, "href": "https://example.com/wp-json/wp/v2/pages/1" } ],
+    "about": [ { "href": "https://example.com/wp-json/wp/v2/types/page" } ],
+    "collection": [ { "href": "https://example.com/wp-json/gutenberg/v1/search" } ]
+  }
+}
+```
 
 ### `autoFocus: Boolean`
 
-*Optional.* By default, the input will gain focus when it is rendered as typically it is used in combination with a `Popover` in `URLInputBUtton`. If you are rendering the component all the time set this to `false`.
+*Optional.* By default, the input will gain focus when it is rendered, as typically it is displayed conditionally. For example when clicking on `URLInputButton` or editing a block.
+
+If you are not conditionally rendering this component set this property to `false`.
 
 ## Example
 
