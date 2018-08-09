@@ -23,7 +23,13 @@ function BlockDraggable( { rootClientId, index, clientId, layout, isDragging, ..
 
 	return (
 		<Draggable className={ className } transferData={ transferData } { ...props }>
-			<div className="editor-block-list__block-draggable-inner"></div>
+			{
+				/*
+				 * TODO: remove the DnD handle text.
+				 * We use this to teach the browser to give the div some space.
+				 */
+			}
+			<div className="editor-block-list__block-draggable-inner">DnD handle</div>
 		</Draggable>
 	);
 }
