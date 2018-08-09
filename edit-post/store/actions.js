@@ -1,8 +1,9 @@
 /**
  * Returns an action object used in signalling that the user opened an editor sidebar.
  *
- * @param {string} name        Sidebar name to be opened.
- * @return {Object}            Action object.
+ * @param {string} name Sidebar name to be opened.
+ *
+ * @return {Object} Action object.
  */
 export function openGeneralSidebar( name ) {
 	return {
@@ -25,8 +26,9 @@ export function closeGeneralSidebar() {
 /**
  * Returns an action object used in signalling that the user opened an editor sidebar.
  *
- * @param {string} name        Sidebar name to be opened.
- * @return {Object}            Action object.
+ * @param {string} name A string that uniquely identifies the modal.
+ *
+ * @return {Object} Action object.
  */
 export function openModal( name ) {
 	return {
@@ -154,7 +156,7 @@ export function initializeMetaBoxState( metaBoxes ) {
 /**
  * Returns an action object used to request meta box update.
  *
- * @return {Object}      Action object.
+ * @return {Object} Action object.
  */
 export function requestMetaBoxUpdates() {
 	return {
@@ -178,7 +180,8 @@ export function metaBoxUpdatesSuccess() {
  * This is used to check if the meta boxes have been touched when leaving the editor.
  *
  * @param   {Object} dataPerLocation Meta Boxes Data per location.
- * @return {Object}                 Action object.
+ *
+ * @return {Object} Action object.
  */
 export function setMetaBoxSavedData( dataPerLocation ) {
 	return {
