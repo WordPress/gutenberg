@@ -38,14 +38,9 @@ export const select = defaultRegistry.select;
 export const dispatch = defaultRegistry.dispatch;
 export const subscribe = defaultRegistry.subscribe;
 export const registerStore = defaultRegistry.registerStore;
-export const registerApi = defaultRegistry.registerApi;
 export const registerReducer = defaultRegistry.registerReducer;
 export const registerActions = defaultRegistry.registerActions;
 export const registerSelectors = defaultRegistry.registerSelectors;
 export const registerResolvers = defaultRegistry.registerResolvers;
 export const setupPersistence = defaultRegistry.setupPersistence;
 export const use = defaultRegistry.use;
-
-export const SECOND = 1000;
-export const MINUTE = 60 * SECOND;
-export const HOUR = 60 * MINUTE;

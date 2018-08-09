@@ -2,8 +2,13 @@
  * External dependencies
  */
 import { createStore } from 'redux';
-import { flowRight, without, mapValues, overEvery, get } from 'lodash';
-import { FreshDataApi } from '@fresh-data/framework';
+import {
+	flowRight,
+	without,
+	mapValues,
+	overEvery,
+	get,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -298,114 +303,6 @@ export function createRegistry( storeConfigs = {} ) {
 		return store;
 	}
 
-	function registerApi( apiName, options ) {
-		if ( ! options.methods ) {
-			throw new TypeError( 'Must specify methods' );
-		}
-		if ( ! options.operations ) {
-			throw new TypeError( 'Must specify operations' );
-		}
-
-		function reduceRequested( state, action ) {
-			const { resourceNames, time } = action;
-			const apiState = state || {};
-			const clientState = apiState.client || {};
-			const existingResources = clientState.resources || {};
-
-			const resources = resourceNames.reduce( ( newResources, resourceName ) => {
-				const existingResource = existingResources[ resourceName ];
-				newResources[ resourceName ] = { ...existingResource, lastRequested: time };
-				return newResources;
-			}, existingResources );
-
-			return { ...state, client: { resources: resources } };
-		}
-
-		function reduceReceived( state = {}, action ) {
-			const { resources, time } = action;
-			const apiState = state || {};
-			const clientState = apiState.client || {};
-			const existingResources = clientState.resources || {};
-
-			const updatedResources = Object.keys( resources ).reduce( ( newResources, resourceName ) => {
-				const existingResource = existingResources[ resourceName ];
-				const resource = action.resources[ resourceName ];
-				if ( resource.data ) {
-					resource.lastReceived = time;
-				}
-				if ( resource.error ) {
-					resource.lastError = time;
-				}
-				newResources[ resourceName ] = { ...existingResource, ...resource };
-				return newResources;
-			}, existingResources );
-
-			return { ...state, client: { resources: updatedResources } };
-		}
-
-		const reducer = ( state = {}, action ) => {
-			switch ( action.type ) {
-				case 'RESOURCES_REQUESTED':
-					return reduceRequested( state, action );
-				case 'RESOURCES_RECEIVED':
-					return reduceReceived( state, action );
-				default:
-					return state;
-			}
-		};
-
-		const actions = {
-			dataRequested( api, clientKey, resourceNames, time = new Date() ) {
-				return {
-					type: 'RESOURCES_REQUESTED',
-					api,
-					clientKey,
-					resourceNames,
-					time,
-				};
-			},
-			dataReceived( api, clientKey, resources, time = new Date() ) {
-				return {
-					type: 'RESOURCES_RECEIVED',
-					api,
-					clientKey,
-					resources,
-					time,
-				};
-			},
-		};
-
-		class ApiClass extends FreshDataApi {
-			constructor() {
-				super();
-				this.methods = options.methods;
-				this.operations = options.operations;
-				this.mutations = options.mutations;
-				this.selectors = options.selectors || {};
-			}
-		}
-
-		registerReducer( apiName, reducer, options.persist );
-		registerActions( apiName, actions );
-
-		const namespace = namespaces[ apiName ];
-		const api = new ApiClass();
-
-		api.setDataHandlers( namespace.actions );
-
-		namespace.api = api;
-		namespace.store.subscribe( () => {
-			const state = namespace.store.getState() || {};
-			api.updateState( state );
-		} );
-	}
-
-	// TODO: Consider removing clientKey from api altogether, as
-	// we can just instantiate another api with the different client key info.
-	function getApiClient( apiName, clientKey = 'client' ) {
-		return namespaces[ apiName ].api.getClient( clientKey );
-	}
-
 	/**
 	 * Subscribe to changes to any data.
 	 *
@@ -482,8 +379,6 @@ export function createRegistry( storeConfigs = {} ) {
 		registerResolvers,
 		registerActions,
 		registerStore,
-		registerApi,
-		getApiClient,
 		subscribe,
 		select,
 		dispatch,
