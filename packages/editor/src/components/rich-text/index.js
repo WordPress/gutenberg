@@ -383,6 +383,64 @@ export class RichText extends Component {
 	}
 
 	/**
+	 * Handles a delete keydown event to handle merge or removal for collapsed
+	 * selection where caret is at directional edge: forward for a delete key,
+	 * reverse for a backspace key.
+	 *
+	 * @link https://en.wikipedia.org/wiki/Caret_navigation
+	 *
+	 * @param {tinymce.EditorEvent<KeyboardEvent>} event Keydown event.
+	 */
+	onDeleteKeyDown( event ) {
+		const { onMerge, onRemove } = this.props;
+		if ( ! onMerge && ! onRemove ) {
+			return;
+		}
+
+		const { keyCode } = event;
+		const isReverse = keyCode === BACKSPACE;
+		const { isCollapsed } = getSelection();
+
+		// Only process delete if the key press occurs at uncollapsed edge.
+		if ( ! isCollapsed ) {
+			return;
+		}
+
+		// It is important to consider emptiness because an empty container
+		// will include a bogus TinyMCE BR node _after_ the caret, so in a
+		// forward deletion the isHorizontalEdge function will incorrectly
+		// interpret the presence of the bogus node as not being at the edge.
+		const isEmpty = this.isEmpty();
+		const isEdge = (
+			isEmpty ||
+			isHorizontalEdge( this.editor.getBody(), isReverse )
+		);
+
+		if ( ! isEdge ) {
+			return;
+		}
+
+		if ( onMerge ) {
+			onMerge( ! isReverse );
+		}
+
+		// Only handle remove on Backspace. This serves dual-purpose of being
+		// an intentional user interaction distinguishing between Backspace and
+		// Delete to remove the empty field, but also to avoid merge & remove
+		// causing destruction of two fields (merge, then removed merged).
+		if ( onRemove && isEmpty && isReverse ) {
+			onRemove( ! isReverse );
+		}
+
+		event.preventDefault();
+
+		// Calling onMerge() or onRemove() will destroy the editor, so it's
+		// important that we stop other handlers (e.g. ones registered by
+		// TinyMCE) from also handling this event.
+		event.stopImmediatePropagation();
+	}
+
+	/**
 	 * Handles a horizontal navigation key down event to handle the case where
 	 * TinyMCE attempts to preventDefault when on the outside edge of an inline
 	 * boundary when arrowing _away_ from the boundary, not within it. Replaces
@@ -424,72 +482,6 @@ export class RichText extends Component {
 			// the original event object.
 			event.preventDefault = noop;
 		}
-	}
-
-	/**
-	 * Handles a delete key down event to handle merge or removal for a
-	 * collapsed selection where caret is at directional edge: forward for a
-	 * delete key down, reverse for a backspace key down.
-	 *
-	 * @param {tinymce.EditorEvent<KeyboardEvent>} event Keydown event.
-	 */
-	onDeleteKeyDown( event ) {
-		const { onMerge, onRemove } = this.props;
-		if ( ! onMerge && ! onRemove ) {
-			return;
-		}
-
-		const { keyCode } = event;
-		const isReverse = keyCode === BACKSPACE;
-		const { isCollapsed } = getSelection();
-
-		// Only process delete if occurs at uncollapsed edge.
-		if ( ! isCollapsed ) {
-			return;
-		}
-
-		// It is important to consider emptiness because an empty container
-		// will include a bogus TinyMCE BR node _after_ the caret, so in a
-		// forward deletion the isHorizontalEdge function will incorrectly
-		// interpret the presence of the bogus node as not being at the edge.
-		const isEmpty = this.isEmpty();
-		const isEdge = (
-			isEmpty ||
-			isHorizontalEdge( this.editor.getBody(), isReverse )
-		);
-
-		if ( ! isEdge ) {
-			return;
-		}
-
-		let isHandled = false;
-
-		let isMerged = false;
-		if ( onMerge ) {
-			isMerged = onMerge( ! isReverse );
-			isHandled = !! isMerged;
-		}
-
-		// `onMerge`, if it is exists, is not required to return a value, thus
-		// the check on explicit false. This condition will cover cases where
-		// either (a) `onMerge` is not defined or (b) it returns false to
-		// indicate a merge was not possible.
-		if ( onRemove && false === isMerged && isEmpty ) {
-			onRemove( ! isReverse );
-			isHandled = true;
-		}
-
-		if ( ! isHandled ) {
-			// Only prevent default behaviors if handled.
-			return;
-		}
-
-		event.preventDefault();
-
-		// Calling onMerge() or onRemove() will destroy the editor, so it's
-		// important that we stop other handlers (e.g. ones registered by
-		// TinyMCE) from also handling this event.
-		event.stopImmediatePropagation();
 	}
 
 	/**

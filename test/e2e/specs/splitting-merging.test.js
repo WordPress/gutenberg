@@ -135,6 +135,7 @@ describe( 'splitting and merging blocks', () => {
 		// See: https://github.com/WordPress/gutenberg/issues/8731
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Second' );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'Delete' );
 
@@ -148,6 +149,24 @@ describe( 'splitting and merging blocks', () => {
 		// See: https://github.com/WordPress/gutenberg/pull/8306
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should remove at most one paragraph in forward direction', async () => {
+		// Regression Test: A forward delete on empty RichText previously would
+		// destroy two paragraphs on the dual-action of merge & remove.
+		//
+		// See: https://github.com/WordPress/gutenberg/pull/8735
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'First' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Second' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'Delete' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

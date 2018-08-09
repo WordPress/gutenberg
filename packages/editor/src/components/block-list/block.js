@@ -218,31 +218,22 @@ export class BlockListBlock extends Component {
 		}
 	}
 
-	/**
-	 * Handles block merger, returning true if the merge is possible, or false
-	 * otherwise.
-	 *
-	 * @param {boolean} forward Whether merge should occur with the next block.
-	 *
-	 * @return {boolean} Whether merge is possible.
-	 */
 	mergeBlocks( forward = false ) {
 		const { block, previousBlockClientId, nextBlockClientId, onMerge } = this.props;
 
-		const hasMergeableTarget = (
-			( forward && !! nextBlockClientId ) ||
-			( ! forward && !! previousBlockClientId )
-		);
-
-		if ( hasMergeableTarget ) {
-			if ( forward ) {
-				onMerge( block.clientId, nextBlockClientId );
-			} else {
-				onMerge( previousBlockClientId, block.clientId );
-			}
+		// Do nothing when it's the first block.
+		if (
+			( ! forward && ! previousBlockClientId ) ||
+			( forward && ! nextBlockClientId )
+		) {
+			return;
 		}
 
-		return hasMergeableTarget;
+		if ( forward ) {
+			onMerge( block.clientId, nextBlockClientId );
+		} else {
+			onMerge( previousBlockClientId, block.clientId );
+		}
 	}
 
 	insertBlocksAfter( blocks ) {
