@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pick, identity, isEqual, map } from 'lodash';
+import { pick, isEqual, map } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -149,8 +149,6 @@ InnerBlocks = compose( [
 ] )( InnerBlocks );
 
 InnerBlocks.Content = withBlockContentContext(
-	identity
-)(
 	( { BlockContent } ) => <BlockContent />
 );
 
