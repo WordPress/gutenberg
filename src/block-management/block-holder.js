@@ -61,7 +61,7 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 				<Block
 					attributes={ { ...this.props.attributes } }
 					// pass a curried version of onChanged with just one argument
-					setAttributes={ ( attrs ) => this.props.onChange( this.props.uid, attrs ) }
+					setAttributes={ ( attrs ) => this.props.onChange( this.props.uid, { ...this.props.attributes, ...attrs } ) }
 					isSelected={ this.props.focused }
 					style={ style }
 				/>
