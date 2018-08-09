@@ -53,7 +53,7 @@ export default function deprecated( feature, options = {} ) {
 	 * @param {?string} options.plugin      Plugin name if it's a plugin feature
 	 * @param {?string} options.link        Link to documentation
 	 * @param {?string} options.hint        Additional message to help transition away from the deprecated feature.
-	 * @param {?string} message				Message sent to console.warn
+	 * @param {?string} message             Message sent to console.warn
 	 */
 	doAction( 'wp.deprecated', feature, options, message );
 
