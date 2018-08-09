@@ -118,7 +118,7 @@ describe( 'serialize()', () => {
 		expect( result ).toBe( '<div ok="good"></div>' );
 	} );
 
-	it( 'should render with context', () => {
+	it( 'should render with context (legacy)', () => {
 		class Provider extends Component {
 			getChildContext() {
 				return {

@@ -31,7 +31,6 @@
 import {
 	flowRight,
 	isEmpty,
-	isFunction,
 	castArray,
 	omit,
 	startsWith,
@@ -47,6 +46,29 @@ import {
 	StrictMode,
 } from './react';
 import RawHTML from './raw-html';
+
+/**
+ * Boolean reflecting whether the current environment supports Symbol.
+ *
+ * @link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol
+ *
+ * @type {boolean}
+ */
+const HAS_SYMBOL = typeof Symbol === 'function' && Symbol.for;
+
+/**
+ * Internal React symbol representing Provider type.
+ *
+ * @type {Symbol}
+ */
+const REACT_PROVIDER_TYPE = HAS_SYMBOL ? Symbol.for( 'react.provider' ) : 0xeacd;
+
+/**
+ * Internal React symbol representing context (Consumer) type.
+ *
+ * @type {Symbol}
+ */
+const REACT_CONTEXT_TYPE = HAS_SYMBOL ? Symbol.for( 'react.context' ) : 0xeace;
 
 /**
  * Valid attribute types.
@@ -458,9 +480,9 @@ export function renderElement( element, context, legacyContext = {} ) {
 			return element.toString();
 	}
 
-	const { type: tagName, props } = element;
+	const { type, props } = element;
 
-	switch ( tagName ) {
+	switch ( type ) {
 		case StrictMode:
 		case Fragment:
 			return renderChildren( props.children, context, legacyContext );
@@ -479,28 +501,23 @@ export function renderElement( element, context, legacyContext = {} ) {
 			);
 	}
 
-	switch ( typeof tagName ) {
+	switch ( typeof type ) {
 		case 'string':
-			return renderNativeComponent( tagName, props, context, legacyContext );
+			return renderNativeComponent( type, props, context, legacyContext );
 
 		case 'function':
-			if ( tagName.prototype && typeof tagName.prototype.render === 'function' ) {
-				return renderComponent( tagName, props, context, legacyContext );
+			if ( type.prototype && typeof type.prototype.render === 'function' ) {
+				return renderComponent( type, props, context, legacyContext );
 			}
 
-			return renderElement( tagName( props, legacyContext ), context, legacyContext );
-		case 'object':
-			if ( tagName === null ) {
-				return;
-			}
+			return renderElement( type( props, legacyContext ), context, legacyContext );
+	}
+	switch ( type && type.$$typeof ) {
+		case REACT_PROVIDER_TYPE:
+			return renderChildren( props.children, props.value, legacyContext );
 
-			if ( tagName._context && props.children ) {
-				return renderChildren( props.children, props.value, legacyContext );
-			}
-
-			if ( tagName._currentValue && isFunction( props.children ) ) {
-				return renderElement( props.children( context || tagName._currentValue ), context, legacyContext );
-			}
+		case REACT_CONTEXT_TYPE:
+			return renderElement( props.children( context || type._currentValue ), context, legacyContext );
 	}
 
 	return '';
