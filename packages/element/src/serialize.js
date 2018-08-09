@@ -435,18 +435,19 @@ function getNormalStylePropertyValue( property, value ) {
 /**
  * Serializes a React element to string.
  *
- * @param {WPElement} element Element to serialize.
- * @param {?Object}   context Context object.
+ * @param {WPElement} element       Element to serialize.
+ * @param {?Object}   context       Context object.
+ * @param {?Object}   legacyContext Legacy context object.
  *
  * @return {string} Serialized element.
  */
-export function renderElement( element, context = {} ) {
+export function renderElement( element, context, legacyContext = {} ) {
 	if ( null === element || undefined === element || false === element ) {
 		return '';
 	}
 
 	if ( Array.isArray( element ) ) {
-		return renderChildren( element, context );
+		return renderChildren( element, context, legacyContext );
 	}
 
 	switch ( typeof element ) {
@@ -462,7 +463,7 @@ export function renderElement( element, context = {} ) {
 	switch ( tagName ) {
 		case StrictMode:
 		case Fragment:
-			return renderChildren( props.children, context );
+			return renderChildren( props.children, context, legacyContext );
 
 		case RawHTML:
 			const { children, ...wrapperProps } = props;
@@ -473,32 +474,32 @@ export function renderElement( element, context = {} ) {
 					...wrapperProps,
 					dangerouslySetInnerHTML: { __html: children },
 				},
-				context
+				context,
+				legacyContext
 			);
 	}
 
 	switch ( typeof tagName ) {
 		case 'string':
-			return renderNativeComponent( tagName, props, context );
+			return renderNativeComponent( tagName, props, context, legacyContext );
 
 		case 'function':
 			if ( tagName.prototype && typeof tagName.prototype.render === 'function' ) {
-				return renderComponent( tagName, props, context );
+				return renderComponent( tagName, props, context, legacyContext );
 			}
 
-			return renderElement( tagName( props, context ), context );
+			return renderElement( tagName( props, legacyContext ), context, legacyContext );
 		case 'object':
 			if ( tagName === null ) {
 				return;
 			}
 
 			if ( tagName._context && props.children ) {
-				tagName._context._currentValue = props.value;
-				return renderChildren( props.children, context );
+				return renderChildren( props.children, props.value, legacyContext );
 			}
 
 			if ( tagName._currentValue && isFunction( props.children ) ) {
-				return renderElement( props.children( tagName._currentValue ), context );
+				return renderElement( props.children( context || tagName._currentValue ), context, legacyContext );
 			}
 	}
 
@@ -508,27 +509,28 @@ export function renderElement( element, context = {} ) {
 /**
  * Serializes a native component type to string.
  *
- * @param {?string} type    Native component type to serialize, or null if
- *                          rendering as fragment of children content.
- * @param {Object}  props   Props object.
- * @param {?Object} context Context object.
+ * @param {?string} type          Native component type to serialize, or null if
+ *                                rendering as fragment of children content.
+ * @param {Object}  props         Props object.
+ * @param {?Object} context       Context object.
+ * @param {?Object} legacyContext Legacy context object.
  *
  * @return {string} Serialized element.
  */
-export function renderNativeComponent( type, props, context = {} ) {
+export function renderNativeComponent( type, props, context, legacyContext = {} ) {
 	let content = '';
 	if ( type === 'textarea' && props.hasOwnProperty( 'value' ) ) {
 		// Textarea children can be assigned as value prop. If it is, render in
 		// place of children. Ensure to omit so it is not assigned as attribute
 		// as well.
-		content = renderChildren( props.value, context );
+		content = renderChildren( props.value, context, legacyContext );
 		props = omit( props, 'value' );
 	} else if ( props.dangerouslySetInnerHTML &&
 			typeof props.dangerouslySetInnerHTML.__html === 'string' ) {
 		// Dangerous content is left unescaped.
 		content = props.dangerouslySetInnerHTML.__html;
 	} else if ( typeof props.children !== 'undefined' ) {
-		content = renderChildren( props.children, context );
+		content = renderChildren( props.children, context, legacyContext );
 	}
 
 	if ( ! type ) {
@@ -547,20 +549,21 @@ export function renderNativeComponent( type, props, context = {} ) {
 /**
  * Serializes a non-native component type to string.
  *
- * @param {Function} Component Component type to serialize.
- * @param {Object}   props     Props object.
- * @param {?Object}  context   Context object.
+ * @param {Function} Component     Component type to serialize.
+ * @param {Object}   props         Props object.
+ * @param {?Object}  context       Context object.
+ * @param {?Object}  legacyContext Legacy context object.
  *
  * @return {string} Serialized element
  */
-export function renderComponent( Component, props, context = {} ) {
-	const instance = new Component( props, context );
+export function renderComponent( Component, props, context, legacyContext = {} ) {
+	const instance = new Component( props, legacyContext );
 
 	if ( typeof instance.getChildContext === 'function' ) {
-		Object.assign( context, instance.getChildContext() );
+		Object.assign( legacyContext, instance.getChildContext() );
 	}
 
-	const html = renderElement( instance.render(), context );
+	const html = renderElement( instance.render(), context, legacyContext );
 
 	return html;
 }
@@ -568,12 +571,13 @@ export function renderComponent( Component, props, context = {} ) {
 /**
  * Serializes an array of children to string.
  *
- * @param {Array}   children Children to serialize.
- * @param {?Object} context  Context object.
+ * @param {Array}   children      Children to serialize.
+ * @param {?Object} context       Context object.
+ * @param {?Object} legacyContext Legacy context object.
  *
  * @return {string} Serialized children.
  */
-function renderChildren( children, context = {} ) {
+function renderChildren( children, context, legacyContext = {} ) {
 	let result = '';
 
 	children = castArray( children );
@@ -581,7 +585,7 @@ function renderChildren( children, context = {} ) {
 	for ( let i = 0; i < children.length; i++ ) {
 		const child = children[ i ];
 
-		result += renderElement( child, context );
+		result += renderElement( child, context, legacyContext );
 	}
 
 	return result;
