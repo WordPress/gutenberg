@@ -2,6 +2,7 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 
 ## 3.8.0
 
+ - `wp.components.withContext` has been removed. Please use `wp.element.createContext` instead. See: https://reactjs.org/docs/context.html.
  - `wp.coreBlocks.registerCoreBlocks` has been removed. Please use `wp.blockLibrary.registerCoreBlocks` instead.
 
 ## 3.7.0
@@ -20,7 +21,6 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
  - `wp.utils.mediaUpload` has been removed. Please use `wp.editor.mediaUpload` instead.
  - `wp.utils.preloadImage` has been removed.
  - `supports.wideAlign` has been removed from the Block API. Please use `supports.alignWide` instead.
- - `wp.components.withContext` has been removed. Please use `wp.element.createContext` instead. See: https://reactjs.org/docs/context.html.
 
 ## 3.5.0
 

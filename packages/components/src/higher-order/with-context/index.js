@@ -13,7 +13,7 @@ import deprecated from '@wordpress/deprecated';
 export default ( contextName ) => ( mapSettingsToProps ) => createHigherOrderComponent(
 	( OriginalComponent ) => {
 		deprecated( 'wp.components.withContext', {
-			version: '3.6',
+			version: '3.8',
 			alternative: 'wp.element.createContext',
 			plugin: 'Gutenberg',
 			hint: 'https://reactjs.org/docs/context.html',
