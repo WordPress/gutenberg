@@ -43,7 +43,6 @@ export const settings = {
 
 		return (
 			<View style={ styles.unsupportedBlock }>
-				<View style={ styles.unsupportedBlockImagePlaceholder }></View>
 				<Text style={ styles.unsupportedBlockName }>{ blockName }</Text>
 				<Text style={ styles.unsupportedBlockMessage }>Unsupported</Text>
 			</View>

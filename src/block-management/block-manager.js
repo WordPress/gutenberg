@@ -12,9 +12,14 @@ import { ToolbarButton } from './constants';
 import type { BlockType } from '../store/';
 
 import styles from './block-manager.scss';
+import holderStyles from './block-holder.scss';
 
 // Gutenberg imports
-import { getBlockType, serialize } from '@wordpress/blocks';
+import { 
+	createBlock,
+	getBlockType, 
+	serialize
+} from '@wordpress/blocks';
 import { getUnknownTypeHandlerName } from '@wordpress/blocks';
 
 export type BlockListType = {
@@ -170,6 +175,23 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	renderItem( value: { item: BlockType, uid: string } ) {
+
+		const blockType = getBlockType( value.item.name );
+
+		if (!blockType) {
+			const unsupportedBlockName = getUnknownTypeHandlerName();
+			const unsupportedBlockType = getBlockType( unsupportedBlockName );
+			const Block = unsupportedBlockType.edit
+
+			return (
+				<View style={ holderStyles.blockContainer }>
+					<Block
+						attributes={ { ...value.item.attributes, title: value.item.name } }
+					/>
+				</View>
+			);
+		}
+
 		return (
 			<BlockHolder
 				onToolbarButtonPressed={ this.onToolbarButtonPressed.bind( this ) }

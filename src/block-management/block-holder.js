@@ -6,7 +6,6 @@
 import React from 'react';
 import { View, Text, TouchableWithoutFeedback } from 'react-native';
 import RCTAztecView from 'react-native-aztec';
-import * as unsupportedBlock from '../block-types/unsupported-block.js';
 import Toolbar from './toolbar';
 
 import type { BlockType } from '../store/';

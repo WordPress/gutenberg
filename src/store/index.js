@@ -14,7 +14,7 @@ import {
 import { createStore } from 'redux';
 import { reducer } from './reducers';
 
-import * as unknownBlock from '../block-types/unsupported-block.js';
+import * as UnknownBlock from '../block-types/unsupported-block.js';
 
 export type BlockType = {
 	uid: string,
@@ -31,8 +31,8 @@ export type StateType = {
 };
 
 registerCoreBlocks();
-registerBlockType( unknownBlock.name, unknownBlock.settings );
-setUnknownTypeHandlerName( unknownBlock.name );
+registerBlockType( UnknownBlock.name, UnknownBlock.settings );
+setUnknownTypeHandlerName( UnknownBlock.name );
 
 const initialCodeBlockHtml = `
 <!-- wp:code -->
