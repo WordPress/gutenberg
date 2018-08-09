@@ -555,6 +555,7 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-i18n',
 			'wp-keycodes',
 			'wp-plugins',
+			'wp-tinymce',
 			'wp-viewport',
 		),
 		filemtime( gutenberg_dir_path() . 'build/edit-post/index.js' ),

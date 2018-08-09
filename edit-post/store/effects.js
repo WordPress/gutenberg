@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { reduce, some } from 'lodash';
+import tinymce from 'tinymce';
 
 /**
  * WordPress dependencies
@@ -44,6 +45,9 @@ const effects = {
 			}
 		} );
 
+		// Saves the wp_editor fields
+		tinymce.triggerSave();
+
 		// Initialize metaboxes state
 		const dataPerLocation = reduce( action.metaBoxes, ( memo, isActive, location ) => {
 			if ( isActive ) {
@@ -73,6 +77,9 @@ const effects = {
 		} );
 	},
 	REQUEST_META_BOX_UPDATES( action, store ) {
+		// Saves the wp_editor fields
+		tinymce.triggerSave();
+
 		const state = store.getState();
 		const dataPerLocation = reduce( getMetaBoxes( state ), ( memo, metabox, location ) => {
 			if ( metabox.isActive ) {
