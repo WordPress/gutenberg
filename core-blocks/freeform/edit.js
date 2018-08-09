@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { BACKSPACE, DELETE, F10 } from '@wordpress/keycodes';
 
 /**
@@ -114,7 +114,7 @@ export default class FreeformEdit extends Component {
 		} );
 
 		editor.addButton( 'kitchensink', {
-			tooltip: __( 'More' ),
+			tooltip: _x( 'More', 'button to expand options' ),
 			icon: 'dashicon dashicons-editor-kitchensink',
 			onClick: function() {
 				const button = this;

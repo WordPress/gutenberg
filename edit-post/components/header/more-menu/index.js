@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { IconButton, Dropdown, MenuGroup } from '@wordpress/components';
 
 /**
@@ -20,7 +20,7 @@ const MoreMenu = () => (
 		renderToggle={ ( { isOpen, onToggle } ) => (
 			<IconButton
 				icon="ellipsis"
-				label={ __( 'More' ) }
+				label={ _x( 'More', 'button to expand options' ) }
 				onClick={ onToggle }
 				aria-expanded={ isOpen }
 			/>
