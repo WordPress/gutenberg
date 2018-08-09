@@ -14,6 +14,7 @@ import {
 	Placeholder,
 	ServerSideRender,
 	Toolbar,
+	withNotices,
 	CheckboxControl,
 	PanelBody,
 	SelectControl,
@@ -21,10 +22,12 @@ import {
 import { Component, Fragment } from '@wordpress/element';
 import {
 	InspectorControls,
-	MediaUpload,
+	MediaPlaceholder,
 	BlockControls,
-	editorMediaUpload,
+	MediaUpload,
 } from '@wordpress/editor';
+
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -42,6 +45,7 @@ class PlaylistEdit extends Component {
 		// check for if ids is set to determine edit state
 		this.state = {
 			isEditing: ! this.props.attributes.ids,
+			hasError: false,
 		};
 	}
 
@@ -54,8 +58,8 @@ class PlaylistEdit extends Component {
 	}
 
 	onUploadFiles( files ) {
-		const { setAttributes } = this.props;
-		editorMediaUpload( {
+		const { setAttributes, noticeOperations } = this.props;
+		MediaUpload( {
 			allowedType: [ 'audio', 'video' ],
 			filesList: files,
 			onFileChange: ( media ) => {
@@ -63,13 +67,14 @@ class PlaylistEdit extends Component {
 				const isConsistentType = !! firstType && every( files, ( filesMedia ) => filesMedia.mimeType === firstType );
 				//validate type is consistent for playlist
 				if ( ! isConsistentType ) {
-					console.log( 'I cannot let you do that. Error notice will go here.' );
+					this.setState( { hasError: true } );
+					noticeOperations.createErrorNotice( 'CANNOT DO THAT' );
 					setAttributes( { ids: null, type: null } );
 				} else if ( media.length > 0 && media[ 0 ].mimeType ) {
 					const type = media[ 0 ].mimeType.split( '/' )[ 0 ];
 					const ids = JSON.stringify( media.map( ( item ) => item.id ) );
 					setAttributes( { ids, type } );
-					this.setState( { isEditing: false } );
+					this.setState( { isEditing: false, hasError: false } );
 				}
 			},
 		} );
@@ -82,8 +87,8 @@ class PlaylistEdit extends Component {
 	}
 
 	render() {
-		const { attributes, setAttributes, className } = this.props;
-		const { isEditing } = this.state;
+		const { attributes, setAttributes, className, noticeUI, noticeOperations } = this.props;
+		const { isEditing, hasError } = this.state;
 		const { tracklist, showTrackNumbers, showArtists, images, style, type } = attributes;
 
 		const onSelectMedia = ( media ) => {
@@ -96,6 +101,24 @@ class PlaylistEdit extends Component {
 		};
 
 		const mediaIds = this.props.attributes.ids && this.props.attributes.ids.replace( /^\[(.+)\]$/, '$1' ).split( ',' );
+
+		if ( hasError ) {
+			return (
+				<MediaPlaceholder
+					icon="format-audio"
+					labels={ {
+						title: __( 'Media' ),
+						name: __( 'a media' ),
+					} }
+					className={ className }
+					onSelect={ this.onSelectImage }
+					notices={ noticeUI }
+					onError={ noticeOperations.createErrorNotice }
+					accept="audio/*,video/*"
+					type="audio,video"
+				/>
+			);
+		}
 
 		if ( isEditing ) {
 			return (
@@ -118,6 +141,7 @@ class PlaylistEdit extends Component {
 						type={ type }
 						multiple
 						playlist
+						notices={ this.props.noticeUI }
 						value={ mediaIds }
 						render={ ( { open } ) => (
 							<IconButton
@@ -200,4 +224,6 @@ class PlaylistEdit extends Component {
 	}
 }
 
-export default PlaylistEdit;
+export default compose( [
+	withNotices,
+] )( PlaylistEdit );
