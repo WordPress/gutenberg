@@ -48,7 +48,9 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 	}
 
 	getBlockForType() {
-		const blockType = this.getBlockType( this.props.name );
+		// Since unsupported blocks are handled in block-manager.js, at this point the block should definitely
+		// be supported.
+		const blockType = getBlockType( this.props.name );
 		const Block = blockType.edit;
 
 		let style;
@@ -68,8 +70,6 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 				style={ style }
 			/>
 		);
-
-		return this.getBlockForUnsupportedType();
 	}
 
 	getBlockType( blockName ) {
