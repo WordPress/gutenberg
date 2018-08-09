@@ -91,8 +91,8 @@
 	},
 	{
 		"title": "Patterns",
-		"slug": "patterns",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/design/patterns.md",
+		"slug": "design-patterns",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/design/design-patterns.md",
 		"parent": "design"
 	},
 	{
@@ -103,8 +103,8 @@
 	},
 	{
 		"title": "Resources",
-		"slug": "resources",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/design/resources.md",
+		"slug": "design-resources",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/design/design-resources.md",
 		"parent": "design"
 	},
 	{
