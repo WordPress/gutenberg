@@ -127,6 +127,8 @@ If you're publishing a new package, ensure that its `package.json` file contains
 	}
 ```
 
+You can double check it by executing `npm run lint-pkg-json` command.
+
 ### Development release
 
 Run the following command to release a dev version of the outdated packages, replacing "123456" with your 2FA code. Make sure you're using a freshly generated 2FA code, rather than one that's about to timeout. This is a little cumbersome, but helps to prevent the release process from dying mid-deploy.
@@ -147,7 +149,12 @@ To release a production version for the outdated packages, run the following com
 NPM_CONFIG_OTP=123456 npm run publish:prod
 ```
 
-Choose the correct version (minor, major or patch) and confirm your choices and let Lerna do its magic.
+Choose the correct version (`major`, `minor` or `patch`) according to the following guidelines:
+- Major version X (X.y.z | X > 0) should be bumped on any backwards-incompatible change. This will usually occur at the final removal of the feature. The deprecation should be fully backwards-compatible and, if it is not, it should warrant a separate major version bump.
+- Minor version Y (x.Y.z | x > 0) update should be selected when you add functionality in a backwards-compatible manner. It must be incremented if any public API functionality is marked as deprecated.
+- Patch version Z (x.y.Z | x > 0) should be incremented when you make backwards-compatible bug fixes.
+
+When in doubt, refer to [Semantic Versioning specification](https://semver.org/). Confirm all your choices and let Lerna do its magic.
 
 ## How Designers Can Contribute
 
