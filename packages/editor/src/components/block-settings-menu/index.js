@@ -40,6 +40,14 @@ const shortcuts = {
 		raw: rawShortcut.primaryAlt( 'backspace' ),
 		display: displayShortcut.primaryAlt( 'bksp' ),
 	},
+	insertBefore: {
+		raw: rawShortcut.primaryAlt( 'b' ),
+		display: displayShortcut.primaryShift( 'b' ),
+	},
+	insertAfter: {
+		raw: rawShortcut.primaryAlt( 'a' ),
+		display: displayShortcut.primaryAlt( 'a' ),
+	},
 };
 
 export class BlockSettingsMenu extends Component {
@@ -94,6 +102,11 @@ export class BlockSettingsMenu extends Component {
 						// Does not clash with any known browser/native shortcuts, but preventDefault
 						// is used to prevent any obscure unknown shortcuts from triggering
 						[ shortcuts.removeBlock.raw ]: flow( preventDefault, onRemove ),
+
+						// There are no known clashes for these shortcuts, but prevent obscure unknown
+						// behaviour using preventDefault.
+						[ shortcuts.insertBefore.raw ]: flow( preventDefault, onInsertBefore ),
+						[ shortcuts.insertAfter.raw ]: flow( preventDefault, onInsertAfter ),
 					} }
 				/>
 				<Dropdown
@@ -152,6 +165,7 @@ export class BlockSettingsMenu extends Component {
 								className="editor-block-settings-menu__control"
 								onClick={ onInsertBefore }
 								icon="insert-before"
+								shortcut={ shortcuts.insertBefore.display }
 							>
 								{ __( 'Insert Before' ) }
 							</MenuItem>
@@ -159,6 +173,7 @@ export class BlockSettingsMenu extends Component {
 								className="editor-block-settings-menu__control"
 								onClick={ onInsertAfter }
 								icon="insert-after"
+								shortcut={ shortcuts.insertAfter.display }
 							>
 								{ __( 'Insert After' ) }
 							</MenuItem>
