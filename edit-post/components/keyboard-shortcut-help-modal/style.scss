@@ -18,7 +18,7 @@
 		display: flex;
 		align-items: center;
 		padding: 0.6rem 0;
-		border-top: 1px solid $light-gray-500;;
+		border-top: 1px solid $light-gray-500;
 
 		&:last-child {
 			border-bottom: 1px solid $light-gray-500;
@@ -45,9 +45,9 @@
 	}
 
 	&__shortcut-key {
-		padding: .25rem .5rem;
+		padding: 0.25rem 0.5rem;
 		border-radius: 8%;
-		margin: 0 .2rem 0 .2rem;
+		margin: 0 0.2rem 0 0.2rem;
 
 		&:last-child {
 			margin: 0 0 0 0.2rem;
