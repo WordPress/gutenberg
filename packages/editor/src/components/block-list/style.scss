@@ -31,21 +31,21 @@
 	z-index: z-index(".editor-block-list__block-draggable");
 
 	> .editor-block-list__block-draggable-inner {
-		// visibility: hidden;
+		visibility: hidden;
 
 		// Use opacity to work in various editor styles.
 		background-color: $dark-opacity-light-200;
-		background-color: red;
+		// background-color: red;
 
 		.is-dark-theme & {
 			background-color: $light-opacity-light-200;
-			background-color: blue;
+			// background-color: blue;
 		}
 	}
 
 	&.is-visible > .editor-block-list__block-draggable-inner {
 		visibility: visible;
-		background-color: green;
+		// background-color: green;
 	}
 
 	cursor: move; // Fallback for IE/Edge < 14
