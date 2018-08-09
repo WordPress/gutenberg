@@ -154,21 +154,23 @@ describe( 'state', () => {
 		} );
 	} );
 
-	it( 'should set the activeModal to the provided name', () => {
-		const state = activeModal( null, {
-			type: 'OPEN_MODAL',
-			name: 'test-modal',
+	describe( 'activeModal', () => {
+		it( 'should set the activeModal to the provided name', () => {
+			const state = activeModal( null, {
+				type: 'OPEN_MODAL',
+				name: 'test-modal',
+			} );
+
+			expect( state ).toEqual( 'test-modal' );
 		} );
 
-		expect( state ).toEqual( 'test-modal' );
-	} );
+		it( 'should set the activeModal to null', () => {
+			const state = activeModal( 'test-modal', {
+				type: 'CLOSE_MODAL',
+			} );
 
-	it( 'should set the activeModal to null', () => {
-		const state = activeModal( 'test-modal', {
-			type: 'CLOSE_MODAL',
+			expect( state ).toBeNull();
 		} );
-
-		expect( state ).toBeNull();
 	} );
 
 	describe( 'isSavingMetaBoxes', () => {
