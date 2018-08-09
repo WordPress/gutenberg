@@ -119,12 +119,6 @@ export class BlockSettingsMenu extends Component {
 						<NavigableMenu className="editor-block-settings-menu__content">
 							<_BlockSettingsMenuFirstItem.Slot fillProps={ { onClose } } />
 							{ count === 1 && (
-								<BlockModeToggle
-									clientId={ firstBlockClientId }
-									onToggle={ onClose }
-								/>
-							) }
-							{ count === 1 && (
 								<BlockUnknownConvertButton
 									clientId={ firstBlockClientId }
 								/>
@@ -151,6 +145,12 @@ export class BlockSettingsMenu extends Component {
 								/>
 							) }
 							<_BlockSettingsMenuPluginsExtension.Slot fillProps={ { clientIds, onClose } } />
+							{ count === 1 && (
+								<BlockModeToggle
+									clientId={ firstBlockClientId }
+									onToggle={ onClose }
+								/>
+							) }
 							<div className="editor-block-settings-menu__separator" />
 							{ count === 1 && (
 								<ReusableBlockDeleteButton
