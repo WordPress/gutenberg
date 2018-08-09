@@ -2,6 +2,7 @@
 .editor-rich-text {
 	// This is needed to position the formatting toolbar.
 	position: relative;
+	overflow:hidden; 
 }
 
 .editor-rich-text__tinymce {
