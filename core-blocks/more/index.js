@@ -6,7 +6,7 @@ import { compact } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { RawHTML } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 
@@ -18,7 +18,7 @@ import edit from './edit';
 export const name = 'core/more';
 
 export const settings = {
-	title: __( 'More' ),
+	title: _x( 'More', 'block name' ),
 
 	description: __( 'Want to show only part of this post on your blog’s home page? Insert a "More" block where you want the split.' ),
 
