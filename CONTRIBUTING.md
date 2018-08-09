@@ -109,13 +109,63 @@ The workflow is documented in greater detail in the [repository management](./do
 
 Gutenberg contains both PHP and JavaScript code, and encourages testing and code style linting for both. It also incorporates end-to-end testing using [Google Puppeteer](https://developers.google.com/web/tools/puppeteer/). You can find out more details in [Testing Overview document](./docs/reference/testing-overview.md).
 
-## Releasing packages
+## Managing packages
 
-This repository uses [lerna](https://lernajs.io) to manage Gutenberg modules and publish them as packages to `npm`. Lerna automatically releases all the outdated packages. To check which packages are outdated and will be released, type `npm run publish:check`.
+This repository uses [lerna](https://lernajs.io) to manage Gutenberg modules and publish them as packages to `npm`. 
+
+### Creating new package
+
+When creating a new package you need to provide at least the following:
+
+1. `package.json` based on the template:
+	```json
+	{
+		"name": "@wordpress/package-name",
+		"version": "1.0.0-beta.0",
+		"description": "Package description.",
+		"author": "The WordPress Contributors",
+		"license": "GPL-2.0-or-later",
+		"keywords": [
+			"wordpress"
+		],
+		"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/package-name/README.md",
+		"repository": {
+			"type": "git",
+			"url": "https://github.com/WordPress/gutenberg.git"
+		},
+		"bugs": {
+			"url": "https://github.com/WordPress/gutenberg/issues"
+		},
+		"main": "build/index.js",
+		"module": "build-module/index.js",
+		"dependencies": {
+			"@babel/runtime-corejs2": "7.0.0-beta.56"
+		},
+		"publishConfig": {
+			"access": "public"
+		}
+	}
+	```
+	It assumes that code is goind to be located in `src` folder and will be transpiled with `Babel`.
+2. `.npmrc` file which disables creating `package-lock.json` file for the package:
+	```
+	package-lock=false
+	```
+3. `README.md` file containing at least:
+	- Package name.
+	- Package description.
+	- Installation details.
+	- Usage example.
+	- `Code is Poetry` logo.
+
+
+### Releasing packages
+
+Lerna automatically releases all the outdated packages. To check which packages are outdated and will be released, type `npm run publish:check`.
 
 If you have the ability to publish packages, you _must_ have [2FA enabled](https://docs.npmjs.com/getting-started/using-two-factor-authentication) on your npmjs.com account.
 
-### Before releasing
+#### Before releasing
 
 Confirm that you're logged into `npm`, by running `npm whoami`. If you're not logged in, run `npm adduser` to login.
 
@@ -129,7 +179,7 @@ If you're publishing a new package, ensure that its `package.json` file contains
 
 You can double check it by executing `npm run lint-pkg-json` command.
 
-### Development release
+#### Development release
 
 Run the following command to release a dev version of the outdated packages, replacing "123456" with your 2FA code. Make sure you're using a freshly generated 2FA code, rather than one that's about to timeout. This is a little cumbersome, but helps to prevent the release process from dying mid-deploy.
 
@@ -141,7 +191,7 @@ Lerna will ask you which version number you want to choose for each package. For
 
 Lerna will then publish to `npm`, commit the `package.json` changes and create the git tags.
 
-### Production release
+#### Production release
 
 To release a production version for the outdated packages, run the following command, replacing "123456" with your (freshly generated, as above) 2FA code:
 
