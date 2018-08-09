@@ -49,52 +49,39 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 	}
 
 	getBlockForType() {
-		/*
-		if (!isSupported( this.props.name )) {
-			return <UnsupportedBlock />
-		}
-		*/
-
-		const blockType = getBlockType( this.props.name );
-
-		if ( blockType ) {
-			const Block = blockType.edit;
-
-			let style;
-			if ( blockType.name === 'core/code' ) {
-				style = styles.block_code;
-			} else if ( blockType.name === 'core/paragraph' ) {
-				style = styles[ 'aztec_editor' ];
-			}
-
-			// TODO: setAttributes needs to change the state/attributes
-			return (
-				<Block
-					attributes={ { ...this.props.attributes } }
-					// pass a curried version of onChanged with just one argument
-					setAttributes={ ( attrs ) => this.props.onChange( this.props.uid, { ...this.props.attributes, ...attrs } ) }
-					isSelected={ this.props.focused }
-					style={ style }
-				/>
-			);
-		}
-
-		return this.getBlockForUnsupportedType();
-	}
-
-	getBlockForUnsupportedType() {
-		const fallbackBlockName = getUnknownTypeHandlerName();
-		const blockType = getBlockType( fallbackBlockName );
+		const blockType = this.getBlockType( this.props.name );
 		const Block = blockType.edit;
 
+		let style;
+		if ( blockType.name === 'core/code' ) {
+			style = styles.block_code;
+		} else if ( blockType.name === 'core/paragraph' ) {
+			style = styles[ 'aztec_editor' ];
+		}
+
+		// TODO: setAttributes needs to change the state/attributes
 		return (
 			<Block
 				attributes={ { ...this.props.attributes } }
 				// pass a curried version of onChanged with just one argument
-				setAttributes={ ( attrs ) => this.props.onChange( this.props.uid, attrs ) }
+				setAttributes={ ( attrs ) => this.props.onChange( this.props.uid, { ...this.props.attributes, ...attrs } ) }
 				isSelected={ this.props.focused }
+				style={ style }
 			/>
 		);
+
+		return this.getBlockForUnsupportedType();
+	}
+
+	getBlockType( blockName ) {
+		var blockType = getBlockType( blockName );
+
+		if ( !blockType ) {
+			const fallbackBlockName = getUnknownTypeHandlerName();
+			blockType = getBlockType( fallbackBlockName );
+		}
+
+		return blockType
 	}
 
 	render() {

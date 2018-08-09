@@ -48,9 +48,7 @@ export const settings = {
 		);
 	},
 
-	save( { attributes }: Object ) {
-		const { content } = attributes;
-
-		return <RawHTML>{ content }</RawHTML>;
+	save( { attributes } ) {
+		return <RawHTML>{ attributes.content }</RawHTML>;
 	},
 };

@@ -15,6 +15,7 @@ import styles from './block-manager.scss';
 
 // Gutenberg imports
 import { getBlockType, serialize } from '@wordpress/blocks';
+import { getUnknownTypeHandlerName } from '@wordpress/blocks';
 
 export type BlockListType = {
 	onChange: ( uid: string, attributes: mixed ) => void,
@@ -82,14 +83,24 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	serializeToHtml() {
 		return this.props.blocks
 			.map( ( block ) => {
-				const blockType = getBlockType( block.name );
-				if ( blockType ) {
-					return serialize( [ block ] ) + '\n\n';
-				} else if ( block.name === 'aztec' ) {
+
+				if ( block.name === 'aztec' ) {
 					return '<aztec>' + block.attributes.content + '</aztec>\n\n';
 				}
 
-				return blockType.save();
+				return serialize( [ block ] ) + '\n\n';
+/*
+				const blockType = getBlockType( block.name );
+
+				if ( blockType ) {
+					return serialize( [ block ] ) + '\n\n';
+				} else 
+
+				const fallbackBlockName = getUnknownTypeHandlerName();
+				const unsupportedBlockType = getBlockType( fallbackBlockName );
+
+				return serialize( [ block ] ) + '\n\n'; // unsupportedBlockType.save( block.attributes );
+*/
 			} )
 			.reduce( ( prevVal, value ) => {
 				return prevVal + value;
