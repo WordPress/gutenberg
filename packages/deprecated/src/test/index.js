@@ -2,6 +2,10 @@
  * Internal dependencies
  */
 import deprecated, { logged } from '../';
+/**
+ * WordPress dependencies
+ */
+import { didAction } from '@wordpress/hooks';
 
 describe( 'deprecated', () => {
 	afterEach( () => {
@@ -79,5 +83,12 @@ describe( 'deprecated', () => {
 		expect( console ).toHaveWarned();
 		// eslint-disable-next-line no-console
 		expect( console.warn ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'should do an action', () => {
+		deprecated( 'pork' );
+
+		expect( didAction( 'wp.deprecated' ) ).toBeTrue();
+
 	} );
 } );
