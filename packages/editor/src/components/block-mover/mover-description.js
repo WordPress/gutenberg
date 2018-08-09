@@ -32,12 +32,11 @@ export function getBlockMoverDescription( selectedCount, type, firstIndex, isFir
 	if ( dir > 0 && ! isLast ) {
 		// moving down
 		return sprintf(
-			__( 'Move %(type)s block from position %(position)d down to position %(newPosition)d' ),
-			{
-				type,
-				position,
-				newPosition: ( position + 1 ),
-			}
+			// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block, 3: New position
+			__( 'Move %1$s block from position %2$d down to position %3$d' ),
+			type,
+			position,
+			( position + 1 )
 		);
 	}
 
@@ -50,12 +49,11 @@ export function getBlockMoverDescription( selectedCount, type, firstIndex, isFir
 	if ( dir < 0 && ! isFirst ) {
 		// moving up
 		return sprintf(
-			__( 'Move %(type)s block from position %(position)d up to position %(newPosition)d' ),
-			{
-				type,
-				position,
-				newPosition: ( position - 1 ),
-			}
+			// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block, 3: New position
+			__( 'Move %1$s block from position %2$d up to position %3$d' ),
+			type,
+			position,
+			( position - 1 )
 		);
 	}
 
@@ -91,21 +89,19 @@ export function getMultiBlockMoverDescription( selectedCount, firstIndex, isFirs
 
 	if ( dir < 0 && ! isFirst ) {
 		return sprintf(
-			__( 'Move %(selectedCount)d blocks from position %(position)d up by one place' ),
-			{
-				selectedCount,
-				position,
-			}
+			// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block
+			__( 'Move %1$d blocks from position %2$d up by one place' ),
+			selectedCount,
+			position
 		);
 	}
 
 	if ( dir > 0 && ! isLast ) {
 		return sprintf(
-			__( 'Move %(selectedCount)d blocks from position %(position)s down by one place' ),
-			{
-				selectedCount,
-				position,
-			}
+			// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block
+			__( 'Move %1$d blocks from position %2$s down by one place' ),
+			selectedCount,
+			position
 		);
 	}
 }
