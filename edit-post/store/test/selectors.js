@@ -145,9 +145,7 @@ describe( 'selectors', () => {
 
 		it( 'returns false if the preferences activeModal property is null', () => {
 			const state = {
-				preferences: {
-					activeModal: null,
-				},
+				activeModal: null,
 			};
 
 			expect( isModalActive( state, 'test-modal' ) ).toBe( false );
