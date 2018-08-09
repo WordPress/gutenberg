@@ -307,11 +307,3 @@ async function acceptPageDialog( dialog ) {
 export function enablePageDialogAccept() {
 	page.on( 'dialog', acceptPageDialog );
 }
-
-/**
- * Disables even listener which accepts a page dialog which
- * may appear when navigating away from Gutenberg.
- */
-export function disablePageDialogAccept() {
-	page.removeListener( 'dialog', acceptPageDialog );
-}
