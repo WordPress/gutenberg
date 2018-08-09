@@ -203,8 +203,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 					multiline
 					numberOfLines={ 0 }
 					style={ styles.htmlView }
-					onChangeText={ ( html ) => this.html = html }
-				>
+					onChangeText={ ( html ) => this.html = html }>
 					{ this.html }
 				</TextInput>
 			</KeyboardAvoidingView>
