@@ -10,8 +10,9 @@ import {
 } from '../store/actions';
 import MainApp from './MainApp';
 
-const mapStateToProps = ( state ) => ( {
+const mapStateToProps = ( state, parser ) => ( {
 	...state,
+	parser: parser
 } );
 
 const mapDispatchToProps = ( dispatch, ownProps ) => {
@@ -32,8 +33,8 @@ const mapDispatchToProps = ( dispatch, ownProps ) => {
 		deleteBlockAction: ( uid ) => {
 			dispatch( deleteBlockAction( uid ) );
 		},
-		parseBlocksAction: ( html ) => {
-			dispatch( parseBlocksAction( html ));
+		parseBlocksAction: ( html, parser ) => {
+			dispatch( parseBlocksAction( html, parser ));
 		}
 
 	};

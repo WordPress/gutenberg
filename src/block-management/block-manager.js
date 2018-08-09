@@ -22,10 +22,11 @@ export type BlockListType = {
 	moveBlockUpAction: string => mixed,
 	moveBlockDownAction: string => mixed,
 	deleteBlockAction: string => mixed,
-	parseBlocksAction: string => mixed,
+	parseBlocksAction: string => mixed => mixed,
 	blocks: Array<BlockType>,
 	aztechtml: string,
 	refresh: boolean,
+	parser: mixed,
 };
 
 type PropsType = BlockListType;
@@ -87,7 +88,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	serializeToHtml() {
-		const parsedHTML = this.props.blocks
+		return this.props.blocks
 			.map( ( block ) => {
 				const blockType = getBlockType( block.name );
 				if ( blockType ) {
@@ -101,12 +102,15 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			.reduce( ( prevVal, value ) => {
 				return prevVal + value;
 			}, '' );
-		this.html = parsedHTML
 	}
 
 	parseHTML() {
-		const html = this.html
-		this.props.parseBlocksAction(html)
+		const {
+			parser, 
+			parseBlocksAction
+		} = this.props
+
+		parseBlocksAction(this.html, parser)
 	}
 
 	componentDidUpdate() {
@@ -164,7 +168,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 						value={ this.state.showHtml }
 						onValueChange={ ( value ) => {
 							if (value) {
-								this.serializeToHtml()
+								this.html = this.serializeToHtml()
 							} else {
 								this.parseHTML()
 							}

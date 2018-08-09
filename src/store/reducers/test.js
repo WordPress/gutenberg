@@ -156,5 +156,13 @@ describe( 'Store', () => {
 			// the code block should be at the bottom
 			expect( newState.blocks[ 1 ].blockType ).toEqual( 'core/code' );
 		} );
+
+		it( 'should call parse function on parseBlocksAction with the given html', () => {
+			registerCoreBlocks()
+			const html = 'text'
+			const parser = jest.fn()
+			const newState = reducer( initialState, actions.parseBlocksAction( html, parser ) );
+			expect( parser ).toBeCalledWith(html)
+		})
 	} );
 } );
