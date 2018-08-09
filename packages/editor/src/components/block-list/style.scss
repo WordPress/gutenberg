@@ -48,35 +48,12 @@
 			background-color: $light-opacity-light-200;
 			background-color: blue;
 		}
-
-		@include break-small {
-			margin: 0 48px;
-		}
 	}
 
 	&.is-visible > .editor-block-list__block-draggable-inner {
 		visibility: visible;
 		background-color: green;
 	}
-
-	@include break-small {
-		// use a wider available space for hovering/selecting/dragging on top level blocks
-		left: -$parent-block-padding - $block-padding;
-		right: -$parent-block-padding - $block-padding;
-
-		// use smaller space for hovering/selecting/dragging on child blocks
-		.editor-block-list__layout & {
-			left: 0;
-			right: 0;
-		}
-
-		// Full width blocks don't have the place to expand on the side
-		.editor-block-list__block[data-align="full"] & {
-			left: 0;
-			right: 0;
-		}
-	}
-
 
 	cursor: move; // Fallback for IE/Edge < 14
 	cursor: grab;
