@@ -30,9 +30,11 @@
 	}
 }
 
-.editor-block-switcher__popover .components-popover__content {
-	width: 300px;
+.components-popover:not(.is-mobile).editor-block-switcher__popover .components-popover__content {
+	min-width: 320px;
+}
 
+.editor-block-switcher__popover .components-popover__content {
 	@include break-medium {
 		position: relative;
 
