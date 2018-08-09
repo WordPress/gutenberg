@@ -33,16 +33,26 @@ class MaybeTagsPanel extends Component {
 	constructor( props ) {
 		super( props );
 		this.state = {
-			hadTags: props.hasTags,
+			hadTagsWhenOpeningThePanel: props.hasTags,
 		};
 	}
 
+	/*
+	 * We only want to show the tag panel if the post didn't have
+	 * any tags when the user hit the Publish button.
+	 *
+	 * We can't use the prop.hasTags because it'll change to true
+	 * if the user adds a new tag within the pre-publish panel.
+	 * This would force a re-render and a new prop.hasTags check,
+	 * hiding this panel and keeping the user from adding
+	 * more than one tag.
+	 */
 	render() {
-		if ( this.state.hadTags ) {
-			return null;
+		if ( ! this.state.hadTagsWhenOpeningThePanel ) {
+			return <TagsPanel />;
 		}
 
-		return <TagsPanel />;
+		return null;
 	}
 }
 
