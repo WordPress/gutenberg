@@ -115,8 +115,12 @@ function buildPackageScss( packagePath ) {
 		return;
 	}
 
-	const outputFile = path.resolve( packagePath, BUILD_DIR.style, 'style.css' );
-	const outputFileRTL = path.resolve( packagePath, BUILD_DIR.style, 'style-rtl.css' );
+	buildScssFile( styleFile );
+}
+
+function buildScssFile( styleFile ) {
+	const outputFile = getBuildPath( styleFile, BUILD_DIR.style );
+	const outputFileRTL = getBuildPath( styleFile.replace( '.scss', '-rtl.scss' ), BUILD_DIR.style );
 	mkdirp.sync( path.dirname( outputFile ) );
 	const builtSass = sass.renderSync( {
 		file: styleFile,
@@ -203,8 +207,10 @@ function buildPackage( packagePath ) {
 	// Build js files individually.
 	jsFiles.forEach( ( file ) => buildJsFile( file, true ) );
 
-	// Build entire package scss.
-	buildPackageScss( packagePath );
+	const scssFiles = glob.sync( `${ srcDir }/*.scss` );
+
+	// Build scss files individually.
+	scssFiles.forEach( buildScssFile );
 
 	process.stdout.write( `${ DONE }\n` );
 }
