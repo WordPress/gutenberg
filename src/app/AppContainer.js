@@ -10,9 +10,8 @@ import {
 } from '../store/actions';
 import MainApp from './MainApp';
 
-const mapStateToProps = ( state, parser ) => ( {
+const mapStateToProps = ( state ) => ( {
 	...state,
-	parser: parser,
 } );
 
 const mapDispatchToProps = ( dispatch, ownProps ) => {
