@@ -37,13 +37,15 @@ export const settings = {
 	transforms: {
 	},
 
-	edit() {
+	edit( { attributes }) {
+
+		let blockName = attributes.title.charAt(0).toUpperCase() + attributes.title.slice(1);
+
 		return (
-			<View style={ styles.blockHolder }>
-				<View style={ styles.blockTitle }>
-					<Text>Unsupported BlockType</Text>
-				</View>
-				<View style={{backgroundColor: 'red', flex: 0.5}} />
+			<View style={ styles.unsupportedBlock }>
+				<View style={ styles.unsupportedBlockImagePlaceholder }></View>
+				<Text style={ styles.unsupportedBlockName }>{ blockName }</Text>
+				<Text style={ styles.unsupportedBlockMessage }>Unsupported</Text>
 			</View>
 		);
 	},
