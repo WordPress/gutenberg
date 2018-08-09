@@ -1,4 +1,4 @@
-# Design Resources
+# Resources
 
 The [SketchPress](https://github.com/10up/SketchPress) project includes a library of Gutenberg design components, and is incredibly helpful for designing and prototyping Gutenberg and Gutenberg blocks:
 
