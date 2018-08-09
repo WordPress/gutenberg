@@ -228,6 +228,19 @@ const CSS_PROPERTIES_SUPPORTS_UNITLESS = new Set( [
 ] );
 
 /**
+ * Regular expression matching invalid attribute names.
+ *
+ * "Attribute names must consist of one or more characters other than controls,
+ * U+0020 SPACE, U+0022 ("), U+0027 ('), U+003E (>), U+002F (/), U+003D (=),
+ * and noncharacters."
+ *
+ * @link https://html.spec.whatwg.org/multipage/syntax.html#attributes-2
+ *
+ * @type {RegExp}
+ */
+const REGEXP_INVALID_ATTRIBUTE_NAME = /[\u007F-\u009F "'>/="\uFDD0-\uFDEF]/;
+
+/**
  * Returns a string with ampersands escaped. Note that this is an imperfect
  * implementation, where only ampersands which do not appear as a pattern of
  * named, decimal, or hexadecimal character references are escaped. Invalid
@@ -300,6 +313,17 @@ export const escapeHTML = flowRight( [
 	escapeAmpersand,
 	escapeLessThan,
 ] );
+
+/**
+ * Returns true if the given attribute name is valid, or false otherwise.
+ *
+ * @param {string} name Attribute name to test.
+ *
+ * @return {boolean} Whether attribute is valid.
+ */
+export function isValidAttributeName( name ) {
+	return ! REGEXP_INVALID_ATTRIBUTE_NAME.test( name );
+}
 
 /**
  * Returns true if the specified string is prefixed by one of an array of
@@ -556,6 +580,10 @@ export function renderAttributes( props ) {
 
 	for ( const key in props ) {
 		const attribute = getNormalAttributeName( key );
+		if ( ! isValidAttributeName( attribute ) ) {
+			continue;
+		}
+
 		let value = getNormalAttributeValue( key, props[ key ] );
 
 		// If value is not of serializeable type, skip.
