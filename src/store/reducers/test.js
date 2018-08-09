@@ -158,7 +158,6 @@ describe( 'Store', () => {
 		} );
 
 		it( 'should call parse function on parseBlocksAction with the given html', () => {
-			registerCoreBlocks()
 			const html = 'text'
 			const parser = jest.fn()
 			const newState = reducer( initialState, actions.parseBlocksAction( html, parser ) );

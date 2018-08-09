@@ -40,16 +40,15 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 	constructor( props: PropsType ) {
 		super( props );
-		this.html = ''
+		this.html = '';
 		this.state = {
 			dataSource: new DataSource( this.props.blocks, ( item: BlockType ) => item.uid ),
-			showHtml: false
+			showHtml: false,
 		};
-		
 	}
 
 	componentDidMount() {
-		this.serializeToHtml()
+		this.serializeToHtml();
 	}
 
 	onBlockHolderPressed( uid: string ) {
@@ -106,11 +105,11 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 	parseHTML() {
 		const {
-			parser, 
-			parseBlocksAction
-		} = this.props
+			parser,
+			parseBlocksAction,
+		} = this.props;
 
-		parseBlocksAction(this.html, parser)
+		parseBlocksAction( this.html, parser );
 	}
 
 	componentDidUpdate() {
@@ -167,13 +166,13 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 						inActiveText={ 'Off' }
 						value={ this.state.showHtml }
 						onValueChange={ ( value ) => {
-							if (value) {
-								this.html = this.serializeToHtml()
+							if ( value ) {
+								this.html = this.serializeToHtml();
 							} else {
-								this.parseHTML()
+								this.parseHTML();
 							}
-							
-							this.setState( { showHtml: value } ) 
+
+							this.setState( { showHtml: value } );
 						} }
 					/>
 				</View>
@@ -204,9 +203,9 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 					multiline
 					numberOfLines={ 0 }
 					style={ styles.htmlView }
-					onChangeText={(html) => this.html = html }
+					onChangeText={ ( html ) => this.html = html }
 				>
-				{ this.html }
+					{ this.html }
 				</TextInput>
 			</KeyboardAvoidingView>
 		);

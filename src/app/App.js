@@ -11,6 +11,6 @@ const store = setupStore();
 // eslint-disable-next-line react/display-name
 export default () => (
 	<Provider store={ store }>
-		<AppContainer parser={ parse }/>
+		<AppContainer parser={ parse } />
 	</Provider>
 );

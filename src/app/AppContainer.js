@@ -6,13 +6,13 @@ import {
 	moveBlockUpAction,
 	moveBlockDownAction,
 	deleteBlockAction,
-	parseBlocksAction
+	parseBlocksAction,
 } from '../store/actions';
 import MainApp from './MainApp';
 
 const mapStateToProps = ( state, parser ) => ( {
 	...state,
-	parser: parser
+	parser: parser,
 } );
 
 const mapDispatchToProps = ( dispatch, ownProps ) => {
@@ -34,8 +34,8 @@ const mapDispatchToProps = ( dispatch, ownProps ) => {
 			dispatch( deleteBlockAction( uid ) );
 		},
 		parseBlocksAction: ( html, parser ) => {
-			dispatch( parseBlocksAction( html, parser ));
-		}
+			dispatch( parseBlocksAction( html, parser ) );
+		},
 
 	};
 };
