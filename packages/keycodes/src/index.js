@@ -50,6 +50,10 @@ const modifiers = {
 	primaryAlt: ( _isMac ) => _isMac() ? [ ALT, COMMAND ] : [ CTRL, ALT ],
 	secondary: ( _isMac ) => _isMac() ? [ SHIFT, ALT, COMMAND ] : [ CTRL, SHIFT, ALT ],
 	access: ( _isMac ) => _isMac() ? [ CTRL, ALT ] : [ SHIFT, ALT ],
+	ctrl: () => [ CTRL ],
+	ctrlShift: () => [ CTRL, SHIFT ],
+	shift: () => [ SHIFT ],
+	shiftAlt: () => [ SHIFT, ALT ],
 };
 
 /**

@@ -5,10 +5,17 @@ import { displayShortcutList } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 
 const {
+	// Cmd+<key> on a mac, Ctrl+<key> elsewhere
 	primary,
+	// Shift+Cmd+<key> on a mac, Ctrl+Shift+<key> elsewhere
 	primaryShift,
+	// Shift+Alt+Cmd+<key> on a mac, Ctrl+Shift+Akt+<key> elsewhere
 	secondary,
+	// Ctrl+Alt+<key> on a mac, Shift+Alt+<key> elsewhere
 	access,
+	ctrl,
+	ctrlShift,
+	shiftAlt,
 } = displayShortcutList;
 
 const globalShortcuts = {
@@ -35,6 +42,22 @@ const globalShortcuts = {
 			description: __( 'Show or hide the settings sidebar.' ),
 		},
 		{
+			keyCombination: ctrl( '`' ),
+			description: __( 'Navigate to a the next part of the editor.' ),
+		},
+		{
+			keyCombination: ctrlShift( '`' ),
+			description: __( 'Navigate to the previous part of the editor.' ),
+		},
+		{
+			keyCombination: shiftAlt( 'n' ),
+			description: __( 'Navigate to a the next part of the editor (alternative).' ),
+		},
+		{
+			keyCombination: shiftAlt( 'p' ),
+			description: __( 'Navigate to the previous part of the editor (alternative).' ),
+		},
+		{
 			keyCombination: secondary( 'm' ),
 			description: __( 'Switch between Visual Editor and Code Editor.' ),
 		},
@@ -46,7 +69,7 @@ const selectionShortcuts = {
 	shortcuts: [
 		{
 			keyCombination: primary( 'a' ),
-			description: __( 'Select all text if typing, otherwise select all blocks.' ),
+			description: __( 'Select all text when typing. Press again to select all blocks.' ),
 		},
 		{
 			keyCombination: 'Esc',
@@ -58,10 +81,6 @@ const selectionShortcuts = {
 const blockShortcuts = {
 	title: __( 'Block shortcuts' ),
 	shortcuts: [
-		{
-			keyCombination: primary( 'del' ),
-			description: __( 'Delete the selected block(s).' ),
-		},
 		{
 			keyCombination: primaryShift( 'd' ),
 			description: __( 'Duplicate the selected block(s).' ),
