@@ -6,6 +6,12 @@ exports[`splitting and merging blocks should delete an empty first line 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`splitting and merging blocks should forward delete from an empty paragraph 1`] = `
+"<!-- wp:paragraph -->
+<p>Second</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`splitting and merging blocks should gracefully handle if placing caret in empty container 1`] = `
 "<!-- wp:paragraph -->
 <p><strong>Foo</strong></p>
@@ -31,6 +37,22 @@ exports[`splitting and merging blocks should not merge paragraphs if the selecti
 <p></p>
 <!-- /wp:paragraph -->"
 `;
+
+exports[`splitting and merging blocks should remove at most one paragraph in forward direction 1`] = `
+"<!-- wp:paragraph -->
+<p>First</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Second</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`splitting and merging blocks should remove empty paragraph block on backspace 1`] = `""`;
 
 exports[`splitting and merging blocks should split and merge paragraph blocks using Enter and Backspace 1`] = `
 "<!-- wp:paragraph -->

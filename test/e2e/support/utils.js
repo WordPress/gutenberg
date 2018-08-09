@@ -77,6 +77,34 @@ async function login() {
 	] );
 }
 
+/**
+ * Returns a promise which resolves once it's determined that the active DOM
+ * element is not within a RichText field, or the RichText field's TinyMCE has
+ * completed initialization. This is an unfortunate workaround to address an
+ * issue where TinyMCE takes its time to become ready for user input.
+ *
+ * TODO: This is a code smell, indicating that "too fast" resulting in breakage
+ * could be equally problematic for a fast human. It should be explored whether
+ * all event bindings we assign to TinyMCE to handle could be handled through
+ * the DOM directly instead.
+ *
+ * @return {Promise} Promise resolving once RichText is initialized, or is
+ *                   determined to not be a container of the active element.
+ */
+async function waitForRichTextInitialization() {
+	const isInRichText = await page.evaluate( () => {
+		return !! document.activeElement.closest( '.editor-rich-text__tinymce' );
+	} );
+
+	if ( ! isInRichText ) {
+		return;
+	}
+
+	return page.waitForFunction( () => {
+		return !! document.activeElement.closest( '.mce-content-body' );
+	} );
+}
+
 export async function visitAdmin( adminPath, query ) {
 	await goToWPPath( join( 'wp-admin', adminPath ), query );
 
@@ -170,6 +198,7 @@ export async function ensureSidebarOpened() {
  */
 export async function clickBlockAppender() {
 	await expect( page ).toClick( '.editor-default-block-appender__content' );
+	await waitForRichTextInitialization();
 }
 
 /**
@@ -199,6 +228,7 @@ export async function insertBlock( searchTerm, panelName = null ) {
 		await panelButton.click();
 	}
 	await page.click( `button[aria-label="${ searchTerm }"]` );
+	await waitForRichTextInitialization();
 }
 
 /**

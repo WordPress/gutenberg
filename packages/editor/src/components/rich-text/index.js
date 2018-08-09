@@ -81,6 +81,7 @@ export class RichText extends Component {
 		this.onFocus = this.onFocus.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
+		this.onDeleteKeyDown = this.onDeleteKeyDown.bind( this );
 		this.onHorizontalNavigationKeyDown = this.onHorizontalNavigationKeyDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onKeyUp = this.onKeyUp.bind( this );
@@ -382,6 +383,64 @@ export class RichText extends Component {
 	}
 
 	/**
+	 * Handles a delete keyDown event to handle merge or removal for collapsed
+	 * selection where caret is at directional edge: forward for a delete key,
+	 * reverse for a backspace key.
+	 *
+	 * @link https://en.wikipedia.org/wiki/Caret_navigation
+	 *
+	 * @param {tinymce.EditorEvent<KeyboardEvent>} event Keydown event.
+	 */
+	onDeleteKeyDown( event ) {
+		const { onMerge, onRemove } = this.props;
+		if ( ! onMerge && ! onRemove ) {
+			return;
+		}
+
+		const { keyCode } = event;
+		const isReverse = keyCode === BACKSPACE;
+		const { isCollapsed } = getSelection();
+
+		// Only process delete if the key press occurs at uncollapsed edge.
+		if ( ! isCollapsed ) {
+			return;
+		}
+
+		// It is important to consider emptiness because an empty container
+		// will include a bogus TinyMCE BR node _after_ the caret, so in a
+		// forward deletion the isHorizontalEdge function will incorrectly
+		// interpret the presence of the bogus node as not being at the edge.
+		const isEmpty = this.isEmpty();
+		const isEdge = (
+			isEmpty ||
+			isHorizontalEdge( this.editor.getBody(), isReverse )
+		);
+
+		if ( ! isEdge ) {
+			return;
+		}
+
+		if ( onMerge ) {
+			onMerge( ! isReverse );
+		}
+
+		// Only handle remove on Backspace. This serves dual-purpose of being
+		// an intentional user interaction distinguishing between Backspace and
+		// Delete to remove the empty field, but also to avoid merge & remove
+		// causing destruction of two fields (merge, then removed merged).
+		if ( onRemove && isEmpty && isReverse ) {
+			onRemove( ! isReverse );
+		}
+
+		event.preventDefault();
+
+		// Calling onMerge() or onRemove() will destroy the editor, so it's
+		// important that we stop other handlers (e.g. ones registered by
+		// TinyMCE) from also handling this event.
+		event.stopImmediatePropagation();
+	}
+
+	/**
 	 * Handles a horizontal navigation key down event to handle the case where
 	 * TinyMCE attempts to preventDefault when on the outside edge of an inline
 	 * boundary when arrowing _away_ from the boundary, not within it. Replaces
@@ -435,32 +494,9 @@ export class RichText extends Component {
 		const rootNode = this.editor.getBody();
 		const { keyCode } = event;
 
-		if (
-			getSelection().isCollapsed && (
-				( keyCode === BACKSPACE && isHorizontalEdge( rootNode, true ) ) ||
-				( keyCode === DELETE && isHorizontalEdge( rootNode, false ) )
-			)
-		) {
-			if ( ! this.props.onMerge && ! this.props.onRemove ) {
-				return;
-			}
-
-			const forward = keyCode === DELETE;
-
-			if ( this.props.onMerge ) {
-				this.props.onMerge( forward );
-			}
-
-			if ( this.props.onRemove && this.isEmpty() ) {
-				this.props.onRemove( forward );
-			}
-
-			event.preventDefault();
-
-			// Calling onMerge() or onRemove() will destroy the editor, so it's important
-			// that we stop other handlers (e.g. ones registered by TinyMCE) from
-			// also handling this event.
-			event.stopImmediatePropagation();
+		const isDelete = keyCode === DELETE || keyCode === BACKSPACE;
+		if ( isDelete ) {
+			this.onDeleteKeyDown( event );
 		}
 
 		const isHorizontalNavigation = keyCode === LEFT || keyCode === RIGHT;
