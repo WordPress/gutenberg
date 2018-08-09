@@ -1,41 +1,52 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`core/embed block edit matches snapshot 1`] = `
-<div
-  class="wp-block-table editor-rich-text"
->
-  <div>
-    <div>
-      <div
-        class="components-autocomplete"
+Array [
+  <div
+    class="components-base-control"
+  >
+    <div
+      class="components-base-control__field"
+    >
+      <label
+        class="components-base-control__label"
+        for="inspector-text-control-0"
       >
-        <table
-          aria-autocomplete="list"
-          aria-expanded="false"
-          class="editor-rich-text__tinymce"
-          contenteditable="true"
-        >
-          <tbody>
-            <tr>
-              <td>
-                <br />
-              </td>
-              <td>
-                <br />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <br />
-              </td>
-              <td>
-                <br />
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+        Column Count
+      </label>
+      <input
+        class="components-text-control__input"
+        id="inspector-text-control-0"
+        type="number"
+        value="2"
+      />
     </div>
-  </div>
-</div>
+  </div>,
+  <div
+    class="components-base-control"
+  >
+    <div
+      class="components-base-control__field"
+    >
+      <label
+        class="components-base-control__label"
+        for="inspector-text-control-1"
+      >
+        Row Count
+      </label>
+      <input
+        class="components-text-control__input"
+        id="inspector-text-control-1"
+        type="number"
+        value="2"
+      />
+    </div>
+  </div>,
+  <button
+    class="components-button is-button is-primary"
+    type="button"
+  >
+    Create
+  </button>,
+]
 `;

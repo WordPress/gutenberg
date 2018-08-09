@@ -7,24 +7,18 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Fragment } from '@wordpress/element';
 import { getPhrasingContentSchema } from '@wordpress/blocks';
-import {
-	RichText,
-	InspectorControls,
-} from '@wordpress/editor';
-
-import {
-	PanelBody,
-	ToggleControl,
-} from '@wordpress/components';
+import { RichText } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import TableBlock from './table-block';
+import './editor.scss';
+import './style.scss';
+import './theme.scss';
+import edit from './edit';
 
-const tableContentSchema = {
+const tableContentPasteSchema = {
 	tr: {
 		children: {
 			th: {
@@ -37,21 +31,50 @@ const tableContentSchema = {
 	},
 };
 
-const tableSchema = {
+const tablePasteSchema = {
 	table: {
 		children: {
 			thead: {
-				children: tableContentSchema,
+				children: tableContentPasteSchema,
 			},
 			tfoot: {
-				children: tableContentSchema,
+				children: tableContentPasteSchema,
 			},
 			tbody: {
-				children: tableContentSchema,
+				children: tableContentPasteSchema,
 			},
 		},
 	},
 };
+
+function getTablePartAttributeSchema( part ) {
+	return {
+		type: 'array',
+		default: [],
+		source: 'query',
+		selector: `t${ part } tr`,
+		query: {
+			cells: {
+				type: 'array',
+				default: [],
+				source: 'query',
+				selector: 'td,th',
+				query: {
+					content: {
+						type: 'array',
+						default: [],
+						source: 'children',
+					},
+					tag: {
+						type: 'string',
+						default: 'td',
+						source: 'tag',
+					},
+				},
+			},
+		},
+	};
+}
 
 export const name = 'core/table';
 
@@ -62,21 +85,13 @@ export const settings = {
 	category: 'formatting',
 
 	attributes: {
-		content: {
-			type: 'array',
-			source: 'children',
-			selector: 'table',
-			default: [
-				<tbody key="1">
-					<tr><td><br /></td><td><br /></td></tr>
-					<tr><td><br /></td><td><br /></td></tr>
-				</tbody>,
-			],
-		},
 		hasFixedLayout: {
 			type: 'boolean',
 			default: false,
 		},
+		head: getTablePartAttributeSchema( 'head' ),
+		body: getTablePartAttributeSchema( 'body' ),
+		foot: getTablePartAttributeSchema( 'foot' ),
 	},
 
 	supports: {
@@ -88,57 +103,45 @@ export const settings = {
 			{
 				type: 'raw',
 				selector: 'table',
-				schema: tableSchema,
+				schema: tablePasteSchema,
 			},
 		],
 	},
 
-	edit( { attributes, setAttributes, isSelected, className } ) {
-		const { content, hasFixedLayout } = attributes;
-		const toggleFixedLayout = () => {
-			setAttributes( { hasFixedLayout: ! hasFixedLayout } );
-		};
-
-		const classes = classnames(
-			className,
-			{
-				'has-fixed-layout': hasFixedLayout,
-			},
-		);
-
-		return (
-			<Fragment>
-				<InspectorControls>
-					<PanelBody title={ __( 'Table Settings' ) } className="blocks-table-settings">
-						<ToggleControl
-							label={ __( 'Fixed width table cells' ) }
-							checked={ !! hasFixedLayout }
-							onChange={ toggleFixedLayout }
-						/>
-					</PanelBody>
-				</InspectorControls>
-				<TableBlock
-					onChange={ ( nextContent ) => {
-						setAttributes( { content: nextContent } );
-					} }
-					content={ content }
-					className={ classes }
-					isSelected={ isSelected }
-				/>
-			</Fragment>
-		);
-	},
+	edit,
 
 	save( { attributes } ) {
-		const { content, hasFixedLayout } = attributes;
-		const classes = classnames(
-			{
-				'has-fixed-layout': hasFixedLayout,
-			},
-		);
+		const { hasFixedLayout, head, body, foot } = attributes;
+		const classes = classnames( {
+			'has-fixed-layout': hasFixedLayout,
+		} );
+
+		const Part = ( { type, rows } ) => {
+			if ( ! rows.length ) {
+				return null;
+			}
+
+			const Tag = `t${ type }`;
+
+			return (
+				<Tag>
+					{ rows.map( ( { cells }, rowIndex ) =>
+						<tr key={ rowIndex }>
+							{ cells.map( ( { content, tag }, cellIndex ) =>
+								<RichText.Content tagName={ tag } value={ content } key={ cellIndex } />
+							) }
+						</tr>
+					) }
+				</Tag>
+			);
+		};
 
 		return (
-			<RichText.Content tagName="table" className={ classes } value={ content } />
+			<table className={ classes }>
+				<Part type="head" rows={ head } />
+				<Part type="body" rows={ body } />
+				<Part type="foot" rows={ foot } />
+			</table>
 		);
 	},
 };
