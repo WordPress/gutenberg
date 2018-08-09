@@ -64,11 +64,11 @@ class GalleryEdit extends Component {
 		};
 	}
 
-	onSelectImage( index ) {
+	onSelectImage( id ) {
 		return () => {
-			if ( this.state.selectedImage !== index ) {
+			if ( this.state.selectedImage !== id ) {
 				this.setState( {
-					selectedImage: index,
+					selectedImage: id,
 				} );
 			}
 		};
@@ -270,9 +270,9 @@ class GalleryEdit extends Component {
 								url={ img.url }
 								alt={ img.alt }
 								id={ img.id }
-								isSelected={ isSelected && this.state.selectedImage === index }
+								isSelected={ isSelected && this.state.selectedImage === img.id }
 								onRemove={ this.onRemoveImage( index ) }
-								onSelect={ this.onSelectImage( index ) }
+								onSelect={ this.onSelectImage( img.id ) }
 								setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
 								caption={ img.caption }
 								tabIndex={ '0' }
