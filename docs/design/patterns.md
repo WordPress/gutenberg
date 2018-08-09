@@ -1,4 +1,4 @@
-# Design Patterns
+# Patterns
 
 ## Basic Editor Interface
 
