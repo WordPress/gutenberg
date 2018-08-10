@@ -246,8 +246,6 @@ export async function insertBlock( searchTerm, panelName = null ) {
  *
  * @param {string|Array} modifiers Modifier key or array of modifier keys.
  * @param {string} key      	   Key to press while modifier held.
- *
- * @return {Promise} Promise resolving when key combination pressed.
  */
 export async function pressWithModifier( modifiers, key ) {
 	const modifierKeys = castArray( modifiers );
@@ -258,7 +256,7 @@ export async function pressWithModifier( modifiers, key ) {
 
 	await page.keyboard.press( key );
 
-	return await Promise.all(
+	await Promise.all(
 		modifierKeys.map( async ( modifier ) => page.keyboard.up( modifier ) )
 	);
 }
