@@ -40,7 +40,7 @@ $block-inserter-search-height: 38px;
 	flex-direction: column;
 	height: 100%;
 	@include break-medium {
-		width: 350px;
+		width: 400px;
 		position: relative;
 
 		.editor-block-preview {
@@ -70,9 +70,8 @@ $block-inserter-search-height: 38px;
 	padding: 11px 16px;
 	position: relative;
 	z-index: 1;
-	border: none;
-	border-bottom: $border-width solid $light-gray-500;
-	border-radius: 0;
+	border: 1px solid $light-gray-500;
+	border-radius: 3px;
 
 	/* Fonts smaller than 16px causes mobile safari to zoom. */
 	font-size: $mobile-text-min-font-size;
