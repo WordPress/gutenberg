@@ -47,7 +47,11 @@ function render_block_core_latest_posts( $attributes ) {
 		$list_items_markup .= "</li>\n";
 	}
 
-	$class = "wp-block-latest-posts align{$attributes['align']}";
+	$class = 'wp-block-latest-posts';
+	if ( isset( $attributes['align'] ) ) {
+		$class .= ' align' . $attributes['align'];
+	}
+
 	if ( isset( $attributes['postLayout'] ) && 'grid' === $attributes['postLayout'] ) {
 		$class .= ' is-grid';
 	}
@@ -99,7 +103,6 @@ function register_block_core_latest_posts() {
 			),
 			'align'           => array(
 				'type'    => 'string',
-				'default' => 'center',
 			),
 			'order'           => array(
 				'type'    => 'string',
