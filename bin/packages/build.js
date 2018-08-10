@@ -108,14 +108,11 @@ function buildJsFile( file, silent ) {
  * @param {string} packagePath The path to the package.
  */
 function buildPackageScss( packagePath ) {
-	const styleFile = path.resolve( packagePath, SRC_DIR, 'style.scss' );
+	const srcDir = path.resolve( packagePath, SRC_DIR );
+	const scssFiles = glob.sync( `${ srcDir }/*.scss` );
 
-	// Return early if the package has no root style file.
-	if ( ! fs.existsSync( styleFile ) ) {
-		return;
-	}
-
-	buildScssFile( styleFile );
+	// Build scss files individually.
+	scssFiles.forEach( buildScssFile );
 }
 
 function buildScssFile( styleFile ) {
@@ -207,10 +204,8 @@ function buildPackage( packagePath ) {
 	// Build js files individually.
 	jsFiles.forEach( ( file ) => buildJsFile( file, true ) );
 
-	const scssFiles = glob.sync( `${ srcDir }/*.scss` );
-
-	// Build scss files individually.
-	scssFiles.forEach( buildScssFile );
+	// Build package CSS files
+	buildPackageScss( packagePath );
 
 	process.stdout.write( `${ DONE }\n` );
 }
