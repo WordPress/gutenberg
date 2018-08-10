@@ -28,6 +28,7 @@ class ParagraphEdit extends Component {
 		return (
 			<View>
 				<RichText
+					tagName="p"
 					content={ { contentTree: attributes.content, eventCount: attributes.eventCount } }
 					style={ {
 						...style,

@@ -92,10 +92,6 @@ export class RichText extends Component {
 	}
 }
 
-RichText.defaultProps = {
-	tagName: 'p',
-};
-
 const RichTextContainer = compose( [
 	withInstanceId,
 ] )( RichText );
