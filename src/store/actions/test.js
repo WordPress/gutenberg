@@ -41,6 +41,7 @@ describe( 'Store', () => {
 			const newBlock = createBlock( 'core/code', { content: 'new test text for a core/code block' } );
 			const action = actions.createBlockAction( '1', newBlock );
 			expect( action.type ).toEqual( ActionTypes.BLOCK.CREATE );
+			expect( action.clientId ).toEqual( '1' );
 		} );
 
 	} );
