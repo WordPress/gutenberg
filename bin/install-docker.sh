@@ -3,7 +3,7 @@
 # Exit if any command fails.
 set -e
 
-WP_VERSION=${WP_VERSION-latest}
+. "$(dirname "$0")/bootstrap-env.sh"
 
 # Include useful functions.
 . "$(dirname "$0")/includes.sh"
@@ -22,15 +22,15 @@ fi
 
 # Stop existing containers.
 echo -e $(status_message "Stopping Docker containers...")
-docker-compose down --remove-orphans >/dev/null 2>&1
+docker-compose $DOCKER_COMPOSE_FILE_OPTIONS down --remove-orphans >/dev/null 2>&1
 
 # Download image updates.
 echo -e $(status_message "Downloading Docker image updates...")
-docker-compose pull
+docker-compose $DOCKER_COMPOSE_FILE_OPTIONS pull
 
 # Launch the containers.
 echo -e $(status_message "Starting Docker containers...")
-docker-compose up -d >/dev/null
+docker-compose $DOCKER_COMPOSE_FILE_OPTIONS up -d >/dev/null
 
 # Set up WordPress Development site.
 # Note: we don't bother installing the test site right now, because that's
@@ -39,8 +39,8 @@ docker-compose up -d >/dev/null
 
 # Install the PHPUnit test scaffolding.
 echo -e $(status_message "Installing PHPUnit test scaffolding...")
-docker-compose run --rm wordpress_phpunit /app/bin/install-wp-tests.sh wordpress_test root example mysql $WP_VERSION false > /dev/null
+docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm wordpress_phpunit /app/bin/install-wp-tests.sh wordpress_test root example mysql $WP_VERSION false > /dev/null
 
 # Install Composer. This is only used to run WordPress Coding Standards checks.
 echo -e $(status_message "Installing and updating Composer modules...")
-docker-compose run --rm composer install
+docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm composer install
