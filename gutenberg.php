@@ -193,6 +193,12 @@ function gutenberg_init( $return, $post ) {
 	 */
 	remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
 
+	/*
+	 * Ensure meta box functions are available to third-party code;
+	 * includes/meta-boxes is typically loaded from edit-form-advanced.php.
+	 */
+	require_once ABSPATH . 'wp-admin/includes/meta-boxes.php';
+
 	require_once ABSPATH . 'wp-admin/admin-header.php';
 	the_gutenberg_project();
 
