@@ -81,7 +81,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				const newBlock = createBlock( 'core/paragraph', { content: 'new test text for a core/paragraph block' } );
 				const newBlockWithFocusedState = { ...newBlock, focused: false };
 				this.state.dataSource.push( newBlockWithFocusedState );
-				this.props.createBlockAction( newBlockWithFocusedState.uid, newBlockWithFocusedState );
+				this.props.createBlockAction( newBlockWithFocusedState.clientId, newBlockWithFocusedState );
 				break;
 			case ToolbarButton.SETTINGS:
 				// TODO: implement settings

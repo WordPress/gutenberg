@@ -38,8 +38,8 @@ export const deleteBlockAction: BlockActionType = clientId => ( {
 	clientId,
 } );
 
-export const createBlockAction: BlockActionType = (uid, block) => ( {
+export const createBlockAction: BlockActionType = (clientId, block) => ( {
 	type: ActionTypes.BLOCK.CREATE,
 	block: block,
-	uid: uid,
+	clientId,
 } );
