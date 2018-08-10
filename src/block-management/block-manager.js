@@ -26,13 +26,13 @@ export type BlockListType = {
 	blocks: Array<BlockType>,
 	aztechtml: string,
 	refresh: boolean,
-	parser: mixed,
 };
 
 type PropsType = BlockListType;
 type StateType = {
 	dataSource: DataSource,
-	showHtml: boolean
+	showHtml: boolean,
+	html: string,
 };
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
@@ -40,10 +40,10 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 	constructor( props: PropsType ) {
 		super( props );
-		this.html = '';
 		this.state = {
 			dataSource: new DataSource( this.props.blocks, ( item: BlockType ) => item.uid ),
 			showHtml: false,
+			html: '',
 		};
 	}
 
@@ -101,7 +101,8 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 	parseHTML() {
 		const { parseBlocksAction } = this.props;
-		parseBlocksAction( this.html );
+		const { html } = this.state;
+		parseBlocksAction( html );
 	}
 
 	componentDidUpdate() {
@@ -157,21 +158,28 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 						activeText={ 'On' }
 						inActiveText={ 'Off' }
 						value={ this.state.showHtml }
-						onValueChange={ ( value ) => {
-							if ( value ) {
-								this.html = this.serializeToHtml();
-							} else {
-								this.parseHTML();
-							}
-
-							this.setState( { showHtml: value } );
-						} }
+						onValueChange={ this.handleSwitchEditor }
 					/>
 				</View>
 				{ this.state.showHtml && this.renderHTML() }
 				{ ! this.state.showHtml && list }
 			</View>
 		);
+	}
+
+	handleSwitchEditor = ( showHtml: boolean ) => {
+		if ( showHtml ) {
+			const html = this.serializeToHtml();
+			this.handleHTMLUpdate( html );
+		} else {
+			this.parseHTML();
+		}
+
+		this.setState( { showHtml } );
+	}
+
+	handleHTMLUpdate = ( html: string ) => {
+		this.setState( { html } );
 	}
 
 	renderItem( value: { item: BlockType, uid: string } ) {
@@ -195,8 +203,9 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 					multiline
 					numberOfLines={ 0 }
 					style={ styles.htmlView }
-					onChangeText={ ( html ) => this.html = html }>
-					{ this.html }
+					value={ this.state.html }
+					onChangeText={ this.handleHTMLUpdate }>
+
 				</TextInput>
 			</KeyboardAvoidingView>
 		);
