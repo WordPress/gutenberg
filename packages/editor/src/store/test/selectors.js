@@ -6,7 +6,6 @@ import { filter, property, without } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { moment } from '@wordpress/date';
 
@@ -21,14 +20,12 @@ const {
 	hasEditorRedo,
 	isEditedPostNew,
 	isEditedPostDirty,
-	isCleanNewPost,
 	getCurrentPost,
 	getCurrentPostId,
 	getCurrentPostLastRevisionId,
 	getCurrentPostRevisionsCount,
 	getCurrentPostType,
 	getPostEdits,
-	getDocumentTitle,
 	getEditedPostVisibility,
 	isCurrentPostPending,
 	isCurrentPostPublished,
@@ -284,59 +281,6 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isCleanNewPost', () => {
-		it( 'should return true when the post is not dirty and has not been saved before', () => {
-			const state = {
-				editor: {
-					isDirty: false,
-				},
-				currentPost: {
-					id: 1,
-					status: 'auto-draft',
-				},
-				saving: {
-					requesting: false,
-				},
-			};
-
-			expect( isCleanNewPost( state ) ).toBe( true );
-		} );
-
-		it( 'should return false when the post is not dirty but the post has been saved', () => {
-			const state = {
-				editor: {
-					isDirty: false,
-				},
-				currentPost: {
-					id: 1,
-					status: 'draft',
-				},
-				saving: {
-					requesting: false,
-				},
-			};
-
-			expect( isCleanNewPost( state ) ).toBe( false );
-		} );
-
-		it( 'should return false when the post is dirty but the post has not been saved', () => {
-			const state = {
-				editor: {
-					isDirty: true,
-				},
-				currentPost: {
-					id: 1,
-					status: 'auto-draft',
-				},
-				saving: {
-					requesting: false,
-				},
-			};
-
-			expect( isCleanNewPost( state ) ).toBe( false );
-		} );
-	} );
-
 	describe( 'getCurrentPost', () => {
 		it( 'should return the current post', () => {
 			const state = {
@@ -577,97 +521,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( getPostEdits( state ) ).toEqual( { title: 'terga' } );
-		} );
-	} );
-
-	describe( 'getDocumentTitle', () => {
-		it( 'should return current title unedited existing post', () => {
-			const state = {
-				currentPost: {
-					id: 123,
-					title: 'The Title',
-				},
-				editor: {
-					present: {
-						edits: {},
-						blocksByClientId: {},
-						blockOrder: {},
-					},
-					isDirty: false,
-				},
-				saving: {
-					requesting: false,
-				},
-			};
-
-			expect( getDocumentTitle( state ) ).toBe( 'The Title' );
-		} );
-
-		it( 'should return current title for edited existing post', () => {
-			const state = {
-				currentPost: {
-					id: 123,
-					title: 'The Title',
-				},
-				editor: {
-					present: {
-						edits: {
-							title: 'Modified Title',
-						},
-					},
-				},
-				saving: {
-					requesting: false,
-				},
-			};
-
-			expect( getDocumentTitle( state ) ).toBe( 'Modified Title' );
-		} );
-
-		it( 'should return new post title when new post is clean', () => {
-			const state = {
-				currentPost: {
-					id: 1,
-					status: 'auto-draft',
-					title: '',
-				},
-				editor: {
-					present: {
-						edits: {},
-						blocksByClientId: {},
-						blockOrder: {},
-					},
-					isDirty: false,
-				},
-				saving: {
-					requesting: false,
-				},
-			};
-
-			expect( getDocumentTitle( state ) ).toBe( __( 'New post' ) );
-		} );
-
-		it( 'should return untitled title', () => {
-			const state = {
-				currentPost: {
-					id: 123,
-					status: 'draft',
-					title: '',
-				},
-				editor: {
-					present: {
-						edits: {},
-						blocksByClientId: {},
-						blockOrder: {},
-					},
-					isDirty: true,
-				},
-				saving: {
-					requesting: false,
-				},
-			};
-
-			expect( getDocumentTitle( state ) ).toBe( __( '(Untitled)' ) );
 		} );
 	} );
 
