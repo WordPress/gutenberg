@@ -36,10 +36,10 @@ export function setupHearthbeatPostLocking() {
 		}
 
 		data[ 'wp-refresh-post-lock' ] = send;
-	} );
+	} )
 
 	// Refresh post locks: update the lock string or show the dialog if somebody has taken over editing.
-	jQuery( document ).on( 'heartbeat-tick.refresh-lock', function( e, data ) {
+	.on( 'heartbeat-tick.refresh-lock', function( e, data ) {
 		if ( data[ 'wp-refresh-post-lock' ] ) {
 			const received = data[ 'wp-refresh-post-lock' ];
 
@@ -55,8 +55,8 @@ export function setupHearthbeatPostLocking() {
 		}
 	} );
 
-	// Unlock the post when the window is closed or exited.
-	jQuery( window ).on( 'unload.edit-post', function( event ) {
+	// Unlock the post before the window is exited.
+	jQuery( window ).on( 'beforeunload.edit-post', function( event ) {
 		const postID = jQuery( '#post_ID' ).val();
 		const postLock = jQuery( '#active_post_lock' ).val();
 
