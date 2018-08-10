@@ -397,8 +397,14 @@ export class RichText extends Component {
 			return;
 		}
 
-		const { keyCode } = event;
+		const { keyCode, altKey, metaKey } = event;
 		const isReverse = keyCode === BACKSPACE;
+
+		// User is using the Remove Block shortcut, so allow the event to bubble
+		if ( altKey && metaKey && isReverse ) {
+			return;
+		}
+
 		const { isCollapsed } = getSelection();
 
 		// Only process delete if the key press occurs at uncollapsed edge.
