@@ -7,19 +7,20 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { IconButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 function Notice( { className, status, children, onRemove = noop, isDismissible = true } ) {
-	const classNames = classnames( className, 'notice notice-alt notice-' + status, {
+	const classNames = classnames( className, 'components-notice components-notice--' + status, {
 		'is-dismissible': isDismissible,
 	} );
 	return (
 		<div className={ classNames }>
-			{ isString( children ) ? <p>{ children }</p> : children }
+			{ isString( children ) ? <div className="components-notice__content">{ children }</div> : children }
 			{ isDismissible && (
-				<button className="notice-dismiss" type="button" onClick={ onRemove }>
+				<IconButton icon="no-alt" className="components-notice__dismiss" onClick={ onRemove }>
 					<span className="screen-reader-text">{ __( 'Dismiss this notice' ) }</span>
-				</button>
+				</IconButton>
 			) }
 		</div>
 	);

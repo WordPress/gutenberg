@@ -1,3 +1,54 @@
+.components-notice {
+	background: $white;
+	border-left: 4px solid $white;
+	margin: 5px 15px 2px;
+	padding: 1px 12px;
+
+	&.is-dismissible {
+		padding-right: 38px;
+		position: relative;
+	}
+}
+
+.components-notice__content {
+	margin: 0.5em 0;
+	padding: 2px;
+}
+
+.components-notice__dismiss {
+	position: absolute;
+	top: 0;
+	right: 1px;
+	border: none;
+	margin: 0;
+	padding: 9px;
+	background: none;
+	color: $dark-gray-200;
+	cursor: pointer;
+
+  	&::before {
+		background: none;
+		color: #72777c;
+		content: "\f153";
+		display: block;
+		font: normal 16px/20px dashicons;
+		speak: none;
+		height: 20px;
+		text-align: center;
+		width: 20px;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+
+	&:hover,
+	&:active,
+	&:focus {
+		&::before{
+			color: $alert-red;
+		}
+	}
+}
+
 .components-notice-list {
 	min-width: 300px;
 	z-index: z-index(".components-notice-list");
