@@ -206,7 +206,7 @@ body.gutenberg-editor-page {
 	}
 
 	input[type="radio"] {
-		border-radius: 50%;
+		border-radius: $radius-round;
 
 		&::before {
 			margin: 3px 0 0 3px;
