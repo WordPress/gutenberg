@@ -57,12 +57,14 @@ const licenses = [
 
 const licenseFiles = [
 	'LICENCE',
+	'license',
 	'LICENSE',
 	'LICENSE.md',
 	'LICENSE.txt',
 	'LICENSE-MIT',
 	'MIT-LICENSE.txt',
 	'Readme.md',
+	'README.md',
 ];
 
 const licenseFileStrings = {
