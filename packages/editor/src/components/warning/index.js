@@ -1,11 +1,16 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { Children } from '@wordpress/element';
 
-function Warning( { actions, children } ) {
+function Warning( { className, actions, children } ) {
 	return (
-		<div className="editor-warning">
+		<div className={ classnames( className, 'editor-warning' ) }>
 			<div className="editor-warning__contents">
 				<p className="editor-warning__message">{ children }</p>
 

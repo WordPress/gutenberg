@@ -50,6 +50,7 @@ class ErrorBoundary extends Component {
 
 		return (
 			<Warning
+				className="editor-error-boundary"
 				actions={ [
 					<Button key="recovery" onClick={ this.reboot } isLarge>
 						{ __( 'Attempt Recovery' ) }
