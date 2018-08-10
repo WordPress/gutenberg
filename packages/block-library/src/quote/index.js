@@ -55,6 +55,7 @@ export const settings = {
 	styles: [
 		{ name: 'default', label: __( 'Regular' ), isDefault: true },
 		{ name: 'large', label: __( 'Large' ) },
+		{ name: 'fancy', label: __( 'Fancy' ) },
 	],
 
 	transforms: {

@@ -11,7 +11,7 @@
 	}
 }
 
-.wp-block-quote:not(.is-large):not(.is-style-large) {
+.wp-block-quote:not(.is-large):not(.is-style-large):not(.is-style-fancy) {
 	border-left: 4px solid $black;
 	padding-left: 1em;
 }
