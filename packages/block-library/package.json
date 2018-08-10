@@ -1,0 +1,54 @@
+{
+	"name": "@wordpress/block-library",
+	"version": "1.0.0-alpha.0",
+	"description": "Core Blocks of the WordPress editor.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"blocks"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/block-library/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"dependencies": {
+		"@babel/runtime": "^7.0.0-beta.52",
+		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/autop": "file:../autop",
+		"@wordpress/blob": "file:../blob",
+		"@wordpress/blocks": "file:../blocks",
+		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/core-data": "file:../core-data",
+		"@wordpress/data": "file:../data",
+		"@wordpress/deprecated": "file:../deprecated",
+		"@wordpress/editor": "file:../editor",
+		"@wordpress/element": "file:../element",
+		"@wordpress/html-entities": "file:../html-entities",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/viewport": "file:../viewport",
+		"classnames": "^2.2.5",
+		"lodash": "^4.17.10",
+		"memize": "^1.0.5",
+		"moment": "^2.22.1",
+		"querystring": "^0.2.0",
+		"querystringify": "^1.0.0",
+		"re-resizable": "^4.7.1",
+		"url": "^0.11.0"
+	},
+	"devDependencies": {
+		"enzyme": "^3.3.0",
+		"react-test-renderer": "^16.4.1"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

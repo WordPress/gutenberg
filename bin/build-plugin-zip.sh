@@ -120,8 +120,8 @@ status "Creating archive... 🎁"
 zip -r gutenberg.zip \
 	gutenberg.php \
 	lib/*.php \
-	core-blocks/*/*.php \
-	packages/core-blocks/src/*/*.php \
+	block-library/*/*.php \
+	packages/block-library/src/*/*.php \
 	post-content.php \
 	$vendor_scripts \
 	$build_files \
