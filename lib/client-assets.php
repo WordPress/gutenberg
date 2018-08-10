@@ -407,7 +407,6 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-url',
 			'wp-viewport',
 		),
-
 		filemtime( gutenberg_dir_path() . 'build/block-library/index.js' ),
 		true
 	);
