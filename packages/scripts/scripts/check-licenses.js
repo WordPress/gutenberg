@@ -18,6 +18,7 @@ const gpl2 = hasCliArg( '--gpl2' );
 
 const gpl2Licenses = [
 	'Apache-2.0 WITH LLVM-exception',
+	'Artistic-2.0',
 	'BSD',
 	'BSD-2-Clause',
 	'BSD-3-Clause',
@@ -25,19 +26,28 @@ const gpl2Licenses = [
 	'CC-BY-3.0',
 	'CC-BY-4.0',
 	'CC0-1.0',
+	'GPL-2.0',
 	'GPL-2.0+',
 	'GPL-2.0-or-later',
 	'ISC',
 	'LGPL-2.1',
 	'MIT',
 	'MIT/X11',
+	'MIT (http://mootools.net/license.txt)',
+	'MPL-2.0',
 	'Public Domain',
 	'Unlicense',
 	'WTFPL',
+	'Zlib',
+	'(MIT AND BSD-3-Clause)',
+	'(MIT AND Zlib)',
 ];
 
 const ossLicenses = [
 	'Apache-2.0',
+	'Apache 2.0',
+	'Apache License, Version 2.0',
+	'Apache version 2.0',
 ];
 
 const licenses = [
@@ -46,30 +56,46 @@ const licenses = [
 ];
 
 const licenseFiles = [
+	'LICENCE',
 	'LICENSE',
 	'LICENSE.md',
+	'LICENSE.txt',
+	'LICENSE-MIT',
 	'MIT-LICENSE.txt',
+	'Readme.md',
 ];
 
 const licenseFileStrings = {
-	BSD: 'Redistributions in binary form must reproduce the above copyright notice,',
-	MIT: 'Permission is hereby granted, free of charge,',
+	'Apache-2.0': [
+		'Licensed under the Apache License, Version 2.0',
+	],
+	BSD: [
+		'Redistributions in binary form must reproduce the above copyright notice,',
+	],
+	MIT: [
+		'Permission is hereby granted, free of charge,',
+		'## License\n\nMIT',
+		'## License\n\n  MIT',
+	],
 };
 
 const checkLicense = ( allowedLicense, licenseType ) => {
-	if ( allowedLicense === licenseType ) {
-		return true;
-	}
-
 	if ( ! licenseType ) {
 		return false;
+	}
+
+	const formattedAllowedLicense = allowedLicense.toLowerCase();
+	const formattedlicenseType = licenseType.toLowerCase();
+
+	if ( formattedAllowedLicense === formattedlicenseType ) {
+		return true;
 	}
 
 	if ( licenseType.indexOf( 'OR' ) < 0 ) {
 		return false;
 	}
 
-	const subLicenseTypes = licenseType.replace( /^\(*/g, '' ).replace( /\)*$/, '' ).split( ' OR ' ).map( ( e ) => e.trim() );
+	const subLicenseTypes = formattedlicenseType.replace( /^\(*/g, '' ).replace( /\)*$/, '' ).split( ' or ' ).map( ( e ) => e.trim() );
 
 	return subLicenseTypes.reduce( ( satisfied, subLicenseType ) => {
 		if ( checkLicense( allowedLicense, subLicenseType ) ) {
@@ -100,7 +126,7 @@ modules.forEach( ( path ) => {
 	}
 
 	const packageInfo = require( filename );
-	const license = packageInfo.license || ( packageInfo.licenses && packageInfo.licenses.map( ( l ) => l.type ).join( ' OR ' ) );
+	const license = packageInfo.license || ( packageInfo.licenses && packageInfo.licenses.map( ( l ) => l.type || l ).join( ' OR ' ) );
 	let licenseType = typeof license === 'object' ? license.type : license;
 
 	if ( licenseType === undefined ) {
@@ -117,11 +143,12 @@ modules.forEach( ( path ) => {
 				return Object.keys( licenseFileStrings ).reduce( ( stringDetectedType, licenseStringType ) => {
 					const licenseFileString = licenseFileStrings[ licenseStringType ];
 
-					if ( licenseText.includes( licenseFileString ) ) {
-						return licenseStringType;
-					}
-
-					return stringDetectedType;
+					return licenseFileString.reduce( ( currentDetectedType, fileString ) => {
+						if ( licenseText.includes( fileString ) ) {
+							return licenseStringType;
+						}
+						return currentDetectedType;
+					}, stringDetectedType );
 				}, detectedType );
 			}
 		}, false );
