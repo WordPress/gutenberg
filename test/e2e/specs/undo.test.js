@@ -6,6 +6,7 @@ import {
 	getEditedPostContent,
 	newPost,
 	pressWithModifier,
+	META_KEY,
 } from '../support/utils';
 
 describe( 'undo', () => {
@@ -24,12 +25,12 @@ describe( 'undo', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		await pressWithModifier( 'mod', 'z' ); // Undo 3rd paragraph text.
-		await pressWithModifier( 'mod', 'z' ); // Undo 3rd block.
-		await pressWithModifier( 'mod', 'z' ); // Undo 2nd paragraph text.
-		await pressWithModifier( 'mod', 'z' ); // Undo 2nd block.
-		await pressWithModifier( 'mod', 'z' ); // Undo 1st paragraph text.
-		await pressWithModifier( 'mod', 'z' ); // Undo 1st block.
+		await pressWithModifier( META_KEY, 'z' ); // Undo 3rd paragraph text.
+		await pressWithModifier( META_KEY, 'z' ); // Undo 3rd block.
+		await pressWithModifier( META_KEY, 'z' ); // Undo 2nd paragraph text.
+		await pressWithModifier( META_KEY, 'z' ); // Undo 2nd block.
+		await pressWithModifier( META_KEY, 'z' ); // Undo 1st paragraph text.
+		await pressWithModifier( META_KEY, 'z' ); // Undo 1st block.
 
 		// After undoing every action, there should be no more undo history.
 		await page.waitForSelector( '.editor-history__undo:disabled' );

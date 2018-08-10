@@ -6,6 +6,7 @@ import {
 	getEditedPostContent,
 	newPost,
 	pressWithModifier,
+	META_KEY,
 } from '../support/utils';
 
 describe( 'Formatting Controls', () => {
@@ -26,7 +27,7 @@ describe( 'Formatting Controls', () => {
 		await page.keyboard.up( 'Shift' );
 
 		// Applying "bold"
-		await pressWithModifier( 'Mod', 'b' );
+		await pressWithModifier( META_KEY, 'b' );
 
 		// Check content
 		const content = await getEditedPostContent();

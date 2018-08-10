@@ -84,6 +84,13 @@ export default class FreeformEdit extends Component {
 
 		this.editor = editor;
 
+		// Disable TinyMCE's keyboard shortcut help.
+		editor.on( 'BeforeExecCommand', ( event ) => {
+			if ( event.command === 'WP_Help' ) {
+				event.preventDefault();
+			}
+		} );
+
 		if ( content ) {
 			editor.on( 'loadContent', () => editor.setContent( content ) );
 		}

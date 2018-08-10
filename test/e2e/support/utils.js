@@ -7,7 +7,7 @@ import { URL } from 'url';
 /**
  * External dependencies
  */
-import { times } from 'lodash';
+import { times, castArray } from 'lodash';
 
 const {
 	WP_BASE_URL = 'http://localhost:8889',
@@ -16,13 +16,22 @@ const {
 } = process.env;
 
 /**
- * Platform-specific modifier key.
+ * Platform-specific meta key.
  *
  * @see pressWithModifier
  *
  * @type {string}
  */
-const MOD_KEY = process.platform === 'darwin' ? 'Meta' : 'Control';
+export const META_KEY = process.platform === 'darwin' ? 'Meta' : 'Control';
+
+/**
+ * Platform-specific modifier for the access key chord.
+ *
+ * @see pressWithModifier
+ *
+ * @type {string}
+ */
+export const ACCESS_MODIFIER_KEYS = process.platform === 'darwin' ? [ 'Control', 'Alt' ] : [ 'Shift', 'Alt' ];
 
 /**
  * Regular expression matching zero-width space characters.
@@ -235,19 +244,21 @@ export async function insertBlock( searchTerm, panelName = null ) {
  * Performs a key press with modifier (Shift, Control, Meta, Mod), where "Mod"
  * is normalized to platform-specific modifier (Meta in MacOS, else Control).
  *
- * @param {string} modifier Modifier key.
- * @param {string} key      Key to press while modifier held.
- *
- * @return {Promise} Promise resolving when key combination pressed.
+ * @param {string|Array} modifiers Modifier key or array of modifier keys.
+ * @param {string} key      	   Key to press while modifier held.
  */
-export async function pressWithModifier( modifier, key ) {
-	if ( modifier.toLowerCase() === 'mod' ) {
-		modifier = MOD_KEY;
-	}
+export async function pressWithModifier( modifiers, key ) {
+	const modifierKeys = castArray( modifiers );
 
-	await page.keyboard.down( modifier );
+	await Promise.all(
+		modifierKeys.map( async ( modifier ) => page.keyboard.down( modifier ) )
+	);
+
 	await page.keyboard.press( key );
-	return page.keyboard.up( modifier );
+
+	await Promise.all(
+		modifierKeys.map( async ( modifier ) => page.keyboard.up( modifier ) )
+	);
 }
 
 /**
@@ -336,4 +347,23 @@ async function acceptPageDialog( dialog ) {
  */
 export function enablePageDialogAccept() {
 	page.on( 'dialog', acceptPageDialog );
+}
+
+/**
+ * Click on the close button of an open modal.
+ *
+ * @param {?string} modalClassName Class name for the modal to close
+ */
+export async function clickOnCloseModalButton( modalClassName ) {
+	let closeButtonClassName = '.components-modal__header .components-icon-button';
+
+	if ( modalClassName ) {
+		closeButtonClassName = `${ modalClassName } ${ closeButtonClassName }`;
+	}
+
+	const closeButton = await page.$( closeButtonClassName );
+
+	if ( closeButton ) {
+		await page.click( closeButtonClassName );
+	}
 }
