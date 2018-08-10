@@ -195,7 +195,6 @@
 			content: "";
 			position: absolute;
 			outline: $border-width solid transparent;
-			transition: outline 0.1s linear;
 			pointer-events: none;
 
 			// Show wider padding for top level blocks.
@@ -233,7 +232,8 @@
 
 	// Hover style
 	&.is-hovered > .editor-block-list__block-edit::before {
-		outline: $border-width solid theme(outlines);
+		@include outline_fade_in(0.1s, 1s);
+		outline: $border-width solid $dark-opacity-light-500;
 	}
 }
 
@@ -983,7 +983,8 @@
 
 		// Animate in
 		.editor-block-list__block:hover & {
-			@include fade_in(0.1s);
+			opacity: 0;
+			@include fade_in(0.1s, 1s);
 		}
 	}
 }
