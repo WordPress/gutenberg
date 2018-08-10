@@ -42,6 +42,11 @@ Then, run a setup script to check if docker and node are configured properly and
 ./bin/setup-local-env.sh
 ``` 
 
+If you're developing themes, or core WordPress functionality alongside Gutenberg, you can access the WordPress files in `wordpress/` by running the following command instead:
+```
+DOCKER_ENV=localwpdev ./bin/setup-local-env.sh
+```
+
 If everything was successful, you'll see the following ascii art:
 ```
 Welcome to...
