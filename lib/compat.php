@@ -380,7 +380,7 @@ function gutenberg_warn_classic_about_cloudflare() {
 					<?php
 						printf(
 							/* translators: %s link to an issue in the Gutenberg repository */
-							__( 'If neither of these options are possible for you, please <a href="%s">follow this issue for updates</a>. We hope to have this issue rectifed soon!', 'gutenberg' ),
+							__( 'If neither of these options are possible for you, please <a href="%s">follow this issue for updates</a>. We hope to have this issue rectified soon!', 'gutenberg' ),
 							'https://github.com/WordPress/gutenberg/issues/2704'
 						);
 					?>
