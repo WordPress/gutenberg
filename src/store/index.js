@@ -11,7 +11,7 @@ import { createStore } from 'redux';
 import { reducer } from './reducers';
 
 export type BlockType = {
-	uid: string,
+	clientId: string,
 	name: string,
 	isValid: boolean,
 	attributes: Object,
@@ -58,7 +58,7 @@ const initialState: StateType = {
 	// If not it should be created from a string parsing (commented HTML to json).
 	blocks: [
 		{
-			uid: '1',
+			clientId: '1',
 			name: 'title',
 			isValid: true,
 			attributes: {
@@ -73,7 +73,7 @@ const initialState: StateType = {
 		{ ...codeBlockInstance, focused: false },
 		{ ...moreBlockInstance, focused: false },
 		{
-			uid: '5',
+			clientId: '5',
 			name: 'paragraph',
 			isValid: true,
 			attributes: {
