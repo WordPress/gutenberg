@@ -17,6 +17,7 @@ const PluginSidebarMoreMenuItem = ( { children, icon, isSelected, onClick } ) =>
 			<MenuItem
 				icon={ isSelected ? 'yes' : icon }
 				isSelected={ isSelected }
+				role="menuitemcheckbox"
 				onClick={ compose( onClick, fillProps.onClose ) }
 			>
 				{ children }

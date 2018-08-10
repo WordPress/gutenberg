@@ -7,9 +7,14 @@ import { flow, noop } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, withSpokenMessages } from '@wordpress/components';
+import { MenuItem, withSpokenMessages } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import shortcuts from '../../keyboard-shortcuts';
 
 export function BlockInspectorButton( {
 	areAdvancedSettingsOpened,
@@ -18,7 +23,6 @@ export function BlockInspectorButton( {
 	onClick = noop,
 	small = false,
 	speak,
-	role,
 } ) {
 	const speakMessage = () => {
 		if ( areAdvancedSettingsOpened ) {
@@ -31,15 +35,15 @@ export function BlockInspectorButton( {
 	const label = areAdvancedSettingsOpened ? __( 'Hide Block Settings' ) : __( 'Show Block Settings' );
 
 	return (
-		<IconButton
+		<MenuItem
 			className="editor-block-settings-menu__control"
 			onClick={ flow( areAdvancedSettingsOpened ? closeSidebar : openEditorSidebar, speakMessage, onClick ) }
 			icon="admin-generic"
 			label={ small ? label : undefined }
-			role={ role }
+			shortcut={ shortcuts.toggleSidebar.display }
 		>
 			{ ! small && label }
-		</IconButton>
+		</MenuItem>
 	);
 }
 

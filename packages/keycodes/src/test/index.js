@@ -21,6 +21,11 @@ describe( 'displayShortcut', () => {
 			const shortcut = displayShortcut.primary( 'm', isMacOSTrue );
 			expect( shortcut ).toEqual( '⌘M' );
 		} );
+
+		it( 'outputs command Del on MacOS (works for multiple character keys)', () => {
+			const shortcut = displayShortcut.primary( 'del', isMacOSTrue );
+			expect( shortcut ).toEqual( '⌘Del' );
+		} );
 	} );
 
 	describe( 'primaryShift', () => {
@@ -32,6 +37,11 @@ describe( 'displayShortcut', () => {
 		it( 'should output shift+command symbols on MacOS', () => {
 			const shortcut = displayShortcut.primaryShift( 'm', isMacOSTrue );
 			expect( shortcut ).toEqual( 'Shift+⌘M' );
+		} );
+
+		it( 'outputs shift+command Del on MacOS (works for multiple character keys)', () => {
+			const shortcut = displayShortcut.primaryShift( 'del', isMacOSTrue );
+			expect( shortcut ).toEqual( 'Shift+⌘Del' );
 		} );
 	} );
 

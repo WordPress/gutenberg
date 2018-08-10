@@ -12,7 +12,7 @@
 /**
  * External dependencies
  */
-import { get, mapValues, includes } from 'lodash';
+import { get, mapValues, includes, capitalize } from 'lodash';
 
 export const BACKSPACE = 8;
 export const TAB = 9;
@@ -47,6 +47,7 @@ export function isMacOS( _window = window ) {
 const modifiers = {
 	primary: ( _isMac ) => _isMac() ? [ COMMAND ] : [ CTRL ],
 	primaryShift: ( _isMac ) => _isMac() ? [ SHIFT, COMMAND ] : [ CTRL, SHIFT ],
+	primaryAlt: ( _isMac ) => _isMac() ? [ ALT, COMMAND ] : [ CTRL, ALT ],
 	secondary: ( _isMac ) => _isMac() ? [ SHIFT, ALT, COMMAND ] : [ CTRL, SHIFT, ALT ],
 	access: ( _isMac ) => _isMac() ? [ CTRL, ALT ] : [ SHIFT, ALT ],
 };
@@ -81,13 +82,13 @@ export const displayShortcut = mapValues( modifiers, ( modifier ) => {
 		};
 		const shortcut = [
 			...modifier( _isMac ).map( ( key ) => get( replacementKeyMap, key, key ) ),
-			character.toUpperCase(),
+			capitalize( character ),
 		].join( '+' );
 
 		// Because we use just the clover symbol for MacOS's "command" key, remove
 		// the key join character ("+") between it and the final character if that
 		// final character is alphanumeric. ⌘S looks nicer than ⌘+S.
-		return shortcut.replace( /⌘\+([A-Z0-9])$/g, '⌘$1' );
+		return shortcut.replace( /⌘\+(.+)$/g, '⌘$1' );
 	};
 } );
 
