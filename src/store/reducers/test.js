@@ -4,6 +4,9 @@
 
 import { reducer } from './';
 import * as actions from '../actions/';
+import { registerCoreBlocks } from '@gutenberg/core-blocks';
+
+registerCoreBlocks()
 
 describe( 'Store', () => {
 	describe( 'reducer', () => {
@@ -157,11 +160,15 @@ describe( 'Store', () => {
 			expect( newState.blocks[ 1 ].blockType ).toEqual( 'core/code' );
 		} );
 
-		it( 'should call parse function on parseBlocksAction with the given html', () => {
-			const html = 'text'
-			const parser = jest.fn()
-			const newState = reducer( initialState, actions.parseBlocksAction( html, parser ) );
-			expect( parser ).toBeCalledWith(html)
+		it( 'parses the html string into a new array of blocks', () => {
+			const htmlContent = '<!--more-->'
+			const html = '<!-- wp:more -->' + htmlContent + '<!-- /wp:more -->'
+
+			const newState = reducer( initialState, actions.parseBlocksAction( html ) );
+
+			expect( newState.blocks ).toHaveLength( 1 );
+			expect( newState.blocks[ 0 ].originalContent ).toEqual( htmlContent );
+			expect( newState.blocks[ 0 ].name ).toEqual( 'core/more' );
 		})
 	} );
 } );
