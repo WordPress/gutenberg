@@ -22,13 +22,10 @@ class HeadingEdit extends Component {
 		const {
 			attributes,
 			setAttributes,
-			style,
 			className,
 		} = this.props;
 
 		const {
-			align,
-			content,
 			level,
 			placeholder,
 		} = attributes;
@@ -44,8 +41,12 @@ class HeadingEdit extends Component {
 					style={ {
 						minHeight: Math.max( minHeight, typeof attributes.aztecHeight === 'undefined' ? 0 : attributes.aztecHeight ),
 					} }
-					onChange={ ( value ) => { setAttributes( value ); } }
-					onContentSizeChange={ ( event ) => { setAttributes( { aztecHeight: event.aztecHeight } ); } }
+					onChange={ ( value ) => {
+						setAttributes( value );
+					} }
+					onContentSizeChange={ ( event ) => {
+						setAttributes( { aztecHeight: event.aztecHeight } );
+					} }
 					className={ className }
 					placeholder={ placeholder || __( 'Write heading…' ) }
 				/>
