@@ -22,7 +22,6 @@ class HeadingEdit extends Component {
 		const {
 			attributes,
 			setAttributes,
-			className,
 		} = this.props;
 
 		const {
@@ -35,7 +34,6 @@ class HeadingEdit extends Component {
 		return (
 			<View>
 				<RichText
-					wrapperClassName="wp-block-heading"
 					tagName={ tagName }
 					content={ { contentTree: attributes.content, eventCount: attributes.eventCount } }
 					style={ {
@@ -47,7 +45,6 @@ class HeadingEdit extends Component {
 					onContentSizeChange={ ( event ) => {
 						setAttributes( { aztecHeight: event.aztecHeight } );
 					} }
-					className={ className }
 					placeholder={ placeholder || __( 'Write heading…' ) }
 				/>
 			</View>
