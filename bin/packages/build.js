@@ -119,8 +119,8 @@ function buildPackageScss( packagePath ) {
 }
 
 function buildScssFile( styleFile ) {
-	const outputFile = getBuildPath( styleFile, BUILD_DIR.style );
-	const outputFileRTL = getBuildPath( styleFile.replace( '.scss', '-rtl.scss' ), BUILD_DIR.style );
+	const outputFile = getBuildPath( styleFile.replace( '.scss', '.css' ), BUILD_DIR.style );
+	const outputFileRTL = getBuildPath( styleFile.replace( '.scss', '-rtl.css' ), BUILD_DIR.style );
 	mkdirp.sync( path.dirname( outputFile ) );
 	const builtSass = sass.renderSync( {
 		file: styleFile,
