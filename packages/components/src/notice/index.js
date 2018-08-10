@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { IconButton } from '@wordpress/components';
+import Dashicon from '../dashicon';
 import { __ } from '@wordpress/i18n';
 
 function Notice( { className, status, children, onRemove = noop, isDismissible = true } ) {
@@ -18,9 +18,10 @@ function Notice( { className, status, children, onRemove = noop, isDismissible =
 		<div className={ classNames }>
 			{ isString( children ) ? <div className="components-notice__content">{ children }</div> : children }
 			{ isDismissible && (
-				<IconButton icon="no-alt" className="components-notice__dismiss" onClick={ onRemove }>
+				<button className="components-notice__dismiss" type="button" onClick={ onRemove }>
+					<Dashicon icon="no" />
 					<span className="screen-reader-text">{ __( 'Dismiss this notice' ) }</span>
-				</IconButton>
+				</button>
 			) }
 		</div>
 	);
