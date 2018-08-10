@@ -17,12 +17,12 @@
 			top: inherit;
 		}
 
-		.notice {
+		.components-notice {
 			margin: 0 0 5px;
 			padding: 6px 12px;
 			min-height: $panel-header-height;
 
-			.notice-dismiss {
+			.components-notice__dismiss {
 				margin: 5px;
 			}
 		}

@@ -23,7 +23,7 @@ $input-size: 230px;
 		}
 	}
 
-	.components-spinner {
+	.spinner {
 		position: absolute;
 		right: 0;
 		top: $input-padding;
@@ -41,7 +41,7 @@ $input-size: 230px;
 
 // Hide suggestions on mobile until we @todo find a better way to show them
 .editor-url-input__suggestions,
-.editor-url-input .components-spinner {
+.editor-url-input .spinner {
 	display: none;
 	@include break-small() {
 		display: inherit;
