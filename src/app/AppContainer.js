@@ -17,20 +17,20 @@ const mapStateToProps = ( state ) => ( {
 const mapDispatchToProps = ( dispatch, ownProps ) => {
 	return {
 		...ownProps,
-		onChange: ( uid, attributes ) => {
-			dispatch( updateBlockAttributes( uid, attributes ) );
+		onChange: ( clientId, attributes ) => {
+			dispatch( updateBlockAttributes( clientId, attributes ) );
 		},
-		focusBlockAction: ( uid ) => {
-			dispatch( focusBlockAction( uid ) );
+		focusBlockAction: ( clientId ) => {
+			dispatch( focusBlockAction( clientId ) );
 		},
-		moveBlockUpAction: ( uid ) => {
-			dispatch( moveBlockUpAction( uid ) );
+		moveBlockUpAction: ( clientId ) => {
+			dispatch( moveBlockUpAction( clientId ) );
 		},
-		moveBlockDownAction: ( uid ) => {
-			dispatch( moveBlockDownAction( uid ) );
+		moveBlockDownAction: ( clientId ) => {
+			dispatch( moveBlockDownAction( clientId ) );
 		},
-		deleteBlockAction: ( uid ) => {
-			dispatch( deleteBlockAction( uid ) );
+		deleteBlockAction: ( clientId ) => {
+			dispatch( deleteBlockAction( clientId ) );
 		},
 		createBlockAction: ( uid, block ) => {
 			dispatch( createBlockAction( uid, block ) );
