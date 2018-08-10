@@ -8,6 +8,7 @@ import { find, findIndex, reduce } from 'lodash';
 import ActionTypes from '../actions/ActionTypes';
 import type { StateType } from '../';
 import type { BlockActionType } from '../actions';
+import { parse } from '@wordpress/blocks';
 
 function findBlock( blocks, uid: string ) {
 	return find( blocks, obj => {
@@ -109,7 +110,7 @@ export const reducer = (
 			return { blocks: blocks, refresh: ! state.refresh };
 		}
 		case ActionTypes.BLOCK.PARSE: {
-			const parsed = action.parse(action.payload)
+			const parsed = parse(action.payload)
 			return { blocks: parsed, refresh: state.refresh };
 		}
 		default:

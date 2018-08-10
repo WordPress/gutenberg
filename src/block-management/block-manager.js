@@ -27,7 +27,6 @@ export type BlockListType = {
 	aztechtml: string,
 	refresh: boolean,
 	parser: mixed,
-	html: string
 };
 
 type PropsType = BlockListType;
@@ -39,12 +38,9 @@ type StateType = {
 export default class BlockManager extends React.Component<PropsType, StateType> {
 	_recycler = null;
 
-	static defaultProps = {
-		html: '',
-	};
-
 	constructor( props: PropsType ) {
 		super( props );
+		this.html = '';
 		this.state = {
 			dataSource: new DataSource( this.props.blocks, ( item: BlockType ) => item.uid ),
 			showHtml: false,
@@ -108,13 +104,8 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	parseHTML() {
-		const {
-			parser,
-			parseBlocksAction,
-			html,
-		} = this.props;
-
-		parseBlocksAction( html, parser );
+		const { parseBlocksAction } = this.props;
+		parseBlocksAction( this.html );
 	}
 
 	componentDidUpdate() {
@@ -172,7 +163,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 						value={ this.state.showHtml }
 						onValueChange={ ( value ) => {
 							if ( value ) {
-								this.props.html = this.serializeToHtml();
+								this.html = this.serializeToHtml();
 							} else {
 								this.parseHTML();
 							}
@@ -208,8 +199,8 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 					multiline
 					numberOfLines={ 0 }
 					style={ styles.htmlView }
-					onChangeText={ ( html ) => this.props.html = html }>
-					{ this.props.html }
+					onChangeText={ ( html ) => this.html = html }>
+					{ this.html }
 				</TextInput>
 			</KeyboardAvoidingView>
 		);
