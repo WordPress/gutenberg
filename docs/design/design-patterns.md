@@ -24,13 +24,13 @@ A selected block shows a number of contextual actions:
 
 The block interface holds basic actions. Gutenberg aims to ensure good, common defaults, so users should be able to get all their creating done without ever having to use the advanced actions in the Settings Sidebar.
 
-Commonly used actions are highlighted in the **Block Toolbar**. The **Block Chip** lives in the block toolbar, and contains high level block controls for the selected block. It primarily allows users to transform a block into another type of compatible block. Some blocks also use the block chip to users to choose from a set of alternate block styles. 
+Commonly used actions are highlighted in the **Block Toolbar**. The **Block Chip** lives in the block toolbar, and contains high level block controls for the selected block. It primarily allows users to transform a block into another type of compatible block. Some blocks also use the block chip to users to choose from a set of alternate block styles.
 
-The **Block Formatting** options let users adjust block-level settings, and the **Inline Formatting** options allow for adjustments to elements inside the block. When a block is long, the block toolbar pins itself to the top of the screen as the user scrolls down the page. 
+The **Block Formatting** options let users adjust block-level settings, and the **Inline Formatting** options allow for adjustments to elements inside the block. When a block is long, the block toolbar pins itself to the top of the screen as the user scrolls down the page.
 
-Blocks can be moved up and down via the **Block Mover** icons on the left. Additional Block options are available on the right: **Advanced Settings** like “Edit as HTML” and “Convert to Shared Block,” and the ability to delete the block.
+Blocks can be moved up and down via the **Block Mover** icons on the left. Additional block actions are available on the right via an ellipsis menu: deleting and duplicating blocks, as well as **advanced actions** like “Edit as HTML” and “Convert to Reusable Block.”
 
-An unselected block does not show the block toolbar or any other contextual controls. In effect, an unselected block is essentially a preview of the content itself:
+An unselected block does not show the block toolbar or any other contextual controls. In effect, an unselected block is a preview of the content itself:
 
 ![Unselected Block](https://cldup.com/DH9HZnEgwH-3000x3000.png)
 
