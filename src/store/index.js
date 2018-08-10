@@ -11,7 +11,7 @@ import { createStore } from 'redux';
 import { reducer } from './reducers';
 
 export type BlockType = {
-	uid: string,
+	clientId: string,
 	name: string,
 	isValid: boolean,
 	attributes: Object,
@@ -41,6 +41,7 @@ const initialMoreBlockHtml = `
 <!-- /wp:more -->
 `;
 
+const initialHeadingBlockHtml = '<!-- wp:heading {"level": 2} --><h2>Welcome to Gutenberg</h2><!-- /wp:heading -->';
 const initialParagraphBlockHtml = '<!-- wp:paragraph --><p><b>Hello</b> World!</p><!-- /wp:paragraph -->';
 const initialParagraphBlockHtml2 = `<!-- wp:paragraph {"dropCap":true,"backgroundColor":"vivid-red","fontSize":"large","className":"custom-class-1 custom-class-2"} -->
 <p class="has-background has-drop-cap has-large-font-size has-vivid-red-background-color custom-class-1 custom-class-2">
@@ -48,6 +49,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer tempor tincidun
 
 const codeBlockInstance = parse( initialCodeBlockHtml )[ 0 ];
 const moreBlockInstance = parse( initialMoreBlockHtml )[ 0 ];
+const headingBlockInstance = parse( initialHeadingBlockHtml )[ 0 ];
 const paragraphBlockInstance = parse( initialParagraphBlockHtml )[ 0 ];
 const paragraphBlockInstance2 = parse( initialParagraphBlockHtml2 )[ 0 ];
 
@@ -56,7 +58,7 @@ const initialState: StateType = {
 	// If not it should be created from a string parsing (commented HTML to json).
 	blocks: [
 		{
-			uid: '1',
+			clientId: '1',
 			name: 'title',
 			isValid: true,
 			attributes: {
@@ -65,12 +67,13 @@ const initialState: StateType = {
 			innerBlocks: [],
 			focused: false,
 		},
+		{ ...headingBlockInstance, focused: false },
 		{ ...paragraphBlockInstance, focused: false },
 		{ ...paragraphBlockInstance2, focused: false },
 		{ ...codeBlockInstance, focused: false },
 		{ ...moreBlockInstance, focused: false },
 		{
-			uid: '5',
+			clientId: '5',
 			name: 'paragraph',
 			isValid: true,
 			attributes: {

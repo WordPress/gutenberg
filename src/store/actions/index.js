@@ -7,7 +7,7 @@ import ActionTypes from './ActionTypes';
 
 export type BlockActionType = string => {
 	type: $Values<typeof ActionTypes.BLOCK>,
-	uid: string,
+	clientId: string,
 };
 
 export type ParseActionType = string => {
@@ -15,32 +15,32 @@ export type ParseActionType = string => {
 	payload: string,
 };
 
-export function updateBlockAttributes( uid: string, attributes: mixed ) {
+export function updateBlockAttributes( clientId: string, attributes: mixed ) {
 	return {
 		type: ActionTypes.BLOCK.UPDATE_ATTRIBUTES,
-		uid,
+		clientId,
 		attributes,
 	};
 }
 
-export const focusBlockAction: BlockActionType = uid => ( {
+export const focusBlockAction: BlockActionType = clientId => ( {
 	type: ActionTypes.BLOCK.FOCUS,
-	uid: uid,
+	clientId,
 } );
 
-export const moveBlockUpAction: BlockActionType = uid => ( {
+export const moveBlockUpAction: BlockActionType = clientId => ( {
 	type: ActionTypes.BLOCK.MOVE_UP,
-	uid: uid,
+	clientId,
 } );
 
-export const moveBlockDownAction: BlockActionType = uid => ( {
+export const moveBlockDownAction: BlockActionType = clientId => ( {
 	type: ActionTypes.BLOCK.MOVE_DOWN,
-	uid: uid,
+	clientId,
 } );
 
-export const deleteBlockAction: BlockActionType = uid => ( {
+export const deleteBlockAction: BlockActionType = clientId => ( {
 	type: ActionTypes.BLOCK.DELETE,
-	uid: uid,
+	clientId,
 } );
 
 export const parseBlocksAction: ParseActionType = payload => ( {
