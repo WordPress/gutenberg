@@ -31,6 +31,9 @@ $z-layers: (
 	".editor-block-settings-remove": 1,
 	".editor-block-mover__control": 1,
 
+	// Active pill button
+	".components-button.is-button {:focus or .is-primary}": 1,
+
 	// Should have lower index than anything else positioned inside the block containers
 	".editor-block-list__block-draggable": 0,
 
