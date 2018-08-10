@@ -81,11 +81,23 @@ const licenseFileStrings = {
 	],
 };
 
+/**
+ * Check if a license string matches the given license.
+ *
+ * The license string can be a single license, or an SPDX-compatible OR license string.
+ * eg, "(MIT OR Zlib)".
+ *
+ * @param {string} allowedLicense The license that's allowed.
+ * @param {string} licenseType The license string to check.
+ *
+ * @return {boolean} true if the licenseType matches the allowedLicense, false if it doesn't.
+ */
 const checkLicense = ( allowedLicense, licenseType ) => {
 	if ( ! licenseType ) {
 		return false;
 	}
 
+	// Some licenses have unusual capitalisation in them.
 	const formattedAllowedLicense = allowedLicense.toLowerCase();
 	const formattedlicenseType = licenseType.toLowerCase();
 
@@ -93,12 +105,24 @@ const checkLicense = ( allowedLicense, licenseType ) => {
 		return true;
 	}
 
+	// We can skip the parsing below if there isn't an 'OR' in the license.
 	if ( licenseType.indexOf( 'OR' ) < 0 ) {
 		return false;
 	}
 
-	const subLicenseTypes = formattedlicenseType.replace( /^\(*/g, '' ).replace( /\)*$/, '' ).split( ' or ' ).map( ( e ) => e.trim() );
+	/*
+	 * In order to do a basic parse of SPDX-compatible OR license strings, we:
+	 * - Remove surrounding brackets: "(mit or zlib)" -> "mit or zlib"
+	 * - Split it into an array: "mit or zlib" -> [ "mit", "zlib" ]
+	 * - Trim any remaining whitespace from each element
+	 */
+	const subLicenseTypes = formattedlicenseType
+		.replace( /^\(*/g, '' )
+		.replace( /\)*$/, '' )
+		.split( ' or ' )
+		.map( ( e ) => e.trim() );
 
+	// We can then check our array of licenses against the allowedLicense.
 	return subLicenseTypes.reduce( ( satisfied, subLicenseType ) => {
 		if ( checkLicense( allowedLicense, subLicenseType ) ) {
 			return true;
@@ -107,6 +131,7 @@ const checkLicense = ( allowedLicense, licenseType ) => {
 	}, false );
 };
 
+// Use `npm ls` to grab a list of all the packages.
 const child = spawn.sync( 'npm', [
 	'ls',
 	'--parseable',
@@ -127,10 +152,27 @@ modules.forEach( ( path ) => {
 		process.exit( 1 );
 	}
 
+	/*
+	 * The package.json format can be kind of weird. We allow for the following formats:
+	 * - { license: 'MIT' }
+	 * - { license: { type: 'MIT' } }
+	 * - { licenses: [ 'MIT', 'Zlib' ] }
+	 * - { licenses: [ { type: 'MIT' }, { type: 'Zlib' } ] }
+	 */
 	const packageInfo = require( filename );
-	const license = packageInfo.license || ( packageInfo.licenses && packageInfo.licenses.map( ( l ) => l.type || l ).join( ' OR ' ) );
+	const license = packageInfo.license ||
+		(
+			packageInfo.licenses &&
+			packageInfo.licenses
+				.map( ( l ) => l.type || l )
+				.join( ' OR ' )
+		);
 	let licenseType = typeof license === 'object' ? license.type : license;
 
+	/*
+	 * If we haven't been able to detect a license in the package.json file, try reading
+	 * it from the files defined in licenseFiles, instead.
+	 */
 	if ( licenseType === undefined ) {
 		licenseType = licenseFiles.reduce( ( detectedType, licenseFile ) => {
 			if ( detectedType ) {
@@ -142,6 +184,7 @@ modules.forEach( ( path ) => {
 			if ( existsSync( licensePath ) ) {
 				const licenseText = readFileSync( licensePath ).toString();
 
+				// Check if the file contains any of the strings in licenseFileStrings
 				return Object.keys( licenseFileStrings ).reduce( ( stringDetectedType, licenseStringType ) => {
 					const licenseFileString = licenseFileStrings[ licenseStringType ];
 
@@ -156,6 +199,11 @@ modules.forEach( ( path ) => {
 		}, false );
 	}
 
+	if ( ! licenseType ) {
+		return false;
+	}
+
+	// Now that we finally have a license to check, see if any of the allowed licenses match.
 	const allowed = licenses.reduce( ( satisfied, allowedLicense ) => {
 		if ( checkLicense( allowedLicense, licenseType ) ) {
 			return true;
