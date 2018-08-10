@@ -1,7 +1,7 @@
 /**
  * Wordpress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 
 /**
  * Return a label for the block movement controls depending on block position.
@@ -89,8 +89,12 @@ export function getMultiBlockMoverDescription( selectedCount, firstIndex, isFirs
 
 	if ( dir < 0 && ! isFirst ) {
 		return sprintf(
-			// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block
-			__( 'Move %1$d blocks from position %2$d up by one place' ),
+			// translators: 1: Number of selected blocks, 2: Position of selected blocks
+			_n(
+				'Move %1$d block from position %2$d up by one place',
+				'Move %1$d blocks from position %2$d up by one place',
+				selectedCount
+			),
 			selectedCount,
 			position
 		);
@@ -98,8 +102,12 @@ export function getMultiBlockMoverDescription( selectedCount, firstIndex, isFirs
 
 	if ( dir > 0 && ! isLast ) {
 		return sprintf(
-			// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block
-			__( 'Move %1$d blocks from position %2$s down by one place' ),
+			// translators: 1: Number of selected blocks, 2: Position of selected blocks
+			_n(
+				'Move %1$d block from position %2$d down by one place',
+				'Move %1$d blocks from position %2$d down by one place',
+				selectedCount
+			),
 			selectedCount,
 			position
 		);
