@@ -6,14 +6,9 @@ OR if you're looking to change now SVGs get output, you'll need to edit strings 
 !!! */
 
 /**
- * External dependencies
+ * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import './style.scss';
 
 export default class Dashicon extends Component {
 	shouldComponentUpdate( nextProps ) {
