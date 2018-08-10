@@ -1,3 +1,6 @@
+/**
+ * WordPress dependencies
+ */
 import { registerCoreBlocks as registerBlockLibrary } from '@wordpress/block-library';
 import deprecated from '@wordpress/deprecated';
 
