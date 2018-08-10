@@ -15,6 +15,7 @@ import {
 	TextControl,
 	Button,
 	Toolbar,
+	DropdownMenu,
 } from '@wordpress/components';
 
 import {
@@ -266,7 +267,13 @@ export default class extends Component {
 		return (
 			<Fragment>
 				<BlockControls>
-					<Toolbar controls={ this.getTableControls() } />
+					<Toolbar>
+						<DropdownMenu
+							icon="editor-table"
+							label={ __( 'Edit Table' ) }
+							controls={ this.getTableControls() }
+						/>
+					</Toolbar>
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'Table Settings' ) } className="blocks-table-settings">
