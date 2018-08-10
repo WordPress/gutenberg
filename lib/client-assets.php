@@ -416,7 +416,7 @@ function gutenberg_register_scripts_and_styles() {
 		gutenberg_url( 'build/core-blocks/index.js' ),
 		array(
 			'wp-block-library',
-			'wp-deprecated'
+			'wp-deprecated',
 		),
 		filemtime( gutenberg_dir_path() . 'build/core-blocks/index.js' ),
 		true
