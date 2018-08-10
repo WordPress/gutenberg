@@ -190,6 +190,7 @@ function gutenberg_init( $return, $post ) {
 	add_filter( 'admin_body_class', 'gutenberg_add_admin_body_class' );
 
 	$post_type_object = get_post_type_object( $post_type );
+
 	/*
 	 * Always force <title> to 'Edit Post' (or equivalent)
 	 * because it needs to be in a generic state for both
