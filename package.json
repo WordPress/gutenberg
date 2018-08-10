@@ -200,6 +200,9 @@
 		"*.js": [
 			"eslint"
 		],
+		"*.scss": [
+			"npm run lint-css"
+		],
 		"{docs/{root-manifest.json,tool/*.js},packages/{*/README.md,*/src/{actions,selectors}.js,components/src/*/README.md}}": [
 			"npm run docs:build"
 		]
