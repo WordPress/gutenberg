@@ -10,11 +10,3 @@ services:
     image: wordpress:cli
     volumes:
       - ./wordpress:/var/www/html
-
-  wordpress_e2e_tests:
-    volumes:
-      - ./wordpress:/var/www/html
-
-  cli_e2e_tests:
-    volumes:
-      - ./wordpress:/var/www/html
