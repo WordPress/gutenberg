@@ -16,7 +16,7 @@
 			border-radius: 0 3px 3px 0;
 		}
 
-		// The focused button should be elevated so the focusring isn't cropped,
+		// The focused button should be elevated so the focus ring isn't cropped,
 		// as should the active button, because it has a different border color.
 		&:focus,
 		&.is-primary {
