@@ -1,14 +1,15 @@
 # Block Design
 
-The following is a light guide to designing a new block. It consists of some recommendations, as well as detailed descriptions of existing blocks to help demonstrate good practices.    
+Want to design a new block? These recommendations and examples should start you off on the right foot.
 
 ## Best Practices
 
-- Blocks should have a simple icon and label for the Inserter. Ideally, this is a single color icon. Look to [Dashicons](https://developer.wordpress.org/resource/dashicons/) for style inspiration.
-- Blocks should have a good placeholder state when they’re first inserted. If the block includes a text input, provide placeholder text. If it’s meant to hold media, include buttons for uploading or accessing media libraries, as well as drop-zones for drag and drop. In the future, the placeholder state will be used to make page and post templates.
-- When unselected, your block should preview its content.
+- Blocks should have a simple label for the Inserter. Keep it as short as possible.
+- Blocks should have an identifying icon, ideally using a single color. Try to avoid using the same icon used by an existing block. Look to [Dashicons](https://developer.wordpress.org/resource/dashicons/) for style inspiration.
+- Blocks should have a instructive placeholder state when they’re first inserted. If the block includes a text input, provide placeholder text. If your block holds media, include buttons for uploading files and accessing media libraries, as well as drop-zones for drag and drop. Keep in mind that in the future, the placeholder state will be used to make page and post templates.
+- When unselected, your block should preview its content as closely to the front-end output as possible.
 - When selected, your block may surface additional options: input fields or buttons to configure the block directly (if those are necessary for basic operation).
-- Every block should include a description in the “Block” tab of the Settings sidebar. 
+- Every block should include a description in the “Block” tab of the Settings sidebar. The description should explain as clearly as possible what your block does. Keep it to a single sentence.
 - Additional block options and configuration can also be added to the “Block” tab of the Settings Sidebar, but keep in mind that a user might dismiss the sidebar and never use it. Do not put critical options there.
 - Be sure to consider how your block looks, feels, and works on all sorts of devices and screen sizes.
 
@@ -40,11 +41,11 @@ Basic image block.
 
 **Placeholder:**
 
-A generic gray placeholder block with options to upload an image, drop an image directly on it, or pick an image from the media library. 
+A generic gray placeholder block with options to upload an image, drop an image directly on it, or choose an image from the media library.
 
 **Selected state:**
 
-- Block Toolbar: Alignments, including wide and full-wide (if the theme supports it).
+- Block Toolbar: Alignments, including wide and full-width (if the theme supports it).
 - Block Toolbar: Edit Image (opens the Media Library)
 - Block Toolbar: Link button
 - When an image is uploaded, a caption input field appears with a “Write caption…” placeholder text below the image:
