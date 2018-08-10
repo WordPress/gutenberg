@@ -410,6 +410,7 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'build/block-library/index.js' ),
 		true
 	);
+	// Remove it with 3.8.0 release.
 	wp_register_script(
 		'wp-core-blocks',
 		gutenberg_url( 'build/core-blocks/index.js' ),
