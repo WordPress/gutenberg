@@ -15,7 +15,7 @@ describe( 'Store', () => {
 			__iniState = {
 				blocks: [
 					{
-						uid: '0',
+						clientId: '0',
 						blockType: 'title',
 						attributes: {
 							content: 'Hello World',
@@ -23,7 +23,7 @@ describe( 'Store', () => {
 						focused: false,
 					},
 					{
-						uid: '1',
+						clientId: '1',
 						blockType: 'paragraph',
 						attributes: {
 							content: 'paragraph content',

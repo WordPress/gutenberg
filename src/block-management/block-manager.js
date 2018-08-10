@@ -17,7 +17,7 @@ import styles from './block-manager.scss';
 import { getBlockType, serialize } from '@wordpress/blocks';
 
 export type BlockListType = {
-	onChange: ( uid: string, attributes: mixed ) => void,
+	onChange: ( clientId: string, attributes: mixed ) => void,
 	focusBlockAction: string => mixed,
 	moveBlockUpAction: string => mixed,
 	moveBlockDownAction: string => mixed,
@@ -39,39 +39,39 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	constructor( props: PropsType ) {
 		super( props );
 		this.state = {
-			dataSource: new DataSource( this.props.blocks, ( item: BlockType ) => item.uid ),
+			dataSource: new DataSource( this.props.blocks, ( item: BlockType ) => item.clientId ),
 			showHtml: false,
 		};
 	}
 
-	onBlockHolderPressed( uid: string ) {
-		this.props.focusBlockAction( uid );
+	onBlockHolderPressed( clientId: string ) {
+		this.props.focusBlockAction( clientId );
 	}
 
-	getDataSourceIndexFromUid( uid: string ) {
+	getDataSourceIndexFromUid( clientId: string ) {
 		for ( let i = 0; i < this.state.dataSource.size(); ++i ) {
 			const block = this.state.dataSource.get( i );
-			if ( block.uid === uid ) {
+			if ( block.clientId === clientId ) {
 				return i;
 			}
 		}
 		return -1;
 	}
 
-	onToolbarButtonPressed( button: number, uid: string ) {
-		const dataSourceBlockIndex = this.getDataSourceIndexFromUid( uid );
+	onToolbarButtonPressed( button: number, clientId: string ) {
+		const dataSourceBlockIndex = this.getDataSourceIndexFromUid( clientId );
 		switch ( button ) {
 			case ToolbarButton.UP:
 				this.state.dataSource.moveUp( dataSourceBlockIndex );
-				this.props.moveBlockUpAction( uid );
+				this.props.moveBlockUpAction( clientId );
 				break;
 			case ToolbarButton.DOWN:
 				this.state.dataSource.moveDown( dataSourceBlockIndex );
-				this.props.moveBlockDownAction( uid );
+				this.props.moveBlockDownAction( clientId );
 				break;
 			case ToolbarButton.DELETE:
 				this.state.dataSource.splice( dataSourceBlockIndex, 1 );
-				this.props.deleteBlockAction( uid );
+				this.props.deleteBlockAction( clientId );
 				break;
 			case ToolbarButton.SETTINGS:
 				// TODO: implement settings
@@ -101,14 +101,14 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		this.state.dataSource.setDirty();
 	}
 
-	onChange( uid: string, attributes: mixed ) {
+	onChange( clientId: string, attributes: mixed ) {
 		// Update datasource UI
-		const index = this.getDataSourceIndexFromUid( uid );
+		const index = this.getDataSourceIndexFromUid( clientId );
 		const dataSource = this.state.dataSource;
-		const block = dataSource.get( this.getDataSourceIndexFromUid( uid ) );
+		const block = dataSource.get( this.getDataSourceIndexFromUid( clientId ) );
 		dataSource.set( index, { ...block, attributes: attributes } );
 		// Update Redux store
-		this.props.onChange( uid, attributes );
+		this.props.onChange( clientId, attributes );
 	}
 
 	render() {
@@ -134,7 +134,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 					style={ styles.list }
 					data={ this.props.blocks }
 					extraData={ this.props.refresh }
-					keyExtractor={ ( item ) => item.uid }
+					keyExtractor={ ( item ) => item.clientId }
 					renderItem={ this.renderItem.bind( this ) }
 				/>
 			);
@@ -158,14 +158,15 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		);
 	}
 
-	renderItem( value: { item: BlockType, uid: string } ) {
+	renderItem( value: { item: BlockType, clientId: string } ) {
 		return (
 			<BlockHolder
+				key={ value.clientId }
 				onToolbarButtonPressed={ this.onToolbarButtonPressed.bind( this ) }
 				onBlockHolderPressed={ this.onBlockHolderPressed.bind( this ) }
 				onChange={ this.onChange.bind( this ) }
 				focused={ value.item.focused }
-				uid={ value.uid }
+				clientId={ value.clientId }
 				{ ...value.item }
 			/>
 		);
