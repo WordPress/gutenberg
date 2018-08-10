@@ -15,12 +15,13 @@ export default class Dashicon extends Component {
 		return (
 			this.props.icon !== nextProps.icon ||
 			this.props.size !== nextProps.size ||
+			this.props.viewBox !== nextProps.viewBox ||
 			this.props.className !== nextProps.className
 		);
 	}
 
 	render() {
-		const { icon, className, size = 20 } = this.props;
+		const { icon, className, size = 20, viewBox = 20 } = this.props;
 		let path;
 
 		switch ( icon ) {
@@ -893,7 +894,7 @@ export default class Dashicon extends Component {
 				xmlns="http://www.w3.org/2000/svg"
 				width={ size }
 				height={ size }
-				viewBox="0 0 20 20"
+				viewBox={ '0 0 ' + viewBox + ' ' + viewBox } // TODO: if we like this approach, remove this hack and implement upstream
 			>
 				<path d={ path } />
 			</svg>

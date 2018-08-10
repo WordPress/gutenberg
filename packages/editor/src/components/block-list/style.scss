@@ -965,6 +965,10 @@
 		.editor-block-list__block:hover & {
 			@include fade_in(0.1s);
 		}
+
+		.editor-block-list__breadcrumb-drag-handle {
+			margin-right: 2px;
+		}
 	}
 }
 

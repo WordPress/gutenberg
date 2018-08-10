@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Component, Fragment } from '@wordpress/element';
-import { Toolbar } from '@wordpress/components';
+import { Dashicon, Toolbar } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -53,7 +53,7 @@ export class BlockBreadcrumb extends Component {
 		return (
 			<div className={ 'editor-block-list__breadcrumb' }>
 				<Toolbar>
-					<div>:::&nbsp;&nbsp;</div>
+					<div className="editor-block-list__breadcrumb-drag-handle"><Dashicon icon="editor-justify" size={ 10 } viewBox={ 14 } /></div>
 					{ rootClientId && (
 						<Fragment>
 							<BlockTitle clientId={ rootClientId } />
