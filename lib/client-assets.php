@@ -411,6 +411,16 @@ function gutenberg_register_scripts_and_styles() {
 		true
 	);
 	wp_register_script(
+		'wp-core-blocks',
+		gutenberg_url( 'build/core-blocks/index.js' ),
+		array(
+			'wp-block-library',
+			'wp-deprecated'
+		),
+		filemtime( gutenberg_dir_path() . 'build/core-blocks/index.js' ),
+		true
+	);
+	wp_register_script(
 		'wp-nux',
 		gutenberg_url( 'build/nux/index.js' ),
 		array( 'wp-element', 'wp-components', 'wp-compose', 'wp-data', 'wp-i18n', 'lodash' ),

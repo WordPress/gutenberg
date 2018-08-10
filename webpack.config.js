@@ -80,6 +80,7 @@ const entryPointNames = [
 	'utils',
 	'edit-post',
 	'block-library',
+	'core-blocks',
 ];
 
 const gutenbergPackages = [
