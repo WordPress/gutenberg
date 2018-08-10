@@ -123,12 +123,7 @@ const checkLicense = ( allowedLicense, licenseType ) => {
 		.map( ( e ) => e.trim() );
 
 	// We can then check our array of licenses against the allowedLicense.
-	return subLicenseTypes.reduce( ( satisfied, subLicenseType ) => {
-		if ( checkLicense( allowedLicense, subLicenseType ) ) {
-			return true;
-		}
-		return satisfied;
-	}, false );
+	return undefined !== subLicenseTypes.find( ( subLicenseType ) => checkLicense( allowedLicense, subLicenseType ) );
 };
 
 // Use `npm ls` to grab a list of all the packages.
@@ -204,12 +199,7 @@ modules.forEach( ( path ) => {
 	}
 
 	// Now that we finally have a license to check, see if any of the allowed licenses match.
-	const allowed = licenses.reduce( ( satisfied, allowedLicense ) => {
-		if ( checkLicense( allowedLicense, licenseType ) ) {
-			return true;
-		}
-		return satisfied;
-	}, false );
+	const allowed = licenses.find( ( allowedLicense ) => checkLicense( allowedLicense, licenseType ) );
 
 	if ( ! allowed ) {
 		process.exitCode = 1;
