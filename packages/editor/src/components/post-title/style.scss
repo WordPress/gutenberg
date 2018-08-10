@@ -47,7 +47,8 @@
 	}
 
 	.editor-post-title__input:hover {
-		border-color: theme(outlines);
+		@include outline_fade_in(0.1s, 1s);
+		outline: $border-width solid $dark-opacity-light-500;
 	}
 }
 
