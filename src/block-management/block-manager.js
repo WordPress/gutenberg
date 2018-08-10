@@ -47,10 +47,6 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		};
 	}
 
-	componentDidMount() {
-		this.serializeToHtml();
-	}
-
 	onBlockHolderPressed( uid: string ) {
 		this.props.focusBlockAction( uid );
 	}
