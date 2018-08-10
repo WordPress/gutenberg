@@ -30,8 +30,10 @@ export class RichText extends Component {
 		this.lastEventCount = event.nativeEvent.eventCount;
 		// The following method just cleans up any <p> tags produced by aztec and replaces them with a br tag
 		// This should be removed on a later version when aztec doesn't return the top tag of the text being edited
-		const contentWithoutP = event.nativeEvent.text.replace( /<p>/gi, '' ).replace( /<\/p>/gi, '<br>' );
-		this.lastContent = contentWithoutP;
+		const openingTagRegexp = RegExp( '^<' + this.props.tagName + '>', 'gi' );
+		const closingTagRegexp = RegExp( '</' + this.props.tagName + '>$', 'gi' );
+		const contentWithoutRootTag = event.nativeEvent.text.replace( openingTagRegexp, '' ).replace( closingTagRegexp, '' );
+		this.lastContent = contentWithoutRootTag;
 
 		this.currentTimer = setTimeout( function() {
 			this.props.onChange( {
@@ -68,12 +70,14 @@ export class RichText extends Component {
 	}
 
 	render() {
-		// Save back to HTML from React tree
-		const html = renderToString( this.props.content.contentTree );
 		const {
+			tagName,
 			style,
 			eventCount,
 		} = this.props;
+
+		// Save back to HTML from React tree
+		const html = '<' + tagName + '>' + renderToString( this.props.content.contentTree ) + '</' + tagName + '>';
 
 		return (
 			<RCTAztecView
