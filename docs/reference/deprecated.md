@@ -1,5 +1,9 @@
 Gutenberg's deprecation policy is intended to support backwards-compatibility for two minor releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
 
+## 3.8.0
+
+ - `wp.coreBlocks.registerCoreBlocks` has been removed. Please use `wp.blockLibrary.registerCoreBlocks` instead.
+
 ## 3.7.0
 
  - `wp.components.withAPIData` has been removed. Please use the Core Data module or `wp.apiFetch` directly instead.

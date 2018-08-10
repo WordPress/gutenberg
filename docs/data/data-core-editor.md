@@ -1,6 +1,6 @@
 # **core/editor**: The Editor’s Data
 
-## Selectors
+## Selectors 
 
 ### hasEditorUndo
 
@@ -1423,4 +1423,3 @@ Returns an action object used in signalling that the editor settings have been u
 *Parameters*
 
  * settings: Updated settings
- 

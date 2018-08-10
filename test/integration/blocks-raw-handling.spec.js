@@ -12,7 +12,7 @@ import {
 	rawHandler,
 	serialize,
 } from '@wordpress/blocks';
-import { registerCoreBlocks } from '@wordpress/core-blocks';
+import { registerCoreBlocks } from '@wordpress/block-library';
 
 describe( 'Blocks raw handling', () => {
 	beforeAll( () => {

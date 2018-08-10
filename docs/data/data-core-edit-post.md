@@ -95,6 +95,19 @@ Returns true if the editor sidebar panel is open, or false otherwise.
 
 Whether the sidebar panel is open.
 
+### isModalActive
+
+Returns true if a modal is active, or false otherwise.
+
+*Parameters*
+
+ * state: Global application state.
+ * modalName: A string that uniquely identifies the modal.
+
+*Returns*
+
+Whether the modal is active.
+
 ### isFeatureActive
 
 Returns whether the given feature is enabled or not.
@@ -170,6 +183,18 @@ Returns an action object used in signalling that the user opened an editor sideb
  * name: Sidebar name to be opened.
 
 ### closeGeneralSidebar
+
+Returns an action object signalling that the user closed the sidebar.
+
+### openModal
+
+Returns an action object used in signalling that the user opened an editor sidebar.
+
+*Parameters*
+
+ * name: A string that uniquely identifies the modal.
+
+### closeModal
 
 Returns an action object signalling that the user closed the sidebar.
 
