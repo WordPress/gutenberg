@@ -300,6 +300,9 @@ describe( 'selectors', () => {
 			};
 
 			expect( isCleanNewPost( state ) ).toBe( true );
+			expect( console ).toHaveWarnedWith(
+				'isCleanNewPost selector is deprecated and will be removed from Gutenberg in 3.8.'
+			);
 		} );
 
 		it( 'should return false when the post is not dirty but the post has been saved', () => {
@@ -317,6 +320,9 @@ describe( 'selectors', () => {
 			};
 
 			expect( isCleanNewPost( state ) ).toBe( false );
+			expect( console ).toHaveWarnedWith(
+				'isCleanNewPost selector is deprecated and will be removed from Gutenberg in 3.8.'
+			);
 		} );
 
 		it( 'should return false when the post is dirty but the post has not been saved', () => {
@@ -334,6 +340,9 @@ describe( 'selectors', () => {
 			};
 
 			expect( isCleanNewPost( state ) ).toBe( false );
+			expect( console ).toHaveWarnedWith(
+				'isCleanNewPost selector is deprecated and will be removed from Gutenberg in 3.8.'
+			);
 		} );
 	} );
 
@@ -601,6 +610,9 @@ describe( 'selectors', () => {
 			};
 
 			expect( getDocumentTitle( state ) ).toBe( 'The Title' );
+			expect( console ).toHaveWarnedWith(
+				'getDocumentTitle selector is deprecated and will be removed from Gutenberg in 3.8.'
+			);
 		} );
 
 		it( 'should return current title for edited existing post', () => {
@@ -622,6 +634,9 @@ describe( 'selectors', () => {
 			};
 
 			expect( getDocumentTitle( state ) ).toBe( 'Modified Title' );
+			expect( console ).toHaveWarnedWith(
+				'getDocumentTitle selector is deprecated and will be removed from Gutenberg in 3.8.'
+			);
 		} );
 
 		it( 'should return new post title when new post is clean', () => {
@@ -645,6 +660,9 @@ describe( 'selectors', () => {
 			};
 
 			expect( getDocumentTitle( state ) ).toBe( __( 'New post' ) );
+			expect( console ).toHaveWarnedWith(
+				'getDocumentTitle selector is deprecated and will be removed from Gutenberg in 3.8.'
+			);
 		} );
 
 		it( 'should return untitled title', () => {
@@ -668,6 +686,9 @@ describe( 'selectors', () => {
 			};
 
 			expect( getDocumentTitle( state ) ).toBe( __( '(Untitled)' ) );
+			expect( console ).toHaveWarnedWith(
+				'getDocumentTitle selector is deprecated and will be removed from Gutenberg in 3.8.'
+			);
 		} );
 	} );
 
