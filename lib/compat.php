@@ -88,39 +88,6 @@ function gutenberg_disable_editor_settings_wpautop( $settings, $editor_id ) {
 add_filter( 'wp_editor_settings', 'gutenberg_disable_editor_settings_wpautop', 10, 2 );
 
 /**
- * Add TinyMCE fixes for the Classic Editor.
- *
- * @see https://core.trac.wordpress.org/ticket/44308
- */
-function gutenberg_add_classic_editor_fixes() {
-	// Temp add the fix for not creating paragraphs from HTML comments.
-	// TODO: remove after 4.9.7, this should be in core.
-	$script = <<<JS
-jQuery( document ).on( 'tinymce-editor-setup', function( event, editor ) {
-	var hasWpautop = ( window.wp && window.wp.editor && window.wp.editor.autop && editor.getParam( 'wpautop', true ) );
-
-	editor.on( 'BeforeSetContent', function( event ) {
-		if ( event.load && event.format !== 'raw' && ! hasWpautop ) {
-			// Prevent creation of paragraphs out of multiple HTML comments.
-			event.content = event.content.replace( /-->\s+<!--/g, '--><!--' );
-		}
-	});
-
-	editor.on( 'SaveContent', function( event ) {
-		if ( ! hasWpautop ) {
-			// Restore formatting of block boundaries.
-			event.content = event.content.replace( /-->\s*<!-- wp:/g, '-->\\n\\n<!-- wp:' );
-		}
-	});
-});
-JS;
-
-	wp_add_inline_script( 'editor', $script, 'before' );
-
-}
-add_action( 'init', 'gutenberg_add_classic_editor_fixes' );
-
-/**
  * Add rest nonce to the heartbeat response.
  *
  * @param  array $response Original heartbeat response.
@@ -167,7 +134,7 @@ function gutenberg_check_if_classic_needs_warning_about_blocks() {
 		return;
 	}
 
-	if ( ! gutenberg_post_has_blocks( $post ) ) {
+	if ( ! gutenberg_post_has_blocks( $post ) && ! isset( $_REQUEST['cloudflare-error'] ) ) {
 		return;
 	}
 
@@ -175,7 +142,11 @@ function gutenberg_check_if_classic_needs_warning_about_blocks() {
 	wp_enqueue_script( 'wp-a11y' );
 	wp_enqueue_script( 'wp-sanitize' );
 
-	add_action( 'admin_footer', 'gutenberg_warn_classic_about_blocks' );
+	if ( isset( $_REQUEST['cloudflare-error'] ) ) {
+		add_action( 'admin_footer', 'gutenberg_warn_classic_about_cloudflare' );
+	} else {
+		add_action( 'admin_footer', 'gutenberg_warn_classic_about_blocks' );
+	}
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_check_if_classic_needs_warning_about_blocks' );
 
@@ -283,6 +254,141 @@ function gutenberg_warn_classic_about_blocks() {
 					// Attach event handlers.
 					dialog.warningTabbables.on( 'keydown', dialog.constrainTabbing );
 					dialog.warning.on( 'click', '.blocks-in-post-classic-button', dialog.dismissWarning );
+
+					// Make screen readers announce the warning message after a short delay (necessary for some screen readers).
+					setTimeout( function() {
+						wp.a11y.speak( wp.sanitize.stripTags( dialog.rawMessage.replace( /\s+/g, ' ' ) ), 'assertive' );
+					}, 1000 );
+				};
+
+				dialog.constrainTabbing = function( event ) {
+					var firstTabbable, lastTabbable;
+
+					if ( 9 !== event.which ) {
+						return;
+					}
+
+					firstTabbable = dialog.warningTabbables.first()[0];
+					lastTabbable = dialog.warningTabbables.last()[0];
+
+					if ( lastTabbable === event.target && ! event.shiftKey ) {
+						firstTabbable.focus();
+						event.preventDefault();
+					} else if ( firstTabbable === event.target && event.shiftKey ) {
+						lastTabbable.focus();
+						event.preventDefault();
+					}
+				};
+
+				dialog.dismissWarning = function() {
+					// Hide modal.
+					dialog.warning.remove();
+					$( '#wpwrap' ).removeAttr( 'aria-hidden' );
+					$( 'body' ).removeClass( 'modal-open' );
+				};
+
+				$( document ).ready( dialog.init );
+			} )( jQuery );
+			/* ]]> */
+		</script>
+	<?php
+}
+
+/**
+ * Adds a warning to the Classic Editor when CloudFlare is blocking REST API requests.
+ *
+ * @since 3.4.0
+ */
+function gutenberg_warn_classic_about_cloudflare() {
+	?>
+		<style type="text/css">
+			#cloudflare-block-dialog .notification-dialog {
+				padding: 25px;
+			}
+
+			#cloudflare-block-dialog ul {
+				list-style: initial;
+				padding-left: 20px;
+			}
+
+			@media only screen and (max-height: 480px), screen and (max-width: 450px) {
+				#cloudflare-block-dialog .notification-dialog {
+					width: 100%;
+					height: 100%;
+					max-height: 100%;
+					position: fixed;
+					top: 0;
+					margin: 0;
+					left: 0;
+				}
+			}
+		</style>
+
+		<div id="cloudflare-block-dialog" class="notification-dialog-wrap">
+			<div class="notification-dialog-background"></div>
+			<div class="notification-dialog">
+				<div class="cloudflare-block-message">
+					<h2><?php _e( 'Cloudflare is blocking REST API requests.', 'gutenberg' ); ?></h2>
+					<p><?php _e( 'Your site uses Cloudflare, which provides a Web Application Firewall (WAF) to secure your site against attacks. Unfortunately, some of these WAF rules are incorrectly blocking legitimate access to your site, preventing Gutenberg from functioning correctly.', 'gutenberg' ); ?></p>
+					<p><?php _e( "We're working closely with Cloudflare to fix this issue, but in the mean time, you can work around it in one of two ways:", 'gutenberg' ); ?></p>
+					<ul>
+						<li><?php _e( 'If you have a Cloudflare Pro account, log in to Cloudflare, visit the Firewall settings page, open the "Cloudflare Rule Set" details, open the "Cloudflare WordPress" ruleset, then set the rules "WP0025A" and "WP0025B" to "Disable".', 'gutenberg' ); ?></li>
+						<li>
+						<?php
+							printf(
+								/* translators: %s: link to a comment in the Gutenberg repository */
+								__( 'For free Cloudflare accounts, you can <a href="%s">change the REST API URL</a>, to avoid triggering the WAF rules. Please be aware that this may cause issues with other plugins that use the REST API, and removes any other protection Cloudflare may be offering for the REST API.', 'gutenberg' ),
+								'https://github.com/WordPress/gutenberg/issues/2704#issuecomment-410582252'
+							);
+						?>
+						</li>
+					</ul>
+					<p>
+					<?php
+						printf(
+							/* translators: %s link to an issue in the Gutenberg repository */
+							__( 'If neither of these options are possible for you, please <a href="%s">follow this issue for updates</a>. We hope to have this issue rectified soon!', 'gutenberg' ),
+							'https://github.com/WordPress/gutenberg/issues/2704'
+						);
+					?>
+					</p>
+				</div>
+				<p>
+					<button type="button" class="button button-primary cloudflare-block-classic-button"><?php _e( 'Continue to Classic Editor', 'gutenberg' ); ?></button>
+				</p>
+			</div>
+		</div>
+
+		<script type="text/javascript">
+			/* <![CDATA[ */
+			( function( $ ) {
+				var dialog = {};
+
+				dialog.init = function() {
+					// The modal
+					dialog.warning = $( '#cloudflare-block-dialog' );
+					// Get the links and buttons within the modal.
+					dialog.warningTabbables = dialog.warning.find( 'a, button' );
+
+					// Get the text within the modal.
+					dialog.rawMessage = dialog.warning.find( '.cloudflare-block-message' ).text();
+
+					// Hide all the #wpwrap content from assistive technologies.
+					$( '#wpwrap' ).attr( 'aria-hidden', 'true' );
+
+					// Detach the warning modal from its position and append it to the body.
+					$( document.body )
+						.addClass( 'modal-open' )
+						.append( dialog.warning.detach() );
+
+					// Reveal the modal and set focus on the Gutenberg button.
+					dialog.warning
+						.removeClass( 'hidden' )
+						.find( '.cloudflare-block-gutenberg-button' ).focus();
+
+					// Attach event handlers.
+					dialog.warningTabbables.on( 'keydown', dialog.constrainTabbing );
+					dialog.warning.on( 'click', '.cloudflare-block-classic-button', dialog.dismissWarning );
 
 					// Make screen readers announce the warning message after a short delay (necessary for some screen readers).
 					setTimeout( function() {

@@ -1,18 +1,17 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
 import {
-	newPost,
-	newDesktopBrowserPage,
+	clickBlockAppender,
 	getEditedPostContent,
-	pressWithModifier,
+	newPost,
 	pressTimes,
+	pressWithModifier,
+	META_KEY,
 } from '../support/utils';
 
 describe( 'adding blocks', () => {
 	beforeEach( async () => {
-		await newDesktopBrowserPage();
 		await newPost();
 	} );
 
@@ -20,7 +19,7 @@ describe( 'adding blocks', () => {
 		let activeElementText;
 
 		// Add demo content
-		await page.click( '.editor-default-block-appender__content' );
+		await clickBlockAppender();
 		await page.keyboard.type( 'First paragraph' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/columns' );
@@ -76,7 +75,7 @@ describe( 'adding blocks', () => {
 
 	it( 'should navigate around inline boundaries', async () => {
 		// Add demo content
-		await page.click( '.editor-default-block-appender__content' );
+		await clickBlockAppender();
 		await page.keyboard.type( 'First' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Second' );
@@ -90,7 +89,7 @@ describe( 'adding blocks', () => {
 		await page.keyboard.down( 'Shift' );
 		await pressTimes( 'ArrowLeft', 6 );
 		await page.keyboard.up( 'Shift' );
-		await pressWithModifier( 'mod', 'b' );
+		await pressWithModifier( META_KEY, 'b' );
 
 		// Arrow left from selected bold should collapse to before the inline
 		// boundary. Arrow once more to traverse into first paragraph.
@@ -146,17 +145,17 @@ describe( 'adding blocks', () => {
 	it( 'should clean TinyMCE content', async () => {
 		// Ensure no zero-width space character. Notably, this can occur when
 		// save occurs while at an inline boundary edge.
-		await page.click( '.editor-default-block-appender__content' );
-		await pressWithModifier( 'mod', 'b' );
+		await clickBlockAppender();
+		await pressWithModifier( META_KEY, 'b' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		// When returning to Visual mode, backspace in selected block should
-		// reset to the provisional block.
+		// reset to an unmodified default block.
 		await page.keyboard.press( 'Backspace' );
 
 		// Ensure no data-mce-selected. Notably, this can occur when content
 		// is saved while typing within an inline boundary.
-		await pressWithModifier( 'mod', 'b' );
+		await pressWithModifier( META_KEY, 'b' );
 		await page.keyboard.type( 'Inside' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

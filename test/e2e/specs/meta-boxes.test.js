@@ -1,19 +1,16 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage } from '../support/utils';
+import { newPost } from '../support/utils';
 import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
 describe( 'Meta boxes', () => {
 	beforeAll( async () => {
-		await newDesktopBrowserPage();
 		await activatePlugin( 'gutenberg-test-plugin-meta-box' );
 		await newPost();
 	} );
 
 	afterAll( async () => {
-		await newDesktopBrowserPage();
 		await deactivatePlugin( 'gutenberg-test-plugin-meta-box' );
 	} );
 

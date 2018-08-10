@@ -17,6 +17,7 @@ function FixedToolbarToggle( { onToggle, isActive } ) {
 			icon={ isActive && 'yes' }
 			isSelected={ isActive }
 			onClick={ onToggle }
+			role="menuitemcheckbox"
 		>
 			{ __( 'Fix Toolbar to Top' ) }
 		</MenuItem>

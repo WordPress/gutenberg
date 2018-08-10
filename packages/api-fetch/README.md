@@ -58,7 +58,7 @@ apiFetch.use( apiFetch.createNonceMiddleware( nonce ) );
 import apiFetch from '@wordpress/api-fetch';
 
 const rootURL = "http://my-wordpress-site/wp-json/";
-apiFetch.use( apiFetch.createRootURLMiddleware( nonce ) );
+apiFetch.use( apiFetch.createRootURLMiddleware( rootURL ) );
 ```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

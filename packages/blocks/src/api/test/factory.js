@@ -1024,9 +1024,9 @@ describe( 'block factory', () => {
 
 			const transformedBlocks = switchToBlockType( block, 'core/updated-text-block' );
 
-			// Make sure the block UIDs are set as expected: the first
+			// Make sure the block client IDs are set as expected: the first
 			// transformed block whose type matches the "destination" type gets
-			// to keep the existing block's UID.
+			// to keep the existing block's client ID.
 			expect( transformedBlocks ).toHaveLength( 2 );
 			expect( transformedBlocks[ 0 ] ).toHaveProperty( 'clientId' );
 			expect( transformedBlocks[ 0 ].clientId ).not.toBe( block.clientId );

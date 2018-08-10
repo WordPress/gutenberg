@@ -11,13 +11,11 @@ Renders a button with default style.
 ```jsx
 import { Button } from "@wordpress/components";
 
-function MyButton() {
-	return (
-		<Button isDefault>
-			Click me!
-		</Button>
-	);
-}
+const MyButton = () => (
+	<Button isDefault>
+		Click me!
+	</Button>
+);
 ```
 
 ## Props

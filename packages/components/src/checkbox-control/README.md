@@ -10,7 +10,7 @@ Render an is author checkbox:
 import { CheckboxControl } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
 
-withState( {
+const MyCheckboxControl = withState( {
 	isChecked: true,
 } )( ( { isChecked, setState } ) => ( 
 	<CheckboxControl
@@ -20,7 +20,7 @@ withState( {
 		checked={ isChecked }
 		onChange={ ( isChecked ) => { setState( { isChecked } ) } }
 	/>
-) )
+) );
 ```
 
 ## Props

@@ -1,0 +1,56 @@
+.edit-post-keyboard-shortcut-help {
+	&__title {
+		font-size: 1rem;
+		font-weight: bold;
+	}
+
+	&__section {
+		margin: 0 0 2rem 0;
+	}
+
+
+	&__section-title {
+		font-size: 0.9rem;
+		font-weight: bold;
+	}
+
+	&__shortcut {
+		display: flex;
+		align-items: center;
+		padding: 0.6rem 0;
+		border-top: 1px solid $light-gray-500;
+
+		&:last-child {
+			border-bottom: 1px solid $light-gray-500;
+		}
+	}
+
+	&__shortcut-term {
+		flex: 1;
+		order: 1;
+		text-align: right;
+		font-weight: bold;
+		margin: 0 0 0 1rem;
+	}
+
+	&__shortcut-description {
+		order: 0;
+		margin: 0;
+	}
+
+	&__shortcut-key-combination {
+		background: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	&__shortcut-key {
+		padding: 0.25rem 0.5rem;
+		border-radius: 8%;
+		margin: 0 0.2rem 0 0.2rem;
+
+		&:last-child {
+			margin: 0 0 0 0.2rem;
+		}
+	}
+}

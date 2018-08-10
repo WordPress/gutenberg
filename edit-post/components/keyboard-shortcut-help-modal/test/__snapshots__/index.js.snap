@@ -1,0 +1,256 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`KeyboardShortcutHelpModal should match snapshot when the modal is active 1`] = `
+<React.Fragment>
+  <KeyboardShortcuts
+    bindGlobal={true}
+    shortcuts={
+      Object {
+        "shift+alt+h": [Function],
+      }
+    }
+  />
+  <WithInstanceId(Modal)
+    className="edit-post-keyboard-shortcut-help"
+    closeLabel="Close"
+    onRequestClose={[Function]}
+    title={
+      <span
+        className="edit-post-keyboard-shortcut-help__title"
+      >
+        Keyboard Shortcuts
+      </span>
+    }
+  >
+    <ShortcutSection
+      key="0"
+      shortcuts={
+        Array [
+          Object {
+            "description": "Display this help.",
+            "keyCombination": Array [
+              "Shift",
+              "+",
+              "Alt",
+              "+",
+              "H",
+            ],
+          },
+          Object {
+            "description": "Save your changes.",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "S",
+            ],
+          },
+          Object {
+            "description": "Undo your last changes.",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "Z",
+            ],
+          },
+          Object {
+            "description": "Redo your last undo.",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "Shift",
+              "+",
+              "Z",
+            ],
+          },
+          Object {
+            "description": "Show or hide the settings sidebar.",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "Shift",
+              "+",
+              ",",
+            ],
+          },
+          Object {
+            "description": "Navigate to a the next part of the editor.",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "\`",
+            ],
+          },
+          Object {
+            "description": "Navigate to the previous part of the editor.",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "Shift",
+              "+",
+              "\`",
+            ],
+          },
+          Object {
+            "description": "Navigate to a the next part of the editor (alternative).",
+            "keyCombination": Array [
+              "Shift",
+              "+",
+              "Alt",
+              "+",
+              "N",
+            ],
+          },
+          Object {
+            "description": "Navigate to the previous part of the editor (alternative).",
+            "keyCombination": Array [
+              "Shift",
+              "+",
+              "Alt",
+              "+",
+              "P",
+            ],
+          },
+          Object {
+            "description": "Switch between Visual Editor and Code Editor.",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "Shift",
+              "+",
+              "Alt",
+              "+",
+              "M",
+            ],
+          },
+        ]
+      }
+      title="Global shortcuts"
+    />
+    <ShortcutSection
+      key="1"
+      shortcuts={
+        Array [
+          Object {
+            "description": "Select all text when typing. Press again to select all blocks.",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "A",
+            ],
+          },
+          Object {
+            "description": "Clear selection.",
+            "keyCombination": "Esc",
+          },
+        ]
+      }
+      title="Selection shortcuts"
+    />
+    <ShortcutSection
+      key="2"
+      shortcuts={
+        Array [
+          Object {
+            "description": "Duplicate the selected block(s).",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "Shift",
+              "+",
+              "D",
+            ],
+          },
+          Object {
+            "description": "Change the block type after adding a new paragraph.",
+            "keyCombination": "/",
+          },
+        ]
+      }
+      title="Block shortcuts"
+    />
+    <ShortcutSection
+      key="3"
+      shortcuts={
+        Array [
+          Object {
+            "description": "Make the selected text bold.",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "B",
+            ],
+          },
+          Object {
+            "description": "Make the selected text italic.",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "I",
+            ],
+          },
+          Object {
+            "description": "Underline the selected text.",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "U",
+            ],
+          },
+          Object {
+            "description": "Convert the selected text into a link.",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "K",
+            ],
+          },
+          Object {
+            "description": "Remove a link.",
+            "keyCombination": Array [
+              "Shift",
+              "+",
+              "Alt",
+              "+",
+              "S",
+            ],
+          },
+          Object {
+            "description": "Add a strikethrough to the selected text.",
+            "keyCombination": Array [
+              "Shift",
+              "+",
+              "Alt",
+              "+",
+              "D",
+            ],
+          },
+          Object {
+            "description": "Display the selected text in a monospaced font.",
+            "keyCombination": Array [
+              "Shift",
+              "+",
+              "Alt",
+              "+",
+              "X",
+            ],
+          },
+        ]
+      }
+      title="Text formatting"
+    />
+  </WithInstanceId(Modal)>
+</React.Fragment>
+`;
+
+exports[`KeyboardShortcutHelpModal should match snapshot when the modal is not active 1`] = `
+<React.Fragment>
+  <KeyboardShortcuts
+    bindGlobal={true}
+    shortcuts={
+      Object {
+        "shift+alt+h": [Function],
+      }
+    }
+  />
+</React.Fragment>
+`;

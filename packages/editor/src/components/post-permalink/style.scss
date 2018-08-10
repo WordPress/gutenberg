@@ -44,8 +44,8 @@
 	position: relative;
 	white-space: nowrap;
 
-	&:after {
-		@include long-content-fade( $size: 20%, $edge: 1px );
+	&::after {
+		@include long-content-fade($size: 20%, $edge: 1px);
 	}
 }
 

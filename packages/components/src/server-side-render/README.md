@@ -1,5 +1,4 @@
-ServerSideRender
-=======
+# ServerSideRender
 
 ServerSideRender is a component used for server-side rendering a preview of dynamic blocks to display in the editor. Server-side rendering in a block's `edit` function should be limited to blocks that are heavily dependent on existing PHP rendering logic that is heavily intertwined with data, particularly when there are no endpoints available.
 
@@ -14,10 +13,17 @@ New blocks should be built in conjunction with any necessary REST API endpoints,
 Render core/archives preview.
 
 ```jsx
+import { ServerSideRender } from '@wordpress/components';
+
+const MyServerSideRender = () => (
 	<ServerSideRender
 		block="core/archives"
-		attributes={ this.props.attributes }
+		attributes={ {
+			showPostCounts: true,
+			displayAsDropdown: false, 
+		} }
 	/>
+);
 ```
 
 ## Output

@@ -12,7 +12,7 @@
 /**
  * External dependencies
  */
-import { get, mapValues, includes } from 'lodash';
+import { get, mapValues, includes, capitalize } from 'lodash';
 
 export const BACKSPACE = 8;
 export const TAB = 9;
@@ -47,8 +47,13 @@ export function isMacOS( _window = window ) {
 const modifiers = {
 	primary: ( _isMac ) => _isMac() ? [ COMMAND ] : [ CTRL ],
 	primaryShift: ( _isMac ) => _isMac() ? [ SHIFT, COMMAND ] : [ CTRL, SHIFT ],
+	primaryAlt: ( _isMac ) => _isMac() ? [ ALT, COMMAND ] : [ CTRL, ALT ],
 	secondary: ( _isMac ) => _isMac() ? [ SHIFT, ALT, COMMAND ] : [ CTRL, SHIFT, ALT ],
 	access: ( _isMac ) => _isMac() ? [ CTRL, ALT ] : [ SHIFT, ALT ],
+	ctrl: () => [ CTRL ],
+	ctrlShift: () => [ CTRL, SHIFT ],
+	shift: () => [ SHIFT ],
+	shiftAlt: () => [ SHIFT, ALT ],
 };
 
 /**
@@ -65,12 +70,12 @@ export const rawShortcut = mapValues( modifiers, ( modifier ) => {
 } );
 
 /**
- * An object that contains functions to display shortcuts.
- * E.g. displayShortcut.primary( 'm' ) will return '⌘M' on Mac.
+ * Return an array of the parts of a keyboard shortcut chord for display
+ * E.g displayShortcutList.primary( 'm' ) will return [ '⌘', 'M' ] on Mac.
  *
- * @type {Object} Keyed map of functions to display shortcuts.
+ * @type {Object} keyed map of functions to shortcut sequences
  */
-export const displayShortcut = mapValues( modifiers, ( modifier ) => {
+export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
 	return ( character, _isMac = isMacOS ) => {
 		const isMac = _isMac();
 		const replacementKeyMap = {
@@ -79,16 +84,30 @@ export const displayShortcut = mapValues( modifiers, ( modifier ) => {
 			[ COMMAND ]: '⌘',
 			[ SHIFT ]: 'Shift',
 		};
-		const shortcut = [
-			...modifier( _isMac ).map( ( key ) => get( replacementKeyMap, key, key ) ),
-			character.toUpperCase(),
-		].join( '+' );
 
-		// Because we use just the clover symbol for MacOS's "command" key, remove
-		// the key join character ("+") between it and the final character if that
-		// final character is alphanumeric. ⌘S looks nicer than ⌘+S.
-		return shortcut.replace( /⌘\+([A-Z0-9])$/g, '⌘$1' );
+		const modifierKeys = modifier( _isMac ).reduce( ( accumulator, key ) => {
+			const replacementKey = get( replacementKeyMap, key, key );
+			// When the mac's clover symbol is used, do not display a + afterwards
+			if ( replacementKey === '⌘' ) {
+				return [ ...accumulator, replacementKey ];
+			}
+
+			return [ ...accumulator, replacementKey, '+' ];
+		}, [] );
+
+		const capitalizedCharacter = capitalize( character );
+		return [ ...modifierKeys, capitalizedCharacter ];
 	};
+} );
+
+/**
+ * An object that contains functions to display shortcuts.
+ * E.g. displayShortcut.primary( 'm' ) will return '⌘M' on Mac.
+ *
+ * @type {Object} Keyed map of functions to display shortcuts.
+ */
+export const displayShortcut = mapValues( displayShortcutList, ( sequence ) => {
+	return ( character, _isMac = isMacOS ) => sequence( character, _isMac ).join( '' );
 } );
 
 /**

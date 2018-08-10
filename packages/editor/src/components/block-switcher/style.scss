@@ -11,8 +11,8 @@
 
 	// Unset icon button styles.
 	&:active,
-	&:not( :disabled ):not( [aria-disabled="true"] ):hover,
-	&:not( [aria-disabled="true"] ):focus {
+	&:not(:disabled):not([aria-disabled="true"]):hover,
+	&:not([aria-disabled="true"]):focus {
 		outline: none;
 		box-shadow: none;
 		background: none;
@@ -20,7 +20,7 @@
 	}
 
 	// Block hover style.
-	&:not( :disabled ):hover .editor-block-icon__colors {
+	&:not(:disabled):hover .editor-block-icon__colors {
 		@include block-style__hover();
 	}
 
