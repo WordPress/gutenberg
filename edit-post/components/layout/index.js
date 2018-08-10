@@ -14,7 +14,6 @@ import {
 	UnsavedChangesWarning,
 	EditorNotices,
 	PostPublishPanel,
-	DocumentTitle,
 	PreserveScrollInReorder,
 } from '@wordpress/editor';
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -69,7 +68,6 @@ function Layout( {
 	};
 	return (
 		<div className={ className }>
-			<DocumentTitle />
 			<BrowserURL />
 			<UnsavedChangesWarning forceIsDirty={ () => {
 				return some( metaBoxes, ( metaBox, location ) => {
