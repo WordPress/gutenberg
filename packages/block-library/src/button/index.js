@@ -65,7 +65,7 @@ export const settings = {
 
 	description: __( 'Want visitors to click to subscribe, buy, or read more? Get their attention with a button.' ),
 
-	icon: 'button',
+	icon: <svg version="1" width="24" height="24"><path fill="none" d="M0 0h24v24H0V0z"/><g><path d="M19 6H5L3 8v8l2 2h14l2-2V8l-2-2zm0 10H5V8h14v8z"/></g></svg>,
 
 	category: 'layout',
 

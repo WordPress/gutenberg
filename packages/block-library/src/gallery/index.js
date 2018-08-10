@@ -69,7 +69,7 @@ export const name = 'core/gallery';
 export const settings = {
 	title: __( 'Gallery' ),
 	description: __( 'Display multiple images in an elegantly organized tiled layout.' ),
-	icon: <svg height="36" width="36" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M15 7.5c0-.828.672-1.5 1.5-1.5s1.5.672 1.5 1.5S17.328 9 16.5 9 15 8.328 15 7.5zM4 20h14c0 1.105-.895 2-2 2H4c-1.1 0-2-.9-2-2V8c0-1.105.895-2 2-2v14zM22 4v12c0 1.105-.895 2-2 2H8c-1.105 0-2-.895-2-2V4c0-1.105.895-2 2-2h12c1.105 0 2 .895 2 2zM8 4v6.333L11 7l4.855 5.395.656-.73c.796-.886 2.183-.886 2.977 0l.513.57V4H8z"/></g></svg>,
+	icon: <svg version="1" width="24" height="24"><path fill="none" d="M0 0h24v24H0V0z"/><g><path d="M20 4v12H8V4h12m0-2H8L6 4v12l2 2h12l2-2V4l-2-2z"/><path d="M12 12l1 2 3-3 3 4H9z"/><path d="M2 6v14l2 2h14v-2H4V6H2z"/></g></svg>,
 	category: 'common',
 	keywords: [ __( 'images' ), __( 'photos' ) ],
 	attributes: blockAttributes,

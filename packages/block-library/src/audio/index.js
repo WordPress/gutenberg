@@ -16,7 +16,7 @@ export const settings = {
 
 	description: __( 'Embed an audio file and a simple audio player.' ),
 
-	icon: <svg height="36" width="36" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M8 4v10.184C7.686 14.072 7.353 14 7 14c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3V7h7v4.184c-.314-.112-.647-.184-1-.184-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3V4H8z"/></g></svg>,
+	icon: <svg version="1" width="24" height="24"><path fill="none" d="M0 0h24v24H0V0z"/><g><path d="M12 3v11a4 4 0 1 0-2 7c2 0 4-2 4-4V7h4V3h-6zm-2 16l-2-2 2-2 2 2-2 2z"/></g></svg>,
 
 	category: 'common',
 

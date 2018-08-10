@@ -11,7 +11,7 @@ export const settings = {
 
 	description: __( 'Insert a horizontal line where you want to create a break between ideas.' ),
 
-	icon: 'minus',
+	icon: <svg version="1" width="24" height="24"><path fill="none" d="M0 0h24v24H0V0z"/><path d="M19 13H5v-2h14v2z"/></svg>,
 
 	category: 'layout',
 

@@ -15,7 +15,7 @@ export const settings = {
 
 	description: __( 'Show a list of your site’s most recent comments.' ),
 
-	icon: 'list-view',
+	icon: <svg version="1" width="24" height="24"><path fill="none" d="M0 0h24v24H0V0z"/><g><path d="M22 4l-2-2H4L2 4v12l2 2h14l4 4V4zm-2 0v13l-1-1H4V4h16z"/><path d="M6 12h12v2H6zM6 9h12v2H6zM6 6h12v2H6z"/></g></svg>,
 
 	category: 'widgets',
 

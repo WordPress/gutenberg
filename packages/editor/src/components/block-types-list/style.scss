@@ -60,14 +60,14 @@
 
 .editor-block-types-list__item-icon {
 	padding: 15px 20px;
-	background: $light-gray-200;
+	background: $white;
 	border-radius: 4px;
 	color: $dark-gray-500;
 	transition: all 0.05s ease-in-out;
 
 	svg {
-		width: 20px;
-		height: 20px;
+		width: 24px;
+		height: 24px;
 		transition: all 0.15s ease-out;
 	}
 }
