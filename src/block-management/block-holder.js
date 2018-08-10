@@ -15,9 +15,9 @@ import styles from './block-holder.scss';
 import { getBlockType } from '@wordpress/blocks';
 
 type PropsType = BlockType & {
-	onChange: ( uid: string, attributes: mixed ) => void,
-	onToolbarButtonPressed: ( button: number, uid: string ) => void,
-	onBlockHolderPressed: ( uid: string ) => void,
+	onChange: ( clientId: string, attributes: mixed ) => void,
+	onToolbarButtonPressed: ( button: number, clientId: string ) => void,
+	onBlockHolderPressed: ( clientId: string ) => void,
 };
 type StateType = {
 	selected: boolean,
@@ -36,7 +36,7 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 	renderToolbarIfBlockFocused() {
 		if ( this.props.focused ) {
 			return (
-				<Toolbar uid={ this.props.uid } onButtonPressed={ this.props.onToolbarButtonPressed } />
+				<Toolbar clientId={ this.props.clientId } onButtonPressed={ this.props.onToolbarButtonPressed } />
 			);
 		}
 
@@ -61,7 +61,7 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 				<Block
 					attributes={ { ...this.props.attributes } }
 					// pass a curried version of onChanged with just one argument
-					setAttributes={ ( attrs ) => this.props.onChange( this.props.uid, attrs ) }
+					setAttributes={ ( attrs ) => this.props.onChange( this.props.clientId, { ...this.props.attributes, ...attrs } ) }
 					isSelected={ this.props.focused }
 					style={ style }
 				/>
@@ -75,7 +75,7 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 	render() {
 		return (
 			<TouchableWithoutFeedback
-				onPress={ this.props.onBlockHolderPressed.bind( this, this.props.uid ) }
+				onPress={ this.props.onBlockHolderPressed.bind( this, this.props.clientId ) }
 			>
 				<View style={ styles.blockHolder }>
 					<View style={ styles.blockTitle }>
