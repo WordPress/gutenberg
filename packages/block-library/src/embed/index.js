@@ -333,7 +333,7 @@ export const name = 'core/embed';
 export const settings = getEmbedBlockSettings( {
 	title: __( 'Embed' ),
 	description: __( 'The Embed block allows you to easily add videos, images, tweets, audio, and other content to your post or page.' ),
-	icon: 'embed-generic',
+	icon: <svg version="1" width="24" height="24"><path fill="none" d="M0 0h24v24H0V0z"/><path fill="none" d="M0 0h24v24H0V0z"/><g><path d="M21 3H3L1 5v3h2V5h18v14h-7v2h7l2-2V5l-2-2zM1 18v3h3c0-2-1-3-3-3zm0-4v2c3 0 5 2 5 5h2c0-4-3-7-7-7zm0-4v2c5 0 9 4 9 9h2c0-6-5-11-11-11z"/></g></svg>,
 	transforms: {
 		from: [
 			{
@@ -349,12 +349,19 @@ export const settings = getEmbedBlockSettings( {
 	},
 } );
 
+const embedContentIcon = <svg version="1" width="24" height="24"><path fill="none" d="M0 0h24v24H0V0z"/><path fill="none" d="M0 0h24v24H0V0z"/><g><path d="M21 3H3L1 5v3h2V5h18v14h-7v2h7l2-2V5l-2-2zM1 18v3h3c0-2-1-3-3-3zm0-4v2c3 0 5 2 5 5h2c0-4-3-7-7-7zm0-4v2c5 0 9 4 9 9h2c0-6-5-11-11-11z"/></g></svg>;
+const embedAudioIcon = <svg version="1" width="24" height="24"><path fill="none" d="M0 0h24v24H0V0z"/><path d="M21 3H3L1 5v14l2 2h18l2-2V5l-2-2zm0 16H3V5h18v14zM8 15a3 3 0 0 1 4-3V6h5v2h-3v7a3 3 0 0 1-6 0z"/></svg>;
+
 export const common = [
 	{
 		name: 'core-embed/twitter',
 		settings: getEmbedBlockSettings( {
 			title: 'Twitter',
-			icon: 'embed-post',
+			icon: {
+				background: '#1DA1F2',
+				foreground: '#ffffff',
+				src: <svg height="48" width="48" viewBox="0 0 24 24"><path d="M22 6l-2 1 2-3-3 1-3-1a4 4 0 0 0-4 5C9 9 6 7 4 5a4 4 0 0 0 1 5H3c0 2 1 3 3 4a4 4 0 0 1-2 0l4 3a8 8 0 0 1-6 1c2 2 4 2 7 2A12 12 0 0 0 20 8l2-2z"/></svg>,
+			},
 			keywords: [ __( 'tweet' ) ],
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?twitter\.com\/.+/i ],
@@ -363,7 +370,11 @@ export const common = [
 		name: 'core-embed/youtube',
 		settings: getEmbedBlockSettings( {
 			title: 'YouTube',
-			icon: 'embed-video',
+			icon: {
+				background: '#ffffff',
+				foreground: '#ff0000',
+				src: <svg height="48" width="48" viewBox="0 0 24 24"><path d="M22 8l-1-2-2-1H5L3 6 2 8v8l1 2 2 1h14l2-1 1-2v-5-3zm-12 7V9l5 3-5 3z"/></svg>,
+			},
 			keywords: [ __( 'music' ), __( 'video' ) ],
 		} ),
 		patterns: [ /^https?:\/\/((m|www)\.)?youtube\.com\/.+/i, /^https?:\/\/youtu\.be\/.+/i ],
@@ -372,7 +383,11 @@ export const common = [
 		name: 'core-embed/facebook',
 		settings: getEmbedBlockSettings( {
 			title: 'Facebook',
-			icon: 'embed-post',
+			icon: {
+				background: '#3B5998',
+				foreground: '#ffffff',
+				src: <svg class="social-logo facebook" height="48" width="48" viewBox="0 0 24 24"><path d="M20 3H4L3 4v16l1 1h9v-7h-3v-3h3V9c0-2 1-3 3-3h2v2h-1l-2 2v1h3v3h-3v7h5l1-1V4l-1-1z"/></svg>,
+			},
 		} ),
 		patterns: [ /^https?:\/\/www\.facebook.com\/.+/i ],
 	},
@@ -380,7 +395,11 @@ export const common = [
 		name: 'core-embed/instagram',
 		settings: getEmbedBlockSettings( {
 			title: 'Instagram',
-			icon: 'embed-photo',
+			icon: {
+				background: 'radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%)',
+				foreground: '#ffffff',
+				src: <svg class="social-logo instagram" height="48" width="48" viewBox="0 0 24 24"><path d="M12 5a64 64 0 0 1 5 0l1 1 1 1v1a63 63 0 0 1 0 9l-1 1-1 1h-1a63 63 0 0 1-9 0l-1-1-1-1v-1a63 63 0 0 1 0-9l1-1 1-1h5m0-2a64 64 0 0 0-6 0L5 5 3 6v2a64 64 0 0 0 0 10l2 1 1 2h2a64 64 0 0 0 10 0l1-2 2-1v-2a64 64 0 0 0 0-10l-2-1-1-2h-6zm0 4a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 8a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm5-9a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg>,
+			},
 			keywords: [ __( 'image' ) ],
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?instagr(\.am|am\.com)\/.+/i ],
@@ -397,7 +416,7 @@ export const common = [
 		name: 'core-embed/soundcloud',
 		settings: getEmbedBlockSettings( {
 			title: 'SoundCloud',
-			icon: 'embed-audio',
+			icon: embedAudioIcon,
 			keywords: [ __( 'music' ), __( 'audio' ) ],
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?soundcloud\.com\/.+/i ],
@@ -406,7 +425,11 @@ export const common = [
 		name: 'core-embed/spotify',
 		settings: getEmbedBlockSettings( {
 			title: 'Spotify',
-			icon: 'embed-audio',
+			icon: {
+				background: '#1DB954',
+				foreground: '#ffffff',
+				src: <svg height="48" width="48" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20m5 14l-1 1c-3-2-6-2-9-1a1 1 0 1 1 0-2c3 0 7 0 9 2h1m1-2h-1c-3-2-7-2-10-1a1 1 0 1 1-1-2c4-1 8 0 12 2v1m0-3c-3-2-9-2-12-1a1 1 0 0 1 0-2c3-1 9-1 13 1a1 1 0 1 1-1 2"/></svg>,
+			},
 			keywords: [ __( 'music' ), __( 'audio' ) ],
 		} ),
 		patterns: [ /^https?:\/\/(open|play)\.spotify\.com\/.+/i ],
@@ -516,7 +539,7 @@ export const others = [
 		name: 'core-embed/mixcloud',
 		settings: getEmbedBlockSettings( {
 			title: 'Mixcloud',
-			icon: 'embed-audio',
+			icon: embedAudioIcon,
 			keywords: [ __( 'music' ), __( 'audio' ) ],
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?mixcloud\.com\/.+/i ],
@@ -549,7 +572,7 @@ export const others = [
 		name: 'core-embed/reverbnation',
 		settings: getEmbedBlockSettings( {
 			title: 'ReverbNation',
-			icon: 'embed-audio',
+			icon: embedAudioIcon,
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?reverbnation\.com\/.+/i ],
 	},
@@ -589,7 +612,7 @@ export const others = [
 		name: 'core-embed/speaker',
 		settings: getEmbedBlockSettings( {
 			title: 'Speaker',
-			icon: 'embed-audio',
+			icon: embedAudioIcon,
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?speakerdeck\.com\/.+/i ],
 	},
