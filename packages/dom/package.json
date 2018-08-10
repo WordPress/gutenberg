@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/dom",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "DOM utilities module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,7 +20,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"@babel/runtime": "^7.0.0-beta.52",
+		"@babel/runtime-corejs2": "7.0.0-beta.56",
 		"element-closest": "^2.0.2",
 		"lodash": "^4.17.10"
 	},

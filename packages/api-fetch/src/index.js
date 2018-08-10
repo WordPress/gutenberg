@@ -18,6 +18,14 @@ function registerMiddleware( middleware ) {
 	middlewares.push( middleware );
 }
 
+function checkCloudflareError( error ) {
+	if ( typeof error === 'string' && error.indexOf( 'Cloudflare Ray ID' ) >= 0 ) {
+		throw {
+			code: 'cloudflare_error',
+		};
+	}
+}
+
 function apiFetch( options ) {
 	const raw = ( nextOptions ) => {
 		const { url, path, body, data, parse = true, ...remainingOptions } = nextOptions;
@@ -68,8 +76,18 @@ function apiFetch( options ) {
 					throw invalidJsonError;
 				}
 
+				/*
+				 * Response data is a stream, which will be consumed by the .json() call.
+				 * If we need to re-use this data to send to the Cloudflare error handler,
+				 * we need a clone of the original response, so the stream can be consumed
+				 * in the .text() call, instead.
+				 */
+				const responseClone = response.clone();
+
 				return response.json()
-					.catch( () => {
+					.catch( async () => {
+						const text = await responseClone.text();
+						checkCloudflareError( text );
 						throw invalidJsonError;
 					} )
 					.then( ( error ) => {
@@ -77,6 +95,8 @@ function apiFetch( options ) {
 							code: 'unknown_error',
 							message: __( 'An unknown error occurred.' ),
 						};
+
+						checkCloudflareError( error );
 
 						throw error || unknownError;
 					} );

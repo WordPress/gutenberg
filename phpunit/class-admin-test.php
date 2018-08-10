@@ -89,6 +89,14 @@ class Admin_Test extends WP_UnitTestCase {
 		) );
 		update_option( 'page_for_posts', $blog_page_with_content );
 		$this->assertTrue( gutenberg_can_edit_post( $blog_page_with_content ) );
+
+		add_filter( 'gutenberg_can_edit_post', '__return_false' );
+		$this->assertFalse( gutenberg_can_edit_post( $generic_post_id ) );
+		remove_filter( 'gutenberg_can_edit_post', '__return_false' );
+
+		add_filter( 'gutenberg_can_edit_post', '__return_true' );
+		$this->assertTrue( gutenberg_can_edit_post( $restless_post_id ) );
+		remove_filter( 'gutenberg_can_edit_post', '__return_true' );
 	}
 
 	/**

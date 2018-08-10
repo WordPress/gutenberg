@@ -7,26 +7,25 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
-import { IconButton } from '@wordpress/components';
+import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { isReusableBlock } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 
-export function ReusableBlockDeleteButton( { reusableBlock, onDelete, itemsRole } ) {
+export function ReusableBlockDeleteButton( { reusableBlock, onDelete } ) {
 	if ( ! reusableBlock ) {
 		return null;
 	}
 
 	return (
-		<IconButton
+		<MenuItem
 			className="editor-block-settings-menu__control"
 			icon="no"
 			disabled={ reusableBlock.isTemporary }
 			onClick={ () => onDelete( reusableBlock.id ) }
-			role={ itemsRole }
 		>
 			{ __( 'Remove from Reusable Blocks' ) }
-		</IconButton>
+		</MenuItem>
 	);
 }
 

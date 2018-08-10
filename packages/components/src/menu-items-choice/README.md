@@ -6,7 +6,7 @@
 import { MenuGroup, MenuItemsChoice } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
 
-withState( {
+const MyMenuItemsChoice = withState( {
 	mode: 'visual',
 	choices: [
 		{
@@ -26,5 +26,5 @@ withState( {
 			onSelect={ mode => setState( { mode } ) }
 		/>
 	</MenuGroup>
-) )
+) );
 ```

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "1.0.1",
+	"version": "2.0.0",
 	"description": "Building blocks for WordPress editors.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,7 +20,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.0.0-beta.52",
+		"@babel/runtime-corejs2": "7.0.0-beta.56",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blob": "file:../blob",
@@ -43,7 +43,6 @@
 		"@wordpress/viewport": "file:../viewport",
 		"@wordpress/wordcount": "file:../wordcount",
 		"classnames": "^2.2.5",
-		"dom-react": "^2.2.1",
 		"dom-scroll-into-view": "^1.2.1",
 		"element-closest": "^2.0.2",
 		"lodash": "^4.17.10",

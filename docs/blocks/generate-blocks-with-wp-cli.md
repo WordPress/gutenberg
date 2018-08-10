@@ -5,7 +5,7 @@ It turns out that writing the simplest possible block which contains only static
 - [zgordon/gutenberg-course](https://github.com/zgordon/gutenberg-course) - a repository for Zac Gordon's Gutenberg Development Course
 - [ahmadawais/create-guten-block](https://github.com/ahmadawais/create-guten-block) - A zero-configuration developer toolkit for building WordPress Gutenberg block plugins
 
-It might be also a good idea to browse the folder with [all core blocks](https://github.com/WordPress/gutenberg/tree/master/core-blocks) to see how they are implemented.
+It might be also a good idea to browse the folder with [all core blocks](https://github.com/WordPress/gutenberg/tree/master/packages/block-library/src) to see how they are implemented.
 
 ## WP-CLI
 

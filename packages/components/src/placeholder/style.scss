@@ -37,7 +37,7 @@
 	width: 100%;
 	max-width: 280px;
 	flex-wrap: wrap;
-	z-index: z-index( '.components-placeholder__fieldset' );
+	z-index: z-index(".components-placeholder__fieldset");
 
 	p {
 		font-family: $default-font;

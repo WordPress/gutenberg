@@ -111,7 +111,7 @@ The following is a contrived completer for fresh fruit.
 ```jsx
 import { Autocomplete } from '@wordpress/components';
 
-function FreshFruitAutocomplete() {
+const MyAutocomplete = () => {
 	const autocompleters = [
 		{
 			name: 'fruit',

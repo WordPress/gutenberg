@@ -42,6 +42,11 @@ Then, run a setup script to check if docker and node are configured properly and
 ./bin/setup-local-env.sh
 ``` 
 
+If you're developing themes, or core WordPress functionality alongside Gutenberg, you can access the WordPress files in `wordpress/` by running the following command instead:
+```
+DOCKER_ENV=localwpdev ./bin/setup-local-env.sh
+```
+
 If everything was successful, you'll see the following ascii art:
 ```
 Welcome to...
@@ -153,6 +158,10 @@ If you'd like to contribute to the design or front-end, feel free to contribute 
 Documentation is automatically synced from master to the [Gutenberg Documentation Website](https://wordpress.org/gutenberg/handbook/) every 15 minutes.
 
 To add a new documentation page, you'll have to create a Markdown file in the [docs](https://github.com/WordPress/gutenberg/tree/master/docs) folder and add an item to the [manifest file](https://github.com/WordPress/gutenberg/blob/master/docs/manifest.json).
+
+### `@wordpress/component`
+
+If you're contributing to the documentation of any component from the `@wordpress/component` package, take a look at its [guidelines for contributing](./packages/components/CONTRIBUTING.md). 
 
 ## Reporting Security Issues
 

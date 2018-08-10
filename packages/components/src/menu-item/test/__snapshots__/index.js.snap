@@ -2,10 +2,25 @@
 
 exports[`MenuItem should match snapshot when all props provided 1`] = `
 <IconButton
-  aria-pressed={true}
+  aria-checked={true}
   className="components-menu-item__button my-class has-icon"
   icon="wordpress"
   onClick={[Function]}
+  role="menuitemcheckbox"
+>
+  My item
+  <MenuItemsShortcut
+    shortcut="mod+shift+alt+w"
+  />
+</IconButton>
+`;
+
+exports[`MenuItem should match snapshot when isSelected and role are optionally provided 1`] = `
+<IconButton
+  className="components-menu-item__button my-class has-icon"
+  icon="wordpress"
+  onClick={[Function]}
+  role="menuitem"
 >
   My item
   <MenuItemsShortcut
@@ -16,8 +31,8 @@ exports[`MenuItem should match snapshot when all props provided 1`] = `
 
 exports[`MenuItem should match snapshot when only label provided 1`] = `
 <Button
-  aria-pressed={false}
   className="components-menu-item__button"
+  role="menuitem"
 >
   My item
   <MenuItemsShortcut />

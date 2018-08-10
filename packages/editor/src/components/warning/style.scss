@@ -1,5 +1,5 @@
 .editor-block-list__block .editor-warning {
-	z-index: z-index( '.editor-warning' );
+	z-index: z-index(".editor-warning");
 	position: absolute;
 	top: -$block-padding - $border-width;
 	right: -$parent-block-padding - $border-width;
@@ -45,7 +45,7 @@
 		display: flex;
 		margin: 0 0 $block-padding 0;
 	}
-	
+
 	.editor-warning__action {
 		margin: 0 6px 0 0;
 		margin-left: 0;

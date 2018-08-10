@@ -1,5 +1,4 @@
-Notice
-======
+# Notice
 
 This component is used to display notices in editor.
 
@@ -8,17 +7,21 @@ This component is used to display notices in editor.
 To display a plain notice, pass `Notice` a string:
 
 ```jsx
-<Notice status="error">
-    An unknown error occurred.
-</Notice>
+const MyNotice = () => (
+	<Notice status="error">
+		An unknown error occurred.
+	</Notice>
+);
 ```
 
 For more complex markup, you can pass any JSX element:
 
 ```jsx
-<Notice status="error">
-    <p>An error occurred: <code>{ errorDetails }</code>.</p>
-</Notice>
+const MyNotice = () => (
+	<Notice status="error">
+		<p>An error occurred: <code>{ errorDetails }</code>.</p>
+	</Notice>
+);
 ```
 
 ### Props

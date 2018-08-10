@@ -1,11 +1,9 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
 import {
-	clearLocalStorage,
+	clickBlockAppender,
 	clickOnMoreMenuItem,
-	newDesktopBrowserPage,
 	newPost,
 } from '../support/utils';
 
@@ -35,13 +33,7 @@ describe( 'New User Experience (NUX)', () => {
 	}
 
 	beforeEach( async () => {
-		await newDesktopBrowserPage();
-		await newPost( undefined, false );
-	} );
-
-	afterEach( async () => {
-		// Clear localStorage tips so they aren't persisted for the next test.
-		await clearLocalStorage();
+		await newPost( { enableTips: true } );
 	} );
 
 	it( 'should show tips to a first-time user', async () => {
@@ -170,7 +162,7 @@ describe( 'New User Experience (NUX)', () => {
 		// Let's type something so there's content in this post.
 		await page.click( '.editor-post-title__input' );
 		await page.keyboard.type( 'Post title' );
-		await page.click( '.editor-default-block-appender' );
+		await clickBlockAppender();
 		await page.keyboard.type( 'Post content goes here.' );
 		// Save the post as a draft.
 		await page.click( '.editor-post-save-draft' );

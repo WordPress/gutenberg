@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/element",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "Element React module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -21,9 +21,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.0.0-beta.52",
-		"@wordpress/deprecated": "file:../deprecated",
-		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+		"@babel/runtime-corejs2": "7.0.0-beta.56",
 		"lodash": "^4.17.10",
 		"react": "^16.4.1",
 		"react-dom": "^16.4.1"

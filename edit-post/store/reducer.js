@@ -88,6 +88,25 @@ export function panel( state = 'document', action ) {
 	return state;
 }
 
+/**
+ * Reducer for storing the name of the open modal, or null if no modal is open.
+ *
+ * @param {Object} state  Previous state.
+ * @param {Object} action Action object containing the `name` of the modal
+ *
+ * @return {Object} Updated state
+ */
+export function activeModal( state = null, action ) {
+	switch ( action.type ) {
+		case 'OPEN_MODAL':
+			return action.name;
+		case 'CLOSE_MODAL':
+			return null;
+	}
+
+	return state;
+}
+
 export function publishSidebarActive( state = false, action ) {
 	switch ( action.type ) {
 		case 'OPEN_PUBLISH_SIDEBAR':
@@ -121,7 +140,8 @@ const defaultMetaBoxState = locations.reduce( ( result, key ) => {
  *
  * @param {boolean}  state   Previous state.
  * @param {Object}   action  Action Object.
- * @return {Object}         Updated state.
+ *
+ * @return {Object} Updated state.
  */
 export function isSavingMetaBoxes( state = false, action ) {
 	switch ( action.type ) {
@@ -144,7 +164,8 @@ export function isSavingMetaBoxes( state = false, action ) {
  *
  * @param {boolean}  state   Previous state.
  * @param {Object}   action  Action Object.
- * @return {Object}         Updated state.
+ *
+ * @return {Object} Updated state.
  */
 export function metaBoxes( state = defaultMetaBoxState, action ) {
 	switch ( action.type ) {
@@ -172,6 +193,7 @@ export function metaBoxes( state = defaultMetaBoxState, action ) {
 export default combineReducers( {
 	preferences,
 	panel,
+	activeModal,
 	publishSidebarActive,
 	metaBoxes,
 	isSavingMetaBoxes,

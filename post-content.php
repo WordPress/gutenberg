@@ -73,7 +73,7 @@
 
 <!-- wp:quote {"style":1} -->
 <blockquote class="wp-block-quote">
-	<p><?php _e( 'The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.', 'gutenberg' ); ?></p>
+	<p><?php _e( 'The editor will endeavor to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.', 'gutenberg' ); ?></p>
 	<cite><?php _e( 'Matt Mullenweg, 2017', 'gutenberg' ); ?></cite>
 </blockquote>
 <!-- /wp:quote -->

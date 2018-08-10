@@ -9,7 +9,7 @@ class Parsing_Test extends WP_UnitTestCase {
 	protected static $fixtures_dir;
 
 	function parsing_test_filenames() {
-		self::$fixtures_dir = dirname( dirname( __FILE__ ) ) . '/core-blocks/test/fixtures';
+		self::$fixtures_dir = dirname( dirname( __FILE__ ) ) . '/test/integration/full-content/fixtures';
 
 		require_once dirname( dirname( __FILE__ ) ) . '/lib/parser.php';
 

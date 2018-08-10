@@ -5,7 +5,7 @@
 import { ColorPalette } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
 
-withState( {
+const MyColorPalette = withState( {
 	color: '#f00',
 } )( ( { color, setState } ) => { 
 	const colors = [ 
@@ -18,8 +18,8 @@ withState( {
 		<ColorPalette 
 			colors={ colors } 
 			value={ color }
-			onChange={ color => setState( { color } ) } 
+			onChange={ ( color ) => setState( { color } ) } 
 		/>
 	) 
-} )
+} );
 ```
