@@ -1,21 +1,21 @@
 # Block Design
 
-Want to design a new block? These recommendations and examples should start you off on the right foot.
+The following is a light guide to designing a new block with recommendations and detailed descriptions of existing blocks to illustrate good practices.
 
 ## Best Practices
 
 - Blocks should have a simple label for the Inserter. Keep it as short as possible.
 - Blocks should have an identifying icon, ideally using a single color. Try to avoid using the same icon used by an existing block. Look to [Dashicons](https://developer.wordpress.org/resource/dashicons/) for style inspiration.
-- Blocks should have a instructive placeholder state when they’re first inserted. If the block includes a text input, provide placeholder text. If your block holds media, include buttons for uploading files and accessing media libraries, as well as drop-zones for drag and drop. Keep in mind that in the future, the placeholder state will be used to make page and post templates.
+- Blocks should have a instructive placeholder state when they’re first inserted. If the block includes a text input, provide placeholder text. If your block holds media, include buttons for uploading files and accessing media libraries, as well as drop-zones for drag-and-drop. 
 - When unselected, your block should preview its content as closely to the front-end output as possible.
-- When selected, your block may surface additional options: input fields or buttons to configure the block directly (if those are necessary for basic operation).
+- When selected, your block may surface additional options like input fields or buttons to configure the block directly, if those are necessary for basic operation.
 - Every block should include a description in the “Block” tab of the Settings sidebar. The description should explain as clearly as possible what your block does. Keep it to a single sentence.
-- Additional block options and configuration can also be added to the “Block” tab of the Settings Sidebar, but keep in mind that a user might dismiss the sidebar and never use it. Do not put critical options there.
-- Be sure to consider how your block looks, feels, and works on all sorts of devices and screen sizes.
+- The “Block” tab of the Settings Sidebar can contain additional block options and configuration, but keep in mind that a user might dismiss the sidebar and never use it. Do not put critical options there.
+- Check how your block looks, feels, and works on all sorts of devices and screen sizes.
 
 ## Examples
 
-To help demonstrate some of these practices, here are a few annotated examples of default Gutenberg blocks:
+To demonstrate some of these practices, here are a few annotated examples of default Gutenberg blocks:
 
 ### Paragraph
 
@@ -25,7 +25,7 @@ The most basic unit of the editor. The paragraph block is a simple input field.
 
 **Placeholder:**
 
-- Simple placeholder text that says “Add text or type / to add content” (This placeholder disappears when the block is selected).
+- Simple placeholder text that says “Add text or type / to add content.” The placeholder disappears when the block is selected.
 
 **Selected state:**
 
@@ -41,12 +41,12 @@ Basic image block.
 
 **Placeholder:**
 
-A generic gray placeholder block with options to upload an image, drop an image directly on it, or choose an image from the media library.
+- A generic gray placeholder block with options to upload an image, drag and drop an image directly on it, or pick an image from the media library.
 
 **Selected state:**
 
-- Block Toolbar: Alignments, including wide and full-width (if the theme supports it).
-- Block Toolbar: Edit Image (opens the Media Library)
+- Block Toolbar: Alignments, including wide and full-width if the theme supports it.
+- Block Toolbar: Edit Image, to open the Media Library
 - Block Toolbar: Link button
 - When an image is uploaded, a caption input field appears with a “Write caption…” placeholder text below the image:
 
@@ -55,7 +55,7 @@ A generic gray placeholder block with options to upload an image, drop an image 
 **Block settings:**
 
 - Has description: “They're worth 1,000 words! Insert a single image.”
-- Has options for changing or adding alt text, and adding additional custom CSS classes.
+- Has options for changing or adding alt text and adding additional custom CSS classes.
 
 _Future improvements to the Image block could include getting rid of the media modal, in place of letting users select images directly from the placeholder itself. In general, try to avoid modals._
 
@@ -65,7 +65,7 @@ _Future improvements to the Image block could include getting rid of the media m
 
 **Placeholder:**
 
-Has no placeholder, as it works fine upon insertion. The default inserted state shows the last 5 posts.
+Has no placeholder, as it works immediately upon insertion. The default inserted state shows the last 5 posts.
 
 **Selected state:**
 
