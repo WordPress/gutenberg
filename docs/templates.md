@@ -67,7 +67,7 @@ Sometimes the intention might be to lock the template on the UI so that the bloc
 *Options:*
 
 - `all` — prevents all operations. It is not possible to insert new blocks, move existing blocks, or delete blocks.
-- `insert` — prevents inserting new blocks, but allows moving or removing existing blocks.
+- `insert` — prevents inserting or removing blocks, but allows moving existing blocks.
 
 ## Existing Post Types
 
