@@ -22,7 +22,7 @@ export type BlockListType = {
 	moveBlockUpAction: string => mixed,
 	moveBlockDownAction: string => mixed,
 	deleteBlockAction: string => mixed,
-	parseBlocksAction: (html: string, parser: mixed) => mixed,
+	parseBlocksAction: ( html: string, parser: mixed ) => mixed,
 	blocks: Array<BlockType>,
 	aztechtml: string,
 	refresh: boolean,
@@ -111,7 +111,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		const {
 			parser,
 			parseBlocksAction,
-			html
+			html,
 		} = this.props;
 
 		parseBlocksAction( html, parser );
