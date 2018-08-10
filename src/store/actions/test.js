@@ -42,6 +42,7 @@ describe( 'Store', () => {
 			const action = actions.createBlockAction( '1', newBlock );
 			expect( action.type ).toEqual( ActionTypes.BLOCK.CREATE );
 			expect( action.clientId ).toEqual( '1' );
+			expect( action.block ).toEqual( newBlock );
 		} );
 
 	} );
