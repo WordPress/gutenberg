@@ -10,6 +10,11 @@ export type BlockActionType = string => {
 	uid: string,
 };
 
+export type ParseActionType = string => {
+	type: $Values<typeof ActionTypes.BLOCK>,
+	payload: string,
+};
+
 export function updateBlockAttributes( uid: string, attributes: mixed ) {
 	return {
 		type: ActionTypes.BLOCK.UPDATE_ATTRIBUTES,
@@ -38,8 +43,7 @@ export const deleteBlockAction: BlockActionType = uid => ( {
 	uid: uid,
 } );
 
-export const parseBlocksAction: BlockActionType = payload => ( {
+export const parseBlocksAction: ParseActionType = payload => ( {
 	type: ActionTypes.BLOCK.PARSE,
-	uid: '',
 	payload: payload,
 } );
