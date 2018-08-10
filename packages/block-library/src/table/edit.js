@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { times } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,6 +17,15 @@ import {
 	Toolbar,
 } from '@wordpress/components';
 
+import {
+	createTable,
+	updateCellContent,
+	insertRow,
+	deleteRow,
+	insertColumn,
+	deleteColumn,
+} from './state';
+
 export default class extends Component {
 	constructor() {
 		super( ...arguments );
@@ -27,7 +35,7 @@ export default class extends Component {
 		this.createOnChange = this.createOnChange.bind( this );
 		this.onChangeInitialColumnCount = this.onChangeInitialColumnCount.bind( this );
 		this.onChangeInitialRowCount = this.onChangeInitialRowCount.bind( this );
-		this.renderPart = this.renderPart.bind( this );
+		this.renderSection = this.renderSection.bind( this );
 		this.getTableControls = this.getTableControls.bind( this );
 		this.createOnDeleteRow = this.createOnDeleteRow.bind( this );
 		this.createOnDeleteColumn = this.createOnDeleteColumn.bind( this );
@@ -54,14 +62,10 @@ export default class extends Component {
 		const { setAttributes } = this.props;
 		const { initialRowCount, initialColumnCount } = this.state;
 
-		setAttributes( {
-			body: times( initialRowCount, () => ( {
-				cells: times( initialColumnCount, () => ( {
-					content: [],
-					tag: 'td',
-				} ) ),
-			} ) ),
-		} );
+		setAttributes( createTable( {
+			rowCount: initialRowCount,
+			columnCount: initialColumnCount,
+		} ) );
 	}
 
 	onChangeFixedLayout() {
@@ -71,102 +75,55 @@ export default class extends Component {
 		setAttributes( { hasFixedLayout: ! hasFixedLayout } );
 	}
 
-	createOnChange( { part, rowIndex, cellIndex } ) {
+	createOnChange( { section, rowIndex, columnIndex } ) {
 		const { attributes, setAttributes } = this.props;
 
 		return ( content ) => {
-			setAttributes( {
-				[ part ]: attributes[ part ].map( ( row, i ) => {
-					if ( i !== rowIndex ) {
-						return row;
-					}
-
-					return {
-						cells: row.cells.map( ( cell, ii ) => {
-							if ( ii !== cellIndex ) {
-								return cell;
-							}
-
-							return {
-								...cell,
-								content,
-							};
-						} ),
-					};
-				} ),
-			} );
+			setAttributes( updateCellContent( attributes, {
+				section,
+				rowIndex,
+				columnIndex,
+				content,
+			} ) );
 		};
 	}
 
-	createOnInsertRow( { part, rowIndex }, delta ) {
+	createOnInsertRow( { section, rowIndex }, delta ) {
 		const { attributes, setAttributes } = this.props;
-		const cellCount = attributes[ part ][ rowIndex ].cells.length;
 
 		rowIndex += delta;
 
 		return () => {
-			setAttributes( {
-				[ part ]: [
-					...attributes[ part ].slice( 0, rowIndex ),
-					{
-						cells: times( cellCount, () => ( {
-							content: [],
-							tag: 'td',
-						} ) ),
-					},
-					...attributes[ part ].slice( rowIndex ),
-				],
-			} );
-
+			setAttributes( insertRow( attributes, { section, rowIndex } ) );
 			this.setState( { selectedCell: null } );
 		};
 	}
 
-	createOnDeleteRow( { part, rowIndex } ) {
+	createOnDeleteRow( { section, rowIndex } ) {
 		const { attributes, setAttributes } = this.props;
 
 		return () => {
-			setAttributes( {
-				[ part ]: attributes[ part ].filter( ( row, index ) => index !== rowIndex ),
-			} );
-
+			setAttributes( deleteRow( attributes, { section, rowIndex } ) );
 			this.setState( { selectedCell: null } );
 		};
 	}
 
-	createOnInsertColumn( { part, cellIndex }, delta ) {
+	createOnInsertColumn( { section, columnIndex }, delta ) {
 		const { attributes, setAttributes } = this.props;
 
-		cellIndex += delta;
+		columnIndex += delta;
 
 		return () => {
-			setAttributes( {
-				[ part ]: attributes[ part ].map( ( row ) => ( {
-					cells: [
-						...row.cells.slice( 0, cellIndex ),
-						{
-							content: [],
-							tag: 'td',
-						},
-						...row.cells.slice( cellIndex ),
-					],
-				} ) ),
-			} );
-
+			setAttributes( insertColumn( attributes, { section, columnIndex } ) );
 			this.setState( { selectedCell: null } );
 		};
 	}
 
-	createOnDeleteColumn( { part, cellIndex } ) {
+	createOnDeleteColumn( { section, columnIndex } ) {
 		const { attributes, setAttributes } = this.props;
 
 		return () => {
-			setAttributes( {
-				[ part ]: attributes[ part ].map( ( row ) => ( {
-					cells: row.cells.filter( ( cell, index ) => index !== cellIndex ),
-				} ) ),
-			} );
-
+			setAttributes( deleteColumn( attributes, { section, columnIndex } ) );
 			this.setState( { selectedCell: null } );
 		};
 	}
@@ -220,7 +177,7 @@ export default class extends Component {
 		];
 	}
 
-	renderPart( { type, rows } ) {
+	renderSection( { type, rows } ) {
 		if ( ! rows.length ) {
 			return null;
 		}
@@ -232,17 +189,17 @@ export default class extends Component {
 			<Tag>
 				{ rows.map( ( { cells }, rowIndex ) =>
 					<tr key={ rowIndex }>
-						{ cells.map( ( { content, tag: CellTag }, cellIndex ) => {
+						{ cells.map( ( { content, tag: CellTag }, columnIndex ) => {
 							const isSelected = selectedCell && (
-								type === selectedCell.part &&
+								type === selectedCell.section &&
 								rowIndex === selectedCell.rowIndex &&
-								cellIndex === selectedCell.cellIndex
+								columnIndex === selectedCell.columnIndex
 							);
 
 							const id = {
-								part: type,
+								section: type,
 								rowIndex,
-								cellIndex,
+								columnIndex,
 							};
 
 							const classes = classnames( {
@@ -250,7 +207,7 @@ export default class extends Component {
 							} );
 
 							return (
-								<CellTag key={ cellIndex } className={ classes }>
+								<CellTag key={ columnIndex } className={ classes }>
 									<RichText
 										value={ content }
 										onChange={ this.createOnChange( id ) }
@@ -280,7 +237,7 @@ export default class extends Component {
 		const { initialRowCount, initialColumnCount } = this.state;
 		const { hasFixedLayout, head, body, foot } = attributes;
 		const isEmpty = ! head.length && ! body.length && ! foot.length;
-		const Part = this.renderPart;
+		const Section = this.renderSection;
 
 		if ( isEmpty ) {
 			return (
@@ -321,9 +278,9 @@ export default class extends Component {
 					</PanelBody>
 				</InspectorControls>
 				<table className={ classes }>
-					<Part type="head" rows={ head } />
-					<Part type="body" rows={ body } />
-					<Part type="foot" rows={ foot } />
+					<Section type="head" rows={ head } />
+					<Section type="body" rows={ body } />
+					<Section type="foot" rows={ foot } />
 				</table>
 			</Fragment>
 		);

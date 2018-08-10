@@ -47,12 +47,12 @@ const tablePasteSchema = {
 	},
 };
 
-function getTablePartAttributeSchema( part ) {
+function getTableSectionAttributeSchema( section ) {
 	return {
 		type: 'array',
 		default: [],
 		source: 'query',
-		selector: `t${ part } tr`,
+		selector: `t${ section } tr`,
 		query: {
 			cells: {
 				type: 'array',
@@ -89,9 +89,9 @@ export const settings = {
 			type: 'boolean',
 			default: false,
 		},
-		head: getTablePartAttributeSchema( 'head' ),
-		body: getTablePartAttributeSchema( 'body' ),
-		foot: getTablePartAttributeSchema( 'foot' ),
+		head: getTableSectionAttributeSchema( 'head' ),
+		body: getTableSectionAttributeSchema( 'body' ),
+		foot: getTableSectionAttributeSchema( 'foot' ),
 	},
 
 	supports: {
@@ -112,11 +112,17 @@ export const settings = {
 
 	save( { attributes } ) {
 		const { hasFixedLayout, head, body, foot } = attributes;
+		const isEmpty = ! head.length && ! body.length && ! foot.length;
+
+		if ( isEmpty ) {
+			return null;
+		}
+
 		const classes = classnames( {
 			'has-fixed-layout': hasFixedLayout,
 		} );
 
-		const Part = ( { type, rows } ) => {
+		const Section = ( { type, rows } ) => {
 			if ( ! rows.length ) {
 				return null;
 			}
@@ -138,9 +144,9 @@ export const settings = {
 
 		return (
 			<table className={ classes }>
-				<Part type="head" rows={ head } />
-				<Part type="body" rows={ body } />
-				<Part type="foot" rows={ foot } />
+				<Section type="head" rows={ head } />
+				<Section type="body" rows={ body } />
+				<Section type="foot" rows={ foot } />
 			</table>
 		);
 	},
