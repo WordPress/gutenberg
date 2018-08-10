@@ -2,7 +2,6 @@
 	position: relative;
 	padding: 50px 0;
 
-	input[type="text"].editor-default-block-appender__content, // The default appender should match a single paragraph. Needs specificity.
 	&,
 	& p {
 		font-family: $editor-font;
