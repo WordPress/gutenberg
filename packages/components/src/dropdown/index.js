@@ -61,6 +61,7 @@ class Dropdown extends Component {
 		const {
 			renderContent,
 			renderToggle,
+			noArrow = false,
 			position = 'bottom',
 			className,
 			contentClassName,
@@ -86,6 +87,7 @@ class Dropdown extends Component {
 							onClickOutside={ this.clickOutside }
 							expandOnMobile={ expandOnMobile }
 							headerTitle={ headerTitle }
+							noArrow={ noArrow }
 						>
 							{ renderContent( args ) }
 						</Popover>
