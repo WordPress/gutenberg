@@ -39,6 +39,7 @@ $block-inserter-search-height: 38px;
 	display: flex;
 	flex-direction: column;
 	height: 100%;
+	padding: 13px;
 	@include break-medium {
 		width: 400px;
 		position: relative;
@@ -66,11 +67,10 @@ $block-inserter-search-height: 38px;
 
 .components-popover input[type="search"].editor-inserter__search {
 	display: block;
-	margin: 0;
+	margin: 0 0 13px;
 	padding: 11px 16px;
 	position: relative;
 	z-index: 1;
-	border: 1px solid $light-gray-500;
 	border-radius: 3px;
 
 	/* Fonts smaller than 16px causes mobile safari to zoom. */
