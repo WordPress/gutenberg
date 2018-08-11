@@ -189,7 +189,7 @@ describe( 'Change detection', () => {
 			pressWithModifier( META_KEY, 'S' ),
 
 			// Ensure save update fails and presents button.
-			page.waitForXPath( "//p[contains(text(), 'Updating failed')]" ),
+			page.waitForXPath( "//.components-notice__content[contains(text(), 'Updating failed')]" ),
 			page.waitForSelector( '.editor-post-save-draft' ),
 		] );
 
