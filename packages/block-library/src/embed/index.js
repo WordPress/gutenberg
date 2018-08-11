@@ -333,7 +333,7 @@ export const name = 'core/embed';
 export const settings = getEmbedBlockSettings( {
 	title: __( 'Embed' ),
 	description: __( 'The Embed block allows you to easily add videos, images, tweets, audio, and other content to your post or page.' ),
-	icon: <svg version="1" width="24" height="24"><path fill="none" d="M0 0h24v24H0V0z"/><path fill="none" d="M0 0h24v24H0V0z"/><g><path d="M21 3H3L1 5v3h2V5h18v14h-7v2h7l2-2V5l-2-2zM1 18v3h3c0-2-1-3-3-3zm0-4v2c3 0 5 2 5 5h2c0-4-3-7-7-7zm0-4v2c5 0 9 4 9 9h2c0-6-5-11-11-11z"/></g></svg>,
+	icon: <svg version="1" width="24" height="24"><path fill="none" d="M0 0h24v24H0V0z" /><path fill="none" d="M0 0h24v24H0V0z" /><g><path d="M21 3H3L1 5v3h2V5h18v14h-7v2h7l2-2V5l-2-2zM1 18v3h3c0-2-1-3-3-3zm0-4v2c3 0 5 2 5 5h2c0-4-3-7-7-7zm0-4v2c5 0 9 4 9 9h2c0-6-5-11-11-11z" /></g></svg>,
 	transforms: {
 		from: [
 			{
@@ -349,8 +349,10 @@ export const settings = getEmbedBlockSettings( {
 	},
 } );
 
-const embedContentIcon = <svg version="1" width="24" height="24"><path fill="none" d="M0 0h24v24H0V0z"/><path fill="none" d="M0 0h24v24H0V0z"/><g><path d="M21 3H3L1 5v3h2V5h18v14h-7v2h7l2-2V5l-2-2zM1 18v3h3c0-2-1-3-3-3zm0-4v2c3 0 5 2 5 5h2c0-4-3-7-7-7zm0-4v2c5 0 9 4 9 9h2c0-6-5-11-11-11z"/></g></svg>;
-const embedAudioIcon = <svg version="1" width="24" height="24"><path fill="none" d="M0 0h24v24H0V0z"/><path d="M21 3H3L1 5v14l2 2h18l2-2V5l-2-2zm0 16H3V5h18v14zM8 15a3 3 0 0 1 4-3V6h5v2h-3v7a3 3 0 0 1-6 0z"/></svg>;
+const embedContentIcon = <svg version="1" width="24" height="24"><path fill="none" d="M0 0h24v24H0V0z" /><path fill="none" d="M0 0h24v24H0V0z" /><g><path d="M21 3H3L1 5v3h2V5h18v14h-7v2h7l2-2V5l-2-2zM1 18v3h3c0-2-1-3-3-3zm0-4v2c3 0 5 2 5 5h2c0-4-3-7-7-7zm0-4v2c5 0 9 4 9 9h2c0-6-5-11-11-11z" /></g></svg>;
+const embedAudioIcon = <svg version="1" width="24" height="24"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M21 3H3L1 5v14l2 2h18l2-2V5l-2-2zm0 16H3V5h18v14zM8 15a3 3 0 0 1 4-3V6h5v2h-3v7a3 3 0 0 1-6 0z" /></svg>;
+const embedPhotoIcon = <svg enableBackground="new 0 0 24 24" version="1.1" viewBox="0 0 24 24" xmlSpace="preserve"><path d="M0,0h24v24H0V0z" fill="none" /><path d="M21,4H3C1.9,4,1,4.9,1,6v12c0,1.1,0.9,2,2,2h18c1.1,0,2-0.9,2-2V6C23,4.9,22.1,4,21,4z M21,18H3V6h18V18z" /><polygon points="14.5 11 11 15.51 8.5 12.5 5 17 19 17" /></svg>;
+const embedVideoIcon = <svg enableBackground="new 0 0 24 24" version="1.1" viewBox="0 0 24 24" xmlSpace="preserve"><path d="M0,0h24v24H0V0z" fill="none" /><path d="m10 8v8l5-4-5-4zm9-5h-14c-1.1 0-2 0.9-2 2v14c0 1.1 0.9 2 2 2h14c1.1 0 2-0.9 2-2v-14c0-1.1-0.9-2-2-2zm0 16h-14v-14h14v14z" /></svg>;
 
 export const common = [
 	{
@@ -358,8 +360,8 @@ export const common = [
 		settings: getEmbedBlockSettings( {
 			title: 'Twitter',
 			icon: {
-				background: '#1DA1F2',
-				foreground: '#ffffff',
+				background: '#ffffff',
+				foreground: '#1da1f2',
 				src: <svg height="48" width="48" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M22.23 5.924c-.736.326-1.527.547-2.357.646.847-.508 1.498-1.312 1.804-2.27-.793.47-1.67.812-2.606.996C18.325 4.498 17.258 4 16.078 4c-2.266 0-4.103 1.837-4.103 4.103 0 .322.036.635.106.935-3.41-.17-6.433-1.804-8.457-4.287-.353.607-.556 1.312-.556 2.064 0 1.424.724 2.68 1.825 3.415-.673-.022-1.305-.207-1.86-.514v.052c0 1.988 1.415 3.647 3.293 4.023-.344.095-.707.145-1.08.145-.265 0-.522-.026-.773-.074.522 1.63 2.038 2.817 3.833 2.85-1.404 1.1-3.174 1.757-5.096 1.757-.332 0-.66-.02-.98-.057 1.816 1.164 3.973 1.843 6.29 1.843 7.547 0 11.675-6.252 11.675-11.675 0-.178-.004-.355-.012-.53.802-.578 1.497-1.3 2.047-2.124z"></path></g></svg>,
 			},
 			keywords: [ __( 'tweet' ) ],
@@ -373,7 +375,7 @@ export const common = [
 			icon: {
 				background: '#ffffff',
 				foreground: '#ff0000',
-				src: <svg height="48" width="48" viewBox="0 0 24 24"><path d="M22 8l-1-2-2-1H5L3 6 2 8v8l1 2 2 1h14l2-1 1-2v-5-3zm-12 7V9l5 3-5 3z"/></svg>,
+				src: <svg height="48" width="48" viewBox="0 0 24 24"><path d="M22 8l-1-2-2-1H5L3 6 2 8v8l1 2 2 1h14l2-1 1-2v-5-3zm-12 7V9l5 3-5 3z" /></svg>,
 			},
 			keywords: [ __( 'music' ), __( 'video' ) ],
 		} ),
@@ -384,9 +386,9 @@ export const common = [
 		settings: getEmbedBlockSettings( {
 			title: 'Facebook',
 			icon: {
-				background: '#3B5998',
-				foreground: '#ffffff',
-				src: <svg class="social-logo facebook" height="48" width="48" viewBox="0 0 24 24"><path d="M20 3H4L3 4v16l1 1h9v-7h-3v-3h3V9c0-2 1-3 3-3h2v2h-1l-2 2v1h3v3h-3v7h5l1-1V4l-1-1z"/></svg>,
+				background: '#ffffff',
+				foreground: '#3b5998',
+				src: <svg height="48" width="48" viewBox="0 0 24 24"><path d="M20 3H4L3 4v16l1 1h9v-7h-3v-3h3V9c0-2 1-3 3-3h2v2h-1l-2 2v1h3v3h-3v7h5l1-1V4l-1-1z" /></svg>,
 			},
 		} ),
 		patterns: [ /^https?:\/\/www\.facebook.com\/.+/i ],
@@ -395,11 +397,7 @@ export const common = [
 		name: 'core-embed/instagram',
 		settings: getEmbedBlockSettings( {
 			title: 'Instagram',
-			icon: {
-				background: 'radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%)',
-				foreground: '#ffffff',
-				src: <svg class="social-logo instagram" height="48" width="48" viewBox="0 0 24 24"><path d="M12 5a64 64 0 0 1 5 0l1 1 1 1v1a63 63 0 0 1 0 9l-1 1-1 1h-1a63 63 0 0 1-9 0l-1-1-1-1v-1a63 63 0 0 1 0-9l1-1 1-1h5m0-2a64 64 0 0 0-6 0L5 5 3 6v2a64 64 0 0 0 0 10l2 1 1 2h2a64 64 0 0 0 10 0l1-2 2-1v-2a64 64 0 0 0 0-10l-2-1-1-2h-6zm0 4a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 8a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm5-9a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg>,
-			},
+			icon: <svg height="48" width="48" viewBox="0 0 24 24"><path d="M12 5a64 64 0 0 1 5 0l1 1 1 1v1a63 63 0 0 1 0 9l-1 1-1 1h-1a63 63 0 0 1-9 0l-1-1-1-1v-1a63 63 0 0 1 0-9l1-1 1-1h5m0-2a64 64 0 0 0-6 0L5 5 3 6v2a64 64 0 0 0 0 10l2 1 1 2h2a64 64 0 0 0 10 0l1-2 2-1v-2a64 64 0 0 0 0-10l-2-1-1-2h-6zm0 4a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 8a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm5-9a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" /></svg>,
 			keywords: [ __( 'image' ) ],
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?instagr(\.am|am\.com)\/.+/i ],
@@ -408,7 +406,7 @@ export const common = [
 		name: 'core-embed/wordpress',
 		settings: getEmbedBlockSettings( {
 			title: 'WordPress',
-			icon: 'embed-post',
+			icon: embedContentIcon,
 			keywords: [ __( 'post' ), __( 'blog' ) ],
 		} ),
 	},
@@ -426,9 +424,9 @@ export const common = [
 		settings: getEmbedBlockSettings( {
 			title: 'Spotify',
 			icon: {
-				background: '#1DB954',
-				foreground: '#ffffff',
-				src: <svg height="48" width="48" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20m5 14l-1 1c-3-2-6-2-9-1a1 1 0 1 1 0-2c3 0 7 0 9 2h1m1-2h-1c-3-2-7-2-10-1a1 1 0 1 1-1-2c4-1 8 0 12 2v1m0-3c-3-2-9-2-12-1a1 1 0 0 1 0-2c3-1 9-1 13 1a1 1 0 1 1-1 2"/></svg>,
+				background: '#ffffff',
+				foreground: '#1db954',
+				src: <svg width="48" height="48" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2m4.586 14.424c-.18.295-.563.387-.857.207-2.35-1.434-5.305-1.76-8.786-.963-.335.077-.67-.133-.746-.47-.077-.334.132-.67.47-.745 3.808-.87 7.076-.496 9.712 1.115.293.18.386.563.206.857M17.81 13.7c-.226.367-.706.482-1.072.257-2.687-1.652-6.785-2.13-9.965-1.166-.413.127-.848-.106-.973-.517-.125-.413.108-.848.52-.973 3.632-1.102 8.147-.568 11.234 1.328.366.226.48.707.256 1.072m.105-2.835C14.692 8.95 9.375 8.775 6.297 9.71c-.493.15-1.016-.13-1.166-.624-.148-.495.13-1.017.625-1.167 3.532-1.073 9.404-.866 13.115 1.337.445.264.59.838.327 1.282-.264.443-.838.59-1.282.325" /></svg>,
 			},
 			keywords: [ __( 'music' ), __( 'audio' ) ],
 		} ),
@@ -438,7 +436,7 @@ export const common = [
 		name: 'core-embed/flickr',
 		settings: getEmbedBlockSettings( {
 			title: 'Flickr',
-			icon: 'embed-photo',
+			icon: <svg width="48" height="48" viewBox="0 0 24 24"><path d="m6.5 7c-2.75 0-5 2.25-5 5s2.25 5 5 5 5-2.25 5-5-2.25-5-5-5zm11 0c-2.75 0-5 2.25-5 5s2.25 5 5 5 5-2.25 5-5-2.25-5-5-5z" /></svg>,
 			keywords: [ __( 'image' ) ],
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?flickr\.com\/.+/i, /^https?:\/\/flic\.kr\/.+/i ],
@@ -447,7 +445,10 @@ export const common = [
 		name: 'core-embed/vimeo',
 		settings: getEmbedBlockSettings( {
 			title: 'Vimeo',
-			icon: 'embed-video',
+			icon: {
+				foreground: '#1ab7ea',
+				src: <svg height="48" width="48" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M22.396 7.164c-.093 2.026-1.507 4.8-4.245 8.32C15.323 19.16 12.93 21 10.97 21c-1.214 0-2.24-1.12-3.08-3.36-.56-2.052-1.118-4.105-1.68-6.158-.622-2.24-1.29-3.36-2.004-3.36-.156 0-.7.328-1.634.98l-.978-1.26c1.027-.903 2.04-1.806 3.037-2.71C6 3.95 7.03 3.328 7.716 3.265c1.62-.156 2.616.95 2.99 3.32.404 2.558.685 4.148.84 4.77.468 2.12.982 3.18 1.543 3.18.435 0 1.09-.687 1.963-2.064.872-1.376 1.34-2.422 1.402-3.142.125-1.187-.343-1.782-1.4-1.782-.5 0-1.013.115-1.542.34 1.023-3.35 2.977-4.976 5.862-4.883 2.14.063 3.148 1.45 3.024 4.16z"></path></g></svg>,
+			},
 			keywords: [ __( 'video' ) ],
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?vimeo\.com\/.+/i ],
@@ -459,7 +460,7 @@ export const others = [
 		name: 'core-embed/animoto',
 		settings: getEmbedBlockSettings( {
 			title: 'Animoto',
-			icon: 'embed-video',
+			icon: embedVideoIcon,
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?(animoto|video214)\.com\/.+/i ],
 	},
@@ -467,7 +468,7 @@ export const others = [
 		name: 'core-embed/cloudup',
 		settings: getEmbedBlockSettings( {
 			title: 'Cloudup',
-			icon: 'embed-post',
+			icon: embedContentIcon,
 		} ),
 		patterns: [ /^https?:\/\/cloudup\.com\/.+/i ],
 	},
@@ -475,7 +476,7 @@ export const others = [
 		name: 'core-embed/collegehumor',
 		settings: getEmbedBlockSettings( {
 			title: 'CollegeHumor',
-			icon: 'embed-video',
+			icon: embedVideoIcon,
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?collegehumor\.com\/.+/i ],
 	},
@@ -483,7 +484,7 @@ export const others = [
 		name: 'core-embed/dailymotion',
 		settings: getEmbedBlockSettings( {
 			title: 'Dailymotion',
-			icon: 'embed-video',
+			icon: embedVideoIcon,
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?dailymotion\.com\/.+/i ],
 	},
@@ -491,7 +492,7 @@ export const others = [
 		name: 'core-embed/funnyordie',
 		settings: getEmbedBlockSettings( {
 			title: 'Funny or Die',
-			icon: 'embed-video',
+			icon: embedVideoIcon,
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?funnyordie\.com\/.+/i ],
 	},
@@ -499,7 +500,7 @@ export const others = [
 		name: 'core-embed/hulu',
 		settings: getEmbedBlockSettings( {
 			title: 'Hulu',
-			icon: 'embed-video',
+			icon: embedVideoIcon,
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?hulu\.com\/.+/i ],
 	},
@@ -507,7 +508,7 @@ export const others = [
 		name: 'core-embed/imgur',
 		settings: getEmbedBlockSettings( {
 			title: 'Imgur',
-			icon: 'embed-photo',
+			icon: embedPhotoIcon,
 		} ),
 		patterns: [ /^https?:\/\/(.+\.)?imgur\.com\/.+/i ],
 	},
@@ -515,7 +516,7 @@ export const others = [
 		name: 'core-embed/issuu',
 		settings: getEmbedBlockSettings( {
 			title: 'Issuu',
-			icon: 'embed-post',
+			icon: embedContentIcon,
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?issuu\.com\/.+/i ],
 	},
@@ -523,7 +524,7 @@ export const others = [
 		name: 'core-embed/kickstarter',
 		settings: getEmbedBlockSettings( {
 			title: 'Kickstarter',
-			icon: 'embed-post',
+			icon: embedContentIcon,
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?kickstarter\.com\/.+/i, /^https?:\/\/kck\.st\/.+/i ],
 	},
@@ -531,7 +532,7 @@ export const others = [
 		name: 'core-embed/meetup-com',
 		settings: getEmbedBlockSettings( {
 			title: 'Meetup.com',
-			icon: 'embed-post',
+			icon: embedContentIcon,
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?meetu(\.ps|p\.com)\/.+/i ],
 	},
@@ -548,7 +549,7 @@ export const others = [
 		name: 'core-embed/photobucket',
 		settings: getEmbedBlockSettings( {
 			title: 'Photobucket',
-			icon: 'embed-photo',
+			icon: embedPhotoIcon,
 		} ),
 		patterns: [ /^http:\/\/g?i*\.photobucket\.com\/.+/i ],
 	},
@@ -556,7 +557,7 @@ export const others = [
 		name: 'core-embed/polldaddy',
 		settings: getEmbedBlockSettings( {
 			title: 'Polldaddy',
-			icon: 'embed-post',
+			icon: embedContentIcon,
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?mixcloud\.com\/.+/i ],
 	},
@@ -564,7 +565,7 @@ export const others = [
 		name: 'core-embed/reddit',
 		settings: getEmbedBlockSettings( {
 			title: 'Reddit',
-			icon: 'embed-post',
+			icon: <svg width="48" height="48" viewBox="0 0 24 24"><path d="M22 11.816c0-1.256-1.02-2.277-2.277-2.277-.593 0-1.122.24-1.526.613-1.48-.965-3.455-1.594-5.647-1.69l1.17-3.702 3.18.75c.01 1.027.847 1.86 1.877 1.86 1.035 0 1.877-.84 1.877-1.877 0-1.035-.842-1.877-1.877-1.877-.77 0-1.43.466-1.72 1.13L13.55 3.92c-.204-.047-.4.067-.46.26l-1.35 4.27c-2.317.037-4.412.67-5.97 1.67-.402-.355-.917-.58-1.493-.58C3.02 9.54 2 10.56 2 11.815c0 .814.433 1.523 1.078 1.925-.037.222-.06.445-.06.673 0 3.292 4.01 5.97 8.94 5.97s8.94-2.678 8.94-5.97c0-.214-.02-.424-.052-.632.687-.39 1.154-1.12 1.154-1.964zm-3.224-7.422c.606 0 1.1.493 1.1 1.1s-.493 1.1-1.1 1.1-1.1-.494-1.1-1.1.493-1.1 1.1-1.1zm-16 7.422c0-.827.673-1.5 1.5-1.5.313 0 .598.103.838.27-.85.675-1.477 1.478-1.812 2.36-.32-.274-.525-.676-.525-1.13zm9.183 7.79c-4.502 0-8.165-2.33-8.165-5.193S7.457 9.22 11.96 9.22s8.163 2.33 8.163 5.193-3.663 5.193-8.164 5.193zM20.635 13c-.326-.89-.948-1.7-1.797-2.383.247-.186.55-.3.882-.3.827 0 1.5.672 1.5 1.5 0 .482-.23.91-.586 1.184zm-11.64 1.704c-.76 0-1.397-.616-1.397-1.376 0-.76.636-1.397 1.396-1.397.76 0 1.376.638 1.376 1.398 0 .76-.616 1.376-1.376 1.376zm7.405-1.376c0 .76-.615 1.376-1.375 1.376s-1.4-.616-1.4-1.376c0-.76.64-1.397 1.4-1.397.76 0 1.376.638 1.376 1.398zm-1.17 3.38c.15.152.15.398 0 .55-.675.674-1.728 1.002-3.22 1.002l-.01-.002-.012.002c-1.492 0-2.544-.328-3.218-1.002-.152-.152-.152-.398 0-.55.152-.152.4-.15.55 0 .52.52 1.394.775 2.67.775l.01.002.01-.002c1.276 0 2.15-.253 2.67-.775.15-.152.398-.152.55 0z" /></svg>,
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?reddit\.com\/.+/i ],
 	},
@@ -580,7 +581,7 @@ export const others = [
 		name: 'core-embed/screencast',
 		settings: getEmbedBlockSettings( {
 			title: 'Screencast',
-			icon: 'embed-video',
+			icon: embedVideoIcon,
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?screencast\.com\/.+/i ],
 	},
@@ -588,7 +589,7 @@ export const others = [
 		name: 'core-embed/scribd',
 		settings: getEmbedBlockSettings( {
 			title: 'Scribd',
-			icon: 'embed-post',
+			icon: embedContentIcon,
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?scribd\.com\/.+/i ],
 	},
@@ -596,7 +597,7 @@ export const others = [
 		name: 'core-embed/slideshare',
 		settings: getEmbedBlockSettings( {
 			title: 'Slideshare',
-			icon: 'embed-post',
+			icon: embedContentIcon,
 		} ),
 		patterns: [ /^https?:\/\/(.+?\.)?slideshare\.net\/.+/i ],
 	},
@@ -604,7 +605,7 @@ export const others = [
 		name: 'core-embed/smugmug',
 		settings: getEmbedBlockSettings( {
 			title: 'SmugMug',
-			icon: 'embed-photo',
+			icon: embedPhotoIcon,
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?smugmug\.com\/.+/i ],
 	},
@@ -620,7 +621,7 @@ export const others = [
 		name: 'core-embed/ted',
 		settings: getEmbedBlockSettings( {
 			title: 'TED',
-			icon: 'embed-video',
+			icon: embedVideoIcon,
 		} ),
 		patterns: [ /^https?:\/\/(www\.|embed\.)?ted\.com\/.+/i ],
 	},
@@ -628,7 +629,7 @@ export const others = [
 		name: 'core-embed/tumblr',
 		settings: getEmbedBlockSettings( {
 			title: 'Tumblr',
-			icon: 'embed-post',
+			icon: embedContentIcon,
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?tumblr\.com\/.+/i ],
 	},
@@ -636,7 +637,7 @@ export const others = [
 		name: 'core-embed/videopress',
 		settings: getEmbedBlockSettings( {
 			title: 'VideoPress',
-			icon: 'embed-video',
+			icon: embedVideoIcon,
 			keywords: [ __( 'video' ) ],
 		} ),
 		patterns: [ /^https?:\/\/videopress\.com\/.+/i ],
@@ -645,7 +646,7 @@ export const others = [
 		name: 'core-embed/wordpress-tv',
 		settings: getEmbedBlockSettings( {
 			title: 'WordPress.tv',
-			icon: 'embed-video',
+			icon: embedVideoIcon,
 		} ),
 		patterns: [ /^https?:\/\/wordpress\.tv\/.+/i ],
 	},

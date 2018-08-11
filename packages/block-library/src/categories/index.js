@@ -15,7 +15,7 @@ export const settings = {
 
 	description: __( 'Display a list of all your site’s categories.' ),
 
-	icon: <svg version="1" width="24" height="24"><path fill="none" d="M0 0h24v24H0V0z"/><path d="M12 2l-5 9h11l-6-9zm0 4l2 3h-4l2-3zM18 13a4 4 0 1 0-1 9 4 4 0 0 0 1-9zm0 7a3 3 0 1 1 0-5 3 3 0 0 1 0 5zM3 22h8v-8H3v8zm2-6h4v4H5v-4z"/></svg>,
+	icon: <svg enableBackground="new 0 0 24 24" version="1.1" viewBox="0 0 24 24" xmlSpace="preserve"><path d="M0,0h24v24H0V0z" fill="none" /><path d="M12,2l-5.5,9h11L12,2z M12,5.84L13.93,9h-3.87L12,5.84z" /><path d="m17.5 13c-2.49 0-4.5 2.01-4.5 4.5s2.01 4.5 4.5 4.5 4.5-2.01 4.5-4.5-2.01-4.5-4.5-4.5zm0 7c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" /><path d="m3 21.5h8v-8h-8v8zm2-6h4v4h-4v-4z" /></svg>,
 
 	category: 'widgets',
 

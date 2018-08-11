@@ -74,7 +74,7 @@ export const settings = {
 
 	description: __( 'Add some basic text.' ),
 
-	icon: 'editor-paragraph',
+	icon: <svg enableBackground="new 0 0 24 24" version="1.1" viewBox="0 0 24 24" xmlSpace="preserve"><path d="M0,0h24v24H0V0z" fill="none" /><polygon points="21 11.01 3 11 3 13 21 13" /><rect x="3" y="16" width="12" height="2" /><polygon points="21 6 3 6 3 8.01 21 8" /></svg>,
 
 	category: 'common',
 
