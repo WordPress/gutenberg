@@ -80,6 +80,8 @@
 .editor-block-types-list__item-has-children {
 	.editor-block-types-list__item-icon {
 		margin-right: 3px;
+		margin-bottom: 6px;
+		padding: 12px 20px 8px;
 		position: relative;
 		top: -2px;
 		left: -2px;
@@ -95,8 +97,8 @@
 		height: 100%;
 		position: absolute;
 		z-index: -1; // Show below the card as a shadow
-		bottom: -4px;
-		right: -4px;
+		bottom: -6px;
+		right: -6px;
 		border-radius: 4px;
 	}
 }
