@@ -11,23 +11,23 @@
 }
 
 .components-notice--success {
-  border-left-color: $alert-green;
-  background-color: lighten($alert-green, 45%);
+	border-left-color: $alert-green;
+	background-color: lighten($alert-green, 45%);
 }
 
 .components-notice--warning {
-  border-left-color: $alert-yellow;
-  background-color: lighten($alert-yellow, 35%);
+	border-left-color: $alert-yellow;
+	background-color: lighten($alert-yellow, 35%);
 }
 
 .components-notice--error {
-  border-left-color: $alert-red;
-  background-color: lighten($alert-red, 35%);
+	border-left-color: $alert-red;
+	background-color: lighten($alert-red, 35%);
 }
 
 .components-notice--info {
-  border-left-color: $blue-medium-500;
-  background-color: $blue-medium-100;
+	border-left-color: $blue-medium-500;
+	background-color: $blue-medium-100;
 }
 
 .components-notice__content {
@@ -53,7 +53,7 @@
 		color: $alert-red;
 	}
 
-  	&:focus {
+	&:focus {
 		outline: none;
 		box-shadow: 0 0 0 1px $blue-medium-400, 0 0 2px 1px $blue-medium-focus;
 	}
