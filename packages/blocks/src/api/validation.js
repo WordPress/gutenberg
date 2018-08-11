@@ -380,10 +380,12 @@ export function getNextNonWhitespaceToken( tokens ) {
 }
 
 /**
- * Tokenize some HTML, with exception handling
- * @param {string} html Actual HTML string.
+ * Tokenize an HTML string, gracefully handling any errors thrown during
+ * underlying tokenization.
  *
- * @return {Array} Array of valid tokenized HTML elements
+ * @param {string} html HTML string to tokenize.
+ *
+ * @return {Object[]} Array of valid tokenized HTML elements.
  */
 function getHTMLTokens( html ) {
 	try {
