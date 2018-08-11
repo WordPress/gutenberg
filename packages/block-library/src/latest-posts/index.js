@@ -15,7 +15,7 @@ export const settings = {
 
 	description: __( 'Display a list of your most recent posts.' ),
 
-	icon: <svg version="1" width="24" height="24"><path fill="none" d="M0 0h24v24H0V0z"/><path d="M13 8h5v2h-5zM13 15h5v2h-5z"/><path d="M19 3H5L3 5v14l2 2h14l2-2V5l-2-2zm0 16H5V5h14v14z"/><path d="M11 6H6v5h5V6zm-1 4H7V7h3v3zM11 13H6v5h5v-5zm-1 4H7v-3h3v3z"/></svg>,
+	icon: <svg enableBackground="new 0 0 24 24" version="1.1" viewBox="0 0 24 24" xmlSpace="preserve"><path d="M0,0h24v24H0V0z" fill="none" /><rect x="11" y="7" width="6" height="2" /><rect x="11" y="11" width="6" height="2" /><rect x="11" y="15" width="6" height="2" /><rect x="7" y="7" width="2" height="2" /><rect x="7" y="11" width="2" height="2" /><rect x="7" y="15" width="2" height="2" /><path d="M20.1,3H3.9C3.4,3,3,3.4,3,3.9v16.2C3,20.5,3.4,21,3.9,21h16.2c0.4,0,0.9-0.5,0.9-0.9V3.9C21,3.4,20.5,3,20.1,3z M19,19H5V5h14V19z" /></svg>,
 
 	category: 'widgets',
 
