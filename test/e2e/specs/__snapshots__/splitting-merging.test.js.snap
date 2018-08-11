@@ -79,3 +79,13 @@ exports[`splitting and merging blocks should split and merge paragraph blocks us
 <p>BeforeSecond:Second</p>
 <!-- /wp:paragraph -->"
 `;
+
+exports[`splitting and merging blocks should split without inline formatting 1`] = `
+"<!-- wp:paragraph -->
+<p><strong>Foo</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Bar</p>
+<!-- /wp:paragraph -->"
+`;

@@ -127,6 +127,22 @@ export function createBlockChildrenFromTinyMCEElement( element ) {
 	};
 }
 
+export function createHTMLElementFromTinyMCEElement( element ) {
+	const cleanElement = document.createElement( element.nodeName.toLowerCase() );
+
+	for ( let i = 0; i < element.attributes.length; i++ ) {
+		const { name, value } = element.attributes[ i ];
+
+		if ( ! isTinyMCEInternalAttribute( name ) ) {
+			cleanElement.setAttribute( name, value );
+		}
+	}
+
+	cleanElement.appendChild( domToDOM( element.childNodes ) );
+
+	return cleanElement;
+}
+
 /**
  * Given an array of HTMLElement from a TinyMCE editor body element, returns an
  * equivalent WPBlockChildren value. The element may undergo some preprocessing
@@ -177,6 +193,36 @@ export function domToString( value ) {
 	return children.toHTML( domToBlockChildren( value ) );
 }
 
+export function domToDOM( value ) {
+	const fragment = document.createDocumentFragment();
+
+	for ( let i = 0; i < value.length; i++ ) {
+		let node = value[ i ];
+		switch ( node.nodeType ) {
+			case TEXT_NODE:
+				node = document.createTextNode( getCleanTextNodeValue( node ) );
+				if ( node.length ) {
+					fragment.appendChild( node );
+				}
+				break;
+
+			case ELEMENT_NODE:
+				if ( isTinyMCEBogusElement( node ) ) {
+					break;
+				}
+
+				if ( ! isTinyMCEBogusWrapperElement( node ) ) {
+					fragment.appendChild( createHTMLElementFromTinyMCEElement( node ) );
+				} else if ( node.hasChildNodes() ) {
+					fragment.appendChild( domToDOM( node.childNodes ) );
+				}
+				break;
+		}
+	}
+
+	return fragment;
+}
+
 /**
  * Transforms an array of DOM Elements to the given format.
  *
@@ -192,5 +238,8 @@ export function domToFormat( value, format ) {
 
 		case 'children':
 			return domToBlockChildren( value );
+
+		case 'dom':
+			return domToDOM( value );
 	}
 }

@@ -15,7 +15,7 @@ import { BACKSPACE, DELETE } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import { diffAriaProps, pickAriaProps } from './aria';
-import { valueToString } from './format';
+import { valueToString, domToFormat } from './format';
 
 /**
  * Determines whether we need a fix to provide `input` events for contenteditable.
@@ -96,10 +96,13 @@ function applyInternetExplorerInputFix( editorNode ) {
 }
 
 const IS_PLACEHOLDER_VISIBLE_ATTR_NAME = 'data-is-placeholder-visible';
+
 export default class TinyMCE extends Component {
 	constructor() {
-		super();
+		super( ...arguments );
+
 		this.bindEditorNode = this.bindEditorNode.bind( this );
+		this.resetDOMState = this.resetDOMState.bind( this );
 	}
 
 	componentDidMount() {
@@ -147,6 +150,15 @@ export default class TinyMCE extends Component {
 		if ( this.editorNode.getAttribute( IS_PLACEHOLDER_VISIBLE_ATTR_NAME ) !== isPlaceholderVisibleString ) {
 			this.editorNode.setAttribute( IS_PLACEHOLDER_VISIBLE_ATTR_NAME, isPlaceholderVisibleString );
 		}
+	}
+
+	resetDOMState() {
+		const cleanFragment = domToFormat( this.editorNode.childNodes, 'dom' );
+		while ( this.editorNode.firstChild ) {
+			this.editorNode.removeChild( this.editorNode.firstChild );
+		}
+
+		this.editorNode.appendChild( cleanFragment );
 	}
 
 	initialize() {
@@ -215,6 +227,7 @@ export default class TinyMCE extends Component {
 			...ariaProps,
 			className: classnames( className, 'editor-rich-text__tinymce' ),
 			contentEditable: true,
+			onBlur: this.resetDOMState,
 			[ IS_PLACEHOLDER_VISIBLE_ATTR_NAME ]: isPlaceholderVisible,
 			ref: this.bindEditorNode,
 			style,

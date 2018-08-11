@@ -171,4 +171,17 @@ describe( 'splitting and merging blocks', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should split without inline formatting', async () => {
+		// Regression test: Previously, splitting while at the extent of an
+		// inline boundary and continuing to type would revert caret position
+		// back inside the inline boundary.
+		await insertBlock( 'Paragraph' );
+		await pressWithModifier( META_KEY, 'b' );
+		await page.keyboard.type( 'Foo' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Bar' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

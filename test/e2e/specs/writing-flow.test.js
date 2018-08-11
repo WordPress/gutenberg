@@ -108,9 +108,9 @@ describe( 'adding blocks', () => {
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.type( 'After' );
 
-		// Arrow right from end of first should traverse to second, *BEFORE*
-		// the bolded text. Another press should move within inline boundary.
-		await pressTimes( 'ArrowRight', 2 );
+		// Arrow right from end of first should traverse to second, inside the
+		// bolded text.
+		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( 'Inside' );
 
 		// Arrow left from end of beginning of inline boundary should move to
@@ -131,7 +131,8 @@ describe( 'adding blocks', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'ArrowLeft' );
 
-		// Should be after the inline boundary again.
+		// Should be inside the inline boundary, so navigate out.
+		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( 'After' );
 
 		// Finally, ensure that ArrowRight from end of unbolded text moves to
