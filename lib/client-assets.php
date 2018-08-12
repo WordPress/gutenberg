@@ -1237,12 +1237,24 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 			)
 		);
 	} elseif ( $is_new_post ) {
+		$default_post = array(
+			'title' => array(
+				'raw'      => '',
+				/** This filter is documented in wp-includes/post-template.php */
+				'rendered' => apply_filters( 'the_title', '', $post->ID ),
+			),
+		);
+
+		/**
+		 * Filters the default post data for a new post
+		 *
+		 * @param array $default_post Array of key values to insert in the new post data
+		 * @param WP_Post $post       Post
+		 */
+		$default_post = apply_filters( 'gutenberg_default_post', $default_post, $post );
 		wp_add_inline_script(
 			'wp-edit-post',
-			sprintf( 'window._wpGutenbergDefaultPost = { title: %s };', wp_json_encode( array(
-				'raw'      => '',
-				'rendered' => apply_filters( 'the_title', '', $post->ID ),
-			) ) )
+			sprintf( 'window._wpGutenbergDefaultPost = %s;', wp_json_encode( $default_post ) )
 		);
 	}
 
