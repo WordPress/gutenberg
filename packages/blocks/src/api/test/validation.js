@@ -445,6 +445,15 @@ describe( 'validation', () => {
 			expect( isEquivalent ).toBe( true );
 		} );
 
+		it( 'should return true when comparing empty strings', () => {
+			const isEquivalent = isEquivalentHTML(
+				'',
+				'',
+			);
+
+			expect( isEquivalent ).toBe( true );
+		} );
+
 		it( 'should return false if supplied malformed HTML', () => {
 			const isEquivalent = isEquivalentHTML(
 				'<blockquote class="wp-block-quote">fsdfsdfsd<p>fdsfsdfsdd</pfd fd fd></blockquote>',
