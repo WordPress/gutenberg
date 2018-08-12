@@ -385,7 +385,7 @@ export function getNextNonWhitespaceToken( tokens ) {
  *
  * @param {string} html HTML string to tokenize.
  *
- * @return {Object[]} Array of valid tokenized HTML elements.
+ * @return {Object[]|boolean} Array of valid tokenized HTML elements, or false
  */
 function getHTMLTokens( html ) {
 	try {
@@ -394,12 +394,13 @@ function getHTMLTokens( html ) {
 		log.warning( 'Malformed HTML detected: %s', html );
 	}
 
-	return [];
+	return false;
 }
 
 /**
- * Returns true if there is given HTML strings are effectively equivalent, or
- * false otherwise.
+ * Returns true if the given HTML strings are effectively equivalent, or
+ * false otherwise. Invalid HTML is not considered equivalent, even if the
+ * strings directly match.
  *
  * @param {string} actual Actual HTML string.
  * @param {string} expected Expected HTML string.
@@ -409,6 +410,11 @@ function getHTMLTokens( html ) {
 export function isEquivalentHTML( actual, expected ) {
 	// Tokenize input content and reserialized save content
 	const [ actualTokens, expectedTokens ] = [ actual, expected ].map( getHTMLTokens );
+
+	// If either is malformed then stop comparing - the strings are not equivalent
+	if ( actualTokens === false || expectedTokens === false ) {
+		return false;
+	}
 
 	let actualToken, expectedToken;
 	while ( ( actualToken = getNextNonWhitespaceToken( actualTokens ) ) ) {
