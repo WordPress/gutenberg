@@ -82,6 +82,73 @@ edit( { attributes, setAttributes, className, isSelected } ) {
 }
 ```
 
+### Using a JS class
+
+The `edit` can not only be a function but a complete JS class with a complete component lifecycle. For example, you can define this in a separate file:
+
+```js
+const { __ } = wp.i18n;
+const { RichText } = wp.editor;
+const { Component } = wp.element;
+
+class MyCompo extends Component {
+
+    constructor() {
+        super( ...arguments );
+    }
+
+    onChangeTitle ( title ) {
+        this.props.setAttributes( { title } );
+    }
+
+    componentDidUpdate( prevProps ) {
+        console.log( `Component was updated, previous title was: ${ prevProps.attributes.title }` );
+    }
+
+    render() {
+        const { attributes, className } = this.props;
+        return (
+            <div className={ className }>
+                <RichText
+                    tagName="p"
+                    multiline={ false }
+                    placeholder={ __( 'Write text…' ) }
+                    value={ attributes.title }
+                    onChange={ this.onChangeTitle }
+                    />
+            </div>
+        );
+    }
+}
+
+export default MyCompo;
+
+```
+
+and then import it in the file (let's assume both files were in the same directory) where you're registering the block and use it for the `edit` property:
+
+```js
+const { __ } = wp.i18n;
+import MyCompo from './mycompo';
+
+wp.blocks.registerBlockType( 'myblocks/someblock', {
+	title: __( 'Some block' ),
+	icon: 'sort',
+	category: 'layout',
+	attributes: {
+		title: {
+			type: 'string',
+			source: 'children',
+			selector: 'p',
+		},
+	},
+	edit: MyCompo,
+	save: ...
+} );
+
+```
+
+
 ## Save
 
 The `save` function defines the way in which the different attributes should be combined into the final markup, which is then serialized by Gutenberg into `post_content`.
