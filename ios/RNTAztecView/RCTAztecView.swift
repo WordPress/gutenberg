@@ -10,8 +10,6 @@ class RCTAztecView: Aztec.TextView {
 
     private lazy var placeholderLabel: UILabel = {
         let label = UILabel(frame: .zero)
-        label.text = ""
-        label.sizeToFit()
         return label
     }()
 
