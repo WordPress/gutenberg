@@ -19,6 +19,11 @@ cache:
     - $HOME/.npm
 
 before_install:
+  - |
+    git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qvE '(\.md$)' || {
+      echo "Only docs were updated, stopping build process."
+      exit
+    }
   - nvm install && nvm use
   - npm install npm -g
 
@@ -63,5 +68,4 @@ jobs:
       env: WP_VERSION=latest
       script:
         - npm install || exit 1
-        - npm run build || exit 1
         - ./bin/run-e2e-tests.sh || exit 1

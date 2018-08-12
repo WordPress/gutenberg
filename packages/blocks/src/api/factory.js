@@ -58,8 +58,6 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 	// attributes, and their inner blocks.
 	return {
 		clientId,
-		// TODO: Remove from block interface in 3.5 "UID" deprecation.
-		uid: clientId,
 		name,
 		isValid: true,
 		attributes,
@@ -83,8 +81,6 @@ export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
 	return {
 		...block,
 		clientId,
-		// TODO: Remove from block interface in 3.5 "UID" deprecation.
-		uid: uuid(),
 		attributes: {
 			...block.attributes,
 			...mergeAttributes,

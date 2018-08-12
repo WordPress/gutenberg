@@ -1,5 +1,5 @@
 .editor-default-block-appender {
-	input[type=text].editor-default-block-appender__content { // needs specificity
+	input[type="text"].editor-default-block-appender__content { // needs specificity
 		border: none;
 		background: none;
 		box-shadow: none;
@@ -25,10 +25,10 @@
 
 	// Show quick insertion icons faded until hover.
 	.editor-inserter-with-shortcuts {
-		opacity: .5;
+		opacity: 0.5;
 		transition: opacity 0.2s;
 
-		.components-icon-button:not( :hover ) {
+		.components-icon-button:not(:hover) {
 			// use opacity to work in various editor styles
 			color: $dark-opacity-500;
 
@@ -43,8 +43,8 @@
 	}
 
 	// Show the inserter if mousing over or there is a tip.
-	&:not( .has-tip ) {
-		.editor-inserter__toggle:not( [aria-expanded="true"] ) {
+	&:not(.has-tip) {
+		.editor-inserter__toggle:not([aria-expanded="true"]) {
 			opacity: 0;
 		}
 
@@ -97,7 +97,7 @@
 		padding: 4px;
 
 		// use opacity to work in various editor styles
-		&:not( :hover ) {
+		&:not(:hover) {
 			color: $dark-opacity-500;
 
 			.is-dark-theme & {
@@ -111,7 +111,7 @@
 .editor-inserter-with-shortcuts {
 	right: $block-padding;
 	display: none; // Don't show on mobile.
-	z-index: z-index( '.editor-inserter-with-shortcuts' ); // Elevate above the sibling inserter.
+	z-index: z-index(".editor-inserter-with-shortcuts"); // Elevate above the sibling inserter.
 
 	@include break-small {
 		right: 0;

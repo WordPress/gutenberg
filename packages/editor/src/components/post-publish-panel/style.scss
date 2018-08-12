@@ -12,6 +12,7 @@
 }
 
 .editor-post-publish-panel__header {
+	background: $white;
 	padding-left: 16px;
 	height: $header-height;
 	border-bottom: $border-width solid $light-gray-500;
@@ -44,6 +45,7 @@
 
 .editor-post-publish-panel__link {
 	color: $blue-medium-700;
+	font-weight: 400;
 	padding-left: 4px;
 	text-decoration: underline;
 }
@@ -51,16 +53,14 @@
 .editor-post-publish-panel__prepublish {
 	padding: 16px;
 
+	strong {
+		color: $dark-gray-900;
+	}
+
 	.components-panel__body {
+		background: $white;
 		margin-left: -16px;
 		margin-right: -16px;
-		margin-bottom: -16px;
-		margin-top: 10px;
-		border: none;
-
-		.components-panel__body-toggle {
-			font-weight: 400;
-		}
 	}
 
 	.editor-post-visibility__dialog-legend {

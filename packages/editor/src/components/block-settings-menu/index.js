@@ -2,30 +2,41 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { castArray } from 'lodash';
+import { castArray, first, last, every, flow } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { IconButton, Dropdown, NavigableMenu } from '@wordpress/components';
-import { withDispatch } from '@wordpress/data';
+import { IconButton, Dropdown, NavigableMenu, MenuItem, KeyboardShortcuts } from '@wordpress/components';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { cloneBlock, hasBlockSupport } from '@wordpress/blocks';
+import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import BlockModeToggle from './block-mode-toggle';
-import BlockDuplicateButton from './block-duplicate-button';
-import BlockRemoveButton from './block-remove-button';
 import ReusableBlockConvertButton from './reusable-block-convert-button';
 import ReusableBlockDeleteButton from './reusable-block-delete-button';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import BlockUnknownConvertButton from './block-unknown-convert-button';
 import _BlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import _BlockSettingsMenuPluginsExtension from './block-settings-menu-plugins-extension';
-import withDeprecatedUniqueId from '../with-deprecated-unique-id';
+
+const preventDefault = ( event ) => {
+	event.preventDefault();
+	return event;
+};
+
+const shortcuts = {
+	duplicate: {
+		raw: rawShortcut.primaryShift( 'd' ),
+		display: displayShortcut.primaryShift( 'd' ),
+	},
+};
 
 export class BlockSettingsMenu extends Component {
 	constructor() {
@@ -54,8 +65,11 @@ export class BlockSettingsMenu extends Component {
 			clientIds,
 			onSelect,
 			focus,
-			rootClientId,
 			isHidden,
+			onDuplicate,
+			onRemove,
+			canDuplicate,
+			isLocked,
 		} = this.props;
 		const { isFocused } = this.state;
 		const blockClientIds = castArray( clientIds );
@@ -64,6 +78,14 @@ export class BlockSettingsMenu extends Component {
 
 		return (
 			<div className="editor-block-settings-menu">
+				<KeyboardShortcuts
+					bindGlobal
+					shortcuts={ {
+						// Prevents bookmark all Tabs shortcut in Chrome when devtools are closed.
+						// Prevents reposition Chrome devtools pane shortcut when devtools are open.
+						[ shortcuts.duplicate.raw ]: flow( preventDefault, onDuplicate ),
+					} }
+				/>
 				<Dropdown
 					contentClassName="editor-block-settings-menu__popover"
 					position="bottom left"
@@ -97,34 +119,35 @@ export class BlockSettingsMenu extends Component {
 						<NavigableMenu className="editor-block-settings-menu__content">
 							<_BlockSettingsMenuFirstItem.Slot fillProps={ { onClose } } />
 							{ count === 1 && (
-								<BlockModeToggle
-									clientId={ firstBlockClientId }
-									onToggle={ onClose }
-									role="menuitem"
-								/>
-							) }
-							{ count === 1 && (
 								<BlockUnknownConvertButton
 									clientId={ firstBlockClientId }
-									role="menuitem"
 								/>
 							) }
 							{ count === 1 && (
 								<BlockHTMLConvertButton
 									clientId={ firstBlockClientId }
-									role="menuitem"
 								/>
 							) }
-							<BlockDuplicateButton
-								clientIds={ clientIds }
-								rootClientId={ rootClientId }
-								role="menuitem"
-							/>
+							{ ! isLocked && canDuplicate && (
+								<MenuItem
+									className="editor-block-settings-menu__control"
+									onClick={ onDuplicate }
+									icon="admin-page"
+									shortcut={ shortcuts.duplicate.display }
+								>
+									{ __( 'Duplicate' ) }
+								</MenuItem>
+							) }
+							{ count === 1 && (
+								<BlockModeToggle
+									clientId={ firstBlockClientId }
+									onToggle={ onClose }
+								/>
+							) }
 							{ count === 1 && (
 								<ReusableBlockConvertButton
 									clientId={ firstBlockClientId }
 									onToggle={ onClose }
-									itemsRole="menuitem"
 								/>
 							) }
 							<_BlockSettingsMenuPluginsExtension.Slot fillProps={ { clientIds, onClose } } />
@@ -133,13 +156,17 @@ export class BlockSettingsMenu extends Component {
 								<ReusableBlockDeleteButton
 									clientId={ firstBlockClientId }
 									onToggle={ onClose }
-									itemsRole="menuitem"
 								/>
 							) }
-							<BlockRemoveButton
-								clientIds={ clientIds }
-								role="menuitem"
-							/>
+							{ ! isLocked && (
+								<MenuItem
+									className="editor-block-settings-menu__control"
+									onClick={ onRemove }
+									icon="trash"
+								>
+									{ __( 'Remove Block' ) }
+								</MenuItem>
+							) }
 						</NavigableMenu>
 					) }
 				/>
@@ -149,10 +176,55 @@ export class BlockSettingsMenu extends Component {
 }
 
 export default compose( [
-	withDeprecatedUniqueId,
-	withDispatch( ( dispatch ) => ( {
-		onSelect( clientId ) {
-			dispatch( 'core/editor' ).selectBlock( clientId );
-		},
-	} ) ),
+	withSelect( ( select, { clientIds, rootClientId } ) => {
+		const {
+			getBlocksByClientId,
+			getBlockIndex,
+			getTemplateLock,
+		} = select( 'core/editor' );
+
+		const blocks = getBlocksByClientId( clientIds );
+
+		const canDuplicate = every( blocks, ( block ) => {
+			return !! block && hasBlockSupport( block.name, 'multiple', true );
+		} );
+
+		return {
+			index: getBlockIndex( last( castArray( clientIds ) ), rootClientId ),
+			isLocked: !! getTemplateLock( rootClientId ),
+			blocks,
+			canDuplicate,
+			shortcuts,
+		};
+	} ),
+	withDispatch( ( dispatch, { clientIds, rootClientId, blocks, index, isLocked, canDuplicate } ) => {
+		const { insertBlocks, multiSelect, removeBlocks, selectBlock } = dispatch( 'core/editor' );
+
+		return {
+			onDuplicate() {
+				if ( isLocked || ! canDuplicate ) {
+					return;
+				}
+
+				const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
+				insertBlocks(
+					clonedBlocks,
+					index + 1,
+					rootClientId
+				);
+				if ( clonedBlocks.length > 1 ) {
+					multiSelect(
+						first( clonedBlocks ).clientId,
+						last( clonedBlocks ).clientId
+					);
+				}
+			},
+			onRemove() {
+				removeBlocks( clientIds );
+			},
+			onSelect( clientId ) {
+				selectBlock( clientId );
+			},
+		};
+	} ),
 ] )( BlockSettingsMenu );

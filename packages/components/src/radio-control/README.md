@@ -1,5 +1,4 @@
-RadioControl
-=======
+# RadioControl
 
 RadioControl component is used to generate radio input fields.
 
@@ -8,16 +7,23 @@ RadioControl component is used to generate radio input fields.
 
 Render a user interface to select the user type using radio inputs.
 ```jsx
-    <RadioControl
-        label="User type"
-        help="The type of the current user"
-        selected={ value }
-        options={ [
-            { label: 'Author', value: 'a' },
-            { label: 'Editor', value: 'e' },
-        ] }
-        onChange={ onChange }
-    />
+import { RadioControl } from '@wordpress/components';
+import { withState } from '@wordpress/compose';
+
+const MyRadioControl = withState( {
+	option: 'a',
+} )( ( { option, setState } ) => ( 
+	<RadioControl
+		label="User type"
+		help="The type of the current user"
+		selected={ option }
+		options={ [
+			{ label: 'Author', value: 'a' },
+			{ label: 'Editor', value: 'e' },
+		] }
+		onChange={ ( option ) => { setState( { option } ) } }
+	/>
+) );
 ```
 
 ## Props

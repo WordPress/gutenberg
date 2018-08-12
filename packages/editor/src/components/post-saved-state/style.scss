@@ -5,12 +5,12 @@
 	overflow: hidden;
 
 	&.is-saving {
-		animation: loading_fade .5s infinite;
+		animation: loading_fade 0.5s infinite;
 	}
 
 	.dashicon {
 		display: inline-block;
-	    flex: 0 0 auto;
+		flex: 0 0 auto;
 	}
 }
 

@@ -14,33 +14,24 @@ npm install @wordpress/core-data --save
 
 ## Example
 
-Below is an example of a component which simply renders a list of categories:
+Below is an example of a component which simply renders a list of authors:
 
 ```jsx
 const { withSelect } = wp.data;
 
-function MyCategoriesList( { categories, isRequesting } ) {
-	if ( isRequesting ) {
-		return 'Loading…';
-	}
-
+function MyAuthorsList( { authors } ) {
 	return (
 		<ul>
-			{ categories.map( ( category ) => (
-				<li key={ category.id }>{ category.name }</li>
+			{ authors.map( ( author ) => (
+				<li key={ author.id }>{ author.name }</li>
 			) ) }
 		</ul>
 	);
 }
 
-MyCategoriesList = withSelect( ( select ) => {
-	const { getCategories, isRequestingCategories } = select( 'core' );
-
-	return {
-		categories: getCategories(),
-		isRequesting: isRequestingCategories(),
-	};
-} );
+MyAuthorsList = withSelect( ( select ) => ( {
+	authors: select( 'core' ).getAuthors(),
+} ) );
 ```
 
 ## Actions

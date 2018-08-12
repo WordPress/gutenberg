@@ -41,20 +41,18 @@ The function called when dragging ends.
 ```jsx
 import { Dashicon, Draggable, Panel, PanelBody } from '@wordpress/components';
 
-function DraggablePanel() {
-	return (
-		<div id="draggable-panel">
-			<Panel header="Draggable panel" >
-				<PanelBody>
-					<Draggable
-						elementId="draggable-panel"
-						transferData={ { } }
-					>
-						<Dashicon icon="move" />
-					</Draggable>
-				</PanelBody>
-			</Panel>
-		</div>
-	);
-}
+const MyDraggable = () => (
+	<div id="draggable-panel">
+		<Panel header="Draggable panel" >
+			<PanelBody>
+				<Draggable
+					elementId="draggable-panel"
+					transferData={ { } }
+				>
+					<Dashicon icon="move" />
+				</Draggable>
+			</PanelBody>
+		</Panel>
+	</div>
+);
 ```

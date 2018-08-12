@@ -29,7 +29,6 @@ import {
 	preferences,
 	saving,
 	notices,
-	provisionalBlockClientId,
 	blocksMode,
 	isInsertionPointVisible,
 	reusableBlocks,
@@ -1787,100 +1786,6 @@ describe( 'state', () => {
 					status: 'success',
 				},
 			] );
-		} );
-	} );
-
-	describe( 'provisionalBlockClientId()', () => {
-		const PROVISIONAL_UPDATE_ACTION_TYPES = [
-			'UPDATE_BLOCK_ATTRIBUTES',
-			'UPDATE_BLOCK',
-			'CONVERT_BLOCK_TO_REUSABLE',
-		];
-
-		const PROVISIONAL_REPLACE_ACTION_TYPES = [
-			'REPLACE_BLOCKS',
-			'REMOVE_BLOCKS',
-		];
-
-		it( 'returns null by default', () => {
-			const state = provisionalBlockClientId( undefined, {} );
-
-			expect( state ).toBe( null );
-		} );
-
-		it( 'returns the clientId of the first inserted provisional block', () => {
-			const state = provisionalBlockClientId( null, {
-				type: 'INSERT_BLOCKS',
-				isProvisional: true,
-				blocks: [
-					{ clientId: 'chicken' },
-				],
-			} );
-
-			expect( state ).toBe( 'chicken' );
-		} );
-
-		it( 'does not return clientId of block if not provisional', () => {
-			const state = provisionalBlockClientId( null, {
-				type: 'INSERT_BLOCKS',
-				blocks: [
-					{ clientId: 'chicken' },
-				],
-			} );
-
-			expect( state ).toBe( null );
-		} );
-
-		it( 'returns null on block reset', () => {
-			const state = provisionalBlockClientId( 'chicken', {
-				type: 'RESET_BLOCKS',
-			} );
-
-			expect( state ).toBe( null );
-		} );
-
-		it( 'returns null on block update', () => {
-			PROVISIONAL_UPDATE_ACTION_TYPES.forEach( ( type ) => {
-				const state = provisionalBlockClientId( 'chicken', {
-					type,
-					clientId: 'chicken',
-				} );
-
-				expect( state ).toBe( null );
-			} );
-		} );
-
-		it( 'does not return null if update occurs to non-provisional block', () => {
-			PROVISIONAL_UPDATE_ACTION_TYPES.forEach( ( type ) => {
-				const state = provisionalBlockClientId( 'chicken', {
-					type,
-					clientId: 'ribs',
-				} );
-
-				expect( state ).toBe( 'chicken' );
-			} );
-		} );
-
-		it( 'returns null if replacement of provisional block', () => {
-			PROVISIONAL_REPLACE_ACTION_TYPES.forEach( ( type ) => {
-				const state = provisionalBlockClientId( 'chicken', {
-					type,
-					clientIds: [ 'chicken' ],
-				} );
-
-				expect( state ).toBe( null );
-			} );
-		} );
-
-		it( 'does not return null if replacement of non-provisional block', () => {
-			PROVISIONAL_REPLACE_ACTION_TYPES.forEach( ( type ) => {
-				const state = provisionalBlockClientId( 'chicken', {
-					type,
-					clientIds: [ 'ribs' ],
-				} );
-
-				expect( state ).toBe( 'chicken' );
-			} );
 		} );
 	} );
 

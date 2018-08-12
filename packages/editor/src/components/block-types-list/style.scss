@@ -11,7 +11,7 @@
 .editor-block-types-list__item {
 	display: inline-flex;
 	flex-direction: column;
-	width: calc( 33.3% - 8px );
+	width: calc(33.3% - 8px);
 	margin: 0 4px 8px 4px;
 	font-size: $default-font-size;
 	color: $dark-gray-700;
@@ -88,7 +88,7 @@
 	// Show a "stacked card" below an item that has children.
 	.editor-block-types-list__item-icon-stack {
 		display: block;
-		background: rgba( $dark-gray-900, .3 );
+		background: rgba($dark-gray-900, 0.3);
 		width: 100%;
 		height: 100%;
 		position: absolute;

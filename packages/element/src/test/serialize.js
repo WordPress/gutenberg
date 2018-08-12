@@ -8,6 +8,7 @@ import { noop } from 'lodash';
  */
 import {
 	Component,
+	createElement,
 	Fragment,
 	RawHTML,
 } from '../';
@@ -18,6 +19,7 @@ import serialize, {
 	escapeAttribute,
 	escapeHTML,
 	hasPrefix,
+	isValidAttributeName,
 	renderElement,
 	renderNativeComponent,
 	renderComponent,
@@ -71,7 +73,49 @@ describe( 'escapeHTML', () => {
 	testEscapeLessThan( escapeHTML );
 } );
 
+describe( 'isValidAttributeName', () => {
+	it( 'should return false for attribute with controls', () => {
+		const result = isValidAttributeName( 'bad\u007F' );
+
+		expect( result ).toBe( false );
+	} );
+
+	it( 'should return false for attribute with non-permitted characters', () => {
+		const result = isValidAttributeName( 'bad"' );
+
+		expect( result ).toBe( false );
+	} );
+
+	it( 'should return false for attribute with noncharacters', () => {
+		const result = isValidAttributeName( 'bad\uFDD0' );
+
+		expect( result ).toBe( false );
+	} );
+
+	it( 'should return true for valid attribute name', () => {
+		const result = isValidAttributeName( 'good' );
+
+		expect( result ).toBe( true );
+	} );
+} );
+
 describe( 'serialize()', () => {
+	it( 'should allow only valid attribute names', () => {
+		const element = createElement(
+			'div',
+			{
+				'notok\u007F': 'bad',
+				'notok"': 'bad',
+				ok: 'good',
+				'notok\uFDD0': 'bad',
+			},
+		);
+
+		const result = serialize( element );
+
+		expect( result ).toBe( '<div ok="good"></div>' );
+	} );
+
 	it( 'should render with context', () => {
 		class Provider extends Component {
 			getChildContext() {

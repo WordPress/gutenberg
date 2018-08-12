@@ -1,12 +1,13 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage } from '../support/utils';
+import {
+	clickBlockAppender,
+	newPost,
+} from '../support/utils';
 
 describe( 'Managing links', () => {
 	beforeEach( async () => {
-		await newDesktopBrowserPage();
 		await newPost();
 	} );
 
@@ -26,7 +27,7 @@ describe( 'Managing links', () => {
 	it( 'Pressing Left and Esc in Link Dialog in "Fixed to Toolbar" mode', async () => {
 		await setFixedToolbar( true );
 
-		await page.click( '.editor-default-block-appender' );
+		await clickBlockAppender();
 		await page.keyboard.type( 'Text' );
 		await page.click( 'button[aria-label="Link"]' );
 
@@ -44,13 +45,13 @@ describe( 'Managing links', () => {
 	it( 'Pressing Left and Esc in Link Dialog in "Docked Toolbar" mode', async () => {
 		await setFixedToolbar( false );
 
-		await page.click( '.editor-default-block-appender' );
+		await clickBlockAppender();
 		await page.keyboard.type( 'Text' );
 
 		// we need to trigger isTyping = false
-		await page.mouse.move( 200, 300 );
-		await page.mouse.move( 250, 350 );
-
+		await page.mouse.move( 200, 300, { steps: 10 } );
+		await page.mouse.move( 250, 350, { steps: 10 } );
+		await page.waitForSelector( 'button[aria-label="Link"]' );
 		await page.click( 'button[aria-label="Link"]' );
 
 		// Typing "left" should not close the dialog

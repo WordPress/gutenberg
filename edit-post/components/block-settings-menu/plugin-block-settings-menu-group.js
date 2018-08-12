@@ -27,7 +27,7 @@ const PluginBlockSettingsMenuGroupSlot = ( { fillProps, selectedBlocks } ) => {
 };
 
 PluginBlockSettingsMenuGroup.Slot = withSelect( ( select, { fillProps: { clientIds } } ) => ( {
-	selectedBlocks: select( 'core/editor' ).getBlocksByUID( clientIds ),
+	selectedBlocks: select( 'core/editor' ).getBlocksByClientId( clientIds ),
 } ) )( PluginBlockSettingsMenuGroupSlot );
 
 export default PluginBlockSettingsMenuGroup;

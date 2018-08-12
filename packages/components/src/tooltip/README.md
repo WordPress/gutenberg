@@ -1,5 +1,4 @@
-Tooltip
-=======
+# Tooltip
 
 Tooltip is a React component to render floating help text relative to a node when it receives focus or when the user places the mouse cursor atop it. If the tooltip exceeds the bounds of the page in the direction it opens, its position will be flipped automatically.
 
@@ -10,17 +9,15 @@ Accessibility note: the tooltip text is hidden from screen readers and assistive
 Render a Tooltip, passing as a child the element to which it should anchor:
 
 ```jsx
-import { Tooltip } from '@wordpress/components';
+import { Tooltip, Button } from '@wordpress/components';
 
-function HelpfulButton() {
-	return (
-		<Tooltip text="More information">
-			<button>
-				Hover for more information
-			</button>
-		</Tooltip>
-	);
-}
+const MyTooltip = () => (
+	<Tooltip text="More information">
+		<Button isDefault>
+			Hover for more information
+		</Button>
+	</Tooltip>
+);
 ```
 
 ## Props

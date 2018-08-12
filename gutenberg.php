@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
- * Version: 3.4.0
+ * Version: 3.5.0
  * Author: Gutenberg Team
  *
  * @package gutenberg
@@ -175,6 +175,8 @@ function gutenberg_pre_init() {
  * @return bool   Whether Gutenberg was initialized.
  */
 function gutenberg_init( $return, $post ) {
+	global $title, $post_type;
+
 	if ( true === $return && current_filter() === 'replace_editor' ) {
 		return $return;
 	}
@@ -187,11 +189,28 @@ function gutenberg_init( $return, $post ) {
 	add_filter( 'screen_options_show_screen', '__return_false' );
 	add_filter( 'admin_body_class', 'gutenberg_add_admin_body_class' );
 
-	/**
+	$post_type_object = get_post_type_object( $post_type );
+
+	/*
+	 * Always force <title> to 'Edit Post' (or equivalent)
+	 * because it needs to be in a generic state for both
+	 * post-new.php and post.php?post=<id>.
+	 */
+	if ( ! empty( $post_type_object ) ) {
+		$title = $post_type_object->labels->edit_item;
+	}
+
+	/*
 	 * Remove the emoji script as it is incompatible with both React and any
 	 * contenteditable fields.
 	 */
 	remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
+
+	/*
+	 * Ensure meta box functions are available to third-party code;
+	 * includes/meta-boxes is typically loaded from edit-form-advanced.php.
+	 */
+	require_once ABSPATH . 'wp-admin/includes/meta-boxes.php';
 
 	require_once ABSPATH . 'wp-admin/admin-header.php';
 	the_gutenberg_project();

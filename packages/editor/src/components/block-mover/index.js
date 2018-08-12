@@ -19,7 +19,6 @@ import { withInstanceId, compose } from '@wordpress/compose';
  */
 import { getBlockMoverDescription } from './mover-description';
 import { upArrow, downArrow } from './arrows';
-import withDeprecatedUniqueId from '../with-deprecated-unique-id';
 
 export class BlockMover extends Component {
 	constructor() {
@@ -107,7 +106,6 @@ export class BlockMover extends Component {
 }
 
 export default compose(
-	withDeprecatedUniqueId,
 	withSelect( ( select, { clientIds, rootClientId } ) => {
 		const { getBlock, getBlockIndex, getTemplateLock } = select( 'core/editor' );
 		const firstClientId = first( castArray( clientIds ) );
