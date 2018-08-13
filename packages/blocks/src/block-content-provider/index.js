@@ -9,9 +9,7 @@ import { createContext, RawHTML } from '@wordpress/element';
  */
 import { serialize } from '../api';
 
-const { Consumer, Provider } = createContext( {
-	BlockContent: () => {},
-} );
+const { Consumer, Provider } = createContext( () => {} );
 
 /**
  * An internal block component used in block content serialization to inject
@@ -20,8 +18,6 @@ const { Consumer, Provider } = createContext( {
  * `BlockContent` component via context, which is used by the developer-facing
  * `InnerBlocks.Content` component to render block content.
  *
- * @return {WPElement} Element with BlockContent injected via context.
- *
  * @example
  *
  * ```jsx
@@ -29,6 +25,8 @@ const { Consumer, Provider } = createContext( {
  * 	{ blockSaveElement }
  * </BlockContentProvider>
  * ```
+ *
+ * @return {WPElement} Element with BlockContent injected via context.
  */
 const BlockContentProvider = ( { children, innerBlocks } ) => {
 	const BlockContent = () => {
