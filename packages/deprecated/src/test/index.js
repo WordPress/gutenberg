@@ -86,8 +86,9 @@ describe( 'deprecated', () => {
 	} );
 
 	it( 'should do an action', () => {
-		deprecated( 'pork' );
+		deprecated( 'turkey', { alternative: 'tofurky' } );
 
+		expect( console ).toHaveWarned();
 		expect( didAction( 'wp.deprecated' ) ).toBeTruthy();
 	} );
 } );
