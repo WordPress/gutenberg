@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/block-library",
 	"version": "1.0.0",
-	"description": "Core Blocks of the WordPress editor.",
+	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
@@ -20,8 +20,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.0.0-beta.52",
-		"@wordpress/api-fetch": "file:../api-fetch",
+		"@babel/runtime-corejs2": "7.0.0-beta.56",
 		"@wordpress/autop": "file:../autop",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/blocks": "file:../blocks",
