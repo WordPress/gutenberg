@@ -8,13 +8,10 @@ import { Platform, Switch, Text, View, FlatList } from 'react-native';
 import RecyclerViewList, { DataSource } from 'react-native-recyclerview-list';
 import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
-
 import type { BlockType } from '../store/';
-
 import styles from './block-manager.scss';
-
 // Gutenberg imports
-import { getBlockType, serialize } from '@wordpress/blocks';
+import { getBlockType, serialize, createBlock } from '@wordpress/blocks';
 
 export type BlockListType = {
 	onChange: ( clientId: string, attributes: mixed ) => void,
@@ -22,6 +19,7 @@ export type BlockListType = {
 	moveBlockUpAction: string => mixed,
 	moveBlockDownAction: string => mixed,
 	deleteBlockAction: string => mixed,
+	createBlockAction: ( string, BlockType ) => mixed,
 	blocks: Array<BlockType>,
 	aztechtml: string,
 	refresh: boolean,
@@ -72,6 +70,18 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			case ToolbarButton.DELETE:
 				this.state.dataSource.splice( dataSourceBlockIndex, 1 );
 				this.props.deleteBlockAction( clientId );
+				break;
+			case ToolbarButton.PLUS:
+				// TODO: direct access insertion: it would be nice to pass the dataSourceBlockIndex here,
+				// so in this way we know the new block should be inserted right after this one
+				// instead of being appended to the end.
+				// this.props.createBlockAction( uid, dataSourceBlockIndex );
+
+				// TODO: block type picker here instead of hardcoding a core/code block
+				const newBlock = createBlock( 'core/paragraph', { content: 'new test text for a core/paragraph block' } );
+				const newBlockWithFocusedState = { ...newBlock, focused: false };
+				this.state.dataSource.push( newBlockWithFocusedState );
+				this.props.createBlockAction( newBlockWithFocusedState.clientId, newBlockWithFocusedState );
 				break;
 			case ToolbarButton.SETTINGS:
 				// TODO: implement settings

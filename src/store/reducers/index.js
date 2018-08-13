@@ -108,6 +108,12 @@ export const reducer = (
 			blocks.splice( index, 1 );
 			return { blocks: blocks, refresh: ! state.refresh };
 		}
+		case ActionTypes.BLOCK.CREATE: {
+			// TODO we need to set focused: true and search for the currently focused block and
+			// set that one to `focused: false`.
+			blocks.push(action.block);
+			return { blocks: blocks, refresh: ! state.refresh };
+		}
 		default:
 			return state;
 	}
