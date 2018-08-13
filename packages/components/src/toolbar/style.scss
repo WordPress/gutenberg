@@ -74,7 +74,7 @@ div.components-toolbar {
 
 	// Subscript for numbered icon buttons, like headings
 	&[data-subscript] svg {
-		padding: 4px 8px 4px 0;
+		padding: 5px 10px 5px 0;
 	}
 
 	&[data-subscript]::after {
@@ -84,8 +84,8 @@ div.components-toolbar {
 		font-weight: 600;
 		line-height: 12px;
 		position: absolute;
-		right: 7px;
-		bottom: 9px;
+		right: 8px;
+		bottom: 10px;
 	}
 
 	// Assign hover style to child element, not the button itself
