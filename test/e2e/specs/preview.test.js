@@ -102,7 +102,7 @@ describe( 'Preview', () => {
 			editorPage.waitForFunction( () => ! document.querySelector( '.editor-post-preview' ) ),
 			editorPage.click( '.editor-post-publish-panel__header button' ),
 		] );
-		expectedPreviewURL = await editorPage.$eval( '.components-notice--success a', ( node ) => node.href );
+		expectedPreviewURL = await editorPage.$eval( '.components-notice.is-success a', ( node ) => node.href );
 
 		await editorPage.bringToFront();
 		await waitForPreviewNavigation( previewPage );

@@ -11,7 +11,9 @@ import Dashicon from '../dashicon';
 import { __ } from '@wordpress/i18n';
 
 function Notice( { className, status, children, onRemove = noop, isDismissible = true } ) {
-	const classNames = classnames( className, 'components-notice components-notice--' + status, {
+	const classNames = classnames( className, {
+		[ `is-${ status }` ]: ! ! status,
+	}, {
 		'is-dismissible': isDismissible,
 	} );
 	return (

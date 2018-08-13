@@ -16,7 +16,7 @@ exports[`ContrastChecker should render component when the colors do not meet AA 
       status="warning"
     >
       <div
-        className="components-notice components-notice--warning"
+        className="components-notice is-warning"
       >
         <div
           className="components-notice__content"
@@ -45,7 +45,7 @@ exports[`ContrastChecker should render different message matching snapshot when 
       status="warning"
     >
       <div
-        className="components-notice components-notice--warning"
+        className="components-notice is-warning"
       >
         <div
           className="components-notice__content"
@@ -71,7 +71,7 @@ exports[`ContrastChecker should render messages when the textColor is valid, but
       status="warning"
     >
       <div
-        className="components-notice components-notice--warning"
+        className="components-notice is-warning"
       >
         <div
           className="components-notice__content"
@@ -98,7 +98,7 @@ exports[`ContrastChecker should take into consideration the font size passed 1`]
       status="warning"
     >
       <div
-        className="components-notice components-notice--warning"
+        className="components-notice is-warning"
       >
         <div
           className="components-notice__content"
@@ -125,7 +125,7 @@ exports[`ContrastChecker should take into consideration wherever text is large o
       status="warning"
     >
       <div
-        className="components-notice components-notice--warning"
+        className="components-notice is-warning"
       >
         <div
           className="components-notice__content"
@@ -153,7 +153,7 @@ exports[`ContrastChecker should use isLargeText to make decisions if both isLarg
       status="warning"
     >
       <div
-        className="components-notice components-notice--warning"
+        className="components-notice is-warning"
       >
         <div
           className="components-notice__content"

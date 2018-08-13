@@ -45,7 +45,7 @@ describe( 'Reusable Blocks', () => {
 
 		// Wait for creation to finish
 		await page.waitForXPath(
-			'//*[contains(@class, "components-notice--success")]/*[text()="Block created."]'
+			'//*[contains(@class, "components-notice") and contains(@class, "is-success")]/*[text()="Block created."]'
 		);
 
 		// Select all of the text in the title field by triple-clicking on it. We
@@ -92,7 +92,7 @@ describe( 'Reusable Blocks', () => {
 
 		// Wait for creation to finish
 		await page.waitForXPath(
-			'//*[contains(@class, "components-notice--success")]/*[text()="Block created."]'
+			'//*[contains(@class, "components-notice") and contains(@class, "is-success")]/*[text()="Block created."]'
 		);
 
 		// Save the reusable block

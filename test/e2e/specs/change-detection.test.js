@@ -190,7 +190,7 @@ describe( 'Change detection', () => {
 
 			// Ensure save update fails and presents button.
 			page.waitForXPath(
-				'//*[contains(@class, "components-notice--error")]/*[text()="Updating failed"]'
+				'//*[contains(@class, "components-notice") and contains(@class, "is-error")]/*[text()="Updating failed"]'
 			),
 			page.waitForSelector( '.editor-post-save-draft' ),
 		] );
