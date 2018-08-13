@@ -14,7 +14,7 @@ exports[`core/html block edit matches snapshot 1`] = `
       class="components-placeholder__fieldset"
     >
       <span
-        class="spinner is-active"
+        class="components-spinner"
       />
     </div>
   </div>
