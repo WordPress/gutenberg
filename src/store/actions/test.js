@@ -3,7 +3,7 @@
 import * as actions from './';
 import ActionTypes from './ActionTypes';
 // Gutenberg imports
-import { getBlockType, serialize, createBlock } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@gutenberg/core-blocks';
 
 describe( 'Store', () => {
