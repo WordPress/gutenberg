@@ -54,7 +54,7 @@
 .editor-block-list__block {
 	&.is-hidden *,
 	&.is-hidden > * {
-		visibility: hidden;
+		opacity: 0.8;
 	}
 
 	.editor-block-list__block-edit .reusable-block-edit-panel * {
