@@ -89,30 +89,12 @@ const schema = {
 	},
 };
 
-const imageIcon = (
-	<svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 24 24" enableBackground="new 0 0 24 24" xmlSpace="preserve">
-		<g id="Bounding_Boxes">
-			<g id="ui_x5F_spec_x5F_header_copy_3">
-			</g>
-			<path fill="none" d="M0,0h24v24H0V0z"/>
-		</g>
-		<g id="Outline_1_">
-			<g id="ui_x5F_spec_x5F_header_copy_4">
-			</g>
-			<g>
-				<path id="XMLID_53_" d="M19,5v14H5V5H19 M19,3H5C3.9,3,3,3.9,3,5v14c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2V5C21,3.9,20.1,3,19,3    L19,3z"/>
-				<path id="XMLID_51_" d="M14.14,11.86l-3,3.87L9,13.14L6,17h12L14.14,11.86L14.14,11.86z"/>
-			</g>
-		</g>
-	</svg>
-);
-
 export const settings = {
 	title: __( 'Image' ),
 
 	description: __( 'They’re worth 1,000 words! Insert a single image.' ),
 
-	icon: imageIcon,
+	icon: <svg enableBackground="new 0 0 24 24" version="1.1" viewBox="0 0 24 24" xmlSpace="preserve"><path d="M0,0h24v24H0V0z" fill="none" /><path d="m19 5v14h-14v-14h14m0-2h-14c-1.1 0-2 0.9-2 2v14c0 1.1 0.9 2 2 2h14c1.1 0 2-0.9 2-2v-14c0-1.1-0.9-2-2-2z" /><path d="m14.14 11.86l-3 3.87-2.14-2.59-3 3.86h12l-3.86-5.14z" /></svg>,
 
 	category: 'common',
 

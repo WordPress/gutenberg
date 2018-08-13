@@ -62,7 +62,7 @@ export const settings = {
 
 	description: __( 'Insert a headline above your post or page content.' ),
 
-	icon: <svg viewBox="0 0 24 24"><g><path d="M18 20h-3v-6H9v6H6V5.01h3V11h6V5.01h3V20z" /></g></svg>,
+	icon: <svg enableBackground="new 0 0 24 24" version="1.1" viewBox="0 0 24 24" xmlSpace="preserve"><rect width="24" height="24" fill="none" /><path d="M2.5,4v3h5v12h3V7h5V4H2.5z M21.5,9h-9v3h3v7h3v-7h3V9z" /></svg>,
 
 	category: 'common',
 
