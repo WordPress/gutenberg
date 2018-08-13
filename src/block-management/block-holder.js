@@ -36,7 +36,10 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 	renderToolbarIfBlockFocused() {
 		if ( this.props.focused ) {
 			return (
-				<Toolbar clientId={ this.props.clientId } onButtonPressed={ this.props.onToolbarButtonPressed } />
+				<Toolbar
+					clientId={ this.props.clientId }
+					onButtonPressed={ this.props.onToolbarButtonPressed }
+				/>
 			);
 		}
 
@@ -61,7 +64,9 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 				<Block
 					attributes={ { ...this.props.attributes } }
 					// pass a curried version of onChanged with just one argument
-					setAttributes={ ( attrs ) => this.props.onChange( this.props.clientId, { ...this.props.attributes, ...attrs } ) }
+					setAttributes={ ( attrs ) =>
+						this.props.onChange( this.props.clientId, { ...this.props.attributes, ...attrs } )
+					}
 					isSelected={ this.props.focused }
 					style={ style }
 				/>

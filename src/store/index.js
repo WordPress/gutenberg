@@ -41,8 +41,10 @@ const initialMoreBlockHtml = `
 <!-- /wp:more -->
 `;
 
-const initialHeadingBlockHtml = '<!-- wp:heading {"level": 2} --><h2>Welcome to Gutenberg</h2><!-- /wp:heading -->';
-const initialParagraphBlockHtml = '<!-- wp:paragraph --><p><b>Hello</b> World!</p><!-- /wp:paragraph -->';
+const initialHeadingBlockHtml =
+	'<!-- wp:heading {"level": 2} --><h2>Welcome to Gutenberg</h2><!-- /wp:heading -->';
+const initialParagraphBlockHtml =
+	'<!-- wp:paragraph --><p><b>Hello</b> World!</p><!-- /wp:paragraph -->';
 const initialParagraphBlockHtml2 = `<!-- wp:paragraph {"dropCap":true,"backgroundColor":"vivid-red","fontSize":"large","className":"custom-class-1 custom-class-2"} -->
 <p class="has-background has-drop-cap has-large-font-size has-vivid-red-background-color custom-class-1 custom-class-2">
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer tempor tincidunt sapien, quis dictum orci sollicitudin quis. Proin sed elit id est pulvinar feugiat vitae eget dolor. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p><!-- /wp:paragraph -->`;
@@ -89,7 +91,7 @@ const initialState: StateType = {
 
 const devToolsEnhancer =
 	// ( 'development' === process.env.NODE_ENV && require( 'remote-redux-devtools' ).default ) ||
-	( () => {} );
+	() => {};
 
 export function setupStore( state: StateType = initialState ) {
 	const store = createStore( reducer, state, devToolsEnhancer() );
