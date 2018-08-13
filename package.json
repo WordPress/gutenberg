@@ -65,8 +65,8 @@
     "clean:react": "rm -rf $TMPDIR/react-*",
     "clean:node": "rm -rf node_modules",
     "clean:watchman": "watchman watch-del-all",
-    "lint": "eslint $npm_package_config_jsfiles",
-    "lint:fix": "eslint $npm_package_config_jsfiles --fix"
+    "lint": "eslint . --ext .js",
+    "lint:fix": "yarn lint --fix"
   },
   "dependencies": {
     "@wordpress/autop": "^1.0.6",
