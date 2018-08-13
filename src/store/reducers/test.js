@@ -6,8 +6,6 @@ import { reducer } from './';
 import * as actions from '../actions/';
 import { registerCoreBlocks } from '@gutenberg/core-blocks';
 
-registerCoreBlocks()
-
 describe( 'Store', () => {
 	describe( 'reducer', () => {
 		// use scoped variables. See https://github.com/facebook/jest/issues/3553#issuecomment-300851842
@@ -15,6 +13,8 @@ describe( 'Store', () => {
 		let initialState;
 
 		beforeAll( () => {
+			registerCoreBlocks()
+			
 			__iniState = {
 				blocks: [
 					{
