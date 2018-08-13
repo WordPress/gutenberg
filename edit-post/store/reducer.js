@@ -119,6 +119,14 @@ export function publishSidebarActive( state = false, action ) {
 	return state;
 }
 
+export function focusModeActive( state = false, action ) {
+	switch ( action.type ) {
+		case 'TOGGLE_FOCUS_MODE':
+			return ! state;
+	}
+	return state;
+}
+
 const locations = [
 	'normal',
 	'side',
@@ -195,6 +203,7 @@ export default combineReducers( {
 	panel,
 	activeModal,
 	publishSidebarActive,
+	focusModeActive,
 	metaBoxes,
 	isSavingMetaBoxes,
 } );

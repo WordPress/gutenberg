@@ -79,7 +79,6 @@
 	cursor: grab;
 }
 
-
 // Allow Drag & Drop when clicking on the empty area of the mover and the settings menu
 .editor-block-list__layout .editor-block-list__block .editor-block-mover,
 .editor-block-list__layout .editor-block-list__block .editor-block-settings-menu {
@@ -1026,6 +1025,49 @@
 		// Don't use this for full-wide blocks, as there's no clearance to accommodate extra area on the side.
 		&[data-align="full"]::before {
 			content: none;
+		}
+	}
+}
+
+// When focus mode is engaged, dim down visibility of non-selected blocks
+.editor-block-list__layout .editor-block-list__block:not(.is-selected):not(.is-typing) {
+	.is-focus-mode & {
+		opacity: 0.2;
+	}
+}
+
+.editor-block-list__layout .editor-block-contextual-toolbar,
+.editor-block-settings-menu,
+.editor-block-mover,
+.editor-block-list__block.is-hovered .editor-block-list__block-edit::before,
+.editor-block-list__breadcrumb,
+.editor-post-permalink {
+	.is-focus-mode & {
+		display: none !important;
+		outline: none !important;
+	}
+}
+
+.is-focus-mode .edit-post-header {
+	.edit-post-header-toolbar {
+		> * {
+			visibility: hidden !important;
+		}
+
+		.editor-inserter,
+		.editor-history__undo,
+		.editor-history__redo,
+		.edit-post-header-toolbar__block-toolbar {
+			visibility: visible !important;
+		}
+	}
+	.edit-post-header__settings {
+		> * {
+			visibility: hidden !important;
+		}
+
+		.edit-post-more-menu {
+			visibility: visible !important;
 		}
 	}
 }

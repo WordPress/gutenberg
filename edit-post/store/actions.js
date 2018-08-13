@@ -97,6 +97,17 @@ export function toggleGeneralSidebarEditorPanel( panel ) {
 }
 
 /**
+ * Returns an action object used in signalling that the user toggles focus mode.
+ *
+ * @return {Object} Action object
+ */
+export function toggleFocusMode() {
+	return {
+		type: 'TOGGLE_FOCUS_MODE',
+	};
+}
+
+/**
  * Returns an action object used to toggle a feature flag.
  *
  * @param {string} feature Feature name.

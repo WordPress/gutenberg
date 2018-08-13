@@ -52,12 +52,14 @@ function Layout( {
 	hasActiveMetaboxes,
 	isSaving,
 	isMobileViewport,
+	isFocusMode,
 } ) {
 	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 
 	const className = classnames( 'edit-post-layout', {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
+		'is-focus-mode': isFocusMode,
 	} );
 
 	const publishLandmarkProps = {
@@ -143,6 +145,7 @@ export default compose(
 		metaBoxes: select( 'core/edit-post' ).getMetaBoxes(),
 		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+		isFocusMode: select( 'core/edit-post' ).isFocusMode(),
 	} ) ),
 	withDispatch( ( dispatch ) => {
 		const { closePublishSidebar, togglePublishSidebar } = dispatch( 'core/edit-post' );

@@ -100,6 +100,17 @@ export function isEditorSidebarPanelOpened( state, panel ) {
 }
 
 /**
+ * Returns true if focus mode is enabled.
+ *
+ * @param {Object} state Global application state
+ *
+ * @return {boolean} Whether focus mode is enabled.
+ */
+export function isFocusMode( state ) {
+	return state.focusModeActive;
+}
+
+/**
  * Returns true if a modal is active, or false otherwise.
  *
  * @param  {Object}  state 	   Global application state.
