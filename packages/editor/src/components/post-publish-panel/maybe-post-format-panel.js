@@ -16,7 +16,7 @@ import { Button, PanelBody } from '@wordpress/components';
  */
 import { POST_FORMATS } from '../post-format';
 
-const PostFormatSuggested = ( { suggestedPostFormat, suggestionText, onUpdatePostFormat } ) => (
+const PostFormatSuggestion = ( { suggestedPostFormat, suggestionText, onUpdatePostFormat } ) => (
 	<Button isLink onClick={ () => onUpdatePostFormat( suggestedPostFormat ) }>
 		{ suggestionText }
 	</Button>
@@ -38,7 +38,7 @@ const PostFormatPanel = ( { suggestion, onUpdatePostFormat } ) => {
 				{ __( 'Your theme uses post formats to highlight different kinds of content, like images or videos. Apply a post format to see this special styling.' ) }
 			</p>
 			<p>
-				<PostFormatSuggested
+				<PostFormatSuggestion
 					onUpdatePostFormat={ onUpdatePostFormat }
 					suggestedPostFormat={ suggestion.id }
 					suggestionText={ sprintf(
