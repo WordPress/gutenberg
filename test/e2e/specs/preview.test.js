@@ -53,7 +53,6 @@ describe( 'Preview', () => {
 
 	it( 'Should open a preview window for a new post', async () => {
 		const editorPage = page;
-		let previewPage;
 
 		// Disabled until content present.
 		const isPreviewDisabled = await editorPage.$$eval(
@@ -64,7 +63,7 @@ describe( 'Preview', () => {
 
 		await editorPage.type( '.editor-post-title__input', 'Hello World' );
 
-		previewPage = await openPreviewPage( editorPage );
+		const previewPage = await openPreviewPage( editorPage );
 
 		// When autosave completes for a new post, the URL of the editor should
 		// update to include the ID. Use this to assert on preview URL.
@@ -105,12 +104,8 @@ describe( 'Preview', () => {
 		] );
 		expectedPreviewURL = await editorPage.$eval( '.notice-success a', ( node ) => node.href );
 
-		// Workaround for unresolved race condition: sometimes we end up with two preview
-		// pages at this point, so close and reopen to let this test complete reliably.
-		// See: https://github.com/WordPress/gutenberg/issues/8367
-		await previewPage.close();
-		previewPage = await openPreviewPage( editorPage );
-
+		await editorPage.bringToFront();
+		await waitForPreviewNavigation( previewPage );
 		expect( previewPage.url() ).toBe( expectedPreviewURL );
 
 		// Return to editor to change title.
