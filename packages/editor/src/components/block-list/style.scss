@@ -826,7 +826,7 @@
 
 	// Position toolbar below the block on mobile.
 	position: absolute;
-	bottom: $block-toolbar-height - $block-padding;
+	bottom: $block-toolbar-height - $block-padding - 1px;
 	left: 0;
 	right: 0;
 
