@@ -248,7 +248,7 @@ export default {
 		// Dispatch select block action if the currently selected block
 		// is not already the block we want to be selected.
 		if ( blockClientIdToSelect !== currentSelectedBlock ) {
-			dispatch( selectBlock( blockClientIdToSelect ) );
+			dispatch( selectBlock( blockClientIdToSelect, -1 ) );
 		}
 	},
 };
