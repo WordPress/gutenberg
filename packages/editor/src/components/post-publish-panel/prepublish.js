@@ -18,6 +18,8 @@ import PostVisibility from '../post-visibility';
 import PostVisibilityLabel from '../post-visibility/label';
 import PostSchedule from '../post-schedule';
 import PostScheduleLabel from '../post-schedule/label';
+import MaybeTagsPanel from './maybe-tags-panel';
+import MaybePostFormatPanel from './maybe-post-format-panel';
 
 function PostPublishPanelPrepublish( {
 	hasPublishAction,
@@ -41,6 +43,8 @@ function PostPublishPanelPrepublish( {
 					] }>
 						<PostSchedule />
 					</PanelBody>
+					<MaybePostFormatPanel />
+					<MaybeTagsPanel />
 					{ children }
 				</Fragment>
 			) }
