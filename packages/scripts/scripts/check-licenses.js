@@ -10,13 +10,28 @@ const chalk = require( 'chalk' );
  */
 const { hasCliArg } = require( '../utils' );
 
+/*
+ * WARNING: Changes to this file may inadvertently cause us to distribute code that
+ * is not GPL2 compatible.
+ *
+ * When adding a new license (for example, when a new package has a variation of the
+ * various license strings), please ensure that changes to this file are explicitly
+ * reviewed and approved.
+ */
+
 const ERROR = chalk.reset.inverse.bold.red( ' ERROR ' );
 
 const prod = hasCliArg( '--prod' ) || hasCliArg( '--production' );
 const dev = hasCliArg( '--dev' ) || hasCliArg( '--development' );
 const gpl2 = hasCliArg( '--gpl2' );
 
-const gpl2Licenses = [
+/*
+ * A list of license strings that we've found to be GPL2 compatible.
+ *
+ * Note the strings with "AND" in them at the bottom: these should only be added when
+ * all the licenses in that string are GPL2 compatible.
+ */
+const gpl2CompatibleLicenses = [
 	'Apache-2.0 WITH LLVM-exception',
 	'Artistic-2.0',
 	'BSD',
@@ -43,7 +58,13 @@ const gpl2Licenses = [
 	'(MIT AND Zlib)',
 ];
 
-const ossLicenses = [
+/*
+ * A list of OSS license strings that aren't GPL2 compatible.
+ *
+ * We're cool with using packages that are licensed under any of these if we're not
+ * distributing them (for example, build tools), but we can't included them in a release.
+ */
+const otherOssLicenses = [
 	'Apache-2.0',
 	'Apache 2.0',
 	'Apache License, Version 2.0',
@@ -51,10 +72,14 @@ const ossLicenses = [
 ];
 
 const licenses = [
-	...gpl2Licenses,
-	...( gpl2 ? [] : ossLicenses ),
+	...gpl2CompatibleLicenses,
+	...( gpl2 ? [] : otherOssLicenses ),
 ];
 
+/*
+ * Some packages don't included a license string in their package.json file, but they
+ * do have a license listed elsewhere. These files are checked for matching license strings.
+ */
 const licenseFiles = [
 	'LICENCE',
 	'license',
@@ -67,6 +92,10 @@ const licenseFiles = [
 	'README.md',
 ];
 
+/*
+ * When searching through files for licensing information, these are the strings we look for,
+ * and their matching license.
+ */
 const licenseFileStrings = {
 	'Apache-2.0': [
 		'Licensed under the Apache License, Version 2.0',
@@ -84,7 +113,7 @@ const licenseFileStrings = {
 /**
  * Check if a license string matches the given license.
  *
- * The license string can be a single license, or an SPDX-compatible OR license string.
+ * The license string can be a single license, or an SPDX-compatible "OR" license string.
  * eg, "(MIT OR Zlib)".
  *
  * @param {string} allowedLicense The license that's allowed.
@@ -111,7 +140,7 @@ const checkLicense = ( allowedLicense, licenseType ) => {
 	}
 
 	/*
-	 * In order to do a basic parse of SPDX-compatible OR license strings, we:
+	 * In order to do a basic parse of SPDX-compatible "OR" license strings, we:
 	 * - Remove surrounding brackets: "(mit or zlib)" -> "mit or zlib"
 	 * - Split it into an array: "mit or zlib" -> [ "mit", "zlib" ]
 	 * - Trim any remaining whitespace from each element
