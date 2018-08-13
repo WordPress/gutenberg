@@ -45,7 +45,7 @@
     "pre-build": "yarn check-gb-unused-babelrc && yarn bypass-gb-babel",
     "test:pre-build": "yarn check-gb-unused-babelrc && yarn test:bypass-gb-babel",
     "start": "yarn pre-build && yarn react-native start",
-    "start:reset": "yarn clean:runtime && yarn start --reset-cache",
+    "start:reset": "yarn clean:metro && yarn start --reset-cache",
     "start:debug": "yarn pre-build && node --inspect-brk node_modules/.bin/react-native start",
     "android": "react-native run-android",
     "preios": "yarn preios:carthage",
