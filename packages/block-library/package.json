@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "1.0.0-alpha.0",
+	"version": "1.0.0",
 	"description": "Core Blocks of the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
