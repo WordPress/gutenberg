@@ -41,12 +41,12 @@ const shortcuts = {
 		display: displayShortcut.primaryAlt( 'bksp' ),
 	},
 	insertBefore: {
-		raw: rawShortcut.primaryAlt( 'b' ),
-		display: displayShortcut.primaryShift( 'b' ),
+		raw: rawShortcut.primaryAlt( 't' ),
+		display: displayShortcut.primaryAlt( 't' ),
 	},
 	insertAfter: {
-		raw: rawShortcut.primaryAlt( 'a' ),
-		display: displayShortcut.primaryAlt( 'a' ),
+		raw: rawShortcut.primaryAlt( 'y' ),
+		display: displayShortcut.primaryAlt( 'y' ),
 	},
 };
 
