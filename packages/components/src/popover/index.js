@@ -36,6 +36,7 @@ class Popover extends Component {
 		super( ...arguments );
 
 		this.focus = this.focus.bind( this );
+		this.refresh = this.refresh.bind( this );
 		this.getAnchorRect = this.getAnchorRect.bind( this );
 		this.updatePopoverSize = this.updatePopoverSize.bind( this );
 		this.computePopoverPosition = this.computePopoverPosition.bind( this );
