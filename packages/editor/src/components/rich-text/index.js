@@ -23,7 +23,7 @@ import {
 	getScrollContainer,
 } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
-import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, rawShortcut } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, rawShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { Slot } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { rawHandler, children } from '@wordpress/blocks';
@@ -397,11 +397,12 @@ export class RichText extends Component {
 			return;
 		}
 
-		const { keyCode, altKey, metaKey } = event;
+		const { keyCode } = event;
 		const isReverse = keyCode === BACKSPACE;
 
 		// User is using the Remove Block shortcut, so allow the event to bubble
-		if ( altKey && metaKey && isReverse ) {
+		// up to the BlockSettingsMenu component
+		if ( isKeyboardEvent.primaryAlt( event, 'Backspace' ) ) {
 			return;
 		}
 
