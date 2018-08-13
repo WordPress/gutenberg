@@ -103,9 +103,11 @@ export class BlockSettingsMenu extends Component {
 						// is used to prevent any obscure unknown shortcuts from triggering
 						[ shortcuts.removeBlock.raw ]: flow( preventDefault, onRemove ),
 
-						// There are no known clashes for these shortcuts, but prevent obscure unknown
-						// behaviour using preventDefault.
+						// Prevent 'view recently closed tabs' in Opera using preventDefault.
 						[ shortcuts.insertBefore.raw ]: flow( preventDefault, onInsertBefore ),
+
+						// Does not clash with any known browser/native shortcuts, but preventDefault
+						// is used to prevent any obscure unknown shortcuts from triggering
 						[ shortcuts.insertAfter.raw ]: flow( preventDefault, onInsertAfter ),
 					} }
 				/>
