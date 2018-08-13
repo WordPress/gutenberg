@@ -16,7 +16,7 @@ export const settings = {
 
 	description: __( 'Add text that respects your spacing and tabs -- perfect for displaying code.' ),
 
-	icon: <svg height="36" width="36" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M23 12l-5.45 6.5L16 17.21 20.39 12 16 6.79l1.55-1.29zM8 6.79L6.45 5.5 1 12l5.45 6.5L8 17.21 3.61 12zm.45 14.61l1.93.52L15.55 2.6l-1.93-.52z"/></g></svg>,
+	icon: <svg enableBackground="new 0 0 24 24" version="1.1" viewBox="0 0 24 24" xmlSpace="preserve" xmlns="http://www.w3.org/2000/svg"><path d="M0,0h24v24H0V0z" fill="none" /><path d="M9.4,16.6L4.8,12l4.6-4.6L8,6l-6,6l6,6L9.4,16.6z M14.6,16.6l4.6-4.6l-4.6-4.6L16,6l6,6l-6,6L14.6,16.6z" /></svg>,
 
 	category: 'formatting',
 
