@@ -110,7 +110,7 @@ export const reducer = (
 			return { blocks: blocks, refresh: ! state.refresh };
 		}
 		case ActionTypes.BLOCK.PARSE: {
-			const parsed = parse(action.payload)
+			const parsed = parse(action.html)
 			return { blocks: parsed, refresh: state.refresh };
 		}
 		default:

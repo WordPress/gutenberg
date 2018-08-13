@@ -12,7 +12,7 @@ export type BlockActionType = string => {
 
 export type ParseActionType = string => {
 	type: $Values<typeof ActionTypes.BLOCK>,
-	payload: string,
+	html: string,
 };
 
 export function updateBlockAttributes( clientId: string, attributes: mixed ) {
@@ -43,7 +43,7 @@ export const deleteBlockAction: BlockActionType = clientId => ( {
 	clientId,
 } );
 
-export const parseBlocksAction: ParseActionType = payload => ( {
+export const parseBlocksAction: ParseActionType = html => ( {
 	type: ActionTypes.BLOCK.PARSE,
-	payload: payload,
+	html,
 } );
