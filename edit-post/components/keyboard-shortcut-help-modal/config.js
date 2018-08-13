@@ -9,7 +9,7 @@ const {
 	primary,
 	// Shift+Cmd+<key> on a mac, Ctrl+Shift+<key> elsewhere
 	primaryShift,
-	// Alt+Cmd+<key> on a mac, Ctrl+Alt+<key> elsewhere
+	// Option+Cmd+<key> on a mac, Ctrl+Alt+<key> elsewhere
 	primaryAlt,
 	// Shift+Alt+Cmd+<key> on a mac, Ctrl+Shift+Akt+<key> elsewhere
 	secondary,
@@ -90,6 +90,14 @@ const blockShortcuts = {
 		{
 			keyCombination: primaryAlt( 'backspace' ),
 			description: __( 'Remove the selected block(s).' ),
+		},
+		{
+			keyCombination: primaryAlt( 't' ),
+			description: __( 'Insert a new block before the selected block(s).' ),
+		},
+		{
+			keyCombination: primaryAlt( 'y' ),
+			description: __( 'Insert a new block after the selected block(s).' ),
 		},
 		{
 			keyCombination: '/',
