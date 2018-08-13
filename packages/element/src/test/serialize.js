@@ -376,7 +376,7 @@ describe( 'renderElement()', () => {
 		expect( result ).toBe( '1st provided|2nd provided|default' );
 	} );
 
-	it( 'renders proper value through Context API when nested providers', () => {
+	it( 'renders proper value through Context API when nested providers present', () => {
 		const { Consumer, Provider } = createContext( {
 			value: 'default',
 		} );
