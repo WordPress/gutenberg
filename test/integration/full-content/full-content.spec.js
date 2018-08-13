@@ -102,7 +102,7 @@ describe( 'full post content fixture', () => {
 		unstable__bootstrapServerSideBlockDefinitions( require( './server-registered.json' ) );
 
 		// Load all hooks that modify blocks
-		require( '../../packages/editor/src/hooks' );
+		require( '../../../packages/editor/src/hooks' );
 		registerCoreBlocks();
 	} );
 
