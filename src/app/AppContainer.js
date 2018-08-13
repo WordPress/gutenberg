@@ -1,4 +1,6 @@
-/** @format */
+/** @flow
+ * @format */
+
 import { connect } from 'react-redux';
 import {
 	updateBlockAttributes,
