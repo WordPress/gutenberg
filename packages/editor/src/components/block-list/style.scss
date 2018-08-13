@@ -1029,3 +1029,23 @@
 		}
 	}
 }
+
+.editor-block-list__block .editor-warning {
+	z-index: z-index(".editor-warning");
+	position: absolute;
+	top: -$block-padding - $border-width;
+	right: -$parent-block-padding - $border-width;
+	left: -$parent-block-padding - $border-width;
+
+	// Position for nested blocks
+	.editor-block-list__block & {
+		right: -$block-padding - $border-width;
+		left: -$block-padding - $border-width;
+	}
+
+	// Bigger padding on mobile where blocks are edge to edge.
+	padding: 10px $parent-block-padding;
+	@include break-small() {
+		padding: 10px $block-padding;
+	}
+}
