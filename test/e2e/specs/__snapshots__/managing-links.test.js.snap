@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Managing links Creating a link by selecting text and clicking the Link UI 1`] = `
+"<!-- wp:paragraph -->
+<p>This is <a href=\\"https://wordpress.org/gutenberg\\">Gutenberg</a></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Managing links Creating a link by selecting text and using keyboard shortcuts 1`] = `
+"<!-- wp:paragraph -->
+<p>This is <a href=\\"https://wordpress.org/gutenberg\\">Gutenberg</a></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Managing links Creating a link without any text selected 1`] = `
+"<!-- wp:paragraph -->
+<p>This is Gutenberg: <a href=\\"https://wordpress.org/gutenberg\\">https://wordpress.org/gutenberg</a></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Managing links Editing a link 1`] = `
+"<!-- wp:paragraph -->
+<p>This is <a href=\\"https://wordpress.org/gutenberg/handbook\\">Gutenberg</a></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Managing links Removing a link 1`] = `
+"<!-- wp:paragraph -->
+<p>This is Gutenberg</p>
+<!-- /wp:paragraph -->"
+`;
