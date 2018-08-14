@@ -81,7 +81,7 @@ class PostPublishPanel extends Component {
 						aria-expanded={ true }
 						onClick={ onClose }
 						icon="no-alt"
-						label={ __( 'Close Publish panel' ) }
+						label={ __( 'Close panel' ) }
 					/>
 				</div>
 				<div className="editor-post-publish-panel__content">
