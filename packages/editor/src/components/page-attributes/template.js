@@ -7,29 +7,27 @@ import { isEmpty, map } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { withInstanceId, compose } from '@wordpress/compose';
+import { SelectControl } from '@wordpress/components';
+import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
-export function PageTemplate( { availableTemplates, selectedTemplate, instanceId, onUpdate } ) {
+export function PageTemplate( { availableTemplates, selectedTemplate, onUpdate } ) {
 	if ( isEmpty( availableTemplates ) ) {
 		return null;
 	}
-	const selectId = `template-selector-${ instanceId }`;
-	const onEventUpdate = ( event ) => onUpdate( event.target.value );
 	return (
-		<div className="editor-page-attributes__template">
-			<label htmlFor={ selectId }>{ __( 'Template:' ) }</label>
-			<select
-				id={ selectId }
-				value={ selectedTemplate }
-				onBlur={ onEventUpdate }
-				onChange={ onEventUpdate }
-			>
-				{ map( availableTemplates, ( templateName, templateSlug ) => (
-					<option key={ templateSlug } value={ templateSlug }>{ templateName }</option>
-				) ) }
-			</select>
-		</div>
+		<SelectControl
+			label={ __( 'Template:' ) }
+			value={ selectedTemplate }
+			onChange={ ( value ) => onUpdate( value ) }
+			className="editor-page-attributes__template"
+			options={
+				map( availableTemplates, ( templateName, templateSlug ) => ( {
+					value: templateSlug,
+					label: templateName,
+				} ) )
+			}
+		/>
 	);
 }
 
@@ -47,5 +45,4 @@ export default compose(
 			dispatch( 'core/editor' ).editPost( { template: templateSlug || '' } );
 		},
 	} ) ),
-	withInstanceId,
 )( PageTemplate );
