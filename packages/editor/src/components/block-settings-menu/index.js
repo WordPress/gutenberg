@@ -100,14 +100,14 @@ export class BlockSettingsMenu extends Component {
 						[ shortcuts.duplicate.raw ]: flow( preventDefault, onDuplicate ),
 
 						// Does not clash with any known browser/native shortcuts, but preventDefault
-						// is used to prevent any obscure unknown shortcuts from triggering
+						// is used to prevent any obscure unknown shortcuts from triggering.
 						[ shortcuts.removeBlock.raw ]: flow( preventDefault, onRemove ),
 
 						// Prevent 'view recently closed tabs' in Opera using preventDefault.
 						[ shortcuts.insertBefore.raw ]: flow( preventDefault, onInsertBefore ),
 
 						// Does not clash with any known browser/native shortcuts, but preventDefault
-						// is used to prevent any obscure unknown shortcuts from triggering
+						// is used to prevent any obscure unknown shortcuts from triggering.
 						[ shortcuts.insertAfter.raw ]: flow( preventDefault, onInsertAfter ),
 					} }
 				/>
@@ -140,7 +140,6 @@ export class BlockSettingsMenu extends Component {
 						);
 					} }
 					renderContent={ ( { onClose } ) => (
-						// Should this just use a DropdownMenu instead of a DropDown ?
 						<NavigableMenu className="editor-block-settings-menu__content">
 							<_BlockSettingsMenuFirstItem.Slot fillProps={ { onClose } } />
 							{ count === 1 && (

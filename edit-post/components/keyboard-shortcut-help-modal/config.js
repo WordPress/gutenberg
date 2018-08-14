@@ -5,15 +5,15 @@ import { displayShortcutList } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 
 const {
-	// Cmd+<key> on a mac, Ctrl+<key> elsewhere
+	// Cmd+<key> on a mac, Ctrl+<key> elsewhere.
 	primary,
-	// Shift+Cmd+<key> on a mac, Ctrl+Shift+<key> elsewhere
+	// Shift+Cmd+<key> on a mac, Ctrl+Shift+<key> elsewhere.
 	primaryShift,
-	// Option+Cmd+<key> on a mac, Ctrl+Alt+<key> elsewhere
+	// Option+Cmd+<key> on a mac, Ctrl+Alt+<key> elsewhere.
 	primaryAlt,
-	// Shift+Alt+Cmd+<key> on a mac, Ctrl+Shift+Akt+<key> elsewhere
+	// Shift+Alt+Cmd+<key> on a mac, Ctrl+Shift+Akt+<key> elsewhere.
 	secondary,
-	// Ctrl+Alt+<key> on a mac, Shift+Alt+<key> elsewhere
+	// Ctrl+Alt+<key> on a mac, Shift+Alt+<key> elsewhere.
 	access,
 	ctrl,
 	ctrlShift,
