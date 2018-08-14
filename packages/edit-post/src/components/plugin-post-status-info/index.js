@@ -1,8 +1,4 @@
 /**
- * Defines as extensibility slot for the Status & Visibility panel.
- */
-
-/**
  * WordPress dependencies
  */
 import { createSlotFill, PanelRow } from '@wordpress/components';

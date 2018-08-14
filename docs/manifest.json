@@ -360,6 +360,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/edit-post",
+		"slug": "packages-edit-post",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/edit-post/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/editor",
 		"slug": "packages-editor",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/editor/README.md",
@@ -483,12 +489,6 @@
 		"title": "@wordpress/wordcount",
 		"slug": "packages-wordcount",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/wordcount/README.md",
-		"parent": "packages"
-	},
-	{
-		"title": "@wordpress/edit-post",
-		"slug": "packages-edit-post",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/edit-post/README.md",
 		"parent": "packages"
 	},
 	{

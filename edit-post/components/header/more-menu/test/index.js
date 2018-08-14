@@ -6,7 +6,7 @@ import { mount } from 'enzyme';
 /**
  * Internal dependencies
  */
-import MoreMenu from '../index';
+import MoreMenu from '../';
 
 jest.mock( '../../../../../packages/components/src/button' );
 

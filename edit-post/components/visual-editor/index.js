@@ -19,7 +19,7 @@ import {
  */
 import './style.scss';
 import BlockInspectorButton from './block-inspector-button';
-import PluginBlockSettingsMenuGroup from '../block-settings-menu/plugin-block-settings-menu-group';
+import { PluginsBlockSettingsMenuGroup } from '../../plugins';
 
 function VisualEditor() {
 	return (
@@ -37,7 +37,9 @@ function VisualEditor() {
 				{ ( { onClose } ) => <BlockInspectorButton onClick={ onClose } /> }
 			</_BlockSettingsMenuFirstItem>
 			<_BlockSettingsMenuPluginsExtension>
-				{ ( { clientIds, onClose } ) => <PluginBlockSettingsMenuGroup.Slot fillProps={ { clientIds, onClose } } /> }
+				{ ( { clientIds, onClose } ) => (
+					<PluginsBlockSettingsMenuGroup.Slot fillProps={ { clientIds, onClose } } />
+				) }
 			</_BlockSettingsMenuPluginsExtension>
 		</BlockSelectionClearer>
 	);

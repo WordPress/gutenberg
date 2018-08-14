@@ -12,7 +12,7 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import PluginBlockSettingsMenuGroup from './plugin-block-settings-menu-group';
+import PluginsBlockSettingsMenuGroup from '../plugins-block-settings-menu-group';
 
 const isEverySelectedBlockAllowed = ( selected, allowed ) => difference( selected, allowed ).length === 0;
 
@@ -31,22 +31,24 @@ const shouldRenderItem = ( selectedBlockNames, allowedBlockNames ) => ! Array.is
 	isEverySelectedBlockAllowed( selectedBlockNames, allowedBlockNames );
 
 const PluginBlockSettingsMenuItem = ( { allowedBlocks, icon, label, onClick, small, role } ) => (
-	<PluginBlockSettingsMenuGroup>
+	<PluginsBlockSettingsMenuGroup>
 		{ ( { selectedBlocks, onClose } ) => {
 			if ( ! shouldRenderItem( selectedBlocks, allowedBlocks ) ) {
 				return null;
 			}
-			return ( <IconButton
-				className="editor-block-settings-menu__control"
-				onClick={ compose( onClick, onClose ) }
-				icon={ icon || 'admin-plugins' }
-				label={ small ? label : undefined }
-				role={ role }
-			>
-				{ ! small && label }
-			</IconButton> );
+			return (
+				<IconButton
+					className="editor-block-settings-menu__control"
+					onClick={ compose( onClick, onClose ) }
+					icon={ icon || 'admin-plugins' }
+					label={ small ? label : undefined }
+					role={ role }
+				>
+					{ ! small && label }
+				</IconButton>
+			);
 		} }
-	</PluginBlockSettingsMenuGroup>
+	</PluginsBlockSettingsMenuGroup>
 );
 
 export default PluginBlockSettingsMenuItem;

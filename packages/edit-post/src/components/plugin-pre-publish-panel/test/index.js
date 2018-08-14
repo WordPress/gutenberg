@@ -11,22 +11,22 @@ import { SlotFillProvider } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import PluginPostPublishPanel from '../';
+import PluginPrePublishPanel from '../';
 
-jest.mock( '../../../../../packages/components/src/button' );
+jest.mock( '../../../../../components/src/button' );
 
-describe( 'PluginPostPublishPanel', () => {
+describe( 'PluginPrePublishPanel', () => {
 	test( 'renders fill properly', () => {
 		const wrapper = mount(
 			<SlotFillProvider>
-				<PluginPostPublishPanel
-					className="my-plugin-post-publish-panel"
+				<PluginPrePublishPanel
+					className="my-plugin-pre-publish-panel"
 					title="My panel title"
 					initialOpen={ true }
 				>
 					My panel content
-				</PluginPostPublishPanel>
-				<PluginPostPublishPanel.Slot />
+				</PluginPrePublishPanel>
+				<PluginPrePublishPanel.Slot />
 			</SlotFillProvider>
 		);
 

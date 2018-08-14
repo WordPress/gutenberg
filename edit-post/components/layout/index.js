@@ -37,8 +37,10 @@ import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import MetaBoxes from '../meta-boxes';
 import { getMetaBoxContainer } from '../../utils/meta-boxes';
 import Sidebar from '../sidebar';
-import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
-import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
+import {
+	PluginPostPublishPanel,
+	PluginPrePublishPanel,
+} from '../../plugins';
 
 function Layout( {
 	mode,

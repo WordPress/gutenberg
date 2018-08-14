@@ -1,13 +1,23 @@
-## Extending the post editor UI
+## Edit Post
 
-Extending the editor UI can be accomplished with the `registerPlugin` API, allowing you to define all your plugin's UI elements in one place.
+Edit post implementation for WordPress.
 
-Refer to [the plugins module documentation](../plugins/) for more information.
+## Installation
+
+Install the module
+
+```bash
+npm install @wordpress/edit-post --save
+```
+
+## Usage
+
 
 ## Plugin Components
 
-The following components can be used with the `registerPlugin` ([see documentation](../packages/plugins)) API.
-They can be found in the global variable `wp.editPost` when defining `wp-edit-post` as a script dependency.
+Extending the editor UI can be accomplished with the `registerPlugin` ([see documentation](../plugins)) API, allowing you to define all your plugin's UI elements in one place.
+The following components can be used with the `registerPlugin` API.
+In the WordPress context, they can be found in the global variable `wp.editPost` when defining `wp-edit-post` as a script dependency.
 
 ### `PluginBlockSettingsMenuItem`
 
@@ -41,8 +51,8 @@ function MyPluginBlockSettingsMenuItem() {
 
 {% ESNext %}
 ```jsx
-import { __ } from wp.i18n;
-import { PluginBlockSettingsMenuItem } from wp.editPost;
+const { __ } = wp.i18n;
+const { PluginBlockSettingsMenuItem } = wp.editPost;
 
 const doOnClick = ( ) => {
     // To be called when the user clicks the menu item.
@@ -50,9 +60,9 @@ const doOnClick = ( ) => {
 
 const MyPluginBlockSettingsMenuItem = () => (
     <PluginBlockSettingsMenuItem 
-		allowedBlockNames=[ 'core/paragraph' ]
-		icon='dashicon-name'
-		label=__( 'Menu item text' )
+		allowedBlockNames={ [ 'core/paragraph' ] }
+		icon="dashicon-name"
+		label={ __( 'Menu item text' ) }
 		onClick={ doOnClick } />
 );
 ```
@@ -429,3 +439,5 @@ Whether to have the panel initially opened. When no title is provided it is alwa
 - Type: `Boolean`
 - Required: No
 - Default: `false`
+
+<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
