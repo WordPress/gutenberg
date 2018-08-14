@@ -5,14 +5,17 @@ import renderer from 'react-test-renderer';
 import PropTypes from 'prop-types';
 
 /**
+ * WordPress dependencies
+ */
+import { Component } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
+
+/**
  * Internal dependencies
  */
 import withContext from '../';
 
-/**
- * WordPress dependencies
- */
-import { Component } from '@wordpress/element';
+jest.mock( '@wordpress/deprecated', () => jest.fn() );
 
 class PassContext extends Component {
 	getChildContext() {
@@ -39,7 +42,7 @@ describe( 'withContext', () => {
 		);
 
 		expect( wrapper.root.findByType( 'div' ).children[ 0 ] ).toBe( 'ok' );
-		expect( console ).toHaveWarned();
+		expect( deprecated ).toHaveBeenCalled();
 	} );
 
 	it( 'should allow specifying a context getter mapping', () => {
