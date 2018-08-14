@@ -2,6 +2,16 @@
  * External dependencies
  */
 import RCTAztecView from 'react-native-aztec';
+import { View, Text } from "react-native";
+import {
+	isEqual,
+	forEach,
+	merge,
+	identity,
+	find,
+	defer,
+	noop,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,11 +20,21 @@ import { Component, RawHTML, renderToString } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { children } from '@wordpress/blocks';
 
+/**
+ * Internal dependencies
+ */
+import FormatToolbar from './format-toolbar';
+
 export class RichText extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onChange = this.onChange.bind( this );
 		this.onContentSizeChange = this.onContentSizeChange.bind( this );
+		this.changeFormats = this.changeFormats.bind( this );
+		this.state = {
+			formats: {},
+			selectedNodeId: 0,
+		};
 
 		this.lastEventCount = 0;
 	}
@@ -69,17 +89,58 @@ export class RichText extends Component {
 		return true;
 	}
 
+	isFormatActive( format ) {
+		return this.state.formats[ format ] && this.state.formats[ format ].isActive;
+	}
+
+	removeFormat( format ) {
+		//TODO: implement Aztec call to remove format
+		console.log("Remove Format:" + format);
+	}
+
+	applyFormat( format, args, node ) {
+		//TODO: implement Aztec call to apply format
+		console.log("Apply Format:" + format);
+	}
+
+	changeFormats( formats ) {
+		forEach( formats, ( formatValue, format ) => {			
+			const isActive = this.isFormatActive( format );
+			if ( isActive && ! formatValue ) {
+				this.removeFormat( format );
+			} else if ( ! isActive && formatValue ) {
+				this.applyFormat( format );
+			}			
+		} );
+
+		this.setState( ( state ) => ( {
+			formats: merge( {}, state.formats, formats ),
+		} ) );
+	}
+
 	render() {
 		const {
 			tagName,
 			style,
 			eventCount,
+			formattingControls,
+			formatters
 		} = this.props;
+
+		const formatToolbar = (
+			<FormatToolbar
+			    formats={ this.state.formats }								
+				onChange={ this.changeFormats }
+				enabledControls={ formattingControls }
+				customControls={ formatters }
+			/>
+		);
 
 		// Save back to HTML from React tree
 		const html = '<' + tagName + '>' + renderToString( this.props.content.contentTree ) + '</' + tagName + '>';
 
 		return (
+			<View>			
 			<RCTAztecView
 				text={ { text: html, eventCount: eventCount } }
 				onChange={ this.onChange }
@@ -88,6 +149,8 @@ export class RichText extends Component {
 				maxImagesWidth={ 200 }
 				style={ style }
 			/>
+			{ formatToolbar }
+			</View>
 		);
 	}
 }

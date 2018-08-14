@@ -13,6 +13,7 @@
  * External dependencies
  */
 import { get, mapValues, includes, capitalize } from 'lodash';
+import { isAppleOS } from './platform';
 
 export const BACKSPACE = 8;
 export const TAB = 9;
@@ -33,16 +34,7 @@ export const CTRL = 'ctrl';
 export const COMMAND = 'meta';
 export const SHIFT = 'shift';
 
-/**
- * Return true if platform is MacOS.
- *
- * @param {Object} _window   window object by default; used for DI testing.
- *
- * @return {boolean}         True if MacOS; false otherwise.
- */
-export function isMacOS( _window = window ) {
-	return _window.navigator.platform.indexOf( 'Mac' ) !== -1;
-}
+export const isMacOS = isAppleOS;
 
 const modifiers = {
 	primary: ( _isMac ) => _isMac() ? [ COMMAND ] : [ CTRL ],
