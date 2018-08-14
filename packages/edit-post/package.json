@@ -21,7 +21,16 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime-corejs2": "7.0.0-beta.56",
-		"@wordpress/plugins": "file:../plugins"
+		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/data": "file:../data",
+		"@wordpress/element": "file:../element",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/plugins": "file:../plugins",
+		"lodash": "^4.17.10"
+	},
+	"devDependencies": {
+		"enzyme": "^3.3.0"
 	},
 	"publishConfig": {
 		"access": "public"
