@@ -23,7 +23,7 @@ import PositionedAtSelection from './positioned-at-selection';
 import URLInput from '../../url-input';
 import { filterURLForDisplay } from '../../../utils/url';
 
-const FORMATTING_CONTROLS = applyFilters( 'editor.RichText.formattingControls', [
+const getFormattingControls = () => applyFilters( 'editor.RichText.formattingControls', [
 	{
 		icon: 'editor-bold',
 		title: __( 'Bold' ),
@@ -181,7 +181,7 @@ class FormatToolbar extends Component {
 		const { linkValue, settingsVisible, opensInNewWindow } = this.state;
 		const isAddingLink = formats.link && formats.link.isAdding;
 
-		const toolbarControls = FORMATTING_CONTROLS.concat( customControls )
+		const toolbarControls = getFormattingControls().concat( customControls )
 			.filter( ( control ) => enabledControls.indexOf( control.format ) !== -1 )
 			.map( ( control ) => {
 				if ( control.format === 'link' ) {
