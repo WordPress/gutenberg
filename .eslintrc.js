@@ -93,10 +93,6 @@ module.exports = {
 				message: 'Use @wordpress/nux as import path instead.',
 			},
 			{
-				selector: 'ImportDeclaration[source.value=/^utils(\\u002F|$)/]',
-				message: 'Use @wordpress/utils as import path instead.',
-			},
-			{
 				selector: 'ImportDeclaration[source.value=/^edit-post(\\u002F|$)/]',
 				message: 'Use @wordpress/edit-post as import path instead.',
 			},
