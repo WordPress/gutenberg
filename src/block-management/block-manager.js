@@ -201,12 +201,12 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		return (
 			<KeyboardAvoidingView style={ { flex: 1 } } behavior={ behavior }>
 				<TextInput
+					textAlignVertical='top'
 					multiline
 					numberOfLines={ 0 }
 					style={ styles.htmlView }
 					value={ this.state.html }
 					onChangeText={ this.handleHTMLUpdate }>
-
 				</TextInput>
 			</KeyboardAvoidingView>
 		);
