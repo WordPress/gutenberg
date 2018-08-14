@@ -14,7 +14,7 @@ describe( 'PostExcerpt', () => {
 		addFilter( 'editor.post-excerpt.label', 'test', () => 'Filtered Label' );
 		const wrapper = shallow( <PostExcerpt /> );
 		const control = wrapper.childAt( 0 );
-		expect( control.prop( 'label') ).toBe( 'Filtered Label' );
+		expect( control.prop( 'label' ) ).toBe( 'Filtered Label' );
 	} );
 
 	it( 'should allow filtering of the excerpt link text', () => {
