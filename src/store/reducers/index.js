@@ -126,7 +126,6 @@ export const reducer = (
 		case ActionTypes.BLOCK.CREATE: {
 			// TODO we need to set focused: true and search for the currently focused block and
 			// set that one to `focused: false`.
-			blocks.push(action.block);
 			insertBlock(blocks, action.block, action.clientIdAbove);
 			return { blocks: blocks, refresh: ! state.refresh };
 		}
