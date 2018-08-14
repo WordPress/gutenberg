@@ -89,6 +89,30 @@ function get_dynamic_block_names() {
 }
 
 /**
+ * Retrieve the dynamic blocks regular expression for searching.
+ *
+ * @return string
+ */
+function get_dynamic_blocks_regex() {
+	$dynamic_block_names   = get_dynamic_block_names();
+	$dynamic_block_pattern = (
+		'/<!--\s+wp:(' .
+		str_replace( '/', '\/',                 // Escape namespace, not handled by preg_quote.
+			str_replace( 'core/', '(?:core/)?', // Allow implicit core namespace, but don't capture.
+				implode( '|',                   // Join block names into capture group alternation.
+					array_map( 'preg_quote',    // Escape block name for regular expression.
+						$dynamic_block_names
+					)
+				)
+			)
+		) .
+		')(\s+(\{.*?\}))?\s+(\/)?-->/'
+	);
+
+	return $dynamic_block_pattern;
+}
+
+/**
  * Renders a single block into a HTML string.
  *
  * @since 1.9.0
@@ -124,22 +148,8 @@ function gutenberg_render_block( $block ) {
  * @return string          Updated post content.
  */
 function do_blocks( $content ) {
-	$rendered_content = '';
-
-	$dynamic_block_names   = get_dynamic_block_names();
-	$dynamic_block_pattern = (
-		'/<!--\s+wp:(' .
-		str_replace( '/', '\/',                 // Escape namespace, not handled by preg_quote.
-			str_replace( 'core/', '(?:core/)?', // Allow implicit core namespace, but don't capture.
-				implode( '|',                   // Join block names into capture group alternation.
-					array_map( 'preg_quote',    // Escape block name for regular expression.
-						$dynamic_block_names
-					)
-				)
-			)
-		) .
-		')(\s+(\{.*?\}))?\s+(\/)?-->/'
-	);
+	$rendered_content      = '';
+	$dynamic_block_pattern = get_dynamic_blocks_regex();
 
 	while ( preg_match( $dynamic_block_pattern, $content, $block_match, PREG_OFFSET_CAPTURE ) ) {
 		$opening_tag     = $block_match[0][0];
@@ -208,3 +218,46 @@ function do_blocks( $content ) {
 	return $rendered_content;
 }
 add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode().
+
+/**
+ * Remove all dynamic blocks from the given content.
+ *
+ * @param string $content Content of the current post.
+ * @return string
+ */
+function strip_dynamic_blocks( $content ) {
+	return preg_replace( get_dynamic_blocks_regex(), '', $content );
+}
+
+/**
+ * Adds the content filter to strip dynamic blocks from excerpts.
+ *
+ * It's a bit hacky for now, but once this gets merged into core the function
+ * can just be called in `wp_trim_excerpt()`.
+ *
+ * @param string $text Excerpt.
+ *
+ * @return string
+ */
+function strip_dynamic_blocks_add_filter( $text ) {
+	add_filter( 'the_content', 'strip_dynamic_blocks', 8 ); // Before do_blocks().
+
+	return $text;
+}
+add_filter( 'get_the_excerpt', 'strip_dynamic_blocks_add_filter', 9 ); // Before wp_trim_excerpt().
+
+/**
+ * Adds the content filter to strip dynamic blocks from excerpts.
+ *
+ * It's a bit hacky for now, but once this gets merged into core the function
+ * can just be called in `wp_trim_excerpt()`.
+ *
+ * @param string $text Excerpt.
+ * @return string
+ */
+function strip_dynamic_blocks_remove_filter( $text ) {
+	remove_filter( 'the_content', 'strip_dynamic_blocks', 8 );
+
+	return $text;
+}
+add_filter( 'wp_trim_excerpt', 'strip_dynamic_blocks_add_filter', 0 ); // Before all other.
