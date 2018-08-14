@@ -512,11 +512,17 @@ export function renderElement( element, context, legacyContext = {} ) {
 
 			return renderElement( type( props, legacyContext ), context, legacyContext );
 	}
+
+	// React polyfills the symbol constants REACT_PROVIDER_TYPE and REACT_CONTEXT_TYPE
+	// using the 0xeacd and 0xeace numbers in IE11.
+	// See https://github.com/facebook/react/blob/master/packages/shared/ReactSymbols.js
 	switch ( type && type.$$typeof ) {
 		case REACT_PROVIDER_TYPE:
+		case 0xeacd:
 			return renderChildren( props.children, props.value, legacyContext );
 
 		case REACT_CONTEXT_TYPE:
+		case 0xeace:
 			return renderElement( props.children( context || type._currentValue ), context, legacyContext );
 	}
 
