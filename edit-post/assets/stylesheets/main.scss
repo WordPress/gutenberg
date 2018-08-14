@@ -175,9 +175,9 @@ body.gutenberg-editor-page {
 		}
 	}
 
-	input[type="checkbox"] {
+	input[type="checkbox"],
+	input[type="radio"] {
 		border: $border-width + 1 solid $dark-gray-300;
-		border-radius: $radius-round-rectangle / 2;
 		margin-right: 12px;
 		transition: none;
 
@@ -194,10 +194,23 @@ body.gutenberg-editor-page {
 		&:checked:focus {
 			box-shadow: 0 0 0 2px $dark-gray-500;
 		}
+	}
+
+	input[type="checkbox"] {
+		border-radius: $radius-round-rectangle / 2;
 
 		&::before {
 			margin: -4px 0 0 -5px;
 			color: $white;
+		}
+	}
+
+	input[type="radio"] {
+		border-radius: $radius-round;
+
+		&::before {
+			margin: 3px 0 0 3px;
+			background-color: $white;
 		}
 	}
 }
