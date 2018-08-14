@@ -140,16 +140,16 @@ export class RichText extends Component {
 		const html = '<' + tagName + '>' + renderToString( this.props.content.contentTree ) + '</' + tagName + '>';
 
 		return (
-			<View>			
-			<RCTAztecView
-				text={ { text: html, eventCount: eventCount } }
-				onChange={ this.onChange }
-				onContentSizeChange={ this.onContentSizeChange }
-				color={ 'black' }
-				maxImagesWidth={ 200 }
-				style={ style }
-			/>
-			{ formatToolbar }
+			<View>
+				{ formatToolbar }			
+				<RCTAztecView
+					text={ { text: html, eventCount: eventCount } }
+					onChange={ this.onChange }
+					onContentSizeChange={ this.onContentSizeChange }
+					color={ 'black' }
+					maxImagesWidth={ 200 }
+					style={ style }
+				/>			
 			</View>
 		);
 	}
