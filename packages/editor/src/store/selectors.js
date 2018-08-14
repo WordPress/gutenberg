@@ -3,6 +3,7 @@
  */
 import {
 	castArray,
+	flatMap,
 	find,
 	first,
 	get,
@@ -572,6 +573,28 @@ export const getBlocks = createSelector(
 	( state ) => [
 		state.editor.present.blockOrder,
 		state.editor.present.blocksByClientId,
+	]
+);
+
+/**
+ * Returns an array containing the clientIds of the top-level blocks
+ * and their descendants of any depth (for nested blocks).
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Array} ids of top-level and descendant blocks.
+ */
+export const getClientIdsWithDescendants = createSelector(
+	( state ) => {
+		const getDescendants = ( clientIds ) => flatMap( clientIds, ( clientId ) => {
+			const descendants = getBlockOrder( state, clientId );
+			return [ ...descendants, ...getDescendants( descendants ) ];
+		} );
+		const topLevelIds = getBlockOrder( state );
+		return [ ...topLevelIds, ...getDescendants( topLevelIds ) ];
+	},
+	( state ) => [
+		state.editor.present.blockOrder,
 	]
 );
 
@@ -1555,7 +1578,7 @@ export const getInserterItems = createSelector(
 
 			let isDisabled = false;
 			if ( ! hasBlockSupport( blockType.name, 'multiple', true ) ) {
-				isDisabled = some( getBlocks( state ), { name: blockType.name } );
+				isDisabled = some( getBlocksByClientId( state, getClientIdsWithDescendants( state ) ), { name: blockType.name } );
 			}
 
 			const isContextual = isArray( blockType.parent );
