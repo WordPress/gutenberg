@@ -17,7 +17,7 @@ export const settings = {
 
 	type: 'image',
 
-	icon: <svg enableBackground="new 0 0 24 24" version="1.1" viewBox="0 0 24 24" xmlSpace="preserve"><path d="M18,13v2h3v-2H18z M3,19h18v-2H3V19z M5,15h9c1.1,0,2-0.9,2-2V7c0-1.1-0.9-2-2-2H5C3.9,5,3,5.9,3,7v6  C3,14.1,3.9,15,5,15z M5,7h9v6l-1.5-1.5c-0.3-0.3-0.7-0.5-1.1-0.5c-0.3,0-0.7,0.1-1,0.3l-1,1L5,8V7z M5,10.8L7.2,13H5V10.8z" /></svg>,
+	icon: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 16h10c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2zM4 5h10v9H4V5zm14 9v2h4v-2h-4zM2 20h20v-2H2v2zm6.4-8.8L7 9.4 5 12h8l-2.6-3.4-2 2.6z" /></svg>,
 
 	edit( { onSave } ) {
 		return (
