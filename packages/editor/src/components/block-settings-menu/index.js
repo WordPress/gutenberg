@@ -8,7 +8,7 @@ import { castArray, first, last, every, flow } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import { IconButton, Dropdown, NavigableMenu, MenuItem, KeyboardShortcuts } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -163,22 +163,26 @@ export class BlockSettingsMenu extends Component {
 									{ __( 'Duplicate' ) }
 								</MenuItem>
 							) }
-							<MenuItem
-								className="editor-block-settings-menu__control"
-								onClick={ onInsertBefore }
-								icon="insert-before"
-								shortcut={ shortcuts.insertBefore.display }
-							>
-								{ __( 'Insert Before' ) }
-							</MenuItem>
-							<MenuItem
-								className="editor-block-settings-menu__control"
-								onClick={ onInsertAfter }
-								icon="insert-after"
-								shortcut={ shortcuts.insertAfter.display }
-							>
-								{ __( 'Insert After' ) }
-							</MenuItem>
+							{ ! isLocked && (
+								<Fragment>
+									<MenuItem
+										className="editor-block-settings-menu__control"
+										onClick={ onInsertBefore }
+										icon="insert-before"
+										shortcut={ shortcuts.insertBefore.display }
+									>
+										{ __( 'Insert Before' ) }
+									</MenuItem>
+									<MenuItem
+										className="editor-block-settings-menu__control"
+										onClick={ onInsertAfter }
+										icon="insert-after"
+										shortcut={ shortcuts.insertAfter.display }
+									>
+										{ __( 'Insert After' ) }
+									</MenuItem>
+								</Fragment>
+							) }
 							{ count === 1 && (
 								<BlockModeToggle
 									clientId={ firstBlockClientId }
