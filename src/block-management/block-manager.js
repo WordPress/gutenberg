@@ -86,14 +86,14 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 		// create an empty block of the selected type
 		const newBlock = createBlock( itemValue, { content: 'new test text for a ' + itemValue + ' block' } );
-		const newBlockWithFocusedState = { ...newBlock, focused: false };
+		newBlock.focused = false;
 
 		// set it into the datasource, and use the same object instance to send it to props/redux
-		this.state.dataSource.splice( focusedItemIndex + 1, 0, newBlockWithFocusedState );
-		this.props.createBlockAction( newBlockWithFocusedState.clientId, newBlockWithFocusedState, clientIdFocused );
+		this.state.dataSource.splice( focusedItemIndex + 1, 0, newBlock );
+		this.props.createBlockAction( newBlock.clientId, newBlock, clientIdFocused );
 
 		// now set the focus
-		this.props.focusBlockAction( newBlockWithFocusedState.clientId );
+		this.props.focusBlockAction( newBlock.clientId );
 	}
 
 	onToolbarButtonPressed( button: number, clientId: string ) {
