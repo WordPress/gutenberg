@@ -54,22 +54,22 @@ Guidelines for (duh) writing bulleted lists.
 Parallel structure makes lists easier to read quickly -- their predictability takes some cognitive load off the reader.	
 
 GOOD:
-What can you do with this block? Lots of things!
-* Add a quote.
-* Highlight a link.
-* Display multiple images.
-* Create a bulleted list.
+>What can you do with this block? Lots of things!
+>* Add a quote.
+>* Highlight a link.
+>* Display multiple images.
+>* Create a bulleted list.
 
 Every bullet is a full sentence, and ends with a period. (If your list is a bunch of one- or two-word items, those can often just turn into a single regular sentence -- easier to read, and space-saving.) Every line begins with a verb that tells the user what the block can do. The subject of the sentence is always the user. 
 
 A user can absorb this list quickly because once they read the first item, they understand how to read the rest and know what information they’ll find.
 
 LESS GOOD:
-What can you do with this block? Lots of things!
-* You can add a quote.
-* Highlighting a link you love.
-* It displays multiple images. Nice for galleries!
-* Bulleted lists
+>What can you do with this block? Lots of things!
+>* You can add a quote.
+>* Highlighting a link you love.
+>* It displays multiple images. Nice for galleries!
+>* Bulleted lists
 
 Here, every line has different phrasing (some start with a verb, some with a noun) and the subject of the sentence changes (sometimes it’s you, sometimes it’s the block). Some lines have added description, some don't. There’s an incomplete sentence, and punctuation is inconsistent.
 
@@ -77,10 +77,10 @@ Reading this list takes more work because the reader has to parse each bullet an
 
 Note: this doesn't mean every bullet has to be super short and start with an action verb! “Predicable” doesn’t have to mean “simple.” It just means that each bullet should have the same sentence structure. This list would also be fine:
 
-What can you do with this block? Lots of things!
-* Try adding a quote. Sometimes someone else said things best!
-* Use it to highlight a link you love -- sharing links is the currency of the internet.
-* Create a gallery that displays multiple images, and show off your best photos.
+>What can you do with this block? Lots of things!
+>* Try adding a quote. Sometimes someone else said things best!
+>* Use it to highlight a link you love -- sharing links is the currency of the internet.
+>* Create a gallery that displays multiple images, and show off your best photos.
 
 Here, each bullet starts with a more user-focused verb and includes a piece of supplemental information for more interest. The punctuation varies a bit, which keeps the lines from feeling too formulaic, but since the basic structure of each is the same, they remain easy to read.
 
@@ -89,33 +89,33 @@ Do you have to start with a verb? No. But if you’re at a loss, you usually can
 
 In a simple list that’s meant to be purely instructional (e.g., in UI copy where you just need the user to make a decision), it might be fine to start every bullet with the same verb:
 
-To continue, choose an action:
-Add a simple text block.
-Add a pullquote block.
-Add an image block.
+>To continue, choose an action:
+>* Add a simple text block.
+>* Add a pullquote block.
+>* Add an image block.
 
 If your list is more persuasive (e.g., trying to convince someone to use a feature by listing its benefits) or includes multi-step instructions, you’ll want to vary your verbs to keep the reader engaged with more interesting language, as in the example above:
 
-What can you do with this block? Lots of things!
-* Try adding a quote. Sometimes someone else said things best!
-* Use it to highlight a link you love -- sharing links is the currency of the internet.
-* Create a gallery that displays multiple images, and show off your best photos.
+>What can you do with this block? Lots of things!
+>* Try adding a quote. Sometimes someone else said things best!
+>* Use it to highlight a link you love -- sharing links is the currency of the internet.
+>* Create a gallery that displays multiple images, and show off your best photos.
 
 These aren’t hard-and-fast rules -- you might choose the use the same verb in a persuasive list to be more focused and powerful, for example. But they’re good starting places for solid lists. 
 
 #### THREE: When something's clearly a list, you don't have to tell us it's a list.
 
 GOOD:
-What can you do with this block? Lots of things!
-* Add a quote.
-* Highlight a link you love.
-* Display multiple images.
+>What can you do with this block? Lots of things!
+>* Add a quote.
+>* Highlight a link you love.
+>* Display multiple images.
 
 LESS GOOD:
-What can you do with this block? Lots of things! Here are some examples of ways you can use it.
-* You can add a quote.
-* Highlighting a link you love.
-* It displays multiple images. Nice for galleries!
+>What can you do with this block? Lots of things! Here are some examples of ways you can use it.
+>* You can add a quote.
+>* Highlighting a link you love.
+>* It displays multiple images. Nice for galleries!
 
 Find the balance between being as clear as possible and trusting a user. On one hand, we know that people don’t always read instructions; on the other, redundancy can make the user feel like we think they’re stupid.
 
@@ -124,24 +124,24 @@ Use it to focus readers on the key information in a bulleted list. This is espec
 
 “Key information” is, well, key: bold draws the eye, so stick to the most vital piece of information in a given bullet:
 
-What can you do with this block? Lots of things!
-* Try adding a quote. Sometimes someone else said things best!
-* Use it to highlight a link you love -- sharing links is the currency of the internet.
-* Create a gallery that displays multiple images, and show off your best photos.
+>What can you do with this block? Lots of things!
+>* Try adding a **quote**. Sometimes someone else said things best!
+>* Use it to highlight a **link** you love -- sharing links is the currency of the internet.
+>* Create a **gallery** that displays multiple images, and show off your best photos.
 
 On the flipside, bolding too many things creates visual confusion:
 
-What can you do with this block? Lots of things!
-* Try adding a quote. Sometimes someone else said things best!
-* Use it to highlight a link you love -- sharing links is the currency of the internet.
-* Create a gallery that displays multiple images, and show off your best photos.
+>**What can you do with this block?** Lots of things!
+>* Try adding a **quote**. Sometimes someone else said things best!
+>* Use it to highlight a **link** you love -- sharing **links** is the currency of the internet.
+>* Create a **gallery** that displays **multiple images**, and show off your best **photos**.
 
 When lists are short and basic, don't bother -- bolding just adds busy-ness. 
 
-What can you do with this block? Lots of things!
-* Add a quote.
-* Highlight a link.
-* Display multiple images.
+>What can you do with this block? Lots of things!
+>* Add a **quote**.
+>* Highlight a **link**.
+>* Display multiple **images**.
 
 The lack of words creates its own focus; you don't have to add any more.
 
@@ -152,17 +152,23 @@ Guidelines for writing one-line feature descriptions, or short descriptions to c
 If the user doesn't understand what using a particular option will result in, it doesn't matter how clever your pun is. Wordplay and idioms are frequently unclear, and easily misunderstood. If you use them at all, they should be as supplemental information -- never to explain the main idea -- and they should be something you’re fairly certain will be understandable to a pretty wide range of people.
 
 #### TWO: Refer back to section one, and look out for those bulk-adding phrases.
-Active voice is typically the better way to go, and cutting out the bulky phrasing is particularly important when you’ve got limited space and you need people to be able to make decisions and act. 
+Active voice is typically the better way to go, and cutting out the bulky phrasing is particularly important when you’ve got limited space and you need people to be able to make decisions and act. Often you can tighten a UI instruction phrase to be both shorter and clearer:
 
-Another, UI instruction-particular phrase you can often tighten:
+>When you click X, Y happens.
 
-“When you click X, Y happens.” > “Click X do to Y.”
-“When you click the “settings” button, the pop-up will display the advanced settings that are available.” VS.
-“Click “settings” to access the advanced settings.”
+vs.
 
-We sometimes think that adding the extra words helps the user feel like they’re being walked through the product, but most of the time, they really are just extra words. 
+>Click X to do Y.
 
-Similar are “Once you do X…” or “If you want to do X.” Sometimes there are decision points where “If you want to do X” is entirely appropriate and needed because there are different paths the user can take based on their goal, but we often use it to mean “Here is a thing you can do,” which you can express more simply with something like “To do X…”
+We sometimes think that adding the extra words helps the user feel like they’re being walked through the product, but most of the time, they really are just extra words.
+
+>When you click the “settings” button, the pop-up will display the advanced settings that are available.
+
+vs.
+
+>Click “settings” to access the advanced settings.
+
+Similar phrases are “Once you do X…” or “If you want to do X.” Sometimes there are decision points where “If you want to do X” is entirely appropriate and needed because there are different paths the user can take based on their goal, but we often use it to mean “Here is a thing you can do,” which you can express more simply with something like “To do X…”
 
 #### THREE: Be specific.
 When an action depends on the user having completed some prior action, be specific about what’s required and what happens next. We often default to “when you’re ready.”
@@ -183,35 +189,35 @@ Clarity above all, yes, and space is often limited here -- but UI text can still
 
 Single lines of description can still be complete sentences. 
 
-List. Numbered or bulleted.
+>List. Numbered or bulleted.
 
 vs.
 
-Add a list, either numbered or bulleted.
+>Add a list, either numbered or bulleted.
 
 You can still use contractions. 
 
-Add a list. We will provide formatting options.
+>Add a list. We will provide formatting options.
 
 vs.
 
-Add a bulleted list -- we’ll give you some formatting options.
+>Add a bulleted list -- we’ll give you some formatting options.
 
 You can still use punctuation -- em dashes, colons, semicolons -- to control the flow of your words, link ideas, and create pauses. 
 
-List. Numbered or bulleted.
+>List. Numbered or bulleted.
 
 vs.
 
-Add a list -- numbered or bulleted. Your choice!
+>Add a list -- numbered or bulleted. Your choice!
 
 You can still try to avoid jargon in favor of plain language.
 
-Add unordered or ordered list.
+>Add unordered or ordered list.
 
 vs.
 
-Add a list, either numbered or bulleted.
+>Add a list, either numbered or bulleted.
 
 (And because it bears repeating: no wordplay, please! “Personality” can -- and in UI instructions, should -- be subtle. We’re talking about text that sounds like it was said by a human being, not forced attempts at whimsy.)
 
@@ -235,13 +241,16 @@ Voice and tone can say as much as the individual words themselves. Error message
 Let’s say someone’s trying to publish a post, but their user role doesn’t allow them to do that. Here are some ways we could -- but should not -- communicate that:
 
 > Your user role is incorrect.
-> Here, we sound distant and uncaring.
+
+Here, we sound distant and uncaring.
 
 > Stop! You do not have permission to do this.
-> Here, we sound unnecessarily alarmist and stern.
+
+Here, we sound unnecessarily alarmist and stern.
 
 > Oopsie, we can’t let you do that!
-> Here, we sound too cute.
+
+Here, we sound too cute.
 
 We can stay direct, positive, and friendly, even in error messages. How? With tips two through four!
 
