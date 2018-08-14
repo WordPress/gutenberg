@@ -27,7 +27,7 @@ function findBlockIndex( blocks, clientId: string ) {
 function insertBlock( blocks, block, clientIdAbove ) {
 	// TODO we need to set focused: true and search for the currently focused block and
 	// set that one to `focused: false`.
-	blocks.splice( findBlockIndex( blocks, clientIdAbove ) + 1, 0, block);
+	blocks.splice( findBlockIndex( blocks, clientIdAbove ) + 1, 0, block );
 }
 
 export const reducer = (
@@ -120,7 +120,7 @@ export const reducer = (
 		case ActionTypes.BLOCK.CREATE: {
 			// TODO we need to set focused: true and search for the currently focused block and
 			// set that one to `focused: false`.
-			insertBlock(blocks, action.block, action.clientIdAbove);
+			insertBlock( blocks, action.block, action.clientIdAbove );
 			return { blocks: blocks, refresh: ! state.refresh };
 		}
 		default:

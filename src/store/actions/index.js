@@ -11,7 +11,7 @@ export type BlockActionType = string => {
 	clientId: string,
 };
 
-export type CreateActionType = (string, BlockType, string) => {
+export type CreateActionType = ( string, BlockType, string ) => {
 	type: $Values<typeof ActionTypes.BLOCK>,
 	clientId: string,
 	block: BlockType,
@@ -46,9 +46,9 @@ export const deleteBlockAction: BlockActionType = clientId => ( {
 	clientId,
 } );
 
-export const createBlockAction: CreateActionType = (clientId, block, clientIdAbove) => ( {
+export const createBlockAction: CreateActionType = ( clientId, block, clientIdAbove ) => ( {
 	type: ActionTypes.BLOCK.CREATE,
 	clientId,
 	block: block,
-	clientIdAbove
+	clientIdAbove,
 } );

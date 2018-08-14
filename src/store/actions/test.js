@@ -11,7 +11,7 @@ describe( 'Store', () => {
 		beforeAll( () => {
 			registerCoreBlocks();
 		} );
-	
+
 		it( 'should create an action to focus a block', () => {
 			const action = actions.focusBlockAction( '1' );
 			expect( action.type ).toBeDefined();
@@ -48,6 +48,5 @@ describe( 'Store', () => {
 			expect( action.block ).toEqual( newBlock );
 			expect( action.clientIdAbove ).toEqual( '0' );
 		} );
-
 	} );
 } );
