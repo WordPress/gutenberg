@@ -72,8 +72,16 @@
 	.components-icon-button {
 		width: $block-side-ui-width;
 		height: $block-side-ui-width;
-		padding: 4px;
 		margin-right: 12px;
+		padding: 0;
+	}
+
+	.components-icon-button svg {
+		margin: 4px;
+
+		&:not(.dashicon) {
+			margin: 2px;
+		}
 	}
 }
 
@@ -96,7 +104,7 @@
 		border-radius: 50%;
 		width: $block-side-ui-width;
 		height: $block-side-ui-width;
-		padding: 4px;
+		padding: 0;
 
 		// use opacity to work in various editor styles
 		&:not(:hover) {
