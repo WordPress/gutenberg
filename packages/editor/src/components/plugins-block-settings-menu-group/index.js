@@ -8,14 +8,13 @@ import { isEmpty, map } from 'lodash';
  */
 import { createSlotFill } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
-import { withSelect } from '@wordpress/data';
 
 const { Fill: PluginsBlockSettingsMenuGroup, Slot } = createSlotFill( 'PluginsBlockSettingsMenuGroup' );
 
-const PluginsBlockSettingsMenuGroupSlot = ( { fillProps, selectedBlocks } ) => {
-	selectedBlocks = map( selectedBlocks, ( block ) => block.name );
+PluginsBlockSettingsMenuGroup.Slot = ( { fillProps } ) => {
+	const selectedBlockNames = map( fillProps.blocks, ( block ) => block.name );
 	return (
-		<Slot fillProps={ { ...fillProps, selectedBlocks } } >
+		<Slot fillProps={ { onClose: fillProps.onClose, selectedBlockNames } } >
 			{ ( fills ) => ! isEmpty( fills ) && (
 				<Fragment>
 					<div className="editor-block-settings-menu__separator" />
@@ -25,9 +24,5 @@ const PluginsBlockSettingsMenuGroupSlot = ( { fillProps, selectedBlocks } ) => {
 		</Slot>
 	);
 };
-
-PluginsBlockSettingsMenuGroup.Slot = withSelect( ( select, { fillProps: { clientIds } } ) => ( {
-	selectedBlocks: select( 'core/editor' ).getBlocksByClientId( clientIds ),
-} ) )( PluginsBlockSettingsMenuGroupSlot );
 
 export default PluginsBlockSettingsMenuGroup;
