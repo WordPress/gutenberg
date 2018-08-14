@@ -429,6 +429,13 @@ export class BlockListBlock extends Component {
 		}
 		const blockElementId = `block-${ clientId }`;
 
+		// We wrap the BlockEdit component in a div that hides it when editing in
+		// HTML mode. This allows us to render all of the ancillary pieces
+		// (InspectorControls, etc.) which are inside `BlockEdit` but not
+		// `BlockHTML`, even in HTML mode.
+		const BlockEditWrapper = mode === 'visual' ? Fragment :
+			'div';
+
 		// Disable reasons:
 		//
 		//  jsx-a11y/mouse-events-have-key-events:
@@ -520,22 +527,24 @@ export class BlockListBlock extends Component {
 					data-block={ clientId }
 				>
 					<BlockCrashBoundary onError={ this.onBlockError }>
-						{ isValid && mode === 'visual' && (
-							<BlockEdit
-								name={ blockName }
-								isSelected={ isSelected }
-								attributes={ block.attributes }
-								setAttributes={ this.setAttributes }
-								insertBlocksAfter={ isLocked ? undefined : this.insertBlocksAfter }
-								onReplace={ isLocked ? undefined : onReplace }
-								mergeBlocks={ isLocked ? undefined : this.mergeBlocks }
-								clientId={ clientId }
-								isSelectionEnabled={ this.props.isSelectionEnabled }
-								toggleSelection={ this.props.toggleSelection }
-							/>
+						{ isValid && (
+							<BlockEditWrapper style={ mode === 'visual' ? null : { display: 'none' } }>
+								<BlockEdit
+									name={ blockName }
+									isSelected={ isSelected }
+									attributes={ block.attributes }
+									setAttributes={ this.setAttributes }
+									insertBlocksAfter={ isLocked ? undefined : this.insertBlocksAfter }
+									onReplace={ isLocked ? undefined : onReplace }
+									mergeBlocks={ isLocked ? undefined : this.mergeBlocks }
+									clientId={ clientId }
+									isSelectionEnabled={ this.props.isSelectionEnabled }
+									toggleSelection={ this.props.toggleSelection }
+								/>
+							</BlockEditWrapper>
 						) }
 						{ isValid && mode === 'html' && (
-							<BlockHtml clientId={ clientId } />
+							<BlockHtml clientId={ clientId } isSelectionEnabled />
 						) }
 						{ ! isValid && [
 							<div key="invalid-preview">
