@@ -161,6 +161,16 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
             ],
           },
           Object {
+            "description": "Remove the selected block(s).",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "Alt",
+              "+",
+              "Backspace",
+            ],
+          },
+          Object {
             "description": "Change the block type after adding a new paragraph.",
             "keyCombination": "/",
           },
