@@ -1,10 +1,13 @@
 .editor-block-styles {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	grid-gap: $item-spacing;
+	display: flex;
+	flex-wrap: wrap;
+	padding: $item-spacing / 2;
 }
 
 .editor-block-styles__item {
+	margin: $item-spacing / 2;
+	width: calc(50% - #{ $item-spacing });
+	flex-shrink: 0;
 	cursor: pointer;
 	overflow: hidden;
 
