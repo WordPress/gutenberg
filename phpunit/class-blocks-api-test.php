@@ -10,7 +10,7 @@
  */
 class Blocks_API extends WP_UnitTestCase {
 
-	public $content = <<<CONTENT
+	public $content = '
 <!-- wp:paragraph -->
 <p>paragraph</p>
 <!-- /wp:paragraph -->
@@ -19,10 +19,9 @@ class Blocks_API extends WP_UnitTestCase {
 
 <!-- wp:spacer -->
 <div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
-<!-- /wp:spacer -->
-CONTENT;
+<!-- /wp:spacer -->';
 
-	public $filtered_content = <<<FILTERED_CONTENT
+	public $filtered_content = '
 <!-- wp:paragraph -->
 <p>paragraph</p>
 <!-- /wp:paragraph -->
@@ -31,8 +30,7 @@ CONTENT;
 
 <!-- wp:spacer -->
 <div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
-<!-- /wp:spacer -->
-FILTERED_CONTENT;
+<!-- /wp:spacer -->';
 
 	/**
 	 * Tests strip_dynamic_blocks().
