@@ -16,27 +16,28 @@ import { PREFERENCES_DEFAULTS } from './defaults';
 /**
  * Reducer returning the user preferences.
  *
- * @param {Object}  state                 Current state.
- * @param {string}  state.mode            Current editor mode, either "visual" or "text".
- * @param {boolean} state.isSidebarOpened Whether the sidebar is opened or closed.
- * @param {Object}  state.panels          The state of the different sidebar panels.
- * @param {Object}  action                Dispatched action.
+ * @param {Object}  state                           Current state.
+ * @param {string}  state.mode                      Current editor mode, either
+ *                                                  "visual" or "text".
+ * @param {boolean} state.isGeneralSidebarDismissed Whether general sidebar is
+ *                                                  dismissed. False by default
+ *                                                  or when closing general
+ *                                                  sidebar, true when opening
+ *                                                  sidebar.
+ * @param {boolean} state.isSidebarOpened           Whether the sidebar is
+ *                                                  opened or closed.
+ * @param {Object}  state.panels                    The state of the different
+ *                                                  sidebar panels.
+ * @param {Object}  action                          Dispatched action.
  *
- * @return {string} Updated state.
+ * @return {Object} Updated state.
  */
 export const preferences = combineReducers( {
-	activeGeneralSidebar( state = PREFERENCES_DEFAULTS.activeGeneralSidebar, action ) {
+	isGeneralSidebarDismissed( state = false, action ) {
 		switch ( action.type ) {
 			case 'OPEN_GENERAL_SIDEBAR':
-				return action.name;
-
 			case 'CLOSE_GENERAL_SIDEBAR':
-				return null;
-			case 'SERIALIZE': {
-				if ( state === 'edit-post/block' ) {
-					return PREFERENCES_DEFAULTS.activeGeneralSidebar;
-				}
-			}
+				return action.type === 'CLOSE_GENERAL_SIDEBAR';
 		}
 
 		return state;
@@ -78,6 +79,27 @@ export const preferences = combineReducers( {
 		return state;
 	},
 } );
+
+/**
+ * Reducer returning the next active general sidebar state. The active general
+ * sidebar is a unique name to identify either an editor or plugin sidebar.
+ *
+ * @param {?string} state  Current state.
+ * @param {Object}  action Action object.
+ *
+ * @return {?string} Updated state.
+ */
+export function activeGeneralSidebar( state = null, action ) {
+	switch ( action.type ) {
+		case 'OPEN_GENERAL_SIDEBAR':
+			return action.name;
+
+		case 'CLOSE_GENERAL_SIDEBAR':
+			return null;
+	}
+
+	return state;
+}
 
 export function panel( state = 'document', action ) {
 	switch ( action.type ) {
@@ -192,6 +214,7 @@ export function metaBoxes( state = defaultMetaBoxState, action ) {
 
 export default combineReducers( {
 	preferences,
+	activeGeneralSidebar,
 	panel,
 	activeModal,
 	publishSidebarActive,

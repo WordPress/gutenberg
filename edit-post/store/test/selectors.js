@@ -9,6 +9,7 @@ import {
 	isModalActive,
 	isFeatureActive,
 	isPluginSidebarOpened,
+	getActiveGeneralSidebarName,
 	isPluginItemPinned,
 	getMetaBoxes,
 	hasMetaBoxes,
@@ -65,8 +66,20 @@ describe( 'selectors', () => {
 		it( 'should return false when the editor sidebar is not opened', () => {
 			const state = {
 				preferences: {
-					activeGeneralSidebar: null,
+					isGeneralSidebarDismissed: true,
 				},
+				activeGeneralSidebar: null,
+			};
+
+			expect( isEditorSidebarOpened( state ) ).toBe( false );
+		} );
+
+		it( 'should return false when the editor sidebar is assigned but not opened', () => {
+			const state = {
+				preferences: {
+					isGeneralSidebarDismissed: true,
+				},
+				activeGeneralSidebar: 'edit-post/document',
 			};
 
 			expect( isEditorSidebarOpened( state ) ).toBe( false );
@@ -75,8 +88,9 @@ describe( 'selectors', () => {
 		it( 'should return false when the plugin sidebar is opened', () => {
 			const state = {
 				preferences: {
-					activeGeneralSidebar: 'my-plugin/my-sidebar',
+					isGeneralSidebarDismissed: false,
 				},
+				activeGeneralSidebar: 'my-plugin/my-sidebar',
 			};
 
 			expect( isEditorSidebarOpened( state ) ).toBe( false );
@@ -85,8 +99,9 @@ describe( 'selectors', () => {
 		it( 'should return true when the editor sidebar is opened', () => {
 			const state = {
 				preferences: {
-					activeGeneralSidebar: 'edit-post/document',
+					isGeneralSidebarDismissed: false,
 				},
+				activeGeneralSidebar: 'edit-post/document',
 			};
 
 			expect( isEditorSidebarOpened( state ) ).toBe( true );
@@ -97,8 +112,9 @@ describe( 'selectors', () => {
 		it( 'should return false when the plugin sidebar is not opened', () => {
 			const state = {
 				preferences: {
-					activeGeneralSidebar: null,
+					isGeneralSidebarDismissed: true,
 				},
+				activeGeneralSidebar: null,
 			};
 
 			expect( isPluginSidebarOpened( state ) ).toBe( false );
@@ -107,8 +123,9 @@ describe( 'selectors', () => {
 		it( 'should return false when the editor sidebar is opened', () => {
 			const state = {
 				preferences: {
-					activeGeneralSidebar: 'edit-post/document',
+					isGeneralSidebarDismissed: false,
 				},
+				activeGeneralSidebar: 'edit-post/document',
 			};
 
 			expect( isPluginSidebarOpened( state ) ).toBe( false );
@@ -118,11 +135,47 @@ describe( 'selectors', () => {
 			const name = 'plugin-sidebar/my-plugin/my-sidebar';
 			const state = {
 				preferences: {
-					activeGeneralSidebar: name,
+					isGeneralSidebarDismissed: false,
 				},
+				activeGeneralSidebar: name,
 			};
 
 			expect( isPluginSidebarOpened( state ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'getActiveGeneralSidebarName', () => {
+		it( 'returns null if dismissed', () => {
+			const state = {
+				preferences: {
+					isGeneralSidebarDismissed: true,
+				},
+				activeGeneralSidebar: 'edit-post/block',
+			};
+
+			expect( getActiveGeneralSidebarName( state ) ).toBe( null );
+		} );
+
+		it( 'returns active general sidebar', () => {
+			const state = {
+				preferences: {
+					isGeneralSidebarDismissed: false,
+				},
+				activeGeneralSidebar: 'edit-post/block',
+			};
+
+			expect( getActiveGeneralSidebarName( state ) ).toBe( 'edit-post/block' );
+		} );
+
+		it( 'returns default value when no active general sidebar assigned', () => {
+			const state = {
+				preferences: {
+					isGeneralSidebarDismissed: false,
+				},
+				activeGeneralSidebar: null,
+			};
+
+			expect( getActiveGeneralSidebarName( state ) ).toBe( 'edit-post/document' );
 		} );
 	} );
 
