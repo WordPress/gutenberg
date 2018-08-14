@@ -32,18 +32,17 @@ type PropsType = BlockListType;
 type StateType = {
 	dataSource: DataSource,
 	showHtml: boolean,
-	html: string,
 };
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
 	_recycler = null;
+	_htmlTextInput: TextInput = null;
 
 	constructor( props: PropsType ) {
 		super( props );
 		this.state = {
 			dataSource: new DataSource( this.props.blocks, ( item: BlockType ) => item.clientId ),
 			showHtml: false,
-			html: '',
 		};
 	}
 
@@ -99,9 +98,8 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			}, '' );
 	}
 
-	parseHTML() {
+	parseHTML( html: string ) {
 		const { parseBlocksAction } = this.props;
-		const { html } = this.state;
 		parseBlocksAction( html );
 	}
 
@@ -168,18 +166,12 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	handleSwitchEditor = ( showHtml: boolean ) => {
-		if ( showHtml ) {
-			const html = this.serializeToHtml();
-			this.handleHTMLUpdate( html );
-		} else {
-			this.parseHTML();
+		if ( ! showHtml ) {
+			const html = this._htmlTextInput._lastNativeText;
+			this.parseHTML( html );
 		}
 
 		this.setState( { showHtml } );
-	}
-
-	handleHTMLUpdate = ( html: string ) => {
-		this.setState( { html } );
 	}
 
 	renderItem( value: { item: BlockType, clientId: string } ) {
@@ -198,16 +190,15 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 	renderHTML() {
 		const behavior = Platform.OS === 'ios' ? 'padding' : null;
+		const htmlInputRef = ( el ) => this._htmlTextInput = el;
 		return (
 			<KeyboardAvoidingView style={ { flex: 1 } } behavior={ behavior }>
 				<TextInput
 					multiline
+					ref={ htmlInputRef }
 					numberOfLines={ 0 }
 					style={ styles.htmlView }
-					value={ this.state.html }
-					onChangeText={ this.handleHTMLUpdate }>
-
-				</TextInput>
+					value={ this.serializeToHtml() } />
 			</KeyboardAvoidingView>
 		);
 	}
