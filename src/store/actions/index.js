@@ -18,22 +18,22 @@ export function updateBlockAttributes( clientId: string, attributes: mixed ) {
 	};
 }
 
-export const focusBlockAction: BlockActionType = clientId => ( {
+export const focusBlockAction: BlockActionType = ( clientId ) => ( {
 	type: ActionTypes.BLOCK.FOCUS,
 	clientId,
 } );
 
-export const moveBlockUpAction: BlockActionType = clientId => ( {
+export const moveBlockUpAction: BlockActionType = ( clientId ) => ( {
 	type: ActionTypes.BLOCK.MOVE_UP,
 	clientId,
 } );
 
-export const moveBlockDownAction: BlockActionType = clientId => ( {
+export const moveBlockDownAction: BlockActionType = ( clientId ) => ( {
 	type: ActionTypes.BLOCK.MOVE_DOWN,
 	clientId,
 } );
 
-export const deleteBlockAction: BlockActionType = clientId => ( {
+export const deleteBlockAction: BlockActionType = ( clientId ) => ( {
 	type: ActionTypes.BLOCK.DELETE,
 	clientId,
 } );

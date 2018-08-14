@@ -1,4 +1,5 @@
-/** @format */
+/** @flow
+ * @format */
 
 const defaultPlatform = 'android';
 const rnPlatform = process.env.TEST_RN_PLATFORM || defaultPlatform;
@@ -30,7 +31,7 @@ module.exports = {
 		'node',
 	],
 	moduleNameMapper: {
-		'@wordpress\\/(blocks|data|element|deprecated|editor|redux-routine)$': '<rootDir>/gutenberg/packages/$1/src/index',
+		'@wordpress\\/(blocks|data|element|deprecated|editor|redux-routine|block-library)$': '<rootDir>/gutenberg/packages/$1/src/index',
 		'@gutenberg': '<rootDir>/gutenberg',
 
 		// Mock the CSS modules. See https://facebook.github.io/jest/docs/en/webpack.html#handling-static-assets
