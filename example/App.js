@@ -1,46 +1,71 @@
 import React, { Component } from 'react';
-import {AppRegistry, StyleSheet, View, FlatList, KeyboardAvoidingView, SafeAreaView, Platform} from 'react-native';
+import {AppRegistry, StyleSheet, TextInput, FlatList, KeyboardAvoidingView, SafeAreaView, Platform} from 'react-native';
 import {example_content} from './content';
 import RCTAztecView from 'react-native-aztec'
 
-const _minHeight = 300;
+const _minHeight = 100;
+
+const sampleContent = example_content();
+
+const elements = [
+                {key: '1', text: sampleContent, height: _minHeight},
+                {key: '2', text: sampleContent, height: _minHeight},
+                {key: '3', text: sampleContent, height: _minHeight},
+                {key: '4', text: sampleContent, height: _minHeight},
+                {key: '5', text: sampleContent, height: _minHeight},
+                {key: '6', text: sampleContent, height: _minHeight},
+              ]   
 
 export default class example extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {isShowingText: true, height: _minHeight, text: example_content()};
-        console.log("a ver que tiene" + JSON.stringify(this.state));
+        this.renderItem = this.renderItem.bind(this)
+        this.renderItemAsTextInput = this.renderItemAsTextInput.bind(this)
+        this.state = {isShowingText: true, data: elements};                
     }
     
-    render() {
-        let myMinHeight = Math.max(_minHeight, this.state.height);        
+    renderItem( { item } ) {
+      let myMinHeight = Math.max(_minHeight, item.height);
+      const key = item.key;
+      return (<RCTAztecView                
+                style={[styles.aztec_editor, {minHeight: myMinHeight}]}
+                text = { { text: item.text } } 
+                placeholder = {'This is the placeholder text'}
+                placeholderTextColor = {'lightgray'} // See http://facebook.github.io/react-native/docs/colors                
+                onContentSizeChange= {(event) => {                    
+                    let newHeight = event.nativeEvent.contentSize.height                    
+                    const newElements = this.state.data.map( searchItem => {
+                      if (searchItem.key == key) {
+                        return {...searchItem, height: newHeight};
+                      } else {
+                        return searchItem;
+                      }
+                    })
+                    this.setState( { data: newElements})                    
+                }}
+                onChange= {(event) => console.log(event.nativeEvent) }
+                onEndEditing= {(event) => console.log(event.nativeEvent) }
+                color = {'black'}
+                maxImagesWidth = {200} 
+              />
+            )
+    }
+
+    renderItemAsTextInput( { item } ) {      
+      return (<TextInput
+                multiline = { true }
+                value = { item.text }
+              />
+            )
+    }
+
+    render() { 
+        const data = this.state.data;      
         const mainContent =  (          
             <KeyboardAvoidingView style={styles.container} behavior="padding">
-              <FlatList
-                    data={[
-                      {key: 'Stefanos'},
-                      {key: 'Mario'},
-                      {key: 'Danilo'},
-                      {key: 'Maxime'},
-                      {key: 'Koke'},
-                      {key: 'Ondrej'},
-                      {key: 'Cate'},
-                    ]}
-                    renderItem={({item}) =>
-                    <RCTAztecView
-                         {...this.props}
-                         style={[styles.aztec_editor, {minHeight: myMinHeight}]}
-                         text = {{text: example_content()}}
-                         placeholder = {'This is the placeholder text'}
-                         placeholderTextColor = {'darkblue'} // See http://facebook.github.io/react-native/docs/colors
-                         onContentSizeChange= {(event) => {
-                              this.setState({height: event.nativeEvent.contentSize.height});
-                          }}
-                         onChange= {(event) => console.log(event.nativeEvent) }
-                         onEndEditing= {(event) => console.log(event.nativeEvent) }
-                         color = {'black'}
-                         maxImagesWidth = {200} />
-                    }
+              <FlatList                    
+                    data={ data }
+                    renderItem={ this.renderItem }
                   />
             </KeyboardAvoidingView>          
         );
