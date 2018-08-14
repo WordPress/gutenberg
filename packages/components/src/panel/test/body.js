@@ -7,6 +7,7 @@ import { shallow, mount } from 'enzyme';
  * Internal dependencies
  */
 import PanelBody from '../body';
+import { addFilter } from '@wordpress/hooks';
 
 jest.mock( '../../button' );
 
@@ -55,6 +56,13 @@ describe( 'PanelBody', () => {
 			expect( panelBody.instance().props.children ).toBe( 'Some Text' );
 			// Text should be empty even though props.children is set.
 			expect( panelBody.text() ).toBe( '' );
+		} );
+
+		it( 'should obey filter for the panel title', () => {
+			addFilter( 'components.panel.body.title', 'test', () => 'Filtered Title' );
+			const panelBody = shallow( <PanelBody title="Some Text" children="Child Text" /> );
+			const button = panelBody.find( 'Button' );
+			expect( button.childAt( 1 ).text() ).toBe( 'Filtered Title' );
 		} );
 	} );
 

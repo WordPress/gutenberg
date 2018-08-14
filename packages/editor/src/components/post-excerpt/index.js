@@ -7,7 +7,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { applyFilters } from '@wordpress/hooks';
 
-function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
+export function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
 	return (
 		<div className="editor-post-excerpt">
 			<TextareaControl
