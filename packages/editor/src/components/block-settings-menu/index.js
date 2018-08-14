@@ -283,13 +283,19 @@ export default compose( [
 				}
 			},
 			onRemove() {
-				removeBlocks( clientIds );
+				if ( ! isLocked ) {
+					removeBlocks( clientIds );
+				}
 			},
 			onInsertBefore() {
-				insertDefaultBlock( {}, rootClientId, firstSelectedIndex );
+				if ( ! isLocked ) {
+					insertDefaultBlock( {}, rootClientId, firstSelectedIndex );
+				}
 			},
 			onInsertAfter() {
-				insertDefaultBlock( {}, rootClientId, lastSelectedIndex + 1 );
+				if ( ! isLocked ) {
+					insertDefaultBlock( {}, rootClientId, lastSelectedIndex + 1 );
+				}
 			},
 			onSelect( clientId ) {
 				selectBlock( clientId );
