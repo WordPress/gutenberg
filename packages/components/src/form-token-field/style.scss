@@ -32,8 +32,7 @@
 		max-width: 100%;
 		margin: 2px 0 2px 8px;
 		padding: 0;
-		line-height: 24px;
-		height: 24px;
+		min-height: 24px;
 		background: inherit;
 		border: 0;
 		font-size: $default-font-size;
