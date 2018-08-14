@@ -362,7 +362,7 @@
 	{
 		"title": "@wordpress/edit-post",
 		"slug": "packages-edit-post",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/edit-post/README.md",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/edit-post/README.md",
 		"parent": "packages"
 	},
 	{
