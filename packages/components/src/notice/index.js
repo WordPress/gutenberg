@@ -7,8 +7,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import Dashicon from '../dashicon';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import IconButton from '../icon-button';
 
 function Notice( { className, status, children, onRemove = noop, isDismissible = true } ) {
 	const classNames = classnames( className, 'components-notice', {
@@ -20,10 +24,13 @@ function Notice( { className, status, children, onRemove = noop, isDismissible =
 		<div className={ classNames }>
 			{ isString( children ) ? <div className="components-notice__content">{ children }</div> : children }
 			{ isDismissible && (
-				<button className="components-notice__dismiss" type="button" onClick={ onRemove }>
-					<Dashicon icon="no" />
-					<span className="screen-reader-text">{ __( 'Dismiss this notice' ) }</span>
-				</button>
+				<IconButton
+					className="components-notice__dismiss"
+					icon="no"
+					label={ __( 'Dismiss this notice' ) }
+					onClick={ onRemove }
+					tooltip={ false }
+				/>
 			) }
 		</div>
 	);

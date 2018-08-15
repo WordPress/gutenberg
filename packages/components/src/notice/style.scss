@@ -5,7 +5,7 @@
 	padding: 8px 12px;
 
 	&.is-dismissible {
-		padding-right: 38px;
+		padding-right: 36px;
 		position: relative;
 	}
 
@@ -34,20 +34,17 @@
 	position: absolute;
 	top: 0;
 	right: 0;
-	border: none;
-	margin: 0;
-	padding: 9px;
-	background: none;
-	cursor: pointer;
 	color: $dark-gray-300;
 
-	&:hover {
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover,
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):active,
+	&:not(:disabled):not([aria-disabled="true"]):focus {
 		color: $alert-red;
+		background-color: transparent;
 	}
 
-	&:focus {
-		outline: none;
-		box-shadow: 0 0 0 1px $blue-medium-400, 0 0 2px 1px $blue-medium-focus;
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+		box-shadow: none;
 	}
 }
 
