@@ -3,7 +3,7 @@
  */
 import { flow } from 'lodash';
 import postcss from 'postcss';
-import wrap from 'postcss-wrap';
+import wrap from 'postcss-prefixwrap';
 
 /**
  * WordPress Dependencies
@@ -32,7 +32,7 @@ class EditorProvider extends Component {
 		if ( ! this.props.settings.styles ) {
 			return;
 		}
-		postcss( [ wrap( { selector: '.editor-block-list__block' } ) ] )
+		postcss( [ wrap( '.editor-block-list__block' ) ] )
 			.process( this.props.settings.styles )
 			.then( ( css ) => {
 				const node = document.createElement( 'style' );
