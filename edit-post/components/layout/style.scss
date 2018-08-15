@@ -117,15 +117,16 @@
 }
 
 .edit-post-toggle-publish-panel {
-	display: block;
-	position: relative;
-	float: right;
-	top: -9999em;
+	position: absolute;
+	bottom: 0;
+	right: 0;
 	z-index: z-index(".edit-post-toggle-publish-panel");
-	padding: 20px 0 0 0;
 	width: $sidebar-width;
+	height: 0;
+	overflow: hidden;
 	&:focus-within {
-		top: 0;
+		height: auto;
+		padding: 20px 0 0 0;
 	}
 
 	.edit-post-toggle-publish-panel__button {
