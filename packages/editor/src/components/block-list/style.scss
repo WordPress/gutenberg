@@ -784,10 +784,12 @@
 		// Matches the whole empty space between two blocks.
 		height: $block-padding * 2;
 		bottom: auto;
+
+		// Go edge to edge on mobile.
 		left: 0;
 		right: 0;
 
-		// Stack with block borders beyond mobile.
+		// Beyond mobile, make sure the toolbar overlaps the hover style.
 		@include break-small() {
 			left: -$border-width;
 			right: -$border-width;
