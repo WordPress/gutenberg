@@ -2,7 +2,7 @@
 	background-color: $blue-medium-100;
 	border-left: 4px solid $blue-medium-500;
 	margin: 5px 15px 2px;
-	padding: 1px 12px;
+	padding: 8px 12px;
 
 	&.is-dismissible {
 		padding-right: 38px;
@@ -26,8 +26,6 @@
 }
 
 .components-notice__content {
-	margin: 0.5em 0;
-	padding: 2px;
 	font-size: 13px;
 	line-height: 1.5;
 }
@@ -35,14 +33,18 @@
 .components-notice__dismiss {
 	position: absolute;
 	top: 0;
-	right: 1px;
+	right: 0;
 	border: none;
 	margin: 0;
-	padding: 9px;
+	padding: 0;
 	background: none;
 	cursor: pointer;
 	color: $dark-gray-300;
 	height: 100%;
+	width: 38px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 
 	&:hover {
 		color: $alert-red;
