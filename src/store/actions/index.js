@@ -10,6 +10,11 @@ export type BlockActionType = string => {
 	clientId: string,
 };
 
+export type ParseActionType = string => {
+	type: $Values<typeof ActionTypes.BLOCK>,
+	html: string,
+};
+
 export function updateBlockAttributes( clientId: string, attributes: mixed ) {
 	return {
 		type: ActionTypes.BLOCK.UPDATE_ATTRIBUTES,
@@ -36,4 +41,9 @@ export const moveBlockDownAction: BlockActionType = clientId => ( {
 export const deleteBlockAction: BlockActionType = clientId => ( {
 	type: ActionTypes.BLOCK.DELETE,
 	clientId,
+} );
+
+export const parseBlocksAction: ParseActionType = html => ( {
+	type: ActionTypes.BLOCK.PARSE,
+	html,
 } );
