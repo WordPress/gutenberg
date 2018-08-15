@@ -124,7 +124,9 @@ export class RichText extends Component {
 			style,
 			eventCount,
 			formattingControls,
-			formatters
+			formatters,
+			isSelected,
+			inlineToolbar = true,
 		} = this.props;
 
 		const formatToolbar = (
