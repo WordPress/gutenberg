@@ -17,6 +17,13 @@ function render_block_core_block( $attributes ) {
 		return '';
 	}
 
+	/**
+	 * Filter to allow plugins to override the reusable block id.
+	 *
+	 * @since 3.5.0
+	 *
+	 * @param int $block_id     The id of the reusable block
+	 */
 	$reusable_block_id = apply_filters( 'gutenberg_reusable_block_id', $attributes['ref'] );
 	$reusable_block    = get_post( $reusable_block_id );
 	if ( ! $reusable_block || 'wp_block' !== $reusable_block->post_type ) {
