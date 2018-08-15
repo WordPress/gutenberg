@@ -16,12 +16,13 @@ export function PublishButtonLabel( {
 	isSaving,
 	isPublishing,
 	hasPublishAction,
+	isAutosaving,
 } ) {
 	if ( isPublishing ) {
 		return __( 'Publishing…' );
-	} else if ( isPublished && isSaving ) {
+	} else if ( isPublished && isSaving && ! isAutosaving ) {
 		return __( 'Updating…' );
-	} else if ( isBeingScheduled && isSaving ) {
+	} else if ( isBeingScheduled && isSaving && ! isAutosaving ) {
 		return __( 'Scheduling…' );
 	}
 
@@ -45,6 +46,7 @@ export default compose( [
 			isPublishingPost,
 			getCurrentPost,
 			getCurrentPostType,
+			isAutosavingPost,
 		} = select( 'core/editor' );
 		return {
 			isPublished: isCurrentPostPublished(),
@@ -53,6 +55,7 @@ export default compose( [
 			isPublishing: isPublishingPost(),
 			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
 			postType: getCurrentPostType(),
+			isAutosaving: isAutosavingPost(),
 		};
 	} ),
 ] )( PublishButtonLabel );
