@@ -148,6 +148,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		const dataSource = this.state.dataSource;
 		const block = dataSource.get( index );
 		block.attributes = attributes;
+		dataSource.set( index, block );
 		// Update Redux store
 		this.props.onChange( clientId, attributes );
 	}
