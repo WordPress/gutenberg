@@ -61,6 +61,17 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		return -1;
 	}
 
+	static getDerivedStateFromProps( props: PropsType, state: StateType ) {
+		if ( props.fullparse === true ) {
+			return {
+				...state,
+				dataSource: new DataSource( props.blocks, ( item: BlockType ) => item.clientId ),
+			};
+		}
+		// no state change necessary
+		return null;
+	}
+
 	onToolbarButtonPressed( button: number, clientId: string ) {
 		const dataSourceBlockIndex = this.getDataSourceIndexFromUid( clientId );
 		switch ( button ) {
@@ -115,7 +126,8 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		const index = this.getDataSourceIndexFromUid( clientId );
 		const dataSource = this.state.dataSource;
 		const block = dataSource.get( this.getDataSourceIndexFromUid( clientId ) );
-		dataSource.set( index, { ...block, attributes: attributes } );
+		block.attributes = attributes;
+		dataSource.set( index, block );
 		// Update Redux store
 		this.props.onChange( clientId, attributes );
 	}
