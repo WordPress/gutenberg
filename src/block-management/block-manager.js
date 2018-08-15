@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Platform, Switch, Text, View, FlatList } from 'react-native';
+import { Platform, Switch, Text, View, FlatList, TextInput, KeyboardAvoidingView } from 'react-native';
 import RecyclerViewList, { DataSource } from 'react-native-recyclerview-list';
 import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
@@ -22,6 +22,7 @@ export type BlockListType = {
 	moveBlockUpAction: string => mixed,
 	moveBlockDownAction: string => mixed,
 	deleteBlockAction: string => mixed,
+	parseBlocksAction: string => mixed,
 	blocks: Array<BlockType>,
 	aztechtml: string,
 	refresh: boolean,
@@ -31,6 +32,7 @@ type PropsType = BlockListType;
 type StateType = {
 	dataSource: DataSource,
 	showHtml: boolean,
+	html: string,
 };
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
@@ -41,6 +43,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		this.state = {
 			dataSource: new DataSource( this.props.blocks, ( item: BlockType ) => item.clientId ),
 			showHtml: false,
+			html: '',
 		};
 	}
 
@@ -56,6 +59,17 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			}
 		}
 		return -1;
+	}
+
+	static getDerivedStateFromProps( props: PropsType, state: StateType ) {
+		if ( props.fullparse === true ) {
+			return {
+				...state,
+				dataSource: new DataSource( props.blocks, ( item: BlockType ) => item.clientId ),
+			};
+		}
+		// no state change necessary
+		return null;
 	}
 
 	onToolbarButtonPressed( button: number, clientId: string ) {
@@ -96,6 +110,12 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			}, '' );
 	}
 
+	parseHTML() {
+		const { parseBlocksAction } = this.props;
+		const { html } = this.state;
+		parseBlocksAction( html );
+	}
+
 	componentDidUpdate() {
 		// List has been updated, tell the recycler view to update the view
 		this.state.dataSource.setDirty();
@@ -106,7 +126,8 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		const index = this.getDataSourceIndexFromUid( clientId );
 		const dataSource = this.state.dataSource;
 		const block = dataSource.get( this.getDataSourceIndexFromUid( clientId ) );
-		dataSource.set( index, { ...block, attributes: attributes } );
+		block.attributes = attributes;
+		dataSource.set( index, block );
 		// Update Redux store
 		this.props.onChange( clientId, attributes );
 	}
@@ -149,13 +170,28 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 						activeText={ 'On' }
 						inActiveText={ 'Off' }
 						value={ this.state.showHtml }
-						onValueChange={ ( value ) => this.setState( { showHtml: value } ) }
+						onValueChange={ this.handleSwitchEditor }
 					/>
 				</View>
-				{ this.state.showHtml && <Text style={ styles.htmlView }>{ this.serializeToHtml() }</Text> }
+				{ this.state.showHtml && this.renderHTML() }
 				{ ! this.state.showHtml && list }
 			</View>
 		);
+	}
+
+	handleSwitchEditor = ( showHtml: boolean ) => {
+		if ( showHtml ) {
+			const html = this.serializeToHtml();
+			this.handleHTMLUpdate( html );
+		} else {
+			this.parseHTML();
+		}
+
+		this.setState( { showHtml } );
+	}
+
+	handleHTMLUpdate = ( html: string ) => {
+		this.setState( { html } );
 	}
 
 	renderItem( value: { item: BlockType, clientId: string } ) {
@@ -169,6 +205,22 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				clientId={ value.clientId }
 				{ ...value.item }
 			/>
+		);
+	}
+
+	renderHTML() {
+		const behavior = Platform.OS === 'ios' ? 'padding' : null;
+		return (
+			<KeyboardAvoidingView style={ { flex: 1 } } behavior={ behavior }>
+				<TextInput
+					multiline
+					numberOfLines={ 0 }
+					style={ styles.htmlView }
+					value={ this.state.html }
+					onChangeText={ this.handleHTMLUpdate }>
+
+				</TextInput>
+			</KeyboardAvoidingView>
 		);
 	}
 }
