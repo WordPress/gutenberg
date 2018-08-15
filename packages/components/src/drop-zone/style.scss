@@ -18,10 +18,13 @@
 	}
 
 	&.is-dragging-over-element {
-		background-color: rgba($blue-dark-900, 0.8);
 
 		.components-drop-zone__content {
 			display: block;
+		}
+
+		&.is-dragging-file {
+			background-color: rgba($blue-dark-900, 0.8);
 		}
 	}
 }
