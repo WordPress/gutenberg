@@ -70,9 +70,10 @@
 	text-overflow: ellipsis;
 }
 
-.editor-post-permalink-editor__edit {
+.editor-post-permalink input[type="text"].editor-post-permalink-editor__edit {
 	min-width: 20%;
-	margin: 0 5px;
+	margin: 0 3px;
+	padding: 2px 4px;
 }
 
 .editor-post-permalink-editor__suffix {
