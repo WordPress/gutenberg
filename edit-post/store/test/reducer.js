@@ -7,6 +7,7 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import {
+	DEFAULT_ACTIVE_GENERAL_SIDEBAR,
 	preferences,
 	activeGeneralSidebar,
 	activeModal,
@@ -124,6 +125,12 @@ describe( 'state', () => {
 	} );
 
 	describe( 'activeGeneralSidebar', () => {
+		it( 'should default to the default active sidebar', () => {
+			const state = activeGeneralSidebar( undefined, {} );
+
+			expect( state ).toBe( DEFAULT_ACTIVE_GENERAL_SIDEBAR );
+		} );
+
 		it( 'should set the general sidebar', () => {
 			const original = activeGeneralSidebar( undefined, {} );
 			const state = activeGeneralSidebar( original, {
@@ -132,31 +139,6 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toBe( 'edit-post/document' );
-		} );
-
-		it( 'should does not update if sidebar is already set to value', () => {
-			const original = activeGeneralSidebar( undefined, {
-				type: 'OPEN_GENERAL_SIDEBAR',
-				name: 'edit-post/document',
-			} );
-			const state = activeGeneralSidebar( original, {
-				type: 'OPEN_GENERAL_SIDEBAR',
-				name: 'edit-post/document',
-			} );
-
-			expect( original ).toBe( state );
-		} );
-
-		it( 'should unset the general sidebar', () => {
-			const original = activeGeneralSidebar( undefined, {
-				type: 'OPEN_GENERAL_SIDEBAR',
-				name: 'edit-post/document',
-			} );
-			const state = activeGeneralSidebar( original, {
-				type: 'CLOSE_GENERAL_SIDEBAR',
-			} );
-
-			expect( state ).toBe( null );
 		} );
 	} );
 

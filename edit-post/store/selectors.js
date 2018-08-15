@@ -60,14 +60,7 @@ export function getActiveGeneralSidebarName( state ) {
 		return null;
 	}
 
-	// If not dismissed and an active sidebar is assigned, used.
-	const { activeGeneralSidebar } = state;
-	if ( activeGeneralSidebar !== null ) {
-		return activeGeneralSidebar;
-	}
-
-	// Default to Document tab.
-	return 'edit-post/document';
+	return state.activeGeneralSidebar;
 }
 
 /**

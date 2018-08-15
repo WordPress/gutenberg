@@ -166,17 +166,6 @@ describe( 'selectors', () => {
 
 			expect( getActiveGeneralSidebarName( state ) ).toBe( 'edit-post/block' );
 		} );
-
-		it( 'returns default value when no active general sidebar assigned', () => {
-			const state = {
-				preferences: {
-					isGeneralSidebarDismissed: false,
-				},
-				activeGeneralSidebar: null,
-			};
-
-			expect( getActiveGeneralSidebarName( state ) ).toBe( 'edit-post/document' );
-		} );
 	} );
 
 	describe( 'isModalActive', () => {

@@ -14,6 +14,13 @@ import { combineReducers } from '@wordpress/data';
 import { PREFERENCES_DEFAULTS } from './defaults';
 
 /**
+ * The default active general sidebar: The "Document" tab.
+ *
+ * @type {string}
+ */
+export const DEFAULT_ACTIVE_GENERAL_SIDEBAR = 'edit-post/document';
+
+/**
  * Reducer returning the user preferences.
  *
  * @param {Object}  state                           Current state.
@@ -89,13 +96,10 @@ export const preferences = combineReducers( {
  *
  * @return {?string} Updated state.
  */
-export function activeGeneralSidebar( state = null, action ) {
+export function activeGeneralSidebar( state = DEFAULT_ACTIVE_GENERAL_SIDEBAR, action ) {
 	switch ( action.type ) {
 		case 'OPEN_GENERAL_SIDEBAR':
 			return action.name;
-
-		case 'CLOSE_GENERAL_SIDEBAR':
-			return null;
 	}
 
 	return state;
