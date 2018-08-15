@@ -41,10 +41,8 @@
 	cursor: pointer;
 	color: $dark-gray-300;
 	height: 100%;
+	line-height: 100%;
 	width: 38px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
 
 	&:hover {
 		color: $alert-red;
