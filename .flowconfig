@@ -87,6 +87,7 @@ module.name_mapper='^[./a-zA-Z0-9$_-]+\.\(bmp\|gif\|jpg\|jpeg\|png\|psd\|svg\|we
 module.name_mapper='@gutenberg' -> '<PROJECT_ROOT>/gutenberg'
 module.name_mapper='@wordpress/blocks' -> '<PROJECT_ROOT>/gutenberg/packages/blocks/src'
 module.name_mapper='@wordpress/element' -> '<PROJECT_ROOT>/gutenberg/packages/element/src'
+module.name_mapper='@wordpress/components' -> '<PROJECT_ROOT>/gutenberg/packages/components/src'
 
 ; mock/ignore style files
 module.name_mapper='.*\(.scss\)' -> 'empty/object'
