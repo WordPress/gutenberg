@@ -99,11 +99,10 @@ const IS_PLACEHOLDER_VISIBLE_ATTR_NAME = 'data-is-placeholder-visible';
 export default class TinyMCE extends Component {
 	constructor() {
 		super();
-		this.bindEditorNode = this.bindEditorNode.bind( this );
-	}
 
-	componentDidMount() {
-		this.initialize();
+		this.bindEditorNode = this.bindEditorNode.bind( this );
+		this.initialize = this.initialize.bind( this );
+		this.destroy = this.destroy.bind( this );
 	}
 
 	shouldComponentUpdate() {
@@ -134,12 +133,20 @@ export default class TinyMCE extends Component {
 	}
 
 	componentWillUnmount() {
+		this.destroy( false );
+	}
+
+	destroy( isReset = true ) {
 		if ( ! this.editor ) {
 			return;
 		}
 
 		this.editor.destroy();
 		delete this.editor;
+
+		if ( isReset ) {
+			this.editorNode.contentEditable = 'true';
+		}
 	}
 
 	configureIsPlaceholderVisible( isPlaceholderVisible ) {
@@ -150,6 +157,10 @@ export default class TinyMCE extends Component {
 	}
 
 	initialize() {
+		if ( this.editor ) {
+			return;
+		}
+
 		const settings = this.props.getSettings( {
 			theme: false,
 			inline: true,
@@ -172,6 +183,22 @@ export default class TinyMCE extends Component {
 			setup: ( editor ) => {
 				this.editor = editor;
 				this.props.onSetup( editor );
+
+				// TinyMCE resets the element content on initialization, even
+				// when it's already identical to what exists currently. This
+				// behavior clobbers a selection which exists at the time of
+				// initialization, thus breaking writing flow navigation. The
+				// hack here neutralizes setHTML during initialization.
+
+				let setHTML;
+				editor.on( 'PreInit', () => {
+					setHTML = editor.dom.setHTML;
+					editor.dom.setHTML = () => {};
+				} );
+
+				editor.on( 'Init', () => {
+					editor.dom.setHTML = setHTML;
+				} );
 			},
 		} );
 	}
@@ -217,6 +244,8 @@ export default class TinyMCE extends Component {
 			contentEditable: true,
 			[ IS_PLACEHOLDER_VISIBLE_ATTR_NAME ]: isPlaceholderVisible,
 			ref: this.bindEditorNode,
+			onFocus: this.initialize,
+			onBlur: this.destroy,
 			style,
 			suppressContentEditableWarning: true,
 			dangerouslySetInnerHTML: { __html: valueToString( defaultValue, format ) },
