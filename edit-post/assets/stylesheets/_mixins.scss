@@ -214,11 +214,13 @@
 }
 
 @mixin block-style__hover {
-	box-shadow: inset 0 0 0 1px rgba($dark-gray-900, 0.2), 0 1px 3px rgba($dark-gray-900, 0.4);
+	background: $light-gray-100;
+	color: $dark-gray-900;
 }
 
 @mixin block-style__focus-active() {
-	box-shadow: inset 0 0 0 1px $dark-gray-300;
+	color: $dark-gray-900;
+	box-shadow: 0 0 0 2px $blue-medium-500;
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
