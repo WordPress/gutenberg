@@ -4,19 +4,12 @@ exports[`Notice should match snapshot 1`] = `
 <div
   className="components-notice is-example is-dismissible"
 >
-  <button
+  <IconButton
     className="components-notice__dismiss"
+    icon="no"
+    label="Dismiss this notice"
     onClick={[Function]}
-    type="button"
-  >
-    <Dashicon
-      icon="no"
-    />
-    <span
-      className="screen-reader-text"
-    >
-      Dismiss this notice
-    </span>
-  </button>
+    tooltip={false}
+  />
 </div>
 `;
