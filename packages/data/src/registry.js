@@ -104,13 +104,8 @@ export function toAsyncIterable( object ) {
 			object = [ object ];
 		}
 
-		for ( let maybeAction of object ) {
-			// ...of Promises.
-			if ( ! ( maybeAction instanceof Promise ) ) {
-				maybeAction = Promise.resolve( maybeAction );
-			}
-
-			yield await maybeAction;
+		for ( const maybeAction of object ) {
+			yield maybeAction;
 		}
 	}() );
 }
