@@ -7,11 +7,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { withContext } from '@wordpress/components';
 import { withViewportMatch } from '@wordpress/viewport';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { synchronizeBlocksWithTemplate } from '@wordpress/blocks';
+import { synchronizeBlocksWithTemplate, withBlockContentContext } from '@wordpress/blocks';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { compose } from '@wordpress/compose';
 
@@ -149,10 +148,8 @@ InnerBlocks = compose( [
 	} ),
 ] )( InnerBlocks );
 
-InnerBlocks.Content = ( { BlockContent } ) => {
-	return <BlockContent />;
-};
-
-InnerBlocks.Content = withContext( 'BlockContent' )()( InnerBlocks.Content );
+InnerBlocks.Content = withBlockContentContext(
+	( { BlockContent } ) => <BlockContent />
+);
 
 export default InnerBlocks;

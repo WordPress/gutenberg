@@ -2,6 +2,7 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 
 ## 3.8.0
 
+ - `wp.components.withContext` has been removed. Please use `wp.element.createContext` instead. See: https://reactjs.org/docs/context.html.
  - `wp.coreBlocks.registerCoreBlocks` has been removed. Please use `wp.blockLibrary.registerCoreBlocks` instead.
 
 ## 3.7.0

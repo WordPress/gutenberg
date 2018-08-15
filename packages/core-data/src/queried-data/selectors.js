@@ -28,6 +28,7 @@ const queriedItemsCacheByState = new WeakMap();
  */
 function getQueriedItemsUncached( state, query ) {
 	const { stableKey, page, perPage } = getQueryParts( query );
+
 	if ( ! state.queries[ stableKey ] ) {
 		return null;
 	}
@@ -37,8 +38,8 @@ function getQueriedItemsUncached( state, query ) {
 		return null;
 	}
 
-	const startOffset = ( page - 1 ) * perPage;
-	const endOffset = Math.min(
+	const startOffset = perPage === -1 ? 0 : ( page - 1 ) * perPage;
+	const endOffset = perPage === -1 ? itemIds.length : Math.min(
 		startOffset + perPage,
 		itemIds.length
 	);

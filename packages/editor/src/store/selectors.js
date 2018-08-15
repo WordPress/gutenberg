@@ -3,6 +3,7 @@
  */
 import {
 	castArray,
+	flatMap,
 	find,
 	first,
 	get,
@@ -108,6 +109,11 @@ export function isEditedPostDirty( state ) {
  * @return {boolean} Whether new post and unsaved values exist.
  */
 export function isCleanNewPost( state ) {
+	deprecated( 'isCleanNewPost selector', {
+		version: '3.8',
+		plugin: 'Gutenberg',
+	} );
+
 	return ! isEditedPostDirty( state ) && isEditedPostNew( state );
 }
 
@@ -436,11 +442,17 @@ export function isEditedPostBeingScheduled( state ) {
  * @return {string} Document title.
  */
 export function getDocumentTitle( state ) {
+	deprecated( 'getDocumentTitle selector', {
+		version: '3.8',
+		plugin: 'Gutenberg',
+	} );
+
 	let title = getEditedPostAttribute( state, 'title' );
 
 	if ( ! title || ! title.trim() ) {
 		title = isCleanNewPost( state ) ? __( 'New post' ) : __( '(Untitled)' );
 	}
+
 	return title;
 }
 
@@ -561,6 +573,28 @@ export const getBlocks = createSelector(
 	( state ) => [
 		state.editor.present.blockOrder,
 		state.editor.present.blocksByClientId,
+	]
+);
+
+/**
+ * Returns an array containing the clientIds of the top-level blocks
+ * and their descendants of any depth (for nested blocks).
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Array} ids of top-level and descendant blocks.
+ */
+export const getClientIdsWithDescendants = createSelector(
+	( state ) => {
+		const getDescendants = ( clientIds ) => flatMap( clientIds, ( clientId ) => {
+			const descendants = getBlockOrder( state, clientId );
+			return [ ...descendants, ...getDescendants( descendants ) ];
+		} );
+		const topLevelIds = getBlockOrder( state );
+		return [ ...topLevelIds, ...getDescendants( topLevelIds ) ];
+	},
+	( state ) => [
+		state.editor.present.blockOrder,
 	]
 );
 
@@ -1544,7 +1578,7 @@ export const getInserterItems = createSelector(
 
 			let isDisabled = false;
 			if ( ! hasBlockSupport( blockType.name, 'multiple', true ) ) {
-				isDisabled = some( getBlocks( state ), { name: blockType.name } );
+				isDisabled = some( getBlocksByClientId( state, getClientIdsWithDescendants( state ) ), { name: blockType.name } );
 			}
 
 			const isContextual = isArray( blockType.parent );
