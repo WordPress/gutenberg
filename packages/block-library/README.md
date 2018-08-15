@@ -18,4 +18,4 @@ import { registerCoreBlocks } from '@wordpress/block-library';
 registerCoreBlocks();
 ```
 
-<br/><br/><p align=a"center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
