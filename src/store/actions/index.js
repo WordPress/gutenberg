@@ -43,7 +43,7 @@ export const deleteBlockAction: BlockActionType = ( clientId ) => ( {
 	clientId,
 } );
 
-export const parseBlocksAction: ParseActionType = html => ( {
+export const parseBlocksAction: ParseActionType = ( html ) => ( {
 	type: ActionTypes.BLOCK.PARSE,
 	html,
 } );
