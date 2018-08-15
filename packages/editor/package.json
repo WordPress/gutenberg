@@ -48,6 +48,8 @@
 		"element-closest": "^2.0.2",
 		"lodash": "^4.17.10",
 		"memize": "^1.0.5",
+		"postcss": "^7.0.2",
+		"postcss-wrap": "^0.0.4",
 		"react-autosize-textarea": "^3.0.2",
 		"redux-multi": "^0.1.12",
 		"redux-optimist": "^1.0.0",

@@ -2,6 +2,8 @@
  * External dependencies
  */
 import { flow } from 'lodash';
+import postcss from 'postcss';
+import wrap from 'postcss-wrap';
 
 /**
  * WordPress Dependencies
@@ -24,6 +26,19 @@ class EditorProvider extends Component {
 			this.props.updateEditorSettings( props.settings );
 			this.props.setupEditor( props.post, props.settings.autosave );
 		}
+	}
+
+	componentDidMount() {
+		if ( ! this.props.settings.styles ) {
+			return;
+		}
+		postcss( [ wrap( { selector: '.editor-block-list__block' } ) ] )
+			.process( this.props.settings.styles )
+			.then( ( css ) => {
+				const node = document.createElement( 'style' );
+				node.innerHTML = css;
+				document.body.appendChild( node );
+			} );
 	}
 
 	componentDidUpdate( prevProps ) {
