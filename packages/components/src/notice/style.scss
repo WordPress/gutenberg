@@ -36,13 +36,10 @@
 	right: 0;
 	border: none;
 	margin: 0;
-	padding: 0;
+	padding: 9px;
 	background: none;
 	cursor: pointer;
 	color: $dark-gray-300;
-	height: 100%;
-	line-height: 100%;
-	width: 38px;
 
 	&:hover {
 		color: $alert-red;
