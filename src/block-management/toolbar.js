@@ -17,7 +17,11 @@ export default class Toolbar extends React.Component<PropsType> {
 		return (
 			<View style={ styles.toolbar }>
 				<TouchableOpacity
-					onPress={ this.props.onButtonPressed.bind( this, ToolbarButton.PLUS, this.props.clientId ) }
+					onPress={ this.props.onButtonPressed.bind(
+						this,
+						ToolbarButton.PLUS,
+						this.props.clientId
+					) }
 				>
 					<View style={ styles.toolbarButton }>
 						<Text>+</Text>
@@ -33,7 +37,11 @@ export default class Toolbar extends React.Component<PropsType> {
 				</TouchableOpacity>
 				<View style={ styles.buttonSeparator } />
 				<TouchableOpacity
-					onPress={ this.props.onButtonPressed.bind( this, ToolbarButton.DOWN, this.props.clientId ) }
+					onPress={ this.props.onButtonPressed.bind(
+						this,
+						ToolbarButton.DOWN,
+						this.props.clientId
+					) }
 				>
 					<View style={ styles.toolbarButton }>
 						<Text>▼</Text>
@@ -54,7 +62,11 @@ export default class Toolbar extends React.Component<PropsType> {
 				</TouchableOpacity>
 				<View style={ styles.buttonSeparator } />
 				<TouchableOpacity
-					onPress={ this.props.onButtonPressed.bind( this, ToolbarButton.DELETE, this.props.clientId ) }
+					onPress={ this.props.onButtonPressed.bind(
+						this,
+						ToolbarButton.DELETE,
+						this.props.clientId
+					) }
 				>
 					<View style={ styles.toolbarButton }>
 						<Text>🗑</Text>

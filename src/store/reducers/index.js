@@ -11,13 +11,13 @@ import type { BlockActionType } from '../actions';
 import { parse } from '@wordpress/blocks';
 
 function findBlock( blocks, clientId: string ) {
-	return find( blocks, obj => {
+	return find( blocks, ( obj ) => {
 		return obj.clientId === clientId;
 	} );
 }
 
 function findBlockIndex( blocks, clientId: string ) {
-	return findIndex( blocks, obj => {
+	return findIndex( blocks, ( obj ) => {
 		return obj.clientId === clientId;
 	} );
 }
