@@ -87,6 +87,7 @@ describe( 'PostPreviewButton', () => {
 						write: jest.fn(),
 						close: jest.fn(),
 					},
+					focus: () => {},
 				};
 			} );
 

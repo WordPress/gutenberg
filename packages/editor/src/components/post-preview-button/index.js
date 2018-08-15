@@ -68,6 +68,11 @@ export class PostPreviewButton extends Component {
 			this.previewWindow = window.open( '', this.getWindowTarget() );
 		}
 
+		// Ask the browser to bring the preview tab to the front
+		// This can work or not depending on the browser's user preferences
+		// https://html.spec.whatwg.org/multipage/interaction.html#dom-window-focus
+		this.previewWindow.focus();
+
 		// If there are no changes to autosave, we cannot perform the save, but
 		// if there is an existing preview link (e.g. previous published post
 		// autosave), it should be reused as the popup destination.
