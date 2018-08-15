@@ -815,8 +815,8 @@ export function updateSharedBlockTitle( id, title ) {
 	return updateReusableBlockTitle( id, title );
 }
 
-export function convertBlockToSaved( clientId ) {
-	deprecated( 'convertBlockToSaved', {
+export function convertBlockToShared( clientId ) {
+	deprecated( 'convertBlockToShared', {
 		alternative: 'convertBlockToReusable',
 		version: '3.6',
 		plugin: 'Gutenberg',
