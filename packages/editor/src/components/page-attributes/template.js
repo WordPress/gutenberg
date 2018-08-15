@@ -19,7 +19,7 @@ export function PageTemplate( { availableTemplates, selectedTemplate, onUpdate }
 		<SelectControl
 			label={ __( 'Template:' ) }
 			value={ selectedTemplate }
-			onChange={ ( value ) => onUpdate( value ) }
+			onChange={ onUpdate }
 			className="editor-page-attributes__template"
 			options={
 				map( availableTemplates, ( templateName, templateSlug ) => ( {
