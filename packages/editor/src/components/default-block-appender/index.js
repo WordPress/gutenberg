@@ -37,6 +37,19 @@ export function DefaultBlockAppender( {
 
 	const value = decodeEntities( placeholder ) || __( 'Write your story' );
 
+	// The appender "button" is in-fact a text field so as to support
+	// transitions by WritingFlow occurring by arrow key press. WritingFlow
+	// only supports tab transitions into text fields and to the block focus
+	// boundary.
+	//
+	// See: https://github.com/WordPress/gutenberg/issues/4829#issuecomment-374213658
+	//
+	// If it were ever to be made to be a proper `button` element, it is
+	// important to note that `onFocus` alone would not be sufficient to
+	// capture click events, notably in Firefox.
+	//
+	// See: https://gist.github.com/cvrebert/68659d0333a578d75372
+
 	return (
 		<div
 			data-root-client-id={ rootClientId || '' }
@@ -51,8 +64,6 @@ export function DefaultBlockAppender( {
 				type="text"
 				readOnly
 				onFocus={ onAppend }
-				onClick={ onAppend }
-				onKeyDown={ onAppend }
 				value={ showPrompt ? value : '' }
 			/>
 			<InserterWithShortcuts rootClientId={ rootClientId } layout={ layout } />
