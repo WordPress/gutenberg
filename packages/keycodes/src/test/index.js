@@ -3,12 +3,73 @@
  */
 import {
 	isMacOS,
+	displayShortcutList,
 	displayShortcut,
 	rawShortcut,
 } from '../';
 
 const isMacOSFalse = () => false;
 const isMacOSTrue = () => true;
+
+describe( 'displayShortcutList', () => {
+	describe( 'primary', () => {
+		it( 'should output [ Ctrl, +, M ] on Windows', () => {
+			const shortcut = displayShortcutList.primary( 'm', isMacOSFalse );
+			expect( shortcut ).toEqual( [ 'Ctrl', '+', 'M' ] );
+		} );
+
+		it( 'should output [ ⌘, M ] on MacOS', () => {
+			const shortcut = displayShortcutList.primary( 'm', isMacOSTrue );
+			expect( shortcut ).toEqual( [ '⌘', 'M' ] );
+		} );
+
+		it( 'outputs [ ⌘, Del ] on MacOS (works for multiple character keys)', () => {
+			const shortcut = displayShortcutList.primary( 'del', isMacOSTrue );
+			expect( shortcut ).toEqual( [ '⌘', 'Del' ] );
+		} );
+	} );
+
+	describe( 'primaryShift', () => {
+		it( 'should output [ Ctrl, +, Shift, +, M ] on Windows', () => {
+			const shortcut = displayShortcutList.primaryShift( 'm', isMacOSFalse );
+			expect( shortcut ).toEqual( [ 'Ctrl', '+', 'Shift', '+', 'M' ] );
+		} );
+
+		it( 'should output [ Shift, +, ⌘, M ] on MacOS', () => {
+			const shortcut = displayShortcutList.primaryShift( 'm', isMacOSTrue );
+			expect( shortcut ).toEqual( [ 'Shift', '+', '⌘', 'M' ] );
+		} );
+
+		it( 'outputs [ Shift, +, ⌘, Del ] on MacOS (works for multiple character keys)', () => {
+			const shortcut = displayShortcutList.primaryShift( 'del', isMacOSTrue );
+			expect( shortcut ).toEqual( [ 'Shift', '+', '⌘', 'Del' ] );
+		} );
+	} );
+
+	describe( 'secondary', () => {
+		it( 'should output [ Ctrl, +, Shift, +, Alt ] text on Windows', () => {
+			const shortcut = displayShortcutList.secondary( 'm', isMacOSFalse );
+			expect( shortcut ).toEqual( [ 'Ctrl', '+', 'Shift', '+', 'Alt', '+', 'M' ] );
+		} );
+
+		it( 'should output [ Shift, +, Option, +, Command, M ] on MacOS', () => {
+			const shortcut = displayShortcutList.secondary( 'm', isMacOSTrue );
+			expect( shortcut ).toEqual( [ 'Shift', '+', 'Option', '+', '⌘', 'M' ] );
+		} );
+	} );
+
+	describe( 'access', () => {
+		it( 'should output [ Shift, +, Alt, +, M ] on Windows', () => {
+			const shortcut = displayShortcutList.access( 'm', isMacOSFalse );
+			expect( shortcut ).toEqual( [ 'Shift', '+', 'Alt', '+', 'M' ] );
+		} );
+
+		it( 'should output [Ctrl, +, Option, +, M ] on MacOS', () => {
+			const shortcut = displayShortcutList.access( 'm', isMacOSTrue );
+			expect( shortcut ).toEqual( [ 'Ctrl', '+', 'Option', '+', 'M' ] );
+		} );
+	} );
+} );
 
 describe( 'displayShortcut', () => {
 	describe( 'primary', () => {
@@ -21,6 +82,11 @@ describe( 'displayShortcut', () => {
 			const shortcut = displayShortcut.primary( 'm', isMacOSTrue );
 			expect( shortcut ).toEqual( '⌘M' );
 		} );
+
+		it( 'outputs command Del on MacOS (works for multiple character keys)', () => {
+			const shortcut = displayShortcut.primary( 'del', isMacOSTrue );
+			expect( shortcut ).toEqual( '⌘Del' );
+		} );
 	} );
 
 	describe( 'primaryShift', () => {
@@ -32,6 +98,11 @@ describe( 'displayShortcut', () => {
 		it( 'should output shift+command symbols on MacOS', () => {
 			const shortcut = displayShortcut.primaryShift( 'm', isMacOSTrue );
 			expect( shortcut ).toEqual( 'Shift+⌘M' );
+		} );
+
+		it( 'outputs shift+command Del on MacOS (works for multiple character keys)', () => {
+			const shortcut = displayShortcut.primaryShift( 'del', isMacOSTrue );
+			expect( shortcut ).toEqual( 'Shift+⌘Del' );
 		} );
 	} );
 

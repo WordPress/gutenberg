@@ -16,7 +16,7 @@ import { withInstanceId, compose } from '@wordpress/compose';
  */
 import PostFormatCheck from './check';
 
-const POST_FORMATS = [
+export const POST_FORMATS = [
 	{ id: 'aside', caption: __( 'Aside' ) },
 	{ id: 'gallery', caption: __( 'Gallery' ) },
 	{ id: 'link', caption: __( 'Link' ) },

@@ -1,5 +1,4 @@
-Modal
-=======
+# Modal
 
 The modal is used to create an accessible modal over an application.
 
@@ -7,67 +6,28 @@ The modal is used to create an accessible modal over an application.
 
 ## Usage
 
-Render a screen overlay with a modal on top.
+The following example shows you how to properly implement a modal. For the modal to properly work it's important you implement the close logic for the modal properly.
+
 ```jsx
-	<Modal
-		title="My Modal"
-		onRequestClose={ closeFunction }
-		aria={ {
-		    describedby: "modal-description",
-		} }
-	>
-		<p id="modal-description">This modal is meant to be awesome!</p>
-	</Modal>
-```
+import { Button, Modal } from '@wordpress/components';
+import { withState } from '@wordpress/compose';
 
-## Implement close logic
-
-For the modal to properly work it's important you implement the close logic for the modal properly. The following example shows you how to properly implement a modal.
-
-```js
-const { Component, Fragment } = wp.element;
-const { Modal } = wp.components;
-
-class MyModalWrapper extends Component {
-	constructor() {
-		super( ...arguments );
-		this.state = {
-			isOpen: true,
-		}
-
-		this.openModal = this.openModal.bind( this );
-		this.closeModal = this.closeModal.bind( this );
-	}
-	
-	openModal() {
-		if ( ! this.state.isOpen ) {
-			this.setState( { isOpen: true } );
-		}
-	}
-
-	closeModal() {
-		if ( this.state.isOpen ) {
-			this.setState( { isOpen: false } );
-		}
-	}
-
-	render() {
-		return (
-			<Fragment>
-				<button onClick={ this.openModal }>Open Modal</button>
-				{ this.state.isOpen ?
-					<Modal
-						title="This is my modal"
-						onRequestClose={ this.closeModal }>
-						<button onClick={ this.closeModal }>
-						    My custom close button
-						</button>
-					</Modal> 
-					: null }
-			</Fragment>
-		);
-	}
-}
+const MyModal = withState( {
+	isOpen: false,
+} )( ( { isOpen, setState } ) => (
+	<div>
+		<Button isDefault onClick={ () => setState( { isOpen: true } ) }>Open Modal</Button>
+		{ isOpen ?
+			<Modal
+				title="This is my modal"
+				onRequestClose={ () => setState( { isOpen: false } ) }>
+				<Button isDefault onClick={ () => setState( { isOpen: false } ) }>
+					My custom close button
+				</Button>
+			</Modal> 
+			: null }
+	</div>
+) );
 ```
 
 ## Props

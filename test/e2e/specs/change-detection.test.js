@@ -1,21 +1,17 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
 import {
+	clickBlockAppender,
 	newPost,
-	newDesktopBrowserPage,
 	pressWithModifier,
 	ensureSidebarOpened,
 	publishPost,
+	META_KEY,
 } from '../support/utils';
 
 describe( 'Change detection', () => {
 	let handleInterceptedRequest, hadInterceptedSave;
-
-	beforeAll( async () => {
-		await newDesktopBrowserPage();
-	} );
 
 	beforeEach( async () => {
 		hadInterceptedSave = false;
@@ -32,8 +28,7 @@ describe( 'Change detection', () => {
 	async function assertIsDirty( isDirty ) {
 		let hadDialog = false;
 
-		function handleOnDialog( dialog ) {
-			dialog.accept();
+		function handleOnDialog() {
 			hadDialog = true;
 		}
 
@@ -74,7 +69,7 @@ describe( 'Change detection', () => {
 		await interceptSave();
 
 		// Keyboard shortcut Ctrl+S save.
-		await pressWithModifier( 'Mod', 'S' );
+		await pressWithModifier( META_KEY, 'S' );
 
 		expect( hadInterceptedSave ).toBe( false );
 	} );
@@ -98,7 +93,9 @@ describe( 'Change detection', () => {
 
 		// Toggle post as sticky (not persisted for autosave).
 		await ensureSidebarOpened();
-		await page.click( '[id^="post-sticky-toggle-"]' );
+
+		const postStickyToggleButton = ( await page.$x( "//label[contains(text(), 'Stick to the Front Page')]" ) )[ 0 ];
+		await postStickyToggleButton.click( 'button' );
 
 		// Force autosave to occur immediately.
 		await Promise.all( [
@@ -144,7 +141,7 @@ describe( 'Change detection', () => {
 	} );
 
 	it( 'Should prompt if content added without save', async () => {
-		await page.click( '.editor-default-block-appender' );
+		await clickBlockAppender();
 
 		await assertIsDirty( true );
 	} );
@@ -157,7 +154,7 @@ describe( 'Change detection', () => {
 			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
 
 			// Keyboard shortcut Ctrl+S save.
-			pressWithModifier( 'Mod', 'S' ),
+			pressWithModifier( META_KEY, 'S' ),
 		] );
 
 		await assertIsDirty( false );
@@ -171,13 +168,13 @@ describe( 'Change detection', () => {
 			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
 
 			// Keyboard shortcut Ctrl+S save.
-			pressWithModifier( 'Mod', 'S' ),
+			pressWithModifier( META_KEY, 'S' ),
 		] );
 
 		await interceptSave();
 
 		// Keyboard shortcut Ctrl+S save.
-		await pressWithModifier( 'Mod', 'S' );
+		await pressWithModifier( META_KEY, 'S' );
 
 		expect( hadInterceptedSave ).toBe( false );
 	} );
@@ -189,7 +186,7 @@ describe( 'Change detection', () => {
 
 		await Promise.all( [
 			// Keyboard shortcut Ctrl+S save.
-			pressWithModifier( 'Mod', 'S' ),
+			pressWithModifier( META_KEY, 'S' ),
 
 			// Ensure save update fails and presents button.
 			page.waitForXPath( "//p[contains(text(), 'Updating failed')]" ),
@@ -200,6 +197,8 @@ describe( 'Change detection', () => {
 		await page.setOfflineMode( false );
 
 		await assertIsDirty( true );
+
+		expect( console ).toHaveErroredWith( 'Failed to load resource: net::ERR_INTERNET_DISCONNECTED' );
 	} );
 
 	it( 'Should prompt if changes and save is in-flight', async () => {
@@ -211,7 +210,7 @@ describe( 'Change detection', () => {
 		await interceptSave();
 
 		// Keyboard shortcut Ctrl+S save.
-		await pressWithModifier( 'Mod', 'S' );
+		await pressWithModifier( META_KEY, 'S' );
 
 		await releaseSaveIntercept();
 
@@ -227,7 +226,7 @@ describe( 'Change detection', () => {
 		await interceptSave();
 
 		// Keyboard shortcut Ctrl+S save.
-		await pressWithModifier( 'Mod', 'S' );
+		await pressWithModifier( META_KEY, 'S' );
 
 		await page.type( '.editor-post-title__input', '!' );
 
@@ -244,7 +243,7 @@ describe( 'Change detection', () => {
 		await interceptSave();
 
 		// Keyboard shortcut Ctrl+S save.
-		await pressWithModifier( 'Mod', 'S' );
+		await pressWithModifier( META_KEY, 'S' );
 
 		// Dirty post while save is in-flight.
 		await page.type( '.editor-post-title__input', '!' );
@@ -266,9 +265,9 @@ describe( 'Change detection', () => {
 		await interceptSave();
 
 		// Keyboard shortcut Ctrl+S save.
-		await pressWithModifier( 'Mod', 'S' );
+		await pressWithModifier( META_KEY, 'S' );
 
-		await page.click( '.editor-default-block-appender' );
+		await clickBlockAppender();
 
 		// Allow save to complete. Disabling interception flushes pending.
 		await Promise.all( [

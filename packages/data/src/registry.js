@@ -16,6 +16,12 @@ import {
 import deprecated from '@wordpress/deprecated';
 
 /**
+ * Internal dependencies
+ */
+import dataStore from './store';
+import { persistence } from './plugins';
+
+/**
  * An isolated orchestrator of store registrations.
  *
  * @typedef {WPDataRegistry}
@@ -36,12 +42,6 @@ import deprecated from '@wordpress/deprecated';
  *
  * @typedef {WPDataPlugin}
  */
-
-/**
- * Internal dependencies
- */
-import dataStore from './store';
-import { persistence } from './plugins';
 
 /**
  * Returns true if the given argument appears to be a dispatchable action.
@@ -104,13 +104,8 @@ export function toAsyncIterable( object ) {
 			object = [ object ];
 		}
 
-		for ( let maybeAction of object ) {
-			// ...of Promises.
-			if ( ! ( maybeAction instanceof Promise ) ) {
-				maybeAction = Promise.resolve( maybeAction );
-			}
-
-			yield await maybeAction;
+		for ( const maybeAction of object ) {
+			yield maybeAction;
 		}
 	}() );
 }
@@ -230,7 +225,7 @@ export function createRegistry( storeConfigs = {} ) {
 				}
 
 				for await ( const maybeAction of fulfillment ) {
-				// Dispatch if it quacks like an action.
+					// Dispatch if it quacks like an action.
 					if ( isActionLike( maybeAction ) ) {
 						store.dispatch( maybeAction );
 					}

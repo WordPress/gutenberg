@@ -2,25 +2,25 @@ $dot-size: 8px; // Size of the indicator dot
 $dot-scale: 3;  // How much the pulse animation should scale up by in size
 
 .nux-dot-tip {
-	&:before,
-	&:after {
+	&::before,
+	&::after {
 		border-radius: 100%;
-		content: ' ';
+		content: " ";
 		pointer-events: none;
 		position: absolute;
 	}
 
-	&:before {
-		animation: nux-pulse 1.6s infinite cubic-bezier( 0.17, 0.67, 0.92, 0.62 );
-		background: rgba( $blue-medium-800, 0.9 );
+	&::before {
+		animation: nux-pulse 1.6s infinite cubic-bezier(0.17, 0.67, 0.92, 0.62);
+		background: rgba($blue-medium-800, 0.9);
 		height: $dot-size * $dot-scale;
-		left: -( $dot-size * $dot-scale ) / 2;
-		top: -( $dot-size * $dot-scale ) / 2;
-		transform: scale( ( 1 / $dot-scale ) );
-		width: $dot-size * $dot-scale
+		left: -($dot-size * $dot-scale) / 2;
+		top: -($dot-size * $dot-scale) / 2;
+		transform: scale((1 / $dot-scale));
+		width: $dot-size * $dot-scale;
 	}
-		
-	&:after {
+
+	&::after {
 		background: $blue-medium-800;
 		height: $dot-size;
 		left: -$dot-size / 2;
@@ -30,13 +30,13 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
 
 	@keyframes nux-pulse {
 		100% {
-			background: rgba( $blue-medium-800, 0 );
-			transform: scale( 1 );
+			background: rgba($blue-medium-800, 0);
+			transform: scale(1);
 		}
 	}
 
 	.components-popover__content {
-		padding: 5px ( 36px + 5px ) 5px 20px;
+		padding: 5px (36px + 5px) 5px 20px;
 		width: 350px;
 
 		@include break-small {
@@ -73,15 +73,15 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
 	}
 
 	// Extra specificity so that we can override the styles in .component-popover
-	&:not( .is-mobile ).is-left,
-	&:not( .is-mobile ).is-center,
-	&:not( .is-mobile ).is-right {
+	&:not(.is-mobile).is-left,
+	&:not(.is-mobile).is-center,
+	&:not(.is-mobile).is-right {
 
 		// Position tips above popovers
-		z-index: z-index( '.nux-dot-tip' );
+		z-index: z-index(".nux-dot-tip");
 
 		// On mobile, always position the tip below the dot and fill the width of the viewport
-		@media ( max-width: $break-small ) {
+		@media (max-width: $break-small) {
 			.components-popover__content {
 				align-self: end;
 				left: 5px;

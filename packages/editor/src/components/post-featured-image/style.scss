@@ -1,7 +1,7 @@
 .editor-post-featured-image {
 	padding: 0;
 
-	.spinner {
+	.components-spinner {
 		margin: 0;
 	}
 
@@ -24,7 +24,7 @@
 	display: block;
 	width: 100%;
 	padding: 0;
-	transition: all .1s ease-out;
+	transition: all 0.1s ease-out;
 	box-shadow: 0 0 0 0 $blue-medium-500;
 }
 

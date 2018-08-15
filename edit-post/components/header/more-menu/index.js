@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { IconButton, Dropdown, MenuGroup } from '@wordpress/components';
 
 /**
@@ -12,6 +12,7 @@ import ModeSwitcher from '../mode-switcher';
 import FixedToolbarToggle from '../fixed-toolbar-toggle';
 import PluginMoreMenuGroup from '../plugins-more-menu-group';
 import TipsToggle from '../tips-toggle';
+import KeyboardShortcutsHelpMenuItem from '../keyboard-shortcuts-help-menu-item';
 
 const MoreMenu = () => (
 	<Dropdown
@@ -20,7 +21,7 @@ const MoreMenu = () => (
 		renderToggle={ ( { isOpen, onToggle } ) => (
 			<IconButton
 				icon="ellipsis"
-				label={ __( 'More' ) }
+				label={ _x( 'More', 'button to expand options' ) }
 				onClick={ onToggle }
 				aria-expanded={ isOpen }
 			/>
@@ -39,7 +40,9 @@ const MoreMenu = () => (
 				<MenuGroup
 					label={ __( 'Tools' ) }
 					filterName="editPost.MoreMenu.tools"
-				/>
+				>
+					<KeyboardShortcutsHelpMenuItem onSelect={ onClose } />
+				</MenuGroup>
 			</div>
 		) }
 	/>

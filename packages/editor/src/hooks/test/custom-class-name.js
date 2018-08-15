@@ -10,7 +10,7 @@ import { getHTMLRootElementClasses } from '../custom-class-name';
 
 describe( 'custom className', () => {
 	const blockSettings = {
-		save: () => <div />,
+		save: () => <div className="default" />,
 		category: 'common',
 		title: 'block title',
 	};
@@ -95,7 +95,7 @@ describe( 'custom className', () => {
 			const attributes = addParsedDifference(
 				{ className: 'foo' },
 				blockSettings,
-				'<div class="foo bar baz"></div>'
+				'<div class="default foo bar baz"></div>'
 			);
 
 			expect( attributes.className ).toBe( 'foo bar baz' );
@@ -109,6 +109,46 @@ describe( 'custom className', () => {
 			);
 
 			expect( attributes.className ).toBeUndefined();
+		} );
+
+		it( 'should add a custom class name to an element without a class', () => {
+			const attributes = addParsedDifference(
+				{},
+				blockSettings,
+				'<div class="default foo"></div>'
+			);
+
+			expect( attributes.className ).toBe( 'foo' );
+		} );
+
+		it( 'should remove the custom class and retain default class', () => {
+			const attributes = addParsedDifference(
+				{ className: 'custom1 custom2' },
+				blockSettings,
+				'<div class="default custom1"></div>'
+			);
+
+			expect( attributes.className ).toBe( 'custom1' );
+		} );
+
+		it( 'should remove the custom class from an element originally without a class', () => {
+			const attributes = addParsedDifference(
+				{ className: 'foo' },
+				blockSettings,
+				'<div></div>'
+			);
+
+			expect( attributes.className ).toBeUndefined();
+		} );
+
+		it( 'should remove the custom classes and retain default and other custom class', () => {
+			const attributes = addParsedDifference(
+				{ className: 'custom1 custom2 custom3' },
+				blockSettings,
+				'<div class="default custom1 custom3"></div>'
+			);
+
+			expect( attributes.className ).toBe( 'custom1 custom3' );
 		} );
 	} );
 } );

@@ -57,7 +57,7 @@ The `value` property is handled in a manner similar to controlled form component
 import { FormTokenField } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
 
-withState( {
+const MyFormTokenField = withState( {
 	tokens: [],
 	suggestions: [ 'Africa', 'America', 'Antarctica', 'Asia', 'Europe', 'Oceania' ],
 } )( ( { tokens, suggestions, setState } ) => ( 
@@ -67,5 +67,5 @@ withState( {
 		onChange={ tokens => setState( { tokens } ) }
 		placeholder="Type a continent"
 	/>
-) )
+) );
 ```

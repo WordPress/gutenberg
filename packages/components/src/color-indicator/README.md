@@ -5,9 +5,7 @@
 ```jsx
 import { ColorIndicator } from '@wordpress/components';
 
-function MyColorIndicator() {
-	return (
-		<ColorIndicator colorValue="#f00" />
-	);
-}
+const MyColorIndicator = () => (
+	<ColorIndicator colorValue="#f00" />
+);
 ```

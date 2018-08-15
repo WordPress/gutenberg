@@ -32,7 +32,7 @@
 		max-width: 100%;
 		margin: 2px 0 2px 8px;
 		padding: 0;
-		line-height: 24px;
+		min-height: 24px;
 		background: inherit;
 		border: 0;
 		font-size: $default-font-size;
@@ -85,7 +85,7 @@
 
 		.components-form-token-field__token-text {
 			background: transparent;
-			color: theme( secondary );
+			color: theme(secondary);
 		}
 
 		.components-form-token-field__remove-token {
@@ -129,7 +129,7 @@
 	display: inline-block;
 	line-height: 24px;
 	background: $light-gray-500;
-	transition: all .2s cubic-bezier( .4, 1, .4, 1 );
+	transition: all 0.2s cubic-bezier(0.4, 1, 0.4, 1);
 }
 
 .components-form-token-field__token-text {
@@ -157,7 +157,7 @@
 	background: $white;
 	max-height: 9em;
 	overflow-y: scroll;
-	transition: all .15s ease-in-out;
+	transition: all 0.15s ease-in-out;
 	list-style: none;
 	border-top: $border-width solid $dark-gray-300;
 	margin: 0;

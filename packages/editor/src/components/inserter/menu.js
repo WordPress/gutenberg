@@ -13,6 +13,7 @@ import {
 	sortBy,
 	without,
 	includes,
+	deburr,
 } from 'lodash';
 import scrollIntoView from 'dom-scroll-into-view';
 
@@ -48,12 +49,28 @@ const MAX_SUGGESTED_ITEMS = 9;
  * @return {Array}             Filtered item list.
  */
 export const searchItems = ( items, searchTerm ) => {
-	const normalizedSearchTerm = searchTerm.toLowerCase().trim();
-	const matchSearch = ( string ) => string.toLowerCase().indexOf( normalizedSearchTerm ) !== -1;
+	const normalizedSearchTerm = normalizeTerm( searchTerm );
+	const matchSearch = ( string ) => normalizeTerm( string ).indexOf( normalizedSearchTerm ) !== -1;
 
 	return items.filter( ( item ) =>
 		matchSearch( item.title ) || some( item.keywords, matchSearch )
 	);
+};
+
+/**
+ * Converts the search term into a normalized term, removing diacritics,
+ * leading & trailing whitespace. The term is also converted to lowercase.
+ *
+ * @param {string} term The search term to normalize.
+ *
+ * @return {string} The normalized search term.
+ */
+export const normalizeTerm = ( term ) => {
+	term = deburr( term );
+	term = term.toLowerCase();
+	term = term.trim();
+
+	return term;
 };
 
 export class InserterMenu extends Component {

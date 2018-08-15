@@ -15,7 +15,6 @@ import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 import { Spinner, withSpokenMessages, Popover } from '@wordpress/components';
 import { withInstanceId } from '@wordpress/compose';
 import apiFetch from '@wordpress/api-fetch';
-import deprecated from '@wordpress/deprecated';
 import { addQueryArgs } from '@wordpress/url';
 
 // Since URLInput is rendered in the context of other inputs, but should be
@@ -168,14 +167,14 @@ class URLInput extends Component {
 				if ( this.state.selectedSuggestion !== null ) {
 					event.stopPropagation();
 					const post = this.state.posts[ this.state.selectedSuggestion ];
-					this.selectLink( post.url );
+					this.selectLink( post );
 				}
 			}
 		}
 	}
 
-	selectLink( link ) {
-		this.props.onChange( link );
+	selectLink( post ) {
+		this.props.onChange( post.url, post );
 		this.setState( {
 			selectedSuggestion: null,
 			showSuggestions: false,
@@ -227,7 +226,7 @@ class URLInput extends Component {
 									className={ classnames( 'editor-url-input__suggestion', {
 										'is-selected': index === selectedSuggestion,
 									} ) }
-									onClick={ () => this.selectLink( post.url ) }
+									onClick={ () => this.selectLink( post ) }
 									aria-selected={ index === selectedSuggestion }
 								>
 									{ decodeEntities( post.title ) || __( '(no title)' ) }
@@ -242,27 +241,4 @@ class URLInput extends Component {
 	}
 }
 
-// TODO: As part of deprecation of UrlInput, the temporary passthrough
-// component needs access to the enhanced URLInput class, so it cannot be
-// enhanced as part of its export default. Once the temporary passthrough is
-// removed, this can be moved back to the export statement.
-URLInput = withSpokenMessages( withInstanceId( URLInput ) );
-
-export class UrlInput extends Component {
-	constructor() {
-		super( ...arguments );
-
-		deprecated( 'wp.editor.UrlInput', {
-			alternative: 'wp.editor.URLInput',
-			plugin: 'Gutenberg',
-			version: 'v3.5',
-			hint: 'The component has been renamed.',
-		} );
-	}
-
-	render() {
-		return <URLInput { ...this.props } />;
-	}
-}
-
-export default URLInput;
+export default withSpokenMessages( withInstanceId( URLInput ) );

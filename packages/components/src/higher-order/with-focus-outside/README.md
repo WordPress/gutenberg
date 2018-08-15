@@ -9,17 +9,19 @@ Wrap your original component with `withFocusOutside`, defining a `handleFocusOut
 __Note:__ `withFocusOutside` must only be used to wrap the `Component` class.
 
 ```jsx
-const EnhancedComponent = withFocusOutside(
-	class extends Component {
+import { withFocusOutside, TextControl } from '@wordpress/components';
+
+const MyComponentWithFocusOutside = withFocusOutside(
+	class extends React.Component {
 		handleFocusOutside() {
-			this.props.onFocusOutside();
+			console.log( 'Focus outside' );
 		}
 
 		render() {
 			return (
 				<div>
-					<input />
-					<input />
+					<TextControl onChange={ ( ) => { } }/>
+					<TextControl onChange={ ( ) => { } }/>
 				</div>
 			);
 		}

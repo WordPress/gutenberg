@@ -1,7 +1,14 @@
 /**
  * Internal dependencies
  */
-import { triggerGuide, dismissTip, disableTips, enableTips } from '../actions';
+import {
+	triggerGuide,
+	registerTipInstance,
+	unregisterTipInstance,
+	dismissTip,
+	disableTips,
+	enableTips,
+} from '../actions';
 
 describe( 'actions', () => {
 	describe( 'triggerGuide', () => {
@@ -9,6 +16,26 @@ describe( 'actions', () => {
 			expect( triggerGuide( [ 'test/tip-1', 'test/tip-2' ] ) ).toEqual( {
 				type: 'TRIGGER_GUIDE',
 				tipIds: [ 'test/tip-1', 'test/tip-2' ],
+			} );
+		} );
+	} );
+
+	describe( 'registerTipInstance', () => {
+		it( 'should return a REGISTER_TIP_INSTANCE action', () => {
+			expect( registerTipInstance( 'test/tip-1', 123 ) ).toEqual( {
+				type: 'REGISTER_TIP_INSTANCE',
+				tipId: 'test/tip-1',
+				instanceId: 123,
+			} );
+		} );
+	} );
+
+	describe( 'unregisterTipInstance', () => {
+		it( 'should return an UNREGISTER_TIP_INSTANCE action', () => {
+			expect( unregisterTipInstance( 'test/tip-1', 123 ) ).toEqual( {
+				type: 'UNREGISTER_TIP_INSTANCE',
+				tipId: 'test/tip-1',
+				instanceId: 123,
 			} );
 		} );
 	} );

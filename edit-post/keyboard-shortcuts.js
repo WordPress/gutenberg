@@ -5,7 +5,11 @@ import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 
 export default {
 	toggleEditorMode: {
-		value: rawShortcut.secondary( 'm' ),
-		label: displayShortcut.secondary( 'm' ),
+		raw: rawShortcut.secondary( 'm' ),
+		display: displayShortcut.secondary( 'm' ),
+	},
+	toggleSidebar: {
+		raw: rawShortcut.primaryShift( ',' ),
+		display: displayShortcut.primaryShift( ',' ),
 	},
 };

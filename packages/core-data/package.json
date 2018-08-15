@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/core-data",
-	"version": "1.0.3",
+	"version": "1.1.1",
 	"description": "Access to and manipulation of core WordPress entities.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,8 +19,9 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.0.0-beta.52",
+		"@babel/runtime-corejs2": "7.0.0-beta.56",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/data": "file:../data",
 		"@wordpress/url": "file:../url",

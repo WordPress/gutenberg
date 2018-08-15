@@ -5,3 +5,37 @@
 ## Usage
 
 Wrap your original component with `withConstrainedTabbing`.
+
+```jsx
+import { withConstrainedTabbing, TextControl, Button } from '@wordpress/components';
+import { withState } from '@wordpress/compose';
+
+const ConstrainedTabbing = withConstrainedTabbing( ( { children } ) => children );
+
+const MyComponentWithConstrainedTabbing = withState( {
+	isConstrainedTabbing: false,
+} )( ( { isConstrainedTabbing, setState } ) => { 
+	let form = (
+		<form>
+			<TextControl label="Input 1" onChange={ () => {} } />
+			<TextControl label="Input 2" onChange={ () => {} } />
+		</form>
+	);
+	if ( isConstrainedTabbing ) {
+		form = <ConstrainedTabbing>{ form }</ConstrainedTabbing>;
+	}
+	
+	const toggleConstrain = () => {
+		setState( ( state ) => ( { isConstrainedTabbing: ! state.isConstrainedTabbing } ) );
+	};
+	
+	return (
+		<div>
+			{ form }
+			<Button isDefault onClick={ toggleConstrain }>
+				{ isConstrainedTabbing ? 'Disable' : 'Enable' } constrain tabbing
+			</Button>
+		</div>
+	);
+} );
+```

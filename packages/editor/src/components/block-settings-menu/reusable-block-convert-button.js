@@ -7,7 +7,7 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
-import { IconButton } from '@wordpress/components';
+import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { isReusableBlock } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -18,7 +18,6 @@ export function ReusableBlockConvertButton( {
 	isStaticBlock,
 	onConvertToStatic,
 	onConvertToReusable,
-	itemsRole,
 } ) {
 	if ( ! isVisible ) {
 		return null;
@@ -27,24 +26,22 @@ export function ReusableBlockConvertButton( {
 	return (
 		<Fragment>
 			{ isStaticBlock && (
-				<IconButton
+				<MenuItem
 					className="editor-block-settings-menu__control"
 					icon="controls-repeat"
 					onClick={ onConvertToReusable }
-					role={ itemsRole }
 				>
 					{ __( 'Add to Reusable Blocks' ) }
-				</IconButton>
+				</MenuItem>
 			) }
 			{ ! isStaticBlock && (
-				<IconButton
+				<MenuItem
 					className="editor-block-settings-menu__control"
 					icon="controls-repeat"
 					onClick={ onConvertToStatic }
-					role={ itemsRole }
 				>
 					{ __( 'Convert to Regular Block' ) }
-				</IconButton>
+				</MenuItem>
 			) }
 		</Fragment>
 	);

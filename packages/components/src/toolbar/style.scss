@@ -6,17 +6,17 @@
 }
 
 div.components-toolbar {
-	&> div {
+	& > div {
 		// IE11 does not support `position: sticky`, or Flex very well, so use block.
 		display: inline-block;
-		@supports ( position: sticky ) {
+		@supports (position: sticky) {
 			display: inline-flex;
 		}
 
 		margin: 0;
 	}
 
-	&> div + div {
+	& > div + div {
 		margin-left: -3px;
 
 		&.has-left-divider {
@@ -25,9 +25,9 @@ div.components-toolbar {
 			overflow: visible;
 		}
 
-		&.has-left-divider:before {
+		&.has-left-divider::before {
 			display: inline-block;
-			content: '';
+			content: "";
 			box-sizing: content-box;
 			background-color: $light-gray-500;
 			position: absolute;
@@ -52,8 +52,8 @@ div.components-toolbar {
 
 	// Unset icon button styles
 	&:active,
-	&:not( [aria-disabled="true"] ):hover,
-	&:not( [aria-disabled="true"] ):focus {
+	&:not([aria-disabled="true"]):hover,
+	&:not([aria-disabled="true"]):focus {
 		outline: none;
 		box-shadow: none;
 		background: none;
@@ -76,8 +76,8 @@ div.components-toolbar {
 		padding: 4px 8px 4px 0;
 	}
 
-	&[data-subscript]:after {
-		content: attr( data-subscript );
+	&[data-subscript]::after {
+		content: attr(data-subscript);
 		font-family: $default-font;
 		font-size: $default-font-size;
 		font-weight: 600;
@@ -87,12 +87,12 @@ div.components-toolbar {
 	}
 
 	// Assign hover style to child element, not the button itself
-	&:not( :disabled ):not([aria-disabled="true"]):hover {
+	&:not(:disabled):not([aria-disabled="true"]):hover {
 		box-shadow: none;
 	}
 
-	&:not( :disabled ).is-active > svg,
-	&:not( :disabled ):hover > svg {
+	&:not(:disabled).is-active > svg,
+	&:not(:disabled):hover > svg {
 		@include formatting-button-style__hover;
 	}
 
@@ -101,7 +101,7 @@ div.components-toolbar {
 		@include formatting-button-style__active;
 	}
 
-	&:not(:disabled).is-active[data-subscript]:after {
+	&:not(:disabled).is-active[data-subscript]::after {
 		color: $white;
 	}
 

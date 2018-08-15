@@ -259,26 +259,40 @@ function gutenberg_collect_meta_box_data() {
  * @return bool Whether the post can be edited with Gutenberg.
  */
 function gutenberg_can_edit_post( $post ) {
-	$post = get_post( $post );
+	$post     = get_post( $post );
+	$can_edit = true;
 
 	if ( ! $post ) {
-		return false;
+		$can_edit = false;
 	}
 
-	if ( 'trash' === $post->post_status ) {
-		return false;
+	if ( $can_edit && 'trash' === $post->post_status ) {
+		$can_edit = false;
+	}
+
+	if ( $can_edit && ! gutenberg_can_edit_post_type( $post->post_type ) ) {
+		$can_edit = false;
+	}
+
+	if ( $can_edit && ! current_user_can( 'edit_post', $post->ID ) ) {
+		$can_edit = false;
 	}
 
 	// Disable the editor if on the blog page and there is no content.
-	if ( absint( get_option( 'page_for_posts' ) ) === $post->ID && empty( $post->post_content ) ) {
-		return false;
+	if ( $can_edit && absint( get_option( 'page_for_posts' ) ) === $post->ID && empty( $post->post_content ) ) {
+		$can_edit = false;
 	}
 
-	if ( ! gutenberg_can_edit_post_type( $post->post_type ) ) {
-		return false;
-	}
+	/**
+	 * Filter to allow plugins to enable/disable Gutenberg for particular post.
+	 *
+	 * @since 3.5
+	 *
+	 * @param bool $can_edit Whether the post can be edited or not.
+	 * @param WP_Post $post The post being checked.
+	 */
+	return apply_filters( 'gutenberg_can_edit_post', $can_edit, $post );
 
-	return current_user_can( 'edit_post', $post->ID );
 }
 
 /**

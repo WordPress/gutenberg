@@ -8,6 +8,7 @@ import { find } from 'lodash';
  */
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -17,6 +18,7 @@ import {
 	receiveUserQuery,
 	receiveEntityRecords,
 	receiveThemeSupportsFromIndex,
+	receiveEmbedPreview,
 } from './actions';
 import { getKindEntities } from './entities';
 
@@ -25,6 +27,11 @@ import { getKindEntities } from './entities';
  * progress.
  */
 export async function* getCategories() {
+	deprecated( 'getCategories resolver', {
+		version: '3.7.0',
+		alternative: 'getEntityRecords resolver',
+		plugin: 'Gutenberg',
+	} );
 	const categories = await apiFetch( { path: '/wp/v2/categories?per_page=-1' } );
 	yield receiveTerms( 'categories', categories );
 }
@@ -83,4 +90,20 @@ export async function* getEntityRecords( state, kind, name, query = {} ) {
 export async function* getThemeSupports() {
 	const index = await apiFetch( { path: '/' } );
 	yield receiveThemeSupportsFromIndex( index );
+}
+
+/**
+ * Requests a preview from the from the Embed API.
+ *
+ * @param {Object} state State tree
+ * @param {string} url   URL to get the preview for.
+ */
+export async function* getEmbedPreview( state, url ) {
+	try {
+		const embedProxyResponse = await apiFetch( { path: addQueryArgs( '/oembed/1.0/proxy', { url } ) } );
+		yield receiveEmbedPreview( url, embedProxyResponse );
+	} catch ( error ) {
+		// Embed API 404s if the URL cannot be embedded, so we have to catch the error from the apiRequest here.
+		yield receiveEmbedPreview( url, false );
+	}
 }

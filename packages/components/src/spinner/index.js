@@ -1,3 +1,1 @@
-const spinner = <span className="spinner is-active" />;
-
-export default () => spinner;
+export default () => <span className="components-spinner" />;

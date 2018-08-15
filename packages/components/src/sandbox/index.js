@@ -143,8 +143,8 @@ class Sandbox extends Component {
 				// keeping the correct aspect ratio.
 				var potentialIframe = document.body.children[0];
 				if ( 'DIV' === potentialIframe.tagName || 'SPAN' === potentialIframe.tagName ) {
-						potentialIframe = potentialIframe.children[0];
-					}
+					potentialIframe = potentialIframe.children[0];
+				}
 				if ( potentialIframe && 'IFRAME' === potentialIframe.tagName ) {
 					if ( potentialIframe.width ) {
 						iframe = potentialIframe;

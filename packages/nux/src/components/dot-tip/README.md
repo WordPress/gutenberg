@@ -3,6 +3,8 @@ DotTip
 
 `DotTip` is a React component that renders a single _tip_ on the screen. The tip will point to the React element that `DotTip` is nested within. Each tip is uniquely identified by a string passed to `id`.
 
+When there are multiple instances of `DotTip` that reference the same tip identifier, only the first instance to have been mounted will be visible.
+
 ## Usage
 
 ```jsx
@@ -21,7 +23,7 @@ The component accepts the following props:
 
 ### id
 
-A string that uniquely identifies the tip. Identifiers should be prefixed with the name of the plugin, followed by a `/`. For example, `acme/add-to-cart`.
+A string that uniquely identifies the tip. Identifiers should be prefixed with the name of the plugin, followed by a `/`. For example, `acme/add-to-cart`. Changing the identifier after the component has mounted is not supported.
 
 - Type: `string`
 - Required: Yes

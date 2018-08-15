@@ -15,6 +15,7 @@ function TipsToggle( { onToggle, isActive } ) {
 		<MenuItem
 			icon={ isActive && 'yes' }
 			isSelected={ isActive }
+			role="menuitemcheckbox"
 			onClick={ onToggle }
 		>
 			{ __( 'Show Tips' ) }

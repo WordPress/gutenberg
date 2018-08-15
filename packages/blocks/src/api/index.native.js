@@ -13,6 +13,8 @@ export {
 } from './serializer';
 export {
 	registerBlockType,
+	setUnknownTypeHandlerName,
+	getUnknownTypeHandlerName,
 	getBlockType,
 	getBlockTypes,
 	hasBlockSupport,

@@ -3,7 +3,7 @@ InnerBlocks
 
 InnerBlocks exports a pair of components which can be used in block implementations to enable nested block content.
 
-Refer to the [implementation of the Columns block](https://github.com/WordPress/gutenberg/tree/master/core-blocks/columns) as an example resource.
+Refer to the [implementation of the Columns block](https://github.com/WordPress/gutenberg/tree/master/packages/block-library/src/columns) as an example resource.
 
 ## Usage
 
@@ -46,6 +46,7 @@ _Note:_ Because the save step will automatically apply props to the element retu
 * **Type:** `Array<String>`
 
 Allowed blocks prop should contain an array of strings, each string should contain the identifier of a block. When allowedBlocks is set it is only possible to insert blocks part of the set specified in the array.
+
 ```jsx
 const ALLOWED_BLOCKS = [ 'core/image', 'core/paragraph' ];
 ...
@@ -53,6 +54,7 @@ const ALLOWED_BLOCKS = [ 'core/image', 'core/paragraph' ];
     allowedBlocks={ ALLOWED_BLOCKS }
 />
 ```
+
 The previous code block creates an `InnerBlocks` area where only image and paragraph blocks can be inserted.
 
 Child blocks that have marked themselves as compatible are not excluded from the allowed blocks. Even if `allowedBlocks` doesn't specify a child block, a registered child block will still appear on the inserter for this block.
@@ -64,6 +66,7 @@ const ALLOWED_BLOCKS = [];
     allowedBlocks={ ALLOWED_BLOCKS }
 />
 ```
+
 The previous code block restricts all blocks, so only child blocks explicitly registered as compatible with this block can be inserted. If no child blocks are available: it will be impossible to insert any inner blocks.
 
 ### `template`
@@ -86,6 +89,7 @@ const TEMPLATE = [ [ 'core/columns', {}, [
     template={ TEMPLATE }
 />
 ```
+
 The previous example creates an InnerBlocks area containing two columns one with an image and the other with a paragraph.
 
 ### `templateLock`
@@ -97,7 +101,7 @@ Template locking allows locking the `InnerBlocks` area for the current template.
 *Options:*
 
 - `all` — prevents all operations. It is not possible to insert new blocks. Move existing blocks or delete them.
-- `insert` — prevents inserting new blocks, but allows moving or removing existing ones.
+- `insert` — prevents inserting or removing blocks, but allows moving existing ones.
 - `false` — prevents locking from being applied to an `InnerBlocks` area even if a parent block contains locking.
 
 If locking is not set in an `InnerBlocks` area: the locking of the parent `InnerBlocks` area is used.

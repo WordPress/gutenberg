@@ -53,8 +53,8 @@
 	}
 }
 
-@include editor-left('.components-notice-list');
-@include editor-right('.components-notice-list');
+@include editor-left(".components-notice-list");
+@include editor-right(".components-notice-list");
 
 .edit-post-layout__metaboxes:not(:empty) {
 	border-top: $border-width solid $light-gray-500;
@@ -96,7 +96,7 @@
 
 .edit-post-layout .editor-post-publish-panel {
 	position: fixed;
-	z-index: z-index( '.edit-post-layout .edit-post-post-publish-panel' );
+	z-index: z-index(".edit-post-layout .edit-post-post-publish-panel");
 	top: $admin-bar-height-big;
 	bottom: 0;
 	right: 0;
@@ -117,15 +117,16 @@
 }
 
 .edit-post-toggle-publish-panel {
-	display: block;
-	position: relative;
-	float: right;
-	top: -9999em;
-	z-index: z-index( '.edit-post-toggle-publish-panel' );
-	padding: 20px 0 0 0;
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	z-index: z-index(".edit-post-toggle-publish-panel");
 	width: $sidebar-width;
+	height: 0;
+	overflow: hidden;
 	&:focus-within {
-		top: 0;
+		height: auto;
+		padding: 20px 0 0 0;
 	}
 
 	.edit-post-toggle-publish-panel__button {

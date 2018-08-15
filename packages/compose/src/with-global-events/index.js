@@ -61,12 +61,12 @@ function withGlobalEvents( eventTypesToHandlers ) {
 			}
 
 			render() {
-				return <WrappedComponent { ...this.props } ref={ this.handleRef } />;
+				return <WrappedComponent { ...this.props.ownProps } ref={ this.handleRef } />;
 			}
 		}
 
 		return forwardRef( ( props, ref ) => {
-			return <Wrapper { ...props } forwardedRef={ ref } />;
+			return <Wrapper ownProps={ props } forwardedRef={ ref } />;
 		} );
 	}, 'withGlobalEvents' );
 }

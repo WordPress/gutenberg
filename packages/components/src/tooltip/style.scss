@@ -1,15 +1,15 @@
 .components-tooltip.components-popover {
-	z-index: z-index( '.components-tooltip' );
+	z-index: z-index(".components-tooltip");
 
-	&:before {
+	&::before {
 		border-color: transparent;
 	}
 
-	&.is-top:after {
+	&.is-top::after {
 		border-top-color: $dark-gray-900;
 	}
 
-	&.is-bottom:after {
+	&.is-bottom::after {
 		border-bottom-color: $dark-gray-900;
 	}
 }

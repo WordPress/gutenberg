@@ -36,16 +36,16 @@ const FORMATTING_CONTROLS = [
 		format: 'italic',
 	},
 	{
-		icon: 'editor-strikethrough',
-		title: __( 'Strikethrough' ),
-		shortcut: displayShortcut.access( 'd' ),
-		format: 'strikethrough',
-	},
-	{
 		icon: 'admin-links',
 		title: __( 'Link' ),
 		shortcut: displayShortcut.primary( 'k' ),
 		format: 'link',
+	},
+	{
+		icon: 'editor-strikethrough',
+		title: __( 'Strikethrough' ),
+		shortcut: displayShortcut.access( 'd' ),
+		format: 'strikethrough',
 	},
 ];
 
@@ -205,7 +205,7 @@ class FormatToolbar extends Component {
 		const linkSettings = settingsVisible && (
 			<div className="editor-format-toolbar__link-modal-line editor-format-toolbar__link-settings">
 				<ToggleControl
-					label={ __( 'Open in new window' ) }
+					label={ __( 'Open in New Window' ) }
 					checked={ opensInNewWindow }
 					onChange={ this.setLinkTarget } />
 			</div>

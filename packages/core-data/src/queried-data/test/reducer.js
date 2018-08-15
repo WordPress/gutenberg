@@ -106,7 +106,7 @@ describe( 'reducer', () => {
 		} );
 		const state = reducer( original, {
 			type: 'RECEIVE_ITEMS',
-			query: { s: 'a', page: 1, perPage: 3 },
+			query: { s: 'a', page: 1, per_page: 3 },
 			items: [
 				{ id: 1, name: 'abc' },
 			],

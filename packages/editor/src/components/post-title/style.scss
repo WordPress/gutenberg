@@ -1,7 +1,7 @@
 .editor-post-title__block {
 	position: relative;
 	padding: 5px 0;
-	
+
 	@include break-small() {
 		padding: 5px $block-parent-side-ui-clearance;
 	}
@@ -14,7 +14,7 @@
 		background: transparent;
 		font-family: $editor-font;
 		line-height: $default-line-height;
-		transition: border .1s ease-out;
+		transition: border 0.1s ease-out;
 
 		// Show wider parent padding on Desktop breakpoints.
 		padding: #{ $block-padding + 5px } $block-padding;
@@ -47,7 +47,7 @@
 	}
 
 	.editor-post-title__input:hover {
-		border-color: theme( outlines );
+		border-color: theme(outlines);
 	}
 }
 
