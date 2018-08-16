@@ -279,7 +279,7 @@
 
 .editor-block-list__layout .editor-block-list__block {
 	&.has-warning {
-		min-height: $block-padding + $block-spacing;
+		min-height: ( $block-padding + $block-spacing ) * 2;
 	}
 
 	// Warnings
