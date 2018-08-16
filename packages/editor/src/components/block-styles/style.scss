@@ -7,18 +7,20 @@
 .editor-block-styles__item {
 	cursor: pointer;
 	overflow: hidden;
+	border-radius: $radius-round-rectangle;
+	padding: $grid-size-small;
 
-	&:focus,
 	&.is-active {
-		.editor-block-styles__item-preview {
-			@include block-style__focus-active();
-		}
+		@include block-style__focus-active();
+		box-shadow: 0 0 0 2px $dark-gray-500;
+	}
+
+	&:focus {
+		@include block-style__focus-active();
 	}
 
 	&:hover {
-		.editor-block-styles__item-preview {
-			@include block-style__hover;
-		}
+		@include block-style__hover;
 	}
 }
 
@@ -31,6 +33,7 @@
 	border-radius: $radius-round-rectangle;
 	display: flex;
 	height: 60px;
+	background: $white;
 
 	> * {
 		transform: scale(0.7);
