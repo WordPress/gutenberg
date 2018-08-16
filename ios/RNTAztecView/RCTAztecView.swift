@@ -131,7 +131,13 @@ class RCTAztecView: Aztec.TextView {
     // MARK: Format interface
 
     @objc func apply(format: String) {
-        toggleBold(range: selectedRange)
+        switch format {
+        case "bold": toggleBold(range: selectedRange)
+        case "italic": toggleItalic(range: selectedRange)
+        case "strikethrough": toggleStrikethrough(range: selectedRange)
+        default: print("Format not recognized")
+        }
+
     }
 }
 
