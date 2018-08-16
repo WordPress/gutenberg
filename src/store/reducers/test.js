@@ -4,7 +4,7 @@
 
 import { reducer } from './';
 import * as actions from '../actions/';
-import { registerCoreBlocks } from '@gutenberg/core-blocks';
+import { registerCoreBlocks } from '@wordpress/block-library';
 
 describe( 'Store', () => {
 	describe( 'reducer', () => {
