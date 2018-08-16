@@ -719,10 +719,10 @@ function gutenberg_preload_api_request( $memo, $path ) {
  * @since 0.1.0
  */
 function gutenberg_register_vendor_scripts() {
-	$suffix = true ? '' : '.min';
+	$suffix = SCRIPT_DEBUG ? '' : '.min';
 
 	// Vendor Scripts.
-	$react_suffix = ( true ? '.development' : '.production' ) . $suffix;
+	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '.production' ) . $suffix;
 
 	gutenberg_register_vendor_script(
 		'react',
