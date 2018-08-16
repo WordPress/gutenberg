@@ -58,7 +58,8 @@
 	padding-left: 8px;
 
 	// Hide the keyboard shortcuts on mobile, because they aren't super-useful
-	// for most mobile users.
+	// for most mobile users and it frees up screen space for any item
+	// with a long description.
 	display: none;
 	@include break-mobile() {
 		display: inline;
