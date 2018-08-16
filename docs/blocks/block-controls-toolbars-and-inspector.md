@@ -163,7 +163,7 @@ Note that `BlockControls` is only visible when the block is currently selected a
 
 ## Inspector
 
-<img src="https://raw.githubusercontent.com/WordPress/gutenberg/try/4413-format-options-html/docs/blocks/inspector.png" with="281" height="527" alt="inspector">
+<img src="https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/blocks/inspector.png" with="281" height="527" alt="inspector">
 
 The inspector is used to display less-often-used settings or settings that require more screen space. The inspector should be used for **block-level settings only**.
 
