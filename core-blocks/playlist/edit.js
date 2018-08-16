@@ -24,6 +24,7 @@ import {
 	InspectorControls,
 	MediaPlaceholder,
 	BlockControls,
+	mediaUpload,
 	MediaUpload,
 } from '@wordpress/editor';
 
@@ -59,15 +60,15 @@ class PlaylistEdit extends Component {
 
 	onUploadFiles( files ) {
 		const { setAttributes, noticeOperations } = this.props;
-		MediaUpload( {
+		mediaUpload( {
 			allowedType: [ 'audio', 'video' ],
-			filesList: files,
-			onFileChange: ( media ) => {
+			filesList: [ files ],
+			onFileChange: ( [ media ] ) => {
 				const firstType = get( files, [ 0, 'mimeType' ] );
 				const isConsistentType = !! firstType && every( files, ( filesMedia ) => filesMedia.mimeType === firstType );
 				//validate type is consistent for playlist
 				if ( ! isConsistentType ) {
-					this.setState( { hasError: true } );
+					// this.setState( { hasError: true } );
 					noticeOperations.createErrorNotice( 'CANNOT DO THAT' );
 					setAttributes( { ids: null, type: null } );
 				} else if ( media.length > 0 && media[ 0 ].mimeType ) {
@@ -141,7 +142,6 @@ class PlaylistEdit extends Component {
 						type={ type }
 						multiple
 						playlist
-						notices={ this.props.noticeUI }
 						value={ mediaIds }
 						render={ ( { open } ) => (
 							<IconButton
