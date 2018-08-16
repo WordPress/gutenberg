@@ -88,7 +88,7 @@ $block-inserter-search-height: 38px;
 	overflow: auto;
 	position: relative;
 	z-index: 1; // Necessary for the stacked card below parent blocks to show up.
-	margin: 0 $grid-size-large $grid-size-large $grid-size-large;
+	padding: 0 $grid-size-large $grid-size-large $grid-size-large;
 
 	&:focus {
 		outline: $border-width dotted $dark-gray-500;
