@@ -34,7 +34,7 @@
 
 		// Show the hover background in a pseudo selector so it can be below "stacked" icons, like Columns.
 		&:hover::before {
-			content: '';
+			content: "";
 			display: block;
 			@include block-style__hover();
 			position: absolute;
