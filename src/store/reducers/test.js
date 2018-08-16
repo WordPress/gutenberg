@@ -4,6 +4,7 @@
 
 import { reducer } from './';
 import * as actions from '../actions/';
+import { registerCoreBlocks } from '@wordpress/block-library';
 
 describe( 'Store', () => {
 	describe( 'reducer', () => {
@@ -12,6 +13,8 @@ describe( 'Store', () => {
 		let initialState;
 
 		beforeAll( () => {
+			registerCoreBlocks();
+
 			__iniState = {
 				blocks: [
 					{
@@ -155,6 +158,17 @@ describe( 'Store', () => {
 
 			// the code block should be at the bottom
 			expect( newState.blocks[ 1 ].blockType ).toEqual( 'core/code' );
+		} );
+
+		it( 'parses the html string into a new array of blocks', () => {
+			const htmlContent = '<!--more-->';
+			const html = '<!-- wp:more -->' + htmlContent + '<!-- /wp:more -->';
+
+			const newState = reducer( initialState, actions.parseBlocksAction( html ) );
+
+			expect( newState.blocks ).toHaveLength( 1 );
+			expect( newState.blocks[ 0 ].originalContent ).toEqual( htmlContent );
+			expect( newState.blocks[ 0 ].name ).toEqual( 'core/more' );
 		} );
 	} );
 } );

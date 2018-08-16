@@ -8,6 +8,7 @@ import { find, findIndex, reduce } from 'lodash';
 import ActionTypes from '../actions/ActionTypes';
 import type { StateType } from '../';
 import type { BlockActionType } from '../actions';
+import { parse } from '@wordpress/blocks';
 
 function findBlock( blocks, clientId: string ) {
 	return find( blocks, ( obj ) => {
@@ -122,6 +123,10 @@ export const reducer = (
 			// set that one to `focused: false`.
 			insertBlock( blocks, action.block, action.clientIdAbove );
 			return { blocks: blocks, refresh: ! state.refresh };
+		}
+		case ActionTypes.BLOCK.PARSE: {
+			const parsed = parse( action.html );
+			return { blocks: parsed, refresh: ! state.refresh, fullparse: true };
 		}
 		default:
 			return state;
