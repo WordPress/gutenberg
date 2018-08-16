@@ -27,7 +27,9 @@ import {
 	deleteColumn,
 } from './state';
 
-export default class extends Component {
+const { parseInt } = window;
+
+export default class TableEdit extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -61,7 +63,10 @@ export default class extends Component {
 
 	onCreateTable() {
 		const { setAttributes } = this.props;
-		const { initialRowCount, initialColumnCount } = this.state;
+		let { initialRowCount, initialColumnCount } = this.state;
+
+		initialRowCount = parseInt( initialRowCount, 10 ) || 2;
+		initialColumnCount = parseInt( initialColumnCount, 10 ) || 2;
 
 		setAttributes( createTable( {
 			rowCount: initialRowCount,
@@ -77,9 +82,8 @@ export default class extends Component {
 	}
 
 	createOnChange( { section, rowIndex, columnIndex } ) {
-		const { attributes, setAttributes } = this.props;
-
 		return ( content ) => {
+			const { attributes, setAttributes } = this.props;
 			setAttributes( updateCellContent( attributes, {
 				section,
 				rowIndex,
@@ -90,40 +94,34 @@ export default class extends Component {
 	}
 
 	createOnInsertRow( { section, rowIndex }, delta ) {
-		const { attributes, setAttributes } = this.props;
-
-		rowIndex += delta;
-
 		return () => {
+			const { attributes, setAttributes } = this.props;
+			rowIndex += delta;
 			setAttributes( insertRow( attributes, { section, rowIndex } ) );
 			this.setState( { selectedCell: null } );
 		};
 	}
 
 	createOnDeleteRow( { section, rowIndex } ) {
-		const { attributes, setAttributes } = this.props;
-
 		return () => {
+			const { attributes, setAttributes } = this.props;
 			setAttributes( deleteRow( attributes, { section, rowIndex } ) );
 			this.setState( { selectedCell: null } );
 		};
 	}
 
 	createOnInsertColumn( { section, columnIndex }, delta ) {
-		const { attributes, setAttributes } = this.props;
-
-		columnIndex += delta;
-
 		return () => {
+			const { attributes, setAttributes } = this.props;
+			columnIndex += delta;
 			setAttributes( insertColumn( attributes, { section, columnIndex } ) );
 			this.setState( { selectedCell: null } );
 		};
 	}
 
 	createOnDeleteColumn( { section, columnIndex } ) {
-		const { attributes, setAttributes } = this.props;
-
 		return () => {
+			const { attributes, setAttributes } = this.props;
 			setAttributes( deleteColumn( attributes, { section, columnIndex } ) );
 			this.setState( { selectedCell: null } );
 		};
@@ -197,7 +195,7 @@ export default class extends Component {
 								columnIndex === selectedCell.columnIndex
 							);
 
-							const id = {
+							const cell = {
 								section: type,
 								rowIndex,
 								columnIndex,
@@ -211,9 +209,8 @@ export default class extends Component {
 								<CellTag key={ columnIndex } className={ classes }>
 									<RichText
 										value={ content }
-										onChange={ this.createOnChange( id ) }
-										placeholder={ __( 'Add cell content' ) }
-										unstableOnFocus={ this.createOnFocus( id ) }
+										onChange={ this.createOnChange( cell ) }
+										unstableOnFocus={ this.createOnFocus( cell ) }
 									/>
 								</CellTag>
 							);
@@ -242,21 +239,23 @@ export default class extends Component {
 
 		if ( isEmpty ) {
 			return (
-				<Fragment>
+				<form onSubmit={ this.onCreateTable }>
 					<TextControl
 						type="number"
 						label={ __( 'Column Count' ) }
 						value={ initialColumnCount }
 						onChange={ this.onChangeInitialColumnCount }
+						min="1"
 					/>
 					<TextControl
 						type="number"
 						label={ __( 'Row Count' ) }
 						value={ initialRowCount }
 						onChange={ this.onChangeInitialRowCount }
+						min="1"
 					/>
-					<Button isPrimary onClick={ this.onCreateTable }>Create</Button>
-				</Fragment>
+					<Button isPrimary type="submit">{ __( 'Create' ) }</Button>
+				</form>
 			);
 		}
 

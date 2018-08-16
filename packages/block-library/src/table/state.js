@@ -24,14 +24,14 @@ export function updateCellContent( state, {
 	content,
 } ) {
 	return {
-		[ section ]: state[ section ].map( ( row, i ) => {
-			if ( i !== rowIndex ) {
+		[ section ]: state[ section ].map( ( row, currentRowIndex ) => {
+			if ( currentRowIndex !== rowIndex ) {
 				return row;
 			}
 
 			return {
-				cells: row.cells.map( ( cell, ii ) => {
-					if ( ii !== columnIndex ) {
+				cells: row.cells.map( ( cell, currentColumnIndex ) => {
+					if ( currentColumnIndex !== columnIndex ) {
 						return cell;
 					}
 

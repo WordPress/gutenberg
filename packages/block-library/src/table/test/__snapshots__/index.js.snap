@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`core/embed block edit matches snapshot 1`] = `
-Array [
+<form>
   <div
     class="components-base-control"
   >
@@ -17,11 +17,12 @@ Array [
       <input
         class="components-text-control__input"
         id="inspector-text-control-0"
+        min="1"
         type="number"
         value="2"
       />
     </div>
-  </div>,
+  </div>
   <div
     class="components-base-control"
   >
@@ -37,16 +38,17 @@ Array [
       <input
         class="components-text-control__input"
         id="inspector-text-control-1"
+        min="1"
         type="number"
         value="2"
       />
     </div>
-  </div>,
+  </div>
   <button
     class="components-button is-button is-primary"
-    type="button"
+    type="submit"
   >
     Create
-  </button>,
-]
+  </button>
+</form>
 `;
