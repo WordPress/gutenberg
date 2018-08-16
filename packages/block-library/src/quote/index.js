@@ -204,7 +204,6 @@ export const settings = {
 					/>
 					{ ( ( citation && citation.length > 0 ) || isSelected ) && (
 						<RichText
-							tagName="cite"
 							value={ citation }
 							onChange={
 								( nextCitation ) => setAttributes( {
@@ -213,6 +212,7 @@ export const settings = {
 							}
 							/* translators: the individual or entity quoted */
 							placeholder={ __( 'Write citation…' ) }
+							className="wp-block-quote__citation"
 						/>
 					) }
 				</blockquote>
