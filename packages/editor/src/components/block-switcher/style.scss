@@ -24,6 +24,8 @@
 		height: $icon-button-size-small;
 		margin: 0;
 		padding: 0 6px;
+		display: flex;
+		align-items: center;
 
 		svg {
 			height: 21px;
