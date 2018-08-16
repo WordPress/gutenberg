@@ -365,7 +365,7 @@ function has_blocks( $post = null ) {
  * @see gutenberg_parse_blocks()
  *
  * @since 0.5.0
- * @deprecated 3.6.0 Use has_block()
+ * @deprecated 3.6.0 Use has_blocks()
  *
  * @param object $post Post.
  * @return bool  Whether the post has blocks.
@@ -384,7 +384,7 @@ function gutenberg_post_has_blocks( $post ) {
  * @see gutenberg_parse_blocks()
  *
  * @since 1.6.0
- * @deprecated 3.6.0 Use has_block()
+ * @deprecated 3.6.0 Use has_blocks()
  *
  * @param string $content Content to test.
  * @return bool Whether the content contains blocks.
@@ -392,6 +392,33 @@ function gutenberg_post_has_blocks( $post ) {
 function gutenberg_content_has_blocks( $content ) {
 	_deprecated_function( __FUNCTION__, '3.6.0', 'has_blocks()' );
 	return has_blocks( $content );
+}
+
+/**
+ * Determine whether a $post or a string contains a specific block type.
+ * This test optimizes for performance rather than strict accuracy, detecting
+ * the block type exists but not validating its structure.
+ * For strict accuracy, you should use the block parser on post content.
+ *
+ * @since 3.6.0
+ *
+ * @param string                  $block_type Full Block type to look for.
+ * @param int|string|WP_Post|null $post Optional. Post content, post ID, or post object. Defaults to global $post.
+ * @return bool Whether the post content contains the specified block.
+ */
+function has_block( $block_type, $post = null ) {
+	if ( ! is_string( $post ) ) {
+		$wp_post = get_post( $post );
+		if ( $wp_post instanceof WP_Post ) {
+			$post = $wp_post->post_content;
+		}
+	}
+
+	if ( ! has_blocks( $post ) ) {
+		return false;
+	}
+
+	return false !== strpos( $post, '<!-- wp:' . $block_type . ' ' );
 }
 
 /**
