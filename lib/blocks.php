@@ -91,6 +91,8 @@ function get_dynamic_block_names() {
 /**
  * Retrieve the dynamic blocks regular expression for searching.
  *
+ * @since 3.6.0
+ *
  * @return string
  */
 function get_dynamic_blocks_regex() {
@@ -222,6 +224,8 @@ add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode().
 /**
  * Remove all dynamic blocks from the given content.
  *
+ * @since 3.6.0
+ *
  * @param string $content Content of the current post.
  * @return string
  */
@@ -235,8 +239,9 @@ function strip_dynamic_blocks( $content ) {
  * It's a bit hacky for now, but once this gets merged into core the function
  * can just be called in `wp_trim_excerpt()`.
  *
- * @param string $text Excerpt.
+ * @since 3.6.0
  *
+ * @param string $text Excerpt.
  * @return string
  */
 function strip_dynamic_blocks_add_filter( $text ) {
@@ -251,6 +256,8 @@ add_filter( 'get_the_excerpt', 'strip_dynamic_blocks_add_filter', 9 ); // Before
  *
  * It's a bit hacky for now, but once this gets merged into core the function
  * can just be called in `wp_trim_excerpt()`.
+ *
+ * @since 3.6.0
  *
  * @param string $text Excerpt.
  * @return string
