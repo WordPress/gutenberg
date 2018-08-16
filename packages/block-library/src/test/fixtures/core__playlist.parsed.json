@@ -1,0 +1,15 @@
+[
+    {
+        "blockName": "core/playlist",
+        "attrs": {
+            "ids": "[60,61]",
+            "type": "video"
+        },
+        "innerBlocks": [],
+        "innerHTML": ""
+    },
+    {
+        "attrs": {},
+        "innerHTML": "\n"
+    }
+]
