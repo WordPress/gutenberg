@@ -16,6 +16,7 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 
 ## 3.6.0
 
+ - `wp.components.Draggable` has been deprecated. Please, use `wp.components.withDraggable` instead.
  - `wp.editor.editorMediaUpload` has been removed. Please use `wp.editor.mediaUpload` instead.
  - `wp.utils.getMimeTypesArray` has been removed.
  - `wp.utils.mediaUpload` has been removed. Please use `wp.editor.mediaUpload` instead.
