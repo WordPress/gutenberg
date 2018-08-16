@@ -376,6 +376,7 @@ export class BlockListBlock extends Component {
 			isMovable,
 			isPreviousBlockADefaultEmptyBlock,
 			hasSelectedInnerBlock,
+			attachedData
 		} = this.props;
 		const isHovered = this.state.isHovered && ! isMultiSelecting;
 		const { name: blockName, isValid } = block;
@@ -532,6 +533,7 @@ export class BlockListBlock extends Component {
 								clientId={ clientId }
 								isSelectionEnabled={ this.props.isSelectionEnabled }
 								toggleSelection={ this.props.toggleSelection }
+								attachedData={attachedData}
 							/>
 						) }
 						{ isValid && mode === 'html' && (

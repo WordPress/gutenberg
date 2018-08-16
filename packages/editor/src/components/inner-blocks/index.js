@@ -86,6 +86,7 @@ class InnerBlocks extends Component {
 			template,
 			isSmallScreen,
 			isSelectedBlockInRoot,
+			attachedData
 		} = this.props;
 
 		const classes = classnames( 'editor-inner-blocks', {
@@ -96,7 +97,7 @@ class InnerBlocks extends Component {
 			<div className={ classes }>
 				<BlockList
 					rootClientId={ clientId }
-					{ ...{ layouts, allowedBlocks, templateLock, template } }
+					{ ...{ layouts, allowedBlocks, templateLock, template, attachedData } }
 				/>
 			</div>
 		);

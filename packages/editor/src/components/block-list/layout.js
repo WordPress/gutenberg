@@ -196,6 +196,7 @@ class BlockListLayout extends Component {
 			isGroupedByLayout,
 			rootClientId,
 			canInsertDefaultBlock,
+			attachedData
 		} = this.props;
 
 		let defaultLayout;
@@ -221,6 +222,7 @@ class BlockListLayout extends Component {
 						layout={ defaultLayout }
 						isFirst={ blockIndex === 0 }
 						isLast={ blockIndex === blockClientIds.length - 1 }
+						attachedData={attachedData}
 					/>
 				) ) }
 				{ canInsertDefaultBlock && (
