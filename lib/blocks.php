@@ -57,7 +57,7 @@ function gutenberg_parse_blocks( $content ) {
 	 * If there are no blocks in the content, return a single block, rather
 	 * than wasting time trying to parse the string.
 	 */
-	if ( ! gutenberg_content_has_blocks( $content ) ) {
+	if ( ! has_blocks( $content ) ) {
 		return array(
 			array(
 				'attrs'     => array(),
