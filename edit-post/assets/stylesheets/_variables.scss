@@ -14,8 +14,12 @@ $editor-line-height: 1.8;
 $big-font-size: 18px;
 $mobile-text-min-font-size: 16px;	// Any font size below 16px will cause Mobile Safari to "zoom in"
 
+// Grid size
+$item-spacing: 10px; // Should deprecate this in favor of $grid-size.
+$grid-size: 8px;
+$grid-size-large: 16px;
+
 // Widths, heights & dimensions
-$item-spacing: 10px;
 $panel-padding: 16px;
 $header-height: 56px;
 $panel-header-height: 50px;

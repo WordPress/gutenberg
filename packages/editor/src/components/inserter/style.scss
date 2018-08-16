@@ -39,7 +39,6 @@ $block-inserter-search-height: 38px;
 	display: flex;
 	flex-direction: column;
 	height: 100%;
-	padding: 13px;
 	@include break-medium {
 		width: 400px;
 		position: relative;
@@ -67,8 +66,8 @@ $block-inserter-search-height: 38px;
 
 .components-popover input[type="search"].editor-inserter__search {
 	display: block;
-	margin: 0 0 13px;
-	padding: 11px 16px;
+	margin: $grid-size-large;
+	padding: 11px $grid-size-large;
 	position: relative;
 	z-index: 1;
 	border-radius: $radius-round-rectangle;
@@ -89,6 +88,7 @@ $block-inserter-search-height: 38px;
 	overflow: auto;
 	position: relative;
 	z-index: 1; // Necessary for the stacked card below parent blocks to show up.
+	margin: 0 $grid-size-large $grid-size-large $grid-size-large;
 
 	&:focus {
 		outline: $border-width dotted $dark-gray-500;
@@ -115,7 +115,7 @@ $block-inserter-search-height: 38px;
 }
 
 .editor-inserter__child-blocks {
-	padding: 0 16px;
+	padding: 0 $grid-size-large;
 }
 
 .editor-inserter__parent-block-header {
