@@ -12,7 +12,7 @@
 	display: inline-flex;
 	flex-direction: column;
 	width: calc(33.3% - 8px);
-	margin: 0 4px 8px 4px;
+	margin: 0 4px 12px 4px;
 	font-size: $default-font-size;
 	color: $dark-gray-700;
 	padding: 0;
@@ -70,7 +70,7 @@
 }
 
 .editor-block-types-list__item-icon {
-	padding: 15px 20px;
+	padding: 12px 20px;
 	border-radius: $radius-round-rectangle;
 	color: $dark-gray-500;
 	transition: all 0.05s ease-in-out;

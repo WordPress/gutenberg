@@ -54,6 +54,10 @@
 	// Hide the bottom border on the last panel so it stacks with the popover.
 	.components-panel__body {
 		border: 0;
+
+		// Elevate this so the hover style is visible.
+		position: relative;
+		z-index: 1;
 	}
 
 	.components-panel__body + .components-panel__body {
