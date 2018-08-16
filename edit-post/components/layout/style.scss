@@ -86,7 +86,14 @@
 	-webkit-overflow-scrolling: touch;
 
 	.edit-post-visual-editor {
-		flex-basis: 100%;
+		flex-grow: 1;
+
+		// In IE11 flex-basis: 100% cause a bug where the metaboxes area overlap with the content area.
+		// But it works as expected without it.
+		// The flex-basis is needed for the other browsers to make sure the content area is full-height.
+		@supports (position: sticky) {
+			flex-basis: 100%;
+		}
 	}
 
 	.edit-post-layout__metaboxes {
