@@ -433,8 +433,23 @@ export class BlockListBlock extends Component {
 		// HTML mode. This allows us to render all of the ancillary pieces
 		// (InspectorControls, etc.) which are inside `BlockEdit` but not
 		// `BlockHTML`, even in HTML mode.
-		const BlockEditWrapper = mode === 'visual' ? Fragment :
-			'div';
+		let blockEdit = (
+			<BlockEdit
+				name={ blockName }
+				isSelected={ isSelected }
+				attributes={ block.attributes }
+				setAttributes={ this.setAttributes }
+				insertBlocksAfter={ isLocked ? undefined : this.insertBlocksAfter }
+				onReplace={ isLocked ? undefined : onReplace }
+				mergeBlocks={ isLocked ? undefined : this.mergeBlocks }
+				clientId={ clientId }
+				isSelectionEnabled={ this.props.isSelectionEnabled }
+				toggleSelection={ this.props.toggleSelection }
+			/>
+		);
+		if ( mode !== 'visual' ) {
+			blockEdit = <div style={ { display: 'none' } }>{ blockEdit }</div>;
+		}
 
 		// Disable reasons:
 		//
@@ -527,24 +542,9 @@ export class BlockListBlock extends Component {
 					data-block={ clientId }
 				>
 					<BlockCrashBoundary onError={ this.onBlockError }>
-						{ isValid && (
-							<BlockEditWrapper style={ mode === 'visual' ? null : { display: 'none' } }>
-								<BlockEdit
-									name={ blockName }
-									isSelected={ isSelected }
-									attributes={ block.attributes }
-									setAttributes={ this.setAttributes }
-									insertBlocksAfter={ isLocked ? undefined : this.insertBlocksAfter }
-									onReplace={ isLocked ? undefined : onReplace }
-									mergeBlocks={ isLocked ? undefined : this.mergeBlocks }
-									clientId={ clientId }
-									isSelectionEnabled={ this.props.isSelectionEnabled }
-									toggleSelection={ this.props.toggleSelection }
-								/>
-							</BlockEditWrapper>
-						) }
+						{ isValid && blockEdit }
 						{ isValid && mode === 'html' && (
-							<BlockHtml clientId={ clientId } isSelectionEnabled />
+							<BlockHtml clientId={ clientId } />
 						) }
 						{ ! isValid && [
 							<div key="invalid-preview">
