@@ -15,7 +15,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import { isIconUnreadable, isValidIcon, normalizeIconObject } from './utils';
+import { isValidIcon, normalizeIconObject } from './utils';
 
 /**
  * Defined behavior of a block type.
@@ -158,13 +158,6 @@ export function registerBlockType( name, settings ) {
 			'The icon should be a string, an element, a function, or an object following the specifications documented in https://wordpress.org/gutenberg/handbook/block-api/#icon-optional'
 		);
 		return;
-	}
-
-	if ( isIconUnreadable( settings.icon ) && window ) {
-		window.console.warn(
-			`The icon background color ${ settings.icon.background } and the foreground color ${ settings.icon.foreground } are not readable together. ` +
-			'Please try to increase the brightness and/or contrast difference between background and foreground.'
-		);
 	}
 
 	dispatch( 'core/blocks' ).addBlockTypes( settings );

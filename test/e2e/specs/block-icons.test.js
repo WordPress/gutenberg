@@ -11,7 +11,7 @@ import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
 const INSERTER_BUTTON_SELECTOR = '.components-popover__content .editor-block-types-list__item';
 const INSERTER_ICON_SELECTOR = `${ INSERTER_BUTTON_SELECTOR } .editor-block-types-list__item-icon`;
-const INSPECTOR_ICON_SELECTOR = '.edit-post-sidebar .editor-block-icon__colors';
+const INSPECTOR_ICON_SELECTOR = '.edit-post-sidebar .editor-block-icon';
 
 async function getInnerHTML( selector ) {
 	return await page.$eval( selector, ( element ) => element.innerHTML );

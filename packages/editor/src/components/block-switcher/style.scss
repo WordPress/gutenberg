@@ -19,13 +19,25 @@
 		border: none;
 	}
 
+	.editor-block-icon {
+		background: $light-gray-200;
+		height: $icon-button-size-small;
+		margin: 0;
+		padding: 0 6px;
+
+		svg {
+			height: 21px;
+			width: 21px;
+		}
+	}
+
 	// Block hover style.
-	&:not(:disabled):hover .editor-block-icon__colors {
+	&:not(:disabled):hover .editor-block-icon {
 		@include block-style__hover();
 	}
 
 	// Block focus style.
-	&:not(:disabled):focus .editor-block-icon__colors {
+	&:not(:disabled):focus .editor-block-icon {
 		@include block-style__focus-active();
 	}
 }
