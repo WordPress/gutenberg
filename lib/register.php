@@ -407,15 +407,15 @@ function gutenberg_content_has_blocks( $content ) {
  * @return bool Whether the post content contains the specified block.
  */
 function has_block( $block_type, $post = null ) {
+	if ( ! has_blocks( $post ) ) {
+		return false;
+	}
+
 	if ( ! is_string( $post ) ) {
 		$wp_post = get_post( $post );
 		if ( $wp_post instanceof WP_Post ) {
 			$post = $wp_post->post_content;
 		}
-	}
-
-	if ( ! has_blocks( $post ) ) {
-		return false;
 	}
 
 	return false !== strpos( $post, '<!-- wp:' . $block_type . ' ' );
