@@ -4,7 +4,7 @@ import * as actions from './';
 import ActionTypes from './ActionTypes';
 // Gutenberg imports
 import { createBlock } from '@wordpress/blocks';
-import { registerCoreBlocks } from '@gutenberg/core-blocks';
+import { registerCoreBlocks } from '@wordpress/block-library';
 
 describe( 'Store', () => {
 	describe( 'actions', () => {
