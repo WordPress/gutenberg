@@ -11,7 +11,7 @@
 	}
 }
 
-// This is necessary for the editor resize handles to accurately work on a non floated small non resized image.
+// This is necessary for the editor resize handles to accurately work on a non-floated, non-resized, small image.
 .wp-block-image {
 	.wp-block-image__resizer {
 		display: inline-block;
