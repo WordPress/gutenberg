@@ -63,7 +63,7 @@
 
 .editor-block-switcher__popover:not(.is-mobile) > .components-popover__content {
 	// Reset overflow to allow showing the preview on the left once an item is hovered.
-	overflow-y: initial;
+	overflow-y: visible;
 }
 
 .editor-block-switcher__popover .editor-block-styles {

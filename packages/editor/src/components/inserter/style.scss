@@ -18,7 +18,7 @@ $block-inserter-search-height: 38px;
 
 .editor-inserter__popover:not(.is-mobile) > .components-popover__content {
 	@include break-medium {
-		overflow-y: initial;
+		overflow-y: visible;
 		height: $block-inserter-content-height + $block-inserter-tabs-height + $block-inserter-search-height;
 	}
 }
