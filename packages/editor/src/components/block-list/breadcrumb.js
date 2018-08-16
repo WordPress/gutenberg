@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Component, Fragment } from '@wordpress/element';
-import { Dashicon, Toolbar } from '@wordpress/components';
+import { Dashicon, Toolbar, withDraggable } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -48,10 +48,10 @@ export class BlockBreadcrumb extends Component {
 	}
 
 	render() {
-		const { clientId, rootClientId } = this.props;
+		const { isDraggable, clientId, rootClientId, draggableData, draggableElementId, onDragStart } = this.props;
 
 		return (
-			<div className={ 'editor-block-list__breadcrumb' }>
+			<div className={ 'editor-block-list__breadcrumb' } draggable={ isDraggable } onDragStart={ onDragStart( draggableElementId, draggableData ) } >
 				<Toolbar>
 					<div className="editor-block-list__breadcrumb-drag-handle"><Dashicon icon="editor-justify" size={ 10 } viewBox={ 14 } /></div>
 					{ rootClientId && (
@@ -71,9 +71,9 @@ export default compose( [
 	withSelect( ( select, ownProps ) => {
 		const { getBlockRootClientId } = select( 'core/editor' );
 		const { clientId } = ownProps;
-
 		return {
 			rootClientId: getBlockRootClientId( clientId ),
 		};
 	} ),
+	withDraggable,
 ] )( BlockBreadcrumb );

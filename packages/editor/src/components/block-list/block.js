@@ -44,7 +44,6 @@ import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMultiControls from './multi-controls';
 import BlockMobileToolbar from './block-mobile-toolbar';
 import BlockInsertionPoint from './insertion-point';
-import BlockDraggable from './block-draggable';
 import IgnoreNestedEvents from './ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
@@ -394,7 +393,7 @@ export class BlockListBlock extends Component {
 		// We render block movers and block settings to keep them tabbale even if hidden
 		const shouldRenderMovers = ( isSelected || hoverArea === 'left' ) && ! showEmptyBlockSideInserter && ! isMultiSelecting && ! isPartOfMultiSelection && ! isTypingWithinBlock;
 		const shouldRenderBlockSettings = ( isSelected || hoverArea === 'right' ) && ! isMultiSelecting && ! isPartOfMultiSelection;
-		const shouldShowBreadcrumb = isHovered && ! isEmptyDefaultBlock;
+		const shouldShowBreadcrumb = ( isSelected || isHovered ) && ! isEmptyDefaultBlock;
 		const shouldShowContextualToolbar = ! showSideInserter && ( ( isSelected && ! isTypingWithinBlock && isValid ) || isFirstMultiSelected ) && ( ! hasFixedToolbar || ! isLargeViewport );
 		const shouldShowMobileToolbar = shouldAppearSelected;
 		const { error, dragging } = this.state;
@@ -481,18 +480,6 @@ export class BlockListBlock extends Component {
 				] }
 				{ ...wrapperProps }
 			>
-				{ ! isPartOfMultiSelection && isMovable && (
-					<BlockDraggable
-						rootClientId={ rootClientId }
-						index={ order }
-						clientId={ clientId }
-						layout={ layout }
-						onDragStart={ this.onDragStart }
-						onDragEnd={ this.onDragEnd }
-						isDragging={ dragging }
-						elementId={ blockElementId }
-					/>
-				) }
 				{ shouldShowInsertionPoint && (
 					<BlockInsertionPoint
 						clientId={ clientId }
@@ -527,6 +514,15 @@ export class BlockListBlock extends Component {
 				{ shouldShowBreadcrumb && (
 					<BlockBreadcrumb
 						clientId={ clientId }
+						draggableData={ {
+							type: 'block',
+							fromIndex: order,
+							rootClientId,
+							clientId,
+							layout,
+						} }
+						draggableElementId={ blockElementId }
+						isDraggable={ ! isPartOfMultiSelection && isMovable }
 						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }
 					/>
 				) }
