@@ -41,6 +41,13 @@
 		// !important allows icons from plugins to be overriden and given a dark-gray fill
 		fill: $dark-gray-900 !important;
 	}
+
+	// Don't wrap text until viewport is beyond the mobile breakpoint.
+	@include break-mobile() {
+		.components-popover:not(.is-mobile) & {
+			white-space: nowrap;
+		}
+	}
 }
 
 .components-menu-item__shortcut {
@@ -48,4 +55,5 @@
 	margin-right: 0;
 	margin-left: auto;
 	align-self: center;
+	padding-left: 8px;
 }
