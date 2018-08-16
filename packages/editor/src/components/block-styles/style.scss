@@ -1,12 +1,12 @@
 .editor-block-styles {
 	display: flex;
 	flex-wrap: wrap;
-	padding: $item-spacing / 2;
+	justify-content: space-between;
 }
 
 .editor-block-styles__item {
-	margin: $item-spacing / 2;
-	width: calc(50% - #{ $item-spacing });
+	width: calc(50% - #{ $item-spacing / 2 });
+	margin: ($item-spacing / 2) 0;
 	flex-shrink: 0;
 	cursor: pointer;
 	overflow: hidden;
