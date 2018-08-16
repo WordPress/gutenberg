@@ -14,7 +14,7 @@
 		width: 100%;
 	}
 
-	// Floats get an extra wrapping aside element, so the figure becomes a child.
+	// Floats get an extra wrapping <aside> element, so the <figure> becomes a child.
 	.alignleft,
 	.alignright,
 	.aligncenter,
@@ -39,15 +39,15 @@
 	}
 
 	// Supply caption styles to images, even if the theme hasn't opted in.
-	// Reason being: the new markup, figcaptions, are not likely to be styled in the majority of existing themes,
-	// so we supply the styles so as to not appear broken or unstyled in those.
+	// Reason being: the new markup, <figcaptions>, are not likely to be styled in the majority of existing themes,
+	// so we supply the styles so as to not appear broken or unstyled in those themes.
 	figcaption {
 		@include caption-style();
 	}
 }
 
-// Resized images that are not floated, need the caption trick too.
-// These apply the .wp-block-image class on the figure element itself.
+// Resized images that are not floated, so they need the caption trick too.
+// These apply the .wp-block-image class on the <figure> element itself.
 figure.wp-block-image {
 	display: table;
 	margin: 0;
