@@ -20,8 +20,7 @@ describe( 'PanelBody', () => {
 
 		it( 'should render an Button matching the following props and state', () => {
 			const panelBody = shallow( <PanelBody title="Some Text" /> );
-			const button = panelBody.find( 'Button' );
-			expect( button.shallow().hasClass( 'components-panel__body-toggle' ) ).toBe( true );
+			const button = panelBody.find( '.components-panel__body-toggle' );
 			expect( panelBody.hasClass( 'is-opened' ) ).toBe( true );
 			expect( panelBody.state( 'opened' ) ).toBe( true );
 			expect( button.prop( 'onClick' ) ).toBe( panelBody.instance().toggle );
