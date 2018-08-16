@@ -1,13 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import ReactNative, {requireNativeComponent, ViewPropTypes, UIManager} from 'react-native';
+import ReactNative, {requireNativeComponent, ViewPropTypes, UIManager, ColorPropType} from 'react-native';
 
 class AztecView extends React.Component {
   
   static propTypes = {
     text: PropTypes.object,
     placeholder: PropTypes.string,
-    placeholderTextColor: PropTypes.number,
+    placeholderTextColor: ColorPropType,
     color: PropTypes.string,
     maxImagesWidth: PropTypes.number,
     minImagesWidth: PropTypes.number,
