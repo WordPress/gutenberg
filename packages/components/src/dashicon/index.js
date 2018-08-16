@@ -10,6 +10,7 @@ OR if you're looking to change now SVGs get output, you'll need to edit strings 
  */
 import { Component } from '@wordpress/element';
 import SVG from './svg';
+import Path from './path';
 
 export default class Dashicon extends Component {
 	shouldComponentUpdate( nextProps ) {
@@ -886,10 +887,18 @@ export default class Dashicon extends Component {
 		const iconClass = [ 'dashicon', 'dashicons-' + icon, className ].filter( Boolean ).join( ' ' );
 
 		return (
-			<SVG className={ iconClass }
-				size={ size }
-				path= { path }				
-			/>			
+			<SVG
+				aria-hidden
+				role="img"
+				focusable="false"
+				className={ iconClass }
+				xmlns="http://www.w3.org/2000/svg"
+				width={ size }
+				height={ size }
+				viewBox="0 0 20 20"
+			>
+				<Path d={ path } />
+			</SVG>
 		);
 	}
 }
