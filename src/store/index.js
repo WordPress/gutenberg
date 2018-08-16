@@ -55,7 +55,7 @@ const headingBlockInstance = parse( initialHeadingBlockHtml )[ 0 ];
 const paragraphBlockInstance = parse( initialParagraphBlockHtml )[ 0 ];
 const paragraphBlockInstance2 = parse( initialParagraphBlockHtml2 )[ 0 ];
 
-const initialState: StateType = {
+export const initialState: StateType = {
 	// TODO: get blocks list block state should be externalized (shared with Gutenberg at some point?).
 	// If not it should be created from a string parsing (commented HTML to json).
 	blocks: [
