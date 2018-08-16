@@ -8,7 +8,6 @@ import { assign, includes } from 'lodash';
  * WordPress dependencies
  */
 import { createHigherOrderComponent } from '@wordpress/compose';
-import deprecated from '@wordpress/deprecated';
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport, getBlockSupport } from '@wordpress/blocks';
 
@@ -55,14 +54,7 @@ export function getBlockValidAlignments( blockName ) {
 		// `true` includes all alignments...
 		validAlignments.push( 'left', 'center', 'right' );
 
-		// ...including wide alignments unless explicitly `false`.
-		if ( getBlockSupport( blockName, 'wideAlign' ) === false ) {
-			deprecated( 'supports.wideAlign in Block API', {
-				version: '3.6',
-				alternative: 'supports.alignWide',
-				plugin: 'Gutenberg',
-			} );
-		} else if ( hasBlockSupport( blockName, 'alignWide', true ) ) {
+		if ( hasBlockSupport( blockName, 'alignWide', true ) ) {
 			validAlignments.push( 'wide', 'full' );
 		}
 	}

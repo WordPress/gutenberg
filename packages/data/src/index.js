@@ -14,8 +14,6 @@ export { default as withDispatch } from './components/with-dispatch';
 export { default as RegistryProvider, RegistryConsumer } from './components/registry-provider';
 export { createRegistry } from './registry';
 export {
-	withRehydration,
-	loadAndPersist,
 	restrictPersistence,
 	setPersistenceStorage,
 } from './deprecated';
