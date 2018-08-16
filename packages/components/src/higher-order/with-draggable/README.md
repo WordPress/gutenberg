@@ -31,7 +31,6 @@ const MyDraggable = ( { onDragStart } ) => (
 						icon="move"
 						draggable="true"
 						onDragStart={ onDragStart( "draggable-panel", {} ) } />
-				</Draggable>
 			</PanelBody>
 		</Panel>
 	</div>
