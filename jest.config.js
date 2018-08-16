@@ -12,6 +12,7 @@ if ( process.env.TEST_RN_PLATFORM ) {
 }
 
 module.exports = {
+	verbose: true,
 	preset: 'jest-react-native',
 	testEnvironment: 'jsdom',
 	testPathIgnorePatterns: [ '/node_modules/', '/gutenberg/' ],
