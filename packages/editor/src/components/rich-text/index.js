@@ -61,20 +61,18 @@ const { Node, getSelection } = window;
 const TINYMCE_ZWSP = '\uFEFF';
 
 export function getFormatValue( formatName, parents ) {
-	switch ( formatName ) {
-		case 'link' : {
-			const anchor = find( parents, ( node ) => node.nodeName === 'A' );
-			if ( anchor ) {
-				if ( anchor.hasAttribute( 'data-wp-placeholder' ) ) {
-					return { isAdding: true };
-				}
-				return {
-					isActive: true,
-					value: anchor.getAttribute( 'href' ) || '',
-					target: anchor.getAttribute( 'target' ) || '',
-					node: anchor,
-				};
+	if ( formatName === 'link' ) {
+		const anchor = find( parents, ( node ) => node.nodeName === 'A' );
+		if ( anchor ) {
+			if ( anchor.hasAttribute( 'data-wp-placeholder' ) ) {
+				return { isAdding: true };
 			}
+			return {
+				isActive: true,
+				value: anchor.getAttribute( 'href' ) || '',
+				target: anchor.getAttribute( 'target' ) || '',
+				node: anchor,
+			};
 		}
 	}
 
