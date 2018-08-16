@@ -339,7 +339,7 @@ function gutenberg_can_edit_post_type( $post_type ) {
  * the pattern of a block but not validating its structure. For strict accuracy
  * you should use the block parser on post content.
  *
- * @since 3.4.0
+ * @since 3.6.0
  * @see gutenberg_parse_blocks()
  *
  * @param int|string|WP_Post|null $post Optional. Post content, post ID, or post object. Defaults to global $post.
@@ -365,13 +365,13 @@ function has_blocks( $post = null ) {
  * @see gutenberg_parse_blocks()
  *
  * @since 0.5.0
- * @deprecated 3.4.0 Use has_block()
+ * @deprecated 3.6.0 Use has_block()
  *
  * @param object $post Post.
  * @return bool  Whether the post has blocks.
  */
 function gutenberg_post_has_blocks( $post ) {
-	_deprecated_function( __FUNCTION__, '3.4.0', 'has_blocks()' );
+	_deprecated_function( __FUNCTION__, '3.6.0', 'has_blocks()' );
 	return has_blocks( $post );
 }
 
@@ -384,13 +384,13 @@ function gutenberg_post_has_blocks( $post ) {
  * @see gutenberg_parse_blocks()
  *
  * @since 1.6.0
- * @deprecated 3.4.0 Use has_block()
+ * @deprecated 3.6.0 Use has_block()
  *
  * @param string $content Content to test.
  * @return bool Whether the content contains blocks.
  */
 function gutenberg_content_has_blocks( $content ) {
-	_deprecated_function( __FUNCTION__, '3.4.0', 'has_blocks()' );
+	_deprecated_function( __FUNCTION__, '3.6.0', 'has_blocks()' );
 	return has_blocks( $content );
 }
 
