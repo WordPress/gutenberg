@@ -91,7 +91,7 @@
 }
 
 .editor-post-permalink input[type="text"].editor-post-permalink-editor__edit {
-	// Input fields are created with inherent widths. 
+	// Input fields are created with inherent widths.
 	// By supplying both a (any) width and a min-width, we allow it to scale in a flex container.
 	min-width: 10%;
 	width: 100%;
