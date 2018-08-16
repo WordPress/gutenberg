@@ -173,11 +173,11 @@
 		margin: 0 0 12px 0;
 		width: 100%;
 
-		.notice {
+		.components-notice {
 			margin-left: 0;
 			margin-right: 0;
 
-			p {
+			.components-notice__content {
 				font-size: $default-font-size;
 			}
 		}
