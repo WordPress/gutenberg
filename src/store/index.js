@@ -4,7 +4,7 @@
  */
 
 // Gutenberg imports
-import { registerCoreBlocks } from '@gutenberg/core-blocks';
+import { registerCoreBlocks } from '@wordpress/block-library';
 import { parse } from '@wordpress/blocks';
 
 import { createStore } from 'redux';
