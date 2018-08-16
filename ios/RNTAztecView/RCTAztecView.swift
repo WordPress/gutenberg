@@ -127,5 +127,11 @@ class RCTAztecView: Aztec.TextView {
     func updatePlaceholderVisibility() {
         placeholderLabel.isHidden = !self.text.isEmpty
     }
+
+    // MARK: Format interface
+
+    @objc func apply(format: String) {
+        toggleBold(range: selectedRange)
+    }
 }
 

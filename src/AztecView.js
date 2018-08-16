@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
-import {requireNativeComponent, ViewPropTypes} from 'react-native';
+import React from 'react';
+import ReactNative, {requireNativeComponent, ViewPropTypes, UIManager} from 'react-native';
 
-var aztex = {
-  name: 'AztecView',
-  propTypes: {
+class AztecView extends React.Component {
+  
+  static propTypes = {
     text: PropTypes.object,
     placeholder: PropTypes.string,
     placeholderTextColor: PropTypes.number,
@@ -14,7 +15,21 @@ var aztex = {
     onContentSizeChange: PropTypes.func,
     onScroll: PropTypes.func,
     ...ViewPropTypes, // include the default view properties
-  },
-};
+  }
 
-module.exports = requireNativeComponent('RCTAztecView', aztex);
+  applyFormat(format) {   
+    UIManager.dispatchViewManagerCommand(
+                                          ReactNative.findNodeHandle(this),
+                                          UIManager.RCTAztecView.Commands.applyFormat,
+                                          [format],
+                                        );    
+  }
+
+  render() {
+    return (<RCTAztecView {...this.props} />);
+  }
+}
+
+const RCTAztecView = requireNativeComponent('RCTAztecView', AztecView);
+
+export default AztecView
