@@ -34,10 +34,7 @@ $z-layers: (
 	// Active pill button
 	".components-button.is-button {:focus or .is-primary}": 1,
 
-	// The drag handle should show up above the entire UI
-	".editor-block-list__block-draggable": 1000000000,
-
-	// The draggable element should show up above the entire UI
+	// The drag image should show up above the entire UI
 	".components-draggable__clone": 1000000000,
 
 	// Should have higher index than the inset/underlay used for dragging

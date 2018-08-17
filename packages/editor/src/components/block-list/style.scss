@@ -1,19 +1,4 @@
 .editor-block-list__layout .components-draggable__clone {
-	& > .editor-block-list__block > .editor-block-list__block-draggable {
-		background: $white; // @todo: ensure this works with themes that invert the color
-		box-shadow: $shadow-popover;
-
-		@include break-small {
-			left: -$block-parent-side-ui-clearance - $border-width;
-			right: -$block-parent-side-ui-clearance - $border-width;
-
-			.editor-block-list__layout & {
-				left: -$border-width;
-				right: -$border-width;
-			}
-		}
-	}
-
 	// Hide the Block UI when dragging the block
 	// This ensures the page scroll properly (no sticky elements)
 	.editor-block-contextual-toolbar,
@@ -23,21 +8,6 @@
 		display: none !important;
 	}
 }
-
-.editor-block-list__layout .editor-block-list__block-draggable {
-	position: absolute;
-	top: -14px; // TODO: review what breadcrumb component uses
-	right: -15px;
-	z-index: z-index(".editor-block-list__block-draggable");
-
-	> .editor-block-list__block-draggable-inner {
-		visibility: hidden;
-	}
-
-	cursor: move; // Fallback for IE/Edge < 14
-	cursor: grab;
-}
-
 
 // Allow Drag & Drop when clicking on the empty area of the mover and the settings menu
 .editor-block-list__layout .editor-block-list__block .editor-block-mover,
@@ -380,12 +350,6 @@
 		> .editor-block-mover .editor-block-mover__control,
 		> .editor-block-settings-menu > * {
 			float: left;
-		}
-
-		// There is no side UI clearance on full-wide elements, so they are simply not draggable on the sides
-		> .editor-block-list__block-draggable {
-			left: 0;
-			right: 0;
 		}
 
 		// Position hover label on the right
