@@ -1,4 +1,4 @@
-export default ( props ) => (
+const ToolbarButtonContainer = ( props ) => (
 	<div
 		key={ props.keyProp }
 		className={ props.className }
@@ -6,3 +6,4 @@ export default ( props ) => (
 		{ props.children }
 	</div>
 );
+export default ToolbarButtonContainer;

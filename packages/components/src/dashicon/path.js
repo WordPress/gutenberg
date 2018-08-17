@@ -1,1 +1,2 @@
-export default ( props ) => ( <path { ...props } /> );
+const Path = ( props ) => <path { ...props } />;
+export default Path;

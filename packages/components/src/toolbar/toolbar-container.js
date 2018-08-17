@@ -3,8 +3,9 @@
  */
 import classnames from 'classnames';
 
-export default ( props ) => (
+const ToolbarContainer = ( props ) => (
 	<div className={ classnames( 'components-toolbar', props.className ) }>
 		{ props.children }
 	</div>
 );
+export default ToolbarContainer;
