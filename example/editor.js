@@ -23,7 +23,7 @@ export default class Editor extends Component {
               <View style={{flex: 1, flexDirection: 'row'}}>
                 <Button title="Bold" onPress={ () => { this.formatPressed("bold") } }/>
                 <Button title="Italic" onPress={ () => { this.formatPressed("italic") } }/>
-                <Button title="StrikeThrough" onPress={ () => { this.formatPressed("strikethrough") } }/>
+                <Button title="Strikethrough" onPress={ () => { this.formatPressed("strikethrough") } }/>
               </View>
               <RCTAztecView
                 ref="_aztec"

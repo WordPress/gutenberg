@@ -146,6 +146,17 @@ public class ReactAztecText extends AztecText {
         this.mIsSettingTextFromJS = mIsSettingTextFromJS;
     }
 
+    public void applyFormat(String format) {
+        switch (format) {
+            case ("bold"):
+            break;
+            case ("italic"):
+            break;
+            case ("strikethrough"):
+            break;
+        }
+    }
+
     /**
      * This class will redirect *TextChanged calls to the listeners only in the case where the text
      * is changed by the user, and not explicitly set by JS.
