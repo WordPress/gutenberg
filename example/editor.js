@@ -25,7 +25,7 @@ export default class Editor extends Component {
                 <Button title="Italic" onPress={ () => { this.formatPressed("italic") } }/>
                 <Button title="Strikethrough" onPress={ () => { this.formatPressed("strikethrough") } }/>
               </View>
-              <RCTAztecView
+              <AztecView
                 ref="_aztec"
                 style={[styles.aztec_editor, {minHeight: myMinHeight}]}
                 text = { { text: item.text } } 
