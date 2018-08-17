@@ -20,6 +20,7 @@
 		"composer/installers": "~1.0"
 	},
 	"scripts": {
-		"lint": "phpcs"
+		"format": "phpcbf --standard=phpcs.xml.dist --report-summary --report-source",
+		"lint": "phpcs --standard=phpcs.xml.dist --report-summary --report-source"
 	}
 }
