@@ -1,6 +1,6 @@
 export default ( props ) => (
 	<div
-		key={ props.keykeyProp }
+		key={ props.keyProp }
 		className={ props.className }
 	>
 		{ props.children }
