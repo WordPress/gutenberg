@@ -55,6 +55,15 @@ describe( 'replaceActiveStyle', () => {
 			.toBe( 'custom-class is-style-small' );
 	} );
 
+	it( 'Should add the new style if no active style (no existing class)', () => {
+		const activeStyle = undefined;
+		const newStyle = { name: 'small' };
+		const className = '';
+
+		expect( replaceActiveStyle( className, activeStyle, newStyle ) )
+			.toBe( 'is-style-small' );
+	} );
+
 	it( 'Should replace the previous active style', () => {
 		const activeStyle = { name: 'large' };
 		const newStyle = { name: 'small' };
