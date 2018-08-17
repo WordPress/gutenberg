@@ -151,6 +151,7 @@ $arrow-size: 8px;
 		position: absolute;
 		height: auto;
 		overflow-y: auto;
+		min-width: 260px;
 	}
 
 	.components-popover:not(.is-mobile).is-top & {
