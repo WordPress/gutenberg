@@ -19,7 +19,7 @@ Below is an example of a component which simply renders a list of authors:
 ```jsx
 const { withSelect } = wp.data;
 
-function MyAuthorsList( { authors } ) {
+function MyAuthorsListBase( { authors } ) {
 	return (
 		<ul>
 			{ authors.map( ( author ) => (
@@ -29,9 +29,9 @@ function MyAuthorsList( { authors } ) {
 	);
 }
 
-MyAuthorsList = withSelect( ( select ) => ( {
+const MyAuthorsList = withSelect( ( select ) => ( {
 	authors: select( 'core' ).getAuthors(),
-} ) )( MyAuthorsList );
+} ) )( MyAuthorsListBase );
 ```
 
 ## Actions
