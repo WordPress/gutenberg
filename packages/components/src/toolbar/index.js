@@ -8,6 +8,8 @@ import { flatMap } from 'lodash';
  * Internal dependencies
  */
 import IconButton from '../icon-button';
+import ToolbarContainer from './toolbar-container';
+import ToolbarButtonContainer from './toolbar-button-container';
 
 /**
  * Renders a toolbar with controls.
@@ -54,11 +56,12 @@ function Toolbar( { controls = [], children, className } ) {
 	}
 
 	return (
-		<div className={ classnames( 'components-toolbar', className ) }>
+		<ToolbarContainer className={ classnames( 'components-toolbar', className ) }>
 			{ flatMap( controlSets, ( controlSet, indexOfSet ) => (
 				controlSet.map( ( control, indexOfControl ) => (
-					<div
+					<ToolbarButtonContainer
 						key={ [ indexOfSet, indexOfControl ].join() }
+						keyProp= { [ indexOfSet, indexOfControl ].join() }
 						className={ indexOfSet > 0 && indexOfControl === 0 ? 'has-left-divider' : null }
 					>
 						<IconButton
@@ -77,11 +80,11 @@ function Toolbar( { controls = [], children, className } ) {
 							disabled={ control.isDisabled }
 						/>
 						{ control.children }
-					</div>
+					</ToolbarButtonContainer>
 				) )
 			) ) }
 			{ children }
-		</div>
+		</ToolbarContainer>
 	);
 }
 
