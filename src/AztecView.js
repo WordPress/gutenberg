@@ -8,7 +8,7 @@ class AztecView extends React.Component {
     text: PropTypes.object,
     placeholder: PropTypes.string,
     placeholderTextColor: ColorPropType,
-    color: PropTypes.string,
+    color: ColorPropType,
     maxImagesWidth: PropTypes.number,
     minImagesWidth: PropTypes.number,
     onChange: PropTypes.func,

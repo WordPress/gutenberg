@@ -109,12 +109,11 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
         view.setIsSettingTextFromJS(false);
     }
 
-    @ReactProp(name = "color")
-    public void setColor(ReactAztecText view, String color) {
+    @ReactProp(name = "color", customType = "Color")
+    public void setColor(ReactAztecText view, @Nullable Integer color) {
         int newColor = Color.BLACK;
-        try {
-            newColor = Color.parseColor(color);
-        } catch (IllegalArgumentException e) {
+        if (color != null) {
+            newColor = color;
         }
         view.setTextColor(newColor);
     }
