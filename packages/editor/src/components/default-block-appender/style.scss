@@ -76,12 +76,13 @@
 		padding: 0;
 	}
 
-	.components-icon-button svg {
-		margin: 4px;
+	.editor-block-icon {
+		margin: auto;
+	}
 
-		&:not(.dashicon) {
-			margin: 2px;
-		}
+	.components-icon-button svg {
+		display: block;
+		margin: auto;
 	}
 }
 
