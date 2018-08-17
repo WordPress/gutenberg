@@ -12,18 +12,18 @@ describe( 'Publishing', () => {
 			await newPost();
 		} );
 
-		it( 'Should publish a post and close the panel once we start editing again', async () => {
+		it( 'should publish a post and close the panel once we start editing again', async () => {
 			await page.type( '.editor-post-title__input', 'E2E Test Post' );
 
 			await publishPost();
 
-			// The post publish panel is visible
+			// The post-publishing panel is visible.
 			expect( await page.$( '.editor-post-publish-panel' ) ).not.toBeNull();
 
-			// Start editing again
+			// Start editing again.
 			await page.type( '.editor-post-title__input', ' (Updated)' );
 
-			// The post publish panel is not visible anymore
+			// The post-publishing panel is not visible anymore.
 			expect( await page.$( '.editor-post-publish-panel' ) ).toBeNull();
 		} );
 	} );
@@ -33,18 +33,18 @@ describe( 'Publishing', () => {
 			await newPost( 'page' );
 		} );
 
-		it( 'Should publish a page and close the panel once we start editing again', async () => {
-			await page.type( '.editor-post-title__input', 'E2E Test Post' );
+		it( 'should publish a page and close the panel once we start editing again', async () => {
+			await page.type( '.editor-post-title__input', 'E2E Test Page' );
 
 			await publishPost();
 
-			// The post publish panel is visible
+			// The post-publishing panel is visible.
 			expect( await page.$( '.editor-post-publish-panel' ) ).not.toBeNull();
 
-			// Start editing again
+			// Start editing the page again.
 			await page.type( '.editor-post-title__input', ' (Updated)' );
 
-			// The post publish panel is not visible anymore
+			// The post-publishing panel is not visible anymore.
 			expect( await page.$( '.editor-post-publish-panel' ) ).toBeNull();
 		} );
 	} );
