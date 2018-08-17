@@ -28,6 +28,7 @@ import { Slot } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { rawHandler, children } from '@wordpress/blocks';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -109,13 +110,31 @@ export class RichText extends Component {
 	 * @return {Object} The settings for this block.
 	 */
 	getSettings( settings ) {
-		return ( this.props.getSettings || identity )( {
+		let { unstableGetSettings: getSettings } = this.props;
+		if ( ! getSettings && typeof this.props.getSettings === 'function' ) {
+			deprecated( 'RichText getSettings prop', {
+				alternative: 'unstableGetSettings',
+				plugin: 'Gutenberg',
+				version: '3.9',
+				hint: 'Unstable APIs are strongly discouraged to be used, and are subject to removal without notice.',
+			} );
+
+			getSettings = this.props.getSettings;
+		}
+
+		settings = {
 			...settings,
 			forced_root_block: this.props.multiline || false,
 			// Allow TinyMCE to keep one undo level for comparing changes.
 			// Prevent it otherwise from accumulating any history.
 			custom_undo_redo_levels: 1,
-		} );
+		};
+
+		if ( getSettings ) {
+			settings = getSettings( settings );
+		}
+
+		return settings;
 	}
 
 	/**
@@ -143,8 +162,20 @@ export class RichText extends Component {
 
 		patterns.apply( this, [ editor ] );
 
-		if ( this.props.onSetup ) {
-			this.props.onSetup( editor );
+		let { unstableOnSetup: onSetup } = this.props;
+		if ( ! onSetup && typeof this.props.onSetup === 'function' ) {
+			deprecated( 'RichText onSetup prop', {
+				alternative: 'unstableOnSetup',
+				plugin: 'Gutenberg',
+				version: '3.9',
+				hint: 'Unstable APIs are strongly discouraged to be used, and are subject to removal without notice.',
+			} );
+
+			onSetup = this.props.onSetup;
+		}
+
+		if ( onSetup ) {
+			onSetup( editor );
 		}
 	}
 

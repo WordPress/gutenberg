@@ -4,6 +4,11 @@
 import { shallow } from 'enzyme';
 
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+/**
  * Internal dependencies
  */
 import {
@@ -11,6 +16,8 @@ import {
 	getFormatProperties,
 } from '../';
 import { diffAriaProps, pickAriaProps } from '../aria';
+
+jest.mock( '@wordpress/deprecated', () => jest.fn() );
 
 describe( 'getFormatProperties', () => {
 	const formatName = 'link';
@@ -99,10 +106,17 @@ describe( 'RichText', () => {
 				} );
 			} );
 
-			test( 'should be overriden', () => {
+			test( 'should be overriden (deprecated)', () => {
 				const mock = jest.fn().mockImplementation( () => 'mocked' );
 
 				expect( shallow( <RichText value={ value } multiline={ true } getSettings={ mock } /> ).instance().getSettings( settings ) ).toEqual( 'mocked' );
+				expect( deprecated ).toHaveBeenCalled();
+			} );
+
+			test( 'should be overriden', () => {
+				const mock = jest.fn().mockImplementation( () => 'mocked' );
+
+				expect( shallow( <RichText value={ value } multiline={ true } unstableGetSettings={ mock } /> ).instance().getSettings( settings ) ).toEqual( 'mocked' );
 			} );
 		} );
 	} );
