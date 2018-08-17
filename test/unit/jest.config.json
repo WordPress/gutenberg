@@ -23,5 +23,8 @@
 	"testPathIgnorePatterns": [
 		"/node_modules/",
 		"/test/e2e"
+	],
+	"transformIgnorePatterns": [
+		"node_modules/(?!(lodash-es)/)"
 	]
 }
