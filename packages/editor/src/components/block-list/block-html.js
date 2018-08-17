@@ -46,6 +46,11 @@ export class BlockHTML extends Component {
 		if ( ! html ) {
 			this.setState( { html: content } );
 		}
+
+		if ( ! isValid ) {
+			// An error was detected so flip the block back to visual mode so we see the invalid block warning
+			this.props.onToggleMode( this.props.clientId );
+		}
 	}
 
 	onChange( event ) {
@@ -72,6 +77,9 @@ export default compose( [
 	withDispatch( ( dispatch ) => ( {
 		onChange( clientId, attributes, originalContent, isValid ) {
 			dispatch( 'core/editor' ).updateBlock( clientId, { attributes, originalContent, isValid } );
+		},
+		onToggleMode( clientId ) {
+			dispatch( 'core/editor' ).toggleBlockMode( clientId );
 		},
 	} ) ),
 ] )( BlockHTML );
