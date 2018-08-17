@@ -21,6 +21,17 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
  - `wp.utils.mediaUpload` has been removed. Please use `wp.editor.mediaUpload` instead.
  - `wp.utils.preloadImage` has been removed.
  - `supports.wideAlign` has been removed from the Block API. Please use `supports.alignWide` instead.
+ - `wp.blocks.isSharedBlock` has been removed. Use `wp.blocks.isReusableBlock` instead.
+ - `fetchSharedBlocks` action (`core/editor`) has been removed. Use `fetchReusableBlocks` instead.
+ - `receiveSharedBlocks` action (`core/editor`) has been removed. Use `receiveReusableBlocks` instead.
+ - `saveSharedBlock` action (`core/editor`) has been removed. Use `saveReusableBlock` instead.
+ - `deleteSharedBlock` action (`core/editor`) has been removed. Use `deleteReusableBlock` instead.
+ - `updateSharedBlockTitle` action (`core/editor`) has been removed. Use `updateReusableBlockTitle` instead.
+ - `convertBlockToSaved` action (`core/editor`) has been removed. Use `convertBlockToReusable` instead.
+ - `getSharedBlock` selector (`core/editor`) has been removed. Use `getReusableBlock` instead.
+ - `isSavingSharedBlock` selector (`core/editor`) has been removed. Use `isSavingReusableBlock` instead.
+ - `isFetchingSharedBlock` selector (`core/editor`) has been removed. Use `isFetchingReusableBlock` instead.
+ - `getSharedBlocks` selector (`core/editor`) has been removed. Use `getReusableBlocks` instead.
 
 ## 3.5.0
 

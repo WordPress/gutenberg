@@ -4,6 +4,11 @@
 
 	.components-icon-button {
 		border-radius: $radius-round-rectangle;
+
+		svg:not(.dashicon) {
+			height: 24px;
+			width: 24px;
+		}
 	}
 }
 

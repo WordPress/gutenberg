@@ -19,20 +19,36 @@
 		border: none;
 	}
 
+	.editor-block-icon {
+		background: $light-gray-200;
+		height: $icon-button-size-small;
+		margin: 0;
+		padding: 0 6px;
+		display: flex;
+		align-items: center;
+
+		svg {
+			height: 21px;
+			width: 21px;
+		}
+	}
+
 	// Block hover style.
-	&:not(:disabled):hover .editor-block-icon__colors {
+	&:not(:disabled):hover .editor-block-icon {
 		@include block-style__hover();
 	}
 
 	// Block focus style.
-	&:not(:disabled):focus .editor-block-icon__colors {
+	&:not(:disabled):focus .editor-block-icon {
 		@include block-style__focus-active();
 	}
 }
 
-.editor-block-switcher__popover .components-popover__content {
-	width: 300px;
+.components-popover:not(.is-mobile).editor-block-switcher__popover .components-popover__content {
+	min-width: 320px;
+}
 
+.editor-block-switcher__popover .components-popover__content {
 	@include break-medium {
 		position: relative;
 
@@ -52,6 +68,10 @@
 	// Hide the bottom border on the last panel so it stacks with the popover.
 	.components-panel__body {
 		border: 0;
+
+		// Elevate this so the hover style is visible.
+		position: relative;
+		z-index: 1;
 	}
 
 	.components-panel__body + .components-panel__body {
@@ -61,7 +81,7 @@
 
 .editor-block-switcher__popover:not(.is-mobile) > .components-popover__content {
 	// Reset overflow to allow showing the preview on the left once an item is hovered.
-	overflow-y: initial;
+	overflow-y: visible;
 }
 
 .editor-block-switcher__popover .editor-block-styles {

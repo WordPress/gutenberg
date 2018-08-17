@@ -42,33 +42,13 @@ import {
  * Internal dependencies
  */
 import {
+	createContext,
 	Fragment,
 	StrictMode,
 } from './react';
 import RawHTML from './raw-html';
 
-/**
- * Boolean reflecting whether the current environment supports Symbol.
- *
- * @link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol
- *
- * @type {boolean}
- */
-const HAS_SYMBOL = typeof Symbol === 'function' && Symbol.for;
-
-/**
- * Internal React symbol representing Provider type.
- *
- * @type {Symbol}
- */
-const REACT_PROVIDER_TYPE = HAS_SYMBOL ? Symbol.for( 'react.provider' ) : 0xeacd;
-
-/**
- * Internal React symbol representing context (Consumer) type.
- *
- * @type {Symbol}
- */
-const REACT_CONTEXT_TYPE = HAS_SYMBOL ? Symbol.for( 'react.context' ) : 0xeace;
+const { Provider, Consumer } = createContext();
 
 /**
  * Valid attribute types.
@@ -512,11 +492,12 @@ export function renderElement( element, context, legacyContext = {} ) {
 
 			return renderElement( type( props, legacyContext ), context, legacyContext );
 	}
+
 	switch ( type && type.$$typeof ) {
-		case REACT_PROVIDER_TYPE:
+		case Provider.$$typeof:
 			return renderChildren( props.children, props.value, legacyContext );
 
-		case REACT_CONTEXT_TYPE:
+		case Consumer.$$typeof:
 			return renderElement( props.children( context || type._currentValue ), context, legacyContext );
 	}
 

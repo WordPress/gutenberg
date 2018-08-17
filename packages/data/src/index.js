@@ -11,11 +11,9 @@ import * as plugins from './plugins';
 
 export { default as withSelect } from './components/with-select';
 export { default as withDispatch } from './components/with-dispatch';
-export { default as RegistryProvider } from './components/registry-provider';
+export { default as RegistryProvider, RegistryConsumer } from './components/registry-provider';
 export { createRegistry } from './registry';
 export {
-	withRehydration,
-	loadAndPersist,
 	restrictPersistence,
 	setPersistenceStorage,
 } from './deprecated';

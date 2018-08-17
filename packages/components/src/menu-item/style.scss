@@ -41,11 +41,27 @@
 		// !important allows icons from plugins to be overriden and given a dark-gray fill
 		fill: $dark-gray-900 !important;
 	}
+
+	// Don't wrap text until viewport is beyond the mobile breakpoint.
+	@include break-mobile() {
+		.components-popover:not(.is-mobile) & {
+			white-space: nowrap;
+		}
+	}
 }
 
 .components-menu-item__shortcut {
+	align-self: center;
 	opacity: 0.5;
 	margin-right: 0;
 	margin-left: auto;
-	align-self: center;
+	padding-left: 8px;
+
+	// Hide the keyboard shortcuts on mobile, because they aren't super-useful
+	// for most mobile users and it frees up screen space for any item
+	// with a long description.
+	display: none;
+	@include break-mobile() {
+		display: inline;
+	}
 }

@@ -159,10 +159,16 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 ```
 {% end %}
 
-Note that `BlockControls` is only visible when the block is currently selected.
+Note that `BlockControls` is only visible when the block is currently selected and in visual editing mode. `BlockControls` are not shown when editing a block in HTML editing mode.
 
 ## Inspector
 
-While the toolbar area is useful for displaying controls to toggle attributes of a block, sometimes you will find that you need more screen space for form fields. The inspector region is shown in place of the post settings sidebar when a block is selected.
+<img src="https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/blocks/inspector.png" with="281" height="527" alt="inspector">
+
+The inspector is used to display less-often-used settings or settings that require more screen space. The inspector should be used for **block-level settings only**.
+
+If you have settings that affects only selected content inside a block (example: the "bold" setting for selected text inside a paragraph): **do not place it inside the inspector**. The inspector is displayed even when editing a block in HTML mode, so it should only contain block-level settings.
+
+The inspector region is shown in place of the post settings sidebar when a block is selected.
 
 Similar to rendering a toolbar, if you include an `InspectorControls` element in the return value of your block type's `edit` function, those controls will be shown in the inspector region.

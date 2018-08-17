@@ -3,6 +3,7 @@
  */
 import { __, _x } from '@wordpress/i18n';
 import { IconButton, Dropdown, MenuGroup } from '@wordpress/components';
+import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -17,6 +18,7 @@ import KeyboardShortcutsHelpMenuItem from '../keyboard-shortcuts-help-menu-item'
 const MoreMenu = () => (
 	<Dropdown
 		className="edit-post-more-menu"
+		contentClassName="edit-post-more-menu__content"
 		position="bottom left"
 		renderToggle={ ( { isOpen, onToggle } ) => (
 			<IconButton
@@ -27,7 +29,7 @@ const MoreMenu = () => (
 			/>
 		) }
 		renderContent={ ( { onClose } ) => (
-			<div className="edit-post-more-menu__content">
+			<Fragment>
 				<ModeSwitcher onSelect={ onClose } />
 				<MenuGroup
 					label={ __( 'Settings' ) }
@@ -43,7 +45,7 @@ const MoreMenu = () => (
 				>
 					<KeyboardShortcutsHelpMenuItem onSelect={ onClose } />
 				</MenuGroup>
-			</div>
+			</Fragment>
 		) }
 	/>
 );
