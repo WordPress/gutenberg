@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {StyleSheet, Button, View} from 'react-native';
-import RCTAztecView from 'react-native-aztec'
+import AztecView from 'react-native-aztec'
 
 const _minHeight = 100;
 

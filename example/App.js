@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import {AppRegistry, StyleSheet, TextInput, FlatList, KeyboardAvoidingView, SafeAreaView, Platform, Button, View} from 'react-native';
+import {AppRegistry, StyleSheet, TextInput, FlatList, KeyboardAvoidingView, SafeAreaView, Platform} from 'react-native';
 import {example_content} from './content';
-import RCTAztecView from 'react-native-aztec'
 import Editor from './editor'
 
 const _minHeight = 100;
