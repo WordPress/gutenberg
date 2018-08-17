@@ -136,7 +136,7 @@
 }
 
 // This is similar to above but for resized unfloated images only, where the markup is different.
-[data-type="core/image"] .editor-block-list__block-edit figure:not(.alignfull):not(.alignwide) {
+[data-type="core/image"] .editor-block-list__block-edit figure.is-resized {
 	margin: 0;
 	display: table;
 

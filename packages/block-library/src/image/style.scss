@@ -45,15 +45,3 @@
 		@include caption-style();
 	}
 }
-
-// Resized images that are not floated, so they need the caption trick too.
-// These apply the .wp-block-image class on the <figure> element itself.
-figure.wp-block-image {
-	display: table;
-	margin: 0;
-
-	> figcaption {
-		display: table-caption;
-		caption-side: bottom;
-	}
-}
