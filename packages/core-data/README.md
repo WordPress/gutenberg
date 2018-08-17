@@ -31,7 +31,7 @@ function MyAuthorsList( { authors } ) {
 
 MyAuthorsList = withSelect( ( select ) => ( {
 	authors: select( 'core' ).getAuthors(),
-} ) );
+} ) )( MyAuthorsList );
 ```
 
 ## Actions
