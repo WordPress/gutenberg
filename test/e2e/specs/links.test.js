@@ -100,6 +100,27 @@ describe( 'Links', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'can be created instantly when a URL is selected', async () => {
+		// Create a block with some text
+		await clickBlockAppender();
+		await page.keyboard.type( 'This is Gutenberg: https://wordpress.org/gutenberg' );
+
+		// Select the URL
+		await pressWithModifier( SELECT_WORD_MODIFIER_KEYS, 'ArrowLeft' );
+		await pressWithModifier( SELECT_WORD_MODIFIER_KEYS, 'ArrowLeft' );
+		await pressWithModifier( SELECT_WORD_MODIFIER_KEYS, 'ArrowLeft' );
+		await pressWithModifier( SELECT_WORD_MODIFIER_KEYS, 'ArrowLeft' );
+
+		// Click on the Link button
+		await page.click( 'button[aria-label="Link"]' );
+
+		// A placeholder link should not have been inserted
+		expect( await page.$( 'a[data-wp-placeholder]' ) ).toBeNull();
+
+		// A link with the selected URL as its href should have been inserted
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'is not created when we click away from the link input', async () => {
 		// Create a block with some text
 		await clickBlockAppender();

@@ -1,7 +1,42 @@
 /**
- * Internal Dependencies
+ * External dependencies
  */
-import { addQueryArgs, prependHTTP } from '../';
+import { forEach } from 'lodash';
+
+/**
+ * Internal dependencies
+ */
+import { isURL, addQueryArgs, prependHTTP } from '../';
+
+describe( 'isURL', () => {
+	it( 'returns true when given things that look like a URL', () => {
+		const urls = [
+			'http://wordpress.org',
+			'https://wordpress.org',
+			'HTTPS://WORDPRESS.ORG',
+			'https://wordpress.org/foo#bar',
+			'https://localhost/foo#bar',
+		];
+
+		forEach( urls, ( url ) => {
+			expect( isURL( url ) ).toBe( true );
+		} );
+	} );
+
+	it( 'returns false when given things that don\'t look like a URL', () => {
+		const urls = [
+			'HTTP: HyperText Transfer Protocol',
+			'URLs begin with a http:// prefix',
+			'Go here: http://wordpress.org',
+			'http://',
+			'',
+		];
+
+		forEach( urls, ( url ) => {
+			expect( isURL( url ) ).toBe( false );
+		} );
+	} );
+} );
 
 describe( 'addQueryArgs', () => {
 	it( 'should append args to an URL without query string', () => {
