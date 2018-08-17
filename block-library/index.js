@@ -33,6 +33,7 @@ import * as latestPosts from '../packages/block-library/src/latest-posts';
 import * as list from '../packages/block-library/src/list';
 import * as more from '../packages/block-library/src/more';
 import * as nextpage from '../packages/block-library/src/nextpage';
+import * as playlist from '../packages/block-library/src/playlist';
 import * as preformatted from '../packages/block-library/src/preformatted';
 import * as pullquote from '../packages/block-library/src/pullquote';
 import * as reusableBlock from '../packages/block-library/src/block';
@@ -82,6 +83,7 @@ export const registerCoreBlocks = () => {
 		latestPosts,
 		more,
 		nextpage,
+		playlist,
 		preformatted,
 		pullquote,
 		separator,

@@ -21,17 +21,12 @@ import {
 } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
 import {
+	BlockControls,
 	InspectorControls,
 	MediaPlaceholder,
-	BlockControls,
 	mediaUpload,
 	MediaUpload,
 } from '@wordpress/editor';
-
-/**
- * Internal dependencies
- */
-import './editor.scss';
 
 class PlaylistEdit extends Component {
 	constructor() {
