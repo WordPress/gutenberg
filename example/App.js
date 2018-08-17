@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {AppRegistry, StyleSheet, TextInput, FlatList, KeyboardAvoidingView, SafeAreaView, Platform} from 'react-native';
 import {example_content} from './content';
-import RCTAztecView from 'react-native-aztec'
+import Editor from './editor'
 
 const _minHeight = 100;
 
@@ -27,11 +27,9 @@ export default class example extends React.Component {
     renderItem( { item } ) {
       let myMinHeight = Math.max(_minHeight, item.height);
       const key = item.key;
-      return (<RCTAztecView                
-                style={[styles.aztec_editor, {minHeight: myMinHeight}]}
-                text = { { text: item.text } } 
-                placeholder = {'This is the placeholder text'}
-                placeholderTextColor = {'lightgray'} // See http://facebook.github.io/react-native/docs/colors                
+      return (              
+              <Editor                
+                item={ item }                
                 onContentSizeChange= {(event) => {                    
                     let newHeight = event.nativeEvent.contentSize.height                    
                     const newElements = this.state.data.map( searchItem => {
@@ -42,12 +40,8 @@ export default class example extends React.Component {
                       }
                     })
                     this.setState( { data: newElements})                    
-                }}
-                onChange= {(event) => console.log(event.nativeEvent) }
-                onEndEditing= {(event) => console.log(event.nativeEvent) }
-                color = {'black'}
-                maxImagesWidth = {200} 
-              />
+                }}                
+              />              
             )
     }
 

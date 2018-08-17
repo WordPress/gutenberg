@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.util.Log;
 
 import com.facebook.infer.annotation.Assertions;
 import com.facebook.react.bridge.ReactContext;
@@ -108,12 +109,11 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
         view.setIsSettingTextFromJS(false);
     }
 
-    @ReactProp(name = "color")
-    public void setColor(ReactAztecText view, String color) {
+    @ReactProp(name = "color", customType = "Color")
+    public void setColor(ReactAztecText view, @Nullable Integer color) {
         int newColor = Color.BLACK;
-        try {
-            newColor = Color.parseColor(color);
-        } catch (IllegalArgumentException e) {
+        if (color != null) {
+            newColor = color;
         }
         view.setTextColor(newColor);
     }
@@ -157,6 +157,28 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
             view.setScrollWatcher(new AztecScrollWatcher(view));
         } else {
             view.setScrollWatcher(null);
+        }
+    }
+
+    private static final int COMMAND_NOTIFY_APPLY_FORMAT = 1;
+    private static final String TAG = "ReactAztecText";
+
+    @Override
+    public Map<String, Integer> getCommandsMap() {
+        return MapBuilder.of("applyFormat", COMMAND_NOTIFY_APPLY_FORMAT);
+    }
+
+    @Override
+    public void receiveCommand(final ReactAztecText parent, int commandType, @Nullable ReadableArray args) {
+        Assertions.assertNotNull(parent);
+        Assertions.assertNotNull(args);
+        switch (commandType) {
+        case COMMAND_NOTIFY_APPLY_FORMAT: {
+            final String format = args.getString(0);            
+            Log.d(TAG, String.format("Apply format: %s", format)); 
+            parent.applyFormat(format);           
+            return;
+        }
         }
     }
 

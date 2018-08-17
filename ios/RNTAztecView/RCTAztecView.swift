@@ -127,5 +127,17 @@ class RCTAztecView: Aztec.TextView {
     func updatePlaceholderVisibility() {
         placeholderLabel.isHidden = !self.text.isEmpty
     }
+
+    // MARK: Format interface
+
+    @objc func apply(format: String) {
+        switch format {
+        case "bold": toggleBold(range: selectedRange)
+        case "italic": toggleItalic(range: selectedRange)
+        case "strikethrough": toggleStrikethrough(range: selectedRange)
+        default: print("Format not recognized")
+        }
+
+    }
 }
 
