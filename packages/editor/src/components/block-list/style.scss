@@ -444,6 +444,14 @@
 				display: block;
 			}
 		}
+
+		// Beyond the mobile breakpoint, wide images stretch outside of the column.
+		// To center the toolbar, we make it inline-flex so the toolbar is not full-wide.
+		@include break-small () {
+			.editor-block-toolbar {
+				display: inline-flex;
+			}
+		}
 	}
 
 	// Wide
