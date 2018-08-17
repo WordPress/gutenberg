@@ -22,6 +22,15 @@ function findBlockIndex( blocks, clientId: string ) {
 	} );
 }
 
+/*
+ * insert block into blocks[], below / after block having clientIdAbove
+*/
+function insertBlock( blocks, block, clientIdAbove ) {
+	// TODO we need to set focused: true and search for the currently focused block and
+	// set that one to `focused: false`.
+	blocks.splice( findBlockIndex( blocks, clientIdAbove ) + 1, 0, block );
+}
+
 export const reducer = (
 	state: StateType = { blocks: [], refresh: false },
 	action: BlockActionType
@@ -107,6 +116,12 @@ export const reducer = (
 		case ActionTypes.BLOCK.DELETE: {
 			const index = findBlockIndex( blocks, action.clientId );
 			blocks.splice( index, 1 );
+			return { blocks: blocks, refresh: ! state.refresh };
+		}
+		case ActionTypes.BLOCK.CREATE: {
+			// TODO we need to set focused: true and search for the currently focused block and
+			// set that one to `focused: false`.
+			insertBlock( blocks, action.block, action.clientIdAbove );
 			return { blocks: blocks, refresh: ! state.refresh };
 		}
 		case ActionTypes.BLOCK.PARSE: {

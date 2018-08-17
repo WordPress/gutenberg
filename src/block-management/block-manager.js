@@ -4,17 +4,14 @@
  */
 
 import React from 'react';
-import { Platform, Switch, Text, View, FlatList, TextInput, KeyboardAvoidingView } from 'react-native';
+import { Platform, Switch, Text, View, FlatList, Picker, TextInput, KeyboardAvoidingView } from 'react-native';
 import RecyclerViewList, { DataSource } from 'react-native-recyclerview-list';
 import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
-
 import type { BlockType } from '../store/';
-
 import styles from './block-manager.scss';
-
 // Gutenberg imports
-import { getBlockType, serialize } from '@wordpress/blocks';
+import { getBlockType, getBlockTypes, serialize, createBlock } from '@wordpress/blocks';
 
 export type BlockListType = {
 	onChange: ( clientId: string, attributes: mixed ) => void,
@@ -22,6 +19,7 @@ export type BlockListType = {
 	moveBlockUpAction: string => mixed,
 	moveBlockDownAction: string => mixed,
 	deleteBlockAction: string => mixed,
+	createBlockAction: ( string, BlockType, string ) => mixed,
 	parseBlocksAction: string => mixed,
 	blocks: Array<BlockType>,
 	aztechtml: string,
@@ -32,17 +30,22 @@ type PropsType = BlockListType;
 type StateType = {
 	dataSource: DataSource,
 	showHtml: boolean,
+	blockTypePickerVisible: boolean,
+	selectedBlockType: string,
 	html: string,
 };
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
 	_recycler = null;
+	availableBlockTypes = getBlockTypes();
 
 	constructor( props: PropsType ) {
 		super( props );
 		this.state = {
 			dataSource: new DataSource( this.props.blocks, ( item: BlockType ) => item.clientId ),
 			showHtml: false,
+			blockTypePickerVisible: false,
+			selectedBlockType: 'core/paragraph', // just any valid type to start from
 			html: '',
 		};
 	}
@@ -59,6 +62,41 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			}
 		}
 		return -1;
+	}
+
+	findDataSourceIndexForFocusedItem() {
+		for ( let i = 0; i < this.state.dataSource.size(); ++i ) {
+			const block = this.state.dataSource.get( i );
+			if ( block.focused === true ) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	// TODO: in the near future this will likely be changed to onShowBlockTypePicker and bound to this.props
+	// once we move the action to the toolbar
+	showBlockTypePicker() {
+		this.setState( { ...this.state, blockTypePickerVisible: true } );
+	}
+
+	onBlockTypeSelected( itemValue: string ) {
+		this.setState( { ...this.state, selectedBlockType: itemValue, blockTypePickerVisible: false } );
+
+		// find currently focused block
+		const focusedItemIndex = this.findDataSourceIndexForFocusedItem();
+		const clientIdFocused = this.state.dataSource.get( focusedItemIndex ).clientId;
+
+		// create an empty block of the selected type
+		const newBlock = createBlock( itemValue, { content: 'new test text for a ' + itemValue + ' block' } );
+		newBlock.focused = false;
+
+		// set it into the datasource, and use the same object instance to send it to props/redux
+		this.state.dataSource.splice( focusedItemIndex + 1, 0, newBlock );
+		this.props.createBlockAction( newBlock.clientId, newBlock, clientIdFocused );
+
+		// now set the focus
+		this.props.focusBlockAction( newBlock.clientId );
 	}
 
 	static getDerivedStateFromProps( props: PropsType, state: StateType ) {
@@ -86,6 +124,9 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			case ToolbarButton.DELETE:
 				this.state.dataSource.splice( dataSourceBlockIndex, 1 );
 				this.props.deleteBlockAction( clientId );
+				break;
+			case ToolbarButton.PLUS:
+				this.showBlockTypePicker();
 				break;
 			case ToolbarButton.SETTINGS:
 				// TODO: implement settings
@@ -125,7 +166,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		// Update datasource UI
 		const index = this.getDataSourceIndexFromUid( clientId );
 		const dataSource = this.state.dataSource;
-		const block = dataSource.get( this.getDataSourceIndexFromUid( clientId ) );
+		const block = dataSource.get( index );
 		block.attributes = attributes;
 		dataSource.set( index, block );
 		// Update Redux store
@@ -161,6 +202,20 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			);
 		}
 
+		const blockTypePicker = (
+			<View>
+				<Picker
+					selectedValue={ this.state.selectedBlockType }
+					onValueChange={ ( itemValue ) => {
+						this.onBlockTypeSelected( itemValue );
+					} } >
+					{ this.availableBlockTypes.map( ( item, index ) => {
+						return ( <Picker.Item label={ item.title } value={ item.name } key={ index + 1 } /> );
+					} ) }
+				</Picker>
+			</View>
+		);
+
 		return (
 			<View style={ styles.container }>
 				<View style={ { height: 30 } } />
@@ -175,6 +230,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				</View>
 				{ this.state.showHtml && this.renderHTML() }
 				{ ! this.state.showHtml && list }
+				{ this.state.blockTypePickerVisible && blockTypePicker }
 			</View>
 		);
 	}
