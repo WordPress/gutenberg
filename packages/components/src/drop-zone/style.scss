@@ -16,15 +16,16 @@
 		visibility: visible;
 		transition: 0.3s opacity, 0.3s background-color;
 	}
+}
 
-	&.is-dragging-over-element {
-
+// Only show the upload instructions on placeholders and galleries.
+.components-placeholder,
+.wp-block-gallery {
+	.components-drop-zone.components-drop-zone.is-dragging-over-element {
+		background-color: rgba($blue-dark-900, 0.8);
+	
 		.components-drop-zone__content {
 			display: block;
-		}
-
-		&.is-dragging-file {
-			background-color: rgba($blue-dark-900, 0.8);
 		}
 	}
 }
