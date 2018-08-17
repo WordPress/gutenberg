@@ -97,12 +97,12 @@ export default class TableBlock extends Component {
 				<RichText
 					tagName="table"
 					wrapperClassName={ className }
-					getSettings={ ( settings ) => ( {
+					unstableGetSettings={ ( settings ) => ( {
 						...settings,
 						plugins: ( settings.plugins || [] ).concat( 'table' ),
 						table_tab_navigation: false,
 					} ) }
-					onSetup={ ( editor ) => this.handleSetup( editor, isSelected ) }
+					unstableOnSetup={ ( editor ) => this.handleSetup( editor, isSelected ) }
 					onChange={ onChange }
 					value={ content }
 				/>
