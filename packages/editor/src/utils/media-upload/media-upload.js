@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { castArray, compact, flatMap, forEach, get, has, includes, map, noop, some, startsWith } from 'lodash';
+import { castArray, compact, flatMap, forEach, get, has, includes, map, noop, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
