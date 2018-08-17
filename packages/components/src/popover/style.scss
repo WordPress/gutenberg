@@ -151,13 +151,6 @@ $arrow-size: 8px;
 		position: absolute;
 		height: auto;
 		overflow-y: auto;
-
-		// Let the menu scale to fit items.
-		min-width: 260px;
-		@include break-mobile() {
-			width: auto;
-			max-width: $break-mobile;
-		}
 	}
 
 	.components-popover:not(.is-mobile).is-top & {
