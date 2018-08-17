@@ -31,7 +31,7 @@ exports[`PluginPrePublishPanel renders fill properly 1`] = `
               className="components-panel__arrow"
               icon="arrow-up"
             >
-              <svg
+              <SVG
                 aria-hidden={true}
                 className="dashicon dashicons-arrow-up components-panel__arrow"
                 focusable="false"
@@ -41,10 +41,25 @@ exports[`PluginPrePublishPanel renders fill properly 1`] = `
                 width={20}
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <path
-                  d="M7 13l4.03-6L15 13H7z"
-                />
-              </svg>
+                <svg
+                  aria-hidden={true}
+                  className="dashicon dashicons-arrow-up components-panel__arrow"
+                  focusable="false"
+                  height={20}
+                  role="img"
+                  viewBox="0 0 20 20"
+                  width={20}
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <Path
+                    d="M7 13l4.03-6L15 13H7z"
+                  >
+                    <path
+                      d="M7 13l4.03-6L15 13H7z"
+                    />
+                  </Path>
+                </svg>
+              </SVG>
             </Dashicon>
             My panel title
           </button>

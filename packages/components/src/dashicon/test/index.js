@@ -7,6 +7,7 @@ import { shallow } from 'enzyme';
  * Internal dependencies
  */
 import Dashicon from '../';
+import SVG from '../svg';
 
 describe( 'Dashicon', () => {
 	describe( 'basic rendering', () => {
@@ -26,7 +27,7 @@ describe( 'Dashicon', () => {
 			const dashicon = shallow( <Dashicon icon="wordpress" /> );
 			expect( dashicon.hasClass( 'dashicon' ) ).toBe( true );
 			expect( dashicon.hasClass( 'dashicons-wordpress' ) ).toBe( true );
-			expect( dashicon.type() ).toBe( 'svg' );
+			expect( dashicon.type() ).toBe( SVG );
 			expect( dashicon.prop( 'xmlns' ) ).toBe( 'http://www.w3.org/2000/svg' );
 			expect( dashicon.prop( 'width' ) ).toBe( 20 );
 			expect( dashicon.prop( 'height' ) ).toBe( 20 );
