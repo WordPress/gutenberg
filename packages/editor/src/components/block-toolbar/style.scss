@@ -1,7 +1,5 @@
 .editor-block-toolbar {
-	// Should be inline-flex so it isn't full-wide. 
-	// We leverage this to center the toolbar on wide and full-wide images.
-	display: inline-flex;
+	display: flex;
 	flex-grow: 1;
 	width: 100%;
 	overflow: auto; // Allow horizontal scrolling on mobile.
