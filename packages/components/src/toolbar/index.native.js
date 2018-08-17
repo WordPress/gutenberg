@@ -40,7 +40,8 @@ import IconButton from '../icon-button';
  *
  * @return {ReactElement} The rendered toolbar.
  */
-function Toolbar( { controls = [], children, className } ) {	
+// eslint-disable-next-line no-unused-vars
+function Toolbar( { controls = [], children, className } ) {
 	if (
 		( ! controls || ! controls.length ) &&
 		! children
@@ -55,7 +56,7 @@ function Toolbar( { controls = [], children, className } ) {
 	}
 
 	return (
-		<View style={{flex: 1, flexDirection: 'row'}}>
+		<View style={ { flex: 1, flexDirection: 'row' } }>
 			{ flatMap( controlSets, ( controlSet, indexOfSet ) => (
 				controlSet.map( ( control, indexOfControl ) => (
 					<View

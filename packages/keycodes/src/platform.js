@@ -5,6 +5,6 @@
  *
  * @return {boolean}         True if MacOS; false otherwise.
  */
-export function isAppleOS( _window = window ) {	
+export function isAppleOS( _window = window ) {
 	return _window.navigator.platform.indexOf( 'Mac' ) !== -1;
 }
