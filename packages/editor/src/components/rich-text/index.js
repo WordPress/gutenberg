@@ -87,9 +87,9 @@ export class RichText extends Component {
 		this.onKeyUp = this.onKeyUp.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
 		this.onPropagateUndo = this.onPropagateUndo.bind( this );
+		this.onPaste = this.onPaste.bind( this );
 		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
 		this.setFocusedElement = this.setFocusedElement.bind( this );
-		this.onPaste = this.onPaste.bind( this );
 
 		this.state = {
 			formats: {},
@@ -279,8 +279,8 @@ export class RichText extends Component {
 		}
 
 		const content = rawHandler( {
-			HTML: HTML,
-			plainText: this.pastedPlainText,
+			HTML,
+			plainText,
 			mode,
 			tagName: this.props.tagName,
 			canUserUseUnfilteredHTML: this.props.canUserUseUnfilteredHTML,
@@ -868,7 +868,7 @@ export class RichText extends Component {
 								{ ...ariaProps }
 								className={ className }
 								key={ key }
-								onCustomPaste={ this.onPaste }
+								onPaste={ this.onPaste }
 							/>
 							{ isPlaceholderVisible &&
 								<Tagname
