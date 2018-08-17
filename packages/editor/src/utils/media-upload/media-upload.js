@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { compact, flatMap, forEach, get, has, includes, map, noop, startsWith, castArray } from 'lodash';
+import { castArray, compact, flatMap, forEach, get, has, includes, map, noop, some, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -68,7 +68,6 @@ export function mediaUpload( {
 
 	// Allowed type specified by consumer
 	const isAllowedType = ( fileType ) => {
-		allowedType = [].concat( allowedType );
 		return castArray( allowedType ).some( ( type ) => startsWith( fileType, `${ type }/` ) );
 	};
 
@@ -111,7 +110,6 @@ export function mediaUpload( {
 		// with final file from media gallery when upload is `done` below
 		filesSet.push( { url: window.URL.createObjectURL( mediaFile ) } );
 		onFileChange( filesSet );
-
 		return createMediaFromFile( mediaFile, additionalData )
 			.then( ( savedMedia ) => {
 				const mediaObject = {

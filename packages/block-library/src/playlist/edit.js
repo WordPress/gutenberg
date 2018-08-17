@@ -23,7 +23,6 @@ import { Component, Fragment } from '@wordpress/element';
 import {
 	BlockControls,
 	InspectorControls,
-	MediaPlaceholder,
 	mediaUpload,
 	MediaUpload,
 } from '@wordpress/editor';
@@ -55,20 +54,19 @@ class PlaylistEdit extends Component {
 		const { setAttributes, noticeOperations } = this.props;
 		mediaUpload( {
 			allowedType: [ 'audio', 'video' ],
-			filesList: [ files ],
-			onFileChange: ( [ media ] ) => {
-				const firstType = get( files, [ 0, 'mimeType' ] );
-				const isConsistentType = !! firstType && every( files, ( filesMedia ) => filesMedia.mimeType === firstType );
-				//validate type is consistent for playlist
+			filesList: files,
+			onFileChange: ( media ) => {
+				const firstType = get( media, [ 0, 'mimeType' ] );
+				const isConsistentType = !! firstType && every( media, ( filesMedia ) => filesMedia.mimeType === firstType );
+				// validate type is consistent for playlist
 				if ( ! isConsistentType ) {
-					// this.setState( { hasError: true } );
-					noticeOperations.createErrorNotice( 'CANNOT DO THAT' );
+					noticeOperations.createErrorNotice( 'Cannot have mixed types in a Playlist Block' );
 					setAttributes( { ids: null, type: null } );
-				} else if ( media.length > 0 && media[ 0 ].mimeType ) {
+				} else if ( media.length > 0 && media[ 0 ].mimeType && isConsistentType ) {
 					const type = media[ 0 ].mimeType.split( '/' )[ 0 ];
 					const ids = JSON.stringify( media.map( ( item ) => item.id ) );
 					setAttributes( { ids, type } );
-					this.setState( { isEditing: false, hasError: false } );
+					this.setState( { isEditing: false } );
 				}
 			},
 		} );
@@ -81,8 +79,8 @@ class PlaylistEdit extends Component {
 	}
 
 	render() {
-		const { attributes, setAttributes, className, noticeUI, noticeOperations } = this.props;
-		const { isEditing, hasError } = this.state;
+		const { attributes, setAttributes, className, noticeUI } = this.props;
+		const { isEditing } = this.state;
 		const { tracklist, showTrackNumbers, showArtists, images, style, type } = attributes;
 
 		const onSelectMedia = ( media ) => {
@@ -96,29 +94,12 @@ class PlaylistEdit extends Component {
 
 		const mediaIds = this.props.attributes.ids && this.props.attributes.ids.replace( /^\[(.+)\]$/, '$1' ).split( ',' );
 
-		if ( hasError ) {
-			return (
-				<MediaPlaceholder
-					icon="format-audio"
-					labels={ {
-						title: __( 'Media' ),
-						name: __( 'a media' ),
-					} }
-					className={ className }
-					onSelect={ this.onSelectImage }
-					notices={ noticeUI }
-					onError={ noticeOperations.createErrorNotice }
-					accept="audio/*,video/*"
-					type="audio,video"
-				/>
-			);
-		}
-
 		if ( isEditing ) {
 			return (
 				<Placeholder
 					icon="media-audio"
 					label={ __( 'Audio/Video Playlist' ) }
+					notices={ noticeUI }
 					instructions={ __( 'Select audio or video files from your library, or upload a new ones.' ) }
 					className={ className }>
 					<FormFileUpload
