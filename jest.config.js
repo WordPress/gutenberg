@@ -12,6 +12,7 @@ if ( process.env.TEST_RN_PLATFORM ) {
 }
 
 module.exports = {
+	verbose: true,
 	preset: 'jest-react-native',
 	testEnvironment: 'jsdom',
 	testPathIgnorePatterns: [ '/node_modules/', '/gutenberg/' ],
@@ -32,7 +33,6 @@ module.exports = {
 	],
 	moduleNameMapper: {
 		'@wordpress\\/(blocks|data|element|deprecated|editor|redux-routine|block-library|components|keycodes|url)$': '<rootDir>/gutenberg/packages/$1/src/index',
-		'@gutenberg': '<rootDir>/gutenberg',
 
 		// Mock the CSS modules. See https://facebook.github.io/jest/docs/en/webpack.html#handling-static-assets
 		'\\.(scss)$': '<rootDir>/__mocks__/styleMock.js',
