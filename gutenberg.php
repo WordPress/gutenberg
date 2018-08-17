@@ -270,11 +270,13 @@ function gutenberg_add_edit_link( $actions, $post ) {
 		'classic' => sprintf(
 			'<a href="%s" aria-label="%s">%s</a>',
 			esc_url( $edit_url ),
-			esc_attr( sprintf(
-				/* translators: %s: post title */
-				__( 'Edit &#8220;%s&#8221; in the classic editor', 'gutenberg' ),
-				$title
-			) ),
+			esc_attr(
+				sprintf(
+					/* translators: %s: post title */
+					__( 'Edit &#8220;%s&#8221; in the classic editor', 'gutenberg' ),
+					$title
+				)
+			),
 			__( 'Classic Editor', 'gutenberg' )
 		),
 	);

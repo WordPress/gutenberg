@@ -24,11 +24,14 @@ function render_block_core_archives( $attributes ) {
 		$title       = __( 'Archives', 'gutenberg' );
 
 		/** This filter is documented in wp-includes/widgets/class-wp-widget-archives.php */
-		$dropdown_args = apply_filters( 'widget_archives_dropdown_args', array(
-			'type'            => 'monthly',
-			'format'          => 'option',
-			'show_post_count' => $show_post_count,
-		) );
+		$dropdown_args = apply_filters(
+			'widget_archives_dropdown_args',
+			array(
+				'type'            => 'monthly',
+				'format'          => 'option',
+				'show_post_count' => $show_post_count,
+			)
+		);
 
 		$dropdown_args['echo'] = 0;
 
@@ -66,10 +69,13 @@ function render_block_core_archives( $attributes ) {
 	} else {
 
 		/** This filter is documented in wp-includes/widgets/class-wp-widget-archives.php */
-		$archives_args = apply_filters( 'widget_archives_args', array(
-			'type'            => 'monthly',
-			'show_post_count' => $show_post_count,
-		) );
+		$archives_args = apply_filters(
+			'widget_archives_args',
+			array(
+				'type'            => 'monthly',
+				'show_post_count' => $show_post_count,
+			)
+		);
 
 		$archives_args['echo'] = 0;
 
@@ -89,23 +95,26 @@ function render_block_core_archives( $attributes ) {
  * Register archives block.
  */
 function register_block_core_archives() {
-	register_block_type( 'core/archives', array(
-		'attributes'      => array(
-			'showPostCounts'    => array(
-				'type'    => 'boolean',
-				'default' => false,
+	register_block_type(
+		'core/archives',
+		array(
+			'attributes'      => array(
+				'showPostCounts'    => array(
+					'type'    => 'boolean',
+					'default' => false,
+				),
+				'displayAsDropdown' => array(
+					'type'    => 'boolean',
+					'default' => false,
+				),
+				'align'             => array(
+					'type'    => 'string',
+					'default' => 'none',
+				),
 			),
-			'displayAsDropdown' => array(
-				'type'    => 'boolean',
-				'default' => false,
-			),
-			'align'             => array(
-				'type'    => 'string',
-				'default' => 'none',
-			),
-		),
-		'render_callback' => 'render_block_core_archives',
-	) );
+			'render_callback' => 'render_block_core_archives',
+		)
+	);
 }
 
 add_action( 'init', 'register_block_core_archives' );

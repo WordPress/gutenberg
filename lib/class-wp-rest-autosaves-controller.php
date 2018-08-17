@@ -74,7 +74,9 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 	 */
 	public function register_routes() {
 		register_rest_route(
-			$this->rest_namespace, '/' . $this->parent_base . '/(?P<parent>[\d]+)/' . $this->rest_base, array(
+			$this->rest_namespace,
+			'/' . $this->parent_base . '/(?P<parent>[\d]+)/' . $this->rest_base,
+			array(
 				'args'   => array(
 					'parent' => array(
 						'description' => __( 'The ID for the parent of the object.', 'gutenberg' ),
@@ -98,7 +100,9 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 		);
 
 		register_rest_route(
-			$this->rest_namespace, '/' . $this->parent_base . '/(?P<parent>[\d]+)/' . $this->rest_base . '/(?P<id>[\d]+)', array(
+			$this->rest_namespace,
+			'/' . $this->parent_base . '/(?P<parent>[\d]+)/' . $this->rest_base . '/(?P<id>[\d]+)',
+			array(
 				'args'   => array(
 					'parent' => array(
 						'description' => __( 'The ID for the parent of the object.', 'gutenberg' ),
