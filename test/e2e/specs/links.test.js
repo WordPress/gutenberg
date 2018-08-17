@@ -16,12 +16,12 @@ import {
  */
 const SELECT_WORD_MODIFIER_KEYS = process.platform === 'darwin' ? [ 'Shift', 'Alt' ] : [ 'Shift', 'Control' ];
 
-describe( 'Managing links', () => {
+describe( 'Links', () => {
 	beforeEach( async () => {
 		await newPost();
 	} );
 
-	it( 'Creating a link by selecting text and clicking the Link UI', async () => {
+	it( 'can be created by selecting text and clicking Link', async () => {
 		// Create a block with some text
 		await clickBlockAppender();
 		await page.keyboard.type( 'This is Gutenberg' );
@@ -48,7 +48,7 @@ describe( 'Managing links', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'Creating a link by selecting text and using keyboard shortcuts', async () => {
+	it( 'can be created by selecting text and using keyboard shortcuts', async () => {
 		// Create a block with some text
 		await clickBlockAppender();
 		await page.keyboard.type( 'This is Gutenberg' );
@@ -75,7 +75,7 @@ describe( 'Managing links', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'Creating a link without any text selected', async () => {
+	it( 'can be created without any text selected', async () => {
 		// Create a block with some text
 		await clickBlockAppender();
 		await page.keyboard.type( 'This is Gutenberg: ' );
@@ -100,7 +100,7 @@ describe( 'Managing links', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'Creating a link and then cancelling', async () => {
+	it( 'is not created when we click away from the link input', async () => {
 		// Create a block with some text
 		await clickBlockAppender();
 		await page.keyboard.type( 'This is Gutenberg' );
@@ -148,7 +148,7 @@ describe( 'Managing links', () => {
 		await page.click( 'a[href="https://wordpress.org/gutenberg"]' );
 	};
 
-	it( 'Editing a link', async () => {
+	it( 'can be edited', async () => {
 		await createAndReselectLink();
 
 		// Click on the Edit button
@@ -164,7 +164,7 @@ describe( 'Managing links', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'Removing a link', async () => {
+	it( 'can be removed', async () => {
 		await createAndReselectLink();
 
 		// Click on the Unlink button
@@ -187,7 +187,7 @@ describe( 'Managing links', () => {
 		}
 	};
 
-	it( 'Pressing Left and Esc in Link Dialog in "Fixed to Toolbar" mode', async () => {
+	it( 'allows Left to be pressed during creation in "Fixed to Toolbar" mode', async () => {
 		await setFixedToolbar( true );
 
 		await clickBlockAppender();
@@ -205,7 +205,7 @@ describe( 'Managing links', () => {
 		expect( modal ).toBeNull();
 	} );
 
-	it( 'Pressing Left and Esc in Link Dialog in "Docked Toolbar" mode', async () => {
+	it( 'allows Left to be pressed during creation in "Docked Toolbar" mode', async () => {
 		await setFixedToolbar( false );
 
 		await clickBlockAppender();
