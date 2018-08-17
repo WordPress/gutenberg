@@ -13,7 +13,7 @@
 
 // This is necessary for the editor resize handles to accurately work on a non-floated, non-resized, small image.
 .wp-block-image {
-	.wp-block-image__resizer {
+	.block-library-image__resizer {
 		display: inline-block;
 
 		img {
@@ -23,9 +23,9 @@
 	}
 }
 
-.wp-block-image__resize-handler-right,
-.wp-block-image__resize-handler-bottom,
-.wp-block-image__resize-handler-left {
+.block-library-image__resize-handler-right,
+.block-library-image__resize-handler-bottom,
+.block-library-image__resize-handler-left {
 	display: none;
 	border-radius: 50%;
 	border: 2px solid $white;
@@ -36,22 +36,22 @@
 
 	.wp-block-image.is-focused & {
 		display: block;
-		z-index: z-index(".wp-block-image__resize-handlers");
+		z-index: z-index(".block-library-image__resize-handlers");
 	}
 }
 
 /*!rtl:begin:ignore*/
-.wp-block-image__resize-handler-right {
+.block-library-image__resize-handler-right {
 	top: calc(50% - 9px) !important;
 	right: -8px !important;
 }
 
-.wp-block-image__resize-handler-left {
+.block-library-image__resize-handler-left {
 	top: calc(50% - 9px) !important;
 	left: -8px !important;
 }
 
-.wp-block-image__resize-handler-bottom {
+.block-library-image__resize-handler-bottom {
 	bottom: -8px !important;
 	left: calc(50% - 9px) !important;
 }
