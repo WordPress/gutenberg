@@ -410,6 +410,42 @@ function gutenberg_content_block_version( $content ) {
 }
 
 /**
+ * Determine whether a post has a specific block. This test optimizes for
+ * performance rather than strict accuracy, detecting the pattern of a block
+ * but not validating its structure. For strict accuracy, you should use the
+ * block parser on post content.
+ *
+ * @see gutenberg_parse_blocks()
+ *
+ * @since 1.9
+ *
+ * @param object $post Post.
+ * @param string $block_name Full Block name to look for.
+ * @return bool Whether the content contain the specified block.
+ */
+function gutenberg_post_has_block( $post, $block_name ) {
+	$post = get_post( $post );
+	return $post && gutenberg_content_has_block( $post->post_content, $block_name );
+}
+
+/**
+ * Determine whether a content string contains a specific block. This test
+ * optimizes for performance rather than strict accuracy, detecting the
+ * pattern of a block but not validating its structure. For strict accuracy,
+ * you should use the block parser on post content.
+ *
+ * @since 1.9
+ * @see gutenberg_parse_blocks()
+ *
+ * @param string $content Content to test.
+ * @param string $block_name Full Block name to look for.
+ * @return bool Whether the content contain the specified block.
+ */
+function gutenberg_content_has_block( $content, $block_name ) {
+	return false !== strpos( $content, '<!-- wp:' . $block_name );
+}
+
+/**
  * Adds a "Gutenberg" post state for post tables, if the post contains blocks.
  *
  * @param  array   $post_states An array of post display states.
