@@ -10,12 +10,11 @@ import { get, isFunction, some } from 'lodash';
  */
 import { applyFilters, addFilter } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
-import { isIconUnreadable, isValidIcon, normalizeIconObject } from './utils';
+import { isValidIcon, normalizeIconObject } from './utils';
 
 /**
  * Defined behavior of a block type.
@@ -160,13 +159,6 @@ export function registerBlockType( name, settings ) {
 		return;
 	}
 
-	if ( isIconUnreadable( settings.icon ) && window ) {
-		window.console.warn(
-			`The icon background color ${ settings.icon.background } and the foreground color ${ settings.icon.foreground } are not readable together. ` +
-			'Please try to increase the brightness and/or contrast difference between background and foreground.'
-		);
-	}
-
 	dispatch( 'core/blocks' ).addBlockTypes( settings );
 
 	return settings;
@@ -308,16 +300,6 @@ export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
  */
 export function isReusableBlock( blockOrType ) {
 	return blockOrType.name === 'core/block';
-}
-
-export function isSharedBlock( blockOrType ) {
-	deprecated( 'isSharedBlock', {
-		alternative: 'isReusableBlock',
-		version: '3.6',
-		plugin: 'Gutenberg',
-	} );
-
-	return isReusableBlock( blockOrType );
 }
 
 /**

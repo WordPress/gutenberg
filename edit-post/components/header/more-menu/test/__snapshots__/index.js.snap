@@ -4,6 +4,7 @@ exports[`MoreMenu should match snapshot 1`] = `
 <MoreMenu>
   <Dropdown
     className="edit-post-more-menu"
+    contentClassName="edit-post-more-menu__content"
     position="bottom left"
     renderContent={[Function]}
     renderToggle={[Function]}

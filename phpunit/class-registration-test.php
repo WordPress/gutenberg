@@ -10,6 +10,19 @@
  */
 class Registration_Test extends WP_UnitTestCase {
 
+	protected static $post_id;
+
+	public static function wpSetUpBeforeClass( $factory ) {
+		self::$post_id = $factory->post->create( array(
+			'post_content' => file_get_contents( dirname( __FILE__ ) . '/fixtures/do-blocks-original.html' ),
+		) );
+	}
+
+	public static function wpTearDownAfterClass() {
+		// Also deletes revisions.
+		wp_delete_post( self::$post_id, true );
+	}
+
 	function render_stub() {}
 
 	function tearDown() {
@@ -59,5 +72,26 @@ class Registration_Test extends WP_UnitTestCase {
 
 		$this->assertContains( 'core/dynamic', $dynamic_block_names );
 		$this->assertNotContains( 'core/dummy', $dynamic_block_names );
+	}
+
+	function test_has_blocks() {
+		// Test with passing post ID.
+		$this->assertTrue( has_blocks( self::$post_id ) );
+
+		// Test with passing WP_Post object.
+		$this->assertTrue( has_blocks( get_post( self::$post_id ) ) );
+
+		// Test with passing content string.
+		$this->assertTrue( has_blocks( get_post( self::$post_id ) ) );
+
+		// Test default.
+		$this->assertFalse( has_blocks() );
+		$query = new WP_Query( array( 'post__in' => array( self::$post_id ) ) );
+		$query->the_post();
+		$this->assertTrue( has_blocks() );
+
+		// Test string (without blocks).
+		$content = file_get_contents( dirname( __FILE__ ) . '/fixtures/do-blocks-expected.html' );
+		$this->assertFalse( has_blocks( $content ) );
 	}
 }

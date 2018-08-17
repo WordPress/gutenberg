@@ -2,9 +2,10 @@
 	font-family: $editor-html-font;
 	font-size: $text-editor-font-size;
 	color: $dark-gray-800;
-	padding: 0.8em 1.6em;
-	border: $border-width solid $light-gray-500;
-	border-radius: 4px;
+
+	&:focus {
+		box-shadow: none;
+	}
 }
 
 // We should extract this to a separate components-toolbar

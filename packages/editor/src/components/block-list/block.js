@@ -429,6 +429,28 @@ export class BlockListBlock extends Component {
 		}
 		const blockElementId = `block-${ clientId }`;
 
+		// We wrap the BlockEdit component in a div that hides it when editing in
+		// HTML mode. This allows us to render all of the ancillary pieces
+		// (InspectorControls, etc.) which are inside `BlockEdit` but not
+		// `BlockHTML`, even in HTML mode.
+		let blockEdit = (
+			<BlockEdit
+				name={ blockName }
+				isSelected={ isSelected }
+				attributes={ block.attributes }
+				setAttributes={ this.setAttributes }
+				insertBlocksAfter={ isLocked ? undefined : this.insertBlocksAfter }
+				onReplace={ isLocked ? undefined : onReplace }
+				mergeBlocks={ isLocked ? undefined : this.mergeBlocks }
+				clientId={ clientId }
+				isSelectionEnabled={ this.props.isSelectionEnabled }
+				toggleSelection={ this.props.toggleSelection }
+			/>
+		);
+		if ( mode !== 'visual' ) {
+			blockEdit = <div style={ { display: 'none' } }>{ blockEdit }</div>;
+		}
+
 		// Disable reasons:
 		//
 		//  jsx-a11y/mouse-events-have-key-events:
@@ -520,20 +542,7 @@ export class BlockListBlock extends Component {
 					data-block={ clientId }
 				>
 					<BlockCrashBoundary onError={ this.onBlockError }>
-						{ isValid && mode === 'visual' && (
-							<BlockEdit
-								name={ blockName }
-								isSelected={ isSelected }
-								attributes={ block.attributes }
-								setAttributes={ this.setAttributes }
-								insertBlocksAfter={ isLocked ? undefined : this.insertBlocksAfter }
-								onReplace={ isLocked ? undefined : onReplace }
-								mergeBlocks={ isLocked ? undefined : this.mergeBlocks }
-								clientId={ clientId }
-								isSelectionEnabled={ this.props.isSelectionEnabled }
-								toggleSelection={ this.props.toggleSelection }
-							/>
-						) }
+						{ isValid && blockEdit }
 						{ isValid && mode === 'html' && (
 							<BlockHtml clientId={ clientId } />
 						) }

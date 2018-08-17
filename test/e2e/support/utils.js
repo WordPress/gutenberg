@@ -10,7 +10,7 @@ import { URL } from 'url';
 import { times, castArray } from 'lodash';
 
 const {
-	WP_BASE_URL = 'http://localhost:8888',
+	WP_BASE_URL = 'http://localhost:8889',
 	WP_USERNAME = 'admin',
 	WP_PASSWORD = 'password',
 } = process.env;
@@ -291,7 +291,7 @@ export async function publishPost() {
 	await page.click( '.editor-post-publish-button' );
 
 	// A success notice should show up
-	return page.waitForSelector( '.notice-success' );
+	return page.waitForSelector( '.components-notice.is-success' );
 }
 
 /**

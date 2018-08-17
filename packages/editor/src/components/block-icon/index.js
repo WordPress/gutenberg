@@ -25,18 +25,25 @@ function renderIcon( icon ) {
 
 export default function BlockIcon( { icon, showColors = false, className } ) {
 	const renderedIcon = renderIcon( icon && icon.src ? icon.src : icon );
-	if ( showColors ) {
-		return (
-			<div
-				style={ {
-					backgroundColor: icon && icon.background,
-					color: icon && icon.foreground,
-				} }
-				className={ classnames( 'editor-block-icon__colors', className ) }
-			>
-				{ renderedIcon }
-			</div>
-		);
+	const style = showColors ? {
+		backgroundColor: icon && icon.background,
+		color: icon && icon.foreground,
+	} : {};
+
+	if ( ! renderedIcon ) {
+		return null;
 	}
-	return renderedIcon;
+
+	return (
+		<div
+			style={ style }
+			className={ classnames(
+				'editor-block-icon',
+				className,
+				{ 'has-colors': showColors }
+			) }
+		>
+			{ renderedIcon }
+		</div>
+	);
 }

@@ -79,7 +79,7 @@ function _gutenberg_utf8_split( $str ) {
  */
 function gutenberg_disable_editor_settings_wpautop( $settings, $editor_id ) {
 	$post = get_post();
-	if ( 'content' === $editor_id && is_object( $post ) && gutenberg_post_has_blocks( $post ) ) {
+	if ( 'content' === $editor_id && is_object( $post ) && has_blocks( $post ) ) {
 		$settings['wpautop'] = false;
 	}
 
@@ -107,7 +107,7 @@ add_filter( 'wp_refresh_nonces', 'gutenberg_add_rest_nonce_to_heartbeat_response
  * @return string          Paragraph-converted text if non-block content.
  */
 function gutenberg_wpautop( $content ) {
-	if ( gutenberg_content_has_blocks( $content ) ) {
+	if ( has_blocks( $content ) ) {
 		return $content;
 	}
 
@@ -134,7 +134,7 @@ function gutenberg_check_if_classic_needs_warning_about_blocks() {
 		return;
 	}
 
-	if ( ! gutenberg_post_has_blocks( $post ) && ! isset( $_REQUEST['cloudflare-error'] ) ) {
+	if ( ! has_blocks( $post ) && ! isset( $_REQUEST['cloudflare-error'] ) ) {
 		return;
 	}
 

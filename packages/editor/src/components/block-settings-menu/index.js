@@ -8,7 +8,7 @@ import { castArray, first, last, every, flow } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import { IconButton, Dropdown, NavigableMenu, MenuItem, KeyboardShortcuts } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -39,6 +39,14 @@ const shortcuts = {
 	removeBlock: {
 		raw: rawShortcut.primaryAlt( 'backspace' ),
 		display: displayShortcut.primaryAlt( 'bksp' ),
+	},
+	insertBefore: {
+		raw: rawShortcut.primaryAlt( 't' ),
+		display: displayShortcut.primaryAlt( 't' ),
+	},
+	insertAfter: {
+		raw: rawShortcut.primaryAlt( 'y' ),
+		display: displayShortcut.primaryAlt( 'y' ),
 	},
 };
 
@@ -72,6 +80,8 @@ export class BlockSettingsMenu extends Component {
 			isHidden,
 			onDuplicate,
 			onRemove,
+			onInsertBefore,
+			onInsertAfter,
 			canDuplicate,
 			isLocked,
 		} = this.props;
@@ -90,8 +100,15 @@ export class BlockSettingsMenu extends Component {
 						[ shortcuts.duplicate.raw ]: flow( preventDefault, onDuplicate ),
 
 						// Does not clash with any known browser/native shortcuts, but preventDefault
-						// is used to prevent any obscure unknown shortcuts from triggering
+						// is used to prevent any obscure unknown shortcuts from triggering.
 						[ shortcuts.removeBlock.raw ]: flow( preventDefault, onRemove ),
+
+						// Prevent 'view recently closed tabs' in Opera using preventDefault.
+						[ shortcuts.insertBefore.raw ]: flow( preventDefault, onInsertBefore ),
+
+						// Does not clash with any known browser/native shortcuts, but preventDefault
+						// is used to prevent any obscure unknown shortcuts from triggering.
+						[ shortcuts.insertAfter.raw ]: flow( preventDefault, onInsertAfter ),
 					} }
 				/>
 				<Dropdown
@@ -123,7 +140,6 @@ export class BlockSettingsMenu extends Component {
 						);
 					} }
 					renderContent={ ( { onClose } ) => (
-						// Should this just use a DropdownMenu instead of a DropDown ?
 						<NavigableMenu className="editor-block-settings-menu__content">
 							<_BlockSettingsMenuFirstItem.Slot fillProps={ { onClose } } />
 							{ count === 1 && (
@@ -145,6 +161,26 @@ export class BlockSettingsMenu extends Component {
 								>
 									{ __( 'Duplicate' ) }
 								</MenuItem>
+							) }
+							{ ! isLocked && (
+								<Fragment>
+									<MenuItem
+										className="editor-block-settings-menu__control"
+										onClick={ onInsertBefore }
+										icon="insert-before"
+										shortcut={ shortcuts.insertBefore.display }
+									>
+										{ __( 'Insert Before' ) }
+									</MenuItem>
+									<MenuItem
+										className="editor-block-settings-menu__control"
+										onClick={ onInsertAfter }
+										icon="insert-after"
+										shortcut={ shortcuts.insertAfter.display }
+									>
+										{ __( 'Insert After' ) }
+									</MenuItem>
+								</Fragment>
 							) }
 							{ count === 1 && (
 								<BlockModeToggle
@@ -199,15 +235,32 @@ export default compose( [
 		} );
 
 		return {
-			index: getBlockIndex( last( castArray( clientIds ) ), rootClientId ),
+			firstSelectedIndex: getBlockIndex( first( castArray( clientIds ) ), rootClientId ),
+			lastSelectedIndex: getBlockIndex( last( castArray( clientIds ) ), rootClientId ),
 			isLocked: !! getTemplateLock( rootClientId ),
 			blocks,
 			canDuplicate,
 			shortcuts,
 		};
 	} ),
-	withDispatch( ( dispatch, { clientIds, rootClientId, blocks, index, isLocked, canDuplicate } ) => {
-		const { insertBlocks, multiSelect, removeBlocks, selectBlock } = dispatch( 'core/editor' );
+	withDispatch( ( dispatch, props ) => {
+		const {
+			clientIds,
+			rootClientId,
+			blocks,
+			firstSelectedIndex,
+			lastSelectedIndex,
+			isLocked,
+			canDuplicate,
+		} = props;
+
+		const {
+			insertBlocks,
+			multiSelect,
+			removeBlocks,
+			selectBlock,
+			insertDefaultBlock,
+		} = dispatch( 'core/editor' );
 
 		return {
 			onDuplicate() {
@@ -218,7 +271,7 @@ export default compose( [
 				const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
 				insertBlocks(
 					clonedBlocks,
-					index + 1,
+					lastSelectedIndex + 1,
 					rootClientId
 				);
 				if ( clonedBlocks.length > 1 ) {
@@ -229,7 +282,19 @@ export default compose( [
 				}
 			},
 			onRemove() {
-				removeBlocks( clientIds );
+				if ( ! isLocked ) {
+					removeBlocks( clientIds );
+				}
+			},
+			onInsertBefore() {
+				if ( ! isLocked ) {
+					insertDefaultBlock( {}, rootClientId, firstSelectedIndex );
+				}
+			},
+			onInsertAfter() {
+				if ( ! isLocked ) {
+					insertDefaultBlock( {}, rootClientId, lastSelectedIndex + 1 );
+				}
 			},
 			onSelect( clientId ) {
 				selectBlock( clientId );

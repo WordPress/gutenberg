@@ -77,7 +77,6 @@ function camelCaseDash( string ) {
 
 const entryPointNames = [
 	'components',
-	'utils',
 	'edit-post',
 	'block-library',
 	'core-blocks',

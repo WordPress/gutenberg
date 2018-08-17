@@ -23,7 +23,7 @@ export function getEditorMode( state ) {
  * @return {boolean} Whether the editor sidebar is opened.
  */
 export function isEditorSidebarOpened( state ) {
-	const activeGeneralSidebar = getPreference( state, 'activeGeneralSidebar', null );
+	const activeGeneralSidebar = getActiveGeneralSidebarName( state );
 
 	return includes( [ 'edit-post/document', 'edit-post/block' ], activeGeneralSidebar );
 }
@@ -40,14 +40,27 @@ export function isPluginSidebarOpened( state ) {
 }
 
 /**
- * Returns the current active general sidebar name.
+ * Returns the current active general sidebar name, or null if there is no
+ * general sidebar active. The active general sidebar is a unique name to
+ * identify either an editor or plugin sidebar.
+ *
+ * Examples:
+ *
+ *  - `edit-post/document`
+ *  - `my-plugin/insert-image-sidebar`
  *
  * @param {Object} state Global application state.
  *
  * @return {?string} Active general sidebar name.
  */
 export function getActiveGeneralSidebarName( state ) {
-	return getPreference( state, 'activeGeneralSidebar', null );
+	// Dismissal takes precedent.
+	const isDismissed = getPreference( state, 'isGeneralSidebarDismissed', false );
+	if ( isDismissed ) {
+		return null;
+	}
+
+	return state.activeGeneralSidebar;
 }
 
 /**

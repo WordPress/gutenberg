@@ -36,7 +36,14 @@ Whether the plugin sidebar is opened.
 
 ### getActiveGeneralSidebarName
 
-Returns the current active general sidebar name.
+Returns the current active general sidebar name, or null if there is no
+general sidebar active. The active general sidebar is a unique name to
+identify either an editor or plugin sidebar.
+
+Examples:
+
+ - `edit-post/document`
+ - `my-plugin/insert-image-sidebar`
 
 *Parameters*
 

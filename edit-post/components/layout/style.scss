@@ -17,13 +17,13 @@
 			top: inherit;
 		}
 
-		.notice {
+		.components-notice {
 			margin: 0 0 5px;
 			padding: 6px 12px;
 			min-height: $panel-header-height;
 
-			.notice-dismiss {
-				margin: 5px;
+			.components-notice__dismiss {
+				margin: 10px 5px;
 			}
 		}
 	}
@@ -86,7 +86,14 @@
 	-webkit-overflow-scrolling: touch;
 
 	.edit-post-visual-editor {
-		flex-basis: 100%;
+		flex-grow: 1;
+
+		// In IE11 flex-basis: 100% cause a bug where the metaboxes area overlap with the content area.
+		// But it works as expected without it.
+		// The flex-basis is needed for the other browsers to make sure the content area is full-height.
+		@supports (position: sticky) {
+			flex-basis: 100%;
+		}
 	}
 
 	.edit-post-layout__metaboxes {
@@ -117,15 +124,16 @@
 }
 
 .edit-post-toggle-publish-panel {
-	display: block;
-	position: relative;
-	float: right;
-	top: -9999em;
+	position: absolute;
+	bottom: 0;
+	right: 0;
 	z-index: z-index(".edit-post-toggle-publish-panel");
-	padding: 20px 0 0 0;
 	width: $sidebar-width;
+	height: 0;
+	overflow: hidden;
 	&:focus-within {
-		top: 0;
+		height: auto;
+		padding: 20px 0 0 0;
 	}
 
 	.edit-post-toggle-publish-panel__button {

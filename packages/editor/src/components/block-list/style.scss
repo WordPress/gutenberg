@@ -173,11 +173,11 @@
 		margin: 0 0 12px 0;
 		width: 100%;
 
-		.notice {
+		.components-notice {
 			margin-left: 0;
 			margin-right: 0;
 
-			p {
+			.components-notice__content {
 				font-size: $default-font-size;
 			}
 		}
@@ -198,9 +198,9 @@
 			transition: outline 0.1s linear;
 			pointer-events: none;
 
-			// Show wider padding for top level blocks.
-			right: -$parent-block-padding;
-			left: -$parent-block-padding;
+			// Go edge-to-edge on mobile.
+			right: -$block-padding;
+			left: -$block-padding;
 			top: -$block-padding;
 			bottom: -$block-padding;
 
@@ -279,7 +279,7 @@
 
 .editor-block-list__layout .editor-block-list__block {
 	&.has-warning {
-		min-height: $block-padding + $block-spacing;
+		min-height: ( $block-padding + $block-spacing ) * 2;
 	}
 
 	// Warnings
@@ -442,6 +442,14 @@
 		@include break-wide() {
 			> .editor-block-mover {
 				display: block;
+			}
+		}
+
+		// Beyond the mobile breakpoint, wide images stretch outside of the column.
+		// To center the toolbar, we make it inline-flex so the toolbar is not full-wide.
+		@include break-small () {
+			.editor-block-toolbar {
+				display: inline-flex;
 			}
 		}
 	}
@@ -780,11 +788,20 @@
 	> .editor-block-list__insertion-point {
 		position: absolute;
 		top: -$block-padding - $block-spacing / 2;
-		// Matches the whole empty space between two blocks
+
+		// Matches the whole empty space between two blocks.
 		height: $block-padding * 2;
 		bottom: auto;
-		left: -$border-width;
-		right: -$border-width;
+
+		// Go edge to edge on mobile.
+		left: 0;
+		right: 0;
+
+		// Beyond mobile, make sure the toolbar overlaps the hover style.
+		@include break-small() {
+			left: -$border-width;
+			right: -$border-width;
+		}
 	}
 
 	&[data-align="full"] > .editor-block-list__insertion-point {
@@ -826,7 +843,7 @@
 
 	// Position toolbar below the block on mobile.
 	position: absolute;
-	bottom: $block-toolbar-height - $block-padding;
+	bottom: $block-toolbar-height - $block-padding - 1px;
 	left: 0;
 	right: 0;
 
@@ -854,8 +871,8 @@
 	}
 
 	// Make block toolbar full width on mobile.
-	margin-left: -$border-width;
-	margin-right: -$border-width;
+	margin-left: 0;
+	margin-right: 0;
 
 	@include break-small() {
 		margin-left: -$parent-block-padding - $parent-block-padding - $border-width;
@@ -962,8 +979,12 @@
 	z-index: z-index(".editor-block-list__breadcrumb");
 
 	// Position in the top right of the border.
-	right: -$block-parent-side-ui-clearance;
+	right: 0;
 	top: -$block-padding - $border-width;
+
+	@include break-small() {
+		right: -$block-parent-side-ui-clearance;
+	}
 
 	// Nested
 	.editor-block-list__block-edit & {

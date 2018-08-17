@@ -85,6 +85,8 @@
 		right: $item-spacing;
 		top: 50%;
 		transform: translateY(-50%);
+		color: $dark-gray-900;
+		fill: currentColor;
 	}
 
 	// mirror the arrow horizontally in RTL languages

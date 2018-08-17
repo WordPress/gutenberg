@@ -264,13 +264,6 @@ function gutenberg_register_scripts_and_styles() {
 		'before'
 	);
 	wp_register_script(
-		'wp-utils',
-		gutenberg_url( 'build/utils/index.js' ),
-		array( 'lodash', 'wp-api-fetch', 'wp-data', 'wp-deprecated', 'wp-i18n', 'wp-editor' ),
-		filemtime( gutenberg_dir_path() . 'build/utils/index.js' ),
-		true
-	);
-	wp_register_script(
 		'wp-shortcode',
 		gutenberg_url( 'build/shortcode/index.js' ),
 		array(),
@@ -284,8 +277,6 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'build/redux-routine/index.js' ),
 		true
 	);
-	wp_add_inline_script( 'wp-utils', 'var originalUtils = window.wp && window.wp.utils ? window.wp.utils : {};', 'before' );
-	wp_add_inline_script( 'wp-utils', 'for ( var key in originalUtils ) wp.utils[ key ] = originalUtils[ key ];' );
 	wp_register_script(
 		'wp-date',
 		gutenberg_url( 'build/date/index.js' ),
@@ -1166,7 +1157,6 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// https://github.com/WordPress/gutenberg/issues/5667.
 	add_filter( 'user_can_richedit', '__return_true' );
 
-	wp_enqueue_script( 'wp-utils' );
 	wp_enqueue_script( 'wp-edit-post' );
 
 	global $post;
