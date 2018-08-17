@@ -8,7 +8,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Component, createElement } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 
 /**
@@ -96,6 +96,7 @@ function applyInternetExplorerInputFix( editorNode ) {
 }
 
 const IS_PLACEHOLDER_VISIBLE_ATTR_NAME = 'data-is-placeholder-visible';
+
 export default class TinyMCE extends Component {
 	constructor() {
 		super();
@@ -103,7 +104,28 @@ export default class TinyMCE extends Component {
 	}
 
 	componentDidMount() {
-		this.initialize();
+		const settings = this.props.getSettings( {
+			theme: false,
+			inline: true,
+			toolbar: false,
+			browser_spellcheck: true,
+			entity_encoding: 'raw',
+			convert_urls: false,
+			inline_boundaries_selector: 'a[href],code,b,i,strong,em,del,ins,sup,sub',
+			plugins: [],
+			formats: {
+				strikethrough: { inline: 'del' },
+			},
+		} );
+
+		tinymce.init( {
+			...settings,
+			target: this.editorNode,
+			setup: ( editor ) => {
+				this.editor = editor;
+				this.props.onSetup( editor );
+			},
+		} );
 	}
 
 	shouldComponentUpdate() {
@@ -149,33 +171,6 @@ export default class TinyMCE extends Component {
 		}
 	}
 
-	initialize() {
-		const settings = this.props.getSettings( {
-			theme: false,
-			inline: true,
-			toolbar: false,
-			browser_spellcheck: true,
-			entity_encoding: 'raw',
-			convert_urls: false,
-			inline_boundaries_selector: 'a[href],code,b,i,strong,em,del,ins,sup,sub',
-			plugins: [],
-			formats: {
-				strikethrough: { inline: 'del' },
-			},
-		} );
-
-		settings.plugins.push( 'paste' );
-
-		tinymce.init( {
-			...settings,
-			target: this.editorNode,
-			setup: ( editor ) => {
-				this.editor = editor;
-				this.props.onSetup( editor );
-			},
-		} );
-	}
-
 	bindEditorNode( editorNode ) {
 		this.editorNode = editorNode;
 
@@ -194,32 +189,40 @@ export default class TinyMCE extends Component {
 	}
 
 	render() {
-		const { tagName = 'div', style, defaultValue, className, isPlaceholderVisible, format } = this.props;
+		const { tagName: TagName = 'div', style, defaultValue, className, isPlaceholderVisible, format } = this.props;
 		const ariaProps = pickAriaProps( this.props );
+		const placeholderProps = {
+			[ IS_PLACEHOLDER_VISIBLE_ATTR_NAME ]: isPlaceholderVisible,
+		};
 
 		/*
 		 * The role=textbox and aria-multiline=true must always be used together
 		 * as TinyMCE always behaves like a sort of textarea where text wraps in
 		 * multiple lines. Only the table block editable element is excluded.
 		 */
-		if ( tagName !== 'table' ) {
+		if ( TagName !== 'table' ) {
 			ariaProps.role = 'textbox';
 			ariaProps[ 'aria-multiline' ] = true;
 		}
 
-		// If a default value is provided, render it into the DOM even before
-		// TinyMCE finishes initializing. This avoids a short delay by allowing
-		// us to show and focus the content before it's truly ready to edit.
-
-		return createElement( tagName, {
-			...ariaProps,
-			className: classnames( className, 'editor-rich-text__tinymce' ),
-			contentEditable: true,
-			[ IS_PLACEHOLDER_VISIBLE_ATTR_NAME ]: isPlaceholderVisible,
-			ref: this.bindEditorNode,
-			style,
-			suppressContentEditableWarning: true,
-			dangerouslySetInnerHTML: { __html: valueToString( defaultValue, format ) },
-		} );
+		return (
+			<TagName
+				{ ...ariaProps }
+				{ ...placeholderProps }
+				className={ classnames( className, 'editor-rich-text__tinymce' ) }
+				contentEditable={ true }
+				suppressContentEditableWarning={ true }
+				ref={ this.bindEditorNode }
+				style={ style }
+				dangerouslySetInnerHTML={ {
+					// If a default value is provided, render it into the DOM
+					// even before TinyMCE finishes initializing. This avoids a
+					// short delay by allowing us to show and focus the content
+					// before it's truly ready to edit.
+					__html: valueToString( defaultValue, format ),
+				} }
+				onPaste={ this.props.onCustomPaste }
+			/>
+		);
 	}
 }
