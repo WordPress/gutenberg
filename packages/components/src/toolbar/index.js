@@ -61,7 +61,7 @@ function Toolbar( { controls = [], children, className } ) {
 				controlSet.map( ( control, indexOfControl ) => (
 					<ToolbarButtonContainer
 						key={ [ indexOfSet, indexOfControl ].join() }
-						keyProp= { [ indexOfSet, indexOfControl ].join() }
+						keyProp={ [ indexOfSet, indexOfControl ].join() }
 						className={ indexOfSet > 0 && indexOfControl === 0 ? 'has-left-divider' : null }
 					>
 						<IconButton
