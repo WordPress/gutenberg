@@ -52,14 +52,13 @@ export function getActiveStyle( styles, className ) {
  * @return {string} The updated className.
  */
 export function replaceActiveStyle( className, activeStyle, newStyle ) {
-	const newStyleName = 'is-style-' + newStyle.name;
-
 	const list = new TokenList( className );
+
 	if ( activeStyle ) {
-		list.replace( 'is-style-' + activeStyle.name, newStyleName );
-	} else {
-		list.add( newStyleName );
+		list.remove( 'is-style-' + activeStyle.name );
 	}
+
+	list.add( 'is-style-' + newStyle.name );
 
 	return list.value;
 }
