@@ -2,15 +2,10 @@
  * External dependencies
  */
 import RCTAztecView from 'react-native-aztec';
-import { View, Text } from "react-native";
+import { View } from 'react-native';
 import {
-	isEqual,
 	forEach,
 	merge,
-	identity,
-	find,
-	defer,
-	noop,
 } from 'lodash';
 
 /**
@@ -93,24 +88,24 @@ export class RichText extends Component {
 		return this.state.formats[ format ] && this.state.formats[ format ].isActive;
 	}
 
+	// eslint-disable-next-line no-unused-vars
 	removeFormat( format ) {
 		//TODO: implement Aztec call to remove format
-		console.log("Remove Format:" + format);
 	}
 
+	// eslint-disable-next-line no-unused-vars
 	applyFormat( format, args, node ) {
 		//TODO: implement Aztec call to apply format
-		console.log("Apply Format:" + format);
 	}
 
 	changeFormats( formats ) {
-		forEach( formats, ( formatValue, format ) => {			
+		forEach( formats, ( formatValue, format ) => {
 			const isActive = this.isFormatActive( format );
 			if ( isActive && ! formatValue ) {
 				this.removeFormat( format );
 			} else if ( ! isActive && formatValue ) {
 				this.applyFormat( format );
-			}			
+			}
 		} );
 
 		this.setState( ( state ) => ( {
@@ -125,13 +120,11 @@ export class RichText extends Component {
 			eventCount,
 			formattingControls,
 			formatters,
-			isSelected,
-			inlineToolbar = true,
 		} = this.props;
 
 		const formatToolbar = (
 			<FormatToolbar
-			    formats={ this.state.formats }								
+				formats={ this.state.formats }
 				onChange={ this.changeFormats }
 				enabledControls={ formattingControls }
 				customControls={ formatters }
@@ -143,7 +136,7 @@ export class RichText extends Component {
 
 		return (
 			<View>
-				{ formatToolbar }			
+				{ formatToolbar }
 				<RCTAztecView
 					text={ { text: html, eventCount: eventCount } }
 					onChange={ this.onChange }
@@ -151,7 +144,7 @@ export class RichText extends Component {
 					color={ 'black' }
 					maxImagesWidth={ 200 }
 					style={ style }
-				/>			
+				/>
 			</View>
 		);
 	}

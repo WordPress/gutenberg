@@ -3,8 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import {	
-	IconButton,	
+import {
 	Toolbar,
 } from '@wordpress/components';
 import { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER, displayShortcut } from '@wordpress/keycodes';
@@ -15,9 +14,7 @@ import { prependHTTP } from '@wordpress/url';
  */
 //import PositionedAtSelection from './positioned-at-selection';
 //import URLInput from '../../url-input';
-import { filterURLForDisplay } from '../../../utils/url';
-
-import { Text } from 'react-native'
+//import { filterURLForDisplay } from '../../../utils/url';
 
 const FORMATTING_CONTROLS = [
 	{
@@ -173,9 +170,9 @@ class FormatToolbar extends Component {
 	}
 
 	render() {
-		const { formats, enabledControls = DEFAULT_CONTROLS, customControls = [], selectedNodeId } = this.props;
-		const { linkValue, settingsVisible, opensInNewWindow } = this.state;
-		const isAddingLink = formats.link && formats.link.isAdding;
+		const { enabledControls = DEFAULT_CONTROLS, customControls = [] } = this.props;
+		// const { linkValue, settingsVisible, opensInNewWindow } = this.state;
+		// const isAddingLink = formats.link && formats.link.isAdding;
 
 		const toolbarControls = FORMATTING_CONTROLS.concat( customControls )
 			.filter( ( control ) => enabledControls.indexOf( control.format ) !== -1 )
@@ -197,10 +194,10 @@ class FormatToolbar extends Component {
 					onClick: this.toggleFormat( control.format ),
 					isActive: this.isFormatActive( control.format ),
 				};
-			} );		
+			} );
 
-		return (			
-			<Toolbar controls={ toolbarControls } />			
+		return (
+			<Toolbar controls={ toolbarControls } />
 		);
 	}
 }

@@ -7,6 +7,7 @@ import { Platform } from 'react-native';
  *
  * @return {boolean}         True if iOS; false otherwise.
  */
-export function isAppleOS( _window = window ) {		
+// eslint-disable-next-line no-unused-vars
+export function isAppleOS( _window = window ) {
 	return Platform.Version === 'ios';
 }
