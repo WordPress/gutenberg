@@ -385,7 +385,7 @@ export function getNextNonWhitespaceToken( tokens ) {
  *
  * @param {string} html HTML string to tokenize.
  *
- * @return {Object[]|boolean} Array of valid tokenized HTML elements, or null on error
+ * @return {Object[]|null} Array of valid tokenized HTML elements, or null on error
  */
 function getHTMLTokens( html ) {
 	try {
