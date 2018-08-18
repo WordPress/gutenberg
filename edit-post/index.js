@@ -59,7 +59,7 @@ export function initializeEditor( id, postType, postId, settings, overridePost )
 		'core/editor.inserter',
 		'core/editor.settings',
 		'core/editor.preview',
-		'core/editor.publish',
+		'core/editor.publish'
 	] );
 
 	render(
@@ -70,7 +70,7 @@ export function initializeEditor( id, postType, postId, settings, overridePost )
 	return {
 		initializeMetaBoxes( metaBoxes ) {
 			store.dispatch( initializeMetaBoxState( metaBoxes ) );
-		},
+		}
 	};
 }
 
