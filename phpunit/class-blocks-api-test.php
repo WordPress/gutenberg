@@ -49,14 +49,19 @@ class Blocks_API extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
 
-		self::$post_id = $this->factory()->post->create( array(
-			'post_excerpt' => '', // Empty excerpt, so it has to be generated.
-			'post_content' => '<!-- wp:core/dummy /-->',
-		) );
+		self::$post_id = $this->factory()->post->create(
+			array(
+				'post_excerpt' => '', // Empty excerpt, so it has to be generated.
+				'post_content' => '<!-- wp:core/dummy /-->',
+			)
+		);
 
-		register_block_type( 'core/dummy', array(
-			'render_callback' => array( $this, 'render_dummy_block' ),
-		) );
+		register_block_type(
+			'core/dummy',
+			array(
+				'render_callback' => array( $this, 'render_dummy_block' ),
+			)
+		);
 	}
 
 	/**
@@ -101,9 +106,11 @@ class Blocks_API extends WP_UnitTestCase {
 	 * @covers ::strip_dynamic_blocks_add_filter, ::strip_dynamic_blocks_remove_filter
 	 */
 	function test_excerpt_infinite_loop() {
-		$query = new WP_Query( array(
-			'post__in' => array( self::$post_id ),
-		) );
+		$query = new WP_Query(
+			array(
+				'post__in' => array( self::$post_id ),
+			)
+		);
 		$query->the_post();
 
 		$this->assertEmpty( do_blocks( '<!-- wp:core/dummy /-->' ) );

@@ -36,25 +36,31 @@ class Reusable_Blocks_Render_Test extends WP_UnitTestCase {
 	 * @param WP_UnitTest_Factory $factory Helper that creates fake data.
 	 */
 	public static function wpSetUpBeforeClass( $factory ) {
-		self::$user_id = $factory->user->create( array(
-			'role' => 'editor',
-		) );
+		self::$user_id = $factory->user->create(
+			array(
+				'role' => 'editor',
+			)
+		);
 
-		self::$post_id = $factory->post->create( array(
-			'post_author'  => self::$user_id,
-			'post_type'    => 'post',
-			'post_status'  => 'publish',
-			'post_title'   => 'Test Post',
-			'post_content' => '<p>Hello world!</p>',
-		) );
+		self::$post_id = $factory->post->create(
+			array(
+				'post_author'  => self::$user_id,
+				'post_type'    => 'post',
+				'post_status'  => 'publish',
+				'post_title'   => 'Test Post',
+				'post_content' => '<p>Hello world!</p>',
+			)
+		);
 
-		self::$block_id = $factory->post->create( array(
-			'post_author'  => self::$user_id,
-			'post_type'    => 'wp_block',
-			'post_status'  => 'publish',
-			'post_title'   => 'Test Block',
-			'post_content' => '<!-- wp:core/paragraph --><p>Hello world!</p><!-- /wp:core/paragraph -->',
-		) );
+		self::$block_id = $factory->post->create(
+			array(
+				'post_author'  => self::$user_id,
+				'post_type'    => 'wp_block',
+				'post_status'  => 'publish',
+				'post_title'   => 'Test Block',
+				'post_content' => '<!-- wp:core/paragraph --><p>Hello world!</p><!-- /wp:core/paragraph -->',
+			)
+		);
 	}
 
 	/**

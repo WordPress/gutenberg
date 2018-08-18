@@ -25,12 +25,15 @@ function render_block_core_block( $attributes ) {
 	return do_blocks( $reusable_block->post_content );
 }
 
-register_block_type( 'core/block', array(
-	'attributes'      => array(
-		'ref' => array(
-			'type' => 'number',
+register_block_type(
+	'core/block',
+	array(
+		'attributes'      => array(
+			'ref' => array(
+				'type' => 'number',
+			),
 		),
-	),
 
-	'render_callback' => 'render_block_core_block',
-) );
+		'render_callback' => 'render_block_core_block',
+	)
+);

@@ -92,9 +92,12 @@ function build_dropdown_script_block_core_categories( $dropdown_id ) {
  * Registers the `core/categories` block on server.
  */
 function register_block_core_categories() {
-	register_block_type( 'core/categories', array(
-		'render_callback' => 'render_block_core_categories',
-	) );
+	register_block_type(
+		'core/categories',
+		array(
+			'render_callback' => 'render_block_core_categories',
+		)
+	);
 }
 
 add_action( 'init', 'register_block_core_categories' );

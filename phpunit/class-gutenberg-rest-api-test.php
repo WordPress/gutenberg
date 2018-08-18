@@ -12,18 +12,26 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 	function setUp() {
 		parent::setUp();
 
-		$this->administrator = $this->factory->user->create( array(
-			'role' => 'administrator',
-		) );
-		$this->author        = $this->factory->user->create( array(
-			'role' => 'author',
-		) );
-		$this->editor        = $this->factory->user->create( array(
-			'role' => 'editor',
-		) );
-		$this->contributor   = $this->factory->user->create( array(
-			'role' => 'contributor',
-		) );
+		$this->administrator = $this->factory->user->create(
+			array(
+				'role' => 'administrator',
+			)
+		);
+		$this->author        = $this->factory->user->create(
+			array(
+				'role' => 'author',
+			)
+		);
+		$this->editor        = $this->factory->user->create(
+			array(
+				'role' => 'editor',
+			)
+		);
+		$this->contributor   = $this->factory->user->create(
+			array(
+				'role' => 'contributor',
+			)
+		);
 		$this->subscriber    = $this->factory->user->create(
 			array(
 				'role'         => 'subscriber',
@@ -180,9 +188,11 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 	 * Only returns wp:action-publish when current user can publish.
 	 */
 	function test_link_publish_only_appears_for_author() {
-		$post_id   = $this->factory->post->create( array(
-			'post_author' => $this->author,
-		) );
+		$post_id   = $this->factory->post->create(
+			array(
+				'post_author' => $this->author,
+			)
+		);
 		$check_key = 'https://api.w.org/action-publish';
 		// contributors cannot sticky.
 		wp_set_current_user( $this->contributor );
@@ -240,13 +250,17 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 	 * Only returns term-related actions when current user can do so.
 	 */
 	function test_link_term_management_per_user() {
-		$contributor_post  = $this->factory->post->create( array(
-			'post_author' => $this->contributor,
-			'post_status' => 'draft',
-		) );
-		$author_post       = $this->factory->post->create( array(
-			'post_author' => $this->author,
-		) );
+		$contributor_post  = $this->factory->post->create(
+			array(
+				'post_author' => $this->contributor,
+				'post_status' => 'draft',
+			)
+		);
+		$author_post       = $this->factory->post->create(
+			array(
+				'post_author' => $this->author,
+			)
+		);
 		$create_tags       = 'https://api.w.org/action-create-tags';
 		$assign_tags       = 'https://api.w.org/action-assign-tags';
 		$create_categories = 'https://api.w.org/action-create-categories';

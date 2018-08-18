@@ -13,9 +13,11 @@ class Registration_Test extends WP_UnitTestCase {
 	protected static $post_id;
 
 	public static function wpSetUpBeforeClass( $factory ) {
-		self::$post_id = $factory->post->create( array(
-			'post_content' => file_get_contents( dirname( __FILE__ ) . '/fixtures/do-blocks-original.html' ),
-		) );
+		self::$post_id = $factory->post->create(
+			array(
+				'post_content' => file_get_contents( dirname( __FILE__ ) . '/fixtures/do-blocks-original.html' ),
+			)
+		);
 	}
 
 	public static function wpTearDownAfterClass() {

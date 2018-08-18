@@ -37,19 +37,28 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
 	public static function wpSetUpBeforeClass( $factory ) {
-		self::$my_title_post_ids = $factory->post->create_many( 4, array(
-			'post_title' => 'my-footitle',
-			'post_type'  => 'post',
-		) );
+		self::$my_title_post_ids = $factory->post->create_many(
+			4,
+			array(
+				'post_title' => 'my-footitle',
+				'post_type'  => 'post',
+			)
+		);
 
-		self::$my_title_page_ids = $factory->post->create_many( 4, array(
-			'post_title' => 'my-footitle',
-			'post_type'  => 'page',
-		) );
+		self::$my_title_page_ids = $factory->post->create_many(
+			4,
+			array(
+				'post_title' => 'my-footitle',
+				'post_type'  => 'page',
+			)
+		);
 
-		self::$my_content_post_ids = $factory->post->create_many( 6, array(
-			'post_content' => 'my-foocontent',
-		) );
+		self::$my_content_post_ids = $factory->post->create_many(
+			6,
+			array(
+				'post_content' => 'my-foocontent',
+			)
+		);
 	}
 
 	/**
@@ -92,9 +101,11 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * Search through all content.
 	 */
 	public function test_get_items() {
-		$response = $this->do_request_with_params( array(
-			'per_page' => 100,
-		) );
+		$response = $this->do_request_with_params(
+			array(
+				'per_page' => 100,
+			)
+		);
 
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertEqualSets(
@@ -111,9 +122,11 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * Search through all content with a low limit.
 	 */
 	public function test_get_items_with_limit() {
-		$response = $this->do_request_with_params( array(
-			'per_page' => 3,
-		) );
+		$response = $this->do_request_with_params(
+			array(
+				'per_page' => 3,
+			)
+		);
 
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertEquals( 3, count( $response->get_data() ) );
@@ -123,10 +136,12 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * Search through posts of any post type.
 	 */
 	public function test_get_items_search_type_post() {
-		$response = $this->do_request_with_params( array(
-			'per_page' => 100,
-			'type'     => 'post',
-		) );
+		$response = $this->do_request_with_params(
+			array(
+				'per_page' => 100,
+				'type'     => 'post',
+			)
+		);
 
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertEqualSets(
@@ -143,11 +158,13 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * Search through posts of post type 'post'.
 	 */
 	public function test_get_items_search_type_post_subtype_post() {
-		$response = $this->do_request_with_params( array(
-			'per_page' => 100,
-			'type'     => 'post',
-			'subtype'  => 'post',
-		) );
+		$response = $this->do_request_with_params(
+			array(
+				'per_page' => 100,
+				'type'     => 'post',
+				'subtype'  => 'post',
+			)
+		);
 
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertEqualSets(
@@ -163,11 +180,13 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * Search through posts of post type 'page'.
 	 */
 	public function test_get_items_search_type_post_subtype_page() {
-		$response = $this->do_request_with_params( array(
-			'per_page' => 100,
-			'type'     => 'post',
-			'subtype'  => 'page',
-		) );
+		$response = $this->do_request_with_params(
+			array(
+				'per_page' => 100,
+				'type'     => 'post',
+				'subtype'  => 'page',
+			)
+		);
 
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertEqualSets(
@@ -180,10 +199,12 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * Search through an invalid type
 	 */
 	public function test_get_items_search_type_invalid() {
-		$response = $this->do_request_with_params( array(
-			'per_page' => 100,
-			'type'     => 'invalid',
-		) );
+		$response = $this->do_request_with_params(
+			array(
+				'per_page' => 100,
+				'type'     => 'invalid',
+			)
+		);
 
 		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
 	}
@@ -192,11 +213,13 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * Search through posts of an invalid post type.
 	 */
 	public function test_get_items_search_type_post_subtype_invalid() {
-		$response = $this->do_request_with_params( array(
-			'per_page' => 100,
-			'type'     => 'post',
-			'subtype'  => 'invalid',
-		) );
+		$response = $this->do_request_with_params(
+			array(
+				'per_page' => 100,
+				'type'     => 'post',
+				'subtype'  => 'invalid',
+			)
+		);
 
 		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
 	}
@@ -205,11 +228,13 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * Search through posts and pages.
 	 */
 	public function test_get_items_search_posts_and_pages() {
-		$response = $this->do_request_with_params( array(
-			'per_page' => 100,
-			'type'     => 'post',
-			'subtype'  => 'post,page',
-		) );
+		$response = $this->do_request_with_params(
+			array(
+				'per_page' => 100,
+				'type'     => 'post',
+				'subtype'  => 'post,page',
+			)
+		);
 
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertEqualSets(
@@ -226,10 +251,12 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * Search through all that matches a 'footitle' search.
 	 */
 	public function test_get_items_search_for_footitle() {
-		$response = $this->do_request_with_params( array(
-			'per_page' => 100,
-			'search'   => 'footitle',
-		) );
+		$response = $this->do_request_with_params(
+			array(
+				'per_page' => 100,
+				'search'   => 'footitle',
+			)
+		);
 
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertEqualSets(
@@ -245,10 +272,12 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * Search through all that matches a 'foocontent' search.
 	 */
 	public function test_get_items_search_for_foocontent() {
-		$response = $this->do_request_with_params( array(
-			'per_page' => 100,
-			'search'   => 'foocontent',
-		) );
+		$response = $this->do_request_with_params(
+			array(
+				'per_page' => 100,
+				'search'   => 'foocontent',
+			)
+		);
 
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertEqualSets(
@@ -305,14 +334,17 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( 200, $response->get_status() );
 
 		$data = $response->get_data();
-		$this->assertEquals( array(
-			'id',
-			'title',
-			'url',
-			'type',
-			'subtype',
-			'_links',
-		), array_keys( $data[0] ) );
+		$this->assertEquals(
+			array(
+				'id',
+				'title',
+				'url',
+				'type',
+				'subtype',
+				'_links',
+			),
+			array_keys( $data[0] )
+		);
 	}
 
 	/**
@@ -323,17 +355,22 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			$this->markTestSkipped( 'Limiting fields requires the WP_REST_Controller::get_fields_for_response() method.' );
 		}
 
-		$response = $this->do_request_with_params( array(
-			'_fields' => 'id,title',
-		) );
+		$response = $this->do_request_with_params(
+			array(
+				'_fields' => 'id,title',
+			)
+		);
 		$this->assertEquals( 200, $response->get_status() );
 
 		$data = $response->get_data();
-		$this->assertEquals( array(
-			'id',
-			'title',
-			'_links',
-		), array_keys( $data[0] ) );
+		$this->assertEquals(
+			array(
+				'id',
+				'title',
+				'_links',
+			),
+			array_keys( $data[0] )
+		);
 	}
 
 	/**
@@ -356,10 +393,12 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * Tests that non-public post types are not allowed.
 	 */
 	public function test_non_public_post_type() {
-		$response = $this->do_request_with_params( array(
-			'type'    => 'post',
-			'subtype' => 'post,nav_menu_item',
-		) );
+		$response = $this->do_request_with_params(
+			array(
+				'type'    => 'post',
+				'subtype' => 'post,nav_menu_item',
+			)
+		);
 		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
 	}
 
@@ -369,21 +408,25 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	public function test_custom_search_handler_get_items() {
 		$controller = new WP_REST_Search_Controller( array( new WP_REST_Dummy_Search_Handler( 10 ) ) );
 
-		$request  = $this->get_request( array(
-			'page'     => 1,
-			'per_page' => 10,
-			'type'     => 'dummy',
-			'subtype'  => array( WP_REST_Search_Controller::TYPE_ANY ),
-		) );
+		$request  = $this->get_request(
+			array(
+				'page'     => 1,
+				'per_page' => 10,
+				'type'     => 'dummy',
+				'subtype'  => array( WP_REST_Search_Controller::TYPE_ANY ),
+			)
+		);
 		$response = $controller->get_items( $request );
 		$this->assertEqualSets( range( 1, 10 ), wp_list_pluck( $response->get_data(), 'id' ) );
 
-		$request  = $this->get_request( array(
-			'page'     => 1,
-			'per_page' => 10,
-			'type'     => 'dummy',
-			'subtype'  => array( 'dummy_first_type' ),
-		) );
+		$request  = $this->get_request(
+			array(
+				'page'     => 1,
+				'per_page' => 10,
+				'type'     => 'dummy',
+				'subtype'  => array( 'dummy_first_type' ),
+			)
+		);
 		$response = $controller->get_items( $request );
 		$this->assertEqualSets( range( 1, 5 ), wp_list_pluck( $response->get_data(), 'id' ) );
 	}
@@ -394,19 +437,24 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	public function test_custom_search_handler_prepare_item() {
 		$controller = new WP_REST_Search_Controller( array( new WP_REST_Dummy_Search_Handler( 10 ) ) );
 
-		$request  = $this->get_request( array(
-			'type'    => 'dummy',
-			'subtype' => array( WP_REST_Search_Controller::TYPE_ANY ),
-		) );
+		$request  = $this->get_request(
+			array(
+				'type'    => 'dummy',
+				'subtype' => array( WP_REST_Search_Controller::TYPE_ANY ),
+			)
+		);
 		$response = $controller->prepare_item_for_response( 1, $request );
 		$data     = $response->get_data();
-		$this->assertEquals( array(
-			'id',
-			'title',
-			'url',
-			'type',
-			'subtype',
-		), array_keys( $data ) );
+		$this->assertEquals(
+			array(
+				'id',
+				'title',
+				'url',
+				'type',
+				'subtype',
+			),
+			array_keys( $data )
+		);
 	}
 
 	/**
@@ -419,17 +467,22 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 		$controller = new WP_REST_Search_Controller( array( new WP_REST_Dummy_Search_Handler( 10 ) ) );
 
-		$request  = $this->get_request( array(
-			'type'    => 'dummy',
-			'subtype' => array( WP_REST_Search_Controller::TYPE_ANY ),
-			'_fields' => 'id,title',
-		) );
+		$request  = $this->get_request(
+			array(
+				'type'    => 'dummy',
+				'subtype' => array( WP_REST_Search_Controller::TYPE_ANY ),
+				'_fields' => 'id,title',
+			)
+		);
 		$response = $controller->prepare_item_for_response( 1, $request );
 		$data     = $response->get_data();
-		$this->assertEquals( array(
-			'id',
-			'title',
-		), array_keys( $data ) );
+		$this->assertEquals(
+			array(
+				'id',
+				'title',
+			),
+			array_keys( $data )
+		);
 	}
 
 	/**
