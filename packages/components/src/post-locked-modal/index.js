@@ -27,12 +27,14 @@ class PostLockedModal extends Component {
 	}
 
 	takeOverPost() {
-		const { getEditorSettings } = select( 'core/editor' );
+		const { getEditorSettings, getCurrentPost } = select( 'core/editor' );
 		const { lockNonce } = getEditorSettings();
+		const { id } = getCurrentPost();
 		const unlockUrl = addQueryArgs( getPostEditURL(), {
 			'get-post-lock': '1',
-			nonce: lockNonce,
+			_wpnonce: lockNonce,
 			lockKey: true,
+			post: id,
 		} );
 		document.location = unlockUrl;
 	}
@@ -65,7 +67,7 @@ class PostLockedModal extends Component {
 							<PostPreviewButton />
 							<button
 								className="button button-primary"
-								onClick={ this.takeOver }
+								onClick={ this.takeOverPost }
 							>
 								Take Over
 							</button>
