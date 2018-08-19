@@ -42,7 +42,7 @@
 		"eslint-plugin-jest": "^21.0.0",
 		"eslint-plugin-wordpress": "git://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#b65ae0cea1199c9714641ed3be7ea98fcb27dd6c",
 		"husky": "^0.14.3",
-		"jest": "^22.0.0",
+		"jest": "^23.5.0",
 		"npm-run-all": "^4.0.0",
 		"npmpub": "^4.0.1",
 		"remark-cli": "^5.0.0",
