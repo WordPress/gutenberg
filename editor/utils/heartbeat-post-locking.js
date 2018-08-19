@@ -42,14 +42,12 @@ export function setupHearthbeatPostLocking() {
 		.on( 'heartbeat-tick.refresh-lock', function( e, data ) {
 			if ( data[ 'wp-refresh-post-lock' ] ) {
 				const received = data[ 'wp-refresh-post-lock' ];
-
 				if ( received.lock_error ) {
-					// @todo suspend autosaving
-					// @todo Show "editing taken over" message.
+					// Auto save and display the takeover modal.
+					dispatch( 'core/editor' ).autosave();
 					dispatch( 'core/editor' ).lockPost( true, received.lock_error );
 				} else if ( received.new_lock ) {
 					jQuery( '#active_post_lock' ).val( received.new_lock );
-
 					dispatch( 'core/editor' ).lockPost( false );
 				}
 			}
