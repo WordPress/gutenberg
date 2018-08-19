@@ -1,4 +1,4 @@
-# HEAD
+# 13.1.0
 
 -   Added: Added SCSS _shared config_ `extends` tests.
 -   Changed: `stylelint-config-wordpress/scss` now extends [`stylelint-config-recommended-scss`](https://github.com/kristerkari/stylelint-config-recommended-scss) (the net result of this change results in no rule changes for this SCSS config).
