@@ -11,6 +11,7 @@ import {
 import './style.scss';
 import { addQueryArgs } from '@wordpress/url';
 import { getPostEditURL } from '../../../../edit-post/components/browser-url';
+import { getWPAdminURL } from '../../../editor/src/utils/url';
 
 class PostLockedModal extends Component {
 	constructor() {
@@ -20,11 +21,18 @@ class PostLockedModal extends Component {
 		};
 
 		this.takeOverPost = this.takeOverPost.bind( this );
+		const { getLockDetails, getPostLockUser } = select( 'core/editor' );
+		const lockDetails = getLockDetails();
 
-		const user = select( 'core/editor' ).getPostLockUser();
-		const displayName = ( user && user.data ) ? user.data.display_name : __( 'Another user' );
-		this.takeover = sprintf( __( '%s has taken over and is currently editing. Your latest changes were saved as a revision.' ), displayName );
-		this.alreadyEditing = sprintf( __( '%s is already editing this post. Do you want to take over?' ), displayName );
+		if ( lockDetails && lockDetails.text ) {
+			this.modalText = lockDetails.text;
+			this.avatar = lockDetails.avatar_src;
+			this.takeover = true;
+		} else {
+			const user = getPostLockUser();
+			const displayName = ( user && user.data ) ? user.data.display_name : __( 'Another user' );
+			this.modalText = sprintf( __( '%s is already editing this post. Do you want to take over?' ), displayName );
+		}
 	}
 
 	takeOverPost() {
@@ -40,8 +48,8 @@ class PostLockedModal extends Component {
 		document.location = unlockUrl;
 	}
 
-	goBack() {
-		window.history.back();
+	allPosts() {
+		document.location = getWPAdminURL( 'edit.php' );
 	}
 
 	render() {
@@ -50,28 +58,32 @@ class PostLockedModal extends Component {
 				{
 					this.state.isOpen ?
 						<Modal
-							title={ this.alreadyEditing }
+							title={ this.modalText }
 							onRequestClose={ this.closeModal }
 							focusOnMount={ true }
 							shouldCloseOnClickOutside={ false }
 							shouldCloseOnEsc={ false }
 							showCloseIcon={ false }
 							className="post-locked-modal"
+							icon={ this.avatar }
 						>
-
 							<button
-								className="button"
-								onClick={ this.goBack }
+								className={ 'button' + ( this.takeover ? ' button-primary' : '' ) }
+								onClick={ this.allPosts }
 							>
-								Go back
+								{ __( 'All Posts' ) }
 							</button>
-							<PostPreviewButton />
-							<button
-								className="button button-primary"
-								onClick={ this.takeOverPost }
-							>
-								Take Over
-							</button>
+							{ ! this.takeover &&
+								<span>
+									<PostPreviewButton />
+									<button
+										className="button button-primary"
+										onClick={ this.takeOverPost }
+									>
+										{ __( 'Take Over' ) }
+									</button>
+								</span>
+							}
 						</Modal> :
 						null
 				}
