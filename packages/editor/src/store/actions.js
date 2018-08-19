@@ -595,14 +595,16 @@ export function removeNotice( id ) {
 /**
  * Returns an action object used to remove a modal.
  *
- * @param {boolean} locked Whether the editor should be locked.
+ * @param {boolean} locked      Whether the editor should be locked.
+ * @param {Object}  lockDetails Details about the lock user and their avatar.
  *
  * @return {Object} Action object.
  */
-export function lockPost( locked ) {
+export function lockPost( locked, lockDetails ) {
 	return {
 		type: 'LOCK_POST',
 		locked,
+		lockDetails,
 	};
 }
 
