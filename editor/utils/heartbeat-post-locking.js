@@ -29,7 +29,7 @@ export function setupHearthbeatPostLocking() {
 			return;
 		}
 
-		send.postId = postId;
+		send.post_id = postId;
 
 		if ( lock ) {
 			send.lock = lock;

@@ -22,8 +22,9 @@ class PostLockedModal extends Component {
 		this.takeOverPost = this.takeOverPost.bind( this );
 
 		const user = select( 'core/editor' ).getPostLockUser();
-		this.takeover = sprintf( __( '%s has taken over and is currently editing. Your latest changes were saved as a revision.' ), user.data.display_name );
-		this.alreadyEditing = sprintf( __( '%s is already editing this post. Do you want to take over?' ), user.data.display_name );
+		const displayName = ( user && user.data ) ? user.data.display_name : __( 'Another user' );
+		this.takeover = sprintf( __( '%s has taken over and is currently editing. Your latest changes were saved as a revision.' ), displayName );
+		this.alreadyEditing = sprintf( __( '%s is already editing this post. Do you want to take over?' ), displayName );
 	}
 
 	takeOverPost() {
