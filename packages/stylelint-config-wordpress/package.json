@@ -49,7 +49,7 @@
 		"remark-preset-lint-consistent": "^2.0.0",
 		"remark-preset-lint-recommended": "^3.0.0",
 		"stylelint": "^9.5.0",
-		"stylelint-find-rules": "^1.0.1"
+		"stylelint-find-rules": "^1.1.1"
 	},
 	"peerDependencies": {
 		"stylelint": "^9.5.0"
