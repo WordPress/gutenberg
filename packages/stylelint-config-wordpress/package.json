@@ -39,7 +39,7 @@
 		"@commitlint/cli": "^7.0.0",
 		"@commitlint/config-conventional": "^7.0.1",
 		"eslint": "^5.4.0",
-		"eslint-plugin-jest": "^21.0.0",
+		"eslint-plugin-jest": "^21.21.0",
 		"eslint-plugin-wordpress": "git://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#b65ae0cea1199c9714641ed3be7ea98fcb27dd6c",
 		"husky": "^0.14.3",
 		"jest": "^23.5.0",
