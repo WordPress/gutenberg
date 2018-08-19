@@ -18,7 +18,7 @@ const ModalHeader = ( { icon, title, onClose, closeLabel, headingId, showCloseIc
 			<div className="components-modal__header-heading-container">
 				{ icon &&
 					<span className="components-modal__icon-container" aria-hidden>
-						{ icon }
+						{ icon && <img alt={ __( 'User avatar' ) } src={ icon } /> }
 					</span>
 				}
 				{ title &&
