@@ -883,6 +883,7 @@ export function locked( state = false, action ) {
 			return {
 				...state,
 				locked: action.locked,
+				lockDetails: action.lockDetails,
 			};
 	}
 
