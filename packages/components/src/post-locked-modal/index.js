@@ -32,6 +32,7 @@ class PostLockedModal extends Component {
 			const user = getPostLockUser();
 			const displayName = ( user && user.data ) ? user.data.display_name : __( 'Another user' );
 			this.modalText = sprintf( __( '%s is already editing this post. Do you want to take over?' ), displayName );
+			this.avatar = user.data.avatar_src;
 		}
 	}
 

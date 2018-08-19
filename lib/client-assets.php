@@ -1344,8 +1344,15 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		if ( apply_filters( 'show_post_locked_dialog', true, $post, $user ) ) {
 			$locked = true;
 		}
+
+		if ( $avatar = get_avatar( $user->ID, 64 ) ) {
+			if ( preg_match( "|src='([^']+)'|", $avatar, $matches ) ) {
+				$user->avatar_src = $matches[1];
+			}
+		}
+
 		$editor_settings['lockedUser'] = $locked ? $user : false;
-		$editor_settings['lockNonce'] = wp_create_nonce( 'lock-post_' . $post->ID );
+		$editor_settings['lockNonce']  = wp_create_nonce( 'lock-post_' . $post->ID );
 
 	} else {
 		$locked = false;
