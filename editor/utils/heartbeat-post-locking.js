@@ -46,7 +46,7 @@ export function setupHearthbeatPostLocking() {
 				if ( received.lock_error ) {
 					// @todo suspend autosaving
 					// @todo Show "editing taken over" message.
-					dispatch( 'core/editor' ).lockPost( true );
+					dispatch( 'core/editor' ).lockPost( true, received.lock_error );
 				} else if ( received.new_lock ) {
 					jQuery( '#active_post_lock' ).val( received.new_lock );
 
