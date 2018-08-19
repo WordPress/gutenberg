@@ -44,7 +44,7 @@
 		"husky": "^0.14.3",
 		"jest": "^23.5.0",
 		"npm-run-all": "^4.0.0",
-		"npmpub": "^4.0.1",
+		"npmpub": "^4.1.0",
 		"remark-cli": "^5.0.0",
 		"remark-preset-lint-consistent": "^2.0.0",
 		"remark-preset-lint-recommended": "^3.0.0",
