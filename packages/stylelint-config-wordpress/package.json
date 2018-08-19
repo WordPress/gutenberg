@@ -2,6 +2,8 @@
 	"name": "stylelint-config-wordpress",
 	"version": "13.0.0",
 	"description": "WordPress shareable config for stylelint",
+	"author": "Stylelint",
+	"license": "MIT",
 	"keywords": [
 		"code",
 		"code style",
@@ -16,15 +18,15 @@
 		"wordpress",
 		"WordPress"
 	],
-	"author": "Stylelint",
-	"license": "MIT",
+	"homepage": "https://github.com/WordPress-Coding-Standards/stylelint-config-wordpress",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress-Coding-Standards/stylelint-config-wordpress.git"
 	},
-	"homepage": "https://github.com/WordPress-Coding-Standards/stylelint-config-wordpress",
 	"bugs": "https://github.com/WordPress-Coding-Standards/stylelint-config-wordpress/issues",
-	"main": "index.js",
+	"engines": {
+		"node": ">=8.9.3"
+	},
 	"files": [
 		"CHANGELOG.md",
 		"LICENSE",
@@ -32,8 +34,11 @@
 		"index.js",
 		"scss.js"
 	],
-	"engines": {
-		"node": ">=8.9.3"
+	"main": "index.js",
+	"dependencies": {
+		"stylelint-config-recommended": "^2.1.0",
+		"stylelint-config-recommended-scss": "^3.2.0",
+		"stylelint-scss": "^3.3.0"
 	},
 	"devDependencies": {
 		"@commitlint/cli": "^7.0.0",
@@ -101,10 +106,5 @@
 			"lint-recommended",
 			"lint-consistent"
 		]
-	},
-	"dependencies": {
-		"stylelint-config-recommended": "^2.1.0",
-		"stylelint-config-recommended-scss": "^3.2.0",
-		"stylelint-scss": "^3.3.0"
 	}
 }
