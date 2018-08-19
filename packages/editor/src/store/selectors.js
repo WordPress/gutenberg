@@ -1905,6 +1905,17 @@ export function isPostLocked( state ) {
 }
 
 /**
+ * Returns whether the post is locked.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} The lock details object.
+ */
+export function getLockDetails( state ) {
+	return state.locked.lockDetails;
+}
+
+/**
  * Returns whether the post lock user.
  *
  * @param {Object} state   Global application state.
