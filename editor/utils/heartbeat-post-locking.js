@@ -38,22 +38,22 @@ export function setupHearthbeatPostLocking() {
 		data[ 'wp-refresh-post-lock' ] = send;
 	} )
 
-	// Refresh post locks: update the lock string or show the dialog if somebody has taken over editing.
-	.on( 'heartbeat-tick.refresh-lock', function( e, data ) {
-		if ( data[ 'wp-refresh-post-lock' ] ) {
-			const received = data[ 'wp-refresh-post-lock' ];
+		// Refresh post locks: update the lock string or show the dialog if somebody has taken over editing.
+		.on( 'heartbeat-tick.refresh-lock', function( e, data ) {
+			if ( data[ 'wp-refresh-post-lock' ] ) {
+				const received = data[ 'wp-refresh-post-lock' ];
 
-			if ( received.lock_error ) {
-				// @todo suspend autosaving
-				// @todo Show "editing taken over" message.
-				dispatch( 'core/editor' ).lockPost( true );
-			} else if ( received.new_lock ) {
-				jQuery( '#active_post_lock' ).val( received.new_lock );
+				if ( received.lock_error ) {
+					// @todo suspend autosaving
+					// @todo Show "editing taken over" message.
+					dispatch( 'core/editor' ).lockPost( true );
+				} else if ( received.new_lock ) {
+					jQuery( '#active_post_lock' ).val( received.new_lock );
 
-				dispatch( 'core/editor' ).lockPost( false );
+					dispatch( 'core/editor' ).lockPost( false );
+				}
 			}
-		}
-	} );
+		} );
 
 	// Unlock the post before the window is exited.
 	jQuery( window ).on( 'beforeunload.edit-post', function( event ) {
