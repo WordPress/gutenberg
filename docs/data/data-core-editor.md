@@ -1030,6 +1030,30 @@ Returns the editor settings.
 
 The editor settings object
 
+### isPostLocked
+
+Returns whether the post is locked.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+Is locked.
+
+### getPostLockUser
+
+Returns the post lock user.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+A user object.
+
 ### canUserUseUnfilteredHTML
 
 Returns whether or not the user has the unfiltered_html capability.
@@ -1053,6 +1077,7 @@ the specified post object and editor settings.
 
  * post: Post object.
  * autosaveStatus: The Post's autosave status.
+ * lockedUser: The Post's locked user, or false if not locked.
 
 ### resetPost
 
@@ -1329,6 +1354,14 @@ Returns an action object used to remove a notice.
 *Parameters*
 
  * id: The notice id.
+
+### lockPost
+
+Returns an action object used to remove a modal.
+
+*Parameters*
+
+ * locked: Whether the editor should be locked.
 
 ### fetchReusableBlocks
 
