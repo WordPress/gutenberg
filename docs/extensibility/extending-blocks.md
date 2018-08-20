@@ -16,7 +16,7 @@ _Example:_
 wp.blocks.registerBlockStyle( 'core/quote', 'fancy-quote' );
 ```
 
-The example above registers a block style variation called `fancy-quote` to the `core/quote` block. When the user selects this block style variation from the styles selector, a `is-style-fancy-quote` className will be added to the block's wrapper.
+The example above registers a block style variation called `fancy-quote` to the `core/quote` block. When the user selects this block style variation from the styles selector, an `is-style-fancy-quote` className will be added to the block's wrapper.
 
 ### Filters
 
