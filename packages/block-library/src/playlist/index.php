@@ -18,11 +18,7 @@ function render_block_core_playlist( $attributes ) {
 	$attributes['tracknumbers'] = $attributes['showTrackNumbers'];
 
 	$classes = empty( $attributes['align'] ) ? 'wp-block-playlist' : 'wp-block-playlist align' . $attributes['align'];
-	$html    = sprintf(
-		'<figure class="%s">%s</figure>',
-		esc_attr( $classes ),
-		wp_playlist_shortcode( $attributes )
-	);
+	$html    = sprintf( '<figure class="%s">%s</figure>', esc_attr( $classes ), wp_playlist_shortcode( $attributes ) );
 
 	return $html;
 }
