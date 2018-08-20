@@ -4,8 +4,7 @@
 import { View } from 'react-native';
 
 export default ( props ) => (
-	<View
-		key={ props.keyProp }
+	<View		
 		style={ props.className }
 	>
 		{ props.children }

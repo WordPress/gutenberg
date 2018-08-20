@@ -60,8 +60,7 @@ function Toolbar( { controls = [], children, className } ) {
 			{ flatMap( controlSets, ( controlSet, indexOfSet ) => (
 				controlSet.map( ( control, indexOfControl ) => (
 					<ToolbarButtonContainer
-						key={ [ indexOfSet, indexOfControl ].join() }
-						keyProp={ [ indexOfSet, indexOfControl ].join() }
+						key={ [ indexOfSet, indexOfControl ].join() }						
 						className={ indexOfSet > 0 && indexOfControl === 0 ? 'has-left-divider' : null }
 					>
 						<IconButton
