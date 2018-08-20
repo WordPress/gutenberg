@@ -6,7 +6,6 @@ import { filter, property, without } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { moment } from '@wordpress/date';
 
@@ -21,14 +20,12 @@ const {
 	hasEditorRedo,
 	isEditedPostNew,
 	isEditedPostDirty,
-	isCleanNewPost,
 	getCurrentPost,
 	getCurrentPostId,
 	getCurrentPostLastRevisionId,
 	getCurrentPostRevisionsCount,
 	getCurrentPostType,
 	getPostEdits,
-	getDocumentTitle,
 	getEditedPostVisibility,
 	isCurrentPostPending,
 	isCurrentPostPublished,
@@ -45,6 +42,7 @@ const {
 	getBlock,
 	getBlocks,
 	getBlockCount,
+	getClientIdsWithDescendants,
 	hasSelectedBlock,
 	getSelectedBlock,
 	getSelectedBlockClientId,
@@ -85,7 +83,6 @@ const {
 	isPublishingPost,
 	canInsertBlockType,
 	getInserterItems,
-	getProvisionalBlockClientId,
 	isValidTemplate,
 	getTemplate,
 	getTemplateLock,
@@ -282,59 +279,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( isEditedPostDirty( state ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'isCleanNewPost', () => {
-		it( 'should return true when the post is not dirty and has not been saved before', () => {
-			const state = {
-				editor: {
-					isDirty: false,
-				},
-				currentPost: {
-					id: 1,
-					status: 'auto-draft',
-				},
-				saving: {
-					requesting: false,
-				},
-			};
-
-			expect( isCleanNewPost( state ) ).toBe( true );
-		} );
-
-		it( 'should return false when the post is not dirty but the post has been saved', () => {
-			const state = {
-				editor: {
-					isDirty: false,
-				},
-				currentPost: {
-					id: 1,
-					status: 'draft',
-				},
-				saving: {
-					requesting: false,
-				},
-			};
-
-			expect( isCleanNewPost( state ) ).toBe( false );
-		} );
-
-		it( 'should return false when the post is dirty but the post has not been saved', () => {
-			const state = {
-				editor: {
-					isDirty: true,
-				},
-				currentPost: {
-					id: 1,
-					status: 'auto-draft',
-				},
-				saving: {
-					requesting: false,
-				},
-			};
-
-			expect( isCleanNewPost( state ) ).toBe( false );
 		} );
 	} );
 
@@ -578,97 +522,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( getPostEdits( state ) ).toEqual( { title: 'terga' } );
-		} );
-	} );
-
-	describe( 'getDocumentTitle', () => {
-		it( 'should return current title unedited existing post', () => {
-			const state = {
-				currentPost: {
-					id: 123,
-					title: 'The Title',
-				},
-				editor: {
-					present: {
-						edits: {},
-						blocksByClientId: {},
-						blockOrder: {},
-					},
-					isDirty: false,
-				},
-				saving: {
-					requesting: false,
-				},
-			};
-
-			expect( getDocumentTitle( state ) ).toBe( 'The Title' );
-		} );
-
-		it( 'should return current title for edited existing post', () => {
-			const state = {
-				currentPost: {
-					id: 123,
-					title: 'The Title',
-				},
-				editor: {
-					present: {
-						edits: {
-							title: 'Modified Title',
-						},
-					},
-				},
-				saving: {
-					requesting: false,
-				},
-			};
-
-			expect( getDocumentTitle( state ) ).toBe( 'Modified Title' );
-		} );
-
-		it( 'should return new post title when new post is clean', () => {
-			const state = {
-				currentPost: {
-					id: 1,
-					status: 'auto-draft',
-					title: '',
-				},
-				editor: {
-					present: {
-						edits: {},
-						blocksByClientId: {},
-						blockOrder: {},
-					},
-					isDirty: false,
-				},
-				saving: {
-					requesting: false,
-				},
-			};
-
-			expect( getDocumentTitle( state ) ).toBe( __( 'New post' ) );
-		} );
-
-		it( 'should return untitled title', () => {
-			const state = {
-				currentPost: {
-					id: 123,
-					status: 'draft',
-					title: '',
-				},
-				editor: {
-					present: {
-						edits: {},
-						blocksByClientId: {},
-						blockOrder: {},
-					},
-					isDirty: true,
-				},
-				saving: {
-					requesting: false,
-				},
-			};
-
-			expect( getDocumentTitle( state ) ).toBe( __( '(Untitled)' ) );
 		} );
 	} );
 
@@ -1731,6 +1584,67 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'getClientIdsWithDescendants', () => {
+		it( 'should return the ids for top-level blocks and their descendants of any depth (for nested blocks).', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByClientId: {
+							'uuid-2': { clientId: 'uuid-2', name: 'core/image', attributes: {} },
+							'uuid-4': { clientId: 'uuid-4', name: 'core/paragraph', attributes: {} },
+							'uuid-6': { clientId: 'uuid-6', name: 'core/paragraph', attributes: {} },
+							'uuid-8': { clientId: 'uuid-8', name: 'core/block', attributes: {} },
+							'uuid-10': { clientId: 'uuid-10', name: 'core/columns', attributes: {} },
+							'uuid-12': { clientId: 'uuid-12', name: 'core/column', attributes: {} },
+							'uuid-14': { clientId: 'uuid-14', name: 'core/column', attributes: {} },
+							'uuid-16': { clientId: 'uuid-16', name: 'core/quote', attributes: {} },
+							'uuid-18': { clientId: 'uuid-18', name: 'core/block', attributes: {} },
+							'uuid-20': { clientId: 'uuid-20', name: 'core/gallery', attributes: {} },
+							'uuid-22': { clientId: 'uuid-22', name: 'core/block', attributes: {} },
+							'uuid-24': { clientId: 'uuid-24', name: 'core/columns', attributes: {} },
+							'uuid-26': { clientId: 'uuid-26', name: 'core/column', attributes: {} },
+							'uuid-28': { clientId: 'uuid-28', name: 'core/column', attributes: {} },
+							'uuid-30': { clientId: 'uuid-30', name: 'core/paragraph', attributes: {} },
+						},
+						blockOrder: {
+							'': [ 'uuid-6', 'uuid-8', 'uuid-10', 'uuid-22' ],
+							'uuid-2': [ ],
+							'uuid-4': [ ],
+							'uuid-6': [ ],
+							'uuid-8': [ ],
+							'uuid-10': [ 'uuid-12', 'uuid-14' ],
+							'uuid-12': [ 'uuid-16' ],
+							'uuid-14': [ 'uuid-18' ],
+							'uuid-16': [ ],
+							'uuid-18': [ 'uuid-24' ],
+							'uuid-20': [ ],
+							'uuid-22': [ ],
+							'uuid-24': [ 'uuid-26', 'uuid-28' ],
+							'uuid-26': [ ],
+							'uuid-28': [ 'uuid-30' ],
+						},
+						edits: {},
+					},
+				},
+			};
+			expect( getClientIdsWithDescendants( state ) ).toEqual( [
+				'uuid-6',
+				'uuid-8',
+				'uuid-10',
+				'uuid-22',
+				'uuid-12',
+				'uuid-14',
+				'uuid-16',
+				'uuid-18',
+				'uuid-24',
+				'uuid-26',
+				'uuid-28',
+				'uuid-30',
+			] );
+		} );
+	} );
+
 	describe( 'getBlockCount', () => {
 		it( 'should return the number of top-level blocks in the post', () => {
 			const state = {
@@ -2553,8 +2467,6 @@ describe( 'selectors', () => {
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
-				// TODO: To be removed in 3.5 "UID" deprecation.
-				rootUID: undefined,
 				layout: undefined,
 				index: 1,
 			} );
@@ -2587,8 +2499,6 @@ describe( 'selectors', () => {
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: 'clientId1',
-				// TODO: To be removed in 3.5 "UID" deprecation.
-				rootUID: 'clientId1',
 				layout: undefined,
 				index: 1,
 			} );
@@ -2619,8 +2529,6 @@ describe( 'selectors', () => {
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
-				// TODO: To be removed in 3.5 "UID" deprecation.
-				rootUID: undefined,
 				layout: 'wide',
 				index: 1,
 			} );
@@ -2653,8 +2561,6 @@ describe( 'selectors', () => {
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
-				// TODO: To be removed in 3.5 "UID" deprecation.
-				rootUID: undefined,
 				layout: undefined,
 				index: 2,
 			} );
@@ -2687,8 +2593,6 @@ describe( 'selectors', () => {
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
-				// TODO: To be removed in 3.5 "UID" deprecation.
-				rootUID: undefined,
 				layout: undefined,
 				index: 2,
 			} );
@@ -3216,7 +3120,7 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						blocksByClientId: {
-							block1: { name: 'core/test-block-b' },
+							block1: { clientId: 'block1', name: 'core/test-block-b' },
 						},
 						blockOrder: {
 							'': [ 'block1' ],
@@ -3624,24 +3528,6 @@ describe( 'selectors', () => {
 			} );
 
 			expect( isPublishing ).toBe( true );
-		} );
-	} );
-
-	describe( 'getProvisionalBlockClientId()', () => {
-		it( 'should return null if not set', () => {
-			const provisionalBlockClientId = getProvisionalBlockClientId( {
-				provisionalBlockClientId: null,
-			} );
-
-			expect( provisionalBlockClientId ).toBe( null );
-		} );
-
-		it( 'should return ClientId of provisional block', () => {
-			const provisionalBlockClientId = getProvisionalBlockClientId( {
-				provisionalBlockClientId: 'chicken',
-			} );
-
-			expect( provisionalBlockClientId ).toBe( 'chicken' );
 		} );
 	} );
 

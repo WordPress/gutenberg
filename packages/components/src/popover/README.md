@@ -8,23 +8,26 @@ Popover is a React component to render a floating content modal. It is similar i
 Render a Popover within the parent to which it should anchor:
 
 ```jsx
-import { Popover } from '@wordpress/components';
+import { Button, Popover } from '@wordpress/components';
+import { withState } from '@wordpress/compose';
 
-function ToggleButton( { isVisible, toggleVisible } ) {
+const MyPopover = withState( {
+	isVisible: false,
+} )( ( { isVisible, setState } ) => {
+	const toggleVisible = () => {
+		setState( ( state ) => ( { isVisible: ! state.isVisible } ) );
+	};
 	return (
-		<button onClick={ toggleVisible }>
+		<Button isDefault onClick={ toggleVisible }>
 			Toggle Popover!
 			{ isVisible && (
-				<Popover
-					onClose={ toggleVisible }
-					onClick={ ( event ) => event.stopPropagation() }
-				>
+				<Popover>
 					Popover is toggled!
 				</Popover>
 			) }
-		</button>
+		</Button>
 	);
-}
+} );
 ```
 
 If a Popover is returned by your component, it will be shown. To hide the popover, simply omit it from your component's render value.

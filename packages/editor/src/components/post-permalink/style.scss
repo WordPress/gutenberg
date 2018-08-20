@@ -8,17 +8,17 @@
 	height: 40px;
 	white-space: nowrap;
 
-	// use opacity to work in various editor styles
-	border: 1px solid $dark-opacity-light-500;
+	// Use opacity to work in various editor styles.
+	border: $border-width solid $dark-opacity-light-500;
 	border-bottom: none;
 	background-clip: padding-box;
 
-	// put toolbar snugly to edge on mobile
-	margin-left: -$block-padding - 1px;	// stack borders
-	margin-right: -$block-padding - 1px;
+	// Put toolbar snugly to edge on mobile.
+	margin-left: -$block-padding - $border-width; // This hides the border off the edge of the screen.
+	margin-right: -$block-padding - $border-width;
 	@include break-small() {
-		margin-left: -1px;
-		margin-right: -1px;
+		margin-left: -$border-width;
+		margin-right: -$border-width;
 	}
 }
 
@@ -44,8 +44,8 @@
 	position: relative;
 	white-space: nowrap;
 
-	&:after {
-		@include long-content-fade( $size: 20%, $edge: 1px );
+	&::after {
+		@include long-content-fade($size: 20%, $edge: 1px);
 	}
 }
 
@@ -55,9 +55,29 @@
 	display: inline-flex;
 	align-items: center;
 
-	// Higher specificity required to override core margin styles
+	.editor-post-permalink__editor-container {
+		flex: 0 1 100%;
+		display: flex;
+		overflow: hidden; // This enables serious flex shrinking.
+		padding: $border-width 0; // Necessary for the overflow to not crop the focus style.
+
+		.editor-post-permalink-editor__prefix {
+			flex: 1 1 auto;
+
+			@include break-small {
+				flex: 1 0 auto;
+			}
+		}
+
+		.editor-post-permalink-editor__edit {
+			flex: 1 1 100%;
+		}
+	}
+
+	// Higher specificity required to override core margin styles.
 	.editor-post-permalink-editor__save {
 		margin-left: auto;
+		flex: 0 1 auto;
 	}
 }
 
@@ -70,12 +90,17 @@
 	text-overflow: ellipsis;
 }
 
-.editor-post-permalink-editor__edit {
-	min-width: 20%;
-	margin: 0 5px;
+.editor-post-permalink input[type="text"].editor-post-permalink-editor__edit {
+	// Input fields are created with inherent widths.
+	// By supplying both a (any) width and a min-width, we allow it to scale in a flex container.
+	min-width: 10%;
+	width: 100%;
+	margin: 0 3px;
+	padding: 2px 4px;
 }
 
 .editor-post-permalink-editor__suffix {
 	color: $dark-gray-300;
-	margin-right: 10px;
+	margin-right: 6px;
+	flex: 0 0 0%;
 }

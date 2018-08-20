@@ -6,10 +6,7 @@ import { forOwn } from 'lodash';
 /**
  * WordPress Dependencies
  */
-import {
-	registerStore,
-	restrictPersistence,
-} from '@wordpress/data';
+import { registerStore } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -27,10 +24,10 @@ import { validateTokenSettings } from '../components/rich-text/tokens';
 const MODULE_KEY = 'core/editor';
 
 const store = registerStore( MODULE_KEY, {
-	reducer: restrictPersistence( reducer, 'preferences' ),
+	reducer,
 	selectors,
 	actions,
-	persist: true,
+	persist: [ 'preferences' ],
 } );
 applyMiddlewares( store );
 

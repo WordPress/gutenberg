@@ -13,7 +13,7 @@
 
 	@include break-large() {
 		.editor-block-switcher .components-toolbar {
-			border-left: 1px solid $light-gray-500;
+			border-left: $border-width solid $light-gray-500;
 		}
 	}
 }
@@ -27,9 +27,9 @@
 	right: 0;
 	background: $white;
 	min-height: $block-toolbar-height;
-	border-bottom: 1px solid $light-gray-500;
+	border-bottom: $border-width solid $light-gray-500;
 
-	.editor-block-toolbar  {
+	.editor-block-toolbar {
 		border-left: none;
 	}
 

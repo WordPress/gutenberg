@@ -2,18 +2,46 @@
  * External dependencies
  */
 import { createStore } from 'redux';
-import { flowRight, without, mapValues, overEvery, get } from 'lodash';
+import {
+	flowRight,
+	without,
+	mapValues,
+	overEvery,
+	get,
+} from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import isShallowEqual from '@wordpress/is-shallow-equal';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
 import dataStore from './store';
-import { withRehydration, getPersistenceStorage } from './persist';
+import { persistence } from './plugins';
+
+/**
+ * An isolated orchestrator of store registrations.
+ *
+ * @typedef {WPDataRegistry}
+ *
+ * @property {Function} registerReducer
+ * @property {Function} registerSelectors
+ * @property {Function} registerResolvers
+ * @property {Function} registerActions
+ * @property {Function} registerStore
+ * @property {Function} subscribe
+ * @property {Function} select
+ * @property {Function} dispatch
+ * @property {Function} use
+ */
+
+/**
+ * An object of registry function overrides.
+ *
+ * @typedef {WPDataPlugin}
+ */
 
 /**
  * Returns true if the given argument appears to be a dispatchable action.
@@ -76,17 +104,20 @@ export function toAsyncIterable( object ) {
 			object = [ object ];
 		}
 
-		for ( let maybeAction of object ) {
-			// ...of Promises.
-			if ( ! ( maybeAction instanceof Promise ) ) {
-				maybeAction = Promise.resolve( maybeAction );
-			}
-
-			yield await maybeAction;
+		for ( const maybeAction of object ) {
+			yield maybeAction;
 		}
 	}() );
 }
 
+/**
+ * Creates a new store registry, given an optional object of initial store
+ * configurations.
+ *
+ * @param {Object} storeConfigs Initial store configurations.
+ *
+ * @return {WPDataRegistry} Data registry.
+ */
 export function createRegistry( storeConfigs = {} ) {
 	const namespaces = {};
 	let listeners = [];
@@ -99,22 +130,21 @@ export function createRegistry( storeConfigs = {} ) {
 	}
 
 	/**
-	 * Registers a new sub-reducer to the global state and returns a Redux-like store object.
+	 * Registers a new sub-reducer to the global state and returns a Redux-like
+	 * store object.
 	 *
-	 * @param {string}  reducerKey  Reducer key.
-	 * @param {Object}  reducer     Reducer function.
-	 * @param {boolean} persist     Should the reducer be persisted.
+	 * @param {string} reducerKey Reducer key.
+	 * @param {Object} reducer    Reducer function.
 	 *
 	 * @return {Object} Store Object.
 	 */
-	function registerReducer( reducerKey, reducer, persist = false ) {
+	function registerReducer( reducerKey, reducer ) {
 		const enhancers = [];
 		if ( window.__REDUX_DEVTOOLS_EXTENSION__ ) {
 			enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__( { name: reducerKey, instanceId: reducerKey } ) );
 		}
-		reducer = persist ? withRehydration( reducer ) : reducer;
 		const store = createStore( reducer, flowRight( enhancers ) );
-		namespaces[ reducerKey ] = { store, reducer, persist };
+		namespaces[ reducerKey ] = { store, reducer };
 
 		// Customize subscribe behavior to call listeners only on effective change,
 		// not on every dispatch.
@@ -195,7 +225,7 @@ export function createRegistry( storeConfigs = {} ) {
 				}
 
 				for await ( const maybeAction of fulfillment ) {
-				// Dispatch if it quacks like an action.
+					// Dispatch if it quacks like an action.
 					if ( isActionLike( maybeAction ) ) {
 						store.dispatch( maybeAction );
 					}
@@ -251,7 +281,7 @@ export function createRegistry( storeConfigs = {} ) {
 			throw new TypeError( 'Must specify store reducer' );
 		}
 
-		const store = registerReducer( reducerKey, options.reducer, options.persist );
+		const store = registerReducer( reducerKey, options.reducer );
 
 		if ( options.actions ) {
 			registerActions( reducerKey, options.actions );
@@ -313,62 +343,32 @@ export function createRegistry( storeConfigs = {} ) {
 	 * @param {string} storageKey The storage key.
 	 */
 	function setupPersistence( storageKey ) {
-		const persistenceStorage = getPersistenceStorage();
+		deprecated( 'data registry setupPersistence', {
+			alternative: 'persistence plugin',
+			version: '3.7',
+			plugin: 'Gutenberg',
+			hint: 'See https://github.com/WordPress/gutenberg/pull/8341 for more details',
+		} );
 
-		// Load initially persisted value
-		let previousValue = null;
-		const persistedString = persistenceStorage.getItem( storageKey );
-		if ( persistedString ) {
-			const persistedData = JSON.parse( persistedString );
-			Object.entries( namespaces ).forEach( ( [ reducerKey, { store, persist } ] ) => {
-				if ( ! persist ) {
-					return;
-				}
-
-				const persistedState = {
-					...store.getState(),
-					...get( persistedData, reducerKey ),
-				};
-
-				store.dispatch( {
-					type: 'REDUX_REHYDRATE',
-					payload: persistedState,
-				} );
-			} );
-
-			// Avoid initial save.
-			previousValue = persistedData;
-		}
-
-		const triggerPersist = () => {
-			const newValue = Object.entries( namespaces )
-				.filter( ( [ , { persist } ] ) => persist )
-				.reduce( ( memo, [ reducerKey, { reducer, store } ] ) => {
-					memo[ reducerKey ] = reducer( store.getState(), {
-						type: 'SERIALIZE',
-						previousState: get( previousValue, reducerKey ),
-					} );
-					return memo;
-				}, {} );
-
-			if ( ! isShallowEqual( newValue, previousValue ) ) {
-				persistenceStorage.setItem( storageKey, JSON.stringify( newValue ) );
-			}
-
-			previousValue = newValue;
-		};
-
-		// Persist updated preferences
-		subscribe( triggerPersist );
-		triggerPersist();
+		registry.use( persistence, { storageKey } );
 	}
 
-	Object.entries( {
-		'core/data': dataStore,
-		...storeConfigs,
-	} ).map( ( [ name, config ] ) => registerStore( name, config ) );
+	/**
+	 * Maps an object of function values to proxy invocation through to the
+	 * current internal representation of the registry, which may be enhanced
+	 * by plugins.
+	 *
+	 * @param {Object<string,Function>} fns Object of function values.
+	 *
+	 * @return {Object<string,Function>} Object enhanced with plugin proxying.
+	 */
+	function withPlugins( fns ) {
+		return mapValues( fns, ( fn, key ) => function() {
+			return registry[ key ].apply( null, arguments );
+		} );
+	}
 
-	return {
+	let registry = {
 		registerReducer,
 		registerSelectors,
 		registerResolvers,
@@ -378,5 +378,31 @@ export function createRegistry( storeConfigs = {} ) {
 		select,
 		dispatch,
 		setupPersistence,
+		use,
 	};
+
+	/**
+	 * Enhances the registry with the prescribed set of overrides. Returns the
+	 * enhanced registry to enable plugin chaining.
+	 *
+	 * @param {WPDataPlugin} plugin  Plugin by which to enhance.
+	 * @param {?Object}      options Optional options to pass to plugin.
+	 *
+	 * @return {WPDataRegistry} Enhanced registry.
+	 */
+	function use( plugin, options ) {
+		registry = {
+			...registry,
+			...plugin( registry, options ),
+		};
+
+		return registry;
+	}
+
+	Object.entries( {
+		'core/data': dataStore,
+		...storeConfigs,
+	} ).map( ( [ name, config ] ) => registerStore( name, config ) );
+
+	return withPlugins( registry );
 }

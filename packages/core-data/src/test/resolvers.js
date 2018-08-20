@@ -4,10 +4,15 @@
 import apiFetch from '@wordpress/api-fetch';
 
 /**
+ * External dependencies
+ */
+import { addQueryArgs } from '@wordpress/url';
+
+/**
  * Internal dependencies
  */
-import { getCategories, getEntityRecord, getEntityRecords } from '../resolvers';
-import { receiveTerms, receiveEntityRecords, addEntities } from '../actions';
+import { getCategories, getEntityRecord, getEntityRecords, getEmbedPreview } from '../resolvers';
+import { receiveTerms, receiveEntityRecords, addEntities, receiveEmbedPreview } from '../actions';
 
 jest.mock( '@wordpress/api-fetch', () => jest.fn() );
 
@@ -26,6 +31,7 @@ describe( 'getCategories', () => {
 		const fulfillment = getCategories();
 		const received = ( await fulfillment.next() ).value;
 		expect( received ).toEqual( receiveTerms( 'categories', CATEGORIES ) );
+		expect( console ).toHaveWarnedWith( 'getCategories resolver is deprecated and will be removed from Gutenberg in 3.7.0. Please use getEntityRecords resolver instead.' );
 	} );
 } );
 
@@ -102,6 +108,34 @@ describe( 'getEntityRecords', () => {
 		};
 		const fulfillment = getEntityRecords( state, 'root', 'postType' );
 		const received = ( await fulfillment.next() ).value;
-		expect( received ).toEqual( receiveEntityRecords( 'root', 'postType', Object.values( POST_TYPES ) ) );
+		expect( received ).toEqual( receiveEntityRecords( 'root', 'postType', Object.values( POST_TYPES ), {} ) );
+	} );
+} );
+
+describe( 'getEmbedPreview', () => {
+	const SUCCESSFUL_EMBED_RESPONSE = { data: '<p>some html</p>' };
+	const UNEMBEDDABLE_RESPONSE = false;
+	const EMBEDDABLE_URL = 'http://twitter.com/notnownikki';
+	const UNEMBEDDABLE_URL = 'http://example.com/';
+
+	beforeAll( () => {
+		apiFetch.mockImplementation( ( options ) => {
+			if ( options.path === addQueryArgs( '/oembed/1.0/proxy', { url: EMBEDDABLE_URL } ) ) {
+				return Promise.resolve( SUCCESSFUL_EMBED_RESPONSE );
+			}
+			throw 404;
+		} );
+	} );
+
+	it( 'yields with fetched embed preview', async () => {
+		const fulfillment = getEmbedPreview( {}, EMBEDDABLE_URL );
+		const received = ( await fulfillment.next() ).value;
+		expect( received ).toEqual( receiveEmbedPreview( EMBEDDABLE_URL, SUCCESSFUL_EMBED_RESPONSE ) );
+	} );
+
+	it( 'yields false if the URL cannot be embedded', async () => {
+		const fulfillment = getEmbedPreview( {}, UNEMBEDDABLE_URL );
+		const received = ( await fulfillment.next() ).value;
+		expect( received ).toEqual( receiveEmbedPreview( UNEMBEDDABLE_URL, UNEMBEDDABLE_RESPONSE ) );
 	} );
 } );

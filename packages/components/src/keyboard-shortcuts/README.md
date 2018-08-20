@@ -14,7 +14,7 @@ Render `<KeyboardShortcuts />` with a `shortcuts` prop object:
 import { KeyboardShortcuts } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
 
-withState( {
+const MyKeyboardShortcuts = withState( {
 	isAllSelected: false,
 } )( ( { isAllSelected, setState } ) => { 
 	const selectAll = () => {

@@ -61,7 +61,7 @@ class BlockTypesList extends Component {
 									className="editor-block-types-list__item-icon"
 									style={ itemIconStyle }
 								>
-									<BlockIcon icon={ item.icon && item.icon.src } />
+									<BlockIcon icon={ item.icon && item.icon.src } showColors />
 									{ item.hasChildBlocks &&
 									<span
 										className="editor-block-types-list__item-icon-stack"

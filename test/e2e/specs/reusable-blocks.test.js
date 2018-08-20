@@ -1,10 +1,8 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
 import {
 	insertBlock,
-	newDesktopBrowserPage,
 	newPost,
 	pressWithModifier,
 	searchForBlock,
@@ -12,16 +10,12 @@ import {
 
 function waitForAndAcceptDialog() {
 	return new Promise( ( resolve ) => {
-		page.once( 'dialog', async ( dialog ) => {
-			await dialog.accept();
-			resolve();
-		} );
+		page.once( 'dialog', () => resolve() );
 	} );
 }
 
 describe( 'Reusable Blocks', () => {
 	beforeAll( async () => {
-		await newDesktopBrowserPage();
 		await newPost();
 	} );
 
@@ -29,8 +23,8 @@ describe( 'Reusable Blocks', () => {
 		// Remove all blocks from the post so that we're working with a clean slate
 		await page.evaluate( () => {
 			const blocks = wp.data.select( 'core/editor' ).getBlocks();
-			const uids = blocks.map( ( block ) => block.uid );
-			wp.data.dispatch( 'core/editor' ).removeBlocks( uids );
+			const clientIds = blocks.map( ( block ) => block.clientId );
+			wp.data.dispatch( 'core/editor' ).removeBlocks( clientIds );
 		} );
 	} );
 
@@ -40,17 +34,18 @@ describe( 'Reusable Blocks', () => {
 		await page.keyboard.type( 'Hello there!' );
 
 		// Trigger isTyping = false
-		await page.mouse.move( 200, 300 );
-		await page.mouse.move( 250, 350 );
+		await page.mouse.move( 200, 300, { steps: 10 } );
+		await page.mouse.move( 250, 350, { steps: 10 } );
 
 		// Convert block to a reusable block
+		await page.waitForSelector( 'button[aria-label="More Options"]' );
 		await page.click( 'button[aria-label="More Options"]' );
 		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable Blocks"]' );
 		await convertButton.click();
 
 		// Wait for creation to finish
 		await page.waitForXPath(
-			'//*[contains(@class, "notice-success")]/*[text()="Block created."]'
+			'//*[contains(@class, "components-notice") and contains(@class, "is-success")]/*[text()="Block created."]'
 		);
 
 		// Select all of the text in the title field by triple-clicking on it. We
@@ -86,17 +81,18 @@ describe( 'Reusable Blocks', () => {
 		await page.keyboard.type( 'Hello there!' );
 
 		// Trigger isTyping = false
-		await page.mouse.move( 200, 300 );
-		await page.mouse.move( 250, 350 );
+		await page.mouse.move( 200, 300, { steps: 10 } );
+		await page.mouse.move( 250, 350, { steps: 10 } );
 
 		// Convert block to a reusable block
+		await page.waitForSelector( 'button[aria-label="More Options"]' );
 		await page.click( 'button[aria-label="More Options"]' );
 		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable Blocks"]' );
 		await convertButton.click();
 
 		// Wait for creation to finish
 		await page.waitForXPath(
-			'//*[contains(@class, "notice-success")]/*[text()="Block created."]'
+			'//*[contains(@class, "components-notice") and contains(@class, "is-success")]/*[text()="Block created."]'
 		);
 
 		// Save the reusable block

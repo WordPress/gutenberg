@@ -10,11 +10,20 @@
 	<rule ref="WordPress.WP.I18n"/>
 	<config name="text_domain" value="gutenberg,default"/>
 
+	<rule ref="WordPress.CodeAnalysis.EmptyStatement"/>
+
+	<rule ref="PEAR.Functions.FunctionCallSignature">
+		<properties>
+			<property name="allowMultipleArguments" value="false"/>
+		</properties>
+	</rule>
+
 	<arg value="ps"/>
 	<arg name="extensions" value="php"/>
 
 	<file>./bin</file>
-	<file>./core-blocks</file>
+	<file>./block-library</file>
+	<file>./packages/block-library/src</file>
 	<file>./lib</file>
 	<exclude-pattern>./lib/parser.php</exclude-pattern>
 	<file>./phpunit</file>

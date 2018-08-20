@@ -65,9 +65,11 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 			)
 		);
 
-		self::$post_id = $factory->post->create( array(
-			'post_title' => 'Test Post',
-		) );
+		self::$post_id = $factory->post->create(
+			array(
+				'post_title' => 'Test Post',
+			)
+		);
 	}
 
 	/**
@@ -101,34 +103,40 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 	 * Register test block.
 	 */
 	public function register_test_block() {
-		register_block_type( self::$block_name, array(
-			'attributes'      => array(
-				'some_string' => array(
-					'type'    => 'string',
-					'default' => 'some_default',
-				),
-				'some_int'    => array(
-					'type' => 'integer',
-				),
-				'some_array'  => array(
-					'type'  => 'array',
-					'items' => array(
+		register_block_type(
+			self::$block_name,
+			array(
+				'attributes'      => array(
+					'some_string' => array(
+						'type'    => 'string',
+						'default' => 'some_default',
+					),
+					'some_int'    => array(
 						'type' => 'integer',
 					),
+					'some_array'  => array(
+						'type'  => 'array',
+						'items' => array(
+							'type' => 'integer',
+						),
+					),
 				),
-			),
-			'render_callback' => array( $this, 'render_test_block' ),
-		) );
+				'render_callback' => array( $this, 'render_test_block' ),
+			)
+		);
 	}
 
 	/**
 	 * Register test block with post_id as attribute for post context test.
 	 */
 	public function register_post_context_test_block() {
-		register_block_type( self::$context_block_name, array(
-			'attributes'      => array(),
-			'render_callback' => array( $this, 'render_post_context_test_block' ),
-		) );
+		register_block_type(
+			self::$context_block_name,
+			array(
+				'attributes'      => array(),
+				'render_callback' => array( $this, 'render_post_context_test_block' ),
+			)
+		);
 	}
 
 	/**
@@ -217,9 +225,12 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 		wp_set_current_user( self::$user_id );
 		$request = new WP_REST_Request( 'GET', '/gutenberg/v1/block-renderer/' . self::$block_name );
 		$request->set_param( 'context', 'edit' );
-		$request->set_param( 'attributes', array(
-			'some_string' => array( 'no!' ),
-		) );
+		$request->set_param(
+			'attributes',
+			array(
+				'some_string' => array( 'no!' ),
+			)
+		);
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertEquals( 400, $response->get_status() );
 	}
@@ -233,9 +244,12 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 		wp_set_current_user( self::$user_id );
 		$request = new WP_REST_Request( 'GET', '/gutenberg/v1/block-renderer/' . self::$block_name );
 		$request->set_param( 'context', 'edit' );
-		$request->set_param( 'attributes', array(
-			'unrecognized' => 'yes',
-		) );
+		$request->set_param(
+			'attributes',
+			array(
+				'unrecognized' => 'yes',
+			)
+		);
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertEquals( 400, $response->get_status() );
 	}

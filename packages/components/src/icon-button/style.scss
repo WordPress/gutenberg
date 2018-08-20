@@ -21,15 +21,15 @@
 		outline: none;
 	}
 
-	&:not( :disabled ):not( [aria-disabled="true"] ):not( .is-default ):hover {
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
 		@include button-style__hover;
 	}
 
-	&:not( :disabled ):not( [aria-disabled="true"] ):active {
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):active {
 		@include button-style__active;
 	}
 
-	&[aria-disabled=true]:focus,
+	&[aria-disabled="true"]:focus,
 	&:disabled:focus {
 		box-shadow: none;
 	}

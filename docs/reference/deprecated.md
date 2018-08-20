@@ -1,5 +1,19 @@
 Gutenberg's deprecation policy is intended to support backwards-compatibility for two minor releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
 
+## 3.8.0
+
+ - `wp.components.withContext` has been removed. Please use `wp.element.createContext` instead. See: https://reactjs.org/docs/context.html.
+ - `wp.coreBlocks.registerCoreBlocks` has been removed. Please use `wp.blockLibrary.registerCoreBlocks` instead.
+
+## 3.7.0
+
+ - `wp.components.withAPIData` has been removed. Please use the Core Data module or `wp.apiFetch` directly instead.
+ - `wp.data.dispatch("core").receiveTerms` has been deprecated. Please use `wp.data.dispatch("core").receiveEntityRecords` instead.
+ - `getCategories` resolvers has been deprecated. Please use `getEntityRecords` resolver instead.
+ - `wp.data.select("core").getTerms` has been deprecated. Please use `wp.data.select("core").getEntityRecords` instead.
+ - `wp.data.select("core").getCategories` has been deprecated. Please use `wp.data.select("core").getEntityRecords` instead.
+ - `wp.data.select("core").isRequestingTerms` has been deprecated. Please use `wp.data.select("core").getEntitiesByKind` instead.
+
 ## 3.6.0
 
  - `wp.editor.editorMediaUpload` has been removed. Please use `wp.editor.mediaUpload` instead.
@@ -7,6 +21,17 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
  - `wp.utils.mediaUpload` has been removed. Please use `wp.editor.mediaUpload` instead.
  - `wp.utils.preloadImage` has been removed.
  - `supports.wideAlign` has been removed from the Block API. Please use `supports.alignWide` instead.
+ - `wp.blocks.isSharedBlock` has been removed. Use `wp.blocks.isReusableBlock` instead.
+ - `fetchSharedBlocks` action (`core/editor`) has been removed. Use `fetchReusableBlocks` instead.
+ - `receiveSharedBlocks` action (`core/editor`) has been removed. Use `receiveReusableBlocks` instead.
+ - `saveSharedBlock` action (`core/editor`) has been removed. Use `saveReusableBlock` instead.
+ - `deleteSharedBlock` action (`core/editor`) has been removed. Use `deleteReusableBlock` instead.
+ - `updateSharedBlockTitle` action (`core/editor`) has been removed. Use `updateReusableBlockTitle` instead.
+ - `convertBlockToSaved` action (`core/editor`) has been removed. Use `convertBlockToReusable` instead.
+ - `getSharedBlock` selector (`core/editor`) has been removed. Use `getReusableBlock` instead.
+ - `isSavingSharedBlock` selector (`core/editor`) has been removed. Use `isSavingReusableBlock` instead.
+ - `isFetchingSharedBlock` selector (`core/editor`) has been removed. Use `isFetchingReusableBlock` instead.
+ - `getSharedBlocks` selector (`core/editor`) has been removed. Use `getReusableBlocks` instead.
 
 ## 3.5.0
 

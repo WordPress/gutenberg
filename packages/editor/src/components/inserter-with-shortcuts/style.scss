@@ -3,7 +3,12 @@
 	align-items: center;
 
 	.components-icon-button {
-		border-radius: $button-style__radius-roundrect;
+		border-radius: $radius-round-rectangle;
+
+		svg:not(.dashicon) {
+			height: 24px;
+			width: 24px;
+		}
 	}
 }
 

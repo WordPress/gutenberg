@@ -5,15 +5,15 @@
 ## Example:
 
 ```jsx
-function MyLayout() {
-	return (
+import { navigateRegions } from '@wordpress/components';
+
+const MyComponentWithNavigateRegions = navigateRegions( 
+	() => (
 		<div>
 			<div role="region" tabIndex="-1" aria-label="Header">Header</div>
 			<div role="region" tabIndex="-1" aria-label="Content">Content</div>
 			<div role="region" tabIndex="-1" aria-label="Sidebar">Sidebar</div>
 		</div>
-	);
-}
-
-export default navigateRegions( MyLayout );
+	)
+);
 ```

@@ -17,13 +17,13 @@
 			top: inherit;
 		}
 
-		.notice {
+		.components-notice {
 			margin: 0 0 5px;
 			padding: 6px 12px;
 			min-height: $panel-header-height;
 
-			.notice-dismiss {
-				margin: 5px;
+			.components-notice__dismiss {
+				margin: 10px 5px;
 			}
 		}
 	}
@@ -53,11 +53,11 @@
 	}
 }
 
-@include editor-left('.components-notice-list');
-@include editor-right('.components-notice-list');
+@include editor-left(".components-notice-list");
+@include editor-right(".components-notice-list");
 
 .edit-post-layout__metaboxes:not(:empty) {
-	border-top: 1px solid $light-gray-500;
+	border-top: $border-width solid $light-gray-500;
 	margin-top: 10px;
 	padding: 10px 0 10px;
 	clear: both;
@@ -86,7 +86,14 @@
 	-webkit-overflow-scrolling: touch;
 
 	.edit-post-visual-editor {
-		flex-basis: 100%;
+		flex-grow: 1;
+
+		// In IE11 flex-basis: 100% cause a bug where the metaboxes area overlap with the content area.
+		// But it works as expected without it.
+		// The flex-basis is needed for the other browsers to make sure the content area is full-height.
+		@supports (position: sticky) {
+			flex-basis: 100%;
+		}
 	}
 
 	.edit-post-layout__metaboxes {
@@ -96,7 +103,7 @@
 
 .edit-post-layout .editor-post-publish-panel {
 	position: fixed;
-	z-index: z-index( '.edit-post-layout .edit-post-post-publish-panel' );
+	z-index: z-index(".edit-post-layout .edit-post-post-publish-panel");
 	top: $admin-bar-height-big;
 	bottom: 0;
 	right: 0;
@@ -107,7 +114,7 @@
 		top: $admin-bar-height;
 		left: auto;
 		width: $sidebar-width;
-		border-left: 1px solid $light-gray-500;
+		border-left: $border-width solid $light-gray-500;
 		@include slide_in_right;
 	}
 }
@@ -117,15 +124,16 @@
 }
 
 .edit-post-toggle-publish-panel {
-	display: block;
-	position: relative;
-	float: right;
-	top: -9999em;
-	z-index: z-index( '.edit-post-toggle-publish-panel' );
-	padding: 20px 0 0 0;
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	z-index: z-index(".edit-post-toggle-publish-panel");
 	width: $sidebar-width;
+	height: 0;
+	overflow: hidden;
 	&:focus-within {
-		top: 0;
+		height: auto;
+		padding: 20px 0 0 0;
 	}
 
 	.edit-post-toggle-publish-panel__button {

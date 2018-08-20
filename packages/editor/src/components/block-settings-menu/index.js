@@ -2,29 +2,53 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { castArray } from 'lodash';
+import { castArray, first, last, every, flow } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
-import { IconButton, Dropdown, NavigableMenu } from '@wordpress/components';
-import { withDispatch } from '@wordpress/data';
+import { Component, Fragment } from '@wordpress/element';
+import { IconButton, Dropdown, NavigableMenu, MenuItem, KeyboardShortcuts } from '@wordpress/components';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { cloneBlock, hasBlockSupport } from '@wordpress/blocks';
+import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import BlockModeToggle from './block-mode-toggle';
-import BlockDuplicateButton from './block-duplicate-button';
-import BlockRemoveButton from './block-remove-button';
 import ReusableBlockConvertButton from './reusable-block-convert-button';
 import ReusableBlockDeleteButton from './reusable-block-delete-button';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import BlockUnknownConvertButton from './block-unknown-convert-button';
 import _BlockSettingsMenuFirstItem from './block-settings-menu-first-item';
-import withDeprecatedUniqueId from '../with-deprecated-unique-id';
+import _BlockSettingsMenuPluginsExtension from './block-settings-menu-plugins-extension';
+
+const preventDefault = ( event ) => {
+	event.preventDefault();
+	return event;
+};
+
+const shortcuts = {
+	duplicate: {
+		raw: rawShortcut.primaryShift( 'd' ),
+		display: displayShortcut.primaryShift( 'd' ),
+	},
+	removeBlock: {
+		raw: rawShortcut.primaryAlt( 'backspace' ),
+		display: displayShortcut.primaryAlt( 'bksp' ),
+	},
+	insertBefore: {
+		raw: rawShortcut.primaryAlt( 't' ),
+		display: displayShortcut.primaryAlt( 't' ),
+	},
+	insertAfter: {
+		raw: rawShortcut.primaryAlt( 'y' ),
+		display: displayShortcut.primaryAlt( 'y' ),
+	},
+};
 
 export class BlockSettingsMenu extends Component {
 	constructor() {
@@ -53,8 +77,13 @@ export class BlockSettingsMenu extends Component {
 			clientIds,
 			onSelect,
 			focus,
-			rootClientId,
 			isHidden,
+			onDuplicate,
+			onRemove,
+			onInsertBefore,
+			onInsertAfter,
+			canDuplicate,
+			isLocked,
 		} = this.props;
 		const { isFocused } = this.state;
 		const blockClientIds = castArray( clientIds );
@@ -63,6 +92,25 @@ export class BlockSettingsMenu extends Component {
 
 		return (
 			<div className="editor-block-settings-menu">
+				<KeyboardShortcuts
+					bindGlobal
+					shortcuts={ {
+						// Prevents bookmark all Tabs shortcut in Chrome when devtools are closed.
+						// Prevents reposition Chrome devtools pane shortcut when devtools are open.
+						[ shortcuts.duplicate.raw ]: flow( preventDefault, onDuplicate ),
+
+						// Does not clash with any known browser/native shortcuts, but preventDefault
+						// is used to prevent any obscure unknown shortcuts from triggering.
+						[ shortcuts.removeBlock.raw ]: flow( preventDefault, onRemove ),
+
+						// Prevent 'view recently closed tabs' in Opera using preventDefault.
+						[ shortcuts.insertBefore.raw ]: flow( preventDefault, onInsertBefore ),
+
+						// Does not clash with any known browser/native shortcuts, but preventDefault
+						// is used to prevent any obscure unknown shortcuts from triggering.
+						[ shortcuts.insertAfter.raw ]: flow( preventDefault, onInsertAfter ),
+					} }
+				/>
 				<Dropdown
 					contentClassName="editor-block-settings-menu__popover"
 					position="bottom left"
@@ -92,52 +140,78 @@ export class BlockSettingsMenu extends Component {
 						);
 					} }
 					renderContent={ ( { onClose } ) => (
-						// Should this just use a DropdownMenu instead of a DropDown ?
 						<NavigableMenu className="editor-block-settings-menu__content">
 							<_BlockSettingsMenuFirstItem.Slot fillProps={ { onClose } } />
 							{ count === 1 && (
-								<BlockModeToggle
-									clientId={ firstBlockClientId }
-									onToggle={ onClose }
-									role="menuitem"
-								/>
-							) }
-							{ count === 1 && (
 								<BlockUnknownConvertButton
 									clientId={ firstBlockClientId }
-									role="menuitem"
 								/>
 							) }
 							{ count === 1 && (
 								<BlockHTMLConvertButton
 									clientId={ firstBlockClientId }
-									role="menuitem"
 								/>
 							) }
-							<BlockDuplicateButton
-								clientIds={ clientIds }
-								rootClientId={ rootClientId }
-								role="menuitem"
-							/>
+							{ ! isLocked && canDuplicate && (
+								<MenuItem
+									className="editor-block-settings-menu__control"
+									onClick={ onDuplicate }
+									icon="admin-page"
+									shortcut={ shortcuts.duplicate.display }
+								>
+									{ __( 'Duplicate' ) }
+								</MenuItem>
+							) }
+							{ ! isLocked && (
+								<Fragment>
+									<MenuItem
+										className="editor-block-settings-menu__control"
+										onClick={ onInsertBefore }
+										icon="insert-before"
+										shortcut={ shortcuts.insertBefore.display }
+									>
+										{ __( 'Insert Before' ) }
+									</MenuItem>
+									<MenuItem
+										className="editor-block-settings-menu__control"
+										onClick={ onInsertAfter }
+										icon="insert-after"
+										shortcut={ shortcuts.insertAfter.display }
+									>
+										{ __( 'Insert After' ) }
+									</MenuItem>
+								</Fragment>
+							) }
+							{ count === 1 && (
+								<BlockModeToggle
+									clientId={ firstBlockClientId }
+									onToggle={ onClose }
+								/>
+							) }
 							{ count === 1 && (
 								<ReusableBlockConvertButton
 									clientId={ firstBlockClientId }
 									onToggle={ onClose }
-									itemsRole="menuitem"
 								/>
 							) }
+							<_BlockSettingsMenuPluginsExtension.Slot fillProps={ { clientIds, onClose } } />
 							<div className="editor-block-settings-menu__separator" />
 							{ count === 1 && (
 								<ReusableBlockDeleteButton
 									clientId={ firstBlockClientId }
 									onToggle={ onClose }
-									itemsRole="menuitem"
 								/>
 							) }
-							<BlockRemoveButton
-								clientIds={ clientIds }
-								role="menuitem"
-							/>
+							{ ! isLocked && (
+								<MenuItem
+									className="editor-block-settings-menu__control"
+									onClick={ onRemove }
+									icon="trash"
+									shortcut={ shortcuts.removeBlock.display }
+								>
+									{ __( 'Remove Block' ) }
+								</MenuItem>
+							) }
 						</NavigableMenu>
 					) }
 				/>
@@ -147,10 +221,84 @@ export class BlockSettingsMenu extends Component {
 }
 
 export default compose( [
-	withDeprecatedUniqueId,
-	withDispatch( ( dispatch ) => ( {
-		onSelect( clientId ) {
-			dispatch( 'core/editor' ).selectBlock( clientId );
-		},
-	} ) ),
+	withSelect( ( select, { clientIds, rootClientId } ) => {
+		const {
+			getBlocksByClientId,
+			getBlockIndex,
+			getTemplateLock,
+		} = select( 'core/editor' );
+
+		const blocks = getBlocksByClientId( clientIds );
+
+		const canDuplicate = every( blocks, ( block ) => {
+			return !! block && hasBlockSupport( block.name, 'multiple', true );
+		} );
+
+		return {
+			firstSelectedIndex: getBlockIndex( first( castArray( clientIds ) ), rootClientId ),
+			lastSelectedIndex: getBlockIndex( last( castArray( clientIds ) ), rootClientId ),
+			isLocked: !! getTemplateLock( rootClientId ),
+			blocks,
+			canDuplicate,
+			shortcuts,
+		};
+	} ),
+	withDispatch( ( dispatch, props ) => {
+		const {
+			clientIds,
+			rootClientId,
+			blocks,
+			firstSelectedIndex,
+			lastSelectedIndex,
+			isLocked,
+			canDuplicate,
+		} = props;
+
+		const {
+			insertBlocks,
+			multiSelect,
+			removeBlocks,
+			selectBlock,
+			insertDefaultBlock,
+		} = dispatch( 'core/editor' );
+
+		return {
+			onDuplicate() {
+				if ( isLocked || ! canDuplicate ) {
+					return;
+				}
+
+				const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
+				insertBlocks(
+					clonedBlocks,
+					lastSelectedIndex + 1,
+					rootClientId
+				);
+				if ( clonedBlocks.length > 1 ) {
+					multiSelect(
+						first( clonedBlocks ).clientId,
+						last( clonedBlocks ).clientId
+					);
+				}
+			},
+			onRemove() {
+				if ( ! isLocked ) {
+					removeBlocks( clientIds );
+				}
+			},
+			onInsertBefore() {
+				if ( ! isLocked ) {
+					insertDefaultBlock( {}, rootClientId, firstSelectedIndex );
+				}
+			},
+			onInsertAfter() {
+				if ( ! isLocked ) {
+					insertDefaultBlock( {}, rootClientId, lastSelectedIndex + 1 );
+				}
+			},
+			onSelect( clientId ) {
+				selectBlock( clientId );
+			},
+		};
+	} ),
 ] )( BlockSettingsMenu );

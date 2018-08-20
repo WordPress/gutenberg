@@ -9,21 +9,24 @@ import uuid from 'uuid/v4';
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage, getEditedPostContent, insertBlock } from '../support/utils';
+import {
+	clickBlockAppender,
+	getEditedPostContent,
+	insertBlock,
+	newPost,
+} from '../support/utils';
 
 describe( 'adding inline tokens', () => {
 	beforeAll( async () => {
-		await newDesktopBrowserPage();
 		await newPost();
 	} );
 
 	it( 'Should insert inline image', async () => {
 		// Create a paragraph.
-		await page.click( '.editor-default-block-appender' );
+		await clickBlockAppender();
 		await page.keyboard.type( 'a ' );
 
-		await insertBlock( 'Inline Image' );
+		await insertBlock( 'Inline Image', 'Inline Elements' );
 
 		// Wait for media modal to appear and upload image.
 		await page.waitForSelector( '.media-modal input[type=file]' );

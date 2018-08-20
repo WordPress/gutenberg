@@ -15,5 +15,18 @@
 		&:last-child {
 			border-radius: 0 3px 3px 0;
 		}
+
+		// The focused button should be elevated so the focus ring isn't cropped,
+		// as should the active button, because it has a different border color.
+		&:focus,
+		&.is-primary {
+			position: relative;
+			z-index: z-index(".components-button.is-button {:focus or .is-primary}");
+		}
+
+		// The active button should look pressed.
+		&.is-primary {
+			box-shadow: none;
+		}
 	}
 }

@@ -7,7 +7,7 @@ import { URL } from 'url';
 /**
  * External dependencies
  */
-import { times } from 'lodash';
+import { times, castArray } from 'lodash';
 
 const {
 	WP_BASE_URL = 'http://localhost:8889',
@@ -16,13 +16,22 @@ const {
 } = process.env;
 
 /**
- * Platform-specific modifier key.
+ * Platform-specific meta key.
  *
  * @see pressWithModifier
  *
  * @type {string}
  */
-const MOD_KEY = process.platform === 'darwin' ? 'Meta' : 'Control';
+export const META_KEY = process.platform === 'darwin' ? 'Meta' : 'Control';
+
+/**
+ * Platform-specific modifier for the access key chord.
+ *
+ * @see pressWithModifier
+ *
+ * @type {string}
+ */
+export const ACCESS_MODIFIER_KEYS = process.platform === 'darwin' ? [ 'Control', 'Alt' ] : [ 'Shift', 'Alt' ];
 
 /**
  * Regular expression matching zero-width space characters.
@@ -77,6 +86,34 @@ async function login() {
 	] );
 }
 
+/**
+ * Returns a promise which resolves once it's determined that the active DOM
+ * element is not within a RichText field, or the RichText field's TinyMCE has
+ * completed initialization. This is an unfortunate workaround to address an
+ * issue where TinyMCE takes its time to become ready for user input.
+ *
+ * TODO: This is a code smell, indicating that "too fast" resulting in breakage
+ * could be equally problematic for a fast human. It should be explored whether
+ * all event bindings we assign to TinyMCE to handle could be handled through
+ * the DOM directly instead.
+ *
+ * @return {Promise} Promise resolving once RichText is initialized, or is
+ *                   determined to not be a container of the active element.
+ */
+async function waitForRichTextInitialization() {
+	const isInRichText = await page.evaluate( () => {
+		return !! document.activeElement.closest( '.editor-rich-text__tinymce' );
+	} );
+
+	if ( ! isInRichText ) {
+		return;
+	}
+
+	return page.waitForFunction( () => {
+		return !! document.activeElement.closest( '.mce-content-body' );
+	} );
+}
+
 export async function visitAdmin( adminPath, query ) {
 	await goToWPPath( join( 'wp-admin', adminPath ), query );
 
@@ -86,31 +123,17 @@ export async function visitAdmin( adminPath, query ) {
 	}
 }
 
-export async function newPost( postType, disableTips = true ) {
+export async function newPost( { postType, enableTips = false } = {} ) {
 	await visitAdmin( 'post-new.php', postType ? 'post_type=' + postType : '' );
 
-	if ( disableTips ) {
-		// Disable new user tips so that their UI doesn't get in the way
-		await page.evaluate( () => {
-			wp.data.dispatch( 'core/nux' ).disableTips();
-		} );
+	await page.evaluate( ( _enableTips ) => {
+		const action = _enableTips ? 'enableTips' : 'disableTips';
+		wp.data.dispatch( 'core/nux' )[ action ]();
+	}, enableTips );
+
+	if ( enableTips ) {
+		await page.reload();
 	}
-}
-
-export async function newDesktopBrowserPage() {
-	global.page = await browser.newPage();
-
-	page.on( 'pageerror', ( error ) => {
-		// Disable reason: `jest/globals` doesn't include `fail`, but it is
-		// part of the global context supplied by the underlying Jasmine:
-		//
-		//  https://jasmine.github.io/api/3.0/global.html#fail
-
-		// eslint-disable-next-line no-undef
-		fail( error );
-	} );
-
-	await setViewport( 'large' );
 }
 
 export async function setViewport( type ) {
@@ -180,6 +203,14 @@ export async function ensureSidebarOpened() {
 }
 
 /**
+ * Clicks the default block appender.
+ */
+export async function clickBlockAppender() {
+	await expect( page ).toClick( '.editor-default-block-appender__content' );
+	await waitForRichTextInitialization();
+}
+
+/**
  * Search for block in the global inserter
  *
  * @param {string} searchTerm The text to search the inserter for.
@@ -197,29 +228,37 @@ export async function searchForBlock( searchTerm ) {
  * result that appears.
  *
  * @param {string} searchTerm The text to search the inserter for.
+ * @param {string} panelName  The inserter panel to open (if it's closed by default).
  */
-export async function insertBlock( searchTerm ) {
+export async function insertBlock( searchTerm, panelName = null ) {
 	await searchForBlock( searchTerm );
+	if ( panelName ) {
+		const panelButton = ( await page.$x( `//button[contains(text(), '${ panelName }')]` ) )[ 0 ];
+		await panelButton.click();
+	}
 	await page.click( `button[aria-label="${ searchTerm }"]` );
+	await waitForRichTextInitialization();
 }
 
 /**
  * Performs a key press with modifier (Shift, Control, Meta, Mod), where "Mod"
  * is normalized to platform-specific modifier (Meta in MacOS, else Control).
  *
- * @param {string} modifier Modifier key.
- * @param {string} key      Key to press while modifier held.
- *
- * @return {Promise} Promise resolving when key combination pressed.
+ * @param {string|Array} modifiers Modifier key or array of modifier keys.
+ * @param {string} key      	   Key to press while modifier held.
  */
-export async function pressWithModifier( modifier, key ) {
-	if ( modifier.toLowerCase() === 'mod' ) {
-		modifier = MOD_KEY;
-	}
+export async function pressWithModifier( modifiers, key ) {
+	const modifierKeys = castArray( modifiers );
 
-	await page.keyboard.down( modifier );
+	await Promise.all(
+		modifierKeys.map( async ( modifier ) => page.keyboard.down( modifier ) )
+	);
+
 	await page.keyboard.press( key );
-	return page.keyboard.up( modifier );
+
+	await Promise.all(
+		modifierKeys.map( async ( modifier ) => page.keyboard.up( modifier ) )
+	);
 }
 
 /**
@@ -228,7 +267,7 @@ export async function pressWithModifier( modifier, key ) {
  * @param {string} buttonLabel The label to search the button for.
  */
 export async function clickOnMoreMenuItem( buttonLabel ) {
-	await page.click( '.edit-post-more-menu [aria-label="More"]' );
+	await expect( page ).toClick( '.edit-post-more-menu [aria-label="More"]' );
 	const itemButton = ( await page.$x( `//button[contains(text(), '${ buttonLabel }')]` ) )[ 0 ];
 	await itemButton.click( 'button' );
 }
@@ -252,7 +291,7 @@ export async function publishPost() {
 	await page.click( '.editor-post-publish-button' );
 
 	// A success notice should show up
-	return page.waitForSelector( '.notice-success' );
+	return page.waitForSelector( '.components-notice.is-success' );
 }
 
 /**
@@ -291,4 +330,40 @@ export async function pressTimes( key, count ) {
 
 export async function clearLocalStorage() {
 	await page.evaluate( () => window.localStorage.clear() );
+}
+
+/**
+ * Callback which automatically accepts dialog.
+ *
+ * @param {puppeteer.Dialog} dialog Dialog object dispatched by page via the 'dialog' event.
+ */
+async function acceptPageDialog( dialog ) {
+	await dialog.accept();
+}
+
+/**
+ * Enables even listener which accepts a page dialog which
+ * may appear when navigating away from Gutenberg.
+ */
+export function enablePageDialogAccept() {
+	page.on( 'dialog', acceptPageDialog );
+}
+
+/**
+ * Click on the close button of an open modal.
+ *
+ * @param {?string} modalClassName Class name for the modal to close
+ */
+export async function clickOnCloseModalButton( modalClassName ) {
+	let closeButtonClassName = '.components-modal__header .components-icon-button';
+
+	if ( modalClassName ) {
+		closeButtonClassName = `${ modalClassName } ${ closeButtonClassName }`;
+	}
+
+	const closeButton = await page.$( closeButtonClassName );
+
+	if ( closeButton ) {
+		await page.click( closeButtonClassName );
+	}
 }

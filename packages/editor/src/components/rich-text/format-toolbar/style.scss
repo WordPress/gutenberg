@@ -4,7 +4,7 @@
 
 .editor-format-toolbar__link-container {
 	position: absolute;
-	transform: translateX( -50% );
+	transform: translateX(-50%);
 }
 
 .editor-format-toolbar__link-modal-line {
@@ -29,7 +29,7 @@
 }
 
 .editor-format-toolbar__link-value {
-	margin: $item-spacing - 1px; // subtract border
+	margin: $item-spacing - $border-width;
 	flex-grow: 1;
 	flex-shrink: 1;
 	overflow: hidden;
@@ -42,8 +42,8 @@
 
 .editor-format-toolbar__link-settings {
 	padding: 7px 8px;
-	border-top: 1px solid $light-gray-500;
-	padding-top: 8px; // add 1px for the border
+	border-top: $border-width solid $light-gray-500;
+	padding-top: 7px + $border-width;
 
 	.components-base-control {
 		margin: 0;

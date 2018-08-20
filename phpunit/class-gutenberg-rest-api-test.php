@@ -12,18 +12,26 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 	function setUp() {
 		parent::setUp();
 
-		$this->administrator = $this->factory->user->create( array(
-			'role' => 'administrator',
-		) );
-		$this->author        = $this->factory->user->create( array(
-			'role' => 'author',
-		) );
-		$this->editor        = $this->factory->user->create( array(
-			'role' => 'editor',
-		) );
-		$this->contributor   = $this->factory->user->create( array(
-			'role' => 'contributor',
-		) );
+		$this->administrator = $this->factory->user->create(
+			array(
+				'role' => 'administrator',
+			)
+		);
+		$this->author        = $this->factory->user->create(
+			array(
+				'role' => 'author',
+			)
+		);
+		$this->editor        = $this->factory->user->create(
+			array(
+				'role' => 'editor',
+			)
+		);
+		$this->contributor   = $this->factory->user->create(
+			array(
+				'role' => 'contributor',
+			)
+		);
 		$this->subscriber    = $this->factory->user->create(
 			array(
 				'role'         => 'subscriber',
@@ -41,58 +49,30 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 	 * Should return an extra visibility field on response when in edit context.
 	 */
 	function test_visibility_field() {
-		wp_set_current_user( $this->administrator );
-
 		$request = new WP_REST_Request( 'GET', '/wp/v2/taxonomies/category' );
 		$request->set_param( 'context', 'edit' );
-		$response = rest_do_request( $request );
 
-		$result = $response->get_data();
+		$permitted_users = array(
+			$this->administrator,
+			$this->editor,
+			$this->author,
+		);
 
-		$this->assertTrue( isset( $result['visibility'] ) );
-		$this->assertInternalType( 'array', $result['visibility'] );
-		$this->assertArrayHasKey( 'public', $result['visibility'] );
-		$this->assertArrayHasKey( 'publicly_queryable', $result['visibility'] );
-		$this->assertArrayHasKey( 'show_ui', $result['visibility'] );
-		$this->assertArrayHasKey( 'show_admin_column', $result['visibility'] );
-		$this->assertArrayHasKey( 'show_in_nav_menus', $result['visibility'] );
-		$this->assertArrayHasKey( 'show_in_quick_edit', $result['visibility'] );
-	}
+		foreach ( $permitted_users as $user ) {
+			wp_set_current_user( $user );
 
-	/**
-	 * Should return an extra visibility field on response.
-	 */
-	function test_visibility_field_for_non_admin_roles() {
-		wp_set_current_user( $this->editor );
+			$response = rest_do_request( $request );
+			$result   = $response->get_data();
 
-		$request = new WP_REST_Request( 'GET', '/wp/v2/taxonomies/category' );
-		$request->set_param( 'context', 'edit' );
-		$response = rest_do_request( $request );
-
-		$result = $response->get_data();
-
-		$this->assertTrue( isset( $result['visibility'] ) );
-		$this->assertInternalType( 'array', $result['visibility'] );
-		$this->assertArrayHasKey( 'public', $result['visibility'] );
-		$this->assertArrayHasKey( 'publicly_queryable', $result['visibility'] );
-		$this->assertArrayHasKey( 'show_ui', $result['visibility'] );
-		$this->assertArrayHasKey( 'show_admin_column', $result['visibility'] );
-		$this->assertArrayHasKey( 'show_in_nav_menus', $result['visibility'] );
-		$this->assertArrayHasKey( 'show_in_quick_edit', $result['visibility'] );
-
-		/**
-		 * See https://github.com/WordPress/gutenberg/issues/2545
-		 *
-		 * Until that is resolved authors will not be able to set taxonomies.
-		 * This should definitely be resolved though.
-		 */
-		wp_set_current_user( $this->author );
-
-		$response = rest_do_request( $request );
-
-		$result = $response->get_data();
-
-		$this->assertFalse( isset( $result['visibility'] ) );
+			$this->assertTrue( isset( $result['visibility'] ) );
+			$this->assertInternalType( 'array', $result['visibility'] );
+			$this->assertArrayHasKey( 'public', $result['visibility'] );
+			$this->assertArrayHasKey( 'publicly_queryable', $result['visibility'] );
+			$this->assertArrayHasKey( 'show_ui', $result['visibility'] );
+			$this->assertArrayHasKey( 'show_admin_column', $result['visibility'] );
+			$this->assertArrayHasKey( 'show_in_nav_menus', $result['visibility'] );
+			$this->assertArrayHasKey( 'show_in_quick_edit', $result['visibility'] );
+		}
 	}
 
 	/**
@@ -208,9 +188,11 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 	 * Only returns wp:action-publish when current user can publish.
 	 */
 	function test_link_publish_only_appears_for_author() {
-		$post_id   = $this->factory->post->create( array(
-			'post_author' => $this->author,
-		) );
+		$post_id   = $this->factory->post->create(
+			array(
+				'post_author' => $this->author,
+			)
+		);
 		$check_key = 'https://api.w.org/action-publish';
 		// contributors cannot sticky.
 		wp_set_current_user( $this->contributor );
@@ -268,13 +250,17 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 	 * Only returns term-related actions when current user can do so.
 	 */
 	function test_link_term_management_per_user() {
-		$contributor_post  = $this->factory->post->create( array(
-			'post_author' => $this->contributor,
-			'post_status' => 'draft',
-		) );
-		$author_post       = $this->factory->post->create( array(
-			'post_author' => $this->author,
-		) );
+		$contributor_post  = $this->factory->post->create(
+			array(
+				'post_author' => $this->contributor,
+				'post_status' => 'draft',
+			)
+		);
+		$author_post       = $this->factory->post->create(
+			array(
+				'post_author' => $this->author,
+			)
+		);
 		$create_tags       = 'https://api.w.org/action-create-tags';
 		$assign_tags       = 'https://api.w.org/action-assign-tags';
 		$create_categories = 'https://api.w.org/action-create-categories';

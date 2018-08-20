@@ -11,29 +11,26 @@ The following code example shows how to create the latest post block dynamic blo
 
 var el = wp.element.createElement,
 	registerBlockType = wp.blocks.registerBlockType,
-	withAPIData = wp.components.withAPIData;
+	withSelect = wp.data.withSelect;
 
 registerBlockType( 'my-plugin/latest-post', {
 	title: 'Latest Post',
 	icon: 'megaphone',
 	category: 'widgets',
 
-	edit: withAPIData( function() {
+	edit: withSelect( function( select ) {
 		return {
-			posts: '/wp/v2/posts?per_page=1'
+			posts: select( 'core' ).getEntityRecords( 'postType', 'post' )
 		};
 	} )( function( props ) {
-		if ( ! props.posts.data ) {
-			return "loading !";
-		}
-		if ( props.posts.data.length === 0 ) {
+		if ( props.posts && props.posts.length === 0 ) {
 			return "No posts";
 		}
 		var className = props.className;
-		var post = props.posts.data[ 0 ];
-		
+		var post = props.posts[ 0 ];
+
 		return el(
-			'a', 
+			'a',
 			{ className: className, href: post.link },
 			post.title.rendered
 		);
@@ -50,26 +47,23 @@ registerBlockType( 'my-plugin/latest-post', {
 // myblock.js
 
 const { registerBlockType } = wp.blocks;
-const { withAPIData } = wp.components;
+const { withSelect } = wp.data;
 
 registerBlockType( 'my-plugin/latest-post', {
 	title: 'Latest Post',
 	icon: 'megaphone',
 	category: 'widgets',
 
-	edit: withAPIData( () => {
+	edit: withSelect( ( select ) => {
 		return {
-			posts: '/wp/v2/posts?per_page=1'
+			posts: select( 'core' ).getEntityRecords( 'postType', 'post' )
 		};
 	} )( ( { posts, className } ) => {
-		if ( ! posts.data ) {
-			return "loading !";
-		}
-		if ( posts.data.length === 0 ) {
+		if ( posts && posts.length === 0 ) {
 			return "No posts";
 		}
-		var post = posts.data[ 0 ];
-		
+		var post = posts[ 0 ];
+
 		return <a className={ className } href={ post.link }>
 			{ post.title.rendered }
 		</a>;
@@ -119,7 +113,7 @@ There are a few things to notice:
 
 ## Live rendering in Gutenberg editor
 
-Gutenberg 2.8 added the [`<ServerSideRender>`](https://github.com/WordPress/gutenberg/tree/master/components/server-side-render) block which enables all the rendering to take place on the server using PHP rather than in JavaScript. Server-side render is meant as a fallback; client-side rendering in JavaScript is the preferred implementation. 
+Gutenberg 2.8 added the [`<ServerSideRender>`](https://github.com/WordPress/gutenberg/tree/master/packages/components/src/server-side-render) block which enables all the rendering to take place on the server using PHP rather than in JavaScript. Server-side render is meant as a fallback; client-side rendering in JavaScript is the preferred implementation.
 
 {% codetabs %}
 {% ES5 %}

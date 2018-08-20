@@ -2,30 +2,16 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { withSelect } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 class DocumentTitle extends Component {
 	constructor( props ) {
 		super( props );
-		this.originalDocumentTitle = document.title;
-	}
 
-	componentDidMount() {
-		this.setDocumentTitle( this.props.title );
-	}
-
-	componentDidUpdate( prevProps ) {
-		if ( prevProps.title !== this.props.title ) {
-			this.setDocumentTitle( this.props.title );
-		}
-	}
-
-	componentWillUnmount() {
-		document.title = this.originalDocumentTitle;
-	}
-
-	setDocumentTitle( title ) {
-		document.title = title + ' | ' + this.originalDocumentTitle;
+		deprecated( 'DocumentTitle component', {
+			version: '3.8',
+			plugin: 'Gutenberg',
+		} );
 	}
 
 	render() {
@@ -33,6 +19,4 @@ class DocumentTitle extends Component {
 	}
 }
 
-export default withSelect( ( select ) => ( {
-	title: select( 'core/editor' ).getDocumentTitle(),
-} ) )( DocumentTitle );
+export default DocumentTitle;

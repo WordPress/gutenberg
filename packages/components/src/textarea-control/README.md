@@ -1,19 +1,24 @@
-TextareaControl
-=======
+# TextareaControl
 
 TextareaControl is used to generate textarea input fields.
 
 
 ## Usage
 
-Render a user interface to input the name of an additional CSS class.
 ```jsx
-    <TextareaControl
-        label="Text"
-        value={ value }
-        help="Enter some text"
-        onChange={ onChange }
-    />
+import { TextareaControl } from '@wordpress/components';
+import { withState } from '@wordpress/compose';
+
+const MyTextareaControl = withState( {
+	text: '',
+} )( ( { text, setState } ) => ( 
+	<TextareaControl
+		label="Text"
+		help="Enter some text"
+		value={ text }
+		onChange={ ( text ) => setState( { text } ) }
+	/>
+) );
 ```
 
 ## Props

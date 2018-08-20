@@ -1,9 +1,9 @@
 .components-menu-group {
 	width: 100%;
-	padding: 10px;
+	padding: $item-spacing - $border-width;
 }
 
 .components-menu-group__label {
-	margin-bottom: 10px;
+	margin-bottom: $item-spacing;
 	color: $dark-gray-300;
 }

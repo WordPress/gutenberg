@@ -11,7 +11,7 @@
 	padding: 0;
 	width: $block-side-ui-width;
 	height: $block-side-ui-width;
-	border-radius: $button-style__radius-roundrect;
+	border-radius: $radius-round-rectangle;
 	opacity: 0;
 
 	// use opacity to work in various editor styles
@@ -39,35 +39,39 @@
 			&:hover,
 			&:active,
 			&:focus {
-				z-index: z-index( '.editor-block-settings-remove' );
+				z-index: z-index(".editor-block-settings-remove");
 			}
 		}
 	}
 }
 
 .editor-block-settings-menu__toggle .dashicon {
-	transform: rotate( 90deg );
+	transform: rotate(90deg);
 }
 
 // Popout menu
 .editor-block-settings-menu__popover {
-	&:before,
-	&:after {
+	&::before,
+	&::after {
 		margin-left: 2px;
-	}
-
-	.components-popover__content {
-		width: 182px;
 	}
 
 	.editor-block-settings-menu__content {
 		width: 100%;
+		padding: $item-spacing - $border-width;
 	}
 
 	.editor-block-settings-menu__separator {
 		margin-top: $item-spacing;
 		margin-bottom: $item-spacing;
-		border-top: 1px solid $light-gray-500;
+		margin-left: -$item-spacing + $border-width;
+		margin-right: -$item-spacing + $border-width;
+		border-top: $border-width solid $light-gray-500;
+
+		// Check if the separator is the last child in the node and if so, hide itself
+		&:last-child {
+			display: none;
+		}
 	}
 
 	.editor-block-settings-menu__title {

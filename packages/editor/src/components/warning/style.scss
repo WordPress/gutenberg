@@ -1,35 +1,17 @@
-.editor-block-list__block .editor-warning {
-	z-index: z-index( '.editor-warning' );
-	position: absolute;
-	top: -$block-padding - $border-width;
-	right: -$parent-block-padding - $border-width;
-	left: -$parent-block-padding - $border-width;
-
-	// Position for nested blocks
-	.editor-block-list__block & {
-		right: -$block-padding - $border-width;
-		left: -$block-padding - $border-width;
-	}
-
+.editor-warning {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	flex-wrap: nowrap;
 	background-color: $white;
-	border: 1px solid $light-gray-500;
+	border: $border-width solid $light-gray-500;
 	text-align: left;
-
-	// Bigger padding on mobile where blocks are edge to edge.
-	padding: $block-padding $parent-block-padding 0 $parent-block-padding;
-	@include break-small() {
-		padding: $block-padding $block-padding 0 $block-padding;
-	}
+	padding: 20px;
 
 	.editor-warning__message {
 		line-height: $default-line-height;
 		font-family: $default-font;
 		font-size: $default-font-size;
-		margin: 0 0 $block-padding 0;
 	}
 
 	.editor-warning__contents {
@@ -43,9 +25,8 @@
 
 	.editor-warning__actions {
 		display: flex;
-		margin: 0 0 $block-padding 0;
 	}
-	
+
 	.editor-warning__action {
 		margin: 0 6px 0 0;
 		margin-left: 0;

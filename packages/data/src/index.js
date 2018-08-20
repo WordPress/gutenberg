@@ -7,12 +7,17 @@ import { combineReducers } from 'redux';
  * Internal dependencies
  */
 import defaultRegistry from './default-registry';
-export { restrictPersistence, setPersistenceStorage } from './persist';
+import * as plugins from './plugins';
+
 export { default as withSelect } from './components/with-select';
 export { default as withDispatch } from './components/with-dispatch';
-export { default as RegistryProvider } from './components/registry-provider';
+export { default as RegistryProvider, RegistryConsumer } from './components/registry-provider';
 export { createRegistry } from './registry';
-export { withRehydration, loadAndPersist } from './deprecated';
+export {
+	restrictPersistence,
+	setPersistenceStorage,
+} from './deprecated';
+export { plugins };
 
 /**
  * The combineReducers helper function turns an object whose values are different
@@ -35,3 +40,4 @@ export const registerActions = defaultRegistry.registerActions;
 export const registerSelectors = defaultRegistry.registerSelectors;
 export const registerResolvers = defaultRegistry.registerResolvers;
 export const setupPersistence = defaultRegistry.setupPersistence;
+export const use = defaultRegistry.use;

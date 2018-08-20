@@ -19,10 +19,11 @@ export function getEditorMode( state ) {
  * Returns true if the editor sidebar is opened.
  *
  * @param {Object} state Global application state
- * @return {boolean}     Whether the editor sidebar is opened.
+ *
+ * @return {boolean} Whether the editor sidebar is opened.
  */
 export function isEditorSidebarOpened( state ) {
-	const activeGeneralSidebar = getPreference( state, 'activeGeneralSidebar', null );
+	const activeGeneralSidebar = getActiveGeneralSidebarName( state );
 
 	return includes( [ 'edit-post/document', 'edit-post/block' ], activeGeneralSidebar );
 }
@@ -39,14 +40,27 @@ export function isPluginSidebarOpened( state ) {
 }
 
 /**
- * Returns the current active general sidebar name.
+ * Returns the current active general sidebar name, or null if there is no
+ * general sidebar active. The active general sidebar is a unique name to
+ * identify either an editor or plugin sidebar.
+ *
+ * Examples:
+ *
+ *  - `edit-post/document`
+ *  - `my-plugin/insert-image-sidebar`
  *
  * @param {Object} state Global application state.
  *
  * @return {?string} Active general sidebar name.
  */
 export function getActiveGeneralSidebarName( state ) {
-	return getPreference( state, 'activeGeneralSidebar', null );
+	// Dismissal takes precedent.
+	const isDismissed = getPreference( state, 'isGeneralSidebarDismissed', false );
+	if ( isDismissed ) {
+		return null;
+	}
+
+	return state.activeGeneralSidebar;
 }
 
 /**
@@ -78,7 +92,8 @@ export function getPreference( state, preferenceKey, defaultValue ) {
  * Returns true if the publish sidebar is opened.
  *
  * @param {Object} state Global application state
- * @return {boolean}       Whether the publish sidebar is open.
+ *
+ * @return {boolean} Whether the publish sidebar is open.
  */
 export function isPublishSidebarOpened( state ) {
 	return state.publishSidebarActive;
@@ -89,11 +104,24 @@ export function isPublishSidebarOpened( state ) {
  *
  * @param  {Object}  state Global application state.
  * @param  {string}  panel Sidebar panel name.
- * @return {boolean}       Whether the sidebar panel is open.
+ *
+ * @return {boolean} Whether the sidebar panel is open.
  */
 export function isEditorSidebarPanelOpened( state, panel ) {
 	const panels = getPreference( state, 'panels' );
 	return panels ? !! panels[ panel ] : false;
+}
+
+/**
+ * Returns true if a modal is active, or false otherwise.
+ *
+ * @param  {Object}  state 	   Global application state.
+ * @param  {string}  modalName A string that uniquely identifies the modal.
+ *
+ * @return {boolean} Whether the modal is active.
+ */
+export function isModalActive( state, modalName ) {
+	return state.activeModal === modalName;
 }
 
 /**
@@ -127,7 +155,8 @@ export function isPluginItemPinned( state, pluginName ) {
  * Returns the state of legacy meta boxes.
  *
  * @param   {Object} state Global application state.
- * @return {Object}       State of meta boxes.
+ *
+ * @return {Object} State of meta boxes.
  */
 export function getMetaBoxes( state ) {
 	return state.metaBoxes;
@@ -149,7 +178,8 @@ export function getMetaBox( state, location ) {
  * Returns true if the post is using Meta Boxes
  *
  * @param  {Object} state Global application state
- * @return {boolean}      Whether there are metaboxes or not.
+ *
+ * @return {boolean} Whether there are metaboxes or not.
  */
 export const hasMetaBoxes = createSelector(
 	( state ) => {
@@ -166,7 +196,8 @@ export const hasMetaBoxes = createSelector(
  * Returns true if the the Meta Boxes are being saved.
  *
  * @param   {Object}  state Global application state.
- * @return {boolean}       Whether the metaboxes are being saved.
+ *
+ * @return {boolean} Whether the metaboxes are being saved.
  */
 export function isSavingMetaBoxes( state ) {
 	return state.isSavingMetaBoxes;

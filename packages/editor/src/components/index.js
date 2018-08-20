@@ -22,7 +22,7 @@ export { default as RichText } from './rich-text';
 export { default as RichTextProvider } from './rich-text/provider';
 export { default as MediaPlaceholder } from './media-placeholder';
 export { default as MediaUpload } from './media-upload';
-export { default as URLInput, UrlInput } from './url-input';
+export { default as URLInput } from './url-input';
 export { default as URLInputButton } from './url-input/button';
 
 // Post Related Components
@@ -85,6 +85,7 @@ export { default as BlockMover } from './block-mover';
 export { default as BlockSelectionClearer } from './block-selection-clearer';
 export { default as BlockSettingsMenu } from './block-settings-menu';
 export { default as _BlockSettingsMenuFirstItem } from './block-settings-menu/block-settings-menu-first-item';
+export { default as _BlockSettingsMenuPluginsExtension } from './block-settings-menu/block-settings-menu-plugins-extension';
 export { default as BlockTitle } from './block-title';
 export { default as BlockToolbar } from './block-toolbar';
 export { default as CopyHandler } from './copy-handler';

@@ -1,7 +1,7 @@
 /**
- * Wordpress dependencies
+ * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 
 /**
  * Return a label for the block movement controls depending on block position.
@@ -32,12 +32,11 @@ export function getBlockMoverDescription( selectedCount, type, firstIndex, isFir
 	if ( dir > 0 && ! isLast ) {
 		// moving down
 		return sprintf(
-			__( 'Move %(type)s block from position %(position)d down to position %(newPosition)d' ),
-			{
-				type,
-				position,
-				newPosition: ( position + 1 ),
-			}
+			// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block, 3: New position
+			__( 'Move %1$s block from position %2$d down to position %3$d' ),
+			type,
+			position,
+			( position + 1 )
 		);
 	}
 
@@ -50,12 +49,11 @@ export function getBlockMoverDescription( selectedCount, type, firstIndex, isFir
 	if ( dir < 0 && ! isFirst ) {
 		// moving up
 		return sprintf(
-			__( 'Move %(type)s block from position %(position)d up to position %(newPosition)d' ),
-			{
-				type,
-				position,
-				newPosition: ( position - 1 ),
-			}
+			// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block, 3: New position
+			__( 'Move %1$s block from position %2$d up to position %3$d' ),
+			type,
+			position,
+			( position - 1 )
 		);
 	}
 
@@ -91,21 +89,27 @@ export function getMultiBlockMoverDescription( selectedCount, firstIndex, isFirs
 
 	if ( dir < 0 && ! isFirst ) {
 		return sprintf(
-			__( 'Move %(selectedCount)d blocks from position %(position)d up by one place' ),
-			{
-				selectedCount,
-				position,
-			}
+			// translators: 1: Number of selected blocks, 2: Position of selected blocks
+			_n(
+				'Move %1$d block from position %2$d up by one place',
+				'Move %1$d blocks from position %2$d up by one place',
+				selectedCount
+			),
+			selectedCount,
+			position
 		);
 	}
 
 	if ( dir > 0 && ! isLast ) {
 		return sprintf(
-			__( 'Move %(selectedCount)d blocks from position %(position)s down by one place' ),
-			{
-				selectedCount,
-				position,
-			}
+			// translators: 1: Number of selected blocks, 2: Position of selected blocks
+			_n(
+				'Move %1$d block from position %2$d down by one place',
+				'Move %1$d blocks from position %2$d down by one place',
+				selectedCount
+			),
+			selectedCount,
+			position
 		);
 	}
 }

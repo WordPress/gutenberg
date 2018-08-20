@@ -1,11 +1,11 @@
 .edit-post-sidebar {
 	position: fixed;
-	z-index: z-index( '.edit-post-sidebar' );
+	z-index: z-index(".edit-post-sidebar");
 	top: 0;
 	right: 0;
 	bottom: 0;
 	width: $sidebar-width;
-	border-left: 1px solid $light-gray-500;
+	border-left: $border-width solid $light-gray-500;
 	background: $light-gray-300;
 	color: $dark-gray-500;
 	height: 100vh;
@@ -13,7 +13,7 @@
 
 	@include break-small() {
 		top: $admin-bar-height-big + $header-height;
-		z-index: z-index( '.edit-post-sidebar {greater than small}' );
+		z-index: z-index(".edit-post-sidebar {greater than small}");
 		height: auto;
 		overflow: auto;
 		-webkit-overflow-scrolling: touch;
@@ -29,7 +29,7 @@
 		overflow: auto;
 		-webkit-overflow-scrolling: touch;
 		height: auto;
-		max-height: calc( 100vh - #{ $admin-bar-height-big + $panel-header-height } );
+		max-height: calc(100vh - #{ $admin-bar-height-big + $panel-header-height });
 		margin-top: -1px;
 		margin-bottom: -1px;
 
@@ -42,7 +42,7 @@
 
 	> .components-panel .components-panel__header {
 		position: fixed;
-		z-index: z-index( '.components-panel__header' );
+		z-index: z-index(".components-panel__header");
 		top: 0;
 		left: 0;
 		right: 0;
@@ -157,7 +157,7 @@
 
 	&.is-active {
 		padding-bottom: 0;
-		border-bottom: 3px solid theme( primary );
+		border-bottom: 3px solid theme(primary);
 		font-weight: 600;
 	}
 

@@ -393,7 +393,7 @@ export class BlockListBlock extends Component {
 		const shouldAppearSelectedParent = ! showSideInserter && hasSelectedInnerBlock && ! isTypingWithinBlock;
 		// We render block movers and block settings to keep them tabbale even if hidden
 		const shouldRenderMovers = ( isSelected || hoverArea === 'left' ) && ! showEmptyBlockSideInserter && ! isMultiSelecting && ! isPartOfMultiSelection && ! isTypingWithinBlock;
-		const shouldRenderBlockSettings = ( isSelected || hoverArea === 'right' ) && ! isMultiSelecting && ! isPartOfMultiSelection && ! isTypingWithinBlock;
+		const shouldRenderBlockSettings = ( isSelected || hoverArea === 'right' ) && ! isMultiSelecting && ! isPartOfMultiSelection;
 		const shouldShowBreadcrumb = isHovered && ! isEmptyDefaultBlock;
 		const shouldShowContextualToolbar = ! showSideInserter && ( ( isSelected && ! isTypingWithinBlock && isValid ) || isFirstMultiSelected ) && ( ! hasFixedToolbar || ! isLargeViewport );
 		const shouldShowMobileToolbar = shouldAppearSelected;
@@ -428,6 +428,28 @@ export class BlockListBlock extends Component {
 			};
 		}
 		const blockElementId = `block-${ clientId }`;
+
+		// We wrap the BlockEdit component in a div that hides it when editing in
+		// HTML mode. This allows us to render all of the ancillary pieces
+		// (InspectorControls, etc.) which are inside `BlockEdit` but not
+		// `BlockHTML`, even in HTML mode.
+		let blockEdit = (
+			<BlockEdit
+				name={ blockName }
+				isSelected={ isSelected }
+				attributes={ block.attributes }
+				setAttributes={ this.setAttributes }
+				insertBlocksAfter={ isLocked ? undefined : this.insertBlocksAfter }
+				onReplace={ isLocked ? undefined : onReplace }
+				mergeBlocks={ isLocked ? undefined : this.mergeBlocks }
+				clientId={ clientId }
+				isSelectionEnabled={ this.props.isSelectionEnabled }
+				toggleSelection={ this.props.toggleSelection }
+			/>
+		);
+		if ( mode !== 'visual' ) {
+			blockEdit = <div style={ { display: 'none' } }>{ blockEdit }</div>;
+		}
 
 		// Disable reasons:
 		//
@@ -499,7 +521,7 @@ export class BlockListBlock extends Component {
 					<BlockSettingsMenu
 						clientIds={ clientId }
 						rootClientId={ rootClientId }
-						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'right' }
+						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'right' || isTypingWithinBlock }
 					/>
 				) }
 				{ shouldShowBreadcrumb && (
@@ -520,20 +542,7 @@ export class BlockListBlock extends Component {
 					data-block={ clientId }
 				>
 					<BlockCrashBoundary onError={ this.onBlockError }>
-						{ isValid && mode === 'visual' && (
-							<BlockEdit
-								name={ blockName }
-								isSelected={ isSelected }
-								attributes={ block.attributes }
-								setAttributes={ this.setAttributes }
-								insertBlocksAfter={ isLocked ? undefined : this.insertBlocksAfter }
-								onReplace={ isLocked ? undefined : onReplace }
-								mergeBlocks={ isLocked ? undefined : this.mergeBlocks }
-								clientId={ clientId }
-								isSelectionEnabled={ this.props.isSelectionEnabled }
-								toggleSelection={ this.props.toggleSelection }
-							/>
-						) }
+						{ isValid && blockEdit }
 						{ isValid && mode === 'html' && (
 							<BlockHtml clientId={ clientId } />
 						) }

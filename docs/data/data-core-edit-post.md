@@ -36,7 +36,14 @@ Whether the plugin sidebar is opened.
 
 ### getActiveGeneralSidebarName
 
-Returns the current active general sidebar name.
+Returns the current active general sidebar name, or null if there is no
+general sidebar active. The active general sidebar is a unique name to
+identify either an editor or plugin sidebar.
+
+Examples:
+
+ - `edit-post/document`
+ - `my-plugin/insert-image-sidebar`
 
 *Parameters*
 
@@ -94,6 +101,19 @@ Returns true if the editor sidebar panel is open, or false otherwise.
 *Returns*
 
 Whether the sidebar panel is open.
+
+### isModalActive
+
+Returns true if a modal is active, or false otherwise.
+
+*Parameters*
+
+ * state: Global application state.
+ * modalName: A string that uniquely identifies the modal.
+
+*Returns*
+
+Whether the modal is active.
 
 ### isFeatureActive
 
@@ -170,6 +190,18 @@ Returns an action object used in signalling that the user opened an editor sideb
  * name: Sidebar name to be opened.
 
 ### closeGeneralSidebar
+
+Returns an action object signalling that the user closed the sidebar.
+
+### openModal
+
+Returns an action object used in signalling that the user opened an editor sidebar.
+
+*Parameters*
+
+ * name: A string that uniquely identifies the modal.
+
+### closeModal
 
 Returns an action object signalling that the user closed the sidebar.
 

@@ -8,7 +8,6 @@ import { Component } from '@wordpress/element';
  */
 import Edit from './edit';
 import { BlockEditContextProvider } from './context';
-import withDeprecatedUniqueId from '../with-deprecated-unique-id';
 
 class BlockEdit extends Component {
 	constructor( props ) {
@@ -50,4 +49,4 @@ class BlockEdit extends Component {
 	}
 }
 
-export default withDeprecatedUniqueId( BlockEdit );
+export default BlockEdit;
