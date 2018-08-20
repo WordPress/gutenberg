@@ -161,10 +161,13 @@ function gutenberg_warn_classic_about_blocks() {
 	$gutenberg_edit_link = get_edit_post_link( $post->ID, 'raw' );
 
 	$classic_edit_link = $gutenberg_edit_link;
-	$classic_edit_link = add_query_arg( array(
-		'classic-editor'     => '',
-		'hide-block-warning' => '',
-	), $classic_edit_link );
+	$classic_edit_link = add_query_arg(
+		array(
+			'classic-editor'     => '',
+			'hide-block-warning' => '',
+		),
+		$classic_edit_link
+	);
 
 	$revisions_link = '';
 	if ( wp_revisions_enabled( $post ) ) {

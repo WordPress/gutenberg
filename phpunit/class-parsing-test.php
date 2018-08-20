@@ -17,10 +17,14 @@ class Parsing_Test extends WP_UnitTestCase {
 			glob( self::$fixtures_dir . '/*.json' ),
 			glob( self::$fixtures_dir . '/*.html' )
 		);
-		$fixture_filenames = array_values( array_unique( array_map(
-			array( $this, 'clean_fixture_filename' ),
-			$fixture_filenames
-		) ) );
+		$fixture_filenames = array_values(
+			array_unique(
+				array_map(
+					array( $this, 'clean_fixture_filename' ),
+					$fixture_filenames
+				)
+			)
+		);
 
 		return array_map(
 			array( $this, 'pass_parser_fixture_filenames' ),
