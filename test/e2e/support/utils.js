@@ -34,6 +34,24 @@ export const META_KEY = process.platform === 'darwin' ? 'Meta' : 'Control';
 export const ACCESS_MODIFIER_KEYS = process.platform === 'darwin' ? [ 'Control', 'Alt' ] : [ 'Shift', 'Alt' ];
 
 /**
+ * Platform-specific modifier for the primary+alt key chord.
+ *
+ * @see pressWithModifier
+ *
+ * @type {string}
+ */
+export const PRIMARY_ALT_MODIFIER_KEYS = process.platform === 'darwin' ? [ 'Alt', 'Meta' ] : [ 'Control', 'Alt' ];
+
+/**
+ * Platform-specific modifier for the primary+shift key chord.
+ *
+ * @see pressWithModifier
+ *
+ * @type {string}
+ */
+export const PRIMARY_SHIFT_MODIFIER_KEYS = process.platform === 'darwin' ? [ 'Shift', 'Meta' ] : [ 'Control', 'Shift' ];
+
+/**
  * Regular expression matching zero-width space characters.
  *
  * @type {RegExp}
@@ -262,12 +280,23 @@ export async function pressWithModifier( modifiers, key ) {
 }
 
 /**
- * Clicks on More Menu item, searchers for the button with the text provided and clicks it.
+ * Clicks on More Menu item, searches for the button with the text provided and clicks it.
  *
  * @param {string} buttonLabel The label to search the button for.
  */
 export async function clickOnMoreMenuItem( buttonLabel ) {
 	await expect( page ).toClick( '.edit-post-more-menu [aria-label="More"]' );
+	const itemButton = ( await page.$x( `//button[contains(text(), '${ buttonLabel }')]` ) )[ 0 ];
+	await itemButton.click( 'button' );
+}
+
+/**
+ * Clicks on Block Settings Menu item, searches for the button with the text provided and clicks it.
+ *
+ * @param {string} buttonLabel The label to search the button for.
+ */
+export async function clickOnBlockSettingsMenuItem( buttonLabel ) {
+	await expect( page ).toClick( '.editor-block-settings-menu__toggle' );
 	const itemButton = ( await page.$x( `//button[contains(text(), '${ buttonLabel }')]` ) )[ 0 ];
 	await itemButton.click( 'button' );
 }
