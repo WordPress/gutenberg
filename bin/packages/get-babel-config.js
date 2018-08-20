@@ -10,16 +10,7 @@ const babel = require( '@babel/core' );
 const { options: babelDefaultConfig } = babel.loadPartialConfig( {
 	configFile: '@wordpress/babel-preset-default',
 } );
-const plugins = map( babelDefaultConfig.plugins, ( plugin ) => {
-	if ( get( plugin, [ 'file', 'request' ] ) === '@babel/plugin-transform-runtime' ) {
-		return [ '@babel/plugin-transform-runtime', Object.assign(
-			{},
-			plugin.options,
-			{ corejs: false }
-		) ];
-	}
-	return plugin;
-} );
+const plugins = babelDefaultConfig.plugins;
 if ( ! process.env.SKIP_JSX_PRAGMA_TRANSFORM ) {
 	plugins.push( [ '@wordpress/babel-plugin-import-jsx-pragma', {
 		scopeVariable: 'createElement',
@@ -28,29 +19,43 @@ if ( ! process.env.SKIP_JSX_PRAGMA_TRANSFORM ) {
 	} ] );
 }
 
+const overrideOptions = ( target, targetName, options ) => {
+	if ( get( target, [ 'file', 'request' ] ) === targetName ) {
+		return [ targetName, Object.assign(
+			{},
+			target.options,
+			options
+		) ];
+	}
+	return target;
+};
+
 const babelConfigs = {
 	main: Object.assign(
 		{},
 		babelDefaultConfig,
 		{
-			plugins,
-			presets: map( babelDefaultConfig.presets, ( preset ) => {
-				if ( get( preset, [ 'file', 'request' ] ) === '@babel/preset-env' ) {
-					return [ '@babel/preset-env', Object.assign(
-						{},
-						preset.options,
-						{ modules: 'commonjs' }
-					) ];
-				}
-				return preset;
-			} ),
+			plugins: map(
+				plugins,
+				( plugin ) => overrideOptions( plugin, '@babel/plugin-transform-runtime', { corejs: false } )
+			),
+			presets: map(
+				babelDefaultConfig.presets,
+				( preset ) => overrideOptions( preset, '@babel/preset-env', { modules: 'commonjs' } )
+			),
 		}
 	),
 	module: Object.assign(
 		{},
 		babelDefaultConfig,
 		{
-			plugins,
+			plugins: map(
+				plugins,
+				( plugin ) => overrideOptions( plugin, '@babel/plugin-transform-runtime', {
+					corejs: false,
+					useESModules: true,
+				} )
+			),
 		}
 	),
 };
