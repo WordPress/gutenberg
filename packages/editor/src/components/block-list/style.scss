@@ -934,6 +934,9 @@
 			margin-right: 2px;
 		}
 	}
+
+	cursor: move;/* Fallback for IE/Edge < 14 */
+	cursor: grab;
 }
 
 .editor-block-list__descendant-arrow::before {
