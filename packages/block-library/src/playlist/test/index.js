@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { name, settings } from '../';
-import { blockEditRender } from '../../src/test/helpers';
+import { blockEditRender } from '../../test/helpers';
 
 describe( 'core/playlist', () => {
 	test( 'block edit matches snapshot', () => {
