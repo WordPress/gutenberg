@@ -9,15 +9,14 @@ import { TouchableOpacity } from 'react-native';
 import { forwardRef } from '@wordpress/element';
 
 export function Button( props ) {
-	const { onClick } = props;
-	const ariaLabel = props[ 'aria-label' ];
+	const { children, onClick, 'aria-label': ariaLabel } = props;	
 	return (
 		<TouchableOpacity
 			accessible={ true }
 			accessibilityLabel={ ariaLabel }
 			onPress={ onClick }
 		>
-			{ props.children }
+			{ children }
 		</TouchableOpacity>
 	);
 }
