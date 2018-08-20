@@ -59,7 +59,7 @@ class PostLockedModal extends Component {
 				{
 					this.state.isOpen ?
 						<Modal
-							title={ this.modalText }
+							title=""
 							onRequestClose={ this.closeModal }
 							focusOnMount={ true }
 							shouldCloseOnClickOutside={ false }
@@ -67,24 +67,46 @@ class PostLockedModal extends Component {
 							showCloseIcon={ false }
 							className="post-locked-modal"
 							icon={ this.avatar }
+							hideTitleSection={ true }
 						>
-							<button
-								className={ 'button' + ( this.takeover ? ' button-primary' : '' ) }
-								onClick={ this.allPosts }
-							>
-								{ __( 'All Posts' ) }
-							</button>
-							{ ! this.takeover &&
-								<span>
-									<PostPreviewButton />
-									<button
-										className="button button-primary"
-										onClick={ this.takeOverPost }
-									>
-										{ __( 'Take Over' ) }
-									</button>
-								</span>
+							{
+								this.avatar &&
+									<img
+										src={ this.avatar }
+										alt={ __( 'Avatar' ) }
+										className="components-modal__image"
+									/>
 							}
+							<span>
+								<div>
+									{ this.modalText }
+								</div>
+								{
+									this.takeover ?
+										<p><a
+											href={ getWPAdminURL( 'edit.php' ) }
+										>
+											{ __( 'View all posts' ) }
+										</a></p> :
+										<button
+											className={ 'button' }
+											onClick={ this.allPosts }
+										>
+											{ __( 'All Posts' ) }
+										</button>
+								}
+								{ ! this.takeover &&
+									<span>
+										<PostPreviewButton />
+										<button
+											className="button button-primary"
+											onClick={ this.takeOverPost }
+										>
+											{ __( 'Take Over' ) }
+										</button>
+									</span>
+								}
+							</span>
 						</Modal> :
 						null
 				}

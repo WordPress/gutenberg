@@ -88,8 +88,6 @@
 	padding: $panel-padding;
 }
 
-.components-modal__icon-container img {
-	width: 28px;
-	height: 28px;
-	margin-right: 5px;
+.components-modal__content.noheader {
+	height: calc(100% - #{ $admin-bar-height });
 }

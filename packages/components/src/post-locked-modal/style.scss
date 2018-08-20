@@ -1,8 +1,16 @@
 .post-locked-modal {
-	max-height: 140px;
+	max-height: 100px;
+	padding-right: 10px;
+	padding-left: 10px;
+	padding-top: 20px;
 
 	button.button,
 	button.components-button {
 		margin: 5px;
+	}
+	img.components-modal__image {
+		float: left;
+		margin: 8px;
+		margin-right: 15px;
 	}
 }

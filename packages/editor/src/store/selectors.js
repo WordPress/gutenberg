@@ -1905,7 +1905,7 @@ export function isPostLocked( state ) {
 }
 
 /**
- * Returns whether the post is locked.
+ * Returns details about the current post lock if available.
  *
  * @param {Object} state Global application state.
  *
