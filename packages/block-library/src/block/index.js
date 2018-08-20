@@ -15,9 +15,9 @@ export const settings = {
 
 	category: 'reusable',
 
-    description: __( 'Use again in any Post -- changes sync. Convert to Regular Block to use as starter template.' ),
+	description: __( 'Use again in any Post -- changes sync. Convert to Regular Block to use as starter template.' ),
 
-    attributes: {
+	attributes: {
 		ref: {
 			type: 'number',
 		},
