@@ -26,7 +26,7 @@ exports[`core/playlist block edit matches snapshot 1`] = `
   <div
     class="components-placeholder__instructions"
   >
-    Select audio or video files from your library, or upload a new ones
+    Select audio or video files from your library, or upload a new ones.
   </div>
   <div
     class="components-placeholder__fieldset"
@@ -55,7 +55,7 @@ exports[`core/playlist block edit matches snapshot 1`] = `
         Upload
       </button>
       <input
-        accept="audiovideo"
+        accept="audio/*,video/*"
         multiple=""
         style="display:none"
         type="file"
