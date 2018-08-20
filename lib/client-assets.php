@@ -134,6 +134,13 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'build/is-shallow-equal/index.js' ),
 		true
 	);
+	wp_register_script(
+		'wp-token-list',
+		gutenberg_url( 'build/token-list/index.js' ),
+		array( 'lodash' ),
+		filemtime( gutenberg_dir_path() . 'build/token-list/index.js' ),
+		true
+	);
 
 	// Editor Scripts.
 	wp_register_script(
@@ -568,6 +575,7 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-keycodes',
 			'wp-nux',
 			'wp-tinymce',
+			'wp-token-list',
 			'wp-url',
 			'wp-viewport',
 			'wp-wordcount',
