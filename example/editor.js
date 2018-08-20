@@ -7,12 +7,26 @@ const _minHeight = 100;
 export default class Editor extends Component {
     constructor(props) {
         super(props);
-        this.onFormatPress = this.onFormatPress.bind(this)        
+        this.onFormatPress = this.onFormatPress.bind(this) 
+        this.onActiveFormatsChange = this.onActiveFormatsChange.bind(this)
+        this.isFormatActive = this.isFormatActive.bind(this)
+        this.state = { activeFormats: [] };       
     }
     
     onFormatPress( format ) {
       const { _aztec } = this.refs;
-      _aztec.applyFormat(format)
+      _aztec.applyFormat(format);
+    }
+
+    onActiveFormatsChange( event ) {
+      const formats = event.nativeEvent.formats
+      this.setState( { activeFormats: formats });
+    }
+
+    isFormatActive( format ) {
+      const { activeFormats } = this.state;
+      console.log(activeFormats);
+      return activeFormats.indexOf(format) != -1;
     }
     
     render() {
@@ -21,9 +35,9 @@ export default class Editor extends Component {
       return (
               <View>
               <View style={{flex: 1, flexDirection: 'row'}}>
-                <Button title="Bold" onPress={ () => { this.onFormatPress("bold") } }/>
-                <Button title="Italic" onPress={ () => { this.onFormatPress("italic") } }/>
-                <Button title="Strikethrough" onPress={ () => { this.onFormatPress("strikethrough") } }/>
+                <Button title="Bold" color={ this.isFormatActive("bold") ? 'black' : 'gray' } onPress={ () => { this.onFormatPress("bold") } }/>
+                <Button title="Italic" color={ this.isFormatActive("italic") ? 'black' : 'gray' } onPress={ () => { this.onFormatPress("italic") } }/>
+                <Button title="Strikethrough" color={ this.isFormatActive("strikethrough") ? 'black' : 'gray' } onPress={ () => { this.onFormatPress("strikethrough") } }/>
               </View>
               <AztecView
                 ref="_aztec"
@@ -34,6 +48,7 @@ export default class Editor extends Component {
                 onContentSizeChange= { onContentSizeChange }
                 onChange= {(event) => console.log(event.nativeEvent) }
                 onEndEditing= {(event) => console.log(event.nativeEvent) }
+                onActiveFormatsChange = { this.onActiveFormatsChange }
                 color = {'black'}
                 maxImagesWidth = {200} 
               />
