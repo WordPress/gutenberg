@@ -20,7 +20,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime-corejs2": "7.0.0-beta.56",
+		"@babel/runtime": "7.0.0-rc.1",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
