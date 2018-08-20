@@ -137,7 +137,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-token-list',
 		gutenberg_url( 'build/token-list/index.js' ),
-		array(),
+		array( 'lodash' ),
 		filemtime( gutenberg_dir_path() . 'build/token-list/index.js' ),
 		true
 	);
