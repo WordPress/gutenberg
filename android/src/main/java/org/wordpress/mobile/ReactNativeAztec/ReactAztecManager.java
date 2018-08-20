@@ -5,8 +5,8 @@ import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.View;
 import android.util.Log;
+import android.view.View;
 
 import com.facebook.infer.annotation.Assertions;
 import com.facebook.react.bridge.ReactContext;
@@ -173,12 +173,14 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
         Assertions.assertNotNull(parent);
         Assertions.assertNotNull(args);
         switch (commandType) {
-        case COMMAND_NOTIFY_APPLY_FORMAT: {
-            final String format = args.getString(0);            
-            Log.d(TAG, String.format("Apply format: %s", format)); 
-            parent.applyFormat(format);           
-            return;
-        }
+            case COMMAND_NOTIFY_APPLY_FORMAT: {
+                final String format = args.getString(0);
+                Log.d(TAG, String.format("Apply format: %s", format));
+                parent.applyFormat(format);
+                return;
+            }
+            default:
+                super.receiveCommand(parent, commandType, args);
         }
     }
 

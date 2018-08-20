@@ -12,6 +12,8 @@ import com.facebook.react.views.textinput.ReactTextInputLocalData;
 import com.facebook.react.views.textinput.ScrollWatcher;
 
 import org.wordpress.aztec.AztecText;
+import org.wordpress.aztec.AztecTextFormat;
+import org.wordpress.aztec.ITextFormat;
 import org.wordpress.aztec.glideloader.GlideImageLoader;
 import org.wordpress.aztec.glideloader.GlideVideoThumbnailLoader;
 import org.wordpress.aztec.plugins.CssUnderlinePlugin;
@@ -147,14 +149,49 @@ public class ReactAztecText extends AztecText {
     }
 
     public void applyFormat(String format) {
+        ArrayList<ITextFormat> newFormats = new ArrayList<>();
         switch (format) {
             case ("bold"):
+                newFormats.add(AztecTextFormat.FORMAT_STRONG);
+                newFormats.add(AztecTextFormat.FORMAT_BOLD);
             break;
             case ("italic"):
+                newFormats.add(AztecTextFormat.FORMAT_ITALIC);
+                newFormats.add(AztecTextFormat.FORMAT_CITE);
             break;
             case ("strikethrough"):
+                newFormats.add(AztecTextFormat.FORMAT_STRIKETHROUGH);
             break;
         }
+
+        if (newFormats.size() == 0) {
+            return;
+        }
+
+        if (!isTextSelected()) {
+            setSelectedStyles(getNewStylesList(newFormats));
+        } else {
+            toggleFormatting(newFormats.get(0));
+        }
+    }
+
+    // Removes all formats in the list but if none found, applies the first one
+    private ArrayList<ITextFormat> getNewStylesList(ArrayList<ITextFormat> newFormats) {
+        ArrayList<ITextFormat> textFormats = new ArrayList<>();
+        textFormats.addAll(getSelectedStyles());
+        boolean wasRemoved = false;
+        for (ITextFormat currentFormat : newFormats) {
+            if (textFormats.contains(currentFormat)) {
+                wasRemoved = true;
+                textFormats.remove(currentFormat);
+            }
+        }
+
+        if (!wasRemoved) {
+            textFormats.add(newFormats.get(0));
+        }
+
+        return textFormats;
     }
 
     /**
