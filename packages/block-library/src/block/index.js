@@ -12,9 +12,12 @@ export const name = 'core/block';
 
 export const settings = {
 	title: __( 'Reusable Block' ),
+
 	category: 'reusable',
 
-	attributes: {
+    description: __( 'Use again in any Post -- changes sync. Convert to Regular Block to use as starter template.' ),
+
+    attributes: {
 		ref: {
 			type: 'number',
 		},
