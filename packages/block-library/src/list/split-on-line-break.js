@@ -11,8 +11,8 @@ import { last } from 'lodash';
  * array of strings and element-like objects (e.g. `{ type: strong, props: {
  * children: […] } }`).
  *
- * @param {Array}    fragments Rich-text content
- * @return {Array}   Array of rich-text content
+ * @param {WPBlockChildren} fragments Rich-text content
+ * @return {Array<WPBlockChildren>} Array of rich-text content
  */
 export default function splitOnLineBreak( fragments ) {
 	return fragments.reduce( ( acc, fragment, i, arr ) => {
