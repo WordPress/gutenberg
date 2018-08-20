@@ -67,7 +67,7 @@ export const searchItems = ( items, searchTerm ) => {
  */
 export const normalizeTerm = ( term ) => {
 	term = deburr( term );
-  term = term.toLowerCase();
+	term = term.toLowerCase();
 	term = term.trim();
 
 	return term;
