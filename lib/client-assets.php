@@ -1420,7 +1420,8 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 			$locked = true;
 		}
 
-		if ( $avatar = get_avatar( $user->ID, 64 ) ) {
+		$avatar = get_avatar( $user->ID, 56 );
+		if ( $avatar ) {
 			if ( preg_match( "|src='([^']+)'|", $avatar, $matches ) ) {
 				$user->avatar_src = $matches[1];
 			}
