@@ -10,6 +10,7 @@ import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
 import type { BlockType } from '../store/';
 import styles from './block-manager.scss';
+import BlockPicker from './block-picker';
 // Gutenberg imports
 import { getBlockType, getBlockTypes, serialize, createBlock } from '@wordpress/blocks';
 
@@ -37,6 +38,7 @@ type StateType = {
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
 	_recycler = null;
+	blockTypePickerRef = null;
 	availableBlockTypes = getBlockTypes();
 
 	constructor( props: PropsType ) {
@@ -76,11 +78,11 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 	// TODO: in the near future this will likely be changed to onShowBlockTypePicker and bound to this.props
 	// once we move the action to the toolbar
-	showBlockTypePicker() {
-		this.setState( { ...this.state, blockTypePickerVisible: true } );
+	showBlockTypePicker( show: boolean ) {
+		this.setState( { ...this.state, blockTypePickerVisible: show } );
 	}
 
-	onBlockTypeSelected( itemValue: string ) {
+	onBlockTypeSelected( itemValue: string, itemIndex: number ) {
 		this.setState( { ...this.state, selectedBlockType: itemValue, blockTypePickerVisible: false } );
 
 		// find currently focused block
@@ -126,7 +128,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				this.props.deleteBlockAction( clientId );
 				break;
 			case ToolbarButton.PLUS:
-				this.showBlockTypePicker();
+				this.showBlockTypePicker( true );
 				break;
 			case ToolbarButton.SETTINGS:
 				// TODO: implement settings
@@ -216,6 +218,17 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			</View>
 		);
 
+		let blockTypePicker2 = (
+			<View>
+				<BlockPicker 
+					visible={ this.state.blockTypePickerVisible }
+					onDismiss={ () => { this.showBlockTypePicker( false ) } }
+					onValueSelected={ ( itemValue ) => {
+						this.onBlockTypeSelected( itemValue );
+					} } />
+			</View>
+		);
+
 		return (
 			<View style={ styles.container }>
 				<View style={ { height: 30 } } />
@@ -230,7 +243,8 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				</View>
 				{ this.state.showHtml && this.renderHTML() }
 				{ ! this.state.showHtml && list }
-				{ this.state.blockTypePickerVisible && blockTypePicker }
+				{/* { this.state.blockTypePickerVisible && blockTypePicker2 } */}
+				{ blockTypePicker2 }
 			</View>
 		);
 	}
