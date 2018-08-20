@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
+	Disabled,
 	IconButton,
 	PanelBody,
 	SelectControl,
@@ -151,8 +152,9 @@ class VideoEdit extends Component {
 						/>
 						<SelectControl
 							label={ __( 'Preload' ) }
-							value={ preload }
-							onChange={ ( value ) => setAttributes( { preload: value } ) }
+							value={ undefined !== preload ? preload : 'none' }
+							// `undefined` is required for the preload attribute to be unset.
+							onChange={ ( value ) => setAttributes( { preload: ( 'none' !== value ) ? value : undefined } ) }
 							options={ [
 								{ value: 'auto', label: __( 'Auto' ) },
 								{ value: 'metadata', label: __( 'Metadata' ) },
@@ -162,7 +164,13 @@ class VideoEdit extends Component {
 					</PanelBody>
 				</InspectorControls>
 				<figure className={ className }>
-					<video controls src={ src } />
+					{ /*
+						Disable the video tag so the user clicking on it won't play the
+						video when the controls are enabled.
+					*/ }
+					<Disabled>
+						<video controls={ controls } src={ src } />
+					</Disabled>
 					{ ( ( caption && caption.length ) || !! isSelected ) && (
 						<RichText
 							tagName="figcaption"

@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
+	Disabled,
 	IconButton,
 	PanelBody,
 	SelectControl,
@@ -129,7 +130,13 @@ class AudioEdit extends Component {
 					</PanelBody>
 				</InspectorControls>
 				<figure className={ className }>
-					<audio controls="controls" src={ src } />
+					{ /*
+						Disable the audio tag so the user clicking on it won't play the
+						file or change the position slider when the controls are enabled.
+					*/ }
+					<Disabled>
+						<audio controls="controls" src={ src } />
+					</Disabled>
 					{ ( ( caption && caption.length ) || !! isSelected ) && (
 						<RichText
 							tagName="figcaption"
