@@ -21,7 +21,7 @@ class Draggable extends Component {
 		super( ...arguments );
 
 		deprecated( 'wp.components.Draggable', {
-			version: 3.6,
+			version: 3.7,
 			alternative: 'wp.components.withDraggable',
 		} );
 

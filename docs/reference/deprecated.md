@@ -7,6 +7,7 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 
 ## 3.7.0
 
+ - `wp.components.Draggable` has been deprecated. Please, use `wp.components.withDraggable` instead.
  - `wp.components.withAPIData` has been removed. Please use the Core Data module or `wp.apiFetch` directly instead.
  - `wp.data.dispatch("core").receiveTerms` has been deprecated. Please use `wp.data.dispatch("core").receiveEntityRecords` instead.
  - `getCategories` resolvers has been deprecated. Please use `getEntityRecords` resolver instead.
@@ -16,7 +17,6 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 
 ## 3.6.0
 
- - `wp.components.Draggable` has been deprecated. Please, use `wp.components.withDraggable` instead.
  - `wp.editor.editorMediaUpload` has been removed. Please use `wp.editor.mediaUpload` instead.
  - `wp.utils.getMimeTypesArray` has been removed.
  - `wp.utils.mediaUpload` has been removed. Please use `wp.editor.mediaUpload` instead.
