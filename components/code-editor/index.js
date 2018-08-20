@@ -11,6 +11,20 @@ import CodeEditor from './editor';
 import Placeholder from '../../packages/components/src/placeholder';
 import Spinner from '../../packages/components/src/spinner';
 
+/**
+ * Moddule constants
+ */
+let siteURL;
+
+/**
+ * Configure the site's URL to lazy load scripts and styles.
+ *
+ * @param {string} url Site url.
+ */
+export function unstable__setSiteURL( url ) { // eslint-disable-line camelcase
+	siteURL = url;
+}
+
 function loadScript() {
 	return new Promise( ( resolve, reject ) => {
 		const handles = [ 'wp-codemirror', 'code-editor', 'htmlhint', 'csslint', 'jshint' ];
@@ -21,7 +35,7 @@ function loadScript() {
 		}
 
 		const script = document.createElement( 'script' );
-		script.src = `${ wpApiSettings.schema.url }/wp-admin/load-scripts.php?load=${ handles.join( ',' ) }`;
+		script.src = `${ siteURL }/wp-admin/load-scripts.php?load=${ handles.join( ',' ) }`;
 		script.onload = resolve;
 		script.onerror = reject;
 
@@ -35,7 +49,7 @@ function loadStyle() {
 
 		const style = document.createElement( 'link' );
 		style.rel = 'stylesheet';
-		style.href = `${ wpApiSettings.schema.url }/wp-admin/load-styles.php?load=${ handles.join( ',' ) }`;
+		style.href = `${ siteURL }/wp-admin/load-styles.php?load=${ handles.join( ',' ) }`;
 		style.onload = resolve;
 		style.onerror = reject;
 

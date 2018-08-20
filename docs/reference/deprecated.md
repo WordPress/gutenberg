@@ -22,6 +22,7 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
  - `wp.data.select("core").getTerms` has been deprecated. Please use `wp.data.select("core").getEntityRecords` instead.
  - `wp.data.select("core").getCategories` has been deprecated. Please use `wp.data.select("core").getEntityRecords` instead.
  - `wp.data.select("core").isRequestingTerms` has been deprecated. Please use `wp.data.select("core").getEntitiesByKind` instead.
+ - `wp.data.restrictPersistence`, `wp.data.setPersistenceStorage` and  `wp.data.setupPersistence` has been removed. Please use the data persistence plugin instead.
 
 ## 3.6.0
 
