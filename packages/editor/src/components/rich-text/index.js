@@ -212,7 +212,7 @@ export class RichText extends Component {
 	 * @param {PasteEvent} event The paste event as triggered by TinyMCE.
 	 */
 	onPaste( event ) {
-		const { clipboardData } = event;
+		const clipboardData = event.clipboardData || window.clipboardData;
 		const { items = [], files = [] } = clipboardData;
 		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
 		const plainText = clipboardData.getData( 'text/plain' );
