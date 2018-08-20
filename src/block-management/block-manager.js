@@ -12,7 +12,7 @@ import type { BlockType } from '../store/';
 import styles from './block-manager.scss';
 import BlockPicker from './block-picker';
 // Gutenberg imports
-import { getBlockType, getBlockTypes, serialize, createBlock } from '@wordpress/blocks';
+import { getBlockType, serialize, createBlock } from '@wordpress/blocks';
 
 export type BlockListType = {
 	onChange: ( clientId: string, attributes: mixed ) => void,
@@ -38,7 +38,6 @@ type StateType = {
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
 	_recycler = null;
-	availableBlockTypes = getBlockTypes();
 
 	constructor( props: PropsType ) {
 		super( props );
@@ -81,7 +80,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		this.setState( { ...this.state, blockTypePickerVisible: show } );
 	}
 
-	onBlockTypeSelected( itemValue: string, itemIndex: number ) {
+	onBlockTypeSelected( itemValue: string ) {
 		this.setState( { ...this.state, selectedBlockType: itemValue, blockTypePickerVisible: false } );
 
 		// find currently focused block
@@ -203,11 +202,13 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			);
 		}
 
-		let blockTypePicker = (
+		const blockTypePicker = (
 			<View>
-				<BlockPicker 
+				<BlockPicker
 					visible={ this.state.blockTypePickerVisible }
-					onDismiss={ () => { this.showBlockTypePicker( false ) } }
+					onDismiss={ () => {
+						this.showBlockTypePicker( false );
+					} }
 					onValueSelected={ ( itemValue, itemIndex ) => {
 						this.onBlockTypeSelected( itemValue, itemIndex );
 					} } />
