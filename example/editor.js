@@ -7,10 +7,10 @@ const _minHeight = 100;
 export default class Editor extends Component {
     constructor(props) {
         super(props);
-        this.formatPressed = this.formatPressed.bind(this)        
+        this.onFormatPress = this.onFormatPress.bind(this)        
     }
     
-    formatPressed( format ) {
+    onFormatPress( format ) {
       const { _aztec } = this.refs;
       _aztec.applyFormat(format)
     }
@@ -21,9 +21,9 @@ export default class Editor extends Component {
       return (
               <View>
               <View style={{flex: 1, flexDirection: 'row'}}>
-                <Button title="Bold" onPress={ () => { this.formatPressed("bold") } }/>
-                <Button title="Italic" onPress={ () => { this.formatPressed("italic") } }/>
-                <Button title="Strikethrough" onPress={ () => { this.formatPressed("strikethrough") } }/>
+                <Button title="Bold" onPress={ () => { this.onFormatPress("bold") } }/>
+                <Button title="Italic" onPress={ () => { this.onFormatPress("italic") } }/>
+                <Button title="Strikethrough" onPress={ () => { this.onFormatPress("strikethrough") } }/>
               </View>
               <AztecView
                 ref="_aztec"
