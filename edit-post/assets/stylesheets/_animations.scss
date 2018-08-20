@@ -7,15 +7,6 @@
 	}
 }
 
-@keyframes outline-fade-in {
-	from {
-		outline: $border-width solid $dark-opacity-light-500;
-	}
-	to {
-		outline: $border-width solid theme(outlines);
-	}
-}
-
 @mixin animate_fade {
 	animation: animate_fade 0.1s ease-out;
 	animation-fill-mode: forwards;
@@ -37,11 +28,6 @@
 
 @mixin fade_in($speed: 0.2s, $delay: 0s) {
 	animation: fade-in $speed ease-out $delay;
-	animation-fill-mode: forwards;
-}
-
-@mixin outline_fade_in($speed: 0.2s, $delay: 0s) {
-	animation: outline-fade-in $speed ease-out $delay;
 	animation-fill-mode: forwards;
 }
 
