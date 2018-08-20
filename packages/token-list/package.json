@@ -19,7 +19,7 @@
 	"module": "build-module/index.js",
 	"dependencies": {
 		"@babel/runtime-corejs2": "7.0.0-beta.56",
-		"lodash-es": "^4.17.10"
+		"lodash": "^4.17.10"
 	},
 	"publishConfig": {
 		"access": "public"

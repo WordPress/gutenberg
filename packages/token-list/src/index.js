@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { uniq, compact, without } from 'lodash-es';
+import { uniq, compact, without } from 'lodash';
 
 /**
  * A set of tokens.
