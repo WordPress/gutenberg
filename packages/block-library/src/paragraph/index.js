@@ -12,7 +12,7 @@ import {
 	RawHTML,
 } from '@wordpress/element';
 import {
-	getColorClass,
+	getColorClassName,
 	getFontSizeClass,
 	RichText,
 } from '@wordpress/editor';
@@ -123,8 +123,8 @@ export const settings = {
 					customFontSize,
 				} = attributes;
 
-				const textClass = getColorClass( 'color', textColor );
-				const backgroundClass = getColorClass( 'background-color', backgroundColor );
+				const textClass = getColorClassName( 'color', textColor );
+				const backgroundClass = getColorClassName( 'background-color', backgroundColor );
 				const fontSizeClass = fontSize && `is-${ fontSize }-text`;
 
 				const className = classnames( {
@@ -240,8 +240,8 @@ export const settings = {
 			customFontSize,
 		} = attributes;
 
-		const textClass = getColorClass( 'color', textColor );
-		const backgroundClass = getColorClass( 'background-color', backgroundColor );
+		const textClass = getColorClassName( 'color', textColor );
+		const backgroundClass = getColorClassName( 'background-color', backgroundColor );
 		const fontSizeClass = getFontSizeClass( fontSize );
 
 		const className = classnames( {

@@ -10,7 +10,7 @@ import { omit, pick } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import {
 	RichText,
-	getColorClass,
+	getColorClassName,
 } from '@wordpress/editor';
 
 /**
@@ -95,8 +95,8 @@ export const settings = {
 			customTextColor,
 		} = attributes;
 
-		const textClass = getColorClass( 'color', textColor );
-		const backgroundClass = getColorClass( 'background-color', backgroundColor );
+		const textClass = getColorClassName( 'color', textColor );
+		const backgroundClass = getColorClassName( 'background-color', backgroundColor );
 
 		const buttonClasses = classnames( 'wp-block-button__link', {
 			'has-text-color': textColor || customTextColor,
