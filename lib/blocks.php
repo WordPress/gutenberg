@@ -162,6 +162,12 @@ function do_blocks( $content ) {
 	$rendered_content      = '';
 	$dynamic_block_pattern = get_dynamic_blocks_regex();
 
+	/*
+	 * Back up global post, to restore after render callback.
+	 * Allows callbacks to run new WP_Query instances without breaking the global post.
+	 */
+	$global_post = $post;
+
 	while ( preg_match( $dynamic_block_pattern, $content, $block_match, PREG_OFFSET_CAPTURE ) ) {
 		$opening_tag     = $block_match[0][0];
 		$offset          = $block_match[0][1];
@@ -216,14 +222,10 @@ function do_blocks( $content ) {
 			$content       = substr( $content, $end_offset + strlen( $end_tag ) );
 		}
 
-		/*
-		 * Back up global post, to restore after render callback.
-		 * Allows callbacks to run new WP_Query instances without breaking the global post.
-		 */
-		$global_post = $post;
-
 		// Replace dynamic block with server-rendered output.
 		$rendered_content .= $block_type->render( $attributes, $inner_content );
+
+		// Restore global $post.
 		$post = $global_post;
 	}
 
