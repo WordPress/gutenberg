@@ -15,7 +15,7 @@ export const settings = {
 
 	category: 'reusable',
 
-	description: __( 'When updated, content and formatting will change everywhere this Block is inserted.' ),
+	description: __( 'When updated, changes apply everywhere this block is inserted.' ),
 
 	attributes: {
 		ref: {
