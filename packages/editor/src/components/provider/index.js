@@ -1,13 +1,14 @@
 /**
  * External dependencies
  */
-import { flow } from 'lodash';
+import { flow, map } from 'lodash';
 import postcss from 'postcss';
 import wrap from 'postcss-prefixwrap';
 
 /**
  * WordPress Dependencies
  */
+import urlReplace from '@wordpress/postcss-url';
 import { createElement, Component } from '@wordpress/element';
 import { DropZoneProvider, SlotFillProvider } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
@@ -32,13 +33,20 @@ class EditorProvider extends Component {
 		if ( ! this.props.settings.styles ) {
 			return;
 		}
-		postcss( [ wrap( '.editor-block-list__block' ) ] )
-			.process( this.props.settings.styles )
-			.then( ( css ) => {
-				const node = document.createElement( 'style' );
-				node.innerHTML = css;
-				document.body.appendChild( node );
-			} );
+
+		map( this.props.settings.styles, ( { css, baseURL } ) => {
+			const transforms = [ wrap( '.editor-block-list__block' ) ];
+			if ( baseURL ) {
+				transforms.push( urlReplace( { baseURL } ) );
+			}
+			postcss( transforms )
+				.process( css )
+				.then( ( output ) => {
+					const node = document.createElement( 'style' );
+					node.innerHTML = output;
+					document.body.appendChild( node );
+				} );
+		} );
 	}
 
 	componentDidUpdate( prevProps ) {

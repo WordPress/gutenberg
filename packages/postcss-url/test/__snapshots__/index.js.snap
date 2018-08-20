@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`postcss-url Should not replace absolute paths 1`] = `"body { background: url(/images/test.png); }"`;
+
+exports[`postcss-url Should not replace remote paths 1`] = `"body { background: url(http://wp-site.local/images/test.png); }"`;
+
+exports[`postcss-url Should replace complex relative paths 1`] = `"body { background: url(http://wp-site.local/themes/gut/images/test.png); }"`;
+
+exports[`postcss-url Should replace relative paths 1`] = `"body { background: url(http://wp-site.local/themes/gut/css/images/test.png); }"`;

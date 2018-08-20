@@ -1400,6 +1400,25 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		$max_upload_size = 0;
 	}
 
+	// Editor Styles
+	global $editor_styles;
+	$styles = array();
+	if ( $editor_styles ) {
+		foreach ( $editor_styles as $style ) {
+			if (filter_var($style, FILTER_VALIDATE_URL)) {
+				$styles[] = array(
+					'css' => file_get_contents( $style )
+				);
+			} else {
+				$file = get_theme_file_path( $style );
+				$styles[] = array(
+					'css' => file_get_contents( get_theme_file_path( $style ) ),
+					'baseURL' => get_theme_file_uri( $style ),
+				);
+			}
+		}
+	}
+
 	$editor_settings = array(
 		'alignWide'           => $align_wide || ! empty( $gutenberg_theme_support[0]['wide-images'] ), // Backcompat. Use `align-wide` outside of `gutenberg` array.
 		'availableTemplates'  => $available_templates,
@@ -1412,7 +1431,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'autosaveInterval'    => 10,
 		'maxUploadFileSize'   => $max_upload_size,
 		'allowedMimeTypes'    => get_allowed_mime_types(),
-		'styles'              => 'h2 { color: red; }'
+		'styles'              => $styles
 	);
 
 	$post_autosave = get_autosave_newer_than_post_save( $post );

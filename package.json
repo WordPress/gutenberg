@@ -39,6 +39,7 @@
 		"@wordpress/keycodes": "file:packages/keycodes",
 		"@wordpress/nux": "file:packages/nux",
 		"@wordpress/plugins": "file:packages/plugins",
+		"@wordpress/postcss-url": "file:packages/postcss-url",
 		"@wordpress/redux-routine": "file:packages/redux-routine",
 		"@wordpress/shortcode": "file:packages/shortcode",
 		"@wordpress/token-list": "file:packages/token-list",
