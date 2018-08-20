@@ -68,6 +68,7 @@ function computeDerivedState( props ) {
 		settingsVisible: false,
 		opensInNewWindow: !! props.formats.link && !! props.formats.link.target,
 		linkValue: '',
+		isEditingLink: false,
 	};
 }
 
@@ -151,8 +152,7 @@ class FormatToolbar extends Component {
 
 	editLink( event ) {
 		event.preventDefault();
-		this.props.onChange( { link: { ...this.props.formats.link, isAdding: true } } );
-		this.setState( { linkValue: this.props.formats.link.value } );
+		this.setState( { linkValue: this.props.formats.link.value, isEditingLink: true } );
 	}
 
 	submitLink( event ) {
@@ -165,7 +165,7 @@ class FormatToolbar extends Component {
 			value,
 		} } );
 
-		this.setState( { linkValue: value } );
+		this.setState( { linkValue: value, isEditingLink: false } );
 		if ( ! this.props.formats.link.value ) {
 			this.props.speak( __( 'Link added.' ), 'assertive' );
 		}
@@ -177,7 +177,7 @@ class FormatToolbar extends Component {
 
 	render() {
 		const { formats, enabledControls = DEFAULT_CONTROLS, customControls = [], selectedNodeId } = this.props;
-		const { linkValue, settingsVisible, opensInNewWindow } = this.state;
+		const { linkValue, settingsVisible, opensInNewWindow, isEditingLink } = this.state;
 		const isAddingLink = formats.link && formats.link.isAdding;
 
 		const toolbarControls = FORMATTING_CONTROLS.concat( customControls )
@@ -202,6 +202,13 @@ class FormatToolbar extends Component {
 				};
 			} );
 
+		let linkUIToShow = 'none';
+		if ( isAddingLink || isEditingLink ) {
+			linkUIToShow = 'editing';
+		} else if ( formats.link ) {
+			linkUIToShow = 'previewing';
+		}
+
 		const linkSettings = settingsVisible && (
 			<div className="editor-format-toolbar__link-modal-line editor-format-toolbar__link-settings">
 				<ToggleControl
@@ -215,7 +222,7 @@ class FormatToolbar extends Component {
 			<div className="editor-format-toolbar">
 				<Toolbar controls={ toolbarControls } />
 
-				{ ( isAddingLink || formats.link ) && (
+				{ linkUIToShow !== 'none' && (
 					<Fill name="RichText.Siblings">
 						<PositionedAtSelection className="editor-format-toolbar__link-container">
 							<Popover
@@ -223,9 +230,9 @@ class FormatToolbar extends Component {
 								focusOnMount={ isAddingLink ? 'firstElement' : false }
 								key={ selectedNodeId /* Used to force rerender on change */ }
 							>
-								{ isAddingLink && (
-								// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
-								/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+								{ linkUIToShow === 'editing' && (
+									// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
+									/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 									<form
 										className="editor-format-toolbar__link-modal"
 										onKeyPress={ stopKeyPropagation }
@@ -244,12 +251,12 @@ class FormatToolbar extends Component {
 										</div>
 										{ linkSettings }
 									</form>
-								/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
+									/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 								) }
 
-								{ formats.link && ! isAddingLink && (
-								// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
-								/* eslint-disable jsx-a11y/no-static-element-interactions */
+								{ linkUIToShow === 'previewing' && (
+									// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
+									/* eslint-disable jsx-a11y/no-static-element-interactions */
 									<div
 										className="editor-format-toolbar__link-modal"
 										onKeyPress={ stopKeyPropagation }
@@ -272,7 +279,7 @@ class FormatToolbar extends Component {
 										</div>
 										{ linkSettings }
 									</div>
-								/* eslint-enable jsx-a11y/no-static-element-interactions */
+									/* eslint-enable jsx-a11y/no-static-element-interactions */
 								) }
 							</Popover>
 						</PositionedAtSelection>
