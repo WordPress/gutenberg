@@ -10,7 +10,16 @@ const babel = require( '@babel/core' );
 const { options: babelDefaultConfig } = babel.loadPartialConfig( {
 	configFile: '@wordpress/babel-preset-default',
 } );
-const plugins = babelDefaultConfig.plugins;
+const plugins = map( babelDefaultConfig.plugins, ( plugin ) => {
+	if ( get( plugin, [ 'file', 'request' ] ) === '@babel/plugin-transform-runtime' ) {
+		return [ '@babel/plugin-transform-runtime', Object.assign(
+			{},
+			plugin.options,
+			{ corejs: false }
+		) ];
+	}
+	return plugin;
+} );
 if ( ! process.env.SKIP_JSX_PRAGMA_TRANSFORM ) {
 	plugins.push( [ '@wordpress/babel-plugin-import-jsx-pragma', {
 		scopeVariable: 'createElement',
