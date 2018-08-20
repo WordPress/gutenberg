@@ -66,4 +66,5 @@ function register_block_core_playlist() {
 		),
 	) );
 }
+
 add_action( 'init', 'register_block_core_playlist' );
