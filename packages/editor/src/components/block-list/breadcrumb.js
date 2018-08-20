@@ -28,6 +28,8 @@ export class BlockBreadcrumb extends Component {
 		};
 		this.onFocus = this.onFocus.bind( this );
 		this.onBlur = this.onBlur.bind( this );
+		this.onDragStart = this.onDragStart.bind( this );
+		this.onDragEnd = this.onDragEnd.bind( this );
 	}
 
 	onFocus( event ) {
@@ -47,11 +49,25 @@ export class BlockBreadcrumb extends Component {
 		} );
 	}
 
+	onDragStart( event ) {
+		const { draggableData, draggableElementId, initDragging, onDragStart } = this.props;
+		initDragging( draggableElementId, draggableData )( event );
+		onDragStart( event );
+	}
+
+	onDragEnd( event ) {
+		this.props.onDragEnd( event );
+	}
+
 	render() {
-		const { isDraggable, clientId, rootClientId, draggableData, draggableElementId, onDragStart } = this.props;
+		const { isDraggable, clientId, rootClientId } = this.props;
 
 		return (
-			<div className={ 'editor-block-list__breadcrumb' } draggable={ isDraggable } onDragStart={ onDragStart( draggableElementId, draggableData ) } >
+			<div
+				className={ 'editor-block-list__breadcrumb' }
+				draggable={ isDraggable }
+				onDragStart={ this.onDragStart }
+				onDragEnd={ this.onDragEnd } >
 				<Toolbar>
 					<div className="editor-block-list__breadcrumb-drag-handle"><Dashicon icon="editor-justify" size={ 10 } viewBox={ 14 } /></div>
 					{ rootClientId && (

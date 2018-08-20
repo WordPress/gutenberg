@@ -524,6 +524,8 @@ export class BlockListBlock extends Component {
 						draggableElementId={ blockElementId }
 						isDraggable={ ! isPartOfMultiSelection && isMovable }
 						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }
+						onDragStart={ this.onDragStart }
+						onDragEnd={ this.onDragEnd }
 					/>
 				) }
 				{ shouldShowContextualToolbar && <BlockContextualToolbar /> }
