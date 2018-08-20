@@ -2,31 +2,8 @@
 	position: relative;
 	padding: 50px 0;
 
-	&,
-	& p {
-		font-family: $editor-font;
-		font-size: $editor-font-size;
-		line-height: $editor-line-height;
-	}
 
-	&,
-	& p {
-		color: $dark-gray-700;
-	}
 
-	& ul,
-	& ol {
-		margin: 0;
-		padding: 0;
-	}
-
-	& ul:not(.wp-block-gallery) {
-		list-style-type: disc;
-	}
-
-	& ol {
-		list-style-type: decimal;
-	}
 
 	& .components-button {
 		font-family: $default-font;
