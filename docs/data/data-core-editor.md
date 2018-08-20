@@ -1042,6 +1042,18 @@ Returns whether the post is locked.
 
 Is locked.
 
+### getLockDetails
+
+Returns details about the current post lock if available.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+Post lock details.
+
 ### getPostLockUser
 
 Returns the post lock user.
