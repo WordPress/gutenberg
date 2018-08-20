@@ -51,7 +51,7 @@ class PlaylistEdit extends Component {
 	}
 
 	onUploadFiles( files ) {
-		const { setAttributes, noticeOperations } = this.props;
+		const { setAttributes } = this.props;
 		mediaUpload( {
 			allowedType: [ 'audio', 'video' ],
 			filesList: files,
@@ -60,13 +60,13 @@ class PlaylistEdit extends Component {
 				const isConsistentType = !! firstType && every( media, ( filesMedia ) => filesMedia.mimeType === firstType );
 				// validate type is consistent for playlist
 				if ( ! isConsistentType ) {
-					noticeOperations.createErrorNotice( 'Cannot have mixed types in a Playlist Block' );
 					setAttributes( { ids: null, type: null } );
+					this.setState( { hasError: true } );
 				} else if ( media.length > 0 && media[ 0 ].mimeType && isConsistentType ) {
 					const type = media[ 0 ].mimeType.split( '/' )[ 0 ];
 					const ids = JSON.stringify( media.map( ( item ) => item.id ) );
 					setAttributes( { ids, type } );
-					this.setState( { isEditing: false } );
+					this.setState( { isEditing: false, hasError: false } );
 				}
 			},
 		} );
@@ -79,8 +79,8 @@ class PlaylistEdit extends Component {
 	}
 
 	render() {
-		const { attributes, setAttributes, className, noticeUI } = this.props;
-		const { isEditing } = this.state;
+		const { attributes, setAttributes, className, noticeUI, noticeOperations } = this.props;
+		const { isEditing, hasError } = this.state;
 		const { tracklist, showTrackNumbers, showArtists, images, style, type } = attributes;
 
 		const onSelectMedia = ( media ) => {
@@ -100,6 +100,10 @@ class PlaylistEdit extends Component {
 					icon="media-audio"
 					label={ __( 'Audio/Video Playlist' ) }
 					notices={ noticeUI }
+					{ ...hasError && (
+						this.setState( { hasError: false } ),
+						noticeOperations.createErrorNotice( 'Cannot have mixed types in a Playlist Block' )
+					) }
 					instructions={ __( 'Select audio or video files from your library, or upload a new ones.' ) }
 					className={ className }>
 					<FormFileUpload
