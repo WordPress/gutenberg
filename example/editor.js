@@ -18,8 +18,7 @@ export default class Editor extends Component {
       _aztec.applyFormat(format);
     }
 
-    onActiveFormatsChange( event ) {
-      const formats = event.nativeEvent.formats
+    onActiveFormatsChange( formats ) {      
       this.setState( { activeFormats: formats });
     }
 
