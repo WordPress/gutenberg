@@ -8,7 +8,7 @@ Note that the drag handle needs to declare the `draggable="true"` property. The 
 
 The component injects the following props into the wrapped component:
 
-### onDragStart
+### initDragging
 
 A function that initializes the drag event, setting up the transfer data and creating the drag image. It returns a function to be called on the `dragstart` DOM event.
 
@@ -23,14 +23,14 @@ A function that initializes the drag event, setting up the transfer data and cre
 ```jsx
 import { Dashicon, Panel, PanelBody, withDraggable } from '@wordpress/components';
 
-const MyDraggable = ( { onDragStart } ) => (
+const MyDraggable = ( { initDragging } ) => (
 	<div id="draggable-panel">
 		<Panel header="Draggable panel" >
 			<PanelBody>
 					<Dashicon
 						icon="move"
 						draggable="true"
-						onDragStart={ onDragStart( "draggable-panel", {} ) } />
+						onDragStart={ initDragging( "draggable-panel", {} ) } />
 			</PanelBody>
 		</Panel>
 	</div>
@@ -39,7 +39,7 @@ const MyDraggable = ( { onDragStart } ) => (
 export default withDraggable( MyDraggable );
 ```
 
-If the wrapped element would want to inject their own logic into the `dragstart` event, it should initialize the `onDragStart` prop provided by `withDraggable` in that event handler. For example:
+If the wrapped element would want to inject their own logic into the `dragstart` event, it should initialize the `initDragging` prop provided by `withDraggable` in that event handler. For example:
 
 ```jsx
 
@@ -53,7 +53,7 @@ const class MyDraggable extends Component {
 	}
 
 	myDragStart( event ){
-		this.props.onDragStart( 'draggable-panel', {} )( event );
+		this.props.initDragging( 'draggable-panel', {} )( event );
 
 		// can do whatever is necessary after the event has been set up
 	}
