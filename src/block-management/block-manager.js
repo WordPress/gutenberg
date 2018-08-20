@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Platform, Switch, Text, View, FlatList, Picker, TextInput, KeyboardAvoidingView } from 'react-native';
+import { Platform, Switch, Text, View, FlatList, TextInput, KeyboardAvoidingView } from 'react-native';
 import RecyclerViewList, { DataSource } from 'react-native-recyclerview-list';
 import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
@@ -38,7 +38,6 @@ type StateType = {
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
 	_recycler = null;
-	blockTypePickerRef = null;
 	availableBlockTypes = getBlockTypes();
 
 	constructor( props: PropsType ) {
@@ -204,27 +203,13 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			);
 		}
 
-		const blockTypePicker = (
-			<View>
-				<Picker
-					selectedValue={ this.state.selectedBlockType }
-					onValueChange={ ( itemValue ) => {
-						this.onBlockTypeSelected( itemValue );
-					} } >
-					{ this.availableBlockTypes.map( ( item, index ) => {
-						return ( <Picker.Item label={ item.title } value={ item.name } key={ index + 1 } /> );
-					} ) }
-				</Picker>
-			</View>
-		);
-
-		let blockTypePicker2 = (
+		let blockTypePicker = (
 			<View>
 				<BlockPicker 
 					visible={ this.state.blockTypePickerVisible }
 					onDismiss={ () => { this.showBlockTypePicker( false ) } }
-					onValueSelected={ ( itemValue ) => {
-						this.onBlockTypeSelected( itemValue );
+					onValueSelected={ ( itemValue, itemIndex ) => {
+						this.onBlockTypeSelected( itemValue, itemIndex );
 					} } />
 			</View>
 		);
@@ -243,8 +228,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				</View>
 				{ this.state.showHtml && this.renderHTML() }
 				{ ! this.state.showHtml && list }
-				{/* { this.state.blockTypePickerVisible && blockTypePicker2 } */}
-				{ blockTypePicker2 }
+				{ blockTypePicker }
 			</View>
 		);
 	}
