@@ -234,7 +234,7 @@ function gutenberg_collect_meta_box_data() {
 					&& isset( $box['args']['__block_editor_compatible_meta_box'] )
 					&& ! $box['args']['__block_editor_compatible_meta_box'] ) {
 						$incompatible_meta_box = true;
-						?>
+					?>
 						<script type="text/javascript">
 							var joiner = '?';
 							if ( window.location.search ) {
@@ -458,23 +458,26 @@ add_filter( 'display_post_states', 'gutenberg_add_gutenberg_post_state', 10, 2 )
  * @since 0.10.0
  */
 function gutenberg_register_post_types() {
-	register_post_type( 'wp_block', array(
-		'labels'                => array(
-			'name'          => 'Blocks',
-			'singular_name' => 'Block',
-		),
-		'public'                => false,
-		'rewrite'               => false,
-		'show_in_rest'          => true,
-		'rest_base'             => 'blocks',
-		'rest_controller_class' => 'WP_REST_Blocks_Controller',
-		'capability_type'       => 'block',
-		'capabilities'          => array(
-			'read'         => 'read_blocks',
-			'create_posts' => 'create_blocks',
-		),
-		'map_meta_cap'          => true,
-	) );
+	register_post_type(
+		'wp_block',
+		array(
+			'labels'                => array(
+				'name'          => 'Blocks',
+				'singular_name' => 'Block',
+			),
+			'public'                => false,
+			'rewrite'               => false,
+			'show_in_rest'          => true,
+			'rest_base'             => 'blocks',
+			'rest_controller_class' => 'WP_REST_Blocks_Controller',
+			'capability_type'       => 'block',
+			'capabilities'          => array(
+				'read'         => 'read_blocks',
+				'create_posts' => 'create_blocks',
+			),
+			'map_meta_cap'          => true,
+		)
+	);
 
 	$editor_caps = array(
 		'edit_blocks',

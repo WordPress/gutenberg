@@ -99,10 +99,16 @@ function get_dynamic_blocks_regex() {
 	$dynamic_block_names   = get_dynamic_block_names();
 	$dynamic_block_pattern = (
 		'/<!--\s+wp:(' .
-		str_replace( '/', '\/',                 // Escape namespace, not handled by preg_quote.
-			str_replace( 'core/', '(?:core/)?', // Allow implicit core namespace, but don't capture.
-				implode( '|',                   // Join block names into capture group alternation.
-					array_map( 'preg_quote',    // Escape block name for regular expression.
+		str_replace(
+			'/',
+			'\/',                 // Escape namespace, not handled by preg_quote.
+			str_replace(
+				'core/',
+				'(?:core/)?', // Allow implicit core namespace, but don't capture.
+				implode(
+					'|',                   // Join block names into capture group alternation.
+					array_map(
+						'preg_quote',    // Escape block name for regular expression.
 						$dynamic_block_names
 					)
 				)

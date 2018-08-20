@@ -38,19 +38,25 @@ class Block_Type_Test extends WP_UnitTestCase {
 	 * Set up before class.
 	 */
 	public static function wpSetUpBeforeClass() {
-		self::$editor_user_id = self::factory()->user->create( array(
-			'role' => 'editor',
-		) );
+		self::$editor_user_id = self::factory()->user->create(
+			array(
+				'role' => 'editor',
+			)
+		);
 
-		self::$post_with_blocks = self::factory()->post->create( array(
-			'post_title'   => 'Example',
-			'post_content' => "<!-- wp:core/text {\"dropCap\":true} -->\n<p class=\"has-drop-cap\">Tester</p>\n<!-- /wp:core/text -->",
-		) );
+		self::$post_with_blocks = self::factory()->post->create(
+			array(
+				'post_title'   => 'Example',
+				'post_content' => "<!-- wp:core/text {\"dropCap\":true} -->\n<p class=\"has-drop-cap\">Tester</p>\n<!-- /wp:core/text -->",
+			)
+		);
 
-		self::$post_without_blocks = self::factory()->post->create( array(
-			'post_title'   => 'Example',
-			'post_content' => 'Tester',
-		) );
+		self::$post_without_blocks = self::factory()->post->create(
+			array(
+				'post_title'   => 'Example',
+				'post_content' => 'Tester',
+			)
+		);
 	}
 
 	function test_set_props() {
@@ -73,9 +79,12 @@ class Block_Type_Test extends WP_UnitTestCase {
 			'bar' => 'foo',
 		);
 
-		$block_type = new WP_Block_Type( 'core/dummy', array(
-			'render_callback' => array( $this, 'render_dummy_block' ),
-		) );
+		$block_type = new WP_Block_Type(
+			'core/dummy',
+			array(
+				'render_callback' => array( $this, 'render_dummy_block' ),
+			)
+		);
 		$output     = $block_type->render( $attributes );
 		$this->assertEquals( $attributes, json_decode( $output, true ) );
 	}
@@ -90,9 +99,12 @@ class Block_Type_Test extends WP_UnitTestCase {
 
 		$expected = array_merge( $attributes, array( '_content' => $content ) );
 
-		$block_type = new WP_Block_Type( 'core/dummy', array(
-			'render_callback' => array( $this, 'render_dummy_block_with_content' ),
-		) );
+		$block_type = new WP_Block_Type(
+			'core/dummy',
+			array(
+				'render_callback' => array( $this, 'render_dummy_block_with_content' ),
+			)
+		);
 		$output     = $block_type->render( $attributes, $content );
 		$this->assertEquals( $expected, json_decode( $output, true ) );
 	}
@@ -111,9 +123,12 @@ class Block_Type_Test extends WP_UnitTestCase {
 	}
 
 	function test_is_dynamic_for_dynamic_block() {
-		$block_type = new WP_Block_Type( 'core/dummy', array(
-			'render_callback' => array( $this, 'render_dummy_block' ),
-		) );
+		$block_type = new WP_Block_Type(
+			'core/dummy',
+			array(
+				'render_callback' => array( $this, 'render_dummy_block' ),
+			)
+		);
 
 		$this->assertTrue( $block_type->is_dynamic() );
 	}
@@ -127,33 +142,39 @@ class Block_Type_Test extends WP_UnitTestCase {
 			'undefined'          => 'omit',
 		);
 
-		$block_type = new WP_Block_Type( 'core/dummy', array(
-			'attributes' => array(
-				'correct'            => array(
-					'type' => 'string',
+		$block_type = new WP_Block_Type(
+			'core/dummy',
+			array(
+				'attributes' => array(
+					'correct'            => array(
+						'type' => 'string',
+					),
+					'wrongType'          => array(
+						'type' => 'string',
+					),
+					'wrongTypeDefaulted' => array(
+						'type'    => 'string',
+						'default' => 'defaulted',
+					),
+					'missingDefaulted'   => array(
+						'type'    => 'string',
+						'default' => 'define',
+					),
 				),
-				'wrongType'          => array(
-					'type' => 'string',
-				),
-				'wrongTypeDefaulted' => array(
-					'type'    => 'string',
-					'default' => 'defaulted',
-				),
-				'missingDefaulted'   => array(
-					'type'    => 'string',
-					'default' => 'define',
-				),
-			),
-		) );
+			)
+		);
 
 		$prepared_attributes = $block_type->prepare_attributes_for_render( $attributes );
 
-		$this->assertEquals( array(
-			'correct'            => 'include',
-			'wrongType'          => null,
-			'wrongTypeDefaulted' => 'defaulted',
-			'missingDefaulted'   => 'define',
-		), $prepared_attributes );
+		$this->assertEquals(
+			array(
+				'correct'            => 'include',
+				'wrongType'          => null,
+				'wrongTypeDefaulted' => 'defaulted',
+				'missingDefaulted'   => 'define',
+			),
+			$prepared_attributes
+		);
 	}
 
 	function test_has_block_with_mixed_content() {

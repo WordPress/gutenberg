@@ -75,7 +75,8 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 			'after';
 
 		$updated_post_content = do_blocks( $post_content );
-		$this->assertEquals( $updated_post_content,
+		$this->assertEquals(
+			$updated_post_content,
 			'before' .
 			'1:b1' .
 			'2:b1' .
