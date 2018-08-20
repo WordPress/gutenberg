@@ -4,7 +4,23 @@
 
 ## Modifying Blocks
 
-To modify the behavior of existing blocks, Gutenberg exposes the following Filters:
+To modify the behavior of existing blocks, Gutenberg exposes several APIs:
+
+### Block Style Variations
+
+Block Style Variations allow providing alternative styles to existing blocks. They work by adding a className to the block's wrapper. This className can be used to provide an alternative styling for the block if the style variation is selected.
+
+_Example:_
+
+```js
+wp.blocks.registerBlockStyle( 'core/quote', 'fancy-quote' );
+```
+
+The example above registers a block style variation called `fancy-quote` to the `core/quote` block. When the user selects this block style variation from the styles selector, a `is-style-fancy-quote` className will be added to the block's wrapper.
+
+### Filters
+
+Extensing blocks can involve more than just providing alternative styles, in this case, you can use one of the following filters to extend the block settings.
 
 #### `blocks.registerBlockType`
 
