@@ -1400,19 +1400,19 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		$max_upload_size = 0;
 	}
 
-	// Editor Styles
+	// Editor Styles.
 	global $editor_styles;
 	$styles = array();
 	if ( $editor_styles ) {
 		foreach ( $editor_styles as $style ) {
-			if (filter_var($style, FILTER_VALIDATE_URL)) {
+			if ( filter_var( $style, FILTER_VALIDATE_URL ) ) {
 				$styles[] = array(
-					'css' => file_get_contents( $style )
+					'css' => file_get_contents( $style ),
 				);
 			} else {
-				$file = get_theme_file_path( $style );
+				$file     = get_theme_file_path( $style );
 				$styles[] = array(
-					'css' => file_get_contents( get_theme_file_path( $style ) ),
+					'css'     => file_get_contents( get_theme_file_path( $style ) ),
 					'baseURL' => get_theme_file_uri( $style ),
 				);
 			}
@@ -1431,7 +1431,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'autosaveInterval'    => 10,
 		'maxUploadFileSize'   => $max_upload_size,
 		'allowedMimeTypes'    => get_allowed_mime_types(),
-		'styles'              => $styles
+		'styles'              => $styles,
 	);
 
 	$post_autosave = get_autosave_newer_than_post_save( $post );
