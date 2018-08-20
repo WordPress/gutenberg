@@ -39,6 +39,33 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Dummy block rendering function, creating a new WP_Query instance.
+	 *
+	 * @return string Block output.
+	 */
+	function render_dummy_block_wp_query() {
+		$content = '';
+		$recent  = new WP_Query( array(
+			'numberposts'      => 10,
+			'orderby'          => 'ID',
+			'order'            => 'DESC',
+			'post_type'        => 'post',
+			'post_status'      => 'draft, publish, future, pending, private',
+			'suppress_filters' => true,
+		) );
+
+		while ( $recent->have_posts() ) {
+			$recent->the_post();
+
+			$content .= get_the_title();
+		}
+
+		wp_reset_postdata();
+
+		return $content;
+	}
+
+	/**
 	 * Tear down.
 	 */
 	function tearDown() {
@@ -85,6 +112,27 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 			'4:b2' .
 			'after'
 		);
+	}
+
+	/**
+	 * Tests that do_blocks() maintains the global $post variable when dynamic
+	 * blocks create new WP_Query instances in their callbacks.
+	 *
+	 * @covers ::do_blocks
+	 */
+	function test_global_post_persistence() {
+		global $post;
+
+		register_block_type( 'core/dummy', array(
+			'render_callback' => array( $this, 'render_dummy_block_wp_query' ),
+		) );
+
+		$posts = self::factory()->post->create_many( 5 );
+		$global_post = $post = get_post( end( $posts ) );
+
+		do_blocks( '<!-- wp:core/dummy /-->' );
+
+		$this->assertEquals( $global_post, $post );
 	}
 
 	/**

@@ -151,11 +151,14 @@ function gutenberg_render_block( $block ) {
  * Parses dynamic blocks out of `post_content` and re-renders them.
  *
  * @since 0.1.0
+ * @global WP_Post $post The post to edit.
  *
  * @param  string $content Post content.
  * @return string          Updated post content.
  */
 function do_blocks( $content ) {
+	global $post;
+
 	$rendered_content      = '';
 	$dynamic_block_pattern = get_dynamic_blocks_regex();
 
@@ -213,8 +216,15 @@ function do_blocks( $content ) {
 			$content       = substr( $content, $end_offset + strlen( $end_tag ) );
 		}
 
+		/*
+		 * Back up global post, to restore after render callback.
+		 * Allows callbacks to run new WP_Query instances without breaking the global post.
+		 */
+		$global_post = $post;
+
 		// Replace dynamic block with server-rendered output.
 		$rendered_content .= $block_type->render( $attributes, $inner_content );
+		$post = $global_post;
 	}
 
 	// Append remaining unmatched content.
