@@ -13,9 +13,6 @@ import { RichText } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
-import './editor.scss';
-import './style.scss';
-import './theme.scss';
 import edit from './edit';
 
 const tableContentPasteSchema = {

@@ -18,6 +18,9 @@ import {
 	DropdownMenu,
 } from '@wordpress/components';
 
+/**
+ * Internal dependencies
+ */
 import {
 	createTable,
 	updateCellContent,
@@ -27,6 +30,9 @@ import {
 	deleteColumn,
 } from './state';
 
+/**
+ * Browser dependencies
+ */
 const { parseInt } = window;
 
 export default class TableEdit extends Component {
@@ -35,16 +41,19 @@ export default class TableEdit extends Component {
 
 		this.onCreateTable = this.onCreateTable.bind( this );
 		this.onChangeFixedLayout = this.onChangeFixedLayout.bind( this );
-		this.createOnChange = this.createOnChange.bind( this );
+		this.onChange = this.onChange.bind( this );
 		this.onChangeInitialColumnCount = this.onChangeInitialColumnCount.bind( this );
 		this.onChangeInitialRowCount = this.onChangeInitialRowCount.bind( this );
 		this.renderSection = this.renderSection.bind( this );
 		this.getTableControls = this.getTableControls.bind( this );
-		this.createOnDeleteRow = this.createOnDeleteRow.bind( this );
-		this.createOnDeleteColumn = this.createOnDeleteColumn.bind( this );
-		this.createOnInsertRow = this.createOnInsertRow.bind( this );
-		this.createOnInsertColumn = this.createOnInsertColumn.bind( this );
-		this.createOnFocus = this.createOnFocus.bind( this );
+		this.onInsertRow = this.onInsertRow.bind( this );
+		this.onInsertRowBefore = this.onInsertRowBefore.bind( this );
+		this.onInsertRowAfter = this.onInsertRowAfter.bind( this );
+		this.onDeleteRow = this.onDeleteRow.bind( this );
+		this.onInsertColumn = this.onInsertColumn.bind( this );
+		this.onInsertColumnBefore = this.onInsertColumnBefore.bind( this );
+		this.onInsertColumnAfter = this.onInsertColumnAfter.bind( this );
+		this.onDeleteColumn = this.onDeleteColumn.bind( this );
 
 		this.state = {
 			initialRowCount: 2,
@@ -81,50 +90,100 @@ export default class TableEdit extends Component {
 		setAttributes( { hasFixedLayout: ! hasFixedLayout } );
 	}
 
-	createOnChange( { section, rowIndex, columnIndex } ) {
-		return ( content ) => {
-			const { attributes, setAttributes } = this.props;
-			setAttributes( updateCellContent( attributes, {
-				section,
-				rowIndex,
-				columnIndex,
-				content,
-			} ) );
-		};
+	onChange( content ) {
+		const { selectedCell } = this.state;
+
+		if ( ! selectedCell ) {
+			return;
+		}
+
+		const { attributes, setAttributes } = this.props;
+		const { section, rowIndex, columnIndex } = selectedCell;
+
+		setAttributes( updateCellContent( attributes, {
+			section,
+			rowIndex,
+			columnIndex,
+			content,
+		} ) );
 	}
 
-	createOnInsertRow( { section, rowIndex }, delta ) {
-		return () => {
-			const { attributes, setAttributes } = this.props;
-			rowIndex += delta;
-			setAttributes( insertRow( attributes, { section, rowIndex } ) );
-			this.setState( { selectedCell: null } );
-		};
+	onInsertRow( delta ) {
+		const { selectedCell } = this.state;
+
+		if ( ! selectedCell ) {
+			return;
+		}
+
+		const { attributes, setAttributes } = this.props;
+		const { section, rowIndex } = selectedCell;
+
+		this.setState( { selectedCell: null } );
+		setAttributes( insertRow( attributes, {
+			section,
+			rowIndex: rowIndex + delta,
+		} ) );
 	}
 
-	createOnDeleteRow( { section, rowIndex } ) {
-		return () => {
-			const { attributes, setAttributes } = this.props;
-			setAttributes( deleteRow( attributes, { section, rowIndex } ) );
-			this.setState( { selectedCell: null } );
-		};
+	onInsertRowBefore() {
+		this.onInsertRow( 0 );
 	}
 
-	createOnInsertColumn( { section, columnIndex }, delta ) {
-		return () => {
-			const { attributes, setAttributes } = this.props;
-			columnIndex += delta;
-			setAttributes( insertColumn( attributes, { section, columnIndex } ) );
-			this.setState( { selectedCell: null } );
-		};
+	onInsertRowAfter() {
+		this.onInsertRow( 1 );
 	}
 
-	createOnDeleteColumn( { section, columnIndex } ) {
-		return () => {
-			const { attributes, setAttributes } = this.props;
-			setAttributes( deleteColumn( attributes, { section, columnIndex } ) );
-			this.setState( { selectedCell: null } );
-		};
+	onDeleteRow() {
+		const { selectedCell } = this.state;
+
+		if ( ! selectedCell ) {
+			return;
+		}
+
+		const { attributes, setAttributes } = this.props;
+		const { section, rowIndex } = selectedCell;
+
+		this.setState( { selectedCell: null } );
+		setAttributes( deleteRow( attributes, { section, rowIndex } ) );
+	}
+
+	onInsertColumn( delta = 0 ) {
+		const { selectedCell } = this.state;
+
+		if ( ! selectedCell ) {
+			return;
+		}
+
+		const { attributes, setAttributes } = this.props;
+		const { section, columnIndex } = selectedCell;
+
+		this.setState( { selectedCell: null } );
+		setAttributes( insertColumn( attributes, {
+			section,
+			columnIndex: columnIndex + delta,
+		} ) );
+	}
+
+	onInsertColumnBefore() {
+		this.onInsertColumn( 0 );
+	}
+
+	onInsertColumnAfter() {
+		this.onInsertColumn( 1 );
+	}
+
+	onDeleteColumn() {
+		const { selectedCell } = this.state;
+
+		if ( ! selectedCell ) {
+			return;
+		}
+
+		const { attributes, setAttributes } = this.props;
+		const { section, columnIndex } = selectedCell;
+
+		this.setState( { selectedCell: null } );
+		setAttributes( deleteColumn( attributes, { section, columnIndex } ) );
 	}
 
 	createOnFocus( selectedCell ) {
@@ -141,37 +200,37 @@ export default class TableEdit extends Component {
 				icon: 'table-row-before',
 				title: __( 'Add Row Before' ),
 				isDisabled: ! selectedCell,
-				onClick: selectedCell && this.createOnInsertRow( selectedCell ),
+				onClick: this.onInsertRowBefore,
 			},
 			{
 				icon: 'table-row-after',
 				title: __( 'Add Row After' ),
 				isDisabled: ! selectedCell,
-				onClick: selectedCell && this.createOnInsertRow( selectedCell, 1 ),
+				onClick: this.onInsertRowAfter,
 			},
 			{
 				icon: 'table-row-delete',
 				title: __( 'Delete Row' ),
 				isDisabled: ! selectedCell,
-				onClick: selectedCell && this.createOnDeleteRow( selectedCell ),
+				onClick: this.onDeleteRow,
 			},
 			{
 				icon: 'table-col-before',
 				title: __( 'Add Column Before' ),
 				isDisabled: ! selectedCell,
-				onClick: selectedCell && this.createOnInsertColumn( selectedCell ),
+				onClick: this.onInsertColumnBefore,
 			},
 			{
 				icon: 'table-col-after',
 				title: __( 'Add Column After' ),
 				isDisabled: ! selectedCell,
-				onClick: selectedCell && this.createOnInsertColumn( selectedCell, 1 ),
+				onClick: this.onInsertColumnAfter,
 			},
 			{
 				icon: 'table-col-delete',
 				title: __( 'Delete Column' ),
 				isDisabled: ! selectedCell,
-				onClick: selectedCell && this.createOnDeleteColumn( selectedCell ),
+				onClick: this.onDeleteColumn,
 			},
 		];
 	}
@@ -209,7 +268,7 @@ export default class TableEdit extends Component {
 								<CellTag key={ columnIndex } className={ classes }>
 									<RichText
 										value={ content }
-										onChange={ this.createOnChange( cell ) }
+										onChange={ this.onChange }
 										unstableOnFocus={ this.createOnFocus( cell ) }
 									/>
 								</CellTag>
