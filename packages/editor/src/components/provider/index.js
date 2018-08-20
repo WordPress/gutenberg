@@ -40,7 +40,7 @@ class EditorProvider extends Component {
 				transforms.push( urlReplace( { baseURL } ) );
 			}
 			postcss( transforms )
-				.process( css )
+				.process( css, { from: 'src/app.css', to: 'dest/app.css' } )
 				.then( ( output ) => {
 					const node = document.createElement( 'style' );
 					node.innerHTML = output;
