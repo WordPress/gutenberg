@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { forEach } from 'lodash';
+import { every } from 'lodash';
 
 /**
  * Internal dependencies
@@ -18,9 +18,7 @@ describe( 'isURL', () => {
 			'https://localhost/foo#bar',
 		];
 
-		forEach( urls, ( url ) => {
-			expect( isURL( url ) ).toBe( true );
-		} );
+		expect( every( urls, isURL ) ).toBe( true );
 	} );
 
 	it( 'returns false when given things that don\'t look like a URL', () => {
@@ -32,9 +30,7 @@ describe( 'isURL', () => {
 			'',
 		];
 
-		forEach( urls, ( url ) => {
-			expect( isURL( url ) ).toBe( false );
-		} );
+		expect( every( urls, isURL ) ).toBe( false );
 	} );
 } );
 
