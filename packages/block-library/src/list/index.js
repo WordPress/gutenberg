@@ -19,6 +19,11 @@ import {
 	RichText,
 } from '@wordpress/editor';
 
+/**
+ * Internal dependencies
+ */
+import splitOnLineBreak from './split-on-line-break';
+
 const listContentSchema = {
 	...getPhrasingContentSchema(),
 	ul: {},
@@ -73,8 +78,15 @@ export const settings = {
 				isMultiBlock: true,
 				blocks: [ 'core/paragraph' ],
 				transform: ( blockAttributes ) => {
-					const items = blockAttributes.map( ( { content } ) => content );
+					let items = blockAttributes.map( ( { content } ) => content );
 					const hasItems = ! items.every( isEmpty );
+
+					// Look for line breaks if converting a single paragraph,
+					// then treat each line as a list item.
+					if ( hasItems && items.length === 1 ) {
+						items = splitOnLineBreak( items[ 0 ] );
+					}
+
 					return createBlock( 'core/list', {
 						values: hasItems ? items.map( ( content, index ) => <li key={ index }>{ content }</li> ) : [],
 					} );
