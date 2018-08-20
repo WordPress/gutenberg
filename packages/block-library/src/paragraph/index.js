@@ -74,7 +74,7 @@ export const settings = {
 
 	description: __( 'Add some basic text.' ),
 
-	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0,0h24v24H0V0z" fill="none" /><polygon points="21 11.01 3 11 3 13 21 13" /><rect x="3" y="16" width="12" height="2" /><polygon points="21 6 3 6 3 8.01 21 8" /></svg>,
+	icon: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 5v7H9.5C7.6 12 6 10.4 6 8.5S7.6 5 9.5 5H11m8-2H9.5C6.5 3 4 5.5 4 8.5S6.5 14 9.5 14H11v7h2V5h2v16h2V5h2V3z" fill="#12181e" /></svg>,
 
 	category: 'common',
 
