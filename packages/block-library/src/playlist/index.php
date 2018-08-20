@@ -18,7 +18,8 @@ function render_block_core_playlist( $attributes ) {
 	$attributes['tracknumbers'] = $attributes['showTrackNumbers'];
 
 	$classes = empty( $attributes['align'] ) ? 'wp-block-playlist' : 'wp-block-playlist align' . $attributes['align'];
-	$html    = sprintf( '<figure class="%s">%s</figure>',
+	$html    = sprintf(
+		'<figure class="%s">%s</figure>',
 		esc_attr( $classes ),
 		wp_playlist_shortcode( $attributes )
 	);
@@ -30,41 +31,43 @@ function render_block_core_playlist( $attributes ) {
  * Registers the `core/playlist` block on server.
  */
 function register_block_core_playlist() {
-	register_block_type( 'core/playlist', array(
-		'render_callback' => 'render_block_core_playlist',
-		'attributes'      => array(
-			'ids'              => array(
-				'type' => 'string',
+	register_block_type(
+		'core/playlist', array(
+			'render_callback' => 'render_block_core_playlist',
+			'attributes'      => array(
+				'ids'              => array(
+					'type' => 'string',
+				),
+				'type'             => array(
+					'type'    => 'string',
+					'default' => 'audio',
+				),
+				'tracklist'        => array(
+					'type'    => 'boolean',
+					'default' => true,
+				),
+				'showArtists'      => array(
+					'type'    => 'boolean',
+					'default' => true,
+				),
+				'showTrackNumbers' => array(
+					'type'    => 'boolean',
+					'default' => true,
+				),
+				'images'           => array(
+					'type'    => 'boolean',
+					'default' => true,
+				),
+				'style'            => array(
+					'type'    => 'string',
+					'default' => 'light',
+				),
+				'align'            => array(
+					'type' => 'string',
+				),
 			),
-			'type'             => array(
-				'type'    => 'string',
-				'default' => 'audio',
-			),
-			'tracklist'        => array(
-				'type'    => 'boolean',
-				'default' => true,
-			),
-			'showArtists'      => array(
-				'type'    => 'boolean',
-				'default' => true,
-			),
-			'showTrackNumbers' => array(
-				'type'    => 'boolean',
-				'default' => true,
-			),
-			'images'           => array(
-				'type'    => 'boolean',
-				'default' => true,
-			),
-			'style'            => array(
-				'type'    => 'string',
-				'default' => 'light',
-			),
-			'align'            => array(
-				'type' => 'string',
-			),
-		),
-	) );
+		)
+	);
 }
 
 add_action( 'init', 'register_block_core_playlist' );
