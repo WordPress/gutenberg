@@ -159,7 +159,7 @@ When creating a new package you need to provide at least the following:
 	- Usage example.
 	- `Code is Poetry` logo.
 	
-### Managing packages
+### Maintaining changelogs
 
 It isn't easy task to maintain dozens of npm packages. That's why we decided to introduce `CHANGELOG.md` files for all packages to simplify the release process.
 
