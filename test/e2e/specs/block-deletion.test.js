@@ -7,7 +7,7 @@ import {
 	getEditedPostContent,
 	newPost,
 	pressWithModifier,
-	PRIMARY_ALT_MODIFIER_KEYS,
+	META_KEY,
 } from '../support/utils';
 
 const addThreeParagraphsToNewPost = async () => {
@@ -40,7 +40,7 @@ describe( 'block deletion -', () => {
 		beforeAll( addThreeParagraphsToNewPost );
 
 		it( 'results in two remaining blocks', async () => {
-			await pressWithModifier( PRIMARY_ALT_MODIFIER_KEYS, 'Backspace' );
+			await pressWithModifier( [ 'Alt', META_KEY ], 'Backspace' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
 

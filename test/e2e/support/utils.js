@@ -34,24 +34,6 @@ export const META_KEY = process.platform === 'darwin' ? 'Meta' : 'Control';
 export const ACCESS_MODIFIER_KEYS = process.platform === 'darwin' ? [ 'Control', 'Alt' ] : [ 'Shift', 'Alt' ];
 
 /**
- * Platform-specific modifier for the primary+alt key chord.
- *
- * @see pressWithModifier
- *
- * @type {string}
- */
-export const PRIMARY_ALT_MODIFIER_KEYS = process.platform === 'darwin' ? [ 'Alt', 'Meta' ] : [ 'Control', 'Alt' ];
-
-/**
- * Platform-specific modifier for the primary+shift key chord.
- *
- * @see pressWithModifier
- *
- * @type {string}
- */
-export const PRIMARY_SHIFT_MODIFIER_KEYS = process.platform === 'darwin' ? [ 'Shift', 'Meta' ] : [ 'Control', 'Shift' ];
-
-/**
  * Regular expression matching zero-width space characters.
  *
  * @type {RegExp}
