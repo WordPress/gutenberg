@@ -4,7 +4,7 @@
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import { dispatch } from '@wordpress/data';
-import { setupHearthbeatPostLocking } from '../editor/utils/heartbeat-post-locking';
+import { setupHearthbeatPostLocking } from '@wordpress/editor';
 
 /**
  * Internal dependencies
