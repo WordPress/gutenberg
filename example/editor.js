@@ -19,7 +19,7 @@ export default class Editor extends Component {
     }
 
     onActiveFormatsChange( formats ) {      
-      this.setState( { activeFormats: formats });
+      this.setState({activeFormats: formats });
     }
 
     isFormatActive( format ) {

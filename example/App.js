@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import {AppRegistry, StyleSheet, TextInput, FlatList, KeyboardAvoidingView, SafeAreaView, Platform} from 'react-native';
 import {example_content} from './content';
 import Editor from './editor'
@@ -25,7 +25,6 @@ export default class example extends React.Component {
     }
     
     renderItem( { item } ) {
-      let myMinHeight = Math.max(_minHeight, item.height);
       const key = item.key;
       return (              
               <Editor                
