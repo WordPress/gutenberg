@@ -36,7 +36,6 @@ type StateType = {
 };
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
-	_recycler = null;
 	availableBlockTypes = getBlockTypes();
 
 	constructor( props: PropsType ) {
@@ -54,7 +53,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		this.props.focusBlockAction( clientId );
 	}
 
-	getDataSourceIndexFromUid( clientId: string ) {
+	getDataSourceIndexFromClientId( clientId: string ) {
 		for ( let i = 0; i < this.state.dataSource.size(); ++i ) {
 			const block = this.state.dataSource.get( i );
 			if ( block.clientId === clientId ) {
@@ -111,7 +110,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	onToolbarButtonPressed( button: number, clientId: string ) {
-		const dataSourceBlockIndex = this.getDataSourceIndexFromUid( clientId );
+		const dataSourceBlockIndex = this.getDataSourceIndexFromClientId( clientId );
 		switch ( button ) {
 			case ToolbarButton.UP:
 				this.state.dataSource.moveUp( dataSourceBlockIndex );
@@ -164,7 +163,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 	onChange( clientId: string, attributes: mixed ) {
 		// Update datasource UI
-		const index = this.getDataSourceIndexFromUid( clientId );
+		const index = this.getDataSourceIndexFromClientId( clientId );
 		const dataSource = this.state.dataSource;
 		const block = dataSource.get( index );
 		block.attributes = attributes;
@@ -178,7 +177,6 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		if ( Platform.OS === 'android' ) {
 			list = (
 				<RecyclerViewList
-					ref={ ( component ) => ( this._recycler = component ) }
 					style={ styles.list }
 					dataSource={ this.state.dataSource }
 					renderItem={ this.renderItem.bind( this ) }
