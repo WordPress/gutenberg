@@ -23,7 +23,7 @@ npx nvm install
 npx nvm use
 ```
 
-You should also have the latest release of <a href="https://npmjs.org">npm installed</a>, npm is a separate project from Node.js and is updated frequently. If you've just installed Node.js which includes a version of npm within the installation you most likely will need to also update your npm install. To update npm, type this into your terminal: `npm install npm@latest -g`
+You should also have the latest release of [npm installed][npm]. npm is a separate project from Node.js and is updated frequently. If you've just installed Node.js which includes a version of npm within the installation you most likely will need to also update your npm installation. To update npm, type this into your terminal: `npm install npm@latest -g`
 
 To test the plugin, or to contribute to it, you can clone this repository and build the plugin files using Node. How you do that depends on whether you're developing locally or uploading the plugin to a remote host.
 
@@ -111,7 +111,7 @@ Gutenberg contains both PHP and JavaScript code, and encourages testing and code
 
 ## Managing packages
 
-This repository uses [lerna](https://lernajs.io) to manage Gutenberg modules and publish them as packages to `npm`. 
+This repository uses [lerna] to manage Gutenberg modules and publish them as packages to [npm]. 
 
 ### Creating new package
 
@@ -197,7 +197,7 @@ If you have the ability to publish packages, you _must_ have [2FA enabled](https
 
 #### Before releasing
 
-Confirm that you're logged into `npm`, by running `npm whoami`. If you're not logged in, run `npm adduser` to login.
+Confirm that you're logged into [npm], by running `npm whoami`. If you're not logged in, run `npm adduser` to login.
 
 If you're publishing a new package, ensure that its `package.json` file contains the correct `publishConfig` settings:
 
@@ -221,7 +221,7 @@ NPM_CONFIG_OTP=123456 npm run publish:dev
 
 Lerna will ask you which version number you want to choose for each package. For a `dev` release, you'll more likely want to choose the "prerelease" option. Repeat the same for all the outdated packages and confirm your version updates.
 
-Lerna will then publish to `npm`, commit the `package.json` changes and create the git tags.
+Lerna will then publish to [npm], commit the `package.json` changes and create the git tags.
 
 #### Production release
 
@@ -260,3 +260,6 @@ A Global Translation Editor (GTE) or Project Translation Editor (PTE) with suita
 Language packs are automatically generated once 95% of the plugin's strings are translated and approved for a locale.
 
 The eventual inclusion of Gutenberg into WordPress core means that more than 51% of WordPress installations running a translated WordPress installation will have Gutenberg's translated strings compiled into the core language pack as well.
+
+[lerna]: https://lernajs.io/
+[npm]: https://www.npmjs.com/
