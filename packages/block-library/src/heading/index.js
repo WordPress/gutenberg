@@ -60,7 +60,7 @@ export const name = 'core/heading';
 export const settings = {
 	title: __( 'Heading' ),
 
-	description: __( 'Briefly describes the following section to visitors and search engines.' ),
+	description: __( 'Help visitors (and search engines!) understand what they\'re reading with a short description.' ),
 
 	icon: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4z" /><path fill="none" d="M0 0h24v24H0V0z" /></svg>,
 
