@@ -15,7 +15,7 @@ import { last } from 'lodash';
  * @return {Array<WPBlockChildren>} Array of rich-text content
  */
 export default function splitOnLineBreak( fragments ) {
-	return fragments.reduce( ( acc, fragment, i, arr ) => {
+	return fragments.reduce( ( acc, fragment, i ) => {
 		// Skip if fragment is a line break
 		if ( fragment && fragment.type === 'br' ) {
 			return acc;
@@ -23,7 +23,7 @@ export default function splitOnLineBreak( fragments ) {
 
 		// If we've just skipped a line break, append the
 		// next fragment as a new item.
-		const prevFragment = i > 0 && arr[ i - 1 ];
+		const prevFragment = i > 0 && fragments[ i - 1 ];
 		if ( prevFragment && prevFragment.type === 'br' ) {
 			return [ ...acc, [ fragment ] ];
 		}
