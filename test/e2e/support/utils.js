@@ -273,17 +273,6 @@ export async function clickOnMoreMenuItem( buttonLabel ) {
 }
 
 /**
- * Clicks on Block Settings Menu item, searches for the button with the text provided and clicks it.
- *
- * @param {string} buttonLabel The label to search the button for.
- */
-export async function clickOnBlockSettingsMenuItem( buttonLabel ) {
-	await expect( page ).toClick( '.editor-block-settings-menu__toggle' );
-	const itemButton = ( await page.$x( `//*[contains(@class, "editor-block-settings-menu__popover")]//button[contains(text(), '${ buttonLabel }')]` ) )[ 0 ];
-	await itemButton.click();
-}
-
-/**
  * Publishes the post, resolving once the request is complete (once a notice
  * is displayed).
  *

@@ -3,7 +3,6 @@
  */
 import {
 	clickBlockAppender,
-	clickOnBlockSettingsMenuItem,
 	getEditedPostContent,
 	newPost,
 	pressWithModifier,
@@ -19,6 +18,12 @@ const addThreeParagraphsToNewPost = async () => {
 	await page.keyboard.press( 'Enter' );
 	await page.keyboard.type( 'Second paragraph' );
 	await page.keyboard.press( 'Enter' );
+};
+
+const clickOnBlockSettingsMenuItem = async ( buttonLabel ) => {
+	await expect( page ).toClick( '.editor-block-settings-menu__toggle' );
+	const itemButton = ( await page.$x( `//*[contains(@class, "editor-block-settings-menu__popover")]//button[contains(text(), '${ buttonLabel }')]` ) )[ 0 ];
+	await itemButton.click();
 };
 
 describe( 'block deletion -', () => {
