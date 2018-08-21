@@ -204,7 +204,7 @@ export const settings = {
 					/>
 					{ ( ( citation && citation.length > 0 ) || isSelected ) && (
 						<RichText
-							tagName="cite"
+							tagName="footer"
 							value={ citation }
 							onChange={
 								( nextCitation ) => setAttributes( {
