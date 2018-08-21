@@ -115,19 +115,6 @@
 	}
 }
 
-// This is a focus style shown for blocks that need an indicator even when in an isEditing state
-// like for example an image block that receives arrowkey focus.
-.edit-post-visual-editor .editor-block-list__block:not(.is-selected) {
-	.editor-block-list__block-edit {
-		box-shadow: 0 0 0 0 $white, 0 0 0 0 $dark-gray-900;
-		transition: 0.1s box-shadow 0.05s;
-	}
-
-	&:focus .editor-block-list__block-edit {
-		box-shadow: 0 0 0 1px $white, 0 0 0 3px $dark-gray-900;
-	}
-}
-
 .edit-post-visual-editor .editor-default-block-appender {
 	// Default to centered and content-width, like blocks
 	max-width: $content-width;
