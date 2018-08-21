@@ -295,8 +295,8 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 				const { url } = ownProps.attributes;
 				const core = select( 'core' );
 				const { getEmbedPreview, isPreviewEmbedFallback, isRequestingEmbedPreview } = core;
-				const preview = getEmbedPreview( url );
-				const previewIsFallback = isPreviewEmbedFallback( url );
+				const preview = url && getEmbedPreview( url );
+				const previewIsFallback = url && isPreviewEmbedFallback( url );
 				const fetching = undefined !== url && isRequestingEmbedPreview( url );
 				return {
 					preview,
