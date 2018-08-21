@@ -147,25 +147,26 @@ When creating a new package you need to provide at least the following:
 		}
 	}
 	```
-	It assumes that code is goind to be located in `src` folder and will be transpiled with `Babel`.
+	This assumes that your code is located in the `src` folder and will be transpiled with `Babel`.
 2. `.npmrc` file which disables creating `package-lock.json` file for the package:
 	```
 	package-lock=false
 	```
 3. `README.md` file containing at least:
-	- Package name.
-	- Package description.
-	- Installation details.
-	- Usage example.
-	- `Code is Poetry` logo.
+	- Package name
+	- Package description
+	- Installation details
+	- Usage example
+	- `Code is Poetry` logo (`<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>`)
 	
 ### Maintaining changelogs
 
-It isn't easy task to maintain dozens of npm packages. That's why we decided to introduce `CHANGELOG.md` files for all packages to simplify the release process.
+Maintaining dozens of npm packages is difficult–it can be tough to keep track of changes. That's why we use `CHANGELOG.md` files for each package to simplify the release process. All packages should follow the [Semantic Versioning (`semver`) specification](https://semver.org/).
 
-The developer who proposes a change (pull request) is responsible to choose the correct version increment (`major`, `minor` or `patch`) according to the following guidelines:
-- Major version X (X.y.z | X > 0) should be bumped on any backwards-incompatible change. This will usually occur at the final stage of deprecating and the removal of a feature. The deprecation should be fully backwards-compatible and, if it is not, it should warrant a separate major version bump.
-- Minor version Y (x.Y.z | x > 0) update should be selected when you add functionality in a backwards-compatible manner. It must be incremented if any public API functionality is marked as deprecated.
+The developer who proposes a change (pull request) is responsible to choose the correct version increment (`major`, `minor`, or `patch`) according to the following guidelines:
+
+- Major version X (X.y.z | X > 0) should be changed with any backwards-incompatible/"breaking" change. This will usually occur at the final stage of deprecating and removing of a feature.
+- Minor version Y (x.Y.z | x > 0) should be changed when you add functionality or change functionality in a backwards-compatible manner. It must be incremented if any public API functionality is marked as deprecated.
 - Patch version Z (x.y.Z | x > 0) should be incremented when you make backwards-compatible bug fixes.
 
 When in doubt, refer to [Semantic Versioning specification](https://semver.org/).
@@ -175,15 +176,15 @@ _Example:_
 ```md
 ## v1.2.2 (Unreleased)
 
-#### Bug Fix
+### Bug Fix
 
 - ...
 - ...
 ```
 
-- If you need to add something considered a bug fix, you add the item to `Bug Fix`section and leave the version as 1.2.2.
+- If you need to add something considered a bug fix, you add the item to `Bug Fix` section and leave the version as 1.2.2.
 - If it's a new feature you add the item to `New Feature` section and change version to 1.3.0.
-- If it's a breaking change you want to introduce, you add the item to `Breaking Change` section and bump the version to 2.0.0.
+- If it's a breaking change you want to introduce, add the item to `Breaking Change` section and bump the version to 2.0.0.
 
 The version bump is only necessary if one of the following applies:
  - There are no other unreleased changes.
@@ -191,13 +192,13 @@ The version bump is only necessary if one of the following applies:
 
 ### Releasing packages
 
-Lerna automatically releases all the outdated packages. To check which packages are outdated and will be released, type `npm run publish:check`.
+Lerna automatically releases all outdated packages. To check which packages are outdated and will be released, type `npm run publish:check`.
 
-If you have the ability to publish packages, you _must_ have [2FA enabled](https://docs.npmjs.com/getting-started/using-two-factor-authentication) on your npmjs.com account.
+If you have the ability to publish packages, you _must_ have [2FA enabled](https://docs.npmjs.com/getting-started/using-two-factor-authentication) on your [npm account][npm].
 
 #### Before releasing
 
-Confirm that you're logged into [npm], by running `npm whoami`. If you're not logged in, run `npm adduser` to login.
+Confirm that you're logged in to [npm], by running `npm whoami`. If you're not logged in, run `npm adduser` to login.
 
 If you're publishing a new package, ensure that its `package.json` file contains the correct `publishConfig` settings:
 
@@ -209,11 +210,11 @@ If you're publishing a new package, ensure that its `package.json` file contains
 }
 ```
 
-You can double check it by executing `npm run lint-pkg-json` command.
+You can check your package configs by running `npm run lint-pkg-json`.
 
 #### Development release
 
-Run the following command to release a dev version of the outdated packages, replacing "123456" with your 2FA code. Make sure you're using a freshly generated 2FA code, rather than one that's about to timeout. This is a little cumbersome, but helps to prevent the release process from dying mid-deploy.
+Run the following command to release a dev version of the outdated packages, replacing `123456` with your 2FA code. Make sure you're using a freshly generated 2FA code, rather than one that's about to timeout. This is a little cumbersome, but helps to prevent the release process from dying mid-deploy.
 
 ```bash
 NPM_CONFIG_OTP=123456 npm run publish:dev
@@ -225,7 +226,7 @@ Lerna will then publish to [npm], commit the `package.json` changes and create t
 
 #### Production release
 
-To release a production version for the outdated packages, run the following command, replacing "123456" with your (freshly generated, as above) 2FA code:
+To release a production version for the outdated packages, run the following command, replacing `123456` with your (freshly generated, as above) 2FA code:
 
 ```bash
 NPM_CONFIG_OTP=123456 npm run publish:prod
