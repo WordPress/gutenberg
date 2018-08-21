@@ -384,7 +384,7 @@ export const common = [
 			title: 'Facebook',
 			icon: {
 				foreground: '#3b5998',
-				src: <svg viewBox="0 0 24 24"><path d="M20 3H4L3 4v16l1 1h9v-7h-3v-3h3V9c0-2 1-3 3-3h2v2h-1l-2 2v1h3v3h-3v7h5l1-1V4l-1-1z" /></svg>,
+				src: <svg viewBox="0 0 24 24"><path d="M20 3H4c-.6 0-1 .4-1 1v16c0 .5.4 1 1 1h8.6v-7h-2.3v-2.7h2.3v-2c0-2.3 1.4-3.6 3.5-3.6 1 0 1.8.1 2.1.1v2.4h-1.4c-1.1 0-1.3.5-1.3 1.3v1.7h2.7l-.4 2.8h-2.3v7H20c.5 0 1-.4 1-1V4c0-.6-.4-1-1-1z" /></svg>,
 			},
 		} ),
 		patterns: [ /^https?:\/\/www\.facebook.com\/.+/i ],
