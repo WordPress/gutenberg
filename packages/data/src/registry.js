@@ -8,6 +8,7 @@ import {
 	mapValues,
 	overEvery,
 	get,
+	isEmpty,
 } from 'lodash';
 
 /**
@@ -144,7 +145,15 @@ export function createRegistry( storeConfigs = {} ) {
 			enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__( { name: reducerKey, instanceId: reducerKey } ) );
 		}
 		const store = createStore( reducer, flowRight( enhancers ) );
-		namespaces[ reducerKey ] = { store, reducer };
+		namespaces[ reducerKey ] = {
+			store,
+			config: {
+				reducer,
+				selectors: {},
+				actions: {},
+				resolvers: {},
+			},
+		};
 
 		// Customize subscribe behavior to call listeners only on effective change,
 		// not on every dispatch.
@@ -163,7 +172,8 @@ export function createRegistry( storeConfigs = {} ) {
 	}
 
 	/**
-	 * Registers selectors for external usage.
+	 * Registers selectors for external usage. Subsequent calls will merge new
+	 * selectors with the existing set.
 	 *
 	 * @param {string} reducerKey   Part of the state shape to register the
 	 *                              selectors for.
@@ -172,15 +182,20 @@ export function createRegistry( storeConfigs = {} ) {
 	 *                              state as first argument.
 	 */
 	function registerSelectors( reducerKey, newSelectors ) {
-		const store = namespaces[ reducerKey ].store;
+		const { store, config } = namespaces[ reducerKey ];
+
+		// Merge to existing selectors (intially empty).
+		Object.assign( config.selectors, newSelectors );
+
 		const createStateSelector = ( selector ) => ( ...args ) => selector( store.getState(), ...args );
-		namespaces[ reducerKey ].selectors = mapValues( newSelectors, createStateSelector );
+		namespaces[ reducerKey ].selectors = mapValues( config.selectors, createStateSelector );
 	}
 
 	/**
 	 * Registers resolvers for a given reducer key. Resolvers are side effects
 	 * invoked once per argument set of a given selector call, used in ensuring
-	 * that the data needs for the selector are satisfied.
+	 * that the data needs for the selector are satisfied. Subsequent calls
+	 * will merge new resolvers with the existing set.
 	 *
 	 * @param {string} reducerKey   Part of the state shape to register the
 	 *                              resolvers for.
@@ -190,16 +205,36 @@ export function createRegistry( storeConfigs = {} ) {
 		const { hasStartedResolution } = select( 'core/data' );
 		const { startResolution, finishResolution } = dispatch( 'core/data' );
 
+		// In subsequent calls, since we've already wrapped selectors, "unwrap"
+		// them by registering the originally-configured selectors to reset
+		// their behavior to the default. It should be noted that this is not
+		// strictly necessary since `fulfill` checks that resolution has begun
+		// and thus would only run the most recently-registered resolver, but
+		// this is a very fragile guarantee, andwould leave a lingering useless
+		// composed resolver function wrapping the original selector.
+		//
+		// TODO: It could be considered to refactor this as a proper select
+		// flow via function composition or result filtering. Any refactor
+		// should be conscious of performance implication of frequent select
+		// calls.
+		const { config } = namespaces[ reducerKey ];
+		if ( ! isEmpty( config.resolvers[ reducerKey ] ) ) {
+			registerSelectors( reducerKey, config.selectors );
+		}
+
+		// Merge to existing resolvers (intially empty).
+		Object.assign( config.resolvers, newResolvers );
+
 		const createResolver = ( selector, selectorName ) => {
 		// Don't modify selector behavior if no resolver exists.
-			if ( ! newResolvers.hasOwnProperty( selectorName ) ) {
+			if ( ! config.resolvers.hasOwnProperty( selectorName ) ) {
 				return selector;
 			}
 
 			const store = namespaces[ reducerKey ].store;
 
 			// Normalize resolver shape to object.
-			let resolver = newResolvers[ selectorName ];
+			let resolver = config.resolvers[ selectorName ];
 			if ( ! resolver.fulfill ) {
 				resolver = { fulfill: resolver };
 			}
@@ -263,9 +298,13 @@ export function createRegistry( storeConfigs = {} ) {
 	 * @param {Object} newActions   Actions to register.
 	 */
 	function registerActions( reducerKey, newActions ) {
-		const store = namespaces[ reducerKey ].store;
+		const { store, config } = namespaces[ reducerKey ];
+
+		// Merge to existing actions (intially empty).
+		Object.assign( config.actions, newActions );
+
 		const createBoundAction = ( action ) => ( ...args ) => store.dispatch( action( ...args ) );
-		namespaces[ reducerKey ].actions = mapValues( newActions, createBoundAction );
+		namespaces[ reducerKey ].actions = mapValues( config.actions, createBoundAction );
 	}
 
 	/**

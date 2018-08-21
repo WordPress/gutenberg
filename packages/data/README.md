@@ -284,6 +284,75 @@ const SaleButton = withDispatch( ( dispatch, ownProps ) => {
 //  <SaleButton>Start Sale!</SaleButton>
 ```
 
+## Extensibility
+
+By design, a registry's behaviors are intended to be extensible, enabling developers to modify or replace previously-registered behaviors. For example, a developer could substitute the default resolver behavior associated with a selector to satisfy its data requirements from an alternative source: another API, a local cache, or the file system.
+
+_Example:_
+
+Consider the following store, which exposes a simple public interface allowing a developer to request the current temperature for a given city:
+
+```js
+function setTemperature( city, temperature ) {
+	return {
+		type: 'SET_TEMPERATURE',
+		city,
+		temperature,
+	};
+}
+
+registerStore( 'temperature', {
+	reducer( state = {}, action ) {
+		switch ( action.type ) {
+			case 'SET_TEMPERATURE':
+				return {
+					...state,
+					[ action.city ]: action.temperature,
+				};
+		}
+
+		return state;
+	},
+	actions: {
+		setTemperature,
+	},
+	selectors: {
+		getTemperature: ( state, city ) => state[ city ],
+	},
+	controls: {
+		FETCH( action ) {
+			return window.fetch( action.url ).then( ( response ) => response.json() );
+		},
+	},
+	resolvers: {
+		* getTemperature( state, city ) {
+			const url = 'https://samples.openweathermap.org/data/2.5/weather?q=' + city;
+			const json = yield { type: 'FETCH', url };
+			yield setTemperature( city, json.main.temp );
+		},
+	},
+} );
+```
+
+The default resolver in this case requests data from [OpenWeatherMap](https://openweathermap.org/). But this is merely an implementation detail; it could request its data from any other source while retaining the same public contract: the `getTemperature` selector.
+
+Consider we want to change this to request its data from [Yahoo Weather API](https://developer.yahoo.com/weather/). All that is required is that we call `registerResolvers` with a new resolver function:
+
+```js
+registerResolvers( 'temperature', {
+	* getTemperature( state, city ) {
+		const url = (
+			'https://query.yahooapis.com/v1/public/yql?format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&q=' +
+			encodeURIComponent( `select * from weather.forecast where woeid in (select woeid from geo.places(1) where text="${ city }")` )
+		);
+		const json = yield { type: 'FETCH', url };
+		yield setTemperature( city, json.query.results.channel.item.condition[ 0 ].temp );
+	},
+} );
+```
+
+Selectors, actions, and resolvers can be extended by calling `registerSelectors`, `registerActions`, and `registerResolvers` respectively.
+
 ## Comparison with Redux
 
 The data module shares many of the same [core principles](https://redux.js.org/introduction/three-principles) and [API method naming](https://redux.js.org/api-reference) of [Redux](https://redux.js.org/). In fact, it is implemented atop Redux. Where it differs is in establishing a modularization pattern for creating separate but interdependent stores, and in codifying conventions such as selector functions as the primary entry point for data access.

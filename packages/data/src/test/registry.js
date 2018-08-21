@@ -67,6 +67,127 @@ describe( 'createRegistry', () => {
 		} );
 	} );
 
+	describe( 'registerSelectors', () => {
+		it( 'partially applies state as the first argument to callbacks', () => {
+			registry.registerReducer( 'butcher', ( state = { ribs: 6, chicken: 4 } ) => state );
+			registry.registerSelectors( 'butcher', {
+				getPrice: ( state, meat ) => state[ meat ],
+			} );
+
+			expect( registry.select( 'butcher' ).getPrice( 'chicken' ) ).toBe( 4 );
+		} );
+
+		it( 'merges into existing set on subsequent calls', () => {
+			registry.registerReducer( 'butcher', ( state = { ribs: 6, chicken: 4 } ) => state );
+			registry.registerSelectors( 'butcher', {
+				getPrice: ( state, meat ) => state[ meat ],
+			} );
+			registry.registerSelectors( 'butcher', {
+				getMeats: ( state ) => Object.keys( state ),
+			} );
+
+			expect( registry.select( 'butcher' ) ).toMatchObject( {
+				getPrice: expect.any( Function ),
+				getMeats: expect.any( Function ),
+			} );
+			expect( registry.select( 'butcher' ).getPrice( 'chicken' ) ).toBe( 4 );
+		} );
+
+		it( 'should replace an existing selector behavior', () => {
+			registry.registerReducer( 'butcher', ( state = { ribs: 6, chicken: 4 } ) => state );
+			registry.registerSelectors( 'butcher', {
+				getPrice: ( state, meat ) => state[ meat ],
+			} );
+			registry.registerSelectors( 'butcher', {
+				getPrice: () => 0,
+			} );
+
+			expect( registry.select( 'butcher' ).getPrice( 'chicken' ) ).toBe( 0 );
+		} );
+	} );
+
+	describe( 'registerActions', () => {
+		it( 'prebinds dispatch', () => {
+			const store = registry.registerReducer( 'butcher', ( state = { ribs: 6, chicken: 4 }, action ) => {
+				switch ( action.type ) {
+					case 'sale':
+						return {
+							...state,
+							[ action.meat ]: state[ action.meat ] / 2,
+						};
+				}
+
+				return state;
+			} );
+			registry.registerActions( 'butcher', {
+				startSale: ( meat ) => ( { type: 'sale', meat } ),
+			} );
+
+			registry.dispatch( 'butcher' ).startSale( 'chicken' );
+			expect( store.getState() ).toEqual( {
+				chicken: 2,
+				ribs: 6,
+			} );
+		} );
+
+		it( 'merges into existing set on subsequent calls', () => {
+			registry.registerReducer( 'butcher', ( state = { ribs: 6, chicken: 4 }, action ) => {
+				switch ( action.type ) {
+					case 'sale':
+						return {
+							...state,
+							[ action.meat ]: state[ action.meat ] / 2,
+						};
+
+					case 'free_giveaway':
+						return mapValues( state, () => 0 );
+				}
+
+				return state;
+			} );
+			registry.registerActions( 'butcher', {
+				startSale: ( meat ) => ( { type: 'sale', meat } ),
+			} );
+			registry.registerActions( 'butcher', {
+				startFreeMeatGiveaway: () => ( { type: 'free_giveaway' } ),
+			} );
+
+			expect( registry.dispatch( 'butcher' ) ).toMatchObject( {
+				startSale: expect.any( Function ),
+				startFreeMeatGiveaway: expect.any( Function ),
+			} );
+		} );
+
+		it( 'should replace an existing selector behavior', () => {
+			const store = registry.registerReducer( 'butcher', ( state = { ribs: 6, chicken: 4 }, action ) => {
+				switch ( action.type ) {
+					case 'sale':
+						return {
+							...state,
+							[ action.meat ]: state[ action.meat ] / 2,
+						};
+
+					case 'free_giveaway':
+						return mapValues( state, () => 0 );
+				}
+
+				return state;
+			} );
+			registry.registerActions( 'butcher', {
+				startSale: ( meat ) => ( { type: 'sale', meat } ),
+			} );
+			registry.registerActions( 'butcher', {
+				startSale: () => ( { type: 'free_giveaway' } ),
+			} );
+
+			registry.dispatch( 'butcher' ).startSale();
+			expect( store.getState() ).toEqual( {
+				chicken: 0,
+				ribs: 0,
+			} );
+		} );
+	} );
+
 	describe( 'registerResolvers', () => {
 		const unsubscribes = [];
 		afterEach( () => {
@@ -353,24 +474,49 @@ describe( 'createRegistry', () => {
 
 			return promise;
 		} );
-	} );
 
-	describe( 'select', () => {
-		it( 'registers multiple selectors to the public API', () => {
-			const store = registry.registerReducer( 'reducer1', () => 'state1' );
-			const selector1 = jest.fn( () => 'result1' );
-			const selector2 = jest.fn( () => 'result2' );
+		it( 'should into existing set on subsequent calls', () => {
+			const resolver1 = jest.fn();
+			const resolver2 = jest.fn();
 
-			registry.registerSelectors( 'reducer1', {
-				selector1,
-				selector2,
+			registry.registerReducer( 'demo', ( state = 'OK' ) => state );
+			registry.registerSelectors( 'demo', {
+				getValue1: ( state ) => state,
+				getValue2: ( state ) => state,
+			} );
+			registry.registerResolvers( 'demo', {
+				getValue1: resolver1,
+			} );
+			registry.registerResolvers( 'demo', {
+				getValue2: resolver2,
 			} );
 
-			expect( registry.select( 'reducer1' ).selector1() ).toEqual( 'result1' );
-			expect( selector1 ).toBeCalledWith( store.getState() );
+			registry.select( 'demo' ).getValue1();
+			registry.select( 'demo' ).getValue2();
 
-			expect( registry.select( 'reducer1' ).selector2() ).toEqual( 'result2' );
-			expect( selector2 ).toBeCalledWith( store.getState() );
+			expect( resolver1 ).toHaveBeenCalled();
+			expect( resolver2 ).toHaveBeenCalled();
+		} );
+
+		it( 'should replace an existing resolver behavior', () => {
+			const resolver1 = jest.fn();
+			const resolver2 = jest.fn();
+
+			registry.registerReducer( 'demo', ( state = 'OK' ) => state );
+			registry.registerSelectors( 'demo', {
+				getValue: ( state ) => state,
+			} );
+			registry.registerResolvers( 'demo', {
+				getValue: resolver1,
+			} );
+			registry.registerResolvers( 'demo', {
+				getValue: resolver2,
+			} );
+
+			registry.select( 'demo' ).getValue();
+
+			expect( resolver1 ).not.toHaveBeenCalled();
+			expect( resolver2 ).toHaveBeenCalled();
 		} );
 	} );
 
