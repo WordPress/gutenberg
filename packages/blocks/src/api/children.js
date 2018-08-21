@@ -36,6 +36,14 @@ export function getSerializeCapableElement( children ) {
 	return children;
 }
 
+function getChildrenArray( children ) {
+	return children;
+}
+
+function isChildOfType( child, type ) {
+	return child && child.type === type;
+}
+
 /**
  * Given two or more block nodes, returns a new block node representing a
  * concatenation of its values.
@@ -126,6 +134,8 @@ export function matcher( selector ) {
 
 export default {
 	concat,
+	getChildrenArray,
+	isChildOfType,
 	fromDOM,
 	toHTML,
 	matcher,

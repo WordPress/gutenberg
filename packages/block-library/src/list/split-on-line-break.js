@@ -4,34 +4,41 @@
 import { last } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { children as childrenApi } from '@wordpress/blocks';
+
+const { getChildrenArray, isChildOfType } = childrenApi;
+
+/**
  * Split the content of a paragraph on line breaks ('<br>') into sets of
  * content, each representing a list item.
  *
- * The term "content" refers to a rich-text description in the form of a mixed
- * array of strings and element-like objects (e.g. `{ type: strong, props: {
- * children: […] } }`).
+ * The term "content" refers to a rich-text description of block children.
  *
- * @param {WPBlockChildren} fragments Rich-text content
+ * @see WPBlockChildren
+ *
+ * @param {WPBlockChildren} children Rich-text content
  * @return {Array<WPBlockChildren>} Array of rich-text content
  */
-export default function splitOnLineBreak( fragments ) {
-	return fragments.reduce( ( acc, fragment, i ) => {
-		// Skip if fragment is a line break
-		if ( fragment && fragment.type === 'br' ) {
+export default function splitOnLineBreak( children ) {
+	return getChildrenArray( children ).reduce( ( acc, child, i ) => {
+		// Skip if child is a line break
+		if ( isChildOfType( child, 'br' ) ) {
 			return acc;
 		}
 
 		// If we've just skipped a line break, append the
-		// next fragment as a new item.
-		const prevFragment = i > 0 && fragments[ i - 1 ];
-		if ( prevFragment && prevFragment.type === 'br' ) {
-			return [ ...acc, [ fragment ] ];
+		// next child as a new item.
+		const prevFragment = i > 0 && children[ i - 1 ];
+		if ( isChildOfType( prevFragment, 'br' ) ) {
+			return [ ...acc, [ child ] ];
 		}
 
-		// Otherwise, append fragment to last item.
+		// Otherwise, append child to last item.
 		return [
 			...acc.slice( 0, acc.length - 1 ),
-			[ ...last( acc ), fragment ],
+			[ ...last( acc ), child ],
 		];
 	}, [ [] ] );
 }
