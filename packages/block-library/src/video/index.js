@@ -110,7 +110,7 @@ export const settings = {
 						controls={ controls }
 						loop={ loop }
 						muted={ muted }
-						preload={ preload }
+						preload={ preload !== 'metadata' ? preload : undefined }
 						src={ src }
 					/>
 				) }
