@@ -1,5 +1,3 @@
-/* global ajaxurl */
-
 /**
  * WordPress dependencies
  */
@@ -73,6 +71,8 @@ export function setupHearthbeatPostLocking() {
 			post_ID: postID,
 			active_post_lock: postLock,
 		};
+		const { getEditorSettings } = select( 'core/editor' );
+		const { ajaxurl } = getEditorSettings();
 
 		jQuery.post( {
 			async: false,

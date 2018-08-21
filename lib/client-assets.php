@@ -1387,6 +1387,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'autosaveInterval'    => 10,
 		'maxUploadFileSize'   => $max_upload_size,
 		'allowedMimeTypes'    => get_allowed_mime_types(),
+		'ajaxurl'             => admin_url( 'admin-ajax.php' ),
 	);
 
 	$post_autosave = get_autosave_newer_than_post_save( $post );
