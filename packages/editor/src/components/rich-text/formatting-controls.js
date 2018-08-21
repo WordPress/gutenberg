@@ -4,8 +4,6 @@
 import { __ } from '@wordpress/i18n';
 import { displayShortcut } from '@wordpress/keycodes';
 
-export const DEFAULT_CONTROLS = [ 'bold', 'italic', 'strikethrough', 'link', 'code' ];
-
 export const FORMATTING_CONTROLS = [
 	{
 		icon: 'editor-bold',

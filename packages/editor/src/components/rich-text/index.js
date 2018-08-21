@@ -37,7 +37,7 @@ import { isURL } from '@wordpress/url';
  */
 import Autocomplete from '../autocomplete';
 import BlockFormatControls from '../block-format-controls';
-import { DEFAULT_CONTROLS } from './formatting-controls';
+import { FORMATTING_CONTROLS } from './formatting-controls';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 import { pickAriaProps } from './aria';
@@ -1003,7 +1003,7 @@ RichText.contextTypes = {
 };
 
 RichText.defaultProps = {
-	formattingControls: DEFAULT_CONTROLS,
+	formattingControls: FORMATTING_CONTROLS.map( ( { format } ) => format ),
 	formatters: [],
 	format: 'children',
 };
