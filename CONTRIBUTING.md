@@ -202,9 +202,11 @@ Confirm that you're logged into `npm`, by running `npm whoami`. If you're not lo
 If you're publishing a new package, ensure that its `package.json` file contains the correct `publishConfig` settings:
 
 ```json
+{
 	"publishConfig": {
 		"access": "public"
 	}
+}
 ```
 
 You can double check it by executing `npm run lint-pkg-json` command.
