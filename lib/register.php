@@ -333,6 +333,26 @@ function gutenberg_can_edit_post_type( $post_type ) {
 }
 
 /**
+ * Returns blocks from a post or content string.
+ *
+ * @since 3.7.0
+ * @see gutenberg_parse_blocks()
+ *
+ * @param int|string|WP_Post|null $post Optional. Post content, post ID, or post object. Defaults to global $post.
+ * @return array Array of parsed block objects.
+ */
+function get_blocks( $post = null ) {
+	if ( ! is_string( $post ) ) {
+		$wp_post = get_post( $post );
+		if ( $wp_post instanceof WP_Post ) {
+			$post = $wp_post->post_content;
+		}
+	}
+
+	return gutenberg_parse_blocks( (string) $post );
+}
+
+/**
  * Determine whether a post or content string has blocks.
  *
  * This test optimizes for performance rather than strict accuracy, detecting
