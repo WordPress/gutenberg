@@ -5,6 +5,8 @@ import UIKit
 class RCTAztecView: Aztec.TextView {
     @objc var onChange: RCTBubblingEventBlock? = nil
     @objc var onContentSizeChange: RCTBubblingEventBlock? = nil
+
+    @objc var onActiveFormatsChange: RCTBubblingEventBlock? = nil
     
     private var previousContentSize: CGSize = .zero
 
@@ -24,6 +26,7 @@ class RCTAztecView: Aztec.TextView {
     }
 
     func commonInit() {
+        delegate = self
         addSubview(placeholderLabel)
         placeholderLabel.textAlignment = .natural
         placeholderLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -137,7 +140,37 @@ class RCTAztecView: Aztec.TextView {
         case "strikethrough": toggleStrikethrough(range: selectedRange)
         default: print("Format not recognized")
         }
-
+        propagateFormatChanges()
     }
+
+    func propagateFormatChanges() {
+        guard let onActiveFormatsChange = onActiveFormatsChange else {
+            return
+        }
+        let identifiers: Set<FormattingIdentifier>
+        if selectedRange.length > 0 {
+            identifiers = formatIdentifiersSpanningRange(selectedRange)
+        } else {
+            identifiers = formatIdentifiersForTypingAttributes()
+        }
+        let formats = identifiers.compactMap( { (identifier) -> String? in
+            switch identifier {
+            case .bold: return "bold"
+            case .italic: return "italic"
+            case .strikethrough: return "strikethrough"
+            default: return nil
+            }
+        })
+        onActiveFormatsChange(["formats": formats])
+    }
+}
+
+// MARK: UITextView Delegate Methods
+extension RCTAztecView: UITextViewDelegate {
+
+    func textViewDidChangeSelection(_ textView: UITextView) {
+        propagateFormatChanges()
+    }
+
 }
 

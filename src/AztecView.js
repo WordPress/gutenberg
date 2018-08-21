@@ -14,6 +14,7 @@ class AztecView extends React.Component {
     onChange: PropTypes.func,
     onContentSizeChange: PropTypes.func,
     onScroll: PropTypes.func,
+    onActiveFormatsChange: PropTypes.func,
     ...ViewPropTypes, // include the default view properties
   }
 
@@ -25,8 +26,18 @@ class AztecView extends React.Component {
                                         );    
   }
 
+  _onActiveFormatsChange = (event) => {
+    if (!this.props.onActiveFormatsChange) {
+      return;
+    }
+    const formats = event.nativeEvent.formats;
+    const { onActiveFormatsChange } = this.props;
+    onActiveFormatsChange(formats);
+  }
+
   render() {
-    return (<RCTAztecView {...this.props} />);
+    const { onActiveFormatsChange, ...otherProps } = this.props    
+    return (<RCTAztecView {...otherProps} onActiveFormatsChange={ this._onActiveFormatsChange } />);
   }
 }
 
