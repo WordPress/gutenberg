@@ -216,16 +216,16 @@ export class RichText extends Component {
 		const { items = [], files = [] } = clipboardData;
 		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
 		let plainText = '';
-		let HTML = '';
+		let html = '';
 
 		try {
 			plainText = clipboardData.getData( 'text/plain' );
-			HTML = clipboardData.getData( 'text/html' );
+			html = clipboardData.getData( 'text/html' );
 		// IE11 only supports `Text` as an argument for `getData` and will
 		// otherwise throw an invalid argument error.
 		} catch ( error1 ) {
 			try {
-				HTML = clipboardData.getData( 'Text' );
+				html = clipboardData.getData( 'Text' );
 			} catch ( error2 ) {
 				// Some browsers like UC Browser paste plain text by default and
 				// don't support clipboardData at all, so allow default
@@ -237,12 +237,12 @@ export class RichText extends Component {
 		event.preventDefault();
 
 		// Allows us to ask for this information when we get a report.
-		window.console.log( 'Received HTML:\n\n', HTML );
+		window.console.log( 'Received HTML:\n\n', html );
 		window.console.log( 'Received plain text:\n\n', plainText );
 
 		// Only process file if no HTML is present.
 		// Note: a pasted file may have the URL as plain text.
-		if ( item && ! HTML ) {
+		if ( item && ! html ) {
 			const file = item.getAsFile ? item.getAsFile() : item;
 			const content = rawHandler( {
 				HTML: `<img src="${ createBlobURL( file ) }">`,
@@ -269,7 +269,7 @@ export class RichText extends Component {
 		// There is a selection, check if a URL is pasted.
 		if ( ! this.editor.selection.isCollapsed() ) {
 			const linkRegExp = /^(?:https?:)?\/\/\S+$/i;
-			const pastedText = ( HTML || plainText ).replace( /<[^>]+>/g, '' ).trim();
+			const pastedText = ( html || plainText ).replace( /<[^>]+>/g, '' ).trim();
 
 			// A URL was pasted, turn the selection into a link
 			if ( linkRegExp.test( pastedText ) ) {
@@ -295,7 +295,7 @@ export class RichText extends Component {
 		}
 
 		const content = rawHandler( {
-			HTML,
+			HTML: html,
 			plainText,
 			mode,
 			tagName: this.props.tagName,
