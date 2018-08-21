@@ -297,7 +297,7 @@ export async function clickOnMoreMenuItem( buttonLabel ) {
  */
 export async function clickOnBlockSettingsMenuItem( buttonLabel ) {
 	await expect( page ).toClick( '.editor-block-settings-menu__toggle' );
-	const itemButton = ( await page.$x( `//button[contains(text(), '${ buttonLabel }')]` ) )[ 0 ];
+	const itemButton = ( await page.$x( `//*[contains(@class, "editor-block-settings-menu__popover")]//button[contains(text(), '${ buttonLabel }')]` ) )[ 0 ];
 	await itemButton.click( 'button' );
 }
 
