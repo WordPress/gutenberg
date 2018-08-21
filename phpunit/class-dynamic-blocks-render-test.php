@@ -123,13 +123,20 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 	function test_global_post_persistence() {
 		global $post;
 
-		register_block_type( 'core/dummy', array(
-			'render_callback' => array( $this, 'render_dummy_block_wp_query' ),
-		) );
+		register_block_type(
+			'core/dummy',
+			array(
+				'render_callback' => array(
+					$this,
+					'render_dummy_block_wp_query',
+				),
+			)
+		);
 
 		$posts = self::factory()->post->create_many( 5 );
-		$global_post = $post = get_post( end( $posts ) );
+		$post  = get_post( end( $posts ) );
 
+		$global_post = $post;
 		do_blocks( '<!-- wp:core/dummy /-->' );
 
 		$this->assertEquals( $global_post, $post );
