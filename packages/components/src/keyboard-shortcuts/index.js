@@ -15,6 +15,10 @@ class KeyboardShortcuts extends Component {
 		super( ...arguments );
 
 		this.bindKeyTarget = this.bindKeyTarget.bind( this );
+
+		// Firefox uses keycode 173 for '-', while other browsers use 189.
+		// This line makes binding to the '-' key work consistently.
+		Mousetrap.addKeycodes( { 173: '-' } );
 	}
 
 	componentDidMount() {
