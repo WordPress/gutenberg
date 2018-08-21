@@ -2,13 +2,18 @@
 	position: relative;
 	background-size: cover;
 	background-position: center center;
-	height: 430px;
 	min-height: 430px;
 	width: 100%;
 	margin: 0 0 1.5em 0;
 	display: flex;
 	justify-content: center;
 	align-items: center;
+
+	&::after{
+		content: '';
+		min-height: inherit;
+		font-size: 0;
+	}
 
 	&.has-left-content {
 		justify-content: flex-start;
