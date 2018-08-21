@@ -45,6 +45,33 @@ Some blocks such as the image block have the possibility to define a "wide" or "
 add_theme_support( 'align-wide' );
 ```
 
+### Wide Alignments & Floats
+
+It can be tricky to create a responsive layout that accommodates both wide images, a sidebar, a centered column, as well as floats that stay within that centered column. 
+
+For that reason, Gutenberg provides floated images with additional markup to provide more options. Here's the markup for an Image with a caption:
+
+```
+<figure class="wp-block-image">
+	<img src="..." alt="" width="200px">
+	<figcaption>Short image caption.</figcaption>
+</figure>
+```
+
+Here's the markup for a left-floated image:
+
+```
+<div class="wp-block-image">
+	<figure class="alignleft">
+		<img src="..." alt="" width="200px">
+		<figcaption>Short image caption.</figcaption>
+	</figure>
+</div>
+```
+
+In this codepen you can see one method for leveraging the above markup to achieve a responsive layout that features both a sidebar, wide images, as well as floats with bounded captions:
+https://codepen.io/joen/pen/zLWvrW
+
 ### Block Color Palettes:
 
 Different blocks have the possibility of customizing colors. Gutenberg provides a default palette, but a theme can overwrite it and provide its own:

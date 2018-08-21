@@ -1,14 +1,16 @@
 .editor-default-block-appender {
-	input[type="text"].editor-default-block-appender__content { // needs specificity
+	clear: both; // The appender doesn't scale well to sit next to floats, so clear them.
+
+	input[type="text"].editor-default-block-appender__content { // Needs specificity.
 		font-family: $editor-font;
-		font-size: $editor-font-size; // It should match the default paragraph size
+		font-size: $editor-font-size; // It should match the default paragraph size.
 		border: none;
 		background: none;
 		box-shadow: none;
 		display: block;
 		margin-left: 0;
 		margin-right: 0;
-		max-width: none; // fixes a bleed issue from the admin
+		max-width: none; // Overrides upstream CSS from the admin.
 		cursor: text;
 		width: 100%;
 		outline: $border-width solid transparent;
@@ -17,9 +19,8 @@
 		// Emulate the dimensions of a paragraph block.
 		padding: 0 #{ $block-padding + $border-width };
 
-		// use opacity to work in various editor styles
+		// Use opacity to work in various editor styles.
 		color: $dark-opacity-300;
-
 		.is-dark-theme & {
 			color: $light-opacity-300;
 		}
@@ -31,9 +32,8 @@
 		transition: opacity 0.2s;
 
 		.components-icon-button:not(:hover) {
-			// use opacity to work in various editor styles
+			// Use opacity to work in various editor styles.
 			color: $dark-opacity-500;
-
 			.is-dark-theme & {
 				color: $light-opacity-500;
 			}
@@ -107,10 +107,9 @@
 		height: $block-side-ui-width;
 		padding: 0;
 
-		// use opacity to work in various editor styles
+		// Use opacity to work in various editor styles.
 		&:not(:hover) {
 			color: $dark-opacity-500;
-
 			.is-dark-theme & {
 				color: $light-opacity-500;
 			}
