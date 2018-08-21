@@ -326,8 +326,8 @@ export const settings = {
 					<RichText
 						multiline="li"
 						tagName={ tagName }
-						getSettings={ this.getEditorSettings }
-						onSetup={ this.setupEditor }
+						unstableGetSettings={ this.getEditorSettings }
+						unstableOnSetup={ this.setupEditor }
 						onChange={ this.setNextValues }
 						value={ values }
 						wrapperClassName="block-library-list"

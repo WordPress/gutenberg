@@ -99,10 +99,16 @@ function get_dynamic_blocks_regex() {
 	$dynamic_block_names   = get_dynamic_block_names();
 	$dynamic_block_pattern = (
 		'/<!--\s+wp:(' .
-		str_replace( '/', '\/',                 // Escape namespace, not handled by preg_quote.
-			str_replace( 'core/', '(?:core/)?', // Allow implicit core namespace, but don't capture.
-				implode( '|',                   // Join block names into capture group alternation.
-					array_map( 'preg_quote',    // Escape block name for regular expression.
+		str_replace(
+			'/',
+			'\/',                 // Escape namespace, not handled by preg_quote.
+			str_replace(
+				'core/',
+				'(?:core/)?', // Allow implicit core namespace, but don't capture.
+				implode(
+					'|',                   // Join block names into capture group alternation.
+					array_map(
+						'preg_quote',    // Escape block name for regular expression.
 						$dynamic_block_names
 					)
 				)
@@ -252,7 +258,7 @@ function strip_dynamic_blocks_add_filter( $text ) {
 add_filter( 'get_the_excerpt', 'strip_dynamic_blocks_add_filter', 9 ); // Before wp_trim_excerpt().
 
 /**
- * Adds the content filter to strip dynamic blocks from excerpts.
+ * Removes the content filter to strip dynamic blocks from excerpts.
  *
  * It's a bit hacky for now, but once this gets merged into core the function
  * can just be called in `wp_trim_excerpt()`.
@@ -267,4 +273,4 @@ function strip_dynamic_blocks_remove_filter( $text ) {
 
 	return $text;
 }
-add_filter( 'wp_trim_excerpt', 'strip_dynamic_blocks_add_filter', 0 ); // Before all other.
+add_filter( 'wp_trim_excerpt', 'strip_dynamic_blocks_remove_filter', 0 ); // Before all other.

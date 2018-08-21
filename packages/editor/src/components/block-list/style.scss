@@ -346,7 +346,6 @@
 		width: 100%;
 
 		// When images are floated, the block itself should collapse to zero height.
-		margin-bottom: 0;
 		height: 0;
 
 		// Hide block outline when an image is floated.
@@ -354,6 +353,9 @@
 			&::before {
 				content: none;
 			}
+
+			// This margin won't collapse on its own, so zero it out.
+			margin-top: 0;
 		}
 
 		// Keep a 1px margin to compensate for the border/outline.
@@ -442,6 +444,14 @@
 		@include break-wide() {
 			> .editor-block-mover {
 				display: block;
+			}
+		}
+
+		// Beyond the mobile breakpoint, wide images stretch outside of the column.
+		// To center the toolbar, we make it inline-flex so the toolbar is not full-wide.
+		@include break-small () {
+			.editor-block-toolbar {
+				display: inline-flex;
 			}
 		}
 	}

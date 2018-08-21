@@ -39,6 +39,7 @@
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/nux": "file:../nux",
+		"@wordpress/token-list": "file:../token-list",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
 		"@wordpress/wordcount": "file:../wordcount",

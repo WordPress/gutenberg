@@ -26,10 +26,12 @@
 <p><?php _e( 'Handling images and media with the utmost care is a primary focus of the new editor. Hopefully, you&#8217;ll find aspects of adding captions or going full-width with your pictures much easier and robust than before.', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center"} -->
-<figure class="wp-block-image aligncenter"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="Beautiful landscape" />
-	<figcaption><?php _e( 'If your theme supports it, you&#8217;ll see the "wide" button on the image toolbar. Give it a try.', 'gutenberg' ); ?></figcaption>
-</figure>
+<!-- wp:image {"align":"center","className":"aligncenter"} -->
+<div class="wp-block-image aligncenter">
+	<figure class="aligncenter"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="Beautiful landscape" />
+		<figcaption><?php _e( 'If your theme supports it, you&#8217;ll see the "wide" button on the image toolbar. Give it a try.', 'gutenberg' ); ?></figcaption>
+	</figure>
+</div>
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->

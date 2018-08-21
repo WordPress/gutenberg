@@ -2,6 +2,6 @@ build
 build-module
 coverage
 node_modules
-packages/block-serialization-spec-parser
 test/e2e/test-plugins
 vendor
+packages/block-serialization-spec-parser/index.js

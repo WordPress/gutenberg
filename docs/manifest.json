@@ -462,6 +462,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/token-list",
+		"slug": "packages-token-list",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/token-list/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/url",
 		"slug": "packages-url",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/url/README.md",

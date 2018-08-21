@@ -3,12 +3,13 @@
  */
 import classnames from 'classnames';
 import {
-	isEqual,
-	forEach,
-	merge,
-	identity,
-	find,
 	defer,
+	difference,
+	find,
+	forEach,
+	identity,
+	isEqual,
+	merge,
 	noop,
 } from 'lodash';
 import 'element-closest';
@@ -28,6 +29,7 @@ import { Slot } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { rawHandler, children } from '@wordpress/blocks';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -58,15 +60,23 @@ const { Node, getSelection } = window;
  */
 const TINYMCE_ZWSP = '\uFEFF';
 
-export function getFormatProperties( formatName, parents ) {
-	switch ( formatName ) {
-		case 'link' : {
-			const anchor = find( parents, ( node ) => node.nodeName.toLowerCase() === 'a' );
-			return !! anchor ? { value: anchor.getAttribute( 'href' ) || '', target: anchor.getAttribute( 'target' ) || '', node: anchor } : {};
+export function getFormatValue( formatName, parents ) {
+	if ( formatName === 'link' ) {
+		const anchor = find( parents, ( node ) => node.nodeName === 'A' );
+		if ( anchor ) {
+			if ( anchor.hasAttribute( 'data-wp-placeholder' ) ) {
+				return { isAdding: true };
+			}
+			return {
+				isActive: true,
+				value: anchor.getAttribute( 'href' ) || '',
+				target: anchor.getAttribute( 'target' ) || '',
+				node: anchor,
+			};
 		}
-		default:
-			return {};
 	}
+
+	return { isActive: true };
 }
 
 const DEFAULT_FORMATS = [ 'bold', 'italic', 'strikethrough', 'link', 'code' ];
@@ -109,13 +119,31 @@ export class RichText extends Component {
 	 * @return {Object} The settings for this block.
 	 */
 	getSettings( settings ) {
-		return ( this.props.getSettings || identity )( {
+		let { unstableGetSettings: getSettings } = this.props;
+		if ( ! getSettings && typeof this.props.getSettings === 'function' ) {
+			deprecated( 'RichText getSettings prop', {
+				alternative: 'unstableGetSettings',
+				plugin: 'Gutenberg',
+				version: '3.9',
+				hint: 'Unstable APIs are strongly discouraged to be used, and are subject to removal without notice.',
+			} );
+
+			getSettings = this.props.getSettings;
+		}
+
+		settings = {
 			...settings,
 			forced_root_block: this.props.multiline || false,
 			// Allow TinyMCE to keep one undo level for comparing changes.
 			// Prevent it otherwise from accumulating any history.
 			custom_undo_redo_levels: 1,
-		} );
+		};
+
+		if ( getSettings ) {
+			settings = getSettings( settings );
+		}
+
+		return settings;
 	}
 
 	/**
@@ -143,8 +171,20 @@ export class RichText extends Component {
 
 		patterns.apply( this, [ editor ] );
 
-		if ( this.props.onSetup ) {
-			this.props.onSetup( editor );
+		let { unstableOnSetup: onSetup } = this.props;
+		if ( ! onSetup && typeof this.props.onSetup === 'function' ) {
+			deprecated( 'RichText onSetup prop', {
+				alternative: 'unstableOnSetup',
+				plugin: 'Gutenberg',
+				version: '3.9',
+				hint: 'Unstable APIs are strongly discouraged to be used, and are subject to removal without notice.',
+			} );
+
+			onSetup = this.props.onSetup;
+		}
+
+		if ( onSetup ) {
+			onSetup( editor );
 		}
 	}
 
@@ -354,7 +394,6 @@ export class RichText extends Component {
 	/**
 	 * Handles any case where the content of the TinyMCE instance has changed.
 	 */
-
 	onChange() {
 		this.savedContent = this.getContent();
 		this.props.onChange( this.savedContent );
@@ -668,13 +707,12 @@ export class RichText extends Component {
 			return;
 		}
 
+		// Remove *non-selected* placeholder links when the selection is changed.
+		this.removePlaceholderLinks( parents );
+
 		const formatNames = this.props.formattingControls;
 		const formats = this.editor.formatter.matchAll( formatNames ).reduce( ( accFormats, activeFormat ) => {
-			accFormats[ activeFormat ] = {
-				isActive: true,
-				...getFormatProperties( activeFormat, parents ),
-			};
-
+			accFormats[ activeFormat ] = getFormatValue( activeFormat, parents );
 			return accFormats;
 		}, {} );
 
@@ -745,6 +783,27 @@ export class RichText extends Component {
 				console.error( 'Formatters passed via `formatters` prop will only be registered once. Formatters can be enabled/disabled via the `formattingControls` prop.' );
 			}
 		}
+
+		// When the block is unselected, remove placeholder links and hide the formatting toolbar.
+		if ( ! this.props.isSelected && prevProps.isSelected ) {
+			this.removePlaceholderLinks();
+			this.setState( { formats: {} } );
+		}
+	}
+
+	/**
+	 * Removes any placeholder links from the editor DOM. Placeholder links are
+	 * used when adding a link to indicate which text will become a link.
+	 *
+	 * @param {HTMLElement[]=} linksToKeep If specified, these links will *not*
+	 *                                     be removed. Useful for keeping the
+	 *                                     currently selected link as is.
+	 */
+	removePlaceholderLinks( linksToKeep = [] ) {
+		const placeholderLinks = this.editor.$( 'a[data-wp-placeholder]' ).toArray();
+		for ( const placeholderLink of difference( placeholderLinks, linksToKeep ) ) {
+			this.editor.dom.remove( placeholderLink, /* keepChildren: */ true );
+		}
 	}
 
 	/**
@@ -778,37 +837,59 @@ export class RichText extends Component {
 
 	changeFormats( formats ) {
 		forEach( formats, ( formatValue, format ) => {
+			const isActive = this.isFormatActive( format );
+
 			if ( format === 'link' ) {
-				if ( !! formatValue ) {
-					if ( formatValue.isAdding ) {
-						return;
-					}
-
-					const { value: href, target } = formatValue;
-
-					if ( ! this.isFormatActive( 'link' ) && this.editor.selection.isCollapsed() ) {
-						// When no link or text is selected, insert a link with the URL as its text
-						const anchorHTML = this.editor.dom.createHTML(
-							'a',
-							{ href, target },
-							this.editor.dom.encode( href )
-						);
-						this.editor.insertContent( anchorHTML );
-					} else {
-						// Use built-in TinyMCE command turn the selection into a link. This takes
-						// care of deleting any existing links within the selection
-						this.editor.execCommand( 'mceInsertLink', false, { href, target } );
-					}
-				} else {
+				// Remove the selected link when `formats.link` is set to a falsey value.
+				if ( ! formatValue ) {
 					this.editor.execCommand( 'Unlink' );
+					return;
 				}
-			} else {
-				const isActive = this.isFormatActive( format );
-				if ( isActive && ! formatValue ) {
-					this.removeFormat( format );
-				} else if ( ! isActive && formatValue ) {
-					this.applyFormat( format );
+
+				const { isAdding, value: href, target } = formatValue;
+				const isSelectionCollapsed = this.editor.selection.isCollapsed();
+
+				// Bail early if the link is still being added. <RichText> will ask the user
+				// for a URL and then update `formats.link`.
+				if ( isAdding ) {
+					// Create a placeholder <a> so that there's something to indicate which
+					// text will become a link. Placeholder links are stripped from
+					// getContent() and removed when the selection changes.
+					if ( ! isSelectionCollapsed ) {
+						this.editor.formatter.apply( format, {
+							href: '#',
+							'data-wp-placeholder': true,
+							'data-mce-bogus': true,
+						} );
+					}
+					return;
 				}
+
+				// When no link or text is selected, use the URL as the link's text.
+				if ( isSelectionCollapsed && ! isActive ) {
+					this.editor.insertContent( this.editor.dom.createHTML(
+						'a',
+						{ href, target },
+						this.editor.dom.encode( href )
+					) );
+					return;
+				}
+
+				// Use built-in TinyMCE command turn the selection into a link. This takes
+				// care of deleting any existing links within the current selection.
+				this.editor.execCommand( 'mceInsertLink', false, {
+					href,
+					target,
+					'data-wp-placeholder': null,
+					'data-mce-bogus': null,
+				} );
+				return;
+			}
+
+			if ( isActive && ! formatValue ) {
+				this.removeFormat( format );
+			} else if ( ! isActive && formatValue ) {
+				this.applyFormat( format );
 			}
 		} );
 

@@ -60,10 +60,11 @@ export default compose(
 	withSelect( ( select ) => {
 		const postType = select( 'core/editor' ).getCurrentPostType();
 		const tagsTaxonomy = select( 'core' ).getTaxonomy( 'post_tag' );
+		const tags = tagsTaxonomy && select( 'core/editor' ).getEditedPostAttribute( tagsTaxonomy.rest_base );
 		return {
 			areTagsFetched: tagsTaxonomy !== undefined,
 			isPostTypeSupported: tagsTaxonomy && tagsTaxonomy.types.some( ( type ) => type === postType ),
-			hasTags: tagsTaxonomy && select( 'core/editor' ).getEditedPostAttribute( tagsTaxonomy.rest_base ).length,
+			hasTags: tags && tags.length,
 		};
 	} ),
 	ifCondition( ( { areTagsFetched, isPostTypeSupported } ) => isPostTypeSupported && areTagsFetched ),

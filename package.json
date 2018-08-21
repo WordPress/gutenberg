@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "3.6.0",
+	"version": "3.6.2",
 	"private": true,
 	"description": "A new WordPress editor experience",
 	"repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -111,8 +111,8 @@
 		"source-map-loader": "0.2.3",
 		"sprintf-js": "1.1.1",
 		"style-loader": "0.20.3",
-		"stylelint": "9.4.0",
-		"stylelint-config-wordpress": "13.0.0",
+		"stylelint": "9.5.0",
+		"stylelint-config-wordpress": "13.1.0",
 		"symlink-or-copy": "1.2.0",
 		"uuid": "3.1.0",
 		"webpack": "4.8.3",
@@ -194,6 +194,9 @@
 	"lint-staged": {
 		"packages/*/package.json": [
 			"wp-scripts lint-pkg-json"
+		],
+		"*.scss": [
+			"stylelint"
 		],
 		"*.js": [
 			"eslint"

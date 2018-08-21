@@ -1,5 +1,13 @@
 Gutenberg's deprecation policy is intended to support backwards-compatibility for two minor releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
 
+## 3.9.0
+
+- RichText `getSettings` prop has been removed. The `unstableGetSettings` prop is available if continued use is required. Unstable APIs are strongly discouraged to be used, and are subject to removal without notice.
+- RichText `onSetup` prop has been removed. The `unstableOnSetup` prop is available if continued use is required. Unstable APIs are strongly discouraged to be used, and are subject to removal without notice.
+- `wp.editor.getColorName` has been removed. Please use `wp.editor.getColorObjectByColorValue` instead.
+- `wp.editor.getColorClass` has been renamed. Please use `wp.editor.getColorClassName` instead.
+- `value` property in color objects passed by `wp.editor.withColors` has been removed. Please use color property instead.
+
 ## 3.8.0
 
  - `wp.components.withContext` has been removed. Please use `wp.element.createContext` instead. See: https://reactjs.org/docs/context.html.
