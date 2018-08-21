@@ -13,62 +13,79 @@ import deprecated from '@wordpress/deprecated';
  */
 import {
 	RichText,
-	getFormatProperties,
+	getFormatValue,
 } from '../';
 import { diffAriaProps, pickAriaProps } from '../aria';
 
 jest.mock( '@wordpress/deprecated', () => jest.fn() );
 
-describe( 'getFormatProperties', () => {
-	const formatName = 'link';
-	const node = {
-		nodeName: 'A',
-		attributes: {
+describe( 'getFormatValue', () => {
+	function createMockNode( nodeName, attributes = {} ) {
+		return {
+			nodeName,
+			hasAttribute( name ) {
+				return !! attributes[ name ];
+			},
+			getAttribute( name ) {
+				return attributes[ name ];
+			},
+		};
+	}
+
+	test( 'basic formatting', () => {
+		expect( getFormatValue( 'bold' ) ).toEqual( {
+			isActive: true,
+		} );
+	} );
+
+	test( 'link formatting when no anchor is found', () => {
+		const formatValue = getFormatValue( 'link', [
+			createMockNode( 'P' ),
+		] );
+		expect( formatValue ).toEqual( {
+			isActive: true,
+		} );
+	} );
+
+	test( 'link formatting', () => {
+		const mockNode = createMockNode( 'A', {
 			href: 'https://www.testing.com',
 			target: '_blank',
-		},
-	};
+		} );
 
-	test( 'should return an empty object', () => {
-		expect( getFormatProperties( 'ofSomething' ) ).toEqual( {} );
-	} );
+		const formatValue = getFormatValue( 'link', [ mockNode ] );
 
-	test( 'should return an empty object if no anchor element is found', () => {
-		expect( getFormatProperties( formatName, [ { ...node, nodeName: 'P' } ] ) ).toEqual( {} );
-	} );
-
-	test( 'should return a populated object', () => {
-		const mockNode = {
-			...node,
-			getAttribute: jest.fn().mockImplementation( ( attr ) => mockNode.attributes[ attr ] ),
-		};
-
-		const parents = [
-			mockNode,
-		];
-
-		expect( getFormatProperties( formatName, parents ) ).toEqual( {
+		expect( formatValue ).toEqual( {
+			isActive: true,
 			value: 'https://www.testing.com',
 			target: '_blank',
 			node: mockNode,
 		} );
 	} );
 
-	test( 'should return an object with empty values when no link is found', () => {
-		const mockNode = {
-			...node,
-			attributes: {},
-			getAttribute: jest.fn().mockImplementation( ( attr ) => mockNode.attributes[ attr ] ),
-		};
+	test( 'link formatting when the anchor has no attributes', () => {
+		const mockNode = createMockNode( 'A' );
 
-		const parents = [
-			mockNode,
-		];
+		const formatValue = getFormatValue( 'link', [ mockNode ] );
 
-		expect( getFormatProperties( formatName, parents ) ).toEqual( {
+		expect( formatValue ).toEqual( {
+			isActive: true,
 			value: '',
 			target: '',
 			node: mockNode,
+		} );
+	} );
+
+	test( 'link formatting when the link is still being added', () => {
+		const formatValue = getFormatValue( 'link', [
+			createMockNode( 'A', {
+				href: '#',
+				'data-wp-placeholder': 'true',
+				'data-mce-bogus': 'true',
+			} ),
+		] );
+		expect( formatValue ).toEqual( {
+			isAdding: true,
 		} );
 	} );
 } );
