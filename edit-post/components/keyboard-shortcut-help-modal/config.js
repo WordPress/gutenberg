@@ -88,7 +88,7 @@ const blockShortcuts = {
 			description: __( 'Duplicate the selected block(s).' ),
 		},
 		{
-			keyCombination: primaryAlt( 'backspace' ),
+			keyCombination: ctrlShift( '-' ),
 			description: __( 'Remove the selected block(s).' ),
 		},
 		{

@@ -37,8 +37,8 @@ const shortcuts = {
 		display: displayShortcut.primaryShift( 'd' ),
 	},
 	removeBlock: {
-		raw: rawShortcut.primaryAlt( 'backspace' ),
-		display: displayShortcut.primaryAlt( 'bksp' ),
+		raw: rawShortcut.ctrlShift( '-' ),
+		display: displayShortcut.ctrlShift( '-' ),
 	},
 	insertBefore: {
 		raw: rawShortcut.primaryAlt( 't' ),
