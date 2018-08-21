@@ -6,9 +6,13 @@ import { last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { children as childrenApi } from '@wordpress/blocks';
+import {
+	children as childrenAPI,
+	node as nodeAPI,
+} from '@wordpress/blocks';
 
-const { getChildrenArray, isChildOfType } = childrenApi;
+const { getChildrenArray } = childrenAPI;
+const { isNodeOfType } = nodeAPI;
 
 /**
  * Split the content of a paragraph on line breaks ('<br>') into sets of
@@ -18,27 +22,27 @@ const { getChildrenArray, isChildOfType } = childrenApi;
  *
  * @see WPBlockChildren
  *
- * @param {WPBlockChildren} children Rich-text content
- * @return {Array<WPBlockChildren>} Array of rich-text content
+ * @param {WPBlockChildren} children Block children
+ * @return {Array<WPBlockChildren>} Array of block children
  */
 export default function splitOnLineBreak( children ) {
-	return getChildrenArray( children ).reduce( ( acc, child, i ) => {
-		// Skip if child is a line break
-		if ( isChildOfType( child, 'br' ) ) {
+	return getChildrenArray( children ).reduce( ( acc, node, i ) => {
+		// Skip if node is a line break
+		if ( isNodeOfType( node, 'br' ) ) {
 			return acc;
 		}
 
 		// If we've just skipped a line break, append the
-		// next child as a new item.
+		// next node as a new item.
 		const prevFragment = i > 0 && children[ i - 1 ];
-		if ( isChildOfType( prevFragment, 'br' ) ) {
-			return [ ...acc, [ child ] ];
+		if ( isNodeOfType( prevFragment, 'br' ) ) {
+			return [ ...acc, [ node ] ];
 		}
 
-		// Otherwise, append child to last item.
+		// Otherwise, append node to last item.
 		return [
 			...acc.slice( 0, acc.length - 1 ),
-			[ ...last( acc ), child ],
+			[ ...last( acc ), node ],
 		];
 	}, [ [] ] );
 }
