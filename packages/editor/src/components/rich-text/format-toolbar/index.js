@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -28,8 +33,8 @@ function computeDerivedState( props ) {
 		selectedNodeId: props.selectedNodeId,
 		settingsVisible: false,
 		opensInNewWindow: !! props.formats.link && !! props.formats.link.target,
-		linkValue: '',
 		isEditingLink: false,
+		linkValue: get( props, [ 'formats', 'link', 'value' ], '' ),
 	};
 }
 
@@ -103,13 +108,11 @@ class FormatToolbar extends Component {
 	}
 
 	addLink() {
-		this.setState( { linkValue: '' } );
 		this.props.onChange( { link: { isAdding: true } } );
 	}
 
 	dropLink() {
 		this.props.onChange( { link: null } );
-		this.setState( { linkValue: '' } );
 	}
 
 	editLink( event ) {
@@ -126,8 +129,6 @@ class FormatToolbar extends Component {
 			rel: this.state.opensInNewWindow ? 'noreferrer noopener' : null,
 			value,
 		} } );
-
-		this.setState( { linkValue: value, isEditingLink: false } );
 		if ( ! this.props.formats.link.value ) {
 			this.props.speak( __( 'Link added.' ), 'assertive' );
 		}
