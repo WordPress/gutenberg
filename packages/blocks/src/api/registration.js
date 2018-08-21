@@ -130,7 +130,7 @@ export function registerBlockType( name, settings ) {
 	}
 	if (
 		'category' in settings &&
-		! some( select( 'core/blocks' ).getCategories(), { slug: settings.category } )
+		! some( getBlockCategories(), { slug: settings.category } )
 	) {
 		console.error(
 			'The block "' + name + '" must have a registered category.'
@@ -345,3 +345,15 @@ export const registerBlockStyle = ( blockName, styleVariation ) => {
 		};
 	} );
 };
+
+/**
+ * Returns filtered array of all registered block categories.
+ *
+ * @return {Array} Block categories.
+ */
+export function getBlockCategories() {
+	return applyFilters(
+		'blocks.getBlockCategories',
+		select( 'core/blocks' ).getCategories()
+	);
+}
