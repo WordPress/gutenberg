@@ -161,7 +161,7 @@ When creating a new package you need to provide at least the following:
 	
 ### Maintaining changelogs
 
-Maintaining dozens of npm packages is difficult–it can be tough to keep track of changes. That's why we use `CHANGELOG.md` files for each package to simplify the release process. All packages should follow the [Semantic Versioning (`semver`) specification](https://semver.org/).
+Maintaining dozens of npm packages is difficult—it can be tough to keep track of changes. That's why we use `CHANGELOG.md` files for each package to simplify the release process. All packages should follow the [Semantic Versioning (`semver`) specification](https://semver.org/).
 
 The developer who proposes a change (pull request) is responsible to choose the correct version increment (`major`, `minor`, or `patch`) according to the following guidelines:
 
