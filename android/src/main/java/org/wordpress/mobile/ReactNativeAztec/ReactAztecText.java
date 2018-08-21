@@ -129,7 +129,7 @@ public class ReactAztecText extends AztecText {
         LinkedList<String> formattingOptions = new LinkedList<>();
         for (ITextFormat currentStyle : appliedStyles) {
             if (currentStyle == AztecTextFormat.FORMAT_STRONG) {
-                formattingOptions.add("strong");
+                formattingOptions.add("bold");
             }
             if (currentStyle == AztecTextFormat.FORMAT_ITALIC) {
                 formattingOptions.add("italic");
