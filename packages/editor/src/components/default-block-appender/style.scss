@@ -84,6 +84,10 @@
 		display: block;
 		margin: auto;
 	}
+
+	.editor-inserter .editor-inserter__toggle {
+		margin-right: 0;
+	}
 }
 
 // Left side.
@@ -119,7 +123,8 @@
 }
 
 // Quick block insertion icons on the right side.
-.editor-inserter-with-shortcuts {
+// Needs specificity to styles from the component itself.
+.editor-block-list__side-inserter .editor-inserter-with-shortcuts {
 	right: $block-padding;
 	display: none; // Don't show on mobile.
 	z-index: z-index(".editor-inserter-with-shortcuts"); // Elevate above the sibling inserter.
