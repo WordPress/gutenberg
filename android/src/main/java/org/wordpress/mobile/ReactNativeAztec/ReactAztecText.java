@@ -45,6 +45,8 @@ public class ReactAztecText extends AztecText {
     // check when it's used in EditText in RN. (maybe tests?)
     int mNativeEventCount = 0;
 
+    String lastSentFormattingOptionsEventString = "";
+
     public ReactAztecText(ThemedReactContext reactContext) {
         super(reactContext);
         this.setFocusableInTouchMode(true);
@@ -128,16 +130,30 @@ public class ReactAztecText extends AztecText {
         // Read the applied styles and get the String list of formatting options
         LinkedList<String> formattingOptions = new LinkedList<>();
         for (ITextFormat currentStyle : appliedStyles) {
-            if (currentStyle == AztecTextFormat.FORMAT_STRONG) {
+            if ((currentStyle == AztecTextFormat.FORMAT_STRONG || currentStyle == AztecTextFormat.FORMAT_BOLD)
+                    && !formattingOptions.contains("bold")) {
                 formattingOptions.add("bold");
             }
-            if (currentStyle == AztecTextFormat.FORMAT_ITALIC) {
+            if ((currentStyle == AztecTextFormat.FORMAT_ITALIC || currentStyle == AztecTextFormat.FORMAT_CITE)
+                    && !formattingOptions.contains("italic")) {
                 formattingOptions.add("italic");
             }
             if (currentStyle == AztecTextFormat.FORMAT_STRIKETHROUGH) {
                 formattingOptions.add("strikethrough");
             }
         }
+
+        // Check if the same formatting event was already sent
+        String newOptionsAsString = "";
+        for (String currentFormatting: formattingOptions) {
+            newOptionsAsString += currentFormatting;
+        }
+        if (newOptionsAsString.equals(lastSentFormattingOptionsEventString)) {
+            // no need to send any event now
+            return;
+        }
+        lastSentFormattingOptionsEventString = newOptionsAsString;
+
         ReactContext reactContext = (ReactContext) getContext();
         EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
         eventDispatcher.dispatchEvent(
