@@ -97,9 +97,9 @@ If this property is added, it will determine whether the modal requests to close
 - Required: No
 - Default: true
 
-### showCloseIcon
+### isDismissable
 
-If this property is set to false, the modal will not display a close icon.
+If this property is set to false, the modal will not display a close icon and cannot be dismissed.
 
 - Type: `bool`
 - Required: No

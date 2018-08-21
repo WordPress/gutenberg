@@ -64,7 +64,7 @@ class PostLockedModal extends Component {
 							focusOnMount={ true }
 							shouldCloseOnClickOutside={ false }
 							shouldCloseOnEsc={ false }
-							showCloseIcon={ false }
+							isDismissable={ false }
 							className="post-locked-modal"
 						>
 							{

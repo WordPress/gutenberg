@@ -117,7 +117,7 @@ class Modal extends Component {
 			children,
 			aria,
 			instanceId,
-			showCloseIcon,
+			isDismissable,
 			...otherProps
 		} = this.props;
 
@@ -144,7 +144,7 @@ class Modal extends Component {
 					{ ...otherProps } >
 					<ModalHeader
 						closeLabel={ closeButtonLabel }
-						showCloseIcon={ showCloseIcon }
+						isDismissable={ isDismissable }
 						onClose={ onRequestClose }
 						title={ title }
 						headingId={ headingId }
@@ -169,7 +169,7 @@ Modal.defaultProps = {
 	focusOnMount: true,
 	shouldCloseOnEsc: true,
 	shouldCloseOnClickOutside: true,
-	showCloseIcon: true,
+	isDismissable: true,
 	/* accessibility */
 	aria: {
 		labelledby: null,
