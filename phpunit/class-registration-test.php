@@ -92,7 +92,7 @@ class Registration_Test extends WP_UnitTestCase {
 		$this->assertInternalType( 'array', $blocks );
 
 		// WP_Post object.
-		$post = get_post( self::$post_id );
+		$post   = get_post( self::$post_id );
 		$blocks = get_blocks( $post );
 		$this->assertInternalType( 'array', $blocks );
 
