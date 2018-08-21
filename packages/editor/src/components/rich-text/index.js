@@ -221,11 +221,15 @@ export class RichText extends Component {
 		try {
 			plainText = clipboardData.getData( 'text/plain' );
 			HTML = clipboardData.getData( 'text/html' );
-		// IE11 will throw an invalid argument error.
-		} catch ( e1 ) {
+		// IE11 only supports `Text` as an argument for `getData` and will
+		// otherwise throw an invalid argument error.
+		} catch ( error1 ) {
 			try {
 				HTML = clipboardData.getData( 'Text' );
-			} catch ( e2 ) {
+			} catch ( error2 ) {
+				// Some browsers like UC Browser paste plain text by default and
+				// don't support clipboardData at all, so allow default
+				// behaviour.
 				return;
 			}
 		}
