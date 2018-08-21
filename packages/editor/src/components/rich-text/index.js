@@ -218,11 +218,12 @@ export class RichText extends Component {
 		let plainText = '';
 		let html = '';
 
+		// IE11 only supports `Text` as an argument for `getData` and will
+		// otherwise throw an invalid argument error, so we try the standard
+		// arguments first, then fallback to `Text` if they fail.
 		try {
 			plainText = clipboardData.getData( 'text/plain' );
 			html = clipboardData.getData( 'text/html' );
-		// IE11 only supports `Text` as an argument for `getData` and will
-		// otherwise throw an invalid argument error.
 		} catch ( error1 ) {
 			try {
 				html = clipboardData.getData( 'Text' );
