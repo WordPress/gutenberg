@@ -37,22 +37,25 @@ function render_block_core_tag_cloud( $attributes ) {
  * Registers the `core/tag-cloud` block on server.
  */
 function register_block_core_tag_cloud() {
-	register_block_type( 'core/tag-cloud', array(
-		'attributes'      => array(
-			'taxonomy'      => array(
-				'type' => 'string',
+	register_block_type(
+		'core/tag-cloud',
+		array(
+			'attributes'      => array(
+				'taxonomy'      => array(
+					'type' => 'string',
+				),
+				'showTagCounts' => array(
+					'type'    => 'boolean',
+					'default' => false,
+				),
+				'align'         => array(
+					'type'    => 'string',
+					'default' => 'center',
+				),
 			),
-			'showTagCounts' => array(
-				'type'    => 'boolean',
-				'default' => false,
-			),
-			'align'         => array(
-				'type'    => 'string',
-				'default' => 'center',
-			),
-		),
-		'render_callback' => 'render_block_core_tag_cloud',
-	) );
+			'render_callback' => 'render_block_core_tag_cloud',
+		)
+	);
 }
 
 add_action( 'init', 'register_block_core_tag_cloud' );
