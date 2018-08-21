@@ -76,6 +76,52 @@ class Registration_Test extends WP_UnitTestCase {
 		$this->assertNotContains( 'core/dummy', $dynamic_block_names );
 	}
 
+	/**
+	 * @covers ::get_blocks, ::gutenberg_parse_blocks
+	 */
+	function test_get_blocks() {
+		$default = array(
+			array(
+				'attrs'     => array(),
+				'innerHTML' => '',
+			),
+		);
+
+		// Post ID.
+		$blocks = get_blocks( self::$post_id );
+		$this->assertInternalType( 'array', $blocks );
+
+		// WP_Post object.
+		$post = get_post( self::$post_id );
+		$blocks = get_blocks( $post );
+		$this->assertInternalType( 'array', $blocks );
+
+		// Content string.
+		$blocks = get_blocks( $post->post_content );
+		$this->assertInternalType( 'array', $blocks );
+
+		foreach ( $blocks as $block ) {
+			$this->assertInternalType( 'array', $block );
+			$this->assertArrayHasKey( 'attrs', $block );
+			$this->assertArrayHasKey( 'innerHTML', $block );
+		}
+
+		// No attribute, outside of loop.
+		$blocks = get_blocks();
+		$this->assertInternalType( 'array', $blocks );
+		$this->assertEqualSetsWithIndex( $default, $blocks );
+
+		// No attribute, inside of loop.
+		$query = new WP_Query( array( 'post__in' => array( self::$post_id ) ) );
+		$query->the_post();
+		$blocks = get_blocks();
+		$this->assertInternalType( 'array', $blocks );
+		$this->assertEquals( 9, count( $blocks ) );
+	}
+
+	/**
+	 * @covers ::has_blocks
+	 */
 	function test_has_blocks() {
 		// Test with passing post ID.
 		$this->assertTrue( has_blocks( self::$post_id ) );
