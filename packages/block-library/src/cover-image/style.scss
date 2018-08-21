@@ -81,10 +81,11 @@
 		width: 100%;
 	}
 
-	// Preventing IE11 issue of misplacing flex alignment (https://github.com/WordPress/gutenberg/issues/5791)
-	&::after{
+	// Prevents misplaced flex alignment in IE11.
+	// See: https://github.com/WordPress/gutenberg/issues/5791
+	&::after {
 		content: '';
-		min-height: inherit;
 		font-size: 0;
+		min-height: inherit;
 	}
 }
