@@ -9,5 +9,5 @@ import { Platform } from 'react-native';
  */
 // eslint-disable-next-line no-unused-vars
 export function isAppleOS( _window = window ) {
-	return Platform.Version === 'ios';
+	return Platform.OS === 'ios';
 }
