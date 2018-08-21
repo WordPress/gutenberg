@@ -37,6 +37,7 @@ import { isURL } from '@wordpress/url';
  */
 import Autocomplete from '../autocomplete';
 import BlockFormatControls from '../block-format-controls';
+import { DEFAULT_CONTROLS } from './formatting-controls';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 import { pickAriaProps } from './aria';
@@ -79,8 +80,6 @@ export function getFormatValue( formatName, parents ) {
 
 	return { isActive: true };
 }
-
-const DEFAULT_FORMATS = [ 'bold', 'italic', 'strikethrough', 'link', 'code' ];
 
 export class RichText extends Component {
 	constructor() {
@@ -1004,7 +1003,7 @@ RichText.contextTypes = {
 };
 
 RichText.defaultProps = {
-	formattingControls: DEFAULT_FORMATS,
+	formattingControls: DEFAULT_CONTROLS,
 	formatters: [],
 	format: 'children',
 };
