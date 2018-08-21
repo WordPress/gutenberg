@@ -97,7 +97,6 @@ export class RichText extends Component {
 		this.onKeyUp = this.onKeyUp.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
 		this.onPropagateUndo = this.onPropagateUndo.bind( this );
-		this.onPastePreProcess = this.onPastePreProcess.bind( this );
 		this.onPaste = this.onPaste.bind( this );
 		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
 		this.setFocusedElement = this.setFocusedElement.bind( this );
@@ -162,8 +161,6 @@ export class RichText extends Component {
 		editor.on( 'keydown', this.onKeyDown );
 		editor.on( 'keyup', this.onKeyUp );
 		editor.on( 'BeforeExecCommand', this.onPropagateUndo );
-		editor.on( 'PastePreProcess', this.onPastePreProcess, true /* Add before core handlers */ );
-		editor.on( 'paste', this.onPaste, true /* Add before core handlers */ );
 		editor.on( 'focus', this.onFocus );
 		editor.on( 'input', this.onChange );
 		// The change event in TinyMCE fires every time an undo level is added.
@@ -255,21 +252,38 @@ export class RichText extends Component {
 	 * @param {PasteEvent} event The paste event as triggered by TinyMCE.
 	 */
 	onPaste( event ) {
-		const dataTransfer =
-			event.clipboardData ||
-			event.dataTransfer ||
-			this.editor.getDoc().dataTransfer ||
-			// Removes the need for further `dataTransfer` checks.
-			{ getData: () => '' };
-
-		const { items = [], files = [], types = [] } = dataTransfer;
+		const clipboardData = event.clipboardData;
+		const { items = [], files = [] } = clipboardData;
 		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
-		const plainText = dataTransfer.getData( 'text/plain' );
-		const HTML = dataTransfer.getData( 'text/html' );
+		let plainText = '';
+		let html = '';
+
+		// IE11 only supports `Text` as an argument for `getData` and will
+		// otherwise throw an invalid argument error, so we try the standard
+		// arguments first, then fallback to `Text` if they fail.
+		try {
+			plainText = clipboardData.getData( 'text/plain' );
+			html = clipboardData.getData( 'text/html' );
+		} catch ( error1 ) {
+			try {
+				html = clipboardData.getData( 'Text' );
+			} catch ( error2 ) {
+				// Some browsers like UC Browser paste plain text by default and
+				// don't support clipboardData at all, so allow default
+				// behaviour.
+				return;
+			}
+		}
+
+		event.preventDefault();
+
+		// Allows us to ask for this information when we get a report.
+		window.console.log( 'Received HTML:\n\n', html );
+		window.console.log( 'Received plain text:\n\n', plainText );
 
 		// Only process file if no HTML is present.
 		// Note: a pasted file may have the URL as plain text.
-		if ( item && ! HTML ) {
+		if ( item && ! html ) {
 			const file = item.getAsFile ? item.getAsFile() : item;
 			const content = rawHandler( {
 				HTML: `<img src="${ createBlobURL( file ) }">`,
@@ -290,36 +304,13 @@ export class RichText extends Component {
 				this.props.setTimeout( () => this.splitContent( content ) );
 			}
 
-			event.preventDefault();
+			return;
 		}
-
-		this.pastedPlainText = plainText;
-		this.isPlainTextPaste = types.length === 1 && types[ 0 ] === 'text/plain';
-	}
-
-	/**
-	 * Handles a PrePasteProcess event from TinyMCE.
-	 *
-	 * Will call the paste handler with the pasted data. If it is a string tries
-	 * to put it in the containing TinyMCE editor. Otherwise call the `onSplit`
-	 * handler.
-	 *
-	 * @param {PrePasteProcessEvent} event The PrePasteProcess event as triggered
-	 *                                     by TinyMCE.
-	 */
-	onPastePreProcess( event ) {
-		const HTML = this.isPlainTextPaste ? '' : event.content;
-
-		event.preventDefault();
-
-		// Allows us to ask for this information when we get a report.
-		window.console.log( 'Received HTML:\n\n', HTML );
-		window.console.log( 'Received plain text:\n\n', this.pastedPlainText );
 
 		// There is a selection, check if a URL is pasted.
 		if ( ! this.editor.selection.isCollapsed() ) {
 			const linkRegExp = /^(?:https?:)?\/\/\S+$/i;
-			const pastedText = event.content.replace( /<[^>]+>/g, '' ).trim();
+			const pastedText = ( html || plainText ).replace( /<[^>]+>/g, '' ).trim();
 
 			// A URL was pasted, turn the selection into a link
 			if ( linkRegExp.test( pastedText ) ) {
@@ -345,8 +336,8 @@ export class RichText extends Component {
 		}
 
 		const content = rawHandler( {
-			HTML,
-			plainText: this.pastedPlainText,
+			HTML: html,
+			plainText,
 			mode,
 			tagName: this.props.tagName,
 			canUserUseUnfilteredHTML: this.props.canUserUseUnfilteredHTML,
@@ -975,6 +966,7 @@ export class RichText extends Component {
 								{ ...ariaProps }
 								className={ className }
 								key={ key }
+								onPaste={ this.onPaste }
 							/>
 							{ isPlaceholderVisible &&
 								<Tagname
