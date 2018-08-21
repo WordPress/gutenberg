@@ -3,7 +3,7 @@
  */
 import { dispatch, select } from '@wordpress/data';
 
-export function setupHearthbeatPostLocking() {
+const setupHearthbeatPostLocking = () => {
 	/**
 	 * Configure Heartbeat post locks.
 	 *
@@ -80,4 +80,6 @@ export function setupHearthbeatPostLocking() {
 			url: ajaxurl,
 		} );
 	} );
-}
+};
+
+export default setupHearthbeatPostLocking;
