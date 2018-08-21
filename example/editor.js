@@ -19,7 +19,7 @@ export default class Editor extends Component {
     }
 
     onActiveFormatsChange( formats ) {      
-      this.setState( { activeFormats: formats });
+      this.setState({activeFormats: formats });
     }
 
     isFormatActive( format ) {
@@ -34,7 +34,7 @@ export default class Editor extends Component {
       return (
               <View>
               <View style={{flex: 1, flexDirection: 'row'}}>
-                <Button title="Bold" color={ this.isFormatActive("bold") ? 'black' : 'gray' } onPress={ () => { this.onFormatPress("bold") } }/>
+                <Button title="Bold" color={ this.isFormatActive("bold") || this.isFormatActive("strong" )? 'black' : 'gray' } onPress={ () => { this.onFormatPress("bold") } }/>
                 <Button title="Italic" color={ this.isFormatActive("italic") ? 'black' : 'gray' } onPress={ () => { this.onFormatPress("italic") } }/>
                 <Button title="Strikethrough" color={ this.isFormatActive("strikethrough") ? 'black' : 'gray' } onPress={ () => { this.onFormatPress("strikethrough") } }/>
               </View>
