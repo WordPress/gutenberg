@@ -87,7 +87,3 @@
 	overflow: auto;
 	padding: $panel-padding;
 }
-
-.components-modal__content.noheader {
-	height: calc(100% - #{ $admin-bar-height });
-}

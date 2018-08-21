@@ -1,8 +1,8 @@
 .post-locked-modal {
-	max-height: 100px;
+	max-height: 152px;
 	padding-right: 10px;
 	padding-left: 10px;
-	padding-top: 20px;
+	padding-top: 10px;
 
 	button.button,
 	button.components-button {
@@ -12,5 +12,12 @@
 		float: left;
 		margin: 8px;
 		margin-right: 15px;
+	}
+	h1 {
+		font-size: 2em;
+		margin-top: 8px;
+	}
+	.components-modal__header {
+		height: 36px;
 	}
 }

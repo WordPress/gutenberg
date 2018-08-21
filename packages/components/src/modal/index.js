@@ -118,7 +118,6 @@ class Modal extends Component {
 			aria,
 			instanceId,
 			showCloseIcon,
-			hideTitleSection,
 			...otherProps
 		} = this.props;
 
@@ -143,19 +142,16 @@ class Modal extends Component {
 						describedby: aria.describedby,
 					} }
 					{ ...otherProps } >
-					{
-						! hideTitleSection &&
-							<ModalHeader
-								closeLabel={ closeButtonLabel }
-								showCloseIcon={ showCloseIcon }
-								onClose={ onRequestClose }
-								title={ title }
-								headingId={ headingId }
-								icon={ icon }
-							/>
-					}
+					<ModalHeader
+						closeLabel={ closeButtonLabel }
+						showCloseIcon={ showCloseIcon }
+						onClose={ onRequestClose }
+						title={ title }
+						headingId={ headingId }
+						icon={ icon }
+					/>
 					<div
-						className={ 'components-modal__content' + hideTitleSection ? ' noheader' : '' }>
+						className={ 'components-modal__content' }>
 						{ children }
 					</div>
 				</ModalFrame>

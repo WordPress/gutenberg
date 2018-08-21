@@ -59,15 +59,13 @@ class PostLockedModal extends Component {
 				{
 					this.state.isOpen ?
 						<Modal
-							title=""
+							title={ this.takeover ? __( 'Post taken over' ) : __( 'Post locked' ) }
 							onRequestClose={ this.closeModal }
 							focusOnMount={ true }
 							shouldCloseOnClickOutside={ false }
 							shouldCloseOnEsc={ false }
 							showCloseIcon={ false }
 							className="post-locked-modal"
-							icon={ this.avatar }
-							hideTitleSection={ true }
 						>
 							{
 								this.avatar &&
