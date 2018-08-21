@@ -17,7 +17,7 @@ import {
 	InspectorControls,
 	MediaPlaceholder,
 	RichText,
-	editorMediaUpload,
+	mediaUpload,
 } from '@wordpress/editor';
 import { getBlobByURL } from '@wordpress/blob';
 
@@ -42,7 +42,7 @@ class AudioEdit extends Component {
 			const file = getBlobByURL( src );
 
 			if ( file ) {
-				editorMediaUpload( {
+				mediaUpload( {
 					filesList: [ file ],
 					onFileChange: ( [ { id: mediaId, url } ] ) => {
 						setAttributes( { id: mediaId, src: url } );
