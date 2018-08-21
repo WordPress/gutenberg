@@ -9,12 +9,6 @@
 	justify-content: center;
 	align-items: center;
 
-	&::after{
-		content: '';
-		min-height: inherit;
-		font-size: 0;
-	}
-
 	&.has-left-content {
 		justify-content: flex-start;
 
@@ -85,5 +79,12 @@
 	&.alignright {
 		max-width: $content-width / 2;
 		width: 100%;
+	}
+
+	// Preventing IE11 issue of misplacing flex alignment (https://github.com/WordPress/gutenberg/issues/5791)
+	&::after{
+		content: '';
+		min-height: inherit;
+		font-size: 0;
 	}
 }
