@@ -212,11 +212,23 @@ export class RichText extends Component {
 	 * @param {PasteEvent} event The paste event as triggered by TinyMCE.
 	 */
 	onPaste( event ) {
-		const clipboardData = event.clipboardData || window.clipboardData;
+		const clipboardData = event.clipboardData;
 		const { items = [], files = [] } = clipboardData;
 		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
-		const plainText = clipboardData.getData( 'text/plain' );
-		const HTML = clipboardData.getData( 'text/html' );
+		let plainText = '';
+		let HTML = '';
+
+		try {
+			plainText = clipboardData.getData( 'text/plain' );
+			HTML = clipboardData.getData( 'text/html' );
+		// IE11 will throw an invalid argument error.
+		} catch ( e1 ) {
+			try {
+				HTML = clipboardData.getData( 'Text' );
+			} catch ( e2 ) {
+				return;
+			}
+		}
 
 		event.preventDefault();
 

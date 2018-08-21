@@ -34,7 +34,7 @@ import {
 /**
  * Browser dependencies
  */
-const { log, warn } = window.console;
+const { console } = window;
 
 export { getPhrasingContentSchema };
 
@@ -50,7 +50,7 @@ function filterInlineHTML( HTML ) {
 	HTML = removeInvalidHTML( HTML, getPhrasingContentSchema(), { inline: true } );
 
 	// Allows us to ask for this information when we get a report.
-	log( 'Processed inline HTML:\n\n', HTML );
+	console.log( 'Processed inline HTML:\n\n', HTML );
 
 	return HTML;
 }
@@ -173,7 +173,7 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 		piece = normaliseBlocks( piece );
 
 		// Allows us to ask for this information when we get a report.
-		log( 'Processed HTML piece:\n\n', piece );
+		console.log( 'Processed HTML piece:\n\n', piece );
 
 		const doc = document.implementation.createHTMLDocument( '' );
 
@@ -183,7 +183,7 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 			const rawTransformation = findTransform( rawTransformations, ( { isMatch } ) => isMatch( node ) );
 
 			if ( ! rawTransformation ) {
-				warn(
+				console.warn(
 					'A block registered a raw transformation schema for `' + node.nodeName + '` but did not match it. ' +
 					'Make sure there is a `selector` or `isMatch` property that can match the schema.\n' +
 					'Sanitized HTML: `' + node.outerHTML + '`'
