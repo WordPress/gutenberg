@@ -4,14 +4,13 @@
 
 	.components-base-control {
 		margin: 0 0 1em 0;
+		&:last-child {
+			margin-bottom: 0;
+		}
 	}
 
 	.components-panel__body-toggle {
 		color: $dark-gray-500;
-	}
-
-	> div:last-child {
-		margin-bottom: 0;
 	}
 
 	&:first-child {
