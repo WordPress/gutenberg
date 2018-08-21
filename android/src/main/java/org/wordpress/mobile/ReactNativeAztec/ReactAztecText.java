@@ -7,6 +7,7 @@ import android.text.TextWatcher;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIManagerModule;
+import com.facebook.react.uimanager.events.EventDispatcher;
 import com.facebook.react.views.textinput.ContentSizeWatcher;
 import com.facebook.react.views.textinput.ReactTextInputLocalData;
 import com.facebook.react.views.textinput.ScrollWatcher;
@@ -27,6 +28,7 @@ import org.wordpress.aztec.plugins.wpcomments.WordPressCommentsPlugin;
 import org.wordpress.aztec.plugins.wpcomments.toolbar.MoreToolbarButton;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class ReactAztecText extends AztecText {
 
@@ -97,6 +99,55 @@ public class ReactAztecText extends AztecText {
         setIntrinsicContentSize();
     }
 
+    void setActiveFormatsChange(boolean enabled) {
+        // If it's not enabled set an empty listener on AztecText
+        if (!enabled) {
+            setOnSelectionChangedListener(new OnSelectionChangedListener() {
+                @Override
+                public void onSelectionChanged(int selStart, int selEnd) {
+                    // nope
+                }
+            });
+            return;
+        }
+
+        setOnSelectionChangedListener(new OnSelectionChangedListener() {
+            @Override
+            public void onSelectionChanged(int selStart, int selEnd) {
+               ReactAztecText.this.updateToolbarButtons(selStart, selEnd);
+            }
+        });
+    }
+
+    private void updateToolbarButtons(int selStart, int selEnd) {
+        ArrayList<ITextFormat> appliedStyles = getAppliedStyles(selStart, selEnd);
+        updateToolbarButtons(appliedStyles);
+    }
+
+    private void updateToolbarButtons(ArrayList<ITextFormat> appliedStyles) {
+        // Read the applied styles and get the String list of formatting options
+        LinkedList<String> formattingOptions = new LinkedList<>();
+        for (ITextFormat currentStyle : appliedStyles) {
+            if (currentStyle == AztecTextFormat.FORMAT_STRONG) {
+                formattingOptions.add("strong");
+            }
+            if (currentStyle == AztecTextFormat.FORMAT_ITALIC) {
+                formattingOptions.add("italic");
+            }
+            if (currentStyle == AztecTextFormat.FORMAT_STRIKETHROUGH) {
+                formattingOptions.add("strikethrough");
+            }
+        }
+        ReactContext reactContext = (ReactContext) getContext();
+        EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
+        eventDispatcher.dispatchEvent(
+                new ReactAztecFormattingChangeEvent(
+                        getId(),
+                        formattingOptions.toArray(new String[formattingOptions.size()])
+                )
+        );
+    }
+
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         onContentSizeChange();
@@ -152,6 +203,7 @@ public class ReactAztecText extends AztecText {
         ArrayList<ITextFormat> newFormats = new ArrayList<>();
         switch (format) {
             case ("bold"):
+            case ("strong"):
                 newFormats.add(AztecTextFormat.FORMAT_STRONG);
                 newFormats.add(AztecTextFormat.FORMAT_BOLD);
             break;
@@ -169,9 +221,14 @@ public class ReactAztecText extends AztecText {
         }
 
         if (!isTextSelected()) {
-            setSelectedStyles(getNewStylesList(newFormats));
+            final ArrayList<ITextFormat> newStylesList = getNewStylesList(newFormats);
+            setSelectedStyles(newStylesList);
+            // Update the toolbar state
+            updateToolbarButtons(newStylesList);
         } else {
             toggleFormatting(newFormats.get(0));
+            // Update the toolbar state
+            updateToolbarButtons(getSelectionStart(), getSelectionEnd());
         }
     }
 
@@ -180,10 +237,10 @@ public class ReactAztecText extends AztecText {
         ArrayList<ITextFormat> textFormats = new ArrayList<>();
         textFormats.addAll(getSelectedStyles());
         boolean wasRemoved = false;
-        for (ITextFormat currentFormat : newFormats) {
-            if (textFormats.contains(currentFormat)) {
+        for (ITextFormat newFormat : newFormats) {
+            if (textFormats.contains(newFormat)) {
                 wasRemoved = true;
-                textFormats.remove(currentFormat);
+                textFormats.remove(newFormat);
             }
         }
 
