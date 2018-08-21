@@ -161,10 +161,10 @@ When creating a new package you need to provide at least the following:
 	
 ### Maintaining changelogs
 
-It isn't easy task to maintain dozens of npm packages. That's why we decided to introduce `CHANGELOG.md` files for all packages to simplify the release process.
+It isn't easy task to maintain dozens of npm packages. That's why we choose to introduce `CHANGELOG.md` files for all packages to simplify the release process.
 
-The developer who proposes a change (pull request) is responsible to choose the correct version increment (`major`, `minor` or `patch`) according to the following guidelines:
-- Major version X (X.y.z | X > 0) should be bumped on any backwards-incompatible change. This will usually occur at the final removal of the feature. The deprecation should be fully backwards-compatible and, if it is not, it should warrant a separate major version bump.
+The developer who proposes a change (pull request) is responsible to determine the correct version increment (`major`, `minor` or `patch`) according to the following guidelines:
+- Major version X (X.y.z | X > 0) should be bumped on any backwards-incompatible change. This will usually occur at the final stage of deprecating and the removal of a feature. The deprecation should be fully backwards-compatible and, if it is not, it should warrant a separate major version bump.
 - Minor version Y (x.Y.z | x > 0) update should be selected when you add functionality in a backwards-compatible manner. It must be incremented if any public API functionality is marked as deprecated.
 - Patch version Z (x.y.Z | x > 0) should be incremented when you make backwards-compatible bug fixes.
 
