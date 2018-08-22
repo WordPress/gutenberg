@@ -30,6 +30,7 @@ import { withSelect } from '@wordpress/data';
 import { rawHandler, children } from '@wordpress/blocks';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
+import { isURL } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -309,11 +310,10 @@ export class RichText extends Component {
 
 		// There is a selection, check if a URL is pasted.
 		if ( ! this.editor.selection.isCollapsed() ) {
-			const linkRegExp = /^(?:https?:)?\/\/\S+$/i;
 			const pastedText = ( html || plainText ).replace( /<[^>]+>/g, '' ).trim();
 
 			// A URL was pasted, turn the selection into a link
-			if ( linkRegExp.test( pastedText ) ) {
+			if ( isURL( pastedText ) ) {
 				this.editor.execCommand( 'mceInsertLink', false, {
 					href: this.editor.dom.decode( pastedText ),
 				} );
@@ -840,9 +840,18 @@ export class RichText extends Component {
 				const { isAdding, value: href, target } = formatValue;
 				const isSelectionCollapsed = this.editor.selection.isCollapsed();
 
-				// Bail early if the link is still being added. <RichText> will ask the user
-				// for a URL and then update `formats.link`.
+				// Are we creating a new link?
 				if ( isAdding ) {
+					// If the selected text is a URL, instantly turn it into a link.
+					const selectedText = this.editor.selection.getContent( { format: 'text' } );
+					if ( isURL( selectedText ) ) {
+						formatValue.isAdding = false;
+						this.editor.execCommand( 'mceInsertLink', false, {
+							href: selectedText,
+						} );
+						return;
+					}
+
 					// Create a placeholder <a> so that there's something to indicate which
 					// text will become a link. Placeholder links are stripped from
 					// getContent() and removed when the selection changes.
@@ -853,6 +862,9 @@ export class RichText extends Component {
 							'data-mce-bogus': true,
 						} );
 					}
+
+					// Bail early if the link is still being added. <RichText> will ask the user
+					// for a URL and then update `formats.link`.
 					return;
 				}
 
