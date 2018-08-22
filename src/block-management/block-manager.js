@@ -245,16 +245,27 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	renderItem( value: { item: BlockType, clientId: string } ) {
+		const insertHere = (
+			<View style={ styles.containerStyleAddHere } >
+				<View style={ styles.lineStyleAddHere }></View>
+				<Text style={ styles.labelStyleAddHere } >ADD BLOCK HERE</Text>
+				<View style={ styles.lineStyleAddHere }></View>
+			</View>
+		);
+
 		return (
-			<BlockHolder
-				key={ value.clientId }
-				onToolbarButtonPressed={ this.onToolbarButtonPressed.bind( this ) }
-				onBlockHolderPressed={ this.onBlockHolderPressed.bind( this ) }
-				onChange={ this.onChange.bind( this ) }
-				focused={ value.item.focused }
-				clientId={ value.clientId }
-				{ ...value.item }
-			/>
+			<View>
+				<BlockHolder
+					key={ value.clientId }
+					onToolbarButtonPressed={ this.onToolbarButtonPressed.bind( this ) }
+					onBlockHolderPressed={ this.onBlockHolderPressed.bind( this ) }
+					onChange={ this.onChange.bind( this ) }
+					focused={ value.item.focused }
+					clientId={ value.clientId }
+					{ ...value.item }
+				/>
+				{ this.state.blockTypePickerVisible && value.item.focused && insertHere }
+			</View>
 		);
 	}
 
