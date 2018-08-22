@@ -16,6 +16,7 @@ type PropsType = {
 	onDismiss: () => void,
 };
 
+// TODO: not used for now - will hold currently selected Block Type, probably makes sense for the inspector
 type StateType = {
 	selectedIndex: number,
 };
