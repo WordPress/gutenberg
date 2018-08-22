@@ -103,8 +103,15 @@ const effects = {
 
 		// Merge all form data objects into a single one.
 		const formData = reduce( formDataToMerge, ( memo, currentFormData ) => {
-			for ( const [ key, value ] of currentFormData ) {
+			// Use a while loop instead of for (var .. of ),
+			// Due to FormData polyfill.
+			const formDataEntries = currentFormData.entries();
+			let formDataEntry = formDataEntries.next();
+
+			while (!formDataEntry.done) {
+				const [key, value] = formDataEntry.value;
 				memo.append( key, value );
+				formDataEntry = formDataEntries.next();
 			}
 			return memo;
 		}, new window.FormData() );
