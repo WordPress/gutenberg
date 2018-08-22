@@ -150,18 +150,6 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				}
 
 				return serialize( [ block ] ) + '\n\n';
-/*
-				const blockType = getBlockType( block.name );
-
-				if ( blockType ) {
-					return serialize( [ block ] ) + '\n\n';
-				} else 
-
-				const fallbackBlockName = getUnknownTypeHandlerName();
-				const unsupportedBlockType = getBlockType( fallbackBlockName );
-
-				return serialize( [ block ] ) + '\n\n'; // unsupportedBlockType.save( block.attributes );
-*/
 			} )
 			.reduce( ( prevVal, value ) => {
 				return prevVal + value;
@@ -273,14 +261,17 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		if (!blockType) {
 			const unsupportedBlockName = getUnknownTypeHandlerName();
 			const unsupportedBlockType = getBlockType( unsupportedBlockName );
-			const Block = unsupportedBlockType.edit
+			const Block = unsupportedBlockType.edit;
 
 			return (
 				<View style={ holderStyles.blockContainer }>
 					<Block
-						attributes={ { ...value.item.attributes, title: value.item.name } }
+						key={ value.clientId }
+						clientId={ value.clientId }
+						name={ value.item.name }
+						{ ...value.item.attributes }
 					/>
-				</View>
+				</View>	
 			);
 		} else {
 			return (
@@ -296,7 +287,6 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			);
 		}
 	}
-
 
 	renderHTML() {
 		const behavior = Platform.OS === 'ios' ? 'padding' : null;
