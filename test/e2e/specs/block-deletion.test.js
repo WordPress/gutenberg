@@ -27,52 +27,43 @@ const clickOnBlockSettingsMenuItem = async ( buttonLabel ) => {
 };
 
 describe( 'block deletion -', () => {
-	describe( 'deleting the third block using the Remove Block menu item', () => {
-		beforeAll( addThreeParagraphsToNewPost );
+	beforeEach( addThreeParagraphsToNewPost );
 
-		it( 'results in two remaining blocks', async () => {
+	describe( 'deleting the third block using the Remove Block menu item', () => {
+		it( 'results in two remaining blocks and positions the caret at the end of the second block', async () => {
 			await clickOnBlockSettingsMenuItem( 'Remove Block' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
-		} );
 
-		it( 'positions the caret at the end of the second block as evidenced by typing additional text', async () => {
+			// Type additional text and assert that caret position is correct by comparing to snapshot.
 			await page.keyboard.type( ' - caret was here' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
 	} );
 
 	describe( 'deleting the third block using the Remove Block shortcut', () => {
-		beforeAll( addThreeParagraphsToNewPost );
-
-		it( 'results in two remaining blocks', async () => {
+		it( 'results in two remaining blocks and positions the caret at the end of the second block', async () => {
 			await pressWithModifier( [ 'Alt', META_KEY ], 'Backspace' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
-		} );
 
-		it( 'positions the caret at the end of the second block as evidenced by typing additional text', async () => {
+			// Type additional text and assert that caret position is correct by comparing to snapshot.
 			await page.keyboard.type( ' - caret was here' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
 	} );
 
 	describe( 'deleting the third block using backspace in an empty block', () => {
-		beforeAll( addThreeParagraphsToNewPost );
-
-		it( 'results in two remaining blocks', async () => {
+		it( 'results in two remaining blocks and positions the caret at the end of the second block', async () => {
 			await page.keyboard.press( 'Backspace' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
-		} );
 
-		it( 'positions the caret at the end of the second block as evidenced by typing additional text', async () => {
+			// Type additional text and assert that caret position is correct by comparing to snapshot.
 			await page.keyboard.type( ' - caret was here' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
 	} );
 
 	describe( 'deleting the third block using backspace with block wrapper selection', () => {
-		beforeAll( addThreeParagraphsToNewPost );
-
-		it( 'results in three remaining blocks', async () => {
+		it( 'results in three remaining blocks and positions the caret at the end of the third block', async () => {
 			// Add an image block since it's easier to click the wrapper on non-textual blocks.
 			await page.keyboard.type( '/image' );
 			await page.keyboard.press( 'Enter' );
@@ -85,33 +76,27 @@ describe( 'block deletion -', () => {
 			await page.keyboard.press( 'Backspace' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
-		} );
 
-		it( 'positions the caret at the end of the second block as evidenced by typing additional text', async () => {
+			// Type additional text and assert that caret position is correct by comparing to snapshot.
 			await page.keyboard.type( ' - caret was here' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
 	} );
 
 	describe( 'deleting third third and fourth blocks using backspace with multi-block selection', () => {
-		beforeAll( async () => {
-			await addThreeParagraphsToNewPost();
-
+		it( 'results in two remaining blocks and positions the caret at the end of the second block', async () => {
 			// Add a third paragraph for this test.
 			await page.keyboard.type( 'Third paragraph' );
 			await page.keyboard.press( 'Enter' );
-		} );
 
-		it( 'results in two remaining blocks', async () => {
 			// Press the up arrow once to select the third and fourth blocks.
 			await pressWithModifier( 'Shift', 'ArrowUp' );
 
 			// Now that the block wrapper is selected, press backspace to delete it.
 			await page.keyboard.press( 'Backspace' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
-		} );
 
-		it( 'positions the caret at the end of the second block as evidenced by typing additional text', async () => {
+			// Type additional text and assert that caret position is correct by comparing to snapshot.
 			await page.keyboard.type( ' - caret was here' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
