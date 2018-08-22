@@ -1,3 +1,7 @@
+/**
+ * Internal dependencies
+ */
+
 import {
 	createTable,
 	updateCellContent,

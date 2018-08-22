@@ -1,11 +1,13 @@
 /**
  * External dependencies
  */
+
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
+
 import { __ } from '@wordpress/i18n';
 import { getPhrasingContentSchema } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
@@ -13,6 +15,7 @@ import { RichText } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
+
 import edit from './edit';
 
 const tableContentPasteSchema = {

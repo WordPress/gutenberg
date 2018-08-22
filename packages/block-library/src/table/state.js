@@ -1,8 +1,17 @@
 /**
  * External dependencies
  */
+
 import { times } from 'lodash';
 
+/**
+ * Creates a table state.
+ *
+ * @param {number} options.rowCount    Row count for the table to create.
+ * @param {number} options.columnCount Column count for the table to create.
+ *
+ * @return {Object} New table state.
+ */
 export function createTable( {
 	rowCount,
 	columnCount,
@@ -17,6 +26,17 @@ export function createTable( {
 	};
 }
 
+/**
+ * Updates cell content in the table state.
+ *
+ * @param {Object} state               Current table state.
+ * @param {string} options.section     Section of the cell to update.
+ * @param {number} options.rowIndex    Row index of the cell to update.
+ * @param {number} options.columnIndex Column index of the cell to update.
+ * @param {Array}  options.content     Content to set for the cell.
+ *
+ * @return {Object} New table state.
+ */
 export function updateCellContent( state, {
 	section,
 	rowIndex,
@@ -45,6 +65,15 @@ export function updateCellContent( state, {
 	};
 }
 
+/**
+ * Inserts a row in the table state.
+ *
+ * @param {Object} state            Current table state.
+ * @param {string} options.section  Section in which to insert the row.
+ * @param {number} options.rowIndex Row index at which to insert the row.
+ *
+ * @return {Object} New table state.
+ */
 export function insertRow( state, {
 	section,
 	rowIndex,
@@ -65,6 +94,15 @@ export function insertRow( state, {
 	};
 }
 
+/**
+ * Deletes a row from the table state.
+ *
+ * @param {Object} state            Current table state.
+ * @param {string} options.section  Section in which to delete the row.
+ * @param {number} options.rowIndex Row index to delete.
+ *
+ * @return {Object} New table state.
+ */
 export function deleteRow( state, {
 	section,
 	rowIndex,
@@ -74,6 +112,15 @@ export function deleteRow( state, {
 	};
 }
 
+/**
+ * Inserts a column in the table state.
+ *
+ * @param {Object} state               Current table state.
+ * @param {string} options.section     Section in which to insert the column.
+ * @param {number} options.columnIndex Column index at which to insert the column.
+ *
+ * @return {Object} New table state.
+ */
 export function insertColumn( state, {
 	section,
 	columnIndex,
@@ -92,6 +139,15 @@ export function insertColumn( state, {
 	};
 }
 
+/**
+ * Deletes a column from the table state.
+ *
+ * @param {Object} state               Current table state.
+ * @param {string} options.section     Section in which to delete the column.
+ * @param {number} options.columnIndex Column index to delete.
+ *
+ * @return {Object} New table state.
+ */
 export function deleteColumn( state, {
 	section,
 	columnIndex,

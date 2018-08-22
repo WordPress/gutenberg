@@ -1,11 +1,13 @@
 /**
  * External dependencies
  */
+
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
+
 import { Fragment, Component } from '@wordpress/element';
 import { InspectorControls, BlockControls, RichText } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
@@ -21,6 +23,7 @@ import {
 /**
  * Internal dependencies
  */
+
 import {
 	createTable,
 	updateCellContent,
@@ -33,6 +36,7 @@ import {
 /**
  * Browser dependencies
  */
+
 const { parseInt } = window;
 
 export default class TableEdit extends Component {
@@ -62,14 +66,27 @@ export default class TableEdit extends Component {
 		};
 	}
 
+	/**
+	 * Updates the initial column count used for table creation.
+	 *
+	 * @param {number} initialColumnCount New initial column count.
+	 */
 	onChangeInitialColumnCount( initialColumnCount ) {
 		this.setState( { initialColumnCount } );
 	}
 
+	/**
+	 * Updates the initial row count used for table creation.
+	 *
+	 * @param {[type]} initialRowCount New initial row count.
+	 */
 	onChangeInitialRowCount( initialRowCount ) {
 		this.setState( { initialRowCount } );
 	}
 
+	/**
+	 * Creates a table based on dimensions in local state.
+	 */
 	onCreateTable() {
 		const { setAttributes } = this.props;
 		let { initialRowCount, initialColumnCount } = this.state;
@@ -83,6 +100,9 @@ export default class TableEdit extends Component {
 		} ) );
 	}
 
+	/**
+	 * Toggles whether the table has a fixed layout or not.
+	 */
 	onChangeFixedLayout() {
 		const { attributes, setAttributes } = this.props;
 		const { hasFixedLayout } = attributes;
@@ -90,6 +110,11 @@ export default class TableEdit extends Component {
 		setAttributes( { hasFixedLayout: ! hasFixedLayout } );
 	}
 
+	/**
+	 * Changes the content of the currently selected cell.
+	 *
+	 * @param {Array} content A RichText content value.
+	 */
 	onChange( content ) {
 		const { selectedCell } = this.state;
 
@@ -108,6 +133,11 @@ export default class TableEdit extends Component {
 		} ) );
 	}
 
+	/**
+	 * Inserts a row at the currently selected row index, plus `delta`.
+	 *
+	 * @param {number} delta Offset for selected row index at which to insert.
+	 */
 	onInsertRow( delta ) {
 		const { selectedCell } = this.state;
 
@@ -125,14 +155,23 @@ export default class TableEdit extends Component {
 		} ) );
 	}
 
+	/**
+	 * Inserts a row before the currently selected row.
+	 */
 	onInsertRowBefore() {
 		this.onInsertRow( 0 );
 	}
 
+	/**
+	 * Inserts a row after the currently selected row.
+	 */
 	onInsertRowAfter() {
 		this.onInsertRow( 1 );
 	}
 
+	/**
+	 * Deletes the currently selected row.
+	 */
 	onDeleteRow() {
 		const { selectedCell } = this.state;
 
@@ -147,6 +186,11 @@ export default class TableEdit extends Component {
 		setAttributes( deleteRow( attributes, { section, rowIndex } ) );
 	}
 
+	/**
+	 * Inserts a column at the currently selected column index, plus `delta`.
+	 *
+	 * @param {number} delta Offset for selected column index at which to insert.
+	 */
 	onInsertColumn( delta = 0 ) {
 		const { selectedCell } = this.state;
 
@@ -164,14 +208,23 @@ export default class TableEdit extends Component {
 		} ) );
 	}
 
+	/**
+	 * Inserts a column before the currently selected column.
+	 */
 	onInsertColumnBefore() {
 		this.onInsertColumn( 0 );
 	}
 
+	/**
+	 * Inserts a column after the currently selected column.
+	 */
 	onInsertColumnAfter() {
 		this.onInsertColumn( 1 );
 	}
 
+	/**
+	 * Deletes the currently selected column.
+	 */
 	onDeleteColumn() {
 		const { selectedCell } = this.state;
 
@@ -186,12 +239,25 @@ export default class TableEdit extends Component {
 		setAttributes( deleteColumn( attributes, { section, columnIndex } ) );
 	}
 
+	/**
+	 * Creates an onFocus handler for a specified cell.
+	 *
+	 * @param {Object} selectedCell Object with `section`, `rowIndex`, and
+	 *                              `columnIndex` properties.
+	 *
+	 * @return {Function} Function to call on focus.
+	 */
 	createOnFocus( selectedCell ) {
 		return () => {
 			this.setState( { selectedCell } );
 		};
 	}
 
+	/**
+	 * Gets the table controls to display in the block toolbar.
+	 *
+	 * @return {Array} Table controls.
+	 */
 	getTableControls() {
 		const { selectedCell } = this.state;
 
@@ -235,6 +301,14 @@ export default class TableEdit extends Component {
 		];
 	}
 
+	/**
+	 * Renders a table section.
+	 *
+	 * @param {string} options.type Section type: head, body, or foot.
+	 * @param {Array}  options.rows The rows to render.
+	 *
+	 * @return {Object} React element for the section.
+	 */
 	renderSection( { type, rows } ) {
 		if ( ! rows.length ) {
 			return null;
