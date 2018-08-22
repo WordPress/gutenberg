@@ -10,4 +10,4 @@ export const SVG = ( props ) => {
 			{ props.children }
 		</Svg>
 	);
-}
+};

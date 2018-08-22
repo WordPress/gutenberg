@@ -1,2 +1,2 @@
-const LinkContainer = () => { return null; };
+const LinkContainer = () => { return null };
 export default LinkContainer;
