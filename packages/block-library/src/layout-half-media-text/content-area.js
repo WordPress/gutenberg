@@ -19,6 +19,12 @@ export const settings = {
 
 	category: 'common',
 
+	supports: {
+		hoverMarks: false,
+		selectionMarks: false,
+		settingsMenu: false,
+	},
+
 	edit() {
 		return (
 			<div className="half-media__content">

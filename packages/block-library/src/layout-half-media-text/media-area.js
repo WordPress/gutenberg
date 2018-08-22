@@ -26,6 +26,12 @@ export const settings = {
 
 	category: 'common',
 
+	supports: {
+		hoverMarks: false,
+		selectionMarks: false,
+		settingsMenu: false,
+	},
+
 	edit: withSelect( ( select, { clientId } ) => {
 		const { getBlockOrder } = select( 'core/editor' );
 		const blocksInside = getBlockOrder( clientId );
