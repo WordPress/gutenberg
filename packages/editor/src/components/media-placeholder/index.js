@@ -20,6 +20,7 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import MediaUpload from '../media-upload';
+import MediaUploadCheck from '../media-upload/check';
 import { mediaUpload } from '../../utils/';
 
 class MediaPlaceholder extends Component {
@@ -96,10 +97,12 @@ class MediaPlaceholder extends Component {
 				className={ classnames( 'editor-media-placeholder', className ) }
 				notices={ notices }
 			>
-				<DropZone
-					onFilesDrop={ this.onFilesUpload }
-					onHTMLDrop={ onHTMLDrop }
-				/>
+				<MediaUploadCheck>
+					<DropZone
+						onFilesDrop={ this.onFilesUpload }
+						onHTMLDrop={ onHTMLDrop }
+					/>
+				</MediaUploadCheck>
 				{ onSelectURL && (
 					<form onSubmit={ this.onSubmitSrc }>
 						<input
@@ -117,27 +120,29 @@ class MediaPlaceholder extends Component {
 						</Button>
 					</form>
 				) }
-				<FormFileUpload
-					isLarge
-					className="editor-media-placeholder__upload-button"
-					onChange={ this.onUpload }
-					accept={ accept }
-					multiple={ multiple }
-				>
-					{ __( 'Upload' ) }
-				</FormFileUpload>
-				<MediaUpload
-					gallery={ multiple && type === 'image' }
-					multiple={ multiple }
-					onSelect={ onSelect }
-					type={ type }
-					value={ value.id }
-					render={ ( { open } ) => (
-						<Button isLarge onClick={ open }>
-							{ __( 'Media Library' ) }
-						</Button>
-					) }
-				/>
+				<MediaUploadCheck>
+					<FormFileUpload
+						isLarge
+						className="editor-media-placeholder__upload-button"
+						onChange={ this.onUpload }
+						accept={ accept }
+						multiple={ multiple }
+					>
+						{ __( 'Upload' ) }
+					</FormFileUpload>
+					<MediaUpload
+						gallery={ multiple && type === 'image' }
+						multiple={ multiple }
+						onSelect={ onSelect }
+						type={ type }
+						value={ value.id }
+						render={ ( { open } ) => (
+							<Button isLarge onClick={ open }>
+								{ __( 'Media Library' ) }
+							</Button>
+						) }
+					/>
+				</MediaUploadCheck>
 			</Placeholder>
 		);
 	}
