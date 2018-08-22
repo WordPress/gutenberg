@@ -45,15 +45,18 @@ export default class BlockPicker extends Component<PropsType, StateType> {
 					<View>
 						<Text style={ styles.title }>ADD BLOCK</Text>
 					</View>
-					<View style={ styles.lineStyle }/>
+					<View style={ styles.lineStyle } />
 					<FlatList
 						numColumns={ 3 }
 						data={ this.availableBlockTypes }
 						keyExtractor={ ( item ) => item.name }
 						renderItem={ ( { item } ) =>
 							<TouchableHighlight onPress={ this.props.onValueSelected.bind( this, item.name ) }>
-								<View style={ { backgroundColor: 'white' } }>
-									<Text>{ item.title }</Text>
+								<View style={ styles.modalItem }>
+									<View style={ styles.modalIcon }>
+										{ /* TODO: ICON IMAGE GOES HERE */ }
+									</View>
+									<Text style={ styles.modalItemLabel }>{ item.title }</Text>
 								</View>
 							</TouchableHighlight>
 						}
