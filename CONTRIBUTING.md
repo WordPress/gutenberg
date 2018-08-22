@@ -185,6 +185,7 @@ _Example:_
 - If you need to add something considered a bug fix, you add the item to `Bug Fix` section and leave the version as 1.2.2.
 - If it's a new feature you add the item to `New Feature` section and change version to 1.3.0.
 - If it's a breaking change you want to introduce, add the item to `Breaking Change` section and bump the version to 2.0.0.
+- If you struggle to classify a change as one of the above, then it might be not necessary to include it.
 
 The version bump is only necessary if one of the following applies:
  - There are no other unreleased changes.
