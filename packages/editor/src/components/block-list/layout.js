@@ -217,6 +217,7 @@ class BlockListLayout extends Component {
 						blockRef={ this.setBlockRef }
 						onSelectionStart={ this.onSelectionStart }
 						onShiftSelection={ this.onShiftSelection }
+						onSelectionEnd={ this.onSelectionEnd }
 						rootClientId={ rootClientId }
 						layout={ defaultLayout }
 						isFirst={ blockIndex === 0 }
