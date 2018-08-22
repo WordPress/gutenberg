@@ -42,7 +42,12 @@ export default class BlockPicker extends Component<PropsType, StateType> {
 				style={ [ styles.bottomModal, this.props.style ] }
 				onBackdropPress={ this.props.onDismiss.bind( this ) }>
 				<View style={ styles.modalContent }>
+					<View>
+						<Text style={ styles.title }>ADD BLOCK</Text>
+					</View>
+					<View style={ styles.lineStyle }/>
 					<FlatList
+						numColumns={ 3 }
 						data={ this.availableBlockTypes }
 						keyExtractor={ ( item ) => item.name }
 						renderItem={ ( { item } ) =>

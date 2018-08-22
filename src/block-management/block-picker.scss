@@ -2,9 +2,20 @@
 
 @import '../variables.scss';
 
+.title {
+	font-family: $default-monospace-font;
+	font-size: 16px;
+}
+
+.lineStyle {
+	border-bottom-color: lightgray;
+	border-bottom-width: 1px;
+	width: 100%;
+}
+
 .bottomModal {
 	justify-content: flex-end;
-	margin: 0;
+	margin: 0px;
 }
 
 .modalContent {
@@ -15,6 +26,6 @@
 	padding-bottom: 8;
 	justify-content: center;
 	align-items: center;
-	border-radius: 4px;
+	border-radius: 4px 4px 0px 0px;
 }
 
