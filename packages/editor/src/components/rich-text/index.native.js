@@ -21,12 +21,17 @@ import { children } from '@wordpress/blocks';
 import FormatToolbar from './format-toolbar';
 import { FORMATTING_CONTROLS } from './formatting-controls';
 
+export function getFormatValue( formatName ) {
+	return { isActive: true };
+}
+
 export class RichText extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onChange = this.onChange.bind( this );
 		this.onContentSizeChange = this.onContentSizeChange.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
+		this.onActiveFormatsChange = this.onActiveFormatsChange.bind( this );
 		this.state = {
 			formats: {},
 			selectedNodeId: 0,
@@ -35,6 +40,15 @@ export class RichText extends Component {
 		this.lastEventCount = 0;
 	}
 
+	onActiveFormatsChange( formats ) {
+		const formatNames = this.props.formattingControls;
+		const newFormats = formats.reduce( ( accFormats, activeFormat ) => {
+			accFormats[ activeFormat ] = getFormatValue( activeFormat );
+			return accFormats;
+		}, {} );
+
+		this.setState( { formats, selectedNodeId: this.state.selectedNodeId + 1 } );
+	}
 	/**
 	 * Handles any case where the content of the AztecRN instance has changed.
 	 */
@@ -142,6 +156,7 @@ export class RichText extends Component {
 					text={ { text: html, eventCount: eventCount } }
 					onChange={ this.onChange }
 					onContentSizeChange={ this.onContentSizeChange }
+					onActiveFormatsChange = { this.onActiveFormatsChange }
 					color={ 'black' }
 					maxImagesWidth={ 200 }
 					style={ style }
