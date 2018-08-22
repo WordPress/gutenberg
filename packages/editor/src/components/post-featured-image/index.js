@@ -17,12 +17,33 @@ import { withSelect, withDispatch } from '@wordpress/data';
  */
 import PostFeaturedImageCheck from './check';
 import MediaUpload from '../media-upload';
+import MediaUploadCheck from '../media-upload/check';
 
 // Used when labels from post type were not yet loaded or when they are not present.
 const DEFAULT_SET_FEATURE_IMAGE_LABEL = __( 'Set featured image' );
 const DEFAULT_REMOVE_FEATURE_IMAGE_LABEL = __( 'Remove image' );
 
 function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onRemoveImage, media, postType } ) {
+	if ( ! featuredImageId ) {
+		return (
+			<PostFeaturedImageCheck>
+				<div className="editor-post-featured-image">
+					<MediaUpload
+						title={ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
+						onSelect={ onUpdateImage }
+						type="image"
+						modalClass="editor-post-featured-image__media-modal"
+						render={ ( { open } ) => (
+							<Button className="editor-post-featured-image__toggle" onClick={ open }>
+								{ __( 'Set featured image' ) }
+							</Button>
+						) }
+					/>
+				</div>
+			</PostFeaturedImageCheck>
+		);
+	}
+
 	const postLabel = get( postType, [ 'labels' ], {} );
 
 	let mediaWidth, mediaHeight, mediaSourceUrl;
@@ -42,60 +63,43 @@ function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onR
 	return (
 		<PostFeaturedImageCheck>
 			<div className="editor-post-featured-image">
-				{ !! featuredImageId &&
-					<MediaUpload
-						title={ __( 'Set featured image' ) }
-						onSelect={ onUpdateImage }
-						type="image"
-						modalClass="editor-post-featured-image__media-modal"
-						render={ ( { open } ) => (
-							<Button className="editor-post-featured-image__preview" onClick={ open }>
-								{ media &&
-									<ResponsiveWrapper
-										naturalWidth={ mediaWidth }
-										naturalHeight={ mediaHeight }
-									>
-										<img src={ mediaSourceUrl } alt={ __( 'Featured image' ) } />
-									</ResponsiveWrapper>
-								}
-								{ ! media && <Spinner /> }
-							</Button>
-						) }
-					/>
-				}
-				{ !! featuredImageId && media && ! media.isLoading &&
 				<MediaUpload
-					title={ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
+					title={ __( 'Set featured image' ) }
 					onSelect={ onUpdateImage }
 					type="image"
 					modalClass="editor-post-featured-image__media-modal"
 					render={ ( { open } ) => (
-						<Button onClick={ open } isDefault isLarge>
-							{ __( 'Replace image' ) }
+						<Button className="editor-post-featured-image__preview" onClick={ open }>
+							{ media &&
+								<ResponsiveWrapper
+									naturalWidth={ mediaWidth }
+									naturalHeight={ mediaHeight }
+								>
+									<img src={ mediaSourceUrl } alt={ __( 'Featured image' ) } />
+								</ResponsiveWrapper>
+							}
+							{ ! media && <Spinner /> }
 						</Button>
 					) }
 				/>
+				{ media && ! media.isLoading &&
+					<MediaUpload
+						title={ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
+						onSelect={ onUpdateImage }
+						type="image"
+						modalClass="editor-post-featured-image__media-modal"
+						render={ ( { open } ) => (
+							<Button onClick={ open } isDefault isLarge>
+								{ __( 'Replace image' ) }
+							</Button>
+						) }
+					/>
 				}
-				{ ! featuredImageId &&
-					<div>
-						<MediaUpload
-							title={ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
-							onSelect={ onUpdateImage }
-							type="image"
-							modalClass="editor-post-featured-image__media-modal"
-							render={ ( { open } ) => (
-								<Button className="editor-post-featured-image__toggle" onClick={ open }>
-									{ __( 'Set featured image' ) }
-								</Button>
-							) }
-						/>
-					</div>
-				}
-				{ !! featuredImageId &&
+				<MediaUploadCheck>
 					<Button onClick={ onRemoveImage } isLink isDestructive>
 						{ postLabel.remove_featured_image || DEFAULT_REMOVE_FEATURE_IMAGE_LABEL }
 					</Button>
-				}
+				</MediaUploadCheck>
 			</div>
 		</PostFeaturedImageCheck>
 	);
