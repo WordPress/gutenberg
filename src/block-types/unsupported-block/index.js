@@ -25,6 +25,10 @@ export const settings = {
 	category: 'formatting',
 
 	attributes: {
+		name: {
+			type: 'string',
+			source: 'name',
+		},
 		content: {
 			type: 'string',
 			source: 'html',
@@ -41,7 +45,7 @@ export const settings = {
 
 	edit,
 
-	save() {
-		return <RawHTML>Ahoi!</RawHTML>;
+	save({ attributes }) {
+		return <RawHTML>{ attributes.content }</RawHTML>;
 	},
 };

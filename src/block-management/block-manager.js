@@ -11,6 +11,7 @@ import { ToolbarButton } from './constants';
 import type { BlockType } from '../store/';
 import styles from './block-manager.scss';
 import holderStyles from './block-holder.scss';
+import * as UnsupportedBlock from '../block-types/unsupported-block/';
 
 // Gutenberg imports
 import { 
@@ -256,12 +257,15 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 	renderItem( value: { item: BlockType, clientId: string } ) {
 
+		//const blockName = value.item.name;
 		const blockType = getBlockType( value.item.name );
+		const unsupportedBlockName = getUnknownTypeHandlerName();
+		const unsupportedBlockType = getBlockType( unsupportedBlockName );
 
-		if (!blockType) {
-			const unsupportedBlockName = getUnknownTypeHandlerName();
-			const unsupportedBlockType = getBlockType( unsupportedBlockName );
+		if (blockType == unsupportedBlockType) {
 			const Block = unsupportedBlockType.edit;
+
+			console.log("Diego 3:  %O", blockType );
 
 			return (
 				<View style={ holderStyles.blockContainer }>

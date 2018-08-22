@@ -34,7 +34,7 @@ export default class UnsupportedBlockEdit extends React.Component<PropsType, Sta
 	}
 
 	render() {
-		//console.log("Diego:  %O", this );
+		console.log("Diego:  %O", this );
 
 		let blockName = this.props.name.charAt(0).toUpperCase() + this.props.name.slice(1);
 
