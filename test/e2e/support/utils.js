@@ -206,7 +206,8 @@ export async function ensureSidebarOpened() {
  * Clicks the default block appender.
  */
 export async function clickBlockAppender() {
-	await expect( page ).toClick( '.editor-default-block-appender__content' );
+	await page.waitForSelector( '.editor-default-block-appender__content' );
+	await page.click( '.editor-default-block-appender__content' );
 	await waitForRichTextInitialization();
 }
 
