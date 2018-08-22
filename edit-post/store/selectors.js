@@ -137,7 +137,7 @@ export function isFeatureActive( state, feature ) {
 }
 
 /**
- * Returns true if the the plugin item is pinned to the header.
+ * Returns true if the plugin item is pinned to the header.
  * When the value is not set it defaults to true.
  *
  * @param  {Object}  state      Global application state.
@@ -193,7 +193,7 @@ export const hasMetaBoxes = createSelector(
 );
 
 /**
- * Returns true if the the Meta Boxes are being saved.
+ * Returns true if the Meta Boxes are being saved.
  *
  * @param   {Object}  state Global application state.
  *

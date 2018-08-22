@@ -1494,7 +1494,7 @@ function getInsertUsage( state, id ) {
 }
 
 /**
- * Determines the items that appear in the the inserter. Includes both static
+ * Determines the items that appear in the inserter. Includes both static
  * items (e.g. a regular block type) and dynamic items (e.g. a reusable block).
  *
  * Each item object contains what's necessary to display a button in the

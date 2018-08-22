@@ -42,12 +42,13 @@ Then, run a setup script to check if docker and node are configured properly and
 ./bin/setup-local-env.sh
 ``` 
 
-If you're developing themes, or core WordPress functionality alongside Gutenberg, you can access the WordPress files in `wordpress/` by running the following command instead:
-```
-DOCKER_ENV=localwpdev ./bin/setup-local-env.sh
-```
+**If you're developing themes, or core WordPress functionality alongside Gutenberg**, you can make the WordPress files accessible in `wordpress/` by following these instructions instead:
 
-If everything was successful, you'll see the following ascii art:
+1. If this is your first time setting up the environment, run `DOCKER_ENV=localwpdev ./bin/setup-local-env.sh` instead of `./bin/setup-local-env.sh`
+2. If you've already had the previous environment set up, you need to start fresh, and you can do that by first running `docker-compose down --rmi all`. After that you can repeat step 1.
+3. If you turn off your computer or restart Docker, you can get your local WordPress dev enviroment back by typing `docker-compose -f docker-compose.yml -f docker-compose-localdev.yml up`. If you just run `docker-compose up`, you will get the vanilla install that doesn't expose the WordPress folder.
+
+**If everything was successful**, you'll see the following ascii art:
 ```
 Welcome to...
 
