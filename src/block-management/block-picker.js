@@ -3,8 +3,9 @@
  * @flow
  */
 import React, { Component } from 'react';
-import { StyleSheet, FlatList, Text, TouchableHighlight, View } from 'react-native';
+import { FlatList, Text, TouchableHighlight, View } from 'react-native';
 import Modal from 'react-native-modal';
+import styles from './block-picker.scss';
 // Gutenberg imports
 import { getBlockTypes } from '@wordpress/blocks';
 
@@ -18,22 +19,6 @@ type PropsType = {
 type StateType = {
 	selectedIndex: number,
 };
-
-const style = StyleSheet.create( {
-	bottomModal: {
-		justifyContent: "flex-end",
-		margin: 0
-	},
-
-    modalContent: {
-        backgroundColor: "white",
-        padding: 22,
-        justifyContent: "center",
-        alignItems: "center",
-        borderRadius: 4,
-        borderColor: "rgba(0, 0, 0, 0.1)"
-    },
-} );
 
 export default class BlockPicker extends Component<PropsType, StateType> {
 	availableBlockTypes = getBlockTypes();
@@ -53,9 +38,9 @@ export default class BlockPicker extends Component<PropsType, StateType> {
                 isVisible={ this.props.visible }
                 onSwipe={ this.props.onDismiss.bind( this ) }
                 swipeDirection="down"
-                style={[style.bottomModal, this.props.style]}
+                style={[styles.bottomModal, this.props.style]}
                 onBackdropPress={ this.props.onDismiss.bind( this ) }>
-                <View style={style.modalContent}>
+                <View style={styles.modalContent}>
                     <FlatList
                         data={ this.availableBlockTypes }
                         keyExtractor={ ( item ) => item.name }
