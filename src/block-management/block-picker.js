@@ -46,9 +46,9 @@ export default class BlockPicker extends Component<PropsType, StateType> {
 						data={ this.availableBlockTypes }
 						keyExtractor={ ( item ) => item.name }
 						renderItem={ ( { item } ) =>
-							<TouchableHighlight onPress={ this.props.onValueSelected.bind( this, item.name, 1 ) }>
+							<TouchableHighlight onPress={ this.props.onValueSelected.bind( this, item.name ) }>
 								<View style={ { backgroundColor: 'white' } }>
-									<Text>{ item.name }</Text>
+									<Text>{ item.title }</Text>
 								</View>
 							</TouchableHighlight>
 						}
