@@ -200,16 +200,14 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		}
 
 		const blockTypePicker = (
-			<View>
-				<BlockPicker
-					visible={ this.state.blockTypePickerVisible }
-					onDismiss={ () => {
-						this.showBlockTypePicker( false );
-					} }
-					onValueSelected={ ( itemValue, itemIndex ) => {
-						this.onBlockTypeSelected( itemValue, itemIndex );
-					} } />
-			</View>
+			<BlockPicker
+				visible={ this.state.blockTypePickerVisible }
+				onDismiss={ () => {
+					this.showBlockTypePicker( false );
+				} }
+				onValueSelected={ ( itemValue, itemIndex ) => {
+					this.onBlockTypeSelected( itemValue, itemIndex );
+				} } />
 		);
 
 		return (

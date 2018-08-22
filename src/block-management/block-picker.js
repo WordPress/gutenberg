@@ -20,13 +20,18 @@ type StateType = {
 
 const style = StyleSheet.create( {
 	bottomModal: {
-		justifyContent: 'flex-end',
-		backgroundColor: 'white',
-		padding: 22,
-		alignItems: 'center',
-		borderRadius: 4,
-		borderColor: 'rgba(0, 0, 0, 0.1)',
+		justifyContent: "flex-end",
+		margin: 0
 	},
+
+    modalContent: {
+        backgroundColor: "white",
+        padding: 22,
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: 4,
+        borderColor: "rgba(0, 0, 0, 0.1)"
+    },
 } );
 
 export default class BlockPicker extends Component<PropsType, StateType> {
@@ -42,19 +47,20 @@ export default class BlockPicker extends Component<PropsType, StateType> {
 	render() {
 		return (
 			<Modal
-            animationType="slide"
-                transparent={false}
+                animationType="slide"
+                transparent={ true }
                 isVisible={ this.props.visible }
                 onSwipe={ this.props.onDismiss.bind( this ) }
                 swipeDirection="down"
-                style={style.bottomModal}>
-                <View style={{marginTop: 22}}>
+                style={[style.bottomModal, this.props.style]}
+                onBackdropPress={ this.props.onDismiss.bind( this ) }>
+                <View style={style.modalContent}>
                     <FlatList
                         data={ this.availableBlockTypes }
                         keyExtractor={ ( item ) => item.name }
                         renderItem={({item}) =>
                             <TouchableHighlight onPress={ this.props.onValueSelected.bind( this, item.name, 1 ) }>
-                                <View style={{backgroundColor: 'white'}}>
+                                <View style={ { backgroundColor: 'white' } }>
                                     <Text>{item.name}</Text>
                                 </View>
                             </TouchableHighlight>
