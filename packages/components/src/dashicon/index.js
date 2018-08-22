@@ -9,6 +9,9 @@ OR if you're looking to change now SVGs get output, you'll need to edit strings 
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+/**
+ * Internal dependencies
+ */
 import SVG from './svg';
 import Path from './path';
 

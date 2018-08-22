@@ -180,7 +180,7 @@ RichTextContainer.Content = ( { value, format, tagName: Tag, ...props } ) => {
 	return content;
 };
 
-RichTextContainer.Content.defaultProps = {	
+RichTextContainer.Content.defaultProps = {
 	format: 'children',
 };
 

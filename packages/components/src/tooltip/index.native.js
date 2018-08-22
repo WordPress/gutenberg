@@ -1,4 +1,4 @@
-import React from 'react';
+import { Children } from '@wordpress/element';
 
-// for the native mobile, just shortcircuit the Tooltip to return its child
-export default ( props ) => React.Children.only( props.children );
+// For native mobile, just shortcircuit the Tooltip to return its child.
+export default ( props ) => Children.only( props.children );

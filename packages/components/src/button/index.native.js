@@ -3,12 +3,7 @@
  */
 import { TouchableOpacity } from 'react-native';
 
-/**
- * WordPress dependencies
- */
-import { forwardRef } from '@wordpress/element';
-
-export function Button( props ) {
+export default function Button( props ) {
 	const { children, onClick, 'aria-label': ariaLabel } = props;	
 	return (
 		<TouchableOpacity
@@ -20,5 +15,3 @@ export function Button( props ) {
 		</TouchableOpacity>
 	);
 }
-
-export default forwardRef( Button );

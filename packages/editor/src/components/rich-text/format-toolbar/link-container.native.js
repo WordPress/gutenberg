@@ -1,1 +1,1 @@
-export const LinkContainer = () => {}
+export default LinkContainer = () => {}
