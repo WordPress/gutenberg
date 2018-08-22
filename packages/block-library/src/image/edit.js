@@ -35,6 +35,7 @@ import {
 	InspectorControls,
 	MediaPlaceholder,
 	MediaUpload,
+	MediaUploadCheck,
 	BlockAlignmentToolbar,
 	mediaUpload,
 } from '@wordpress/editor';
@@ -219,19 +220,21 @@ class ImageEdit extends Component {
 				/>
 
 				<Toolbar>
-					<MediaUpload
-						onSelect={ this.onSelectImage }
-						type="image"
-						value={ id }
-						render={ ( { open } ) => (
-							<IconButton
-								className="components-toolbar__control"
-								label={ __( 'Edit image' ) }
-								icon="edit"
-								onClick={ open }
-							/>
-						) }
-					/>
+					<MediaUploadCheck>
+						<MediaUpload
+							onSelect={ this.onSelectImage }
+							type="image"
+							value={ id }
+							render={ ( { open } ) => (
+								<IconButton
+									className="components-toolbar__control"
+									label={ __( 'Edit image' ) }
+									icon="edit"
+									onClick={ open }
+								/>
+							) }
+						/>
+					</MediaUploadCheck>
 				</Toolbar>
 			</BlockControls>
 		);

@@ -22,6 +22,7 @@ import {
 import {
 	BlockControls,
 	MediaUpload,
+	MediaUploadCheck,
 	MediaPlaceholder,
 	InspectorControls,
 	mediaUpload,
@@ -165,23 +166,25 @@ class GalleryEdit extends Component {
 		const controls = (
 			<BlockControls>
 				{ !! images.length && (
-					<Toolbar>
-						<MediaUpload
-							onSelect={ this.onSelectImages }
-							type="image"
-							multiple
-							gallery
-							value={ images.map( ( img ) => img.id ) }
-							render={ ( { open } ) => (
-								<IconButton
-									className="components-toolbar__control"
-									label={ __( 'Edit Gallery' ) }
-									icon="edit"
-									onClick={ open }
-								/>
-							) }
-						/>
-					</Toolbar>
+					<MediaUploadCheck>
+						<Toolbar>
+							<MediaUpload
+								onSelect={ this.onSelectImages }
+								type="image"
+								multiple
+								gallery
+								value={ images.map( ( img ) => img.id ) }
+								render={ ( { open } ) => (
+									<IconButton
+										className="components-toolbar__control"
+										label={ __( 'Edit Gallery' ) }
+										icon="edit"
+										onClick={ open }
+									/>
+								) }
+							/>
+						</Toolbar>
+					</MediaUploadCheck>
 				) }
 			</BlockControls>
 		);
@@ -252,18 +255,20 @@ class GalleryEdit extends Component {
 						</li>
 					) ) }
 					{ isSelected &&
-						<li className="blocks-gallery-item has-add-item-button">
-							<FormFileUpload
-								multiple
-								isLarge
-								className="block-library-gallery-add-item-button"
-								onChange={ this.uploadFromFiles }
-								accept="image/*"
-								icon="insert"
-							>
-								{ __( 'Upload an image' ) }
-							</FormFileUpload>
-						</li>
+						<MediaUploadCheck>
+							<li className="blocks-gallery-item has-add-item-button">
+								<FormFileUpload
+									multiple
+									isLarge
+									className="block-library-gallery-add-item-button"
+									onChange={ this.uploadFromFiles }
+									accept="image/*"
+									icon="insert"
+								>
+									{ __( 'Upload an image' ) }
+								</FormFileUpload>
+							</li>
+						</MediaUploadCheck>
 					}
 				</ul>
 			</Fragment>
