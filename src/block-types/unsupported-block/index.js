@@ -32,7 +32,8 @@ export const settings = {
 	},
 
 	supports: {
-		html: false,
+		className: false,
+		customClassName: false,
 	},
 
 	transforms: {
