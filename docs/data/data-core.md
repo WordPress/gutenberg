@@ -175,6 +175,14 @@ get back from the oEmbed preview API.
 
 Is the preview for the URL an oEmbed link fallback.
 
+### hasUploadPermissions
+
+Return whether the user has media upload permissions.
+
+*Returns*
+
+Does the user have media upload permissions?
+
 ## Actions
 
 ### receiveTerms
