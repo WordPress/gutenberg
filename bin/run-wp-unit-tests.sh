@@ -33,8 +33,8 @@ fi
 
 echo Running with the following versions:
 if [[ $DOCKER = "true" ]]; then
-	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm wordpress_phpunit php -v
-	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm wordpress_phpunit phpunit --version
+	docker-compose run --rm wordpress_phpunit php -v
+	docker-compose run --rm wordpress_phpunit phpunit --version
 else
 	php -v
 	phpunit --version
