@@ -29,13 +29,10 @@ import { getUnknownTypeHandlerName } from '@wordpress/blocks';
 
 export default class UnsupportedBlockEdit extends React.Component<PropsType, StateType> {
 	constructor( props: PropsType ) {
-		console.log("Diego 2:  %O", props );
 		super( props );
 	}
 
 	render() {
-		console.log("Diego:  %O", this );
-
 		let blockName = this.props.name.charAt(0).toUpperCase() + this.props.name.slice(1);
 
 		return (

@@ -257,15 +257,13 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 	renderItem( value: { item: BlockType, clientId: string } ) {
 
-		//const blockName = value.item.name;
+		const blockName = value.item.name;
 		const blockType = getBlockType( value.item.name );
 		const unsupportedBlockName = getUnknownTypeHandlerName();
 		const unsupportedBlockType = getBlockType( unsupportedBlockName );
 
-		if (blockType == unsupportedBlockType) {
+		if (blockName == unsupportedBlockName) {
 			const Block = unsupportedBlockType.edit;
-
-			console.log("Diego 3:  %O", blockType );
 
 			return (
 				<View style={ holderStyles.blockContainer }>

@@ -25,10 +25,6 @@ export const settings = {
 	category: 'formatting',
 
 	attributes: {
-		name: {
-			type: 'string',
-			source: 'name',
-		},
 		content: {
 			type: 'string',
 			source: 'html',
