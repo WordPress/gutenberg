@@ -15,6 +15,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -23,7 +24,7 @@ import MediaUpload from '../media-upload';
 import MediaUploadCheck from '../media-upload/check';
 import { mediaUpload } from '../../utils/';
 
-class MediaPlaceholder extends Component {
+export class MediaPlaceholder extends Component {
 	constructor() {
 		super( ...arguments );
 		this.state = {
@@ -86,14 +87,24 @@ class MediaPlaceholder extends Component {
 			onHTMLDrop = noop,
 			multiple = false,
 			notices,
+			hasUploadPermissions,
 		} = this.props;
+
+		let instructions;
+		if ( hasUploadPermissions ) {
+			instructions = sprintf( __( 'Drag %s, upload a new one, or select a file from your library.' ), labels.name );
+		} else if ( onSelectURL ) {
+			instructions = sprintf( __( 'Given your current role, you can only link %s, you cannot upload.' ), labels.name );
+		} else {
+			instructions = __( 'To edit this block, you need permission to upload media.' );
+		}
 
 		return (
 			<Placeholder
 				icon={ icon }
 				label={ labels.title }
 				// translators: %s: media name label e.g: "an audio","an image", "a video"
-				instructions={ sprintf( __( 'Drag %s, upload a new one or select a file from your library.' ), labels.name ) }
+				instructions={ instructions }
 				className={ classnames( 'editor-media-placeholder', className ) }
 				notices={ notices }
 			>
@@ -148,4 +159,12 @@ class MediaPlaceholder extends Component {
 	}
 }
 
-export default MediaPlaceholder;
+export default withSelect( ( select ) => {
+	const {
+		hasUploadPermissions,
+	} = select( 'core' );
+
+	return {
+		hasUploadPermissions: hasUploadPermissions(),
+	};
+} )( MediaPlaceholder );

@@ -18,6 +18,7 @@ import { withSelect } from '@wordpress/data';
 import { Component, Fragment } from '@wordpress/element';
 import {
 	MediaUpload,
+	MediaUploadCheck,
 	MediaPlaceholder,
 	BlockControls,
 	RichText,
@@ -171,21 +172,23 @@ class FileEdit extends Component {
 					} }
 				/>
 				<BlockControls>
-					<Toolbar>
-						<MediaUpload
-							onSelect={ this.onSelectFile }
-							type="*"
-							value={ id }
-							render={ ( { open } ) => (
-								<IconButton
-									className="components-toolbar__control"
-									label={ __( 'Edit file' ) }
-									onClick={ open }
-									icon="edit"
-								/>
-							) }
-						/>
-					</Toolbar>
+					<MediaUploadCheck>
+						<Toolbar>
+							<MediaUpload
+								onSelect={ this.onSelectFile }
+								type="*"
+								value={ id }
+								render={ ( { open } ) => (
+									<IconButton
+										className="components-toolbar__control"
+										label={ __( 'Edit file' ) }
+										onClick={ open }
+										icon="edit"
+									/>
+								) }
+							/>
+						</Toolbar>
+					</MediaUploadCheck>
 				</BlockControls>
 				<div className={ classes }>
 					<div className={ `${ className }__content-wrapper` }>
