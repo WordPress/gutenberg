@@ -19,6 +19,7 @@ import {
 	cloneBlock,
 	getBlockType,
 	getSaveElement,
+	hasBlockSupport,
 	isReusableBlock,
 	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
@@ -389,12 +390,14 @@ export class BlockListBlock extends Component {
 		// Empty paragraph blocks should always show up as unselected.
 		const showEmptyBlockSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
 		const showSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
-		const shouldAppearSelected = ! showSideInserter && isSelected && ! isTypingWithinBlock;
-		const shouldAppearSelectedParent = ! showSideInserter && hasSelectedInnerBlock && ! isTypingWithinBlock;
+		const supportsHoverMarks = hasBlockSupport( blockName, 'hoverMarks', true );
+		const supportsSelectionMarks = hasBlockSupport( blockName, 'selectionMarks', true );
+		const shouldAppearSelected = supportsSelectionMarks && ! showSideInserter && isSelected && ! isTypingWithinBlock;
+		const shouldAppearSelectedParent = supportsSelectionMarks && ! showSideInserter && hasSelectedInnerBlock && ! isTypingWithinBlock;
 		// We render block movers and block settings to keep them tabbale even if hidden
 		const shouldRenderMovers = ( isSelected || hoverArea === 'left' ) && ! showEmptyBlockSideInserter && ! isMultiSelecting && ! isPartOfMultiSelection && ! isTypingWithinBlock;
 		const shouldRenderBlockSettings = ( isSelected || hoverArea === 'right' ) && ! isMultiSelecting && ! isPartOfMultiSelection;
-		const shouldShowBreadcrumb = isHovered && ! isEmptyDefaultBlock;
+		const shouldShowBreadcrumb = supportsHoverMarks && isHovered && ! isEmptyDefaultBlock;
 		const shouldShowContextualToolbar = ! showSideInserter && ( ( isSelected && ! isTypingWithinBlock && isValid ) || isFirstMultiSelected ) && ( ! hasFixedToolbar || ! isLargeViewport );
 		const shouldShowMobileToolbar = shouldAppearSelected;
 		const { error, dragging } = this.state;
@@ -411,7 +414,7 @@ export class BlockListBlock extends Component {
 			'is-selected': shouldAppearSelected,
 			'is-multi-selected': isPartOfMultiSelection,
 			'is-selected-parent': shouldAppearSelectedParent,
-			'is-hovered': isHovered && ! isEmptyDefaultBlock,
+			'is-hovered': supportsHoverMarks && isHovered && ! isEmptyDefaultBlock,
 			'is-reusable': isReusableBlock( blockType ),
 			'is-hidden': dragging,
 			'is-typing': isTypingWithinBlock,

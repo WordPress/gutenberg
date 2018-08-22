@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { Component, Fragment } from '@wordpress/element';
 import { IconButton, Dropdown, NavigableMenu, MenuItem, KeyboardShortcuts } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { compose, ifCondition } from '@wordpress/compose';
 import { cloneBlock, hasBlockSupport } from '@wordpress/blocks';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 
@@ -230,11 +230,16 @@ export default compose( [
 
 		const blocks = getBlocksByClientId( clientIds );
 
+		const isSupported = every( blocks, ( block ) => {
+			return !! block && hasBlockSupport( block.name, 'settingsMenu', true );
+		} );
+
 		const canDuplicate = every( blocks, ( block ) => {
 			return !! block && hasBlockSupport( block.name, 'multiple', true );
 		} );
 
 		return {
+			isSupported,
 			firstSelectedIndex: getBlockIndex( first( castArray( clientIds ) ), rootClientId ),
 			lastSelectedIndex: getBlockIndex( last( castArray( clientIds ) ), rootClientId ),
 			isLocked: !! getTemplateLock( rootClientId ),
@@ -243,6 +248,7 @@ export default compose( [
 			shortcuts,
 		};
 	} ),
+	ifCondition( ( { isSupported } ) => isSupported ),
 	withDispatch( ( dispatch, props ) => {
 		const {
 			clientIds,
