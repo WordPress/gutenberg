@@ -4,36 +4,61 @@
  */
 
 import ActionTypes from './ActionTypes';
+import type { BlockType } from '../';
 
 export type BlockActionType = string => {
 	type: $Values<typeof ActionTypes.BLOCK>,
-	uid: string,
+	clientId: string,
 };
 
-export function updateBlockAttributes( uid: string, attributes: mixed ) {
+export type CreateActionType = ( string, BlockType, string ) => {
+	type: $Values<typeof ActionTypes.BLOCK>,
+	clientId: string,
+	block: BlockType,
+	clientIdAbove: string,
+};
+
+export type ParseActionType = string => {
+	type: $Values<typeof ActionTypes.BLOCK>,
+	html: string,
+};
+
+export function updateBlockAttributes( clientId: string, attributes: mixed ) {
 	return {
 		type: ActionTypes.BLOCK.UPDATE_ATTRIBUTES,
-		uid,
+		clientId,
 		attributes,
 	};
 }
 
-export const focusBlockAction: BlockActionType = uid => ( {
+export const focusBlockAction: BlockActionType = ( clientId ) => ( {
 	type: ActionTypes.BLOCK.FOCUS,
-	uid: uid,
+	clientId,
 } );
 
-export const moveBlockUpAction: BlockActionType = uid => ( {
+export const moveBlockUpAction: BlockActionType = ( clientId ) => ( {
 	type: ActionTypes.BLOCK.MOVE_UP,
-	uid: uid,
+	clientId,
 } );
 
-export const moveBlockDownAction: BlockActionType = uid => ( {
+export const moveBlockDownAction: BlockActionType = ( clientId ) => ( {
 	type: ActionTypes.BLOCK.MOVE_DOWN,
-	uid: uid,
+	clientId,
 } );
 
-export const deleteBlockAction: BlockActionType = uid => ( {
+export const deleteBlockAction: BlockActionType = ( clientId ) => ( {
 	type: ActionTypes.BLOCK.DELETE,
-	uid: uid,
+	clientId,
+} );
+
+export const createBlockAction: CreateActionType = ( clientId, block, clientIdAbove ) => ( {
+	type: ActionTypes.BLOCK.CREATE,
+	clientId,
+	block: block,
+	clientIdAbove,
+} );
+
+export const parseBlocksAction: ParseActionType = ( html ) => ( {
+	type: ActionTypes.BLOCK.PARSE,
+	html,
 } );

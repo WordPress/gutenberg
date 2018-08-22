@@ -8,8 +8,8 @@ import { ToolbarButton } from './constants';
 import styles from './toolbar.scss';
 
 type PropsType = {
-	uid: string,
-	onButtonPressed: ( button: number, uid: string ) => void,
+	clientId: string,
+	onButtonPressed: ( button: number, clientId: string ) => void,
 };
 
 export default class Toolbar extends React.Component<PropsType> {
@@ -17,7 +17,11 @@ export default class Toolbar extends React.Component<PropsType> {
 		return (
 			<View style={ styles.toolbar }>
 				<TouchableOpacity
-					onPress={ this.props.onButtonPressed.bind( this, ToolbarButton.PLUS, this.props.uid ) }
+					onPress={ this.props.onButtonPressed.bind(
+						this,
+						ToolbarButton.PLUS,
+						this.props.clientId
+					) }
 				>
 					<View style={ styles.toolbarButton }>
 						<Text>+</Text>
@@ -25,7 +29,7 @@ export default class Toolbar extends React.Component<PropsType> {
 				</TouchableOpacity>
 				<View style={ styles.buttonSeparator } />
 				<TouchableOpacity
-					onPress={ this.props.onButtonPressed.bind( this, ToolbarButton.UP, this.props.uid ) }
+					onPress={ this.props.onButtonPressed.bind( this, ToolbarButton.UP, this.props.clientId ) }
 				>
 					<View style={ styles.toolbarButton }>
 						<Text>▲</Text>
@@ -33,7 +37,11 @@ export default class Toolbar extends React.Component<PropsType> {
 				</TouchableOpacity>
 				<View style={ styles.buttonSeparator } />
 				<TouchableOpacity
-					onPress={ this.props.onButtonPressed.bind( this, ToolbarButton.DOWN, this.props.uid ) }
+					onPress={ this.props.onButtonPressed.bind(
+						this,
+						ToolbarButton.DOWN,
+						this.props.clientId
+					) }
 				>
 					<View style={ styles.toolbarButton }>
 						<Text>▼</Text>
@@ -44,7 +52,7 @@ export default class Toolbar extends React.Component<PropsType> {
 					onPress={ this.props.onButtonPressed.bind(
 						this,
 						ToolbarButton.SETTINGS,
-						this.props.uid
+						this.props.clientId
 					) }
 				>
 					<View style={ styles.toolbarButton }>
@@ -54,7 +62,11 @@ export default class Toolbar extends React.Component<PropsType> {
 				</TouchableOpacity>
 				<View style={ styles.buttonSeparator } />
 				<TouchableOpacity
-					onPress={ this.props.onButtonPressed.bind( this, ToolbarButton.DELETE, this.props.uid ) }
+					onPress={ this.props.onButtonPressed.bind(
+						this,
+						ToolbarButton.DELETE,
+						this.props.clientId
+					) }
 				>
 					<View style={ styles.toolbarButton }>
 						<Text>🗑</Text>

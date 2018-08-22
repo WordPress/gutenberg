@@ -17,9 +17,9 @@ import { getBlockType } from '@wordpress/blocks';
 import { getUnknownTypeHandlerName } from '@wordpress/blocks';
 
 type PropsType = BlockType & {
-	onChange: ( uid: string, attributes: mixed ) => void,
-	onToolbarButtonPressed: ( button: number, uid: string ) => void,
-	onBlockHolderPressed: ( uid: string ) => void,
+	onChange: ( clientId: string, attributes: mixed ) => void,
+	onToolbarButtonPressed: ( button: number, clientId: string ) => void,
+	onBlockHolderPressed: ( clientId: string ) => void,
 };
 
 type StateType = {
@@ -39,7 +39,10 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 	renderToolbarIfBlockFocused() {
 		if ( this.props.focused ) {
 			return (
-				<Toolbar uid={ this.props.uid } onButtonPressed={ this.props.onToolbarButtonPressed } />
+				<Toolbar
+					clientId={ this.props.clientId }
+					onButtonPressed={ this.props.onToolbarButtonPressed }
+				/>
 			);
 		}
 
@@ -63,16 +66,18 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 		// TODO: setAttributes needs to change the state/attributes
 		return (
 			<Block
-				attributes={ { ...this.props.attributes, title: this.props.name } }
+				attributes={ { ...this.props.attributes } }
 				// pass a curried version of onChanged with just one argument
-				setAttributes={ ( attrs ) => this.props.onChange( this.props.uid, { ...this.props.attributes, ...attrs } ) }
+				setAttributes={ ( attrs ) =>
+					this.props.onChange( this.props.clientId, { ...this.props.attributes, ...attrs } )
+				}
 				isSelected={ this.props.focused }
 				style={ style }
 			/>
 		);
 	}
 
-	getBlockType( blockName ) {
+	getBlockType( blockName: String ) {
 		var blockType = getBlockType( blockName );
 
 		if ( !blockType ) {
@@ -86,7 +91,7 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 	render() {
 		return (
 			<TouchableWithoutFeedback
-				onPress={ this.props.onBlockHolderPressed.bind( this, this.props.uid ) }
+				onPress={ this.props.onBlockHolderPressed.bind( this, this.props.clientId ) }
 			>
 				<View style={ styles.blockHolder }>
 					<View style={ styles.blockTitle }>

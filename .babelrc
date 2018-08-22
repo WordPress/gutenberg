@@ -4,21 +4,6 @@
   ],
   "plugins": [
     "react-require",
-    [
-      "module-resolver",
-      {
-        "cwd": "babelrc",
-        "alias": {          
-          "@gutenberg": "./gutenberg"
-        },
-        "extensions": [
-          ".js",
-          ".native.js",
-          ".ios.js",
-          ".android.js"
-        ]
-      }
-    ],
     "transform-async-to-generator",
     "transform-async-generator-functions",
     "react-native-classname-to-style",
