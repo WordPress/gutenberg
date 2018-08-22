@@ -143,8 +143,7 @@ class Popover extends Component {
 		window.console.warn( `<Popover> component: focusOnMount argument "${ focusOnMount }" not recognized.` );
 	}
 
-	getAnchorRect() {
-		const anchor = this.anchorNode.current;
+	getAnchorRect( anchor ) {
 		if ( ! anchor || ! anchor.parentNode ) {
 			return;
 		}
@@ -185,7 +184,10 @@ class Popover extends Component {
 	computePopoverPosition( popoverSize ) {
 		const { getAnchorRect = this.getAnchorRect, position = 'top', expandOnMobile } = this.props;
 		const newPopoverPosition = computePopoverPosition(
-			getAnchorRect(), popoverSize || this.state.popoverSize, position, expandOnMobile
+			getAnchorRect( this.anchorNode.current ),
+			popoverSize || this.state.popoverSize,
+			position,
+			expandOnMobile
 		);
 
 		if (
