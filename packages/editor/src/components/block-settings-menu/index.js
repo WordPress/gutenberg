@@ -119,7 +119,7 @@ export class BlockSettingsMenu extends Component {
 							'is-opened': isOpen,
 							'is-visible': isFocused || isOpen || ! isHidden,
 						} );
-						const label = isOpen ? __( 'Hide Options' ) : __( 'More Options' );
+						const label = isOpen ? __( 'Hide options' ) : __( 'More options' );
 
 						return (
 							<IconButton
