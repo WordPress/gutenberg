@@ -52,7 +52,11 @@ export default class BlockPicker extends Component<PropsType, StateType> {
 						data={ this.availableBlockTypes }
 						keyExtractor={ ( item ) => item.name }
 						renderItem={ ( { item } ) =>
-							<TouchableHighlight onPress={ this.props.onValueSelected.bind( this, item.name ) }>
+							<TouchableHighlight 
+								style= { styles.touchableArea }
+								underlayColor= { 'transparent' }
+								activeOpacity= { .5 }
+								onPress={ this.props.onValueSelected.bind( this, item.name ) }>
 								<View style={ styles.modalItem }>
 									<View style={ styles.modalIcon }>
 										{ /* TODO: ICON IMAGE GOES HERE */ }
