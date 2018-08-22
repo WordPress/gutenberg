@@ -30,8 +30,7 @@ export const settings = {
 			<div className="half-media__content">
 				<InnerBlocks
 					template={ [
-						[ 'core/heading', { level: 4 } ],
-						[ 'core/paragraph' ],
+						[ 'core/paragraph', { fontSize: 'large', placeholder: 'Content...' } ],
 					] }
 					allowedBlocks={ ALLOWED_BLOCKS }
 					templateLock={ false }
