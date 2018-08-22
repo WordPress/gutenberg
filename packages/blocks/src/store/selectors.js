@@ -2,7 +2,8 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { filter, includes, map } from 'lodash';
+import { filter, includes, map, some } from 'lodash';
+import { hasBlockSupport } from '../api/';
 
 /**
  * Returns all the available block types.
@@ -86,7 +87,7 @@ export const getChildBlockNames = createSelector(
 );
 
 /**
- * Returns a boolean indicating if a block has child blocks or not.
+ * Returns a boolean indicating if a block has child blocks available on the inserter or not.
  *
  * @param {Object} state     Data state.
  * @param {string} blockName Block type name.
@@ -94,5 +95,7 @@ export const getChildBlockNames = createSelector(
  * @return {boolean} True if a block contains child blocks and false otherwise.
  */
 export const hasChildBlocks = ( state, blockName ) => {
-	return getChildBlockNames( state, blockName ).length > 0;
+	return some( getChildBlockNames( state, blockName ), ( currentBlockName ) => {
+		return hasBlockSupport( currentBlockName, 'inserter', true );
+	} );
 };
