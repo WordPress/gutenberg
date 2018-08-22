@@ -20,6 +20,7 @@ import { prependHTTP } from '@wordpress/url';
  */
 import { FORMATTING_CONTROLS } from '../formatting-controls';
 import LinkContainer from './link-container';
+import ToolbarContainer from './toolbar-container';
 
 /**
  * Returns the Format Toolbar state given a set of props.
@@ -168,7 +169,7 @@ class FormatToolbar extends Component {
 			} );
 
 		return (
-			<div className="editor-format-toolbar">
+			<ToolbarContainer>
 				<Toolbar controls={ toolbarControls } />
 
 				{ ( isEditing || isPreviewing ) && (
@@ -188,7 +189,7 @@ class FormatToolbar extends Component {
 						toggleLinkSettingsVisibility={ this.toggleLinkSettingsVisibility }
 					/>
 				) }
-			</div>
+			</ToolbarContainer>
 		);
 	}
 }
