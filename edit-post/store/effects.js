@@ -108,8 +108,8 @@ const effects = {
 			const formDataEntries = currentFormData.entries();
 			let formDataEntry = formDataEntries.next();
 
-			while (!formDataEntry.done) {
-				const [key, value] = formDataEntry.value;
+			while ( ! formDataEntry.done ) {
+				const [ key, value ] = formDataEntry.value;
 				memo.append( key, value );
 				formDataEntry = formDataEntries.next();
 			}
