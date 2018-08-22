@@ -1,5 +1,5 @@
 /** @format */
-
+import '../../globals';
 import * as actions from './';
 import ActionTypes from './ActionTypes';
 // Gutenberg imports
