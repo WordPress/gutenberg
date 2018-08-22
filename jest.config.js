@@ -32,7 +32,7 @@ module.exports = {
 		'node',
 	],
 	moduleNameMapper: {
-		'@wordpress\\/(blocks|data|element|deprecated|editor|redux-routine|block-library)$': '<rootDir>/gutenberg/packages/$1/src/index',
+		'@wordpress\\/(blocks|data|element|deprecated|editor|redux-routine|block-library|components|keycodes|url|a11y)$': '<rootDir>/gutenberg/packages/$1/src/index',
 
 		// Mock the CSS modules. See https://facebook.github.io/jest/docs/en/webpack.html#handling-static-assets
 		'\\.(scss)$': '<rootDir>/__mocks__/styleMock.js',
@@ -40,6 +40,6 @@ module.exports = {
 	haste: {
 		defaultPlatform: rnPlatform,
 		platforms: [ 'android', 'ios', 'native' ],
-		providesModuleNodeModules: [ 'react-native' ],
+		providesModuleNodeModules: [ 'react-native', 'react-native-svg' ],
 	},
 };

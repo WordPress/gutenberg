@@ -2,6 +2,8 @@
  * @format
  */
 
+import '../../globals';
+
 import { reducer } from './';
 import * as actions from '../actions/';
 import { registerCoreBlocks } from '@wordpress/block-library';
