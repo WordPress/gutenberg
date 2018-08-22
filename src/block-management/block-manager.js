@@ -205,8 +205,8 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				onDismiss={ () => {
 					this.showBlockTypePicker( false );
 				} }
-				onValueSelected={ ( itemValue, itemIndex ) => {
-					this.onBlockTypeSelected( itemValue, itemIndex );
+				onValueSelected={ ( itemValue ) => {
+					this.onBlockTypeSelected( itemValue );
 				} } />
 		);
 
