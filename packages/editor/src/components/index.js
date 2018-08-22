@@ -22,6 +22,7 @@ export { default as RichText } from './rich-text';
 export { default as RichTextProvider } from './rich-text/provider';
 export { default as MediaPlaceholder } from './media-placeholder';
 export { default as MediaUpload } from './media-upload';
+export { default as MediaUploadCheck } from './media-upload/check';
 export { default as URLInput } from './url-input';
 export { default as URLInputButton } from './url-input/button';
 
