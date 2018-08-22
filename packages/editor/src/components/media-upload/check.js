@@ -1,10 +1,15 @@
-// Hardcode hasUploadPermissions to true for now - in future this value will be
-// correctly populated from application state.
-// See github issue for more information:
-// https://github.com/WordPress/gutenberg/issues/3672
-export function MediaUploadCheck( { hasUploadPermissions = true, fallback, children } ) {
+/**
+ * WordPress dependencies
+ */
+import { withSelect } from '@wordpress/data';
+
+export function MediaUploadCheck( { hasUploadPermissions, fallback, children } ) {
 	const optionalFallback = fallback || null;
 	return hasUploadPermissions ? children : optionalFallback;
 }
 
-export default MediaUploadCheck;
+export default withSelect( ( select ) => {
+	return {
+		hasUploadPermissions: select( 'core' ).hasUploadPermissions(),
+	};
+} )( MediaUploadCheck );

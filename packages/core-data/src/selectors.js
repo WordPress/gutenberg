@@ -169,3 +169,16 @@ export function isPreviewEmbedFallback( state, url ) {
 	}
 	return preview.html === oEmbedLinkCheck;
 }
+
+/*
+ * Return whether the user has media upload permissions.
+ *
+ * @return {boolean} Does the user have media upload permissions?
+ */
+export function hasUploadPermissions() {
+	// Hardcode hasUploadPermissions to true for now - in future this value will be
+	// correctly populated from a REST API call that will store user permissions
+	// See github issue for more information:
+	// https://github.com/WordPress/gutenberg/issues/3672
+	return true;
+}
