@@ -76,6 +76,9 @@
 	div.components-toolbar {
 		box-shadow: none;
 		margin-bottom: 1.5em;
+		&:last-child {
+			margin-bottom: 0;
+		}
 	}
 
 	p + div.components-toolbar {
