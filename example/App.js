@@ -29,8 +29,8 @@ export default class example extends React.Component {
       return (              
               <Editor                
                 item={ item }                
-                onContentSizeChange= {(event) => {                    
-                    let newHeight = event.nativeEvent.contentSize.height                    
+                onContentSizeChange= {(contentSize) => {                    
+                    let newHeight = contentSize.height;                    
                     const newElements = this.state.data.map( searchItem => {
                       if (searchItem.key == key) {
                         return {...searchItem, height: newHeight};
