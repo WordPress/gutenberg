@@ -63,7 +63,7 @@ function Header( {
 						shortcut={ shortcuts.toggleSidebar.display }
 					>
 						<DotTip id="core/editor.settings">
-							{ __( 'You’ll find more settings for your page and blocks in the sidebar. Click ‘Settings’ to open it.' ) }
+							{ __( 'You’ll find more settings for your page and blocks in the sidebar. Click “Settings” to open it.' ) }
 						</DotTip>
 					</IconButton>
 					<PinnedPlugins.Slot />

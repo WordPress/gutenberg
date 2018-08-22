@@ -16,8 +16,8 @@ describe( 'Editing modes (visual/HTML)', () => {
 		expect( visualBlock ).toHaveLength( 1 );
 
 		// Change editing mode from "Visual" to "HTML".
-		await page.waitForSelector( 'button[aria-label="More Options"]' );
-		await page.click( 'button[aria-label="More Options"]' );
+		await page.waitForSelector( 'button[aria-label="More options"]' );
+		await page.click( 'button[aria-label="More options"]' );
 		let changeModeButton = await page.waitForXPath( '//button[text()="Edit as HTML"]' );
 		await changeModeButton.click();
 
@@ -26,8 +26,8 @@ describe( 'Editing modes (visual/HTML)', () => {
 		expect( htmlBlock ).toHaveLength( 1 );
 
 		// Change editing mode from "HTML" back to "Visual".
-		await page.waitForSelector( 'button[aria-label="More Options"]' );
-		await page.click( 'button[aria-label="More Options"]' );
+		await page.waitForSelector( 'button[aria-label="More options"]' );
+		await page.click( 'button[aria-label="More options"]' );
 		changeModeButton = await page.waitForXPath( '//button[text()="Edit visually"]' );
 		await changeModeButton.click();
 
@@ -38,8 +38,8 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 	it( 'should display sidebar in HTML mode', async () => {
 		// Change editing mode from "Visual" to "HTML".
-		await page.waitForSelector( 'button[aria-label="More Options"]' );
-		await page.click( 'button[aria-label="More Options"]' );
+		await page.waitForSelector( 'button[aria-label="More options"]' );
+		await page.click( 'button[aria-label="More options"]' );
 		const changeModeButton = await page.waitForXPath( '//button[text()="Edit as HTML"]' );
 		await changeModeButton.click();
 
@@ -51,8 +51,8 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 	it( 'should update HTML in HTML mode when sidebar is used', async () => {
 		// Change editing mode from "Visual" to "HTML".
-		await page.waitForSelector( 'button[aria-label="More Options"]' );
-		await page.click( 'button[aria-label="More Options"]' );
+		await page.waitForSelector( 'button[aria-label="More options"]' );
+		await page.click( 'button[aria-label="More options"]' );
 		const changeModeButton = await page.waitForXPath( '//button[text()="Edit as HTML"]' );
 		await changeModeButton.click();
 

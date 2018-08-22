@@ -127,7 +127,7 @@ export class PostPreviewButton extends Component {
 			>
 				{ _x( 'Preview', 'imperative verb' ) }
 				<DotTip id="core/editor.preview">
-					{ __( 'Click ‘Preview’ to load a preview of this page, so you can make sure you’re happy with your blocks.' ) }
+					{ __( 'Click “Preview” to load a preview of this page, so you can make sure you’re happy with your blocks.' ) }
 				</DotTip>
 			</Button>
 		);

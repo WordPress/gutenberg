@@ -3,8 +3,10 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
+	Disabled,
 	IconButton,
 	PanelBody,
+	SelectControl,
 	Toolbar,
 	ToggleControl,
 	withNotices,
@@ -73,7 +75,7 @@ class VideoEdit extends Component {
 	}
 
 	render() {
-		const { autoplay, caption, controls, loop, muted, src } = this.props.attributes;
+		const { autoplay, caption, controls, loop, muted, preload, src } = this.props.attributes;
 		const { setAttributes, isSelected, className, noticeOperations, noticeUI } = this.props;
 		const { editing } = this.state;
 		const switchToEditing = () => {
@@ -148,10 +150,26 @@ class VideoEdit extends Component {
 							onChange={ this.toggleAttribute( 'controls' ) }
 							checked={ controls }
 						/>
+						<SelectControl
+							label={ __( 'Preload' ) }
+							value={ preload }
+							onChange={ ( value ) => setAttributes( { preload: value } ) }
+							options={ [
+								{ value: 'auto', label: __( 'Auto' ) },
+								{ value: 'metadata', label: __( 'Metadata' ) },
+								{ value: 'none', label: __( 'None' ) },
+							] }
+						/>
 					</PanelBody>
 				</InspectorControls>
 				<figure className={ className }>
-					<video controls src={ src } />
+					{ /*
+						Disable the video tag so the user clicking on it won't play the
+						video when the controls are enabled.
+					*/ }
+					<Disabled>
+						<video controls={ controls } src={ src } />
+					</Disabled>
 					{ ( ( caption && caption.length ) || !! isSelected ) && (
 						<RichText
 							tagName="figcaption"

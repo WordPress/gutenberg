@@ -20,6 +20,19 @@ const { TEXT_NODE, ELEMENT_NODE } = window.Node;
  */
 
 /**
+ * Given a single node and a node type (e.g. `'br'`), returns true if the node
+ * corresponds to that type, false otherwise.
+ *
+ * @param {WPBlockNode} node Block node to test
+ * @param {string} type      Node to type to test against.
+ *
+ * @return {boolean} Whether node is of intended type.
+ */
+function isNodeOfType( node, type ) {
+	return node && node.type === type;
+}
+
+/**
  * Given an object implementing the NamedNodeMap interface, returns a plain
  * object equivalent value of name, value key-value pairs.
  *
@@ -106,6 +119,7 @@ export function matcher( selector ) {
 }
 
 export default {
+	isNodeOfType,
 	fromDOM,
 	toHTML,
 	matcher,

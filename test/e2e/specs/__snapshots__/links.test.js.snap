@@ -12,6 +12,12 @@ exports[`Links can be created by selecting text and using keyboard shortcuts 1`]
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Links can be created instantly when a URL is selected 1`] = `
+"<!-- wp:paragraph -->
+<p>This is Gutenberg: <a href=\\"https://wordpress.org/gutenberg\\">https://wordpress.org/gutenberg</a></p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`Links can be created without any text selected 1`] = `
 "<!-- wp:paragraph -->
 <p>This is Gutenberg: <a href=\\"https://wordpress.org/gutenberg\\">https://wordpress.org/gutenberg</a></p>
