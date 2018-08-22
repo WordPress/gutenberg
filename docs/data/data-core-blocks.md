@@ -1,6 +1,6 @@
 # **core/blocks**: Block Types Data
 
-## Selectors 
+## Selectors
 
 ### getBlockType
 

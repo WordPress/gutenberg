@@ -1,6 +1,6 @@
 # **core/editor**: The Editor’s Data
 
-## Selectors 
+## Selectors
 
 ### hasEditorUndo
 
