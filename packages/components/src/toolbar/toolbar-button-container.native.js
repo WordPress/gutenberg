@@ -4,9 +4,7 @@
 import { View } from 'react-native';
 
 export default ( props ) => (
-	<View
-		style={ props.className }
-	>
+	<View>
 		{ props.children }
 	</View>
 );
