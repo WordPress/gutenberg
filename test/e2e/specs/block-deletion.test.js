@@ -109,8 +109,6 @@ describe( 'block deletion -', () => {
 			// Now that the block wrapper is selected, press backspace to delete it.
 			await page.keyboard.press( 'Backspace' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
-
-			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
 
 		it( 'positions the caret at the end of the second block as evidenced by typing additional text', async () => {
