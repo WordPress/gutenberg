@@ -19,6 +19,7 @@ import { children } from '@wordpress/blocks';
  * Internal dependencies
  */
 import FormatToolbar from './format-toolbar';
+import { FORMATTING_CONTROLS } from './formatting-controls';
 
 export class RichText extends Component {
 	constructor() {
@@ -150,6 +151,12 @@ export class RichText extends Component {
 	}
 }
 
+RichText.defaultProps = {
+	formattingControls: FORMATTING_CONTROLS.map( ( { format } ) => format ),
+	formatters: [],
+	format: 'children',
+};
+
 const RichTextContainer = compose( [
 	withInstanceId,
 ] )( RichText );
@@ -173,7 +180,7 @@ RichTextContainer.Content = ( { value, format, tagName: Tag, ...props } ) => {
 	return content;
 };
 
-RichTextContainer.Content.defaultProps = {
+RichTextContainer.Content.defaultProps = {	
 	format: 'children',
 };
 
