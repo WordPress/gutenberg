@@ -1,6 +1,6 @@
 # **core**: WordPress Core Data
 
-## Selectors 
+## Selectors
 
 ### getTerms
 
