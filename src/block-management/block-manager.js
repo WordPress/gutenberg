@@ -287,7 +287,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				/>
 			);
 		}
-
+	}
 
 
 	renderHTML() {
