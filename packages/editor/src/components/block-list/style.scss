@@ -984,7 +984,7 @@
 		// Animate in
 		.editor-block-list__block:hover & {
 			opacity: 0;
-			@include fade_in(0.1s, 0.5s);
+			@include fade_in(60ms, 0.5s);
 		}
 	}
 }
