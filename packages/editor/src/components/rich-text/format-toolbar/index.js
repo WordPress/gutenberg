@@ -14,6 +14,7 @@ import {
 } from '@wordpress/components';
 import { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER, displayShortcut } from '@wordpress/keycodes';
 import { prependHTTP } from '@wordpress/url';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -22,7 +23,7 @@ import PositionedAtSelection from './positioned-at-selection';
 import URLInput from '../../url-input';
 import { filterURLForDisplay } from '../../../utils/url';
 
-const FORMATTING_CONTROLS = [
+const getFormattingControls = () => applyFilters( 'editor.RichText.formattingControls', [
 	{
 		icon: 'editor-bold',
 		title: __( 'Bold' ),
@@ -47,7 +48,7 @@ const FORMATTING_CONTROLS = [
 		shortcut: displayShortcut.access( 'd' ),
 		format: 'strikethrough',
 	},
-];
+] );
 
 // Default controls shown if no `enabledControls` prop provided
 const DEFAULT_CONTROLS = [ 'bold', 'italic', 'strikethrough', 'link' ];
@@ -180,7 +181,7 @@ class FormatToolbar extends Component {
 		const { linkValue, settingsVisible, opensInNewWindow, isEditingLink } = this.state;
 		const isAddingLink = formats.link && formats.link.isAdding;
 
-		const toolbarControls = FORMATTING_CONTROLS.concat( customControls )
+		const toolbarControls = getFormattingControls().concat( customControls )
 			.filter( ( control ) => enabledControls.indexOf( control.format ) !== -1 )
 			.map( ( control ) => {
 				if ( control.format === 'link' ) {
