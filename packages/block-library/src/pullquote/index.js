@@ -68,7 +68,7 @@ export const settings = {
 					placeholder={ __( 'Write quote…' ) }
 					wrapperClassName="block-library-pullquote__content"
 				/>
-				{ ( citation || isSelected ) && (
+				{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 					<RichText
 						tagName="cite"
 						value={ citation }
@@ -91,7 +91,7 @@ export const settings = {
 		return (
 			<blockquote>
 				<RichText.Content value={ toRichTextValue( value ) } />
-				{ citation && citation.length > 0 && <RichText.Content tagName="cite" value={ citation } /> }
+				{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
 			</blockquote>
 		);
 	},
@@ -116,7 +116,7 @@ export const settings = {
 			return (
 				<blockquote className={ `align${ align }` }>
 					<RichText.Content value={ toRichTextValue( value ) } />
-					{ citation && citation.length > 0 && <RichText.Content tagName="footer" value={ citation } /> }
+					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="footer" value={ citation } /> }
 				</blockquote>
 			);
 		},

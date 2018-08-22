@@ -472,7 +472,7 @@ class ImageEdit extends Component {
 							);
 						} }
 					</ImageSize>
-					{ ( caption && caption.length > 0 ) || isSelected ? (
+					{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 						<RichText
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
@@ -482,7 +482,7 @@ class ImageEdit extends Component {
 							isSelected={ this.state.captionFocused }
 							inlineToolbar
 						/>
-					) : null }
+					) }
 				</figure>
 			</Fragment>
 		);

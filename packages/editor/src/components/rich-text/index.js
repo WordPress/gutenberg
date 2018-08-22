@@ -1059,6 +1059,17 @@ RichTextContainer.Content = ( { value, format, tagName: Tag, ...props } ) => {
 	return content;
 };
 
+/**
+ * Check if the given `RichText` value is empty on not.
+ *
+ * @param {Array} value `RichText` value.
+ *
+ * @return {boolean} True if empty, false if not.
+ */
+RichTextContainer.isEmpty = ( value ) => {
+	return ! value || ! value.length;
+};
+
 RichTextContainer.Content.defaultProps = {
 	format: 'children',
 };

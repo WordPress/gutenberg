@@ -90,7 +90,7 @@ export const settings = {
 		return (
 			<figure>
 				<audio controls="controls" src={ src } autoPlay={ autoplay } loop={ loop } preload={ preload } />
-				{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
+				{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
 			</figure>
 		);
 	},
