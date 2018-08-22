@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native'
+import { View } from 'react-native';
 
 const ToolbarContainer = ( props ) => (
 	<View

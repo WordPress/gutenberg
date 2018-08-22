@@ -10,9 +10,12 @@ import filterMessage from './filterMessage';
  * @param {string} ariaLive Optional. The politeness level for aria-live. Possible values:
  *                          polite or assertive. Default polite.
  */
-export const speak = function( message, ariaLive ) {
-	
+export const speak = function( message, ariaLive ) {	
 	message = filterMessage( message );
-
 	//TODO: Use native module to speak message
+	if ( 'assertive' === ariaLive ) {
+
+	} else {
+
+	}
 };

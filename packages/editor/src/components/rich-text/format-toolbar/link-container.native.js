@@ -1,1 +1,2 @@
-export default LinkContainer = () => {}
+const LinkContainer = () => {};
+export default LinkContainer;
