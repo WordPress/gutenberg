@@ -1,4 +1,4 @@
-/**
+	/**
  * @format
  * @flow
  */
@@ -43,6 +43,7 @@ export default class BlockPicker extends Component<PropsType, StateType> {
 				backdropColor={ 'grey' }
 				onBackdropPress={ this.props.onDismiss.bind( this ) }>
 				<View style={ styles.modalContent }>
+					<View style={ styles.shortLineStyle } />
 					<View>
 						<Text style={ styles.title }>ADD BLOCK</Text>
 					</View>
