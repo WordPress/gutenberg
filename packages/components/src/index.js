@@ -1,4 +1,5 @@
 // Components
+export * from './primitives';
 // eslint-disable-next-line camelcase
 export { default as APIProvider, unstable__setApiSettings } from './higher-order/with-api-data/provider';
 export { default as Autocomplete } from './autocomplete';
