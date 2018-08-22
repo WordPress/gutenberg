@@ -266,7 +266,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		this.setState( { html } );
 	}
 
-	renderItem( value: { item: BlockType, uid: string } ) {
+	renderItem( value: { item: BlockType, clientId: string } ) {
 
 		const blockType = getBlockType( value.item.name );
 
@@ -275,6 +275,14 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			const unsupportedBlockType = getBlockType( unsupportedBlockName );
 			const Block = unsupportedBlockType.edit
 
+			return (
+				<View style={ holderStyles.blockContainer }>
+					<Block
+						attributes={ { ...value.item.attributes, title: value.item.name } }
+					/>
+				</View>
+			);
+		} else {
 			return (
 				<BlockHolder
 					key={ value.clientId }
