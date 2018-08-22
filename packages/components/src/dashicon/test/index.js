@@ -7,7 +7,7 @@ import { shallow } from 'enzyme';
  * Internal dependencies
  */
 import Dashicon from '../';
-import SVG from '../svg';
+import { SVG } from '../../primitives';
 
 describe( 'Dashicon', () => {
 	describe( 'basic rendering', () => {

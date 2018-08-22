@@ -153,8 +153,6 @@ body.gutenberg-editor-page {
 	input[type="number"],
 	select,
 	textarea {
-		margin-top: 0; // These override a "margin: 1px" from core.
-		margin-bottom: 0;
 		font-family: $default-font;
 		font-size: $default-font-size;
 		padding: 6px 8px;
