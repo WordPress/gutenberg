@@ -10,6 +10,7 @@ import { getBlockTypes } from '@wordpress/blocks';
 
 type PropsType = {
     visible: boolean,
+    style?: StyleSheet,
 	onValueSelected: ( itemValue: string, itemIndex: number ) => void,
 	onDismiss: () => void,
 };
