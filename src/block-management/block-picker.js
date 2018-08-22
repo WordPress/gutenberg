@@ -40,6 +40,7 @@ export default class BlockPicker extends Component<PropsType, StateType> {
 				onSwipe={ this.props.onDismiss.bind( this ) }
 				swipeDirection="down"
 				style={ [ styles.bottomModal, this.props.style ] }
+				backdropColor={ 'grey' }
 				onBackdropPress={ this.props.onDismiss.bind( this ) }>
 				<View style={ styles.modalContent }>
 					<View>
