@@ -4,7 +4,7 @@
         "name": "core/playlist",
         "isValid": true,
         "attributes": {
-            "ids": "[60,61]",
+            "ids": [60,61],
             "type": "video",
             "showArtists": true,
             "showTrackNumbers": true,
