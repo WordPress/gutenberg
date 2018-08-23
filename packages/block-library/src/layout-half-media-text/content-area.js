@@ -23,6 +23,7 @@ export const settings = {
 		hoverMarks: false,
 		selectionMarks: false,
 		settingsMenu: false,
+		inserter: false,
 	},
 
 	edit() {
