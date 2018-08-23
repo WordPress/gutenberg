@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { over, compact } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
@@ -138,16 +133,20 @@ export default compose( [
 			clearSelectedBlock,
 		} = dispatch( 'core/editor' );
 
-		const withClearAndFinish = ( fn ) => over( compact( [
-			clearSelectedBlock,
-			ownProps.onFinishedEditing,
-			fn,
-		] ) );
-
 		return {
-			onChangeTitle: ( title ) => editPost( { title } ),
-			onSave: withClearAndFinish( savePost ),
-			onCancel: withClearAndFinish( undoAll ),
+			onChangeTitle( title ) {
+				editPost( { title } );
+			},
+			onSave() {
+				clearSelectedBlock();
+				savePost();
+				ownProps.onSave();
+			},
+			onCancel() {
+				clearSelectedBlock();
+				undoAll();
+				ownProps.onCancel();
+			},
 		};
 	} ),
 ] )( ReusableBlockEditPanel );

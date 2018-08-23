@@ -24,8 +24,9 @@ class ReusableBlockEdit extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
-		this.startEditing = this.toggleEditing.bind( this, true );
-		this.stopEditing = this.toggleEditing.bind( this, false );
+		this.startEdit = this.toggleIsEditing.bind( this, true );
+		this.cancelEdit = this.toggleIsEditing.bind( this, false );
+		this.saveEdit = this.saveEdit.bind( this );
 		this.registry = defaultRegistry.clone();
 		createStore( this.registry );
 
@@ -33,6 +34,7 @@ class ReusableBlockEdit extends Component {
 		this.state = {
 			isEditing: !! ( reusableBlock && reusableBlock.isTemporary ),
 			settingsWithLock: { ...settings, templateLock: true },
+			reusableBlockInstanceId: 0,
 		};
 	}
 
@@ -50,13 +52,41 @@ class ReusableBlockEdit extends Component {
 		};
 	}
 
-	toggleEditing( isEditing ) {
+	componentDidUpdate( prevProps ) {
+		if ( this.props.reusableBlock !== prevProps.reusableBlock ) {
+			this.setState( { reusableBlockInstanceId: this.state.reusableBlockInstanceId + 1 } );
+		}
+	}
+
+	toggleIsEditing( isEditing ) {
 		this.setState( { isEditing } );
+	}
+
+	saveEdit() {
+		this.toggleIsEditing( false );
+
+		const {
+			getEditedPostAttribute,
+			getEditedPostContent,
+			getBlocks,
+		} = this.registry.select( 'core/editor' );
+
+		const reusableBlock = {
+			...this.props.reusableBlock,
+			title: getEditedPostAttribute( 'title' ),
+			content: {
+				raw: getEditedPostContent(),
+			},
+		};
+
+		const [ parsedBlock ] = getBlocks();
+
+		this.props.onSave( reusableBlock, parsedBlock );
 	}
 
 	render() {
 		const { setIsSelected, reusableBlock, isSelected, isSaving } = this.props;
-		const { settingsWithLock, isEditing } = this.state;
+		const { settingsWithLock, isEditing, reusableBlockInstanceId } = this.state;
 
 		if ( ! reusableBlock ) {
 			return <Placeholder><Spinner /></Placeholder>;
@@ -70,6 +100,9 @@ class ReusableBlockEdit extends Component {
 		return (
 			<RegistryProvider value={ this.registry }>
 				<EditorProvider
+					// Force a rerender when reusableBlock is updated, so that changes made
+					// externally appear in the nested editor.
+					key={ reusableBlockInstanceId }
 					postType="wp_block"
 					inheritContext
 					settings={ settingsWithLock }
@@ -84,8 +117,9 @@ class ReusableBlockEdit extends Component {
 							<ReusableBlockEditPanel
 								isEditing={ isEditing }
 								isSaving={ isSaving && ! reusableBlock.isTemporary }
-								onEdit={ this.startEditing }
-								onFinishedEditing={ this.stopEditing }
+								onEdit={ this.startEdit }
+								onCancel={ this.cancelEdit }
+								onSave={ this.saveEdit }
 							/>
 						) }
 						{ ! isSelected && ! isEditing && <ReusableBlockIndicator /> }
@@ -110,11 +144,18 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
-		const { selectBlock } = dispatch( 'core/editor' );
-		const { id } = ownProps;
-
+		const { selectBlock, receiveReusableBlocks } = dispatch( 'core/editor' );
+		const { receiveEntityRecords } = dispatch( 'core' );
 		return {
-			setIsSelected: () => selectBlock( id ),
+			setIsSelected() {
+				selectBlock( ownProps.clientId );
+			},
+			onSave( reusableBlock, parsedBlock ) {
+				// Update the editor's store when the reusable block is changed. This
+				// ensures other instances of the same reusable block are updated.
+				receiveReusableBlocks( [ { reusableBlock, parsedBlock } ] );
+				receiveEntityRecords( 'postType', 'wp_block', reusableBlock );
+			},
 		};
 	} ),
 ] )( ReusableBlockEdit );
