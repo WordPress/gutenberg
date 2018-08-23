@@ -53,8 +53,10 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 		return (
 			el(
 				Fragment,
+				null,
 				el(
 					BlockControls,
+					null,
 					el(
 						AlignmentToolbar,
 						{
