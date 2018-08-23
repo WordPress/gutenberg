@@ -35,9 +35,23 @@ class AztecView extends React.Component {
     onActiveFormatsChange(formats);
   }
 
+  _onContentSizeChange = (event) => {
+    if (!this.props.onContentSizeChange) {
+      return;
+    }
+    const size = event.nativeEvent.contentSize;
+    const { onContentSizeChange } = this.props;
+    onContentSizeChange(size);
+  }
+
   render() {
     const { onActiveFormatsChange, ...otherProps } = this.props    
-    return (<RCTAztecView {...otherProps} onActiveFormatsChange={ this._onActiveFormatsChange } />);
+    return (
+      <RCTAztecView {...otherProps} 
+        onActiveFormatsChange={ this._onActiveFormatsChange }
+        onContentSizeChange = { this._onContentSizeChange }
+      />
+    );
   }
 }
 
