@@ -10,6 +10,7 @@ import BlockSwitcher from '../block-switcher';
 import MultiBlocksSwitcher from '../block-switcher/multi-blocks-switcher';
 import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
+import BlockSettingsMenu from '../block-settings-menu';
 
 function BlockToolbar( { blockClientIds, isValid, mode } ) {
 	if ( blockClientIds.length > 1 ) {
@@ -29,6 +30,7 @@ function BlockToolbar( { blockClientIds, isValid, mode } ) {
 			<BlockSwitcher clientIds={ blockClientIds } />
 			<BlockControls.Slot />
 			<BlockFormatControls.Slot />
+			<BlockSettingsMenu clientIds={ blockClientIds } />
 		</div>
 	);
 }

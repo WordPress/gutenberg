@@ -12,7 +12,6 @@ import { withSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import BlockMover from '../block-mover';
-import BlockSettingsMenu from '../block-settings-menu';
 
 function BlockListMultiControls( {
 	multiSelectedBlockClientIds,
@@ -25,21 +24,12 @@ function BlockListMultiControls( {
 		return null;
 	}
 
-	return [
-		<BlockMover
-			key="mover"
-			clientId={ clientId }
-			clientIds={ multiSelectedBlockClientIds }
-			isFirst={ isFirst }
-			isLast={ isLast }
-		/>,
-		<BlockSettingsMenu
-			key="menu"
-			clientId={ clientId }
-			clientIds={ multiSelectedBlockClientIds }
-			focus
-		/>,
-	];
+	return <BlockMover
+		clientId={ clientId }
+		clientIds={ multiSelectedBlockClientIds }
+		isFirst={ isFirst }
+		isLast={ isLast }
+	/>;
 }
 
 export default withSelect( ( select, { clientId } ) => {
