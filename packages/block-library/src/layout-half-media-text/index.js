@@ -12,6 +12,8 @@ import {
 	BlockAlignmentToolbar,
 	InnerBlocks,
 } from '@wordpress/editor';
+import { Component } from '@wordpress/element';
+import { withSelect } from '@wordpress/data';
 
 const MEDIA_POSITIONS = [ 'left', 'right' ];
 
@@ -32,32 +34,47 @@ export const settings = {
 	},
 
 	supports: {
-		align: [ 'wide', 'full' ],
+		align: [ 'center', 'wide', 'full' ],
 	},
 
-	edit( { attributes, setAttributes } ) {
-		return (
-			<div className={ classnames(
-				'half-media',
-				{ 'has-media-on-the-right': 'right' === attributes.mediaPosition }
-			) }>
-				<BlockControls>
-					<BlockAlignmentToolbar
-						controls={ MEDIA_POSITIONS }
-						value={ attributes.mediaPosition }
-						onChange={ ( mediaPosition ) => setAttributes( { mediaPosition } ) }
-					/>
-				</BlockControls>
-				<InnerBlocks
-					template={ [
-						[ 'core/half-media-media-area' ],
-						[ 'core/half-media-content-area' ],
-					] }
-					templateLock="all"
-				/>
-			</div>
-		);
-	},
+	edit: withSelect( ( select ) => {
+		return {
+			wideControlsEnabled: select( 'core/editor' ).getEditorSettings().alignWide,
+		};
+	} )(
+		class extends Component {
+			componentWillMount() {
+				if ( this.props.wideControlsEnabled && ! this.props.attributes.align ) {
+					this.props.setAttributes( {
+						align: 'wide',
+					} );
+				}
+			}
+			render() {
+				const { attributes, setAttributes } = this.props;
+				return (
+					<div className={ classnames(
+						'half-media',
+						{ 'has-media-on-the-right': 'right' === attributes.mediaPosition }
+					) }>
+						<BlockControls>
+							<BlockAlignmentToolbar
+								controls={ MEDIA_POSITIONS }
+								value={ attributes.mediaPosition }
+								onChange={ ( mediaPosition ) => setAttributes( { mediaPosition } ) }
+							/>
+						</BlockControls>
+						<InnerBlocks
+							template={ [
+								[ 'core/half-media-media-area' ],
+								[ 'core/half-media-content-area' ],
+							] }
+							templateLock="all"
+						/>
+					</div>
+				);
+			}
+		} ),
 
 	save( { attributes } ) {
 		return (
