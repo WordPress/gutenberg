@@ -2,7 +2,8 @@
 	margin-left: 28px;
 }
 
-.half-media {
+.half-media,
+.half-media.aligncenter {
 	display: flex;
 }
 
@@ -12,14 +13,18 @@
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
-	padding: 5px;
+	padding: 0;
 }
 
 .half-media__media {
 	flex: 1;
-	padding: 5px;
+	margin-top: auto;
+	margin-bottom: auto;
 }
 
 .half-media.has-media-on-the-right {
 	flex-direction: row-reverse;
+	.half-media__media > * {
+		float: right;
+	}
 }

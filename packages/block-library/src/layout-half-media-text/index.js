@@ -11,9 +11,14 @@ import {
 	BlockControls,
 	BlockAlignmentToolbar,
 	InnerBlocks,
+	InspectorControls,
+	getColorClass,
+	PanelColorSettings,
+	withColors,
 } from '@wordpress/editor';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
 const MEDIA_POSITIONS = [ 'left', 'right' ];
 
@@ -27,6 +32,12 @@ export const settings = {
 	category: 'layout',
 
 	attributes: {
+		backgroundColor: {
+			type: 'string',
+		},
+		customBackgroundColor: {
+			type: 'string',
+		},
 		mediaPosition: {
 			type: 'string',
 			default: 'left',
@@ -37,11 +48,14 @@ export const settings = {
 		align: [ 'center', 'wide', 'full' ],
 	},
 
-	edit: withSelect( ( select ) => {
-		return {
-			wideControlsEnabled: select( 'core/editor' ).getEditorSettings().alignWide,
-		};
-	} )(
+	edit: compose( [
+		withColors( 'backgroundColor' ),
+		withSelect( ( select ) => {
+			return {
+				wideControlsEnabled: select( 'core/editor' ).getEditorSettings().alignWide,
+			};
+		} ),
+	] )(
 		class extends Component {
 			componentWillMount() {
 				if ( this.props.wideControlsEnabled && ! this.props.attributes.align ) {
@@ -51,12 +65,33 @@ export const settings = {
 				}
 			}
 			render() {
-				const { attributes, setAttributes } = this.props;
+				const { attributes, backgroundColor, setAttributes, setBackgroundColor } = this.props;
 				return (
-					<div className={ classnames(
-						'half-media',
-						{ 'has-media-on-the-right': 'right' === attributes.mediaPosition }
-					) }>
+					<div
+						className={ classnames(
+							'half-media',
+							{
+								'has-media-on-the-right': 'right' === attributes.mediaPosition,
+								[ backgroundColor.class ]: backgroundColor.class,
+							}
+						) }
+						style={ {
+							backgroundColor: backgroundColor.value,
+						} }
+					>
+						<InspectorControls>
+							<PanelColorSettings
+								title={ __( 'Color Settings' ) }
+								initialOpen={ false }
+								colorSettings={ [
+									{
+										value: backgroundColor.value,
+										onChange: setBackgroundColor,
+										label: __( 'Background Color' ),
+									},
+								] }
+							/>
+						</InspectorControls>
 						<BlockControls>
 							<BlockAlignmentToolbar
 								controls={ MEDIA_POSITIONS }
@@ -77,11 +112,24 @@ export const settings = {
 		} ),
 
 	save( { attributes } ) {
+		const {
+			backgroundColor,
+			customBackgroundColor,
+		} = attributes;
+		const backgroundClass = getColorClass( 'background-color', backgroundColor );
 		return (
-			<div className={ classnames(
-				'half-media',
-				{ 'has-media-on-the-right': 'right' === attributes.mediaPosition }
-			) }>
+			<div
+				className={ classnames(
+					'half-media',
+					{
+						'has-media-on-the-right': 'right' === attributes.mediaPosition,
+						[ backgroundClass ]: backgroundClass,
+					}
+				) }
+				style={ {
+					backgroundColor: backgroundClass ? undefined : customBackgroundColor,
+				} }
+			>
 				<InnerBlocks.Content />
 			</div>
 		);

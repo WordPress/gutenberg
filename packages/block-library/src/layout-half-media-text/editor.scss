@@ -10,19 +10,44 @@
 	.half-media__content {
 		text-align: initial;
 	}
+	.components-placeholder {
+		background-color: #f3f3f4;
+	}
+	.editor-block-placeholder {
+		margin-bottom: 14px;
+	}
+}
+
+.half-media.has-media-on-the-right .components-placeholder {
+	margin-left: 2px;
+}
+
+.half-media:not(.has-media-on-the-right) .components-placeholder {
+	margin-left: -2px;
 }
 
 .half-media > .editor-inner-blocks > .editor-block-list__layout {
 	display: flex;
+	> [data-type="core/half-media-media-area"] {
+		flex-basis: 50%;
+	}
+	> [data-type="core/half-media-content-area"] {
+		flex-basis: 50%;
+	}
 	> [data-type="core/half-media-media-area"],
 	> [data-type="core/half-media-content-area"] {
 		display: flex;
 		flex-direction: column;
-		flex: 1;
 		width: 0;
+
 		.editor-block-list__block-edit {
 			flex-basis: 100%;
 		}
+	}
+	> [data-type="core/half-media-media-area"] {
+		margin-top: auto;
+		margin-bottom: auto;
+
 	}
 	> [data-type="core/half-media-media-area"] > .editor-block-list__block-edit {
 		margin-top: 0;
