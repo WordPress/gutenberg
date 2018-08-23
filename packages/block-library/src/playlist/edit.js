@@ -67,7 +67,7 @@ class PlaylistEdit extends Component {
 					const type = media[ 0 ].mimeType.split( '/' )[ 0 ];
 					const ids = JSON.stringify( media.map( ( item ) => item.id ) );
 					setAttributes( { ids, type } );
-					this.setState( { isEditing: false, hasError: false } );
+					this.setState( { isEditing: false } );
 				}
 			},
 		} );
