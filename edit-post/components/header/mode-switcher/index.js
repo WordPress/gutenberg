@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { MenuItemsChoice, MenuGroup } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
+import { applyFilters } from '@wordpress/hooks';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
@@ -15,16 +16,16 @@ import shortcuts from '../../../keyboard-shortcuts';
  *
  * @type {Array}
  */
-const MODES = [
-	{
-		value: 'visual',
-		label: __( 'Visual Editor' ),
-	},
-	{
-		value: 'text',
-		label: __( 'Code Editor' ),
-	},
-];
+const MODES = applyFilters( 'editor.modeSwitcher', [
+    {
+        value: 'visual',
+        label: __( 'Visual Editor' ),
+    },
+    {
+        value: 'text',
+        label: __( 'Code Editor' ),
+    },
+] );
 
 function ModeSwitcher( { onSwitch, mode } ) {
 	const choices = MODES.map( ( choice ) => {
