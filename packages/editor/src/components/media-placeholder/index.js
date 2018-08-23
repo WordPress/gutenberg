@@ -156,7 +156,7 @@ class MediaPlaceholder extends Component {
 					>
 						<input
 							type="url"
-							className="components-placeholder__input"
+							className="components-placeholder__input editor-media-placeholder__url-input"
 							aria-label={ labels.title }
 							placeholder={ __( 'Enter URL here…' ) }
 							onChange={ this.onChangeSrc }

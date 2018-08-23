@@ -2,13 +2,18 @@
 	max-width: 400px;
 
 	.editor-media-placeholder__url-input-form {
-		margin-top: 1em;
+		margin-top: 0.5rem;
 		max-width: none;
 	}
 }
 
+.editor-media-placeholder__url-input {
+	margin-bottom: 0.5rem;
+}
+
 .editor-media-placeholder__upload-button.components-button {
 	margin-right: 5px;
+	margin-bottom: 0.5rem;
 
 	.dashicon {
 		vertical-align: middle;
