@@ -116,9 +116,9 @@ export class RichText extends Component {
 	}
 
 	changeFormats( formats ) {
-		const newStateFormats = [];
+		const newStateFormats = {};
 		forEach( formats, ( formatValue, format ) => {
-			newStateFormats.push( getFormatValue( format ) );
+			newStateFormats[ format ] = getFormatValue( format );
 			const isActive = this.isFormatActive( format );
 			if ( isActive && ! formatValue ) {
 				this.removeFormat( format );
