@@ -2,24 +2,24 @@
 
 exports[`URL rewrite should not replace absolute paths 1`] = `
 "h1 {
-  background: url(/images/test.png);
+background: url(/images/test.png);
 }"
 `;
 
 exports[`URL rewrite should not replace remote paths 1`] = `
 "h1 {
-  background: url(http://wp.org/images/test.png);
+background: url(http://wp.org/images/test.png);
 }"
 `;
 
 exports[`URL rewrite should replace complex relative paths 1`] = `
 "h1 {
-  background: url(http://wp-site.local/themes/gut/images/test.png);
+background: url(http://wp-site.local/themes/gut/images/test.png);
 }"
 `;
 
 exports[`URL rewrite should replace relative paths 1`] = `
 "h1 {
-  background: url(http://wp-site.local/themes/gut/css/images/test.png);
+background: url(http://wp-site.local/themes/gut/css/images/test.png);
 }"
 `;

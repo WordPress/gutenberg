@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { parse, stringify } from 'css';
+import { parse, stringify } from './ast';
 import traverse from 'traverse';
 
 function traverseCSS( css, callback ) {

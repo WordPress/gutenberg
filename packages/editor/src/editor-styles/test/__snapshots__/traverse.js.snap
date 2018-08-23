@@ -2,6 +2,6 @@
 
 exports[`CSS traverse Should traverse the CSS 1`] = `
 "namespace h1 {
-  color: red;
+color: red;
 }"
 `;
