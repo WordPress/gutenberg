@@ -3,13 +3,13 @@ buildscript {
         gradlePluginVersion = '3.0.1'
         kotlinVersion = '1.2.31'
         supportLibVersion = '27.1.1'
-        tagSoupVersion = '1.2.1'
+        tagSoupVersion = '1.2.2'
         glideVersion = '3.7.0'
         picassoVersion = '2.5.2'
         robolectricVersion = '3.5.1'
         jUnitVersion = '4.12'
         jSoupVersion = '1.10.3'
-        wordpressUtilsVersion = '1.20.2'
+        wordpressUtilsVersion = '1.22'
         espressoVersion = '3.0.1'
     }
 
@@ -19,7 +19,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath 'com.android.tools.build:gradle:3.1.4'
     }
 }
 
@@ -36,7 +36,7 @@ List<String> dirs = [
 android {
     compileSdkVersion 27
 
-    buildToolsVersion "26.0.2"
+    buildToolsVersion "27.0.3"
 
     defaultConfig {
         minSdkVersion 16
