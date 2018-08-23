@@ -74,6 +74,7 @@
     "@wordpress/autop": "^1.0.6",
     "@wordpress/compose": "^1.0.1",
     "@wordpress/deprecated": "^1.0.0-alpha.2",
+    "@wordpress/element": "^1.0.2",
     "@wordpress/hooks": "^1.2.1",
     "@wordpress/i18n": "^1.1.0",
     "@wordpress/is-shallow-equal": "^1.0.1",

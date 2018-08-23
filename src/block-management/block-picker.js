@@ -6,6 +6,7 @@ import React, { Component } from 'react';
 import { FlatList, Text, TouchableHighlight, View } from 'react-native';
 import Modal from 'react-native-modal';
 import styles from './block-picker.scss';
+import { name as unsupportedBlockName } from '../block-types/unsupported-block';
 // Gutenberg imports
 import { getBlockTypes } from '@wordpress/blocks';
 
@@ -22,7 +23,7 @@ type StateType = {
 };
 
 export default class BlockPicker extends Component<PropsType, StateType> {
-	availableBlockTypes = getBlockTypes();
+	availableBlockTypes = getBlockTypes().filter( ( { name } ) => name !== unsupportedBlockName );
 
 	constructor( props: PropsType ) {
 		super( props );

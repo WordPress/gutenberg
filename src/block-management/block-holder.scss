@@ -21,6 +21,32 @@
 	padding-bottom: 4;
 }
 
+.unsupportedBlock {
+	background-color: #e9eff3; // grey lighten 30 
+	padding-top: 8;
+	padding-bottom: 8;
+	padding-left: 8;
+	padding-right: 8;
+}
+
+.unsupportedBlockImagePlaceholder {
+	margin: auto;
+	text-align: center;
+	background-color: #4f748e; // dark grey
+	width: 20;
+	height: 20;
+	margin-top: 24;
+	margin-bottom: 8;
+}
+
+.unsupportedBlockMessage {
+	text-align: center;
+	color: #4f748e; // grey darken 20
+	padding-top: 24;
+	padding-bottom: 24;
+	font-size: 16px;
+}
+
 .aztec_container {
 	flex: 1;
 }
