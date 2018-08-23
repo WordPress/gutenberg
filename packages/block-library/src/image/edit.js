@@ -71,6 +71,17 @@ export const pickRelevantMediaFiles = ( image ) => {
  */
 const isTemporaryBlobURL = ( id, url ) => ! id && isBlobURL( url );
 
+/**
+ * Is the url for the image hosted externally. An externally hosted image has no id
+ * and is not a blob url.
+ *
+ * @param {number=} id  The id of the image.
+ * @param {string=} url The url of the image.
+ *
+ * @return {boolean} Is the url an externally hosted url?
+ */
+const isExternalURL = ( id, url ) => url && ! id && ! isBlobURL( url );
+
 class ImageEdit extends Component {
 	constructor() {
 		super( ...arguments );
@@ -79,15 +90,18 @@ class ImageEdit extends Component {
 		this.onFocusCaption = this.onFocusCaption.bind( this );
 		this.onImageClick = this.onImageClick.bind( this );
 		this.onSelectImage = this.onSelectImage.bind( this );
+		this.onSelectURL = this.onSelectURL.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.updateWidth = this.updateWidth.bind( this );
 		this.updateHeight = this.updateHeight.bind( this );
 		this.updateDimensions = this.updateDimensions.bind( this );
 		this.onSetCustomHref = this.onSetCustomHref.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
+		this.toggleIsEditing = this.toggleIsEditing.bind( this );
 
 		this.state = {
 			captionFocused: false,
+			isEditing: ! this.props.attributes.url,
 		};
 	}
 
@@ -136,6 +150,10 @@ class ImageEdit extends Component {
 			return;
 		}
 
+		this.setState( {
+			isEditing: false,
+		} );
+
 		this.props.setAttributes( {
 			...pickRelevantMediaFiles( media ),
 			width: undefined,
@@ -160,6 +178,29 @@ class ImageEdit extends Component {
 			linkDestination: value,
 			href,
 		} );
+	}
+
+	onSelectURL( newURL ) {
+		const { url, id } = this.props.attributes;
+
+		this.setState( {
+			isEditing: false,
+		} );
+
+		if ( newURL !== url && id ) {
+			// User is switching from an uploaded image an external image.
+			// Unset any properties that relate to an uploaded image.
+			this.props.setAttributes( {
+				url: newURL,
+				alt: undefined,
+				id: undefined,
+				caption: undefined,
+			} );
+		} else {
+			this.props.setAttributes( {
+				url: newURL,
+			} );
+		}
 	}
 
 	onSetCustomHref( value ) {
@@ -224,17 +265,33 @@ class ImageEdit extends Component {
 		];
 	}
 
+	toggleIsEditing() {
+		this.setState( {
+			isEditing: ! this.state.isEditing,
+		} );
+	}
+
 	render() {
+		const { isEditing } = this.state;
 		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, noticeOperations, noticeUI, toggleSelection, isRTL } = this.props;
 		const { url, alt, caption, align, id, href, linkDestination, width, height } = attributes;
+		const isExternal = isExternalURL( id, url );
 
-		const controls = (
-			<BlockControls>
-				<BlockAlignmentToolbar
-					value={ align }
-					onChange={ this.updateAlignment }
-				/>
-				{ !! url && (
+		let toolbarEditButton;
+		if ( url ) {
+			if ( isExternal ) {
+				toolbarEditButton = (
+					<Toolbar>
+						<IconButton
+							className="components-icon-button components-toolbar__control"
+							label={ __( 'Edit image' ) }
+							onClick={ this.toggleIsEditing }
+							icon="edit"
+						/>
+					</Toolbar>
+				);
+			} else {
+				toolbarEditButton = (
 					<Toolbar>
 						<MediaUpload
 							onSelect={ this.onSelectImage }
@@ -250,11 +307,22 @@ class ImageEdit extends Component {
 							) }
 						/>
 					</Toolbar>
-				) }
+				);
+			}
+		}
+
+		const controls = (
+			<BlockControls>
+				<BlockAlignmentToolbar
+					value={ align }
+					onChange={ this.updateAlignment }
+				/>
+				{ toolbarEditButton }
 			</BlockControls>
 		);
 
-		if ( ! url ) {
+		if ( isEditing ) {
+			const src = isExternal ? url : undefined;
 			return (
 				<Fragment>
 					{ controls }
@@ -266,10 +334,12 @@ class ImageEdit extends Component {
 						} }
 						className={ className }
 						onSelect={ this.onSelectImage }
+						onSelectURL={ this.onSelectURL }
 						notices={ noticeUI }
 						onError={ noticeOperations.createErrorNotice }
 						accept="image/*"
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						value={ { id, src } }
 					/>
 				</Fragment>
 			);
@@ -399,7 +469,7 @@ class ImageEdit extends Component {
 							// Disable reason: Image itself is not meant to be
 							// interactive, but should direct focus to block
 							// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-							const img = <img src={ url } alt={ alt } onClick={ this.onImageClick } />;
+							const img = ( <img src={ url } alt={ alt } onClick={ this.onImageClick } /> );
 
 							if ( ! isResizable || ! imageWidthWithinContainer ) {
 								return (
