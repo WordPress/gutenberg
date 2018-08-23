@@ -2,7 +2,7 @@
  * External Dependencies
  */
 
-import { get, every } from 'lodash';
+import { uniqBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -50,9 +50,12 @@ class PlaylistEdit extends Component {
 	}
 
 	onUploadFiles( files ) {
-		const firstType = get( files, [ 0, 'type' ] );
+		function getMimeBaseType( type ) {
+			return type.split( '/' )[ 0 ];
+		}
+
 		const { setAttributes, noticeOperations } = this.props;
-		const isConsistentType = every( files, { type: firstType } );
+		const isConsistentType = uniqBy( files, ( file ) => getMimeBaseType( file.type ) ).length === 1;
 		if ( ! isConsistentType ) {
 			noticeOperations.createErrorNotice( 'Cannot have mixed types in a Playlist Block' );
 			setAttributes( { ids: null, type: null } );
