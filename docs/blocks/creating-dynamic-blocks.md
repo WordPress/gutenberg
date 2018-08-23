@@ -179,7 +179,7 @@ The PHP code is the same as above and is automatically handled through the WP RE
 
 ## Rendering block markup with PHP
 
-Dynamic blocks can be used in order to control the markup of your block with PHP. This is useful as if you decide to change your blocks markup, you won't have to go back and re-save all the posts which use that block, in order for your blocks markup change to be reflected on all posts.
+Dynamic blocks can be used in order to control the markup of your block with PHP. This is useful as if you decide to change your block's markup, you won't have to go back and re-save all the posts which use that block, in order for your block's markup change to be reflected on all posts.
 
 {% ESNext %}
 ```js
