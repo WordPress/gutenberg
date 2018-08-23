@@ -158,6 +158,7 @@ repositories {
 }
 
 dependencies {
+    implementation project(':react-native-svg')
 	implementation project(':react-native-aztec')
 	implementation project(':react-native-recyclerview-list')
     // compile fileTree(dir: "libs", include: ["*.jar"])

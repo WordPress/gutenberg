@@ -4,12 +4,13 @@
  */
 
 import React from 'react';
-import { Platform, Switch, Text, View, FlatList, Picker, TextInput, KeyboardAvoidingView } from 'react-native';
+import { Platform, Switch, Text, View, FlatList, TextInput, KeyboardAvoidingView } from 'react-native';
 import RecyclerViewList, { DataSource } from 'react-native-recyclerview-list';
 import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
 import type { BlockType } from '../store/';
 import styles from './block-manager.scss';
+import BlockPicker from './block-picker';
 import holderStyles from './block-holder.scss';
 import * as UnsupportedBlock from '../block-types/unsupported-block/';
 
@@ -45,8 +46,6 @@ type StateType = {
 };
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
-	availableBlockTypes = getBlockTypes();
-
 	constructor( props: PropsType ) {
 		super( props );
 		this.state = {
@@ -84,8 +83,8 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 	// TODO: in the near future this will likely be changed to onShowBlockTypePicker and bound to this.props
 	// once we move the action to the toolbar
-	showBlockTypePicker() {
-		this.setState( { ...this.state, blockTypePickerVisible: true } );
+	showBlockTypePicker( show: boolean ) {
+		this.setState( { ...this.state, blockTypePickerVisible: show } );
 	}
 
 	onBlockTypeSelected( itemValue: string ) {
@@ -134,7 +133,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				this.props.deleteBlockAction( clientId );
 				break;
 			case ToolbarButton.PLUS:
-				this.showBlockTypePicker();
+				this.showBlockTypePicker( true );
 				break;
 			case ToolbarButton.SETTINGS:
 				// TODO: implement settings
@@ -208,17 +207,14 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		}
 
 		const blockTypePicker = (
-			<View>
-				<Picker
-					selectedValue={ this.state.selectedBlockType }
-					onValueChange={ ( itemValue ) => {
-						this.onBlockTypeSelected( itemValue );
-					} } >
-					{ this.availableBlockTypes.map( ( item, index ) => {
-						return ( <Picker.Item label={ item.title } value={ item.name } key={ index + 1 } /> );
-					} ) }
-				</Picker>
-			</View>
+			<BlockPicker
+				visible={ this.state.blockTypePickerVisible }
+				onDismiss={ () => {
+					this.showBlockTypePicker( false );
+				} }
+				onValueSelected={ ( itemValue ) => {
+					this.onBlockTypeSelected( itemValue );
+				} } />
 		);
 
 		return (
@@ -235,7 +231,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				</View>
 				{ this.state.showHtml && this.renderHTML() }
 				{ ! this.state.showHtml && list }
-				{ this.state.blockTypePickerVisible && blockTypePicker }
+				{ blockTypePicker }
 			</View>
 		);
 	}
@@ -256,27 +252,16 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	renderItem( value: { item: BlockType, clientId: string } ) {
+		const insertHere = (
+			<View style={ styles.containerStyleAddHere } >
+				<View style={ styles.lineStyleAddHere }></View>
+				<Text style={ styles.labelStyleAddHere } >ADD BLOCK HERE</Text>
+				<View style={ styles.lineStyleAddHere }></View>
+			</View>
+		);
 
-		const blockName = value.item.name;
-		const blockType = getBlockType( value.item.name );
-		const unsupportedBlockName = getUnknownTypeHandlerName();
-		const unsupportedBlockType = getBlockType( unsupportedBlockName );
-
-		if (blockName == unsupportedBlockName) {
-			const Block = unsupportedBlockType.edit;
-
-			return (
-				<View style={ holderStyles.blockContainer }>
-					<Block
-						key={ value.clientId }
-						clientId={ value.clientId }
-						name={ value.item.name }
-						{ ...value.item.attributes }
-					/>
-				</View>	
-			);
-		} else {
-			return (
+		return (
+			<View>
 				<BlockHolder
 					key={ value.clientId }
 					onToolbarButtonPressed={ this.onToolbarButtonPressed.bind( this ) }
@@ -286,8 +271,9 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 					clientId={ value.clientId }
 					{ ...value.item }
 				/>
-			);
-		}
+				{ this.state.blockTypePickerVisible && value.item.focused && insertHere }
+			</View>
+		);
 	}
 
 	renderHTML() {

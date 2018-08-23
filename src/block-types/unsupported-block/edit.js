@@ -33,11 +33,8 @@ export default class UnsupportedBlockEdit extends React.Component<PropsType, Sta
 	}
 
 	render() {
-		let blockName = this.props.name.charAt(0).toUpperCase() + this.props.name.slice(1);
-
 		return (
 			<View style={ styles.unsupportedBlock }>
-				<Text style={ styles.unsupportedBlockName }>{ blockName }</Text>
 				<Text style={ styles.unsupportedBlockMessage }>Unsupported</Text>
 			</View>
 		);

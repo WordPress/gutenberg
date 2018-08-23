@@ -1,5 +1,6 @@
 {
     "recommendations": [
-    	"gcazaciuc.vscode-flow-ide"
+        "gcazaciuc.vscode-flow-ide",
+        "vsmobile.vscode-react-native"
     ]
 }
