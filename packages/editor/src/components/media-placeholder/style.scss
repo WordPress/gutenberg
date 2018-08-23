@@ -1,14 +1,9 @@
-.editor-media-placeholder {
-	&__url-input-form {
+.editor-media-placeholder .components-placeholder__fieldset {
+	max-width: 400px;
+
+	.editor-media-placeholder__url-input-form {
 		margin-top: 1em;
-	}
-
-	.components-placeholder__fieldset {
-		max-width: 400px;
-
-		form {
-			max-width: none;
-		}
+		max-width: none;
 	}
 }
 
