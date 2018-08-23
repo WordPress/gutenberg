@@ -13,6 +13,10 @@ import { RawHTML } from '@wordpress/element';
 
 import edit from './edit';
 
+type Attributes = {
+	content: String
+}
+
 export const name = 'gmobile/unsupported';
 
 export const settings = {
@@ -41,7 +45,7 @@ export const settings = {
 
 	edit,
 
-	save({ attributes }) {
+	save( { attributes } : { attributes: Attributes } ) {
 		return <RawHTML>{ attributes.content }</RawHTML>;
 	},
 };
