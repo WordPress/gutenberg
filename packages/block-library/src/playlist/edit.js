@@ -51,13 +51,13 @@ class PlaylistEdit extends Component {
 	}
 
 	onUploadFiles( files ) {
+		const firstType = get( files, [ 0, 'mimeType' ] );
 		const { setAttributes, noticeOperations } = this.props;
+		const isConsistentType = every( files, ( filesMedia ) => filesMedia.mimeType === firstType );
 		mediaUpload( {
 			allowedType: [ 'audio', 'video' ],
 			filesList: files,
 			onFileChange: ( media ) => {
-				const firstType = get( media, [ 0, 'mimeType' ] );
-				const isConsistentType = every( media, ( filesMedia ) => filesMedia.mimeType === firstType );
 				// validate type is consistent for playlist
 				if ( ! isConsistentType ) {
 					this.setState( { hasError: true } );
