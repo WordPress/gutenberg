@@ -38,15 +38,7 @@ class PlaylistEdit extends Component {
 		// check for if ids is set to determine edit state
 		this.state = {
 			isEditing: ! this.props.attributes.ids,
-			hasError: false,
 		};
-	}
-
-	componentDidUpdate( prevProps, prevState ) {
-		const { noticeOperations } = this.props;
-		if ( this.state.hasError && ! prevState.hasError ) {
-			noticeOperations.createErrorNotice( 'Cannot have mixed types in a Playlist Block' );
-		}
 	}
 
 	initializePlaylist() {
@@ -58,11 +50,11 @@ class PlaylistEdit extends Component {
 	}
 
 	onUploadFiles( files ) {
-		const firstType = get( files, [ 0, 'mimeType' ] );
-		const { setAttributes } = this.props;
-		const isConsistentType = every( files, { mimeType: firstType } );
+		const firstType = get( files, [ 0, 'type' ] );
+		const { setAttributes, noticeOperations } = this.props;
+		const isConsistentType = every( files, { type: firstType } );
 		if ( ! isConsistentType ) {
-			this.setState( { hasError: true } );
+			noticeOperations.createErrorNotice( 'Cannot have mixed types in a Playlist Block' );
 			setAttributes( { ids: null, type: null } );
 			return;
 		}
@@ -98,7 +90,7 @@ class PlaylistEdit extends Component {
 			if ( media && media[ 0 ].url ) {
 				const ids = JSON.stringify( media.map( ( item ) => item.id ) );
 				setAttributes( { ids, type: media[ 0 ].type } );
-				this.setState( { isEditing: false, hasError: false } );
+				this.setState( { isEditing: false } );
 			}
 		};
 
