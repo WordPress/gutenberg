@@ -57,9 +57,9 @@ class PlaylistEdit extends Component {
 			filesList: files,
 			onFileChange: ( media ) => {
 				const firstType = get( media, [ 0, 'mimeType' ] );
-				const isConsistentType = !! firstType && every( media, ( filesMedia ) => filesMedia.mimeType === firstType );
+				const isConsistentType = every( media, ( filesMedia ) => filesMedia.mimeType === firstType );
 				// validate type is consistent for playlist
-				if ( ! isConsistentType && ! this.state.hasError ) {
+				if ( ! isConsistentType ) {
 					this.setState( { hasError: true } );
 					noticeOperations.createErrorNotice( 'Cannot have mixed types in a Playlist Block' );
 					setAttributes( { ids: null, type: null } );
