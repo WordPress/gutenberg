@@ -58,7 +58,7 @@ class PlaylistEdit extends Component {
 		const isConsistentType = uniqBy( files, ( file ) => getMimeBaseType( file.type ) ).length === 1;
 		if ( ! isConsistentType ) {
 			noticeOperations.createErrorNotice( 'Cannot have mixed types in a Playlist Block' );
-			setAttributes( { ids: null, type: null } );
+			setAttributes( { ids: undefined, type: undefined } );
 			return;
 		}
 
