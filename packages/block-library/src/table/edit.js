@@ -107,14 +107,8 @@ export default class TableEdit extends Component {
 	 * @param {Array} content A RichText content value.
 	 */
 	onChange( content ) {
-		const { selectedCell } = this.state;
-
-		if ( ! selectedCell ) {
-			return;
-		}
-
 		const { attributes, setAttributes } = this.props;
-		const { section, rowIndex, columnIndex } = selectedCell;
+		const { section, rowIndex, columnIndex } = this.state.selectedCell;
 
 		setAttributes( updateCellContent( attributes, {
 			section,
@@ -130,14 +124,8 @@ export default class TableEdit extends Component {
 	 * @param {number} delta Offset for selected row index at which to insert.
 	 */
 	onInsertRow( delta ) {
-		const { selectedCell } = this.state;
-
-		if ( ! selectedCell ) {
-			return;
-		}
-
 		const { attributes, setAttributes } = this.props;
-		const { section, rowIndex } = selectedCell;
+		const { section, rowIndex } = this.state.selectedCell;
 
 		this.setState( { selectedCell: null } );
 		setAttributes( insertRow( attributes, {
@@ -164,14 +152,8 @@ export default class TableEdit extends Component {
 	 * Deletes the currently selected row.
 	 */
 	onDeleteRow() {
-		const { selectedCell } = this.state;
-
-		if ( ! selectedCell ) {
-			return;
-		}
-
 		const { attributes, setAttributes } = this.props;
-		const { section, rowIndex } = selectedCell;
+		const { section, rowIndex } = this.state.selectedCell;
 
 		this.setState( { selectedCell: null } );
 		setAttributes( deleteRow( attributes, { section, rowIndex } ) );
@@ -183,14 +165,8 @@ export default class TableEdit extends Component {
 	 * @param {number} delta Offset for selected column index at which to insert.
 	 */
 	onInsertColumn( delta = 0 ) {
-		const { selectedCell } = this.state;
-
-		if ( ! selectedCell ) {
-			return;
-		}
-
 		const { attributes, setAttributes } = this.props;
-		const { section, columnIndex } = selectedCell;
+		const { section, columnIndex } = this.state.selectedCell;
 
 		this.setState( { selectedCell: null } );
 		setAttributes( insertColumn( attributes, {
@@ -217,14 +193,8 @@ export default class TableEdit extends Component {
 	 * Deletes the currently selected column.
 	 */
 	onDeleteColumn() {
-		const { selectedCell } = this.state;
-
-		if ( ! selectedCell ) {
-			return;
-		}
-
 		const { attributes, setAttributes } = this.props;
-		const { section, columnIndex } = selectedCell;
+		const { section, columnIndex } = this.state.selectedCell;
 
 		this.setState( { selectedCell: null } );
 		setAttributes( deleteColumn( attributes, { section, columnIndex } ) );
