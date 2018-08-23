@@ -107,14 +107,19 @@ export const saveReusableBlock = async ( action, store ) => {
 			updatedId: updatedReusableBlock.id,
 			id,
 		} );
-		const message = __( 'Block created.' );
-		dispatch( createSuccessNotice( message, { id: REUSABLE_BLOCK_NOTICE_ID } ) );
+		dispatch( createSuccessNotice(
+			<p>{ __( 'Block created.' ) }</p>,
+			{ id: REUSABLE_BLOCK_NOTICE_ID }
+		) );
 	} catch ( error ) {
 		dispatch( { type: 'SAVE_REUSABLE_BLOCK_FAILURE', id } );
-		dispatch( createErrorNotice( error.message, {
-			id: REUSABLE_BLOCK_NOTICE_ID,
-			spokenMessage: error.message,
-		} ) );
+		dispatch( createErrorNotice(
+			<p>{ error.message }</p>,
+			{
+				id: REUSABLE_BLOCK_NOTICE_ID,
+				spokenMessage: error.message,
+			}
+		) );
 	}
 };
 
@@ -159,18 +164,23 @@ export const deleteReusableBlocks = async ( action, store ) => {
 			id,
 			optimist: { type: COMMIT, id: transactionId },
 		} );
-		const message = __( 'Block deleted.' );
-		dispatch( createSuccessNotice( message, { id: REUSABLE_BLOCK_NOTICE_ID } ) );
+		dispatch( createSuccessNotice(
+			<p>{ __( 'Block deleted.' ) }</p>,
+			{ id: REUSABLE_BLOCK_NOTICE_ID }
+		) );
 	} catch ( error ) {
 		dispatch( {
 			type: 'DELETE_REUSABLE_BLOCK_FAILURE',
 			id,
 			optimist: { type: REVERT, id: transactionId },
 		} );
-		dispatch( createErrorNotice( error.message, {
-			id: REUSABLE_BLOCK_NOTICE_ID,
-			spokenMessage: error.message,
-		} ) );
+		dispatch( createErrorNotice(
+			<p>{ error.message }</p>,
+			{
+				id: REUSABLE_BLOCK_NOTICE_ID,
+				spokenMessage: error.message,
+			}
+		) );
 	}
 };
 
