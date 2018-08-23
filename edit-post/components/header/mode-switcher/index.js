@@ -17,14 +17,14 @@ import shortcuts from '../../../keyboard-shortcuts';
  * @type {Array}
  */
 const MODES = applyFilters( 'editor.modeSwitcher', [
-    {
-        value: 'visual',
-        label: __( 'Visual Editor' ),
-    },
-    {
-        value: 'text',
-        label: __( 'Code Editor' ),
-    },
+	{
+		value: 'visual',
+		label: __( 'Visual Editor' ),
+	},
+	{
+		value: 'text',
+		label: __( 'Code Editor' ),
+	},
 ] );
 
 function ModeSwitcher( { onSwitch, mode } ) {
