@@ -1,7 +1,11 @@
 /**
+ * External dependencies
+ */
+import deepFreeze from 'deep-freeze';
+
+/**
  * Internal dependencies
  */
-
 import {
 	createTable,
 	updateCellContent,
@@ -11,7 +15,7 @@ import {
 	deleteColumn,
 } from '../state';
 
-const table = {
+const table = deepFreeze( {
 	body: [
 		{
 			cells: [
@@ -38,9 +42,9 @@ const table = {
 			],
 		},
 	],
-};
+} );
 
-const tableWithContent = {
+const tableWithContent = deepFreeze( {
 	body: [
 		{
 			cells: [
@@ -67,7 +71,7 @@ const tableWithContent = {
 			],
 		},
 	],
-};
+} );
 
 describe( 'createTable', () => {
 	it( 'should create a table', () => {

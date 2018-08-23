@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-
 import { times } from 'lodash';
 
 /**

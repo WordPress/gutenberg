@@ -1,13 +1,11 @@
 /**
  * External dependencies
  */
-
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-
 import { Fragment, Component } from '@wordpress/element';
 import { InspectorControls, BlockControls, RichText } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
@@ -23,7 +21,6 @@ import {
 /**
  * Internal dependencies
  */
-
 import {
 	createTable,
 	updateCellContent,
@@ -32,12 +29,6 @@ import {
 	insertColumn,
 	deleteColumn,
 } from './state';
-
-/**
- * Browser dependencies
- */
-
-const { parseInt } = window;
 
 export default class TableEdit extends Component {
 	constructor() {
@@ -78,7 +69,7 @@ export default class TableEdit extends Component {
 	/**
 	 * Updates the initial row count used for table creation.
 	 *
-	 * @param {[type]} initialRowCount New initial row count.
+	 * @param {number} initialRowCount New initial row count.
 	 */
 	onChangeInitialRowCount( initialRowCount ) {
 		this.setState( { initialRowCount } );

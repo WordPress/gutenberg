@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`core/embed block edit matches snapshot 1`] = `
+exports[`core/table block edit matches snapshot 1`] = `
 <form>
   <div
     class="components-base-control"
