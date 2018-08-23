@@ -1,0 +1,26 @@
+.components-responsive-toolbar {
+	position: relative;
+
+	> * {
+		display: inline-block;
+	}
+}
+
+.components-responsive-toolbar__compute-position {
+	position: absolute;
+	left: 0;
+	right: 0;
+	z-index: -1;
+	visibility: hidden;
+	overflow-x: auto;
+	white-space: nowrap;
+
+	> * {
+		display: inline-block;
+	}
+}
+
+.components-responsive-toolbar__dropdown {
+	position: absolute;
+	right: 0;
+}
