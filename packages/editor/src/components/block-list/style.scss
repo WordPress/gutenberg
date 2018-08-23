@@ -847,22 +847,6 @@
 	left: 0;
 	right: 0;
 
-	// Paint the borders on the toolbar itself on mobile.
-	border-top: $border-width solid $light-gray-500;
-	.components-toolbar {
-		border-top: none;
-		border-bottom: none;
-
-	}
-
-	@include break-small() {
-		border-top: none;
-		.components-toolbar {
-			border-top: $border-width solid $light-gray-500;
-			border-bottom: $border-width solid $light-gray-500;
-		}
-	}
-
 	// Floated items have special needs for the contextual toolbar position.
 	.editor-block-list__block[data-align="left"] &,
 	.editor-block-list__block[data-align="right"] & {

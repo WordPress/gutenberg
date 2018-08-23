@@ -8,8 +8,9 @@
 }
 
 .edit-post-header-toolbar {
-	display: inline-flex;
+	display: flex;
 	align-items: center;
+	flex-grow: 1;
 
 	@include break-large() {
 		.editor-block-switcher .components-toolbar {
@@ -28,9 +29,12 @@
 	background: $white;
 	min-height: $block-toolbar-height;
 	border-bottom: $border-width solid $light-gray-500;
+	flex-grow: 1;
 
 	.editor-block-toolbar {
 		border-left: none;
+		border-top: 0;
+		border-bottom: 0;
 	}
 
 	.editor-block-toolbar .components-toolbar {

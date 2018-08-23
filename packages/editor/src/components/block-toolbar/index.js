@@ -2,7 +2,8 @@
  * WordPress Dependencies
  */
 import { withSelect } from '@wordpress/data';
-import { ResponsiveToolbar } from '@wordpress/components';
+import { Toolbar, ResponsiveToolbar } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal Dependencies
@@ -27,12 +28,25 @@ function BlockToolbar( { blockClientIds, isValid, mode } ) {
 	}
 
 	return (
-		<ResponsiveToolbar className="editor-block-toolbar">
-			<BlockSwitcher clientIds={ blockClientIds } />
-			<BlockControls.Slot />
-			<BlockFormatControls.Slot />
+		<div className="editor-block-toolbar">
+			<ResponsiveToolbar
+				className="editor-block-toolbar__tools"
+				extraContentClassName="editor-block-toolbar__tools-dropdown"
+				renderToggle={ ( { onToggle, isOpen } ) => (
+					<Toolbar controls={ [ {
+						icon: 'arrow-down-alt2',
+						title: __( 'More Tools' ),
+						onClick: onToggle,
+						extraProps: { 'aria-expanded': isOpen },
+					} ] } />
+				) }
+			>
+				<BlockSwitcher clientIds={ blockClientIds } />
+				<BlockControls.Slot />
+				<BlockFormatControls.Slot />
+			</ResponsiveToolbar>
 			<BlockSettingsMenu clientIds={ blockClientIds } />
-		</ResponsiveToolbar>
+		</div>
 	);
 }
 

@@ -6,7 +6,7 @@ import { noop, map, isString, isFunction } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, Children, cloneElement } from '@wordpress/element';
+import { Component, Children, cloneElement, Fragment } from '@wordpress/element';
 
 class Slot extends Component {
 	constructor() {
@@ -67,9 +67,9 @@ class Slot extends Component {
 		} );
 
 		return (
-			<div ref={ this.bindNode } role="presentation">
+			<Fragment>
 				{ isFunction( children ) ? children( fills.filter( Boolean ) ) : fills }
-			</div>
+			</Fragment>
 		);
 	}
 }

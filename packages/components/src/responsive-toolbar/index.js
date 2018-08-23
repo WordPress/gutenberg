@@ -99,7 +99,21 @@ class ResponsiveToolbar extends Component {
 	}
 
 	render() {
-		const { children, instanceId, className, ...props } = this.props;
+		const defaultRenderToggle = ( { onToggle, isOpen } ) => (
+			<IconButton
+				icon="arrow-down-alt2"
+				onClick={ onToggle }
+				aria-expanded={ isOpen }
+			/>
+		);
+		const {
+			children,
+			instanceId,
+			className,
+			extraContentClassName,
+			renderToggle = defaultRenderToggle,
+			...props
+		} = this.props;
 		const { countHiddenChildren } = this.state;
 
 		return (
@@ -124,14 +138,11 @@ class ResponsiveToolbar extends Component {
 						noArrow
 						position="bottom left"
 						className="components-responsive-toolbar__dropdown"
-						contentClassName={ `components-responsive-toolbar__dropdown-content-${ instanceId }` }
-						renderToggle={ ( { onToggle, isOpen } ) => (
-							<IconButton
-								icon="arrow-down-alt2"
-								onClick={ onToggle }
-								aria-expanded={ isOpen }
-							/>
-						) }
+						contentClassName={ classnames(
+							extraContentClassName,
+							`components-responsive-toolbar__dropdown-content-${ instanceId }` )
+						}
+						renderToggle={ renderToggle }
 						renderContent={ () => {
 							return Children.map( children, ( child, index ) => {
 								return cloneElement( child, { key: index } );
