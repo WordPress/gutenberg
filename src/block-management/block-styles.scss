@@ -2,6 +2,10 @@
 
 @import '../variables.scss';
 
-.block_code {
+.blockCode {
 	font-family: $default-monospace-font;
+}
+
+.blockText {
+	min-height: 50;
 }

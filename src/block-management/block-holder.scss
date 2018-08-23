@@ -8,10 +8,7 @@
 
 .blockContainer {
 	background-color: white;
-	padding-left: 8;
-	padding-right: 8;
-	padding-top: 8;
-	padding-bottom: 8;
+	padding: 8px;
 }
 
 .blockTitle {
@@ -49,8 +46,4 @@
 
 .aztec_container {
 	flex: 1;
-}
-
-.aztec_editor {
-	min-height: 50;
 }

@@ -1,7 +1,7 @@
 /**
- * @format
- * @flow
- */
+* @format
+* @flow
+*/
 
 import React from 'react';
 import { View, Text, TouchableWithoutFeedback } from 'react-native';
@@ -57,9 +57,9 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 
 		let style;
 		if ( blockType.name === 'core/code' ) {
-			style = styles.block_code;
+			style = styles.blockCode;
 		} else if ( blockType.name === 'core/paragraph' ) {
-			style = styles[ 'aztec_editor' ];
+			style = styles.blockText;
 		}
 
 		// TODO: setAttributes needs to change the state/attributes
