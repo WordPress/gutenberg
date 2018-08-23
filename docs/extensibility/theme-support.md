@@ -177,7 +177,14 @@ This flag will make sure users are only able to choose colors from the `editor-c
 
 ## Editor styles
 
-A theme can provide a stylesheet that will change the editor's appearance. You can use this to change colors, fonts, and any other visual aspect of the editor.
+Gutenberg supports the theme's [editor styles](https://codex.wordpress.org/Editor_Style). These styles are applied differently from the classic editor.
+
+ - In the classic editor, the stylesheet is applied as is in the iframe of the post content editor.
+ - Since Gutenberg doesn't make use of iFrames, this is not possible. Instead Gutenberg wrap all the provided styles with `.editor-block-list__block` to avoid leaking styles outside the editor's content area.
+
+ This technique should allow the editor styles to work properly in both editors in most cases.
+
+Alternatively, a theme can provide a stylesheet that will change the editor's appearance entirely. You can use this to change colors, fonts, and any other visual aspect of the editor.
 
 ### Add the stylesheet
 
