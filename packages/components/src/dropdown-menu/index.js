@@ -68,6 +68,9 @@ function DropdownMenu( {
 							<IconButton
 								key={ index }
 								onClick={ ( event ) => {
+									if ( control.isDisabled ) {
+										return;
+									}
 									event.stopPropagation();
 									onClose();
 									if ( control.onClick ) {
@@ -77,6 +80,7 @@ function DropdownMenu( {
 								className="components-dropdown-menu__menu-item"
 								icon={ control.icon }
 								role="menuitem"
+								disabled={ control.isDisabled }
 							>
 								{ control.title }
 							</IconButton>
