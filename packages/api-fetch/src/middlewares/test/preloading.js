@@ -9,8 +9,10 @@ describe( 'Preloading Middleware', () => {
 			status: 'this is the preloaded response',
 		};
 		const preloadedData = {
-			'wp/v2/posts': {
-				body,
+			GET: {
+				'wp/v2/posts': {
+					body,
+				},
 			},
 		};
 		const prelooadingMiddleware = createPreloadingMiddleware( preloadedData );

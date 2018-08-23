@@ -762,11 +762,11 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 
  * data to be attached to the page. Expected to be called in the context of
  * `array_reduce`.
  *
- * @param  array  $memo Reduce accumulator.
- * @param  string $path REST API path to preload.
- * @return array        Modified reduce accumulator.
+ * @param  array $memo Reduce accumulator.
+ * @param  array $args REST API path and method to preload.
+ * @return array       Modified reduce accumulator.
  */
-function gutenberg_preload_api_request( $memo, $path ) {
+function gutenberg_preload_api_request( $memo, $args ) {
 
 	// array_reduce() doesn't support passing an array in PHP 5.2
 	// so we need to make sure we start with one.
@@ -774,16 +774,16 @@ function gutenberg_preload_api_request( $memo, $path ) {
 		$memo = array();
 	}
 
-	if ( empty( $path ) ) {
+	if ( empty( $args ) || empty( $args['path'] ) || empty( $args['method'] ) ) {
 		return $memo;
 	}
 
-	$path_parts = parse_url( $path );
+	$path_parts = parse_url( $args['path'] );
 	if ( false === $path_parts ) {
 		return $memo;
 	}
 
-	$request = new WP_REST_Request( 'GET', $path_parts['path'] );
+	$request = new WP_REST_Request( $args['method'], $path_parts['path'] );
 	if ( ! empty( $path_parts['query'] ) ) {
 		parse_str( $path_parts['query'], $query_params );
 		$request->set_query_params( $query_params );
@@ -802,7 +802,11 @@ function gutenberg_preload_api_request( $memo, $path ) {
 			$data['_links'] = $links;
 		}
 
-		$memo[ $path ] = array(
+		if ( 'OPTIONS' === $args['method'] ) {
+			$response = rest_send_allow_header( $response, $server, $request );
+		}
+
+		$memo[ $args['method'] ][ $args['path'] ] = array(
 			'body'    => $data,
 			'headers' => $response->headers,
 		);
@@ -1278,12 +1282,34 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	// Preload common data.
 	$preload_paths = array(
-		'/',
-		'/wp/v2/types?context=edit',
-		'/wp/v2/taxonomies?per_page=-1&context=edit',
-		sprintf( '/wp/v2/%s/%s?context=edit', $rest_base, $post->ID ),
-		sprintf( '/wp/v2/types/%s?context=edit', $post_type ),
-		sprintf( '/wp/v2/users/me?post_type=%s&context=edit', $post_type ),
+		array(
+			'path'   => '/',
+			'method' => 'GET',
+		),
+		array(
+			'path'   => '/wp/v2/types?context=edit',
+			'method' => 'GET',
+		),
+		array(
+			'path'   => '/wp/v2/taxonomies?per_page=-1&context=edit',
+			'method' => 'GET',
+		),
+		array(
+			'path'   => sprintf( '/wp/v2/%s/%s?context=edit', $rest_base, $post->ID ),
+			'method' => 'GET',
+		),
+		array(
+			'path'   => sprintf( '/wp/v2/types/%s?context=edit', $post_type ),
+			'method' => 'GET',
+		),
+		array(
+			'path'   => sprintf( '/wp/v2/users/me?post_type=%s&context=edit', $post_type ),
+			'method' => 'GET',
+		),
+		array(
+			'path'   => '/wp/v2/media',
+			'method' => 'OPTIONS',
+		),
 	);
 
 	// Ensure the global $post remains the same after
