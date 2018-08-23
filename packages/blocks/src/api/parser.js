@@ -363,7 +363,7 @@ export function createBlockWithFallback( blockNode ) {
  * @return {Function} An implementation which parses the post content.
  */
 const createParse = ( parseImplementation ) =>
-	( content ) => parseImplementation( content ).reduce( ( memo, blockNode ) => {
+	async ( content ) => ( await parseImplementation( content ) ).reduce( ( memo, blockNode ) => {
 		const block = createBlockWithFallback( blockNode );
 		if ( block ) {
 			memo.push( block );
@@ -378,6 +378,10 @@ const createParse = ( parseImplementation ) =>
  *
  * @return {Array} Block list.
  */
-export const parseWithGrammar = createParse( grammarParse );
+export const parseWithGrammar = createParse( ( postContent ) => {
+	const result = grammarParse( postContent );
+
+	return Promise.resolve( result );
+} );
 
 export default parseWithGrammar;

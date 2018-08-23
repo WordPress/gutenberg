@@ -251,7 +251,7 @@ export class RichText extends Component {
 	 *
 	 * @param {PasteEvent} event The paste event as triggered by TinyMCE.
 	 */
-	onPaste( event ) {
+	async onPaste( event ) {
 		const clipboardData = event.clipboardData;
 		const { items = [], files = [] } = clipboardData;
 		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
@@ -285,11 +285,12 @@ export class RichText extends Component {
 		// Note: a pasted file may have the URL as plain text.
 		if ( item && ! html ) {
 			const file = item.getAsFile ? item.getAsFile() : item;
-			const content = rawHandler( {
+			const content = await rawHandler( {
 				HTML: `<img src="${ createBlobURL( file ) }">`,
 				mode: 'BLOCKS',
 				tagName: this.props.tagName,
 			} );
+
 			const shouldReplace = this.props.onReplace && this.isEmpty();
 
 			// Allows us to ask for this information when we get a report.
@@ -334,7 +335,7 @@ export class RichText extends Component {
 			mode = 'AUTO';
 		}
 
-		const content = rawHandler( {
+		const content = await rawHandler( {
 			HTML: html,
 			plainText,
 			mode,

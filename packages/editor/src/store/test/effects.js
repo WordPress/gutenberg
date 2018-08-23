@@ -425,7 +425,7 @@ describe( 'effects', () => {
 			} );
 		} );
 
-		it( 'should return post reset action', () => {
+		it( 'should return post reset action', ( done ) => {
 			const post = {
 				id: 1,
 				title: {
@@ -436,6 +436,16 @@ describe( 'effects', () => {
 				},
 				status: 'draft',
 			};
+			const dispatch = jest.fn().mockImplementation( () => {
+				if ( dispatch.mock.calls.length < 2 ) {
+					return;
+				}
+
+				expect( dispatch ).toHaveBeenCalledWith( setTemplateValidity( true ) );
+				expect( dispatch ).toHaveBeenCalledWith( setupEditorState( post, [], {} ) );
+
+				done();
+			} );
 			const getState = () => ( {
 				settings: {
 					template: null,
@@ -443,15 +453,10 @@ describe( 'effects', () => {
 				},
 			} );
 
-			const result = handler( { post, settings: {} }, { getState } );
-
-			expect( result ).toEqual( [
-				setTemplateValidity( true ),
-				setupEditorState( post, [], {} ),
-			] );
+			handler( { post, settings: {} }, { dispatch, getState } );
 		} );
 
-		it( 'should return block reset with non-empty content', () => {
+		it( 'should return block reset with non-empty content', ( done ) => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			const post = {
 				id: 1,
@@ -463,6 +468,18 @@ describe( 'effects', () => {
 				},
 				status: 'draft',
 			};
+			const dispatch = jest.fn().mockImplementation( () => {
+				if ( dispatch.mock.calls.length < 2 ) {
+					return;
+				}
+
+				const result = dispatch.mock.calls;
+				expect( result[ 1 ][ 0 ].blocks ).toHaveLength( 1 );
+				expect( dispatch ).toHaveBeenCalledWith( setTemplateValidity( true ) );
+				expect( dispatch ).toHaveBeenCalledWith( setupEditorState( post, result[ 1 ][ 0 ].blocks, {} ) );
+
+				done();
+			} );
 			const getState = () => ( {
 				settings: {
 					template: null,
@@ -470,16 +487,10 @@ describe( 'effects', () => {
 				},
 			} );
 
-			const result = handler( { post }, { getState } );
-
-			expect( result[ 1 ].blocks ).toHaveLength( 1 );
-			expect( result ).toEqual( [
-				setTemplateValidity( true ),
-				setupEditorState( post, result[ 1 ].blocks, {} ),
-			] );
+			handler( { post }, { dispatch, getState } );
 		} );
 
-		it( 'should return post setup action only if auto-draft', () => {
+		it( 'should return post setup action only if auto-draft', ( done ) => {
 			const post = {
 				id: 1,
 				title: {
@@ -490,6 +501,16 @@ describe( 'effects', () => {
 				},
 				status: 'auto-draft',
 			};
+			const dispatch = jest.fn().mockImplementation( () => {
+				if ( dispatch.mock.calls.length < 2 ) {
+					return;
+				}
+
+				expect( dispatch ).toHaveBeenCalledWith( setTemplateValidity( true ) );
+				expect( dispatch ).toHaveBeenCalledWith( setupEditorState( post, [], { title: 'A History of Pork' } ) );
+
+				done();
+			} );
 			const getState = () => ( {
 				settings: {
 					template: null,
@@ -497,12 +518,7 @@ describe( 'effects', () => {
 				},
 			} );
 
-			const result = handler( { post }, { getState } );
-
-			expect( result ).toEqual( [
-				setTemplateValidity( true ),
-				setupEditorState( post, [], { title: 'A History of Pork' } ),
-			] );
+			handler( { post }, { dispatch, getState } );
 		} );
 	} );
 } );

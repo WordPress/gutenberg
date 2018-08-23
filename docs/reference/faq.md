@@ -161,10 +161,13 @@ This also [gives us the flexibility](https://github.com/WordPress/gutenberg/issu
 We suggest you look at the [language of Gutenberg](../../docs/language.md) to learn more about how this aspect of the project works.
 
 ## How can I parse the post content back out into blocks in PHP or JS?
+
 In JS:
 
 ```js
-var blocks = wp.blocks.parse( postContent );
+wp.blocks.parse( postContent ).then( function( blocks ) {
+	// ...
+} );
 ```
 
 In PHP:

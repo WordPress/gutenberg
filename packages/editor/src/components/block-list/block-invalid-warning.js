@@ -44,8 +44,8 @@ export default withDispatch( ( dispatch, { block } ) => {
 				content: block.originalContent,
 			} ) );
 		},
-		convertToBlocks() {
-			replaceBlock( block.clientId, rawHandler( {
+		async convertToBlocks() {
+			replaceBlock( block.clientId, await rawHandler( {
 				HTML: block.originalContent,
 				mode: 'BLOCKS',
 			} ) );

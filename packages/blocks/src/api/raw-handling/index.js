@@ -77,7 +77,7 @@ function getRawTransformations() {
  * @param {Array}   [options.tagName]                  The tag into which content will be inserted.
  * @param {boolean} [options.canUserUseUnfilteredHTML] Whether or not the user can use unfiltered HTML.
  *
- * @return {Array|string} A list of blocks or a string, depending on `handlerMode`.
+ * @return {Promise<Array|string>} A list of blocks or a string, depending on `handlerMode`.
  */
 export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', tagName, canUserUseUnfilteredHTML = false } ) {
 	// First of all, strip any meta tags.
@@ -121,7 +121,7 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 	}
 
 	if ( mode === 'INLINE' ) {
-		return filterInlineHTML( HTML );
+		return Promise.resolve( filterInlineHTML( HTML ) );
 	}
 
 	// An array of HTML strings and block objects. The blocks replace matched
@@ -134,14 +134,14 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 	const hasShortcodes = pieces.length > 1;
 
 	if ( mode === 'AUTO' && ! hasShortcodes && isInlineContent( HTML, tagName ) ) {
-		return filterInlineHTML( HTML );
+		return Promise.resolve( filterInlineHTML( HTML ) );
 	}
 
 	const rawTransformations = getRawTransformations();
 	const phrasingContentSchema = getPhrasingContentSchema();
 	const blockContentSchema = getBlockContentSchema( rawTransformations );
 
-	return compact( flatMap( pieces, ( piece ) => {
+	return Promise.resolve( compact( flatMap( pieces, ( piece ) => {
 		// Already a block from shortcode.
 		if ( typeof piece !== 'string' ) {
 			return piece;
@@ -206,5 +206,5 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 				)
 			);
 		} );
-	} ) );
+	} ) ) );
 }
