@@ -35,6 +35,7 @@ type PropsType = BlockListType;
 type StateType = {
 	dataSource: DataSource,
 	showHtml: boolean,
+	inspectBlocks: boolean,
 	blockTypePickerVisible: boolean,
 	selectedBlockType: string,
 	html: string,
@@ -46,6 +47,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		this.state = {
 			dataSource: new DataSource( this.props.blocks, ( item: BlockType ) => item.clientId ),
 			showHtml: false,
+			inspectBlocks: false,
 			blockTypePickerVisible: false,
 			selectedBlockType: 'core/paragraph', // just any valid type to start from
 			html: '',
@@ -194,7 +196,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				<FlatList
 					style={ styles.list }
 					data={ this.props.blocks }
-					extraData={ this.props.refresh }
+					extraData={ this.props.refresh, this.state.inspectBlocks }
 					keyExtractor={ ( item ) => item.clientId }
 					renderItem={ this.renderItem.bind( this ) }
 				/>
@@ -222,15 +224,21 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 		return (
 			<View style={ styles.container }>
-				<View style={ { height: 30 } } />
 				<View style={ styles.switch }>
-					<Text>View html output</Text>
 					<Switch
 						activeText={ 'On' }
 						inActiveText={ 'Off' }
 						value={ this.state.showHtml }
 						onValueChange={ this.handleSwitchEditor }
 					/>
+					<Text style={ styles.switchLabel }>View html output</Text>
+					<Switch
+						activeText={ 'On' }
+						inActiveText={ 'Off' }
+						value={ this.state.inspectBlocks }
+						onValueChange={ this.handleInspectBlocksChanged }
+					/>
+					<Text style={ styles.switchLabel }>Inspect blocks</Text>
 				</View>
 				{ this.state.showHtml && this.renderHTML() }
 				{ ! this.state.showHtml && list }
@@ -248,6 +256,10 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		}
 
 		this.setState( { showHtml } );
+	}
+
+	handleInspectBlocksChanged = ( inspectBlocks: boolean ) => {
+		this.setState( { inspectBlocks } );
 	}
 
 	handleHTMLUpdate = ( html: string ) => {
@@ -270,6 +282,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 					onToolbarButtonPressed={ this.onToolbarButtonPressed.bind( this ) }
 					onBlockHolderPressed={ this.onBlockHolderPressed.bind( this ) }
 					onChange={ this.onChange.bind( this ) }
+					showTitle={ this.state.inspectBlocks }
 					focused={ value.item.focused }
 					clientId={ value.clientId }
 					{ ...value.item }
