@@ -49,7 +49,10 @@ export class RichText extends Component {
 			return accFormats;
 		}, {} );
 
-		this.setState( { formats: newFormats, selectedNodeId: this.state.selectedNodeId + 1 } );
+		this.setState( {
+			formats: merge( {}, newFormats ),
+			selectedNodeId: this.state.selectedNodeId + 1,
+		} );
 	}
 	/**
 	 * Handles any case where the content of the AztecRN instance has changed.
