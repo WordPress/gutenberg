@@ -2,6 +2,7 @@
  * WordPress Dependencies
  */
 import { withSelect } from '@wordpress/data';
+import { ResponsiveToolbar } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -26,12 +27,12 @@ function BlockToolbar( { blockClientIds, isValid, mode } ) {
 	}
 
 	return (
-		<div className="editor-block-toolbar">
+		<ResponsiveToolbar className="editor-block-toolbar">
 			<BlockSwitcher clientIds={ blockClientIds } />
 			<BlockControls.Slot />
 			<BlockFormatControls.Slot />
 			<BlockSettingsMenu clientIds={ blockClientIds } />
-		</div>
+		</ResponsiveToolbar>
 	);
 }
 
