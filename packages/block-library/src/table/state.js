@@ -154,6 +154,6 @@ export function deleteColumn( state, {
 	return {
 		[ section ]: state[ section ].map( ( row ) => ( {
 			cells: row.cells.filter( ( cell, index ) => index !== columnIndex ),
-		} ) ),
+		} ) ).filter( ( row ) => row.cells.length ),
 	};
 }

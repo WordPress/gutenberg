@@ -252,4 +252,37 @@ describe( 'deleteColumn', () => {
 
 		expect( state ).toEqual( expected );
 	} );
+
+	it( 'should delete all rows when only one column present', () => {
+		const tableWithOneColumn = {
+			body: [
+				{
+					cells: [
+						{
+							content: [],
+							tag: 'td',
+						},
+					],
+				},
+				{
+					cells: [
+						{
+							content: [ 'test' ],
+							tag: 'td',
+						},
+					],
+				},
+			],
+		};
+		const state = deleteColumn( tableWithOneColumn, {
+			section: 'body',
+			columnIndex: 0,
+		} );
+
+		const expected = {
+			body: [],
+		};
+
+		expect( state ).toEqual( expected );
+	} );
 } );
