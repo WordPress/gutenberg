@@ -209,6 +209,17 @@ const config = {
 			},
 		],
 	},
+	optimization: {
+		splitChunks: {
+			cacheGroups: {
+				'babel-runtime': {
+					test: /[\\/]node_modules[\\/](core-js|@babel)[\\/]/,
+					name: 'babel-runtime',
+					chunks: 'all',
+				},
+			},
+		},
+	},
 	plugins: [
 		blocksCSSPlugin,
 		editBlocksCSSPlugin,
@@ -238,7 +249,7 @@ const config = {
 					return basename( rawRequest );
 				}
 
-				return path;
+				return get( data, [ 'chunk', 'name' ], path );
 			},
 		} ),
 		new LibraryExportDefaultPlugin( [
