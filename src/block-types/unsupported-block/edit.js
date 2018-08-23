@@ -4,8 +4,7 @@
  */
 
 import React from 'react';
-import { View, Text, TouchableWithoutFeedback } from 'react-native';
-import RCTAztecView from 'react-native-aztec';
+import { View, Text } from 'react-native';
 import type { BlockType } from '../../store/';
 
 type PropsType = BlockType & {
@@ -22,16 +21,7 @@ type StateType = {
 // Styles
 import styles from '../../block-management/block-holder.scss';
 
-// Gutenberg imports
-import { Component } from '@wordpress/element';
-import { getBlockType } from '@wordpress/blocks';
-import { getUnknownTypeHandlerName } from '@wordpress/blocks';
-
 export default class UnsupportedBlockEdit extends React.Component<PropsType, StateType> {
-	constructor( props: PropsType ) {
-		super( props );
-	}
-
 	render() {
 		return (
 			<View style={ styles.unsupportedBlock }>

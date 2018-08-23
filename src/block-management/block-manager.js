@@ -11,17 +11,12 @@ import { ToolbarButton } from './constants';
 import type { BlockType } from '../store/';
 import styles from './block-manager.scss';
 import BlockPicker from './block-picker';
-import holderStyles from './block-holder.scss';
-import * as UnsupportedBlock from '../block-types/unsupported-block/';
 
 // Gutenberg imports
-import { 
+import {
 	createBlock,
-	getBlockType, 
-	getBlockTypes,
-	serialize
+	serialize,
 } from '@wordpress/blocks';
-import { getUnknownTypeHandlerName } from '@wordpress/blocks';
 
 export type BlockListType = {
 	onChange: ( clientId: string, attributes: mixed ) => void,
@@ -144,7 +139,6 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	serializeToHtml() {
 		return this.props.blocks
 			.map( ( block ) => {
-
 				if ( block.name === 'aztec' ) {
 					return '<aztec>' + block.attributes.content + '</aztec>\n\n';
 				}

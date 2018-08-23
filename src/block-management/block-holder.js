@@ -5,7 +5,6 @@
 
 import React from 'react';
 import { View, Text, TouchableWithoutFeedback } from 'react-native';
-import RCTAztecView from 'react-native-aztec';
 import Toolbar from './toolbar';
 
 import type { BlockType } from '../store/';
@@ -13,8 +12,7 @@ import type { BlockType } from '../store/';
 import styles from './block-holder.scss';
 
 // Gutenberg imports
-import { getBlockType } from '@wordpress/blocks';
-import { getUnknownTypeHandlerName } from '@wordpress/blocks';
+import { getBlockType, getUnknownTypeHandlerName } from '@wordpress/blocks';
 
 type PropsType = BlockType & {
 	onChange: ( clientId: string, attributes: mixed ) => void,
@@ -78,14 +76,14 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 	}
 
 	getBlockType( blockName: String ) {
-		var blockType = getBlockType( blockName );
+		let blockType = getBlockType( blockName );
 
-		if ( !blockType ) {
+		if ( ! blockType ) {
 			const fallbackBlockName = getUnknownTypeHandlerName();
 			blockType = getBlockType( fallbackBlockName );
 		}
 
-		return blockType
+		return blockType;
 	}
 
 	render() {

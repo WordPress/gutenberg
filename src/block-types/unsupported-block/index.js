@@ -4,8 +4,6 @@
  */
 
 import React from 'react';
-import { View, Text, TouchableWithoutFeedback } from 'react-native';
-import styles from '../../block-management/block-holder.scss';
 
 // Gutenberg imports
 import { __ } from '@wordpress/i18n';
@@ -45,7 +43,7 @@ export const settings = {
 
 	edit,
 
-	save( { attributes } : { attributes: Attributes } ) {
+	save( { attributes }: { attributes: Attributes } ) {
 		return <RawHTML>{ attributes.content }</RawHTML>;
 	},
 };
