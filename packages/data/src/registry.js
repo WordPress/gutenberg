@@ -140,7 +140,7 @@ export function createRegistry( storeConfigs = {} ) {
 	 */
 	function registerReducer( reducerKey, reducer ) {
 		const enhancers = [];
-		if ( window && window.__REDUX_DEVTOOLS_EXTENSION__ ) {
+		if ( typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION__ ) {
 			enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__( { name: reducerKey, instanceId: reducerKey } ) );
 		}
 		const store = createStore( reducer, flowRight( enhancers ) );
