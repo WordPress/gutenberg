@@ -11,6 +11,7 @@ import {
 	getEntityRecords,
 	getEmbedPreview,
 	isPreviewEmbedFallback,
+	hasUploadPermissions,
 } from '../selectors';
 
 describe( 'getEntityRecord', () => {
@@ -115,5 +116,29 @@ describe( 'isPreviewEmbedFallback()', () => {
 			},
 		} );
 		expect( isPreviewEmbedFallback( state, 'http://example.com/' ) ).toEqual( true );
+	} );
+} );
+
+describe( 'hasUploadPermissions', () => {
+	it( 'returns the true when the hasUploadPermissions property is true', () => {
+		const state = deepFreeze( {
+			hasUploadPermissions: true,
+		} );
+
+		expect( hasUploadPermissions( state ) ).toBe( true );
+	} );
+
+	it( 'returns the false when the hasUploadPermissions property is false', () => {
+		const state = deepFreeze( {
+			hasUploadPermissions: false,
+		} );
+
+		expect( hasUploadPermissions( state ) ).toBe( false );
+	} );
+
+	it( 'returns the false when the hasUploadPermissions property is not defined', () => {
+		const state = deepFreeze( {} );
+
+		expect( hasUploadPermissions( state ) ).toBe( false );
 	} );
 } );

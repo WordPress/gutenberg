@@ -7,7 +7,7 @@ import { filter } from 'lodash';
 /**
  * Internal dependencies
  */
-import { terms, entities, embedPreviews } from '../reducer';
+import { terms, entities, embedPreviews, hasUploadPermissions } from '../reducer';
 
 describe( 'terms()', () => {
 	it( 'returns an empty object by default', () => {
@@ -94,6 +94,32 @@ describe( 'entities', () => {
 		expect( filter( state.config, { kind: 'postType' } ) ).toEqual( [
 			{ kind: 'postType', name: 'posts' },
 		] );
+	} );
+} );
+
+describe( 'hasUploadPermissions()', () => {
+	it( 'returns false by default', () => {
+		const state = hasUploadPermissions( undefined, {} );
+
+		expect( state ).toBe( false );
+	} );
+
+	it( 'returns true for an action with the hasUploadPermissions property with the value true', () => {
+		const state = hasUploadPermissions( false, {
+			type: 'RECEIVE_UPLOAD_PERMISSIONS',
+			hasUploadPermissions: true,
+		} );
+
+		expect( state ).toBe( true );
+	} );
+
+	it( 'returns false for an action with the hasUploadPermissions property with the value false', () => {
+		const state = hasUploadPermissions( true, {
+			type: 'RECEIVE_UPLOAD_PERMISSIONS',
+			hasUploadPermissions: false,
+		} );
+
+		expect( state ).toBe( false );
 	} );
 } );
 

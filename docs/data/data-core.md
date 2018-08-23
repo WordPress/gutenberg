@@ -140,6 +140,10 @@ Is the preview for the URL an oEmbed link fallback.
 
 Return whether the user has media upload permissions.
 
+*Parameters*
+
+ * state: Data state.
+
 *Returns*
 
 Does the user have media upload permissions?
@@ -191,3 +195,11 @@ a given URl has been received.
 
  * url: URL to preview the embed for.
  * preview: Preview data.
+
+### receiveUploadPermissions
+
+Returns an action object used in signalling that Upload permissions have been received.
+
+*Parameters*
+
+ * hasUploadPermissions: Does the user have permission to upload files?
