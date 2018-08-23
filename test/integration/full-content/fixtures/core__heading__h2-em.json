@@ -1,0 +1,22 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/heading",
+        "isValid": true,
+        "attributes": {
+            "content": [
+                "The ",
+                {
+                    "type": "em",
+                    "children": [
+                        "Inserter"
+                    ]
+                },
+                " Tool"
+            ],
+            "level": 2
+        },
+        "innerBlocks": [],
+        "originalContent": "<h2>The <em>Inserter</em> Tool</h2>"
+    }
+]

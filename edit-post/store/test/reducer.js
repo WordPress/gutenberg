@@ -7,7 +7,10 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import {
+	DEFAULT_ACTIVE_GENERAL_SIDEBAR,
 	preferences,
+	activeGeneralSidebar,
+	activeModal,
 	isSavingMetaBoxes,
 	metaBoxes,
 } from '../reducer';
@@ -18,57 +21,25 @@ describe( 'state', () => {
 			const state = preferences( undefined, {} );
 
 			expect( state ).toEqual( {
-				activeGeneralSidebar: 'edit-post/document',
 				editorMode: 'visual',
+				isGeneralSidebarDismissed: false,
 				panels: { 'post-status': true },
 				features: { fixedToolbar: false },
 				pinnedPluginItems: {},
 			} );
 		} );
 
-		it( 'should set the general sidebar', () => {
+		it( 'should set the general sidebar dismissed', () => {
 			const original = deepFreeze( preferences( undefined, {} ) );
 			const state = preferences( original, {
 				type: 'OPEN_GENERAL_SIDEBAR',
 				name: 'edit-post/document',
 			} );
 
-			expect( state.activeGeneralSidebar ).toBe( 'edit-post/document' );
+			expect( state.isGeneralSidebarDismissed ).toBe( false );
 		} );
 
-		it( 'should save activeGeneralSidebar default value when serializing if the value was edit-post/block', () => {
-			const state = preferences( {
-				activeGeneralSidebar: 'edit-post/block',
-				editorMode: 'visual',
-				panels: { 'post-status': true },
-				features: { fixedToolbar: false },
-			}, {
-				type: 'SERIALIZE',
-			} );
-
-			expect( state ).toEqual( {
-				activeGeneralSidebar: 'edit-post/document',
-				editorMode: 'visual',
-				panels: { 'post-status': true },
-				features: { fixedToolbar: false },
-				pinnedPluginItems: {},
-			} );
-		} );
-
-		it( 'should does not update if sidebar is already set to value', () => {
-			const original = deepFreeze( preferences( undefined, {
-				type: 'OPEN_GENERAL_SIDEBAR',
-				name: 'edit-post/document',
-			} ) );
-			const state = preferences( original, {
-				type: 'OPEN_GENERAL_SIDEBAR',
-				name: 'edit-post/document',
-			} );
-
-			expect( original ).toBe( state );
-		} );
-
-		it( 'should unset the general sidebar', () => {
+		it( 'should set the general sidebar undismissed', () => {
 			const original = deepFreeze( preferences( undefined, {
 				type: 'OPEN_GENERAL_SIDEBAR',
 				name: 'edit-post/document',
@@ -77,7 +48,7 @@ describe( 'state', () => {
 				type: 'CLOSE_GENERAL_SIDEBAR',
 			} );
 
-			expect( state.activeGeneralSidebar ).toBe( null );
+			expect( state.isGeneralSidebarDismissed ).toBe( true );
 		} );
 
 		it( 'should set the sidebar panel open flag to true if unset', () => {
@@ -150,6 +121,48 @@ describe( 'state', () => {
 
 				expect( state.pinnedPluginItems[ 'foo/disabled' ] ).toBe( true );
 			} );
+		} );
+	} );
+
+	describe( 'activeGeneralSidebar', () => {
+		it( 'should default to the default active sidebar', () => {
+			const state = activeGeneralSidebar( undefined, {} );
+
+			expect( state ).toBe( DEFAULT_ACTIVE_GENERAL_SIDEBAR );
+		} );
+
+		it( 'should set the general sidebar', () => {
+			const original = activeGeneralSidebar( undefined, {} );
+			const state = activeGeneralSidebar( original, {
+				type: 'OPEN_GENERAL_SIDEBAR',
+				name: 'edit-post/document',
+			} );
+
+			expect( state ).toBe( 'edit-post/document' );
+		} );
+	} );
+
+	describe( 'activeModal', () => {
+		it( 'should default to null', () => {
+			const state = activeModal( undefined, {} );
+			expect( state ).toBeNull();
+		} );
+
+		it( 'should set the activeModal to the provided name', () => {
+			const state = activeModal( null, {
+				type: 'OPEN_MODAL',
+				name: 'test-modal',
+			} );
+
+			expect( state ).toEqual( 'test-modal' );
+		} );
+
+		it( 'should set the activeModal to null', () => {
+			const state = activeModal( 'test-modal', {
+				type: 'CLOSE_MODAL',
+			} );
+
+			expect( state ).toBeNull();
 		} );
 	} );
 

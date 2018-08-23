@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/blob",
-	"version": "1.0.0-alpha.1",
-	"description": "Blob utils for WordPress",
+	"version": "1.0.3",
+	"description": "Blob utilities for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
@@ -18,6 +18,9 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"dependencies": {
+		"@babel/runtime-corejs2": "7.0.0-beta.56"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

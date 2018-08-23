@@ -7,7 +7,7 @@ import { createElement } from '@wordpress/element';
 describe( 'isValidBlock', () => {
 	beforeAll( () => {
 		// Load all hooks that modify blocks
-		require( 'editor/hooks' );
+		require( '../../packages/editor/src/hooks' );
 	} );
 
 	it( 'should use the namespace in the classname for non-core blocks', () => {

@@ -1,15 +1,17 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage, pressWithModifier } from '../support/utils';
+import {
+	clickBlockAppender,
+	newPost,
+	pressWithModifier,
+	ensureSidebarOpened,
+	publishPost,
+	META_KEY,
+} from '../support/utils';
 
 describe( 'Change detection', () => {
 	let handleInterceptedRequest, hadInterceptedSave;
-
-	beforeAll( async () => {
-		await newDesktopBrowserPage();
-	} );
 
 	beforeEach( async () => {
 		hadInterceptedSave = false;
@@ -26,8 +28,7 @@ describe( 'Change detection', () => {
 	async function assertIsDirty( isDirty ) {
 		let hadDialog = false;
 
-		function handleOnDialog( dialog ) {
-			dialog.accept();
+		function handleOnDialog() {
 			hadDialog = true;
 		}
 
@@ -68,7 +69,7 @@ describe( 'Change detection', () => {
 		await interceptSave();
 
 		// Keyboard shortcut Ctrl+S save.
-		await pressWithModifier( 'Mod', 'S' );
+		await pressWithModifier( META_KEY, 'S' );
 
 		expect( hadInterceptedSave ).toBe( false );
 	} );
@@ -83,7 +84,49 @@ describe( 'Change detection', () => {
 			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
 		] );
 
-		// Still dirty after an autosave.
+		// Autosave draft as same user should do full save, i.e. not dirty.
+		await assertIsDirty( false );
+	} );
+
+	it( 'Should prompt to confirm unsaved changes for autosaved draft for non-content fields', async () => {
+		await page.type( '.editor-post-title__input', 'Hello World' );
+
+		// Toggle post as sticky (not persisted for autosave).
+		await ensureSidebarOpened();
+
+		const postStickyToggleButton = ( await page.$x( "//label[contains(text(), 'Stick to the Front Page')]" ) )[ 0 ];
+		await postStickyToggleButton.click( 'button' );
+
+		// Force autosave to occur immediately.
+		await Promise.all( [
+			page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() ),
+			page.waitForSelector( '.editor-post-saved-state.is-autosaving' ),
+			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
+		] );
+
+		await assertIsDirty( true );
+	} );
+
+	it( 'Should prompt to confirm unsaved changes for autosaved published post', async () => {
+		await page.type( '.editor-post-title__input', 'Hello World' );
+
+		await publishPost();
+
+		// Close publish panel.
+		await Promise.all( [
+			page.waitForFunction( () => ! document.querySelector( '.editor-post-publish-panel' ) ),
+			page.click( '.editor-post-publish-panel__header button' ),
+		] );
+
+		// Should be dirty after autosave change of published post.
+		await page.type( '.editor-post-title__input', '!' );
+
+		await Promise.all( [
+			page.waitForSelector( '.editor-post-publish-button.is-busy' ),
+			page.waitForSelector( '.editor-post-publish-button:not( .is-busy )' ),
+			page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).autosave() ),
+		] );
+
 		await assertIsDirty( true );
 	} );
 
@@ -98,7 +141,7 @@ describe( 'Change detection', () => {
 	} );
 
 	it( 'Should prompt if content added without save', async () => {
-		await page.click( '.editor-default-block-appender' );
+		await clickBlockAppender();
 
 		await assertIsDirty( true );
 	} );
@@ -111,7 +154,7 @@ describe( 'Change detection', () => {
 			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
 
 			// Keyboard shortcut Ctrl+S save.
-			pressWithModifier( 'Mod', 'S' ),
+			pressWithModifier( META_KEY, 'S' ),
 		] );
 
 		await assertIsDirty( false );
@@ -125,13 +168,13 @@ describe( 'Change detection', () => {
 			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
 
 			// Keyboard shortcut Ctrl+S save.
-			pressWithModifier( 'Mod', 'S' ),
+			pressWithModifier( META_KEY, 'S' ),
 		] );
 
 		await interceptSave();
 
 		// Keyboard shortcut Ctrl+S save.
-		await pressWithModifier( 'Mod', 'S' );
+		await pressWithModifier( META_KEY, 'S' );
 
 		expect( hadInterceptedSave ).toBe( false );
 	} );
@@ -143,10 +186,12 @@ describe( 'Change detection', () => {
 
 		await Promise.all( [
 			// Keyboard shortcut Ctrl+S save.
-			pressWithModifier( 'Mod', 'S' ),
+			pressWithModifier( META_KEY, 'S' ),
 
 			// Ensure save update fails and presents button.
-			page.waitForXPath( '//p[contains(text(), \'Updating failed\')]' ),
+			page.waitForXPath(
+				'//*[contains(@class, "components-notice") and contains(@class, "is-error")]/*[text()="Updating failed"]'
+			),
 			page.waitForSelector( '.editor-post-save-draft' ),
 		] );
 
@@ -154,6 +199,8 @@ describe( 'Change detection', () => {
 		await page.setOfflineMode( false );
 
 		await assertIsDirty( true );
+
+		expect( console ).toHaveErroredWith( 'Failed to load resource: net::ERR_INTERNET_DISCONNECTED' );
 	} );
 
 	it( 'Should prompt if changes and save is in-flight', async () => {
@@ -165,7 +212,7 @@ describe( 'Change detection', () => {
 		await interceptSave();
 
 		// Keyboard shortcut Ctrl+S save.
-		await pressWithModifier( 'Mod', 'S' );
+		await pressWithModifier( META_KEY, 'S' );
 
 		await releaseSaveIntercept();
 
@@ -181,7 +228,7 @@ describe( 'Change detection', () => {
 		await interceptSave();
 
 		// Keyboard shortcut Ctrl+S save.
-		await pressWithModifier( 'Mod', 'S' );
+		await pressWithModifier( META_KEY, 'S' );
 
 		await page.type( '.editor-post-title__input', '!' );
 
@@ -198,7 +245,7 @@ describe( 'Change detection', () => {
 		await interceptSave();
 
 		// Keyboard shortcut Ctrl+S save.
-		await pressWithModifier( 'Mod', 'S' );
+		await pressWithModifier( META_KEY, 'S' );
 
 		// Dirty post while save is in-flight.
 		await page.type( '.editor-post-title__input', '!' );
@@ -220,9 +267,9 @@ describe( 'Change detection', () => {
 		await interceptSave();
 
 		// Keyboard shortcut Ctrl+S save.
-		await pressWithModifier( 'Mod', 'S' );
+		await pressWithModifier( META_KEY, 'S' );
 
-		await page.click( '.editor-default-block-appender' );
+		await clickBlockAppender();
 
 		// Allow save to complete. Disabling interception flushes pending.
 		await Promise.all( [

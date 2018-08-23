@@ -9,6 +9,7 @@ import { reduce, some } from 'lodash';
 import { select, subscribe } from '@wordpress/data';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -52,12 +53,24 @@ const effects = {
 		}, {} );
 		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
 
-		// Saving metaboxes when saving posts
-		subscribe( onChangeListener( select( 'core/editor' ).isSavingPost, ( isSavingPost ) => {
-			if ( ! isSavingPost ) {
+		let wasSavingPost = select( 'core/editor' ).isSavingPost();
+		let wasAutosavingPost = select( 'core/editor' ).isAutosavingPost();
+		// Save metaboxes when performing a full save on the post.
+		subscribe( () => {
+			const isSavingPost = select( 'core/editor' ).isSavingPost();
+			const isAutosavingPost = select( 'core/editor' ).isAutosavingPost();
+
+			// Save metaboxes on save completion when past save wasn't an autosave.
+			const shouldTriggerMetaboxesSave = wasSavingPost && ! wasAutosavingPost && ! isSavingPost && ! isAutosavingPost;
+
+			// Save current state for next inspection.
+			wasSavingPost = isSavingPost;
+			wasAutosavingPost = isAutosavingPost;
+
+			if ( shouldTriggerMetaboxesSave ) {
 				store.dispatch( requestMetaBoxUpdates() );
 			}
-		} ) );
+		} );
 	},
 	REQUEST_META_BOX_UPDATES( action, store ) {
 		const state = store.getState();
@@ -98,12 +111,11 @@ const effects = {
 		additionalData.forEach( ( [ key, value ] ) => formData.append( key, value ) );
 
 		// Save the metaboxes
-		wp.apiRequest( {
+		apiFetch( {
 			url: window._wpMetaBoxUrl,
 			method: 'POST',
-			processData: false,
-			contentType: false,
-			data: formData,
+			body: formData,
+			parse: false,
 		} )
 			.then( () => store.dispatch( metaBoxUpdatesSuccess() ) );
 	},

@@ -16,7 +16,7 @@ describe( 'DOM', () => {
 	} );
 
 	describe( 'isHorizontalEdge', () => {
-		it( 'Should return true for empty input', () => {
+		it( 'should return true for empty input', () => {
 			const input = document.createElement( 'input' );
 			parent.appendChild( input );
 			input.focus();
@@ -24,7 +24,7 @@ describe( 'DOM', () => {
 			expect( isHorizontalEdge( input, false ) ).toBe( true );
 		} );
 
-		it( 'Should return the right values if we focus the end of the input', () => {
+		it( 'should return the right values if we focus the end of the input', () => {
 			const input = document.createElement( 'input' );
 			parent.appendChild( input );
 			input.value = 'value';
@@ -35,7 +35,7 @@ describe( 'DOM', () => {
 			expect( isHorizontalEdge( input, false ) ).toBe( true );
 		} );
 
-		it( 'Should return the right values if we focus the start of the input', () => {
+		it( 'should return the right values if we focus the start of the input', () => {
 			const input = document.createElement( 'input' );
 			parent.appendChild( input );
 			input.value = 'value';
@@ -46,7 +46,7 @@ describe( 'DOM', () => {
 			expect( isHorizontalEdge( input, false ) ).toBe( false );
 		} );
 
-		it( 'Should return false if we\'re not at the edge', () => {
+		it( 'should return false if we’re not at the edge', () => {
 			const input = document.createElement( 'input' );
 			parent.appendChild( input );
 			input.value = 'value';
@@ -57,7 +57,7 @@ describe( 'DOM', () => {
 			expect( isHorizontalEdge( input, false ) ).toBe( false );
 		} );
 
-		it( 'Should return false if the selection is not collapseds', () => {
+		it( 'should return false if the selection is not collapseds', () => {
 			const input = document.createElement( 'input' );
 			parent.appendChild( input );
 			input.value = 'value';
@@ -68,7 +68,7 @@ describe( 'DOM', () => {
 			expect( isHorizontalEdge( input, false ) ).toBe( false );
 		} );
 
-		it( 'Should always return true for non content editabless', () => {
+		it( 'should always return true for non content editabless', () => {
 			const div = document.createElement( 'div' );
 			parent.appendChild( div );
 			expect( isHorizontalEdge( div, true ) ).toBe( true );

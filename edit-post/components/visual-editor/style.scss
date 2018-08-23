@@ -9,6 +9,11 @@
 		line-height: $editor-line-height;
 	}
 
+	&,
+	& p {
+		color: $dark-gray-700;
+	}
+
 	& ul,
 	& ol {
 		margin: 0;
@@ -49,11 +54,28 @@
 			margin-right: -$block-side-ui-width;
 		}
 
-		&[data-align="full"] > .editor-block-contextual-toolbar,
-		&[data-align="wide"] > .editor-block-contextual-toolbar { // don't affect nested block toolbars
-			max-width: $content-width + 2;	// 1px border left and right
-			margin-left: auto;
-			margin-right: auto;
+		// Center the block toolbar on wide and full-wide blocks.
+		// Use specific selector to not affect nested block toolbars.
+		&[data-align="wide"] > .editor-block-contextual-toolbar,
+		&[data-align="full"] > .editor-block-contextual-toolbar {
+			width: calc(100% + #{ ($parent-block-padding * 4) + $border-width + $border-width }); // Matches the negative margins applied to parent blocks.
+			height: 0; // This collapses the container to an invisible element without margin.
+			text-align: center;
+
+			.editor-block-toolbar {
+				max-width: $content-width + $block-padding + $block-padding;
+				width: 100%;
+				position: relative;
+			}
+		}
+
+		// The centering math changes when a fullwide image doesn't have block padding.
+		&[data-align="full"] > .editor-block-contextual-toolbar {
+			width: calc(100% + #{ ($parent-block-padding * 2) + ($block-padding * 2) }); // Matches the negative margins applied to non-parent blocks, except for borders which are gone in fullwide.
+
+			.editor-block-toolbar {
+				max-width: $content-width - $border-width - $border-width;
+			}
 		}
 	}
 
@@ -69,8 +91,8 @@
 // The base width of the title should match that of blocks even if it isn't a block
 .editor-post-title {
 	@include break-small() {
-		padding-left: $block-side-ui-padding;
-		padding-right: $block-side-ui-padding;
+		padding-left: $block-container-side-padding;
+		padding-right: $block-container-side-padding;
 	}
 }
 .edit-post-visual-editor .editor-post-title__block {
@@ -78,31 +100,18 @@
 	margin-right: auto;
 	max-width: $content-width;
 
-	// stack borders
+	// Stack borders.
 	> div {
-		margin-left: -1px;
-		margin-right: -1px;
+		margin-left: 0;
+		margin-right: 0;
 	}
 
-	// include space for side UI on desktops
+	// Include space for side UI on desktops.
 	@include break-small() {
 		> div {
 			margin-left: -$block-side-ui-width;
 			margin-right: -$block-side-ui-width;
 		}
-	}
-}
-
-// This is a focus style shown for blocks that need an indicator even when in an isEditing state
-// like for example an image block that receives arrowkey focus.
-.edit-post-visual-editor .editor-block-list__block:not( .is-selected ) {
-	.editor-block-list__block-edit {
-		box-shadow: 0 0 0 0 $white, 0 0 0 0 $dark-gray-900;
-		transition: .1s box-shadow .05s;
-	}
-
-	&:focus .editor-block-list__block-edit {
-		box-shadow: 0 0 0 1px $white, 0 0 0 3px $dark-gray-900;
 	}
 }
 
@@ -113,7 +122,7 @@
 	margin-right: auto;
 	position: relative;
 
-	&[data-root-uid=""] .editor-default-block-appender__content:hover {
+	&[data-root-client-id=""] .editor-default-block-appender__content:hover {
 		// Outline on root-level default block appender is redundant with the
 		// WritingFlow click redirector.
 		outline: 1px solid transparent;

@@ -6,8 +6,90 @@ Refer to [the plugins module documentation](../plugins/) for more information.
 
 ## Plugin Components
 
-The following components can be used with the `registerPlugin` ([see documentation](../plugins)) API.
+The following components can be used with the `registerPlugin` ([see documentation](../packages/plugins)) API.
 They can be found in the global variable `wp.editPost` when defining `wp-edit-post` as a script dependency.
+
+### `PluginBlockSettingsMenuItem`
+
+Renders a new item in the block settings menu.
+
+Example:
+
+{% codetabs %}
+
+{% ES5 %}
+```js
+var __ = wp.i18n.__;
+var PluginBlockSettingsMenuItem = wp.editPost.PluginBlockSettingsMenuItem;
+
+function doOnClick(){
+	// To be called when the user clicks the menu item.
+}
+
+function MyPluginBlockSettingsMenuItem() {
+	return el(
+		PluginBlockSettingsMenuItem,
+		{
+			allowedBlockNames: [ 'core/paragraph' ],
+			icon: 'dashicon-name',
+			label: __( 'Menu item text' ),
+			onClick: doOnClick,
+		}
+	);
+}
+```
+
+{% ESNext %}
+```jsx
+import { __ } from wp.i18n;
+import { PluginBlockSettingsMenuItem } from wp.editPost;
+
+const doOnClick = ( ) => {
+    // To be called when the user clicks the menu item.
+};
+
+const MyPluginBlockSettingsMenuItem = () => (
+    <PluginBlockSettingsMenuItem 
+		allowedBlockNames=[ 'core/paragraph' ]
+		icon='dashicon-name'
+		label=__( 'Menu item text' )
+		onClick={ doOnClick } />
+);
+```
+
+{% end %}
+
+#### Props
+
+##### allowedBlockNames
+
+An array containing a whitelist of block names for which the item should be shown. If this prop is not present the item will be rendered for any block. If multiple blocks are selected, it'll be shown if and only if all of them are in the whitelist.
+
+- Type: `Array`
+- Required: No
+- Default: Menu item is shown for any block
+
+##### icon
+
+The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
+
+- Type: `String` | `Element`
+- Required: No
+- Default: Menu item wil be rendered without icon
+
+##### label
+
+A string containing the menu item text.
+
+- Type: `String`
+- Required: Yes
+
+##### onClick
+
+The callback function to be executed when the user clicks the menu item.
+
+- Type: `function`
+- Required: Yes
 
 ### `PluginSidebar`
 
@@ -20,6 +102,34 @@ wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/sidebar-na
 
 _Example:_
 
+{% codetabs %}
+
+{% ES5 %}
+```js
+var __ = wp.i18n.__;
+var el = wp.element.createElement;
+var PanelBody = wp.components.PanelBody;
+var PluginSidebar = wp.editPost.PluginSidebar;
+
+
+function MyPluginSidebar() {
+	return el(
+			PluginSidebar,
+			{
+				name: 'my-sidebar',
+				title: 'My sidebar title',
+				icon: 'smiley',
+			},
+			el(
+				PanelBody,
+				{},
+				__( 'My sidebar content' )
+			)
+	);
+}
+```
+
+{% ESNext %}
 ```jsx
 const { __ } = wp.i18n;
 const { PanelBody } = wp.components;
@@ -37,6 +147,7 @@ const MyPluginSidebar = () => (
 	</PluginSidebar>
 );
 ```
+{% end %}
 
 #### Props
 
@@ -78,6 +189,27 @@ The text within the component appears as the menu item label.
 
 _Example:_
 
+{% codetabs %}
+
+{% ES5 %}
+```js
+var __ = wp.i18n.__;
+var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
+var el = wp.element.createElement;
+
+function MySidebarMoreMenuItem() {
+	return el(
+		PluginSidebarMoreMenuItem,
+		{
+			target: 'my-sidebar',
+			icon: 'smiley',
+		},
+		__( 'My sidebar title' )
+	)
+}
+```
+
+{% ESNext %}
 ```jsx
 const { __ } = wp.i18n;
 const { PluginSidebarMoreMenuItem } = wp.editPost;
@@ -91,6 +223,7 @@ const MySidebarMoreMenuItem = () => (
 	</PluginSidebarMoreMenuItem>
 );
 ```
+{% end %}
 
 #### Props
 
@@ -116,17 +249,49 @@ Renders a row in the Status & Visibility panel of the Document sidebar.
 It should be noted that this is named and implemented around the function it serves and not its location, which may change in future iterations.
 
 _Example:_
+
+{% codetabs %}
+
+{% ES5 %}
+```js
+var __ = wp.i18n.__;
+var PluginPostStatusInfo = wp.editPost.PluginPostStatusInfo;
+var el = wp.element.createElement;
+
+function MyPluginPostStatusInfo() {
+	return el(
+		PluginPostStatusInfo,
+		{
+			className: 'my-plugin-post-status-info',
+		},
+		__( 'My post status info' )
+	)
+}
+```
+
+{% ESNext %}
 ```jsx
 const { __ } = wp.i18n;
 const { PluginPostStatusInfo } = wp.editPost;
 
 const MyPluginPostStatusInfo = () => (
-	<PluginPostStatusInfo>
+	<PluginPostStatusInfo
+		className="my-plugin-post-status-info"
+	>
 		{ __( 'My post status info' ) }
 	</PluginPostStatusInfo>
 );
 ```
+{% end %}
 
+#### Props
+
+##### className
+
+An optional class name added to the row.
+
+- Type: `String`
+- Required: No
 
 ### `PluginPrePublishPanel`
 
@@ -134,6 +299,28 @@ Renders provided content to the pre-publish side panel in the publish flow (side
 
 _Example:_
 
+{% codetabs %}
+
+{% ES5 %}
+```js
+var __ = wp.i18n.__;
+var PluginPrePublishPanel = wp.editPost.PluginPrePublishPanel;
+var el = wp.element.createElement;
+
+function MyPluginPrePublishPanel() {
+	return el(
+		PluginPrePublishPanel,
+		{
+			className: 'my-plugin-pre-publish-panel',
+			title: __( 'My panel title' ),
+			initialOpen: true,
+		},
+		__( 'My panel content' )
+	);
+}
+```
+
+{% ESNext %}
 ```jsx
 const { __ } = wp.i18n;
 const { PluginPrePublishPanel } = wp.editPost;
@@ -148,6 +335,7 @@ const MyPluginPrePublishPanel = () => (
 	</PluginPrePublishPanel>
 );
 ```
+{% end %}
 
 #### Props
 
@@ -180,6 +368,28 @@ Renders provided content to the post-publish panel in the publish flow (side pan
 
 _Example:_
 
+{% codetabs %}
+
+{% ES5 %}
+```js
+var __ = wp.i18n.__;
+var PluginPostPublishPanel = wp.editPost.PluginPostPublishPanel;
+var el = wp.element.createElement;
+
+function MyPluginPostPublishPanel() {
+	return el(
+		PluginPostPublishPanel,
+		{
+			className: 'my-plugin-post-publish-panel',
+			title: __( 'My panel title' ),
+			initialOpen: true,
+		},
+		__( 'My panel content' )
+	);
+}
+```
+
+{% ESNext %}
 ```jsx
 const { __ } = wp.i18n;
 const { PluginPostPublishPanel } = wp.editPost;
@@ -194,6 +404,7 @@ const MyPluginPostPublishPanel = () => (
 	</PluginPostPublishPanel>
 );
 ```
+{% end %}
 
 #### Props
 

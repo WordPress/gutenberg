@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`domToBlockChildren should return the corresponding element  1`] = `
+Array [
+  Object {
+    "props": Object {
+      "children": Array [
+        Object {
+          "props": Object {
+            "children": Array [
+              "content",
+            ],
+          },
+          "type": "strong",
+        },
+      ],
+      "class": "container",
+    },
+    "type": "div",
+  },
+]
+`;

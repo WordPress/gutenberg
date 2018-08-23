@@ -12,18 +12,26 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 	function setUp() {
 		parent::setUp();
 
-		$this->administrator = $this->factory->user->create( array(
-			'role' => 'administrator',
-		) );
-		$this->author        = $this->factory->user->create( array(
-			'role' => 'author',
-		) );
-		$this->editor        = $this->factory->user->create( array(
-			'role' => 'editor',
-		) );
-		$this->contributor   = $this->factory->user->create( array(
-			'role' => 'contributor',
-		) );
+		$this->administrator = $this->factory->user->create(
+			array(
+				'role' => 'administrator',
+			)
+		);
+		$this->author        = $this->factory->user->create(
+			array(
+				'role' => 'author',
+			)
+		);
+		$this->editor        = $this->factory->user->create(
+			array(
+				'role' => 'editor',
+			)
+		);
+		$this->contributor   = $this->factory->user->create(
+			array(
+				'role' => 'contributor',
+			)
+		);
 		$this->subscriber    = $this->factory->user->create(
 			array(
 				'role'         => 'subscriber',
@@ -41,58 +49,30 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 	 * Should return an extra visibility field on response when in edit context.
 	 */
 	function test_visibility_field() {
-		wp_set_current_user( $this->administrator );
-
 		$request = new WP_REST_Request( 'GET', '/wp/v2/taxonomies/category' );
 		$request->set_param( 'context', 'edit' );
-		$response = rest_do_request( $request );
 
-		$result = $response->get_data();
+		$permitted_users = array(
+			$this->administrator,
+			$this->editor,
+			$this->author,
+		);
 
-		$this->assertTrue( isset( $result['visibility'] ) );
-		$this->assertInternalType( 'array', $result['visibility'] );
-		$this->assertArrayHasKey( 'public', $result['visibility'] );
-		$this->assertArrayHasKey( 'publicly_queryable', $result['visibility'] );
-		$this->assertArrayHasKey( 'show_ui', $result['visibility'] );
-		$this->assertArrayHasKey( 'show_admin_column', $result['visibility'] );
-		$this->assertArrayHasKey( 'show_in_nav_menus', $result['visibility'] );
-		$this->assertArrayHasKey( 'show_in_quick_edit', $result['visibility'] );
-	}
+		foreach ( $permitted_users as $user ) {
+			wp_set_current_user( $user );
 
-	/**
-	 * Should return an extra visibility field on response.
-	 */
-	function test_visibility_field_for_non_admin_roles() {
-		wp_set_current_user( $this->editor );
+			$response = rest_do_request( $request );
+			$result   = $response->get_data();
 
-		$request = new WP_REST_Request( 'GET', '/wp/v2/taxonomies/category' );
-		$request->set_param( 'context', 'edit' );
-		$response = rest_do_request( $request );
-
-		$result = $response->get_data();
-
-		$this->assertTrue( isset( $result['visibility'] ) );
-		$this->assertInternalType( 'array', $result['visibility'] );
-		$this->assertArrayHasKey( 'public', $result['visibility'] );
-		$this->assertArrayHasKey( 'publicly_queryable', $result['visibility'] );
-		$this->assertArrayHasKey( 'show_ui', $result['visibility'] );
-		$this->assertArrayHasKey( 'show_admin_column', $result['visibility'] );
-		$this->assertArrayHasKey( 'show_in_nav_menus', $result['visibility'] );
-		$this->assertArrayHasKey( 'show_in_quick_edit', $result['visibility'] );
-
-		/**
-		 * See https://github.com/WordPress/gutenberg/issues/2545
-		 *
-		 * Until that is resolved authors will not be able to set taxonomies.
-		 * This should definitely be resolved though.
-		 */
-		wp_set_current_user( $this->author );
-
-		$response = rest_do_request( $request );
-
-		$result = $response->get_data();
-
-		$this->assertFalse( isset( $result['visibility'] ) );
+			$this->assertTrue( isset( $result['visibility'] ) );
+			$this->assertInternalType( 'array', $result['visibility'] );
+			$this->assertArrayHasKey( 'public', $result['visibility'] );
+			$this->assertArrayHasKey( 'publicly_queryable', $result['visibility'] );
+			$this->assertArrayHasKey( 'show_ui', $result['visibility'] );
+			$this->assertArrayHasKey( 'show_admin_column', $result['visibility'] );
+			$this->assertArrayHasKey( 'show_in_nav_menus', $result['visibility'] );
+			$this->assertArrayHasKey( 'show_in_quick_edit', $result['visibility'] );
+		}
 	}
 
 	/**
@@ -131,6 +111,51 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Only returns wp:action-unfiltered_html when current user can use unfiltered HTML.
+	 * See https://codex.wordpress.org/Roles_and_Capabilities#Capability_vs._Role_Table
+	 */
+	function test_link_unfiltered_html() {
+		$post_id   = $this->factory->post->create();
+		$check_key = 'https://api.w.org/action-unfiltered_html';
+		// admins can in a single site, but can't in a multisite.
+		wp_set_current_user( $this->administrator );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+		if ( is_multisite() ) {
+			$this->assertFalse( isset( $links[ $check_key ] ) );
+		} else {
+			$this->assertTrue( isset( $links[ $check_key ] ) );
+		}
+		// authors can't.
+		wp_set_current_user( $this->author );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+		$this->assertFalse( isset( $links[ $check_key ] ) );
+		// editors can in a single site, but can't in a multisite.
+		wp_set_current_user( $this->editor );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+		if ( is_multisite() ) {
+			$this->assertFalse( isset( $links[ $check_key ] ) );
+		} else {
+			$this->assertTrue( isset( $links[ $check_key ] ) );
+		}
+		// contributors can't.
+		wp_set_current_user( $this->contributor );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+		$this->assertFalse( isset( $links[ $check_key ] ) );
+	}
+
+	/**
 	 * Only returns wp:action-assign-author when current user can assign author.
 	 */
 	function test_link_assign_author_only_appears_for_editor() {
@@ -163,9 +188,11 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 	 * Only returns wp:action-publish when current user can publish.
 	 */
 	function test_link_publish_only_appears_for_author() {
-		$post_id   = $this->factory->post->create( array(
-			'post_author' => $this->author,
-		) );
+		$post_id   = $this->factory->post->create(
+			array(
+				'post_author' => $this->author,
+			)
+		);
 		$check_key = 'https://api.w.org/action-publish';
 		// contributors cannot sticky.
 		wp_set_current_user( $this->contributor );
@@ -223,13 +250,17 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 	 * Only returns term-related actions when current user can do so.
 	 */
 	function test_link_term_management_per_user() {
-		$contributor_post  = $this->factory->post->create( array(
-			'post_author' => $this->contributor,
-			'post_status' => 'draft',
-		) );
-		$author_post       = $this->factory->post->create( array(
-			'post_author' => $this->author,
-		) );
+		$contributor_post  = $this->factory->post->create(
+			array(
+				'post_author' => $this->contributor,
+				'post_status' => 'draft',
+			)
+		);
+		$author_post       = $this->factory->post->create(
+			array(
+				'post_author' => $this->author,
+			)
+		);
 		$create_tags       = 'https://api.w.org/action-create-tags';
 		$assign_tags       = 'https://api.w.org/action-assign-tags';
 		$create_categories = 'https://api.w.org/action-create-categories';
@@ -278,21 +309,33 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 		$this->assertTrue( in_array( 'standard', $result['theme_supports']['formats'] ) );
 	}
 
-	public function test_get_items_who_author_query() {
-		wp_set_current_user( $this->administrator );
-		// First request should include subscriber in the set.
-		$request = new WP_REST_Request( 'GET', '/wp/v2/users' );
-		$request->set_param( 'search', 'subscriber' );
-		$response = rest_get_server()->dispatch( $request );
-		$this->assertEquals( 200, $response->get_status() );
-		$this->assertCount( 1, $response->get_data() );
-		// Second request should exclude subscriber.
-		$request = new WP_REST_Request( 'GET', '/wp/v2/users' );
-		$request->set_param( 'who', 'authors' );
-		$request->set_param( 'search', 'subscriber' );
-		$response = rest_get_server()->dispatch( $request );
-		$this->assertEquals( 200, $response->get_status() );
-		$this->assertCount( 0, $response->get_data() );
+	public function test_theme_supports_post_thumbnails_false() {
+		remove_theme_support( 'post-thumbnails' );
+		$request  = new WP_REST_Request( 'GET', '/' );
+		$response = rest_do_request( $request );
+		$result   = $response->get_data();
+		$this->assertTrue( isset( $result['theme_supports'] ) );
+		$this->assertFalse( isset( $result['theme_supports']['post-thumbnails'] ) );
+	}
+
+	public function test_theme_supports_post_thumbnails_true() {
+		remove_theme_support( 'post-thumbnails' );
+		add_theme_support( 'post-thumbnails' );
+		$request  = new WP_REST_Request( 'GET', '/' );
+		$response = rest_do_request( $request );
+		$result   = $response->get_data();
+		$this->assertTrue( isset( $result['theme_supports'] ) );
+		$this->assertEquals( true, $result['theme_supports']['post-thumbnails'] );
+	}
+
+	public function test_theme_supports_post_thumbnails_array() {
+		remove_theme_support( 'post-thumbnails' );
+		add_theme_support( 'post-thumbnails', array( 'post' ) );
+		$request  = new WP_REST_Request( 'GET', '/' );
+		$response = rest_do_request( $request );
+		$result   = $response->get_data();
+		$this->assertTrue( isset( $result['theme_supports'] ) );
+		$this->assertEquals( array( 'post' ), $result['theme_supports']['post-thumbnails'] );
 	}
 
 	public function test_get_taxonomies_context_edit() {
@@ -374,20 +417,6 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 		$this->assertEquals( 'so-awesome', $data['slug'] );
 	}
 
-	/**
-	 * Any user with 'edit_posts' on a show_in_rest post type
-	 * can view authors. Others (e.g. subscribers) cannot.
-	 */
-	public function test_get_items_who_unauthorized_query() {
-		wp_set_current_user( $this->subscriber );
-		$request = new WP_REST_Request( 'GET', '/wp/v2/users' );
-		$request->set_param( 'who', 'authors' );
-		$response = rest_get_server()->dispatch( $request );
-		$this->assertEquals( 403, $response->get_status() );
-		$data = $response->get_data();
-		$this->assertEquals( 'rest_forbidden_who', $data['code'] );
-	}
-
 	public function test_get_items_unbounded_per_page() {
 		wp_set_current_user( $this->author );
 		$request = new WP_REST_Request( 'GET', '/wp/v2/users' );
@@ -446,18 +475,26 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 		$this->assertEquals( 'rest_forbidden_per_page', $data['code'] );
 	}
 
-	public function test_get_page_edit_context_includes_preview() {
-		wp_set_current_user( $this->editor );
-		$page_id = $this->factory->post->create( array(
-			'post_type'   => 'page',
-			'post_status' => 'draft',
-		) );
-		$page    = get_post( $page_id );
-		$request = new WP_REST_Request( 'GET', '/wp/v2/pages/' . $page_id );
-		$request->set_param( 'context', 'edit' );
+	public function test_get_post_links_predecessor_version() {
+		$post_id = $this->factory->post->create();
+		wp_update_post(
+			array(
+				'post_content' => 'This content is marvelous.',
+				'ID'           => $post_id,
+			)
+		);
+		$revisions  = wp_get_post_revisions( $post_id );
+		$revision_1 = array_pop( $revisions );
+
+		$request  = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', $post_id ) );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertEquals( 200, $response->get_status() );
-		$data = $response->get_data();
-		$this->assertEquals( get_preview_post_link( $page ), $data['preview_link'] );
+
+		$links = $response->get_links();
+
+		$this->assertEquals( rest_url( '/wp/v2/posts/' . $post_id . '/revisions' ), $links['version-history'][0]['href'] );
+		$this->assertEquals( 1, $links['version-history'][0]['attributes']['count'] );
+
+		$this->assertEquals( rest_url( '/wp/v2/posts/' . $post_id . '/revisions/' . $revision_1->ID ), $links['predecessor-version'][0]['href'] );
+		$this->assertEquals( $revision_1->ID, $links['predecessor-version'][0]['attributes']['id'] );
 	}
 }

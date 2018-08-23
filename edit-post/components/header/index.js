@@ -9,7 +9,8 @@ import {
 	PostPublishPanelToggle,
 } from '@wordpress/editor';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
+import { DotTip } from '@wordpress/nux';
 
 /**
  * Internal dependencies
@@ -18,6 +19,7 @@ import './style.scss';
 import MoreMenu from './more-menu';
 import HeaderToolbar from './header-toolbar';
 import PinnedPlugins from './pinned-plugins';
+import shortcuts from '../../keyboard-shortcuts';
 
 function Header( {
 	isEditorSidebarOpened,
@@ -33,7 +35,8 @@ function Header( {
 	return (
 		<div
 			role="region"
-			aria-label={ __( 'Editor toolbar' ) }
+			/* translators: accessibility text for the top bar landmark region. */
+			aria-label={ __( 'Editor top bar' ) }
 			className="edit-post-header"
 			tabIndex="-1"
 		>
@@ -57,7 +60,12 @@ function Header( {
 						onClick={ toggleGeneralSidebar }
 						isToggled={ isEditorSidebarOpened }
 						aria-expanded={ isEditorSidebarOpened }
-					/>
+						shortcut={ shortcuts.toggleSidebar.display }
+					>
+						<DotTip id="core/editor.settings">
+							{ __( 'You’ll find more settings for your page and blocks in the sidebar. Click “Settings” to open it.' ) }
+						</DotTip>
+					</IconButton>
 					<PinnedPlugins.Slot />
 					<MoreMenu />
 				</div>

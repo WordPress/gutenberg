@@ -2,7 +2,7 @@
 
 exports[`Using a CPT with a predefined template Should add a custom post types with a predefined template 1`] = `
 "<!-- wp:image -->
-<figure class=\\"wp-block-image\\"><img alt=\\"\\" /></figure>
+<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
 <!-- /wp:image -->
 
 <!-- wp:paragraph {\\"placeholder\\":\\"Add a book description\\"} -->
@@ -14,14 +14,16 @@ exports[`Using a CPT with a predefined template Should add a custom post types w
 <!-- /wp:quote -->
 
 <!-- wp:columns -->
-<div class=\\"wp-block-columns has-2-columns\\">
-	<!-- wp:image {\\"layout\\":\\"column-1\\"} -->
-	<figure class=\\"wp-block-image layout-column-1\\"><img alt=\\"\\" /></figure>
-	<!-- /wp:image -->
+<div class=\\"wp-block-columns has-2-columns\\"><!-- wp:column -->
+<div class=\\"wp-block-column\\"><!-- wp:image -->
+<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
+<!-- /wp:image --></div>
+<!-- /wp:column -->
 
-	<!-- wp:paragraph {\\"placeholder\\":\\"Add a inner paragraph\\",\\"layout\\":\\"column-2\\"} -->
-	<p class=\\"layout-column-2\\"></p>
-	<!-- /wp:paragraph -->
-</div>
+<!-- wp:column -->
+<div class=\\"wp-block-column\\"><!-- wp:paragraph {\\"placeholder\\":\\"Add a inner paragraph\\"} -->
+<p></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column --></div>
 <!-- /wp:columns -->"
 `;

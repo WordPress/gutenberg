@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+
+# Set up environment variables
+. "$(dirname "$0")/bootstrap-env.sh"
+
 cd "$(dirname "$0")/../"
 
 export PATH="$HOME/.composer/vendor/bin:$PATH"
@@ -29,8 +33,8 @@ fi
 
 echo Running with the following versions:
 if [[ $DOCKER = "true" ]]; then
-	docker-compose run --rm wordpress_phpunit php -v
-	docker-compose run --rm wordpress_phpunit phpunit --version
+	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm wordpress_phpunit php -v
+	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm wordpress_phpunit phpunit --version
 else
 	php -v
 	phpunit --version

@@ -99,3 +99,7 @@ This list is manually curated to include valuable contributions by volunteers th
 | @noisysocks | @noisysocks |
 | @omarreiss | @omarreiss |
 | @hedgefield | @hedgefield |
+| @hideokamoto | @hideokamoto |
+| @mirucon | @mirucon |
+| @nosolosw | @nosolosw |
+| @DannyCooper | @DannyCooper |

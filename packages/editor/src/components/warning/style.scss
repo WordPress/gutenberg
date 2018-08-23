@@ -1,0 +1,34 @@
+.editor-warning {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	flex-wrap: nowrap;
+	background-color: $white;
+	border: $border-width solid $light-gray-500;
+	text-align: left;
+	padding: 20px;
+
+	.editor-warning__message {
+		line-height: $default-line-height;
+		font-family: $default-font;
+		font-size: $default-font-size;
+	}
+
+	.editor-warning__contents {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		align-items: center;
+		width: 100%;
+	}
+
+	.editor-warning__actions {
+		display: flex;
+	}
+
+	.editor-warning__action {
+		margin: 0 6px 0 0;
+		margin-left: 0;
+	}
+}

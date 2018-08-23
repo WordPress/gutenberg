@@ -27,11 +27,6 @@ module.exports = {
 		'react',
 		'jsx-a11y',
 	],
-	settings: {
-		react: {
-			pragma: 'wp',
-		},
-	},
 	rules: {
 		'array-bracket-spacing': [ 'error', 'always' ],
 		'arrow-parens': [ 'error', 'always' ],
@@ -104,6 +99,7 @@ module.exports = {
 		'no-whitespace-before-property': 'error',
 		'object-curly-spacing': [ 'error', 'always' ],
 		'padded-blocks': [ 'error', 'never' ],
+		quotes: [ 'error', 'single', { allowTemplateLiterals: true, avoidEscape: true } ],
 		'quote-props': [ 'error', 'as-needed' ],
 		'react/display-name': 'off',
 		'react/jsx-curly-spacing': [ 'error', {
@@ -117,6 +113,7 @@ module.exports = {
 		'react/jsx-tag-spacing': 'error',
 		'react/no-children-prop': 'off',
 		'react/prop-types': 'off',
+		'react/react-in-jsx-scope': 'off',
 		semi: 'error',
 		'semi-spacing': 'error',
 		'space-before-blocks': [ 'error', 'always' ],
@@ -160,14 +157,4 @@ module.exports = {
 		'valid-typeof': 'error',
 		yoda: 'off',
 	},
-	overrides: [
-		{
-			files: 'packages/**/*.js',
-			settings: {
-				react: {
-					pragma: 'createElement',
-				},
-			},
-		},
-	],
 };

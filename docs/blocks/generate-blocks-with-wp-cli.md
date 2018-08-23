@@ -3,9 +3,9 @@
 It turns out that writing the simplest possible block which contains only static content might not be the easiest task. It requires to follow closely the steps described in the documentation. It stems from the fact that you need to create at least 2 files and integrate your code with the existing APIs. One way to mitigate this inconvenience is to copy the source code of the existing block from one of the repositories that share working examples:
 - [WordPress/gutenberg-examples](https://github.com/WordPress/gutenberg-examples) - the official examples for extending Gutenberg with plugins which create blocks
 - [zgordon/gutenberg-course](https://github.com/zgordon/gutenberg-course) - a repository for Zac Gordon's Gutenberg Development Course
-- [ahmadawais/Gutenberg-Boilerplate](https://github.com/ahmadawais/Gutenberg-Boilerplate) - an inline documented starter WordPress plugin for the new Gutenberg editor
+- [ahmadawais/create-guten-block](https://github.com/ahmadawais/create-guten-block) - A zero-configuration developer toolkit for building WordPress Gutenberg block plugins
 
-It might be also a good idea to browse the folder with [all core blocks](https://github.com/WordPress/gutenberg/tree/master/core-blocks) to see how they are implemented.
+It might be also a good idea to browse the folder with [all core blocks](https://github.com/WordPress/gutenberg/tree/master/packages/block-library/src) to see how they are implemented.
 
 ## WP-CLI
 

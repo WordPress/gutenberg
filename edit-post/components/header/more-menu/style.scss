@@ -20,9 +20,17 @@
 	}
 }
 
-.edit-post-more-menu__content {
+.edit-post-more-menu__content .components-popover__content {
+	min-width: 260px;
+
+	// Let the menu scale to fit items.
+	@include break-mobile() {
+		width: auto;
+		max-width: $break-mobile;
+	}
+
 	.components-menu-group:not(:last-child),
 	> div:not(:last-child) .components-menu-group {
-  		border-bottom: 1px solid $light-gray-500;
+		border-bottom: $border-width solid $light-gray-500;
 	}
 }

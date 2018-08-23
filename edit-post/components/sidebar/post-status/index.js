@@ -3,8 +3,9 @@
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
-import { compose } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal Dependencies
@@ -27,14 +28,20 @@ const PANEL_NAME = 'post-status';
 function PostStatus( { isOpened, onTogglePanel } ) {
 	return (
 		<PanelBody className="edit-post-post-status" title={ __( 'Status & Visibility' ) } opened={ isOpened } onToggle={ onTogglePanel }>
-			<PostVisibility />
-			<PostSchedule />
-			<PostFormat />
-			<PostSticky />
-			<PostPendingStatus />
-			<PostAuthor />
-			<PluginPostStatusInfo.Slot />
-			<PostTrash />
+			<PluginPostStatusInfo.Slot>
+				{ ( fills ) => (
+					<Fragment>
+						<PostVisibility />
+						<PostSchedule />
+						<PostFormat />
+						<PostSticky />
+						<PostPendingStatus />
+						<PostAuthor />
+						{ fills }
+						<PostTrash />
+					</Fragment>
+				) }
+			</PluginPostStatusInfo.Slot>
 		</PanelBody>
 	);
 }

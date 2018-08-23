@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { registerCoreBlocks } from '@wordpress/core-blocks';
+import { registerCoreBlocks } from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
+import { dispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -12,16 +13,6 @@ import './hooks';
 import store from './store';
 import { initializeMetaBoxState } from './store/actions';
 import Editor from './editor';
-
-/**
- * Configure heartbeat to refresh the wp-api nonce, keeping the editor
- * authorization intact.
- */
-window.jQuery( document ).on( 'heartbeat-tick', ( event, response ) => {
-	if ( response[ 'rest-nonce' ] ) {
-		window.wpApiSettings.nonce = response[ 'rest-nonce' ];
-	}
-} );
 
 /**
  * Reinitializes the editor after the user chooses to reboot the editor after
@@ -59,19 +50,17 @@ export function reinitializeEditor( postType, postId, target, settings, override
  * @return {Object} Editor interface.
  */
 export function initializeEditor( id, postType, postId, settings, overridePost ) {
-	if ( 'production' !== process.env.NODE_ENV ) {
-		// Remove with 3.0 release.
-		window.console.info(
-			'`isSelected` usage is no longer mandatory with `BlockControls`, `InspectorControls` and `RichText`. ' +
-			'It is now handled by the editor internally to ensure that controls are visible only when block is selected. ' +
-			'See updated docs: https://github.com/WordPress/gutenberg/blob/master/blocks/README.md#components.'
-		);
-	}
-
 	const target = document.getElementById( id );
 	const reboot = reinitializeEditor.bind( null, postType, postId, target, settings, overridePost );
 
 	registerCoreBlocks();
+
+	dispatch( 'core/nux' ).triggerGuide( [
+		'core/editor.inserter',
+		'core/editor.settings',
+		'core/editor.preview',
+		'core/editor.publish',
+	] );
 
 	render(
 		<Editor settings={ settings } onError={ reboot } postId={ postId } postType={ postType } overridePost={ overridePost } />,
@@ -85,6 +74,7 @@ export function initializeEditor( id, postType, postId, settings, overridePost )
 	};
 }
 
+export { default as PluginBlockSettingsMenuItem } from './components/block-settings-menu/plugin-block-settings-menu-item';
 export { default as PluginPostPublishPanel } from './components/sidebar/plugin-post-publish-panel';
 export { default as PluginPostStatusInfo } from './components/sidebar/plugin-post-status-info';
 export { default as PluginPrePublishPanel } from './components/sidebar/plugin-pre-publish-panel';
