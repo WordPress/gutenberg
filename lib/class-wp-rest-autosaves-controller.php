@@ -181,12 +181,12 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 
 		if ( ( 'draft' === $post->post_status || 'auto-draft' === $post->post_status ) && $post->post_author == $user_id ) {
 			// Draft posts for the same author: autosaving has to override a filter to create a revision.
-			add_filter( 'wp_save_post_block_revision_for_autosave', '__return_false' );
+			add_filter( 'wp_save_post_prevent_revision_for_autosave', '__return_false' );
 
 			// Convert the post object to an array and add slashes, wp_update_post expects escaped array.
 			$autosave_id = wp_update_post( wp_slash( (array) $prepared_post ), true );
 
-			remove_filter( 'wp_save_post_block_revision_for_autosave', '__return_false' );
+			remove_filter( 'wp_save_post_prevent_revision_for_autosave', '__return_false' );
 		} else {
 			// Non-draft posts: create or update the post autosave.
 			$autosave_id = $this->create_post_autosave( (array) $prepared_post );
