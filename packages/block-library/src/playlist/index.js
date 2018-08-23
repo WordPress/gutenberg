@@ -21,7 +21,7 @@ export const settings = {
 
 	attributes: {
 		ids: {
-			type: 'string',
+			type: 'array',
 		},
 		type: {
 			type: 'string',

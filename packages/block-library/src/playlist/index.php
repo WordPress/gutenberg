@@ -13,7 +13,6 @@
  * @return string Playlist output. Empty string if the passed type is unsupported.
  */
 function render_block_core_playlist( $attributes ) {
-	$attributes['ids']          = json_decode( $attributes['ids'] );
 	$attributes['artists']      = $attributes['showArtists'];
 	$attributes['tracknumbers'] = $attributes['showTrackNumbers'];
 
@@ -32,7 +31,10 @@ function register_block_core_playlist() {
 			'render_callback' => 'render_block_core_playlist',
 			'attributes'      => array(
 				'ids'              => array(
-					'type' => 'string',
+					'type'  => 'array',
+					'items' => array(
+						'type' => 'number',
+					),
 				),
 				'type'             => array(
 					'type'    => 'string',

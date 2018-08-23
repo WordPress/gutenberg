@@ -69,7 +69,7 @@ class PlaylistEdit extends Component {
 				// validate type is consistent for playlist
 				if ( media.length > 0 && media[ 0 ].mimeType && isConsistentType ) {
 					const type = media[ 0 ].mimeType.split( '/' )[ 0 ];
-					const ids = JSON.stringify( media.map( ( item ) => item.id ) );
+					const ids = media.map( ( item ) => item.id );
 					setAttributes( { ids, type } );
 					this.setState( { isEditing: false } );
 				}
@@ -91,13 +91,13 @@ class PlaylistEdit extends Component {
 		const onSelectMedia = ( media ) => {
 			//check if there are returned media items and set attributes when there are
 			if ( media && media[ 0 ].url ) {
-				const ids = JSON.stringify( media.map( ( item ) => item.id ) );
+				const ids = media.map( ( item ) => item.id );
 				setAttributes( { ids, type: media[ 0 ].type } );
 				this.setState( { isEditing: false } );
 			}
 		};
 
-		const mediaIds = this.props.attributes.ids && this.props.attributes.ids.replace( /^\[(.+)\]$/, '$1' ).split( ',' );
+		const mediaIds = this.props.attributes.ids;
 
 		if ( isEditing ) {
 			return (
@@ -121,7 +121,7 @@ class PlaylistEdit extends Component {
 						type={ type }
 						multiple
 						playlist
-						value={ mediaIds }
+						value={ this.props.attributes.ids }
 						render={ ( { open } ) => (
 							<IconButton
 								isLarge
