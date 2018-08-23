@@ -2,7 +2,7 @@
     {
         "blockName": "core/playlist",
         "attrs": {
-            "ids": "[60,61]",
+            "ids": [60,61],
             "type": "video"
         },
         "innerBlocks": [],
