@@ -42,6 +42,13 @@ class PlaylistEdit extends Component {
 		};
 	}
 
+	componentDidUpdate( prevProps, prevState ) {
+		const { noticeOperations } = this.props;
+		if ( this.state.hasError && ! prevState.hasError ) {
+			noticeOperations.createErrorNotice( 'Cannot have mixed types in a Playlist Block' );
+		}
+	}
+
 	initializePlaylist() {
 		window.wp.playlist.initialize();
 	}
@@ -52,18 +59,20 @@ class PlaylistEdit extends Component {
 
 	onUploadFiles( files ) {
 		const firstType = get( files, [ 0, 'mimeType' ] );
-		const { setAttributes, noticeOperations } = this.props;
-		const isConsistentType = every( files, ( filesMedia ) => filesMedia.mimeType === firstType );
+		const { setAttributes } = this.props;
+		const isConsistentType = every( files, { mimeType: firstType } );
+		if ( ! isConsistentType ) {
+			this.setState( { hasError: true } );
+			setAttributes( { ids: null, type: null } );
+			return;
+		}
+
 		mediaUpload( {
 			allowedType: [ 'audio', 'video' ],
 			filesList: files,
 			onFileChange: ( media ) => {
 				// validate type is consistent for playlist
-				if ( ! isConsistentType ) {
-					this.setState( { hasError: true } );
-					noticeOperations.createErrorNotice( 'Cannot have mixed types in a Playlist Block' );
-					setAttributes( { ids: null, type: null } );
-				} else if ( media.length > 0 && media[ 0 ].mimeType && isConsistentType ) {
+				if ( media.length > 0 && media[ 0 ].mimeType && isConsistentType ) {
 					const type = media[ 0 ].mimeType.split( '/' )[ 0 ];
 					const ids = JSON.stringify( media.map( ( item ) => item.id ) );
 					setAttributes( { ids, type } );
