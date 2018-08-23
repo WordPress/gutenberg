@@ -22,6 +22,9 @@ import FormatToolbar from './format-toolbar';
 import { FORMATTING_CONTROLS } from './formatting-controls';
 
 export function getFormatValue( formatName ) {
+	if ( 'link' === formatName ) {
+		//TODO: Implement link command
+	}
 	return { isActive: true };
 }
 
@@ -41,13 +44,12 @@ export class RichText extends Component {
 	}
 
 	onActiveFormatsChange( formats ) {
-		const formatNames = this.props.formattingControls;
 		const newFormats = formats.reduce( ( accFormats, activeFormat ) => {
 			accFormats[ activeFormat ] = getFormatValue( activeFormat );
 			return accFormats;
 		}, {} );
 
-		this.setState( { formats, selectedNodeId: this.state.selectedNodeId + 1 } );
+		this.setState( { newFormats, selectedNodeId: this.state.selectedNodeId + 1 } );
 	}
 	/**
 	 * Handles any case where the content of the AztecRN instance has changed.
@@ -105,12 +107,12 @@ export class RichText extends Component {
 
 	// eslint-disable-next-line no-unused-vars
 	removeFormat( format ) {
-		//TODO: implement Aztec call to remove format
+		this._editor.applyFormat( format );
 	}
 
 	// eslint-disable-next-line no-unused-vars
 	applyFormat( format, args, node ) {
-		//TODO: implement Aztec call to apply format
+		this._editor.applyFormat( format );
 	}
 
 	changeFormats( formats ) {
@@ -153,10 +155,14 @@ export class RichText extends Component {
 			<View>
 				{ formatToolbar }
 				<RCTAztecView
+					ref={ ( ref ) => {
+						this._editor = ref;
+					}
+					}
 					text={ { text: html, eventCount: eventCount } }
 					onChange={ this.onChange }
 					onContentSizeChange={ this.onContentSizeChange }
-					onActiveFormatsChange = { this.onActiveFormatsChange }
+					onActiveFormatsChange={ this.onActiveFormatsChange }
 					color={ 'black' }
 					maxImagesWidth={ 200 }
 					style={ style }
