@@ -1,10 +1,6 @@
 .editor-media-placeholder {
-	.components-placeholder__input {
-		margin-top: 0.5em;
-	}
-
-	.components-button.is-large {
-		margin-top: 0.5em;
+	&__url-input-form {
+		margin-top: 1em;
 	}
 
 	.components-placeholder__fieldset {

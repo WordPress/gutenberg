@@ -58,21 +58,6 @@ exports[`core/audio block edit matches snapshot 1`] = `
         </span>
       </div>
     </div>
-    <form>
-      <input
-        aria-label="Audio"
-        class="components-placeholder__input"
-        placeholder="Enter URL here…"
-        type="url"
-        value=""
-      />
-      <button
-        class="components-button is-button is-default is-large"
-        type="submit"
-      >
-        Use URL
-      </button>
-    </form>
     <div
       class="components-form-file-upload"
     >
@@ -102,6 +87,23 @@ exports[`core/audio block edit matches snapshot 1`] = `
         type="file"
       />
     </div>
+    <form
+      class="editor-media-placeholder__url-input-form"
+    >
+      <input
+        aria-label="Audio"
+        class="components-placeholder__input editor-media-placeholder__url-input"
+        placeholder="Enter URL here…"
+        type="url"
+        value=""
+      />
+      <button
+        class="components-button is-button is-default is-large"
+        type="submit"
+      >
+        Use URL
+      </button>
+    </form>
   </div>
 </div>
 `;
