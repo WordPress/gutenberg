@@ -44,12 +44,11 @@
 		"@wordpress/viewport": "file:../viewport",
 		"@wordpress/wordcount": "file:../wordcount",
 		"classnames": "^2.2.5",
+		"css":"^2.2.3",
 		"dom-scroll-into-view": "^1.2.1",
 		"element-closest": "^2.0.2",
 		"lodash": "^4.17.10",
 		"memize": "^1.0.5",
-		"postcss": "^7.0.2",
-		"postcss-prefixwrap": "^1.3.0",
 		"react-autosize-textarea": "^3.0.2",
 		"redux-multi": "^0.1.12",
 		"redux-optimist": "^1.0.0",
@@ -57,6 +56,7 @@
 		"rememo": "^3.0.0",
 		"tinycolor2": "^1.4.1",
 		"tinymce": "^4.7.2",
+		"traverse": "^0.6.6",
 		"uuid": "^3.1.0"
 	},
 	"devDependencies": {

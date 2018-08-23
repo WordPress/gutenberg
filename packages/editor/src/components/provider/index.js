@@ -2,13 +2,11 @@
  * External dependencies
  */
 import { flow, map } from 'lodash';
-import postcss from 'postcss';
-import wrap from 'postcss-prefixwrap';
 
 /**
  * WordPress Dependencies
  */
-import urlReplace from '@wordpress/postcss-url';
+import { compose } from '@wordpress/compose';
 import { createElement, Component } from '@wordpress/element';
 import { DropZoneProvider, SlotFillProvider } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
@@ -16,6 +14,7 @@ import { withDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
+import { traverse, wrap, urlRewrite } from '../../editor-styles';
 import RichTextProvider from '../rich-text/provider';
 
 class EditorProvider extends Component {
@@ -37,15 +36,14 @@ class EditorProvider extends Component {
 		map( this.props.settings.styles, ( { css, baseURL } ) => {
 			const transforms = [ wrap( '.editor-block-list__block' ) ];
 			if ( baseURL ) {
-				transforms.push( urlReplace( { baseURL } ) );
+				transforms.push( urlRewrite( baseURL ) );
 			}
-			postcss( transforms )
-				.process( css, { from: 'src/app.css', to: 'dest/app.css' } )
-				.then( ( output ) => {
-					const node = document.createElement( 'style' );
-					node.innerHTML = output;
-					document.body.appendChild( node );
-				} );
+			const updatedCSS = traverse( css, compose( transforms ) );
+			if ( updatedCSS ) {
+				const node = document.createElement( 'style' );
+				node.innerHTML = updatedCSS;
+				document.body.appendChild( node );
+			}
 		} );
 	}
 
