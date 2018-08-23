@@ -9,9 +9,9 @@ exports[`adding blocks Should insert content using the placeholder and the regul
 <blockquote class=\\"wp-block-quote\\"><p>Quote block</p></blockquote>
 <!-- /wp:quote -->
 
-<!-- wp:image -->
-<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
-<!-- /wp:image -->
+<!-- wp:separator -->
+<hr class=\\"wp-block-separator\\"/>
+<!-- /wp:separator -->
 
 <!-- wp:paragraph -->
 <p></p>

@@ -30,10 +30,10 @@ describe( 'adding blocks', () => {
 		await page.keyboard.press( 'ArrowDown' );
 
 		// Focus should be moved to block focus boundary on a block which does
-		// not have its own inputs (e.g. image). Proceeding to press enter will
+		// not have its own inputs (e.g. separator). Proceeding to press enter will
 		// append the default block. Pressing backspace on the focused block
 		// will remove it.
-		await page.keyboard.type( '/image' );
+		await page.keyboard.type( '/separator' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
