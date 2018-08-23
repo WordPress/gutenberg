@@ -1,7 +1,7 @@
 buildscript {
     ext {
         gradlePluginVersion = '3.0.1'
-        kotlinVersion = '1.2.31'
+        kotlinVersion = '1.2.61'
         supportLibVersion = '27.1.1'
         tagSoupVersion = '1.2.1'
         glideVersion = '3.7.0'
@@ -9,7 +9,7 @@ buildscript {
         robolectricVersion = '3.5.1'
         jUnitVersion = '4.12'
         jSoupVersion = '1.10.3'
-        wordpressUtilsVersion = '1.20.2'
+        wordpressUtilsVersion = '1.22'
         espressoVersion = '3.0.1'
     }
 
@@ -19,7 +19,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.1'
+        classpath 'com.android.tools.build:gradle:3.1.4'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     }
 
