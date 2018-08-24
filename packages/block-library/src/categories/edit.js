@@ -203,10 +203,12 @@ class CategoriesEdit extends Component {
 }
 
 export default withSelect( ( select ) => {
-	const { getCategories, isRequestingCategories } = select( 'core' );
+	const { getEntityRecords } = select( 'core' );
+	const { isResolving } = select( 'core/data' );
+	const query = { per_page: -1 };
 
 	return {
-		categories: getCategories(),
-		isRequesting: isRequestingCategories(),
+		categories: getEntityRecords( 'taxonomy', 'category', query ),
+		isRequesting: isResolving( 'core', 'getEntityRecords', 'taxonomy', 'category', query ),
 	};
 } )( CategoriesEdit );
