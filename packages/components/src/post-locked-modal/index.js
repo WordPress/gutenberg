@@ -7,11 +7,11 @@ import { Component, Fragment } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import {
 	PostPreviewButton,
-} from '../post-preview-button';
-
+} from '@wordpress/editor';
+import './style.scss';
 import { addQueryArgs } from '@wordpress/url';
-import { getPostEditURL } from '../../../../../edit-post/components/browser-url';
-import { getWPAdminURL } from '../../../src/utils/url';
+import { getPostEditURL } from '../../../../edit-post/components/browser-url';
+import { getWPAdminURL } from '../../../editor/src/utils/url';
 
 class PostLockedModal extends Component {
 	constructor() {
@@ -69,19 +69,23 @@ class PostLockedModal extends Component {
 								{
 									this.takeover ?
 										<p>
-											<a href={ getWPAdminURL( 'edit.php' ) } className={ 'button' }>
+											<a href={ getWPAdminURL( 'edit.php' ) }>
 												{ __( 'View all posts' ) }
 											</a>
 										</p> :
-										<a href={ allPosts } className={ 'button' }>
-											{ __( 'All Posts' ) }
+										<a href={ allPosts } >
+											<button className={ 'button' } >
+												{ __( 'All Posts' ) }
+											</button>
 										</a>
 								}
 								{ ! this.takeover &&
 									<span>
 										<PostPreviewButton />
-										<a href={ unlockUrl } className={ 'button button-primary' }>
-											{ __( 'Take Over' ) }
+										<a href={ unlockUrl }>
+											<button className="button button-primary" >
+												{ __( 'Take Over' ) }
+											</button>
 										</a>
 									</span>
 								}
