@@ -1353,8 +1353,6 @@ export function getSuggestedPostFormat( state ) {
 		case 'core/image':
 			return 'image';
 		case 'core/quote':
-		case 'core/pullquote':
-			return 'quote';
 		case 'core/gallery':
 			return 'gallery';
 		case 'core/video':
