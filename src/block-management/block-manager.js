@@ -172,8 +172,9 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		this.props.onChange( clientId, attributes );
 	}
 
-	render() {
+	renderList() {
 		let list;
+		const behavior = Platform.OS === 'ios' ? 'padding' : null;
 		if ( Platform.OS === 'android' ) {
 			list = (
 				<RecyclerViewList
@@ -199,7 +200,15 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				/>
 			);
 		}
+		return (
+			<KeyboardAvoidingView style={ { flex: 1 } } behavior={ behavior }>
+				{ list }
+			</KeyboardAvoidingView>
+		);
+	}
 
+	render() {	
+		const list = this.renderList();
 		const blockTypePicker = (
 			<BlockPicker
 				visible={ this.state.blockTypePickerVisible }
@@ -222,9 +231,9 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 						value={ this.state.showHtml }
 						onValueChange={ this.handleSwitchEditor }
 					/>
-				</View>
+				</View>				
 				{ this.state.showHtml && this.renderHTML() }
-				{ ! this.state.showHtml && list }
+				{ ! this.state.showHtml && list }				
 				{ blockTypePicker }
 			</View>
 		);
