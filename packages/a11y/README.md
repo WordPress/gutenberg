@@ -10,6 +10,8 @@ Install the module
 npm install @wordpress/a11y --save
 ```
 
+_This package assumes that your code will run in an ES5 environment. If you're using an environment that has limited or no support for ES5 such as lower versions of IE then using [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+
 ## speak
 
 Allows you to easily announce dynamic interface updates to screen readers using ARIA live regions. This module is inspired by the `speak` function in wp-a11y.js

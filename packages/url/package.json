@@ -20,7 +20,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "7.0.0-rc.1",
+		"@babel/runtime": "7.0.0-rc.2",
 		"qs": "^6.5.2s"
 	},
 	"publishConfig": {

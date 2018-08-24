@@ -24,7 +24,7 @@
 	],
 	"main": "index.js",
 	"dependencies": {
-		"@babel/runtime": "7.0.0-rc.1"
+		"@babel/runtime": "7.0.0-rc.2"
 	},
 	"devDependencies": {
 		"benchmark": "^2.1.4",
