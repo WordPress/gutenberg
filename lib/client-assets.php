@@ -549,6 +549,20 @@ function gutenberg_register_scripts_and_styles() {
 	);
 
 	wp_register_script(
+		'wp-plugins',
+		gutenberg_url( 'build/plugins/index.js' ),
+		array(
+			'lodash',
+			'wp-components',
+			'wp-compose',
+			'wp-data',
+			'wp-element',
+			'wp-hooks',
+		),
+		filemtime( gutenberg_dir_path() . 'build/plugins/index.js' )
+	);
+
+	wp_register_script(
 		'wp-editor',
 		gutenberg_url( 'build/editor/index.js' ),
 		array(
@@ -636,7 +650,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_style(
 		'wp-edit-post',
 		gutenberg_url( 'build/edit-post/style.css' ),
-		array( 'wp-components', 'wp-editor', 'wp-edit-blocks', 'wp-block-library', 'wp-nux' ),
+		array( 'wp-components', 'wp-editor', 'wp-edit-blocks', 'wp-block-library', 'wp-nux', 'wp-plugins' ),
 		filemtime( gutenberg_dir_path() . 'build/edit-post/style.css' )
 	);
 	wp_style_add_data( 'wp-edit-post', 'rtl', 'replace' );
@@ -679,19 +693,20 @@ function gutenberg_register_scripts_and_styles() {
 	wp_style_add_data( 'wp-nux', 'rtl', 'replace' );
 
 	wp_register_style(
+		'wp-plugins',
+		gutenberg_url( 'build/plugins/style.css' ),
+		array( 'wp-components' ),
+		filemtime( gutenberg_dir_path() . 'build/plugins/style.css' )
+	);
+	wp_style_add_data( 'wp-plugins', 'rtl', 'replace' );
+
+	wp_register_style(
 		'wp-block-library-theme',
 		gutenberg_url( 'build/block-library/theme.css' ),
 		array(),
 		filemtime( gutenberg_dir_path() . 'build/block-library/theme.css' )
 	);
 	wp_style_add_data( 'wp-block-library-theme', 'rtl', 'replace' );
-
-	wp_register_script(
-		'wp-plugins',
-		gutenberg_url( 'build/plugins/index.js' ),
-		array( 'lodash', 'wp-element', 'wp-hooks', 'wp-compose' ),
-		filemtime( gutenberg_dir_path() . 'build/plugins/index.js' )
-	);
 
 	if ( defined( 'GUTENBERG_LIVE_RELOAD' ) && GUTENBERG_LIVE_RELOAD ) {
 		$live_reload_url = ( GUTENBERG_LIVE_RELOAD === true ) ? 'http://localhost:35729/livereload.js' : GUTENBERG_LIVE_RELOAD;
