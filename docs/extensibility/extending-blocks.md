@@ -186,7 +186,7 @@ wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-data-align', withDa
 Adding blocks is easy enough, removing them is as easy. Plugin or theme authors have the possibility to "unregister" blocks.
 
 ```js
-// myp-lugin.js
+// my-plugin.js
 
 wp.blocks.unregisterBlockType( 'core/verse' );
 ```
