@@ -5,4 +5,5 @@
  - [**core/editor**: The Editor’s Data](../../docs/data/data-core-editor.md)
  - [**core/edit-post**: The Editor’s UI Data](../../docs/data/data-core-edit-post.md)
  - [**core/nux**: The NUX (New User Experience) Data](../../docs/data/data-core-nux.md)
+ - [**core/plugins**: The Plugins Data](../../docs/data/data-core-plugins.md)
  - [**core/viewport**: The Viewport Data](../../docs/data/data-core-viewport.md)

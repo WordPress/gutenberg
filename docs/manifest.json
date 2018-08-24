@@ -834,6 +834,12 @@
 		"parent": "data"
 	},
 	{
+		"title": "The Plugins Data",
+		"slug": "data-core-plugins",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-plugins.md",
+		"parent": "data"
+	},
+	{
 		"title": "The Viewport Data",
 		"slug": "data-core-viewport",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-viewport.md",

@@ -128,20 +128,6 @@ Returns whether the given feature is enabled or not.
 
 Is active.
 
-### isPluginItemPinned
-
-Returns true if the plugin item is pinned to the header.
-When the value is not set it defaults to true.
-
-*Parameters*
-
- * state: Global application state.
- * pluginName: Plugin item name.
-
-*Returns*
-
-Whether the plugin item is pinned.
-
 ### getMetaBoxes
 
 Returns the state of legacy meta boxes.
@@ -234,14 +220,6 @@ Returns an action object used to toggle a feature flag.
 *Parameters*
 
  * feature: Feature name.
-
-### togglePinnedPluginItem
-
-Returns an action object used to toggle a plugin name flag.
-
-*Parameters*
-
- * pluginName: Plugin name.
 
 ### initializeMetaBoxState
 
