@@ -5,3 +5,4 @@ import { createElement } from '@wordpress/element';
 
 export const Path = ( props ) => createElement( 'path', props );
 export const SVG = ( props ) => createElement( 'svg', props );
+export const G = ( props ) => createElement( 'g', props );
