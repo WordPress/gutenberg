@@ -34,6 +34,7 @@ class PlaylistEdit extends Component {
 		this.uploadFromFiles = this.uploadFromFiles.bind( this );
 		this.onUploadFiles = this.onUploadFiles.bind( this );
 		this.onSelectMedia = this.onSelectMedia.bind( this );
+		this.getMimeBaseType = this.getMimeBaseType.bind( this );
 	}
 
 	/**
@@ -50,13 +51,13 @@ class PlaylistEdit extends Component {
 		this.onUploadFiles( event.target.files );
 	}
 
-	onUploadFiles( files ) {
-		function getMimeBaseType( type ) {
-			return type.split( '/' )[ 0 ];
-		}
+	getMimeBaseType( type ) {
+		return type.split( '/' )[ 0 ];
+	}
 
+	onUploadFiles( files ) {
 		const { setAttributes, noticeOperations } = this.props;
-		const isConsistentType = uniqBy( files, ( file ) => getMimeBaseType( file.type ) ).length === 1;
+		const isConsistentType = uniqBy( files, ( file ) => this.getMimeBaseType( file.type ) ).length === 1;
 		if ( ! isConsistentType ) {
 			noticeOperations.createErrorNotice( 'Cannot have mixed types in a Playlist Block' );
 			setAttributes( { ids: undefined, type: undefined } );
