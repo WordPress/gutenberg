@@ -21,12 +21,20 @@ import { children } from '@wordpress/blocks';
 import FormatToolbar from './format-toolbar';
 import { FORMATTING_CONTROLS } from './formatting-controls';
 
+export function getFormatValue( formatName ) {
+	if ( 'link' === formatName ) {
+		//TODO: Implement link command
+	}
+	return { isActive: true };
+}
+
 export class RichText extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onChange = this.onChange.bind( this );
 		this.onContentSizeChange = this.onContentSizeChange.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
+		this.onActiveFormatsChange = this.onActiveFormatsChange.bind( this );
 		this.state = {
 			formats: {},
 			selectedNodeId: 0,
@@ -35,6 +43,17 @@ export class RichText extends Component {
 		this.lastEventCount = 0;
 	}
 
+	onActiveFormatsChange( formats ) {
+		const newFormats = formats.reduce( ( accFormats, activeFormat ) => {
+			accFormats[ activeFormat ] = getFormatValue( activeFormat );
+			return accFormats;
+		}, {} );
+
+		this.setState( {
+			formats: merge( {}, newFormats ),
+			selectedNodeId: this.state.selectedNodeId + 1,
+		} );
+	}
 	/**
 	 * Handles any case where the content of the AztecRN instance has changed.
 	 */
@@ -91,16 +110,18 @@ export class RichText extends Component {
 
 	// eslint-disable-next-line no-unused-vars
 	removeFormat( format ) {
-		//TODO: implement Aztec call to remove format
+		this._editor.applyFormat( format );
 	}
 
 	// eslint-disable-next-line no-unused-vars
 	applyFormat( format, args, node ) {
-		//TODO: implement Aztec call to apply format
+		this._editor.applyFormat( format );
 	}
 
 	changeFormats( formats ) {
+		const newStateFormats = {};
 		forEach( formats, ( formatValue, format ) => {
+			newStateFormats[ format ] = getFormatValue( format );
 			const isActive = this.isFormatActive( format );
 			if ( isActive && ! formatValue ) {
 				this.removeFormat( format );
@@ -110,7 +131,7 @@ export class RichText extends Component {
 		} );
 
 		this.setState( ( state ) => ( {
-			formats: merge( {}, state.formats, formats ),
+			formats: merge( {}, state.formats, newStateFormats ),
 		} ) );
 	}
 
@@ -139,9 +160,14 @@ export class RichText extends Component {
 			<View>
 				{ formatToolbar }
 				<RCTAztecView
+					ref={ ( ref ) => {
+						this._editor = ref;
+					}
+					}
 					text={ { text: html, eventCount: eventCount } }
 					onChange={ this.onChange }
 					onContentSizeChange={ this.onContentSizeChange }
+					onActiveFormatsChange={ this.onActiveFormatsChange }
 					color={ 'black' }
 					maxImagesWidth={ 200 }
 					style={ style }
