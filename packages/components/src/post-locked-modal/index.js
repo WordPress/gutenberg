@@ -19,7 +19,6 @@ class PostLockedModal extends Component {
 		this.state = {
 			isOpen: true,
 		};
-		this.takeOverPost = this.takeOverPost.bind( this );
 		const { lockDetails, user } = this.props;
 
 		if ( lockDetails && lockDetails.text ) {
@@ -33,7 +32,7 @@ class PostLockedModal extends Component {
 		}
 	}
 
-	takeOverPost() {
+	render() {
 		const { lockNonce, id } = this.props;
 		const unlockUrl = addQueryArgs( getPostEditURL(), {
 			'get-post-lock': '1',
@@ -41,14 +40,8 @@ class PostLockedModal extends Component {
 			lockKey: true,
 			post: id,
 		} );
-		document.location = unlockUrl;
-	}
+		const allPosts = getWPAdminURL( 'edit.php' );
 
-	allPosts() {
-		document.location = getWPAdminURL( 'edit.php' );
-	}
-
-	render() {
 		return (
 			<Fragment>
 				{
@@ -76,27 +69,25 @@ class PostLockedModal extends Component {
 								</div>
 								{
 									this.takeover ?
-										<p><a
-											href={ getWPAdminURL( 'edit.php' ) }
-										>
-											{ __( 'View all posts' ) }
-										</a></p> :
-										<button
-											className={ 'button' }
-											onClick={ this.allPosts }
-										>
-											{ __( 'All Posts' ) }
-										</button>
+										<p>
+											<a href={ getWPAdminURL( 'edit.php' ) }>
+												{ __( 'View all posts' ) }
+											</a>
+										</p> :
+										<a href={ allPosts } >
+											<button className={ 'button' } >
+												{ __( 'All Posts' ) }
+											</button>
+										</a>
 								}
 								{ ! this.takeover &&
 									<span>
 										<PostPreviewButton />
-										<button
-											className="button button-primary"
-											onClick={ this.takeOverPost }
-										>
-											{ __( 'Take Over' ) }
-										</button>
+										<a href={ unlockUrl }>
+											<button className="button button-primary" >
+												{ __( 'Take Over' ) }
+											</button>
+										</a>
 									</span>
 								}
 							</span>
