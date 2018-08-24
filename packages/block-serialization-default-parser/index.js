@@ -2,7 +2,7 @@ let document;
 let offset;
 let output;
 let stack;
-const tokenizer = /<!--\s+(?<closer>\/)?wp:(?<namespace>[a-z][a-z0-9_-]*\/)?(?<name>[a-z][a-z0-9_-]*)\s+(?<attrs>{(?:(?!}\s+-->)[^])+}\s+)?(?<void>\/)?-->/g;
+const tokenizer = /<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:(?!}\s+-->)[^])+}\s+)?(\/)?-->/g;
 
 class Block {
 	constructor( name, attrs, innerBlocks, innerHTML ) {
