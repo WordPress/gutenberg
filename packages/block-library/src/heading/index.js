@@ -21,7 +21,7 @@ import { RichText } from '@wordpress/editor';
  */
 import edit from './edit';
 import { Path, SVG } from '@wordpress/components';
-// 
+
 /**
  * Given a node name string for a heading node, returns its numeric level.
  *
