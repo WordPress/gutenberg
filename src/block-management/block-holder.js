@@ -1,7 +1,7 @@
 /**
- * @format
- * @flow
- */
+* @format
+* @flow
+*/
 
 import React from 'react';
 import { View, Text, TouchableWithoutFeedback } from 'react-native';
@@ -15,6 +15,7 @@ import styles from './block-holder.scss';
 import { getBlockType, getUnknownTypeHandlerName } from '@wordpress/blocks';
 
 type PropsType = BlockType & {
+	showTitle: boolean,
 	onChange: ( clientId: string, attributes: mixed ) => void,
 	onToolbarButtonPressed: ( button: number, clientId: string ) => void,
 	onBlockHolderPressed: ( clientId: string ) => void,
@@ -56,9 +57,9 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 
 		let style;
 		if ( blockType.name === 'core/code' ) {
-			style = styles.block_code;
+			style = styles.blockCode;
 		} else if ( blockType.name === 'core/paragraph' ) {
-			style = styles[ 'aztec_editor' ];
+			style = styles.blockText;
 		}
 
 		// TODO: setAttributes needs to change the state/attributes
@@ -86,15 +87,21 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 		return blockType;
 	}
 
+	renderBlockTitle() {
+		return (
+			<View style={ styles.blockTitle }>
+				<Text>BlockType: { this.props.name }</Text>
+			</View>
+		);
+	}
+
 	render() {
 		return (
 			<TouchableWithoutFeedback
 				onPress={ this.props.onBlockHolderPressed.bind( this, this.props.clientId ) }
 			>
 				<View style={ styles.blockHolder }>
-					<View style={ styles.blockTitle }>
-						<Text>BlockType: { this.props.name }</Text>
-					</View>
+					{ this.props.showTitle && this.renderBlockTitle() }
 					<View style={ styles.blockContainer }>{ this.getBlockForType.bind( this )() }</View>
 					{ this.renderToolbarIfBlockFocused.bind( this )() }
 				</View>
