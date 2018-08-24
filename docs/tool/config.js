@@ -44,6 +44,11 @@ module.exports = {
 			selectors: [ path.resolve( root, 'packages/nux/src/store/selectors.js' ) ],
 			actions: [ path.resolve( root, 'packages/nux/src/store/actions.js' ) ],
 		},
+		'core/plugins': {
+			title: 'The Plugins Data',
+			selectors: [ path.resolve( root, 'packages/plugins/src/store/selectors.js' ) ],
+			actions: [ path.resolve( root, 'packages/plugins/src/store/actions.js' ) ],
+		},
 		'core/viewport': {
 			title: 'The Viewport Data',
 			selectors: [ path.resolve( root, 'packages/viewport/src/store/selectors.js' ) ],

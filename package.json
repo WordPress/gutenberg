@@ -202,7 +202,7 @@
 		"*.js": [
 			"eslint"
 		],
-		"{docs/{root-manifest.json,tool/*.js},packages/{*/README.md,*/src/{actions,selectors}.js,components/src/*/README.md}}": [
+		"{docs/{root-manifest.json,tool/*.js},packages/{*/README.md,*/src/store/{actions,selectors}.js,components/src/*/README.md}}": [
 			"npm run docs:build"
 		]
 	}
