@@ -15,12 +15,15 @@ import {
 	children,
 } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
+import {
+	Path,
+	SVG
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import edit from './edit';
-import { Path, SVG } from '@wordpress/components';
 
 /**
  * Given a node name string for a heading node, returns its numeric level.

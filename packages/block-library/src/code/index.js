@@ -3,12 +3,15 @@
  */
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
+import {
+	Path,
+	SVG
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import edit from './edit';
-import { Path, SVG } from '@wordpress/components';
 
 export const name = 'core/code';
 

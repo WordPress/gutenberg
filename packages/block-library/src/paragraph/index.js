@@ -20,12 +20,15 @@ import {
 	getPhrasingContentSchema,
 	children,
 } from '@wordpress/blocks';
+import {
+	Path,
+	SVG
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import edit from './edit';
-import { Path, SVG } from '@wordpress/components';
 
 const supports = {
 	className: false,

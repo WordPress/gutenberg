@@ -9,12 +9,16 @@ import { compact } from 'lodash';
 import { __, _x } from '@wordpress/i18n';
 import { RawHTML } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
+import {
+	Path,
+	G,
+	SVG
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import edit from './edit';
-import { Path, G, SVG } from '@wordpress/components';
 
 export const name = 'core/more';
 
