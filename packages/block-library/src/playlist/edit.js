@@ -97,8 +97,6 @@ class PlaylistEdit extends Component {
 			}
 		};
 
-		const mediaIds = this.props.attributes.ids;
-
 		if ( isEditing ) {
 			return (
 				<Placeholder
@@ -121,7 +119,7 @@ class PlaylistEdit extends Component {
 						type={ type }
 						multiple
 						playlist
-						value={ this.props.attributes.ids }
+						value={ attributes.ids }
 						render={ ( { open } ) => (
 							<IconButton
 								isLarge
@@ -146,7 +144,7 @@ class PlaylistEdit extends Component {
 							type={ type }
 							multiple
 							playlist
-							value={ mediaIds }
+							value={ attributes.ids }
 							render={ ( { open } ) => (
 								<IconButton
 									className="components-toolbar__control"
