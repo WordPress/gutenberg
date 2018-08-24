@@ -30,9 +30,9 @@ class ReusableBlockEdit extends Component {
 		this.registry = defaultRegistry.clone();
 		createStore( this.registry );
 
-		const { reusableBlock, settings } = props;
+		const { isTemporaryReusableBlock, settings } = props;
 		this.state = {
-			isEditing: !! ( reusableBlock && reusableBlock.isTemporary ),
+			isEditing: isTemporaryReusableBlock,
 			settingsWithLock: { ...settings, templateLock: true },
 			reusableBlockInstanceId: 0,
 		};
@@ -132,13 +132,16 @@ class ReusableBlockEdit extends Component {
 export default compose( [
 	withSelect( ( select, ownProps ) => {
 		const { ref } = ownProps.attributes;
-		if ( ! Number.isFinite( ref ) ) {
-			return;
+		const isTemporaryReusableBlock = ! Number.isFinite( ref );
+
+		let reusableBlock = null;
+		if ( ! isTemporaryReusableBlock ) {
+			reusableBlock = select( 'core' ).getEntityRecord( 'postType', 'wp_block', ref );
 		}
 
-		const { getEntityRecord } = select( 'core' );
 		return {
-			reusableBlock: getEntityRecord( 'postType', 'wp_block', ref ),
+			isTemporaryReusableBlock,
+			reusableBlock,
 			settings: select( 'core/editor' ).getEditorSettings(),
 		};
 	} ),
