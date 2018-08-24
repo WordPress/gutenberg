@@ -4,7 +4,7 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { Modal } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
-import { select } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 import {
 	PostPreviewButton,
 } from '@wordpress/editor';
@@ -19,17 +19,14 @@ class PostLockedModal extends Component {
 		this.state = {
 			isOpen: true,
 		};
-
 		this.takeOverPost = this.takeOverPost.bind( this );
-		const { getLockDetails, getPostLockUser } = select( 'core/editor' );
-		const lockDetails = getLockDetails();
+		const { lockDetails, user } = this.props;
 
 		if ( lockDetails && lockDetails.text ) {
 			this.modalText = lockDetails.text;
 			this.avatar = lockDetails.avatar_src;
 			this.takeover = true;
 		} else {
-			const user = getPostLockUser();
 			const displayName = ( user && user.data ) ? user.data.display_name : __( 'Another user' );
 			this.modalText = sprintf( __( '%s is already editing this post. Do you want to take over?' ), displayName );
 			this.avatar = user.data.avatar_src;
@@ -37,9 +34,7 @@ class PostLockedModal extends Component {
 	}
 
 	takeOverPost() {
-		const { getEditorSettings, getCurrentPost } = select( 'core/editor' );
-		const { lockNonce } = getEditorSettings();
-		const { id } = getCurrentPost();
+		const { lockNonce, id } = this.props;
 		const unlockUrl = addQueryArgs( getPostEditURL(), {
 			'get-post-lock': '1',
 			_wpnonce: lockNonce,
@@ -113,4 +108,11 @@ class PostLockedModal extends Component {
 	}
 }
 
-export default PostLockedModal;
+export default withSelect( ( select ) => {
+	return {
+		lockDetails: select( 'core/editor' ).getLockDetails(),
+		user: select( 'core/editor' ).getPostLockUser(),
+		id: select( 'core/editor' ).getCurrentPost().id,
+		lockNonce: select( 'core/editor' ).getEditorSettings().lockNonce,
+	};
+} )( PostLockedModal );
