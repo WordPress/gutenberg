@@ -1,5 +1,6 @@
 .editor-block-switcher {
 	position: relative;
+	height: $icon-button-size;
 }
 
 // Style this the same as the block buttons in the library.
@@ -20,26 +21,35 @@
 	}
 
 	.editor-block-icon {
-		background: $light-gray-200;
 		height: $icon-button-size-small;
 		margin: 0;
 		padding: 0 6px;
 		display: flex;
 		align-items: center;
-
-		svg {
-			height: 21px;
-			width: 21px;
-		}
 	}
 
 	// Block hover style.
-	&:not(:disabled):hover .editor-block-icon {
+	&:not(:disabled):hover {
 		@include block-style__hover();
+
+		// Paint a dropdown arrow.
+		&::after {
+			content: "";
+			pointer-events: none;
+			display: block;
+			position: absolute;
+			right: 6px;
+			top: $icon-button-size / 2;
+			width: 0;
+			height: 0;
+			border-left: 3px solid transparent;
+			border-right: 3px solid transparent;
+			border-top: 4px solid $light-gray-700;
+		}
 	}
 
 	// Block focus style.
-	&:not(:disabled):focus .editor-block-icon {
+	&:not(:disabled):focus {
 		@include block-style__focus-active();
 	}
 }
