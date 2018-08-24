@@ -1,7 +1,7 @@
 .editor-default-block-appender {
 	clear: both; // The appender doesn't scale well to sit next to floats, so clear them.
 
-	input[type="text"].editor-default-block-appender__content { // Needs specificity in order to override upstream input field styles.
+	input[type="text"].editor-default-block-appender__content { // Needs specificity in order to override input field styles from WP-admin styles.
 		font-family: $editor-font;
 		font-size: $editor-font-size; // It should match the default paragraph size.
 		border: none;
