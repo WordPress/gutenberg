@@ -4,12 +4,15 @@
 	color: $dark-gray-500;
 	right: 0;
 	left: auto;
-	padding: 32px; // We're doubling standard padding to make it feel a bit more spacious.
+	padding: 32px 32px 18px; // We're doubling standard padding to make it feel a bit more spacious.
 	width: 420px;
 	max-width: calc(100% - 20px);
+	display: flex;
+	flex-direction: column;
+	justify-content: normal;
 }
 
-// Loading spinner?
+// Spinner shows whilst publishing. Maybe we should change it.
 .editor-post-publish-panel__content {
 	.components-spinner {
 		display: block;
@@ -81,8 +84,8 @@
 	}
 }
 
-// Panel footer (publish button)
-.editor-post-publish-panel__footer {
+// Action buttons (used for publishing button and flow)
+.editor-post-publish-panel__action-buttons {
 	padding: 32px;
 	text-align: center;
 }
@@ -119,6 +122,11 @@
 	.components-clipboard-button {
 		width: 100%;
 	}
+}
+
+// Checkbox to disable pre-publish panel.
+.editor-post-publish-panel__disable-check {
+	margin-top: auto; // Since our parent container uses flexbox, this floats the checkmark to the bottom of the screen.
 }
 
 // A toggle of some sort? May not be needed anymore.
