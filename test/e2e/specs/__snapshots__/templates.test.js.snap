@@ -30,7 +30,7 @@ exports[`templates Using a CPT with a predefined template Should add a custom po
 
 exports[`templates Using a CPT with a predefined template Should respect user edits to not re-apply template after save (full delete) 1`] = `""`;
 
-exports[`templates Using a CPT with a predefined template Should respect user edits to not re-apply template after save 1`] = `
+exports[`templates Using a CPT with a predefined template Should respect user edits to not re-apply template after save (single block removal) 1`] = `
 "<!-- wp:paragraph {\\"placeholder\\":\\"Add a book description\\"} -->
 <p></p>
 <!-- /wp:paragraph -->
