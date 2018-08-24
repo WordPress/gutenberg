@@ -1402,7 +1402,13 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	// Editor Styles.
 	global $editor_styles;
-	$styles = array();
+	$styles = array(
+		array(
+			'css' => file_get_contents(
+				gutenberg_dir_path() . 'build/editor/editor-styles.css'
+			),
+		),
+	);
 	if ( $editor_styles && current_theme_supports( 'editor-styles' ) ) {
 		foreach ( $editor_styles as $style ) {
 			if ( filter_var( $style, FILTER_VALIDATE_URL ) ) {

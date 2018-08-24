@@ -93,14 +93,6 @@
 }
 
 .editor-block-list__block {
-	font-family: $editor-font;
-	line-height: $editor-line-height;
-	color: $dark-gray-700;
-
-	p {
-		font-size: $editor-font-size;
-	}
-
 	&.is-hidden *,
 	&.is-hidden > * {
 		visibility: hidden;
