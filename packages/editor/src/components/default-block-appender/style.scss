@@ -40,17 +40,15 @@
 		}
 	}
 
-	&:hover .editor-inserter-with-shortcuts {
-		opacity: 1;
+	// Don't show the inserter until mousing over.
+	.editor-inserter__toggle:not([aria-expanded="true"]) {
+		opacity: 0;
 	}
-
-	// Show the inserter if mousing over or there is a tip.
-	&:not(.has-tip) {
-		.editor-inserter__toggle:not([aria-expanded="true"]) {
-			opacity: 0;
+	&:hover {
+		.editor-inserter-with-shortcuts {
+			opacity: 1;
 		}
-
-		&:hover .editor-inserter__toggle {
+		.editor-inserter__toggle {
 			opacity: 1;
 		}
 	}
