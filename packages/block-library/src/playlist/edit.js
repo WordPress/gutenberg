@@ -36,6 +36,12 @@ class PlaylistEdit extends Component {
 		this.onSelectMedia = this.onSelectMedia.bind( this );
 	}
 
+	/**
+	* The function is used after the editor has enqueued playlist dependencies.
+	*
+	* @param  {function} initializePlaylist Function that Initializes playlist
+	*/
+
 	initializePlaylist() {
 		window.wp.playlist.initialize();
 	}
