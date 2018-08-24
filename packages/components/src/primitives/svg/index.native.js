@@ -9,15 +9,15 @@ import {
 } from 'react-native-svg';
 
 export {
-    G,
-    Path,
+	G,
+	Path,
 };
 
 export const SVG = ( props ) => {
-	// for some reason if a `className` prop is passed it gets converted to `style` here. 
+	// for some reason if a `className` prop is passed it gets converted to `style` here.
 	// Given it carries a string (as it was originally className) but an object is expected for `style`,
 	// we need to check whether `style` exists and is a string, and strip in that case.
-	const safeProps = ( typeof props.style === 'string' || props.style instanceof String ) ? { ...omit( props, [ 'style', 'className' ]) } : { ...omit( props, [ 'className' ] ) };
+	const safeProps = ( typeof props.style === 'string' || props.style instanceof String ) ? { ...omit( props, [ 'style', 'className' ] ) } : { ...omit( props, [ 'className' ] ) };
 	if ( safeProps.width !== undefined && safeProps.height !== undefined ) {
 		return (
 			<Svg { ...safeProps } />

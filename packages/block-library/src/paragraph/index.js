@@ -22,7 +22,7 @@ import {
 } from '@wordpress/blocks';
 import {
 	Path,
-	SVG
+	SVG,
 } from '@wordpress/components';
 
 /**

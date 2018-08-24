@@ -12,7 +12,7 @@ import { createBlock } from '@wordpress/blocks';
 import {
 	Path,
 	G,
-	SVG
+	SVG,
 } from '@wordpress/components';
 
 /**

@@ -17,7 +17,7 @@ import {
 import { RichText } from '@wordpress/editor';
 import {
 	Path,
-	SVG
+	SVG,
 } from '@wordpress/components';
 
 /**
