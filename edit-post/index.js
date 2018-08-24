@@ -4,6 +4,7 @@
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import { dispatch } from '@wordpress/data';
+import '@wordpress/plugins';
 
 /**
  * Internal dependencies

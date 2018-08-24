@@ -11,6 +11,7 @@ import {
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { DotTip } from '@wordpress/nux';
+import { PinnedPlugins } from '@wordpress/plugins';
 
 /**
  * Internal dependencies
@@ -18,7 +19,6 @@ import { DotTip } from '@wordpress/nux';
 import './style.scss';
 import MoreMenu from './more-menu';
 import HeaderToolbar from './header-toolbar';
-import PinnedPlugins from './pinned-plugins';
 import shortcuts from '../../keyboard-shortcuts';
 
 function Header( {

@@ -5,13 +5,12 @@ import { IconButton, Panel } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { withPluginContext } from '@wordpress/plugins';
+import { PinnedPlugins, withPluginContext } from '@wordpress/plugins';
 import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import PinnedPlugins from '../../header/pinned-plugins';
 import Sidebar from '../';
 import SidebarHeader from '../sidebar-header';
 
@@ -82,10 +81,8 @@ export default compose(
 		};
 	} ),
 	withSelect( ( select, { sidebarName } ) => {
-		const {
-			getActiveGeneralSidebarName,
-			isPluginItemPinned,
-		} = select( 'core/edit-post' );
+		const { getActiveGeneralSidebarName } = select( 'core/edit-post' );
+		const { isPluginItemPinned } = select( 'core/plugins' );
 
 		return {
 			isActive: getActiveGeneralSidebarName() === sidebarName,
@@ -96,8 +93,8 @@ export default compose(
 		const {
 			closeGeneralSidebar,
 			openGeneralSidebar,
-			togglePinnedPluginItem,
 		} = dispatch( 'core/edit-post' );
+		const { togglePinnedPluginItem } = dispatch( 'core/plugins' );
 
 		return {
 			togglePin() {

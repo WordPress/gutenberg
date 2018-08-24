@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { get, includes, some } from 'lodash';
+import { includes, some } from 'lodash';
 
 /**
  * Returns the current editing mode.
@@ -134,21 +134,6 @@ export function isModalActive( state, modalName ) {
  */
 export function isFeatureActive( state, feature ) {
 	return !! state.preferences.features[ feature ];
-}
-
-/**
- * Returns true if the plugin item is pinned to the header.
- * When the value is not set it defaults to true.
- *
- * @param  {Object}  state      Global application state.
- * @param  {string}  pluginName Plugin item name.
- *
- * @return {boolean} Whether the plugin item is pinned.
- */
-export function isPluginItemPinned( state, pluginName ) {
-	const pinnedPluginItems = getPreference( state, 'pinnedPluginItems', {} );
-
-	return get( pinnedPluginItems, [ pluginName ], true );
 }
 
 /**

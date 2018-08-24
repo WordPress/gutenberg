@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
@@ -74,15 +69,6 @@ export const preferences = combineReducers( {
 			return action.mode;
 		}
 
-		return state;
-	},
-	pinnedPluginItems( state = PREFERENCES_DEFAULTS.pinnedPluginItems, action ) {
-		if ( action.type === 'TOGGLE_PINNED_PLUGIN_ITEM' ) {
-			return {
-				...state,
-				[ action.pluginName ]: ! get( state, [ action.pluginName ], true ),
-			};
-		}
 		return state;
 	},
 } );

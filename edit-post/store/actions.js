@@ -118,20 +118,6 @@ export function switchEditorMode( mode ) {
 }
 
 /**
- * Returns an action object used to toggle a plugin name flag.
- *
- * @param {string} pluginName Plugin name.
- *
- * @return {Object} Action object.
- */
-export function togglePinnedPluginItem( pluginName ) {
-	return {
-		type: 'TOGGLE_PINNED_PLUGIN_ITEM',
-		pluginName,
-	};
-}
-
-/**
  * Returns an action object used to check the state of meta boxes at a location.
  *
  * This should only be fired once to initialize meta box state. If a meta box

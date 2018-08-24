@@ -8,17 +8,12 @@ import { isEmpty } from 'lodash';
  */
 import { createSlotFill } from '@wordpress/components';
 
-/**
- * Internal dependencies
- */
-import './style.scss';
-
 const { Fill: PinnedPlugins, Slot } = createSlotFill( 'PinnedPlugins' );
 
 PinnedPlugins.Slot = ( props ) => (
 	<Slot { ...props }>
 		{ ( fills ) => ! isEmpty( fills ) && (
-			<div className="edit-post-pinned-plugins">
+			<div className="plugins-pinned-plugins">
 				{ fills }
 			</div>
 		) }
