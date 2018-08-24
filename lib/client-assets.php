@@ -554,7 +554,6 @@ function gutenberg_register_scripts_and_styles() {
 		array(
 			'lodash',
 			'tinymce-latest-lists',
-			'tinymce-latest-table',
 			'wp-a11y',
 			'wp-api-fetch',
 			'wp-blob',
@@ -794,11 +793,6 @@ function gutenberg_register_vendor_scripts() {
 	gutenberg_register_vendor_script(
 		'tinymce-latest-lists',
 		'https://unpkg.com/tinymce@' . $tinymce_version . '/plugins/lists/plugin' . $suffix . '.js',
-		array( 'wp-tinymce' )
-	);
-	gutenberg_register_vendor_script(
-		'tinymce-latest-table',
-		'https://unpkg.com/tinymce@' . $tinymce_version . '/plugins/table/plugin' . $suffix . '.js',
 		array( 'wp-tinymce' )
 	);
 	gutenberg_register_vendor_script(

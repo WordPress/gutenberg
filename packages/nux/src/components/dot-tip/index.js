@@ -1,84 +1,74 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { compose, withInstanceId } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 import { Popover, Button, IconButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 
-export class DotTip extends Component {
-	componentDidMount() {
-		this.props.onRegister();
+function getAnchorRect( anchor ) {
+	// The default getAnchorRect() excludes an element's top and bottom padding
+	// from its calculation. We want tips to point to the outer margin of an
+	// element, so we override getAnchorRect() to include all padding.
+	return anchor.parentNode.getBoundingClientRect();
+}
+
+function onClick( event ) {
+	// Tips are often nested within buttons. We stop propagation so that clicking
+	// on a tip doesn't result in the button being clicked.
+	event.stopPropagation();
+}
+
+export function DotTip( {
+	children,
+	isVisible,
+	hasNextTip,
+	onDismiss,
+	onDisable,
+} ) {
+	if ( ! isVisible ) {
+		return null;
 	}
 
-	componentWillUnmount() {
-		this.props.onUnregister();
-	}
-
-	render() {
-		const { children, isVisible, hasNextTip, onDismiss, onDisable } = this.props;
-
-		if ( ! isVisible ) {
-			return null;
-		}
-
-		return (
-			<Popover
-				className="nux-dot-tip"
-				position="middle right"
-				noArrow
-				focusOnMount="container"
-				role="dialog"
-				aria-label={ __( 'Gutenberg tips' ) }
-				onClick={ ( event ) => {
-					// Tips are often nested within buttons. We stop propagation so that clicking
-					// on a tip doesn't result in the button being clicked.
-					event.stopPropagation();
-				} }
-			>
-				<p>{ children }</p>
-				<p>
-					<Button isLink onClick={ onDismiss }>
-						{ hasNextTip ? __( 'See next tip' ) : __( 'Got it' ) }
-					</Button>
-				</p>
-				<IconButton
-					className="nux-dot-tip__disable"
-					icon="no-alt"
-					label={ __( 'Disable tips' ) }
-					onClick={ onDisable }
-				/>
-			</Popover>
-		);
-	}
+	return (
+		<Popover
+			className="nux-dot-tip"
+			position="middle right"
+			noArrow
+			focusOnMount="container"
+			getAnchorRect={ getAnchorRect }
+			role="dialog"
+			aria-label={ __( 'Gutenberg tips' ) }
+			onClick={ onClick }
+		>
+			<p>{ children }</p>
+			<p>
+				<Button isLink onClick={ onDismiss }>
+					{ hasNextTip ? __( 'See next tip' ) : __( 'Got it' ) }
+				</Button>
+			</p>
+			<IconButton
+				className="nux-dot-tip__disable"
+				icon="no-alt"
+				label={ __( 'Disable tips' ) }
+				onClick={ onDisable }
+			/>
+		</Popover>
+	);
 }
 
 export default compose(
-	withInstanceId,
-	withSelect( ( select, { id, instanceId } ) => {
+	withSelect( ( select, { id } ) => {
 		const { isTipVisible, getAssociatedGuide } = select( 'core/nux' );
 		const associatedGuide = getAssociatedGuide( id );
 		return {
-			isVisible: isTipVisible( id, instanceId ),
+			isVisible: isTipVisible( id ),
 			hasNextTip: !! ( associatedGuide && associatedGuide.nextTipId ),
 		};
 	} ),
-	withDispatch( ( dispatch, { id, instanceId } ) => {
-		const {
-			registerTipInstance,
-			unregisterTipInstance,
-			dismissTip,
-			disableTips,
-		} = dispatch( 'core/nux' );
-
+	withDispatch( ( dispatch, { id } ) => {
+		const { dismissTip, disableTips } = dispatch( 'core/nux' );
 		return {
-			onRegister() {
-				registerTipInstance( id, instanceId );
-			},
-			onUnregister() {
-				unregisterTipInstance( id, instanceId );
-			},
 			onDismiss() {
 				dismissTip( id );
 			},

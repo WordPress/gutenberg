@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import '@wordpress/core-data';
 import {
 	registerBlockType,
 	setDefaultBlockName,

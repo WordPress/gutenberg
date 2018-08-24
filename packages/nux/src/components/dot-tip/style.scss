@@ -51,10 +51,16 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
 	}
 
 	// Position the dot right next to the edge of the button
-	&.is-left {
+	&.is-top {
+		margin-top: -$dot-size / 2;
+	}
+	&.is-bottom {
+		margin-top: $dot-size / 2;
+	}
+	&.is-middle.is-left {
 		margin-left: -$dot-size / 2;
 	}
-	&.is-right {
+	&.is-middle.is-right {
 		margin-left: $dot-size / 2;
 	}
 
