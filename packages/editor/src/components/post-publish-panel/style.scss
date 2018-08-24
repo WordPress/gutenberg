@@ -54,6 +54,32 @@
 	margin: 0;
 }
 
+.editor-post-publish-panel__prepublish {
+	strong {
+		color: $dark-gray-900;
+	}
+
+	.editor-post-visibility__dialog-legend {
+		display: none;
+	}
+
+	.editor-post-visibility__choice input[type="radio"] {
+		margin-right: 4px;
+	}
+
+	.editor-post-visibility__choice input[type="radio"] + label {
+		vertical-align: top;
+	}
+
+	.editor-post-visibility__choice {
+		padding-bottom: 8px;
+	}
+
+	.editor-post-visibility__dialog-info {
+		margin-top: 0.5em;
+	}
+}
+
 // Panel footer (publish button)
 .editor-post-publish-panel__footer {
 	padding: 32px;
