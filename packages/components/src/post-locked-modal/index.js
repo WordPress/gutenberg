@@ -48,7 +48,6 @@ class PostLockedModal extends Component {
 					this.state.isOpen ?
 						<Modal
 							title={ this.takeover ? __( 'Post taken over' ) : __( 'Post locked' ) }
-							onRequestClose={ this.closeModal }
 							focusOnMount={ true }
 							shouldCloseOnClickOutside={ false }
 							shouldCloseOnEsc={ false }
