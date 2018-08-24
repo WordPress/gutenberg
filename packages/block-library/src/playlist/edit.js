@@ -48,6 +48,11 @@ class PlaylistEdit extends Component {
 	}
 
 	uploadFromFiles( event ) {
+		const { noticeOperations } = this.props;
+		if ( ! event.target.files ) {
+			noticeOperations.createErrorNotice( 'Files list provided is empty' );
+			return;
+		}
 		this.onUploadFiles( event.target.files );
 	}
 
