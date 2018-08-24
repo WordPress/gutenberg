@@ -1,8 +1,13 @@
 /**
  * External dependencies
  */
-import { mount } from 'enzyme';
+import { create } from 'react-test-renderer';
 import { isEmpty } from 'lodash';
+
+/**
+ * WordPress Dependencies
+ */
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -10,11 +15,6 @@ import { isEmpty } from 'lodash';
 import Slot from '../slot';
 import Fill from '../fill';
 import Provider from '../provider';
-
-/**
- * WordPress Dependencies
- */
-import { Component } from '@wordpress/element';
 
 class Filler extends Component {
 	constructor() {
@@ -33,19 +33,25 @@ class Filler extends Component {
 }
 
 describe( 'Slot', () => {
+	function expectEmptyFill( wrapper ) {
+		expect( wrapper.root.findByType( Fill ).children ).toHaveLength( 0 );
+	}
+
 	it( 'should render empty Fills', () => {
-		const element = mount(
+		const wrapper = create(
 			<Provider>
 				<Slot name="chicken" />
 				<Fill name="chicken" />
 			</Provider>
 		);
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation"></div>' );
+		const slot = wrapper.root.findByType( Slot );
+		expect( slot.children ).toHaveLength( 0 );
+		expectEmptyFill( wrapper );
 	} );
 
 	it( 'should render a string Fill', () => {
-		const element = mount(
+		const wrapper = create(
 			<Provider>
 				<Slot name="chicken" />
 				<Fill name="chicken">
@@ -54,11 +60,14 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation">content</div>' );
+		const slot = wrapper.root.findByType( Slot );
+		expect( slot.children ).toHaveLength( 1 );
+		expect( slot.children[ 0 ] ).toBe( 'content' );
+		expectEmptyFill( wrapper );
 	} );
 
 	it( 'should render a Fill containing an element', () => {
-		const element = mount(
+		const wrapper = create(
 			<Provider>
 				<Slot name="chicken" />
 				<Fill name="chicken">
@@ -67,11 +76,14 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation"><span></span></div>' );
+		const slot = wrapper.root.findByType( Slot );
+		expect( slot.children ).toHaveLength( 1 );
+		expect( slot.children[ 0 ].type ).toBe( 'span' );
+		expectEmptyFill( wrapper );
 	} );
 
 	it( 'should render a Fill containing an array', () => {
-		const element = mount(
+		const wrapper = create(
 			<Provider>
 				<Slot name="chicken" />
 				<Fill name="chicken">
@@ -80,13 +92,18 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation"><span></span><div></div>text</div>' );
+		const slot = wrapper.root.findByType( Slot );
+		expect( slot.children ).toHaveLength( 3 );
+		expect( slot.children[ 0 ].type ).toBe( 'span' );
+		expect( slot.children[ 1 ].type ).toBe( 'div' );
+		expect( slot.children[ 2 ] ).toBe( 'text' );
+		expectEmptyFill( wrapper );
 	} );
 
 	it( 'calls the functions passed as the Slot’s fillProps in the Fill', () => {
 		const onClose = jest.fn();
 
-		const element = mount(
+		const wrapper = create(
 			<Provider>
 				<Slot name="chicken" fillProps={ { onClose } } />
 				<Fill name="chicken">
@@ -99,13 +116,13 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		element.find( 'button' ).simulate( 'click' );
+		wrapper.root.findByType( Slot ).findByType( 'button' ).props.onClick();
 
 		expect( onClose ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'should render empty Fills without HTML wrapper when render props used', () => {
-		const element = mount(
+		const wrapper = create(
 			<Provider>
 				<Slot name="chicken">
 					{ ( fills ) => ( ! isEmpty( fills ) && (
@@ -118,11 +135,13 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation"></div>' );
+		const slot = wrapper.root.findByType( Slot );
+		expect( slot.children ).toHaveLength( 0 );
+		expectEmptyFill( wrapper );
 	} );
 
 	it( 'should render a string Fill with HTML wrapper when render props used', () => {
-		const element = mount(
+		const wrapper = create(
 			<Provider>
 				<Slot name="chicken">
 					{ ( fills ) => ( fills && (
@@ -137,54 +156,66 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation"><blockquote>content</blockquote></div>' );
+		const slot = wrapper.root.findByType( Slot );
+		expect( slot.children ).toHaveLength( 1 );
+		expect( slot.children[ 0 ].type ).toBe( 'blockquote' );
+		expect( slot.children[ 0 ].children ).toHaveLength( 1 );
+		expect( slot.children[ 0 ].children[ 0 ] ).toBe( 'content' );
+		expectEmptyFill( wrapper );
 	} );
 
 	it( 'should re-render Slot when not bubbling virtually', () => {
-		const element = mount(
+		const wrapper = create(
 			<Provider>
 				<Slot name="egg" />
 				<Filler name="egg" />
 			</Provider>
 		);
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation">1</div>' );
+		let slot = wrapper.root.findByType( Slot );
+		expect( slot.children ).toHaveLength( 1 );
+		expect( slot.children[ 0 ] ).toBe( '1' );
 
-		element.find( 'button' ).simulate( 'click' );
+		wrapper.root.findByType( Filler ).findByType( 'button' ).props.onClick();
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation">2</div>' );
+		slot = wrapper.root.findByType( Slot );
+		expect( slot.children ).toHaveLength( 1 );
+		expect( slot.children[ 0 ] ).toBe( '2' );
 	} );
 
 	it( 'should render in expected order', () => {
-		const element = mount(
+		const wrapper = create(
 			<Provider>
 				<Slot name="egg" key="slot" />
 			</Provider>
 		);
 
-		element.setProps( {
-			children: [
-				<Slot name="egg" key="slot" />,
-				<Filler name="egg" key="first" text="first" />,
-				<Filler name="egg" key="second" text="second" />,
-			],
-		} );
+		wrapper.update(
+			<Provider>
+				<Slot name="egg" key="slot" />
+				<Filler name="egg" key="first" text="first" />
+				<Filler name="egg" key="second" text="second" />
+			</Provider>
+		);
 
-		element.setProps( {
-			children: [
-				<Slot name="egg" key="slot" />,
-				<Filler name="egg" key="second" text="second" />,
-			],
-		} );
+		wrapper.update(
+			<Provider>
+				<Slot name="egg" key="slot" />
+				<Filler name="egg" key="second" text="second" />
+			</Provider>
+		);
 
-		element.setProps( {
-			children: [
-				<Slot name="egg" key="slot" />,
-				<Filler name="egg" key="first" text="first" />,
-				<Filler name="egg" key="second" text="second" />,
-			],
-		} );
+		wrapper.update(
+			<Provider>
+				<Slot name="egg" key="slot" />
+				<Filler name="egg" key="first" text="first" />
+				<Filler name="egg" key="second" text="second" />
+			</Provider>
+		);
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation">firstsecond</div>' );
+		const slot = wrapper.root.findByType( Slot );
+		expect( slot.children ).toHaveLength( 2 );
+		expect( slot.children[ 0 ] ).toBe( 'first' );
+		expect( slot.children[ 1 ] ).toBe( 'second' );
 	} );
 } );
