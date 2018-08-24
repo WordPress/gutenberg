@@ -207,7 +207,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		);
 	}
 
-	render() {	
+	render() {
 		const list = this.renderList();
 		const blockTypePicker = (
 			<BlockPicker
@@ -231,9 +231,9 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 						value={ this.state.showHtml }
 						onValueChange={ this.handleSwitchEditor }
 					/>
-				</View>				
+				</View>
 				{ this.state.showHtml && this.renderHTML() }
-				{ ! this.state.showHtml && list }				
+				{ ! this.state.showHtml && list }
 				{ blockTypePicker }
 			</View>
 		);
