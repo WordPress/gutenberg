@@ -73,19 +73,15 @@ class PostLockedModal extends Component {
 												{ __( 'View all posts' ) }
 											</a>
 										</p> :
-										<a href={ allPosts } >
-											<button className={ 'button' } >
-												{ __( 'All Posts' ) }
-											</button>
+										<a href={ allPosts } className={ 'button' } >
+											{ __( 'All Posts' ) }
 										</a>
 								}
 								{ ! this.takeover &&
 									<span>
 										<PostPreviewButton />
-										<a href={ unlockUrl }>
-											<button className="button button-primary" >
-												{ __( 'Take Over' ) }
-											</button>
+										<a className="button button-primary" href={ unlockUrl }>
+											{ __( 'Take Over' ) }
 										</a>
 									</span>
 								}
