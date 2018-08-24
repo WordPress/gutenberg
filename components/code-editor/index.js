@@ -12,7 +12,7 @@ import Placeholder from '../../packages/components/src/placeholder';
 import Spinner from '../../packages/components/src/spinner';
 
 /**
- * Moddule constants
+ * @var {string?} siteURL WordPRess Site URL
  */
 let siteURL;
 
