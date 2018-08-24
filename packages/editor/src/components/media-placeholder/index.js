@@ -128,7 +128,6 @@ class MediaPlaceholder extends Component {
 				</FormFileUpload>
 				<MediaUpload
 					gallery={ multiple && type === "image" }
-					playlist={ multiple && type === "audio" }
 					multiple={ multiple }
 					onSelect={ onSelect }
 					type={ type }
