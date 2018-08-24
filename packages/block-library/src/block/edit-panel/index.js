@@ -119,10 +119,11 @@ class ReusableBlockEditPanel extends Component {
 export default compose( [
 	withInstanceId,
 	withSelect( ( select ) => {
-		const { getEditedPostAttribute } = select( 'core/editor' );
+		const { getEditedPostAttribute, isSavingPost } = select( 'core/editor' );
 
 		return {
 			title: getEditedPostAttribute( 'title' ),
+			isSaving: isSavingPost(),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {

@@ -85,7 +85,7 @@ class ReusableBlockEdit extends Component {
 	}
 
 	render() {
-		const { setIsSelected, reusableBlock, isSelected, isSaving } = this.props;
+		const { setIsSelected, reusableBlock, isSelected } = this.props;
 		const { settingsWithLock, isEditing, reusableBlockInstanceId } = this.state;
 
 		if ( ! reusableBlock ) {
@@ -116,7 +116,6 @@ class ReusableBlockEdit extends Component {
 						{ ( isSelected || isEditing ) && (
 							<ReusableBlockEditPanel
 								isEditing={ isEditing }
-								isSaving={ isSaving && ! reusableBlock.isTemporary }
 								onEdit={ this.startEdit }
 								onCancel={ this.cancelEdit }
 								onSave={ this.saveEdit }
