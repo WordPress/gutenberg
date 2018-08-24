@@ -122,11 +122,12 @@ export default {
 		const state = getState();
 		const template = getTemplate( state );
 		const templateLock = getTemplateLock( state );
+		const isNewPost = post.status === 'auto-draft';
 
 		// Parse content as blocks
 		let blocks;
 		let isValidTemplate = true;
-		if ( post.content.raw ) {
+		if ( ! isNewPost ) {
 			blocks = parse( post.content.raw );
 
 			// Unlocked templates are considered always valid because they act as default values only.
@@ -145,7 +146,7 @@ export default {
 
 		// Include auto draft title in edits while not flagging post as dirty
 		const edits = {};
-		if ( post.status === 'auto-draft' ) {
+		if ( isNewPost ) {
 			edits.title = post.title.raw;
 		}
 
