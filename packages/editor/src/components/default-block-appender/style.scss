@@ -40,17 +40,15 @@
 		}
 	}
 
-	&:hover .editor-inserter-with-shortcuts {
-		opacity: 1;
+	// Don't show the inserter until mousing over.
+	.editor-inserter__toggle:not([aria-expanded="true"]) {
+		opacity: 0;
 	}
-
-	// Show the inserter if mousing over or there is a tip.
-	&:not(.has-tip) {
-		.editor-inserter__toggle:not([aria-expanded="true"]) {
-			opacity: 0;
+	&:hover {
+		.editor-inserter-with-shortcuts {
+			opacity: 1;
 		}
-
-		&:hover .editor-inserter__toggle {
+		.editor-inserter__toggle {
 			opacity: 1;
 		}
 	}
@@ -83,6 +81,10 @@
 	.components-icon-button svg {
 		display: block;
 		margin: auto;
+	}
+
+	.editor-inserter__toggle {
+		margin-right: 0;
 	}
 }
 
@@ -119,7 +121,9 @@
 }
 
 // Quick block insertion icons on the right side.
-.editor-inserter-with-shortcuts {
+// Needs specificity to styles from the component itself.
+.editor-block-list__side-inserter .editor-inserter-with-shortcuts,
+.editor-default-block-appender .editor-inserter-with-shortcuts {
 	right: $block-padding;
 	display: none; // Don't show on mobile.
 	z-index: z-index(".editor-inserter-with-shortcuts"); // Elevate above the sibling inserter.

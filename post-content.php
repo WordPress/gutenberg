@@ -28,7 +28,7 @@
 
 <!-- wp:image {"align":"center","className":"aligncenter"} -->
 <div class="wp-block-image aligncenter">
-	<figure class="aligncenter"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="Beautiful landscape" />
+	<figure class="aligncenter"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="<?php esc_attr_e( 'Beautiful landscape', 'gutenberg' ); ?>" />
 		<figcaption><?php _e( 'If your theme supports it, you&#8217;ll see the "wide" button on the image toolbar. Give it a try.', 'gutenberg' ); ?></figcaption>
 	</figure>
 </div>

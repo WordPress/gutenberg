@@ -18,7 +18,7 @@ import { getBlockType, getUnknownTypeHandlerName } from './registration';
 import { createBlock } from './factory';
 import { isValidBlock } from './validation';
 import { getCommentDelimitedContent } from './serializer';
-import { attr, html, text, query, node, children } from './matchers';
+import { attr, html, text, query, node, children, prop } from './matchers';
 
 /**
  * Higher-order hpq matcher which enhances an attribute matcher to return true
@@ -115,6 +115,11 @@ export function matcherFromSource( sourceConfig ) {
 		case 'query':
 			const subMatchers = mapValues( sourceConfig.query, matcherFromSource );
 			return query( sourceConfig.selector, subMatchers );
+		case 'tag':
+			return flow( [
+				prop( sourceConfig.selector, 'nodeName' ),
+				( value ) => value.toLowerCase(),
+			] );
 		default:
 			// eslint-disable-next-line no-console
 			console.error( `Unknown source type "${ sourceConfig.source }"` );
@@ -160,6 +165,7 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 		case 'children':
 		case 'node':
 		case 'query':
+		case 'tag':
 			value = parseWithAttributeSchema( innerHTML, attributeSchema );
 			break;
 	}
