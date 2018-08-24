@@ -1,11 +1,14 @@
 import {
-	Path as PATH,
-	G as GROUP,
+	Path,
+	G,
 	Svg,
 } from 'react-native-svg';
 
-export const Path = PATH;
-export const G = GROUP;
+export {
+    G,
+    Path,
+};
+
 export const SVG = ( props ) => {
 	if ( props.width !== undefined && props.height !== undefined ) {
 		return (
