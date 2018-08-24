@@ -34,11 +34,6 @@ class PlaylistEdit extends Component {
 		this.uploadFromFiles = this.uploadFromFiles.bind( this );
 		this.onUploadFiles = this.onUploadFiles.bind( this );
 		this.onSelectMedia = this.onSelectMedia.bind( this );
-
-		// check for if ids is set to determine edit state
-		this.state = {
-			isEditing: ! this.props.attributes.ids,
-		};
 	}
 
 	initializePlaylist() {
