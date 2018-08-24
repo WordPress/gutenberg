@@ -18,11 +18,11 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 
  - `wp.components.withAPIData` has been removed. Please use the Core Data module or `wp.apiFetch` directly instead.
  - `wp.data.dispatch("core").receiveTerms` has been deprecated. Please use `wp.data.dispatch("core").receiveEntityRecords` instead.
- - `getCategories` resolvers has been deprecated. Please use `getEntityRecords` resolver instead.
+ - `getCategories` resolver has been deprecated. Please use `getEntityRecords` resolver instead.
  - `wp.data.select("core").getTerms` has been deprecated. Please use `wp.data.select("core").getEntityRecords` instead.
  - `wp.data.select("core").getCategories` has been deprecated. Please use `wp.data.select("core").getEntityRecords` instead.
  - `wp.data.select("core").isRequestingCategories` has been deprecated. Please use `wp.data.select("core/data").isResolving` instead.
- - `wp.data.select("core").isRequestingTerms` has been deprecated. Please use `wp.data.select("core").getEntitiesByKind` instead.
+ - `wp.data.select("core").isRequestingTerms` has been deprecated. Please use `wp.data.select("core").isResolving` instead.
  - `wp.data.restrictPersistence`, `wp.data.setPersistenceStorage` and  `wp.data.setupPersistence` has been removed. Please use the data persistence plugin instead.
 
 ## 3.6.0
