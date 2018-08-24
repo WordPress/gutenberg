@@ -1,7 +1,6 @@
 /**
  * External Dependencies
  */
-
 import { uniqBy } from 'lodash';
 
 /**
@@ -34,6 +33,7 @@ class PlaylistEdit extends Component {
 		this.initializePlaylist = this.initializePlaylist.bind( this );
 		this.uploadFromFiles = this.uploadFromFiles.bind( this );
 		this.onUploadFiles = this.onUploadFiles.bind( this );
+		this.onSelectMedia = this.onSelectMedia.bind( this );
 
 		// check for if ids is set to determine edit state
 		this.state = {
@@ -71,7 +71,6 @@ class PlaylistEdit extends Component {
 					const type = media[ 0 ].mimeType.split( '/' )[ 0 ];
 					const ids = media.map( ( item ) => item.id );
 					setAttributes( { ids, type } );
-					this.setState( { isEditing: false } );
 				}
 			},
 		} );
@@ -83,27 +82,26 @@ class PlaylistEdit extends Component {
 		};
 	}
 
+	onSelectMedia( media ) {
+		const { setAttributes } = this.props;
+		//check if there are returned media items and set attributes when there are
+		if ( media && media[ 0 ].url ) {
+			const ids = media.map( ( item ) => item.id );
+			setAttributes( { ids, type: media[ 0 ].type } );
+		}
+	}
+
 	render() {
-		const { attributes, setAttributes, className, noticeUI } = this.props;
-		const { isEditing } = this.state;
+		const { attributes, className, noticeUI } = this.props;
 		const { tracklist, showTrackNumbers, showArtists, images, style, type } = attributes;
 
-		const onSelectMedia = ( media ) => {
-			//check if there are returned media items and set attributes when there are
-			if ( media && media[ 0 ].url ) {
-				const ids = media.map( ( item ) => item.id );
-				setAttributes( { ids, type: media[ 0 ].type } );
-				this.setState( { isEditing: false } );
-			}
-		};
-
-		if ( isEditing ) {
+		if ( ! this.props.attributes.ids ) {
 			return (
 				<Placeholder
 					icon="media-audio"
 					label={ __( 'Audio/Video Playlist' ) }
 					notices={ noticeUI }
-					instructions={ __( 'Select audio or video files from your library, or upload a new ones.' ) }
+					instructions={ __( 'Select audio or video files from your library, or upload new ones.' ) }
 					className={ className }>
 					<FormFileUpload
 						isLarge
@@ -115,7 +113,7 @@ class PlaylistEdit extends Component {
 						{ __( 'Upload' ) }
 					</FormFileUpload>
 					<MediaUpload
-						onSelect={ onSelectMedia }
+						onSelect={ this.onSelectMedia }
 						type={ type }
 						multiple
 						playlist
@@ -140,7 +138,7 @@ class PlaylistEdit extends Component {
 				<BlockControls>
 					<Toolbar>
 						<MediaUpload
-							onSelect={ onSelectMedia }
+							onSelect={ this.onSelectMedia }
 							type={ type }
 							multiple
 							playlist
