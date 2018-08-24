@@ -222,7 +222,7 @@ class ParagraphBlock extends Component {
 					onMerge={ mergeBlocks }
 					onReplace={ this.onReplace }
 					onRemove={ () => onReplace( [] ) }
-					placeholder={ placeholder || __( 'Add text or type / to add content' ) }
+					placeholder={ placeholder }
 				/>
 			</Fragment>
 		);
