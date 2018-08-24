@@ -101,14 +101,17 @@
 	}
 }
 
+// Pre-publish panel. Should perhaps be shifted to the post-publish-panel component?
 .edit-post-layout .editor-post-publish-panel {
 	position: fixed;
 	z-index: z-index(".edit-post-layout .edit-post-post-publish-panel");
 	top: $admin-bar-height-big;
 	bottom: 0;
 	right: 0;
-	left: 0;
+	left: auto;
 	overflow: auto;
+	border-left: $border-width solid $light-gray-500;
+	@include slide_in_right;
 
 	body.is-fullscreen-mode & {
 		top: 0;
@@ -116,28 +119,6 @@
 
 	@include break-medium() {
 		top: $admin-bar-height;
-		left: auto;
-		width: $sidebar-width;
-		border-left: $border-width solid $light-gray-500;
-		@include slide_in_right;
-
-		body.is-fullscreen-mode & {
-			top: 0;
-		}
-	}
-}
-
-.edit-post-layout .editor-post-publish-panel__header-publish-button {
-	// Match the size of the Publish... button.
-	.components-button.is-large {
-		height: 33px;
-		line-height: 32px;
-	}
-
-	// Size the spacer flexibly to allow for different button lengths.
-	.editor-post-publish-panel__spacer {
-		display: inline-flex;
-		flex: 0 1 52px; // This number is approximative to keep the publish button at the same position when opening the panel
 	}
 }
 

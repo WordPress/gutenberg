@@ -63,21 +63,14 @@ class PostPublishPanel extends Component {
 
 	render() {
 		const { isScheduled, isPublishSidebarEnabled, onClose, onTogglePublishSidebar, forceIsDirty, forceIsSaving, PrePublishExtension, PostPublishExtension, ...additionalProps } = this.props;
-		const { loading, submitted } = this.state;
+		const { loading, submitted, hasPublishAction } = this.state;
 		return (
 			<div className="editor-post-publish-panel" { ...additionalProps }>
 				<div className="editor-post-publish-panel__header">
-					{ ! submitted && (
-						<div className="editor-post-publish-panel__header-publish-button">
-							<PostPublishButton focusOnMount={ true } onSubmit={ this.onSubmit } forceIsDirty={ forceIsDirty } forceIsSaving={ forceIsSaving } />
-							<span className="editor-post-publish-panel__spacer"></span>
-						</div>
-					) }
-					{ submitted && (
-						<div className="editor-post-publish-panel__header-published">
-							{ isScheduled ? __( 'Scheduled' ) : __( 'Published' ) }
-						</div>
-					) }
+					<strong className="editor-post-publish-panel__title">
+						{ hasPublishAction ? __( 'Ready to submit for review?' ) : __( 'Ready to publish?' ) }
+					</strong>
+
 					<IconButton
 						aria-expanded={ true }
 						onClick={ onClose }
@@ -98,12 +91,18 @@ class PostPublishPanel extends Component {
 						</PostPublishPanelPostpublish>
 					) }
 				</div>
+
 				<div className="editor-post-publish-panel__footer">
-					<CheckboxControl
-						label={ __( 'Always show pre-publish checks.' ) }
-						checked={ isPublishSidebarEnabled }
-						onChange={ onTogglePublishSidebar }
-					/>
+					{ ! submitted && (
+						<div className="editor-post-publish-panel__header-publish-button">
+							<PostPublishButton focusOnMount={ true } onSubmit={ this.onSubmit } forceIsDirty={ forceIsDirty } forceIsSaving={ forceIsSaving } />
+						</div>
+					) }
+					{ submitted && (
+						<div className="editor-post-publish-panel__header-published">
+							{ isScheduled ? __( 'Scheduled' ) : __( 'Published' ) }
+						</div>
+					) }
 				</div>
 			</div>
 		);

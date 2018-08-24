@@ -1,8 +1,15 @@
+// Overall panel styles.
 .editor-post-publish-panel {
 	background: $white;
 	color: $dark-gray-500;
+	right: 0;
+	left: auto;
+	padding: 32px; // We're doubling standard padding to make it feel a bit more spacious.
+	width: 420px;
+	max-width: calc(100% - 20px);
 }
 
+// Loading spinner?
 .editor-post-publish-panel__content {
 	.components-spinner {
 		display: block;
@@ -11,77 +18,60 @@
 	}
 }
 
+// Panel header.
 .editor-post-publish-panel__header {
-	background: $white;
-	padding-left: 16px;
-	height: $header-height;
-	border-bottom: $border-width solid $light-gray-500;
 	display: flex;
 	align-items: center;
-	align-content: space-between;
+	justify-content: space-between;
+	color: $dark-gray-900;
 }
 
-.editor-post-publish-panel__header-publish-button {
-	display: flex;
-	justify-content: flex-end;
-	flex-grow: 1;
-	text-align: right;
-	flex-wrap: nowrap;
+.editor-post-publish-panel__title {
+	font-size: 15px;
 }
 
-.editor-post-publish-panel__header-published {
-	flex-grow: 1;
-}
-
-.editor-post-publish-panel__footer {
-	padding: 16px;
-	position: absolute;
-	bottom: 0;
-}
-
-.components-button.editor-post-publish-panel__toggle.is-primary {
-	display: inline-flex;
-	align-items: center;
-
-	&.is-busy .dashicon {
-		display: none;
-	}
-
-	.dashicon {
-		margin-right: -4px;
-	}
+// Individual sub-panels, mostly resetting a bunch of things here to simplify styling.
+.editor-post-publish-panel .components-panel__body-toggle.components-button {
+	padding: 20px 0;
 }
 
 .editor-post-publish-panel__link {
-	color: $blue-medium-700;
+	color: $blue-dark-900;
 	font-weight: 400;
 	padding-left: 4px;
-	text-decoration: underline;
 }
 
-.editor-post-publish-panel__prepublish {
-	padding: 16px;
-
-	strong {
-		color: $dark-gray-900;
-	}
-
-	.components-panel__body {
-		background: $white;
-		margin-left: -16px;
-		margin-right: -16px;
-	}
-
-	.editor-post-visibility__dialog-legend {
-		display: none;
-	}
+.editor-post-publish-panel .components-panel__body {
+	border-top: 0;
+	padding: 0;
 }
 
-.post-publish-panel__postpublish .components-panel__body {
-	border-bottom: $border-width solid $light-gray-500;
-	border-top: none;
+.editor-post-publish-panel .components-panel__body.is-opened {
+	padding-bottom: 16px;
 }
 
+.editor-post-publish-panel .components-panel__body.is-opened > .components-panel__body-title {
+	margin: 0;
+}
+
+// Panel footer (publish button)
+.editor-post-publish-panel__footer {
+	padding: 32px;
+	text-align: center;
+}
+
+.components-button.editor-post-publish-button {
+	justify-content: center;
+	padding: 6px 32px;
+	height: auto;
+	font-size: 15px;
+	text-shadow: none;
+	box-shadow: none;
+	border-radius: 6px;
+	background: $blue-dark-900;
+}
+
+// Buttons that appear in post-publish panel. (Probably will move to their own component.)
 .post-publish-panel__postpublish-buttons {
 	display: flex;
 	align-content: space-between;
@@ -104,6 +94,21 @@
 	}
 }
 
+// A toggle of some sort? May not be needed anymore.
+.components-button.editor-post-publish-panel__toggle.is-primary {
+	display: inline-flex;
+	align-items: center;
+
+	&.is-busy .dashicon {
+		display: none;
+	}
+
+	.dashicon {
+		margin-right: -4px;
+	}
+}
+
+// MYSTERY.
 .post-publish-panel__postpublish-link-input[readonly] {
 	width: 100%;
 	padding: 10px;
@@ -111,12 +116,4 @@
 	background: $white;
 	overflow: hidden;
 	text-overflow: ellipsis;
-}
-
-.post-publish-panel__postpublish-header {
-	font-weight: 500;
-}
-
-.post-publish-panel__tip {
-	color: $alert-yellow;
 }

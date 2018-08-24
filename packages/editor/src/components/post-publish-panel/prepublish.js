@@ -43,6 +43,7 @@ function PostPublishPanelPrepublish( {
 		<div className="editor-post-publish-panel__prepublish">
 			<div><strong>{ prePublishTitle }</strong></div>
 			<p>{ prePublishBodyText }</p>
+
 			{ hasPublishAction && (
 				<Fragment>
 					<PanelBody initialOpen={ false } title={ [
