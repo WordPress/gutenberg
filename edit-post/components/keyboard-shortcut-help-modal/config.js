@@ -101,7 +101,7 @@ const blockShortcuts = {
 		},
 		{
 			keyCombination: '/',
-			description: __( `Change the block type after adding a new paragraph.` ),
+			description: __( 'Change the block type after adding a new paragraph.' ),
 		},
 	],
 };
