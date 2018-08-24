@@ -44,6 +44,9 @@ export class RichText extends Component {
 	}
 
 	onActiveFormatsChange( formats ) {
+		// force re-render the component skipping shouldComponentUpdate() See: https://reactjs.org/docs/react-component.html#forceupdate
+		// This is needed because our shouldComponentUpdate impl. doesn't take in consideration props yet.
+		this.forceUpdate();
 		const newFormats = formats.reduce( ( accFormats, activeFormat ) => {
 			accFormats[ activeFormat ] = getFormatValue( activeFormat );
 			return accFormats;
@@ -139,7 +142,6 @@ export class RichText extends Component {
 		const {
 			tagName,
 			style,
-			eventCount,
 			formattingControls,
 			formatters,
 		} = this.props;
@@ -155,6 +157,7 @@ export class RichText extends Component {
 
 		// Save back to HTML from React tree
 		const html = '<' + tagName + '>' + renderToString( this.props.content.contentTree ) + '</' + tagName + '>';
+		const eventCount = this.props.content.eventCount;
 
 		return (
 			<View>
