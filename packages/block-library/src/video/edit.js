@@ -190,7 +190,7 @@ class VideoEdit extends Component {
 							label={ __( 'Poster Image' ) }
 						>
 							<MediaUpload
-								title={ 'Select Poster Image' }
+								title={ __( 'Select Poster Image' ) }
 								onSelect={ this.onSelectPoster }
 								type="image"
 								render={ ( { open } ) => (
