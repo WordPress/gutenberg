@@ -20,6 +20,8 @@ class Fill extends Component {
 		const { registerFill = noop } = this.context;
 
 		registerFill( this.props.name, this );
+
+		this.checkIfSlotAvailable();
 	}
 
 	componentWillUpdate() {
@@ -50,6 +52,23 @@ class Fill extends Component {
 			unregisterFill( prevProps.name, this );
 			registerFill( name, this );
 		}
+
+		this.checkIfSlotAvailable();
+	}
+
+	/**
+	 * Forces an update if the target slot becomes available after the fill was
+	 * rendered without the slot having yet been prepared. This can occur when
+	 * the slot is mounted after the fill, or when the slot and fill render
+	 * simultaneously and the Slot's portal target has not yet been mounted for
+	 * the fill to use as a container.
+	 */
+	checkIfSlotAvailable() {
+		const { getSlot = noop } = this.context;
+		const { name } = this.props;
+		if ( this.isPendingSlot && !! getSlot( name ) ) {
+			this.forceUpdate();
+		}
 	}
 
 	resetOccurrence() {
@@ -60,9 +79,18 @@ class Fill extends Component {
 		const { getSlot = noop } = this.context;
 		const { name } = this.props;
 		let { children } = this.props;
-		const slot = getSlot( name );
 
-		if ( ! slot || ! slot.props.bubblesVirtually ) {
+		const slot = getSlot( name );
+		if ( ! slot ) {
+			this.isPendingSlot = true;
+			return null;
+		}
+
+		delete this.isPendingSlot;
+
+		// A slot which does not bubble events virtually is responsible for
+		// rendering its own fills.
+		if ( ! slot.props.bubblesVirtually ) {
 			return null;
 		}
 
@@ -71,7 +99,7 @@ class Fill extends Component {
 			children = children( slot.props.fillProps );
 		}
 
-		return createPortal( children, slot.node );
+		return createPortal( children, slot.virtualTarget.current );
 	}
 }
 

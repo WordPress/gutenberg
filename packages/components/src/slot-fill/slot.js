@@ -6,13 +6,19 @@ import { noop, map, isString, isFunction } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, Children, cloneElement } from '@wordpress/element';
+import {
+	Component,
+	Children,
+	Fragment,
+	cloneElement,
+	createRef,
+} from '@wordpress/element';
 
 class Slot extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.bindNode = this.bindNode.bind( this );
+		this.virtualTarget = createRef();
 	}
 
 	componentDidMount() {
@@ -40,16 +46,15 @@ class Slot extends Component {
 		}
 	}
 
-	bindNode( node ) {
-		this.node = node;
-	}
-
 	render() {
-		const { children, name, bubblesVirtually = false, fillProps = {} } = this.props;
+		const { children, name, bubblesVirtually, fillProps = {} } = this.props;
 		const { getFills = noop } = this.context;
 
 		if ( bubblesVirtually ) {
-			return <div ref={ this.bindNode } />;
+			// When bubbling virtually, createPortal requires a DOM node in
+			// which to render the fill elements. This `div` serves no purpose
+			// other than to act as the target container.
+			return <div ref={ this.virtualTarget } role="presentation" />;
 		}
 
 		const fills = map( getFills( name ), ( fill ) => {
@@ -67,9 +72,9 @@ class Slot extends Component {
 		} );
 
 		return (
-			<div ref={ this.bindNode } role="presentation">
+			<Fragment>
 				{ isFunction( children ) ? children( fills.filter( Boolean ) ) : fills }
-			</div>
+			</Fragment>
 		);
 	}
 }

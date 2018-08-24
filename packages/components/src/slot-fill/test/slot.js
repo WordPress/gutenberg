@@ -2,6 +2,11 @@
  * External dependencies
  */
 import { create } from 'react-test-renderer';
+import {
+	renderIntoDocument,
+	findRenderedComponentWithType,
+	findRenderedDOMComponentWithTag,
+} from 'react-dom/test-utils';
 import { isEmpty } from 'lodash';
 
 /**
@@ -98,6 +103,53 @@ describe( 'Slot', () => {
 		expect( slot.children[ 1 ].type ).toBe( 'div' );
 		expect( slot.children[ 2 ] ).toBe( 'text' );
 		expectEmptyFill( wrapper );
+	} );
+
+	it( 'should render a Fill to a Slot mounted later', () => {
+		const wrapper = create(
+			<Provider>
+				<Fill name="chicken">
+					content
+				</Fill>
+			</Provider>
+		);
+
+		wrapper.update(
+			<Provider>
+				<Fill name="chicken">
+					content
+				</Fill>
+				<Slot name="chicken" />
+			</Provider>
+		);
+
+		const slot = wrapper.root.findByType( Slot );
+		expect( slot.children ).toHaveLength( 1 );
+		expect( slot.children[ 0 ] ).toBe( 'content' );
+		expectEmptyFill( wrapper );
+	} );
+
+	it( 'should render a Fill to a Slot mounted later (virtually)', () => {
+		let tree = renderIntoDocument(
+			<Provider>
+				<Fill name="chicken">
+					content
+				</Fill>
+			</Provider>
+		);
+
+		tree = renderIntoDocument(
+			<Provider>
+				<Fill name="chicken">
+					content
+				</Fill>
+				<Slot name="chicken" bubblesVirtually />
+			</Provider>
+		);
+
+		const slot = findRenderedComponentWithType( tree, Slot );
+		const slotDiv = findRenderedDOMComponentWithTag( slot, 'div' );
+		expect( slotDiv.outerHTML ).toBe( '<div role="presentation">content</div>' );
 	} );
 
 	it( 'calls the functions passed as the Slot’s fillProps in the Fill', () => {
@@ -217,5 +269,40 @@ describe( 'Slot', () => {
 		expect( slot.children ).toHaveLength( 2 );
 		expect( slot.children[ 0 ] ).toBe( 'first' );
 		expect( slot.children[ 1 ] ).toBe( 'second' );
+	} );
+
+	it( 'should unrender unmounted fills', () => {
+		const wrapper = create(
+			<Provider>
+				<Slot name="egg" />
+				<Fill name="egg">first</Fill>
+			</Provider>
+		);
+
+		wrapper.update(
+			<Provider>
+				<Slot name="egg" />
+				<Fill name="egg">second</Fill>
+			</Provider>
+		);
+
+		const slot = wrapper.root.findByType( Slot );
+		expect( slot.children ).toHaveLength( 1 );
+		expect( slot.children[ 0 ] ).toBe( 'second' );
+	} );
+
+	it( 'should render virtually by portal', () => {
+		const tree = renderIntoDocument(
+			<Provider>
+				<Slot name="chicken" bubblesVirtually />
+				<Fill name="chicken">
+					content
+				</Fill>
+			</Provider>
+		);
+
+		const slot = findRenderedComponentWithType( tree, Slot );
+		const slotDiv = findRenderedDOMComponentWithTag( slot, 'div' );
+		expect( slotDiv.outerHTML ).toBe( '<div role="presentation">content</div>' );
 	} );
 } );
