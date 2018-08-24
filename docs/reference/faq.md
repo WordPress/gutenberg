@@ -151,7 +151,7 @@ Other features, like the new _wide_ and _full-wide_ alignment options, will simp
 
 ## How will editor styles work?
 
-Refular editor styles will work as is in most casees and themes can also load extra stylesheets by using the following hook:
+Refular editor styles are opt-in and will work as is in most cases. Themes can also load extra stylesheets by using the following hook:
 
 ```php
 function gutenbergtheme_editor_styles() {
