@@ -1052,11 +1052,11 @@ Returns details about the current post lock if available.
 
 *Returns*
 
-The lock details object.
+Post lock details.
 
 ### getPostLockUser
 
-Returns whether the post lock user.
+Returns the post lock user.
 
 *Parameters*
 
@@ -1374,7 +1374,6 @@ Returns an action object used to remove a modal.
 *Parameters*
 
  * locked: Whether the editor should be locked.
- * lockDetails: Details about the lock user and their avatar.
 
 ### fetchReusableBlocks
 
