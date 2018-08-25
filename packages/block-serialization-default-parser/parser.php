@@ -29,12 +29,14 @@ class BSDP_Frame {
     public $token_start;
     public $token_length;
     public $prev_offset;
+    public $leading_html_start;
 
-    function __construct( $block, $token_start, $token_length, $prev_offset = null ) {
-        $this->block        = $block;
-        $this->token_start  = $token_start;
+    function __construct( $block, $token_start, $token_length, $prev_offset = null, $leading_html_start = null ) {
+        $this->block = $block;
+        $this->token_start = $token_start;
         $this->token_length = $token_length;
-        $this->prev_offset  = isset( $prev_offset ) ? $prev_offset : $token_start + $token_length;
+        $this->prev_offset = isset($prev_offset) ? $prev_offset : $token_start + $token_length;
+        $this->leading_html_start = $leading_html_start;
     }
 }
 
@@ -110,16 +112,15 @@ class BSDP_Parser {
 
             case 'block-opener':
                 # we may have some HTML soup before the next block
-                if ( $start_offset > $this->offset ) {
-                    self::add_freeform( $start_offset - $this->offset );
-                }
+                $leading_html_start = $start_offset > $this->offset ? $this->offset : null;
 
                 # track all newly-opened blocks on the stack
                 array_push( $this->stack, new BSDP_Frame(
                     new BSDP_Block( $block_name, $attrs, array(), '' ),
                     $start_offset,
                     $token_length,
-                    $start_offset + $token_length
+                    $start_offset + $token_length,
+                    $leading_html_start
                 ) );
                 $this->offset = $start_offset + $token_length;
                 return true;
@@ -242,6 +243,17 @@ class BSDP_Parser {
         $stack_top->block->innerHTML .= isset( $end_offset )
             ? substr( $this->document, $prev_offset, $end_offset - $prev_offset )
             : substr( $this->document, $prev_offset );
+
+        if ( isset( $stack_top->leading_html_start ) ) {
+            $this->output[] = array(
+                'attrs' => new stdClass(),
+                'innerHTML' => substr(
+                    $this->document,
+                    $stack_top->leading_html_start,
+                    $stack_top->token_start - $stack_top->leading_html_start
+                ),
+            );
+        }
 
         $this->output[] = $stack_top->block;
     }

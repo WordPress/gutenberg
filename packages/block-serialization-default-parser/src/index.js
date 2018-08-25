@@ -4,22 +4,23 @@ let output;
 let stack;
 const tokenizer = /<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:(?!}\s+-->)[^])+}\s+)?(\/)?-->/g;
 
-class Block {
-	constructor( name, attrs, innerBlocks, innerHTML ) {
-		this.blockName = name;
-		this.attrs = attrs;
-		this.innerBlocks = innerBlocks;
-		this.innerHTML = innerHTML;
-	}
+function Block( blockName, attrs, innerBlocks, innerHTML ) {
+	return {
+		blockName,
+		attrs,
+		innerBlocks,
+		innerHTML,
+	};
 }
 
-class Frame {
-	constructor( block, tokenStart, tokenLength, prevOffset ) {
-		this.block = block;
-		this.tokenStart = tokenStart;
-		this.tokenLength = tokenLength;
-		this.prevOffset = prevOffset || tokenStart + tokenLength;
-	}
+function Frame( block, tokenStart, tokenLength, prevOffset, leadingHtmlStart ) {
+	return {
+		block,
+		tokenStart,
+		tokenLength,
+		prevOffset: prevOffset || tokenStart + tokenLength,
+		leadingHtmlStart,
+	};
 }
 
 export const parse = ( doc ) => {
@@ -37,7 +38,8 @@ export const parse = ( doc ) => {
 };
 
 function proceed() {
-	const [ tokenType, blockName, attrs, startOffset, tokenLength ] = nextToken();
+	const next = nextToken();
+	const [ tokenType, blockName, attrs, startOffset, tokenLength ] = next;
 	const stackDepth = stack.length;
 
 	switch ( tokenType ) {
@@ -72,14 +74,14 @@ function proceed() {
 			// easy case is if we stumbled upon a void block
 			// in the top-level of the document
 			if ( 0 === stackDepth ) {
-				output.push( new Block( blockName, attrs, [], '' ) );
+				output.push( Block( blockName, attrs, [], '' ) );
 				offset = startOffset + tokenLength;
 				return true;
 			}
 
 			// otherwise we found an inner block
 			addInnerBlock(
-				new Block( blockName, attrs, [], '' ),
+				Block( blockName, attrs, [], '' ),
 				startOffset,
 				tokenLength,
 			);
@@ -88,17 +90,16 @@ function proceed() {
 
 		case 'block-opener':
 			// we may have some HTML soup before the next block
-			if ( startOffset > offset ) {
-				addFreeform( startOffset - offset );
-			}
+			const leadingHtmlStart = ( startOffset > offset ) ? offset : null;
 
 			// track all newly-opened blocks on the stack
 			stack.push(
-				new Frame(
-					new Block( blockName, attrs, [], '' ),
+				Frame(
+					Block( blockName, attrs, [], '' ),
 					startOffset,
 					tokenLength,
 					startOffset + tokenLength,
+					leadingHtmlStart,
 				),
 			);
 			offset = startOffset + tokenLength;
@@ -124,7 +125,7 @@ function proceed() {
 			}
 
 			// otherwise we're nested and we have to close out the current
-			// block and add it as a new innerBlock to the parent
+			// block and add it as a innerBlock to the parent
 			const stackTop = stack.pop();
 			stackTop.block.innerHTML += document.substr(
 				stackTop.prevOffset,
@@ -219,14 +220,20 @@ function addInnerBlock( block, tokenStart, tokenLength, lastOffset ) {
 }
 
 function addBlockFromStack( endOffset ) {
-	const stackTop = stack.pop();
-	const prevOffset = stackTop.prevOffset;
+	const { block, leadingHtmlStart, prevOffset, tokenStart } = stack.pop();
 
 	if ( endOffset ) {
-		stackTop.block.innerHTML += document.substr( prevOffset, endOffset - prevOffset );
+		block.innerHTML += document.substr( prevOffset, endOffset - prevOffset );
 	} else {
-		stackTop.block.innerHTML += document.substr( prevOffset );
+		block.innerHTML += document.substr( prevOffset );
 	}
 
-	output.push( stackTop.block );
+	if ( null !== leadingHtmlStart ) {
+		output.push( {
+			attrs: {},
+			innerHTML: document.substr( leadingHtmlStart, tokenStart - leadingHtmlStart ),
+		} );
+	}
+
+	output.push( block );
 }

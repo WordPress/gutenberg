@@ -15,7 +15,7 @@ import {
 	serialize,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '@wordpress/blocks';
-import { parse as grammarParse } from '@wordpress/block-serialization-spec-parser';
+import { parse as grammarParse } from '@wordpress/block-serialization-default-parser';
 import { registerCoreBlocks } from '@wordpress/block-library';
 
 const fixturesDir = path.join( __dirname, 'fixtures' );
