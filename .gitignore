@@ -9,6 +9,7 @@ languages/gutenberg.pot
 /languages/gutenberg-translations.php
 
 # Directories/files that may appear in your environment
+.directory
 .DS_Store
 *.log
 phpcs.xml
