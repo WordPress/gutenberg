@@ -208,6 +208,10 @@ export const settings = {
 						href={ textLinkHref }
 						target={ textLinkTarget }
 						rel={ textLinkTarget ? 'noreferrer noopener' : false }
+						// ensure download attribute is still set when fileName
+						// is undefined. Using '' here as `true` still leaves
+						// the attribute unset.
+						download={ fileName || '' }
 					>
 						{ fileName }
 					</a>
