@@ -44,11 +44,8 @@ export const settings = {
 			{
 				type: 'block',
 				blocks: [ 'core/paragraph' ],
-				transform: ( { content } ) => {
-					return createBlock( 'core/paragraph', {
-						content,
-					} );
-				},
+				transform: ( attributes ) =>
+					createBlock( 'core/paragraph', attributes ),
 			},
 		],
 	},
