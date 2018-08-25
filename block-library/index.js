@@ -39,7 +39,6 @@ import * as reusableBlock from '../packages/block-library/src/block';
 import * as separator from '../packages/block-library/src/separator';
 import * as shortcode from '../packages/block-library/src/shortcode';
 import * as spacer from '../packages/block-library/src/spacer';
-import * as subhead from '../packages/block-library/src/subhead';
 import * as table from '../packages/block-library/src/table';
 import * as textColumns from '../packages/block-library/src/text-columns';
 import * as verse from '../packages/block-library/src/verse';
@@ -87,7 +86,6 @@ export const registerCoreBlocks = () => {
 		separator,
 		reusableBlock,
 		spacer,
-		subhead,
 		table,
 		textColumns,
 		verse,
