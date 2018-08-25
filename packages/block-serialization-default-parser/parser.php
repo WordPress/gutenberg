@@ -246,7 +246,7 @@ class BSDP_Parser {
 
         if ( isset( $stack_top->leading_html_start ) ) {
             $this->output[] = array(
-                'attrs' => new stdClass(),
+                'attrs' => array(),
                 'innerHTML' => substr(
                     $this->document,
                     $stack_top->leading_html_start,
