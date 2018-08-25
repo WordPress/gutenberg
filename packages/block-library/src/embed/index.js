@@ -144,6 +144,12 @@ export function getEmbedEdit( title, icon ) {
 
 			// Some plugins only return HTML with no type info, so default this to 'rich'.
 			let { type = 'rich' } = preview;
+
+			// If provider does not return a thumbnail_url we can't show a photo preview.
+			if ( type === 'photo' && ! preview.thumbnail_url ) {
+				type = 'rich';
+			}
+
 			// If we got a provider name from the API, use it for the slug, otherwise we use the title,
 			// because not all embed code gives us a provider name.
 			const { html, provider_name: providerName } = preview;
