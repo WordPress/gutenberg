@@ -1,12 +1,11 @@
 /**
  * External dependencies
  */
-import { find, compact, get, initial, last, isEmpty, omit } from 'lodash';
+import { compact, get, initial, last, isEmpty, omit } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	createBlock,
@@ -15,7 +14,6 @@ import {
 	getBlockType,
 } from '@wordpress/blocks';
 import {
-	BlockControls,
 	RichText,
 } from '@wordpress/editor';
 
@@ -23,6 +21,7 @@ import {
  * Internal dependencies
  */
 import splitOnLineBreak from './split-on-line-break';
+import edit from './edit';
 
 const listContentSchema = {
 	...getPhrasingContentSchema(),
@@ -55,6 +54,12 @@ const schema = {
 		source: 'children',
 		selector: 'ol,ul',
 		default: [],
+	},
+	textColor: {
+		type: 'string',
+	},
+	backgroundColor: {
+		type: 'string',
 	},
 };
 
@@ -219,158 +224,7 @@ export const settings = {
 		};
 	},
 
-	edit: class extends Component {
-		constructor() {
-			super( ...arguments );
-
-			this.setupEditor = this.setupEditor.bind( this );
-			this.getEditorSettings = this.getEditorSettings.bind( this );
-			this.setNextValues = this.setNextValues.bind( this );
-
-			this.state = {
-				internalListType: null,
-			};
-		}
-
-		findInternalListType( { parents } ) {
-			const list = find( parents, ( node ) => node.nodeName === 'UL' || node.nodeName === 'OL' );
-			return list ? list.nodeName : null;
-		}
-
-		setupEditor( editor ) {
-			editor.on( 'nodeChange', ( nodeInfo ) => {
-				this.setState( {
-					internalListType: this.findInternalListType( nodeInfo ),
-				} );
-			} );
-
-			// this checks for languages that do not typically have square brackets on their keyboards
-			const lang = window.navigator.browserLanguage || window.navigator.language;
-			const keyboardHasSqBracket = ! /^(?:fr|nl|sv|ru|de|es|it)/.test( lang );
-
-			if ( keyboardHasSqBracket ) {
-				// keycode 219 = '[' and keycode 221 = ']'
-				editor.shortcuts.add( 'meta+219', 'Decrease indent', 'Outdent' );
-				editor.shortcuts.add( 'meta+221', 'Increase indent', 'Indent' );
-			} else {
-				editor.shortcuts.add( 'meta+shift+m', 'Decrease indent', 'Outdent' );
-				editor.shortcuts.add( 'meta+m', 'Increase indent', 'Indent' );
-			}
-
-			this.editor = editor;
-		}
-
-		createSetListType( type, command ) {
-			return () => {
-				const { setAttributes } = this.props;
-				const { internalListType } = this.state;
-				if ( internalListType ) {
-					// only change list types, don't toggle off internal lists
-					if ( internalListType !== type && this.editor ) {
-						this.editor.execCommand( command );
-					}
-				} else {
-					setAttributes( { ordered: type === 'OL' } );
-				}
-			};
-		}
-
-		createExecCommand( command ) {
-			return () => {
-				if ( this.editor ) {
-					this.editor.execCommand( command );
-				}
-			};
-		}
-
-		getEditorSettings( editorSettings ) {
-			return {
-				...editorSettings,
-				plugins: ( editorSettings.plugins || [] ).concat( 'lists' ),
-				lists_indent_on_tab: false,
-			};
-		}
-
-		setNextValues( nextValues ) {
-			this.props.setAttributes( { values: nextValues } );
-		}
-
-		render() {
-			const {
-				attributes,
-				insertBlocksAfter,
-				setAttributes,
-				mergeBlocks,
-				onReplace,
-				className,
-			} = this.props;
-			const { ordered, values } = attributes;
-			const tagName = ordered ? 'ol' : 'ul';
-
-			return (
-				<Fragment>
-					<BlockControls
-						controls={ [
-							{
-								icon: 'editor-ul',
-								title: __( 'Convert to unordered list' ),
-								isActive: ! ordered,
-								onClick: this.createSetListType( 'UL', 'InsertUnorderedList' ),
-							},
-							{
-								icon: 'editor-ol',
-								title: __( 'Convert to ordered list' ),
-								isActive: ordered,
-								onClick: this.createSetListType( 'OL', 'InsertOrderedList' ),
-							},
-							{
-								icon: 'editor-outdent',
-								title: __( 'Outdent list item' ),
-								onClick: this.createExecCommand( 'Outdent' ),
-							},
-							{
-								icon: 'editor-indent',
-								title: __( 'Indent list item' ),
-								onClick: this.createExecCommand( 'Indent' ),
-							},
-						] }
-					/>
-					<RichText
-						multiline="li"
-						tagName={ tagName }
-						unstableGetSettings={ this.getEditorSettings }
-						unstableOnSetup={ this.setupEditor }
-						onChange={ this.setNextValues }
-						value={ values }
-						wrapperClassName="block-library-list"
-						className={ className }
-						placeholder={ __( 'Write list…' ) }
-						onMerge={ mergeBlocks }
-						onSplit={
-							insertBlocksAfter ?
-								( before, after, ...blocks ) => {
-									if ( ! blocks.length ) {
-										blocks.push( createBlock( 'core/paragraph' ) );
-									}
-
-									if ( after.length ) {
-										blocks.push( createBlock( 'core/list', {
-											ordered,
-											values: after,
-										} ) );
-									}
-
-									setAttributes( { values: before } );
-									insertBlocksAfter( blocks );
-								} :
-								undefined
-						}
-						onRemove={ () => onReplace( [] ) }
-					/>
-				</Fragment>
-			);
-		}
-	},
+	edit,
 
 	save( { attributes } ) {
 		const { ordered, values } = attributes;
