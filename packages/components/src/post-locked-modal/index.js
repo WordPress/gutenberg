@@ -5,13 +5,10 @@ import { __, sprintf } from '@wordpress/i18n';
 import { Modal } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import {
-	PostPreviewButton,
-} from '@wordpress/editor';
+import { PostPreviewButton, getWPAdminURL } from '@wordpress/editor';
 import './style.scss';
 import { addQueryArgs } from '@wordpress/url';
 import { getPostEditURL } from '../../../../edit-post/components/browser-url';
-import { getWPAdminURL } from '../../../editor/src/utils/url';
 
 class PostLockedModal extends Component {
 	constructor() {
