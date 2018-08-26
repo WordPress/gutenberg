@@ -181,7 +181,7 @@
 
 		// Keep it open on focus to avoid conflict with navigate-regions animation.
 		.is-focusing-regions & {
-			transform: translateX( 0% );
+			transform: translateX(0%);
 		}
 	}
 }
@@ -233,7 +233,7 @@
 		text-decoration: none;
 		outline: none;
 		background: #f1f1f1;
-		color: theme( secondary );
+		color: theme(secondary);
 
 		&:focus {
 			position: fixed;
