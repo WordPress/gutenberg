@@ -25,9 +25,9 @@ export const settings = {
 		inserter: false,
 	},
 
-	title: __( 'Text Columns' ),
+	title: __( 'Text Columns (deprecated)' ),
 
-	description: __( 'Add text, and display it in two or more columns. Like a newspaper! This block is experimental.' ),
+	description: __( 'This block is deprecated. Please use the Columns block instead.' ),
 
 	icon: 'columns',
 
