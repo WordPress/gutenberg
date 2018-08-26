@@ -1,15 +1,5 @@
 <?php
 
-function bsdp_parse($document ) {
-    static $parser;
-
-    if ( ! isset( $parser ) ) {
-        $parser = new BSDP_Parser();
-    }
-
-    return $parser->parse( $document );
-}
-
 class BSDP_Block {
     public $blockName;
     public $attrs;
@@ -274,3 +264,9 @@ class BSDP_Parser {
         $this->output[] = $stack_top->block;
     }
 }
+
+function bdsp_select_parser( $prev_parse_class ) {
+    return 'BSDP_Parser';
+}
+
+add_filter( 'block_parser_class', 'bdsp_select_parser', 10, 1 );
