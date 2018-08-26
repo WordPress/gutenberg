@@ -1369,7 +1369,7 @@ Returns an action object used to remove a notice.
 
 ### lockPost
 
-Returns an action object used to remove a modal.
+Returns an action object used to lock the editor.
 
 *Parameters*
 
