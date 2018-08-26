@@ -53,7 +53,7 @@ class BSDP_Parser {
         $this->stack    = array();
 
         do {
-            # twiddle our thumbs
+            // twiddle our thumbs
         } while ( $this->proceed() );
 
         return $this->output;
@@ -65,43 +65,49 @@ class BSDP_Parser {
 
         switch ( $token_type ) {
             case 'no-more-tokens':
-                # if not in a block then flush output
+                // if not in a block then flush output
                 if ( 0 === $stack_depth ) {
                     $this->add_freeform();
                     return false;
                 }
 
-                # Otherwise we have a problem
-                # This is an error
+                /*
+                 * Otherwise we have a problem
+                 * This is an error
+                 *
+                 * we have options
+                 * - treat it all as freeform text
+                 * - assume an implicit closer (easiest when not nesting)
+                 */
 
-                # we have options
-                #  - treat it all as freeform text
-                #  - assume an implicit closer (easiest when not nesting)
-
-                # for the easy case we'll assume an implicit closer
+                // for the easy case we'll assume an implicit closer
                 if ( 1 === $stack_depth ) {
                     $this->add_block_from_stack();
                     return false;
                 }
 
-                # for the nested case where it's more difficult we'll
-                # have to assume that multiple closers are missing
-                # and so we'll collapse the whole stack piecewise
+                /*
+                 * for the nested case where it's more difficult we'll
+                 * have to assume that multiple closers are missing
+                 * and so we'll collapse the whole stack piecewise
+                 */
                 while ( 0 < count( $this->stack ) ) {
                     $this->add_block_from_stack();
                 }
                 return false;
 
             case 'void-block':
-                # easy case is if we stumbled upon a void block
-                # in the top-level of the document
+                /*
+                 * easy case is if we stumbled upon a void block
+                 * in the top-level of the document
+                 */
                 if ( 0 === $stack_depth ) {
                     $this->output[] = new BSDP_Block( $block_name, $attrs, array(), '' );
                     $this->offset = $start_offset + $token_length;
                     return true;
                 }
 
-                # otherwise we found an inner block
+                // otherwise we found an inner block
                 $this->add_inner_block(
                     new BSDP_Block( $block_name, $attrs, array(), '' ),
                     $start_offset,
@@ -111,10 +117,10 @@ class BSDP_Parser {
                 return true;
 
             case 'block-opener':
-                # we may have some HTML soup before the next block
+                // we may have some HTML soup before the next block
                 $leading_html_start = $start_offset > $this->offset ? $this->offset : null;
 
-                # track all newly-opened blocks on the stack
+                // track all newly-opened blocks on the stack
                 array_push( $this->stack, new BSDP_Frame(
                     new BSDP_Block( $block_name, $attrs, array(), '' ),
                     $start_offset,
@@ -126,26 +132,32 @@ class BSDP_Parser {
                 return true;
 
             case 'block-closer':
-                # if we're missing an opener we're in trouble
-                # This is an error
+                /*
+                 * if we're missing an opener we're in trouble
+                 * This is an error
+                 */
                 if ( 0 === $stack_depth ) {
-                    # we have options
-                    #  - assume an implicit opener
-                    #  - assume _this_ is the opener
-                    #  - give up and close out the document
+                    /*
+                     * we have options
+                     * - assume an implicit opener
+                     * - assume _this_ is the opener
+                     * - give up and close out the document
+                     */
                     $this->add_freeform();
                     return false;
                 }
 
-                # if we're not nesting then this is easy - close the block
+                // if we're not nesting then this is easy - close the block
                 if ( 1 === $stack_depth ) {
                     $this->add_block_from_stack( $start_offset );
                     $this->offset = $start_offset + $token_length;
                     return true;
                 }
 
-                # otherwise we're nested and we have to close out the current
-                # block and add it as a new innerBlock to the parent
+                /*
+                 * otherwise we're nested and we have to close out the current
+                 * block and add it as a new innerBlock to the parent
+                 */
                 $stack_top = array_pop( $this->stack );
                 $stack_top->block->innerHTML .= substr( $this->document, $stack_top->prev_offset, $start_offset - $stack_top->prev_offset );
                 $stack_top->prev_offset = $start_offset + $token_length;
@@ -160,7 +172,7 @@ class BSDP_Parser {
                 return true;
 
             default:
-                # This is an error
+                // This is an error
                 $this->add_freeform();
                 return false;
         }
@@ -169,12 +181,14 @@ class BSDP_Parser {
     function next_token() {
         $matches = null;
 
-        # aye the magic
-        # we're using a single RegExp to tokenize the block comment delimiters
-        # we're also using a trick here because the only difference between a
-        # block opener and a block closer is the leading `/` before `wp:` (and
-        # a closer has no attributes). we can trap them both and process the
-        # match back in PHP to see which one it was.
+        /*
+         * aye the magic
+         * we're using a single RegExp to tokenize the block comment delimiters
+         * we're also using a trick here because the only difference between a
+         * block opener and a block closer is the leading `/` before `wp:` (and
+         * a closer has no attributes). we can trap them both and process the
+         * match back in PHP to see which one it was.
+         */
         $has_match = preg_match(
             '/<!--\s+(?<closer>\/)?wp:(?<namespace>[a-z][a-z0-9_-]*\/)?(?<name>[a-z][a-z0-9_-]*)\s+(?<attrs>{(?:(?!}\s+-->).)+}\s+)?(?<void>\/)?-->/s',
             $this->document,
@@ -183,7 +197,7 @@ class BSDP_Parser {
             $this->offset
         );
 
-        # we have no more tokens
+        // we have no more tokens
         if ( 0 === $has_match ) {
             return array( 'no-more-tokens' );
         }
@@ -199,10 +213,12 @@ class BSDP_Parser {
         $has_attrs  = isset( $matches[ 'attrs' ] ) && -1 !== $matches[ 'attrs' ][ 1 ];
         $attrs      = $has_attrs ? json_decode( $matches[ 'attrs' ][ 0 ] ) : null;
 
-        # This state isn't allowed
-        # This is an error
+        /*
+         * This state isn't allowed
+         * This is an error
+         */
         if ( $is_closer && ( $is_void || $has_attrs ) ) {
-            # we can ignore them since they don't hurt anything
+            // we can ignore them since they don't hurt anything
         }
 
         if ( $is_void ) {
