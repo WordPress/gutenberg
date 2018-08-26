@@ -2,9 +2,10 @@
  * Internal dependencies
  */
 import mediaUpload from './media-upload';
-
 export { mediaUpload };
 
-import setupHearthbeatPostLocking from './heartbeat-post-locking';
+import hearthbeatPostLocking from './heartbeat-post-locking';
+export { hearthbeatPostLocking };
 
-export { setupHearthbeatPostLocking };
+import { getWPAdminURL } from './url';
+export { getWPAdminURL };

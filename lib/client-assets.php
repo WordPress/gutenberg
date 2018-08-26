@@ -1402,6 +1402,11 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$user_id = wp_check_post_lock( $post->ID );
 	if ( $user_id ) {
 		$user = get_userdata( $user_id );
+	} else {
+
+		// Lock the post.
+		$active_post_lock = wp_set_post_lock( $post->ID );
+		$editor_settings['activePostLock'] = esc_attr( implode( ':', $active_post_lock ) );
 	}
 
 	if ( $user ) {
@@ -1435,6 +1440,9 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		$locked = false;
 	}
 	$editor_settings['locked'] = $locked;
+
+	// Add a nonce for post unlocking on window unload.
+	$editor_settings['_wpnonce']   = wp_create_nonce( 'update-post_' . $post->ID );
 
 	if ( false !== $color_palette ) {
 		$editor_settings['colors'] = $color_palette;

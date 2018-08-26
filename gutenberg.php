@@ -25,14 +25,7 @@ gutenberg_pre_init();
  */
 function the_gutenberg_project() {
 	global $post_type_object, $post;
-
-	if ( ! wp_check_post_lock( $post->ID ) ) {
-		$active_post_lock = wp_set_post_lock( $post->ID );
-	}
-
-	if ( ! empty( $active_post_lock ) ) { ?>
-	<input type="hidden" id="active_post_lock" value="<?php echo esc_attr( implode( ':', $active_post_lock ) ); ?>" />
-	<?php } ?>
+	?>
 	<div class="gutenberg">
 		<h1 class="screen-reader-text"><?php echo esc_html( $post_type_object->labels->edit_item ); ?></h1>
 		<div id="editor" class="gutenberg__editor"></div>

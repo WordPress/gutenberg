@@ -3,18 +3,26 @@
  */
 import { dispatch, select } from '@wordpress/data';
 
-const setupHearthbeatPostLocking = () => {
+/**
+ * Configure Heartbeat post locks.
+ *
+ * Used to lock editing of an object by only one user at a time.
+ *
+ * @param {number} postId   The post Id.
+ * @param {Object} settings The editor settings.
+ */
+const hearthbeatPostLocking = ( postId, settings ) => {
+	// Track the current post lock.
+	let activePostLock = settings.activePostLock;
+
 	/**
-	 * Configure Heartbeat post locks.
-	 *
-	 * Used to lock editing of an object by only one user at a time.
+	 * Keep the lock refreshed.
 	 *
 	 * When the user does not send a heartbeat in a heartbeat-tick
 	 * the user is no longer editing and another user can start editing.
 	 */
 	jQuery( document ).on( 'heartbeat-send.refresh-lock', function( e, data ) {
-		const lock = jQuery( '#active_post_lock' ).val(),
-			postId = jQuery( '#post_ID' ).val(),
+		const lock = activePostLock,
 			send = {};
 
 		if ( ! postId ) {
@@ -45,7 +53,7 @@ const setupHearthbeatPostLocking = () => {
 					dispatch( 'core/editor' ).autosave();
 					dispatch( 'core/editor' ).lockPost( true, received.lock_error );
 				} else if ( received.new_lock ) {
-					jQuery( '#active_post_lock' ).val( received.new_lock );
+					activePostLock = received.new_lock;
 					dispatch( 'core/editor' ).lockPost( false );
 				}
 			}
@@ -53,33 +61,31 @@ const setupHearthbeatPostLocking = () => {
 
 	// Unlock the post before the window is exited.
 	jQuery( window ).on( 'beforeunload.edit-post', function( event ) {
-		const postID = jQuery( '#post_ID' ).val();
-		const postLock = jQuery( '#active_post_lock' ).val();
+		const postLock = activePostLock;
 
 		// Make sure we process only the main document unload.
 		if ( event.target && event.target.nodeName !== '#document' ) {
 			return;
 		}
 
-		if ( ! postID || ! postLock ) {
+		if ( ! postId || ! postLock ) {
 			return;
 		}
 
 		const data = {
 			action: 'wp-remove-post-lock',
-			_wpnonce: jQuery( '#_wpnonce' ).val(),
-			post_ID: postID,
+			_wpnonce: settings._wpnonce,
+			post_ID: postId,
 			active_post_lock: postLock,
 		};
-		const { getEditorSettings } = select( 'core/editor' );
-		const { ajaxurl } = getEditorSettings();
 
 		jQuery.post( {
 			async: false,
 			data: data,
-			url: ajaxurl,
+			url: settings.ajaxurl,
 		} );
 	} );
 };
 
-export default setupHearthbeatPostLocking;
+export default hearthbeatPostLocking;
+
