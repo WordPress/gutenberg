@@ -66,15 +66,15 @@ function gutenberg_parse_blocks( $content ) {
 		);
 	}
 
-    /**
-     * Filter to allow plugins to replace the server-side block parser
-     *
-     * @since 3.7
-     *
-     * @param string $parser_class Name of block parser class
-     */
+	/**
+	 * Filter to allow plugins to replace the server-side block parser
+	 *
+	 * @since 3.7
+	 *
+	 * @param string $parser_class Name of block parser class
+	 */
 	$parser_class = apply_filters( 'block_parser_class', 'BDSP_Parser' );
-	$parser = new $parser_class();
+	$parser       = new $parser_class();
 	return $parser->parse( $content );
 }
 
