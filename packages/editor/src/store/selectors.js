@@ -1896,7 +1896,7 @@ export function getTokenSettings( state, name ) {
 /**
  * Returns whether the post is locked.
  *
- * @param {Object} state   Global application state.
+ * @param {Object} state Global application state.
  *
  * @return {boolean} Is locked.
  */
@@ -1916,9 +1916,9 @@ export function getLockDetails( state ) {
 }
 
 /**
- * Returns whether the post lock user.
+ * Returns details about the post lock user.
  *
- * @param {Object} state   Global application state.
+ * @param {Object} state Global application state.
  *
  * @return {Object} A user object.
  */
