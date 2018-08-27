@@ -39,10 +39,6 @@ const getColumnsTemplate = memoize( ( columns ) => {
 	return times( columns, () => [ 'core/column' ] );
 } );
 
-const supports = {
-	align: [ 'wide', 'full' ],
-};
-
 export const name = 'core/columns';
 
 export const settings = {
@@ -66,32 +62,8 @@ export const settings = {
 
 	description: __( 'Add a block that displays content in multiple columns, then add whatever content blocks you’d like.' ),
 
-	supports,
-
-	transforms: {
-		from: [
-			{
-				type: 'block',
-				blocks: [ 'core/text-columns' ],
-				transform: ( { className, columns, content, width } ) => (
-					createBlock(
-						'core/columns',
-						{
-							align: supports.align.includes( width ) ? width : undefined,
-							className,
-							columns,
-						},
-						content.map( ( { children } ) =>
-							createBlock(
-								'core/column',
-								{},
-								[ createBlock( 'core/paragraph', { content: children } ) ]
-							)
-						)
-					)
-				),
-			},
-		],
+	supports: {
+		align: [ 'wide', 'full' ],
 	},
 
 	deprecated: [
