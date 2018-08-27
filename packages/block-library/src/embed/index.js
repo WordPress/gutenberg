@@ -557,7 +557,7 @@ export const others = [
 			title: 'Polldaddy',
 			icon: embedContentIcon,
 		} ),
-		patterns: [ /^https?:\/\/(www\.)?mixcloud\.com\/.+/i ],
+		patterns: [ /^https?:\/\/(www\.)?polldaddy\.com\/.+/i ],
 	},
 	{
 		name: 'core-embed/reddit',
