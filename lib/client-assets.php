@@ -77,7 +77,8 @@ function register_tinymce_scripts() {
 	$suffix     = SCRIPT_DEBUG ? '' : '.min';
 	$compressed = $compress_scripts && $concatenate_scripts && isset( $_SERVER['HTTP_ACCEPT_ENCODING'] )
 		&& false !== stripos( $_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip' );
-	// Load tinymce.js when running from /src, else load wp-tinymce.js.gz (production) or tinymce.min.js (SCRIPT_DEBUG).
+	// Load tinymce.js when running from /src, otherwise load wp-tinymce.js.gz (in production) or
+	// tinymce.min.js (when SCRIPT_DEBUG is true).
 	$mce_suffix = false !== strpos( get_bloginfo( 'version' ), '-src' ) ? '' : '.min';
 	if ( $compressed ) {
 		wp_register_script( 'wp-tinymce', includes_url( 'js/tinymce/' ) . 'wp-tinymce.php', array() );
