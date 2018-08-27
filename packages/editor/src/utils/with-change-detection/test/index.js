@@ -65,6 +65,20 @@ describe( 'withChangeDetection()', () => {
 		expect( state ).toEqual( { count: 1, isDirty: false } );
 	} );
 
+	it( 'should allow ignore callback as option', () => {
+		const reducer = withChangeDetection( {
+			isIgnored: ( action ) => action.type === 'INCREMENT',
+		} )( originalReducer );
+
+		let state;
+
+		state = reducer( undefined, {} );
+		expect( state ).toEqual( { count: 0, isDirty: false } );
+
+		state = reducer( deepFreeze( state ), { type: 'INCREMENT' } );
+		expect( state ).toEqual( { count: 1, isDirty: false } );
+	} );
+
 	it( 'should treat an initial ignore type as default false dirty', () => {
 		const reducer = withChangeDetection( { ignoreTypes: [ 'INCREMENT' ] } )( originalReducer );
 
