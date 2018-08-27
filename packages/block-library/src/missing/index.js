@@ -15,7 +15,8 @@ export const name = 'core/missing';
 export const settings = {
 	name,
 	category: 'common',
-	title: __( 'Missing Block' ),
+	title: __( 'Unrecognized Block' ),
+	description: __( 'Your site doesn\'t include support for this block.' ),
 
 	supports: {
 		className: false,
