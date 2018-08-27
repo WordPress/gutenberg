@@ -10,7 +10,7 @@ import { Children } from '@wordpress/element';
 import { Dropdown, IconButton, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-function Warning( { className, primaryActions, children, hiddenActions } ) {
+function Warning( { className, primaryActions, children, secondaryActions } ) {
 	return (
 		<div className={ classnames( className, 'editor-warning' ) }>
 			<div className="editor-warning__contents">
@@ -27,7 +27,7 @@ function Warning( { className, primaryActions, children, hiddenActions } ) {
 				) }
 			</div>
 
-			{ hiddenActions && (
+			{ secondaryActions && (
 				<div className="editor-warning__hidden">
 					<Dropdown
 						className="edit-post-more-menu"
@@ -43,7 +43,7 @@ function Warning( { className, primaryActions, children, hiddenActions } ) {
 						renderContent={ () => (
 							<div className="edit-post-more-menu__content">
 								<MenuGroup label={ __( 'More options' ) }>
-									{ hiddenActions.map( ( item, pos ) =>
+									{ secondaryActions.map( ( item, pos ) =>
 										<MenuItem onClick={ item.onClick } key={ pos }>
 											{ item.title }
 										</MenuItem>

@@ -30,7 +30,7 @@ function BlockInvalidWarning( { convertToHTML, convertToBlocks, convertToClassic
 					</Button>
 				),
 			] }
-			hiddenActions={ [
+			secondaryActions={ [
 				{ title: __( 'Convert to Blocks' ), onClick: convertToBlocks },
 				{ title: __( 'Convert to Classic Block' ), onClick: convertToClassic },
 			] }
