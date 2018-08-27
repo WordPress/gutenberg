@@ -1,15 +1,22 @@
 .editor-block-list__block[data-type="core/missing"] {
 	.editor-warning {
 		position: static;
-
-		// Round corners for a better visual separation between the warning border
-		// and the unrounded corners of the selected block outline.
-		border-radius: 4px;
 	}
 
-	.editor-warning__contents {
-		// Ensure action buttons display on the same line as the text.
-		flex-wrap: nowrap;
-		align-items: flex-start;
+	&.is-selected,
+	&.is-hovered {
+		// Remove the block outline because design requested that this
+		// feel less like a first-class block and more like an error message.
+		> .editor-block-list__block-edit::before {
+			outline: none;
+			transition: none !important;
+		}
+
+		// Remove the block menu because design requested that this
+		// feel less like a first-class block and more like an error message.
+		.editor-block-list__breadcrumb,
+		.editor-block-settings-menu {
+			display: none;
+		}
 	}
 }
