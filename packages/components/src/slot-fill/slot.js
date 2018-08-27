@@ -1,12 +1,23 @@
 /**
  * External dependencies
  */
-import { noop, map, isString, isFunction } from 'lodash';
+import {
+	isFunction,
+	isString,
+	map,
+	negate,
+	noop,
+} from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Component, Children, cloneElement, Fragment } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { isEmptyElement } from './utils';
 
 class Slot extends Component {
 	constructor() {
@@ -64,11 +75,16 @@ class Slot extends Component {
 				const childKey = `${ fillKey }---${ child.key || childIndex }`;
 				return cloneElement( child, { key: childKey } );
 			} );
-		} );
+		} ).filter(
+			// In some cases fills are rendered only when some conditions apply.
+			// This ensures that we only use non-empty fills when rendering, i.e.,
+			// it allows us to render wrappers only when the fills are actually present.
+			negate( isEmptyElement )
+		);
 
 		return (
 			<Fragment>
-				{ isFunction( children ) ? children( fills.filter( Boolean ) ) : fills }
+				{ isFunction( children ) ? children( fills ) : fills }
 			</Fragment>
 		);
 	}
