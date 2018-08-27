@@ -70,7 +70,7 @@ function gutenberg_get_script_polyfill( $tests ) {
  * Registers the main TinyMCE scripts.
  */
 function register_tinymce_scripts() {
-	global $concatenate_scripts, $compress_scripts;
+	global $tinymce_version, $concatenate_scripts, $compress_scripts;
 	if ( ! isset( $concatenate_scripts ) ) {
 		script_concat_settings();
 	}
@@ -81,10 +81,10 @@ function register_tinymce_scripts() {
 	// tinymce.min.js (when SCRIPT_DEBUG is true).
 	$mce_suffix = false !== strpos( get_bloginfo( 'version' ), '-src' ) ? '' : '.min';
 	if ( $compressed ) {
-		wp_register_script( 'wp-tinymce', includes_url( 'js/tinymce/' ) . 'wp-tinymce.php', array() );
+		wp_register_script( 'wp-tinymce', includes_url( 'js/tinymce/' ) . 'wp-tinymce.php', array(), $tinymce_version );
 	} else {
-		wp_register_script( 'wp-tinymce-root', includes_url( 'js/tinymce/' ) . "tinymce{$mce_suffix}.js", array() );
-		wp_register_script( 'wp-tinymce', includes_url( 'js/tinymce/' ) . "plugins/compat3x/plugin{$suffix}.js", array( 'wp-tinymce-root' ) );
+		wp_register_script( 'wp-tinymce-root', includes_url( 'js/tinymce/' ) . "tinymce{$mce_suffix}.js", array(), $tinymce_version );
+		wp_register_script( 'wp-tinymce', includes_url( 'js/tinymce/' ) . "plugins/compat3x/plugin{$suffix}.js", array( 'wp-tinymce-root' ), $tinymce_version );
 	}
 }
 
