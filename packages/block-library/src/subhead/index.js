@@ -17,7 +17,7 @@ export const settings = {
 
 	description: __( 'What’s a subhead? Smaller than a headline, bigger than basic text.' ),
 
-	icon: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7.1 6l-.5 3h4.5L9.4 19h3l1.8-10h4.5l.5-3H7.1z" /></svg>,
+	icon: <svg role="img" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7.1 6l-.5 3h4.5L9.4 19h3l1.8-10h4.5l.5-3H7.1z" /></svg>,
 
 	category: 'common',
 
