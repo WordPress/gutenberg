@@ -31,7 +31,6 @@ import * as list from './list';
 import * as more from './more';
 import * as nextpage from './nextpage';
 import * as preformatted from './preformatted';
-import * as pullquote from './pullquote';
 import * as reusableBlock from './block';
 import * as separator from './separator';
 import * as shortcode from './shortcode';
@@ -72,7 +71,6 @@ export const registerCoreBlocks = () => {
 		more,
 		nextpage,
 		preformatted,
-		pullquote,
 		separator,
 		reusableBlock,
 		spacer,

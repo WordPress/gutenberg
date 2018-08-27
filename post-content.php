@@ -139,10 +139,6 @@
 <p><?php _e( 'You can build any block you like, static or dynamic, decorative or plain. Here&#8217;s a pullquote block:', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:pullquote -->
-<blockquote class="wp-block-pullquote"><p><?php _e( 'Code is Poetry', 'gutenberg' ); ?></p><cite><?php _e( 'The WordPress community', 'gutenberg' ); ?></cite></blockquote>
-<!-- /wp:pullquote -->
-
 <!-- wp:paragraph {"align":"center"} -->
 <p style="text-align:center">
 	<em>

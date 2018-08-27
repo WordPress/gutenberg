@@ -34,7 +34,6 @@ import * as list from '../packages/block-library/src/list';
 import * as more from '../packages/block-library/src/more';
 import * as nextpage from '../packages/block-library/src/nextpage';
 import * as preformatted from '../packages/block-library/src/preformatted';
-import * as pullquote from '../packages/block-library/src/pullquote';
 import * as reusableBlock from '../packages/block-library/src/block';
 import * as separator from '../packages/block-library/src/separator';
 import * as shortcode from '../packages/block-library/src/shortcode';
@@ -83,7 +82,6 @@ export const registerCoreBlocks = () => {
 		more,
 		nextpage,
 		preformatted,
-		pullquote,
 		separator,
 		reusableBlock,
 		spacer,
