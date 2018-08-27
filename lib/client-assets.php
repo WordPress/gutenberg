@@ -620,9 +620,25 @@ function gutenberg_register_scripts_and_styles() {
 	// This empty stylesheet is defined to ensure backwards compatibility.
 	wp_register_style( 'wp-blocks', false );
 
+	$fonts_url = '';
+
+	/*
+	 * Translators: If there are characters in your language that are not supported
+	 * by Noto Serif, translate this to 'off'. Do not translate into your own language.
+	 */
+	if ( 'off' !== _x( 'on', 'Noto Serif font: on or off', 'gutenberg' ) ) {
+		$query_args = array(
+			'family' => urlencode( 'Noto Serif:400,400i,700,700i' ),
+		);
+
+		$fonts_url = esc_url_raw( add_query_arg( $query_args, 'https://fonts.googleapis.com/css' ) );
+	}
+
 	wp_register_style(
 		'wp-editor-font',
-		'https://fonts.googleapis.com/css?family=Noto+Serif:400,400i,700,700i'
+		$fonts_url,
+		array(),
+		null
 	);
 
 	wp_register_style(

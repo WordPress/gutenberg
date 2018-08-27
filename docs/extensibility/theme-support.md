@@ -53,7 +53,7 @@ Gutenberg adds additional markup to floated images to make styling them easier.
 
 Here's the markup for an `Image` with a caption:
 
-```
+```html
 <figure class="wp-block-image">
 	<img src="..." alt="" width="200px">
 	<figcaption>Short image caption.</figcaption>
@@ -62,7 +62,7 @@ Here's the markup for an `Image` with a caption:
 
 Here's the markup for a left-floated image:
 
-```
+```html
 <div class="wp-block-image">
 	<figure class="alignleft">
 		<img src="..." alt="" width="200px">
