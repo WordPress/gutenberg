@@ -9,6 +9,8 @@ Gutenberg is about blocks, and the main extensibility API of Gutenberg is the Bl
 
 Here is a small example of a static custom block type (you can try it in your browser's console):
 
+{% codetabs %}
+{% ES5 %}
 ```js
 var el = wp.element.createElement;
 
@@ -24,6 +26,24 @@ wp.blocks.registerBlockType( 'mytheme/red-block', {
 	}
 } );
 ```
+{% ESNext %}
+```js
+const { registerBlockType } = wp.blocks;
+const blockStyle = { backgroundColor: '#900', color: '#fff', padding: '20px' };
+
+registerBlockType( 'mytheme/red-block', {
+	title: 'Red Block',
+	icon: 'universal-access-alt',
+	category: 'layout',
+	edit: function() {
+		return <div style={ blockStyle }>I am a red block</div>
+	},
+	save: function() {
+		return <div style={ blockStyle }>I am a red block</div>
+	}
+} );
+```
+
 
 If you want to learn more about block creation, the [Blocks Tutorial](../docs/blocks.md) is the best place to start.
 

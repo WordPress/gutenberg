@@ -274,3 +274,5 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 {% end %}
 
 In the example above we updated the block to use an inner paragraph block with a title instead of a title attribute.
+
+> Above are some of the cases to use block deprecation. If you want to refer some real examples, [core block library](https://github.com/WordPress/gutenberg/tree/master/packages/block-library/src) is the best place. Core blocks have been updated across releases and implement simple to complex deprecations.
