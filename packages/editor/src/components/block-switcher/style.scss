@@ -11,26 +11,6 @@
 	display: block;
 	height: $icon-button-size;
 	padding: 6px 3px;
-	width: $icon-button-size + 6px + 6px; // Include padding in width.
-
-	// Paint a dropdown.
-	&::after {
-		content: "";
-		pointer-events: none;
-		display: block;
-		position: absolute;
-		top: $icon-button-size / 2;
-		width: 0;
-		height: 0;
-		border-left: 3px solid transparent;
-		border-right: 3px solid transparent;
-		border-top: 4px solid $dark-gray-500;
-		right: 6px;
-
-		@include break-small() {
-			right: 9px;
-		}
-	}
 
 	// Unset icon button styles.
 	&:active,
@@ -44,6 +24,7 @@
 
 	.editor-block-icon,
 	.editor-block-switcher__transform {
+		position: relative;
 		height: $icon-button-size-small;
 		margin: 0;
 		padding: 0 6px;
@@ -52,11 +33,26 @@
 		transition: all 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
 	}
 
+	// Paint a dropdown.
+	.editor-block-icon::after {
+		content: "";
+		pointer-events: none;
+		display: block;
+		position: absolute;
+		top: $icon-button-size-small / 2;
+		width: 0;
+		height: 0;
+		border-left: 3px solid transparent;
+		border-right: 3px solid transparent;
+		border-top: 4px solid currentColor;
+		right: 6px;
+	}
+
 	.editor-block-switcher__transform {
 		margin-top: 6px + 3px;
 		border-radius: $radius-round-rectangle;
 		height: $icon-button-size-small + 6px;
-		padding: 3px 12px 3px 6px;
+		padding: 3px 9px 3px 9px;
 	}
 
 	// Block hover and focus style.
