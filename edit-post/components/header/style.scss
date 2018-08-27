@@ -4,8 +4,7 @@
 	border-bottom: $border-width solid $light-gray-500;
 	background: $white;
 	display: flex;
-	flex-direction: row;
-	align-items: stretch;
+	align-items: center;
 	justify-content: space-between;
 	z-index: z-index(".edit-post-header");
 	left: 0;
@@ -39,8 +38,13 @@
 @include editor-left(".edit-post-header");
 
 .edit-post-header__settings {
-	display: inline-flex;
+	display: flex;
 	align-items: center;
+	flex-shrink: 0;
+
+	& > * {
+		flex-shrink: 0;
+	}
 }
 
 .edit-post-header .components-button {

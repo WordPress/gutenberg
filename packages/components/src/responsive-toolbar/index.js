@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Component, cloneElement, Children, createRef } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import { withInstanceId } from '@wordpress/compose';
 
 /**
@@ -30,22 +30,25 @@ class ResponsiveToolbar extends Component {
 		this.container = createRef();
 		this.hiddenContainer = createRef();
 
+		this.updateHiddenItems = this.updateHiddenItems.bind( this );
 		this.throttledUpdateHiddenItems = this.throttledUpdateHiddenItems.bind( this );
 	}
 
 	componentDidMount() {
 		this.toggleWindowEvents( true );
 		this.updateHiddenItems();
-	}
 
-	componentDidUpdate( prevProps ) {
-		if ( prevProps.children !== this.props.children ) {
-			this.updateHiddenItems();
-		}
+		// If the children change, we need to recompute
+		this.observer = new window.MutationObserver( this.updateHiddenItems );
+		this.observer.observe( this.hiddenContainer.current, { childList: true } );
 	}
 
 	componentWillUnmount() {
 		this.toggleWindowEvents( false );
+		this.observer.disconnect();
+		if ( this.style ) {
+			this.style.parentNode.removeChild( this.style );
+		}
 	}
 
 	toggleWindowEvents( isListening ) {
@@ -53,7 +56,6 @@ class ResponsiveToolbar extends Component {
 
 		window.cancelAnimationFrame( this.rafHandle );
 		window[ handler ]( 'resize', this.throttledUpdateHiddenItems );
-		window[ handler ]( 'scroll', this.throttledUpdateHiddenItems, true );
 	}
 
 	throttledUpdateHiddenItems() {
@@ -129,9 +131,7 @@ class ResponsiveToolbar extends Component {
 					</div>
 				</Disabled>
 
-				{ Children.map( children, ( child, index ) => {
-					return cloneElement( child, { key: index } );
-				} ) }
+				{ children }
 
 				{ countHiddenChildren > 0 && (
 					<Dropdown
@@ -143,11 +143,7 @@ class ResponsiveToolbar extends Component {
 							`components-responsive-toolbar__dropdown-content-${ instanceId }` )
 						}
 						renderToggle={ renderToggle }
-						renderContent={ () => {
-							return Children.map( children, ( child, index ) => {
-								return cloneElement( child, { key: index } );
-							} );
-						} }
+						renderContent={ () => children }
 					/>
 				) }
 			</div>

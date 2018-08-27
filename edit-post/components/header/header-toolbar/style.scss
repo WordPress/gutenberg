@@ -9,8 +9,9 @@
 
 .edit-post-header-toolbar {
 	display: flex;
-	align-items: center;
+	align-items: stretch;
 	flex-grow: 1;
+	position: relative;
 
 	@include break-large() {
 		.editor-block-switcher .components-toolbar {
@@ -32,16 +33,31 @@
 	flex-grow: 1;
 
 	.editor-block-toolbar {
+		position: absolute;
+		top: -9px;
+		left: 9px;
+		right: 0;
+		bottom: -9px;
 		border-left: none;
 		border-top: 0;
 		border-bottom: 0;
-	}
 
-	.editor-block-toolbar .components-toolbar {
-		border-top: none;
-		border-bottom: none;
-		margin: -9px 0;
-		padding: 9px;
+		.components-toolbar {
+			border-top: none;
+			border-bottom: none;
+			padding: 9px;
+		}
+
+		.editor-block-toolbar__tools-dropdown {
+			.components-toolbar {
+				border-bottom: $border-width solid $light-gray-500;
+				border-top: $border-width solid $light-gray-500;
+				padding: 0;
+				margin: 0;
+				margin-left: -1px;
+				margin-top: -1px;
+			}
+		}
 	}
 
 	.is-sidebar-opened & {
@@ -58,9 +74,10 @@
 	// Move toolbar into top Editor Bar.
 	@include break-large {
 		padding-left: $item-spacing;
-		position: static;
+		position: relative;
 		left: auto;
 		right: auto;
+		top: auto;
 		background: none;
 		border-bottom: none;
 		min-height: auto;
