@@ -1184,7 +1184,7 @@ describe( 'state', () => {
 					} ],
 				} );
 
-				expect( state.past ).toHaveLength( 1 );
+				expect( state.past ).toHaveLength( 0 );
 
 				state = editor( state, {
 					type: 'UPDATE_BLOCK_ATTRIBUTES',
@@ -1202,7 +1202,7 @@ describe( 'state', () => {
 					},
 				} );
 
-				expect( state.past ).toHaveLength( 2 );
+				expect( state.past ).toHaveLength( 1 );
 			} );
 
 			it( 'should not overwrite present history if updating different attributes', () => {
@@ -1217,7 +1217,7 @@ describe( 'state', () => {
 					} ],
 				} );
 
-				expect( state.past ).toHaveLength( 1 );
+				expect( state.past ).toHaveLength( 0 );
 
 				state = editor( state, {
 					type: 'UPDATE_BLOCK_ATTRIBUTES',
@@ -1235,7 +1235,7 @@ describe( 'state', () => {
 					},
 				} );
 
-				expect( state.past ).toHaveLength( 3 );
+				expect( state.past ).toHaveLength( 2 );
 			} );
 		} );
 	} );

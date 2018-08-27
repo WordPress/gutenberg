@@ -116,7 +116,6 @@ const withHistory = ( options = {} ) => ( reducer ) => {
 
 		if (
 			shouldCreateUndoLevel ||
-			! past.length ||
 			! shouldOverwriteState( action, previousAction )
 		) {
 			nextPast = [ ...past, present ];

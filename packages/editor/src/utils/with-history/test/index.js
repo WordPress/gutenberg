@@ -123,7 +123,7 @@ describe( 'withHistory', () => {
 		state = reducer( state, { type: 'INCREMENT' } );
 
 		expect( state ).toEqual( {
-			past: [ 0 ], // Needs at least one history
+			past: [],
 			present: 2,
 			future: [],
 			lastAction: { type: 'INCREMENT' },
@@ -149,18 +149,8 @@ describe( 'withHistory', () => {
 		state = reducer( state, { type: 'INCREMENT' } );
 
 		expect( state ).toEqual( {
-			past: [ 0 ],
+			past: [],
 			present: 1,
-			future: [],
-			lastAction: { type: 'INCREMENT' },
-			shouldCreateUndoLevel: false,
-		} );
-
-		state = reducer( state, { type: 'INCREMENT' } );
-
-		expect( state ).toEqual( {
-			past: [ 0 ],
-			present: 2,
 			future: [],
 			lastAction: { type: 'INCREMENT' },
 			shouldCreateUndoLevel: false,
@@ -178,7 +168,7 @@ describe( 'withHistory', () => {
 		state = reducer( state, { type: 'CREATE_UNDO_LEVEL' } );
 
 		expect( state ).toEqual( {
-			past: [ 0 ],
+			past: [],
 			present: 1,
 			future: [],
 			lastAction: null,
@@ -188,7 +178,7 @@ describe( 'withHistory', () => {
 		state = reducer( state, { type: 'INCREMENT' } );
 
 		expect( state ).toEqual( {
-			past: [ 0, 1 ],
+			past: [ 1 ],
 			present: 2,
 			future: [],
 			lastAction: { type: 'INCREMENT' },
