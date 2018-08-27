@@ -209,6 +209,6 @@ export default withSelect( ( select ) => {
 
 	return {
 		categories: getEntityRecords( 'taxonomy', 'category', query ),
-		isRequesting: isResolving( 'core', 'getEntityRecords', 'taxonomy', 'category', query ),
+		isRequesting: isResolving( 'core', 'getEntityRecords', [ 'taxonomy', 'category', query ] ),
 	};
 } )( CategoriesEdit );
