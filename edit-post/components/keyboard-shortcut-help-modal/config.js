@@ -88,7 +88,7 @@ const blockShortcuts = {
 			description: __( 'Duplicate the selected block(s).' ),
 		},
 		{
-			keyCombination: ctrlShift( '-' ),
+			keyCombination: primaryShift( 'x' ),
 			description: __( 'Remove the selected block(s).' ),
 		},
 		{
