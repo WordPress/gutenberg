@@ -18,6 +18,14 @@ const withChangeDetection = ( options = {} ) => ( reducer ) => {
 	return ( state, action ) => {
 		let nextState = reducer( state, action );
 
+		// If initial state, assume non-dirty.
+		if ( state === undefined ) {
+			return {
+				...nextState,
+				isDirty: false,
+			};
+		}
+
 		// Reset at:
 		//  - Initial state
 		//  - Reset types
@@ -34,8 +42,8 @@ const withChangeDetection = ( options = {} ) => ( reducer ) => {
 		}
 
 		// Avoid mutating state, unless it's already changing by original
-		// reducer and not initial.
-		if ( ! isChanging || state === undefined ) {
+		// reducer.
+		if ( ! isChanging ) {
 			nextState = { ...nextState };
 		}
 
