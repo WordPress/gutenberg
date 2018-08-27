@@ -9,6 +9,7 @@ import classnames from 'classnames';
  */
 import { Component } from '@wordpress/element';
 import { withSafeTimeout } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
 const dragImageClass = 'components-draggable__invisible-drag-image';
 const cloneWrapperClass = 'components-draggable__clone';
@@ -18,6 +19,11 @@ const clonePadding = 20;
 class Draggable extends Component {
 	constructor() {
 		super( ...arguments );
+
+		deprecated( 'wp.components.Draggable', {
+			version: 3.7,
+			alternative: 'wp.components.withDraggable',
+		} );
 
 		this.onDragStart = this.onDragStart.bind( this );
 		this.onDragOver = this.onDragOver.bind( this );

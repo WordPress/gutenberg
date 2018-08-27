@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Component, Fragment } from '@wordpress/element';
-import { Toolbar } from '@wordpress/components';
+import { Dashicon, Toolbar, withDraggable } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -28,6 +28,8 @@ export class BlockBreadcrumb extends Component {
 		};
 		this.onFocus = this.onFocus.bind( this );
 		this.onBlur = this.onBlur.bind( this );
+		this.onDragStart = this.onDragStart.bind( this );
+		this.onDragEnd = this.onDragEnd.bind( this );
 	}
 
 	onFocus( event ) {
@@ -47,12 +49,27 @@ export class BlockBreadcrumb extends Component {
 		} );
 	}
 
+	onDragStart( event ) {
+		const { draggableData, draggableElementId, initDragging, onDragStart } = this.props;
+		initDragging( draggableElementId, draggableData )( event );
+		onDragStart( event );
+	}
+
+	onDragEnd( event ) {
+		this.props.onDragEnd( event );
+	}
+
 	render() {
-		const { clientId, rootClientId } = this.props;
+		const { isDraggable, clientId, rootClientId } = this.props;
 
 		return (
-			<div className={ 'editor-block-list__breadcrumb' }>
+			<div
+				className={ 'editor-block-list__breadcrumb' }
+				draggable={ isDraggable }
+				onDragStart={ this.onDragStart }
+				onDragEnd={ this.onDragEnd } >
 				<Toolbar>
+					<div className="editor-block-list__breadcrumb-drag-handle"><Dashicon icon="editor-justify" size={ 10 } viewBox={ 14 } /></div>
 					{ rootClientId && (
 						<Fragment>
 							<BlockTitle clientId={ rootClientId } />
@@ -70,9 +87,9 @@ export default compose( [
 	withSelect( ( select, ownProps ) => {
 		const { getBlockRootClientId } = select( 'core/editor' );
 		const { clientId } = ownProps;
-
 		return {
 			rootClientId: getBlockRootClientId( clientId ),
 		};
 	} ),
+	withDraggable,
 ] )( BlockBreadcrumb );

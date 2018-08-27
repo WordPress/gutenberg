@@ -1,19 +1,4 @@
 .editor-block-list__layout .components-draggable__clone {
-	& > .editor-block-list__block > .editor-block-list__block-draggable {
-		background: $white; // @todo: ensure this works with themes that invert the color
-		box-shadow: $shadow-popover;
-
-		@include break-small {
-			left: -$block-parent-side-ui-clearance - $border-width;
-			right: -$block-parent-side-ui-clearance - $border-width;
-
-			.editor-block-list__layout & {
-				left: -$border-width;
-				right: -$border-width;
-			}
-		}
-	}
-
 	// Hide the Block UI when dragging the block
 	// This ensures the page scroll properly (no sticky elements)
 	.editor-block-contextual-toolbar,
@@ -23,62 +8,6 @@
 		display: none !important;
 	}
 }
-
-.editor-block-list__layout .editor-block-list__block-draggable {
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	z-index: z-index(".editor-block-list__block-draggable");
-
-	> .editor-block-list__block-draggable-inner {
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
-		visibility: hidden;
-
-		// Use opacity to work in various editor styles.
-		background-color: $dark-opacity-light-200;
-
-		.is-dark-theme & {
-			background-color: $light-opacity-light-200;
-		}
-
-		@include break-small {
-			margin: 0 48px;
-		}
-	}
-
-	&.is-visible > .editor-block-list__block-draggable-inner {
-		visibility: visible;
-	}
-
-	@include break-small {
-		// use a wider available space for hovering/selecting/dragging on top level blocks
-		left: -$parent-block-padding - $block-padding;
-		right: -$parent-block-padding - $block-padding;
-
-		// use smaller space for hovering/selecting/dragging on child blocks
-		.editor-block-list__layout & {
-			left: 0;
-			right: 0;
-		}
-
-		// Full width blocks don't have the place to expand on the side
-		.editor-block-list__block[data-align="full"] & {
-			left: 0;
-			right: 0;
-		}
-	}
-
-
-	cursor: move; // Fallback for IE/Edge < 14
-	cursor: grab;
-}
-
 
 // Allow Drag & Drop when clicking on the empty area of the mover and the settings menu
 .editor-block-list__layout .editor-block-list__block .editor-block-mover,
@@ -95,7 +24,7 @@
 .editor-block-list__block {
 	&.is-hidden *,
 	&.is-hidden > * {
-		visibility: hidden;
+		opacity: 0.8;
 	}
 
 	.editor-block-list__block-edit .reusable-block-edit-panel * {
@@ -423,12 +352,6 @@
 		> .editor-block-mover .editor-block-mover__control,
 		> .editor-block-settings-menu > * {
 			float: left;
-		}
-
-		// There is no side UI clearance on full-wide elements, so they are simply not draggable on the sides
-		> .editor-block-list__block-draggable {
-			left: 0;
-			right: 0;
 		}
 
 		// Position hover label on the right
@@ -1006,7 +929,14 @@
 		.editor-block-list__block:hover & {
 			@include fade_in(0.1s);
 		}
+
+		.editor-block-list__breadcrumb-drag-handle {
+			margin-right: 2px;
+		}
 	}
+
+	cursor: move;/* Fallback for IE/Edge < 14 */
+	cursor: grab;
 }
 
 .editor-block-list__descendant-arrow::before {
