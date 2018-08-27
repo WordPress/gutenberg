@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
+import { noop } from 'lodash-es';
 import TestUtils from 'react-dom/test-utils';
 import ReactDOM from 'react-dom';
 

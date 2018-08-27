@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pick, sortBy, forEach, without, noop } from 'lodash';
+import { pick, sortBy, forEach, without, noop } from 'lodash-es';
 
 /**
  * WordPress dependencies

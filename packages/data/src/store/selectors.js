@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 
 /**
  * Returns the raw `isResolving` value for a given reducer key, selector name,

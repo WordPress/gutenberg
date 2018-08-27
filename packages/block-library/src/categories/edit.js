@@ -5,7 +5,7 @@ import { Component, Fragment } from '@wordpress/element';
 import { PanelBody, Placeholder, Spinner, ToggleControl } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { times, unescape } from 'lodash';
+import { times, unescape } from 'lodash-es';
 import {
 	InspectorControls,
 	BlockControls,

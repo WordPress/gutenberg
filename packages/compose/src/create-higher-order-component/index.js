@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { camelCase, upperFirst } from 'lodash';
+import { camelCase, upperFirst } from 'lodash-es';
 
 /**
  * Given a function mapping a component to an enhanced component and modifier

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { matcherHint, printExpected, printReceived } from 'jest-matcher-utils';
-import { isEqual, reduce, some } from 'lodash';
+import { isEqual, reduce, some } from 'lodash-es';
 
 /**
  * Internal dependencies

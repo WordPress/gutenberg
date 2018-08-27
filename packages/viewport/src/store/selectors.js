@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { takeRight } from 'lodash';
+import { takeRight } from 'lodash-es';
 
 /**
  * Returns true if the viewport matches the given query, or false otherwise.

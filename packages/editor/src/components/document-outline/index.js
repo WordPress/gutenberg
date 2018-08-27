@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { countBy, flatMap, get } from 'lodash';
+import { countBy, flatMap, get } from 'lodash-es';
 
 /**
  * WordPress dependencies

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { upperFirst, camelCase, map, find } from 'lodash';
+import { upperFirst, camelCase, map, find } from 'lodash-es';
 
 /**
  * WordPress dependencies

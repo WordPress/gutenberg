@@ -7,7 +7,7 @@ import {
 	isArray,
 	get,
 	some,
-} from 'lodash';
+} from 'lodash-es';
 
 /**
  * WordPress dependencies

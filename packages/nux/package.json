@@ -26,7 +26,7 @@
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
-		"lodash": "^4.17.10",
+		"lodash-es": "^4.17.10",
 		"rememo": "^3.0.0"
 	},
 	"devDependencies": {

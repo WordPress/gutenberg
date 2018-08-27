@@ -1,7 +1,7 @@
 /**
  * External dependencies.
  */
-import { isEqual } from 'lodash';
+import { isEqual } from 'lodash-es';
 
 /**
  * WordPress dependencies.

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { first, partial, castArray } from 'lodash';
+import { first, partial, castArray } from 'lodash-es';
 import classnames from 'classnames';
 
 /**

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import tinymce from 'tinymce';
-import { isEqual } from 'lodash';
+import { isEqual } from 'lodash-es';
 import classnames from 'classnames';
 
 /**

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { throttle } from 'lodash';
+import { throttle } from 'lodash-es';
 import classnames from 'classnames';
 import scrollIntoView from 'dom-scroll-into-view';
 

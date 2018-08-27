@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { mount } from 'enzyme';
-import { isEmpty } from 'lodash';
+import { isEmpty } from 'lodash-es';
 
 /**
  * Internal dependencies

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get, includes, union } from 'lodash';
+import { find, get, includes, union } from 'lodash-es';
 
 /**
  * WordPress dependencies

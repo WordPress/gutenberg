@@ -3,7 +3,7 @@
  * External Dependencies
  */
 import TextareaAutosize from 'react-autosize-textarea';
-import { isEqual } from 'lodash';
+import { isEqual } from 'lodash-es';
 
 /**
  * WordPress Dependencies

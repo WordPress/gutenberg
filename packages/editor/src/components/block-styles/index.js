@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get } from 'lodash';
+import { find, get } from 'lodash-es';
 import classnames from 'classnames';
 
 /**

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { uniq } from 'lodash';
+import { uniq } from 'lodash-es';
 
 /**
  * WordPress dependencies

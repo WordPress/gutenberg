@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, reduce, size, castArray, first, last } from 'lodash';
+import { get, reduce, size, castArray, first, last } from 'lodash-es';
 
 /**
  * WordPress dependencies

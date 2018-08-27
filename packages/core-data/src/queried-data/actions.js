@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray } from 'lodash';
+import { castArray } from 'lodash-es';
 
 /**
  * Returns an action object used in signalling that items have been received.

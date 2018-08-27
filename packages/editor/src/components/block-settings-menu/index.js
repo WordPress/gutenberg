@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { castArray, first, last, every, flow } from 'lodash';
+import { castArray, first, last, every, flow } from 'lodash-es';
 
 /**
  * WordPress dependencies

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, map } from 'lodash';
+import { filter, map } from 'lodash-es';
 import TestUtils from 'react-dom/test-utils';
 import ReactDOM from 'react-dom';
 

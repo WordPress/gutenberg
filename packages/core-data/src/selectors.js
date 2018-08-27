@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { map, find, get, filter } from 'lodash';
+import { map, find, get, filter } from 'lodash-es';
 
 /**
  * WordPress dependencies

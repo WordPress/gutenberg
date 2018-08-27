@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { extend, pick, isString, isEqual, forEach, isNumber } from 'lodash';
+import { extend, pick, isString, isEqual, forEach, isNumber } from 'lodash-es';
 import memize from 'memize';
 
 /**

@@ -8,7 +8,7 @@ import { applyFilters, doAction } from '@wordpress/hooks';
 /**
  * External dependencies
  */
-import { isFunction } from 'lodash';
+import { isFunction } from 'lodash-es';
 
 /**
  * Plugin definitions keyed by plugin name.

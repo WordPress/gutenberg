@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { cond, matchesProperty } from 'lodash';
+import { cond, matchesProperty } from 'lodash-es';
 
 /**
  * WordPress dependencies

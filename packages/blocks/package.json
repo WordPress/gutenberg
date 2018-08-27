@@ -34,7 +34,7 @@
 		"@wordpress/shortcode": "file:../shortcode",
 		"element-closest": "^2.0.2",
 		"hpq": "^1.2.0",
-		"lodash": "^4.17.10",
+		"lodash-es": "^4.17.10",
 		"rememo": "^3.0.0",
 		"showdown": "^1.8.6",
 		"simple-html-tokenizer": "^0.4.1",

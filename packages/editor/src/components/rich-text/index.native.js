@@ -6,7 +6,7 @@ import { View } from 'react-native';
 import {
 	forEach,
 	merge,
-} from 'lodash';
+} from 'lodash-es';
 
 /**
  * WordPress dependencies

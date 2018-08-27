@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { omit } from 'lodash';
+import { omit } from 'lodash-es';
 
 const phrasingContentSchema = {
 	strong: {},

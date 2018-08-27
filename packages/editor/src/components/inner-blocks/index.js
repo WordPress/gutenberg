@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pick, isEqual, map } from 'lodash';
+import { pick, isEqual, map } from 'lodash-es';
 import classnames from 'classnames';
 
 /**

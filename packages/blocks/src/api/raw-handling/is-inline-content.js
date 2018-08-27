@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { difference } from 'lodash';
+import { difference } from 'lodash-es';
 
 /**
  * Internal dependencies

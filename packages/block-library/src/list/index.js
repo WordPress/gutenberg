@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, compact, get, initial, last, isEmpty, omit } from 'lodash';
+import { find, compact, get, initial, last, isEmpty, omit } from 'lodash-es';
 
 /**
  * WordPress dependencies

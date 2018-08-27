@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { includes, debounce } from 'lodash';
+import { includes, debounce } from 'lodash-es';
 import classnames from 'classnames';
 
 /**

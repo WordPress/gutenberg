@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { mount } from 'enzyme';
-import { noop } from 'lodash';
+import { noop } from 'lodash-es';
 import TestUtils from 'react-dom/test-utils';
 
 /**

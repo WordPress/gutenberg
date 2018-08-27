@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { times, property, omit } from 'lodash';
+import { times, property, omit } from 'lodash-es';
 import classnames from 'classnames';
 import memoize from 'memize';
 

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flowRight } from 'lodash';
+import { flowRight } from 'lodash-es';
 import refx from 'refx';
 
 /**

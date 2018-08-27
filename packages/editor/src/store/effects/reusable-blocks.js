@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, map, uniqueId } from 'lodash';
+import { castArray, map, uniqueId } from 'lodash-es';
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
 
 /**

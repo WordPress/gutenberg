@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { keyBy, map, groupBy, flowRight } from 'lodash';
+import { keyBy, map, groupBy, flowRight } from 'lodash-es';
 
 /**
  * WordPress dependencies

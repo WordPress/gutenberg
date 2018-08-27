@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { mount } from 'enzyme';
-import { each } from 'lodash';
+import { each } from 'lodash-es';
 
 /**
  * WordPress dependencies

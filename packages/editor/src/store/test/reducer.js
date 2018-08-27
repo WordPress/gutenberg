@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { values, noop } from 'lodash';
+import { values, noop } from 'lodash-es';
 import deepFreeze from 'deep-freeze';
 
 /**

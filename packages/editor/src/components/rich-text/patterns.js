@@ -2,7 +2,7 @@
  * External dependencies
  */
 import tinymce from 'tinymce';
-import { filter, escapeRegExp, groupBy, drop } from 'lodash';
+import { filter, escapeRegExp, groupBy, drop } from 'lodash-es';
 
 /**
  * WordPress dependencies

@@ -8,7 +8,7 @@ import {
 	mapValues,
 	overEvery,
 	get,
-} from 'lodash';
+} from 'lodash-es';
 
 /**
  * WordPress dependencies

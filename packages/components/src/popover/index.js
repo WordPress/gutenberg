@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop } from 'lodash';
+import { noop } from 'lodash-es';
 
 /**
  * WordPress dependencies

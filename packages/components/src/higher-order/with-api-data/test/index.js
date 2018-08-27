@@ -2,7 +2,7 @@
  * External dependencies
  */
 import renderer from 'react-test-renderer';
-import { identity, fromPairs } from 'lodash';
+import { identity, fromPairs } from 'lodash-es';
 import PropTypes from 'prop-types';
 
 /**

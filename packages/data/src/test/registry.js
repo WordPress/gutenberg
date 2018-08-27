@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, mapValues } from 'lodash';
+import { castArray, mapValues } from 'lodash-es';
 
 /**
  * Internal dependencies

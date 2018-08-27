@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mapValues, reduce, forEach, noop } from 'lodash';
+import { mapValues, reduce, forEach, noop } from 'lodash-es';
 
 /**
  * WordPress dependencies

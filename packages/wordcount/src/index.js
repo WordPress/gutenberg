@@ -1,4 +1,4 @@
-import { extend, flow } from 'lodash';
+import { extend, flow } from 'lodash-es';
 import { defaultSettings } from './defaultSettings';
 import stripTags from './stripTags';
 import transposeAstralsToCountableChar from './transposeAstralsToCountableChar';

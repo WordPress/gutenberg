@@ -24,7 +24,7 @@
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
-		"lodash": "^4.17.10"
+		"lodash-es": "^4.17.10"
 	},
 	"devDependencies": {
 		"deep-freeze": "^0.0.1",

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, pickBy, reduce, some, upperFirst } from 'lodash';
+import { find, pickBy, reduce, some, upperFirst } from 'lodash-es';
 
 /**
  * WordPress dependencies

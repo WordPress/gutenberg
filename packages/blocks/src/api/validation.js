@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { tokenize } from 'simple-html-tokenizer';
-import { xor, fromPairs, isEqual, includes, stubTrue } from 'lodash';
+import { xor, fromPairs, isEqual, includes, stubTrue } from 'lodash-es';
 
 /**
  * Internal dependencies

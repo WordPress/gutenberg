@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { overSome, includes, first, last, drop, dropRight } from 'lodash';
+import { overSome, includes, first, last, drop, dropRight } from 'lodash-es';
 
 /**
  * Default options for withHistory reducer enhancer. Refer to withHistory

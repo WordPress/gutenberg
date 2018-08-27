@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { shallow } from 'enzyme';
-import { noop } from 'lodash';
+import { noop } from 'lodash-es';
 
 /**
  * Internal dependencies

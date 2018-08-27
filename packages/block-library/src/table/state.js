@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { times } from 'lodash';
+import { times } from 'lodash-es';
 
 /**
  * Creates a table state.

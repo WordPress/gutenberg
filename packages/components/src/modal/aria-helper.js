@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { forEach } from 'lodash';
+import { forEach } from 'lodash-es';
 
 const LIVE_REGION_ARIA_ROLES = new Set( [
 	'alert',

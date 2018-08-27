@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
+import { noop } from 'lodash-es';
 
 /**
  * External dependencies

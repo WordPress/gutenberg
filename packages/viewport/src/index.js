@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { reduce, forEach, debounce, mapValues, property } from 'lodash';
+import { reduce, forEach, debounce, mapValues, property } from 'lodash-es';
 
 /**
  * WordPress dependencies

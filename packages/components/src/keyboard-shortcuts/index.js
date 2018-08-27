@@ -3,7 +3,7 @@
  */
 import Mousetrap from 'mousetrap';
 import 'mousetrap/plugins/global-bind/mousetrap-global-bind';
-import { forEach } from 'lodash';
+import { forEach } from 'lodash-es';
 
 /**
  * WordPress dependencies

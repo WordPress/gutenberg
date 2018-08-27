@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { last, take, clone, uniq, map, difference, each, identity, some } from 'lodash';
+import { last, take, clone, uniq, map, difference, each, identity, some } from 'lodash-es';
 import classnames from 'classnames';
 
 /**

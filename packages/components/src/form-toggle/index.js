@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop } from 'lodash';
+import { noop } from 'lodash-es';
 
 function FormToggle( { className, checked, id, onChange = noop, ...props } ) {
 	const wrapperClasses = classnames(

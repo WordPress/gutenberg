@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { combineReducers } from 'redux';
-import { keyBy, map, flowRight } from 'lodash';
+import { keyBy, map, flowRight } from 'lodash-es';
 
 /**
  * Internal dependencies

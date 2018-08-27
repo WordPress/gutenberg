@@ -2,7 +2,7 @@
  * External dependencies
  */
 import deepFreeze from 'deep-freeze';
-import { filter } from 'lodash';
+import { filter } from 'lodash-es';
 
 /**
  * Internal dependencies

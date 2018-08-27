@@ -11,7 +11,7 @@ import {
 	isEqual,
 	merge,
 	noop,
-} from 'lodash';
+} from 'lodash-es';
 import 'element-closest';
 
 /**

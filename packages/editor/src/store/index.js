@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { forOwn } from 'lodash';
+import { forOwn } from 'lodash-es';
 
 /**
  * WordPress Dependencies

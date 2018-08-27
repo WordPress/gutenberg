@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { includes, difference, keys } from 'lodash';
+import { includes, difference, keys } from 'lodash-es';
 
 /**
  * An object containing information about a guide.

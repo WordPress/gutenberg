@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pick, flow } from 'lodash';
+import { pick, flow } from 'lodash-es';
 
 /**
  * Internal dependencies

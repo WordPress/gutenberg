@@ -9,7 +9,7 @@ import {
 	map,
 	pick,
 	startCase,
-} from 'lodash';
+} from 'lodash-es';
 
 /**
  * WordPress dependencies

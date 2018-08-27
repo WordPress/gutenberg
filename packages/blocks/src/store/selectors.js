@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { filter, includes, map } from 'lodash';
+import { filter, includes, map } from 'lodash-es';
 
 /**
  * Returns all the available block types.

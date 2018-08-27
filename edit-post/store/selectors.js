@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { get, includes, some } from 'lodash';
+import { get, includes, some } from 'lodash-es';
 
 /**
  * Returns the current editing mode.

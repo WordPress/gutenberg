@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, kebabCase } from 'lodash';
+import { find, kebabCase } from 'lodash-es';
 
 /**
  *  Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values.

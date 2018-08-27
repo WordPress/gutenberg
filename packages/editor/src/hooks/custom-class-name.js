@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { assign, difference, omit } from 'lodash';
+import { assign, difference, omit } from 'lodash-es';
 import classnames from 'classnames';
 
 /**

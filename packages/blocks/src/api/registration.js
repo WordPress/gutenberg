@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { get, isFunction, some } from 'lodash';
+import { get, isFunction, some } from 'lodash-es';
 
 /**
  * WordPress dependencies

@@ -24,7 +24,7 @@
 		"@babel/runtime-corejs2": "7.0.0-beta.56",
 		"@wordpress/element": "file:../element",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
-		"lodash": "^4.17.10"
+		"lodash-es": "^4.17.10"
 	},
 	"devDependencies": {
 		"enzyme": "^3.3.0",

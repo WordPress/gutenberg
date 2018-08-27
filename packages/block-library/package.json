@@ -36,7 +36,7 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/viewport": "file:../viewport",
 		"classnames": "^2.2.5",
-		"lodash": "^4.17.10",
+		"lodash-es": "^4.17.10",
 		"memize": "^1.0.5",
 		"moment": "^2.22.1",
 		"querystring": "^0.2.0",
