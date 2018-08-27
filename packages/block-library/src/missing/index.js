@@ -23,7 +23,6 @@ export const settings = {
 		customClassName: false,
 		inserter: false,
 		html: false,
-		preserveOriginalContent: true,
 	},
 
 	attributes: {
