@@ -28,25 +28,23 @@ function BlockToolbar( { blockClientIds, isValid, mode } ) {
 	}
 
 	return (
-		<div className="editor-block-toolbar">
-			<ResponsiveToolbar
-				className="editor-block-toolbar__tools"
-				extraContentClassName="editor-block-toolbar__tools-dropdown"
-				renderToggle={ ( { onToggle, isOpen } ) => (
-					<Toolbar controls={ [ {
-						icon: 'arrow-down-alt2',
-						title: __( 'More Tools' ),
-						onClick: onToggle,
-						extraProps: { 'aria-expanded': isOpen },
-					} ] } />
-				) }
-			>
-				<BlockSwitcher clientIds={ blockClientIds } />
-				<BlockControls.Slot />
-				<BlockFormatControls.Slot />
-			</ResponsiveToolbar>
+		<ResponsiveToolbar
+			className="editor-block-toolbar"
+			extraContentClassName="editor-block-toolbar__tools-dropdown"
+			renderToggle={ ( { onToggle, isOpen } ) => (
+				<Toolbar controls={ [ {
+					icon: 'arrow-down-alt2',
+					title: __( 'More Tools' ),
+					onClick: onToggle,
+					extraProps: { 'aria-expanded': isOpen },
+				} ] } />
+			) }
+		>
+			<BlockSwitcher clientIds={ blockClientIds } />
+			<BlockControls.Slot />
+			<BlockFormatControls.Slot />
 			<BlockSettingsMenu clientIds={ blockClientIds } />
-		</div>
+		</ResponsiveToolbar>
 	);
 }
 

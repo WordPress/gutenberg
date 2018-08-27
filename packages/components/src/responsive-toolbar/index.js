@@ -89,7 +89,7 @@ class ResponsiveToolbar extends Component {
 					display: none;
 				}
 
-				.components-responsive-toolbar__dropdown-content-${ instanceId } .components-popover__content > *:nth-child(-n+${ total - countHiddenChildren }) {
+				.components-responsive-toolbar__dropdown-content-${ instanceId } > *:nth-child(-n+${ total - countHiddenChildren }) {
 					display: none;
 				}
 			`;
@@ -135,11 +135,11 @@ class ResponsiveToolbar extends Component {
 
 				{ countHiddenChildren > 0 && (
 					<Dropdown
-						noArrow
-						position="bottom left"
+						position="inline"
 						className="components-responsive-toolbar__dropdown"
 						contentClassName={ classnames(
 							extraContentClassName,
+							'components-responsive-toolbar__dropdown-content',
 							`components-responsive-toolbar__dropdown-content-${ instanceId }` )
 						}
 						renderToggle={ renderToggle }

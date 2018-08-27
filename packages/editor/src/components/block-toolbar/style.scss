@@ -2,13 +2,9 @@
 	display: flex;
 	flex-grow: 1;
 	width: 100%;
-	overflow: auto; // Allow horizontal scrolling on mobile.
 	position: relative;
-	background: $white;
 
-	// Avoid right border on the container
-	border-top: $border-width solid $light-gray-500;
-	border-bottom: $border-width solid $light-gray-500;
+	// Show a left border on the parent container.
 	border-left: $border-width solid $light-gray-500;
 
 	// Allow overflow on desktop.
@@ -19,6 +15,8 @@
 	// The component is born with a border, but we only need some of them.
 	.components-toolbar {
 		border: 0;
+		border-top: $border-width solid $light-gray-500;
+		border-bottom: $border-width solid $light-gray-500;
 
 		// Add a right border to show as separator in the block toolbar.
 		border-right: $border-width solid $light-gray-500;
@@ -34,12 +32,18 @@
 	}
 }
 
-.editor-block-toolbar__tools {
-	display: inline-block;
-	width: calc(100% - 36px);
-}
-
-.editor-block-toolbar__tools-dropdown .components-popover__content {
+.editor-block-toolbar__tools-dropdown {
 	display: flex;
 	flex-wrap: wrap;
+	border: none;
+	padding-top: 1px;
+
+	// The component is born with a border, but we only need some of them.
+	.components-toolbar {
+		// Add a right border to show as separator in the block toolbar.
+		border-right: $border-width solid $light-gray-500;
+		border-left: $border-width solid $light-gray-500;
+		margin-left: -1px;
+		margin-top: -1px;
+	}
 }

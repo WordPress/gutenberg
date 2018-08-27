@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -70,6 +75,7 @@ class Dropdown extends Component {
 		} = this.props;
 
 		const args = { isOpen, onToggle: this.toggle, onClose: this.close };
+		const content = renderContent( args );
 
 		return (
 			<div className={ className } ref={ this.bindContainer }>
@@ -79,7 +85,7 @@ class Dropdown extends Component {
 				   */ }
 				<div>
 					{ renderToggle( args ) }
-					{ isOpen && (
+					{ isOpen && position !== 'inline' && (
 						<Popover
 							className={ contentClassName }
 							position={ position }
@@ -89,8 +95,13 @@ class Dropdown extends Component {
 							headerTitle={ headerTitle }
 							noArrow={ noArrow }
 						>
-							{ renderContent( args ) }
+							{ content }
 						</Popover>
+					) }
+					{ isOpen && position === 'inline' && (
+						<div className={ classnames( 'components-dropdown__inline-content', contentClassName ) }>
+							{ content }
+						</div>
 					) }
 				</div>
 			</div>
