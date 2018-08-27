@@ -15,6 +15,7 @@ const DEFAULT_OPTIONS = {
 	resetTypes: [],
 	ignoreTypes: [],
 	shouldOverwriteState: () => false,
+	isIgnored: () => false,
 };
 
 /**
@@ -26,6 +27,9 @@ const DEFAULT_OPTIONS = {
  *                                                 clear past.
  * @param {?Array}    options.ignoreTypes          Action types upon which to
  *                                                 avoid history tracking.
+ * @param {?Function} options.isIgnored            Function given action, to
+ *                                                 return true if intended to
+ *                                                 avoid history tracking.
  * @param {?Function} options.shouldOverwriteState Function receiving last and
  *                                                 current actions, returning
  *                                                 boolean indicating whether
@@ -34,13 +38,14 @@ const DEFAULT_OPTIONS = {
  *
  * @return {Function} Higher-order reducer.
  */
-const withHistory = ( options = {} ) => ( reducer ) => {
+const withHistory = ( options ) => ( reducer ) => {
 	options = { ...DEFAULT_OPTIONS, ...options };
 
-	// `ignoreTypes` is simply a convenience for `shouldOverwriteState`
+	// `ignoreTypes`, `isIgnored` are conveniences for `shouldOverwriteState`
 	options.shouldOverwriteState = overSome( [
 		options.shouldOverwriteState,
 		( action ) => includes( options.ignoreTypes, action.type ),
+		( action ) => options.isIgnored( action ),
 	] );
 
 	const initialState = {
