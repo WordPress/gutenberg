@@ -43,13 +43,14 @@ Our goal with Gutenberg is not just to create a seamless post- and page-building
 
 ## Are there Keyboard Shortcuts for Gutenberg?
 
-Yes. There are a lot! There is available a help modal showing all available keyboard shortcuts.
+Yes. There are a lot! There is a help modal showing all available keyboard shortcuts.
 
-You can see the whole list going to the top right corner menu of the new editor, and clicking on the link "Keyboard Shorcuts" (or opening using Ctrl + Option + H).
+You can see the whole list going to the top right corner menu of the new editor and clicking on "Keyboard Shorcuts" (or by using the keyboard shortcut Ctrl + Option + H).
 
-Here is the list of keyboard shortcuts for Gutenberg (and more will be coming!):
+This is the canonical list of keyboard shortcuts:
 
-```Ctrl+Option+H       Display this help.
+```
+Ctrl+Option+H       Display keyboard shortcuts.
 ⌘S                  Save your changes.
 ⌘Z                  Undo your last changes.
 Shift+⌘Z            Redo your last undo.
