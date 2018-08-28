@@ -41,6 +41,54 @@ Our goal with Gutenberg is not just to create a seamless post- and page-building
 
 ![Typing](https://make.wordpress.org/core/files/2017/10/gutenberg-typing-1_6.gif)
 
+## Are there Keyboard Shortcuts for Gutenberg?
+
+Yes. There are a lot! There is a help modal showing all available keyboard shortcuts.
+
+You can see the whole list going to the top right corner menu of the new editor and clicking on "Keyboard Shorcuts" (or by using the keyboard shortcut Ctrl + Option + H).
+
+This is the canonical list of keyboard shortcuts:
+
+### Editor shortcuts
+
+* <kbd>Ctrl</kbd>+<kbd>Option</kbd>+<kbd>H</kbd> Display keyboard shortcuts.
+* <kbd>⌘S</kbd> Save your changes.
+* <kbd>⌘Z</kbd> Undo your last changes.
+* <kbd>Shift</kbd>+<kbd>⌘Z</kbd> Redo your last undo.
+* <kbd>Shift</kbd>+<kbd>⌘,</kbd> Show or hide the settings sidebar.
+* <kbd>Ctrl</kbd>+<kbd>\`</kbd> Navigate to a the next part of the editor.
+* <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>\`</kbd> Navigate to the previous part of the editor.
+* <kbd>Shift</kbd>+<kbd>Option</kbd>+<kbd>N</kbd> Navigate to a the next part of the editor (alternative).
+* <kbd>Shift</kbd>+<kbd>Option</kbd>+<kbd>P</kbd> Navigate to the previous part of the editor (alternative).
+* <kbd>Shift</kbd>+<kbd>Option</kbd>+<kbd>⌘M</kbd> Switch between Visual Editor and Code Editor.
+
+### Selection shortcuts
+
+* <kbd>⌘A</kbd> Select all text when typing. Press again to select all blocks.
+* <kbd>Esc</kbd> Clear selection.
+
+### Block shortcuts
+
+* <kbd>Shift</kbd>+<kbd>⌘D</kbd> Duplicate the selected block(s).
+* <kbd>Option</kbd>+<kbd>⌘Backspace</kbd> Remove the selected block(s).
+* <kbd>Option</kbd>+<kbd>⌘T</kbd> Insert a new block before the selected block(s).
+* <kbd>Option</kbd>+<kbd>⌘Y</kbd> Insert a new block after the selected block(s).
+* <kbd>/</kbd> Change the block type after adding a new paragraph.
+
+### Text formatting
+
+* <kbd>⌘B</kbd> Make the selected text bold.
+* <kbd>⌘I</kbd> Make the selected text italic.
+* <kbd>⌘U</kbd> Underline the selected text.
+* <kbd>⌘K</kbd> Convert the selected text into a link.
+* <kbd>Ctrl</kbd>+<kbd>Option</kbd>+<kbd>S</kbd> Remove a link.
+* <kbd>Ctrl</kbd>+<kbd>Option</kbd>+<kbd>D</kbd> Add a strikethrough to the selected text.
+* <kbd>Ctrl</kbd>+<kbd>Option</kbd>+<kbd>X</kbd> Display the selected text in a monospaced font.
+
+Here is a brief animation illustrating how to find and use the keyboard shortcuts:
+
+![GIF showing how to access keyboard shortcuts](https://make.wordpress.org/community/files/2018/08/gutenberg-keyboard-shortcuts.gif)
+
 ## Is Gutenberg built on top of TinyMCE?
 
 No. [TinyMCE](https://www.tinymce.com/) is one of the best tools for enabling rich text on the web. In Gutenberg, TinyMCE does exactly that. Nearly every text field you'll find is augmented with TinyMCE for rich text. Whether it be text, lists, or even just a single caption, TinyMCE can be invoked on blocks for rich text enhancements.
