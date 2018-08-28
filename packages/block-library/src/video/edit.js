@@ -13,7 +13,7 @@ import {
 	ToggleControl,
 	withNotices,
 } from '@wordpress/components';
-import { Component, Fragment } from '@wordpress/element';
+import { Component, Fragment, createRef } from '@wordpress/element';
 import {
 	BlockControls,
 	InspectorControls,
@@ -33,6 +33,7 @@ class VideoEdit extends Component {
 			editing: ! this.props.attributes.src,
 		};
 
+		this.videoPlayer = createRef();
 		this.toggleAttribute = this.toggleAttribute.bind( this );
 		this.onSelectURL = this.onSelectURL.bind( this );
 		this.onSelectPoster = this.onSelectPoster.bind( this );
@@ -60,6 +61,12 @@ class VideoEdit extends Component {
 		}
 	}
 
+	componentDidUpdate( prevProps ) {
+		if ( this.props.attributes.poster !== prevProps.attributes.poster ) {
+			this.videoPlayer.current.load();
+		}
+	}
+
 	toggleAttribute( attribute ) {
 		return ( newValue ) => {
 			this.props.setAttributes( { [ attribute ]: newValue } );
@@ -80,9 +87,8 @@ class VideoEdit extends Component {
 	}
 
 	onSelectPoster( image ) {
-		const { setAttributes, clientId } = this.props;
+		const { setAttributes } = this.props;
 		setAttributes( { poster: image.url } );
-		document.getElementById( 'block-' + clientId ).getElementsByTagName( 'video' )[ 0 ].load();
 	}
 
 	onRemovePoster() {
@@ -217,6 +223,7 @@ class VideoEdit extends Component {
 							controls={ controls }
 							poster={ poster }
 							src={ src }
+							ref={ this.videoPlayer }
 						/>
 					</Disabled>
 					{ ( ( caption && caption.length ) || !! isSelected ) && (
