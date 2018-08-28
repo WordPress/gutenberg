@@ -70,7 +70,7 @@ This is the canonical list of keyboard shortcuts:
 ### Block shortcuts
 
 * <kbd>Shift</kbd>+<kbd>⌘D</kbd> Duplicate the selected block(s).
-* <kbd>Shift</kbd>+<kbd>⌘X</kbd> Remove the selected block(s).
+* <kbd>Option</kbd>+<kbd>⌘Backspace</kbd> Remove the selected block(s).
 * <kbd>Option</kbd>+<kbd>⌘T</kbd> Insert a new block before the selected block(s).
 * <kbd>Option</kbd>+<kbd>⌘Y</kbd> Insert a new block after the selected block(s).
 * <kbd>/</kbd> Change the block type after adding a new paragraph.

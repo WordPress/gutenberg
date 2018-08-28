@@ -165,9 +165,9 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
             "keyCombination": Array [
               "Ctrl",
               "+",
-              "Shift",
+              "Alt",
               "+",
-              "X",
+              "Backspace",
             ],
           },
           Object {
