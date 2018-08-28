@@ -52,7 +52,7 @@ description: 'Block showing a Book card.'
 
 #### Category
 
-* **Type:** `String`
+* **Type:** `String` [ common | formatting | layout | widgets | embed ]
 
 Blocks are grouped into categories to help users browse and discover them. 
 
