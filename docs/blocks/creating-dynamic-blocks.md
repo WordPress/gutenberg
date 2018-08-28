@@ -115,7 +115,7 @@ There are a few things to notice:
 
 Gutenberg 2.8 added the [`<ServerSideRender>`](https://github.com/WordPress/gutenberg/tree/master/packages/components/src/server-side-render) block which enables all the rendering to take place on the server using PHP rather than in JavaScript. 
 
-> Server-side render is meant as a fallback; client-side rendering in JavaScript is the preferred implementation.
+*Server-side render is meant as a fallback; client-side rendering in JavaScript is the preferred implementation.*
 
 {% codetabs %}
 {% ES5 %}
