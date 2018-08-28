@@ -133,6 +133,7 @@ module.exports = {
 				message: 'Prefer page.waitForSelector instead.'
 			}
 		],
+		'linebreak-style': 'off',
 	},
 	overrides: [
 		{

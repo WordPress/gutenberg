@@ -21,6 +21,7 @@ import { createBlobURL } from '@wordpress/blob';
  * Internal dependencies
  */
 import edit from './edit';
+import { getPercentWidth } from './image-size';
 
 export const name = 'core/image';
 
@@ -65,11 +66,27 @@ const blockAttributes = {
 		type: 'string',
 		default: 'none',
 	},
+	srcSet: {
+		type: 'string',
+	},
+	sizes: {
+		type: 'string',
+	},
+	'data-wp-attachment-id': {
+		type: 'number',
+	},
+	'data-wp-percent-width': {
+		type: 'number',
+		source: 'attribute',
+		selector: 'img',
+		attribute: 'data-wp-percent-width',
+	},
 };
 
+// Schemas are used only when pasting...
 const imageSchema = {
 	img: {
-		attributes: [ 'src', 'alt' ],
+		attributes: [ 'src', 'alt', 'srcSet' ],
 		classes: [ 'alignleft', 'aligncenter', 'alignright', 'alignnone', /^wp-image-\d+$/ ],
 	},
 };
@@ -200,7 +217,16 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { url, alt, caption, align, href, width, height, id } = attributes;
+		const { url, alt, caption, align, href, width, height, id, srcSet, sizes } = attributes;
+		let percentWidth;
+
+		if ( width ) {
+			percentWidth = getPercentWidth( width );
+		}
+
+		if ( ! percentWidth ) {
+			percentWidth = attributes[ 'data-wp-percent-width' ] || 100;
+		}
 
 		const classes = classnames( {
 			[ `align${ align }` ]: align,
@@ -214,6 +240,10 @@ export const settings = {
 				className={ id ? `wp-image-${ id }` : null }
 				width={ width }
 				height={ height }
+				srcSet={ srcSet }
+				sizes={ sizes }
+				data-wp-attachment-id={ id || null }
+				data-wp-percent-width={ percentWidth }
 			/>
 		);
 

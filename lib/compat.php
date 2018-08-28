@@ -124,6 +124,10 @@ add_filter( 'the_content', 'gutenberg_wpautop', 8 );
  * @return WP_REST_Response Response object.
  */
 function gutenberg_rest_prepare_attachment( $response, $attachment ) {
+	if ( ! isset( $response->data['media_type'] ) ) {
+		return $response;
+	}
+	
 	if ( $response->data['media_type'] === 'image' && ! empty( $response->data['media_details']['sizes'] ) ) {
 		$meta = wp_get_attachment_metadata( $attachment->ID );
 		$sizes = $response->data['media_details']['sizes'];
