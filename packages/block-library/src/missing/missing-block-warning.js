@@ -15,20 +15,21 @@ export function MissingBlockWarning( { attributes, removeBlock, convertToHTML } 
 	const hasContent = !! originalUndelimitedContent;
 	const hasHTMLBlock = getBlockType( 'core/html' );
 
-	const actions = [];
+	const actions = [
+		<Button key="remove" onClick={ removeBlock } isLarge>
+			{ __( 'Remove Block' ) }
+		</Button>,
+	];
 	let messageHTML;
 	if ( hasContent && hasHTMLBlock ) {
-		actions.push(
-			<Button key="remove" onClick={ removeBlock } isLarge>
-				{ __( 'Remove Block' ) }
-			</Button>,
-			<Button key="convert" onClick={ convertToHTML } isLarge isPrimary>
-				{ __( 'Keep as HTML' ) }
-			</Button>
-		);
 		messageHTML = sprintf(
 			__( 'Your site doesn\'t include support for the <code>%s</code> block. You can leave this block intact, convert its content to a Custom HTML block, or remove it entirely.' ),
 			originalName
+		);
+		actions.push(
+			<Button key="convert" onClick={ convertToHTML } isLarge isPrimary>
+				{ __( 'Keep as HTML' ) }
+			</Button>
 		);
 	} else {
 		messageHTML = sprintf(
