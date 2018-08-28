@@ -56,8 +56,8 @@ This is the canonical list of keyboard shortcuts:
 * <kbd>⌘Z</kbd> Undo your last changes.
 * <kbd>Shift</kbd>+<kbd>⌘Z</kbd> Redo your last undo.
 * <kbd>Shift</kbd>+<kbd>⌘,</kbd> Show or hide the settings sidebar.
-* <kbd>Ctrl</kbd>+<kbd>`</kbd> Navigate to a the next part of the editor.
-* <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>`</kbd> Navigate to the previous part of the editor.
+* <kbd>Ctrl</kbd>+<kbd>\`</kbd> Navigate to a the next part of the editor.
+* <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>\`</kbd> Navigate to the previous part of the editor.
 * <kbd>Shift</kbd>+<kbd>Option</kbd>+<kbd>N</kbd> Navigate to a the next part of the editor (alternative).
 * <kbd>Shift</kbd>+<kbd>Option</kbd>+<kbd>P</kbd> Navigate to the previous part of the editor (alternative).
 * <kbd>Shift</kbd>+<kbd>Option</kbd>+<kbd>⌘M</kbd> Switch between Visual Editor and Code Editor.
