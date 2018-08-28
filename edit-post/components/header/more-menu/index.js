@@ -30,19 +30,19 @@ const MoreMenu = () => (
 		) }
 		renderContent={ ( { onClose } ) => (
 			<Fragment>
-				<ModeSwitcher onSelect={ onClose } />
 				<MenuGroup
-					label={ __( 'Settings' ) }
-					filterName="editPost.MoreMenu.settings"
+					label={ __( 'Writing' ) }
+					filterName="editPost.MoreMenu.writing"
 				>
 					<FixedToolbarToggle onToggle={ onClose } />
-					<TipsToggle onToggle={ onClose } />
 				</MenuGroup>
+				<ModeSwitcher onSelect={ onClose } />
 				<PluginMoreMenuGroup.Slot fillProps={ { onClose } } />
 				<MenuGroup
 					label={ __( 'Tools' ) }
 					filterName="editPost.MoreMenu.tools"
 				>
+					<TipsToggle onToggle={ onClose } />
 					<KeyboardShortcutsHelpMenuItem onSelect={ onClose } />
 				</MenuGroup>
 			</Fragment>

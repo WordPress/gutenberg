@@ -19,7 +19,7 @@ function FixedToolbarToggle( { onToggle, isActive } ) {
 			onClick={ onToggle }
 			role="menuitemcheckbox"
 		>
-			{ __( 'Fix Toolbar to Top' ) }
+			{ __( 'Focus Mode' ) }
 		</MenuItem>
 	);
 }

@@ -195,9 +195,9 @@ describe( 'Links', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	const setFixedToolbar = async ( b ) => {
+	const setFocusMode = async ( b ) => {
 		await page.click( '.edit-post-more-menu button' );
-		const button = ( await page.$x( "//button[contains(text(), 'Fix Toolbar to Top')]" ) )[ 0 ];
+		const button = ( await page.$x( "//button[contains(text(), 'Focus Mode')]" ) )[ 0 ];
 		const buttonClassNameProperty = await button.getProperty( 'className' );
 		const buttonClassName = await buttonClassNameProperty.jsonValue();
 		const isSelected = buttonClassName.indexOf( 'is-selected' ) !== -1;
@@ -208,8 +208,8 @@ describe( 'Links', () => {
 		}
 	};
 
-	it( 'allows Left to be pressed during creation in "Fixed to Toolbar" mode', async () => {
-		await setFixedToolbar( true );
+	it( 'allows Left to be pressed during creation in Focus mode', async () => {
+		await setFocusMode( true );
 
 		await clickBlockAppender();
 		await page.keyboard.type( 'Text' );
@@ -227,7 +227,7 @@ describe( 'Links', () => {
 	} );
 
 	it( 'allows Left to be pressed during creation in "Docked Toolbar" mode', async () => {
-		await setFixedToolbar( false );
+		await setFocusMode( false );
 
 		await clickBlockAppender();
 		await page.keyboard.type( 'Text' );
