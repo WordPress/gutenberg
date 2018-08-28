@@ -20,22 +20,24 @@
 	outline: none;
 
 	// In small screens the content needs to be full width.
-	position: fixed;
+	position: absolute;
 	top: 0;
 	right: 0;
 	bottom: 0;
 	left: 0;
+	box-sizing: border-box;
 	margin: 0;
+	border: $border-width solid $light-gray-500;
+	background-color: $white;
+	box-shadow: $shadow-modal;
+	outline: none;
+	overflow: auto;
 
-	// Show slightly bigger on small screens.
+	// Show a bigger modal on bigger screens.
 	@include break-small() {
-		position: absolute;
+		top: 50%;
 		right: auto;
 		bottom: auto;
-		max-width: calc(100% - #{ $panel-padding } - #{ $panel-padding });
-		margin-right: -50%;
-		transform: translate(-50%, 0);
-		top: $panel-padding;
 		left: 50%;
 		height: 90%;
 
@@ -45,7 +47,8 @@
 
 	// Show pretty big on desktop breakpoints.
 	@include break-medium () {
-		max-width: calc(#{ $break-medium } - #{ $panel-padding } - #{ $panel-padding });
+		max-width: calc(100% - #{ $grid-size-large } - #{ $grid-size-large });
+		max-height: calc(100% - #{ $grid-size-large } - #{ $grid-size-large });
 		transform: translate(-50%, -30%);
 		top: 30%;
 		left: 50%;
@@ -62,8 +65,6 @@
 	flex-direction: row;
 	align-items: stretch;
 	justify-content: space-between;
-	position: fixed;
-	top: 0;
 	background: $white;
 	width: calc(100% - #{$panel-padding + $panel-padding});
 	height: $header-height;
@@ -74,36 +75,45 @@
 		font-weight: normal;
 	}
 
-	.components-modal__header-heading-container {
-		align-items: center;
-		flex-grow: 1;
-		display: flex;
-		flex-direction: row;
-		justify-content: left;
-	}
+	position: sticky;
+	top: 0;
+	z-index: z-index(".components-modal__header");
+	border-bottom: $border-width solid $light-gray-500;
+	padding: $grid-size $grid-size $grid-size $grid-size-large;
+}
 
-	.components-modal__header-icon-container {
-		display: inline-block;
+.components-modal__header-heading-container {
+	align-items: center;
+	flex-grow: 1;
+	display: flex;
+	flex-direction: row;
+	justify-content: left;
+}
 
-		svg {
-			max-width: $icon-button-size;
-			max-height: $icon-button-size;
-			padding: 8px;
-		}
-	}
+.components-modal__header-icon-container {
+	display: inline-block;
 
-	h1 {
-		line-height: 1;
-		margin: 0;
+	svg {
+		max-width: $icon-button-size;
+		max-height: $icon-button-size;
+		padding: $grid-size;
 	}
+}
+
+h1 {
+	line-height: 1;
+	margin: 0;
 }
 
 // Modal contents.
 .components-modal__content {
 	box-sizing: border-box;
 	overflow: auto;
+	// The height of the content is the height of its parent, minus the header. after that, the offset was 3px.
 	height: 100%;
 	padding: ($header-height+$panel-padding) $panel-padding $panel-padding $panel-padding;
+	padding: $panel-padding;
+	padding: $grid-size-large;
 
 	&:focus {
 		outline: $border-width solid $dark-gray-500;
