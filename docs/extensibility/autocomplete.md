@@ -1,13 +1,13 @@
 Autocomplete
 ============
 
-Gutenberg provides a `blocks.Autocomplete.completers` filter for extending and overriding the list of autocompleters used by blocks.
+Gutenberg provides a `editor.Autocomplete.completers` filter for extending and overriding the list of autocompleters used by blocks.
 
 The `Autocomplete` component found in `@wordpress/editor` applies this filter. The `@wordpress/components` package provides the foundational `Autocomplete` component that does not apply such a filter, but blocks should generally use the component provided by `@wordpress/editor`.
 
 ### Example
 
-Here is an example of using the `blocks.Autocomplete.completers` filter to add an acronym completer. You can find full documentation for the autocompleter interface with the `Autocomplete` component in the `@wordpress/components` package.
+Here is an example of using the `editor.Autocomplete.completers` filter to add an acronym completer. You can find full documentation for the autocompleter interface with the `Autocomplete` component in the `@wordpress/components` package.
 
 {% codetabs %}
 {% ES5 %}
@@ -46,7 +46,7 @@ function appendAcronymCompleter( completers, blockName ) {
 
 // Adding the filter
 wp.hooks.addFilter(
-	'blocks.Autocomplete.completers',
+	'editor.Autocomplete.completers',
 	'my-plugin/autocompleters/acronyms',
 	appendAcronymCompleter
 );
@@ -81,7 +81,7 @@ function appendAcronymCompleter( completers, blockName ) {
 
 // Adding the filter
 wp.hooks.addFilter(
-	'blocks.Autocomplete.completers',
+	'editor.Autocomplete.completers',
 	'my-plugin/autocompleters/acronym',
 	appendAcronymCompleter
 );

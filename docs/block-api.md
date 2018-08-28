@@ -79,6 +79,8 @@ when they are applicable e.g.: in the inserter.
 icon: {
 	// Specifying a background color to appear with the icon e.g.: in the inserter.
 	background: '#7e70af',
+	// Specifying a color for the icon (optional: if not set, a readable color will be automatically defined)
+	foreground: '#fff',
 	// Specifying a dashicon for the block
 	src: 'book-alt',
 } ,
@@ -126,7 +128,7 @@ attributes: {
 
 * **Type:** `Array`
 
-Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression or a raw DOM node.
+Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression, a file or a raw DOM node.
 
 For example, a paragraph block can be transformed into a heading block.
 
@@ -265,25 +267,112 @@ transforms: {
 ```
 {% end %}
 
+An optional `isMatch` function can be specified on a transform object. This provides an opportunity to perform additional checks on whether a transform should be possible. Returning `false` from this function will prevent the transform from being displayed as an option to the user.
+
+{% codetabs %}
+{% ES5 %}
+```js
+transforms: {
+    to: [
+        {
+            type: 'block',
+			blocks: [ 'core/paragraph' ],
+			isMatch: function( attribute ) {
+				return attributes.isText;
+			},
+            transform: function( content ) {
+                return createBlock( 'core/paragraph', {
+                    content,
+                } );
+            },
+        },
+    ],
+},
+```
+{% ESNext %}
+```js
+transforms: {
+    to: [
+        {
+            type: 'block',
+			blocks: [ 'core/paragraph' ],
+			isMatch: ( { isText } ) => isText,
+            transform: ( { content } ) => {
+                return createBlock( 'core/paragraph', {
+                    content,
+                } );
+            },
+        },
+    ],
+},
+```
+{% end %}
+
 To control the priority with which a transform is applied, define a `priority` numeric property on your transform object, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
-#### useOnce (optional)
+A file can be dropped into the editor and converted into a block with a matching transform.
 
-* **Type:** `Bool`
-* **Default:** `false`
-
-A once-only block can be inserted into each post, one time only. For example, the built-in 'More' block cannot be inserted again if it already exists in the post being edited. A once-only block's icon is automatically dimmed (unclickable) to prevent multiple instances.
-
+{% codetabs %}
+{% ES5 %}
 ```js
-// Use the block just once per post
-useOnce: true,
+transforms: {
+	from: [
+		{
+			type: 'files',
+			isMatch: function ( files ) {
+				return files.length === 1;
+			},
+			// We define a lower priority (higher number) than the default of 10. This
+			// ensures that the File block is only created as a fallback.
+			priority: 15,
+			transform: function( files ) {
+				var file = files[ 0 ];
+				var blobURL = createBlobURL( file );
+
+				// File will be uploaded in componentDidMount()
+				return createBlock( 'core/file', {
+					href: blobURL,
+					fileName: file.name,
+					textLinkHref: blobURL,
+				} );
+			},
+		},
+	]
+}
 ```
+{% ESNext %}
+```js
+transforms: {
+	from: [
+		{
+			type: 'files',
+			isMatch: ( files ) => files.length === 1,
+			// We define a lower priority (higher number) than the default of 10. This
+			// ensures that the File block is only created as a fallback.
+			priority: 15,
+			transform: ( files ) => {
+				const file = files[ 0 ];
+				const blobURL = createBlobURL( file );
+
+				// File will be uploaded in componentDidMount()
+				return createBlock( 'core/file', {
+					href: blobURL,
+					fileName: file.name,
+					textLinkHref: blobURL,
+				} );
+			},
+		},
+	]
+}
+```
+{% end %}
+
 
 #### parent (optional)
 
 * **Type:** `Array`
 
-Blocks are able to be inserted into blocks that use [`InnerBlocks`](https://github.com/WordPress/gutenberg/blob/master/editor/components/inner-blocks/README.md) as nested content. Sometimes it is useful to restrict a block so that it is only available as a nested block. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
+Blocks are able to be inserted into blocks that use [`InnerBlocks`](https://github.com/WordPress/gutenberg/blob/master/packages/editor/src/components/inner-blocks/README.md) as nested content. Sometimes it is useful to restrict a block so that it is only available as a nested block. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
 
 Setting `parent` lets a block require that it is only available when nested within the specified blocks.
 
@@ -296,7 +385,23 @@ parent: [ 'core/columns' ],
 
 * **Type:** `Object`
 
-Optional block extended support features. The following options are supported, and should be specified as a boolean `true` or `false` value:
+Optional block extended support features. The following options are supported:
+
+- `align` (default `false`): This property adds block controls which allow to change block's alignment. _Important: It doesn't work with dynamic blocks yet._
+
+```js
+// Add the support for block's alignment (left, center, right, wide, full).
+align: true,
+// Pick which alignment options to display.
+align: [ 'left', 'right', 'full' ],
+```
+
+- `alignWide` (default `true`): Gutenberg allows to enable [wide alignment](../docs/extensibility/theme-support.md#wide-alignment) for your theme. To disable this behavior for a single block, set this flag to `false`.
+
+```js
+// Remove the support for wide alignment.
+alignWide: false,
+```
 
 - `anchor` (default `false`): Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link.
 
@@ -333,6 +438,15 @@ html: false,
 inserter: false,
 ```
 
+- `multiple` (default `true`): A non-multiple block can be inserted into each post, one time only. For example, the built-in 'More' block cannot be inserted again if it already exists in the post being edited. A non-multiple block's icon is automatically dimmed (unclickable) to prevent multiple instances.
+
+```js
+// Use the block just once per post
+multiple: false,
+```
+
 ## Edit and Save
 
 The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](../docs/block-api/block-edit-save.md).
+
+Note: Some [block supports](#supports) — for example, `anchor` or `className` — apply their attributes by adding additional props on the element returned by `save`. This will work automatically for default HTML tag elements (`div`, etc). However, if the return value of your `save` is a custom component element, you will need to ensure that your custom component handles these props in order for the attributes to be persisted.

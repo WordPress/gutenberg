@@ -42,22 +42,25 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
 
   # php and phpunit3.6 installs should be cached, only build if they're not there.
   if [ ! -f $PHPBREW_BUILT_CHECK ]; then
-    
+
     # init with known --old to get 5.2 and 5.3
     $HOME/php-utils-bin/phpbrew init
     $HOME/php-utils-bin/phpbrew known --old
 
+    # fetch the build tarballs manually
+    mkdir -p $HOME/.phpbrew/distfiles
+    curl -L -o $HOME/.phpbrew/distfiles/php-5.2.17.tar.bz2 https://museum.php.net/php5/php-5.2.17.tar.bz2
+    curl -L -o $HOME/.phpbrew/distfiles/php-5.3.29.tar.bz2 https://museum.php.net/php5/php-5.3.29.tar.bz2
+
     # build PHP5.2
     echo 'Installing PHP 5.2...'
-    $HOME/php-utils-bin/phpbrew install --patch ${THIS_DIR}/patches/node.patch --patch ${THIS_DIR}/patches/openssl.patch 5.2 +default +mysql +pdo \
-    +gettext +phar +openssl -- --with-openssl-dir=/usr/include/openssl --enable-spl --with-mysql --with-mysqli=/usr/bin/mysql_config --with-pdo-mysql=/usr \
-    > /dev/null
+    $HOME/php-utils-bin/phpbrew install --patch ${THIS_DIR}/patches/node.patch --patch ${THIS_DIR}/patches/openssl.patch 5.2.17 +default +mysql +pdo \
+    +gettext +phar +openssl -- --with-openssl-dir=/usr/include/openssl --enable-spl --with-mysql --with-mysqli=/usr/bin/mysql_config --with-pdo-mysql=/usr
 
     # build PHP5.3
     echo 'Installing PHP 5.3...'
-    $HOME/php-utils-bin/phpbrew install --patch ${THIS_DIR}/patches/node.patch --patch ${THIS_DIR}/patches/openssl.patch 5.3 +default +mysql +pdo \
-    +gettext +phar +openssl -- --with-openssl-dir=/usr/include/openssl --enable-spl --with-mysql --with-mysqli=/usr/bin/mysql_config --with-pdo-mysql=/usr \
-    > /dev/null
+    $HOME/php-utils-bin/phpbrew install --patch ${THIS_DIR}/patches/node.patch --patch ${THIS_DIR}/patches/openssl.patch 5.3.29 +default +mysql +pdo \
+    +gettext +phar +openssl -- --with-openssl-dir=/usr/include/openssl --enable-spl --with-mysql --with-mysqli=/usr/bin/mysql_config --with-pdo-mysql=/usr
 
     # install PHPUnit 3.6. The only install method available is from source, using git branches old
     # enough that they don't rely on any PHP5.3+ features. This clones each needed dependency
@@ -91,8 +94,6 @@ if [[ ${SWITCH_TO_PHP:0:3} == "5.2" ]] || [[ ${SWITCH_TO_PHP:0:3} == "5.3" ]]; t
     export PHPBREW_RC_ENABLE=1
     source $HOME/.phpbrew/bashrc
     phpbrew use 5.2.17
-    pear channel-discover pear.symfony-project.com
-    pear install pear.symfony-project.com/YAML-1.0.2
 
     # manually go back to the system php, we can't use `phpbrew switch-off`
     # because we're running a version of php that phpbrew doesn't work with at this point

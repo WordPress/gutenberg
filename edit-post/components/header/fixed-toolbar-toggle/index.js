@@ -7,24 +7,20 @@ import { withSelect, withDispatch } from '@wordpress/data';
  * WordPress Dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { compose } from '@wordpress/element';
-import { MenuGroup, MenuItem, withInstanceId } from '@wordpress/components';
+import { compose } from '@wordpress/compose';
+import { MenuItem } from '@wordpress/components';
 import { ifViewportMatches } from '@wordpress/viewport';
 
-function FeatureToggle( { onToggle, isActive } ) {
+function FixedToolbarToggle( { onToggle, isActive } ) {
 	return (
-		<MenuGroup
-			label={ __( 'Settings' ) }
-			filterName="editPost.MoreMenu.settings"
+		<MenuItem
+			icon={ isActive && 'yes' }
+			isSelected={ isActive }
+			onClick={ onToggle }
+			role="menuitemcheckbox"
 		>
-			<MenuItem
-				icon={ isActive && 'yes' }
-				isSelected={ isActive }
-				onClick={ onToggle }
-			>
-				{ __( 'Fix Toolbar to Top' ) }
-			</MenuItem>
-		</MenuGroup>
+			{ __( 'Fix Toolbar to Top' ) }
+		</MenuItem>
 	);
 }
 
@@ -39,5 +35,4 @@ export default compose( [
 		},
 	} ) ),
 	ifViewportMatches( 'medium' ),
-	withInstanceId,
-] )( FeatureToggle );
+] )( FixedToolbarToggle );

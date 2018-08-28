@@ -4,22 +4,58 @@
 
 ## Modifying Blocks
 
-To modify the behavior of existing blocks, Gutenberg exposes the following Filters:
+To modify the behavior of existing blocks, Gutenberg exposes several APIs:
+
+### Block Style Variations
+
+Block Style Variations allow providing alternative styles to existing blocks. They work by adding a className to the block's wrapper. This className can be used to provide an alternative styling for the block if the style variation is selected.
+
+_Example:_
+
+```js
+wp.blocks.registerBlockStyle( 'core/quote', 'fancy-quote' );
+```
+
+The example above registers a block style variation called `fancy-quote` to the `core/quote` block. When the user selects this block style variation from the styles selector, an `is-style-fancy-quote` className will be added to the block's wrapper.
+
+### Filters
+
+Extensing blocks can involve more than just providing alternative styles, in this case, you can use one of the following filters to extend the block settings.
 
 #### `blocks.registerBlockType`
 
 Used to filter the block settings. It receives the block settings and the name of the block the registered block as arguments.
 
-#### `blocks.BlockEdit`
+_Example:_
 
-Used to modify the block's `edit` component. It receives the original block `edit` component and returns a new wrapped component.
+Ensure that List blocks are saved with the canonical generated class name (`wp-block-list`):
+
+```js
+function addListBlockClassName( settings, name ) {
+	if ( name !== 'core/list' ) {
+		return settings;
+	}
+
+	return lodash.assign( {}, settings, {
+		supports: lodash.assign( {}, settings.supports, {
+			className: true
+		} ),
+	} );
+}
+
+wp.hooks.addFilter(
+	'blocks.registerBlockType',
+	'my-plugin/class-names/list-block',
+	addListBlockClassName
+);
+```
 
 #### `blocks.getSaveElement`
 
 A filter that applies to the result of a block's `save` function. This filter is used to replace or extend the element, for example using `wp.element.cloneElement` to modify the element's props or replace its children, or returning an entirely new element.
 
 #### `blocks.getSaveContent.extraProps`
- 
+
 A filter that applies to all blocks returning a WP Element in the `save` function. This filter is used to add extra props to the root element of the `save` function. For example: to add a className, an id, or any valid prop for this element. It receives the current props of the `save` element, the block type and the block attributes as arguments.
 
 _Example:_
@@ -28,7 +64,7 @@ Adding a background by default to all blocks.
 
 ```js
 function addBackgroundColorStyle( props ) {
-	return Object.assign( props, { style: { backgroundColor: 'red' } } );
+	return lodash.assign( props, { style: { backgroundColor: 'red' } } );
 }
 
 wp.hooks.addFilter(
@@ -70,6 +106,79 @@ Used internally by the default block (paragraph) to exclude the attributes from 
 
 Used to filters an individual transform result from block transformation. All of the original blocks are passed, since transformations are many-to-many, not one-to-one.
 
+#### `blocks.getBlockAttributes`
+
+Called immediately after the default parsing of a block's attributes and before validation to allow a plugin to manipulate attribute values in time for validation and/or the initial values rendering of the block in the editor.
+
+#### `editor.BlockEdit`
+
+Used to modify the block's `edit` component. It receives the original block `BlockEdit` component and returns a new wrapped component.
+
+_Example:_
+
+```js
+var el = wp.element.createElement;
+
+var withInspectorControls = wp.compose.createHigherOrderComponent( function( BlockEdit ) {
+	return function( props ) {
+		return el(
+			wp.element.Fragment,
+			{},
+			el(
+				BlockEdit,
+				props
+			),
+			el(
+				wp.editor.InspectorControls,
+				{},
+				el(
+					wp.components.PanelBody,
+					{},
+					'My custom control'
+				)
+			)
+		);
+	};
+}, 'withInspectorControls' );
+
+wp.hooks.addFilter( 'editor.BlockEdit', 'my-plugin/with-inspector-controls', withInspectorControls );
+```
+
+#### `editor.BlockListBlock`
+
+Used to modify the block's wrapper component containing the block's `edit` component and all toolbars. It receives the original `BlockListBlock` component and returns a new wrapped component.
+
+_Example:_
+
+```js
+var el = wp.element.createElement;
+
+var withDataAlign = wp.compose.createHigherOrderComponent( function( BlockListBlock ) {
+	return function( props ) {
+		var newProps = lodash.assign(
+			{},
+			props,
+			{
+				wrapperProps: lodash.assign(
+					{},
+					props.wrapperProps,
+					{
+						'data-align': props.block.attributes.align
+					}
+				)
+			}
+		);
+
+		return el(
+			BlockListBlock,
+			newProps
+		);
+	};
+}, 'withAlign' );
+
+wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-data-align', withDataAlign );
+```
+
 ## Removing Blocks
 
 ### Using a blacklist
@@ -77,7 +186,7 @@ Used to filters an individual transform result from block transformation. All of
 Adding blocks is easy enough, removing them is as easy. Plugin or theme authors have the possibility to "unregister" blocks.
 
 ```js
-// myplugin.js
+// my-plugin.js
 
 wp.blocks.unregisterBlockType( 'core/verse' );
 ```
@@ -86,16 +195,16 @@ and load this script in the Editor
 
 ```php
 <?php
-// myplugin.php
+// my-plugin.php
 
-function myplugin_blacklist_blocks() {
+function my_plugin_blacklist_blocks() {
 	wp_enqueue_script(
-		'myplugin-blacklist-blocks',
-		plugins_url( 'myplugin.js', __FILE__ ),
+		'my-plugin-blacklist-blocks',
+		plugins_url( 'my-plugin.js', __FILE__ ),
 		array( 'wp-blocks' )
 	);
 }
-add_action( 'enqueue_block_editor_assets', 'myplugin_blacklist_blocks' );
+add_action( 'enqueue_block_editor_assets', 'my_plugin_blacklist_blocks' );
 ```
 
 ### Using a whitelist
@@ -103,7 +212,8 @@ add_action( 'enqueue_block_editor_assets', 'myplugin_blacklist_blocks' );
 If you want to disable all blocks except a whitelisted list, you can adapt the script above like so:
 
 ```js
-// myplugin.js
+// my-plugin.js
+
 var allowedBlocks = [
 	'core/paragraph',
 	'core/image',
@@ -123,10 +233,40 @@ wp.blocks.getBlockTypes().forEach( function( blockType ) {
 On the server, you can filter the list of blocks shown in the inserter using the `allowed_block_types` filter. You can return either true (all block types supported), false (no block types supported), or an array of block type names to allow. You can also use the second provided param `$post` to filter block types based on its content.
 
 ```php
-add_filter( 'allowed_block_types', function( $allowed_block_types, $post ) {
-	if ( $post->post_type === 'post' ) {
+<?php
+// my-plugin.php
+
+function my_plugin_allowed_block_types( $allowed_block_types, $post ) {
+	if ( $post->post_type !== 'post' ) {
 	    return $allowed_block_types;
 	}
-	return [ 'core/paragraph' ];
-}, 10, 2 );
+	return array( 'core/paragraph' );
+}
+
+add_filter( 'allowed_block_types', 'my_plugin_allowed_block_types', 10, 2 );
+```
+
+## Managing block categories
+
+It is possible to filter the list of default block categories using the `block_categories` filter. You can do it on the server by implementing a function which returns a list of categories. It is going to be used during blocks registration and to group blocks in the inserter. You can also use the second provided param `$post` to generate a different list depending on the post's content.
+
+```php
+<?php
+// my-plugin.php
+
+function my_plugin_block_categories( $categories, $post ) {
+	if ( $post->post_type !== 'post' ) {
+		return $categories;
+	}
+	return array_merge(
+		$categories,
+		array(
+			array(
+				'slug' => 'my-category',
+				'title' => __( 'My category', 'my-plugin' ),
+			),
+		)
+	);
+}
+add_filter( 'block_categories', 'my_plugin_block_categories', 10, 2 );
 ```

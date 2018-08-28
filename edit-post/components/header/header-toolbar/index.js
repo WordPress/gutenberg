@@ -1,9 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
+import { DotTip } from '@wordpress/nux';
 
 /**
  * WordPress dependencies
@@ -15,7 +16,6 @@ import {
 	TableOfContents,
 	EditorHistoryRedo,
 	EditorHistoryUndo,
-	MultiBlocksSwitcher,
 	NavigableToolbar,
 } from '@wordpress/editor';
 
@@ -30,11 +30,14 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport } ) {
 			className="edit-post-header-toolbar"
 			aria-label={ __( 'Editor Toolbar' ) }
 		>
-			<Inserter position="bottom right" />
+			<Inserter position="bottom right">
+				<DotTip id="core/editor.inserter">
+					{ __( 'Welcome to the wonderful world of blocks! Click the “+” (“Add block”) button to add a new block. There are blocks available for all kind of content: you can insert text, headings, images, lists, and lots more!' ) }
+				</DotTip>
+			</Inserter>
 			<EditorHistoryUndo />
 			<EditorHistoryRedo />
 			<TableOfContents />
-			<MultiBlocksSwitcher />
 			{ hasFixedToolbar && isLargeViewport && (
 				<div className="edit-post-header-toolbar__block-toolbar">
 					<BlockToolbar />

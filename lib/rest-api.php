@@ -19,6 +19,20 @@ function gutenberg_register_rest_routes() {
 	$controller = new WP_REST_Block_Renderer_Controller();
 	$controller->register_routes();
 
+	/**
+	 * Filters the search handlers to use in the REST search controller.
+	 *
+	 * @since 3.3.0
+	 *
+	 * @param array $search_handlers List of search handlers to use in the controller. Each search
+	 *                               handler instance must extend the `WP_REST_Search_Handler` class.
+	 *                               Default is only a handler for posts.
+	 */
+	$search_handlers = apply_filters( 'wp_rest_search_handlers', array( new WP_REST_Post_Search_Handler() ) );
+
+	$controller = new WP_REST_Search_Controller( $search_handlers );
+	$controller->register_routes();
+
 	foreach ( get_post_types( array( 'show_in_rest' => true ), 'objects' ) as $post_type ) {
 		$class = ! empty( $post_type->rest_controller_class ) ? $post_type->rest_controller_class : 'WP_REST_Posts_Controller';
 
@@ -27,10 +41,9 @@ function gutenberg_register_rest_routes() {
 			continue;
 		}
 
-		if ( post_type_supports( $post_type->name, 'revisions' ) ) {
-			$autosaves_controller = new WP_REST_Autosaves_Controller( $post_type->name );
-			$autosaves_controller->register_routes();
-		}
+		// Initialize the Autosaves controller.
+		$autosaves_controller = new WP_REST_Autosaves_Controller( $post_type->name );
+		$autosaves_controller->register_routes();
 	}
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_routes' );
@@ -229,109 +242,21 @@ function gutenberg_add_target_schema_to_links( $response, $post, $request ) {
 	$orig_links = $response->get_links();
 	$post_type  = get_post_type_object( $post->post_type );
 	$orig_href  = ! empty( $orig_links['self'][0]['href'] ) ? $orig_links['self'][0]['href'] : null;
-	if ( 'edit' === $request['context'] && post_type_supports( $post_type->name, 'author' ) ) {
-		if ( current_user_can( $post_type->cap->edit_others_posts ) ) {
-			$new_links['https://api.w.org/action-assign-author'] = array(
-				array(
-					'title'        => __( 'The current user can change the author on this post.', 'gutenberg' ),
-					'href'         => $orig_href,
-					'targetSchema' => array(
-						'type'       => 'object',
-						'properties' => array(
-							'author' => array(
-								'type' => 'integer',
-							),
+	if ( 'edit' === $request['context'] && current_user_can( 'unfiltered_html' ) ) {
+		$new_links['https://api.w.org/action-unfiltered_html'] = array(
+			array(
+				'title'        => __( 'The current user can post HTML markup and JavaScript.', 'gutenberg' ),
+				'href'         => $orig_href,
+				'targetSchema' => array(
+					'type'       => 'object',
+					'properties' => array(
+						'unfiltered_html' => array(
+							'type' => 'boolean',
 						),
 					),
 				),
-			);
-		}
-	}
-	if ( 'edit' === $request['context'] ) {
-		if ( current_user_can( $post_type->cap->publish_posts ) ) {
-			$new_links['https://api.w.org/action-publish'] = array(
-				array(
-					'title'        => __( 'The current user can publish this post.', 'gutenberg' ),
-					'href'         => $orig_href,
-					'targetSchema' => array(
-						'type'       => 'object',
-						'properties' => array(
-							'status' => array(
-								'type' => 'string',
-								'enum' => array( 'publish', 'future' ),
-							),
-						),
-					),
-				),
-			);
-		}
-	}
-	// Only Posts can be sticky.
-	if ( 'post' === $post->post_type && 'edit' === $request['context'] ) {
-		if ( current_user_can( $post_type->cap->edit_others_posts )
-			&& current_user_can( $post_type->cap->publish_posts ) ) {
-			$new_links['https://api.w.org/action-sticky'] = array(
-				array(
-					'title'        => __( 'The current user can sticky this post.', 'gutenberg' ),
-					'href'         => $orig_href,
-					'targetSchema' => array(
-						'type'       => 'object',
-						'properties' => array(
-							'sticky' => array(
-								'type' => 'boolean',
-							),
-						),
-					),
-				),
-			);
-		}
-	}
-	// Term assignment and creation.
-	if ( 'edit' === $request['context'] ) {
-		$taxonomies = get_object_taxonomies( $post_type->name, 'objects' );
-		foreach ( $taxonomies as $tax_obj ) {
-			if ( empty( $tax_obj->show_in_rest ) ) {
-				continue;
-			}
-			$rest_base = ! empty( $tax_obj->rest_base ) ? $tax_obj->rest_base : $tax_obj->name;
-			// 'edit_terms' is required to create hierarchical terms,
-			// but 'assign_terms' is required for non-hierarchical terms.
-			if ( ( is_taxonomy_hierarchical( $tax_obj->name )
-				&& current_user_can( $tax_obj->cap->edit_terms ) )
-				|| ( ! is_taxonomy_hierarchical( $tax_obj->name )
-				&& current_user_can( $tax_obj->cap->assign_terms ) ) ) {
-				$new_links[ 'https://api.w.org/action-create-' . $rest_base ] = array(
-					array(
-						'title'        => __( 'The current user can create terms.', 'gutenberg' ),
-						'href'         => $orig_href,
-						'targetSchema' => array(
-							'type'       => 'object',
-							'properties' => array(
-								$rest_base => array(
-									'type' => 'array',
-								),
-							),
-						),
-					),
-				);
-			}
-			if ( current_user_can( $tax_obj->cap->assign_terms ) ) {
-				$new_links[ 'https://api.w.org/action-assign-' . $rest_base ] = array(
-					array(
-						'title'        => __( 'The current user can assign terms.', 'gutenberg' ),
-						'href'         => $orig_href,
-						'targetSchema' => array(
-							'type'       => 'object',
-							'properties' => array(
-								$rest_base => array(
-									'type' => 'array',
-								),
-							),
-						),
-					),
-				);
-			}
-		}
+			),
+		);
 	}
 
 	$response->add_links( $new_links );
@@ -366,118 +291,6 @@ function gutenberg_register_taxonomy_prepare_functions( $taxonomy ) {
 add_filter( 'registered_taxonomy', 'gutenberg_register_taxonomy_prepare_functions' );
 
 /**
- * Includes the value for the 'viewable' attribute of a post type resource.
- *
- * @see https://core.trac.wordpress.org/ticket/43739
- *
- * @param object $post_type Post type response object.
- * @return boolean Whether or not the post type can be viewed.
- */
-function gutenberg_get_post_type_viewable( $post_type ) {
-	return is_post_type_viewable( $post_type['slug'] );
-}
-
-/**
- * Adds the 'viewable' attribute to the REST API response of a post type.
- *
- * @see https://core.trac.wordpress.org/ticket/43739
- */
-function gutenberg_register_rest_api_post_type_viewable() {
-	register_rest_field( 'type',
-		'viewable',
-		array(
-			'get_callback' => 'gutenberg_get_post_type_viewable',
-			'schema'       => array(
-				'description' => __( 'Whether or not the post type can be viewed', 'gutenberg' ),
-				'type'        => 'boolean',
-				'context'     => array( 'edit' ),
-				'readonly'    => true,
-			),
-		)
-	);
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_type_viewable' );
-
-/**
- * Gets revisions details for the selected post.
- *
- * @since 1.6.0
- *
- * @param array $post The post object from the response.
- * @return array|null Revisions details or null when no revisions present.
- */
-function gutenberg_get_post_revisions( $post ) {
-	$revisions       = wp_get_post_revisions( $post['id'] );
-	$revisions_count = count( $revisions );
-	if ( 0 === $revisions_count ) {
-		return null;
-	}
-
-	$last_revision = array_shift( $revisions );
-
-	return array(
-		'count'   => $revisions_count,
-		'last_id' => $last_revision->ID,
-	);
-}
-
-/**
- * Adds the custom field `revisions` to the REST API response of post.
- *
- * TODO: This is a temporary solution. Next step would be to find a solution that is limited to the editor.
- *
- * @since 1.6.0
- */
-function gutenberg_register_rest_api_post_revisions() {
-	register_rest_field( get_post_types( '', 'names' ),
-		'revisions',
-		array(
-			'get_callback' => 'gutenberg_get_post_revisions',
-		)
-	);
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_revisions' );
-
-/**
- * Get the preview link for the post object.
- *
- * @see https://github.com/WordPress/gutenberg/issues/4555
- *
- * @param WP_Post $post Post object.
- * @return string
- */
-function gutenberg_get_post_preview_link( $post ) {
-	return get_preview_post_link( $post['id'] );
-}
-
-/**
- * Adds the 'preview_link' attribute to the REST API response of a post.
- *
- * @see https://github.com/WordPress/gutenberg/issues/4555
- */
-function gutenberg_register_rest_api_post_preview_link() {
-	foreach ( get_post_types( array( 'show_in_rest' => true ), 'names' ) as $post_type ) {
-		if ( ! is_post_type_viewable( $post_type ) ) {
-			continue;
-		}
-		register_rest_field( $post_type,
-			'preview_link',
-			array(
-				'get_callback' => 'gutenberg_get_post_preview_link',
-				'schema'       => array(
-					'description' => __( 'Preview link for the post.', 'gutenberg' ),
-					'type'        => 'string',
-					'format'      => 'uri',
-					'context'     => array( 'edit' ),
-					'readonly'    => true,
-				),
-			)
-		);
-	}
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_preview_link' );
-
-/**
  * Ensure that the wp-json index contains the 'theme-supports' setting as
  * part of its site info elements.
  *
@@ -497,8 +310,11 @@ function gutenberg_ensure_wp_json_has_theme_supports( $response ) {
 		$site_info['theme_supports']['formats'] = $formats;
 	}
 	if ( ! array_key_exists( 'post-thumbnails', $site_info['theme_supports'] ) ) {
-		if ( get_theme_support( 'post-thumbnails' ) ) {
-			$site_info['theme_supports']['post-thumbnails'] = true;
+		$post_thumbnails = get_theme_support( 'post-thumbnails' );
+		if ( $post_thumbnails ) {
+			// $post_thumbnails can contain a nested array of post types.
+			// e.g. array( array( 'post', 'page' ) ).
+			$site_info['theme_supports']['post-thumbnails'] = is_array( $post_thumbnails ) ? $post_thumbnails[0] : true;
 		}
 	}
 	$response->set_data( $site_info );
@@ -537,14 +353,15 @@ add_filter( 'rest_request_before_callbacks', 'gutenberg_handle_early_callback_ch
  *
  * @see https://core.trac.wordpress.org/ticket/43998
  *
- * @param array  $query_params JSON Schema-formatted collection parameters.
- * @param string $post_type    Post type being accessed.
+ * @param array        $query_params JSON Schema-formatted collection parameters.
+ * @param WP_Post_Type $post_type    Post type object being accessed.
  * @return array
  */
 function gutenberg_filter_post_collection_parameters( $query_params, $post_type ) {
-	$post_types = array( 'page', 'wp_block' );
-	if ( in_array( $post_type->name, $post_types, true )
-		&& isset( $query_params['per_page'] ) ) {
+	if (
+		isset( $query_params['per_page'] ) &&
+		( $post_type->hierarchical || 'wp_block' === $post_type->name )
+	) {
 		// Change from '1' to '-1', which means unlimited.
 		$query_params['per_page']['minimum'] = -1;
 		// Default sanitize callback is 'absint', which won't work in our case.
@@ -563,8 +380,10 @@ function gutenberg_filter_post_collection_parameters( $query_params, $post_type 
  * @return array
  */
 function gutenberg_filter_post_query_arguments( $prepared_args, $request ) {
-	$post_types = array( 'page', 'wp_block' );
-	if ( in_array( $prepared_args['post_type'], $post_types, true ) ) {
+	if (
+		is_post_type_hierarchical( $prepared_args['post_type'] ) ||
+		'wp_block' === $prepared_args['post_type']
+	) {
 		// Avoid triggering 'rest_post_invalid_page_number' error
 		// which will need to be addressed in https://core.trac.wordpress.org/ticket/43998.
 		if ( -1 === $prepared_args['posts_per_page'] ) {
@@ -638,111 +457,3 @@ function gutenberg_filter_user_collection_parameters( $query_params ) {
 	return $query_params;
 }
 add_filter( 'rest_user_collection_params', 'gutenberg_filter_user_collection_parameters' );
-
-/**
- * Overload taxonomy and term permission handling to address our new necessary behavior.
- *
- * This is temporary code that will be removed once the Trac ticket lands in a release.
- *
- * @see https://core.trac.wordpress.org/ticket/44096
- *
- * @param WP_HTTP_Response $response Result to send to the client. Usually a WP_REST_Response.
- * @param WP_REST_Server   $handler  ResponseHandler instance (usually WP_REST_Server).
- * @param WP_REST_Request  $request  Request used to generate the response.
- * @return $response
- */
-function gutenberg_filter_request_after_callbacks( $response, $handler, $request ) {
-	$should_rerun_response = false;
-	if ( is_wp_error( $response ) ) {
-		// Handle GET /wp/v2/taxonomies?context=edit when user can assign_terms
-		// but not manage_terms.
-		if ( '/wp/v2/taxonomies' === $request->get_route()
-			&& is_array( $handler['permission_callback'] )
-			&& is_a( $handler['permission_callback'][0], 'WP_REST_Taxonomies_Controller' )
-			&& 'edit' === $request['context']
-			&& 'rest_cannot_view' === $response->get_error_code() ) {
-			if ( ! empty( $request['type'] ) ) {
-				$taxonomies = get_object_taxonomies( $request['type'], 'objects' );
-			} else {
-				$taxonomies = get_taxonomies( '', 'objects' );
-			}
-			foreach ( $taxonomies as $taxonomy ) {
-				if ( ! empty( $taxonomy->show_in_rest )
-					&& current_user_can( $taxonomy->cap->assign_terms ) ) {
-					$GLOBALS['Gutenberg_Temporary_Taxonomies_Controller'] = $handler['permission_callback'][0];
-
-					$handler['callback']   = 'gutenberg_taxonomies_controller_get_items';
-					$should_rerun_response = true;
-					break;
-				}
-			}
-		}
-		// Handle POST /wp/v2/tags (and non-hierarchical taxonomies) when user
-		// can assign_terms but not manage terms. Users should be able to create
-		// terms.
-		if ( 'rest_cannot_create' === $response->get_error_code()
-			&& is_array( $handler['permission_callback'] )
-			&& is_a( $handler['permission_callback'][0], 'WP_REST_Terms_Controller' ) ) {
-			$schema       = $handler['permission_callback'][0]->get_item_schema();
-			$taxonomy     = 'tag' === $schema['title'] ? 'post_tag' : $schema['title'];
-			$taxonomy_obj = get_taxonomy( $taxonomy );
-			if ( ! is_taxonomy_hierarchical( $taxonomy_obj->name )
-				&& current_user_can( $taxonomy_obj->cap->assign_terms ) ) {
-				$should_rerun_response = true;
-			}
-		}
-	}
-	// Re-run the response generation if we've decided we need to.
-	if ( $should_rerun_response ) {
-		$callback = $handler['callback'];
-		// Filter defined in class-wp-rest-server.php.
-		$dispatch_result = apply_filters( 'rest_dispatch_request', null, $request, $request->get_route(), $handler );
-
-		// Allow plugins to halt the request via this filter.
-		if ( null !== $dispatch_result ) {
-			$response = $dispatch_result;
-		} else {
-			$response = call_user_func( $callback, $request );
-		}
-	}
-	return $response;
-}
-add_filter( 'rest_request_after_callbacks', 'gutenberg_filter_request_after_callbacks', 10, 3 );
-
-/**
- * Overloaded version of WP_REST_Taxonomies_Controller::get_items()
- *
- * This is temporary code that will be removed once the Trac ticket lands in a release.
- *
- * @see https://core.trac.wordpress.org/ticket/44096
- *
- * @param WP_REST_Request $request Full details about the request.
- * @return WP_REST_Response Response object on success, or WP_Error object on failure.
- */
-function gutenberg_taxonomies_controller_get_items( $request ) {
-	$controller = $GLOBALS['Gutenberg_Temporary_Taxonomies_Controller'];
-	// Retrieve the controller of registered collection query parameters.
-	$registered = $controller->get_collection_params();
-
-	if ( isset( $registered['type'] ) && ! empty( $request['type'] ) ) {
-		$taxonomies = get_object_taxonomies( $request['type'], 'objects' );
-	} else {
-		$taxonomies = get_taxonomies( '', 'objects' );
-	}
-	$data = array();
-	foreach ( $taxonomies as $tax_type => $value ) {
-		if ( empty( $value->show_in_rest ) || ( 'edit' === $request['context'] && ! current_user_can( $value->cap->assign_terms ) ) ) {
-			continue;
-		}
-		$tax               = $controller->prepare_item_for_response( $value, $request );
-		$tax               = $controller->prepare_response_for_collection( $tax );
-		$data[ $tax_type ] = $tax;
-	}
-
-	if ( empty( $data ) ) {
-		// Response should still be returned as a JSON object when it is empty.
-		$data = (object) $data;
-	}
-
-	return rest_ensure_response( $data );
-}

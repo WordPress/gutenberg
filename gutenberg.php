@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
- * Version: 3.0.1
+ * Version: 3.6.2
  * Author: Gutenberg Team
  *
  * @package gutenberg
@@ -65,6 +65,12 @@ function gutenberg_menu() {
 
 	if ( current_user_can( 'edit_posts' ) ) {
 		$submenu['gutenberg'][] = array(
+			__( 'Support', 'gutenberg' ),
+			'edit_posts',
+			__( 'https://wordpress.org/support/plugin/gutenberg', 'gutenberg' ),
+		);
+
+		$submenu['gutenberg'][] = array(
 			__( 'Feedback', 'gutenberg' ),
 			'edit_posts',
 			'http://wordpressdotorg.polldaddy.com/s/gutenberg-support',
@@ -115,7 +121,7 @@ function is_gutenberg_page() {
  */
 function gutenberg_wordpress_version_notice() {
 	echo '<div class="error"><p>';
-	echo __( 'Gutenberg requires WordPress 4.9.6 or later to function properly. Please upgrade WordPress before activating Gutenberg.', 'gutenberg' );
+	echo __( 'Gutenberg requires WordPress 4.9.8 or later to function properly. Please upgrade WordPress before activating Gutenberg.', 'gutenberg' );
 	echo '</p></div>';
 
 	deactivate_plugins( array( 'gutenberg/gutenberg.php' ) );
@@ -149,7 +155,7 @@ function gutenberg_pre_init() {
 	// Strip '-src' from the version string. Messes up version_compare().
 	$version = str_replace( '-src', '', $wp_version );
 
-	if ( version_compare( $version, '4.9.6', '<' ) ) {
+	if ( version_compare( $version, '4.9.8', '<' ) ) {
 		add_action( 'admin_notices', 'gutenberg_wordpress_version_notice' );
 		return;
 	}
@@ -169,6 +175,8 @@ function gutenberg_pre_init() {
  * @return bool   Whether Gutenberg was initialized.
  */
 function gutenberg_init( $return, $post ) {
+	global $title, $post_type;
+
 	if ( true === $return && current_filter() === 'replace_editor' ) {
 		return $return;
 	}
@@ -181,11 +189,28 @@ function gutenberg_init( $return, $post ) {
 	add_filter( 'screen_options_show_screen', '__return_false' );
 	add_filter( 'admin_body_class', 'gutenberg_add_admin_body_class' );
 
-	/**
+	$post_type_object = get_post_type_object( $post_type );
+
+	/*
+	 * Always force <title> to 'Edit Post' (or equivalent)
+	 * because it needs to be in a generic state for both
+	 * post-new.php and post.php?post=<id>.
+	 */
+	if ( ! empty( $post_type_object ) ) {
+		$title = $post_type_object->labels->edit_item;
+	}
+
+	/*
 	 * Remove the emoji script as it is incompatible with both React and any
 	 * contenteditable fields.
 	 */
 	remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
+
+	/*
+	 * Ensure meta box functions are available to third-party code;
+	 * includes/meta-boxes is typically loaded from edit-form-advanced.php.
+	 */
+	require_once ABSPATH . 'wp-admin/includes/meta-boxes.php';
 
 	require_once ABSPATH . 'wp-admin/admin-header.php';
 	the_gutenberg_project();
@@ -245,11 +270,13 @@ function gutenberg_add_edit_link( $actions, $post ) {
 		'classic' => sprintf(
 			'<a href="%s" aria-label="%s">%s</a>',
 			esc_url( $edit_url ),
-			esc_attr( sprintf(
-				/* translators: %s: post title */
-				__( 'Edit &#8220;%s&#8221; in the classic editor', 'gutenberg' ),
-				$title
-			) ),
+			esc_attr(
+				sprintf(
+					/* translators: %s: post title */
+					__( 'Edit &#8220;%s&#8221; in the classic editor', 'gutenberg' ),
+					$title
+				)
+			),
 			__( 'Classic Editor', 'gutenberg' )
 		),
 	);
@@ -376,7 +403,7 @@ function gutenberg_replace_default_add_new_button() {
 			newbutton += '<a href="' + classicUrl + '"><?php echo esc_js( __( 'Classic Editor', 'gutenberg' ) ); ?></a></span></span><span class="page-title-action" style="display:none;"></span>';
 
 			button.insertAdjacentHTML( 'afterend', newbutton );
-			button.remove();
+			button.parentNode.removeChild( button );
 
 			var expander = document.getElementById( 'split-page-title-action' ).getElementsByClassName( 'expander' ).item( 0 );
 			var dropdown = expander.parentNode.querySelector( '.dropdown' );

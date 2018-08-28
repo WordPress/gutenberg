@@ -1,6 +1,6 @@
-# @wordpress/deprecated
+# Deprecated
 
-Logs a message to notify developers about a deprecated feature.
+Deprecation utility for WordPress. Logs a message to notify developers about a deprecated feature.
 
 ## Installation
 

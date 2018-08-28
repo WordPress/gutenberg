@@ -1,7 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`PluginPostStatusInfo renders fill properly 1`] = `
-<div>
+<div
+  role="presentation"
+>
   <PanelRow
     className="my-plugin-post-status-info"
     key="1---0/.0"

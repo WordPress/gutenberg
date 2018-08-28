@@ -21,6 +21,12 @@ const exists = ( filename ) => {
 	} catch ( e ) {}
 	return false;
 };
+
+// Exclude deceitful source-like files, such as editor swap files.
+const isSourceFile = ( filename ) => {
+	return /.\.(js|scss)$/.test( filename );
+};
+
 const rebuild = ( filename ) => filesToBuild.set( filename, true );
 
 getPackages().forEach( ( p ) => {
@@ -29,6 +35,10 @@ getPackages().forEach( ( p ) => {
 		fs.accessSync( srcDir, fs.F_OK );
 		fs.watch( path.resolve( p, 'src' ), { recursive: true }, ( event, filename ) => {
 			const filePath = path.resolve( srcDir, filename );
+
+			if ( ! isSourceFile( filename ) ) {
+				return;
+			}
 
 			if ( ( event === 'change' || event === 'rename' ) && exists( filePath ) ) {
 				// eslint-disable-next-line no-console

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { keyBy, map, groupBy } from 'lodash';
+import { keyBy, map, groupBy, flowRight } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,6 +11,8 @@ import { combineReducers } from '@wordpress/data';
 /**
  * Internal dependencies
  */
+import { ifMatchingAction, replaceAction } from './utils';
+import { reducer as queriedDataReducer } from './queried-data';
 import { defaultEntities } from './entities';
 
 /**
@@ -109,30 +111,24 @@ export function themeSupports( state = {}, action ) {
  * @return {Function} Reducer.
  */
 function entity( entityConfig ) {
-	const key = entityConfig.key || 'id';
+	return flowRight( [
+		// Limit to matching action type so we don't attempt to replace action on
+		// an unhandled action.
+		ifMatchingAction( ( action ) => (
+			action.name &&
+			action.kind &&
+			action.name === entityConfig.name &&
+			action.kind === entityConfig.kind
+		) ),
 
-	return ( state = { byKey: {} }, action ) => {
-		if (
-			! action.name ||
-			! action.kind ||
-			action.name !== entityConfig.name ||
-			action.kind !== entityConfig.kind
-		) {
-			return state;
-		}
-
-		switch ( action.type ) {
-			case 'RECEIVE_ENTITY_RECORDS':
-				return {
-					byKey: {
-						...state.byKey,
-						...keyBy( action.records, key ),
-					},
-				};
-			default:
-				return state;
-		}
-	};
+		// Inject the entity config into the action.
+		replaceAction( ( action ) => {
+			return {
+				...action,
+				key: entityConfig.key || 'id',
+			};
+		} ),
+	] )( queriedDataReducer );
 }
 
 /**
@@ -201,10 +197,31 @@ export const entities = ( state = {}, action ) => {
 	};
 };
 
+/**
+ * Reducer managing embed preview data.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function embedPreviews( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_EMBED_PREVIEW':
+			const { url, preview } = action;
+			return {
+				...state,
+				[ url ]: preview,
+			};
+	}
+	return state;
+}
+
 export default combineReducers( {
 	terms,
 	users,
 	taxonomies,
 	themeSupports,
 	entities,
+	embedPreviews,
 } );

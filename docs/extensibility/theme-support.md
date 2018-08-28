@@ -8,24 +8,28 @@ To opt-in for one of these features, call `add_theme_support` in the `functions.
 
 ```php
 function mytheme_setup_theme_supported_features() {
-	add_theme_support( 'editor-color-palette',
+	add_theme_support( 'editor-color-palette', array(
 		array(
-			'name' => 'strong magenta',
+			'name' => __( 'strong magenta', 'themeLangDomain' ),
+			'slug' => 'strong-magenta',
 			'color' => '#a156b4',
 		),
 		array(
-			'name' => 'light grayish magenta',
+			'name' => __( 'light grayish magenta', 'themeLangDomain' ),
+			'slug' => 'light-grayish-magenta',
 			'color' => '#d0a5db',
 		),
 		array(
-			'name' => 'very light gray',
+			'name' => __( 'very light gray', 'themeLangDomain' ),
+			'slug' => 'very-light-gray',
 			'color' => '#eee',
 		),
 		array(
-			'name' => 'very dark gray',
+			'name' => __( 'very dark gray', 'themeLangDomain' ),
+			'slug' => 'very-dark-gray',
 			'color' => '#444',
-		)
-	);
+		),
+	) );
 }
 
 add_action( 'after_setup_theme', 'mytheme_setup_theme_supported_features' );
@@ -41,29 +45,61 @@ Some blocks such as the image block have the possibility to define a "wide" or "
 add_theme_support( 'align-wide' );
 ```
 
-### Block Color Palettes:
+### Wide Alignments and Floats
+
+It can be difficult to create a responsive layout that accommodates wide images, a sidebar, a centered column, and floated elements that stay within that centered column.
+
+Gutenberg adds additional markup to floated images to make styling them easier.
+
+Here's the markup for an `Image` with a caption:
+
+```html
+<figure class="wp-block-image">
+	<img src="..." alt="" width="200px">
+	<figcaption>Short image caption.</figcaption>
+</figure>
+```
+
+Here's the markup for a left-floated image:
+
+```html
+<div class="wp-block-image">
+	<figure class="alignleft">
+		<img src="..." alt="" width="200px">
+		<figcaption>Short image caption.</figcaption>
+	</figure>
+</div>
+```
+
+Here's an example using the above markup to achieve a responsive layout that features a sidebar, wide images, and floated elements with bounded captions: https://codepen.io/joen/pen/zLWvrW.
+
+### Block Color Palettes
 
 Different blocks have the possibility of customizing colors. Gutenberg provides a default palette, but a theme can overwrite it and provide its own:
 
 ```php
-add_theme_support( 'editor-color-palette',
+add_theme_support( 'editor-color-palette', array(
 	array(
-		'name' => 'strong magenta',
+		'name' => __( 'strong magenta', 'themeLangDomain' ),
+		'slug' => 'strong-magenta',
 		'color' => '#a156b4',
 	),
 	array(
-		'name' => 'light grayish magenta',
+		'name' => __( 'light grayish magenta', 'themeLangDomain' ),
+		'slug' => 'light-grayish-magenta',
 		'color' => '#d0a5db',
 	),
 	array(
-		'name' => 'very light gray',
+		'name' => __( 'very light gray', 'themeLangDomain' ),
+		'slug' => 'very-light-gray',
 		'color' => '#eee',
 	),
 	array(
-		'name' => 'very dark gray',
+		'name' => __( 'very dark gray', 'themeLangDomain' ),
+		'slug' => 'very-dark-gray',
 		'color' => '#444',
-	)
-);
+	),
+) );
 ```
 
 The colors will be shown in order on the palette, and there's no limit to how many can be specified.
@@ -81,6 +117,53 @@ Themes are responsible for creating the classes that apply the colors in differe
 ```
 
 The class name is built appending 'has-', followed by the class name *using* kebab case and ending with the context name.
+
+### Block Font Sizes:
+
+Blocks may allow the user to configure the font sizes they use, e.g., the paragraph block. Gutenberg provides a default set of font sizes, but a theme can overwrite it and provide its own:
+
+
+```php
+add_theme_support( 'editor-font-sizes', array(
+	array(
+		'name' => __( 'small', 'themeLangDomain' ),
+		'shortName' => __( 'S', 'themeLangDomain' ),
+		'size' => 12,
+		'slug' => 'small'
+	),
+	array(
+		'name' => __( 'regular', 'themeLangDomain' ),
+		'shortName' => __( 'M', 'themeLangDomain' ),
+		'size' => 16,
+		'slug' => 'regular'
+	),
+	array(
+		'name' => __( 'large', 'themeLangDomain' ),
+		'shortName' => __( 'L', 'themeLangDomain' ),
+		'size' => 36,
+		'slug' => 'large'
+	),
+	array(
+		'name' => __( 'larger', 'themeLangDomain' ),
+		'shortName' => __( 'XL', 'themeLangDomain' ),
+		'size' => 50,
+		'slug' => 'larger'
+	)
+) );
+```
+
+The font sizes are rendered on the font size picker in the order themes provide them.
+
+Themes are responsible for creating the classes that apply the correct font size styles.
+The class name is built appending 'has-', followed by the font size name *using* kebab case and ending with `-font-size`.
+
+As an example for the regular font size, a theme may provide the following class.
+
+```css
+.has-regular-font-size {
+    font-size: 16px;
+}
+```
 
 ### Disabling custom colors in block Color Palettes
 
