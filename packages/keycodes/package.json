@@ -20,7 +20,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "7.0.0-rc.2",
+		"@babel/runtime": "^7.0.0",
 		"lodash": "^4.17.10"
 	},
 	"publishConfig": {
