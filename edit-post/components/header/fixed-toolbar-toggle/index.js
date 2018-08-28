@@ -9,7 +9,6 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
 import { MenuItem } from '@wordpress/components';
-import { ifViewportMatches } from '@wordpress/viewport';
 
 function FixedToolbarToggle( { onToggle, isActive } ) {
 	return (
@@ -34,5 +33,4 @@ export default compose( [
 			ownProps.onToggle();
 		},
 	} ) ),
-	ifViewportMatches( 'medium' ),
 ] )( FixedToolbarToggle );
