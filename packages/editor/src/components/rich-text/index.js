@@ -62,6 +62,17 @@ const { Node, getSelection } = window;
  */
 const TINYMCE_ZWSP = '\uFEFF';
 
+/**
+ * Check if the given `RichText` value is empty on not.
+ *
+ * @param {Array} value `RichText` value.
+ *
+ * @return {boolean} True if empty, false if not.
+ */
+const isRichTextValueEmpty = ( value ) => {
+	return ! value || ! value.length;
+};
+
 export function getFormatValue( formatName, parents ) {
 	if ( formatName === 'link' ) {
 		const anchor = find( parents, ( node ) => node.nodeName === 'A' );
@@ -804,7 +815,7 @@ export class RichText extends Component {
 	 * @return {boolean} Whether field is empty.
 	 */
 	isEmpty( value = this.props.value ) {
-		return ! value || ! value.length;
+		return isRichTextValueEmpty( value );
 	}
 
 	isFormatActive( format ) {
@@ -1059,16 +1070,7 @@ RichTextContainer.Content = ( { value, format, tagName: Tag, ...props } ) => {
 	return content;
 };
 
-/**
- * Check if the given `RichText` value is empty on not.
- *
- * @param {Array} value `RichText` value.
- *
- * @return {boolean} True if empty, false if not.
- */
-RichTextContainer.isEmpty = ( value ) => {
-	return ! value || ! value.length;
-};
+RichTextContainer.isEmpty = isRichTextValueEmpty;
 
 RichTextContainer.Content.defaultProps = {
 	format: 'children',
