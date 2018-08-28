@@ -1396,11 +1396,6 @@ export function getBlocksForSerialization( state ) {
  */
 export const getEditedPostContent = createSelector(
 	( state ) => {
-		const edits = getPostEdits( state );
-		if ( 'content' in edits ) {
-			return edits.content;
-		}
-
 		const blocks = getBlocksForSerialization( state );
 		const content = serialize( blocks );
 
@@ -1418,10 +1413,7 @@ export const getEditedPostContent = createSelector(
 
 		return content;
 	},
-	( state ) => [
-		...getBlocks.getDependants( state ),
-		state.editor.present.edits.content,
-	],
+	( state ) => getBlocks.getDependants( state )
 );
 
 /**
