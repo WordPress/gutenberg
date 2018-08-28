@@ -42,7 +42,7 @@ describe( 'block deletion -', () => {
 
 	describe( 'deleting the third block using the Remove Block shortcut', () => {
 		it( 'results in two remaining blocks and positions the caret at the end of the second block', async () => {
-			await pressWithModifier( [ 'Alt', META_KEY ], 'Backspace' );
+			await pressWithModifier( [ 'Shift', META_KEY ], 'x' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 
 			// Type additional text and assert that caret position is correct by comparing to snapshot.
