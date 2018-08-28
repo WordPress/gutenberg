@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import isOnline from 'is-online';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -91,6 +96,22 @@ function apiFetch( options ) {
 			.then( checkStatus )
 			.then( parseResponse )
 			.catch( ( response ) => {
+				// If the error meets this criteria, that means we couldn't reach the
+				// server and are likely offline. In that case we'll dispatch an error
+				// saying we're offline so the UI has the option to display a notice
+				// or warning instead of an error.
+				if (
+					response.name === 'TypeError' &&
+					response.message === 'NetworkError when attempting to fetch resource.'
+				) {
+					console.debug( 'HTTP Status was zero; no internet connection.' );
+					const noNetworkConnectionError = {
+						code: 'no_network_connection',
+						message: __( 'Could not reach server; you may be offline.' ),
+					};
+					throw noNetworkConnectionError;
+				}
+
 				if ( ! parse ) {
 					throw response;
 				}

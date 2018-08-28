@@ -49,6 +49,7 @@
 		"@wordpress/redux-routine": "file:packages/redux-routine",
 		"@wordpress/rich-text": "file:packages/rich-text",
 		"@wordpress/shortcode": "file:packages/shortcode",
+		"@wordpress/storage": "file:packages/storage",
 		"@wordpress/token-list": "file:packages/token-list",
 		"@wordpress/url": "file:packages/url",
 		"@wordpress/viewport": "file:packages/viewport",
