@@ -37,7 +37,7 @@ describe( 'Warning', () => {
 	it( 'should show hidden actions', () => {
 		const wrapper = shallow( <Warning secondaryActions={ [ { title: 'test', onClick: null } ] }>Message</Warning> );
 
-		const actions = wrapper.find( '.editor-warning__hidden' );
+		const actions = wrapper.find( '.editor-warning__secondary' );
 
 		expect( actions ).toHaveLength( 1 );
 	} );
