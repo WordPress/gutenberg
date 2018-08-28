@@ -7,7 +7,7 @@ import { isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockType, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import { PanelBody } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
@@ -24,7 +24,12 @@ const BlockInspector = ( { selectedBlock, blockType, count } ) => {
 		return <span className="editor-block-inspector__multi-blocks">{ __( 'Coming Soon' ) }</span>;
 	}
 
-	if ( ! selectedBlock ) {
+	/*
+	 * In addition to the actual case of no-block-selected,
+	 * avoid showing an unregistered block as an actual selection because we want
+	 * the user to focus on the unregistered block warning, not block settings.
+	 */
+	if ( ! selectedBlock || selectedBlock.name === getUnregisteredTypeHandlerName() ) {
 		return <span className="editor-block-inspector__no-blocks">{ __( 'No block selected.' ) }</span>;
 	}
 
