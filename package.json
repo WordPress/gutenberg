@@ -58,8 +58,8 @@
 		"rememo": "3.0.0"
 	},
 	"devDependencies": {
-		"@babel/core": "7.0.0-rc.2",
-		"@babel/runtime-corejs2": "7.0.0-rc.2",
+		"@babel/core": "^7.0.0",
+		"@babel/runtime-corejs2": "^7.0.0",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:packages/babel-plugin-import-jsx-pragma",
 		"@wordpress/babel-plugin-makepot": "file:packages/babel-plugin-makepot",
 		"@wordpress/babel-preset-default": "file:packages/babel-preset-default",
@@ -72,8 +72,8 @@
 		"@wordpress/postcss-themes": "file:packages/postcss-themes",
 		"@wordpress/scripts": "file:packages/scripts",
 		"autoprefixer": "8.2.0",
-		"babel-eslint": "8.0.3",
-		"babel-loader": "8.0.0-beta.4",
+		"babel-eslint": "8.0.1",
+		"babel-loader": "8.0.0",
 		"chalk": "2.4.1",
 		"check-node-version": "3.1.1",
 		"codecov": "3.0.2",

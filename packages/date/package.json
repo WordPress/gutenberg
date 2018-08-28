@@ -19,7 +19,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"@babel/runtime": "7.0.0-rc.2",
+		"@babel/runtime": "^7.0.0",
 		"moment": "^2.22.1",
 		"moment-timezone": "^0.5.16"
 	},

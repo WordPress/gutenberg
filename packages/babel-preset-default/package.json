@@ -23,12 +23,12 @@
 	},
 	"main": "index.js",
 	"dependencies": {
-		"@babel/plugin-proposal-async-generator-functions": "7.0.0-rc.2",
-		"@babel/plugin-proposal-object-rest-spread": "7.0.0-rc.2",
-		"@babel/plugin-transform-react-jsx": "7.0.0-rc.2",
-		"@babel/plugin-transform-runtime": "7.0.0-rc.2",
-		"@babel/preset-env": "7.0.0-rc.2",
-		"@babel/runtime": "7.0.0-rc.2",
+		"@babel/plugin-proposal-async-generator-functions": "^7.0.0",
+		"@babel/plugin-proposal-object-rest-spread": "^7.0.0",
+		"@babel/plugin-transform-react-jsx": "^7.0.0",
+		"@babel/plugin-transform-runtime": "^7.0.0",
+		"@babel/preset-env": "^7.0.0",
+		"@babel/runtime": "^7.0.0",
 		"@wordpress/browserslist-config": "file:../browserslist-config",
 		"babel-core": "^7.0.0-bridge.0"
 	},
