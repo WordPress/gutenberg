@@ -87,7 +87,7 @@ This is the canonical list of keyboard shortcuts:
 
 Here is a brief animation illustrating how to find and use the keyboard shortcuts:
 
-![Typing](https://make.wordpress.org/community/files/2018/08/gutenberg-keyboard-shortcuts.gif)
+![GIF showing how to access keyboard shortcuts](https://make.wordpress.org/community/files/2018/08/gutenberg-keyboard-shortcuts.gif)
 
 ## Is Gutenberg built on top of TinyMCE?
 
