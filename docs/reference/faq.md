@@ -49,43 +49,43 @@ You can see the whole list going to the top right corner menu of the new editor 
 
 This is the canonical list of keyboard shortcuts:
 
-```
-Ctrl+Option+H       Display keyboard shortcuts.
-⌘S                  Save your changes.
-⌘Z                  Undo your last changes.
-Shift+⌘Z            Redo your last undo.
-Shift+⌘,            Show or hide the settings sidebar.
-Ctrl+`              Navigate to a the next part of the editor.
-Ctrl+Shift+`        Navigate to the previous part of the editor.
-Shift+Option+N      Navigate to a the next part of the editor (alternative).
-Shift+Option+P      Navigate to the previous part of the editor (alternative).
-Shift+Option+⌘M     Switch between Visual Editor and Code Editor.
+### Editor shortcuts
 
-Selection shortcuts
+* <kbd>Ctrl</kbd>+<kbd>Option</kbd>+<kbd>H</kbd> Display keyboard shortcuts.
+* <kbd>⌘S</kbd> Save your changes.
+* <kbd>⌘Z</kbd> Undo your last changes.
+* <kbd>Shift</kbd>+<kbd>⌘Z</kbd> Redo your last undo.
+* <kbd>Shift</kbd>+<kbd>⌘,</kbd> Show or hide the settings sidebar.
+* <kbd>Ctrl</kbd>+<kbd>`</kbd> Navigate to a the next part of the editor.
+* <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>`</kbd> Navigate to the previous part of the editor.
+* <kbd>Shift</kbd>+<kbd>Option</kbd>+<kbd>N</kbd> Navigate to a the next part of the editor (alternative).
+* <kbd>Shift</kbd>+<kbd>Option</kbd>+<kbd>P</kbd> Navigate to the previous part of the editor (alternative).
+* <kbd>Shift</kbd>+<kbd>Option</kbd>+<kbd>⌘M</kbd> Switch between Visual Editor and Code Editor.
 
-⌘A                  Select all text when typing. Press again to select all blocks.
-Esc                 Clear selection.
+### Selection shortcuts
 
-Block shortcuts
+* <kbd>⌘A</kbd> Select all text when typing. Press again to select all blocks.
+* <kbd>Esc</kbd> Clear selection.
 
-Shift+⌘D            Duplicate the selected block(s).
-Option+⌘Backspace   Remove the selected block(s).
-Option+⌘T           Insert a new block before the selected block(s).
-Option+⌘Y           Insert a new block after the selected block(s).
-/                   Change the block type after adding a new paragraph.
+### Block shortcuts
 
-Text formatting
+* <kbd>Shift</kbd>+<kbd>⌘D</kbd> Duplicate the selected block(s).
+* <kbd>Option</kbd>+<kbd>⌘Backspace</kbd> Remove the selected block(s).
+* <kbd>Option</kbd>+<kbd>⌘T</kbd> Insert a new block before the selected block(s).
+* <kbd>Option</kbd>+<kbd>⌘Y</kbd> Insert a new block after the selected block(s).
+* <kbd>/</kbd> Change the block type after adding a new paragraph.
 
-⌘B                  Make the selected text bold.
-⌘I                  Make the selected text italic.
-⌘U                  Underline the selected text.
-⌘K                  Convert the selected text into a link.
-Ctrl+Option+S       Remove a link.
-Ctrl+Option+D       Add a strikethrough to the selected text.
-Ctrl+Option+X       Display the selected text in a monospaced font.
-```
+### Text formatting
 
- Here is a brief animation illustrating how to find and use the keyboard shortcuts:
+* <kbd>⌘B</kbd> Make the selected text bold.
+* <kbd>⌘I</kbd> Make the selected text italic.
+* <kbd>⌘U</kbd> Underline the selected text.
+* <kbd>⌘K</kbd> Convert the selected text into a link.
+* <kbd>Ctrl</kbd>+<kbd>Option</kbd>+<kbd>S</kbd> Remove a link.
+* <kbd>Ctrl</kbd>+<kbd>Option</kbd>+<kbd>D</kbd> Add a strikethrough to the selected text.
+* <kbd>Ctrl</kbd>+<kbd>Option</kbd>+<kbd>X</kbd> Display the selected text in a monospaced font.
+
+Here is a brief animation illustrating how to find and use the keyboard shortcuts:
 
 ![Typing](https://make.wordpress.org/community/files/2018/08/gutenberg-keyboard-shortcuts.gif)
 
