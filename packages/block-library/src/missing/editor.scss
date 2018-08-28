@@ -3,13 +3,13 @@
 		position: static;
 	}
 
+	&,
 	&.is-selected,
 	&.is-hovered {
 		// Remove the block outline because design requested that this
 		// feel less like a first-class block and more like an error message.
 		> .editor-block-list__block-edit::before {
 			outline: none;
-			transition: none !important;
 		}
 
 		// Remove the block menu because design requested that this
