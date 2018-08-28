@@ -28,31 +28,27 @@ function Warning( { className, primaryActions, children, secondaryActions } ) {
 			</div>
 
 			{ secondaryActions && (
-				<div className="editor-warning__hidden">
-					<Dropdown
-						className="edit-post-more-menu"
-						position="bottom left"
-						renderToggle={ ( { isOpen, onToggle } ) => (
-							<IconButton
-								icon="ellipsis"
-								label={ __( 'More options' ) }
-								onClick={ onToggle }
-								aria-expanded={ isOpen }
-							/>
-						) }
-						renderContent={ () => (
-							<div className="edit-post-more-menu__content">
-								<MenuGroup label={ __( 'More options' ) }>
-									{ secondaryActions.map( ( item, pos ) =>
-										<MenuItem onClick={ item.onClick } key={ pos }>
-											{ item.title }
-										</MenuItem>
-									) }
-								</MenuGroup>
-							</div>
-						) }
-					/>
-				</div>
+				<Dropdown
+					className="editor-warning__secondary"
+					position="bottom left"
+					renderToggle={ ( { isOpen, onToggle } ) => (
+						<IconButton
+							icon="ellipsis"
+							label={ __( 'More options' ) }
+							onClick={ onToggle }
+							aria-expanded={ isOpen }
+						/>
+					) }
+					renderContent={ () => (
+						<MenuGroup label={ __( 'More options' ) }>
+							{ secondaryActions.map( ( item, pos ) =>
+								<MenuItem onClick={ item.onClick } key={ pos }>
+									{ item.title }
+								</MenuItem>
+							) }
+						</MenuGroup>
+					) }
+				/>
 			) }
 		</div>
 	);
