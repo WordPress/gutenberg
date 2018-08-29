@@ -80,7 +80,9 @@ body.gutenberg-editor-page {
 	}
 }
 
-.gutenberg {
+.gutenberg,
+// The modals are shown outside the .gutenberg wrapper, they need these styles
+.components-modal__frame {
 	box-sizing: border-box;
 
 	*,

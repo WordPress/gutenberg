@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Modal } from '@wordpress/components';
+import { Modal, Button } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
@@ -46,38 +46,36 @@ function PostLockedModal( { lockNonce, lockDetails, user, postId, isLocked } ) {
 				shouldCloseOnClickOutside={ false }
 				shouldCloseOnEsc={ false }
 				isDismissable={ false }
-				className="post-locked-modal"
+				className="editor-post-locked-modal"
 			>
-				{
-					!! avatar &&
+				{	!! avatar && (
 					<img
 						src={ avatar }
 						alt={ __( 'Avatar' ) }
-						className="components-modal__image"
+						className="editor-post-locked-modal__avatar"
 					/>
-				}
-				<span>
+				) }
+				<div>
 					<div>{ modalText }</div>
-					{
-						!! takeover ?
-							<p>
-								<a href={ allPosts }>
-									{ __( 'View all posts' ) }
-								</a>
-							</p> :
-							<a href={ allPosts } className={ 'button' } >
-								{ __( 'All Posts' ) }
+					{ !! takeover && (
+						<p>
+							<a href={ allPosts }>
+								{ __( 'View all posts' ) }
 							</a>
-					}
+						</p>
+					) }
 					{ ! takeover &&
-					<span>
-						<PostPreviewButton />
-						<a className="button button-primary" href={ unlockUrl }>
-							{ __( 'Take Over' ) }
-						</a>
-					</span>
+						<div className="editor-post-locked-modal__buttons">
+							<Button isDefault isLarge href={ allPosts }>
+								{ __( 'All Posts' ) }
+							</Button>
+							<PostPreviewButton />
+							<Button isPrimary isLarge href={ unlockUrl }>
+								{ __( 'Take Over' ) }
+							</Button>
+						</div>
 					}
-				</span>
+				</div>
 			</Modal>
 		</Fragment>
 	);
