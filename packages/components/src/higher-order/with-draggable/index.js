@@ -150,6 +150,6 @@ const withDraggable = createHigherOrderComponent(
 );
 
 export default compose(
-	withDraggable,
 	withSafeTimeout,
+	withDraggable,
 );
