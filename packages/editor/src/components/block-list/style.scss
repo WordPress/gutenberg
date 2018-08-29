@@ -104,6 +104,7 @@
 
 	&.is-focus-mode {
 		opacity: 0.6;
+		transition: opacity 0.1s linear;
 
 		&:not(.is-focused) .editor-block-list__block,
 		&.is-focused {
