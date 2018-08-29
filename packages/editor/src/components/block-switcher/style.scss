@@ -24,6 +24,7 @@
 
 	.editor-block-icon,
 	.editor-block-switcher__transform {
+		width: $icon-button-size + 3px + 3px;
 		position: relative;
 		height: $icon-button-size-small;
 		margin: 0;
@@ -33,7 +34,7 @@
 		transition: all 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
 	}
 
-	// Paint a dropdown.
+	// Add a dropdown arrow indicator.
 	.editor-block-icon::after {
 		content: "";
 		pointer-events: none;
