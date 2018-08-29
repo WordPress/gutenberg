@@ -2,6 +2,7 @@
 
 exports[`BlockAlignmentToolbar should match snapshot 1`] = `
 <Toolbar
+  className="block-alignment-toolbar"
   controls={
     Array [
       Object {

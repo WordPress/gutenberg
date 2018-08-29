@@ -1,0 +1,31 @@
+.half-image__content-area {
+	margin-left: 28px;
+}
+
+.half-media,
+.half-media.aligncenter {
+	display: grid;
+	align-items: center;
+	column-gap: 10px;
+}
+
+.half-media {
+	grid-template-areas: "half-media-media half-media-content";
+	grid-template-columns: fit-content(70%) minmax(200px, 70%);
+	grid-template-rows: auto;
+}
+
+.half-media__content {
+	grid-area: half-media-content;
+	word-break: break-word;
+}
+
+.half-media__media {
+	grid-area: half-media-media;
+	justify-self: center;
+}
+
+.half-media.has-media-on-the-right {
+	grid-template-areas: "half-media-content half-media-media";
+	grid-template-columns: minmax(200px, 70%) fit-content(70%);
+}

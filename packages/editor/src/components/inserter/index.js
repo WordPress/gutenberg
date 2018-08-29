@@ -86,14 +86,16 @@ class Inserter extends Component {
 }
 
 export default compose( [
-	withSelect( ( select ) => {
+	withSelect( ( select, { insertionPoint } ) => {
 		const {
 			getEditedPostAttribute,
 			getBlockInsertionPoint,
 			getSelectedBlock,
 			getInserterItems,
 		} = select( 'core/editor' );
-		const insertionPoint = getBlockInsertionPoint();
+		if ( ! insertionPoint ) {
+			insertionPoint = getBlockInsertionPoint();
+		}
 		const { rootClientId } = insertionPoint;
 		return {
 			title: getEditedPostAttribute( 'title' ),

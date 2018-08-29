@@ -1,0 +1,56 @@
+.half-media__media .block-alignment-toolbar {
+	display: none;
+}
+
+.half-media {
+	display: block;
+	.half-media__media {
+		padding: 0;
+	}
+	.half-media__content {
+		text-align: initial;
+	}
+	.components-placeholder {
+		background-color: #f3f3f4;
+	}
+	.editor-block-placeholder {
+		margin-bottom: 14px;
+	}
+}
+
+.half-media.has-media-on-the-right .components-placeholder {
+	margin-left: 2px;
+}
+
+.half-media:not(.has-media-on-the-right) .components-placeholder {
+	margin-left: -2px;
+}
+
+.half-media > .editor-inner-blocks > .editor-block-list__layout {
+	display: grid;
+	grid-template-columns: fit-content(70%) minmax(200px, 70%);
+	grid-template-rows: auto;
+	grid-template-areas: "half-media-media half-media-content";
+	align-items: center;
+
+	[data-type="core/half-media-media-area"],
+	[data-type="core/half-media-content-area"] {
+		word-break: break-word;
+		width: 100%;
+	}
+
+	[data-type="core/half-media-content-area"] {
+		grid-area: half-media-content;
+		margin-left: unset;
+		margin-right: unset;
+	}
+
+	[data-type="core/half-media-media-area"] {
+		grid-area: half-media-media;
+	}
+}
+
+.half-media.has-media-on-the-right > .editor-inner-blocks > .editor-block-list__layout {
+	grid-template-areas: "half-media-content half-media-media";
+	grid-template-columns: minmax(200px, 70%) fit-content(70%);
+}
