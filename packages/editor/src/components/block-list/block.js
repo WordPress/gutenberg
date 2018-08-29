@@ -483,14 +483,17 @@ export class BlockListBlock extends Component {
 			>
 				{ ! isPartOfMultiSelection && isMovable && (
 					<BlockDraggable
-						rootClientId={ rootClientId }
-						index={ order }
-						clientId={ clientId }
-						layout={ layout }
+						elementId={ blockElementId }
+						transferData={ {
+							type: 'block',
+							fromIndex: order,
+							rootClientId,
+							clientId,
+							layout,
+						} }
 						onDragStart={ this.onDragStart }
 						onDragEnd={ this.onDragEnd }
 						isDragging={ dragging }
-						elementId={ blockElementId }
 					/>
 				) }
 				{ shouldShowInsertionPoint && (
