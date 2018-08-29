@@ -268,7 +268,7 @@ module.exports = function() {
 				// If exists, also assign translator comment
 				const translator = getTranslatorComment( path );
 				if ( translator ) {
-					translation.comments.translator = translator;
+					translation.comments.extracted = translator;
 				}
 
 				// Create context grouping for translation if not yet exists
