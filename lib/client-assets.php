@@ -101,9 +101,9 @@ function gutenberg_register_scripts_and_styles() {
 
 	wp_register_script(
 		'wp-babel-runtime',
-		gutenberg_url( 'build/babel-runtime/0.index.js' ),
+		gutenberg_url( 'build/babel-runtime/babel-runtime.index.js' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'build/babel-runtime/0.index.js' ),
+		filemtime( gutenberg_dir_path() . 'build/babel-runtime/babel-runtime.index.js' ),
 		true
 	);
 
@@ -145,7 +145,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-hooks',
 		gutenberg_url( 'build/hooks/index.js' ),
-		array(),
+		array( 'wp-babel-runtime' ),
 		filemtime( gutenberg_dir_path() . 'build/hooks/index.js' ),
 		true
 	);
@@ -237,7 +237,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-html-entities',
 		gutenberg_url( 'build/html-entities/index.js' ),
-		array(),
+		array( 'wp-babel-runtime' ),
 		filemtime( gutenberg_dir_path() . 'build/html-entities/index.js' ),
 		true
 	);

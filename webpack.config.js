@@ -210,10 +210,11 @@ const config = {
 		],
 	},
 	optimization: {
+		namedChunks: true,
 		splitChunks: {
 			cacheGroups: {
 				'babel-runtime': {
-					test: /[\\/]node_modules[\\/](core-js|@babel)[\\/]/,
+					test: /[\\/]node_modules[\\/](@babel|core-js|regenerator-runtime)[\\/]/,
 					name: 'babel-runtime',
 					chunks: 'all',
 				},
