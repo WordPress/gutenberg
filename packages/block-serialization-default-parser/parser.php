@@ -180,7 +180,7 @@ class BSDP_Parser {
          * match back in PHP to see which one it was.
          */
         $has_match = preg_match(
-            '/<!--\s+(?<closer>\/)?wp:(?<namespace>[a-z][a-z0-9_-]*\/)?(?<name>[a-z][a-z0-9_-]*)\s+(?<attrs>{(?:(?!}\s+-->).)+}\s+)?(?<void>\/)?-->/s',
+            '/<!--\s+(?<closer>\/)?wp:(?<namespace>[a-z][a-z0-9_-]*\/)?(?<name>[a-z][a-z0-9_-]*)\s+(?<attrs>{(?:(?!}\s+-->).)+?}\s+)?(?<void>\/)?-->/s',
             $this->document,
             $matches,
             PREG_OFFSET_CAPTURE,
@@ -264,9 +264,3 @@ class BSDP_Parser {
         $this->output[] = $stack_top->block;
     }
 }
-
-function bdsp_select_parser( $prev_parse_class ) {
-    return 'BSDP_Parser';
-}
-
-add_filter( 'block_parser_class', 'bdsp_select_parser', 10, 1 );

@@ -2,7 +2,7 @@ let document;
 let offset;
 let output;
 let stack;
-const tokenizer = /<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:(?!}\s+-->)[^])+}\s+)?(\/)?-->/g;
+const tokenizer = /<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:(?!}\s+-->)[^])+?}\s+)?(\/)?-->/g;
 
 function Block( blockName, attrs, innerBlocks, innerHTML ) {
 	return {
@@ -149,6 +149,24 @@ function proceed() {
 	}
 }
 
+/**
+ * Parse JSON if valid, otherwise return null
+ *
+ * Note that JSON coming from the block comment
+ * delimiters is constrained to be an object
+ * and cannot be things like `true` or `null`
+ *
+ * @param {string} input JSON input string to parse
+ * @return {Object|null} parsed JSON if valid
+ */
+function parseJSON( input ) {
+	try {
+		return JSON.parse( input );
+	} catch ( e ) {
+		return null;
+	}
+}
+
 function nextToken() {
 	// aye the magic
 	// we're using a single RegExp to tokenize the block comment delimiters
@@ -172,7 +190,7 @@ function nextToken() {
 	const namespace = namespaceMatch || 'core/';
 	const name = namespace + nameMatch;
 	const hasAttrs = !! attrsMatch;
-	const attrs = hasAttrs ? JSON.parse( attrsMatch ) : null;
+	const attrs = hasAttrs ? parseJSON( attrsMatch ) : null;
 
 	// This state isn't allowed
 	// This is an error
