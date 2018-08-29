@@ -2,7 +2,7 @@
 
 exports[`templates Using a CPT with a predefined template Should add a custom post types with a predefined template 1`] = `
 "<!-- wp:image -->
-<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
+<figure class=\\"wp-block-image\\"><img alt=\\"\\" width=\\"0\\" height=\\"0\\"/></figure>
 <!-- /wp:image -->
 
 <!-- wp:paragraph {\\"placeholder\\":\\"Add a book description\\"} -->
