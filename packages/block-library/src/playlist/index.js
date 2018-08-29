@@ -19,39 +19,6 @@ export const settings = {
 
 	category: 'common',
 
-	attributes: {
-		ids: {
-			type: 'array',
-		},
-		type: {
-			type: 'string',
-			default: 'audio',
-		},
-		showTrackNumbers: {
-			type: 'boolean',
-			default: true,
-		},
-		showArtists: {
-			type: 'boolean',
-			default: true,
-		},
-		images: {
-			type: 'boolean',
-			default: true,
-		},
-		tracklist: {
-			type: 'boolean',
-			default: true,
-		},
-		style: {
-			type: 'string',
-			default: 'light',
-		},
-		align: {
-			type: 'string',
-		},
-	},
-
 	supports: {
 		align: true,
 		html: false,
