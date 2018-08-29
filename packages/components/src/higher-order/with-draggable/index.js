@@ -2,7 +2,7 @@
  * WordPress Dependencies
  */
 import { Component } from '@wordpress/element';
-import { createHigherOrderComponent } from '@wordpress/compose';
+import { compose, createHigherOrderComponent, withSafeTimeout } from '@wordpress/compose';
 
 const dragImageClass = 'components-draggable__invisible-drag-image';
 const cloneWrapperClass = 'components-draggable__clone';
@@ -30,7 +30,7 @@ const withDraggable = createHigherOrderComponent(
 			 * @param  {Object} event The Drag event..
 			 */
 			onDragStart( event ) {
-				const { elementId, transferData } = this.props;
+				const { elementId, transferData, onDragStart, setTimeout } = this.props;
 				const element = document.getElementById( elementId );
 				if ( ! element || ! transferData ) {
 					event.preventDefault();
@@ -84,8 +84,11 @@ const withDraggable = createHigherOrderComponent(
 				// Mark the current cursor coordinates.
 				this.cursorLeft = event.clientX;
 				this.cursorTop = event.clientY;
+
 				// Update cursor to 'grabbing', document wide.
 				document.body.classList.add( 'is-dragging-components-draggable' );
+
+				setTimeout( onDragStart );
 			}
 
 			/**
@@ -109,8 +112,11 @@ const withDraggable = createHigherOrderComponent(
 			 * @param { Object } event The DragEvent.
 			 */
 			onDragEnd( event ) {
+				const { onDragEnd, setTimeout } = this.props;
 				event.preventDefault();
 				this.resetDragState();
+
+				setTimeout( onDragEnd );
 			}
 
 			/**
@@ -143,4 +149,7 @@ const withDraggable = createHigherOrderComponent(
 	'withDraggable'
 );
 
-export default withDraggable;
+export default compose(
+	withDraggable,
+	withSafeTimeout,
+);
