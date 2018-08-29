@@ -137,10 +137,10 @@ const withDraggable = createHigherOrderComponent(
 			render() {
 				return (
 					<OriginalComponent
+						{ ...this.props }
 						onDragStart={ this.onDragStart }
 						onDragOver={ this.onDragOver }
 						onDragEnd={ this.onDragEnd }
-						{ ...this.props }
 					/>
 				);
 			}
