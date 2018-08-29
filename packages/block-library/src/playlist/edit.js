@@ -59,7 +59,7 @@ class PlaylistEdit extends Component {
 	getMimeBaseType( type ) {
 		const { noticeOperations } = this.props;
 		if ( ! type ) {
-			noticeOperations.createErrorNotice( 'MIME Type could not be determined' );
+			noticeOperations.createErrorNotice( 'MIME type could not be determined' );
 			return;
 		}
 		return type.split( '/' )[ 0 ];
