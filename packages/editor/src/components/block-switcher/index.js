@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, get, some } from 'lodash';
+import { castArray, filter, first, get, mapKeys, orderBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -36,19 +36,28 @@ export class BlockSwitcher extends Component {
 	}
 
 	render() {
-		const { blocks, onTransform, isLocked } = this.props;
+		const { blocks, onTransform, inserterItems } = this.props;
 		const { hoveredClassName } = this.state;
 
 		if ( ! blocks || ! blocks.length ) {
 			return null;
 		}
 
-		const allowedBlocks = getPossibleBlockTransformations( blocks );
+		const itemsByName = mapKeys( inserterItems, ( { name } ) => name );
+		const possibleBlockTransformations = orderBy(
+			filter(
+				getPossibleBlockTransformations( blocks ),
+				( block ) => !! itemsByName[ block.name ]
+			),
+			( block ) => itemsByName[ block.name ].frecency,
+			'desc'
+		);
+
 		const sourceBlockName = blocks[ 0 ].name;
 		const blockType = getBlockType( sourceBlockName );
 		const hasStyles = blocks.length === 1 && get( blockType, [ 'styles' ], [] ).length !== 0;
 
-		if ( ! hasStyles && ( ! allowedBlocks.length || isLocked ) ) {
+		if ( ! hasStyles && ! possibleBlockTransformations.length ) {
 			return null;
 		}
 
@@ -97,13 +106,13 @@ export class BlockSwitcher extends Component {
 								/>
 							</PanelBody>
 						}
-						{ allowedBlocks.length !== 0 && ! isLocked &&
+						{ possibleBlockTransformations.length !== 0 &&
 							<PanelBody
 								title={ __( 'Transform To:' ) }
 								initialOpen
 							>
 								<BlockTypesList
-									items={ allowedBlocks.map( ( destinationBlockType ) => ( {
+									items={ possibleBlockTransformations.map( ( destinationBlockType ) => ( {
 										id: destinationBlockType.name,
 										icon: destinationBlockType.icon,
 										title: destinationBlockType.title,
@@ -131,14 +140,12 @@ export class BlockSwitcher extends Component {
 }
 
 export default compose(
-	withSelect( ( select, ownProps ) => {
-		const { getBlock, getBlockRootClientId, getTemplateLock } = select( 'core/editor' );
+	withSelect( ( select, { clientIds } ) => {
+		const { getBlocksByClientId, getBlockRootClientId, getInserterItems } = select( 'core/editor' );
+		const rootClientId = getBlockRootClientId( first( castArray( clientIds ) ) );
 		return {
-			blocks: ownProps.clientIds.map( getBlock ),
-			isLocked: some(
-				castArray( ownProps.clientIds ),
-				( clientId ) => !! getTemplateLock( getBlockRootClientId( clientId ) )
-			),
+			blocks: getBlocksByClientId( clientIds ),
+			inserterItems: getInserterItems( rootClientId ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {
