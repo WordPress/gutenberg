@@ -5,15 +5,17 @@
         "isValid": true,
         "attributes": {
             "url": "https://cldup.com/YLYhpou2oq.jpg",
+            "width": 1322,
             "alt": "",
             "caption": [
                 "Give it a try. Press the \"really wide\" button on the image toolbar."
             ],
+            "height": 511,
             "align": "center",
             "linkDestination": "none",
             "className": "aligncenter"
         },
         "innerBlocks": [],
-        "originalContent": "<div class=\"wp-block-image aligncenter\"><figure class=\"aligncenter\"><img src=\"https://cldup.com/YLYhpou2oq.jpg\" alt=\"\" /><figcaption>Give it a try. Press the &quot;really wide&quot; button on the image toolbar.</figcaption></figure></div>"
+        "originalContent": "<div class=\"wp-block-image aligncenter\"><figure class=\"aligncenter\"><img src=\"https://cldup.com/YLYhpou2oq.jpg\" alt=\"\" width=\"1322\" height=\"511\" /><figcaption>Give it a try. Press the &quot;really wide&quot; button on the image toolbar.</figcaption></figure></div>"
     }
 ]

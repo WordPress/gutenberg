@@ -4,6 +4,7 @@
 import classnames from 'classnames';
 import ResizableBox from 're-resizable';
 import {
+	find,
 	get,
 	isEmpty,
 	map,
@@ -63,7 +64,7 @@ class ImageEdit extends Component {
 		this.onFocusCaption = this.onFocusCaption.bind( this );
 		this.onImageClick = this.onImageClick.bind( this );
 		this.onSelectImage = this.onSelectImage.bind( this );
-		this.updateImageURL = this.updateImageURL.bind( this );
+		this.updateSizesAndURL = this.updateSizesAndURL.bind( this );
 		this.updateWidth = this.updateWidth.bind( this );
 		this.updateHeight = this.updateHeight.bind( this );
 		this.updateDimensions = this.updateDimensions.bind( this );
@@ -120,9 +121,7 @@ class ImageEdit extends Component {
 			return;
 		}
 		this.props.setAttributes( {
-			...pick( media, [ 'alt', 'id', 'caption', 'url' ] ),
-			width: undefined,
-			height: undefined,
+			...pick( media, [ 'alt', 'id', 'caption', 'url', 'width', 'height' ] ),
 		} );
 	}
 
@@ -176,21 +175,33 @@ class ImageEdit extends Component {
 		this.props.setAttributes( { ...extraUpdatedAttributes, align: nextAlign } );
 	}
 
-	updateImageURL( url ) {
-		this.props.setAttributes( { url, width: undefined, height: undefined } );
+	updateSizesAndURL( url ) {
+		const newAttributes = { url, isResized: false };
+		const availableSizes = this.getAvailableSizes();
+
+		const newSize = find( availableSizes, ( size ) => {
+			return url === size.source_url;
+		} );
+
+		if ( undefined !== newSize && undefined !== newSize.width && undefined !== newSize.height ) {
+			newAttributes.width = newSize.width;
+			newAttributes.height = newSize.height;
+		}
+
+		this.props.setAttributes( newAttributes );
 	}
 
 	updateWidth( width ) {
-		this.props.setAttributes( { width: parseInt( width, 10 ) } );
+		this.props.setAttributes( { width: parseInt( width, 10 ), isResized: true } );
 	}
 
 	updateHeight( height ) {
-		this.props.setAttributes( { height: parseInt( height, 10 ) } );
+		this.props.setAttributes( { height: parseInt( height, 10 ), isResized: true } );
 	}
 
 	updateDimensions( width = undefined, height = undefined ) {
 		return () => {
-			this.props.setAttributes( { width, height } );
+			this.props.setAttributes( { width, height, isResized: !! ( width && height ) } );
 		};
 	}
 
@@ -209,7 +220,7 @@ class ImageEdit extends Component {
 
 	render() {
 		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, noticeOperations, noticeUI, toggleSelection, isRTL } = this.props;
-		const { url, alt, caption, align, id, href, linkDestination, width, height } = attributes;
+		const { url, alt, caption, align, id, href, linkDestination, width, height, isResized } = attributes;
 
 		const controls = (
 			<BlockControls>
@@ -259,7 +270,7 @@ class ImageEdit extends Component {
 
 		const classes = classnames( className, {
 			'is-transient': 0 === url.indexOf( 'blob:' ),
-			'is-resized': !! width || !! height,
+			'is-resized': isResized,
 			'is-focused': isSelected,
 		} );
 
@@ -284,7 +295,7 @@ class ImageEdit extends Component {
 								value: size.source_url,
 								label: startCase( name ),
 							} ) ) }
-							onChange={ this.updateImageURL }
+							onChange={ this.updateSizesAndURL }
 						/>
 					) }
 					{ isResizable && (
@@ -298,7 +309,6 @@ class ImageEdit extends Component {
 									className="block-library-image__dimensions__width"
 									label={ __( 'Width' ) }
 									value={ width !== undefined ? width : '' }
-									placeholder={ imageWidth }
 									min={ 1 }
 									onChange={ this.updateWidth }
 								/>
@@ -307,7 +317,6 @@ class ImageEdit extends Component {
 									className="block-library-image__dimensions__height"
 									label={ __( 'Height' ) }
 									value={ height !== undefined ? height : '' }
-									placeholder={ imageHeight }
 									min={ 1 }
 									onChange={ this.updateHeight }
 								/>

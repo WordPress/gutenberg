@@ -57,9 +57,20 @@ const blockAttributes = {
 	},
 	width: {
 		type: 'number',
+		source: 'attribute',
+		selector: 'img',
+		attribute: 'width',
+		default: '',
 	},
 	height: {
 		type: 'number',
+		source: 'attribute',
+		selector: 'img',
+		attribute: 'height',
+		default: '',
+	},
+	isResized: {
+		type: 'boolean',
 	},
 	linkDestination: {
 		type: 'string',
@@ -69,7 +80,7 @@ const blockAttributes = {
 
 const imageSchema = {
 	img: {
-		attributes: [ 'src', 'alt' ],
+		attributes: [ 'src', 'alt', 'width', 'height' ],
 		classes: [ 'alignleft', 'aligncenter', 'alignright', 'alignnone', /^wp-image-\d+$/ ],
 	},
 };
@@ -200,11 +211,11 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { url, alt, caption, align, href, width, height, id } = attributes;
+		const { url, alt, caption, align, href, width, height, id, isResized } = attributes;
 
 		const classes = classnames( {
 			[ `align${ align }` ]: align,
-			'is-resized': width || height,
+			'is-resized': isResized,
 		} );
 
 		const image = (
