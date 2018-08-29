@@ -187,7 +187,6 @@ class ImageEdit extends Component {
 			newAttributes.width = newSize.width;
 			newAttributes.height = newSize.height;
 		}
-
 		this.props.setAttributes( newAttributes );
 	}
 
