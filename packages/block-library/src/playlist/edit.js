@@ -97,10 +97,8 @@ class PlaylistEdit extends Component {
 	onSelectMedia( media ) {
 		const { setAttributes } = this.props;
 		//check if there are returned media items and set attributes when there are
-		if ( media && media[ 0 ].url ) {
-			const ids = media.map( ( item ) => item.id );
-			setAttributes( { ids, type: media[ 0 ].type } );
-		}
+		const ids = media.map( ( item ) => item.id );
+		setAttributes( { ids, type: media[ 0 ].type } );
 	}
 
 	render() {
