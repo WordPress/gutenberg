@@ -3,7 +3,7 @@ version: '3.1'
 services:
 
   wordpress:
-    image: wordpress
+    image: wordpress:4.9.2-php7.2
     ports:
       - 8888:80
     environment:
@@ -16,7 +16,7 @@ services:
       - ./test/e2e/test-mu-plugins:/var/www/html/wp-content/mu-plugins
 
   cli:
-    image: wordpress:cli
+    image: wordpress:cli-php7.2
     volumes:
       - wordpress:/var/www/html
       - .:/var/www/html/wp-content/plugins/gutenberg
@@ -41,7 +41,7 @@ services:
       - .:/app
 
   wordpress_e2e_tests:
-    image: wordpress
+    image: wordpress:4.9.2-php7.2
     ports:
       - 8889:80
     environment:
