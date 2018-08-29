@@ -102,8 +102,13 @@
 		z-index: z-index(".editor-block-list__block-edit .reusable-block-edit-panel *");
 	}
 
-	&.is-not-focused {
+	&.is-focus-mode {
 		opacity: 0.6;
+
+		&:not(.is-focused) .editor-block-list__block,
+		&.is-focused {
+			opacity: 1;
+		}
 	}
 }
 
@@ -856,7 +861,6 @@
 	.components-toolbar {
 		border-top: none;
 		border-bottom: none;
-
 	}
 
 	@include break-small() {
@@ -899,6 +903,10 @@
 	& > * {
 		pointer-events: auto;
 	}
+}
+
+.editor-block-list__block.is-focus-mode > .editor-block-contextual-toolbar {
+	margin-left: -$block-side-ui-width;
 }
 
 // Enable toolbar footprint collapsing
