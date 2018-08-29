@@ -24,7 +24,7 @@ describe( 'Warning', () => {
 	} );
 
 	it( 'should show child error message element', () => {
-		const wrapper = shallow( <Warning primaryActions={ <button /> }>Message</Warning> );
+		const wrapper = shallow( <Warning actions={ <button /> }>Message</Warning> );
 
 		const actions = wrapper.find( '.editor-warning__actions' );
 		const action = actions.childAt( 0 );
