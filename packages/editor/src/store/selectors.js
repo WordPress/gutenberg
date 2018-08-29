@@ -1901,18 +1901,18 @@ export function getTokenSettings( state, name ) {
  * @return {boolean} Is locked.
  */
 export function isPostLocked( state ) {
-	return !! state.locked.locked;
+	return state.postLock.isLocked;
 }
 
 /**
- * Returns details about the current post lock if available.
+ * Returns whether the post is locked.
  *
  * @param {Object} state Global application state.
  *
- * @return {Object} The lock details object.
+ * @return {boolean} Is locked.
  */
-export function getLockDetails( state ) {
-	return state.locked.lockDetails;
+export function isPostLockTakeover( state ) {
+	return state.postLock.isTakeover;
 }
 
 /**
@@ -1923,7 +1923,18 @@ export function getLockDetails( state ) {
  * @return {Object} A user object.
  */
 export function getPostLockUser( state ) {
-	return state.locked.locked;
+	return state.postLock.user;
+}
+
+/**
+ * Returns the active post lock.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} The lock object.
+ */
+export function getActivePostLock( state ) {
+	return state.postLock.activePostLock;
 }
 
 /**

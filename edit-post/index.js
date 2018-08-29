@@ -57,7 +57,7 @@ export function initializeEditor( id, postType, postId, settings, overridePost )
 	registerCoreBlocks();
 
 	// Set up heartbeat post locking.
-	hearthbeatPostLocking( postId, settings );
+	hearthbeatPostLocking( settings );
 
 	dispatch( 'core/nux' ).triggerGuide( [
 		'core/editor.inserter',
