@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
 import { MenuItem } from '@wordpress/components';
 
-function FixedToolbarToggle( { onToggle, isActive } ) {
+function FeatureToggle( { onToggle, isActive, label } ) {
 	return (
 		<MenuItem
 			icon={ isActive && 'yes' }
@@ -18,19 +18,19 @@ function FixedToolbarToggle( { onToggle, isActive } ) {
 			onClick={ onToggle }
 			role="menuitemcheckbox"
 		>
-			{ __( 'Focus Mode' ) }
+			{ __( label ) }
 		</MenuItem>
 	);
 }
 
 export default compose( [
-	withSelect( ( select ) => ( {
-		isActive: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
+	withSelect( ( select, { feature } ) => ( {
+		isActive: select( 'core/edit-post' ).isFeatureActive( feature ),
 	} ) ),
 	withDispatch( ( dispatch, ownProps ) => ( {
 		onToggle() {
-			dispatch( 'core/edit-post' ).toggleFeature( 'fixedToolbar' );
+			dispatch( 'core/edit-post' ).toggleFeature( ownProps.feature );
 			ownProps.onToggle();
 		},
 	} ) ),
-] )( FixedToolbarToggle );
+] )( FeatureToggle );

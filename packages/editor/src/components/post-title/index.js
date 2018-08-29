@@ -88,11 +88,11 @@ class PostTitle extends Component {
 	}
 
 	render() {
-		const { title, placeholder, instanceId, isPostTypeViewable, hasFixedToolbar } = this.props;
+		const { title, placeholder, instanceId, isPostTypeViewable, isFocusMode } = this.props;
 		const { isSelected } = this.state;
 		const className = classnames( 'editor-post-title__block', {
 			'is-selected': isSelected,
-			'is-focus-mode': hasFixedToolbar,
+			'is-focus-mode': isFocusMode,
 		} );
 		const decodedPlaceholder = decodeEntities( placeholder );
 
@@ -132,13 +132,13 @@ const applyWithSelect = withSelect( ( select ) => {
 	const { getEditedPostAttribute, getEditorSettings } = select( 'core/editor' );
 	const { getPostType } = select( 'core' );
 	const postType = getPostType( getEditedPostAttribute( 'type' ) );
-	const { titlePlaceholder, hasFixedToolbar } = getEditorSettings();
+	const { titlePlaceholder, focusMode } = getEditorSettings();
 
 	return {
 		title: getEditedPostAttribute( 'title' ),
 		isPostTypeViewable: get( postType, [ 'viewable' ], false ),
 		placeholder: titlePlaceholder,
-		hasFixedToolbar,
+		isFocusMode: focusMode,
 	};
 } );
 

@@ -8,7 +8,7 @@ import { ifViewportMatches } from '@wordpress/viewport';
 /**
  * Internal dependencies
  */
-import FixedToolbarToggle from '../fixed-toolbar-toggle';
+import FeatureToggle from '../feature-toggle';
 
 function WritingMenu( { onClose } ) {
 	return (
@@ -16,7 +16,8 @@ function WritingMenu( { onClose } ) {
 			label={ __( 'Writing' ) }
 			filterName="editPost.MoreMenu.writing"
 		>
-			<FixedToolbarToggle onToggle={ onClose } />
+			<FeatureToggle feature="fixedToolbar" label={ __( 'Fix Toolbar To Top' ) } onToggle={ onClose } />
+			<FeatureToggle feature="focusMode" label={ __( 'Focus Mode' ) } onToggle={ onClose } />
 		</MenuGroup>
 	);
 }
