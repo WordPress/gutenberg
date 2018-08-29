@@ -4,7 +4,6 @@
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import { dispatch } from '@wordpress/data';
-import { hearthbeatPostLocking } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -55,9 +54,6 @@ export function initializeEditor( id, postType, postId, settings, overridePost )
 	const reboot = reinitializeEditor.bind( null, postType, postId, target, settings, overridePost );
 
 	registerCoreBlocks();
-
-	// Set up heartbeat post locking.
-	hearthbeatPostLocking( settings );
 
 	dispatch( 'core/nux' ).triggerGuide( [
 		'core/editor.inserter',
