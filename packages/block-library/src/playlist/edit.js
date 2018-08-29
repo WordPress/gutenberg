@@ -50,7 +50,7 @@ class PlaylistEdit extends Component {
 	uploadFromFiles( event ) {
 		const { noticeOperations } = this.props;
 		if ( ! event.target.files ) {
-			noticeOperations.createErrorNotice( 'Files list provided is empty' );
+			noticeOperations.createErrorNotice( __( 'Files list provided is empty' ) );
 			return;
 		}
 		this.onUploadFiles( event.target.files );
@@ -59,7 +59,7 @@ class PlaylistEdit extends Component {
 	getMimeBaseType( type ) {
 		const { noticeOperations } = this.props;
 		if ( ! type ) {
-			noticeOperations.createErrorNotice( 'MIME type could not be determined' );
+			noticeOperations.createErrorNotice( __( 'MIME type could not be determined' ) );
 			return;
 		}
 		return type.split( '/' )[ 0 ];
@@ -69,7 +69,7 @@ class PlaylistEdit extends Component {
 		const { setAttributes, noticeOperations } = this.props;
 		const isConsistentType = uniqBy( files, ( file ) => this.getMimeBaseType( file.type ) ).length === 1;
 		if ( ! isConsistentType ) {
-			noticeOperations.createErrorNotice( 'Cannot have mixed types in a Playlist Block' );
+			noticeOperations.createErrorNotice( __( 'Cannot have mixed types in a Playlist Block' ) );
 			setAttributes( { ids: undefined, type: undefined } );
 			return;
 		}

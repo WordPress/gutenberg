@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { castArray, pick } from 'lodash';
+import { castArray, defaults, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -37,7 +37,7 @@ const getGalleryDetailsMediaFrame = () => {
 					multiple: 'add',
 					editable: false,
 
-					library: wp.media.query( _.defaults( {
+					library: wp.media.query( defaults( {
 						type: 'image',
 					}, this.options.library ) ),
 				} ),
@@ -82,7 +82,7 @@ const getPlaylistDetailsMediaFrame = () => {
 					multiple: 'add',
 					editable: false,
 
-					library: wp.media.query( _.defaults( {
+					library: wp.media.query( defaults( {
 						type: 'audio',
 					}, this.options.library ) ),
 				} ),
@@ -114,7 +114,7 @@ const getPlaylistDetailsMediaFrame = () => {
 					multiple: 'add',
 					editable: false,
 
-					library: wp.media.query( _.defaults( {
+					library: wp.media.query( defaults( {
 						type: 'video',
 					}, this.options.library ) ),
 				} ),

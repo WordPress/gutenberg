@@ -68,7 +68,7 @@ export function mediaUpload( {
 
 	// Allowed type specified by consumer
 	const isAllowedType = ( fileType ) => {
-		return castArray( allowedType ).some( ( type ) => startsWith( fileType, `${ type }/` ) );
+		return ( allowedType === '*' ) || castArray( allowedType ).some( ( type ) => startsWith( fileType, `${ type }/` ) );
 	};
 
 	// Allowed types for the current WP_User
