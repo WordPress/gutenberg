@@ -11,7 +11,7 @@ import { FocusableIframe } from '@wordpress/components';
 
 const MyFocusableIframe = () => (
 	<FocusableIframe
-		src="/"
+		src="/my-iframe-url"
 		onFocus={ () => console.log( 'iframe is focused' ) }
 	/>
 );

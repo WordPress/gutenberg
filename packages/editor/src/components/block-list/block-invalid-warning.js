@@ -15,12 +15,12 @@ import { withDispatch } from '@wordpress/data';
  */
 import Warning from '../warning';
 
-function BlockInvalidWarning( { convertToHTML, convertToBlocks } ) {
+function BlockInvalidWarning( { convertToHTML, convertToBlocks, convertToClassic } ) {
 	const hasHTMLBlock = !! getBlockType( 'core/html' );
 
 	return (
 		<Warning
-			actions={ [
+			primaryActions={ [
 				<Button key="convert" onClick={ convertToBlocks } isLarge isPrimary={ ! hasHTMLBlock }>
 					{ __( 'Convert to Blocks' ) }
 				</Button>,
@@ -29,6 +29,10 @@ function BlockInvalidWarning( { convertToHTML, convertToBlocks } ) {
 						{ __( 'Keep as HTML' ) }
 					</Button>
 				),
+			] }
+			secondaryActions={ [
+				{ title: __( 'Convert to Blocks' ), onClick: convertToBlocks },
+				{ title: __( 'Convert to Classic Block' ), onClick: convertToClassic },
 			] }
 		>
 			{ __( 'This block has been modified externally.' ) }
@@ -39,6 +43,11 @@ function BlockInvalidWarning( { convertToHTML, convertToBlocks } ) {
 export default withDispatch( ( dispatch, { block } ) => {
 	const { replaceBlock } = dispatch( 'core/editor' );
 	return {
+		convertToClassic() {
+			replaceBlock( block.uid, createBlock( 'core/freeform', {
+				content: block.originalContent,
+			} ) );
+		},
 		convertToHTML() {
 			replaceBlock( block.clientId, createBlock( 'core/html', {
 				content: block.originalContent,

@@ -1,6 +1,13 @@
 ## 2.1.0 (Unreleased)
 
+### Bug Fix
+
+- Resolves an issue where npm package lint script did not work in Windows environments ([#9321](https://github.com/WordPress/gutenberg/pull/9321)
+
+### Updated Dependencies
+
 - Updated dependencies: `jest`, `npm-package-json-lint` and `read-pkg-up`
+
 
 ## 2.0.0 (2018-07-12)
 
