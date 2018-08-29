@@ -13,6 +13,8 @@ import { SlotFillProvider } from '@wordpress/components';
  */
 import PluginPrePublishPanel from '../';
 
+jest.mock( '../../../../../packages/components/src/button' );
+
 describe( 'PluginPrePublishPanel', () => {
 	test( 'renders fill properly', () => {
 		const wrapper = mount(

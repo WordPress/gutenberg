@@ -15,6 +15,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require dirname( __FILE__ ) . '/class-wp-rest-blocks-controller.php';
 	require dirname( __FILE__ ) . '/class-wp-rest-autosaves-controller.php';
 	require dirname( __FILE__ ) . '/class-wp-rest-block-renderer-controller.php';
+	require dirname( __FILE__ ) . '/class-wp-rest-search-controller.php';
+	require dirname( __FILE__ ) . '/class-wp-rest-search-handler.php';
+	require dirname( __FILE__ ) . '/class-wp-rest-post-search-handler.php';
 	require dirname( __FILE__ ) . '/rest-api.php';
 }
 
@@ -31,6 +34,9 @@ require dirname( __FILE__ ) . '/register.php';
 
 
 // Register server-side code for individual blocks.
-foreach ( glob( dirname( __FILE__ ) . '/../core-blocks/*/index.php' ) as $block_logic ) {
+foreach ( glob( dirname( __FILE__ ) . '/../block-library/*/index.php' ) as $block_logic ) {
+	require $block_logic;
+}
+foreach ( glob( dirname( __FILE__ ) . '/../packages/block-library/src/*/index.php' ) as $block_logic ) {
 	require $block_logic;
 }

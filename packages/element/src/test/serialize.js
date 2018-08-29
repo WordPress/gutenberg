@@ -8,10 +8,12 @@ import { noop } from 'lodash';
  */
 import {
 	Component,
+	createContext,
 	createElement,
 	Fragment,
-	RawHTML,
-} from '../';
+	StrictMode,
+} from '../react';
+import RawHTML from '../raw-html';
 import serialize, {
 	escapeAmpersand,
 	escapeQuotationMark,
@@ -19,6 +21,7 @@ import serialize, {
 	escapeAttribute,
 	escapeHTML,
 	hasPrefix,
+	isValidAttributeName,
 	renderElement,
 	renderNativeComponent,
 	renderComponent,
@@ -72,8 +75,50 @@ describe( 'escapeHTML', () => {
 	testEscapeLessThan( escapeHTML );
 } );
 
+describe( 'isValidAttributeName', () => {
+	it( 'should return false for attribute with controls', () => {
+		const result = isValidAttributeName( 'bad\u007F' );
+
+		expect( result ).toBe( false );
+	} );
+
+	it( 'should return false for attribute with non-permitted characters', () => {
+		const result = isValidAttributeName( 'bad"' );
+
+		expect( result ).toBe( false );
+	} );
+
+	it( 'should return false for attribute with noncharacters', () => {
+		const result = isValidAttributeName( 'bad\uFDD0' );
+
+		expect( result ).toBe( false );
+	} );
+
+	it( 'should return true for valid attribute name', () => {
+		const result = isValidAttributeName( 'good' );
+
+		expect( result ).toBe( true );
+	} );
+} );
+
 describe( 'serialize()', () => {
-	it( 'should render with context', () => {
+	it( 'should allow only valid attribute names', () => {
+		const element = createElement(
+			'div',
+			{
+				'notok\u007F': 'bad',
+				'notok"': 'bad',
+				ok: 'good',
+				'notok\uFDD0': 'bad',
+			},
+		);
+
+		const result = serialize( element );
+
+		expect( result ).toBe( '<div ok="good"></div>' );
+	} );
+
+	it( 'should render with context (legacy)', () => {
 		class Provider extends Component {
 			getChildContext() {
 				return {
@@ -255,10 +300,102 @@ describe( 'renderElement()', () => {
 		expect( result ).toBe( 'Hello' );
 	} );
 
+	it( 'renders StrictMode with undefined children', () => {
+		const result = renderElement( <StrictMode /> );
+
+		expect( result ).toBe( '' );
+	} );
+
+	it( 'renders StrictMode as its inner children', () => {
+		const result = renderElement( <StrictMode>Hello</StrictMode> );
+
+		expect( result ).toBe( 'Hello' );
+	} );
+
 	it( 'renders Fragment with undefined children', () => {
 		const result = renderElement( <Fragment /> );
 
 		expect( result ).toBe( '' );
+	} );
+
+	it( 'renders default value from Context API', () => {
+		const { Consumer } = createContext( {
+			value: 'default',
+		} );
+
+		const result = renderElement(
+			<Consumer>
+				{ ( context ) => context.value }
+			</Consumer>
+		);
+
+		expect( result ).toBe( 'default' );
+	} );
+
+	it( 'renders provided value through Context API', () => {
+		const { Consumer, Provider } = createContext( {
+			value: 'default',
+		} );
+
+		const result = renderElement(
+			<Provider value={ { value: 'provided' } }>
+				<Consumer>
+					{ ( context ) => context.value }
+				</Consumer>
+			</Provider>
+		);
+
+		expect( result ).toBe( 'provided' );
+	} );
+
+	it( 'renders proper value through Context API when multiple providers present', () => {
+		const { Consumer, Provider } = createContext( {
+			value: 'default',
+		} );
+
+		const result = renderElement(
+			<Fragment>
+				<Provider value={ { value: '1st provided' } }>
+					<Consumer>
+						{ ( context ) => context.value }
+					</Consumer>
+				</Provider>
+				{ '|' }
+				<Provider value={ { value: '2nd provided' } }>
+					<Consumer>
+						{ ( context ) => context.value }
+					</Consumer>
+				</Provider>
+				{ '|' }
+				<Consumer>
+					{ ( context ) => context.value }
+				</Consumer>
+			</Fragment>
+		);
+
+		expect( result ).toBe( '1st provided|2nd provided|default' );
+	} );
+
+	it( 'renders proper value through Context API when nested providers present', () => {
+		const { Consumer, Provider } = createContext( {
+			value: 'default',
+		} );
+
+		const result = renderElement(
+			<Provider value={ { value: 'outer provided' } }>
+				<Provider value={ { value: 'inner provided' } }>
+					<Consumer>
+						{ ( context ) => context.value }
+					</Consumer>
+				</Provider>
+				{ '|' }
+				<Consumer>
+					{ ( context ) => context.value }
+				</Consumer>
+			</Provider>
+		);
+
+		expect( result ).toBe( 'inner provided|outer provided' );
 	} );
 
 	it( 'renders RawHTML as its unescaped children', () => {
@@ -354,7 +491,7 @@ describe( 'renderNativeComponent()', () => {
 } );
 
 describe( 'renderComponent()', () => {
-	it( 'calls constructor and componentWillMount', () => {
+	it( 'calls constructor', () => {
 		class Example extends Component {
 			constructor() {
 				super( ...arguments );
@@ -362,19 +499,14 @@ describe( 'renderComponent()', () => {
 				this.constructed = 'constructed';
 			}
 
-			componentWillMount() {
-				this.willMounted = 'willMounted';
-			}
-
 			render() {
-				return this.constructed + this.willMounted;
+				return this.constructed;
 			}
 		}
 
 		const result = renderComponent( Example, {} );
 
-		expect( console ).toHaveWarned();
-		expect( result ).toBe( 'constructedwillMounted' );
+		expect( result ).toBe( 'constructed' );
 	} );
 
 	it( 'does not call componentDidMount', () => {
@@ -517,6 +649,12 @@ describe( 'renderAttributes()', () => {
 } );
 
 describe( 'renderStyle()', () => {
+	it( 'should return string verbatim', () => {
+		const result = renderStyle( 'color:red' );
+
+		expect( result ).toBe( 'color:red' );
+	} );
+
 	it( 'should return undefined if empty', () => {
 		const result = renderStyle( {} );
 
@@ -557,6 +695,25 @@ describe( 'renderStyle()', () => {
 		} );
 
 		expect( result ).toBe( 'color:red;background-color:green' );
+	} );
+
+	it( 'should not kebab-case custom properties', () => {
+		const result = renderStyle( {
+			'--myBackgroundColor': 'palegoldenrod',
+		} );
+
+		expect( result ).toBe( '--myBackgroundColor:palegoldenrod' );
+	} );
+
+	it( 'should -kebab-case style properties with a vendor prefix', () => {
+		const result = renderStyle( {
+			msTransform: 'none',
+			OTransform: 'none',
+			MozTransform: 'none',
+			WebkitTransform: 'none',
+		} );
+
+		expect( result ).toBe( '-ms-transform:none;-o-transform:none;-moz-transform:none;-webkit-transform:none' );
 	} );
 
 	describe( 'value unit', () => {

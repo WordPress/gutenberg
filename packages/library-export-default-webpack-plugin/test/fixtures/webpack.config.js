@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-const LibraryExportDefaultPlugin = require( '../../' );
+const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-webpack-plugin' );
 
 module.exports = {
 	mode: 'development',

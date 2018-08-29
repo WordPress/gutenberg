@@ -1,28 +1,56 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
-import { clickOnMoreMenuItem, newPost, newDesktopBrowserPage } from '../support/utils';
+import {
+	META_KEY,
+	newPost,
+	getEditedPostContent,
+	saveDraft,
+	pressWithModifier,
+} from '../support/utils';
 import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
-describe( 'Using a CPT with a predefined template', () => {
-	beforeAll( async () => {
-		await newDesktopBrowserPage();
-		await activatePlugin( 'gutenberg-test-plugin-templates' );
-		await newPost( 'book' );
-	} );
+describe( 'templates', () => {
+	describe( 'Using a CPT with a predefined template', () => {
+		beforeAll( async () => {
+			await activatePlugin( 'gutenberg-test-plugin-templates' );
+		} );
 
-	afterAll( async () => {
-		await newDesktopBrowserPage();
-		await deactivatePlugin( 'gutenberg-test-plugin-templates' );
-	} );
+		beforeEach( async () => {
+			await newPost( { postType: 'book' } );
+		} );
 
-	it( 'Should add a custom post types with a predefined template', async () => {
-		//Switch to Code Editor to check HTML output
-		await clickOnMoreMenuItem( 'Code Editor' );
+		afterAll( async () => {
+			await deactivatePlugin( 'gutenberg-test-plugin-templates' );
+		} );
 
-		// Assert that the post already contains the template defined blocks
-		const textEditorContent = await page.$eval( '.editor-post-text-editor', ( element ) => element.value );
-		expect( textEditorContent ).toMatchSnapshot();
+		it( 'Should add a custom post types with a predefined template', async () => {
+			expect( await getEditedPostContent() ).toMatchSnapshot();
+		} );
+
+		it( 'Should respect user edits to not re-apply template after save (single block removal)', async () => {
+			// Remove a block from the template to verify that it's not
+			// re-added after saving and reloading the editor.
+			await page.click( '.editor-post-title__input' );
+			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'Backspace' );
+			await saveDraft();
+			await page.reload();
+
+			expect( await getEditedPostContent() ).toMatchSnapshot();
+		} );
+
+		it( 'Should respect user edits to not re-apply template after save (full delete)', async () => {
+			// Remove all blocks from the template to verify that they're not
+			// re-added after saving and reloading the editor.
+			await page.type( '.editor-post-title__input', 'My Empty Book' );
+			await page.keyboard.press( 'ArrowDown' );
+			await pressWithModifier( META_KEY, 'A' );
+			await page.keyboard.press( 'Backspace' );
+			await saveDraft();
+			await page.reload();
+
+			expect( await getEditedPostContent() ).toMatchSnapshot();
+		} );
 	} );
 } );

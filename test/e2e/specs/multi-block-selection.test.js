@@ -1,12 +1,16 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage, pressWithModifier, insertBlock } from '../support/utils';
+import {
+	clickBlockAppender,
+	insertBlock,
+	newPost,
+	pressWithModifier,
+	META_KEY,
+} from '../support/utils';
 
 describe( 'Multi-block selection', () => {
 	beforeAll( async () => {
-		await newDesktopBrowserPage();
 		await newPost();
 	} );
 
@@ -17,7 +21,7 @@ describe( 'Multi-block selection', () => {
 		const multiSelectedCssClass = 'is-multi-selected';
 
 		// Creating test blocks
-		await page.click( '.editor-default-block-appender' );
+		await clickBlockAppender();
 		await page.keyboard.type( 'First Paragraph' );
 		await insertBlock( 'Image' );
 		await insertBlock( 'Quote' );
@@ -56,7 +60,7 @@ describe( 'Multi-block selection', () => {
 
 		// Multiselect via keyboard
 		await page.click( 'body' );
-		await pressWithModifier( 'Mod', 'a' );
+		await pressWithModifier( META_KEY, 'a' );
 
 		// Verify selection
 		await expectMultiSelected( blocks, true );
@@ -66,5 +70,11 @@ describe( 'Multi-block selection', () => {
 
 		// No selection
 		await expectMultiSelected( blocks, false );
+
+		// Select all via double shortcut.
+		await page.click( firstBlockSelector );
+		await pressWithModifier( META_KEY, 'a' );
+		await pressWithModifier( META_KEY, 'a' );
+		await expectMultiSelected( blocks, true );
 	} );
 } );

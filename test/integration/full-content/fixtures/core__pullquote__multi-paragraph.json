@@ -1,0 +1,44 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/pullquote",
+        "isValid": true,
+        "attributes": {
+            "value": [
+                {
+                    "children": {
+                        "type": "p",
+                        "props": {
+                            "children": [
+                                "Paragraph ",
+                                {
+                                    "type": "strong",
+                                    "props": {
+                                        "children": [
+                                            "one"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "children": {
+                        "type": "p",
+                        "props": {
+                            "children": [
+                                "Paragraph two"
+                            ]
+                        }
+                    }
+                }
+            ],
+            "citation": [
+                "by whomever"
+            ]
+        },
+        "innerBlocks": [],
+        "originalContent": "<blockquote class=\"wp-block-pullquote\">\n    <p>Paragraph <strong>one</strong></p>\n    <p>Paragraph two</p>\n    <cite>by whomever</cite>\n</blockquote>"
+    }
+]

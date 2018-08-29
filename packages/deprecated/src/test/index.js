@@ -1,9 +1,15 @@
 /**
  * Internal dependencies
  */
-import deprecated from '../';
+import deprecated, { logged } from '../';
 
 describe( 'deprecated', () => {
+	afterEach( () => {
+		for ( const key in logged ) {
+			delete logged[ key ];
+		}
+	} );
+
 	it( 'should show a deprecation warning', () => {
 		deprecated( 'Eating meat' );
 
@@ -64,5 +70,14 @@ describe( 'deprecated', () => {
 		expect( console ).toHaveWarnedWith(
 			'Eating meat is deprecated and will be removed from the earth in the future. Please use vegetables instead. Note: You may find it beneficial to transition gradually.'
 		);
+	} );
+
+	it( 'should show a message once', () => {
+		deprecated( 'Eating meat' );
+		deprecated( 'Eating meat' );
+
+		expect( console ).toHaveWarned();
+		// eslint-disable-next-line no-console
+		expect( console.warn ).toHaveBeenCalledTimes( 1 );
 	} );
 } );

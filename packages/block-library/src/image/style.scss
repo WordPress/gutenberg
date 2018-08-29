@@ -1,0 +1,47 @@
+.wp-block-image {
+	max-width: 100%;
+
+	img {
+		max-width: 100%;
+	}
+
+	&.aligncenter {
+		text-align: center;
+	}
+
+	&.alignfull img,
+	&.alignwide img {
+		width: 100%;
+	}
+
+	// Floats get an extra wrapping <aside> element, so the <figure> becomes a child.
+	.alignleft,
+	.alignright,
+	.aligncenter,
+	&.is-resized {
+		display: table;
+		margin: 0;
+
+		> figcaption {
+			display: table-caption;
+			caption-side: bottom;
+		}
+	}
+
+	.alignleft {
+		float: left;
+		margin-right: 1em;
+	}
+
+	.alignright {
+		float: right;
+		margin-left: 1em;
+	}
+
+	// Supply caption styles to images, even if the theme hasn't opted in.
+	// Reason being: the new markup, <figcaptions>, are not likely to be styled in the majority of existing themes,
+	// so we supply the styles so as to not appear broken or unstyled in those themes.
+	figcaption {
+		@include caption-style();
+	}
+}
