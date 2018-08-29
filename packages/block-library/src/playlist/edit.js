@@ -38,9 +38,9 @@ class PlaylistEdit extends Component {
 	}
 
 	/**
-	* The function is used after the editor has enqueued playlist dependencies.
-	*
-	* @param  {function} initializePlaylist Function that Initializes playlist
+	 * The function is used after the editor has enqueued playlist dependencies.
+	 *
+	 * @param  {function} initializePlaylist Function that Initializes playlist
 	*/
 
 	initializePlaylist() {
