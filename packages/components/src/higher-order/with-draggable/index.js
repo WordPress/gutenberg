@@ -37,6 +37,9 @@ const withDraggable = createHigherOrderComponent(
 					return;
 				}
 
+				// Connect event listeners
+				document.addEventListener( 'dragover', this.onDragOver );
+
 				event.dataTransfer.setData( 'text', JSON.stringify( transferData ) );
 
 				// Set a fake drag image to avoid browser defaults. Remove from DOM
@@ -124,6 +127,9 @@ const withDraggable = createHigherOrderComponent(
 			 * while dragging.
 			 */
 			resetDragState() {
+				// Remove event listeners
+				document.removeEventListener( 'dragover', this.onDragOver );
+
 				// Remove drag clone
 				if ( this.cloneWrapper && this.cloneWrapper.parentNode ) {
 					this.cloneWrapper.parentNode.removeChild( this.cloneWrapper );
@@ -139,7 +145,6 @@ const withDraggable = createHigherOrderComponent(
 					<OriginalComponent
 						{ ...this.props }
 						onDragStart={ this.onDragStart }
-						onDragOver={ this.onDragOver }
 						onDragEnd={ this.onDragEnd }
 					/>
 				);

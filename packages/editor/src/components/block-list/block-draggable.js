@@ -11,7 +11,7 @@ import { withDraggable } from '@wordpress/components';
 
 class BlockDraggable extends Component {
 	render() {
-		const { isDragging, onDragStart, onDragOver, onDragEnd } = this.props;
+		const { isDragging, onDragStart, onDragEnd } = this.props;
 		const className = classnames( 'editor-block-list__block-draggable', {
 			'is-visible': isDragging,
 		} );
@@ -20,7 +20,6 @@ class BlockDraggable extends Component {
 			<div
 				className={ className }
 				onDragStart={ onDragStart }
-				onDragOver={ onDragOver }
 				onDragEnd={ onDragEnd }
 				draggable
 			>
