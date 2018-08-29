@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, last } from 'lodash';
+import { last } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,8 +10,6 @@ import {
 	parse,
 	getBlockType,
 	switchToBlockType,
-	createBlock,
-	getDefaultBlockForPostFormat,
 	doBlocksMatchTemplate,
 	synchronizeBlocksWithTemplate,
 } from '@wordpress/blocks';
@@ -25,14 +23,12 @@ import {
 	setupEditorState,
 	replaceBlocks,
 	createWarningNotice,
-	insertBlock,
 	selectBlock,
 	resetBlocks,
 	setTemplateValidity,
 } from './actions';
 import {
 	getBlock,
-	getBlockCount,
 	getBlockRootClientId,
 	getBlocks,
 	getPreviousBlockClientId,
@@ -138,8 +134,6 @@ export default {
 			);
 		} else if ( template ) {
 			blocks = synchronizeBlocksWithTemplate( [], template );
-		} else if ( getDefaultBlockForPostFormat( post.format ) ) {
-			blocks = [ createBlock( getDefaultBlockForPostFormat( post.format ) ) ];
 		} else {
 			blocks = [];
 		}
@@ -213,18 +207,6 @@ export default {
 		const message = spokenMessage || content;
 		speak( message, 'assertive' );
 	},
-
-	EDIT_POST( action, { getState } ) {
-		const format = get( action, [ 'edits', 'format' ] );
-		if ( ! format ) {
-			return;
-		}
-		const blockName = getDefaultBlockForPostFormat( format );
-		if ( blockName && getBlockCount( getState() ) === 0 ) {
-			return insertBlock( createBlock( blockName ) );
-		}
-	},
-
 	REMOVE_BLOCKS( action, { getState, dispatch } ) {
 		// if the action says previous block should not be selected don't do anything.
 		if ( ! action.selectPrevious ) {

@@ -1066,6 +1066,46 @@ add_action( 'enqueue_block_assets', 'gutenberg_enqueue_registered_block_scripts_
 add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_registered_block_scripts_and_styles' );
 
 /**
+ * Assigns a default editor template with a default block by post format, if
+ * not otherwise assigned for a new post of type "post".
+ *
+ * @param array   $settings Default editor settings.
+ * @param WP_Post $post     Post being edited.
+ *
+ * @return array Filtered block editor settings.
+ */
+function gutenberg_default_post_format_template( $settings, $post ) {
+	// Only assign template for new posts without explicitly assigned template.
+	$is_new_post = 'auto-draft' === $post->post_status;
+	if ( $is_new_post && ! isset( $settings['template'] ) && 'post' === $post->post_type ) {
+		switch ( get_post_format() ) {
+			case 'audio':
+				$default_block_name = 'core/audio';
+				break;
+			case 'gallery':
+				$default_block_name = 'core/gallery';
+				break;
+			case 'image':
+				$default_block_name = 'core/image';
+				break;
+			case 'quote':
+				$default_block_name = 'core/quote';
+				break;
+			case 'video':
+				$default_block_name = 'core/video';
+				break;
+		}
+
+		if ( isset( $default_block_name ) ) {
+			$settings['template'] = array( array( $default_block_name ) );
+		}
+	}
+
+	return $settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_default_post_format_template', 10, 2 );
+
+/**
  * The code editor settings that were last captured by
  * gutenberg_capture_code_editor_settings().
  *
@@ -1404,6 +1444,16 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		} );
 } )();
 JS;
+
+	/**
+	 * Filters the settings to pass to the block editor.
+	 *
+	 * @since 3.7.0
+	 *
+	 * @param array   $editor_settings Default editor settings.
+	 * @param WP_Post $post            Post being edited.
+	 */
+	$editor_settings = apply_filters( 'block_editor_settings', $editor_settings, $post );
 
 	$script = sprintf( $init_script, wp_json_encode( $editor_settings ), $post->post_type, $post->ID );
 	wp_add_inline_script( 'wp-edit-post', $script );
