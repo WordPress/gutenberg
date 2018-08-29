@@ -237,7 +237,6 @@ function gutenberg_register_scripts_and_styles() {
 		'wp-data',
 		gutenberg_url( 'build/data/index.js' ),
 		array(
-			'wp-deprecated',
 			'wp-element',
 			'wp-compose',
 			'wp-is-shallow-equal',
@@ -252,15 +251,9 @@ function gutenberg_register_scripts_and_styles() {
 		implode(
 			"\n",
 			array(
-				// TODO: Transferring old storage should be removed at v3.7.
 				'( function() {',
 				'	var userId = window.userSettings.uid;',
-				'	var oldStorageKey = "WP_EDIT_POST_DATA_" + userId;',
 				'	var storageKey = "WP_DATA_USER_" + userId;',
-				'	if ( localStorage[ oldStorageKey ] ) {',
-				'		localStorage[ storageKey ] = localStorage[ oldStorageKey ];',
-				'		delete localStorage[ oldStorageKey ];',
-				'	}',
 				'	wp.data',
 				'		.use( wp.data.plugins.persistence, { storageKey: storageKey } )',
 				'		.use( wp.data.plugins.controls );',
@@ -368,7 +361,6 @@ function gutenberg_register_scripts_and_styles() {
 			'lodash',
 			'moment',
 			'wp-a11y',
-			'wp-api',
 			'wp-api-fetch',
 			'wp-compose',
 			'wp-deprecated',
@@ -383,6 +375,10 @@ function gutenberg_register_scripts_and_styles() {
 		),
 		filemtime( gutenberg_dir_path() . 'build/components/index.js' ),
 		true
+	);
+	wp_add_inline_script(
+		'wp-components',
+		sprintf( 'wp.components.unstable__setSiteURL(%s);', json_encode( site_url() ) )
 	);
 	wp_register_script(
 		'wp-blocks',
@@ -612,7 +608,6 @@ function gutenberg_register_scripts_and_styles() {
 			'media-models',
 			'media-views',
 			'wp-a11y',
-			'wp-api',
 			'wp-api-fetch',
 			'wp-components',
 			'wp-compose',
@@ -966,47 +961,6 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
 }
 
 /**
- * Provide the components script with the required config to make withAPIData work.
- */
-function gutenberg_prepare_wp_components_script() {
-	$schema_response = rest_do_request( new WP_REST_Request( 'GET', '/' ) );
-	if ( ! $schema_response->is_error() ) {
-		wp_add_inline_script(
-			'wp-components',
-			sprintf(
-				'wpApiSettings.cacheSchema = true; wpApiSettings.schema = %s;',
-				wp_json_encode( $schema_response->get_data() )
-			),
-			'before'
-		);
-	}
-
-	// Post Types Mapping.
-	$post_type_rest_base_mapping = array();
-	foreach ( get_post_types( array(), 'objects' ) as $post_type_object ) {
-		$rest_base = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name;
-		$post_type_rest_base_mapping[ $post_type_object->name ] = $rest_base;
-	}
-
-	// Taxonomies Mapping.
-	$taxonomy_rest_base_mapping = array();
-	foreach ( get_taxonomies( array(), 'objects' ) as $taxonomy_object ) {
-		$rest_base = ! empty( $taxonomy_object->rest_base ) ? $taxonomy_object->rest_base : $taxonomy_object->name;
-		$taxonomy_rest_base_mapping[ $taxonomy_object->name ] = $rest_base;
-	}
-
-	wp_add_inline_script(
-		'wp-components',
-		sprintf(
-			'wp.components.unstable__setApiSettings( wpApiSettings.schema, %s, %s )',
-			wp_json_encode( $post_type_rest_base_mapping ),
-			wp_json_encode( $taxonomy_rest_base_mapping )
-		),
-		'after'
-	);
-}
-
-/**
  * Prepares server-registered blocks for JavaScript, returning an associative
  * array of registered block data keyed by block name. Data includes properties
  * of a block relevant for client registration.
@@ -1217,8 +1171,6 @@ function get_block_categories( $post ) {
  */
 function gutenberg_editor_scripts_and_styles( $hook ) {
 	$is_demo = isset( $_GET['gutenberg-demo'] );
-
-	gutenberg_prepare_wp_components_script();
 
 	global $wp_scripts;
 
@@ -1446,10 +1398,8 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	( function() {
 		var editorSettings = %s;
 		window._wpLoadGutenbergEditor = new Promise( function( resolve ) {
-			wp.api.init().then( function() {
-				wp.domReady( function() {
-					resolve( wp.editPost.initializeEditor( 'editor', "%s", %d, editorSettings, window._wpGutenbergDefaultPost ) );
-				} );
+			wp.domReady( function() {
+				resolve( wp.editPost.initializeEditor( 'editor', "%s", %d, editorSettings, window._wpGutenbergDefaultPost ) );
 			} );
 		} );
 } )();

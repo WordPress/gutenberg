@@ -7,11 +7,7 @@ import { flow } from 'lodash';
  * WordPress Dependencies
  */
 import { createElement, Component } from '@wordpress/element';
-import {
-	APIProvider,
-	DropZoneProvider,
-	SlotFillProvider,
-} from '@wordpress/components';
+import { DropZoneProvider, SlotFillProvider } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
 
 /**
@@ -66,15 +62,6 @@ class EditorProvider extends Component {
 			//  - context.unregisterSlot
 			[
 				SlotFillProvider,
-			],
-
-			// APIProvider
-			//
-			//  - context.getAPISchema
-			//  - context.getAPIPostTypeRestBaseMapping
-			//  - context.getAPITaxonomyRestBaseMapping
-			[
-				APIProvider,
 			],
 
 			// DropZone provider:
