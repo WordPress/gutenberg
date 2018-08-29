@@ -35,35 +35,33 @@ The spec parser is defined via a _Parsing Expression Grammar_ (PEG) which answer
 
 ### How does it work?
 
-It's pretty self-explanatory...haha just kidding.
+Every serialized Gutenberg document is nominally an HTML document which, in addition to normal HTML, may also contain specially designed HTML comments -- the block comment delimiters -- which separate and isolate the blocks serialized in the document.
 
-Every Gutenberg document is nominally an HTML document which in addition to normal HTML may also contain specially designed HTML comments - the block comment delimiters - which separate and isolate the blocks which are serialized in the document.
+This parser attempts to create a state-machine around the transitions triggered from those delimiters -- the "tokens" of the grammar. Every time we find one we should only be doing either of:
 
-This parser attempts to create a state-machine around the transitions triggered from those delimiters - the "tokens" of the grammar. Every time we find one we should only be doing one of a small set of actions:
-
- - enter a new block
- - exit out of a block
+ - enter a new block;
+ - exit out of a block.
 
 Those actions have different effects depending on the context; for instance, when we exit a block we either need to add it to the output block list _or_ we need to append it as the next `innerBlock` on the parent block below it in the block stack (the place where we track open blocks). The details are documented below.
 
-The biggest challenge in this parser is making the right accounting of indices required to to construct the `innerHTML` values for each block at every level of nesting depth. We take a simple approach:
+The biggest challenge in this parser is making the right accounting of indices required to construct the `innerHTML` values for each block at every level of nesting depth. We take a simple approach:
 
- - start each newly-opened block with an empty `innerHTML`
- - whenever we push a first block into the `innerBlocks` list then add the content from where the content of the parent block started to where this inner block starts
- - whenever we push another block into the `innerBlocks` list then add the content from where the previous inner block ended to where this inner block starts
- - when we close out an open block we add the content from where the last inner block ended to where the closing block delimiter starts
- - if there are no inner blocks then we take the entire content between the opening and closing block comment delimiters as the `innerHTML`
+ - Start each newly opened block with an empty `innerHTML`.
+ - Whenever we push a first block into the `innerBlocks` list, add the content from where the content of the parent block started to where this inner block starts.
+ - Whenever we push another block into the `innerBlocks` list, add the content from where the previous inner block ended to where this inner block starts.
+ - When we close out an open block, add the content from where the last inner block ended to where the closing block delimiter starts.
+ - If there are no inner blocks then we take the entire content between the opening and closing block comment delimiters as the `innerHTML`.
 
 ### I meant, how does it perform?
 
 This parser operates much faster than the generated parser from the specification. Because we know more about the parsing than the PEG does we can take advantage of several tricks to improve our speed and memory usage:
 
- - we only have one or two distinct tokens depending on how you look at it and they are all readily matched via a regular expression. instead of parsing on a character-per- character basis we can allow the PCRE RegExp engine skip over large swaths of the document for us in order to find those tokens.
- - since `preg_match()` takes an `offset` parameter we can crawl through the input without passing copies of the input text on every step. we can track our position in the string and only pass a number instead
- - not copying all those strings means that we'll also skip many memory allocations
+ - We only have one or two distinct tokens, depending on how you look at it, and they are all readily matched via a regular expression. Instead of parsing on a character-per-character basis we can allow the PCRE RegExp engine to skip over large swaths of the document for us in order to find those tokens.
+ - Since `preg_match()` takes an `offset` parameter we can crawl through the input without passing copies of the input text on every step. We can track our position in the string and only pass a number instead.
+ - Not copying all those strings means that we'll also skip many memory allocations.
 
-Further since we're tokenizing with a RegExp we have an additional advantage. The generated parser from the PEG provides predictable performance characteristics and in order to do that must control how things are tokenized - it doesn't allow us to define RegExp patterns in the rules because doing so could introduce bad things like cataclysmic backtracking and that breaks the PEG guarantees.
+Further, tokenizing with a RegExp brings an additional advantage. The parser generated by the PEG provides predictable performance characteristics in exchange for control over tokenization rules -- it doesn't allow us to define RegExp patterns in the rules so as to guard against _e.g._ cataclysmic backtracking that would break the PEG guarantees.
 
-However, since our "token language" of the block comment delimiters is _regular_ and _can_ be trivially matched with RegExp patterns we can do that here and then something magical happens: we jump out of PHP or JavaScript and into a highly-optimized RegExp engine written in C or C++ on the host system. We leave the virtual machine and its overhead.
+However, since our "token language" of the block comment delimiters is _regular_ and _can_ be trivially matched with RegExp patterns, we can do that here and then something magical happens: we jump out of PHP or JavaScript and into a highly-optimized RegExp engine written in C or C++ on the host system. We thereby leave the virtual machine and its overhead.
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
