@@ -21,7 +21,7 @@ function Notice( { className, status, children, onRemove = noop, isDismissible =
 		'is-dismissible': isDismissible,
 	} );
 	return (
-		<div className={ classNames }>
+		<div className={ classNames } role="alert">
 			{ isString( children ) ? <div className="components-notice__content">{ children }</div> : children }
 			{ isDismissible && (
 				<IconButton

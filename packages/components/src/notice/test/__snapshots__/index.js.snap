@@ -3,6 +3,7 @@
 exports[`Notice should match snapshot 1`] = `
 <div
   className="components-notice is-example is-dismissible"
+  role="alert"
 >
   <IconButton
     className="components-notice__dismiss"
