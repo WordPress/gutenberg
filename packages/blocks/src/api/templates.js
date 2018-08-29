@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, map } from 'lodash';
+import { every, map } from 'lodash-es';
 
 /**
  * Internal dependencies

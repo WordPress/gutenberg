@@ -14,7 +14,7 @@ import {
 	without,
 	includes,
 	deburr,
-} from 'lodash';
+} from 'lodash-es';
 import scrollIntoView from 'dom-scroll-into-view';
 
 /**

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flowRight } from 'lodash';
+import { flowRight } from 'lodash-es';
 
 export { default as createHigherOrderComponent } from './create-higher-order-component';
 export { default as ifCondition } from './if-condition';

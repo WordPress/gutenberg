@@ -7,7 +7,7 @@ import { URL } from 'url';
 /**
  * External dependencies
  */
-import { times, castArray } from 'lodash';
+import { times, castArray } from 'lodash-es';
 
 const {
 	WP_BASE_URL = 'http://localhost:8889',

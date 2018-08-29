@@ -2,7 +2,7 @@
  * External Dependencies
  */
 import uuid from 'uuid/v4';
-import { partial, castArray } from 'lodash';
+import { partial, castArray } from 'lodash-es';
 
 /**
  * WordPress dependencies

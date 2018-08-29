@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mapValues } from 'lodash';
+import { mapValues } from 'lodash-es';
 
 /**
  * WordPress dependencies

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isObjectLike } from 'lodash';
+import { isObjectLike } from 'lodash-es';
 
 /**
  * Given a function, returns an enhanced function which caches the result and

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, get, some } from 'lodash';
+import { castArray, get, some } from 'lodash-es';
 
 /**
  * WordPress dependencies

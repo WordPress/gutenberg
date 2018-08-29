@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray } from 'lodash';
+import { castArray } from 'lodash-es';
 
 /**
  * Insert one or multiple elements into a given position of an array.

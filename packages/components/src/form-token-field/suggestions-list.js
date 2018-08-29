@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
+import { map } from 'lodash-es';
 import scrollIntoView from 'dom-scroll-into-view';
 import classnames from 'classnames';
 

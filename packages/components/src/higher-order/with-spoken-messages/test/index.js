@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { render } from 'enzyme';
-import { isFunction } from 'lodash';
+import { isFunction } from 'lodash-es';
 
 /**
  * Internal dependencies

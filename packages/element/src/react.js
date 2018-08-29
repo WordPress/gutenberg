@@ -13,7 +13,7 @@ import {
 	isValidElement,
 	StrictMode,
 } from 'react';
-import { isString } from 'lodash';
+import { isString } from 'lodash-es';
 
 export { Children };
 

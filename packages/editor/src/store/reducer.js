@@ -17,7 +17,7 @@ import {
 	isEqual,
 	overSome,
 	get,
-} from 'lodash';
+} from 'lodash-es';
 
 /**
  * WordPress dependencies

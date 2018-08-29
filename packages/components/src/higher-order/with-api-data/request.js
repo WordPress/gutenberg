@@ -2,7 +2,7 @@
  * External dependencies
  */
 import memoize from 'memize';
-import { mapKeys } from 'lodash';
+import { mapKeys } from 'lodash-es';
 
 /**
  * WordPress dependencies

@@ -36,7 +36,7 @@ import {
 	startsWith,
 	kebabCase,
 	isPlainObject,
-} from 'lodash';
+} from 'lodash-es';
 
 /**
  * Internal dependencies

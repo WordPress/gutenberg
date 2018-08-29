@@ -9,7 +9,7 @@ import {
 	keys,
 	pickBy,
 	startsWith,
-} from 'lodash';
+} from 'lodash-es';
 
 const isAriaPropName = ( name ) =>
 	startsWith( name, 'aria-' );

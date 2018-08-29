@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { compact, uniq } from 'lodash';
+import { compact, uniq } from 'lodash-es';
 
 /**
  * WordPress dependencies

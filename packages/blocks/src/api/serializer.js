@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, reduce, isObject, castArray, startsWith } from 'lodash';
+import { isEmpty, reduce, isObject, castArray, startsWith } from 'lodash-es';
 
 /**
  * WordPress dependencies

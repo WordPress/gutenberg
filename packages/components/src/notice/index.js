@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isString, noop } from 'lodash';
+import { isString, noop } from 'lodash-es';
 import classnames from 'classnames';
 
 /**

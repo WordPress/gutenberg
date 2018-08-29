@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual, find, some, filter, noop, throttle } from 'lodash';
+import { isEqual, find, some, filter, noop, throttle } from 'lodash-es';
 
 /**
  * WordPress dependencies

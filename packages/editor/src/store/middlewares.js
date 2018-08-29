@@ -3,7 +3,7 @@
  */
 import refx from 'refx';
 import multi from 'redux-multi';
-import { flowRight } from 'lodash';
+import { flowRight } from 'lodash-es';
 
 /**
  * Internal dependencies

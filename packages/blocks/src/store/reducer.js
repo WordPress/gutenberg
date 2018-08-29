@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { keyBy, omit } from 'lodash';
+import { keyBy, omit } from 'lodash-es';
 
 /**
  * WordPress dependencies

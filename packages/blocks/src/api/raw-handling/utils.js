@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mergeWith, includes, noop } from 'lodash';
+import { mergeWith, includes, noop } from 'lodash-es';
 
 /**
  * WordPress dependencies

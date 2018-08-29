@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { first, last, some } from 'lodash';
+import { first, last, some } from 'lodash-es';
 
 /**
  * WordPress dependencies

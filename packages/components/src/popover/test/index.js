@@ -4,7 +4,7 @@
 import { shallow } from 'enzyme';
 import TestUtils from 'react-dom/test-utils';
 import ReactDOM from 'react-dom';
-import { noop } from 'lodash';
+import { noop } from 'lodash-es';
 
 /**
  * Internal dependencies

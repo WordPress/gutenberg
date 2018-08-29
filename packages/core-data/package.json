@@ -26,7 +26,7 @@
 		"@wordpress/data": "file:../data",
 		"@wordpress/url": "file:../url",
 		"equivalent-key-map": "^0.2.1",
-		"lodash": "^4.17.10",
+		"lodash-es": "^4.17.10",
 		"rememo": "^3.0.0"
 	},
 	"devDependencies": {

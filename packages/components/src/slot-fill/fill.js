@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop, isFunction } from 'lodash';
+import { noop, isFunction } from 'lodash-es';
 
 /**
  * WordPress dependencies

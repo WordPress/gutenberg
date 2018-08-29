@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escapeRegExp, find, filter, map, debounce } from 'lodash';
+import { escapeRegExp, find, filter, map, debounce } from 'lodash-es';
 import 'element-closest';
 
 /**

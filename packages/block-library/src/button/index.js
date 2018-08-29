@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit, pick } from 'lodash';
+import { omit, pick } from 'lodash-es';
 
 /**
  * WordPress dependencies

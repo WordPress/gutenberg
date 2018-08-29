@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { unescape as unescapeString, repeat, flatMap, compact } from 'lodash';
+import { unescape as unescapeString, repeat, flatMap, compact } from 'lodash-es';
 
 /**
  * Internal dependencies

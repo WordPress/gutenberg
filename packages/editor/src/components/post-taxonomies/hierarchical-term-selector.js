@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, unescape as unescapeString, without, find, some, invoke } from 'lodash';
+import { get, unescape as unescapeString, without, find, some, invoke } from 'lodash-es';
 
 /**
  * WordPress dependencies

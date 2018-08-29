@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, isString, kebabCase, reduce, upperFirst } from 'lodash';
+import { get, isString, kebabCase, reduce, upperFirst } from 'lodash-es';
 
 /**
  * WordPress dependencies

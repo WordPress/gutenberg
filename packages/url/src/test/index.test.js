@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every } from 'lodash';
+import { every } from 'lodash-es';
 
 /**
  * Internal dependencies

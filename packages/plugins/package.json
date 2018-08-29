@@ -23,7 +23,7 @@
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",
-		"lodash": "^4.17.10"
+		"lodash-es": "^4.17.10"
 	},
 	"publishConfig": {
 		"access": "public"

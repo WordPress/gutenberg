@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { includes } from 'lodash';
+import { includes } from 'lodash-es';
 
 /**
  * Higher-order reducer creator for tracking changes to state over time. The

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray } from 'lodash';
+import { castArray } from 'lodash-es';
 
 /**
  * Returns an action object used in signalling that block types have been added.

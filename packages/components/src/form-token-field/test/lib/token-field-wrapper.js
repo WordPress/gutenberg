@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { unescape } from 'lodash';
+import { unescape } from 'lodash-es';
 
 /**
  * Internal dependencies

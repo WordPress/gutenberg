@@ -17,7 +17,7 @@ import {
 	reduce,
 	size,
 	some,
-} from 'lodash';
+} from 'lodash-es';
 import createSelector from 'rememo';
 
 /**

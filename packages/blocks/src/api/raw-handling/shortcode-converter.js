@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { some, castArray, first, mapValues, pickBy, includes } from 'lodash';
+import { some, castArray, first, mapValues, pickBy, includes } from 'lodash-es';
 
 /**
  * WordPress dependencies

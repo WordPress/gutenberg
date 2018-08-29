@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, noop } from 'lodash';
+import { get, noop } from 'lodash-es';
 import classnames from 'classnames';
 
 /**

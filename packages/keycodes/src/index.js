@@ -12,7 +12,7 @@
 /**
  * External dependencies
  */
-import { get, mapValues, includes, capitalize } from 'lodash';
+import { get, mapValues, includes, capitalize } from 'lodash-es';
 
 /**
  * Internal dependencies

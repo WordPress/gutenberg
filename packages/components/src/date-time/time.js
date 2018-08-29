@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isInteger } from 'lodash';
+import { isInteger } from 'lodash-es';
 import moment from 'moment';
 
 /**

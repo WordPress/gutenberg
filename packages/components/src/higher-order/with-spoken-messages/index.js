@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { debounce } from 'lodash';
+import { debounce } from 'lodash-es';
 
 /**
  * WordPress dependencies

@@ -9,7 +9,7 @@ import {
 	sortBy,
 	throttle,
 	last,
-} from 'lodash';
+} from 'lodash-es';
 import classnames from 'classnames';
 import 'element-closest';
 

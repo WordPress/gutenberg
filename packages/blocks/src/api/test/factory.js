@@ -2,7 +2,7 @@
  * External dependencies
  */
 import deepFreeze from 'deep-freeze';
-import { noop } from 'lodash';
+import { noop } from 'lodash-es';
 
 /**
  * Internal dependencies

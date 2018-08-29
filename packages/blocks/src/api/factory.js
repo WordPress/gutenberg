@@ -14,7 +14,7 @@ import {
 	uniq,
 	isFunction,
 	isEmpty,
-} from 'lodash';
+} from 'lodash-es';
 
 /**
  * WordPress dependencies

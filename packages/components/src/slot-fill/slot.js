@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop, map, isString, isFunction } from 'lodash';
+import { noop, map, isString, isFunction } from 'lodash-es';
 
 /**
  * WordPress dependencies

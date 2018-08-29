@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { omit, noop, includes } from 'lodash';
+import { omit, noop, includes } from 'lodash-es';
 
 /**
  * WordPress Dependencies

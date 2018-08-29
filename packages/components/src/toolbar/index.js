@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { flatMap } from 'lodash';
+import { flatMap } from 'lodash-es';
 
 /**
  * Internal dependencies

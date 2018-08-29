@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, kebabCase } from 'lodash';
+import { find, kebabCase } from 'lodash-es';
 
 /**
  * WordPress dependencies

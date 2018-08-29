@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { forEach, without } from 'lodash';
+import { forEach, without } from 'lodash-es';
 
 /**
  * Class responsible for orchestrating event handling on the global window,

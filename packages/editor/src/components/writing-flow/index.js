@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { overEvery, find, findLast, reverse, first, last } from 'lodash';
+import { overEvery, find, findLast, reverse, first, last } from 'lodash-es';
 
 /**
  * WordPress dependencies

@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { filter, identity, includes } from 'lodash';
+import { filter, identity, includes } from 'lodash-es';
 
 /**
  * WordPress dependencies

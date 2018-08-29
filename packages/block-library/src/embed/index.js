@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { parse } from 'url';
-import { includes, kebabCase, toLower } from 'lodash';
+import { includes, kebabCase, toLower } from 'lodash-es';
 import classnames from 'classnames';
 
 /**

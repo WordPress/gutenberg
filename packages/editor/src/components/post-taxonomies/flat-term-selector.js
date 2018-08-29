@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, get, unescape as unescapeString, find, throttle, uniqBy, invoke } from 'lodash';
+import { isEmpty, get, unescape as unescapeString, find, throttle, uniqBy, invoke } from 'lodash-es';
 
 /**
  * WordPress dependencies

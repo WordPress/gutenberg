@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { groupBy } from 'lodash';
+import { groupBy } from 'lodash-es';
 
 /**
  * Returns terms in a tree form.

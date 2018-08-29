@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { parse as hpqParse } from 'hpq';
-import { flow, castArray, mapValues, omit, stubFalse } from 'lodash';
+import { flow, castArray, mapValues, omit, stubFalse } from 'lodash-es';
 
 /**
  * WordPress dependencies

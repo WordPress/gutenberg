@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { pick, includes } from 'lodash';
+import { pick, includes } from 'lodash-es';
 
 /**
  * WordPress dependencies

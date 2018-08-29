@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty } from 'lodash';
+import { isEmpty } from 'lodash-es';
 import classnames from 'classnames';
 
 /**

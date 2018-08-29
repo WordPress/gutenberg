@@ -3,7 +3,7 @@
  */
 import fs from 'fs';
 import path from 'path';
-import { uniq, isObject, omit, startsWith, get } from 'lodash';
+import { uniq, isObject, omit, startsWith, get } from 'lodash-es';
 import { format } from 'util';
 
 /**
