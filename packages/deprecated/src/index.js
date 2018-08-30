@@ -55,7 +55,7 @@ export default function deprecated( feature, options = {} ) {
 	 * @param {?string} options.hint        Additional message to help transition away from the deprecated feature.
 	 * @param {?string} message             Message sent to console.warn
 	 */
-	doAction( 'wp.deprecated', feature, options, message );
+	doAction( 'deprecated', feature, options, message );
 
 	// eslint-disable-next-line no-console
 	console.warn( message );

@@ -27,6 +27,18 @@ deprecated( 'Eating meat', {
 
 ## Hook
 
-The `wp.deprecated` action is fired with three parameters: the name of the deprecated feature, the options object passed to deprecated, and the message sent to the console.  
+The `deprecated` action is fired with three parameters: the name of the deprecated feature, the options object passed to deprecated, and the message sent to the console.
+
+_Example:_
+
+```js
+import { addAction } from '@wordpress/hooks';
+
+function addDeprecationAlert( message, { version } ) {
+	alert( `Deprecation: ${ message }. Version: ${ version }` );	
+}
+
+addAction( 'deprecated', 'my-plugin/add-deprecation-alert', addDeprecationAlert );
+```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

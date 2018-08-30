@@ -89,6 +89,6 @@ describe( 'deprecated', () => {
 		deprecated( 'turkey', { alternative: 'tofurky' } );
 
 		expect( console ).toHaveWarned();
-		expect( didAction( 'wp.deprecated' ) ).toBeTruthy();
+		expect( didAction( 'deprecated' ) ).toBeTruthy();
 	} );
 } );
