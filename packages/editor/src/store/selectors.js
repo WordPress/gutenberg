@@ -1101,15 +1101,19 @@ export function isBlockSelected( state, clientId ) {
 /**
  * Returns true if one of the block's inner blocks is selected.
  *
- * @param {Object} state    Editor state.
- * @param {string} clientId Block client ID.
+ * @param {Object}  state    Editor state.
+ * @param {string}  clientId Block client ID.
+ * @param {boolean} deep     Perform a deep check.
  *
  * @return {boolean} Whether the block as an inner block selected
  */
-export function hasSelectedInnerBlock( state, clientId ) {
+export function hasSelectedInnerBlock( state, clientId, deep = false ) {
 	return some(
 		getBlockOrder( state, clientId ),
-		( innerClientId ) => isBlockSelected( state, innerClientId )
+		( innerClientId ) => (
+			isBlockSelected( state, innerClientId ) ||
+			( deep && hasSelectedInnerBlock( state, innerClientId, deep ) )
+		)
 	);
 }
 
