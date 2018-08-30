@@ -1,6 +1,6 @@
 # Notice
 
-This component is used to display notices in editor.
+This component is used to display notices in the editor. Notices use an ARIA `role="alert"`: they're assertive live regions and will be processed as such by assistive technologies. For this reason, they must be returned directly, without any wrappers.
 
 ## Usage
 
