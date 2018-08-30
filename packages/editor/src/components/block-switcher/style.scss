@@ -31,7 +31,9 @@
 		padding: 0 6px;
 		display: flex;
 		align-items: center;
-		transition: all 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
+
+		// Transition opacity slightly slower than the movement for a smoother effect
+		transition: opacity 0.3s ease-in-out, transform 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
 	}
 
 	// Add a dropdown arrow indicator.
@@ -54,16 +56,28 @@
 		border-radius: $radius-round-rectangle;
 		height: $icon-button-size-small + 6px;
 		padding: 3px 9px 3px 9px;
+
+		// Start fully transparent so the icon fades into place
+		opacity: 0;
 	}
 
 	// Block hover and focus style.
-	&[aria-expanded="true"] .editor-block-icon,
-	&[aria-expanded="true"] .editor-block-switcher__transform,
-	&:not(:disabled):hover .editor-block-icon,
-	&:not(:disabled):hover .editor-block-switcher__transform,
-	&:not(:disabled):focus .editor-block-icon,
-	&:not(:disabled):focus .editor-block-switcher__transform {
-		transform: translateY(-$icon-button-size);
+	&[aria-expanded="true"],
+	&:not(:disabled):hover,
+	&:not(:disabled):focus {
+		.editor-block-icon,
+		.editor-block-switcher__transform {
+			transform: translateY(-$icon-button-size);
+		}
+
+		// Swap opacities on hover
+		.editor-block-icon {
+			opacity: 0;
+		}
+
+		.editor-block-switcher__transform {
+			opacity: 1;
+		}
 	}
 
 	// Block focus style.
