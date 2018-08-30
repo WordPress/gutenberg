@@ -6,7 +6,7 @@ The process of loading the serialized HTML into the editor is performed by the _
 
 ## Server-side parser
 
-Plugins have access to the parser if they want to process posts in their structured form instead of a plain HTML-as-string representation. WordPress itself uses the server-side parser when rendering pages: it removes the block comment delimiters and it replaces dynamic blocks with their rendered content.
+Plugins have access to the parser if they want to process posts in their structured form instead of a plain HTML-as-string representation.
 
 ## Client-side parser
 
