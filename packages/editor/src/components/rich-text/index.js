@@ -26,7 +26,7 @@ import {
 import { createBlobURL } from '@wordpress/blob';
 import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, rawShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { Slot } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
+import { withDispatch, withSelect } from '@wordpress/data';
 import { rawHandler, children } from '@wordpress/blocks';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
@@ -241,7 +241,7 @@ export class RichText extends Component {
 	 * @param {UndoEvent} event The undo event as triggered by TinyMCE.
 	 */
 	onPropagateUndo( event ) {
-		const { onUndo, onRedo } = this.context;
+		const { onUndo, onRedo } = this.props;
 		const { command } = event;
 
 		if ( command === 'Undo' && onUndo ) {
@@ -419,7 +419,7 @@ export class RichText extends Component {
 			this.onChange();
 		}
 
-		this.context.onCreateUndoLevel();
+		this.props.onCreateUndoLevel();
 	}
 
 	/**
@@ -1005,12 +1005,6 @@ export class RichText extends Component {
 	}
 }
 
-RichText.contextTypes = {
-	onUndo: noop,
-	onRedo: noop,
-	onCreateUndoLevel: noop,
-};
-
 RichText.defaultProps = {
 	formattingControls: FORMATTING_CONTROLS.map( ( { format } ) => format ),
 	formatters: [],
@@ -1044,6 +1038,19 @@ const RichTextContainer = compose( [
 		return {
 			isViewportSmall: isViewportMatch( '< small' ),
 			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		const {
+			createUndoLevel,
+			redo,
+			undo,
+		} = dispatch( 'core/editor' );
+
+		return {
+			onCreateUndoLevel: createUndoLevel,
+			onRedo: redo,
+			onUndo: undo,
 		};
 	} ),
 	withSafeTimeout,

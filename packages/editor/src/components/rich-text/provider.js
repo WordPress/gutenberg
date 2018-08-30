@@ -6,6 +6,7 @@ import { pick, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { Component } from '@wordpress/element';
 
 /**
@@ -16,6 +17,13 @@ import { Component } from '@wordpress/element';
  */
 class RichTextProvider extends Component {
 	getChildContext() {
+		deprecated( 'wp.editor.RichTextProvider', {
+			alternative: "wp.data.select( 'core/editor' ) methods",
+			version: '4.0.0',
+			plugin: 'Gutenberg',
+			hint: 'This is a global warning, shown regardless of whether the component is used.',
+		} );
+
 		return pick(
 			this.props,
 			Object.keys( this.constructor.childContextTypes )
