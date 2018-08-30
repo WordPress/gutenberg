@@ -18,10 +18,10 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 
  - `wp.components.withContext` has been removed. Please use `wp.element.createContext` instead. See: https://reactjs.org/docs/context.html.
  - `wp.coreBlocks.registerCoreBlocks` has been removed. Please use `wp.blockLibrary.registerCoreBlocks` instead.
+- `wp.components.Draggable` as a DOM node drag handler has been deprecated. Please, use `wp.components.Draggable` as a wrap component for your DOM node drag handler.
 
 ## 3.7.0
 
- - `wp.components.Draggable` has been deprecated. Please, use `wp.components.withDraggable` instead.
  - `wp.components.withAPIData` has been removed. Please use the Core Data module or `wp.apiFetch` directly instead.
  - `wp.data.dispatch("core").receiveTerms` has been deprecated. Please use `wp.data.dispatch("core").receiveEntityRecords` instead.
  - `getCategories` resolver has been deprecated. Please use `getEntityRecords` resolver instead.
