@@ -157,8 +157,9 @@ class Draggable extends Component {
 		}
 
 		deprecated( 'wp.components.Draggable as a DOM node drag handle', {
-			version: 3.8,
+			version: 3.10,
 			alternative: 'wp.components.Draggable as a wrapper component for a DOM node',
+			plugin: 'Gutenberg',
 		} );
 
 		return (
