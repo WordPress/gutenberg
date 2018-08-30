@@ -32,8 +32,9 @@
 		display: flex;
 		align-items: center;
 
-		// Transition opacity slightly slower than the movement for a smoother effect
-		transition: opacity 0.3s ease-in-out, transform 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+		// The opacity and transform transitions use separate easings so the opacity
+		// animation starts while the "incoming" icon is mostly in frame.
+		transition: opacity 0.2s cubic-bezier(1, 0, 0.8, 0.65), transform 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
 	}
 
 	// Add a dropdown arrow indicator.
@@ -57,7 +58,7 @@
 		height: $icon-button-size-small + 6px;
 		padding: 3px 9px 3px 9px;
 
-		// Start fully transparent so the icon fades into place
+		// Start fully transparent so the icon fades into place.
 		opacity: 0;
 	}
 
@@ -70,7 +71,7 @@
 			transform: translateY(-$icon-button-size);
 		}
 
-		// Swap opacities on hover
+		// Swap the icon opacities on hover.
 		.editor-block-icon {
 			opacity: 0;
 		}
