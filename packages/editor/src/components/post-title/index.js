@@ -94,7 +94,6 @@ class PostTitle extends Component {
 			'is-selected': isSelected,
 			'is-focus-mode': isFocusMode,
 			'has-fixed-toolbar': hasFixedToolbar,
-			'is-focused': isFocusMode && isSelected,
 		} );
 		const decodedPlaceholder = decodeEntities( placeholder );
 
