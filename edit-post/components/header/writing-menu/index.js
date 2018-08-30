@@ -16,8 +16,8 @@ function WritingMenu( { onClose } ) {
 			label={ __( 'Writing' ) }
 			filterName="editPost.MoreMenu.writing"
 		>
-			<FeatureToggle feature="fixedToolbar" label={ __( 'Fix Toolbar To Top' ) } onToggle={ onClose } />
-			<FeatureToggle feature="focusMode" label={ __( 'Focus Mode' ) } onToggle={ onClose } />
+			<FeatureToggle feature="fixedToolbar" label={ __( 'Unified Toolbar' ) } onToggle={ onClose } />
+			<FeatureToggle feature="focusMode" label={ __( 'Spotlight Mode' ) } onToggle={ onClose } />
 		</MenuGroup>
 	);
 }
