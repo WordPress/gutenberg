@@ -906,7 +906,7 @@
 	}
 }
 
-.editor-block-list__block.is-focus-mode > .editor-block-contextual-toolbar {
+.editor-block-list__block.is-focus-mode:not(.is-multi-selected) > .editor-block-contextual-toolbar {
 	margin-left: -$block-side-ui-width;
 }
 
