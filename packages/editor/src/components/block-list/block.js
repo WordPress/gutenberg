@@ -324,12 +324,8 @@ export class BlockListBlock extends Component {
 			case BACKSPACE:
 			case DELETE:
 				// Remove block on backspace.
-				const { clientId, onRemove, previousBlockClientId, onSelect } = this.props;
+				const { clientId, onRemove } = this.props;
 				onRemove( clientId );
-
-				if ( previousBlockClientId ) {
-					onSelect( previousBlockClientId, -1 );
-				}
 				event.preventDefault();
 				break;
 		}
