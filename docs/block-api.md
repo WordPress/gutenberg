@@ -52,14 +52,23 @@ description: 'Block showing a Book card.'
 
 #### Category
 
-* **Type:** `String [ common | formatting | layout | widgets | embed ]`
+* **Type:** `String` [ common | formatting | layout | widgets | embed ]
 
-Blocks are grouped into categories to help users browse and discover them. The core provided categories are `common`, `formatting`, `layout`, `widgets`, and `embed`.
+Blocks are grouped into categories to help users browse and discover them. 
+
+The core provided categories are:
+* common
+* formatting
+* layout
+* widgets
+* embed
 
 ```js
 // Assigning to the 'widgets' category
 category: 'widgets',
 ```
+
+Plugins and Themes can also register [custom block categories](../docs/block-api/extensibility.md).
 
 #### Icon (optional)
 
@@ -68,6 +77,9 @@ An icon property should be specified to make it easier to identify a block. Thes
 ```js
 // Specifying a dashicon for the block
 icon: 'book-alt',
+
+// Specifying a custom svg for the block
+icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true" focusable="false"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M19 13H5v-2h14v2z" /></svg>,
 ```
 
 An object can also be passed as icon, in this case, icon, as specified above, should be included in the src property.
@@ -92,8 +104,9 @@ icon: {
 Sometimes a block could have aliases that help users discover it while searching. For example, an `image` block could also want to be discovered by `photo`. You can do so by providing an array of terms (which can be translated). It is only allowed to add as much as three terms per block.
 
 ```js
-// Make it easier to discover a block with keyword aliases
-keywords: [ __( 'read' ) ],
+// Make it easier to discover a block with keyword aliases.
+// These can be localised so your keywords work across locales.
+keywords: [ __( 'image' ), __( 'photo' ), __( 'pics' ) ],
 ```
 
 #### Attributes (optional)
@@ -396,7 +409,7 @@ align: true,
 align: [ 'left', 'right', 'full' ],
 ```
 
-- `alignWide` (default `true`): Gutenberg allows to enable [wide alignment](../docs/extensibility/theme-support.md#wide-alignment) for your theme. To disable this behavior for a single block, set this flag to `false`.
+- `alignWide` (default `true`): This property allows to enable [wide alignment](../docs/extensibility/theme-support.md#wide-alignment) for your theme. To disable this behavior for a single block, set this flag to `false`.
 
 ```js
 // Remove the support for wide alignment.
@@ -449,4 +462,4 @@ multiple: false,
 
 The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](../docs/block-api/block-edit-save.md).
 
-Note: Some [block supports](#supports-optional) — for example, `anchor` or `className` — apply their attributes by adding additional props on the element returned by `save`. This will work automatically for default HTML tag elements (`div`, etc). However, if the return value of your `save` is a custom component element, you will need to ensure that your custom component handles these props in order for the attributes to be persisted.
+*Some [block supports](#supports-optional) — for example, `anchor` or `className` — apply their attributes by adding additional props on the element returned by `save`. This will work automatically for default HTML tag elements (`div`, etc). However, if the return value of your `save` is a custom component element, you will need to ensure that your custom component handles these props in order for the attributes to be persisted.*
