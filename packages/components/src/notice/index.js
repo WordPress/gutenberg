@@ -29,7 +29,6 @@ function Notice( { className, status, children, onRemove = noop, isDismissible =
 					icon="no"
 					label={ __( 'Dismiss this notice' ) }
 					onClick={ onRemove }
-					tooltip={ false }
 				/>
 			) }
 		</div>

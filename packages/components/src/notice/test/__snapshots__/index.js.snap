@@ -13,7 +13,6 @@ exports[`Notice should match snapshot 1`] = `
     icon="no"
     label="Dismiss this notice"
     onClick={[Function]}
-    tooltip={false}
   />
 </div>
 `;
