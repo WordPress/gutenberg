@@ -11,8 +11,8 @@ import { speak } from '@wordpress/a11y';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
- * A Higher Order Component used to be provide a unique instance ID by
- * component.
+ * A Higher Order Component used to be provide audible messages to assistive
+ * technologies using ARIA live regions.
  *
  * @param {WPElement} WrappedComponent  The wrapped component.
  *
