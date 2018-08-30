@@ -6,7 +6,6 @@ import { withSelect, withDispatch } from '@wordpress/data';
 /**
  * WordPress Dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
 import { MenuItem } from '@wordpress/components';
 
@@ -18,7 +17,7 @@ function FeatureToggle( { onToggle, isActive, label } ) {
 			onClick={ onToggle }
 			role="menuitemcheckbox"
 		>
-			{ __( label ) }
+			{ label }
 		</MenuItem>
 	);
 }
