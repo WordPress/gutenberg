@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isString, noop } from 'lodash';
+import { noop } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -22,7 +22,7 @@ function Notice( { className, status, children, onRemove = noop, isDismissible =
 	} );
 	return (
 		<div className={ classNames } role="alert">
-			{ isString( children ) ? <div className="components-notice__content">{ children }</div> : children }
+			<div className="components-notice__content">{ children }</div>
 			{ isDismissible && (
 				<IconButton
 					className="components-notice__dismiss"
