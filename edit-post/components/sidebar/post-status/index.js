@@ -18,7 +18,7 @@ import PostSticky from '../post-sticky';
 import PostAuthor from '../post-author';
 import PostFormat from '../post-format';
 import PostPendingStatus from '../post-pending-status';
-import PluginPostStatusInfo from '../plugin-post-status-info';
+import { PluginPostStatusInfo } from '../../../plugins';
 
 /**
  * Module Constants

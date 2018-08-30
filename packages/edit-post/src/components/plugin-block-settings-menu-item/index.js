@@ -8,11 +8,7 @@ import { difference } from 'lodash';
  */
 import { IconButton } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
-import PluginBlockSettingsMenuGroup from './plugin-block-settings-menu-group';
+import { PluginsBlockSettingsMenuGroup } from '@wordpress/editor';
 
 const isEverySelectedBlockAllowed = ( selected, allowed ) => difference( selected, allowed ).length === 0;
 
@@ -27,26 +23,29 @@ const isEverySelectedBlockAllowed = ( selected, allowed ) => difference( selecte
  * @param {string[]} allowedBlockNames Array containing the names of the blocks allowed
  * @return {boolean} Whether the item will be rendered or not.
  */
-const shouldRenderItem = ( selectedBlockNames, allowedBlockNames ) => ! Array.isArray( allowedBlockNames ) ||
+const shouldRenderItem = ( selectedBlockNames, allowedBlockNames ) =>
+	! Array.isArray( allowedBlockNames ) ||
 	isEverySelectedBlockAllowed( selectedBlockNames, allowedBlockNames );
 
-const PluginBlockSettingsMenuItem = ( { allowedBlocks, icon, label, onClick, small, role } ) => (
-	<PluginBlockSettingsMenuGroup>
-		{ ( { selectedBlocks, onClose } ) => {
-			if ( ! shouldRenderItem( selectedBlocks, allowedBlocks ) ) {
+const PluginBlockSettingsMenuItem = ( { allowedBlockNames, icon, label, onClick, small, role } ) => (
+	<PluginsBlockSettingsMenuGroup>
+		{ ( { selectedBlockNames, onClose } ) => {
+			if ( ! shouldRenderItem( selectedBlockNames, allowedBlockNames ) ) {
 				return null;
 			}
-			return ( <IconButton
-				className="editor-block-settings-menu__control"
-				onClick={ compose( onClick, onClose ) }
-				icon={ icon || 'admin-plugins' }
-				label={ small ? label : undefined }
-				role={ role }
-			>
-				{ ! small && label }
-			</IconButton> );
+			return (
+				<IconButton
+					className="editor-block-settings-menu__control"
+					onClick={ compose( onClick, onClose ) }
+					icon={ icon || 'admin-plugins' }
+					label={ small ? label : undefined }
+					role={ role }
+				>
+					{ ! small && label }
+				</IconButton>
+			);
 		} }
-	</PluginBlockSettingsMenuGroup>
+	</PluginsBlockSettingsMenuGroup>
 );
 
 export default PluginBlockSettingsMenuItem;

@@ -11,7 +11,7 @@ import { Fragment } from '@wordpress/element';
 import './style.scss';
 import ModeSwitcher from '../mode-switcher';
 import FixedToolbarToggle from '../fixed-toolbar-toggle';
-import PluginMoreMenuGroup from '../plugins-more-menu-group';
+import { PluginsMoreMenuGroup } from '../../../plugins';
 import TipsToggle from '../tips-toggle';
 import KeyboardShortcutsHelpMenuItem from '../keyboard-shortcuts-help-menu-item';
 
@@ -38,7 +38,7 @@ const MoreMenu = () => (
 					<FixedToolbarToggle onToggle={ onClose } />
 					<TipsToggle onToggle={ onClose } />
 				</MenuGroup>
-				<PluginMoreMenuGroup.Slot fillProps={ { onClose } } />
+				<PluginsMoreMenuGroup.Slot fillProps={ { onClose } } />
 				<MenuGroup
 					label={ __( 'Tools' ) }
 					filterName="editPost.MoreMenu.tools"

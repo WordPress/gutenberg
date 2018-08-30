@@ -6,15 +6,6 @@ const path = require( 'path' );
 
 const root = path.resolve( __dirname, '../../' );
 
-// These are packages published to NPM as their own node modules.
-const npmReadyPackages = glob( 'packages/*/package.json' )
-	.map( ( fileName ) => fileName.split( '/' )[ 1 ] );
-
-// These are internal-only packages (for now), not yet published as standalone node modules.
-const gutenbergPackages = [
-	'edit-post',
-];
-
 module.exports = {
 	componentPaths: glob( 'packages/components/src/*/README.md' ),
 	dataNamespaces: {
@@ -51,18 +42,7 @@ module.exports = {
 		},
 	},
 	dataDocsOutput: path.resolve( __dirname, '../data' ),
-
-	packages: {
-		...npmReadyPackages.reduce( ( memo, packageName ) => {
-			memo[ packageName ] = { isNpmReady: true };
-			return memo;
-		}, {} ),
-		...gutenbergPackages.reduce( ( memo, packageName ) => {
-			memo[ packageName ] = { isNpmReady: false };
-			return memo;
-		}, {} ),
-	},
-
+	packages: glob( 'packages/*/README.md' ),
 	rootManifest: path.resolve( __dirname, '../root-manifest.json' ),
 	manifestOutput: path.resolve( __dirname, '../manifest.json' ),
 };
