@@ -121,7 +121,7 @@ export const settings = {
 						src={ src }
 					/>
 				) }
-				{ caption && caption.length > 0 && (
+				{ ! RichText.isEmpty( caption ) && (
 					<RichText.Content tagName="figcaption" value={ caption } />
 				) }
 			</figure>

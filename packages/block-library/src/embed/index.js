@@ -242,7 +242,7 @@ export function getEmbedEdit( title, icon ) {
 							<p className="components-placeholder__error">{ __( 'Previews for this are unavailable in the editor, sorry!' ) }</p>
 						</Placeholder>
 					) : embedWrapper }
-					{ ( caption && caption.length > 0 ) || isSelected ? (
+					{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 						<RichText
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
@@ -250,7 +250,7 @@ export function getEmbedEdit( title, icon ) {
 							onChange={ ( value ) => setAttributes( { caption: value } ) }
 							inlineToolbar
 						/>
-					) : null }
+					) }
 				</figure>
 			);
 		}
@@ -321,7 +321,7 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 			return (
 				<figure className={ embedClassName }>
 					{ `\n${ url }\n` /* URL needs to be on its own line. */ }
-					{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
+					{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
 				</figure>
 			);
 		},

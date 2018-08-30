@@ -62,6 +62,17 @@ const { Node, getSelection } = window;
  */
 const TINYMCE_ZWSP = '\uFEFF';
 
+/**
+ * Check if the given `RichText` value is empty on not.
+ *
+ * @param {Array} value `RichText` value.
+ *
+ * @return {boolean} True if empty, false if not.
+ */
+const isRichTextValueEmpty = ( value ) => {
+	return ! value || ! value.length;
+};
+
 export function getFormatValue( formatName, parents ) {
 	if ( formatName === 'link' ) {
 		const anchor = find( parents, ( node ) => node.nodeName === 'A' );
@@ -676,17 +687,17 @@ export class RichText extends Component {
 		// value. This also provides an opportunity for the parent component to
 		// determine whether the before/after value has changed using a trivial
 		//  strict equality operation.
-		if ( this.isEmpty( after ) ) {
+		if ( isRichTextValueEmpty( after ) ) {
 			before = this.props.value;
-		} else if ( this.isEmpty( before ) ) {
+		} else if ( isRichTextValueEmpty( before ) ) {
 			after = this.props.value;
 		}
 
 		// If pasting and the split would result in no content other than the
 		// pasted blocks, remove the before and after blocks.
 		if ( context.paste ) {
-			before = this.isEmpty( before ) ? null : before;
-			after = this.isEmpty( after ) ? null : after;
+			before = isRichTextValueEmpty( before ) ? null : before;
+			after = isRichTextValueEmpty( after ) ? null : after;
 		}
 
 		onSplit( before, after, ...blocks );
@@ -797,14 +808,12 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Returns true if the field is currently empty, or false otherwise.
+	 * Returns true if the component's value prop is currently empty, or false otherwise.
 	 *
-	 * @param {Array} value Content to check.
-	 *
-	 * @return {boolean} Whether field is empty.
+	 * @return {boolean} Whether this.props.value is empty.
 	 */
-	isEmpty( value = this.props.value ) {
-		return ! value || ! value.length;
+	isEmpty() {
+		return isRichTextValueEmpty( this.props.value );
 	}
 
 	isFormatActive( format ) {
@@ -1058,6 +1067,8 @@ RichTextContainer.Content = ( { value, format, tagName: Tag, ...props } ) => {
 
 	return content;
 };
+
+RichTextContainer.isEmpty = isRichTextValueEmpty;
 
 RichTextContainer.Content.defaultProps = {
 	format: 'children',

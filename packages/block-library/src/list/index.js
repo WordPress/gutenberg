@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, compact, get, initial, last, isEmpty, omit } from 'lodash';
+import { find, compact, get, initial, last, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -79,7 +79,7 @@ export const settings = {
 				blocks: [ 'core/paragraph' ],
 				transform: ( blockAttributes ) => {
 					let items = blockAttributes.map( ( { content } ) => content );
-					const hasItems = ! items.every( isEmpty );
+					const hasItems = ! items.every( RichText.isEmpty );
 
 					// Look for line breaks if converting a single paragraph,
 					// then treat each line as a list item.
@@ -97,10 +97,10 @@ export const settings = {
 				blocks: [ 'core/quote' ],
 				transform: ( { value, citation } ) => {
 					const items = value.map( ( p ) => get( p, [ 'children', 'props', 'children' ] ) );
-					if ( ! isEmpty( citation ) ) {
+					if ( ! RichText.isEmpty( citation ) ) {
 						items.push( citation );
 					}
-					const hasItems = ! items.every( isEmpty );
+					const hasItems = ! items.every( RichText.isEmpty );
 					return createBlock( 'core/list', {
 						values: hasItems ? items.map( ( content, index ) => <li key={ index }>{ content }</li> ) : [],
 					} );
