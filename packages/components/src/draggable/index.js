@@ -20,11 +20,6 @@ class Draggable extends Component {
 	constructor() {
 		super( ...arguments );
 
-		deprecated( 'wp.components.Draggable', {
-			version: 3.7,
-			alternative: 'wp.components.withDraggable',
-		} );
-
 		this.onDragStart = this.onDragStart.bind( this );
 		this.onDragOver = this.onDragOver.bind( this );
 		this.onDragEnd = this.onDragEnd.bind( this );
@@ -154,6 +149,18 @@ class Draggable extends Component {
 
 	render() {
 		const { children, className } = this.props;
+		if ( typeof children === 'function' ) {
+			return children( {
+				onDraggableStart: this.onDragStart,
+				onDraggableEnd: this.onDragEnd,
+			} );
+		}
+
+		deprecated( 'wp.components.Draggable as a DOM node drag handle', {
+			version: 3.8,
+			alternative: 'wp.components.Draggable as a wrapper component for a DOM node',
+		} );
+
 		return (
 			<div
 				className={ classnames( 'components-draggable', className ) }
