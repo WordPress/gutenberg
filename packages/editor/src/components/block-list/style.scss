@@ -103,7 +103,7 @@
 	}
 
 	&.is-focus-mode:not(.is-multi-selected) {
-		opacity: 0.6;
+		opacity: 0.5;
 		transition: opacity 0.1s linear;
 
 		&:not(.is-focused) .editor-block-list__block,
