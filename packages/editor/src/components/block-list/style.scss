@@ -102,7 +102,7 @@
 		z-index: z-index(".editor-block-list__block-edit .reusable-block-edit-panel *");
 	}
 
-	&.is-focus-mode {
+	&.is-focus-mode:not(.is-multi-selected) {
 		opacity: 0.6;
 		transition: opacity 0.1s linear;
 
