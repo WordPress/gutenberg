@@ -121,21 +121,18 @@ export default {
 		const isNewPost = post.status === 'auto-draft';
 
 		// Parse content as blocks
-		let blocks;
+		let blocks = parse( post.content.raw );
 		let isValidTemplate = true;
-		if ( ! isNewPost ) {
-			blocks = parse( post.content.raw );
-
+		if ( isNewPost && template ) {
+			// Apply a template for new posts only, if exists.
+			blocks = synchronizeBlocksWithTemplate( blocks, template );
+		} else {
 			// Unlocked templates are considered always valid because they act as default values only.
 			isValidTemplate = (
 				! template ||
 				templateLock !== 'all' ||
 				doBlocksMatchTemplate( blocks, template )
 			);
-		} else if ( template ) {
-			blocks = synchronizeBlocksWithTemplate( [], template );
-		} else {
-			blocks = [];
 		}
 
 		// Include auto draft title in edits while not flagging post as dirty
