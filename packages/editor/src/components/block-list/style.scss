@@ -847,22 +847,6 @@
 	left: 0;
 	right: 0;
 
-	// Paint the borders on the toolbar itself on mobile.
-	border-top: $border-width solid $light-gray-500;
-	.components-toolbar {
-		border-top: none;
-		border-bottom: none;
-
-	}
-
-	@include break-small() {
-		border-top: none;
-		.components-toolbar {
-			border-top: $border-width solid $light-gray-500;
-			border-bottom: $border-width solid $light-gray-500;
-		}
-	}
-
 	// Floated items have special needs for the contextual toolbar position.
 	.editor-block-list__block[data-align="left"] &,
 	.editor-block-list__block[data-align="right"] & {
@@ -903,8 +887,6 @@
 	.editor-block-list__block & {
 		@include break-small() {
 			bottom: auto;
-			left: auto;
-			right: auto;
 			box-shadow: none;
 
 			// Move the block toolbar out of the flow using translate.
@@ -917,13 +899,14 @@
 				// Compensate for translate, so the sticky sticks to the top.
 				top: $block-toolbar-height + $block-padding;
 			}
-
-			// This is an important one. Because the toolbar is sticky, it's part of the flow.
-			// It behaves as relative, in other words, until it reaches an edge and then behaves as fixed.
-			// But by applying a float, we take it out of this flow. The benefit is that we don't need to compensate for margins.
-			// In turn, this allows margins on sibling elements to collapse to parent elements.
-			float: left;
 		}
+
+		// This is an important one. Because the toolbar is sticky, it's part of the flow.
+		// It behaves as relative, in other words, until it reaches an edge and then behaves as fixed.
+		// But by applying a float, we take it out of this flow. The benefit is that we don't need to compensate for margins.
+		// In turn, this allows margins on sibling elements to collapse to parent elements.
+		float: left;
+		width: 100%;
 	}
 
 	.editor-block-list__block[data-align="right"] & {
@@ -960,11 +943,6 @@
 		right: auto;
 		left: 0;
 		/*!rtl:end:ignore*/
-	}
-
-
-	@include break-small() {
-		width: auto;
 	}
 }
 

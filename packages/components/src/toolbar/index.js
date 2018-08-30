@@ -72,11 +72,12 @@ function Toolbar( { controls = [], children, className } ) {
 								event.stopPropagation();
 								control.onClick();
 							} }
-							className={ classnames( 'components-toolbar__control', {
+							className={ classnames( 'components-toolbar__control', control.className, {
 								'is-active': control.isActive,
 							} ) }
 							aria-pressed={ control.isActive }
 							disabled={ control.isDisabled }
+							{ ...control.extraProps }
 						/>
 						{ control.children }
 					</ToolbarButtonContainer>

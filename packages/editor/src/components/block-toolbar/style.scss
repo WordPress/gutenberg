@@ -2,16 +2,15 @@
 	display: flex;
 	flex-grow: 1;
 	width: 100%;
-	overflow: auto; // Allow horizontal scrolling on mobile.
 	position: relative;
+
+	// Show a left border on the parent container.
+	border-left: $border-width solid $light-gray-500;
 
 	// Allow overflow on desktop.
 	@include break-small() {
 		overflow: inherit;
 	}
-
-	// Show a left border on the parent container.
-	border-left: $border-width solid $light-gray-500;
 
 	// The component is born with a border, but we only need some of them.
 	.components-toolbar {
@@ -30,5 +29,21 @@
 		@supports (position: sticky) {
 			display: flex;
 		}
+	}
+}
+
+.editor-block-toolbar__tools-dropdown {
+	display: flex;
+	flex-wrap: wrap;
+	border: none;
+	padding-top: 1px;
+
+	// The component is born with a border, but we only need some of them.
+	.components-toolbar {
+		// Add a right border to show as separator in the block toolbar.
+		border-right: $border-width solid $light-gray-500;
+		border-left: $border-width solid $light-gray-500;
+		margin-left: -1px;
+		margin-top: -1px;
 	}
 }
