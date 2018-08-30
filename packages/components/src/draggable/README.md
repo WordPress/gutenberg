@@ -58,7 +58,7 @@ const MyDraggable = () => (
 							onDragStart={ onDraggableStart }
 							onDragEnd={ onDraggableEnd }
 							draggable
-							/>
+						/>
 					)
 				}
 				</Draggable>
@@ -91,7 +91,7 @@ const MyDraggable = ( { onDragStart, onDragEnd } ) => (
 							onDragStart={ onDraggableStart }
 							onDragEnd={ onDraggableEnd }
 							draggable
-							/>
+						/>
 					)
 				}
 				</Draggable>
