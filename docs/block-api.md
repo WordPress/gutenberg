@@ -104,8 +104,9 @@ icon: {
 Sometimes a block could have aliases that help users discover it while searching. For example, an `image` block could also want to be discovered by `photo`. You can do so by providing an array of terms (which can be translated). It is only allowed to add as much as three terms per block.
 
 ```js
-// Make it easier to discover a block with keyword aliases
-keywords: [ 'image', 'photo', 'pics' ],
+// Make it easier to discover a block with keyword aliases.
+// These can be localised so your keywords work across locales.
+keywords: [ __( 'image' ), __( 'photo' ), __( 'pics' ) ],
 ```
 
 #### Attributes (optional)
