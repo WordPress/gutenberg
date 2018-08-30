@@ -394,7 +394,6 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-autop',
 			'wp-blob',
 			'wp-block-serialization-default-parser',
-			'wp-block-serialization-spec-parser',
 			'wp-data',
 			'wp-deprecated',
 			'wp-dom',
