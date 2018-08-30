@@ -1021,6 +1021,11 @@
 			@include fade_in(60ms, 0.5s);
 		}
 	}
+
+	&.is-light .components-toolbar {
+		background: rgba($white, 0.5);
+		color: $dark-gray-700;
+	}
 }
 
 .editor-block-list__descendant-arrow::before {
