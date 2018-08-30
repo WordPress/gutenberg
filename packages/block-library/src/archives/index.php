@@ -79,12 +79,18 @@ function render_block_core_archives( $attributes ) {
 
 		$archives_args['echo'] = 0;
 
-		$block_content = wp_get_archives( $archives_args );
+		$archives = wp_get_archives( $archives_args );
 
-		$block_content = sprintf(
+		$classnames = esc_attr( $class );
+
+		$block_content = ! empty( $archives ) ? sprintf(
 			'<ul class="%1$s">%2$s</ul>',
-			esc_attr( $class ),
-			$block_content
+			$classnames,
+			$archives
+		) : sprintf(
+			'<div class="%1$s">%2$s</div>',
+			$classnames,
+			__( 'No archives to show.', 'gutenberg' )
 		);
 	}
 
