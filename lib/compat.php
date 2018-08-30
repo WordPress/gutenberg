@@ -182,23 +182,30 @@ function gutenberg_warn_classic_about_blocks() {
 	?>
 		<style type="text/css">
 			#blocks-in-post-dialog .notification-dialog {
-				padding: 25px;
+				position: fixed;
 				top: 50%;
-				margin: 0;
+				left: 50%;
+				width: 500px;
+				box-sizing: border-box;
 				transform: translate(-50%, -50%);
+				margin: 0;
+				padding: 25px;
+				max-height: 90%;
+				background: #fff;
+				box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+				line-height: 1.5;
+				z-index: 1000005;
+				overflow-y: auto;
 			}
 
 			@media only screen and (max-height: 480px), screen and (max-width: 450px) {
 				#blocks-in-post-dialog .notification-dialog {
+					top: 0;
+					left: 0;
 					width: 100%;
 					height: 100%;
-					box-sizing: border-box;
-					max-height: 100%;
-					position: fixed;
-					top: 0;
-					margin: 0;
-					left: 0;
 					transform: none;
+					max-height: 100%;
 				}
 			}
 		</style>
@@ -311,10 +318,20 @@ function gutenberg_warn_classic_about_cloudflare() {
 	?>
 		<style type="text/css">
 			#cloudflare-block-dialog .notification-dialog {
-				padding: 25px;
+				position: fixed;
 				top: 50%;
-				margin: 0;
+				left: 50%;
+				width: 500px;
+				box-sizing: border-box;
 				transform: translate(-50%, -50%);
+				margin: 0;
+				padding: 25px;
+				max-height: 90%;
+				background: #fff;
+				box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+				line-height: 1.5;
+				z-index: 1000005;
+				overflow-y: auto;
 			}
 
 			#cloudflare-block-dialog ul {
@@ -324,15 +341,12 @@ function gutenberg_warn_classic_about_cloudflare() {
 
 			@media only screen and (max-height: 480px), screen and (max-width: 450px) {
 				#cloudflare-block-dialog .notification-dialog {
+					top: 0;
+					left: 0;
 					width: 100%;
 					height: 100%;
-					box-sizing: border-box;
-					max-height: 100%;
-					position: fixed;
-					top: 0;
-					margin: 0;
-					left: 0;
 					transform: none;
+					max-height: 100%;
 				}
 			}
 		</style>
