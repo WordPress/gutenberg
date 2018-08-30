@@ -301,7 +301,7 @@ export class RichText extends Component {
 				mode: 'BLOCKS',
 				tagName: this.props.tagName,
 			} );
-			const shouldReplace = this.props.onReplace && isRichTextValueEmpty( this.props.value );
+			const shouldReplace = this.props.onReplace && this.isEmpty();
 
 			// Allows us to ask for this information when we get a report.
 			window.console.log( 'Received item:\n\n', file );
