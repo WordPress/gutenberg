@@ -3,6 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
+	BaseControl,
+	Button,
 	Disabled,
 	IconButton,
 	PanelBody,
@@ -11,11 +13,12 @@ import {
 	ToggleControl,
 	withNotices,
 } from '@wordpress/components';
-import { Component, Fragment } from '@wordpress/element';
+import { Component, Fragment, createRef } from '@wordpress/element';
 import {
 	BlockControls,
 	InspectorControls,
 	MediaPlaceholder,
+	MediaUpload,
 	RichText,
 	editorMediaUpload,
 } from '@wordpress/editor';
@@ -30,8 +33,11 @@ class VideoEdit extends Component {
 			editing: ! this.props.attributes.src,
 		};
 
+		this.videoPlayer = createRef();
 		this.toggleAttribute = this.toggleAttribute.bind( this );
 		this.onSelectURL = this.onSelectURL.bind( this );
+		this.onSelectPoster = this.onSelectPoster.bind( this );
+		this.onRemovePoster = this.onRemovePoster.bind( this );
 	}
 
 	componentDidMount() {
@@ -55,6 +61,12 @@ class VideoEdit extends Component {
 		}
 	}
 
+	componentDidUpdate( prevProps ) {
+		if ( this.props.attributes.poster !== prevProps.attributes.poster ) {
+			this.videoPlayer.current.load();
+		}
+	}
+
 	toggleAttribute( attribute ) {
 		return ( newValue ) => {
 			this.props.setAttributes( { [ attribute ]: newValue } );
@@ -74,8 +86,27 @@ class VideoEdit extends Component {
 		this.setState( { editing: false } );
 	}
 
+	onSelectPoster( image ) {
+		const { setAttributes } = this.props;
+		setAttributes( { poster: image.url } );
+	}
+
+	onRemovePoster() {
+		const { setAttributes } = this.props;
+		setAttributes( { poster: '' } );
+	}
+
 	render() {
-		const { autoplay, caption, controls, loop, muted, preload, src } = this.props.attributes;
+		const {
+			autoplay,
+			caption,
+			controls,
+			loop,
+			muted,
+			poster,
+			preload,
+			src,
+		} = this.props.attributes;
 		const { setAttributes, isSelected, className, noticeOperations, noticeUI } = this.props;
 		const { editing } = this.state;
 		const switchToEditing = () => {
@@ -160,6 +191,26 @@ class VideoEdit extends Component {
 								{ value: 'none', label: __( 'None' ) },
 							] }
 						/>
+						<BaseControl
+							className="editor-video-poster-control"
+							label={ __( 'Poster Image' ) }
+						>
+							<MediaUpload
+								title={ __( 'Select Poster Image' ) }
+								onSelect={ this.onSelectPoster }
+								type="image"
+								render={ ( { open } ) => (
+									<Button isDefault onClick={ open }>
+										{ ! this.props.attributes.poster ? __( 'Select Poster Image' ) : __( 'Replace image' ) }
+									</Button>
+								) }
+							/>
+							{ !! this.props.attributes.poster &&
+								<Button onClick={ this.onRemovePoster } isLink isDestructive>
+									{ __( 'Remove Poster Image' ) }
+								</Button>
+							}
+						</BaseControl>
 					</PanelBody>
 				</InspectorControls>
 				<figure className={ className }>
@@ -168,7 +219,12 @@ class VideoEdit extends Component {
 						video when the controls are enabled.
 					*/ }
 					<Disabled>
-						<video controls={ controls } src={ src } />
+						<video
+							controls={ controls }
+							poster={ poster }
+							src={ src }
+							ref={ this.videoPlayer }
+						/>
 					</Disabled>
 					{ ( ( caption && caption.length ) || !! isSelected ) && (
 						<RichText
