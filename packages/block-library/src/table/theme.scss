@@ -4,7 +4,9 @@
 	border-collapse: collapse;
 	width: 100%;
 
-	tbody {
+	thead,
+	tbody,
+	tfoot {
 		width: 100%;
 		min-width: $break-mobile / 2;
 	}
