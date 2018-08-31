@@ -65,12 +65,14 @@ export function initializeEditor( id, postType, postId, settings, initialEdits )
 		'core/editor.publish',
 	] );
 
-	if ( initialEdits ) {
-		dispatch( 'core/editor' ).editPost( initialEdits, { quiet: true } );
-	}
-
 	render(
-		<Editor settings={ settings } onError={ reboot } postId={ postId } postType={ postType } />,
+		<Editor
+			settings={ settings }
+			onError={ reboot }
+			postId={ postId }
+			postType={ postType }
+			initialEdits={ initialEdits }
+		/>,
 		target
 	);
 
