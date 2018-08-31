@@ -6,7 +6,6 @@ import {
 	flowRight,
 	without,
 	mapValues,
-	overEvery,
 	get,
 } from 'lodash';
 
@@ -167,8 +166,37 @@ export function createRegistry( storeConfigs = {} ) {
 	 */
 	function registerSelectors( reducerKey, newSelectors ) {
 		const store = namespaces[ reducerKey ].store;
-		const createStateSelector = ( selector ) => ( ...args ) => selector( store.getState(), ...args );
-		namespaces[ reducerKey ].selectors = mapValues( newSelectors, createStateSelector );
+		const createStateSelector = ( selector, selectorName ) => ( ...args ) => {
+			const { hasStartedResolution } = select( 'core/data' );
+			const { startResolution, finishResolution } = dispatch( 'core/data' );
+			const state = store.getState();
+
+			async function fulfillSelector() {
+				// Don't modify selector behavior if no resolver exists.
+				const resolver = get( namespaces, [ reducerKey, 'resolvers', selectorName ] );
+				if ( ! resolver ) {
+					return;
+				}
+
+				if ( typeof resolver.isFulfilled === 'function' && resolver.isFulfilled( state, ...args ) ) {
+					return;
+				}
+
+				if ( hasStartedResolution( reducerKey, selectorName, args ) ) {
+					return;
+				}
+
+				startResolution( reducerKey, selectorName, args );
+				await fulfill( reducerKey )[ selectorName ]( ...args );
+				finishResolution( reducerKey, selectorName, args );
+			}
+
+			fulfillSelector( ...args );
+			return selector( state, ...args );
+		};
+
+		namespaces[ reducerKey ].selectors =
+			mapValues( newSelectors, createStateSelector );
 	}
 
 	/**
@@ -181,72 +209,13 @@ export function createRegistry( storeConfigs = {} ) {
 	 * @param {Object} newResolvers Resolvers to register.
 	 */
 	function registerResolvers( reducerKey, newResolvers ) {
-		const { hasStartedResolution } = select( 'core/data' );
-		const { startResolution, finishResolution } = dispatch( 'core/data' );
-
-		const createResolver = ( selector, selectorName ) => {
-		// Don't modify selector behavior if no resolver exists.
-			if ( ! newResolvers.hasOwnProperty( selectorName ) ) {
-				return selector;
-			}
-
-			const store = namespaces[ reducerKey ].store;
-
-			// Normalize resolver shape to object.
-			let resolver = newResolvers[ selectorName ];
+		namespaces[ reducerKey ].resolvers = mapValues( newResolvers, ( resolver ) => {
 			if ( ! resolver.fulfill ) {
 				resolver = { fulfill: resolver };
 			}
 
-			async function fulfill( ...args ) {
-				if ( hasStartedResolution( reducerKey, selectorName, args ) ) {
-					return;
-				}
-
-				startResolution( reducerKey, selectorName, args );
-
-				// At this point, selectors have already been pre-bound to inject
-				// state, it would not be otherwise provided to fulfill.
-				const state = store.getState();
-
-				let fulfillment = resolver.fulfill( state, ...args );
-
-				// Attempt to normalize fulfillment as async iterable.
-				fulfillment = toAsyncIterable( fulfillment );
-				if ( ! isAsyncIterable( fulfillment ) ) {
-					finishResolution( reducerKey, selectorName, args );
-					return;
-				}
-
-				for await ( const maybeAction of fulfillment ) {
-					// Dispatch if it quacks like an action.
-					if ( isActionLike( maybeAction ) ) {
-						store.dispatch( maybeAction );
-					}
-				}
-
-				finishResolution( reducerKey, selectorName, args );
-			}
-
-			if ( typeof resolver.isFulfilled === 'function' ) {
-			// When resolver provides its own fulfillment condition, fulfill
-			// should only occur if not already fulfilled (opt-out condition).
-				fulfill = overEvery( [
-					( ...args ) => {
-						const state = store.getState();
-						return ! resolver.isFulfilled( state, ...args );
-					},
-					fulfill,
-				] );
-			}
-
-			return ( ...args ) => {
-				fulfill( ...args );
-				return selector( ...args );
-			};
-		};
-
-		namespaces[ reducerKey ].selectors = mapValues( namespaces[ reducerKey ].selectors, createResolver );
+			return resolver;
+		} );
 	}
 
 	/**
@@ -320,6 +289,42 @@ export function createRegistry( storeConfigs = {} ) {
 	}
 
 	/**
+	 * Calls a resolver given  arguments
+	 *
+	 * @param {string} reducerKey Part of the state shape to register the
+	 *                            selectors for.
+	 *
+	 * @return {*} The selector's returned value.
+	 */
+	function fulfill( reducerKey ) {
+		return mapValues(
+			get( namespaces, [ reducerKey, 'resolvers' ] ),
+			( resolver ) => async ( ...args ) => {
+				const store = namespaces[ reducerKey ].store;
+
+				// At this point, selectors have already been pre-bound to inject
+				// state, it would not be otherwise provided to fulfill.
+				const state = store.getState();
+
+				let fulfillment = resolver.fulfill( state, ...args );
+
+				// Attempt to normalize fulfillment as async iterable.
+				fulfillment = toAsyncIterable( fulfillment );
+				if ( ! isAsyncIterable( fulfillment ) ) {
+					return;
+				}
+
+				for await ( const maybeAction of fulfillment ) {
+					// Dispatch if it quacks like an action.
+					if ( isActionLike( maybeAction ) ) {
+						store.dispatch( maybeAction );
+					}
+				}
+			}
+		);
+	}
+
+	/**
 	 * Returns the available actions for a part of the state.
 	 *
 	 * @param {string} reducerKey Part of the state shape to dispatch the
@@ -354,6 +359,7 @@ export function createRegistry( storeConfigs = {} ) {
 		registerStore,
 		subscribe,
 		select,
+		fulfill,
 		dispatch,
 		use,
 	};

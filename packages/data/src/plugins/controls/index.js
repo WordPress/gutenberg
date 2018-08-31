@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { applyMiddleware } from 'redux';
+import { get, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -25,6 +26,15 @@ export default function( registry ) {
 			}
 
 			return store;
+		},
+
+		fulfill( reducerKey ) {
+			return mapValues(
+				get( registry.namespaces, [ reducerKey, 'resolvers' ] ),
+				( resolver ) => async ( ...args ) => (
+					await registry.namespaces[ reducerKey ].store.dispatch( resolver( ...args ) )
+				)
+			);
 		},
 	};
 }
