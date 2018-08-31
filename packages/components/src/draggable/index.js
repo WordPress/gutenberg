@@ -17,7 +17,7 @@ const cloneHeightTransformationBreakpoint = 700;
 const clonePadding = 20;
 
 const isChromeUA = ( ) => /Chrome/.test( window.navigator.userAgent );
-const documentHasIframes = ( ) => [ ...document.body.querySelectorAll( 'iframe' ) ].length > 0;
+const documentHasIframes = ( ) => [ ...document.getElementById( 'editor' ).querySelectorAll( 'iframe' ) ].length > 0;
 
 class Draggable extends Component {
 	constructor() {
