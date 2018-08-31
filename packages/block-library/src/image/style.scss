@@ -38,6 +38,11 @@
 		margin-left: 1em;
 	}
 
+	// Centered images.
+	.aligncenter {
+		margin: 0 auto;
+	}
+
 	// Supply caption styles to images, even if the theme hasn't opted in.
 	// Reason being: the new markup, <figcaptions>, are not likely to be styled in the majority of existing themes,
 	// so we supply the styles so as to not appear broken or unstyled in those themes.
