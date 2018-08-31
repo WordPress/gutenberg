@@ -28,52 +28,75 @@ function computeDerivedState( props ) {
 	};
 }
 
-class PostTextEditor extends Component {
-	constructor() {
+export class PostTextEditor extends Component {
+	constructor( props ) {
 		super( ...arguments );
 
-		this.startEditing = this.startEditing.bind( this );
 		this.edit = this.edit.bind( this );
 		this.stopEditing = this.stopEditing.bind( this );
 
-		this.state = {
-			value: null,
-			isDirty: false,
-		};
+		this.state = computeDerivedState( props );
 	}
 
 	static getDerivedPropsFromState( props, state ) {
 		// If we receive a new value while we're editing (but before we've made
 		// changes), go ahead and clobber the local state
-		if ( state.persistedValue !== props.value && ! state.isDirty ) {
+		const isReceivingNewNonConflictingPropsValue = (
+			state.persistedValue !== props.value &&
+			! state.isDirty
+		);
+
+		// While editing text, value is maintained in state. Prefer this value,
+		// deferring to the incoming prop only if not editing (value `null`).
+		// It is not necessary to compare to a previous state value because the
+		// null state value will be immediately replaced with the props value.
+		// Therefore, state value is effectively never assigned as null.
+		const hasStoppedEditing = state.value === null;
+
+		if ( isReceivingNewNonConflictingPropsValue || hasStoppedEditing ) {
 			return computeDerivedState( props );
 		}
 
 		return null;
 	}
 
-	startEditing() {
-		// Copying the post content into local state ensures that edits won't be
-		// clobbered by changes to global editor state
-		this.setState( { value: this.props.value } );
-	}
-
+	/**
+	 * Handles a textarea change event to notify the onChange prop callback and
+	 * reflect the new value in the component's own state. This marks the start
+	 * of the user's edits, if not already changed, preventing future props
+	 * changes to value from replacing the rendered value. This is expected to
+	 * be followed by a reset to editing state via `stopEditing`.
+	 *
+	 * @see stopEditing
+	 *
+	 * @param {Event} event Change event.
+	 */
 	edit( event ) {
 		const value = event.target.value;
 		this.props.onChange( value );
 		this.setState( { value, isDirty: true } );
 	}
 
+	/**
+	 * Function called when the user has completed their edits, responsible for
+	 * ensuring that changes, if made, are surfaced to the onPersist prop
+	 * callback and resetting editing state.
+	 */
 	stopEditing() {
 		if ( this.state.isDirty ) {
 			this.props.onPersist( this.state.value );
 		}
 
-		this.setState( { value: null, isDirty: false } );
+		// Other state values will be reset as a result of the subsequent call
+		// to getDerivedPropsFromState on this state change.
+		//
+		// See: getDerivedPropsFromState (hasStoppedEditing)
+		this.setState( { value: null } );
 	}
 
 	render() {
-		const { value, placeholder, instanceId } = this.props;
+		const { value } = this.state;
+		const { placeholder, instanceId } = this.props;
 		const decodedPlaceholder = decodeEntities( placeholder );
 
 		return (
@@ -83,8 +106,7 @@ class PostTextEditor extends Component {
 				</label>
 				<Textarea
 					autoComplete="off"
-					value={ this.state.value || value }
-					onFocus={ this.startEditing }
+					value={ value }
 					onChange={ this.edit }
 					onBlur={ this.stopEditing }
 					className="editor-post-text-editor"
