@@ -20,7 +20,7 @@ import {
 	MediaPlaceholder,
 	MediaUpload,
 	RichText,
-	editorMediaUpload,
+	mediaUpload,
 } from '@wordpress/editor';
 import { getBlobByURL } from '@wordpress/blob';
 
@@ -46,7 +46,7 @@ class VideoEdit extends Component {
 		if ( ! id && src.indexOf( 'blob:' ) === 0 ) {
 			const file = getBlobByURL( src );
 			if ( file ) {
-				editorMediaUpload( {
+				mediaUpload( {
 					filesList: [ file ],
 					onFileChange: ( [ { url } ] ) => {
 						setAttributes( { src: url } );
