@@ -327,7 +327,7 @@
 	}
 
 	&.has-warning.is-selected .editor-block-list__block-edit::after {
-		bottom: ( $block-toolbar-height - $block-padding - 1px );
+		bottom: ( $block-toolbar-height - $block-padding - $border-width );
 
 		@include break-small() {
 			bottom: -$block-padding;
