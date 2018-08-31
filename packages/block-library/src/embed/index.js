@@ -188,10 +188,10 @@ export function getEmbedEdit( title, icon ) {
 				);
 			}
 
+			// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
 			const label = sprintf( __( '%s URL' ), title );
 
 			if ( ! preview || previewIsFallback || editingURL ) {
-				// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
 				return (
 					<Placeholder icon={ <BlockIcon icon={ icon } showColors /> } label={ label } className="wp-block-embed">
 						<form onSubmit={ this.setUrl }>
