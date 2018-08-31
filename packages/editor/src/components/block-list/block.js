@@ -564,7 +564,7 @@ export class BlockListBlock extends Component {
 					) }
 					{ !! error && <BlockCrashWarning /> }
 				</IgnoreNestedEvents>
-				{ showEmptyBlockSideInserter && (
+				{ showEmptyBlockSideInserter && isValid && (
 					<Fragment>
 						<div className="editor-block-list__side-inserter">
 							<InserterWithShortcuts
