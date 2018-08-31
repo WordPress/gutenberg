@@ -36,11 +36,12 @@ export class BlockInvalidWarning extends Component {
 	}
 
 	render() {
-		const { convertToHTML, convertToBlocks, convertToClassic, block } = this.props;
+		const { convertToHTML, convertToBlocks, convertToClassic, overwriteBlock, block } = this.props;
 		const hasHTMLBlock = !! getBlockType( 'core/html' );
 		const { compare } = this.state;
 		const hiddenActions = [
 			{ title: __( 'Convert to Classic Block' ), onClick: convertToClassic },
+			{ title: __( 'Overwrite with Valid Block' ), onCLick: overwriteBlock },
 		];
 
 		if ( compare ) {
@@ -96,6 +97,7 @@ const blockToHTML = ( block ) => createBlock( 'core/html', {
 const blockToBlocks = ( block ) => rawHandler( {
 	HTML: block.originalContent,
 } );
+const blockOverwrite = ( { name, attributes } ) => createBlock( name, attributes );
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => ( {
@@ -113,6 +115,9 @@ export default compose( [
 			},
 			convertToBlocks() {
 				replaceBlock( block.clientId, blockToBlocks( block ) );
+			},
+			overwriteBlock() {
+				replaceBlock( block.clientId, blockOverwrite( block ) );
 			},
 		};
 	} ),
