@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import isGenerator from './is-generator';
+import createRuntime from './runtime';
 
 /**
  * Creates a Redux middleware, given an object of controls where each key is an
@@ -11,15 +12,19 @@ import isGenerator from './is-generator';
  * value of the yield assignment. If the control handler returns undefined, the
  * execution is not continued.
  *
- * @param {Object} runtime Object of control handlers.
+ * @param {Object}    controls Object of control handlers.
  *
  * @return {Function} Co-routine runtime
  */
-export default function createMiddleware( runtime ) {
-	return ( store ) => ( next ) => ( action ) => {
-		if ( ! isGenerator( action ) ) {
-			return next( action );
-		}
-		runtime( action, store.dispatch );
+export default function createMiddleware( controls = {} ) {
+	return ( store ) => {
+		const runtime = createRuntime( controls, store.dispatch );
+		return ( next ) => ( action ) => {
+			if ( ! isGenerator( action ) ) {
+				return next( action );
+			}
+
+			return runtime( action );
+		};
 	};
 }

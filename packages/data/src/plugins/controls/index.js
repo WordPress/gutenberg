@@ -6,7 +6,7 @@ import { applyMiddleware } from 'redux';
 /**
  * WordPress dependencies
  */
-import { createMiddleware, createRuntime } from '@wordpress/redux-routine';
+import createMiddleware from '@wordpress/redux-routine';
 
 export default function( registry ) {
 	return {
@@ -14,8 +14,7 @@ export default function( registry ) {
 			const store = registry.registerStore( reducerKey, options );
 
 			if ( options.controls ) {
-				const runtime = createRuntime( options.controls );
-				const middleware = createMiddleware( runtime );
+				const middleware = createMiddleware( options.controls );
 				const enhancer = applyMiddleware( middleware );
 				const createStore = () => store;
 

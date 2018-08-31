@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+import { create } from 'rungen';
+import { map, isString } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import castError from './cast-error';
@@ -7,39 +13,46 @@ import castError from './cast-error';
  * Create a co-routine runtime.
  *
  * @param {Object}    controls Object of control handlers.
+ * @param {function}  dispatch Unhandled action dispatch.
  *
  * @return {function} co-routine runtime
  */
-export default function createRuntime( controls = {} ) {
-	function step( generator, nextAction, dispatch ) {
-		if ( ! nextAction ) {
-			return;
+export default function createRuntime( controls = {}, dispatch ) {
+	const rungenControls = map( controls, ( control, actionType ) => ( value, next, iterate, yieldNext, yieldError ) => {
+		if ( typeof value !== 'object' || value.type !== actionType ) {
+			return false;
 		}
-
-		const control = controls[ nextAction.type ];
-		if ( typeof control === 'function' ) {
-			const routine = control( nextAction );
-
-			if ( routine instanceof Promise ) {
-				// Async control routine awaits resolution.
-				routine.then(
-					( result ) => step( generator, generator.next( result ).value, dispatch ),
-					( error ) => generator.throw( castError( error ) ),
-				);
-			} else if ( routine !== undefined ) {
-				// Sync control routine steps synchronously.
-				step( generator, generator.next( routine ).value, dispatch );
-			}
+		const routine = control( value );
+		if ( routine instanceof Promise ) {
+			// Async control routine awaits resolution.
+			routine.then(
+				next,
+				( error ) => yieldError( castError( error ) ),
+			);
 		} else {
-			// Uncontrolled action is dispatched.
-			dispatch( nextAction );
-			step( generator, generator.next().value, dispatch );
+			next( routine );
 		}
-	}
+		return true;
+	} );
 
-	return ( generator, dispatch ) => step(
-		generator,
-		generator.next().value,
-		dispatch
+	const unhandledActionControl = ( value, next ) => {
+		if ( typeof value !== 'object' || ! isString( value.type ) ) {
+			return false;
+		}
+		dispatch( value );
+		next();
+		return true;
+	};
+	rungenControls.push( unhandledActionControl );
+
+	const rungenRuntime = create( rungenControls );
+
+	return ( action ) => new Promise( ( resolve, reject ) =>
+		rungenRuntime( action, ( result ) => {
+			if ( typeof result === 'object' && isString( result.type ) ) {
+				dispatch( result );
+			}
+			resolve( result );
+		}, reject )
 	);
 }
