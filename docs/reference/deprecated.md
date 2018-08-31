@@ -1,5 +1,9 @@
 Gutenberg's deprecation policy is intended to support backwards-compatibility for two minor releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
 
+## 4.0.0
+
+- `wp.components.RichTextProvider` has been removed. Please use `wp.data.select( 'core/editor' )` methods instead.
+
 ## 3.9.0
 
 - RichText `getSettings` prop has been removed. The `unstableGetSettings` prop is available if continued use is required. Unstable APIs are strongly discouraged to be used, and are subject to removal without notice.
