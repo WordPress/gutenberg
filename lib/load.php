@@ -29,9 +29,10 @@ require dirname( __FILE__ ) . '/client-assets.php';
 require dirname( __FILE__ ) . '/compat.php';
 require dirname( __FILE__ ) . '/plugin-compat.php';
 require dirname( __FILE__ ) . '/i18n.php';
-require dirname( __FILE__ ) . '/parser.php';
 require dirname( __FILE__ ) . '/register.php';
 
+// Load default block parser for server-side parsing.
+require dirname( __FILE__ ) . '/../packages/block-serialization-default-parser/parser.php';
 
 // Register server-side code for individual blocks.
 foreach ( glob( dirname( __FILE__ ) . '/../block-library/*/index.php' ) as $block_logic ) {
