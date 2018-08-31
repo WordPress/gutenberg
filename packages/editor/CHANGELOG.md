@@ -14,3 +14,7 @@
 - `isFetchingSharedBlock` selector has been removed. Use `isFetchingReusableBlock` instead.
 - `getSharedBlocks` selector has been removed. Use `getReusableBlocks` instead.
 - `editorMediaUpload` has been removed. Use `mediaUpload` instead.
+
+### Deprecation
+
+- `wp.editor.RichTextProvider` flagged for deprecation. Please use `wp.data.select( 'core/editor' )` methods instead.
