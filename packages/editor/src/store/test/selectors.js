@@ -2931,31 +2931,6 @@ describe( 'selectors', () => {
 			} );
 		} );
 
-		it( 'defers to returning an edited post attribute', () => {
-			const block = createBlock( 'core/block' );
-
-			const state = {
-				editor: {
-					present: {
-						blockOrder: {
-							'': [ block.clientId ],
-						},
-						blocksByClientId: {
-							[ block.clientId ]: block,
-						},
-						edits: {
-							content: 'custom edit',
-						},
-					},
-				},
-				currentPost: {},
-			};
-
-			const content = getEditedPostContent( state );
-
-			expect( content ).toBe( 'custom edit' );
-		} );
-
 		it( 'returns serialization of blocks', () => {
 			const block = createBlock( 'core/block' );
 

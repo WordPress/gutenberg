@@ -9,7 +9,6 @@ import Textarea from 'react-autosize-textarea';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { Component, Fragment } from '@wordpress/element';
-import { parse } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 
@@ -97,13 +96,13 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, resetBlocks } = dispatch( 'core/editor' );
+		const { editPost } = dispatch( 'core/editor' );
 		return {
 			onChange( content ) {
-				editPost( { content } );
+				editPost( { content }, { skipContentParse: true } );
 			},
 			onPersist( content ) {
-				resetBlocks( parse( content ) );
+				editPost( { content }, { skipContentParse: false } );
 			},
 		};
 	} ),

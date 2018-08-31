@@ -23,18 +23,17 @@ import Editor from './editor';
  * an unhandled error occurs, replacing previously mounted editor element using
  * an initial state from prior to the crash.
  *
- * @param {Object}  postType       Post type of the post to edit.
- * @param {Object}  postId         ID of the post to edit.
- * @param {Element} target         DOM node in which editor is rendered.
- * @param {?Object} settings       Editor settings object.
- * @param {Object}  overridePost   Post properties to override.
+ * @param {Object}  postType Post type of the post to edit.
+ * @param {Object}  postId   ID of the post to edit.
+ * @param {Element} target   DOM node in which editor is rendered.
+ * @param {?Object} settings Editor settings object.
  */
-export function reinitializeEditor( postType, postId, target, settings, overridePost ) {
+export function reinitializeEditor( postType, postId, target, settings ) {
 	unmountComponentAtNode( target );
-	const reboot = reinitializeEditor.bind( null, postType, postId, target, settings, overridePost );
+	const reboot = reinitializeEditor.bind( null, postType, postId, target, settings );
 
 	render(
-		<Editor settings={ settings } onError={ reboot } postId={ postId } postType={ postType } overridePost={ overridePost } recovery />,
+		<Editor settings={ settings } onError={ reboot } postId={ postId } postType={ postType } recovery />,
 		target
 	);
 }
@@ -45,17 +44,17 @@ export function reinitializeEditor( postType, postId, target, settings, override
  * The return value of this function is not necessary if we change where we
  * call initializeEditor(). This is due to metaBox timing.
  *
- * @param {string}  id            Unique identifier for editor instance.
- * @param {Object}  postType      Post type of the post to edit.
- * @param {Object}  postId        ID of the post to edit.
- * @param {?Object} settings      Editor settings object.
- * @param {Object}  overridePost  Post properties to override.
+ * @param {string}  id           Unique identifier for editor instance.
+ * @param {Object}  postType     Post type of the post to edit.
+ * @param {Object}  postId       ID of the post to edit.
+ * @param {?Object} settings     Editor settings object.
+ * @param {Object}  initialEdits Post properties to override.
  *
  * @return {Object} Editor interface.
  */
-export function initializeEditor( id, postType, postId, settings, overridePost ) {
+export function initializeEditor( id, postType, postId, settings, initialEdits ) {
 	const target = document.getElementById( id );
-	const reboot = reinitializeEditor.bind( null, postType, postId, target, settings, overridePost );
+	const reboot = reinitializeEditor.bind( null, postType, postId, target, settings );
 
 	registerCoreBlocks();
 
@@ -66,8 +65,12 @@ export function initializeEditor( id, postType, postId, settings, overridePost )
 		'core/editor.publish',
 	] );
 
+	if ( initialEdits ) {
+		dispatch( 'core/editor' ).editPost( initialEdits, { quiet: true } );
+	}
+
 	render(
-		<Editor settings={ settings } onError={ reboot } postId={ postId } postType={ postType } overridePost={ overridePost } />,
+		<Editor settings={ settings } onError={ reboot } postId={ postId } postType={ postType } />,
 		target
 	);
 

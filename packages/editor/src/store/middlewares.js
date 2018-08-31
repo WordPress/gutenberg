@@ -9,6 +9,9 @@ import { flowRight } from 'lodash';
  * Internal dependencies
  */
 import effects from './effects';
+import syncBlocksToContent from './middlewares/sync-blocks-to-content';
+
+// TODO: Move this file contents to ./middlewares/index.js
 
 /**
  * Applies the custom middlewares used specifically in the editor module.
@@ -21,6 +24,7 @@ function applyMiddlewares( store ) {
 	const middlewares = [
 		refx( effects ),
 		multi,
+		syncBlocksToContent,
 	];
 
 	let enhancedDispatch = () => {

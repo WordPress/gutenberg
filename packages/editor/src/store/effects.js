@@ -1,28 +1,24 @@
 /**
  * External dependencies
  */
-import { compact, last } from 'lodash';
+import { last } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import {
-	parse,
 	getBlockType,
 	switchToBlockType,
 	doBlocksMatchTemplate,
 	synchronizeBlocksWithTemplate,
 } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
 import {
-	setupEditorState,
 	replaceBlocks,
-	createWarningNotice,
 	selectBlock,
 	resetBlocks,
 	setTemplateValidity,
@@ -52,7 +48,6 @@ import {
 	trashPost,
 	trashPostFailure,
 	refreshPost,
-	AUTOSAVE_POST_NOTICE_ID,
 } from './effects/posts';
 
 /**
@@ -144,63 +139,17 @@ export default {
 			]
 		) );
 	},
-	SETUP_EDITOR( action, store ) {
-		const { post, autosave } = action;
-		const state = store.getState();
-
-		// Parse content as blocks
-		let blocks = parse( post.content.raw );
-
-		// Apply a template for new posts only, if exists.
-		const isNewPost = post.status === 'auto-draft';
-		const template = getTemplate( state );
-		if ( isNewPost && template ) {
-			blocks = synchronizeBlocksWithTemplate( blocks, template );
-		}
-
-		// Include auto draft title in edits while not flagging post as dirty
-		const edits = {};
-		if ( isNewPost ) {
-			edits.title = post.title.raw;
-		}
-
-		// Check the auto-save status
-		let autosaveAction;
-		if ( autosave ) {
-			const noticeMessage = __( 'There is an autosave of this post that is more recent than the version below.' );
-			autosaveAction = createWarningNotice(
-				<p>
-					{ noticeMessage }
-					{ ' ' }
-					<a href={ autosave.editLink }>{ __( 'View the autosave' ) }</a>
-				</p>,
-				{
-					id: AUTOSAVE_POST_NOTICE_ID,
-					spokenMessage: noticeMessage,
-				}
-			);
-		}
-
-		const setupAction = setupEditorState( post, blocks, edits );
-
-		return compact( [
-			setupAction,
-			autosaveAction,
-
-			// TODO: This is temporary, necessary only so long as editor setup
-			// is a separate action from block resetting.
-			//
-			// See: https://github.com/WordPress/gutenberg/pull/9403
-			validateBlocksToTemplate( setupAction, store ),
-		] );
-	},
 	RESET_BLOCKS: [
 		validateBlocksToTemplate,
 	],
 	SYNCHRONIZE_TEMPLATE( action, { getState } ) {
 		const state = getState();
-		const blocks = getBlocks( state );
 		const template = getTemplate( state );
+		if ( ! template ) {
+			return;
+		}
+
+		const blocks = getBlocks( state );
 		const updatedBlockList = synchronizeBlocksWithTemplate( blocks, template );
 
 		return resetBlocks( updatedBlockList );

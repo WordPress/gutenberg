@@ -10,6 +10,7 @@ import { compose } from '@wordpress/compose';
 import { createElement, Component } from '@wordpress/element';
 import { DropZoneProvider, SlotFillProvider } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -21,10 +22,38 @@ class EditorProvider extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
-		// Assume that we don't need to initialize in the case of an error recovery.
-		if ( ! props.recovery ) {
-			this.props.updateEditorSettings( props.settings );
-			this.props.setupEditor( props.post, props.settings.autosave );
+		// Assume that we don't need to initialize in the case of an error
+		// recovery.
+		//
+		// TODO: Check to see whether we would ever expect constructor to be
+		// called even in case of recovery. In recovery, wouldn't the same
+		// Provider be reused? Suspected dead code.
+		if ( props.recovery ) {
+			return;
+		}
+
+		props.updateEditorSettings( props.settings );
+		props.resetPost( props.post );
+
+		const isNewPost = props.post.status === 'auto-draft';
+		if ( isNewPost ) {
+			props.synchronizeTemplate();
+		}
+
+		const { autosave } = props.settings;
+		if ( autosave ) {
+			const noticeMessage = __( 'There is an autosave of this post that is more recent than the version below.' );
+			props.createWarningNotice(
+				<p>
+					{ noticeMessage }
+					{ ' ' }
+					<a href={ autosave.editLink }>{ __( 'View the autosave' ) }</a>
+				</p>,
+				{
+					id: 'autosave-exists',
+					spokenMessage: noticeMessage,
+				}
+			);
 		}
 	}
 
@@ -106,17 +135,21 @@ class EditorProvider extends Component {
 
 export default withDispatch( ( dispatch ) => {
 	const {
-		setupEditor,
+		resetPost,
+		createWarningNotice,
 		updateEditorSettings,
 		undo,
 		redo,
 		createUndoLevel,
+		synchronizeTemplate,
 	} = dispatch( 'core/editor' );
 	return {
-		setupEditor,
+		resetPost,
+		createWarningNotice,
 		undo,
 		redo,
 		createUndoLevel,
 		updateEditorSettings,
+		synchronizeTemplate,
 	};
 } )( EditorProvider );

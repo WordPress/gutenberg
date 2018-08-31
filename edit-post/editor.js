@@ -15,7 +15,6 @@ function Editor( {
 	hasFixedToolbar,
 	focusMode,
 	post,
-	overridePost,
 	onError,
 	...props
 } ) {
@@ -33,7 +32,7 @@ function Editor( {
 		<StrictMode>
 			<EditorProvider
 				settings={ editorSettings }
-				post={ { ...post, ...overridePost } }
+				post={ post }
 				{ ...props }
 			>
 				<ErrorBoundary onError={ onError }>

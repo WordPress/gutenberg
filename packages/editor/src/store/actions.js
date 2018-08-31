@@ -23,6 +23,12 @@ import deprecated from '@wordpress/deprecated';
  * @return {Object} Action object.
  */
 export function setupEditor( post, autosaveStatus ) {
+	deprecated( 'setupEditor', {
+		version: '4.0',
+		plugin: 'Gutenberg',
+		hint: 'An editor is kept in sync automatically by its post state, without a predefined start point.',
+	} );
+
 	return {
 		type: 'SETUP_EDITOR',
 		autosave: autosaveStatus,
@@ -85,6 +91,12 @@ export function updatePost( edits ) {
  * @return {Object} Action object.
  */
 export function setupEditorState( post, blocks, edits ) {
+	deprecated( 'setupEditorState', {
+		version: '4.0',
+		plugin: 'Gutenberg',
+		hint: 'An editor is kept in sync automatically by its post state, without a predefined start point.',
+	} );
+
 	return {
 		type: 'SETUP_EDITOR_STATE',
 		post,
@@ -398,10 +410,23 @@ export function synchronizeTemplate() {
 	};
 }
 
-export function editPost( edits ) {
+/**
+ * Returns an action object used in signalling that attributes of the post have
+ * been edited.
+ *
+ * @param {Object}   edits         Post attributes to edit.
+ * @param {?Object}  options       Options for editing.
+ * @param {?boolean} options.quiet Whether edit is triggered programmatically,
+ *                                 contrasted with explicit user interaction,
+ *                                 to bypass change detection and undo history.
+ *
+ * @return {Object} Action object.
+ */
+export function editPost( edits, options = {} ) {
 	return {
 		type: 'EDIT_POST',
 		edits,
+		options,
 	};
 }
 

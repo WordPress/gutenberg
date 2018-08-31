@@ -215,22 +215,22 @@ export const editor = flow( [
 
 	// Track undo history, starting at editor initialization.
 	withHistory( {
-		resetTypes: [ 'SETUP_EDITOR_STATE' ],
-		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
+		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'RESET_BLOCKS', 'UPDATE_POST' ],
+		isIgnored: ( action ) => !! ( action.options && action.options.quiet ),
 		shouldOverwriteState,
 	} ),
 
 	// Track whether changes exist, resetting at each post save. Relies on
 	// editor initialization firing post reset as an effect.
 	withChangeDetection( {
-		resetTypes: [ 'SETUP_EDITOR_STATE', 'REQUEST_POST_UPDATE_START' ],
-		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
+		resetTypes: [ 'REQUEST_POST_UPDATE_START' ],
+		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'RESET_BLOCKS', 'UPDATE_POST' ],
+		isIgnored: ( action ) => !! ( action.options && action.options.quiet ),
 	} ),
 ] )( {
 	edits( state = {}, action ) {
 		switch ( action.type ) {
 			case 'EDIT_POST':
-			case 'SETUP_EDITOR_STATE':
 				return reduce( action.edits, ( result, value, key ) => {
 					// Only assign into result if not already same value
 					if ( value !== state[ key ] ) {
@@ -245,13 +245,6 @@ export const editor = flow( [
 
 					return result;
 				}, state );
-
-			case 'RESET_BLOCKS':
-				if ( 'content' in state ) {
-					return omit( state, 'content' );
-				}
-
-				return state;
 
 			case 'DIRTY_ARTIFICIALLY':
 				return { ...state };
@@ -282,7 +275,6 @@ export const editor = flow( [
 	blocksByClientId( state = {}, action ) {
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
-			case 'SETUP_EDITOR_STATE':
 				return getFlattenedBlocks( action.blocks );
 
 			case 'RECEIVE_BLOCKS':
@@ -406,7 +398,6 @@ export const editor = flow( [
 	blockOrder( state = {}, action ) {
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
-			case 'SETUP_EDITOR_STATE':
 				return mapBlockOrder( action.blocks );
 
 			case 'RECEIVE_BLOCKS':
@@ -545,7 +536,6 @@ export const editor = flow( [
  */
 export function currentPost( state = {}, action ) {
 	switch ( action.type ) {
-		case 'SETUP_EDITOR_STATE':
 		case 'RESET_POST':
 		case 'UPDATE_POST':
 			let post;

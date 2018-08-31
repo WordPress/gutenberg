@@ -11,7 +11,6 @@ import {
 	convertBlockToStatic,
 	convertBlockToReusable,
 	toggleSelection,
-	setupEditor,
 	resetPost,
 	resetBlocks,
 	updateBlockAttributes,
@@ -45,19 +44,6 @@ import {
 } from '../actions';
 
 describe( 'actions', () => {
-	describe( 'setupEditor', () => {
-		it( 'should return the SETUP_EDITOR action', () => {
-			const post = {};
-			const autosave = {};
-			const result = setupEditor( post, autosave );
-			expect( result ).toEqual( {
-				type: 'SETUP_EDITOR',
-				post,
-				autosave,
-			} );
-		} );
-	} );
-
 	describe( 'resetPost', () => {
 		it( 'should return the RESET_POST action', () => {
 			const post = {};
@@ -236,6 +222,17 @@ describe( 'actions', () => {
 			expect( editPost( edits ) ).toEqual( {
 				type: 'EDIT_POST',
 				edits,
+				options: {},
+			} );
+		} );
+
+		it( 'should return EDIT_POST action with options', () => {
+			const edits = { format: 'sample' };
+			const options = { quiet: true };
+			expect( editPost( edits, options ) ).toEqual( {
+				type: 'EDIT_POST',
+				edits,
+				options,
 			} );
 		} );
 	} );

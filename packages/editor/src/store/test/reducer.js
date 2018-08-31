@@ -1037,22 +1037,6 @@ describe( 'state', () => {
 				} );
 			} );
 
-			it( 'should save initial post state', () => {
-				const state = editor( undefined, {
-					type: 'SETUP_EDITOR_STATE',
-					edits: {
-						status: 'draft',
-						title: 'post title',
-					},
-					blocks: [],
-				} );
-
-				expect( state.present.edits ).toEqual( {
-					status: 'draft',
-					title: 'post title',
-				} );
-			} );
-
 			it( 'should omit content when resetting', () => {
 				// Use case: When editing in Text mode, we defer to content on
 				// the property, but we reset blocks by parse when switching
