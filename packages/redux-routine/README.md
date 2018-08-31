@@ -22,9 +22,9 @@ For example, consider a common case where we need to issue a network request. We
 
 ```js
 import { combineReducers, createStore, applyMiddleware } from 'redux';
-import createRoutineMiddleware from '@wordpress/redux-routine';
+import { createMiddleware, createRuntime }  from '@wordpress/redux-routine';
 
-const middleware = createRoutineMiddleware( {
+const runtime = createRuntime( {
 	async FETCH_JSON( action ) {
 		const response = await window.fetch( action.url );
 		return response.json();
@@ -39,6 +39,8 @@ function temperature( state = null, action ) {
 
 	return state;
 }
+
+const middleware = createMiddleware( runtime );
 
 const reducer = combineReducers( { temperature } );
 
@@ -57,9 +59,15 @@ request has completed does the action creator procede to return the `SET_TEMPERA
 
 ## API
 
-### `createMiddleware( controls: ?Object )`
+### `createRuntime( controls: ?Object ): runtime function`
 
-Create a Redux middleware, given an object of controls where each key is an action type for which to act upon, the value a function which returns either a promise which is to resolve when evaluation of the action should continue, or a value. The value or resolved promise value is assigned on the return value of the yield assignment. If the control handler returns undefined, the execution is not continued.
+Create a co-routine runtime, given an object of controls where each key is an action type for which to act upon, the value a function which returns either a promise which is to resolve when evaluation of the action should continue, or a value. The value or resolved promise value is assigned on the return value of the yield assignment. If the control handler returns undefined, the execution is not continued.
+
+The returned runtime is a function taking the generator to loop throught as a first argument and a callback function called with the unhandled actions as a second argument.
+
+### `createMiddleware( runtime: function )`
+
+Create a Redux middleware, given a co-routine runtime function created used the `createRuntime` API, this middleware passes all the generator actions through the runtime and dispatch any unhandled action to the redux store.
 
 ## Motivation
 

@@ -6,7 +6,8 @@ import { createStore, applyMiddleware } from 'redux';
 /**
  * Internal dependencies
  */
-import createMiddleware from '../';
+import createMiddleware from '../middleware';
+import createRuntime from '../runtime';
 
 describe( 'createMiddleware', () => {
 	function createStoreWithMiddleware( middleware ) {
@@ -15,7 +16,8 @@ describe( 'createMiddleware', () => {
 	}
 
 	it( 'should not alter dispatch flow of uncontrolled action', () => {
-		const middleware = createMiddleware();
+		const runtime = createRuntime();
+		const middleware = createMiddleware( runtime );
 		const store = createStoreWithMiddleware( middleware );
 
 		store.dispatch( { type: 'CHANGE', nextState: 1 } );
@@ -24,7 +26,8 @@ describe( 'createMiddleware', () => {
 	} );
 
 	it( 'should dispatch yielded actions', () => {
-		const middleware = createMiddleware();
+		const runtime = createRuntime();
+		const middleware = createMiddleware( runtime );
 		const store = createStoreWithMiddleware( middleware );
 		function* createAction() {
 			yield { type: 'CHANGE', nextState: 1 };
@@ -36,9 +39,10 @@ describe( 'createMiddleware', () => {
 	} );
 
 	it( 'should continue only once control condition resolves', ( done ) => {
-		const middleware = createMiddleware( {
+		const runtime = createRuntime( {
 			WAIT: () => new Promise( ( resolve ) => setTimeout( resolve, 0 ) ),
 		} );
+		const middleware = createMiddleware( runtime );
 		const store = createStoreWithMiddleware( middleware );
 		function* createAction() {
 			yield { type: 'WAIT' };
@@ -58,11 +62,12 @@ describe( 'createMiddleware', () => {
 	} );
 
 	it( 'should throw if promise rejects', ( done ) => {
-		const middleware = createMiddleware( {
+		const runtime = createRuntime( {
 			WAIT_FAIL: () => new Promise( ( resolve, reject ) => {
 				setTimeout( () => reject( 'Message' ), 0 );
 			} ),
 		} );
+		const middleware = createMiddleware( runtime );
 		const store = createStoreWithMiddleware( middleware );
 		function* createAction() {
 			try {
@@ -79,11 +84,12 @@ describe( 'createMiddleware', () => {
 	} );
 
 	it( 'should throw if promise throws', ( done ) => {
-		const middleware = createMiddleware( {
+		const runtime = createRuntime( {
 			WAIT_FAIL: () => new Promise( () => {
 				throw new Error( 'Message' );
 			} ),
 		} );
+		const middleware = createMiddleware( runtime );
 		const store = createStoreWithMiddleware( middleware );
 		function* createAction() {
 			try {
@@ -100,9 +106,10 @@ describe( 'createMiddleware', () => {
 	} );
 
 	it( 'assigns sync controlled return value into yield assignment', () => {
-		const middleware = createMiddleware( {
+		const runtime = createRuntime( {
 			RETURN_TWO: () => 2,
 		} );
+		const middleware = createMiddleware( runtime );
 		const store = createStoreWithMiddleware( middleware );
 		function* createAction() {
 			const nextState = yield { type: 'RETURN_TWO' };
@@ -115,13 +122,14 @@ describe( 'createMiddleware', () => {
 	} );
 
 	it( 'assigns async controlled return value into yield assignment', ( done ) => {
-		const middleware = createMiddleware( {
+		const runtime = createRuntime( {
 			WAIT: ( action ) => new Promise( ( resolve ) => {
 				setTimeout( () => {
 					resolve( action.value );
 				}, 0 );
 			} ),
 		} );
+		const middleware = createMiddleware( runtime );
 		const store = createStoreWithMiddleware( middleware );
 		function* createAction() {
 			const nextState = yield { type: 'WAIT', value: 2 };
@@ -140,9 +148,10 @@ describe( 'createMiddleware', () => {
 	} );
 
 	it( 'kills continuation if control returns undefined', () => {
-		const middleware = createMiddleware( {
-			KILL: () => {},
+		const runtime = createRuntime( {
+			KILL: () => { },
 		} );
+		const middleware = createMiddleware( runtime );
 		const store = createStoreWithMiddleware( middleware );
 		function* createAction() {
 			yield { type: 'KILL' };
