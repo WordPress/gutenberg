@@ -13,51 +13,25 @@ import { parse } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 
-/**
- * Returns the PostTextEditor state given a set of props.
- *
- * @param {Object} props Component props.
- *
- * @return {Object} State object.
- */
-function computeDerivedState( props ) {
-	return {
-		persistedValue: props.value,
-		value: props.value,
-		isDirty: false,
-	};
-}
-
 export class PostTextEditor extends Component {
-	constructor( props ) {
+	constructor() {
 		super( ...arguments );
 
 		this.edit = this.edit.bind( this );
 		this.stopEditing = this.stopEditing.bind( this );
 
-		this.state = computeDerivedState( props );
+		this.state = {};
 	}
 
-	static getDerivedPropsFromState( props, state ) {
-		// If we receive a new value while we're editing (but before we've made
-		// changes), go ahead and clobber the local state
-		const isReceivingNewNonConflictingPropsValue = (
-			state.persistedValue !== props.value &&
-			! state.isDirty
-		);
-
-		// While editing text, value is maintained in state. Prefer this value,
-		// deferring to the incoming prop only if not editing (value `null`).
-		// It is not necessary to compare to a previous state value because the
-		// null state value will be immediately replaced with the props value.
-		// Therefore, state value is effectively never assigned as null.
-		const hasStoppedEditing = state.value === null;
-
-		if ( isReceivingNewNonConflictingPropsValue || hasStoppedEditing ) {
-			return computeDerivedState( props );
+	static getDerivedStateFromProps( props, state ) {
+		if ( state.isDirty ) {
+			return null;
 		}
 
-		return null;
+		return {
+			value: props.value,
+			isDirty: false,
+		};
 	}
 
 	/**
@@ -65,7 +39,7 @@ export class PostTextEditor extends Component {
 	 * reflect the new value in the component's own state. This marks the start
 	 * of the user's edits, if not already changed, preventing future props
 	 * changes to value from replacing the rendered value. This is expected to
-	 * be followed by a reset to editing state via `stopEditing`.
+	 * be followed by a reset to dirty state via `stopEditing`.
 	 *
 	 * @see stopEditing
 	 *
@@ -80,18 +54,13 @@ export class PostTextEditor extends Component {
 	/**
 	 * Function called when the user has completed their edits, responsible for
 	 * ensuring that changes, if made, are surfaced to the onPersist prop
-	 * callback and resetting editing state.
+	 * callback and resetting dirty state.
 	 */
 	stopEditing() {
 		if ( this.state.isDirty ) {
 			this.props.onPersist( this.state.value );
+			this.setState( { isDirty: false } );
 		}
-
-		// Other state values will be reset as a result of the subsequent call
-		// to getDerivedPropsFromState on this state change.
-		//
-		// See: getDerivedPropsFromState (hasStoppedEditing)
-		this.setState( { value: null } );
 	}
 
 	render() {
