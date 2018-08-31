@@ -41,7 +41,7 @@ export class PostSavedState extends Component {
 	}
 
 	render() {
-		const { isNew, isScheduled, isPublished, isDirty, isSaving, isSaveable, onSave, isAutosaving } = this.props;
+		const { isNew, isScheduled, isPublished, isDirty, isSaving, isSaveable, onSave, isAutosaving, isPending } = this.props;
 		const { forceSavedMessage } = this.state;
 		if ( isSaving ) {
 			// TODO: Classes generation should be common across all return
@@ -83,7 +83,7 @@ export class PostSavedState extends Component {
 				icon="cloud-upload"
 				shortcut={ displayShortcut.primary( 's' ) }
 			>
-				{ __( 'Save Draft' ) }
+				{ isPending ? __( 'Save as Pending' ) : __( 'Save Draft' ) }
 			</IconButton>
 		);
 	}
@@ -100,6 +100,7 @@ export default compose( [
 			isEditedPostSaveable,
 			getCurrentPost,
 			isAutosavingPost,
+			getEditedPostAttribute,
 		} = select( 'core/editor' );
 		return {
 			post: getCurrentPost(),
@@ -110,6 +111,7 @@ export default compose( [
 			isSaving: forceIsSaving || isSavingPost(),
 			isSaveable: isEditedPostSaveable(),
 			isAutosaving: isAutosavingPost(),
+			isPending: 'pending' === getEditedPostAttribute( 'status' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
