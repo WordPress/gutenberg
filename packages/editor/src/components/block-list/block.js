@@ -547,13 +547,13 @@ export class BlockListBlock extends Component {
 							<BlockHtml clientId={ clientId } />
 						) }
 						{ ! isValid && [
-							<div key="invalid-preview">
-								{ getSaveElement( blockType, block.attributes ) }
-							</div>,
 							<BlockInvalidWarning
 								key="invalid-warning"
 								block={ block }
 							/>,
+							<div key="invalid-preview">
+								{ getSaveElement( blockType, block.attributes ) }
+							</div>,
 						] }
 					</BlockCrashBoundary>
 					{ shouldShowMobileToolbar && (
