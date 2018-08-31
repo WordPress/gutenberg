@@ -2,8 +2,6 @@
 	display: inline-block;
 	border-radius: 4px;
 	margin: 0;
-	width: 24px;
-	height: 24px;
 
 	&.has-colors {
 		svg {
@@ -11,15 +9,8 @@
 		}
 	}
 
-	svg {
-		// Don't let SVG icons get bigger than 24x24px.
-		max-height: 24px;
-		max-width: 24px;
-
-		// Keep the icon vertically centered. We do this
-		// over flexbox alignment because it causes
-		// issues if the SVG element does not have an
-		// explicit width and height.
-		vertical-align: middle;
+	svg:not(.dashicon) {
+		height: 24px;
+		width: 24px;
 	}
 }
