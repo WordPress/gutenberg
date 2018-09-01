@@ -25,7 +25,7 @@ export const settings = {
 
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
-		if ( 'left' === align || 'right' === align || 'center' === align ) {
+		if ( [ 'left', 'center', 'right', 'wide', 'full' ].includes( align ) ) {
 			return { 'data-align': align };
 		}
 	},

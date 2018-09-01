@@ -125,7 +125,6 @@ class LatestPostsEdit extends Component {
 						onChange={ ( nextAlign ) => {
 							setAttributes( { align: nextAlign } );
 						} }
-						controls={ [ 'center', 'wide', 'full' ] }
 					/>
 					<Toolbar controls={ layoutControls } />
 				</BlockControls>
