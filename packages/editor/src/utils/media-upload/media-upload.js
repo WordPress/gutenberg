@@ -88,7 +88,7 @@ export function mediaUpload( {
 			return;
 		}
 
-		// verify if uploaded file is not empty
+		// verify if uploaded file is empty
 		if ( mediaFile.size === 0 ) {
 			onError( {
 				code: 'ZERO_BYTE_FILE',
