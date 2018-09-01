@@ -10,15 +10,15 @@ import { Children } from '@wordpress/element';
 import { Dropdown, IconButton, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-function Warning( { className, primaryActions, children, secondaryActions } ) {
+function Warning( { className, actions, children, secondaryActions } ) {
 	return (
 		<div className={ classnames( className, 'editor-warning' ) }>
 			<div className="editor-warning__contents">
 				<p className="editor-warning__message">{ children }</p>
 
-				{ Children.count( primaryActions ) > 0 && (
+				{ Children.count( actions ) > 0 && (
 					<div className="editor-warning__actions">
-						{ Children.map( primaryActions, ( action, i ) => (
+						{ Children.map( actions, ( action, i ) => (
 							<span key={ i } className="editor-warning__action">
 								{ action }
 							</span>

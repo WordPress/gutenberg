@@ -188,10 +188,10 @@ export function getEmbedEdit( title, icon ) {
 				);
 			}
 
-			if ( ! preview || previewIsFallback || editingURL ) {
-				// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
-				const label = sprintf( __( '%s URL' ), title );
+			// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
+			const label = sprintf( __( '%s URL' ), title );
 
+			if ( ! preview || previewIsFallback || editingURL ) {
 				return (
 					<Placeholder icon={ <BlockIcon icon={ icon } showColors /> } label={ label } className="wp-block-embed">
 						<form onSubmit={ this.setUrl }>
@@ -237,12 +237,12 @@ export function getEmbedEdit( title, icon ) {
 				<figure className={ classnames( className, 'wp-block-embed', { 'is-video': 'video' === type } ) }>
 					{ controls }
 					{ ( cannotPreview ) ? (
-						<Placeholder icon={ icon } label={ __( 'Embed URL' ) }>
+						<Placeholder icon={ <BlockIcon icon={ icon } showColors /> } label={ label } className="wp-block-embed">
 							<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
 							<p className="components-placeholder__error">{ __( 'Previews for this are unavailable in the editor, sorry!' ) }</p>
 						</Placeholder>
 					) : embedWrapper }
-					{ ( caption && caption.length > 0 ) || isSelected ? (
+					{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 						<RichText
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
@@ -250,7 +250,7 @@ export function getEmbedEdit( title, icon ) {
 							onChange={ ( value ) => setAttributes( { caption: value } ) }
 							inlineToolbar
 						/>
-					) : null }
+					) }
 				</figure>
 			);
 		}
@@ -321,7 +321,7 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 			return (
 				<figure className={ embedClassName }>
 					{ `\n${ url }\n` /* URL needs to be on its own line. */ }
-					{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
+					{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
 				</figure>
 			);
 		},

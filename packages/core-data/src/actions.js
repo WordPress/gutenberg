@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { castArray } from 'lodash';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -11,28 +10,6 @@ import {
 	receiveItems,
 	receiveQueriedItems,
 } from './queried-data';
-
-/**
- * Returns an action object used in signalling that terms have been received
- * for a given taxonomy.
- *
- * @param {string}   taxonomy Taxonomy name.
- * @param {Object[]} terms    Terms received.
- *
- * @return {Object} Action object.
- */
-export function receiveTerms( taxonomy, terms ) {
-	deprecated( 'wp.data.dispatch("core").receiveTerms', {
-		version: '3.7.0',
-		alternative: 'wp.data.dispatch("core").receiveEntityRecords',
-		plugin: 'Gutenberg',
-	} );
-	return {
-		type: 'RECEIVE_TERMS',
-		taxonomy,
-		terms,
-	};
-}
 
 /**
  * Returns an action object used in signalling that authors have been received.

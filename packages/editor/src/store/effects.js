@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, last } from 'lodash';
+import { last } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,8 +10,6 @@ import {
 	parse,
 	getBlockType,
 	switchToBlockType,
-	createBlock,
-	getDefaultBlockForPostFormat,
 	doBlocksMatchTemplate,
 	synchronizeBlocksWithTemplate,
 } from '@wordpress/blocks';
@@ -25,14 +23,12 @@ import {
 	setupEditorState,
 	replaceBlocks,
 	createWarningNotice,
-	insertBlock,
 	selectBlock,
 	resetBlocks,
 	setTemplateValidity,
 } from './actions';
 import {
 	getBlock,
-	getBlockCount,
 	getBlockRootClientId,
 	getBlocks,
 	getPreviousBlockClientId,
@@ -125,23 +121,18 @@ export default {
 		const isNewPost = post.status === 'auto-draft';
 
 		// Parse content as blocks
-		let blocks;
+		let blocks = parse( post.content.raw );
 		let isValidTemplate = true;
-		if ( ! isNewPost ) {
-			blocks = parse( post.content.raw );
-
+		if ( isNewPost && template ) {
+			// Apply a template for new posts only, if exists.
+			blocks = synchronizeBlocksWithTemplate( blocks, template );
+		} else {
 			// Unlocked templates are considered always valid because they act as default values only.
 			isValidTemplate = (
 				! template ||
 				templateLock !== 'all' ||
 				doBlocksMatchTemplate( blocks, template )
 			);
-		} else if ( template ) {
-			blocks = synchronizeBlocksWithTemplate( [], template );
-		} else if ( getDefaultBlockForPostFormat( post.format ) ) {
-			blocks = [ createBlock( getDefaultBlockForPostFormat( post.format ) ) ];
-		} else {
-			blocks = [];
 		}
 
 		// Include auto draft title in edits while not flagging post as dirty
@@ -213,18 +204,6 @@ export default {
 		const message = spokenMessage || content;
 		speak( message, 'assertive' );
 	},
-
-	EDIT_POST( action, { getState } ) {
-		const format = get( action, [ 'edits', 'format' ] );
-		if ( ! format ) {
-			return;
-		}
-		const blockName = getDefaultBlockForPostFormat( format );
-		if ( blockName && getBlockCount( getState() ) === 0 ) {
-			return insertBlock( createBlock( blockName ) );
-		}
-	},
-
 	REMOVE_BLOCKS( action, { getState, dispatch } ) {
 		// if the action says previous block should not be selected don't do anything.
 		if ( ! action.selectPrevious ) {
@@ -248,7 +227,7 @@ export default {
 		// Dispatch select block action if the currently selected block
 		// is not already the block we want to be selected.
 		if ( blockClientIdToSelect !== currentSelectedBlock ) {
-			dispatch( selectBlock( blockClientIdToSelect ) );
+			dispatch( selectBlock( blockClientIdToSelect, -1 ) );
 		}
 	},
 };

@@ -11,15 +11,9 @@ import {
 } from 'lodash';
 
 /**
- * WordPress dependencies
- */
-import deprecated from '@wordpress/deprecated';
-
-/**
  * Internal dependencies
  */
 import dataStore from './store';
-import { persistence } from './plugins';
 
 /**
  * An isolated orchestrator of store registrations.
@@ -338,22 +332,6 @@ export function createRegistry( storeConfigs = {} ) {
 	}
 
 	/**
-	 * Setup persistence for the current registry.
-	 *
-	 * @param {string} storageKey The storage key.
-	 */
-	function setupPersistence( storageKey ) {
-		deprecated( 'data registry setupPersistence', {
-			alternative: 'persistence plugin',
-			version: '3.7',
-			plugin: 'Gutenberg',
-			hint: 'See https://github.com/WordPress/gutenberg/pull/8341 for more details',
-		} );
-
-		registry.use( persistence, { storageKey } );
-	}
-
-	/**
 	 * Maps an object of function values to proxy invocation through to the
 	 * current internal representation of the registry, which may be enhanced
 	 * by plugins.
@@ -377,7 +355,6 @@ export function createRegistry( storeConfigs = {} ) {
 		subscribe,
 		select,
 		dispatch,
-		setupPersistence,
 		use,
 	};
 

@@ -73,16 +73,16 @@ export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
 	return ( character, _isApple = isAppleOS ) => {
 		const isMac = _isApple();
 		const replacementKeyMap = {
-			[ ALT ]: isMac ? 'Option' : 'Alt',
-			[ CTRL ]: 'Ctrl',
+			[ ALT ]: isMac ? '⌥' : 'Alt',
+			[ CTRL ]: isMac ? '^' : 'Ctrl',
 			[ COMMAND ]: '⌘',
-			[ SHIFT ]: 'Shift',
+			[ SHIFT ]: isMac ? '⇧' : 'Shift',
 		};
 
 		const modifierKeys = modifier( _isApple ).reduce( ( accumulator, key ) => {
 			const replacementKey = get( replacementKeyMap, key, key );
-			// When the mac's clover symbol is used, do not display a + afterwards
-			if ( replacementKey === '⌘' ) {
+			// If on the Mac, adhere to platform convention and don't show plus between keys.
+			if ( isMac ) {
 				return [ ...accumulator, replacementKey ];
 			}
 

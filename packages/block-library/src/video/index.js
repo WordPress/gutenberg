@@ -58,6 +58,12 @@ export const settings = {
 			selector: 'video',
 			attribute: 'muted',
 		},
+		poster: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'video',
+			attribute: 'poster',
+		},
 		preload: {
 			type: 'string',
 			source: 'attribute',
@@ -101,7 +107,7 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { autoplay, caption, controls, loop, muted, preload, src } = attributes;
+		const { autoplay, caption, controls, loop, muted, poster, preload, src } = attributes;
 		return (
 			<figure>
 				{ src && (
@@ -110,11 +116,12 @@ export const settings = {
 						controls={ controls }
 						loop={ loop }
 						muted={ muted }
+						poster={ poster }
 						preload={ preload !== 'metadata' ? preload : undefined }
 						src={ src }
 					/>
 				) }
-				{ caption && caption.length > 0 && (
+				{ ! RichText.isEmpty( caption ) && (
 					<RichText.Content tagName="figcaption" value={ caption } />
 				) }
 			</figure>
