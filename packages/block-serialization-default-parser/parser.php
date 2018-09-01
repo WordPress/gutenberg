@@ -223,7 +223,7 @@ class BSDP_Parser {
     }
 
     function add_freeform( $length = null ) {
-        $length = $length ?: strlen( $this->document ) - $this->offset;
+        $length = $length ? $length : strlen( $this->document ) - $this->offset;
 
         if ( 0 === $length ) {
             return;
@@ -239,7 +239,7 @@ class BSDP_Parser {
         $parent = $this->stack[ count( $this->stack ) - 1 ];
         $parent->block->innerBlocks[] = $block;
         $parent->block->innerHTML .= substr( $this->document, $parent->prev_offset, $token_start - $parent->prev_offset );
-        $parent->prev_offset = $last_offset ?: $token_start + $token_length;
+        $parent->prev_offset = $last_offset ? $last_offset : $token_start + $token_length;
     }
 
     function add_block_from_stack( $end_offset = null ) {
