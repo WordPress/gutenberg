@@ -42,6 +42,8 @@ describe( 'block deletion -', () => {
 
 	describe( 'deleting the third block using the Remove Block shortcut', () => {
 		it( 'results in two remaining blocks and positions the caret at the end of the second block', async () => {
+			// Type some text to assert that the shortcut also deletes block content.
+			await page.keyboard.type( 'this is block 2' );
 			await pressWithModifier( [ 'Alt', META_KEY ], 'Backspace' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 
