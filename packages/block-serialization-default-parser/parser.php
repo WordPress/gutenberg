@@ -189,7 +189,7 @@ class BSDP_Parser {
 
         // we have no more tokens
         if ( 0 === $has_match ) {
-            return array( 'no-more-tokens' );
+            return array( 'no-more-tokens', null, null, null, null );
         }
 
         list( $match, $started_at ) = $matches[ 0 ];
