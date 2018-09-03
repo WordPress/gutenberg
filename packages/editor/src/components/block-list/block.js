@@ -508,9 +508,11 @@ export class BlockListBlock extends Component {
 				/>
 				{ shouldRenderMovers && (
 					<BlockMover
+						blockElementId={ blockElementId }
 						clientIds={ clientId }
 						rootClientId={ rootClientId }
 						layout={ layout }
+						order={ order }
 						isFirst={ isFirst }
 						isLast={ isLast }
 						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }
