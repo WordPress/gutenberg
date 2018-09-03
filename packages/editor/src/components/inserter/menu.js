@@ -22,10 +22,7 @@ import scrollIntoView from 'dom-scroll-into-view';
  */
 import { __ } from '@wordpress/i18n';
 import { Component, findDOMNode, createRef } from '@wordpress/element';
-import {
-	withSpokenMessages,
-	PanelBody,
-} from '@wordpress/components';
+import { withSpokenMessages, PanelBody, IconButton } from '@wordpress/components';
 import { getCategories, isReusableBlock } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
@@ -281,6 +278,7 @@ export class InserterMenu extends Component {
 
 					{ !! reusableItems.length && (
 						<PanelBody
+							className="editor-inserter__reusable-blocks-panel"
 							title={ __( 'Reusable' ) }
 							opened={ isPanelOpen( 'reusable' ) }
 							onToggle={ this.onTogglePanel( 'reusable' ) }
@@ -288,6 +286,12 @@ export class InserterMenu extends Component {
 							ref={ this.bindPanel( 'reusable' ) }
 						>
 							<BlockTypesList items={ reusableItems } onSelect={ onSelect } onHover={ this.onHover } />
+							<IconButton
+								className="editor-inserter__manage-reusable-blocks"
+								icon="admin-generic"
+								label={ __( 'Manage Blocks' ) }
+								href="edit.php?post_type=wp_block"
+							/>
 						</PanelBody>
 					) }
 					{ isEmpty( suggestedItems ) && isEmpty( reusableItems ) && isEmpty( itemsPerCategory ) && (
