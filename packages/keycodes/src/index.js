@@ -132,7 +132,7 @@ export const shortcutAriaLabel = mapValues( modifiers, ( modifier ) => {
 
 		return [ ...modifier( _isApple ), character ]
 			.map( ( key ) => capitalize( get( replacementKeyMap, key, key ) ) )
-			.join( ' + ' );
+			.join( isApple ? ' ' : ' + ' );
 	};
 } );
 

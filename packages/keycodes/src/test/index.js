@@ -138,9 +138,9 @@ describe( 'shortcutAriaLabel', () => {
 			expect( shortcut ).toEqual( 'Control + Period' );
 		} );
 
-		it( 'should output "Command + Period" on Windows', () => {
+		it( 'should output "Command Period" on Windows', () => {
 			const shortcut = shortcutAriaLabel.primary( '.', isAppleOSTrue );
-			expect( shortcut ).toEqual( 'Command + Period' );
+			expect( shortcut ).toEqual( 'Command Period' );
 		} );
 	} );
 
@@ -150,9 +150,9 @@ describe( 'shortcutAriaLabel', () => {
 			expect( shortcut ).toEqual( 'Control + Shift + Period' );
 		} );
 
-		it( 'should output "Shift + Command + Period" on MacOS', () => {
+		it( 'should output "Shift Command Period" on MacOS', () => {
 			const shortcut = shortcutAriaLabel.primaryShift( '.', isAppleOSTrue );
-			expect( shortcut ).toEqual( 'Shift + Command + Period' );
+			expect( shortcut ).toEqual( 'Shift Command Period' );
 		} );
 	} );
 
@@ -162,9 +162,9 @@ describe( 'shortcutAriaLabel', () => {
 			expect( shortcut ).toEqual( 'Control + Shift + Alt + Period' );
 		} );
 
-		it( 'should output "Shift + Option + Command + Period" on MacOS', () => {
+		it( 'should output "Shift Option Command Period" on MacOS', () => {
 			const shortcut = shortcutAriaLabel.secondary( '.', isAppleOSTrue );
-			expect( shortcut ).toEqual( 'Shift + Option + Command + Period' );
+			expect( shortcut ).toEqual( 'Shift Option Command Period' );
 		} );
 	} );
 
@@ -174,9 +174,9 @@ describe( 'shortcutAriaLabel', () => {
 			expect( shortcut ).toEqual( 'Shift + Alt + Period' );
 		} );
 
-		it( 'should output "Control + Option + Period" on MacOS', () => {
+		it( 'should output "Control Option Period" on MacOS', () => {
 			const shortcut = shortcutAriaLabel.access( '.', isAppleOSTrue );
-			expect( shortcut ).toEqual( 'Control + Option + Period' );
+			expect( shortcut ).toEqual( 'Control Option Period' );
 		} );
 	} );
 } );
