@@ -78,7 +78,23 @@ export function mediaUpload( {
 	};
 
 	files.forEach( ( mediaFile, idx ) => {
+		// verify if uploaded file is allowed
 		if ( ! isAllowedType( mediaFile.type ) ) {
+			onError( {
+				code: 'INVALID_FILETYPE',
+				message: sprintf( __( 'Sorry, this file type is not permitted for security reasons.' ) ),
+				file: mediaFile,
+			} );
+			return;
+		}
+
+		// verify if uploaded file is empty
+		if ( mediaFile.size === 0 ) {
+			onError( {
+				code: 'ZERO_BYTE_FILE',
+				message: sprintf( __( 'This file is empty. Please try another.' ) ),
+				file: mediaFile,
+			} );
 			return;
 		}
 
