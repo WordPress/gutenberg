@@ -227,31 +227,31 @@ body.gutenberg-editor-page {
 .editor-block-list__block {
 	input,
 	textarea {
-		// use opacity to work in various editor styles
+		// Use opacity to work in various editor styles.
 		&::-webkit-input-placeholder {
-			color: $dark-opacity-100;
+			color: $dark-opacity-300;
 		}
+
 		&::-moz-placeholder {
-			color: $dark-opacity-100;
+			opacity: 1; // Necessary because Firefox reduces this from 1.
+			color: $dark-opacity-300;
 		}
+
 		&:-ms-input-placeholder {
-			color: $dark-opacity-100;
-		}
-		&:-moz-placeholder {
-			color: $dark-opacity-100;
+			color: $dark-opacity-300;
 		}
 
 		.is-dark-theme & {
 			&::-webkit-input-placeholder {
 				color: $light-opacity-300;
 			}
+
 			&::-moz-placeholder {
+				opacity: 1; // Necessary because Firefox reduces this from 1.
 				color: $light-opacity-300;
 			}
+
 			&:-ms-input-placeholder {
-				color: $light-opacity-300;
-			}
-			&:-moz-placeholder {
 				color: $light-opacity-300;
 			}
 		}
