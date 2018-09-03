@@ -76,18 +76,18 @@ export const rawShortcut = mapValues( modifiers, ( modifier ) => {
  */
 export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
 	return ( character, _isApple = isAppleOS ) => {
-		const isMac = _isApple();
+		const isApple = _isApple();
 		const replacementKeyMap = {
-			[ ALT ]: isMac ? '⌥' : 'Alt',
-			[ CTRL ]: isMac ? '^' : 'Ctrl',
+			[ ALT ]: isApple ? '⌥' : 'Alt',
+			[ CTRL ]: isApple ? '^' : 'Ctrl',
 			[ COMMAND ]: '⌘',
-			[ SHIFT ]: isMac ? '⇧' : 'Shift',
+			[ SHIFT ]: isApple ? '⇧' : 'Shift',
 		};
 
 		const modifierKeys = modifier( _isApple ).reduce( ( accumulator, key ) => {
 			const replacementKey = get( replacementKeyMap, key, key );
 			// If on the Mac, adhere to platform convention and don't show plus between keys.
-			if ( isMac ) {
+			if ( isApple ) {
 				return [ ...accumulator, replacementKey ];
 			}
 
@@ -105,8 +105,8 @@ export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
  *
  * @type {Object} Keyed map of functions to display shortcuts.
  */
-export const displayShortcut = mapValues( displayShortcutList, ( sequence ) => {
-	return ( character, _isApple = isAppleOS ) => sequence( character, _isApple ).join( '' );
+export const displayShortcut = mapValues( displayShortcutList, ( shortcutList ) => {
+	return ( character, _isApple = isAppleOS ) => shortcutList( character, _isApple ).join( '' );
 } );
 
 /**
