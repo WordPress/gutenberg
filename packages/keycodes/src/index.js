@@ -15,6 +15,11 @@
 import { get, mapValues, includes, capitalize } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import { isAppleOS } from './platform';
@@ -102,6 +107,33 @@ export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
  */
 export const displayShortcut = mapValues( displayShortcutList, ( sequence ) => {
 	return ( character, _isApple = isAppleOS ) => sequence( character, _isApple ).join( '' );
+} );
+
+/**
+ * An object that contains functions to return an aria label for a keyboard shortcut.
+ * E.g. shortcutAriaLabel.primary( '.' ) will return 'Command + Period' on Mac.
+ */
+export const shortcutAriaLabel = mapValues( modifiers, ( modifier ) => {
+	return ( character, _isApple = isAppleOS ) => {
+		const isApple = _isApple();
+		const replacementKeyMap = {
+			[ SHIFT ]: 'Shift',
+			[ COMMAND ]: isApple ? 'Command' : 'Control',
+			[ CTRL ]: 'Control',
+			[ ALT ]: isApple ? 'Option' : 'Alt',
+			/* translators: comma as in the character ',' */
+			',': __( 'Comma' ),
+			/* translators: period as in the character '.' */
+			'.': __( 'Period' ),
+			/* translators: backtick as in the character '`' */
+			'`': __( 'Backtick' ),
+			esc: 'Escape',
+		};
+
+		return [ ...modifier( _isApple ), character ]
+			.map( ( key ) => capitalize( get( replacementKeyMap, key, key ) ) )
+			.join( ' + ' );
+	};
 } );
 
 /**

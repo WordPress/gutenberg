@@ -5,6 +5,7 @@ import {
 	displayShortcutList,
 	displayShortcut,
 	rawShortcut,
+	shortcutAriaLabel,
 } from '../';
 
 const isAppleOSFalse = () => false;
@@ -126,6 +127,56 @@ describe( 'displayShortcut', () => {
 		it( 'should output control+option symbols on MacOS', () => {
 			const shortcut = displayShortcut.access( 'm', isAppleOSTrue );
 			expect( shortcut ).toEqual( '^⌥M' );
+		} );
+	} );
+} );
+
+describe( 'shortcutAriaLabel', () => {
+	describe( 'primary', () => {
+		it( 'should output "Control + Period" on Windows', () => {
+			const shortcut = shortcutAriaLabel.primary( '.', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Control + Period' );
+		} );
+
+		it( 'should output "Command + Period" on Windows', () => {
+			const shortcut = shortcutAriaLabel.primary( '.', isAppleOSTrue );
+			expect( shortcut ).toEqual( 'Command + Period' );
+		} );
+	} );
+
+	describe( 'primaryShift', () => {
+		it( 'should output "Control + Shift + Period" on Windows', () => {
+			const shortcut = shortcutAriaLabel.primaryShift( '.', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Control + Shift + Period' );
+		} );
+
+		it( 'should output "Shift + Command + Period" on MacOS', () => {
+			const shortcut = shortcutAriaLabel.primaryShift( '.', isAppleOSTrue );
+			expect( shortcut ).toEqual( 'Shift + Command + Period' );
+		} );
+	} );
+
+	describe( 'secondary', () => {
+		it( 'should output "Control + Shift + Alt + Period" on Windows', () => {
+			const shortcut = shortcutAriaLabel.secondary( '.', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Control + Shift + Alt + Period' );
+		} );
+
+		it( 'should output "Shift + Option + Command + Period" on MacOS', () => {
+			const shortcut = shortcutAriaLabel.secondary( '.', isAppleOSTrue );
+			expect( shortcut ).toEqual( 'Shift + Option + Command + Period' );
+		} );
+	} );
+
+	describe( 'access', () => {
+		it( 'should output "Shift + Alt + Period" on Windows', () => {
+			const shortcut = shortcutAriaLabel.access( '.', isAppleOSFalse );
+			expect( shortcut ).toEqual( 'Shift + Alt + Period' );
+		} );
+
+		it( 'should output "Control + Option + Period" on MacOS', () => {
+			const shortcut = shortcutAriaLabel.access( '.', isAppleOSTrue );
+			expect( shortcut ).toEqual( 'Control + Option + Period' );
 		} );
 	} );
 } );
