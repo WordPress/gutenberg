@@ -187,7 +187,7 @@ export function createRegistry( storeConfigs = {} ) {
 				}
 
 				startResolution( reducerKey, selectorName, args );
-				await fulfill( reducerKey )[ selectorName ]( ...args );
+				await fulfill( reducerKey, selectorName, ...args );
 				finishResolution( reducerKey, selectorName, args );
 			}
 
@@ -291,37 +291,33 @@ export function createRegistry( storeConfigs = {} ) {
 	/**
 	 * Calls a resolver given  arguments
 	 *
-	 * @param {string} reducerKey Part of the state shape to register the
-	 *                            selectors for.
-	 *
-	 * @return {*} The selector's returned value.
+	 * @param {string} reducerKey   Part of the state shape to register the
+	 *                              selectors for.
+	 * @param {string} selectorName Selector name to fulfill.
+	 * @param {Array} args          Selector Arguments.
 	 */
-	function fulfill( reducerKey ) {
-		return mapValues(
-			get( namespaces, [ reducerKey, 'resolvers' ] ),
-			( resolver ) => async ( ...args ) => {
-				const store = namespaces[ reducerKey ].store;
+	async function fulfill( reducerKey, selectorName, ...args ) {
+		const resolver = get( namespaces, [ reducerKey, 'resolvers', selectorName ] );
+		if ( ! resolver ) {
+			return;
+		}
 
-				// At this point, selectors have already been pre-bound to inject
-				// state, it would not be otherwise provided to fulfill.
-				const state = store.getState();
+		const store = namespaces[ reducerKey ].store;
+		const state = store.getState();
+		let fulfillment = resolver.fulfill( state, ...args );
 
-				let fulfillment = resolver.fulfill( state, ...args );
+		// Attempt to normalize fulfillment as async iterable.
+		fulfillment = toAsyncIterable( fulfillment );
+		if ( ! isAsyncIterable( fulfillment ) ) {
+			return;
+		}
 
-				// Attempt to normalize fulfillment as async iterable.
-				fulfillment = toAsyncIterable( fulfillment );
-				if ( ! isAsyncIterable( fulfillment ) ) {
-					return;
-				}
-
-				for await ( const maybeAction of fulfillment ) {
-					// Dispatch if it quacks like an action.
-					if ( isActionLike( maybeAction ) ) {
-						store.dispatch( maybeAction );
-					}
-				}
+		for await ( const maybeAction of fulfillment ) {
+			// Dispatch if it quacks like an action.
+			if ( isActionLike( maybeAction ) ) {
+				store.dispatch( maybeAction );
 			}
-		);
+		}
 	}
 
 	/**
