@@ -75,29 +75,29 @@ class Parsing_Test extends WP_UnitTestCase {
 		);
 	}
 
-    /**
-     * @dataProvider parsing_test_filenames
-     */
-    function test_default_parser_output( $html_filename, $parsed_json_filename ) {
-        $html_path        = self::$fixtures_dir . '/' . $html_filename;
-        $parsed_json_path = self::$fixtures_dir . '/' . $parsed_json_filename;
+	/**
+	 * @dataProvider parsing_test_filenames
+	 */
+	function test_default_parser_output( $html_filename, $parsed_json_filename ) {
+		$html_path        = self::$fixtures_dir . '/' . $html_filename;
+		$parsed_json_path = self::$fixtures_dir . '/' . $parsed_json_filename;
 
-        foreach ( array( $html_path, $parsed_json_path ) as $filename ) {
-            if ( ! file_exists( $filename ) ) {
-                throw new Exception( "Missing fixture file: '$filename'" );
-            }
-        }
+		foreach ( array( $html_path, $parsed_json_path ) as $filename ) {
+			if ( ! file_exists( $filename ) ) {
+				throw new Exception( "Missing fixture file: '$filename'" );
+			}
+		}
 
-        $html            = self::strip_r( file_get_contents( $html_path ) );
-        $expected_parsed = json_decode( self::strip_r( file_get_contents( $parsed_json_path ) ), true );
+		$html            = self::strip_r( file_get_contents( $html_path ) );
+		$expected_parsed = json_decode( self::strip_r( file_get_contents( $parsed_json_path ) ), true );
 
-        $parser = new BSDP_Parser();
-        $result = $parser->parse( $html );
+		$parser = new BSDP_Parser();
+		$result = $parser->parse( $html );
 
-        $this->assertEquals(
-            $expected_parsed,
-            $result,
-            "File '$parsed_json_filename' does not match expected value"
-        );
-    }
+		$this->assertEquals(
+			$expected_parsed,
+			$result,
+			"File '$parsed_json_filename' does not match expected value"
+		);
+	}
 }
