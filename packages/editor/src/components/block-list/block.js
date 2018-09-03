@@ -43,7 +43,6 @@ import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMultiControls from './multi-controls';
 import BlockMobileToolbar from './block-mobile-toolbar';
 import BlockInsertionPoint from './insertion-point';
-import BlockDraggable from './block-draggable';
 import IgnoreNestedEvents from './ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
@@ -480,18 +479,6 @@ export class BlockListBlock extends Component {
 				] }
 				{ ...wrapperProps }
 			>
-				{ ! isPartOfMultiSelection && isMovable && (
-					<BlockDraggable
-						clientId={ clientId }
-						rootClientId={ rootClientId }
-						blockElementId={ blockElementId }
-						layout={ layout }
-						order={ order }
-						onDragStart={ this.onDragStart }
-						onDragEnd={ this.onDragEnd }
-						isDragging={ dragging }
-					/>
-				) }
 				{ shouldShowInsertionPoint && (
 					<BlockInsertionPoint
 						clientId={ clientId }
