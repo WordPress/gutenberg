@@ -1,19 +1,22 @@
-
 .editor-block-types-list {
 	list-style: none;
 	padding: 2px 0;
 	overflow: hidden;
+	display: flex;
+	flex-wrap: wrap;
 }
 
 .editor-block-types-list__list-item {
-	display: inline;
+	display: block;
+	width: 33.33%;
+	padding: 0 4px;
+	margin: 0 0 12px;
 }
 
 .editor-block-types-list__item {
-	display: inline-flex;
+	display: flex;
 	flex-direction: column;
-	width: calc(33.3% - 8px);
-	margin: 0 4px 12px 4px;
+	width: 100%;
 	font-size: $default-font-size;
 	color: $dark-gray-700;
 	padding: 0;
@@ -26,7 +29,6 @@
 	border: $border-width solid transparent;
 	transition: all 0.05s ease-in-out;
 	position: relative;
-	float: left; // This shouldn't be necessary, but without it, IE11 mangles margins.
 
 	&:disabled {
 		@include block-style__disabled();
@@ -54,6 +56,7 @@
 				color: currentColor;
 			}
 		}
+
 		&:active,
 		&.is-active,
 		&:focus {
@@ -83,7 +86,7 @@
 }
 
 .editor-block-types-list__item-title {
-	padding: 4px 2px;
+	padding: 4px 2px 8px;
 }
 
 .editor-block-types-list__item-has-children {
@@ -91,7 +94,7 @@
 		background: $white;
 		margin-right: 3px;
 		margin-bottom: 6px;
-		padding: 12px 20px 8px;
+		padding: 9px 20px 9px;
 		position: relative;
 		top: -2px;
 		left: -2px;
