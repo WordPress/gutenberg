@@ -1,7 +1,8 @@
 
 .editor-block-types-list {
 	list-style: none;
-	padding: 0;
+	padding: 2px 0;
+	overflow: hidden;
 }
 
 .editor-block-types-list__list-item {
@@ -25,6 +26,7 @@
 	border: $border-width solid transparent;
 	transition: all 0.05s ease-in-out;
 	position: relative;
+	float: left; // This shouldn't be necessary, but without it, IE11 mangles margins.
 
 	&:disabled {
 		@include block-style__disabled();

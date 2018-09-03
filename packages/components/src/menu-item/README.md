@@ -16,5 +16,5 @@ const MyMenuItem = withState( {
 	>
 		Toggle
 	</MenuItem>
-) )
+) );
 ```

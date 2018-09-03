@@ -1,6 +1,6 @@
-# Core Blocks
+# Block library
 
-Core Blocks for the WordPress editor.
+Block library for the WordPress editor.
 
 ## Installation
 

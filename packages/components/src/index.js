@@ -1,7 +1,6 @@
 // Components
 export * from './primitives';
 // eslint-disable-next-line camelcase
-export { default as APIProvider, unstable__setApiSettings } from './higher-order/with-api-data/provider';
 export { default as Autocomplete } from './autocomplete';
 export { default as BaseControl } from './base-control';
 export { default as Button } from './button';
@@ -60,7 +59,6 @@ export { createSlotFill, Slot, Fill, Provider as SlotFillProvider } from './slot
 
 // Higher-Order Components
 export { default as navigateRegions } from './higher-order/navigate-regions';
-export { default as withAPIData } from './higher-order/with-api-data';
 export { default as withContext } from './higher-order/with-context';
 export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
 export { default as withFallbackStyles } from './higher-order/with-fallback-styles';

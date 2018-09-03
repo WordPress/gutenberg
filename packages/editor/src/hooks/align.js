@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { assign, includes } from 'lodash';
+import { assign, get, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -23,6 +23,10 @@ import { BlockControls, BlockAlignmentToolbar } from '../components';
  * @return {Object}          Filtered block settings
  */
 export function addAttribute( settings ) {
+	// allow blocks to specify their own attribute definition with default values if needed.
+	if ( get( settings.attributes, [ 'align', 'type' ] ) === 'string' ) {
+		return settings;
+	}
 	if ( hasBlockSupport( settings, 'align' ) ) {
 		// Use Lodash's assign to gracefully handle if attributes are undefined
 		settings.attributes = assign( settings.attributes, {
