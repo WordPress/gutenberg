@@ -18,7 +18,7 @@ import { withInstanceId, compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import { getBlockMoverDescription } from './mover-description';
-import { upArrow, downArrow } from './arrows';
+import { upArrow, downArrow, dragHandle } from './arrows';
 
 export class BlockMover extends Component {
 	constructor() {
@@ -63,6 +63,13 @@ export class BlockMover extends Component {
 					label={ __( 'Move up' ) }
 					aria-describedby={ `editor-block-mover__up-description-${ instanceId }` }
 					aria-disabled={ isFirst }
+					onFocus={ this.onFocus }
+					onBlur={ this.onBlur }
+				/>
+				<IconButton
+					className="editor-block-mover__control"
+					icon={ dragHandle }
+					label={ __( 'Drag block' ) }
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
 				/>

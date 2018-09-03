@@ -14,3 +14,14 @@ export const downArrow = (
 		<polygon points="9,13.5 14.7,7.9 13.2,6.5 9,10.7 4.8,6.5 3.3,7.9 " />
 	</AccessibleSVG>
 );
+
+export const dragHandle = (
+	<svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" aria-hidden role="img" focusable="false">
+		<circle cx="4.5" cy="6" r="1.5" />
+		<circle cx="9" cy="6" r="1.5" />
+		<circle cx="13.5" cy="6" r="1.5" />
+		<circle cx="4.5" cy="12" r="1.5" />
+		<circle cx="9" cy="12" r="1.5" />
+		<circle cx="13.5" cy="12" r="1.5" />
+	</svg>
+);
