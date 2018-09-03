@@ -58,7 +58,7 @@ class HeadingEdit extends Component {
 				<Toolbar controls={ range( 2, 5 ).map( this.createLevelControl.bind( this ) ) } />
 				<RichText
 					tagName={ tagName }
-					content={ { contentTree: attributes.content, eventCount: attributes.eventCount } }
+					content={ { contentTree: attributes.content } }
 					style={ {
 						minHeight: Math.max( minHeight, typeof attributes.aztecHeight === 'undefined' ? 0 : attributes.aztecHeight ),
 					} }
