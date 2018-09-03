@@ -105,11 +105,19 @@ body.gutenberg-editor-page {
 		bottom: 0;
 		left: 0;
 		min-height: calc(100vh - #{ $admin-bar-height-big });
+
+		body.is-fullscreen-mode & {
+			min-height: calc(100vh);
+		}
 	}
 
 	// The WP header height changes at this breakpoint
 	@include break-medium {
 		min-height: calc(100vh - #{ $admin-bar-height });
+
+		body.is-fullscreen-mode & {
+			min-height: calc(100vh);
+		}
 	}
 
 	img {
@@ -261,4 +269,13 @@ body.gutenberg-editor-page {
 
 .ephox-snooker-resizer-bar-dragging {
 	background: $blue-medium-500;
+}
+
+// This style is defined here instead of the modal component
+// because the modal should be context agnostic.
+.components-modal__content {
+	height: calc(100% - #{ $header-height } - #{ $admin-bar-height });
+	body.is-fullscreen-mode & {
+		height: calc(100% - #{ $header-height });
+	}
 }

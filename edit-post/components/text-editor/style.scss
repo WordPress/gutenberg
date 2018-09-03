@@ -3,10 +3,18 @@
 
 	@include break-small() {
 		padding-top: 40px + $admin-bar-height-big;
+
+		body.is-fullscreen-mode & {
+			padding-top: 40px;
+		}
 	}
 
 	@include break-medium() {
-		padding-top: 40px + $admin-bar-height;
+		padding-top: 40px;
+
+		body.is-fullscreen-mode & {
+			padding-top: 40px;
+		}
 	}
 }
 
