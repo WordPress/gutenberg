@@ -61,7 +61,7 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 		} else if ( blockType.name === 'core/paragraph' ) {
 			style = styles.blockText;
 		}
-		
+
 		return (
 			<Block
 				attributes={ { ...this.props.attributes } }
