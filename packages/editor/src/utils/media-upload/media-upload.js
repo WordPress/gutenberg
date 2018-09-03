@@ -82,7 +82,11 @@ export function mediaUpload( {
 		if ( allowedMimeTypesForUser && ! isAllowedMimeTypeForUser( mediaFile.type ) ) {
 			onError( {
 				code: 'MIME_TYPE_NOT_ALLOWED_FOR_USER',
-				message: __( 'Sorry, this file type is not permitted for security reasons.' ),
+				message: [
+					<strong key="filename">{ mediaFile.name }</strong>,
+					': ',
+					__( 'Sorry, this file type is not permitted for security reasons.' ),
+				],
 				file: mediaFile,
 			} );
 			return;
@@ -92,7 +96,11 @@ export function mediaUpload( {
 		if ( ! isAllowedType( mediaFile.type ) ) {
 			onError( {
 				code: 'MIME_TYPE_NOT_SUPPORTED_FOR_BLOCK',
-				message: __( 'Sorry, this file type is not supported by this block.' ),
+				message: [
+					<strong key="filename">{ mediaFile.name }</strong>,
+					': ',
+					__( 'Sorry, this file type is not supported by this block.' ),
+				],
 				file: mediaFile,
 			} );
 			return;
