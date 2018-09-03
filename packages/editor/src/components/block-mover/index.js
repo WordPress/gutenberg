@@ -8,7 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, Draggable } from '@wordpress/components';
+import { IconButton } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -19,6 +19,7 @@ import { withInstanceId, compose } from '@wordpress/compose';
  */
 import { getBlockMoverDescription } from './mover-description';
 import { upArrow, downArrow, dragHandle } from './arrows';
+import { IconDragHandle } from './drag-handle';
 
 export class BlockMover extends Component {
 	constructor() {
@@ -66,30 +67,18 @@ export class BlockMover extends Component {
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
 				/>
-				<Draggable
-					elementId={ blockElementId }
-					transferData={ {
-						type: 'block',
-						fromIndex: order,
-						rootClientId,
-						clientId: clientIds,
-						layout,
-					} }
-				>
-					{
-						( { onDraggableStart, onDraggableEnd } ) => (
-							<IconButton
-								className="editor-block-mover__control"
-								icon={ dragHandle }
-								label={ __( 'Drag block' ) }
-								onFocus={ this.onFocus }
-								onBlur={ this.onBlur }
-								onDragStart={ onDraggableStart }
-								onDragEnd={ onDraggableEnd }
-								draggable
-							/>
-						) }
-				</Draggable>
+				<IconDragHandle
+					className="editor-block-mover__control"
+					icon={ dragHandle }
+					label={ __( 'Drag block' ) }
+					onFocus={ this.onFocus }
+					onBlur={ this.onBlur }
+					blockElementId={ blockElementId }
+					order={ order }
+					rootClientId={ rootClientId }
+					clientId={ clientIds }
+					layout={ layout }
+				/>
 				<IconButton
 					className="editor-block-mover__control"
 					onClick={ isLast ? null : onMoveDown }
