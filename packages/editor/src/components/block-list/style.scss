@@ -1083,18 +1083,18 @@
 	position: relative;
 
 	// Stretch the warning edge to edge.
-	margin-left: -$parent-block-padding;
-	margin-right: -$parent-block-padding;
+	margin-left: -$parent-block-padding - $border-width;
+	margin-right: -$parent-block-padding - $border-width;
 
 	// Stretch the warning less in nested contexts.
 	.editor-block-list__block & {
-		margin-left: -$block-padding;
-		margin-right: -$block-padding;
+		margin-left: -$block-padding - $border-width;
+		margin-right: -$block-padding - $border-width;
 	}
 
 	// Pull the warning upwards to the edge, and add a negative bottom margin to compensate.
-	margin-bottom: -$block-padding;
-	transform: translateY(-$block-padding);
+	margin-bottom: -$block-padding - $border-width;
+	transform: translateY(-$block-padding - $border-width);
 
 	// Bigger padding on mobile where blocks are edge to edge.
 	padding: 10px $parent-block-padding;
