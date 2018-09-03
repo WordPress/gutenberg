@@ -22,9 +22,9 @@
 }
 
 .editor-block-list__block {
-	&.is-hidden *,
-	&.is-hidden > * {
-		visibility: hidden;
+	&.is-dragging *,
+	&.is-dragging > * {
+		opacity: 0.7;
 	}
 
 	.editor-block-list__block-edit .reusable-block-edit-panel * {

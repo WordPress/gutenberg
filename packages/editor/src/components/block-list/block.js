@@ -409,7 +409,7 @@ export class BlockListBlock extends Component {
 			'is-selected-parent': shouldAppearSelectedParent,
 			'is-hovered': shouldAppearHovered,
 			'is-reusable': isReusableBlock( blockType ),
-			'is-hidden': dragging,
+			'is-dragging': dragging,
 			'is-typing': isTypingWithinBlock,
 			'is-focused': isFocusMode && ( isSelected || isParentOfSelectedBlock ),
 			'is-focus-mode': isFocusMode,
