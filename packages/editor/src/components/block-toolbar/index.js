@@ -17,6 +17,7 @@ function BlockToolbar( { blockClientIds, isValid, mode } ) {
 		return (
 			<div className="editor-block-toolbar">
 				<MultiBlocksSwitcher />
+				<BlockSettingsMenu clientIds={ blockClientIds } />
 			</div>
 		);
 	}
