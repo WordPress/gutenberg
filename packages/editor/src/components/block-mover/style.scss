@@ -78,6 +78,11 @@
 	}
 }
 
+.editor-block-mover__control-drag-handle {
+	cursor: move; // Fallback for IE/Edge < 14
+	cursor: grab;
+}
+
 .editor-block-mover__description {
 	display: none;
 }

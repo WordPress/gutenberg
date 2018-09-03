@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { IconButton, Draggable } from '@wordpress/components';
@@ -7,6 +12,9 @@ export const IconDragHandle = ( { isVisible, className, icon, label, onFocus, on
 	if ( ! isVisible ) {
 		return null;
 	}
+
+	const dragHandleClassNames = classnames( 'editor-block-mover__control-drag-handle', className );
+
 	return (
 		<Draggable
 			elementId={ blockElementId }
@@ -14,7 +22,7 @@ export const IconDragHandle = ( { isVisible, className, icon, label, onFocus, on
 				type: 'block',
 				fromIndex: order,
 				rootClientId,
-				clientId: clientId,
+				clientId,
 				layout,
 			} }
 			onDragStart={ onDragStart }
@@ -23,7 +31,7 @@ export const IconDragHandle = ( { isVisible, className, icon, label, onFocus, on
 			{
 				( { onDraggableStart, onDraggableEnd } ) => (
 					<IconButton
-						className={ className }
+						className={ dragHandleClassNames }
 						icon={ icon }
 						label={ label }
 						onFocus={ onFocus }
