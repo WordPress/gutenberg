@@ -44,7 +44,7 @@ export class BlockMover extends Component {
 	}
 
 	render() {
-		const { onMoveUp, onMoveDown, isFirst, isLast, isDragHandleVisible, clientIds, rootClientId, blockElementId, layout, order, blockType, firstIndex, isLocked, instanceId, isHidden } = this.props;
+		const { onMoveUp, onMoveDown, isFirst, isLast, isDragHandleVisible, onDragStart, onDragEnd, clientIds, rootClientId, blockElementId, layout, order, blockType, firstIndex, isLocked, instanceId, isHidden } = this.props;
 		const { isFocused } = this.state;
 		const blocksCount = castArray( clientIds ).length;
 		if ( isLocked || ( isFirst && isLast ) ) {
@@ -79,6 +79,8 @@ export class BlockMover extends Component {
 					clientId={ clientIds }
 					layout={ layout }
 					isVisible={ isDragHandleVisible }
+					onDragStart={ onDragStart }
+					onDragEnd={ onDragEnd }
 				/>
 				<IconButton
 					className="editor-block-mover__control"

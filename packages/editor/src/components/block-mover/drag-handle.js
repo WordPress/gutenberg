@@ -3,7 +3,7 @@
  */
 import { IconButton, Draggable } from '@wordpress/components';
 
-export const IconDragHandle = ( { isVisible, className, icon, label, onFocus, onBlur, blockElementId, order, rootClientId, clientId, layout } ) => {
+export const IconDragHandle = ( { isVisible, className, icon, label, onFocus, onBlur, onDragStart, onDragEnd, blockElementId, order, rootClientId, clientId, layout } ) => {
 	if ( ! isVisible ) {
 		return null;
 	}
@@ -17,6 +17,8 @@ export const IconDragHandle = ( { isVisible, className, icon, label, onFocus, on
 				clientId: clientId,
 				layout,
 			} }
+			onDragStart={ onDragStart }
+			onDragEnd={ onDragEnd }
 		>
 			{
 				( { onDraggableStart, onDraggableEnd } ) => (
