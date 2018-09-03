@@ -23,12 +23,19 @@ export default function( registry ) {
 					store,
 					enhancer( createStore )( options.reducer )
 				);
+
+				registry.namespaces[ reducerKey ].supportControls = true;
 			}
 
 			return store;
 		},
 
 		async fulfill( reducerKey, selectorName, ...args ) {
+			if ( ! registry.namespaces[ reducerKey ].supportControls ) {
+				registry.fulfill( reducerKey, selectorName, ...args );
+				return;
+			}
+
 			const resolver = get( registry.namespaces, [ reducerKey, 'resolvers', selectorName ] );
 			if ( ! resolver ) {
 				return;
