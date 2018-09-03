@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { displayShortcutList } from '@wordpress/keycodes';
+import { displayShortcutList, shortcutAriaLabel } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 
 const {
@@ -42,14 +42,17 @@ const globalShortcuts = {
 		{
 			keyCombination: primaryShift( ',' ),
 			description: __( 'Show or hide the settings sidebar.' ),
+			ariaLabel: shortcutAriaLabel.primaryShift( ',' ),
 		},
 		{
 			keyCombination: ctrl( '`' ),
 			description: __( 'Navigate to a the next part of the editor.' ),
+			ariaLabel: shortcutAriaLabel.ctrl( '`' ),
 		},
 		{
 			keyCombination: ctrlShift( '`' ),
 			description: __( 'Navigate to the previous part of the editor.' ),
+			ariaLabel: shortcutAriaLabel.ctrlShift( '`' ),
 		},
 		{
 			keyCombination: shiftAlt( 'n' ),
@@ -76,6 +79,8 @@ const selectionShortcuts = {
 		{
 			keyCombination: 'Esc',
 			description: __( 'Clear selection.' ),
+			/* translators: The 'escape' key on a keyboard. */
+			ariaLabel: __( 'Escape' ),
 		},
 	],
 };
@@ -102,6 +107,8 @@ const blockShortcuts = {
 		{
 			keyCombination: '/',
 			description: __( 'Change the block type after adding a new paragraph.' ),
+			/* translators: The forward-slash character. e.g. '/'. */
+			ariaLabel: __( 'Forward-slash' ),
 		},
 	],
 };

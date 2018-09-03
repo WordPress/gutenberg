@@ -63,6 +63,7 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
             ],
           },
           Object {
+            "ariaLabel": "Control + Shift + Comma",
             "description": "Show or hide the settings sidebar.",
             "keyCombination": Array [
               "Ctrl",
@@ -73,6 +74,7 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
             ],
           },
           Object {
+            "ariaLabel": "Control + Backtick",
             "description": "Navigate to a the next part of the editor.",
             "keyCombination": Array [
               "Ctrl",
@@ -81,6 +83,7 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
             ],
           },
           Object {
+            "ariaLabel": "Control + Shift + Backtick",
             "description": "Navigate to the previous part of the editor.",
             "keyCombination": Array [
               "Ctrl",
@@ -139,6 +142,7 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
             ],
           },
           Object {
+            "ariaLabel": "Escape",
             "description": "Clear selection.",
             "keyCombination": "Esc",
           },
@@ -191,6 +195,7 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
             ],
           },
           Object {
+            "ariaLabel": "Forward-slash",
             "description": "Change the block type after adding a new paragraph.",
             "keyCombination": "/",
           },

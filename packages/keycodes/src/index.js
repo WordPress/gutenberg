@@ -127,7 +127,6 @@ export const shortcutAriaLabel = mapValues( modifiers, ( modifier ) => {
 			'.': __( 'Period' ),
 			/* translators: backtick as in the character '`' */
 			'`': __( 'Backtick' ),
-			esc: 'Escape',
 		};
 
 		return [ ...modifier( _isApple ), character ]
