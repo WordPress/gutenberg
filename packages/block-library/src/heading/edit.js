@@ -1,4 +1,9 @@
 /**
+ * Internal dependencies
+ */
+import createLevelControl from './level-control';
+
+/**
  * External dependencies
  */
 import { range } from 'lodash';
@@ -6,7 +11,7 @@ import { range } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 import { PanelBody, Toolbar } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
@@ -23,26 +28,15 @@ export default function HeadingEdit( {
 	const { align, content, level, placeholder } = attributes;
 	const tagName = 'h' + level;
 
-	function createLevelControl( targetLevel ) {
-		return {
-			icon: 'heading',
-			// translators: %s: heading level e.g: "1", "2", "3"
-			title: sprintf( __( 'Heading %d' ), targetLevel ),
-			isActive: targetLevel === level,
-			onClick: () => setAttributes( { level: targetLevel } ),
-			subscript: String( targetLevel ),
-		};
-	}
-
 	return (
 		<Fragment>
 			<BlockControls>
-				<Toolbar controls={ range( 2, 5 ).map( createLevelControl ) } />
+				<Toolbar controls={ range( 2, 5 ).map( ( index ) => createLevelControl( index, level, setAttributes ) ) } />
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Heading Settings' ) }>
 					<p>{ __( 'Level' ) }</p>
-					<Toolbar controls={ range( 1, 7 ).map( createLevelControl ) } />
+					<Toolbar controls={ range( 1, 7 ).map( ( index ) => createLevelControl( index, level, setAttributes ) ) } />
 					<p>{ __( 'Text Alignment' ) }</p>
 					<AlignmentToolbar
 						value={ align }

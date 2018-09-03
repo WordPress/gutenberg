@@ -1,4 +1,9 @@
 /**
+ * Internal dependencies
+ */
+import createLevelControl from './level-control';
+
+/**
  * External dependencies
  */
 import { View } from 'react-native';
@@ -7,7 +12,7 @@ import { range } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { RichText } from '@wordpress/editor';
 import { Toolbar } from '@wordpress/components';
@@ -20,26 +25,6 @@ import './editor.scss';
 const minHeight = 50;
 
 class HeadingEdit extends Component {
-	createLevelControl( targetLevel ) {
-		const {
-			attributes,
-			setAttributes,
-		} = this.props;
-
-		const {
-			level,
-		} = attributes;
-
-		return {
-			icon: 'heading',
-			// translators: %s: heading level e.g: "1", "2", "3"
-			title: sprintf( __( 'Heading %d' ), targetLevel ),
-			isActive: targetLevel === level,
-			onClick: () => setAttributes( { level: targetLevel } ),
-			subscript: String( targetLevel ),
-		};
-	}
-
 	render() {
 		const {
 			attributes,
@@ -55,7 +40,7 @@ class HeadingEdit extends Component {
 
 		return (
 			<View>
-				<Toolbar controls={ range( 2, 5 ).map( this.createLevelControl.bind( this ) ) } />
+				<Toolbar controls={ range( 2, 5 ).map( ( index ) => createLevelControl( index, level, setAttributes ) ) } />
 				<RichText
 					tagName={ tagName }
 					content={ { contentTree: attributes.content, eventCount: attributes.eventCount } }
