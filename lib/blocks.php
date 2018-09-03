@@ -69,11 +69,11 @@ function gutenberg_parse_blocks( $content ) {
 	/**
 	 * Filter to allow plugins to replace the server-side block parser
 	 *
-	 * @since 3.8
+	 * @since 3.8.0
 	 *
 	 * @param string $parser_class Name of block parser class
 	 */
-	$parser_class = apply_filters( 'block_parser_class', 'BSDP_Parser' );
+	$parser_class = apply_filters( 'block_parser_class', 'WP_Block_Parser' );
 	$parser       = new $parser_class();
 	return $parser->parse( $content );
 }

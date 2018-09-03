@@ -1,6 +1,6 @@
 <?php
 
-class BSDP_Block {
+class WP_Block_Parser_Block {
     public $blockName;
     public $attrs;
     public $innerBlocks;
@@ -14,7 +14,7 @@ class BSDP_Block {
     }
 }
 
-class BSDP_Frame {
+class WP_Block_Parser_Frame {
     public $block;
     public $token_start;
     public $token_length;
@@ -30,7 +30,7 @@ class BSDP_Frame {
     }
 }
 
-class BSDP_Parser {
+class WP_Block_Parser {
     public $document;
     public $offset;
     public $output;
@@ -92,14 +92,14 @@ class BSDP_Parser {
                  * in the top-level of the document
                  */
                 if ( 0 === $stack_depth ) {
-                    $this->output[] = new BSDP_Block( $block_name, $attrs, array(), '' );
+                    $this->output[] = new WP_Block_Parser_Block( $block_name, $attrs, array(), '' );
                     $this->offset = $start_offset + $token_length;
                     return true;
                 }
 
                 // otherwise we found an inner block
                 $this->add_inner_block(
-                    new BSDP_Block( $block_name, $attrs, array(), '' ),
+                    new WP_Block_Parser_Block( $block_name, $attrs, array(), '' ),
                     $start_offset,
                     $token_length
                 );
@@ -111,8 +111,8 @@ class BSDP_Parser {
                 $leading_html_start = $start_offset > $this->offset ? $this->offset : null;
 
                 // track all newly-opened blocks on the stack
-                array_push( $this->stack, new BSDP_Frame(
-                    new BSDP_Block( $block_name, $attrs, array(), '' ),
+                array_push( $this->stack, new WP_Block_Parser_Frame(
+                    new WP_Block_Parser_Block( $block_name, $attrs, array(), '' ),
                     $start_offset,
                     $token_length,
                     $start_offset + $token_length,
@@ -235,7 +235,7 @@ class BSDP_Parser {
         );
     }
 
-    function add_inner_block(BSDP_Block $block, $token_start, $token_length, $last_offset = null ) {
+    function add_inner_block(WP_Block_Parser_Block $block, $token_start, $token_length, $last_offset = null ) {
         $parent = $this->stack[ count( $this->stack ) - 1 ];
         $parent->block->innerBlocks[] = $block;
         $parent->block->innerHTML .= substr( $this->document, $parent->prev_offset, $token_start - $parent->prev_offset );
