@@ -34,7 +34,7 @@ describe( 'mediaUpload', () => {
 		} );
 		expect( onFileChangeSpy ).not.toHaveBeenCalled();
 		expect( onError ).toHaveBeenCalled();
-		expect( onError.mock.calls[ 0 ][ 0 ].code ).toBe( 'MIME_TYPE_NOT_SUPPORTED_FOR_BLOCK' );
+		expect( onError.mock.calls[ 0 ][ 0 ].code ).toBe( 'MIME_TYPE_NOT_SUPPORTED' );
 	} );
 
 	it( 'should call error handler with the correct error object if file size is greater than the maximum', () => {

@@ -102,8 +102,8 @@ export function mediaUpload( {
 		// Check if the block supports this mime type
 		if ( ! isAllowedType( mediaFile.type ) ) {
 			triggerError( {
-				code: 'MIME_TYPE_NOT_SUPPORTED_FOR_BLOCK',
-				message: __( 'Sorry, this file type is not supported by this block.' ),
+				code: 'MIME_TYPE_NOT_SUPPORTED',
+				message: __( 'Sorry, this file type is not supported here.' ),
 				file: mediaFile,
 			} );
 			return;
