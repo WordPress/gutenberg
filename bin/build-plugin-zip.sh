@@ -45,11 +45,6 @@ if [ ! -z "$changed" ]; then
 fi
 
 branch="$(git rev-parse --abbrev-ref HEAD)"
-if [ "$branch" != 'master' ]; then
-	warning "WARNING: You should probably be running this script against the
-         'master' branch (current: '$branch')"
-	sleep 2
-fi
 
 # Do a dry run of the repository reset. Prompting the user for a list of all
 # files that will be removed should prevent them from losing important files!
