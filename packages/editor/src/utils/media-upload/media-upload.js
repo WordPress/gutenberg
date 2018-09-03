@@ -119,6 +119,16 @@ export function mediaUpload( {
 			return;
 		}
 
+		// Don't allow empty files to be uploaded.
+		if ( mediaFile.size <= 0 ) {
+			triggerError( {
+				code: 'EMPTY_FILE',
+				message: __( 'This file is empty.' ),
+				file: mediaFile,
+			} );
+			return;
+		}
+
 		// Set temporary URL to create placeholder media file, this is replaced
 		// with final file from media gallery when upload is `done` below
 		filesSet.push( { url: window.URL.createObjectURL( mediaFile ) } );
