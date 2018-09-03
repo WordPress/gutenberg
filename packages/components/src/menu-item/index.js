@@ -13,7 +13,7 @@ import { cloneElement } from '@wordpress/element';
  * Internal dependencies
  */
 import Button from '../button';
-import Shortcut from './shortcut';
+import Shortcut from '../shortcut';
 import IconButton from '../icon-button';
 
 /**
@@ -45,7 +45,7 @@ function MenuItem( { children, className, icon, onClick, shortcut, isSelected, r
 				{ ...props }
 			>
 				{ children }
-				<Shortcut shortcut={ shortcut } />
+				<Shortcut className="components-menu-item__shortcut" shortcut={ shortcut } />
 			</IconButton>
 		);
 	}
@@ -59,7 +59,7 @@ function MenuItem( { children, className, icon, onClick, shortcut, isSelected, r
 			{ ...props }
 		>
 			{ children }
-			<Shortcut shortcut={ shortcut } />
+			<Shortcut className="components-menu-item__shortcut" shortcut={ shortcut } />
 		</Button>
 	);
 }
