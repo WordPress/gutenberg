@@ -54,7 +54,7 @@ description: 'Block showing a Book card.'
 
 * **Type:** `String` [ common | formatting | layout | widgets | embed ]
 
-Blocks are grouped into categories to help users browse and discover them. 
+Blocks are grouped into categories to help users browse and discover them.
 
 The core provided categories are:
 * common
