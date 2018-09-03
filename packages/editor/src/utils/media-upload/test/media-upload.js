@@ -6,6 +6,7 @@ import { mediaUpload, getMimeTypesArray } from '../media-upload';
 const invalidMediaObj = {
 	url: 'https://cldup.com/uuUqE_dXzy.jpg',
 	type: 'text/xml',
+	name: 'test.xml',
 };
 
 const validMediaObj = {
@@ -32,11 +33,8 @@ describe( 'mediaUpload', () => {
 			onError,
 		} );
 		expect( onFileChangeSpy ).not.toHaveBeenCalled();
-		expect( onError ).toBeCalledWith( {
-			code: 'MIME_TYPE_NOT_SUPPORTED_FOR_BLOCK',
-			file: invalidMediaObj,
-			message: 'Sorry, this file type is not supported by this block.',
-		} );
+		expect( onError ).toHaveBeenCalled();
+		expect( onError.mock.calls[ 0 ][ 0 ].code ).toBe( 'MIME_TYPE_NOT_SUPPORTED_FOR_BLOCK' );
 	} );
 
 	it( 'should call error handler with the correct error object if file size is greater than the maximum', () => {
@@ -49,11 +47,8 @@ describe( 'mediaUpload', () => {
 			maxUploadFileSize: 512,
 			onError,
 		} );
-		expect( onError ).toBeCalledWith( {
-			code: 'SIZE_ABOVE_LIMIT',
-			file: validMediaObj,
-			message: `${ validMediaObj.name } exceeds the maximum upload size for this site.`,
-		} );
+		expect( onError ).toHaveBeenCalled();
+		expect( onError.mock.calls[ 0 ][ 0 ].code ).toBe( 'SIZE_ABOVE_LIMIT' );
 	} );
 
 	it( 'should call error handler with the correct error object if file type is not allowed for user', () => {
@@ -67,11 +62,8 @@ describe( 'mediaUpload', () => {
 			onError,
 			allowedMimeTypes,
 		} );
-		expect( onError ).toBeCalledWith( {
-			code: 'MIME_TYPE_NOT_ALLOWED_FOR_USER',
-			file: validMediaObj,
-			message: 'Sorry, this file type is not permitted for security reasons.',
-		} );
+		expect( onError ).toHaveBeenCalled();
+		expect( onError.mock.calls[ 0 ][ 0 ].code ).toBe( 'MIME_TYPE_NOT_ALLOWED_FOR_USER' );
 	} );
 } );
 

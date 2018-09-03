@@ -77,16 +77,23 @@ export function mediaUpload( {
 		return includes( allowedMimeTypesForUser, fileType );
 	};
 
+	// Build the error message including the filename
+	const triggerError = ( error ) => {
+		error.message = [
+			<strong key="filename">{ error.file.name }</strong>,
+			': ',
+			error.message,
+		];
+
+		onError( error );
+	};
+
 	files.forEach( ( mediaFile, idx ) => {
 		// verify if user is allowed to upload this mime type
 		if ( allowedMimeTypesForUser && ! isAllowedMimeTypeForUser( mediaFile.type ) ) {
-			onError( {
+			triggerError( {
 				code: 'MIME_TYPE_NOT_ALLOWED_FOR_USER',
-				message: [
-					<strong key="filename">{ mediaFile.name }</strong>,
-					': ',
-					__( 'Sorry, this file type is not permitted for security reasons.' ),
-				],
+				message: __( 'Sorry, this file type is not permitted for security reasons.' ),
 				file: mediaFile,
 			} );
 			return;
@@ -94,13 +101,9 @@ export function mediaUpload( {
 
 		// Check if the block supports this mime type
 		if ( ! isAllowedType( mediaFile.type ) ) {
-			onError( {
+			triggerError( {
 				code: 'MIME_TYPE_NOT_SUPPORTED_FOR_BLOCK',
-				message: [
-					<strong key="filename">{ mediaFile.name }</strong>,
-					': ',
-					__( 'Sorry, this file type is not supported by this block.' ),
-				],
+				message: __( 'Sorry, this file type is not supported by this block.' ),
 				file: mediaFile,
 			} );
 			return;
@@ -108,13 +111,9 @@ export function mediaUpload( {
 
 		// verify if file is greater than the maximum file upload size allowed for the site.
 		if ( maxUploadFileSize && mediaFile.size > maxUploadFileSize ) {
-			onError( {
+			triggerError( {
 				code: 'SIZE_ABOVE_LIMIT',
-				message: sprintf(
-					// translators: %s: file name
-					__( '%s exceeds the maximum upload size for this site.' ),
-					mediaFile.name
-				),
+				message: __( 'This file exceeds the maximum upload size for this site.' ),
 				file: mediaFile,
 			} );
 			return;
