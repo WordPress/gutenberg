@@ -79,6 +79,11 @@ export function mediaUpload( {
 
 	files.forEach( ( mediaFile, idx ) => {
 		if ( ! isAllowedType( mediaFile.type ) ) {
+			onError( {
+				code: 'MIME_TYPE_NOT_ALLOWED',
+				message: __( 'Sorry, this file type is not permitted for security reasons.' ),
+				file: mediaFile,
+			} );
 			return;
 		}
 
