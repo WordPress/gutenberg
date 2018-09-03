@@ -170,7 +170,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		// Change the data source
 		const index = this.getDataSourceIndexFromClientId( clientId );
 		const dataSource = this.state.dataSource;
-		const block = { ...( dataSource.get( index ) ) };
+		const block = dataSource.get( index );
 		block.attributes = attributes;
 		dataSource.set( index, block );
 	}
