@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
 import { isString, isObject } from 'lodash';
 
 function Shortcut( { shortcut, className } ) {
@@ -21,10 +20,8 @@ function Shortcut( { shortcut, className } ) {
 		ariaLabel = shortcut.ariaLabel;
 	}
 
-	const classes = classnames( 'components__shortcut', className );
-
 	return (
-		<span className={ classes } aria-label={ ariaLabel }>
+		<span className={ className } aria-label={ ariaLabel }>
 			{ displayText }
 		</span>
 	);
