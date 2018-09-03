@@ -92,7 +92,7 @@ class Parsing_Test extends WP_UnitTestCase {
 		$expected_parsed = json_decode( self::strip_r( file_get_contents( $parsed_json_path ) ), true );
 
 		$parser = new BSDP_Parser();
-		$result = $parser->parse( $html );
+		$result = json_decode( json_encode( $parser->parse( $html ) ), true );
 
 		$this->assertEquals(
 			$expected_parsed,
