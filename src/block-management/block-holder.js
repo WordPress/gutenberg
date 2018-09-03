@@ -61,8 +61,7 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 		} else if ( blockType.name === 'core/paragraph' ) {
 			style = styles.blockText;
 		}
-
-		// TODO: setAttributes needs to change the state/attributes
+		
 		return (
 			<Block
 				attributes={ { ...this.props.attributes } }
