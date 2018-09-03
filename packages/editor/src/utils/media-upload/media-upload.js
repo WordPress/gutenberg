@@ -78,20 +78,21 @@ export function mediaUpload( {
 	};
 
 	files.forEach( ( mediaFile, idx ) => {
-		if ( ! isAllowedType( mediaFile.type ) ) {
+		// verify if user is allowed to upload this mime type
+		if ( allowedMimeTypesForUser && ! isAllowedMimeTypeForUser( mediaFile.type ) ) {
 			onError( {
-				code: 'MIME_TYPE_NOT_ALLOWED',
+				code: 'MIME_TYPE_NOT_ALLOWED_FOR_USER',
 				message: __( 'Sorry, this file type is not permitted for security reasons.' ),
 				file: mediaFile,
 			} );
 			return;
 		}
 
-		// verify if user is allowed to upload this mime type
-		if ( allowedMimeTypesForUser && ! isAllowedMimeTypeForUser( mediaFile.type ) ) {
+		// Check if the block supports this mime type
+		if ( ! isAllowedType( mediaFile.type ) ) {
 			onError( {
-				code: 'MIME_TYPE_NOT_ALLOWED_FOR_USER',
-				message: __( 'Sorry, this file type is not permitted for security reasons.' ),
+				code: 'MIME_TYPE_NOT_SUPPORTED_FOR_BLOCK',
+				message: __( 'Sorry, this file type is not supported by this block.' ),
 				file: mediaFile,
 			} );
 			return;

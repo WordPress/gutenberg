@@ -25,12 +25,17 @@ describe( 'mediaUpload', () => {
 
 	it( 'should do nothing on invalid image type', () => {
 		const onError = jest.fn();
-		mediaUpload( { filesList: [ invalidMediaObj ], onFileChange: onFileChangeSpy, allowedType: 'image' } );
+		mediaUpload( {
+			filesList: [ invalidMediaObj ],
+			onFileChange: onFileChangeSpy,
+			allowedType: 'image',
+			onError,
+		} );
 		expect( onFileChangeSpy ).not.toHaveBeenCalled();
 		expect( onError ).toBeCalledWith( {
-			code: 'MIME_TYPE_NOT_ALLOWED',
-			file: validMediaObj,
-			message: 'Sorry, this file type is not permitted for security reasons.',
+			code: 'MIME_TYPE_NOT_SUPPORTED_FOR_BLOCK',
+			file: invalidMediaObj,
+			message: 'Sorry, this file type is not supported by this block.',
 		} );
 	} );
 
