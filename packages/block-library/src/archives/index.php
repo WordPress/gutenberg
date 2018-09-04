@@ -17,7 +17,7 @@
 function render_block_core_archives( $attributes ) {
 	$show_post_count = ! empty( $attributes['showPostCounts'] );
 
-	$class = "wp-block-archives";
+	$class = 'wp-block-archives';
 
 	if ( isset( $attributes['align'] ) ) {
 		$class .= " align{$attributes['align']}";
