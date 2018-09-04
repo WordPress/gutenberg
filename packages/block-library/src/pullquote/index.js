@@ -55,7 +55,7 @@ export const settings = {
 		const { value, citation } = attributes;
 
 		return (
-			<aside className={ className }>
+			<figure className={ className }>
 				<blockquote>
 					<RichText
 						multiline="p"
@@ -83,7 +83,7 @@ export const settings = {
 						/>
 					) }
 				</blockquote>
-			</aside>
+			</figure>
 		);
 	},
 
