@@ -107,18 +107,15 @@
 	}
 }
 
-.post-publish-panel__postpublish-link-label {
-	display: inline-block;
-	margin-top: $grid-size;
-}
+.post-publish-panel__postpublish-post-address {
+	margin-bottom: $grid-size-large;
 
-.post-publish-panel__postpublish-link-input[readonly] {
-	width: 100%;
-	padding: 10px;
-	margin: $grid-size-small 0 $grid-size-large;
-	background: $white;
-	overflow: hidden;
-	text-overflow: ellipsis;
+	input[readonly] {
+		padding: 10px;
+		background: $light-gray-400;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
 }
 
 .post-publish-panel__postpublish-header {
@@ -126,7 +123,7 @@
 }
 
 .post-publish-panel__postpublish-subheader {
-	margin: 0;
+	margin: 0 0 $grid-size;
 }
 
 .post-publish-panel__tip {

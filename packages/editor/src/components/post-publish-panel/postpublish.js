@@ -6,11 +6,10 @@ import { get } from 'lodash';
 /**
  * WordPress Dependencies
  */
-import { PanelBody, Button, ClipboardButton } from '@wordpress/components';
+import { PanelBody, Button, ClipboardButton, TextControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Component, Fragment } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import { withInstanceId, compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -49,10 +48,9 @@ class PostPublishPanelPostpublish extends Component {
 	}
 
 	render() {
-		const { children, isScheduled, post, postType, instanceId } = this.props;
+		const { children, isScheduled, post, postType } = this.props;
 		const postLabel = get( postType, [ 'labels', 'singular_name' ] );
 		const viewPostLabel = get( postType, [ 'labels', 'view_item' ] );
-		const id = `post-publish-panel__postpublish-link-input-${ instanceId }`;
 
 		const postPublishNonLinkHeader = isScheduled ?
 			<Fragment>{ __( 'is now scheduled. It will go live on' ) } <PostScheduleLabel />.</Fragment> :
@@ -67,19 +65,15 @@ class PostPublishPanelPostpublish extends Component {
 					<p className="post-publish-panel__postpublish-subheader">
 						<strong>{ __( 'What’s next?' ) }</strong>
 					</p>
-					<label htmlFor={ id } className="post-publish-panel__postpublish-link-label">
-						{ sprintf(
+					<TextControl
+						className="post-publish-panel__postpublish-post-address"
+						readOnly
+						label={ sprintf(
 							/* translators: %s: post type singular name */
 							__( '%s address' ), postLabel
 						) }
-					</label>
-					<input
-						id={ id }
-						className="post-publish-panel__postpublish-link-input"
-						readOnly
 						value={ post.link }
 						onFocus={ this.onSelectInput }
-						type="text"
 					/>
 					<div className="post-publish-panel__postpublish-buttons">
 						{ ! isScheduled && (
@@ -99,16 +93,13 @@ class PostPublishPanelPostpublish extends Component {
 	}
 }
 
-export default compose(
-	withSelect( ( select ) => {
-		const { getEditedPostAttribute, getCurrentPost, isCurrentPostScheduled } = select( 'core/editor' );
-		const { getPostType } = select( 'core' );
+export default withSelect( ( select ) => {
+	const { getEditedPostAttribute, getCurrentPost, isCurrentPostScheduled } = select( 'core/editor' );
+	const { getPostType } = select( 'core' );
 
-		return {
-			post: getCurrentPost(),
-			postType: getPostType( getEditedPostAttribute( 'type' ) ),
-			isScheduled: isCurrentPostScheduled(),
-		};
-	} ),
-	withInstanceId
-)( PostPublishPanelPostpublish );
+	return {
+		post: getCurrentPost(),
+		postType: getPostType( getEditedPostAttribute( 'type' ) ),
+		isScheduled: isCurrentPostScheduled(),
+	};
+} )( PostPublishPanelPostpublish );
