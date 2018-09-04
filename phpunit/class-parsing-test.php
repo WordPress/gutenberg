@@ -79,6 +79,8 @@ class Parsing_Test extends WP_UnitTestCase {
 	 * @dataProvider parsing_test_filenames
 	 */
 	function test_default_parser_output( $html_filename, $parsed_json_filename ) {
+		// include the parser if it was not yet loaded.
+		require_once dirname( __FILE__ ) . '/../packages/block-serialization-default-parser/parser.php';
 		$html_path        = self::$fixtures_dir . '/' . $html_filename;
 		$parsed_json_path = self::$fixtures_dir . '/' . $parsed_json_filename;
 

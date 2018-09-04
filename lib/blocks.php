@@ -74,7 +74,11 @@ function gutenberg_parse_blocks( $content ) {
 	 * @param string $parser_class Name of block parser class
 	 */
 	$parser_class = apply_filters( 'block_parser_class', 'WP_Block_Parser' );
-	$parser       = new $parser_class();
+	// Load default block parser for server-side parsing if the default parser class is being used.
+	if ( 'WP_Block_Parser' === $parser_class ) {
+		require_once dirname( __FILE__ ) . '/../packages/block-serialization-default-parser/parser.php';
+	}
+	$parser = new $parser_class();
 	return $parser->parse( $content );
 }
 
