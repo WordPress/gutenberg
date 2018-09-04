@@ -93,6 +93,17 @@
 .editor-block-mover__control-drag-handle {
 	cursor: move; // Fallback for IE/Edge < 14
 	cursor: grab;
+
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover,
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):active,
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):focus {
+		box-shadow: none;
+		background: none;
+	}
+
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):active {
+		cursor: grabbing;
+	}
 }
 
 .editor-block-mover__description {
