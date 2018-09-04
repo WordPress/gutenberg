@@ -75,7 +75,7 @@ class Sortable extends Component {
 				onSortStart={ this.onSortStart }
 				onSortEnd={ this.onSortEnd }
 				distance={ 10 }
-				helperClass={ this.props.className }
+				helperClass={ 'dragged-element' }
 			/>
 		);
 	}
