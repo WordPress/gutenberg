@@ -47,8 +47,9 @@ export const name = 'core/quote';
 export const settings = {
 	title: __( 'Quote' ),
 	description: __( 'Maybe someone else said it better -- add some quoted text.' ),
-	icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><g><path d="M19 18h-6l2-4h-2V6h8v7l-2 5zm-2-2l2-3V8h-4v4h4l-2 4zm-8 2H3l2-4H3V6h8v7l-2 5zm-2-2l2-3V8H5v4h4l-2 4z" /></g></svg>,
+	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><g><path d="M19 18h-6l2-4h-2V6h8v7l-2 5zm-2-2l2-3V8h-4v4h4l-2 4zm-8 2H3l2-4H3V6h8v7l-2 5zm-2-2l2-3V8H5v4h4l-2 4z" /></g></svg>,
 	category: 'common',
+	keywords: [ __( 'blockquote' ) ],
 
 	attributes: blockAttributes,
 
@@ -202,7 +203,7 @@ export const settings = {
 						/* translators: the text of the quotation */
 						placeholder={ __( 'Write quote…' ) }
 					/>
-					{ ( ( citation && citation.length > 0 ) || isSelected ) && (
+					{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 						<RichText
 							tagName="cite"
 							value={ citation }
@@ -226,7 +227,7 @@ export const settings = {
 		return (
 			<blockquote style={ { textAlign: align ? align : null } }>
 				<RichText.Content value={ toRichTextValue( value ) } />
-				{ citation && citation.length > 0 && <RichText.Content tagName="cite" value={ citation } /> }
+				{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
 			</blockquote>
 		);
 	},
@@ -261,7 +262,7 @@ export const settings = {
 						style={ { textAlign: align ? align : null } }
 					>
 						<RichText.Content value={ toRichTextValue( value ) } />
-						{ citation && citation.length > 0 && <RichText.Content tagName="cite" value={ citation } /> }
+						{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
 					</blockquote>
 				);
 			},
@@ -289,7 +290,7 @@ export const settings = {
 						style={ { textAlign: align ? align : null } }
 					>
 						<RichText.Content value={ toRichTextValue( value ) } />
-						{ citation && citation.length > 0 && <RichText.Content tagName="footer" value={ citation } /> }
+						{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="footer" value={ citation } /> }
 					</blockquote>
 				);
 			},

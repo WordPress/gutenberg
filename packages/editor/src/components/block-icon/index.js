@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Dashicon } from '@wordpress/components';
+import { Dashicon, AccessibleSVG } from '@wordpress/components';
 import { createElement, Component } from '@wordpress/element';
 
 function renderIcon( icon ) {
@@ -18,6 +18,8 @@ function renderIcon( icon ) {
 		}
 
 		return icon();
+	} else if ( icon && icon.type === 'svg' ) {
+		return <AccessibleSVG { ...icon.props } />;
 	}
 
 	return icon || null;

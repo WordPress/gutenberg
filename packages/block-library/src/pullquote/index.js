@@ -41,7 +41,7 @@ export const settings = {
 
 	description: __( 'Highlight a quote from your post or page by displaying it as a graphic element.' ),
 
-	icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0,0h24v24H0V0z" fill="none" /><polygon points="21 18 2 18 2 20 21 20" /><path d="m19 10v4h-15v-4h15m1-2h-17c-0.55 0-1 0.45-1 1v6c0 0.55 0.45 1 1 1h17c0.55 0 1-0.45 1-1v-6c0-0.55-0.45-1-1-1z" /><polygon points="21 4 2 4 2 6 21 6" /></svg>,
+	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0,0h24v24H0V0z" fill="none" /><polygon points="21 18 2 18 2 20 21 20" /><path d="m19 10v4h-15v-4h15m1-2h-17c-0.55 0-1 0.45-1 1v6c0 0.55 0.45 1 1 1h17c0.55 0 1-0.45 1-1v-6c0-0.55-0.45-1-1-1z" /><polygon points="21 4 2 4 2 6 21 6" /></svg>,
 
 	category: 'formatting',
 
@@ -68,7 +68,7 @@ export const settings = {
 					placeholder={ __( 'Write quote…' ) }
 					wrapperClassName="block-library-pullquote__content"
 				/>
-				{ ( citation || isSelected ) && (
+				{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 					<RichText
 						tagName="cite"
 						value={ citation }
@@ -91,7 +91,7 @@ export const settings = {
 		return (
 			<blockquote>
 				<RichText.Content value={ toRichTextValue( value ) } />
-				{ citation && citation.length > 0 && <RichText.Content tagName="cite" value={ citation } /> }
+				{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
 			</blockquote>
 		);
 	},
@@ -116,7 +116,7 @@ export const settings = {
 			return (
 				<blockquote className={ `align${ align }` }>
 					<RichText.Content value={ toRichTextValue( value ) } />
-					{ citation && citation.length > 0 && <RichText.Content tagName="footer" value={ citation } /> }
+					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="footer" value={ citation } /> }
 				</blockquote>
 			);
 		},

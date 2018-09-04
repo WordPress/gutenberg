@@ -13,10 +13,6 @@ export { default as withSelect } from './components/with-select';
 export { default as withDispatch } from './components/with-dispatch';
 export { default as RegistryProvider, RegistryConsumer } from './components/registry-provider';
 export { createRegistry } from './registry';
-export {
-	restrictPersistence,
-	setPersistenceStorage,
-} from './deprecated';
 export { plugins };
 
 /**
@@ -39,5 +35,4 @@ export const registerReducer = defaultRegistry.registerReducer;
 export const registerActions = defaultRegistry.registerActions;
 export const registerSelectors = defaultRegistry.registerSelectors;
 export const registerResolvers = defaultRegistry.registerResolvers;
-export const setupPersistence = defaultRegistry.setupPersistence;
 export const use = defaultRegistry.use;

@@ -1,5 +1,10 @@
 Gutenberg's deprecation policy is intended to support backwards-compatibility for two minor releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
 
+## 4.0.0
+
+- `wp.components.RichTextProvider` has been removed. Please use `wp.data.select( 'core/editor' )` methods instead.
+- `wp.components.Draggable` as a DOM node drag handler has been removed. Please, use `wp.components.Draggable` as a wrap component for your DOM node drag handler.
+
 ## 3.9.0
 
 - RichText `getSettings` prop has been removed. The `unstableGetSettings` prop is available if continued use is required. Unstable APIs are strongly discouraged to be used, and are subject to removal without notice.
@@ -7,6 +12,8 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 - `wp.editor.getColorName` has been removed. Please use `wp.editor.getColorObjectByColorValue` instead.
 - `wp.editor.getColorClass` has been renamed. Please use `wp.editor.getColorClassName` instead.
 - `value` property in color objects passed by `wp.editor.withColors` has been removed. Please use color property instead.
+- The Subheading block has been removed. Please use the Paragraph block instead.
+- `wp.blocks.getDefaultBlockForPostFormat` has been removed.
 
 ## 3.8.0
 
@@ -17,10 +24,12 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 
  - `wp.components.withAPIData` has been removed. Please use the Core Data module or `wp.apiFetch` directly instead.
  - `wp.data.dispatch("core").receiveTerms` has been deprecated. Please use `wp.data.dispatch("core").receiveEntityRecords` instead.
- - `getCategories` resolvers has been deprecated. Please use `getEntityRecords` resolver instead.
+ - `getCategories` resolver has been deprecated. Please use `getEntityRecords` resolver instead.
  - `wp.data.select("core").getTerms` has been deprecated. Please use `wp.data.select("core").getEntityRecords` instead.
  - `wp.data.select("core").getCategories` has been deprecated. Please use `wp.data.select("core").getEntityRecords` instead.
- - `wp.data.select("core").isRequestingTerms` has been deprecated. Please use `wp.data.select("core").getEntitiesByKind` instead.
+ - `wp.data.select("core").isRequestingCategories` has been deprecated. Please use `wp.data.select("core/data").isResolving` instead.
+ - `wp.data.select("core").isRequestingTerms` has been deprecated. Please use `wp.data.select("core").isResolving` instead.
+ - `wp.data.restrictPersistence`, `wp.data.setPersistenceStorage` and  `wp.data.setupPersistence` has been removed. Please use the data persistence plugin instead.
 
 ## 3.6.0
 

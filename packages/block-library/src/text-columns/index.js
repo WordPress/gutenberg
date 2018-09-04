@@ -6,6 +6,7 @@ import { get, times } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { createBlock } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { PanelBody, RangeControl } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
@@ -52,6 +53,32 @@ export const settings = {
 		width: {
 			type: 'string',
 		},
+	},
+
+	transforms: {
+		to: [
+			{
+				type: 'block',
+				blocks: [ 'core/columns' ],
+				transform: ( { className, columns, content, width } ) => (
+					createBlock(
+						'core/columns',
+						{
+							align: ( 'wide' === width || 'full' === width ) ? width : undefined,
+							className,
+							columns,
+						},
+						content.map( ( { children } ) =>
+							createBlock(
+								'core/column',
+								{},
+								[ createBlock( 'core/paragraph', { content: children } ) ]
+							)
+						)
+					)
+				),
+			},
+		],
 	},
 
 	getEditWrapperProps( attributes ) {

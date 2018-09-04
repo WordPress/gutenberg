@@ -38,7 +38,7 @@ const shortcuts = {
 	},
 	removeBlock: {
 		raw: rawShortcut.primaryAlt( 'backspace' ),
-		display: displayShortcut.primaryAlt( 'bksp' ),
+		display: displayShortcut.primaryAlt( 'Backspace' ),
 	},
 	insertBefore: {
 		raw: rawShortcut.primaryAlt( 't' ),
