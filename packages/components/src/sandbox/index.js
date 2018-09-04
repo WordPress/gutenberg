@@ -90,7 +90,7 @@ class Sandbox extends Component {
 					window.parent.postMessage( {
 						action: 'resize',
 						width: clientBoundingRect.width,
-						height: height,
+						height: clientBoundingRect.height,
 					}, '*' );
 				}
 
@@ -142,6 +142,11 @@ class Sandbox extends Component {
 			body > div,
 			body > div > iframe {
 				width: 100%;
+			}
+			html.video,
+			body.video,
+			body.video > div,
+			body.video > div > iframe {
 				height: 100%;
 			}
 			body > div > * {
@@ -153,7 +158,7 @@ class Sandbox extends Component {
 		// put the html snippet into a html document, and then write it to the iframe's document
 		// we can use this in the future to inject custom styles or scripts
 		const htmlDoc = (
-			<html lang={ document.documentElement.lang }>
+			<html lang={ document.documentElement.lang } className={ this.props.type }>
 				<head>
 					<title>{ this.props.title }</title>
 					<style dangerouslySetInnerHTML={ { __html: style } } />

@@ -214,6 +214,7 @@ export function getEmbedEdit( title, icon ) {
 				}
 
 				if ( aspectRatioClassName ) {
+					aspectRatioClassName += ' wp-embed-has-aspect-ratio';
 					const className = classnames( this.props.attributes.className, aspectRatioClassName );
 					this.props.setAttributes( { className } );
 				}
