@@ -71,10 +71,11 @@ export default compose(
 		const isEmpty = ! getBlockCount( ownProps.rootClientId );
 		const lastBlock = getBlock( ownProps.lastBlockClientId );
 		const isLastBlockDefault = get( lastBlock, [ 'name' ] ) === getDefaultBlockName();
+		const isLastBlockValid = get( lastBlock, [ 'isValid' ] );
 		const { bodyPlaceholder } = getEditorSettings();
 
 		return {
-			isVisible: isEmpty || ! isLastBlockDefault,
+			isVisible: isEmpty || ! isLastBlockDefault || ! isLastBlockValid,
 			showPrompt: isEmpty,
 			isLocked: !! getTemplateLock( ownProps.rootClientId ),
 			placeholder: bodyPlaceholder,

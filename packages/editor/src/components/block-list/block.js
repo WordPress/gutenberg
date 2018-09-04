@@ -384,7 +384,7 @@ export class BlockListBlock extends Component {
 
 		// If the block is selected and we're typing the block should not appear.
 		// Empty paragraph blocks should always show up as unselected.
-		const showEmptyBlockSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
+		const showEmptyBlockSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock && isValid;
 		const showSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
 		const shouldAppearSelected = ! isFocusMode && ! hasFixedToolbar && ! showSideInserter && isSelected && ! isTypingWithinBlock;
 		const shouldAppearSelectedParent = ! isFocusMode && ! hasFixedToolbar && ! showSideInserter && hasSelectedInnerBlock && ! isTypingWithinBlock;
