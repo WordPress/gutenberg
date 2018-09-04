@@ -83,15 +83,21 @@ function render_block_core_archives( $attributes ) {
 
 		$classnames = esc_attr( $class );
 
-		$block_content = ! empty( $archives ) ? sprintf(
-			'<ul class="%1$s">%2$s</ul>',
-			$classnames,
-			$archives
-		) : sprintf(
-			'<div class="%1$s">%2$s</div>',
-			$classnames,
-			__( 'No archives to show.', 'gutenberg' )
-		);
+		if ( empty( $archives ) ) {
+
+			$block_content = sprintf(
+				'<div class="%1$s">%2$s</div>',
+				$classnames,
+				__( 'No archives to show.', 'gutenberg' )
+			);
+		} else {
+
+			$block_content = sprintf(
+				'<ul class="%1$s">%2$s</ul>',
+				$classnames,
+				$archives
+			);
+		}
 	}
 
 	return $block_content;
