@@ -1,6 +1,6 @@
 # AccessibleSVG
 
-A drop-in replacement for the svg element to add the required a11y props for cross-browser accessible SVG elements.
+A drop-in replacement for the svg element that adds the required accessibility attributes for accessible SVG elements across browsers.
 
 ## Usage
 
