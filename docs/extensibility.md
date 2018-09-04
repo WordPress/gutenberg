@@ -43,7 +43,7 @@ registerBlockType( 'mytheme/red-block', {
 	}
 } );
 ```
-
+{% end %}
 
 If you want to learn more about block creation, the [Blocks Tutorial](../docs/blocks.md) is the best place to start.
 
