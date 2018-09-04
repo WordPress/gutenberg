@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import Textarea from 'react-autosize-textarea';
 import classnames from 'classnames';
 import { get } from 'lodash';
@@ -10,7 +9,7 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { ENTER } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -37,7 +36,7 @@ class PostTitle extends Component {
 		this.onUnselect = this.onUnselect.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.redirectHistory = this.redirectHistory.bind( this );
-		this.textareaRef = React.createRef();
+		this.textareaRef = createRef();
 
 		this.state = {
 			isSelected: false,
