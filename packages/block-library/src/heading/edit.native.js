@@ -15,6 +15,7 @@ import { range } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { RichText } from '@wordpress/editor';
+import { parse } from '@wordpress/blocks';
 import { Toolbar } from '@wordpress/components';
 
 /**
@@ -47,8 +48,14 @@ class HeadingEdit extends Component {
 					style={ {
 						minHeight: Math.max( minHeight, typeof attributes.aztecHeight === 'undefined' ? 0 : attributes.aztecHeight ),
 					} }
-					onChange={ ( value ) => {
-						setAttributes( value );
+					onChange={ ( event ) => {
+						// Create a React Tree from the new HTML
+						const newParaBlock = parse( `<!-- wp:heading --><${ tagName }>${ event.content }</${ tagName }><!-- /wp:heading -->` )[ 0 ];
+						setAttributes( {
+							...this.props.attributes,
+							content: newParaBlock.attributes.content,
+							eventCount: event.eventCount,
+						} );
 					} }
 					onContentSizeChange={ ( event ) => {
 						setAttributes( { aztecHeight: event.aztecHeight } );
