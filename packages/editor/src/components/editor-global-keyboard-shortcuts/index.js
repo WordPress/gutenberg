@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { first, last, some } from 'lodash';
+import { first, last, some, flow } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,8 +9,37 @@ import { first, last, some } from 'lodash';
 import { Component, Fragment } from '@wordpress/element';
 import { KeyboardShortcuts } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { rawShortcut } from '@wordpress/keycodes';
+import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 import { compose } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import BlockActions from '../block-actions';
+
+const preventDefault = ( event ) => {
+	event.preventDefault();
+	return event;
+};
+
+export const shortcuts = {
+	duplicate: {
+		raw: rawShortcut.primaryShift( 'd' ),
+		display: displayShortcut.primaryShift( 'd' ),
+	},
+	removeBlock: {
+		raw: rawShortcut.primaryAlt( 'backspace' ),
+		display: displayShortcut.primaryAlt( 'Backspace' ),
+	},
+	insertBefore: {
+		raw: rawShortcut.primaryAlt( 't' ),
+		display: displayShortcut.primaryAlt( 't' ),
+	},
+	insertAfter: {
+		raw: rawShortcut.primaryAlt( 'y' ),
+		display: displayShortcut.primaryAlt( 'y' ),
+	},
+};
 
 class EditorGlobalKeyboardShortcuts extends Component {
 	constructor() {
@@ -24,9 +53,9 @@ class EditorGlobalKeyboardShortcuts extends Component {
 	}
 
 	selectAll( event ) {
-		const { clientIds, onMultiSelect } = this.props;
+		const { rootBlocksClientIds, onMultiSelect } = this.props;
 		event.preventDefault();
-		onMultiSelect( first( clientIds ), last( clientIds ) );
+		onMultiSelect( first( rootBlocksClientIds ), last( rootBlocksClientIds ) );
 	}
 
 	undoOrRedo( event ) {
@@ -47,11 +76,11 @@ class EditorGlobalKeyboardShortcuts extends Component {
 	}
 
 	deleteSelectedBlocks( event ) {
-		const { multiSelectedBlockClientIds, onRemove, isLocked } = this.props;
-		if ( multiSelectedBlockClientIds.length ) {
+		const { selectedBlockClientIds, hasMultiSelection, onRemove, isLocked } = this.props;
+		if ( hasMultiSelection ) {
 			event.preventDefault();
 			if ( ! isLocked ) {
-				onRemove( multiSelectedBlockClientIds );
+				onRemove( selectedBlockClientIds );
 			}
 		}
 	}
@@ -68,6 +97,7 @@ class EditorGlobalKeyboardShortcuts extends Component {
 	}
 
 	render() {
+		const { selectedBlockClientIds } = this.props;
 		return (
 			<Fragment>
 				<KeyboardShortcuts
@@ -86,6 +116,31 @@ class EditorGlobalKeyboardShortcuts extends Component {
 						[ rawShortcut.primary( 's' ) ]: this.save,
 					} }
 				/>
+				{ selectedBlockClientIds.length && (
+					<BlockActions clientIds={ selectedBlockClientIds }>
+						{ ( { onDuplicate, onRemove, onInsertAfter, onInsertBefore } ) => (
+							<KeyboardShortcuts
+								bindGlobal
+								shortcuts={ {
+									// Prevents bookmark all Tabs shortcut in Chrome when devtools are closed.
+									// Prevents reposition Chrome devtools pane shortcut when devtools are open.
+									[ shortcuts.duplicate.raw ]: flow( preventDefault, onDuplicate ),
+
+									// Does not clash with any known browser/native shortcuts, but preventDefault
+									// is used to prevent any obscure unknown shortcuts from triggering.
+									[ shortcuts.removeBlock.raw ]: flow( preventDefault, onRemove ),
+
+									// Prevent 'view recently closed tabs' in Opera using preventDefault.
+									[ shortcuts.insertBefore.raw ]: flow( preventDefault, onInsertBefore ),
+
+									// Does not clash with any known browser/native shortcuts, but preventDefault
+									// is used to prevent any obscure unknown shortcuts from triggering.
+									[ shortcuts.insertAfter.raw ]: flow( preventDefault, onInsertAfter ),
+								} }
+							/>
+						) }
+					</BlockActions>
+				) }
 			</Fragment>
 		);
 	}
@@ -100,18 +155,20 @@ export default compose( [
 			isEditedPostDirty,
 			getBlockRootClientId,
 			getTemplateLock,
+			getSelectedBlock,
 		} = select( 'core/editor' );
-		const multiSelectedBlockClientIds = getMultiSelectedBlockClientIds();
+		const block = getSelectedBlock();
+		const selectedBlockClientIds = block ? [ block.clientId ] : getMultiSelectedBlockClientIds();
 
 		return {
-			clientIds: getBlockOrder(),
-			multiSelectedBlockClientIds,
+			rootBlocksClientIds: getBlockOrder(),
 			hasMultiSelection: hasMultiSelection(),
 			isLocked: some(
-				multiSelectedBlockClientIds,
+				selectedBlockClientIds,
 				( clientId ) => !! getTemplateLock( getBlockRootClientId( clientId ) )
 			),
 			isDirty: isEditedPostDirty(),
+			selectedBlockClientIds,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
