@@ -143,10 +143,10 @@ class Sandbox extends Component {
 			body > div > iframe {
 				width: 100%;
 			}
-			html.video,
-			body.video,
-			body.video > div,
-			body.video > div > iframe {
+			html.wp-has-aspect-ratio,
+			body.wp-has-aspect-ratio,
+			body.wp-has-aspect-ratio > div,
+			body.wp-has-aspect-ratio > div > iframe {
 				height: 100%;
 			}
 			body > div > * {

@@ -214,7 +214,7 @@ export function getEmbedEdit( title, icon ) {
 				}
 
 				if ( aspectRatioClassName ) {
-					aspectRatioClassName += ' wp-embed-has-aspect-ratio';
+					aspectRatioClassName += ' wp-has-aspect-ratio';
 					const className = classnames( this.props.attributes.className, aspectRatioClassName );
 					this.props.setAttributes( { className } );
 				}
@@ -281,6 +281,7 @@ export function getEmbedEdit( title, icon ) {
 			const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedUrl.host.replace( /^www\./, '' ) );
 			// translators: %s: host providing embed content e.g: www.youtube.com
 			const iframeTitle = sprintf( __( 'Embedded content from %s' ), parsedUrl.host );
+			const sandboxClassnames = className ? type + ' ' + className : type;
 			const embedWrapper = 'wp-embed' === type ? (
 				<div
 					className="wp-block-embed__wrapper"
@@ -291,7 +292,7 @@ export function getEmbedEdit( title, icon ) {
 					<SandBox
 						html={ html }
 						title={ iframeTitle }
-						type={ type }
+						type={ sandboxClassnames }
 					/>
 				</div>
 			);
