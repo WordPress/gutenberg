@@ -319,6 +319,24 @@ export function getEmbedEdit( title, icon ) {
 	};
 }
 
+const embedAttributes = {
+	url: {
+		type: 'string',
+	},
+	caption: {
+		type: 'array',
+		source: 'children',
+		selector: 'figcaption',
+		default: [],
+	},
+	type: {
+		type: 'string',
+	},
+	providerNameSlug: {
+		type: 'string',
+	},
+};
+
 function getEmbedBlockSettings( { title, description, icon, category = 'embed', transforms, keywords = [] } ) {
 	// translators: %s: Name of service (e.g. VideoPress, YouTube)
 	const blockDescription = description || sprintf( __( 'Add a block that displays content pulled from other sites, like Twitter, Instagram or YouTube.' ), title );
@@ -328,23 +346,7 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 		icon,
 		category,
 		keywords,
-		attributes: {
-			url: {
-				type: 'string',
-			},
-			caption: {
-				type: 'array',
-				source: 'children',
-				selector: 'figcaption',
-				default: [],
-			},
-			type: {
-				type: 'string',
-			},
-			providerNameSlug: {
-				type: 'string',
-			},
-		},
+		attributes: embedAttributes,
 
 		supports: {
 			align: true,
@@ -382,11 +384,38 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 
 			return (
 				<figure className={ embedClassName }>
-					{ `\n${ url }\n` /* URL needs to be on its own line. */ }
+					<div className="wp-block-embed__wrapper">
+						{ `\n${ url }\n` /* URL needs to be on its own line. */ }
+					</div>
 					{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
 				</figure>
 			);
 		},
+
+		deprecated: [
+			{
+				attributes: embedAttributes,
+				save( { attributes } ) {
+					const { url, caption, type, providerNameSlug } = attributes;
+
+					if ( ! url ) {
+						return null;
+					}
+
+					const embedClassName = classnames( 'wp-block-embed', {
+						[ `is-type-${ type }` ]: type,
+						[ `is-provider-${ providerNameSlug }` ]: providerNameSlug,
+					} );
+
+					return (
+						<figure className={ embedClassName }>
+							{ `\n${ url }\n` /* URL needs to be on its own line. */ }
+							{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
+						</figure>
+					);
+				},
+			},
+		],
 	};
 }
 
