@@ -1,13 +1,12 @@
 /**
  * Internal dependencies
  */
-import createLevelControl from './level-control';
+import HeadingToolbar from './heading-toolbar';
 
 /**
  * External dependencies
  */
 import { View } from 'react-native';
-import { range } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,7 +15,6 @@ import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { RichText } from '@wordpress/editor';
 import { parse } from '@wordpress/blocks';
-import { Toolbar } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -41,7 +39,7 @@ class HeadingEdit extends Component {
 
 		return (
 			<View>
-				<Toolbar controls={ range( 2, 5 ).map( ( index ) => createLevelControl( index, level, setAttributes ) ) } />
+				<HeadingToolbar minLevel={ 2 } maxLevel={ 5 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
 				<RichText
 					tagName={ tagName }
 					content={ { contentTree: attributes.content, eventCount: attributes.eventCount } }
