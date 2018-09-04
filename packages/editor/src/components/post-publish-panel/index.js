@@ -115,7 +115,7 @@ class PostPublishPanel extends Component {
 
 				<div className="editor-post-publish-panel__disable-check">
 					<CheckboxControl
-						label={ __( 'Don’t show this again' ) }
+						label={ __( 'Show this panel every time I publish a post' ) }
 						checked={ false }
 						onChange={ () => this.onUpdateDisableToggle() }
 					/>
