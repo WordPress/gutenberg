@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import React from 'react';
 import Textarea from 'react-autosize-textarea';
 import classnames from 'classnames';
 import { get } from 'lodash';
@@ -36,10 +37,19 @@ class PostTitle extends Component {
 		this.onUnselect = this.onUnselect.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.redirectHistory = this.redirectHistory.bind( this );
+		this.textareaRef = React.createRef();
 
 		this.state = {
 			isSelected: false,
 		};
+	}
+
+	componentDidMount() {
+		// If there is a post title and it's empty, we should focus the title so
+		// the user can start typing the title right away.
+		if ( ! this.props.title || ! this.props.title.length ) {
+			this.textareaRef.current.textarea.focus();
+		}
 	}
 
 	handleFocusOutside() {
@@ -119,6 +129,7 @@ class PostTitle extends Component {
 								onFocus={ this.onSelect }
 								onKeyDown={ this.onKeyDown }
 								onKeyPress={ this.onUnselect }
+								ref={ this.textareaRef }
 							/>
 						</KeyboardShortcuts>
 						{ isSelected && isPostTypeViewable && <PostPermalink /> }
