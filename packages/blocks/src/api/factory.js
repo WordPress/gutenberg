@@ -60,6 +60,7 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 		clientId,
 		name,
 		isValid: true,
+		blockStatus: 'ok',
 		attributes,
 		innerBlocks,
 	};

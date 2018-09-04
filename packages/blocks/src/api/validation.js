@@ -5,6 +5,11 @@ import { tokenize } from 'simple-html-tokenizer';
 import { xor, fromPairs, isEqual, includes, stubTrue } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { applyFilters } from '@wordpress/hooks';
+
+/**
  * Internal dependencies
  */
 import { getSaveContent } from './serializer';
@@ -484,4 +489,91 @@ export function isValidBlock( innerHTML, blockType, attributes ) {
 	}
 
 	return isValid;
+}
+
+/**
+ * Returns a boolean isValid given a block's status
+ *
+ * @param {status} status  Block status.
+ *
+ * @return {boolean} Whether block is valid.
+ */
+export function isValidStatus( status ) {
+	if ( status === undefined || status === 'ok' ) {
+		return true;
+	}
+
+	return false;
+}
+
+/**
+ * Checks if the block's HTML is different from what is expected for the block's data
+ *
+ * @param {string} innerHTML  Original block content.
+ * @param {string} blockType  Block type.
+ * @param {Object} attributes Parsed block attributes.
+ *
+ * @return {string} Status value, 'ok' is no problems detected, 'modified' if HTML has been modified
+ */
+export function checkForDifference( innerHTML, blockType, attributes ) {
+	const isValid = isValidBlock( innerHTML, blockType, attributes );
+
+	return isValid ? 'ok' : 'modified';
+}
+
+/**
+ * Validates the HTML by checking for broken HTML
+ *
+ * Note that broken is defined as anything that causes the HTML tokenizer to break. There
+ * may be invalid HTML that passes this test
+ *
+ * @param {string} innerHTML  Original block content.
+ *
+ * @return {string} Status value, 'ok' if no problems detected, 'invalid-html' otherwise
+ */
+export function checkBrokenHtml( innerHTML ) {
+	const tokens = getHTMLTokens( innerHTML );
+
+	// Check for invalid HTML and set the status, unless the block is allowed to be invalid
+	if ( tokens === null ) {
+		return 'invalid-html';
+	}
+
+	return 'ok';
+}
+
+function shouldValidateBlock( blockName ) {
+	const ignoreBlockTypes = [
+		'core/html',
+	];
+
+	return ignoreBlockTypes.indexOf( blockName ) === -1;
+}
+
+/**
+ * Get a status value for a block to indicate if the block is valid ('ok'), or
+ * what kind of problem has been detected.
+ *
+ * Uses 'blocks.getBlockValidators' filter to modify validations
+ *
+ * @param {string} innerHTML  Original block content.
+ * @param {string} blockType  Block type.
+ * @param {Object} attributes Parsed block attributes.
+ *
+ * @return {string} Status value, 'ok' if no problems detected
+ */
+export function getBlockStatus( innerHTML, blockType, attributes ) {
+	if ( ! shouldValidateBlock( blockType.name ) ) {
+		return 'ok';
+	}
+
+	const defaultValidators = [ checkBrokenHtml, checkForDifference ];
+	const validators = applyFilters( 'blocks.getBlockValidators', defaultValidators );
+
+	// Run the block through the validators and return the first non-ok status, if any
+	const status = validators
+		.map( ( blockValidate ) => blockValidate( innerHTML, blockType, attributes ) )
+		.filter( ( result ) => result !== 'ok' );
+
+	return status.length === 0 ? 'ok' : status[ 0 ];
 }
