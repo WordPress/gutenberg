@@ -87,7 +87,7 @@ export function BlockSettingsMenu( {
 			/>
 			<Dropdown
 				contentClassName="editor-block-settings-menu__popover"
-				position="bottom left"
+				position="bottom right"
 				renderToggle={ ( { onToggle, isOpen } ) => {
 					const toggleClassname = classnames( 'editor-block-settings-menu__toggle', {
 						'is-opened': isOpen,
