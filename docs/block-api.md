@@ -79,8 +79,10 @@ An icon property should be specified to make it easier to identify a block. Thes
 icon: 'book-alt',
 
 // Specifying a custom svg for the block
-icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true" focusable="false"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M19 13H5v-2h14v2z" /></svg>,
+icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M19 13H5v-2h14v2z" /></svg>,
 ```
+
+**Note:** Custom SVG icons are automatically wrapped in the `wp.components.AccessibleSVG` component to add the a11y attributes (role, aria-hidden and focusable).
 
 An object can also be passed as icon, in this case, icon, as specified above, should be included in the src property.
 Besides src the object can contain background and foreground colors, this colors will appear with the icon
