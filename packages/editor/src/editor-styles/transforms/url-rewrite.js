@@ -132,7 +132,7 @@ function replaceURLs( raw, URLs ) {
 	return raw;
 }
 
-export const rewrite = ( rootURL ) => ( node ) => {
+const rewrite = ( rootURL ) => ( node ) => {
 	if ( node.type === 'declaration' ) {
 		const updatedURLs = getURLs( node.value ).map( processURL( rootURL ) );
 		return {

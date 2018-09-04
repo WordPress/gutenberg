@@ -21,6 +21,14 @@ describe( 'CSS selector wrap', () => {
 		expect( output ).toMatchSnapshot();
 	} );
 
+	it( 'should ignore selectors', () => {
+		const callback = wrap( '.my-namespace', 'body' );
+		const input = `h1, body { color: red; }`;
+		const output = traverse( input, callback );
+
+		expect( output ).toMatchSnapshot();
+	} );
+
 	it( 'should replace root tags', () => {
 		const callback = wrap( '.my-namespace' );
 		const input = `body, h1 { color: red; }`;
