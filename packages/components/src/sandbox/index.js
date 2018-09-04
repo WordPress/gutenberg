@@ -137,8 +137,12 @@ class Sandbox extends Component {
 			body {
 				margin: 0;
 			}
+			html,
+			body,
+			body > div,
 			body > div > iframe {
 				width: 100%;
+				height: 100%;
 			}
 			body > div > * {
 				margin-top: 0 !important;	/* has to have !important to override inline styles */
