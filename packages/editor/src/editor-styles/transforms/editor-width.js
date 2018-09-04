@@ -24,7 +24,7 @@ export const getEditorWidthRules = ( width ) => {
 const editorWidth = ( node ) => {
 	if (
 		node.type === 'rule' &&
-		find( node.selectors, ( selector ) => selector.trim() === 'html' )
+		find( node.selectors, ( selector ) => selector.trim() === '.wp-block' )
 	) {
 		const widthDeclaration = find(
 			node.declarations,

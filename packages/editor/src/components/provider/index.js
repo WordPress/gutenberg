@@ -36,7 +36,7 @@ class EditorProvider extends Component {
 		map( this.props.settings.styles, ( { css, baseURL } ) => {
 			const transforms = [
 				editorWidth,
-				wrap( '.editor-block-list__block', [ 'html' ] ),
+				wrap( '.editor-block-list__block', [ '.wp-block' ] ),
 			];
 			if ( baseURL ) {
 				transforms.push( urlRewrite( baseURL ) );
