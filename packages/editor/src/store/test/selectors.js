@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, property, without } from 'lodash';
+import { filter, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -137,7 +137,7 @@ describe( 'selectors', () => {
 			parent: [ 'core/test-block-b' ],
 		} );
 
-		cachedSelectors = filter( selectors, property( 'clear' ) );
+		cachedSelectors = filter( selectors, ( selector ) => selector.clear );
 	} );
 
 	beforeEach( () => {
