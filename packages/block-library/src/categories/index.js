@@ -20,9 +20,8 @@ export const settings = {
 	category: 'widgets',
 
 	attributes: {
-		showPostCounts: {
-			type: 'boolean',
-			default: false,
+		align: {
+			type: 'string',
 		},
 		displayAsDropdown: {
 			type: 'boolean',
@@ -32,8 +31,9 @@ export const settings = {
 			type: 'boolean',
 			default: false,
 		},
-		align: {
-			type: 'string',
+		showPostCounts: {
+			type: 'boolean',
+			default: false,
 		},
 	},
 
