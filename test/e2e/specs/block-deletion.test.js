@@ -31,6 +31,12 @@ describe( 'block deletion -', () => {
 
 	describe( 'deleting the third block using the Remove Block menu item', () => {
 		it( 'results in two remaining blocks and positions the caret at the end of the second block', async () => {
+			// The blocks can't be empty to trigger the toolbar
+			await page.keyboard.type( 'Paragraph to remove' );
+
+			// Move the mouse to show the block toolbar
+			await page.mouse.move( 200, 300, { steps: 10 } );
+
 			await clickOnBlockSettingsMenuItem( 'Remove Block' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 

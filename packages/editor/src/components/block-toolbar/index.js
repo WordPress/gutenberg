@@ -2,7 +2,7 @@
  * WordPress Dependencies
  */
 import { withSelect } from '@wordpress/data';
-import { Component, createRef } from '@wordpress/element';
+import { Component, createRef, Fragment } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 
 /**
@@ -53,15 +53,19 @@ class BlockToolbar extends Component {
 			);
 		}
 
-		if ( ! isValid || 'visual' !== mode ) {
+		if ( ! isValid ) {
 			return null;
 		}
 
 		return (
 			<div className="editor-block-toolbar">
-				<BlockSwitcher clientIds={ blockClientIds } />
-				<BlockControls.Slot />
-				<BlockFormatControls.Slot />
+				{ mode === 'visual' && (
+					<Fragment>
+						<BlockSwitcher clientIds={ blockClientIds } />
+						<BlockControls.Slot />
+						<BlockFormatControls.Slot />
+					</Fragment>
+				) }
 				<BlockSettingsMenu clientIds={ blockClientIds } />
 			</div>
 		);
