@@ -94,11 +94,19 @@
 	cursor: move; // Fallback for IE/Edge < 14
 	cursor: grab;
 
+	&,
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover,
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):active,
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):focus {
 		box-shadow: none;
 		background: none;
+
+		// Use opacity to work in various editor styles.
+		color: $dark-opacity-500;
+
+		.is-dark-theme & {
+			color: $light-opacity-500;
+		}
 	}
 
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):active {
