@@ -118,6 +118,10 @@ module.exports = {
 				message: 'Always pass an array as the path argument',
 			},
 			{
+				selector: 'CallExpression[callee.name=/^(property|matchesProperty|path)$/] > Literal:nth-child(1)',
+				message: 'Always pass an array as the path argument',
+			},
+			{
 				selector: 'CallExpression[callee.name=/^(__|_x|_n|_nx)$/] Literal[value=/\\.{3}/]',
 				message: 'Use ellipsis character (…) in place of three dots',
 			},
