@@ -3,6 +3,7 @@
         "clientId": "_clientId_0",
         "name": "core/gallery",
         "isValid": true,
+        "blockStatus": "ok",
         "attributes": {
             "images": [
                 {

@@ -289,6 +289,7 @@ describe( 'block parser', () => {
 				attributes: {},
 				originalContent: '<span class="wp-block-test-block">Bananas</span>',
 				isValid: false,
+				blockStatus: 'changed',
 			} );
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
@@ -303,6 +304,7 @@ describe( 'block parser', () => {
 				attributes: {},
 				originalContent: '<span class="wp-block-test-block">Bananas</span>',
 				isValid: false,
+				blockStatus: 'changed',
 			} );
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
@@ -328,6 +330,7 @@ describe( 'block parser', () => {
 				attributes: {},
 				originalContent: '<span>Bananas</span>',
 				isValid: false,
+				blockStatus: 'changed',
 			} );
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
@@ -357,6 +360,7 @@ describe( 'block parser', () => {
 				attributes: {},
 				originalContent: '<span>Bananas</span>',
 				isValid: false,
+				blockStatus: 'changed',
 			} );
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
@@ -400,6 +404,7 @@ describe( 'block parser', () => {
 				},
 				originalContent: 'Bananas',
 				isValid: true,
+				blockStatus: 'ok',
 			} );
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
@@ -429,6 +434,7 @@ describe( 'block parser', () => {
 				},
 				originalContent: 'Bananas',
 				isValid: true,
+				blockStatus: 'ok',
 			} );
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
@@ -542,6 +548,7 @@ describe( 'block parser', () => {
 			expect( block.name ).toEqual( 'core/test-block' );
 			expect( block.attributes ).toEqual( { fruit: 'Big Bananas' } );
 			expect( block.isValid ).toBe( true );
+			expect( block.blockStatus ).toBe( 'ok' );
 			expect( console ).toHaveErrored();
 			expect( console ).toHaveWarned();
 		} );

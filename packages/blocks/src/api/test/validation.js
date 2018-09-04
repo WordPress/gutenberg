@@ -14,6 +14,10 @@ import {
 	getNextNonWhitespaceToken,
 	isEquivalentHTML,
 	isValidBlock,
+	isValidStatus,
+	checkForDifference,
+	checkBrokenHtml,
+	getBlockStatus,
 } from '../validation';
 import {
 	registerBlockType,
@@ -518,6 +522,106 @@ describe( 'validation', () => {
 			);
 
 			expect( isValid ).toBe( true );
+		} );
+	} );
+
+	describe( 'getBlockStatus()', () => {
+		it( 'should return "ok" when all validators pass on valid HTML', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			const status = getBlockStatus(
+				'Bananas',
+				getBlockType( 'core/test-block' ),
+				{ fruit: 'Bananas' }
+			);
+
+			expect( status ).toBe( 'ok' );
+		} );
+
+		it( 'should return "ok" with broken HTML on an HTML block', () => {
+			const status = getBlockStatus(
+				'<blockquote class="wp-block-quote">fsdfsdfsd</blockquote dsf dste>',
+				{ name: 'core/html' },
+			);
+
+			expect( status ).toBe( 'ok' );
+		} );
+
+		it( 'should return first non-valid status when all validators fail', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			const status = getBlockStatus(
+				'<blockquote class="wp-block-quote">fsdfsdfsd<p>fdsfsdfsdd</pfd fd fd></blockquote>',
+				getBlockType( 'core/test-block' ),
+				{ fruit: 'Bananas' }
+			);
+
+			expect( console ).toHaveWarned();
+			expect( console ).toHaveErrored();
+			expect( status ).toBe( 'invalid-html' );
+		} );
+	} );
+
+	describe( 'checkBrokenHtml()', () => {
+		it( 'should return "invalid-html" if supplied malformed HTML', () => {
+			const status = checkBrokenHtml(
+				'<blockquote class="wp-block-quote">fsdfsdfsd<p>fdsfsdfsdd</pfd fd fd></blockquote>',
+				{ name: 'core/thing' },
+			);
+
+			expect( console ).toHaveWarned();
+			expect( status ).toBe( 'invalid-html' );
+		} );
+
+		it( 'should return "ok" if supplied valid HTML', () => {
+			const status = checkBrokenHtml(
+				'<blockquote class="wp-block-quote">fsdfsdfsd</blockquote>',
+				{ name: 'core/text' },
+			);
+
+			expect( status ).toBe( 'ok' );
+		} );
+	} );
+
+	describe( 'checkForDifference()', () => {
+		it( 'should return "ok" when HTML is equivalent', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			const status = checkForDifference(
+				'Bananas',
+				getBlockType( 'core/test-block' ),
+				{ fruit: 'Bananas' }
+			);
+
+			expect( status ).toBe( 'ok' );
+		} );
+
+		it( 'should return "modified" when HTML is not equivalent', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			const status = checkForDifference(
+				'Apples',
+				getBlockType( 'core/test-block' ),
+				{ fruit: 'Bananas' }
+			);
+
+			expect( console ).toHaveWarned();
+			expect( console ).toHaveErrored();
+			expect( status ).toBe( 'modified' );
+		} );
+	} );
+
+	describe( 'isValidStatus()', () => {
+		it( 'returns true if an undefined status', () => {
+			expect( isValidStatus() ).toBe( true );
+		} );
+
+		it( 'returns true if an "ok" status', () => {
+			expect( isValidStatus( 'ok' ) ).toBe( true );
+		} );
+
+		it( 'returns false for any other status', () => {
+			expect( isValidStatus( 'anything' ) ).toBe( false );
 		} );
 	} );
 } );

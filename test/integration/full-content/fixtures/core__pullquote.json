@@ -3,6 +3,7 @@
         "clientId": "_clientId_0",
         "name": "core/pullquote",
         "isValid": true,
+        "blockStatus": "ok",
         "attributes": {
             "value": [
                 {

@@ -3,6 +3,7 @@
         "clientId": "_clientId_0",
         "name": "core/file",
         "isValid": true,
+        "blockStatus": "ok",
         "attributes": {
             "id": 176,
             "href": "http://localhost:8888/wp-content/uploads/2018/05/keycodes.js",

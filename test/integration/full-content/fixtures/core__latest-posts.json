@@ -3,6 +3,7 @@
         "clientId": "_clientId_0",
         "name": "core/latest-posts",
         "isValid": true,
+        "blockStatus": "ok",
         "attributes": {
             "postsToShow": 5,
             "displayPostDate": false,

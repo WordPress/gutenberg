@@ -269,6 +269,7 @@ describe( 'block serializer', () => {
 			} );
 
 			block.isValid = false;
+			block.blockStatus = 'changed';
 			block.originalContent = 'Correct';
 
 			expect( serialize( block ) ).toEqual(
@@ -312,6 +313,7 @@ describe( 'block serializer', () => {
 					content: 'chicken',
 				},
 				isValid: true,
+				blockStatus: 'ok',
 			};
 			expect( getBlockContent( block ) ).toBe( 'chicken' );
 		} );

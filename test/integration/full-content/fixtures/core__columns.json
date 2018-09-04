@@ -3,6 +3,7 @@
         "clientId": "_clientId_0",
         "name": "core/columns",
         "isValid": true,
+        "blockStatus": "ok",
         "attributes": {
             "columns": 3
         },
@@ -11,12 +12,14 @@
                 "clientId": "_clientId_0",
                 "name": "core/column",
                 "isValid": true,
+                "blockStatus": "ok",
                 "attributes": {},
                 "innerBlocks": [
                     {
                         "clientId": "_clientId_0",
                         "name": "core/paragraph",
                         "isValid": true,
+                        "blockStatus": "ok",
                         "attributes": {
                             "content": [
                                 "Column One, Paragraph One"
@@ -30,6 +33,7 @@
                         "clientId": "_clientId_1",
                         "name": "core/paragraph",
                         "isValid": true,
+                        "blockStatus": "ok",
                         "attributes": {
                             "content": [
                                 "Column One, Paragraph Two"
@@ -46,12 +50,14 @@
                 "clientId": "_clientId_1",
                 "name": "core/column",
                 "isValid": true,
+                "blockStatus": "ok",
                 "attributes": {},
                 "innerBlocks": [
                     {
                         "clientId": "_clientId_0",
                         "name": "core/paragraph",
                         "isValid": true,
+                        "blockStatus": "ok",
                         "attributes": {
                             "content": [
                                 "Column Two, Paragraph One"
@@ -65,6 +71,7 @@
                         "clientId": "_clientId_1",
                         "name": "core/paragraph",
                         "isValid": true,
+                        "blockStatus": "ok",
                         "attributes": {
                             "content": [
                                 "Column Three, Paragraph One"

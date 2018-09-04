@@ -471,6 +471,7 @@ describe( 'state', () => {
 					name: 'core/test-block',
 					attributes: {},
 					isValid: false,
+					blockStatus: 'changed',
 					innerBlocks: [],
 				} ],
 			} );
@@ -480,6 +481,7 @@ describe( 'state', () => {
 				updates: {
 					attributes: { content: 'ribs' },
 					isValid: true,
+					blockStatus: 'ok',
 				},
 			} );
 
@@ -488,6 +490,7 @@ describe( 'state', () => {
 				name: 'core/test-block',
 				attributes: { content: 'ribs' },
 				isValid: true,
+				blockStatus: 'ok',
 			} );
 		} );
 
@@ -501,6 +504,7 @@ describe( 'state', () => {
 						ref: 'random-clientId',
 					},
 					isValid: false,
+					blockStatus: 'changed',
 					innerBlocks: [],
 				} ],
 			} );
@@ -518,6 +522,7 @@ describe( 'state', () => {
 					ref: 3,
 				},
 				isValid: false,
+				blockStatus: 'changed',
 			} );
 		} );
 

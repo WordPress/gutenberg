@@ -3,6 +3,7 @@
         "clientId": "_clientId_0",
         "name": "core/list",
         "isValid": true,
+        "blockStatus": "ok",
         "attributes": {
             "ordered": false,
             "values": [

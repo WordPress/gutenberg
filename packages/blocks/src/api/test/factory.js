@@ -74,6 +74,7 @@ describe( 'block factory', () => {
 				align: 'left',
 			} );
 			expect( block.isValid ).toBe( true );
+			expect( block.blockStatus ).toBe( 'ok' );
 			expect( block.innerBlocks ).toHaveLength( 1 );
 			expect( block.innerBlocks[ 0 ].name ).toBe( 'core/test-block' );
 			expect( typeof block.clientId ).toBe( 'string' );
@@ -734,6 +735,7 @@ describe( 'block factory', () => {
 			expect( transformedBlocks[ 0 ] ).toHaveProperty( 'clientId' );
 			expect( transformedBlocks[ 0 ].name ).toBe( 'core/updated-text-block' );
 			expect( transformedBlocks[ 0 ].isValid ).toBe( true );
+			expect( transformedBlocks[ 0 ].blockStatus ).toBe( 'ok' );
 			expect( transformedBlocks[ 0 ].attributes ).toEqual( {
 				value: 'chicken ribs',
 			} );
@@ -773,6 +775,7 @@ describe( 'block factory', () => {
 			expect( transformedBlocks[ 0 ] ).toHaveProperty( 'clientId' );
 			expect( transformedBlocks[ 0 ].name ).toBe( 'core/updated-text-block' );
 			expect( transformedBlocks[ 0 ].isValid ).toBe( true );
+			expect( transformedBlocks[ 0 ].blockStatus ).toBe( 'ok' );
 			expect( transformedBlocks[ 0 ].attributes ).toEqual( {
 				value: 'chicken ribs',
 			} );
@@ -1032,6 +1035,7 @@ describe( 'block factory', () => {
 			expect( transformedBlocks[ 0 ].clientId ).not.toBe( block.clientId );
 			expect( transformedBlocks[ 0 ].name ).toBe( 'core/text-block' );
 			expect( transformedBlocks[ 0 ].isValid ).toBe( true );
+			expect( transformedBlocks[ 0 ].blockStatus ).toBe( 'ok' );
 			expect( transformedBlocks[ 0 ].attributes ).toEqual( {
 				value: 'chicken ribs',
 			} );
@@ -1039,6 +1043,7 @@ describe( 'block factory', () => {
 			expect( transformedBlocks[ 1 ] ).toHaveProperty( 'clientId' );
 			expect( transformedBlocks[ 1 ].name ).toBe( 'core/updated-text-block' );
 			expect( transformedBlocks[ 1 ].isValid ).toBe( true );
+			expect( transformedBlocks[ 1 ].blockStatus ).toBe( 'ok' );
 			expect( transformedBlocks[ 1 ].attributes ).toEqual( {
 				value: 'smoked ribs',
 			} );
