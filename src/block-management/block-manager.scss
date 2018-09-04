@@ -5,12 +5,12 @@
 .container {
 	flex: 1;
 	justify-content: flex-start;
-	background-color: #caa;
+	background-color: #fff;
+	padding-top: 30;
 }
 
 .list {
 	flex: 1;
-	background-color: #ccc;
 }
 
 .htmlView {
@@ -26,7 +26,14 @@
 .switch {
 	flex-direction: row;
 	justify-content: flex-start;
+	align-items: center;
+	margin: 10px;
 }
+
+.switchLabel {
+	margin-left: 10px;
+}
+
 
 .lineStyleAddHere {
 	flex: 1;
