@@ -289,7 +289,7 @@ export class InserterMenu extends Component {
 							<IconButton
 								className="editor-inserter__manage-reusable-blocks"
 								icon="admin-generic"
-								label={ __( 'Manage Blocks' ) }
+								label={ __( 'Manage All Reusable Blocks' ) }
 								href="edit.php?post_type=wp_block"
 							/>
 						</PanelBody>
