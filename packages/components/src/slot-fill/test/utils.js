@@ -13,6 +13,7 @@ describe( 'isEmptyElement', () => {
 		expect( isEmptyElement( undefined ) ).toBe( true );
 		expect( isEmptyElement( false ) ).toBe( true );
 		expect( isEmptyElement( '' ) ).toBe( true );
+		expect( isEmptyElement( new String( '' ) ) ).toBe( true );
 		expect( isEmptyElement( [] ) ).toBe( true );
 	} );
 
