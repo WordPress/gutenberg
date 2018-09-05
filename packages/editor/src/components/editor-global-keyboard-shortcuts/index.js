@@ -116,7 +116,7 @@ class EditorGlobalKeyboardShortcuts extends Component {
 						[ rawShortcut.primary( 's' ) ]: this.save,
 					} }
 				/>
-				{ selectedBlockClientIds.length && (
+				{ selectedBlockClientIds.length > 0 && (
 					<BlockActions clientIds={ selectedBlockClientIds }>
 						{ ( { onDuplicate, onRemove, onInsertAfter, onInsertBefore } ) => (
 							<KeyboardShortcuts
