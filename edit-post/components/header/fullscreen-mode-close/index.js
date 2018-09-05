@@ -1,4 +1,9 @@
 /**
+ * External Dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * WordPress Dependencies
  */
 import { withSelect } from '@wordpress/data';
@@ -12,7 +17,7 @@ import { addQueryArgs } from '@wordpress/url';
 import './style.scss';
 
 function FullscreenModeClose( { isActive, postType } ) {
-	if ( ! isActive ) {
+	if ( ! isActive || ! postType ) {
 		return null;
 	}
 
@@ -20,14 +25,24 @@ function FullscreenModeClose( { isActive, postType } ) {
 		<Toolbar className="edit-post-fullscreen-mode-close__toolbar">
 			<IconButton
 				icon="no-alt"
-				href={ addQueryArgs( 'edit.php', { post_type: postType } ) }
-				label={ __( 'Close' ) }
+				href={ addQueryArgs( 'edit.php', { post_type: postType.slug } ) }
+				label={ get(
+					postType,
+					[ 'labels', 'view_items' ],
+					__( 'View Posts' )
+				) }
 			/>
 		</Toolbar>
 	);
 }
 
-export default withSelect( ( select ) => ( {
-	isActive: select( 'core/edit-post' ).isFeatureActive( 'fullscreenMode' ),
-	postType: select( 'core/editor' ).getCurrentPostType(),
-} ) )( FullscreenModeClose );
+export default withSelect( ( select ) => {
+	const { getCurrentPostType } = select( 'core/editor' );
+	const { isFeatureActive } = select( 'core/edit-post' );
+	const { getPostType } = select( 'core' );
+
+	return {
+		isActive: isFeatureActive( 'fullscreenMode' ),
+		postType: getPostType( getCurrentPostType() ),
+	};
+} )( FullscreenModeClose );
