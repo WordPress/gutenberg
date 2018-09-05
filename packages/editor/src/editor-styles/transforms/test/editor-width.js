@@ -13,7 +13,7 @@ describe( 'Editor Width', () => {
 	} );
 
 	it( 'should generate the editor width styles', () => {
-		const input = `html { width: 300px; }`;
+		const input = `.wp-block { width: 300px; }`;
 		const output = traverse( input, editorWidth );
 
 		expect( output ).toMatchSnapshot();
