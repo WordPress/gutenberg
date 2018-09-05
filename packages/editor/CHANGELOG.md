@@ -1,5 +1,9 @@
 ## 3.0.0 (Unreleased)
 
+### New Features
+
+- Add editor styles support.
+
 ### Breaking Changes
 
 - The `wideAlign` block supports hook has been removed. Use `alignWide` instead.

@@ -444,6 +444,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/postcss-url",
+		"slug": "packages-postcss-url",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/postcss-url/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/redux-routine",
 		"slug": "packages-redux-routine",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/redux-routine/README.md",
