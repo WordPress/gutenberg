@@ -2240,6 +2240,35 @@ describe( 'selectors', () => {
 
 			expect( hasSelectedInnerBlock( state, 4 ) ).toBe( true );
 		} );
+
+		it( 'should return true if a multi selection exists that contains children of the block with the given ClientId', () => {
+			const state = {
+				editor: {
+					present: {
+						blockOrder: {
+							6: [ 5, 4, 3, 2, 1 ],
+						},
+					},
+				},
+				blockSelection: { start: 2, end: 4 },
+			};
+			expect( hasSelectedInnerBlock( state, 6 ) ).toBe( true );
+		} );
+
+		it( 'should return false if a multi selection exists bot does not contains children of the block with the given ClientId', () => {
+			const state = {
+				editor: {
+					present: {
+						blockOrder: {
+							3: [ 2, 1 ],
+							6: [ 5, 4 ],
+						},
+					},
+				},
+				blockSelection: { start: 5, end: 4 },
+			};
+			expect( hasSelectedInnerBlock( state, 3 ) ).toBe( false );
+		} );
 	} );
 
 	describe( 'isBlockWithinSelection', () => {
