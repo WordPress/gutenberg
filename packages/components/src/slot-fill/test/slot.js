@@ -36,51 +36,59 @@ describe( 'Slot', () => {
 	it( 'should render empty Fills', () => {
 		const element = mount(
 			<Provider>
-				<Slot name="chicken" />
+				<div>
+					<Slot name="chicken" />
+				</div>
 				<Fill name="chicken" />
 			</Provider>
 		);
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation"></div>' );
+		expect( element.html() ).toBe( '<div></div>' );
 	} );
 
 	it( 'should render a string Fill', () => {
 		const element = mount(
 			<Provider>
-				<Slot name="chicken" />
+				<div>
+					<Slot name="chicken" />
+				</div>
 				<Fill name="chicken">
 					content
 				</Fill>
 			</Provider>
 		);
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation">content</div>' );
+		expect( element.html() ).toBe( '<div>content</div>' );
 	} );
 
 	it( 'should render a Fill containing an element', () => {
 		const element = mount(
 			<Provider>
-				<Slot name="chicken" />
+				<div>
+					<Slot name="chicken" />
+				</div>
 				<Fill name="chicken">
 					<span />
 				</Fill>
 			</Provider>
 		);
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation"><span></span></div>' );
+		expect( element.html() ).toBe( '<div><span></span></div>' );
 	} );
 
 	it( 'should render a Fill containing an array', () => {
 		const element = mount(
 			<Provider>
-				<Slot name="chicken" />
+				<div>
+					<Slot name="chicken" />
+				</div>
 				<Fill name="chicken">
 					{ [ <span key="1" />, <div key="2" />, 'text' ] }
 				</Fill>
 			</Provider>
 		);
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation"><span></span><div></div>text</div>' );
+		expect( element.html() ).toBe( '<div><span></span><div></div>text</div>' );
 	} );
 
 	it( 'calls the functions passed as the Slot’s fillProps in the Fill', () => {
@@ -107,64 +115,74 @@ describe( 'Slot', () => {
 	it( 'should render empty Fills without HTML wrapper when render props used', () => {
 		const element = mount(
 			<Provider>
-				<Slot name="chicken">
-					{ ( fills ) => ( ! isEmpty( fills ) && (
-						<blockquote>
-							{ fills }
-						</blockquote>
-					) ) }
-				</Slot>
+				<div>
+					<Slot name="chicken">
+						{ ( fills ) => ( ! isEmpty( fills ) && (
+							<blockquote>
+								{ fills }
+							</blockquote>
+						) ) }
+					</Slot>
+				</div>
 				<Fill name="chicken" />
 			</Provider>
 		);
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation"></div>' );
+		expect( element.html() ).toBe( '<div></div>' );
 	} );
 
 	it( 'should render a string Fill with HTML wrapper when render props used', () => {
 		const element = mount(
 			<Provider>
-				<Slot name="chicken">
-					{ ( fills ) => ( fills && (
-						<blockquote>
-							{ fills }
-						</blockquote>
-					) ) }
-				</Slot>
+				<div>
+					<Slot name="chicken">
+						{ ( fills ) => ( fills && (
+							<blockquote>
+								{ fills }
+							</blockquote>
+						) ) }
+					</Slot>
+				</div>
 				<Fill name="chicken">
 					content
 				</Fill>
 			</Provider>
 		);
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation"><blockquote>content</blockquote></div>' );
+		expect( element.html() ).toBe( '<div><blockquote>content</blockquote></div>' );
 	} );
 
 	it( 'should re-render Slot when not bubbling virtually', () => {
 		const element = mount(
 			<Provider>
-				<Slot name="egg" />
+				<div>
+					<Slot name="egg" />
+				</div>
 				<Filler name="egg" />
 			</Provider>
 		);
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation">1</div>' );
+		expect( element.html() ).toBe( '<div>1</div>' );
 
 		element.find( 'button' ).simulate( 'click' );
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation">2</div>' );
+		expect( element.html() ).toBe( '<div>2</div>' );
 	} );
 
 	it( 'should render in expected order', () => {
 		const element = mount(
 			<Provider>
-				<Slot name="egg" key="slot" />
+				<div key="slot">
+					<Slot name="egg" />
+				</div>
 			</Provider>
 		);
 
 		element.setProps( {
 			children: [
-				<Slot name="egg" key="slot" />,
+				<div key="slot">
+					<Slot name="egg" />
+				</div>,
 				<Filler name="egg" key="first" text="first" />,
 				<Filler name="egg" key="second" text="second" />,
 			],
@@ -172,19 +190,23 @@ describe( 'Slot', () => {
 
 		element.setProps( {
 			children: [
-				<Slot name="egg" key="slot" />,
+				<div key="slot">
+					<Slot name="egg" />
+				</div>,
 				<Filler name="egg" key="second" text="second" />,
 			],
 		} );
 
 		element.setProps( {
 			children: [
-				<Slot name="egg" key="slot" />,
+				<div key="slot">
+					<Slot name="egg" />
+				</div>,
 				<Filler name="egg" key="first" text="first" />,
 				<Filler name="egg" key="second" text="second" />,
 			],
 		} );
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div role="presentation">firstsecond</div>' );
+		expect( element.html() ).toBe( '<div>firstsecond</div>' );
 	} );
 } );

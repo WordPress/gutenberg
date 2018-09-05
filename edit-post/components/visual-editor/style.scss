@@ -2,32 +2,6 @@
 	position: relative;
 	padding: 50px 0;
 
-	&,
-	& p {
-		font-family: $editor-font;
-		font-size: $editor-font-size;
-		line-height: $editor-line-height;
-	}
-
-	&,
-	& p {
-		color: $dark-gray-700;
-	}
-
-	& ul,
-	& ol {
-		margin: 0;
-		padding: 0;
-	}
-
-	& ul:not(.wp-block-gallery) {
-		list-style-type: disc;
-	}
-
-	& ol {
-		list-style-type: decimal;
-	}
-
 	& .components-button {
 		font-family: $default-font;
 	}
@@ -112,19 +86,6 @@
 			margin-left: -$block-side-ui-width;
 			margin-right: -$block-side-ui-width;
 		}
-	}
-}
-
-// This is a focus style shown for blocks that need an indicator even when in an isEditing state
-// like for example an image block that receives arrowkey focus.
-.edit-post-visual-editor .editor-block-list__block:not(.is-selected) {
-	.editor-block-list__block-edit {
-		box-shadow: 0 0 0 0 $white, 0 0 0 0 $dark-gray-900;
-		transition: 0.1s box-shadow 0.05s;
-	}
-
-	&:focus .editor-block-list__block-edit {
-		box-shadow: 0 0 0 1px $white, 0 0 0 3px $dark-gray-900;
 	}
 }
 

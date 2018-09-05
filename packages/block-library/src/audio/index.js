@@ -8,6 +8,8 @@ import { RichText } from '@wordpress/editor';
  * Internal dependencies
  */
 import edit from './edit';
+import { createBlock } from '@wordpress/blocks';
+import { createBlobURL } from '@wordpress/blob';
 
 export const name = 'core/audio';
 
@@ -55,6 +57,28 @@ export const settings = {
 		},
 	},
 
+	transforms: {
+		from: [
+			{
+				type: 'files',
+				isMatch( files ) {
+					return files.length === 1 && files[ 0 ].type.indexOf( 'audio/' ) === 0;
+				},
+				transform( files ) {
+					const file = files[ 0 ];
+					// We don't need to upload the media directly here
+					// It's already done as part of the `componentDidMount`
+					// in the audio block
+					const block = createBlock( 'core/audio', {
+						src: createBlobURL( file ),
+					} );
+
+					return block;
+				},
+			},
+		],
+	},
+
 	supports: {
 		align: true,
 	},
@@ -66,7 +90,7 @@ export const settings = {
 		return (
 			<figure>
 				<audio controls="controls" src={ src } autoPlay={ autoplay } loop={ loop } preload={ preload } />
-				{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
+				{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
 			</figure>
 		);
 	},

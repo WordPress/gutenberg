@@ -9,6 +9,7 @@ import classnames from 'classnames';
  */
 import { Component } from '@wordpress/element';
 import { withSafeTimeout } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
 const dragImageClass = 'components-draggable__invisible-drag-image';
 const cloneWrapperClass = 'components-draggable__clone';
@@ -148,6 +149,19 @@ class Draggable extends Component {
 
 	render() {
 		const { children, className } = this.props;
+		if ( typeof children === 'function' ) {
+			return children( {
+				onDraggableStart: this.onDragStart,
+				onDraggableEnd: this.onDragEnd,
+			} );
+		}
+
+		deprecated( 'wp.components.Draggable as a DOM node drag handle', {
+			version: 4.0,
+			alternative: 'wp.components.Draggable as a wrapper component for a DOM node',
+			plugin: 'Gutenberg',
+		} );
+
 		return (
 			<div
 				className={ classnames( 'components-draggable', className ) }

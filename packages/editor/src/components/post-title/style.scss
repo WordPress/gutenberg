@@ -37,17 +37,28 @@
 		font-weight: 600;
 	}
 
-	&.is-selected .editor-post-title__input {
-		// use opacity to work in various editor styles
-		border-color: $dark-opacity-light-500;
+	&:not(.is-focus-mode):not(.has-fixed-toolbar) {
+		&.is-selected .editor-post-title__input {
+			// use opacity to work in various editor styles
+			border-color: $dark-opacity-light-500;
 
-		.is-dark-theme & {
-			border-color: $light-opacity-light-500;
+			.is-dark-theme & {
+				border-color: $light-opacity-light-500;
+			}
+		}
+
+		.editor-post-title__input:hover {
+			border-color: theme(outlines);
 		}
 	}
 
-	.editor-post-title__input:hover {
-		border-color: theme(outlines);
+	&.is-focus-mode .editor-post-title__input {
+		opacity: 0.5;
+		transition: opacity 0.1s linear;
+
+		&:focus {
+			opacity: 1;
+		}
 	}
 }
 
@@ -55,7 +66,7 @@
 	font-size: $default-font-size;
 	color: $dark-gray-900;
 	position: absolute;
-	top: -$block-toolbar-height + $border-width + $border-width; // Shift this element upward the same height as the block toolbar, minus the border size
+	top: -$block-toolbar-height + $border-width + $border-width + 1px; // Shift this element upward the same height as the block toolbar, minus the border size
 	left: 0;
 	right: 0;
 

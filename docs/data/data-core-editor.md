@@ -1,6 +1,6 @@
 # **core/editor**: The Editor’s Data
 
-## Selectors 
+## Selectors
 
 ### hasEditorUndo
 
@@ -48,19 +48,6 @@ false if the editing state matches the saved or new post.
 *Returns*
 
 Whether unsaved values exist.
-
-### isCleanNewPost
-
-Returns true if there are no unsaved values for the current edit session and if
-the currently edited post is new (and has never been saved before).
-
-*Parameters*
-
- * state: Global application state.
-
-*Returns*
-
-Whether new post and unsaved values exist.
 
 ### getCurrentPost
 
@@ -319,18 +306,6 @@ unsaved status values.
 *Returns*
 
 Whether the post has been published.
-
-### getDocumentTitle
-
-Gets the document title to be used.
-
-*Parameters*
-
- * state: Global application state.
-
-*Returns*
-
-Document title.
 
 ### getBlockName
 
@@ -652,6 +627,7 @@ Returns true if one of the block's inner blocks is selected.
 
  * state: Editor state.
  * clientId: Block client ID.
+ * deep: Perform a deep check.
 
 *Returns*
 

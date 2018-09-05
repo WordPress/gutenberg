@@ -1,5 +1,4 @@
 .wp-block-image {
-	width: fit-content;
 	max-width: 100%;
 
 	img {
@@ -7,31 +6,46 @@
 	}
 
 	&.aligncenter {
-		display: block;
-		margin-left: auto;
-		margin-right: auto;
 		text-align: center;
 	}
 
+	&.alignfull img,
+	&.alignwide img {
+		width: 100%;
+	}
+
+	// Floats get an extra wrapping <aside> element, so the <figure> becomes a child.
+	.alignleft,
+	.alignright,
+	.aligncenter,
 	&.is-resized {
-		width: min-content;
+		display: table;
+		margin: 0;
 
-		// Emulate min-content for Edge and IE11
-		display: -ms-inline-grid;
-		-ms-grid-columns: min-content;
-
-		figcaption {
-			-ms-grid-row: 2;
-		}
-
-		img {
-			max-width: none;
+		> figcaption {
+			display: table-caption;
+			caption-side: bottom;
 		}
 	}
 
+	.alignleft {
+		float: left;
+		margin-right: 1em;
+	}
+
+	.alignright {
+		float: right;
+		margin-left: 1em;
+	}
+
+	// Centered images.
+	.aligncenter {
+		margin: 0 auto;
+	}
+
 	// Supply caption styles to images, even if the theme hasn't opted in.
-	// Reason being: the new markup, figcaptions, are not likely to be styled in the majority of existing themes,
-	// so we supply the styles so as to not appear broken or unstyled in those.
+	// Reason being: the new markup, <figcaptions>, are not likely to be styled in the majority of existing themes,
+	// so we supply the styles so as to not appear broken or unstyled in those themes.
 	figcaption {
 		@include caption-style();
 	}

@@ -10,10 +10,10 @@ import { Fragment } from '@wordpress/element';
  */
 import './style.scss';
 import ModeSwitcher from '../mode-switcher';
-import FixedToolbarToggle from '../fixed-toolbar-toggle';
 import PluginMoreMenuGroup from '../plugins-more-menu-group';
 import TipsToggle from '../tips-toggle';
 import KeyboardShortcutsHelpMenuItem from '../keyboard-shortcuts-help-menu-item';
+import WritingMenu from '../writing-menu';
 
 const MoreMenu = () => (
 	<Dropdown
@@ -30,19 +30,14 @@ const MoreMenu = () => (
 		) }
 		renderContent={ ( { onClose } ) => (
 			<Fragment>
+				<WritingMenu onClose={ onClose } />
 				<ModeSwitcher onSelect={ onClose } />
-				<MenuGroup
-					label={ __( 'Settings' ) }
-					filterName="editPost.MoreMenu.settings"
-				>
-					<FixedToolbarToggle onToggle={ onClose } />
-					<TipsToggle onToggle={ onClose } />
-				</MenuGroup>
 				<PluginMoreMenuGroup.Slot fillProps={ { onClose } } />
 				<MenuGroup
 					label={ __( 'Tools' ) }
 					filterName="editPost.MoreMenu.tools"
 				>
+					<TipsToggle onToggle={ onClose } />
 					<KeyboardShortcutsHelpMenuItem onSelect={ onClose } />
 				</MenuGroup>
 			</Fragment>

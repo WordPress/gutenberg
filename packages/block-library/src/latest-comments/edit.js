@@ -81,22 +81,22 @@ class LatestComments extends Component {
 				<InspectorControls>
 					<PanelBody title={ __( 'Latest Comments Settings' ) }>
 						<ToggleControl
-							label={ __( 'Display avatar' ) }
+							label={ __( 'Display Avatar' ) }
 							checked={ displayAvatar }
 							onChange={ this.toggleDisplayAvatar }
 						/>
 						<ToggleControl
-							label={ __( 'Display date' ) }
+							label={ __( 'Display Date' ) }
 							checked={ displayDate }
 							onChange={ this.toggleDisplayDate }
 						/>
 						<ToggleControl
-							label={ __( 'Display excerpt' ) }
+							label={ __( 'Display Excerpt' ) }
 							checked={ displayExcerpt }
 							onChange={ this.toggleDisplayExcerpt }
 						/>
 						<RangeControl
-							label={ __( 'Number of comments' ) }
+							label={ __( 'Number of Comments' ) }
 							value={ commentsToShow }
 							onChange={ this.setCommentsToShow }
 							min={ MIN_COMMENTS }

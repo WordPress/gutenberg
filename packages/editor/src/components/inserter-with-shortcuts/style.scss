@@ -18,9 +18,8 @@
 	height: $icon-button-size;
 	padding-top: 8px;
 
-	// use opacity to work in various editor styles
+	// Use opacity to work in various editor styles.
 	color: $dark-opacity-light-700;
-
 	.is-dark-theme & {
 		color: $light-opacity-light-700;
 	}

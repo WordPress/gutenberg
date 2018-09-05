@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
+	Disabled,
 	IconButton,
 	PanelBody,
 	SelectControl,
@@ -16,7 +17,9 @@ import {
 	InspectorControls,
 	MediaPlaceholder,
 	RichText,
+	mediaUpload,
 } from '@wordpress/editor';
+import { getBlobByURL } from '@wordpress/blob';
 
 class AudioEdit extends Component {
 	constructor() {
@@ -29,6 +32,30 @@ class AudioEdit extends Component {
 
 		this.toggleAttribute = this.toggleAttribute.bind( this );
 		this.onSelectURL = this.onSelectURL.bind( this );
+	}
+
+	componentDidMount() {
+		const { attributes, noticeOperations, setAttributes } = this.props;
+		const { id, src = '' } = attributes;
+
+		if ( ! id && src.indexOf( 'blob:' ) === 0 ) {
+			const file = getBlobByURL( src );
+
+			if ( file ) {
+				mediaUpload( {
+					filesList: [ file ],
+					onFileChange: ( [ { id: mediaId, url } ] ) => {
+						setAttributes( { id: mediaId, src: url } );
+					},
+					onError: ( e ) => {
+						setAttributes( { src: undefined, id: undefined } );
+						this.setState( { editing: true } );
+						noticeOperations.createErrorNotice( e );
+					},
+					allowedType: 'audio',
+				} );
+			}
+		}
 	}
 
 	toggleAttribute( attribute ) {
@@ -129,8 +156,14 @@ class AudioEdit extends Component {
 					</PanelBody>
 				</InspectorControls>
 				<figure className={ className }>
-					<audio controls="controls" src={ src } />
-					{ ( ( caption && caption.length ) || !! isSelected ) && (
+					{ /*
+						Disable the audio tag so the user clicking on it won't play the
+						file or change the position slider when the controls are enabled.
+					*/ }
+					<Disabled>
+						<audio controls="controls" src={ src } />
+					</Disabled>
+					{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 						<RichText
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }

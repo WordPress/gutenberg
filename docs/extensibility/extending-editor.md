@@ -12,7 +12,7 @@ Used to modify the image size displayed in the Post Featured Image component. It
 
 _Example:_
 
-```
+```js
 var withImageSize = function( size, mediaId, postId ) {
 	return 'large';
 };

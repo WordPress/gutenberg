@@ -175,12 +175,12 @@ class ParagraphBlock extends Component {
 						initialOpen={ false }
 						colorSettings={ [
 							{
-								value: backgroundColor.value,
+								value: backgroundColor.color,
 								onChange: setBackgroundColor,
 								label: __( 'Background Color' ),
 							},
 							{
-								value: textColor.value,
+								value: textColor.color,
 								onChange: setTextColor,
 								label: __( 'Text Color' ),
 							},
@@ -188,8 +188,8 @@ class ParagraphBlock extends Component {
 					>
 						<ContrastChecker
 							{ ...{
-								textColor: textColor.value,
-								backgroundColor: backgroundColor.value,
+								textColor: textColor.color,
+								backgroundColor: backgroundColor.color,
 								fallbackTextColor,
 								fallbackBackgroundColor,
 							} }
@@ -200,15 +200,15 @@ class ParagraphBlock extends Component {
 				<RichText
 					tagName="p"
 					className={ classnames( 'wp-block-paragraph', className, {
-						'has-background': backgroundColor.value,
+						'has-background': backgroundColor.color,
 						'has-drop-cap': dropCap,
 						[ backgroundColor.class ]: backgroundColor.class,
 						[ textColor.class ]: textColor.class,
 						[ fontSize.class ]: fontSize.class,
 					} ) }
 					style={ {
-						backgroundColor: backgroundColor.value,
-						color: textColor.value,
+						backgroundColor: backgroundColor.color,
+						color: textColor.color,
 						fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
 						textAlign: align,
 					} }

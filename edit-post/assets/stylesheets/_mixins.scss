@@ -272,6 +272,10 @@
 			margin-left: -18px;
 		}
 	}
+
+	body.is-fullscreen-mode #{$selector} {
+		left: 0 !important;
+	}
 }
 
 /**
