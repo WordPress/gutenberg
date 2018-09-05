@@ -34,7 +34,6 @@ export const IconDragHandle = ( { isVisible, className, icon, onFocus, onBlur, o
 						className={ dragHandleClassNames }
 						icon={ icon }
 						aria-hidden="true"
-						focusable="false"
 						aria-label=""
 						tabIndex="-1"
 						onFocus={ onFocus }
