@@ -119,17 +119,11 @@
 		outline: $border-width solid #e2e4e7;
 	}
 
-	// Don't show normal block toolbar
-	.editor-block-contextual-toolbar {
-		display: none;
-	}
-
 	// Don't show block type label for classic block
 	&.is-hovered .editor-block-list__breadcrumb {
 		display: none;
 	}
 }
-
 
 div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 	margin-top: 0;
