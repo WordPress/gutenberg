@@ -27,9 +27,11 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:image {"align":"center"} -->
-<figure class="wp-block-image aligncenter"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="Beautiful landscape" />
-	<figcaption><?php _e( 'If your theme supports it, you&#8217;ll see the "wide" button on the image toolbar. Give it a try.', 'gutenberg' ); ?></figcaption>
-</figure>
+<div class="wp-block-image">
+	<figure class="aligncenter"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="<?php esc_attr_e( 'Beautiful landscape', 'gutenberg' ); ?>" />
+		<figcaption><?php _e( 'If your theme supports it, you&#8217;ll see the "wide" button on the image toolbar. Give it a try.', 'gutenberg' ); ?></figcaption>
+	</figure>
+</div>
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->

@@ -79,7 +79,6 @@ const entryPointNames = [
 	'components',
 	'edit-post',
 	'block-library',
-	'core-blocks',
 ];
 
 const gutenbergPackages = [
@@ -107,6 +106,7 @@ const gutenbergPackages = [
 	'plugins',
 	'redux-routine',
 	'shortcode',
+	'token-list',
 	'url',
 	'viewport',
 	'wordcount',

@@ -6,6 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	createBlock,
@@ -216,15 +217,59 @@ export const settings = {
 			/>
 		);
 
-		return (
-			<figure className={ classes }>
+		const figure = (
+			<Fragment>
 				{ href ? <a href={ href }>{ image }</a> : image }
 				{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
+			</Fragment>
+		);
+
+		if ( 'left' === align || 'right' === align || 'center' === align ) {
+			return (
+				<div>
+					<figure className={ classes }>
+						{ figure }
+					</figure>
+				</div>
+			);
+		}
+
+		return (
+			<figure className={ classes }>
+				{ figure }
 			</figure>
 		);
 	},
 
 	deprecated: [
+		{
+			attributes: blockAttributes,
+			save( { attributes } ) {
+				const { url, alt, caption, align, href, width, height, id } = attributes;
+
+				const classes = classnames( {
+					[ `align${ align }` ]: align,
+					'is-resized': width || height,
+				} );
+
+				const image = (
+					<img
+						src={ url }
+						alt={ alt }
+						className={ id ? `wp-image-${ id }` : null }
+						width={ width }
+						height={ height }
+					/>
+				);
+
+				return (
+					<figure className={ classes }>
+						{ href ? <a href={ href }>{ image }</a> : image }
+						{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
+					</figure>
+				);
+			},
+		},
 		{
 			attributes: blockAttributes,
 			save( { attributes } ) {
@@ -243,7 +288,7 @@ export const settings = {
 				return (
 					<figure className={ align ? `align${ align }` : null } >
 						{ href ? <a href={ href }>{ image }</a> : image }
-						{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
+						{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
 					</figure>
 				);
 			},
@@ -266,7 +311,7 @@ export const settings = {
 				return (
 					<figure className={ align ? `align${ align }` : null } style={ figureStyle }>
 						{ href ? <a href={ href }>{ image }</a> : image }
-						{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
+						{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
 					</figure>
 				);
 			},

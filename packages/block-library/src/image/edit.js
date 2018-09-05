@@ -432,6 +432,7 @@ class ImageEdit extends Component {
 								<Fragment>
 									{ getInspectorControls( imageWidth, imageHeight ) }
 									<ResizableBox
+										className="block-library-image__resizer"
 										size={
 											width && height ? {
 												width,
@@ -444,9 +445,9 @@ class ImageEdit extends Component {
 										maxHeight={ maxWidth / ratio }
 										lockAspectRatio
 										handleClasses={ {
-											right: 'wp-block-image__resize-handler-right',
-											bottom: 'wp-block-image__resize-handler-bottom',
-											left: 'wp-block-image__resize-handler-left',
+											right: 'block-library-image__resize-handler-right',
+											bottom: 'block-library-image__resize-handler-bottom',
+											left: 'block-library-image__resize-handler-left',
 										} }
 										enable={ {
 											top: false,
@@ -471,7 +472,7 @@ class ImageEdit extends Component {
 							);
 						} }
 					</ImageSize>
-					{ ( caption && caption.length > 0 ) || isSelected ? (
+					{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 						<RichText
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
@@ -481,7 +482,7 @@ class ImageEdit extends Component {
 							isSelected={ this.state.captionFocused }
 							inlineToolbar
 						/>
-					) : null }
+					) }
 				</figure>
 			</Fragment>
 		);

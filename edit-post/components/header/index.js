@@ -54,18 +54,19 @@ function Header( {
 						forceIsDirty={ hasActiveMetaboxes }
 						forceIsSaving={ isSaving }
 					/>
-					<IconButton
-						icon="admin-generic"
-						label={ __( 'Settings' ) }
-						onClick={ toggleGeneralSidebar }
-						isToggled={ isEditorSidebarOpened }
-						aria-expanded={ isEditorSidebarOpened }
-						shortcut={ shortcuts.toggleSidebar.display }
-					>
+					<div>
+						<IconButton
+							icon="admin-generic"
+							label={ __( 'Settings' ) }
+							onClick={ toggleGeneralSidebar }
+							isToggled={ isEditorSidebarOpened }
+							aria-expanded={ isEditorSidebarOpened }
+							shortcut={ shortcuts.toggleSidebar.display }
+						/>
 						<DotTip id="core/editor.settings">
-							{ __( 'You’ll find more settings for your page and blocks in the sidebar. Click ‘Settings’ to open it.' ) }
+							{ __( 'You’ll find more settings for your page and blocks in the sidebar. Click “Settings” to open it.' ) }
 						</DotTip>
-					</IconButton>
+					</div>
 					<PinnedPlugins.Slot />
 					<MoreMenu />
 				</div>

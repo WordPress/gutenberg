@@ -41,9 +41,6 @@ function gutenberg_collect_meta_box_data() {
 
 	$screen = $current_screen;
 
-	// Disable hidden metaboxes because there's no UI to toggle visibility.
-	add_filter( 'hidden_meta_boxes', '__return_empty_array' );
-
 	// If we are working with an already predetermined post.
 	if ( isset( $_REQUEST['post'] ) ) {
 		$post    = get_post( absint( $_REQUEST['post'] ) );
@@ -61,6 +58,9 @@ function gutenberg_collect_meta_box_data() {
 	if ( ! gutenberg_can_edit_post_type( $post_type ) ) {
 		return;
 	}
+
+	// Disable hidden metaboxes because there's no UI to toggle visibility.
+	add_filter( 'hidden_meta_boxes', '__return_empty_array' );
 
 	$thumbnail_support = current_theme_supports( 'post-thumbnails', $post_type ) && post_type_supports( $post_type, 'thumbnail' );
 	if ( ! $thumbnail_support && 'attachment' === $post_type && $post->post_mime_type ) {

@@ -72,25 +72,19 @@ class Dropdown extends Component {
 
 		return (
 			<div className={ className } ref={ this.bindContainer }>
-				{ /**
-				   * This seemingly redundant wrapper node avoids root return
-				   * element styling impacting popover positioning.
-				   */ }
-				<div>
-					{ renderToggle( args ) }
-					{ isOpen && (
-						<Popover
-							className={ contentClassName }
-							position={ position }
-							onClose={ this.close }
-							onClickOutside={ this.clickOutside }
-							expandOnMobile={ expandOnMobile }
-							headerTitle={ headerTitle }
-						>
-							{ renderContent( args ) }
-						</Popover>
-					) }
-				</div>
+				{ renderToggle( args ) }
+				{ isOpen && (
+					<Popover
+						className={ contentClassName }
+						position={ position }
+						onClose={ this.close }
+						onClickOutside={ this.clickOutside }
+						expandOnMobile={ expandOnMobile }
+						headerTitle={ headerTitle }
+					>
+						{ renderContent( args ) }
+					</Popover>
+				) }
 			</div>
 		);
 	}

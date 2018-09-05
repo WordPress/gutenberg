@@ -32,7 +32,7 @@
 	{
 		"title": "RichText API",
 		"slug": "rich-text-api",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/editor/components/rich-text/README.md",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/editor/src/components/rich-text/README.md",
 		"parent": "block-api"
 	},
 	{
@@ -444,6 +444,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/postcss-url",
+		"slug": "packages-postcss-url",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/postcss-url/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/redux-routine",
 		"slug": "packages-redux-routine",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/redux-routine/README.md",
@@ -459,6 +465,12 @@
 		"title": "@wordpress/shortcode",
 		"slug": "packages-shortcode",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/shortcode/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/token-list",
+		"slug": "packages-token-list",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/token-list/README.md",
 		"parent": "packages"
 	},
 	{

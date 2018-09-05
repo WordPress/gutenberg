@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
- * Version: 3.6.2
+ * Version: 3.7.0
  * Author: Gutenberg Team
  *
  * @package gutenberg
@@ -435,5 +435,6 @@ add_action( 'admin_print_scripts-edit.php', 'gutenberg_replace_default_add_new_b
  * @return string The $classes string, with gutenberg-editor-page appended.
  */
 function gutenberg_add_admin_body_class( $classes ) {
-	return "$classes gutenberg-editor-page";
+	// Default to is-fullscreen-mode to avoid jumps in the UI.
+	return "$classes gutenberg-editor-page is-fullscreen-mode";
 }

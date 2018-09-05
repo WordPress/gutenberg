@@ -23,7 +23,7 @@ Once you’ve verified requirements, you should follow the [installation instruc
 
 ### Using `wp scaffold block`
 
-The following command generates PHP, JS and CSS code for registering a Gutenberg block.
+The following command generates PHP, JS and CSS code for registering a block.
 
 ```bash
 wp scaffold block <slug> [--title=<title>] [--dashicon=<dashicon>] [--category=<category>] [--theme] [--plugin=<plugin>] [--force]

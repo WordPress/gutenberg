@@ -188,10 +188,10 @@ export function getEmbedEdit( title, icon ) {
 				);
 			}
 
-			if ( ! preview || previewIsFallback || editingURL ) {
-				// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
-				const label = sprintf( __( '%s URL' ), title );
+			// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
+			const label = sprintf( __( '%s URL' ), title );
 
+			if ( ! preview || previewIsFallback || editingURL ) {
 				return (
 					<Placeholder icon={ <BlockIcon icon={ icon } showColors /> } label={ label } className="wp-block-embed">
 						<form onSubmit={ this.setUrl }>
@@ -237,12 +237,12 @@ export function getEmbedEdit( title, icon ) {
 				<figure className={ classnames( className, 'wp-block-embed', { 'is-video': 'video' === type } ) }>
 					{ controls }
 					{ ( cannotPreview ) ? (
-						<Placeholder icon={ icon } label={ __( 'Embed URL' ) }>
+						<Placeholder icon={ <BlockIcon icon={ icon } showColors /> } label={ label } className="wp-block-embed">
 							<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
 							<p className="components-placeholder__error">{ __( 'Previews for this are unavailable in the editor, sorry!' ) }</p>
 						</Placeholder>
 					) : embedWrapper }
-					{ ( caption && caption.length > 0 ) || isSelected ? (
+					{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 						<RichText
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
@@ -250,7 +250,7 @@ export function getEmbedEdit( title, icon ) {
 							onChange={ ( value ) => setAttributes( { caption: value } ) }
 							inlineToolbar
 						/>
-					) : null }
+					) }
 				</figure>
 			);
 		}
@@ -295,8 +295,8 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 				const { url } = ownProps.attributes;
 				const core = select( 'core' );
 				const { getEmbedPreview, isPreviewEmbedFallback, isRequestingEmbedPreview } = core;
-				const preview = getEmbedPreview( url );
-				const previewIsFallback = isPreviewEmbedFallback( url );
+				const preview = url && getEmbedPreview( url );
+				const previewIsFallback = url && isPreviewEmbedFallback( url );
 				const fetching = undefined !== url && isRequestingEmbedPreview( url );
 				return {
 					preview,
@@ -321,7 +321,7 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 			return (
 				<figure className={ embedClassName }>
 					{ `\n${ url }\n` /* URL needs to be on its own line. */ }
-					{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
+					{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
 				</figure>
 			);
 		},
@@ -384,7 +384,7 @@ export const common = [
 			title: 'Facebook',
 			icon: {
 				foreground: '#3b5998',
-				src: <svg viewBox="0 0 24 24"><path d="M20 3H4L3 4v16l1 1h9v-7h-3v-3h3V9c0-2 1-3 3-3h2v2h-1l-2 2v1h3v3h-3v7h5l1-1V4l-1-1z" /></svg>,
+				src: <svg viewBox="0 0 24 24"><path d="M20 3H4c-.6 0-1 .4-1 1v16c0 .5.4 1 1 1h8.6v-7h-2.3v-2.7h2.3v-2c0-2.3 1.4-3.6 3.5-3.6 1 0 1.8.1 2.1.1v2.4h-1.4c-1.1 0-1.3.5-1.3 1.3v1.7h2.7l-.4 2.8h-2.3v7H20c.5 0 1-.4 1-1V4c0-.6-.4-1-1-1z" /></svg>,
 			},
 		} ),
 		patterns: [ /^https?:\/\/www\.facebook.com\/.+/i ],
@@ -557,7 +557,7 @@ export const others = [
 			title: 'Polldaddy',
 			icon: embedContentIcon,
 		} ),
-		patterns: [ /^https?:\/\/(www\.)?mixcloud\.com\/.+/i ],
+		patterns: [ /^https?:\/\/(www\.)?polldaddy\.com\/.+/i ],
 	},
 	{
 		name: 'core-embed/reddit',

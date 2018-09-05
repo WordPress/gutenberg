@@ -101,6 +101,16 @@
 	.editor-block-list__block-edit .reusable-block-edit-panel * {
 		z-index: z-index(".editor-block-list__block-edit .reusable-block-edit-panel *");
 	}
+
+	&.is-focus-mode:not(.is-multi-selected) {
+		opacity: 0.5;
+		transition: opacity 0.1s linear;
+
+		&:not(.is-focused) .editor-block-list__block,
+		&.is-focused {
+			opacity: 1;
+		}
+	}
 }
 
 
@@ -346,7 +356,6 @@
 		width: 100%;
 
 		// When images are floated, the block itself should collapse to zero height.
-		margin-bottom: 0;
 		height: 0;
 
 		// Hide block outline when an image is floated.
@@ -354,6 +363,9 @@
 			&::before {
 				content: none;
 			}
+
+			// This margin won't collapse on its own, so zero it out.
+			margin-top: 0;
 		}
 
 		// Keep a 1px margin to compensate for the border/outline.
@@ -716,6 +728,7 @@
 .editor-block-list__insertion-point {
 	position: relative;
 	z-index: z-index(".editor-block-list__insertion-point");
+	margin-top: -$block-padding;
 }
 
 .editor-block-list__insertion-point-indicator {
@@ -727,6 +740,7 @@
 	background: theme(primary);
 }
 
+// This is the clickable plus.
 .editor-block-list__insertion-point-inserter {
 	// Don't show on mobile.
 	display: none;
@@ -738,12 +752,7 @@
 	bottom: auto;
 	left: 0;
 	right: 0;
-	// Matches the whole empty space between two blocks
-	height: $block-padding * 2;
 	justify-content: center;
-
-	// Position above block.
-	top: -$block-padding;
 
 	// Show a clickable plus.
 	.editor-block-list__insertion-point-button {
@@ -784,6 +793,7 @@
 	}
 }
 
+// This is the edge-to-edge hover area that contains the plus.
 .editor-block-list__block {
 	> .editor-block-list__insertion-point {
 		position: absolute;
@@ -852,7 +862,6 @@
 	.components-toolbar {
 		border-top: none;
 		border-bottom: none;
-
 	}
 
 	@include break-small() {
@@ -895,6 +904,10 @@
 	& > * {
 		pointer-events: auto;
 	}
+}
+
+.editor-block-list__block.is-focus-mode:not(.is-multi-selected) > .editor-block-contextual-toolbar {
+	margin-left: -$block-side-ui-width;
 }
 
 // Enable toolbar footprint collapsing
@@ -1004,8 +1017,14 @@
 
 		// Animate in
 		.editor-block-list__block:hover & {
-			@include fade_in(0.1s);
+			opacity: 0;
+			@include fade_in(60ms, 0.5s);
 		}
+	}
+
+	&.is-light .components-toolbar {
+		background: rgba($white, 0.5);
+		color: $dark-gray-700;
 	}
 }
 

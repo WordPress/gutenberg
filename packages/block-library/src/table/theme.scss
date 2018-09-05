@@ -1,12 +1,15 @@
 .wp-block-table {
 	overflow-x: auto;
-	display: block;
+	display: block; // Necessary in order for this table to be mobile responsive.
 	border-collapse: collapse;
 	width: 100%;
 
-	tbody {
+	thead,
+	tbody,
+	tfoot {
 		width: 100%;
 		min-width: $break-mobile / 2;
+		display: table;
 	}
 
 	td,

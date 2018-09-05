@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "2.0.1",
+	"version": "3.0.0",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,7 +20,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime-corejs2": "7.0.0-beta.56",
+		"@babel/runtime": "^7.0.0",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/compose": "file:../compose",

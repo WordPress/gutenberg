@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import deepFreeze from 'deep-freeze';
-
-/**
  * Internal dependencies
  */
-import { guides, tipInstanceIds, areTipsEnabled, dismissedTips } from '../reducer';
+import { guides, areTipsEnabled, dismissedTips } from '../reducer';
 
 describe( 'reducer', () => {
 	describe( 'guides', () => {
@@ -15,74 +10,13 @@ describe( 'reducer', () => {
 		} );
 
 		it( 'should add a guide when it is triggered', () => {
-			const original = deepFreeze( [] );
-			const state = guides( original, {
+			const state = guides( [], {
 				type: 'TRIGGER_GUIDE',
 				tipIds: [ 'test/tip-1', 'test/tip-2' ],
 			} );
 			expect( state ).toEqual( [
 				[ 'test/tip-1', 'test/tip-2' ],
 			] );
-		} );
-	} );
-
-	describe( 'tipInstanceIds', () => {
-		it( 'should start out empty', () => {
-			expect( tipInstanceIds( undefined, {} ) ).toEqual( {} );
-		} );
-
-		it( 'should register an initial tip instance', () => {
-			const original = deepFreeze( {} );
-			const state = tipInstanceIds( original, {
-				type: 'REGISTER_TIP_INSTANCE',
-				tipId: 'test/tip-1',
-				instanceId: 123,
-			} );
-			expect( state ).toEqual( {
-				'test/tip-1': [ 123 ],
-			} );
-		} );
-
-		it( 'should register an second tip instance', () => {
-			const original = deepFreeze( {
-				'test/tip-1': [ 123 ],
-			} );
-			const state = tipInstanceIds( original, {
-				type: 'REGISTER_TIP_INSTANCE',
-				tipId: 'test/tip-1',
-				instanceId: 456,
-			} );
-			expect( state ).toEqual( {
-				'test/tip-1': [ 123, 456 ],
-			} );
-		} );
-
-		it( 'should not register duplicate tip instances', () => {
-			const original = deepFreeze( {
-				'test/tip-1': [ 123 ],
-			} );
-			const state = tipInstanceIds( original, {
-				type: 'REGISTER_TIP_INSTANCE',
-				tipId: 'test/tip-1',
-				instanceId: 123,
-			} );
-			expect( state ).toEqual( {
-				'test/tip-1': [ 123 ],
-			} );
-		} );
-
-		it( 'should unregister a tip instance', () => {
-			const original = deepFreeze( {
-				'test/tip-1': [ 123, 456 ],
-			} );
-			const state = tipInstanceIds( original, {
-				type: 'UNREGISTER_TIP_INSTANCE',
-				tipId: 'test/tip-1',
-				instanceId: 123,
-			} );
-			expect( state ).toEqual( {
-				'test/tip-1': [ 456 ],
-			} );
 		} );
 	} );
 
@@ -112,8 +46,7 @@ describe( 'reducer', () => {
 		} );
 
 		it( 'should mark tips as dismissed', () => {
-			const original = deepFreeze( {} );
-			const state = dismissedTips( original, {
+			const state = dismissedTips( {}, {
 				type: 'DISMISS_TIP',
 				id: 'test/tip',
 			} );
@@ -123,10 +56,10 @@ describe( 'reducer', () => {
 		} );
 
 		it( 'should reset if tips are enabled', () => {
-			const original = deepFreeze( {
+			const initialState = {
 				'test/tip': true,
-			} );
-			const state = dismissedTips( original, {
+			};
+			const state = dismissedTips( initialState, {
 				type: 'ENABLE_TIPS',
 			} );
 			expect( state ).toEqual( {} );

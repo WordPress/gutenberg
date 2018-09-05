@@ -4,7 +4,23 @@
 
 ## Modifying Blocks
 
-To modify the behavior of existing blocks, Gutenberg exposes the following Filters:
+To modify the behavior of existing blocks, Gutenberg exposes several APIs:
+
+### Block Style Variations
+
+Block Style Variations allow providing alternative styles to existing blocks. They work by adding a className to the block's wrapper. This className can be used to provide an alternative styling for the block if the style variation is selected.
+
+_Example:_
+
+```js
+wp.blocks.registerBlockStyle( 'core/quote', 'fancy-quote' );
+```
+
+The example above registers a block style variation called `fancy-quote` to the `core/quote` block. When the user selects this block style variation from the styles selector, an `is-style-fancy-quote` className will be added to the block's wrapper.
+
+### Filters
+
+Extensing blocks can involve more than just providing alternative styles, in this case, you can use one of the following filters to extend the block settings.
 
 #### `blocks.registerBlockType`
 
@@ -100,6 +116,8 @@ Used to modify the block's `edit` component. It receives the original block `Blo
 
 _Example:_
 
+{% codetabs %}
+{% ES5 %}
 ```js
 var el = wp.element.createElement;
 
@@ -127,6 +145,30 @@ var withInspectorControls = wp.compose.createHigherOrderComponent( function( Blo
 
 wp.hooks.addFilter( 'editor.BlockEdit', 'my-plugin/with-inspector-controls', withInspectorControls );
 ```
+{% ESNext %}
+```js
+const { createHigherOrderComponent } = wp.compose;
+const { Fragment } = wp.Element;
+const { InspectorControls } = wp.editor;
+const { PanelBody } = wp.components;
+
+const withInspectorControls =  createHigherOrderComponent(BlockEdit => {
+  return props => {
+    return (
+      <Fragment>
+		<InspectorControls>
+			<PanelBody>
+				My custom control
+			</PanelBody>
+		<InspectorControls />
+        <BlockEdit { ...props } />
+      </Fragment>
+    );
+  };
+}, "withInspectorControl" );
+
+wp.hooks.addFilter( 'editor.BlockEdit', 'my-plugin/with-inspector-controls', withInspectorControls );
+```
 
 #### `editor.BlockListBlock`
 
@@ -134,6 +176,8 @@ Used to modify the block's wrapper component containing the block's `edit` compo
 
 _Example:_
 
+{% codetabs %}
+{% ES5 %}
 ```js
 var el = wp.element.createElement;
 
@@ -162,6 +206,23 @@ var withDataAlign = wp.compose.createHigherOrderComponent( function( BlockListBl
 
 wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-data-align', withDataAlign );
 ```
+{% ESNext %}
+```js
+const { createHigherOrderComponent } = wp.compose;
+
+const withDataAlign = createHigherOrderComponent( ( BlockListBlock ) => {
+	return ( props ) => {
+		const { align } = props.block.attributes;
+
+		let wrapperProps = props.wrapperProps;
+		wrapperProps = { ...wrapperProps, 'data-align': align };
+
+		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
+	};
+}, 'withDataAlign' );
+
+wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-data-align', withDataAlign );
+```
 
 ## Removing Blocks
 
@@ -170,7 +231,7 @@ wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-data-align', withDa
 Adding blocks is easy enough, removing them is as easy. Plugin or theme authors have the possibility to "unregister" blocks.
 
 ```js
-// myp-lugin.js
+// my-plugin.js
 
 wp.blocks.unregisterBlockType( 'core/verse' );
 ```
