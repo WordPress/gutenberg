@@ -42,11 +42,12 @@
 		color: $dark-gray-800;
 		border-bottom: 1px solid #ddd;
 		padding-bottom: 15px;
+		line-height: 1.7;
 
 		span {
 			background-color: #e6ffed;
-			padding-top: 5px;
-			padding-bottom: 5px;
+			padding-top: 3px;
+			padding-bottom: 3px;
 		}
 
 		span.editor-block-compare__added {
@@ -60,9 +61,11 @@
 
 	.editor-block-compare__preview {
 		padding: 0;
+		padding-top: $block-padding;
 
 		p {
 			font-size: 12px;
+			margin-top: 0;
 		}
 	}
 
