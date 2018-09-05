@@ -8,11 +8,8 @@ module.exports = function( api ) {
 				targets: {
 					browsers: [ 'extends @wordpress/browserslist-config' ],
 				},
-				useBuiltIns: 'usage',
 			} ],
-			isTestEnv && [ '@babel/preset-env', {
-				useBuiltIns: 'usage',
-			} ],
+			isTestEnv && [ '@babel/preset-env' ],
 		].filter( Boolean ),
 		plugins: [
 			'@babel/plugin-proposal-object-rest-spread',
