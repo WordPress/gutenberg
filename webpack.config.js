@@ -79,7 +79,6 @@ const entryPointNames = [
 	'components',
 	'edit-post',
 	'block-library',
-	'core-blocks',
 ];
 
 const gutenbergPackages = [
