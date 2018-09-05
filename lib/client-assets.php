@@ -1394,47 +1394,26 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$styles = array(
 		array(
 			'css' => file_get_contents(
-		 *
-		 * Returning a falsey value to the filter will short-circuit displaying the dialog.
 				gutenberg_dir_path() . 'build/editor/editor-styles.css'
-		 * @since 3.6.0
-		 *
-		 * @param bool         $display Whether to display the dialog. Default true.
-		 * @param WP_Post      $post    Post object.
-		 * @param WP_User|bool $user    WP_User object on success, false otherwise.
-		 */
-		if ( apply_filters( 'show_post_locked_dialog', true, $post, $user ) ) {
-			$locked = true;
-		}
-
-		$userDetails = null;
 			),
 		),
-			$userDetails = array(
-				'name' => $user->display_name,
-			);
+	);
 	if ( $editor_styles && current_theme_supports( 'editor-styles' ) ) {
 		foreach ( $editor_styles as $style ) {
 			if ( filter_var( $style, FILTER_VALIDATE_URL ) ) {
-					$userDetails[ 'avatar' ] = $matches[1];
-				}
-			}
-		}
-
 				$styles[] = array(
-			'isLocked' => $locked,
 					'css' => file_get_contents( $style ),
-		);
-	} else {
+				);
+			} else {
 				$file     = get_theme_file_path( $style );
-		$active_post_lock = wp_set_post_lock( $post->ID );
 				$styles[] = array(
 					'css'     => file_get_contents( get_theme_file_path( $style ) ),
 					'baseURL' => get_theme_file_uri( $style ),
-		);
+				);
 			}
 		}
 	}
+
 	// Lock settings
 	$user_id = wp_check_post_lock( $post->ID );
 	if ( $user_id ) {
