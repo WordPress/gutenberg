@@ -70,7 +70,7 @@ export const settings = {
 				/>
 				{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 					<RichText
-						tagName="cite"
+						tagName="footer"
 						value={ citation }
 						/* translators: the individual or entity quoted */
 						placeholder={ __( 'Write citation…' ) }
