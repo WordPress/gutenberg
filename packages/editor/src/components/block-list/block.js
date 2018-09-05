@@ -372,6 +372,7 @@ export class BlockListBlock extends Component {
 			hasSelectedInnerBlock,
 			isParentOfSelectedBlock,
 			hasMultiSelection,
+			isDraggable,
 		} = this.props;
 		const isHovered = this.state.isHovered && ! isMultiSelecting;
 		const { name: blockName, isValid } = block;
@@ -503,7 +504,7 @@ export class BlockListBlock extends Component {
 						isFirst={ isFirst }
 						isLast={ isLast }
 						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }
-						isDragHandleVisible={ ! isPartOfMultiSelection && isMovable }
+						isDraggable={ ( isDraggable !== false ) && ( ! isPartOfMultiSelection && isMovable ) }
 						onDragStart={ this.onDragStart }
 						onDragEnd={ this.onDragEnd }
 					/>
