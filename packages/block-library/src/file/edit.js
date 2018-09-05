@@ -20,6 +20,7 @@ import {
 	MediaUpload,
 	MediaPlaceholder,
 	BlockControls,
+	BlockIcon,
 	RichText,
 	mediaUpload,
 } from '@wordpress/editor';
@@ -29,6 +30,7 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import FileBlockInspector from './inspector';
+import { icon } from './index';
 
 class FileEdit extends Component {
 	constructor() {
@@ -140,7 +142,7 @@ class FileEdit extends Component {
 		if ( ! href || hasError ) {
 			return (
 				<MediaPlaceholder
-					icon="media-default"
+					icon=<BlockIcon icon={ icon } />
 					labels={ {
 						title: __( 'File' ),
 						name: __( 'a file' ),

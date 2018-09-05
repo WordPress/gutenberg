@@ -32,6 +32,7 @@ import { withSelect } from '@wordpress/data';
 import {
 	RichText,
 	BlockControls,
+	BlockIcon,
 	InspectorControls,
 	MediaPlaceholder,
 	MediaUpload,
@@ -45,6 +46,7 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import ImageSize from './image-size';
+import { icon } from './index';
 
 /**
  * Module constants
@@ -241,7 +243,7 @@ class ImageEdit extends Component {
 				<Fragment>
 					{ controls }
 					<MediaPlaceholder
-						icon="format-image"
+						icon=<BlockIcon icon={ icon } />
 						labels={ {
 							title: __( 'Image' ),
 							name: __( 'an image' ),

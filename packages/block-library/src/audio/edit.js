@@ -14,12 +14,18 @@ import {
 import { Component, Fragment } from '@wordpress/element';
 import {
 	BlockControls,
+	BlockIcon,
 	InspectorControls,
 	MediaPlaceholder,
 	RichText,
 	mediaUpload,
 } from '@wordpress/editor';
 import { getBlobByURL } from '@wordpress/blob';
+
+/**
+ * Internal dependencies
+ */
+import { icon } from './index';
 
 class AudioEdit extends Component {
 	constructor() {
@@ -100,7 +106,7 @@ class AudioEdit extends Component {
 		if ( editing ) {
 			return (
 				<MediaPlaceholder
-					icon="media-audio"
+					icon=<BlockIcon icon={ icon } />
 					labels={ {
 						title: __( 'Audio' ),
 						name: __( 'an audio' ),

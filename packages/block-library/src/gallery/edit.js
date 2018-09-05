@@ -21,6 +21,7 @@ import {
 } from '@wordpress/components';
 import {
 	BlockControls,
+	BlockIcon,
 	MediaUpload,
 	MediaPlaceholder,
 	InspectorControls,
@@ -31,6 +32,7 @@ import {
  * Internal dependencies
  */
 import GalleryImage from './gallery-image';
+import { icon } from './index';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -191,7 +193,7 @@ class GalleryEdit extends Component {
 				<Fragment>
 					{ controls }
 					<MediaPlaceholder
-						icon="format-gallery"
+						icon=<BlockIcon icon={ icon } />
 						className={ className }
 						labels={ {
 							title: __( 'Gallery' ),

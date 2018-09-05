@@ -16,6 +16,7 @@ import {
 import { Component, Fragment, createRef } from '@wordpress/element';
 import {
 	BlockControls,
+	BlockIcon,
 	InspectorControls,
 	MediaPlaceholder,
 	MediaUpload,
@@ -23,6 +24,11 @@ import {
 	mediaUpload,
 } from '@wordpress/editor';
 import { getBlobByURL } from '@wordpress/blob';
+
+/**
+ * Internal dependencies
+ */
+import { icon } from './index';
 
 class VideoEdit extends Component {
 	constructor() {
@@ -129,7 +135,7 @@ class VideoEdit extends Component {
 		if ( editing ) {
 			return (
 				<MediaPlaceholder
-					icon="media-video"
+					icon=<BlockIcon icon={ icon } />
 					labels={ {
 						title: __( 'Video' ),
 						name: __( 'a video' ),
