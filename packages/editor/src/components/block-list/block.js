@@ -373,6 +373,7 @@ export class BlockListBlock extends Component {
 			isPreviousBlockADefaultEmptyBlock,
 			hasSelectedInnerBlock,
 			isParentOfSelectedBlock,
+			hasMultiSelection,
 		} = this.props;
 		const isHovered = this.state.isHovered && ! isMultiSelecting;
 		const { name: blockName, isValid } = block;
@@ -387,7 +388,7 @@ export class BlockListBlock extends Component {
 		const showEmptyBlockSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
 		const showSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
 		const shouldAppearSelected = ! isFocusMode && ! hasFixedToolbar && ! showSideInserter && isSelected && ! isTypingWithinBlock;
-		const shouldAppearSelectedParent = ! isFocusMode && ! hasFixedToolbar && ! showSideInserter && hasSelectedInnerBlock && ! isTypingWithinBlock;
+		const shouldAppearSelectedParent = ! isFocusMode && ! hasFixedToolbar && ! showSideInserter && hasSelectedInnerBlock && ! isTypingWithinBlock && ! hasMultiSelection;
 		const shouldAppearHovered = ! isFocusMode && ! hasFixedToolbar && isHovered && ! isEmptyDefaultBlock;
 		// We render block movers and block settings to keep them tabbale even if hidden
 		const shouldRenderMovers = ! isFocusMode && ( isSelected || hoverArea === 'left' ) && ! showEmptyBlockSideInserter && ! isMultiSelecting && ! isPartOfMultiSelection && ! isTypingWithinBlock;
@@ -607,6 +608,7 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		getEditorSettings,
 		hasSelectedInnerBlock,
 		getTemplateLock,
+		hasMultiSelection,
 	} = select( 'core/editor' );
 	const isSelected = isBlockSelected( clientId );
 	const { hasFixedToolbar, focusMode } = getEditorSettings();
@@ -640,6 +642,7 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		block,
 		isSelected,
 		isParentOfSelectedBlock,
+		hasMultiSelection: hasMultiSelection(),
 	};
 } );
 
