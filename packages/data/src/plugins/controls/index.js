@@ -40,7 +40,7 @@ export default function( registry ) {
 			if ( ! resolver ) {
 				return;
 			}
-			await registry.namespaces[ reducerKey ].store.dispatch( resolver( ...args ) );
+			await registry.namespaces[ reducerKey ].store.dispatch( resolver.fulfill( ...args ) );
 		},
 	};
 }

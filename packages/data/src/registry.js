@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import {
 	flowRight,
 	without,
@@ -13,6 +13,7 @@ import {
  * Internal dependencies
  */
 import dataStore from './store';
+import promise from './middlewares/promise';
 
 /**
  * An isolated orchestrator of store registrations.
@@ -35,73 +36,6 @@ import dataStore from './store';
  *
  * @typedef {WPDataPlugin}
  */
-
-/**
- * Returns true if the given argument appears to be a dispatchable action.
- *
- * @param {*} action Object to test.
- *
- * @return {boolean} Whether object is action-like.
- */
-export function isActionLike( action ) {
-	return (
-		!! action &&
-		typeof action.type === 'string'
-	);
-}
-
-/**
- * Returns true if the given object is an async iterable, or false otherwise.
- *
- * @param {*} object Object to test.
- *
- * @return {boolean} Whether object is an async iterable.
- */
-export function isAsyncIterable( object ) {
-	return (
-		!! object &&
-		typeof object[ Symbol.asyncIterator ] === 'function'
-	);
-}
-
-/**
- * Returns true if the given object is iterable, or false otherwise.
- *
- * @param {*} object Object to test.
- *
- * @return {boolean} Whether object is iterable.
- */
-export function isIterable( object ) {
-	return (
-		!! object &&
-		typeof object[ Symbol.iterator ] === 'function'
-	);
-}
-
-/**
- * Normalizes the given object argument to an async iterable, asynchronously
- * yielding on a singular or array of generator yields or promise resolution.
- *
- * @param {*} object Object to normalize.
- *
- * @return {AsyncGenerator} Async iterable actions.
- */
-export function toAsyncIterable( object ) {
-	if ( isAsyncIterable( object ) ) {
-		return object;
-	}
-
-	return ( async function* () {
-		// Normalize as iterable...
-		if ( ! isIterable( object ) ) {
-			object = [ object ];
-		}
-
-		for ( const maybeAction of object ) {
-			yield maybeAction;
-		}
-	}() );
-}
 
 /**
  * Creates a new store registry, given an optional object of initial store
@@ -132,7 +66,9 @@ export function createRegistry( storeConfigs = {} ) {
 	 * @return {Object} Store Object.
 	 */
 	function registerReducer( reducerKey, reducer ) {
-		const enhancers = [];
+		const enhancers = [
+			applyMiddleware( promise ),
+		];
 		if ( typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION__ ) {
 			enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__( { name: reducerKey, instanceId: reducerKey } ) );
 		}
@@ -187,7 +123,7 @@ export function createRegistry( storeConfigs = {} ) {
 				}
 
 				startResolution( reducerKey, selectorName, args );
-				await fulfill( reducerKey, selectorName, ...args );
+				await registry.fulfill( reducerKey, selectorName, ...args );
 				finishResolution( reducerKey, selectorName, args );
 			}
 
@@ -303,20 +239,9 @@ export function createRegistry( storeConfigs = {} ) {
 		}
 
 		const store = namespaces[ reducerKey ].store;
-		const state = store.getState();
-		let fulfillment = resolver.fulfill( state, ...args );
-
-		// Attempt to normalize fulfillment as async iterable.
-		fulfillment = toAsyncIterable( fulfillment );
-		if ( ! isAsyncIterable( fulfillment ) ) {
-			return;
-		}
-
-		for await ( const maybeAction of fulfillment ) {
-			// Dispatch if it quacks like an action.
-			if ( isActionLike( maybeAction ) ) {
-				store.dispatch( maybeAction );
-			}
+		const actionCreator = resolver.fulfill( ...args );
+		if ( actionCreator ) {
+			await store.dispatch( actionCreator );
 		}
 	}
 
@@ -348,6 +273,7 @@ export function createRegistry( storeConfigs = {} ) {
 	}
 
 	let registry = {
+		namespaces,
 		registerReducer,
 		registerSelectors,
 		registerResolvers,
@@ -355,9 +281,9 @@ export function createRegistry( storeConfigs = {} ) {
 		registerStore,
 		subscribe,
 		select,
-		fulfill,
 		dispatch,
 		use,
+		fulfill,
 	};
 
 	/**
