@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { IconButton, Draggable } from '@wordpress/components';
+import { Draggable } from '@wordpress/components';
 
 export const IconDragHandle = ( { isVisible, className, icon, onFocus, onBlur, onDragStart, onDragEnd, blockElementId, order, rootClientId, clientId, layout } ) => {
 	if ( ! isVisible ) {
@@ -30,9 +30,8 @@ export const IconDragHandle = ( { isVisible, className, icon, onFocus, onBlur, o
 		>
 			{
 				( { onDraggableStart, onDraggableEnd } ) => (
-					<IconButton
+					<div
 						className={ dragHandleClassNames }
-						icon={ icon }
 						aria-hidden="true"
 						aria-label=""
 						tabIndex="-1"
@@ -41,7 +40,9 @@ export const IconDragHandle = ( { isVisible, className, icon, onFocus, onBlur, o
 						onDragStart={ onDraggableStart }
 						onDragEnd={ onDraggableEnd }
 						draggable
-					/>
+					>
+						{ icon }
+					</div>
 				) }
 		</Draggable>
 	);
