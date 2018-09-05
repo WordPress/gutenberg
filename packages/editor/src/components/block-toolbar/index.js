@@ -53,13 +53,9 @@ class BlockToolbar extends Component {
 			);
 		}
 
-		if ( ! isValid ) {
-			return null;
-		}
-
 		return (
 			<div className="editor-block-toolbar">
-				{ mode === 'visual' && (
+				{ mode === 'visual' && isValid && (
 					<Fragment>
 						<BlockSwitcher clientIds={ blockClientIds } />
 						<BlockControls.Slot />
