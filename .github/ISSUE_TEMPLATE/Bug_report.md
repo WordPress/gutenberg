@@ -17,6 +17,10 @@ Steps to reproduce the behavior:
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
+Please add whether this is a regression from a previous Gutenberg release:
+
+- [ ] This is a regression.
+
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
