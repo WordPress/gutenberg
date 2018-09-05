@@ -34,7 +34,6 @@ import { compose } from '@wordpress/compose';
 import BlockEdit from '../block-edit';
 import BlockMover from '../block-mover';
 import BlockDropZone from '../block-drop-zone';
-import BlockSettingsMenu from '../block-settings-menu';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
@@ -391,9 +390,8 @@ export class BlockListBlock extends Component {
 		const shouldAppearHovered = ! isFocusMode && ! hasFixedToolbar && isHovered && ! isEmptyDefaultBlock;
 		// We render block movers and block settings to keep them tabbale even if hidden
 		const shouldRenderMovers = ! isFocusMode && ( isSelected || hoverArea === 'left' ) && ! showEmptyBlockSideInserter && ! isMultiSelecting && ! isPartOfMultiSelection && ! isTypingWithinBlock;
-		const shouldRenderBlockSettings = ( isSelected || hoverArea === 'right' ) && ! isMultiSelecting && ! isPartOfMultiSelection;
 		const shouldShowBreadcrumb = ! isFocusMode && isHovered && ! isEmptyDefaultBlock;
-		const shouldShowContextualToolbar = ! hasFixedToolbar && ! showSideInserter && ( ( isSelected && ! isTypingWithinBlock && isValid ) || isFirstMultiSelected );
+		const shouldShowContextualToolbar = ! hasFixedToolbar && ! showSideInserter && ( ( isSelected && ! isTypingWithinBlock ) || isFirstMultiSelected );
 		const shouldShowMobileToolbar = shouldAppearSelected;
 		const { error, dragging } = this.state;
 
@@ -517,13 +515,6 @@ export class BlockListBlock extends Component {
 						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }
 					/>
 				) }
-				{ shouldRenderBlockSettings && (
-					<BlockSettingsMenu
-						clientIds={ clientId }
-						rootClientId={ rootClientId }
-						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'right' || isTypingWithinBlock }
-					/>
-				) }
 				{ shouldShowBreadcrumb && (
 					<BlockBreadcrumb
 						clientId={ clientId }
@@ -558,7 +549,6 @@ export class BlockListBlock extends Component {
 					</BlockCrashBoundary>
 					{ shouldShowMobileToolbar && (
 						<BlockMobileToolbar
-							rootClientId={ rootClientId }
 							clientId={ clientId }
 						/>
 					) }
