@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { dcnpgettext, sprintf, __, _x, _n, _nx, setLocaleData } from '../';
+import { sprintf, __, _x, _n, _nx, setLocaleData } from '../';
 
 // Mock memoization as identity function. Inline since Jest errors on out-of-
 // scope references in a mock callback.
@@ -34,12 +34,25 @@ const additionalLocaleData = {
 setLocaleData( localeData, 'test_domain' );
 
 describe( 'i18n', () => {
-	describe( 'dcnpgettext()', () => {
-		it( 'absorbs errors', () => {
-			const result = dcnpgettext( 'domain-without-data', undefined, 'Hello' );
-
+	describe( 'error absorb', () => {
+		it( '__', () => {
+			__( 'Hello', 'domain-without-data' );
 			expect( console ).toHaveErrored();
-			expect( result ).toBe( 'Hello' );
+		} );
+
+		it( '_x', () => {
+			_x( 'feed', 'verb', 'domain-without-data' );
+			expect( console ).toHaveErrored();
+		} );
+
+		it( '_n', () => {
+			_n( '%d banana', '%d bananas', 3, 'domain-without-data' );
+			expect( console ).toHaveErrored();
+		} );
+
+		it( '_nx', () => {
+			_nx( '%d apple', '%d apples', 3, 'fruit', 'domain-without-data' );
+			expect( console ).toHaveErrored();
 		} );
 	} );
 

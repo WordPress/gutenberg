@@ -1,3 +1,10 @@
+## 2.1.0 (Unreleased)
+
+### Deprecations
+
+- `getI18n` has been deprecated. Use `__`, `_x`, `_n`, or `_nx` instead.
+- `dcnpgettext` has been deprecated. Use `__`, `_x`, `_n`, or `_nx` instead.
+
 ## 2.0.0 (2018-09-05)
 
 ### Breaking Change
