@@ -47,9 +47,16 @@ export default compose(
 			closeGeneralSidebar,
 			openGeneralSidebar,
 		} = dispatch( 'core/edit-post' );
+		const {
+			clearSelectedBlock,
+		} = dispatch( 'core/editor' );
+
 		const onClick = isSelected ?
 			closeGeneralSidebar :
-			() => openGeneralSidebar( sidebarName );
+			() => {
+				clearSelectedBlock();
+				openGeneralSidebar( sidebarName );
+			};
 
 		return { onClick };
 	} ),

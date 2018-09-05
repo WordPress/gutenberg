@@ -98,6 +98,9 @@ export default compose(
 			openGeneralSidebar,
 			togglePinnedPluginItem,
 		} = dispatch( 'core/edit-post' );
+		const {
+			clearSelectedBlock,
+		} = dispatch( 'core/editor' );
 
 		return {
 			togglePin() {
@@ -107,6 +110,7 @@ export default compose(
 				if ( isActive ) {
 					closeGeneralSidebar();
 				} else {
+					clearSelectedBlock();
 					openGeneralSidebar( sidebarName );
 				}
 			},
