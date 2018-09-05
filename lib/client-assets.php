@@ -1245,7 +1245,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$preload_paths = array(
 		'/',
 		'/wp/v2/types?context=edit',
-		'/wp/v2/taxonomies?context=edit',
+		'/wp/v2/taxonomies?per_page=-1&context=edit',
 		sprintf( '/wp/v2/%s/%s?context=edit', $rest_base, $post->ID ),
 		sprintf( '/wp/v2/types/%s?context=edit', $post_type ),
 		sprintf( '/wp/v2/users/me?post_type=%s&context=edit', $post_type ),
