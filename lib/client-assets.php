@@ -1375,42 +1375,9 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		$max_upload_size = 0;
 	}
 
-	$editor_settings = array(
-		'alignWide'           => $align_wide || ! empty( $gutenberg_theme_support[0]['wide-images'] ), // Backcompat. Use `align-wide` outside of `gutenberg` array.
-		'availableTemplates'  => $available_templates,
-		'allowedBlockTypes'   => $allowed_block_types,
-		'disableCustomColors' => get_theme_support( 'disable-custom-colors' ),
-		'disablePostFormats'  => ! current_theme_supports( 'post-formats' ),
-		'titlePlaceholder'    => apply_filters( 'enter_title_here', __( 'Add title', 'gutenberg' ), $post ),
-		'bodyPlaceholder'     => apply_filters( 'write_your_story', __( 'Write your story', 'gutenberg' ), $post ),
-		'isRTL'               => is_rtl(),
-		'autosaveInterval'    => 10,
-		'maxUploadFileSize'   => $max_upload_size,
-		'allowedMimeTypes'    => get_allowed_mime_types(),
-		'ajaxurl'             => admin_url( 'admin-ajax.php' ),
-	);
-
-	$post_autosave = get_autosave_newer_than_post_save( $post );
-	if ( $post_autosave ) {
-		$editor_settings['autosave'] = array(
-			'editLink' => add_query_arg( 'gutenberg', true, get_edit_post_link( $post_autosave->ID ) ),
-		);
-	}
-
-	// Check to see if the post is locked.
-	$user    = null;
+	// Lock settings
 	$user_id = wp_check_post_lock( $post->ID );
 	if ( $user_id ) {
-		$user = get_userdata( $user_id );
-	} else {
-
-		// Lock the post.
-		$active_post_lock                  = wp_set_post_lock( $post->ID );
-		$editor_settings['activePostLock'] = esc_attr( implode( ':', $active_post_lock ) );
-	}
-
-	if ( $user ) {
-
 		/**
 		 * Filters whether to show the post locked dialog.
 		 *
@@ -1426,23 +1393,60 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 			$locked = true;
 		}
 
-		$avatar = get_avatar( $user->ID, 64 );
-		if ( $avatar ) {
-			if ( preg_match( "|src='([^']+)'|", $avatar, $matches ) ) {
-				$user->avatar_src = $matches[1];
+		$userDetails = null;
+		if ( $locked ) {
+			$user = get_userdata( $user_id );
+			$userDetails = array(
+				'name' => $user->display_name,
+			);
+			$avatar = get_avatar( $user_id, 64 );
+			if ( $avatar ) {
+				if ( preg_match( "|src='([^']+)'|", $avatar, $matches ) ) {
+					$userDetails[ 'avatar' ] = $matches[1];
+				}
 			}
 		}
 
-		$editor_settings['lockedUser'] = $locked ? $user : false;
-		$editor_settings['lockNonce']  = wp_create_nonce( 'lock-post_' . $post->ID );
-
+		$lock_details = array(
+			'isLocked' => $locked,
+			'user'     => $userDetails,
+		);
 	} else {
-		$locked = false;
+		// Lock the post
+		$active_post_lock = wp_set_post_lock( $post->ID );
+		$lock_details = array(
+			'isLocked' => false,
+			'activePostLock' => esc_attr( implode( ':', $active_post_lock ) )
+		);
 	}
-	$editor_settings['locked'] = $locked;
 
-	// Add a nonce for post unlocking on window unload.
-	$editor_settings['_wpnonce'] = wp_create_nonce( 'update-post_' . $post->ID );
+	$editor_settings = array(
+		'alignWide'           => $align_wide || ! empty( $gutenberg_theme_support[0]['wide-images'] ), // Backcompat. Use `align-wide` outside of `gutenberg` array.
+		'availableTemplates'  => $available_templates,
+		'allowedBlockTypes'   => $allowed_block_types,
+		'disableCustomColors' => get_theme_support( 'disable-custom-colors' ),
+		'disablePostFormats'  => ! current_theme_supports( 'post-formats' ),
+		'titlePlaceholder'    => apply_filters( 'enter_title_here', __( 'Add title', 'gutenberg' ), $post ),
+		'bodyPlaceholder'     => apply_filters( 'write_your_story', __( 'Write your story', 'gutenberg' ), $post ),
+		'isRTL'               => is_rtl(),
+		'autosaveInterval'    => 10,
+		'maxUploadFileSize'   => $max_upload_size,
+		'allowedMimeTypes'    => get_allowed_mime_types(),
+		'postLock'            => $lock_details,
+
+		// Ideally, we'd remove this and rely on a REST API endpoint
+		'postLockUtils'       => array(
+			'nonce'             => wp_create_nonce( 'lock-post_' . $post->ID ),
+			'ajaxUrl'           => admin_url( 'admin-ajax.php' ),
+		)
+	);
+
+	$post_autosave = get_autosave_newer_than_post_save( $post );
+	if ( $post_autosave ) {
+		$editor_settings['autosave'] = array(
+			'editLink' => add_query_arg( 'gutenberg', true, get_edit_post_link( $post_autosave->ID ) ),
+		);
+	}
 
 	if ( false !== $color_palette ) {
 		$editor_settings['colors'] = $color_palette;

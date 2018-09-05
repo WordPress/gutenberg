@@ -18,15 +18,13 @@ import {
  *
  * @param {Object}  post           Post object.
  * @param {Object}  autosaveStatus The Post's autosave status.
- * @param {Object}  lockedUser     The Post's locked user, or false if not locked.
  *
  * @return {Object} Action object.
  */
-export function setupEditor( post, autosaveStatus, lockedUser ) {
+export function setupEditor( post, autosaveStatus ) {
 	return {
 		type: 'SETUP_EDITOR',
 		autosave: autosaveStatus,
-		locked: lockedUser,
 		post,
 	};
 }
@@ -595,16 +593,14 @@ export function removeNotice( id ) {
 /**
  * Returns an action object used to lock the editor.
  *
- * @param {boolean} locked      Whether the editor should be locked.
- * @param {Object}  lockDetails Details about the lock user and their avatar.
+ * @param {Object}  lock Details about the post lock status, user, and nonce.
  *
  * @return {Object} Action object.
  */
-export function lockPost( locked, lockDetails ) {
+export function updatePostLock( lock ) {
 	return {
-		type: 'LOCK_POST',
-		locked,
-		lockDetails,
+		type: 'UPDATE_POST_LOCK',
+		lock,
 	};
 }
 

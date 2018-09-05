@@ -876,15 +876,10 @@ export function notices( state = [], action ) {
 	return state;
 }
 
-export function locked( state = false, action ) {
+export function postLock( state = { isLocked: false }, action ) {
 	switch ( action.type ) {
-		case 'LOCK_POST':
-		case 'SETUP_EDITOR':
-			return {
-				...state,
-				locked: action.locked,
-				lockDetails: action.lockDetails,
-			};
+		case 'UPDATE_POST_LOCK':
+			return action.lock;
 	}
 
 	return state;
@@ -1103,7 +1098,7 @@ export default optimist( combineReducers( {
 	isInsertionPointVisible,
 	preferences,
 	saving,
-	locked,
+	postLock,
 	notices,
 	reusableBlocks,
 	template,

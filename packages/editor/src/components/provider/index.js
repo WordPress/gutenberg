@@ -26,7 +26,8 @@ class EditorProvider extends Component {
 		// Assume that we don't need to initialize in the case of an error recovery.
 		if ( ! props.recovery ) {
 			this.props.updateEditorSettings( props.settings );
-			this.props.setupEditor( props.post, props.settings.autosave, props.settings.lockedUser );
+			this.props.updatePostLock( props.settings.postLock );
+			this.props.setupEditor( props.post, props.settings.autosave );
 		}
 	}
 
@@ -100,6 +101,7 @@ export default withDispatch( ( dispatch ) => {
 		undo,
 		redo,
 		createUndoLevel,
+		updatePostLock,
 	} = dispatch( 'core/editor' );
 	return {
 		setupEditor,
@@ -107,5 +109,6 @@ export default withDispatch( ( dispatch ) => {
 		redo,
 		createUndoLevel,
 		updateEditorSettings,
+		updatePostLock,
 	};
 } )( EditorProvider );

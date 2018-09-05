@@ -1042,9 +1042,9 @@ Returns whether the post is locked.
 
 Is locked.
 
-### getLockDetails
+### isPostLockTakeover
 
-Returns details about the current post lock if available.
+Returns whether the post is locked.
 
 *Parameters*
 
@@ -1052,11 +1052,11 @@ Returns details about the current post lock if available.
 
 *Returns*
 
-Post lock details.
+Is locked.
 
 ### getPostLockUser
 
-Returns the post lock user.
+Returns details about the post lock user.
 
 *Parameters*
 
@@ -1065,6 +1065,18 @@ Returns the post lock user.
 *Returns*
 
 A user object.
+
+### getActivePostLock
+
+Returns the active post lock.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+The lock object.
 
 ### canUserUseUnfilteredHTML
 
@@ -1089,7 +1101,6 @@ the specified post object and editor settings.
 
  * post: Post object.
  * autosaveStatus: The Post's autosave status.
- * lockedUser: The Post's locked user, or false if not locked.
 
 ### resetPost
 
@@ -1367,13 +1378,13 @@ Returns an action object used to remove a notice.
 
  * id: The notice id.
 
-### lockPost
+### updatePostLock
 
 Returns an action object used to lock the editor.
 
 *Parameters*
 
- * locked: Whether the editor should be locked.
+ * lock: Details about the post lock status, user, and nonce.
 
 ### fetchReusableBlocks
 

@@ -49,6 +49,7 @@ export { default as PostFormat } from './post-format';
 export { default as PostFormatCheck } from './post-format/check';
 export { default as PostLastRevision } from './post-last-revision';
 export { default as PostLastRevisionCheck } from './post-last-revision/check';
+export { default as PostLockedModal } from './post-locked-modal';
 export { default as PostPendingStatus } from './post-pending-status';
 export { default as PostPendingStatusCheck } from './post-pending-status/check';
 export { default as PostPingbacks } from './post-pingbacks';
