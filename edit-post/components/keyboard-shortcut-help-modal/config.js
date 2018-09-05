@@ -46,7 +46,7 @@ const globalShortcuts = {
 		},
 		{
 			keyCombination: ctrl( '`' ),
-			description: __( 'Navigate to a the next part of the editor.' ),
+			description: __( 'Navigate to the next part of the editor.' ),
 			ariaLabel: shortcutAriaLabel.ctrl( '`' ),
 		},
 		{
@@ -56,7 +56,7 @@ const globalShortcuts = {
 		},
 		{
 			keyCombination: shiftAlt( 'n' ),
-			description: __( 'Navigate to a the next part of the editor (alternative).' ),
+			description: __( 'Navigate to the next part of the editor (alternative).' ),
 		},
 		{
 			keyCombination: shiftAlt( 'p' ),
