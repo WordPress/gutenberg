@@ -9,7 +9,7 @@ import { assign, get, includes } from 'lodash';
  */
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
-import { hasBlockSupport, getBlockSupport } from '@wordpress/blocks';
+import { hasBlockSupport, getBlockSupport, getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -77,7 +77,16 @@ export const withToolbarControls = createHigherOrderComponent( ( BlockEdit ) => 
 	return ( props ) => {
 		const validAlignments = getBlockValidAlignments( props.name );
 
-		const updateAlignment = ( nextAlign ) => props.setAttributes( { align: nextAlign } );
+		const updateAlignment = ( nextAlign ) => {
+			if ( ! nextAlign ) {
+				const blockType = getBlockType( props.name );
+				const blockDefaultAlign = get( blockType, [ 'attributes', 'align', 'default' ] );
+				if ( blockDefaultAlign ) {
+					nextAlign = null;
+				}
+			}
+			props.setAttributes( { align: nextAlign } );
+		};
 
 		return [
 			validAlignments.length > 0 && props.isSelected && (
