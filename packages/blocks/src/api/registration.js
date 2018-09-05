@@ -180,7 +180,7 @@ export function unregisterBlockType( name ) {
 export function setUnknownTypeHandlerName( name ) {
 	deprecated( 'setUnknownTypeHandlerName', {
 		plugin: 'Gutenberg',
-		version: '3.8',
+		version: '4.0',
 		alternative: 'setUnstructuredTypeHandlerName and setUnregisteredTypeHandlerName',
 	} );
 	dispatch( 'core/blocks' ).setFallbackBlockName( name );

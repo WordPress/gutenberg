@@ -60,7 +60,7 @@ export function setDefaultBlockName( name ) {
 export function setFallbackBlockName( name ) {
 	deprecated( 'setFallbackBlockName', {
 		plugin: 'Gutenberg',
-		version: '3.8',
+		version: '4.0',
 		alternative: 'setUnstructuredFallbackBlockName and setUnregisteredFallbackBlockName',
 	} );
 	return {
