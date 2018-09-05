@@ -60,7 +60,6 @@ export { createSlotFill, Slot, Fill, Provider as SlotFillProvider } from './slot
 
 // Higher-Order Components
 export { default as navigateRegions } from './higher-order/navigate-regions';
-export { default as withContext } from './higher-order/with-context';
 export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
 export { default as withFallbackStyles } from './higher-order/with-fallback-styles';
 export { default as withFilters } from './higher-order/with-filters';
