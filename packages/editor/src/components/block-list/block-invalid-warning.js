@@ -41,7 +41,7 @@ export class BlockInvalidWarning extends Component {
 		const hiddenActions = [
 			{ title: __( 'Convert to Blocks' ), onClick: convertToBlocks },
 			{ title: __( 'Convert to Classic Block' ), onClick: convertToClassic },
-			{ title: __( 'Compare conversion' ), onClick: this.onCompare },
+			{ title: __( 'Compare Conversion' ), onClick: this.onCompare },
 		];
 
 		if ( compare ) {
