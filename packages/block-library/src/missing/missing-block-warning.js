@@ -10,16 +10,12 @@ import { Warning } from '@wordpress/editor';
 
 export const name = 'core/unknown';
 
-export function MissingBlockWarning( { attributes, removeBlock, convertToHTML } ) {
+export function MissingBlockWarning( { attributes, convertToHTML } ) {
 	const { originalName, originalUndelimitedContent } = attributes;
 	const hasContent = !! originalUndelimitedContent;
 	const hasHTMLBlock = getBlockType( 'core/html' );
 
-	const actions = [
-		<Button key="remove" onClick={ removeBlock } isLarge>
-			{ __( 'Remove Block' ) }
-		</Button>,
-	];
+	const actions = [];
 	let messageHTML;
 	if ( hasContent && hasHTMLBlock ) {
 		messageHTML = sprintf(
@@ -53,11 +49,8 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, { block, attributes } ) => {
-		const { replaceBlock, removeBlock } = dispatch( 'core/editor' );
+		const { replaceBlock } = dispatch( 'core/editor' );
 		return {
-			removeBlock() {
-				removeBlock( block.clientId );
-			},
 			convertToHTML() {
 				replaceBlock( block.clientId, createBlock( 'core/html', {
 					content: attributes.originalUndelimitedContent,

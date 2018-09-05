@@ -12,10 +12,9 @@
 			outline: none;
 		}
 
-		// Remove the block menu because design requested that this
+		// Remove the block breadcrumb because design requested that this
 		// feel less like a first-class block and more like an error message.
-		.editor-block-list__breadcrumb,
-		.editor-block-settings-menu {
+		.editor-block-list__breadcrumb {
 			display: none;
 		}
 	}
