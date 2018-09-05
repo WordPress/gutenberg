@@ -4,6 +4,8 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 
 - `wp.components.RichTextProvider` has been removed. Please use `wp.data.select( 'core/editor' )` methods instead.
 - `wp.components.Draggable` as a DOM node drag handler has been removed. Please, use `wp.components.Draggable` as a wrap component for your DOM node drag handler.
+- `wp.i18n.getI18n` has been removed. Use `__`, `_x`, `_n`, or `_nx` instead.
+- `wp.i18n.dcnpgettext` has been removed. Use `__`, `_x`, `_n`, or `_nx` instead.
 
 ## 3.9.0
 
