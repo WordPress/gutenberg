@@ -23,6 +23,7 @@ import {
  * Internal dependencies
  */
 import './style.scss';
+import FullscreenModeClose from '../fullscreen-mode-close';
 
 function HeaderToolbar( { hasFixedToolbar, isLargeViewport } ) {
 	return (
@@ -30,6 +31,7 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport } ) {
 			className="edit-post-header-toolbar"
 			aria-label={ __( 'Editor Toolbar' ) }
 		>
+			<FullscreenModeClose />
 			<div>
 				<Inserter position="bottom right" />
 				<DotTip id="core/editor.inserter">

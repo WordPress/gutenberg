@@ -2,10 +2,6 @@
  * WordPress Dependencies
  */
 import { withSelect, withDispatch } from '@wordpress/data';
-
-/**
- * WordPress Dependencies
- */
 import { compose } from '@wordpress/compose';
 import { MenuItem } from '@wordpress/components';
 
