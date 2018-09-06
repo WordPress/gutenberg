@@ -9,18 +9,6 @@
 	}
 }
 
-// Allow Drag & Drop when clicking on the empty area of the mover and the settings menu
-.editor-block-list__layout .editor-block-list__block .editor-block-mover,
-.editor-block-list__layout .editor-block-list__block .editor-block-settings-menu {
-	pointer-events: none;
-
-	// Nested blocks don't have any side affordance for drag and drop
-	.editor-block-list__layout &,
-	> * {
-		pointer-events: auto;
-	}
-}
-
 .editor-block-list__layout .editor-block-list__block.is-selected { // Needs specificity to override inherited styles.
 	// While block is being dragged, dim the slot dragged from, and hide some UI.
 	&.is-dragging {
