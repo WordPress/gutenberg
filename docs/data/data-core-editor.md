@@ -49,19 +49,6 @@ false if the editing state matches the saved or new post.
 
 Whether unsaved values exist.
 
-### isCleanNewPost
-
-Returns true if there are no unsaved values for the current edit session and if
-the currently edited post is new (and has never been saved before).
-
-*Parameters*
-
- * state: Global application state.
-
-*Returns*
-
-Whether new post and unsaved values exist.
-
 ### getCurrentPost
 
 Returns the post currently being edited in its last known saved state, not
@@ -319,18 +306,6 @@ unsaved status values.
 *Returns*
 
 Whether the post has been published.
-
-### getDocumentTitle
-
-Gets the document title to be used.
-
-*Parameters*
-
- * state: Global application state.
-
-*Returns*
-
-Document title.
 
 ### getBlockName
 
