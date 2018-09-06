@@ -27,9 +27,9 @@ export const SVG = ( props ) => {
 	if ( typeof props.style === 'string' || props.style instanceof String ) {
 		styleKeys = props.style.split( ' ' );
 		styleKeys.forEach(element => {
-			let oneStyle = styles[ styleKeys[ element ] ];
+			let oneStyle = styles[ element ];
 			if ( oneStyle != undefined ) {
-				styleValues.push( styles[ styleKeys[ element ] ] );
+				styleValues.push( oneStyle );
 			}
 		});
 	}
