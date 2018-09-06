@@ -32,12 +32,12 @@
 		// Use specific selector to not affect nested block toolbars.
 		&[data-align="wide"] > .editor-block-contextual-toolbar,
 		&[data-align="full"] > .editor-block-contextual-toolbar {
-			width: calc(100% + #{ ($parent-block-padding * 4) + $border-width + $border-width }); // Matches the negative margins applied to parent blocks.
+			width: calc(100% + #{ $block-side-ui-width * 2 + $block-padding * 2 + $border-width * 2 }); // Matches the negative margins applied to parent blocks.
 			height: 0; // This collapses the container to an invisible element without margin.
 			text-align: center;
 
 			.editor-block-toolbar {
-				max-width: $content-width + $block-padding + $block-padding;
+				max-width: $content-width;
 				width: 100%;
 				position: relative;
 			}
@@ -45,7 +45,7 @@
 
 		// The centering math changes when a fullwide image doesn't have block padding.
 		&[data-align="full"] > .editor-block-contextual-toolbar {
-			width: calc(100% + #{ ($parent-block-padding * 2) + ($block-padding * 2) }); // Matches the negative margins applied to non-parent blocks, except for borders which are gone in fullwide.
+			width: calc(100% + #{ $block-side-ui-width * 2 + $block-padding * 2 }); // Matches the negative margins applied to non-parent blocks, except for borders which are gone in fullwide.
 
 			.editor-block-toolbar {
 				max-width: $content-width - $border-width - $border-width;
@@ -80,11 +80,11 @@
 		margin-right: 0;
 	}
 
-	// Include space for side UI on desktops.
+	// Stretch to mimic outline padding on desktop.
 	@include break-small() {
 		> div {
-			margin-left: -$block-side-ui-width;
-			margin-right: -$block-side-ui-width;
+			margin-left: -$block-side-ui-clearance;
+			margin-right: -$block-side-ui-clearance;
 		}
 	}
 }
