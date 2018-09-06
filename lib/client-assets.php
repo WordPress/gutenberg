@@ -1434,11 +1434,11 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 		$user_details = null;
 		if ( $locked ) {
-			$user = get_userdata( $user_id );
+			$user         = get_userdata( $user_id );
 			$user_details = array(
 				'name' => $user->display_name,
 			);
-			$avatar = get_avatar( $user_id, 64 );
+			$avatar       = get_avatar( $user_id, 64 );
 			if ( $avatar ) {
 				if ( preg_match( "|src='([^']+)'|", $avatar, $matches ) ) {
 					$user_details['avatar'] = $matches[1];
@@ -1454,8 +1454,8 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 		// Lock the post.
 		$active_post_lock = wp_set_post_lock( $post->ID );
-		$lock_details = array(
-			'isLocked' => false,
+		$lock_details     = array(
+			'isLocked'       => false,
 			'activePostLock' => esc_attr( implode( ':', $active_post_lock ) ),
 		);
 	}
@@ -1476,8 +1476,8 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 		// Ideally, we'd remove this and rely on a REST API endpoint.
 		'postLockUtils'       => array(
-			'nonce'             => wp_create_nonce( 'lock-post_' . $post->ID ),
-			'ajaxUrl'           => admin_url( 'admin-ajax.php' ),
+			'nonce'   => wp_create_nonce( 'lock-post_' . $post->ID ),
+			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
 		),
 	);
 
