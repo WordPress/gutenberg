@@ -71,10 +71,4 @@ See: http://www.diveintojavascript.com/projects/javascript-sprintf
 
 Creates a new Jed instance with specified locale data configuration.
 
-`getI18n(): Jed`
-
-Returns the current Jed instance, initializing with a default configuration if not already assigned.
-
-See: http://messageformat.github.io/Jed/
-
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

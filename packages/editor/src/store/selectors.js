@@ -1071,6 +1071,7 @@ export function hasSelectedInnerBlock( state, clientId, deep = false ) {
 		getBlockOrder( state, clientId ),
 		( innerClientId ) => (
 			isBlockSelected( state, innerClientId ) ||
+			isBlockMultiSelected( state, innerClientId ) ||
 			( deep && hasSelectedInnerBlock( state, innerClientId, deep ) )
 		)
 	);
