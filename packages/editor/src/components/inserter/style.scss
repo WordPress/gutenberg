@@ -108,6 +108,16 @@ $block-inserter-search-height: 38px;
 	margin: 0 -8px;
 }
 
+.editor-inserter__reusable-blocks-panel {
+	position: relative;
+
+	.editor-inserter__manage-reusable-blocks {
+		bottom: 5px;
+		position: absolute;
+		right: 0;
+	}
+}
+
 .editor-inserter__no-results {
 	font-style: italic;
 	padding: 24px;
