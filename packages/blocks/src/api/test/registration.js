@@ -16,8 +16,8 @@ import {
 	unregisterBlockType,
 	setUnknownTypeHandlerName,
 	getUnknownTypeHandlerName,
-	setUnstructuredTypeHandlerName,
-	getUnstructuredTypeHandlerName,
+	setFreeformContentHandlerName,
+	getFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
 	getUnregisteredTypeHandlerName,
 	setDefaultBlockName,
@@ -43,7 +43,7 @@ describe( 'blocks', () => {
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
-		setUnstructuredTypeHandlerName( undefined );
+		setFreeformContentHandlerName( undefined );
 		setUnregisteredTypeHandlerName( undefined );
 		setDefaultBlockName( undefined );
 		unstable__bootstrapServerSideBlockDefinitions( {} );
@@ -392,17 +392,17 @@ describe( 'blocks', () => {
 		} );
 	} );
 
-	describe( 'setUnstructuredTypeHandlerName()', () => {
+	describe( 'setFreeformContentHandlerName()', () => {
 		it( 'assigns unknown type handler', () => {
-			setUnstructuredTypeHandlerName( 'core/test-block' );
+			setFreeformContentHandlerName( 'core/test-block' );
 
-			expect( getUnstructuredTypeHandlerName() ).toBe( 'core/test-block' );
+			expect( getFreeformContentHandlerName() ).toBe( 'core/test-block' );
 		} );
 	} );
 
-	describe( 'getUnstructuredTypeHandlerName()', () => {
+	describe( 'getFreeformContentHandlerName()', () => {
 		it( 'defaults to undefined', () => {
-			expect( getUnstructuredTypeHandlerName() ).toBeNull();
+			expect( getFreeformContentHandlerName() ).toBeNull();
 		} );
 	} );
 

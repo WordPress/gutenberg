@@ -5,7 +5,7 @@ import '@wordpress/core-data';
 import {
 	registerBlockType,
 	setDefaultBlockName,
-	setUnstructuredTypeHandlerName,
+	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
 } from '@wordpress/blocks';
 
@@ -102,7 +102,7 @@ export const registerCoreBlocks = () => {
 
 	setDefaultBlockName( paragraph.name );
 	if ( window.wp && window.wp.oldEditor ) {
-		setUnstructuredTypeHandlerName( classic.name );
+		setFreeformContentHandlerName( classic.name );
 	}
 	setUnregisteredTypeHandlerName( missing.name );
 };

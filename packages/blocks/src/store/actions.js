@@ -61,7 +61,7 @@ export function setFallbackBlockName( name ) {
 	deprecated( 'setFallbackBlockName', {
 		plugin: 'Gutenberg',
 		version: '4.0',
-		alternative: 'setUnstructuredFallbackBlockName and setUnregisteredFallbackBlockName',
+		alternative: 'setFreeformFallbackBlockName and setUnregisteredFallbackBlockName',
 	} );
 	return {
 		type: 'SET_FALLBACK_BLOCK_NAME',
@@ -77,9 +77,9 @@ export function setFallbackBlockName( name ) {
  *
  * @return {Object} Action object.
  */
-export function setUnstructuredFallbackBlockName( name ) {
+export function setFreeformFallbackBlockName( name ) {
 	return {
-		type: 'SET_NONBLOCK_FALLBACK_BLOCK_NAME',
+		type: 'SET_FREEFORM_FALLBACK_BLOCK_NAME',
 		name,
 	};
 }

@@ -18,7 +18,7 @@ import {
 	getBlockTypes,
 	registerBlockType,
 	unregisterBlockType,
-	setUnstructuredTypeHandlerName,
+	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
 } from '../registration';
 import { createBlock } from '../';
@@ -30,7 +30,7 @@ describe( 'block serializer', () => {
 	} );
 
 	afterEach( () => {
-		setUnstructuredTypeHandlerName( undefined );
+		setFreeformContentHandlerName( undefined );
 		setUnregisteredTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
@@ -198,10 +198,10 @@ describe( 'block serializer', () => {
 	} );
 
 	describe( 'serializeBlock()', () => {
-		it( 'serializes the unstructured fallback block without comment delimiters', () => {
-			registerBlockType( 'core/unstructured-block', {
+		it( 'serializes the freeform content fallback block without comment delimiters', () => {
+			registerBlockType( 'core/freeform-block', {
 				category: 'common',
-				title: 'unstructured block',
+				title: 'freeform block',
 				attributes: {
 					fruit: {
 						type: 'string',
@@ -209,8 +209,8 @@ describe( 'block serializer', () => {
 				},
 				save: ( { attributes } ) => attributes.fruit,
 			} );
-			setUnstructuredTypeHandlerName( 'core/unstructured-block' );
-			const block = createBlock( 'core/unstructured-block', { fruit: 'Bananas' } );
+			setFreeformContentHandlerName( 'core/freeform-block' );
+			const block = createBlock( 'core/freeform-block', { fruit: 'Bananas' } );
 
 			const content = serializeBlock( block );
 

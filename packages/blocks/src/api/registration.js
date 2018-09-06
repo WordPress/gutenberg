@@ -181,7 +181,7 @@ export function setUnknownTypeHandlerName( name ) {
 	deprecated( 'setUnknownTypeHandlerName', {
 		plugin: 'Gutenberg',
 		version: '4.0',
-		alternative: 'setUnstructuredTypeHandlerName and setUnregisteredTypeHandlerName',
+		alternative: 'setFreeformContentHandlerName and setUnregisteredTypeHandlerName',
 	} );
 	dispatch( 'core/blocks' ).setFallbackBlockName( name );
 }
@@ -201,8 +201,8 @@ export function getUnknownTypeHandlerName() {
  *
  * @param {string} name Block name.
  */
-export function setUnstructuredTypeHandlerName( name ) {
-	dispatch( 'core/blocks' ).setUnstructuredFallbackBlockName( name );
+export function setFreeformContentHandlerName( name ) {
+	dispatch( 'core/blocks' ).setFreeformFallbackBlockName( name );
 }
 
 /**
@@ -211,8 +211,8 @@ export function setUnstructuredTypeHandlerName( name ) {
  *
  * @return {?string} Blog name.
  */
-export function getUnstructuredTypeHandlerName() {
-	return select( 'core/blocks' ).getUnstructuredFallbackBlockName();
+export function getFreeformContentHandlerName() {
+	return select( 'core/blocks' ).getFreeformFallbackBlockName();
 }
 
 /**

@@ -28,7 +28,7 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 	getBlockTypes,
-	setUnstructuredTypeHandlerName,
+	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
 } from '../registration';
 import { createBlock } from '../factory';
@@ -66,7 +66,7 @@ describe( 'block parser', () => {
 	} );
 
 	afterEach( () => {
-		setUnstructuredTypeHandlerName( undefined );
+		setFreeformContentHandlerName( undefined );
 		setUnregisteredTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
@@ -563,14 +563,14 @@ describe( 'block parser', () => {
 			expect( block.attributes.content ).toContain( 'wp:test-block' );
 		} );
 
-		it( 'should fall back to the unstructured type handler if block type not specified', () => {
-			registerBlockType( 'core/unstructured-block', unknownBlockSettings );
-			setUnstructuredTypeHandlerName( 'core/unstructured-block' );
+		it( 'should fall back to the freeform content handler if block type not specified', () => {
+			registerBlockType( 'core/freeform-block', unknownBlockSettings );
+			setFreeformContentHandlerName( 'core/freeform-block' );
 
 			const block = createBlockWithFallback( {
 				innerHTML: 'content',
 			} );
-			expect( block.name ).toEqual( 'core/unstructured-block' );
+			expect( block.name ).toEqual( 'core/freeform-block' );
 			expect( block.attributes ).toEqual( { content: '<p>content</p>' } );
 		} );
 
@@ -708,7 +708,7 @@ describe( 'block parser', () => {
 		it( 'should ignore blocks with a bad namespace', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			setUnstructuredTypeHandlerName( 'core/unknown-block' );
+			setFreeformContentHandlerName( 'core/unknown-block' );
 			setUnregisteredTypeHandlerName( 'core/unknown-block' );
 
 			const parsed = parse(
@@ -724,7 +724,7 @@ describe( 'block parser', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			registerBlockType( 'core/unknown-block', unknownBlockSettings );
 
-			setUnstructuredTypeHandlerName( 'core/unknown-block' );
+			setFreeformContentHandlerName( 'core/unknown-block' );
 
 			const parsed = parse(
 				'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
@@ -744,7 +744,7 @@ describe( 'block parser', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			registerBlockType( 'core/unknown-block', unknownBlockSettings );
 
-			setUnstructuredTypeHandlerName( 'core/unknown-block' );
+			setFreeformContentHandlerName( 'core/unknown-block' );
 
 			const parsed = parse(
 				'<p>Cauliflower</p>' +

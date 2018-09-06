@@ -52,7 +52,7 @@ export default compose( [
 		const { getBlock, getReusableBlock } = select( 'core/editor' );
 		const {
 			getFallbackBlockName,
-			getUnstructuredFallbackBlockName,
+			getFreeformFallbackBlockName,
 			getUnregisteredFallbackBlockName,
 		} = select( 'core/blocks' );
 
@@ -65,7 +65,7 @@ export default compose( [
 			( blocks.length !== 1 ||
 				// TODO: Revisit this.
 				blocks[ 0 ].name !== getFallbackBlockName() ||
-				blocks[ 0 ].name !== getUnstructuredFallbackBlockName() ||
+				blocks[ 0 ].name !== getFreeformFallbackBlockName() ||
 				blocks[ 0 ].name !== getUnregisteredFallbackBlockName() )
 		);
 
