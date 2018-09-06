@@ -4,6 +4,7 @@ import UIKit
 
 class RCTAztecView: Aztec.TextView {
     @objc var onChange: RCTBubblingEventBlock? = nil
+    @objc var onEnter: RCTBubblingEventBlock? = nil
     @objc var onContentSizeChange: RCTBubblingEventBlock? = nil
 
     @objc var onActiveFormatsChange: RCTBubblingEventBlock? = nil
@@ -61,8 +62,14 @@ class RCTAztecView: Aztec.TextView {
     // MARK: - Edits
     
     open override func insertText(_ text: String) {
+        guard text != "\n" else {            
+            onEnter?([:])
+            return
+        }
+        
         super.insertText(text)
         updatePlaceholderVisibility()
+        
         if let onChange = onChange {
             let text = packForRN(getHTML(), withName: "text")
             onChange(text)
@@ -72,6 +79,7 @@ class RCTAztecView: Aztec.TextView {
     open override func deleteBackward() {
         super.deleteBackward()
         updatePlaceholderVisibility()
+        
         if let onChange = onChange {
             let text = packForRN(getHTML(), withName: "text")
             onChange(text)
@@ -81,7 +89,8 @@ class RCTAztecView: Aztec.TextView {
     // MARK: - Native-to-RN Value Packing Logic
     
     func packForRN(_ text: String, withName name: String) -> [AnyHashable: Any] {
-        return [name: text, "eventCount": 1]
+        return [name: text,
+                "eventCount": 1]
     }
     
     func packForRN(_ size: CGSize, withName name: String) -> [AnyHashable: Any] {

@@ -13,6 +13,7 @@ class AztecView extends React.Component {
     minImagesWidth: PropTypes.number,
     onChange: PropTypes.func,
     onContentSizeChange: PropTypes.func,
+    onEnter: PropTypes.func,
     onScroll: PropTypes.func,
     onActiveFormatsChange: PropTypes.func,
     ...ViewPropTypes, // include the default view properties
