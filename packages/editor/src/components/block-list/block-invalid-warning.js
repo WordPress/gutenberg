@@ -51,7 +51,6 @@ export class BlockInvalidWarning extends Component {
 					onRequestClose={ this.onCompareClose }
 					className="editor-block-compare"
 					focusOnMount={ false }
-					shouldCloseOnClickOutside={ false }
 				>
 					<BlockCompare
 						block={ block }
