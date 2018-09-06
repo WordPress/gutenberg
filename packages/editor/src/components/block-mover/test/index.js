@@ -7,7 +7,7 @@ import { shallow } from 'enzyme';
  * Internal dependencies
  */
 import { BlockMover } from '../';
-import { upArrow, downArrow } from '../arrows';
+import { upArrow, downArrow, dragHandle } from '../arrows';
 
 describe( 'BlockMover', () => {
 	describe( 'basic rendering', () => {
@@ -22,7 +22,7 @@ describe( 'BlockMover', () => {
 			expect( wrapper.type() ).toBe( null );
 		} );
 
-		it( 'should render two IconButton components with the following props', () => {
+		it( 'should render three icons with the following props', () => {
 			const blockMover = shallow(
 				<BlockMover
 					clientIds={ selectedClientIds }
@@ -33,10 +33,12 @@ describe( 'BlockMover', () => {
 			expect( blockMover.hasClass( 'editor-block-mover' ) ).toBe( true );
 
 			const moveUp = blockMover.childAt( 0 );
-			const moveDown = blockMover.childAt( 1 );
-			const moveUpDesc = blockMover.childAt( 2 );
-			const moveDownDesc = blockMover.childAt( 3 );
+			const drag = blockMover.childAt( 1 );
+			const moveDown = blockMover.childAt( 2 );
+			const moveUpDesc = blockMover.childAt( 3 );
+			const moveDownDesc = blockMover.childAt( 4 );
 			expect( moveUp.type().name ).toBe( 'IconButton' );
+			expect( drag.type().name ).toBe( 'IconDragHandle' );
 			expect( moveDown.type().name ).toBe( 'IconButton' );
 			expect( moveUp.props() ).toMatchObject( {
 				className: 'editor-block-mover__control',
@@ -45,6 +47,11 @@ describe( 'BlockMover', () => {
 				icon: upArrow,
 				'aria-disabled': undefined,
 				'aria-describedby': 'editor-block-mover__up-description-1',
+			} );
+			expect( drag.props() ).toMatchObject( {
+				className: 'editor-block-mover__control',
+				icon: dragHandle,
+				label: 'Drag',
 			} );
 			expect( moveDown.props() ).toMatchObject( {
 				className: 'editor-block-mover__control',
@@ -72,6 +79,23 @@ describe( 'BlockMover', () => {
 			expect( moveUp.prop( 'onClick' ) ).toBe( onMoveUp );
 		} );
 
+		it( 'should render the drag handle with onDragStart and onDragEnd callback', () => {
+			const onDragStart = ( event ) => event;
+			const onDragEnd = ( event ) => event;
+			const blockMover = shallow(
+				<BlockMover
+					clientIds={ selectedClientIds }
+					blockType={ blockType }
+					onDragStart={ onDragStart }
+					onDragEnd={ onDragEnd }
+					firstIndex={ 0 }
+				/>
+			);
+			const dragHandler = blockMover.childAt( 1 );
+			expect( dragHandler.prop( 'onDragStart' ) ).toBe( onDragStart );
+			expect( dragHandler.prop( 'onDragEnd' ) ).toBe( onDragEnd );
+		} );
+
 		it( 'should render the down arrow with a onMoveDown callback', () => {
 			const onMoveDown = ( event ) => event;
 			const blockMover = shallow(
@@ -82,26 +106,21 @@ describe( 'BlockMover', () => {
 					firstIndex={ 0 }
 				/>
 			);
-			const moveDown = blockMover.childAt( 1 );
+			const moveDown = blockMover.childAt( 2 );
 			expect( moveDown.prop( 'onClick' ) ).toBe( onMoveDown );
 		} );
 
-		it( 'should render with a disabled up arrow when the block isFirst', () => {
-			const onMoveUp = ( event ) => event;
+		it( 'should not render the drag handle if block is not draggable', () => {
 			const blockMover = shallow(
 				<BlockMover
 					clientIds={ selectedClientIds }
 					blockType={ blockType }
-					onMoveUp={ onMoveUp }
-					isFirst
-					firstIndex={ 0 }
+					isDraggable={ false }
 				/>
 			);
-			const moveUp = blockMover.childAt( 0 );
-			expect( moveUp.props() ).toMatchObject( {
-				onClick: null,
-				'aria-disabled': true,
-			} );
+			const dragHandler = blockMover.childAt( 1 );
+			expect( dragHandler.type().name ).toBe( 'IconDragHandle' );
+			expect( dragHandler.prop( 'isVisible' ) ).toBe( false );
 		} );
 
 		it( 'should render with a disabled down arrow when the block isLast', () => {
@@ -115,7 +134,7 @@ describe( 'BlockMover', () => {
 					firstIndex={ 0 }
 				/>
 			);
-			const moveDown = blockMover.childAt( 1 );
+			const moveDown = blockMover.childAt( 2 );
 			expect( moveDown.props() ).toMatchObject( {
 				onClick: null,
 				'aria-disabled': true,
