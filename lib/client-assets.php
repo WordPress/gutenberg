@@ -1426,9 +1426,9 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		 *
 		 * @param bool         $display Whether to display the dialog. Default true.
 		 * @param WP_Post      $post    Post object.
-		 * @param WP_User|bool $user    WP_User object on success, false otherwise.
+		 * @param WP_User|bool $user    The user id currently editing the post.
 		 */
-		if ( apply_filters( 'show_post_locked_dialog', true, $post, $user ) ) {
+		if ( apply_filters( 'show_post_locked_dialog', true, $post, $user_id ) ) {
 			$locked = true;
 		}
 
