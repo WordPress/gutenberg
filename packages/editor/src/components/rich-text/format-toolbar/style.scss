@@ -1,5 +1,6 @@
 .editor-format-toolbar {
-	display: inline-flex;
+	display: flex;
+	flex-shrink: 0;
 }
 
 .editor-format-toolbar__link-container {
