@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { Draggable } from '@wordpress/components';
 
-export const IconDragHandle = ( { isVisible, className, icon, onFocus, onBlur, onDragStart, onDragEnd, blockElementId, order, rootClientId, clientId, layout } ) => {
+export const IconDragHandle = ( { isVisible, className, icon, onDragStart, onDragEnd, blockElementId, order, rootClientId, clientId, layout } ) => {
 	if ( ! isVisible ) {
 		return null;
 	}
@@ -33,8 +33,6 @@ export const IconDragHandle = ( { isVisible, className, icon, onFocus, onBlur, o
 					<div
 						className={ dragHandleClassNames }
 						aria-hidden="true"
-						onFocus={ onFocus }
-						onBlur={ onBlur }
 						onDragStart={ onDraggableStart }
 						onDragEnd={ onDraggableEnd }
 						draggable

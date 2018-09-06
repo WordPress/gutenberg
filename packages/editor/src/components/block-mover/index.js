@@ -70,8 +70,6 @@ export class BlockMover extends Component {
 				<IconDragHandle
 					className="editor-block-mover__control"
 					icon={ dragHandle }
-					onFocus={ this.onFocus }
-					onBlur={ this.onBlur }
 					blockElementId={ blockElementId }
 					order={ order }
 					rootClientId={ rootClientId }
