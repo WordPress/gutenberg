@@ -1414,7 +1414,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		}
 	}
 
-	// Lock settings
+	// Lock settings.
 	$user_id = wp_check_post_lock( $post->ID );
 	if ( $user_id ) {
 		/**
@@ -1451,7 +1451,8 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 			'user'     => $user_details,
 		);
 	} else {
-		// Lock the post
+
+		// Lock the post.
 		$active_post_lock = wp_set_post_lock( $post->ID );
 		$lock_details = array(
 			'isLocked' => false,
@@ -1473,7 +1474,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'allowedMimeTypes'    => get_allowed_mime_types(),
 		'postLock'            => $lock_details,
 
-		// Ideally, we'd remove this and rely on a REST API endpoint
+		// Ideally, we'd remove this and rely on a REST API endpoint.
 		'postLockUtils'       => array(
 			'nonce'             => wp_create_nonce( 'lock-post_' . $post->ID ),
 			'ajaxUrl'           => admin_url( 'admin-ajax.php' ),
