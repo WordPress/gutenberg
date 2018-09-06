@@ -32,6 +32,7 @@ export class RichText extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onChange = this.onChange.bind( this );
+		this.onEnter = this.onEnter.bind( this );
 		this.onContentSizeChange = this.onContentSizeChange.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
 		this.onActiveFormatsChange = this.onActiveFormatsChange.bind( this );
@@ -92,6 +93,10 @@ export class RichText extends Component {
 			aztecHeight: contentHeight,
 		}
 		);
+	}
+
+	onEnter( event ) {
+		console.log("Enter pressed!  This logic still needs to be implemented.");
 	}
 
 	shouldComponentUpdate( nextProps ) {
@@ -169,6 +174,7 @@ export class RichText extends Component {
 					}
 					text={ { text: html, eventCount: eventCount } }
 					onChange={ this.onChange }
+					onEnter={ this.onEnter }
 					onContentSizeChange={ this.onContentSizeChange }
 					onActiveFormatsChange={ this.onActiveFormatsChange }
 					color={ 'black' }
