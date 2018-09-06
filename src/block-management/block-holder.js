@@ -70,7 +70,6 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 				setAttributes={ ( attrs ) =>
 					this.props.onChange( this.props.clientId, { ...this.props.attributes, ...attrs } )
 				}
-				onEnter={ console.log("testing!") }
 				isSelected={ this.props.focused }
 				style={ style }
 			/>
