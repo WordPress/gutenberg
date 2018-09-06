@@ -25,11 +25,14 @@
 	// While block is being dragged, dim the slot dragged from, and hide some UI.
 	&.is-dragging {
 		.editor-block-list__block-edit::before {
-			background: $light-gray-100;
-			outline-color: $light-gray-100;
+			outline: none;
 		}
 
 		> .editor-block-list__block-edit > * {
+			background: $light-gray-100;
+		}
+
+		> .editor-block-list__block-edit > * > * {
 			visibility: hidden;
 		}
 
