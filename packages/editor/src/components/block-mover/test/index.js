@@ -51,7 +51,6 @@ describe( 'BlockMover', () => {
 			expect( drag.props() ).toMatchObject( {
 				className: 'editor-block-mover__control',
 				icon: dragHandle,
-				label: 'Drag',
 			} );
 			expect( moveDown.props() ).toMatchObject( {
 				className: 'editor-block-mover__control',

@@ -6,9 +6,9 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Draggable, Tooltip } from '@wordpress/components';
+import { Draggable } from '@wordpress/components';
 
-export const IconDragHandle = ( { label, isVisible, className, icon, onFocus, onBlur, onDragStart, onDragEnd, blockElementId, order, rootClientId, clientId, layout } ) => {
+export const IconDragHandle = ( { isVisible, className, icon, onFocus, onBlur, onDragStart, onDragEnd, blockElementId, order, rootClientId, clientId, layout } ) => {
 	if ( ! isVisible ) {
 		return null;
 	}
@@ -30,21 +30,17 @@ export const IconDragHandle = ( { label, isVisible, className, icon, onFocus, on
 		>
 			{
 				( { onDraggableStart, onDraggableEnd } ) => (
-					<Tooltip
-						text={ label }
+					<div
+						className={ dragHandleClassNames }
+						aria-hidden="true"
+						onFocus={ onFocus }
+						onBlur={ onBlur }
+						onDragStart={ onDraggableStart }
+						onDragEnd={ onDraggableEnd }
+						draggable
 					>
-						<div
-							className={ dragHandleClassNames }
-							aria-hidden="true"
-							onFocus={ onFocus }
-							onBlur={ onBlur }
-							onDragStart={ onDraggableStart }
-							onDragEnd={ onDraggableEnd }
-							draggable
-						>
-							{ icon }
-						</div>
-					</Tooltip>
+						{ icon }
+					</div>
 				) }
 		</Draggable>
 	);
