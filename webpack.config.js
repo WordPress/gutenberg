@@ -87,6 +87,7 @@ const gutenbergPackages = [
 	'autop',
 	'blob',
 	'blocks',
+	'block-serialization-default-parser',
 	'block-serialization-spec-parser',
 	'compose',
 	'core-data',

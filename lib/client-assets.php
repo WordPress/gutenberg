@@ -276,6 +276,13 @@ function gutenberg_register_scripts_and_styles() {
 		true
 	);
 	wp_register_script(
+		'wp-block-serialization-default-parser',
+		gutenberg_url( 'build/block-serialization-default-parser/index.js' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'build/block-serialization-default-parser/index.js' ),
+		true
+	);
+	wp_register_script(
 		'wp-block-serialization-spec-parser',
 		gutenberg_url( 'build/block-serialization-spec-parser/index.js' ),
 		array(),
@@ -386,7 +393,7 @@ function gutenberg_register_scripts_and_styles() {
 		array(
 			'wp-autop',
 			'wp-blob',
-			'wp-block-serialization-spec-parser',
+			'wp-block-serialization-default-parser',
 			'wp-data',
 			'wp-deprecated',
 			'wp-dom',
