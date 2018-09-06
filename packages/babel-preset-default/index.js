@@ -10,9 +10,7 @@ module.exports = function( api ) {
 				},
 			} ],
 			isTestEnv && [ '@babel/preset-env', {
-				targets: {
-					node: 'current',
-				},
+				useBuiltIns: 'usage',
 			} ],
 		].filter( Boolean ),
 		plugins: [
