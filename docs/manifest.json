@@ -504,9 +504,9 @@
 		"parent": null
 	},
 	{
-		"title": "AccessibleSvg",
-		"slug": "accessible-svg",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/accessible-svg/README.md",
+		"title": "Svg",
+		"slug": "svg",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/svg/README.md",
 		"parent": "components"
 	},
 	{

@@ -24,7 +24,7 @@ exports[`PluginPostPublishPanel renders fill properly 1`] = `
           onClick={[Function]}
           type="button"
         >
-          <AccessibleSVG
+          <Svg
             className="components-panel__arrow"
             height="24px"
             viewBox="0 0 24 24"
@@ -53,7 +53,7 @@ exports[`PluginPostPublishPanel renders fill properly 1`] = `
                 />
               </g>
             </svg>
-          </AccessibleSVG>
+          </Svg>
           My panel title
         </button>
       </Button>

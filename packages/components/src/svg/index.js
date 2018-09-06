@@ -1,4 +1,4 @@
-function AccessibleSVG( props ) {
+function Svg( props ) {
 	const appliedProps = {
 		...props,
 		role: 'img',
@@ -9,4 +9,4 @@ function AccessibleSVG( props ) {
 	return <svg { ...appliedProps } />;
 }
 
-export default AccessibleSVG;
+export default Svg;
