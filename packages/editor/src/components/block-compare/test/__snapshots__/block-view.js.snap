@@ -4,20 +4,24 @@ exports[`BlockView should match snapshot 1`] = `
 <div
   className="class"
 >
-  <h1
-    className="components-modal__header-heading"
-  >
-    title
-  </h1>
   <div
-    className="editor-block-compare__html"
+    className="editor-block-compare__content"
   >
-    raw
-  </div>
-  <div
-    className="editor-block-compare__preview edit-post-visual-editor"
-  >
-    render
+    <h1
+      className="components-modal__header-heading"
+    >
+      title
+    </h1>
+    <div
+      className="editor-block-compare__html"
+    >
+      raw
+    </div>
+    <div
+      className="editor-block-compare__preview edit-post-visual-editor"
+    >
+      render
+    </div>
   </div>
   <div
     className="editor-block-compare__action"
