@@ -1432,30 +1432,30 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 			$locked = true;
 		}
 
-		$userDetails = null;
+		$user_details = null;
 		if ( $locked ) {
 			$user = get_userdata( $user_id );
-			$userDetails = array(
+			$user_details = array(
 				'name' => $user->display_name,
 			);
 			$avatar = get_avatar( $user_id, 64 );
 			if ( $avatar ) {
 				if ( preg_match( "|src='([^']+)'|", $avatar, $matches ) ) {
-					$userDetails[ 'avatar' ] = $matches[1];
+					$user_details['avatar'] = $matches[1];
 				}
 			}
 		}
 
 		$lock_details = array(
 			'isLocked' => $locked,
-			'user'     => $userDetails,
+			'user'     => $user_details,
 		);
 	} else {
 		// Lock the post
 		$active_post_lock = wp_set_post_lock( $post->ID );
 		$lock_details = array(
 			'isLocked' => false,
-			'activePostLock' => esc_attr( implode( ':', $active_post_lock ) )
+			'activePostLock' => esc_attr( implode( ':', $active_post_lock ) ),
 		);
 	}
 
@@ -1477,7 +1477,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'postLockUtils'       => array(
 			'nonce'             => wp_create_nonce( 'lock-post_' . $post->ID ),
 			'ajaxUrl'           => admin_url( 'admin-ajax.php' ),
-		)
+		),
 	);
 
 	$post_autosave = get_autosave_newer_than_post_save( $post );
