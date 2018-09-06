@@ -28,7 +28,6 @@ import {
 	blockSelection,
 	preferences,
 	saving,
-	notices,
 	blocksMode,
 	isInsertionPointVisible,
 	reusableBlocks,
@@ -1721,91 +1720,6 @@ describe( 'state', () => {
 					message: 'update failed',
 				},
 			} );
-		} );
-	} );
-
-	describe( 'notices()', () => {
-		it( 'should create a notice', () => {
-			const originalState = [
-				{
-					id: 'b',
-					content: 'Error saving',
-					status: 'error',
-				},
-			];
-			const state = notices( deepFreeze( originalState ), {
-				type: 'CREATE_NOTICE',
-				notice: {
-					id: 'a',
-					content: 'Post saved',
-					status: 'success',
-				},
-			} );
-			expect( state ).toEqual( [
-				originalState[ 0 ],
-				{
-					id: 'a',
-					content: 'Post saved',
-					status: 'success',
-				},
-			] );
-		} );
-
-		it( 'should remove a notice', () => {
-			const originalState = [
-				{
-					id: 'a',
-					content: 'Post saved',
-					status: 'success',
-				},
-				{
-					id: 'b',
-					content: 'Error saving',
-					status: 'error',
-				},
-			];
-			const state = notices( deepFreeze( originalState ), {
-				type: 'REMOVE_NOTICE',
-				noticeId: 'a',
-			} );
-			expect( state ).toEqual( [
-				originalState[ 1 ],
-			] );
-		} );
-
-		it( 'should dedupe distinct ids', () => {
-			const originalState = [
-				{
-					id: 'a',
-					content: 'Post saved',
-					status: 'success',
-				},
-				{
-					id: 'b',
-					content: 'Error saving',
-					status: 'error',
-				},
-			];
-			const state = notices( deepFreeze( originalState ), {
-				type: 'CREATE_NOTICE',
-				notice: {
-					id: 'a',
-					content: 'Post updated',
-					status: 'success',
-				},
-			} );
-			expect( state ).toEqual( [
-				{
-					id: 'b',
-					content: 'Error saving',
-					status: 'error',
-				},
-				{
-					id: 'a',
-					content: 'Post updated',
-					status: 'success',
-				},
-			] );
 		} );
 	} );
 

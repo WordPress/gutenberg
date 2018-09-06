@@ -478,6 +478,18 @@ function gutenberg_register_scripts_and_styles() {
 		true
 	);
 	gutenberg_override_script(
+		'wp-notices',
+		gutenberg_url( 'build/notices/index.js' ),
+		array(
+			'lodash',
+			'wp-a11y',
+			'wp-data',
+			'wp-polyfill-ecmascript',
+		),
+		filemtime( gutenberg_dir_path() . 'build/notices/index.js' ),
+		true
+	);
+	gutenberg_override_script(
 		'wp-viewport',
 		gutenberg_url( 'build/viewport/index.js' ),
 		array( 'wp-polyfill', 'wp-element', 'wp-data', 'wp-compose', 'lodash' ),
@@ -680,6 +692,7 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-i18n',
 			'wp-is-shallow-equal',
 			'wp-keycodes',
+			'wp-notices',
 			'wp-nux',
 			'wp-polyfill',
 			'wp-tinymce',

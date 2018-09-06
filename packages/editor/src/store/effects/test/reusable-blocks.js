@@ -12,7 +12,7 @@ import {
 	unregisterBlockType,
 	createBlock,
 } from '@wordpress/blocks';
-import '@wordpress/core-data'; // Needed to load the core store
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -37,8 +37,10 @@ import {
 	fetchReusableBlocks as fetchReusableBlocksAction,
 } from '../../actions';
 import reducer from '../../reducer';
+import '../../..'; // Ensure store dependencies are imported via root.
 
 jest.mock( '@wordpress/api-fetch', () => jest.fn() );
+jest.mock( '@wordpress/deprecated', () => jest.fn() );
 
 describe( 'reusable blocks effects', () => {
 	beforeAll( () => {
@@ -227,6 +229,7 @@ describe( 'reusable blocks effects', () => {
 				id: 123,
 				updatedId: 456,
 			} );
+			expect( deprecated ).toHaveBeenCalled();
 		} );
 
 		it( 'should handle an API error', async () => {
