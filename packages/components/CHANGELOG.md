@@ -9,4 +9,4 @@
 
 ### New Feature
 
-- Added a new `AccessibleSVG` component.
+- Added a new `Svg` component.

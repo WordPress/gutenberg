@@ -1,7 +1,7 @@
 // Components
 export * from './primitives';
 // eslint-disable-next-line camelcase
-export { default as AccessibleSVG } from './accessible-svg';
+export { default as Svg } from './svg';
 export { default as Autocomplete } from './autocomplete';
 export { default as BaseControl } from './base-control';
 export { default as Button } from './button';

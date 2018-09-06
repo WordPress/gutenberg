@@ -1,14 +1,14 @@
-# AccessibleSVG
+# Svg
 
 A drop-in replacement for the svg element that adds the required accessibility attributes for SVG elements across browsers.
 
 ## Usage
 
 ```jsx
-import { AccessibleSVG } from '@wordpress/components';
+import { Svg } from '@wordpress/components';
 
 const MyIcon = () => (
-	<AccessibleSVG
+	<Svg
 		viewBox="0 0 24 24"
 		xmlns="http://www.w3.org/2000/svg"
 	>
@@ -18,7 +18,7 @@ const MyIcon = () => (
 			<path d="M12 12l1 2 3-3 3 4H9z" />
 			<path d="M2 6v14l2 2h14v-2H4V6H2z" />
 		</g>
-	</AccessibleSVG>
+	</Svg>
 	>
 );
 ```
