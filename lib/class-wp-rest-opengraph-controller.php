@@ -33,21 +33,25 @@ class WP_REST_OpenGraph_Controller extends WP_REST_Controller {
 	 */
 	public function register_routes() {
 
-		register_rest_route( $this->api_namespace, '/' . $this->rest_base, array(
+		register_rest_route(
+			$this->api_namespace,
+			'/' . $this->rest_base,
 			array(
-				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => array( $this, 'get_preview' ),
-				'permission_callback' => array( $this, 'get_preview_permissions_check' ),
-				'args'                => array(
-					'url' => array(
-						'description'       => __( 'The URL of the resource for which to fetch OpenGraph data.', 'gutenberg' ),
-						'type'              => 'string',
-						'required'          => true,
-						'sanitize_callback' => 'esc_url_raw',
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_preview' ),
+					'permission_callback' => array( $this, 'get_preview_permissions_check' ),
+					'args'                => array(
+						'url' => array(
+							'description'       => __( 'The URL of the resource for which to fetch OpenGraph data.', 'gutenberg' ),
+							'type'              => 'string',
+							'required'          => true,
+							'sanitize_callback' => 'esc_url_raw',
+						),
 					),
 				),
-			),
-		) );
+			)
+		);
 	}
 
 	/**
