@@ -30,15 +30,29 @@ describe( 'new editor state', () => {
 	} );
 
 	it( 'should focus the title if the title is empty', async () => {
+		// We need to remove the tips to make sure they aren't clicked/removed
+		// during our check of the title `textarea`'s focus.
+		await page.evaluate( () => {
+			return wp.data.dispatch( 'core/nux' ).disableTips();
+		} );
+
+		// And then reload the page to ensure we get a new page that should
+		// autofocus the title, without any NUX tips.
+		await page.reload();
+
 		const activeElementClasses = await page.evaluate( () => {
 			return Object.values( document.activeElement.classList );
 		} );
 		const activeElementTagName = await page.evaluate( () => {
 			return document.activeElement.tagName.toLowerCase();
 		} );
+		const titleAutofocus = await page.$eval( '.editor-post-title__input', ( element ) => {
+			return element.getAttribute( 'autofocus' );
+		} );
 
 		expect( activeElementClasses ).toContain( 'editor-post-title__input' );
 		expect( activeElementTagName ).toEqual( 'textarea' );
+		expect( titleAutofocus ).toEqual( 'autofocus' );
 	} );
 
 	it( 'should not focus the title if the title exists', async () => {
@@ -56,10 +70,14 @@ describe( 'new editor state', () => {
 		const activeElementTagName = await page.evaluate( () => {
 			return document.activeElement.tagName.toLowerCase();
 		} );
+		const titleAutofocus = await page.$eval( '.editor-post-title__input', ( element ) => {
+			return element.getAttribute( 'autofocus' );
+		} );
 
 		expect( activeElementClasses ).not.toContain( 'editor-post-title__input' );
-		// The document body should be the `activeElement`, because nothing is
+		// The document `body` should be the `activeElement`, because nothing is
 		// focused by default when a post already has a title.
 		expect( activeElementTagName ).toEqual( 'body' );
+		expect( titleAutofocus ).toEqual( null );
 	} );
 } );

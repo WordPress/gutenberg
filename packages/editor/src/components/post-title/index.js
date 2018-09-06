@@ -43,14 +43,6 @@ class PostTitle extends Component {
 		};
 	}
 
-	componentDidMount() {
-		// If there is a post title and it's empty, we should focus the title so
-		// the user can start typing the title right away.
-		if ( ! this.props.title || ! this.props.title.length ) {
-			this.textareaRef.current.textarea.focus();
-		}
-	}
-
 	handleFocusOutside() {
 		this.onUnselect();
 	}
@@ -128,7 +120,13 @@ class PostTitle extends Component {
 								onFocus={ this.onSelect }
 								onKeyDown={ this.onKeyDown }
 								onKeyPress={ this.onUnselect }
-								ref={ this.textareaRef }
+								/*
+									Only autofocus the title when the post is entirely empty.
+									This should only happen for a new post, which means we
+									focus the title on new post so the author can start typing
+									right away, without needing to click anything.
+								*/
+								autofocus={ this.props.isPostEmpty ? 'autofocus' : undefined }
 							/>
 						</KeyboardShortcuts>
 						{ isSelected && isPostTypeViewable && <PostPermalink /> }
@@ -140,12 +138,13 @@ class PostTitle extends Component {
 }
 
 const applyWithSelect = withSelect( ( select ) => {
-	const { getEditedPostAttribute, getEditorSettings } = select( 'core/editor' );
+	const { getEditedPostAttribute, getEditorSettings, isEditedPostSaveable } = select( 'core/editor' );
 	const { getPostType } = select( 'core' );
 	const postType = getPostType( getEditedPostAttribute( 'type' ) );
 	const { titlePlaceholder, focusMode, hasFixedToolbar } = getEditorSettings();
 
 	return {
+		isPostEmpty: ! isEditedPostSaveable(),
 		title: getEditedPostAttribute( 'title' ),
 		isPostTypeViewable: get( postType, [ 'viewable' ], false ),
 		placeholder: titlePlaceholder,
