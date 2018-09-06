@@ -123,7 +123,7 @@ class PostLockedModal extends Component {
 	}
 
 	render() {
-		const { user, postId, isLocked, isTakeover, postLockUtils } = this.props;
+		const { user, postId, isLocked, isTakeover, postLockUtils, postType } = this.props;
 		if ( ! isLocked ) {
 			return null;
 		}
@@ -139,10 +139,9 @@ class PostLockedModal extends Component {
 			_wpnonce: postLockUtils.nonce,
 		} );
 		const allPosts = getWPAdminURL( 'edit.php' );
-
 		return (
 			<Modal
-				title={ isTakeover ? __( 'Post taken over' ) : __( 'Post locked' ) }
+				title={ isTakeover ? __( 'Someone else has taken over this post.' ) : __( 'This post is already being edited.' ) }
 				focusOnMount={ true }
 				shouldCloseOnClickOutside={ false }
 				shouldCloseOnEsc={ false }
@@ -158,7 +157,9 @@ class PostLockedModal extends Component {
 				) }
 				{ !! isTakeover && (
 					<div>
-						<p>{ sprintf( __( '%s has taken over and is currently editing.' ), userDisplayName ) }</p>
+						<div>
+							<strong>{ userDisplayName }</strong> { sprintf( __( 'now has editing control of this %s. Don\'t worry, your changes up to this moment have been saved' ), postType ) }
+						</div>
 						<p>
 							<a href={ allPosts }>
 								{ __( 'View all posts' ) }
@@ -168,7 +169,10 @@ class PostLockedModal extends Component {
 				) }
 				{ ! isTakeover && (
 					<div>
-						<p>{ sprintf( __( '%s is already editing this post. Do you want to take over?' ), userDisplayName ) }</p>
+						<div>
+							<strong>{ userDisplayName }</strong> { sprintf( __( 'is currently working on this %s, which means you cannot make changes, unless you take over.' ), postType ) }
+						</div>
+
 						<div className="editor-post-locked-modal__buttons">
 							<Button isDefault isLarge href={ allPosts }>
 								{ __( 'All Posts' ) }
@@ -194,6 +198,7 @@ export default compose(
 			getPostLockUser,
 			getCurrentPostId,
 			getActivePostLock,
+			getEditedPostAttribute,
 		} = select( 'core/editor' );
 		return {
 			isLocked: isPostLocked(),
@@ -202,7 +207,7 @@ export default compose(
 			postId: getCurrentPostId(),
 			postLockUtils: getEditorSettings().postLockUtils,
 			activePostLock: getActivePostLock(),
-
+			postType: getEditedPostAttribute( 'type' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
