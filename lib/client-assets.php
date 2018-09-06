@@ -173,6 +173,15 @@ function gutenberg_register_scripts_and_styles() {
 	);
 	wp_add_inline_script(
 		'wp-api-fetch',
+		gutenberg_get_script_polyfill(
+			array(
+				'\'fetch\' in window' => 'wp-polyfill-fetch',
+			)
+		),
+		'before'
+	);
+	wp_add_inline_script(
+		'wp-api-fetch',
 		sprintf(
 			'wp.apiFetch.use( wp.apiFetch.createNonceMiddleware( "%s" ) );',
 			( wp_installing() && ! is_multisite() ) ? '' : wp_create_nonce( 'wp_rest' )
@@ -823,12 +832,7 @@ function gutenberg_register_vendor_scripts() {
 	wp_add_inline_script( 'lodash', 'window.lodash = _.noConflict();' );
 	gutenberg_register_vendor_script(
 		'wp-polyfill-fetch',
-		'https://unpkg.com/whatwg-fetch/fetch.js',
-		array( 'wp-deprecated' )
-	);
-	wp_add_inline_script(
-		'wp-polyfill-fetch',
-		'wp.deprecated( "wp-polyfill-fetch script handle", { plugin: "Gutenberg", version: "4.0" } );'
+		'https://unpkg.com/whatwg-fetch/fetch.js'
 	);
 	gutenberg_register_vendor_script(
 		'wp-polyfill-promise',
