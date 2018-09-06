@@ -2,7 +2,6 @@
 	// Hide the Block UI when dragging the block
 	// This ensures the page scroll properly (no sticky elements)
 	.editor-block-contextual-toolbar,
-	.editor-block-mover,
 	.editor-block-settings-menu {
 		// I think important is fine here to avoid over complexing the selector
 		display: none !important;
