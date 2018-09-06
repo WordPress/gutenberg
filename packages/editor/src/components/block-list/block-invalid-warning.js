@@ -39,7 +39,7 @@ export class BlockInvalidWarning extends Component {
 		const hasHTMLBlock = !! getBlockType( 'core/html' );
 		const { compare } = this.state;
 		const hiddenActions = [
-			{ title: __( 'Convert to Blocks' ), onClick: convertToBlocks },
+			{ title: __( 'Try Recovery' ), onClick: convertToBlocks },
 			{ title: __( 'Convert to Classic Block' ), onClick: convertToClassic },
 			{ title: __( 'Compare Conversion' ), onClick: this.onCompare },
 		];
@@ -56,7 +56,7 @@ export class BlockInvalidWarning extends Component {
 						onKeep={ convertToHTML }
 						onConvert={ convertToBlocks }
 						convertor={ blockToBlocks }
-						convertButtonText={ __( 'Convert to Blocks' ) }
+						convertButtonText={ __( 'Try Recovery' ) }
 					/>
 				</Modal>
 			);
@@ -66,17 +66,17 @@ export class BlockInvalidWarning extends Component {
 			<Warning
 				actions={ [
 					<Button key="convert" onClick={ convertToBlocks } isLarge isPrimary={ ! hasHTMLBlock }>
-						{ __( 'Convert to Blocks' ) }
+						{ __( 'Try Recovery' ) }
 					</Button>,
 					hasHTMLBlock && (
 						<Button key="edit" onClick={ convertToHTML } isLarge isPrimary>
-							{ __( 'Keep as HTML' ) }
+							{ __( 'Convert to HTML' ) }
 						</Button>
 					),
 				] }
 				secondaryActions={ hiddenActions }
 			>
-				{ __( 'This block has been modified externally.' ) }
+				{ __( 'This block is unrecognized or contains invalid HTML.' ) }
 			</Warning>
 		);
 	}
