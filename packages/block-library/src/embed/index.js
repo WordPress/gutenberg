@@ -69,7 +69,17 @@ export function getEmbedEdit( title, icon ) {
 			}
 
 			if ( ( hasPreview && ! hadPreview ) || switchedPreview ) {
-				if ( this.props.previewIsFallback ) {
+				if ( this.props.previewIsFallback && 'core/embed' === this.props.name ) {
+					// We couldn't find a block that handled the URL, and oEmbed
+					// provided a fallback response, so switch to a link preview block.
+					const { url } = this.props.attributes;
+					this.props.onReplace(
+						[
+							createBlock( 'core/paragraph', { content: <a href={ url } key={ url }>{ url }</a> } ),
+							createBlock( 'core-embed/link-preview', { url } ),
+						]
+					);
+				} else if ( this.props.previewIsFallback ) {
 					this.setState( { editingURL: true } );
 					return;
 				}

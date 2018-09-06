@@ -27,6 +27,7 @@ import * as embed from './embed';
 import * as file from './file';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
+import * as linkPreview from './link-preview';
 import * as list from './list';
 import * as more from './more';
 import * as nextpage from './nextpage';
@@ -69,6 +70,7 @@ export const registerCoreBlocks = () => {
 		file,
 		latestComments,
 		latestPosts,
+		linkPreview,
 		more,
 		nextpage,
 		preformatted,

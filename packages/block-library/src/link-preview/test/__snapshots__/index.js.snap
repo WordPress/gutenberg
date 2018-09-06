@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`core-embed/link-preview block edit matches snapshot 1`] = `
+<div
+  class="components-placeholder wp-block-embed"
+>
+  <div
+    class="components-placeholder__label"
+  >
+    Link preview
+  </div>
+  <div
+    class="components-placeholder__fieldset"
+  >
+    <form>
+      <input
+        aria-label="Link preview"
+        class="components-placeholder__input"
+        placeholder="Enter URL here…"
+        type="url"
+        value=""
+      />
+      <button
+        class="components-button is-button is-default is-large"
+        type="submit"
+      >
+        Preview
+      </button>
+    </form>
+  </div>
+</div>
+`;

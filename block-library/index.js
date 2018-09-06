@@ -30,6 +30,7 @@ import * as embed from '../packages/block-library/src/embed';
 import * as file from '../packages/block-library/src/file';
 import * as latestComments from '../packages/block-library/src/latest-comments';
 import * as latestPosts from '../packages/block-library/src/latest-posts';
+import * as linkPreview from '../packages/block-library/src/link-preview';
 import * as list from '../packages/block-library/src/list';
 import * as more from '../packages/block-library/src/more';
 import * as nextpage from '../packages/block-library/src/nextpage';
@@ -80,6 +81,7 @@ export const registerCoreBlocks = () => {
 		html,
 		latestComments,
 		latestPosts,
+		linkPreview,
 		more,
 		nextpage,
 		preformatted,
