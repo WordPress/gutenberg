@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Draggable } from '@wordpress/components';
+import BlockDraggable from '../block-draggable';
 
 export const IconDragHandle = ( { isVisible, className, icon, onDragStart, onDragEnd, blockElementId, order, rootClientId, clientId, layout } ) => {
 	if ( ! isVisible ) {
@@ -16,15 +16,12 @@ export const IconDragHandle = ( { isVisible, className, icon, onDragStart, onDra
 	const dragHandleClassNames = classnames( 'editor-block-mover__control-drag-handle', className );
 
 	return (
-		<Draggable
-			elementId={ blockElementId }
-			transferData={ {
-				type: 'block',
-				fromIndex: order,
-				rootClientId,
-				clientId,
-				layout,
-			} }
+		<BlockDraggable
+			blockElementId={ blockElementId }
+			rootClientId={ rootClientId }
+			clientId={ clientId }
+			order={ order }
+			layout={ layout }
 			onDragStart={ onDragStart }
 			onDragEnd={ onDragEnd }
 		>
@@ -40,6 +37,6 @@ export const IconDragHandle = ( { isVisible, className, icon, onDragStart, onDra
 						{ icon }
 					</div>
 				) }
-		</Draggable>
+		</BlockDraggable>
 	);
 };
