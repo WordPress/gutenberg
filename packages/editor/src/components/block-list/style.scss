@@ -21,13 +21,25 @@
 	}
 }
 
-.editor-block-list__block {
-	&.is-dragging *,
-	&.is-dragging > * {
-		opacity: 0.7;
+.editor-block-list__layout .editor-block-list__block.is-selected { // Needs specificity to override inherited styles.
+	// While block is being dragged, dim the slot dragged from, and hide some UI.
+	&.is-dragging {
+		.editor-block-list__block-edit::before {
+			background: $light-gray-100;
+			outline-color: $light-gray-100;
+		}
+
+		> .editor-block-list__block-edit > * {
+			visibility: hidden;
+		}
+
+		.editor-block-mover,
+		.editor-block-contextual-toolbar {
+			display: none;
+		}
 	}
 
-	.editor-block-list__block-edit .reusable-block-edit-panel * {
+	> .editor-block-list__block-edit .reusable-block-edit-panel * {
 		z-index: z-index(".editor-block-list__block-edit .reusable-block-edit-panel *");
 	}
 
