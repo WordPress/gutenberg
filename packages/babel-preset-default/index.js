@@ -9,7 +9,11 @@ module.exports = function( api ) {
 					browsers: [ 'extends @wordpress/browserslist-config' ],
 				},
 			} ],
-			isTestEnv && [ '@babel/preset-env' ],
+			isTestEnv && [ '@babel/preset-env', {
+				targets: {
+					node: 'current',
+				},
+			} ],
 		].filter( Boolean ),
 		plugins: [
 			'@babel/plugin-proposal-object-rest-spread',
@@ -18,9 +22,10 @@ module.exports = function( api ) {
 			} ],
 			'@babel/plugin-proposal-async-generator-functions',
 			! isTestEnv && [ '@babel/plugin-transform-runtime', {
-				corejs: false, // we polyfill so we don't need core-js
+				corejs: false, // We polyfill so we don't need core-js.
 				helpers: true,
-				regenerator: false,
+				regenerator: false, // We polyfill so we don't need regenerator.
+				useESModules: false,
 			} ],
 		].filter( Boolean ),
 	};

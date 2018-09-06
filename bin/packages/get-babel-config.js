@@ -35,7 +35,7 @@ const babelConfigs = {
 		{},
 		babelDefaultConfig,
 		{
-			plugins: plugins,
+			plugins,
 			presets: map(
 				babelDefaultConfig.presets,
 				( preset ) => overrideOptions( preset, '@babel/preset-env', {
