@@ -17,7 +17,11 @@ module.exports = function( api ) {
 				pragma: 'createElement',
 			} ],
 			'@babel/plugin-proposal-async-generator-functions',
-			! isTestEnv && [ '@babel/plugin-transform-runtime', { corejs: 2 } ],
+			! isTestEnv && [ '@babel/plugin-transform-runtime', {
+				corejs: false, // we polyfill so we don't need core-js
+				helpers: true,
+				regenerator: false,
+			} ],
 		].filter( Boolean ),
 	};
 };

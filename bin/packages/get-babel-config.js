@@ -35,17 +35,11 @@ const babelConfigs = {
 		{},
 		babelDefaultConfig,
 		{
-			plugins: map(
-				plugins,
-				( plugin ) => overrideOptions( plugin, '@babel/plugin-transform-runtime', {
-					corejs: false,
-				} )
-			),
+			plugins: plugins,
 			presets: map(
 				babelDefaultConfig.presets,
 				( preset ) => overrideOptions( preset, '@babel/preset-env', {
 					modules: 'commonjs',
-					useBuiltIns: false,
 				} )
 			),
 		}
@@ -57,7 +51,6 @@ const babelConfigs = {
 			plugins: map(
 				plugins,
 				( plugin ) => overrideOptions( plugin, '@babel/plugin-transform-runtime', {
-					corejs: false,
 					useESModules: true,
 				} )
 			),
@@ -65,7 +58,6 @@ const babelConfigs = {
 				babelDefaultConfig.presets,
 				( preset ) => overrideOptions( preset, '@babel/preset-env', {
 					modules: false,
-					useBuiltIns: false,
 				} )
 			),
 		}
