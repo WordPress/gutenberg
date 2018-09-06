@@ -62,9 +62,7 @@ class RCTAztecView: Aztec.TextView {
     // MARK: - Edits
     
     open override func insertText(_ text: String) {
-        guard text != "\n" else {
-            print("onEnter: \(String(describing: onEnter))")
-            
+        guard text != "\n" else {            
             onEnter?([:])
             return
         }
