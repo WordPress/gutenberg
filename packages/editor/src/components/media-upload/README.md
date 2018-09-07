@@ -29,11 +29,13 @@ You can check how this component is implemented for the edit post page using `wp
 import { Button } from '@wordpress/components';
 import { MediaUpload } from '@wordpress/editor';
 
+const ALLOWED_MEDIA_TYPES = [ 'audio' ];
+
 function MyMediaUploader() {
 	return (
 		<MediaUpload
 			onSelect={ ( media ) => console.log( 'selected ' + media.length ) }
-			type="image"
+			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			value={ mediaId }
 			render={ ( { open } ) => (
 				<Button onClick={ open }>
@@ -49,11 +51,14 @@ function MyMediaUploader() {
 
 The component accepts the following props. Props not included in this set will be applied to the element wrapping Popover content.
 
-### type
+### allowedTypes
 
-Type of the media to upload/select from the media library (image, video, audio).
+Array withe the types of the media to upload/select from the media library.
+Each type is a string that can contain the general mime type e.g: 'image', 'audio', 'text',
+or the complete mime type e.g: 'audio/mpeg', 'image/gif'.
+If allowedTypes is unset all mime types should be allowed.
 
-- Type: `String`
+- Type: `Array`
 - Required: No
 
 ### multiple
