@@ -237,7 +237,7 @@ export function getEmbedEdit( title, icon ) {
 				<figure className={ classnames( className, 'wp-block-embed', { 'is-video': 'video' === type } ) }>
 					{ controls }
 					{ ( cannotPreview ) ? (
-						<Placeholder icon={ <BlockIcon icon={ icon } showColors /> } label={ label } className="wp-block-embed">
+						<Placeholder icon={ <BlockIcon icon={ icon } showColors /> } label={ label }>
 							<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
 							<p className="components-placeholder__error">{ __( 'Previews for this are unavailable in the editor, sorry!' ) }</p>
 						</Placeholder>
