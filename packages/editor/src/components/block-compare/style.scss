@@ -15,13 +15,9 @@
 
 .editor-block-compare__wrapper {
 	display: flex;
-	justify-content: space-between;
 	padding-bottom: $panel-padding;
 
 	> div {
-		display: flex;
-		justify-content: space-between;
-		flex-direction: column;
 		width: 50%;
 		padding: 0 $panel-padding 0 $panel-padding;
 		min-width: 200px;
