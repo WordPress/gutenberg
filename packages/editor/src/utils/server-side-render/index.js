@@ -2,14 +2,17 @@
  * WordPress dependencies.
  */
 import { ServerSideRender } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
+import { select } from '@wordpress/data';
 
-export default withSelect( ( select ) => {
+export default function( { urlQueryArgs = {}, ...props } ) {
 	const { getCurrentPostId } = select( 'core/editor' );
 
-	return {
-		urlQueryArgs: {
-			post_id: getCurrentPostId(),
-		},
+	urlQueryArgs = {
+		post_id: getCurrentPostId(),
+		...urlQueryArgs,
 	};
-} )( ServerSideRender );
+
+	return (
+		<ServerSideRender urlQueryArgs={ urlQueryArgs } { ...props } />
+	);
+}
