@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+import classname from 'classnames';
+import { castArray } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -17,13 +23,12 @@ class BlockCompare extends Component {
 		const difference = differ.diff( originalContent, newContent );
 
 		return difference.map( ( item, pos ) => {
-			if ( item.added ) {
-				return <span key={ pos } className="editor-block-compare__added">{ item.value }</span>;
-			} else if ( item.removed ) {
-				return <span key={ pos } className="editor-block-compare__removed">{ item.value }</span>;
-			}
+			const classes = classname( {
+				'editor-block-compare__added': item.added,
+				'editor-block-compare__removed': item.removed,
+			} );
 
-			return <span key={ pos }>{ item.value }</span>;
+			return <span key={ pos } className={ classes }>{ item.value }</span>;
 		} );
 	}
 
@@ -32,30 +37,30 @@ class BlockCompare extends Component {
 		const blockType = getBlockType( block.name );
 
 		return {
-			content: block.originalContent,
-			render: getSaveElement( blockType, block.attributes ),
+			rawContent: block.originalContent,
+			renderedContent: getSaveElement( blockType, block.attributes ),
 		};
 	}
 
 	getConvertedContent( block ) {
 		// The convertor may return an array of items or a single item
-		const newBlocks = Array.isArray( block ) ? block : [ block ];
+		const newBlocks = castArray( block );
 
 		// Get converted block details
 		const newContent = newBlocks.map( ( item ) => getSaveContent( getBlockType( item.name ), item.attributes, item.innerBlocks ) );
-		const render = newBlocks.map( ( item ) => getSaveElement( getBlockType( item.name ), item.attributes, item.innerBlocks ) );
+		const renderedContent = newBlocks.map( ( item ) => getSaveElement( getBlockType( item.name ), item.attributes, item.innerBlocks ) );
 
 		return {
-			content: newContent.join( '' ),
-			render,
+			rawContent: newContent.join( '' ),
+			renderedContent,
 		};
 	}
 
 	render() {
 		const { block, onKeep, onConvert, convertor, convertButtonText } = this.props;
 		const original = this.getOriginalContent( block );
-		const converted = this.getConvertedContent( convertor( block ), original );
-		const difference = this.getDifference( original.content, converted.content );
+		const converted = this.getConvertedContent( convertor( block ) );
+		const difference = this.getDifference( original.rawContent, converted.rawContent );
 
 		return (
 			<div className="editor-block-compare__wrapper">
@@ -64,8 +69,8 @@ class BlockCompare extends Component {
 					className="editor-block-compare__current"
 					action={ onKeep }
 					actionText={ __( 'Keep as HTML' ) }
-					rawContent={ original.content }
-					renderedContent={ original.render }
+					rawContent={ original.rawContent }
+					renderedContent={ original.renderedContent }
 				/>
 
 				<BlockView
@@ -74,7 +79,7 @@ class BlockCompare extends Component {
 					action={ onConvert }
 					actionText={ convertButtonText }
 					rawContent={ difference }
-					renderedContent={ converted.render }
+					renderedContent={ converted.renderedContent }
 				/>
 			</div>
 		);
