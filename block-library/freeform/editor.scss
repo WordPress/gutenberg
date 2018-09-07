@@ -151,6 +151,13 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 	z-index: z-index(".freeform-toolbar");
 	top: $block-padding;
 	transform: translateY(-$block-padding);
+
+	// On mobile, toolbars go edge to edge.
+	padding: 0 $block-padding;
+
+	@include break-small() {
+		padding: 0;
+	}
 }
 
 .freeform-toolbar:empty {
