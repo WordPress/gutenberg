@@ -43,6 +43,7 @@ export function getEmbedEdit( title, icon ) {
 			this.setUrl = this.setUrl.bind( this );
 			this.maybeSwitchBlock = this.maybeSwitchBlock.bind( this );
 			this.setAttributesFromPreview = this.setAttributesFromPreview.bind( this );
+			this.maybeSetAspectRatioClassName = this.maybeSetAspectRatioClassName.bind( this );
 
 			this.state = {
 				editingURL: false,
@@ -137,54 +138,22 @@ export function getEmbedEdit( title, icon ) {
 		}
 
 		/**
-		 * Finds the first iframe with a width and height and returns
-		 * an object with width and height attributes, empty object
-		 * if there is no iframe with width and height.
-		 * @param {string} html the preview HTML that possible contains an iframe with width and height set.
-		 * @return {Object} Object with extracted height and width if available.
+		 * Sets the appropriate CSS class to enforce an aspect ratio when the embed is resized
+		 * if the HTML has an iframe with width and height set.
+		 *
+		 * @param {string} html The preview HTML that possibly contains an iframe with width and height set.
 		 */
-		getiFrameHeightWidth( html ) {
+		maybeSetAspectRatioClassName( html ) {
 			const previewDom = document.createElement( 'div' );
 			previewDom.innerHTML = html;
-			const walker = document.createTreeWalker( previewDom );
-			while ( walker.nextNode() ) {
-				if ( 'IFRAME' === walker.currentNode.tagName ) {
-					return {
-						height: walker.currentNode.height,
-						width: walker.currentNode.width,
-					};
-				}
-			}
-			return {};
-		}
+			const iframe = previewDom.querySelector( 'iframe' );
 
-		/***
-		 * Sets block attributes based on the preview data.
-		 */
-		setAttributesFromPreview() {
-			const { setAttributes, preview } = this.props;
-
-			// Some plugins only return HTML with no type info, so default this to 'rich'.
-			let { type = 'rich' } = preview;
-			// If we got a provider name from the API, use it for the slug, otherwise we use the title,
-			// because not all embed code gives us a provider name.
-			const { html, provider_name: providerName } = preview;
-			const providerNameSlug = kebabCase( toLower( '' !== providerName ? providerName : title ) );
-
-			if ( includes( html, 'class="wp-embedded-content" data-secret' ) ) {
-				type = 'wp-embed';
+			if ( ! iframe ) {
+				return;
 			}
 
-			if ( html || 'photo' === type ) {
-				setAttributes( { type, providerNameSlug } );
-			}
-
-			// If the embedded content is in an iframe with fixed width and height, we
-			// calculate the aspect ratio and set an extra css class so that the rendered
-			// content keeps the correct height no matter how wide the block is set to be.
-			const { height, width } = this.getiFrameHeightWidth( html );
-			if ( undefined !== height && undefined !== width ) {
-				const aspectRatio = ( width / height ).toFixed( 2 );
+			if ( iframe.height && iframe.width ) {
+				const aspectRatio = ( iframe.width / iframe.height ).toFixed( 2 );
 				let aspectRatioClassName;
 
 				switch ( aspectRatio ) {
@@ -214,11 +183,34 @@ export function getEmbedEdit( title, icon ) {
 				}
 
 				if ( aspectRatioClassName ) {
-					aspectRatioClassName += ' wp-has-aspect-ratio';
-					const className = classnames( this.props.attributes.className, aspectRatioClassName );
+					const className = classnames( this.props.attributes.className, 'wp-has-aspect-ratio', aspectRatioClassName );
 					this.props.setAttributes( { className } );
 				}
 			}
+		}
+
+		/***
+		 * Sets block attributes based on the preview data.
+		 */
+		setAttributesFromPreview() {
+			const { setAttributes, preview } = this.props;
+
+			// Some plugins only return HTML with no type info, so default this to 'rich'.
+			let { type = 'rich' } = preview;
+			// If we got a provider name from the API, use it for the slug, otherwise we use the title,
+			// because not all embed code gives us a provider name.
+			const { html, provider_name: providerName } = preview;
+			const providerNameSlug = kebabCase( toLower( '' !== providerName ? providerName : title ) );
+
+			if ( includes( html, 'class="wp-embedded-content" data-secret' ) ) {
+				type = 'wp-embed';
+			}
+
+			if ( html || 'photo' === type ) {
+				setAttributes( { type, providerNameSlug } );
+			}
+
+			this.maybeSetAspectRatioClassName( html );
 		}
 
 		switchBackToURLInput() {
@@ -281,7 +273,7 @@ export function getEmbedEdit( title, icon ) {
 			const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedUrl.host.replace( /^www\./, '' ) );
 			// translators: %s: host providing embed content e.g: www.youtube.com
 			const iframeTitle = sprintf( __( 'Embedded content from %s' ), parsedUrl.host );
-			const sandboxClassnames = className ? type + ' ' + className : type;
+			const sandboxClassnames = classnames( type, className );
 			const embedWrapper = 'wp-embed' === type ? (
 				<div
 					className="wp-block-embed__wrapper"
