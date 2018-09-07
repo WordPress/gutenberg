@@ -4,6 +4,10 @@
 
 - `wp.components.Draggable` as a DOM node drag handler has been removed. Please, use `wp.components.Draggable` as a wrap component for your DOM node drag handler.
 
+### Deprecation
+
+- Renamed `AccessibleSVG` component to `SVG`.
+
 ## 3.0.0 (2018-09-05)
 
 ### Breaking Change
