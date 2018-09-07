@@ -18,7 +18,7 @@ export default SVG;
 
 export const AccessibleSVG = ( props ) => {
 	deprecated( 'wp.components.AccessibleSVG', {
-		version: '4.0',
+		version: '4.1',
 		alternative: 'wp.components.SVG',
 		plugin: 'Gutenberg',
 	} );
