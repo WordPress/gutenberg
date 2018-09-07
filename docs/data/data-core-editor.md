@@ -51,8 +51,11 @@ Whether unsaved values exist.
 
 ### isCleanNewPost
 
-Returns true if there are no unsaved values for the current edit session and if
-the currently edited post is new (and has never been saved before).
+Returns true if there are no unsaved values for the current edit session and
+if the currently edited post is new (has never been saved before).
+
+Note: This selector is not currently used by the editor package, but is made
+available as an assumed-useful selector for external integrations.
 
 *Parameters*
 
@@ -319,18 +322,6 @@ unsaved status values.
 *Returns*
 
 Whether the post has been published.
-
-### getDocumentTitle
-
-Gets the document title to be used.
-
-*Parameters*
-
- * state: Global application state.
-
-*Returns*
-
-Document title.
 
 ### getBlockName
 
@@ -652,6 +643,7 @@ Returns true if one of the block's inner blocks is selected.
 
  * state: Editor state.
  * clientId: Block client ID.
+ * deep: Perform a deep check.
 
 *Returns*
 

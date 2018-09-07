@@ -101,6 +101,16 @@
 	.editor-block-list__block-edit .reusable-block-edit-panel * {
 		z-index: z-index(".editor-block-list__block-edit .reusable-block-edit-panel *");
 	}
+
+	&.is-focus-mode:not(.is-multi-selected) {
+		opacity: 0.5;
+		transition: opacity 0.1s linear;
+
+		&:not(.is-focused) .editor-block-list__block,
+		&.is-focused {
+			opacity: 1;
+		}
+	}
 }
 
 
@@ -852,7 +862,6 @@
 	.components-toolbar {
 		border-top: none;
 		border-bottom: none;
-
 	}
 
 	@include break-small() {
@@ -895,6 +904,10 @@
 	& > * {
 		pointer-events: auto;
 	}
+}
+
+.editor-block-list__block.is-focus-mode:not(.is-multi-selected) > .editor-block-contextual-toolbar {
+	margin-left: -$block-side-ui-width;
 }
 
 // Enable toolbar footprint collapsing
@@ -1004,8 +1017,14 @@
 
 		// Animate in
 		.editor-block-list__block:hover & {
-			@include fade_in(0.1s);
+			opacity: 0;
+			@include fade_in(60ms, 0.5s);
 		}
+	}
+
+	&.is-light .components-toolbar {
+		background: rgba($white, 0.5);
+		color: $dark-gray-700;
 	}
 }
 

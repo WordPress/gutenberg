@@ -10,6 +10,7 @@ import { get, isFunction, some } from 'lodash';
  */
 import { applyFilters, addFilter } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -228,6 +229,11 @@ export function getDefaultBlockName() {
  * @return {string}            Block name.
  */
 export function getDefaultBlockForPostFormat( postFormat ) {
+	deprecated( 'getDefaultBlockForPostFormat', {
+		plugin: 'Gutenberg',
+		version: '3.9',
+	} );
+
 	const blockName = POST_FORMAT_BLOCK_MAP[ postFormat ];
 	if ( blockName && getBlockType( blockName ) ) {
 		return blockName;

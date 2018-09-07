@@ -24,9 +24,7 @@ import createSelector from 'rememo';
  * WordPress dependencies
  */
 import { serialize, getBlockType, getBlockTypes, hasBlockSupport, hasChildBlocks, getUnknownTypeHandlerName } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
 import { moment } from '@wordpress/date';
-import deprecated from '@wordpress/deprecated';
 import { removep } from '@wordpress/autop';
 
 /***
@@ -101,19 +99,17 @@ export function isEditedPostDirty( state ) {
 }
 
 /**
- * Returns true if there are no unsaved values for the current edit session and if
- * the currently edited post is new (and has never been saved before).
+ * Returns true if there are no unsaved values for the current edit session and
+ * if the currently edited post is new (has never been saved before).
+ *
+ * Note: This selector is not currently used by the editor package, but is made
+ * available as an assumed-useful selector for external integrations.
  *
  * @param {Object} state Global application state.
  *
  * @return {boolean} Whether new post and unsaved values exist.
  */
 export function isCleanNewPost( state ) {
-	deprecated( 'isCleanNewPost selector', {
-		version: '3.8',
-		plugin: 'Gutenberg',
-	} );
-
 	return ! isEditedPostDirty( state ) && isEditedPostNew( state );
 }
 
@@ -432,28 +428,6 @@ export function isEditedPostBeingScheduled( state ) {
 	const now = moment().add( 1, 'minute' );
 
 	return date.isAfter( now );
-}
-
-/**
- * Gets the document title to be used.
- *
- * @param {Object} state Global application state.
- *
- * @return {string} Document title.
- */
-export function getDocumentTitle( state ) {
-	deprecated( 'getDocumentTitle selector', {
-		version: '3.8',
-		plugin: 'Gutenberg',
-	} );
-
-	let title = getEditedPostAttribute( state, 'title' );
-
-	if ( ! title || ! title.trim() ) {
-		title = isCleanNewPost( state ) ? __( 'New post' ) : __( '(Untitled)' );
-	}
-
-	return title;
 }
 
 /**
@@ -1101,15 +1075,20 @@ export function isBlockSelected( state, clientId ) {
 /**
  * Returns true if one of the block's inner blocks is selected.
  *
- * @param {Object} state    Editor state.
- * @param {string} clientId Block client ID.
+ * @param {Object}  state    Editor state.
+ * @param {string}  clientId Block client ID.
+ * @param {boolean} deep     Perform a deep check.
  *
  * @return {boolean} Whether the block as an inner block selected
  */
-export function hasSelectedInnerBlock( state, clientId ) {
+export function hasSelectedInnerBlock( state, clientId, deep = false ) {
 	return some(
 		getBlockOrder( state, clientId ),
-		( innerClientId ) => isBlockSelected( state, innerClientId )
+		( innerClientId ) => (
+			isBlockSelected( state, innerClientId ) ||
+			isBlockMultiSelected( state, innerClientId ) ||
+			( deep && hasSelectedInnerBlock( state, innerClientId, deep ) )
+		)
 	);
 }
 

@@ -163,7 +163,7 @@ class AudioEdit extends Component {
 					<Disabled>
 						<audio controls="controls" src={ src } />
 					</Disabled>
-					{ ( ( caption && caption.length ) || !! isSelected ) && (
+					{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 						<RichText
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }

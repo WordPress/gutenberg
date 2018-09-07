@@ -235,18 +235,30 @@ function gutenberg_warn_classic_about_blocks() {
 	?>
 		<style type="text/css">
 			#blocks-in-post-dialog .notification-dialog {
+				position: fixed;
+				top: 50%;
+				left: 50%;
+				width: 500px;
+				box-sizing: border-box;
+				transform: translate(-50%, -50%);
+				margin: 0;
 				padding: 25px;
+				max-height: 90%;
+				background: #fff;
+				box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+				line-height: 1.5;
+				z-index: 1000005;
+				overflow-y: auto;
 			}
 
 			@media only screen and (max-height: 480px), screen and (max-width: 450px) {
 				#blocks-in-post-dialog .notification-dialog {
+					top: 0;
+					left: 0;
 					width: 100%;
 					height: 100%;
+					transform: none;
 					max-height: 100%;
-					position: fixed;
-					top: 0;
-					margin: 0;
-					left: 0;
 				}
 			}
 		</style>
@@ -359,7 +371,20 @@ function gutenberg_warn_classic_about_cloudflare() {
 	?>
 		<style type="text/css">
 			#cloudflare-block-dialog .notification-dialog {
+				position: fixed;
+				top: 50%;
+				left: 50%;
+				width: 500px;
+				box-sizing: border-box;
+				transform: translate(-50%, -50%);
+				margin: 0;
 				padding: 25px;
+				max-height: 90%;
+				background: #fff;
+				box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+				line-height: 1.5;
+				z-index: 1000005;
+				overflow-y: auto;
 			}
 
 			#cloudflare-block-dialog ul {
@@ -369,13 +394,12 @@ function gutenberg_warn_classic_about_cloudflare() {
 
 			@media only screen and (max-height: 480px), screen and (max-width: 450px) {
 				#cloudflare-block-dialog .notification-dialog {
+					top: 0;
+					left: 0;
 					width: 100%;
 					height: 100%;
+					transform: none;
 					max-height: 100%;
-					position: fixed;
-					top: 0;
-					margin: 0;
-					left: 0;
 				}
 			}
 		</style>
@@ -384,7 +408,7 @@ function gutenberg_warn_classic_about_cloudflare() {
 			<div class="notification-dialog-background"></div>
 			<div class="notification-dialog">
 				<div class="cloudflare-block-message">
-					<h2><?php _e( 'Cloudflare is blocking REST API requests.', 'gutenberg' ); ?></h2>
+					<h2><?php _e( 'Cloudflare is blocking REST API requests', 'gutenberg' ); ?></h2>
 					<p><?php _e( 'Your site uses Cloudflare, which provides a Web Application Firewall (WAF) to secure your site against attacks. Unfortunately, some of these WAF rules are incorrectly blocking legitimate access to your site, preventing Gutenberg from functioning correctly.', 'gutenberg' ); ?></p>
 					<p><?php _e( "We're working closely with Cloudflare to fix this issue, but in the mean time, you can work around it in one of two ways:", 'gutenberg' ); ?></p>
 					<ul>
@@ -440,7 +464,7 @@ function gutenberg_warn_classic_about_cloudflare() {
 					// Reveal the modal and set focus on the Gutenberg button.
 					dialog.warning
 						.removeClass( 'hidden' )
-						.find( '.cloudflare-block-gutenberg-button' ).focus();
+						.find( '.cloudflare-block-classic-button' ).focus();
 
 					// Attach event handlers.
 					dialog.warningTabbables.on( 'keydown', dialog.constrainTabbing );

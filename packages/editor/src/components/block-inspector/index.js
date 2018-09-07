@@ -36,18 +36,20 @@ const BlockInspector = ( { selectedBlock, blockType, count } ) => {
 				<div className="editor-block-inspector__card-description">{ blockType.description }</div>
 			</div>
 		</div>,
-		<InspectorControls.Slot key="inspector-controls" />,
-		<InspectorAdvancedControls.Slot key="inspector-advanced-controls">
-			{ ( fills ) => ! isEmpty( fills ) && (
-				<PanelBody
-					className="editor-block-inspector__advanced"
-					title={ __( 'Advanced' ) }
-					initialOpen={ false }
-				>
-					{ fills }
-				</PanelBody>
-			) }
-		</InspectorAdvancedControls.Slot>,
+		<div key="inspector-controls"><InspectorControls.Slot /></div>,
+		<div key="inspector-advanced-controls">
+			<InspectorAdvancedControls.Slot>
+				{ ( fills ) => ! isEmpty( fills ) && (
+					<PanelBody
+						className="editor-block-inspector__advanced"
+						title={ __( 'Advanced' ) }
+						initialOpen={ false }
+					>
+						{ fills }
+					</PanelBody>
+				) }
+			</InspectorAdvancedControls.Slot>
+		</div>,
 		<SkipToSelectedBlock key="back" />,
 	];
 };

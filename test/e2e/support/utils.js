@@ -206,7 +206,7 @@ export async function ensureSidebarOpened() {
  * Clicks the default block appender.
  */
 export async function clickBlockAppender() {
-	await expect( page ).toClick( '.editor-default-block-appender__content' );
+	await page.click( '.editor-default-block-appender__content' );
 	await waitForRichTextInitialization();
 }
 
@@ -262,7 +262,7 @@ export async function pressWithModifier( modifiers, key ) {
 }
 
 /**
- * Clicks on More Menu item, searchers for the button with the text provided and clicks it.
+ * Clicks on More Menu item, searches for the button with the text provided and clicks it.
  *
  * @param {string} buttonLabel The label to search the button for.
  */
