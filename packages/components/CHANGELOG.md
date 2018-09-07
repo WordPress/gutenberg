@@ -1,3 +1,9 @@
+## 3.1.0 (Unreleased)
+
+### Deprecation
+
+- Renamed `AccessibleSVG` component to `SVG`.
+
 ## 3.0.0 (2018-09-05)
 
 ### Breaking Change

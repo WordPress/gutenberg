@@ -13,7 +13,7 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { Path, SVG } from '../primitives';
+import { SVG } from '../primitives';
 
 export default class Dashicon extends Component {
 	shouldComponentUpdate( nextProps ) {
@@ -900,7 +900,7 @@ export default class Dashicon extends Component {
 				height={ size }
 				viewBox="0 0 20 20"
 			>
-				<Path d={ path } />
+				<path d={ path } />
 			</SVG>
 		);
 	}

@@ -1,1 +1,1 @@
-export * from './svg';
+export { default as SVG, AccessibleSVG } from './svg';

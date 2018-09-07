@@ -1,7 +1,26 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { createElement } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
-export const Path = ( props ) => createElement( 'path', props );
-export const SVG = ( props ) => createElement( 'svg', props );
+const SVG = ( props ) => {
+	const appliedProps = {
+		...props,
+		role: 'img',
+		'aria-hidden': 'true',
+		focusable: 'false',
+	};
+
+	return <svg { ...appliedProps } />;
+};
+
+export default SVG;
+
+export const AccessibleSVG = ( props ) => {
+	deprecated( 'wp.components.AccessibleSVG', {
+		version: '4.0',
+		alternative: 'wp.components.SVG',
+		plugin: 'Gutenberg',
+	} );
+	return <SVG { ...props } />;
+};

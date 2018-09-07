@@ -1,13 +1,13 @@
-import {
-	Path as PATH,
-	Svg,
-} from 'react-native-svg';
+/**
+ * External dependencies
+ */
+import { omit } from 'lodash';
+import { Svg } from 'react-native-svg';
 
-export const Path = PATH;
-export const SVG = ( props ) => {
-	return (
-		<Svg width={ props.width } height={ props.height } >
-			{ props.children }
-		</Svg>
-	);
+const SVG = ( props ) => {
+	const appliedProps = omit( props, 'className' );
+
+	return <Svg { ...appliedProps } />;
 };
+
+export default SVG;
