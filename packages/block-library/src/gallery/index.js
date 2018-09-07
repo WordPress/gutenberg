@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, every } from 'lodash';
+import { filter, every, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,7 +14,7 @@ import { createBlobURL } from '@wordpress/blob';
 /**
  * Internal dependencies
  */
-import { default as edit, defaultColumnsNumber } from './edit';
+import { default as edit, defaultColumnsNumber, RELEVANT_MEDIA_FIELDS } from './edit';
 
 const blockAttributes = {
 	images: {
@@ -134,7 +134,9 @@ export const settings = {
 					} );
 					mediaUpload( {
 						filesList: files,
-						onFileChange: ( images ) => onChange( block.clientId, { images } ),
+						onFileChange: ( images ) => onChange( block.clientId, {
+							images: images.map( ( image ) => pick( image, RELEVANT_MEDIA_FIELDS ) ),
+						} ),
 						allowedTypes: [ 'image' ],
 					} );
 					return block;
