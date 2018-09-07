@@ -10,6 +10,10 @@
 	.components-modal__content {
 		padding: 0;
 	}
+
+	@include break-small() {
+		max-height: 70%;
+	}
 }
 
 .editor-block-compare__wrapper {
