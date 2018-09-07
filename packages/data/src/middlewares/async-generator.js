@@ -74,7 +74,7 @@ export function toAsyncIterable( object ) {
  */
 const asyncGeneratorMiddleware = ( store ) => ( next ) => ( action ) => {
 	if ( ! isAsyncIterable( action ) ) {
-		next( action );
+		return next( action );
 	}
 
 	const runtime = async ( fulfillment ) => {
