@@ -66,7 +66,6 @@ const MyDraggable = () => (
 		</Panel>
 	</div>
 );
-export default MyDraggable;
 ```
 
 In case you want to call your own `dragstart` / `dragend` event handlers as well, you can pass them to `Draggable` and it'll take care of calling them after their own:
@@ -99,6 +98,4 @@ const MyDraggable = ( { onDragStart, onDragEnd } ) => (
 		</Panel>
 	</div>
 );
-
-export default MyDraggable;
 ```
