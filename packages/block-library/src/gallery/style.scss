@@ -94,4 +94,12 @@
 		max-width: $content-width / 2;
 		width: 100%;
 	}
+
+	// Keep the display property consistent when alignments are applied
+	// to preserve columns
+	&.alignleft,
+	&.aligncenter,
+	&.alignright {
+		display: flex;
+	}
 }
