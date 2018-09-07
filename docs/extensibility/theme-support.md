@@ -209,12 +209,14 @@ function mytheme_block_editor_styles() {
 add_action( 'enqueue_block_editor_assets', 'mytheme_block_editor_styles' );
 ```
 
-If your editor style relies on a dark background, you can add the following to invert the UI colors:
+If your editor style relies on a dark background, you can add the following to adjust the color of the UI to work on dark backgrounds:
 
 ```php
+add_theme_support( 'editor-styles' );
 add_theme_support( 'dark-theme' );
 ```
 
+Note you don't need to add `add_theme_support( 'editor-styles' );` twice, but that rule does need to be present for the `dark-theme` rule to work.
 
 ### Basic colors
 
