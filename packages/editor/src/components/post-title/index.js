@@ -9,7 +9,7 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, createRef } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { ENTER } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -36,7 +36,6 @@ class PostTitle extends Component {
 		this.onUnselect = this.onUnselect.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.redirectHistory = this.redirectHistory.bind( this );
-		this.textareaRef = createRef();
 
 		this.state = {
 			isSelected: false,
@@ -89,7 +88,15 @@ class PostTitle extends Component {
 	}
 
 	render() {
-		const { title, placeholder, instanceId, isPostTypeViewable, isFocusMode, hasFixedToolbar } = this.props;
+		const {
+			hasFixedToolbar,
+			isCleanNewPost,
+			isFocusMode,
+			isPostTypeViewable,
+			instanceId,
+			placeholder,
+			title,
+		} = this.props;
 		const { isSelected } = this.state;
 		const className = classnames( 'editor-post-title__block', {
 			'is-selected': isSelected,
@@ -126,7 +133,9 @@ class PostTitle extends Component {
 									focus the title on new post so the author can start typing
 									right away, without needing to click anything.
 								*/
-								autofocus={ this.props.isPostEmpty ? 'autofocus' : undefined }
+								/* eslint-disable jsx-a11y/no-autofocus */
+								autoFocus={ isCleanNewPost }
+								/* eslint-enable jsx-a11y/no-autofocus */
 							/>
 						</KeyboardShortcuts>
 						{ isSelected && isPostTypeViewable && <PostPermalink /> }
@@ -138,13 +147,13 @@ class PostTitle extends Component {
 }
 
 const applyWithSelect = withSelect( ( select ) => {
-	const { getEditedPostAttribute, getEditorSettings, isEditedPostSaveable } = select( 'core/editor' );
+	const { getEditedPostAttribute, getEditorSettings, isCleanNewPost } = select( 'core/editor' );
 	const { getPostType } = select( 'core' );
 	const postType = getPostType( getEditedPostAttribute( 'type' ) );
 	const { titlePlaceholder, focusMode, hasFixedToolbar } = getEditorSettings();
 
 	return {
-		isPostEmpty: ! isEditedPostSaveable(),
+		isCleanNewPost: isCleanNewPost(),
 		title: getEditedPostAttribute( 'title' ),
 		isPostTypeViewable: get( postType, [ 'viewable' ], false ),
 		placeholder: titlePlaceholder,

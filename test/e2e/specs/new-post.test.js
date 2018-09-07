@@ -46,13 +46,9 @@ describe( 'new editor state', () => {
 		const activeElementTagName = await page.evaluate( () => {
 			return document.activeElement.tagName.toLowerCase();
 		} );
-		const titleAutofocus = await page.$eval( '.editor-post-title__input', ( element ) => {
-			return element.getAttribute( 'autofocus' );
-		} );
 
 		expect( activeElementClasses ).toContain( 'editor-post-title__input' );
 		expect( activeElementTagName ).toEqual( 'textarea' );
-		expect( titleAutofocus ).toEqual( 'autofocus' );
 	} );
 
 	it( 'should not focus the title if the title exists', async () => {
@@ -70,14 +66,10 @@ describe( 'new editor state', () => {
 		const activeElementTagName = await page.evaluate( () => {
 			return document.activeElement.tagName.toLowerCase();
 		} );
-		const titleAutofocus = await page.$eval( '.editor-post-title__input', ( element ) => {
-			return element.getAttribute( 'autofocus' );
-		} );
 
 		expect( activeElementClasses ).not.toContain( 'editor-post-title__input' );
 		// The document `body` should be the `activeElement`, because nothing is
 		// focused by default when a post already has a title.
 		expect( activeElementTagName ).toEqual( 'body' );
-		expect( titleAutofocus ).toEqual( null );
 	} );
 } );
