@@ -5,8 +5,7 @@
         "isValid": true,
         "attributes": {
             "showPostCounts": false,
-            "displayAsDropdown": false,
-            "align": "none"
+            "displayAsDropdown": false
         },
         "innerBlocks": [],
         "originalContent": ""

@@ -20,9 +20,8 @@ export const settings = {
 	category: 'widgets',
 
 	attributes: {
-		showPostCounts: {
-			type: 'boolean',
-			default: false,
+		align: {
+			type: 'string',
 		},
 		displayAsDropdown: {
 			type: 'boolean',
@@ -32,8 +31,9 @@ export const settings = {
 			type: 'boolean',
 			default: false,
 		},
-		align: {
-			type: 'string',
+		showPostCounts: {
+			type: 'boolean',
+			default: false,
 		},
 	},
 
@@ -43,7 +43,7 @@ export const settings = {
 
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
-		if ( 'left' === align || 'right' === align || 'full' === align ) {
+		if ( [ 'left', 'center', 'right', 'wide', 'full' ].includes( align ) ) {
 			return { 'data-align': align };
 		}
 	},

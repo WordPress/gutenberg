@@ -44,7 +44,6 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 					onChange={ ( nextAlign ) => {
 						setAttributes( { align: nextAlign } );
 					} }
-					controls={ [ 'left', 'center', 'right' ] }
 				/>
 			</BlockControls>
 			<Disabled>

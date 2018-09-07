@@ -83,6 +83,9 @@ function register_block_core_latest_posts() {
 		'core/latest-posts',
 		array(
 			'attributes'      => array(
+				'align'           => array(
+					'type' => 'string',
+				),
 				'categories'      => array(
 					'type' => 'string',
 				),
@@ -104,9 +107,6 @@ function register_block_core_latest_posts() {
 				'columns'         => array(
 					'type'    => 'number',
 					'default' => 3,
-				),
-				'align'           => array(
-					'type' => 'string',
 				),
 				'order'           => array(
 					'type'    => 'string',

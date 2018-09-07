@@ -187,7 +187,6 @@ class CategoriesEdit extends Component {
 						onChange={ ( nextAlign ) => {
 							setAttributes( { align: nextAlign } );
 						} }
-						controls={ [ 'left', 'center', 'right', 'full' ] }
 					/>
 				</BlockControls>
 				<div className={ this.props.className }>
