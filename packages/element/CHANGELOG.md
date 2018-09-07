@@ -1,3 +1,7 @@
+## 2.1.0 (Unreleased)
+
+- New API method `isEmptyElement` was introduced ([9861](https://github.com/WordPress/gutenberg/pull/9681/)).
+
 ## 2.0.0 (2018-09-05)
 
 ### Breaking Change
