@@ -262,12 +262,15 @@ export function createRegistry( storeConfigs = {} ) {
 	 * current internal representation of the registry, which may be enhanced
 	 * by plugins.
 	 *
-	 * @param {Object<string,Function>} fns Object of function values.
+	 * @param {Object<string,Function>} attributes Object of function values.
 	 *
 	 * @return {Object<string,Function>} Object enhanced with plugin proxying.
 	 */
-	function withPlugins( fns ) {
-		return mapValues( fns, ( fn, key ) => function() {
+	function withPlugins( attributes ) {
+		return mapValues( attributes, ( attribute, key ) => function() {
+			if ( key === 'attributes' ) {
+				return attribute;
+			}
 			return registry[ key ].apply( null, arguments );
 		} );
 	}
