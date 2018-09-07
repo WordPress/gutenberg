@@ -209,6 +209,13 @@ function mytheme_block_editor_styles() {
 add_action( 'enqueue_block_editor_assets', 'mytheme_block_editor_styles' );
 ```
 
+If your editor style relies on a dark background, you can add the following to invert the UI colors:
+
+```php
+add_theme_support( 'dark-theme' );
+```
+
+
 ### Basic colors
 
 You can style the editor like any other webpage. Here's how to change the background color and the font color to blue:
