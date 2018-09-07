@@ -11,7 +11,6 @@ import { __ } from '@wordpress/i18n';
 import {
 	IconButton,
 	DropZone,
-	FormFileUpload,
 	PanelBody,
 	RangeControl,
 	SelectControl,
@@ -55,7 +54,8 @@ class GalleryEdit extends Component {
 		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.setImageAttributes = this.setImageAttributes.bind( this );
 		this.addFiles = this.addFiles.bind( this );
-		this.uploadFromFiles = this.uploadFromFiles.bind( this );
+		this.onAddMoreImages = this.onAddMoreImages.bind( this );
+		this.updateImagesAttribute = this.updateImagesAttribute.bind( this );
 
 		this.state = {
 			selectedImage: null,
@@ -123,10 +123,6 @@ class GalleryEdit extends Component {
 		} );
 	}
 
-	uploadFromFiles( event ) {
-		this.addFiles( event.target.files );
-	}
-
 	addFiles( files ) {
 		const currentImages = this.props.attributes.images || [];
 		const { noticeOperations, setAttributes } = this.props;
@@ -139,6 +135,21 @@ class GalleryEdit extends Component {
 				} );
 			},
 			onError: noticeOperations.createErrorNotice,
+		} );
+	}
+
+	onAddMoreImages( newImages ) {
+		if ( ! window.event ) { // from "Upload" option after newImages absolute paths have been generated
+			this.updateImagesAttribute( newImages );
+		} else if ( window.event.type === 'click' ) { // from "Media Library" option
+			this.updateImagesAttribute( newImages );
+		}
+	}
+
+	updateImagesAttribute( newImages ) {
+		const currentImages = this.props.attributes.images || [];
+		this.props.setAttributes( {
+			images: currentImages.concat( newImages.map( ( image ) => pick( image, [ 'url', 'link', 'alt', 'id', 'caption' ] ) ) ),
 		} );
 	}
 
@@ -253,16 +264,20 @@ class GalleryEdit extends Component {
 					) ) }
 					{ isSelected &&
 						<li className="blocks-gallery-item has-add-item-button">
-							<FormFileUpload
-								multiple
-								isLarge
-								className="block-library-gallery-add-item-button"
-								onChange={ this.uploadFromFiles }
+							<MediaPlaceholder
+								icon="format-gallery"
+								className={ className }
+								labels={ {
+									title: __( 'Gallery' ),
+									name: __( 'images' ),
+								} }
+								onSelect={ this.onAddMoreImages }
 								accept="image/*"
-								icon="insert"
-							>
-								{ __( 'Upload an image' ) }
-							</FormFileUpload>
+								type="*"
+								multiple
+								notices={ noticeUI }
+								onError={ noticeOperations.createErrorNotice }
+							/>
 						</li>
 					}
 				</ul>

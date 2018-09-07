@@ -1,7 +1,7 @@
 MediaUpload
 ===========
 
-MediaUpload is a React component used to render a button that opens a the WordPress media modal.
+MediaUpload is a React component used to render a button that opens the WordPress media modal.
 
 ## Setup
 
