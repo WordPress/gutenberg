@@ -41,7 +41,7 @@ class IconButton extends Component {
 		);
 
 		let element = (
-			<Button { ...additionalProps } aria-label={ label } className={ classes }>
+			<Button isBorderless { ...additionalProps } aria-label={ label } className={ classes }>
 				{ isString( icon ) ? <Dashicon icon={ icon } /> : icon }
 				{ children }
 			</Button>

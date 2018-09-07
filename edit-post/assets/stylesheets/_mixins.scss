@@ -105,6 +105,210 @@
  * Button states and focus styles
  */
 
+@mixin appearance-button {
+	display: inline-flex;
+	text-decoration: none;
+	padding: 5px 10px;
+	margin: 0;
+	border: 0;
+	cursor: pointer;
+	-webkit-appearance: none;
+	white-space: nowrap;
+	border-radius: $radius-round-rectangle;
+	border: 1px solid #ccc;
+	background: #f7f7f7;
+	box-shadow: inset 0 -1px 0 #ccc;
+	color: #555;
+
+	&:hover {
+		background: #fafafa;
+		border-color: #999;
+		box-shadow: inset 0 -1px 0 #999;
+		color: #23282d;
+	}
+
+	&:focus:not(:disabled):not([aria-disabled="true"]) {
+		background: #fafafa;
+		color: #23282d;
+		border-color: #999;
+		box-shadow:
+			inset 0 -1px 0 #999,
+			0 0 0 2px $blue-medium-200;
+	}
+
+	&:active {
+		color: currentColor;
+
+		&:not(:disabled):not([aria-disabled="true"]) {
+			background: #eee;
+			border-color: #999;
+			box-shadow: inset 0 1px 0 #999;
+		}
+	}
+
+	&:disabled,
+	&[disabled] {
+		color: #a0a5aa;
+		border-color: #ddd;
+		background: #f7f7f7;
+		box-shadow: none;
+		text-shadow: 0 1px 0 #fff;
+		cursor: default;
+		opacity: 0.3;
+	}
+
+	&.is-unstyled {
+		padding: 0;
+		border-radius: 0;
+		border: none;
+		background: none;
+		color: inherit;
+
+		&:hover,
+		&:active,
+		&:focus:not(:disabled):not([aria-disabled="true"]),
+		&:active:not(:disabled):not([aria-disabled="true"]),
+		&:disabled,
+		&[disabled] {
+			background: none;
+			color: inherit;
+			text-shadow: none;
+			opacity: 1;
+		}
+	}
+
+	&.is-borderless {
+		color: inherit;
+		border-color: none;
+		background: none;
+		box-shadow: none;
+
+		&:not(:disabled):not([aria-disabled="true"]) {
+			&:focus {
+				@include button-style__focus-active;
+			}
+
+			&:hover {
+				@include button-style__hover;
+			}
+
+			&:active {
+				@include button-style__active;
+			}
+		}
+	}
+
+	&.is-primary {
+		background: color(theme(button));
+		border-color: color(theme(button) shade(20%)) color(theme(button) shade(25%)) color(theme(button) shade(25%));
+		box-shadow: inset 0 -1px 0 color(theme(button) shade(25%));
+		color: $white;
+		text-decoration: none;
+		text-shadow:
+			0 -1px 1px color(theme(button) shade(30%)),
+			1px 0 1px color(theme(button) shade(30%)),
+			0 1px 1px color(theme(button) shade(30%)),
+			-1px 0 1px color(theme(button) shade(30%));
+
+		&:hover,
+		&:focus:not(:disabled):not([aria-disabled="true"]) {
+			background: color(theme(button) shade(5%));
+			border-color: color(theme(button) shade(50%));
+			box-shadow: inset 0 -1px 0 color(theme(button) shade(50%));
+			color: $white;
+		}
+
+		&:focus:not(:disabled):not([aria-disabled="true"]) {
+			box-shadow:
+				inset 0 -1px 0 color(theme(button) shade(50%)),
+				0 0 0 2px $blue-medium-200;
+		}
+
+		&:active:not(:disabled):not([aria-disabled="true"]) {
+			background: color(theme(button) shade(20%));
+			border-color: color(theme(button) shade(50%));
+			box-shadow: inset 0 1px 0 color(theme(button) shade(50%));
+			vertical-align: top;
+		}
+
+		&:disabled,
+		&[disabled] {
+			color: color(theme(button) tint(30%));
+			background: color(theme(button) shade(30%));
+			border-color: color(theme(button) shade(20%));
+			box-shadow: none;
+			text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.1);
+		}
+
+		&.is-busy,
+		&.is-primary.is-busy[disabled] {
+			color: $white;
+			background-size: 100px 100%;
+			// Disable reason: This function call looks nicer when each argument is on its own line.
+			/* stylelint-disable */
+			background-image: linear-gradient(
+				-45deg,
+				theme(primary) 28%,
+				color(theme(primary) shade(30%)) 28%,
+				color(theme(primary) shade(30%)) 72%,
+				theme(primary) 72%
+			);
+			/* stylelint-enable */
+			border-color: color(theme(primary) shade(50%));
+		}
+	}
+
+	&.is-busy,
+	&.is-busy[disabled] {
+		animation: appearance-button-busy-animation 2500ms infinite linear;
+		background-size: 100px 100%;
+		background-image: repeating-linear-gradient(-45deg, $light-gray-500, $white 11px, $white 10px, $light-gray-500 20px);
+		opacity: 1;
+	}
+
+	&.is-large {
+		height: 30px;
+		line-height: 28px;
+		padding: 0 12px 2px;
+	}
+
+	&.is-small {
+		height: 24px;
+		line-height: 22px;
+		padding: 0 8px 1px;
+		font-size: 11px;
+	}
+}
+
+@mixin appearance-link {
+	margin: 0;
+	padding: 0;
+	box-shadow: none;
+	border: 0;
+	border-radius: 0;
+	background: none;
+	outline: none;
+	text-align: left;
+	/* Mimics the default link style in common.css */
+	color: #0073aa;
+	text-decoration: underline;
+	transition-property: border, background, color;
+	transition-duration: 0.05s;
+	transition-timing-function: ease-in-out;
+
+	&:hover,
+	&:active {
+		color: #00a0d2;
+	}
+
+	&:focus {
+		color: #124964;
+		box-shadow:
+			0 0 0 1px #5b9dd9,
+			0 0 2px 1px rgba(30, 140, 190, 0.8);
+	}
+}
+
 // Buttons with rounded corners.
 @mixin button-style__disabled {
 	opacity: 0.6;

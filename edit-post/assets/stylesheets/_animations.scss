@@ -57,3 +57,9 @@
 @mixin animate_rotation($speed: 1s) {
 	animation: rotation $speed infinite linear;
 }
+
+@keyframes appearance-button-busy-animation {
+	0% {
+		background-position: 200px 0;
+	}
+}

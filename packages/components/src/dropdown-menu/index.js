@@ -81,6 +81,7 @@ function DropdownMenu( {
 								icon={ control.icon }
 								role="menuitem"
 								disabled={ control.isDisabled }
+								isUnstyled
 							>
 								{ control.title }
 							</IconButton>

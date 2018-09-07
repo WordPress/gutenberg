@@ -1,0 +1,7 @@
+.components-link {
+	@include appearance-link;
+
+	.has-button-appearance {
+		@include appearance-button;
+	}
+}

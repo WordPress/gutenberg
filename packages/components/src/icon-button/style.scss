@@ -9,7 +9,6 @@
 	position: relative;
 	overflow: hidden;
 	text-indent: 4px;
-	border-radius: $radius-round-rectangle;
 
 	.dashicon {
 		display: inline-block;
@@ -20,14 +19,6 @@
 	svg {
 		fill: currentColor;
 		outline: none;
-	}
-
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
-		@include button-style__hover;
-	}
-
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):active {
-		@include button-style__active;
 	}
 
 	&[aria-disabled="true"]:focus,

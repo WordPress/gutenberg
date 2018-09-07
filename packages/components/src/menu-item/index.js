@@ -56,6 +56,7 @@ function MenuItem( { children, className, icon, onClick, shortcut, isSelected, r
 			onClick={ onClick }
 			aria-checked={ isSelected }
 			role={ role }
+			isBorderless
 			{ ...props }
 		>
 			{ children }
