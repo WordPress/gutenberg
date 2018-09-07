@@ -115,6 +115,20 @@
 }
 
 .editor-block-list__layout .editor-block-list__block[data-type="core/freeform"] {
+
+	// Not sure why this is necessary, there seems to be a skin file that overrides this upstream.
+	.mce-btn.mce-active button,
+	.mce-btn.mce-active:hover button,
+	.mce-btn.mce-active i,
+	.mce-btn.mce-active:hover i {
+		color: $dark-gray-800;
+	}
+
+	// Adjust padding to not cause a jump.
+	.mce-toolbar-grp > div {
+		padding: 1px 3px;
+	}
+
 	.editor-block-list__block-edit::before {
 		outline: $border-width solid #e2e4e7;
 	}
@@ -182,13 +196,22 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 	display: block;
 }
 
+// We don't want the ellipsis to overlap the classic toolbar, which it will due to position sticky.
+// So we move it to the right, and make room for it.
 @include break-small() {
 	.editor-block-list__block[data-type="core/freeform"] {
 		.editor-block-contextual-toolbar {
 			float: right;
 			margin-right: -$block-padding - $block-side-ui-clearance - $border-width;
-			transform: translateY(-#{ $block-padding - $border-width });
+			transform: translateY(-#{ $block-padding });
 			top: $block-padding;
+
+			.components-toolbar {
+				background: transparent;
+				border-top: none;
+				border-right: none;
+				border-bottom: none;
+			}
 		}
 
 		.mce-container.mce-toolbar.mce-stack-layout-item {
