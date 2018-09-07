@@ -6,7 +6,7 @@ import { MenuItem } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
-const PublishPanelToggle = function( { onToggle, isEnabled } ) {
+const PrePublishPanelToggle = function( { onToggle, isEnabled } ) {
 	return (
 		<MenuItem
 			icon={ isEnabled && 'yes' }
@@ -34,4 +34,4 @@ export default compose( [
 			ownProps.onToggle();
 		},
 	} ) ),
-] )( PublishPanelToggle );
+] )( PrePublishPanelToggle );

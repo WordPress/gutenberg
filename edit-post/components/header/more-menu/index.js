@@ -14,7 +14,7 @@ import PluginMoreMenuGroup from '../plugins-more-menu-group';
 import TipsToggle from '../tips-toggle';
 import KeyboardShortcutsHelpMenuItem from '../keyboard-shortcuts-help-menu-item';
 import WritingMenu from '../writing-menu';
-import PublishPanelToggle from '../publish-panel-toggle';
+import PrePublishPanelToggle from '../pre-publish-panel-toggle';
 
 const MoreMenu = () => (
 	<Dropdown
@@ -45,7 +45,7 @@ const MoreMenu = () => (
 						{ __( 'Manage All Reusable Blocks' ) }
 					</MenuItem>
 					<TipsToggle onToggle={ onClose } />
-					<PublishPanelToggle />
+					<PrePublishPanelToggle />
 					<KeyboardShortcutsHelpMenuItem onSelect={ onClose } />
 				</MenuGroup>
 			</Fragment>
