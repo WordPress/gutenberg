@@ -128,9 +128,6 @@ const effects = {
 		subscribe( onChangeListener(
 			() => !! select( 'core/editor' ).getBlockSelectionStart(),
 			( hasBlockSelection ) => {
-				if ( ! select( 'core/edit-post' ).isEditorSidebarOpened() ) {
-					return;
-				}
 				if ( hasBlockSelection ) {
 					store.dispatch( openGeneralSidebar( 'edit-post/block' ) );
 				} else {
