@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "3.7.0",
+	"version": "3.8.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience",
 	"repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -20,6 +20,7 @@
 		"@wordpress/autop": "file:packages/autop",
 		"@wordpress/blob": "file:packages/blob",
 		"@wordpress/block-library": "file:packages/block-library",
+		"@wordpress/block-serialization-default-parser": "file:packages/block-serialization-default-parser",
 		"@wordpress/block-serialization-spec-parser": "file:packages/block-serialization-spec-parser",
 		"@wordpress/blocks": "file:packages/blocks",
 		"@wordpress/components": "file:packages/components",

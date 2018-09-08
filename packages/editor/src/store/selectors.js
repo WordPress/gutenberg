@@ -99,6 +99,18 @@ export function isEditedPostDirty( state ) {
 }
 
 /**
+ * Returns true if there are no unsaved values for the current edit session and
+ * if the currently edited post is new (has never been saved before).
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether new post and unsaved values exist.
+ */
+export function isCleanNewPost( state ) {
+	return ! isEditedPostDirty( state ) && isEditedPostNew( state );
+}
+
+/**
  * Returns the post currently being edited in its last known saved state, not
  * including unsaved edits. Returns an object containing relevant default post
  * values if the post has not yet been saved.

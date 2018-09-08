@@ -49,6 +49,19 @@ false if the editing state matches the saved or new post.
 
 Whether unsaved values exist.
 
+### isCleanNewPost
+
+Returns true if there are no unsaved values for the current edit session and
+if the currently edited post is new (has never been saved before).
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+Whether new post and unsaved values exist.
+
 ### getCurrentPost
 
 Returns the post currently being edited in its last known saved state, not
