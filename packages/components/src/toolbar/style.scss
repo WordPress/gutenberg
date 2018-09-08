@@ -3,6 +3,7 @@
 	border: $border-width solid $light-gray-500;
 	background-color: $white;
 	display: flex;
+	flex-shrink: 0;
 }
 
 div.components-toolbar {

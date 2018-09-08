@@ -22,7 +22,7 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
  - `wp.components.withContext` has been removed. Please use `wp.element.createContext` instead. See: https://reactjs.org/docs/context.html.
  - `wp.coreBlocks.registerCoreBlocks` has been removed. Please use `wp.blockLibrary.registerCoreBlocks` instead.
  - `wp.editor.DocumentTitle` component has been removed.
- - `isCleanNewPost` and `getDocumentTitle` selectors (`core/editor`) have been removed.
+ - `getDocumentTitle` selector (`core/editor`) has been removed.
 
 ## 3.7.0
 
