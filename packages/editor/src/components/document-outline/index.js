@@ -90,7 +90,7 @@ export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupporte
 			<ul>
 				{ hasTitle && (
 					<DocumentOutlineItem
-						level="Title"
+						level={ __( 'Title' ) }
 						isValid
 						onClick={ focusTitle }
 					>

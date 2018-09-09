@@ -1,6 +1,7 @@
 .editor-post-title__block {
 	position: relative;
 	padding: 5px 0;
+	font-size: $editor-font-size;
 
 	@include break-small() {
 		padding: 5px $block-parent-side-ui-clearance;

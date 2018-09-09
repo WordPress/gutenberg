@@ -20,6 +20,7 @@ const {
 	hasEditorRedo,
 	isEditedPostNew,
 	isEditedPostDirty,
+	isCleanNewPost,
 	getCurrentPost,
 	getCurrentPostId,
 	getCurrentPostLastRevisionId,
@@ -279,6 +280,59 @@ describe( 'selectors', () => {
 			};
 
 			expect( isEditedPostDirty( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isCleanNewPost', () => {
+		it( 'should return true when the post is not dirty and has not been saved before', () => {
+			const state = {
+				editor: {
+					isDirty: false,
+				},
+				currentPost: {
+					id: 1,
+					status: 'auto-draft',
+				},
+				saving: {
+					requesting: false,
+				},
+			};
+
+			expect( isCleanNewPost( state ) ).toBe( true );
+		} );
+
+		it( 'should return false when the post is not dirty but the post has been saved', () => {
+			const state = {
+				editor: {
+					isDirty: false,
+				},
+				currentPost: {
+					id: 1,
+					status: 'draft',
+				},
+				saving: {
+					requesting: false,
+				},
+			};
+
+			expect( isCleanNewPost( state ) ).toBe( false );
+		} );
+
+		it( 'should return false when the post is dirty but the post has not been saved', () => {
+			const state = {
+				editor: {
+					isDirty: true,
+				},
+				currentPost: {
+					id: 1,
+					status: 'auto-draft',
+				},
+				saving: {
+					requesting: false,
+				},
+			};
+
+			expect( isCleanNewPost( state ) ).toBe( false );
 		} );
 	} );
 
@@ -2239,6 +2293,35 @@ describe( 'selectors', () => {
 			};
 
 			expect( hasSelectedInnerBlock( state, 4 ) ).toBe( true );
+		} );
+
+		it( 'should return true if a multi selection exists that contains children of the block with the given ClientId', () => {
+			const state = {
+				editor: {
+					present: {
+						blockOrder: {
+							6: [ 5, 4, 3, 2, 1 ],
+						},
+					},
+				},
+				blockSelection: { start: 2, end: 4 },
+			};
+			expect( hasSelectedInnerBlock( state, 6 ) ).toBe( true );
+		} );
+
+		it( 'should return false if a multi selection exists bot does not contains children of the block with the given ClientId', () => {
+			const state = {
+				editor: {
+					present: {
+						blockOrder: {
+							3: [ 2, 1 ],
+							6: [ 5, 4 ],
+						},
+					},
+				},
+				blockSelection: { start: 5, end: 4 },
+			};
+			expect( hasSelectedInnerBlock( state, 3 ) ).toBe( false );
 		} );
 	} );
 
