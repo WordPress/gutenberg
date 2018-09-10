@@ -5,14 +5,14 @@
         "isValid": true,
         "attributes": {
             "url": "https://cldup.com/uuUqE_dXzy.jpg",
-            "width": "",
+            "width": 579,
             "alt": "",
             "caption": [],
-            "height": "",
+            "height": 385,
             "href": "https://wordpress.org/",
             "linkDestination": "custom"
         },
         "innerBlocks": [],
-        "originalContent": "<figure class=\"wp-block-image\"><a href=\"https://wordpress.org/\"><img src=\"https://cldup.com/uuUqE_dXzy.jpg\" alt=\"\" /></a></figure>"
+        "originalContent": "<figure class=\"wp-block-image\"><a href=\"https://wordpress.org/\"><img src=\"https://cldup.com/uuUqE_dXzy.jpg\" alt=\"\" width=\"579\" height=\"385\" /></a></figure>"
     }
 ]

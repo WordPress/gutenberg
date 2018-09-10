@@ -7,12 +7,12 @@
             "url": "https://cldup.com/uuUqE_dXzy.jpg",
             "alt": "",
             "caption": [],
-            "height": "",
-            "width": "",
+            "height": 385,
+            "width": 579,
             "href": "https://cldup.com/uuUqE_dXzy.jpg",
             "linkDestination": "media"
         },
         "innerBlocks": [],
-        "originalContent": "<figure class=\"wp-block-image\"><a href=\"https://cldup.com/uuUqE_dXzy.jpg\"><img src=\"https://cldup.com/uuUqE_dXzy.jpg\" alt=\"\" /></a></figure>"
+        "originalContent": "<figure class=\"wp-block-image\"><a href=\"https://cldup.com/uuUqE_dXzy.jpg\"><img src=\"https://cldup.com/uuUqE_dXzy.jpg\" alt=\"\" width=\"579\" height=\"385\" /></a></figure>"
     }
 ]

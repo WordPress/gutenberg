@@ -60,14 +60,12 @@ const blockAttributes = {
 		source: 'attribute',
 		selector: 'img',
 		attribute: 'width',
-		default: '',
 	},
 	height: {
 		type: 'number',
 		source: 'attribute',
 		selector: 'img',
 		attribute: 'height',
-		default: '',
 	},
 	isResized: {
 		type: 'boolean',
