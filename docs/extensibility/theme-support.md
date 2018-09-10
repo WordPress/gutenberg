@@ -213,10 +213,10 @@ If your editor style relies on a dark background, you can add the following to a
 
 ```php
 add_theme_support( 'editor-styles' );
-add_theme_support( 'dark-theme' );
+add_theme_support( 'dark-editor-style' );
 ```
 
-Note you don't need to add `add_theme_support( 'editor-styles' );` twice, but that rule does need to be present for the `dark-theme` rule to work.
+Note you don't need to add `add_theme_support( 'editor-styles' );` twice, but that rule does need to be present for the `dark-editor-style` rule to work.
 
 ### Basic colors
 
