@@ -74,6 +74,18 @@ export const settings = {
 					createBlock( 'core/cover-image', { title: content } )
 				),
 			},
+			{
+				type: 'block',
+				blocks: [ 'core/image' ],
+				transform: ( { caption, url, align, id } ) => (
+					createBlock( 'core/cover-image', {
+						title: caption,
+						url,
+						align,
+						id,
+					} )
+				),
+			},
 		],
 		to: [
 			{
@@ -81,6 +93,18 @@ export const settings = {
 				blocks: [ 'core/heading' ],
 				transform: ( { title } ) => (
 					createBlock( 'core/heading', { content: title } )
+				),
+			},
+			{
+				type: 'block',
+				blocks: [ 'core/image' ],
+				transform: ( { title, url, align, id } ) => (
+					createBlock( 'core/image', {
+						caption: title,
+						url,
+						align,
+						id,
+					} )
 				),
 			},
 		],
