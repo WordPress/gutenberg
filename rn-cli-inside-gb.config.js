@@ -1,4 +1,5 @@
 /** @format */
+const blacklist = require( 'metro' ).createBlacklist;
 const path = require( 'path' );
 
 const enm = require( './extra-node-modules.config.js' );
@@ -23,6 +24,12 @@ module.exports = {
 			Object.values( wppackages )
 		);
 		return roots;
+	},
+	getBlacklistRE: function() {
+		// Blacklist the GB packages we want to consume from NPM (online) directly.
+		// On the other hand, GB packages that are loaded from the source tree directly
+		// are automagically resolved by Metro so, there is no list of them anywhere.
+		return blacklist( [ new RegExp( path.basename( __dirname ) + '/gutenberg/.*' ) ] );
 	},
 	getTransformModulePath() {
 		return require.resolve( './sass-transformer-inside-gb.js' );
