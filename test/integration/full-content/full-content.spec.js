@@ -223,7 +223,7 @@ describe( 'full post content fixture', () => {
 			.map( ( block ) => block.name )
 			// We don't want tests for each oembed provider, which all have the same
 			// `save` functions and attributes.
-			.filter( ( name ) => name.indexOf( 'core-embed' ) !== 0 )
+			.filter( ( name ) => name.indexOf( 'core-embed' ) !== 0 && name !== 'core/template' )
 			.forEach( ( name ) => {
 				const nameToFilename = name.replace( /\//g, '__' );
 				const foundFixtures = fileBasenames
