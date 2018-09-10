@@ -2,6 +2,10 @@
 	display: flex;
 	justify-content: space-between;
 	margin-bottom: 1em;
+
+	.components-button {
+		overflow: hidden;
+	}
 }
 
 .components-font-size-picker__custom-input {

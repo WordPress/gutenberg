@@ -82,26 +82,20 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 		{
 			name: __( 'Small' ),
 			shortName: __( 'S' ),
-			size: 14,
+			size: 13,
 			slug: 'small',
 		},
 		{
-			name: __( 'Regular' ),
+			name: __( 'Medium' ),
 			shortName: __( 'M' ),
-			size: 16,
-			slug: 'regular',
+			size: 18,
+			slug: 'medium',
 		},
 		{
 			name: __( 'Large' ),
 			shortName: __( 'L' ),
-			size: 36,
+			size: 22,
 			slug: 'large',
-		},
-		{
-			name: __( 'Larger' ),
-			shortName: __( 'XL' ),
-			size: 48,
-			slug: 'larger',
 		},
 	],
 
