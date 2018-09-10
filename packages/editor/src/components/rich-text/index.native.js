@@ -95,7 +95,7 @@ export class RichText extends Component {
 		);
 	}
 
-	onEnter( event ) {
+	onEnter() {
 		console.log("Enter pressed!  This logic still needs to be implemented.");
 	}
 
