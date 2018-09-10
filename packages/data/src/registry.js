@@ -267,11 +267,13 @@ export function createRegistry( storeConfigs = {} ) {
 	 * @return {Object<string,Function>} Object enhanced with plugin proxying.
 	 */
 	function withPlugins( attributes ) {
-		return mapValues( attributes, ( attribute, key ) => function() {
-			if ( key === 'attributes' ) {
+		return mapValues( attributes, ( attribute, key ) => {
+			if ( typeof attribute !== 'function' ) {
 				return attribute;
 			}
-			return registry[ key ].apply( null, arguments );
+			return function() {
+				return registry[ key ].apply( null, arguments );
+			};
 		} );
 	}
 

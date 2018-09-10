@@ -6,7 +6,7 @@ import { createStore, applyMiddleware } from 'redux';
 /**
  * Internal dependencies
  */
-import createMiddleware from '../middleware';
+import createMiddleware from '../';
 
 describe( 'createMiddleware', () => {
 	function createStoreWithMiddleware( middleware ) {
