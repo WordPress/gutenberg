@@ -42,8 +42,11 @@
   },
   "scripts": {
     "start": "yarn react-native start",
+    "start:inside-gb": "yarn react-native start --config `pwd`/rn-cli-inside-gb.config.js",
     "start:reset": "yarn clean:runtime && yarn start --reset-cache",
+    "start:inside-gb:reset": "yarn clean:runtime && yarn start:inside-gb --reset-cache",
     "start:debug": "node --inspect-brk node_modules/.bin/react-native start",
+    "start:inside-gb:debug": "node --inspect-brk node_modules/.bin/react-native start:inside-gb",
     "android": "react-native run-android",
     "preios": "yarn preios:carthage",
     "preios:carthage": "pushd react-native-aztec && (yarn install-aztec-ios; popd)",
