@@ -106,12 +106,10 @@ export function BlockSettingsMenu( { clientIds, onSelect } ) {
 									onToggle={ onClose }
 								/>
 							) }
-							{ count === 1 && (
-								<ReusableBlockConvertButton
-									clientId={ firstBlockClientId }
-									onToggle={ onClose }
-								/>
-							) }
+							<ReusableBlockConvertButton
+								clientIds={ clientIds }
+								onToggle={ onClose }
+							/>
 							<_BlockSettingsMenuPluginsExtension.Slot fillProps={ { clientIds, onClose } } />
 							<div className="editor-block-settings-menu__separator" />
 							{ count === 1 && (

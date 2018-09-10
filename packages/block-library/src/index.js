@@ -33,6 +33,7 @@ import * as nextpage from './nextpage';
 import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
 import * as reusableBlock from './block';
+import * as reusableTemplate from './template';
 import * as separator from './separator';
 import * as shortcode from './shortcode';
 import * as spacer from './spacer';
@@ -75,6 +76,7 @@ export const registerCoreBlocks = () => {
 		pullquote,
 		separator,
 		reusableBlock,
+		reusableTemplate,
 		spacer,
 		subhead,
 		table,

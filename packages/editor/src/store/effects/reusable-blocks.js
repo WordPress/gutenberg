@@ -13,6 +13,7 @@ import {
 	serialize,
 	createBlock,
 	isReusableBlock,
+	cloneBlock,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
@@ -25,7 +26,7 @@ import {
 	createSuccessNotice,
 	createErrorNotice,
 	removeBlocks,
-	replaceBlock,
+	replaceBlocks,
 	receiveBlocks,
 	saveReusableBlock,
 } from '../actions';
@@ -33,6 +34,7 @@ import {
 	getReusableBlock,
 	getBlock,
 	getBlocks,
+	getBlocksByClientId,
 } from '../selectors';
 
 /**
@@ -215,8 +217,13 @@ export const convertBlockToStatic = ( action, store ) => {
 	const oldBlock = getBlock( state, action.clientId );
 	const reusableBlock = getReusableBlock( state, oldBlock.attributes.ref );
 	const referencedBlock = getBlock( state, reusableBlock.clientId );
-	const newBlock = createBlock( referencedBlock.name, referencedBlock.attributes );
-	store.dispatch( replaceBlock( oldBlock.clientId, newBlock ) );
+	let newBlocks;
+	if ( referencedBlock.name === 'core/template' ) {
+		newBlocks = referencedBlock.innerBlocks.map( ( innerBlock ) => cloneBlock( innerBlock ) );
+	} else {
+		newBlocks = [ createBlock( referencedBlock.name, referencedBlock.attributes ) ];
+	}
+	store.dispatch( replaceBlocks( oldBlock.clientId, newBlocks ) );
 };
 
 /**
@@ -227,8 +234,21 @@ export const convertBlockToStatic = ( action, store ) => {
  */
 export const convertBlockToReusable = ( action, store ) => {
 	const { getState, dispatch } = store;
+	let parsedBlock;
+	if ( action.clientIds.length === 1 ) {
+		parsedBlock = getBlock( getState(), action.clientIds[ 0 ] );
+	} else {
+		parsedBlock = createBlock(
+			'core/template',
+			{},
+			getBlocksByClientId( getState(), action.clientIds )
+		);
 
-	const parsedBlock = getBlock( getState(), action.clientId );
+		// This shouldn't be necessary but at the moment
+		// we expect the content of the shared blocks to live in the blocks state.
+		dispatch( receiveBlocks( [ parsedBlock ] ) );
+	}
+
 	const reusableBlock = {
 		id: uniqueId( 'reusable' ),
 		clientId: parsedBlock.clientId,
@@ -242,8 +262,8 @@ export const convertBlockToReusable = ( action, store ) => {
 
 	dispatch( saveReusableBlock( reusableBlock.id ) );
 
-	dispatch( replaceBlock(
-		parsedBlock.clientId,
+	dispatch( replaceBlocks(
+		action.clientIds,
 		createBlock( 'core/block', {
 			ref: reusableBlock.id,
 			layout: parsedBlock.attributes.layout,
