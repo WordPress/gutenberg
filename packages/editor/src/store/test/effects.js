@@ -21,7 +21,6 @@ import {
 	mergeBlocks,
 	replaceBlocks,
 	selectBlock,
-	createErrorNotice,
 	setTemplateValidity,
 	editPost,
 } from '../actions';
@@ -356,7 +355,15 @@ describe( 'effects', () => {
 			handler( action, store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( createErrorNotice( 'Publishing failed', { id: 'SAVE_POST_NOTICE_ID' } ) );
+			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
+				notice: {
+					content: <p>Publishing failed</p>,
+					id: 'SAVE_POST_NOTICE_ID',
+					isDismissible: true,
+					status: 'error',
+				},
+				type: 'CREATE_NOTICE',
+			} ) );
 		} );
 
 		it( 'should not dispatch a notice when there were no changes for autosave to save.', () => {
@@ -412,7 +419,15 @@ describe( 'effects', () => {
 			handler( action, store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( createErrorNotice( 'Updating failed', { id: 'SAVE_POST_NOTICE_ID' } ) );
+			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
+				notice: {
+					content: <p>Updating failed</p>,
+					id: 'SAVE_POST_NOTICE_ID',
+					isDismissible: true,
+					status: 'error',
+				},
+				type: 'CREATE_NOTICE',
+			} ) );
 		} );
 	} );
 

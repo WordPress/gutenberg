@@ -275,7 +275,7 @@ export const requestPostUpdateFailure = ( action, store ) => {
 			{ ' ' }
 			<a href={ cloudflareDetailsLink }>{ __( 'Learn More' ) } </a>
 		</p> :
-		noticeMessage;
+		<p>{ noticeMessage }</p>;
 
 	dispatch( createErrorNotice( cloudflaredMessage, { id: SAVE_POST_NOTICE_ID } ) );
 };
