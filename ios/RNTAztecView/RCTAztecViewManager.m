@@ -33,8 +33,7 @@ RCT_EXPORT_VIEW_PROPERTY(placeholderTextColor, UIColor)
 }
 
 RCT_EXPORT_METHOD(applyFormat:(nonnull NSNumber *)node format:(NSString *)format)
-{
-    RCTLogInfo(@"Apply format: %@", format);
+{    
     [self executeBlock:^(RCTAztecView *aztecView) {
         [aztecView applyWithFormat:format];
     } onNode:node];
