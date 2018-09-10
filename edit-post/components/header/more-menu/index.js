@@ -45,7 +45,7 @@ const MoreMenu = () => (
 						{ __( 'Manage All Reusable Blocks' ) }
 					</MenuItem>
 					<TipsToggle onToggle={ onClose } />
-					<PrePublishPanelToggle />
+					<PrePublishPanelToggle onToggle={ onClose } />
 					<KeyboardShortcutsHelpMenuItem onSelect={ onClose } />
 				</MenuGroup>
 			</Fragment>

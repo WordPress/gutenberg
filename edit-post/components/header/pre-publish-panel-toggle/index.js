@@ -6,7 +6,7 @@ import { MenuItem } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
-const PrePublishPanelToggle = function( { onToggle, isEnabled } ) {
+const PublishSidebarToggle = function( { onToggle, isEnabled } ) {
 	return (
 		<MenuItem
 			icon={ isEnabled && 'yes' }
@@ -14,24 +14,24 @@ const PrePublishPanelToggle = function( { onToggle, isEnabled } ) {
 			role="menuitemcheckbox"
 			onClick={ onToggle }
 		>
-			{ __( 'PrePublish Panel' ) }
+			{ __( 'Publish Sidebar' ) }
 		</MenuItem>
 	);
 };
 
 export default compose( [
 	withSelect( ( select ) => ( {
-		isEnabled: select( 'core/nux' ).isPrePublishPanelEnabled(),
+		isEnabled: select( 'core/edit-post' ).isPublishSidebarEnabled(),
 	} ) ),
 	withDispatch( ( dispatch, ownProps ) => ( {
 		onToggle() {
-			const { disablePrePublishPanel, enablePrePublishPanel } = dispatch( 'core/nux' );
-			if ( ownProps.isActive ) {
-				disablePrePublishPanel();
+			const { disablePublishSidebar, enablePublishSidebar } = dispatch( 'core/edit-post' );
+			if ( ownProps.isEnabled ) {
+				disablePublishSidebar();
 			} else {
-				enablePrePublishPanel();
+				enablePublishSidebar();
 			}
 			ownProps.onToggle();
 		},
 	} ) ),
-] )( PrePublishPanelToggle );
+] )( PublishSidebarToggle );

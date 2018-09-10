@@ -49,6 +49,15 @@ export const preferences = combineReducers( {
 
 		return state;
 	},
+	isPublishSidebarEnabled( state = true, action ) {
+		switch ( action.type ) {
+			case 'ENABLE_PUBLISH_SIDEBAR':
+			case 'DISABLE_PUBLISH_SIDEBAR':
+				return action.type === 'ENABLE_PUBLISH_SIDEBAR';
+		}
+
+		return state;
+	},
 	panels( state = PREFERENCES_DEFAULTS.panels, action ) {
 		if ( action.type === 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL' ) {
 			return {
