@@ -23,14 +23,9 @@
 	min-height: $block-toolbar-height;
 	border-bottom: $border-width solid $light-gray-500;
 
-	.editor-block-toolbar {
-		margin: -9px 0;
-	}
-
 	.editor-block-toolbar .components-toolbar {
 		border-top: none;
 		border-bottom: none;
-		padding: 9px;
 	}
 
 	.is-sidebar-opened & {
@@ -56,6 +51,14 @@
 
 		.is-sidebar-opened & {
 			right: auto;
+		}
+
+		.editor-block-toolbar {
+			margin: -9px 0;
+		}
+
+		.editor-block-toolbar .components-toolbar {
+			padding: 9px;
 		}
 	}
 }
