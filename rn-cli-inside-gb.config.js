@@ -5,8 +5,8 @@ const path = require( 'path' );
 const enm = require( './extra-node-modules.config.js' );
 
 const { lstatSync, readdirSync } = require( 'fs' );
-const getDirectoryNames = dir =>
-	readdirSync( dir ).filter( name => lstatSync( path.resolve( dir, name ) ).isDirectory() );
+const getDirectoryNames = ( dir ) =>
+	readdirSync( dir ).filter( ( name ) => lstatSync( path.resolve( dir, name ) ).isDirectory() );
 
 const wppackagenames = getDirectoryNames( path.resolve( __dirname, '../packages/' ) );
 
