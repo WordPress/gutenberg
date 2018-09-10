@@ -332,6 +332,7 @@ export default class TableEdit extends Component {
 							return (
 								<CellTag key={ columnIndex } className={ classes }>
 									<RichText
+										className="wp-block-table__cell-content"
 										value={ content }
 										onChange={ this.onChange }
 										unstableOnFocus={ this.createOnFocus( cell ) }
