@@ -119,17 +119,11 @@
 		outline: $border-width solid #e2e4e7;
 	}
 
-	// Don't show normal block toolbar
-	.editor-block-contextual-toolbar {
-		display: none;
-	}
-
 	// Don't show block type label for classic block
 	&.is-hovered .editor-block-list__breadcrumb {
 		display: none;
 	}
 }
-
 
 div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 	margin-top: 0;
@@ -186,4 +180,19 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 
 .freeform-toolbar.has-advanced-toolbar .mce-toolbar-grp .mce-toolbar {
 	display: block;
+}
+
+@include break-small() {
+	.editor-block-list__block[data-type="core/freeform"] {
+		.editor-block-contextual-toolbar {
+			float: right;
+			margin-right: -$block-padding - $block-side-ui-clearance - $border-width;
+			transform: translateY(-#{ $block-padding - $border-width });
+			top: $block-padding;
+		}
+
+		.mce-container.mce-toolbar.mce-stack-layout-item {
+			padding-right: $icon-button-size;
+		}
+	}
 }

@@ -1,16 +1,20 @@
 /**
+ * Internal dependencies
+ */
+import HeadingToolbar from './heading-toolbar';
+
+/**
  * External dependencies
  */
 import { View } from 'react-native';
-import { range } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { RichText } from '@wordpress/editor';
-import { Toolbar } from '@wordpress/components';
+import { parse } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -20,26 +24,6 @@ import './editor.scss';
 const minHeight = 50;
 
 class HeadingEdit extends Component {
-	createLevelControl( targetLevel ) {
-		const {
-			attributes,
-			setAttributes,
-		} = this.props;
-
-		const {
-			level,
-		} = attributes;
-
-		return {
-			icon: 'heading',
-			// translators: %s: heading level e.g: "1", "2", "3"
-			title: sprintf( __( 'Heading %d' ), targetLevel ),
-			isActive: targetLevel === level,
-			onClick: () => setAttributes( { level: targetLevel } ),
-			subscript: String( targetLevel ),
-		};
-	}
-
 	render() {
 		const {
 			attributes,
@@ -55,15 +39,20 @@ class HeadingEdit extends Component {
 
 		return (
 			<View>
-				<Toolbar controls={ range( 2, 5 ).map( this.createLevelControl.bind( this ) ) } />
+				<HeadingToolbar minLevel={ 2 } maxLevel={ 5 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
 				<RichText
 					tagName={ tagName }
 					content={ { contentTree: attributes.content } }
 					style={ {
 						minHeight: Math.max( minHeight, typeof attributes.aztecHeight === 'undefined' ? 0 : attributes.aztecHeight ),
 					} }
-					onChange={ ( value ) => {
-						setAttributes( value );
+					onChange={ ( event ) => {
+						// Create a React Tree from the new HTML
+						const newParaBlock = parse( `<!-- wp:heading --><${ tagName }>${ event.content }</${ tagName }><!-- /wp:heading -->` )[ 0 ];
+						setAttributes( {
+							...this.props.attributes,
+							content: newParaBlock.attributes.content,
+						} );
 					} }
 					onContentSizeChange={ ( event ) => {
 						setAttributes( { aztecHeight: event.aztecHeight } );

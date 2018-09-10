@@ -39,6 +39,7 @@ import { getMetaBoxContainer } from '../../utils/meta-boxes';
 import Sidebar from '../sidebar';
 import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
+import FullscreenMode from '../fullscreen-mode';
 
 function Layout( {
 	mode,
@@ -68,6 +69,7 @@ function Layout( {
 	};
 	return (
 		<div className={ className }>
+			<FullscreenMode />
 			<BrowserURL />
 			<UnsavedChangesWarning forceIsDirty={ () => {
 				return some( metaBoxes, ( metaBox, location ) => {

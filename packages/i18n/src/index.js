@@ -4,6 +4,11 @@
 import Jed from 'jed';
 import memoize from 'memize';
 
+/**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
 let i18n;
 
 /**
@@ -47,7 +52,7 @@ export function setLocaleData( localeData = { '': {} }, domain = 'default' ) {
  *
  * @return {Jed} Jed instance.
  */
-export function getI18n() {
+function _getI18n() {
 	if ( ! i18n ) {
 		setLocaleData();
 	}
@@ -69,9 +74,9 @@ export function getI18n() {
  *
  * @return {string} The translated string.
  */
-export const dcnpgettext = memoize( ( domain = 'default', context, single, plural, number ) => {
+const _dcnpgettext = memoize( ( domain = 'default', context, single, plural, number ) => {
 	try {
-		return getI18n().dcnpgettext( domain, context, single, plural, number );
+		return _getI18n().dcnpgettext( domain, context, single, plural, number );
 	} catch ( error ) {
 		logErrorOnce( 'Jed localization error: \n\n' + error.toString() );
 
@@ -90,7 +95,7 @@ export const dcnpgettext = memoize( ( domain = 'default', context, single, plura
  * @return {string} Translated text.
  */
 export function __( text, domain ) {
-	return dcnpgettext( domain, undefined, text );
+	return _dcnpgettext( domain, undefined, text );
 }
 
 /**
@@ -105,7 +110,7 @@ export function __( text, domain ) {
  * @return {string} Translated context string without pipe.
  */
 export function _x( text, context, domain ) {
-	return dcnpgettext( domain, context, text );
+	return _dcnpgettext( domain, context, text );
 }
 
 /**
@@ -123,7 +128,7 @@ export function _x( text, context, domain ) {
  * @return {string} The translated singular or plural form.
  */
 export function _n( single, plural, number, domain ) {
-	return dcnpgettext( domain, undefined, single, plural, number );
+	return _dcnpgettext( domain, undefined, single, plural, number );
 }
 
 /**
@@ -142,7 +147,7 @@ export function _n( single, plural, number, domain ) {
  * @return {string} The translated singular or plural form.
  */
 export function _nx( single, plural, number, context, domain ) {
-	return dcnpgettext( domain, context, single, plural, number );
+	return _dcnpgettext( domain, context, single, plural, number );
 }
 
 /**
@@ -164,4 +169,32 @@ export function sprintf( format, ...args ) {
 
 		return format;
 	}
+}
+
+//
+// Deprecated
+//
+
+// TODO: Revert names of internal copies to non-underscore-prefixed, as it is
+// only needed to avoid variable shadowing issues with deprecated version on
+// the exported public interface.
+
+export function getI18n() {
+	deprecated( 'wp.i18n.getI18n', {
+		plugin: 'Gutenberg',
+		version: '4.0',
+		alternative: '`__`, `_x`, `_n`, or `_nx`',
+	} );
+
+	return _getI18n();
+}
+
+export function dcnpgettext( domain, context, single, plural, number ) {
+	deprecated( 'wp.i18n.dcnpgettext', {
+		plugin: 'Gutenberg',
+		version: '4.0',
+		alternative: '`__`, `_x`, `_n`, or `_nx`',
+	} );
+
+	return _dcnpgettext( domain, context, single, plural, number );
 }

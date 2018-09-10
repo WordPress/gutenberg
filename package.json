@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "3.7.0",
+	"version": "3.8.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience",
 	"repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -20,6 +20,7 @@
 		"@wordpress/autop": "file:packages/autop",
 		"@wordpress/blob": "file:packages/blob",
 		"@wordpress/block-library": "file:packages/block-library",
+		"@wordpress/block-serialization-default-parser": "file:packages/block-serialization-default-parser",
 		"@wordpress/block-serialization-spec-parser": "file:packages/block-serialization-spec-parser",
 		"@wordpress/blocks": "file:packages/blocks",
 		"@wordpress/components": "file:packages/components",
@@ -58,7 +59,8 @@
 		"rememo": "3.0.0"
 	},
 	"devDependencies": {
-		"@babel/core": "7.0.0-beta.56",
+		"@babel/core": "7.0.0",
+		"@babel/runtime-corejs2": "7.0.0",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:packages/babel-plugin-import-jsx-pragma",
 		"@wordpress/babel-plugin-makepot": "file:packages/babel-plugin-makepot",
 		"@wordpress/babel-preset-default": "file:packages/babel-preset-default",
@@ -72,7 +74,7 @@
 		"@wordpress/scripts": "file:packages/scripts",
 		"autoprefixer": "8.2.0",
 		"babel-eslint": "8.0.3",
-		"babel-loader": "8.0.0-beta.4",
+		"babel-loader": "8.0.0",
 		"chalk": "2.4.1",
 		"check-node-version": "3.1.1",
 		"codecov": "3.0.2",

@@ -1,11 +1,12 @@
 /**
  * External dependencies
  */
-import { flow } from 'lodash';
+import { flow, map } from 'lodash';
 
 /**
  * WordPress Dependencies
  */
+import { compose } from '@wordpress/compose';
 import { createElement, Component } from '@wordpress/element';
 import { DropZoneProvider, SlotFillProvider } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
@@ -13,6 +14,7 @@ import { withDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
+import { traverse, wrap, urlRewrite, editorWidth } from '../../editor-styles';
 import RichTextProvider from '../rich-text/provider';
 
 class EditorProvider extends Component {
@@ -24,6 +26,28 @@ class EditorProvider extends Component {
 			this.props.updateEditorSettings( props.settings );
 			this.props.setupEditor( props.post, props.settings.autosave );
 		}
+	}
+
+	componentDidMount() {
+		if ( ! this.props.settings.styles ) {
+			return;
+		}
+
+		map( this.props.settings.styles, ( { css, baseURL } ) => {
+			const transforms = [
+				editorWidth,
+				wrap( '.editor-block-list__block', [ '.wp-block' ] ),
+			];
+			if ( baseURL ) {
+				transforms.push( urlRewrite( baseURL ) );
+			}
+			const updatedCSS = traverse( css, compose( transforms ) );
+			if ( updatedCSS ) {
+				const node = document.createElement( 'style' );
+				node.innerHTML = updatedCSS;
+				document.body.appendChild( node );
+			}
+		} );
 	}
 
 	componentDidUpdate( prevProps ) {

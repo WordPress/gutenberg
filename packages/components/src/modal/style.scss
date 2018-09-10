@@ -83,7 +83,7 @@
 
 .components-modal__content {
 	// The height of the content is the height of it's parent, minus the header. after that, the offset was 3px.
-	height: calc(100% - #{ $header-height } - #{ $admin-bar-height });
+	height: 100%;
 	overflow: auto;
 	padding: $panel-padding;
 }

@@ -22,7 +22,6 @@ export function Button( props, ref ) {
 		isDestructive,
 		className,
 		disabled,
-		focus,
 		...additionalProps
 	} = props;
 
@@ -45,7 +44,6 @@ export function Button( props, ref ) {
 		...tagProps,
 		...additionalProps,
 		className: classes,
-		autoFocus: focus,
 		ref,
 	} );
 }

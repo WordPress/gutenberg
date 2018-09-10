@@ -151,7 +151,7 @@ Other features, like the new _wide_ and _full-wide_ alignment options, will simp
 
 ## How will editor styles work?
 
-Themes can provide editor styles for blocks by using the following hook:
+Regular editor styles are opt-in and will work as is in most cases. Themes can also load extra stylesheets by using the following hook:
 
 ```php
 function gutenbergtheme_editor_styles() {
@@ -159,6 +159,8 @@ function gutenbergtheme_editor_styles() {
 }
 add_action( 'enqueue_block_editor_assets', 'gutenbergtheme_editor_styles' );
 ```
+
+*Details:* [Editor Styles](../../docs/extensibility/theme-support.md#editor-styles)
 
 ## Should I be concerned that Gutenberg will make my plugin obsolete?
 

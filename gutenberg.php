@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
- * Version: 3.7.0
+ * Version: 3.8.0-rc.1
  * Author: Gutenberg Team
  *
  * @package gutenberg
@@ -257,6 +257,12 @@ add_action( 'admin_init', 'gutenberg_add_edit_link_filters' );
  * @return array          Updated post actions.
  */
 function gutenberg_add_edit_link( $actions, $post ) {
+	if ( 'wp_block' === $post->post_type ) {
+		unset( $actions['edit'] );
+		unset( $actions['inline hide-if-no-js'] );
+		return $actions;
+	}
+
 	if ( ! gutenberg_can_edit_post( $post ) ) {
 		return $actions;
 	}
@@ -293,15 +299,42 @@ function gutenberg_add_edit_link( $actions, $post ) {
 }
 
 /**
+ * Removes the Edit action from the reusable block list's Bulk Actions dropdown.
+ *
+ * @since 3.8.0
+ *
+ * @param array $actions Bulk actions.
+ *
+ * @return array Updated bulk actions.
+ */
+function gutenberg_block_bulk_actions( $actions ) {
+	unset( $actions['edit'] );
+	return $actions;
+}
+add_filter( 'bulk_actions-edit-wp_block', 'gutenberg_block_bulk_actions' );
+
+/**
  * Prints the JavaScript to replace the default "Add New" button.$_COOKIE
  *
  * @since 1.5.0
  */
 function gutenberg_replace_default_add_new_button() {
 	global $typenow;
+
+	if ( 'wp_block' === $typenow ) {
+		?>
+		<style type="text/css">
+			.page-title-action {
+				display: none;
+			}
+		</style>
+		<?php
+	}
+
 	if ( ! gutenberg_can_edit_post_type( $typenow ) ) {
 		return;
 	}
+
 	?>
 	<style type="text/css">
 		.split-page-title-action {
@@ -435,5 +468,6 @@ add_action( 'admin_print_scripts-edit.php', 'gutenberg_replace_default_add_new_b
  * @return string The $classes string, with gutenberg-editor-page appended.
  */
 function gutenberg_add_admin_body_class( $classes ) {
-	return "$classes gutenberg-editor-page";
+	// Default to is-fullscreen-mode to avoid jumps in the UI.
+	return "$classes gutenberg-editor-page is-fullscreen-mode";
 }

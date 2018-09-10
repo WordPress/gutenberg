@@ -21,10 +21,18 @@
 		position: fixed;
 		padding: $item-spacing;
 		top: $admin-bar-height-big;
+
+		body.is-fullscreen-mode & {
+			top: 0;
+		}
 	}
 
 	@include break-medium() {
 		top: $admin-bar-height;
+
+		body.is-fullscreen-mode & {
+			top: 0;
+		}
 	}
 
 	.editor-post-switch-to-draft + .editor-post-preview {

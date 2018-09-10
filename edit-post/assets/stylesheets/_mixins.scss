@@ -272,6 +272,10 @@
 			margin-left: -18px;
 		}
 	}
+
+	body.is-fullscreen-mode #{$selector} {
+		left: 0 !important;
+	}
 }
 
 /**
@@ -295,6 +299,7 @@
 
 @mixin caption-style() {
 	margin-top: 0.5em;
+	margin-bottom: 1em;
 	color: $dark-gray-300;
 	text-align: center;
 	font-size: $default-font-size;

@@ -43,7 +43,7 @@ registerBlockType( 'mytheme/red-block', {
 	}
 } );
 ```
-
+{% end %}
 
 If you want to learn more about block creation, the [Blocks Tutorial](../docs/blocks.md) is the best place to start.
 
@@ -74,3 +74,9 @@ There are some advanced block features which require opt-in support in the theme
 ## Autocomplete
 
 Autocompleters within blocks may be extended and overridden. See [autocomplete](../docs/extensibility/autocomplete.md).
+
+## Block Parsing and Serialization
+
+Posts in the editor move through a couple of different stages between being stored in `post_content` and appearing in the editor. Since the blocks themselves are data structures that live in memory it takes a parsing and serialization step to transform out from and into the stored format in the database.
+
+Customizing the parser is an advanced topic that you can learn more about in the [Extending the Parser](../docs/extensibility/parser.md) section.
