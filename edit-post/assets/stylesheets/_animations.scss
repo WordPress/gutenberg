@@ -26,8 +26,8 @@
 	animation: slide_in_right 0.1s forwards;
 }
 
-@mixin fade_in($speed: 0.2s) {
-	animation: fade-in $speed ease-out;
+@mixin fade_in($speed: 0.2s, $delay: 0s) {
+	animation: fade-in $speed ease-out $delay;
 	animation-fill-mode: forwards;
 }
 

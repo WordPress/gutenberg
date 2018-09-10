@@ -1,4 +1,9 @@
 /**
+ * Internal dependencies
+ */
+import HeadingToolbar from './heading-toolbar';
+
+/**
  * External dependencies
  */
 import { View } from 'react-native';
@@ -9,6 +14,7 @@ import { View } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { RichText } from '@wordpress/editor';
+import { parse } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -33,14 +39,21 @@ class HeadingEdit extends Component {
 
 		return (
 			<View>
+				<HeadingToolbar minLevel={ 2 } maxLevel={ 5 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
 				<RichText
 					tagName={ tagName }
 					content={ { contentTree: attributes.content, eventCount: attributes.eventCount } }
 					style={ {
 						minHeight: Math.max( minHeight, typeof attributes.aztecHeight === 'undefined' ? 0 : attributes.aztecHeight ),
 					} }
-					onChange={ ( value ) => {
-						setAttributes( value );
+					onChange={ ( event ) => {
+						// Create a React Tree from the new HTML
+						const newParaBlock = parse( `<!-- wp:heading --><${ tagName }>${ event.content }</${ tagName }><!-- /wp:heading -->` )[ 0 ];
+						setAttributes( {
+							...this.props.attributes,
+							content: newParaBlock.attributes.content,
+							eventCount: event.eventCount,
+						} );
 					} }
 					onContentSizeChange={ ( event ) => {
 						setAttributes( { aztecHeight: event.aztecHeight } );

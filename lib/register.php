@@ -462,10 +462,13 @@ function gutenberg_register_post_types() {
 		'wp_block',
 		array(
 			'labels'                => array(
-				'name'          => 'Blocks',
-				'singular_name' => 'Block',
+				'name'          => __( 'Blocks', 'gutenberg' ),
+				'singular_name' => __( 'Block', 'gutenberg' ),
+				'search_items'  => __( 'Search Blocks', 'gutenberg' ),
 			),
 			'public'                => false,
+			'show_ui'               => true,
+			'show_in_menu'          => false,
 			'rewrite'               => false,
 			'show_in_rest'          => true,
 			'rest_base'             => 'blocks',
@@ -476,6 +479,7 @@ function gutenberg_register_post_types() {
 				'create_posts' => 'create_blocks',
 			),
 			'map_meta_cap'          => true,
+			'supports'              => false,
 		)
 	);
 

@@ -146,19 +146,19 @@ class CategoriesEdit extends Component {
 			<InspectorControls>
 				<PanelBody title={ __( 'Categories Settings' ) }>
 					<ToggleControl
-						label={ __( 'Display as dropdown' ) }
+						label={ __( 'Display as Dropdown' ) }
 						checked={ displayAsDropdown }
 						onChange={ this.toggleDisplayAsDropdown }
 					/>
 					<ToggleControl
-						label={ __( 'Show post counts' ) }
-						checked={ showPostCounts }
-						onChange={ this.toggleShowPostCounts }
-					/>
-					<ToggleControl
-						label={ __( 'Show hierarchy' ) }
+						label={ __( 'Show Hierarchy' ) }
 						checked={ showHierarchy }
 						onChange={ this.toggleShowHierarchy }
+					/>
+					<ToggleControl
+						label={ __( 'Show Post Counts' ) }
+						checked={ showPostCounts }
+						onChange={ this.toggleShowPostCounts }
 					/>
 				</PanelBody>
 			</InspectorControls>
@@ -203,10 +203,12 @@ class CategoriesEdit extends Component {
 }
 
 export default withSelect( ( select ) => {
-	const { getCategories, isRequestingCategories } = select( 'core' );
+	const { getEntityRecords } = select( 'core' );
+	const { isResolving } = select( 'core/data' );
+	const query = { per_page: -1 };
 
 	return {
-		categories: getCategories(),
-		isRequesting: isRequestingCategories(),
+		categories: getEntityRecords( 'taxonomy', 'category', query ),
+		isRequesting: isResolving( 'core', 'getEntityRecords', [ 'taxonomy', 'category', query ] ),
 	};
 } )( CategoriesEdit );

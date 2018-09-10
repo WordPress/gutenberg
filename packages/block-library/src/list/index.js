@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, compact, get, initial, last, isEmpty, omit } from 'lodash';
+import { find, compact, get, initial, last, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -79,7 +79,7 @@ export const settings = {
 				blocks: [ 'core/paragraph' ],
 				transform: ( blockAttributes ) => {
 					let items = blockAttributes.map( ( { content } ) => content );
-					const hasItems = ! items.every( isEmpty );
+					const hasItems = ! items.every( RichText.isEmpty );
 
 					// Look for line breaks if converting a single paragraph,
 					// then treat each line as a list item.
@@ -97,10 +97,10 @@ export const settings = {
 				blocks: [ 'core/quote' ],
 				transform: ( { value, citation } ) => {
 					const items = value.map( ( p ) => get( p, [ 'children', 'props', 'children' ] ) );
-					if ( ! isEmpty( citation ) ) {
+					if ( ! RichText.isEmpty( citation ) ) {
 						items.push( citation );
 					}
-					const hasItems = ! items.every( isEmpty );
+					const hasItems = ! items.every( RichText.isEmpty );
 					return createBlock( 'core/list', {
 						values: hasItems ? items.map( ( content, index ) => <li key={ index }>{ content }</li> ) : [],
 					} );
@@ -244,12 +244,12 @@ export const settings = {
 				} );
 			} );
 
-			// this checks for languages that do not typically have square brackets on their keyboards
+			// Check for languages that do not have square brackets on their keyboards.
 			const lang = window.navigator.browserLanguage || window.navigator.language;
-			const keyboardHasSqBracket = ! /^(?:fr|nl|sv|ru|de|es|it)/.test( lang );
+			const keyboardHasSquareBracket = ! /^(?:fr|nl|sv|ru|de|es|it)/.test( lang );
 
-			if ( keyboardHasSqBracket ) {
-				// keycode 219 = '[' and keycode 221 = ']'
+			if ( keyboardHasSquareBracket ) {
+				// `[` is keycode 219; `]` is keycode 221.
 				editor.shortcuts.add( 'meta+219', 'Decrease indent', 'Outdent' );
 				editor.shortcuts.add( 'meta+221', 'Increase indent', 'Indent' );
 			} else {
@@ -265,7 +265,7 @@ export const settings = {
 				const { setAttributes } = this.props;
 				const { internalListType } = this.state;
 				if ( internalListType ) {
-					// only change list types, don't toggle off internal lists
+					// Only change list types, don't toggle off internal lists.
 					if ( internalListType !== type && this.editor ) {
 						this.editor.execCommand( command );
 					}

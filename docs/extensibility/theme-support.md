@@ -45,7 +45,35 @@ Some blocks such as the image block have the possibility to define a "wide" or "
 add_theme_support( 'align-wide' );
 ```
 
-### Block Color Palettes:
+### Wide Alignments and Floats
+
+It can be difficult to create a responsive layout that accommodates wide images, a sidebar, a centered column, and floated elements that stay within that centered column.
+
+Gutenberg adds additional markup to floated images to make styling them easier.
+
+Here's the markup for an `Image` with a caption:
+
+```html
+<figure class="wp-block-image">
+	<img src="..." alt="" width="200px">
+	<figcaption>Short image caption.</figcaption>
+</figure>
+```
+
+Here's the markup for a left-floated image:
+
+```html
+<div class="wp-block-image">
+	<figure class="alignleft">
+		<img src="..." alt="" width="200px">
+		<figcaption>Short image caption.</figcaption>
+	</figure>
+</div>
+```
+
+Here's an example using the above markup to achieve a responsive layout that features a sidebar, wide images, and floated elements with bounded captions: https://codepen.io/joen/pen/zLWvrW.
+
+### Block Color Palettes
 
 Different blocks have the possibility of customizing colors. Gutenberg provides a default palette, but a theme can overwrite it and provide its own:
 
@@ -149,7 +177,20 @@ This flag will make sure users are only able to choose colors from the `editor-c
 
 ## Editor styles
 
-A theme can provide a stylesheet that will change the editor's appearance. You can use this to change colors, fonts, and any other visual aspect of the editor.
+Gutenberg supports the theme's [editor styles](https://codex.wordpress.org/Editor_Style). This support is opt-in because these styles are applied differently from the classic editor.
+
+ - In the classic editor, the stylesheet is applied as is in the iframe of the post content editor.
+ - Since Gutenberg doesn't make use of iFrames, this is not possible. Instead Gutenberg wrap all the provided styles with `.editor-block-list__block` to avoid leaking styles outside the editor's content area.
+
+This technique should allow the editor styles to work properly in both editors in most cases.
+
+Enabling editor styles support is done using:
+
+```php
+add_theme_support( 'editor-styles' );
+```
+
+Alternatively, a theme can provide a stylesheet that will change the editor's appearance entirely. You can use this to change colors, fonts, and any other visual aspect of the editor.
 
 ### Add the stylesheet
 
@@ -167,6 +208,15 @@ function mytheme_block_editor_styles() {
 
 add_action( 'enqueue_block_editor_assets', 'mytheme_block_editor_styles' );
 ```
+
+If your editor style relies on a dark background, you can add the following to adjust the color of the UI to work on dark backgrounds:
+
+```php
+add_theme_support( 'editor-styles' );
+add_theme_support( 'dark-editor-style' );
+```
+
+Note you don't need to add `add_theme_support( 'editor-styles' );` twice, but that rule does need to be present for the `dark-editor-style` rule to work.
 
 ### Basic colors
 

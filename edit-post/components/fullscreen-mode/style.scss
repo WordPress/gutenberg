@@ -1,0 +1,17 @@
+body.is-fullscreen-mode {
+	// Reset the html.wp-topbar padding
+	margin-top: -$admin-bar-height-big;
+	@include break-medium() {
+		margin-top: -$admin-bar-height;
+	}
+
+	#adminmenumain,
+	#wpadminbar {
+		display: none;
+	}
+
+	#wpcontent,
+	#wpfooter {
+		margin-left: 0;
+	}
+}

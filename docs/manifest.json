@@ -32,7 +32,7 @@
 	{
 		"title": "RichText API",
 		"slug": "rich-text-api",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/editor/components/rich-text/README.md",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/editor/src/components/rich-text/README.md",
 		"parent": "block-api"
 	},
 	{
@@ -288,6 +288,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/block-serialization-default-parser",
+		"slug": "packages-block-serialization-default-parser",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/block-serialization-default-parser/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/block-serialization-spec-parser",
 		"slug": "packages-block-serialization-spec-parser",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/block-serialization-spec-parser/README.md",
@@ -496,6 +502,12 @@
 		"slug": "components",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components.md",
 		"parent": null
+	},
+	{
+		"title": "AccessibleSvg",
+		"slug": "accessible-svg",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/accessible-svg/README.md",
+		"parent": "components"
 	},
 	{
 		"title": "Autocomplete",

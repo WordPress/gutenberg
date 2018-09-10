@@ -28,7 +28,7 @@ export const settings = {
 		from: [
 			{
 				type: 'block',
-				blocks: [ 'core/paragraph' ],
+				blocks: [ 'core/code', 'core/paragraph' ],
 				transform: ( attributes ) =>
 					createBlock( 'core/preformatted', attributes ),
 			},
