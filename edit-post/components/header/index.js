@@ -6,7 +6,6 @@ import { IconButton } from '@wordpress/components';
 import {
 	PostPreviewButton,
 	PostSavedState,
-	PostPublishPanelToggle,
 } from '@wordpress/editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -19,6 +18,7 @@ import './style.scss';
 import MoreMenu from './more-menu';
 import HeaderToolbar from './header-toolbar';
 import PinnedPlugins from './pinned-plugins';
+import PublishButton from './publish-button';
 import shortcuts from '../../keyboard-shortcuts';
 
 function Header( {
@@ -26,6 +26,7 @@ function Header( {
 	openGeneralSidebar,
 	closeGeneralSidebar,
 	isPublishSidebarOpened,
+	isPublishSidebarEnabled,
 	togglePublishSidebar,
 	hasActiveMetaboxes,
 	isSaving,
@@ -48,8 +49,9 @@ function Header( {
 						forceIsSaving={ isSaving }
 					/>
 					<PostPreviewButton />
-					<PostPublishPanelToggle
-						isOpen={ isPublishSidebarOpened }
+					<PublishButton
+						isSidebarOpen={ isPublishSidebarOpened }
+						isSidebarEnabled={ isPublishSidebarEnabled }
 						onToggle={ togglePublishSidebar }
 						forceIsDirty={ hasActiveMetaboxes }
 						forceIsSaving={ isSaving }
@@ -79,6 +81,7 @@ export default compose(
 	withSelect( ( select ) => ( {
 		isEditorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
 		isPublishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
+		isPublishSidebarEnabled: select( 'core/edit-post' ).isPublishSidebarEnabled(),
 		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 		hasBlockSelection: !! select( 'core/editor' ).getBlockSelectionStart(),
