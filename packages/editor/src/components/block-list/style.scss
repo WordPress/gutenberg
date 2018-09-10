@@ -126,7 +126,7 @@
 		padding-right: $block-container-side-padding;
 	}
 
-	// Don't add side padding for nested blocks, and compensate for block padding
+	// Don't add side padding for nested blocks.
 	.editor-block-list__block & {
 		// Compensate for side UI.
 		padding-left: 0;
@@ -135,24 +135,19 @@
 		// Compensate for block padding horizontally.
 		margin-left: -$block-padding;
 		margin-right: -$block-padding;
-
-		// Compensate for block padding.
-		margin-top: -$block-padding;
-		margin-bottom: -$block-padding;
 	}
 
 	// Adjust the spacing of the appender, or the first block, to sit near the title.
-	.editor-default-block-appender .editor-default-block-appender__content,
-	.editor-block-list__block:first-child .editor-block-list__block-edit {
+	> .editor-default-block-appender > .editor-default-block-appender__content,
+	> .editor-block-list__block:first-child > .editor-block-list__block-edit {
 		margin-top: $block-padding - $block-spacing / 2;
 	}
 
 	// Space every block, and the default appender, using margins.
 	// This allows margins to collapse, which gives a better representation of how it looks on the frontend.
-	.editor-default-block-appender__content,
-	.editor-block-list__block .editor-block-list__block-edit,
-	.editor-block-list__layout .editor-block-list__block .editor-block-list__block-edit,
-	.editor-block-list__layout .editor-default-block-appender .editor-default-block-appender__content { // Explicitly target nested blocks, as those need to override the preceding rule.
+	> .editor-default-block-appender__content,
+	> .editor-block-list__block > .editor-block-list__block-edit,
+	> .editor-block-list__layout > .editor-block-list__block > .editor-block-list__block-edit {
 		margin-top: $block-padding * 2 + $block-spacing;
 		margin-bottom: $block-padding * 2 + $block-spacing;
 	}
