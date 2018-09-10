@@ -70,10 +70,19 @@ export const fetchReusableBlocks = async ( action, store ) => {
 		const reusableBlockOrBlocks = await result;
 		dispatch( receiveReusableBlocksAction( map(
 			castArray( reusableBlockOrBlocks ),
-			( reusableBlock ) => ( {
-				reusableBlock,
-				parsedBlock: parse( reusableBlock.content )[ 0 ],
-			} )
+			( reusableBlock ) => {
+				const parsedBlocks = parse( reusableBlock.content );
+				if ( parsedBlocks.length === 1 ) {
+					return {
+						reusableBlock,
+						parsedBlock: parsedBlocks[ 0 ],
+					};
+				}
+				return {
+					reusableBlock,
+					parsedBlock: createBlock( 'core/template', {}, parsedBlocks ),
+				};
+			}
 		) ) );
 
 		dispatch( {
@@ -107,8 +116,8 @@ export const saveReusableBlocks = async ( action, store ) => {
 	const { dispatch } = store;
 	const state = store.getState();
 	const { clientId, title, isTemporary } = getReusableBlock( state, id );
-	const { name, attributes, innerBlocks } = getBlock( state, clientId );
-	const content = serialize( createBlock( name, attributes, innerBlocks ) );
+	const reusableBlock = getBlock( state, clientId );
+	const content = serialize( reusableBlock.name === 'core/template' ? reusableBlock.innerBlocks : reusableBlock );
 
 	const data = isTemporary ? { title, content } : { id, title, content };
 	const path = isTemporary ? `/wp/v2/${ postType.rest_base }` : `/wp/v2/${ postType.rest_base }/${ id }`;
