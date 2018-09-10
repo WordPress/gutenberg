@@ -79,8 +79,6 @@ class Sandbox extends Component {
 		const observeAndResizeJS = `
 			( function() {
 				var observer;
-				var aspectRatio = false;
-				var iframe = false;
 
 				if ( ! window.MutationObserver || ! document.body || ! window.parent ) {
 					return;
@@ -88,22 +86,11 @@ class Sandbox extends Component {
 
 				function sendResize() {
 					var clientBoundingRect = document.body.getBoundingClientRect();
-					var height = aspectRatio ? Math.ceil( clientBoundingRect.width / aspectRatio ) : clientBoundingRect.height;
-
-					if ( iframe && aspectRatio ) {
-						// This is embedded content delivered in an iframe with a fixed aspect ratio,
-						// so set the height correctly and stop processing. The DOM mutation will trigger
-						// another event and the resize message will get posted.
-						if ( iframe.height != height ) {
-							iframe.height = height;
-							return;
-						}
-					}
 
 					window.parent.postMessage( {
 						action: 'resize',
 						width: clientBoundingRect.width,
-						height: height,
+						height: clientBoundingRect.height,
 					}, '*' );
 				}
 
@@ -139,20 +126,6 @@ class Sandbox extends Component {
 				document.body.style.width = '100%';
 				document.body.setAttribute( 'data-resizable-iframe-connected', '' );
 
-				// Make embedded content in an iframe with a fixed size responsive,
-				// keeping the correct aspect ratio.
-				var potentialIframe = document.body.children[0];
-				if ( 'DIV' === potentialIframe.tagName || 'SPAN' === potentialIframe.tagName ) {
-					potentialIframe = potentialIframe.children[0];
-				}
-				if ( potentialIframe && 'IFRAME' === potentialIframe.tagName ) {
-					if ( potentialIframe.width ) {
-						iframe = potentialIframe;
-						aspectRatio = potentialIframe.width / potentialIframe.height;
-						potentialIframe.width = '100%';
-					}
-				}
-
 				sendResize();
 
 				// Resize events can change the width of elements with 100% width, but we don't
@@ -164,8 +137,17 @@ class Sandbox extends Component {
 			body {
 				margin: 0;
 			}
+			html,
+			body,
+			body > div,
 			body > div > iframe {
 				width: 100%;
+			}
+			html.wp-has-aspect-ratio,
+			body.wp-has-aspect-ratio,
+			body.wp-has-aspect-ratio > div,
+			body.wp-has-aspect-ratio > div > iframe {
+				height: 100%;
 			}
 			body > div > * {
 				margin-top: 0 !important;	/* has to have !important to override inline styles */
@@ -176,7 +158,7 @@ class Sandbox extends Component {
 		// put the html snippet into a html document, and then write it to the iframe's document
 		// we can use this in the future to inject custom styles or scripts
 		const htmlDoc = (
-			<html lang={ document.documentElement.lang }>
+			<html lang={ document.documentElement.lang } className={ this.props.type }>
 				<head>
 					<title>{ this.props.title }</title>
 					<style dangerouslySetInnerHTML={ { __html: style } } />
