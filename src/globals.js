@@ -1,4 +1,5 @@
-/** @format */
+/** @flow
+ * @format */
 
 import { createElement } from '@wordpress/element';
 import jsdom from 'jsdom-jscore';

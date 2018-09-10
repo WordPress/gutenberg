@@ -4,10 +4,18 @@
  */
 
 import ActionTypes from './ActionTypes';
+import type { BlockType } from '../';
 
 export type BlockActionType = string => {
 	type: $Values<typeof ActionTypes.BLOCK>,
 	clientId: string,
+};
+
+export type CreateActionType = ( string, BlockType, string ) => {
+	type: $Values<typeof ActionTypes.BLOCK>,
+	clientId: string,
+	block: BlockType,
+	clientIdAbove: string,
 };
 
 export type ParseActionType = string => {
@@ -23,27 +31,34 @@ export function updateBlockAttributes( clientId: string, attributes: mixed ) {
 	};
 }
 
-export const focusBlockAction: BlockActionType = clientId => ( {
+export const focusBlockAction: BlockActionType = ( clientId ) => ( {
 	type: ActionTypes.BLOCK.FOCUS,
 	clientId,
 } );
 
-export const moveBlockUpAction: BlockActionType = clientId => ( {
+export const moveBlockUpAction: BlockActionType = ( clientId ) => ( {
 	type: ActionTypes.BLOCK.MOVE_UP,
 	clientId,
 } );
 
-export const moveBlockDownAction: BlockActionType = clientId => ( {
+export const moveBlockDownAction: BlockActionType = ( clientId ) => ( {
 	type: ActionTypes.BLOCK.MOVE_DOWN,
 	clientId,
 } );
 
-export const deleteBlockAction: BlockActionType = clientId => ( {
+export const deleteBlockAction: BlockActionType = ( clientId ) => ( {
 	type: ActionTypes.BLOCK.DELETE,
 	clientId,
 } );
 
-export const parseBlocksAction: ParseActionType = html => ( {
+export const createBlockAction: CreateActionType = ( clientId, block, clientIdAbove ) => ( {
+	type: ActionTypes.BLOCK.CREATE,
+	clientId,
+	block: block,
+	clientIdAbove,
+} );
+
+export const parseBlocksAction: ParseActionType = ( html ) => ( {
 	type: ActionTypes.BLOCK.PARSE,
 	html,
 } );

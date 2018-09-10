@@ -1,7 +1,7 @@
 /**
- * @format
- * @flow
- */
+* @format
+* @flow
+*/
 
 import React from 'react';
 import { View, Text, TouchableWithoutFeedback } from 'react-native';
@@ -12,13 +12,15 @@ import type { BlockType } from '../store/';
 import styles from './block-holder.scss';
 
 // Gutenberg imports
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockType, getUnknownTypeHandlerName } from '@wordpress/blocks';
 
 type PropsType = BlockType & {
+	showTitle: boolean,
 	onChange: ( clientId: string, attributes: mixed ) => void,
 	onToolbarButtonPressed: ( button: number, clientId: string ) => void,
 	onBlockHolderPressed: ( clientId: string ) => void,
 };
+
 type StateType = {
 	selected: boolean,
 	focused: boolean,
@@ -36,7 +38,10 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 	renderToolbarIfBlockFocused() {
 		if ( this.props.focused ) {
 			return (
-				<Toolbar clientId={ this.props.clientId } onButtonPressed={ this.props.onToolbarButtonPressed } />
+				<Toolbar
+					clientId={ this.props.clientId }
+					onButtonPressed={ this.props.onToolbarButtonPressed }
+				/>
 			);
 		}
 
@@ -45,31 +50,48 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 	}
 
 	getBlockForType() {
+		// Since unsupported blocks are handled in block-manager.js, at this point the block should definitely
+		// be supported.
 		const blockType = getBlockType( this.props.name );
-		if ( blockType ) {
-			const Block = blockType.edit;
+		const Block = blockType.edit;
 
-			let style;
-			if ( blockType.name === 'core/code' ) {
-				style = styles.block_code;
-			} else if ( blockType.name === 'core/paragraph' ) {
-				style = styles[ 'aztec_editor' ];
-			}
-
-			// TODO: setAttributes needs to change the state/attributes
-			return (
-				<Block
-					attributes={ { ...this.props.attributes } }
-					// pass a curried version of onChanged with just one argument
-					setAttributes={ ( attrs ) => this.props.onChange( this.props.clientId, { ...this.props.attributes, ...attrs } ) }
-					isSelected={ this.props.focused }
-					style={ style }
-				/>
-			);
+		let style;
+		if ( blockType.name === 'core/code' ) {
+			style = styles.blockCode;
+		} else if ( blockType.name === 'core/paragraph' ) {
+			style = styles.blockText;
 		}
 
-		// Default block placeholder
-		return <Text>{ this.props.attributes.content }</Text>;
+		return (
+			<Block
+				attributes={ { ...this.props.attributes } }
+				// pass a curried version of onChanged with just one argument
+				setAttributes={ ( attrs ) =>
+					this.props.onChange( this.props.clientId, { ...this.props.attributes, ...attrs } )
+				}
+				isSelected={ this.props.focused }
+				style={ style }
+			/>
+		);
+	}
+
+	getBlockType( blockName: String ) {
+		let blockType = getBlockType( blockName );
+
+		if ( ! blockType ) {
+			const fallbackBlockName = getUnknownTypeHandlerName();
+			blockType = getBlockType( fallbackBlockName );
+		}
+
+		return blockType;
+	}
+
+	renderBlockTitle() {
+		return (
+			<View style={ styles.blockTitle }>
+				<Text>BlockType: { this.props.name }</Text>
+			</View>
+		);
 	}
 
 	render() {
@@ -78,9 +100,7 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 				onPress={ this.props.onBlockHolderPressed.bind( this, this.props.clientId ) }
 			>
 				<View style={ styles.blockHolder }>
-					<View style={ styles.blockTitle }>
-						<Text>BlockType: { this.props.name }</Text>
-					</View>
+					{ this.props.showTitle && this.renderBlockTitle() }
 					<View style={ styles.blockContainer }>{ this.getBlockForType.bind( this )() }</View>
 					{ this.renderToolbarIfBlockFocused.bind( this )() }
 				</View>

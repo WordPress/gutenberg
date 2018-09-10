@@ -1,4 +1,5 @@
-/** @format */
+/** @flow
+ * @format */
 
 const defaultPlatform = 'android';
 const rnPlatform = process.env.TEST_RN_PLATFORM || defaultPlatform;
@@ -11,6 +12,7 @@ if ( process.env.TEST_RN_PLATFORM ) {
 }
 
 module.exports = {
+	verbose: true,
 	preset: 'jest-react-native',
 	testEnvironment: 'jsdom',
 	testPathIgnorePatterns: [ '/node_modules/', '/gutenberg/' ],
@@ -30,8 +32,7 @@ module.exports = {
 		'node',
 	],
 	moduleNameMapper: {
-		'@wordpress\\/(blocks|data|element|deprecated|editor|redux-routine)$': '<rootDir>/gutenberg/packages/$1/src/index',
-		'@gutenberg': '<rootDir>/gutenberg',
+		'@wordpress\\/(blocks|data|element|deprecated|editor|redux-routine|block-library|components|keycodes|url|a11y|viewport|core-data|api-fetch|nux)$': '<rootDir>/gutenberg/packages/$1/src/index',
 
 		// Mock the CSS modules. See https://facebook.github.io/jest/docs/en/webpack.html#handling-static-assets
 		'\\.(scss)$': '<rootDir>/__mocks__/styleMock.js',
@@ -39,6 +40,6 @@ module.exports = {
 	haste: {
 		defaultPlatform: rnPlatform,
 		platforms: [ 'android', 'ios', 'native' ],
-		providesModuleNodeModules: [ 'react-native' ],
+		providesModuleNodeModules: [ 'react-native', 'react-native-svg' ],
 	},
 };

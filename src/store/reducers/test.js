@@ -2,9 +2,11 @@
  * @format
  */
 
+import '../../globals';
+
 import { reducer } from './';
 import * as actions from '../actions/';
-import { registerCoreBlocks } from '@gutenberg/core-blocks';
+import { registerCoreBlocks } from '@wordpress/block-library';
 
 describe( 'Store', () => {
 	describe( 'reducer', () => {
@@ -13,8 +15,8 @@ describe( 'Store', () => {
 		let initialState;
 
 		beforeAll( () => {
-			registerCoreBlocks()
-			
+			registerCoreBlocks();
+
 			__iniState = {
 				blocks: [
 					{
@@ -161,14 +163,14 @@ describe( 'Store', () => {
 		} );
 
 		it( 'parses the html string into a new array of blocks', () => {
-			const htmlContent = '<!--more-->'
-			const html = '<!-- wp:more -->' + htmlContent + '<!-- /wp:more -->'
+			const htmlContent = '<!--more-->';
+			const html = '<!-- wp:more -->' + htmlContent + '<!-- /wp:more -->';
 
 			const newState = reducer( initialState, actions.parseBlocksAction( html ) );
 
 			expect( newState.blocks ).toHaveLength( 1 );
 			expect( newState.blocks[ 0 ].originalContent ).toEqual( htmlContent );
 			expect( newState.blocks[ 0 ].name ).toEqual( 'core/more' );
-		})
+		} );
 	} );
 } );

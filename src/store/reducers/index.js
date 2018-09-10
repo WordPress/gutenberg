@@ -11,15 +11,24 @@ import type { BlockActionType } from '../actions';
 import { parse } from '@wordpress/blocks';
 
 function findBlock( blocks, clientId: string ) {
-	return find( blocks, obj => {
+	return find( blocks, ( obj ) => {
 		return obj.clientId === clientId;
 	} );
 }
 
 function findBlockIndex( blocks, clientId: string ) {
-	return findIndex( blocks, obj => {
+	return findIndex( blocks, ( obj ) => {
 		return obj.clientId === clientId;
 	} );
+}
+
+/*
+ * insert block into blocks[], below / after block having clientIdAbove
+*/
+function insertBlock( blocks, block, clientIdAbove ) {
+	// TODO we need to set focused: true and search for the currently focused block and
+	// set that one to `focused: false`.
+	blocks.splice( findBlockIndex( blocks, clientIdAbove ) + 1, 0, block );
 }
 
 export const reducer = (
@@ -109,9 +118,15 @@ export const reducer = (
 			blocks.splice( index, 1 );
 			return { blocks: blocks, refresh: ! state.refresh };
 		}
+		case ActionTypes.BLOCK.CREATE: {
+			// TODO we need to set focused: true and search for the currently focused block and
+			// set that one to `focused: false`.
+			insertBlock( blocks, action.block, action.clientIdAbove );
+			return { blocks: blocks, refresh: ! state.refresh };
+		}
 		case ActionTypes.BLOCK.PARSE: {
-			const parsed = parse(action.html)
-			return { blocks: parsed, refresh: state.refresh };
+			const parsed = parse( action.html );
+			return { blocks: parsed, refresh: ! state.refresh, fullparse: true };
 		}
 		default:
 			return state;

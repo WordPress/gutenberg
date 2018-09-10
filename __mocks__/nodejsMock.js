@@ -1,3 +1,4 @@
-/** @format */
+/** @flow
+ * @format */
 
 module.exports = {};
