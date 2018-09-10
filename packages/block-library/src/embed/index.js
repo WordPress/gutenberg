@@ -694,6 +694,7 @@ export const others = [
 		patterns: [ /^https?:\/\/(www\.)?smugmug\.com\/.+/i ],
 	},
 	{
+		// Deprecated in favour of the core-embed/speaker-deck block.
 		name: 'core-embed/speaker',
 		settings: getEmbedBlockSettings( {
 			title: 'Speaker',
@@ -701,6 +702,14 @@ export const others = [
 			supports: {
 				inserter: false,
 			},
+		} ),
+		patterns: [],
+	},
+	{
+		name: 'core-embed/speaker-deck',
+		settings: getEmbedBlockSettings( {
+			title: 'Speaker Deck',
+			icon: embedContentIcon,
 			transform: [ {
 				type: 'block',
 				blocks: [ 'core-embed/speaker' ],
@@ -710,14 +719,6 @@ export const others = [
 					} );
 				},
 			} ],
-		} ),
-		patterns: [ /^https?:\/\/(www\.)?speakerdeck\.com\/.+/i ],
-	},
-	{
-		name: 'core-embed/speaker-deck',
-		settings: getEmbedBlockSettings( {
-			title: 'Speaker Deck',
-			icon: embedContentIcon,
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?speakerdeck\.com\/.+/i ],
 	},
