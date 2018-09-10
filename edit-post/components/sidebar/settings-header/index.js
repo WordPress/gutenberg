@@ -32,7 +32,11 @@ const SettingsHeader = ( { count, openDocumentSettings, openBlockSettings, sideb
 				className={ `edit-post-sidebar__panel-tab ${ sidebarName === 'edit-post/block' ? 'is-active' : '' }` }
 				aria-label={ __( 'Block settings' ) }
 			>
-				{ 1 === count ? __( 'Block' ) : sprintf( _n( '%d Block', '%d Blocks', count ), count ) }
+				{ (
+					1 === count ?
+						__( 'Block' ) :
+						sprintf( _n( '%d Block', '%d Blocks', count ), count )
+				) }
 			</button>
 		</SidebarHeader>
 	);
