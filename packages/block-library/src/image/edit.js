@@ -45,7 +45,7 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { ImageSize, getEditorWidth, getPercentWidth } from './image-size';
+import ImageSize, { getEditorWidth, getPercentWidth } from './image-size';
 
 /**
  * Module constants
@@ -127,7 +127,7 @@ class ImageEdit extends Component {
 		let percentWidth = 100;
 		let sizesWidth = editorWidth;
 
-		/* jshint ignore:start */
+		/* eslint-disable no-lonely-if */
 		if ( media.sizes ) {
 			// The "full" size is included in `sizes`.
 			img = media.sizes.large || media.sizes.full;
@@ -147,7 +147,7 @@ class ImageEdit extends Component {
 				percentWidth = getPercentWidth( media.width );
 			}
 		}
-		/* jshint ignore:end */
+		/* eslint-enable no-lonely-if */
 
 		this.props.setAttributes( {
 			...pick( media, [ 'alt', 'id', 'caption' ] ),
@@ -294,17 +294,15 @@ class ImageEdit extends Component {
 		];
 	}
 
-	/* jshint ignore:start */
 	/**
 	 * Helper function to test if aspect ratios for two images match.
 	 *
-	 * @param int fullWidth  Width of the image in pixels.
-	 * @param int fullHeight Height of the image in pixels.
-	 * @param int targetWidth  Width of the smaller image in pixels.
-	 * @param int targetHeight Height of the smaller image in pixels.
-	 * @return bool True if aspect ratios match within 1px. False if not.
+	 * @param {number} fullWidth  Width of the image in pixels.
+	 * @param {number} fullHeight Height of the image in pixels.
+	 * @param {number} targetWidth  Width of the smaller image in pixels.
+	 * @param {number} targetHeight Height of the smaller image in pixels.
+	 * @return {boolean} True if aspect ratios match within 1px. False if not.
 	 */
-	/* jshint ignore:end */
 	imageMatchesRatio( fullWidth, fullHeight, targetWidth, targetHeight ) {
 		if ( ! fullWidth || ! fullHeight || ! targetWidth || ! targetHeight ) {
 			return false;
@@ -321,7 +319,7 @@ class ImageEdit extends Component {
 
 		// Very small dimensions may result in 0, 1 should be the minimum.
 		let width = Math.max( 1, round( fullWidth * ratio ) );
-		let height = Math.max( 1, round( fullHeight * ratio ) ); // jshint ignore:line
+		let height = Math.max( 1, round( fullHeight * ratio ) ); // eslint-disable-line prefer-const
 
 		// Sometimes, due to rounding, we'll end up with a result like this: 465x700 in a 177x177 box is 117x176... a pixel short.
 		if ( width === targetWidth - 1 ) {
@@ -344,7 +342,7 @@ class ImageEdit extends Component {
 		const fullWidth = sizes.full.width;
 		const fullHeight = sizes.full.height;
 		let name;
-		let showSizes = { // jshint ignore:line
+		let showSizes = { // eslint-disable-line prefer-const
 			default: sizes.large || sizes.full,
 			// Always show the thumbnail size.
 			thumbnail: sizes.thumbnail,
