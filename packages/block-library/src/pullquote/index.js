@@ -103,6 +103,19 @@ export const settings = {
 	deprecated: [ {
 		attributes: {
 			...blockAttributes,
+		},
+		save( { attributes } ) {
+			const { value, citation } = attributes;
+			return (
+				<blockquote>
+					<RichText.Content value={ toRichTextValue( value ) } />
+					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
+				</blockquote>
+			);
+		},
+	}, {
+		attributes: {
+			...blockAttributes,
 			citation: {
 				type: 'array',
 				source: 'children',
