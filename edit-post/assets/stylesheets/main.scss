@@ -96,8 +96,8 @@ body.gutenberg-editor-page {
 }
 
 .gutenberg__editor {
-	// on mobile the main content area has to scroll
-	// otherwise you can invoke the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻
+	// On mobile the main content area has to scroll, otherwise you can invoke
+	// the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻.
 	@include break-small {
 		position: absolute;
 		top: 0;
@@ -111,13 +111,44 @@ body.gutenberg-editor-page {
 		}
 	}
 
-	// The WP header height changes at this breakpoint
+	// The WP header height changes at this breakpoint.
 	@include break-medium {
 		min-height: calc(100vh - #{ $admin-bar-height });
 
 		body.is-fullscreen-mode & {
 			min-height: 100vh;
 		}
+	}
+
+	.components-navigate-regions {
+		height: 100%;
+	}
+}
+
+/**
+ * Vanilla editor styles
+ */
+
+.gutenberg__editor {
+
+	// Gutenberg specific elements
+	.editor-default-block-appender__content,
+	.components-placeholder {
+		margin-top: $default-block-margin;
+		margin-bottom: $default-block-margin;
+	}
+
+	// Core blocks
+	[ class*="wp-block-" ] {
+		margin-top: $default-block-margin;
+		margin-bottom: $default-block-margin;
+	}
+
+	p,
+	ul,
+	ol {
+		margin-top: $default-block-margin;
+		margin-bottom: $default-block-margin;
 	}
 
 	img {
@@ -127,10 +158,6 @@ body.gutenberg-editor-page {
 
 	iframe {
 		width: 100%;
-	}
-
-	.components-navigate-regions {
-		height: 100%;
 	}
 }
 
