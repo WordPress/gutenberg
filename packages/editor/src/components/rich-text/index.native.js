@@ -39,8 +39,6 @@ export class RichText extends Component {
 			formats: {},
 			selectedNodeId: 0,
 		};
-
-		this.lastEventCount = 0;
 	}
 
 	onActiveFormatsChange( formats ) {
@@ -76,7 +74,6 @@ export class RichText extends Component {
 		this.currentTimer = setTimeout( function() {
 			this.props.onChange( {
 				content: this.lastContent,
-				eventCount: this.lastEventCount,
 			} );
 		}.bind( this ), 1000 );
 	}
@@ -96,11 +93,13 @@ export class RichText extends Component {
 
 	shouldComponentUpdate( nextProps ) {
 		// The check below allows us to avoid updating the content right after an `onChange` call
+		if ( nextProps.content.forceUpdate ) {
+			return true;
+		}
+		// first time the component is drawn with empty content `lastContent` is undefined
 		if ( nextProps.content.contentTree &&
-			nextProps.content.eventCount &&
-			this.lastContent && // first time the component is drawn with empty content `lastContent` is undefined
-			this.lastEventCount &&
-			nextProps.content.contentTree.eventCount !== this.lastEventCount ) {
+			this.lastContent && 
+			this.lastEventCount ) {
 			return false;
 		}
 
@@ -157,7 +156,7 @@ export class RichText extends Component {
 
 		// Save back to HTML from React tree
 		const html = '<' + tagName + '>' + renderToString( this.props.content.contentTree ) + '</' + tagName + '>';
-		const eventCount = this.props.content.eventCount;
+		const eventCount = this.lastEventCount;
 
 		return (
 			<View>
