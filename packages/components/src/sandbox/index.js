@@ -172,7 +172,6 @@ class Sandbox extends Component {
 				margin-bottom: 0 !important;
 			}
 		`;
-
 		// put the html snippet into a html document, and then write it to the iframe's document
 		// we can use this in the future to inject custom styles or scripts
 		const htmlDoc = (
@@ -180,6 +179,9 @@ class Sandbox extends Component {
 				<head>
 					<title>{ this.props.title }</title>
 					<style dangerouslySetInnerHTML={ { __html: style } } />
+					{ ( this.props.scripts ? this.props.scripts.map(
+						( src ) => <script key={ src } src={ src } />
+					) : null ) }
 				</head>
 				<body data-resizable-iframe-connected="data-resizable-iframe-connected" className={ this.props.type }>
 					<div dangerouslySetInnerHTML={ { __html: this.props.html } } />

@@ -214,6 +214,7 @@ export function getEmbedEdit( title, icon ) {
 			}
 
 			const html = 'photo' === type ? this.getPhotoHtml( preview ) : preview.html;
+			const { scripts } = preview;
 			const parsedUrl = parse( url );
 			const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedUrl.host.replace( /^www\./, '' ) );
 			// translators: %s: host providing embed content e.g: www.youtube.com
@@ -227,6 +228,7 @@ export function getEmbedEdit( title, icon ) {
 				<div className="wp-block-embed__wrapper">
 					<SandBox
 						html={ html }
+						scripts={ scripts }
 						title={ iframeTitle }
 						type={ type }
 					/>
