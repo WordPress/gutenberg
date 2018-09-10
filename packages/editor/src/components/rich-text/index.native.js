@@ -98,7 +98,7 @@ export class RichText extends Component {
 		}
 		// first time the component is drawn with empty content `lastContent` is undefined
 		if ( nextProps.content.contentTree &&
-			this.lastContent && 
+			this.lastContent &&
 			this.lastEventCount ) {
 			return false;
 		}
