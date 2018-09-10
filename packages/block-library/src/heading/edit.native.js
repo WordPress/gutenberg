@@ -48,7 +48,7 @@ class HeadingEdit extends Component {
 					} }
 					onChange={ ( event ) => {
 						// Create a React Tree from the new HTML
-						const newParaBlock = parse( `<!-- wp:heading --><${ tagName }>${ event.content }</${ tagName }><!-- /wp:heading -->` )[ 0 ];
+						const newParaBlock = parse( `<!-- wp:heading {"level":${ level }} --><${ tagName }>${ event.content }</${ tagName }><!-- /wp:heading -->` )[ 0 ];
 						setAttributes( {
 							...this.props.attributes,
 							content: newParaBlock.attributes.content,
