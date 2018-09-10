@@ -3,7 +3,8 @@
 	flex-wrap: wrap;
 	list-style-type: none;
 	padding: 0;
-	// allow gallery items to go edge to edge
+
+	// Allow gallery items to go edge to edge.
 	margin: 0 -8px 0 -8px;
 
 	.blocks-gallery-image,
@@ -19,7 +20,7 @@
 			margin: 0;
 			height: 100%;
 			display: flex;
-			align-items: flex-end;
+			align-items: center;
 		}
 
 		img {
@@ -50,11 +51,16 @@
 	&.is-cropped .blocks-gallery-item {
 		a,
 		img {
-			flex: 1;
+			// IE11 doesn't support object-fit, so just make sure images aren't skewed.
+			// The following rules are for all browsers.
 			width: 100%;
-			height: 100%;
-			object-fit: cover;
 
+			// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
+			@supports (position: sticky) {
+				height: 100%;
+				flex: 1;
+				object-fit: cover;
+			}
 		}
 	}
 
