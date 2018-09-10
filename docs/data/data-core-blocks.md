@@ -2,6 +2,14 @@
 
 ## Selectors
 
+### getBlockTypes
+
+Returns all the available block types.
+
+*Parameters*
+
+ * state: Data state.
+
 ### getBlockType
 
 Returns a block type by name.
@@ -10,6 +18,10 @@ Returns a block type by name.
 
  * state: Data state.
  * name: Block type name.
+
+*Returns*
+
+Block Type.
 
 ### getCategories
 
@@ -46,6 +58,32 @@ Returns the name of the fallback block name.
 *Returns*
 
 Fallback block name.
+
+### getChildBlockNames
+
+Returns an array with the child blocks of a given block.
+
+*Parameters*
+
+ * state: Data state.
+ * blockName: Block type name.
+
+*Returns*
+
+Array of child block names.
+
+### hasChildBlocks
+
+Returns a boolean indicating if a block has child blocks or not.
+
+*Parameters*
+
+ * state: Data state.
+ * blockName: Block type name.
+
+*Returns*
+
+True if a block contains child blocks and false otherwise.
 
 ## Actions
 
