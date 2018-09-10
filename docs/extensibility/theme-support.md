@@ -209,6 +209,15 @@ function mytheme_block_editor_styles() {
 add_action( 'enqueue_block_editor_assets', 'mytheme_block_editor_styles' );
 ```
 
+If your editor style relies on a dark background, you can add the following to adjust the color of the UI to work on dark backgrounds:
+
+```php
+add_theme_support( 'editor-styles' );
+add_theme_support( 'dark-editor-style' );
+```
+
+Note you don't need to add `add_theme_support( 'editor-styles' );` twice, but that rule does need to be present for the `dark-editor-style` rule to work.
+
 ### Basic colors
 
 You can style the editor like any other webpage. Here's how to change the background color and the font color to blue:
