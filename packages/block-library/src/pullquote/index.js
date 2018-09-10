@@ -70,7 +70,6 @@ export const settings = {
 				/>
 				{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 					<RichText
-						tagName="cite"
 						value={ citation }
 						/* translators: the individual or entity quoted */
 						placeholder={ __( 'Write citation…' ) }
@@ -79,6 +78,7 @@ export const settings = {
 								citation: nextCitation,
 							} )
 						}
+						className="wp-block-pullquote__citation"
 					/>
 				) }
 			</blockquote>

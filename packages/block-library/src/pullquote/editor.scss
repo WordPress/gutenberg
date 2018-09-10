@@ -9,10 +9,6 @@
 }
 
 .wp-block-pullquote {
-	cite {
-		display: block;
-	}
-
 	cite .editor-rich-text__tinymce[data-is-empty="true"]::before {
 		font-size: 14px;
 		font-family: $default-font;
