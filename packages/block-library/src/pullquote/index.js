@@ -1,15 +1,23 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
+import { includes, map } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import {
+	InspectorControls,
+	getColorClassName,
+	PanelColorSettings,
 	RichText,
+	withColors,
 } from '@wordpress/editor';
+import {
+	Fragment,
+} from '@wordpress/element';
 
 const toRichTextValue = ( value ) => map( value, ( ( subValue ) => subValue.children ) );
 const fromRichTextValue = ( value ) => map( value, ( subValue ) => ( {
@@ -31,7 +39,16 @@ const blockAttributes = {
 		source: 'children',
 		selector: 'cite',
 	},
+	backgroundColor: {
+		type: 'string',
+	},
+	customBackgroundColor: {
+		type: 'string',
+	},
 };
+
+const STYLIZED_STYLE_NAME = 'stylized';
+const STYLIZED_CLASS = `is-style-${ STYLIZED_STYLE_NAME }`;
 
 export const name = 'core/pullquote';
 
@@ -47,51 +64,89 @@ export const settings = {
 
 	attributes: blockAttributes,
 
+	styles: [
+		{ name: 'default', label: __( 'Regular' ), isDefault: true },
+		{ name: STYLIZED_STYLE_NAME, label: __( 'Stylized' ) },
+	],
+
 	supports: {
 		align: true,
 	},
 
-	edit( { attributes, setAttributes, isSelected, className } ) {
-		const { value, citation } = attributes;
+	edit: withColors( 'backgroundColor' )(
+		( { attributes, backgroundColor, setAttributes, isSelected, className, setBackgroundColor } ) => {
+			const { value, citation } = attributes;
 
-		return (
-			<figure className={ className }>
-				<blockquote>
-					<RichText
-						multiline="p"
-						value={ toRichTextValue( value ) }
-						onChange={
-							( nextValue ) => setAttributes( {
-								value: fromRichTextValue( nextValue ),
-							} )
-						}
-						/* translators: the text of the quotation */
-						placeholder={ __( 'Write quote…' ) }
-						wrapperClassName="block-library-pullquote__content"
-					/>
-					{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
-						<RichText
-							value={ citation }
-							/* translators: the individual or entity quoted */
-							placeholder={ __( 'Write citation…' ) }
-							onChange={
-								( nextCitation ) => setAttributes( {
-									citation: nextCitation,
-								} )
-							}
-							className="wp-block-pullquote__citation"
+			let colorSettings = null;
+			const isStylizedStyleVariation = includes( className, STYLIZED_CLASS );
+			if ( isStylizedStyleVariation ) {
+				colorSettings = (
+					<InspectorControls>
+						<PanelColorSettings
+							title={ __( 'Color Settings' ) }
+							colorSettings={ [
+								{
+									value: backgroundColor.color,
+									onChange: setBackgroundColor,
+									label: __( 'Background Color' ),
+								},
+							] }
 						/>
-					) }
-				</blockquote>
-			</figure>
-		);
-	},
+					</InspectorControls>
+				);
+			}
+
+			return (
+				<Fragment>
+					<figure style={ isStylizedStyleVariation ? { backgroundColor: backgroundColor.color } : undefined } className={ classnames(
+						className, {
+							[ backgroundColor.class ]: isStylizedStyleVariation && backgroundColor.class,
+						} ) }>
+						<blockquote>
+							<RichText
+								multiline="p"
+								value={ toRichTextValue( value ) }
+								onChange={
+									( nextValue ) => setAttributes( {
+										value: fromRichTextValue( nextValue ),
+									} )
+								}
+								/* translators: the text of the quotation */
+								placeholder={ __( 'Write quote…' ) }
+								wrapperClassName="block-library-pullquote__content"
+							/>
+							{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
+								<RichText
+									value={ citation }
+									/* translators: the individual or entity quoted */
+									placeholder={ __( 'Write citation…' ) }
+									onChange={
+										( nextCitation ) => setAttributes( {
+											citation: nextCitation,
+										} )
+									}
+									className="wp-block-pullquote__citation"
+								/>
+							) }
+						</blockquote>
+					</figure>
+					{ colorSettings }
+				</Fragment>
+			);
+		}
+	),
 
 	save( { attributes } ) {
-		const { value, citation } = attributes;
+		const { backgroundColor, value, citation, className } = attributes;
+		const isStylizedStyleVariation = includes( className, STYLIZED_CLASS );
+		const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+
+		const figureClasses = classnames( {
+			[ backgroundClass ]: isStylizedStyleVariation && backgroundClass,
+		} );
 
 		return (
-			<figure>
+			<figure className={ figureClasses }>
 				<blockquote>
 					<RichText.Content value={ toRichTextValue( value ) } />
 					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
