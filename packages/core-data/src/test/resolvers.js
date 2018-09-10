@@ -11,29 +11,10 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { getCategories, getEntityRecord, getEntityRecords, getEmbedPreview } from '../resolvers';
-import { receiveTerms, receiveEntityRecords, addEntities, receiveEmbedPreview } from '../actions';
+import { getEntityRecord, getEntityRecords, getEmbedPreview } from '../resolvers';
+import { receiveEntityRecords, addEntities, receiveEmbedPreview } from '../actions';
 
 jest.mock( '@wordpress/api-fetch', () => jest.fn() );
-
-describe( 'getCategories', () => {
-	const CATEGORIES = [ { id: 1 } ];
-
-	beforeAll( () => {
-		apiFetch.mockImplementation( ( options ) => {
-			if ( options.path === '/wp/v2/categories?per_page=-1' ) {
-				return Promise.resolve( CATEGORIES );
-			}
-		} );
-	} );
-
-	it( 'yields with requested terms', async () => {
-		const fulfillment = getCategories();
-		const received = ( await fulfillment.next() ).value;
-		expect( received ).toEqual( receiveTerms( 'categories', CATEGORIES ) );
-		expect( console ).toHaveWarnedWith( 'getCategories resolver is deprecated and will be removed from Gutenberg in 3.7.0. Please use getEntityRecords resolver instead.' );
-	} );
-} );
 
 describe( 'getEntityRecord', () => {
 	const POST_TYPE = { slug: 'post' };

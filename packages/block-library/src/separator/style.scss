@@ -8,6 +8,7 @@
 
 	// Dots style
 	&.is-style-dots {
+		background: none; // Override any background themes often set on the hr tag for this style.
 		border: none;
 		text-align: center;
 		max-width: none;

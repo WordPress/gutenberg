@@ -8,7 +8,6 @@ import { map, find, get, filter } from 'lodash';
  * WordPress dependencies
  */
 import { select } from '@wordpress/data';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -27,74 +26,6 @@ import { getQueriedItems } from './queried-data';
  */
 function isResolving( selectorName, ...args ) {
 	return select( 'core/data' ).isResolving( REDUCER_KEY, selectorName, args );
-}
-
-/**
- * Returns all the available terms for the given taxonomy.
- *
- * @param {Object} state    Data state.
- * @param {string} taxonomy Taxonomy name.
- *
- * @return {Array} Categories list.
- */
-export function getTerms( state, taxonomy ) {
-	deprecated( 'wp.data.select("core").getTerms', {
-		version: '3.7.0',
-		alternative: 'wp.data.select("core").getEntityRecords',
-		plugin: 'Gutenberg',
-	} );
-	return state.terms[ taxonomy ];
-}
-
-/**
- * Returns all the available categories.
- *
- * @param {Object} state Data state.
- *
- * @return {Array} Categories list.
- */
-export function getCategories( state ) {
-	deprecated( 'wp.data.select("core").getCategories', {
-		version: '3.7.0',
-		alternative: 'wp.data.select("core").getEntityRecords',
-		plugin: 'Gutenberg',
-	} );
-	return getTerms( state, 'categories' );
-}
-
-/**
- * Returns true if a request is in progress for terms data of a given taxonomy,
- * or false otherwise.
- *
- * @param {Object} state    Data state.
- * @param {string} taxonomy Taxonomy name.
- *
- * @return {boolean} Whether a request is in progress for taxonomy's terms.
- */
-export function isRequestingTerms( state, taxonomy ) {
-	deprecated( 'wp.data.select("core").isRequestingTerms', {
-		version: '3.7.0',
-		alternative: 'wp.data.select("core").getEntitiesByKind',
-		plugin: 'Gutenberg',
-	} );
-	return isResolving( 'getTerms', taxonomy );
-}
-
-/**
- * Returns true if a request is in progress for categories data, or false
- * otherwise.
- *
- * @param {Object} state Data state.
- *
- * @return {boolean} Whether a request is in progress for categories.
- */
-export function isRequestingCategories() {
-	deprecated( 'wp.data.select("core").isRequestingCategories', {
-		version: '3.7.0',
-		alternative: 'wp.data.select("core").getEntitiesByKind',
-		plugin: 'Gutenberg',
-	} );
-	return isResolving( 'getCategories' );
 }
 
 /**

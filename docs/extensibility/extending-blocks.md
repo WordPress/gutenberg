@@ -116,6 +116,8 @@ Used to modify the block's `edit` component. It receives the original block `Blo
 
 _Example:_
 
+{% codetabs %}
+{% ES5 %}
 ```js
 var el = wp.element.createElement;
 
@@ -143,6 +145,30 @@ var withInspectorControls = wp.compose.createHigherOrderComponent( function( Blo
 
 wp.hooks.addFilter( 'editor.BlockEdit', 'my-plugin/with-inspector-controls', withInspectorControls );
 ```
+{% ESNext %}
+```js
+const { createHigherOrderComponent } = wp.compose;
+const { Fragment } = wp.Element;
+const { InspectorControls } = wp.editor;
+const { PanelBody } = wp.components;
+
+const withInspectorControls =  createHigherOrderComponent(BlockEdit => {
+  return props => {
+    return (
+      <Fragment>
+		<InspectorControls>
+			<PanelBody>
+				My custom control
+			</PanelBody>
+		<InspectorControls />
+        <BlockEdit { ...props } />
+      </Fragment>
+    );
+  };
+}, "withInspectorControl" );
+
+wp.hooks.addFilter( 'editor.BlockEdit', 'my-plugin/with-inspector-controls', withInspectorControls );
+```
 
 #### `editor.BlockListBlock`
 
@@ -150,6 +176,8 @@ Used to modify the block's wrapper component containing the block's `edit` compo
 
 _Example:_
 
+{% codetabs %}
+{% ES5 %}
 ```js
 var el = wp.element.createElement;
 
@@ -178,6 +206,23 @@ var withDataAlign = wp.compose.createHigherOrderComponent( function( BlockListBl
 
 wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-data-align', withDataAlign );
 ```
+{% ESNext %}
+```js
+const { createHigherOrderComponent } = wp.compose;
+
+const withDataAlign = createHigherOrderComponent( ( BlockListBlock ) => {
+	return ( props ) => {
+		const { align } = props.block.attributes;
+
+		let wrapperProps = props.wrapperProps;
+		wrapperProps = { ...wrapperProps, 'data-align': align };
+
+		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
+	};
+}, 'withDataAlign' );
+
+wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-data-align', withDataAlign );
+```
 
 ## Removing Blocks
 
@@ -186,7 +231,7 @@ wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-data-align', withDa
 Adding blocks is easy enough, removing them is as easy. Plugin or theme authors have the possibility to "unregister" blocks.
 
 ```js
-// myp-lugin.js
+// my-plugin.js
 
 wp.blocks.unregisterBlockType( 'core/verse' );
 ```

@@ -3,7 +3,7 @@
  */
 import { parse } from 'url';
 import { includes, kebabCase, toLower } from 'lodash';
-import classnames from 'classnames';
+import classnames from 'classnames/dedupe';
 
 /**
  * WordPress dependencies
@@ -43,6 +43,7 @@ export function getEmbedEdit( title, icon ) {
 			this.setUrl = this.setUrl.bind( this );
 			this.maybeSwitchBlock = this.maybeSwitchBlock.bind( this );
 			this.setAttributesFromPreview = this.setAttributesFromPreview.bind( this );
+			this.maybeSetAspectRatioClassName = this.maybeSetAspectRatioClassName.bind( this );
 
 			this.state = {
 				editingURL: false,
@@ -136,6 +137,58 @@ export function getEmbedEdit( title, icon ) {
 			return false;
 		}
 
+		/**
+		 * Sets the appropriate CSS class to enforce an aspect ratio when the embed is resized
+		 * if the HTML has an iframe with width and height set.
+		 *
+		 * @param {string} html The preview HTML that possibly contains an iframe with width and height set.
+		 */
+		maybeSetAspectRatioClassName( html ) {
+			const previewDom = document.createElement( 'div' );
+			previewDom.innerHTML = html;
+			const iframe = previewDom.querySelector( 'iframe' );
+
+			if ( ! iframe ) {
+				return;
+			}
+
+			if ( iframe.height && iframe.width ) {
+				const aspectRatio = ( iframe.width / iframe.height ).toFixed( 2 );
+				let aspectRatioClassName;
+
+				switch ( aspectRatio ) {
+					// Common video resolutions.
+					case '2.33':
+						aspectRatioClassName = 'wp-embed-aspect-21-9';
+						break;
+					case '2.00':
+						aspectRatioClassName = 'wp-embed-aspect-18-9';
+						break;
+					case '1.78':
+						aspectRatioClassName = 'wp-embed-aspect-16-9';
+						break;
+					case '1.33':
+						aspectRatioClassName = 'wp-embed-aspect-4-3';
+						break;
+					// Vertical video and instagram square video support.
+					case '1.00':
+						aspectRatioClassName = 'wp-embed-aspect-1-1';
+						break;
+					case '0.56':
+						aspectRatioClassName = 'wp-embed-aspect-9-16';
+						break;
+					case '0.50':
+						aspectRatioClassName = 'wp-embed-aspect-1-2';
+						break;
+				}
+
+				if ( aspectRatioClassName ) {
+					const className = classnames( this.props.attributes.className, 'wp-has-aspect-ratio', aspectRatioClassName );
+					this.props.setAttributes( { className } );
+				}
+			}
+		}
+
 		/***
 		 * Sets block attributes based on the preview data.
 		 */
@@ -156,6 +209,8 @@ export function getEmbedEdit( title, icon ) {
 			if ( html || 'photo' === type ) {
 				setAttributes( { type, providerNameSlug } );
 			}
+
+			this.maybeSetAspectRatioClassName( html );
 		}
 
 		switchBackToURLInput() {
@@ -188,10 +243,10 @@ export function getEmbedEdit( title, icon ) {
 				);
 			}
 
-			if ( ! preview || previewIsFallback || editingURL ) {
-				// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
-				const label = sprintf( __( '%s URL' ), title );
+			// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
+			const label = sprintf( __( '%s URL' ), title );
 
+			if ( ! preview || previewIsFallback || editingURL ) {
 				return (
 					<Placeholder icon={ <BlockIcon icon={ icon } showColors /> } label={ label } className="wp-block-embed">
 						<form onSubmit={ this.setUrl }>
@@ -218,6 +273,7 @@ export function getEmbedEdit( title, icon ) {
 			const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedUrl.host.replace( /^www\./, '' ) );
 			// translators: %s: host providing embed content e.g: www.youtube.com
 			const iframeTitle = sprintf( __( 'Embedded content from %s' ), parsedUrl.host );
+			const sandboxClassnames = classnames( type, className );
 			const embedWrapper = 'wp-embed' === type ? (
 				<div
 					className="wp-block-embed__wrapper"
@@ -228,7 +284,7 @@ export function getEmbedEdit( title, icon ) {
 					<SandBox
 						html={ html }
 						title={ iframeTitle }
-						type={ type }
+						type={ sandboxClassnames }
 					/>
 				</div>
 			);
@@ -237,12 +293,12 @@ export function getEmbedEdit( title, icon ) {
 				<figure className={ classnames( className, 'wp-block-embed', { 'is-video': 'video' === type } ) }>
 					{ controls }
 					{ ( cannotPreview ) ? (
-						<Placeholder icon={ icon } label={ __( 'Embed URL' ) }>
+						<Placeholder icon={ <BlockIcon icon={ icon } showColors /> } label={ label }>
 							<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
 							<p className="components-placeholder__error">{ __( 'Previews for this are unavailable in the editor, sorry!' ) }</p>
 						</Placeholder>
 					) : embedWrapper }
-					{ ( caption && caption.length > 0 ) || isSelected ? (
+					{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 						<RichText
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
@@ -250,12 +306,30 @@ export function getEmbedEdit( title, icon ) {
 							onChange={ ( value ) => setAttributes( { caption: value } ) }
 							inlineToolbar
 						/>
-					) : null }
+					) }
 				</figure>
 			);
 		}
 	};
 }
+
+const embedAttributes = {
+	url: {
+		type: 'string',
+	},
+	caption: {
+		type: 'array',
+		source: 'children',
+		selector: 'figcaption',
+		default: [],
+	},
+	type: {
+		type: 'string',
+	},
+	providerNameSlug: {
+		type: 'string',
+	},
+};
 
 function getEmbedBlockSettings( { title, description, icon, category = 'embed', transforms, keywords = [] } ) {
 	// translators: %s: Name of service (e.g. VideoPress, YouTube)
@@ -266,23 +340,7 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 		icon,
 		category,
 		keywords,
-		attributes: {
-			url: {
-				type: 'string',
-			},
-			caption: {
-				type: 'array',
-				source: 'children',
-				selector: 'figcaption',
-				default: [],
-			},
-			type: {
-				type: 'string',
-			},
-			providerNameSlug: {
-				type: 'string',
-			},
-		},
+		attributes: embedAttributes,
 
 		supports: {
 			align: true,
@@ -320,11 +378,38 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 
 			return (
 				<figure className={ embedClassName }>
-					{ `\n${ url }\n` /* URL needs to be on its own line. */ }
-					{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
+					<div className="wp-block-embed__wrapper">
+						{ `\n${ url }\n` /* URL needs to be on its own line. */ }
+					</div>
+					{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
 				</figure>
 			);
 		},
+
+		deprecated: [
+			{
+				attributes: embedAttributes,
+				save( { attributes } ) {
+					const { url, caption, type, providerNameSlug } = attributes;
+
+					if ( ! url ) {
+						return null;
+					}
+
+					const embedClassName = classnames( 'wp-block-embed', {
+						[ `is-type-${ type }` ]: type,
+						[ `is-provider-${ providerNameSlug }` ]: providerNameSlug,
+					} );
+
+					return (
+						<figure className={ embedClassName }>
+							{ `\n${ url }\n` /* URL needs to be on its own line. */ }
+							{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
+						</figure>
+					);
+				},
+			},
+		],
 	};
 }
 
@@ -557,7 +642,7 @@ export const others = [
 			title: 'Polldaddy',
 			icon: embedContentIcon,
 		} ),
-		patterns: [ /^https?:\/\/(www\.)?mixcloud\.com\/.+/i ],
+		patterns: [ /^https?:\/\/(www\.)?polldaddy\.com\/.+/i ],
 	},
 	{
 		name: 'core-embed/reddit',

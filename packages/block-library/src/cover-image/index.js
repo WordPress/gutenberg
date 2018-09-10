@@ -208,7 +208,7 @@ export const settings = {
 					style={ style }
 					className={ classes }
 				>
-					{ title || isSelected ? (
+					{ ( ! RichText.isEmpty( title ) || isSelected ) && (
 						<RichText
 							tagName="p"
 							className="wp-block-cover-image-text"
@@ -217,7 +217,7 @@ export const settings = {
 							onChange={ ( value ) => setAttributes( { title: value } ) }
 							inlineToolbar
 						/>
-					) : null }
+					) }
 				</div>
 			</Fragment>
 		);
@@ -239,7 +239,7 @@ export const settings = {
 
 		return (
 			<div className={ classes } style={ style }>
-				{ title && title.length > 0 && (
+				{ ! RichText.isEmpty( title ) && (
 					<RichText.Content tagName="p" className="wp-block-cover-image-text" value={ title } />
 				) }
 			</div>

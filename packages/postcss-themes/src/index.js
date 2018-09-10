@@ -1,6 +1,6 @@
 const postcss = require( 'postcss' );
 
-module.exports = postcss.plugin( 'postcss-test-plugin', function( options ) {
+module.exports = postcss.plugin( 'postcss-themes', function( options ) {
 	return function( root ) {
 		root.walkRules( ( rule ) => {
 			const themeDecls = {};

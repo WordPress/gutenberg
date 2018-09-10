@@ -2,15 +2,16 @@
 	margin: 0;
 	border: $border-width solid $light-gray-500;
 	background-color: $white;
-	display: inline-flex;
+	display: flex;
+	flex-shrink: 0;
 }
 
 div.components-toolbar {
 	& > div {
 		// IE11 does not support `position: sticky`, or Flex very well, so use block.
-		display: inline-block;
+		display: block;
 		@supports (position: sticky) {
-			display: inline-flex;
+			display: flex;
 		}
 
 		margin: 0;

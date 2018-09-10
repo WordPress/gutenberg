@@ -9,7 +9,7 @@ import { flow, castArray, mapValues, omit, stubFalse } from 'lodash';
  */
 import { autop } from '@wordpress/autop';
 import { applyFilters } from '@wordpress/hooks';
-import { parse as grammarParse } from '@wordpress/block-serialization-spec-parser';
+import { parse as defaultParse } from '@wordpress/block-serialization-default-parser';
 
 /**
  * Internal dependencies
@@ -378,6 +378,6 @@ const createParse = ( parseImplementation ) =>
  *
  * @return {Array} Block list.
  */
-export const parseWithGrammar = createParse( grammarParse );
+export const parseWithGrammar = createParse( defaultParse );
 
 export default parseWithGrammar;
