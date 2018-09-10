@@ -15,7 +15,7 @@ module.exports = {
 	verbose: true,
 	preset: 'jest-react-native',
 	testEnvironment: 'jsdom',
-	testPathIgnorePatterns: [ '/node_modules/', '/gutenberg/' ],
+	testPathIgnorePatterns: [ '/node_modules/', '/gutenberg/test/', '/gutenberg/packages/' ],
 	moduleFileExtensions: [
 		'native.js',
 		'android.js',
