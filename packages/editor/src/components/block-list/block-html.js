@@ -42,8 +42,10 @@ export class BlockHTML extends Component {
 
 		this.props.onChange( this.props.clientId, attributes, content, isValid );
 
-		// Ensure the state is updated if we reset
-		this.setState( { html: content } );
+		// Ensure the state is updated if we reset so it displays the default content
+		if ( ! html ) {
+			this.setState( { html: content } );
+		}
 	}
 
 	onChange( event ) {
