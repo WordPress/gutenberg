@@ -41,7 +41,7 @@ function render_block_core_categories( $attributes ) {
 			$wrapper_markup .= build_dropdown_script_block_core_categories( $id );
 		}
 	} else {
-		$wrapper_markup = '<div class="%1$s"><ul>%2$s</ul></div>';
+		$wrapper_markup = '<ul class="%1$s">%2$s</ul>';
 		$items_markup   = wp_list_categories( $args );
 		$type           = 'list';
 	}
