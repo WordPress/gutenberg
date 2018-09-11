@@ -23,9 +23,15 @@ import createSelector from 'rememo';
 /**
  * WordPress dependencies
  */
-import { serialize, getBlockType, getBlockTypes, hasBlockSupport, hasChildBlocksWithInserterSupport, getUnknownTypeHandlerName } from '@wordpress/blocks';
+import {
+	serialize,
+	getBlockType,
+	getBlockTypes,
+	hasBlockSupport,
+	hasChildBlocksWithInserterSupport,
+} from '@wordpress/blocks';
 import { moment } from '@wordpress/date';
-import { removep } from '@wordpress/autop';
+import { applyFilters } from '@wordpress/hooks';
 
 /***
  * Module constants
@@ -349,15 +355,20 @@ export function isEditedPostSaveable( state ) {
 
 /**
  * Returns true if the edited post has content. A post has content if it has at
- * least one block or otherwise has a non-empty content property assigned.
+ * least one saveable block or otherwise has a non-empty content property
+ * assigned.
  *
  * @param {Object} state Global application state.
  *
  * @return {boolean} Whether post has content.
  */
 export function isEditedPostEmpty( state ) {
+	// While the condition of truthy content string would be sufficient for
+	// determining emptiness, testing saveable blocks length is a trivial
+	// operation by comparison. Since this function can be called frequently,
+	// optimize for the fast case where saveable blocks are non-empty.
 	return (
-		! getBlockCount( state ) &&
+		! getBlocksForSave( state ).length &&
 		! getEditedPostAttribute( state, 'content' )
 	);
 }
@@ -1347,6 +1358,50 @@ export function getSuggestedPostFormat( state ) {
 }
 
 /**
+ * Returns a filtered set of blocks which are assumed to be used in
+ * consideration of the post's generated save content.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {WPBlock[]} Filtered set of blocks for save.
+ */
+export function getBlocksForSave( state ) {
+	/**
+	 * Filters the set of blocks assumed to be used in consideration of the
+	 * post's generated save content.
+	 *
+	 * @param {Object[]} blocks Original editor state blocks.
+	 */
+	return applyFilters(
+		'editor.selectors.getBlocksForSave',
+		getBlocks( state ),
+	);
+}
+
+/**
+ * Returns a filtered HTML string for serialized given array of blocks.
+ *
+ * @param {Object}    state  Editor state.
+ * @param {WPBlock[]} blocks Array of blocks from which to generate content.
+ *
+ * @return {string} Filtered HTML string for serialized blocks.
+ */
+export function getBlockContent( state, blocks ) {
+	/**
+	 * Filters the serialized content result of blocks.
+	 *
+	 * @param {string}    content Original serialized value.
+	 * @param {WPBlock[]} blocks  Blocks from which serialized value is
+	 *                            generated.
+	 */
+	return applyFilters(
+		'editor.selectors.getBlockContent',
+		serialize( blocks ),
+		blocks
+	);
+}
+
+/**
  * Returns the content of the post being edited, preferring raw string edit
  * before falling back to serialization of block state.
  *
@@ -1361,13 +1416,7 @@ export const getEditedPostContent = createSelector(
 			return edits.content;
 		}
 
-		const blocks = getBlocks( state );
-
-		if ( blocks.length === 1 && blocks[ 0 ].name === getUnknownTypeHandlerName() ) {
-			return removep( serialize( blocks ) );
-		}
-
-		return serialize( blocks );
+		return getBlockContent( state, getBlocksForSave( state ) );
 	},
 	( state ) => [
 		state.editor.present.edits.content,
