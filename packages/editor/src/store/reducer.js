@@ -812,10 +812,15 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 			};
 
 		case 'ENABLE_PUBLISH_SIDEBAR':
+			return {
+				...state,
+				isPublishSidebarEnabled: true,
+			};
+
 		case 'DISABLE_PUBLISH_SIDEBAR':
 			return {
 				...state,
-				isPublishSidebarEnabled: action.type === 'ENABLE_PUBLISH_SIDEBAR',
+				isPublishSidebarEnabled: false,
 			};
 	}
 
