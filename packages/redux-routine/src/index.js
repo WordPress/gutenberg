@@ -12,7 +12,7 @@ import createRuntime from './runtime';
  * value of the yield assignment. If the control handler returns undefined, the
  * execution is not continued.
  *
- * @param {Object}    controls Object of control handlers.
+ * @param {Object} controls Object of control handlers.
  *
  * @return {Function} Co-routine runtime
  */
