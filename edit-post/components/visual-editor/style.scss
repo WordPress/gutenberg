@@ -96,6 +96,10 @@
 	margin-right: auto;
 	position: relative;
 
+	.editor-default-block-appender__content {
+		height: $empty-paragraph-height / 2;
+	}
+
 	&[data-root-client-id=""] .editor-default-block-appender__content:hover {
 		// Outline on root-level default block appender is redundant with the
 		// WritingFlow click redirector.
