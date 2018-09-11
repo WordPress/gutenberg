@@ -20,7 +20,7 @@ The example above registers a block style variation called `fancy-quote` to the 
 
 ### Filters
 
-Extensing blocks can involve more than just providing alternative styles, in this case, you can use one of the following filters to extend the block settings.
+Extending blocks can involve more than just providing alternative styles, in this case, you can use one of the following filters to extend the block settings.
 
 #### `blocks.registerBlockType`
 
