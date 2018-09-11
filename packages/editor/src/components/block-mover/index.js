@@ -18,7 +18,7 @@ import { withInstanceId, compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import { getBlockMoverDescription } from './mover-description';
-import { upArrow, downArrow, dragHandle } from './arrows';
+import { upArrow, downArrow, dragHandle } from './icons';
 import { IconDragHandle } from './drag-handle';
 
 export class BlockMover extends Component {

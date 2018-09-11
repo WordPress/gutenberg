@@ -7,7 +7,7 @@ import { shallow } from 'enzyme';
  * Internal dependencies
  */
 import { BlockMover } from '../';
-import { upArrow, downArrow, dragHandle } from '../arrows';
+import { upArrow, downArrow, dragHandle } from '../icons';
 
 describe( 'BlockMover', () => {
 	describe( 'basic rendering', () => {
