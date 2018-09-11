@@ -6,6 +6,8 @@ import { IconButton } from '@wordpress/components';
 import {
 	PostPreviewButton,
 	PostSavedState,
+	PostPublishPanelToggle,
+	PostPublishButton,
 } from '@wordpress/editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -18,7 +20,6 @@ import './style.scss';
 import MoreMenu from './more-menu';
 import HeaderToolbar from './header-toolbar';
 import PinnedPlugins from './pinned-plugins';
-import PublishButton from './publish-button';
 import shortcuts from '../../keyboard-shortcuts';
 
 function Header( {
@@ -49,13 +50,18 @@ function Header( {
 						forceIsSaving={ isSaving }
 					/>
 					<PostPreviewButton />
-					<PublishButton
-						isSidebarOpen={ isPublishSidebarOpened }
-						isSidebarEnabled={ isPublishSidebarEnabled }
-						onToggle={ togglePublishSidebar }
-						forceIsDirty={ hasActiveMetaboxes }
-						forceIsSaving={ isSaving }
-					/>
+					{ isPublishSidebarEnabled ?
+						( <PostPublishPanelToggle
+							isOpen={ isPublishSidebarOpened }
+							onToggle={ togglePublishSidebar }
+							forceIsDirty={ hasActiveMetaboxes }
+							forceIsSaving={ isSaving }
+						/> ) :
+						( <PostPublishButton
+							forceIsDirty={ hasActiveMetaboxes }
+							forceIsSaving={ isSaving }
+						/> )
+					}
 					<div>
 						<IconButton
 							icon="admin-generic"
