@@ -1882,7 +1882,7 @@ export function canUserUseUnfilteredHTML( state ) {
 
 /**
  * Returns whether the pre-publish panel should be shown
- * or hidden on publish.
+ * or skipped when the user clicks the "publish" button.
  *
  * @param {Object} state Global application state.
  *
