@@ -1,10 +1,27 @@
 .components-font-size-picker__buttons {
 	display: flex;
 	justify-content: space-between;
-	margin-bottom: 1em;
+	align-items: center;
+
+	// Apply the same height as the isSmall Reset button.
+	.components-range-control__number {
+		height: 24px;
+		line-height: 22px;
+
+		// Show the reset button as disabled until a value is entered.
+		&[value=""] + .components-button {
+			cursor: default;
+			opacity: 0.3;
+			pointer-events: none;
+		}
+	}
 
 	.components-button {
 		overflow: hidden;
+
+		> span {
+			line-height: 1;
+		}
 	}
 }
 

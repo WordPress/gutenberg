@@ -42,7 +42,7 @@ export default function FontSizePicker( { fontSizes = [], fallbackFontSize, valu
 								onClick={ () => onChange( size ) }
 								style={ { fontSize: size } }
 							>
-								A
+								<span>A</span>
 							</Button>
 						</Tooltip>
 					) ) }
@@ -57,7 +57,12 @@ export default function FontSizePicker( { fontSizes = [], fallbackFontSize, valu
 					/>
 				}
 				<Button
+					className="components-color-palette__clear"
+					type="button"
 					onClick={ () => onChange( undefined ) }
+					isButton
+					isSmall
+					isDefault
 				>
 					{ __( 'Reset' ) }
 				</Button>
