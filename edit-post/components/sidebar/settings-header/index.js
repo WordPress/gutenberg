@@ -24,6 +24,7 @@ const SettingsHeader = ( { count, openDocumentSettings, openBlockSettings, sideb
 				onClick={ openDocumentSettings }
 				className={ `edit-post-sidebar__panel-tab ${ sidebarName === 'edit-post/document' ? 'is-active' : '' }` }
 				aria-label={ __( 'Document settings' ) }
+				data-label={ __( 'Document' ) }
 			>
 				{ __( 'Document' ) }
 			</button>
@@ -31,6 +32,11 @@ const SettingsHeader = ( { count, openDocumentSettings, openBlockSettings, sideb
 				onClick={ openBlockSettings }
 				className={ `edit-post-sidebar__panel-tab ${ sidebarName === 'edit-post/block' ? 'is-active' : '' }` }
 				aria-label={ __( 'Block settings' ) }
+				data-label={ (
+					1 === count ?
+						__( 'Block' ) :
+						sprintf( _n( '%d Block', '%d Blocks', count ), count )
+				) }
 			>
 				{ (
 					1 === count ?

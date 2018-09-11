@@ -17,6 +17,17 @@
 	color: $dark-gray-900;
 	@include square-style__neutral;
 
+	// This pseudo-element "duplicates" the tab label and sets the text to bold.
+	// This ensures that the tab doesn't change width when selected.
+	&::after {
+		display: block;
+		content: attr(data-label);
+		font-weight: 600;
+		overflow: hidden;
+		visibility: hidden;
+		height: 0;
+	}
+
 	&.is-active {
 		padding-bottom: 0;
 		border-bottom: 3px solid theme(primary);
