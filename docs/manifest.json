@@ -212,7 +212,7 @@
 	{
 		"title": "Articles",
 		"slug": "articles",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/outreach/docs/articles.md",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/outreach/articles.md",
 		"parent": "outreach"
 	},
 	{
