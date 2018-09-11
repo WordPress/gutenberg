@@ -14,7 +14,7 @@ const PublishSidebarToggle = function( { onToggle, isEnabled } ) {
 			role="menuitemcheckbox"
 			onClick={ onToggle }
 		>
-			{ __( 'Publish Sidebar' ) }
+			{ __( 'Show publish confirmation' ) }
 		</MenuItem>
 	);
 };
