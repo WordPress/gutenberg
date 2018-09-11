@@ -26,6 +26,7 @@ export default function FontSizePicker( { fontSizes = [], fallbackFontSize, valu
 		}
 		onChange( Number( newValue ) );
 	};
+
 	return (
 		<BaseControl
 			label={ __( 'Font Size' ) }
@@ -53,12 +54,13 @@ export default function FontSizePicker( { fontSizes = [], fallbackFontSize, valu
 						type="number"
 						onChange={ onChangeValue }
 						aria-label={ __( 'Custom Size' ) }
-						value={ value }
+						value={ value || '' }
 					/>
 				}
 				<Button
 					className="components-color-palette__clear"
 					type="button"
+					disabled={ value === undefined }
 					onClick={ () => onChange( undefined ) }
 					isButton
 					isSmall
