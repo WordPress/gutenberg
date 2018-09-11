@@ -6,12 +6,12 @@ import { map } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
+import BaseControl from '../base-control';
 import Button from '../button';
 import ButtonGroup from '../button-group';
 import RangeControl from '../range-control';
@@ -27,7 +27,9 @@ export default function FontSizePicker( { fontSizes = [], fallbackFontSize, valu
 		onChange( Number( newValue ) );
 	};
 	return (
-		<Fragment>
+		<BaseControl
+			label={ __( 'Font Size' ) }
+		>
 			<div className="components-font-size-picker__buttons">
 				<ButtonGroup aria-label={ __( 'Font Size' ) }>
 					{ map( fontSizes, ( { name, size, shortName } ) => (
@@ -73,6 +75,6 @@ export default function FontSizePicker( { fontSizes = [], fallbackFontSize, valu
 					afterIcon="editor-textcolor"
 				/>
 			}
-		</Fragment>
+		</BaseControl>
 	);
 }
