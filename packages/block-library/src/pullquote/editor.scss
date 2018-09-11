@@ -9,7 +9,7 @@
 }
 
 .wp-block-pullquote {
-	cite .editor-rich-text__tinymce[data-is-empty="true"]::before {
+	footer .editor-rich-text__tinymce[data-is-empty="true"]::before {
 		font-size: 14px;
 		font-family: $default-font;
 	}

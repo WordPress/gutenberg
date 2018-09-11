@@ -3,9 +3,7 @@
 	border-bottom: 4px solid $dark-gray-500;
 	color: $dark-gray-600;
 
-	cite,
-	footer,
-	&__citation {
+	footer {
 		color: $dark-gray-600;
 		text-transform: uppercase;
 		font-size: $default-font-size;
