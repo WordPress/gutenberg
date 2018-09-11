@@ -79,6 +79,7 @@ export default withSelect( ( select ) => {
 		[ block.clientId ] :
 		getMultiSelectedBlockClientIds();
 
+	// Continue to use isValid here until removed, at which point use isValidStatus
 	return {
 		blockClientIds,
 		isValid: block ? block.isValid : null,

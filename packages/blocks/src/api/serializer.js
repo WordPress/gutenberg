@@ -15,6 +15,7 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
  */
 import { getBlockType, getUnknownTypeHandlerName } from './registration';
 import BlockContentProvider from '../block-content-provider';
+import { isValidStatus } from './validation';
 
 /**
  * Returns the block's default classname from its name.
@@ -205,7 +206,7 @@ export function getBlockContent( block ) {
 	// otherwise have no access to its original content and content loss would
 	// still occur.
 	let saveContent = block.originalContent;
-	if ( block.isValid || block.innerBlocks.length ) {
+	if ( isValidStatus( block.blockStatus ) || block.innerBlocks.length ) {
 		try {
 			saveContent = getSaveContent( blockType, block.attributes, block.innerBlocks );
 		} catch ( error ) {}

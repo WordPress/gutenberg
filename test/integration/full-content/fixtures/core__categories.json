@@ -3,6 +3,7 @@
         "clientId": "_clientId_0",
         "name": "core/categories",
         "isValid": true,
+        "blockStatus": "ok",
         "attributes": {
             "showPostCounts": false,
             "displayAsDropdown": false,

@@ -15,7 +15,15 @@ import { withDispatch } from '@wordpress/data';
  */
 import Warning from '../warning';
 
-function BlockInvalidWarning( { convertToHTML, convertToBlocks, convertToClassic } ) {
+const getInvalidMessage = ( { blockStatus } ) => {
+	if ( blockStatus === 'invalid-html' ) {
+		return __( 'This block contains invalid HTML.' );
+	}
+
+	return __( 'This block has been modified externally.' );
+};
+
+function BlockInvalidWarning( { convertToHTML, convertToBlocks, convertToClassic, block } ) {
 	const hasHTMLBlock = !! getBlockType( 'core/html' );
 
 	return (
@@ -35,7 +43,7 @@ function BlockInvalidWarning( { convertToHTML, convertToBlocks, convertToClassic
 				{ title: __( 'Convert to Classic Block' ), onClick: convertToClassic },
 			] }
 		>
-			{ __( 'This block has been modified externally.' ) }
+			{ getInvalidMessage( block ) }
 		</Warning>
 	);
 }

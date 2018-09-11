@@ -3,6 +3,7 @@
         "clientId": "_clientId_0",
         "name": "core/heading",
         "isValid": true,
+        "blockStatus": "ok",
         "attributes": {
             "content": [
                 "The ",

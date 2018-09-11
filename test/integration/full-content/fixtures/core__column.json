@@ -3,11 +3,13 @@
         "clientId": "_clientId_0",
         "name": "core/column",
         "isValid": true,
+        "blockStatus": "ok",
         "attributes": {},
         "innerBlocks": [
             {
                 "clientId": "_clientId_0",
                 "name": "core/paragraph",
+                "blockStatus": "ok",
                 "isValid": true,
                 "attributes": {
                     "content": [
@@ -22,6 +24,7 @@
                 "clientId": "_clientId_1",
                 "name": "core/paragraph",
                 "isValid": true,
+                "blockStatus": "ok",
                 "attributes": {
                     "content": [
                         "Column One, Paragraph Two"

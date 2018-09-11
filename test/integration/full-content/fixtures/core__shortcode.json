@@ -3,6 +3,7 @@
         "clientId": "_clientId_0",
         "name": "core/shortcode",
         "isValid": true,
+        "blockStatus": "ok",
         "attributes": {
             "text": "[gallery ids=\"238,338\"]"
         },

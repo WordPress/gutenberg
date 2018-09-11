@@ -16,7 +16,7 @@ import { parse as defaultParse } from '@wordpress/block-serialization-default-pa
  */
 import { getBlockType, getUnknownTypeHandlerName } from './registration';
 import { createBlock } from './factory';
-import { isValidBlock } from './validation';
+import { getBlockStatus, isValidStatus } from './validation';
 import { getCommentDelimitedContent } from './serializer';
 import { attr, html, text, query, node, children, prop } from './matchers';
 
@@ -239,19 +239,20 @@ export function getMigratedBlock( block ) {
 		);
 
 		// Ignore the deprecation if it produces a block which is not valid.
-		const isValid = isValidBlock(
+		const blockStatus = getBlockStatus(
 			originalContent,
 			deprecatedBlockType,
 			migratedAttributes
 		);
 
-		if ( ! isValid ) {
+		if ( ! isValidStatus( blockStatus ) ) {
 			continue;
 		}
 
 		block = {
 			...block,
 			isValid: true,
+			blockStatus,
 		};
 
 		let migratedInnerBlocks = innerBlocks;
@@ -343,7 +344,8 @@ export function createBlockWithFallback( blockNode ) {
 	// provided source value with the serialized output before there are any modifications to
 	// the block. When both match, the block is marked as valid.
 	if ( name !== fallbackBlock ) {
-		block.isValid = isValidBlock( innerHTML, blockType, block.attributes );
+		block.blockStatus = getBlockStatus( innerHTML, blockType, block.attributes );
+		block.isValid = isValidStatus( block.blockStatus );
 	}
 
 	// Preserve original content for future use in case the block is parsed as
