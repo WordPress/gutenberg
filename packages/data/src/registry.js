@@ -102,37 +102,8 @@ export function createRegistry( storeConfigs = {} ) {
 	 */
 	function registerSelectors( reducerKey, newSelectors ) {
 		const store = namespaces[ reducerKey ].store;
-		const createStateSelector = ( selector, selectorName ) => ( ...args ) => {
-			const { hasStartedResolution } = select( 'core/data' );
-			const { startResolution, finishResolution } = dispatch( 'core/data' );
-			const state = store.getState();
-
-			async function fulfillSelector() {
-				// Don't modify selector behavior if no resolver exists.
-				const resolver = get( namespaces, [ reducerKey, 'resolvers', selectorName ] );
-				if ( ! resolver ) {
-					return;
-				}
-
-				if ( typeof resolver.isFulfilled === 'function' && resolver.isFulfilled( state, ...args ) ) {
-					return;
-				}
-
-				if ( hasStartedResolution( reducerKey, selectorName, args ) ) {
-					return;
-				}
-
-				startResolution( reducerKey, selectorName, args );
-				await registry.fulfill( reducerKey, selectorName, ...args );
-				finishResolution( reducerKey, selectorName, args );
-			}
-
-			fulfillSelector( ...args );
-			return selector( state, ...args );
-		};
-
-		namespaces[ reducerKey ].selectors =
-			mapValues( newSelectors, createStateSelector );
+		const createStateSelector = ( selector ) => ( ...args ) => selector( store.getState(), ...args );
+		namespaces[ reducerKey ].selectors = mapValues( newSelectors, createStateSelector );
 	}
 
 	/**
@@ -151,6 +122,35 @@ export function createRegistry( storeConfigs = {} ) {
 			}
 
 			return resolver;
+		} );
+
+		namespaces[ reducerKey ].selectors = mapValues( namespaces[ reducerKey ].selectors, ( selector, selectorName ) => {
+			const resolver = newResolvers[ selectorName ];
+			if ( ! resolver ) {
+				return selector;
+			}
+
+			return ( ...args ) => {
+				const { hasStartedResolution } = select( 'core/data' );
+				const { startResolution, finishResolution } = dispatch( 'core/data' );
+				async function fulfillSelector() {
+					const state = namespaces[ reducerKey ].store.getState();
+					if ( typeof resolver.isFulfilled === 'function' && resolver.isFulfilled( state, ...args ) ) {
+						return;
+					}
+
+					if ( hasStartedResolution( reducerKey, selectorName, args ) ) {
+						return;
+					}
+
+					startResolution( reducerKey, selectorName, args );
+					await registry.fulfill( reducerKey, selectorName, ...args );
+					finishResolution( reducerKey, selectorName, args );
+				}
+
+				fulfillSelector( ...args );
+				return selector( ...args );
+			};
 		} );
 	}
 
