@@ -96,6 +96,8 @@ class PostPublishPanel extends Component {
 							{ PostPublishExtension && <PostPublishExtension /> }
 						</PostPublishPanelPostpublish>
 					) }
+				</div>
+				<div className="editor-post-publish-panel__footer">
 					<CheckboxControl
 						label={ __( 'Don’t show this sidebar again.' ) }
 						checked={ ! isPublishSidebarEnabled }
