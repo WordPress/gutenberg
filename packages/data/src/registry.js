@@ -13,7 +13,7 @@ import {
  * Internal dependencies
  */
 import dataStore from './store';
-import promise from './middlewares/promise';
+import promise from './promise-middleware';
 
 /**
  * An isolated orchestrator of store registrations.

@@ -7,7 +7,7 @@ import { get } from 'lodash';
 /**
  * Internal dependencies
  */
-import asyncGeneratorMiddleware, { toAsyncIterable } from '../../middlewares/async-generator';
+import asyncGeneratorMiddleware, { toAsyncIterable } from './middleware';
 
 export default function( registry ) {
 	return {
