@@ -86,6 +86,11 @@
 		&:focus a[data-mce-selected] {
 			color: rgba(0, 0, 0, 0.2);
 		}
+
+		// Caption placeholder text.
+		&[data-is-placeholder-visible="true"] + .editor-rich-text__tinymce {
+			opacity: 0.8;
+		}
 	}
 }
 
