@@ -1,11 +1,11 @@
 import { PostPublishPanelToggle, PostPublishButton } from '@wordpress/editor';
 
-const PublishButton = function( {
+const PublishButton = ( {
 	isSidebarOpen,
 	isSidebarEnabled,
 	onToggle,
 	forceIsDirty,
-	forceIsSaving } ) {
+	forceIsSaving } ) => {
 	if ( isSidebarEnabled ) {
 		return (
 			<PostPublishPanelToggle
