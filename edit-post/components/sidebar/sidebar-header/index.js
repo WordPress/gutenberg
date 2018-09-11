@@ -16,7 +16,6 @@ import { withDispatch, withSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import './style.scss';
-import shortcuts from '../../../keyboard-shortcuts';
 
 const SidebarHeader = ( { children, className, closeLabel, closeSidebar, title } ) => {
 	return (
@@ -33,12 +32,6 @@ const SidebarHeader = ( { children, className, closeLabel, closeSidebar, title }
 			</div>
 			<div className={ classnames( 'components-panel__header edit-post-sidebar-header', className ) }>
 				{ children }
-				<IconButton
-					onClick={ closeSidebar }
-					icon="no-alt"
-					label={ closeLabel }
-					shortcut={ shortcuts.toggleSidebar.display }
-				/>
 			</div>
 		</Fragment>
 	);
