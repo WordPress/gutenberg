@@ -1,8 +1,9 @@
 /**
  * External dependencies
  */
-import classname from 'classnames';
+import classnames from 'classnames';
 import { castArray } from 'lodash';
+import { diffChars } from 'diff';
 
 /**
  * WordPress dependencies
@@ -15,15 +16,13 @@ import { getBlockType, getSaveContent, getSaveElement } from '@wordpress/blocks'
  * Internal dependencies
  */
 import BlockView from './block-view';
-import Diff from './diff';
 
 class BlockCompare extends Component {
 	getDifference( originalContent, newContent ) {
-		const differ = new Diff();
-		const difference = differ.diff( originalContent, newContent );
+		const difference = diffChars( originalContent, newContent );
 
 		return difference.map( ( item, pos ) => {
-			const classes = classname( {
+			const classes = classnames( {
 				'editor-block-compare__added': item.added,
 				'editor-block-compare__removed': item.removed,
 			} );
