@@ -2162,6 +2162,21 @@ export function isPublishSidebarEnabled( state ) {
 	return PREFERENCES_DEFAULTS.isPublishSidebarEnabled;
 }
 
+/**
+ * Returns the properties for the currently selected text inside the active
+ * RichText.
+ *
+ * Can be used together with the addAnnotation action to annotate the selected
+ * text.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} RichText information about the currently selected text.
+ */
+export function getCurrentRichTextSelection( state ) {
+	return state.blockSelection.richText;
+}
+
 //
 // Deprecated
 //

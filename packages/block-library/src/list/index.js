@@ -335,6 +335,7 @@ export const settings = {
 					<RichText
 						identifier="values"
 						multiline="li"
+						identifier="values"
 						tagName={ tagName }
 						unstableGetSettings={ this.getEditorSettings }
 						unstableOnSetup={ this.setupEditor }

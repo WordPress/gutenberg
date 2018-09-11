@@ -653,6 +653,11 @@ export function blockSelection( state = {
 	isMultiSelecting: false,
 	isEnabled: true,
 	initialPosition: null,
+	richText: {
+		blockClientId: null,
+		identifier: null,
+		range: { start: null, end: null },
+	},
 }, action ) {
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK':
@@ -747,6 +752,12 @@ export function blockSelection( state = {
 			return {
 				...state,
 				isEnabled: action.isSelectionEnabled,
+			};
+
+		case 'SET_RICH_TEXT_SELECTION':
+			return {
+				...state,
+				richText: action.selection,
 			};
 	}
 

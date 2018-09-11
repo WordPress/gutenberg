@@ -57,6 +57,7 @@ import TinyMCE, { TINYMCE_ZWSP } from './tinymce';
 import { pickAriaProps } from './aria';
 import { getPatterns } from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
+import { applyAnnotations, removeAnnotations } from './annotations';
 
 /**
  * Browser dependencies
@@ -221,7 +222,7 @@ export class RichText extends Component {
 	 * @return {Object} The current record (value and selection).
 	 */
 	getRecord() {
-		const { formats, text } = this.formatToValue( this.props.value );
+		const { formats, text } = this.formatToValue( this.props.value, this.props.annotations );
 		const { start, end } = this.state;
 
 		return { formats, text, start, end };
@@ -259,7 +260,7 @@ export class RichText extends Component {
 	}
 
 	isEmpty() {
-		return isEmpty( this.formatToValue( this.props.value ) );
+		return isEmpty( this.formatToValue( this.props.value, this.props.annotations ) );
 	}
 
 	/**
@@ -439,6 +440,7 @@ export class RichText extends Component {
 			}
 
 			this.setState( { start, end } );
+			this.props.onSelectionChange( this.props.clientId, this.props.identifier, { start, end } );
 		}
 	}
 
@@ -739,12 +741,15 @@ export class RichText extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { tagName, value, isSelected } = this.props;
+		const { tagName, value, isSelected, annotations } = this.props;
+
+		const shouldApplyAnnotations = annotations !== prevProps.annotations;
 
 		if (
-			tagName === prevProps.tagName &&
+			( tagName === prevProps.tagName &&
 			value !== prevProps.value &&
-			value !== this.savedContent
+			value !== this.savedContent ) ||
+			shouldApplyAnnotations
 		) {
 			// Handle deprecated `children` and `node` sources.
 			// The old way of passing a value with the `node` matcher required
@@ -756,10 +761,10 @@ export class RichText extends Component {
 				return;
 			}
 
-			const record = this.formatToValue( value );
+			const record = this.formatToValue( value, annotations );
 
 			if ( isSelected ) {
-				const prevRecord = this.formatToValue( prevProps.value );
+				const prevRecord = this.formatToValue( prevProps.value, prevProps.annotations );
 				const length = getTextContent( prevRecord ).length;
 				record.start = length;
 				record.end = length;
@@ -773,8 +778,8 @@ export class RichText extends Component {
 		// an empty paragraph into another, then also set the selection to the
 		// end.
 		if ( isSelected && ! prevProps.isSelected && ! this.isActive() ) {
-			const record = this.formatToValue( value );
-			const prevRecord = this.formatToValue( prevProps.value );
+			const record = this.formatToValue( value, annotations );
+			const prevRecord = this.formatToValue( prevProps.value, prevProps.annotations );
 			const length = getTextContent( prevRecord ).length;
 			record.start = length;
 			record.end = length;
@@ -798,10 +803,12 @@ export class RichText extends Component {
 		}
 	}
 
-	formatToValue( value ) {
+	formatToValue( value, annotations = [] ) {
+		let record;
+
 		// Handle deprecated `children` and `node` sources.
 		if ( Array.isArray( value ) ) {
-			return create( {
+			record = create( {
 				html: children.toHTML( value ),
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
@@ -809,7 +816,7 @@ export class RichText extends Component {
 		}
 
 		if ( this.props.format === 'string' ) {
-			return create( {
+			record = create( {
 				html: value,
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
@@ -819,10 +826,10 @@ export class RichText extends Component {
 		// Guard for blocks passing `null` in onSplit callbacks. May be removed
 		// if onSplit is revised to not pass a `null` value.
 		if ( value === null ) {
-			return create();
+			record = create();
 		}
 
-		return value;
+		return applyAnnotations( record, annotations );
 	}
 
 	valueToEditableHTML( value ) {
@@ -840,10 +847,12 @@ export class RichText extends Component {
 	}
 
 	valueToFormat( { formats, text } ) {
+		const value = removeAnnotations( { formats, text } );
+
 		// Handle deprecated `children` and `node` sources.
 		if ( this.usedDeprecatedChildrenSource ) {
 			return children.fromDOM( unstableToDom( {
-				value: { formats, text },
+				value: value,
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
 			} ).body.childNodes );
@@ -851,13 +860,13 @@ export class RichText extends Component {
 
 		if ( this.props.format === 'string' ) {
 			return toHTMLString( {
-				value: { formats, text },
+				value: value,
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
 			} );
 		}
 
-		return { formats, text };
+		return value;
 	}
 
 	render() {
@@ -978,15 +987,24 @@ const RichTextContainer = compose( [
 			clientId: context.clientId,
 		};
 	} ),
-	withSelect( ( select ) => {
+	withSelect( ( select, props ) => {
 		const { isViewportMatch } = select( 'core/viewport' );
 		const { canUserUseUnfilteredHTML, isCaretWithinFormattedText } = select( 'core/editor' );
+		const { getAnnotationsForRichText } = select( 'core/annotations' );
 
-		return {
+		const selectProps = {
 			isViewportSmall: isViewportMatch( '< small' ),
 			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
 			isCaretWithinFormattedText: isCaretWithinFormattedText(),
 		};
+
+		// Allow explicit annotations to be passed in.
+		// When an identifier is passed in we can retrieve the annotations for this RichText.
+		if ( ! props.annotations && props.identifier ) {
+			selectProps.annotations = getAnnotationsForRichText( props.clientId, props.identifier );
+		}
+
+		return selectProps;
 	} ),
 	withDispatch( ( dispatch ) => {
 		const {
@@ -995,6 +1013,7 @@ const RichTextContainer = compose( [
 			undo,
 			enterFormattedText,
 			exitFormattedText,
+			setRichTextSelection,
 		} = dispatch( 'core/editor' );
 
 		return {
@@ -1003,6 +1022,7 @@ const RichTextContainer = compose( [
 			onUndo: undo,
 			onEnterFormattedText: enterFormattedText,
 			onExitFormattedText: exitFormattedText,
+			onSelectionChange: setRichTextSelection,
 		};
 	} ),
 	withSafeTimeout,

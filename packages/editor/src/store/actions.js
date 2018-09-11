@@ -788,6 +788,26 @@ export function unlockPostSaving( lockName ) {
 	};
 }
 
+/**
+ * Sets the rich text selection to a certain value.
+ *
+ * @param {string} blockClientId The block that text is selected in.
+ * @param {string} identifier    The RichText identifier that text is selected in.
+ * @param {Object} range         The start and end that text is selected in.
+ *
+ * @return {Object} Action object.
+ */
+export function setRichTextSelection( blockClientId, identifier, range ) {
+	return {
+		type: 'SET_RICH_TEXT_SELECTION',
+		selection: {
+			blockClientId,
+			richTextIdentifier: identifier,
+			range,
+		},
+	};
+}
+
 //
 // Deprecated
 //

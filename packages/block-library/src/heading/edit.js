@@ -44,6 +44,7 @@ export default function HeadingEdit( {
 			<RichText
 				identifier="content"
 				wrapperClassName="wp-block-heading"
+				identifier="content"
 				tagName={ tagName }
 				value={ content }
 				onChange={ ( value ) => setAttributes( { content: value } ) }

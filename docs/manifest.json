@@ -258,6 +258,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/annotations",
+		"slug": "packages-annotations",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/annotations/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/api-fetch",
 		"slug": "packages-api-fetch",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/api-fetch/README.md",
@@ -927,6 +933,12 @@
 		"title": "WordPress Core Data",
 		"slug": "data-core",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core.md",
+		"parent": "data"
+	},
+	{
+		"title": "Annotations",
+		"slug": "data-core-annotations",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-annotations.md",
 		"parent": "data"
 	},
 	{

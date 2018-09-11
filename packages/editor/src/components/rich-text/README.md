@@ -57,6 +57,25 @@ Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs
 
 *Optional.* A list of autocompleters to use instead of the default.
 
+### `annotations: Array`
+
+*Optional.* A list of annotations that should be applied to the content.
+
+An annotation has the following shape:
+
+```js
+{
+	// The source of the annotation, will be used for the HTML class.
+	"source": "annotations-tester",
+	
+	// The starting offset within the rich-text structure.
+	"start": 106,
+	
+	// The ending offset within the rich-text structure.
+	"end": 75
+}
+```
+
 ## RichText.Content
 
 `RichText.Content` should be used in the `save` function of your block to correctly save rich text content.

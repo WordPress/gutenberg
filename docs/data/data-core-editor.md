@@ -1393,6 +1393,22 @@ or skipped when the user clicks the "publish" button.
 
 Whether the pre-publish panel should be shown or not.
 
+### getCurrentRichTextSelection
+
+Returns the properties for the currently selected text inside the active
+RichText.
+
+Can be used together with the addAnnotation action to annotate the selected
+text.
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+RichText information about the currently selected text.
+
 ## Actions
 
 ### setupEditor
@@ -1803,6 +1819,16 @@ Returns an action object used to signal that post saving is unlocked.
 *Parameters*
 
  * lockName: The lock name.
+
+### setRichTextSelection
+
+Sets the rich text selection to a certain value.
+
+*Parameters*
+
+ * blockClientId: The block that text is selected in.
+ * identifier: The RichText identifier that text is selected in.
+ * range: The start and end that text is selected in.
 
 ### createNotice
 

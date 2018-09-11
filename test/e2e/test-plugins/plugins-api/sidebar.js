@@ -5,6 +5,8 @@
 	var compose = wp.compose.compose;
 	var withDispatch = wp.data.withDispatch;
 	var withSelect = wp.data.withSelect;
+	var select = wp.data.select;
+	var dispatch = wp.data.dispatch;
 	var PlainText = wp.editor.PlainText;
 	var Fragment = wp.element.Fragment;
 	var el = wp.element.createElement;
@@ -48,6 +50,24 @@
 					},
 					__( 'Reset' )
 				)
+			),
+			el(
+				Button,
+				{
+					isPrimary: true,
+					onClick: () => {
+						dispatch( 'core/annotations' ).addAnnotation( {
+							source: 'e2e-tests',
+							blockClientId: select( 'core/editor' ).getBlockOrder()[ 0 ],
+							richTextIdentifier: 'content',
+							range: {
+								start: 9,
+								end: 13,
+							},
+						} );
+					},
+				},
+				__( 'Add annotation' )
 			)
 		);
 	}
