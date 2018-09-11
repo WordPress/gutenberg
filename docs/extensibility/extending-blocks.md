@@ -169,6 +169,7 @@ const withInspectorControls =  createHigherOrderComponent(BlockEdit => {
 
 wp.hooks.addFilter( 'editor.BlockEdit', 'my-plugin/with-inspector-controls', withInspectorControls );
 ```
+{% end %}
 
 #### `editor.BlockListBlock`
 
@@ -223,6 +224,7 @@ const withDataAlign = createHigherOrderComponent( ( BlockListBlock ) => {
 
 wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-data-align', withDataAlign );
 ```
+{% end %}
 
 ## Removing Blocks
 
