@@ -5,7 +5,8 @@ const PublishButton = ( {
 	isSidebarEnabled,
 	onToggle,
 	forceIsDirty,
-	forceIsSaving } ) => {
+	forceIsSaving,
+} ) => {
 	if ( isSidebarEnabled ) {
 		return (
 			<PostPublishPanelToggle
