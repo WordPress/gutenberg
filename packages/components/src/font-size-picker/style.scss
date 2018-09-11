@@ -22,6 +22,14 @@
 		> span {
 			line-height: 1;
 		}
+
+		&.is-font-medium {
+			font-size: 18px;
+		}
+
+		&.is-font-large {
+			font-size: 22px;
+		}
 	}
 }
 

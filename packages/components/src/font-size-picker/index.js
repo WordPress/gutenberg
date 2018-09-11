@@ -33,7 +33,7 @@ export default function FontSizePicker( { fontSizes = [], fallbackFontSize, valu
 		>
 			<div className="components-font-size-picker__buttons">
 				<ButtonGroup aria-label={ __( 'Font Size' ) }>
-					{ map( fontSizes, ( { name, size, shortName } ) => (
+					{ map( fontSizes, ( { name, size, shortName, slug } ) => (
 						<Tooltip text={ name || shortName }>
 							<Button
 								key={ size }
@@ -41,7 +41,7 @@ export default function FontSizePicker( { fontSizes = [], fallbackFontSize, valu
 								isPrimary={ value === size }
 								aria-pressed={ value === size }
 								onClick={ () => onChange( size ) }
-								style={ { fontSize: size } }
+								className={ 'is-font-' + slug }
 							>
 								<span>A</span>
 							</Button>
