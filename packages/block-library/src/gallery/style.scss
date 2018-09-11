@@ -29,6 +29,15 @@
 			height: auto;
 		}
 
+		// IE doesn't handle cropping, so we need an explicit width here.
+		img {
+			width: 100%;
+			// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
+			@supports (position: sticky) {
+				width: auto;
+			}
+		}
+
 		figcaption {
 			position: absolute;
 			width: 100%;
