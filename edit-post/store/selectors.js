@@ -16,18 +16,6 @@ export function getEditorMode( state ) {
 }
 
 /**
- * Returns whether the pre-publish panel show be shown
- * or hidden on publish.
- *
- * @param {Object} state Global application state.
- *
- * @return {boolean} Whether the pre-publish panel should be shown or not.
- */
-export function isPublishSidebarEnabled( state ) {
-	return getPreference( state, 'isPublishSidebarEnabled', true );
-}
-
-/**
  * Returns true if the editor sidebar is opened.
  *
  * @param {Object} state Global application state

@@ -21,11 +21,11 @@ const PublishSidebarToggle = function( { onToggle, isEnabled } ) {
 
 export default compose( [
 	withSelect( ( select ) => ( {
-		isEnabled: select( 'core/edit-post' ).isPublishSidebarEnabled(),
+		isEnabled: select( 'core/editor' ).isPublishSidebarEnabled(),
 	} ) ),
 	withDispatch( ( dispatch, ownProps ) => ( {
 		onToggle() {
-			const { disablePublishSidebar, enablePublishSidebar } = dispatch( 'core/edit-post' );
+			const { disablePublishSidebar, enablePublishSidebar } = dispatch( 'core/editor' );
 			if ( ownProps.isEnabled ) {
 				disablePublishSidebar();
 			} else {

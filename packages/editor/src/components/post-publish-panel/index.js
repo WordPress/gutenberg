@@ -117,7 +117,7 @@ export default compose( [
 			isSavingPost,
 			isEditedPostDirty,
 		} = select( 'core/editor' );
-		const { isPublishSidebarEnabled } = select( 'core/edit-post' );
+		const { isPublishSidebarEnabled } = select( 'core/editor' );
 		return {
 			postType: getCurrentPostType(),
 			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
@@ -129,7 +129,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, { isPublishSidebarEnabled } ) => {
-		const { disablePublishSidebar, enablePublishSidebar } = dispatch( 'core/edit-post' );
+		const { disablePublishSidebar, enablePublishSidebar } = dispatch( 'core/editor' );
 		return {
 			onTogglePublishSidebar: ( ) => {
 				if ( isPublishSidebarEnabled ) {

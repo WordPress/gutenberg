@@ -810,6 +810,13 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 				...state,
 				insertUsage: omitBy( state.insertUsage, ( { insert } ) => insert.ref === action.id ),
 			};
+
+		case 'ENABLE_PUBLISH_SIDEBAR':
+		case 'DISABLE_PUBLISH_SIDEBAR':
+			return {
+				...state,
+				isPublishSidebarEnabled: action.type === 'ENABLE_PUBLISH_SIDEBAR',
+			};
 	}
 
 	return state;

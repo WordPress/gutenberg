@@ -23,7 +23,6 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				editorMode: 'visual',
 				isGeneralSidebarDismissed: false,
-				isPublishSidebarEnabled: true,
 				panels: { 'post-status': true },
 				features: { fixedToolbar: false },
 				pinnedPluginItems: {},
@@ -50,24 +49,6 @@ describe( 'state', () => {
 			} );
 
 			expect( state.isGeneralSidebarDismissed ).toBe( true );
-		} );
-
-		it( 'should disable the publish sidebar', () => {
-			const original = deepFreeze( preferences( undefined, { } ) );
-			const state = preferences( original, {
-				type: 'DISABLE_PUBLISH_SIDEBAR',
-			} );
-
-			expect( state.isPublishSidebarEnabled ).toBe( false );
-		} );
-
-		it( 'should enable the publish sidebar', () => {
-			const original = deepFreeze( preferences( { isPublishSidebarEnabled: false }, { } ) );
-			const state = preferences( original, {
-				type: 'ENABLE_PUBLISH_SIDEBAR',
-			} );
-
-			expect( state.isPublishSidebarEnabled ).toBe( true );
 		} );
 
 		it( 'should set the sidebar panel open flag to true if unset', () => {

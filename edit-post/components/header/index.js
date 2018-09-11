@@ -81,7 +81,7 @@ export default compose(
 	withSelect( ( select ) => ( {
 		isEditorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
 		isPublishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
-		isPublishSidebarEnabled: select( 'core/edit-post' ).isPublishSidebarEnabled(),
+		isPublishSidebarEnabled: select( 'core/editor' ).isPublishSidebarEnabled(),
 		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 		hasBlockSelection: !! select( 'core/editor' ).getBlockSelectionStart(),

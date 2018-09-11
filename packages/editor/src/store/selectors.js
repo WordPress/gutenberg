@@ -1879,3 +1879,15 @@ export function getTokenSettings( state, name ) {
 export function canUserUseUnfilteredHTML( state ) {
 	return has( getCurrentPost( state ), [ '_links', 'wp:action-unfiltered_html' ] );
 }
+
+/**
+ * Returns whether the pre-publish panel should be shown
+ * or hidden on publish.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the pre-publish panel should be shown or not.
+ */
+export function isPublishSidebarEnabled( state ) {
+	return state.preferences.isPublishSidebarEnabled;
+}
