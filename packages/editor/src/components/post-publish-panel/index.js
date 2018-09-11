@@ -97,7 +97,7 @@ class PostPublishPanel extends Component {
 						</PostPublishPanelPostpublish>
 					) }
 					<CheckboxControl
-						label={ __( "Don't show this sidebar again." ) }
+						label={ __( 'Don’t show this sidebar again.' ) }
 						checked={ ! isPublishSidebarEnabled }
 						onChange={ onTogglePublishSidebar }
 					/>
