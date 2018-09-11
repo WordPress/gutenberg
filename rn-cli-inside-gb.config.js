@@ -26,9 +26,8 @@ module.exports = {
 		return roots;
 	},
 	getBlacklistRE: function() {
-		// Blacklist the GB packages we want to consume from NPM (online) directly.
-		// On the other hand, GB packages that are loaded from the source tree directly
-		// are automagically resolved by Metro so, there is no list of them anywhere.
+		// Blacklist the nested GB filetree so modules are not resolved in duplicates,
+		//  both in the nested directory and the parent directory.
 		return blacklist( [ new RegExp( path.basename( __dirname ) + '/gutenberg/.*' ) ] );
 	},
 	getTransformModulePath() {
