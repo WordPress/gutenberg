@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import BlockDraggable from '../block-draggable';
 
-export const IconDragHandle = ( { isVisible, className, icon, onDragStart, onDragEnd, blockElementId, order, rootClientId, clientId, layout } ) => {
+export const IconDragHandle = ( { isVisible, className, icon, onDragStart, onDragEnd, blockElementId, clientId, layout } ) => {
 	if ( ! isVisible ) {
 		return null;
 	}
@@ -17,10 +17,8 @@ export const IconDragHandle = ( { isVisible, className, icon, onDragStart, onDra
 
 	return (
 		<BlockDraggable
-			blockElementId={ blockElementId }
-			rootClientId={ rootClientId }
 			clientId={ clientId }
-			order={ order }
+			blockElementId={ blockElementId }
 			layout={ layout }
 			onDragStart={ onDragStart }
 			onDragEnd={ onDragEnd }

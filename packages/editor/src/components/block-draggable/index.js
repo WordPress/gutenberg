@@ -2,11 +2,12 @@
  * WordPress dependencies
  */
 import { Draggable } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 
-const BlockDraggable = ( { children, clientId, rootClientId, blockElementId, layout, order, onDragStart, onDragEnd } ) => {
+const BlockDraggable = ( { children, clientId, rootClientId, blockElementId, index, layout, onDragStart, onDragEnd } ) => {
 	const transferData = {
 		type: 'block',
-		fromIndex: order,
+		fromIndex: index,
 		rootClientId,
 		clientId,
 		layout,
@@ -31,4 +32,10 @@ const BlockDraggable = ( { children, clientId, rootClientId, blockElementId, lay
 	);
 };
 
-export default BlockDraggable;
+export default withSelect( ( select, { clientId } ) => {
+	const { getBlockIndex, getBlockRootClientId } = select( 'core/editor' );
+	return {
+		index: getBlockIndex( clientId ),
+		rootClientId: getBlockRootClientId( clientId ),
+	};
+} )( BlockDraggable );

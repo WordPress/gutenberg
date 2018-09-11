@@ -44,7 +44,7 @@ export class BlockMover extends Component {
 	}
 
 	render() {
-		const { onMoveUp, onMoveDown, isFirst, isLast, isDraggable, onDragStart, onDragEnd, clientIds, rootClientId, blockElementId, layout, order, blockType, firstIndex, isLocked, instanceId, isHidden } = this.props;
+		const { onMoveUp, onMoveDown, isFirst, isLast, isDraggable, onDragStart, onDragEnd, clientIds, blockElementId, layout, blockType, firstIndex, isLocked, instanceId, isHidden } = this.props;
 		const { isFocused } = this.state;
 		const blocksCount = castArray( clientIds ).length;
 		if ( isLocked || ( isFirst && isLast ) ) {
@@ -70,10 +70,8 @@ export class BlockMover extends Component {
 				<IconDragHandle
 					className="editor-block-mover__control"
 					icon={ dragHandle }
-					blockElementId={ blockElementId }
-					order={ order }
-					rootClientId={ rootClientId }
 					clientId={ clientIds }
+					blockElementId={ blockElementId }
 					layout={ layout }
 					isVisible={ isDraggable }
 					onDragStart={ onDragStart }
@@ -119,15 +117,17 @@ export class BlockMover extends Component {
 }
 
 export default compose(
-	withSelect( ( select, { clientIds, rootClientId } ) => {
-		const { getBlock, getBlockIndex, getTemplateLock } = select( 'core/editor' );
+	withSelect( ( select, { clientIds } ) => {
+		const { getBlock, getBlockIndex, getTemplateLock, getBlockRootClientId } = select( 'core/editor' );
 		const firstClientId = first( castArray( clientIds ) );
 		const block = getBlock( firstClientId );
+		const rootClientId = getBlockRootClientId( first( castArray( clientIds ) ) );
 
 		return {
 			firstIndex: getBlockIndex( firstClientId, rootClientId ),
 			blockType: block ? getBlockType( block.name ) : null,
 			isLocked: getTemplateLock( rootClientId ) === 'all',
+			rootClientId,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientIds, rootClientId } ) => {
