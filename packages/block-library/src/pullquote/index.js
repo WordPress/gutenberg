@@ -55,33 +55,35 @@ export const settings = {
 		const { value, citation } = attributes;
 
 		return (
-			<blockquote className={ className }>
-				<RichText
-					multiline="p"
-					value={ toRichTextValue( value ) }
-					onChange={
-						( nextValue ) => setAttributes( {
-							value: fromRichTextValue( nextValue ),
-						} )
-					}
-					/* translators: the text of the quotation */
-					placeholder={ __( 'Write quote…' ) }
-					wrapperClassName="block-library-pullquote__content"
-				/>
-				{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
+			<figure className={ className }>
+				<blockquote>
 					<RichText
-						value={ citation }
-						/* translators: the individual or entity quoted */
-						placeholder={ __( 'Write citation…' ) }
+						multiline="p"
+						value={ toRichTextValue( value ) }
 						onChange={
-							( nextCitation ) => setAttributes( {
-								citation: nextCitation,
+							( nextValue ) => setAttributes( {
+								value: fromRichTextValue( nextValue ),
 							} )
 						}
-						className="wp-block-pullquote__citation"
+						/* translators: the text of the quotation */
+						placeholder={ __( 'Write quote…' ) }
+						wrapperClassName="block-library-pullquote__content"
 					/>
-				) }
-			</blockquote>
+					{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
+						<RichText
+							value={ citation }
+							/* translators: the individual or entity quoted */
+							placeholder={ __( 'Write citation…' ) }
+							onChange={
+								( nextCitation ) => setAttributes( {
+									citation: nextCitation,
+								} )
+							}
+							className="wp-block-pullquote__citation"
+						/>
+					) }
+				</blockquote>
+			</figure>
 		);
 	},
 
@@ -89,14 +91,29 @@ export const settings = {
 		const { value, citation } = attributes;
 
 		return (
-			<blockquote>
-				<RichText.Content value={ toRichTextValue( value ) } />
-				{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
-			</blockquote>
+			<figure>
+				<blockquote>
+					<RichText.Content value={ toRichTextValue( value ) } />
+					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
+				</blockquote>
+			</figure>
 		);
 	},
 
 	deprecated: [ {
+		attributes: {
+			...blockAttributes,
+		},
+		save( { attributes } ) {
+			const { value, citation } = attributes;
+			return (
+				<blockquote>
+					<RichText.Content value={ toRichTextValue( value ) } />
+					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
+				</blockquote>
+			);
+		},
+	}, {
 		attributes: {
 			...blockAttributes,
 			citation: {
