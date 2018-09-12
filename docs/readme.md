@@ -13,8 +13,11 @@ Key take-aways from parsing that paragraph:
 Gutenberg is being developed on [GitHub](https://github.com/WordPress/gutenberg), and you can try [an early beta version today from the plugin repository](https://wordpress.org/plugins/gutenberg/). Though keep in mind it's not fully functional, feature complete, or production ready.
 
 ## Logo
+<img width="200px" src="https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/final-g-wapuu-black.svg?sanitize=true" alt="Gutenberg Logo" />
+
 Released under GPL license, made by [Cristel Rossignol](https://twitter.com/cristelrossi).
-[Gutenberg logo](https://github.com/WordPress/gutenberg/blob/master/docs/final-g-wapuu-black.svg).
+
+[Download](https://github.com/WordPress/gutenberg/blob/master/docs/final-g-wapuu-black.svg) logo SVG file.
 
 ## Mockups
 
