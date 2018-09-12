@@ -1,6 +1,6 @@
 # Panel
 
-Panel creates a container with a header that can take collapsible PanelBody components to easily create a user friendly interface for affecting state and attributes within Gutenberg.
+The Panel creates a container with a header that can take collapsible PanelBody components to easily create a user friendly interface for affecting state and attributes within Gutenberg.
 
 ### Sub-Components
 
@@ -22,7 +22,7 @@ Title of the Panel. Text will be rendered inside an `<h2>` tag.
 - Type: `String`
 - Required: No
 
-
+---
 #### PanelBody
 
 The PanelBody creates a collapsible container that can be toggled open or closed. 
@@ -73,7 +73,7 @@ Whether or not the panel will start open.
 - Type: `Boolean`
 - Required: No
 - Default: true
-
+---
 #### PanelRow
 
 The is a generic container for panel content. Default Gutenberg styles add a top margin and arrange items in a flex row.
@@ -86,7 +86,20 @@ The class that will be added with `components-panel__row`.  to the classes of th
 
 - Type: `String`
 - Required: No
+---
 
+#### PanelHeader
+
+This is a simple container for a header component. This is used by the `Panel` component under the hood, so it does not typically need to be used.
+
+##### Props
+
+###### label
+
+The text that will be rendered as the title of the Panel. Will be rendered in an `<h2>` tag.
+
+- Type: `String`
+- Required: No
 
 ## Usage
 
