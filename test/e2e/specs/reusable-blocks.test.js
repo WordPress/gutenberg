@@ -127,8 +127,12 @@ describe( 'Reusable Blocks', () => {
 		// Change the block's title
 		await page.keyboard.type( 'Surprised greeting block' );
 
+		// Tab three times to navigate to the block's content
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+
 		// Change the block's content
-		await pressWithModifier( 'Shift', 'Tab' );
 		await page.keyboard.type( 'Oh! ' );
 
 		// Save the reusable block
@@ -154,7 +158,7 @@ describe( 'Reusable Blocks', () => {
 			'.editor-block-list__block[data-type="core/block"] .editor-rich-text',
 			( element ) => element.innerText
 		);
-		expect( text ).toMatch( 'Hello there!' );
+		expect( text ).toMatch( 'Oh! Hello there!' );
 	} );
 
 	it( 'can be converted to a regular block', async () => {
@@ -177,7 +181,7 @@ describe( 'Reusable Blocks', () => {
 			'.editor-block-list__block[data-type="core/paragraph"] .editor-rich-text',
 			( element ) => element.innerText
 		);
-		expect( text ).toMatch( 'Hello there!' );
+		expect( text ).toMatch( 'Oh! Hello there!' );
 	} );
 
 	it( 'can be deleted', async () => {
