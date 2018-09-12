@@ -144,48 +144,64 @@ export function getEmbedEdit( title, icon ) {
 		 * @param {string} html The preview HTML that possibly contains an iframe with width and height set.
 		 */
 		maybeSetAspectRatioClassName( html ) {
-			const previewDom = document.createElement( 'div' );
-			previewDom.innerHTML = html;
-			const iframe = previewDom.querySelector( 'iframe' );
+			// Extract the first iframe's height and width without having to construct DOM elements.
+			const matches = html.toLowerCase().match( /<iframe[^>]+(height|width)=['"]?([0-9]+)["']?[^>]+(height|width)=['"]?([0-9]+)["']?.*?>/ );
+			let height;
+			let width;
 
-			if ( ! iframe ) {
+			if ( ! matches ) {
 				return;
 			}
 
-			if ( iframe.height && iframe.width ) {
-				const aspectRatio = ( iframe.width / iframe.height ).toFixed( 2 );
-				let aspectRatioClassName;
+			if ( 'height' === matches[ 1 ] ) {
+				height = parseInt( matches[ 2 ] );
+			}
+			if ( 'height' === matches[ 3 ] ) {
+				height = parseInt( matches[ 4 ] );
+			}
+			if ( 'width' === matches[ 1 ] ) {
+				width = parseInt( matches[ 2 ] );
+			}
+			if ( 'width' === matches[ 3 ] ) {
+				width = parseInt( matches[ 4 ] );
+			}
 
-				switch ( aspectRatio ) {
-					// Common video resolutions.
-					case '2.33':
-						aspectRatioClassName = 'wp-embed-aspect-21-9';
-						break;
-					case '2.00':
-						aspectRatioClassName = 'wp-embed-aspect-18-9';
-						break;
-					case '1.78':
-						aspectRatioClassName = 'wp-embed-aspect-16-9';
-						break;
-					case '1.33':
-						aspectRatioClassName = 'wp-embed-aspect-4-3';
-						break;
-					// Vertical video and instagram square video support.
-					case '1.00':
-						aspectRatioClassName = 'wp-embed-aspect-1-1';
-						break;
-					case '0.56':
-						aspectRatioClassName = 'wp-embed-aspect-9-16';
-						break;
-					case '0.50':
-						aspectRatioClassName = 'wp-embed-aspect-1-2';
-						break;
-				}
+			if ( ! height && ! width ) {
+				return;
+			}
 
-				if ( aspectRatioClassName ) {
-					const className = classnames( this.props.attributes.className, 'wp-has-aspect-ratio', aspectRatioClassName );
-					this.props.setAttributes( { className } );
-				}
+			const aspectRatio = ( width / height ).toFixed( 2 );
+			let aspectRatioClassName;
+
+			switch ( aspectRatio ) {
+				// Common video resolutions.
+				case '2.33':
+					aspectRatioClassName = 'wp-embed-aspect-21-9';
+					break;
+				case '2.00':
+					aspectRatioClassName = 'wp-embed-aspect-18-9';
+					break;
+				case '1.78':
+					aspectRatioClassName = 'wp-embed-aspect-16-9';
+					break;
+				case '1.33':
+					aspectRatioClassName = 'wp-embed-aspect-4-3';
+					break;
+				// Vertical video and instagram square video support.
+				case '1.00':
+					aspectRatioClassName = 'wp-embed-aspect-1-1';
+					break;
+				case '0.56':
+					aspectRatioClassName = 'wp-embed-aspect-9-16';
+					break;
+				case '0.50':
+					aspectRatioClassName = 'wp-embed-aspect-1-2';
+					break;
+			}
+
+			if ( aspectRatioClassName ) {
+				const className = classnames( this.props.attributes.className, 'wp-has-aspect-ratio', aspectRatioClassName );
+				this.props.setAttributes( { className } );
 			}
 		}
 
