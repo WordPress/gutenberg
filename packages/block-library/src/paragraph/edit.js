@@ -150,7 +150,6 @@ class ParagraphBlock extends Component {
 			<Fragment>
 				<BlockControls>
 					<AlignmentToolbar
-						isCollapsed
 						value={ align }
 						onChange={ ( nextAlign ) => {
 							setAttributes( { align: nextAlign } );
