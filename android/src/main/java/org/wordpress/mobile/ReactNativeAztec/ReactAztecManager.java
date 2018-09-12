@@ -77,6 +77,11 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
                                 "phasedRegistrationNames",
                                 MapBuilder.of("bubbled", "onTextInput", "captured", "onTextInputCapture")))
                 .put(
+                        "topTextInputEnter",
+                        MapBuilder.of(
+                                "phasedRegistrationNames",
+                                MapBuilder.of("bubbled", "onEnter")))
+                .put(
                         "topFocus",
                         MapBuilder.of(
                                 "phasedRegistrationNames",
@@ -167,6 +172,23 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
             view.setScrollWatcher(new AztecScrollWatcher(view));
         } else {
             view.setScrollWatcher(null);
+        }
+    }
+
+    @ReactProp(name = "onEnter", defaultBoolean = false)
+    public void setOnEnterHandling(final ReactAztecText view, boolean onEnterHandling) {
+        if (onEnterHandling) {
+            view.setOnEnterListener(new ReactAztecText.OnEnterListener() {
+                @Override
+                public boolean onEnterKey() {
+                    ReactContext reactContext = (ReactContext) view.getContext();
+                    EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
+                    eventDispatcher.dispatchEvent(new ReactAztecEnterEvent(view.getId()));
+                    return true;
+                }
+            });
+        } else {
+            view.setOnEnterListener(null);
         }
     }
 
