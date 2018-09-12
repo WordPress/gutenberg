@@ -213,11 +213,27 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 			transform: translateY(-#{ $block-padding });
 			top: $block-padding;
 
+			.editor-block-toolbar {
+				border: none;
+
+				// Match the TinyMCE "mobile" breakpoint buttons alignment.
+				margin-top: 3px;
+				@include break-medium() {
+					margin-top: 0;
+				}
+
+				&::before {
+					content: "";
+					display: block;
+					border-left: 1px solid $light-gray-500;
+					margin-top: $grid-size-small;
+					margin-bottom: $grid-size-small;
+				}
+			}
+
 			.components-toolbar {
 				background: transparent;
-				border-top: none;
-				border-right: none;
-				border-bottom: none;
+				border: none;
 			}
 		}
 
