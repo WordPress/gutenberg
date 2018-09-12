@@ -3,7 +3,14 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Toolbar } from '@wordpress/components';
+import { withViewportMatch } from '@wordpress/viewport';
 import { withSelect } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import { withBlockEditContext } from '../block-edit/context';
 
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	left: {
@@ -31,7 +38,7 @@ const BLOCK_ALIGNMENTS_CONTROLS = {
 const DEFAULT_CONTROLS = [ 'left', 'center', 'right', 'wide', 'full' ];
 const WIDE_CONTROLS = [ 'wide', 'full' ];
 
-export function BlockAlignmentToolbar( { value, onChange, controls = DEFAULT_CONTROLS, wideControlsEnabled = false } ) {
+export function BlockAlignmentToolbar( { isCollapsed, value, onChange, controls = DEFAULT_CONTROLS, wideControlsEnabled = false } ) {
 	function applyOrUnset( align ) {
 		return () => onChange( value === align ? undefined : align );
 	}
@@ -40,8 +47,13 @@ export function BlockAlignmentToolbar( { value, onChange, controls = DEFAULT_CON
 		controls :
 		controls.filter( ( control ) => WIDE_CONTROLS.indexOf( control ) === -1 );
 
+	const activeAlignment = BLOCK_ALIGNMENTS_CONTROLS[ value ];
+
 	return (
 		<Toolbar
+			isCollapsed={ isCollapsed }
+			icon={ activeAlignment ? activeAlignment.icon : 'align-left' }
+			label={ __( 'Change Text Alignment' ) }
 			controls={
 				enabledControls.map( ( control ) => {
 					return {
@@ -55,8 +67,21 @@ export function BlockAlignmentToolbar( { value, onChange, controls = DEFAULT_CON
 	);
 }
 
-export default withSelect(
-	( select ) => ( {
-		wideControlsEnabled: select( 'core/editor' ).getEditorSettings().alignWide,
-	} )
+export default compose(
+	withBlockEditContext( ( { clientId } ) => {
+		return {
+			clientId,
+		};
+	} ),
+	withViewportMatch( { isLargeViewport: 'medium' } ),
+	withSelect( ( select, { clientId, isLargeViewport, isCollapsed } ) => {
+		const { getBlockRootClientId, getEditorSettings } = select( 'core/editor' );
+		return {
+			wideControlsEnabled: select( 'core/editor' ).getEditorSettings().alignWide,
+			isCollapsed: isCollapsed || ! isLargeViewport || (
+				getBlockRootClientId( clientId ) &&
+				! getEditorSettings().hasFixedToolbar
+			),
+		};
+	} ),
 )( BlockAlignmentToolbar );
