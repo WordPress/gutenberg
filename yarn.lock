@@ -445,6 +445,12 @@
     pirates "^4.0.0"
     source-map-support "^0.4.2"
 
+"@babel/runtime@^7.0.0":
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.0.0.tgz#adeb78fedfc855aa05bc041640f3f6f98e85424c"
+  dependencies:
+    regenerator-runtime "^0.12.0"
+
 "@babel/runtime@^7.0.0-beta.52":
   version "7.0.0-beta.54"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.0.0-beta.54.tgz#39ebb42723fe7ca4b3e1b00e967e80138d47cadf"
@@ -535,6 +541,12 @@
     babel-plugin-transform-react-jsx "^6.24.1"
     babel-plugin-transform-runtime "^6.23.0"
     babel-preset-env "^1.6.1"
+
+"@wordpress/blob@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@wordpress/blob/-/blob-2.0.0.tgz#b310674a93f7484c0b4492e6698aba55a1e04f48"
+  dependencies:
+    "@babel/runtime" "^7.0.0"
 
 "@wordpress/block-serialization-spec-parser@^1.0.0":
   version "1.0.0"
