@@ -35,7 +35,7 @@ const blockAttributes = {
 	citation: {
 		type: 'array',
 		source: 'children',
-		selector: 'cite',
+		selector: 'footer cite',
 	},
 	align: {
 		type: 'string',
@@ -205,6 +205,7 @@ export const settings = {
 					/>
 					{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 						<RichText
+							tagName="footer"
 							value={ citation }
 							onChange={
 								( nextCitation ) => setAttributes( {
@@ -213,7 +214,6 @@ export const settings = {
 							}
 							/* translators: the individual or entity quoted */
 							placeholder={ __( 'Write citation…' ) }
-							className="wp-block-quote__citation"
 						/>
 					) }
 				</blockquote>
@@ -227,7 +227,11 @@ export const settings = {
 		return (
 			<blockquote style={ { textAlign: align ? align : null } }>
 				<RichText.Content value={ toRichTextValue( value ) } />
-				{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
+				{ ! RichText.isEmpty( citation ) && (
+					<footer>
+						<RichText.Content tagName="cite" value={ citation } />
+					</footer>
+				) }
 			</blockquote>
 		);
 	},
@@ -291,6 +295,27 @@ export const settings = {
 					>
 						<RichText.Content value={ toRichTextValue( value ) } />
 						{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="footer" value={ citation } /> }
+					</blockquote>
+				);
+			},
+		},
+		{
+			attributes: {
+				...blockAttributes,
+				citation: {
+					type: 'array',
+					source: 'children',
+					selector: 'cite',
+				},
+			},
+
+			save( { attributes } ) {
+				const { align, value, citation } = attributes;
+
+				return (
+					<blockquote style={ { textAlign: align ? align : null } }>
+						<RichText.Content value={ toRichTextValue( value ) } />
+						{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
 					</blockquote>
 				);
 			},

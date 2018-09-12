@@ -1,9 +1,7 @@
 .wp-block-quote {
 	margin: 20px 0;
 
-	cite,
-	footer,
-	&__citation {
+	footer {
 		color: $dark-gray-300;
 		font-size: $default-font-size;
 		margin-top: 1em;

@@ -29,7 +29,7 @@ const blockAttributes = {
 	citation: {
 		type: 'array',
 		source: 'children',
-		selector: 'cite',
+		selector: 'footer cite',
 	},
 };
 
@@ -70,6 +70,7 @@ export const settings = {
 				/>
 				{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 					<RichText
+						tagName="footer"
 						value={ citation }
 						/* translators: the individual or entity quoted */
 						placeholder={ __( 'Write citation…' ) }
@@ -78,7 +79,6 @@ export const settings = {
 								citation: nextCitation,
 							} )
 						}
-						className="wp-block-pullquote__citation"
 					/>
 				) }
 			</blockquote>
@@ -91,34 +91,61 @@ export const settings = {
 		return (
 			<blockquote>
 				<RichText.Content value={ toRichTextValue( value ) } />
-				{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
+				{ ! RichText.isEmpty( citation ) && (
+					<footer>
+						<RichText.Content tagName="cite" value={ citation } />
+					</footer>
+				) }
 			</blockquote>
 		);
 	},
 
-	deprecated: [ {
-		attributes: {
-			...blockAttributes,
-			citation: {
-				type: 'array',
-				source: 'children',
-				selector: 'footer',
+	deprecated: [
+		{
+			attributes: {
+				...blockAttributes,
+				citation: {
+					type: 'array',
+					source: 'children',
+					selector: 'footer',
+				},
+				align: {
+					type: 'string',
+					default: 'none',
+				},
 			},
-			align: {
-				type: 'string',
-				default: 'none',
+
+			save( { attributes } ) {
+				const { value, citation, align } = attributes;
+
+				return (
+					<blockquote className={ `align${ align }` }>
+						<RichText.Content value={ toRichTextValue( value ) } />
+						{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="footer" value={ citation } /> }
+					</blockquote>
+				);
 			},
 		},
+		{
+			attributes: {
+				...blockAttributes,
+				citation: {
+					type: 'array',
+					source: 'children',
+					selector: 'cite',
+				},
+			},
 
-		save( { attributes } ) {
-			const { value, citation, align } = attributes;
+			save( { attributes } ) {
+				const { value, citation } = attributes;
 
-			return (
-				<blockquote className={ `align${ align }` }>
-					<RichText.Content value={ toRichTextValue( value ) } />
-					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="footer" value={ citation } /> }
-				</blockquote>
-			);
+				return (
+					<blockquote>
+						<RichText.Content value={ toRichTextValue( value ) } />
+						{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
+					</blockquote>
+				);
+			},
 		},
-	} ],
+	],
 };

@@ -21,6 +21,6 @@
             ]
         },
         "innerBlocks": [],
-        "originalContent": "<blockquote class=\"wp-block-pullquote\">\n<p>Testing pullquote block...</p><cite>...with a caption</cite>\n</blockquote>"
+        "originalContent": "<blockquote class=\"wp-block-pullquote\">\n<p>Testing pullquote block...</p>\n<footer><cite>...with a caption</cite></footer>\n</blockquote>"
     }
 ]
