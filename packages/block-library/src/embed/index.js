@@ -144,9 +144,9 @@ export function getEmbedEdit( title, icon ) {
 		 * @param {string} html The preview HTML that possibly contains an iframe with width and height set.
 		 */
 		maybeSetAspectRatioClassName( html ) {
-			const previewDom = document.createElement( 'div' );
-			previewDom.innerHTML = html;
-			const iframe = previewDom.querySelector( 'iframe' );
+			const previewDocument = document.implementation.createHTMLDocument( '' );
+			previewDocument.body.innerHTML = html;
+			const iframe = previewDocument.body.querySelector( 'iframe' );
 
 			if ( ! iframe ) {
 				return;
