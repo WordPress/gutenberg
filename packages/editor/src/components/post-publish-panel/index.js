@@ -99,7 +99,7 @@ class PostPublishPanel extends Component {
 				</div>
 				<div className="editor-post-publish-panel__footer">
 					<CheckboxControl
-						label={ __( 'Show this pre-publish check every time I publish.' ) }
+						label={ __( 'Always show pre-publish checks.' ) }
 						checked={ isPublishSidebarEnabled }
 						onChange={ onTogglePublishSidebar }
 					/>

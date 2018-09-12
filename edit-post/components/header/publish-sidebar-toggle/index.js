@@ -14,7 +14,7 @@ const PublishSidebarToggle = function( { onToggle, isEnabled } ) {
 			role="menuitemcheckbox"
 			onClick={ onToggle }
 		>
-			{ __( 'Enable pre-publish checks' ) }
+			{ __( 'Enable Pre-publish Checks' ) }
 		</MenuItem>
 	);
 };
