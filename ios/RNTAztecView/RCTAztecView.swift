@@ -69,17 +69,14 @@ class RCTAztecView: Aztec.TextView {
         
         super.insertText(text)
         updatePlaceholderVisibility()
-        
-        if let onChange = onChange {
-            let text = packForRN(getHTML(), withName: "text")
-            onChange(text)
-        }
     }
     
     open override func deleteBackward() {
         super.deleteBackward()
         updatePlaceholderVisibility()
-        
+    }
+
+    func propagateContentChanges() {
         if let onChange = onChange {
             let text = packForRN(getHTML(), withName: "text")
             onChange(text)
@@ -149,7 +146,6 @@ class RCTAztecView: Aztec.TextView {
         case "strikethrough": toggleStrikethrough(range: selectedRange)
         default: print("Format not recognized")
         }
-        propagateFormatChanges()
     }
 
     func propagateFormatChanges() {
@@ -179,6 +175,11 @@ extension RCTAztecView: UITextViewDelegate {
 
     func textViewDidChangeSelection(_ textView: UITextView) {
         propagateFormatChanges()
+    }
+
+    func textViewDidChange(_ textView: UITextView) {
+        propagateFormatChanges()
+        propagateContentChanges()
     }
 
 }
