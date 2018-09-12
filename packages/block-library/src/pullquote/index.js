@@ -1,28 +1,28 @@
 /**
  * External dependencies
  */
-import { includes, map } from 'lodash';
-import classnames from 'classnames';
+import { get, includes } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import {
-	InspectorControls,
 	getColorClassName,
-	PanelColorSettings,
 	RichText,
-	withColors,
+	getColorObjectByAttributeValues,
 } from '@wordpress/editor';
 import {
-	Fragment,
-} from '@wordpress/element';
+	select,
+} from '@wordpress/data';
 
-const toRichTextValue = ( value ) => map( value, ( ( subValue ) => subValue.children ) );
-const fromRichTextValue = ( value ) => map( value, ( subValue ) => ( {
-	children: subValue,
-} ) );
+import {
+	default as edit,
+	SOLID_COLOR_STYLE_NAME,
+	SOLID_COLOR_CLASS,
+	toRichTextValue,
+} from './edit';
+
 const blockAttributes = {
 	value: {
 		type: 'array',
@@ -39,16 +39,19 @@ const blockAttributes = {
 		source: 'children',
 		selector: 'cite',
 	},
-	backgroundColor: {
+	mainColor: {
 		type: 'string',
 	},
-	customBackgroundColor: {
+	customMainColor: {
+		type: 'string',
+	},
+	textColor: {
+		type: 'string',
+	},
+	customTextColor: {
 		type: 'string',
 	},
 };
-
-const STYLIZED_STYLE_NAME = 'stylized';
-const STYLIZED_CLASS = `is-style-${ STYLIZED_STYLE_NAME }`;
 
 export const name = 'core/pullquote';
 
@@ -66,88 +69,48 @@ export const settings = {
 
 	styles: [
 		{ name: 'default', label: __( 'Regular' ), isDefault: true },
-		{ name: STYLIZED_STYLE_NAME, label: __( 'Stylized' ) },
+		{ name: SOLID_COLOR_STYLE_NAME, label: __( 'Solid Color' ) },
 	],
 
 	supports: {
 		align: true,
 	},
 
-	edit: withColors( 'backgroundColor' )(
-		( { attributes, backgroundColor, setAttributes, isSelected, className, setBackgroundColor } ) => {
-			const { value, citation } = attributes;
-
-			let colorSettings = null;
-			const isStylizedStyleVariation = includes( className, STYLIZED_CLASS );
-			if ( isStylizedStyleVariation ) {
-				colorSettings = (
-					<InspectorControls>
-						<PanelColorSettings
-							title={ __( 'Color Settings' ) }
-							colorSettings={ [
-								{
-									value: backgroundColor.color,
-									onChange: setBackgroundColor,
-									label: __( 'Background Color' ),
-								},
-							] }
-						/>
-					</InspectorControls>
-				);
-			}
-
-			return (
-				<Fragment>
-					<figure style={ isStylizedStyleVariation ? { backgroundColor: backgroundColor.color } : undefined } className={ classnames(
-						className, {
-							[ backgroundColor.class ]: isStylizedStyleVariation && backgroundColor.class,
-						} ) }>
-						<blockquote>
-							<RichText
-								multiline="p"
-								value={ toRichTextValue( value ) }
-								onChange={
-									( nextValue ) => setAttributes( {
-										value: fromRichTextValue( nextValue ),
-									} )
-								}
-								/* translators: the text of the quotation */
-								placeholder={ __( 'Write quote…' ) }
-								wrapperClassName="block-library-pullquote__content"
-							/>
-							{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
-								<RichText
-									value={ citation }
-									/* translators: the individual or entity quoted */
-									placeholder={ __( 'Write citation…' ) }
-									onChange={
-										( nextCitation ) => setAttributes( {
-											citation: nextCitation,
-										} )
-									}
-									className="wp-block-pullquote__citation"
-								/>
-							) }
-						</blockquote>
-					</figure>
-					{ colorSettings }
-				</Fragment>
-			);
-		}
-	),
+	edit,
 
 	save( { attributes } ) {
-		const { backgroundColor, value, citation, className } = attributes;
-		const isStylizedStyleVariation = includes( className, STYLIZED_CLASS );
-		const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+		const { mainColor, customMainColor, textColor, customTextColor, value, citation, className } = attributes;
+		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
 
-		const figureClasses = classnames( {
-			[ backgroundClass ]: isStylizedStyleVariation && backgroundClass,
-		} );
+		let figureClass, figureStyles;
+		// Is solid color style
+		if ( isSolidColorStyle ) {
+			figureClass = getColorClassName( 'background-color', mainColor );
+			if ( ! figureClass ) {
+				figureStyles = {
+					backgroundColor: customMainColor,
+				};
+			}
+		// Is normal style and a custom color is being used ( we can set a style directly with its value)
+		} else if ( customMainColor ) {
+			figureStyles = {
+				borderColor: customMainColor,
+			};
+		// Is normal style and a named color is being used, we need to retrieve the color value to set the style,
+		// as there is no expectation that themes create classes that set border colors.
+		} else if ( mainColor ) {
+			const colors = get( select( 'core/editor' ).getEditorSettings(), [ 'colors' ], [] );
+			const colorObject = getColorObjectByAttributeValues( colors, mainColor );
+			figureStyles = {
+				borderColor: colorObject.color,
+			};
+		}
 
+		const blockquoteClass = getColorClassName( 'color', textColor );
+		const blockquoteStyle = blockquoteClass ? undefined : { color: customTextColor };
 		return (
-			<figure className={ figureClasses }>
-				<blockquote>
+			<figure className={ figureClass } style={ figureStyles }>
+				<blockquote className={ blockquoteClass } style={ blockquoteStyle } >
 					<RichText.Content value={ toRichTextValue( value ) } />
 					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
 				</blockquote>

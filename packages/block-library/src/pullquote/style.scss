@@ -22,11 +22,11 @@
 	}
 }
 
-.wp-block-pullquote:not(.is-style-stylized) {
+.wp-block-pullquote:not(.is-style-solid-color) {
 	background: none;
 }
 
-.wp-block-pullquote.is-style-stylized {
+.wp-block-pullquote.is-style-solid-color {
 	border: none;
 	blockquote {
 		margin-left: auto;
@@ -45,5 +45,8 @@
 			font-style: normal;
 		}
 	}
+}
 
+.wp-block-pullquote cite {
+	color: inherit;
 }

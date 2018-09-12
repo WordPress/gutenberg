@@ -27,7 +27,11 @@
 	}
 }
 
-.wp-block-pullquote.is-style-stylized {
+.wp-block-pullquote.is-style-solid-color {
 	margin-left: 0;
 	margin-right: 0;
+}
+
+.wp-block-pullquote .wp-block-pullquote__citation {
+	color: inherit;
 }
