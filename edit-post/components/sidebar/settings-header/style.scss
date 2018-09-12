@@ -22,6 +22,7 @@
 	&::after {
 		display: block;
 		content: attr(data-label);
+		speak: none;
 		font-weight: 600;
 		overflow: hidden;
 		visibility: hidden;
