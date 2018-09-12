@@ -28,7 +28,7 @@ import BlockListBlock from './block';
 import IgnoreNestedEvents from './ignore-nested-events';
 import DefaultBlockAppender from '../default-block-appender';
 
-class BlockListLayout extends Component {
+class BlockList extends Component {
 	constructor( props ) {
 		super( props );
 
@@ -275,4 +275,4 @@ export default compose( [
 			onSelect: selectBlock,
 		};
 	} ),
-] )( BlockListLayout );
+] )( BlockList );
