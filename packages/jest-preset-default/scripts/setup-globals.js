@@ -1,5 +1,3 @@
-require( 'element-closest' );
-
 // These are necessary to load TinyMCE successfully
 global.URL = window.URL;
 global.window.tinyMCEPreInit = {

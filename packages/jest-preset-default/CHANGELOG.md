@@ -1,9 +1,3 @@
-## 2.1.0 (Unreleased)
-
-### New Features
-
-- Browser globals setup now includes polyfill for [`Element#closest`](https://developer.mozilla.org/en-US/docs/Web/API/Element/closest)
-
 ## 2.0.0 (2018-07-12)
 
 ### Breaking Change
