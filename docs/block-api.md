@@ -68,7 +68,7 @@ The core provided categories are:
 category: 'widgets',
 ```
 
-Plugins and Themes can also register [custom block categories](../docs/block-api/extensibility.md#managing-block-categories).
+Plugins and Themes can also register [custom block categories](../docs/extensibility/extending-blocks/#managing-block-categories).
 
 #### Icon (optional)
 
