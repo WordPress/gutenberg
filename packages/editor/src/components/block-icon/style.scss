@@ -1,7 +1,12 @@
 .editor-block-icon {
-	display: inline-block;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	margin: 0 auto;
+
 	border-radius: 4px;
-	margin: 0;
 
 	&.has-colors {
 		svg {
@@ -9,8 +14,8 @@
 		}
 	}
 
-	svg:not(.dashicon) {
-		height: 24px;
-		width: 24px;
+	svg {
+		max-height: 24px;
+		max-width: 24px;
 	}
 }
