@@ -17,7 +17,7 @@ Gutenberg is being developed on [GitHub](https://github.com/WordPress/gutenberg)
 
 Released under GPL license, made by [Cristel Rossignol](https://twitter.com/cristelrossi).
 
-[Download](https://github.com/WordPress/gutenberg/blob/master/docs/final-g-wapuu-black.svg) logo SVG file.
+[Download the SVG logo](https://github.com/WordPress/gutenberg/blob/master/docs/final-g-wapuu-black.svg).
 
 ## Mockups
 
