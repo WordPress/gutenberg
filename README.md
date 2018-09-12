@@ -1,6 +1,7 @@
 # Gutenberg
 [![Build Status](https://img.shields.io/travis/WordPress/gutenberg/master.svg)](https://travis-ci.org/WordPress/gutenberg)
 [![Coverage](https://img.shields.io/codecov/c/github/WordPress/gutenberg/master.svg)](https://codecov.io/gh/WordPress/gutenberg)
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
 Printing since 1440.
 
@@ -36,7 +37,7 @@ Blocks are the unifying evolution of what is now covered, in different ways, by 
 
 Imagine a custom “employee” block that a client can drag to an About page to automatically display a picture, name, and bio. A whole universe of plugins that all extend WordPress in the same way. Simplified menus and widgets. Users who can instantly understand and use WordPress  -- and 90% of plugins. This will allow you to easily compose beautiful posts like <a href="http://moc.co/sandbox/example-post/">this example</a>.
 
-Check out the <a href="https://github.com/WordPress/gutenberg/blob/master/docs/faq.md">FAQ</a> for answers to the most common questions about the project.
+Check out the <a href="https://github.com/WordPress/gutenberg/blob/master/docs/reference/faq.md">FAQ</a> for answers to the most common questions about the project.
 
 ## Compatibility
 
@@ -52,7 +53,7 @@ Gutenberg is a big change, and there will be ways to ensure that existing functi
 
 ## Get involved
 
-We’re calling this editor project "Gutenberg" because it's a big undertaking. We are working on it every day in GitHub, and we'd love your help building it. You’re also welcome to give feedback, the easiest is to join us in <a href="https://make.wordpress.org/chat/">our Slack channel</a>, `#core-editor`.
+We’re calling this editor project "Gutenberg" because it's a big undertaking. We are working on it every day in GitHub, and we'd love your help building it. You’re also welcome to give feedback, the easiest is to join us in <a href="https://make.wordpress.org/chat/">our Slack channel</a>, `#core-editor`. A weekly meeting is held in the Slack channel on Wednesdays at 13:00 UTC.
 
 ## Contributors
 

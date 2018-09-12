@@ -70,54 +70,22 @@ function _gutenberg_utf8_split( $str ) {
 }
 
 /**
- * Shims fix for apiRequest on sites configured to use plain permalinks.
- *
- * @see https://core.trac.wordpress.org/ticket/42382
- *
- * @param WP_Scripts $scripts WP_Scripts instance (passed by reference).
- */
-function gutenberg_shim_fix_api_request_plain_permalinks( $scripts ) {
-	$api_request_fix = <<<JS
-( function( wp, wpApiSettings ) {
-	var buildAjaxOptions;
-
-	if ( 'string' !== typeof wpApiSettings.root ||
-			-1 === wpApiSettings.root.indexOf( '?' ) ) {
-		return;
-	}
-
-	buildAjaxOptions = wp.apiRequest.buildAjaxOptions;
-
-	wp.apiRequest.buildAjaxOptions = function( options ) {
-		if ( 'string' === typeof options.path ) {
-			options.path = options.path.replace( '?', '&' );
-		}
-
-		return buildAjaxOptions.call( wp.apiRequest, options );
-	};
-} )( window.wp, window.wpApiSettings );
-JS;
-
-	$scripts->add_inline_script( 'wp-api-request', $api_request_fix, 'after' );
-}
-add_action( 'wp_default_scripts', 'gutenberg_shim_fix_api_request_plain_permalinks' );
-
-/**
  * Disables wpautop behavior in classic editor when post contains blocks, to
  * prevent removep from invalidating paragraph blocks.
  *
- * @param  array $settings Original editor settings.
- * @return array           Filtered settings.
+ * @param  array  $settings  Original editor settings.
+ * @param  string $editor_id ID for the editor instance.
+ * @return array             Filtered settings.
  */
-function gutenberg_disable_editor_settings_wpautop( $settings ) {
+function gutenberg_disable_editor_settings_wpautop( $settings, $editor_id ) {
 	$post = get_post();
-	if ( is_object( $post ) && gutenberg_post_has_blocks( $post ) ) {
+	if ( 'content' === $editor_id && is_object( $post ) && has_blocks( $post ) ) {
 		$settings['wpautop'] = false;
 	}
 
 	return $settings;
 }
-add_filter( 'wp_editor_settings', 'gutenberg_disable_editor_settings_wpautop' );
+add_filter( 'wp_editor_settings', 'gutenberg_disable_editor_settings_wpautop', 10, 2 );
 
 /**
  * Add rest nonce to the heartbeat response.
@@ -129,30 +97,7 @@ function gutenberg_add_rest_nonce_to_heartbeat_response_headers( $response ) {
 	$response['rest-nonce'] = wp_create_nonce( 'wp_rest' );
 	return $response;
 }
-
 add_filter( 'wp_refresh_nonces', 'gutenberg_add_rest_nonce_to_heartbeat_response_headers' );
-
-/**
- * Ensure that the wp-json index contains the `permalink_structure` setting as
- * part of its site info elements.
- *
- * @see https://core.trac.wordpress.org/ticket/42465
- *
- * @param WP_REST_Response $response WP REST API response of the wp-json index.
- * @return WP_REST_Response Response that contains the permalink structure.
- */
-function gutenberg_ensure_wp_json_has_permalink_structure( $response ) {
-	$site_info = $response->get_data();
-
-	if ( ! array_key_exists( 'permalink_structure', $site_info ) ) {
-		$site_info['permalink_structure'] = get_option( 'permalink_structure' );
-	}
-
-	$response->set_data( $site_info );
-
-	return $response;
-}
-add_filter( 'rest_index', 'gutenberg_ensure_wp_json_has_permalink_structure' );
 
 /**
  * As a substitute for the default content `wpautop` filter, applies autop
@@ -162,7 +107,7 @@ add_filter( 'rest_index', 'gutenberg_ensure_wp_json_has_permalink_structure' );
  * @return string          Paragraph-converted text if non-block content.
  */
 function gutenberg_wpautop( $content ) {
-	if ( gutenberg_content_has_blocks( $content ) ) {
+	if ( has_blocks( $content ) ) {
 		return $content;
 	}
 
@@ -171,108 +116,342 @@ function gutenberg_wpautop( $content ) {
 remove_filter( 'the_content', 'wpautop' );
 add_filter( 'the_content', 'gutenberg_wpautop', 8 );
 
+
 /**
- * Includes the value for the custom field `post_type_capabities` inside the REST API response of user.
+ * Check if we need to load the block warning in the Classic Editor.
  *
- * TODO: This is a temporary solution. Next step would be to edit the WP_REST_Users_Controller,
- * once merged into Core.
- *
- * @since ?
- *
- * @param array           $user An array containing user properties.
- * @param string          $name The name of the custom field.
- * @param WP_REST_Request $request Full details about the REST API request.
- * @return object The Post Type capabilities.
+ * @since 3.4.0
  */
-function gutenberg_get_post_type_capabilities( $user, $name, $request ) {
-	$post_type = $request->get_param( 'post_type' );
-	$value     = new stdClass;
+function gutenberg_check_if_classic_needs_warning_about_blocks() {
+	global $pagenow;
 
-	if ( ! empty( $user['id'] ) && $post_type && post_type_exists( $post_type ) ) {
-		// The Post Type object contains the Post Type's specific caps.
-		$post_type_object = get_post_type_object( $post_type );
-
-		// Loop in the Post Type's caps to validate the User's caps for it.
-		foreach ( $post_type_object->cap as $post_cap => $post_type_cap ) {
-			// Ignore caps requiring a post ID.
-			if ( in_array( $post_cap, array( 'edit_post', 'read_post', 'delete_post' ) ) ) {
-				continue;
-			}
-
-			// Set the User's post type capability.
-			$value->{$post_cap} = user_can( $user['id'], $post_type_cap );
-		}
+	if ( ! in_array( $pagenow, array( 'post.php', 'post-new.php' ), true ) || ! isset( $_REQUEST['classic-editor'] ) ) {
+		return;
 	}
 
-	return $value;
+	$post = get_post();
+	if ( ! $post ) {
+		return;
+	}
+
+	if ( ! has_blocks( $post ) && ! isset( $_REQUEST['cloudflare-error'] ) ) {
+		return;
+	}
+
+	// Enqueue the JS we're going to need in the dialog.
+	wp_enqueue_script( 'wp-a11y' );
+	wp_enqueue_script( 'wp-sanitize' );
+
+	if ( isset( $_REQUEST['cloudflare-error'] ) ) {
+		add_action( 'admin_footer', 'gutenberg_warn_classic_about_cloudflare' );
+	} else {
+		add_action( 'admin_footer', 'gutenberg_warn_classic_about_blocks' );
+	}
 }
+add_action( 'admin_enqueue_scripts', 'gutenberg_check_if_classic_needs_warning_about_blocks' );
 
 /**
- * Adds the custom field `post_type_capabities` to the REST API response of user.
+ * Adds a warning to the Classic Editor when trying to edit a post containing blocks.
  *
- * TODO: This is a temporary solution. Next step would be to edit the WP_REST_Users_Controller,
- * once merged into Core.
- *
- * @since ?
+ * @since 3.4.0
  */
-function gutenberg_register_rest_api_post_type_capabilities() {
-	register_rest_field( 'user',
-		'post_type_capabilities',
+function gutenberg_warn_classic_about_blocks() {
+	$post = get_post();
+
+	$gutenberg_edit_link = get_edit_post_link( $post->ID, 'raw' );
+
+	$classic_edit_link = $gutenberg_edit_link;
+	$classic_edit_link = add_query_arg(
 		array(
-			'get_callback' => 'gutenberg_get_post_type_capabilities',
-			'schema'       => array(
-				'description' => __( 'Post Type capabilities for the user.', 'gutenberg' ),
-				'type'        => 'object',
-				'context'     => array( 'edit' ),
-				'readonly'    => true,
-			),
-		)
+			'classic-editor'     => '',
+			'hide-block-warning' => '',
+		),
+		$classic_edit_link
 	);
+
+	$revisions_link = '';
+	if ( wp_revisions_enabled( $post ) ) {
+		$revisions = wp_get_post_revisions( $post );
+
+		// If there's only one revision, that won't help.
+		if ( count( $revisions ) > 1 ) {
+			reset( $revisions ); // Reset pointer for key().
+			$revisions_link = get_edit_post_link( key( $revisions ) );
+		}
+	}
+	?>
+		<style type="text/css">
+			#blocks-in-post-dialog .notification-dialog {
+				position: fixed;
+				top: 50%;
+				left: 50%;
+				width: 500px;
+				box-sizing: border-box;
+				transform: translate(-50%, -50%);
+				margin: 0;
+				padding: 25px;
+				max-height: 90%;
+				background: #fff;
+				box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+				line-height: 1.5;
+				z-index: 1000005;
+				overflow-y: auto;
+			}
+
+			@media only screen and (max-height: 480px), screen and (max-width: 450px) {
+				#blocks-in-post-dialog .notification-dialog {
+					top: 0;
+					left: 0;
+					width: 100%;
+					height: 100%;
+					transform: none;
+					max-height: 100%;
+				}
+			}
+		</style>
+
+		<div id="blocks-in-post-dialog" class="notification-dialog-wrap">
+			<div class="notification-dialog-background"></div>
+			<div class="notification-dialog">
+				<div class="blocks-in-post-message">
+					<p><?php _e( 'This post was previously edited in Gutenberg. You can continue in the Classic Editor, but you may lose data and formatting.', 'gutenberg' ); ?></p>
+					<?php
+					if ( $revisions_link ) {
+						?>
+							<p>
+							<?php
+								/* translators: link to the post revisions page */
+								printf( __( 'You can also <a href="%s">browse previous revisions</a> and restore a version of the post before it was edited in Gutenberg.', 'gutenberg' ), esc_url( $revisions_link ) );
+							?>
+							</p>
+						<?php
+					} else {
+						?>
+							<p><strong><?php _e( 'Because this post does not have revisions, you will not be able to revert any changes you make in the Classic Editor.', 'gutenberg' ); ?></strong></p>
+						<?php
+					}
+					?>
+				</div>
+				<p>
+					<a class="button button-primary blocks-in-post-gutenberg-button" href="<?php echo esc_url( $gutenberg_edit_link ); ?>"><?php _e( 'Edit in Gutenberg', 'gutenberg' ); ?></a>
+					<button type="button" class="button blocks-in-post-classic-button"><?php _e( 'Continue to Classic Editor', 'gutenberg' ); ?></button>
+				</p>
+			</div>
+		</div>
+
+		<script type="text/javascript">
+			/* <![CDATA[ */
+			( function( $ ) {
+				var dialog = {};
+
+				dialog.init = function() {
+					// The modal
+					dialog.warning = $( '#blocks-in-post-dialog' );
+					// Get the links and buttons within the modal.
+					dialog.warningTabbables = dialog.warning.find( 'a, button' );
+
+					// Get the text within the modal.
+					dialog.rawMessage = dialog.warning.find( '.blocks-in-post-message' ).text();
+
+					// Hide all the #wpwrap content from assistive technologies.
+					$( '#wpwrap' ).attr( 'aria-hidden', 'true' );
+
+					// Detach the warning modal from its position and append it to the body.
+					$( document.body )
+						.addClass( 'modal-open' )
+						.append( dialog.warning.detach() );
+
+					// Reveal the modal and set focus on the Gutenberg button.
+					dialog.warning
+						.removeClass( 'hidden' )
+						.find( '.blocks-in-post-gutenberg-button' ).focus();
+
+					// Attach event handlers.
+					dialog.warningTabbables.on( 'keydown', dialog.constrainTabbing );
+					dialog.warning.on( 'click', '.blocks-in-post-classic-button', dialog.dismissWarning );
+
+					// Make screen readers announce the warning message after a short delay (necessary for some screen readers).
+					setTimeout( function() {
+						wp.a11y.speak( wp.sanitize.stripTags( dialog.rawMessage.replace( /\s+/g, ' ' ) ), 'assertive' );
+					}, 1000 );
+				};
+
+				dialog.constrainTabbing = function( event ) {
+					var firstTabbable, lastTabbable;
+
+					if ( 9 !== event.which ) {
+						return;
+					}
+
+					firstTabbable = dialog.warningTabbables.first()[0];
+					lastTabbable = dialog.warningTabbables.last()[0];
+
+					if ( lastTabbable === event.target && ! event.shiftKey ) {
+						firstTabbable.focus();
+						event.preventDefault();
+					} else if ( firstTabbable === event.target && event.shiftKey ) {
+						lastTabbable.focus();
+						event.preventDefault();
+					}
+				};
+
+				dialog.dismissWarning = function() {
+					// Hide modal.
+					dialog.warning.remove();
+					$( '#wpwrap' ).removeAttr( 'aria-hidden' );
+					$( 'body' ).removeClass( 'modal-open' );
+				};
+
+				$( document ).ready( dialog.init );
+			} )( jQuery );
+			/* ]]> */
+		</script>
+	<?php
 }
-add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_type_capabilities' );
 
 /**
- * Make sure oEmbed REST Requests apply the WP Embed security mechanism for WordPress embeds.
+ * Adds a warning to the Classic Editor when CloudFlare is blocking REST API requests.
  *
- * @see  https://core.trac.wordpress.org/ticket/32522
- *
- * TODO: This is a temporary solution. Next step would be to edit the WP_oEmbed_Controller,
- * once merged into Core.
- *
- * @since 2.3.0
- *
- * @param  WP_HTTP_Response|WP_Error $response The REST Request response.
- * @param  WP_REST_Server            $handler  ResponseHandler instance (usually WP_REST_Server).
- * @param  WP_REST_Request           $request  Request used to generate the response.
- * @return WP_HTTP_Response|object|WP_Error    The REST Request response.
+ * @since 3.4.0
  */
-function gutenberg_filter_oembed_result( $response, $handler, $request ) {
-	if ( 'GET' !== $request->get_method() ) {
-		return $response;
-	}
-
-	if ( is_wp_error( $response ) && 'oembed_invalid_url' !== $response->get_error_code() ) {
-		return $response;
-	}
-
-	// External embeds.
-	if ( '/oembed/1.0/proxy' === $request->get_route() ) {
-		if ( is_wp_error( $response ) ) {
-			// It's possibly a local post, so lets try and retrieve it that way.
-			$post_id = url_to_postid( $_GET['url'] );
-			$data    = get_oembed_response_data( $post_id, apply_filters( 'oembed_default_width', 600 ) );
-
-			if ( ! $data ) {
-				// Not a local post, return the original error.
-				return $response;
+function gutenberg_warn_classic_about_cloudflare() {
+	?>
+		<style type="text/css">
+			#cloudflare-block-dialog .notification-dialog {
+				position: fixed;
+				top: 50%;
+				left: 50%;
+				width: 500px;
+				box-sizing: border-box;
+				transform: translate(-50%, -50%);
+				margin: 0;
+				padding: 25px;
+				max-height: 90%;
+				background: #fff;
+				box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+				line-height: 1.5;
+				z-index: 1000005;
+				overflow-y: auto;
 			}
-			$response = (object) $data;
-		}
 
-		// Make sure the HTML is run through the oembed sanitisation routines.
-		$response->html = wp_oembed_get( $_GET['url'], $_GET );
-	}
+			#cloudflare-block-dialog ul {
+				list-style: initial;
+				padding-left: 20px;
+			}
 
-	return $response;
+			@media only screen and (max-height: 480px), screen and (max-width: 450px) {
+				#cloudflare-block-dialog .notification-dialog {
+					top: 0;
+					left: 0;
+					width: 100%;
+					height: 100%;
+					transform: none;
+					max-height: 100%;
+				}
+			}
+		</style>
+
+		<div id="cloudflare-block-dialog" class="notification-dialog-wrap">
+			<div class="notification-dialog-background"></div>
+			<div class="notification-dialog">
+				<div class="cloudflare-block-message">
+					<h2><?php _e( 'Cloudflare is blocking REST API requests', 'gutenberg' ); ?></h2>
+					<p><?php _e( 'Your site uses Cloudflare, which provides a Web Application Firewall (WAF) to secure your site against attacks. Unfortunately, some of these WAF rules are incorrectly blocking legitimate access to your site, preventing Gutenberg from functioning correctly.', 'gutenberg' ); ?></p>
+					<p><?php _e( "We're working closely with Cloudflare to fix this issue, but in the mean time, you can work around it in one of two ways:", 'gutenberg' ); ?></p>
+					<ul>
+						<li><?php _e( 'If you have a Cloudflare Pro account, log in to Cloudflare, visit the Firewall settings page, open the "Cloudflare Rule Set" details, open the "Cloudflare WordPress" ruleset, then set the rules "WP0025A" and "WP0025B" to "Disable".', 'gutenberg' ); ?></li>
+						<li>
+						<?php
+							printf(
+								/* translators: %s: link to a comment in the Gutenberg repository */
+								__( 'For free Cloudflare accounts, you can <a href="%s">change the REST API URL</a>, to avoid triggering the WAF rules. Please be aware that this may cause issues with other plugins that use the REST API, and removes any other protection Cloudflare may be offering for the REST API.', 'gutenberg' ),
+								'https://github.com/WordPress/gutenberg/issues/2704#issuecomment-410582252'
+							);
+						?>
+						</li>
+					</ul>
+					<p>
+					<?php
+						printf(
+							/* translators: %s link to an issue in the Gutenberg repository */
+							__( 'If neither of these options are possible for you, please <a href="%s">follow this issue for updates</a>. We hope to have this issue rectified soon!', 'gutenberg' ),
+							'https://github.com/WordPress/gutenberg/issues/2704'
+						);
+					?>
+					</p>
+				</div>
+				<p>
+					<button type="button" class="button button-primary cloudflare-block-classic-button"><?php _e( 'Continue to Classic Editor', 'gutenberg' ); ?></button>
+				</p>
+			</div>
+		</div>
+
+		<script type="text/javascript">
+			/* <![CDATA[ */
+			( function( $ ) {
+				var dialog = {};
+
+				dialog.init = function() {
+					// The modal
+					dialog.warning = $( '#cloudflare-block-dialog' );
+					// Get the links and buttons within the modal.
+					dialog.warningTabbables = dialog.warning.find( 'a, button' );
+
+					// Get the text within the modal.
+					dialog.rawMessage = dialog.warning.find( '.cloudflare-block-message' ).text();
+
+					// Hide all the #wpwrap content from assistive technologies.
+					$( '#wpwrap' ).attr( 'aria-hidden', 'true' );
+
+					// Detach the warning modal from its position and append it to the body.
+					$( document.body )
+						.addClass( 'modal-open' )
+						.append( dialog.warning.detach() );
+
+					// Reveal the modal and set focus on the Gutenberg button.
+					dialog.warning
+						.removeClass( 'hidden' )
+						.find( '.cloudflare-block-classic-button' ).focus();
+
+					// Attach event handlers.
+					dialog.warningTabbables.on( 'keydown', dialog.constrainTabbing );
+					dialog.warning.on( 'click', '.cloudflare-block-classic-button', dialog.dismissWarning );
+
+					// Make screen readers announce the warning message after a short delay (necessary for some screen readers).
+					setTimeout( function() {
+						wp.a11y.speak( wp.sanitize.stripTags( dialog.rawMessage.replace( /\s+/g, ' ' ) ), 'assertive' );
+					}, 1000 );
+				};
+
+				dialog.constrainTabbing = function( event ) {
+					var firstTabbable, lastTabbable;
+
+					if ( 9 !== event.which ) {
+						return;
+					}
+
+					firstTabbable = dialog.warningTabbables.first()[0];
+					lastTabbable = dialog.warningTabbables.last()[0];
+
+					if ( lastTabbable === event.target && ! event.shiftKey ) {
+						firstTabbable.focus();
+						event.preventDefault();
+					} else if ( firstTabbable === event.target && event.shiftKey ) {
+						lastTabbable.focus();
+						event.preventDefault();
+					}
+				};
+
+				dialog.dismissWarning = function() {
+					// Hide modal.
+					dialog.warning.remove();
+					$( '#wpwrap' ).removeAttr( 'aria-hidden' );
+					$( 'body' ).removeClass( 'modal-open' );
+				};
+
+				$( document ).ready( dialog.init );
+			} )( jQuery );
+			/* ]]> */
+		</script>
+	<?php
 }
-add_filter( 'rest_request_after_callbacks', 'gutenberg_filter_oembed_result', 10, 3 );

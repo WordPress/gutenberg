@@ -4,10 +4,13 @@
 import {
 	getEditorMode,
 	getPreference,
-	isGeneralSidebarPanelOpened,
-	hasOpenSidebar,
+	isEditorSidebarOpened,
 	isEditorSidebarPanelOpened,
+	isModalActive,
 	isFeatureActive,
+	isPluginSidebarOpened,
+	getActiveGeneralSidebarName,
+	isPluginItemPinned,
 	getMetaBoxes,
 	hasMetaBoxes,
 	isSavingMetaBoxes,
@@ -59,67 +62,135 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isGeneralSidebarPanelOpened', () => {
-		it( 'should return true when specified the sidebar panel is opened', () => {
+	describe( 'isEditorSidebarOpened', () => {
+		it( 'should return false when the editor sidebar is not opened', () => {
 			const state = {
 				preferences: {
-					activeGeneralSidebar: 'editor',
-					activeSidebarPanel: 'document',
+					isGeneralSidebarDismissed: true,
 				},
+				activeGeneralSidebar: null,
 			};
-			const panel = 'document';
-			const sidebar = 'editor';
 
-			expect( isGeneralSidebarPanelOpened( state, sidebar, panel ) ).toBe( true );
+			expect( isEditorSidebarOpened( state ) ).toBe( false );
 		} );
 
-		it( 'should return false when another panel than the specified sidebar panel is opened', () => {
+		it( 'should return false when the editor sidebar is assigned but not opened', () => {
 			const state = {
 				preferences: {
-					activeGeneralSidebar: 'editor',
-					activeSidebarPanel: 'blocks',
+					isGeneralSidebarDismissed: true,
 				},
+				activeGeneralSidebar: 'edit-post/document',
 			};
-			const panel = 'document';
-			const sidebar = 'editor';
 
-			expect( isGeneralSidebarPanelOpened( state, sidebar, panel ) ).toBe( false );
+			expect( isEditorSidebarOpened( state ) ).toBe( false );
 		} );
 
-		it( 'should return false when no sidebar panel is opened', () => {
+		it( 'should return false when the plugin sidebar is opened', () => {
 			const state = {
 				preferences: {
-					activeGeneralSidebar: null,
-					activeSidebarPanel: null,
+					isGeneralSidebarDismissed: false,
 				},
+				activeGeneralSidebar: 'my-plugin/my-sidebar',
 			};
-			const panel = 'blocks';
-			const sidebar = 'editor';
 
-			expect( isGeneralSidebarPanelOpened( state, sidebar, panel ) ).toBe( false );
+			expect( isEditorSidebarOpened( state ) ).toBe( false );
+		} );
+
+		it( 'should return true when the editor sidebar is opened', () => {
+			const state = {
+				preferences: {
+					isGeneralSidebarDismissed: false,
+				},
+				activeGeneralSidebar: 'edit-post/document',
+			};
+
+			expect( isEditorSidebarOpened( state ) ).toBe( true );
 		} );
 	} );
 
-	describe( 'hasOpenSidebar', () => {
-		it( 'should return true if at least one sidebar is open', () => {
+	describe( 'isPluginSidebarOpened', () => {
+		it( 'should return false when the plugin sidebar is not opened', () => {
 			const state = {
 				preferences: {
-					activeSidebarPanel: null,
+					isGeneralSidebarDismissed: true,
 				},
+				activeGeneralSidebar: null,
 			};
 
-			expect( hasOpenSidebar( state ) ).toBe( true );
+			expect( isPluginSidebarOpened( state ) ).toBe( false );
 		} );
 
-		it( 'should return false if no sidebar is open', () => {
+		it( 'should return false when the editor sidebar is opened', () => {
 			const state = {
-				publishSidebarActive: false,
 				preferences: {
-					activeGeneralSidebar: null,
+					isGeneralSidebarDismissed: false,
 				},
+				activeGeneralSidebar: 'edit-post/document',
 			};
 
-			expect( hasOpenSidebar( state ) ).toBe( false );
+			expect( isPluginSidebarOpened( state ) ).toBe( false );
+		} );
+
+		it( 'should return true when the plugin sidebar is opened', () => {
+			const name = 'plugin-sidebar/my-plugin/my-sidebar';
+			const state = {
+				preferences: {
+					isGeneralSidebarDismissed: false,
+				},
+				activeGeneralSidebar: name,
+			};
+
+			expect( isPluginSidebarOpened( state ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'getActiveGeneralSidebarName', () => {
+		it( 'returns null if dismissed', () => {
+			const state = {
+				preferences: {
+					isGeneralSidebarDismissed: true,
+				},
+				activeGeneralSidebar: 'edit-post/block',
+			};
+
+			expect( getActiveGeneralSidebarName( state ) ).toBe( null );
+		} );
+
+		it( 'returns active general sidebar', () => {
+			const state = {
+				preferences: {
+					isGeneralSidebarDismissed: false,
+				},
+				activeGeneralSidebar: 'edit-post/block',
+			};
+
+			expect( getActiveGeneralSidebarName( state ) ).toBe( 'edit-post/block' );
+		} );
+	} );
+
+	describe( 'isModalActive', () => {
+		it( 'returns true if the provided name matches the value in the preferences activeModal property', () => {
+			const state = {
+				activeModal: 'test-modal',
+			};
+
+			expect( isModalActive( state, 'test-modal' ) ).toBe( true );
+		} );
+
+		it( 'returns false if the provided name does not match the preferences activeModal property', () => {
+			const state = {
+				activeModal: 'something-else',
+			};
+
+			expect( isModalActive( state, 'test-modal' ) ).toBe( false );
+		} );
+
+		it( 'returns false if the preferences activeModal property is null', () => {
+			const state = {
+				activeModal: null,
+			};
+
+			expect( isModalActive( state, 'test-modal' ) ).toBe( false );
 		} );
 	} );
 
@@ -185,6 +256,30 @@ describe( 'selectors', () => {
 			expect( isFeatureActive( state, 'chicken' ) ).toBe( false );
 		} );
 	} );
+
+	describe( 'isPluginItemPinned', () => {
+		const state = {
+			preferences: {
+				pinnedPluginItems: {
+					'foo/pinned': true,
+					'foo/unpinned': false,
+				},
+			},
+		};
+
+		it( 'should return true if the flag is not set for the plugin item', () => {
+			expect( isPluginItemPinned( state, 'foo/unknown' ) ).toBe( true );
+		} );
+
+		it( 'should return true if plugin item is not pinned', () => {
+			expect( isPluginItemPinned( state, 'foo/pinned' ) ).toBe( true );
+		} );
+
+		it( 'should return false if plugin item item is unpinned', () => {
+			expect( isPluginItemPinned( state, 'foo/unpinned' ) ).toBe( false );
+		} );
+	} );
+
 	describe( 'hasMetaBoxes', () => {
 		it( 'should return true if there are active meta boxes', () => {
 			const state = {

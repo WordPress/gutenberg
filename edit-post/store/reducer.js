@@ -1,8 +1,12 @@
 /**
  * External dependencies
  */
-import { combineReducers } from 'redux';
-import { get, omit } from 'lodash';
+import { get } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { combineReducers } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -10,64 +14,92 @@ import { get, omit } from 'lodash';
 import { PREFERENCES_DEFAULTS } from './defaults';
 
 /**
+ * The default active general sidebar: The "Document" tab.
+ *
+ * @type {string}
+ */
+export const DEFAULT_ACTIVE_GENERAL_SIDEBAR = 'edit-post/document';
+
+/**
  * Reducer returning the user preferences.
  *
- * @param {Object}  state                 Current state.
- * @param {string}  state.mode            Current editor mode, either "visual" or "text".
- * @param {boolean} state.isSidebarOpened Whether the sidebar is opened or closed.
- * @param {Object}  state.panels          The state of the different sidebar panels.
- * @param {Object}  action                Dispatched action.
+ * @param {Object}  state                           Current state.
+ * @param {string}  state.mode                      Current editor mode, either
+ *                                                  "visual" or "text".
+ * @param {boolean} state.isGeneralSidebarDismissed Whether general sidebar is
+ *                                                  dismissed. False by default
+ *                                                  or when closing general
+ *                                                  sidebar, true when opening
+ *                                                  sidebar.
+ * @param {boolean} state.isSidebarOpened           Whether the sidebar is
+ *                                                  opened or closed.
+ * @param {Object}  state.panels                    The state of the different
+ *                                                  sidebar panels.
+ * @param {Object}  action                          Dispatched action.
  *
- * @return {string} Updated state.
+ * @return {Object} Updated state.
  */
-export function preferences( state = PREFERENCES_DEFAULTS, action ) {
+export const preferences = combineReducers( {
+	isGeneralSidebarDismissed( state = false, action ) {
+		switch ( action.type ) {
+			case 'OPEN_GENERAL_SIDEBAR':
+			case 'CLOSE_GENERAL_SIDEBAR':
+				return action.type === 'CLOSE_GENERAL_SIDEBAR';
+		}
+
+		return state;
+	},
+	panels( state = PREFERENCES_DEFAULTS.panels, action ) {
+		if ( action.type === 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL' ) {
+			return {
+				...state,
+				[ action.panel ]: ! state[ action.panel ],
+			};
+		}
+
+		return state;
+	},
+	features( state = PREFERENCES_DEFAULTS.features, action ) {
+		if ( action.type === 'TOGGLE_FEATURE' ) {
+			return {
+				...state,
+				[ action.feature ]: ! state[ action.feature ],
+			};
+		}
+
+		return state;
+	},
+	editorMode( state = PREFERENCES_DEFAULTS.editorMode, action ) {
+		if ( action.type === 'SWITCH_MODE' ) {
+			return action.mode;
+		}
+
+		return state;
+	},
+	pinnedPluginItems( state = PREFERENCES_DEFAULTS.pinnedPluginItems, action ) {
+		if ( action.type === 'TOGGLE_PINNED_PLUGIN_ITEM' ) {
+			return {
+				...state,
+				[ action.pluginName ]: ! get( state, [ action.pluginName ], true ),
+			};
+		}
+		return state;
+	},
+} );
+
+/**
+ * Reducer returning the next active general sidebar state. The active general
+ * sidebar is a unique name to identify either an editor or plugin sidebar.
+ *
+ * @param {?string} state  Current state.
+ * @param {Object}  action Action object.
+ *
+ * @return {?string} Updated state.
+ */
+export function activeGeneralSidebar( state = DEFAULT_ACTIVE_GENERAL_SIDEBAR, action ) {
 	switch ( action.type ) {
 		case 'OPEN_GENERAL_SIDEBAR':
-			const activeSidebarPanel = action.panel ? action.panel : state.activeSidebarPanel[ action.sidebar ];
-			return {
-				...state,
-				activeGeneralSidebar: action.sidebar,
-				activeSidebarPanel: {
-					...state.activeSidebarPanel,
-					[ action.sidebar ]: activeSidebarPanel,
-				},
-			};
-		case 'SET_GENERAL_SIDEBAR_ACTIVE_PANEL':
-			return {
-				...state,
-				activeSidebarPanel: {
-					...state.activeSidebarPanel,
-					[ action.sidebar ]: action.panel,
-				},
-			};
-		case 'CLOSE_GENERAL_SIDEBAR':
-			return {
-				...state,
-				activeGeneralSidebar: null,
-			};
-		case 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL':
-			return {
-				...state,
-				panels: {
-					...state.panels,
-					[ action.panel ]: ! get( state, [ 'panels', action.panel ], false ),
-				},
-			};
-		case 'SWITCH_MODE':
-			return {
-				...state,
-				editorMode: action.mode,
-			};
-		case 'TOGGLE_FEATURE':
-			return {
-				...state,
-				features: {
-					...state.features,
-					[ action.feature ]: ! state.features[ action.feature ],
-				},
-			};
-		case 'SERIALIZE':
-			return omit( state, [ 'sidebars.mobile', 'sidebars.publish' ] );
+			return action.name;
 	}
 
 	return state;
@@ -77,6 +109,25 @@ export function panel( state = 'document', action ) {
 	switch ( action.type ) {
 		case 'SET_ACTIVE_PANEL':
 			return action.panel;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer for storing the name of the open modal, or null if no modal is open.
+ *
+ * @param {Object} state  Previous state.
+ * @param {Object} action Action object containing the `name` of the modal
+ *
+ * @return {Object} Updated state
+ */
+export function activeModal( state = null, action ) {
+	switch ( action.type ) {
+		case 'OPEN_MODAL':
+			return action.name;
+		case 'CLOSE_MODAL':
+			return null;
 	}
 
 	return state;
@@ -115,7 +166,8 @@ const defaultMetaBoxState = locations.reduce( ( result, key ) => {
  *
  * @param {boolean}  state   Previous state.
  * @param {Object}   action  Action Object.
- * @return {Object}         Updated state.
+ *
+ * @return {Object} Updated state.
  */
 export function isSavingMetaBoxes( state = false, action ) {
 	switch ( action.type ) {
@@ -138,7 +190,8 @@ export function isSavingMetaBoxes( state = false, action ) {
  *
  * @param {boolean}  state   Previous state.
  * @param {Object}   action  Action Object.
- * @return {Object}         Updated state.
+ *
+ * @return {Object} Updated state.
  */
 export function metaBoxes( state = defaultMetaBoxState, action ) {
 	switch ( action.type ) {
@@ -165,7 +218,9 @@ export function metaBoxes( state = defaultMetaBoxState, action ) {
 
 export default combineReducers( {
 	preferences,
+	activeGeneralSidebar,
 	panel,
+	activeModal,
 	publishSidebarActive,
 	metaBoxes,
 	isSavingMetaBoxes,

@@ -1,14 +1,16 @@
 # Extensibility
 
-Extensibility is key for WordPress and like the rest of WordPress components, Gutenberg is highly extensible.
+Extensibility is key for WordPress and, like the rest of WordPress components, Gutenberg is highly extensible.
 
 
 ## Creating Blocks
 
-Gutenberg is about blocks and the main extensibility API of Gutenberg is the Block API. It allows you to create static blocks, dynamic blocks rendering on the server and also blocks saving data to Post Meta for more structured content.
+Gutenberg is about blocks, and the main extensibility API of Gutenberg is the Block API. It allows you to create your own static blocks, dynamic blocks rendered on the server and also blocks capable of saving data to Post Meta for more structured content.
 
 Here is a small example of a static custom block type (you can try it in your browser's console):
 
+{% codetabs %}
+{% ES5 %}
 ```js
 var el = wp.element.createElement;
 
@@ -24,134 +26,57 @@ wp.blocks.registerBlockType( 'mytheme/red-block', {
 	}
 } );
 ```
-
-If you want to learn more about block creation, The [Blocks Tutorial](./blocks) is the best place to start.
-
-
-## Removing Blocks
-
-### Using a blacklist
-
-Adding blocks is easy enough, removing them is as easy. Plugin or theme authors have the possibility to "unregister" blocks.
-
+{% ESNext %}
 ```js
-// myplugin.js
+const { registerBlockType } = wp.blocks;
+const blockStyle = { backgroundColor: '#900', color: '#fff', padding: '20px' };
 
-wp.blocks.unregisterBlockType( 'core/verse' );
-```
-
-and load this script in the Editor
-
-```php
-<?php
-// myplugin.php
-
-function myplugin_blacklist_blocks() {
-	wp_enqueue_script(
-		'myplugin-blacklist-blocks',
-		plugins_url( 'myplugin.js', __FILE__ ),
-		array( 'wp-blocks' )
-	);
-}
-add_action( 'enqueue_block_editor_assets', 'myplugin_blacklist_blocks' );
-```
-
-
-### Using a whitelist
-
-If you want to disable all blocks except a whitelisted list, you can adapt the script above like so:
-
-```js
-// myplugin.js
-var allowedBlocks = [
-	'core/paragraph',
-	'core/image',
-	'core/html',
-	'core/freeform'
-];
-
-wp.blocks.getBlockTypes().forEach( function( blockType ) {
-	if ( allowedBlocks.indexOf( blockType.name ) === -1 ) {
-		wp.blocks.unregisterBlockType( blockType.name );
+registerBlockType( 'mytheme/red-block', {
+	title: 'Red Block',
+	icon: 'universal-access-alt',
+	category: 'layout',
+	edit: function() {
+		return <div style={ blockStyle }>I am a red block</div>
+	},
+	save: function() {
+		return <div style={ blockStyle }>I am a red block</div>
 	}
 } );
 ```
+{% end %}
 
-## Hiding blocks from the inserter
+If you want to learn more about block creation, the [Blocks Tutorial](../docs/blocks.md) is the best place to start.
 
-On the server, you can filter the list of blocks shown in the inserter using the `allowed_block_types` filter. you can return either true (all block types supported), false (no block types supported), or an array of block type names to allow.
+## Extending Blocks
 
-```php
-add_filter( 'allowed_block_types', function() {
-	return [ 'core/paragraph' ];
-} );
-```
+It is also possible to modify the behavior of existing blocks or even remove them completely using filters.
 
+Learn more in the [Extending Blocks](../docs/extensibility/extending-blocks.md) section.
 
-## Modifying Blocks (Experimental)
+## Extending the Editor UI
 
-To modify the behaviour of existing blocks, Gutenberg exposes a list of filters:
+Extending the editor UI can be accomplished with the `registerPlugin` API, allowing you to define all your plugin's UI elements in one place.
 
-- `blocks.registerBlockType`: Used to filter the block settings. It receives the block settings and the name of the block the registered block as arguments.
+Refer to the [Plugins](https://github.com/WordPress/gutenberg/blob/master/packages/plugins/README.md) and [Edit Post](https://github.com/WordPress/gutenberg/blob/master/edit-post/README.md) section for more information.
 
-- `blocks.getSaveElement`: A filter that applies to the result of a block's `save` function. This filter is used to replace or extend the element, for example using `wp.element.cloneElement` to modify the element's props or replace its children, or returning an entirely new element.
+## Meta Boxes
 
-- `blocks.getSaveContent.extraProps`: A filter that applies to all blocks returning a WP Element in the `save` function. This filter is used to add extra props to the root element of the `save` function. For example: to add a className, an id, or any valid prop for this element. It receives the current props of the `save` element, the block Type and the block attributes as arguments.
+**Porting PHP meta boxes to blocks is highly encouraged!**
 
-- `blocks.BlockEdit`: Used to modify the block's `edit` component. It receives the original block `edit` component and returns a new wrapped component.
+Discover how [Meta Box](../docs/extensibility/meta-box.md) support works in Gutenberg.
 
-**Example**
+## Theme Support
 
-Adding a background by default to all blocks.
+By default, blocks provide their styles to enable basic support for blocks in themes without any change. Themes can add/override these styles, or rely on defaults.
 
-```js
-// Our filter function
-function addBackgroundProp( props ) {
-	return Object.assign( props, { style: { backgroundColor: 'red' } } );
-}
+There are some advanced block features which require opt-in support in the theme. See [theme support](../docs/extensibility/theme-support.md).
 
-// Adding the filter
-wp.hooks.addFilter(
-	'blocks.getSaveContent.extraProps',
-	'myplugin/add-background',
-	addBackgroundProp
-);
-```
+## Autocomplete
 
-_Note:_ This filter must always be run on every page load, and not in your browser's developer tools console. Otherwise, a [block validation](https://wordpress.org/gutenberg/handbook/block-api/block-edit-save/#validation) error will occur the next time the post is edited. This is due to the fact that block validation occurs by verifying that the saved output matches what is stored in the post's content during editor initialization. So, if this filter does not exist when the editor loads, the block will be marked as invalid.
+Autocompleters within blocks may be extended and overridden. See [autocomplete](../docs/extensibility/autocomplete.md).
 
-## Adding a sidebar
+## Block Parsing and Serialization
 
-**Warning:** This is an experimental API, and is subject to change or even removal.
+Posts in the editor move through a couple of different stages between being stored in `post_content` and appearing in the editor. Since the blocks themselves are data structures that live in memory it takes a parsing and serialization step to transform out from and into the stored format in the database.
 
-### Registering a sidebar
-
-`wp.editPost.__experimentalRegisterSidebar( name: string, settings: { title: string, render: function } )`
-
-This method takes a sidebar `name` and a `settings` object, containing a title and a render function. The name should contain a namespace prefix (Example: my-plugin/my-custom-sidebar).
-
-**Example**
-
-```js
-wp.editPost.__experimentalRegisterSidebar( 'my-plugin/my-custom-sidebar', {
-	render: function mySidebar() {
-		return <p>This is an example</p>;
-	},
-} );
-```
-
-### Activating a sidebar
-
-`wp.editPost.__experimentalActivateSidebar( name: string )`
-
-This method takes the `name` of the sidebar you'd like to open. That sidebar should have been registered beforehand using the `registerSidebar` method.
-
-**Example**
-
-```js
-wp.editPost.__experimentalActivateSidebar( 'my-plugin/my-custom-sidebar' );
-```
-
-## Extending the editor's UI (Slot and Fill)
-
-Coming soon.
+Customizing the parser is an advanced topic that you can learn more about in the [Extending the Parser](../docs/extensibility/parser.md) section.

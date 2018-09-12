@@ -1,61 +1,59 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import { flow, noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, withSpokenMessages } from '@wordpress/components';
+import { MenuItem, withSpokenMessages } from '@wordpress/components';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import { getActiveEditorPanel, isGeneralSidebarPanelOpened } from '../../store/selectors';
-import { openGeneralSidebar } from '../../store/actions';
+import shortcuts from '../../keyboard-shortcuts';
 
 export function BlockInspectorButton( {
-	isGeneralSidebarEditorOpened,
-	onOpenGeneralSidebarEditor,
-	panel,
+	areAdvancedSettingsOpened,
+	closeSidebar,
+	openEditorSidebar,
 	onClick = noop,
 	small = false,
 	speak,
 } ) {
 	const speakMessage = () => {
-		if ( ! isGeneralSidebarEditorOpened || ( isGeneralSidebarEditorOpened && panel !== 'block' ) ) {
-			speak( __( 'Additional settings are now available in the Editor advanced settings sidebar' ) );
+		if ( areAdvancedSettingsOpened ) {
+			speak( __( 'Block settings closed' ) );
 		} else {
-			speak( __( 'Advanced settings closed' ) );
+			speak( __( 'Additional settings are now available in the Editor block settings sidebar' ) );
 		}
 	};
 
-	const label = ( isGeneralSidebarEditorOpened && panel === 'block' ) ? __( 'Hide Advanced Settings' ) : __( 'Show Advanced Settings' );
+	const label = areAdvancedSettingsOpened ? __( 'Hide Block Settings' ) : __( 'Show Block Settings' );
 
 	return (
-		<IconButton
+		<MenuItem
 			className="editor-block-settings-menu__control"
-			onClick={ flow( onOpenGeneralSidebarEditor, speakMessage, onClick ) }
+			onClick={ flow( areAdvancedSettingsOpened ? closeSidebar : openEditorSidebar, speakMessage, onClick ) }
 			icon="admin-generic"
 			label={ small ? label : undefined }
+			shortcut={ shortcuts.toggleSidebar.display }
 		>
 			{ ! small && label }
-		</IconButton>
+		</MenuItem>
 	);
 }
 
-export default connect(
-	( state ) => ( {
-		isGeneralSidebarEditorOpened: isGeneralSidebarPanelOpened( state, 'editor' ),
-		panel: getActiveEditorPanel( state ),
-	} ),
-	( dispatch ) => ( {
-		onOpenGeneralSidebarEditor() {
-			dispatch( openGeneralSidebar( 'editor', 'block' ) );
-		},
-	} ),
-	undefined,
-	{ storeKey: 'edit-post' }
-)( withSpokenMessages( BlockInspectorButton ) );
+export default compose(
+	withSelect( ( select ) => ( {
+		areAdvancedSettingsOpened: select( 'core/edit-post' ).getActiveGeneralSidebarName() === 'edit-post/block',
+	} ) ),
+	withDispatch( ( dispatch ) => ( {
+		openEditorSidebar: () => dispatch( 'core/edit-post' ).openGeneralSidebar( 'edit-post/block' ),
+		closeSidebar: dispatch( 'core/edit-post' ).closeGeneralSidebar,
+	} ) ),
+	withSpokenMessages,
+)( BlockInspectorButton );

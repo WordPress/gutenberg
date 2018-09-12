@@ -6,45 +6,41 @@ import {
 	CopyHandler,
 	PostTitle,
 	WritingFlow,
+	ObserveTyping,
 	EditorGlobalKeyboardShortcuts,
 	BlockSelectionClearer,
 	MultiSelectScrollIntoView,
+	_BlockSettingsMenuFirstItem,
+	_BlockSettingsMenuPluginsExtension,
 } from '@wordpress/editor';
-import { Fragment, compose } from '@wordpress/element';
-import { withSelect } from '@wordpress/data';
-import { withViewportMatch } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import BlockInspectorButton from './block-inspector-button';
+import PluginBlockSettingsMenuGroup from '../block-settings-menu/plugin-block-settings-menu-group';
 
-function VisualEditor( { hasFixedToolbar, isLargeViewport } ) {
+function VisualEditor() {
 	return (
 		<BlockSelectionClearer className="edit-post-visual-editor">
 			<EditorGlobalKeyboardShortcuts />
 			<CopyHandler />
 			<MultiSelectScrollIntoView />
 			<WritingFlow>
-				<PostTitle />
-				<BlockList
-					showContextualToolbar={ ! isLargeViewport || ! hasFixedToolbar }
-					renderBlockMenu={ ( { children, onClose } ) => (
-						<Fragment>
-							<BlockInspectorButton onClick={ onClose } />
-							{ children }
-						</Fragment>
-					) }
-				/>
+				<ObserveTyping>
+					<PostTitle />
+					<BlockList />
+				</ObserveTyping>
 			</WritingFlow>
+			<_BlockSettingsMenuFirstItem>
+				{ ( { onClose } ) => <BlockInspectorButton onClick={ onClose } /> }
+			</_BlockSettingsMenuFirstItem>
+			<_BlockSettingsMenuPluginsExtension>
+				{ ( { clientIds, onClose } ) => <PluginBlockSettingsMenuGroup.Slot fillProps={ { clientIds, onClose } } /> }
+			</_BlockSettingsMenuPluginsExtension>
 		</BlockSelectionClearer>
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => ( {
-		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
-	} ) ),
-	withViewportMatch( { isLargeViewport: 'medium' } ),
-] )( VisualEditor );
+export default VisualEditor;

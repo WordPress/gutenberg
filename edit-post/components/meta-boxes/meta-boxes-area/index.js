@@ -2,19 +2,18 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { isSavingMetaBoxes } from '../../../store/selectors';
 
 class MetaBoxesArea extends Component {
 	/**
@@ -77,18 +76,8 @@ class MetaBoxesArea extends Component {
 	}
 }
 
-/**
- * @inheritdoc
- */
-function mapStateToProps( state ) {
+export default withSelect( ( select ) => {
 	return {
-		isSaving: isSavingMetaBoxes( state ),
+		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 	};
-}
-
-export default connect(
-	mapStateToProps,
-	undefined,
-	undefined,
-	{ storeKey: 'edit-post' }
-)( MetaBoxesArea );
+} )( MetaBoxesArea );

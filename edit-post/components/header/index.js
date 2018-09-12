@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -13,6 +8,9 @@ import {
 	PostSavedState,
 	PostPublishPanelToggle,
 } from '@wordpress/editor';
+import { withDispatch, withSelect } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
+import { DotTip } from '@wordpress/nux';
 
 /**
  * Internal dependencies
@@ -20,38 +18,30 @@ import {
 import './style.scss';
 import MoreMenu from './more-menu';
 import HeaderToolbar from './header-toolbar';
-import {
-	getOpenedGeneralSidebar,
-	isPublishSidebarOpened,
-	hasMetaBoxes,
-	isSavingMetaBoxes,
-} from '../../store/selectors';
-import {
-	openGeneralSidebar,
-	closeGeneralSidebar,
-	togglePublishSidebar,
-} from '../../store/actions';
+import PinnedPlugins from './pinned-plugins';
+import shortcuts from '../../keyboard-shortcuts';
 
 function Header( {
-	isGeneralSidebarEditorOpen,
-	onOpenGeneralSidebar,
-	onCloseGeneralSidebar,
-	isPublishSidebarOpen,
-	onTogglePublishSidebar,
+	isEditorSidebarOpened,
+	openGeneralSidebar,
+	closeGeneralSidebar,
+	isPublishSidebarOpened,
+	togglePublishSidebar,
 	hasActiveMetaboxes,
 	isSaving,
 } ) {
-	const toggleGeneralSidebar = isGeneralSidebarEditorOpen ? onCloseGeneralSidebar : onOpenGeneralSidebar;
+	const toggleGeneralSidebar = isEditorSidebarOpened ? closeGeneralSidebar : openGeneralSidebar;
 
 	return (
 		<div
 			role="region"
-			aria-label={ __( 'Editor toolbar' ) }
+			/* translators: accessibility text for the top bar landmark region. */
+			aria-label={ __( 'Editor top bar' ) }
 			className="edit-post-header"
 			tabIndex="-1"
 		>
 			<HeaderToolbar />
-			{ ! isPublishSidebarOpen && (
+			{ ! isPublishSidebarOpened && (
 				<div className="edit-post-header__settings">
 					<PostSavedState
 						forceIsDirty={ hasActiveMetaboxes }
@@ -59,37 +49,48 @@ function Header( {
 					/>
 					<PostPreviewButton />
 					<PostPublishPanelToggle
-						isOpen={ isPublishSidebarOpen }
-						onToggle={ onTogglePublishSidebar }
+						isOpen={ isPublishSidebarOpened }
+						onToggle={ togglePublishSidebar }
 						forceIsDirty={ hasActiveMetaboxes }
 						forceIsSaving={ isSaving }
 					/>
-					<IconButton
-						icon="admin-generic"
-						onClick={ toggleGeneralSidebar }
-						isToggled={ isGeneralSidebarEditorOpen }
-						label={ __( 'Settings' ) }
-						aria-expanded={ isGeneralSidebarEditorOpen }
-					/>
-					<MoreMenu key="more-menu" />
+					<div>
+						<IconButton
+							icon="admin-generic"
+							label={ __( 'Settings' ) }
+							onClick={ toggleGeneralSidebar }
+							isToggled={ isEditorSidebarOpened }
+							aria-expanded={ isEditorSidebarOpened }
+							shortcut={ shortcuts.toggleSidebar.display }
+						/>
+						<DotTip id="core/editor.settings">
+							{ __( 'You’ll find more settings for your page and blocks in the sidebar. Click “Settings” to open it.' ) }
+						</DotTip>
+					</div>
+					<PinnedPlugins.Slot />
+					<MoreMenu />
 				</div>
 			) }
 		</div>
 	);
 }
 
-export default connect(
-	( state ) => ( {
-		isGeneralSidebarEditorOpen: getOpenedGeneralSidebar( state ) === 'editor',
-		isPublishSidebarOpen: isPublishSidebarOpened( state ),
-		hasActiveMetaboxes: hasMetaBoxes( state ),
-		isSaving: isSavingMetaBoxes( state ),
+export default compose(
+	withSelect( ( select ) => ( {
+		isEditorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
+		isPublishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
+		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
+		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+		hasBlockSelection: !! select( 'core/editor' ).getBlockSelectionStart(),
+	} ) ),
+	withDispatch( ( dispatch, { hasBlockSelection } ) => {
+		const { openGeneralSidebar, closeGeneralSidebar, togglePublishSidebar } = dispatch( 'core/edit-post' );
+		const sidebarToOpen = hasBlockSelection ? 'edit-post/block' : 'edit-post/document';
+		return {
+			openGeneralSidebar: () => openGeneralSidebar( sidebarToOpen ),
+			closeGeneralSidebar: closeGeneralSidebar,
+			togglePublishSidebar: togglePublishSidebar,
+			hasBlockSelection: undefined,
+		};
 	} ),
-	{
-		onOpenGeneralSidebar: () => openGeneralSidebar( 'editor' ),
-		onCloseGeneralSidebar: closeGeneralSidebar,
-		onTogglePublishSidebar: togglePublishSidebar,
-	},
-	undefined,
-	{ storeKey: 'edit-post' }
 )( Header );

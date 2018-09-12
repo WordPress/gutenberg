@@ -1,16 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { ClipboardButton, withState } from '@wordpress/components';
-import { compose } from '@wordpress/element';
+import { ClipboardButton } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { withState, compose } from '@wordpress/compose';
 
 function CopyContentMenuItem( { editedPostContent, hasCopied, setState } ) {
 	return (
 		<ClipboardButton
 			text={ editedPostContent }
-			className="components-menu-items__button"
+			className="components-menu-item__button"
 			onCopy={ () => setState( { hasCopied: true } ) }
 			onFinishCopy={ () => setState( { hasCopied: false } ) }
 		>

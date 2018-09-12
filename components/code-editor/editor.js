@@ -2,12 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { keycodes } from '@wordpress/utils';
-
-/**
- * Module constants
- */
-const { UP, DOWN } = keycodes;
+import { UP, DOWN } from '@wordpress/keycodes';
 
 class CodeEditor extends Component {
 	constructor() {
@@ -20,13 +15,19 @@ class CodeEditor extends Component {
 	}
 
 	componentDidMount() {
-		const instance = wp.codeEditor.initialize( this.textarea, window._wpGutenbergCodeEditorSettings );
+		const settings = this.props.settings || window._wpGutenbergCodeEditorSettings;
+		const instance = wp.codeEditor.initialize( this.textarea, settings );
 		this.editor = instance.codemirror;
 
 		this.editor.on( 'focus', this.onFocus );
 		this.editor.on( 'blur', this.onBlur );
 		this.editor.on( 'cursorActivity', this.onCursorActivity );
 		this.editor.on( 'keyHandled', this.onKeyHandled );
+
+		// Pass a reference to the editor back up.
+		if ( this.props.editorRef ) {
+			this.props.editorRef( this.editor );
+		}
 
 		this.updateFocus();
 	}
@@ -98,7 +99,7 @@ class CodeEditor extends Component {
 	}
 
 	render() {
-		return <textarea ref={ ref => ( this.textarea = ref ) } value={ this.props.value } />;
+		return <textarea ref={ ( ref ) => ( this.textarea = ref ) } defaultValue={ this.props.value } />;
 	}
 }
 

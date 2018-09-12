@@ -1,75 +1,45 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress Dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { withFocusReturn } from '@wordpress/components';
+import { createSlotFill, withFocusReturn } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
+import { ifCondition, compose } from '@wordpress/compose';
 
 /**
  * Internal Dependencies
  */
 import './style.scss';
-import PostSettings from './post-settings';
-import BlockInspectorPanel from './block-inspector-panel';
-import Header from './header';
-import { getActiveEditorPanel } from '../../store/selectors';
+
+const { Fill, Slot } = createSlotFill( 'Sidebar' );
 
 /**
- * Returns the panel that should be rendered in the sidebar.
- *
- * @param {string} panel The currently active panel.
- *
- * @return {Object} The React element to render as a panel.
- */
-function getPanel( panel ) {
-	switch ( panel ) {
-		case 'document':
-			return PostSettings;
-		case 'block':
-			return BlockInspectorPanel;
-		default:
-			return PostSettings;
-	}
-}
-
-/**
- * Renders a sidebar with the relevant panel.
- *
- * @param {string} panel The currently active panel.
+ * Renders a sidebar with its content.
  *
  * @return {Object} The rendered sidebar.
  */
-const Sidebar = ( { panel } ) => {
-	const ActivePanel = getPanel( panel );
-
-	const props = {
-		panel,
-	};
-
+const Sidebar = ( { children, label } ) => {
 	return (
-		<div
-			className="edit-post-sidebar"
-			role="region"
-			aria-label={ __( 'Editor advanced settings' ) }
-			tabIndex="-1"
-		>
-			<Header />
-			<ActivePanel { ...props } />
-		</div>
+		<Fill>
+			<div
+				className="edit-post-sidebar"
+				role="region"
+				aria-label={ label }
+				tabIndex="-1"
+			>
+				{ children }
+			</div>
+		</Fill>
 	);
 };
 
-export default connect(
-	( state ) => {
-		return {
-			panel: getActiveEditorPanel( state ),
-		};
-	},
-	undefined,
-	undefined,
-	{ storeKey: 'edit-post' }
-)( withFocusReturn( Sidebar ) );
+const WrappedSidebar = compose(
+	withSelect( ( select, { name } ) => ( {
+		isActive: select( 'core/edit-post' ).getActiveGeneralSidebarName() === name,
+	} ) ),
+	ifCondition( ( { isActive } ) => isActive ),
+	withFocusReturn,
+)( Sidebar );
+
+WrappedSidebar.Slot = Slot;
+
+export default WrappedSidebar;

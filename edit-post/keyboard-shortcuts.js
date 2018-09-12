@@ -1,9 +1,15 @@
-const isMac = window.navigator.platform.toUpperCase().indexOf( 'MAC' ) >= 0;
-const mod = isMac ? '⌘' : 'Ctrl';
+/**
+ * WordPress dependencies
+ */
+import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 
 export default {
 	toggleEditorMode: {
-		value: 'mod+shift+alt+m',
-		label: `${ mod }+Shift+Alt+M`,
+		raw: rawShortcut.secondary( 'm' ),
+		display: displayShortcut.secondary( 'm' ),
+	},
+	toggleSidebar: {
+		raw: rawShortcut.primaryShift( ',' ),
+		display: displayShortcut.primaryShift( ',' ),
 	},
 };

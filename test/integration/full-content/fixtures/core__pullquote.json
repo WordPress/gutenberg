@@ -1,0 +1,26 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/pullquote",
+        "isValid": true,
+        "attributes": {
+            "value": [
+                {
+                    "children": {
+                        "type": "p",
+                        "props": {
+                            "children": [
+                                "Testing pullquote block..."
+                            ]
+                        }
+                    }
+                }
+            ],
+            "citation": [
+                "...with a caption"
+            ]
+        },
+        "innerBlocks": [],
+        "originalContent": "<figure class=\"wp-block-pullquote\">\n    <blockquote>\n    <p>Testing pullquote block...</p><cite>...with a caption</cite>\n    </blockquote>\n</figure>"
+    }
+]

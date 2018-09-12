@@ -1,25 +1,39 @@
 /**
  * External dependencies
  */
-const webpack = require( 'webpack' );
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
-const { reduce, escapeRegExp, castArray, get } = require( 'lodash' );
+const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
+const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
+const postcss = require( 'postcss' );
+
+const { get } = require( 'lodash' );
 const { basename } = require( 'path' );
+
+/**
+ * WordPress dependencies
+ */
+const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
+const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-webpack-plugin' );
 
 // Main CSS loader for everything but blocks..
 const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
-	filename: './[basename]/build/style.css',
+	filename: './build/[basename]/style.css',
 } );
 
 // CSS loader for styles specific to block editing.
 const editBlocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './blocks/build/edit-blocks.css',
+	filename: './build/block-library/edit-blocks.css',
 } );
 
 // CSS loader for styles specific to blocks in general.
 const blocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './blocks/build/style.css',
+	filename: './build/block-library/style.css',
+} );
+
+// CSS loader for default visual block styles.
+const themeBlocksCSSPlugin = new ExtractTextPlugin( {
+	filename: './build/block-library/theme.css',
 } );
 
 // Configuration for the ExtractTextPlugin.
@@ -29,16 +43,14 @@ const extractConfig = {
 		{
 			loader: 'postcss-loader',
 			options: {
-				plugins: [
-					require( 'autoprefixer' ),
-				],
+				plugins: require( './bin/packages/post-css-config' ),
 			},
 		},
 		{
 			loader: 'sass-loader',
 			query: {
 				includePaths: [ 'edit-post/assets/stylesheets' ],
-				data: '@import "colors"; @import "admin-schemes"; @import "breakpoints"; @import "variables"; @import "mixins"; @import "animations";@import "z-index";',
+				data: '@import "colors"; @import "breakpoints"; @import "variables"; @import "mixins"; @import "animations";@import "z-index";',
 				outputStyle: 'production' === process.env.NODE_ENV ?
 					'compressed' : 'nested',
 			},
@@ -46,105 +58,97 @@ const extractConfig = {
 	],
 };
 
+/**
+ * Given a string, returns a new string with dash separators converedd to
+ * camel-case equivalent. This is not as aggressive as `_.camelCase` in
+ * converting to uppercase, where Lodash will convert letters following
+ * numbers.
+ *
+ * @param {string} string Input dash-delimited string.
+ *
+ * @return {string} Camel-cased string.
+ */
+function camelCaseDash( string ) {
+	return string.replace(
+		/-([a-z])/g,
+		( match, letter ) => letter.toUpperCase()
+	);
+}
+
 const entryPointNames = [
-	'blocks',
 	'components',
-	'date',
-	'editor',
-	'element',
-	'i18n',
-	'utils',
-	'data',
-	'viewport',
-	[ 'editPost', 'edit-post' ],
+	'edit-post',
+	'block-library',
 ];
 
-const packageNames = [
+const gutenbergPackages = [
+	'a11y',
+	'api-fetch',
+	'autop',
+	'blob',
+	'blocks',
+	'block-serialization-default-parser',
+	'block-serialization-spec-parser',
+	'compose',
+	'core-data',
+	'data',
+	'date',
+	'deprecated',
+	'dom',
+	'dom-ready',
+	'editor',
+	'element',
 	'hooks',
+	'html-entities',
+	'i18n',
+	'is-shallow-equal',
+	'keycodes',
+	'nux',
+	'plugins',
+	'redux-routine',
+	'shortcode',
+	'token-list',
+	'url',
+	'viewport',
+	'wordcount',
 ];
 
 const externals = {
 	react: 'React',
 	'react-dom': 'ReactDOM',
-	'react-dom/server': 'ReactDOMServer',
 	tinymce: 'tinymce',
 	moment: 'moment',
 	jquery: 'jQuery',
+	lodash: 'lodash',
+	'lodash-es': 'lodash',
 };
 
-[ ...entryPointNames, ...packageNames ].forEach( name => {
+[
+	...entryPointNames,
+	...gutenbergPackages,
+].forEach( ( name ) => {
 	externals[ `@wordpress/${ name }` ] = {
-		this: [ 'wp', name ],
+		this: [ 'wp', camelCaseDash( name ) ],
 	};
 } );
 
-/**
- * Webpack plugin for handling specific template tags in Webpack configuration
- * values like those supported in the base Webpack functionality (e.g. `name`).
- *
- * @see webpack.TemplatedPathPlugin
- */
-class CustomTemplatedPathPlugin {
-	/**
-	 * CustomTemplatedPathPlugin constructor. Initializes handlers as a tuple
-	 * set of RegExp, handler, where the regular expression is used in matching
-	 * a Webpack asset path.
-	 *
-	 * @param {Object.<string,Function>} handlers Object keyed by tag to match,
-	 *                                            with function value returning
-	 *                                            replacement string.
-	 *
-	 * @return {void}
-	 */
-	constructor( handlers ) {
-		this.handlers = reduce( handlers, ( result, handler, key ) => {
-			const regexp = new RegExp( `\\[${ escapeRegExp( key ) }\\]`, 'gi' );
-			return [ ...result, [ regexp, handler ] ];
-		}, [] );
-	}
-
-	/**
-	 * Webpack plugin application logic.
-	 *
-	 * @param {Object} compiler Webpack compiler
-	 *
-	 * @return {void}
-	 */
-	apply( compiler ) {
-		compiler.plugin( 'compilation', ( compilation ) => {
-			compilation.mainTemplate.plugin( 'asset-path', ( path, data ) => {
-				for ( let i = 0; i < this.handlers.length; i++ ) {
-					const [ regexp, handler ] = this.handlers[ i ];
-					if ( regexp.test( path ) ) {
-						return path.replace( regexp, handler( path, data ) );
-					}
-				}
-
-				return path;
-			} );
-		} );
-	}
-}
-
 const config = {
+	mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+
 	entry: Object.assign(
-		entryPointNames.reduce( ( memo, entryPoint ) => {
-			// Normalized entry point as an array of [ name, path ]. If a path
-			// is not explicitly defined, use the name.
-			entryPoint = castArray( entryPoint );
-			const [ name, path = name ] = entryPoint;
-
+		entryPointNames.reduce( ( memo, path ) => {
+			const name = camelCaseDash( path );
 			memo[ name ] = `./${ path }`;
-
 			return memo;
 		}, {} ),
-		packageNames.reduce( ( memo, packageName ) => {
-			memo[ packageName ] = `./node_modules/@wordpress/${ packageName }`;
+		gutenbergPackages.reduce( ( memo, packageName ) => {
+			const name = camelCaseDash( packageName );
+			memo[ name ] = `./packages/${ packageName }`;
 			return memo;
-		}, {} )
+		}, {} ),
 	),
 	output: {
-		filename: '[basename]/build/index.js',
+		filename: './build/[basename]/index.js',
 		path: __dirname,
 		library: [ 'wp', '[name]' ],
 		libraryTarget: 'this',
@@ -155,60 +159,81 @@ const config = {
 			__dirname,
 			'node_modules',
 		],
+		alias: {
+			'lodash-es': 'lodash',
+		},
 	},
 	module: {
 		rules: [
 			{
-				test: /\.pegjs/,
-				use: 'pegjs-loader',
+				test: /\.js$/,
+				use: [ 'source-map-loader' ],
+				enforce: 'pre',
 			},
 			{
 				test: /\.js$/,
-				exclude: /node_modules/,
+				exclude: [
+					/block-serialization-spec-parser/,
+					/is-shallow-equal/,
+					/node_modules/,
+				],
 				use: 'babel-loader',
 			},
 			{
 				test: /style\.s?css$/,
 				include: [
-					/blocks/,
+					/block-library/,
 				],
 				use: blocksCSSPlugin.extract( extractConfig ),
 			},
 			{
 				test: /editor\.s?css$/,
 				include: [
-					/blocks/,
+					/block-library/,
 				],
 				use: editBlocksCSSPlugin.extract( extractConfig ),
 			},
 			{
+				test: /theme\.s?css$/,
+				include: [
+					/block-library/,
+				],
+				use: themeBlocksCSSPlugin.extract( extractConfig ),
+			},
+			{
 				test: /\.s?css$/,
 				exclude: [
-					/blocks/,
+					/block-library/,
 				],
 				use: mainCSSExtractTextPlugin.extract( extractConfig ),
 			},
 		],
 	},
 	plugins: [
-		new webpack.DefinePlugin( {
-			'process.env.NODE_ENV': JSON.stringify( process.env.NODE_ENV || 'development' ),
-		} ),
 		blocksCSSPlugin,
 		editBlocksCSSPlugin,
+		themeBlocksCSSPlugin,
 		mainCSSExtractTextPlugin,
 		// Create RTL files with a -rtl suffix
 		new WebpackRTLPlugin( {
 			suffix: '-rtl',
 			minify: process.env.NODE_ENV === 'production' ? { safe: true } : false,
 		} ),
-		new webpack.LoaderOptionsPlugin( {
-			minimize: process.env.NODE_ENV === 'production',
-			debug: process.env.NODE_ENV !== 'production',
-		} ),
 		new CustomTemplatedPathPlugin( {
 			basename( path, data ) {
-				const rawRequest = get( data, [ 'chunk', 'entryModule', 'rawRequest' ] );
+				let rawRequest;
+
+				const entryModule = get( data, [ 'chunk', 'entryModule' ], {} );
+				switch ( entryModule.type ) {
+					case 'javascript/auto':
+						rawRequest = entryModule.rawRequest;
+						break;
+
+					case 'javascript/esm':
+						rawRequest = entryModule.rootModule.rawRequest;
+						break;
+				}
+
 				if ( rawRequest ) {
 					return basename( rawRequest );
 				}
@@ -216,19 +241,43 @@ const config = {
 				return path;
 			},
 		} ),
+		new LibraryExportDefaultPlugin( [
+			'api-fetch',
+			'deprecated',
+			'dom-ready',
+			'redux-routine',
+		].map( camelCaseDash ) ),
+		new CopyWebpackPlugin(
+			gutenbergPackages.map( ( packageName ) => ( {
+				from: `./packages/${ packageName }/build-style/*.css`,
+				to: `./build/${ packageName }/`,
+				flatten: true,
+				transform: ( content ) => {
+					if ( config.mode === 'production' ) {
+						return postcss( [
+							require( 'cssnano' )( {
+								preset: 'default',
+							} ),
+						] )
+							.process( content, { from: 'src/app.css', to: 'dest/app.css' } )
+							.then( ( result ) => result.css );
+					}
+					return content;
+				},
+			} ) )
+		),
 	],
 	stats: {
 		children: false,
 	},
 };
 
-switch ( process.env.NODE_ENV ) {
-	case 'production':
-		config.plugins.push( new webpack.optimize.UglifyJsPlugin() );
-		break;
+if ( config.mode !== 'production' ) {
+	config.devtool = process.env.SOURCEMAP || 'source-map';
+}
 
-	default:
-		config.devtool = 'source-map';
+if ( config.mode === 'development' ) {
+	config.plugins.push( new LiveReloadPlugin( { port: process.env.GUTENBERG_LIVE_RELOAD_PORT || 35729 } ) );
 }
 
 module.exports = config;
