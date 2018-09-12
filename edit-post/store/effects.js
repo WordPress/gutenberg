@@ -120,7 +120,7 @@ const effects = {
 			.then( () => store.dispatch( metaBoxUpdatesSuccess() ) );
 	},
 	SWITCH_MODE( action ) {
-		// Unselect blocks when we switch to the code editor
+		// Unselect blocks when we switch to the code editor.
 		if ( action.mode !== 'visual' ) {
 			dispatch( 'core/editor' ).clearSelectedBlock();
 		}
