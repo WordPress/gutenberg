@@ -28,7 +28,7 @@
 		height: $icon-button-size-small + 6px;
 		position: relative;
 		margin: 0 auto;
-		padding: 0;
+		padding: 3px;
 		display: flex;
 		align-items: center;
 		transition: all 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
@@ -49,7 +49,6 @@
 	.editor-block-switcher__transform {
 		margin-top: 6px;
 		border-radius: $radius-round-rectangle;
-		padding: 3px;
 	}
 
 	// Block hover and focus style.
