@@ -16,9 +16,13 @@
 
 .blocks-gallery-item {
 
+	// Hide the focus outline that otherwise briefly appears when selecting a block.
+	figure:not(.is-selected):focus {
+		outline: none;
+	}
+
 	.is-selected {
 		outline: 4px solid theme(primary);
-		outline-offset: -4px;
 	}
 
 	&.is-transient img {
@@ -41,8 +45,8 @@
 	.is-selected .editor-rich-text {
 		// IE calculates this incorrectly, so leave it to modern browsers.
 		@supports (position: sticky) {
-			width: calc(100% - 8px);
-			left: 4px;
+			right: 0;
+			left: 0;
 			margin-top: -4px;
 		}
 
@@ -96,8 +100,8 @@
 .block-library-gallery-item__inline-menu {
 	padding: 2px;
 	position: absolute;
-	top: 0;
-	right: 0;
+	top: -2px;
+	right: -2px;
 	background-color: theme(primary);
 	display: inline-flex;
 	z-index: z-index(".block-library-gallery-item__inline-menu");
