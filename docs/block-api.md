@@ -25,7 +25,7 @@ registerBlockType( 'my-plugin/book', {} );
 
 ### Block Configuration
 
-* **Type:** `{ key: value }`
+* **Type:** `Object` [ `{ key: value }` ]
 
 A block requires a few properties to be specified before it can be registered successfully. These are defined through a configuration object, which includes the following:
 
@@ -37,7 +37,7 @@ This is the display title for your block, which can be translated with our trans
 
 ```js
 // Our data object
-title: 'Book'
+title: __( 'Book' )
 ```
 
 #### Description (optional)
@@ -47,7 +47,7 @@ title: 'Book'
 This is a short description for your block, which can be translated with our translation functions. This will be shown in the block inspector.
 
 ```js
-description: 'Block showing a Book card.'
+description: __( 'Block showing a Book card.' )
 ```
 
 #### Category
@@ -68,9 +68,11 @@ The core provided categories are:
 category: 'widgets',
 ```
 
-Plugins and Themes can also register [custom block categories](../docs/block-api/extensibility.md).
+Plugins and Themes can also register [custom block categories](../docs/extensibility/extending-blocks/#managing-block-categories).
 
 #### Icon (optional)
+
+* **Type:** `String` | `Object`
 
 An icon property should be specified to make it easier to identify a block. These can be any of [WordPress' Dashicons](https://developer.wordpress.org/resource/dashicons/), or a custom `svg` element.
 
@@ -100,8 +102,9 @@ icon: {
 } ,
 ```
 
-
 #### Keywords (optional)
+
+* **Type:** `Array`
 
 Sometimes a block could have aliases that help users discover it while searching. For example, an `image` block could also want to be discovered by `photo`. You can do so by providing an array of terms (which can be translated). It is only allowed to add as much as three terms per block.
 
@@ -113,7 +116,7 @@ keywords: [ __( 'image' ), __( 'photo' ), __( 'pics' ) ],
 
 #### Attributes (optional)
 
-* **Type:** `{ attr: {} }`
+* **Type:** `Object`
 
 Attributes provide the structured data needs of a block. They can exist in different forms when they are serialized, but they are declared together under a common interface.
 
