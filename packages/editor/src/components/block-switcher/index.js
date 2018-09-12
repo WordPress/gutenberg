@@ -74,7 +74,18 @@ export class BlockSwitcher extends Component {
 							onToggle();
 						}
 					};
-					const label = sprintf( _n( 'Change block type', 'Change type of %d blocks', blocks.length ), blocks.length );
+					const label = (
+						1 === blocks.length ?
+							__( 'Change block type' ) :
+							sprintf(
+								_n(
+									'Change type of %d block',
+									'Change type of %d blocks',
+									blocks.length
+								),
+								blocks.length
+							)
+					);
 
 					return (
 						<Toolbar>

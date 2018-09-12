@@ -24,6 +24,19 @@ Returns all available authors.
 
 Authors list.
 
+### getUserQueryResults
+
+Returns all the users returned by a query ID.
+
+*Parameters*
+
+ * state: Data state.
+ * queryID: Query ID.
+
+*Returns*
+
+Users list.
+
 ### getEntitiesByKind
 
 Returns whether the entities for the give kind are loaded.

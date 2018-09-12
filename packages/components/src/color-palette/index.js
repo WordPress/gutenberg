@@ -84,7 +84,6 @@ export default function ColorPalette( { colors, disableCustomColors = false, val
 				className="components-color-palette__clear"
 				type="button"
 				onClick={ () => onChange( undefined ) }
-				isButton
 				isSmall
 				isDefault
 			>

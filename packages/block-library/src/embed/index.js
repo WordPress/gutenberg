@@ -331,7 +331,7 @@ const embedAttributes = {
 	},
 };
 
-function getEmbedBlockSettings( { title, description, icon, category = 'embed', transforms, keywords = [] } ) {
+function getEmbedBlockSettings( { title, description, icon, category = 'embed', transforms, keywords = [], supports = {} } ) {
 	// translators: %s: Name of service (e.g. VideoPress, YouTube)
 	const blockDescription = description || sprintf( __( 'Add a block that displays content pulled from other sites, like Twitter, Instagram or YouTube.' ), title );
 	return {
@@ -344,6 +344,7 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 
 		supports: {
 			align: true,
+			...supports,
 		},
 
 		transforms,
@@ -693,10 +694,31 @@ export const others = [
 		patterns: [ /^https?:\/\/(www\.)?smugmug\.com\/.+/i ],
 	},
 	{
+		// Deprecated in favour of the core-embed/speaker-deck block.
 		name: 'core-embed/speaker',
 		settings: getEmbedBlockSettings( {
 			title: 'Speaker',
 			icon: embedAudioIcon,
+			supports: {
+				inserter: false,
+			},
+		} ),
+		patterns: [],
+	},
+	{
+		name: 'core-embed/speaker-deck',
+		settings: getEmbedBlockSettings( {
+			title: 'Speaker Deck',
+			icon: embedContentIcon,
+			transform: [ {
+				type: 'block',
+				blocks: [ 'core-embed/speaker' ],
+				transform: ( content ) => {
+					return createBlock( 'core-embed/speaker-deck', {
+						content,
+					} );
+				},
+			} ],
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?speakerdeck\.com\/.+/i ],
 	},
