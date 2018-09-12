@@ -35,7 +35,7 @@ const ALIGNMENT_CONTROLS = [
 	},
 ];
 
-function AlignmentToolbar( { isCollapsed, value, onChange } ) {
+export function AlignmentToolbar( { isCollapsed, value, onChange } ) {
 	function applyOrUnset( align ) {
 		return () => onChange( value === align ? undefined : align );
 	}

@@ -53,7 +53,7 @@ export function BlockAlignmentToolbar( { isCollapsed, value, onChange, controls 
 		<Toolbar
 			isCollapsed={ isCollapsed }
 			icon={ activeAlignment ? activeAlignment.icon : 'align-left' }
-			label={ __( 'Change Text Alignment' ) }
+			label={ __( 'Change Alignment' ) }
 			controls={
 				enabledControls.map( ( control ) => {
 					return {
