@@ -11,7 +11,6 @@ import {
 	last,
 } from 'lodash';
 import classnames from 'classnames';
-import 'element-closest';
 
 /**
  * WordPress dependencies
