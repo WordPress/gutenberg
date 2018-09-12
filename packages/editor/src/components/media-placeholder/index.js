@@ -9,6 +9,7 @@ import classnames from 'classnames';
  */
 import {
 	Button,
+	IconButton,
 	FormFileUpload,
 	Placeholder,
 	DropZone,
@@ -28,11 +29,13 @@ class MediaPlaceholder extends Component {
 		super( ...arguments );
 		this.state = {
 			src: '',
+			isURLInputExpanded: false,
 		};
 		this.onChangeSrc = this.onChangeSrc.bind( this );
 		this.onSubmitSrc = this.onSubmitSrc.bind( this );
 		this.onUpload = this.onUpload.bind( this );
 		this.onFilesUpload = this.onFilesUpload.bind( this );
+		this.toggleURLInputVisibility = this.toggleURLInputVisibility.bind( this );
 	}
 
 	getAllowedTypes() {
@@ -101,6 +104,10 @@ class MediaPlaceholder extends Component {
 		} );
 	}
 
+	toggleURLInputVisibility() {
+		this.setState( { isURLInputExpanded: ! this.state.isURLInputExpanded } );
+	}
+
 	render() {
 		const {
 			accept,
@@ -114,7 +121,13 @@ class MediaPlaceholder extends Component {
 			multiple = false,
 			notices,
 		} = this.props;
+
+		const {
+			isURLInputExpanded,
+		} = this.state;
+
 		const allowedTypes = this.getAllowedTypes();
+
 		return (
 			<Placeholder
 				icon={ icon }
@@ -150,24 +163,38 @@ class MediaPlaceholder extends Component {
 					) }
 				/>
 				{ onSelectURL && (
-					<form
-						className="editor-media-placeholder__url-input-form"
-						onSubmit={ this.onSubmitSrc }
-					>
-						<input
-							type="url"
-							className="components-placeholder__input editor-media-placeholder__url-input"
-							aria-label={ labels.title }
-							placeholder={ __( 'Enter URL here…' ) }
-							onChange={ this.onChangeSrc }
-							value={ this.state.src }
-						/>
-						<Button
+					<div className="editor-media-placeholder__url-input-expandable-section">
+						<IconButton
 							isLarge
-							type="submit">
-							{ __( 'Use URL' ) }
-						</Button>
-					</form>
+							className="editor-media-placeholder__url-input-expandable-button"
+							icon={ isURLInputExpanded ? 'arrow-up' : 'arrow-down' }
+							onClick={ this.toggleURLInputVisibility }
+							isToggled={ isURLInputExpanded }
+							aria-expanded={ isURLInputExpanded }
+						>
+							{ ! isURLInputExpanded ? __( 'Enter URL' ) : null }
+						</IconButton>
+						{ isURLInputExpanded &&
+							<form
+								className="editor-media-placeholder__url-input-form"
+								onSubmit={ this.onSubmitSrc }
+							>
+								<input
+									type="url"
+									className="components-placeholder__input editor-media-placeholder__url-input"
+									aria-label={ labels.title }
+									placeholder={ __( 'Enter URL here…' ) }
+									onChange={ this.onChangeSrc }
+									value={ this.state.src }
+								/>
+								<Button
+									isLarge
+									type="submit">
+									{ __( 'Use URL' ) }
+								</Button>
+							</form>
+						}
+					</div>
 				) }
 			</Placeholder>
 		);
