@@ -223,6 +223,7 @@ describe( 'full post content fixture', () => {
 			.map( ( block ) => block.name )
 			// We don't want tests for each oembed provider, which all have the same
 			// `save` functions and attributes.
+			// The `core/template` is not worth testing here because it's never saved, it's covered better in e2e tests.
 			.filter( ( name ) => name.indexOf( 'core-embed' ) !== 0 && name !== 'core/template' )
 			.forEach( ( name ) => {
 				const nameToFilename = name.replace( /\//g, '__' );

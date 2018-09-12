@@ -33,12 +33,12 @@ import * as nextpage from './nextpage';
 import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
 import * as reusableBlock from './block';
-import * as reusableTemplate from './template';
 import * as separator from './separator';
 import * as shortcode from './shortcode';
 import * as spacer from './spacer';
 import * as subhead from './subhead';
 import * as table from './table';
+import * as template from './template';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
@@ -76,10 +76,10 @@ export const registerCoreBlocks = () => {
 		pullquote,
 		separator,
 		reusableBlock,
-		reusableTemplate,
 		spacer,
 		subhead,
 		table,
+		template,
 		textColumns,
 		verse,
 		video,
