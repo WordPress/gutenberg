@@ -144,8 +144,7 @@ export function getEmbedEdit( title, icon ) {
 		 * @param {string} html The preview HTML that possibly contains an iframe with width and height set.
 		 */
 		maybeSetAspectRatioClassName( html ) {
-			// Extract the first iframe's height and width. Uses a regex so we don't have to
-			// create the DOM and have potential security risks.
+			// Extract the first iframe's height and width without having to construct DOM elements.
 			const matches = html.toLowerCase().match( /<iframe[^>]+(height|width)=['"]?([0-9]+)["']?[^>]+(height|width)=['"]?([0-9]+)["']?.*?>/ );
 			let height;
 			let width;
