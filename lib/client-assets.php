@@ -832,7 +832,7 @@ function gutenberg_register_vendor_scripts() {
 	wp_add_inline_script( 'lodash', 'window.lodash = _.noConflict();' );
 	gutenberg_register_vendor_script(
 		'wp-polyfill-fetch',
-		'https://unpkg.com/whatwg-fetch/fetch.js'
+		'https://unpkg.com/whatwg-fetch@3.0.0/dist/fetch.umd.js'
 	);
 	gutenberg_register_vendor_script(
 		'wp-polyfill-promise',
