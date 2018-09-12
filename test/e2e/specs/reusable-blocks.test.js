@@ -154,7 +154,7 @@ describe( 'Reusable Blocks', () => {
 			'.editor-block-list__block[data-type="core/block"] .editor-rich-text',
 			( element ) => element.innerText
 		);
-		expect( text ).toMatch( 'Oh! Hello there!' );
+		expect( text ).toMatch( 'Hello there!' );
 	} );
 
 	it( 'can be converted to a regular block', async () => {
@@ -177,7 +177,7 @@ describe( 'Reusable Blocks', () => {
 			'.editor-block-list__block[data-type="core/paragraph"] .editor-rich-text',
 			( element ) => element.innerText
 		);
-		expect( text ).toMatch( 'Oh! Hello there!' );
+		expect( text ).toMatch( 'Hello there!' );
 	} );
 
 	it( 'can be deleted', async () => {
