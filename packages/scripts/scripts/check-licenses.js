@@ -3,12 +3,13 @@
  */
 const spawn = require( 'cross-spawn' );
 const { existsSync, readFileSync } = require( 'fs' );
+const { sep } = require( 'path' );
 const chalk = require( 'chalk' );
 
 /**
  * Internal dependencies
  */
-const { hasCliArg } = require( '../utils' );
+const { getCliArg, hasCliArg } = require( '../utils' );
 
 /*
  * WARNING: Changes to this file may inadvertently cause us to distribute code that
@@ -24,6 +25,13 @@ const ERROR = chalk.reset.inverse.bold.red( ' ERROR ' );
 const prod = hasCliArg( '--prod' ) || hasCliArg( '--production' );
 const dev = hasCliArg( '--dev' ) || hasCliArg( '--development' );
 const gpl2 = hasCliArg( '--gpl2' );
+const ignored = hasCliArg( '--ignore' ) ?
+	getCliArg( '--ignore' )
+		// "--ignore=a, b" -> "[ 'a', ' b' ]"
+		.split( ',' )
+		// "[ 'a', ' b' ]" -> "[ 'a', 'b' ]"
+		.map( ( moduleName ) => moduleName.trim() ) :
+	[];
 
 /*
  * A list of license strings that we've found to be GPL2 compatible.
@@ -155,6 +163,23 @@ const checkLicense = ( allowedLicense, licenseType ) => {
 	return undefined !== subLicenseTypes.find( ( subLicenseType ) => checkLicense( allowedLicense, subLicenseType ) );
 };
 
+/**
+ * Returns true if the given module path is not to be ignored for consideration
+ * in license validation, or false otherwise.
+ *
+ * @param {string} moduleName Module path.
+ *
+ * @return {boolean} Whether module path is not to be ignored.
+ */
+const isNotIgnoredModule = ( moduleName ) => (
+	! ignored.some( ( ignoredItem ) => (
+		// `moduleName` is a file path to the module directory. Assume CLI arg
+		// is passed as basename of package (directory(s) after node_modules).
+		// Prefix with sep to avoid false-positives on prefixing variations.
+		moduleName.endsWith( sep + ignoredItem )
+	) )
+);
+
 // Use `npm ls` to grab a list of all the packages.
 const child = spawn.sync( 'npm', [
 	'ls',
@@ -163,7 +188,10 @@ const child = spawn.sync( 'npm', [
 	...( dev ? [ '--dev' ] : [] ),
 ] );
 
-const modules = child.stdout.toString().split( '\n' );
+const modules = child.stdout
+	.toString()
+	.split( '\n' )
+	.filter( isNotIgnoredModule );
 
 modules.forEach( ( path ) => {
 	if ( ! path ) {
