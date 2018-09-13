@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { flow } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -24,7 +29,9 @@ function ImportDropdown( { onUpload } ) {
 					{ __( 'Import from JSON' ) }
 				</Button>
 			) }
-			renderContent={ () => <ImportForm onUpload={ onUpload } /> }
+			renderContent={ ( { onClose } ) => (
+				<ImportForm onUpload={ flow( onClose, onUpload ) } />
+			) }
 		/>
 	);
 }

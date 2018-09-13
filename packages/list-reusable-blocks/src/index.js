@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { render } from '@wordpress/element';
-import { addQueryArgs } from '@wordpress/url';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -21,18 +21,25 @@ document.body.addEventListener( 'click', ( event ) => {
 
 // Setup Import Form
 document.addEventListener( 'DOMContentLoaded', function() {
-	const buttons = document.getElementsByClassName( 'page-title-action' );
-	const button = buttons.item( 0 );
+	const button = document.querySelector( '.page-title-action' );
 	if ( ! button ) {
 		return;
 	}
 
-	const refreshAndShowNotice = () => {
-		window.location = addQueryArgs( window.location.href, { action: 'import' } );
+	const showNotice = () => {
+		const notice = document.createElement( 'div' );
+		notice.className = 'notice notice-success is-dismissible';
+		notice.innerHTML = `<p>${ __( 'Reusable block imported with success!' ) }</p>`;
+
+		const headerEnd = document.querySelector( '.wp-header-end' );
+		if ( ! headerEnd ) {
+			return;
+		}
+		headerEnd.parentNode.insertBefore( notice, headerEnd );
 	};
 
 	const container = document.createElement( 'div' );
 	container.className = 'list-reusable-blocks__container';
 	button.parentNode.insertBefore( container, button );
-	render( <ImportDropdown onUpload={ refreshAndShowNotice } />, container );
+	render( <ImportDropdown onUpload={ showNotice } />, container );
 } );

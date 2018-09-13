@@ -481,29 +481,3 @@ function gutenberg_add_admin_body_class( $classes ) {
 		return "$classes gutenberg-editor-page is-fullscreen-mode";
 	}
 }
-
-/**
- * Add the reusable blocks list page import success notice.
- */
-function wp_add_reusable_blocks_import_success_notice() {
-	?>
-	<div class="notice notice-success is-dismissible">
-			<p><?php _e( 'Reusable block imported with success!', 'gutenberg' ); ?></p>
-	</div>
-	<?php
-}
-
-/**
- * Add hooks specific to the reusable blocks list page.
- *
- * @param string $current_screen Current screen.
- */
-function wp_add_reusable_blocks_list_hooks( $current_screen ) {
-	$is_reusable_blocks_list_page = 'wp_block' === $current_screen->post_type && 'edit' === $current_screen->base;
-	$should_show_success_notice   = $is_reusable_blocks_list_page && isset( $_GET['action'] ) && 'import' === $_GET['action'];
-
-	if ( $should_show_success_notice ) {
-		add_action( 'admin_notices', 'wp_add_reusable_blocks_import_success_notice' );
-	}
-}
-add_action( 'current_screen', 'wp_add_reusable_blocks_list_hooks' );
