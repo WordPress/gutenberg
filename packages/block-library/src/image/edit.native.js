@@ -3,6 +3,11 @@
  */
 import { View, Text, Image, Button } from 'react-native';
 
+/**
+ * Internal dependencies
+ */
+import styles from './editor.scss';
+
 export default function ImageEdit( { attributes } ) {
 	const { url, width, height } = attributes;
 
@@ -16,10 +21,14 @@ export default function ImageEdit( { attributes } ) {
 
 	if (! url) {
 		return (
-			<View style={ { alignItems: 'center', padding: 12, backgroundColor: '#f2f2f2' } }>
-				<Text style={ { textAlign: 'center', fontWeight: "bold", paddingBottom: 10} }>Image</Text>
-				<Text style={ { textAlign: 'center' } }>Upload a new image or select a file from your library.</Text>
-				<View style={{flexDirection: 'row', alignItems: 'center'}}>
+			<View style={ styles.emptyStateContainer }>
+				<Text style={ styles.emptyStateTitle }>
+					Image
+				</Text>
+				<Text style={ styles.emptyStateDescription }>
+					Upload a new image or select a file from your library.
+				</Text>
+				<View style={ styles.emptyStateButtonsContainer }>
 					<Button title="Upload" onPress={onUploadPress}/>
 					<Button title="Media Library" onPress={onMediaLibraryPress}/>
 				</View>
