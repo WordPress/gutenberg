@@ -22,7 +22,7 @@ export default function( registry ) {
 			return store;
 		},
 
-		async fulfill( reducerKey, selectorName, ...args ) {
+		async __experimentalFulfill( reducerKey, selectorName, ...args ) {
 			const resolver = get( registry.namespaces, [ reducerKey, 'resolvers', selectorName ] );
 			if ( ! resolver ) {
 				return;
