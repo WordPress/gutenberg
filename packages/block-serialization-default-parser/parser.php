@@ -38,7 +38,7 @@ class WP_Block_Parser_Block {
     public $innerBlocks;
 
 	/**
-	 * Resultant HTML from inside block comment delimieters
+	 * Resultant HTML from inside block comment delimiters
 	 * after removing inner blocks
 	 *
 	 * @example "...Just <!-- wp:test /--> testing..." -> "Just testing..."
