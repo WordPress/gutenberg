@@ -60,17 +60,18 @@ export class RichText extends Component {
 	 */
 
 	onChange( event ) {
+		// If we had a timer set to propagate a change, let's cancel it, because the user meanwhile typed something extra
 		if ( !! this.currentTimer ) {
 			clearTimeout( this.currentTimer );
 		}
 		this.lastEventCount = event.nativeEvent.eventCount;
-		// The following method just cleans up any <p> tags produced by aztec and replaces them with a br tag
+		// The following method just cleans up any root tags produced by aztec and replaces them with a br tag
 		// This should be removed on a later version when aztec doesn't return the top tag of the text being edited
 		const openingTagRegexp = RegExp( '^<' + this.props.tagName + '>', 'gim' );
 		const closingTagRegexp = RegExp( '</' + this.props.tagName + '>$', 'gim' );
 		const contentWithoutRootTag = event.nativeEvent.text.replace( openingTagRegexp, '' ).replace( closingTagRegexp, '' );
 		this.lastContent = contentWithoutRootTag;
-
+		// Set a time to call the onChange prop if nothing changes in the next second
 		this.currentTimer = setTimeout( function() {
 			this.props.onChange( {
 				content: this.lastContent,
@@ -92,10 +93,12 @@ export class RichText extends Component {
 	}
 
 	shouldComponentUpdate( nextProps ) {
-		// The check below allows us to avoid updating the content right after an `onChange` call
-		if ( nextProps.content.forceUpdate ) {
+		if ( nextProps.content.forceUpdate || nextProps.tagName !== this.props.tagName ) {
+			this.lastEventCount = undefined;
+			this.lastContent = undefined;
 			return true;
 		}
+		// The check below allows us to avoid updating the content right after an `onChange` call
 		// first time the component is drawn with empty content `lastContent` is undefined
 		if ( nextProps.content.contentTree &&
 			this.lastContent &&
@@ -156,7 +159,6 @@ export class RichText extends Component {
 
 		// Save back to HTML from React tree
 		const html = '<' + tagName + '>' + renderToString( this.props.content.contentTree ) + '</' + tagName + '>';
-		const eventCount = this.lastEventCount;
 
 		return (
 			<View>
@@ -166,7 +168,7 @@ export class RichText extends Component {
 						this._editor = ref;
 					}
 					}
-					text={ { text: html, eventCount: eventCount } }
+					text={ { text: html, eventCount: this.lastEventCount } }
 					onChange={ this.onChange }
 					onContentSizeChange={ this.onContentSizeChange }
 					onActiveFormatsChange={ this.onActiveFormatsChange }
