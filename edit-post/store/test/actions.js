@@ -2,37 +2,27 @@
  * Internal dependencies
  */
 import {
-	setGeneralSidebarActivePanel,
 	toggleGeneralSidebarEditorPanel,
 	openGeneralSidebar,
 	closeGeneralSidebar,
 	openPublishSidebar,
 	closePublishSidebar,
 	togglePublishSidebar,
+	openModal,
+	closeModal,
 	toggleFeature,
+	togglePinnedPluginItem,
 	requestMetaBoxUpdates,
 	initializeMetaBoxState,
 } from '../actions';
 
 describe( 'actions', () => {
-	describe( 'setGeneralSidebarActivePanel', () => {
-		it( 'should return SET_GENERAL_SIDEBAR_ACTIVE_PANEL action', () => {
-			expect( setGeneralSidebarActivePanel( 'editor', 'document' ) ).toEqual( {
-				type: 'SET_GENERAL_SIDEBAR_ACTIVE_PANEL',
-				sidebar: 'editor',
-				panel: 'document',
-			} );
-		} );
-	} );
-
 	describe( 'openGeneralSidebar', () => {
 		it( 'should return OPEN_GENERAL_SIDEBAR action', () => {
-			const sidebar = 'sidebarName';
-			const panel = 'panelName';
-			expect( openGeneralSidebar( sidebar, panel ) ).toEqual( {
+			const name = 'plugin/my-name';
+			expect( openGeneralSidebar( name ) ).toEqual( {
 				type: 'OPEN_GENERAL_SIDEBAR',
-				sidebar,
-				panel,
+				name,
 			} );
 		} );
 	} );
@@ -79,12 +69,41 @@ describe( 'actions', () => {
 		} );
 	} );
 
+	describe( 'openModal', () => {
+		it( 'should return OPEN_MODAL action', () => {
+			const name = 'plugin/my-name';
+			expect( openModal( name ) ).toEqual( {
+				type: 'OPEN_MODAL',
+				name,
+			} );
+		} );
+	} );
+
+	describe( 'closeModal', () => {
+		it( 'should return CLOSE_MODAL action', () => {
+			expect( closeModal() ).toEqual( {
+				type: 'CLOSE_MODAL',
+			} );
+		} );
+	} );
+
 	describe( 'toggleFeature', () => {
 		it( 'should return TOGGLE_FEATURE action', () => {
 			const feature = 'name';
 			expect( toggleFeature( feature ) ).toEqual( {
 				type: 'TOGGLE_FEATURE',
 				feature,
+			} );
+		} );
+	} );
+
+	describe( 'togglePinnedPluginItem', () => {
+		it( 'should return TOGGLE_PINNED_PLUGIN_ITEM action', () => {
+			const pluginName = 'foo/bar';
+
+			expect( togglePinnedPluginItem( pluginName ) ).toEqual( {
+				type: 'TOGGLE_PINNED_PLUGIN_ITEM',
+				pluginName,
 			} );
 		} );
 	} );

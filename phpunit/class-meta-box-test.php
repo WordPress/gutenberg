@@ -112,55 +112,6 @@ class Meta_Box_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests for empty meta box.
-	 */
-	public function test_gutenberg_is_meta_box_empty_with_empty_meta_box() {
-		$context                              = 'side';
-		$post_type                            = 'post';
-		$meta_boxes                           = $this->meta_boxes;
-		$meta_boxes[ $post_type ][ $context ] = array();
-
-		$is_empty = gutenberg_is_meta_box_empty( $meta_boxes, $context, $post_type );
-		$this->assertTrue( $is_empty );
-	}
-
-	/**
-	 * Tests for non empty meta box area.
-	 */
-	public function test_gutenberg_is_meta_box_empty_with_non_empty_meta_box() {
-		$context    = 'normal';
-		$post_type  = 'post';
-		$meta_boxes = $this->meta_boxes;
-
-		$is_empty = gutenberg_is_meta_box_empty( $meta_boxes, $context, $post_type );
-		$this->assertFalse( $is_empty );
-	}
-
-	/**
-	 * Tests for non existant location.
-	 */
-	public function test_gutenberg_is_meta_box_empty_with_non_existant_location() {
-		$context    = 'test';
-		$post_type  = 'post';
-		$meta_boxes = $this->meta_boxes;
-
-		$is_empty = gutenberg_is_meta_box_empty( $meta_boxes, $context, $post_type );
-		$this->assertTrue( $is_empty );
-	}
-
-	/**
-	 * Tests for non existant page.
-	 */
-	public function test_gutenberg_is_meta_box_empty_with_non_existant_page() {
-		$context    = 'normal';
-		$post_type  = 'test';
-		$meta_boxes = $this->meta_boxes;
-
-		$is_empty = gutenberg_is_meta_box_empty( $meta_boxes, $context, $post_type );
-		$this->assertTrue( $is_empty );
-	}
-
-	/**
 	 * Test filtering of meta box data.
 	 */
 	public function test_gutenberg_filter_meta_boxes() {

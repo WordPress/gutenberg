@@ -3,6 +3,9 @@
 # Exit if any command fails
 set -e
 
+# Set up environment variables
+. "$(dirname "$0")/bootstrap-env.sh"
+
 # Include useful functions
 . "$(dirname "$0")/includes.sh"
 
@@ -16,14 +19,14 @@ cd "$(dirname "$0")/.."
 . "$(dirname "$0")/install-docker.sh"
 
 ! read -d '' GUTENBERG <<"EOT"
-,⁻⁻⁻.       .                 |
-|  _. .   . |---  ,---. ,---. |---. ,---. ,---. ,---.
+,⁻⁻⁻·       .                 |
+|  ،⁓’.   . |---  ,---. ,---. |---. ,---. ,---. ,---.
 |   | |   | |     |---' |   | |   | |---' |     |   |
 `---' `---' `---’ `---’ '   ` `---' `---’ `     `---|
                                                 `---'
 EOT
 
-CURRENT_URL=$(docker-compose run -T --rm cli option get siteurl)
+CURRENT_URL=$(docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run -T --rm cli option get siteurl)
 
 echo -e "\nWelcome to...\n"
 echo -e "\033[95m$GUTENBERG\033[0m"

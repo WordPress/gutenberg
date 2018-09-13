@@ -1,0 +1,16 @@
+.editor-block-icon {
+	display: inline-block;
+	border-radius: 4px;
+	margin: 0;
+
+	&.has-colors {
+		svg {
+			fill: currentColor;
+		}
+	}
+
+	svg:not(.dashicon) {
+		height: 24px;
+		width: 24px;
+	}
+}

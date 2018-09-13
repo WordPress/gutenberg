@@ -7,7 +7,10 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import {
+	DEFAULT_ACTIVE_GENERAL_SIDEBAR,
 	preferences,
+	activeGeneralSidebar,
+	activeModal,
 	isSavingMetaBoxes,
 	metaBoxes,
 } from '../reducer';
@@ -18,45 +21,43 @@ describe( 'state', () => {
 			const state = preferences( undefined, {} );
 
 			expect( state ).toEqual( {
-				activeGeneralSidebar: 'editor',
-				activeSidebarPanel: {
-					editor: null,
-					plugin: null,
-				},
 				editorMode: 'visual',
+				isGeneralSidebarDismissed: false,
 				panels: { 'post-status': true },
 				features: { fixedToolbar: false },
+				pinnedPluginItems: {},
 			} );
 		} );
 
-		it( 'should set the general sidebar active panel', () => {
-			const state = preferences( deepFreeze( {
-				activeGeneralSidebar: 'editor',
-				activeSidebarPanel: {
-					editor: null,
-					plugin: null,
-				},
-			} ), {
-				type: 'SET_GENERAL_SIDEBAR_ACTIVE_PANEL',
-				sidebar: 'editor',
-				panel: 'document',
+		it( 'should set the general sidebar dismissed', () => {
+			const original = deepFreeze( preferences( undefined, {} ) );
+			const state = preferences( original, {
+				type: 'OPEN_GENERAL_SIDEBAR',
+				name: 'edit-post/document',
 			} );
-			expect( state ).toEqual( {
-				activeGeneralSidebar: 'editor',
-				activeSidebarPanel: {
-					editor: 'document',
-					plugin: null,
-				},
+
+			expect( state.isGeneralSidebarDismissed ).toBe( false );
+		} );
+
+		it( 'should set the general sidebar undismissed', () => {
+			const original = deepFreeze( preferences( undefined, {
+				type: 'OPEN_GENERAL_SIDEBAR',
+				name: 'edit-post/document',
+			} ) );
+			const state = preferences( original, {
+				type: 'CLOSE_GENERAL_SIDEBAR',
 			} );
+
+			expect( state.isGeneralSidebarDismissed ).toBe( true );
 		} );
 
 		it( 'should set the sidebar panel open flag to true if unset', () => {
-			const state = preferences( deepFreeze( {} ), {
+			const state = preferences( deepFreeze( { panels: {} } ), {
 				type: 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL',
 				panel: 'post-taxonomies',
 			} );
 
-			expect( state ).toEqual( { panels: { 'post-taxonomies': true } } );
+			expect( state.panels ).toEqual( { 'post-taxonomies': true } );
 		} );
 
 		it( 'should toggle the sidebar panel open flag', () => {
@@ -65,16 +66,16 @@ describe( 'state', () => {
 				panel: 'post-taxonomies',
 			} );
 
-			expect( state ).toEqual( { panels: { 'post-taxonomies': false } } );
+			expect( state.panels ).toEqual( { 'post-taxonomies': false } );
 		} );
 
 		it( 'should return switched mode', () => {
-			const state = preferences( deepFreeze( {} ), {
+			const state = preferences( deepFreeze( { editorMode: 'visual' } ), {
 				type: 'SWITCH_MODE',
 				mode: 'text',
 			} );
 
-			expect( state ).toEqual( { editorMode: 'text' } );
+			expect( state.editorMode ).toBe( 'text' );
 		} );
 
 		it( 'should toggle a feature flag', () => {
@@ -82,7 +83,86 @@ describe( 'state', () => {
 				type: 'TOGGLE_FEATURE',
 				feature: 'chicken',
 			} );
-			expect( state ).toEqual( { features: { chicken: false } } );
+
+			expect( state.features ).toEqual( { chicken: false } );
+		} );
+
+		describe( 'pinnedPluginItems', () => {
+			const initialState = deepFreeze( {
+				pinnedPluginItems: {
+					'foo/enabled': true,
+					'foo/disabled': false,
+				},
+			} );
+
+			it( 'should disable a pinned plugin flag when the value does not exist', () => {
+				const state = preferences( initialState, {
+					type: 'TOGGLE_PINNED_PLUGIN_ITEM',
+					pluginName: 'foo/does-not-exist',
+				} );
+
+				expect( state.pinnedPluginItems[ 'foo/does-not-exist' ] ).toBe( false );
+			} );
+
+			it( 'should disable a pinned plugin flag when it is enabled', () => {
+				const state = preferences( initialState, {
+					type: 'TOGGLE_PINNED_PLUGIN_ITEM',
+					pluginName: 'foo/enabled',
+				} );
+
+				expect( state.pinnedPluginItems[ 'foo/enabled' ] ).toBe( false );
+			} );
+
+			it( 'should enable a pinned plugin flag when it is disabled', () => {
+				const state = preferences( initialState, {
+					type: 'TOGGLE_PINNED_PLUGIN_ITEM',
+					pluginName: 'foo/disabled',
+				} );
+
+				expect( state.pinnedPluginItems[ 'foo/disabled' ] ).toBe( true );
+			} );
+		} );
+	} );
+
+	describe( 'activeGeneralSidebar', () => {
+		it( 'should default to the default active sidebar', () => {
+			const state = activeGeneralSidebar( undefined, {} );
+
+			expect( state ).toBe( DEFAULT_ACTIVE_GENERAL_SIDEBAR );
+		} );
+
+		it( 'should set the general sidebar', () => {
+			const original = activeGeneralSidebar( undefined, {} );
+			const state = activeGeneralSidebar( original, {
+				type: 'OPEN_GENERAL_SIDEBAR',
+				name: 'edit-post/document',
+			} );
+
+			expect( state ).toBe( 'edit-post/document' );
+		} );
+	} );
+
+	describe( 'activeModal', () => {
+		it( 'should default to null', () => {
+			const state = activeModal( undefined, {} );
+			expect( state ).toBeNull();
+		} );
+
+		it( 'should set the activeModal to the provided name', () => {
+			const state = activeModal( null, {
+				type: 'OPEN_MODAL',
+				name: 'test-modal',
+			} );
+
+			expect( state ).toEqual( 'test-modal' );
+		} );
+
+		it( 'should set the activeModal to null', () => {
+			const state = activeModal( 'test-modal', {
+				type: 'CLOSE_MODAL',
+			} );
+
+			expect( state ).toBeNull();
 		} );
 	} );
 

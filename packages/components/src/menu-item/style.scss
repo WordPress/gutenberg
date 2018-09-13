@@ -1,0 +1,67 @@
+.components-menu-item__button,
+.components-menu-item__button.components-icon-button {
+	width: 100%;
+	padding: 8px;
+	text-align: left;
+	padding-left: 2rem;
+	color: $dark-gray-500;
+
+	// Target plugin icons that can have arbitrary classes by using an aggressive selector.
+	.dashicon,
+	.components-menu-items__item-icon,
+	> span > svg {
+		margin-right: 4px;
+	}
+
+	.components-menu-items__item-icon {
+		display: inline-block;
+		flex: 0 0 auto;
+	}
+
+	&.has-icon {
+		padding-left: 0.5rem;
+	}
+
+	&:hover:not(:disabled):not([aria-disabled="true"]) {
+		@include menu-style__neutral;
+	}
+
+	&:focus:not(:disabled):not([aria-disabled="true"]) {
+		@include menu-style__focus;
+	}
+
+	// Colorize plugin icons to ensure contrast and cohesion, but allow plugin developers to override.
+	svg,
+	svg * {
+		fill: $dark-gray-500;
+	}
+
+	&:hover svg,
+	&:hover svg * {
+		// !important allows icons from plugins to be overriden and given a dark-gray fill
+		fill: $dark-gray-900 !important;
+	}
+
+	// Don't wrap text until viewport is beyond the mobile breakpoint.
+	@include break-mobile() {
+		.components-popover:not(.is-mobile) & {
+			white-space: nowrap;
+		}
+	}
+}
+
+.components-menu-item__shortcut {
+	align-self: center;
+	opacity: 0.5;
+	margin-right: 0;
+	margin-left: auto;
+	padding-left: 8px;
+
+	// Hide the keyboard shortcuts on mobile, because they aren't super-useful
+	// for most mobile users and it frees up screen space for any item
+	// with a long description.
+	display: none;
+	@include break-mobile() {
+		display: inline;
+	}
+}

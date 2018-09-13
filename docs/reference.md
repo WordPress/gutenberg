@@ -1,7 +1,6 @@
 # Reference
 
-- [Glossary](./reference/glossary)
-- [Design Principles](./reference/design-principles)
-- [Coding Guidelines](./reference/coding-guidelines)
-- [Testing Overview](./reference/testing-overview)
-- [Frequently Asked Questions](./reference/faq)
+- [Glossary](../docs/reference/glossary.md)
+- [Coding Guidelines](../docs/reference/coding-guidelines.md)
+- [Testing Overview](../docs/reference/testing-overview.md)
+- [Frequently Asked Questions](../docs/reference/faq.md)

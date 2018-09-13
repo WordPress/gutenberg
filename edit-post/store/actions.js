@@ -1,32 +1,14 @@
-
 /**
- * Returns an action object used in signalling that the user switched the active
- * sidebar tab panel.
+ * Returns an action object used in signalling that the user opened an editor sidebar.
  *
- * @param  {string} sidebar Sidebar name
- * @param  {string} panel   Panel name
- * @return {Object}         Action object
- */
-export function setGeneralSidebarActivePanel( sidebar, panel ) {
-	return {
-		type: 'SET_GENERAL_SIDEBAR_ACTIVE_PANEL',
-		sidebar,
-		panel,
-	};
-}
-
-/**
- * Returns an action object used in signalling that the user opened a sidebar.
+ * @param {string} name Sidebar name to be opened.
  *
- * @param {string} sidebar        Sidebar to open.
- * @param {string} [panel = null] Panel to open in the sidebar. Null if unchanged.
- * @return {Object}              Action object.
+ * @return {Object} Action object.
  */
-export function openGeneralSidebar( sidebar, panel = null ) {
+export function openGeneralSidebar( name ) {
 	return {
 		type: 'OPEN_GENERAL_SIDEBAR',
-		sidebar,
-		panel,
+		name,
 	};
 }
 
@@ -38,6 +20,31 @@ export function openGeneralSidebar( sidebar, panel = null ) {
 export function closeGeneralSidebar() {
 	return {
 		type: 'CLOSE_GENERAL_SIDEBAR',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user opened an editor sidebar.
+ *
+ * @param {string} name A string that uniquely identifies the modal.
+ *
+ * @return {Object} Action object.
+ */
+export function openModal( name ) {
+	return {
+		type: 'OPEN_MODAL',
+		name,
+	};
+}
+
+/**
+ * Returns an action object signalling that the user closed the sidebar.
+ *
+ * @return {Object} Action object.
+ */
+export function closeModal() {
+	return {
+		type: 'CLOSE_MODAL',
 	};
 }
 
@@ -66,7 +73,7 @@ export function closePublishSidebar() {
 }
 
 /**
- * Returns an action object used in signalling that the user toggles the publish sidebar
+ * Returns an action object used in signalling that the user toggles the publish sidebar.
  *
  * @return {Object} Action object
  */
@@ -92,7 +99,7 @@ export function toggleGeneralSidebarEditorPanel( panel ) {
 /**
  * Returns an action object used to toggle a feature flag.
  *
- * @param {string} feature Featurre name.
+ * @param {string} feature Feature name.
  *
  * @return {Object} Action object.
  */
@@ -107,6 +114,20 @@ export function switchEditorMode( mode ) {
 	return {
 		type: 'SWITCH_MODE',
 		mode,
+	};
+}
+
+/**
+ * Returns an action object used to toggle a plugin name flag.
+ *
+ * @param {string} pluginName Plugin name.
+ *
+ * @return {Object} Action object.
+ */
+export function togglePinnedPluginItem( pluginName ) {
+	return {
+		type: 'TOGGLE_PINNED_PLUGIN_ITEM',
+		pluginName,
 	};
 }
 
@@ -135,7 +156,7 @@ export function initializeMetaBoxState( metaBoxes ) {
 /**
  * Returns an action object used to request meta box update.
  *
- * @return {Object}      Action object.
+ * @return {Object} Action object.
  */
 export function requestMetaBoxUpdates() {
 	return {
@@ -144,7 +165,7 @@ export function requestMetaBoxUpdates() {
 }
 
 /**
- * Returns an action object used signal a successfull meta nox update.
+ * Returns an action object used signal a successful meta box update.
  *
  * @return {Object} Action object.
  */
@@ -155,11 +176,12 @@ export function metaBoxUpdatesSuccess() {
 }
 
 /**
- * Returns an action object used set the saved meta boxes data.
+ * Returns an action object used to set the saved meta boxes data.
  * This is used to check if the meta boxes have been touched when leaving the editor.
  *
  * @param   {Object} dataPerLocation Meta Boxes Data per location.
- * @return {Object}                 Action object.
+ *
+ * @return {Object} Action object.
  */
 export function setMetaBoxSavedData( dataPerLocation ) {
 	return {

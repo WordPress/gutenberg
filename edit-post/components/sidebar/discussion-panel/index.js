@@ -1,20 +1,11 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody, PanelRow } from '@wordpress/components';
 import { PostComments, PostPingbacks, PostTypeSupportCheck } from '@wordpress/editor';
-
-/**
- * Internal Dependencies
- */
-import { isEditorSidebarPanelOpened } from '../../../store/selectors';
-import { toggleGeneralSidebarEditorPanel } from '../../../store/actions';
+import { compose } from '@wordpress/compose';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Module Constants
@@ -41,18 +32,16 @@ function DiscussionPanel( { isOpened, onTogglePanel } ) {
 	);
 }
 
-export default connect(
-	( state ) => {
+export default compose( [
+	withSelect( ( select ) => {
 		return {
-			isOpened: isEditorSidebarPanelOpened( state, PANEL_NAME ),
+			isOpened: select( 'core/edit-post' ).isEditorSidebarPanelOpened( PANEL_NAME ),
 		};
-	},
-	{
+	} ),
+	withDispatch( ( dispatch ) => ( {
 		onTogglePanel() {
-			return toggleGeneralSidebarEditorPanel( PANEL_NAME );
+			return dispatch( 'core/edit-post' ).toggleGeneralSidebarEditorPanel( PANEL_NAME );
 		},
-	},
-	undefined,
-	{ storeKey: 'edit-post' }
-)( DiscussionPanel );
+	} ) ),
+] )( DiscussionPanel );
 

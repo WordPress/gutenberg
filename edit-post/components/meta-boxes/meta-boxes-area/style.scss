@@ -2,25 +2,37 @@
 .edit-post-meta-boxes-area {
 	position: relative;
 
-		/* Match width and positioning of the meta boxes. Override default styles. */
+	/**
+	 * The wordpress default for most meta-box elements is content-box. Some
+	 * elements such as textarea and input are set to border-box in forms.css.
+	 * These elements therefore specifically set back to border-box here, while
+	 * other elements (such as .button) are unaffected by Gutenberg's style
+	 * because of their higher specificity.
+	 */
+	&__container,
+	.inside {
+		box-sizing: content-box;
+	}
+
+	textarea,
+	input {
+		box-sizing: border-box;
+	}
+
+	/* Match width and positioning of the meta boxes. Override default styles. */
 	#poststuff {
 		margin: 0 auto;
 		padding-top: 0;
 		min-width: auto;
 	}
 
-	#post {
-		margin: 0;
-	}
-
 	/* Override Default meta box stylings */
-
 	#poststuff h3.hndle,
 	#poststuff .stuffbox > h3,
 	#poststuff h2.hndle { /* WordPress selectors yolo */
-		border-bottom: 1px solid $light-gray-500;
+		border-bottom: $border-width solid $light-gray-500;
 		box-sizing: border-box;
-		color: $dark-gray-500;
+		color: inherit;
 		font-weight: 600;
 		outline: none;
 		padding: 15px;
@@ -30,41 +42,15 @@
 
 	.postbox {
 		border: 0;
-		color: $dark-gray-500;
+		color: inherit;
 		margin-bottom: 0;
 	}
 
 	.postbox > .inside {
-		border-bottom: 1px solid $light-gray-500;
-		color: $dark-gray-500;
-		padding: 15px;
+		border-bottom: $border-width solid $light-gray-500;
+		color: inherit;
+		padding: 0 $block-padding $block-padding;
 		margin: 0;
-	}
-
-	input {
-		max-width: 300px;
-	}
-
-	input,
-	select,
-	textarea {
-		background: inherit;
-		border: 1px solid $light-gray-500;
-		border-radius: 4px;
-		box-shadow: none;
-		color: $dark-gray-800;
-		display: inline-block;
-		font-family: inherit;
-		font-size: 13px;
-		line-height: 24px;
-		outline: none;
-		padding: 4px;
-	}
-
-	input:hover,
-	select:hover,
-	textarea:hover {
-		border: 1px solid $light-gray-700;
 	}
 
 	.postbox .handlediv {
@@ -72,22 +58,22 @@
 		width: 44px;
 	}
 
-	&.is-loading:before {
+	&.is-loading::before {
 		position: absolute;
 		top: 0;
 		left: 0;
 		right: 0;
 		bottom: 0;
-		content: '';
+		content: "";
 		background: transparent;
-		z-index: z-index( '.edit-post-meta-boxes-area.is-loading:before');
+		z-index: z-index(".edit-post-meta-boxes-area.is-loading::before");
 	}
 
-	.spinner {
+	.components-spinner {
 		position: absolute;
 		top: 10px;
 		right: 20px;
-		z-index: z-index( '.edit-post-meta-boxes-area .spinner');
+		z-index: z-index(".edit-post-meta-boxes-area .spinner");
 	}
 }
 
