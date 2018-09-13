@@ -167,7 +167,7 @@ class MediaPlaceholder extends Component {
 						<IconButton
 							isLarge
 							className="editor-media-placeholder__url-input-expandable-button"
-							icon={ isURLInputExpanded ? 'arrow-up' : 'arrow-down' }
+							icon={ isURLInputExpanded ? 'arrow-right-alt2' : 'arrow-left-alt2' }
 							onClick={ this.toggleURLInputVisibility }
 							isToggled={ isURLInputExpanded }
 							aria-expanded={ isURLInputExpanded }
