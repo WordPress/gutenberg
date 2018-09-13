@@ -2,7 +2,7 @@
 
 TabPanel is a React component to render an ARIA-compliant TabPanel. It has two sections: a list of tabs, and the view to show when tabs are chosen. When the list of tabs gets focused, the active tab gets focus (the first tab if there isn't one already). Use the arrow keys to navigate between tabs AND select the newly focused tab at the same time.
 
-TabPanel is a Function-as-Children component. The function takes `tabName` as an argument.
+TabPanel is a Function-as-Children component. The function takes the active tab object as as an argument.
 
 ## Usage
 
@@ -32,7 +32,7 @@ const MyTabPanel = () => (
 			},
 		] }>
 		{
-			( tabName ) => <p>{ tabName }</p>
+			( tab ) => <p>{ tab.title }</p>
 		}
 	</TabPanel>
 );
@@ -95,8 +95,8 @@ Optionally provide a tab name for a tab to be selected upon mounting of componen
 
 ### children
 
-A function which renders the tabviews given the selected tab. The function is passed a `tabName` as an argument.
+A function which renders the tabviews given the selected tab. The function is passed the active tab object as an argument as defined the the tabs prop.
 The element to which the tooltip should anchor.
 
-- Type: (`String`) => `Element`
+- Type: (`Object`) => `Element`
 - Required: Yes
