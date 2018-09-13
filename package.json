@@ -185,6 +185,8 @@
 		"pretest-e2e": "concurrently \"./bin/reset-e2e-tests.sh\" \"npm run build\"",
 		"test-e2e": "cross-env JEST_PUPPETEER_CONFIG=test/e2e/puppeteer.config.js wp-scripts test-unit-js --config test/e2e/jest.config.json --runInBand",
 		"test-e2e:watch": "npm run test-e2e -- --watch",
+		"pretest-mobile": "cd gutenberg-mobile; yarn install; cd ..;",
+		"test-mobile": "cd gutenberg-mobile; yarn test:inside-gb; cd ..;",
 		"test-php": "npm run lint-php && npm run test-unit-php",
 		"test-unit": "wp-scripts test-unit-js --config test/unit/jest.config.json",
 		"test-unit:coverage": "npm run test-unit -- --coverage",
