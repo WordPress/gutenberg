@@ -151,15 +151,6 @@
 	padding-right: $grid-size-small;
 	border-top: 0;
 	margin-top: 0;
-
-	.components-icon-button {
-		display: none;
-		margin-left: auto;
-
-		@include break-medium() {
-			display: flex;
-		}
-	}
 }
 
 .edit-post-sidebar__panel-tab {
