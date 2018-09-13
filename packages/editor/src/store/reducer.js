@@ -773,9 +773,6 @@ export function settings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
  * Reducer returning the user preferences.
  *
  * @param {Object}  state                 Current state.
- * @param {string}  state.mode            Current editor mode, either "visual" or "text".
- * @param {boolean} state.isSidebarOpened Whether the sidebar is opened or closed.
- * @param {Object}  state.panels          The state of the different sidebar panels.
  * @param {Object}  action                Dispatched action.
  *
  * @return {string} Updated state.
