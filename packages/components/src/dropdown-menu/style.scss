@@ -27,16 +27,7 @@
 		&:hover,
 		&:focus,
 		&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
-			box-shadow: none;
-			outline: none;
-			color: $dark-gray-500;
-			border-color: $dark-gray-500;
-		}
-
-		&.is-active > svg,
-		&.is-active:hover > svg {
-			background-color: $dark-gray-500;
-			color: $white;
+			@include formatting-button-style__hover();
 		}
 
 		.components-dropdown-menu__indicator {
@@ -65,9 +56,9 @@
 	.components-dropdown-menu__menu-item {
 		width: 100%;
 		padding: 6px;
-		border-radius: 0;
 		outline: none;
 		cursor: pointer;
+		margin-bottom: $grid-size-small;
 
 		&.has-separator {
 			margin-top: 6px;
@@ -87,9 +78,16 @@
 			height: 1px;
 		}
 
-		&:not(:disabled).is-active > svg {
-			@include formatting-button-style__active;
+		&:hover:not(:disabled):not([aria-disabled="true"]):not(.is-default) {
+			@include formatting-button-style__hover();
+		}
+
+		&:not(:disabled):not([aria-disabled="true"]):not(.is-default).is-active {
+			@include formatting-button-style__active();
+		}
+
+		&:focus:not(:disabled):not([aria-disabled="true"]):not(.is-default) {
+			@include formatting-button-style__focus();
 		}
 	}
 }
-

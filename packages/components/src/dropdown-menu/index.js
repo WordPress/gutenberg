@@ -47,11 +47,7 @@ function DropdownMenu( {
 				};
 				return (
 					<IconButton
-						className={
-							classnames( 'components-dropdown-menu__toggle', {
-								'is-active': isOpen,
-							} )
-						}
+						className="components-dropdown-menu__toggle"
 						icon={ icon }
 						onClick={ onToggle }
 						onKeyDown={ openOnArrowDown }
