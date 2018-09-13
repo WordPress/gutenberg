@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { shallow } from 'enzyme';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -79,7 +80,7 @@ describe( 'BlockHTML', () => {
 				content: 'test-block',
 				isValid: true,
 			} );
-			const wrapper = shallow( <BlockHTML block={ block } onChange={ onChange } /> );
+			const wrapper = shallow( <BlockHTML block={ block } onChange={ onChange } onToggleMode={ noop } /> );
 
 			wrapper.instance().onChange( { target: { value: '<p>update' } } );
 			wrapper.instance().onBlur();
