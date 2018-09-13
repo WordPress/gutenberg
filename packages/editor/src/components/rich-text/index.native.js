@@ -94,7 +94,7 @@ export class RichText extends Component {
 	}
 
 	onEnter() {
-		console.log("Enter pressed!  This logic still needs to be implemented.");
+		// Descriptive placeholder: This logic still needs to be implemented.
 	}
 
 	shouldComponentUpdate( nextProps ) {
