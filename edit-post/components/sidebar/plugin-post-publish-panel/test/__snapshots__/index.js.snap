@@ -15,13 +15,11 @@ exports[`PluginPostPublishPanel renders fill properly 1`] = `
     >
       <Button
         aria-expanded={true}
-        aria-label="My panel title"
         className="components-panel__body-toggle"
         onClick={[Function]}
       >
         <button
           aria-expanded={true}
-          aria-label="My panel title"
           className="components-button components-panel__body-toggle"
           onClick={[Function]}
           type="button"
