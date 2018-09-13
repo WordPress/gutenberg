@@ -18,6 +18,7 @@ import {
  * Internal dependencies
  */
 import Popover from '../popover';
+import Shortcut from '../shortcut';
 
 /**
  * Time over children to wait before showing tooltip
@@ -178,7 +179,7 @@ class Tooltip extends Component {
 						aria-hidden="true"
 					>
 						{ text }
-						{ shortcut && <span className="components-tooltip__shortcut">{ shortcut }</span> }
+						<Shortcut className="components-tooltip__shortcut" shortcut={ shortcut } />
 					</Popover>
 				),
 			),
