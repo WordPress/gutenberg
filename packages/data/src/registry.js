@@ -239,9 +239,9 @@ export function createRegistry( storeConfigs = {} ) {
 		}
 
 		const store = namespaces[ reducerKey ].store;
-		const actionCreator = resolver.fulfill( ...args );
-		if ( actionCreator ) {
-			await store.dispatch( actionCreator );
+		const action = resolver.fulfill( ...args );
+		if ( action ) {
+			await store.dispatch( action );
 		}
 	}
 

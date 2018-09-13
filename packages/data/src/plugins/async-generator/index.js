@@ -29,9 +29,9 @@ export default function( registry ) {
 			}
 			const store = registry.namespaces[ reducerKey ].store;
 			const state = store.getState();
-			const actionCreator = resolver.fulfill( state, ...args );
-			if ( actionCreator ) {
-				await store.dispatch( toAsyncIterable( actionCreator ) );
+			const action = resolver.fulfill( state, ...args );
+			if ( action ) {
+				await store.dispatch( toAsyncIterable( action ) );
 			}
 		},
 	};
