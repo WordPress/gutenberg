@@ -1,29 +1,27 @@
 /**
  * External dependencies
  */
-import { View, Text, Image, Button } from 'react-native';
+import { View, Image } from 'react-native';
 
 /**
  * Internal dependencies
  */
-import {
-	MediaPlaceholder
-} from '@wordpress/editor';
+import { MediaPlaceholder } from '@wordpress/editor';
 
 export default function ImageEdit( { attributes } ) {
-	const { url, width, height } = attributes;
+	const { url } = attributes;
 
-	const onUploadPress = ()=> {
-	}
+	const onUploadPress = () => {
+	};
 
-	const onMediaLibraryPress = ()=> {
-	}
+	const onMediaLibraryPress = () => {
+	};
 
-	if (! url) {
+	if ( ! url ) {
 		return (
 			<MediaPlaceholder
-				onUploadPress = {onUploadPress}
-				onMediaLibraryPress = {onMediaLibraryPress}
+				onUploadPress={ onUploadPress }
+				onMediaLibraryPress={ onMediaLibraryPress }
 			/>
 		);
 	}
@@ -31,10 +29,10 @@ export default function ImageEdit( { attributes } ) {
 	return (
 		<View style={ { flex: 1 } }>
 			<Image
-				style={{width:'100%', height:200}}
-				resizeMethod = 'scale'
-				source={{uri: url}}
+				style={ { width: '100%', height: 200 } }
+				resizeMethod="scale"
+				source={ { uri: url } }
 			/>
-		</View> 
+		</View>
 	);
 }
