@@ -29,6 +29,7 @@ async function importReusableBlock( file ) {
 		throw new Error( __( 'Invalid JSON file' ) );
 	}
 	if (
+		parsedContent.__file !== 'wp_block' ||
 		! parsedContent.title ||
 		! parsedContent.content ||
 		! isString( parsedContent.title ) ||
