@@ -13,7 +13,10 @@ import SidebarHeader from '../sidebar-header';
 
 const SettingsHeader = ( { count, openDocumentSettings, openBlockSettings, sidebarName } ) => {
 	// Do not display "0 Blocks".
-	count = count === 0 ? 1 : count;
+	const blockCount = count === 0 ? 1 : count;
+	const blockLabel = blockCount === 1 ?
+		__( 'Block' ) :
+		sprintf( _n( '%d Block', '%d Blocks', blockCount ), blockCount );
 
 	return (
 		<SidebarHeader
@@ -32,17 +35,9 @@ const SettingsHeader = ( { count, openDocumentSettings, openBlockSettings, sideb
 				onClick={ openBlockSettings }
 				className={ `edit-post-sidebar__panel-tab ${ sidebarName === 'edit-post/block' ? 'is-active' : '' }` }
 				aria-label={ __( 'Block settings' ) }
-				data-label={ (
-					1 === count ?
-						__( 'Block' ) :
-						sprintf( _n( '%d Block', '%d Blocks', count ), count )
-				) }
+				data-label={ blockLabel }
 			>
-				{ (
-					1 === count ?
-						__( 'Block' ) :
-						sprintf( _n( '%d Block', '%d Blocks', count ), count )
-				) }
+				{ blockLabel }
 			</button>
 		</SidebarHeader>
 	);
