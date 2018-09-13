@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { __, _x } from '@wordpress/i18n';
 import { getPhrasingContentSchema } from '@wordpress/blocks';
-import { RichText } from '@wordpress/editor';
+import { RichText, getColorClassName } from '@wordpress/editor';
 import { G, Path, SVG } from '@wordpress/components';
 
 /**
@@ -86,6 +86,24 @@ export const settings = {
 			type: 'boolean',
 			default: false,
 		},
+		backgroundColor: {
+			type: 'string',
+		},
+		customBackgroundColor: {
+			type: 'string',
+		},
+		borderColor: {
+			type: 'string',
+		},
+		customBorderColor: {
+			type: 'string',
+		},
+		textColor: {
+			type: 'string',
+		},
+		customTextColor: {
+			type: 'string',
+		},
 		head: getTableSectionAttributeSchema( 'head' ),
 		body: getTableSectionAttributeSchema( 'body' ),
 		foot: getTableSectionAttributeSchema( 'foot' ),
@@ -113,16 +131,30 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { hasFixedLayout, head, body, foot } = attributes;
+		const {
+			className,
+			hasFixedLayout,
+			head,
+			body,
+			foot,
+			backgroundColor,
+			customBackgroundColor,
+			textColor,
+			customTextColor,
+		} = attributes;
 		const isEmpty = ! head.length && ! body.length && ! foot.length;
 
 		if ( isEmpty ) {
 			return null;
 		}
 
-		const classes = classnames( {
+		const tableClasses = classnames( {
 			'has-fixed-layout': hasFixedLayout,
 		} );
+
+		const isStriped = !! className && className.indexOf( 'is-style-stripes' ) > -1;
+		const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+		const textClass = getColorClassName( 'color', textColor );
 
 		const Section = ( { type, rows } ) => {
 			if ( ! rows.length ) {
@@ -133,19 +165,38 @@ export const settings = {
 
 			return (
 				<Tag>
-					{ rows.map( ( { cells }, rowIndex ) =>
-						<tr key={ rowIndex }>
-							{ cells.map( ( { content, tag }, cellIndex ) =>
-								<RichText.Content tagName={ tag } value={ content } key={ cellIndex } />
-							) }
-						</tr>
-					) }
+					{ rows.map( ( { cells }, rowIndex ) => {
+						const hasColors = isStriped ? rowIndex % 2 === 0 : true;
+
+						const rowClasses = classnames( {
+							'has-background-color': hasColors && backgroundClass,
+							[ backgroundClass ]: hasColors ? backgroundClass : undefined,
+							[ textClass ]: hasColors ? textClass : undefined,
+						} );
+
+						const rowStyles = {
+							backgroundColor: hasColors && ! backgroundClass ? customBackgroundColor : undefined,
+							color: hasColors && ! textClass ? customTextColor : undefined,
+						};
+
+						return (
+							<tr key={ rowIndex } className={ rowClasses || undefined } style={ rowStyles }>
+								{ cells.map( ( { content, tag }, cellIndex ) =>
+									<RichText.Content
+										tagName={ tag }
+										value={ content }
+										key={ cellIndex }
+									/>
+								) }
+							</tr>
+						);
+					} ) }
 				</Tag>
 			);
 		};
 
 		return (
-			<table className={ classes }>
+			<table className={ tableClasses }>
 				<Section type="head" rows={ head } />
 				<Section type="body" rows={ body } />
 				<Section type="foot" rows={ foot } />

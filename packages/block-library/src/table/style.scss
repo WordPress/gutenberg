@@ -23,7 +23,7 @@
 		border-spacing: 0;
 		border-collapse: inherit;
 
-		tr:nth-child(odd) {
+		tr:nth-child(odd):not(.has-background-color) {
 			background-color: $light-gray-200;
 		}
 

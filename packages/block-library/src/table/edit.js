@@ -7,7 +7,14 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Fragment, Component } from '@wordpress/element';
-import { InspectorControls, BlockControls, RichText } from '@wordpress/editor';
+import {
+	InspectorControls,
+	BlockControls,
+	RichText,
+	PanelColorSettings,
+	ContrastChecker,
+	withColors,
+} from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import {
 	PanelBody,
@@ -16,7 +23,9 @@ import {
 	Button,
 	Toolbar,
 	DropdownMenu,
+	withFallbackStyles,
 } from '@wordpress/components';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -30,7 +39,18 @@ import {
 	deleteColumn,
 } from './state';
 
-export default class TableEdit extends Component {
+const { getComputedStyle } = window;
+
+const applyFallbackStyles = withFallbackStyles( ( node, props ) => {
+	const { textColor, backgroundColor } = props.attributes;
+	const styles = node ? getComputedStyle( node ) : undefined;
+	return {
+		fallbackBackgroundColor: backgroundColor || ! styles ? undefined : styles.backgroundColor,
+		fallbackTextColor: textColor || ! styles ? undefined : styles.color,
+	};
+} );
+
+export class TableEdit extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -304,7 +324,7 @@ export default class TableEdit extends Component {
 	 *
 	 * @return {Object} React element for the section.
 	 */
-	renderSection( { type, rows } ) {
+	renderSection( { type, rows, isStriped, backgroundColor, textColor } ) {
 		if ( ! rows.length ) {
 			return null;
 		}
@@ -314,38 +334,54 @@ export default class TableEdit extends Component {
 
 		return (
 			<Tag>
-				{ rows.map( ( { cells }, rowIndex ) =>
-					<tr key={ rowIndex }>
-						{ cells.map( ( { content, tag: CellTag }, columnIndex ) => {
-							const isSelected = selectedCell && (
-								type === selectedCell.section &&
-								rowIndex === selectedCell.rowIndex &&
-								columnIndex === selectedCell.columnIndex
-							);
+				{ rows.map( ( { cells }, rowIndex ) => {
+					const hasColors = isStriped ? rowIndex % 2 === 0 : true;
 
-							const cell = {
-								section: type,
-								rowIndex,
-								columnIndex,
-							};
+					const rowClasses = classnames( {
+						'has-background-color': hasColors && backgroundColor.class,
+						[ backgroundColor.class ]: hasColors ? backgroundColor.class : undefined,
+						[ textColor.class ]: hasColors ? textColor.class : undefined,
+					} );
 
-							const classes = classnames( {
-								'is-selected': isSelected,
-							} );
+					const rowStyles = {
+						backgroundColor: hasColors ? backgroundColor.color : undefined,
+						color: hasColors ? textColor.color : undefined,
+					};
 
-							return (
-								<CellTag key={ columnIndex } className={ classes }>
-									<RichText
-										className="wp-block-table__cell-content"
-										value={ content }
-										onChange={ this.onChange }
-										unstableOnFocus={ this.createOnFocus( cell ) }
-									/>
-								</CellTag>
-							);
-						} ) }
-					</tr>
-				) }
+					return (
+						<tr key={ rowIndex } className={ rowClasses } style={ rowStyles }>
+							{ cells.map( ( { content, tag: CellTag }, columnIndex ) => {
+								const isSelected = selectedCell && (
+									type === selectedCell.section &&
+									rowIndex === selectedCell.rowIndex &&
+									columnIndex === selectedCell.columnIndex
+								);
+
+								const cell = {
+									section: type,
+									rowIndex,
+									columnIndex,
+								};
+
+								const cellClasses = classnames( { 'is-selected': isSelected	} );
+
+								return (
+									<CellTag
+										key={ columnIndex }
+										className={ cellClasses }
+									>
+										<RichText
+											className="wp-block-table__cell-content"
+											value={ content }
+											onChange={ this.onChange }
+											unstableOnFocus={ this.createOnFocus( cell ) }
+										/>
+									</CellTag>
+								);
+							} ) }
+						</tr>
+					);
+				} ) }
 			</Tag>
 		);
 	}
@@ -360,7 +396,16 @@ export default class TableEdit extends Component {
 	}
 
 	render() {
-		const { attributes, className } = this.props;
+		const {
+			attributes,
+			className,
+			backgroundColor,
+			fallbackBackgroundColor,
+			setBackgroundColor,
+			textColor,
+			fallbackTextColor,
+			setTextColor,
+		} = this.props;
 		const { initialRowCount, initialColumnCount } = this.state;
 		const { hasFixedLayout, head, body, foot } = attributes;
 		const isEmpty = ! head.length && ! body.length && ! foot.length;
@@ -392,6 +437,12 @@ export default class TableEdit extends Component {
 			'has-fixed-layout': hasFixedLayout,
 		} );
 
+		const sectionProps = {
+			isStriped: !! className && className.indexOf( 'is-style-stripes' ) > -1,
+			backgroundColor: backgroundColor,
+			textColor: textColor,
+		};
+
 		return (
 			<Fragment>
 				<BlockControls>
@@ -411,13 +462,45 @@ export default class TableEdit extends Component {
 							onChange={ this.onChangeFixedLayout }
 						/>
 					</PanelBody>
+					<PanelColorSettings
+						title={ __( 'Color Settings' ) }
+						initialOpen={ false }
+						colorSettings={ [
+							{
+								value: backgroundColor.color,
+								onChange: setBackgroundColor,
+								label: __( 'Background Color' ),
+							},
+							{
+								value: textColor.color,
+								onChange: setTextColor,
+								label: __( 'Text Color' ),
+							},
+						] }
+					>
+						<ContrastChecker
+							{ ...{
+								textColor: textColor.color,
+								backgroundColor: backgroundColor.color,
+								fallbackTextColor,
+								fallbackBackgroundColor,
+							} }
+						/>
+					</PanelColorSettings>
 				</InspectorControls>
 				<table className={ classes }>
-					<Section type="head" rows={ head } />
-					<Section type="body" rows={ body } />
-					<Section type="foot" rows={ foot } />
+					<Section type="head" rows={ head } { ...sectionProps } />
+					<Section type="body" rows={ body } { ...sectionProps } />
+					<Section type="foot" rows={ foot } { ...sectionProps } />
 				</table>
 			</Fragment>
 		);
 	}
 }
+
+const ComposedTableEdit = compose( [
+	withColors( 'backgroundColor', { textColor: 'color' } ),
+	applyFallbackStyles,
+] )( TableEdit );
+
+export default ComposedTableEdit;
