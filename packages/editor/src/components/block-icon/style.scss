@@ -13,8 +13,15 @@
 		}
 	}
 
+	// Icons with width/height attributes below 20px will be sized up to 20px,
+	// and icons with width/height attributes above 24px will be sized down to
+	// 24px. Icons with width/height >=20px and <=24px will display at the
+	// indicated size.
+	// See: https://github.com/WordPress/gutenberg/pull/9828
 	svg {
-		max-height: 24px;
+		min-width: 20px;
+		min-height: 20px;
 		max-width: 24px;
+		max-height: 24px;
 	}
 }
