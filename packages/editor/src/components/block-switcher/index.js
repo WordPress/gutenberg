@@ -110,6 +110,7 @@ export class BlockSwitcher extends Component {
 							<PanelBody
 								title={ __( 'Block Styles' ) }
 								initialOpen
+								opened={ possibleBlockTransformations.length === 0 || undefined }
 							>
 								<BlockStyles
 									clientId={ blocks[ 0 ].clientId }
@@ -122,6 +123,7 @@ export class BlockSwitcher extends Component {
 							<PanelBody
 								title={ __( 'Transform To:' ) }
 								initialOpen
+								opened={ ! hasStyles || undefined }
 							>
 								<BlockTypesList
 									items={ possibleBlockTransformations.map( ( destinationBlockType ) => ( {
