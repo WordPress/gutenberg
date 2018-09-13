@@ -78,16 +78,24 @@
 			height: 1px;
 		}
 
-		&:hover:not(:disabled):not([aria-disabled="true"]):not(.is-default) {
-			@include formatting-button-style__hover();
-		}
-
-		&:not(:disabled):not([aria-disabled="true"]):not(.is-default).is-active {
-			@include formatting-button-style__active();
-		}
-
+		// Plain menu styles.
 		&:focus:not(:disabled):not([aria-disabled="true"]):not(.is-default) {
-			@include formatting-button-style__focus();
+			@include menu-style__focus();
+		}
+
+		// Formatting buttons
+		> svg {
+			border-radius: $radius-round-rectangle;
+
+			// This assumes 20x20px dashicons.
+			padding: 2px;
+			width: $icon-button-size-small;
+			height: $icon-button-size-small;
+			margin: -1px $grid-size -1px 0;
+		}
+
+		&:not(:disabled):not([aria-disabled="true"]):not(.is-default).is-active > svg {
+			@include formatting-button-style__active();
 		}
 	}
 }
