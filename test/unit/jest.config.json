@@ -25,5 +25,8 @@
 		"/test/e2e",
 		"<rootDir>/.*/build/",
 		"<rootDir>/.*/build-module/"
+	],
+	"modulePathIgnorePatterns": [
+		"<rootDir>/gutenberg-mobile/"
 	]
 }
