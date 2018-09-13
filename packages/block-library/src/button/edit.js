@@ -76,7 +76,7 @@ class ButtonEdit extends Component {
 
 		return (
 			<Fragment>
-				<span className={ className } title={ title } ref={ this.bindRef }>
+				<div className={ className } title={ title } ref={ this.bindRef }>
 					<RichText
 						placeholder={ __( 'Add text…' ) }
 						value={ text }
@@ -123,7 +123,7 @@ class ButtonEdit extends Component {
 							/>
 						</PanelColorSettings>
 					</InspectorControls>
-				</span>
+				</div>
 				{ isSelected && (
 					<form
 						className="block-library-button__inline-link"

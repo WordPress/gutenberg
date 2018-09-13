@@ -193,7 +193,7 @@ class Sandbox extends Component {
 			<FocusableIframe
 				iframeRef={ this.iframe }
 				title={ title }
-				scrolling="no"
+				scrolling="no" /* TODO: Remove */
 				sandbox="allow-scripts allow-same-origin allow-presentation"
 				onLoad={ this.trySandbox }
 				width={ Math.ceil( this.state.width ) }
