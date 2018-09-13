@@ -93,7 +93,9 @@ export class RichText extends Component {
 	}
 
 	shouldComponentUpdate( nextProps ) {
-		if ( nextProps.content.forceUpdate ) {
+		if ( nextProps.content.forceUpdate || nextProps.tagName !== this.props.tagName ) {
+			this.lastEventCount = undefined;
+			this.lastContent = undefined;
 			return true;
 		}
 		// The check below allows us to avoid updating the content right after an `onChange` call
@@ -157,8 +159,7 @@ export class RichText extends Component {
 
 		// Save back to HTML from React tree
 		const html = '<' + tagName + '>' + renderToString( this.props.content.contentTree ) + '</' + tagName + '>';
-		// If we are rendering we can reset lastEventCount
-		this.lastEventCount = undefined;
+
 		return (
 			<View>
 				{ formatToolbar }
@@ -167,7 +168,7 @@ export class RichText extends Component {
 						this._editor = ref;
 					}
 					}
-					text={ { text: html } }
+					text={ { text: html, eventCount: this.lastEventCount } }
 					onChange={ this.onChange }
 					onContentSizeChange={ this.onContentSizeChange }
 					onActiveFormatsChange={ this.onActiveFormatsChange }
