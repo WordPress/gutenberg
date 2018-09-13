@@ -54,6 +54,43 @@ wp.hooks.addFilter(
 
 A filter that applies to the result of a block's `save` function. This filter is used to replace or extend the element, for example using `wp.element.cloneElement` to modify the element's props or replace its children, or returning an entirely new element.
 
+Notably, while you _can_ modify a block's `save` result from a theme or plugin, this behavior won't persist when the theme or plugin is deactivated.
+
+_Example:_
+
+Include a custom data attribute on the Image Block `<img>` tag when the block attribute is set.
+
+```js
+function addCustomDataAttribute( element, blockType, attributes ) {
+	if ( 'core/image' !== blockType.name ) {
+		return element;
+	}
+
+	if ( ! attributes.myCustomAttribute.length ) {
+		return element;
+	}
+	// Modifying nested JavaScript objects is pretty awful.
+	element = lodash.assign( {}, element, {
+		props: lodash.assign( {}, element.props, {
+			children: [
+				lodash.assign( {}, element.props.children[0], {
+					props: lodash.assign( {}, element.props.children[0].props, {
+						'data-custom-attribute': attributes.myCustomAttribute,
+					} )
+				} )
+			],
+		} )
+	} );
+	return element;
+};
+
+wp.hooks.addFilter(
+	'blocks.getSaveElement',
+	'my-plugin/add-custom-data-attribute',
+	addCustomDataAttribute
+);
+```
+
 #### `blocks.getSaveContent.extraProps`
 
 A filter that applies to all blocks returning a WP Element in the `save` function. This filter is used to add extra props to the root element of the `save` function. For example: to add a className, an id, or any valid prop for this element. It receives the current props of the `save` element, the block type and the block attributes as arguments.
