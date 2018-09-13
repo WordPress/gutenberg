@@ -80,6 +80,7 @@ jobs:
         yarn: true
       script:
         - cd ./gutenberg-mobile
+        - yarn install
         - ./.travis/travis-checks-js.sh
     - stage: test
       language: node_js
@@ -92,6 +93,7 @@ jobs:
         yarn: true
       script:
         - cd ./gutenberg-mobile
+        - yarn install
         - ./.travis/travis-checks-js.sh
     - stage: test
       language: node_js
@@ -104,4 +106,5 @@ jobs:
         yarn: true
       script:
         - cd ./gutenberg-mobile
+        - yarn install
         - ./.travis/travis-checks-js.sh
