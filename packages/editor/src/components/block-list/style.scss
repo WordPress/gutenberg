@@ -307,7 +307,7 @@
 	&.has-warning .editor-block-list__block-edit::after {
 		content: "";
 		position: absolute;
-		background-color: rgba($light-gray-100, 0.8);
+		background-color: rgba($light-gray-100, 0.4);
 
 		top: -$block-padding;
 		bottom: -$block-padding;
@@ -318,6 +318,14 @@
 		.editor-block-list__block & {
 			right: -$block-padding;
 			left: -$block-padding;
+		}
+	}
+
+	&.has-warning.is-selected .editor-block-list__block-edit::after {
+		bottom: ( $block-toolbar-height - $block-padding - $border-width );
+
+		@include break-small() {
+			bottom: -$block-padding;
 		}
 	}
 
@@ -1067,16 +1075,21 @@
 
 .editor-block-list__block .editor-warning {
 	z-index: z-index(".editor-warning");
-	position: absolute;
-	top: -$block-padding - $border-width;
-	right: -$parent-block-padding - $border-width;
-	left: -$parent-block-padding - $border-width;
+	position: relative;
 
-	// Position for nested blocks
+	// Stretch the warning edge to edge.
+	margin-left: -$parent-block-padding - $border-width;
+	margin-right: -$parent-block-padding - $border-width;
+
+	// Stretch the warning less in nested contexts.
 	.editor-block-list__block & {
-		right: -$block-padding - $border-width;
-		left: -$block-padding - $border-width;
+		margin-left: -$block-padding - $border-width;
+		margin-right: -$block-padding - $border-width;
 	}
+
+	// Pull the warning upwards to the edge, and add a negative bottom margin to compensate.
+	margin-bottom: -$block-padding - $border-width;
+	transform: translateY(-$block-padding - $border-width);
 
 	// Bigger padding on mobile where blocks are edge to edge.
 	padding: 10px $parent-block-padding;
