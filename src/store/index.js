@@ -35,6 +35,10 @@ registerBlockType( UnsupportedBlock.name, UnsupportedBlock.settings );
 setUnknownTypeHandlerName( UnsupportedBlock.name );
 
 const initialHtml = `
+<!-- wp:image -->
+<figure class="wp-block-image"><img alt=""/></figure>
+<!-- /wp:image -->
+
 <!-- wp:title -->
 Hello World
 <!-- /wp:title -->

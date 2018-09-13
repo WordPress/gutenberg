@@ -9,7 +9,7 @@ module.exports = {
 		// On the other hand, GB packages that are loaded from the source tree directly
 		// are automagically resolved by Metro so, there is no list of them anywhere.
 		return blacklist( [
-			/gutenberg\/packages\/(autop|compose|deprecated|hooks|i18n|is-shallow-equal)\/.*/,
+			/gutenberg\/packages\/(autop|compose|deprecated|hooks|i18n|is-shallow-equal|blob)\/.*/,
 		] );
 	},
 	getTransformModulePath() {
