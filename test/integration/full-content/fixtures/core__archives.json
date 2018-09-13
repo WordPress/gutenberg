@@ -4,9 +4,8 @@
         "name": "core/archives",
         "isValid": true,
         "attributes": {
-            "showPostCounts": false,
             "displayAsDropdown": false,
-            "align": "none"
+            "showPostCounts": false
         },
         "innerBlocks": [],
         "originalContent": ""

@@ -16,7 +16,16 @@
  */
 function render_block_core_archives( $attributes ) {
 	$show_post_count = ! empty( $attributes['showPostCounts'] );
-	$class           = "wp-block-archives align{$attributes['align']}";
+
+	$class = 'wp-block-archives';
+
+	if ( isset( $attributes['align'] ) ) {
+		$class .= " align{$attributes['align']}";
+	}
+
+	if ( isset( $attributes['className'] ) ) {
+		$class .= " {$attributes['className']}";
+	}
 
 	if ( ! empty( $attributes['displayAsDropdown'] ) ) {
 
@@ -111,17 +120,19 @@ function register_block_core_archives() {
 		'core/archives',
 		array(
 			'attributes'      => array(
-				'showPostCounts'    => array(
-					'type'    => 'boolean',
-					'default' => false,
+				'align'             => array(
+					'type' => 'string',
+				),
+				'className'         => array(
+					'type' => 'string',
 				),
 				'displayAsDropdown' => array(
 					'type'    => 'boolean',
 					'default' => false,
 				),
-				'align'             => array(
-					'type'    => 'string',
-					'default' => 'none',
+				'showPostCounts'    => array(
+					'type'    => 'boolean',
+					'default' => false,
 				),
 			),
 			'render_callback' => 'render_block_core_archives',

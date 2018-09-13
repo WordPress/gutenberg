@@ -1,7 +1,5 @@
 export {
-	getColorClass,
 	getColorClassName,
-	getColorName,
 	getColorObjectByAttributeValues,
 	getColorObjectByColorValue,
 } from './utils';

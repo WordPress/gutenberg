@@ -32,7 +32,6 @@ export {
 	getUnknownTypeHandlerName,
 	setDefaultBlockName,
 	getDefaultBlockName,
-	getDefaultBlockForPostFormat,
 	getBlockType,
 	getBlockTypes,
 	getBlockSupport,

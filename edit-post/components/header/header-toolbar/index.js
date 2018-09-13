@@ -25,7 +25,7 @@ import {
 import './style.scss';
 import FullscreenModeClose from '../fullscreen-mode-close';
 
-function HeaderToolbar( { hasFixedToolbar, isLargeViewport } ) {
+function HeaderToolbar( { hasFixedToolbar, isLargeViewport, mode } ) {
 	return (
 		<NavigableToolbar
 			className="edit-post-header-toolbar"
@@ -33,7 +33,7 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport } ) {
 		>
 			<FullscreenModeClose />
 			<div>
-				<Inserter position="bottom right" />
+				<Inserter disabled={ mode !== 'visual' } position="bottom right" />
 				<DotTip id="core/editor.inserter">
 					{ __( 'Welcome to the wonderful world of blocks! Click the “+” (“Add block”) button to add a new block. There are blocks available for all kind of content: you can insert text, headings, images, lists, and lots more!' ) }
 				</DotTip>
@@ -53,6 +53,7 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport } ) {
 export default compose( [
 	withSelect( ( select ) => ( {
 		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
+		mode: select( 'core/edit-post' ).getEditorMode(),
 	} ) ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
 ] )( HeaderToolbar );

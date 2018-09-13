@@ -167,6 +167,18 @@ Returns the state of legacy meta boxes.
 
 State of meta box at specified location.
 
+### hasMetaBoxes
+
+Returns true if the post is using Meta Boxes
+
+*Parameters*
+
+ * state: Global application state
+
+*Returns*
+
+Whether there are metaboxes or not.
+
 ### isSavingMetaBoxes
 
 Returns true if the Meta Boxes are being saved.

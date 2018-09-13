@@ -10,7 +10,6 @@ import { get, isFunction, some } from 'lodash';
  */
 import { applyFilters, addFilter } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -41,19 +40,6 @@ import { isValidIcon, normalizeIconObject } from './utils';
  * @property {WPComponent}               edit       Component rendering element to be
  *                                                  interacted with in an editor.
  */
-
-/**
- * Constant mapping post formats to the expected default block.
- *
- * @type {Object}
- */
-const POST_FORMAT_BLOCK_MAP = {
-	audio: 'core/audio',
-	gallery: 'core/gallery',
-	image: 'core/image',
-	quote: 'core/quote',
-	video: 'core/video',
-};
 
 let serverSideBlockDefinitions = {};
 
@@ -220,25 +206,6 @@ export function setDefaultBlockName( name ) {
  */
 export function getDefaultBlockName() {
 	return select( 'core/blocks' ).getDefaultBlockName();
-}
-
-/**
- * Retrieves the expected default block for the post format.
- *
- * @param	{string} postFormat Post format
- * @return {string}            Block name.
- */
-export function getDefaultBlockForPostFormat( postFormat ) {
-	deprecated( 'getDefaultBlockForPostFormat', {
-		plugin: 'Gutenberg',
-		version: '3.9',
-	} );
-
-	const blockName = POST_FORMAT_BLOCK_MAP[ postFormat ];
-	if ( blockName && getBlockType( blockName ) ) {
-		return blockName;
-	}
-	return null;
 }
 
 /**

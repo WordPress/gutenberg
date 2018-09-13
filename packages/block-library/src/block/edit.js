@@ -125,7 +125,6 @@ class ReusableBlockEdit extends Component {
 
 		return (
 			<Fragment>
-				{ element }
 				{ ( isSelected || isEditing ) && (
 					<ReusableBlockEditPanel
 						isEditing={ isEditing }
@@ -138,6 +137,7 @@ class ReusableBlockEdit extends Component {
 					/>
 				) }
 				{ ! isSelected && ! isEditing && <ReusableBlockIndicator title={ reusableBlock.title } /> }
+				{ element }
 			</Fragment>
 		);
 	}
