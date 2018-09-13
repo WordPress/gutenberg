@@ -76,7 +76,6 @@ function DropdownMenu( {
 							controlSet.map( ( control, indexOfControl ) => (
 								<IconButton
 									key={ [ indexOfSet, indexOfControl ].join() }
-
 									onClick={ ( event ) => {
 										if ( control.isDisabled ) {
 											return;
@@ -89,7 +88,10 @@ function DropdownMenu( {
 									} }
 									className={ classnames(
 										'components-dropdown-menu__menu-item',
-										{ 'has-separator': indexOfSet > 0 && indexOfControl === 0 }
+										{
+											'has-separator': indexOfSet > 0 && indexOfControl === 0,
+											'is-active': control.isActive,
+										},
 									) }
 									icon={ control.icon }
 									role="menuitem"

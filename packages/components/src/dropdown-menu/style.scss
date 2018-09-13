@@ -80,6 +80,10 @@
 			right: 0;
 			height: 1px;
 		}
+
+		&:not(:disabled).is-active > svg {
+			@include formatting-button-style__active;
+		}
 	}
 }
 
