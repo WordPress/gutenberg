@@ -38,10 +38,11 @@ type StateType = {
 	inspectBlocks: boolean,
 	blockTypePickerVisible: boolean,
 	selectedBlockType: string,
-	html: string,
 };
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
+	_htmlTextInput: TextInput = null;
+
 	constructor( props: PropsType ) {
 		super( props );
 		this.state = {
@@ -50,7 +51,6 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			inspectBlocks: false,
 			blockTypePickerVisible: false,
 			selectedBlockType: 'core/paragraph', // just any valid type to start from
-			html: '',
 		};
 	}
 
@@ -152,9 +152,8 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			}, '' );
 	}
 
-	parseHTML() {
+	parseHTML( html: string ) {
 		const { parseBlocksAction } = this.props;
-		const { html } = this.state;
 		parseBlocksAction( html );
 	}
 
@@ -164,14 +163,15 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	onChange( clientId: string, attributes: mixed ) {
-		// Update datasource UI
+		// Update Redux store
+		this.props.onChange( clientId, attributes );
+
+		// Change the data source
 		const index = this.getDataSourceIndexFromClientId( clientId );
 		const dataSource = this.state.dataSource;
 		const block = dataSource.get( index );
 		block.attributes = attributes;
 		dataSource.set( index, block );
-		// Update Redux store
-		this.props.onChange( clientId, attributes );
 	}
 
 	renderList() {
@@ -248,11 +248,9 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	handleSwitchEditor = ( showHtml: boolean ) => {
-		if ( showHtml ) {
-			const html = this.serializeToHtml();
-			this.handleHTMLUpdate( html );
-		} else {
-			this.parseHTML();
+		if ( ! showHtml ) {
+			const html = this._htmlTextInput._lastNativeText;
+			this.parseHTML( html );
 		}
 
 		this.setState( { showHtml } );
@@ -260,10 +258,6 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 	handleInspectBlocksChanged = ( inspectBlocks: boolean ) => {
 		this.setState( { inspectBlocks } );
-	}
-
-	handleHTMLUpdate = ( html: string ) => {
-		this.setState( { html } );
 	}
 
 	renderItem( value: { item: BlockType, clientId: string } ) {
@@ -294,16 +288,16 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 	renderHTML() {
 		const behavior = Platform.OS === 'ios' ? 'padding' : null;
+		const htmlInputRef = ( el ) => this._htmlTextInput = el;
 		return (
 			<KeyboardAvoidingView style={ { flex: 1 } } behavior={ behavior }>
 				<TextInput
 					textAlignVertical="top"
 					multiline
+					ref={ htmlInputRef }
 					numberOfLines={ 0 }
 					style={ styles.htmlView }
-					value={ this.state.html }
-					onChangeText={ this.handleHTMLUpdate }>
-				</TextInput>
+					value={ this.serializeToHtml() } />
 			</KeyboardAvoidingView>
 		);
 	}

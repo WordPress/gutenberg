@@ -62,7 +62,6 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 			style = styles.blockText;
 		}
 
-		// TODO: setAttributes needs to change the state/attributes
 		return (
 			<Block
 				attributes={ { ...this.props.attributes } }
