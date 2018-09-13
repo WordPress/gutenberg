@@ -480,7 +480,7 @@ function gutenberg_add_admin_body_class( $classes ) {
  * Adds attributes to kses allowed tags that aren't in the default list
  * and that Gutenberg needs to save blocks such as the Gallery block.
  *
- * @param array $allowed_html Allowed HTML.
+ * @param array $tags Allowed HTML.
  * @return array (Maybe) modified allowed HTML.
  */
 function gutenberg_kses_allowedtags( $tags ) {
@@ -491,4 +491,4 @@ function gutenberg_kses_allowedtags( $tags ) {
 	return $tags;
 }
 
-add_filter( 'wp_kses_allowed_html', 'gutenberg_kses_allowedtags', 10, 2);
+add_filter( 'wp_kses_allowed_html', 'gutenberg_kses_allowedtags', 10, 2 );
