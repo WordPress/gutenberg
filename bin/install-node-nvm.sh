@@ -72,6 +72,21 @@ npm install
 # Make sure npm is up-to-date
 npm install npm -g
 
+# Check if yarn is installed
+if [ "$TRAVIS" != "true" ] && ! command_exists "yarn"; then
+	if ask "$(error_message "Yarn isn't installed, would you like to download and install it automatically?")" Y; then
+		echo -en $(status_message "Installing yarn..." )
+		npm install -g yarn >/dev/null 2>&1
+		echo ' done!'
+	else
+		echo -e $(error_message "")
+		echo -e $(error_message "Please install Yarn manually, then re-run the setup script to continue.")
+		echo -e $(error_message "Yarn installation instructions can be found here: $(action_format "https://yarnpkg.com/lang/en/docs/install/#install-via-npm")")
+	fi
+
+	exit 1
+fi
+
 # There was a bug in NPM that caused changes in package-lock.json. Handle that.
 if [ "$TRAVIS" != "true" ] && ! git diff --exit-code package-lock.json >/dev/null; then
 	if ask "$(warning_message "Your package-lock.json changed, which may mean there's an issue with your NPM cache. Would you like to try and automatically clean it up?" )" N 10; then
