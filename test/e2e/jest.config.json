@@ -7,5 +7,8 @@
 	],
 	"transform": {
 		"^.+\\.jsx?$": "<rootDir>/node_modules/babel-jest"
-	}
+	},
+	"modulePathIgnorePatterns": [
+		"<rootDir>/gutenberg-mobile/"
+	]
 }
