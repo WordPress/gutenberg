@@ -38,6 +38,17 @@
 			background-color: $dark-gray-500;
 			color: $white;
 		}
+
+		.components-dropdown-menu__indicator {
+			display: inline-block;
+			margin-left: 10px;
+
+			// Add a dropdown arrow indicator.
+			&::after {
+				@include dropdown-arrow();
+				top: $icon-button-size-small / 2 + 1px;
+			}
+		}
 	}
 }
 .components-dropdown-menu__popover .components-popover__content {
@@ -57,11 +68,6 @@
 		border-radius: 0;
 		outline: none;
 		cursor: pointer;
-
-		.dashicon {
-			margin-right: 8px;
-		}
-
 
 		&.has-separator {
 			margin-top: 6px;

@@ -13,7 +13,6 @@ import { DOWN } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import IconButton from '../icon-button';
-import Dashicon from '../dashicon';
 import Dropdown from '../dropdown';
 import { NavigableMenu } from '../navigable-container';
 
@@ -61,7 +60,7 @@ function DropdownMenu( {
 						label={ label }
 						tooltip={ label }
 					>
-						<Dashicon icon="arrow-down" />
+						<span className="components-dropdown-menu__indicator" />
 					</IconButton>
 				);
 			} }
