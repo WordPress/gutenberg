@@ -45,6 +45,7 @@ const gpl2CompatibleLicenses = [
 	'BSD',
 	'BSD-2-Clause',
 	'BSD-3-Clause',
+	'BSD-3-Clause-W3C',
 	'BSD-like',
 	'CC-BY-3.0',
 	'CC-BY-4.0',
@@ -110,6 +111,9 @@ const licenseFileStrings = {
 	],
 	BSD: [
 		'Redistributions in binary form must reproduce the above copyright notice,',
+	],
+	'BSD-3-Clause-W3C': [
+		'W3C 3-clause BSD License',
 	],
 	MIT: [
 		'Permission is hereby granted, free of charge,',
@@ -220,6 +224,11 @@ modules.forEach( ( path ) => {
 				.join( ' OR ' )
 		);
 	let licenseType = typeof license === 'object' ? license.type : license;
+
+	// Check if the license we've detected is telling us to look in the license file, instead.
+	if ( licenseType && licenseFiles.find( ( licenseFile ) => licenseType.indexOf( licenseFile ) >= 0 ) ) {
+		licenseType = undefined;
+	}
 
 	/*
 	 * If we haven't been able to detect a license in the package.json file, try reading
