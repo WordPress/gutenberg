@@ -37,7 +37,6 @@
 	// Add a dropdown arrow indicator.
 	.editor-block-icon::after {
 		@include dropdown-arrow();
-		top: $icon-button-size-small / 2 - 1px;
 	}
 
 	.editor-block-switcher__transform {
