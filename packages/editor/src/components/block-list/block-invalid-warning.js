@@ -41,7 +41,7 @@ export class BlockInvalidWarning extends Component {
 		const { compare } = this.state;
 		const hiddenActions = [
 			{ title: __( 'Convert to Classic Block' ), onClick: convertToClassic },
-			{ title: __( 'Overwrite with Valid Block' ), onCLick: overwriteBlock },
+			{ title: __( 'Overwrite with Valid Block' ), onClick: overwriteBlock },
 		];
 
 		if ( compare ) {
