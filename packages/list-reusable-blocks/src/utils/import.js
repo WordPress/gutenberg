@@ -7,7 +7,6 @@ import { isString } from 'lodash';
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -26,7 +25,7 @@ async function importReusableBlock( file ) {
 	try {
 		parsedContent = JSON.parse( fileContent );
 	} catch ( e ) {
-		throw new Error( __( 'Invalid JSON file' ) );
+		throw new Error( 'Invalid JSON file' );
 	}
 	if (
 		parsedContent.__file !== 'wp_block' ||
@@ -35,7 +34,7 @@ async function importReusableBlock( file ) {
 		! isString( parsedContent.title ) ||
 		! isString( parsedContent.content )
 	) {
-		throw new Error( __( 'Invalid Reusable Block JSON file' ) );
+		throw new Error( 'Invalid Reusable Block JSON file' );
 	}
 	const postType = await apiFetch( { path: `/wp/v2/types/wp_block` } );
 	const reusableBlock = await apiFetch( {

@@ -55,7 +55,19 @@ class ImportForm extends Component {
 					return;
 				}
 
-				this.setState( { isLoading: false, error: error.message } );
+				let uiMessage;
+				switch ( error.message ) {
+					case 'Invalid JSON file':
+						uiMessage = __( 'Invalid JSON file' );
+						break;
+					case 'Invalid Reusable Block JSON file':
+						uiMessage = __( 'Invalid Reusable Block JSON file' );
+						break;
+					default:
+						uiMessage = __( 'Unknow error' );
+				}
+
+				this.setState( { isLoading: false, error: uiMessage } );
 			} );
 	}
 
