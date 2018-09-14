@@ -8,7 +8,7 @@ exports[`BlockView should match snapshot 1`] = `
     className="editor-block-compare__content"
   >
     <h1
-      className="components-modal__header-heading"
+      className="editor-block-compare__heading"
     >
       title
     </h1>
@@ -29,7 +29,7 @@ exports[`BlockView should match snapshot 1`] = `
     <[object Object]
       isLarge={true}
       onClick={[Function]}
-      tabindex="0"
+      tabIndex="0"
     >
       action
     </[object Object]>
