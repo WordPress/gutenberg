@@ -13,6 +13,7 @@ import { moment } from '@wordpress/date';
  * Internal dependencies
  */
 import * as selectors from '../selectors';
+import { PREFERENCES_DEFAULTS } from '../defaults';
 
 const {
 	canUserUseUnfilteredHTML,
@@ -82,6 +83,7 @@ const {
 	getReusableBlocks,
 	getStateBeforeOptimisticTransaction,
 	isPublishingPost,
+	isPublishSidebarEnabled,
 	canInsertBlockType,
 	getInserterItems,
 	isValidTemplate,
@@ -3384,6 +3386,33 @@ describe( 'selectors', () => {
 
 			const isSaving = isSavingReusableBlock( state, 5187 );
 			expect( isSaving ).toBe( true );
+		} );
+	} );
+
+	describe( 'isPublishSidebarEnabled', () => {
+		it( 'should return the value on state if it is thruthy', () => {
+			const state = {
+				preferences: {
+					isPublishSidebarEnabled: true,
+				},
+			};
+			expect( isPublishSidebarEnabled( state ) ).toBe( state.preferences.isPublishSidebarEnabled );
+		} );
+
+		it( 'should return the value on state if it is falsy', () => {
+			const state = {
+				preferences: {
+					isPublishSidebarEnabled: false,
+				},
+			};
+			expect( isPublishSidebarEnabled( state ) ).toBe( state.preferences.isPublishSidebarEnabled );
+		} );
+
+		it( 'should return the default value if there is no isPublishSidebarEnabled key on state', () => {
+			const state = {
+				preferences: { },
+			};
+			expect( isPublishSidebarEnabled( state ) ).toBe( PREFERENCES_DEFAULTS.isPublishSidebarEnabled );
 		} );
 	} );
 

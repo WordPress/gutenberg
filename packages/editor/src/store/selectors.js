@@ -1894,5 +1894,8 @@ export function canUserUseUnfilteredHTML( state ) {
  * @return {boolean} Whether the pre-publish panel should be shown or not.
  */
 export function isPublishSidebarEnabled( state ) {
-	return state.preferences.isPublishSidebarEnabled || PREFERENCES_DEFAULTS.isPublishSidebarEnabled;
+	if ( state.preferences.hasOwnProperty( 'isPublishSidebarEnabled' ) ) {
+		return state.preferences.isPublishSidebarEnabled;
+	}
+	return PREFERENCES_DEFAULTS.isPublishSidebarEnabled;
 }
