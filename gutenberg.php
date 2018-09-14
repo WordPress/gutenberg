@@ -260,6 +260,12 @@ function gutenberg_add_edit_link( $actions, $post ) {
 	if ( 'wp_block' === $post->post_type ) {
 		unset( $actions['edit'] );
 		unset( $actions['inline hide-if-no-js'] );
+		$actions['export'] = sprintf(
+			'<a class="wp-list-reusable-blocks__export" href="#" data-id="%s" aria-label="%s">%s</a>',
+			$post->ID,
+			__( 'Export as JSON', 'gutenberg' ),
+			__( 'Export as JSON', 'gutenberg' )
+		);
 		return $actions;
 	}
 
