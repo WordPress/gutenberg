@@ -29,9 +29,11 @@ import {
 	getBlockTypes,
 	hasBlockSupport,
 	hasChildBlocksWithInserterSupport,
+	getUnknownTypeHandlerName,
+	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
 import { moment } from '@wordpress/date';
-import { applyFilters } from '@wordpress/hooks';
+import { removep } from '@wordpress/autop';
 
 /***
  * Module constants
@@ -368,7 +370,7 @@ export function isEditedPostEmpty( state ) {
 	// operation by comparison. Since this function can be called frequently,
 	// optimize for the fast case where saveable blocks are non-empty.
 	return (
-		! getBlocksForSave( state ).length &&
+		! getBlocksForSerialization( state ).length &&
 		! getEditedPostAttribute( state, 'content' )
 	);
 }
@@ -1358,47 +1360,28 @@ export function getSuggestedPostFormat( state ) {
 }
 
 /**
- * Returns a filtered set of blocks which are assumed to be used in
- * consideration of the post's generated save content.
+ * Returns a set of blocks which are to be used in consideration of the post's
+ * generated save content.
  *
  * @param {Object} state Editor state.
  *
  * @return {WPBlock[]} Filtered set of blocks for save.
  */
-export function getBlocksForSave( state ) {
-	/**
-	 * Filters the set of blocks assumed to be used in consideration of the
-	 * post's generated save content.
-	 *
-	 * @param {Object[]} blocks Original editor state blocks.
-	 */
-	return applyFilters(
-		'editor.selectors.getBlocksForSave',
-		getBlocks( state ),
-	);
-}
+export function getBlocksForSerialization( state ) {
+	const blocks = getBlocks( state );
 
-/**
- * Returns a filtered HTML string for serialized given array of blocks.
- *
- * @param {Object}    state  Editor state.
- * @param {WPBlock[]} blocks Array of blocks from which to generate content.
- *
- * @return {string} Filtered HTML string for serialized blocks.
- */
-export function getBlockContent( state, blocks ) {
-	/**
-	 * Filters the serialized content result of blocks.
-	 *
-	 * @param {string}    content Original serialized value.
-	 * @param {WPBlock[]} blocks  Blocks from which serialized value is
-	 *                            generated.
-	 */
-	return applyFilters(
-		'editor.selectors.getBlockContent',
-		serialize( blocks ),
-		blocks
+	// A single unmodified default block is assumed to be equivalent to an
+	// empty post.
+	const isSingleUnmodifiedDefaultBlock = (
+		blocks.length === 1 &&
+		isUnmodifiedDefaultBlock( blocks[ 0 ] )
 	);
+
+	if ( isSingleUnmodifiedDefaultBlock ) {
+		return [];
+	}
+
+	return blocks;
 }
 
 /**
@@ -1416,7 +1399,22 @@ export const getEditedPostContent = createSelector(
 			return edits.content;
 		}
 
-		return getBlockContent( state, getBlocksForSave( state ) );
+		const blocks = getBlocksForSerialization( state );
+		const content = serialize( blocks );
+
+		// For compatibility purposes, treat a post consisting of a single
+		// unknown block as legacy content and downgrade to a pre-block-editor
+		// removep'd content format.
+		const isSingleUnknownBlock = (
+			blocks.length === 1 &&
+			blocks[ 0 ].name === getUnknownTypeHandlerName()
+		);
+
+		if ( isSingleUnknownBlock ) {
+			return removep( content );
+		}
+
+		return content;
 	},
 	( state ) => [
 		state.editor.present.edits.content,
