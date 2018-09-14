@@ -15,6 +15,12 @@
 	border-bottom: 1px solid $light-gray-500;
 	margin: -16px -16px 16px -16px;
 	padding: 16px;
+
+	.editor-block-icon {
+		svg {
+			vertical-align: middle; 
+		}
+	}
 }
 
 .editor-block-inspector__card-icon {
