@@ -26,6 +26,7 @@ class Modal extends Component {
 		super( props );
 
 		this.prepareDOM();
+		this.stopEventPropagationOutsideModal = this.stopEventPropagationOutsideModal.bind( this );
 	}
 
 	/**
@@ -102,6 +103,14 @@ class Modal extends Component {
 	}
 
 	/**
+	 * Stop all onMouseDown events propagating further - they should only go to the modal
+ 	 * @param {string} ev Event object
+	 */
+	stopEventPropagationOutsideModal( ev ) {
+		ev.stopPropagation();
+	}
+
+	/**
 	 * Renders the modal.
 	 *
 	 * @return {WPElement} The modal element.
@@ -125,11 +134,13 @@ class Modal extends Component {
 			'components-modal-header-' + instanceId
 		);
 
+		// Disable reason: this stops mouse events from triggering tooltips and other elements underneath the modal overlay
+		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return createPortal(
-			<div className={ classnames(
-				'components-modal__screen-overlay',
-				overlayClassName
-			) }>
+			<div
+				className={ classnames( 'components-modal__screen-overlay', overlayClassName ) }
+				onMouseDown={ this.stopEventPropagationOutsideModal }
+			>
 				<ModalFrame
 					className={ classnames(
 						'components-modal__frame',
@@ -155,6 +166,7 @@ class Modal extends Component {
 			</div>,
 			this.node
 		);
+		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
 

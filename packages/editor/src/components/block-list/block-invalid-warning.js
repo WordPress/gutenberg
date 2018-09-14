@@ -50,7 +50,6 @@ export class BlockInvalidWarning extends Component {
 					title={ __( 'Compare Block Conversion' ) }
 					onRequestClose={ this.onCompareClose }
 					className="editor-block-compare"
-					focusOnMount={ false }
 				>
 					<BlockCompare
 						block={ block }
