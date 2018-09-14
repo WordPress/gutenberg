@@ -20,13 +20,13 @@ class ImportForm extends Component {
 			file: null,
 		};
 
-		this.isMounted = true;
+		this.isStillMounted = true;
 		this.onChangeFile = this.onChangeFile.bind( this );
 		this.onSubmit = this.onSubmit.bind( this );
 	}
 
 	componentWillUnmount() {
-		this.isMounted = false;
+		this.isStillMounted = false;
 	}
 
 	onChangeFile( event ) {
@@ -43,7 +43,7 @@ class ImportForm extends Component {
 		this.setState( { isLoading: true } );
 		importReusableBlock( file )
 			.then( ( reusableBlock ) => {
-				if ( ! this.isMounted ) {
+				if ( ! this.isStillMounted ) {
 					return;
 				}
 
@@ -51,7 +51,7 @@ class ImportForm extends Component {
 				onUpload( reusableBlock );
 			} )
 			.catch( ( error ) => {
-				if ( ! this.isMounted ) {
+				if ( ! this.isStillMounted ) {
 					return;
 				}
 
