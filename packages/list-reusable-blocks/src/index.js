@@ -20,7 +20,7 @@ document.body.addEventListener( 'click', ( event ) => {
 } );
 
 // Setup Import Form
-document.addEventListener( 'DOMContentLoaded', function() {
+document.addEventListener( 'DOMContentLoaded', () => {
 	const button = document.querySelector( '.page-title-action' );
 	if ( ! button ) {
 		return;
@@ -29,7 +29,7 @@ document.addEventListener( 'DOMContentLoaded', function() {
 	const showNotice = () => {
 		const notice = document.createElement( 'div' );
 		notice.className = 'notice notice-success is-dismissible';
-		notice.innerHTML = `<p>${ __( 'Reusable block imported with success!' ) }</p>`;
+		notice.innerHTML = `<p>${ __( 'Reusable block imported successfully!' ) }</p>`;
 
 		const headerEnd = document.querySelector( '.wp-header-end' );
 		if ( ! headerEnd ) {

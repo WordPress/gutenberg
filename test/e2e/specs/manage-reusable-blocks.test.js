@@ -31,7 +31,7 @@ describe( 'Managing reusable blocks', () => {
 		// Wait for the success notice
 		await page.waitForSelector( '.notice-success' );
 		const noticeContent = await page.$eval( '.notice-success', ( element ) => element.textContent );
-		expect( noticeContent ).toEqual( 'Reusable block imported with success!' );
+		expect( noticeContent ).toEqual( 'Reusable block imported successfully!' );
 
 		// Refresh the page
 		await visitAdmin( 'edit.php', 'post_type=wp_block' );
