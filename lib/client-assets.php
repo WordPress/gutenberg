@@ -632,6 +632,22 @@ function gutenberg_register_scripts_and_styles() {
 		true
 	);
 
+	wp_register_script(
+		'wp-list-reusable-blocks',
+		gutenberg_url( 'build/list-reusable-blocks/index.js' ),
+		array(
+			'lodash',
+			'wp-api-fetch',
+			'wp-components',
+			'wp-compose',
+			'wp-element',
+			'wp-i18n',
+			'wp-polyfill-ecmascript',
+		),
+		filemtime( gutenberg_dir_path() . 'build/list-reusable-blocks/index.js' ),
+		true
+	);
+
 	// Editor Styles.
 	// This empty stylesheet is defined to ensure backwards compatibility.
 	wp_register_style( 'wp-blocks', false );
@@ -717,6 +733,14 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'build/block-library/theme.css' )
 	);
 	wp_style_add_data( 'wp-block-library-theme', 'rtl', 'replace' );
+
+	wp_register_style(
+		'wp-list-reusable-blocks',
+		gutenberg_url( 'build/list-reusable-blocks/style.css' ),
+		array( 'wp-components' ),
+		filemtime( gutenberg_dir_path() . 'build/list-reusable-blocks/style.css' )
+	);
+	wp_style_add_data( 'wp-list-reusable-block', 'rtl', 'replace' );
 
 	if ( defined( 'GUTENBERG_LIVE_RELOAD' ) && GUTENBERG_LIVE_RELOAD ) {
 		$live_reload_url = ( GUTENBERG_LIVE_RELOAD === true ) ? 'http://localhost:35729/livereload.js' : GUTENBERG_LIVE_RELOAD;
@@ -1513,3 +1537,17 @@ JS;
 	 */
 	do_action( 'enqueue_block_editor_assets' );
 }
+
+/**
+ * Enqueue the reusable blocks listing page's script
+ *
+ * @param string $hook Screen name.
+ */
+function wp_load_list_reusable_blocks( $hook ) {
+	$is_reusable_blocks_list_page = 'edit.php' === $hook && isset( $_GET['post_type'] ) && 'wp_block' === $_GET['post_type'];
+	if ( $is_reusable_blocks_list_page ) {
+		wp_enqueue_script( 'wp-list-reusable-blocks' );
+		wp_enqueue_style( 'wp-list-reusable-blocks' );
+	}
+}
+add_action( 'admin_enqueue_scripts', 'wp_load_list_reusable_blocks' );

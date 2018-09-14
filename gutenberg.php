@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
- * Version: 3.8.0
+ * Version: 3.9.0-rc.1
  * Author: Gutenberg Team
  *
  * @package gutenberg
@@ -260,6 +260,12 @@ function gutenberg_add_edit_link( $actions, $post ) {
 	if ( 'wp_block' === $post->post_type ) {
 		unset( $actions['edit'] );
 		unset( $actions['inline hide-if-no-js'] );
+		$actions['export'] = sprintf(
+			'<a class="wp-list-reusable-blocks__export" href="#" data-id="%s" aria-label="%s">%s</a>',
+			$post->ID,
+			__( 'Export as JSON', 'gutenberg' ),
+			__( 'Export as JSON', 'gutenberg' )
+		);
 		return $actions;
 	}
 

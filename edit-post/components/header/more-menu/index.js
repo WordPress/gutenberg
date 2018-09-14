@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { IconButton, Dropdown, MenuGroup } from '@wordpress/components';
+import { IconButton, Dropdown, MenuGroup, MenuItem } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 
 /**
@@ -37,6 +37,12 @@ const MoreMenu = () => (
 					label={ __( 'Tools' ) }
 					filterName="editPost.MoreMenu.tools"
 				>
+					<MenuItem
+						role="menuitem"
+						href="edit.php?post_type=wp_block"
+					>
+						{ __( 'Manage All Reusable Blocks' ) }
+					</MenuItem>
 					<TipsToggle onToggle={ onClose } />
 					<KeyboardShortcutsHelpMenuItem onSelect={ onClose } />
 				</MenuGroup>
