@@ -12,9 +12,15 @@ export default function ImageEdit( { attributes } ) {
 	const { url } = attributes;
 
 	const onUploadPress = () => {
+		// This method should present an image picker from
+		// the device.
+		//TODO: Implement upload image method.
 	};
 
 	const onMediaLibraryPress = () => {
+		// This method should present an image picker from
+		// the WordPress media library.
+		//TODO: Implement media library method.
 	};
 
 	if ( ! url ) {
