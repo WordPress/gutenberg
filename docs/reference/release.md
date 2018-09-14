@@ -12,13 +12,13 @@ Up until version `4.0.0`, "point releases"/minor releases (eg. `3.8` > `3.9`) ef
 
 Our [deprecation policy](./deprecated.md) maintains deprecated APIs/functions for two major versions, whenever possible.
 
-## Release Candidates
+# Release Candidates
 
 Since [`3.8`](https://github.com/WordPress/gutenberg/releases/tag/v3.8.0), we [publish a release candidate](https://github.com/WordPress/gutenberg/releases/tag/v3.8.0-rc.1) at least one week before we publish a new version. This release candidate is available for plugin authors and for users to test. If any bugs/regressions are found with a release candidate, they should be cherry-picked into a new release candidate and it should be published.
 
 Release candidates should be versioned incrementally, starting with `-rc.1`, then `-rc.2`, and so on.
 
-### Creating a Release Candidate
+## Creating a Release Candidate
 
 Creating a release candidate involves:
 
@@ -107,11 +107,11 @@ git push origin v3.8.0-rc.2
 
 It's worth mentioning that a new release candidate has been released in the [`#core-editor` channel](https://wordpress.slack.com/messages/C02QB2JS7).
 
-## Official Gutenberg Releases™
+# Official Gutenberg Releases™
 
 The process of releasing Gutenberg is similar to creating a release candidate, except we don't use the `-rc.X` in the `git` tag and we publish a new branch in the subversion repository. This updates the version available in the WordPress plugin repository and will cause WordPress sites around the world to prompt users to update to this new version. The steps below are very similar to the ones above, for a release candidate, but they're spelled out here in their entirely to reduce confusion. 😅
 
-### Creating a Release
+## Creating a Release
 
 Creating a release involves:
 
