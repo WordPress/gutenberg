@@ -196,6 +196,7 @@ class BlockList extends Component {
 			isGroupedByLayout,
 			rootClientId,
 			canInsertDefaultBlock,
+			isDraggable,
 		} = this.props;
 
 		let defaultLayout;
@@ -221,6 +222,7 @@ class BlockList extends Component {
 						layout={ defaultLayout }
 						isFirst={ blockIndex === 0 }
 						isLast={ blockIndex === blockClientIds.length - 1 }
+						isDraggable={ isDraggable }
 					/>
 				) ) }
 				{ canInsertDefaultBlock && (

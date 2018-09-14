@@ -43,7 +43,6 @@ import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMultiControls from './multi-controls';
 import BlockMobileToolbar from './block-mobile-toolbar';
 import BlockInsertionPoint from './insertion-point';
-import BlockDraggable from './block-draggable';
 import IgnoreNestedEvents from './ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
@@ -373,6 +372,7 @@ export class BlockListBlock extends Component {
 			hasSelectedInnerBlock,
 			isParentOfSelectedBlock,
 			hasMultiSelection,
+			isDraggable,
 		} = this.props;
 		const isHovered = this.state.isHovered && ! isMultiSelecting;
 		const { name: blockName, isValid } = block;
@@ -410,7 +410,7 @@ export class BlockListBlock extends Component {
 			'is-selected-parent': shouldAppearSelectedParent,
 			'is-hovered': shouldAppearHovered,
 			'is-reusable': isReusableBlock( blockType ),
-			'is-hidden': dragging,
+			'is-dragging': dragging,
 			'is-typing': isTypingWithinBlock,
 			'is-focused': isFocusMode && ( isSelected || isParentOfSelectedBlock ),
 			'is-focus-mode': isFocusMode,
@@ -480,18 +480,6 @@ export class BlockListBlock extends Component {
 				] }
 				{ ...wrapperProps }
 			>
-				{ ! isPartOfMultiSelection && isMovable && (
-					<BlockDraggable
-						clientId={ clientId }
-						rootClientId={ rootClientId }
-						blockElementId={ blockElementId }
-						layout={ layout }
-						order={ order }
-						onDragStart={ this.onDragStart }
-						onDragEnd={ this.onDragEnd }
-						isDragging={ dragging }
-					/>
-				) }
 				{ shouldShowInsertionPoint && (
 					<BlockInsertionPoint
 						clientId={ clientId }
@@ -509,11 +497,14 @@ export class BlockListBlock extends Component {
 				{ shouldRenderMovers && (
 					<BlockMover
 						clientIds={ clientId }
-						rootClientId={ rootClientId }
+						blockElementId={ blockElementId }
 						layout={ layout }
 						isFirst={ isFirst }
 						isLast={ isLast }
 						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }
+						isDraggable={ ( isDraggable !== false ) && ( ! isPartOfMultiSelection && isMovable ) }
+						onDragStart={ this.onDragStart }
+						onDragEnd={ this.onDragEnd }
 					/>
 				) }
 				{ shouldShowBreadcrumb && (
