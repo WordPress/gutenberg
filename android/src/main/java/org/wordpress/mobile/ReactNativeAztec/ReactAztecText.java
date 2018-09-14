@@ -215,6 +215,15 @@ public class ReactAztecText extends AztecText {
         this.mIsSettingTextFromJS = mIsSettingTextFromJS;
     }
 
+    void emitHTMLWithCursorEvent() {
+        disableTextChangedListener();
+        String content = toPlainHtml(true);
+        enableTextChangedListener();
+        ReactContext reactContext = (ReactContext) getContext();
+        EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
+        eventDispatcher.dispatchEvent(new ReactAztecHtmlWithCursorEvent( getId(), content));
+    }
+
     public void applyFormat(String format) {
         ArrayList<ITextFormat> newFormats = new ArrayList<>();
         switch (format) {

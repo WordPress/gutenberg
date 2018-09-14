@@ -16,6 +16,7 @@ class AztecView extends React.Component {
     onEnter: PropTypes.func,
     onScroll: PropTypes.func,
     onActiveFormatsChange: PropTypes.func,
+    onHTMLContentWithCursor: PropTypes.func,
     ...ViewPropTypes, // include the default view properties
   }
 
@@ -24,6 +25,14 @@ class AztecView extends React.Component {
                                           ReactNative.findNodeHandle(this),
                                           UIManager.RCTAztecView.Commands.applyFormat,
                                           [format],
+                                        );    
+  }
+
+  requestHTMLWithCursor() {
+    UIManager.dispatchViewManagerCommand(
+                                          ReactNative.findNodeHandle(this),
+                                          UIManager.RCTAztecView.Commands.returnHTMLWithCursor,
+                                          [],
                                         );    
   }
 
@@ -54,12 +63,23 @@ class AztecView extends React.Component {
     onEnter();
   }
 
+  _onHTMLContentWithCursor = (event) => {
+    if (!this.props.onHTMLContentWithCursor) {
+      return;
+    }
+
+    const { onHTMLContentWithCursor } = this.props;
+    const contentWithCursor = event.nativeEvent.text;
+    onHTMLContentWithCursor(contentWithCursor);
+  }
+
   render() {
     const { onActiveFormatsChange, ...otherProps } = this.props    
     return (
       <RCTAztecView {...otherProps} 
         onActiveFormatsChange={ this._onActiveFormatsChange }
         onContentSizeChange = { this._onContentSizeChange }
+        onHTMLContentWithCursor = { this._onHTMLContentWithCursor }
         onEnter = { this._onEnter }
       />
     );
