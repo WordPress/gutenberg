@@ -1,6 +1,6 @@
 // Link input
 $input-padding: 9px 8px;
-$input-size: 230px;
+$input-size: 300px;
 
 .editor-block-list__block .editor-url-input,
 .components-popover .editor-url-input,
@@ -11,7 +11,7 @@ $input-size: 230px;
 	padding: 1px;
 
 	input[type="text"] {
-		width: 100%;
+		width: $input-size;
 		padding: $input-padding;
 		border: none;
 		border-radius: 0;
