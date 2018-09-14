@@ -1589,7 +1589,7 @@ Returns an action object used to convert a static block into a reusable block.
 
 *Parameters*
 
- * clientId: The client ID of the block to detach.
+ * clientIds: The client IDs of the block to detach.
 
 ### insertDefaultBlock
 
