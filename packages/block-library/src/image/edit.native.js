@@ -12,6 +12,47 @@ import { Component } from '@wordpress/element';
 
 class ImageEdit extends Component {
 
+	constructor() {
+		super( ...arguments );
+		this.state = {
+			height: 0,
+			width: 0,
+		};
+	}
+
+	componentDidMount = () => {
+		const { url } = this.props.attributes;
+
+		Image.getSize(url, (imageRealWidth, imageRealHeight) => {
+			this.image = {}
+			this.image.width = imageRealWidth
+			this.image.height = imageRealHeight
+			this.setState({ imageRealWidth, imageRealHeight}, this.calculateImageDimentions)
+		});
+	}
+
+	calculateImageDimentions = () => {
+		console.log('calculateImageDimentions')
+
+		if (this.image === undefined || this.clientWidth === undefined) {
+			console.log('false')
+			return;
+		}
+
+		const maxWidth = this.clientWidth;
+		const exceedMaxWidth = this.image.width > maxWidth;
+		const ratio = this.image.height / this.image.width;
+		const width = exceedMaxWidth ? maxWidth : this.image.width;
+		const height = exceedMaxWidth ? maxWidth * ratio : this.image.height;
+		this.setState( { width, height } );
+	}
+
+	onLayout = (event) => {
+		let {width, height} = event.nativeEvent.layout;
+		this.clientWidth = width;
+		this.calculateImageDimentions();
+	}
+
 	onUploadPress = () => {
 		// This method should present an image picker from
 		// the device.
@@ -36,10 +77,11 @@ class ImageEdit extends Component {
 			);
 		}
 
+		console.log('Rendering');
 		return (
-			<View style={ { flex: 1 } }>
+			<View style={ { flex: 1 } } onLayout={this.onLayout}>
 				<Image
-					style={ { width: '100%', height: 200 } }
+					style={ { width: this.state.width, height: this.state.height } }
 					resizeMethod="scale"
 					source={ { uri: url } }
 				/>
