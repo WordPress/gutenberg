@@ -7,10 +7,16 @@
 	left: 0;
 	background-color: rgba($white, 0.4);
 	z-index: z-index(".components-modal__screen-overlay");
+
+	// Animate appearance.
+	@include fade-in();
 }
 
 // The modal window element.
 .components-modal__frame {
+	// Animate appearance.
+	@include modal_appear();
+
 	// In small screens the content needs to be full width.
 	position: fixed;
 	top: 0;
