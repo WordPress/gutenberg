@@ -79,8 +79,8 @@ export default compose(
 		return {
 			wideControlsEnabled: select( 'core/editor' ).getEditorSettings().alignWide,
 			isCollapsed: isCollapsed || ! isLargeViewport || (
-				getBlockRootClientId( clientId ) &&
-				! getEditorSettings().hasFixedToolbar
+				! getEditorSettings().hasFixedToolbar &&
+				getBlockRootClientId( clientId )
 			),
 		};
 	} ),

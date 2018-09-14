@@ -72,9 +72,6 @@ function DropdownMenu( {
 								<IconButton
 									key={ [ indexOfSet, indexOfControl ].join() }
 									onClick={ ( event ) => {
-										if ( control.isDisabled ) {
-											return;
-										}
 										event.stopPropagation();
 										onClose();
 										if ( control.onClick ) {

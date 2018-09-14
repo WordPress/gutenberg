@@ -72,8 +72,8 @@ export default compose(
 		const { getBlockRootClientId, getEditorSettings } = select( 'core/editor' );
 		return {
 			isCollapsed: isCollapsed || ! isLargeViewport || (
-				getBlockRootClientId( clientId ) &&
-				! getEditorSettings().hasFixedToolbar
+				! getEditorSettings().hasFixedToolbar &&
+				getBlockRootClientId( clientId )
 			),
 		};
 	} ),
