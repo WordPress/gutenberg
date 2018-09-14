@@ -18,7 +18,8 @@ import { withInstanceId, compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import { getBlockMoverDescription } from './mover-description';
-import { upArrow, downArrow } from './arrows';
+import { upArrow, downArrow, dragHandle } from './icons';
+import { IconDragHandle } from './drag-handle';
 
 export class BlockMover extends Component {
 	constructor() {
@@ -43,7 +44,7 @@ export class BlockMover extends Component {
 	}
 
 	render() {
-		const { onMoveUp, onMoveDown, isFirst, isLast, clientIds, blockType, firstIndex, isLocked, instanceId, isHidden } = this.props;
+		const { onMoveUp, onMoveDown, isFirst, isLast, isDraggable, onDragStart, onDragEnd, clientIds, blockElementId, layout, blockType, firstIndex, isLocked, instanceId, isHidden } = this.props;
 		const { isFocused } = this.state;
 		const blocksCount = castArray( clientIds ).length;
 		if ( isLocked || ( isFirst && isLast ) ) {
@@ -65,6 +66,16 @@ export class BlockMover extends Component {
 					aria-disabled={ isFirst }
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
+				/>
+				<IconDragHandle
+					className="editor-block-mover__control"
+					icon={ dragHandle }
+					clientId={ clientIds }
+					blockElementId={ blockElementId }
+					layout={ layout }
+					isVisible={ isDraggable }
+					onDragStart={ onDragStart }
+					onDragEnd={ onDragEnd }
 				/>
 				<IconButton
 					className="editor-block-mover__control"
@@ -106,15 +117,17 @@ export class BlockMover extends Component {
 }
 
 export default compose(
-	withSelect( ( select, { clientIds, rootClientId } ) => {
-		const { getBlock, getBlockIndex, getTemplateLock } = select( 'core/editor' );
+	withSelect( ( select, { clientIds } ) => {
+		const { getBlock, getBlockIndex, getTemplateLock, getBlockRootClientId } = select( 'core/editor' );
 		const firstClientId = first( castArray( clientIds ) );
 		const block = getBlock( firstClientId );
+		const rootClientId = getBlockRootClientId( first( castArray( clientIds ) ) );
 
 		return {
 			firstIndex: getBlockIndex( firstClientId, rootClientId ),
 			blockType: block ? getBlockType( block.name ) : null,
 			isLocked: getTemplateLock( rootClientId ) === 'all',
+			rootClientId,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientIds, rootClientId } ) => {

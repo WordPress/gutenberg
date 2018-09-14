@@ -19,8 +19,13 @@
 		figure {
 			margin: 0;
 			height: 100%;
-			display: flex;
-			align-items: center;
+
+			// IE doesn't support flex so omit that.
+			@supports (position: sticky) {
+				display: flex;
+				align-items: flex-end;
+				justify-content: flex-start;
+			}
 		}
 
 		img {
@@ -29,8 +34,19 @@
 			height: auto;
 		}
 
+		// IE doesn't handle cropping, so we need an explicit width here.
+		img {
+			width: 100%;
+
+			// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
+			@supports (position: sticky) {
+				width: auto;
+			}
+		}
+
 		figcaption {
 			position: absolute;
+			bottom: 0;
 			width: 100%;
 			max-height: 100%;
 			overflow: auto;

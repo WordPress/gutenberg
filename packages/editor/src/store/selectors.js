@@ -23,7 +23,7 @@ import createSelector from 'rememo';
 /**
  * WordPress dependencies
  */
-import { serialize, getBlockType, getBlockTypes, hasBlockSupport, hasChildBlocks, getUnknownTypeHandlerName } from '@wordpress/blocks';
+import { serialize, getBlockType, getBlockTypes, hasBlockSupport, hasChildBlocksWithInserterSupport, getUnknownTypeHandlerName } from '@wordpress/blocks';
 import { moment } from '@wordpress/date';
 import { removep } from '@wordpress/autop';
 
@@ -1571,7 +1571,7 @@ export const getInserterItems = createSelector(
 				isDisabled,
 				utility: calculateUtility( blockType.category, count, isContextual ),
 				frecency: calculateFrecency( time, count ),
-				hasChildBlocks: hasChildBlocks( blockType.name ),
+				hasChildBlocksWithInserterSupport: hasChildBlocksWithInserterSupport( blockType.name ),
 			};
 		};
 

@@ -1,11 +1,7 @@
 /**
- * WordPress dependencies
- */
-import { createElement } from '@wordpress/element';
-
-/**
  * Internal dependencies
  */
+import { createElement } from '../react';
 import { isEmptyElement } from '../utils';
 
 describe( 'isEmptyElement', () => {

@@ -8,28 +8,25 @@
 		@include loading_fade;
 	}
 
-	&__content-wrapper {
+	.wp-block-file__content-wrapper {
 		flex-grow: 1;
 	}
 
-	&__textlink {
+	.wp-block-file__textlink {
 		display: inline-block;
-		color: $blue-medium-700;
 		min-width: 1em;
-		text-decoration: underline;
 
 		&:focus {
 			box-shadow: none;
-			color: $blue-medium-700;
 		}
 	}
 
-	&__button-richtext-wrapper {
+	.wp-block-file__button-richtext-wrapper {
 		display: inline-block;
 		margin-left: 0.75em;
 	}
 
-	&__copy-url-button {
+	.wp-block-file__copy-url-button {
 		margin-left: 1em;
 	}
 }

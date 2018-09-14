@@ -136,11 +136,7 @@ class Popover extends Component {
 			// Focus the popover panel itself so items in the popover are easily
 			// accessed via keyboard navigation.
 			this.contentNode.current.focus();
-
-			return;
 		}
-
-		window.console.warn( `<Popover> component: focusOnMount argument "${ focusOnMount }" not recognized.` );
 	}
 
 	getAnchorRect( anchor ) {

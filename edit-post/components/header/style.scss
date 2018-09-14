@@ -1,6 +1,6 @@
 .edit-post-header {
 	height: $header-height;
-	padding: $item-spacing 2px;
+	padding: $grid-size-small 2px;
 	border-bottom: $border-width solid $light-gray-500;
 	background: $white;
 	display: flex;
@@ -19,7 +19,7 @@
 	// otherwise you can invoke the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻
 	@include break-small {
 		position: fixed;
-		padding: $item-spacing;
+		padding: $grid-size;
 		top: $admin-bar-height-big;
 
 		body.is-fullscreen-mode & {

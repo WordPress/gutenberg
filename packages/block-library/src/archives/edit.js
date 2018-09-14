@@ -4,7 +4,6 @@
 import { Fragment } from '@wordpress/element';
 import {
 	PanelBody,
-	ServerSideRender,
 	ToggleControl,
 	Disabled,
 } from '@wordpress/components';
@@ -17,6 +16,7 @@ import {
 	InspectorControls,
 	BlockAlignmentToolbar,
 	BlockControls,
+	ServerSideRender,
 } from '@wordpress/editor';
 
 export default function ArchivesEdit( { attributes, setAttributes } ) {
