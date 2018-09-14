@@ -1,5 +1,6 @@
 ( function() {
 	var registerBlockType = wp.blocks.registerBlockType;
+	var createValue = wp.richTextStructure.createValue;
 	var el = wp.element.createElement;
 	var InnerBlocks = wp.editor.InnerBlocks;
     var circle = el( 'circle', { cx: 10, cy: 10, r: 10, fill: 'red', stroke: 'blue', strokeWidth: '10' } );
@@ -18,7 +19,7 @@
 						allowedBlocks: [ 'core/paragraph', 'core/image' ],
 						template: [
 							[ 'core/paragraph', {
-								content: 'TestSimpleSvgIcon',
+								content: createValue( 'TestSimpleSvgIcon' ),
 							} ],
 						],
 					}
@@ -46,7 +47,7 @@
 						allowedBlocks: [ 'core/paragraph', 'core/image' ],
 						template: [
 							[ 'core/paragraph', {
-								content: 'TestDashIcon',
+								content: createValue( 'TestDashIcon' ),
 							} ],
 						],
 					}
@@ -76,7 +77,7 @@
 						allowedBlocks: [ 'core/paragraph', 'core/image' ],
 						template: [
 							[ 'core/paragraph', {
-								content: 'TestFunctionIcon',
+								content: createValue( 'TestFunctionIcon' ),
 							} ],
 						],
 					}
@@ -108,7 +109,7 @@
 						allowedBlocks: [ 'core/paragraph', 'core/image' ],
 						template: [
 							[ 'core/paragraph', {
-								content: 'TestIconColors',
+								content: createValue( 'TestIconColors' ),
 							} ],
 						],
 					}
@@ -139,7 +140,7 @@
 						allowedBlocks: [ 'core/paragraph', 'core/image' ],
 						template: [
 							[ 'core/paragraph', {
-								content: 'TestIconColors',
+								content: createValue( 'TestIconColors' ),
 							} ],
 						],
 					}

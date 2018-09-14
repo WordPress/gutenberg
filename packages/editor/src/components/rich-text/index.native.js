@@ -20,7 +20,10 @@ import { children } from '@wordpress/blocks';
  */
 import FormatToolbar from './format-toolbar';
 import { FORMATTING_CONTROLS } from './formatting-controls';
-import { isRichTextValueEmpty } from './utils';
+
+const isRichTextValueEmpty = ( value ) => {
+	return ! value || ! value.length;
+};
 
 export function getFormatValue( formatName ) {
 	if ( 'link' === formatName ) {

@@ -6,14 +6,24 @@
         "attributes": {
             "content": [
                 {
-                    "children": [
-                        "One"
-                    ]
+                    "children": {
+                        "formats": [
+                            null,
+                            null,
+                            null
+                        ],
+                        "text": "One"
+                    }
                 },
                 {
-                    "children": [
-                        "Two"
-                    ]
+                    "children": {
+                        "formats": [
+                            null,
+                            null,
+                            null
+                        ],
+                        "text": "Two"
+                    }
                 }
             ],
             "columns": 2,

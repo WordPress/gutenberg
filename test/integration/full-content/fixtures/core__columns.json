@@ -18,9 +18,36 @@
                         "name": "core/paragraph",
                         "isValid": true,
                         "attributes": {
-                            "content": [
-                                "Column One, Paragraph One"
-                            ],
+                            "content": {
+                                "formats": [
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                                ],
+                                "text": "Column One, Paragraph One"
+                            },
                             "dropCap": false
                         },
                         "innerBlocks": [],
@@ -31,9 +58,36 @@
                         "name": "core/paragraph",
                         "isValid": true,
                         "attributes": {
-                            "content": [
-                                "Column One, Paragraph Two"
-                            ],
+                            "content": {
+                                "formats": [
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                                ],
+                                "text": "Column One, Paragraph Two"
+                            },
                             "dropCap": false
                         },
                         "innerBlocks": [],
@@ -53,9 +107,36 @@
                         "name": "core/paragraph",
                         "isValid": true,
                         "attributes": {
-                            "content": [
-                                "Column Two, Paragraph One"
-                            ],
+                            "content": {
+                                "formats": [
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                                ],
+                                "text": "Column Two, Paragraph One"
+                            },
                             "dropCap": false
                         },
                         "innerBlocks": [],
@@ -66,9 +147,38 @@
                         "name": "core/paragraph",
                         "isValid": true,
                         "attributes": {
-                            "content": [
-                                "Column Three, Paragraph One"
-                            ],
+                            "content": {
+                                "formats": [
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                                ],
+                                "text": "Column Three, Paragraph One"
+                            },
                             "dropCap": false
                         },
                         "innerBlocks": [],

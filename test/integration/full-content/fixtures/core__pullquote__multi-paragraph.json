@@ -4,39 +4,67 @@
         "name": "core/pullquote",
         "isValid": true,
         "attributes": {
-            "value": [
-                {
-                    "children": {
-                        "type": "p",
-                        "props": {
-                            "children": [
-                                "Paragraph ",
-                                {
-                                    "type": "strong",
-                                    "props": {
-                                        "children": [
-                                            "one"
-                                        ]
-                                    }
-                                }
-                            ]
+            "value": {
+                "formats": [
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    [
+                        {
+                            "type": "strong"
                         }
-                    }
-                },
-                {
-                    "children": {
-                        "type": "p",
-                        "props": {
-                            "children": [
-                                "Paragraph two"
-                            ]
+                    ],
+                    [
+                        {
+                            "type": "strong"
                         }
-                    }
-                }
-            ],
-            "citation": [
-                "by whomever"
-            ]
+                    ],
+                    [
+                        {
+                            "type": "strong"
+                        }
+                    ],
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ],
+                "text": "Paragraph one\n\nParagraph two"
+            },
+            "citation": {
+                "formats": [
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ],
+                "text": "by whomever"
+            }
         },
         "innerBlocks": [],
         "originalContent": "<figure class=\"wp-block-pullquote\">\n    <blockquote>\n        <p>Paragraph <strong>one</strong></p>\n        <p>Paragraph two</p>\n        <cite>by whomever</cite>\n\t</blockquote>\n</figure>"

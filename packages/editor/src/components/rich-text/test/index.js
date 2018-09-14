@@ -4,105 +4,20 @@
 import { shallow } from 'enzyme';
 
 /**
+ * WordPress dependencies
+ */
+import { createValue } from '@wordpress/rich-text-structure';
+
+/**
  * Internal dependencies
  */
-import {
-	RichText,
-	getFormatValue,
-} from '../';
+import { RichText } from '../';
 import { diffAriaProps, pickAriaProps } from '../aria';
-
-describe( 'getFormatValue', () => {
-	function createMockNode( nodeName, attributes = {} ) {
-		return {
-			nodeName,
-			hasAttribute( name ) {
-				return !! attributes[ name ];
-			},
-			getAttribute( name ) {
-				return attributes[ name ];
-			},
-		};
-	}
-
-	test( 'basic formatting', () => {
-		expect( getFormatValue( 'bold' ) ).toEqual( {
-			isActive: true,
-		} );
-	} );
-
-	test( 'link formatting when no anchor is found', () => {
-		const formatValue = getFormatValue( 'link', [
-			createMockNode( 'P' ),
-		] );
-		expect( formatValue ).toEqual( {
-			isActive: true,
-		} );
-	} );
-
-	test( 'link formatting', () => {
-		const mockNode = createMockNode( 'A', {
-			href: 'https://www.testing.com',
-			target: '_blank',
-		} );
-
-		const formatValue = getFormatValue( 'link', [ mockNode ] );
-
-		expect( formatValue ).toEqual( {
-			isActive: true,
-			value: 'https://www.testing.com',
-			target: '_blank',
-			node: mockNode,
-		} );
-	} );
-
-	test( 'link formatting when the anchor has no attributes', () => {
-		const mockNode = createMockNode( 'A' );
-
-		const formatValue = getFormatValue( 'link', [ mockNode ] );
-
-		expect( formatValue ).toEqual( {
-			isActive: true,
-			value: '',
-			target: '',
-			node: mockNode,
-		} );
-	} );
-
-	test( 'link formatting when the link is still being added', () => {
-		const formatValue = getFormatValue( 'link', [
-			createMockNode( 'A', {
-				href: '#',
-				'data-wp-placeholder': 'true',
-				'data-mce-bogus': 'true',
-			} ),
-		] );
-		expect( formatValue ).toEqual( {
-			isAdding: true,
-		} );
-	} );
-} );
 
 describe( 'RichText', () => {
 	describe( 'Component', () => {
-		describe( '.adaptFormatter', () => {
-			const wrapper = shallow( <RichText value={ [ 'valid' ] } /> );
-			const options = {
-				type: 'inline-style',
-				style: {
-					'font-weight': '600',
-				},
-			};
-
-			test( 'should return an object on inline: span, and a styles property matching the style object provided', () => {
-				expect( wrapper.instance().adaptFormatter( options ) ).toEqual( {
-					inline: 'span',
-					styles: options.style,
-				} );
-			} );
-		} );
 		describe( '.getSettings', () => {
-			const value = [ 'Hi!' ];
+			const value = createValue();
 			const settings = {
 				setting: 'hi',
 			};
@@ -119,7 +34,7 @@ describe( 'RichText', () => {
 			test( 'should be overriden', () => {
 				const mock = jest.fn().mockImplementation( () => 'mocked' );
 
-				expect( shallow( <RichText value={ value } multiline={ true } unstableGetSettings={ mock } /> ).instance().getSettings( settings ) ).toEqual( 'mocked' );
+				expect( shallow( <RichText value={ value } unstableGetSettings={ mock } /> ).instance().getSettings( settings ) ).toEqual( 'mocked' );
 			} );
 		} );
 	} );

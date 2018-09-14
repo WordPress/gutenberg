@@ -25,9 +25,10 @@ export const settings = {
 
 	attributes: {
 		content: {
-			type: 'array',
-			source: 'children',
+			source: 'html',
+			type: 'string',
 			selector: 'pre',
+			default: '',
 		},
 		textAlign: {
 			type: 'string',
@@ -68,6 +69,7 @@ export const settings = {
 				</BlockControls>
 				<RichText
 					tagName="pre"
+					format="string"
 					value={ content }
 					onChange={ ( nextContent ) => {
 						setAttributes( {
@@ -89,6 +91,7 @@ export const settings = {
 		return (
 			<RichText.Content
 				tagName="pre"
+				format="string"
 				className={ className }
 				style={ { textAlign: textAlign } }
 				value={ content }

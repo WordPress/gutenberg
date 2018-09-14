@@ -1,19 +1,18 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { Toolbar } from '@wordpress/components';
+import { rawShortcut } from '@wordpress/keycodes';
 import { Component } from '@wordpress/element';
 import {
-	Toolbar,
-	withSpokenMessages,
-} from '@wordpress/components';
-import { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
-import { prependHTTP } from '@wordpress/url';
+	applyFormat,
+	removeFormat,
+	getActiveFormat,
+	getTextContent,
+	slice,
+} from '@wordpress/rich-text-structure';
+import { isURL } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -22,177 +21,136 @@ import { FORMATTING_CONTROLS } from '../formatting-controls';
 import LinkContainer from './link-container';
 import ToolbarContainer from './toolbar-container';
 
-/**
- * Returns the Format Toolbar state given a set of props.
- *
- * @param {Object} props Component props.
- *
- * @return {Object} State object.
- */
-function computeDerivedState( props ) {
-	return {
-		selectedNodeId: props.selectedNodeId,
-		settingsVisible: false,
-		opensInNewWindow: !! props.formats.link && !! props.formats.link.target,
-		isEditingLink: false,
-		linkValue: get( props, [ 'formats', 'link', 'value' ], '' ),
-	};
-}
-
 class FormatToolbar extends Component {
-	constructor() {
+	constructor( { toggleFormat, editor } ) {
 		super( ...arguments );
-		this.state = {};
 
+		this.removeLink = this.removeLink.bind( this );
 		this.addLink = this.addLink.bind( this );
-		this.editLink = this.editLink.bind( this );
-		this.dropLink = this.dropLink.bind( this );
-		this.submitLink = this.submitLink.bind( this );
-		this.onKeyDown = this.onKeyDown.bind( this );
-		this.onChangeLinkValue = this.onChangeLinkValue.bind( this );
-		this.toggleLinkSettingsVisibility = this.toggleLinkSettingsVisibility.bind( this );
-		this.setLinkTarget = this.setLinkTarget.bind( this );
-	}
+		this.stopAddingLink = this.stopAddingLink.bind( this );
+		this.applyFormat = this.applyFormat.bind( this );
+		this.removeFormat = this.removeFormat.bind( this );
+		this.getActiveFormat = this.getActiveFormat.bind( this );
+		this.toggleFormat = this.toggleFormat.bind( this );
 
-	onKeyDown( event ) {
-		if ( event.keyCode === ESCAPE ) {
-			const link = this.props.formats.link;
-			const isAddingLink = link && link.isAdding;
-			if ( isAddingLink ) {
-				event.stopPropagation();
-				if ( ! link.value ) {
-					this.dropLink();
-				} else {
-					this.props.onChange( { link: { ...link, isAdding: false } } );
-				}
-			}
-		}
-		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
-			// Stop the key event from propagating up to maybeStartTyping in BlockListBlock.
-			event.stopPropagation();
-		}
-	}
-
-	static getDerivedStateFromProps( props, state ) {
-		if ( state.selectedNodeId !== props.selectedNodeId ) {
-			return computeDerivedState( props );
-		}
-
-		return null;
-	}
-
-	onChangeLinkValue( value ) {
-		this.setState( { linkValue: value } );
-	}
-
-	toggleFormat( format ) {
-		return () => {
-			this.props.onChange( {
-				[ format ]: ! this.props.formats[ format ],
-			} );
+		this.state = {
+			addingLink: false,
 		};
+
+		editor.shortcuts.add( rawShortcut.primary( 'k' ), '', this.addLink );
+		editor.shortcuts.add( rawShortcut.access( 'a' ), '', this.addLink );
+		editor.shortcuts.add( rawShortcut.access( 's' ), '', this.removeLink );
+		editor.shortcuts.add( rawShortcut.access( 'd' ), '', () => toggleFormat( { type: 'del' } ) );
+		editor.shortcuts.add( rawShortcut.access( 'x' ), '', () => toggleFormat( { type: 'code' } ) );
 	}
 
-	toggleLinkSettingsVisibility() {
-		this.setState( ( state ) => ( { settingsVisible: ! state.settingsVisible } ) );
-	}
-
-	setLinkTarget( opensInNewWindow ) {
-		this.setState( { opensInNewWindow } );
-		if ( this.props.formats.link && ! this.props.formats.link.isAdding ) {
-			this.props.onChange( { link: {
-				value: this.props.formats.link.value,
-				target: opensInNewWindow ? '_blank' : null,
-				rel: opensInNewWindow ? 'noreferrer noopener' : null,
-			} } );
-		}
+	removeLink() {
+		this.removeFormat( 'a' );
 	}
 
 	addLink() {
-		this.props.onChange( { link: { isAdding: true } } );
-	}
+		const text = getTextContent( slice( this.props.record ) );
 
-	dropLink() {
-		this.props.onChange( { link: null } );
-	}
-
-	editLink( event ) {
-		event.preventDefault();
-		this.setState( { linkValue: this.props.formats.link.value, isEditingLink: true } );
-	}
-
-	submitLink( event ) {
-		event.preventDefault();
-		const value = prependHTTP( this.state.linkValue );
-		this.props.onChange( { link: {
-			isAdding: false,
-			target: this.state.opensInNewWindow ? '_blank' : null,
-			rel: this.state.opensInNewWindow ? 'noreferrer noopener' : null,
-			value,
-		} } );
-		if ( ! this.props.formats.link.value ) {
-			this.props.speak( __( 'Link added.' ), 'assertive' );
+		if ( text && isURL( text ) ) {
+			this.applyFormat( {
+				type: 'a',
+				attributes: {
+					href: text,
+				},
+			} );
+		} else {
+			this.setState( { addingLink: true } );
 		}
 	}
 
-	isFormatActive( format ) {
-		return this.props.formats[ format ] && this.props.formats[ format ].isActive;
+	stopAddingLink() {
+		this.setState( { addingLink: false } );
+	}
+
+	/**
+	 * Apply a format with the current value and selection.
+	 *
+	 * @param {Object} format The format to apply.
+	 */
+	applyFormat( format ) {
+		this.props.onChange( applyFormat( this.props.record, format ) );
+	}
+
+	/**
+	 * Remove a format from the current value with the current selection.
+	 *
+	 * @param {string} formatType The type of format to remove.
+	 */
+	removeFormat( formatType ) {
+		this.props.onChange( removeFormat( this.props.record, formatType ) );
+	}
+
+	/**
+	 * Get the current format based on the selection
+	 *
+	 * @param {string} formatType The type of format to check.
+	 *
+	 * @return {boolean} Whether the format is active or not.
+	 */
+	getActiveFormat( formatType ) {
+		return getActiveFormat( this.props.record, formatType );
+	}
+
+	/**
+	 * Toggle a format based on the selection.
+	 *
+	 * @param {Object} format The format to toggle.
+	 */
+	toggleFormat( format ) {
+		if ( this.getActiveFormat( format.type ) ) {
+			this.removeFormat( format.type );
+		} else {
+			this.applyFormat( format );
+		}
 	}
 
 	render() {
-		const { formats, enabledControls = [], customControls = [], selectedNodeId } = this.props;
-		const { linkValue, settingsVisible, opensInNewWindow, isEditingLink } = this.state;
-		const isAddingLink = formats.link && formats.link.isAdding;
-		const isEditing = isAddingLink || isEditingLink;
-		const isPreviewing = ! isEditing && formats.link;
-
-		const toolbarControls = FORMATTING_CONTROLS.concat( customControls )
-			.filter( ( control ) => enabledControls.indexOf( control.format ) !== -1 )
+		const link = this.getActiveFormat( 'a' );
+		const toolbarControls = FORMATTING_CONTROLS
+			.filter( ( control ) => this.props.enabledControls.indexOf( control.format ) !== -1 )
 			.map( ( control ) => {
 				if ( control.format === 'link' ) {
-					const isFormatActive = this.isFormatActive( 'link' );
-					const isActive = isFormatActive || isAddingLink;
+					const linkIsActive = link !== undefined;
+
 					return {
 						...control,
-						shortcut: isFormatActive ? control.activeShortcut : control.shortcut,
-						icon: isFormatActive ? 'editor-unlink' : 'admin-links', // TODO: Need proper unlink icon
-						title: isFormatActive ? __( 'Unlink' ) : __( 'Link' ),
-						onClick: isActive ? this.dropLink : this.addLink,
-						isActive,
+						shortcut: linkIsActive ? control.activeShortcut : control.shortcut,
+						icon: linkIsActive ? 'editor-unlink' : 'admin-links', // TODO: Need proper unlink icon
+						title: linkIsActive ? __( 'Unlink' ) : __( 'Link' ),
+						onClick: linkIsActive ? this.removeLink : this.addLink,
+						isActive: !! linkIsActive,
 					};
 				}
 
 				return {
 					...control,
-					onClick: this.toggleFormat( control.format ),
-					isActive: this.isFormatActive( control.format ),
+					onClick: () => this.toggleFormat( { type: control.selector } ),
+					isActive: this.getActiveFormat( control.selector ) !== undefined,
 				};
 			} );
 
 		return (
 			<ToolbarContainer>
 				<Toolbar controls={ toolbarControls } />
-
-				{ ( isEditing || isPreviewing ) && (
-					<LinkContainer
-						editLink={ this.editLink }
-						formats={ formats }
-						isEditing={ isEditing }
-						isPreviewing={ isPreviewing }
-						linkValue={ linkValue }
-						onChangeLinkValue={ this.onChangeLinkValue }
-						onKeyDown={ this.onKeyDown }
-						opensInNewWindow={ opensInNewWindow }
-						selectedNodeId={ selectedNodeId }
-						setLinkTarget={ this.setLinkTarget }
-						settingsVisible={ settingsVisible }
-						submitLink={ this.submitLink }
-						toggleLinkSettingsVisibility={ this.toggleLinkSettingsVisibility }
-					/>
-				) }
+				<LinkContainer
+					link={ link }
+					record={ this.props.record }
+					onChange={ this.props.onChange }
+					applyFormat={ this.applyFormat }
+					removeFormat={ this.removeFormat }
+					getActiveFormat={ this.getActiveFormat }
+					toggleFormat={ this.toggleFormat }
+					addingLink={ this.state.addingLink }
+					stopAddingLink={ this.stopAddingLink }
+				/>
 			</ToolbarContainer>
 		);
 	}
 }
 
-export default withSpokenMessages( FormatToolbar );
+export default FormatToolbar;

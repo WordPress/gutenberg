@@ -18,7 +18,6 @@ export const settings = {
 
 	attributes: {
 		content: {
-			type: 'array',
 			source: 'children',
 			selector: 'pre',
 		},

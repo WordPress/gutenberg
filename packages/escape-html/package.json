@@ -1,0 +1,26 @@
+{
+	"name": "@wordpress/escape-html",
+	"version": "1.0.0",
+	"description": "Escape HTML.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/escape-html/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"dependencies": {
+		"@babel/runtime-corejs2": "7.0.0-beta.56"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

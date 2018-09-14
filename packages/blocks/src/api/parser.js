@@ -10,6 +10,7 @@ import { flow, castArray, mapValues, omit, stubFalse } from 'lodash';
 import { autop } from '@wordpress/autop';
 import { applyFilters } from '@wordpress/hooks';
 import { parse as defaultParse } from '@wordpress/block-serialization-default-parser';
+import { createValue } from '@wordpress/rich-text-structure';
 
 /**
  * Internal dependencies
@@ -109,7 +110,7 @@ export function matcherFromSource( sourceConfig ) {
 		case 'text':
 			return text( sourceConfig.selector );
 		case 'children':
-			return children( sourceConfig.selector );
+			return children( sourceConfig.selector, sourceConfig.multiline );
 		case 'node':
 			return node( sourceConfig.selector );
 		case 'query':
@@ -153,6 +154,12 @@ export function parseWithAttributeSchema( innerHTML, attributeSchema ) {
  */
 export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, commentAttributes ) {
 	let value;
+
+	if ( attributeSchema.source === 'children' ) {
+		attributeSchema.default = createValue( null, attributeSchema.multiline );
+		attributeSchema.type = 'object';
+	}
+
 	switch ( attributeSchema.source ) {
 		// undefined source means that it's an attribute serialized to the block's "comment"
 		case undefined:

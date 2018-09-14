@@ -12,7 +12,6 @@ import {
 	getPhrasingContentSchema,
 	getBlockAttributes,
 	getBlockType,
-	children,
 } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
 
@@ -39,7 +38,6 @@ const supports = {
 
 const schema = {
 	content: {
-		type: 'array',
 		source: 'children',
 		selector: 'h1,h2,h3,h4,h5,h6',
 	},
@@ -167,10 +165,7 @@ export const settings = {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: children.concat(
-				attributes.content,
-				attributesToMerge.content
-			),
+			content: RichText.concat( attributes.content, attributesToMerge.content ),
 		};
 	},
 

@@ -5,7 +5,10 @@
         "isValid": true,
         "attributes": {
             "src": "https://media.simplecast.com/episodes/audio/80564/draft-podcast-51-livePublish2.mp3",
-            "caption": [],
+            "caption": {
+                "formats": [],
+                "text": ""
+            },
             "autoplay": false,
             "loop": false,
             "align": "right"

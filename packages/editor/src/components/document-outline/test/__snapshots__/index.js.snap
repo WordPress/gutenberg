@@ -15,7 +15,27 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
       <Component
         format="children"
         tagName="span"
-        value="Heading parent"
+        value={
+          Object {
+            "formats": Array [
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+            ],
+            "text": "Heading parent",
+          }
+        }
       />
     </TableOfContentsItem>
     <TableOfContentsItem
@@ -28,7 +48,26 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
       <Component
         format="children"
         tagName="span"
-        value="Heading child"
+        value={
+          Object {
+            "formats": Array [
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+            ],
+            "text": "Heading child",
+          }
+        }
       />
     </TableOfContentsItem>
   </ul>
@@ -50,7 +89,22 @@ exports[`DocumentOutline header blocks present should render warnings for multip
       <Component
         format="children"
         tagName="span"
-        value="Heading 1"
+        value={
+          Object {
+            "formats": Array [
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+            ],
+            "text": "Heading 1",
+          }
+        }
       />
       <br
         key="incorrect-break-multiple-h1"
@@ -71,7 +125,22 @@ exports[`DocumentOutline header blocks present should render warnings for multip
       <Component
         format="children"
         tagName="span"
-        value="Heading 1"
+        value={
+          Object {
+            "formats": Array [
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+            ],
+            "text": "Heading 1",
+          }
+        }
       />
       <br
         key="incorrect-break-multiple-h1"

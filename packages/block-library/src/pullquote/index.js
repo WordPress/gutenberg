@@ -21,22 +21,15 @@ import {
 	default as edit,
 	SOLID_COLOR_STYLE_NAME,
 	SOLID_COLOR_CLASS,
-	toRichTextValue,
 } from './edit';
 
 const blockAttributes = {
 	value: {
-		type: 'array',
-		source: 'query',
-		selector: 'blockquote > p',
-		query: {
-			children: {
-				source: 'node',
-			},
-		},
+		source: 'children',
+		selector: 'blockquote',
+		multiline: 'p',
 	},
 	citation: {
-		type: 'array',
 		source: 'children',
 		selector: 'cite',
 	},
@@ -115,7 +108,7 @@ export const settings = {
 		return (
 			<figure className={ figureClass } style={ figureStyles }>
 				<blockquote className={ blockquoteClasses } style={ blockquoteStyle } >
-					<RichText.Content value={ toRichTextValue( value ) } />
+					<RichText.Content value={ value } multiline="p" />
 					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
 				</blockquote>
 			</figure>
@@ -130,7 +123,7 @@ export const settings = {
 			const { value, citation } = attributes;
 			return (
 				<blockquote>
-					<RichText.Content value={ toRichTextValue( value ) } />
+					<RichText.Content value={ value } multiline="p" />
 					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
 				</blockquote>
 			);
@@ -139,7 +132,6 @@ export const settings = {
 		attributes: {
 			...blockAttributes,
 			citation: {
-				type: 'array',
 				source: 'children',
 				selector: 'footer',
 			},
@@ -154,7 +146,7 @@ export const settings = {
 
 			return (
 				<blockquote className={ `align${ align }` }>
-					<RichText.Content value={ toRichTextValue( value ) } />
+					<RichText.Content value={ value } />
 					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="footer" value={ citation } /> }
 				</blockquote>
 			);

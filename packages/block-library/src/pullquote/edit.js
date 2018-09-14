@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { includes, map } from 'lodash';
+import { includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,11 +22,6 @@ import {
 
 export const SOLID_COLOR_STYLE_NAME = 'solid-color';
 export const SOLID_COLOR_CLASS = `is-style-${ SOLID_COLOR_STYLE_NAME }`;
-
-export const toRichTextValue = ( value ) => map( value, ( ( subValue ) => subValue.children ) );
-export const fromRichTextValue = ( value ) => map( value, ( subValue ) => ( {
-	children: subValue,
-} ) );
 
 class PullQuoteEdit extends Component {
 	constructor( props ) {
@@ -83,10 +78,10 @@ class PullQuoteEdit extends Component {
 					<blockquote style={ blockquoteStyle } className={ blockquoteClasses }>
 						<RichText
 							multiline="p"
-							value={ toRichTextValue( value ) }
+							value={ value }
 							onChange={
 								( nextValue ) => setAttributes( {
-									value: fromRichTextValue( nextValue ),
+									value: nextValue,
 								} )
 							}
 							/* translators: the text of the quotation */
