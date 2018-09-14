@@ -33,6 +33,7 @@ class HeadingEdit extends Component {
 		const {
 			level,
 			placeholder,
+			content,
 		} = attributes;
 
 		const tagName = 'h' + level;
@@ -42,7 +43,7 @@ class HeadingEdit extends Component {
 				<HeadingToolbar minLevel={ 2 } maxLevel={ 5 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
 				<RichText
 					tagName={ tagName }
-					content={ { contentTree: attributes.content } }
+					value={ content }
 					style={ {
 						minHeight: Math.max( minHeight, typeof attributes.aztecHeight === 'undefined' ? 0 : attributes.aztecHeight ),
 					} }

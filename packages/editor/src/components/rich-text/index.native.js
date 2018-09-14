@@ -151,6 +151,7 @@ export class RichText extends Component {
 			style,
 			formattingControls,
 			formatters,
+			value,
 		} = this.props;
 
 		const formatToolbar = (
@@ -163,7 +164,7 @@ export class RichText extends Component {
 		);
 
 		// Save back to HTML from React tree
-		const html = '<' + tagName + '>' + renderToString( this.props.content.contentTree ) + '</' + tagName + '>';
+		const html = '<' + tagName + '>' + renderToString( value ) + '</' + tagName + '>';
 
 		return (
 			<View>
