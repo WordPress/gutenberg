@@ -15,6 +15,7 @@
 		background: transparent;
 		font-family: $editor-font;
 		line-height: $default-line-height;
+		color: $dark-gray-900;
 		transition: border 0.1s ease-out;
 
 		// Show wider parent padding on Desktop breakpoints.
@@ -33,9 +34,22 @@
 			border-width: $border-width;
 		}
 
-		// Match h1 heading
+		// Match h1 heading.
 		font-size: 2.441em;
 		font-weight: 600;
+
+		// Large text needs a 3:1 contrast ratio.
+		&::-webkit-input-placeholder {
+			color: $dark-opacity-200;
+		}
+
+		&::-moz-placeholder {
+			color: $dark-opacity-200;
+		}
+
+		&:-ms-input-placeholder {
+			color: $dark-opacity-200;
+		}
 	}
 
 	&:not(.is-focus-mode):not(.has-fixed-toolbar) {
