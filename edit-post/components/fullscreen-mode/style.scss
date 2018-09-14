@@ -14,4 +14,11 @@ body.is-fullscreen-mode {
 	#wpfooter {
 		margin-left: 0;
 	}
+
+	// Animations
+	@include fade_in(0.3s);
+
+	.edit-post-header {
+		@include slide_in_top();
+	}
 }
