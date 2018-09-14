@@ -26,7 +26,7 @@ class Modal extends Component {
 		super( props );
 
 		this.prepareDOM();
-		this.onModalOnly = this.onModalOnly.bind( this );
+		this.stopEventPropagationOutsideModal = this.stopEventPropagationOutsideModal.bind( this );
 	}
 
 	/**
@@ -102,8 +102,11 @@ class Modal extends Component {
 		ariaHelper.showApp();
 	}
 
-	onModalOnly( ev ) {
-		// Stop all onMouseDown events propagating further - they should only go to the modal
+	/**
+	 * Stop all onMouseDown events propagating further - they should only go to the modal
+ 	 * @param {string} ev Event object
+	 */
+	stopEventPropagationOutsideModal( ev ) {
 		ev.stopPropagation();
 	}
 
@@ -136,7 +139,7 @@ class Modal extends Component {
 		return createPortal(
 			<div
 				className={ classnames( 'components-modal__screen-overlay', overlayClassName ) }
-				onMouseDown={ this.onModalOnly }
+				onMouseDown={ this.stopEventPropagationOutsideModal }
 			>
 				<ModalFrame
 					className={ classnames(
