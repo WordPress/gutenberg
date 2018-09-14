@@ -2,6 +2,6 @@
 
 exports[`Deprecated Node Matcher should insert block 1`] = `
 "<!-- wp:deprecated-node-matcher -->
-<blockquote class=\\"wp-block-deprecated-node-matcher\\"><p></p><p>tset</p></blockquote>
+<blockquote class=\\"wp-block-deprecated-node-matcher\\"><p>test</p><p></p></blockquote>
 <!-- /wp:deprecated-node-matcher -->"
 `;
