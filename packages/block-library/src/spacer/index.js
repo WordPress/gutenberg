@@ -38,6 +38,7 @@ export const settings = {
 			return (
 				<Fragment>
 					<ResizableBox
+						className="block-library-spacer__resize-container"
 						size={ {
 							height,
 						} }
