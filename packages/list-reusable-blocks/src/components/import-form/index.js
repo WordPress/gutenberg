@@ -64,7 +64,7 @@ class ImportForm extends Component {
 						uiMessage = __( 'Invalid Reusable Block JSON file' );
 						break;
 					default:
-						uiMessage = __( 'Unknow error' );
+						uiMessage = __( 'Unknown error' );
 				}
 
 				this.setState( { isLoading: false, error: uiMessage } );
