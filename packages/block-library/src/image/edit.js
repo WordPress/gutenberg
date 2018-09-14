@@ -119,6 +119,7 @@ class ImageEdit extends Component {
 			} );
 			return;
 		}
+		console.log('dad');
 		this.props.setAttributes( {
 			...pick( media, [ 'alt', 'id', 'caption', 'url' ] ),
 			width: undefined,
