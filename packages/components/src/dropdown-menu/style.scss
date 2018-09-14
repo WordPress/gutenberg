@@ -7,12 +7,12 @@
 		margin: 0;
 		padding: 4px;
 		border: $border-width solid transparent;
-		border-radius: 0;
 		display: flex;
 		flex-direction: row;
 
 		&.is-active,
 		&.is-active:hover {
+			box-shadow: none;
 			background-color: $dark-gray-500;
 			color: $white;
 		}
@@ -26,17 +26,19 @@
 
 		&:hover,
 		&:focus,
-		&:not(:disabled):hover {
-			box-shadow: none;
-			outline: none;
-			color: $dark-gray-500;
-			border-color: $dark-gray-500;
+		&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+			@include formatting-button-style__hover();
 		}
 
-		&.is-active > svg,
-		&.is-active:hover > svg {
-			background-color: $dark-gray-500;
-			color: $white;
+		.components-dropdown-menu__indicator {
+			display: inline-block;
+			margin-left: 10px;
+
+			// Add a dropdown arrow indicator.
+			&::after {
+				@include dropdown-arrow();
+				top: $icon-button-size-small / 2 + 1px;
+			}
 		}
 	}
 }
@@ -45,9 +47,8 @@
 }
 
 .components-dropdown-menu__menu {
-	// note that left is set by react in a style attribute
 	width: 100%;
-	padding: 3px 3px 0;
+	padding: 9px;
 	font-family: $default-font;
 	font-size: $default-font-size;
 	line-height: $default-line-height;
@@ -55,13 +56,46 @@
 	.components-dropdown-menu__menu-item {
 		width: 100%;
 		padding: 6px;
-		border-radius: 0;
 		outline: none;
 		cursor: pointer;
+		margin-bottom: $grid-size-small;
 
-		.dashicon {
-			margin-right: 8px;
+		&.has-separator {
+			margin-top: 6px;
+			position: relative;
+			overflow: visible;
+		}
+
+		&.has-separator::before {
+			display: block;
+			content: "";
+			box-sizing: content-box;
+			background-color: $light-gray-500;
+			position: absolute;
+			top: -3px;
+			left: 0;
+			right: 0;
+			height: 1px;
+		}
+
+		// Plain menu styles.
+		&:focus:not(:disabled):not([aria-disabled="true"]):not(.is-default) {
+			@include menu-style__focus();
+		}
+
+		// Formatting buttons
+		> svg {
+			border-radius: $radius-round-rectangle;
+
+			// This assumes 20x20px dashicons.
+			padding: 2px;
+			width: $icon-button-size-small;
+			height: $icon-button-size-small;
+			margin: -1px $grid-size -1px 0;
+		}
+
+		&:not(:disabled):not([aria-disabled="true"]):not(.is-default).is-active > svg {
+			@include formatting-button-style__active();
 		}
 	}
 }
-

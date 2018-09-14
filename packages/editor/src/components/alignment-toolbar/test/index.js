@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import AlignmentToolbar from '../';
+import { AlignmentToolbar } from '../';
 
 describe( 'AlignmentToolbar', () => {
 	const alignment = 'left';
