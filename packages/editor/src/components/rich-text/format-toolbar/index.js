@@ -154,6 +154,7 @@ class FormatToolbar extends Component {
 					const isActive = isFormatActive || isAddingLink;
 					return {
 						...control,
+						shortcut: isFormatActive ? control.activeShortcut : control.shortcut,
 						icon: isFormatActive ? 'editor-unlink' : 'admin-links', // TODO: Need proper unlink icon
 						title: isFormatActive ? __( 'Unlink' ) : __( 'Link' ),
 						onClick: isActive ? this.dropLink : this.addLink,
