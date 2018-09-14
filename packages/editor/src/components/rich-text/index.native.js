@@ -98,14 +98,14 @@ export class RichText extends Component {
 	}
 
 	shouldComponentUpdate( nextProps ) {
-		if ( nextProps.content.forceUpdate || nextProps.tagName !== this.props.tagName ) {
+		if ( nextProps.tagName !== this.props.tagName ) {
 			this.lastEventCount = undefined;
 			this.lastContent = undefined;
 			return true;
 		}
 		// The check below allows us to avoid updating the content right after an `onChange` call
 		// first time the component is drawn with empty content `lastContent` is undefined
-		if ( nextProps.content.contentTree &&
+		if ( nextProps.value &&
 			this.lastContent &&
 			this.lastEventCount ) {
 			return false;
