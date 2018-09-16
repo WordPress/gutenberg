@@ -1,5 +1,9 @@
 .wp-block-columns {
 	display: flex;
+	.wp-block-column {
+		padding-left: 5px;
+		padding-right: 5px;
+	}
 }
 
 .wp-block-column {
