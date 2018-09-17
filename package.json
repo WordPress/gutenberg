@@ -185,7 +185,7 @@
 		"publish:check": "npm run build:packages && lerna updated",
 		"publish:dev": "npm run build:packages && lerna publish --npm-tag next",
 		"publish:prod": "npm run build:packages && lerna publish",
-		"test": "npm run lint && npm run test-unit && npm run test-mobile",
+		"test": "concurrently \"npm run lint && npm run test-unit\" \"npm run test-mobile\"",
 		"pretest-e2e": "concurrently \"./bin/reset-e2e-tests.sh\" \"npm run build\"",
 		"test-e2e": "cross-env JEST_PUPPETEER_CONFIG=test/e2e/puppeteer.config.js wp-scripts test-unit-js --config test/e2e/jest.config.json --runInBand",
 		"test-e2e:watch": "npm run test-e2e -- --watch",
