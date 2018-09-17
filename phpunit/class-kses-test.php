@@ -1,6 +1,6 @@
 <?php
 /**
- * Tests that serialized HTML is not altered by KSES
+ * Tests that serialized HTML is not altered by KSES.
  *
  * @package Gutenberg
  */
@@ -14,19 +14,19 @@ class KSES_Test extends WP_UnitTestCase {
 	 * Generates a normalized array of tag names and attributes.
 	 * Takes into account how kses alters CSS.
 	 *
-	 * @param string $html HTML
-	 * @return array Normalized list of tags and attributes
+	 * @param string $html HTML.
+	 * @return array Normalized list of tags and attributes.
 	 */
 	function get_normalized_dom( $html ) {
 		$normalized = array();
-		$document = new DOMDocument();
-		libxml_use_internal_errors( true ); // Avoid errors with HTML5 elements
+		$document   = new DOMDocument();
+		libxml_use_internal_errors( true ); // Avoid errors with HTML5 elements.
 		$document->loadHTML( $html );
 		$node_list = $document->getElementsByTagName( '*' );
 		foreach ( $node_list as $node ) {
 			$node_repr = array(
 				'tagName'    => $node->tagName,
-				'attributes' => array()
+				'attributes' => array(),
 			);
 			foreach ( $node->attributes as $attr ) {
 				$name  = $attr->name;
@@ -71,12 +71,12 @@ class KSES_Test extends WP_UnitTestCase {
 		$admin_only = array(
 			// Freeform HTML.
 			'core__html.serialized.html',
-			// Currently broken for non-admin users, tracked at https://github.com/WordPress/gutenberg/issues/2539
-			'core__cover-image.serialized.html'
+			// Currently broken for non-admin users, https://github.com/WordPress/gutenberg/issues/2539 .
+			'core__cover-image.serialized.html',
 		);
 
 		foreach ( $admin_only as $excluded ) {
-			if ( $excluded === substr( $filename, -strlen( $excluded ) ) ) {
+			if ( substr( $filename, -strlen( $excluded ) ) === $excluded ) {
 				return false;
 			}
 		}

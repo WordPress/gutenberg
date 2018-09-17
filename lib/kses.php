@@ -1,5 +1,11 @@
 <?php
 /**
+ * KSES related functions for the Gutenberg plugin.
+ *
+ * @package gutenberg
+ */
+
+/**
  * Adds attributes to kses allowed tags that aren't in the default list
  * and that Gutenberg needs to save blocks such as the Gallery block.
  *
