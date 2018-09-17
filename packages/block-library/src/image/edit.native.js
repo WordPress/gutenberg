@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Image, TextInput } from 'react-native';
+import { View, Image, Text, TextInput } from 'react-native';
 
 /**
  * Internal dependencies
@@ -86,19 +86,6 @@ class ImageEdit extends Component {
 			);
 		}
 
-		const sizeControlls = (
-			<View style={{flexDirection: 'row', flexDirection: 'row'}}>
-				<TextInput 
-					placeholder='Width'
-					onChangeText = { this.updateWidth }
-				/>
-				<TextInput 
-					placeholder='Height'
-					onChangeText = { this.updateHeight }
-				/>
-			</View>
-		)
-
 		let imageHeight = this.state.height;
 		if (height > 0 && height < imageHeight) {
 			imageHeight = height;
@@ -108,6 +95,27 @@ class ImageEdit extends Component {
 		if (width > 0 && width < imageWidth) {
 			imageWidth = width;
 		}
+
+		const sizeControlls = (
+			<View style={{flexDirection: 'row', justifyContent: "center", flex: 1}}>
+				<View style={{padding: 5, flexDirection: 'row', flex: 1}}>
+					<Text>Width: </Text>
+					<TextInput
+						value={ width !== undefined ? width.toString() : '' }
+						placeholder={ this.image !== undefined ? this.image.width.toString() : '0' }
+						onChangeText = { this.updateWidth }
+					/>
+				</View>
+				<View style={{padding: 5, flexDirection: 'row', flex: 1}}>
+					<Text>Height: </Text>
+					<TextInput 
+						value={ height !== undefined ? height.toString() : '' }
+						placeholder={ this.image !== undefined ? this.image.height.toString() : '0' }
+						onChangeText = { this.updateHeight }
+					/>
+				</View>
+			</View>
+		)
 
 		return (
 			<View>
