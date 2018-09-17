@@ -21,17 +21,17 @@ class ImageEdit extends Component {
 		this.updateHeight = this.updateHeight.bind( this );
 	}
 
-	onUploadPress = () => {
+	onUploadPress() {
 		// This method should present an image picker from
 		// the device.
 		//TODO: Implement upload image method.
-	};
+	}
 
-	onMediaLibraryPress = () => {
+	onMediaLibraryPress() {
 		// This method should present an image picker from
 		// the WordPress media library.
 		//TODO: Implement media library method.
-	};
+	}
 
 	updateWidth( width ) {
 		this.props.setAttributes( { width: this.intOrUndefined( width ) } );
