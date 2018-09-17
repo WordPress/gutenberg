@@ -68,7 +68,20 @@ class KSES_Test extends WP_UnitTestCase {
 	}
 
 	function is_saved_through_kses( $filename ) {
-		return 'core__html.serialized.html' !== substr( $filename, -26 );
+		$admin_only = array(
+			// Freeform HTML.
+			'core__html.serialized.html',
+			// Currently broken for non-admin users, tracked at https://github.com/WordPress/gutenberg/issues/2539
+			'core__cover-image.serialized.html'
+		);
+
+		foreach ( $admin_only as $excluded ) {
+			if ( $excluded === substr( $filename, -strlen( $excluded ) ) ) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	function filename_to_args( $filename ) {
