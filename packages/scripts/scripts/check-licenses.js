@@ -147,7 +147,7 @@ const checkLicense = ( allowedLicense, licenseType ) => {
 	}
 
 	// We can skip the parsing below if there isn't an 'OR' in the license.
-	if ( licenseType.indexOf( 'OR' ) < 0 ) {
+	if ( ! licenseType.includes( 'OR' ) ) {
 		return false;
 	}
 
@@ -226,7 +226,7 @@ modules.forEach( ( path ) => {
 	let licenseType = typeof license === 'object' ? license.type : license;
 
 	// Check if the license we've detected is telling us to look in the license file, instead.
-	if ( licenseType && licenseFiles.find( ( licenseFile ) => licenseType.indexOf( licenseFile ) >= 0 ) ) {
+	if ( licenseType && licenseFiles.find( ( licenseFile ) => licenseType.includes( licenseFile ) ) ) {
 		licenseType = undefined;
 	}
 
