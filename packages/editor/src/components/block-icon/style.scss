@@ -9,8 +9,17 @@
 		}
 	}
 
-	svg:not(.dashicon) {
+	// By default, library icons should be 24px by 24px.
+	// If an icon is provided that has a `dashicons` class, or an explicit width/height,
+	// we don't override the height/width.
+	svg:not(.dashicon):not([width]) {
 		height: 24px;
 		width: 24px;
+	}
+
+	// Don't allow icons to be bigger than the recommended standard.
+	svg {
+		max-width: 24px;
+		max-height: 24px;
 	}
 }
