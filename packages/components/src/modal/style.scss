@@ -111,8 +111,7 @@ h1 {
 	overflow: auto;
 	// The height of the content is the height of its parent, minus the header. after that, the offset was 3px.
 	height: 100%;
-	padding: ($header-height+$panel-padding) $panel-padding $panel-padding $panel-padding;
-	padding: $panel-padding;
+	overflow: auto;
 	padding: $grid-size-large;
 
 	&:focus {
