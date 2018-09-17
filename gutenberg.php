@@ -163,6 +163,9 @@ function gutenberg_pre_init() {
 	require_once dirname( __FILE__ ) . '/lib/load.php';
 
 	add_filter( 'replace_editor', 'gutenberg_init', 10, 2 );
+
+	// Include kses fixes so core blocks work for non-admin users.
+	require_once dirname( __FILE__ ) . '/lib/kses.php';
 }
 
 /**
@@ -481,20 +484,3 @@ function gutenberg_add_admin_body_class( $classes ) {
 		return "$classes gutenberg-editor-page is-fullscreen-mode";
 	}
 }
-
-/**
- * Adds attributes to kses allowed tags that aren't in the default list
- * and that Gutenberg needs to save blocks such as the Gallery block.
- *
- * @param array $tags Allowed HTML.
- * @return array (Maybe) modified allowed HTML.
- */
-function gutenberg_kses_allowedtags( $tags ) {
-	if ( isset( $tags['img'] ) ) {
-		$tags['img']['data-link'] = true;
-		$tags['img']['data-id']   = true;
-	}
-	return $tags;
-}
-
-add_filter( 'wp_kses_allowed_html', 'gutenberg_kses_allowedtags', 10, 2 );
