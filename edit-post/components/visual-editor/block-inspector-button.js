@@ -40,7 +40,7 @@ export function BlockInspectorButton( {
 			onClick={ flow( areAdvancedSettingsOpened ? closeSidebar : openEditorSidebar, speakMessage, onClick ) }
 			icon="admin-generic"
 			label={ small ? label : undefined }
-			shortcut={ shortcuts.toggleSidebar.display }
+			shortcut={ shortcuts.toggleSidebar }
 		>
 			{ ! small && label }
 		</MenuItem>

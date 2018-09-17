@@ -426,6 +426,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/list-reusable-blocks",
+		"slug": "packages-list-reusable-blocks",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/list-reusable-blocks/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/npm-package-json-lint-config",
 		"slug": "packages-npm-package-json-lint-config",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/npm-package-json-lint-config/README.md",

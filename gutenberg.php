@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
- * Version: 3.8.0-rc.1
+ * Version: 3.9.0-rc.1
  * Author: Gutenberg Team
  *
  * @package gutenberg
@@ -24,7 +24,7 @@ gutenberg_pre_init();
  * @since 0.1.0
  */
 function the_gutenberg_project() {
-	global $post_type_object, $post;
+	global $post_type_object;
 	?>
 	<div class="gutenberg">
 		<h1 class="screen-reader-text"><?php echo esc_html( $post_type_object->labels->edit_item ); ?></h1>
@@ -260,6 +260,12 @@ function gutenberg_add_edit_link( $actions, $post ) {
 	if ( 'wp_block' === $post->post_type ) {
 		unset( $actions['edit'] );
 		unset( $actions['inline hide-if-no-js'] );
+		$actions['export'] = sprintf(
+			'<a class="wp-list-reusable-blocks__export" href="#" data-id="%s" aria-label="%s">%s</a>',
+			$post->ID,
+			__( 'Export as JSON', 'gutenberg' ),
+			__( 'Export as JSON', 'gutenberg' )
+		);
 		return $actions;
 	}
 
@@ -468,18 +474,27 @@ add_action( 'admin_print_scripts-edit.php', 'gutenberg_replace_default_add_new_b
  * @return string The $classes string, with gutenberg-editor-page appended.
  */
 function gutenberg_add_admin_body_class( $classes ) {
-	// Default to is-fullscreen-mode to avoid jumps in the UI.
-	return "$classes gutenberg-editor-page is-fullscreen-mode";
+	if ( current_theme_supports( 'editor-styles' ) && current_theme_supports( 'dark-editor-style' ) ) {
+		return "$classes gutenberg-editor-page is-fullscreen-mode is-dark-theme";
+	} else {
+		// Default to is-fullscreen-mode to avoid jumps in the UI.
+		return "$classes gutenberg-editor-page is-fullscreen-mode";
+	}
 }
 
 /**
- * Ensure heartbeat interval is low enough to work for post locking.
+ * Adds attributes to kses allowed tags that aren't in the default list
+ * and that Gutenberg needs to save blocks such as the Gallery block.
  *
- * @param  array $settings Settings.
- * @return array           Filtered settings.
+ * @param array $tags Allowed HTML.
+ * @return array (Maybe) modified allowed HTML.
  */
-function wp_heartbeat_settings_gutenberg( $settings ) {
-	$settings['interval'] = 15;
-	return $settings;
+function gutenberg_kses_allowedtags( $tags ) {
+	if ( isset( $tags['img'] ) ) {
+		$tags['img']['data-link'] = true;
+		$tags['img']['data-id']   = true;
+	}
+	return $tags;
 }
-add_filter( 'heartbeat_settings', 'wp_heartbeat_settings_gutenberg' );
+
+add_filter( 'wp_kses_allowed_html', 'gutenberg_kses_allowedtags', 10, 2 );

@@ -37,7 +37,7 @@ const SidebarHeader = ( { children, className, closeLabel, closeSidebar, title }
 					onClick={ closeSidebar }
 					icon="no-alt"
 					label={ closeLabel }
-					shortcut={ shortcuts.toggleSidebar.display }
+					shortcut={ shortcuts.toggleSidebar }
 				/>
 			</div>
 		</Fragment>

@@ -12,12 +12,13 @@ import {
 /**
  * WordPress dependencies
  */
-import { Component, Children, cloneElement, Fragment } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { isEmptyElement } from './utils';
+import {
+	Children,
+	Component,
+	cloneElement,
+	Fragment,
+	isEmptyElement,
+} from '@wordpress/element';
 
 class Slot extends Component {
 	constructor() {

@@ -115,11 +115,11 @@ export const settings = {
 				type: 'block',
 				blocks: [ 'core/paragraph' ],
 				transform: ( { value, citation } ) => {
-					// transforming an empty quote
+					// Transforming an empty quote
 					if ( ( ! value || ! value.length ) && ! citation ) {
 						return createBlock( 'core/paragraph' );
 					}
-					// transforming a quote with content
+					// Transforming a quote with content
 					return ( value || [] ).map( ( item ) => createBlock( 'core/paragraph', {
 						content: [ get( item, [ 'children', 'props', 'children' ], '' ) ],
 					} ) ).concat( citation ? createBlock( 'core/paragraph', {
@@ -131,8 +131,8 @@ export const settings = {
 				type: 'block',
 				blocks: [ 'core/heading' ],
 				transform: ( { value, citation, ...attrs } ) => {
-					// if no text content exist just transform the quote into an heading block
-					// using citation as the content, it may be empty creating an empty heading block.
+					// If there is no quote content, use the citation as the content of the resulting
+					// heading. A nonexistent citation will result in an empty heading.
 					if ( ( ! value || ! value.length ) ) {
 						return createBlock( 'core/heading', {
 							content: citation,
@@ -145,16 +145,17 @@ export const settings = {
 						get( firstValue, [ 'props', 'children' ], '' )
 					);
 
-					// if the quote content just contains a paragraph and no citation exist
-					// convert the quote content into and heading block.
+					// If the quote content just contains a single paragraph, and no citation exists, convert
+					// the quote content into a heading.
 					if ( ! citation && value.length === 1 ) {
 						return createBlock( 'core/heading', {
 							content: headingContent,
 						} );
 					}
 
-					// In the normal case convert the first paragraph of quote into an heading
-					// and create a new quote block equal tl what we had excluding the first paragraph
+					// In the normal case (a quote containing multiple paragraphs) convert the first
+					// paragraph into a heading and create a new quote block containing the rest of the
+					// content.
 					const heading = createBlock( 'core/heading', {
 						content: headingContent,
 					} );
@@ -205,7 +206,6 @@ export const settings = {
 					/>
 					{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 						<RichText
-							tagName="cite"
 							value={ citation }
 							onChange={
 								( nextCitation ) => setAttributes( {
@@ -214,6 +214,7 @@ export const settings = {
 							}
 							/* translators: the individual or entity quoted */
 							placeholder={ __( 'Write citation…' ) }
+							className="wp-block-quote__citation"
 						/>
 					) }
 				</blockquote>

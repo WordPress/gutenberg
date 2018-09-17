@@ -89,9 +89,18 @@
 		}
 	}
 
-	& + .editor-rich-text__tinymce {
-		opacity: 0.5;
+	// Placeholder text.
+	& + .editor-rich-text__tinymce, {
 		pointer-events: none;
+
+		// Use opacity to work in various editor styles.
+		&,
+		p {
+			color: $dark-opacity-300;
+			.is-dark-theme & {
+				color: $light-opacity-300;
+			}
+		}
 	}
 
 	&.mce-content-body {

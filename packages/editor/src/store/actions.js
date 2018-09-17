@@ -705,14 +705,14 @@ export function convertBlockToStatic( clientId ) {
 /**
  * Returns an action object used to convert a static block into a reusable block.
  *
- * @param {string} clientId The client ID of the block to detach.
+ * @param {string} clientIds The client IDs of the block to detach.
  *
  * @return {Object} Action object.
  */
-export function convertBlockToReusable( clientId ) {
+export function convertBlockToReusable( clientIds ) {
 	return {
 		type: 'CONVERT_BLOCK_TO_REUSABLE',
-		clientId,
+		clientIds: castArray( clientIds ),
 	};
 }
 /**

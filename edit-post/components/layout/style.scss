@@ -110,12 +110,20 @@
 	left: 0;
 	overflow: auto;
 
+	body.is-fullscreen-mode & {
+		top: 0;
+	}
+
 	@include break-medium() {
 		top: $admin-bar-height;
 		left: auto;
 		width: $sidebar-width;
 		border-left: $border-width solid $light-gray-500;
 		@include slide_in_right;
+
+		body.is-fullscreen-mode & {
+			top: 0;
+		}
 	}
 }
 

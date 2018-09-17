@@ -6,19 +6,39 @@ import { castArray, mapValues } from 'lodash';
 /**
  * Internal dependencies
  */
-import {
-	isActionLike,
-	isAsyncIterable,
-	isIterable,
-	toAsyncIterable,
-	createRegistry,
-} from '../registry';
+import { createRegistry } from '../registry';
+import { asyncGenerator } from '../plugins';
 
 describe( 'createRegistry', () => {
 	let registry;
 
+	const unsubscribes = [];
+	function subscribeWithUnsubscribe( ...args ) {
+		const unsubscribe = registry.subscribe( ...args );
+		unsubscribes.push( unsubscribe );
+		return unsubscribe;
+	}
+	function subscribeUntil( predicates ) {
+		predicates = castArray( predicates );
+
+		return new Promise( ( resolve ) => {
+			subscribeWithUnsubscribe( () => {
+				if ( predicates.every( ( predicate ) => predicate() ) ) {
+					resolve();
+				}
+			} );
+		} );
+	}
+
 	beforeEach( () => {
 		registry = createRegistry();
+	} );
+
+	afterEach( () => {
+		let unsubscribe;
+		while ( ( unsubscribe = unsubscribes.shift() ) ) {
+			unsubscribe();
+		}
 	} );
 
 	describe( 'registerStore', () => {
@@ -68,32 +88,6 @@ describe( 'createRegistry', () => {
 	} );
 
 	describe( 'registerResolvers', () => {
-		const unsubscribes = [];
-		afterEach( () => {
-			let unsubscribe;
-			while ( ( unsubscribe = unsubscribes.shift() ) ) {
-				unsubscribe();
-			}
-		} );
-
-		function subscribeWithUnsubscribe( ...args ) {
-			const unsubscribe = registry.subscribe( ...args );
-			unsubscribes.push( unsubscribe );
-			return unsubscribe;
-		}
-
-		function subscribeUntil( predicates ) {
-			predicates = castArray( predicates );
-
-			return new Promise( ( resolve ) => {
-				subscribeWithUnsubscribe( () => {
-					if ( predicates.every( ( predicate ) => predicate() ) ) {
-						resolve();
-					}
-				} );
-			} );
-		}
-
 		it( 'should not do anything for selectors which do not have resolvers', () => {
 			registry.registerReducer( 'demo', ( state = 'OK' ) => state );
 			registry.registerSelectors( 'demo', {
@@ -117,7 +111,7 @@ describe( 'createRegistry', () => {
 
 			const value = registry.select( 'demo' ).getValue( 'arg1', 'arg2' );
 			expect( value ).toBe( 'OK' );
-			expect( resolver ).toHaveBeenCalledWith( 'OK', 'arg1', 'arg2' );
+			expect( resolver ).toHaveBeenCalledWith( 'arg1', 'arg2' );
 			registry.select( 'demo' ).getValue( 'arg1', 'arg2' );
 			expect( resolver ).toHaveBeenCalledTimes( 1 );
 			registry.select( 'demo' ).getValue( 'arg3', 'arg4' );
@@ -219,53 +213,6 @@ describe( 'createRegistry', () => {
 			return promise;
 		} );
 
-		it( 'should resolve mixed type action array to dispatch', () => {
-			registry.registerReducer( 'counter', ( state = 0, action ) => {
-				return action.type === 'INCREMENT' ? state + 1 : state;
-			} );
-			registry.registerSelectors( 'counter', {
-				getCount: ( state ) => state,
-			} );
-			registry.registerResolvers( 'counter', {
-				getCount: () => [
-					{ type: 'INCREMENT' },
-					Promise.resolve( { type: 'INCREMENT' } ),
-				],
-			} );
-
-			const promise = subscribeUntil( [
-				() => registry.select( 'counter' ).getCount() === 2,
-				() => registry.select( 'core/data' ).hasFinishedResolution( 'counter', 'getCount' ),
-			] );
-
-			registry.select( 'counter' ).getCount();
-
-			return promise;
-		} );
-
-		it( 'should resolve generator action to dispatch', () => {
-			registry.registerReducer( 'demo', ( state = 'NOTOK', action ) => {
-				return action.type === 'SET_OK' ? 'OK' : state;
-			} );
-			registry.registerSelectors( 'demo', {
-				getValue: ( state ) => state,
-			} );
-			registry.registerResolvers( 'demo', {
-				* getValue() {
-					yield { type: 'SET_OK' };
-				},
-			} );
-
-			const promise = subscribeUntil( [
-				() => registry.select( 'demo' ).getValue() === 'OK',
-				() => registry.select( 'core/data' ).hasFinishedResolution( 'demo', 'getValue' ),
-			] );
-
-			registry.select( 'demo' ).getValue();
-
-			return promise;
-		} );
-
 		it( 'should resolve promise action to dispatch', () => {
 			registry.registerReducer( 'demo', ( state = 'NOTOK', action ) => {
 				return action.type === 'SET_OK' ? 'OK' : state;
@@ -311,30 +258,6 @@ describe( 'createRegistry', () => {
 			} );
 		} );
 
-		it( 'should resolve async iterator action to dispatch', () => {
-			registry.registerReducer( 'counter', ( state = 0, action ) => {
-				return action.type === 'INCREMENT' ? state + 1 : state;
-			} );
-			registry.registerSelectors( 'counter', {
-				getCount: ( state ) => state,
-			} );
-			registry.registerResolvers( 'counter', {
-				getCount: async function* () {
-					yield { type: 'INCREMENT' };
-					yield await Promise.resolve( { type: 'INCREMENT' } );
-				},
-			} );
-
-			const promise = subscribeUntil( [
-				() => registry.select( 'counter' ).getCount() === 2,
-				() => registry.select( 'core/data' ).hasFinishedResolution( 'counter', 'getCount' ),
-			] );
-
-			registry.select( 'counter' ).getCount();
-
-			return promise;
-		} );
-
 		it( 'should not dispatch resolved promise action on subsequent selector calls', () => {
 			registry.registerReducer( 'demo', ( state = 'NOTOK', action ) => {
 				return action.type === 'SET_OK' && state === 'NOTOK' ? 'OK' : 'NOTOK';
@@ -350,6 +273,92 @@ describe( 'createRegistry', () => {
 
 			registry.select( 'demo' ).getValue();
 			registry.select( 'demo' ).getValue();
+
+			return promise;
+		} );
+	} );
+
+	describe( 'async generators', () => {
+		it( 'should resolve mixed type action array to dispatch', () => {
+			registry.use( asyncGenerator );
+			const reducer = ( state = 0, action ) => {
+				return action.type === 'INCREMENT' ? state + 1 : state;
+			};
+			const selectors = {
+				getCount: ( state ) => state,
+			};
+			const resolvers = {
+				getCount: () => [
+					{ type: 'INCREMENT' },
+					Promise.resolve( { type: 'INCREMENT' } ),
+				],
+			};
+			registry.registerStore( 'counter', {
+				reducer,
+				selectors,
+				resolvers,
+			} );
+
+			const promise = subscribeUntil( [
+				() => registry.select( 'counter' ).getCount() === 2,
+				() => registry.select( 'core/data' ).hasFinishedResolution( 'counter', 'getCount' ),
+			] );
+
+			registry.select( 'counter' ).getCount();
+
+			return promise;
+		} );
+
+		it( 'should resolve generator action to dispatch', () => {
+			registry.use( asyncGenerator );
+			const reducer = ( state = 'NOTOK', action ) => {
+				return action.type === 'SET_OK' ? 'OK' : state;
+			};
+			const selectors = {
+				getValue: ( state ) => state,
+			};
+			const resolvers = {
+				* getValue() {
+					yield { type: 'SET_OK' };
+				},
+			};
+			registry.registerStore( 'demo', {
+				reducer,
+				selectors,
+				resolvers,
+			} );
+			const promise = subscribeUntil( [
+				() => registry.select( 'demo' ).getValue() === 'OK',
+				() => registry.select( 'core/data' ).hasFinishedResolution( 'demo', 'getValue' ),
+			] );
+
+			registry.select( 'demo' ).getValue();
+
+			return promise;
+		} );
+
+		it( 'should resolve async iterator action to dispatch', () => {
+			registry.use( asyncGenerator );
+			const reducer = ( state = 0, action ) => {
+				return action.type === 'INCREMENT' ? state + 1 : state;
+			};
+			const selectors = {
+				getCount: ( state ) => state,
+			};
+			const resolvers = {
+				getCount: async function* () {
+					yield { type: 'INCREMENT' };
+					yield await Promise.resolve( { type: 'INCREMENT' } );
+				},
+			};
+			registry.registerStore( 'counter', { reducer, selectors, resolvers } );
+
+			const promise = subscribeUntil( [
+				() => registry.select( 'counter' ).getCount() === 2,
+				() => registry.select( 'core/data' ).hasFinishedResolution( 'counter', 'getCount' ),
+			] );
+
+			registry.select( 'counter' ).getCount();
 
 			return promise;
 		} );
@@ -375,20 +384,6 @@ describe( 'createRegistry', () => {
 	} );
 
 	describe( 'subscribe', () => {
-		const unsubscribes = [];
-		afterEach( () => {
-			let unsubscribe;
-			while ( ( unsubscribe = unsubscribes.shift() ) ) {
-				unsubscribe();
-			}
-		} );
-
-		function subscribeWithUnsubscribe( ...args ) {
-			const unsubscribe = registry.subscribe( ...args );
-			unsubscribes.push( unsubscribe );
-			return unsubscribe;
-		}
-
 		it( 'registers multiple selectors to the public API', () => {
 			let incrementedValue = null;
 			const store = registry.registerReducer( 'myAwesomeReducer', ( state = 0 ) => state + 1 );
@@ -484,7 +479,12 @@ describe( 'createRegistry', () => {
 				// representation of the object, the latter applying its
 				// function proxying.
 				expect( _registry ).toMatchObject(
-					mapValues( registry, () => expect.any( Function ) )
+					mapValues( registry, ( value, key ) => {
+						if ( key === 'namespaces' ) {
+							return expect.any( Object );
+						}
+						return expect.any( Function );
+					} )
 				);
 
 				actualOptions = options;
@@ -506,116 +506,5 @@ describe( 'createRegistry', () => {
 
 			expect( registry.select() ).toBe( 10 );
 		} );
-	} );
-} );
-
-describe( 'isActionLike', () => {
-	it( 'returns false if non-action-like', () => {
-		expect( isActionLike( undefined ) ).toBe( false );
-		expect( isActionLike( null ) ).toBe( false );
-		expect( isActionLike( [] ) ).toBe( false );
-		expect( isActionLike( {} ) ).toBe( false );
-		expect( isActionLike( 1 ) ).toBe( false );
-		expect( isActionLike( 0 ) ).toBe( false );
-		expect( isActionLike( Infinity ) ).toBe( false );
-		expect( isActionLike( { type: null } ) ).toBe( false );
-	} );
-
-	it( 'returns true if action-like', () => {
-		expect( isActionLike( { type: 'POW' } ) ).toBe( true );
-	} );
-} );
-
-describe( 'isAsyncIterable', () => {
-	it( 'returns false if not async iterable', () => {
-		expect( isAsyncIterable( undefined ) ).toBe( false );
-		expect( isAsyncIterable( null ) ).toBe( false );
-		expect( isAsyncIterable( [] ) ).toBe( false );
-		expect( isAsyncIterable( {} ) ).toBe( false );
-	} );
-
-	it( 'returns true if async iterable', async () => {
-		async function* getAsyncIterable() {
-			yield new Promise( ( resolve ) => process.nextTick( resolve ) );
-		}
-
-		const result = getAsyncIterable();
-
-		expect( isAsyncIterable( result ) ).toBe( true );
-
-		await result;
-	} );
-} );
-
-describe( 'isIterable', () => {
-	it( 'returns false if not iterable', () => {
-		expect( isIterable( undefined ) ).toBe( false );
-		expect( isIterable( null ) ).toBe( false );
-		expect( isIterable( {} ) ).toBe( false );
-		expect( isIterable( Promise.resolve( {} ) ) ).toBe( false );
-	} );
-
-	it( 'returns true if iterable', () => {
-		function* getIterable() {
-			yield 'foo';
-		}
-
-		const result = getIterable();
-
-		expect( isIterable( result ) ).toBe( true );
-		expect( isIterable( [] ) ).toBe( true );
-	} );
-} );
-
-describe( 'toAsyncIterable', () => {
-	it( 'normalizes async iterable', async () => {
-		async function* getAsyncIterable() {
-			yield await Promise.resolve( { ok: true } );
-		}
-
-		const object = getAsyncIterable();
-		const normalized = toAsyncIterable( object );
-
-		expect( ( await normalized.next() ).value ).toEqual( { ok: true } );
-	} );
-
-	it( 'normalizes promise', async () => {
-		const object = Promise.resolve( { ok: true } );
-		const normalized = toAsyncIterable( object );
-
-		expect( ( await normalized.next() ).value ).toEqual( { ok: true } );
-	} );
-
-	it( 'normalizes object', async () => {
-		const object = { ok: true };
-		const normalized = toAsyncIterable( object );
-
-		expect( ( await normalized.next() ).value ).toEqual( { ok: true } );
-	} );
-
-	it( 'normalizes array of promise', async () => {
-		const object = [ Promise.resolve( { ok: true } ) ];
-		const normalized = toAsyncIterable( object );
-
-		expect( ( await normalized.next() ).value ).toEqual( { ok: true } );
-	} );
-
-	it( 'normalizes mixed array', async () => {
-		const object = [ { foo: 'bar' }, Promise.resolve( { ok: true } ) ];
-		const normalized = toAsyncIterable( object );
-
-		expect( ( await normalized.next() ).value ).toEqual( { foo: 'bar' } );
-		expect( ( await normalized.next() ).value ).toEqual( { ok: true } );
-	} );
-
-	it( 'normalizes generator', async () => {
-		function* getIterable() {
-			yield Promise.resolve( { ok: true } );
-		}
-
-		const object = getIterable();
-		const normalized = toAsyncIterable( object );
-
-		expect( ( await normalized.next() ).value ).toEqual( { ok: true } );
 	} );
 } );

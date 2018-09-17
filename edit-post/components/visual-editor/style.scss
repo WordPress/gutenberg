@@ -89,22 +89,31 @@
 	}
 }
 
-.edit-post-visual-editor .editor-default-block-appender {
-	// Default to centered and content-width, like blocks
-	max-width: $content-width;
-	margin-left: auto;
-	margin-right: auto;
-	position: relative;
+.edit-post-visual-editor {
+	.editor-default-block-appender {
+		// Default to centered and content-width, like blocks
+		max-width: $content-width;
+		margin-left: auto;
+		margin-right: auto;
+		position: relative;
 
-	&[data-root-client-id=""] .editor-default-block-appender__content:hover {
-		// Outline on root-level default block appender is redundant with the
-		// WritingFlow click redirector.
-		outline: 1px solid transparent;
+		&[data-root-client-id=""] .editor-default-block-appender__content:hover {
+			// Outline on root-level default block appender is redundant with the
+			// WritingFlow click redirector.
+			outline: 1px solid transparent;
+		}
+
+		@include break-small() {
+			.editor-default-block-appender__content {
+				padding: 0 $block-padding;
+			}
+		}
 	}
 
-	@include break-small() {
-		.editor-default-block-appender__content {
-			padding: 0 $block-padding;
-		}
+	// Ensure that the height of the first appender, and the one between blocks, is the same as text.
+	.editor-block-list__block[data-type="core/paragraph"] p[data-is-placeholder-visible="true"] + p,
+	.editor-default-block-appender__content {
+		height: $empty-paragraph-height / 2;
+		line-height: $editor-line-height;
 	}
 }

@@ -508,7 +508,7 @@ describe( 'actions', () => {
 			const clientId = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
 			expect( convertBlockToReusable( clientId ) ).toEqual( {
 				type: 'CONVERT_BLOCK_TO_REUSABLE',
-				clientId,
+				clientIds: [ clientId ],
 			} );
 		} );
 	} );

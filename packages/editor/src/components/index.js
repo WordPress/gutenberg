@@ -20,6 +20,7 @@ export { default as PanelColorSettings } from './panel-color-settings';
 export { default as PlainText } from './plain-text';
 export { default as RichText } from './rich-text';
 export { default as RichTextProvider } from './rich-text/provider';
+export { default as ServerSideRender } from './server-side-render';
 export { default as MediaPlaceholder } from './media-placeholder';
 export { default as MediaUpload } from './media-upload';
 export { default as URLInput } from './url-input';
