@@ -23,13 +23,14 @@ class ParagraphEdit extends Component {
 
 		const {
 			placeholder,
+			content,
 		} = attributes;
 
 		return (
 			<View>
 				<RichText
 					tagName="p"
-					content={ { contentTree: attributes.content } }
+					value={ content }
 					style={ {
 						...style,
 						minHeight: Math.max( minHeight, typeof attributes.aztecHeight === 'undefined' ? 0 : attributes.aztecHeight ),

@@ -72,6 +72,38 @@ Returns an array with the child blocks of a given block.
 
 Array of child block names.
 
+### getBlockSupport
+
+Returns the block support value for a feature, if defined.
+
+*Parameters*
+
+ * state: Data state.
+ * nameOrType: Block name or type object
+ * feature: Feature to retrieve
+ * defaultSupports: Default value to return if not
+                                          explicitly defined
+
+*Returns*
+
+Block support value
+
+### hasBlockSupport
+
+Returns true if the block defines support for a feature, or false otherwise.
+
+*Parameters*
+
+ * state: Data state.
+ * nameOrType: Block name or type object.
+ * feature: Feature to test.
+ * defaultSupports: Whether feature is supported by
+                                         default if not explicitly defined.
+
+*Returns*
+
+Whether block supports feature.
+
 ### hasChildBlocks
 
 Returns a boolean indicating if a block has child blocks or not.
@@ -84,6 +116,20 @@ Returns a boolean indicating if a block has child blocks or not.
 *Returns*
 
 True if a block contains child blocks and false otherwise.
+
+### hasChildBlocksWithInserterSupport
+
+Returns a boolean indicating if a block has at least one child block with inserter support.
+
+*Parameters*
+
+ * state: Data state.
+ * blockName: Block type name.
+
+*Returns*
+
+True if a block contains at least one child blocks with inserter support
+                  and false otherwise.
 
 ## Actions
 

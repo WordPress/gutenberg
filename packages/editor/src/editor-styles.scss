@@ -1,11 +1,11 @@
 .wp-block {
-	width: 610px;
+	width: $content-width;
 }
 
 body {
 	font-family: $editor-font;
 	line-height: $editor-line-height;
-	color: $dark-gray-700;
+	color: $dark-gray-900;
 	font-size: $editor-font-size;
 }
 
