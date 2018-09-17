@@ -44,7 +44,7 @@ export class RichText extends Component {
 	}
 
 	// eslint-disable-next-line no-unused-vars
-	onHTMLContentWithCursor( contentWithCursor ) {
+	onHTMLContentWithCursor( htmlText, cursorPosition ) {
 		// Descriptive placeholder: This logic still needs to be implemented.
 	}
 
