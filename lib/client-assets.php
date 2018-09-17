@@ -1317,41 +1317,32 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'after'
 	);
 
-	// Prepopulate with some test content in demo.
+	// Assign initial edits, if applicable. These are not initially assigned
+	// to the persisted post, but should be included in its save payload.
 	if ( $is_new_post && $is_demo ) {
+		// Prepopulate with some test content in demo.
 		ob_start();
 		include gutenberg_dir_path() . 'post-content.php';
 		$demo_content = ob_get_clean();
 
-		wp_add_inline_script(
-			'wp-edit-post',
-			sprintf(
-				'window._wpGutenbergDefaultPost = { title: %s, content: %s };',
-				wp_json_encode(
-					array(
-						'raw' => __( 'Welcome to the Gutenberg Editor', 'gutenberg' ),
-					)
-				),
-				wp_json_encode(
-					array(
-						'raw' => $demo_content,
-					)
-				)
-			)
+		$initial_edits = array(
+			'title'   => array(
+				'raw' => __( 'Welcome to the Gutenberg Editor', 'gutenberg' ),
+			),
+			'content' => array(
+				'raw' => $demo_content,
+			),
 		);
 	} elseif ( $is_new_post ) {
-		wp_add_inline_script(
-			'wp-edit-post',
-			sprintf(
-				'window._wpGutenbergDefaultPost = { title: %s };',
-				wp_json_encode(
-					array(
-						'raw'      => '',
-						'rendered' => apply_filters( 'the_title', '', $post->ID ),
-					)
-				)
-			)
+		// Override "(Auto Draft)" new post default title with empty string,
+		// or filtered value.
+		$initial_edits = array(
+			'title' => array(
+				'raw' => apply_filters( 'the_title', '', $post->ID ),
+			),
 		);
+	} else {
+		$initial_edits = null;
 	}
 
 	// Prepare Jed locale data.
@@ -1489,10 +1480,9 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	$init_script = <<<JS
 	( function() {
-		var editorSettings = %s;
 		window._wpLoadGutenbergEditor = new Promise( function( resolve ) {
 			wp.domReady( function() {
-				resolve( wp.editPost.initializeEditor( 'editor', "%s", %d, editorSettings, window._wpGutenbergDefaultPost ) );
+				resolve( wp.editPost.initializeEditor( 'editor', "%s", %d, %s, %s ) );
 			} );
 		} );
 } )();
@@ -1508,7 +1498,13 @@ JS;
 	 */
 	$editor_settings = apply_filters( 'block_editor_settings', $editor_settings, $post );
 
-	$script = sprintf( $init_script, wp_json_encode( $editor_settings ), $post->post_type, $post->ID );
+	$script = sprintf(
+		$init_script,
+		$post->post_type,
+		$post->ID,
+		wp_json_encode( $editor_settings ),
+		wp_json_encode( $initial_edits )
+	);
 	wp_add_inline_script( 'wp-edit-post', $script );
 
 	/**
