@@ -198,5 +198,17 @@ describe( 'splitting and merging blocks', () => {
 
 		// But the effective saved content is still empty:
 		expect( await getEditedPostContent() ).toBe( '' );
+
+		// And focus is retained:
+		const isInDefaultBlock = await page.evaluate( () => {
+			const activeBlockName = document.activeElement
+				.closest( '[data-type]' )
+				.getAttribute( 'data-type' );
+			const defaultBlockName = window.wp.blocks.getDefaultBlockName();
+
+			return activeBlockName === defaultBlockName;
+		} );
+
+		expect( isInDefaultBlock ).toBe( true );
 	} );
 } );
