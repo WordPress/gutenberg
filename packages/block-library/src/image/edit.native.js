@@ -75,7 +75,8 @@ class ImageEdit extends Component {
 	}
 
 	render() {
-		const { url, width, height } = this.props.attributes;
+		const { attributes, isSelected } = this.props;
+		const { url, width, height } = attributes;
 
 		if ( ! url ) {
 			return (
@@ -96,7 +97,8 @@ class ImageEdit extends Component {
 			imageWidth = width;
 		}
 
-		const sizeControlls = (
+		// sizeControls is for tests pruposes only. It will be replaced when the 
+		const sizeControls = (
 			<View style={{flexDirection: 'row', justifyContent: "center", flex: 1}}>
 				<View style={{padding: 5, flexDirection: 'row', flex: 1}}>
 					<Text>Width: </Text>
@@ -119,14 +121,14 @@ class ImageEdit extends Component {
 
 		return (
 			<View>
-			{ sizeControlls }
-			<View style={ { flex: 1 } } onLayout={this.onLayout}>
-				<Image
-					style={ { height: imageHeight, width: imageWidth } }
-					resizeMethod="scale"
-					source={ { uri: url } }
-				/>
-			</View>
+				{ isSelected ? sizeControls : null }
+				<View style={ { flex: 1 } } onLayout={this.onLayout}>
+					<Image
+						style={ { height: imageHeight, width: imageWidth } }
+						resizeMethod="scale"
+						source={ { uri: url } }
+					/>
+				</View>
 			</View>
 		);
 	}
