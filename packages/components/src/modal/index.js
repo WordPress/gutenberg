@@ -9,6 +9,7 @@ import { noop } from 'lodash';
  */
 import { Component, createPortal } from '@wordpress/element';
 import { withInstanceId } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -135,7 +136,8 @@ class Modal extends Component {
 			'components-modal-header-' + instanceId
 		);
 
-		// Disable reason: this stops mouse events from triggering tooltips and other elements underneath the modal overlay
+		// Disable reason: this stops mouse events from triggering tooltips and
+		// other elements underneath the modal overlay.
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return createPortal(
 			<div
@@ -152,17 +154,22 @@ class Modal extends Component {
 						labelledby: title ? headingId : null,
 						describedby: aria.describedby,
 					} }
-					{ ...otherProps } >
-					<ModalHeader
-						closeLabel={ closeButtonLabel }
-						isDismissable={ isDismissable }
-						onClose={ onRequestClose }
-						title={ title }
-						headingId={ headingId }
-						icon={ icon }
-					/>
+					{ ...otherProps }
+				>
 					<div
-						className={ 'components-modal__content' }>
+						className={ 'components-modal__content' }
+						role="region"
+						aria-label={ __( 'Dialog Contents' ) }
+						tabIndex="0"
+					>
+						<ModalHeader
+							closeLabel={ closeButtonLabel }
+							headingId={ headingId }
+							icon={ icon }
+							isDismissable={ isDismissable }
+							onClose={ onRequestClose }
+							title={ title }
+						/>
 						{ children }
 					</div>
 				</ModalFrame>

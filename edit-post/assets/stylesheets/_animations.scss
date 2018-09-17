@@ -65,10 +65,10 @@
 
 @keyframes modal-appear {
 	from {
-		transform: translate(-50%, -20%);
+		margin-top: $grid-size * 4;
 	}
 	to {
-		transform: translate(-50%, -30%); // Matches the starting state of the Modal.
+		margin-top: 0;
 	}
 }
 

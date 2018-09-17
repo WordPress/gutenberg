@@ -14,8 +14,10 @@
 
 // The modal window element.
 .components-modal__frame {
-	// Animate appearance.
-	@include modal_appear();
+	border: $border-width solid $light-gray-500;
+	background-color: $white;
+	box-shadow: $shadow-modal;
+	outline: none;
 
 	// In small screens the content needs to be full width.
 	position: fixed;
@@ -36,6 +38,9 @@
 		top: $panel-padding;
 		left: 50%;
 		height: 90%;
+
+		// Animate appearance.
+		@include modal_appear();
 	}
 
 	// Show pretty big on desktop breakpoints.
@@ -46,50 +51,61 @@
 		left: 50%;
 		height: 70%;
 	}
-
-	border: $border-width solid $light-gray-500;
-	background-color: $white;
-	box-shadow: $shadow-modal;
-	outline: none;
 }
 
+// Fix heading to the top.
 .components-modal__header {
 	box-sizing: border-box;
-	height: $header-height;
 	border-bottom: $border-width solid $light-gray-500;
-	padding: $item-spacing $item-spacing $item-spacing $panel-padding;
+	padding: 0 0 $grid-size 0;
 	display: flex;
 	flex-direction: row;
 	align-items: stretch;
 	justify-content: space-between;
-}
+	position: fixed;
+	top: 0;
+	background: $white;
+	width: calc(100% - #{$panel-padding + $panel-padding});
+	height: $header-height;
+	padding: $item-spacing 0;
 
-.components-modal__header-heading-container {
-	align-items: center;
-	flex-grow: 1;
-	display: flex;
-	flex-direction: row;
-	justify-content: left;
-}
+	.components-modal__header-heading {
+		font-size: 1em;
+		font-weight: normal;
+	}
 
-.components-modal__header-heading {
-	font-size: 1em;
-	font-weight: normal;
-}
+	.components-modal__header-heading-container {
+		align-items: center;
+		flex-grow: 1;
+		display: flex;
+		flex-direction: row;
+		justify-content: left;
+	}
 
-.components-modal__header-icon-container {
-	display: inline-block;
+	.components-modal__header-icon-container {
+		display: inline-block;
 
-	svg {
-		max-width: $icon-button-size;
-		max-height: $icon-button-size;
-		padding: 8px;
+		svg {
+			max-width: $icon-button-size;
+			max-height: $icon-button-size;
+			padding: 8px;
+		}
+	}
+
+	h1 {
+		line-height: 1;
+		margin: 0;
 	}
 }
 
+// Modal contents.
 .components-modal__content {
-	// The height of the content is the height of it's parent, minus the header. after that, the offset was 3px.
-	height: 100%;
+	box-sizing: border-box;
 	overflow: auto;
-	padding: $panel-padding;
+	height: 100%;
+	padding: ($header-height+$panel-padding) $panel-padding $panel-padding $panel-padding;
+
+	&:focus {
+		outline: $border-width solid $dark-gray-500;
+	}
 }
