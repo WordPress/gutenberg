@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Image } from 'react-native';
+import { View, Image, TextInput } from 'react-native';
 
 /**
  * Internal dependencies
@@ -14,6 +14,9 @@ class ImageEdit extends Component {
 
 	constructor() {
 		super( ...arguments );
+		this.updateWidth = this.updateWidth.bind( this );
+		this.updateHeight = this.updateHeight.bind( this );
+
 		this.state = {
 			height: 0,
 			width: 0,
@@ -32,10 +35,7 @@ class ImageEdit extends Component {
 	}
 
 	calculateImageDimentions = () => {
-		console.log('calculateImageDimentions')
-
 		if (this.image === undefined || this.clientWidth === undefined) {
-			console.log('false')
 			return;
 		}
 
@@ -65,6 +65,15 @@ class ImageEdit extends Component {
 		//TODO: Implement media library method.
 	};
 
+	updateWidth( width ) {
+		console.log(width);
+		this.props.setAttributes( { width: parseInt( width, 10 ) } );
+	}
+
+	updateHeight( height ) {
+		this.props.setAttributes( { height: parseInt( height, 10 ) } );
+	}
+
 	render() {
 		const { url, width, height } = this.props.attributes;
 
@@ -77,14 +86,39 @@ class ImageEdit extends Component {
 			);
 		}
 
-		console.log('Rendering');
+		const sizeControlls = (
+			<View style={{flexDirection: 'row', flexDirection: 'row'}}>
+				<TextInput 
+					placeholder='Width'
+					onChangeText = { this.updateWidth }
+				/>
+				<TextInput 
+					placeholder='Height'
+					onChangeText = { this.updateHeight }
+				/>
+			</View>
+		)
+
+		let imageHeight = this.state.height;
+		if (height > 0 && height < imageHeight) {
+			imageHeight = height;
+		}
+
+		let imageWidth = this.state.width;
+		if (width > 0 && width < imageWidth) {
+			imageWidth = width;
+		}
+
 		return (
+			<View>
+			{ sizeControlls }
 			<View style={ { flex: 1 } } onLayout={this.onLayout}>
 				<Image
-					style={ { width: this.state.width, height: this.state.height } }
+					style={ { height: imageHeight, width: imageWidth } }
 					resizeMethod="scale"
 					source={ { uri: url } }
 				/>
+			</View>
 			</View>
 		);
 	}
