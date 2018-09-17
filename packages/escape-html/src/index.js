@@ -52,6 +52,17 @@ export function escapeLessThan( value ) {
 }
 
 /**
+ * Returns a string with grater-than sign replaced.
+ *
+ * @param {string} value Original string.
+ *
+ * @return {string} Escaped string.
+ */
+export function escapeGreaterThan( value ) {
+	return value.replace( />/g, '&gt;' );
+}
+
+/**
  * Returns an escaped attribute value.
  *
  * @link https://w3c.github.io/html/syntax.html#elements-attributes
@@ -64,7 +75,7 @@ export function escapeLessThan( value ) {
  * @return {string} Escaped attribute value.
  */
 export function escapeAttribute( value ) {
-	return escapeQuotationMark( escapeAmpersand( value ) );
+	return escapeGreaterThan( escapeQuotationMark( escapeAmpersand( value ) ) );
 }
 
 /**

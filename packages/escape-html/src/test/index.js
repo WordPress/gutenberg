@@ -5,10 +5,18 @@ import {
 	escapeAmpersand,
 	escapeQuotationMark,
 	escapeLessThan,
+	escapeGreaterThan,
 	escapeAttribute,
 	escapeHTML,
 	isValidAttributeName,
 } from '../';
+
+function testEscapeGreaterThan( implementation ) {
+	it( 'should escape greater than', () => {
+		const result = implementation( 'Chicken > Ribs' );
+		expect( result ).toBe( 'Chicken &gt; Ribs' );
+	} );
+}
 
 function testEscapeAmpersand( implementation ) {
 	it( 'should escape ampersand', () => {
@@ -46,9 +54,14 @@ describe( 'escapeLessThan', () => {
 	testEscapeLessThan( escapeLessThan );
 } );
 
+describe( 'escapeGreaterThan', () => {
+	testEscapeGreaterThan( escapeGreaterThan );
+} );
+
 describe( 'escapeAttribute', () => {
 	testEscapeAmpersand( escapeAttribute );
 	testEscapeQuotationMark( escapeAttribute );
+	testEscapeGreaterThan( escapeAttribute );
 } );
 
 describe( 'escapeHTML', () => {
