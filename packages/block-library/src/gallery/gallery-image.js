@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress Dependencies
  */
 import { Component } from '@wordpress/element';
-import { IconButton, Spinner } from '@wordpress/components';
+import { IconButton, Spinner, Dashicon, Draggable } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { withSelect } from '@wordpress/data';
@@ -85,7 +85,9 @@ class GalleryImage extends Component {
 	}
 
 	render() {
-		const { url, alt, id, linkTo, link, isSelected, caption, onRemove, setAttributes } = this.props;
+		const { url, alt, id, dragId, linkTo, link, isSelected, caption, onRemove, setAttributes } = this.props;
+
+		const transferData = { message: 'message' };
 
 		let href;
 
@@ -113,13 +115,33 @@ class GalleryImage extends Component {
 		return (
 			<figure className={ className } tabIndex="-1" onKeyDown={ this.onKeyDown } ref={ this.bindContainer }>
 				{ isSelected &&
-					<div className="block-library-gallery-item__inline-menu">
-						<IconButton
-							icon="no-alt"
-							onClick={ onRemove }
-							className="blocks-gallery-item__remove"
-							label={ __( 'Remove Image' ) }
-						/>
+					<div>
+						<div className="block-library-gallery-item__inline-menu">
+							<IconButton
+								icon="no-alt"
+								onClick={ onRemove }
+								className="blocks-gallery-item__remove"
+								label={ __( 'Remove Image' ) }
+							/>
+						</div>
+						<div className="block-library-gallery-item__inline-move">
+							<Draggable
+								elementId={ dragId }
+								transferData={ transferData }
+							>
+								{
+									( { onDraggableStart, onDraggableEnd } ) => (
+										<Dashicon
+											icon="move"
+											onDragStart={ onDraggableStart }
+											onDragEnd={ onDraggableEnd }
+											className="blocks-gallery-item__remove"
+											draggable
+										/>
+									)
+								}
+							</Draggable>
+						</div>
 					</div>
 				}
 				{ href ? <a href={ href }>{ img }</a> : img }

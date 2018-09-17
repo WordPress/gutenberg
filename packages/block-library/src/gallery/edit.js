@@ -154,7 +154,7 @@ class GalleryEdit extends Component {
 	}
 
 	render() {
-		const { attributes, isSelected, className, noticeOperations, noticeUI } = this.props;
+		const { attributes, isSelected, className, noticeOperations, noticeUI, clientId } = this.props;
 		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
 
 		const dropZone = (
@@ -238,20 +238,22 @@ class GalleryEdit extends Component {
 				{ noticeUI }
 				<ul className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
 					{ dropZone }
-					{ images.map( ( img, index ) => (
-						<li className="blocks-gallery-item" key={ img.id || img.url }>
+					{ images.map( ( img, index ) => {
+						const imageId = `gallery_image_${ clientId }_${ img.id }`;
+						return <li id={ imageId } className="blocks-gallery-item" key={ img.id || img.url }>
 							<GalleryImage
 								url={ img.url }
 								alt={ img.alt }
 								id={ img.id }
+								dragId={ imageId }
 								isSelected={ isSelected && this.state.selectedImage === index }
 								onRemove={ this.onRemoveImage( index ) }
 								onSelect={ this.onSelectImage( index ) }
 								setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
 								caption={ img.caption }
 							/>
-						</li>
-					) ) }
+						</li>;
+					} ) }
 					{ isSelected &&
 						<li className="blocks-gallery-item has-add-item-button">
 							<FormFileUpload

@@ -104,7 +104,19 @@
 	}
 }
 
+.block-library-gallery-item__inline-move {
+	padding: 2px;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: theme(primary);
+	display: inline-flex;
+	z-index: z-index(".block-library-gallery-item__inline-menu");
+}
+
 .blocks-gallery-item__remove {
+	color: $white;
+	cursor: grab;
 	padding: 0;
 }
 
