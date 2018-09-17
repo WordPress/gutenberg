@@ -136,6 +136,12 @@ export async function newPost( { postType, enableTips = false } = {} ) {
 	}
 }
 
+export async function disablePrePublishChecks( ) {
+	await page.click( '.edit-post-more-menu' );
+	await page.waitForSelector( '.components-popover__content' );
+	await page.click( '.components-popover__content > .components-menu-group:nth-child(3) button:nth-child(3)' );
+}
+
 export async function setViewport( type ) {
 	const allowedDimensions = {
 		large: { width: 960, height: 700 },
@@ -291,6 +297,17 @@ export async function publishPost() {
 	await page.click( '.editor-post-publish-button' );
 
 	// A success notice should show up
+	return page.waitForSelector( '.components-notice.is-success' );
+}
+
+/**
+ * Publishes the post without the pre-publish checks,
+ * resolving once the request is complete (once a notice is displayed).
+ *
+ * @return {Promise} Promise resolving when publish is complete.
+ */
+export async function publishPostWithoutPrePublishChecks() {
+	await page.click( '.editor-post-publish-button' );
 	return page.waitForSelector( '.components-notice.is-success' );
 }
 
