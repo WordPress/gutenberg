@@ -54,8 +54,6 @@ class KSES_Test extends WP_UnitTestCase {
 	function kses_test_filenames() {
 		self::$fixtures_dir = dirname( dirname( __FILE__ ) ) . '/test/integration/full-content/fixtures';
 
-		require_once dirname( dirname( __FILE__ ) ) . '/lib/parser.php';
-
 		// Exclude fixtures that would require admin to save,
 		// and so wouldn't go through kses.
 		$fixture_files = array_filter(
