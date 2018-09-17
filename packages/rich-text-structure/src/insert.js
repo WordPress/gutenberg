@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+
+import { create } from './create';
+
+/**
  * Inserts the second given record into the first.
  * The value in between the start and end indices will be removed.
  * If no start index or end index is provided, the record's selection will be
@@ -17,6 +23,10 @@ export function insert(
 	startIndex = start,
 	endIndex = end
 ) {
+	if ( typeof recordToInsert === 'string' ) {
+		recordToInsert = create( recordToInsert );
+	}
+
 	const index = startIndex + recordToInsert.text.length;
 
 	return {

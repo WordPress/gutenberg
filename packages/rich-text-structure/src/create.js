@@ -41,7 +41,15 @@ function getEmptyRecord() {
  */
 export function create( element, range, multilineTag, settings ) {
 	if ( typeof element === 'string' ) {
-		element = createElement( element );
+		if ( element.indexOf( '<' ) !== -1 || /[^\s]+;/.test( element ) ) {
+			// May be HTML.
+			element = createElement( element );
+		} else {
+			return {
+				formats: Array( element.length ),
+				text: element,
+			};
+		}
 	}
 
 	if ( ! multilineTag ) {

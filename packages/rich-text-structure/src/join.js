@@ -1,4 +1,10 @@
 /**
+ * Internal dependencies
+ */
+
+import { create } from './create';
+
+/**
  * Combines the given records into one record, separated by the given record or
  * text.
  *
@@ -9,15 +15,12 @@
  *
  * @return {Object} A new combined record.
  */
-export function join( records, separator ) {
-	return records.reduce( ( accumlator, { formats, text } ) => {
-		if ( typeof separator === 'string' ) {
-			separator = {
-				formats: Array( separator.length ),
-				text: separator,
-			};
-		}
+export function join( records, separator = '' ) {
+	if ( typeof separator === 'string' ) {
+		separator = create( separator );
+	}
 
+	return records.reduce( ( accumlator, { formats, text } ) => {
 		return {
 			text: accumlator.text + separator.text + text,
 			formats: accumlator.formats.concat( separator.formats, formats ),

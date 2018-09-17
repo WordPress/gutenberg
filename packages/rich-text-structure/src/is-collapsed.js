@@ -3,7 +3,8 @@
  *
  * @param {Object} record The rich text record to check.
  *
- * @return {boolean} True if the selection is collapsed, false if not.
+ * @return {?boolean} True if the selection is collapsed, false if not,
+ *                    undefined if there is no selection.
  */
 export function isCollapsed( { start, end } ) {
 	if ( start === undefined || end === undefined ) {

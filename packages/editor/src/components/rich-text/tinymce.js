@@ -175,6 +175,10 @@ export default class TinyMCE extends Component {
 	bindEditorNode( editorNode ) {
 		this.editorNode = editorNode;
 
+		if ( this.props.setRef ) {
+			this.props.setRef( editorNode );
+		}
+
 		/**
 		 * A ref function can be used for cleanup because React calls it with
 		 * `null` when unmounting.
