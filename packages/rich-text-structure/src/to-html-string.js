@@ -50,7 +50,7 @@ export function toHTMLString( record, multilineTag ) {
 			} );
 		}
 
-		if ( character ) {
+		if ( character !== '\ufffc' ) {
 			if ( character === '\n' ) {
 				pointer = append( pointer.parent, { type: 'br', object: true } );
 			} else if ( pointer.text === undefined ) {

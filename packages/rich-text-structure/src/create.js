@@ -233,6 +233,8 @@ function createRecord( element, range, settings = {} ) {
 
 		if ( format && format.attributes && text.length === 0 ) {
 			format.object = true;
+			// Object replacement character.
+			accumulator.text += '\ufffc';
 
 			if ( formats[ start ] ) {
 				formats[ start ].unshift( format );

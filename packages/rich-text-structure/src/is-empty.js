@@ -5,6 +5,6 @@
  *
  * @return {boolean} True if the record is empty, false if not.
  */
-export function isEmpty( { text, formats } ) {
-	return text.length === 0 && formats.length === 0;
+export function isEmpty( { text } ) {
+	return text.length === 0;
 }

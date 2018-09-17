@@ -203,7 +203,7 @@ describe( 'create', () => {
 				start: 0,
 				end: 0,
 				formats: [ [ img ] ],
-				text: '',
+				text: '\ufffc',
 			},
 		},
 		{
@@ -219,7 +219,7 @@ describe( 'create', () => {
 				start: 0,
 				end: 1,
 				formats: [ [ em, img ] ],
-				text: '',
+				text: '\ufffc',
 			},
 		},
 		{
@@ -233,9 +233,9 @@ describe( 'create', () => {
 			} ),
 			record: {
 				start: 0,
-				end: 4,
+				end: 5,
 				formats: [ , , [ em ], [ em ], [ em, img ] ],
-				text: 'test',
+				text: 'test\ufffc',
 			},
 		},
 		{
@@ -249,9 +249,9 @@ describe( 'create', () => {
 			} ),
 			record: {
 				start: 0,
-				end: 4,
+				end: 5,
 				formats: [ [ em, img ], [ em ], [ em ], , , ],
-				text: 'test',
+				text: '\ufffctest',
 			},
 		},
 		{

@@ -19,14 +19,7 @@ describe( 'isEmpty', () => {
 			formats: [],
 			text: 'test',
 		};
-		const two = {
-			formats: [
-				[ { type: 'image' } ],
-			],
-			text: '',
-		};
 
 		expect( isEmpty( one ) ).toBe( false );
-		expect( isEmpty( two ) ).toBe( false );
 	} );
 } );

@@ -101,7 +101,7 @@ export function recordToDom( { formats, text, start, end }, tag ) {
 			} );
 		}
 
-		if ( character ) {
+		if ( character !== '\ufffc' ) {
 			if ( character === '\n' ) {
 				pointer = pointer.parentNode.appendChild( htmlDocument.createElement( 'br' ) );
 			} else if ( pointer.nodeType === TEXT_NODE ) {

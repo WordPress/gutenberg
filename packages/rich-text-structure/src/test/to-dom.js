@@ -59,7 +59,7 @@ describe( 'recordToDom', () => {
 		expect( body.innerHTML ).toEqual( node.innerHTML );
 		expect( selection ).toEqual( {
 			startPath: [ 1, 0, 1 ],
-			endPath: [ 3, 0, 5 ],
+			endPath: [ 3, 2, 0 ],
 		} );
 	} );
 
