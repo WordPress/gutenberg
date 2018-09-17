@@ -218,10 +218,16 @@ public class ReactAztecText extends AztecText {
     void emitHTMLWithCursorEvent() {
         disableTextChangedListener();
         String content = toPlainHtml(true);
+        int cursorPosition = content.indexOf("aztec_cursor");
+        if (cursorPosition != -1) {
+            content = content.replaceFirst("aztec_cursor", "");
+        } else {
+            cursorPosition = 0; // Something went wrong in Aztec - default to 0 if not found.
+        }
         enableTextChangedListener();
         ReactContext reactContext = (ReactContext) getContext();
         EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
-        eventDispatcher.dispatchEvent(new ReactAztecHtmlWithCursorEvent( getId(), content));
+        eventDispatcher.dispatchEvent(new ReactAztecHtmlWithCursorEvent( getId(), content, cursorPosition));
     }
 
     public void applyFormat(String format) {

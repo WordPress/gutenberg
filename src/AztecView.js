@@ -67,10 +67,11 @@ class AztecView extends React.Component {
     if (!this.props.onHTMLContentWithCursor) {
       return;
     }
-
+    
+    const text = event.nativeEvent.text;
+    const cursorPosition = event.nativeEvent.cursorPosition;
     const { onHTMLContentWithCursor } = this.props;
-    const contentWithCursor = event.nativeEvent.text;
-    onHTMLContentWithCursor(contentWithCursor);
+    onHTMLContentWithCursor(text, cursorPosition);
   }
 
   render() {
