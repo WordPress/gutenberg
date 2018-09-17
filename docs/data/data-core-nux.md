@@ -1,6 +1,16 @@
-# **core/nux**: The NUX (New User Experience) module Data
+# **core/nux**: The NUX (New User Experience) Data
 
-## Selectors 
+## Selectors
+
+### getAssociatedGuide
+
+Returns an object describing the guide, if any, that the given tip is a part
+of.
+
+*Parameters*
+
+ * state: Global application state.
+ * tipId: The tip to query.
 
 ### isTipVisible
 
@@ -11,7 +21,11 @@ guide that they have been added to.
 *Parameters*
 
  * state: Global application state.
- * id: The tip to query.
+ * tipId: The tip to query.
+
+*Returns*
+
+Whether or not the given tip is showing.
 
 ### areTipsEnabled
 

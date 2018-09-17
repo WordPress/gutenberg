@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/deprecated",
-	"version": "1.0.0-alpha.2",
-	"description": "Deprecation utility for WordPress",
+	"version": "2.0.0",
+	"description": "Deprecation utility for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
@@ -18,6 +18,10 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"dependencies": {
+		"@babel/runtime": "^7.0.0",
+		"@wordpress/hooks": "file:../hooks"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

@@ -7,24 +7,13 @@ import { withSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import MetaBoxesArea from './meta-boxes-area';
-import MetaBoxesPanel from './meta-boxes-panel';
 
-function MetaBoxes( { location, isActive, usePanel = false } ) {
+function MetaBoxes( { location, isActive } ) {
 	if ( ! isActive ) {
 		return null;
 	}
 
-	const element = <MetaBoxesArea location={ location } />;
-
-	if ( ! usePanel ) {
-		return element;
-	}
-
-	return (
-		<MetaBoxesPanel>
-			{ element }
-		</MetaBoxesPanel>
-	);
+	return <MetaBoxesArea location={ location } />;
 }
 
 export default withSelect(

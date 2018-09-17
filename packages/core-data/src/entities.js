@@ -6,7 +6,7 @@ import { upperFirst, camelCase, map, find } from 'lodash';
 /**
  * WordPress dependencies
  */
-import apiRequest from '@wordpress/api-request';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -15,13 +15,14 @@ import { getEntitiesByKind } from './selectors';
 import { addEntities } from './actions';
 
 export const defaultEntities = [
-	{ name: 'postType', kind: 'root', key: 'slug', baseUrl: '/wp/v2/types' },
-	{ name: 'media', kind: 'root', baseUrl: '/wp/v2/media', plural: 'mediaItems' },
-	{ name: 'taxonomy', kind: 'root', key: 'slug', baseUrl: '/wp/v2/taxonomies', plural: 'taxonomies' },
+	{ name: 'postType', kind: 'root', key: 'slug', baseURL: '/wp/v2/types' },
+	{ name: 'media', kind: 'root', baseURL: '/wp/v2/media', plural: 'mediaItems' },
+	{ name: 'taxonomy', kind: 'root', key: 'slug', baseURL: '/wp/v2/taxonomies', plural: 'taxonomies' },
 ];
 
 export const kinds = [
 	{ name: 'postType', loadEntities: loadPostTypeEntities },
+	{ name: 'taxonomy', loadEntities: loadTaxonomyEntities },
 ];
 
 /**
@@ -30,11 +31,27 @@ export const kinds = [
  * @return {Promise} Entities promise
  */
 async function loadPostTypeEntities() {
-	const postTypes = await apiRequest( { path: '/wp/v2/types?context=edit' } );
+	const postTypes = await apiFetch( { path: '/wp/v2/types?context=edit' } );
 	return map( postTypes, ( postType, name ) => {
 		return {
 			kind: 'postType',
-			baseUrl: '/wp/v2/' + postType.rest_base,
+			baseURL: '/wp/v2/' + postType.rest_base,
+			name,
+		};
+	} );
+}
+
+/**
+ * Returns the list of the taxonomies entities.
+ *
+ * @return {Promise} Entities promise
+ */
+async function loadTaxonomyEntities() {
+	const taxonomies = await apiFetch( { path: '/wp/v2/taxonomies?context=edit' } );
+	return map( taxonomies, ( taxonomy, name ) => {
+		return {
+			kind: 'taxonomy',
+			baseURL: '/wp/v2/' + taxonomy.rest_base,
 			name,
 		};
 	} );

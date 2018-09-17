@@ -1,0 +1,26 @@
+.wp-block-video {
+	// Remove the left and right margin the figure is born with.
+	margin-left: 0;
+	margin-right: 0;
+
+	video {
+		max-width: 100%;
+	}
+
+	@supports (position: sticky) {
+		[poster] {
+			object-fit: cover;
+		}
+	}
+
+	&.aligncenter {
+		text-align: center;
+	}
+
+	// Supply caption styles to videos, even if the theme hasn't opted in.
+	// Reason being: the new markup, <figcaptions>, are not likely to be styled in the majority of existing themes,
+	// so we supply the styles so as to not appear broken or unstyled in those themes.
+	figcaption {
+		@include caption-style();
+	}
+}

@@ -12,12 +12,12 @@ import {
 	rawHandler,
 	serialize,
 } from '@wordpress/blocks';
-import { registerCoreBlocks } from '@wordpress/core-blocks';
+import { registerCoreBlocks } from '@wordpress/block-library';
 
 describe( 'Blocks raw handling', () => {
 	beforeAll( () => {
 		// Load all hooks that modify blocks
-		require( 'editor/hooks' );
+		require( '../../packages/editor/src/hooks' );
 		registerCoreBlocks();
 	} );
 
@@ -28,6 +28,7 @@ describe( 'Blocks raw handling', () => {
 		} );
 
 		expect( filtered ).toBe( '<em>test</em>' );
+		expect( console ).toHaveLogged();
 	} );
 
 	it( 'should parse Markdown', () => {
@@ -37,7 +38,8 @@ describe( 'Blocks raw handling', () => {
 			mode: 'AUTO',
 		} ).map( getBlockContent ).join( '' );
 
-		expect( filtered ).toBe( '<ul>\n\t<li>one</li>\n\t<li>two</li>\n\t<li>three</li>\n</ul>' );
+		expect( filtered ).toBe( '<ul><li>one</li><li>two</li><li>three</li></ul>' );
+		expect( console ).toHaveLogged();
 	} );
 
 	it( 'should parse inline Markdown', () => {
@@ -48,6 +50,7 @@ describe( 'Blocks raw handling', () => {
 		} );
 
 		expect( filtered ).toBe( 'Some <strong>bold</strong> text.' );
+		expect( console ).toHaveLogged();
 	} );
 
 	it( 'should parse HTML in plainText', () => {
@@ -58,6 +61,7 @@ describe( 'Blocks raw handling', () => {
 		} ).map( getBlockContent ).join( '' );
 
 		expect( filtered ).toBe( '<p>Some <strong>bold</strong> text.</p>' );
+		expect( console ).toHaveLogged();
 	} );
 
 	it( 'should parse Markdown with HTML', () => {
@@ -68,6 +72,7 @@ describe( 'Blocks raw handling', () => {
 		} ).map( getBlockContent ).join( '' );
 
 		expect( filtered ).toBe( '<h1>Some <em>heading</em></h1>' );
+		expect( console ).toHaveLogged();
 	} );
 
 	it( 'should break up forced inline content', () => {
@@ -77,6 +82,7 @@ describe( 'Blocks raw handling', () => {
 		} );
 
 		expect( filtered ).toBe( 'test<br>test' );
+		expect( console ).toHaveLogged();
 	} );
 
 	it( 'should normalize decomposed characters', () => {
@@ -86,6 +92,7 @@ describe( 'Blocks raw handling', () => {
 		} );
 
 		expect( filtered ).toBe( 'schön' );
+		expect( console ).toHaveLogged();
 	} );
 
 	describe( 'serialize', () => {
@@ -115,6 +122,7 @@ describe( 'Blocks raw handling', () => {
 				const serialized = typeof converted === 'string' ? converted : serialize( converted );
 
 				expect( serialized ).toBe( output );
+				expect( console ).toHaveLogged();
 			} );
 		} );
 	} );

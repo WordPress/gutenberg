@@ -1,57 +1,65 @@
 /**
  * External dependencies
  */
-const { isArray, map } = require( 'lodash' );
-const babelPluginTransformReactJSX = require( 'babel-plugin-transform-react-jsx' );
-const babelPresetEnv = require( 'babel-preset-env' );
+const { get, map } = require( 'lodash' );
+const babel = require( '@babel/core' );
 
 /**
  * WordPress dependencies
  */
-const babelDefaultConfig = require( '@wordpress/babel-preset-default' );
-
-const plugins = map( babelDefaultConfig.plugins, ( plugin ) => {
-	if ( isArray( plugin ) && plugin[ 0 ] === babelPluginTransformReactJSX ) {
-		// TODO: It should become the default value when all modules are moved to packages.
-		return [ babelPluginTransformReactJSX, { pragma: 'createElement' } ];
-	}
-
-	return plugin;
+const { options: babelDefaultConfig } = babel.loadPartialConfig( {
+	configFile: '@wordpress/babel-preset-default',
 } );
-
+const plugins = babelDefaultConfig.plugins;
 if ( ! process.env.SKIP_JSX_PRAGMA_TRANSFORM ) {
-	plugins.push( [ require( '../../packages/babel-plugin-import-jsx-pragma' ).default, {
+	plugins.push( [ '@wordpress/babel-plugin-import-jsx-pragma', {
 		scopeVariable: 'createElement',
 		source: '@wordpress/element',
 		isDefault: false,
 	} ] );
 }
 
+const overrideOptions = ( target, targetName, options ) => {
+	if ( get( target, [ 'file', 'request' ] ) === targetName ) {
+		return [ targetName, Object.assign(
+			{},
+			target.options,
+			options
+		) ];
+	}
+	return target;
+};
+
 const babelConfigs = {
 	main: Object.assign(
 		{},
 		babelDefaultConfig,
 		{
-			babelrc: false,
 			plugins,
-			presets: map( babelDefaultConfig.presets, ( preset ) => {
-				if ( isArray( preset ) && preset[ 0 ] === babelPresetEnv ) {
-					return [ babelPresetEnv, Object.assign(
-						{},
-						preset[ 1 ],
-						{ modules: 'commonjs' }
-					) ];
-				}
-				return preset;
-			} ),
+			presets: map(
+				babelDefaultConfig.presets,
+				( preset ) => overrideOptions( preset, '@babel/preset-env', {
+					modules: 'commonjs',
+				} )
+			),
 		}
 	),
 	module: Object.assign(
 		{},
 		babelDefaultConfig,
 		{
-			babelrc: false,
-			plugins,
+			plugins: map(
+				plugins,
+				( plugin ) => overrideOptions( plugin, '@babel/plugin-transform-runtime', {
+					useESModules: true,
+				} )
+			),
+			presets: map(
+				babelDefaultConfig.presets,
+				( preset ) => overrideOptions( preset, '@babel/preset-env', {
+					modules: false,
+				} )
+			),
 		}
 	),
 };

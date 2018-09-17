@@ -18,7 +18,6 @@ module.exports = {
 		},
 	},
 	globals: {
-		wp: true,
 		window: true,
 		document: true,
 	},
@@ -99,6 +98,7 @@ module.exports = {
 		'no-whitespace-before-property': 'error',
 		'object-curly-spacing': [ 'error', 'always' ],
 		'padded-blocks': [ 'error', 'never' ],
+		quotes: [ 'error', 'single', { allowTemplateLiterals: true, avoidEscape: true } ],
 		'quote-props': [ 'error', 'as-needed' ],
 		'react/display-name': 'off',
 		'react/jsx-curly-spacing': [ 'error', {

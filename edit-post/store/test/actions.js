@@ -8,6 +8,8 @@ import {
 	openPublishSidebar,
 	closePublishSidebar,
 	togglePublishSidebar,
+	openModal,
+	closeModal,
 	toggleFeature,
 	togglePinnedPluginItem,
 	requestMetaBoxUpdates,
@@ -63,6 +65,24 @@ describe( 'actions', () => {
 			expect( toggleGeneralSidebarEditorPanel( panel ) ).toEqual( {
 				type: 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL',
 				panel,
+			} );
+		} );
+	} );
+
+	describe( 'openModal', () => {
+		it( 'should return OPEN_MODAL action', () => {
+			const name = 'plugin/my-name';
+			expect( openModal( name ) ).toEqual( {
+				type: 'OPEN_MODAL',
+				name,
+			} );
+		} );
+	} );
+
+	describe( 'closeModal', () => {
+		it( 'should return CLOSE_MODAL action', () => {
+			expect( closeModal() ).toEqual( {
+				type: 'CLOSE_MODAL',
 			} );
 		} );
 	} );

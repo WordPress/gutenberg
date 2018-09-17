@@ -1,8 +1,8 @@
-# @wordpress/library-export-default-webpack-plugin
+# Library Export Default Webpack Plugin
 
-Webpack plugin for exporting default property for selected libraries. Implementation is based on the Webpack's core plugin [ExportPropertyMainTemplatePlugin](https://github.com/webpack/webpack/blob/51b0df77e4f366163730ee465f01458bfad81f34/lib/ExportPropertyMainTemplatePlugin.js). The only difference is that this plugin allows to whitelist all entry point names where the default export of your entry point will be assigned to the library target.  
+Webpack plugin for exporting `default` property for selected libraries which use ES6 Modules. Implementation is based on the Webpack's core plugin [ExportPropertyMainTemplatePlugin](https://github.com/webpack/webpack/blob/51b0df77e4f366163730ee465f01458bfad81f34/lib/ExportPropertyMainTemplatePlugin.js). The only difference is that this plugin allows to whitelist all entry point names where the default export of your entry point will be assigned to the library target.  
 
-**Note**: This plugin targets Webpack 4.0 and newer, and is not compatible with older versions.
+**Note**: This plugin requires Webpack 4.0 and newer, and is not compatible with older versions.
 
 ## Installation
 
