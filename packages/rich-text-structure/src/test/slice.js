@@ -1,3 +1,5 @@
+import deepFreeze from 'deep-freeze';
+
 /**
  * Internal dependencies
  */
@@ -17,7 +19,7 @@ describe( 'slice', () => {
 			formats: [ , [ em ], [ em ] ],
 			text: ' tw',
 		};
-		const result = slice( record, 3, 6 );
+		const result = slice( deepFreeze( record ), 3, 6 );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
@@ -35,7 +37,7 @@ describe( 'slice', () => {
 			formats: [ , [ em ], [ em ] ],
 			text: ' tw',
 		};
-		const result = slice( record );
+		const result = slice( deepFreeze( record ) );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );

@@ -1,3 +1,5 @@
+import deepFreeze from 'deep-freeze';
+
 /**
  * Internal dependencies
  */
@@ -29,7 +31,7 @@ describe( 'join', () => {
 				formats: [ , , [ em ], , [ em ], , , ],
 				text: 'one two',
 			};
-			const result = join( [ one, two ], separator );
+			const result = join( [ deepFreeze( one ), deepFreeze( two ) ], separator );
 
 			expect( result ).not.toBe( one );
 			expect( result ).not.toBe( two );

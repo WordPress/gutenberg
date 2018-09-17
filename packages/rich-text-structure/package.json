@@ -23,6 +23,9 @@
 		"@wordpress/escape-html": "file:../escape-html",
 		"lodash": "4.17.10"
 	},
+	"devDependencies": {
+		"deep-freeze": "0.0.1"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

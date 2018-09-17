@@ -1,3 +1,5 @@
+import deepFreeze from 'deep-freeze';
+
 /**
  * Internal dependencies
  */
@@ -27,7 +29,7 @@ describe( 'split', () => {
 				text: 'o three',
 			},
 		];
-		const result = split( record, 6, 6 );
+		const result = split( deepFreeze( record ), 6, 6 );
 
 		expect( result ).toEqual( expected );
 		result.forEach( ( item, index ) => {
@@ -56,7 +58,7 @@ describe( 'split', () => {
 				end: 0,
 			},
 		];
-		const result = split( record );
+		const result = split( deepFreeze( record ) );
 
 		expect( result ).toEqual( expected );
 		result.forEach( ( item, index ) => {
@@ -85,7 +87,7 @@ describe( 'split', () => {
 				end: 0,
 			},
 		];
-		const result = split( record );
+		const result = split( deepFreeze( record ) );
 
 		expect( result ).toEqual( expected );
 		result.forEach( ( item, index ) => {
@@ -130,7 +132,7 @@ describe( 'split', () => {
 				text: 'five',
 			},
 		];
-		const result = split( record, ' ' );
+		const result = split( deepFreeze( record ), ' ' );
 
 		expect( result ).toEqual( expected );
 		result.forEach( ( item, index ) => {
@@ -163,7 +165,7 @@ describe( 'split', () => {
 				text: 'three',
 			},
 		];
-		const result = split( record, ' ' );
+		const result = split( deepFreeze( record ), ' ' );
 
 		expect( result ).toEqual( expected );
 		result.forEach( ( item, index ) => {

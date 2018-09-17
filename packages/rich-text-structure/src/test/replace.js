@@ -1,3 +1,5 @@
+import deepFreeze from 'deep-freeze';
+
 /**
  * Internal dependencies
  */
@@ -19,7 +21,7 @@ describe( 'replace', () => {
 			formats: [ , , , , [ em ], , , , , , , ],
 			text: 'one 2 three',
 		};
-		const result = replace( record, 'two', '2' );
+		const result = replace( deepFreeze( record ), 'two', '2' );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
@@ -41,7 +43,7 @@ describe( 'replace', () => {
 			formats: [ , , , , , , , , , , , ],
 			text: 'one 2 three',
 		};
-		const result = replace( record, 'two', replacement );
+		const result = replace( deepFreeze( record ), 'two', replacement );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
@@ -60,7 +62,7 @@ describe( 'replace', () => {
 			text: 'abc - 12345 - #$*%',
 		};
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace
-		const result = replace( record, /([^\d]*)(\d*)([^\w]*)/, ( match, p1, p2, p3 ) => {
+		const result = replace( deepFreeze( record ), /([^\d]*)(\d*)([^\w]*)/, ( match, p1, p2, p3 ) => {
 			return [ p1, p2, p3 ].join( ' - ' );
 		} );
 

@@ -1,3 +1,5 @@
+import deepFreeze from 'deep-freeze';
+
 /**
  * Internal dependencies
  */
@@ -22,7 +24,7 @@ describe( 'concat', () => {
 			text: 'onetwo',
 		};
 
-		const merged = concat( one, two );
+		const merged = concat( deepFreeze( one ), deepFreeze( two ) );
 
 		expect( merged ).not.toBe( one );
 		expect( merged ).toEqual( three );

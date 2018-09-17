@@ -1,3 +1,5 @@
+import deepFreeze from 'deep-freeze';
+
 /**
  * Internal dependencies
  */
@@ -26,7 +28,7 @@ describe( 'insert', () => {
 			start: 3,
 			end: 3,
 		};
-		const result = insert( record, toInsert, 2, 6 );
+		const result = insert( deepFreeze( record ), toInsert, 2, 6 );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
@@ -50,7 +52,7 @@ describe( 'insert', () => {
 			start: 2,
 			end: 2,
 		};
-		const result = insert( record, toInsert );
+		const result = insert( deepFreeze( record ), toInsert );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );

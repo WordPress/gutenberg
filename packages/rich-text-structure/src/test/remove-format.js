@@ -1,3 +1,5 @@
+import deepFreeze from 'deep-freeze';
+
 /**
  * Internal dependencies
  */
@@ -18,7 +20,7 @@ describe( 'removeFormat', () => {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
 			text: 'one two three',
 		};
-		const result = removeFormat( record, 'strong', 3, 6 );
+		const result = removeFormat( deepFreeze( record ), 'strong', 3, 6 );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
@@ -34,7 +36,7 @@ describe( 'removeFormat', () => {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
 			text: 'one two three',
 		};
-		const result = removeFormat( record, 'strong', 4, 4 );
+		const result = removeFormat( deepFreeze( record ), 'strong', 4, 4 );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );

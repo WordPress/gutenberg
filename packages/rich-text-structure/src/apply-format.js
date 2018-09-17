@@ -17,15 +17,17 @@ export function applyFormat(
 	startIndex = start,
 	endIndex = end
 ) {
-	for ( let i = startIndex; i < endIndex; i++ ) {
-		if ( formats[ i ] ) {
-			const newFormats = formats[ i ].filter( ( { type } ) => type !== format.type );
-			newFormats.push( format );
-			formats[ i ] = newFormats;
+	const newFormats = formats.slice( 0 );
+
+	for ( let index = startIndex; index < endIndex; index++ ) {
+		if ( formats[ index ] ) {
+			const newFormatsAtIndex = formats[ index ].filter( ( { type } ) => type !== format.type );
+			newFormatsAtIndex.push( format );
+			newFormats[ index ] = newFormatsAtIndex;
 		} else {
-			formats[ i ] = [ format ];
+			newFormats[ index ] = [ format ];
 		}
 	}
 
-	return { formats, text, start, end };
+	return { formats: newFormats, text, start, end };
 }
