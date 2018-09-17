@@ -15,9 +15,11 @@ class ImageSize extends Component {
 			width: undefined,
 			height: undefined,
 		};
+		this.onLayout = this.onLayout.bind( this );
+		this.calculateImageDimentions = this.calculateImageDimentions.bind( this );
 	}
 
-	componentDidMount = () => {
+	componentDidMount() {
 		const { src } = this.props;
 
 		Image.getSize( src, ( imageRealWidth, imageRealHeight ) => {
@@ -28,7 +30,7 @@ class ImageSize extends Component {
 		} );
 	}
 
-	onLayout = ( event ) => {
+	onLayout( event ) {
 		const { width, height } = event.nativeEvent.layout;
 		this.container = {};
 		this.container.clientWidth = width;
@@ -36,7 +38,7 @@ class ImageSize extends Component {
 		this.calculateImageDimentions();
 	}
 
-	calculateImageDimentions = () => {
+	calculateImageDimentions() {
 		if ( this.image === undefined || this.container === undefined ) {
 			return;
 		}
