@@ -25,7 +25,7 @@ class KSES_Test extends WP_UnitTestCase {
 		$node_list = $document->getElementsByTagName( '*' );
 		foreach ( $node_list as $node ) {
 			$node_repr = array(
-				'tag_name'    => $node->tagName,
+				'tag_name'   => $node->tagName, // @codingStandardsIgnoreLine WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar 
 				'attributes' => array(),
 			);
 			foreach ( $node->attributes as $attr ) {
