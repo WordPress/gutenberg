@@ -3,7 +3,6 @@
  */
 import classnames from 'classnames';
 import { escapeRegExp, find, filter, map, debounce } from 'lodash';
-import 'element-closest';
 
 /**
  * WordPress dependencies

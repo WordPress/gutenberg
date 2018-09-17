@@ -114,6 +114,7 @@ function gutenberg_register_scripts_and_styles() {
 				'\'fetch\' in window' => 'wp-polyfill-fetch',
 				'document.contains'   => 'wp-polyfill-node-contains',
 				'window.FormData && window.FormData.prototype.keys' => 'wp-polyfill-formdata',
+				'Element.prototype.matches && Element.prototype.closest' => 'wp-polyfill-element-closest',
 			)
 		)
 	);
@@ -870,6 +871,10 @@ function gutenberg_register_vendor_scripts() {
 	gutenberg_register_vendor_script(
 		'wp-polyfill-node-contains',
 		'https://unpkg.com/polyfill-library@3.26.0-0/polyfills/Node/prototype/contains/polyfill.js'
+	);
+	gutenberg_register_vendor_script(
+		'wp-polyfill-element-closest',
+		'https://unpkg.com/element-closest@2.0.2/element-closest.js'
 	);
 	gutenberg_register_vendor_script(
 		'wp-polyfill-ecmascript',
