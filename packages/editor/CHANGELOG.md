@@ -8,6 +8,10 @@
 - `RichText` `getSettings` prop has been removed. The `unstableGetSettings` prop is available if continued use is required. Unstable APIs are strongly discouraged to be used, and are subject to removal without notice, even as part of a minor release.
 - `RichText` `onSetup` prop has been removed. The `unstableOnSetup` prop is available if continued use is required. Unstable APIs are strongly discouraged to be used, and are subject to removal without notice, even as part of a minor release.
 
+### Deprecations
+
+- The `checkTemplateValidity` action has been deprecated. Validity is verified automatically upon block reset.
+
 ## 3.0.0 (2018-09-05)
 
 ### New Features
