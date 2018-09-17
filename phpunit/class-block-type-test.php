@@ -109,6 +109,36 @@ class Block_Type_Test extends WP_UnitTestCase {
 		$this->assertEquals( $expected, json_decode( $output, true ) );
 	}
 
+	function test_render_callback_params() {
+
+		$block_type = 'core/dummy';
+		$attributes = array(
+			'foo' => 'bar',
+			'bar' => 'foo',
+		);
+
+		$content = 'baz';
+
+		$mock = $this->getMockBuilder( 'stdClass' )
+		             ->setMethods( [ 'render' ] )->getMock();
+		$mock->expects( $this->once( ) )
+		     ->method( 'render' )
+		     ->with(
+		     	$this->equalTo( $attributes ),
+		        $this->equalTo( $content ),
+		        $this->equalTo($block_type)
+		     );
+
+		$block_type  = new WP_Block_Type(
+			$block_type,
+			array(
+				'render_callback' => array( $mock, 'render' ),
+			)
+		);
+
+		$block_type->render( $attributes, $content );
+	}
+
 	function test_render_for_static_block() {
 		$block_type = new WP_Block_Type( 'core/dummy', array() );
 		$output     = $block_type->render();
