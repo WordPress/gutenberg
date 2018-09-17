@@ -36,14 +36,19 @@ class ImageEdit extends Component {
 	};
 
 	updateWidth( width ) {
-		this.props.setAttributes( { width: parseInt( width, 10 ) } );
+		this.props.setAttributes( { width: this.intOrUndefined(width) } );
 	}
 
 	updateHeight( height ) {
-		this.props.setAttributes( { height: parseInt( height, 10 ) } );
+		this.props.setAttributes( { height: this.intOrUndefined(height) } );
 	}
 
-	getSizeControls() {
+	intOrUndefined(value) {
+		return parseInt( value, 10 ) || undefined;
+	}
+
+	// Theses "Size Controls" are for tests pruposes only.
+	getSizeControls(imageHeight, imageWidth) {
 		const { width, height } = this.props.attributes;
 
 		return (
@@ -52,7 +57,7 @@ class ImageEdit extends Component {
 					<Text>Width: </Text>
 					<TextInput
 						value={ width !== undefined ? width.toString() : '' }
-						placeholder={ this.image !== undefined ? this.image.width.toString() : '0' }
+						placeholder={ imageWidth.toString() }
 						onChangeText = { this.updateWidth }
 					/>
 				</View>
@@ -60,7 +65,7 @@ class ImageEdit extends Component {
 					<Text>Height: </Text>
 					<TextInput 
 						value={ height !== undefined ? height.toString() : '' }
-						placeholder={ this.image !== undefined ? this.image.height.toString() : '0' }
+						placeholder={ imageHeight.toString() }
 						onChangeText = { this.updateHeight }
 					/>
 				</View>
@@ -75,49 +80,46 @@ class ImageEdit extends Component {
 		if ( ! url ) {
 			return (
 				<MediaPlaceholder
-					onUploadPress={ onUploadPress }
-					onMediaLibraryPress={ onMediaLibraryPress }
+					onUploadPress={ this.onUploadPress }
+					onMediaLibraryPress={ this.onMediaLibraryPress }
 				/>
 			);
 		}
 
 		return (
 			<ImageSize src={url}>
-			{ (sizes) => {
-				
-				const {
-					imageWidthWithinContainer,
-					imageHeightWithinContainer,
-					imageWidth,
-					imageHeight,
-				} = sizes;
+				{ (sizes) => {
+					
+					const {
+						imageWidthWithinContainer,
+						imageHeightWithinContainer,
+						imageWidth,
+						imageHeight,
+					} = sizes;
 
-				// sizeControls is for tests pruposes only. It will be replaced when the 
-
-				let finalHeight = imageHeightWithinContainer;
-				if (height > 0 && height < imageHeightWithinContainer) {
-					finalHeight = height;
-				}
-		
-				let finalWidth = imageWidthWithinContainer;
-				if (width > 0 && width < imageWidthWithinContainer) {
-					finalWidth = width;
-				}
-				
-				return (
-					<View>
-						{ isSelected ? this.getSizeControls() : null }
-						<View style={ { flex: 1 } } >
-							<Image
-								style={ { height: finalHeight, width: finalWidth } }
-								resizeMethod="scale"
-								source={ { uri: url } }
-							/>
+					let finalHeight = imageHeightWithinContainer;
+					if (height > 0 && height < imageHeightWithinContainer) {
+						finalHeight = height;
+					}
+			
+					let finalWidth = imageWidthWithinContainer;
+					if (width > 0 && width < imageWidthWithinContainer) {
+						finalWidth = width;
+					}
+					
+					return (
+						<View>
+							{ isSelected ? this.getSizeControls(imageHeight, imageWidth) : null }
+							<View style={ { flex: 1 } } >
+								<Image
+									style={ { height: finalHeight, width: finalWidth } }
+									resizeMethod="scale"
+									source={ { uri: url } }
+								/>
+							</View>
 						</View>
-					</View>
-				)
-			}}
-
+					)
+				}}
 			</ImageSize>
 		);
 	}
