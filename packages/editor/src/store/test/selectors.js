@@ -6,8 +6,18 @@ import { filter, without } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+import {
+	registerBlockType,
+	unregisterBlockType,
+	createBlock,
+	getBlockTypes,
+	getDefaultBlockName,
+	setDefaultBlockName,
+	getUnknownTypeHandlerName,
+	setUnknownTypeHandlerName,
+} from '@wordpress/blocks';
 import { moment } from '@wordpress/date';
+import { RawHTML } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -74,6 +84,7 @@ const {
 	didPostSaveRequestSucceed,
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
+	getEditedPostContent,
 	getNotices,
 	getReusableBlock,
 	isSavingReusableBlock,
@@ -101,6 +112,10 @@ describe( 'selectors', () => {
 	let cachedSelectors;
 
 	beforeAll( () => {
+		cachedSelectors = filter( selectors, ( selector ) => selector.clear );
+	} );
+
+	beforeEach( () => {
 		registerBlockType( 'core/block', {
 			save: () => null,
 			category: 'reusable',
@@ -138,14 +153,10 @@ describe( 'selectors', () => {
 			parent: [ 'core/test-block-b' ],
 		} );
 
-		cachedSelectors = filter( selectors, ( selector ) => selector.clear );
-	} );
-
-	beforeEach( () => {
 		cachedSelectors.forEach( ( { clear } ) => clear() );
 	} );
 
-	afterAll( () => {
+	afterEach( () => {
 		unregisterBlockType( 'core/block' );
 		unregisterBlockType( 'core/test-block-a' );
 		unregisterBlockType( 'core/test-block-b' );
@@ -2869,6 +2880,197 @@ describe( 'selectors', () => {
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBe( 'quote' );
+		} );
+	} );
+
+	describe( 'getEditedPostContent', () => {
+		let originalDefaultBlockName, originalUnknownTypeHandlerName;
+
+		beforeAll( () => {
+			originalDefaultBlockName = getDefaultBlockName();
+			originalUnknownTypeHandlerName = getUnknownTypeHandlerName();
+
+			registerBlockType( 'core/default', {
+				category: 'common',
+				title: 'default',
+				attributes: {
+					modified: {
+						type: 'boolean',
+						default: false,
+					},
+				},
+				save: () => null,
+			} );
+			registerBlockType( 'core/unknown', {
+				category: 'common',
+				title: 'unknown',
+				attributes: {
+					html: {
+						type: 'string',
+					},
+				},
+				save: ( { attributes } ) => <RawHTML>{ attributes.html }</RawHTML>,
+			} );
+			setDefaultBlockName( 'core/default' );
+			setUnknownTypeHandlerName( 'core/unknown' );
+		} );
+
+		afterAll( () => {
+			setDefaultBlockName( originalDefaultBlockName );
+			setUnknownTypeHandlerName( originalUnknownTypeHandlerName );
+			getBlockTypes().forEach( ( block ) => {
+				unregisterBlockType( block.name );
+			} );
+		} );
+
+		it( 'defers to returning an edited post attribute', () => {
+			const block = createBlock( 'core/block' );
+
+			const state = {
+				editor: {
+					present: {
+						blockOrder: {
+							'': [ block.clientId ],
+						},
+						blocksByClientId: {
+							[ block.clientId ]: block,
+						},
+						edits: {
+							content: 'custom edit',
+						},
+					},
+				},
+				currentPost: {},
+			};
+
+			const content = getEditedPostContent( state );
+
+			expect( content ).toBe( 'custom edit' );
+		} );
+
+		it( 'returns serialization of blocks', () => {
+			const block = createBlock( 'core/block' );
+
+			const state = {
+				editor: {
+					present: {
+						blockOrder: {
+							'': [ block.clientId ],
+						},
+						blocksByClientId: {
+							[ block.clientId ]: block,
+						},
+						edits: {},
+					},
+				},
+				currentPost: {},
+			};
+
+			const content = getEditedPostContent( state );
+
+			expect( content ).toBe( '<!-- wp:block /-->' );
+		} );
+
+		it( 'returns removep\'d serialization of blocks for single unknown', () => {
+			const unknownBlock = createBlock( getUnknownTypeHandlerName(), {
+				html: '<p>foo</p>',
+			} );
+			const state = {
+				editor: {
+					present: {
+						blockOrder: {
+							'': [ unknownBlock.clientId ],
+						},
+						blocksByClientId: {
+							[ unknownBlock.clientId ]: unknownBlock,
+						},
+						edits: {},
+					},
+				},
+				currentPost: {},
+			};
+
+			const content = getEditedPostContent( state );
+
+			expect( content ).toBe( 'foo' );
+		} );
+
+		it( 'returns non-removep\'d serialization of blocks for multiple unknown', () => {
+			const firstUnknown = createBlock( getUnknownTypeHandlerName(), {
+				html: '<p>foo</p>',
+			} );
+			const secondUnknown = createBlock( getUnknownTypeHandlerName(), {
+				html: '<p>bar</p>',
+			} );
+			const state = {
+				editor: {
+					present: {
+						blockOrder: {
+							'': [ firstUnknown.clientId, secondUnknown.clientId ],
+						},
+						blocksByClientId: {
+							[ firstUnknown.clientId ]: firstUnknown,
+							[ secondUnknown.clientId ]: secondUnknown,
+						},
+						edits: {},
+					},
+				},
+				currentPost: {},
+			};
+
+			const content = getEditedPostContent( state );
+
+			expect( content ).toBe( '<p>foo</p>\n\n<p>bar</p>' );
+		} );
+
+		it( 'returns empty string for single unmodified default block', () => {
+			const defaultBlock = createBlock( getDefaultBlockName() );
+			const state = {
+				editor: {
+					present: {
+						blockOrder: {
+							'': [ defaultBlock.clientId ],
+						},
+						blocksByClientId: {
+							[ defaultBlock.clientId ]: defaultBlock,
+						},
+						edits: {},
+					},
+				},
+				currentPost: {},
+			};
+
+			const content = getEditedPostContent( state );
+
+			expect( content ).toBe( '' );
+		} );
+
+		it( 'should not return empty string for modified default block', () => {
+			const defaultBlock = createBlock( getDefaultBlockName() );
+			const state = {
+				editor: {
+					present: {
+						blockOrder: {
+							'': [ defaultBlock.clientId ],
+						},
+						blocksByClientId: {
+							[ defaultBlock.clientId ]: {
+								...defaultBlock,
+								attributes: {
+									...defaultBlock.attributes,
+									modified: true,
+								},
+							},
+						},
+						edits: {},
+					},
+				},
+				currentPost: {},
+			};
+
+			const content = getEditedPostContent( state );
+
+			expect( content ).toBe( '<!-- wp:default {\"modified\":true} /-->' );
 		} );
 	} );
 
