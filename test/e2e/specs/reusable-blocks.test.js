@@ -194,8 +194,7 @@ describe( 'Reusable Blocks', () => {
 		await Promise.all( [ waitForAndAcceptDialog(), convertButton.click() ] );
 
 		// Check that we have an empty post again
-		const block = await page.$$( '.editor-block-list__block' );
-		expect( block ).toHaveLength( 0 );
+		expect( await getEditedPostContent() ).toBe( '' );
 
 		// Search for the block in the inserter
 		await searchForBlock( 'Surprised greeting block' );
