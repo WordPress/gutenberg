@@ -384,7 +384,7 @@ export default class TableEdit extends Component {
 			);
 		}
 
-		const classes = classnames( className, {
+		const classes = classnames( {
 			'has-fixed-layout': hasFixedLayout,
 		} );
 
@@ -408,11 +408,13 @@ export default class TableEdit extends Component {
 						/>
 					</PanelBody>
 				</InspectorControls>
-				<table className={ classes }>
-					<Section type="head" rows={ head } />
-					<Section type="body" rows={ body } />
-					<Section type="foot" rows={ foot } />
-				</table>
+				<div className={ className }>
+					<table className={ classes }>
+						<Section type="head" rows={ head } />
+						<Section type="body" rows={ body } />
+						<Section type="foot" rows={ foot } />
+					</table>
+				</div>
 			</Fragment>
 		);
 	}
