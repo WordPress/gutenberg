@@ -7,7 +7,6 @@ import { View, Image, Text, TextInput } from 'react-native';
  * WordPress dependencies
  */
 import { MediaPlaceholder } from '@wordpress/editor';
-import { render } from '@wordpress/element/src';
 import { Component } from '@wordpress/element';
 
 /**
@@ -16,7 +15,6 @@ import { Component } from '@wordpress/element';
 import ImageSize from './image-size';
 
 class ImageEdit extends Component {
-
 	constructor() {
 		super( ...arguments );
 		this.updateWidth = this.updateWidth.bind( this );
@@ -36,41 +34,41 @@ class ImageEdit extends Component {
 	};
 
 	updateWidth( width ) {
-		this.props.setAttributes( { width: this.intOrUndefined(width) } );
+		this.props.setAttributes( { width: this.intOrUndefined( width ) } );
 	}
 
 	updateHeight( height ) {
-		this.props.setAttributes( { height: this.intOrUndefined(height) } );
+		this.props.setAttributes( { height: this.intOrUndefined( height ) } );
 	}
 
-	intOrUndefined(value) {
+	intOrUndefined( value ) {
 		return parseInt( value, 10 ) || undefined;
 	}
 
 	// Theses "Size Controls" are for tests pruposes only.
-	getSizeControls(imageHeight, imageWidth) {
+	getSizeControls( imageHeight, imageWidth ) {
 		const { width, height } = this.props.attributes;
 
 		return (
-			<View style={{flexDirection: 'row', justifyContent: "center", flex: 1}}>
-				<View style={{padding: 5, flexDirection: 'row', flex: 1}}>
+			<View style={ { flexDirection: 'row', justifyContent: 'center', flex: 1 } }>
+				<View style={ { padding: 5, flexDirection: 'row', flex: 1 } }>
 					<Text>Width: </Text>
 					<TextInput
 						value={ width !== undefined ? width.toString() : '' }
 						placeholder={ imageWidth.toString() }
-						onChangeText = { this.updateWidth }
+						onChangeText={ this.updateWidth }
 					/>
 				</View>
-				<View style={{padding: 5, flexDirection: 'row', flex: 1}}>
+				<View style={ { padding: 5, flexDirection: 'row', flex: 1 } }>
 					<Text>Height: </Text>
-					<TextInput 
+					<TextInput
 						value={ height !== undefined ? height.toString() : '' }
 						placeholder={ imageHeight.toString() }
-						onChangeText = { this.updateHeight }
+						onChangeText={ this.updateHeight }
 					/>
 				</View>
 			</View>
-		)
+		);
 	}
 
 	render() {
@@ -87,9 +85,8 @@ class ImageEdit extends Component {
 		}
 
 		return (
-			<ImageSize src={url}>
-				{ (sizes) => {
-					
+			<ImageSize src={ url }>
+				{ ( sizes ) => {
 					const {
 						imageWidthWithinContainer,
 						imageHeightWithinContainer,
@@ -98,18 +95,18 @@ class ImageEdit extends Component {
 					} = sizes;
 
 					let finalHeight = imageHeightWithinContainer;
-					if (height > 0 && height < imageHeightWithinContainer) {
+					if ( height > 0 && height < imageHeightWithinContainer ) {
 						finalHeight = height;
 					}
-			
+
 					let finalWidth = imageWidthWithinContainer;
-					if (width > 0 && width < imageWidthWithinContainer) {
+					if ( width > 0 && width < imageWidthWithinContainer ) {
 						finalWidth = width;
 					}
-					
+
 					return (
 						<View>
-							{ isSelected ? this.getSizeControls(imageHeight, imageWidth) : null }
+							{ isSelected ? this.getSizeControls( imageHeight, imageWidth ) : null }
 							<View style={ { flex: 1 } } >
 								<Image
 									style={ { height: finalHeight, width: finalWidth } }
@@ -118,8 +115,8 @@ class ImageEdit extends Component {
 								/>
 							</View>
 						</View>
-					)
-				}}
+					);
+				} }
 			</ImageSize>
 		);
 	}
