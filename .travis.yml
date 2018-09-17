@@ -26,7 +26,6 @@ before_install:
     }
   - nvm install && nvm use
   - npm install npm -g
-  - npm install yarn -g
 
 branches:
   only:
