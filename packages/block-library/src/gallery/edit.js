@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { filter, pick } from 'lodash';
+import { compact, filter, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -171,7 +171,7 @@ class GalleryEdit extends Component {
 							type="image"
 							multiple
 							gallery
-							value={ images.map( ( img ) => img.id ) }
+							value={ compact( images.map( ( img ) => img.id ) ) }
 							render={ ( { open } ) => (
 								<IconButton
 									className="components-toolbar__control"

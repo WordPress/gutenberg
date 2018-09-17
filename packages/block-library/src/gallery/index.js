@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, every } from 'lodash';
+import { filter, every, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -28,6 +28,11 @@ const blockAttributes = {
 				selector: 'img',
 				attribute: 'src',
 			},
+			href: {
+				source: 'attribute',
+				selector: 'figure > a',
+				attribute: 'href',
+			},
 			link: {
 				source: 'attribute',
 				selector: 'img',
@@ -48,6 +53,11 @@ const blockAttributes = {
 				type: 'array',
 				source: 'children',
 				selector: 'figcaption',
+			},
+			class: {
+				source: 'attribute',
+				selector: 'img',
+				attribute: 'class',
 			},
 		},
 	},
@@ -170,11 +180,35 @@ export const settings = {
 							href = image.url;
 							break;
 						case 'attachment':
-							href = image.link;
+							// If linkTo is attachment use the link attribute as destination or if link attribute is not set,
+							// ( e.g: because of being removed by a security rule) use the existing href as the destination,
+							// if different from image.url because if it is equal previously we had media as linkTo.
+							href = image.link || ( image.href === image.url ? undefined : image.href );
 							break;
 					}
 
-					const img = <img src={ image.url } alt={ image.alt } data-id={ image.id } data-link={ image.link } className={ image.id ? `wp-image-${ image.id }` : null } />;
+					let imageClass;
+					if ( image.id ) {
+						const idClass = `wp-image-${ image.id }`;
+						if ( image.class ) {
+							if ( includes( image.class, idClass ) ) {
+								// If the id of the image is know and the existing class includes idClass, just use the class that was already stored.
+								imageClass = image.class;
+							} else {
+								// If the id of the image is know and something was stored as class but did not included idClass,
+								// append idClass to the classes that were already there
+								imageClass = `${ image.class } ${ idClass }`;
+							}
+						} else {
+							// If the id of the image is know but nothing was stored as class use idClass as the class.
+							imageClass = idClass;
+						}
+					} else {
+						// If the id of the image is not known just use as class what was stored before (probably nothing).
+						imageClass = image.class;
+					}
+
+					const img = <img src={ image.url } alt={ image.alt } data-id={ image.id } data-link={ image.link } className={ imageClass } />;
 
 					return (
 						<li key={ image.id || image.url } className="blocks-gallery-item">
