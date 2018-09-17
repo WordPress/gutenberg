@@ -93,6 +93,7 @@
 .editor-block-mover__control-drag-handle {
 	cursor: move; // Fallback for IE/Edge < 14
 	cursor: grab;
+	fill: currentColor;
 
 	&,
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover,
