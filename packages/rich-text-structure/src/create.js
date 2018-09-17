@@ -160,6 +160,7 @@ function createRecord( element, range, settings = {} ) {
 	const accumulator = getEmptyRecord();
 
 	if ( ! element || ! element.hasChildNodes() ) {
+		accumulateSelection( accumulator, element, range, getEmptyRecord() );
 		return accumulator;
 	}
 

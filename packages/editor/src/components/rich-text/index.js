@@ -118,6 +118,14 @@ export class RichText extends Component {
 		this.deprecatedMultilineArrayFormat = Array.isArray( value );
 	}
 
+	componentDidMount() {
+		document.addEventListener( 'selectionchange', this.onSelectionChange );
+	}
+
+	componentWillUnmount() {
+		document.removeEventListener( 'selectionchange', this.onSelectionChange );
+	}
+
 	/**
 	 * Retrieves the settings for this block.
 	 *
@@ -160,10 +168,8 @@ export class RichText extends Component {
 		editor.on( 'keyup', this.onKeyUp );
 		editor.on( 'BeforeExecCommand', this.onPropagateUndo );
 		editor.on( 'focus', this.onFocus );
-		editor.on( 'input', this.onInput );
 		// The change event in TinyMCE fires every time an undo level is added.
 		editor.on( 'change', this.onCreateUndoLevel );
-		editor.on( 'selectionchange', this.onSelectionChange );
 
 		const { unstableOnSetup } = this.props;
 		if ( unstableOnSetup ) {
@@ -916,6 +922,7 @@ export class RichText extends Component {
 								className={ className }
 								key={ key }
 								onPaste={ this.onPaste }
+								onInput={ this.onInput }
 								multilineTag={ MultilineTag }
 							/>
 							{ isPlaceholderVisible &&

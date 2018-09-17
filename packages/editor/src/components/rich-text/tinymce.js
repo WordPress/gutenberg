@@ -190,8 +190,17 @@ export default class TinyMCE extends Component {
 	}
 
 	render() {
-		const { tagName = 'div', style, defaultValue, className, isPlaceholderVisible, onPaste, multilineTag } = this.props;
 		const ariaProps = pickAriaProps( this.props );
+		const {
+			tagName = 'div',
+			style,
+			defaultValue,
+			className,
+			isPlaceholderVisible,
+			onPaste,
+			onInput,
+			multilineTag,
+		} = this.props;
 
 		/*
 		 * The role=textbox and aria-multiline=true must always be used together
@@ -238,6 +247,7 @@ export default class TinyMCE extends Component {
 			suppressContentEditableWarning: true,
 			dangerouslySetInnerHTML: { __html: initialHTML },
 			onPaste,
+			onInput,
 		} );
 	}
 }

@@ -36,10 +36,12 @@ describe( 'create', () => {
 			createRange: ( element ) => ( {
 				startOffset: 0,
 				startContainer: element,
-				endOffset: 1,
+				endOffset: 0,
 				endContainer: element,
 			} ),
 			record: {
+				start: 0,
+				end: 0,
 				formats: [],
 				text: '',
 			},
