@@ -22,7 +22,8 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.0.0"
+		"@babel/runtime": "^7.0.0",
+		"rungen": "^0.3.2"
 	},
 	"devDependencies": {
 		"redux": "^4.0.0"
