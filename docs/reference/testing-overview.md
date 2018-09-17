@@ -387,7 +387,7 @@ To test locally, along with the typical Gutenberg setup and testing instructions
 ```
 git submodule --init --recursive
 ```
-You can then use the available script to lanuch the mobile testsuite in isolation:
+You can then use the available script to launch the mobile testsuite in isolation:
 ```
 npm run test-mobile
 ```
