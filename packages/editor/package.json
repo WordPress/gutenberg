@@ -45,7 +45,6 @@
 		"@wordpress/wordcount": "file:../wordcount",
 		"classnames": "^2.2.5",
 		"dom-scroll-into-view": "^1.2.1",
-		"element-closest": "^2.0.2",
 		"inherits": "^2.0.3",
 		"lodash": "^4.17.10",
 		"memize": "^1.0.5",

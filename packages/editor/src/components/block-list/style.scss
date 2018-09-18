@@ -32,16 +32,6 @@
 	> .editor-block-list__block-edit .reusable-block-edit-panel * {
 		z-index: z-index(".editor-block-list__block-edit .reusable-block-edit-panel *");
 	}
-
-	&.is-focus-mode:not(.is-multi-selected) {
-		opacity: 0.5;
-		transition: opacity 0.1s linear;
-
-		&:not(.is-focused) .editor-block-list__block,
-		&.is-focused {
-			opacity: 1;
-		}
-	}
 }
 
 
@@ -170,6 +160,17 @@
 	// Hover style
 	&.is-hovered > .editor-block-list__block-edit::before {
 		outline: $border-width solid theme(outlines);
+	}
+
+	// Spotlight mode
+	&.is-focus-mode:not(.is-multi-selected) {
+		opacity: 0.5;
+		transition: opacity 0.1s linear;
+
+		&:not(.is-focused) .editor-block-list__block,
+		&.is-focused {
+			opacity: 1;
+		}
 	}
 }
 

@@ -20,6 +20,7 @@
 	"setupFiles": [
 		"core-js/fn/symbol/async-iterator"
 	],
+	"testURL": "http://localhost",
 	"testPathIgnorePatterns": [
 		"/node_modules/",
 		"/test/e2e",

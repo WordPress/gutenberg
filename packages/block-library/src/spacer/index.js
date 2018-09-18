@@ -2,6 +2,7 @@
  * External dependencies
  */
 import ResizableBox from 're-resizable';
+import classnames from 'classnames';
 
 /**
  * WordPress
@@ -31,13 +32,17 @@ export const settings = {
 	},
 
 	edit: withInstanceId(
-		( { attributes, setAttributes, toggleSelection, instanceId } ) => {
+		( { attributes, isSelected, setAttributes, toggleSelection, instanceId } ) => {
 			const { height } = attributes;
 			const id = `block-spacer-height-input-${ instanceId }`;
 
 			return (
 				<Fragment>
 					<ResizableBox
+						className={ classnames(
+							'block-library-spacer__resize-container',
+							{ 'is-selected': isSelected }
+						) }
 						size={ {
 							height,
 						} }
