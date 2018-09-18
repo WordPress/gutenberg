@@ -149,4 +149,63 @@ export const settings = {
 			</div>
 		);
 	},
+
+	deprecated: [
+		{
+			attributes: {
+				hasFixedLayout: {
+					type: 'boolean',
+					default: false,
+				},
+				head: getTableSectionAttributeSchema( 'head' ),
+				body: getTableSectionAttributeSchema( 'body' ),
+				foot: getTableSectionAttributeSchema( 'foot' ),
+			},
+
+			supports: {
+				align: true,
+			},
+
+			save( { attributes } ) {
+				const { hasFixedLayout, head, body, foot } = attributes;
+				const isEmpty = ! head.length && ! body.length && ! foot.length;
+
+				if ( isEmpty ) {
+					return null;
+				}
+
+				const classes = classnames( {
+					'has-fixed-layout': hasFixedLayout,
+				} );
+
+				const Section = ( { type, rows } ) => {
+					if ( ! rows.length ) {
+						return null;
+					}
+
+					const Tag = `t${ type }`;
+
+					return (
+						<Tag>
+							{ rows.map( ( { cells }, rowIndex ) =>
+								<tr key={ rowIndex }>
+									{ cells.map( ( { content, tag }, cellIndex ) =>
+										<RichText.Content tagName={ tag } value={ content } key={ cellIndex } />
+									) }
+								</tr>
+							) }
+						</Tag>
+					);
+				};
+
+				return (
+					<table className={ classes }>
+						<Section type="head" rows={ head } />
+						<Section type="body" rows={ body } />
+						<Section type="foot" rows={ foot } />
+					</table>
+				);
+			},
+		},
+	],
 };
