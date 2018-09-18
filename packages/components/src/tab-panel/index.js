@@ -8,6 +8,7 @@ import { partial, noop, find } from 'lodash';
  */
 import { Component } from '@wordpress/element';
 import { withInstanceId } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -63,6 +64,13 @@ class TabPanel extends Component {
 
 		const selectedTab = find( tabs, { name: selected } );
 		const selectedId = instanceId + '-' + selectedTab.name;
+		
+		deprecated( 'Tab Panel child function argument used as string', {
+			alternative: "Argument is now an object, access the name property directly.",
+			version: '4.0.0',
+			plugin: 'Gutenberg',
+			hint: 'This is a global warning, shown regardless of whether the component is used.',
+		} );
 
 		return (
 			<div className={ className }>
