@@ -1,11 +1,11 @@
-.editor-block-list__block[data-type="core/spacer"].is-selected .editor-block-list__block-edit {
+.block-library-spacer__resize-container.is-selected {
 	.block-library-spacer__resize-handler-top,
 	.block-library-spacer__resize-handler-bottom {
 		display: block;
 	}
 }
 
-.editor-block-list__block[data-type="core/spacer"].is-selected .block-library-spacer__resize-container {
+.block-library-spacer__resize-container.is-selected {
 	background: $light-gray-200;
 }
 
