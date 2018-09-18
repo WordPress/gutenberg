@@ -72,3 +72,33 @@ export function setCategories( categories ) {
 		categories,
 	};
 }
+
+/**
+ * Returns an action object used to add a new block category.
+ *
+ * @param {string} title Title of the block category.
+ * @param {string} slug  Slug of the block category.
+ *
+ * @return {Object} Action object.
+ */
+export function addCategory( title, slug ) {
+	return {
+		type: 'ADD_CATEGORY',
+		title,
+		slug,
+	};
+}
+
+/**
+ * Returns an action object used to remove an existing block category.
+ *
+ * @param {string} slug Slug of the category to remove.
+ *
+ * @return {Object} Action object.
+ */
+export function removeCategory( slug ) {
+	return {
+		type: 'REMOVE_CATEGORY',
+		slug,
+	};
+}
