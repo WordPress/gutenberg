@@ -64,9 +64,9 @@ class TabPanel extends Component {
 
 		const selectedTab = find( tabs, { name: selected } );
 		const selectedId = instanceId + '-' + selectedTab.name;
-		
+
 		deprecated( 'Tab Panel child function argument used as string', {
-			alternative: "Argument is now an object, access the name property directly.",
+			alternative: 'Argument is now an object, access the name property directly.',
 			version: '4.0.0',
 			plugin: 'Gutenberg',
 			hint: 'This is a global warning, shown regardless of whether the component is used.',
