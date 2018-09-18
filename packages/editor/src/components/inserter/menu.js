@@ -48,10 +48,12 @@ const MAX_SUGGESTED_ITEMS = 9;
 export const searchItems = ( items, searchTerm ) => {
 	const normalizedSearchTerm = normalizeTerm( searchTerm );
 	const matchSearch = ( string ) => normalizeTerm( string ).indexOf( normalizedSearchTerm ) !== -1;
+	const categories = getCategories();
 
-	return items.filter( ( item ) =>
-		matchSearch( item.title ) || some( item.keywords, matchSearch )
-	);
+	return items.filter( ( item ) => {
+		const itemCategory = find( categories, { slug: item.category } );
+		return matchSearch( item.title ) || some( item.keywords, matchSearch ) || matchSearch( itemCategory.title );
+	} );
 };
 
 /**
