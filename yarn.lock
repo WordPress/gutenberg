@@ -627,6 +627,12 @@
   dependencies:
     "@babel/runtime" "^7.0.0-beta.52"
 
+"@wordpress/redux-routine@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@wordpress/redux-routine/-/redux-routine-2.0.0.tgz#9ec9afa29abc69510c80f3c2d0d2a392d6c7604f"
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+
 abab@^1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/abab/-/abab-1.0.4.tgz#5faad9c2c07f60dd76770f71cf025b62a63cfd4e"
