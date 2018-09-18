@@ -350,7 +350,7 @@ class ImageEdit extends Component {
 						options={ this.getLinkDestinationOptions() }
 						onChange={ this.onSetLinkDestination }
 					/>
-					{ linkDestination !== 'none' && (
+					{ linkDestination !== LINK_DESTINATION_NONE && (
 						<TextControl
 							label={ __( 'Link URL' ) }
 							value={ href || '' }
