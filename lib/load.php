@@ -40,6 +40,7 @@ $paths = array(
 
 foreach ( $paths as $path ) {
 	$block_logic_files = glob( $path );
+	// glob() can sometimes return false if there's an error, or it couldn't find any files.
 	if ( ! $block_logic_files ) {
 		continue;
 	}
