@@ -221,7 +221,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				} }
 				onValueSelected={ ( itemValue ) => {
 					this.onBlockTypeSelected( itemValue );
-				} } 
+				} }
 			/>
 		);
 
@@ -290,8 +290,8 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	onChangeHTML = ( html: string ) => {
-		if (Platform.OS === 'android') {
-			this.setState( { html } ) 
+		if ( Platform.OS === 'android' ) {
+			this.setState( { html } );
 		}
 	}
 
