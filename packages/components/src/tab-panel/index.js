@@ -91,7 +91,7 @@ class TabPanel extends Component {
 						className="components-tab-panel__tab-content"
 						tabIndex="0"
 					>
-						{ this.props.children( selectedTab ) }
+						{ this.props.children( Object.assign( new String( selectedTab.name ), selectedTab ) ) }
 					</div>
 				) }
 			</div>
