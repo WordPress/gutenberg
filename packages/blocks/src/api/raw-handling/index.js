@@ -13,6 +13,7 @@ import normaliseBlocks from './normalise-blocks';
 import specialCommentConverter from './special-comment-converter';
 import isInlineContent from './is-inline-content';
 import phrasingContentReducer from './phrasing-content-reducer';
+import headRemover from './head-remover';
 import msListConverter from './ms-list-converter';
 import listReducer from './list-reducer';
 import imageCorrector from './image-corrector';
@@ -79,7 +80,7 @@ function getRawTransformations() {
  */
 export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', tagName, canUserUseUnfilteredHTML = false } ) {
 	// First of all, strip any meta tags.
-	HTML = HTML.replace( /<meta[^>]+>/, '' );
+	// HTML = HTML.replace( /<meta[^>]+>/, '' );
 
 	// If we detect block delimiters, parse entirely as blocks.
 	if ( mode !== 'INLINE' && HTML.indexOf( '<!-- wp:' ) !== -1 ) {
@@ -147,6 +148,7 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 
 		const filters = [
 			msListConverter,
+			headRemover,
 			listReducer,
 			imageCorrector,
 			phrasingContentReducer,

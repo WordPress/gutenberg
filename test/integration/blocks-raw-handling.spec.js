@@ -106,6 +106,7 @@ describe( 'Blocks raw handling', () => {
 			'apple',
 			'google-docs',
 			'ms-word',
+			'ms-word-styled',
 			'ms-word-online',
 			'evernote',
 			'iframe-embed',
