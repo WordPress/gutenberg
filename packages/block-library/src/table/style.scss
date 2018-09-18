@@ -1,7 +1,7 @@
 .wp-block-table {
 	overflow-x: auto;
 
-	table.has-fixed-layout {
+	&.has-fixed-layout table {
 		table-layout: fixed;
 		width: 100%;
 	}

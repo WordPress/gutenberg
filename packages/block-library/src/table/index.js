@@ -140,8 +140,8 @@ export const settings = {
 		};
 
 		return (
-			<div>
-				<table className={ classes }>
+			<div className={ classes }>
+				<table>
 					<Section type="head" rows={ head } />
 					<Section type="body" rows={ body } />
 					<Section type="foot" rows={ foot } />
