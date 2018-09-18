@@ -162,6 +162,9 @@ class Sandbox extends Component {
 				<head>
 					<title>{ this.props.title }</title>
 					<style dangerouslySetInnerHTML={ { __html: style } } />
+					{ ( this.props.scripts && this.props.scripts.map(
+						( src ) => <script key={ src } src={ src } />
+					) ) }
 				</head>
 				<body data-resizable-iframe-connected="data-resizable-iframe-connected" className={ this.props.type }>
 					<div dangerouslySetInnerHTML={ { __html: this.props.html } } />

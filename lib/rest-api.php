@@ -87,9 +87,17 @@ function gutenberg_filter_oembed_result( $response, $handler, $request ) {
 				global $wp_embed;
 				$html = $wp_embed->shortcode( array(), $_GET['url'] );
 				if ( $html ) {
+					global $wp_scripts;
+					// Check if any scripts were enqueued by the shortcode, and
+					// include them in the response.
+					$enqueued_scripts = array();
+					foreach ( $wp_scripts->queue as $script ) {
+						$enqueued_scripts[] = $wp_scripts->registered[ $script ]->src;
+					}
 					return array(
 						'provider_name' => __( 'Embed Handler', 'gutenberg' ),
 						'html'          => $html,
+						'scripts'       => $enqueued_scripts,
 					);
 				}
 			}
