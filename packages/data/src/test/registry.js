@@ -360,6 +360,8 @@ describe( 'createRegistry', () => {
 
 			registry.select( 'counter' ).getCount();
 
+			expect( console ).toHaveWarned();
+
 			return promise;
 		} );
 	} );
