@@ -67,7 +67,7 @@ class TabPanel extends Component {
 
 		deprecated( 'Tab Panel child function argument used as string', {
 			alternative: 'Argument is now an object, access the name property directly.',
-			version: '4.0.0',
+			version: '4.2.0',
 			plugin: 'Gutenberg',
 			hint: 'This is a global warning, shown regardless of whether the component is used.',
 		} );
