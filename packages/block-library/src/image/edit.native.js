@@ -45,28 +45,31 @@ class ImageEdit extends Component {
 		return parseInt( value, 10 ) || undefined;
 	}
 
+	toSafeString( value ) {
+		return value !== undefined ? value.toString() : '';
+	}
+
 	// Theses "Size Controls" are for tests pruposes only.
 	getSizeControls( imageHeight, imageWidth ) {
 		const { width, height } = this.props.attributes;
 
 		return (
 			<View style={ { flexDirection: 'row', justifyContent: 'center', flex: 1 } }>
-				<View style={ { padding: 5, flexDirection: 'row', flex: 1 } }>
-					<Text>Width: </Text>
-					<TextInput
-						value={ width !== undefined ? width.toString() : '' }
-						placeholder={ imageWidth.toString() }
-						onChangeText={ this.updateWidth }
-					/>
-				</View>
-				<View style={ { padding: 5, flexDirection: 'row', flex: 1 } }>
-					<Text>Height: </Text>
-					<TextInput
-						value={ height !== undefined ? height.toString() : '' }
-						placeholder={ imageHeight.toString() }
-						onChangeText={ this.updateHeight }
-					/>
-				</View>
+				{ this.getSizeField( this.toSafeString( width ), this.toSafeString( imageWidth ), this.updateWidth ) }
+				{ this.getSizeField( this.toSafeString( height ), this.toSafeString( imageHeight ), this.updateHeight ) }
+			</View>
+		);
+	}
+
+	getSizeField( size, placeholder, updater ) {
+		return (
+			<View style={ { padding: 5, flexDirection: 'row', flex: 1 } }>
+				<Text>Width: </Text>
+				<TextInput
+					value={ size }
+					placeholder={ placeholder }
+					onChangeText={ updater }
+				/>
 			</View>
 		);
 	}
