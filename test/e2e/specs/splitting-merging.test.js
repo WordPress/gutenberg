@@ -75,13 +75,23 @@ describe( 'splitting and merging blocks', () => {
 		// should remove the first.
 		//
 		// See: https://github.com/WordPress/gutenberg/issues/8388
+
+		// First paragraph
 		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'First' );
+		await page.keyboard.press( 'Enter' );
+
+		// Second paragraph
 		await page.keyboard.down( 'Shift' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.up( 'Shift' );
 
 		// Delete the soft line break.
 		await page.keyboard.press( 'Backspace' );
+
+		// Typing at this point should occur still within the second paragraph,
+		// while before the regression fix it would have occurred in the first.
+		await page.keyboard.type( 'Still Second' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

@@ -12,7 +12,6 @@ import {
 	merge,
 	noop,
 } from 'lodash';
-import 'element-closest';
 
 /**
  * WordPress dependencies

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,6 +15,8 @@ class Dropdown extends Component {
 		this.close = this.close.bind( this );
 		this.clickOutside = this.clickOutside.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
+		this.refresh = this.refresh.bind( this );
+		this.popoverRef = createRef();
 		this.state = {
 			isOpen: false,
 		};
@@ -38,6 +40,17 @@ class Dropdown extends Component {
 
 	bindContainer( ref ) {
 		this.container = ref;
+	}
+
+	/**
+	 * When contents change height due to user interaction,
+	 * `refresh` can be called to re-render Popover with correct
+	 * attributes which allow scroll, if need be.
+	 */
+	refresh() {
+		if ( this.popoverRef.current ) {
+			this.popoverRef.current.refresh();
+		}
 	}
 
 	toggle() {
@@ -76,6 +89,7 @@ class Dropdown extends Component {
 				{ isOpen && (
 					<Popover
 						className={ contentClassName }
+						ref={ this.popoverRef }
 						position={ position }
 						onClose={ this.close }
 						onClickOutside={ this.clickOutside }

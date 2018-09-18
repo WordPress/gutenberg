@@ -1,10 +1,12 @@
 .editor-block-list__block[data-type="core/spacer"].is-selected .editor-block-list__block-edit {
-	background: $light-gray-200;
-
 	.block-library-spacer__resize-handler-top,
 	.block-library-spacer__resize-handler-bottom {
 		display: block;
 	}
+}
+
+.editor-block-list__block[data-type="core/spacer"].is-selected .block-library-spacer__resize-container {
+	background: $light-gray-200;
 }
 
 .block-library-spacer__resize-handler-top,
