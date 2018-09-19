@@ -43,6 +43,7 @@ import patterns from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
 import { domToFormat, valueToString } from './format';
 import TokenUI from './tokens/ui';
+import { isRichTextValueEmpty } from './utils';
 
 /**
  * Browser dependencies
@@ -59,17 +60,6 @@ const { Node, getSelection } = window;
  * @type {string}
  */
 const TINYMCE_ZWSP = '\uFEFF';
-
-/**
- * Check if the given `RichText` value is empty on not.
- *
- * @param {Array} value `RichText` value.
- *
- * @return {boolean} True if empty, false if not.
- */
-const isRichTextValueEmpty = ( value ) => {
-	return ! value || ! value.length;
-};
 
 export function getFormatValue( formatName, parents ) {
 	if ( formatName === 'link' ) {
