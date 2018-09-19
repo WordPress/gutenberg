@@ -38,6 +38,7 @@ type StateType = {
 	inspectBlocks: boolean,
 	blockTypePickerVisible: boolean,
 	selectedBlockType: string,
+	html: string,
 };
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
@@ -51,6 +52,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			inspectBlocks: false,
 			blockTypePickerVisible: false,
 			selectedBlockType: 'core/paragraph', // just any valid type to start from
+			html: '', // This is used to hold the Android html text input state.
 		};
 	}
 
@@ -219,7 +221,8 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				} }
 				onValueSelected={ ( itemValue ) => {
 					this.onBlockTypeSelected( itemValue );
-				} } />
+				} }
+			/>
 		);
 
 		return (
@@ -252,8 +255,8 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			const html = this._htmlTextInput._lastNativeText;
 			this.parseHTML( html );
 		}
-
-		this.setState( { showHtml } );
+		const html = this.serializeToHtml();
+		this.setState( { showHtml, html } );
 	}
 
 	handleInspectBlocksChanged = ( inspectBlocks: boolean ) => {
@@ -286,9 +289,16 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		);
 	}
 
+	onChangeHTML = ( html: string ) => {
+		if ( Platform.OS === 'android' ) {
+			this.setState( { html } );
+		}
+	}
+
 	renderHTML() {
 		const behavior = Platform.OS === 'ios' ? 'padding' : null;
 		const htmlInputRef = ( el ) => this._htmlTextInput = el;
+
 		return (
 			<KeyboardAvoidingView style={ { flex: 1 } } behavior={ behavior }>
 				<TextInput
@@ -297,7 +307,9 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 					ref={ htmlInputRef }
 					numberOfLines={ 0 }
 					style={ styles.htmlView }
-					value={ this.serializeToHtml() } />
+					value={ this.state.html }
+					onChangeText={ ( html ) => this.onChangeHTML( html ) }
+				/>
 			</KeyboardAvoidingView>
 		);
 	}
