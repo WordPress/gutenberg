@@ -275,7 +275,7 @@ function strip_dynamic_blocks( $content ) {
  * @return string
  */
 function strip_dynamic_blocks_add_filter( $text ) {
-	add_filter( 'the_content', 'strip_dynamic_blocks', 8 ); // Before do_blocks().
+	add_filter( 'the_content', 'strip_dynamic_blocks', 6 ); // Before do_blocks().
 
 	return $text;
 }
