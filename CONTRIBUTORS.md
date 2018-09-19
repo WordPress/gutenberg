@@ -105,3 +105,4 @@ This list is manually curated to include valuable contributions by volunteers th
 | @DannyCooper | @DannyCooper |
 | @burhandodhy | @burhandodhy |
 | @ZebulanStanphill | @zebulan |
+| @sharazghouri | @sharaz |
