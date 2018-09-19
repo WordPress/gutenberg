@@ -20,6 +20,7 @@ import { children } from '@wordpress/blocks';
  */
 import FormatToolbar from './format-toolbar';
 import { FORMATTING_CONTROLS } from './formatting-controls';
+import { isRichTextValueEmpty } from './utils';
 
 export function getFormatValue( formatName ) {
 	if ( 'link' === formatName ) {
@@ -216,6 +217,8 @@ RichTextContainer.Content = ( { value, format, tagName: Tag, ...props } ) => {
 
 	return content;
 };
+
+RichTextContainer.isEmpty = isRichTextValueEmpty;
 
 RichTextContainer.Content.defaultProps = {
 	format: 'children',
