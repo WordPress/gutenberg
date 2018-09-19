@@ -5,7 +5,8 @@ import {
 	newPost,
 	publishPost,
 	publishPostWithoutPrePublishChecks,
-	togglePrePublishChecks,
+	enablePrePublishChecks,
+	disablePrePublishChecks,
 } from '../support/utils';
 
 describe( 'Publishing', () => {
@@ -13,6 +14,11 @@ describe( 'Publishing', () => {
 		describe( `a ${ postType }`, () => {
 			beforeEach( async () => {
 				await newPost( postType );
+				await enablePrePublishChecks();
+			} );
+
+			afterEach( async () => {
+				await disablePrePublishChecks();
 			} );
 
 			it( `should publish the ${ postType } and close the panel once we start editing again.`, async () => {
@@ -36,11 +42,11 @@ describe( 'Publishing', () => {
 		describe( `a ${ postType } with pre-publish checks disabled`, () => {
 			beforeEach( async () => {
 				await newPost( postType );
-				await togglePrePublishChecks();
+				await disablePrePublishChecks();
 			} );
 
 			afterEach( async () => {
-				await togglePrePublishChecks();
+				await enablePrePublishChecks();
 			} );
 
 			it( `should publish the ${ postType } without opening the post-publish sidebar.`, async () => {

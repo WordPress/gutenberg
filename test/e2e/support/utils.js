@@ -142,6 +142,22 @@ export async function togglePrePublishChecks( ) {
 	await page.click( '.components-popover__content > .components-menu-group:nth-child(3) button:nth-child(3)' );
 }
 
+export async function arePrePublishChecksEnabled( ) {
+	return page.evaluate( () => window.wp.data.select( 'core/editor' ).isPublishSidebarEnabled() );
+}
+
+export async function enablePrePublishChecks( ) {
+	if ( ! await arePrePublishChecksEnabled( ) ) {
+		await togglePrePublishChecks();
+	}
+}
+
+export async function disablePrePublishChecks( ) {
+	if ( await arePrePublishChecksEnabled( ) ) {
+		await togglePrePublishChecks();
+	}
+}
+
 export async function setViewport( type ) {
 	const allowedDimensions = {
 		large: { width: 960, height: 700 },
