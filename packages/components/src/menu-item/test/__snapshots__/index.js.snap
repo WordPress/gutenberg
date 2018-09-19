@@ -9,7 +9,8 @@ exports[`MenuItem should match snapshot when all props provided 1`] = `
   role="menuitemcheckbox"
 >
   My item
-  <MenuItemsShortcut
+  <Shortcut
+    className="components-menu-item__shortcut"
     shortcut="mod+shift+alt+w"
   />
 </IconButton>
@@ -23,7 +24,8 @@ exports[`MenuItem should match snapshot when isSelected and role are optionally 
   role="menuitem"
 >
   My item
-  <MenuItemsShortcut
+  <Shortcut
+    className="components-menu-item__shortcut"
     shortcut="mod+shift+alt+w"
   />
 </IconButton>
@@ -35,6 +37,8 @@ exports[`MenuItem should match snapshot when only label provided 1`] = `
   role="menuitem"
 >
   My item
-  <MenuItemsShortcut />
+  <Shortcut
+    className="components-menu-item__shortcut"
+  />
 </Button>
 `;

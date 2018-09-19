@@ -136,6 +136,28 @@ export async function newPost( { postType, enableTips = false } = {} ) {
 	}
 }
 
+export async function togglePrePublishChecks( ) {
+	await page.click( '.edit-post-more-menu' );
+	await page.waitForSelector( '.components-popover__content' );
+	await page.click( '.edit-post__pre-publish-checks' );
+}
+
+export async function arePrePublishChecksEnabled( ) {
+	return page.evaluate( () => window.wp.data.select( 'core/editor' ).isPublishSidebarEnabled() );
+}
+
+export async function enablePrePublishChecks( ) {
+	if ( ! await arePrePublishChecksEnabled( ) ) {
+		await togglePrePublishChecks();
+	}
+}
+
+export async function disablePrePublishChecks( ) {
+	if ( await arePrePublishChecksEnabled( ) ) {
+		await togglePrePublishChecks();
+	}
+}
+
 export async function setViewport( type ) {
 	const allowedDimensions = {
 		large: { width: 960, height: 700 },
@@ -291,6 +313,17 @@ export async function publishPost() {
 	await page.click( '.editor-post-publish-button' );
 
 	// A success notice should show up
+	return page.waitForSelector( '.components-notice.is-success' );
+}
+
+/**
+ * Publishes the post without the pre-publish checks,
+ * resolving once the request is complete (once a notice is displayed).
+ *
+ * @return {Promise} Promise resolving when publish is complete.
+ */
+export async function publishPostWithoutPrePublishChecks() {
+	await page.click( '.editor-post-publish-button' );
 	return page.waitForSelector( '.components-notice.is-success' );
 }
 

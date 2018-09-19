@@ -12,22 +12,26 @@ import {
 	registerBlockType,
 	createBlock,
 } from '@wordpress/blocks';
+import { createRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import {
+import actions, {
+	updateEditorSettings,
 	setupEditorState,
 	mergeBlocks,
 	replaceBlocks,
+	resetBlocks,
 	selectBlock,
 	createErrorNotice,
 	setTemplateValidity,
 	editPost,
 } from '../actions';
-import effects from '../effects';
+import effects, { validateBlocksToTemplate } from '../effects';
 import * as selectors from '../selectors';
 import reducer from '../reducer';
+import applyMiddlewares from '../middlewares';
 
 describe( 'effects', () => {
 	const defaultBlockSettings = { save: () => 'Saved', category: 'common', title: 'block title' };
@@ -441,12 +445,14 @@ describe( 'effects', () => {
 					template: null,
 					templateLock: false,
 				},
+				template: {
+					isValid: true,
+				},
 			} );
 
 			const result = handler( { post, settings: {} }, { getState } );
 
 			expect( result ).toEqual( [
-				setTemplateValidity( true ),
 				setupEditorState( post, [], {} ),
 			] );
 		} );
@@ -468,14 +474,16 @@ describe( 'effects', () => {
 					template: null,
 					templateLock: false,
 				},
+				template: {
+					isValid: true,
+				},
 			} );
 
 			const result = handler( { post }, { getState } );
 
-			expect( result[ 1 ].blocks ).toHaveLength( 1 );
+			expect( result[ 0 ].blocks ).toHaveLength( 1 );
 			expect( result ).toEqual( [
-				setTemplateValidity( true ),
-				setupEditorState( post, result[ 1 ].blocks, {} ),
+				setupEditorState( post, result[ 0 ].blocks, {} ),
 			] );
 		} );
 
@@ -495,14 +503,88 @@ describe( 'effects', () => {
 					template: null,
 					templateLock: false,
 				},
+				template: {
+					isValid: true,
+				},
 			} );
 
 			const result = handler( { post }, { getState } );
 
 			expect( result ).toEqual( [
-				setTemplateValidity( true ),
 				setupEditorState( post, [], { title: 'A History of Pork' } ),
 			] );
+		} );
+	} );
+
+	describe( 'validateBlocksToTemplate', () => {
+		let store;
+		beforeEach( () => {
+			store = createRegistry().registerStore( 'test', {
+				actions,
+				selectors,
+				reducer,
+			} );
+			applyMiddlewares( store );
+
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+		} );
+
+		afterEach( () => {
+			getBlockTypes().forEach( ( block ) => {
+				unregisterBlockType( block.name );
+			} );
+		} );
+
+		it( 'should return undefined if no template assigned', () => {
+			const result = validateBlocksToTemplate( resetBlocks( [
+				createBlock( 'core/test-block' ),
+			] ), store );
+
+			expect( result ).toBe( undefined );
+		} );
+
+		it( 'should return undefined if invalid but unlocked', () => {
+			store.dispatch( updateEditorSettings( {
+				template: [
+					[ 'core/foo', {} ],
+				],
+			} ) );
+
+			const result = validateBlocksToTemplate( resetBlocks( [
+				createBlock( 'core/test-block' ),
+			] ), store );
+
+			expect( result ).toBe( undefined );
+		} );
+
+		it( 'should return undefined if locked and valid', () => {
+			store.dispatch( updateEditorSettings( {
+				template: [
+					[ 'core/test-block' ],
+				],
+				templateLock: 'all',
+			} ) );
+
+			const result = validateBlocksToTemplate( resetBlocks( [
+				createBlock( 'core/test-block' ),
+			] ), store );
+
+			expect( result ).toBe( undefined );
+		} );
+
+		it( 'should return validity set action if invalid on default state', () => {
+			store.dispatch( updateEditorSettings( {
+				template: [
+					[ 'core/foo' ],
+				],
+				templateLock: 'all',
+			} ) );
+
+			const result = validateBlocksToTemplate( resetBlocks( [
+				createBlock( 'core/test-block' ),
+			] ), store );
+
+			expect( result ).toEqual( setTemplateValidity( false ) );
 		} );
 	} );
 } );

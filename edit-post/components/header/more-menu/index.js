@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { IconButton, Dropdown, MenuGroup } from '@wordpress/components';
+import { IconButton, Dropdown, MenuGroup, MenuItem } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 
 /**
@@ -14,6 +14,7 @@ import PluginMoreMenuGroup from '../plugins-more-menu-group';
 import TipsToggle from '../tips-toggle';
 import KeyboardShortcutsHelpMenuItem from '../keyboard-shortcuts-help-menu-item';
 import WritingMenu from '../writing-menu';
+import PublishSidebarToggle from '../publish-sidebar-toggle';
 
 const MoreMenu = () => (
 	<Dropdown
@@ -37,7 +38,14 @@ const MoreMenu = () => (
 					label={ __( 'Tools' ) }
 					filterName="editPost.MoreMenu.tools"
 				>
+					<MenuItem
+						role="menuitem"
+						href="edit.php?post_type=wp_block"
+					>
+						{ __( 'Manage All Reusable Blocks' ) }
+					</MenuItem>
 					<TipsToggle onToggle={ onClose } />
+					<PublishSidebarToggle onToggle={ onClose } />
 					<KeyboardShortcutsHelpMenuItem onSelect={ onClose } />
 				</MenuGroup>
 			</Fragment>

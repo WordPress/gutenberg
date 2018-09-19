@@ -350,13 +350,15 @@ class ImageEdit extends Component {
 						options={ this.getLinkDestinationOptions() }
 						onChange={ this.onSetLinkDestination }
 					/>
-					<TextControl
-						label={ __( 'Link URL' ) }
-						value={ href || '' }
-						onChange={ this.onSetCustomHref }
-						placeholder={ ! isLinkURLInputDisabled ? 'https://' : undefined }
-						disabled={ isLinkURLInputDisabled }
-					/>
+					{ linkDestination !== LINK_DESTINATION_NONE && (
+						<TextControl
+							label={ __( 'Link URL' ) }
+							value={ href || '' }
+							onChange={ this.onSetCustomHref }
+							placeholder={ ! isLinkURLInputDisabled ? 'https://' : undefined }
+							disabled={ isLinkURLInputDisabled }
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 		);

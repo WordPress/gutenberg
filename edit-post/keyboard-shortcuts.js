@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
+import { rawShortcut, displayShortcut, shortcutAriaLabel } from '@wordpress/keycodes';
 
 export default {
 	toggleEditorMode: {
@@ -11,5 +11,6 @@ export default {
 	toggleSidebar: {
 		raw: rawShortcut.primaryShift( ',' ),
 		display: displayShortcut.primaryShift( ',' ),
+		ariaLabel: shortcutAriaLabel.primaryShift( ',' ),
 	},
 };

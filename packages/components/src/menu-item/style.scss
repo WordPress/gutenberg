@@ -23,7 +23,7 @@
 	}
 
 	&:hover:not(:disabled):not([aria-disabled="true"]) {
-		@include menu-style__neutral;
+		@include menu-style__hover;
 	}
 
 	&:focus:not(:disabled):not([aria-disabled="true"]) {

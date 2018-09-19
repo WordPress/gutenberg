@@ -12,6 +12,12 @@
 		"parent": null
 	},
 	{
+		"title": "The Gutenberg block grammar",
+		"slug": "grammar",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/grammar.md",
+		"parent": "language"
+	},
+	{
 		"title": "Block API",
 		"slug": "block-api",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/block-api.md",
@@ -212,7 +218,7 @@
 	{
 		"title": "Articles",
 		"slug": "articles",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/outreach/articles.md",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/outreach/docs/articles.md",
 		"parent": "outreach"
 	},
 	{
@@ -423,6 +429,12 @@
 		"title": "@wordpress/library-export-default-webpack-plugin",
 		"slug": "packages-library-export-default-webpack-plugin",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/library-export-default-webpack-plugin/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/list-reusable-blocks",
+		"slug": "packages-list-reusable-blocks",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/list-reusable-blocks/README.md",
 		"parent": "packages"
 	},
 	{

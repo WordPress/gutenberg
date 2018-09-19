@@ -12,7 +12,6 @@ import {
 	merge,
 	noop,
 } from 'lodash';
-import 'element-closest';
 
 /**
  * WordPress dependencies
@@ -29,7 +28,6 @@ import { Slot } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { rawHandler, children } from '@wordpress/blocks';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
-import deprecated from '@wordpress/deprecated';
 import { isURL } from '@wordpress/url';
 
 /**
@@ -45,6 +43,7 @@ import patterns from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
 import { domToFormat, valueToString } from './format';
 import TokenUI from './tokens/ui';
+import { isRichTextValueEmpty } from './utils';
 
 /**
  * Browser dependencies
@@ -61,17 +60,6 @@ const { Node, getSelection } = window;
  * @type {string}
  */
 const TINYMCE_ZWSP = '\uFEFF';
-
-/**
- * Check if the given `RichText` value is empty on not.
- *
- * @param {Array} value `RichText` value.
- *
- * @return {boolean} True if empty, false if not.
- */
-const isRichTextValueEmpty = ( value ) => {
-	return ! value || ! value.length;
-};
 
 export function getFormatValue( formatName, parents ) {
 	if ( formatName === 'link' ) {
@@ -129,18 +117,6 @@ export class RichText extends Component {
 	 * @return {Object} The settings for this block.
 	 */
 	getSettings( settings ) {
-		let { unstableGetSettings: getSettings } = this.props;
-		if ( ! getSettings && typeof this.props.getSettings === 'function' ) {
-			deprecated( 'RichText getSettings prop', {
-				alternative: 'unstableGetSettings',
-				plugin: 'Gutenberg',
-				version: '3.9',
-				hint: 'Unstable APIs are strongly discouraged to be used, and are subject to removal without notice.',
-			} );
-
-			getSettings = this.props.getSettings;
-		}
-
 		settings = {
 			...settings,
 			forced_root_block: this.props.multiline || false,
@@ -149,8 +125,9 @@ export class RichText extends Component {
 			custom_undo_redo_levels: 1,
 		};
 
-		if ( getSettings ) {
-			settings = getSettings( settings );
+		const { unstableGetSettings } = this.props;
+		if ( unstableGetSettings ) {
+			settings = unstableGetSettings( settings );
 		}
 
 		return settings;
@@ -179,20 +156,9 @@ export class RichText extends Component {
 
 		patterns.apply( this, [ editor ] );
 
-		let { unstableOnSetup: onSetup } = this.props;
-		if ( ! onSetup && typeof this.props.onSetup === 'function' ) {
-			deprecated( 'RichText onSetup prop', {
-				alternative: 'unstableOnSetup',
-				plugin: 'Gutenberg',
-				version: '3.9',
-				hint: 'Unstable APIs are strongly discouraged to be used, and are subject to removal without notice.',
-			} );
-
-			onSetup = this.props.onSetup;
-		}
-
-		if ( onSetup ) {
-			onSetup( editor );
+		const { unstableOnSetup } = this.props;
+		if ( unstableOnSetup ) {
+			unstableOnSetup( editor );
 		}
 	}
 

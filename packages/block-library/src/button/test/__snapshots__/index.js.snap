@@ -3,7 +3,7 @@
 exports[`core/button block edit matches snapshot 1`] = `
 <div>
    
-  <span
+  <div
     class="wp-block-button"
   >
     <div
@@ -33,7 +33,7 @@ exports[`core/button block edit matches snapshot 1`] = `
         </div>
       </div>
     </div>
-  </span>
+  </div>
    
 </div>
 `;

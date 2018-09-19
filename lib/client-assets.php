@@ -114,6 +114,7 @@ function gutenberg_register_scripts_and_styles() {
 				'\'fetch\' in window' => 'wp-polyfill-fetch',
 				'document.contains'   => 'wp-polyfill-node-contains',
 				'window.FormData && window.FormData.prototype.keys' => 'wp-polyfill-formdata',
+				'Element.prototype.matches && Element.prototype.closest' => 'wp-polyfill-element-closest',
 			)
 		)
 	);
@@ -265,6 +266,7 @@ function gutenberg_register_scripts_and_styles() {
 				'	var storageKey = "WP_DATA_USER_" + userId;',
 				'	wp.data',
 				'		.use( wp.data.plugins.persistence, { storageKey: storageKey } )',
+				'		.use( wp.data.plugins.asyncGenerator )',
 				'		.use( wp.data.plugins.controls );',
 				'} )()',
 			)
@@ -632,6 +634,22 @@ function gutenberg_register_scripts_and_styles() {
 		true
 	);
 
+	wp_register_script(
+		'wp-list-reusable-blocks',
+		gutenberg_url( 'build/list-reusable-blocks/index.js' ),
+		array(
+			'lodash',
+			'wp-api-fetch',
+			'wp-components',
+			'wp-compose',
+			'wp-element',
+			'wp-i18n',
+			'wp-polyfill-ecmascript',
+		),
+		filemtime( gutenberg_dir_path() . 'build/list-reusable-blocks/index.js' ),
+		true
+	);
+
 	// Editor Styles.
 	// This empty stylesheet is defined to ensure backwards compatibility.
 	wp_register_style( 'wp-blocks', false );
@@ -717,6 +735,14 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'build/block-library/theme.css' )
 	);
 	wp_style_add_data( 'wp-block-library-theme', 'rtl', 'replace' );
+
+	wp_register_style(
+		'wp-list-reusable-blocks',
+		gutenberg_url( 'build/list-reusable-blocks/style.css' ),
+		array( 'wp-components' ),
+		filemtime( gutenberg_dir_path() . 'build/list-reusable-blocks/style.css' )
+	);
+	wp_style_add_data( 'wp-list-reusable-block', 'rtl', 'replace' );
 
 	if ( defined( 'GUTENBERG_LIVE_RELOAD' ) && GUTENBERG_LIVE_RELOAD ) {
 		$live_reload_url = ( GUTENBERG_LIVE_RELOAD === true ) ? 'http://localhost:35729/livereload.js' : GUTENBERG_LIVE_RELOAD;
@@ -845,6 +871,10 @@ function gutenberg_register_vendor_scripts() {
 	gutenberg_register_vendor_script(
 		'wp-polyfill-node-contains',
 		'https://unpkg.com/polyfill-library@3.26.0-0/polyfills/Node/prototype/contains/polyfill.js'
+	);
+	gutenberg_register_vendor_script(
+		'wp-polyfill-element-closest',
+		'https://unpkg.com/element-closest@2.0.2/element-closest.js'
 	);
 	gutenberg_register_vendor_script(
 		'wp-polyfill-ecmascript',
@@ -1292,41 +1322,32 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'after'
 	);
 
-	// Prepopulate with some test content in demo.
+	// Assign initial edits, if applicable. These are not initially assigned
+	// to the persisted post, but should be included in its save payload.
 	if ( $is_new_post && $is_demo ) {
+		// Prepopulate with some test content in demo.
 		ob_start();
 		include gutenberg_dir_path() . 'post-content.php';
 		$demo_content = ob_get_clean();
 
-		wp_add_inline_script(
-			'wp-edit-post',
-			sprintf(
-				'window._wpGutenbergDefaultPost = { title: %s, content: %s };',
-				wp_json_encode(
-					array(
-						'raw' => __( 'Welcome to the Gutenberg Editor', 'gutenberg' ),
-					)
-				),
-				wp_json_encode(
-					array(
-						'raw' => $demo_content,
-					)
-				)
-			)
+		$initial_edits = array(
+			'title'   => array(
+				'raw' => __( 'Welcome to the Gutenberg Editor', 'gutenberg' ),
+			),
+			'content' => array(
+				'raw' => $demo_content,
+			),
 		);
 	} elseif ( $is_new_post ) {
-		wp_add_inline_script(
-			'wp-edit-post',
-			sprintf(
-				'window._wpGutenbergDefaultPost = { title: %s };',
-				wp_json_encode(
-					array(
-						'raw'      => '',
-						'rendered' => apply_filters( 'the_title', '', $post->ID ),
-					)
-				)
-			)
+		// Override "(Auto Draft)" new post default title with empty string,
+		// or filtered value.
+		$initial_edits = array(
+			'title' => array(
+				'raw' => apply_filters( 'the_title', '', $post->ID ),
+			),
 		);
+	} else {
+		$initial_edits = null;
 	}
 
 	// Prepare Jed locale data.
@@ -1464,10 +1485,9 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	$init_script = <<<JS
 	( function() {
-		var editorSettings = %s;
 		window._wpLoadGutenbergEditor = new Promise( function( resolve ) {
 			wp.domReady( function() {
-				resolve( wp.editPost.initializeEditor( 'editor', "%s", %d, editorSettings, window._wpGutenbergDefaultPost ) );
+				resolve( wp.editPost.initializeEditor( 'editor', "%s", %d, %s, %s ) );
 			} );
 		} );
 } )();
@@ -1483,7 +1503,13 @@ JS;
 	 */
 	$editor_settings = apply_filters( 'block_editor_settings', $editor_settings, $post );
 
-	$script = sprintf( $init_script, wp_json_encode( $editor_settings ), $post->post_type, $post->ID );
+	$script = sprintf(
+		$init_script,
+		$post->post_type,
+		$post->ID,
+		wp_json_encode( $editor_settings ),
+		wp_json_encode( $initial_edits )
+	);
 	wp_add_inline_script( 'wp-edit-post', $script );
 
 	/**
@@ -1513,3 +1539,17 @@ JS;
 	 */
 	do_action( 'enqueue_block_editor_assets' );
 }
+
+/**
+ * Enqueue the reusable blocks listing page's script
+ *
+ * @param string $hook Screen name.
+ */
+function wp_load_list_reusable_blocks( $hook ) {
+	$is_reusable_blocks_list_page = 'edit.php' === $hook && isset( $_GET['post_type'] ) && 'wp_block' === $_GET['post_type'];
+	if ( $is_reusable_blocks_list_page ) {
+		wp_enqueue_script( 'wp-list-reusable-blocks' );
+		wp_enqueue_style( 'wp-list-reusable-blocks' );
+	}
+}
+add_action( 'admin_enqueue_scripts', 'wp_load_list_reusable_blocks' );

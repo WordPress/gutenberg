@@ -127,8 +127,12 @@ describe( 'Reusable Blocks', () => {
 		// Change the block's title
 		await page.keyboard.type( 'Surprised greeting block' );
 
+		// Tab three times to navigate to the block's content
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+
 		// Change the block's content
-		await pressWithModifier( 'Shift', 'Tab' );
 		await page.keyboard.type( 'Oh! ' );
 
 		// Save the reusable block

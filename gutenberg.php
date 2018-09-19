@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
- * Version: 3.8.0
+ * Version: 3.9.0-rc.1
  * Author: Gutenberg Team
  *
  * @package gutenberg
@@ -257,9 +257,24 @@ add_action( 'admin_init', 'gutenberg_add_edit_link_filters' );
  * @return array          Updated post actions.
  */
 function gutenberg_add_edit_link( $actions, $post ) {
+	// Build the classic edit action. See also: WP_Posts_List_Table::handle_row_actions().
+	$title = _draft_or_post_title( $post->ID );
+
 	if ( 'wp_block' === $post->post_type ) {
 		unset( $actions['edit'] );
 		unset( $actions['inline hide-if-no-js'] );
+		$actions['export'] = sprintf(
+			'<button type="button" class="wp-list-reusable-blocks__export button-link" data-id="%s" aria-label="%s">%s</button>',
+			$post->ID,
+			esc_attr(
+				sprintf(
+					/* translators: %s: post title */
+					__( 'Export &#8220;%s&#8221; as JSON', 'gutenberg' ),
+					$title
+				)
+			),
+			__( 'Export as JSON', 'gutenberg' )
+		);
 		return $actions;
 	}
 
@@ -270,8 +285,6 @@ function gutenberg_add_edit_link( $actions, $post ) {
 	$edit_url = get_edit_post_link( $post->ID, 'raw' );
 	$edit_url = add_query_arg( 'classic-editor', '', $edit_url );
 
-	// Build the classic edit action. See also: WP_Posts_List_Table::handle_row_actions().
-	$title       = _draft_or_post_title( $post->ID );
 	$edit_action = array(
 		'classic' => sprintf(
 			'<a href="%s" aria-label="%s">%s</a>',
@@ -475,3 +488,20 @@ function gutenberg_add_admin_body_class( $classes ) {
 		return "$classes gutenberg-editor-page is-fullscreen-mode";
 	}
 }
+
+/**
+ * Adds attributes to kses allowed tags that aren't in the default list
+ * and that Gutenberg needs to save blocks such as the Gallery block.
+ *
+ * @param array $tags Allowed HTML.
+ * @return array (Maybe) modified allowed HTML.
+ */
+function gutenberg_kses_allowedtags( $tags ) {
+	if ( isset( $tags['img'] ) ) {
+		$tags['img']['data-link'] = true;
+		$tags['img']['data-id']   = true;
+	}
+	return $tags;
+}
+
+add_filter( 'wp_kses_allowed_html', 'gutenberg_kses_allowedtags', 10, 2 );

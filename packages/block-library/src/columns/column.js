@@ -17,6 +17,10 @@ export const settings = {
 
 	category: 'common',
 
+	supports: {
+		inserter: false,
+	},
+
 	edit() {
 		return <InnerBlocks templateLock={ false } />;
 	},

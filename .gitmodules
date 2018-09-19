@@ -1,0 +1,3 @@
+[submodule "gutenberg-mobile"]
+	path = gutenberg-mobile
+	url = ../../wordpress-mobile/gutenberg-mobile

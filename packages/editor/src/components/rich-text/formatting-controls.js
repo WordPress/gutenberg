@@ -21,6 +21,7 @@ export const FORMATTING_CONTROLS = [
 		icon: 'admin-links',
 		title: __( 'Link' ),
 		shortcut: displayShortcut.primary( 'k' ),
+		activeShortcut: displayShortcut.access( 's' ),
 		format: 'link',
 	},
 	{
