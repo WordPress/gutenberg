@@ -26,22 +26,18 @@ function PostPublishPanelPrepublish( {
 	isBeingScheduled,
 	children,
 } ) {
-	let prePublishTitle, prePublishBodyText;
+	let prePublishBodyText;
 
 	if ( ! hasPublishAction ) {
-		prePublishTitle = __( 'Are you ready to submit for review?' );
 		prePublishBodyText = __( 'When you’re ready, submit your work for review, and an Editor will be able to approve it for you.' );
 	} else if ( isBeingScheduled ) {
-		prePublishTitle = __( 'Are you ready to schedule?' );
 		prePublishBodyText = __( 'Your post will be published at the specified date and time.' );
 	} else {
-		prePublishTitle = __( 'Are you ready to publish?' );
 		prePublishBodyText = __( 'Double-check your settings, then use the button to publish your post.' );
 	}
 
 	return (
 		<div className="editor-post-publish-panel__prepublish">
-			<div><strong>{ prePublishTitle }</strong></div>
 			<p>{ prePublishBodyText }</p>
 
 			{ hasPublishAction && (

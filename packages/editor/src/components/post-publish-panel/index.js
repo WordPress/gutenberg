@@ -61,20 +61,23 @@ class PostPublishPanel extends Component {
 		this.setState( { loading: true } );
 	}
 
-	onUpdateDisableToggle() {
-		// There should be a setting to allow users to skip the pre-publish step forever.
-		// When a user toggles this option on, their setting will be saved and they won't need
-		// to press two "publish" buttons in order to make a post happen.
-	}
-
 	render() {
-		const { isScheduled, isPublishSidebarEnabled, onClose, onTogglePublishSidebar, forceIsDirty, forceIsSaving, PrePublishExtension, PostPublishExtension, ...additionalProps } = this.props;
-		const { loading, submitted, hasPublishAction } = this.state;
+		const { hasPublishAction, isScheduled, isBeingScheduled, onClose, forceIsDirty, forceIsSaving, PrePublishExtension, PostPublishExtension, ...additionalProps } = this.props;
+		const { loading, submitted } = this.state;
+		let prePublishTitle;
+
+		if ( ! hasPublishAction ) {
+			prePublishTitle = __( 'Ready to submit for review?' );
+		} else if ( isBeingScheduled ) {
+			prePublishTitle = __( 'Ready to schedule?' );
+		} else {
+			prePublishTitle = __( 'Ready to publish?' );
+		}
 		return (
 			<div className="editor-post-publish-panel" { ...additionalProps }>
 				<div className="editor-post-publish-panel__header">
 					<strong className="editor-post-publish-panel__title">
-						{ hasPublishAction ? __( 'Ready to submit for review?' ) : __( 'Ready to publish?' ) }
+						{ prePublishTitle }
 					</strong>
 
 					<IconButton
@@ -110,8 +113,6 @@ class PostPublishPanel extends Component {
 						</div>
 					) }
 				</div>
-<<<<<<< HEAD
-=======
 
 				<div className="editor-post-publish-panel__disable-check">
 					<CheckboxControl
@@ -121,7 +122,6 @@ class PostPublishPanel extends Component {
 					/>
 				</div>
 
->>>>>>> Add a checkbox to skip the prepublish panel.
 			</div>
 		);
 	}
@@ -134,6 +134,7 @@ export default compose( [
 			getCurrentPostType,
 			isCurrentPostPublished,
 			isCurrentPostScheduled,
+			isEditedPostBeingScheduled,
 			isSavingPost,
 			isEditedPostDirty,
 		} = select( 'core/editor' );
@@ -143,6 +144,7 @@ export default compose( [
 			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
 			isPublished: isCurrentPostPublished(),
 			isScheduled: isCurrentPostScheduled(),
+			isBeingScheduled: isEditedPostBeingScheduled(),
 			isSaving: isSavingPost(),
 			isDirty: isEditedPostDirty(),
 			isPublishSidebarEnabled: isPublishSidebarEnabled(),
