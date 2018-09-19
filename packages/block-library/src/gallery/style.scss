@@ -4,12 +4,9 @@
 	list-style-type: none;
 	padding: 0;
 
-	// Allow gallery items to go edge to edge.
-	//margin: 0 -8px 0 -8px;
-
 	.blocks-gallery-image,
 	.blocks-gallery-item {
-		// Add space between thumbnails, and unset the nth-child and last-child later
+		// Add space between thumbnails, and unset right most thumbnails later.
 		margin: 0 $grid-size-large $grid-size-large 0;
 		display: flex;
 		flex-grow: 1;
@@ -81,7 +78,7 @@
 		}
 	}
 
-	// Responsive fallback value, 2 columns
+	// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
 	& .blocks-gallery-image,
 	& .blocks-gallery-item {
 		width: calc((100% / 2) - (#{ $grid-size-large } * 2));
@@ -92,6 +89,7 @@
 		width: calc(100% / 1);
 	}
 
+	// Beyond mobile viewports, we allow up to 8 columns.
 	@include break-small {
 		@for $i from 3 through 8 {
 			&.columns-#{ $i } .blocks-gallery-image,
@@ -101,17 +99,16 @@
 		}
 	}
 
-	// Unset right margins.
+	// Unset the right margin on every rightmost gallery item to ensure center balance.
 	@for $j from 1 through 8 {
 		&.columns-#{ $j } .blocks-gallery-image:nth-of-type(#{ $j }n),
 		&.columns-#{ $j } .blocks-gallery-item:nth-of-type(#{ $j }n) {
 			margin-right: 0;
-			//border: 10px solid red;
 		}
 	}
 
 	// Last item always needs margins reset.
-	// When block is selected, only reset the right margin of the 2nd to last child.
+	// When block is selected, only reset the right margin of the 2nd to last item.
 	.blocks-gallery-image:last-child,
 	.blocks-gallery-item:last-child,
 	.is-selected & .blocks-gallery-image:nth-last-child(2),
@@ -127,7 +124,7 @@
 		}
 	}
 
-	// Apply max-width to floated items that have no intrinsic width
+	// Apply max-width to floated items that have no intrinsic width.
 	[data-align="left"] &,
 	[data-align="right"] &,
 	&.alignleft,
