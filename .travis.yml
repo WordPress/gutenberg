@@ -74,6 +74,7 @@ jobs:
       node_js: 8
       env:
         LANE='node'
+        GUTENBERG_AS_PARENT=true
         CHECK_CORRECTNESS='true'
       cache:
         yarn: true
@@ -86,6 +87,7 @@ jobs:
       node_js: 8
       env:
         LANE='node'
+        GUTENBERG_AS_PARENT=true
         CHECK_TESTS='true'
         TEST_RN_PLATFORM='android'
       cache:
@@ -99,6 +101,7 @@ jobs:
       node_js: 8
       env:
         LANE='node'
+        GUTENBERG_AS_PARENT=true
         CHECK_TESTS='true'
         TEST_RN_PLATFORM='ios'
       cache:
