@@ -11,12 +11,11 @@
 	left: 0;
 	right: 0;
 
-	// mobile edgecase for toolbar
+	// Stick the toolbar to the top, because the admin bar is not fixed on mobile..
 	top: 0;
 	position: sticky;
 
-	// on mobile the main content area has to scroll
-	// otherwise you can invoke the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻
+	// On mobile the main content area has to scroll, otherwise you can invoke the overscroll bounce on the non-scrolling container.
 	@include break-small {
 		position: fixed;
 		padding: $grid-size;
@@ -52,14 +51,12 @@
 }
 
 .edit-post-header .components-button {
-	border-radius: $radius-round-rectangle;
-
-	// header toggle buttons
+	// Header toggle buttons.
 	&.is-toggled {
 		color: $white;
 	}
 
-	// put the gray background on a separate layer, so as to match the size of the publish button (34px)
+	// Put the gray background on a separate layer, so as to match the size of the publish button (34px).
 	&.is-toggled::before {
 		content: "";
 		border-radius: $radius-round-rectangle;
