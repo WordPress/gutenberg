@@ -11,6 +11,7 @@ import { ToolbarButton } from './constants';
 import type { BlockType } from '../store/';
 import styles from './block-manager.scss';
 import BlockPicker from './block-picker';
+import HTMLTextInput from '../components/html-text-input'
 
 // Gutenberg imports
 import {
@@ -29,6 +30,8 @@ export type BlockListType = {
 	blocks: Array<BlockType>,
 	aztechtml: string,
 	refresh: boolean,
+	showBlocks: void => void,
+	showHtml: void => void,
 };
 
 type PropsType = BlockListType;
@@ -42,7 +45,6 @@ type StateType = {
 };
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
-	_htmlTextInput: TextInput = null;
 
 	constructor( props: PropsType ) {
 		super( props );
@@ -52,7 +54,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			inspectBlocks: false,
 			blockTypePickerVisible: false,
 			selectedBlockType: 'core/paragraph', // just any valid type to start from
-			html: '', // This is used to hold the Android html text input state.
+			html: '',
 		};
 	}
 
@@ -154,9 +156,9 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			}, '' );
 	}
 
-	parseHTML( html: string ) {
+	parseHTML() {
 		const { parseBlocksAction } = this.props;
-		parseBlocksAction( html );
+		parseBlocksAction( this.state.html );
 	}
 
 	componentDidUpdate() {
@@ -251,12 +253,17 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	handleSwitchEditor = ( showHtml: boolean ) => {
-		if ( ! showHtml ) {
-			const html = this._htmlTextInput._lastNativeText;
-			this.parseHTML( html );
-		}
+		showHtml ? this.showHtml() : this.showBlocks()
+	}
+
+	showBlocks() {
+		this.parseHTML();
+		this.setState( { showHtml: false } );
+	}
+
+	showHtml() {
 		const html = this.serializeToHtml();
-		this.setState( { showHtml, html } );
+		this.setState( { showHtml: true, html } );
 	}
 
 	handleInspectBlocksChanged = ( inspectBlocks: boolean ) => {
@@ -290,27 +297,15 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	onChangeHTML = ( html: string ) => {
-		if ( Platform.OS === 'android' ) {
-			this.setState( { html } );
-		}
+		this.setState( { html } );
 	}
 
 	renderHTML() {
-		const behavior = Platform.OS === 'ios' ? 'padding' : null;
-		const htmlInputRef = ( el ) => this._htmlTextInput = el;
-
 		return (
-			<KeyboardAvoidingView style={ { flex: 1 } } behavior={ behavior }>
-				<TextInput
-					textAlignVertical="top"
-					multiline
-					ref={ htmlInputRef }
-					numberOfLines={ 0 }
-					style={ styles.htmlView }
-					value={ this.state.html }
-					onChangeText={ ( html ) => this.onChangeHTML( html ) }
-				/>
-			</KeyboardAvoidingView>
+			<HTMLTextInput
+				value={ this.state.html }
+				onChange={ this.onChangeHTML }
+			/>
 		);
 	}
 }
