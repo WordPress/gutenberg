@@ -199,6 +199,12 @@
 	box-shadow: none;
 }
 
+@mixin menu-style__hover() {
+	color: $dark-gray-900;
+	border: none;
+	box-shadow: none;
+}
+
 @mixin menu-style__focus() {
 	color: $dark-gray-900;
 	border: none;
