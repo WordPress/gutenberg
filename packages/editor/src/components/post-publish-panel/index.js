@@ -62,7 +62,7 @@ class PostPublishPanel extends Component {
 	}
 
 	render() {
-		const { hasPublishAction, isScheduled, isBeingScheduled, onClose, forceIsDirty, forceIsSaving, PrePublishExtension, PostPublishExtension, ...additionalProps } = this.props;
+		const { hasPublishAction, isScheduled, isBeingScheduled, isPublishSidebarEnabled, onClose, onTogglePublishSidebar, forceIsDirty, forceIsSaving, PrePublishExtension, PostPublishExtension, ...additionalProps } = this.props;
 		const { loading, submitted } = this.state;
 		let prePublishTitle;
 
@@ -116,9 +116,9 @@ class PostPublishPanel extends Component {
 
 				<div className="editor-post-publish-panel__disable-check">
 					<CheckboxControl
-						label={ __( 'Show this panel every time I publish a post' ) }
-						checked={ false }
-						onChange={ () => this.onUpdateDisableToggle() }
+						label={ __( 'Always show pre-publish checks.' ) }
+						checked={ isPublishSidebarEnabled }
+						onChange={ onTogglePublishSidebar }
 					/>
 				</div>
 
