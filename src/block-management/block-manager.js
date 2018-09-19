@@ -4,14 +4,14 @@
  */
 
 import React from 'react';
-import { Platform, Switch, Text, View, FlatList, TextInput, KeyboardAvoidingView } from 'react-native';
+import { Platform, Switch, Text, View, FlatList, KeyboardAvoidingView } from 'react-native';
 import RecyclerViewList, { DataSource } from 'react-native-recyclerview-list';
 import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
 import type { BlockType } from '../store/';
 import styles from './block-manager.scss';
 import BlockPicker from './block-picker';
-import HTMLTextInput from '../components/html-text-input'
+import HTMLTextInput from '../components/html-text-input';
 
 // Gutenberg imports
 import {
@@ -31,7 +31,7 @@ export type BlockListType = {
 	aztechtml: string,
 	refresh: boolean,
 	showBlocks: void => void,
-	showHtml: void => void,
+	showHTML: void => void,
 };
 
 type PropsType = BlockListType;
@@ -45,7 +45,6 @@ type StateType = {
 };
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
-
 	constructor( props: PropsType ) {
 		super( props );
 		this.state = {
@@ -253,7 +252,11 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	handleSwitchEditor = ( showHtml: boolean ) => {
-		showHtml ? this.showHtml() : this.showBlocks()
+		if ( showHtml ) {
+			this.showHTML();
+		} else {
+			this.showBlocks();
+		}
 	}
 
 	showBlocks() {
@@ -261,7 +264,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		this.setState( { showHtml: false } );
 	}
 
-	showHtml() {
+	showHTML() {
 		const html = this.serializeToHtml();
 		this.setState( { showHtml: true, html } );
 	}
