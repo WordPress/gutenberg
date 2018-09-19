@@ -18,12 +18,18 @@ if [ "$CHECK_CORRECTNESS" = true ] ; then
   npm run lint || pFail
 fi
 
+if [ "$GUTENBERG_AS_PARENT" = true ] ; then
+  TEST_SCRIPT_NAME='test:inside-gb'
+else
+  TEST_SCRIPT_NAME='test'
+fi
+
 if [ "$CHECK_TESTS" = true ] ; then
   # we'll run the tests twich (once for each platform) if the platform env var is not set
   if [[ -z "${TEST_RN_PLATFORM}" ]] ; then
-    TEST_RN_PLATFORM=android npm test || pFail
-    TEST_RN_PLATFORM=ios npm test || pFail
+    TEST_RN_PLATFORM=android npm run ${TEST_SCRIPT_NAME} || pFail
+    TEST_RN_PLATFORM=ios npm run ${TEST_SCRIPT_NAME} || pFail
   else
-    npm test || pFail
+    npm run ${TEST_SCRIPT_NAME} || pFail
   fi
 fi
