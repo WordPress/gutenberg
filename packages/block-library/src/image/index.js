@@ -220,7 +220,7 @@ export const settings = {
 		const figure = (
 			<Fragment>
 				{ href ? <a href={ href }>{ image }</a> : image }
-				{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
+				{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
 			</Fragment>
 		);
 
