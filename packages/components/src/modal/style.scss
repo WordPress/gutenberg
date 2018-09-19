@@ -33,7 +33,7 @@
 	outline: none;
 	overflow: auto;
 
-	// Show a bigger modal on bigger screens.
+	// Show a centered modal on bigger screens.
 	@include break-small() {
 		top: 50%;
 		right: auto;
@@ -53,6 +53,11 @@
 		top: 30%;
 		left: 50%;
 		height: 70%;
+
+		min-width: $modal-min-width;
+		max-width: calc(100% - #{ $grid-size-large } - #{ $grid-size-large });
+		max-height: calc(100% - #{ $header-height });
+		transform: translate(-50%, -50%);
 	}
 }
 
@@ -65,8 +70,13 @@
 	flex-direction: row;
 	align-items: stretch;
 	justify-content: space-between;
+<<<<<<< HEAD
 	background: $white;
 	width: calc(100% - #{$panel-padding + $panel-padding});
+=======
+	align-items: center;
+	box-sizing: border-box;
+>>>>>>> Add min width and fix button size.
 	height: $header-height;
 	padding: $grid-size 0;
 
