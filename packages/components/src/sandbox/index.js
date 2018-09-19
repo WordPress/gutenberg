@@ -148,9 +148,10 @@ class Sandbox extends Component {
 			body.wp-has-aspect-ratio > div,
 			body.wp-has-aspect-ratio > div > iframe {
 				height: 100%;
+				overflow: hidden; /* If it has an aspect ratio, it shouldn't scroll. */
 			}
 			body > div > * {
-				margin-top: 0 !important;	/* has to have !important to override inline styles */
+				margin-top: 0 !important; /* Has to have !important to override inline styles. */
 				margin-bottom: 0 !important;
 			}
 		`;
