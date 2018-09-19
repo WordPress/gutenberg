@@ -38,17 +38,21 @@ export function getEmbedEdit( title, icon ) {
 	return class extends Component {
 		constructor() {
 			super( ...arguments );
-
 			this.switchBackToURLInput = this.switchBackToURLInput.bind( this );
 			this.setUrl = this.setUrl.bind( this );
 			this.maybeSwitchBlock = this.maybeSwitchBlock.bind( this );
+			this.getAttributesFromPreview = this.getAttributesFromPreview.bind( this );
 			this.setAttributesFromPreview = this.setAttributesFromPreview.bind( this );
-			this.maybeSetAspectRatioClassName = this.maybeSetAspectRatioClassName.bind( this );
+			this.getClassNamesWithAspectRatio = this.getClassNamesWithAspectRatio.bind( this );
 
 			this.state = {
 				editingURL: false,
 				url: this.props.attributes.url,
 			};
+
+			if ( this.props.preview && ! this.props.previewIsFallback ) {
+				this.setAttributesFromPreview();
+			}
 
 			this.maybeSwitchBlock();
 		}
@@ -65,7 +69,7 @@ export function getEmbedEdit( title, icon ) {
 			const switchedPreview = this.props.preview && this.props.attributes.url !== prevProps.attributes.url;
 			const switchedURL = this.props.attributes.url !== prevProps.attributes.url;
 
-			if ( switchedURL && this.maybeSwitchBlock() ) {
+			if ( ( switchedURL || ( hasPreview && ! hadPreview ) ) && this.maybeSwitchBlock() ) {
 				return;
 			}
 
@@ -128,7 +132,22 @@ export function getEmbedEdit( title, icon ) {
 				if ( includes( html, 'class="wp-embedded-content" data-secret' ) ) {
 					// If this is not the WordPress embed block, transform it into one.
 					if ( this.props.name !== 'core-embed/wordpress' ) {
-						this.props.onReplace( createBlock( 'core-embed/wordpress', { url } ) );
+						this.props.onReplace(
+							createBlock(
+								'core-embed/wordpress',
+								{
+									url,
+									// By now we have the preview, but when the new block first renders, it
+									// won't have had all the attributes set, and so won't get the correct
+									// type and it won't render correctly. So, we work out the attributes
+									// here so that the initial render works when we switch to the WordPress
+									// block. This only affects the WordPress block because it can't be
+									// rendered in the usual Sandbox (it has a sandbox of its own) and it
+									// relies on the preview to set the correct render type.
+									...this.getAttributesFromPreview( this.props.preview ),
+								}
+							)
+						);
 						return true;
 					}
 				}
@@ -142,14 +161,15 @@ export function getEmbedEdit( title, icon ) {
 		 * if the HTML has an iframe with width and height set.
 		 *
 		 * @param {string} html The preview HTML that possibly contains an iframe with width and height set.
+		 * @return {string} The CSS classes with any aspect ratio classes included.
 		 */
-		maybeSetAspectRatioClassName( html ) {
+		getClassNamesWithAspectRatio( html ) {
 			const previewDocument = document.implementation.createHTMLDocument( '' );
 			previewDocument.body.innerHTML = html;
 			const iframe = previewDocument.body.querySelector( 'iframe' );
 
 			if ( ! iframe ) {
-				return;
+				return this.props.attributes.className;
 			}
 
 			if ( iframe.height && iframe.width ) {
@@ -183,18 +203,21 @@ export function getEmbedEdit( title, icon ) {
 				}
 
 				if ( aspectRatioClassName ) {
-					const className = classnames( this.props.attributes.className, 'wp-has-aspect-ratio', aspectRatioClassName );
-					this.props.setAttributes( { className } );
+					return classnames( this.props.attributes.className, 'wp-has-aspect-ratio', aspectRatioClassName );
 				}
+
+				return this.props.attributes.className;
 			}
 		}
 
 		/***
-		 * Sets block attributes based on the preview data.
+		 * Gets block attributes based on the preview.
+		 *
+		 * @param {string} preview The preview data.
+		 * @return {Object} Attributes and values.
 		 */
-		setAttributesFromPreview() {
-			const { setAttributes, preview } = this.props;
-
+		getAttributesFromPreview( preview ) {
+			const attributes = {};
 			// Some plugins only return HTML with no type info, so default this to 'rich'.
 			let { type = 'rich' } = preview;
 			// If we got a provider name from the API, use it for the slug, otherwise we use the title,
@@ -207,10 +230,21 @@ export function getEmbedEdit( title, icon ) {
 			}
 
 			if ( html || 'photo' === type ) {
-				setAttributes( { type, providerNameSlug } );
+				attributes.type = type;
+				attributes.providerNameSlug = providerNameSlug;
 			}
 
-			this.maybeSetAspectRatioClassName( html );
+			attributes.className = this.getClassNamesWithAspectRatio( html );
+
+			return attributes;
+		}
+
+		/***
+		 * Sets block attributes based on the preview data.
+		 */
+		setAttributesFromPreview() {
+			const { setAttributes, preview } = this.props;
+			setAttributes( this.getAttributesFromPreview( preview ) );
 		}
 
 		switchBackToURLInput() {

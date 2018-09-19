@@ -249,7 +249,7 @@ function do_blocks( $content ) {
 
 	return $rendered_content;
 }
-add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode().
+add_filter( 'the_content', 'do_blocks', 7 ); // BEFORE do_shortcode() and oembed.
 
 /**
  * Remove all dynamic blocks from the given content.
