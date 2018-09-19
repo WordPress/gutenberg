@@ -1,8 +1,11 @@
 body.is-fullscreen-mode {
 	// Reset the html.wp-topbar padding
+	// Because this uses negative margins, we have to compensate for the height.
 	margin-top: -$admin-bar-height-big;
+	height: calc(100% + #{ $admin-bar-height-big });
 	@include break-medium() {
 		margin-top: -$admin-bar-height;
+		height: calc(100% + #{ $admin-bar-height });
 	}
 
 	#adminmenumain,
