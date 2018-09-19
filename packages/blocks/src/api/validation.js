@@ -8,6 +8,7 @@ import { xor, fromPairs, isEqual, includes, stubTrue } from 'lodash';
  * Internal dependencies
  */
 import { getSaveContent } from './serializer';
+import { hasBlockSupport } from './registration';
 
 /**
  * Globally matches any consecutive whitespace
@@ -464,6 +465,11 @@ export function isEquivalentHTML( actual, expected ) {
  * @return {boolean} Whether block is valid.
  */
 export function isValidBlock( innerHTML, blockType, attributes ) {
+	// Validate blocks that support it, otherwise assume it is valid
+	if ( ! hasBlockSupport( blockType.name, 'htmlValidation', true ) ) {
+		return true;
+	}
+
 	let saveContent;
 	try {
 		saveContent = getSaveContent( blockType, attributes );
