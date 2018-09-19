@@ -24,11 +24,7 @@ exports[`adding blocks Should navigate inner blocks with arrow keys 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
-exports[`adding blocks should clean TinyMCE content 1`] = `
-"<!-- wp:paragraph -->
-<p></p>
-<!-- /wp:paragraph -->"
-`;
+exports[`adding blocks should clean TinyMCE content 1`] = `""`;
 
 exports[`adding blocks should clean TinyMCE content 2`] = `
 "<!-- wp:paragraph -->
