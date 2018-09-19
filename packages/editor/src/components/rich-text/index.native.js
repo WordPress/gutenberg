@@ -20,7 +20,7 @@ import { children } from '@wordpress/blocks';
  */
 import FormatToolbar from './format-toolbar';
 import { FORMATTING_CONTROLS } from './formatting-controls';
-import isRichTextValueEmpty from './utils';
+import { isRichTextValueEmpty } from './utils';
 
 export function getFormatValue( formatName ) {
 	if ( 'link' === formatName ) {

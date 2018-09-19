@@ -43,7 +43,7 @@ import patterns from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
 import { domToFormat, valueToString } from './format';
 import TokenUI from './tokens/ui';
-import isRichTextValueEmpty from './utils';
+import { isRichTextValueEmpty } from './utils';
 
 /**
  * Browser dependencies
