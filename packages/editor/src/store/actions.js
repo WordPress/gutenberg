@@ -772,3 +772,25 @@ export function unregisterToken( name ) {
 		name,
 	};
 }
+
+/**
+ * Returns an action object used in signalling that the user has enabled the publish sidebar.
+ *
+ * @return {Object} Action object
+ */
+export function enablePublishSidebar() {
+	return {
+		type: 'ENABLE_PUBLISH_SIDEBAR',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user has disabled the publish sidebar.
+ *
+ * @return {Object} Action object
+ */
+export function disablePublishSidebar() {
+	return {
+		type: 'DISABLE_PUBLISH_SIDEBAR',
+	};
+}

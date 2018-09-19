@@ -35,6 +35,11 @@ import {
 import { moment } from '@wordpress/date';
 import { removep } from '@wordpress/autop';
 
+/**
+ * Dependencies
+ */
+import { PREFERENCES_DEFAULTS } from './defaults';
+
 /***
  * Module constants
  */
@@ -1925,4 +1930,19 @@ export function getTokenSettings( state, name ) {
  */
 export function canUserUseUnfilteredHTML( state ) {
 	return has( getCurrentPost( state ), [ '_links', 'wp:action-unfiltered_html' ] );
+}
+
+/**
+ * Returns whether the pre-publish panel should be shown
+ * or skipped when the user clicks the "publish" button.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the pre-publish panel should be shown or not.
+ */
+export function isPublishSidebarEnabled( state ) {
+	if ( state.preferences.hasOwnProperty( 'isPublishSidebarEnabled' ) ) {
+		return state.preferences.isPublishSidebarEnabled;
+	}
+	return PREFERENCES_DEFAULTS.isPublishSidebarEnabled;
 }
