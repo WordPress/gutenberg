@@ -136,7 +136,7 @@ export async function newPost( { postType, enableTips = false } = {} ) {
 	}
 }
 
-export async function disablePrePublishChecks( ) {
+export async function togglePrePublishChecks( ) {
 	await page.click( '.edit-post-more-menu' );
 	await page.waitForSelector( '.components-popover__content' );
 	await page.click( '.components-popover__content > .components-menu-group:nth-child(3) button:nth-child(3)' );

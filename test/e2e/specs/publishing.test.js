@@ -5,7 +5,7 @@ import {
 	newPost,
 	publishPost,
 	publishPostWithoutPrePublishChecks,
-	disablePrePublishChecks,
+	togglePrePublishChecks,
 } from '../support/utils';
 
 describe( 'Publishing', () => {
@@ -36,7 +36,11 @@ describe( 'Publishing', () => {
 		describe( `a ${ postType } with pre-publish checks disabled`, () => {
 			beforeEach( async () => {
 				await newPost( postType );
-				await disablePrePublishChecks();
+				await togglePrePublishChecks();
+			} );
+
+			afterEach( async () => {
+				await togglePrePublishChecks();
 			} );
 
 			it( `should publish the ${ postType } without opening the post-publish sidebar.`, async () => {
