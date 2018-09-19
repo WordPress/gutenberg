@@ -7,18 +7,25 @@ import {
 	publishPostWithoutPrePublishChecks,
 	enablePrePublishChecks,
 	disablePrePublishChecks,
+	arePrePublishChecksEnabled,
 } from '../support/utils';
 
 describe( 'Publishing', () => {
 	[ 'post', 'page' ].forEach( ( postType ) => {
+		let werePrePublishChecksEnabled;
 		describe( `a ${ postType }`, () => {
 			beforeEach( async () => {
 				await newPost( postType );
-				await enablePrePublishChecks();
+				werePrePublishChecksEnabled = await arePrePublishChecksEnabled();
+				if ( ! werePrePublishChecksEnabled ) {
+					await enablePrePublishChecks();
+				}
 			} );
 
 			afterEach( async () => {
-				await disablePrePublishChecks();
+				if ( ! werePrePublishChecksEnabled ) {
+					await disablePrePublishChecks();
+				}
 			} );
 
 			it( `should publish the ${ postType } and close the panel once we start editing again.`, async () => {
@@ -39,14 +46,20 @@ describe( 'Publishing', () => {
 	} );
 
 	[ 'post', 'page' ].forEach( ( postType ) => {
+		let werePrePublishChecksEnabled;
 		describe( `a ${ postType } with pre-publish checks disabled`, () => {
 			beforeEach( async () => {
 				await newPost( postType );
-				await disablePrePublishChecks();
+				werePrePublishChecksEnabled = await arePrePublishChecksEnabled();
+				if ( werePrePublishChecksEnabled ) {
+					await disablePrePublishChecks();
+				}
 			} );
 
 			afterEach( async () => {
-				await enablePrePublishChecks();
+				if ( werePrePublishChecksEnabled ) {
+					await enablePrePublishChecks();
+				}
 			} );
 
 			it( `should publish the ${ postType } without opening the post-publish sidebar.`, async () => {
