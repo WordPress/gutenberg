@@ -9,6 +9,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 const PublishSidebarToggle = function( { onToggle, isEnabled } ) {
 	return (
 		<MenuItem
+			className={ 'edit-post__pre-publish-checks' }
 			icon={ isEnabled && 'yes' }
 			isSelected={ isEnabled }
 			role="menuitemcheckbox"
