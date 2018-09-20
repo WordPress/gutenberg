@@ -4,6 +4,7 @@
 import { __, _x } from '@wordpress/i18n';
 import { IconButton, Dropdown, MenuGroup, MenuItem } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -40,7 +41,7 @@ const MoreMenu = () => (
 				>
 					<MenuItem
 						role="menuitem"
-						href="edit.php?post_type=wp_block"
+						href={ addQueryArgs( 'edit.php', { post_type: 'wp_block' } ) }
 					>
 						{ __( 'Manage All Reusable Blocks' ) }
 					</MenuItem>
