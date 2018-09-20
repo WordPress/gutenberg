@@ -54,6 +54,11 @@
 	// where it is no longer noticeable.
 	> .edit-post-header__settings {
 		order: 1;
+
+		// Restore default order for all other browsers
+		@supports (position: sticky) {
+			order: initial;
+		}
 	}
 }
 
