@@ -52,7 +52,7 @@ export const searchItems = ( items, searchTerm ) => {
 
 	return items.filter( ( item ) => {
 		const itemCategory = find( categories, { slug: item.category } );
-		return matchSearch( item.title ) || some( item.keywords, matchSearch ) || matchSearch( itemCategory.title );
+		return matchSearch( item.title ) || some( item.keywords, matchSearch ) || ( itemCategory && matchSearch( itemCategory.title ) );
 	} );
 };
 
