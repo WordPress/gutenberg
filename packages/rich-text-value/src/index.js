@@ -4,7 +4,7 @@ export { create, createValue } from './create';
 export { getActiveFormat } from './get-active-format';
 export { getTextContent } from './get-text-content';
 export { isCollapsed } from './is-collapsed';
-export { isEmpty } from './is-empty';
+export { isEmpty, isEmptyLine } from './is-empty';
 export { join } from './join';
 export { removeFormat } from './remove-format';
 export { remove } from './remove';

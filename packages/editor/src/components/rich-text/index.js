@@ -40,6 +40,7 @@ import {
 	getTextContent,
 	join,
 	insert,
+	isEmptyLine,
 } from '@wordpress/rich-text-value';
 import deprecated from '@wordpress/deprecated';
 
@@ -576,7 +577,6 @@ export class RichText extends Component {
 	 * @param {KeydownEvent} event The keydown event as triggered by TinyMCE.
 	 */
 	onKeyDown( event ) {
-		const dom = this.editor.dom;
 		const { keyCode } = event;
 
 		const isDelete = keyCode === DELETE || keyCode === BACKSPACE;
@@ -616,37 +616,15 @@ export class RichText extends Component {
 					return;
 				}
 
-				const selectedNode = this.editor.selection.getNode();
+				const record = this.getRecord();
 
-				if ( selectedNode.parentNode !== this.editableRef ) {
-					return;
-				}
-
-				if ( ! dom.isEmpty( selectedNode ) ) {
+				if ( ! isEmptyLine( record ) ) {
 					return;
 				}
 
 				event.preventDefault();
 
-				const childNodes = Array.from( this.editableRef.childNodes );
-				const index = dom.nodeIndex( selectedNode );
-				const beforeNodes = childNodes.slice( 0, index );
-				const afterNodes = childNodes.slice( index + 1 );
-				const beforeFragment = document.createDocumentFragment();
-				const afterFragment = document.createDocumentFragment();
-
-				beforeNodes.forEach( ( node ) => {
-					beforeFragment.appendChild( node );
-				} );
-				afterNodes.forEach( ( node ) => {
-					afterFragment.appendChild( node );
-				} );
-
-				const { multiline } = this.props;
-				const before = createValue( beforeFragment, multiline, richTextStructureSettings );
-				const after = createValue( afterFragment, multiline, richTextStructureSettings );
-
-				this.props.onSplit( this.valueToFormat( before ), this.valueToFormat( after ) );
+				this.props.onSplit( ...split( record ).map( this.valueToFormat ) );
 			} else {
 				event.preventDefault();
 

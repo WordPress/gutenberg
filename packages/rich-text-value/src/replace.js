@@ -14,7 +14,7 @@
  *
  * @return {Object} A new value with replacements applied.
  */
-export function replace( { formats, text }, pattern, replacement ) {
+export function replace( { formats, text, start, end }, pattern, replacement ) {
 	text = text.replace( pattern, ( match, ...rest ) => {
 		const offset = rest[ rest.length - 2 ];
 		let newText = replacement;
@@ -37,8 +37,12 @@ export function replace( { formats, text }, pattern, replacement ) {
 
 		formats = formats.slice( 0, offset ).concat( newFormats, formats.slice( offset + match.length ) );
 
+		if ( start ) {
+			start = end = offset + newText.length;
+		}
+
 		return newText;
 	} );
 
-	return { formats, text };
+	return { formats, text, start, end };
 }

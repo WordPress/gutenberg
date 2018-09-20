@@ -97,6 +97,35 @@ describe( 'split', () => {
 		} );
 	} );
 
+	it( 'should split multiline', () => {
+		const record = {
+			formats: [ , , , , , , , , , , , , ],
+			text: 'test\n\n\n\ntest',
+			start: 6,
+			end: 6,
+		};
+		const expected = [
+			{
+				formats: [ , , , , ],
+				text: 'test',
+			},
+			{
+				formats: [ , , , , ],
+				text: 'test',
+				start: 0,
+				end: 0,
+			},
+		];
+		const result = split( deepFreeze( record ) );
+
+		expect( result ).toEqual( expected );
+		result.forEach( ( item, index ) => {
+			expect( item ).not.toBe( record );
+			expect( getSparseArrayLength( item.formats ) )
+				.toBe( getSparseArrayLength( expected[ index ].formats ) );
+		} );
+	} );
+
 	it( 'should split search', () => {
 		const record = {
 			start: 6,

@@ -319,13 +319,13 @@ function createFromMultilineElement( element, range, multilineTag, settings ) {
 
 		const value = createFromElement( node, range, settings );
 
-		accumulateSelection( accumulator, node, range, value );
-
 		// Multiline value text should be separated by a double line break.
 		if ( index !== 0 ) {
 			accumulator.formats = accumulator.formats.concat( [ , , ] );
 			accumulator.text += '\n\n';
 		}
+
+		accumulateSelection( accumulator, node, range, value );
 
 		accumulator.formats = accumulator.formats.concat( value.formats );
 		accumulator.text += value.text;

@@ -314,7 +314,7 @@ describe( 'create', () => {
 			} ),
 			record: {
 				start: 1,
-				end: 3,
+				end: 5,
 				formats: [ , , , , , , , , ],
 				text: 'one\n\ntwo',
 			},
@@ -334,6 +334,23 @@ describe( 'create', () => {
 				end: 6,
 				formats: [ , , , list, list, list, , , , , , , , ],
 				text: 'onetwo\n\nthree',
+			},
+		},
+		{
+			description: 'should handle multiline value with empty',
+			multiline: 'p',
+			html: '<p>one</p><p></p>',
+			createRange: ( element ) => ( {
+				startOffset: 0,
+				startContainer: element.lastChild,
+				endOffset: 0,
+				endContainer: element.lastChild,
+			} ),
+			record: {
+				start: 5,
+				end: 5,
+				formats: [ , , , , , ],
+				text: 'one\n\n',
 			},
 		},
 		{

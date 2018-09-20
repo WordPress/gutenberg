@@ -330,7 +330,7 @@ export const settings = {
 										blocks.push( createBlock( 'core/paragraph' ) );
 									}
 
-									if ( after.length ) {
+									if ( ! RichText.isEmpty( after ) ) {
 										blocks.push( createBlock( 'core/list', {
 											ordered,
 											values: after,

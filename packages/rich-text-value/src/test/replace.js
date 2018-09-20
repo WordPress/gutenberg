@@ -20,6 +20,8 @@ describe( 'replace', () => {
 		const expected = {
 			formats: [ , , , , [ em ], , , , , , , ],
 			text: 'one 2 three',
+			start: 5,
+			end: 5,
 		};
 		const result = replace( deepFreeze( record ), 'two', '2' );
 
@@ -42,6 +44,8 @@ describe( 'replace', () => {
 		const expected = {
 			formats: [ , , , , , , , , , , , ],
 			text: 'one 2 three',
+			start: 5,
+			end: 5,
 		};
 		const result = replace( deepFreeze( record ), 'two', replacement );
 
@@ -60,6 +64,8 @@ describe( 'replace', () => {
 		const expected = {
 			formats: [ , , , , , , , , , , , , , , , , , , ],
 			text: 'abc - 12345 - #$*%',
+			start: 18,
+			end: 18,
 		};
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace
 		const result = replace( deepFreeze( record ), /([^\d]*)(\d*)([^\w]*)/, ( match, p1, p2, p3 ) => {

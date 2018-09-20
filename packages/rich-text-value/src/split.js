@@ -1,4 +1,10 @@
 /**
+ * Internal dependencies
+ */
+
+import { replace } from './replace';
+
+/**
  * Split a Rich Text value in two at the given `startIndex` and `endIndex`, or
  * split at the given separator. This is similar to `String.prototype.split`.
  * Indices are retrieved from the selection if none are provided.
@@ -48,16 +54,20 @@ function splitAtSelection(
 	startIndex = start,
 	endIndex = end
 ) {
+	const before = {
+		formats: formats.slice( 0, startIndex ),
+		text: text.slice( 0, startIndex ),
+	};
+	const after = {
+		formats: formats.slice( endIndex ),
+		text: text.slice( endIndex ),
+		start: 0,
+		end: 0,
+	};
+
 	return [
-		{
-			formats: formats.slice( 0, startIndex ),
-			text: text.slice( 0, startIndex ),
-		},
-		{
-			formats: formats.slice( endIndex ),
-			text: text.slice( endIndex ),
-			start: 0,
-			end: 0,
-		},
+		// Ensure newlines are trimmed.
+		replace( before, /\n+$/, '' ),
+		replace( after, /^\n+/, '' ),
 	];
 }
