@@ -866,6 +866,9 @@
 				// Move the block toolbar upwards using margin, as translate doesn't work.
 				margin-top: -$block-toolbar-height -$block-padding -$border-width;
 
+				// Disable the technique used to move the block toolbar upwards in non-edge browsers.
+				transform: translateY(0);
+
 				// Stick to the top which is different because of using margins instead of translate.
 				top: -$border-width;
 			}
