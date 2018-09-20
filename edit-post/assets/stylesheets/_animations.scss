@@ -26,6 +26,11 @@
 	animation: slide_in_right 0.1s forwards;
 }
 
+@mixin slide_in_top {
+	transform: translateY(-100%);
+	animation: slide_in_top 0.1s forwards;
+}
+
 @mixin fade_in($speed: 0.2s, $delay: 0s) {
 	animation: fade-in $speed ease-out $delay;
 	animation-fill-mode: forwards;
