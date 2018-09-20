@@ -1,6 +1,8 @@
 export default function( node ) {
 	if (
-		node.nodeName !== 'META' &&
+		node.nodeName !== 'SCRIPT' &&
+		node.nodeName !== 'NOSCRIPT' &&
+		node.nodeName !== 'TEMPLATE' &&
 		node.nodeName !== 'STYLE'
 	) {
 		return;

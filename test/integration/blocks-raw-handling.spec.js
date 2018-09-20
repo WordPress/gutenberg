@@ -114,6 +114,7 @@ describe( 'Blocks raw handling', () => {
 			'two-images',
 			'markdown',
 			'wordpress',
+			'gutenberg',
 		].forEach( ( type ) => {
 			it( type, () => {
 				const HTML = readFile( path.join( __dirname, `fixtures/${ type }-in.html` ) );
@@ -123,7 +124,10 @@ describe( 'Blocks raw handling', () => {
 				const serialized = typeof converted === 'string' ? converted : serialize( converted );
 
 				expect( serialized ).toBe( output );
-				expect( console ).toHaveLogged();
+
+				if ( type !== 'gutenberg' ) {
+					expect( console ).toHaveLogged();
+				}
 			} );
 		} );
 	} );

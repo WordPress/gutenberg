@@ -80,7 +80,7 @@ function getRawTransformations() {
  */
 export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', tagName, canUserUseUnfilteredHTML = false } ) {
 	// First of all, strip any meta tags.
-	// HTML = HTML.replace( /<meta[^>]+>/, '' );
+	HTML = HTML.replace( /<meta[^>]+>/, '' );
 
 	// If we detect block delimiters, parse entirely as blocks.
 	if ( mode !== 'INLINE' && HTML.indexOf( '<!-- wp:' ) !== -1 ) {
