@@ -10,7 +10,7 @@ import classnames from 'classnames';
  */
 import { Component, createElement } from '@wordpress/element';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
-import { toHTMLString, join, createValue } from '@wordpress/rich-text-structure';
+import { toHTMLString, join, createValue } from '@wordpress/rich-text-value';
 import deprecated from '@wordpress/deprecated';
 
 /**

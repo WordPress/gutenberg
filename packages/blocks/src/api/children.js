@@ -5,7 +5,7 @@ import {
 	concat as richTextConcat,
 	toHTMLString,
 	createValue,
-} from '@wordpress/rich-text-structure';
+} from '@wordpress/rich-text-value';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -23,7 +23,7 @@ import deprecated from '@wordpress/deprecated';
  */
 function getChildrenArray( children ) {
 	deprecated( 'wp.blocks.children.getChildrenArray', {
-		alternative: 'wp.richTextStructure.createValue',
+		alternative: 'wp.richTextValue.createValue',
 		plugin: 'Gutenberg',
 		version: '3.9',
 	} );
@@ -44,7 +44,7 @@ function getChildrenArray( children ) {
  */
 export function concat( ...children ) {
 	deprecated( 'wp.blocks.children.concat', {
-		alternative: 'wp.richTextStructure.concat',
+		alternative: 'wp.richTextValue.concat',
 		plugin: 'Gutenberg',
 		version: '3.9',
 	} );
@@ -62,7 +62,7 @@ export function concat( ...children ) {
  */
 export function fromDOM( domNodes ) {
 	deprecated( 'wp.blocks.children.fromDOM', {
-		alternative: 'wp.richTextStructure.createValue',
+		alternative: 'wp.richTextValue.createValue',
 		plugin: 'Gutenberg',
 		version: '3.9',
 	} );
@@ -83,7 +83,7 @@ export function fromDOM( domNodes ) {
  */
 export function toHTML( children ) {
 	deprecated( 'wp.blocks.children.toHTML', {
-		alternative: 'wp.richTextStructure.toHTMLString',
+		alternative: 'wp.richTextValue.toHTMLString',
 		plugin: 'Gutenberg',
 		version: '3.9',
 	} );

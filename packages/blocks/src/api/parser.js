@@ -10,7 +10,7 @@ import { flow, castArray, mapValues, omit, stubFalse } from 'lodash';
 import { autop } from '@wordpress/autop';
 import { applyFilters } from '@wordpress/hooks';
 import { parse as defaultParse } from '@wordpress/block-serialization-default-parser';
-import { createValue } from '@wordpress/rich-text-structure';
+import { createValue } from '@wordpress/rich-text-value';
 
 /**
  * Internal dependencies

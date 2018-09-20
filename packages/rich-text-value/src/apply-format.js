@@ -1,8 +1,7 @@
 /**
- * Applies a given format to a record from the given start to the given end.
- * If either start or end are omitted, the record's selection will be used.
- * If at any index there is already a format of the same type present, it will
- * be removed.
+ * Apply a format object to a Rich Text value from the given `startIndex` to the
+ * given `endIndex`. Indices are retrieved from the selection if none are
+ * provided.
  *
  * @param {Object} record     Record to modify.
  * @param {Object} format     Format to apply.

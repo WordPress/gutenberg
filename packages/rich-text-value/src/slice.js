@@ -1,13 +1,13 @@
 /**
- * Extracts a section of a record and returns it as a new record.
+ * Slice a Rich Text value from `startIndex` to `endIndex`. Indices are
+ * retrieved from the selection if none are provided. This is similar to
+ * `String.prototype.slice`.
  *
- * Works like `String.prototype.slice()`.
- *
- * @param {Object} record      Record to modify.
+ * @param {Object} value       Value to modify.
  * @param {number} startIndex  Start index.
  * @param {number} endIndex    End index.
  *
- * @return {Object} A new extracted record.
+ * @return {Object} A new extracted value.
  */
 export function slice(
 	{ formats, text, start, end },

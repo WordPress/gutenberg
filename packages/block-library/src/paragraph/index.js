@@ -17,7 +17,7 @@ import {
 	RichText,
 } from '@wordpress/editor';
 import { getPhrasingContentSchema } from '@wordpress/blocks';
-import { createValue } from '@wordpress/rich-text-structure';
+import { createValue } from '@wordpress/rich-text-value';
 
 /**
  * Internal dependencies

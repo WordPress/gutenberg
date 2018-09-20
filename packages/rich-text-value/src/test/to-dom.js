@@ -9,7 +9,7 @@ import { JSDOM } from 'jsdom';
  */
 
 import { create } from '../create';
-import { recordToDom, multilineRecordToDom, applyValue } from '../to-dom';
+import { valueToDom, multilineValueToDom, applyValue } from '../to-dom';
 
 const { window } = new JSDOM();
 const { document } = window;
@@ -36,7 +36,7 @@ describe( 'recordToDom', () => {
 			endOffset: 1,
 			endContainer: node.querySelector( 'strong' ).firstChild,
 		};
-		const { body, selection } = recordToDom( create( node, range ) );
+		const { body, selection } = valueToDom( create( node, range ) );
 
 		expect( body.innerHTML ).toEqual( node.innerHTML );
 		expect( selection ).toEqual( {
@@ -54,7 +54,7 @@ describe( 'recordToDom', () => {
 			endOffset: 0,
 			endContainer: node.querySelector( 'strong' ).firstChild,
 		};
-		const { body, selection } = recordToDom( create( node, range ) );
+		const { body, selection } = valueToDom( create( node, range ) );
 
 		expect( body.innerHTML ).toEqual( node.innerHTML );
 		expect( selection ).toEqual( {
@@ -72,7 +72,7 @@ describe( 'recordToDom', () => {
 			endOffset: 1,
 			endContainer: node,
 		};
-		const { body, selection } = recordToDom( create( node, range ) );
+		const { body, selection } = valueToDom( create( node, range ) );
 
 		expect( body.innerHTML ).toEqual( node.innerHTML );
 		expect( selection ).toEqual( {
@@ -90,7 +90,7 @@ describe( 'recordToDom', () => {
 			endOffset: 2,
 			endContainer: node.querySelector( 'em' ).firstChild,
 		};
-		const { body, selection } = recordToDom( create( node, range ) );
+		const { body, selection } = valueToDom( create( node, range ) );
 
 		expect( body.innerHTML ).toEqual( node.innerHTML );
 		expect( selection ).toEqual( {
@@ -108,7 +108,7 @@ describe( 'recordToDom', () => {
 			endOffset: 0,
 			endContainer: node.querySelector( 'a' ).firstChild,
 		};
-		const { body, selection } = recordToDom( create( node, range ) );
+		const { body, selection } = valueToDom( create( node, range ) );
 
 		expect( body.innerHTML ).toEqual( node.innerHTML );
 		expect( selection ).toEqual( {
@@ -126,7 +126,7 @@ describe( 'recordToDom', () => {
 			endOffset: 2,
 			endContainer: node,
 		};
-		const { body, selection } = recordToDom( create( node, range ) );
+		const { body, selection } = valueToDom( create( node, range ) );
 
 		expect( body.innerHTML ).toEqual( node.innerHTML );
 		expect( selection ).toEqual( {
@@ -144,7 +144,7 @@ describe( 'recordToDom', () => {
 			endOffset: 2,
 			endContainer: node.querySelector( 'li' ).firstChild,
 		};
-		const { body, selection } = multilineRecordToDom( create( node, range, 'li' ), 'li' );
+		const { body, selection } = multilineValueToDom( create( node, range, 'li' ), 'li' );
 
 		expect( body.innerHTML ).toEqual( node.innerHTML );
 		expect( selection ).toEqual( {

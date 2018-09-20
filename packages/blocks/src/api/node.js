@@ -4,7 +4,7 @@
 import {
 	toHTMLString,
 	createValue,
-} from '@wordpress/rich-text-structure';
+} from '@wordpress/rich-text-value';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -43,7 +43,7 @@ function isNodeOfType( node, type ) {
  */
 export function fromDOM( domNode ) {
 	deprecated( 'wp.blocks.node.fromDOM', {
-		alternative: 'wp.richTextStructure.createValue',
+		alternative: 'wp.richTextValue.createValue',
 		plugin: 'Gutenberg',
 		version: '3.9',
 	} );
@@ -60,7 +60,7 @@ export function fromDOM( domNode ) {
  */
 export function toHTML( node ) {
 	deprecated( 'wp.blocks.node.toHTML', {
-		alternative: 'wp.richTextStructure.toHTMLString',
+		alternative: 'wp.richTextValue.toHTMLString',
 		plugin: 'Gutenberg',
 		version: '3.9',
 	} );

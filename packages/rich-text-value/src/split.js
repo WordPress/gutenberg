@@ -1,14 +1,13 @@
 /**
- * Splits a record into an array of records using a specified separator string
- * or start and end indices to determine where to make each split. If indices
- * are provided, the array will always consist of two records and the content in
- * between will not be returned.
+ * Split a Rich Text value in two at the given `startIndex` and `endIndex`, or
+ * split at the given separator. This is similar to `String.prototype.split`.
+ * Indices are retrieved from the selection if none are provided.
  *
- * @param {Object}        record  Record to modify.
+ * @param {Object}        value   Value to modify.
  * @param {number|string} string  Start index, or string at which to split.
  * @param {number}        end     End index.
  *
- * @return {Array} An array of new records.
+ * @return {Array} An array of new values.
  */
 export function split( { formats, text, start, end }, string ) {
 	if ( typeof string !== 'string' ) {
@@ -19,7 +18,7 @@ export function split( { formats, text, start, end }, string ) {
 
 	return text.split( string ).map( ( substring ) => {
 		const startIndex = nextStart;
-		const record = {
+		const value = {
 			formats: formats.slice( startIndex, startIndex + substring.length ),
 			text: substring,
 		};
@@ -28,19 +27,19 @@ export function split( { formats, text, start, end }, string ) {
 
 		if ( start !== undefined && end !== undefined ) {
 			if ( start > startIndex && start < nextStart ) {
-				record.start = start - startIndex;
+				value.start = start - startIndex;
 			} else if ( start < startIndex && end > startIndex ) {
-				record.start = 0;
+				value.start = 0;
 			}
 
 			if ( end > startIndex && end < nextStart ) {
-				record.end = end - startIndex;
+				value.end = end - startIndex;
 			} else if ( start < nextStart && end > nextStart ) {
-				record.end = substring.length;
+				value.end = substring.length;
 			}
 		}
 
-		return record;
+		return value;
 	} );
 }
 

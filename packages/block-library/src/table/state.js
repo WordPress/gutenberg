@@ -6,7 +6,7 @@ import { times } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createValue } from '@wordpress/rich-text-structure';
+import { createValue } from '@wordpress/rich-text-value';
 
 /**
  * Creates a table state.

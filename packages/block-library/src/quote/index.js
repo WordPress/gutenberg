@@ -14,7 +14,7 @@ import {
 	AlignmentToolbar,
 	RichText,
 } from '@wordpress/editor';
-import { join, split } from '@wordpress/rich-text-structure';
+import { join, split } from '@wordpress/rich-text-value';
 
 const blockAttributes = {
 	value: {

@@ -25,21 +25,30 @@ function createElement( html ) {
 	return htmlDocument.body;
 }
 
-function getEmptyRecord() {
+function createEmptyValue() {
 	return { formats: [], text: '' };
 }
 
 /**
- * Creates a rich text record from a DOM element and range.
+ * Create a RichText value from an `Element` tree (DOM), an HTML string or a
+ * plain text string, with optionally a `Range` object to set the selection. If
+ * called without a given `input`, an empty value will be created. If
+ * `multilineTag` is provided, any content of direct children whose type matches
+ * `multilineTag` will be separated by two newlines. The `settings` object can
+ * be used to filter out content.
  *
- * @param {Element} element      Element to create record from.
- * @param {Range}   range        Range to create record from.
+ * @param {Element} element      Element to create value from.
+ * @param {Range}   range        Range to create value from.
  * @param {string}  multilineTag Multiline tag if the structure is multiline.
- * @param {Object}  settings     Settings passed to `createRecord`.
+ * @param {Object}  settings     Settings passed to `createFromElement`.
  *
- * @return {Object} A rich text record.
+ * @return {Object} A rich text value.
  */
 export function create( element, range, multilineTag, settings ) {
+	if ( ! element ) {
+		return createEmptyValue();
+	}
+
 	if ( typeof element === 'string' ) {
 		if ( element.indexOf( '<' ) !== -1 || /[^\s]+;/.test( element ) ) {
 			// May be HTML.
@@ -53,35 +62,35 @@ export function create( element, range, multilineTag, settings ) {
 	}
 
 	if ( ! multilineTag ) {
-		return createRecord( element, range, settings );
+		return createFromElement( element, range, settings );
 	}
 
-	return createRecordFromMultilineElement( element, range, multilineTag, settings );
+	return createFromMultilineElement( element, range, multilineTag, settings );
 }
 
 /**
- * Creates a rich text record from a DOM element.
+ * Creates a rich text value from a DOM element.
  *
  * @param {Element} element      Element to create value object from.
  * @param {string}  multilineTag Multiline tag.
- * @param {Object}  settings     Settings passed to `createRecord`.
+ * @param {Object}  settings     Settings passed to `createFromElement`.
  *
- * @return {Object} A rich text value object.
+ * @return {Object} A rich text value.
  */
 export function createValue( element, multilineTag, settings ) {
 	return create( element, null, multilineTag, settings );
 }
 
 /**
- * Helper to accumulate the record's selection start and end from the current
+ * Helper to accumulate the value's selection start and end from the current
  * node and range.
  *
  * @param {Object} accumulator Object to accumulate into.
- * @param {Node}   node        Node to create record with.
- * @param {Range}  range       Range to create record with.
- * @param {Object} record      Record that is being accumulated.
+ * @param {Node}   node        Node to create value with.
+ * @param {Range}  range       Range to create value with.
+ * @param {Object} value       Value that is being accumulated.
  */
-function accumulateSelection( accumulator, node, range, record ) {
+function accumulateSelection( accumulator, node, range, value ) {
 	if ( ! range ) {
 		return;
 	}
@@ -90,9 +99,9 @@ function accumulateSelection( accumulator, node, range, record ) {
 	const { startContainer, startOffset, endContainer, endOffset } = range;
 	const currentLength = accumulator.text.length;
 
-	// Selection can be extracted from record.
-	if ( record.start !== undefined ) {
-		accumulator.start = currentLength + record.start;
+	// Selection can be extracted from value.
+	if ( value.start !== undefined ) {
+		accumulator.start = currentLength + value.start;
 	// Range indicates that the current node has selection.
 	} else if ( node === startContainer ) {
 		accumulator.start = currentLength + startOffset;
@@ -104,9 +113,9 @@ function accumulateSelection( accumulator, node, range, record ) {
 		accumulator.start = currentLength;
 	}
 
-	// Selection can be extracted from record.
-	if ( record.end !== undefined ) {
-		accumulator.end = currentLength + record.end;
+	// Selection can be extracted from value.
+	if ( value.end !== undefined ) {
+		accumulator.end = currentLength + value.end;
 	// Range indicates that the current node has selection.
 	} else if ( node === endContainer ) {
 		accumulator.end = currentLength + endOffset;
@@ -115,7 +124,7 @@ function accumulateSelection( accumulator, node, range, record ) {
 		parentNode === endContainer &&
 		node === endContainer.childNodes[ endOffset - 1 ]
 	) {
-		accumulator.end = currentLength + record.text.length;
+		accumulator.end = currentLength + value.text.length;
 	}
 }
 
@@ -148,10 +157,10 @@ function filterRange( node, range, filter ) {
 }
 
 /**
- * Creates a rich text record from a DOM element and range.
+ * Creates a Rich Text value from a DOM element and range.
  *
- * @param {Element}  element                  ELement to create record with.
- * @param {Range}    range                    Range to create record with.
+ * @param {Element}  element                  ELement to create value with.
+ * @param {Range}    range                    Range to create value with.
  * @param {Object}   settings                 Settings object.
  * @param {Function} settings.removeNodeMatch Function to declare whether the
  *                                            given node should be removed.
@@ -162,13 +171,13 @@ function filterRange( node, range, filter ) {
  * @param {Function} settings.removeAttribute Match Wether to remove an
  *                                            attribute based on the name.
  *
- * @return {Object} A rich text record.
+ * @return {Object} A rich text value.
  */
-function createRecord( element, range, settings = {} ) {
-	const accumulator = getEmptyRecord();
+function createFromElement( element, range, settings = {} ) {
+	const accumulator = createEmptyValue();
 
 	if ( ! element || ! element.hasChildNodes() ) {
-		accumulateSelection( accumulator, element, range, getEmptyRecord() );
+		accumulateSelection( accumulator, element, range, createEmptyValue() );
 		return accumulator;
 	}
 
@@ -207,12 +216,12 @@ function createRecord( element, range, settings = {} ) {
 			removeNodeMatch( node ) ||
 			( unwrapNodeMatch( node ) && ! node.hasChildNodes() )
 		) {
-			accumulateSelection( accumulator, node, range, getEmptyRecord() );
+			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			continue;
 		}
 
 		if ( node.nodeName === 'BR' ) {
-			accumulateSelection( accumulator, node, range, getEmptyRecord() );
+			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			accumulator.text += '\n';
 			accumulator.formats.length += 1;
 			continue;
@@ -226,14 +235,14 @@ function createRecord( element, range, settings = {} ) {
 			format = attributes ? { type, attributes } : { type };
 		}
 
-		const record = createRecord( node, range, settings );
-		const text = record.text;
+		const value = createFromElement( node, range, settings );
+		const text = value.text;
 		const start = accumulator.text.length;
 
-		accumulateSelection( accumulator, node, range, record );
+		accumulateSelection( accumulator, node, range, value );
 
 		// Don't apply the element as formatting if it has no content.
-		if ( isEmpty( record ) && format && ! format.attributes ) {
+		if ( isEmpty( value ) && format && ! format.attributes ) {
 			continue;
 		}
 
@@ -252,7 +261,7 @@ function createRecord( element, range, settings = {} ) {
 		} else {
 			accumulator.text += text;
 
-			let i = record.formats.length;
+			let i = value.formats.length;
 
 			// Optimise for speed.
 			while ( i-- ) {
@@ -266,11 +275,11 @@ function createRecord( element, range, settings = {} ) {
 					}
 				}
 
-				if ( record.formats[ i ] ) {
+				if ( value.formats[ i ] ) {
 					if ( formats[ formatIndex ] ) {
-						formats[ formatIndex ].push( ...record.formats[ i ] );
+						formats[ formatIndex ].push( ...value.formats[ i ] );
 					} else {
-						formats[ formatIndex ] = record.formats[ i ];
+						formats[ formatIndex ] = value.formats[ i ];
 					}
 				}
 			}
@@ -281,18 +290,18 @@ function createRecord( element, range, settings = {} ) {
 }
 
 /**
- * Creates a rich text record from a DOM element and range that should be
+ * Creates a rich text value from a DOM element and range that should be
  * multiline.
  *
- * @param {Element} element      Element to create record from.
- * @param {Range}   range        Range to create record from.
+ * @param {Element} element      Element to create value from.
+ * @param {Range}   range        Range to create value from.
  * @param {string}  multilineTag Multiline tag if the structure is multiline.
- * @param {Object}  settings     Settings passed to `createRecord`.
+ * @param {Object}  settings     Settings passed to `createFromElement`.
  *
- * @return {Object} A rich text record.
+ * @return {Object} A rich text value.
  */
-function createRecordFromMultilineElement( element, range, multilineTag, settings ) {
-	const accumulator = getEmptyRecord();
+function createFromMultilineElement( element, range, multilineTag, settings ) {
+	const accumulator = createEmptyValue();
 
 	if ( ! element || ! element.hasChildNodes() ) {
 		return accumulator;
@@ -308,18 +317,18 @@ function createRecordFromMultilineElement( element, range, multilineTag, setting
 			continue;
 		}
 
-		const record = createRecord( node, range, settings );
+		const value = createFromElement( node, range, settings );
 
-		accumulateSelection( accumulator, node, range, record );
+		accumulateSelection( accumulator, node, range, value );
 
-		// Multiline record text should be separated by a double line break.
+		// Multiline value text should be separated by a double line break.
 		if ( index !== 0 ) {
 			accumulator.formats = accumulator.formats.concat( [ , , ] );
 			accumulator.text += '\n\n';
 		}
 
-		accumulator.formats = accumulator.formats.concat( record.formats );
-		accumulator.text += record.text;
+		accumulator.formats = accumulator.formats.concat( value.formats );
+		accumulator.text += value.text;
 	}
 
 	return accumulator;

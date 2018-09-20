@@ -7,7 +7,7 @@ import { mount, shallow } from 'enzyme';
  * WordPress dependencies
  */
 import { createBlock, registerBlockType, unregisterBlockType } from '@wordpress/blocks';
-import { createValue } from '@wordpress/rich-text-structure';
+import { createValue } from '@wordpress/rich-text-value';
 
 /**
  * Internal dependencies

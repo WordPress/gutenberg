@@ -58,7 +58,7 @@ function getNodeByPath( node, path ) {
 	};
 }
 
-export function recordToDom( { formats, text, start, end }, tag ) {
+export function valueToDom( { formats, text, start, end }, tag ) {
 	const htmlDocument = document.implementation.createHTMLDocument( '' );
 	let { body } = htmlDocument;
 	let startPath = [];
@@ -130,14 +130,14 @@ export function recordToDom( { formats, text, start, end }, tag ) {
 	};
 }
 
-export function multilineRecordToDom( record, tag ) {
+export function multilineValueToDom( value, tag ) {
 	const htmlDocument = document.implementation.createHTMLDocument( '' );
 	const { body } = htmlDocument;
 	let startPath = [];
 	let endPath = [];
 
-	split( record, '\n\n' ).forEach( ( piece, index ) => {
-		const dom = recordToDom( piece, tag );
+	split( value, '\n\n' ).forEach( ( piece, index ) => {
+		const dom = valueToDom( piece, tag );
 
 		body.appendChild( dom.body );
 
@@ -157,22 +157,23 @@ export function multilineRecordToDom( record, tag ) {
 }
 
 /**
- * Applies the given element tree and selection to the live DOM (very basic diff
- * for now).
+ * Create an `Element` tree from a Rich Text value and applies the difference to
+ * the `Element` tree contained by `current`. If a `multilineTag` is provided,
+ * text separated by two new lines will be wrapped in an `Element` of that type.
  *
- * @param {Object}      record       Record to apply.
+ * @param {Object}      value        Value to apply.
  * @param {HTMLElement} current      The live root node to apply the element
  *                                   tree to.
  * @param {string}      multilineTag Multiline tag.
  */
-export function apply( record, current, multilineTag ) {
+export function apply( value, current, multilineTag ) {
 	// Construct a new element tree in memory
-	const toDom = multilineTag ? multilineRecordToDom : recordToDom;
-	const { body, selection } = toDom( record, multilineTag );
+	const toDom = multilineTag ? multilineValueToDom : valueToDom;
+	const { body, selection } = toDom( value, multilineTag );
 
 	applyValue( body, current );
 
-	if ( record.start !== undefined ) {
+	if ( value.start !== undefined ) {
 		applySelection( selection, current );
 	}
 }

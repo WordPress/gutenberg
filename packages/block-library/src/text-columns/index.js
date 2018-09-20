@@ -17,7 +17,7 @@ import {
 	RichText,
 } from '@wordpress/editor';
 import deprecated from '@wordpress/deprecated';
-import { createValue } from '@wordpress/rich-text-structure';
+import { createValue } from '@wordpress/rich-text-value';
 
 export const name = 'core/text-columns';
 

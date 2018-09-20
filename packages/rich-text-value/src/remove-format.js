@@ -5,17 +5,16 @@
 import { find } from 'lodash';
 
 /**
- * Removes a given format from a record from the given start to the given end.
- * If either start or end are omitted, the record's selection will be used.
- * If the selection is collapsed, the start and end will be expanded to the
- * boundaries of the format.
+ * Remove any format object from a Rich Text value by type from the given
+ * `startIndex` to the given `endIndex`. Indices are retrieved from the
+ * selection if none are provided.
  *
- * @param {Object} record     Record to modify.
+ * @param {Object} value      Value to modify.
  * @param {string} formatType Format type to remove.
  * @param {number} startIndex Start index.
  * @param {number} endIndex   End index.
  *
- * @return {Object} A new record with the format applied.
+ * @return {Object} A new value with the format applied.
  */
 export function removeFormat(
 	{ formats, text, start, end },

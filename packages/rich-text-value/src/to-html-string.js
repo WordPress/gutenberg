@@ -11,21 +11,22 @@ import { escapeHTML, escapeAttribute } from '@wordpress/escape-html';
 import { split } from './split';
 
 /**
- * Creates an HTML string from a rich text record.
+ * Create an HTML string from a Rich Text value. If a `multilineTag` is
+ * provided, text separated by two new lines will be wrapped in it.
  *
- * @param {Object} record       Rich text record.
+ * @param {Object} value        Rich text value.
  * @param {string} multilineTag Multiline tag.
  *
  * @return {string} HTML string.
  */
-export function toHTMLString( record, multilineTag ) {
+export function toHTMLString( value, multilineTag ) {
 	if ( multilineTag ) {
-		return split( record, '\n\n' ).map( ( line ) =>
+		return split( value, '\n\n' ).map( ( line ) =>
 			`<${ multilineTag }>${ toHTMLString( line ) }</${ multilineTag }>`
 		).join( '' );
 	}
 
-	const { formats, text } = record;
+	const { formats, text } = value;
 	const formatsLength = formats.length + 1;
 	const tree = {};
 

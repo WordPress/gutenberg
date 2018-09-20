@@ -1,9 +1,8 @@
 /**
- * Replaces text in the given record with the given replacement text or record.
+ * Search a Rich Text value and replace the match(es) with `replacement`. This
+ * is similar to `String.prototype.replace`.
  *
- * Works like `String.prototype.replace()`.
- *
- * @param {Object}         record       The record to modify.
+ * @param {Object}         value        The value to modify.
  * @param {RegExp|string}  pattern      A RegExp object or literal. Can also be
  *                                      a string. It is treated as a verbatim
  *                                      string and is not interpreted as a
@@ -13,7 +12,7 @@
  *                                      the specified or the value returned by
  *                                      the specified function.
  *
- * @return {Object} A new record with replacements applied.
+ * @return {Object} A new value with replacements applied.
  */
 export function replace( { formats, text }, pattern, replacement ) {
 	text = text.replace( pattern, ( match, ...rest ) => {

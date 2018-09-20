@@ -11,7 +11,7 @@ import {
 	getActiveFormat,
 	getTextContent,
 	slice,
-} from '@wordpress/rich-text-structure';
+} from '@wordpress/rich-text-value';
 import { isURL } from '@wordpress/url';
 
 /**
