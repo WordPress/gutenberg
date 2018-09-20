@@ -11,9 +11,9 @@ import {
 /**
  * WordPress dependencies
  */
-import { Component, RawHTML, renderToString } from '@wordpress/element';
+import { Component, RawHTML } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
-import { children } from '@wordpress/blocks';
+import { toHTMLString } from '@wordpress/rich-text-value';
 
 /**
  * Internal dependencies
@@ -174,7 +174,7 @@ export class RichText extends Component {
 		);
 
 		// Save back to HTML from React tree
-		const html = '<' + tagName + '>' + renderToString( value ) + '</' + tagName + '>';
+		const html = '<' + tagName + '>' + toHTMLString( value ) + '</' + tagName + '>';
 
 		return (
 			<View>
@@ -217,7 +217,7 @@ RichTextContainer.Content = ( { value, format, tagName: Tag, ...props } ) => {
 			break;
 
 		case 'children':
-			content = <RawHTML>{ children.toHTML( value ) }</RawHTML>;
+			content = <RawHTML>{ toHTMLString( value ) }</RawHTML>;
 			break;
 	}
 

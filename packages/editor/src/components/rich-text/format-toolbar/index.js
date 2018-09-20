@@ -37,11 +37,13 @@ class FormatToolbar extends Component {
 			addingLink: false,
 		};
 
-		editor.shortcuts.add( rawShortcut.primary( 'k' ), '', this.addLink );
-		editor.shortcuts.add( rawShortcut.access( 'a' ), '', this.addLink );
-		editor.shortcuts.add( rawShortcut.access( 's' ), '', this.removeLink );
-		editor.shortcuts.add( rawShortcut.access( 'd' ), '', () => toggleFormat( { type: 'del' } ) );
-		editor.shortcuts.add( rawShortcut.access( 'x' ), '', () => toggleFormat( { type: 'code' } ) );
+		if ( editor ) {
+			editor.shortcuts.add( rawShortcut.primary( 'k' ), '', this.addLink );
+			editor.shortcuts.add( rawShortcut.access( 'a' ), '', this.addLink );
+			editor.shortcuts.add( rawShortcut.access( 's' ), '', this.removeLink );
+			editor.shortcuts.add( rawShortcut.access( 'd' ), '', () => toggleFormat( { type: 'del' } ) );
+			editor.shortcuts.add( rawShortcut.access( 'x' ), '', () => toggleFormat( { type: 'code' } ) );
+		}
 	}
 
 	removeLink() {
