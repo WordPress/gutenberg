@@ -131,10 +131,11 @@ describe( 'categories', () => {
 		] );
 	} );
 
-	it( 'should override previous match when adding a category', () => {
+	it( 'should append and remove previous match when adding a category', () => {
 		const original = deepFreeze( [
 			{ slug: 'chicken', title: 'Chicken' },
 			{ slug: 'wings', title: 'Original wings' },
+			{ slug: 'strips', title: 'Strips' },
 		] );
 
 		const state = categories( original, {
@@ -145,6 +146,7 @@ describe( 'categories', () => {
 
 		expect( state ).toEqual( [
 			{ slug: 'chicken', title: 'Chicken' },
+			{ slug: 'strips', title: 'Strips' },
 			{ slug: 'wings', title: 'Wings' },
 		] );
 	} );
