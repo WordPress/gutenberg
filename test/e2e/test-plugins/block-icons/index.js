@@ -1,6 +1,6 @@
 ( function() {
 	var registerBlockType = wp.blocks.registerBlockType;
-	var createValue = wp.richTextStructure.createValue;
+	var createValue = wp.richTextValue.createValue;
 	var el = wp.element.createElement;
 	var InnerBlocks = wp.editor.InnerBlocks;
     var circle = el( 'circle', { cx: 10, cy: 10, r: 10, fill: 'red', stroke: 'blue', strokeWidth: '10' } );
