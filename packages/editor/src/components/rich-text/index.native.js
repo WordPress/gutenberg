@@ -37,10 +37,16 @@ export class RichText extends Component {
 		this.onContentSizeChange = this.onContentSizeChange.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
 		this.onActiveFormatsChange = this.onActiveFormatsChange.bind( this );
+		this.onHTMLContentWithCursor = this.onHTMLContentWithCursor.bind( this );
 		this.state = {
 			formats: {},
 			selectedNodeId: 0,
 		};
+	}
+
+	// eslint-disable-next-line no-unused-vars
+	onHTMLContentWithCursor( htmlText, cursorPosition ) {
+		// Descriptive placeholder: This logic still needs to be implemented.
 	}
 
 	onActiveFormatsChange( formats ) {
@@ -95,7 +101,7 @@ export class RichText extends Component {
 	}
 
 	onEnter() {
-		// Descriptive placeholder: This logic still needs to be implemented.
+		this._editor.requestHTMLWithCursor();
 	}
 
 	shouldComponentUpdate( nextProps ) {
@@ -180,6 +186,7 @@ export class RichText extends Component {
 					onEnter={ this.onEnter }
 					onContentSizeChange={ this.onContentSizeChange }
 					onActiveFormatsChange={ this.onActiveFormatsChange }
+					onHTMLContentWithCursor={ this.onHTMLContentWithCursor }
 					color={ 'black' }
 					maxImagesWidth={ 200 }
 					style={ style }
