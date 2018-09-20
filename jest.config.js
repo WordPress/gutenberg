@@ -15,7 +15,12 @@ module.exports = {
 	verbose: true,
 	preset: 'jest-react-native',
 	testEnvironment: 'jsdom',
-	testPathIgnorePatterns: [ '/node_modules/', '/gutenberg/test/', '/gutenberg/packages/' ],
+	testPathIgnorePatterns: [
+		'/node_modules/',
+		'/gutenberg/gutenberg-mobile/',
+		'/gutenberg/test/',
+		'/gutenberg/packages/',
+	],
 	moduleFileExtensions: [
 		'native.js',
 		'android.js',
@@ -31,6 +36,7 @@ module.exports = {
 		'jsx',
 		'node',
 	],
+	modulePathIgnorePatterns: [ '<rootDir>/gutenberg/gutenberg-mobile' ],
 	moduleNameMapper: {
 		'@wordpress\\/(block-serialization-default-parser|blocks|data|element|deprecated|editor|block-library|components|keycodes|url|a11y|viewport|core-data|api-fetch|nux)$':
 			'<rootDir>/gutenberg/packages/$1/src/index',
