@@ -3,11 +3,12 @@
  */
 import { noop } from 'lodash';
 
-/**
- * WordPress dependencies
- */
-import { withGlobalEvents } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { fetchImageSize, renderContainer, onLayout, exporter } from './utils'
 
 class ImageSize extends Component {
 	constructor() {
@@ -49,12 +50,27 @@ class ImageSize extends Component {
 	}
 
 	fetchImageSize() {
-		this.image = new window.Image();
-		this.image.onload = this.calculateSize;
-		this.image.src = this.props.src;
+		fetchImageSize(this.props.src, this.calculateSize, (image) => {
+			this.image = image;
+			console.log('fetchImageSize callback: Image!!')
+			console.log(image);
+		});
+	}
+
+	onLayout = ( event ) => {
+		onLayout( event, ( container ) => {
+			this.container = container;
+			console.log("OnLayout callback: container!");
+			console.log(container);
+			this.calculateSize()
+		});
 	}
 
 	calculateSize() {
+		if ( this.image === undefined || this.container === undefined ) {
+			return;
+		}
+
 		const maxWidth = this.container.clientWidth;
 		const exceedMaxWidth = this.image.width > maxWidth;
 		const ratio = this.image.height / this.image.width;
@@ -72,14 +88,8 @@ class ImageSize extends Component {
 			imageWidthWithinContainer: this.state.width,
 			imageHeightWithinContainer: this.state.height,
 		};
-		return (
-			<div ref={ this.bindContainer }>
-				{ this.props.children( sizes ) }
-			</div>
-		);
+		return renderContainer(this.bindContainer, sizes, this.props.children, this.onLayout)
 	}
 }
 
-export default withGlobalEvents( {
-	resize: 'calculateSize',
-} )( ImageSize );
+export default exporter( ImageSize );
