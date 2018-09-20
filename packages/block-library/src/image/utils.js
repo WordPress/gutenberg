@@ -3,14 +3,15 @@
  */
 import { withGlobalEvents } from '@wordpress/compose';
 
-export function fetchImageSize(src, onload, callback) {
+export function fetchImageSize( src, onload, callback ) {
 	const image = new window.Image();
 	image.onload = onload;
 	image.src = src;
-	callback(image);
+	callback( image );
 }
 
-export function renderContainer(bindContainer, sizes, children, onLayout) {
+export function renderContainer( bindContainer, sizes, children, onLayoutCallback ) {
+	onLayoutCallback();
 	return (
 		<div ref={ bindContainer }>
 			{ children( sizes ) }
@@ -19,6 +20,7 @@ export function renderContainer(bindContainer, sizes, children, onLayout) {
 }
 
 export function onLayout( event, callback ) {
+	callback();
 }
 
 export function exporter( component ) {

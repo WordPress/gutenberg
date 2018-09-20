@@ -8,7 +8,7 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { fetchImageSize, renderContainer, onLayout, exporter } from './utils'
+import { fetchImageSize, renderContainer, onLayout, exporter } from './utils';
 
 class ImageSize extends Component {
 	constructor() {
@@ -19,6 +19,7 @@ class ImageSize extends Component {
 		};
 		this.bindContainer = this.bindContainer.bind( this );
 		this.calculateSize = this.calculateSize.bind( this );
+		this.onLayout = this.onLayout.bind( this );
 	}
 
 	bindContainer( ref ) {
@@ -50,20 +51,16 @@ class ImageSize extends Component {
 	}
 
 	fetchImageSize() {
-		fetchImageSize(this.props.src, this.calculateSize, (image) => {
+		fetchImageSize( this.props.src, this.calculateSize, ( image ) => {
 			this.image = image;
-			console.log('fetchImageSize callback: Image!!')
-			console.log(image);
-		});
+		} );
 	}
 
-	onLayout = ( event ) => {
+	onLayout( event ) {
 		onLayout( event, ( container ) => {
 			this.container = container;
-			console.log("OnLayout callback: container!");
-			console.log(container);
-			this.calculateSize()
-		});
+			this.calculateSize();
+		} );
 	}
 
 	calculateSize() {
@@ -88,7 +85,7 @@ class ImageSize extends Component {
 			imageWidthWithinContainer: this.state.width,
 			imageHeightWithinContainer: this.state.height,
 		};
-		return renderContainer(this.bindContainer, sizes, this.props.children, this.onLayout)
+		return renderContainer( this.bindContainer, sizes, this.props.children, this.onLayout );
 	}
 }
 
