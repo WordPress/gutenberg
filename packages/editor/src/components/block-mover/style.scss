@@ -58,6 +58,7 @@
 	cursor: move; // Fallback for IE/Edge < 14
 	cursor: grab;
 	fill: currentColor;
+	border-radius: $radius-round-rectangle;
 
 	&,
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover,
