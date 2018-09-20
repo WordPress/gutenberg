@@ -41,6 +41,24 @@
 			display: inline-flex;
 		}
 	}
+
+	// Some browsers, most notably IE11, honor an older version of the flexbox spec
+	// which takes absolutely positioned items into account when calculating `space-between`.
+	// https://www.w3.org/TR/2012/WD-css3-flexbox-20120612/#abspos-flex-items
+	//
+	// This difference is causing our header layout to break when focused in IE11.
+	// Our focused region styles use an absolutely positioned :after pseudo element to draw an outline,
+	// and IE11 is adding space between it and our last real child, shifting righthand UI elements
+	// to the left. For a workaround, we change the flex order to move the undesired spacing to the middle
+	// where it is no longer noticeable.
+	> .edit-post-header__settings {
+		order: 1;
+
+		// Restore default order for all other browsers
+		@supports (position: sticky) {
+			order: initial;
+		}
+	}
 }
 
 @include editor-left(".edit-post-header");
