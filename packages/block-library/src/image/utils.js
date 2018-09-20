@@ -11,7 +11,7 @@ export function fetchImageSize( src, onload, callback ) {
 }
 
 export function renderContainer( bindContainer, sizes, children, onLayoutCallback ) {
-	onLayoutCallback();
+	onLayoutCallback(); // silence unused lint error
 	return (
 		<div ref={ bindContainer }>
 			{ children( sizes ) }
@@ -20,7 +20,7 @@ export function renderContainer( bindContainer, sizes, children, onLayoutCallbac
 }
 
 export function onLayout( event, callback ) {
-	callback();
+	callback(); // silence unused lint error
 }
 
 export function exporter( component ) {
