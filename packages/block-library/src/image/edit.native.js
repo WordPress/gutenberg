@@ -76,41 +76,40 @@ class ImageEdit extends Component {
 	}
 
 	getCaptionTextinput( caption, isSelected ) {
-		var captionString = [] + caption; // caption can be a string or an array.
+		const captionString = [] + caption; // caption can be a string or an array.
 
 		if ( ! captionString.length && ! isSelected ) {
 			return null;
 		}
 
-		const textContainer = (children) => {
+		const textContainer = ( children ) => {
 			return (
 				<View style={ { padding: 12, flex: 1 } }>
 					{ children() }
 				</View>
-			)
-		}
+			);
+		};
 
 		const textInput = () => {
 			return (
 				<TextInput
 					style={ { textAlign: 'center' } }
-					underlineColorAndroid='transparent'
+					underlineColorAndroid="transparent"
 					value={ captionString }
 					placeholder={ 'Write caption…' }
-					onChangeText={ ( caption ) => this.props.setAttributes( { caption } ) }
+					onChangeText={ ( newCaption ) => this.props.setAttributes( { caption: newCaption } ) }
 				/>
-			)
-		}
+			);
+		};
 
 		const text = () => {
-			return (<Text style={ { textAlign: 'center' } }>{ captionString }</Text>)
-		}
+			return ( <Text style={ { textAlign: 'center' } }>{ captionString }</Text> );
+		};
 
-		if (isSelected) {
-			return textContainer(textInput);
-		} else {
-			return textContainer(text);
+		if ( isSelected ) {
+			return textContainer( textInput );
 		}
+		return textContainer( text );
 	}
 
 	render() {
@@ -127,7 +126,7 @@ class ImageEdit extends Component {
 		}
 
 		return (
-			<View style={{flex: 1}}>
+			<View style={ { flex: 1 } }>
 				<ImageSize src={ url }>
 					{ ( sizes ) => {
 						const {
@@ -161,7 +160,7 @@ class ImageEdit extends Component {
 						);
 					} }
 				</ImageSize>
-				{ this.getCaptionTextinput(caption, isSelected) }
+				{ this.getCaptionTextinput( caption, isSelected ) }
 			</View>
 		);
 	}
