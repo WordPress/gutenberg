@@ -86,7 +86,7 @@
 
 	&.columns-1 .blocks-gallery-image,
 	&.columns-1 .blocks-gallery-item {
-		width: calc(100% / 1);
+		width: 100%;
 	}
 
 	// Beyond mobile viewports, we allow up to 8 columns.
