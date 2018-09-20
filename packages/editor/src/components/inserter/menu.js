@@ -26,6 +26,7 @@ import { withSpokenMessages, PanelBody, IconButton } from '@wordpress/components
 import { getCategories, isReusableBlock } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -290,7 +291,7 @@ export class InserterMenu extends Component {
 								className="editor-inserter__manage-reusable-blocks"
 								icon="admin-generic"
 								label={ __( 'Manage All Reusable Blocks' ) }
-								href="edit.php?post_type=wp_block"
+								href={ addQueryArgs( 'edit.php', { post_type: 'wp_block' } ) }
 							/>
 						</PanelBody>
 					) }
