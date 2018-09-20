@@ -60,10 +60,24 @@
 	font-size: inherit;
 	margin-top: 0;
 	margin-bottom: 0;
+	transition: 0.1s background ease-in-out;
+
+	&:hover {
+		background: $light-gray-100;
+
+		.components-button,
+		.components-panel__arrow {
+			color: $dark-gray-900;
+		}
+	}
 }
 .components-panel__body.is-opened > .components-panel__body-title {
 	margin: -1 * $panel-padding;
 	margin-bottom: 5px;
+
+	&:hover {
+		background: transparent;
+	}
 }
 
 .components-panel__body-toggle.components-button {
@@ -73,8 +87,9 @@
 	width: 100%;
 	font-weight: 600;
 	text-align: left;
-	color: $dark-gray-900;
+	color: $dark-gray-500;
 	@include menu-style__neutral;
+	transition: 0.1s background ease-in-out;
 
 	&:focus:not(:disabled):not([aria-disabled="true"]) {
 		@include menu-style__focus;
@@ -85,8 +100,9 @@
 		right: $item-spacing;
 		top: 50%;
 		transform: translateY(-50%);
-		color: $dark-gray-900;
+		color: $dark-gray-500;
 		fill: currentColor;
+		transition: 0.1s color ease-in-out;
 	}
 
 	// mirror the arrow horizontally in RTL languages
