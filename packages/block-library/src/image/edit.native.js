@@ -55,17 +55,18 @@ class ImageEdit extends Component {
 
 		return (
 			<View style={ { flexDirection: 'row', justifyContent: 'center', flex: 1 } }>
-				{ this.getSizeField( this.toSafeString( width ), this.toSafeString( imageWidth ), this.updateWidth ) }
-				{ this.getSizeField( this.toSafeString( height ), this.toSafeString( imageHeight ), this.updateHeight ) }
+				{ this.getSizeField('Width', this.toSafeString( width ), this.toSafeString( imageWidth ), this.updateWidth ) }
+				{ this.getSizeField('Height', this.toSafeString( height ), this.toSafeString( imageHeight ), this.updateHeight ) }
 			</View>
 		);
 	}
 
-	getSizeField( size, placeholder, updater ) {
+	getSizeField(labelText, size, placeholder, updater ) {
 		return (
-			<View style={ { padding: 5, flexDirection: 'row', flex: 1 } }>
-				<Text>Width: </Text>
+			<View style={ { padding: 5, flexDirection: 'row', flex: 1, alignItems: 'center' } }>
+				<Text>{ labelText }: </Text>
 				<TextInput
+					style={ { flex: 1 } }
 					value={ size }
 					placeholder={ placeholder }
 					onChangeText={ updater }
