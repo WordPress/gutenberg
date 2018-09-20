@@ -13,9 +13,8 @@ export default function FormatToolbar( {
 	onChange,
 	formats,
 	enabledControls = [],
-	customControls = [],
 } ) {
-	const toolbarControls = FORMATTING_CONTROLS.concat( customControls )
+	const toolbarControls = FORMATTING_CONTROLS
 		.filter( ( control ) => enabledControls.indexOf( control.format ) !== -1 )
 		.map( ( control ) => {
 			return {
