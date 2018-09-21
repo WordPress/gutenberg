@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, unescape as unescapeString, without, find, some, invoke } from 'lodash';
+import { get, unescape as unescapeString, without, find, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,8 +11,6 @@ import { Component } from '@wordpress/element';
 import { TreeSelect, withSpokenMessages, withFilters, Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -41,11 +39,7 @@ class HierarchicalTermSelector extends Component {
 		this.onAddTerm = this.onAddTerm.bind( this );
 		this.onToggleForm = this.onToggleForm.bind( this );
 		this.setFilterValue = this.setFilterValue.bind( this );
-		this.sortBySelected = this.sortBySelected.bind( this );
 		this.state = {
-			loading: true,
-			availableTermsTree: [],
-			availableTerms: [],
 			adding: false,
 			formName: '',
 			formParent: '',
@@ -55,14 +49,18 @@ class HierarchicalTermSelector extends Component {
 		};
 	}
 
+	componentWillUnmount() {
+		this.addRequest = null;
+	}
+
 	onChange( event ) {
-		const { onUpdateTerms, terms = [], taxonomy } = this.props;
+		const { onUpdateTerms, terms = [] } = this.props;
 		const termId = parseInt( event.target.value, 10 );
 		const hasTerm = terms.indexOf( termId ) !== -1;
 		const newTerms = hasTerm ?
 			without( terms, termId ) :
 			[ ...terms, termId ];
-		onUpdateTerms( newTerms, taxonomy.rest_base );
+		onUpdateTerms( newTerms );
 	}
 
 	onChangeFormName( event ) {
@@ -89,8 +87,8 @@ class HierarchicalTermSelector extends Component {
 
 	onAddTerm( event ) {
 		event.preventDefault();
-		const { onUpdateTerms, taxonomy, terms, slug } = this.props;
-		const { formName, formParent, adding, availableTerms } = this.state;
+		const { onUpdateTerms, onSaveTerm, terms, slug, availableTerms, taxonomy } = this.props;
+		const { formName, formParent, adding } = this.state;
 		if ( formName === '' || adding ) {
 			return;
 		}
@@ -100,7 +98,7 @@ class HierarchicalTermSelector extends Component {
 		if ( existingTerm ) {
 			// if the term we are adding exists but is not selected select it
 			if ( ! some( terms, ( term ) => term === existingTerm.id ) ) {
-				onUpdateTerms( [ ...terms, existingTerm.id ], taxonomy.rest_base );
+				onUpdateTerms( [ ...terms, existingTerm.id ] );
 			}
 			this.setState( {
 				formName: '',
@@ -112,41 +110,21 @@ class HierarchicalTermSelector extends Component {
 		this.setState( {
 			adding: true,
 		} );
-		this.addRequest = apiFetch( {
-			path: `/wp/v2/${ taxonomy.rest_base }`,
-			method: 'POST',
-			data: {
-				name: formName,
-				parent: formParent ? formParent : undefined,
-			},
+
+		this.addRequest = onSaveTerm( {
+			name: formName,
+			parent: formParent ? formParent : undefined,
 		} );
-		// Tries to create a term or fetch it if it already exists
-		const findOrCreatePromise = this.addRequest
-			.catch( ( error ) => {
-				const errorCode = error.code;
-				if ( errorCode === 'term_exists' ) {
-					// search the new category created since last fetch
-					this.addRequest = apiFetch( {
-						path: addQueryArgs(
-							`/wp/v2/${ taxonomy.rest_base }`,
-							{ ...DEFAULT_QUERY, parent: formParent || 0, search: formName }
-						),
-					} );
-					return this.addRequest
-						.then( ( searchResult ) => {
-							return this.findTerm( searchResult, formParent, formName );
-						} );
-				}
-				return Promise.reject( error );
-			} );
-		findOrCreatePromise
+
+		this.addRequest
 			.then( ( term ) => {
-				const hasTerm = !! find( this.state.availableTerms, ( availableTerm ) => availableTerm.id === term.id );
-				const newAvailableTerms = hasTerm ? this.state.availableTerms : [ term, ...this.state.availableTerms ];
+				if ( this.addRequest === null ) {
+					return;
+				}
 				const termAddedMessage = sprintf(
 					_x( '%s added', 'term' ),
 					get(
-						this.props.taxonomy,
+						taxonomy,
 						[ 'data', 'labels', 'singular_name' ],
 						slug === 'category' ? __( 'Category' ) : __( 'Term' )
 					)
@@ -157,12 +135,10 @@ class HierarchicalTermSelector extends Component {
 					adding: false,
 					formName: '',
 					formParent: '',
-					availableTerms: newAvailableTerms,
-					availableTermsTree: this.sortBySelected( buildTermsTree( newAvailableTerms ) ),
 				} );
-				onUpdateTerms( [ ...terms, term.id ], taxonomy.rest_base );
-			}, ( xhr ) => {
-				if ( xhr.statusText === 'abort' ) {
+				onUpdateTerms( [ ...terms, term.id ] );
+			}, () => {
+				if ( this.addRequest === null ) {
 					return;
 				}
 				this.addRequest = null;
@@ -170,52 +146,6 @@ class HierarchicalTermSelector extends Component {
 					adding: false,
 				} );
 			} );
-	}
-
-	componentDidMount() {
-		this.fetchTerms();
-	}
-
-	componentWillUnmount() {
-		invoke( this.fetchRequest, [ 'abort' ] );
-		invoke( this.addRequest, [ 'abort' ] );
-	}
-
-	componentDidUpdate( prevProps ) {
-		if ( this.props.taxonomy !== prevProps.taxonomy ) {
-			this.fetchTerms();
-		}
-	}
-
-	fetchTerms() {
-		const { taxonomy } = this.props;
-		if ( ! taxonomy ) {
-			return;
-		}
-		this.fetchRequest = apiFetch( {
-			path: addQueryArgs( `/wp/v2/${ taxonomy.rest_base }`, DEFAULT_QUERY ),
-		} );
-		this.fetchRequest.then(
-			( terms ) => { // resolve
-				const availableTermsTree = this.sortBySelected( buildTermsTree( terms ) );
-
-				this.fetchRequest = null;
-				this.setState( {
-					loading: false,
-					availableTermsTree,
-					availableTerms: terms,
-				} );
-			},
-			( xhr ) => { // reject
-				if ( xhr.statusText === 'abort' ) {
-					return;
-				}
-				this.fetchRequest = null;
-				this.setState( {
-					loading: false,
-				} );
-			}
-		);
 	}
 
 	sortBySelected( termsTree ) {
@@ -256,7 +186,7 @@ class HierarchicalTermSelector extends Component {
 	}
 
 	setFilterValue( event ) {
-		const { availableTermsTree } = this.state;
+		const { availableTermsTree } = this.props;
 		const filterValue = event.target.value;
 		const filteredTermsTree = availableTermsTree.map( this.getFilterMatcher( filterValue ) ).filter( ( term ) => term );
 		const getResultCount = ( terms ) => {
@@ -269,12 +199,10 @@ class HierarchicalTermSelector extends Component {
 			}
 			return count;
 		};
-		this.setState(
-			{
-				filterValue,
-				filteredTermsTree,
-			}
-		);
+		this.setState( {
+			filterValue,
+			filteredTermsTree,
+		} );
 
 		const resultCount = getResultCount( filteredTermsTree );
 		const resultsFoundMessage = sprintf(
@@ -339,13 +267,21 @@ class HierarchicalTermSelector extends Component {
 	}
 
 	render() {
-		const { slug, taxonomy, instanceId, hasCreateAction, hasAssignAction } = this.props;
+		const {
+			slug,
+			taxonomy,
+			instanceId,
+			hasCreateAction,
+			hasAssignAction,
+			availableTermsTree,
+			availableTerms,
+		} = this.props;
 
 		if ( ! hasAssignAction ) {
 			return null;
 		}
 
-		const { availableTermsTree, availableTerms, filteredTermsTree, formName, formParent, loading, showForm, filterValue } = this.state;
+		const { filteredTermsTree, formName, formParent, isRequestingTerms, showForm, filterValue } = this.state;
 		const labelWithFallback = ( labelProperty, fallbackIsCategory, fallbackIsNotCategory ) => get(
 			taxonomy,
 			[ 'data', 'labels', labelProperty ],
@@ -409,9 +345,9 @@ class HierarchicalTermSelector extends Component {
 				role="group"
 				aria-label={ groupLabel }
 			>
-				{ this.renderTerms( '' !== filterValue ? filteredTermsTree : availableTermsTree ) }
+				{ this.renderTerms( '' !== filterValue ? filteredTermsTree : this.sortBySelected( availableTermsTree ) ) }
 			</div>,
-			! loading && hasCreateAction && (
+			! isRequestingTerms && hasCreateAction && (
 				<Button
 					key="term-add-button"
 					onClick={ this.onToggleForm }
@@ -464,18 +400,27 @@ class HierarchicalTermSelector extends Component {
 export default compose( [
 	withSelect( ( select, { slug } ) => {
 		const { getCurrentPost } = select( 'core/editor' );
-		const { getTaxonomy } = select( 'core' );
+		const { getTaxonomy, getEntityRecords } = select( 'core' );
+		const { isResolving } = select( 'core/data' );
 		const taxonomy = getTaxonomy( slug );
+		const availableTerms = getEntityRecords( 'taxonomy', slug, DEFAULT_QUERY );
+		const availableTermsTree = buildTermsTree( availableTerms );
 		return {
 			hasCreateAction: taxonomy ? get( getCurrentPost(), [ '_links', 'wp:action-create-' + taxonomy.rest_base ], false ) : false,
 			hasAssignAction: taxonomy ? get( getCurrentPost(), [ '_links', 'wp:action-assign-' + taxonomy.rest_base ], false ) : false,
 			terms: taxonomy ? select( 'core/editor' ).getEditedPostAttribute( taxonomy.rest_base ) : [],
+			isRequestingTerms: isResolving( 'core', 'getEntityRecords', [ 'taxonomy', slug, DEFAULT_QUERY ] ),
 			taxonomy,
+			availableTerms,
+			availableTermsTree,
 		};
 	} ),
-	withDispatch( ( dispatch ) => ( {
-		onUpdateTerms( terms, restBase ) {
-			dispatch( 'core/editor' ).editPost( { [ restBase ]: terms } );
+	withDispatch( ( dispatch, { slug, taxonomy } ) => ( {
+		onUpdateTerms( terms ) {
+			dispatch( 'core/editor' ).editPost( { [ taxonomy.rest_base ]: terms } );
+		},
+		onSaveTerm( term ) {
+			return dispatch( 'core' ).saveEntityRecord( 'taxonomy', slug, term );
 		},
 	} ) ),
 	withSpokenMessages,
