@@ -9,6 +9,7 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.facebook.react.views.textinput.ContentSizeWatcher;
+import com.facebook.react.views.textinput.ReactTextChangedEvent;
 import com.facebook.react.views.textinput.ReactTextInputLocalData;
 import com.facebook.react.views.textinput.ScrollWatcher;
 
@@ -261,6 +262,16 @@ public class ReactAztecText extends AztecText {
             // Update the toolbar state
             updateToolbarButtons(getSelectionStart(), getSelectionEnd());
         }
+
+        // emit onChange because the underlying HTML has changed applying the style
+        ReactContext reactContext = (ReactContext) getContext();
+        EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
+        eventDispatcher.dispatchEvent(
+                new ReactTextChangedEvent(
+                        getId(),
+                        toHtml(false),
+                        incrementAndGetEventCounter())
+        );
     }
 
     // Removes all formats in the list but if none found, applies the first one
