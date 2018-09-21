@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { isEmpty } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -194,7 +193,7 @@ export const settings = {
 		);
 
 		if ( ! url ) {
-			const hasTitle = ! isEmpty( title );
+			const hasTitle = ! RichText.isEmpty( title );
 			const icon = hasTitle ? undefined : 'format-image';
 			const label = hasTitle ? (
 				<RichText
