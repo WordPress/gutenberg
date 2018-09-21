@@ -81,12 +81,17 @@
 	// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
 	& .blocks-gallery-image,
 	& .blocks-gallery-item {
-		width: calc((100% / 2) - #{ $grid-size-large });
+		width: calc((100% - #{ $grid-size-large }) / 2);
+
+		&:nth-child(odd) {
+			margin-right: 0;
+		}
 	}
 
 	&.columns-1 .blocks-gallery-image,
 	&.columns-1 .blocks-gallery-item {
 		width: 100%;
+		margin-right: 0;
 	}
 
 	// Beyond mobile viewports, we allow up to 8 columns.
@@ -94,16 +99,17 @@
 		@for $i from 3 through 8 {
 			&.columns-#{ $i } .blocks-gallery-image,
 			&.columns-#{ $i } .blocks-gallery-item {
-				width: calc((100% / #{ $i }) - #{ $grid-size-large });
+				width: calc((100% - #{ $grid-size-large } * #{ $i - 1 }) / #{ $i });
+				margin-right: 16px;
 			}
 		}
-	}
 
-	// Unset the right margin on every rightmost gallery item to ensure center balance.
-	@for $column-count from 1 through 8 {
-		&.columns-#{ $column-count } .blocks-gallery-image:nth-of-type(#{ $column-count }n),
-		&.columns-#{ $column-count } .blocks-gallery-item:nth-of-type(#{ $column-count }n) {
-			margin-right: 0;
+		// Unset the right margin on every rightmost gallery item to ensure center balance.
+		@for $column-count from 1 through 8 {
+			&.columns-#{ $column-count } .blocks-gallery-image:nth-of-type(#{ $column-count }n),
+			&.columns-#{ $column-count } .blocks-gallery-item:nth-of-type(#{ $column-count }n) {
+				margin-right: 0;
+			}
 		}
 	}
 
