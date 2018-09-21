@@ -30,8 +30,6 @@ export type BlockListType = {
 	blocks: Array<BlockType>,
 	aztechtml: string,
 	refresh: boolean,
-	showBlocks: void => void,
-	showHTML: void => void,
 };
 
 type PropsType = BlockListType;
