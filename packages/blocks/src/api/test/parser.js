@@ -137,7 +137,7 @@ describe( 'block parser', () => {
 	} );
 
 	describe( 'parseWithAttributeSchema', () => {
-		it( 'should return the matcher’s attribute value', () => {
+		it( 'should return the matcher’s text content value', () => {
 			const value = parseWithAttributeSchema(
 				'<div>chicken</div>',
 				{
@@ -147,6 +147,19 @@ describe( 'block parser', () => {
 				},
 			);
 			expect( value ).toBe( 'chicken' );
+		} );
+
+		it( 'should return the matcher’s style property value', () => {
+			const value = parseWithAttributeSchema(
+				'<div style="width: 10px">chicken</div>',
+				{
+					type: 'string',
+					source: 'inlineStyle',
+					selector: 'div',
+					styleProperty: 'width',
+				},
+			);
+			expect( value ).toBe( '10px' );
 		} );
 
 		it( 'should return the matcher’s string attribute value', () => {
@@ -216,7 +229,7 @@ describe( 'block parser', () => {
 			expect( value ).toBe( 10 );
 		} );
 
-		it( "should return the matcher's attribute value", () => {
+		it( "should return the matcher's text content value", () => {
 			const value = getBlockAttribute(
 				'content',
 				{
@@ -228,6 +241,21 @@ describe( 'block parser', () => {
 				{}
 			);
 			expect( value ).toBe( 'chicken' );
+		} );
+
+		it( "returns the matcher's style property value", () => {
+			const value = getBlockAttribute(
+				'content',
+				{
+					type: 'string',
+					source: 'inlineStyle',
+					selector: 'div',
+					styleProperty: 'width',
+				},
+				'<div style="width:10px">chicken</div>',
+				{}
+			);
+			expect( value ).toBe( '10px' );
 		} );
 
 		it( 'should return undefined for meta attributes', () => {

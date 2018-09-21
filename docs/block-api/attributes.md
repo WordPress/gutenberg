@@ -77,6 +77,26 @@ _Example_: Extract child nodes from a paragraph of rich text.
 // }
 ```
 
+### `styleProperty`
+
+Use `inlineStyle` to extract a value from the inline style declaration of the matched element.
+
+_Example_: Extract the width value from the an inline style
+
+```js
+{
+	width: {
+		type: 'string',
+		source: 'inlineStyle',
+		selector: 'div',
+		styleProperty: 'width'
+	}
+}
+// {
+//   "width": "20px" 
+// }
+```
+
 ### `query`
 
 Use `query` to extract an array of values from markup. Entries of the array are determined by the selector argument, where each matched element within the block will have an entry structured corresponding to the second argument, an object of attribute sources.
