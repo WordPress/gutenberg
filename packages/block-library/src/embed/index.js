@@ -168,11 +168,7 @@ export function getEmbedEdit( title, icon ) {
 			previewDocument.body.innerHTML = html;
 			const iframe = previewDocument.body.querySelector( 'iframe' );
 
-			if ( ! iframe ) {
-				return this.props.attributes.className;
-			}
-
-			if ( iframe.height && iframe.width ) {
+			if ( iframe && iframe.height && iframe.width ) {
 				const aspectRatio = ( iframe.width / iframe.height ).toFixed( 2 );
 				let aspectRatioClassName;
 
@@ -205,9 +201,9 @@ export function getEmbedEdit( title, icon ) {
 				if ( aspectRatioClassName ) {
 					return classnames( this.props.attributes.className, 'wp-has-aspect-ratio', aspectRatioClassName );
 				}
-
-				return this.props.attributes.className;
 			}
+
+			return this.props.attributes.className;
 		}
 
 		/***
