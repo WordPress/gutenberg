@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { isFunction } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -29,8 +30,12 @@ class ToggleControl extends Component {
 	}
 
 	render() {
-		const { label, checked, help, instanceId } = this.props;
+		const { label, checked, help, instanceId, className } = this.props;
 		const id = `inspector-toggle-control-${ instanceId }`;
+		const classes = classnames(
+			'components-toggle-control',
+			className,
+		);
 
 		let describedBy, helpLabel;
 		if ( help ) {
@@ -43,7 +48,7 @@ class ToggleControl extends Component {
 				label={ label }
 				id={ id }
 				help={ helpLabel }
-				className="components-toggle-control"
+				className={ classes }
 			>
 				<FormToggle
 					id={ id }

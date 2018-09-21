@@ -221,6 +221,7 @@ class GalleryEdit extends Component {
 							max={ Math.min( MAX_COLUMNS, images.length ) }
 						/> }
 						<ToggleControl
+							className="components-toggle-control__crop"
 							label={ __( 'Crop Images' ) }
 							checked={ !! imageCrop }
 							onChange={ this.toggleImageCrop }

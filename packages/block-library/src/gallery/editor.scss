@@ -130,3 +130,12 @@
 	left: 50%;
 	transform: translate(-50%, -50%);
 }
+
+// Because IE doesn't handle cropping, we hide the control entirely.
+.components-toggle-control__crop {
+	display: none;
+
+	@supports (position: sticky) {
+		display: inherit;
+	}
+}
