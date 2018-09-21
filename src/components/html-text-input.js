@@ -21,7 +21,7 @@ export default class HTMLInputView extends React.Component<PropsType> {
 		const behavior = Platform.OS === 'ios' ? 'padding' : null;
 
 		return (
-			<KeyboardAvoidingView style={ { flex: 1 } } behavior={ behavior }>
+			<KeyboardAvoidingView style={ styles.container } behavior={ behavior }>
 				<TextInput
 					textAlignVertical="top"
 					multiline
