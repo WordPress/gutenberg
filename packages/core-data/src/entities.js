@@ -25,7 +25,7 @@ export const kinds = [
  *
  * @return {Promise} Entities promise
  */
-function * loadPostTypeEntities() {
+function* loadPostTypeEntities() {
 	const postTypes = yield apiFetch( { path: '/wp/v2/types?context=edit' } );
 	return map( postTypes, ( postType, name ) => {
 		return {
@@ -41,7 +41,7 @@ function * loadPostTypeEntities() {
  *
  * @return {Promise} Entities promise
  */
-function * loadTaxonomyEntities() {
+function* loadTaxonomyEntities() {
 	const taxonomies = yield apiFetch( { path: '/wp/v2/taxonomies?context=edit' } );
 	return map( taxonomies, ( taxonomy, name ) => {
 		return {
