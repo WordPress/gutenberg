@@ -29,6 +29,29 @@ export const fromRichTextValue = ( value ) => map( value, ( subValue ) => ( {
 } ) );
 
 class PullQuoteEdit extends Component {
+	constructor( props ) {
+		super( props );
+
+		this.wasTextColorAutomaticallyComputed = false;
+		this.pullQuoteMainColorSetter = this.pullQuoteMainColorSetter.bind( this );
+		this.pullQuoteTextColorSetter = this.pullQuoteTextColorSetter.bind( this );
+	}
+
+	pullQuoteMainColorSetter( colorValue ) {
+		const { colorUtils, textColor, setTextColor, setMainColor } = this.props;
+		setMainColor( colorValue );
+		if ( ! textColor.color || this.wasTextColorAutomaticallyComputed ) {
+			this.wasTextColorAutomaticallyComputed = true;
+			setTextColor( colorUtils.getMostReadableColor( colorValue ) );
+		}
+	}
+
+	pullQuoteTextColorSetter( colorValue ) {
+		const { setTextColor } = this.props;
+		setTextColor( colorValue );
+		this.wasTextColorAutomaticallyComputed = false;
+	}
+
 	render() {
 		const {
 			attributes,
@@ -37,8 +60,6 @@ class PullQuoteEdit extends Component {
 			setAttributes,
 			isSelected,
 			className,
-			setMainColor,
-			setTextColor,
 		} = this.props;
 
 		const { value, citation } = attributes;
@@ -91,12 +112,12 @@ class PullQuoteEdit extends Component {
 						colorSettings={ [
 							{
 								value: mainColor.color,
-								onChange: setMainColor,
+								onChange: this.pullQuoteMainColorSetter,
 								label: __( 'Main Color' ),
 							},
 							{
 								value: textColor.color,
-								onChange: setTextColor,
+								onChange: this.pullQuoteTextColorSetter,
 								label: __( 'Text Color' ),
 							},
 						] }
