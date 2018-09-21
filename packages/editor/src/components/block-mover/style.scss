@@ -1,6 +1,6 @@
 .editor-block-mover {
 	min-height: $empty-paragraph-height;
-	//opacity: 0;
+	opacity: 0;
 
 	&.is-visible {
 		@include fade_in;
