@@ -14,7 +14,7 @@ type PropsType = {
 
 export default class HTMLInputView extends React.Component<PropsType> {
 	shouldComponentUpdate() {
-		return Platform.OS === 'android';
+		return Platform.OS === 'android'; // iOS TextInput gets jumpy if it's updated on every key stroke.
 	}
 
 	render() {
