@@ -183,3 +183,13 @@ a given URl has been received.
 
  * url: URL to preview the embed for.
  * preview: Preview data.
+
+### saveEntityRecord
+
+Action triggered to save an entity record.
+
+*Parameters*
+
+ * kind: Kind of the received entity.
+ * name: Name of the received entity.
+ * record: Record to be saved.

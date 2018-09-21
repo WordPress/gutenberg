@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray } from 'lodash';
+import { castArray, find } from 'lodash';
 
 /**
  * Internal dependencies
@@ -10,6 +10,8 @@ import {
 	receiveItems,
 	receiveQueriedItems,
 } from './queried-data';
+import { getKindEntities } from './entities';
+import { apiFetch } from './controls';
 
 /**
  * Returns an action object used in signalling that authors have been received.
@@ -95,4 +97,31 @@ export function receiveEmbedPreview( url, preview ) {
 		url,
 		preview,
 	};
+}
+
+/**
+ * Action triggered to save an entity record.
+ *
+ * @param {string} kind    Kind of the received entity.
+ * @param {string} name    Name of the received entity.
+ * @param {Object} record  Record to be saved.
+ *
+ * @return {Object} Updated record.
+ */
+export function* saveEntityRecord( kind, name, record ) {
+	const entities = yield getKindEntities( kind );
+	const entity = find( entities, { kind, name } );
+	if ( ! entity ) {
+		return;
+	}
+	const key = entity[ key ] || 'id';
+	const recordId = record[ key ];
+	const updatedRecord = yield apiFetch( {
+		path: `${ entity.baseURL }${ recordId ? '/' + recordId : '' }`,
+		method: recordId ? 'PUT' : 'POST',
+		data: record,
+	} );
+	yield receiveEntityRecords( kind, name, updatedRecord );
+
+	return updatedRecord;
 }

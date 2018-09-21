@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { pick } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { registerStore } from '@wordpress/data';
@@ -21,20 +26,23 @@ const createEntityRecordSelector = ( source ) => defaultEntities.reduce( ( resul
 	return result;
 }, {} );
 
-const createEntityRecordResolver = ( source ) => defaultEntities.reduce( ( result, entity ) => {
+const createEntityRecordResolverOrAction = ( source ) => defaultEntities.reduce( ( result, entity ) => {
 	const { kind, name } = entity;
 	result[ getMethodName( kind, name ) ] = ( key ) => source.getEntityRecord( kind, name, key );
 	result[ getMethodName( kind, name, 'get', true ) ] = ( ...args ) => source.getEntityRecords( kind, name, ...args );
 	return result;
 }, {} );
 
-const entityResolvers = createEntityRecordResolver( resolvers );
+const entityActions = createEntityRecordResolverOrAction(
+	pick( actions, [ 'saveEntityRecord' ] )
+);
+const entityResolvers = createEntityRecordResolverOrAction( resolvers );
 const entitySelectors = createEntityRecordSelector( selectors );
 
 const store = registerStore( REDUCER_KEY, {
 	reducer,
-	actions,
 	controls,
+	actions: { ...actions, ...entityActions },
 	selectors: { ...selectors, ...entitySelectors },
 	resolvers: { ...resolvers, ...entityResolvers },
 } );
