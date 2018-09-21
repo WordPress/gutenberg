@@ -411,3 +411,30 @@ export async function clickOnCloseModalButton( modalClassName ) {
 		await page.click( closeButtonClassName );
 	}
 }
+
+/**
+ * Sets code editor content
+ * @param {string} content New code editor content.
+ */
+export async function setCodeEditorContent( content ) {
+	await page.$eval( '.editor-post-text-editor', ( element, newValue ) => {
+		element.value = newValue;
+	}, content );
+	// press enter inside the code editor so the onChange events for the new value trigger
+	await page.click( '.editor-post-text-editor' );
+	await page.keyboard.press( 'a' );
+	await page.keyboard.press( 'Backspace' );
+	await page.click( '.editor-post-title__input' );
+}
+
+/**
+ * Returns an array with all blocks; Equivalent to calling wp.data.select( 'core/editor' ).getBlocks();
+ *
+ * @return {Promise} Promise resolving with an array containing all blocks in the document.
+ */
+export async function getAllBlocks() {
+	return await page.evaluate( () => {
+		const { select } = window.wp.data;
+		return select( 'core/editor' ).getBlocks();
+	} );
+}
