@@ -1,3 +1,3 @@
 import { use, plugins } from '../../../../packages/data/src';
-use( plugins.asyncGenerator );
+use( plugins.controls );
 export * from '../../../../packages/data/src';

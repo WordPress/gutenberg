@@ -36,7 +36,7 @@
 - `wp.editor.DocumentTitle` component has been removed.
 - `getDocumentTitle` selector (`core/editor`) has been removed.
 
-### Deprecation
+### Deprecations
 
 - `wp.editor.RichTextProvider` flagged for deprecation. Please use `wp.data.select( 'core/editor' )` methods instead.
 
