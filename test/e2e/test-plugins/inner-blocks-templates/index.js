@@ -2,9 +2,13 @@
 	var registerBlockType = wp.blocks.registerBlockType;
 	var el = wp.element.createElement;
 	var InnerBlocks = wp.editor.InnerBlocks;
+	var createValue = wp.richTextValue.createValue;
 	var __ = wp.i18n.__;
 	var TEMPLATE = [
-		[ 'core/paragraph', { fontSize: 'large', content: 'Content…' } ],
+		[ 'core/paragraph', {
+			fontSize: 'large',
+			content: createValue( 'Content…' ),
+		} ],
 	];
 
 	var save = function() {
