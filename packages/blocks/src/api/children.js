@@ -6,7 +6,7 @@ import { castArray } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { renderToString } from '@wordpress/element';
+import { renderToString, getTextElements } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -115,6 +115,19 @@ export function toHTML( children ) {
 }
 
 /**
+ * Given a block node, returns its text content.
+ *
+ * @param {WPBlockChildren} children Block node(s) to convert to text string.
+ *
+ * @return {string} String with the text content of a block node.
+ */
+export function toText( children ) {
+	const element = getSerializeCapableElement( children );
+
+	return getTextElements( element ).join( '' );
+}
+
+/**
  * Given a selector, returns an hpq matcher generating a WPBlockChildren value
  * matching the selector result.
  *
@@ -144,4 +157,5 @@ export default {
 	fromDOM,
 	toHTML,
 	matcher,
+	toText,
 };
