@@ -224,10 +224,10 @@ export default class TinyMCE extends Component {
 		// Handle deprecated `query` and `node` matcher combination for multiline
 		// values.
 		if ( Array.isArray( defaultValue ) ) {
-			deprecated( 'node matcher', {
-				alternative: 'children matcher with multiline property',
+			deprecated( 'node source', {
+				alternative: 'children source with multiline property',
 				plugin: 'Gutenberg',
-				version: '3.9',
+				version: '4.2',
 			} );
 
 			let toJoin = defaultValue;

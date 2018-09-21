@@ -45,7 +45,7 @@ export function fromDOM( domNode ) {
 	deprecated( 'wp.blocks.node.fromDOM', {
 		alternative: 'wp.richTextValue.createValue',
 		plugin: 'Gutenberg',
-		version: '3.9',
+		version: '4.2',
 	} );
 
 	return createValue( domNode );
@@ -62,7 +62,7 @@ export function toHTML( node ) {
 	deprecated( 'wp.blocks.node.toHTML', {
 		alternative: 'wp.richTextValue.toHTMLString',
 		plugin: 'Gutenberg',
-		version: '3.9',
+		version: '4.2',
 	} );
 
 	return toHTMLString( node );
@@ -80,7 +80,7 @@ export function matcher( selector ) {
 	deprecated( 'wp.blocks.node.matcher', {
 		alternative: 'wp.blocks.children.matcher with multiline property',
 		plugin: 'Gutenberg',
-		version: '3.9',
+		version: '4.2',
 	} );
 
 	return ( domNode ) => {
