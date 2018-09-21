@@ -131,13 +131,16 @@ class GalleryImage extends Component {
 							>
 								{
 									( { onDraggableStart, onDraggableEnd } ) => (
-										<Dashicon
-											icon="move"
+										<span
+											draggable
 											onDragStart={ onDraggableStart }
 											onDragEnd={ onDraggableEnd }
-											className="blocks-gallery-item__remove"
-											draggable
-										/>
+										>
+											<Dashicon
+												icon="move"
+												className="blocks-gallery-item__remove"
+											/>
+										</span>
 									)
 								}
 							</Draggable>
