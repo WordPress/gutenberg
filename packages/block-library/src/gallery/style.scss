@@ -94,15 +94,15 @@
 		@for $i from 3 through 8 {
 			&.columns-#{ $i } .blocks-gallery-image,
 			&.columns-#{ $i } .blocks-gallery-item {
-				width: calc((100% / #{ $i }) - (#{ $grid-size-large } * #{ $i }));
+				width: calc((100% / #{ $i }) - #{ $grid-size-large });
 			}
 		}
 	}
 
 	// Unset the right margin on every rightmost gallery item to ensure center balance.
-	@for $j from 1 through 8 {
-		&.columns-#{ $j } .blocks-gallery-image:nth-of-type(#{ $j }n),
-		&.columns-#{ $j } .blocks-gallery-item:nth-of-type(#{ $j }n) {
+	@for $column-count from 1 through 8 {
+		&.columns-#{ $column-count } .blocks-gallery-image:nth-of-type(#{ $column-count }n),
+		&.columns-#{ $column-count } .blocks-gallery-item:nth-of-type(#{ $column-count }n) {
 			margin-right: 0;
 		}
 	}
