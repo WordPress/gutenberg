@@ -28,6 +28,7 @@ import { combineReducers } from '@wordpress/data';
  */
 import withHistory from '../utils/with-history';
 import withChangeDetection from '../utils/with-change-detection';
+import withLastChange from '../utils/with-last-change';
 import { PREFERENCES_DEFAULTS, EDITOR_SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
 
@@ -224,6 +225,8 @@ export const editor = flow( [
 		resetTypes: [ 'SETUP_EDITOR_STATE', 'REQUEST_POST_UPDATE_START' ],
 		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
 	} ),
+
+	withLastChange,
 ] )( {
 	edits( state = {}, action ) {
 		switch ( action.type ) {
