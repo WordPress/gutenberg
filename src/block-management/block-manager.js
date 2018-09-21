@@ -14,10 +14,7 @@ import BlockPicker from './block-picker';
 import HTMLTextInput from '../components/html-text-input';
 
 // Gutenberg imports
-import {
-	createBlock,
-	serialize,
-} from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 
 export type BlockListType = {
 	onChange: ( clientId: string, attributes: mixed ) => void,
@@ -39,7 +36,6 @@ type StateType = {
 	inspectBlocks: boolean,
 	blockTypePickerVisible: boolean,
 	selectedBlockType: string,
-	html: string,
 };
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
@@ -51,7 +47,6 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			inspectBlocks: false,
 			blockTypePickerVisible: false,
 			selectedBlockType: 'core/paragraph', // just any valid type to start from
-			html: '',
 		};
 	}
 
@@ -137,25 +132,6 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				// TODO: implement settings
 				break;
 		}
-	}
-
-	serializeToHtml() {
-		return this.props.blocks
-			.map( ( block ) => {
-				if ( block.name === 'aztec' ) {
-					return '<aztec>' + block.attributes.content + '</aztec>\n\n';
-				}
-
-				return serialize( [ block ] ) + '\n\n';
-			} )
-			.reduce( ( prevVal, value ) => {
-				return prevVal + value;
-			}, '' );
-	}
-
-	parseHTML() {
-		const { parseBlocksAction } = this.props;
-		parseBlocksAction( this.state.html );
 	}
 
 	componentDidUpdate() {
@@ -250,21 +226,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	handleSwitchEditor = ( showHtml: boolean ) => {
-		if ( showHtml ) {
-			this.showHTML();
-		} else {
-			this.showBlocks();
-		}
-	}
-
-	showBlocks() {
-		this.parseHTML();
-		this.setState( { showHtml: false } );
-	}
-
-	showHTML() {
-		const html = this.serializeToHtml();
-		this.setState( { showHtml: true, html } );
+		this.setState( { showHtml } );
 	}
 
 	handleInspectBlocksChanged = ( inspectBlocks: boolean ) => {
@@ -297,16 +259,9 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		);
 	}
 
-	onChangeHTML = ( html: string ) => {
-		this.setState( { html } );
-	}
-
 	renderHTML() {
 		return (
-			<HTMLTextInput
-				value={ this.state.html }
-				onChange={ this.onChangeHTML }
-			/>
+			<HTMLTextInput { ...this.props } />
 		);
 	}
 }
