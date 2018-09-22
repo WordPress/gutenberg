@@ -165,16 +165,16 @@
         peg$c10 = function(blockName, attrs) {
             /** <?php
             return array(
-              'blockName'  => $blockName,
-              'attrs'      => $attrs,
+              'blockName'   => $blockName,
+              'attrs'       => isset( $attrs ) ? $attrs : array(),
               'innerBlocks' => array(),
-              'innerHTML' => '',
+              'innerHTML'   => '',
             );
             ?> **/
 
             return {
               blockName: blockName,
-              attrs: attrs,
+              attrs: attrs || {},
               innerBlocks: [],
               innerHTML: ''
             };
@@ -184,10 +184,10 @@
             list( $innerHTML, $innerBlocks ) = peg_array_partition( $children, 'is_string' );
 
             return array(
-              'blockName'  => $s['blockName'],
-              'attrs'      => $s['attrs'],
+              'blockName'    => $s['blockName'],
+              'attrs'        => $s['attrs'],
               'innerBlocks'  => $innerBlocks,
-              'innerHTML'  => implode( '', $innerHTML ),
+              'innerHTML'    => implode( '', $innerHTML ),
             );
             ?> **/
 
@@ -208,13 +208,13 @@
             /** <?php
             return array(
               'blockName' => $blockName,
-              'attrs'     => $attrs,
+              'attrs'     => isset( $attrs ) ? $attrs : array(),
             );
             ?> **/
 
             return {
               blockName: blockName,
-              attrs: attrs
+              attrs: attrs || {}
             };
           },
         peg$c15 = "/wp:",
@@ -1498,7 +1498,12 @@
             $blocks = array();
 
             if ( ! empty( $pre ) ) {
-                $blocks[] = array( 'attrs' => array(), 'innerHTML' => $pre );
+                $blocks[] = array(
+                    'blockName' => 'core/freeform',
+                    'attrs' => array(),
+                    'innerBlocks' => array(),
+                    'innerHTML' => $pre
+                );
             }
 
             foreach ( $tokens as $token ) {
@@ -1507,12 +1512,22 @@
                 $blocks[] = $token;
 
                 if ( ! empty( $html ) ) {
-                    $blocks[] = array( 'attrs' => array(), 'innerHTML' => $html );
+                    $blocks[] = array(
+                        'blockName' => 'core/freeform',
+                        'attrs' => array(),
+                        'innerBlocks' => array(),
+                        'innerHTML' => $html
+                    );
                 }
             }
 
             if ( ! empty( $post ) ) {
-                $blocks[] = array( 'attrs' => array(), 'innerHTML' => $post );
+                $blocks[] = array(
+                    'blockName' => 'core/freeform',
+                    'attrs' => array(),
+                    'innerBlocks' => array(),
+                    'innerHTML' => $post
+                );
             }
 
             return $blocks;
@@ -1523,8 +1538,10 @@
 
     function freeform( s ) {
         return s.length && {
+            blockName: 'core/freeform',
             attrs: {},
-            innerHTML: s
+            innerBlocks: [],
+            innerHTML: s,
         };
     }
 

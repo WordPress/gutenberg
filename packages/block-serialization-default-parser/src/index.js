@@ -13,6 +13,10 @@ function Block( blockName, attrs, innerBlocks, innerHTML ) {
 	};
 }
 
+function Freeform( innerHTML ) {
+	return Block( 'core/freeform', {}, [], innerHTML );
+}
+
 function Frame( block, tokenStart, tokenLength, prevOffset, leadingHtmlStart ) {
 	return {
 		block,
@@ -78,10 +82,7 @@ function proceed() {
 			// in the top-level of the document
 			if ( 0 === stackDepth ) {
 				if ( null !== leadingHtmlStart ) {
-					output.push( {
-						attrs: {},
-						innerHTML: document.substr( leadingHtmlStart, startOffset - leadingHtmlStart ),
-					} );
+					output.push( Freeform( document.substr( leadingHtmlStart, startOffset - leadingHtmlStart ) ) );
 				}
 				output.push( Block( blockName, attrs, [], '' ) );
 				offset = startOffset + tokenLength;
@@ -196,7 +197,7 @@ function nextToken() {
 	const namespace = namespaceMatch || 'core/';
 	const name = namespace + nameMatch;
 	const hasAttrs = !! attrsMatch;
-	const attrs = hasAttrs ? parseJSON( attrsMatch ) : null;
+	const attrs = hasAttrs ? parseJSON( attrsMatch ) : {};
 
 	// This state isn't allowed
 	// This is an error
@@ -223,14 +224,7 @@ function addFreeform( rawLength ) {
 		return;
 	}
 
-	// why is this not a Frame? it's because the current grammar
-	// specifies an object that's different. we can update the
-	// specification and change here if we want to but for now we
-	// want this parser to be spec-compliant
-	output.push( {
-		attrs: {},
-		innerHTML: document.substr( offset, length ),
-	} );
+	output.push( Freeform( document.substr( offset, length ) ) );
 }
 
 function addInnerBlock( block, tokenStart, tokenLength, lastOffset ) {
@@ -253,10 +247,7 @@ function addBlockFromStack( endOffset ) {
 	}
 
 	if ( null !== leadingHtmlStart ) {
-		output.push( {
-			attrs: {},
-			innerHTML: document.substr( leadingHtmlStart, tokenStart - leadingHtmlStart ),
-		} );
+		output.push( Freeform( document.substr( leadingHtmlStart, tokenStart - leadingHtmlStart ) ) );
 	}
 
 	output.push( block );
