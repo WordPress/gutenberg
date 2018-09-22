@@ -354,12 +354,12 @@ export function isEditedPostSaveable( state ) {
 	//  See: <PostPublishButton /> (`forceIsDirty` prop)
 	//  See: https://github.com/WordPress/gutenberg/pull/4184
 
-	const isSavable = (
+	const isEditedPostSavable = (
 		!! getEditedPostAttribute( state, 'title' ) ||
 		!! getEditedPostAttribute( state, 'excerpt' ) ||
 		! isEditedPostEmpty( state )
 	);
-	return applyFilters( 'editor.selectors.isSavable', isSavable );
+	return applyFilters( 'editor.selectors.isEditedPostSavable', isEditedPostSavable );
 }
 
 /**
