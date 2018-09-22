@@ -199,6 +199,12 @@
 	box-shadow: none;
 }
 
+@mixin menu-style__hover() {
+	color: $dark-gray-900;
+	border: none;
+	box-shadow: none;
+}
+
 @mixin menu-style__focus() {
 	color: $dark-gray-900;
 	border: none;
@@ -309,11 +315,14 @@
 	content: "";
 	pointer-events: none;
 	display: block;
-	position: absolute;
 	width: 0;
 	height: 0;
 	border-left: 3px solid transparent;
 	border-right: 3px solid transparent;
 	border-top: 5px solid currentColor;
-	right: 6px;
+	margin-left: $grid-size-small;
+
+	// This gives the icon space on the right side consistent with the material
+	// icon standards.
+	margin-right: 2px;
 }

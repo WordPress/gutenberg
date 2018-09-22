@@ -45,7 +45,10 @@
 		cursor: pointer;
 		@include menu-style__neutral;
 
-		&:hover:not(:disabled):not([aria-disabled="true"]),
+		&:hover:not(:disabled):not([aria-disabled="true"]) {
+			@include menu-style__hover;
+		}
+
 		&:focus:not(:disabled):not([aria-disabled="true"]) {
 			@include menu-style__focus;
 		}

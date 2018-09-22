@@ -23,9 +23,22 @@ import createSelector from 'rememo';
 /**
  * WordPress dependencies
  */
-import { serialize, getBlockType, getBlockTypes, hasBlockSupport, hasChildBlocksWithInserterSupport, getUnknownTypeHandlerName } from '@wordpress/blocks';
+import {
+	serialize,
+	getBlockType,
+	getBlockTypes,
+	hasBlockSupport,
+	hasChildBlocksWithInserterSupport,
+	getUnknownTypeHandlerName,
+	isUnmodifiedDefaultBlock,
+} from '@wordpress/blocks';
 import { moment } from '@wordpress/date';
 import { removep } from '@wordpress/autop';
+
+/**
+ * Dependencies
+ */
+import { PREFERENCES_DEFAULTS } from './defaults';
 
 /***
  * Module constants
@@ -349,15 +362,20 @@ export function isEditedPostSaveable( state ) {
 
 /**
  * Returns true if the edited post has content. A post has content if it has at
- * least one block or otherwise has a non-empty content property assigned.
+ * least one saveable block or otherwise has a non-empty content property
+ * assigned.
  *
  * @param {Object} state Global application state.
  *
  * @return {boolean} Whether post has content.
  */
 export function isEditedPostEmpty( state ) {
+	// While the condition of truthy content string would be sufficient for
+	// determining emptiness, testing saveable blocks length is a trivial
+	// operation by comparison. Since this function can be called frequently,
+	// optimize for the fast case where saveable blocks are non-empty.
 	return (
-		! getBlockCount( state ) &&
+		! getBlocksForSerialization( state ).length &&
 		! getEditedPostAttribute( state, 'content' )
 	);
 }
@@ -1347,6 +1365,31 @@ export function getSuggestedPostFormat( state ) {
 }
 
 /**
+ * Returns a set of blocks which are to be used in consideration of the post's
+ * generated save content.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {WPBlock[]} Filtered set of blocks for save.
+ */
+export function getBlocksForSerialization( state ) {
+	const blocks = getBlocks( state );
+
+	// A single unmodified default block is assumed to be equivalent to an
+	// empty post.
+	const isSingleUnmodifiedDefaultBlock = (
+		blocks.length === 1 &&
+		isUnmodifiedDefaultBlock( blocks[ 0 ] )
+	);
+
+	if ( isSingleUnmodifiedDefaultBlock ) {
+		return [];
+	}
+
+	return blocks;
+}
+
+/**
  * Returns the content of the post being edited, preferring raw string edit
  * before falling back to serialization of block state.
  *
@@ -1361,13 +1404,22 @@ export const getEditedPostContent = createSelector(
 			return edits.content;
 		}
 
-		const blocks = getBlocks( state );
+		const blocks = getBlocksForSerialization( state );
+		const content = serialize( blocks );
 
-		if ( blocks.length === 1 && blocks[ 0 ].name === getUnknownTypeHandlerName() ) {
-			return removep( serialize( blocks ) );
+		// For compatibility purposes, treat a post consisting of a single
+		// unknown block as legacy content and downgrade to a pre-block-editor
+		// removep'd content format.
+		const isSingleUnknownBlock = (
+			blocks.length === 1 &&
+			blocks[ 0 ].name === getUnknownTypeHandlerName()
+		);
+
+		if ( isSingleUnknownBlock ) {
+			return removep( content );
 		}
 
-		return serialize( blocks );
+		return content;
 	},
 	( state ) => [
 		state.editor.present.edits.content,
@@ -1878,4 +1930,19 @@ export function getTokenSettings( state, name ) {
  */
 export function canUserUseUnfilteredHTML( state ) {
 	return has( getCurrentPost( state ), [ '_links', 'wp:action-unfiltered_html' ] );
+}
+
+/**
+ * Returns whether the pre-publish panel should be shown
+ * or skipped when the user clicks the "publish" button.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the pre-publish panel should be shown or not.
+ */
+export function isPublishSidebarEnabled( state ) {
+	if ( state.preferences.hasOwnProperty( 'isPublishSidebarEnabled' ) ) {
+		return state.preferences.isPublishSidebarEnabled;
+	}
+	return PREFERENCES_DEFAULTS.isPublishSidebarEnabled;
 }

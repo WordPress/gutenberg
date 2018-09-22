@@ -1,3 +1,9 @@
+## 2.0.1 (Unreleased)
+
+### Bug Fixes
+
+- Captures and protects against unexpected console logging occurring during lifecycle.
+
 ## 2.0.0 (2018-07-12)
 
 ### Breaking Change
