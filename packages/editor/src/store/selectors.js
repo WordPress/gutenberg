@@ -34,6 +34,7 @@ import {
 } from '@wordpress/blocks';
 import { moment } from '@wordpress/date';
 import { removep } from '@wordpress/autop';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Dependencies
@@ -353,11 +354,12 @@ export function isEditedPostSaveable( state ) {
 	//  See: <PostPublishButton /> (`forceIsDirty` prop)
 	//  See: https://github.com/WordPress/gutenberg/pull/4184
 
-	return (
+	const isSavable = (
 		!! getEditedPostAttribute( state, 'title' ) ||
 		!! getEditedPostAttribute( state, 'excerpt' ) ||
 		! isEditedPostEmpty( state )
 	);
+	return applyFilters( 'editor.selectors.isSavable', isSavable );
 }
 
 /**
