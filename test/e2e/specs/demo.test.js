@@ -44,14 +44,10 @@ describe( 'new editor state', () => {
 	} );
 
 	it( 'content should load without making the post dirty', async () => {
-		await page.waitForFunction( () => {
-			const editor = wp.data.select( 'core/editor' );
-			if ( editor.isEditedPostDirty() ) {
-				// Will cause the test to fail if the post is dirty.
-				// eslint-disable-next-line no-console
-				console.error( 'Demo page was marked dirty' );
-			}
-			return true;
+		const isDirty = await page.evaluate( () => {
+			const { select } = window.wp.data;
+			return select( 'core/editor' ).isEditedPostDirty();
 		} );
+		expect( isDirty ).toBeFalsy();
 	} );
 } );
