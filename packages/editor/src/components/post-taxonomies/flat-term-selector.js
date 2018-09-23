@@ -173,7 +173,7 @@ class FlatTermSelector extends Component {
 
 		const { loading, availableTerms, selectedTerms } = this.state;
 		const termNames = availableTerms.map( ( term ) => term.name );
-		const newTermPlaceholderLabel = get(
+		const newTermLabel = get(
 			taxonomy,
 			[ 'data', 'labels', 'add_new_item' ],
 			slug === 'post_tag' ? __( 'Add New Tag' ) : __( 'Add New Term' )
@@ -196,7 +196,7 @@ class FlatTermSelector extends Component {
 				onInputChange={ this.searchTerms }
 				maxSuggestions={ MAX_TERMS_SUGGESTIONS }
 				disabled={ loading }
-				placeholder={ newTermPlaceholderLabel }
+				label={ newTermLabel }
 				messages={ {
 					added: termAddedLabel,
 					removed: termRemovedLabel,
