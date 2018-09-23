@@ -99,7 +99,7 @@ android {
 
     defaultConfig {
         applicationId "com.gutenberg"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
@@ -155,6 +155,12 @@ repositories {
     jcenter()
     google()
     maven { url "https://jitpack.io" }
+}
+
+configurations.all {
+    resolutionStrategy {
+        force 'org.webkit:android-jsc:r224109'
+    }
 }
 
 dependencies {
