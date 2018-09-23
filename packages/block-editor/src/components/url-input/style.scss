@@ -31,6 +31,11 @@ $input-size: 300px;
 		}
 	}
 
+	&.has-border input[type="text"] {
+		border: 1px solid $dark-gray-500;
+		border-radius: 4px;
+	}
+
 	.components-spinner {
 		position: absolute;
 		right: $input-padding;

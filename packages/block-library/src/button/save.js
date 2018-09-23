@@ -20,6 +20,8 @@ export default function save( { attributes } ) {
 		textColor,
 		customBackgroundColor,
 		customTextColor,
+		linkTarget,
+		linkRel,
 	} = attributes;
 
 	const textClass = getColorClassName( 'color', textColor );
@@ -46,6 +48,8 @@ export default function save( { attributes } ) {
 				title={ title }
 				style={ buttonStyle }
 				value={ text }
+				target={ linkTarget }
+				rel={ linkRel }
 			/>
 		</div>
 	);
