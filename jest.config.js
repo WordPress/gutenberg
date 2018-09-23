@@ -17,7 +17,7 @@ module.exports = {
 	testEnvironment: 'jsdom',
 	testPathIgnorePatterns: [
 		'/node_modules/',
-		'/gutenberg/gutenberg-mobile/',
+		'<rootDir>/gutenberg/gutenberg-mobile/',
 		'/gutenberg/test/',
 		'/gutenberg/packages/',
 	],
