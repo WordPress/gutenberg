@@ -287,7 +287,7 @@ class HierarchicalTermSelector extends Component {
 		/* eslint-disable jsx-a11y/no-onchange */
 		return [
 			<input
-				type="text"
+				type="search"
 				id={ filterInputId }
 				value={ filterValue }
 				onChange={ ( event ) => this.setState( { filterValue: event.target.value } ) }
