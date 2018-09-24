@@ -5,6 +5,8 @@
 	border-top: 0;
 	background: $light-gray-200;
 	position: sticky;
+	z-index: z-index(".components-panel__header.edit-post-sidebar__panel-tabs");
+	top: 0;
 }
 
 .edit-post-sidebar__panel-tab {
@@ -12,7 +14,7 @@
 	border: none;
 	border-radius: 0;
 	cursor: pointer;
-	height: 50px;
+	height: $grid-size * 6;
 	padding: 3px 15px; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 	margin-left: 0;
 	font-weight: 400;
