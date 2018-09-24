@@ -1,3 +1,6 @@
+/**
+ * External dependencies
+ */
 import deepFreeze from 'deep-freeze';
 
 /**

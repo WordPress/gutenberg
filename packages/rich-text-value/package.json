@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/rich-text-value",
-	"version": "1.0.0",
+	"version": "1.0.0-beta.0",
 	"description": "Rich text value and manipulation API.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,12 +20,13 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime-corejs2": "7.0.0-beta.56",
+		"@babel/runtime": "^7.0.0",
 		"@wordpress/escape-html": "file:../escape-html",
-		"lodash": "4.17.10"
+		"lodash": "^4.17.10"
 	},
 	"devDependencies": {
-		"deep-freeze": "0.0.1"
+		"deep-freeze": "^0.0.1",
+		"jsdom": "^11.12.0"
 	},
 	"publishConfig": {
 		"access": "public"
