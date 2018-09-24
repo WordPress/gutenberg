@@ -304,7 +304,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-shortcode',
 		gutenberg_url( 'build/shortcode/index.js' ),
-		array( 'wp-polyfill' ),
+		array( 'wp-polyfill', 'lodash' ),
 		filemtime( gutenberg_dir_path() . 'build/shortcode/index.js' ),
 		true
 	);
