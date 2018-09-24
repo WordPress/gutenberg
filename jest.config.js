@@ -13,7 +13,7 @@ if ( process.env.TEST_RN_PLATFORM ) {
 
 module.exports = {
 	verbose: true,
-	preset: 'jest-react-native',
+	preset: 'react-native',
 	testEnvironment: 'jsdom',
 	testPathIgnorePatterns: [
 		'/node_modules/',
@@ -27,9 +27,5 @@ module.exports = {
 		// Mock the CSS modules. See https://facebook.github.io/jest/docs/en/webpack.html#handling-static-assets
 		'\\.(scss)$': '<rootDir>/__mocks__/styleMock.js',
 	},
-	haste: {
-		defaultPlatform: rnPlatform,
-		platforms: [ 'android', 'ios', 'native' ],
-		providesModuleNodeModules: [ 'react-native', 'react-native-svg' ],
-	},
+	transform: { '^.+\\.js$': './node_modules/react-native/jest/preprocessor.js' },
 };
