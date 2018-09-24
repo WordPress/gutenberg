@@ -2,7 +2,21 @@
 	max-width: 400px;
 
 	.editor-media-placeholder__url-input-form {
-		max-width: none;
+		max-width: 210px;
+		height: 32px;
+		margin: -1px 0 0 6px;
+
+		.editor-media-placeholder__url-input-submit-button {
+			display: none;
+		}
+
+		&.is-expanded {
+			max-width: none;
+
+			.editor-media-placeholder__url-input-submit-button {
+				display: block;
+			}
+		}
 	}
 }
 
@@ -18,17 +32,4 @@
 	&:hover {
 		color: $dark-gray-800;
 	}
-}
-
-.editor-media-placeholder__url-input-expandable-section {
-	width: 100%;
-	min-height: 32px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
-
-.editor-media-placeholder__url-input-expandable-button.is-large {
-	margin-right: 5px;
-	padding-left: 10px;
 }
