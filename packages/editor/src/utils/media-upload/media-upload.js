@@ -7,7 +7,7 @@ import { compact, flatMap, forEach, get, has, includes, map, noop, startsWith } 
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
-import { createBlobURL } from '@wordpress/blob';
+import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -63,6 +63,7 @@ export function mediaUpload( {
 
 	const filesSet = [];
 	const setAndUpdateFiles = ( idx, value ) => {
+		revokeBlobURL( get( filesSet, [ idx, 'url' ] ) );
 		filesSet[ idx ] = value;
 		onFileChange( compact( filesSet ) );
 	};
