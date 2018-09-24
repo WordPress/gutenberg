@@ -805,7 +805,7 @@ export class RichText extends Component {
 					return;
 				}
 
-				const { isAdding, value: href, target } = formatValue;
+				const { isAdding, value: href, target, rel } = formatValue;
 				const isSelectionCollapsed = this.editor.selection.isCollapsed();
 
 				// Are we creating a new link?
@@ -840,7 +840,7 @@ export class RichText extends Component {
 				if ( isSelectionCollapsed && ! isActive ) {
 					this.editor.insertContent( this.editor.dom.createHTML(
 						'a',
-						{ href, target },
+						{ href, target, rel },
 						this.editor.dom.encode( href )
 					) );
 					return;
@@ -851,6 +851,7 @@ export class RichText extends Component {
 				this.editor.execCommand( 'mceInsertLink', false, {
 					href,
 					target,
+					rel,
 					'data-wp-placeholder': null,
 					'data-mce-bogus': null,
 				} );
