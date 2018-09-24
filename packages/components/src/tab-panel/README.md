@@ -74,6 +74,8 @@ A list of tabs where each tab is defined by an object with the following fields:
 2. title: String. Defines the translated text for the tab
 3. className: String. Defines the class to put on the tab.
 
+Other fields may be added to the object and accessed from the child function if desired.
+
 - Type: Array
 - Required: Yes
 
