@@ -1,0 +1,18 @@
+/** @format */
+
+@import '../variables.scss';
+
+.htmlView {
+	font-family: $default-monospace-font;
+	flex: 1;
+	background-color: #eee;
+	padding-left: 8;
+	padding-right: 8;
+	padding-top: 8;
+	padding-bottom: 8;
+}
+
+.container {
+	flex: 1;
+}
+

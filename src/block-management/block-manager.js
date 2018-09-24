@@ -4,19 +4,17 @@
  */
 
 import React from 'react';
-import { Platform, Switch, Text, View, FlatList, TextInput, KeyboardAvoidingView } from 'react-native';
+import { Platform, Switch, Text, View, FlatList, KeyboardAvoidingView } from 'react-native';
 import RecyclerViewList, { DataSource } from 'react-native-recyclerview-list';
 import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
 import type { BlockType } from '../store/';
 import styles from './block-manager.scss';
 import BlockPicker from './block-picker';
+import HTMLTextInput from '../components/html-text-input';
 
 // Gutenberg imports
-import {
-	createBlock,
-	serialize,
-} from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 
 export type BlockListType = {
 	onChange: ( clientId: string, attributes: mixed ) => void,
@@ -38,12 +36,9 @@ type StateType = {
 	inspectBlocks: boolean,
 	blockTypePickerVisible: boolean,
 	selectedBlockType: string,
-	html: string,
 };
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
-	_htmlTextInput: TextInput = null;
-
 	constructor( props: PropsType ) {
 		super( props );
 		this.state = {
@@ -52,7 +47,6 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			inspectBlocks: false,
 			blockTypePickerVisible: false,
 			selectedBlockType: 'core/paragraph', // just any valid type to start from
-			html: '', // This is used to hold the Android html text input state.
 		};
 	}
 
@@ -138,25 +132,6 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				// TODO: implement settings
 				break;
 		}
-	}
-
-	serializeToHtml() {
-		return this.props.blocks
-			.map( ( block ) => {
-				if ( block.name === 'aztec' ) {
-					return '<aztec>' + block.attributes.content + '</aztec>\n\n';
-				}
-
-				return serialize( [ block ] ) + '\n\n';
-			} )
-			.reduce( ( prevVal, value ) => {
-				return prevVal + value;
-			}, '' );
-	}
-
-	parseHTML( html: string ) {
-		const { parseBlocksAction } = this.props;
-		parseBlocksAction( html );
 	}
 
 	componentDidUpdate() {
@@ -251,12 +226,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	handleSwitchEditor = ( showHtml: boolean ) => {
-		if ( ! showHtml ) {
-			const html = this._htmlTextInput._lastNativeText;
-			this.parseHTML( html );
-		}
-		const html = this.serializeToHtml();
-		this.setState( { showHtml, html } );
+		this.setState( { showHtml } );
 	}
 
 	handleInspectBlocksChanged = ( inspectBlocks: boolean ) => {
@@ -289,28 +259,9 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		);
 	}
 
-	onChangeHTML = ( html: string ) => {
-		if ( Platform.OS === 'android' ) {
-			this.setState( { html } );
-		}
-	}
-
 	renderHTML() {
-		const behavior = Platform.OS === 'ios' ? 'padding' : null;
-		const htmlInputRef = ( el ) => this._htmlTextInput = el;
-
 		return (
-			<KeyboardAvoidingView style={ { flex: 1 } } behavior={ behavior }>
-				<TextInput
-					textAlignVertical="top"
-					multiline
-					ref={ htmlInputRef }
-					numberOfLines={ 0 }
-					style={ styles.htmlView }
-					value={ this.state.html }
-					onChangeText={ ( html ) => this.onChangeHTML( html ) }
-				/>
-			</KeyboardAvoidingView>
+			<HTMLTextInput { ...this.props } />
 		);
 	}
 }
