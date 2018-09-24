@@ -76,13 +76,16 @@ async function goToWPPath( WPPath, query ) {
 	await page.goto( getUrl( WPPath, query ) );
 }
 
-async function login() {
-	await page.type( '#user_login', WP_USERNAME );
-	await page.type( '#user_pass', WP_PASSWORD );
+export async function login( username = WP_USERNAME, password = WP_PASSWORD, browserPage = page ) {
+	const loginButton = await browserPage.$( '#user_login' );
+	await loginButton.click();
+
+	await browserPage.type( '#user_login', username );
+	await browserPage.type( '#user_pass', password );
 
 	await Promise.all( [
-		page.waitForNavigation(),
-		page.click( '#wp-submit' ),
+		browserPage.waitForNavigation(),
+		browserPage.click( '#wp-submit' ),
 	] );
 }
 
@@ -126,7 +129,11 @@ export async function visitAdmin( adminPath, query ) {
 export async function newPost( { postType, enableTips = false } = {} ) {
 	await visitAdmin( 'post-new.php', postType ? 'post_type=' + postType : '' );
 
-	await page.evaluate( ( _enableTips ) => {
+	await setTipsPreference( enableTips );
+}
+
+export async function setTipsPreference( enableTips = false, browserPage = page ) {
+	await browserPage.evaluate( ( _enableTips ) => {
 		const action = _enableTips ? 'enableTips' : 'disableTips';
 		wp.data.dispatch( 'core/nux' )[ action ]();
 	}, enableTips );
@@ -410,4 +417,16 @@ export async function clickOnCloseModalButton( modalClassName ) {
 	if ( closeButton ) {
 		await page.click( closeButtonClassName );
 	}
+}
+
+/**
+ * Creates a new browser page in incognito mode.
+ *
+ * @return {Promise<Page>} Browser page.
+ */
+export async function newBrowserIncognitoPage() {
+	// Create a new incognito browser context.
+	const context = await browser.createIncognitoBrowserContext();
+	// Create a new page in a pristine context.
+	return await context.newPage();
 }
