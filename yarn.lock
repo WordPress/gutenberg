@@ -445,19 +445,6 @@
     pirates "^4.0.0"
     source-map-support "^0.4.2"
 
-"@babel/runtime@^7.0.0":
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.0.0.tgz#adeb78fedfc855aa05bc041640f3f6f98e85424c"
-  dependencies:
-    regenerator-runtime "^0.12.0"
-
-"@babel/runtime@^7.0.0-beta.52":
-  version "7.0.0-beta.54"
-  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.0.0-beta.54.tgz#39ebb42723fe7ca4b3e1b00e967e80138d47cadf"
-  dependencies:
-    core-js "^2.5.7"
-    regenerator-runtime "^0.12.0"
-
 "@babel/template@7.0.0-beta.44":
   version "7.0.0-beta.44"
   resolved "https://registry.yarnpkg.com/@babel/template/-/template-7.0.0-beta.44.tgz#f8832f4fdcee5d59bf515e595fc5106c529b394f"
@@ -525,12 +512,6 @@
   version "10.5.2"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.5.2.tgz#f19f05314d5421fe37e74153254201a7bf00a707"
 
-"@wordpress/autop@^1.0.6":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@wordpress/autop/-/autop-1.1.1.tgz#00a4b91ef2feaf5dfb704383f2dd16b880604084"
-  dependencies:
-    "@babel/runtime" "^7.0.0-beta.52"
-
 "@wordpress/babel-preset-default@^1.1.2":
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/@wordpress/babel-preset-default/-/babel-preset-default-1.3.0.tgz#e5818a448812a2966d308e9f82097b9f81514b77"
@@ -542,12 +523,6 @@
     babel-plugin-transform-runtime "^6.23.0"
     babel-preset-env "^1.6.1"
 
-"@wordpress/blob@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@wordpress/blob/-/blob-2.0.0.tgz#b310674a93f7484c0b4492e6698aba55a1e04f48"
-  dependencies:
-    "@babel/runtime" "^7.0.0"
-
 "@wordpress/block-serialization-spec-parser@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@wordpress/block-serialization-spec-parser/-/block-serialization-spec-parser-1.0.0.tgz#a51a9276421629d4be398dfcc9bab52e303c3403"
@@ -555,83 +530,6 @@
 "@wordpress/browserslist-config@^2.1.4":
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@wordpress/browserslist-config/-/browserslist-config-2.2.0.tgz#7fcc77db40d4d846dbb158e485a6badc143c76d2"
-
-"@wordpress/compose@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@wordpress/compose/-/compose-1.0.1.tgz#fdfb24b27390ca97db432108c47188b4fc96dea8"
-  dependencies:
-    "@babel/runtime" "^7.0.0-beta.52"
-    "@wordpress/element" "^1.0.1"
-    "@wordpress/is-shallow-equal" "^1.1.1"
-    lodash "^4.17.10"
-
-"@wordpress/deprecated@^1.0.0-alpha.2", "@wordpress/deprecated@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@wordpress/deprecated/-/deprecated-1.0.1.tgz#8769d791b228022caef156dbbff0f21eb2b21f3e"
-  dependencies:
-    "@babel/runtime" "^7.0.0-beta.52"
-
-"@wordpress/deprecated@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@wordpress/deprecated/-/deprecated-1.0.2.tgz#ac69168d55b790d797946ef2dfd2eeda13bf1c56"
-  dependencies:
-    "@babel/runtime" "^7.0.0-beta.52"
-
-"@wordpress/element@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@wordpress/element/-/element-1.0.1.tgz#d9e31e437793655556816e6328bc67bfbecc4a27"
-  dependencies:
-    "@babel/runtime" "^7.0.0-beta.52"
-    "@wordpress/deprecated" "^1.0.1"
-    "@wordpress/is-shallow-equal" "^1.1.1"
-    lodash "^4.17.10"
-    react "^16.4.1"
-    react-dom "^16.4.1"
-
-"@wordpress/element@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@wordpress/element/-/element-1.0.2.tgz#1b2c8e245ce9e7d126d6521f2a93e69606d1c71c"
-  dependencies:
-    "@babel/runtime" "^7.0.0-beta.52"
-    "@wordpress/deprecated" "^1.0.2"
-    "@wordpress/is-shallow-equal" "^1.1.2"
-    lodash "^4.17.10"
-    react "^16.4.1"
-    react-dom "^16.4.1"
-
-"@wordpress/hooks@^1.2.1":
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/@wordpress/hooks/-/hooks-1.3.1.tgz#1ee50c777938060a96b202e22ca2e902eacce335"
-  dependencies:
-    "@babel/runtime" "^7.0.0-beta.52"
-
-"@wordpress/i18n@^1.1.0":
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/@wordpress/i18n/-/i18n-1.2.1.tgz#b5c7c52065db9fa13a3d1872ddb9a198bc8ea29a"
-  dependencies:
-    "@babel/runtime" "^7.0.0-beta.52"
-    gettext-parser "^1.3.1"
-    jed "^1.1.1"
-    lodash "^4.17.10"
-    memize "^1.0.5"
-
-"@wordpress/is-shallow-equal@^1.0.1", "@wordpress/is-shallow-equal@^1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@wordpress/is-shallow-equal/-/is-shallow-equal-1.1.1.tgz#377db18206afe2a6e787862106c3ff5c27d65e36"
-  dependencies:
-    "@babel/runtime" "^7.0.0-beta.52"
-
-"@wordpress/is-shallow-equal@^1.1.2":
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/@wordpress/is-shallow-equal/-/is-shallow-equal-1.1.2.tgz#360a3d06a5805148d05e00cf92e5e42360baf0a2"
-  dependencies:
-    "@babel/runtime" "^7.0.0-beta.52"
-
-"@wordpress/redux-routine@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@wordpress/redux-routine/-/redux-routine-2.0.0.tgz#9ec9afa29abc69510c80f3c2d0d2a392d6c7604f"
-  dependencies:
-    "@babel/runtime" "^7.0.0"
 
 abab@^1.0.4:
   version "1.0.4"
@@ -2911,7 +2809,7 @@ encodeurl@~1.0.1, encodeurl@~1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/encodeurl/-/encodeurl-1.0.2.tgz#ad3ff4c86ec2d029322f5a02c3a9a606c95b3f59"
 
-encoding@^0.1.11, encoding@^0.1.12:
+encoding@^0.1.11:
   version "0.1.12"
   resolved "https://registry.yarnpkg.com/encoding/-/encoding-0.1.12.tgz#538b66f3ee62cd1ab51ec323829d1f9480c74beb"
   dependencies:
@@ -3642,13 +3540,6 @@ getpass@^0.1.1:
   resolved "https://registry.yarnpkg.com/getpass/-/getpass-0.1.7.tgz#5eff8e3e684d569ae4cb2b1282604e8ba62149fa"
   dependencies:
     assert-plus "^1.0.0"
-
-gettext-parser@^1.3.1:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/gettext-parser/-/gettext-parser-1.4.0.tgz#f8baf34a292f03d5e42f02df099d301f167a7ace"
-  dependencies:
-    encoding "^0.1.12"
-    safe-buffer "^5.1.1"
 
 glob-base@^0.3.0:
   version "0.3.0"
@@ -4767,6 +4658,10 @@ jsan@^3.1.5, jsan@^3.1.9:
 jsbn@~0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/jsbn/-/jsbn-0.1.1.tgz#a5e654c2e5a2deb5f201d96cefbca80c0ef2f513"
+
+jsc-android@224109.x.x:
+  version "224109.1.0"
+  resolved "https://registry.yarnpkg.com/jsc-android/-/jsc-android-224109.1.0.tgz#9749ec92f1e284b3c09befe7c47cc6e60b1f0cdf"
 
 "jsdom-jscore@git+https://github.com/iamcco/jsdom-jscore-rn.git#6eac88dd5d5e7c21ce6382abde7dbc376d7f7f59":
   version "0.1.7"
@@ -6362,7 +6257,7 @@ react-devtools-core@3.1.0:
     shell-quote "^1.6.1"
     ws "^2.0.3"
 
-react-dom@^16.2.0, react-dom@^16.4.1:
+react-dom@^16.2.0:
   version "16.4.1"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.4.1.tgz#7f8b0223b3a5fbe205116c56deb85de32685dad6"
   dependencies:
@@ -6549,15 +6444,6 @@ react@^0.14.0:
     envify "^3.0.0"
     fbjs "^0.6.1"
 
-react@^16.4.1:
-  version "16.4.1"
-  resolved "https://registry.yarnpkg.com/react/-/react-16.4.1.tgz#de51ba5764b5dbcd1f9079037b862bd26b82fe32"
-  dependencies:
-    fbjs "^0.8.16"
-    loose-envify "^1.1.0"
-    object-assign "^4.1.1"
-    prop-types "^15.6.0"
-
 read-pkg-up@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/read-pkg-up/-/read-pkg-up-1.0.1.tgz#9d63c13276c065918d57f002a57f40a1b643fb02"
@@ -6645,10 +6531,6 @@ regenerate@^1.2.1:
 regenerator-runtime@^0.11.0:
   version "0.11.1"
   resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.11.1.tgz#be05ad7f9bf7d22e056f9726cee5017fbf19e2e9"
-
-regenerator-runtime@^0.12.0:
-  version "0.12.0"
-  resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.12.0.tgz#8052ac952d85b10f3425192cd0c53f45cf65c6cb"
 
 regenerator-transform@^0.10.0:
   version "0.10.1"
@@ -6951,6 +6833,10 @@ run-async@^2.2.0:
   resolved "https://registry.yarnpkg.com/run-async/-/run-async-2.3.0.tgz#0371ab4ae0bdd720d4166d7dfda64ff7a445a6c0"
   dependencies:
     is-promise "^2.1.0"
+
+rungen@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/rungen/-/rungen-0.3.2.tgz#400c09ebe914e7b17e0b6ef3263400fc2abc7cb3"
 
 rx-lite-aggregates@^4.0.8:
   version "4.0.8"

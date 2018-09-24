@@ -74,6 +74,8 @@ libdefs.js
 emoji=true
 
 module.system=haste
+module.system.node.resolve_dirname=node_modules
+module.system.node.resolve_dirname=symlinked-packages
 
 module.file_ext=.js
 module.file_ext=.jsx
@@ -84,10 +86,6 @@ module.file_ext=.scss
 munge_underscores=true
 
 module.name_mapper='^[./a-zA-Z0-9$_-]+\.\(bmp\|gif\|jpg\|jpeg\|png\|psd\|svg\|webp\|m4v\|mov\|mp4\|mpeg\|mpg\|webm\|aac\|aiff\|caf\|m4a\|mp3\|wav\|html\|pdf\)$' -> 'RelativeImageStub'
-module.name_mapper='@wordpress/block-library' -> '<PROJECT_ROOT>/gutenberg/packages/block-library/src'
-module.name_mapper='@wordpress/blocks' -> '<PROJECT_ROOT>/gutenberg/packages/blocks/src'
-module.name_mapper='@wordpress/element' -> '<PROJECT_ROOT>/gutenberg/packages/element/src'
-module.name_mapper='@wordpress/components' -> '<PROJECT_ROOT>/gutenberg/packages/components/src'
 
 ; mock/ignore style files
 module.name_mapper='.*\(.scss\)' -> 'empty/object'
