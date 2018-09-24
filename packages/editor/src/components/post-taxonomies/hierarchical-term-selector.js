@@ -24,8 +24,8 @@ import { buildTermsTree } from '../../utils/terms';
  */
 const DEFAULT_QUERY = {
 	per_page: -1,
-	orderby: 'count',
-	order: 'desc',
+	orderby: 'name',
+	order: 'asc',
 	_fields: 'id,name,parent',
 };
 
@@ -46,6 +46,7 @@ class HierarchicalTermSelector extends Component {
 			formName: '',
 			formParent: '',
 			showForm: false,
+			filterValue: '',
 		};
 	}
 
@@ -214,9 +215,22 @@ class HierarchicalTermSelector extends Component {
 
 	renderTerms( renderedTerms ) {
 		const { terms = [] } = this.props;
+		const { filterValue } = this.state;
 		return renderedTerms.map( ( term ) => {
 			const id = `editor-post-taxonomies-hierarchical-term-${ term.id }`;
-			return (
+			const show = (
+				// No filter set.
+				'' === filterValue ||
+				// Filter value appears in the term name.
+				-1 !== term.name.toLowerCase().indexOf( filterValue.toLowerCase() ) ||
+				// Filter value appers in any of the children.
+				( term.children.length > 0 && term.children.map(
+					( childTerm ) => -1 !== childTerm.name.toLowerCase().indexOf( filterValue.toLowerCase() )
+				).reduce(
+					( appeared, appears ) => appeared || appears
+				) )
+			);
+			return show && (
 				<div key={ term.id } className="editor-post-taxonomies__hierarchical-terms-choice">
 					<input
 						id={ id }
@@ -244,7 +258,7 @@ class HierarchicalTermSelector extends Component {
 			return null;
 		}
 
-		const { availableTermsTree, availableTerms, formName, formParent, loading, showForm } = this.state;
+		const { availableTermsTree, availableTerms, formName, formParent, loading, showForm, filterValue } = this.state;
 		const labelWithFallback = ( labelProperty, fallbackIsCategory, fallbackIsNotCategory ) => get(
 			taxonomy,
 			[ 'data', 'labels', labelProperty ],
@@ -268,10 +282,24 @@ class HierarchicalTermSelector extends Component {
 		const noParentOption = `— ${ parentSelectLabel } —`;
 		const newTermSubmitLabel = newTermButtonLabel;
 		const inputId = `editor-post-taxonomies__hierarchical-terms-input-${ instanceId }`;
+		const filterInputId = `editor-post-taxonomies__hierarchical-terms-filter-${ instanceId }`;
 
 		/* eslint-disable jsx-a11y/no-onchange */
 		return [
-			...this.renderTerms( availableTermsTree ),
+			<input
+				type="text"
+				id={ filterInputId }
+				value={ filterValue }
+				onChange={ ( event ) => this.setState( { filterValue: event.target.value } ) }
+				className="editor-post-taxonomies__hierarchical-terms-filter"
+				key="term-filter-input"
+			/>,
+			<div
+				className="editor-post-taxonomies__hierarchical-terms-list"
+				key="term-list"
+			>
+				{ this.renderTerms( availableTermsTree ) }
+			</div>,
 			! loading && hasCreateAction && (
 				<Button
 					key="term-add-button"
