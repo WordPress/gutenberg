@@ -43,7 +43,7 @@ import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMultiControls from './multi-controls';
 import BlockMobileToolbar from './block-mobile-toolbar';
 import BlockInsertionPoint from './insertion-point';
-import IgnoreNestedEvents from './ignore-nested-events';
+import IgnoreNestedEvents from '../ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
 import withHoverAreas from './with-hover-areas';

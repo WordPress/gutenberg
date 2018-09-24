@@ -88,26 +88,31 @@ class Inserter extends Component {
 }
 
 export default compose( [
-	withSelect( ( select ) => {
+	withSelect( ( select, { rootClientId, layout } ) => {
 		const {
 			getEditedPostAttribute,
 			getBlockInsertionPoint,
 			getSelectedBlock,
 			getInserterItems,
+			getBlockOrder,
 		} = select( 'core/editor' );
 		const insertionPoint = getBlockInsertionPoint();
-		const { rootClientId } = insertionPoint;
+		const parentId = rootClientId || insertionPoint.rootClientId;
 		return {
 			title: getEditedPostAttribute( 'title' ),
-			insertionPoint,
+			insertionPoint: {
+				rootClientId: parentId,
+				layout: rootClientId ? layout : insertionPoint.layout,
+				index: rootClientId ? getBlockOrder( rootClientId ).length : insertionPoint.index,
+			},
 			selectedBlock: getSelectedBlock(),
-			items: getInserterItems( rootClientId ),
-			rootClientId,
+			items: getInserterItems( parentId ),
+			rootClientId: parentId,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {
 		onInsertBlock: ( item ) => {
-			const { insertionPoint, selectedBlock } = ownProps;
+			const { selectedBlock, insertionPoint } = ownProps;
 			const { index, rootClientId, layout } = insertionPoint;
 			const { name, initialAttributes } = item;
 			const insertedBlock = createBlock( name, { ...initialAttributes, layout } );
