@@ -384,6 +384,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/escape-html",
+		"slug": "packages-escape-html",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/escape-html/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/hooks",
 		"slug": "packages-hooks",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/hooks/README.md",
@@ -465,6 +471,12 @@
 		"title": "@wordpress/redux-routine",
 		"slug": "packages-redux-routine",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/redux-routine/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/rich-text-value",
+		"slug": "packages-rich-text-value",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/rich-text-value/README.md",
 		"parent": "packages"
 	},
 	{
