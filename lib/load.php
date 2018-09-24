@@ -33,9 +33,19 @@ require dirname( __FILE__ ) . '/register.php';
 
 
 // Register server-side code for individual blocks.
-foreach ( glob( dirname( __FILE__ ) . '/../block-library/*/index.php' ) as $block_logic ) {
-	require $block_logic;
-}
-foreach ( glob( dirname( __FILE__ ) . '/../packages/block-library/src/*/index.php' ) as $block_logic ) {
-	require $block_logic;
+$paths = array(
+	dirname( __FILE__ ) . '/../block-library/*/index.php',
+	dirname( __FILE__ ) . '/../packages/block-library/src/*/index.php',
+);
+
+foreach ( $paths as $path ) {
+	$block_logic_files = glob( $path );
+	// glob() can sometimes return false if there's an error, or it couldn't find any files.
+	if ( ! $block_logic_files ) {
+		continue;
+	}
+
+	foreach ( $block_logic_files as $block_logic ) {
+		require $block_logic;
+	}
 }

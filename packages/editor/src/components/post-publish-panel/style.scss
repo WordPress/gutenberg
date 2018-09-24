@@ -22,12 +22,21 @@
 }
 
 .editor-post-publish-panel__header-publish-button {
+	display: flex;
+	justify-content: flex-end;
 	flex-grow: 1;
 	text-align: right;
+	flex-wrap: nowrap;
 }
 
 .editor-post-publish-panel__header-published {
 	flex-grow: 1;
+}
+
+.editor-post-publish-panel__footer {
+	padding: 16px;
+	position: absolute;
+	bottom: 0;
 }
 
 .components-button.editor-post-publish-panel__toggle.is-primary {

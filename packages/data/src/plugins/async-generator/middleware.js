@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+/**
  * Returns true if the given argument appears to be a dispatchable action.
  *
  * @param {*} action Object to test.
@@ -50,6 +55,11 @@ function isIterable( object ) {
  */
 export function toAsyncIterable( object ) {
 	if ( isAsyncIterable( object ) ) {
+		deprecated( 'Writing Resolvers as async generators', {
+			alternative: 'resolvers as generators with controls',
+			plugin: 'Gutenberg',
+			version: 4.2,
+		} );
 		return object;
 	}
 

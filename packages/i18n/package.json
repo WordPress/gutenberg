@@ -18,6 +18,7 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"react-native": "src/index",
 	"bin": {
 		"pot-to-php": "./tools/pot-to-php.js"
 	},

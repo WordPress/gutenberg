@@ -773,9 +773,6 @@ export function settings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
  * Reducer returning the user preferences.
  *
  * @param {Object}  state                 Current state.
- * @param {string}  state.mode            Current editor mode, either "visual" or "text".
- * @param {boolean} state.isSidebarOpened Whether the sidebar is opened or closed.
- * @param {Object}  state.panels          The state of the different sidebar panels.
  * @param {Object}  action                Dispatched action.
  *
  * @return {string} Updated state.
@@ -809,6 +806,18 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 			return {
 				...state,
 				insertUsage: omitBy( state.insertUsage, ( { insert } ) => insert.ref === action.id ),
+			};
+
+		case 'ENABLE_PUBLISH_SIDEBAR':
+			return {
+				...state,
+				isPublishSidebarEnabled: true,
+			};
+
+		case 'DISABLE_PUBLISH_SIDEBAR':
+			return {
+				...state,
+				isPublishSidebarEnabled: false,
 			};
 	}
 

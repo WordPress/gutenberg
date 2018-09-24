@@ -259,7 +259,8 @@ Whether the post can be saved.
 ### isEditedPostEmpty
 
 Returns true if the edited post has content. A post has content if it has at
-least one block or otherwise has a non-empty content property assigned.
+least one saveable block or otherwise has a non-empty content property
+assigned.
 
 *Parameters*
 
@@ -988,6 +989,19 @@ default post format. Returns null if the format cannot be determined.
 *Returns*
 
 Suggested post format.
+
+### getBlocksForSerialization
+
+Returns a set of blocks which are to be used in consideration of the post's
+generated save content.
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+Filtered set of blocks for save.
 
 ### getEditedPostContent
 

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { last } from 'lodash';
+import { compact, last } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -35,6 +35,7 @@ import {
 	getSelectedBlock,
 	getTemplate,
 	getTemplateLock,
+	isValidTemplate,
 } from './selectors';
 import {
 	fetchReusableBlocks,
@@ -53,6 +54,36 @@ import {
 	refreshPost,
 	AUTOSAVE_POST_NOTICE_ID,
 } from './effects/posts';
+
+/**
+ * Block validity is a function of blocks state (at the point of a
+ * reset) and the template setting. As a compromise to its placement
+ * across distinct parts of state, it is implemented here as a side-
+ * effect of the block reset action.
+ *
+ * @param {Object} action RESET_BLOCKS action.
+ * @param {Object} store  Store instance.
+ *
+ * @return {?Object} New validity set action if validity has changed.
+ */
+export function validateBlocksToTemplate( action, store ) {
+	const state = store.getState();
+	const template = getTemplate( state );
+	const templateLock = getTemplateLock( state );
+
+	// Unlocked templates are considered always valid because they act
+	// as default values only.
+	const isBlocksValidToTemplate = (
+		! template ||
+		templateLock !== 'all' ||
+		doBlocksMatchTemplate( action.blocks, template )
+	);
+
+	// Update if validity has changed.
+	if ( isBlocksValidToTemplate !== isValidTemplate( state ) ) {
+		return setTemplateValidity( isBlocksValidToTemplate );
+	}
+}
 
 export default {
 	REQUEST_POST_UPDATE: ( action, store ) => {
@@ -113,26 +144,18 @@ export default {
 			]
 		) );
 	},
-	SETUP_EDITOR( action, { getState } ) {
+	SETUP_EDITOR( action, store ) {
 		const { post, autosave } = action;
-		const state = getState();
-		const template = getTemplate( state );
-		const templateLock = getTemplateLock( state );
-		const isNewPost = post.status === 'auto-draft';
+		const state = store.getState();
 
 		// Parse content as blocks
 		let blocks = parse( post.content.raw );
-		let isValidTemplate = true;
+
+		// Apply a template for new posts only, if exists.
+		const isNewPost = post.status === 'auto-draft';
+		const template = getTemplate( state );
 		if ( isNewPost && template ) {
-			// Apply a template for new posts only, if exists.
 			blocks = synchronizeBlocksWithTemplate( blocks, template );
-		} else {
-			// Unlocked templates are considered always valid because they act as default values only.
-			isValidTemplate = (
-				! template ||
-				templateLock !== 'all' ||
-				doBlocksMatchTemplate( blocks, template )
-			);
 		}
 
 		// Include auto draft title in edits while not flagging post as dirty
@@ -158,22 +181,29 @@ export default {
 			);
 		}
 
-		return [
-			setTemplateValidity( isValidTemplate ),
-			setupEditorState( post, blocks, edits ),
-			...( autosaveAction ? [ autosaveAction ] : [] ),
-		];
+		const setupAction = setupEditorState( post, blocks, edits );
+
+		return compact( [
+			setupAction,
+			autosaveAction,
+
+			// TODO: This is temporary, necessary only so long as editor setup
+			// is a separate action from block resetting.
+			//
+			// See: https://github.com/WordPress/gutenberg/pull/9403
+			validateBlocksToTemplate( setupAction, store ),
+		] );
 	},
+	RESET_BLOCKS: [
+		validateBlocksToTemplate,
+	],
 	SYNCHRONIZE_TEMPLATE( action, { getState } ) {
 		const state = getState();
 		const blocks = getBlocks( state );
 		const template = getTemplate( state );
 		const updatedBlockList = synchronizeBlocksWithTemplate( blocks, template );
 
-		return [
-			resetBlocks( updatedBlockList ),
-			setTemplateValidity( true ),
-		];
+		return resetBlocks( updatedBlockList );
 	},
 	CHECK_TEMPLATE_VALIDITY( action, { getState } ) {
 		const state = getState();

@@ -97,14 +97,13 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, resetBlocks, checkTemplateValidity } = dispatch( 'core/editor' );
+		const { editPost, resetBlocks } = dispatch( 'core/editor' );
 		return {
 			onChange( content ) {
 				editPost( { content } );
 			},
 			onPersist( content ) {
 				resetBlocks( parse( content ) );
-				checkTemplateValidity();
 			},
 		};
 	} ),
