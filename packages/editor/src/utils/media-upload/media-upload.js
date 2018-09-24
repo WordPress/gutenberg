@@ -7,6 +7,7 @@ import { compact, flatMap, forEach, get, has, includes, map, noop, startsWith } 
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
+import { createBlobURL } from '@wordpress/blob';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -131,7 +132,7 @@ export function mediaUpload( {
 
 		// Set temporary URL to create placeholder media file, this is replaced
 		// with final file from media gallery when upload is `done` below
-		filesSet.push( { url: window.URL.createObjectURL( mediaFile ) } );
+		filesSet.push( { url: createBlobURL( mediaFile ) } );
 		onFileChange( filesSet );
 
 		return createMediaFromFile( mediaFile, additionalData )
