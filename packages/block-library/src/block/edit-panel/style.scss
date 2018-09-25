@@ -8,8 +8,8 @@
 	font-size: $default-font-size;
 	position: relative;
 	top: -$block-padding;
-	margin: 0 (-$parent-block-padding) (-$block-padding) (-$parent-block-padding);
-	padding: $grid-size $parent-block-padding;
+	margin: 0 (-$block-padding) (-$block-padding) (-$block-padding);
+	padding: $grid-size $block-padding;
 
 	// Show a smaller padding when nested.
 	.editor-block-list__layout & {

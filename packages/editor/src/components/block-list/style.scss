@@ -1,8 +1,7 @@
 .editor-block-list__layout .components-draggable__clone {
 	// Hide the Block UI when dragging the block
 	// This ensures the page scroll properly (no sticky elements)
-	.editor-block-contextual-toolbar,
-	.editor-block-settings-menu {
+	.editor-block-contextual-toolbar {
 		// I think important is fine here to avoid over complexing the selector
 		display: none !important;
 	}
@@ -53,7 +52,7 @@
 		padding-left: 0;
 		padding-right: 0;
 
-		// Compensate for block padding horizontally.
+		// Compensate for block padding.
 		margin-left: -$block-padding;
 		margin-right: -$block-padding;
 	}
@@ -90,10 +89,12 @@
 	/**
 	 * Notices
 	 */
+
 	.components-placeholder .components-with-notices-ui {
 		margin: -10px 20px 12px 20px;
 		width: calc(100% - 40px);
 	}
+
 	.components-with-notices-ui {
 		margin: 0 0 12px 0;
 		width: 100%;
@@ -124,20 +125,6 @@
 			pointer-events: none;
 
 			// Go edge-to-edge on mobile.
-			right: -$block-padding;
-			left: -$block-padding;
-			top: -$block-padding;
-			bottom: -$block-padding;
-
-			// Show wider padding for top level blocks.
-			@include break-small() {
-				right: -$parent-block-padding;
-				left: -$parent-block-padding;
-			}
-		}
-
-		// Show smaller padding for child blocks.
-		.editor-block-list__block-edit::before {
 			right: -$block-padding;
 			left: -$block-padding;
 			top: -$block-padding;
@@ -242,14 +229,8 @@
 
 		top: -$block-padding;
 		bottom: -$block-padding;
-		right: -$parent-block-padding;
-		left: -$parent-block-padding;
-
-		// Position for nested blocks
-		.editor-block-list__block & {
-			right: -$block-padding;
-			left: -$block-padding;
-		}
+		right: -$block-padding;
+		left: -$block-padding;
 	}
 
 	&.has-warning.is-selected .editor-block-list__block-edit::after {
@@ -339,8 +320,7 @@
 		z-index: z-index(".editor-block-list__block {core/image aligned wide or fullwide}");
 
 		// Mover and settings above
-		> .editor-block-mover,
-		> .editor-block-settings-menu {
+		> .editor-block-mover {
 			// This moves the menu up by the height of the button + border + padding.
 			top: -$block-side-ui-width - $block-padding - $block-side-ui-clearance;
 			bottom: auto;
@@ -354,13 +334,7 @@
 			}
 		}
 
-		> .editor-block-settings-menu {
-			width: $block-side-ui-width;
-			flex-direction: row;
-		}
-
-		> .editor-block-mover .editor-block-mover__control,
-		> .editor-block-settings-menu > * {
+		> .editor-block-mover .editor-block-mover__control {
 			float: left;
 		}
 
@@ -391,16 +365,6 @@
 
 	// Wide
 	&[data-align="wide"] {
-		// Position hover label on the right
-		> .editor-block-list__breadcrumb {
-			right: -$block-padding;
-		}
-
-		// Position ellipsis.
-		> .editor-block-settings-menu {
-			right: -$block-padding + $block-side-ui-clearance;
-		}
-
 		// Position mover
 		> .editor-block-mover {
 			left: -$block-padding + $border-width;
@@ -442,11 +406,6 @@
 			right: 0;
 			border-left-width: 0;
 			border-right-width: 0;
-		}
-
-		// Position ellipsis.
-		> .editor-block-settings-menu {
-			right: $block-side-ui-clearance;
 		}
 
 		// Position mover
@@ -491,7 +450,6 @@
 .editor-block-list__block {
 
 	// Left and right block settings and mover.
-	> .editor-block-settings-menu,
 	> .editor-block-mover {
 		position: absolute;
 		width: $block-side-ui-width + $block-side-ui-clearance;
@@ -501,7 +459,6 @@
 	}
 
 	// Position depending on whether selected or not.
-	> .editor-block-settings-menu,
 	> .editor-block-mover {
 		top: -$block-padding - $border-width;
 	}
@@ -511,30 +468,9 @@
 		&.is-multi-selected,
 		&.is-selected,
 		&.is-hovered {
-			.editor-block-settings-menu,
 			.editor-block-mover {
 				z-index: z-index(".editor-block-list__block.is-{selected,hovered} .editor-block-{settings-menu,mover}");
 			}
-		}
-	}
-
-	// Right side UI
-	> .editor-block-settings-menu {
-		padding-left: $block-side-ui-clearance;
-
-		// Position for top level blocks
-		right: -$block-side-ui-width - $block-side-ui-clearance - $block-parent-side-ui-clearance;
-
-		// Position for nested blocks
-		.editor-block-list__block & {
-			right: -$block-side-ui-width - $block-side-ui-clearance;
-		}
-
-		// Mobile
-		display: none;
-		@include break-small() {
-			display: flex;
-			flex-direction: column;
 		}
 	}
 
@@ -543,12 +479,7 @@
 		padding-right: $block-side-ui-clearance;
 
 		// Position for top level blocks
-		left: -$block-side-ui-width - $block-side-ui-clearance - $block-parent-side-ui-clearance;
-
-		// Position for nested blocks
-		.editor-block-list__block & {
-			left: -$block-side-ui-width - $block-side-ui-clearance;
-		}
+		left: -$block-side-ui-width - $block-side-ui-clearance;
 
 		// Mobile
 		display: none;
@@ -597,8 +528,7 @@
 		}
 
 		.editor-inserter__toggle,
-		.editor-block-mover__control,
-		.editor-block-settings-menu .components-button {
+		.editor-block-mover__control {
 			width: $icon-button-size;
 			height: $icon-button-size;
 			border-radius: $radius-round-rectangle;
@@ -621,11 +551,6 @@
 			.editor-block-mover__control {
 				float: left;
 			}
-		}
-
-		// Block Settings
-		.editor-block-settings-menu > * {
-			float: left;
 		}
 	}
 
@@ -807,14 +732,8 @@
 	margin-right: 0;
 
 	@include break-small() {
-		margin-left: -$parent-block-padding - $parent-block-padding - $border-width;
-		margin-right: -$parent-block-padding - $parent-block-padding - $border-width;
-
-		// Position toolbar for nested contexts.
-		.editor-block-list__block & {
-			margin-left: -$parent-block-padding - $block-padding - $border-width;
-			margin-right: -$parent-block-padding - $block-padding - $border-width;
-		}
+		margin-left: -$block-side-ui-width - $block-padding - $border-width;
+		margin-right: -$block-side-ui-width - $block-padding - $border-width;
 
 		// Except for wide elements, this causes a horizontal scrollbar.
 		[data-align="full"] & {
@@ -918,15 +837,6 @@
 	right: 0;
 	top: -$block-padding - $border-width;
 
-	@include break-small() {
-		right: -$block-parent-side-ui-clearance;
-	}
-
-	// Nested
-	.editor-block-list__block-edit & {
-		right: $parent-block-padding - $block-padding - $block-parent-side-ui-clearance;
-	}
-
 	.components-toolbar {
 		padding: 0;
 		border: none;
@@ -971,9 +881,9 @@
 		&::before {
 			bottom: 0;
 			content: "";
-			left: -$parent-block-padding - $block-padding;
+			left: -$block-padding * 2;
 			position: absolute;
-			right: -$parent-block-padding - $block-padding;
+			right: -$block-padding * 2;
 			top: 0;
 		}
 
@@ -996,23 +906,15 @@
 .editor-block-list__block .editor-warning {
 	z-index: z-index(".editor-warning");
 	position: relative;
-
-	// Stretch the warning edge to edge.
-	margin-left: -$parent-block-padding - $border-width;
-	margin-right: -$parent-block-padding - $border-width;
-
-	// Stretch the warning less in nested contexts.
-	.editor-block-list__block & {
-		margin-left: -$block-padding - $border-width;
-		margin-right: -$block-padding - $border-width;
-	}
+	margin-right: -$block-padding - $border-width;
+	margin-left: -$block-padding - $border-width;
 
 	// Pull the warning upwards to the edge, and add a negative bottom margin to compensate.
 	margin-bottom: -$block-padding - $border-width;
 	transform: translateY(-$block-padding - $border-width);
 
 	// Bigger padding on mobile where blocks are edge to edge.
-	padding: 10px $parent-block-padding;
+	padding: 10px $block-padding;
 	@include break-small() {
 		padding: 10px $block-padding;
 	}
