@@ -240,7 +240,8 @@ export const settings = {
 			attributes: {
 				...blockAttributes,
 				citation: {
-					source: 'children',
+					source: 'rich-text-value',
+					type: 'rich-text-value',
 					selector: 'footer',
 				},
 				style: {

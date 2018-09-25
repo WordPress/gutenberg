@@ -49,14 +49,6 @@ export function create( element, range, multilineTag, settings ) {
 		return createEmptyValue();
 	}
 
-	if (
-		typeof element === 'object' &&
-		typeof element.text === 'string' &&
-		Array.isArray( element.formats )
-	) {
-		return element;
-	}
-
 	if ( typeof element === 'string' ) {
 		if ( element.indexOf( '<' ) !== -1 || /[^\s]+;/.test( element ) ) {
 			// May be HTML.

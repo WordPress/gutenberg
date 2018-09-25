@@ -1,4 +1,4 @@
-# Escape HTM
+# Escape HTML
 
 Escape HTML utils.
 
