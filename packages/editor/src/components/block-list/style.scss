@@ -911,10 +911,9 @@
 
 .editor-block-list__block .editor-warning {
 	z-index: z-index(".editor-warning");
-	position: absolute;
-	top: -$block-padding - $border-width;
-	right: -$block-padding - $border-width;
-	left: -$block-padding - $border-width;
+	position: relative;
+	margin-right: -$block-padding - $border-width;
+	margin-left: -$block-padding - $border-width;
 
 	// Pull the warning upwards to the edge, and add a negative bottom margin to compensate.
 	margin-bottom: -$block-padding - $border-width;
