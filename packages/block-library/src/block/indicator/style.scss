@@ -7,6 +7,7 @@
 	height: 30px;
 	padding: $grid-size-small;
 	position: absolute;
+	z-index: z-index(".editor-block-list__layout .reusable-block-indicator");
 	width: 30px;
 	right: -$block-padding;
 }
