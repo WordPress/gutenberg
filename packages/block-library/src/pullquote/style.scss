@@ -20,6 +20,9 @@
 	footer {
 		position: relative;
 	}
+	.has-text-color a {
+		color: inherit;
+	}
 }
 
 .wp-block-pullquote:not(.is-style-solid-color) {

@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import classnames from 'classnames';
 import { get, includes } from 'lodash';
 
 /**
@@ -106,11 +107,14 @@ export const settings = {
 			};
 		}
 
-		const blockquoteClass = getColorClassName( 'color', textColor );
-		const blockquoteStyle = blockquoteClass ? undefined : { color: customTextColor };
+		const blockquoteTextColorClass = getColorClassName( 'color', textColor );
+		const blockquoteClasses = textColor || customTextColor ? classnames( 'has-text-color', {
+			[ blockquoteTextColorClass ]: blockquoteTextColorClass,
+		} ) : undefined;
+		const blockquoteStyle = blockquoteTextColorClass ? undefined : { color: customTextColor };
 		return (
 			<figure className={ figureClass } style={ figureStyles }>
-				<blockquote className={ blockquoteClass } style={ blockquoteStyle } >
+				<blockquote className={ blockquoteClasses } style={ blockquoteStyle } >
 					<RichText.Content value={ toRichTextValue( value ) } />
 					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
 				</blockquote>

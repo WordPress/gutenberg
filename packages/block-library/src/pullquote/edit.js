@@ -71,14 +71,16 @@ class PullQuoteEdit extends Component {
 		const blockquoteStyle = {
 			color: textColor.color,
 		};
-		const blockquoteClass = textColor.class;
+		const blockquoteClasses = textColor.color ? classnames( 'has-text-color', {
+			[ textColor.class ]: textColor.class,
+		} ) : undefined;
 		return (
 			<Fragment>
 				<figure style={ figureStyle } className={ classnames(
 					className, {
 						[ mainColor.class ]: isSolidColorStyle && mainColor.class,
 					} ) }>
-					<blockquote style={ blockquoteStyle } className={ blockquoteClass }>
+					<blockquote style={ blockquoteStyle } className={ blockquoteClasses }>
 						<RichText
 							multiline="p"
 							value={ toRichTextValue( value ) }
