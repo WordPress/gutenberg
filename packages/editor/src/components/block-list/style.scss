@@ -309,31 +309,26 @@
 		}
 	}
 
-	// Left
-	&[data-align="left"] {
-		// This is in the editor only; the image should be floated on the frontend.
-		.editor-block-list__block-edit {
-			/*!rtl:begin:ignore*/
-			float: left;
-			margin-right: 2em;
-			/*!rtl:end:ignore*/
-		}
+	// Left: This is in the editor only; the image should be floated on the frontend.
+	&[data-align="left"] > .editor-block-list__block-edit {
+		/*!rtl:begin:ignore*/
+		float: left;
+		margin-right: 2em;
+		/*!rtl:end:ignore*/
 	}
 
-	// Right
-	&[data-align="right"] {
-		// This is in the editor only; the image should be floated on the frontend.
-		.editor-block-list__block-edit {
-			/*!rtl:begin:ignore*/
-			float: right;
-			margin-left: 2em;
-			/*!rtl:end:ignore*/
-		}
+	// Right: This is in the editor only; the image should be floated on the frontend.
+	&[data-align="right"] > .editor-block-list__block-edit {
+		/*!rtl:begin:ignore*/
+		float: right;
+		margin-left: 2em;
+		/*!rtl:end:ignore*/
+	}
 
-		.editor-block-toolbar {
-			/*!rtl:ignore*/
-			float: right;
-		}
+	&[data-align="right"] > .editor-block-contextual-toolbar > .editor-block-toolbar {
+		/*!rtl:begin:ignore*/
+		float: right;
+		/*!rtl:end:ignore*/
 	}
 
 	// Wide and full-wide
