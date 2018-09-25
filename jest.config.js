@@ -13,7 +13,7 @@ if ( process.env.TEST_RN_PLATFORM ) {
 
 module.exports = {
 	verbose: true,
-	preset: 'jest-react-native',
+	preset: 'react-native',
 	testEnvironment: 'jsdom',
 	testPathIgnorePatterns: [
 		'/node_modules/',
@@ -29,7 +29,15 @@ module.exports = {
 	},
 	haste: {
 		defaultPlatform: rnPlatform,
-		platforms: [ 'android', 'ios', 'native' ],
-		providesModuleNodeModules: [ 'react-native', 'react-native-svg' ],
+		platforms: [
+			'android',
+			'ios',
+			'native',
+		],
+		hasteImplModulePath: '<rootDir>/node_modules/react-native/jest/hasteImpl.js',
+		providesModuleNodeModules: [
+			'react-native',
+			'react-native-svg',
+		],
 	},
 };

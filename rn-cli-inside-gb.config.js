@@ -1,6 +1,9 @@
 /** @format */
-const blacklist = require( 'metro' ).createBlacklist;
 const path = require( 'path' );
+const blacklist = require( 'metro-config/src/defaults/blacklist' );
+// Blacklist the nested GB filetree so modules are not resolved in duplicates,
+//  both in the nested directory and the parent directory.
+const blacklistElements = blacklist( [ new RegExp( path.basename( __dirname ) + '/gutenberg/.*' ) ] );
 
 const enm = require( './extra-node-modules.config.js' );
 
@@ -16,27 +19,17 @@ const mapper = function( accu, v ) {
 };
 
 const wppackages = wppackagenames.reduce( mapper, {} );
+const alternateRoots = [ path.resolve( __dirname, '../node_modules' ) ].concat( Object.values( wppackages ) );
 
 module.exports = {
 	extraNodeModules: Object.assign( enm, wppackages ),
-	getProjectRoots() {
-		const roots = [ __dirname, path.resolve( __dirname, '../node_modules' ) ].concat(
-			Object.values( wppackages )
-		);
-		return roots;
+	watchFolders: alternateRoots,
+	resolver: {
+		blacklistRE: blacklistElements,
+		sourceExts: [ 'js', 'json', 'scss', 'sass' ],
+		providesModuleNodeModules: [ 'react-native-svg', 'react-native' ],
 	},
-	getBlacklistRE: function() {
-		// Blacklist the nested GB filetree so modules are not resolved in duplicates,
-		//  both in the nested directory and the parent directory.
-		return blacklist( [ new RegExp( path.basename( __dirname ) + '/gutenberg/.*' ) ] );
-	},
-	getTransformModulePath() {
-		return require.resolve( './sass-transformer-inside-gb.js' );
-	},
-	getSourceExts() {
-		return [ 'js', 'json', 'scss', 'sass' ];
-	},
-	getProvidesModuleNodeModules() {
-		return [ 'react-native-svg', 'react-native' ];
+	transformer: {
+		babelTransformerPath: require.resolve( './sass-transformer-inside-gb.js' ),
 	},
 };
