@@ -32,7 +32,7 @@ export function getPatterns( { onReplace, multiline } ) {
 			const result = text.match( transformation.regExp );
 
 			const block = transformation.transform( {
-				content: remove( record.value, 0, result[ 0 ].length ),
+				content: remove( record, 0, result[ 0 ].length ),
 				match: result,
 			} );
 
