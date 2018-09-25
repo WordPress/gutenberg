@@ -27,12 +27,30 @@ describe( 'isEmpty', () => {
 describe( 'isEmptyLine', () => {
 	it( 'should return true', () => {
 		const one = {
+			formats: [],
+			text: '',
+			start: 0,
+			end: 0,
+		};
+		const two = {
+			formats: [ , , ],
+			text: '\n\n',
+			start: 0,
+			end: 0,
+		};
+		const three = {
+			formats: [ , , ],
+			text: '\n\n',
+			start: 2,
+			end: 2,
+		};
+		const four = {
 			formats: [ , , , , ],
 			text: '\n\n\n\n',
 			start: 2,
 			end: 2,
 		};
-		const two = {
+		const five = {
 			formats: [ , , , , ],
 			text: 'a\n\n\n\nb',
 			start: 3,
@@ -41,28 +59,25 @@ describe( 'isEmptyLine', () => {
 
 		expect( isEmptyLine( one ) ).toBe( true );
 		expect( isEmptyLine( two ) ).toBe( true );
+		expect( isEmptyLine( three ) ).toBe( true );
+		expect( isEmptyLine( four ) ).toBe( true );
+		expect( isEmptyLine( five ) ).toBe( true );
 	} );
 
 	it( 'should return false', () => {
 		const one = {
-			formats: [],
-			text: '',
-			start: 0,
-			end: 0,
-		};
-		const two = {
 			formats: [ , , , , ],
 			text: '\n\n\n\n',
 			start: 3,
 			end: 3,
 		};
-		const three = {
+		const two = {
 			formats: [ , , , , ],
 			text: '\n\na\n\n',
 			start: 2,
 			end: 2,
 		};
-		const four = {
+		const three = {
 			formats: [ , , , , ],
 			text: '\n\n\n',
 			start: 2,
@@ -72,6 +87,5 @@ describe( 'isEmptyLine', () => {
 		expect( isEmptyLine( one ) ).toBe( false );
 		expect( isEmptyLine( two ) ).toBe( false );
 		expect( isEmptyLine( three ) ).toBe( false );
-		expect( isEmptyLine( four ) ).toBe( false );
 	} );
 } );

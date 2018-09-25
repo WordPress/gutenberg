@@ -19,8 +19,20 @@ export function isEmpty( { text } ) {
  * @return {boolean} True if the line is empty, false if not.
  */
 export function isEmptyLine( { text, start, end } ) {
-	if ( start !== end || start < 2 || start > text.length - 2 ) {
+	if ( start !== end ) {
 		return false;
+	}
+
+	if ( text.length === 0 ) {
+		return true;
+	}
+
+	if ( start === 0 && text.slice( 0, 2 ) === '\n\n' ) {
+		return true;
+	}
+
+	if ( start === text.length && text.slice( -2 ) === '\n\n' ) {
+		return true;
 	}
 
 	return text.slice( start - 2, end + 2 ) === '\n\n\n\n';
