@@ -1,8 +1,7 @@
 .editor-block-list__layout .components-draggable__clone {
 	// Hide the Block UI when dragging the block
 	// This ensures the page scroll properly (no sticky elements)
-	.editor-block-contextual-toolbar,
-	.editor-block-settings-menu {
+	.editor-block-contextual-toolbar {
 		// I think important is fine here to avoid over complexing the selector
 		display: none !important;
 	}
@@ -327,8 +326,7 @@
 		z-index: z-index(".editor-block-list__block {core/image aligned wide or fullwide}");
 
 		// Mover and settings above
-		> .editor-block-mover,
-		> .editor-block-settings-menu {
+		> .editor-block-mover {
 			// This moves the menu up by the height of the button + border + padding.
 			top: -$block-side-ui-width - $block-padding - $block-side-ui-clearance;
 			bottom: auto;
@@ -342,13 +340,7 @@
 			}
 		}
 
-		> .editor-block-settings-menu {
-			width: $block-side-ui-width;
-			flex-direction: row;
-		}
-
-		> .editor-block-mover .editor-block-mover__control,
-		> .editor-block-settings-menu > * {
+		> .editor-block-mover .editor-block-mover__control {
 			float: left;
 		}
 
@@ -379,11 +371,6 @@
 
 	// Wide
 	&[data-align="wide"] {
-		// Position ellipsis.
-		> .editor-block-settings-menu {
-			right: -$block-padding + $block-side-ui-clearance;
-		}
-
 		// Position mover
 		> .editor-block-mover {
 			left: -$block-padding + $border-width;
@@ -425,11 +412,6 @@
 			right: 0;
 			border-left-width: 0;
 			border-right-width: 0;
-		}
-
-		// Position ellipsis.
-		> .editor-block-settings-menu {
-			right: $block-side-ui-clearance;
 		}
 
 		// Position mover
@@ -474,7 +456,6 @@
 .editor-block-list__block {
 
 	// Left and right block settings and mover.
-	> .editor-block-settings-menu,
 	> .editor-block-mover {
 		position: absolute;
 		width: $block-side-ui-width + $block-side-ui-clearance;
@@ -484,7 +465,6 @@
 	}
 
 	// Position depending on whether selected or not.
-	> .editor-block-settings-menu,
 	> .editor-block-mover {
 		top: -$block-padding - $border-width;
 	}
@@ -494,7 +474,6 @@
 		&.is-multi-selected,
 		&.is-selected,
 		&.is-hovered {
-			.editor-block-settings-menu,
 			.editor-block-mover {
 				z-index: z-index(".editor-block-list__block.is-{selected,hovered} .editor-block-{settings-menu,mover}");
 			}
@@ -555,8 +534,7 @@
 		}
 
 		.editor-inserter__toggle,
-		.editor-block-mover__control,
-		.editor-block-settings-menu .components-button {
+		.editor-block-mover__control {
 			width: $icon-button-size;
 			height: $icon-button-size;
 			border-radius: $radius-round-rectangle;
@@ -579,11 +557,6 @@
 			.editor-block-mover__control {
 				float: left;
 			}
-		}
-
-		// Block Settings
-		.editor-block-settings-menu > * {
-			float: left;
 		}
 	}
 
