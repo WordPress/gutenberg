@@ -40,6 +40,7 @@ export default class Editor extends Component {
               </View>
               <AztecView
                 ref="_aztec"
+                disableGutenbergMode = { false }
                 style={[styles.aztec_editor, {minHeight: myMinHeight}]}
                 text = { { text: item.text } } 
                 placeholder = {'This is the placeholder text'}
