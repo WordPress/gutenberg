@@ -37,6 +37,7 @@ module.exports = {
 		hasteImplModulePath: '<rootDir>/node_modules/react-native/jest/hasteImpl.js',
 		providesModuleNodeModules: [
 			'react-native',
+			'react-native-svg',
 		],
 	},
 };
