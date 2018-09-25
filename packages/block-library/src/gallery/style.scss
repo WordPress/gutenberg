@@ -4,12 +4,10 @@
 	list-style-type: none;
 	padding: 0;
 
-	// Allow gallery items to go edge to edge.
-	margin: 0 -8px 0 -8px;
-
 	.blocks-gallery-image,
 	.blocks-gallery-item {
-		margin: 8px;
+		// Add space between thumbnails, and unset right most thumbnails later.
+		margin: 0 $grid-size-large $grid-size-large 0;
 		display: flex;
 		flex-grow: 1;
 		flex-direction: column;
@@ -80,24 +78,48 @@
 		}
 	}
 
-	// Responsive fallback value, 2 columns
+	// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
 	& .blocks-gallery-image,
 	& .blocks-gallery-item {
-		width: calc(100% / 2 - 16px);
+		width: calc((100% - #{ $grid-size-large }) / 2);
+
+		&:nth-of-type(even) {
+			margin-right: 0;
+		}
 	}
 
 	&.columns-1 .blocks-gallery-image,
 	&.columns-1 .blocks-gallery-item {
-		width: calc(100% / 1 - 16px);
+		width: 100%;
+		margin-right: 0;
 	}
 
+	// Beyond mobile viewports, we allow up to 8 columns.
 	@include break-small {
 		@for $i from 3 through 8 {
 			&.columns-#{ $i } .blocks-gallery-image,
 			&.columns-#{ $i } .blocks-gallery-item {
-				width: calc(100% / #{ $i } - 16px);
+				width: calc((100% - #{ $grid-size-large } * #{ $i - 1 }) / #{ $i });
+				margin-right: 16px;
 			}
 		}
+
+		// Unset the right margin on every rightmost gallery item to ensure center balance.
+		@for $column-count from 1 through 8 {
+			&.columns-#{ $column-count } .blocks-gallery-image:nth-of-type(#{ $column-count }n),
+			&.columns-#{ $column-count } .blocks-gallery-item:nth-of-type(#{ $column-count }n) {
+				margin-right: 0;
+			}
+		}
+	}
+
+	// Last item always needs margins reset.
+	// When block is selected, only reset the right margin of the 2nd to last item.
+	.blocks-gallery-image:last-child,
+	.blocks-gallery-item:last-child,
+	.is-selected & .blocks-gallery-image:nth-last-child(2),
+	.is-selected & .blocks-gallery-item:nth-last-child(2) {
+		margin-right: 0;
 	}
 
 	// Make the "Add new Gallery item" button full-width (so it always appears
@@ -108,7 +130,7 @@
 		}
 	}
 
-	// Apply max-width to floated items that have no intrinsic width
+	// Apply max-width to floated items that have no intrinsic width.
 	[data-align="left"] &,
 	[data-align="right"] &,
 	&.alignleft,
