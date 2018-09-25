@@ -82,6 +82,10 @@
 	& .blocks-gallery-image,
 	& .blocks-gallery-item {
 		width: calc((100% - #{ $grid-size-large }) / 2);
+
+		&:nth-of-type(even) {
+			margin-right: 0;
+		}
 	}
 
 	&.columns-1 .blocks-gallery-image,
