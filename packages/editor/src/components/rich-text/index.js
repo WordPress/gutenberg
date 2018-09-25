@@ -25,7 +25,7 @@ import { createBlobURL } from '@wordpress/blob';
 import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, rawShortcut } from '@wordpress/keycodes';
 import { Slot } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { rawHandler, getBlockTransforms, findTransform } from '@wordpress/blocks';
+import { rawHandler, children, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
 import { isURL } from '@wordpress/url';
 import {
@@ -38,11 +38,10 @@ import {
 	toHTMLString,
 	createValue,
 	getTextContent,
-	join,
 	insert,
 	isEmptyLine,
+	unstableToDom,
 } from '@wordpress/rich-text-value';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -119,7 +118,7 @@ export class RichText extends Component {
 
 		this.state = {};
 
-		this.deprecatedMultilineArrayFormat = Array.isArray( value );
+		this.usedDeprecatedChildrenSource = Array.isArray( value );
 	}
 
 	componentDidMount() {
@@ -788,20 +787,9 @@ export class RichText extends Component {
 	formatToValue( value ) {
 		const { format, multiline } = this.props;
 
-		// Handle deprecated `query` and `node` matcher combination for multiline
-		// values.
+		// Handle deprecated `children` and `node` sources.
 		if ( Array.isArray( value ) ) {
-			deprecated( 'node source', {
-				alternative: 'children source with multiline property',
-				plugin: 'Gutenberg',
-				version: '4.2',
-			} );
-
-			if ( value.length === 0 ) {
-				value = [ createValue() ];
-			}
-
-			return join( value, '\n\n' );
+			return createValue( children.toHTML( value ), multiline );
 		}
 
 		if ( format === 'string' ) {
@@ -814,12 +802,13 @@ export class RichText extends Component {
 	valueToFormat( { formats, text } ) {
 		const { format, multiline } = this.props;
 
-		if ( this.deprecatedMultilineArrayFormat ) {
-			return split( { formats, text }, '\n\n' ).map( ( record ) => {
-				record._deprecatedMultilineTag = multiline;
-				return record;
-			} );
-		} if ( format === 'string' ) {
+		// Handle deprecated `children` and `node` sources.
+		if ( this.usedDeprecatedChildrenSource ) {
+			// Maybe we can convert directly here to improve performance a bit.
+			return children.fromDOM( unstableToDom( { formats, text }, multiline ).body.childNodes );
+		}
+
+		if ( format === 'string' ) {
 			return toHTMLString( { formats, text }, multiline );
 		}
 
@@ -930,7 +919,7 @@ export class RichText extends Component {
 
 RichText.defaultProps = {
 	formattingControls: FORMATTING_CONTROLS.map( ( { format } ) => format ),
-	format: 'children',
+	format: 'rich-text-value',
 };
 
 const RichTextContainer = compose( [
@@ -981,20 +970,9 @@ const RichTextContainer = compose( [
 RichTextContainer.Content = ( { value, format, tagName: Tag, multiline, ...props } ) => {
 	let html = value;
 
-	// Handle deprecated `query` and `node` matcher combination for multiline
-	// values.
+	// Handle deprecated `children` and `node` sources.
 	if ( Array.isArray( value ) ) {
-		deprecated( 'node source', {
-			alternative: 'children source with multiline property',
-			plugin: 'Gutenberg',
-			version: '4.2',
-		} );
-
-		if ( value.length === 0 ) {
-			html = '';
-		} else {
-			html = toHTMLString( join( value, '\n\n' ), value[ 0 ]._deprecatedMultilineTag );
-		}
+		html = children.toHTML( value );
 	} else if ( format !== 'string' ) {
 		html = toHTMLString( value, multiline );
 	}
@@ -1008,11 +986,23 @@ RichTextContainer.Content = ( { value, format, tagName: Tag, multiline, ...props
 	return content;
 };
 
-RichTextContainer.isEmpty = isEmpty;
+RichTextContainer.isEmpty = ( value ) => {
+	// Handle deprecated `children` and `node` sources.
+	if ( Array.isArray( value ) ) {
+		return ! value || value.length === 0;
+	}
+
+	if ( typeof value === 'string' ) {
+		return value.length === 0;
+	}
+
+	return isEmpty( value );
+};
+
 RichTextContainer.concat = concat;
 
 RichTextContainer.Content.defaultProps = {
-	format: 'children',
+	format: 'rich-text-value',
 };
 
 export default RichTextContainer;

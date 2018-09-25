@@ -1,18 +1,41 @@
 /**
+ * External dependencies
+ */
+import { castArray } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import {
-	concat as richTextConcat,
-	toHTMLString,
-	createValue,
-} from '@wordpress/rich-text-value';
 import deprecated from '@wordpress/deprecated';
+import { renderToString } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import * as node from './node';
 
 /**
  * A representation of a block's rich text value.
  *
  * @typedef {WPBlockNode[]} WPBlockChildren
  */
+
+/**
+ * Given block children, returns a serialize-capable WordPress element.
+ *
+ * @param {WPBlockChildren} children Block children object to convert.
+ *
+ * @return {WPElement} A serialize-capable element.
+ */
+export function getSerializeCapableElement( children ) {
+	// The fact that block children are compatible with the element serializer is
+	// merely an implementation detail that currently serves to be true, but
+	// should not be mistaken as being a guarantee on the external API. The
+	// public API only offers guarantees to work with strings (toHTML) and DOM
+	// elements (fromDOM), and should provide utilities to manipulate the value
+	// rather than expect consumers to inspect or construct its shape (concat).
+	return children;
+}
 
 /**
  * Given block children, returns an array of block nodes.
@@ -22,8 +45,8 @@ import deprecated from '@wordpress/deprecated';
  * @return {Array<WPBlockNode>} An array of individual block nodes.
  */
 function getChildrenArray( children ) {
-	deprecated( 'wp.blocks.children.getChildrenArray', {
-		alternative: 'wp.richTextValue.createValue',
+	deprecated( 'children and node source', {
+		alternative: 'rich-text-value source',
 		plugin: 'Gutenberg',
 		version: '4.2',
 	} );
@@ -42,14 +65,32 @@ function getChildrenArray( children ) {
  *
  * @return {WPBlockChildren} Concatenated block node.
  */
-export function concat( ...children ) {
-	deprecated( 'wp.blocks.children.concat', {
-		alternative: 'wp.richTextValue.concat',
+export function concat( ...blockNodes ) {
+	deprecated( 'children and node source', {
+		alternative: 'rich-text-value source',
 		plugin: 'Gutenberg',
 		version: '4.2',
 	} );
 
-	return richTextConcat( ...children );
+	const result = [];
+	for ( let i = 0; i < blockNodes.length; i++ ) {
+		const blockNode = castArray( blockNodes[ i ] );
+		for ( let j = 0; j < blockNode.length; j++ ) {
+			const child = blockNode[ j ];
+			const canConcatToPreviousString = (
+				typeof child === 'string' &&
+				typeof result[ result.length - 1 ] === 'string'
+			);
+
+			if ( canConcatToPreviousString ) {
+				result[ result.length - 1 ] += child;
+			} else {
+				result.push( child );
+			}
+		}
+	}
+
+	return result;
 }
 
 /**
@@ -61,17 +102,22 @@ export function concat( ...children ) {
  * @return {WPBlockChildren} Block children equivalent to DOM nodes.
  */
 export function fromDOM( domNodes ) {
-	deprecated( 'wp.blocks.children.fromDOM', {
-		alternative: 'wp.richTextValue.createValue',
+	deprecated( 'children and node source', {
+		alternative: 'rich-text-value source',
 		plugin: 'Gutenberg',
 		version: '4.2',
 	} );
 
-	if ( domNodes.length === 0 ) {
-		return createValue();
+	const result = [];
+	for ( let i = 0; i < domNodes.length; i++ ) {
+		try {
+			result.push( node.fromDOM( domNodes[ i ] ) );
+		} catch ( error ) {
+			// Simply ignore if DOM node could not be converted.
+		}
 	}
 
-	return createValue( domNodes[ 0 ].parentNode );
+	return result;
 }
 
 /**
@@ -82,25 +128,32 @@ export function fromDOM( domNodes ) {
  * @return {string} String HTML representation of block node.
  */
 export function toHTML( children ) {
-	deprecated( 'wp.blocks.children.toHTML', {
-		alternative: 'wp.richTextValue.toHTMLString',
+	deprecated( 'children and node source', {
+		alternative: 'rich-text-value source',
 		plugin: 'Gutenberg',
 		version: '4.2',
 	} );
 
-	return toHTMLString( children );
+	const element = getSerializeCapableElement( children );
+
+	return renderToString( element );
 }
 
 /**
  * Given a selector, returns an hpq matcher generating a WPBlockChildren value
  * matching the selector result.
  *
- * @param {string} selector     DOM selector.
- * @param {string} multilineTag Multiline tag.
+ * @param {string} selector DOM selector.
  *
  * @return {Function} hpq matcher.
  */
-export function matcher( selector, multilineTag ) {
+export function matcher( selector ) {
+	deprecated( 'children and node source', {
+		alternative: 'rich-text-value source',
+		plugin: 'Gutenberg',
+		version: '4.2',
+	} );
+
 	return ( domNode ) => {
 		let match = domNode;
 
@@ -108,7 +161,11 @@ export function matcher( selector, multilineTag ) {
 			match = domNode.querySelector( selector );
 		}
 
-		return createValue( match, multilineTag );
+		if ( match ) {
+			return fromDOM( match.childNodes );
+		}
+
+		return [];
 	};
 }
 

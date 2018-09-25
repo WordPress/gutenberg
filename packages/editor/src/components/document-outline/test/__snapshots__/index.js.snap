@@ -13,7 +13,7 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
       path={Array []}
     >
       <Component
-        format="children"
+        format="rich-text-value"
         tagName="span"
         value={
           Object {
@@ -46,7 +46,7 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
       path={Array []}
     >
       <Component
-        format="children"
+        format="rich-text-value"
         tagName="span"
         value={
           Object {
@@ -87,7 +87,7 @@ exports[`DocumentOutline header blocks present should render warnings for multip
       path={Array []}
     >
       <Component
-        format="children"
+        format="rich-text-value"
         tagName="span"
         value={
           Object {
@@ -123,7 +123,7 @@ exports[`DocumentOutline header blocks present should render warnings for multip
       path={Array []}
     >
       <Component
-        format="children"
+        format="rich-text-value"
         tagName="span"
         value={
           Object {

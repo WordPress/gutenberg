@@ -24,7 +24,8 @@ const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
 
 const blockAttributes = {
 	title: {
-		source: 'children',
+		source: 'rich-text-value',
+		type: 'rich-text-value',
 		selector: 'p',
 	},
 	url: {

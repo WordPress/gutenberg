@@ -38,7 +38,8 @@ const supports = {
 
 const schema = {
 	content: {
-		source: 'children',
+		source: 'rich-text-value',
+		type: 'rich-text-value',
 		selector: 'h1,h2,h3,h4,h5,h6',
 	},
 	level: {

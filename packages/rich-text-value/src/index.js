@@ -12,5 +12,5 @@ export { replace } from './replace';
 export { insert } from './insert';
 export { slice } from './slice';
 export { split } from './split';
-export { apply } from './to-dom';
+export { apply, toDom as unstableToDom } from './to-dom';
 export { toHTMLString } from './to-html-string';

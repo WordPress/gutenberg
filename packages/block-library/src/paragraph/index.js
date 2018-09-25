@@ -30,7 +30,8 @@ const supports = {
 
 const schema = {
 	content: {
-		source: 'children',
+		source: 'rich-text-value',
+		type: 'rich-text-value',
 		selector: 'p',
 	},
 	align: {

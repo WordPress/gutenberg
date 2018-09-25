@@ -1,11 +1,17 @@
 /**
  * WordPress dependencies
  */
-import {
-	toHTMLString,
-	createValue,
-} from '@wordpress/rich-text-value';
 import deprecated from '@wordpress/deprecated';
+
+/**
+ * Internal dependencies
+ */
+import * as children from './children';
+
+/**
+ * Browser dependencies
+ */
+const { TEXT_NODE, ELEMENT_NODE } = window.Node;
 
 /**
  * A representation of a single node within a block's rich text value. If
@@ -28,7 +34,33 @@ import deprecated from '@wordpress/deprecated';
  * @return {boolean} Whether node is of intended type.
  */
 function isNodeOfType( node, type ) {
+	deprecated( 'children and node source', {
+		alternative: 'rich-text-value source',
+		plugin: 'Gutenberg',
+		version: '4.2',
+	} );
+
 	return node && node.type === type;
+}
+
+/**
+ * Given an object implementing the NamedNodeMap interface, returns a plain
+ * object equivalent value of name, value key-value pairs.
+ *
+ * @see https://dom.spec.whatwg.org/#interface-namednodemap
+ *
+ * @param {NamedNodeMap} nodeMap NamedNodeMap to convert to object.
+ *
+ * @return {Object} Object equivalent value of NamedNodeMap.
+ */
+export function getNamedNodeMapAsObject( nodeMap ) {
+	const result = {};
+	for ( let i = 0; i < nodeMap.length; i++ ) {
+		const { name, value } = nodeMap[ i ];
+		result[ name ] = value;
+	}
+
+	return result;
 }
 
 /**
@@ -42,13 +74,30 @@ function isNodeOfType( node, type ) {
  * @return {WPBlockNode} Block node equivalent to DOM node.
  */
 export function fromDOM( domNode ) {
-	deprecated( 'wp.blocks.node.fromDOM', {
-		alternative: 'wp.richTextValue.createValue',
+	deprecated( 'children and node source', {
+		alternative: 'rich-text-value source',
 		plugin: 'Gutenberg',
 		version: '4.2',
 	} );
 
-	return createValue( domNode );
+	if ( domNode.nodeType === TEXT_NODE ) {
+		return domNode.nodeValue;
+	}
+
+	if ( domNode.nodeType !== ELEMENT_NODE ) {
+		throw new TypeError(
+			'A block node can only be created from a node of type text or ' +
+			'element.'
+		);
+	}
+
+	return {
+		type: domNode.nodeName.toLowerCase(),
+		props: {
+			...getNamedNodeMapAsObject( domNode.attributes ),
+			children: children.fromDOM( domNode.childNodes ),
+		},
+	};
 }
 
 /**
@@ -59,13 +108,13 @@ export function fromDOM( domNode ) {
  * @return {string} String HTML representation of block node.
  */
 export function toHTML( node ) {
-	deprecated( 'wp.blocks.node.toHTML', {
-		alternative: 'wp.richTextValue.toHTMLString',
+	deprecated( 'children and node source', {
+		alternative: 'rich-text-value source',
 		plugin: 'Gutenberg',
 		version: '4.2',
 	} );
 
-	return toHTMLString( node );
+	return children.toHTML( [ node ] );
 }
 
 /**
@@ -77,8 +126,8 @@ export function toHTML( node ) {
  * @return {Function} hpq matcher.
  */
 export function matcher( selector ) {
-	deprecated( 'wp.blocks.node.matcher', {
-		alternative: 'wp.blocks.children.matcher with multiline property',
+	deprecated( 'children and node source', {
+		alternative: 'rich-text-value source',
 		plugin: 'Gutenberg',
 		version: '4.2',
 	} );
@@ -90,11 +139,11 @@ export function matcher( selector ) {
 			match = domNode.querySelector( selector );
 		}
 
-		const record = createValue( match );
-
-		record._deprecatedMultilineTag = match.nodeName.toLowerCase();
-
-		return record;
+		try {
+			return fromDOM( match );
+		} catch ( error ) {
+			return null;
+		}
 	};
 }
 

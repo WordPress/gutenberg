@@ -10,8 +10,8 @@ import classnames from 'classnames';
  */
 import { Component, createElement } from '@wordpress/element';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
-import { toHTMLString, join, createValue } from '@wordpress/rich-text-value';
-import deprecated from '@wordpress/deprecated';
+import { toHTMLString } from '@wordpress/rich-text-value';
+import { children } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -221,22 +221,9 @@ export default class TinyMCE extends Component {
 		// us to show and focus the content before it's truly ready to edit.
 		let initialHTML = defaultValue;
 
-		// Handle deprecated `query` and `node` matcher combination for multiline
-		// values.
+		// Handle deprecated `children` and `node` sources.
 		if ( Array.isArray( defaultValue ) ) {
-			deprecated( 'node source', {
-				alternative: 'children source with multiline property',
-				plugin: 'Gutenberg',
-				version: '4.2',
-			} );
-
-			let toJoin = defaultValue;
-
-			if ( defaultValue.length === 0 ) {
-				toJoin = [ createValue() ];
-			}
-
-			initialHTML = toHTMLString( join( toJoin, '\n\n' ), multilineTag );
+			initialHTML = children.toHTML( defaultValue );
 		} else if ( typeof defaultValue !== 'string' ) {
 			initialHTML = toHTMLString( defaultValue, multilineTag );
 		}

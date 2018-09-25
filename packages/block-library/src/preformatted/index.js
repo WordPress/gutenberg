@@ -19,7 +19,8 @@ export const settings = {
 
 	attributes: {
 		content: {
-			source: 'children',
+			source: 'rich-text-value',
+			type: 'rich-text-value',
 			selector: 'pre',
 		},
 	},

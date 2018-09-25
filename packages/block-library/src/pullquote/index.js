@@ -25,12 +25,12 @@ import {
 
 const blockAttributes = {
 	value: {
-		source: 'children',
+		source: 'rich-text-value',
 		selector: 'blockquote',
 		multiline: 'p',
 	},
 	citation: {
-		source: 'children',
+		source: 'rich-text-value',
 		selector: 'cite',
 	},
 	mainColor: {

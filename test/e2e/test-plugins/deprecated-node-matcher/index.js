@@ -4,6 +4,35 @@
 	var el = wp.element.createElement;
 	var el = wp.element.createElement;
 
+	registerBlockType( 'core/deprecated-children-matcher', {
+		title: 'Deprecated Children Matcher',
+		attributes: {
+			value: {
+				type: 'array',
+				source: 'children',
+				selector: 'p',
+				default: [],
+			},
+		},
+		category: 'formatting',
+		edit: function( { attributes, setAttributes } ) {
+			console.log(  attributes.value )
+			return el( RichText, {
+				tagName: 'p',
+				value: attributes.value,
+				onChange: function( nextValue ) {
+					setAttributes( { value: nextValue } );
+				},
+			} );
+		},
+		save: function( { attributes } ) {
+			return el( RichText.Content, {
+				tagName: 'p',
+				value: attributes.value,
+			} );
+		},
+	} );
+
 	function toRichTextValue( value ) {
 		return _.map( value, function( subValue ) {
 			return subValue.children;

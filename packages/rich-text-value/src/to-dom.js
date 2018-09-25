@@ -114,7 +114,7 @@ function remove( node ) {
 	return node.parentNode.removeChild( node );
 }
 
-export function valueToDom( value, multilineTag ) {
+export function toDom( value, multilineTag ) {
 	let startPath = [];
 	let endPath = [];
 
@@ -162,7 +162,7 @@ export function valueToDom( value, multilineTag ) {
  */
 export function apply( value, current, multilineTag ) {
 	// Construct a new element tree in memory.
-	const { body, selection } = valueToDom( value, multilineTag );
+	const { body, selection } = toDom( value, multilineTag );
 
 	applyValue( body, current );
 

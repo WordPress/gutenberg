@@ -45,7 +45,8 @@ const blockAttributes = {
 				attribute: 'data-id',
 			},
 			caption: {
-				source: 'children',
+				source: 'rich-text-value',
+				type: 'rich-text-value',
 				selector: 'figcaption',
 			},
 		},

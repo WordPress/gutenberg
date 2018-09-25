@@ -46,10 +46,10 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 		const value = blockAttributes[ key ];
 		if ( undefined !== value ) {
 			result[ key ] = value;
-		} else if ( schema.source === 'children' ) {
-			result[ key ] = createValue( null, schema.multiline );
 		} else if ( schema.hasOwnProperty( 'default' ) ) {
 			result[ key ] = schema.default;
+		} else if ( schema.source === 'rich-text-value' ) {
+			result[ key ] = createValue( null, schema.multiline );
 		}
 
 		return result;

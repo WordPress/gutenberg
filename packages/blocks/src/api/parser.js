@@ -10,7 +10,6 @@ import { flow, castArray, mapValues, omit, stubFalse } from 'lodash';
 import { autop } from '@wordpress/autop';
 import { applyFilters } from '@wordpress/hooks';
 import { parse as defaultParse } from '@wordpress/block-serialization-default-parser';
-import { createValue } from '@wordpress/rich-text-value';
 
 /**
  * Internal dependencies
@@ -19,7 +18,7 @@ import { getBlockType, getUnknownTypeHandlerName } from './registration';
 import { createBlock } from './factory';
 import { isValidBlock } from './validation';
 import { getCommentDelimitedContent } from './serializer';
-import { attr, html, text, query, node, children, prop } from './matchers';
+import { attr, html, text, query, node, children, prop, richTextValue } from './matchers';
 
 /**
  * Higher-order hpq matcher which enhances an attribute matcher to return true
@@ -55,8 +54,8 @@ export const toBooleanAttributeMatcher = ( matcher ) => flow( [
  *
  * @see http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
  *
- * @param {*}      value Original value.
- * @param {string} type  Type to coerce.
+ * @param {*}      value           Original value.
+ * @param {string} type            Type to coerce.
  *
  * @return {*} Coerced value.
  */
@@ -110,9 +109,11 @@ export function matcherFromSource( sourceConfig ) {
 		case 'text':
 			return text( sourceConfig.selector );
 		case 'children':
-			return children( sourceConfig.selector, sourceConfig.multiline );
+			return children( sourceConfig.selector );
 		case 'node':
 			return node( sourceConfig.selector );
+		case 'rich-text-value':
+			return richTextValue( sourceConfig.selector, sourceConfig.multiline );
 		case 'query':
 			const subMatchers = mapValues( sourceConfig.query, matcherFromSource );
 			return query( sourceConfig.selector, subMatchers );
@@ -153,12 +154,8 @@ export function parseWithAttributeSchema( innerHTML, attributeSchema ) {
  * @return {*} Attribute value.
  */
 export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, commentAttributes ) {
+	let { type } = attributeSchema;
 	let value;
-
-	if ( attributeSchema.source === 'children' ) {
-		attributeSchema.default = createValue( null, attributeSchema.multiline );
-		attributeSchema.type = 'object';
-	}
 
 	switch ( attributeSchema.source ) {
 		// undefined source means that it's an attribute serialized to the block's "comment"
@@ -175,9 +172,12 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 		case 'tag':
 			value = parseWithAttributeSchema( innerHTML, attributeSchema );
 			break;
+		case 'rich-text-value':
+			type = 'object';
+			value = parseWithAttributeSchema( innerHTML, attributeSchema );
 	}
 
-	return value === undefined ? attributeSchema.default : asType( value, attributeSchema.type );
+	return value === undefined ? attributeSchema.default : asType( value, type );
 }
 
 /**
