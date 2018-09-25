@@ -3,6 +3,7 @@
  */
 import { PostTextEditor, PostTitle } from '@wordpress/editor';
 import { IconButton } from '@wordpress/components';
+import { withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { displayShortcut } from '@wordpress/keycodes';
 
@@ -11,13 +12,13 @@ import { displayShortcut } from '@wordpress/keycodes';
  */
 import './style.scss';
 
-function TextEditor() {
+function TextEditor( { onExit } ) {
 	return (
 		<div className="edit-post-text-editor">
 			<div className="edit-post-text-editor__toolbar">
 				<h2>{ __( 'Editing Code' ) }</h2>
 				<IconButton
-					//onClick={ onSave }
+					onClick={ onExit }
 					icon="no-alt"
 					shortcut={ displayShortcut.secondary( 'm' ) }
 				>
@@ -32,4 +33,10 @@ function TextEditor() {
 	);
 }
 
-export default TextEditor;
+export default withDispatch( ( dispatch ) => {
+	return {
+		onExit() {
+			dispatch( 'core/edit-post' ).switchEditorMode( 'visual' );
+		},
+	};
+} )( TextEditor );
