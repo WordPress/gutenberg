@@ -275,7 +275,8 @@ export const settings = {
 		attributes: {
 			...blockAttributes,
 			title: {
-				source: 'children',
+				source: 'rich-text-value',
+				type: 'rich-text-value',
 				selector: 'h2',
 			},
 		},

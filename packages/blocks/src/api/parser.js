@@ -54,8 +54,8 @@ export const toBooleanAttributeMatcher = ( matcher ) => flow( [
  *
  * @see http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
  *
- * @param {*}      value           Original value.
- * @param {string} type            Type to coerce.
+ * @param {*}      value Original value.
+ * @param {string} type  Type to coerce.
  *
  * @return {*} Coerced value.
  */

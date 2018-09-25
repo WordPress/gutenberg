@@ -763,6 +763,7 @@ export class RichText extends Component {
 			value !== prevProps.value &&
 			value !== this.savedContent
 		) {
+			// Handle deprecated `children` and `node` sources.
 			// The old way of passing a value with the `node` matcher required
 			// the value to be mapped first, creating a new array each time, so
 			// a shallow check wouldn't work. We need to check deep equality.
@@ -804,7 +805,6 @@ export class RichText extends Component {
 
 		// Handle deprecated `children` and `node` sources.
 		if ( this.usedDeprecatedChildrenSource ) {
-			// Maybe we can convert directly here to improve performance a bit.
 			return children.fromDOM( unstableToDom( { formats, text }, multiline ).body.childNodes );
 		}
 

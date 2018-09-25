@@ -34,8 +34,8 @@ const { TEXT_NODE, ELEMENT_NODE } = window.Node;
  * @return {boolean} Whether node is of intended type.
  */
 function isNodeOfType( node, type ) {
-	deprecated( 'children and node source', {
-		alternative: 'rich-text-value source',
+	deprecated( 'wp.blocks.node.isNodeOfType', {
+		alternative: 'node.type',
 		plugin: 'Gutenberg',
 		version: '4.2',
 	} );
@@ -74,8 +74,8 @@ export function getNamedNodeMapAsObject( nodeMap ) {
  * @return {WPBlockNode} Block node equivalent to DOM node.
  */
 export function fromDOM( domNode ) {
-	deprecated( 'children and node source', {
-		alternative: 'rich-text-value source',
+	deprecated( 'wp.blocks.node.fromDOM', {
+		alternative: 'wp.richTextValue.create',
 		plugin: 'Gutenberg',
 		version: '4.2',
 	} );
@@ -108,8 +108,8 @@ export function fromDOM( domNode ) {
  * @return {string} String HTML representation of block node.
  */
 export function toHTML( node ) {
-	deprecated( 'children and node source', {
-		alternative: 'rich-text-value source',
+	deprecated( 'wp.blocks.node.toHTML', {
+		alternative: 'wp.richTextValue.toHTMLString',
 		plugin: 'Gutenberg',
 		version: '4.2',
 	} );
@@ -126,7 +126,7 @@ export function toHTML( node ) {
  * @return {Function} hpq matcher.
  */
 export function matcher( selector ) {
-	deprecated( 'children and node source', {
+	deprecated( 'node source', {
 		alternative: 'rich-text-value source',
 		plugin: 'Gutenberg',
 		version: '4.2',

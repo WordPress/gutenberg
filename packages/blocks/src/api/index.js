@@ -53,3 +53,4 @@ export {
 	synchronizeBlocksWithTemplate,
 } from './templates';
 export { default as children } from './children';
+export { default as node } from './node';

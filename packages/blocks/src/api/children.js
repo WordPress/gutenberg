@@ -66,8 +66,8 @@ function getChildrenArray( children ) {
  * @return {WPBlockChildren} Concatenated block node.
  */
 export function concat( ...blockNodes ) {
-	deprecated( 'children and node source', {
-		alternative: 'rich-text-value source',
+	deprecated( 'wp.blocks.children.concat', {
+		alternative: 'wp.richTextValue.concat',
 		plugin: 'Gutenberg',
 		version: '4.2',
 	} );
@@ -102,8 +102,8 @@ export function concat( ...blockNodes ) {
  * @return {WPBlockChildren} Block children equivalent to DOM nodes.
  */
 export function fromDOM( domNodes ) {
-	deprecated( 'children and node source', {
-		alternative: 'rich-text-value source',
+	deprecated( 'wp.blocks.children.fromDom', {
+		alternative: 'wp.richTextValue.create',
 		plugin: 'Gutenberg',
 		version: '4.2',
 	} );
@@ -128,8 +128,8 @@ export function fromDOM( domNodes ) {
  * @return {string} String HTML representation of block node.
  */
 export function toHTML( children ) {
-	deprecated( 'children and node source', {
-		alternative: 'rich-text-value source',
+	deprecated( 'wp.blocks.children.toHTML', {
+		alternative: 'wp.richTextValue.toHTMLString',
 		plugin: 'Gutenberg',
 		version: '4.2',
 	} );
@@ -148,7 +148,7 @@ export function toHTML( children ) {
  * @return {Function} hpq matcher.
  */
 export function matcher( selector ) {
-	deprecated( 'children and node source', {
+	deprecated( 'children source', {
 		alternative: 'rich-text-value source',
 		plugin: 'Gutenberg',
 		version: '4.2',
