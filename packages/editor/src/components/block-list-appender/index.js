@@ -30,10 +30,7 @@ function BlockListAppender( {
 		return null;
 	}
 
-	let defaultLayout;
-	if ( isGroupedByLayout ) {
-		defaultLayout = layout;
-	}
+	const defaultLayout = isGroupedByLayout ? layout : undefined;
 
 	if ( canInsertDefaultBlock ) {
 		return (
