@@ -1,3 +1,9 @@
+## 4.0.0 (Unreleased)
+
+### Breaking Change
+
+- `wp.components.Draggable` as a DOM node drag handler has been removed. Please, use `wp.components.Draggable` as a wrap component for your DOM node drag handler.
+
 ## 3.0.0 (2018-09-05)
 
 ### Breaking Change
