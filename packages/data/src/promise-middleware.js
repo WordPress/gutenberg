@@ -5,7 +5,11 @@
  */
 const promiseMiddleware = () => ( next ) => ( action ) => {
 	if ( action instanceof Promise ) {
-		return action.then( next );
+		return action.then( ( resolvedAction ) => {
+			if ( resolvedAction ) {
+				return next( resolvedAction );
+			}
+		} );
 	}
 
 	return next( action );
