@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 
-import { split } from './split';
+import { toTree } from './to-tree';
 
 /**
  * Browser dependencies
@@ -58,100 +58,94 @@ function getNodeByPath( node, path ) {
 	};
 }
 
-export function valueToDom( { formats, text, start, end }, tag ) {
-	const htmlDocument = document.implementation.createHTMLDocument( '' );
-	let { body } = htmlDocument;
-	let startPath = [];
-	let endPath = [];
+function createEmpty( type ) {
+	const { body } = document.implementation.createHTMLDocument( '' );
 
-	const formatsLength = formats.length + 1;
-
-	if ( tag ) {
-		body = body.appendChild( htmlDocument.createElement( tag ) );
+	if ( type ) {
+		return body.appendChild( body.ownerDocument.createElement( type ) );
 	}
 
-	body.appendChild( htmlDocument.createTextNode( '' ) );
-
-	for ( let i = 0; i < formatsLength; i++ ) {
-		const character = text.charAt( i );
-		const nextFormats = formats[ i ] || [];
-		let pointer = body.lastChild;
-
-		if ( nextFormats ) {
-			nextFormats.forEach( ( { type, attributes, object } ) => {
-				if ( pointer && type === pointer.nodeName.toLowerCase() ) {
-					pointer = pointer.lastChild;
-					return;
-				}
-
-				const newNode = htmlDocument.createElement( type );
-				const parentNode = pointer.parentNode;
-
-				for ( const key in attributes ) {
-					newNode.setAttribute( key, attributes[ key ] );
-				}
-
-				parentNode.appendChild( newNode );
-
-				if ( pointer.nodeType === TEXT_NODE && pointer.nodeValue === '' ) {
-					pointer.parentNode.removeChild( pointer );
-				}
-
-				pointer = ( object ? parentNode : newNode ).appendChild( htmlDocument.createTextNode( '' ) );
-			} );
-		}
-
-		if ( character !== '\ufffc' ) {
-			if ( character === '\n' ) {
-				pointer = pointer.parentNode.appendChild( htmlDocument.createElement( 'br' ) );
-			} else if ( pointer.nodeType === TEXT_NODE ) {
-				pointer.appendData( character );
-			} else {
-				pointer = pointer.parentNode.appendChild( htmlDocument.createTextNode( character ) );
-			}
-		}
-
-		if ( start === i + 1 ) {
-			const initialPath = [ pointer.nodeValue.length ];
-			startPath = createPathToNode( pointer, body, initialPath );
-		}
-
-		if ( start === end ) {
-			endPath = startPath;
-		} else if ( end === i + 1 ) {
-			const initialPath = [ pointer.nodeValue.length ];
-			endPath = createPathToNode( pointer, body, initialPath );
-		}
-	}
-
-	return {
-		body,
-		selection: { startPath, endPath },
-	};
+	return body;
 }
 
-export function multilineValueToDom( value, tag ) {
-	const htmlDocument = document.implementation.createHTMLDocument( '' );
-	const { body } = htmlDocument;
+function append( element, child ) {
+	if ( typeof child === 'string' ) {
+		child = element.ownerDocument.createTextNode( child );
+	}
+
+	const { type, attributes } = child;
+
+	if ( type ) {
+		child = element.ownerDocument.createElement( type );
+
+		for ( const key in attributes ) {
+			child.setAttribute( key, attributes[ key ] );
+		}
+	}
+
+	return element.appendChild( child );
+}
+
+function appendText( node, text ) {
+	node.appendData( text );
+}
+
+function getLastChild( { lastChild } ) {
+	return lastChild;
+}
+
+function getParent( { parentNode } ) {
+	return parentNode;
+}
+
+function getType( { nodeName } ) {
+	return nodeName.toLowerCase();
+}
+
+function isText( { nodeType } ) {
+	return nodeType === TEXT_NODE;
+}
+
+function getText( { nodeValue } ) {
+	return nodeValue;
+}
+
+function remove( node ) {
+	return node.parentNode.removeChild( node );
+}
+
+export function valueToDom( value, multilineTag ) {
 	let startPath = [];
 	let endPath = [];
 
-	split( value, '\n\n' ).forEach( ( piece, index ) => {
-		const dom = valueToDom( piece, tag );
+	const tree = toTree( value, multilineTag, {
+		createEmpty,
+		append,
+		getLastChild,
+		getParent,
+		getType,
+		isText,
+		getText,
+		remove,
+		appendText,
+		onStartIndex( body, pointer, multilineIndex ) {
+			startPath = createPathToNode( pointer, body, [ pointer.nodeValue.length ] );
 
-		body.appendChild( dom.body );
+			if ( multilineIndex !== undefined ) {
+				startPath = [ multilineIndex, ...startPath ];
+			}
+		},
+		onEndIndex( body, pointer, multilineIndex ) {
+			endPath = createPathToNode( pointer, body, [ pointer.nodeValue.length ] );
 
-		if ( dom.selection.startPath.length ) {
-			startPath = [ index, ...dom.selection.startPath ];
-		}
-
-		if ( dom.selection.endPath.length ) {
-			endPath = [ index, ...dom.selection.endPath ];
-		}
+			if ( multilineIndex !== undefined ) {
+				endPath = [ multilineIndex, ...endPath ];
+			}
+		},
 	} );
 
 	return {
-		body,
+		body: tree,
 		selection: { startPath, endPath },
 	};
 }
@@ -167,9 +161,8 @@ export function multilineValueToDom( value, tag ) {
  * @param {string}      multilineTag Multiline tag.
  */
 export function apply( value, current, multilineTag ) {
-	// Construct a new element tree in memory
-	const toDom = multilineTag ? multilineValueToDom : valueToDom;
-	const { body, selection } = toDom( value, multilineTag );
+	// Construct a new element tree in memory.
+	const { body, selection } = valueToDom( value, multilineTag );
 
 	applyValue( body, current );
 

@@ -9,7 +9,7 @@ import { JSDOM } from 'jsdom';
  */
 
 import { create } from '../create';
-import { valueToDom, multilineValueToDom, applyValue } from '../to-dom';
+import { valueToDom, applyValue } from '../to-dom';
 
 const { window } = new JSDOM();
 const { document } = window;
@@ -144,7 +144,7 @@ describe( 'recordToDom', () => {
 			endOffset: 2,
 			endContainer: node.querySelector( 'li' ).firstChild,
 		};
-		const { body, selection } = multilineValueToDom( create( node, range, 'li' ), 'li' );
+		const { body, selection } = valueToDom( create( node, range, 'li' ), 'li' );
 
 		expect( body.innerHTML ).toEqual( node.innerHTML );
 		expect( selection ).toEqual( {

@@ -8,7 +8,7 @@ import { escapeHTML, escapeAttribute } from '@wordpress/escape-html';
  * Internal dependencies
  */
 
-import { split } from './split';
+import { toTree } from './to-tree';
 
 /**
  * Create an HTML string from a Rich Text value. If a `multilineTag` is
@@ -20,49 +20,23 @@ import { split } from './split';
  * @return {string} HTML string.
  */
 export function toHTMLString( value, multilineTag ) {
-	if ( multilineTag ) {
-		return split( value, '\n\n' ).map( ( line ) =>
-			`<${ multilineTag }>${ toHTMLString( line ) }</${ multilineTag }>`
-		).join( '' );
-	}
-
-	const { formats, text } = value;
-	const formatsLength = formats.length + 1;
-	const tree = {};
-
-	append( tree, { text: '' } );
-
-	for ( let i = 0; i < formatsLength; i++ ) {
-		const character = text.charAt( i );
-		const characterFormats = formats[ i ];
-
-		let pointer = getLastChild( tree );
-
-		if ( characterFormats ) {
-			characterFormats.forEach( ( { type, attributes, object } ) => {
-				if ( pointer && type === pointer.type ) {
-					pointer = getLastChild( pointer );
-					return;
-				}
-
-				const newNode = { type, attributes, object };
-				append( pointer.parent, newNode );
-				pointer = append( object ? pointer.parent : newNode, { text: '' } );
-			} );
-		}
-
-		if ( character !== '\ufffc' ) {
-			if ( character === '\n' ) {
-				pointer = append( pointer.parent, { type: 'br', object: true } );
-			} else if ( pointer.text === undefined ) {
-				pointer = append( pointer.parent, { text: character } );
-			} else {
-				pointer.text += character;
-			}
-		}
-	}
+	const tree = toTree( value, multilineTag, {
+		createEmpty,
+		append,
+		getLastChild,
+		getParent,
+		getType,
+		isText,
+		getText,
+		remove,
+		appendText,
+	} );
 
 	return createChildrenHTML( tree.children );
+}
+
+function createEmpty( type ) {
+	return { type };
 }
 
 function getLastChild( { children } ) {
@@ -70,9 +44,43 @@ function getLastChild( { children } ) {
 }
 
 function append( parent, object ) {
+	if ( typeof object === 'string' ) {
+		object = { text: object };
+	}
+
 	object.parent = parent;
 	parent.children = parent.children || [];
 	parent.children.push( object );
+	return object;
+}
+
+function appendText( object, text ) {
+	object.text += text;
+}
+
+function getParent( { parent } ) {
+	return parent;
+}
+
+function getType( { type } ) {
+	return type;
+}
+
+function isText( { text } ) {
+	return typeof text === 'string';
+}
+
+function getText( { text } ) {
+	return text;
+}
+
+function remove( object ) {
+	const index = object.parent.children.indexOf( object );
+
+	if ( index !== -1 ) {
+		object.parent.children.splice( index, 1 );
+	}
+
 	return object;
 }
 
