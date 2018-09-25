@@ -56,7 +56,6 @@
 		"prop-types": "15.5.10",
 		"react": "16.4.1",
 		"react-dom": "16.4.1",
-		"redux": "3.7.2",
 		"refx": "3.0.0"
 	},
 	"devDependencies": {
