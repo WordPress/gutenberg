@@ -74,7 +74,7 @@ export const settings = {
 	],
 
 	supports: {
-		align: true,
+		align: [ 'left', 'right', 'wide', 'full' ],
 	},
 
 	edit,
