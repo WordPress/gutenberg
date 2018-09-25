@@ -1,7 +1,16 @@
-.block-list-appender {
+.block-list-appender > .editor-inserter {
+	display: block;
+}
+
+.block-list-appender__toggle {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	padding: 10px;
-	border: 1px dotted $light-gray-500;
+	padding: 20px;
+	outline: 2px dotted $light-gray-500;
+	width: 100%;
+
+	&:hover {
+		outline: 1px solid $dark-gray-500;
+	}
 }

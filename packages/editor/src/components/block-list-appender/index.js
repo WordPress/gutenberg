@@ -8,6 +8,8 @@ import { last } from 'lodash';
  */
 import { withSelect } from '@wordpress/data';
 import { getDefaultBlockName } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
+import { Button, Dashicon } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -47,7 +49,22 @@ function BlockListAppender( {
 
 	return (
 		<div className="block-list-appender">
-			<Inserter rootClientId={ rootClientId } layout={ defaultLayout } />
+			<Inserter
+				rootClientId={ rootClientId }
+				layout={ defaultLayout }
+				renderToggle={ ( { onToggle, disabled, isOpen } ) => (
+					<Button
+						aria-label={ __( 'Add block' ) }
+						onClick={ onToggle }
+						className="block-list-appender__toggle"
+						aria-haspopup="true"
+						aria-expanded={ isOpen }
+						disabled={ disabled }
+					>
+						<Dashicon icon="insert" />
+					</Button>
+				) }
+			/>
 		</div>
 	);
 }
