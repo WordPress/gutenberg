@@ -74,6 +74,10 @@
 	margin-right: auto;
 	max-width: $content-width;
 
+	// Space title similarly to other blocks.
+	// This uses negative margins so as to not affect the default block margins.
+	margin-bottom: -$block-padding - $block-spacing - $border-width - $border-width;
+
 	// Stack borders.
 	> div {
 		margin-left: 0;

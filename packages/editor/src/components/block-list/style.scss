@@ -58,10 +58,9 @@
 		margin-right: -$block-padding;
 	}
 
-	// Adjust the spacing of the appender, or the first block, to sit near the title.
-	.editor-default-block-appender > .editor-default-block-appender__content,
-	.editor-block-list__block:first-child > .editor-block-list__block-edit {
-		margin-top: $block-padding - $block-spacing / 2;
+	// Adjust the spacing of the appender to match text blocks.
+	.editor-default-block-appender > .editor-default-block-appender__content {
+		margin-top: $block-padding * 2 + $block-spacing;
 	}
 
 	// Space every block, and the default appender, using margins.
