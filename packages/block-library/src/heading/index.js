@@ -14,6 +14,7 @@ import {
 	getBlockType,
 } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
+import { concat } from '@wordpress/rich-text-value';
 
 /**
  * Internal dependencies
@@ -166,7 +167,7 @@ export const settings = {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: RichText.concat( attributes.content, attributesToMerge.content ),
+			content: concat( attributes.content, attributesToMerge.content ),
 		};
 	},
 

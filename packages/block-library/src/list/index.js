@@ -181,19 +181,12 @@ export const settings = {
 	],
 
 	merge( attributes, attributesToMerge ) {
-		const valuesToMerge = attributesToMerge.values || [];
-
-		// Standard text-like block attribute.
-		if ( attributesToMerge.content ) {
-			valuesToMerge.push( attributesToMerge.content );
-		}
+		const { values, content } = attributesToMerge;
+		const valueToMerge = values || content;
 
 		return {
 			...attributes,
-			values: [
-				...attributes.values,
-				...valuesToMerge,
-			],
+			values: join( [ attributes.values, valueToMerge ], '\n\n' ),
 		};
 	},
 

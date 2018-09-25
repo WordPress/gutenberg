@@ -8,13 +8,13 @@ import { omit } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
-import { children, createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
+import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
 import {
 	BlockControls,
 	AlignmentToolbar,
 	RichText,
 } from '@wordpress/editor';
-import { join, split } from '@wordpress/rich-text-value';
+import { join, split, concat } from '@wordpress/rich-text-value';
 
 const blockAttributes = {
 	value: {
@@ -196,8 +196,8 @@ export const settings = {
 	merge( attributes, attributesToMerge ) {
 		return {
 			...attributes,
-			value: attributes.value.concat( attributesToMerge.value ),
-			citation: children.concat( attributes.citation, attributesToMerge.citation ),
+			value: join( [ attributes.value, attributesToMerge.value ], '\n\n' ),
+			citation: concat( attributes.citation, attributesToMerge.citation ),
 		};
 	},
 

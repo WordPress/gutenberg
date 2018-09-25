@@ -30,7 +30,6 @@ import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
 import { isURL } from '@wordpress/url';
 import {
 	isEmpty,
-	concat,
 	create,
 	apply,
 	applyFormat,
@@ -774,11 +773,11 @@ export class RichText extends Component {
 			}
 
 			const record = this.formatToValue( value );
-			const { start, end } = this.state;
 
 			if ( this.isActive() ) {
-				record.start = start;
-				record.end = end;
+				const length = getTextContent( prevProps.value ).length;
+				record.start = length;
+				record.end = length;
 			}
 
 			this.applyRecord( record );
@@ -998,8 +997,6 @@ RichTextContainer.isEmpty = ( value ) => {
 
 	return isEmpty( value );
 };
-
-RichTextContainer.concat = concat;
 
 RichTextContainer.Content.defaultProps = {
 	format: 'rich-text-value',
