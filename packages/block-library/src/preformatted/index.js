@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { children, createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
+import { createValue } from '@wordpress/rich-text-value';
 
 export const name = 'core/preformatted';
 
@@ -28,8 +29,10 @@ export const settings = {
 			{
 				type: 'block',
 				blocks: [ 'core/code', 'core/paragraph' ],
-				transform: ( attributes ) =>
-					createBlock( 'core/preformatted', attributes ),
+				transform: ( { content } ) =>
+					createBlock( 'core/preformatted', {
+						content: createValue( content ),
+					} ),
 			},
 			{
 				type: 'raw',
