@@ -156,6 +156,10 @@ function gutenberg_pre_init() {
 	$version = str_replace( '-src', '', $wp_version );
 
 	if ( version_compare( $version, '4.9.8', '<' ) ) {
+
+		// prevent admin notice 'plugin activated'
+		unset( $_GET['activate'] );
+
 		add_action( 'admin_notices', 'gutenberg_wordpress_version_notice' );
 		return;
 	}
