@@ -2,6 +2,8 @@ package org.wordpress.mobile.ReactNativeAztec;
 
 import android.support.annotation.Nullable;
 import android.text.Editable;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextWatcher;
 
 import com.facebook.react.bridge.ReactContext;
@@ -13,6 +15,7 @@ import com.facebook.react.views.textinput.ReactTextChangedEvent;
 import com.facebook.react.views.textinput.ReactTextInputLocalData;
 import com.facebook.react.views.textinput.ScrollWatcher;
 
+import org.wordpress.aztec.AztecParser;
 import org.wordpress.aztec.AztecText;
 import org.wordpress.aztec.AztecTextFormat;
 import org.wordpress.aztec.ITextFormat;
@@ -27,6 +30,9 @@ import org.wordpress.aztec.plugins.shortcodes.VideoShortcodePlugin;
 import org.wordpress.aztec.plugins.wpcomments.HiddenGutenbergPlugin;
 import org.wordpress.aztec.plugins.wpcomments.WordPressCommentsPlugin;
 import org.wordpress.aztec.plugins.wpcomments.toolbar.MoreToolbarButton;
+import org.wordpress.aztec.source.Format;
+import org.wordpress.aztec.spans.AztecCursorSpan;
+import org.wordpress.aztec.watchers.EndOfBufferMarkerAdder;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -218,17 +224,42 @@ public class ReactAztecText extends AztecText {
 
     void emitHTMLWithCursorEvent() {
         disableTextChangedListener();
-        String content = toPlainHtml(true);
-        int cursorPosition = content.indexOf("aztec_cursor");
-        if (cursorPosition != -1) {
-            content = content.replaceFirst("aztec_cursor", "");
-        } else {
-            cursorPosition = 0; // Something went wrong in Aztec - default to 0 if not found.
+        // The code below is taken from `toHtml` method of Aztec and adapted to report the current
+        // selection if present by adding 2 cursor spans before the converting to HTML.
+        AztecParser aztecParser = new AztecParser(getPlugins());
+        SpannableStringBuilder output = new SpannableStringBuilder(getText());
+        clearMetaSpans(output);
+        final AztecCursorSpan[] spans = output.getSpans(0, output.length(), AztecCursorSpan.class);
+        for (AztecCursorSpan currentSpan : spans) {
+            output.removeSpan(currentSpan);
         }
+
+        output.setSpan(new AztecCursorSpan(), getSelectionEnd(), getSelectionEnd(), Spanned.SPAN_MARK_MARK);
+        if (isTextSelected()) {
+            output.setSpan(new AztecCursorSpan(), getSelectionStart(), getSelectionStart(), Spanned.SPAN_MARK_MARK);
+        }
+
+        aztecParser.syncVisualNewlinesOfBlockElements(output);
+        Format.postProcessSpannedText(output, false);
+        String content = EndOfBufferMarkerAdder.removeEndOfTextMarker(aztecParser.toHtml(output, true));
+
+        int cursorPositionStart = content.indexOf("aztec_cursor");
+        if (cursorPositionStart != -1) {
+            content = content.replaceFirst("aztec_cursor", "");
+        }
+        int cursorPositionEnd = cursorPositionStart;
+
+        if (content.contains("aztec_cursor")) {
+            cursorPositionEnd = content.indexOf("aztec_cursor");
+            content = content.replaceFirst("aztec_cursor", "");
+        }
+
         enableTextChangedListener();
         ReactContext reactContext = (ReactContext) getContext();
         EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
-        eventDispatcher.dispatchEvent(new ReactAztecHtmlWithCursorEvent( getId(), content, cursorPosition));
+        eventDispatcher.dispatchEvent(
+                new ReactAztecHtmlWithCursorEvent(getId(), content, cursorPositionStart, cursorPositionEnd)
+        );
     }
 
     public void applyFormat(String format) {

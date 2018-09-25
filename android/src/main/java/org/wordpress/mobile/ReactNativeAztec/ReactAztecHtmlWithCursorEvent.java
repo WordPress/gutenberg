@@ -13,12 +13,14 @@ class ReactAztecHtmlWithCursorEvent extends Event<ReactAztecHtmlWithCursorEvent>
   private static final String EVENT_NAME = "topHTMLWithCursorRequested";
 
   private String mText;
-  private int mCursorPosition;
+  private int mSelectionStart;
+  private int mSelectionEnd;
 
-  public ReactAztecHtmlWithCursorEvent(int viewId, String text, int cursorPosition) {
+  public ReactAztecHtmlWithCursorEvent(int viewId, String text, int selectionStart, int selectionEnd) {
     super(viewId);
     mText = text;
-    mCursorPosition = cursorPosition;
+    mSelectionStart = selectionStart;
+    mSelectionEnd = selectionEnd;
   }
 
   @Override
@@ -40,7 +42,8 @@ class ReactAztecHtmlWithCursorEvent extends Event<ReactAztecHtmlWithCursorEvent>
     WritableMap eventData = Arguments.createMap();
     eventData.putInt("target", getViewTag());
     eventData.putString("text", mText);
-    eventData.putInt("cursorPosition", mCursorPosition);
+    eventData.putInt("selectionStart", mSelectionStart);
+    eventData.putInt("selectionEnd", mSelectionEnd);
     return eventData;
   }
 }
