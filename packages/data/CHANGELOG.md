@@ -4,6 +4,10 @@
 
 - Adding support for using controls in resolvers using the controls plugin.
 
+### Polish
+
+- Updated `redux` dependency to the latest version.
+
 ### Deprecations
 
 - Writing resolvers as async generators has been deprecated. Use the controls plugin instead.
