@@ -19,11 +19,9 @@ describe( 'Code block', () => {
 
 		await page.type( '.editor-block-list__block textarea', code );
 
-		// Verify the content starts as a Code block.
+		// Verify the content starts out as a Code block.
 		const originalPostContent = await getEditedPostContent();
-		const codeRegex = new RegExp( `<!-- wp:code -->\\s*<pre class="wp-block-code"><code>${ code }<\\/code><\\/pre>\\s*<!-- \\/wp:code -->` );
-
-		expect( originalPostContent ).toMatch( codeRegex );
+		expect( originalPostContent ).toMatchSnapshot();
 
 		// Hover over this block to show its toolbar so we can click on the block
 		// conversion button.
@@ -37,8 +35,6 @@ describe( 'Code block', () => {
 
 		// The content should now be a Preformatted block with no data loss.
 		const convertedPostContent = await getEditedPostContent();
-		const preformattedRegex = new RegExp( `<!-- wp:preformatted -->\\s*<pre class="wp-block-preformatted">${ code }<\\/pre>\\s*<!-- \\/wp:preformatted -->` );
-
-		expect( convertedPostContent ).toMatch( preformattedRegex );
+		expect( convertedPostContent ).toMatchSnapshot();
 	} );
 } );
