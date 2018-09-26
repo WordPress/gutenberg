@@ -52,7 +52,7 @@ export function getEmbedEdit( title, icon ) {
 			this.setUrl = this.setUrl.bind( this );
 			this.maybeSwitchBlock = this.maybeSwitchBlock.bind( this );
 			this.setAttributesFromPreview = this.setAttributesFromPreview.bind( this );
-			this.maybeSetAspectRatioClassName = this.maybeSetAspectRatioClassName.bind( this );
+			this.setAspectRatioClassNames = this.setAspectRatioClassNames.bind( this );
 			this.getResponsiveHelp = this.getResponsiveHelp.bind( this );
 			this.toggleResponsive = this.toggleResponsive.bind( this );
 
@@ -197,17 +197,15 @@ export function getEmbedEdit( title, icon ) {
 					};
 				}
 			}
-
-			return {};
 		}
 
 		/**
-		 * Maybe sets the appropriate CSS class names to enforce an aspect ratio when the embed
-		 * is resized if the HTML has an iframe with width and height set.
+		 * Sets the aspect ratio related class names returned by `getAspectRatioClassNames`
+		 * if `allowResponsive` is truthy.
 		 *
-		 * @param {string} html The preview HTML that possibly contains an iframe with width and height set.
+		 * @param {string} html The preview HTML.
 		 */
-		maybeSetAspectRatioClassName( html ) {
+		setAspectRatioClassNames( html ) {
 			const { allowResponsive } = this.props.attributes;
 			if ( ! allowResponsive ) {
 				return;
@@ -240,7 +238,7 @@ export function getEmbedEdit( title, icon ) {
 				setAttributes( { type, providerNameSlug } );
 			}
 
-			this.maybeSetAspectRatioClassName( html );
+			this.setAspectRatioClassNames( html );
 		}
 
 		switchBackToURLInput() {
