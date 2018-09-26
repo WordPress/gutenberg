@@ -6,7 +6,7 @@ import { get } from 'lodash';
 /**
  * WordPress Dependencies
  */
-import { Button } from '@wordpress/components';
+import { Button, withFilters } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
@@ -83,4 +83,5 @@ export default compose( [
 			postType: getCurrentPostType(),
 		};
 	} ),
+	withFilters( 'editor.PostPublishPanelToggle' ),
 ] )( PostPublishPanelToggle );
