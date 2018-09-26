@@ -74,9 +74,11 @@ class BlockDropZone extends Component {
 		const { index } = this.props;
 		const positionIndex = this.getInsertIndex( position );
 
-		// If the block is kept at the same level and moved downwards, subtract
-		// to account for blocks shifting upward to occupy its old position.
-		const insertIndex = index && fromIndex < index && rootClientId === this.props.rootClientId ? positionIndex - 1 : positionIndex;
+		// If the block is kept at the same level and moved downwards,
+		// subtract to account for blocks shifting upward to occupy its old position.
+		// Note that rootClientId can be undefined or a void string if the block is at the top-level.
+		const isSameLevel = ( src, dst ) => ( src === dst ) || ( ! src === true && ! dst === true );
+		const insertIndex = index && fromIndex < index && isSameLevel( rootClientId, this.props.rootClientId ) ? positionIndex - 1 : positionIndex;
 		this.props.moveBlockToPosition( clientId, rootClientId, insertIndex );
 	}
 
