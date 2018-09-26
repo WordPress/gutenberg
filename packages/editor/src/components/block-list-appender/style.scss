@@ -6,8 +6,8 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	padding: 20px;
-	outline: 2px dotted $light-gray-500;
+	padding: $grid-size-large;
+	outline: 1px dashed $light-gray-500;
 	width: 100%;
 
 	&:hover {
