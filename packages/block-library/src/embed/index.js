@@ -153,9 +153,10 @@ export function getEmbedEdit( title, icon ) {
 		 * if the HTML has an iframe with width and height set.
 		 *
 		 * @param {string} html The preview HTML that possibly contains an iframe with width and height set.
-		 * @return {Object} Object with classnames set to true, for use with `classnames`.
+		 * @param {boolean} add If the classes should be added, or removed.
+		 * @return {Object} Object with classnames set for use with `classnames`.
 		 */
-		getAspectRatioClassNames( html ) {
+		getAspectRatioClassNames( html, add = true ) {
 			const previewDocument = document.implementation.createHTMLDocument( '' );
 			previewDocument.body.innerHTML = html;
 			const iframe = previewDocument.body.querySelector( 'iframe' );
@@ -192,8 +193,8 @@ export function getEmbedEdit( title, icon ) {
 
 				if ( aspectRatioClassName ) {
 					return {
-						[ aspectRatioClassName ]: true,
-						'wp-has-aspect-ratio': true,
+						[ aspectRatioClassName ]: add,
+						'wp-has-aspect-ratio': add,
 					};
 				}
 			}
@@ -252,15 +253,7 @@ export function getEmbedEdit( title, icon ) {
 		toggleResponsive() {
 			const { allowResponsive, className } = this.props.attributes;
 			const { html } = this.props.preview;
-			const responsiveClassNames = this.getAspectRatioClassNames( html );
-
-			if ( allowResponsive ) {
-				// Before toggling, we were allowing responsiveness, so
-				// this will remove the responsive classes from the className attribute.
-				for ( const property in responsiveClassNames ) {
-					responsiveClassNames[ property ] = false;
-				}
-			}
+			const responsiveClassNames = this.getAspectRatioClassNames( html, ! allowResponsive );
 
 			this.props.setAttributes(
 				{
