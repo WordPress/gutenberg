@@ -7,7 +7,6 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Children } from '@wordpress/element';
-import { applyFilters } from '@wordpress/hooks';
 import { withInstanceId } from '@wordpress/compose';
 
 /**
@@ -18,14 +17,10 @@ import { NavigableMenu } from '../navigable-container';
 export function MenuGroup( {
 	children,
 	className = '',
-	filterName,
 	instanceId,
 	label,
 } ) {
-	const childrenArray = Children.toArray( children );
-	const menuItems = filterName ?
-		applyFilters( filterName, childrenArray ) :
-		childrenArray;
+	const menuItems = Children.toArray( children );
 
 	if ( ! Array.isArray( menuItems ) || ! menuItems.length ) {
 		return null;
