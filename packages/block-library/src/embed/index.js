@@ -153,10 +153,10 @@ export function getEmbedEdit( title, icon ) {
 		 * if the HTML has an iframe with width and height set.
 		 *
 		 * @param {string} html The preview HTML that possibly contains an iframe with width and height set.
-		 * @param {boolean} add If the classes should be added, or removed.
+		 * @param {boolean} allowResponsive If the classes should be added, or removed.
 		 * @return {Object} Object with classnames set for use with `classnames`.
 		 */
-		getAspectRatioClassNames( html, add = true ) {
+		getAspectRatioClassNames( html, allowResponsive = true ) {
 			const previewDocument = document.implementation.createHTMLDocument( '' );
 			previewDocument.body.innerHTML = html;
 			const iframe = previewDocument.body.querySelector( 'iframe' );
@@ -193,8 +193,8 @@ export function getEmbedEdit( title, icon ) {
 
 				if ( aspectRatioClassName ) {
 					return {
-						[ aspectRatioClassName ]: add,
-						'wp-has-aspect-ratio': add,
+						[ aspectRatioClassName ]: allowResponsive,
+						'wp-has-aspect-ratio': allowResponsive,
 					};
 				}
 			}
@@ -284,7 +284,7 @@ export function getEmbedEdit( title, icon ) {
 					<InspectorControls>
 						<PanelBody title={ __( 'Media Settings' ) } className="blocks-responsive">
 							<ToggleControl
-								label={ __( 'Responsive' ) }
+								label={ __( 'Automatically scale content' ) }
 								checked={ allowResponsive }
 								help={ this.getResponsiveHelp }
 								onChange={ this.toggleResponsive }
