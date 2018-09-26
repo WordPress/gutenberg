@@ -359,7 +359,8 @@ export class RichText extends Component {
 		} );
 
 		if ( typeof content === 'string' ) {
-			this.onChange( insert( this.getRecord(), content ) );
+			const recordToInsert = create( { html: content } );
+			this.onChange( insert( this.getRecord(), recordToInsert ) );
 		} else if ( this.props.onSplit ) {
 			if ( ! content.length ) {
 				return;
