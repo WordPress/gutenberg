@@ -271,12 +271,14 @@ export function getEmbedEdit( title, icon ) {
 				<Fragment>
 					<BlockControls>
 						<Toolbar>
-							{ ( preview && ! previewIsFallback && <IconButton
-								className="components-toolbar__control"
-								label={ __( 'Edit URL' ) }
-								icon="edit"
-								onClick={ this.switchBackToURLInput }
-							/> ) }
+							{ preview && ! previewIsFallback && (
+								<IconButton
+									className="components-toolbar__control"
+									label={ __( 'Edit URL' ) }
+									icon="edit"
+									onClick={ this.switchBackToURLInput }
+								/>
+							) }
 						</Toolbar>
 					</BlockControls>
 					<InspectorControls>
