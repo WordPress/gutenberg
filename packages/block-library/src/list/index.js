@@ -18,7 +18,7 @@ import {
 	BlockControls,
 	RichText,
 } from '@wordpress/editor';
-import { replace, join, split } from '@wordpress/rich-text-value';
+import { replace, join, split, isEmpty } from '@wordpress/rich-text-value';
 
 const listContentSchema = {
 	...getPhrasingContentSchema(),
@@ -183,6 +183,10 @@ export const settings = {
 	merge( attributes, attributesToMerge ) {
 		const { values, content } = attributesToMerge;
 		const valueToMerge = values || content;
+
+		if ( isEmpty( valueToMerge ) ) {
+			return attributes;
+		}
 
 		return {
 			...attributes,
