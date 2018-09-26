@@ -28,6 +28,7 @@ export default function withFilters( hookName ) {
 			/** @inheritdoc */
 			constructor( props ) {
 				super( props );
+				this.ComponentProps = applyFilters( hookName + 'Props', props );
 
 				this.onHooksUpdated = this.onHooksUpdated.bind( this );
 				this.Component = applyFilters( hookName, OriginalComponent );
@@ -54,14 +55,14 @@ export default function withFilters( hookName ) {
 			 * @param {string} updatedHookName  Name of the hook that was updated.
 			 */
 			onHooksUpdated( updatedHookName ) {
-				if ( updatedHookName === hookName ) {
+				if ( updatedHookName === hookName || updatedHookName === hookName + 'Props' ) {
 					this.throttledForceUpdate();
 				}
 			}
 
 			/** @inheritdoc */
 			render() {
-				return <this.Component { ...this.props } />;
+				return <this.Component { ...this.ComponentProps } />;
 			}
 		};
 	}, 'withFilters' );
