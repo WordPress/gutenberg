@@ -45,6 +45,30 @@ describe( 'reducer', () => {
 		expect( state.test.getFoo.get( [] ) ).toBe( false );
 	} );
 
+	it( 'should remove invalidations', () => {
+		let state = reducer( undefined, {
+			type: 'START_RESOLUTION',
+			reducerKey: 'test',
+			selectorName: 'getFoo',
+			args: [],
+		} );
+		state = reducer( deepFreeze( state ), {
+			type: 'FINISH_RESOLUTION',
+			reducerKey: 'test',
+			selectorName: 'getFoo',
+			args: [],
+		} );
+		state = reducer( deepFreeze( state ), {
+			type: 'INVALIDATE_CACHE',
+			reducerKey: 'test',
+			selectorName: 'getFoo',
+			args: [],
+		} );
+
+		// { test: { getFoo: EquivalentKeyMap( [] => undefined ) } }
+		expect( state.test.getFoo.get( [] ) ).toBe( undefined );
+	} );
+
 	it( 'different arguments should not conflict', () => {
 		const original = reducer( undefined, {
 			type: 'START_RESOLUTION',
