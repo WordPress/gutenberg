@@ -6,7 +6,10 @@ import { PanelBody, ToggleControl } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
 import { InspectorControls } from '@wordpress/editor';
 import { ENTER } from '@wordpress/keycodes';
-import { createBlock } from '@wordpress/blocks';
+import {
+	getDefaultBlockName,
+	createBlock,
+} from '@wordpress/blocks';
 
 export default class MoreEdit extends Component {
 	constructor() {
@@ -33,7 +36,7 @@ export default class MoreEdit extends Component {
 		const { keyCode } = event;
 		const { insertBlocksAfter } = this.props;
 		if ( keyCode === ENTER ) {
-			insertBlocksAfter( [ createBlock( 'core/paragraph' ) ] );
+			insertBlocksAfter( [ createBlock( getDefaultBlockName() ) ] );
 		}
 	}
 
