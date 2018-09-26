@@ -60,10 +60,11 @@ class BlockDropZone extends Component {
 			return;
 		}
 
-		let clientId, type, rootClientId, fromIndex;
+		const { index: dstIndex, rootClientId: dstRootClientId } = this.props;
 
+		let type, srcClientId, srcRootClientId, srcIndex;
 		try {
-			( { clientId, type, rootClientId, fromIndex } = JSON.parse( event.dataTransfer.getData( 'text' ) ) );
+			( { type, srcClientId, srcRootClientId, srcIndex } = JSON.parse( event.dataTransfer.getData( 'text' ) ) );
 		} catch ( err ) {
 			return;
 		}
@@ -71,15 +72,15 @@ class BlockDropZone extends Component {
 		if ( type !== 'block' ) {
 			return;
 		}
-		const { index } = this.props;
+
 		const positionIndex = this.getInsertIndex( position );
 
 		// If the block is kept at the same level and moved downwards,
 		// subtract to account for blocks shifting upward to occupy its old position.
 		// Note that rootClientId can be undefined or a void string if the block is at the top-level.
-		const isSameLevel = ( src, dst ) => ( src === dst ) || ( ! src === true && ! dst === true );
-		const insertIndex = index && fromIndex < index && isSameLevel( rootClientId, this.props.rootClientId ) ? positionIndex - 1 : positionIndex;
-		this.props.moveBlockToPosition( clientId, rootClientId, insertIndex );
+		const isSameLevel = ( ) => ( srcRootClientId === dstRootClientId ) || ( ! srcRootClientId === true && ! dstRootClientId === true );
+		const insertIndex = dstIndex && srcIndex < dstIndex && isSameLevel() ? positionIndex - 1 : positionIndex;
+		this.props.moveBlockToPosition( srcClientId, srcRootClientId, insertIndex );
 	}
 
 	render() {
@@ -111,7 +112,7 @@ export default compose(
 		} = dispatch( 'core/editor' );
 
 		return {
-			insertBlocks( blocks, insertIndex ) {
+			insertBlocks( blocks, index ) {
 				const { rootClientId, layout } = ownProps;
 
 				if ( layout ) {
@@ -124,14 +125,14 @@ export default compose(
 					) );
 				}
 
-				insertBlocks( blocks, insertIndex, rootClientId );
+				insertBlocks( blocks, index, rootClientId );
 			},
 			updateBlockAttributes( ...args ) {
 				updateBlockAttributes( ...args );
 			},
-			moveBlockToPosition( clientId, fromRootClientId, index ) {
-				const { rootClientId, layout } = ownProps;
-				moveBlockToPosition( clientId, fromRootClientId, rootClientId, layout, index );
+			moveBlockToPosition( srcClientId, srcRootClientId, dstIndex ) {
+				const { rootClientId: dstRootClientId, layout } = ownProps;
+				moveBlockToPosition( srcClientId, srcRootClientId, dstRootClientId, layout, dstIndex );
 			},
 		};
 	} ),
