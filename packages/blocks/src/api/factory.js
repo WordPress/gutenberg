@@ -50,6 +50,10 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 			result[ key ] = schema.default;
 		} else if ( schema.source === 'rich-text-value' ) {
 			result[ key ] = create();
+		} else if ( schema.source === 'children' ) {
+			result[ key ] = [];
+		} else if ( schema.source === 'node' ) {
+			result[ key ] = [];
 		}
 
 		return result;

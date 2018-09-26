@@ -11,7 +11,6 @@
 				type: 'array',
 				source: 'children',
 				selector: 'p',
-				default: [],
 			},
 		},
 		category: 'formatting',
