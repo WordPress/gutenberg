@@ -49,6 +49,34 @@ function gutenberg_register_rest_routes() {
 add_action( 'rest_api_init', 'gutenberg_register_rest_routes' );
 
 /**
+ * Register a new field on the REST API posts response for floating dates
+ *
+ * @see  https://core.trac.wordpress.org/ticket/39953
+ *
+ * TODO: This is a temporary solution until a date_floating flag can be added to core
+ */
+function gutenberg_add_date_floating_flag() {
+	$post_types = get_post_types( array( 'show_in_rest' => true ), 'names' );
+	register_rest_field( $post_types, 'date_floating', array( 'get_callback' => 'gutenberg_get_date_floating_flag' ) );
+}
+add_action( 'rest_api_init', 'gutenberg_add_date_floating_flag' );
+
+/**
+ * Checks whether the date of a post is floating or fixed
+ *
+ * @see  https://core.trac.wordpress.org/ticket/39953
+ *
+ * TODO: This is a temporary solution until a date_floating flag can be added to core
+ *
+ * @param WP_Post $rest_post Post to determine floating date status for.
+ * @return bool
+ */
+function gutenberg_get_date_floating_flag( $rest_post ) {
+	$current_post = get_post( $rest_post['id'] );
+	return (boolean) ( '0000-00-00 00:00:00' === $current_post->post_date_gmt );
+}
+
+/**
  * Make sure oEmbed REST Requests apply the WP Embed security mechanism for WordPress embeds.
  *
  * @see  https://core.trac.wordpress.org/ticket/32522
