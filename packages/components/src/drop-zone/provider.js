@@ -16,7 +16,7 @@ class DropZoneProvider extends Component {
 		this.resetDragState = this.resetDragState.bind( this );
 		this.toggleDraggingOverDocument = throttle( this.toggleDraggingOverDocument.bind( this ), 200 );
 		this.dragOverListener = this.dragOverListener.bind( this );
-		this.isWithinZoneBounds = this.isWithinZoneBounds.bind( this );
+		this.isWithinZoneReach = this.isWithinZoneReach.bind( this );
 		this.onDrop = this.onDrop.bind( this );
 
 		this.state = {
@@ -121,7 +121,7 @@ class DropZoneProvider extends Component {
 
 		const hoveredDropZones = filter( this.dropzones, ( dropzone ) =>
 			this.doesDropzoneSupportType( dropzone, dragEventType ) &&
-			this.isWithinZoneBounds( dropzone.element, detail.clientX, detail.clientY )
+			this.isWithinZoneReach( dropzone.element, detail.clientX, detail.clientY )
 		);
 
 		// Find the leaf dropzone not containing another dropzone
@@ -184,7 +184,7 @@ class DropZoneProvider extends Component {
 		}
 	}
 
-	isWithinZoneBounds( dropzone, x, y ) {
+	isWithinZoneReach( dropzone, x, y ) {
 		const isWithinElement = ( element ) => {
 			const rect = element.getBoundingClientRect();
 			/// make sure the rect is a valid rect
@@ -192,10 +192,17 @@ class DropZoneProvider extends Component {
 				return false;
 			}
 
-			return (
-				x >= rect.left && x <= rect.right &&
-				y >= rect.top && y <= rect.bottom
-			);
+			// The space between the block's bounding boxes is ~43.5px (columns block).
+			// Give enough horizontalPull while avoiding conflicts between zones.
+			const horizontalPull = 21.75;
+			// The space between the blocks' bounding boxes is ~25px.
+			// Give enough verticalPull while avoiding conflicts between zones.
+			const verticalPull = 12.5;
+			const leftBoundary = Math.max( rect.left - horizontalPull, 0 );
+			const rightBoundary = rect.right + horizontalPull;
+			const topBoundary = Math.max( rect.top - verticalPull, 0 );
+			const bottomBoundary = rect.bottom + verticalPull;
+			return x >= leftBoundary && x <= rightBoundary && y >= topBoundary && y <= bottomBoundary;
 		};
 
 		return isWithinElement( dropzone );
