@@ -4,19 +4,17 @@
  */
 
 import React from 'react';
-import { Platform, Switch, Text, View, FlatList, TextInput, KeyboardAvoidingView } from 'react-native';
+import { Platform, Switch, Text, View, FlatList, KeyboardAvoidingView } from 'react-native';
 import RecyclerViewList, { DataSource } from 'react-native-recyclerview-list';
 import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
 import type { BlockType } from '../store/';
 import styles from './block-manager.scss';
 import BlockPicker from './block-picker';
+import HTMLTextInput from '../components/html-text-input';
 
 // Gutenberg imports
-import {
-	createBlock,
-	serialize,
-} from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 
 export type BlockListType = {
 	onChange: ( clientId: string, attributes: mixed ) => void,
@@ -38,7 +36,6 @@ type StateType = {
 	inspectBlocks: boolean,
 	blockTypePickerVisible: boolean,
 	selectedBlockType: string,
-	html: string,
 };
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
@@ -50,7 +47,6 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			inspectBlocks: false,
 			blockTypePickerVisible: false,
 			selectedBlockType: 'core/paragraph', // just any valid type to start from
-			html: '',
 		};
 	}
 
@@ -138,40 +134,21 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		}
 	}
 
-	serializeToHtml() {
-		return this.props.blocks
-			.map( ( block ) => {
-				if ( block.name === 'aztec' ) {
-					return '<aztec>' + block.attributes.content + '</aztec>\n\n';
-				}
-
-				return serialize( [ block ] ) + '\n\n';
-			} )
-			.reduce( ( prevVal, value ) => {
-				return prevVal + value;
-			}, '' );
-	}
-
-	parseHTML() {
-		const { parseBlocksAction } = this.props;
-		const { html } = this.state;
-		parseBlocksAction( html );
-	}
-
 	componentDidUpdate() {
 		// List has been updated, tell the recycler view to update the view
 		this.state.dataSource.setDirty();
 	}
 
 	onChange( clientId: string, attributes: mixed ) {
-		// Update datasource UI
+		// Update Redux store
+		this.props.onChange( clientId, attributes );
+
+		// Change the data source
 		const index = this.getDataSourceIndexFromClientId( clientId );
 		const dataSource = this.state.dataSource;
 		const block = dataSource.get( index );
 		block.attributes = attributes;
 		dataSource.set( index, block );
-		// Update Redux store
-		this.props.onChange( clientId, attributes );
 	}
 
 	renderList() {
@@ -219,7 +196,8 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				} }
 				onValueSelected={ ( itemValue ) => {
 					this.onBlockTypeSelected( itemValue );
-				} } />
+				} }
+			/>
 		);
 
 		return (
@@ -248,22 +226,11 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	handleSwitchEditor = ( showHtml: boolean ) => {
-		if ( showHtml ) {
-			const html = this.serializeToHtml();
-			this.handleHTMLUpdate( html );
-		} else {
-			this.parseHTML();
-		}
-
 		this.setState( { showHtml } );
 	}
 
 	handleInspectBlocksChanged = ( inspectBlocks: boolean ) => {
 		this.setState( { inspectBlocks } );
-	}
-
-	handleHTMLUpdate = ( html: string ) => {
-		this.setState( { html } );
 	}
 
 	renderItem( value: { item: BlockType, clientId: string } ) {
@@ -293,18 +260,8 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	renderHTML() {
-		const behavior = Platform.OS === 'ios' ? 'padding' : null;
 		return (
-			<KeyboardAvoidingView style={ { flex: 1 } } behavior={ behavior }>
-				<TextInput
-					textAlignVertical="top"
-					multiline
-					numberOfLines={ 0 }
-					style={ styles.htmlView }
-					value={ this.state.html }
-					onChangeText={ this.handleHTMLUpdate }>
-				</TextInput>
-			</KeyboardAvoidingView>
+			<HTMLTextInput { ...this.props } />
 		);
 	}
 }

@@ -1,25 +1,18 @@
 /** @format */
-const blacklist = require( 'metro' ).createBlacklist;
-
-const enm = require( 'node-libs-react-native' );
-enm.fs = __dirname + '/__mocks__/nodejsMock.js';
-enm.net = __dirname + '/__mocks__/nodejsMock.js';
-enm.canvas = __dirname + '/__mocks__/nodejsMock.js';
+const path = require( 'path' );
+const blacklist = require( 'metro-config/src/defaults/blacklist' );
+// Blacklist the nested GB filetree so modules are not resolved in duplicates,
+//  both in the nested directory and the parent directory.
+const blacklistElements = blacklist( [ new RegExp( path.basename( __dirname ) + '/gutenberg/gutenberg-mobile/.*' ) ] );
+const enm = require( './extra-node-modules.config.js' );
 
 module.exports = {
 	extraNodeModules: enm,
-	getBlacklistRE: function() {
-		// Blacklist the GB packages we want to consume from NPM (online) directly.
-		// On the other hand, GB packages that are loaded from the source tree directly
-		// are automagically resolved by Metro so, there is no list of them anywhere.
-		return blacklist( [
-			/gutenberg\/packages\/(autop|compose|deprecated|hooks|i18n|is-shallow-equal)\/.*/,
-		] );
+	resolver: {
+		blacklistRE: blacklistElements,
+		sourceExts: [ 'js', 'json', 'scss', 'sass' ],
 	},
-	getTransformModulePath() {
-		return require.resolve( './sass-transformer.js' );
-	},
-	getSourceExts() {
-		return [ 'js', 'json', 'scss', 'sass' ];
+	transformer: {
+		babelTransformerPath: require.resolve( './sass-transformer.js' ),
 	},
 };
