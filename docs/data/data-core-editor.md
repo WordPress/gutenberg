@@ -1253,6 +1253,19 @@ Returns whether or not the user has the unfiltered_html capability.
 
 Whether the user can or can't post unfiltered HTML.
 
+### isPublishSidebarEnabled
+
+Returns whether the pre-publish panel should be shown
+or skipped when the user clicks the "publish" button.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+Whether the pre-publish panel should be shown or not.
+
 ## Actions
 
 ### setupEditor
@@ -1634,3 +1647,11 @@ Returns an action object used in signalling that the editor settings have been u
 *Parameters*
 
  * settings: Updated settings
+
+### enablePublishSidebar
+
+Returns an action object used in signalling that the user has enabled the publish sidebar.
+
+### disablePublishSidebar
+
+Returns an action object used in signalling that the user has disabled the publish sidebar.
