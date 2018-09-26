@@ -3,12 +3,13 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
-import { children, createBlock } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import {
 	RichText,
 	BlockControls,
 	AlignmentToolbar,
 } from '@wordpress/editor';
+import { concat } from '@wordpress/rich-text-value';
 
 export const name = 'core/verse';
 
@@ -25,10 +26,9 @@ export const settings = {
 
 	attributes: {
 		content: {
-			source: 'html',
-			type: 'string',
+			source: 'rich-text-value',
+			type: 'rich-text-value',
 			selector: 'pre',
-			default: '',
 		},
 		textAlign: {
 			type: 'string',
@@ -69,7 +69,6 @@ export const settings = {
 				</BlockControls>
 				<RichText
 					tagName="pre"
-					format="string"
 					value={ content }
 					onChange={ ( nextContent ) => {
 						setAttributes( {
@@ -91,7 +90,6 @@ export const settings = {
 		return (
 			<RichText.Content
 				tagName="pre"
-				format="string"
 				className={ className }
 				style={ { textAlign: textAlign } }
 				value={ content }
@@ -101,7 +99,7 @@ export const settings = {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: children.concat( attributes.content, attributesToMerge.content ),
+			content: concat( attributes.content, attributesToMerge.content ),
 		};
 	},
 };
