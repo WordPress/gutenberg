@@ -47,7 +47,15 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 		if ( undefined !== value ) {
 			result[ key ] = value;
 		} else if ( schema.hasOwnProperty( 'default' ) ) {
-			result[ key ] = schema.default;
+			let defaultValue = schema.default;
+
+			if ( schema.source === 'children' ) {
+				defaultValue = castArray( defaultValue );
+			} else if ( schema.source === 'node' ) {
+				defaultValue = castArray( defaultValue );
+			}
+
+			result[ key ] = defaultValue;
 		} else if ( schema.source === 'rich-text-value' ) {
 			result[ key ] = create();
 		} else if ( schema.source === 'children' ) {
