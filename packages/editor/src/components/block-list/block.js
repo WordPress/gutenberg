@@ -498,7 +498,6 @@ export class BlockListBlock extends Component {
 					<BlockMover
 						clientIds={ clientId }
 						blockElementId={ blockElementId }
-						layout={ layout }
 						isFirst={ isFirst }
 						isLast={ isLast }
 						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }
