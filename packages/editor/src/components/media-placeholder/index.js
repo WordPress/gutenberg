@@ -12,6 +12,8 @@ import {
 	FormFileUpload,
 	Placeholder,
 	DropZone,
+	Popover,
+	IconButton,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
@@ -23,18 +25,51 @@ import deprecated from '@wordpress/deprecated';
 import MediaUpload from '../media-upload';
 import { mediaUpload } from '../../utils/';
 
+const stopPropagation = ( event ) => event.stopPropagation();
+
+const UrlInputPopover = ( { value, onChange, onSubmit, onClickOutside } ) => (
+	<Popover
+		position="bottom center"
+		onClickOutside={ onClickOutside }
+	>
+		{ // Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
+		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */ }
+		<form
+			className="editor-format-toolbar__link-modal"
+			onKeyPress={ stopPropagation }
+
+			onSubmit={ onSubmit }
+		>
+			<div className="editor-format-toolbar__link-modal-line">
+				<div className="editor-url-input">
+					<input
+						type="text"
+						aria-label={ __( 'URL' ) }
+						placeholder={ __( 'Paste URL or type' ) }
+						onChange={ onChange }
+						value={ value }
+					/>
+				</div>
+				<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
+			</div>
+		</form>
+		{ /* eslint-enable jsx-a11y/no-noninteractive-element-interactions */ }
+	</Popover>
+);
+
 class MediaPlaceholder extends Component {
 	constructor() {
 		super( ...arguments );
 		this.state = {
 			src: '',
-			isURLInputExpanded: false,
+			isURLInputVisible: false,
 		};
 		this.onChangeSrc = this.onChangeSrc.bind( this );
 		this.onSubmitSrc = this.onSubmitSrc.bind( this );
 		this.onUpload = this.onUpload.bind( this );
 		this.onFilesUpload = this.onFilesUpload.bind( this );
-		this.toggleURLInputVisibility = this.toggleURLInputVisibility.bind( this );
+		this.openURLInput = this.openURLInput.bind( this );
+		this.closeURLInput = this.closeURLInput.bind( this );
 	}
 
 	getAllowedTypes() {
@@ -75,20 +110,14 @@ class MediaPlaceholder extends Component {
 	}
 
 	onChangeSrc( event ) {
-		const value = event.target.value;
-
-		const stateUpdate = {
-			src: value,
-			isURLInputExpanded: value.length > 0,
-		};
-
-		this.setState( stateUpdate );
+		this.setState( { src: event.target.value } );
 	}
 
 	onSubmitSrc( event ) {
 		event.preventDefault();
 		if ( this.state.src && this.props.onSelectURL ) {
 			this.props.onSelectURL( this.state.src );
+			this.closeURLInput();
 		}
 	}
 
@@ -108,8 +137,12 @@ class MediaPlaceholder extends Component {
 		} );
 	}
 
-	toggleURLInputVisibility() {
-		this.setState( { isURLInputExpanded: true } );
+	openURLInput() {
+		this.setState( { isURLInputVisible: true } );
+	}
+
+	closeURLInput() {
+		this.setState( { isURLInputVisible: false } );
 	}
 
 	render() {
@@ -127,12 +160,10 @@ class MediaPlaceholder extends Component {
 		} = this.props;
 
 		const {
-			isURLInputExpanded,
+			isURLInputVisible,
 		} = this.state;
 
-		const urlInputFormClasses = classnames( 'editor-media-placeholder__url-input-form', {
-			'is-expanded': isURLInputExpanded,
-		} );
+		const toggleURLInput = ! isURLInputVisible ? this.openURLInput : undefined;
 
 		const allowedTypes = this.getAllowedTypes();
 
@@ -171,25 +202,25 @@ class MediaPlaceholder extends Component {
 					) }
 				/>
 				{ onSelectURL && (
-					<form
-						className={ urlInputFormClasses }
-						onSubmit={ this.onSubmitSrc }
+					<div
+						className="editor-media-placeholder__url-input-container"
 					>
-						<input
-							type="url"
-							className="components-placeholder__input editor-media-placeholder__url-input"
-							aria-label={ labels.title }
-							placeholder={ __( 'Enter URL here…' ) }
-							onChange={ this.onChangeSrc }
-							value={ this.state.src }
-						/>
 						<Button
-							className="editor-media-placeholder__url-input-submit-button"
-							isLarge
-							type="submit">
-							{ __( 'Use URL' ) }
+							className="editor-media-placeholder__url-input-toggle-button"
+							onClick={ toggleURLInput }
+							isToggled={ isURLInputVisible }
+							isLarge>
+							{ __( 'Insert from URL' ) }
 						</Button>
-					</form>
+						{ isURLInputVisible && (
+							<UrlInputPopover
+								onChange={ this.onChangeSrc }
+								value={ this.state.src }
+								onSubmit={ this.onSubmitSrc }
+								onClickOutside={ this.closeURLInput }
+							/>
+						) }
+					</div>
 				) }
 			</Placeholder>
 		);
