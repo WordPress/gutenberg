@@ -279,7 +279,7 @@ class HierarchicalTermSelector extends Component {
 			_n( '%d result found.', '%d results found.', resultCount, 'term' ),
 			resultCount
 		);
-		this.props.speak( resultsFoundMessage, 'assertive' );
+		this.props.debouncedSpeak( resultsFoundMessage, 'assertive' );
 	}
 
 	getFilterMatcher( filterValue ) {
