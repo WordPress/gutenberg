@@ -248,7 +248,7 @@ export function getEmbedEdit( title, icon ) {
 		}
 
 		getResponsiveHelp( checked ) {
-			return checked ? __( 'Videos are responsive.' ) : __( 'Toggle to make videos responsive.' );
+			return checked ? __( 'Videos automatically resize.' ) : __( 'Videos are fixed size.' );
 		}
 
 		toggleResponsive() {
