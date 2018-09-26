@@ -200,6 +200,7 @@ class ParagraphBlock extends Component {
 				<RichText
 					tagName="p"
 					className={ classnames( 'wp-block-paragraph', className, {
+						'has-text-color': textColor.color,
 						'has-background': backgroundColor.color,
 						'has-drop-cap': dropCap,
 						[ backgroundColor.class ]: backgroundColor.class,
