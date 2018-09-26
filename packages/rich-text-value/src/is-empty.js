@@ -27,13 +27,13 @@ export function isEmptyLine( { text, start, end } ) {
 		return true;
 	}
 
-	if ( start === 0 && text.slice( 0, 2 ) === '\n\n' ) {
+	if ( start === 0 && text.slice( 0, 1 ) === '\u2028' ) {
 		return true;
 	}
 
-	if ( start === text.length && text.slice( -2 ) === '\n\n' ) {
+	if ( start === text.length && text.slice( -1 ) === '\u2028' ) {
 		return true;
 	}
 
-	return text.slice( start - 2, end + 2 ) === '\n\n\n\n';
+	return text.slice( start - 1, end + 1 ) === '\u2028\u2028';
 }

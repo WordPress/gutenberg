@@ -102,10 +102,10 @@ describe( 'split', () => {
 
 	it( 'should split multiline', () => {
 		const record = {
-			formats: [ , , , , , , , , , , , , ],
-			text: 'test\n\n\n\ntest',
-			start: 6,
-			end: 6,
+			formats: [ , , , , , , , , , , ],
+			text: 'test\u2028\u2028test',
+			start: 5,
+			end: 5,
 		};
 		const expected = [
 			{

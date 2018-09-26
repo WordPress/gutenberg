@@ -34,27 +34,27 @@ describe( 'isEmptyLine', () => {
 		};
 		const two = {
 			formats: [ , , ],
-			text: '\n\n',
+			text: '\u2028',
 			start: 0,
 			end: 0,
 		};
 		const three = {
 			formats: [ , , ],
-			text: '\n\n',
-			start: 2,
-			end: 2,
+			text: '\u2028',
+			start: 1,
+			end: 1,
 		};
 		const four = {
 			formats: [ , , , , ],
-			text: '\n\n\n\n',
-			start: 2,
-			end: 2,
+			text: '\u2028\u2028',
+			start: 1,
+			end: 1,
 		};
 		const five = {
 			formats: [ , , , , ],
-			text: 'a\n\n\n\nb',
-			start: 3,
-			end: 3,
+			text: 'a\u2028\u2028b',
+			start: 2,
+			end: 2,
 		};
 
 		expect( isEmptyLine( one ) ).toBe( true );
@@ -67,25 +67,18 @@ describe( 'isEmptyLine', () => {
 	it( 'should return false', () => {
 		const one = {
 			formats: [ , , , , ],
-			text: '\n\n\n\n',
-			start: 3,
-			end: 3,
+			text: '\u2028a\u2028',
+			start: 1,
+			end: 1,
 		};
 		const two = {
 			formats: [ , , , , ],
-			text: '\n\na\n\n',
-			start: 2,
-			end: 2,
-		};
-		const three = {
-			formats: [ , , , , ],
-			text: '\n\n\n',
-			start: 2,
-			end: 2,
+			text: '\u2028\n',
+			start: 1,
+			end: 1,
 		};
 
 		expect( isEmptyLine( one ) ).toBe( false );
 		expect( isEmptyLine( two ) ).toBe( false );
-		expect( isEmptyLine( three ) ).toBe( false );
 	} );
 } );

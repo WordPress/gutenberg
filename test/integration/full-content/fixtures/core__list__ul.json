@@ -168,11 +168,6 @@
                     null,
                     null,
                     null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
                     [
                         {
                             "type": "em"
@@ -226,7 +221,7 @@
                     null,
                     null
                 ],
-                "text": "Text & Headings\n\nImages & Videos\n\nGalleries\n\nEmbeds, like YouTube, Tweets, or other WordPress posts.\n\nLayout blocks, like Buttons, Hero Images, Separators, etc.\n\nAnd Lists like this one of course :)"
+                "text": "Text & Headings Images & Videos Galleries Embeds, like YouTube, Tweets, or other WordPress posts. Layout blocks, like Buttons, Hero Images, Separators, etc. And Lists like this one of course :)"
             }
         },
         "innerBlocks": [],

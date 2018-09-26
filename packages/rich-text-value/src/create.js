@@ -391,8 +391,8 @@ function createFromMultilineElement( {
 
 		// Multiline value text should be separated by a double line break.
 		if ( index !== 0 ) {
-			accumulator.formats = accumulator.formats.concat( [ , , ] );
-			accumulator.text += '\n\n';
+			accumulator.formats = accumulator.formats.concat( [ , ] );
+			accumulator.text += '\u2028';
 		}
 
 		accumulateSelection( accumulator, node, range, value );

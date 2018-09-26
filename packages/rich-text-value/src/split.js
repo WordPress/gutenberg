@@ -67,7 +67,7 @@ function splitAtSelection(
 
 	return [
 		// Ensure newlines are trimmed.
-		replace( before, /\n+$/, '' ),
-		replace( after, /^\n+/, '' ),
+		replace( before, /\u2028+$/, '' ),
+		replace( after, /^\u2028+/, '' ),
 	];
 }

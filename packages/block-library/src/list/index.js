@@ -75,7 +75,9 @@ export const settings = {
 				blocks: [ 'core/paragraph' ],
 				transform: ( blockAttributes ) => {
 					return createBlock( 'core/list', {
-						values: join( blockAttributes.map( ( { content } ) => replace( content, /\n/g, '\n\n' ) ), '\n\n' ),
+						values: join( blockAttributes.map( ( { content } ) =>
+							replace( content, /\n/g, '\u2028' )
+						), '\u2028' ),
 					} );
 				},
 			},
@@ -130,7 +132,7 @@ export const settings = {
 				type: 'block',
 				blocks: [ 'core/paragraph' ],
 				transform: ( { values } ) =>
-					split( values, '\n\n' ).map( ( content ) =>
+					split( values, '\u2028' ).map( ( content ) =>
 						createBlock( 'core/paragraph', { content } )
 					),
 			},
@@ -190,7 +192,7 @@ export const settings = {
 
 		return {
 			...attributes,
-			values: join( [ attributes.values, valueToMerge ], '\n\n' ),
+			values: join( [ attributes.values, valueToMerge ], '\u2028' ),
 		};
 	},
 

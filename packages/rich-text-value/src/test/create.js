@@ -314,9 +314,9 @@ describe( 'create', () => {
 			} ),
 			record: {
 				start: 1,
-				end: 5,
-				formats: [ , , , , , , , , ],
-				text: 'one\n\ntwo',
+				end: 4,
+				formats: [ , , , , , , , ],
+				text: 'one\u2028two',
 			},
 		},
 		{
@@ -332,8 +332,8 @@ describe( 'create', () => {
 			record: {
 				start: 0,
 				end: 6,
-				formats: [ , , , list, list, list, , , , , , , , ],
-				text: 'onetwo\n\nthree',
+				formats: [ , , , list, list, list, , , , , , , ],
+				text: 'onetwo\u2028three',
 			},
 		},
 		{
@@ -347,10 +347,10 @@ describe( 'create', () => {
 				endContainer: element.lastChild,
 			} ),
 			record: {
-				start: 5,
-				end: 5,
-				formats: [ , , , , , ],
-				text: 'one\n\n',
+				start: 4,
+				end: 4,
+				formats: [ , , , , ],
+				text: 'one\u2028',
 			},
 		},
 		{

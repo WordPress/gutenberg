@@ -9,7 +9,7 @@ export function toTree( value, multilineTag, settings ) {
 		const { createEmpty, append } = settings;
 		const tree = createEmpty();
 
-		split( value, '\n\n' ).forEach( ( piece, index ) => {
+		split( value, '\u2028' ).forEach( ( piece, index ) => {
 			append( tree, toTree( piece, null, {
 				...settings,
 				tag: multilineTag,

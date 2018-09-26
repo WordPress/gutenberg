@@ -44,10 +44,9 @@
                     null,
                     null,
                     null,
-                    null,
                     null
                 ],
-                "text": "Paragraph one\n\nParagraph two"
+                "text": "Paragraph one Paragraph two"
             },
             "citation": {
                 "formats": [
