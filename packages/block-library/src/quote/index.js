@@ -57,7 +57,7 @@ export const settings = {
 				blocks: [ 'core/paragraph' ],
 				transform: ( attributes ) => {
 					return createBlock( 'core/quote', {
-						value: join( attributes.map( ( { content } ) => content ), '\n\n' ),
+						value: join( attributes.map( ( { content } ) => content ), '\u2028' ),
 					} );
 				},
 			},
@@ -98,7 +98,7 @@ export const settings = {
 				type: 'block',
 				blocks: [ 'core/paragraph' ],
 				transform: ( { value } ) =>
-					split( value, '\n\n' ).map( ( content ) =>
+					split( value, '\u2028' ).map( ( content ) =>
 						createBlock( 'core/paragraph', { content } )
 					),
 			},
@@ -115,7 +115,7 @@ export const settings = {
 						} );
 					}
 
-					const values = split( value, '\n\n' );
+					const values = split( value, '\u2028' );
 
 					return [
 						createBlock( 'core/heading', {
@@ -124,7 +124,7 @@ export const settings = {
 						createBlock( 'core/quote', {
 							...attrs,
 							citation,
-							value: join( values.slice( 1 ), '\n\n' ),
+							value: join( values.slice( 1 ), '\u2028' ),
 						} ),
 					];
 				},
@@ -196,7 +196,7 @@ export const settings = {
 	merge( attributes, attributesToMerge ) {
 		return {
 			...attributes,
-			value: join( [ attributes.value, attributesToMerge.value ], '\n\n' ),
+			value: join( [ attributes.value, attributesToMerge.value ], '\u2028' ),
 			citation: concat( attributes.citation, attributesToMerge.citation ),
 		};
 	},
