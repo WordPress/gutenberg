@@ -491,6 +491,7 @@ export class BlockListBlock extends Component {
 				) }
 				<BlockDropZone
 					index={ order }
+					clientId={ clientId }
 					rootClientId={ rootClientId }
 					layout={ layout }
 				/>
