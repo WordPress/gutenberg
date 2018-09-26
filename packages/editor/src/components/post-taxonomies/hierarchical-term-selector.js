@@ -6,7 +6,7 @@ import { get, unescape as unescapeString, without, find, some, invoke } from 'lo
 /**
  * WordPress dependencies
  */
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { TreeSelect, withSpokenMessages, withFilters, Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -257,13 +257,29 @@ class HierarchicalTermSelector extends Component {
 		const { availableTermsTree } = this.state;
 		const filterValue = event.target.value;
 		const filteredTermsTree = availableTermsTree.map( this.getFilterMatcher( filterValue ) ).filter( ( term ) => term );
+		const getResultCount = ( terms ) => {
+			let count = 0;
+			for ( let i = 0; i < terms.length; i++ ) {
+				count++;
+				if ( undefined !== terms[ i ].children ) {
+					count += getResultCount( terms[ i ].children );
+				}
+			}
+			return count;
+		};
 		this.setState(
 			{
 				filterValue,
 				filteredTermsTree,
 			}
 		);
-		// TODO: speak results summary.
+
+		const resultCount = getResultCount( filteredTermsTree );
+		const resultsFoundMessage = sprintf(
+			_n( '%d result found.', '%d results found.', resultCount, 'term' ),
+			resultCount
+		);
+		this.props.speak( resultsFoundMessage, 'assertive' );
 	}
 
 	getFilterMatcher( filterValue ) {
@@ -352,9 +368,29 @@ class HierarchicalTermSelector extends Component {
 		const newTermSubmitLabel = newTermButtonLabel;
 		const inputId = `editor-post-taxonomies__hierarchical-terms-input-${ instanceId }`;
 		const filterInputId = `editor-post-taxonomies__hierarchical-terms-filter-${ instanceId }`;
+		const filterLabel = sprintf(
+			_x( 'Search %s', 'term' ),
+			get(
+				this.props.taxonomy,
+				[ 'name' ],
+				slug === 'category' ? __( 'Categories' ) : __( 'Terms' )
+			)
+		);
+		const groupLabel = sprintf(
+			_x( 'Available %s', 'term' ),
+			get(
+				this.props.taxonomy,
+				[ 'name' ],
+				slug === 'category' ? __( 'Categories' ) : __( 'Terms' )
+			)
+		);
 
-		/* eslint-disable jsx-a11y/no-onchange */
 		return [
+			<label
+				key="filter-label"
+				htmlFor={ filterInputId }>
+				{ filterLabel }
+			</label>,
 			<input
 				type="search"
 				id={ filterInputId }
@@ -366,6 +402,9 @@ class HierarchicalTermSelector extends Component {
 			<div
 				className="editor-post-taxonomies__hierarchical-terms-list"
 				key="term-list"
+				tabIndex="0"
+				role="group"
+				aria-label={ groupLabel }
 			>
 				{ this.renderTerms( '' !== filterValue ? filteredTermsTree : availableTermsTree ) }
 			</div>,
