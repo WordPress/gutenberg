@@ -257,7 +257,8 @@ export function getEmbedEdit( title, icon ) {
 			const responsiveClassNames = this.getAspectRatioClassNames( html );
 
 			if ( allowResponsive ) {
-				// This will remove the responsive classes from the className attribute.
+				// Before toggling, we were allowing responsiveness, so
+				// this will remove the responsive classes from the className attribute.
 				for ( const property in responsiveClassNames ) {
 					responsiveClassNames[ property ] = false;
 				}
