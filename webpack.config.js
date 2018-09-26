@@ -15,6 +15,7 @@ const { basename } = require( 'path' );
  */
 const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
 const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-webpack-plugin' );
+const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 
 // Main CSS loader for everything but blocks..
 const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
@@ -120,9 +121,11 @@ const externals = {
 	};
 } );
 
-const config = {
-	mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+const isProduction = process.env.NODE_ENV === 'production';
+const mode = isProduction ? 'production' : 'development';
 
+const config = {
+	mode,
 	entry: Object.assign(
 		entryPointNames.reduce( ( memo, path ) => {
 			const name = camelCaseDash( path );
@@ -214,7 +217,7 @@ const config = {
 				to: `./build/${ packageName }/`,
 				flatten: true,
 				transform: ( content ) => {
-					if ( config.mode === 'production' ) {
+					if ( isProduction ) {
 						return postcss( [
 							require( 'cssnano' )( {
 								preset: 'default',
@@ -227,18 +230,16 @@ const config = {
 				},
 			} ) )
 		),
-	],
+		process.env.BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
+		! isProduction && new LiveReloadPlugin( { port: process.env.GUTENBERG_LIVE_RELOAD_PORT || 35729 } ),
+	].filter( Boolean ),
 	stats: {
 		children: false,
 	},
 };
 
-if ( config.mode !== 'production' ) {
+if ( ! isProduction ) {
 	config.devtool = process.env.SOURCEMAP || 'source-map';
-}
-
-if ( config.mode === 'development' ) {
-	config.plugins.push( new LiveReloadPlugin( { port: process.env.GUTENBERG_LIVE_RELOAD_PORT || 35729 } ) );
 }
 
 module.exports = config;
