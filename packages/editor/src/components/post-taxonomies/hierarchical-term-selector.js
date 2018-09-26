@@ -38,6 +38,8 @@ class HierarchicalTermSelector extends Component {
 		this.onChangeFormParent = this.onChangeFormParent.bind( this );
 		this.onAddTerm = this.onAddTerm.bind( this );
 		this.onToggleForm = this.onToggleForm.bind( this );
+		this.setFilterValue = this.setFilterValue.bind( this );
+		this.sortBySelected = this.sortBySelected.bind( this );
 		this.state = {
 			loading: true,
 			availableTermsTree: [],
@@ -47,6 +49,7 @@ class HierarchicalTermSelector extends Component {
 			formParent: '',
 			showForm: false,
 			filterValue: '',
+			filteredTermsTree: [],
 		};
 	}
 
@@ -153,7 +156,7 @@ class HierarchicalTermSelector extends Component {
 					formName: '',
 					formParent: '',
 					availableTerms: newAvailableTerms,
-					availableTermsTree: buildTermsTree( newAvailableTerms ),
+					availableTermsTree: this.sortBySelected( buildTermsTree( newAvailableTerms ) ),
 				} );
 				onUpdateTerms( [ ...terms, term.id ], taxonomy.rest_base );
 			}, ( xhr ) => {
@@ -192,7 +195,7 @@ class HierarchicalTermSelector extends Component {
 		} );
 		this.fetchRequest.then(
 			( terms ) => { // resolve
-				const availableTermsTree = buildTermsTree( terms );
+				const availableTermsTree = this.sortBySelected( buildTermsTree( terms ) );
 
 				this.fetchRequest = null;
 				this.setState( {
@@ -213,24 +216,90 @@ class HierarchicalTermSelector extends Component {
 		);
 	}
 
+	sortBySelected( termsTree ) {
+		const { terms } = this.props;
+		const treeHasSelection = ( termTree ) => {
+			if ( terms.indexOf( termTree.id ) !== -1 ) {
+				return true;
+			}
+			if ( undefined === termTree.children ) {
+				return false;
+			}
+			const anyChildIsSelected = termTree.children.map( treeHasSelection ).filter( ( child ) => child ).length > 0;
+			if ( anyChildIsSelected ) {
+				return true;
+			}
+			return false;
+		};
+		const termOrChildIsSelected = ( termA, termB ) => {
+			const termASelected = treeHasSelection( termA );
+			const termBSelected = treeHasSelection( termB );
+
+			if ( termASelected === termBSelected ) {
+				return 0;
+			}
+
+			if ( termASelected && ! termBSelected ) {
+				return -1;
+			}
+
+			if ( ! termASelected && termBSelected ) {
+				return 1;
+			}
+
+			return 0;
+		};
+		termsTree.sort( termOrChildIsSelected );
+		return termsTree;
+	}
+
+	setFilterValue( event ) {
+		const { availableTermsTree } = this.state;
+		const filterValue = event.target.value;
+		const filteredTermsTree = availableTermsTree.map( this.getFilterMatcher( filterValue ) ).filter( ( term ) => term );
+		this.setState(
+			{
+				filterValue,
+				filteredTermsTree,
+			}
+		);
+		// TODO: speak results summary.
+	}
+
+	getFilterMatcher( filterValue ) {
+		const matchTermsForFilter = ( originalTerm ) => {
+			if ( '' === filterValue ) {
+				return originalTerm;
+			}
+
+			// Shallow clone, because we'll be filtering the term's children and
+			// don't want to modify the original term.
+			const term = { ...originalTerm };
+
+			// Map and filter the children, recursive so we deal with grandchildren
+			// and any deeper levels.
+			if ( term.children.length > 0 ) {
+				term.children = term.children.map( matchTermsForFilter ).filter( ( child ) => child );
+			}
+
+			// If the term's name contains the filterValue, or it has children
+			// (i.e. some child matched at some point in the tree) then return it.
+			if ( -1 !== term.name.toLowerCase().indexOf( filterValue ) || term.children.length > 0 ) {
+				return term;
+			}
+
+			// Otherwise, return false. After mapping, the list of terms will need
+			// to have false values filtered out.
+			return false;
+		};
+		return matchTermsForFilter;
+	}
+
 	renderTerms( renderedTerms ) {
 		const { terms = [] } = this.props;
-		const { filterValue } = this.state;
 		return renderedTerms.map( ( term ) => {
 			const id = `editor-post-taxonomies-hierarchical-term-${ term.id }`;
-			const show = (
-				// No filter set.
-				'' === filterValue ||
-				// Filter value appears in the term name.
-				-1 !== term.name.toLowerCase().indexOf( filterValue.toLowerCase() ) ||
-				// Filter value appers in any of the children.
-				( term.children.length > 0 && term.children.map(
-					( childTerm ) => -1 !== childTerm.name.toLowerCase().indexOf( filterValue.toLowerCase() )
-				).reduce(
-					( appeared, appears ) => appeared || appears
-				) )
-			);
-			return show && (
+			return (
 				<div key={ term.id } className="editor-post-taxonomies__hierarchical-terms-choice">
 					<input
 						id={ id }
@@ -258,7 +327,7 @@ class HierarchicalTermSelector extends Component {
 			return null;
 		}
 
-		const { availableTermsTree, availableTerms, formName, formParent, loading, showForm, filterValue } = this.state;
+		const { availableTermsTree, availableTerms, filteredTermsTree, formName, formParent, loading, showForm, filterValue } = this.state;
 		const labelWithFallback = ( labelProperty, fallbackIsCategory, fallbackIsNotCategory ) => get(
 			taxonomy,
 			[ 'data', 'labels', labelProperty ],
@@ -290,7 +359,7 @@ class HierarchicalTermSelector extends Component {
 				type="search"
 				id={ filterInputId }
 				value={ filterValue }
-				onChange={ ( event ) => this.setState( { filterValue: event.target.value } ) }
+				onChange={ this.setFilterValue }
 				className="editor-post-taxonomies__hierarchical-terms-filter"
 				key="term-filter-input"
 			/>,
@@ -298,7 +367,7 @@ class HierarchicalTermSelector extends Component {
 				className="editor-post-taxonomies__hierarchical-terms-list"
 				key="term-list"
 			>
-				{ this.renderTerms( availableTermsTree ) }
+				{ this.renderTerms( '' !== filterValue ? filteredTermsTree : availableTermsTree ) }
 			</div>,
 			! loading && hasCreateAction && (
 				<Button
