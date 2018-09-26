@@ -165,6 +165,7 @@ Returns an action object used in signalling that entity records have been receiv
  * name: Name of the received entity.
  * records: Records received.
  * query: Query Object.
+ * invalidateCache: Should invalidate query caches
 
 ### receiveThemeSupports
 

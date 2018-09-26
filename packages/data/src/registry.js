@@ -7,6 +7,7 @@ import {
 	without,
 	mapValues,
 	get,
+	pick,
 } from 'lodash';
 
 /**
@@ -14,6 +15,7 @@ import {
  */
 import dataStore from './store';
 import promise from './promise-middleware';
+import createResolversCacheMiddleware from './resolvers-cache-middleware';
 
 /**
  * An isolated orchestrator of store registrations.
@@ -67,7 +69,7 @@ export function createRegistry( storeConfigs = {} ) {
 	 */
 	function registerReducer( reducerKey, reducer ) {
 		const enhancers = [
-			applyMiddleware( promise ),
+			applyMiddleware( createResolversCacheMiddleware( registry, reducerKey ), promise ),
 		];
 		if ( typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION__ ) {
 			enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__( { name: reducerKey, instanceId: reducerKey } ) );
@@ -117,11 +119,9 @@ export function createRegistry( storeConfigs = {} ) {
 	 */
 	function registerResolvers( reducerKey, newResolvers ) {
 		namespaces[ reducerKey ].resolvers = mapValues( newResolvers, ( resolver ) => {
-			if ( ! resolver.fulfill ) {
-				resolver = { fulfill: resolver };
-			}
-
-			return resolver;
+			const normalizedResolver = pick( resolver, [ 'shouldInvalidate', 'isFulfilled' ] );
+			normalizedResolver.fulfill = resolver.fulfill ? resolver.fulfill : resolver;
+			return normalizedResolver;
 		} );
 
 		namespaces[ reducerKey ].selectors = mapValues( namespaces[ reducerKey ].selectors, ( selector, selectorName ) => {

@@ -46,14 +46,15 @@ export function addEntities( entities ) {
 /**
  * Returns an action object used in signalling that entity records have been received.
  *
- * @param {string}       kind    Kind of the received entity.
- * @param {string}       name    Name of the received entity.
- * @param {Array|Object} records Records received.
- * @param {?Object}      query  Query Object.
+ * @param {string}       kind            Kind of the received entity.
+ * @param {string}       name            Name of the received entity.
+ * @param {Array|Object} records         Records received.
+ * @param {?Object}      query           Query Object.
+ * @param {?boolean}     invalidateCache Should invalidate query caches
  *
  * @return {Object} Action object.
  */
-export function receiveEntityRecords( kind, name, records, query ) {
+export function receiveEntityRecords( kind, name, records, query, invalidateCache = false ) {
 	let action;
 	if ( query ) {
 		action = receiveQueriedItems( records, query );
@@ -65,6 +66,7 @@ export function receiveEntityRecords( kind, name, records, query ) {
 		...action,
 		kind,
 		name,
+		invalidateCache,
 	};
 }
 
@@ -121,7 +123,7 @@ export function* saveEntityRecord( kind, name, record ) {
 		method: recordId ? 'PUT' : 'POST',
 		data: record,
 	} );
-	yield receiveEntityRecords( kind, name, updatedRecord );
+	yield receiveEntityRecords( kind, name, updatedRecord, undefined, true );
 
 	return updatedRecord;
 }

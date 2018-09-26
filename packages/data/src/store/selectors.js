@@ -69,3 +69,15 @@ export function hasFinishedResolution( state, reducerKey, selectorName, args = [
 export function isResolving( state, reducerKey, selectorName, args = [] ) {
 	return getIsResolving( state, reducerKey, selectorName, args ) === true;
 }
+
+/**
+ * Returns the list of the cached resolvers.
+ *
+ * @param {Object} state      Data state.
+ * @param {string} reducerKey Registered store reducer key.
+ *
+ * @return {Object} Resolvers mapped by args and selectorName.
+ */
+export function getCachedResolvers( state, reducerKey ) {
+	return get( state, reducerKey, {} );
+}

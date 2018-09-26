@@ -24,7 +24,6 @@ const DEFAULT_QUERY = {
 	per_page: -1,
 	orderby: 'name',
 	order: 'asc',
-	_fields: 'id,name,parent',
 };
 
 const MIN_TERMS_COUNT_FOR_FILTER = 8;

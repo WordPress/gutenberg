@@ -26,17 +26,26 @@ const createEntityRecordSelector = ( source ) => defaultEntities.reduce( ( resul
 	return result;
 }, {} );
 
-const createEntityRecordResolverOrAction = ( source ) => defaultEntities.reduce( ( result, entity ) => {
+const createEntityRecordAction = ( source ) => defaultEntities.reduce( ( result, entity ) => {
 	const { kind, name } = entity;
 	result[ getMethodName( kind, name ) ] = ( key ) => source.getEntityRecord( kind, name, key );
 	result[ getMethodName( kind, name, 'get', true ) ] = ( ...args ) => source.getEntityRecords( kind, name, ...args );
 	return result;
 }, {} );
 
-const entityActions = createEntityRecordResolverOrAction(
+const createEntityRecordResolver = ( source ) => defaultEntities.reduce( ( result, entity ) => {
+	const { kind, name } = entity;
+	result[ getMethodName( kind, name ) ] = ( key ) => source.getEntityRecord( kind, name, key );
+	const pluralMethodName = getMethodName( kind, name, 'get', true );
+	result[ pluralMethodName ] = ( ...args ) => source.getEntityRecords( kind, name, ...args );
+	result[ pluralMethodName ].shouldInvalidate = ( action, ...args ) => source.getEntityRecords.shouldInvalidate( action, kind, name, ...args );
+	return result;
+}, {} );
+
+const entityActions = createEntityRecordAction(
 	pick( actions, [ 'saveEntityRecord' ] )
 );
-const entityResolvers = createEntityRecordResolverOrAction( resolvers );
+const entityResolvers = createEntityRecordResolver( resolvers );
 const entitySelectors = createEntityRecordSelector( selectors );
 
 const store = registerStore( REDUCER_KEY, {
