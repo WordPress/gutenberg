@@ -117,7 +117,7 @@
 	// Ensure that the height of the first appender, and the one between blocks, is the same as text.
 	.editor-block-list__block[data-type="core/paragraph"] p[data-is-placeholder-visible="true"] + p,
 	.editor-default-block-appender__content {
-		height: $empty-paragraph-height / 2;
+		min-height: $empty-paragraph-height / 2;
 		line-height: $editor-line-height;
 	}
 }
