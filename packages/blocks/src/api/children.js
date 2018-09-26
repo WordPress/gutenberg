@@ -48,7 +48,7 @@ function getChildrenArray( children ) {
 	deprecated( 'children and node source', {
 		alternative: 'rich-text-value source',
 		plugin: 'Gutenberg',
-		version: '4.2',
+		version: '4.4',
 	} );
 
 	// The fact that block children are compatible with the element serializer
@@ -69,7 +69,7 @@ export function concat( ...blockNodes ) {
 	deprecated( 'wp.blocks.children.concat', {
 		alternative: 'wp.richTextValue.concat',
 		plugin: 'Gutenberg',
-		version: '4.2',
+		version: '4.4',
 	} );
 
 	const result = [];
@@ -105,7 +105,7 @@ export function fromDOM( domNodes ) {
 	deprecated( 'wp.blocks.children.fromDom', {
 		alternative: 'wp.richTextValue.create',
 		plugin: 'Gutenberg',
-		version: '4.2',
+		version: '4.4',
 	} );
 
 	const result = [];
@@ -131,7 +131,7 @@ export function toHTML( children ) {
 	deprecated( 'wp.blocks.children.toHTML', {
 		alternative: 'wp.richTextValue.toHTMLString',
 		plugin: 'Gutenberg',
-		version: '4.2',
+		version: '4.4',
 	} );
 
 	const element = getSerializeCapableElement( children );
@@ -151,7 +151,7 @@ export function matcher( selector ) {
 	deprecated( 'children source', {
 		alternative: 'rich-text-value source',
 		plugin: 'Gutenberg',
-		version: '4.2',
+		version: '4.4',
 	} );
 
 	return ( domNode ) => {

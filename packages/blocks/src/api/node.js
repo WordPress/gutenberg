@@ -37,7 +37,7 @@ function isNodeOfType( node, type ) {
 	deprecated( 'wp.blocks.node.isNodeOfType', {
 		alternative: 'node.type',
 		plugin: 'Gutenberg',
-		version: '4.2',
+		version: '4.4',
 	} );
 
 	return node && node.type === type;
@@ -77,7 +77,7 @@ export function fromDOM( domNode ) {
 	deprecated( 'wp.blocks.node.fromDOM', {
 		alternative: 'wp.richTextValue.create',
 		plugin: 'Gutenberg',
-		version: '4.2',
+		version: '4.4',
 	} );
 
 	if ( domNode.nodeType === TEXT_NODE ) {
@@ -111,7 +111,7 @@ export function toHTML( node ) {
 	deprecated( 'wp.blocks.node.toHTML', {
 		alternative: 'wp.richTextValue.toHTMLString',
 		plugin: 'Gutenberg',
-		version: '4.2',
+		version: '4.4',
 	} );
 
 	return children.toHTML( [ node ] );
@@ -129,7 +129,7 @@ export function matcher( selector ) {
 	deprecated( 'node source', {
 		alternative: 'rich-text-value source',
 		plugin: 'Gutenberg',
-		version: '4.2',
+		version: '4.4',
 	} );
 
 	return ( domNode ) => {
