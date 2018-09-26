@@ -6,7 +6,7 @@ export { attr, prop, html, text, query } from 'hpq';
 /**
  * WordPress dependencies
  */
-import { createValue } from '@wordpress/rich-text-value';
+import { create } from '@wordpress/rich-text-value';
 
 /**
  * Internal dependencies
@@ -22,6 +22,9 @@ export function richTextValue( selector, multilineTag ) {
 			match = domNode.querySelector( selector );
 		}
 
-		return createValue( match, multilineTag );
+		return create( {
+			element: match,
+			multilineTag,
+		} );
 	};
 }

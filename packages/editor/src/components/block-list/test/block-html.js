@@ -8,7 +8,7 @@ import { shallow } from 'enzyme';
  */
 import { createBlock } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
-import { createValue } from '@wordpress/rich-text-value';
+import { create } from '@wordpress/rich-text-value';
 
 /**
  * Internal dependencies
@@ -35,7 +35,7 @@ describe( 'BlockHTML', () => {
 
 		it( 'use block content for a valid block', () => {
 			const block = createBlock( 'core/paragraph', {
-				content: createValue( 'test-block' ),
+				content: create( { text: 'test-block' } ),
 				isValid: true,
 			} );
 

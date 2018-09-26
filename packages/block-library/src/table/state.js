@@ -6,7 +6,7 @@ import { times } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createValue } from '@wordpress/rich-text-value';
+import { create } from '@wordpress/rich-text-value';
 
 /**
  * Creates a table state.
@@ -23,7 +23,7 @@ export function createTable( {
 	return {
 		body: times( rowCount, () => ( {
 			cells: times( columnCount, () => ( {
-				content: createValue(),
+				content: create(),
 				tag: 'td',
 			} ) ),
 		} ) ),
@@ -89,7 +89,7 @@ export function insertRow( state, {
 			...state[ section ].slice( 0, rowIndex ),
 			{
 				cells: times( cellCount, () => ( {
-					content: createValue(),
+					content: create(),
 					tag: 'td',
 				} ) ),
 			},
@@ -134,7 +134,7 @@ export function insertColumn( state, {
 			cells: [
 				...row.cells.slice( 0, columnIndex ),
 				{
-					content: createValue(),
+					content: create(),
 					tag: 'td',
 				},
 				...row.cells.slice( columnIndex ),

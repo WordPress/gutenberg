@@ -8,7 +8,7 @@ import { JSDOM } from 'jsdom';
  * Internal dependencies
  */
 
-import { create, createValue } from '../create';
+import { create } from '../create';
 import { getSparseArrayLength } from './helpers';
 
 const { window } = new JSDOM();
@@ -304,7 +304,7 @@ describe( 'create', () => {
 		},
 		{
 			description: 'should handle multiline value',
-			multiline: 'p',
+			multilineTag: 'p',
 			html: '<p>one</p><p>two</p>',
 			createRange: ( element ) => ( {
 				startOffset: 1,
@@ -321,7 +321,7 @@ describe( 'create', () => {
 		},
 		{
 			description: 'should handle multiline list value',
-			multiline: 'li',
+			multilineTag: 'li',
 			html: '<li>one<ul><li>two</li></ul></li><li>three</li>',
 			createRange: ( element ) => ( {
 				startOffset: 0,
@@ -338,7 +338,7 @@ describe( 'create', () => {
 		},
 		{
 			description: 'should handle multiline value with empty',
-			multiline: 'p',
+			multilineTag: 'p',
 			html: '<p>one</p><p></p>',
 			createRange: ( element ) => ( {
 				startOffset: 0,
@@ -356,7 +356,7 @@ describe( 'create', () => {
 		{
 			description: 'should remove with settings',
 			settings: {
-				unwrapNodeMatch: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),
+				unwrapNode: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),
 			},
 			html: '<strong data-mce-bogus="true"></strong>',
 			createRange: ( element ) => ( {
@@ -375,7 +375,7 @@ describe( 'create', () => {
 		{
 			description: 'should remove br with settings',
 			settings: {
-				unwrapNodeMatch: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),
+				unwrapNode: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),
 			},
 			html: '<br data-mce-bogus="true">',
 			createRange: ( element ) => ( {
@@ -394,7 +394,7 @@ describe( 'create', () => {
 		{
 			description: 'should unwrap with settings',
 			settings: {
-				unwrapNodeMatch: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),
+				unwrapNode: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),
 			},
 			html: '<strong data-mce-bogus="true">te<em>st</em></strong>',
 			createRange: ( element ) => ( {
@@ -413,7 +413,7 @@ describe( 'create', () => {
 		{
 			description: 'should remove with children with settings',
 			settings: {
-				removeNodeMatch: ( node ) => node.getAttribute( 'data-mce-bogus' ) === 'all',
+				removeNode: ( node ) => node.getAttribute( 'data-mce-bogus' ) === 'all',
 			},
 			html: '<strong data-mce-bogus="all">one</strong>two',
 			createRange: ( element ) => ( {
@@ -432,7 +432,7 @@ describe( 'create', () => {
 		{
 			description: 'should filter format attributes with settings',
 			settings: {
-				removeAttributeMatch: ( attribute ) => attribute.indexOf( 'data-mce-' ) === 0,
+				removeAttribute: ( attribute ) => attribute.indexOf( 'data-mce-' ) === 0,
 			},
 			html: '<strong data-mce-selected="inline-boundary">test</strong>',
 			createRange: ( element ) => ( {
@@ -526,23 +526,21 @@ describe( 'create', () => {
 		},
 	];
 
-	spec.forEach( ( { description, multiline, settings, html, createRange, record } ) => {
+	spec.forEach( ( { description, multilineTag, settings, html, createRange, record } ) => {
 		it( description, () => {
 			const element = createElement( html );
 			const range = createRange( element );
-			const createdRecord = create( element, range, multiline, settings );
-			expect( createdRecord ).toEqual( record );
+			const createdRecord = create( { element, range, multilineTag, ...settings } );
+			const formatsLength = getSparseArrayLength( record.formats );
+			const createdFormatsLength = getSparseArrayLength( createdRecord.formats );
 
-			if ( ! multiline ) {
-				const formatsLength = getSparseArrayLength( record.formats );
-				const createdFormatsLength = getSparseArrayLength( createdRecord.formats );
-				expect( createdFormatsLength ).toEqual( formatsLength );
-			}
+			expect( createdRecord ).toEqual( record );
+			expect( createdFormatsLength ).toEqual( formatsLength );
 		} );
 	} );
 
 	it( 'should reference formats', () => {
-		const value = createValue( '<em>te<strong>st</strong></em>' );
+		const value = create( { html: '<em>te<strong>st</strong></em>' } );
 
 		expect( value ).toEqual( {
 			formats: [ [ em ], [ em ], [ em, strong ], [ em, strong ] ],

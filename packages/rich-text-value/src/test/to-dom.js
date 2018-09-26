@@ -29,16 +29,16 @@ function createElement( html ) {
 describe( 'recordToDom', () => {
 	it( 'should extract recreate HTML 1', () => {
 		const HTML = 'one <em>two 🍒</em> <a href="#"><img src=""><strong>three</strong></a><img src="">';
-		const node = createNode( `<p>${ HTML }</p>` );
+		const element = createNode( `<p>${ HTML }</p>` );
 		const range = {
 			startOffset: 1,
-			startContainer: node.querySelector( 'em' ).firstChild,
+			startContainer: element.querySelector( 'em' ).firstChild,
 			endOffset: 1,
-			endContainer: node.querySelector( 'strong' ).firstChild,
+			endContainer: element.querySelector( 'strong' ).firstChild,
 		};
-		const { body, selection } = toDom( create( node, range ) );
+		const { body, selection } = toDom( create( { element, range } ) );
 
-		expect( body.innerHTML ).toEqual( node.innerHTML );
+		expect( body.innerHTML ).toEqual( element.innerHTML );
 		expect( selection ).toEqual( {
 			startPath: [ 1, 0, 1 ],
 			endPath: [ 3, 1, 0, 1 ],
@@ -47,16 +47,16 @@ describe( 'recordToDom', () => {
 
 	it( 'should extract recreate HTML 2', () => {
 		const HTML = 'one <em>two 🍒</em> <a href="#">test <img src=""><strong>three</strong></a><img src="">';
-		const node = createNode( `<p>${ HTML }</p>` );
+		const element = createNode( `<p>${ HTML }</p>` );
 		const range = {
 			startOffset: 1,
-			startContainer: node.querySelector( 'em' ).firstChild,
+			startContainer: element.querySelector( 'em' ).firstChild,
 			endOffset: 0,
-			endContainer: node.querySelector( 'strong' ).firstChild,
+			endContainer: element.querySelector( 'strong' ).firstChild,
 		};
-		const { body, selection } = toDom( create( node, range ) );
+		const { body, selection } = toDom( create( { element, range } ) );
 
-		expect( body.innerHTML ).toEqual( node.innerHTML );
+		expect( body.innerHTML ).toEqual( element.innerHTML );
 		expect( selection ).toEqual( {
 			startPath: [ 1, 0, 1 ],
 			endPath: [ 3, 2, 0 ],
@@ -65,16 +65,16 @@ describe( 'recordToDom', () => {
 
 	it( 'should extract recreate HTML 3', () => {
 		const HTML = '<img src="">';
-		const node = createNode( `<p>${ HTML }</p>` );
+		const element = createNode( `<p>${ HTML }</p>` );
 		const range = {
 			startOffset: 0,
-			startContainer: node,
+			startContainer: element,
 			endOffset: 1,
-			endContainer: node,
+			endContainer: element,
 		};
-		const { body, selection } = toDom( create( node, range ) );
+		const { body, selection } = toDom( create( { element, range } ) );
 
-		expect( body.innerHTML ).toEqual( node.innerHTML );
+		expect( body.innerHTML ).toEqual( element.innerHTML );
 		expect( selection ).toEqual( {
 			startPath: [],
 			endPath: [],
@@ -83,16 +83,16 @@ describe( 'recordToDom', () => {
 
 	it( 'should extract recreate HTML 4', () => {
 		const HTML = '<em>two 🍒</em>';
-		const node = createNode( `<p>${ HTML }</p>` );
+		const element = createNode( `<p>${ HTML }</p>` );
 		const range = {
 			startOffset: 1,
-			startContainer: node.querySelector( 'em' ).firstChild,
+			startContainer: element.querySelector( 'em' ).firstChild,
 			endOffset: 2,
-			endContainer: node.querySelector( 'em' ).firstChild,
+			endContainer: element.querySelector( 'em' ).firstChild,
 		};
-		const { body, selection } = toDom( create( node, range ) );
+		const { body, selection } = toDom( create( { element, range } ) );
 
-		expect( body.innerHTML ).toEqual( node.innerHTML );
+		expect( body.innerHTML ).toEqual( element.innerHTML );
 		expect( selection ).toEqual( {
 			startPath: [ 0, 0, 1 ],
 			endPath: [ 0, 0, 2 ],
@@ -101,16 +101,16 @@ describe( 'recordToDom', () => {
 
 	it( 'should extract recreate HTML 5', () => {
 		const HTML = '<em>If you want to learn more about how to build additional blocks, or if you are interested in helping with the project, head over to the <a href="https://github.com/WordPress/gutenberg">GitHub repository</a>.</em>';
-		const node = createNode( `<p>${ HTML }</p>` );
+		const element = createNode( `<p>${ HTML }</p>` );
 		const range = {
 			startOffset: 1,
-			startContainer: node.querySelector( 'em' ).firstChild,
+			startContainer: element.querySelector( 'em' ).firstChild,
 			endOffset: 0,
-			endContainer: node.querySelector( 'a' ).firstChild,
+			endContainer: element.querySelector( 'a' ).firstChild,
 		};
-		const { body, selection } = toDom( create( node, range ) );
+		const { body, selection } = toDom( create( { element, range } ) );
 
-		expect( body.innerHTML ).toEqual( node.innerHTML );
+		expect( body.innerHTML ).toEqual( element.innerHTML );
 		expect( selection ).toEqual( {
 			startPath: [ 0, 0, 1 ],
 			endPath: [ 0, 0, 135 ],
@@ -119,16 +119,16 @@ describe( 'recordToDom', () => {
 
 	it( 'should create correct selection path ', () => {
 		const HTML = 'test <em>italic</em>';
-		const node = createNode( `<p>${ HTML }</p>` );
+		const element = createNode( `<p>${ HTML }</p>` );
 		const range = {
 			startOffset: 1,
-			startContainer: node,
+			startContainer: element,
 			endOffset: 2,
-			endContainer: node,
+			endContainer: element,
 		};
-		const { body, selection } = toDom( create( node, range ) );
+		const { body, selection } = toDom( create( { element, range } ) );
 
-		expect( body.innerHTML ).toEqual( node.innerHTML );
+		expect( body.innerHTML ).toEqual( element.innerHTML );
 		expect( selection ).toEqual( {
 			startPath: [ 0, 5 ],
 			endPath: [ 1, 0, 6 ],
@@ -137,16 +137,17 @@ describe( 'recordToDom', () => {
 
 	it( 'should extract recreate HTML 6', () => {
 		const HTML = '<li>one<ul><li>two</li></ul></li><li>three</li>';
-		const node = createNode( `<ul>${ HTML }</ul>` );
+		const element = createNode( `<ul>${ HTML }</ul>` );
 		const range = {
 			startOffset: 1,
-			startContainer: node.querySelector( 'li' ).firstChild,
+			startContainer: element.querySelector( 'li' ).firstChild,
 			endOffset: 2,
-			endContainer: node.querySelector( 'li' ).firstChild,
+			endContainer: element.querySelector( 'li' ).firstChild,
 		};
-		const { body, selection } = toDom( create( node, range, 'li' ), 'li' );
+		const multilineTag = 'li';
+		const { body, selection } = toDom( create( { element, range, multilineTag } ), 'li' );
 
-		expect( body.innerHTML ).toEqual( node.innerHTML );
+		expect( body.innerHTML ).toEqual( element.innerHTML );
 		expect( selection ).toEqual( {
 			startPath: [ 0, 0, 1 ],
 			endPath: [ 0, 0, 2 ],

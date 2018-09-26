@@ -1,6 +1,6 @@
 export { applyFormat } from './apply-format';
 export { concat } from './concat';
-export { create, createValue } from './create';
+export { create } from './create';
 export { getActiveFormat } from './get-active-format';
 export { getTextContent } from './get-text-content';
 export { isCollapsed } from './is-collapsed';

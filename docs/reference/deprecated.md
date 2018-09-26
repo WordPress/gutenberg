@@ -4,14 +4,14 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 
 - Writing resolvers as async generators has been removed. Use the controls plugin instead.
 - `wp.components.AccessibleSVG` component has been removed. Please use `wp.components.SVG` instead.
-- The block attribute source type `node` has been removed. Please use the `children` source type instead with a `multiline` property passing the right tag. See the core quote and list blocks for examples.
-- `wp.blocks.node.matcher` has been removed. Please use `wp.blocks.children.matcher` with the `multilineTag` argument instead.
+- The block attribute sources `children` and `node` have been removed. Please use the `rich-text-value` source instead. See the core blocks for examples.
+- `wp.blocks.node.matcher` has been removed. Please use `wp.richTextValue.create` instead.
 - `wp.blocks.node.toHTML` has been removed. Please use `wp.richTextValue.toHTMLString` instead.
-- `wp.blocks.node.fromDOM` has been removed. Please use `wp.richTextValue.createValue` instead.
+- `wp.blocks.node.fromDOM` has been removed. Please use `wp.richTextValue.create` instead.
 - `wp.blocks.children.toHTML` has been removed. Please use `wp.richTextValue.toHTMLString` instead.
-- `wp.blocks.children.fromDOM` has been removed. Please use `wp.richTextValue.createValue` instead.
+- `wp.blocks.children.fromDOM` has been removed. Please use `wp.richTextValue.create` instead.
 - `wp.blocks.children.concat` has been removed. Please use `wp.richTextValue.concat` instead.
-- `wp.blocks.children.getChildrenArray` has been removed. Please use `wp.richTextValue.createValue` instead.
+- `wp.blocks.children.getChildrenArray` has been removed. Please use `wp.richTextValue.create` instead.
 
 ## 4.1.0
 

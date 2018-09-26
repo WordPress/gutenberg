@@ -35,7 +35,6 @@ import {
 	applyFormat,
 	split,
 	toHTMLString,
-	createValue,
 	getTextContent,
 	insert,
 	isEmptyLine,
@@ -70,13 +69,6 @@ const { Node, getSelection } = window;
  * @type {string}
  */
 const TINYMCE_ZWSP = '\uFEFF';
-
-const richTextStructureSettings = {
-	removeNodeMatch: ( node ) => node.getAttribute( 'data-mce-bogus' ) === 'all',
-	unwrapNodeMatch: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),
-	removeAttributeMatch: ( attribute ) => attribute.indexOf( 'data-mce-' ) === 0,
-	filterString: ( string ) => string.replace( TINYMCE_ZWSP, '' ),
-};
 
 export class RichText extends Component {
 	constructor( { value, onReplace, multiline } ) {
@@ -238,7 +230,15 @@ export class RichText extends Component {
 		const { multiline } = this.props;
 		const range = window.getSelection().getRangeAt( 0 );
 
-		return create( this.editableRef, range, multiline, richTextStructureSettings );
+		return create( {
+			element: this.editableRef,
+			range,
+			multilineTag: multiline,
+			removeNode: ( node ) => node.getAttribute( 'data-mce-bogus' ) === 'all',
+			unwrapNode: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),
+			removeAttribute: ( attribute ) => attribute.indexOf( 'data-mce-' ) === 0,
+			filterString: ( string ) => string.replace( TINYMCE_ZWSP, '' ),
+		} );
 	}
 
 	applyRecord( record ) {
@@ -789,11 +789,17 @@ export class RichText extends Component {
 
 		// Handle deprecated `children` and `node` sources.
 		if ( Array.isArray( value ) ) {
-			return createValue( children.toHTML( value ), multiline );
+			return create( {
+				html: children.toHTML( value ),
+				multilineTag: multiline,
+			} );
 		}
 
 		if ( format === 'string' ) {
-			return createValue( value, multiline );
+			return create( {
+				html: value,
+				multilineTag: multiline,
+			} );
 		}
 
 		return value;

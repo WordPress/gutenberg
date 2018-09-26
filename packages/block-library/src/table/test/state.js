@@ -6,7 +6,7 @@ import deepFreeze from 'deep-freeze';
 /**
  * WordPress dependencies
  */
-import { createValue } from '@wordpress/rich-text-value';
+import { create } from '@wordpress/rich-text-value';
 
 /**
  * Internal dependencies
@@ -25,11 +25,11 @@ const table = deepFreeze( {
 		{
 			cells: [
 				{
-					content: createValue(),
+					content: create(),
 					tag: 'td',
 				},
 				{
-					content: createValue(),
+					content: create(),
 					tag: 'td',
 				},
 			],
@@ -37,11 +37,11 @@ const table = deepFreeze( {
 		{
 			cells: [
 				{
-					content: createValue(),
+					content: create(),
 					tag: 'td',
 				},
 				{
-					content: createValue(),
+					content: create(),
 					tag: 'td',
 				},
 			],
@@ -54,11 +54,11 @@ const tableWithContent = deepFreeze( {
 		{
 			cells: [
 				{
-					content: createValue(),
+					content: create(),
 					tag: 'td',
 				},
 				{
-					content: createValue(),
+					content: create(),
 					tag: 'td',
 				},
 			],
@@ -66,11 +66,11 @@ const tableWithContent = deepFreeze( {
 		{
 			cells: [
 				{
-					content: createValue(),
+					content: create(),
 					tag: 'td',
 				},
 				{
-					content: createValue( 'test' ),
+					content: create( { text: 'test' } ),
 					tag: 'td',
 				},
 			],
@@ -92,7 +92,7 @@ describe( 'updateCellContent', () => {
 			section: 'body',
 			rowIndex: 1,
 			columnIndex: 1,
-			content: createValue( 'test' ),
+			content: create( { text: 'test' } ),
 		} );
 
 		expect( state ).toEqual( tableWithContent );
@@ -111,23 +111,11 @@ describe( 'insertRow', () => {
 				{
 					cells: [
 						{
-							content: createValue(),
+							content: create(),
 							tag: 'td',
 						},
 						{
-							content: createValue(),
-							tag: 'td',
-						},
-					],
-				},
-				{
-					cells: [
-						{
-							content: createValue(),
-							tag: 'td',
-						},
-						{
-							content: createValue( 'test' ),
+							content: create(),
 							tag: 'td',
 						},
 					],
@@ -135,11 +123,23 @@ describe( 'insertRow', () => {
 				{
 					cells: [
 						{
-							content: createValue(),
+							content: create(),
 							tag: 'td',
 						},
 						{
-							content: createValue(),
+							content: create( { text: 'test' } ),
+							tag: 'td',
+						},
+					],
+				},
+				{
+					cells: [
+						{
+							content: create(),
+							tag: 'td',
+						},
+						{
+							content: create(),
 							tag: 'td',
 						},
 					],
@@ -163,15 +163,15 @@ describe( 'insertColumn', () => {
 				{
 					cells: [
 						{
-							content: createValue(),
+							content: create(),
 							tag: 'td',
 						},
 						{
-							content: createValue(),
+							content: create(),
 							tag: 'td',
 						},
 						{
-							content: createValue(),
+							content: create(),
 							tag: 'td',
 						},
 					],
@@ -179,15 +179,15 @@ describe( 'insertColumn', () => {
 				{
 					cells: [
 						{
-							content: createValue(),
+							content: create(),
 							tag: 'td',
 						},
 						{
-							content: createValue( 'test' ),
+							content: create( { text: 'test' } ),
 							tag: 'td',
 						},
 						{
-							content: createValue(),
+							content: create(),
 							tag: 'td',
 						},
 					],
@@ -211,11 +211,11 @@ describe( 'deleteRow', () => {
 				{
 					cells: [
 						{
-							content: createValue(),
+							content: create(),
 							tag: 'td',
 						},
 						{
-							content: createValue( 'test' ),
+							content: create( { text: 'test' } ),
 							tag: 'td',
 						},
 					],
@@ -239,7 +239,7 @@ describe( 'deleteColumn', () => {
 				{
 					cells: [
 						{
-							content: createValue(),
+							content: create(),
 							tag: 'td',
 						},
 					],
@@ -247,7 +247,7 @@ describe( 'deleteColumn', () => {
 				{
 					cells: [
 						{
-							content: createValue( 'test' ),
+							content: create( { text: 'test' } ),
 							tag: 'td',
 						},
 					],
@@ -264,7 +264,7 @@ describe( 'deleteColumn', () => {
 				{
 					cells: [
 						{
-							content: createValue(),
+							content: create(),
 							tag: 'td',
 						},
 					],
@@ -272,7 +272,7 @@ describe( 'deleteColumn', () => {
 				{
 					cells: [
 						{
-							content: createValue( 'test' ),
+							content: create( { text: 'test' } ),
 							tag: 'td',
 						},
 					],

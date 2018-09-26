@@ -24,7 +24,7 @@ export function insert(
 	endIndex = end
 ) {
 	if ( typeof valueToInsert === 'string' ) {
-		valueToInsert = create( valueToInsert );
+		valueToInsert = create( { text: valueToInsert } );
 	}
 
 	const index = startIndex + valueToInsert.text.length;

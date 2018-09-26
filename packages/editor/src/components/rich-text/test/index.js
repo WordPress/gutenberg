@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * WordPress dependencies
  */
-import { createValue } from '@wordpress/rich-text-value';
+import { create } from '@wordpress/rich-text-value';
 
 /**
  * Internal dependencies
@@ -17,7 +17,7 @@ import { diffAriaProps, pickAriaProps } from '../aria';
 describe( 'RichText', () => {
 	describe( 'Component', () => {
 		describe( '.getSettings', () => {
-			const value = createValue();
+			const value = create();
 			const settings = {
 				setting: 'hi',
 			};

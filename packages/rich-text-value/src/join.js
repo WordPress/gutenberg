@@ -16,7 +16,7 @@ import { create } from './create';
  */
 export function join( values, separator = '' ) {
 	if ( typeof separator === 'string' ) {
-		separator = create( separator );
+		separator = create( { text: separator } );
 	}
 
 	return values.reduce( ( accumlator, { formats, text } ) => {

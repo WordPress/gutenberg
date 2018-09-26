@@ -32,53 +32,74 @@ function createEmptyValue() {
 /**
  * Create a RichText value from an `Element` tree (DOM), an HTML string or a
  * plain text string, with optionally a `Range` object to set the selection. If
- * called without a given `input`, an empty value will be created. If
+ * called without any input, an empty value will be created. If
  * `multilineTag` is provided, any content of direct children whose type matches
- * `multilineTag` will be separated by two newlines. The `settings` object can
+ * `multilineTag` will be separated by two newlines. The optional functions can
  * be used to filter out content.
  *
- * @param {Element} element      Element to create value from.
- * @param {Range}   range        Range to create value from.
- * @param {string}  multilineTag Multiline tag if the structure is multiline.
- * @param {Object}  settings     Settings passed to `createFromElement`.
+ * @param {?Object}   $1                 Optional named argements.
+ * @param {?Element}  $1.element         Element to create value from.
+ * @param {?string}   $1.text            Text to create value from.
+ * @param {?string}   $1.html            HTML to create value from.
+ * @param {?Range}    $1.range           Range to create value from.
+ * @param {?string}   $1.multilineTag    Multiline tag if the structure is
+ *                                       multiline.
+ * @param {?Function} $1.removeNode      Function to declare whether the given
+ *                                       node should be removed.
+ * @param {?Function} $1.unwrapNode      Function to declare whether the given
+ *                                       node should be unwrapped.
+ * @param {?Function} $1.filterString    Function to filter the given string.
+ * @param {?Function} $1.removeAttribute Wether to remove an attribute based on
+ *                                       the name.
  *
  * @return {Object} A rich text value.
  */
-export function create( element, range, multilineTag, settings ) {
-	if ( ! element ) {
+export function create( {
+	element,
+	text,
+	html,
+	range,
+	multilineTag,
+	removeNode,
+	unwrapNode,
+	filterString,
+	removeAttribute,
+} = {} ) {
+	if ( typeof text === 'string' && text.length > 0 ) {
+		return {
+			formats: Array( text.length ),
+			text: text,
+		};
+	}
+
+	if ( typeof html === 'string' && html.length > 0 ) {
+		element = createElement( html );
+	}
+
+	if ( typeof element !== 'object' ) {
 		return createEmptyValue();
 	}
 
-	if ( typeof element === 'string' ) {
-		if ( element.indexOf( '<' ) !== -1 || /[^\s]+;/.test( element ) ) {
-			// May be HTML.
-			element = createElement( element );
-		} else {
-			return {
-				formats: Array( element.length ),
-				text: element,
-			};
-		}
-	}
-
 	if ( ! multilineTag ) {
-		return createFromElement( element, range, settings );
+		return createFromElement( {
+			element,
+			range,
+			removeNode,
+			unwrapNode,
+			filterString,
+			removeAttribute,
+		} );
 	}
 
-	return createFromMultilineElement( element, range, multilineTag, settings );
-}
-
-/**
- * Creates a rich text value from a DOM element.
- *
- * @param {Element} element      Element to create value object from.
- * @param {string}  multilineTag Multiline tag.
- * @param {Object}  settings     Settings passed to `createFromElement`.
- *
- * @return {Object} A rich text value.
- */
-export function createValue( element, multilineTag, settings ) {
-	return create( element, null, multilineTag, settings );
+	return createFromMultilineElement( {
+		element,
+		range,
+		multilineTag,
+		removeNode,
+		unwrapNode,
+		filterString,
+		removeAttribute,
+	} );
 }
 
 /**
@@ -159,39 +180,52 @@ function filterRange( node, range, filter ) {
 /**
  * Creates a Rich Text value from a DOM element and range.
  *
- * @param {Element}  element                  ELement to create value with.
- * @param {Range}    range                    Range to create value with.
- * @param {Object}   settings                 Settings object.
- * @param {Function} settings.removeNodeMatch Function to declare whether the
- *                                            given node should be removed.
- * @param {Function} settings.unwrapNodeMatch Function to declare whether the
- *                                            given node should be unwrapped.
- * @param {Function} settings.filterString    Function to filter the given
- *                                            string.
- * @param {Function} settings.removeAttribute Match Wether to remove an
- *                                            attribute based on the name.
+ * @param {Object}    $1                 Named argements.
+ * @param {?Element}  $1.element         Element to create value from.
+ * @param {?Range}    $1.range           Range to create value from.
+ * @param {?Function} $1.removeNode      Function to declare whether the given
+ *                                       node should be removed.
+ * @param {?Function} $1.unwrapNode      Function to declare whether the given
+ *                                       node should be unwrapped.
+ * @param {?Function} $1.filterString    Function to filter the given string.
+ * @param {?Function} $1.removeAttribute Wether to remove an attribute based on
+ *                                       the name.
  *
  * @return {Object} A rich text value.
  */
-function createFromElement( element, range, settings = {} ) {
+function createFromElement( {
+	element,
+	range,
+	removeNode,
+	unwrapNode,
+	filterString,
+	removeAttribute,
+} ) {
 	const accumulator = createEmptyValue();
 
-	if ( ! element || ! element.hasChildNodes() ) {
+	if ( ! element ) {
+		return accumulator;
+	}
+
+	if ( ! element.hasChildNodes() ) {
 		accumulateSelection( accumulator, element, range, createEmptyValue() );
 		return accumulator;
 	}
 
-	const {
-		removeNodeMatch = () => false,
-		unwrapNodeMatch = () => false,
-		filterString = ( string ) => string,
-		removeAttributeMatch,
-	} = settings;
+	const length = element.childNodes.length;
+
 	// Remove any line breaks in text nodes. They are not content, but used to
 	// format the HTML. Line breaks in HTML are stored as BR elements.
 	// See https://www.w3.org/TR/html5/syntax.html#newlines.
-	const filterStringComplete = ( string ) => filterString( string.replace( /[\r\n]/g, '' ) );
-	const length = element.childNodes.length;
+	const filterStringComplete = ( string ) => {
+		string = string.replace( /[\r\n]/g, '' );
+
+		if ( filterString ) {
+			string = filterString( string );
+		}
+
+		return string;
+	};
 
 	// Optimise for speed.
 	for ( let index = 0; index < length; index++ ) {
@@ -213,8 +247,8 @@ function createFromElement( element, range, settings = {} ) {
 		}
 
 		if (
-			removeNodeMatch( node ) ||
-			( unwrapNodeMatch( node ) && ! node.hasChildNodes() )
+			( removeNode && removeNode( node ) ) ||
+			( unwrapNode && unwrapNode( node ) && ! node.hasChildNodes() )
 		) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			continue;
@@ -229,13 +263,25 @@ function createFromElement( element, range, settings = {} ) {
 
 		let format;
 
-		if ( ! unwrapNodeMatch( node ) ) {
+		if ( ! unwrapNode || ! unwrapNode( node ) ) {
 			const type = node.nodeName.toLowerCase();
-			const attributes = getAttributes( node, { removeAttributeMatch } );
+			const attributes = getAttributes( {
+				element: node,
+				removeAttribute,
+			} );
+
 			format = attributes ? { type, attributes } : { type };
 		}
 
-		const value = createFromElement( node, range, settings );
+		const value = createFromElement( {
+			element: node,
+			range,
+			removeNode,
+			unwrapNode,
+			filterString,
+			removeAttribute,
+		} );
+
 		const text = value.text;
 		const start = accumulator.text.length;
 
@@ -293,14 +339,30 @@ function createFromElement( element, range, settings = {} ) {
  * Creates a rich text value from a DOM element and range that should be
  * multiline.
  *
- * @param {Element} element      Element to create value from.
- * @param {Range}   range        Range to create value from.
- * @param {string}  multilineTag Multiline tag if the structure is multiline.
- * @param {Object}  settings     Settings passed to `createFromElement`.
+ * @param {Object}    $1                 Named argements.
+ * @param {?Element}  $1.element         Element to create value from.
+ * @param {?Range}    $1.range           Range to create value from.
+ * @param {?string}   $1.multilineTag    Multiline tag if the structure is
+ *                                       multiline.
+ * @param {?Function} $1.removeNode      Function to declare whether the given
+ *                                       node should be removed.
+ * @param {?Function} $1.unwrapNode      Function to declare whether the given
+ *                                       node should be unwrapped.
+ * @param {?Function} $1.filterString    Function to filter the given string.
+ * @param {?Function} $1.removeAttribute Wether to remove an attribute based on
+ *                                       the name.
  *
  * @return {Object} A rich text value.
  */
-function createFromMultilineElement( element, range, multilineTag, settings ) {
+function createFromMultilineElement( {
+	element,
+	range,
+	multilineTag,
+	removeNode,
+	unwrapNode,
+	filterString,
+	removeAttribute,
+} ) {
 	const accumulator = createEmptyValue();
 
 	if ( ! element || ! element.hasChildNodes() ) {
@@ -317,7 +379,15 @@ function createFromMultilineElement( element, range, multilineTag, settings ) {
 			continue;
 		}
 
-		const value = createFromElement( node, range, settings );
+		const value = createFromElement( {
+			element: node,
+			range,
+			multilineTag,
+			removeNode,
+			unwrapNode,
+			filterString,
+			removeAttribute,
+		} );
 
 		// Multiline value text should be separated by a double line break.
 		if ( index !== 0 ) {
@@ -337,18 +407,17 @@ function createFromMultilineElement( element, range, multilineTag, settings ) {
 /**
  * Gets the attributes of an element in object shape.
  *
- * @param {Element}  element                       Element to get attributes
- *                                                 from.
- * @param {Function} settings.removeAttributeMatch Function whose return value
- *                                                 determines whether or not to
- *                                                 remove an attribute based on
- *                                                 name.
+ * @param {Object}    $1                 Named argements.
+ * @param {Element}   $1.element         Element to get attributes from.
+ * @param {?Function} $1.removeAttribute Wether to remove an attribute based on
+ *                                       the name.
  *
  * @return {?Object} Attribute object or `undefined` if the element has no
  *                   attributes.
  */
-function getAttributes( element, {
-	removeAttributeMatch = () => false,
+function getAttributes( {
+	element,
+	removeAttribute,
 } ) {
 	if ( ! element.hasAttributes() ) {
 		return;
@@ -361,7 +430,7 @@ function getAttributes( element, {
 	for ( let i = 0; i < length; i++ ) {
 		const { name, value } = element.attributes[ i ];
 
-		if ( removeAttributeMatch( name ) ) {
+		if ( removeAttribute && removeAttribute( name ) ) {
 			continue;
 		}
 
