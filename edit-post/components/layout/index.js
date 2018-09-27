@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -35,7 +34,6 @@ import VisualEditor from '../visual-editor';
 import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import MetaBoxes from '../meta-boxes';
-import { getMetaBoxContainer } from '../../utils/meta-boxes';
 import Sidebar from '../sidebar';
 import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
@@ -49,7 +47,6 @@ function Layout( {
 	hasFixedToolbar,
 	closePublishSidebar,
 	togglePublishSidebar,
-	metaBoxes,
 	hasActiveMetaboxes,
 	isSaving,
 	isMobileViewport,
@@ -71,12 +68,7 @@ function Layout( {
 		<div className={ className }>
 			<FullscreenMode />
 			<BrowserURL />
-			<UnsavedChangesWarning forceIsDirty={ () => {
-				return some( metaBoxes, ( metaBox, location ) => {
-					return metaBox.isActive &&
-						jQuery( getMetaBoxContainer( location ) ).serialize() !== metaBox.data;
-				} );
-			} } />
+			<UnsavedChangesWarning />
 			<AutosaveMonitor />
 			<Header />
 			<div
@@ -142,7 +134,6 @@ export default compose(
 		pluginSidebarOpened: select( 'core/edit-post' ).isPluginSidebarOpened(),
 		publishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
 		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
-		metaBoxes: select( 'core/edit-post' ).getMetaBoxes(),
 		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 	} ) ),

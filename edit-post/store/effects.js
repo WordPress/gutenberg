@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { reduce, some } from 'lodash';
+import { reduce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,18 +16,20 @@ import apiFetch from '@wordpress/api-fetch';
  */
 import {
 	metaBoxUpdatesSuccess,
-	setMetaBoxSavedData,
 	requestMetaBoxUpdates,
 	openGeneralSidebar,
 	closeGeneralSidebar,
 } from './actions';
-import { getMetaBoxes, getActiveGeneralSidebarName } from './selectors';
+import {
+	getActiveMetaBoxLocations,
+	getActiveGeneralSidebarName,
+} from './selectors';
 import { getMetaBoxContainer } from '../utils/meta-boxes';
 import { onChangeListener } from './utils';
 
 const effects = {
-	INITIALIZE_META_BOX_STATE( action, store ) {
-		const hasActiveMetaBoxes = some( action.metaBoxes );
+	SET_ACTIVE_META_BOX_LOCATIONS( action, store ) {
+		const hasActiveMetaBoxes = action.locations.length > 0;
 		if ( ! hasActiveMetaBoxes ) {
 			return;
 		}
@@ -43,15 +45,6 @@ const effects = {
 				window.postboxes.add_postbox_toggles( postType );
 			}
 		} );
-
-		// Initialize metaboxes state
-		const dataPerLocation = reduce( action.metaBoxes, ( memo, isActive, location ) => {
-			if ( isActive ) {
-				memo[ location ] = jQuery( getMetaBoxContainer( location ) ).serialize();
-			}
-			return memo;
-		}, {} );
-		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
 
 		let wasSavingPost = select( 'core/editor' ).isSavingPost();
 		let wasAutosavingPost = select( 'core/editor' ).isAutosavingPost();
@@ -74,13 +67,6 @@ const effects = {
 	},
 	REQUEST_META_BOX_UPDATES( action, store ) {
 		const state = store.getState();
-		const dataPerLocation = reduce( getMetaBoxes( state ), ( memo, metabox, location ) => {
-			if ( metabox.isActive ) {
-				memo[ location ] = jQuery( getMetaBoxContainer( location ) ).serialize();
-			}
-			return memo;
-		}, {} );
-		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
 
 		// Additional data needed for backwards compatibility.
 		// If we do not provide this data the post will be overriden with the default values.
@@ -94,12 +80,12 @@ const effects = {
 
 		// We gather all the metaboxes locations data and the base form data
 		const baseFormData = new window.FormData( document.querySelector( '.metabox-base-form' ) );
-		const formDataToMerge = reduce( getMetaBoxes( state ), ( memo, metabox, location ) => {
-			if ( metabox.isActive ) {
-				memo.push( new window.FormData( getMetaBoxContainer( location ) ) );
-			}
-			return memo;
-		}, [ baseFormData ] );
+		const formDataToMerge = [
+			baseFormData,
+			...getActiveMetaBoxLocations( state ).map( ( location ) => (
+				new window.FormData( getMetaBoxContainer( location ) )
+			) ),
+		];
 
 		// Merge all form data objects into a single one.
 		const formData = reduce( formDataToMerge, ( memo, currentFormData ) => {
