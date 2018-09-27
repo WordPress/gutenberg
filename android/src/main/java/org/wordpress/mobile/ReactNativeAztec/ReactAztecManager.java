@@ -178,6 +178,9 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
             view.addPlugin(new CssUnderlinePlugin());
             view.setImageGetter(new GlideImageLoader(view.getContext()));
             view.setVideoThumbnailGetter(new GlideVideoThumbnailLoader(view.getContext()));
+            // we need to restart the editor now
+            String content = view.toHtml(false);
+            view.fromHtml(content, false);
         }
     }
 
