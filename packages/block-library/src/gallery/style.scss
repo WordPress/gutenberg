@@ -118,7 +118,9 @@
 	.blocks-gallery-image:last-child,
 	.blocks-gallery-item:last-child,
 	.is-selected & .blocks-gallery-image:nth-last-child(2),
-	.is-selected & .blocks-gallery-item:nth-last-child(2) {
+	.is-selected & .blocks-gallery-item:nth-last-child(2),
+	.is-typing & .blocks-gallery-image:nth-last-child(2),
+	.is-typing & .blocks-gallery-item:nth-last-child(2) {
 		margin-right: 0;
 	}
 
