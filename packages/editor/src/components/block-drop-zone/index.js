@@ -60,7 +60,7 @@ class BlockDropZone extends Component {
 			return;
 		}
 
-		const { index: dstIndex, rootClientId: dstRootClientId, clientId: dstClientId } = this.props;
+		const { getDescendants, index: dstIndex, rootClientId: dstRootClientId, clientId: dstClientId } = this.props;
 
 		let type, srcClientId, srcRootClientId, srcIndex;
 		try {
@@ -75,15 +75,17 @@ class BlockDropZone extends Component {
 
 		const isSameLevel = ( ) => ( srcRootClientId === dstRootClientId ) || ( ! srcRootClientId === true && ! dstRootClientId === true );
 		const isSameBlock = ( ) => srcClientId === dstClientId;
+		const isSrcBlockAnAncestorOfDstBlock = ( ) => getDescendants( [ srcClientId ] ).some( ( id ) => id === dstClientId );
 
-		let insertIndex = dstIndex;
-		if ( ! isSameBlock() ) {
-			// If the block is kept at the same level and moved downwards,
-			// subtract to account for blocks shifting upward to occupy its old position.
-			// Note that rootClientId can be undefined or a void string if the block is at the top-level.
-			const positionIndex = this.getInsertIndex( position );
-			insertIndex = dstIndex && srcIndex < dstIndex && isSameLevel() ? positionIndex - 1 : positionIndex;
+		if ( isSameBlock() || isSrcBlockAnAncestorOfDstBlock() ) {
+			return;
 		}
+
+		// If the block is kept at the same level and moved downwards,
+		// subtract to account for blocks shifting upward to occupy its old position.
+		// Note that rootClientId can be undefined or a void string if the block is at the top-level.
+		const positionIndex = this.getInsertIndex( position );
+		const insertIndex = dstIndex && srcIndex < dstIndex && isSameLevel() ? positionIndex - 1 : positionIndex;
 		this.props.moveBlockToPosition( srcClientId, srcRootClientId, insertIndex );
 	}
 
@@ -141,9 +143,10 @@ export default compose(
 		};
 	} ),
 	withSelect( ( select, { rootClientId } ) => {
-		const { getTemplateLock } = select( 'core/editor' );
+		const { getDescendants, getTemplateLock } = select( 'core/editor' );
 		return {
 			isLocked: !! getTemplateLock( rootClientId ),
+			getDescendants,
 		};
 	} )
 )( BlockDropZone );
