@@ -803,6 +803,12 @@ export class RichText extends Component {
 			} );
 		}
 
+		// Guard for blocks passing `null` in onSplit callbacks. May be removed
+		// if onSplit is revised to not pass a `null` value.
+		if ( value === null ) {
+			return create();
+		}
+
 		return value;
 	}
 
