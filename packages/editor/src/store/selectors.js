@@ -566,6 +566,20 @@ export const getBlocks = createSelector(
 );
 
 /**
+ * Returns an array containing the clientIds of all descendants
+ * of the blocks given.
+ *
+ * @param {Object} state Global application state.
+ * @param {Array} clientIds Array of blocks to inspect.
+ *
+ * @return {Array} ids of descendants.
+ */
+export const getDescendants = ( state, clientIds ) => flatMap( clientIds, ( clientId ) => {
+	const descendants = getBlockOrder( state, clientId );
+	return [ ...descendants, ...getDescendants( state, descendants ) ];
+} );
+
+/**
  * Returns an array containing the clientIds of the top-level blocks
  * and their descendants of any depth (for nested blocks).
  *
@@ -575,12 +589,8 @@ export const getBlocks = createSelector(
  */
 export const getClientIdsWithDescendants = createSelector(
 	( state ) => {
-		const getDescendants = ( clientIds ) => flatMap( clientIds, ( clientId ) => {
-			const descendants = getBlockOrder( state, clientId );
-			return [ ...descendants, ...getDescendants( descendants ) ];
-		} );
 		const topLevelIds = getBlockOrder( state );
-		return [ ...topLevelIds, ...getDescendants( topLevelIds ) ];
+		return [ ...topLevelIds, ...getDescendants( state, topLevelIds ) ];
 	},
 	( state ) => [
 		state.editor.present.blockOrder,
