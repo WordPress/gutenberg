@@ -18,6 +18,27 @@ import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
+const parseDropEvent = ( event ) => {
+	let result = {
+		srcRootClientId: null,
+		srcClientId: null,
+		srcIndex: null,
+		type: null,
+	};
+
+	if ( ! event.dataTransfer ) {
+		return result;
+	}
+
+	try {
+		result = Object.assign( result, JSON.parse( event.dataTransfer.getData( 'text' ) ) );
+	} catch ( err ) {
+		return result;
+	}
+
+	return result;
+};
+
 class BlockDropZone extends Component {
 	constructor() {
 		super( ...arguments );
@@ -56,36 +77,28 @@ class BlockDropZone extends Component {
 	}
 
 	onDrop( event, position ) {
-		if ( ! event.dataTransfer ) {
+		const { rootClientId: dstRootClientId, clientId: dstClientId, index: dstIndex, getDescendants } = this.props;
+		const { srcRootClientId, srcClientId, srcIndex, type } = parseDropEvent( event );
+
+		const isBlockDropType = ( dropType ) => dropType === 'block';
+		const isSameLevel = ( srcRoot, dstRoot ) => {
+			// Note that rootClientId of top-level blocks will be undefined OR a void string,
+			// so we also need to account for that case separately.
+			return ( srcRoot === dstRoot ) || ( ! srcRoot === true && ! dstRoot === true );
+		};
+		const isSameBlock = ( src, dst ) => src === dst;
+		const isSrcBlockAnAncestorOfDstBlock = ( src, dst ) => getDescendants( [ src ] ).some( ( id ) => id === dst );
+
+		if ( ! isBlockDropType( type ) ||
+			isSameBlock( srcClientId, dstClientId ) ||
+			isSrcBlockAnAncestorOfDstBlock( srcClientId, dstClientId ) ) {
 			return;
 		}
 
-		const { getDescendants, index: dstIndex, rootClientId: dstRootClientId, clientId: dstClientId } = this.props;
-
-		let type, srcClientId, srcRootClientId, srcIndex;
-		try {
-			( { type, srcClientId, srcRootClientId, srcIndex } = JSON.parse( event.dataTransfer.getData( 'text' ) ) );
-		} catch ( err ) {
-			return;
-		}
-
-		if ( type !== 'block' ) {
-			return;
-		}
-
-		const isSameLevel = ( ) => ( srcRootClientId === dstRootClientId ) || ( ! srcRootClientId === true && ! dstRootClientId === true );
-		const isSameBlock = ( ) => srcClientId === dstClientId;
-		const isSrcBlockAnAncestorOfDstBlock = ( ) => getDescendants( [ srcClientId ] ).some( ( id ) => id === dstClientId );
-
-		if ( isSameBlock() || isSrcBlockAnAncestorOfDstBlock() ) {
-			return;
-		}
-
+		const positionIndex = this.getInsertIndex( position );
 		// If the block is kept at the same level and moved downwards,
 		// subtract to account for blocks shifting upward to occupy its old position.
-		// Note that rootClientId can be undefined or a void string if the block is at the top-level.
-		const positionIndex = this.getInsertIndex( position );
-		const insertIndex = dstIndex && srcIndex < dstIndex && isSameLevel() ? positionIndex - 1 : positionIndex;
+		const insertIndex = dstIndex && srcIndex < dstIndex && isSameLevel( srcRootClientId, dstRootClientId ) ? positionIndex - 1 : positionIndex;
 		this.props.moveBlockToPosition( srcClientId, srcRootClientId, insertIndex );
 	}
 
