@@ -39,7 +39,6 @@ class BlockDropZone extends Component {
 			getBlockTransforms( 'from' ),
 			( transform ) => transform.type === 'files' && transform.isMatch( files )
 		);
-
 		if ( transformation ) {
 			const insertIndex = this.getInsertIndex( position );
 			const blocks = transformation.transform( files, this.props.updateBlockAttributes );

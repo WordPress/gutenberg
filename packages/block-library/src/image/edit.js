@@ -72,23 +72,27 @@ class ImageEdit extends Component {
 
 		this.state = {
 			captionFocused: false,
+			hasError: false,
 		};
 	}
 
 	componentDidMount() {
-		const { attributes, setAttributes } = this.props;
+		const { attributes, setAttributes, noticeOperations } = this.props;
 		const { id, url = '' } = attributes;
-
 		if ( ! id && url.indexOf( 'blob:' ) === 0 ) {
 			const file = getBlobByURL( url );
 
 			if ( file ) {
 				mediaUpload( {
 					filesList: [ file ],
+					allowedType: 'image',
 					onFileChange: ( [ image ] ) => {
 						setAttributes( { ...image } );
 					},
-					allowedType: 'image',
+					onError: ( message ) => {
+						this.setState( { hasError: true } );
+						noticeOperations.createErrorNotice( message );
+					},
 				} );
 			}
 		}
@@ -119,6 +123,7 @@ class ImageEdit extends Component {
 			} );
 			return;
 		}
+		this.setState( { hasError: false } );
 		this.props.setAttributes( {
 			...pick( media, [ 'alt', 'id', 'caption', 'url' ] ),
 			width: undefined,
@@ -210,6 +215,7 @@ class ImageEdit extends Component {
 	render() {
 		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, noticeOperations, noticeUI, toggleSelection, isRTL } = this.props;
 		const { url, alt, caption, align, id, href, linkDestination, width, height } = attributes;
+		const { hasError } = this.state;
 
 		const controls = (
 			<BlockControls>
@@ -236,7 +242,7 @@ class ImageEdit extends Component {
 			</BlockControls>
 		);
 
-		if ( ! url ) {
+		if ( ! url || hasError ) {
 			return (
 				<Fragment>
 					{ controls }
