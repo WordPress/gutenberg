@@ -55,18 +55,21 @@ export function getEmbedEdit( title, icon ) {
 			this.setAspectRatioClassNames = this.setAspectRatioClassNames.bind( this );
 			this.getResponsiveHelp = this.getResponsiveHelp.bind( this );
 			this.toggleResponsive = this.toggleResponsive.bind( this );
+			this.receivePreview = this.receivePreview.bind( this );
 
 			this.state = {
 				editingURL: false,
 				url: this.props.attributes.url,
 			};
 
-			this.maybeSwitchBlock();
+			if ( this.props.preview ) {
+				this.receivePreview();
+			}
 		}
 
-		componentWillUnmount() {
-			// can't abort the fetch promise, so let it know we will unmount
-			this.unmounting = true;
+		receivePreview() {
+			this.setAttributesFromPreview();
+			this.maybeSwitchBlock();
 		}
 
 		componentDidUpdate( prevProps ) {
@@ -85,7 +88,7 @@ export function getEmbedEdit( title, icon ) {
 					this.setState( { editingURL: true } );
 					return;
 				}
-				this.setAttributesFromPreview();
+				this.receivePreview();
 			}
 		}
 
@@ -163,39 +166,26 @@ export function getEmbedEdit( title, icon ) {
 
 			if ( iframe && iframe.height && iframe.width ) {
 				const aspectRatio = ( iframe.width / iframe.height ).toFixed( 2 );
-				let aspectRatioClassName;
-
-				switch ( aspectRatio ) {
+				const aspectRatios = [
 					// Common video resolutions.
-					case '2.33':
-						aspectRatioClassName = 'wp-embed-aspect-21-9';
-						break;
-					case '2.00':
-						aspectRatioClassName = 'wp-embed-aspect-18-9';
-						break;
-					case '1.78':
-						aspectRatioClassName = 'wp-embed-aspect-16-9';
-						break;
-					case '1.33':
-						aspectRatioClassName = 'wp-embed-aspect-4-3';
-						break;
+					{ ratio: '2.33', className: 'wp-embed-aspect-21-9' },
+					{ ratio: '2.00', className: 'wp-embed-aspect-18-9' },
+					{ ratio: '1.78', className: 'wp-embed-aspect-16-9' },
+					{ ratio: '1.33', className: 'wp-embed-aspect-4-3' },
 					// Vertical video and instagram square video support.
-					case '1.00':
-						aspectRatioClassName = 'wp-embed-aspect-1-1';
-						break;
-					case '0.56':
-						aspectRatioClassName = 'wp-embed-aspect-9-16';
-						break;
-					case '0.50':
-						aspectRatioClassName = 'wp-embed-aspect-1-2';
-						break;
-				}
-
-				if ( aspectRatioClassName ) {
-					return {
-						[ aspectRatioClassName ]: allowResponsive,
-						'wp-has-aspect-ratio': allowResponsive,
-					};
+					{ ratio: '1.00', className: 'wp-embed-aspect-1-1' },
+					{ ratio: '0.56', className: 'wp-embed-aspect-9-16' },
+					{ ratio: '0.50', className: 'wp-embed-aspect-1-2' },
+				];
+				// Given the actual aspect ratio, find the widest ratio to support it.
+				for ( let idx = 0; idx < aspectRatios.length; idx++ ) {
+					const potentialRatio = aspectRatios[ idx ];
+					if ( aspectRatio >= potentialRatio.ratio ) {
+						return {
+							[ potentialRatio.className ]: allowResponsive,
+							'wp-has-aspect-ratio': allowResponsive,
+						};
+					}
 				}
 			}
 		}
