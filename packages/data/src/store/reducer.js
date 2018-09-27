@@ -31,7 +31,7 @@ const isResolved = flowRight( [
 			nextState.set( action.args, isStarting );
 			return nextState;
 		}
-		case 'INVALIDATE_CACHE': {
+		case 'INVALIDATE_RESOLUTION': {
 			const nextState = new EquivalentKeyMap( state );
 			nextState.delete( action.args );
 			return nextState;

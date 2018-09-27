@@ -45,9 +45,9 @@ export function finishResolution( reducerKey, selectorName, args ) {
  *
  * @return {Object} Action object.
  */
-export function invalidateCache( reducerKey, selectorName, args ) {
+export function invalidateResolution( reducerKey, selectorName, args ) {
 	return {
-		type: 'INVALIDATE_CACHE',
+		type: 'INVALIDATE_RESOLUTION',
 		reducerKey,
 		selectorName,
 		args,

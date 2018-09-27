@@ -24,7 +24,7 @@ const createResolversCacheMiddleware = ( registry, reducerKey ) => () => ( next 
 			}
 
 			// Trigger cache invalidation
-			registry.dispatch( 'core/data' ).invalidateCache( reducerKey, selectorName, args );
+			registry.dispatch( 'core/data' ).invalidateResolution( reducerKey, selectorName, args );
 		} );
 	} );
 	next( action );
