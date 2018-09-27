@@ -38,6 +38,7 @@ const {
 	hasAutosave,
 	isEditedPostEmpty,
 	isEditedPostBeingScheduled,
+	isEditedPostDateFloating,
 	getBlockDependantsCacheBust,
 	getBlockName,
 	getBlock,
@@ -1218,6 +1219,83 @@ describe( 'selectors', () => {
 			};
 
 			expect( isEditedPostBeingScheduled( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isEditedPostDateFloating', () => {
+		let editor;
+
+		beforeEach( () => {
+			editor = {
+				present: {
+					edits: {},
+				},
+			};
+		} );
+
+		it( 'should return true for draft posts where the date matches the modified date', () => {
+			const state = {
+				currentPost: {
+					date: '2018-09-27T01:23:45.678Z',
+					modified: '2018-09-27T01:23:45.678Z',
+					status: 'draft',
+				},
+				editor,
+			};
+
+			expect( isEditedPostDateFloating( state ) ).toBe( true );
+		} );
+
+		it( 'should return true for auto-draft posts where the date matches the modified date', () => {
+			const state = {
+				currentPost: {
+					date: '2018-09-27T01:23:45.678Z',
+					modified: '2018-09-27T01:23:45.678Z',
+					status: 'auto-draft',
+				},
+				editor,
+			};
+
+			expect( isEditedPostDateFloating( state ) ).toBe( true );
+		} );
+
+		it( 'should return false for draft posts where the date does not match the modified date', () => {
+			const state = {
+				currentPost: {
+					date: '2018-09-27T01:23:45.678Z',
+					modified: '1970-01-01T00:00:00.000Z',
+					status: 'draft',
+				},
+				editor,
+			};
+
+			expect( isEditedPostDateFloating( state ) ).toBe( false );
+		} );
+
+		it( 'should return false for auto-draft posts where the date does not match the modified date', () => {
+			const state = {
+				currentPost: {
+					date: '2018-09-27T01:23:45.678Z',
+					modified: '1970-01-01T00:00:00.000Z',
+					status: 'auto-draft',
+				},
+				editor,
+			};
+
+			expect( isEditedPostDateFloating( state ) ).toBe( false );
+		} );
+
+		it( 'should return false for published posts', () => {
+			const state = {
+				currentPost: {
+					date: '2018-09-27T01:23:45.678Z',
+					modified: '2018-09-27T01:23:45.678Z',
+					status: 'publish',
+				},
+				editor,
+			};
+
+			expect( isEditedPostDateFloating( state ) ).toBe( false );
 		} );
 	} );
 

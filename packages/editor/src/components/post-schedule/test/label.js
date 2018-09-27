@@ -14,22 +14,15 @@ describe( 'PostScheduleLabel', () => {
 		expect( wrapper.text() ).toBe( 'Immediately' );
 	} );
 
-	it( 'should show the post will be published immediately if in draft status and the date and modified date match', () => {
+	it( 'should show the post will be published immediately if it has a floating date', () => {
 		const date = '2018-09-17T01:23:45.678Z';
-		const wrapper = shallow( <PostScheduleLabel date={ date } modified={ date } status={ 'draft' } /> );
-		expect( wrapper.text() ).toBe( 'Immediately' );
-	} );
-
-	it( 'should show the post will be published immediately if in auto-draft status and the date and modified date match', () => {
-		const date = '2018-09-17T01:23:45.678Z';
-		const wrapper = shallow( <PostScheduleLabel date={ date } modified={ date } status={ 'auto-draft' } /> );
+		const wrapper = shallow( <PostScheduleLabel date={ date } floating={ true } /> );
 		expect( wrapper.text() ).toBe( 'Immediately' );
 	} );
 
 	it( 'should show the scheduled publish date if a date has been set', () => {
 		const date = '2018-09-17T01:23:45.678Z';
-		const modified = '2018-08-01T00:00:00.000Z';
-		const wrapper = shallow( <PostScheduleLabel date={ date } modified={ modified } status={ 'draft' } /> );
+		const wrapper = shallow( <PostScheduleLabel date={ date } floating={ false } /> );
 		expect( wrapper.text() ).not.toBe( 'Immediately' );
 	} );
 } );
