@@ -19,7 +19,7 @@ describe( 'saveEntityRecord', () => {
 		} );
 		// Provide response and trigger action
 		const { value: received } = fulfillment.next( { ...post, id: 10 } );
-		expect( received ).toEqual( receiveEntityRecords( 'postType', 'post', { ...post, id: 10 } ) );
+		expect( received ).toEqual( receiveEntityRecords( 'postType', 'post', { ...post, id: 10 }, undefined, true ) );
 	} );
 
 	it( 'triggers a PUT request for an existing record', async () => {
@@ -37,6 +37,6 @@ describe( 'saveEntityRecord', () => {
 		} );
 		// Provide response and trigger action
 		const { value: received } = fulfillment.next( post );
-		expect( received ).toEqual( receiveEntityRecords( 'postType', 'post', post ) );
+		expect( received ).toEqual( receiveEntityRecords( 'postType', 'post', post, undefined, true ) );
 	} );
 } );
