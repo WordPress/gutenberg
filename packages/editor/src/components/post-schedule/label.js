@@ -5,9 +5,9 @@ import { __ } from '@wordpress/i18n';
 import { dateI18n, getSettings } from '@wordpress/date';
 import { withSelect } from '@wordpress/data';
 
-export function PostScheduleLabel( { date, floating } ) {
+export function PostScheduleLabel( { date, isFloating } ) {
 	const settings = getSettings();
-	return date && ! floating ?
+	return date && ! isFloating ?
 		dateI18n( settings.formats.datetime, date ) :
 		__( 'Immediately' );
 }
@@ -15,6 +15,6 @@ export function PostScheduleLabel( { date, floating } ) {
 export default withSelect( ( select ) => {
 	return {
 		date: select( 'core/editor' ).getEditedPostAttribute( 'date' ),
-		floating: select( 'core/editor' ).isEditedPostDateFloating(),
+		isFloating: select( 'core/editor' ).isEditedPostDateFloating(),
 	};
 } )( PostScheduleLabel );
