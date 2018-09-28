@@ -54,6 +54,8 @@ const blockAttributes = {
 
 export const name = 'core/cover-image';
 
+const ALLOWED_MEDIA_TYPES = [ 'image' ];
+
 export const settings = {
 	title: __( 'Cover Image' ),
 
@@ -157,7 +159,7 @@ export const settings = {
 					<Toolbar>
 						<MediaUpload
 							onSelect={ onSelectImage }
-							type="image"
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
 							value={ id }
 							render={ ( { open } ) => (
 								<IconButton
@@ -216,7 +218,7 @@ export const settings = {
 						} }
 						onSelect={ onSelectImage }
 						accept="image/*"
-						type="image"
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						notices={ noticeUI }
 						onError={ noticeOperations.createErrorNotice }
 					/>
