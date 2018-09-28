@@ -94,7 +94,6 @@ class ImageEdit extends Component {
 						this.setState( { hasError: true } );
 						noticeOperations.createErrorNotice( message );
 					},
-
 				} );
 			}
 		}
