@@ -59,24 +59,24 @@
 		}
 	}
 
-	// These max-widths constrain columns so long words do not cause overflow issues in the editor.
-	&.has-2-columns .editor-block-list__layout > .editor-block-list__block-edit {
+	// These max-widths constrain columns so long content does not cause overflow issues in the editor.
+	&.has-2-columns > .editor-inner-blocks > .editor-block-list__layout > .editor-block-list__block {
 		max-width: 50%;
 	}
 
-	&.has-3-columns .editor-block-list__layout > .editor-block-list__block-edit {
+	&.has-3-columns > .editor-inner-blocks > .editor-block-list__layout > .editor-block-list__block {
 		max-width: 33.3333%;
 	}
 
-	&.has-4-columns .editor-block-list__layout > .editor-block-list__block-edit {
+	&.has-4-columns > .editor-inner-blocks > .editor-block-list__layout > .editor-block-list__block {
 		max-width: 25%;
 	}
 
-	&.has-5-columns .editor-block-list__layout > .editor-block-list__block-edit {
+	&.has-5-columns > .editor-inner-blocks > .editor-block-list__layout > .editor-block-list__block {
 		max-width: 20%;
 	}
 
-	&.has-6-columns .editor-block-list__layout > .editor-block-list__block-edit {
+	&.has-6-columns > .editor-inner-blocks > .editor-block-list__layout > .editor-block-list__block {
 		max-width: 16.6666%;
 	}
 }
