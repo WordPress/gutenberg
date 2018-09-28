@@ -26,7 +26,7 @@ time docker-compose $DOCKER_COMPOSE_FILE_OPTIONS down --remove-orphans >/dev/nul
 
 # Download image updates.
 echo -e $(status_message "Downloading Docker image updates...")
-time docker-compose $DOCKER_COMPOSE_FILE_OPTIONS pull
+time docker-compose $DOCKER_COMPOSE_FILE_OPTIONS pull --parallel
 
 # Launch the containers.
 echo -e $(status_message "Starting Docker containers...")
