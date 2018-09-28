@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "3.9.0-rc.1",
+	"version": "3.9.0",
 	"private": true,
 	"description": "A new WordPress editor experience",
 	"repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -209,7 +209,7 @@
 		"*.js": [
 			"eslint"
 		],
-		"{docs/{root-manifest.json,tool/*.js},packages/{*/README.md,*/src/{actions,selectors}.js,components/src/*/README.md}}": [
+		"{docs/{root-manifest.json,tool/*.js},packages/{*/README.md,*/src/{actions,selectors}.js,components/src/*/**/README.md}}": [
 			"npm run docs:build"
 		]
 	}

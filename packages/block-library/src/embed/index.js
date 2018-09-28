@@ -10,10 +10,19 @@ import classnames from 'classnames/dedupe';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
-import { Component, renderToString } from '@wordpress/element';
-import { Button, Placeholder, Spinner, SandBox, IconButton, Toolbar } from '@wordpress/components';
+import { Component, renderToString, Fragment } from '@wordpress/element';
+import {
+	Button,
+	Placeholder,
+	Spinner,
+	SandBox,
+	IconButton,
+	Toolbar,
+	PanelBody,
+	ToggleControl,
+} from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
-import { RichText, BlockControls, BlockIcon } from '@wordpress/editor';
+import { RichText, BlockControls, BlockIcon, InspectorControls } from '@wordpress/editor';
 import { withSelect } from '@wordpress/data';
 
 // These embeds do not work in sandboxes
@@ -43,7 +52,9 @@ export function getEmbedEdit( title, icon ) {
 			this.maybeSwitchBlock = this.maybeSwitchBlock.bind( this );
 			this.getAttributesFromPreview = this.getAttributesFromPreview.bind( this );
 			this.setAttributesFromPreview = this.setAttributesFromPreview.bind( this );
-			this.getClassNamesWithAspectRatio = this.getClassNamesWithAspectRatio.bind( this );
+			this.setAspectRatioClassNames = this.setAspectRatioClassNames.bind( this );
+			this.getResponsiveHelp = this.getResponsiveHelp.bind( this );
+			this.toggleResponsive = this.toggleResponsive.bind( this );
 
 			this.state = {
 				editingURL: false,
@@ -144,7 +155,9 @@ export function getEmbedEdit( title, icon ) {
 									// block. This only affects the WordPress block because it can't be
 									// rendered in the usual Sandbox (it has a sandbox of its own) and it
 									// relies on the preview to set the correct render type.
-									...this.getAttributesFromPreview( this.props.preview ),
+									...this.getAttributesFromPreview(
+										this.props.preview, this.props.attributes.allowResponsive
+									),
 								}
 							)
 						);
@@ -157,13 +170,14 @@ export function getEmbedEdit( title, icon ) {
 		}
 
 		/**
-		 * Sets the appropriate CSS class to enforce an aspect ratio when the embed is resized
+		 * Gets the appropriate CSS class names to enforce an aspect ratio when the embed is resized
 		 * if the HTML has an iframe with width and height set.
 		 *
 		 * @param {string} html The preview HTML that possibly contains an iframe with width and height set.
-		 * @return {string} The CSS classes with any aspect ratio classes included.
+		 * @param {boolean} allowResponsive If the classes should be added, or removed.
+		 * @return {Object} Object with classnames set for use with `classnames`.
 		 */
-		getClassNamesWithAspectRatio( html ) {
+		getAspectRatioClassNames( html, allowResponsive = true ) {
 			const previewDocument = document.implementation.createHTMLDocument( '' );
 			previewDocument.body.innerHTML = html;
 			const iframe = previewDocument.body.querySelector( 'iframe' );
@@ -199,11 +213,32 @@ export function getEmbedEdit( title, icon ) {
 				}
 
 				if ( aspectRatioClassName ) {
-					return classnames( this.props.attributes.className, 'wp-has-aspect-ratio', aspectRatioClassName );
+					return {
+						[ aspectRatioClassName ]: allowResponsive,
+						'wp-has-aspect-ratio': allowResponsive,
+					};
 				}
 			}
 
 			return this.props.attributes.className;
+		}
+
+		/**
+		 * Sets the aspect ratio related class names returned by `getAspectRatioClassNames`
+		 * if `allowResponsive` is truthy.
+		 *
+		 * @param {string} html The preview HTML.
+		 */
+		setAspectRatioClassNames( html ) {
+			const { allowResponsive } = this.props.attributes;
+			if ( ! allowResponsive ) {
+				return;
+			}
+			const className = classnames(
+				this.props.attributes.className,
+				this.getAspectRatioClassNames( html )
+			);
+			this.props.setAttributes( { className } );
 		}
 
 		/***
@@ -212,7 +247,7 @@ export function getEmbedEdit( title, icon ) {
 		 * @param {string} preview The preview data.
 		 * @return {Object} Attributes and values.
 		 */
-		getAttributesFromPreview( preview ) {
+		getAttributesFromPreview( preview, allowResponsive = true ) {
 			const attributes = {};
 			// Some plugins only return HTML with no type info, so default this to 'rich'.
 			let { type = 'rich' } = preview;
@@ -230,7 +265,10 @@ export function getEmbedEdit( title, icon ) {
 				attributes.providerNameSlug = providerNameSlug;
 			}
 
-			attributes.className = this.getClassNamesWithAspectRatio( html );
+			attributes.className = classnames(
+				this.props.attributes.className,
+				this.getAspectRatioClassNames( html, allowResponsive )
+			);
 
 			return attributes;
 		}
@@ -240,28 +278,60 @@ export function getEmbedEdit( title, icon ) {
 		 */
 		setAttributesFromPreview() {
 			const { setAttributes, preview } = this.props;
-			setAttributes( this.getAttributesFromPreview( preview ) );
+			const { allowResponsive } = this.props.attributes;
+			setAttributes( this.getAttributesFromPreview( preview, allowResponsive ) );
 		}
 
 		switchBackToURLInput() {
 			this.setState( { editingURL: true } );
 		}
 
+		getResponsiveHelp( checked ) {
+			return checked ? __( 'Videos and other content automatically resizes.' ) : __( 'Content is fixed size.' );
+		}
+
+		toggleResponsive() {
+			const { allowResponsive, className } = this.props.attributes;
+			const { html } = this.props.preview;
+			const responsiveClassNames = this.getAspectRatioClassNames( html, ! allowResponsive );
+
+			this.props.setAttributes(
+				{
+					allowResponsive: ! allowResponsive,
+					className: classnames( className, responsiveClassNames ),
+				}
+			);
+		}
+
 		render() {
 			const { url, editingURL } = this.state;
-			const { caption, type } = this.props.attributes;
+			const { caption, type, allowResponsive } = this.props.attributes;
 			const { fetching, setAttributes, isSelected, className, preview, previewIsFallback } = this.props;
 			const controls = (
-				<BlockControls>
-					<Toolbar>
-						{ ( preview && ! previewIsFallback && <IconButton
-							className="components-toolbar__control"
-							label={ __( 'Edit URL' ) }
-							icon="edit"
-							onClick={ this.switchBackToURLInput }
-						/> ) }
-					</Toolbar>
-				</BlockControls>
+				<Fragment>
+					<BlockControls>
+						<Toolbar>
+							{ preview && ! previewIsFallback && (
+								<IconButton
+									className="components-toolbar__control"
+									label={ __( 'Edit URL' ) }
+									icon="edit"
+									onClick={ this.switchBackToURLInput }
+								/>
+							) }
+						</Toolbar>
+					</BlockControls>
+					<InspectorControls>
+						<PanelBody title={ __( 'Media Settings' ) } className="blocks-responsive">
+							<ToggleControl
+								label={ __( 'Automatically scale content' ) }
+								checked={ allowResponsive }
+								help={ this.getResponsiveHelp }
+								onChange={ this.toggleResponsive }
+							/>
+						</PanelBody>
+					</InspectorControls>
+				</Fragment>
 			);
 
 			if ( fetching ) {
@@ -360,6 +430,10 @@ const embedAttributes = {
 	},
 	providerNameSlug: {
 		type: 'string',
+	},
+	allowResponsive: {
+		type: 'boolean',
+		default: true,
 	},
 };
 

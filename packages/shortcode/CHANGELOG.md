@@ -1,3 +1,9 @@
+## 2.0.1 (Unreleased)
+
+### Bug Fixes
+
+- Fix missing memize dependency in package.json
+
 ## 2.0.0 (2018-09-05)
 
 ### Breaking Change

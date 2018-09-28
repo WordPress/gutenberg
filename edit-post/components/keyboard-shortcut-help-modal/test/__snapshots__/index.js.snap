@@ -167,11 +167,11 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
           Object {
             "description": "Remove the selected block(s).",
             "keyCombination": Array [
-              "Ctrl",
+              "Shift",
               "+",
               "Alt",
               "+",
-              "Backspace",
+              "Z",
             ],
           },
           Object {

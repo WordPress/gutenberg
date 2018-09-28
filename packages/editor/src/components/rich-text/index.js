@@ -23,7 +23,7 @@ import {
 	getScrollContainer,
 } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
-import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, rawShortcut, isKeyboardEvent } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, rawShortcut } from '@wordpress/keycodes';
 import { Slot } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { rawHandler, children } from '@wordpress/blocks';
@@ -43,6 +43,7 @@ import patterns from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
 import { domToFormat, valueToString } from './format';
 import TokenUI from './tokens/ui';
+import { isRichTextValueEmpty } from './utils';
 
 /**
  * Browser dependencies
@@ -59,17 +60,6 @@ const { Node, getSelection } = window;
  * @type {string}
  */
 const TINYMCE_ZWSP = '\uFEFF';
-
-/**
- * Check if the given `RichText` value is empty on not.
- *
- * @param {Array} value `RichText` value.
- *
- * @return {boolean} True if empty, false if not.
- */
-const isRichTextValueEmpty = ( value ) => {
-	return ! value || ! value.length;
-};
 
 export function getFormatValue( formatName, parents ) {
 	if ( formatName === 'link' ) {
@@ -415,12 +405,6 @@ export class RichText extends Component {
 
 		const { keyCode } = event;
 		const isReverse = keyCode === BACKSPACE;
-
-		// User is using the Remove Block shortcut, so allow the event to bubble
-		// up to the BlockSettingsMenu component
-		if ( isKeyboardEvent.primaryAlt( event, 'Backspace' ) ) {
-			return;
-		}
 
 		const { isCollapsed } = getSelection();
 

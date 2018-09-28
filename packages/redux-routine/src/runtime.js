@@ -26,7 +26,7 @@ export default function createRuntime( controls = {}, dispatch ) {
 		if ( routine instanceof Promise ) {
 			// Async control routine awaits resolution.
 			routine.then(
-				next,
+				yieldNext,
 				( error ) => yieldError( castError( error ) ),
 			);
 		} else {

@@ -248,6 +248,7 @@ function gutenberg_register_scripts_and_styles() {
 		array(
 			'lodash',
 			'wp-compose',
+			'wp-deprecated',
 			'wp-element',
 			'wp-is-shallow-equal',
 			'wp-polyfill',
@@ -303,7 +304,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-shortcode',
 		gutenberg_url( 'build/shortcode/index.js' ),
-		array( 'wp-polyfill' ),
+		array( 'wp-polyfill', 'lodash' ),
 		filemtime( gutenberg_dir_path() . 'build/shortcode/index.js' ),
 		true
 	);
@@ -854,15 +855,6 @@ function gutenberg_register_vendor_scripts() {
 	gutenberg_register_vendor_script(
 		'wp-polyfill-fetch',
 		'https://unpkg.com/whatwg-fetch@3.0.0/dist/fetch.umd.js'
-	);
-	gutenberg_register_vendor_script(
-		'wp-polyfill-promise',
-		'https://unpkg.com/promise-polyfill@7.0.0/dist/promise' . $suffix . '.js',
-		array( 'wp-deprecated' )
-	);
-	wp_add_inline_script(
-		'wp-polyfill-promise',
-		'wp.deprecated( "wp-polyfill-promise script handle", { plugin: "Gutenberg", version: "4.0" } );'
 	);
 	gutenberg_register_vendor_script(
 		'wp-polyfill-formdata',

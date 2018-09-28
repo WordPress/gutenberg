@@ -47,11 +47,13 @@ const LinkContainer = ( props ) => {
 
 	return (
 		<Fill name="RichText.Siblings">
-			<PositionedAtSelection className="editor-format-toolbar__link-container">
+			<PositionedAtSelection
+				className="editor-format-toolbar__link-container"
+				key={ selectedNodeId /* Used to force remount on change to ensure popover repositions */ }
+			>
 				<Popover
 					position="bottom center"
 					focusOnMount={ isEditing ? 'firstElement' : false }
-					key={ selectedNodeId /* Used to force rerender on change */ }
 				>
 					{ isEditing && (
 						// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar

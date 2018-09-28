@@ -37,6 +37,12 @@
 	}
 }
 
+@keyframes slide_in_top {
+	100% {
+		transform: translateY(0%);
+	}
+}
+
 // In order to use mix-blend-mode, this element needs to have an explicitly set background-color
 // We scope it to .wp-toolbar to be wp-admin only, to prevent bleed into other implementations
 html.wp-toolbar {
