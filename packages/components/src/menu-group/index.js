@@ -20,9 +20,7 @@ export function MenuGroup( {
 	instanceId,
 	label,
 } ) {
-	const menuItems = Children.toArray( children );
-
-	if ( ! Array.isArray( menuItems ) || ! menuItems.length ) {
+	if ( ! Children.count( children ) ) {
 		return null;
 	}
 
@@ -35,7 +33,7 @@ export function MenuGroup( {
 				<div className="components-menu-group__label" id={ labelId }>{ label }</div>
 			}
 			<NavigableMenu orientation="vertical" aria-labelledby={ labelId }>
-				{ menuItems }
+				{ children }
 			</NavigableMenu>
 		</div>
 	);
