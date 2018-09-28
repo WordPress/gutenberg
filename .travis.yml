@@ -97,6 +97,7 @@ jobs:
         - cd ./gutenberg-mobile
         - yarn install
         - ./.travis/travis-checks-js.sh
+
     - stage: test
       language: node_js
       node_js: 8
@@ -111,6 +112,7 @@ jobs:
         - cd ./gutenberg-mobile
         - yarn install
         - ./.travis/travis-checks-js.sh
+
     - stage: test
       language: node_js
       node_js: 8
