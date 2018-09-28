@@ -361,6 +361,12 @@
 				display: inline-flex;
 			}
 		}
+
+		// This resets the intrinsic margin on the figure in wide and full-wide alignments.
+		figure {
+			margin-left: 0;
+			margin-right: 0;
+		}
 	}
 
 	// Wide
@@ -373,7 +379,6 @@
 
 	// Full-wide
 	&[data-align="full"] {
-
 		// Position hover label on the right
 		> .editor-block-list__breadcrumb {
 			right: -$border-width;
