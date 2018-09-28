@@ -166,6 +166,18 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
         view.setMinImagesWidth(minWidth);
     }
 
+    /*
+     * This property/method is used to disable the Gutenberg compatibility mode on AztecRN.
+     *
+     * Aztec comes along with some nice plugins that are able to show preview of Pictures/Videos/shortcodes,
+     * and WP specific features, in the visual editor.
+     *
+     * We don't need those improvements in Gutenberg mobile, so this RN wrapper around Aztec
+     * that's only used in GB-mobile at the moment, does have them OFF by default.
+     *
+     * An external 3rd party RN-app can use AztecRN wrapper and set the `disableGutenbergMode` to false to have a fully
+     * working visual editor. See the demo app, where `disableGutenbergMode` is already OFF.
+     */
     @ReactProp(name = "disableGutenbergMode", defaultBoolean = false)
     public void disableGBMode(final ReactAztecText view, boolean disable) {
         if (disable) {
