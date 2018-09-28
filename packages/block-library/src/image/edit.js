@@ -54,6 +54,7 @@ const LINK_DESTINATION_NONE = 'none';
 const LINK_DESTINATION_MEDIA = 'media';
 const LINK_DESTINATION_ATTACHMENT = 'attachment';
 const LINK_DESTINATION_CUSTOM = 'custom';
+const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 class ImageEdit extends Component {
 	constructor() {
@@ -85,7 +86,7 @@ class ImageEdit extends Component {
 			if ( file ) {
 				mediaUpload( {
 					filesList: [ file ],
-					allowedType: 'image',
+					allowedTypes: ALLOWED_MEDIA_TYPES,
 					onFileChange: ( [ image ] ) => {
 						setAttributes( { ...image } );
 					},
@@ -93,6 +94,7 @@ class ImageEdit extends Component {
 						this.setState( { hasError: true } );
 						noticeOperations.createErrorNotice( message );
 					},
+
 				} );
 			}
 		}
@@ -227,7 +229,7 @@ class ImageEdit extends Component {
 				<Toolbar>
 					<MediaUpload
 						onSelect={ this.onSelectImage }
-						type="image"
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						value={ id }
 						render={ ( { open } ) => (
 							<IconButton
@@ -257,7 +259,7 @@ class ImageEdit extends Component {
 						notices={ noticeUI }
 						onError={ noticeOperations.createErrorNotice }
 						accept="image/*"
-						type="image"
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
 					/>
 				</Fragment>
 			);

@@ -3,6 +3,7 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 ## 4.2.0
 
 - Writing resolvers as async generators has been removed. Use the controls plugin instead.
+- `wp.components.AccessibleSVG` component has been removed. Please use `wp.components.SVG` instead.
 
 ## 4.1.0
 

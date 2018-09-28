@@ -9,6 +9,7 @@ import { castArray, pick } from 'lodash';
 import { parseWithAttributeSchema } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import deprecated from '@wordpress/deprecated';
 
 // Getter for the sake of unit tests.
 const getGalleryDetailsMediaFrame = () => {
@@ -75,7 +76,15 @@ const getAttachmentsCollection = ( ids ) => {
 };
 
 class MediaUpload extends Component {
-	constructor( { multiple = false, type, gallery = false, title = __( 'Select or Upload Media' ), modalClass, value } ) {
+	constructor( {
+		allowedTypes,
+		type: deprecatedType,
+		multiple = false,
+		gallery = false,
+		title = __( 'Select or Upload Media' ),
+		modalClass,
+		value,
+	} ) {
 		super( ...arguments );
 		this.openModal = this.openModal.bind( this );
 		this.onOpen = this.onOpen.bind( this );
@@ -83,6 +92,19 @@ class MediaUpload extends Component {
 		this.onUpdate = this.onUpdate.bind( this );
 		this.onClose = this.onClose.bind( this );
 		this.processMediaCaption = this.processMediaCaption.bind( this );
+
+		let allowedTypesToUse = allowedTypes;
+		if ( ! allowedTypes && deprecatedType ) {
+			deprecated( 'type property of wp.editor.MediaUpload', {
+				version: '4.2',
+				alternative: 'allowedTypes property containing an array with the allowedTypes or do not pass any property if all types are allowed',
+			} );
+			if ( deprecatedType === '*' ) {
+				allowedTypesToUse = undefined;
+			} else {
+				allowedTypesToUse = [ deprecatedType ];
+			}
+		}
 
 		if ( gallery ) {
 			const currentState = value ? 'gallery-edit' : 'gallery';
@@ -93,7 +115,7 @@ class MediaUpload extends Component {
 				multiple,
 			} );
 			this.frame = new GalleryDetailsMediaFrame( {
-				mimeType: type,
+				mimeType: allowedTypesToUse,
 				state: currentState,
 				multiple,
 				selection,
@@ -108,8 +130,8 @@ class MediaUpload extends Component {
 				},
 				multiple,
 			};
-			if ( !! type ) {
-				frameConfig.library = { type };
+			if ( !! allowedTypesToUse ) {
+				frameConfig.library = { type: allowedTypesToUse };
 			}
 
 			this.frame = wp.media( frameConfig );

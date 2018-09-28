@@ -14,7 +14,6 @@ function WritingMenu( { onClose } ) {
 	return (
 		<MenuGroup
 			label={ __( 'View' ) }
-			filterName="editPost.MoreMenu.writing"
 		>
 			<FeatureToggle feature="fixedToolbar" label={ __( 'Unified Toolbar' ) } onToggle={ onClose } />
 			<FeatureToggle feature="focusMode" label={ __( 'Spotlight Mode' ) } onToggle={ onClose } />
