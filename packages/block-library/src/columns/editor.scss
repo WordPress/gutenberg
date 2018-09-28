@@ -58,4 +58,24 @@
 			}
 		}
 	}
+
+	&.has-2-columns .editor-block-list__layout > .editor-block-list__block-edit {
+		max-width: 50%;
+	}
+
+	&.has-3-columns .editor-block-list__layout > .editor-block-list__block-edit {
+		max-width: 33.3333%;
+	}
+
+	&.has-4-columns .editor-block-list__layout > .editor-block-list__block-edit {
+		max-width: 25%;
+	}
+
+	&.has-5-columns .editor-block-list__layout > .editor-block-list__block-edit {
+		max-width: 20%;
+	}
+
+	&.has-6-columns .editor-block-list__layout > .editor-block-list__block-edit {
+		max-width: 16.6666%;
+	}
 }
