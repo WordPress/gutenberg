@@ -361,12 +361,6 @@
 				display: inline-flex;
 			}
 		}
-
-		// This resets the intrinsic margin on the figure in wide and full-wide alignments.
-		figure {
-			margin-left: 0;
-			margin-right: 0;
-		}
 	}
 
 	// Wide
