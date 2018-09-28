@@ -40,35 +40,50 @@ jobs:
         - npm run ci || exit 1
 
     - stage: test
-      env: WP_VERSION=latest DOCKER=true
+      env:
+        WP_VERSION=latest
+        DOCKER=true
+        SKIP_POSTINSTALL=true
       script:
         - ./bin/run-wp-unit-tests.sh
 
     - stage: test
       php: 5.6
-      env: WP_VERSION=latest
+      env:
+        WP_VERSION=latest
+        SKIP_POSTINSTALL=true
       script:
         - ./bin/run-wp-unit-tests.sh
       if: branch = master and type != "pull_request"
 
     - stage: test
       php: 7.1
-      env: WP_VERSION=latest SWITCH_TO_PHP=5.3
+      env:
+        WP_VERSION=latest
+        SWITCH_TO_PHP=5.3
+        SKIP_POSTINSTALL=true
       script:
         - ./bin/run-wp-unit-tests.sh
       if: branch = master and type != "pull_request"
 
     - stage: test
       php: 7.1
-      env: WP_VERSION=latest SWITCH_TO_PHP=5.2
+      env:
+        WP_VERSION=latest
+        SWITCH_TO_PHP=5.2
+        SKIP_POSTINSTALL=true
       script:
         - ./bin/run-wp-unit-tests.sh
 
     - stage: test
-      env: WP_VERSION=latest
+      env:
+        WP_VERSION=latest
+        SKIP_POSTINSTALL=true
+      cache:
+        yarn: true
       script:
-        - npm install || exit 1
         - ./bin/run-e2e-tests.sh || exit 1
+
     - stage: test
       language: node_js
       node_js: 8
