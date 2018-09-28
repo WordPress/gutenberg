@@ -8,4 +8,4 @@ cd "$(dirname "$0")/../"
 ( ./bin/setup-local-env.sh )
 
 # Run the tests
-npm run test-e2e
+time npm run test-e2e
