@@ -15,22 +15,6 @@
 			pointer-events: none;
 		}
 	}
-
-	.components-button {
-		overflow: hidden;
-
-		> span {
-			line-height: 1;
-		}
-
-		&.is-font-medium {
-			font-size: 18px;
-		}
-
-		&.is-font-large {
-			font-size: 22px;
-		}
-	}
 }
 
 .components-font-size-picker__custom-input {
