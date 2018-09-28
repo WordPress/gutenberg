@@ -69,9 +69,8 @@ describe( 'mediaUpload', () => {
 	it( 'should work as expected if allowedTypes contains a complete mime type string and the validation has success', () => {
 		// When the upload has success we get errors because we don't have available on the test environment
 		// all the functions required by mediaUpload.
-		// We know that when a validation success the function tries to creat a temporary url for the file
+		// We know that when a validation success the function tries to create a temporary url for the file
 		// so we use that function to test the validation success.
-
 		const onError = jest.fn();
 		const testFile = {
 			url: 'https://cldup.com/uuUqE_dXzy.mp3',
@@ -90,6 +89,7 @@ describe( 'mediaUpload', () => {
 		expect( createObjectURL ).not.toHaveBeenCalled();
 		expect( onError ).not.toHaveBeenCalled();
 	} );
+
 	it( 'should error if allowedTypes contains multiple types and the validation fails', () => {
 		const onError = jest.fn();
 		const testFile = {
@@ -115,9 +115,8 @@ describe( 'mediaUpload', () => {
 	it( 'should work as expected if allowedTypes contains multiple types and the validation has success', () => {
 		// When the upload has success we get errors because we don't have available on the test environment
 		// all the functions required by mediaUpload.
-		// We know that when a validation success the function tries to creat a temporary url for the file
+		// We know that when a validation success the function tries to create a temporary url for the file
 		// so we use that function to test the validation success.
-
 		const onError = jest.fn();
 		const testFile = {
 			url: 'https://cldup.com/uuUqE_dXzy.mp3',

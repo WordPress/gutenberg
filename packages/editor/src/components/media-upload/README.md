@@ -53,7 +53,7 @@ The component accepts the following props. Props not included in this set will b
 
 ### allowedTypes
 
-Array withe the types of the media to upload/select from the media library.
+Array with the types of the media to upload/select from the media library.
 Each type is a string that can contain the general mime type e.g: 'image', 'audio', 'text',
 or the complete mime type e.g: 'audio/mpeg', 'image/gif'.
 If allowedTypes is unset all mime types should be allowed.
