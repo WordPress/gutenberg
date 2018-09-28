@@ -3,6 +3,7 @@
  */
 
 import { create } from './create';
+import { normaliseFormats } from './normalise-formats';
 
 /**
  * Combine an array of Rich Text values into one, optionally separated by
@@ -19,10 +20,8 @@ export function join( values, separator = '' ) {
 		separator = create( { text: separator } );
 	}
 
-	return values.reduce( ( accumlator, { formats, text } ) => {
-		return {
-			text: accumlator.text + separator.text + text,
-			formats: accumlator.formats.concat( separator.formats, formats ),
-		};
-	} );
+	return normaliseFormats( values.reduce( ( accumlator, { formats, text } ) => ( {
+		text: accumlator.text + separator.text + text,
+		formats: accumlator.formats.concat( separator.formats, formats ),
+	} ) ) );
 }

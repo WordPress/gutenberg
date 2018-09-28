@@ -3,6 +3,7 @@
  */
 
 import { isEmpty } from './is-empty';
+import { isFormatEqual } from './is-format-equal';
 
 /**
  * Browser dependencies
@@ -261,6 +262,8 @@ function createFromElement( {
 			continue;
 		}
 
+		const lastFormats = accumulator.formats[ accumulator.formats.length - 1 ];
+		const lastFormat = lastFormats && lastFormats[ lastFormats.length - 1 ];
 		let format;
 
 		if ( ! unwrapNode || ! unwrapNode( node ) ) {
@@ -269,8 +272,14 @@ function createFromElement( {
 				element: node,
 				removeAttribute,
 			} );
+			const newFormat = attributes ? { type, attributes } : { type };
 
-			format = attributes ? { type, attributes } : { type };
+			// Reuse the last format if it's equal.
+			if ( isFormatEqual( newFormat, lastFormat ) ) {
+				format = lastFormat;
+			} else {
+				format = newFormat;
+			}
 		}
 
 		const value = createFromElement( {

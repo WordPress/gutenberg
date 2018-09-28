@@ -27,7 +27,6 @@ export function toTree( value, multilineTag, settings ) {
 		append,
 		getLastChild,
 		getParent,
-		getType,
 		isText,
 		getText,
 		remove,
@@ -44,16 +43,22 @@ export function toTree( value, multilineTag, settings ) {
 	for ( let i = 0; i < formatsLength; i++ ) {
 		const character = text.charAt( i );
 		const characterFormats = formats[ i ];
+		const lastCharacterFormats = formats[ i - 1 ];
 
 		let pointer = getLastChild( tree );
 
 		if ( characterFormats ) {
-			characterFormats.forEach( ( { type, attributes, object } ) => {
-				if ( pointer && type === getType( pointer ) ) {
+			characterFormats.forEach( ( format, formatIndex ) => {
+				if (
+					pointer &&
+					lastCharacterFormats &&
+					format === lastCharacterFormats[ formatIndex ]
+				) {
 					pointer = getLastChild( pointer );
 					return;
 				}
 
+				const { type, attributes, object } = format;
 				const parent = getParent( pointer );
 				const newNode = append( parent, { type, attributes, object } );
 

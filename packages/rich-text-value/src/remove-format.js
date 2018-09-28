@@ -5,6 +5,12 @@
 import { find } from 'lodash';
 
 /**
+ * Internal dependencies
+ */
+
+import { normaliseFormats } from './normalise-formats';
+
+/**
  * Remove any format object from a Rich Text value by type from the given
  * `startIndex` to the given `endIndex`. Indices are retrieved from the
  * selection if none are provided.
@@ -48,7 +54,7 @@ export function removeFormat(
 		}
 	}
 
-	return { formats: newFormats, text, start, end };
+	return normaliseFormats( { formats: newFormats, text, start, end } );
 }
 
 function filterFormats( formats, index, formatType ) {

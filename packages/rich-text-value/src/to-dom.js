@@ -98,10 +98,6 @@ function getParent( { parentNode } ) {
 	return parentNode;
 }
 
-function getType( { nodeName } ) {
-	return nodeName.toLowerCase();
-}
-
 function isText( { nodeType } ) {
 	return nodeType === TEXT_NODE;
 }
@@ -123,7 +119,6 @@ export function toDom( value, multilineTag ) {
 		append,
 		getLastChild,
 		getParent,
-		getType,
 		isText,
 		getText,
 		remove,

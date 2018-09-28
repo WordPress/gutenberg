@@ -63,4 +63,19 @@ describe( 'toHTMLString', () => {
 
 		expect( toHTMLString( create( { element, multilineTag } ), 'li' ) ).toEqual( HTML );
 	} );
+
+	it( 'should serialize neighbouring formats of same type', () => {
+		const HTML = '<a href="a">a</a><a href="b">a</a>';
+		const element = createNode( `<p>${ HTML }</p>` );
+
+		expect( toHTMLString( create( { element } ) ) ).toEqual( HTML );
+	} );
+
+	it( 'should serialize neighbouring same formats', () => {
+		const HTML = '<a href="a">a</a><a href="a">a</a>';
+		const element = createNode( `<p>${ HTML }</p>` );
+		const expectedHTML = '<a href="a">aa</a>';
+
+		expect( toHTMLString( create( { element } ) ) ).toEqual( expectedHTML );
+	} );
 } );

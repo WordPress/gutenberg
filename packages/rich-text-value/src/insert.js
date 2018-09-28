@@ -1,8 +1,9 @@
 /**
- * External dependencies
+ * Internal dependencies
  */
 
 import { create } from './create';
+import { normaliseFormats } from './normalise-formats';
 
 /**
  * Insert a Rich Text value, an HTML string, or a plain text string, into a
@@ -29,10 +30,10 @@ export function insert(
 
 	const index = startIndex + valueToInsert.text.length;
 
-	return {
+	return normaliseFormats( {
 		formats: formats.slice( 0, startIndex ).concat( valueToInsert.formats, formats.slice( endIndex ) ),
 		text: text.slice( 0, startIndex ) + valueToInsert.text + text.slice( endIndex ),
 		start: index,
 		end: index,
-	};
+	} );
 }

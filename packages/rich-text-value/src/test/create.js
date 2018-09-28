@@ -551,4 +551,14 @@ describe( 'create', () => {
 		expect( value.formats[ 0 ][ 0 ] ).toBe( value.formats[ 2 ][ 0 ] );
 		expect( value.formats[ 2 ][ 1 ] ).toBe( value.formats[ 3 ][ 1 ] );
 	} );
+
+	it( 'should use same reference for equal format', () => {
+		const value = create( { html: '<a href="#">a</a><a href="#">a</a>' } );
+		expect( value.formats[ 0 ][ 0 ] ).toBe( value.formats[ 1 ][ 0 ] );
+	} );
+
+	it( 'should use different reference for different format', () => {
+		const value = create( { html: '<a href="#">a</a><a href="#a">a</a>' } );
+		expect( value.formats[ 0 ][ 0 ] ).not.toBe( value.formats[ 1 ][ 0 ] );
+	} );
 } );

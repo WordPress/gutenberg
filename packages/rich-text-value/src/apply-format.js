@@ -1,4 +1,10 @@
 /**
+ * Internal dependencies
+ */
+
+import { normaliseFormats } from './normalise-formats';
+
+/**
  * Apply a format object to a Rich Text value from the given `startIndex` to the
  * given `endIndex`. Indices are retrieved from the selection if none are
  * provided.
@@ -28,5 +34,5 @@ export function applyFormat(
 		}
 	}
 
-	return { formats: newFormats, text, start, end };
+	return normaliseFormats( { formats: newFormats, text, start, end } );
 }

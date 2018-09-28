@@ -1,4 +1,10 @@
 /**
+ * Internal dependencies
+ */
+
+import { normaliseFormats } from './normalise-formats';
+
+/**
  * Search a Rich Text value and replace the match(es) with `replacement`. This
  * is similar to `String.prototype.replace`.
  *
@@ -44,5 +50,5 @@ export function replace( { formats, text, start, end }, pattern, replacement ) {
 		return newText;
 	} );
 
-	return { formats, text, start, end };
+	return normaliseFormats( { formats, text, start, end } );
 }

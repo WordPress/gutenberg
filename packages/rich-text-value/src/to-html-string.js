@@ -25,7 +25,6 @@ export function toHTMLString( value, multilineTag ) {
 		append,
 		getLastChild,
 		getParent,
-		getType,
 		isText,
 		getText,
 		remove,
@@ -60,10 +59,6 @@ function appendText( object, text ) {
 
 function getParent( { parent } ) {
 	return parent;
-}
-
-function getType( { type } ) {
-	return type;
 }
 
 function isText( { text } ) {
