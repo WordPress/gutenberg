@@ -516,12 +516,6 @@
 		"parent": null
 	},
 	{
-		"title": "AccessibleSvg",
-		"slug": "accessible-svg",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/accessible-svg/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "Autocomplete",
 		"slug": "autocomplete",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/autocomplete/README.md",
@@ -648,9 +642,57 @@
 		"parent": "components"
 	},
 	{
+		"title": "NavigateRegions",
+		"slug": "navigate-regions",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/higher-order/navigate-regions/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "HigherOrder",
 		"slug": "higher-order",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/higher-order/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "WithConstrainedTabbing",
+		"slug": "with-constrained-tabbing",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/higher-order/with-constrained-tabbing/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "WithFallbackStyles",
+		"slug": "with-fallback-styles",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/higher-order/with-fallback-styles/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "WithFilters",
+		"slug": "with-filters",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/higher-order/with-filters/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "WithFocusOutside",
+		"slug": "with-focus-outside",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/higher-order/with-focus-outside/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "WithFocusReturn",
+		"slug": "with-focus-return",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/higher-order/with-focus-return/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "WithNotices",
+		"slug": "with-notices",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/higher-order/with-notices/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "WithSpokenMessages",
+		"slug": "with-spoken-messages",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/higher-order/with-spoken-messages/README.md",
 		"parent": "components"
 	},
 	{
@@ -717,6 +759,12 @@
 		"title": "Popover",
 		"slug": "popover",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/popover/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Svg",
+		"slug": "svg",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/primitives/svg/README.md",
 		"parent": "components"
 	},
 	{
