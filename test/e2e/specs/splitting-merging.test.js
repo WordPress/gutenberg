@@ -1,6 +1,9 @@
 /**
  * Internal dependencies
  */
+
+// hello!
+
 import {
 	newPost,
 	insertBlock,
