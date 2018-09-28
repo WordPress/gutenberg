@@ -11,11 +11,11 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import Dashicon from '../dashicon';
 import BaseControl from '../base-control';
 import Button from '../button';
-import ButtonGroup from '../button-group';
+import Dropdown from '../dropdown';
 import RangeControl from '../range-control';
-import Tooltip from '../tooltip';
 
 export default function FontSizePicker( { fontSizes = [], fallbackFontSize, value, onChange, withSlider } ) {
 	const onChangeValue = ( event ) => {
@@ -27,27 +27,36 @@ export default function FontSizePicker( { fontSizes = [], fallbackFontSize, valu
 		onChange( Number( newValue ) );
 	};
 
+	const currentFont = fontSizes.find( ( font ) => font.size === value );
+
 	return (
 		<BaseControl
 			label={ __( 'Font Size' ) }
 		>
 			<div className="components-font-size-picker__buttons">
-				<ButtonGroup aria-label={ __( 'Font Size' ) }>
-					{ map( fontSizes, ( { name, size, shortName, slug } ) => (
-						<Tooltip text={ name || shortName }>
-							<Button
-								key={ size }
-								isLarge
-								isPrimary={ value === size }
-								aria-pressed={ value === size }
-								onClick={ () => onChange( size ) }
-								className={ 'is-font-' + slug }
-							>
-								<span>A</span>
-							</Button>
-						</Tooltip>
-					) ) }
-				</ButtonGroup>
+				<Dropdown
+					className="components-font-size-picker__dropdown"
+					contentClassName="components-font-size-picker__dropdown-content"
+					position="bottom"
+					renderToggle={ ( { isOpen, onToggle } ) => (
+						<Button className="components-font-size-picker__selector" isLarge onClick={ onToggle } aria-expanded={ isOpen }>
+							{ ( currentFont && currentFont.name ) || ( ! value && 'Normal' ) || 'Custom' }
+						</Button>
+					) }
+					renderContent={ () => map( fontSizes, ( { name, size, slug } ) => (
+						<Button
+							key={ slug }
+							aria-pressed={ value === size }
+							onClick={ () => onChange( slug === 'normal' ? undefined : size ) }
+							className={ 'is-font-' + slug }
+						>
+							{ ( value === size || ( ! value && slug === 'normal' ) ) &&	<Dashicon icon="saved" /> }
+							<span className="components-font-size-picker__dropdown-text-size" style={ { fontSize: size } }>
+								{ name }
+							</span>
+						</Button>
+					) )	}
+				/>
 				{ ! withSlider &&
 					<input
 						className="components-range-control__number"

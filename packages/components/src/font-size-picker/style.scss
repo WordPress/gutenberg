@@ -39,3 +39,37 @@
 		height: 30px;
 	}
 }
+
+.components-font-size-picker__dropdown-content .components-button {
+	display: block;
+	position: relative;
+	padding: 10px 20px 10px 40px;
+	width: 100%;
+	text-align: left;
+
+	.dashicon {
+		position: absolute;
+		top: calc(50% - 10px);
+		left: 10px;
+	}
+}
+
+.components-font-size-picker__buttons .components-font-size-picker__selector {
+	border: 1px solid;
+	background: none;
+	position: relative;
+	width: 110px;
+
+	@include input-style__neutral();
+
+	&:focus {
+		@include input-style__focus();
+	}
+
+	&::after {
+		@include dropdown-arrow();
+		right: 8px;
+		top: 12px;
+		position: absolute;
+	}
+}

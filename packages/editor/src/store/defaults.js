@@ -81,21 +81,28 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 	fontSizes: [
 		{
 			name: __( 'Small' ),
-			shortName: __( 'S' ),
 			size: 13,
 			slug: 'small',
 		},
 		{
+			name: __( 'Normal' ),
+			size: 16,
+			slug: 'normal',
+		},
+		{
 			name: __( 'Medium' ),
-			shortName: __( 'M' ),
 			size: 20,
 			slug: 'medium',
 		},
 		{
 			name: __( 'Large' ),
-			shortName: __( 'L' ),
 			size: 36,
 			slug: 'large',
+		},
+		{
+			name: __( 'Huge' ),
+			size: 48,
+			slug: 'huge',
 		},
 	],
 
