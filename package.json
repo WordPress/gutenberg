@@ -179,7 +179,7 @@
 		"mobile-submodule-update": "git submodule update --init --recursive",
 		"mobile-install": "yarn --cwd gutenberg-mobile install",
 		"preinstall": "npm run mobile-submodule-update",
-		"postinstall": " npm run mobile-install && npm run check-licenses && npm run build:packages",
+		"postinstall": "./bin/postinstall.sh",
 		"pot-to-php": "./bin/pot-to-php.js",
 		"precommit": "lint-staged",
 		"publish:check": "npm run build:packages && lerna updated",

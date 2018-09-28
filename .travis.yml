@@ -34,6 +34,10 @@ branches:
 jobs:
   include:
     - stage: test
-      env: WP_VERSION=latest
+      env:
+        WP_VERSION=latest
+        CI_RUN=e2e
+      cache:
+        yarn: true
       script:
         - ./bin/run-e2e-tests.sh || exit 1
