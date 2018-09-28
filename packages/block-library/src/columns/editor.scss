@@ -59,6 +59,7 @@
 		}
 	}
 
+	// These max-widths constrain columns so long words do not cause overflow issues in the editor.
 	&.has-2-columns .editor-block-list__layout > .editor-block-list__block-edit {
 		max-width: 50%;
 	}
