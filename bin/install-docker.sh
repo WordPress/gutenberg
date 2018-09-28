@@ -34,7 +34,7 @@ docker-compose $DOCKER_COMPOSE_FILE_OPTIONS up -d >/dev/null
 
 # Set up WordPress Development site.
 # Note: we don't bother installing the test site right now, because that's
-# done on every `npm run test-e2e` is run.
+# done on every time `npm run test-e2e` is run.
 . "$(dirname "$0")/install-wordpress.sh"
 
 # Install the PHPUnit test scaffolding.
