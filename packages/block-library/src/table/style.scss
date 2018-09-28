@@ -1,9 +1,5 @@
 .wp-block-table {
-	// Fixed layout toggle
-	&.has-fixed-layout thead,
-	&.has-fixed-layout tbody,
-	&.has-fixed-layout tfoot {
-		display: table;
+	&.has-fixed-layout table {
 		table-layout: fixed;
 		width: 100%;
 	}
