@@ -242,9 +242,10 @@ export function getEmbedEdit( title, icon ) {
 		}
 
 		/***
-		 * Gets block attributes based on the preview.
+		 * Gets block attributes based on the preview and responsive state.
 		 *
 		 * @param {string} preview The preview data.
+		 * @param {boolean} allowResponsive Apply responsive classes to fixed size content.
 		 * @return {Object} Attributes and values.
 		 */
 		getAttributesFromPreview( preview, allowResponsive = true ) {
