@@ -11,7 +11,7 @@ import { Fragment } from '@wordpress/element';
 import { InspectorControls } from '@wordpress/editor';
 
 function getDownloadButtonHelp( checked ) {
-	return checked ? __( 'The download button is shown.' ) : __( 'The download button is hidden.' );
+	return checked ? __( 'The download button is visible.' ) : __( 'The download button is hidden.' );
 }
 
 export default function FileBlockInspector( {

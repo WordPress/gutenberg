@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
+import { noop, every, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -48,23 +48,29 @@ export function ReusableBlockConvertButton( {
 }
 
 export default compose( [
-	withSelect( ( select, { clientId } ) => {
+	withSelect( ( select, { clientIds } ) => {
 		const { getBlock, getReusableBlock } = select( 'core/editor' );
 		const { getFallbackBlockName } = select( 'core/blocks' );
 
-		const block = getBlock( clientId );
-		if ( ! block ) {
-			return { isVisible: false };
-		}
+		const blocks = map( clientIds, ( clientId ) => getBlock( clientId ) );
+
+		// Hide 'Add to Reusable Blocks' on Classic blocks. Showing it causes a
+		// confusing UX, because of its similarity to the 'Convert to Blocks' button.
+		const isVisible = (
+			every( blocks, ( block ) => !! block ) &&
+			( blocks.length !== 1 || blocks[ 0 ].name !== getFallbackBlockName() )
+		);
 
 		return {
-			// Hide 'Add to Reusable Blocks' on Classic blocks. Showing it causes a
-			// confusing UX, because of its similarity to the 'Convert to Blocks' button.
-			isVisible: block.name !== getFallbackBlockName(),
-			isStaticBlock: ! isReusableBlock( block ) || ! getReusableBlock( block.attributes.ref ),
+			isStaticBlock: isVisible && (
+				blocks.length !== 1 ||
+				! isReusableBlock( blocks[ 0 ] ) ||
+				! getReusableBlock( blocks[ 0 ].attributes.ref )
+			),
+			isVisible,
 		};
 	} ),
-	withDispatch( ( dispatch, { clientId, onToggle = noop } ) => {
+	withDispatch( ( dispatch, { clientIds, onToggle = noop } ) => {
 		const {
 			convertBlockToReusable,
 			convertBlockToStatic,
@@ -72,11 +78,14 @@ export default compose( [
 
 		return {
 			onConvertToStatic() {
-				convertBlockToStatic( clientId );
+				if ( clientIds.length !== 1 ) {
+					return;
+				}
+				convertBlockToStatic( clientIds[ 0 ] );
 				onToggle();
 			},
 			onConvertToReusable() {
-				convertBlockToReusable( clientId );
+				convertBlockToReusable( clientIds );
 				onToggle();
 			},
 		};

@@ -1,7 +1,7 @@
 /**
  * Node dependencies
  */
-const { camelCase, kebabCase, upperFirst } = require( 'lodash' );
+const { camelCase, kebabCase, nth, upperFirst } = require( 'lodash' );
 
 const baseRepoUrl = `https://raw.githubusercontent.com/WordPress/gutenberg/master`;
 
@@ -52,7 +52,7 @@ function getComponentManifest( componentPaths ) {
 		},
 		...componentPaths
 			.map( ( filePath ) => {
-				const slug = filePath.split( '/' )[ 3 ];
+				const slug = nth( filePath.split( '/' ), -2 );
 				return {
 					title: upperFirst( camelCase( slug ) ),
 					slug,

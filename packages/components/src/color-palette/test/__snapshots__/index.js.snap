@@ -127,7 +127,6 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
   </div>
   <Button
     className="components-color-palette__clear"
-    isButton={true}
     isDefault={true}
     isSmall={true}
     onClick={[Function]}
@@ -213,7 +212,6 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
   />
   <Button
     className="components-color-palette__clear"
-    isButton={true}
     isDefault={true}
     isSmall={true}
     onClick={[Function]}

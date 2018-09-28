@@ -115,13 +115,22 @@
 }
 
 .editor-block-list__layout .editor-block-list__block[data-type="core/freeform"] {
-	.editor-block-list__block-edit::before {
-		outline: $border-width solid #e2e4e7;
+
+	// Not sure why this is necessary, there seems to be a skin file that overrides this upstream.
+	.mce-btn.mce-active button,
+	.mce-btn.mce-active:hover button,
+	.mce-btn.mce-active i,
+	.mce-btn.mce-active:hover i {
+		color: $dark-gray-800;
 	}
 
-	// Don't show normal block toolbar
-	.editor-block-contextual-toolbar {
-		display: none;
+	// Adjust padding to not cause a jump.
+	.mce-toolbar-grp > div {
+		padding: 1px 3px;
+	}
+
+	.editor-block-list__block-edit::before {
+		outline: $border-width solid #e2e4e7;
 	}
 
 	// Don't show block type label for classic block
@@ -130,7 +139,6 @@
 	}
 }
 
-
 div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 	margin-top: 0;
 	padding-top: 0;
@@ -138,11 +146,18 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 
 .freeform-toolbar {
 	width: auto;
-	margin: 0 #{ -$parent-block-padding };
+	margin: 0 #{ -$block-padding };
 	position: sticky;
 	z-index: z-index(".freeform-toolbar");
 	top: $block-padding;
 	transform: translateY(-$block-padding);
+
+	// On mobile, toolbars go edge to edge.
+	padding: 0 $block-padding;
+
+	@include break-small() {
+		padding: 0;
+	}
 }
 
 .freeform-toolbar:empty {
@@ -186,4 +201,44 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 
 .freeform-toolbar.has-advanced-toolbar .mce-toolbar-grp .mce-toolbar {
 	display: block;
+}
+
+// We don't want the ellipsis to overlap the classic toolbar, which it will due to position sticky.
+// So we move it to the right, and make room for it.
+@include break-small() {
+	.editor-block-list__block[data-type="core/freeform"] {
+		.editor-block-contextual-toolbar {
+			float: right;
+			margin-right: -$block-side-ui-clearance - $border-width;
+			transform: translateY(-#{ $block-padding - $border-width });
+			top: $block-padding;
+
+			.editor-block-toolbar {
+				border: none;
+
+				// Match the TinyMCE "mobile" breakpoint buttons alignment.
+				margin-top: 3px;
+				@include break-medium() {
+					margin-top: 0;
+				}
+
+				&::before {
+					content: "";
+					display: block;
+					border-left: 1px solid $light-gray-500;
+					margin-top: $grid-size-small;
+					margin-bottom: $grid-size-small;
+				}
+			}
+
+			.components-toolbar {
+				background: transparent;
+				border: none;
+			}
+		}
+
+		.mce-container.mce-toolbar.mce-stack-layout-item {
+			padding-right: $icon-button-size;
+		}
+	}
 }

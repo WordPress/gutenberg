@@ -10,6 +10,8 @@ Install the module
 npm install @wordpress/plugins --save
 ```
 
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+
 ### Plugins API
 
 The plugins API contains the following methods:
@@ -27,7 +29,7 @@ This method takes two arguments:
       or an element (or function returning an element) if you choose to render your own SVG.
     - `render`: A component containing the UI elements to be rendered.
 
-See [the edit-post module documentation](../edit-post/) for available components.
+See [the edit-post module documentation](../../edit-post/) for available components.
 
 _Example:_
 {% codetabs %}

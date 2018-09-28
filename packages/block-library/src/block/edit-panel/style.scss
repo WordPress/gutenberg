@@ -7,14 +7,14 @@
 	font-family: $default-font;
 	font-size: $default-font-size;
 	position: relative;
-	top: $block-padding;
-	margin: 0 (-$parent-block-padding);
-	padding: 10px $parent-block-padding;
+	top: -$block-padding;
+	margin: 0 (-$block-padding) (-$block-padding) (-$block-padding);
+	padding: $grid-size $block-padding;
 
 	// Show a smaller padding when nested.
 	.editor-block-list__layout & {
 		margin: 0 (-$block-padding);
-		padding: 10px $block-padding;
+		padding: $grid-size $block-padding;
 	}
 
 	.reusable-block-edit-panel__spinner {
@@ -40,6 +40,11 @@
 
 	.components-button.reusable-block-edit-panel__button {
 		margin: 0 5px 0 0;
+
+		// Prevent button shrinking in IE11 when other items have a 100% flex basis.
+		// This should be safe to apply in all browsers because we don't want these
+		// buttons to shrink anyway.
+		flex-shrink: 0;
 	}
 
 	@include break-large() {

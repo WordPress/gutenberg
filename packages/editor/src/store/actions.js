@@ -11,6 +11,7 @@ import {
 	getDefaultBlockName,
 	createBlock,
 } from '@wordpress/blocks';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Returns an action object used in signalling that editor has initialized with
@@ -373,6 +374,14 @@ export function setTemplateValidity( isValid ) {
  * @return {Object} Action object.
  */
 export function checkTemplateValidity() {
+	// TODO: Hello future deprecation remover. Please ensure also to remove all
+	// references to CHECK_TEMPLATE_VALIDITY, notably its effect handler.
+	deprecated( 'checkTemplateValidity action (`core/editor`)', {
+		version: '4.1',
+		plugin: 'Gutenberg',
+		hint: 'Validity is verified automatically upon block reset.',
+	} );
+
 	return {
 		type: 'CHECK_TEMPLATE_VALIDITY',
 	};
@@ -691,14 +700,14 @@ export function convertBlockToStatic( clientId ) {
 /**
  * Returns an action object used to convert a static block into a reusable block.
  *
- * @param {string} clientId The client ID of the block to detach.
+ * @param {string} clientIds The client IDs of the block to detach.
  *
  * @return {Object} Action object.
  */
-export function convertBlockToReusable( clientId ) {
+export function convertBlockToReusable( clientIds ) {
 	return {
 		type: 'CONVERT_BLOCK_TO_REUSABLE',
-		clientId,
+		clientIds: castArray( clientIds ),
 	};
 }
 /**
@@ -761,5 +770,27 @@ export function unregisterToken( name ) {
 	return {
 		type: 'UNREGISTER_TOKEN',
 		name,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user has enabled the publish sidebar.
+ *
+ * @return {Object} Action object
+ */
+export function enablePublishSidebar() {
+	return {
+		type: 'ENABLE_PUBLISH_SIDEBAR',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user has disabled the publish sidebar.
+ *
+ * @return {Object} Action object
+ */
+export function disablePublishSidebar() {
+	return {
+		type: 'DISABLE_PUBLISH_SIDEBAR',
 	};
 }

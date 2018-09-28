@@ -15,7 +15,7 @@ import {
 	serialize,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '@wordpress/blocks';
-import { parse as grammarParse } from '@wordpress/block-serialization-spec-parser';
+import { parse as grammarParse } from '@wordpress/block-serialization-default-parser';
 import { registerCoreBlocks } from '@wordpress/block-library';
 
 const fixturesDir = path.join( __dirname, 'fixtures' );
@@ -223,7 +223,8 @@ describe( 'full post content fixture', () => {
 			.map( ( block ) => block.name )
 			// We don't want tests for each oembed provider, which all have the same
 			// `save` functions and attributes.
-			.filter( ( name ) => name.indexOf( 'core-embed' ) !== 0 )
+			// The `core/template` is not worth testing here because it's never saved, it's covered better in e2e tests.
+			.filter( ( name ) => name.indexOf( 'core-embed' ) !== 0 && name !== 'core/template' )
 			.forEach( ( name ) => {
 				const nameToFilename = name.replace( /\//g, '__' );
 				const foundFixtures = fileBasenames

@@ -1,50 +1,3 @@
-.editor-block-settings-menu {
-	min-height: $empty-paragraph-height;
-
-	line-height: 1;
-}
-
-// The Blocks "More" Menu ellipsis icon button, and trash button
-.editor-block-settings-remove,
-.editor-block-settings-menu__toggle {
-	justify-content: center;
-	padding: 0;
-	width: $block-side-ui-width;
-	height: $block-side-ui-width;
-	border-radius: $radius-round-rectangle;
-	opacity: 0;
-
-	// use opacity to work in various editor styles
-	color: $dark-opacity-500;
-
-	&.is-visible {
-		@include fade_in;
-	}
-
-	.is-dark-theme & {
-		color: $light-opacity-500;
-	}
-
-	// Apply a background in nested contexts, only on desktop
-	@include break-small() {
-		.editor-block-list__layout .editor-block-list__layout & {
-			background: $white;
-			box-shadow: inset 0 0 0 1px $light-gray-500;
-			color: $dark-gray-500; // always show dark gray in nested contexts
-
-			&:first-child {
-				margin-bottom: -1px;
-			}
-
-			&:hover,
-			&:active,
-			&:focus {
-				z-index: z-index(".editor-block-settings-remove");
-			}
-		}
-	}
-}
-
 .editor-block-settings-menu__toggle .dashicon {
 	transform: rotate(90deg);
 }
@@ -57,7 +10,6 @@
 	}
 
 	.editor-block-settings-menu__content {
-		width: 100%;
 		padding: $item-spacing - $border-width;
 	}
 
@@ -93,7 +45,10 @@
 		cursor: pointer;
 		@include menu-style__neutral;
 
-		&:hover:not(:disabled):not([aria-disabled="true"]),
+		&:hover:not(:disabled):not([aria-disabled="true"]) {
+			@include menu-style__hover;
+		}
+
 		&:focus:not(:disabled):not([aria-disabled="true"]) {
 			@include menu-style__focus;
 		}

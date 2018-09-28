@@ -20,10 +20,11 @@ import { addQueryArgs } from '@wordpress/url';
 import Placeholder from '../placeholder';
 import Spinner from '../spinner';
 
-export function rendererPathWithAttributes( block, attributes = null ) {
+export function rendererPath( block, attributes = null, urlQueryArgs = {} ) {
 	return addQueryArgs( `/gutenberg/v1/block-renderer/${ block }`, {
 		context: 'edit',
 		...( null !== attributes ? { attributes } : {} ),
+		...urlQueryArgs,
 	} );
 }
 
@@ -54,9 +55,9 @@ export class ServerSideRender extends Component {
 		if ( null !== this.state.response ) {
 			this.setState( { response: null } );
 		}
-		const { block, attributes = null } = props;
+		const { block, attributes = null, urlQueryArgs = {} } = props;
 
-		const path = rendererPathWithAttributes( block, attributes );
+		const path = rendererPath( block, attributes, urlQueryArgs );
 
 		return apiFetch( { path } )
 			.then( ( response ) => {

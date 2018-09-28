@@ -80,6 +80,11 @@
 	color: $dark-gray-500;
 	transition: all 0.05s ease-in-out;
 
+	.editor-block-icon {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
 	svg {
 		transition: all 0.15s ease-out;
 	}

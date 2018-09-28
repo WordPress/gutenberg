@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "3.7.0",
+	"version": "3.9.0",
 	"private": true,
 	"description": "A new WordPress editor experience",
 	"repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -20,6 +20,7 @@
 		"@wordpress/autop": "file:packages/autop",
 		"@wordpress/blob": "file:packages/blob",
 		"@wordpress/block-library": "file:packages/block-library",
+		"@wordpress/block-serialization-default-parser": "file:packages/block-serialization-default-parser",
 		"@wordpress/block-serialization-spec-parser": "file:packages/block-serialization-spec-parser",
 		"@wordpress/blocks": "file:packages/blocks",
 		"@wordpress/components": "file:packages/components",
@@ -58,7 +59,8 @@
 		"rememo": "3.0.0"
 	},
 	"devDependencies": {
-		"@babel/core": "7.0.0-beta.56",
+		"@babel/core": "7.0.0",
+		"@babel/runtime-corejs2": "7.0.0",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:packages/babel-plugin-import-jsx-pragma",
 		"@wordpress/babel-plugin-makepot": "file:packages/babel-plugin-makepot",
 		"@wordpress/babel-preset-default": "file:packages/babel-preset-default",
@@ -72,7 +74,7 @@
 		"@wordpress/scripts": "file:packages/scripts",
 		"autoprefixer": "8.2.0",
 		"babel-eslint": "8.0.3",
-		"babel-loader": "8.0.0-beta.4",
+		"babel-loader": "8.0.0",
 		"chalk": "2.4.1",
 		"check-node-version": "3.1.1",
 		"codecov": "3.0.2",
@@ -119,7 +121,8 @@
 		"webpack": "4.8.3",
 		"webpack-cli": "2.1.3",
 		"webpack-livereload-plugin": "2.1.1",
-		"webpack-rtl-plugin": "github:yoavf/webpack-rtl-plugin#develop"
+		"webpack-rtl-plugin": "github:yoavf/webpack-rtl-plugin#develop",
+		"yarn": "1.9.4"
 	},
 	"npmPackageJsonLintConfig": {
 		"extends": "@wordpress/npm-package-json-lint-config",
@@ -173,16 +176,20 @@
 		"lint-css": "stylelint '**/*.scss'",
 		"lint-css:fix": "stylelint '**/*.scss' --fix",
 		"package-plugin": "./bin/build-plugin-zip.sh",
-		"postinstall": "npm run check-licenses && npm run build:packages",
+		"mobile-submodule-update": "git submodule update --init --recursive",
+		"mobile-install": "yarn --cwd gutenberg-mobile install",
+		"preinstall": "npm run mobile-submodule-update",
+		"postinstall": " npm run mobile-install && npm run check-licenses && npm run build:packages",
 		"pot-to-php": "./bin/pot-to-php.js",
 		"precommit": "lint-staged",
 		"publish:check": "npm run build:packages && lerna updated",
 		"publish:dev": "npm run build:packages && lerna publish --npm-tag next",
 		"publish:prod": "npm run build:packages && lerna publish",
-		"test": "npm run lint && npm run test-unit",
+		"test": "concurrently \"npm run lint && npm run test-unit\" \"npm run test-mobile\"",
 		"pretest-e2e": "concurrently \"./bin/reset-e2e-tests.sh\" \"npm run build\"",
 		"test-e2e": "cross-env JEST_PUPPETEER_CONFIG=test/e2e/puppeteer.config.js wp-scripts test-unit-js --config test/e2e/jest.config.json --runInBand",
 		"test-e2e:watch": "npm run test-e2e -- --watch",
+		"test-mobile": "yarn --cwd gutenberg-mobile test:inside-gb",
 		"test-php": "npm run lint-php && npm run test-unit-php",
 		"test-unit": "wp-scripts test-unit-js --config test/unit/jest.config.json",
 		"test-unit:coverage": "npm run test-unit -- --coverage",
@@ -202,7 +209,7 @@
 		"*.js": [
 			"eslint"
 		],
-		"{docs/{root-manifest.json,tool/*.js},packages/{*/README.md,*/src/{actions,selectors}.js,components/src/*/README.md}}": [
+		"{docs/{root-manifest.json,tool/*.js},packages/{*/README.md,*/src/{actions,selectors}.js,components/src/*/**/README.md}}": [
 			"npm run docs:build"
 		]
 	}

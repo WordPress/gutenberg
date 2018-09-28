@@ -34,7 +34,6 @@ import { compose } from '@wordpress/compose';
 import BlockEdit from '../block-edit';
 import BlockMover from '../block-mover';
 import BlockDropZone from '../block-drop-zone';
-import BlockSettingsMenu from '../block-settings-menu';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
@@ -44,7 +43,6 @@ import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMultiControls from './multi-controls';
 import BlockMobileToolbar from './block-mobile-toolbar';
 import BlockInsertionPoint from './insertion-point';
-import BlockDraggable from './block-draggable';
 import IgnoreNestedEvents from './ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
@@ -373,6 +371,8 @@ export class BlockListBlock extends Component {
 			isPreviousBlockADefaultEmptyBlock,
 			hasSelectedInnerBlock,
 			isParentOfSelectedBlock,
+			hasMultiSelection,
+			isDraggable,
 		} = this.props;
 		const isHovered = this.state.isHovered && ! isMultiSelecting;
 		const { name: blockName, isValid } = block;
@@ -384,16 +384,15 @@ export class BlockListBlock extends Component {
 
 		// If the block is selected and we're typing the block should not appear.
 		// Empty paragraph blocks should always show up as unselected.
-		const showEmptyBlockSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
+		const showEmptyBlockSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock && isValid;
 		const showSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
 		const shouldAppearSelected = ! isFocusMode && ! hasFixedToolbar && ! showSideInserter && isSelected && ! isTypingWithinBlock;
-		const shouldAppearSelectedParent = ! isFocusMode && ! hasFixedToolbar && ! showSideInserter && hasSelectedInnerBlock && ! isTypingWithinBlock;
+		const shouldAppearSelectedParent = ! isFocusMode && ! hasFixedToolbar && ! showSideInserter && hasSelectedInnerBlock && ! isTypingWithinBlock && ! hasMultiSelection;
 		const shouldAppearHovered = ! isFocusMode && ! hasFixedToolbar && isHovered && ! isEmptyDefaultBlock;
 		// We render block movers and block settings to keep them tabbale even if hidden
 		const shouldRenderMovers = ! isFocusMode && ( isSelected || hoverArea === 'left' ) && ! showEmptyBlockSideInserter && ! isMultiSelecting && ! isPartOfMultiSelection && ! isTypingWithinBlock;
-		const shouldRenderBlockSettings = ( isSelected || hoverArea === 'right' ) && ! isMultiSelecting && ! isPartOfMultiSelection;
 		const shouldShowBreadcrumb = ! isFocusMode && isHovered && ! isEmptyDefaultBlock;
-		const shouldShowContextualToolbar = ! hasFixedToolbar && ! showSideInserter && ( ( isSelected && ! isTypingWithinBlock && isValid ) || isFirstMultiSelected );
+		const shouldShowContextualToolbar = ! hasFixedToolbar && ! showSideInserter && ( ( isSelected && ! isTypingWithinBlock ) || isFirstMultiSelected );
 		const shouldShowMobileToolbar = shouldAppearSelected;
 		const { error, dragging } = this.state;
 
@@ -411,7 +410,7 @@ export class BlockListBlock extends Component {
 			'is-selected-parent': shouldAppearSelectedParent,
 			'is-hovered': shouldAppearHovered,
 			'is-reusable': isReusableBlock( blockType ),
-			'is-hidden': dragging,
+			'is-dragging': dragging,
 			'is-typing': isTypingWithinBlock,
 			'is-focused': isFocusMode && ( isSelected || isParentOfSelectedBlock ),
 			'is-focus-mode': isFocusMode,
@@ -481,18 +480,6 @@ export class BlockListBlock extends Component {
 				] }
 				{ ...wrapperProps }
 			>
-				{ ! isPartOfMultiSelection && isMovable && (
-					<BlockDraggable
-						clientId={ clientId }
-						rootClientId={ rootClientId }
-						blockElementId={ blockElementId }
-						layout={ layout }
-						order={ order }
-						onDragStart={ this.onDragStart }
-						onDragEnd={ this.onDragEnd }
-						isDragging={ dragging }
-					/>
-				) }
 				{ shouldShowInsertionPoint && (
 					<BlockInsertionPoint
 						clientId={ clientId }
@@ -510,18 +497,14 @@ export class BlockListBlock extends Component {
 				{ shouldRenderMovers && (
 					<BlockMover
 						clientIds={ clientId }
-						rootClientId={ rootClientId }
+						blockElementId={ blockElementId }
 						layout={ layout }
 						isFirst={ isFirst }
 						isLast={ isLast }
 						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }
-					/>
-				) }
-				{ shouldRenderBlockSettings && (
-					<BlockSettingsMenu
-						clientIds={ clientId }
-						rootClientId={ rootClientId }
-						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'right' || isTypingWithinBlock }
+						isDraggable={ ( isDraggable !== false ) && ( ! isPartOfMultiSelection && isMovable ) }
+						onDragStart={ this.onDragStart }
+						onDragEnd={ this.onDragEnd }
 					/>
 				) }
 				{ shouldShowBreadcrumb && (
@@ -547,18 +530,17 @@ export class BlockListBlock extends Component {
 							<BlockHtml clientId={ clientId } />
 						) }
 						{ ! isValid && [
-							<div key="invalid-preview">
-								{ getSaveElement( blockType, block.attributes ) }
-							</div>,
 							<BlockInvalidWarning
 								key="invalid-warning"
 								block={ block }
 							/>,
+							<div key="invalid-preview">
+								{ getSaveElement( blockType, block.attributes ) }
+							</div>,
 						] }
 					</BlockCrashBoundary>
 					{ shouldShowMobileToolbar && (
 						<BlockMobileToolbar
-							rootClientId={ rootClientId }
 							clientId={ clientId }
 						/>
 					) }
@@ -607,6 +589,7 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		getEditorSettings,
 		hasSelectedInnerBlock,
 		getTemplateLock,
+		hasMultiSelection,
 	} = select( 'core/editor' );
 	const isSelected = isBlockSelected( clientId );
 	const { hasFixedToolbar, focusMode } = getEditorSettings();
@@ -640,6 +623,7 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		block,
 		isSelected,
 		isParentOfSelectedBlock,
+		hasMultiSelection: hasMultiSelection(),
 	};
 } );
 

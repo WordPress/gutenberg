@@ -2,7 +2,7 @@
  * WordPress
  */
 import { __ } from '@wordpress/i18n';
-import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
+import { children, createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
 
 export const name = 'core/preformatted';
@@ -58,7 +58,7 @@ export const settings = {
 		],
 	},
 
-	edit( { attributes, setAttributes, className } ) {
+	edit( { attributes, mergeBlocks, setAttributes, className } ) {
 		const { content } = attributes;
 
 		return (
@@ -72,6 +72,7 @@ export const settings = {
 				} }
 				placeholder={ __( 'Write preformatted text…' ) }
 				wrapperClassName={ className }
+				onMerge={ mergeBlocks }
 			/>
 		);
 	},
@@ -80,5 +81,11 @@ export const settings = {
 		const { content } = attributes;
 
 		return <RichText.Content tagName="pre" value={ content } />;
+	},
+
+	merge( attributes, attributesToMerge ) {
+		return {
+			content: children.concat( attributes.content, attributesToMerge.content ),
+		};
 	},
 };

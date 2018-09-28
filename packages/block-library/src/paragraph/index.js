@@ -249,6 +249,7 @@ export const settings = {
 		const fontSizeClass = getFontSizeClass( fontSize );
 
 		const className = classnames( {
+			'has-text-color': textColor || customTextColor,
 			'has-background': backgroundColor || customBackgroundColor,
 			'has-drop-cap': dropCap,
 			[ fontSizeClass ]: fontSizeClass,

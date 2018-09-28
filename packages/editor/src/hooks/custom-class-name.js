@@ -55,7 +55,6 @@ export function addAttribute( settings ) {
 export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
 		const hasCustomClassName = hasBlockSupport( props.name, 'customClassName', true );
-
 		if ( hasCustomClassName && props.isSelected ) {
 			return (
 				<Fragment>
@@ -145,7 +144,7 @@ export function addParsedDifference( blockAttributes, blockType, innerHTML ) {
 
 		if ( customClasses.length ) {
 			blockAttributes.className = customClasses.join( ' ' );
-		} else {
+		} else if ( serialized ) {
 			delete blockAttributes.className;
 		}
 	}

@@ -1,11 +1,12 @@
 /**
  * External dependencies
  */
-import { flow } from 'lodash';
+import { flow, map } from 'lodash';
 
 /**
  * WordPress Dependencies
  */
+import { compose } from '@wordpress/compose';
 import { createElement, Component } from '@wordpress/element';
 import { DropZoneProvider, SlotFillProvider } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
@@ -13,7 +14,7 @@ import { withDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import RichTextProvider from '../rich-text/provider';
+import { traverse, wrap, urlRewrite, editorWidth } from '../../editor-styles';
 
 class EditorProvider extends Component {
 	constructor( props ) {
@@ -26,6 +27,28 @@ class EditorProvider extends Component {
 		}
 	}
 
+	componentDidMount() {
+		if ( ! this.props.settings.styles ) {
+			return;
+		}
+
+		map( this.props.settings.styles, ( { css, baseURL } ) => {
+			const transforms = [
+				editorWidth,
+				wrap( '.editor-block-list__block', [ '.wp-block' ] ),
+			];
+			if ( baseURL ) {
+				transforms.push( urlRewrite( baseURL ) );
+			}
+			const updatedCSS = traverse( css, compose( transforms ) );
+			if ( updatedCSS ) {
+				const node = document.createElement( 'style' );
+				node.innerHTML = updatedCSS;
+				document.body.appendChild( node );
+			}
+		} );
+	}
+
 	componentDidUpdate( prevProps ) {
 		if ( this.props.settings !== prevProps.settings ) {
 			this.props.updateEditorSettings( this.props.settings );
@@ -35,26 +58,9 @@ class EditorProvider extends Component {
 	render() {
 		const {
 			children,
-			undo,
-			redo,
-			createUndoLevel,
 		} = this.props;
 
 		const providers = [
-			// RichText provider:
-			//
-			//  - context.onUndo
-			//  - context.onRedo
-			//  - context.onCreateUndoLevel
-			[
-				RichTextProvider,
-				{
-					onUndo: undo,
-					onRedo: redo,
-					onCreateUndoLevel: createUndoLevel,
-				},
-			],
-
 			// Slot / Fill provider:
 			//
 			//  - context.getSlot
@@ -84,15 +90,9 @@ export default withDispatch( ( dispatch ) => {
 	const {
 		setupEditor,
 		updateEditorSettings,
-		undo,
-		redo,
-		createUndoLevel,
 	} = dispatch( 'core/editor' );
 	return {
 		setupEditor,
-		undo,
-		redo,
-		createUndoLevel,
 		updateEditorSettings,
 	};
 } )( EditorProvider );

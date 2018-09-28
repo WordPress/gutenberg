@@ -39,6 +39,6 @@
             ]
         },
         "innerBlocks": [],
-        "originalContent": "<blockquote class=\"wp-block-pullquote\">\n    <p>Paragraph <strong>one</strong></p>\n    <p>Paragraph two</p>\n    <cite>by whomever</cite>\n</blockquote>"
+        "originalContent": "<figure class=\"wp-block-pullquote\">\n    <blockquote>\n        <p>Paragraph <strong>one</strong></p>\n        <p>Paragraph two</p>\n        <cite>by whomever</cite>\n\t</blockquote>\n</figure>"
     }
 ]

@@ -1,9 +1,10 @@
 .editor-post-title__block {
 	position: relative;
 	padding: 5px 0;
+	font-size: $editor-font-size;
 
 	@include break-small() {
-		padding: 5px $block-parent-side-ui-clearance;
+		padding: 5px $block-side-ui-clearance;
 	}
 
 	.editor-post-title__input {
@@ -14,14 +15,9 @@
 		background: transparent;
 		font-family: $editor-font;
 		line-height: $default-line-height;
+		color: $dark-gray-900;
 		transition: border 0.1s ease-out;
-
-		// Show wider parent padding on Desktop breakpoints.
 		padding: #{ $block-padding + 5px } $block-padding;
-
-		@include break-small() {
-			padding: #{ $block-padding + 5px } $parent-block-padding;
-		}
 
 		// Stack borders on mobile.
 		border: $border-width solid transparent;
@@ -32,9 +28,22 @@
 			border-width: $border-width;
 		}
 
-		// Match h1 heading
+		// Match h1 heading.
 		font-size: 2.441em;
 		font-weight: 600;
+
+		// Large text needs a 3:1 contrast ratio.
+		&::-webkit-input-placeholder {
+			color: $dark-opacity-200;
+		}
+
+		&::-moz-placeholder {
+			color: $dark-opacity-200;
+		}
+
+		&:-ms-input-placeholder {
+			color: $dark-opacity-200;
+		}
 	}
 
 	&:not(.is-focus-mode):not(.has-fixed-toolbar) {
@@ -71,7 +80,7 @@
 	right: 0;
 
 	@include break-small() {
-		left: $block-parent-side-ui-clearance;
-		right: $block-parent-side-ui-clearance;
+		left: $block-side-ui-clearance;
+		right: $block-side-ui-clearance;
 	}
 }

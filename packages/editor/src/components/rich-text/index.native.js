@@ -20,6 +20,7 @@ import { children } from '@wordpress/blocks';
  */
 import FormatToolbar from './format-toolbar';
 import { FORMATTING_CONTROLS } from './formatting-controls';
+import { isRichTextValueEmpty } from './utils';
 
 export function getFormatValue( formatName ) {
 	if ( 'link' === formatName ) {
@@ -32,15 +33,20 @@ export class RichText extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onChange = this.onChange.bind( this );
+		this.onEnter = this.onEnter.bind( this );
 		this.onContentSizeChange = this.onContentSizeChange.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
 		this.onActiveFormatsChange = this.onActiveFormatsChange.bind( this );
+		this.onHTMLContentWithCursor = this.onHTMLContentWithCursor.bind( this );
 		this.state = {
 			formats: {},
 			selectedNodeId: 0,
 		};
+	}
 
-		this.lastEventCount = 0;
+	// eslint-disable-next-line no-unused-vars
+	onHTMLContentWithCursor( htmlText, cursorPosition ) {
+		// Descriptive placeholder: This logic still needs to be implemented.
 	}
 
 	onActiveFormatsChange( formats ) {
@@ -62,21 +68,21 @@ export class RichText extends Component {
 	 */
 
 	onChange( event ) {
+		// If we had a timer set to propagate a change, let's cancel it, because the user meanwhile typed something extra
 		if ( !! this.currentTimer ) {
 			clearTimeout( this.currentTimer );
 		}
 		this.lastEventCount = event.nativeEvent.eventCount;
-		// The following method just cleans up any <p> tags produced by aztec and replaces them with a br tag
+		// The following method just cleans up any root tags produced by aztec and replaces them with a br tag
 		// This should be removed on a later version when aztec doesn't return the top tag of the text being edited
 		const openingTagRegexp = RegExp( '^<' + this.props.tagName + '>', 'gim' );
 		const closingTagRegexp = RegExp( '</' + this.props.tagName + '>$', 'gim' );
 		const contentWithoutRootTag = event.nativeEvent.text.replace( openingTagRegexp, '' ).replace( closingTagRegexp, '' );
 		this.lastContent = contentWithoutRootTag;
-
+		// Set a time to call the onChange prop if nothing changes in the next second
 		this.currentTimer = setTimeout( function() {
 			this.props.onChange( {
 				content: this.lastContent,
-				eventCount: this.lastEventCount,
 			} );
 		}.bind( this ), 1000 );
 	}
@@ -94,13 +100,21 @@ export class RichText extends Component {
 		);
 	}
 
+	onEnter() {
+		this._editor.requestHTMLWithCursor();
+	}
+
 	shouldComponentUpdate( nextProps ) {
+		if ( nextProps.tagName !== this.props.tagName ) {
+			this.lastEventCount = undefined;
+			this.lastContent = undefined;
+			return true;
+		}
 		// The check below allows us to avoid updating the content right after an `onChange` call
-		if ( nextProps.content.contentTree &&
-			nextProps.content.eventCount &&
-			this.lastContent && // first time the component is drawn with empty content `lastContent` is undefined
-			this.lastEventCount &&
-			nextProps.content.contentTree.eventCount !== this.lastEventCount ) {
+		// first time the component is drawn with empty content `lastContent` is undefined
+		if ( nextProps.value &&
+			this.lastContent &&
+			this.lastEventCount ) {
 			return false;
 		}
 
@@ -144,6 +158,7 @@ export class RichText extends Component {
 			style,
 			formattingControls,
 			formatters,
+			value,
 		} = this.props;
 
 		const formatToolbar = (
@@ -156,8 +171,7 @@ export class RichText extends Component {
 		);
 
 		// Save back to HTML from React tree
-		const html = '<' + tagName + '>' + renderToString( this.props.content.contentTree ) + '</' + tagName + '>';
-		const eventCount = this.props.content.eventCount;
+		const html = '<' + tagName + '>' + renderToString( value ) + '</' + tagName + '>';
 
 		return (
 			<View>
@@ -167,10 +181,12 @@ export class RichText extends Component {
 						this._editor = ref;
 					}
 					}
-					text={ { text: html, eventCount: eventCount } }
+					text={ { text: html, eventCount: this.lastEventCount } }
 					onChange={ this.onChange }
+					onEnter={ this.onEnter }
 					onContentSizeChange={ this.onContentSizeChange }
 					onActiveFormatsChange={ this.onActiveFormatsChange }
+					onHTMLContentWithCursor={ this.onHTMLContentWithCursor }
 					color={ 'black' }
 					maxImagesWidth={ 200 }
 					style={ style }
@@ -208,6 +224,8 @@ RichTextContainer.Content = ( { value, format, tagName: Tag, ...props } ) => {
 
 	return content;
 };
+
+RichTextContainer.isEmpty = isRichTextValueEmpty;
 
 RichTextContainer.Content.defaultProps = {
 	format: 'children',

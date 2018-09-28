@@ -37,6 +37,12 @@
 	}
 }
 
+@keyframes slide_in_top {
+	100% {
+		transform: translateY(0%);
+	}
+}
+
 // In order to use mix-blend-mode, this element needs to have an explicitly set background-color
 // We scope it to .wp-toolbar to be wp-admin only, to prevent bleed into other implementations
 html.wp-toolbar {
@@ -105,11 +111,19 @@ body.gutenberg-editor-page {
 		bottom: 0;
 		left: 0;
 		min-height: calc(100vh - #{ $admin-bar-height-big });
+
+		body.is-fullscreen-mode & {
+			min-height: 100vh;
+		}
 	}
 
 	// The WP header height changes at this breakpoint
 	@include break-medium {
 		min-height: calc(100vh - #{ $admin-bar-height });
+
+		body.is-fullscreen-mode & {
+			min-height: 100vh;
+		}
 	}
 
 	img {
@@ -219,31 +233,31 @@ body.gutenberg-editor-page {
 .editor-block-list__block {
 	input,
 	textarea {
-		// use opacity to work in various editor styles
+		// Use opacity to work in various editor styles.
 		&::-webkit-input-placeholder {
-			color: $dark-opacity-100;
+			color: $dark-opacity-300;
 		}
+
 		&::-moz-placeholder {
-			color: $dark-opacity-100;
+			opacity: 1; // Necessary because Firefox reduces this from 1.
+			color: $dark-opacity-300;
 		}
+
 		&:-ms-input-placeholder {
-			color: $dark-opacity-100;
-		}
-		&:-moz-placeholder {
-			color: $dark-opacity-100;
+			color: $dark-opacity-300;
 		}
 
 		.is-dark-theme & {
 			&::-webkit-input-placeholder {
 				color: $light-opacity-300;
 			}
+
 			&::-moz-placeholder {
+				opacity: 1; // Necessary because Firefox reduces this from 1.
 				color: $light-opacity-300;
 			}
+
 			&:-ms-input-placeholder {
-				color: $light-opacity-300;
-			}
-			&:-moz-placeholder {
 				color: $light-opacity-300;
 			}
 		}
@@ -261,4 +275,13 @@ body.gutenberg-editor-page {
 
 .ephox-snooker-resizer-bar-dragging {
 	background: $blue-medium-500;
+}
+
+// This style is defined here instead of the modal component
+// because the modal should be context agnostic.
+.components-modal__content {
+	height: calc(100% - #{ $header-height } - #{ $admin-bar-height });
+	body.is-fullscreen-mode & {
+		height: calc(100% - #{ $header-height });
+	}
 }

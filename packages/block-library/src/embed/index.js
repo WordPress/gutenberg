@@ -3,17 +3,26 @@
  */
 import { parse } from 'url';
 import { includes, kebabCase, toLower } from 'lodash';
-import classnames from 'classnames';
+import classnames from 'classnames/dedupe';
 
 /**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
-import { Component, renderToString } from '@wordpress/element';
-import { Button, Placeholder, Spinner, SandBox, IconButton, Toolbar } from '@wordpress/components';
+import { Component, renderToString, Fragment } from '@wordpress/element';
+import {
+	Button,
+	Placeholder,
+	Spinner,
+	SandBox,
+	IconButton,
+	Toolbar,
+	PanelBody,
+	ToggleControl,
+} from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
-import { RichText, BlockControls, BlockIcon } from '@wordpress/editor';
+import { RichText, BlockControls, BlockIcon, InspectorControls } from '@wordpress/editor';
 import { withSelect } from '@wordpress/data';
 
 // These embeds do not work in sandboxes
@@ -43,6 +52,9 @@ export function getEmbedEdit( title, icon ) {
 			this.setUrl = this.setUrl.bind( this );
 			this.maybeSwitchBlock = this.maybeSwitchBlock.bind( this );
 			this.setAttributesFromPreview = this.setAttributesFromPreview.bind( this );
+			this.setAspectRatioClassNames = this.setAspectRatioClassNames.bind( this );
+			this.getResponsiveHelp = this.getResponsiveHelp.bind( this );
+			this.toggleResponsive = this.toggleResponsive.bind( this );
 
 			this.state = {
 				editingURL: false,
@@ -136,6 +148,76 @@ export function getEmbedEdit( title, icon ) {
 			return false;
 		}
 
+		/**
+		 * Gets the appropriate CSS class names to enforce an aspect ratio when the embed is resized
+		 * if the HTML has an iframe with width and height set.
+		 *
+		 * @param {string} html The preview HTML that possibly contains an iframe with width and height set.
+		 * @param {boolean} allowResponsive If the classes should be added, or removed.
+		 * @return {Object} Object with classnames set for use with `classnames`.
+		 */
+		getAspectRatioClassNames( html, allowResponsive = true ) {
+			const previewDocument = document.implementation.createHTMLDocument( '' );
+			previewDocument.body.innerHTML = html;
+			const iframe = previewDocument.body.querySelector( 'iframe' );
+
+			if ( iframe && iframe.height && iframe.width ) {
+				const aspectRatio = ( iframe.width / iframe.height ).toFixed( 2 );
+				let aspectRatioClassName;
+
+				switch ( aspectRatio ) {
+					// Common video resolutions.
+					case '2.33':
+						aspectRatioClassName = 'wp-embed-aspect-21-9';
+						break;
+					case '2.00':
+						aspectRatioClassName = 'wp-embed-aspect-18-9';
+						break;
+					case '1.78':
+						aspectRatioClassName = 'wp-embed-aspect-16-9';
+						break;
+					case '1.33':
+						aspectRatioClassName = 'wp-embed-aspect-4-3';
+						break;
+					// Vertical video and instagram square video support.
+					case '1.00':
+						aspectRatioClassName = 'wp-embed-aspect-1-1';
+						break;
+					case '0.56':
+						aspectRatioClassName = 'wp-embed-aspect-9-16';
+						break;
+					case '0.50':
+						aspectRatioClassName = 'wp-embed-aspect-1-2';
+						break;
+				}
+
+				if ( aspectRatioClassName ) {
+					return {
+						[ aspectRatioClassName ]: allowResponsive,
+						'wp-has-aspect-ratio': allowResponsive,
+					};
+				}
+			}
+		}
+
+		/**
+		 * Sets the aspect ratio related class names returned by `getAspectRatioClassNames`
+		 * if `allowResponsive` is truthy.
+		 *
+		 * @param {string} html The preview HTML.
+		 */
+		setAspectRatioClassNames( html ) {
+			const { allowResponsive } = this.props.attributes;
+			if ( ! allowResponsive ) {
+				return;
+			}
+			const className = classnames(
+				this.props.attributes.className,
+				this.getAspectRatioClassNames( html )
+			);
+			this.props.setAttributes( { className } );
+		}
+
 		/***
 		 * Sets block attributes based on the preview data.
 		 */
@@ -156,27 +238,60 @@ export function getEmbedEdit( title, icon ) {
 			if ( html || 'photo' === type ) {
 				setAttributes( { type, providerNameSlug } );
 			}
+
+			this.setAspectRatioClassNames( html );
 		}
 
 		switchBackToURLInput() {
 			this.setState( { editingURL: true } );
 		}
 
+		getResponsiveHelp( checked ) {
+			return checked ? __( 'Videos and other content automatically resizes.' ) : __( 'Content is fixed size.' );
+		}
+
+		toggleResponsive() {
+			const { allowResponsive, className } = this.props.attributes;
+			const { html } = this.props.preview;
+			const responsiveClassNames = this.getAspectRatioClassNames( html, ! allowResponsive );
+
+			this.props.setAttributes(
+				{
+					allowResponsive: ! allowResponsive,
+					className: classnames( className, responsiveClassNames ),
+				}
+			);
+		}
+
 		render() {
 			const { url, editingURL } = this.state;
-			const { caption, type } = this.props.attributes;
+			const { caption, type, allowResponsive } = this.props.attributes;
 			const { fetching, setAttributes, isSelected, className, preview, previewIsFallback } = this.props;
 			const controls = (
-				<BlockControls>
-					<Toolbar>
-						{ ( preview && ! previewIsFallback && <IconButton
-							className="components-toolbar__control"
-							label={ __( 'Edit URL' ) }
-							icon="edit"
-							onClick={ this.switchBackToURLInput }
-						/> ) }
-					</Toolbar>
-				</BlockControls>
+				<Fragment>
+					<BlockControls>
+						<Toolbar>
+							{ preview && ! previewIsFallback && (
+								<IconButton
+									className="components-toolbar__control"
+									label={ __( 'Edit URL' ) }
+									icon="edit"
+									onClick={ this.switchBackToURLInput }
+								/>
+							) }
+						</Toolbar>
+					</BlockControls>
+					<InspectorControls>
+						<PanelBody title={ __( 'Media Settings' ) } className="blocks-responsive">
+							<ToggleControl
+								label={ __( 'Automatically scale content' ) }
+								checked={ allowResponsive }
+								help={ this.getResponsiveHelp }
+								onChange={ this.toggleResponsive }
+							/>
+						</PanelBody>
+					</InspectorControls>
+				</Fragment>
 			);
 
 			if ( fetching ) {
@@ -214,10 +329,12 @@ export function getEmbedEdit( title, icon ) {
 			}
 
 			const html = 'photo' === type ? this.getPhotoHtml( preview ) : preview.html;
+			const { scripts } = preview;
 			const parsedUrl = parse( url );
 			const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedUrl.host.replace( /^www\./, '' ) );
 			// translators: %s: host providing embed content e.g: www.youtube.com
 			const iframeTitle = sprintf( __( 'Embedded content from %s' ), parsedUrl.host );
+			const sandboxClassnames = classnames( type, className );
 			const embedWrapper = 'wp-embed' === type ? (
 				<div
 					className="wp-block-embed__wrapper"
@@ -227,8 +344,9 @@ export function getEmbedEdit( title, icon ) {
 				<div className="wp-block-embed__wrapper">
 					<SandBox
 						html={ html }
+						scripts={ scripts }
 						title={ iframeTitle }
-						type={ type }
+						type={ sandboxClassnames }
 					/>
 				</div>
 			);
@@ -237,7 +355,7 @@ export function getEmbedEdit( title, icon ) {
 				<figure className={ classnames( className, 'wp-block-embed', { 'is-video': 'video' === type } ) }>
 					{ controls }
 					{ ( cannotPreview ) ? (
-						<Placeholder icon={ <BlockIcon icon={ icon } showColors /> } label={ label } className="wp-block-embed">
+						<Placeholder icon={ <BlockIcon icon={ icon } showColors /> } label={ label }>
 							<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
 							<p className="components-placeholder__error">{ __( 'Previews for this are unavailable in the editor, sorry!' ) }</p>
 						</Placeholder>
@@ -257,7 +375,29 @@ export function getEmbedEdit( title, icon ) {
 	};
 }
 
-function getEmbedBlockSettings( { title, description, icon, category = 'embed', transforms, keywords = [] } ) {
+const embedAttributes = {
+	url: {
+		type: 'string',
+	},
+	caption: {
+		type: 'array',
+		source: 'children',
+		selector: 'figcaption',
+		default: [],
+	},
+	type: {
+		type: 'string',
+	},
+	providerNameSlug: {
+		type: 'string',
+	},
+	allowResponsive: {
+		type: 'boolean',
+		default: true,
+	},
+};
+
+function getEmbedBlockSettings( { title, description, icon, category = 'embed', transforms, keywords = [], supports = {} } ) {
 	// translators: %s: Name of service (e.g. VideoPress, YouTube)
 	const blockDescription = description || sprintf( __( 'Add a block that displays content pulled from other sites, like Twitter, Instagram or YouTube.' ), title );
 	return {
@@ -266,26 +406,11 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 		icon,
 		category,
 		keywords,
-		attributes: {
-			url: {
-				type: 'string',
-			},
-			caption: {
-				type: 'array',
-				source: 'children',
-				selector: 'figcaption',
-				default: [],
-			},
-			type: {
-				type: 'string',
-			},
-			providerNameSlug: {
-				type: 'string',
-			},
-		},
+		attributes: embedAttributes,
 
 		supports: {
 			align: true,
+			...supports,
 		},
 
 		transforms,
@@ -320,11 +445,38 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 
 			return (
 				<figure className={ embedClassName }>
-					{ `\n${ url }\n` /* URL needs to be on its own line. */ }
+					<div className="wp-block-embed__wrapper">
+						{ `\n${ url }\n` /* URL needs to be on its own line. */ }
+					</div>
 					{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
 				</figure>
 			);
 		},
+
+		deprecated: [
+			{
+				attributes: embedAttributes,
+				save( { attributes } ) {
+					const { url, caption, type, providerNameSlug } = attributes;
+
+					if ( ! url ) {
+						return null;
+					}
+
+					const embedClassName = classnames( 'wp-block-embed', {
+						[ `is-type-${ type }` ]: type,
+						[ `is-provider-${ providerNameSlug }` ]: providerNameSlug,
+					} );
+
+					return (
+						<figure className={ embedClassName }>
+							{ `\n${ url }\n` /* URL needs to be on its own line. */ }
+							{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
+						</figure>
+					);
+				},
+			},
+		],
 	};
 }
 
@@ -608,10 +760,31 @@ export const others = [
 		patterns: [ /^https?:\/\/(www\.)?smugmug\.com\/.+/i ],
 	},
 	{
+		// Deprecated in favour of the core-embed/speaker-deck block.
 		name: 'core-embed/speaker',
 		settings: getEmbedBlockSettings( {
 			title: 'Speaker',
 			icon: embedAudioIcon,
+			supports: {
+				inserter: false,
+			},
+		} ),
+		patterns: [],
+	},
+	{
+		name: 'core-embed/speaker-deck',
+		settings: getEmbedBlockSettings( {
+			title: 'Speaker Deck',
+			icon: embedContentIcon,
+			transform: [ {
+				type: 'block',
+				blocks: [ 'core-embed/speaker' ],
+				transform: ( content ) => {
+					return createBlock( 'core-embed/speaker-deck', {
+						content,
+					} );
+				},
+			} ],
 		} ),
 		patterns: [ /^https?:\/\/(www\.)?speakerdeck\.com\/.+/i ],
 	},

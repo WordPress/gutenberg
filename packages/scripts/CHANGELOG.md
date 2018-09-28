@@ -1,4 +1,12 @@
-## 2.1.0 (Unreleased)
+## 2.3.0 (Unreleased)
+
+### Improvements
+
+- New flag `--ignore` for `check-licenses` script
+- Try deferring to LICENSE file for `license` fields which include filename
+- Add "BSD-3-Clause-W3C" as GPL-compatible
+
+## 2.2.1 (2018-09-05)
 
 ### Bug Fix
 
@@ -7,7 +15,6 @@
 ### Polish
 
 - Updated dependencies: `jest`, `npm-package-json-lint` and `read-pkg-up`
-
 
 ## 2.0.0 (2018-07-12)
 

@@ -379,5 +379,30 @@ Code style in PHP is enforced using [PHP_CodeSniffer](https://github.com/squizla
 
 To run unit tests only, without the linter, use `npm run test-unit-php` instead.
 
+## Native Mobile Testing
+
+To enable automated testing against the native mobile app currently in development, the whole of the mobile source code is pulled in as a git submodule. Its testsuite is included in the Travis tests run but it can also be used locally, during development.
+
+To test locally, along with the typical Gutenberg setup and testing instructions already mentioned earlier, make sure you check out the code of the submodule:
+```
+git submodule --init --recursive
+```
+You can then use the available script to launch the mobile testsuite in isolation:
+```
+npm run test-mobile
+```
+
+or the typical `npm run test` to run all the lint, unit and mobile tests in one go.
+
+The mobile tests pick up the compiled Gutenberg code/packages and so, don't forget to run `npm install` (while at the Gutenberg root) after you've made changes to the code.
+
+### Debugging native mobile
+
+Say you have made some changes to Gutenberg's code and turns out the mobile tests get broken. What's the path forward? Hopefully, the Jest tests output will have an error message and stacktrace that is indicative enough and helps point where the error happens and what went wrong. Oftenly, what happens is that the code being shared between the web and the mobile project is no longer compatible.
+
+For example, changing an intermmediate interface can inadvertently bring the `file.js` and `file.native.js` pair out of sync. You'll then need to update the `.native.js` file to adhere to the new interface or iterate on the interface itself. Feel free to reach out to mobile devs for help if needed.
+
+In other usual cases, you might directly employ HTML elements in a `render()` function but those are not actually offered by React Native, the UI framework the native mobile is build on. Those elements are usually starting with a lower-case character like `div` or `span`. In any case that code is incompatible or doesn't make sense for mobile, what needs to be done is to wrap that code in a new component and provide a "nativized" variant of it to be loaded when on native mobile instead. To "nativize" a component just create a new `.native.js` file right alongside the web version one and in it return/run the code that is compatible with mobile. The proper variant will be picked up by the toolchain automatically.
+
 [snapshot testing]: https://facebook.github.io/jest/docs/en/snapshot-testing.html
 [update snapshots]: https://facebook.github.io/jest/docs/en/snapshot-testing.html#updating-snapshots

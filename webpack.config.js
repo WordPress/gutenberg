@@ -79,7 +79,6 @@ const entryPointNames = [
 	'components',
 	'edit-post',
 	'block-library',
-	'core-blocks',
 ];
 
 const gutenbergPackages = [
@@ -88,6 +87,7 @@ const gutenbergPackages = [
 	'autop',
 	'blob',
 	'blocks',
+	'block-serialization-default-parser',
 	'block-serialization-spec-parser',
 	'compose',
 	'core-data',
@@ -103,6 +103,7 @@ const gutenbergPackages = [
 	'i18n',
 	'is-shallow-equal',
 	'keycodes',
+	'list-reusable-blocks',
 	'nux',
 	'plugins',
 	'redux-routine',
