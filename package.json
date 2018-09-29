@@ -78,7 +78,6 @@
 		"deasync": "0.1.13",
 		"deep-freeze": "0.0.1",
 		"doctrine": "2.1.0",
-		"eslint": "4.16.0",
 		"eslint-config-wordpress": "2.0.0",
 		"eslint-plugin-jest": "21.5.0",
 		"eslint-plugin-jsx-a11y": "6.0.2",
@@ -163,8 +162,8 @@
 		"fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
 		"lint": "concurrently \"npm run lint-js\" \"npm run lint-pkg-json\" \"npm run lint-css\"",
-		"lint-js": "eslint .",
-		"lint-js:fix": "eslint . --fix",
+		"lint-js": "wp-scripts lint-js .",
+		"lint-js:fix": "wp-scripts lint-js . --fix",
 		"lint-php": "docker-compose run --rm composer run-script lint",
 		"lint-pkg-json": "wp-scripts lint-pkg-json ./packages",
 		"lint-css": "stylelint '**/*.scss'",
@@ -201,7 +200,7 @@
 			"stylelint"
 		],
 		"*.js": [
-			"eslint"
+			"wp-scripts lint-js"
 		],
 		"{docs/{root-manifest.json,tool/*.js},packages/{*/README.md,*/src/{actions,selectors}.js,components/src/*/**/README.md}}": [
 			"npm run docs:build"
