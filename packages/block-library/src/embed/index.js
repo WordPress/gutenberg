@@ -28,6 +28,18 @@ import { withSelect } from '@wordpress/data';
 // These embeds do not work in sandboxes
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
+const ASPECT_RATIOS = [
+	// Common video resolutions.
+	{ ratio: '2.33', className: 'wp-embed-aspect-21-9' },
+	{ ratio: '2.00', className: 'wp-embed-aspect-18-9' },
+	{ ratio: '1.78', className: 'wp-embed-aspect-16-9' },
+	{ ratio: '1.33', className: 'wp-embed-aspect-4-3' },
+	// Vertical video and instagram square video support.
+	{ ratio: '1.00', className: 'wp-embed-aspect-1-1' },
+	{ ratio: '0.56', className: 'wp-embed-aspect-9-16' },
+	{ ratio: '0.50', className: 'wp-embed-aspect-1-2' },
+];
+
 const matchesPatterns = ( url, patterns = [] ) => {
 	return patterns.some( ( pattern ) => {
 		return url.match( pattern );
@@ -55,18 +67,21 @@ export function getEmbedEdit( title, icon ) {
 			this.setAspectRatioClassNames = this.setAspectRatioClassNames.bind( this );
 			this.getResponsiveHelp = this.getResponsiveHelp.bind( this );
 			this.toggleResponsive = this.toggleResponsive.bind( this );
+			this.handleIncomingPreview = this.handleIncomingPreview.bind( this );
 
 			this.state = {
 				editingURL: false,
 				url: this.props.attributes.url,
 			};
 
-			this.maybeSwitchBlock();
+			if ( this.props.preview ) {
+				this.handleIncomingPreview();
+			}
 		}
 
-		componentWillUnmount() {
-			// can't abort the fetch promise, so let it know we will unmount
-			this.unmounting = true;
+		handleIncomingPreview() {
+			this.setAttributesFromPreview();
+			this.maybeSwitchBlock();
 		}
 
 		componentDidUpdate( prevProps ) {
@@ -85,7 +100,7 @@ export function getEmbedEdit( title, icon ) {
 					this.setState( { editingURL: true } );
 					return;
 				}
-				this.setAttributesFromPreview();
+				this.handleIncomingPreview();
 			}
 		}
 
@@ -163,39 +178,15 @@ export function getEmbedEdit( title, icon ) {
 
 			if ( iframe && iframe.height && iframe.width ) {
 				const aspectRatio = ( iframe.width / iframe.height ).toFixed( 2 );
-				let aspectRatioClassName;
-
-				switch ( aspectRatio ) {
-					// Common video resolutions.
-					case '2.33':
-						aspectRatioClassName = 'wp-embed-aspect-21-9';
-						break;
-					case '2.00':
-						aspectRatioClassName = 'wp-embed-aspect-18-9';
-						break;
-					case '1.78':
-						aspectRatioClassName = 'wp-embed-aspect-16-9';
-						break;
-					case '1.33':
-						aspectRatioClassName = 'wp-embed-aspect-4-3';
-						break;
-					// Vertical video and instagram square video support.
-					case '1.00':
-						aspectRatioClassName = 'wp-embed-aspect-1-1';
-						break;
-					case '0.56':
-						aspectRatioClassName = 'wp-embed-aspect-9-16';
-						break;
-					case '0.50':
-						aspectRatioClassName = 'wp-embed-aspect-1-2';
-						break;
-				}
-
-				if ( aspectRatioClassName ) {
-					return {
-						[ aspectRatioClassName ]: allowResponsive,
-						'wp-has-aspect-ratio': allowResponsive,
-					};
+				// Given the actual aspect ratio, find the widest ratio to support it.
+				for ( let ratioIndex = 0; ratioIndex < ASPECT_RATIOS.length; ratioIndex++ ) {
+					const potentialRatio = ASPECT_RATIOS[ ratioIndex ];
+					if ( aspectRatio >= potentialRatio.ratio ) {
+						return {
+							[ potentialRatio.className ]: allowResponsive,
+							'wp-has-aspect-ratio': allowResponsive,
+						};
+					}
 				}
 			}
 		}
