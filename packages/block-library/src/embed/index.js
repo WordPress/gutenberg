@@ -67,7 +67,7 @@ export function getEmbedEdit( title, icon ) {
 			this.setAspectRatioClassNames = this.setAspectRatioClassNames.bind( this );
 			this.getResponsiveHelp = this.getResponsiveHelp.bind( this );
 			this.toggleResponsive = this.toggleResponsive.bind( this );
-			this.receivePreview = this.receivePreview.bind( this );
+			this.handleIncomingPreview = this.handleIncomingPreview.bind( this );
 
 			this.state = {
 				editingURL: false,
@@ -75,11 +75,11 @@ export function getEmbedEdit( title, icon ) {
 			};
 
 			if ( this.props.preview ) {
-				this.receivePreview();
+				this.handleIncomingPreview();
 			}
 		}
 
-		receivePreview() {
+		handleIncomingPreview() {
 			this.setAttributesFromPreview();
 			this.maybeSwitchBlock();
 		}
@@ -100,7 +100,7 @@ export function getEmbedEdit( title, icon ) {
 					this.setState( { editingURL: true } );
 					return;
 				}
-				this.receivePreview();
+				this.handleIncomingPreview();
 			}
 		}
 
