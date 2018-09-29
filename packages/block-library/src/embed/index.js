@@ -28,6 +28,18 @@ import { withSelect } from '@wordpress/data';
 // These embeds do not work in sandboxes
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
+const ASPECT_RATIOS = [
+	// Common video resolutions.
+	{ ratio: '2.33', className: 'wp-embed-aspect-21-9' },
+	{ ratio: '2.00', className: 'wp-embed-aspect-18-9' },
+	{ ratio: '1.78', className: 'wp-embed-aspect-16-9' },
+	{ ratio: '1.33', className: 'wp-embed-aspect-4-3' },
+	// Vertical video and instagram square video support.
+	{ ratio: '1.00', className: 'wp-embed-aspect-1-1' },
+	{ ratio: '0.56', className: 'wp-embed-aspect-9-16' },
+	{ ratio: '0.50', className: 'wp-embed-aspect-1-2' },
+];
+
 const matchesPatterns = ( url, patterns = [] ) => {
 	return patterns.some( ( pattern ) => {
 		return url.match( pattern );
@@ -166,20 +178,9 @@ export function getEmbedEdit( title, icon ) {
 
 			if ( iframe && iframe.height && iframe.width ) {
 				const aspectRatio = ( iframe.width / iframe.height ).toFixed( 2 );
-				const aspectRatios = [
-					// Common video resolutions.
-					{ ratio: '2.33', className: 'wp-embed-aspect-21-9' },
-					{ ratio: '2.00', className: 'wp-embed-aspect-18-9' },
-					{ ratio: '1.78', className: 'wp-embed-aspect-16-9' },
-					{ ratio: '1.33', className: 'wp-embed-aspect-4-3' },
-					// Vertical video and instagram square video support.
-					{ ratio: '1.00', className: 'wp-embed-aspect-1-1' },
-					{ ratio: '0.56', className: 'wp-embed-aspect-9-16' },
-					{ ratio: '0.50', className: 'wp-embed-aspect-1-2' },
-				];
 				// Given the actual aspect ratio, find the widest ratio to support it.
-				for ( let idx = 0; idx < aspectRatios.length; idx++ ) {
-					const potentialRatio = aspectRatios[ idx ];
+				for ( let ratioIndex = 0; ratioIndex < ASPECT_RATIOS.length; ratioIndex++ ) {
+					const potentialRatio = ASPECT_RATIOS[ ratioIndex ];
 					if ( aspectRatio >= potentialRatio.ratio ) {
 						return {
 							[ potentialRatio.className ]: allowResponsive,
