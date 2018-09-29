@@ -2,15 +2,11 @@
  * WordPress Dependencies
  */
 import { withSelect, withDispatch } from '@wordpress/data';
-
-/**
- * WordPress Dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
 import { MenuItem } from '@wordpress/components';
 
-function TipsToggle( { onToggle, isActive } ) {
+function TipsToggleMenuItem( { onToggle, isActive } ) {
 	return (
 		<MenuItem
 			icon={ isActive && 'yes' }
@@ -38,4 +34,4 @@ export default compose( [
 			ownProps.onToggle();
 		},
 	} ) ),
-] )( TipsToggle );
+] )( TipsToggleMenuItem );

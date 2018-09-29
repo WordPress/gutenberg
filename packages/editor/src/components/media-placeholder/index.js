@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, noop } from 'lodash';
+import { every, get, noop, startsWith } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -15,6 +15,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -32,6 +33,33 @@ class MediaPlaceholder extends Component {
 		this.onSubmitSrc = this.onSubmitSrc.bind( this );
 		this.onUpload = this.onUpload.bind( this );
 		this.onFilesUpload = this.onFilesUpload.bind( this );
+	}
+
+	getAllowedTypes() {
+		const { allowedTypes, type: deprecatedType } = this.props;
+		let allowedTypesToUse = allowedTypes;
+		if ( ! allowedTypes && deprecatedType ) {
+			deprecated( 'type property of wp.editor.MediaPlaceholder', {
+				version: '4.2',
+				alternative: 'allowedTypes property containing an array with the allowedTypes or do not pass any property if all types are allowed',
+			} );
+			if ( deprecatedType === '*' ) {
+				allowedTypesToUse = undefined;
+			} else {
+				allowedTypesToUse = [ deprecatedType ];
+			}
+		}
+		return allowedTypesToUse;
+	}
+
+	onlyAllowsImages() {
+		const allowedTypes = this.getAllowedTypes();
+		if ( ! allowedTypes ) {
+			return false;
+		}
+		return every( allowedTypes, ( allowedType ) => {
+			return allowedType === 'image' || startsWith( allowedType, 'image/' );
+		} );
 	}
 
 	componentDidMount() {
@@ -62,10 +90,11 @@ class MediaPlaceholder extends Component {
 	}
 
 	onFilesUpload( files ) {
-		const { onSelect, type, multiple, onError } = this.props;
+		const { onSelect, multiple, onError } = this.props;
+		const allowedTypes = this.getAllowedTypes();
 		const setMedia = multiple ? onSelect : ( [ media ] ) => onSelect( media );
 		mediaUpload( {
-			allowedType: type,
+			allowedTypes,
 			filesList: files,
 			onFileChange: setMedia,
 			onError,
@@ -74,7 +103,6 @@ class MediaPlaceholder extends Component {
 
 	render() {
 		const {
-			type,
 			accept,
 			icon,
 			className,
@@ -86,7 +114,7 @@ class MediaPlaceholder extends Component {
 			multiple = false,
 			notices,
 		} = this.props;
-
+		const allowedTypes = this.getAllowedTypes();
 		return (
 			<Placeholder
 				icon={ icon }
@@ -127,10 +155,10 @@ class MediaPlaceholder extends Component {
 					{ __( 'Upload' ) }
 				</FormFileUpload>
 				<MediaUpload
-					gallery={ multiple && type === 'image' }
+					gallery={ multiple && this.onlyAllowsImages() }
 					multiple={ multiple }
 					onSelect={ onSelect }
-					type={ type }
+					allowedTypes={ allowedTypes }
 					value={ value.id }
 					render={ ( { open } ) => (
 						<Button isLarge onClick={ open }>

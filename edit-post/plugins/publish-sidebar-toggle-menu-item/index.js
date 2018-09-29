@@ -6,7 +6,7 @@ import { MenuItem } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
-const PublishSidebarToggle = function( { onToggle, isEnabled } ) {
+const PublishSidebarToggleMenuItem = function( { onToggle, isEnabled } ) {
 	return (
 		<MenuItem
 			className={ 'edit-post__pre-publish-checks' }
@@ -35,4 +35,4 @@ export default compose( [
 			ownProps.onToggle();
 		},
 	} ) ),
-] )( PublishSidebarToggle );
+] )( PublishSidebarToggleMenuItem );

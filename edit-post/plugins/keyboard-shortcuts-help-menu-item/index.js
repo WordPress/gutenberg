@@ -1,14 +1,10 @@
 /**
  * WordPress Dependencies
  */
-import { withDispatch } from '@wordpress/data';
-import { displayShortcut } from '@wordpress/keycodes';
-
-/**
- * WordPress Dependencies
- */
-import { __ } from '@wordpress/i18n';
 import { MenuItem } from '@wordpress/components';
+import { withDispatch } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { displayShortcut } from '@wordpress/keycodes';
 
 export function KeyboardShortcutsHelpMenuItem( { openModal, onSelect } ) {
 	return (

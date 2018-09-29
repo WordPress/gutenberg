@@ -18,6 +18,8 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import PostFeaturedImageCheck from './check';
 import MediaUpload from '../media-upload';
 
+const ALLOWED_MEDIA_TYPES = [ 'image' ];
+
 // Used when labels from post type were not yet loaded or when they are not present.
 const DEFAULT_SET_FEATURE_IMAGE_LABEL = __( 'Set featured image' );
 const DEFAULT_REMOVE_FEATURE_IMAGE_LABEL = __( 'Remove image' );
@@ -46,7 +48,7 @@ function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onR
 					<MediaUpload
 						title={ __( 'Set featured image' ) }
 						onSelect={ onUpdateImage }
-						type="image"
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						modalClass="editor-post-featured-image__media-modal"
 						render={ ( { open } ) => (
 							<Button className="editor-post-featured-image__preview" onClick={ open }>
@@ -67,7 +69,7 @@ function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onR
 				<MediaUpload
 					title={ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
 					onSelect={ onUpdateImage }
-					type="image"
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					modalClass="editor-post-featured-image__media-modal"
 					render={ ( { open } ) => (
 						<Button onClick={ open } isDefault isLarge>
@@ -81,7 +83,7 @@ function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onR
 						<MediaUpload
 							title={ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
 							onSelect={ onUpdateImage }
-							type="image"
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
 							modalClass="editor-post-featured-image__media-modal"
 							render={ ( { open } ) => (
 								<Button className="editor-post-featured-image__toggle" onClick={ open }>
