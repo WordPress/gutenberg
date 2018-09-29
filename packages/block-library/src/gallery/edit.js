@@ -140,6 +140,7 @@ class GalleryEdit extends Component {
 				} );
 			},
 			onError: noticeOperations.createErrorNotice,
+			clearPreviousNotices: noticeOperations.removeAllNotices,
 		} );
 	}
 
