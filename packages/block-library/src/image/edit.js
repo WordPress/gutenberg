@@ -251,6 +251,7 @@ class ImageEdit extends Component {
 						onSelect={ this.onSelectImage }
 						notices={ noticeUI }
 						onError={ noticeOperations.createErrorNotice }
+						clearPreviousNotices={ noticeOperations.removeAllNotices }
 						accept="image/*"
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 					/>

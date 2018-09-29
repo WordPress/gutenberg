@@ -221,6 +221,7 @@ export const settings = {
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						notices={ noticeUI }
 						onError={ noticeOperations.createErrorNotice }
+						clearPreviousNotices={ noticeOperations.removeAllNotices }
 					/>
 				</Fragment>
 			);

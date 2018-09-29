@@ -30,6 +30,7 @@ export default function( {
 	filesList,
 	maxUploadFileSize,
 	onError = noop,
+	clearPreviousNotices = noop,
 	onFileChange,
 	allowedType,
 } ) {
@@ -61,6 +62,7 @@ export default function( {
 		},
 		maxUploadFileSize,
 		onError: ( { message } ) => onError( message ),
+		clearPreviousNotices,
 		wpAllowedMimeTypes,
 	} );
 }

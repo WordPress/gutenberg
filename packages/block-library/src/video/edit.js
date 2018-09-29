@@ -144,6 +144,7 @@ class VideoEdit extends Component {
 					value={ this.props.attributes }
 					notices={ noticeUI }
 					onError={ noticeOperations.createErrorNotice }
+					clearPreviousNotices={ noticeOperations.removeAllNotices }
 				/>
 			);
 		}

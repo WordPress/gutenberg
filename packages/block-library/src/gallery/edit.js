@@ -204,6 +204,7 @@ class GalleryEdit extends Component {
 						multiple
 						notices={ noticeUI }
 						onError={ noticeOperations.createErrorNotice }
+						clearPreviousNotices={ noticeOperations.removeAllNotices }
 					/>
 				</Fragment>
 			);

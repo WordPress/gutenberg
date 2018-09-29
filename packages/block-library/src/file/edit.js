@@ -147,6 +147,7 @@ class FileEdit extends Component {
 					onSelect={ this.onSelectFile }
 					notices={ noticeUI }
 					onError={ noticeOperations.createErrorNotice }
+					clearPreviousNotices={ noticeOperations.removeAllNotices }
 					accept="*"
 				/>
 			);

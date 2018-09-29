@@ -66,6 +66,7 @@ export function mediaUpload( {
 	filesList,
 	maxUploadFileSize,
 	onError = noop,
+	clearPreviousNotices = noop,
 	onFileChange,
 	wpAllowedMimeTypes = null,
 } ) {
@@ -113,6 +114,11 @@ export function mediaUpload( {
 
 		onError( error );
 	};
+
+	// Clear previous notices, before trying to upload new media files
+	if ( files.length > 0 ) {
+		clearPreviousNotices();
+	}
 
 	files.forEach( ( mediaFile, idx ) => {
 		// verify if user is allowed to upload this mime type

@@ -90,7 +90,7 @@ class MediaPlaceholder extends Component {
 	}
 
 	onFilesUpload( files ) {
-		const { onSelect, multiple, onError } = this.props;
+		const { onSelect, multiple, onError, clearPreviousNotices } = this.props;
 		const allowedTypes = this.getAllowedTypes();
 		const setMedia = multiple ? onSelect : ( [ media ] ) => onSelect( media );
 		mediaUpload( {
@@ -98,6 +98,7 @@ class MediaPlaceholder extends Component {
 			filesList: files,
 			onFileChange: setMedia,
 			onError,
+			clearPreviousNotices,
 		} );
 	}
 
