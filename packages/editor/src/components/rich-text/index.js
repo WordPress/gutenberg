@@ -9,6 +9,7 @@ import {
 	forEach,
 	identity,
 	isEqual,
+	isNil,
 	merge,
 	noop,
 } from 'lodash';
@@ -230,7 +231,13 @@ export class RichText extends Component {
 	 */
 	onPaste( event ) {
 		const clipboardData = event.clipboardData;
-		const { items = [], files = [] } = clipboardData;
+		let { items, files } = clipboardData;
+
+		// In Edge these properties can be null instead of undefined, so a more
+		// rigorous test is required over using default values.
+		items = isNil( items ) ? [] : items;
+		files = isNil( files ) ? [] : files;
+
 		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
 		let plainText = '';
 		let html = '';
