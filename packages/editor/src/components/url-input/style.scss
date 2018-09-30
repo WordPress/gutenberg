@@ -11,7 +11,10 @@ $input-size: 300px;
 	padding: 1px;
 
 	input[type="text"] {
-		width: $input-size;
+		width: 100%;
+		@include break-small() {
+			width: $input-size;
+		}
 		padding: $input-padding;
 		border: none;
 		border-radius: 0;
