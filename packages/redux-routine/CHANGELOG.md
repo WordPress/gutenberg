@@ -5,6 +5,10 @@
 - The middleware returns a promise resolving once the runtime finishes iterating over the generator.
 - It's not possible to kill the execution of the runtime anymore by returning `undefined`
 
+## Bug Fixes
+
+- Fix running routines in Firefox.
+
 ## 2.0.0 (2018-09-05)
 
 ### Breaking Change
