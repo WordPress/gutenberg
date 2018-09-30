@@ -23,6 +23,7 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.0.0",
+		"is-promise": "^2.1.0",
 		"rungen": "^0.3.2"
 	},
 	"devDependencies": {

@@ -8,6 +8,10 @@
 
 - Writing resolvers as async generators has been deprecated. Use the controls plugin instead.
 
+## Bug Fixes
+
+- Fix the promise middleware in Firefox.
+
 ## 2.0.0 (2018-09-05)
 
 ### Breaking Change
