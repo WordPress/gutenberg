@@ -1929,7 +1929,7 @@ export function getTokenSettings( state, name ) {
  * @return {boolean} Whether the user can or can't post unfiltered HTML.
  */
 export function canUserUseUnfilteredHTML( state ) {
-	return has( getCurrentPost( state ), [ '_links', 'wp:action-unfiltered_html' ] );
+	return has( getCurrentPost( state ), [ '_links', 'wp:action-unfiltered-html' ] );
 }
 
 /**
