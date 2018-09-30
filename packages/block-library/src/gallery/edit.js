@@ -265,7 +265,7 @@ class GalleryEdit extends Component {
 					{ dropZone }
 					{ images.map( ( img, index ) => {
 						const imageId = `gallery_image_${ clientId }_${ img.id }`;
-						return <li id={ imageId } className="blocks-gallery-item" key={ img.id || img.url }>
+						return <li className="blocks-gallery-item" key={ img.id || img.url }>
 							<ReorderZone index={ index } handleDrop={ this.handleDrop } />
 							<GalleryImage
 								url={ img.url }
