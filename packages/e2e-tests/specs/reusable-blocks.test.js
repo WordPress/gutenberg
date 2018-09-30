@@ -16,17 +16,8 @@ function waitForAndAcceptDialog() {
 }
 
 describe( 'Reusable Blocks', () => {
-	beforeAll( async () => {
-		await createNewPost();
-	} );
-
 	beforeEach( async () => {
-		// Remove all blocks from the post so that we're working with a clean slate
-		await page.evaluate( () => {
-			const blocks = wp.data.select( 'core/editor' ).getBlocks();
-			const clientIds = blocks.map( ( block ) => block.clientId );
-			wp.data.dispatch( 'core/editor' ).removeBlocks( clientIds );
-		} );
+		await createNewPost();
 	} );
 
 	it( 'can be created', async () => {
