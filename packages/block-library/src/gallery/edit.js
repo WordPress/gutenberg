@@ -14,6 +14,7 @@ import {
 	FormFileUpload,
 	PanelBody,
 	RangeControl,
+	ReorderZone,
 	SelectControl,
 	ToggleControl,
 	Toolbar,
@@ -57,6 +58,7 @@ class GalleryEdit extends Component {
 		this.setImageAttributes = this.setImageAttributes.bind( this );
 		this.addFiles = this.addFiles.bind( this );
 		this.uploadFromFiles = this.uploadFromFiles.bind( this );
+		this.handleDrop = this.handleDrop.bind( this );
 
 		this.state = {
 			selectedImage: null,
@@ -140,6 +142,29 @@ class GalleryEdit extends Component {
 				} );
 			},
 			onError: noticeOperations.createErrorNotice,
+		} );
+	}
+
+	arrayMove( arr, previousIndex, newIndex ) {
+		const array = arr.slice( 0 );
+		array.splice( newIndex, 0, array.splice( previousIndex, 1 )[ 0 ] );
+		return array;
+	}
+
+	handleDrop( oldIndex, newIndex ) {
+		// Don't do anything if dropping on adjacent zone
+		if ( newIndex === oldIndex || newIndex === oldIndex + 1 ) {
+			return;
+		}
+		// Set the correct index when dragging to the right
+		if ( newIndex > oldIndex ) {
+			newIndex -= 1;
+		}
+		const images = this.props.attributes.images;
+		const { setAttributes } = this.props;
+		const reorderedImages = this.arrayMove( images, oldIndex, newIndex );
+		setAttributes( {
+			images: reorderedImages,
 		} );
 	}
 
@@ -241,17 +266,21 @@ class GalleryEdit extends Component {
 					{ images.map( ( img, index ) => {
 						const imageId = `gallery_image_${ clientId }_${ img.id }`;
 						return <li id={ imageId } className="blocks-gallery-item" key={ img.id || img.url }>
+							<ReorderZone index={ index } handleDrop={ this.handleDrop } />
 							<GalleryImage
 								url={ img.url }
 								alt={ img.alt }
 								id={ img.id }
 								dragId={ imageId }
 								isSelected={ isSelected && this.state.selectedImage === index }
+								index={ index }
 								onRemove={ this.onRemoveImage( index ) }
 								onSelect={ this.onSelectImage( index ) }
 								setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
 								caption={ img.caption }
 							/>
+							{ index === images.length - 1 &&
+							<ReorderZone index={ images.length } handleDrop={ this.handleDrop } last /> }
 						</li>;
 					} ) }
 					{ isSelected &&

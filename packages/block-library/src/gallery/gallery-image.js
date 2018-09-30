@@ -85,9 +85,9 @@ class GalleryImage extends Component {
 	}
 
 	render() {
-		const { url, alt, id, dragId, linkTo, link, isSelected, caption, onRemove, setAttributes } = this.props;
+		const { url, alt, id, dragId, linkTo, link, isSelected, index, caption, onRemove, setAttributes } = this.props;
 
-		const transferData = { message: 'message' };
+		const transferData = { oldIndex: index };
 
 		let href;
 

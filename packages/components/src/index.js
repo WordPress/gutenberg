@@ -44,6 +44,7 @@ export { default as QueryControls } from './query-controls';
 export { default as RadioControl } from './radio-control';
 export { default as RangeControl } from './range-control';
 export { default as ResponsiveWrapper } from './responsive-wrapper';
+export { default as ReorderZone } from './reorder-zone';
 export { default as SandBox } from './sandbox';
 export { default as SelectControl } from './select-control';
 export { default as Spinner } from './spinner';

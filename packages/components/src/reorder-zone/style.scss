@@ -1,0 +1,16 @@
+.block-gallery__reorder-zone {
+	height: 183px;
+	width: 8px;
+	left: -12px;
+	position: absolute;
+	z-index: 101;
+
+	&.last {
+		left: auto;
+		right: -12px;
+	}
+
+	&.hovering {
+		background-color: #0085ba;
+	}
+}
