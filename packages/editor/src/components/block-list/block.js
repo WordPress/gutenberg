@@ -259,8 +259,8 @@ export class BlockListBlock extends Component {
 	 *
 	 * @return {void}
 	 */
-	preventDrag( event ) {
-		event.preventDefault();
+	preventDrag() {
+		// event.preventDefault();
 	}
 
 	/**
