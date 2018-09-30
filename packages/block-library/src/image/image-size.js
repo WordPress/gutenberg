@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop, round } from 'lodash';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,20 +12,6 @@ import { Component } from '@wordpress/element';
 export function getEditorWidth() {
 	const node = document.querySelector( 'div.editor-block-list__block-edit' );
 	return node && node.clientWidth;
-}
-
-export function getPercentWidth( width ) {
-	const editorWidth = getEditorWidth();
-
-	if ( ! width || ! editorWidth ) {
-		return;
-	}
-
-	if ( width < editorWidth ) {
-		return round( ( width / editorWidth ) * 100, 3 );
-	}
-
-	return 100;
 }
 
 class ImageSize extends Component {

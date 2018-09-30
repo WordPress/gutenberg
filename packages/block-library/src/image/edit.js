@@ -45,7 +45,7 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import ImageSize, { getEditorWidth, getPercentWidth } from './image-size';
+import ImageSize, { getEditorWidth } from './image-size';
 
 /**
  * Module constants
@@ -65,9 +65,7 @@ class ImageEdit extends Component {
 		this.onImageClick = this.onImageClick.bind( this );
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
-		this.updateWidth = this.updateWidth.bind( this );
-		this.updateHeight = this.updateHeight.bind( this );
-		this.updateDimensions = this.updateDimensions.bind( this );
+		this.resetScale = this.resetScale.bind( this );
 		this.onSetCustomHref = this.onSetCustomHref.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 
@@ -124,7 +122,6 @@ class ImageEdit extends Component {
 		const editorWidth = getEditorWidth();
 		let src = media.url;
 		let img = {};
-		let percentWidth = 100;
 		let sizesWidth = editorWidth;
 
 		/* eslint-disable no-lonely-if */
@@ -136,15 +133,10 @@ class ImageEdit extends Component {
 			if ( img.width < editorWidth ) {
 				// The "full" size may be narrower than 100%.
 				sizesWidth = img.width;
-				percentWidth = getPercentWidth( sizesWidth );
 			}
 
 			if ( img.srcset ) {
 				img.sizes = this.getSizesAttr( sizesWidth );
-			}
-		} else {
-			if ( media.width && media.width < editorWidth ) {
-				percentWidth = getPercentWidth( media.width );
 			}
 		}
 		/* eslint-enable no-lonely-if */
@@ -154,9 +146,7 @@ class ImageEdit extends Component {
 			url: src,
 			srcSet: img.srcset,
 			sizes: img.sizes,
-			width: undefined,
-			height: undefined,
-			'data-wp-percent-width': percentWidth,
+			scale: 1,
 		} );
 	}
 
@@ -205,36 +195,24 @@ class ImageEdit extends Component {
 
 	updateAlignment( nextAlign ) {
 		const extraUpdatedAttributes = [ 'wide', 'full' ].indexOf( nextAlign ) !== -1 ?
-			{ width: undefined, height: undefined } :
+			{ scale: 1 } :
 			{};
 		this.props.setAttributes( { ...extraUpdatedAttributes, align: nextAlign } );
 	}
 
 	updateImageURL( url ) {
-		this.props.setAttributes( { url, width: undefined, height: undefined } );
+		this.props.setAttributes( { url, scale: 1 } );
 		this.updateSrcsetAndSizes( url );
 	}
 
-	updateWidth( width ) {
-		width = parseInt( width, 10 );
+	updateScale( scale ) {
+		this.props.setAttributes( { scale } );
+	}
+
+	resetScale() {
 		this.props.setAttributes( {
-			width: width,
-			'data-wp-percent-width': getPercentWidth( width ),
+			scale: 1,
 		} );
-	}
-
-	updateHeight( height ) {
-		this.props.setAttributes( { height: parseInt( height, 10 ) } );
-	}
-
-	updateDimensions( width = undefined, height = undefined ) {
-		return () => {
-			this.props.setAttributes( {
-				width: width,
-				height: height,
-				'data-wp-percent-width': getPercentWidth( width ) || 100,
-			} );
-		};
 	}
 
 	updateSrcsetAndSizes( url ) {
@@ -257,18 +235,15 @@ class ImageEdit extends Component {
 			this.resetSrcsetAndSizes();
 		} else {
 			const editorWidth = getEditorWidth();
-			let percentWidth = 100;
 			let sizesWidth = editorWidth;
 
 			if ( imageData.width < editorWidth ) {
 				sizesWidth = imageData.width;
-				percentWidth = getPercentWidth( sizesWidth );
 			}
 
 			this.props.setAttributes( {
 				srcSet: imageData.srcset,
 				sizes: this.getSizesAttr( sizesWidth ),
-				'data-wp-percent-width': percentWidth,
 			} );
 		}
 	}
@@ -277,7 +252,6 @@ class ImageEdit extends Component {
 		this.props.setAttributes( {
 			srcSet: null,
 			sizes: null,
-			'data-wp-percent-width': 100,
 		} );
 	}
 
@@ -367,7 +341,7 @@ class ImageEdit extends Component {
 
 	render() {
 		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, noticeOperations, noticeUI, toggleSelection, isRTL } = this.props;
-		const { url, alt, caption, align, id, href, linkDestination, width, height, srcSet } = attributes;
+		const { url, alt, caption, align, id, href, linkDestination, scale, srcSet } = attributes;
 		const sizesAttr = attributes.sizes;
 
 		const controls = (
@@ -420,14 +394,14 @@ class ImageEdit extends Component {
 
 		const classes = classnames( className, {
 			'is-transient': 0 === url.indexOf( 'blob:' ),
-			'is-resized': !! width || !! height,
+			'is-resized': scale !== 1,
 			'is-focused': isSelected,
 		} );
 
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
 		const isLinkURLInputDisabled = linkDestination !== LINK_DESTINATION_CUSTOM;
 
-		const getInspectorControls = ( imageWidth, imageHeight ) => (
+		const getInspectorControls = ( imageWidthWithinContainer, imageHeightWithinContainer ) => (
 			<InspectorControls>
 				<PanelBody title={ __( 'Image Settings' ) }>
 					<TextareaControl
@@ -458,45 +432,46 @@ class ImageEdit extends Component {
 									type="number"
 									className="block-library-image__dimensions__width"
 									label={ __( 'Width' ) }
-									value={ width !== undefined ? width : '' }
-									placeholder={ imageWidth }
+									value={ round( imageWidthWithinContainer * scale ) }
+									placeholder={ round( imageWidthWithinContainer * scale ) }
 									min={ 1 }
-									onChange={ this.updateWidth }
+									onChange={ ( event ) => {
+										this.updatePercent( parseInt( event.target.value, 10 ) / imageWidthWithinContainer );
+									} }
 								/>
 								<TextControl
 									type="number"
 									className="block-library-image__dimensions__height"
 									label={ __( 'Height' ) }
-									value={ height !== undefined ? height : '' }
-									placeholder={ imageHeight }
+									value={ round( imageHeightWithinContainer * scale ) }
+									placeholder={ round( imageHeightWithinContainer * scale ) }
 									min={ 1 }
-									onChange={ this.updateHeight }
+									onChange={ ( event ) => {
+										this.updatePercent( parseInt( event.target.value, 10 ) / imageHeightWithinContainer );
+									} }
 								/>
 							</div>
 							<div className="block-library-image__dimensions__row">
 								<ButtonGroup aria-label={ __( 'Image Size' ) }>
-									{ [ 25, 50, 75, 100 ].map( ( scale ) => {
-										const scaledWidth = Math.round( imageWidth * ( scale / 100 ) );
-										const scaledHeight = Math.round( imageHeight * ( scale / 100 ) );
-
-										const isCurrent = width === scaledWidth && height === scaledHeight;
+									{ [ 25, 50, 75, 100 ].map( ( percent ) => {
+										const isCurrent = scale === percent / 100;
 
 										return (
 											<Button
-												key={ scale }
+												key={ percent }
 												isSmall
 												isPrimary={ isCurrent }
 												aria-pressed={ isCurrent }
-												onClick={ this.updateDimensions( scaledWidth, scaledHeight ) }
+												onClick={ () => this.updateScale( percent / 100 ) }
 											>
-												{ scale }%
+												{ percent }%
 											</Button>
 										);
 									} ) }
 								</ButtonGroup>
 								<Button
 									isSmall
-									onClick={ this.updateDimensions() }
+									onClick={ this.resetScale }
 								>
 									{ __( 'Reset' ) }
 								</Button>
@@ -551,16 +526,16 @@ class ImageEdit extends Component {
 							if ( ! isResizable || ! imageWidthWithinContainer ) {
 								return (
 									<Fragment>
-										{ getInspectorControls( imageWidth, imageHeight ) }
-										<div style={ { width, height } }>
+										{ imageWidthWithinContainer && getInspectorControls( imageWidthWithinContainer, imageHeightWithinContainer ) }
+										<div style={ {
+											width: imageWidthWithinContainer ? imageWidthWithinContainer * scale : undefined,
+											height: imageHeightWithinContainer ? imageHeightWithinContainer * scale : undefined,
+										} }>
 											{ img }
 										</div>
 									</Fragment>
 								);
 							}
-
-							const currentWidth = width || imageWidthWithinContainer;
-							const currentHeight = height || imageHeightWithinContainer;
 
 							const ratio = imageWidth / imageHeight;
 							const minWidth = imageWidth < imageHeight ? MIN_SIZE : MIN_SIZE * ratio;
@@ -601,9 +576,9 @@ class ImageEdit extends Component {
 									<ResizableBox
 										className="block-library-image__resizer"
 										size={
-											width && height ? {
-												width,
-												height,
+											imageWidthWithinContainer && imageHeightWithinContainer ? {
+												width: imageWidthWithinContainer * scale,
+												height: imageHeightWithinContainer * scale,
 											} : undefined
 										}
 										minWidth={ minWidth }
@@ -626,8 +601,10 @@ class ImageEdit extends Component {
 											toggleSelection( false );
 										} }
 										onResizeStop={ ( event, direction, elt, delta ) => {
-											this.updateWidth( parseInt( currentWidth + delta.width, 10 ) );
-											this.updateHeight( parseInt( currentHeight + delta.height, 10 ) );
+											const currentWidth = imageWidthWithinContainer * scale;
+											const newWidth = parseInt( currentWidth + delta.width, 10 );
+											const newScale = newWidth / imageWidthWithinContainer;
+											this.updateScale( newScale );
 											toggleSelection( true );
 										} }
 									>
