@@ -37,6 +37,7 @@ $input-size: 300px;
 	transition: all 0.15s ease-in-out;
 	list-style: none;
 	padding: 4px 0;
+	width: $input-size + 2 * $icon-button-size;
 }
 
 // Hide suggestions on mobile until we @todo find a better way to show them
