@@ -1,4 +1,4 @@
-## 2.1.0 (Unreleased)
+## 2.1.0 (2018-09-30)
 
 ## New Features
 
