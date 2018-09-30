@@ -152,8 +152,12 @@ module.exports = {
 			},
 			{
 				selector: 'CallExpression[callee.object.name="page"][callee.property.name="waitFor"]',
-				message: 'Prefer page.waitForSelector instead.'
-			}
+				message: 'Prefer page.waitForSelector instead.',
+			},
+			{
+				selector: 'JSXAttribute[name.name="id"][value.type="Literal"]',
+				message: 'Do not use string literals for IDs; use withInstanceId instead.',
+			},
 		],
 	},
 	overrides: [
