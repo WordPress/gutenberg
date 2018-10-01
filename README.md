@@ -3,7 +3,7 @@
 [![Coverage](https://img.shields.io/codecov/c/github/WordPress/gutenberg/master.svg)](https://codecov.io/gh/WordPress/gutenberg)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
-Printing since 1440.
+Printing since 1440vc
 
 ![Gutenberg editing](https://cldup.com/H0oKBfpidk.png)
 
