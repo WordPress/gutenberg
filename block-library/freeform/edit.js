@@ -135,6 +135,12 @@ export default class FreeformEdit extends Component {
 		editor.on( 'init', () => {
 			const rootNode = this.editor.getBody();
 
+			// Move wp-includes/css/editor.css as last in <head>,
+			// if editor is the first classic editor in Gutenberg edit-screen.
+			if ( 1 === window.tinymce.editors.length ) {
+				jQuery( '#editor-buttons-css' ).detach().appendTo( 'head' );
+			}
+
 			// Create the toolbar by refocussing the editor.
 			if ( document.activeElement === rootNode ) {
 				rootNode.blur();
