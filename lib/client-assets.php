@@ -1284,14 +1284,18 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	 * @param array $preload_paths Array of paths to preload
 	 * @param object $post         The post resource data.
 	 */
-	$preload_paths = apply_filters( 'editor_preload_paths', array(
-		'/',
-		'/wp/v2/types?context=edit',
-		'/wp/v2/taxonomies?per_page=-1&context=edit',
-		sprintf( '/wp/v2/%s/%s?context=edit', $rest_base, $post->ID ),
-		sprintf( '/wp/v2/types/%s?context=edit', $post_type ),
-		sprintf( '/wp/v2/users/me?post_type=%s&context=edit', $post_type ),
-	), $post );
+	$preload_paths = apply_filters(
+		'editor_preload_paths',
+		array(
+			'/',
+			'/wp/v2/types?context=edit',
+			'/wp/v2/taxonomies?per_page=-1&context=edit',
+			sprintf( '/wp/v2/%s/%s?context=edit', $rest_base, $post->ID ),
+			sprintf( '/wp/v2/types/%s?context=edit', $post_type ),
+			sprintf( '/wp/v2/users/me?post_type=%s&context=edit', $post_type ),
+		),
+		$post
+	);
 
 	// Ensure the global $post remains the same after
 	// API data is preloaded. Because API preloading
