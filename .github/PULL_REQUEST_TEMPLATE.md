@@ -19,3 +19,4 @@
 - [ ] My code follows the WordPress code style. <!-- Check code: `npm run lint`, Guidelines: https://make.wordpress.org/core/handbook/best-practices/coding-standards/javascript/ -->
 - [ ] My code follows the accessibility standards. <!-- Guidelines: https://make.wordpress.org/core/handbook/best-practices/coding-standards/accessibility-coding-standards/ -->
 - [ ] My code has proper inline documentation. <!-- Guidelines: https://make.wordpress.org/core/handbook/best-practices/inline-documentation-standards/javascript/ -->
+<!-- Your code is checked . It's good -->
