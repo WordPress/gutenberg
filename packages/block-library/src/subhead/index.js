@@ -30,8 +30,7 @@ export const settings = {
 
 	attributes: {
 		content: {
-			type: 'array',
-			source: 'children',
+			source: 'rich-text',
 			selector: 'p',
 		},
 		align: {

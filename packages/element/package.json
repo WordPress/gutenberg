@@ -22,6 +22,7 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.0.0",
+		"@wordpress/escape-html": "file:../escape-html",
 		"lodash": "^4.17.10",
 		"react": "^16.4.1",
 		"react-dom": "^16.4.1"

@@ -10,7 +10,7 @@ exports[`templates Using a CPT with a predefined template Should add a custom po
 <!-- /wp:paragraph -->
 
 <!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"></blockquote>
+<blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
 <!-- /wp:quote -->
 
 <!-- wp:columns -->
@@ -36,7 +36,7 @@ exports[`templates Using a CPT with a predefined template Should respect user ed
 <!-- /wp:paragraph -->
 
 <!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"></blockquote>
+<blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
 <!-- /wp:quote -->
 
 <!-- wp:columns -->

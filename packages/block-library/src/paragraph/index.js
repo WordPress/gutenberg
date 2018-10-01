@@ -16,10 +16,8 @@ import {
 	getFontSizeClass,
 	RichText,
 } from '@wordpress/editor';
-import {
-	getPhrasingContentSchema,
-	children,
-} from '@wordpress/blocks';
+import { getPhrasingContentSchema } from '@wordpress/blocks';
+import { create, concat } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -32,10 +30,8 @@ const supports = {
 
 const schema = {
 	content: {
-		type: 'array',
-		source: 'children',
+		source: 'rich-text',
 		selector: 'p',
-		default: [],
 	},
 	align: {
 		type: 'string',
@@ -201,9 +197,7 @@ export const settings = {
 			migrate( attributes ) {
 				return {
 					...attributes,
-					content: [
-						<RawHTML key="html">{ attributes.content }</RawHTML>,
-					],
+					content: create( { html: attributes.content } ),
 				};
 			},
 		},
@@ -211,10 +205,7 @@ export const settings = {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: children.concat(
-				attributes.content,
-				attributesToMerge.content
-			),
+			content: concat( attributes.content, attributesToMerge.content ),
 		};
 	},
 

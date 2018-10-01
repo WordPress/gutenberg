@@ -4,9 +4,22 @@
         "name": "core/cover-image",
         "isValid": true,
         "attributes": {
-            "title": [
-                "Guten Berg!"
-            ],
+            "title": {
+                "formats": [
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ],
+                "text": "Guten Berg!"
+            },
             "url": "https://cldup.com/uuUqE_dXzy.jpg",
             "contentAlign": "center",
             "hasParallax": false,
