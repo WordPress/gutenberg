@@ -8,7 +8,7 @@ import { shallow } from 'enzyme';
  */
 import { createBlock } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
-import { create } from '@wordpress/rich-text-value';
+import { create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies

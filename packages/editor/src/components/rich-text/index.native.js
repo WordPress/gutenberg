@@ -13,7 +13,7 @@ import {
  */
 import { Component, RawHTML } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
-import { toHTMLString } from '@wordpress/rich-text-value';
+import { toHTMLString } from '@wordpress/rich-text';
 import { Toolbar } from '@wordpress/components';
 
 /**

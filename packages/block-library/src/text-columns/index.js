@@ -17,7 +17,7 @@ import {
 	RichText,
 } from '@wordpress/editor';
 import deprecated from '@wordpress/deprecated';
-import { create } from '@wordpress/rich-text-value';
+import { create } from '@wordpress/rich-text';
 
 export const name = 'core/text-columns';
 
@@ -42,8 +42,7 @@ export const settings = {
 			selector: 'p',
 			query: {
 				children: {
-					source: 'rich-text-value',
-					type: 'rich-text-value',
+					source: 'rich-text',
 				},
 			},
 			default: [

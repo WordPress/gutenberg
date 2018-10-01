@@ -6,7 +6,7 @@ import deepFreeze from 'deep-freeze';
 /**
  * WordPress dependencies
  */
-import { create } from '@wordpress/rich-text-value';
+import { create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies

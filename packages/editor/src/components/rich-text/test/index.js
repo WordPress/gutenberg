@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * WordPress dependencies
  */
-import { create } from '@wordpress/rich-text-value';
+import { create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies

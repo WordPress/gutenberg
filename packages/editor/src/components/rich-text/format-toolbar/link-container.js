@@ -18,7 +18,7 @@ import {
 	insert,
 	isCollapsed,
 	applyFormat,
-} from '@wordpress/rich-text-value';
+} from '@wordpress/rich-text';
 
 /**
  * Internal dependencies

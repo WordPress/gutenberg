@@ -20,7 +20,8 @@ import {
  * WordPress dependencies
  */
 import { createHooks, applyFilters } from '@wordpress/hooks';
-import { create } from '@wordpress/rich-text-value';
+import { create } from '@wordpress/rich-text';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -44,24 +45,36 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 	// default values for missing attributes.
 	const attributes = reduce( blockType.attributes, ( result, schema, key ) => {
 		const value = blockAttributes[ key ];
+
 		if ( undefined !== value ) {
 			result[ key ] = value;
 		} else if ( schema.hasOwnProperty( 'default' ) ) {
-			let defaultValue = schema.default;
+			result[ key ] = schema.default;
+		}
 
-			if ( schema.source === 'children' ) {
-				defaultValue = castArray( defaultValue );
-			} else if ( schema.source === 'node' ) {
-				defaultValue = castArray( defaultValue );
+		if ( schema.source === 'rich-text' ) {
+			// Ensure value passed is always a rich text value.
+			if ( typeof result[ key ] === 'string' ) {
+				result[ key ] = create( { text: result[ key ] } );
+			} else if ( ! result[ key ] || ! result[ key ].text ) {
+				result[ key ] = create();
 			}
+		}
 
-			result[ key ] = defaultValue;
-		} else if ( schema.source === 'rich-text-value' ) {
-			result[ key ] = create();
-		} else if ( schema.source === 'children' ) {
-			result[ key ] = [];
-		} else if ( schema.source === 'node' ) {
-			result[ key ] = [];
+		if ( [ 'node', 'children' ].indexOf( schema.source ) !== -1 ) {
+			deprecated( `${ schema.source } source`, {
+				alternative: 'rich-text source',
+				plugin: 'Gutenberg',
+				version: '4.4',
+			} );
+
+			// Ensure value passed is always an array, which we're expecting in
+			// the RichText component to handle the deprecated value.
+			if ( typeof result[ key ] === 'string' ) {
+				result[ key ] = [ result[ key ] ];
+			} else if ( ! Array.isArray( result[ key ] ) ) {
+				result[ key ] = [];
+			}
 		}
 
 		return result;

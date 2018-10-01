@@ -46,7 +46,7 @@ export function getSerializeCapableElement( children ) {
  */
 function getChildrenArray( children ) {
 	deprecated( 'children and node source', {
-		alternative: 'rich-text-value source',
+		alternative: 'rich-text source',
 		plugin: 'Gutenberg',
 		version: '4.4',
 	} );
@@ -67,7 +67,7 @@ function getChildrenArray( children ) {
  */
 export function concat( ...blockNodes ) {
 	deprecated( 'wp.blocks.children.concat', {
-		alternative: 'wp.richTextValue.concat',
+		alternative: 'wp.richText.concat',
 		plugin: 'Gutenberg',
 		version: '4.4',
 	} );
@@ -103,7 +103,7 @@ export function concat( ...blockNodes ) {
  */
 export function fromDOM( domNodes ) {
 	deprecated( 'wp.blocks.children.fromDom', {
-		alternative: 'wp.richTextValue.create',
+		alternative: 'wp.richText.create',
 		plugin: 'Gutenberg',
 		version: '4.4',
 	} );
@@ -129,7 +129,7 @@ export function fromDOM( domNodes ) {
  */
 export function toHTML( children ) {
 	deprecated( 'wp.blocks.children.toHTML', {
-		alternative: 'wp.richTextValue.toHTMLString',
+		alternative: 'wp.richText.toHTMLString',
 		plugin: 'Gutenberg',
 		version: '4.4',
 	} );
@@ -148,8 +148,8 @@ export function toHTML( children ) {
  * @return {Function} hpq matcher.
  */
 export function matcher( selector ) {
-	deprecated( 'children source', {
-		alternative: 'rich-text-value source',
+	deprecated( 'wp.blocks.children.matcher', {
+		hint: 'Use the rich-text source.',
 		plugin: 'Gutenberg',
 		version: '4.4',
 	} );

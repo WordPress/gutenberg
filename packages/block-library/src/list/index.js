@@ -18,7 +18,7 @@ import {
 	BlockControls,
 	RichText,
 } from '@wordpress/editor';
-import { replace, join, split, isEmpty } from '@wordpress/rich-text-value';
+import { replace, join, split, isEmpty } from '@wordpress/rich-text';
 
 const listContentSchema = {
 	...getPhrasingContentSchema(),
@@ -47,8 +47,7 @@ const schema = {
 		default: false,
 	},
 	values: {
-		source: 'rich-text-value',
-		type: 'rich-text-value',
+		source: 'rich-text',
 		selector: 'ol,ul',
 		multiline: 'li',
 	},

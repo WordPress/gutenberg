@@ -7,7 +7,7 @@ import { filter } from 'lodash';
  * WordPress dependencies
  */
 import { getBlockTransforms, findTransform } from '@wordpress/blocks';
-import { remove, applyFormat, getTextContent } from '@wordpress/rich-text-value';
+import { remove, applyFormat, getTextContent } from '@wordpress/rich-text';
 
 export function getPatterns( { onReplace, multiline } ) {
 	const patterns = filter( getBlockTransforms( 'from' ), ( { type, trigger } ) => {

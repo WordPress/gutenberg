@@ -17,7 +17,7 @@ import {
 	RichText,
 } from '@wordpress/editor';
 import { getPhrasingContentSchema } from '@wordpress/blocks';
-import { create, concat } from '@wordpress/rich-text-value';
+import { create, concat } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -30,8 +30,7 @@ const supports = {
 
 const schema = {
 	content: {
-		source: 'rich-text-value',
-		type: 'rich-text-value',
+		source: 'rich-text',
 		selector: 'p',
 	},
 	align: {

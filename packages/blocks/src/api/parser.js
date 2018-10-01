@@ -18,7 +18,7 @@ import { getBlockType, getUnknownTypeHandlerName } from './registration';
 import { createBlock } from './factory';
 import { isValidBlock } from './validation';
 import { getCommentDelimitedContent } from './serializer';
-import { attr, html, text, query, node, children, prop, richTextValue } from './matchers';
+import { attr, html, text, query, node, children, prop, richText } from './matchers';
 
 /**
  * Higher-order hpq matcher which enhances an attribute matcher to return true
@@ -112,8 +112,8 @@ export function matcherFromSource( sourceConfig ) {
 			return children( sourceConfig.selector );
 		case 'node':
 			return node( sourceConfig.selector );
-		case 'rich-text-value':
-			return richTextValue( sourceConfig.selector, sourceConfig.multiline );
+		case 'rich-text':
+			return richText( sourceConfig.selector, sourceConfig.multiline );
 		case 'query':
 			const subMatchers = mapValues( sourceConfig.query, matcherFromSource );
 			return query( sourceConfig.selector, subMatchers );
@@ -172,7 +172,7 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 		case 'tag':
 			value = parseWithAttributeSchema( innerHTML, attributeSchema );
 			break;
-		case 'rich-text-value':
+		case 'rich-text':
 			type = 'object';
 			value = parseWithAttributeSchema( innerHTML, attributeSchema );
 	}

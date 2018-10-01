@@ -10,7 +10,7 @@ import classnames from 'classnames';
  */
 import { Component, createElement } from '@wordpress/element';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
-import { toHTMLString } from '@wordpress/rich-text-value';
+import { toHTMLString } from '@wordpress/rich-text';
 import { children } from '@wordpress/blocks';
 
 /**

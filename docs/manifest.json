@@ -474,9 +474,9 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/rich-text-value",
-		"slug": "packages-rich-text-value",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/rich-text-value/README.md",
+		"title": "@wordpress/rich-text",
+		"slug": "packages-rich-text",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/rich-text/README.md",
 		"parent": "packages"
 	},
 	{

@@ -1,5 +1,5 @@
 {
-	"name": "@wordpress/rich-text-value",
+	"name": "@wordpress/rich-text",
 	"version": "1.0.0-beta.0",
 	"description": "Rich text value and manipulation API.",
 	"author": "The WordPress Contributors",
@@ -8,7 +8,7 @@
 		"wordpress",
 		"rich-text"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/rich-text-value/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/rich-text/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git"

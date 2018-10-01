@@ -39,7 +39,7 @@ import {
 	insert,
 	isEmptyLine,
 	unstableToDom,
-} from '@wordpress/rich-text-value';
+} from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -931,7 +931,7 @@ export class RichText extends Component {
 
 RichText.defaultProps = {
 	formattingControls: FORMATTING_CONTROLS.map( ( { format } ) => format ),
-	format: 'rich-text-value',
+	format: 'rich-text',
 };
 
 const RichTextContainer = compose( [
@@ -1012,7 +1012,7 @@ RichTextContainer.isEmpty = ( value ) => {
 };
 
 RichTextContainer.Content.defaultProps = {
-	format: 'rich-text-value',
+	format: 'rich-text',
 };
 
 export default RichTextContainer;

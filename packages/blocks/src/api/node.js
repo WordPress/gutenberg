@@ -75,7 +75,7 @@ export function getNamedNodeMapAsObject( nodeMap ) {
  */
 export function fromDOM( domNode ) {
 	deprecated( 'wp.blocks.node.fromDOM', {
-		alternative: 'wp.richTextValue.create',
+		alternative: 'wp.richText.create',
 		plugin: 'Gutenberg',
 		version: '4.4',
 	} );
@@ -109,7 +109,7 @@ export function fromDOM( domNode ) {
  */
 export function toHTML( node ) {
 	deprecated( 'wp.blocks.node.toHTML', {
-		alternative: 'wp.richTextValue.toHTMLString',
+		alternative: 'wp.richText.toHTMLString',
 		plugin: 'Gutenberg',
 		version: '4.4',
 	} );
@@ -127,7 +127,7 @@ export function toHTML( node ) {
  */
 export function matcher( selector ) {
 	deprecated( 'node source', {
-		alternative: 'rich-text-value source',
+		alternative: 'rich-text source',
 		plugin: 'Gutenberg',
 		version: '4.4',
 	} );

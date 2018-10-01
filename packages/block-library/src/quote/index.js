@@ -14,18 +14,16 @@ import {
 	AlignmentToolbar,
 	RichText,
 } from '@wordpress/editor';
-import { join, split, concat } from '@wordpress/rich-text-value';
+import { join, split, concat } from '@wordpress/rich-text';
 
 const blockAttributes = {
 	value: {
-		source: 'rich-text-value',
-		type: 'rich-text-value',
+		source: 'rich-text',
 		selector: 'blockquote',
 		multiline: 'p',
 	},
 	citation: {
-		source: 'rich-text-value',
-		type: 'rich-text-value',
+		source: 'rich-text',
 		selector: 'cite',
 	},
 	align: {
@@ -240,8 +238,7 @@ export const settings = {
 			attributes: {
 				...blockAttributes,
 				citation: {
-					source: 'rich-text-value',
-					type: 'rich-text-value',
+					source: 'rich-text',
 					selector: 'footer',
 				},
 				style: {

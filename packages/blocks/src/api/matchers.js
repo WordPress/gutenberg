@@ -6,7 +6,7 @@ export { attr, prop, html, text, query } from 'hpq';
 /**
  * WordPress dependencies
  */
-import { create } from '@wordpress/rich-text-value';
+import { create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -14,7 +14,7 @@ import { create } from '@wordpress/rich-text-value';
 export { matcher as node } from './node';
 export { matcher as children } from './children';
 
-export function richTextValue( selector, multilineTag ) {
+export function richText( selector, multilineTag ) {
 	return ( domNode ) => {
 		let match = domNode;
 

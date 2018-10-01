@@ -17,7 +17,7 @@ import {
 	insert,
 	isCollapsed,
 	getTextContent,
-} from '@wordpress/rich-text-value';
+} from '@wordpress/rich-text';
 import { getRectangleFromRange } from '@wordpress/dom';
 
 /**

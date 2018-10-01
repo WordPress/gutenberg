@@ -14,7 +14,7 @@ import {
 	getBlockType,
 } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
-import { concat } from '@wordpress/rich-text-value';
+import { concat } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -39,8 +39,7 @@ const supports = {
 
 const schema = {
 	content: {
-		source: 'rich-text-value',
-		type: 'rich-text-value',
+		source: 'rich-text',
 		selector: 'h1,h2,h3,h4,h5,h6',
 	},
 	level: {

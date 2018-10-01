@@ -108,7 +108,7 @@ const gutenbergPackages = [
 	'nux',
 	'plugins',
 	'redux-routine',
-	'rich-text-value',
+	'rich-text',
 	'shortcode',
 	'token-list',
 	'url',

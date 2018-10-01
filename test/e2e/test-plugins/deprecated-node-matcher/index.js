@@ -32,13 +32,13 @@
 		},
 	} );
 
-	function toRichTextValue( value ) {
+	function torichText( value ) {
 		return _.map( value, function( subValue ) {
 			return subValue.children;
 		} );
 	}
 
-	function fromRichTextValue( value ) {
+	function fromrichText( value ) {
 		return _.map( value, function( subValue ) {
 			return {
 				children: subValue,
@@ -65,10 +65,10 @@
 			return el( 'blockquote', {},
 				el( RichText, {
 					multiline: 'p',
-					value: toRichTextValue( attributes.value ),
+					value: torichText( attributes.value ),
 					onChange: function( nextValue ) {
 						setAttributes( {
-							value: fromRichTextValue( nextValue ),
+							value: fromrichText( nextValue ),
 						} );
 					},
 				} )
@@ -77,7 +77,7 @@
 		save: function( { attributes } ) {
 			return el( 'blockquote', {},
 				el( RichText.Content, {
-					value: toRichTextValue( attributes.value ),
+					value: torichText( attributes.value ),
 				} )
 			);
 		},
