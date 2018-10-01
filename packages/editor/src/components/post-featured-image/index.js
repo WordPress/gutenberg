@@ -63,6 +63,7 @@ function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onR
 								{ ! media && <Spinner /> }
 							</Button>
 						) }
+						value={ featuredImageId }
 					/>
 				}
 				{ !! featuredImageId && media && ! media.isLoading &&
