@@ -171,7 +171,7 @@ $arrow-size: 8px;
 
 	.components-popover:not(.is-mobile):not(.is-middle).is-right & {
 		/*!rtl:ignore*/
-		margin-left: -24px;
+		margin-left: 0;
 	}
 
 	.components-popover:not(.is-mobile).is-left & {
@@ -182,7 +182,7 @@ $arrow-size: 8px;
 
 	.components-popover:not(.is-mobile):not(.is-middle).is-left & {
 		/*!rtl:ignore*/
-		margin-right: -24px;
+		margin-right: 0;
 	}
 }
 
