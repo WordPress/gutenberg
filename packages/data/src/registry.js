@@ -1,17 +1,17 @@
 /**
  * External dependencies
  */
-import { createStore, applyMiddleware } from 'redux';
 import {
-	flowRight,
 	without,
 	mapValues,
 	get,
 } from 'lodash';
+import { applyMiddleware } from 'redux';
 
 /**
  * Internal dependencies
  */
+import { createNamespace } from './namespace-store.js';
 import dataStore from './store';
 import promise from './promise-middleware';
 import createResolversCacheMiddleware from './resolvers-cache-middleware';
@@ -73,23 +73,10 @@ export function createRegistry( storeConfigs = {} ) {
 		if ( typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION__ ) {
 			enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__( { name: reducerKey, instanceId: reducerKey } ) );
 		}
-		const store = createStore( reducer, flowRight( enhancers ) );
-		namespaces[ reducerKey ] = { store, reducer };
 
-		// Customize subscribe behavior to call listeners only on effective change,
-		// not on every dispatch.
-		let lastState = store.getState();
-		store.subscribe( () => {
-			const state = store.getState();
-			const hasChanged = state !== lastState;
-			lastState = state;
-
-			if ( hasChanged ) {
-				globalListener();
-			}
-		} );
-
-		return store;
+		// TODO: Remove globalListener from this call after subscriptions are passed.
+		namespaces[ reducerKey ] = createNamespace( reducer, enhancers, globalListener );
+		return namespaces[ reducerKey ].store;
 	}
 
 	/**
