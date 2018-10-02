@@ -90,7 +90,7 @@
 	}
 
 	// Placeholder text.
-	& + .editor-rich-text__tinymce, {
+	& + .editor-rich-text__tinymce {
 		pointer-events: none;
 
 		// Use opacity to work in various editor styles.
@@ -99,6 +99,12 @@
 		p {
 			opacity: 0.62;
 		}
+	}
+
+	// Captions may have lighter (gray) text, or be shown on a range of different background luminosites.
+	// To ensure legibility, we increase the default placeholder opacity to ensure contrast.
+	&[data-is-placeholder-visible="true"] + figcaption.editor-rich-text__tinymce {
+		opacity: 0.8;
 	}
 
 	&.mce-content-body {

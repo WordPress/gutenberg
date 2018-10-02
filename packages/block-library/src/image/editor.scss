@@ -8,11 +8,6 @@
 	figcaption img {
 		display: inline;
 	}
-
-	// Increase opacity for placeholder text as the gray is lighter.
-	.editor-rich-text .editor-rich-text__tinymce[data-is-placeholder-visible="true"] + .editor-rich-text__tinymce {
-		opacity: 0.8;
-	}
 }
 
 // This is necessary for the editor resize handles to accurately work on a non-floated, non-resized, small image.
