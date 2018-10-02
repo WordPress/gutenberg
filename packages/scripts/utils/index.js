@@ -78,7 +78,7 @@ const spawnScript = ( scriptName, args = [] ) => {
 			fromScriptsRoot( scriptName ),
 			...args,
 		],
-		{ stdio: 'inherit' },
+		{ stdio: 'inherit' }
 	);
 
 	if ( signal ) {
