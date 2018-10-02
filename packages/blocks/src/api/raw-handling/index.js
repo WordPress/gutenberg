@@ -2,8 +2,6 @@
  * External dependencies
  */
 import { flatMap, filter, compact } from 'lodash';
-// Also polyfills Element#matches.
-import 'element-closest';
 
 /**
  * Internal dependencies
@@ -15,6 +13,7 @@ import normaliseBlocks from './normalise-blocks';
 import specialCommentConverter from './special-comment-converter';
 import isInlineContent from './is-inline-content';
 import phrasingContentReducer from './phrasing-content-reducer';
+import headRemover from './head-remover';
 import msListConverter from './ms-list-converter';
 import listReducer from './list-reducer';
 import imageCorrector from './image-corrector';
@@ -149,6 +148,7 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 
 		const filters = [
 			msListConverter,
+			headRemover,
 			listReducer,
 			imageCorrector,
 			phrasingContentReducer,

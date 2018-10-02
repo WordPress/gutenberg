@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { isEmpty } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -25,8 +24,7 @@ const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
 
 const blockAttributes = {
 	title: {
-		type: 'array',
-		source: 'children',
+		source: 'rich-text',
 		selector: 'p',
 	},
 	url: {
@@ -54,6 +52,8 @@ const blockAttributes = {
 
 export const name = 'core/cover-image';
 
+const ALLOWED_MEDIA_TYPES = [ 'image' ];
+
 export const settings = {
 	title: __( 'Cover Image' ),
 
@@ -74,6 +74,18 @@ export const settings = {
 					createBlock( 'core/cover-image', { title: content } )
 				),
 			},
+			{
+				type: 'block',
+				blocks: [ 'core/image' ],
+				transform: ( { caption, url, align, id } ) => (
+					createBlock( 'core/cover-image', {
+						title: caption,
+						url,
+						align,
+						id,
+					} )
+				),
+			},
 		],
 		to: [
 			{
@@ -81,6 +93,18 @@ export const settings = {
 				blocks: [ 'core/heading' ],
 				transform: ( { title } ) => (
 					createBlock( 'core/heading', { content: title } )
+				),
+			},
+			{
+				type: 'block',
+				blocks: [ 'core/image' ],
+				transform: ( { title, url, align, id } ) => (
+					createBlock( 'core/image', {
+						caption: title,
+						url,
+						align,
+						id,
+					} )
 				),
 			},
 		],
@@ -133,7 +157,7 @@ export const settings = {
 					<Toolbar>
 						<MediaUpload
 							onSelect={ onSelectImage }
-							type="image"
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
 							value={ id }
 							render={ ( { open } ) => (
 								<IconButton
@@ -169,7 +193,7 @@ export const settings = {
 		);
 
 		if ( ! url ) {
-			const hasTitle = ! isEmpty( title );
+			const hasTitle = ! RichText.isEmpty( title );
 			const icon = hasTitle ? undefined : 'format-image';
 			const label = hasTitle ? (
 				<RichText
@@ -192,7 +216,7 @@ export const settings = {
 						} }
 						onSelect={ onSelectImage }
 						accept="image/*"
-						type="image"
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						notices={ noticeUI }
 						onError={ noticeOperations.createErrorNotice }
 					/>
@@ -250,8 +274,7 @@ export const settings = {
 		attributes: {
 			...blockAttributes,
 			title: {
-				type: 'array',
-				source: 'children',
+				source: 'rich-text',
 				selector: 'h2',
 			},
 		},

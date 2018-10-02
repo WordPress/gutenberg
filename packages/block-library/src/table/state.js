@@ -4,6 +4,11 @@
 import { times } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { create } from '@wordpress/rich-text';
+
+/**
  * Creates a table state.
  *
  * @param {number} options.rowCount    Row count for the table to create.
@@ -18,7 +23,7 @@ export function createTable( {
 	return {
 		body: times( rowCount, () => ( {
 			cells: times( columnCount, () => ( {
-				content: [],
+				content: create(),
 				tag: 'td',
 			} ) ),
 		} ) ),
@@ -84,7 +89,7 @@ export function insertRow( state, {
 			...state[ section ].slice( 0, rowIndex ),
 			{
 				cells: times( cellCount, () => ( {
-					content: [],
+					content: create(),
 					tag: 'td',
 				} ) ),
 			},
@@ -129,7 +134,7 @@ export function insertColumn( state, {
 			cells: [
 				...row.cells.slice( 0, columnIndex ),
 				{
-					content: [],
+					content: create(),
 					tag: 'td',
 				},
 				...row.cells.slice( columnIndex ),

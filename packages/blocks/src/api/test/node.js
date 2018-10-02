@@ -31,6 +31,7 @@ describe( 'toHTML', () => {
 
 		const html = toHTML( blockNode );
 
+		expect( console ).toHaveWarned();
 		expect( html ).toBe( '<strong class="is-extra-strong">This is a test</strong>' );
 	} );
 } );
@@ -41,6 +42,7 @@ describe( 'fromDOM', () => {
 
 		const blockNode = fromDOM( node );
 
+		expect( console ).toHaveWarned();
 		expect( blockNode ).toBe( 'Hello world' );
 	} );
 
@@ -57,6 +59,7 @@ describe( 'fromDOM', () => {
 
 		const blockNode = fromDOM( node );
 
+		expect( console ).toHaveWarned();
 		expect( blockNode ).toEqual( {
 			type: 'strong',
 			props: {

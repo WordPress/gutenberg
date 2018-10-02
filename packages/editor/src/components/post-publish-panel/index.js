@@ -8,8 +8,8 @@ import { get } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { IconButton, Spinner } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
+import { IconButton, Spinner, CheckboxControl } from '@wordpress/components';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
 /**
@@ -62,7 +62,7 @@ class PostPublishPanel extends Component {
 	}
 
 	render() {
-		const { isScheduled, onClose, forceIsDirty, forceIsSaving, PrePublishExtension, PostPublishExtension, ...additionalProps } = this.props;
+		const { isScheduled, isPublishSidebarEnabled, onClose, onTogglePublishSidebar, forceIsDirty, forceIsSaving, PrePublishExtension, PostPublishExtension, ...additionalProps } = this.props;
 		const { loading, submitted } = this.state;
 		return (
 			<div className="editor-post-publish-panel" { ...additionalProps }>
@@ -70,6 +70,7 @@ class PostPublishPanel extends Component {
 					{ ! submitted && (
 						<div className="editor-post-publish-panel__header-publish-button">
 							<PostPublishButton focusOnMount={ true } onSubmit={ this.onSubmit } forceIsDirty={ forceIsDirty } forceIsSaving={ forceIsSaving } />
+							<span className="editor-post-publish-panel__spacer"></span>
 						</div>
 					) }
 					{ submitted && (
@@ -97,6 +98,13 @@ class PostPublishPanel extends Component {
 						</PostPublishPanelPostpublish>
 					) }
 				</div>
+				<div className="editor-post-publish-panel__footer">
+					<CheckboxControl
+						label={ __( 'Always show pre-publish checks.' ) }
+						checked={ isPublishSidebarEnabled }
+						onChange={ onTogglePublishSidebar }
+					/>
+				</div>
 			</div>
 		);
 	}
@@ -112,6 +120,7 @@ export default compose( [
 			isSavingPost,
 			isEditedPostDirty,
 		} = select( 'core/editor' );
+		const { isPublishSidebarEnabled } = select( 'core/editor' );
 		return {
 			postType: getCurrentPostType(),
 			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
@@ -119,6 +128,19 @@ export default compose( [
 			isScheduled: isCurrentPostScheduled(),
 			isSaving: isSavingPost(),
 			isDirty: isEditedPostDirty(),
+			isPublishSidebarEnabled: isPublishSidebarEnabled(),
+		};
+	} ),
+	withDispatch( ( dispatch, { isPublishSidebarEnabled } ) => {
+		const { disablePublishSidebar, enablePublishSidebar } = dispatch( 'core/editor' );
+		return {
+			onTogglePublishSidebar: ( ) => {
+				if ( isPublishSidebarEnabled ) {
+					disablePublishSidebar();
+				} else {
+					enablePublishSidebar();
+				}
+			},
 		};
 	} ),
 ] )( PostPublishPanel );

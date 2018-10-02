@@ -78,6 +78,85 @@ describe( 'block factory', () => {
 			expect( block.innerBlocks[ 0 ].name ).toBe( 'core/test-block' );
 			expect( typeof block.clientId ).toBe( 'string' );
 		} );
+
+		it( 'should cast children and node source attributes with default undefined', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					content: {
+						type: 'array',
+						source: 'children',
+					},
+				},
+			} );
+
+			const block = createBlock( 'core/test-block' );
+
+			expect( console ).toHaveWarned();
+			expect( block.attributes ).toEqual( {
+				content: [],
+			} );
+		} );
+
+		it( 'should cast children and node source attributes with string as default', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					content: {
+						type: 'array',
+						source: 'children',
+						default: 'test',
+					},
+				},
+			} );
+
+			const block = createBlock( 'core/test-block' );
+
+			expect( block.attributes ).toEqual( {
+				content: [ 'test' ],
+			} );
+		} );
+
+		it( 'should cast children and node source attributes with unknown type as default', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					content: {
+						type: 'array',
+						source: 'children',
+						default: 1,
+					},
+				},
+			} );
+
+			const block = createBlock( 'core/test-block' );
+
+			expect( block.attributes ).toEqual( {
+				content: [],
+			} );
+		} );
+
+		it( 'should cast rich-text source attributes', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					content: {
+						source: 'rich-text',
+					},
+				},
+			} );
+
+			const block = createBlock( 'core/test-block', {
+				content: 'test',
+			} );
+
+			expect( block.attributes ).toEqual( {
+				content: {
+					formats: [ , , , , ],
+					text: 'test',
+				},
+			} );
+		} );
 	} );
 
 	describe( 'cloneBlock()', () => {

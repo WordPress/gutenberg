@@ -6,7 +6,10 @@
         "attributes": {
             "url": "https://cldup.com/uuUqE_dXzy.jpg",
             "alt": "",
-            "caption": [],
+            "caption": {
+                "formats": [],
+                "text": ""
+            },
             "height": 385,
             "width": 579,
             "href": "https://cldup.com/uuUqE_dXzy.jpg",

@@ -39,6 +39,7 @@ class Inserter extends Component {
 			children,
 			onInsertBlock,
 			rootClientId,
+			disabled,
 		} = this.props;
 
 		if ( items.length === 0 ) {
@@ -61,6 +62,7 @@ class Inserter extends Component {
 						className="editor-inserter__toggle"
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
+						disabled={ disabled }
 					>
 						{ children }
 					</IconButton>

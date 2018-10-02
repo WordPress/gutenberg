@@ -122,6 +122,7 @@ zip -r gutenberg.zip \
 	lib/*.php \
 	block-library/*/*.php \
 	packages/block-library/src/*/*.php \
+	packages/block-serialization-default-parser/*.php \
 	post-content.php \
 	$vendor_scripts \
 	$build_files \

@@ -8,7 +8,10 @@
             "width": 769,
             "height": 511,
             "alt": "",
-            "caption": [],
+            "caption": {
+                "formats": [],
+                "text": ""
+            },
             "linkDestination": "none"
         },
         "innerBlocks": [],

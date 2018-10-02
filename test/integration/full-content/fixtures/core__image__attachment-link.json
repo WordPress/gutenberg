@@ -9,6 +9,10 @@
             "width": 769,
             "height": 511,
             "caption": [],
+            "caption": {
+                "formats": [],
+                "text": ""
+            },
             "href": "http://localhost:8888/?attachment_id=7",
             "linkDestination": "attachment"
         },

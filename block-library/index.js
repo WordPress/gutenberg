@@ -41,6 +41,7 @@ import * as shortcode from '../packages/block-library/src/shortcode';
 import * as spacer from '../packages/block-library/src/spacer';
 import * as subhead from '../packages/block-library/src/subhead';
 import * as table from '../packages/block-library/src/table';
+import * as template from '../packages/block-library/src/template';
 import * as textColumns from '../packages/block-library/src/text-columns';
 import * as verse from '../packages/block-library/src/verse';
 import * as video from '../packages/block-library/src/video';
@@ -89,6 +90,7 @@ export const registerCoreBlocks = () => {
 		spacer,
 		subhead,
 		table,
+		template,
 		textColumns,
 		verse,
 		video,

@@ -21,7 +21,9 @@ exports[`core/quote block edit matches snapshot 1`] = `
             contenteditable="true"
             data-is-placeholder-visible="true"
             role="textbox"
-          />
+          >
+            <p />
+          </div>
           <div
             class="editor-rich-text__tinymce"
           >

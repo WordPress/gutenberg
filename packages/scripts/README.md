@@ -67,6 +67,27 @@ This is how you execute those scripts using the presented setup:
 * `npm run test:help` - prints all available options to configure unit tests runner.
 * `npm run test:watch` - runs all unit tests in the watch mode.
 
+### `wp-scripts check-licenses`
+
+Validates that all dependencies of a project are compatible with the project's own license.
+
+_Example:_
+
+```json
+{
+	"scripts": {
+		"check-licenses": "wp-scripts check-licenses --prod --gpl2 --ignore=abab",
+	}
+}
+```
+
+_Flags_:
+
+- `--prod` (or `--production`): When present, validates only `dependencies` and not `devDependencies`
+- `--dev` (or `--development`): When present, validates both `dependencies` and `devDependencies`
+- `--gpl2`: Validates against [GPLv2 license compatibility](https://www.gnu.org/licenses/license-list.en.html)
+- `--ignore=a,b,c`: A comma-separated set of package names to ignore for validation. This is intended to be used primarily in cases where a dependency's `license` field is malformed. It's assumed that any `ignored` package argument would be manually vetted for compatibility by the project owner.
+
 ## Inspiration
 
 This is inspired by [react-scripts](https://www.npmjs.com/package/react-scripts) and [kcd-scripts](https://www.npmjs.com/package/kcd-scripts).

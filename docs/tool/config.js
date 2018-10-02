@@ -16,7 +16,7 @@ const gutenbergPackages = [
 ];
 
 module.exports = {
-	componentPaths: glob( 'packages/components/src/*/README.md' ),
+	componentPaths: glob( 'packages/components/src/*/**/README.md' ),
 	dataNamespaces: {
 		core: {
 			title: 'WordPress Core Data',

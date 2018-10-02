@@ -8,22 +8,14 @@ import { get, isString, kebabCase, reduce, upperFirst } from 'lodash';
  */
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import deprecated from '@wordpress/deprecated';
 import { compose, createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import { getColorClassName, getColorObjectByColorValue, getColorObjectByAttributeValues } from './utils';
+import { getColorClassName, getColorObjectByColorValue, getColorObjectByAttributeValues, getMostReadableColor } from './utils';
 
 const DEFAULT_COLORS = [];
-
-deprecated( 'value prop in color objects passed by withColors HOC', {
-	version: '3.9',
-	alternative: '`color` prop passed in the object',
-	plugin: 'Gutenberg',
-	hint: 'This is a global warning, shown regardless of whether value prop is used.',
-} );
 
 /**
  * Higher-order component, which handles color logic for class generation
@@ -62,8 +54,16 @@ export default ( ...args ) => {
 						super( props );
 
 						this.setters = this.createSetters();
+						this.colorUtils = {
+							getMostReadableColor: this.getMostReadableColor.bind( this ),
+						};
 
 						this.state = {};
+					}
+
+					getMostReadableColor( colorValue ) {
+						const { colors } = this.props;
+						return getMostReadableColor( colors, colorValue );
 					}
 
 					createSetters() {
@@ -95,19 +95,18 @@ export default ( ...args ) => {
 							);
 
 							const previousColorObject = previousState[ colorAttributeName ];
-							const previousColorValue = get( previousColorObject, [ 'value' ] );
+							const previousColor = get( previousColorObject, [ 'color' ] );
 							/**
 							* The "and previousColorObject" condition checks that a previous color object was already computed.
 							* At the start previousColorObject and colorValue are both equal to undefined
 							* bus as previousColorObject does not exist we should compute the object.
 							*/
-							if ( previousColorValue === colorObject.color && previousColorObject ) {
+							if ( previousColor === colorObject.color && previousColorObject ) {
 								newState[ colorAttributeName ] = previousColorObject;
 							} else {
 								newState[ colorAttributeName ] = {
 									...colorObject,
 									class: getColorClassName( colorContext, colorObject.slug ),
-									value: colorObject.color,
 								};
 							}
 							return newState;
@@ -122,6 +121,7 @@ export default ( ...args ) => {
 									colors: undefined,
 									...this.state,
 									...this.setters,
+									colorUtils: this.colorUtils,
 								} }
 							/>
 						);

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import 'element-closest';
-
-/**
  * Given a block client ID, returns the corresponding DOM node for the block,
  * if exists. As much as possible, this helper should be avoided, and used only
  * in cases where isolated behaviors need remote access to a block node.

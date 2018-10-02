@@ -9,7 +9,8 @@
 		"<rootDir>/.*/build/",
 		"<rootDir>/.*/build-module/",
 		"<rootDir>/packages/.*/benchmark/",
-		"<rootDir>/packages/.*/test/"
+		"<rootDir>/packages/.*/test/",
+		"<rootDir>/gutenberg-mobile/"
 	],
 	"moduleNameMapper": {
 		"@wordpress\\/(components|edit-post|block-library)$": "$1",
@@ -20,10 +21,14 @@
 	"setupFiles": [
 		"core-js/fn/symbol/async-iterator"
 	],
+	"testURL": "http://localhost",
 	"testPathIgnorePatterns": [
 		"/node_modules/",
 		"/test/e2e",
 		"<rootDir>/.*/build/",
 		"<rootDir>/.*/build-module/"
+	],
+	"modulePathIgnorePatterns": [
+		"<rootDir>/gutenberg-mobile/"
 	]
 }

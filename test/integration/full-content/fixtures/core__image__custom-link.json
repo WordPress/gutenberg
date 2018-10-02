@@ -7,7 +7,10 @@
             "url": "https://cldup.com/uuUqE_dXzy.jpg",
             "width": 579,
             "alt": "",
-            "caption": [],
+            "caption": {
+                "formats": [],
+                "text": ""
+            },
             "height": 385,
             "href": "https://wordpress.org/",
             "linkDestination": "custom"

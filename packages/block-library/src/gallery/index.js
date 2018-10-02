@@ -45,8 +45,7 @@ const blockAttributes = {
 				attribute: 'data-id',
 			},
 			caption: {
-				type: 'array',
-				source: 'children',
+				source: 'rich-text',
 				selector: 'figcaption',
 			},
 		},
@@ -136,7 +135,7 @@ export const settings = {
 					mediaUpload( {
 						filesList: files,
 						onFileChange: ( images ) => onChange( block.clientId, { images } ),
-						allowedType: 'image',
+						allowedTypes: [ 'image' ],
 					} );
 					return block;
 				},

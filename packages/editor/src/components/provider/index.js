@@ -15,7 +15,6 @@ import { withDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { traverse, wrap, urlRewrite, editorWidth } from '../../editor-styles';
-import RichTextProvider from '../rich-text/provider';
 
 class EditorProvider extends Component {
 	constructor( props ) {
@@ -59,26 +58,9 @@ class EditorProvider extends Component {
 	render() {
 		const {
 			children,
-			undo,
-			redo,
-			createUndoLevel,
 		} = this.props;
 
 		const providers = [
-			// RichText provider:
-			//
-			//  - context.onUndo
-			//  - context.onRedo
-			//  - context.onCreateUndoLevel
-			[
-				RichTextProvider,
-				{
-					onUndo: undo,
-					onRedo: redo,
-					onCreateUndoLevel: createUndoLevel,
-				},
-			],
-
 			// Slot / Fill provider:
 			//
 			//  - context.getSlot
@@ -108,15 +90,9 @@ export default withDispatch( ( dispatch ) => {
 	const {
 		setupEditor,
 		updateEditorSettings,
-		undo,
-		redo,
-		createUndoLevel,
 	} = dispatch( 'core/editor' );
 	return {
 		setupEditor,
-		undo,
-		redo,
-		createUndoLevel,
 		updateEditorSettings,
 	};
 } )( EditorProvider );

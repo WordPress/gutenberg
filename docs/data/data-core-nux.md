@@ -2,6 +2,16 @@
 
 ## Selectors
 
+### getAssociatedGuide
+
+Returns an object describing the guide, if any, that the given tip is a part
+of.
+
+*Parameters*
+
+ * state: Global application state.
+ * tipId: The tip to query.
+
 ### isTipVisible
 
 Determines whether or not the given tip is showing. Tips are hidden if they
@@ -12,6 +22,10 @@ guide that they have been added to.
 
  * state: Global application state.
  * tipId: The tip to query.
+
+*Returns*
+
+Whether or not the given tip is showing.
 
 ### areTipsEnabled
 

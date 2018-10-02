@@ -259,7 +259,8 @@ Whether the post can be saved.
 ### isEditedPostEmpty
 
 Returns true if the edited post has content. A post has content if it has at
-least one block or otherwise has a non-empty content property assigned.
+least one saveable block or otherwise has a non-empty content property
+assigned.
 
 *Parameters*
 
@@ -320,6 +321,25 @@ unsaved status values.
 
 Whether the post has been published.
 
+### getBlockDependantsCacheBust
+
+Returns a new reference when the inner blocks of a given block client ID
+change. This is used exclusively as a memoized selector dependant, relying
+on this selector's shared return value and recursively those of its inner
+blocks defined as dependencies. This abuses mechanics of the selector
+memoization to return from the original selector function only when
+dependants change.
+
+*Parameters*
+
+ * state: Editor state.
+ * clientId: Block client ID.
+
+*Returns*
+
+A value whose reference will change only when inner blocks of
+            the given block client ID change.
+
 ### getBlockName
 
 Returns a block's name given its client ID, or null if no block exists with
@@ -333,6 +353,80 @@ the client ID.
 *Returns*
 
 Block name.
+
+### getBlock
+
+Returns a block given its client ID. This is a parsed copy of the block,
+containing its `blockName`, `clientId`, and current `attributes` state. This
+is not the block's registration settings, which must be retrieved from the
+blocks module registration store.
+
+*Parameters*
+
+ * state: Editor state.
+ * clientId: Block client ID.
+
+*Returns*
+
+Parsed block object.
+
+### getBlocks
+
+Returns all block objects for the current post being edited as an array in
+the order they appear in the post.
+
+Note: It's important to memoize this selector to avoid return a new instance
+on each call
+
+*Parameters*
+
+ * state: Editor state.
+ * rootClientId: Optional root client ID of block list.
+
+*Returns*
+
+Post blocks.
+
+### getClientIdsWithDescendants
+
+Returns an array containing the clientIds of the top-level blocks
+and their descendants of any depth (for nested blocks).
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+ids of top-level and descendant blocks.
+
+### getGlobalBlockCount
+
+Returns the total number of blocks, or the total number of blocks with a specific name in a post.
+The number returned includes nested blocks.
+
+*Parameters*
+
+ * state: Global application state.
+ * blockName: Optional block name, if specified only blocks of that type will be counted.
+
+*Returns*
+
+Number of blocks in the post, or number of blocks with name equal to blockName.
+
+### getBlocksByClientId
+
+Given an array of block client IDs, returns the corresponding array of block
+objects.
+
+*Parameters*
+
+ * state: Editor state.
+ * clientIds: Client IDs for which blocks are to be returned.
+
+*Returns*
+
+Block objects.
 
 ### getBlockCount
 
@@ -503,6 +597,32 @@ This position is to used to position the caret properly when the selected block 
 
 Selected block.
 
+### getMultiSelectedBlockClientIds
+
+Returns the current multi-selection set of block client IDs, or an empty
+array if there is no multi-selection.
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+Multi-selected block client IDs.
+
+### getMultiSelectedBlocks
+
+Returns the current multi-selection set of blocks, or an empty array if
+there is no multi-selection.
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+Multi-selected block objects.
+
 ### getFirstMultiSelectedBlockClientId
 
 Returns the client ID of the first block in the multi-selection set, or null
@@ -557,6 +677,21 @@ false otherwise.
 *Returns*
 
 Whether block is in multi-selection set.
+
+### isAncestorMultiSelected
+
+Returns true if an ancestor of the block is multi-selected, or false
+otherwise.
+
+*Parameters*
+
+ * state: Editor state.
+ * clientId: Block client ID.
+
+*Returns*
+
+Whether an ancestor of the block is in multi-selection
+                  set.
 
 ### getMultiSelectedBlocksStartClientId
 
@@ -855,6 +990,32 @@ default post format. Returns null if the format cannot be determined.
 
 Suggested post format.
 
+### getBlocksForSerialization
+
+Returns a set of blocks which are to be used in consideration of the post's
+generated save content.
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+Filtered set of blocks for save.
+
+### getEditedPostContent
+
+Returns the content of the post being edited, preferring raw string edit
+before falling back to serialization of block state.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+Post content.
+
 ### getNotices
 
 Returns the user notices array.
@@ -866,6 +1027,67 @@ Returns the user notices array.
 *Returns*
 
 List of notices.
+
+### canInsertBlockType
+
+Determines if the given block type is allowed to be inserted, and, if
+parentClientId is provided, whether it is allowed to be nested within the
+given parent.
+
+*Parameters*
+
+ * state: Editor state.
+ * blockName: The name of the given block type, e.g.
+                                'core/paragraph'.
+ * parentClientId: The parent that the given block is to be
+                                nested within, or null.
+
+*Returns*
+
+Whether the given block type is allowed to be inserted.
+
+### getInserterItems
+
+Determines the items that appear in the inserter. Includes both static
+items (e.g. a regular block type) and dynamic items (e.g. a reusable block).
+
+Each item object contains what's necessary to display a button in the
+inserter and handle its selection.
+
+The 'utility' property indicates how useful we think an item will be to the
+user. There are 4 levels of utility:
+
+1. Blocks that are contextually useful (utility = 3)
+2. Blocks that have been previously inserted (utility = 2)
+3. Blocks that are in the common category (utility = 1)
+4. All other blocks (utility = 0)
+
+The 'frecency' property is a heuristic (https://en.wikipedia.org/wiki/Frecency)
+that combines block usage frequenty and recency.
+
+Items are returned ordered descendingly by their 'utility' and 'frecency'.
+
+*Parameters*
+
+ * state: Editor state.
+ * parentClientId: The block we are inserting into, if any.
+
+*Returns*
+
+Items that appear in inserter.
+
+### getReusableBlock
+
+Returns the reusable block with the given ID.
+
+*Parameters*
+
+ * state: Global application state.
+ * ref: The reusable block's ID.
+
+*Returns*
+
+The reusable block, or null if none exists.
 
 ### isSavingReusableBlock
 
@@ -1030,6 +1252,19 @@ Returns whether or not the user has the unfiltered_html capability.
 *Returns*
 
 Whether the user can or can't post unfiltered HTML.
+
+### isPublishSidebarEnabled
+
+Returns whether the pre-publish panel should be shown
+or skipped when the user clicks the "publish" button.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+Whether the pre-publish panel should be shown or not.
 
 ## Actions
 
@@ -1381,7 +1616,7 @@ Returns an action object used to convert a static block into a reusable block.
 
 *Parameters*
 
- * clientId: The client ID of the block to detach.
+ * clientIds: The client IDs of the block to detach.
 
 ### insertDefaultBlock
 
@@ -1412,3 +1647,11 @@ Returns an action object used in signalling that the editor settings have been u
 *Parameters*
 
  * settings: Updated settings
+
+### enablePublishSidebar
+
+Returns an action object used in signalling that the user has enabled the publish sidebar.
+
+### disablePublishSidebar
+
+Returns an action object used in signalling that the user has disabled the publish sidebar.

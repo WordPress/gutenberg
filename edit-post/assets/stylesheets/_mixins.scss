@@ -199,6 +199,12 @@
 	box-shadow: none;
 }
 
+@mixin menu-style__hover() {
+	color: $dark-gray-900;
+	border: none;
+	box-shadow: none;
+}
+
 @mixin menu-style__focus() {
 	color: $dark-gray-900;
 	border: none;
@@ -300,7 +306,23 @@
 @mixin caption-style() {
 	margin-top: 0.5em;
 	margin-bottom: 1em;
-	color: $dark-gray-300;
+	color: $dark-gray-500;
 	text-align: center;
 	font-size: $default-font-size;
+}
+
+@mixin dropdown-arrow() {
+	content: "";
+	pointer-events: none;
+	display: block;
+	width: 0;
+	height: 0;
+	border-left: 3px solid transparent;
+	border-right: 3px solid transparent;
+	border-top: 5px solid currentColor;
+	margin-left: $grid-size-small;
+
+	// This gives the icon space on the right side consistent with the material
+	// icon standards.
+	margin-right: 2px;
 }

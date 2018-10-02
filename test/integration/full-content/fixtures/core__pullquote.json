@@ -4,23 +4,61 @@
         "name": "core/pullquote",
         "isValid": true,
         "attributes": {
-            "value": [
-                {
-                    "children": {
-                        "type": "p",
-                        "props": {
-                            "children": [
-                                "Testing pullquote block..."
-                            ]
-                        }
-                    }
-                }
-            ],
-            "citation": [
-                "...with a caption"
-            ]
+            "value": {
+                "formats": [
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ],
+                "text": "Testing pullquote block..."
+            },
+            "citation": {
+                "formats": [
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ],
+                "text": "...with a caption"
+            }
         },
         "innerBlocks": [],
-        "originalContent": "<blockquote class=\"wp-block-pullquote\">\n<p>Testing pullquote block...</p><cite>...with a caption</cite>\n</blockquote>"
+        "originalContent": "<figure class=\"wp-block-pullquote\">\n    <blockquote>\n    <p>Testing pullquote block...</p><cite>...with a caption</cite>\n    </blockquote>\n</figure>"
     }
 ]

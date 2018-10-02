@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { applyMiddleware } from 'redux';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,9 +23,24 @@ export default function( registry ) {
 					store,
 					enhancer( createStore )( options.reducer )
 				);
+
+				registry.namespaces[ reducerKey ].supportControls = true;
 			}
 
 			return store;
+		},
+
+		async __experimentalFulfill( reducerKey, selectorName, ...args ) {
+			if ( ! registry.namespaces[ reducerKey ].supportControls ) {
+				await registry.__experimentalFulfill( reducerKey, selectorName, ...args );
+				return;
+			}
+
+			const resolver = get( registry.namespaces, [ reducerKey, 'resolvers', selectorName ] );
+			if ( ! resolver ) {
+				return;
+			}
+			await registry.namespaces[ reducerKey ].store.dispatch( resolver.fulfill( ...args ) );
 		},
 	};
 }

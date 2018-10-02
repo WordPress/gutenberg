@@ -1,6 +1,6 @@
 # Theme Support
 
-By default, blocks provide their styles to enable basic support for blocks in themes without any change. Themes can add/override these styles, or they can provide no styles at all, and rely fully on what the theme provides.
+By default, blocks provide their styles to enable basic support for blocks in themes without any change. Themes can add/override these styles, or they can provide no styles at all, and rely fully on what the blocks provide.
 
 Some advanced block features require opt-in support in the theme itself as it's difficult for the block to provide these styles, they may require some architecting of the theme itself, in order to work well.
 
@@ -44,6 +44,8 @@ Some blocks such as the image block have the possibility to define a "wide" or "
 ```php
 add_theme_support( 'align-wide' );
 ```
+
+For more information about this function, see [the developer docs on `add_theme_support()`](https://developer.wordpress.org/reference/functions/add_theme_support/). 
 
 ### Wide Alignments and Floats
 
@@ -208,6 +210,15 @@ function mytheme_block_editor_styles() {
 
 add_action( 'enqueue_block_editor_assets', 'mytheme_block_editor_styles' );
 ```
+
+If your editor style relies on a dark background, you can add the following to adjust the color of the UI to work on dark backgrounds:
+
+```php
+add_theme_support( 'editor-styles' );
+add_theme_support( 'dark-editor-style' );
+```
+
+Note you don't need to add `add_theme_support( 'editor-styles' );` twice, but that rule does need to be present for the `dark-editor-style` rule to work.
 
 ### Basic colors
 

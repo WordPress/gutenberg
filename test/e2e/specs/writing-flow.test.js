@@ -155,6 +155,7 @@ describe( 'adding blocks', () => {
 
 		// Ensure no data-mce-selected. Notably, this can occur when content
 		// is saved while typing within an inline boundary.
+		await clickBlockAppender();
 		await pressWithModifier( META_KEY, 'b' );
 		await page.keyboard.type( 'Inside' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();

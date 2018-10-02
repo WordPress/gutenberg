@@ -10,6 +10,8 @@ import MediaUpload from '../../../media-upload';
 
 export const name = 'core/image';
 
+const ALLOWED_MEDIA_TYPES = [ 'image' ];
+
 export const settings = {
 	id: 'image',
 
@@ -22,7 +24,7 @@ export const settings = {
 	edit( { onSave } ) {
 		return (
 			<MediaUpload
-				type="image"
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				onSelect={ ( media ) => onSave( media ) }
 				onClose={ () => onSave( null ) }
 				render={ ( { open } ) => {

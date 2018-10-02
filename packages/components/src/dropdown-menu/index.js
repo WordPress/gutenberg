@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { flatMap } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,7 +13,6 @@ import { DOWN } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import IconButton from '../icon-button';
-import Dashicon from '../dashicon';
 import Dropdown from '../dropdown';
 import { NavigableMenu } from '../navigable-container';
 
@@ -21,14 +21,21 @@ function DropdownMenu( {
 	label,
 	menuLabel,
 	controls,
+	className,
 } ) {
 	if ( ! controls || ! controls.length ) {
 		return null;
 	}
 
+	// Normalize controls to nested array of objects (sets of controls)
+	let controlSets = controls;
+	if ( ! Array.isArray( controlSets[ 0 ] ) ) {
+		controlSets = [ controlSets ];
+	}
+
 	return (
 		<Dropdown
-			className="components-dropdown-menu"
+			className={ classnames( 'components-dropdown-menu', className ) }
 			contentClassName="components-dropdown-menu__popover"
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				const openOnArrowDown = ( event ) => {
@@ -40,11 +47,7 @@ function DropdownMenu( {
 				};
 				return (
 					<IconButton
-						className={
-							classnames( 'components-dropdown-menu__toggle', {
-								'is-active': isOpen,
-							} )
-						}
+						className="components-dropdown-menu__toggle"
 						icon={ icon }
 						onClick={ onToggle }
 						onKeyDown={ openOnArrowDown }
@@ -53,7 +56,7 @@ function DropdownMenu( {
 						label={ label }
 						tooltip={ label }
 					>
-						<Dashicon icon="arrow-down" />
+						<span className="components-dropdown-menu__indicator" />
 					</IconButton>
 				);
 			} }
@@ -64,26 +67,31 @@ function DropdownMenu( {
 						role="menu"
 						aria-label={ menuLabel }
 					>
-						{ controls.map( ( control, index ) => (
-							<IconButton
-								key={ index }
-								onClick={ ( event ) => {
-									if ( control.isDisabled ) {
-										return;
-									}
-									event.stopPropagation();
-									onClose();
-									if ( control.onClick ) {
-										control.onClick();
-									}
-								} }
-								className="components-dropdown-menu__menu-item"
-								icon={ control.icon }
-								role="menuitem"
-								disabled={ control.isDisabled }
-							>
-								{ control.title }
-							</IconButton>
+						{ flatMap( controlSets, ( controlSet, indexOfSet ) => (
+							controlSet.map( ( control, indexOfControl ) => (
+								<IconButton
+									key={ [ indexOfSet, indexOfControl ].join() }
+									onClick={ ( event ) => {
+										event.stopPropagation();
+										onClose();
+										if ( control.onClick ) {
+											control.onClick();
+										}
+									} }
+									className={ classnames(
+										'components-dropdown-menu__menu-item',
+										{
+											'has-separator': indexOfSet > 0 && indexOfControl === 0,
+											'is-active': control.isActive,
+										},
+									) }
+									icon={ control.icon }
+									role="menuitem"
+									disabled={ control.isDisabled }
+								>
+									{ control.title }
+								</IconButton>
+							) )
 						) ) }
 					</NavigableMenu>
 				);
