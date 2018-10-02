@@ -94,12 +94,10 @@
 		pointer-events: none;
 
 		// Use opacity to work in various editor styles.
+		// We don't specify the color here, because blocks or editor styles might provide their own.
 		&,
 		p {
-			color: $dark-opacity-300;
-			.is-dark-theme & {
-				color: $light-opacity-300;
-			}
+			opacity: 0.62;
 		}
 	}
 

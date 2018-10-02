@@ -79,7 +79,7 @@
 			color: rgba(0, 0, 0, 0.2);
 		}
 
-		// Caption placeholder text.
+		// Increase opacity for placeholder text as the gray is lighter.
 		&[data-is-placeholder-visible="true"] + .editor-rich-text__tinymce {
 			opacity: 0.8;
 		}
