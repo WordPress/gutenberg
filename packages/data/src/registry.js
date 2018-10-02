@@ -11,7 +11,11 @@ import { applyMiddleware } from 'redux';
 /**
  * Internal dependencies
  */
-import { createNamespace } from './namespace-store.js';
+import {
+	createNamespace,
+	setActions,
+	setSelectors,
+} from './namespace-store.js';
 import dataStore from './store';
 import promise from './promise-middleware';
 import createResolversCacheMiddleware from './resolvers-cache-middleware';
@@ -89,9 +93,7 @@ export function createRegistry( storeConfigs = {} ) {
 	 *                              state as first argument.
 	 */
 	function registerSelectors( reducerKey, newSelectors ) {
-		const store = namespaces[ reducerKey ].store;
-		const createStateSelector = ( selector ) => ( ...args ) => selector( store.getState(), ...args );
-		namespaces[ reducerKey ].selectors = mapValues( newSelectors, createStateSelector );
+		setSelectors( namespaces[ reducerKey ], newSelectors );
 	}
 
 	/**
@@ -147,9 +149,7 @@ export function createRegistry( storeConfigs = {} ) {
 	 * @param {Object} newActions   Actions to register.
 	 */
 	function registerActions( reducerKey, newActions ) {
-		const store = namespaces[ reducerKey ].store;
-		const createBoundAction = ( action ) => ( ...args ) => store.dispatch( action( ...args ) );
-		namespaces[ reducerKey ].actions = mapValues( newActions, createBoundAction );
+		setActions( namespaces[ reducerKey ], newActions );
 	}
 
 	/**

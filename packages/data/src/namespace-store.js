@@ -4,6 +4,7 @@
 import { createStore as createReduxStore } from 'redux';
 import {
 	flowRight,
+	mapValues,
 } from 'lodash';
 
 /**
@@ -34,4 +35,30 @@ export function createNamespace( reducer, enhancers, globalListener ) {
 	} );
 
 	return namespace;
+}
+
+/**
+ * Sets selectors for given namespace.
+ *
+ * @param {Object} namespace  The namespace object to modify.
+ * @param {Object} selectors  Selectors to register. Keys will be used as the
+ *                            public facing API. Selectors will get passed the
+ *                            state as first argument.
+ */
+export function setSelectors( namespace, selectors ) {
+	const { store } = namespace;
+	const createStateSelector = ( selector ) => ( ...args ) => selector( store.getState(), ...args );
+	namespace.selectors = mapValues( selectors, createStateSelector );
+}
+
+/**
+ * Sets actions for given namespace.
+ *
+ * @param {Object} namespace  The namespace object to modify.
+ * @param {Object} actions    Actions to register.
+ */
+export function setActions( namespace, actions ) {
+	const { store } = namespace;
+	const createBoundAction = ( action ) => ( ...args ) => store.dispatch( action( ...args ) );
+	namespace.actions = mapValues( actions, createBoundAction );
 }
