@@ -155,7 +155,9 @@ module.exports = {
 				message: 'Prefer page.waitForSelector instead.',
 			},
 			{
-				selector: 'JSXAttribute[name.name="id"][value.type="Literal"]',
+				// The <DotTip> component uses the `id` prop for something that does not require an
+				// instanceId; maybe we should change its key.
+				selector: 'JSXOpeningElement[name.name!="DotTip"] JSXAttribute[name.name="id"][value.type="Literal"]',
 				message: 'Do not use string literals for IDs; use withInstanceId instead.',
 			},
 		],
