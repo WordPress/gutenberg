@@ -143,6 +143,7 @@ export const settings = {
 			};
 			const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
 			const setDimRatio = ( ratio ) => setAttributes( { dimRatio: ratio } );
+			const setTitle = ( newTitle ) => setAttributes( { title: newTitle } );
 
 			const style = {
 				...backgroundImageStyles( url ),
@@ -227,7 +228,7 @@ export const settings = {
 					<RichText
 						tagName="h2"
 						value={ title }
-						onChange={ ( value ) => setAttributes( { title: value } ) }
+						onChange={ setTitle }
 						inlineToolbar
 					/>
 				) : __( 'Cover Image' );
@@ -266,7 +267,7 @@ export const settings = {
 								className="wp-block-cover-image-text"
 								placeholder={ __( 'Write title…' ) }
 								value={ title }
-								onChange={ ( value ) => setAttributes( { title: value } ) }
+								onChange={ setTitle }
 								inlineToolbar
 							/>
 						) }
