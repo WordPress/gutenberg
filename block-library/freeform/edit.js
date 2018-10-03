@@ -132,6 +132,12 @@ export default class FreeformEdit extends Component {
 			},
 		} );
 
+		editor.addButton( 'wp_add_media', {
+			tooltip: __( 'Insert Media' ),
+			icon: 'dashicon dashicons-admin-media',
+			cmd: 'WP_Medialib',
+		} );
+
 		editor.on( 'init', () => {
 			const rootNode = this.editor.getBody();
 
