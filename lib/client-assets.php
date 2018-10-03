@@ -540,6 +540,7 @@ function gutenberg_register_scripts_and_styles() {
 							'unlink',
 							'wp_more',
 							'spellchecker',
+							'wp_add_media',
 						),
 						'editor'
 					),
