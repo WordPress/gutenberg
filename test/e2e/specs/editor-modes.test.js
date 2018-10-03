@@ -73,7 +73,9 @@ describe( 'Editing modes (visual/HTML)', () => {
 		expect( htmlBlockContent ).toEqual( '<p>Hello world!</p>' );
 
 		// Change the font size using the sidebar.
-		const changeSizeButton = await page.waitForXPath( '//button[text()="L"]' );
+		const fontSizePicker = await page.waitForSelector( '.components-font-size-picker__selector' );
+		await fontSizePicker.click();
+		const changeSizeButton = await page.waitForSelector( '.components-button.is-font-large' );
 		await changeSizeButton.click();
 
 		// Make sure the HTML content updated.
