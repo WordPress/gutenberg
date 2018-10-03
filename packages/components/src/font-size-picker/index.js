@@ -7,6 +7,7 @@ import { map } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -16,8 +17,16 @@ import BaseControl from '../base-control';
 import Button from '../button';
 import Dropdown from '../dropdown';
 import RangeControl from '../range-control';
+import { NavigableMenu } from '../navigable-container';
 
-export default function FontSizePicker( { fontSizes = [], fallbackFontSize, value, onChange, withSlider } ) {
+function FontSizePicker( {
+	fallbackFontSize,
+	fontSizes = [],
+	instanceId,
+	onChange,
+	value,
+	withSlider,
+} ) {
 	const onChangeValue = ( event ) => {
 		const newValue = event.target.value;
 		if ( newValue === '' ) {
@@ -28,10 +37,12 @@ export default function FontSizePicker( { fontSizes = [], fallbackFontSize, valu
 	};
 
 	const currentFont = fontSizes.find( ( font ) => font.size === value );
+	const labelId = `components-font-size-picker-label-${ instanceId }`;
 
 	return (
 		<BaseControl
 			label={ __( 'Font Size' ) }
+			id={ labelId }
 		>
 			<div className="components-font-size-picker__buttons">
 				<Dropdown
@@ -43,19 +54,23 @@ export default function FontSizePicker( { fontSizes = [], fallbackFontSize, valu
 							{ ( currentFont && currentFont.name ) || ( ! value && 'Normal' ) || 'Custom' }
 						</Button>
 					) }
-					renderContent={ () => map( fontSizes, ( { name, size, slug } ) => (
-						<Button
-							key={ slug }
-							aria-pressed={ value === size }
-							onClick={ () => onChange( slug === 'normal' ? undefined : size ) }
-							className={ 'is-font-' + slug }
-						>
-							{ ( value === size || ( ! value && slug === 'normal' ) ) &&	<Dashicon icon="saved" /> }
-							<span className="components-font-size-picker__dropdown-text-size" style={ { fontSize: size } }>
-								{ name }
-							</span>
-						</Button>
-					) )	}
+					renderContent={ () => (
+						<NavigableMenu aria-labelledby={ labelId }>
+							{ map( fontSizes, ( { name, size, slug } ) => (
+								<Button
+									key={ slug }
+									aria-pressed={ value === size }
+									onClick={ () => onChange( slug === 'normal' ? undefined : size ) }
+									className={ 'is-font-' + slug }
+								>
+									{ ( value === size || ( ! value && slug === 'normal' ) ) &&	<Dashicon icon="saved" /> }
+									<span className="components-font-size-picker__dropdown-text-size" style={ { fontSize: size } }>
+										{ name }
+									</span>
+								</Button>
+							) ) }
+						</NavigableMenu>
+					) }
 				/>
 				{ ! withSlider &&
 					<input
@@ -94,3 +109,5 @@ export default function FontSizePicker( { fontSizes = [], fallbackFontSize, valu
 		</BaseControl>
 	);
 }
+
+export default withInstanceId( FontSizePicker );
