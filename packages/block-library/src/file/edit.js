@@ -56,7 +56,6 @@ class FileEdit extends Component {
 			const file = getBlobByURL( href );
 
 			mediaUpload( {
-				allowedType: '*',
 				filesList: [ file ],
 				onFileChange: ( [ media ] ) => this.onSelectFile( media ),
 				onError: ( message ) => {
@@ -149,7 +148,6 @@ class FileEdit extends Component {
 					notices={ noticeUI }
 					onError={ noticeOperations.createErrorNotice }
 					accept="*"
-					type="*"
 				/>
 			);
 		}
@@ -174,7 +172,6 @@ class FileEdit extends Component {
 					<Toolbar>
 						<MediaUpload
 							onSelect={ this.onSelectFile }
-							type="*"
 							value={ id }
 							render={ ( { open } ) => (
 								<IconButton

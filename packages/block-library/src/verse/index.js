@@ -3,12 +3,13 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
-import { children, createBlock } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import {
 	RichText,
 	BlockControls,
 	AlignmentToolbar,
 } from '@wordpress/editor';
+import { concat } from '@wordpress/rich-text';
 
 export const name = 'core/verse';
 
@@ -25,8 +26,7 @@ export const settings = {
 
 	attributes: {
 		content: {
-			type: 'array',
-			source: 'children',
+			source: 'rich-text',
 			selector: 'pre',
 		},
 		textAlign: {
@@ -98,7 +98,7 @@ export const settings = {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: children.concat( attributes.content, attributesToMerge.content ),
+			content: concat( attributes.content, attributesToMerge.content ),
 		};
 	},
 };

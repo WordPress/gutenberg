@@ -2,8 +2,9 @@
  * WordPress
  */
 import { __ } from '@wordpress/i18n';
-import { children, createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
+import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
+import { create, concat } from '@wordpress/rich-text';
 
 export const name = 'core/preformatted';
 
@@ -18,8 +19,7 @@ export const settings = {
 
 	attributes: {
 		content: {
-			type: 'array',
-			source: 'children',
+			source: 'rich-text',
 			selector: 'pre',
 		},
 	},
@@ -29,8 +29,10 @@ export const settings = {
 			{
 				type: 'block',
 				blocks: [ 'core/code', 'core/paragraph' ],
-				transform: ( attributes ) =>
-					createBlock( 'core/preformatted', attributes ),
+				transform: ( { content } ) =>
+					createBlock( 'core/preformatted', {
+						content: create( { text: content } ),
+					} ),
 			},
 			{
 				type: 'raw',
@@ -85,7 +87,7 @@ export const settings = {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: children.concat( attributes.content, attributesToMerge.content ),
+			content: concat( attributes.content, attributesToMerge.content ),
 		};
 	},
 };

@@ -85,6 +85,12 @@
 	overflow-y: auto;
 	-webkit-overflow-scrolling: touch;
 
+	// This rule ensures that if you've scrolled to the end of a container,
+	// then pause, then keep scrolling downwards, the browser doesn't try to scroll
+	// the parent element, usually invoking a "bounce" effect and then preventing you
+	// from scrolling upwards until you pause again.
+	overscroll-behavior-y: none;
+
 	.edit-post-visual-editor {
 		flex-grow: 1;
 

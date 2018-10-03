@@ -9,21 +9,46 @@
                 {
                     "cells": [
                         {
-                            "content": [
-                                "Version"
-                            ],
+                            "content": {
+                                "formats": [
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                                ],
+                                "text": "Version"
+                            },
                             "tag": "th"
                         },
                         {
-                            "content": [
-                                "Musician"
-                            ],
+                            "content": {
+                                "formats": [
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                                ],
+                                "text": "Musician"
+                            },
                             "tag": "th"
                         },
                         {
-                            "content": [
-                                "Date"
-                            ],
+                            "content": {
+                                "formats": [
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                                ],
+                                "text": "Date"
+                            },
                             "tag": "th"
                         }
                     ]
@@ -33,29 +58,82 @@
                 {
                     "cells": [
                         {
-                            "content": [
-                                {
-                                    "type": "a",
-                                    "props": {
-                                        "href": "https://wordpress.org/news/2003/05/wordpress-now-available/",
-                                        "children": [
-                                            ".70"
-                                        ]
-                                    }
-                                }
-                            ],
+                            "content": {
+                                "formats": [
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://wordpress.org/news/2003/05/wordpress-now-available/"
+                                            }
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://wordpress.org/news/2003/05/wordpress-now-available/"
+                                            }
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://wordpress.org/news/2003/05/wordpress-now-available/"
+                                            }
+                                        }
+                                    ]
+                                ],
+                                "text": ".70"
+                            },
                             "tag": "td"
                         },
                         {
-                            "content": [
-                                "No musician chosen."
-                            ],
+                            "content": {
+                                "formats": [
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                                ],
+                                "text": "No musician chosen."
+                            },
                             "tag": "td"
                         },
                         {
-                            "content": [
-                                "May 27, 2003"
-                            ],
+                            "content": {
+                                "formats": [
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                                ],
+                                "text": "May 27, 2003"
+                            },
                             "tag": "td"
                         }
                     ]
@@ -63,29 +141,77 @@
                 {
                     "cells": [
                         {
-                            "content": [
-                                {
-                                    "type": "a",
-                                    "props": {
-                                        "href": "https://wordpress.org/news/2004/01/wordpress-10/",
-                                        "children": [
-                                            "1.0"
-                                        ]
-                                    }
-                                }
-                            ],
+                            "content": {
+                                "formats": [
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://wordpress.org/news/2004/01/wordpress-10/"
+                                            }
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://wordpress.org/news/2004/01/wordpress-10/"
+                                            }
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://wordpress.org/news/2004/01/wordpress-10/"
+                                            }
+                                        }
+                                    ]
+                                ],
+                                "text": "1.0"
+                            },
                             "tag": "td"
                         },
                         {
-                            "content": [
-                                "Miles Davis"
-                            ],
+                            "content": {
+                                "formats": [
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                                ],
+                                "text": "Miles Davis"
+                            },
                             "tag": "td"
                         },
                         {
-                            "content": [
-                                "January 3, 2004"
-                            ],
+                            "content": {
+                                "formats": [
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                                ],
+                                "text": "January 3, 2004"
+                            },
                             "tag": "td"
                         }
                     ]
@@ -93,30 +219,163 @@
                 {
                     "cells": [
                         {
-                            "content": [
-                                "Lots of versions skipped, see ",
-                                {
-                                    "type": "a",
-                                    "props": {
-                                        "href": "https://codex.wordpress.org/WordPress_Versions",
-                                        "children": [
-                                            "the full list"
-                                        ]
-                                    }
-                                }
-                            ],
+                            "content": {
+                                "formats": [
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://codex.wordpress.org/WordPress_Versions"
+                                            }
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://codex.wordpress.org/WordPress_Versions"
+                                            }
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://codex.wordpress.org/WordPress_Versions"
+                                            }
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://codex.wordpress.org/WordPress_Versions"
+                                            }
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://codex.wordpress.org/WordPress_Versions"
+                                            }
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://codex.wordpress.org/WordPress_Versions"
+                                            }
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://codex.wordpress.org/WordPress_Versions"
+                                            }
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://codex.wordpress.org/WordPress_Versions"
+                                            }
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://codex.wordpress.org/WordPress_Versions"
+                                            }
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://codex.wordpress.org/WordPress_Versions"
+                                            }
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://codex.wordpress.org/WordPress_Versions"
+                                            }
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://codex.wordpress.org/WordPress_Versions"
+                                            }
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://codex.wordpress.org/WordPress_Versions"
+                                            }
+                                        }
+                                    ]
+                                ],
+                                "text": "Lots of versions skipped, see the full list"
+                            },
                             "tag": "td"
                         },
                         {
-                            "content": [
-                                "…"
-                            ],
+                            "content": {
+                                "formats": [
+                                    null
+                                ],
+                                "text": "…"
+                            },
                             "tag": "td"
                         },
                         {
-                            "content": [
-                                "…"
-                            ],
+                            "content": {
+                                "formats": [
+                                    null
+                                ],
+                                "text": "…"
+                            },
                             "tag": "td"
                         }
                     ]
@@ -124,29 +383,81 @@
                 {
                     "cells": [
                         {
-                            "content": [
-                                {
-                                    "type": "a",
-                                    "props": {
-                                        "href": "https://wordpress.org/news/2015/12/clifford/",
-                                        "children": [
-                                            "4.4"
-                                        ]
-                                    }
-                                }
-                            ],
+                            "content": {
+                                "formats": [
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://wordpress.org/news/2015/12/clifford/"
+                                            }
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://wordpress.org/news/2015/12/clifford/"
+                                            }
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://wordpress.org/news/2015/12/clifford/"
+                                            }
+                                        }
+                                    ]
+                                ],
+                                "text": "4.4"
+                            },
                             "tag": "td"
                         },
                         {
-                            "content": [
-                                "Clifford Brown"
-                            ],
+                            "content": {
+                                "formats": [
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                                ],
+                                "text": "Clifford Brown"
+                            },
                             "tag": "td"
                         },
                         {
-                            "content": [
-                                "December 8, 2015"
-                            ],
+                            "content": {
+                                "formats": [
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                                ],
+                                "text": "December 8, 2015"
+                            },
                             "tag": "td"
                         }
                     ]
@@ -154,29 +465,80 @@
                 {
                     "cells": [
                         {
-                            "content": [
-                                {
-                                    "type": "a",
-                                    "props": {
-                                        "href": "https://wordpress.org/news/2016/04/coleman/",
-                                        "children": [
-                                            "4.5"
-                                        ]
-                                    }
-                                }
-                            ],
+                            "content": {
+                                "formats": [
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://wordpress.org/news/2016/04/coleman/"
+                                            }
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://wordpress.org/news/2016/04/coleman/"
+                                            }
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://wordpress.org/news/2016/04/coleman/"
+                                            }
+                                        }
+                                    ]
+                                ],
+                                "text": "4.5"
+                            },
                             "tag": "td"
                         },
                         {
-                            "content": [
-                                "Coleman Hawkins"
-                            ],
+                            "content": {
+                                "formats": [
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                                ],
+                                "text": "Coleman Hawkins"
+                            },
                             "tag": "td"
                         },
                         {
-                            "content": [
-                                "April 12, 2016"
-                            ],
+                            "content": {
+                                "formats": [
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                                ],
+                                "text": "April 12, 2016"
+                            },
                             "tag": "td"
                         }
                     ]
@@ -184,29 +546,78 @@
                 {
                     "cells": [
                         {
-                            "content": [
-                                {
-                                    "type": "a",
-                                    "props": {
-                                        "href": "https://wordpress.org/news/2016/08/pepper/",
-                                        "children": [
-                                            "4.6"
-                                        ]
-                                    }
-                                }
-                            ],
+                            "content": {
+                                "formats": [
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://wordpress.org/news/2016/08/pepper/"
+                                            }
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://wordpress.org/news/2016/08/pepper/"
+                                            }
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://wordpress.org/news/2016/08/pepper/"
+                                            }
+                                        }
+                                    ]
+                                ],
+                                "text": "4.6"
+                            },
                             "tag": "td"
                         },
                         {
-                            "content": [
-                                "Pepper Adams"
-                            ],
+                            "content": {
+                                "formats": [
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                                ],
+                                "text": "Pepper Adams"
+                            },
                             "tag": "td"
                         },
                         {
-                            "content": [
-                                "August 16, 2016"
-                            ],
+                            "content": {
+                                "formats": [
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                                ],
+                                "text": "August 16, 2016"
+                            },
                             "tag": "td"
                         }
                     ]
@@ -214,29 +625,80 @@
                 {
                     "cells": [
                         {
-                            "content": [
-                                {
-                                    "type": "a",
-                                    "props": {
-                                        "href": "https://wordpress.org/news/2016/12/vaughan/",
-                                        "children": [
-                                            "4.7"
-                                        ]
-                                    }
-                                }
-                            ],
+                            "content": {
+                                "formats": [
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://wordpress.org/news/2016/12/vaughan/"
+                                            }
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://wordpress.org/news/2016/12/vaughan/"
+                                            }
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            "type": "a",
+                                            "attributes": {
+                                                "href": "https://wordpress.org/news/2016/12/vaughan/"
+                                            }
+                                        }
+                                    ]
+                                ],
+                                "text": "4.7"
+                            },
                             "tag": "td"
                         },
                         {
-                            "content": [
-                                "Sarah Vaughan"
-                            ],
+                            "content": {
+                                "formats": [
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                                ],
+                                "text": "Sarah Vaughan"
+                            },
                             "tag": "td"
                         },
                         {
-                            "content": [
-                                "December 6, 2016"
-                            ],
+                            "content": {
+                                "formats": [
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                                ],
+                                "text": "December 6, 2016"
+                            },
                             "tag": "td"
                         }
                     ]

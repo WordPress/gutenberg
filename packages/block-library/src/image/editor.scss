@@ -1,6 +1,5 @@
 .wp-block-image {
 	position: relative;
-	margin: 0;
 
 	&.is-transient img {
 		@include loading_fade;

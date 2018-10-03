@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Dashicon, AccessibleSVG } from '@wordpress/components';
+import { Dashicon, SVG } from '@wordpress/components';
 import { createElement, Component } from '@wordpress/element';
 
 function renderIcon( icon ) {
@@ -25,7 +25,7 @@ function renderIcon( icon ) {
 			height: icon.props.height || 24,
 		};
 
-		return <AccessibleSVG { ...appliedProps } />;
+		return <SVG { ...appliedProps } />;
 	}
 
 	return icon || null;

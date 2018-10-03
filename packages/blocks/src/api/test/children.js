@@ -55,6 +55,7 @@ describe( 'concat', () => {
 			},
 		);
 
+		expect( console ).toHaveWarned();
 		expect( result ).toEqual( [
 			{
 				type: 'strong',
@@ -111,6 +112,7 @@ describe( 'toHTML', () => {
 
 		const html = toHTML( children );
 
+		expect( console ).toHaveWarned();
 		expect( html ).toBe( 'This is a <strong>test</strong>!' );
 	} );
 } );
@@ -122,6 +124,7 @@ describe( 'fromDOM', () => {
 
 		const blockNode = fromDOM( node.childNodes );
 
+		expect( console ).toHaveWarned();
 		expect( blockNode ).toEqual( [
 			'This ',
 			{

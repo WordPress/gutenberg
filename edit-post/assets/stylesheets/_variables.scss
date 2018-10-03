@@ -50,14 +50,12 @@ $inserter-tabs-height: 36px;
 $block-toolbar-height: $block-controls-height + $border-width;
 
 // Blocks
-$parent-block-padding: 28px; // padding of top level blocks, should be larger than $block-padding, otherwise a user can't select the parent from a child
 $block-padding: 14px; // padding of nested blocks
 $block-spacing: 4px; // vertical space between blocks
 
 $block-side-ui-width: 28px; // width of the side UI, matches half matches half of a single line of text, so two buttons stacke matches 1
 $block-side-ui-clearance: 2px; // space between side UI and block
 $block-side-ui-padding: $block-side-ui-width + $block-side-ui-clearance; // total space used to accommodate side UI
-$block-parent-side-ui-clearance: $parent-block-padding - $block-padding; // space between side UI and block on top level blocks
 
 $block-container-side-padding: $block-side-ui-width + $block-padding + 2 * $block-side-ui-clearance;
 
