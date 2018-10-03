@@ -193,7 +193,7 @@ export const settings = {
 							<PanelBody title={ __( 'Cover Image Settings' ) }>
 								<ToggleControl
 									label={ __( 'Fixed Background' ) }
-									checked={ !! hasParallax }
+									checked={ hasParallax }
 									onChange={ toggleParallax }
 								/>
 								<PanelColorSettings
@@ -287,11 +287,11 @@ export const settings = {
 		const classes = classnames(
 			className,
 			dimRatioToClass( dimRatio ),
+			overlayColorClass,
 			{
 				'has-background-dim': dimRatio !== 0,
 				'has-parallax': hasParallax,
 				[ `has-${ contentAlign }-content` ]: contentAlign !== 'center',
-				[ overlayColorClass ]: !! overlayColor,
 			},
 			align ? `align${ align }` : null,
 		);
@@ -345,5 +345,5 @@ function dimRatioToClass( ratio ) {
 function backgroundImageStyles( url ) {
 	return url ?
 		{ backgroundImage: `url(${ url })` } :
-		undefined;
+		{};
 }
