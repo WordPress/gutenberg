@@ -160,4 +160,51 @@ describe( 'adding blocks', () => {
 		await page.keyboard.type( 'Inside' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should insert line break at end', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'a' );
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.up( 'Shift' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert line break at end and continue writing', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'a' );
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.up( 'Shift' );
+		await page.keyboard.type( 'b' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert line break mid text', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'ab' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.up( 'Shift' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert line break at start', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.up( 'Shift' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert line break in empty container', async () => {
+		await clickBlockAppender();
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.up( 'Shift' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

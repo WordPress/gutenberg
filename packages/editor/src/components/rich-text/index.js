@@ -623,16 +623,29 @@ export class RichText extends Component {
 				}
 
 				event.preventDefault();
-
 				this.props.onSplit( ...split( record ).map( this.valueToFormat ) );
-			} else {
+			} else if ( event.shiftKey || ! this.props.onSplit ) {
 				event.preventDefault();
 
-				if ( event.shiftKey || ! this.props.onSplit ) {
-					this.editor.execCommand( 'InsertLineBreak', false, event );
-				} else {
-					this.splitContent();
+				const record = this.getRecord();
+				const text = getTextContent( record );
+				const length = text.length;
+				let toInsert = '\n';
+
+				// If the caret is at the end of the text, and there is no
+				// trailing line break or no text at all, we have to insert two
+				// line breaks in order to create a new line visually and place
+				// the caret there.
+				if ( record.end === length && (
+					text.charAt( length - 1 ) !== '\n' || length === 0
+				) ) {
+					toInsert = '\n\n';
 				}
+
+				this.onChange( insert( this.getRecord(), toInsert ) );
+			} else {
+				event.preventDefault();
+				this.splitContent();
 			}
 		}
 	}
