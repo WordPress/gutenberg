@@ -1499,7 +1499,7 @@
 
             if ( ! empty( $pre ) ) {
                 $blocks[] = array(
-                    'blockName' => 'core/freeform',
+                    'blockName' => null,
                     'attrs' => array(),
                     'innerBlocks' => array(),
                     'innerHTML' => $pre
@@ -1513,7 +1513,7 @@
 
                 if ( ! empty( $html ) ) {
                     $blocks[] = array(
-                        'blockName' => 'core/freeform',
+                        'blockName' => null,
                         'attrs' => array(),
                         'innerBlocks' => array(),
                         'innerHTML' => $html
@@ -1523,7 +1523,7 @@
 
             if ( ! empty( $post ) ) {
                 $blocks[] = array(
-                    'blockName' => 'core/freeform',
+                    'blockName' => null,
                     'attrs' => array(),
                     'innerBlocks' => array(),
                     'innerHTML' => $post
@@ -1538,7 +1538,7 @@
 
     function freeform( s ) {
         return s.length && {
-            blockName: 'core/freeform',
+            blockName: null,
             attrs: {},
             innerBlocks: [],
             innerHTML: s,

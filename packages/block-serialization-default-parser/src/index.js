@@ -14,7 +14,7 @@ function Block( blockName, attrs, innerBlocks, innerHTML ) {
 }
 
 function Freeform( innerHTML ) {
-	return Block( 'core/freeform', {}, [], innerHTML );
+	return Block( null, {}, [], innerHTML );
 }
 
 function Frame( block, tokenStart, tokenLength, prevOffset, leadingHtmlStart ) {

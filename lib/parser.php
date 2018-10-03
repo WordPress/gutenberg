@@ -1462,7 +1462,7 @@ class Gutenberg_PEG_Parser {
 
             if ( ! empty( $pre ) ) {
                 $blocks[] = array(
-                    'blockName' => 'core/freeform',
+                    'blockName' => null,
                     'attrs' => array(),
                     'innerBlocks' => array(),
                     'innerHTML' => $pre
@@ -1476,7 +1476,7 @@ class Gutenberg_PEG_Parser {
 
                 if ( ! empty( $html ) ) {
                     $blocks[] = array(
-                        'blockName' => 'core/freeform',
+                        'blockName' => null,
                         'attrs' => array(),
                         'innerBlocks' => array(),
                         'innerHTML' => $html
@@ -1486,7 +1486,7 @@ class Gutenberg_PEG_Parser {
 
             if ( ! empty( $post ) ) {
                 $blocks[] = array(
-                    'blockName' => 'core/freeform',
+                    'blockName' => null,
                     'attrs' => array(),
                     'innerBlocks' => array(),
                     'innerHTML' => $post

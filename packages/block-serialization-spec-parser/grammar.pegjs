@@ -72,7 +72,7 @@ if ( ! function_exists( 'peg_join_blocks' ) ) {
 
         if ( ! empty( $pre ) ) {
             $blocks[] = array(
-                'blockName' => 'core/freeform',
+                'blockName' => null,
                 'attrs' => array(),
                 'innerBlocks' => array(),
                 'innerHTML' => $pre
@@ -86,7 +86,7 @@ if ( ! function_exists( 'peg_join_blocks' ) ) {
 
             if ( ! empty( $html ) ) {
                 $blocks[] = array(
-                    'blockName' => 'core/freeform',
+                    'blockName' => null,
                     'attrs' => array(),
                     'innerBlocks' => array(),
                     'innerHTML' => $html
@@ -96,7 +96,7 @@ if ( ! function_exists( 'peg_join_blocks' ) ) {
 
         if ( ! empty( $post ) ) {
             $blocks[] = array(
-                'blockName' => 'core/freeform',
+                'blockName' => null,
                 'attrs' => array(),
                 'innerBlocks' => array(),
                 'innerHTML' => $post
@@ -111,7 +111,7 @@ if ( ! function_exists( 'peg_join_blocks' ) ) {
 
 function freeform( s ) {
     return s.length && {
-        blockName: 'core/freeform',
+        blockName: null,
         attrs: {},
         innerBlocks: [],
         innerHTML: s,
