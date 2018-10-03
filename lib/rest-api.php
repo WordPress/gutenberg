@@ -302,6 +302,8 @@ add_filter( 'registered_taxonomy', 'gutenberg_register_taxonomy_prepare_function
  * Ensure that the wp-json index contains the 'theme-supports' setting as
  * part of its site info elements.
  *
+ * @see https://core.trac.wordpress.org/ticket/45016
+ *
  * @param WP_REST_Response $response WP REST API response of the wp-json index.
  * @return WP_REST_Response Response that contains theme-supports.
  */
