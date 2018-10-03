@@ -6,7 +6,7 @@
 - [Frequently Asked Questions](../docs/reference/faq.md)
 
 ## Logo
-<img width="200px" src="https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/final-g-wapuu-black.svg?sanitize=true" alt="Gutenberg Logo" />
+<img width="200" src="https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/final-g-wapuu-black.svg?sanitize=true" alt="Gutenberg Logo" />
 
 Released under GPL license, made by [Cristel Rossignol](https://twitter.com/cristelrossi).
 
