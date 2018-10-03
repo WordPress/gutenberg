@@ -29,6 +29,8 @@ class PostLockedModal extends Component {
 	}
 
 	componentDidMount() {
+		// Details on these events on the Heartbeat API docs
+		// https://developer.wordpress.org/plugins/javascript/heartbeat-api/
 		jQuery( document )
 			.on( 'heartbeat-send.refresh-lock', this.sendPostLock )
 			.on( 'heartbeat-tick.refresh-lock', this.receivePostLock )
@@ -158,7 +160,11 @@ class PostLockedModal extends Component {
 				{ !! isTakeover && (
 					<div>
 						<div>
-							<strong>{ userDisplayName }</strong> { sprintf( __( 'now has editing control of this %s. Don\'t worry, your changes up to this moment have been saved' ), postType ) }
+							{ sprintf(
+								__( '%s now has editing control of this %s. Don\'t worry, your changes up to this moment have been saved' ),
+								userDisplayName,
+								postType
+							) }
 						</div>
 						<p>
 							<a href={ allPosts }>
@@ -170,7 +176,11 @@ class PostLockedModal extends Component {
 				{ ! isTakeover && (
 					<div>
 						<div>
-							<strong>{ userDisplayName }</strong> { sprintf( __( 'is currently working on this %s, which means you cannot make changes, unless you take over.' ), postType ) }
+							{ sprintf(
+								__( '%s is currently working on this %s, which means you cannot make changes, unless you take over.' ),
+								userDisplayName,
+								postType
+							) }
 						</div>
 
 						<div className="editor-post-locked-modal__buttons">

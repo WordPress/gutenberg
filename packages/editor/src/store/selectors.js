@@ -1933,11 +1933,11 @@ export function isPostLocked( state ) {
 }
 
 /**
- * Returns whether the post is locked.
+ * Returns whether the edition of the post has been taken over.
  *
  * @param {Object} state Global application state.
  *
- * @return {boolean} Is locked.
+ * @return {boolean} Is post lock takeover.
  */
 export function isPostLockTakeover( state ) {
 	return state.postLock.isTakeover;
