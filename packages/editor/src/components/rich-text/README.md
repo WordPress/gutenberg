@@ -65,7 +65,7 @@ Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs
 
 ## RichText.Content
 
-The usage of `RichText.Content` is recommended in the `save` function of your blocks to save rich text content.
+`RichText.Content` should be used in the `save` function of your block to correctly save rich text content.
 
 ## Example
 
