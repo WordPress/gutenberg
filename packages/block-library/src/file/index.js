@@ -10,6 +10,8 @@ import { __ } from '@wordpress/i18n';
 import { createBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
+import { RichText } from '@wordpress/editor';
+import { getTextContent, isEmpty } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -37,8 +39,7 @@ export const settings = {
 			type: 'string',
 		},
 		fileName: {
-			type: 'string',
-			source: 'text',
+			source: 'rich-text',
 			selector: 'a:not([download])',
 		},
 		// Differs to the href when the block is configured to link to the attachment page
@@ -60,8 +61,7 @@ export const settings = {
 			default: true,
 		},
 		downloadButtonText: {
-			type: 'string',
-			source: 'text',
+			source: 'rich-text',
 			selector: 'a[download]',
 			default: __( 'Download' ),
 		},
@@ -203,13 +203,15 @@ export const settings = {
 
 		return ( href &&
 			<div>
-				{ fileName &&
+				{ ! isEmpty( fileName ) &&
 					<a
 						href={ textLinkHref }
 						target={ textLinkTarget }
 						rel={ textLinkTarget ? 'noreferrer noopener' : false }
 					>
-						{ fileName }
+						<RichText.Content
+							value={ fileName }
+						/>
 					</a>
 				}
 				{ showDownloadButton &&
@@ -219,9 +221,11 @@ export const settings = {
 						// ensure download attribute is still set when fileName
 						// is undefined. Using '' here as `true` still leaves
 						// the attribute unset.
-						download={ fileName || '' }
+						download={ getTextContent( fileName ) }
 					>
-						{ downloadButtonText }
+						<RichText.Content
+							value={ downloadButtonText }
+						/>
 					</a>
 				}
 			</div>
