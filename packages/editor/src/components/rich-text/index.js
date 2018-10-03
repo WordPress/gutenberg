@@ -40,6 +40,7 @@ import {
 	isEmptyLine,
 	unstableToDom,
 } from '@wordpress/rich-text';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -329,7 +330,7 @@ export class RichText extends Component {
 				this.onChange( applyFormat( this.getRecord(), {
 					type: 'a',
 					attributes: {
-						href: this.editor.dom.decode( pastedText ),
+						href: decodeEntities( pastedText ),
 					},
 				} ) );
 
