@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { keyBy, omit } from 'lodash';
+import { filter, keyBy, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -80,8 +80,19 @@ export const fallbackBlockName = createBlockNameSetterReducer( 'SET_FALLBACK_BLO
  * @return {Object} Updated state.
  */
 export function categories( state = DEFAULT_CATEGORIES, action ) {
-	if ( action.type === 'SET_CATEGORIES' ) {
-		return action.categories || [];
+	switch ( action.type ) {
+		case 'SET_CATEGORIES':
+			return action.categories || [];
+		case 'ADD_CATEGORY':
+			return [
+				...filter( state, ( category ) => category.slug !== action.slug ),
+				{
+					title: action.title,
+					slug: action.slug,
+				},
+			];
+		case 'REMOVE_CATEGORY':
+			return filter( state, ( category ) => category.slug !== action.slug );
 	}
 
 	return state;

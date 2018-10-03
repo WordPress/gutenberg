@@ -113,4 +113,72 @@ describe( 'categories', () => {
 			{ slug: 'wings', title: 'Wings' },
 		] );
 	} );
+
+	it( 'should add a new category', () => {
+		const original = deepFreeze( [
+			{ slug: 'chicken', title: 'Chicken' },
+		] );
+
+		const state = categories( original, {
+			type: 'ADD_CATEGORY',
+			title: 'Wings',
+			slug: 'wings',
+		} );
+
+		expect( state ).toEqual( [
+			{ slug: 'chicken', title: 'Chicken' },
+			{ slug: 'wings', title: 'Wings' },
+		] );
+	} );
+
+	it( 'should append and remove previous match when adding a category', () => {
+		const original = deepFreeze( [
+			{ slug: 'chicken', title: 'Chicken' },
+			{ slug: 'wings', title: 'Original wings' },
+			{ slug: 'strips', title: 'Strips' },
+		] );
+
+		const state = categories( original, {
+			type: 'ADD_CATEGORY',
+			title: 'Wings',
+			slug: 'wings',
+		} );
+
+		expect( state ).toEqual( [
+			{ slug: 'chicken', title: 'Chicken' },
+			{ slug: 'strips', title: 'Strips' },
+			{ slug: 'wings', title: 'Wings' },
+		] );
+	} );
+
+	it( 'should remove a category', () => {
+		const original = deepFreeze( [
+			{ slug: 'chicken', title: 'Chicken' },
+			{ slug: 'wings', title: 'Wings' },
+		] );
+
+		const state = categories( original, {
+			type: 'REMOVE_CATEGORY',
+			slug: 'wings',
+		} );
+
+		expect( state ).toEqual( [
+			{ slug: 'chicken', title: 'Chicken' },
+		] );
+	} );
+
+	it( 'should return original state when removing a non-existing category', () => {
+		const original = deepFreeze( [
+			{ slug: 'chicken', title: 'Chicken' },
+		] );
+
+		const state = categories( original, {
+			type: 'REMOVE_CATEGORY',
+			slug: 'wings',
+		} );
+
+		expect( state ).toEqual( [
+			{ slug: 'chicken', title: 'Chicken' },
+		] );
+	} );
 } );
