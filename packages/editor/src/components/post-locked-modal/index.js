@@ -11,7 +11,7 @@ import { Modal, Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 import { Component } from '@wordpress/element';
-import { compose } from '@wordpress/compose';
+import { compose, withGlobalEvents } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -33,15 +33,13 @@ class PostLockedModal extends Component {
 		// https://developer.wordpress.org/plugins/javascript/heartbeat-api/
 		jQuery( document )
 			.on( 'heartbeat-send.refresh-lock', this.sendPostLock )
-			.on( 'heartbeat-tick.refresh-lock', this.receivePostLock )
-			.on( 'beforeunload.edit-post', this.releasePostLock );
+			.on( 'heartbeat-tick.refresh-lock', this.receivePostLock );
 	}
 
 	componentWillUnmount() {
 		jQuery( document )
 			.off( 'heartbeat-send.refresh-lock', this.sendPostLock )
-			.off( 'heartbeat-tick.refresh-lock', this.receivePostLock )
-			.off( 'beforeunload.edit-post', this.releasePostLock );
+			.off( 'heartbeat-tick.refresh-lock', this.receivePostLock );
 	}
 
 	/**
@@ -72,25 +70,27 @@ class PostLockedModal extends Component {
 	 * @param {Object} data  Data received in the heartbeat request
 	 */
 	receivePostLock( event, data ) {
-		if ( data[ 'wp-refresh-post-lock' ] ) {
-			const { autosave, updatePostLock } = this.props;
-			const received = data[ 'wp-refresh-post-lock' ];
-			if ( received.lock_error ) {
-				// Auto save and display the takeover modal.
-				autosave();
-				updatePostLock( {
-					isLocked: true,
-					isTakeover: true,
-					user: {
-						avatar: received.lock_error.avatar_src,
-					},
-				} );
-			} else if ( received.new_lock ) {
-				updatePostLock( {
-					isLocked: false,
-					activePostLock: received.new_lock,
-				} );
-			}
+		if ( ! data[ 'wp-refresh-post-lock' ] ) {
+			return;
+		}
+
+		const { autosave, updatePostLock } = this.props;
+		const received = data[ 'wp-refresh-post-lock' ];
+		if ( received.lock_error ) {
+			// Auto save and display the takeover modal.
+			autosave();
+			updatePostLock( {
+				isLocked: true,
+				isTakeover: true,
+				user: {
+					avatar: received.lock_error.avatar_src,
+				},
+			} );
+		} else if ( received.new_lock ) {
+			updatePostLock( {
+				isLocked: false,
+				activePostLock: received.new_lock,
+			} );
 		}
 	}
 
@@ -99,12 +99,7 @@ class PostLockedModal extends Component {
 	 *
 	 * @param {Object} event Event.
 	 */
-	releasePostLock( event ) {
-		// Make sure we process only the main document unload.
-		if ( event.target && event.target.nodeName !== '#document' ) {
-			return;
-		}
-
+	releasePostLock() {
 		const { isLocked, activePostLock, postLockUtils, postId } = this.props;
 		if ( isLocked || ! activePostLock ) {
 			return;
@@ -226,5 +221,10 @@ export default compose(
 			autosave,
 			updatePostLock,
 		};
+	} ),
+
+	withGlobalEvents( {
+		beforeunload: 'releasePostLock',
 	} )
+
 )( PostLockedModal );
