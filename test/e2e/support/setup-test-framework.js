@@ -79,42 +79,6 @@ async function trashExistingPosts() {
 }
 
 /**
- * Navigates to the user listing screen and bulk-trashes all users except the admin user.
- *
- * @return {Promise} Promise resolving once posts have been trashed.
- */
-async function trashExistingUsers() {
-	// Visit `/wp-admin/users.php` so we can see a list of users and delete them.
-	await visitAdmin( 'users.php' );
-
-	// If there's only a single user, there's no user to delete.
-	const users = await page.$$( '#the-list tr' );
-	if ( users.length <= 1 ) {
-		return;
-	}
-
-	const bulkSelector = await page.$( '#cb-select-all-1' );
-	// Select all users.
-	await bulkSelector.click();
-	// Uncheck the admin user
-	await page.click( '#user_1.administrator' );
-	// Select the "bulk actions" > "trash" option.
-	await page.select( '#bulk-action-selector-top', 'delete' );
-	// Submit the form to send all draft/scheduled/published posts to the trash.
-	await page.click( '#doaction' );
-	// Confirm content deletion if needed
-	const deleteAllContent = await page.$( '#delete_option0' );
-	if ( deleteAllContent ) {
-		await deleteAllContent.click();
-	}
-	// Confirm deletion
-	await page.click( '#submit' );
-	return page.waitForXPath(
-		'//*[contains(@class, "updated notice")]'
-	);
-}
-
-/**
  * Adds an event listener to the page to handle additions of page event
  * handlers, to assure that they are removed at test teardown.
  */
@@ -172,7 +136,6 @@ beforeAll( async () => {
 	enablePageDialogAccept();
 	observeConsoleLogging();
 
-	await trashExistingUsers();
 	await trashExistingPosts();
 	await setupBrowser();
 } );
