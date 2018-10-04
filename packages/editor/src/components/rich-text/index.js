@@ -618,6 +618,7 @@ export class RichText extends Component {
 				if ( this.props.onSplit && isEmptyLine( record ) ) {
 					this.props.onSplit( ...split( record ).map( this.valueToFormat ) );
 				} else {
+					// Character is used to separate lines in multiline values.
 					this.onChange( insert( record, '\u2028' ) );
 				}
 			} else if ( event.shiftKey || ! this.props.onSplit ) {
