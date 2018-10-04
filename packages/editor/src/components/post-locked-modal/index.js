@@ -123,8 +123,7 @@ class PostLockedModal extends Component {
 			return null;
 		}
 
-		/* translators: Fallback user name for the post lock message. */
-		const userDisplayName = user.name || __( 'Another user' );
+		const userDisplayName = user.name;
 		const userAvatar = user.avatar;
 
 		const unlockUrl = addQueryArgs( 'post.php', {
@@ -154,11 +153,15 @@ class PostLockedModal extends Component {
 				{ !! isTakeover && (
 					<div>
 						<div>
-							{ sprintf(
+							{ userDisplayName ?
+								sprintf(
+									/* translators: 'post' is generic and may be of any type (post, page, etc.). */
+									__( '%s now has editing control of this post. Don\'t worry, your changes up to this moment have been saved' ),
+									userDisplayName
+								) :
 								/* translators: 'post' is generic and may be of any type (post, page, etc.). */
-								__( '%s now has editing control of this post. Don\'t worry, your changes up to this moment have been saved' ),
-								userDisplayName
-							) }
+								__( 'Another user now has editing control of this post. Don\'t worry, your changes up to this moment have been saved' )
+							}
 						</div>
 						<p>
 							<a href={ allPosts }>
@@ -170,11 +173,15 @@ class PostLockedModal extends Component {
 				{ ! isTakeover && (
 					<div>
 						<div>
-							{ sprintf(
+							{ userDisplayName ?
+								sprintf(
+									/* translators: 'post' is generic and may be of any type (post, page, etc.). */
+									__( '%s is currently working on this post, which means you cannot make changes, unless you take over.' ),
+									userDisplayName
+								) :
 								/* translators: 'post' is generic and may be of any type (post, page, etc.). */
-								__( '%s is currently working on this post, which means you cannot make changes, unless you take over.' ),
-								userDisplayName
-							) }
+								__( 'Another user is currently working on this post, which means you cannot make changes, unless you take over.' )
+							}
 						</div>
 
 						<div className="editor-post-locked-modal__buttons">
