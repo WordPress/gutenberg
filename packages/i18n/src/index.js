@@ -29,7 +29,7 @@ export function setLocaleData( localeData = { '': {} }, domain = 'default' ) {
 		i18n = new Jed( {
 			domain: 'default',
 			locale_data: {
-				default: {},
+				default: { '': {} },
 			},
 		} );
 	}
