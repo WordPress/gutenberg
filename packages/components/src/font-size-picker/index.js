@@ -22,7 +22,6 @@ import { NavigableMenu } from '../navigable-container';
 function FontSizePicker( {
 	fallbackFontSize,
 	fontSizes = [],
-	instanceId,
 	onChange,
 	value,
 	withSlider,
@@ -37,31 +36,33 @@ function FontSizePicker( {
 	};
 
 	const currentFont = fontSizes.find( ( font ) => font.size === value );
-	const labelId = `components-font-size-picker-label-${ instanceId }`;
 
 	return (
-		<BaseControl
-			label={ __( 'Font Size' ) }
-			id={ labelId }
-		>
+		<BaseControl label={ __( 'Font Size' ) }>
 			<div className="components-font-size-picker__buttons">
 				<Dropdown
 					className="components-font-size-picker__dropdown"
 					contentClassName="components-font-size-picker__dropdown-content"
 					position="bottom"
 					renderToggle={ ( { isOpen, onToggle } ) => (
-						<Button className="components-font-size-picker__selector" isLarge onClick={ onToggle } aria-expanded={ isOpen }>
+						<Button
+							className="components-font-size-picker__selector"
+							isLarge
+							onClick={ onToggle }
+							aria-expanded={ isOpen }
+							aria-label={ __( 'Custom font size' ) }
+						>
 							{ ( currentFont && currentFont.name ) || ( ! value && 'Normal' ) || 'Custom' }
 						</Button>
 					) }
 					renderContent={ () => (
-						<NavigableMenu aria-labelledby={ labelId }>
+						<NavigableMenu>
 							{ map( fontSizes, ( { name, size, slug } ) => (
 								<Button
 									key={ slug }
-									aria-pressed={ value === size }
 									onClick={ () => onChange( slug === 'normal' ? undefined : size ) }
 									className={ 'is-font-' + slug }
+									role="menuitem"
 								>
 									{ ( value === size || ( ! value && slug === 'normal' ) ) &&	<Dashicon icon="saved" /> }
 									<span className="components-font-size-picker__dropdown-text-size" style={ { fontSize: size } }>
@@ -77,7 +78,7 @@ function FontSizePicker( {
 						className="components-range-control__number"
 						type="number"
 						onChange={ onChangeValue }
-						aria-label={ __( 'Custom Size' ) }
+						aria-label={ __( 'Custom font size' ) }
 						value={ value || '' }
 					/>
 				}
@@ -89,6 +90,7 @@ function FontSizePicker( {
 					isButton
 					isSmall
 					isDefault
+					aria-label={ __( 'Reset font size' ) }
 				>
 					{ __( 'Reset' ) }
 				</Button>
