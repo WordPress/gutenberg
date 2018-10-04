@@ -244,6 +244,8 @@ function gutenberg_add_block_format_to_post_content( $response, $post, $request 
 /**
  * Include target schema attributes to links, based on whether the user can.
  *
+ * @see https://core.trac.wordpress.org/ticket/45014
+ *
  * @param WP_REST_Response $response WP REST API response of a post.
  * @param WP_Post          $post The post being returned.
  * @param WP_REST_Request  $request WP REST API request.
