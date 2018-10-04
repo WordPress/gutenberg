@@ -1955,6 +1955,50 @@ export function getTokenSettings( state, name ) {
 }
 
 /**
+ * Returns whether the post is locked.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Is locked.
+ */
+export function isPostLocked( state ) {
+	return state.postLock.isLocked;
+}
+
+/**
+ * Returns whether the edition of the post has been taken over.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Is post lock takeover.
+ */
+export function isPostLockTakeover( state ) {
+	return state.postLock.isTakeover;
+}
+
+/**
+ * Returns details about the post lock user.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} A user object.
+ */
+export function getPostLockUser( state ) {
+	return state.postLock.user;
+}
+
+/**
+ * Returns the active post lock.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} The lock object.
+ */
+export function getActivePostLock( state ) {
+	return state.postLock.activePostLock;
+}
+
+/**
  * Returns whether or not the user has the unfiltered_html capability.
  *
  * @param {Object} state Editor state.

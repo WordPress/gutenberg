@@ -593,6 +593,7 @@ function gutenberg_register_scripts_and_styles() {
 		'wp-editor',
 		gutenberg_url( 'build/editor/index.js' ),
 		array(
+			'jquery',
 			'lodash',
 			'tinymce-latest-lists',
 			'wp-a11y',
@@ -1460,6 +1461,52 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		}
 	}
 
+	// Lock settings.
+	$user_id = wp_check_post_lock( $post->ID );
+	if ( $user_id ) {
+		/**
+		 * Filters whether to show the post locked dialog.
+		 *
+		 * Returning a falsey value to the filter will short-circuit displaying the dialog.
+		 *
+		 * @since 3.6.0
+		 *
+		 * @param bool         $display Whether to display the dialog. Default true.
+		 * @param WP_Post      $post    Post object.
+		 * @param WP_User|bool $user    The user id currently editing the post.
+		 */
+		if ( apply_filters( 'show_post_locked_dialog', true, $post, $user_id ) ) {
+			$locked = true;
+		}
+
+		$user_details = null;
+		if ( $locked ) {
+			$user         = get_userdata( $user_id );
+			$user_details = array(
+				'name' => $user->display_name,
+			);
+			$avatar       = get_avatar( $user_id, 64 );
+			if ( $avatar ) {
+				if ( preg_match( "|src='([^']+)'|", $avatar, $matches ) ) {
+					$user_details['avatar'] = $matches[1];
+				}
+			}
+		}
+
+		$lock_details = array(
+			'isLocked' => $locked,
+			'user'     => $user_details,
+		);
+	} else {
+
+		// Lock the post.
+		$active_post_lock = wp_set_post_lock( $post->ID );
+		$lock_details     = array(
+			'isLocked'       => false,
+			'activePostLock' => esc_attr( implode( ':', $active_post_lock ) ),
+		);
+	}
+
 	$editor_settings = array(
 		'alignWide'           => $align_wide || ! empty( $gutenberg_theme_support[0]['wide-images'] ), // Backcompat. Use `align-wide` outside of `gutenberg` array.
 		'availableTemplates'  => $available_templates,
@@ -1472,7 +1519,14 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'autosaveInterval'    => 10,
 		'maxUploadFileSize'   => $max_upload_size,
 		'allowedMimeTypes'    => get_allowed_mime_types(),
-		'styles'              => $styles,
+		'postLock'            => $lock_details,
+
+		// Ideally, we'd remove this and rely on a REST API endpoint.
+		'postLockUtils'       => array(
+			'nonce'       => wp_create_nonce( 'lock-post_' . $post->ID ),
+			'unlockNonce' => wp_create_nonce( 'update-post_' . $post->ID ),
+			'ajaxUrl'     => admin_url( 'admin-ajax.php' ),
+		),
 	);
 
 	$post_autosave = get_autosave_newer_than_post_save( $post );

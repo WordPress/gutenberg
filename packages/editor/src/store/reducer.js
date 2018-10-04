@@ -885,6 +885,34 @@ export function notices( state = [], action ) {
 	return state;
 }
 
+/**
+ * Post Lock State.
+ *
+ * @typedef {Object} PostLockState
+ *
+ * @property {boolean} isLocked       Whether the post is locked.
+ * @property {?boolean} isTakeover     Whether the post editing has been taken over.
+ * @property {?boolean} activePostLock Active post lock value.
+ * @property {?Object}  user           User that took over the post.
+ */
+
+/**
+ * Reducer returning the post lock status.
+ *
+ * @param {PostLockState} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {PostLockState} Updated state.
+ */
+export function postLock( state = { isLocked: false }, action ) {
+	switch ( action.type ) {
+		case 'UPDATE_POST_LOCK':
+			return action.lock;
+	}
+
+	return state;
+}
+
 export const reusableBlocks = combineReducers( {
 	data( state = {}, action ) {
 		switch ( action.type ) {
@@ -1098,6 +1126,7 @@ export default optimist( combineReducers( {
 	isInsertionPointVisible,
 	preferences,
 	saving,
+	postLock,
 	notices,
 	reusableBlocks,
 	template,
