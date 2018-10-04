@@ -491,6 +491,7 @@ export class BlockListBlock extends Component {
 				) }
 				<BlockDropZone
 					index={ order }
+					clientId={ clientId }
 					rootClientId={ rootClientId }
 					layout={ layout }
 				/>
@@ -498,7 +499,6 @@ export class BlockListBlock extends Component {
 					<BlockMover
 						clientIds={ clientId }
 						blockElementId={ blockElementId }
-						layout={ layout }
 						isFirst={ isFirst }
 						isLast={ isLast }
 						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }

@@ -56,6 +56,7 @@ const {
 	getBlocks,
 	getBlockCount,
 	getClientIdsWithDescendants,
+	getClientIdsOfDescendants,
 	hasSelectedBlock,
 	getSelectedBlock,
 	getSelectedBlockClientId,
@@ -1725,6 +1726,63 @@ describe( 'selectors', () => {
 			expect( getBlocks( state ) ).toEqual( [
 				{ clientId: 123, name: 'core/paragraph', attributes: {}, innerBlocks: [] },
 				{ clientId: 23, name: 'core/heading', attributes: {}, innerBlocks: [] },
+			] );
+		} );
+	} );
+
+	describe( 'getClientIdsOfDescendants', () => {
+		it( 'should return the ids of any descendants, given an array of clientIds', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByClientId: {
+							'uuid-2': { clientId: 'uuid-2', name: 'core/image', attributes: {} },
+							'uuid-4': { clientId: 'uuid-4', name: 'core/paragraph', attributes: {} },
+							'uuid-6': { clientId: 'uuid-6', name: 'core/paragraph', attributes: {} },
+							'uuid-8': { clientId: 'uuid-8', name: 'core/block', attributes: {} },
+							'uuid-10': { clientId: 'uuid-10', name: 'core/columns', attributes: {} },
+							'uuid-12': { clientId: 'uuid-12', name: 'core/column', attributes: {} },
+							'uuid-14': { clientId: 'uuid-14', name: 'core/column', attributes: {} },
+							'uuid-16': { clientId: 'uuid-16', name: 'core/quote', attributes: {} },
+							'uuid-18': { clientId: 'uuid-18', name: 'core/block', attributes: {} },
+							'uuid-20': { clientId: 'uuid-20', name: 'core/gallery', attributes: {} },
+							'uuid-22': { clientId: 'uuid-22', name: 'core/block', attributes: {} },
+							'uuid-24': { clientId: 'uuid-24', name: 'core/columns', attributes: {} },
+							'uuid-26': { clientId: 'uuid-26', name: 'core/column', attributes: {} },
+							'uuid-28': { clientId: 'uuid-28', name: 'core/column', attributes: {} },
+							'uuid-30': { clientId: 'uuid-30', name: 'core/paragraph', attributes: {} },
+						},
+						blockOrder: {
+							'': [ 'uuid-6', 'uuid-8', 'uuid-10', 'uuid-22' ],
+							'uuid-2': [ ],
+							'uuid-4': [ ],
+							'uuid-6': [ ],
+							'uuid-8': [ ],
+							'uuid-10': [ 'uuid-12', 'uuid-14' ],
+							'uuid-12': [ 'uuid-16' ],
+							'uuid-14': [ 'uuid-18' ],
+							'uuid-16': [ ],
+							'uuid-18': [ 'uuid-24' ],
+							'uuid-20': [ ],
+							'uuid-22': [ ],
+							'uuid-24': [ 'uuid-26', 'uuid-28' ],
+							'uuid-26': [ ],
+							'uuid-28': [ 'uuid-30' ],
+						},
+						edits: {},
+					},
+				},
+			};
+			expect( getClientIdsOfDescendants( state, [ 'uuid-10' ] ) ).toEqual( [
+				'uuid-12',
+				'uuid-14',
+				'uuid-16',
+				'uuid-18',
+				'uuid-24',
+				'uuid-26',
+				'uuid-28',
+				'uuid-30',
 			] );
 		} );
 	} );

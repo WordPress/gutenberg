@@ -18,6 +18,27 @@ import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
+const parseDropEvent = ( event ) => {
+	let result = {
+		srcRootClientId: null,
+		srcClientId: null,
+		srcIndex: null,
+		type: null,
+	};
+
+	if ( ! event.dataTransfer ) {
+		return result;
+	}
+
+	try {
+		result = Object.assign( result, JSON.parse( event.dataTransfer.getData( 'text' ) ) );
+	} catch ( err ) {
+		return result;
+	}
+
+	return result;
+};
+
 class BlockDropZone extends Component {
 	constructor() {
 		super( ...arguments );
@@ -56,28 +77,29 @@ class BlockDropZone extends Component {
 	}
 
 	onDrop( event, position ) {
-		if ( ! event.dataTransfer ) {
+		const { rootClientId: dstRootClientId, clientId: dstClientId, index: dstIndex, getDescendants } = this.props;
+		const { srcRootClientId, srcClientId, srcIndex, type } = parseDropEvent( event );
+
+		const isBlockDropType = ( dropType ) => dropType === 'block';
+		const isSameLevel = ( srcRoot, dstRoot ) => {
+			// Note that rootClientId of top-level blocks will be undefined OR a void string,
+			// so we also need to account for that case separately.
+			return ( srcRoot === dstRoot ) || ( ! srcRoot === true && ! dstRoot === true );
+		};
+		const isSameBlock = ( src, dst ) => src === dst;
+		const isSrcBlockAnAncestorOfDstBlock = ( src, dst ) => getDescendants( [ src ] ).some( ( id ) => id === dst );
+
+		if ( ! isBlockDropType( type ) ||
+			isSameBlock( srcClientId, dstClientId ) ||
+			isSrcBlockAnAncestorOfDstBlock( srcClientId, dstClientId ) ) {
 			return;
 		}
 
-		let clientId, type, rootClientId, fromIndex;
-
-		try {
-			( { clientId, type, rootClientId, fromIndex } = JSON.parse( event.dataTransfer.getData( 'text' ) ) );
-		} catch ( err ) {
-			return;
-		}
-
-		if ( type !== 'block' ) {
-			return;
-		}
-		const { index } = this.props;
 		const positionIndex = this.getInsertIndex( position );
-
-		// If the block is kept at the same level and moved downwards, subtract
-		// to account for blocks shifting upward to occupy its old position.
-		const insertIndex = index && fromIndex < index && rootClientId === this.props.rootClientId ? positionIndex - 1 : positionIndex;
-		this.props.moveBlockToPosition( clientId, rootClientId, insertIndex );
+		// If the block is kept at the same level and moved downwards,
+		// subtract to account for blocks shifting upward to occupy its old position.
+		const insertIndex = dstIndex && srcIndex < dstIndex && isSameLevel( srcRootClientId, dstRootClientId ) ? positionIndex - 1 : positionIndex;
+		this.props.moveBlockToPosition( srcClientId, srcRootClientId, insertIndex );
 	}
 
 	render() {
@@ -109,7 +131,7 @@ export default compose(
 		} = dispatch( 'core/editor' );
 
 		return {
-			insertBlocks( blocks, insertIndex ) {
+			insertBlocks( blocks, index ) {
 				const { rootClientId, layout } = ownProps;
 
 				if ( layout ) {
@@ -122,21 +144,22 @@ export default compose(
 					) );
 				}
 
-				insertBlocks( blocks, insertIndex, rootClientId );
+				insertBlocks( blocks, index, rootClientId );
 			},
 			updateBlockAttributes( ...args ) {
 				updateBlockAttributes( ...args );
 			},
-			moveBlockToPosition( clientId, fromRootClientId, index ) {
-				const { rootClientId, layout } = ownProps;
-				moveBlockToPosition( clientId, fromRootClientId, rootClientId, layout, index );
+			moveBlockToPosition( srcClientId, srcRootClientId, dstIndex ) {
+				const { rootClientId: dstRootClientId, layout } = ownProps;
+				moveBlockToPosition( srcClientId, srcRootClientId, dstRootClientId, layout, dstIndex );
 			},
 		};
 	} ),
 	withSelect( ( select, { rootClientId } ) => {
-		const { getTemplateLock } = select( 'core/editor' );
+		const { getDescendants, getTemplateLock } = select( 'core/editor' );
 		return {
 			isLocked: !! getTemplateLock( rootClientId ),
+			getDescendants,
 		};
 	} )
 )( BlockDropZone );
