@@ -137,6 +137,11 @@ export function toDom( value, multilineTag ) {
 				endPath = [ multilineIndex, ...endPath ];
 			}
 		},
+		onEmpty( body ) {
+			const br = body.ownerDocument.createElement( 'br' );
+			br.setAttribute( 'data-mce-bogus', '1' );
+			body.appendChild( br );
+		},
 	} );
 
 	return {
