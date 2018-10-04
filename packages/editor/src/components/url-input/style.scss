@@ -1,6 +1,6 @@
 // Link input
 $input-padding: 9px 8px;
-$input-size: 230px;
+$input-size: 300px;
 
 .editor-block-list__block .editor-url-input,
 .components-popover .editor-url-input,
@@ -12,6 +12,9 @@ $input-size: 230px;
 
 	input[type="text"] {
 		width: 100%;
+		@include break-small() {
+			width: $input-size;
+		}
 		padding: $input-padding;
 		border: none;
 		border-radius: 0;
@@ -37,6 +40,7 @@ $input-size: 230px;
 	transition: all 0.15s ease-in-out;
 	list-style: none;
 	padding: 4px 0;
+	width: $input-size + 2 * $icon-button-size;
 }
 
 // Hide suggestions on mobile until we @todo find a better way to show them
