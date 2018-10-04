@@ -24,7 +24,7 @@
 
 	&:hover:not(:disabled):not([aria-disabled="true"]) {
 		color: $dark-gray-500;
-		@include break-medium() {
+		@include break-medium() { // Exclude application to mobile
 			@include menu-style__hover;
 		}
 	}
