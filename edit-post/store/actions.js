@@ -1,4 +1,14 @@
 /**
+ * External dependencies
+ */
+import { reduce } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+/**
  * Returns an action object used in signalling that the user opened an editor sidebar.
  *
  * @param {string} name Sidebar name to be opened.
@@ -147,9 +157,35 @@ export function togglePinnedPluginItem( pluginName ) {
  * @return {Object} Action object.
  */
 export function initializeMetaBoxState( metaBoxes ) {
+	deprecated( 'initializeMetaBoxState action (`core/edit-post`)', {
+		alternative: 'setActiveMetaBoxLocations',
+		plugin: 'Gutenberg',
+		version: '4.2',
+	} );
+
+	const locations = reduce( metaBoxes, ( result, isActive, location ) => {
+		if ( isActive ) {
+			result = result.concat( location );
+		}
+
+		return result;
+	}, [] );
+
+	return setActiveMetaBoxLocations( locations );
+}
+
+/**
+ * Returns an action object used in signaling that the active meta box
+ * locations have changed.
+ *
+ * @param {string[]} locations New active meta box locations.
+ *
+ * @return {Object} Action object.
+ */
+export function setActiveMetaBoxLocations( locations ) {
 	return {
-		type: 'INITIALIZE_META_BOX_STATE',
-		metaBoxes,
+		type: 'SET_ACTIVE_META_BOX_LOCATIONS',
+		locations,
 	};
 }
 
@@ -184,6 +220,11 @@ export function metaBoxUpdatesSuccess() {
  * @return {Object} Action object.
  */
 export function setMetaBoxSavedData( dataPerLocation ) {
+	deprecated( 'setMetaBoxSavedData action (`core/edit-post`)', {
+		plugin: 'Gutenberg',
+		version: '4.2',
+	} );
+
 	return {
 		type: 'META_BOX_SET_SAVED_DATA',
 		dataPerLocation,

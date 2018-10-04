@@ -12,7 +12,7 @@ import {
 	activeGeneralSidebar,
 	activeModal,
 	isSavingMetaBoxes,
-	metaBoxes,
+	activeMetaBoxLocations,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -191,66 +191,22 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'metaBoxes()', () => {
+	describe( 'activeMetaBoxLocations()', () => {
 		it( 'should return default state', () => {
-			const actual = metaBoxes( undefined, {} );
-			const expected = {
-				normal: {
-					isActive: false,
-				},
-				side: {
-					isActive: false,
-				},
-				advanced: {
-					isActive: false,
-				},
-			};
+			const state = activeMetaBoxLocations( undefined, {} );
 
-			expect( actual ).toEqual( expected );
+			expect( state ).toEqual( [] );
 		} );
 
-		it( 'should set the sidebar to active', () => {
-			const theMetaBoxes = {
-				normal: false,
-				advanced: false,
-				side: true,
-			};
-
+		it( 'should set the active meta box locations', () => {
 			const action = {
-				type: 'INITIALIZE_META_BOX_STATE',
-				metaBoxes: theMetaBoxes,
+				type: 'SET_ACTIVE_META_BOX_LOCATIONS',
+				locations: [ 'normal' ],
 			};
 
-			const actual = metaBoxes( undefined, action );
-			const expected = {
-				normal: {
-					isActive: false,
-				},
-				side: {
-					isActive: true,
-				},
-				advanced: {
-					isActive: false,
-				},
-			};
+			const state = activeMetaBoxLocations( undefined, action );
 
-			expect( actual ).toEqual( expected );
-		} );
-
-		it( 'should set the meta boxes saved data', () => {
-			const action = {
-				type: 'META_BOX_SET_SAVED_DATA',
-				dataPerLocation: {
-					side: 'a=b',
-				},
-			};
-
-			const theMetaBoxes = metaBoxes( { normal: { isActive: true }, side: { isActive: false } }, action );
-			expect( theMetaBoxes ).toEqual( {
-				advanced: { data: undefined },
-				normal: { isActive: true, data: undefined },
-				side: { isActive: false, data: 'a=b' },
-			} );
+			expect( state ).toEqual( [ 'normal' ] );
 		} );
 	} );
 } );
