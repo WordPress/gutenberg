@@ -24,7 +24,7 @@ const MyModal = withState( {
 				<Button isDefault onClick={ () => setState( { isOpen: false } ) }>
 					My custom close button
 				</Button>
-			</Modal> 
+			</Modal>
 			: null }
 	</div>
 ) );
@@ -77,15 +77,15 @@ If this property is added, it will be added to the modal content `div` as `aria-
 
 If this property is true, it will focus the first tabbable element rendered in the modal.
 
-- Type: `bool`
+- Type: `boolean`
 - Required: No
 - Default: true
 
 ### shouldCloseOnEsc
 
-If this property is added, it will determine whether the modal requests to close when the escape key is pressed. 
+If this property is added, it will determine whether the modal requests to close when the escape key is pressed.
 
-- Type: `bool`
+- Type: `boolean`
 - Required: No
 - Default: true
 
@@ -93,7 +93,7 @@ If this property is added, it will determine whether the modal requests to close
 
 If this property is added, it will determine whether the modal requests to close when a mouse click occurs outside of the modal content.
 
-- Type: `bool`
+- Type: `boolean`
 - Required: No
 - Default: true
 
@@ -101,7 +101,7 @@ If this property is added, it will determine whether the modal requests to close
 
 If this property is set to false, the modal will not display a close icon and cannot be dismissed.
 
-- Type: `bool`
+- Type: `boolean`
 - Required: No
 - Default: true
 

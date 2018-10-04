@@ -96,8 +96,6 @@ class PostLockedModal extends Component {
 
 	/**
 	 * Unlock the post before the window is exited.
-	 *
-	 * @param {Object} event Event.
 	 */
 	releasePostLock() {
 		const { isLocked, activePostLock, postLockUtils, postId } = this.props;
@@ -125,6 +123,7 @@ class PostLockedModal extends Component {
 			return null;
 		}
 
+		/* translators: Fallback user name for the post lock message. */
 		const userDisplayName = user.name || __( 'Another user' );
 		const userAvatar = user.avatar;
 
@@ -222,9 +221,7 @@ export default compose(
 			updatePostLock,
 		};
 	} ),
-
 	withGlobalEvents( {
 		beforeunload: 'releasePostLock',
 	} )
-
 )( PostLockedModal );

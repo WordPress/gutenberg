@@ -593,6 +593,7 @@ function gutenberg_register_scripts_and_styles() {
 		'wp-editor',
 		gutenberg_url( 'build/editor/index.js' ),
 		array(
+			'jquery',
 			'lodash',
 			'tinymce-latest-lists',
 			'wp-a11y',
