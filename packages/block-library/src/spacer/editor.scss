@@ -13,8 +13,8 @@
 
 	// Offset the handle container's position.
 	position: absolute;
-	bottom: calc(#{$resize-handler-container-size / 2} * -1) !important;
-	left: calc(50% - #{$resize-handler-container-size / 2}) !important;
+	bottom: calc(#{$resize-handler-container-size / 2} * -1);
+	left: calc(50% - #{$resize-handler-container-size / 2});
 }
 
 .block-library-spacer__resize-handler-bottom::before {

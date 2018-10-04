@@ -335,15 +335,10 @@
 @mixin resize-handler__container() {
 	display: none;
 
-	// The unfortunate use of `!important` in the CSS below is because the
-	// re-resizable package, which we use for our resize functionality,
-	// applies an inline `style` attribute that cannot be disabled.
-	// See https://github.com/WordPress/gutenberg/pull/10331
-
 	// The handle itself is a pseudo element, and will sit inside this larger
-	// container size
-	width: $resize-handler-container-size !important;
-	height: $resize-handler-container-size !important;
+	// container size.
+	width: $resize-handler-container-size;
+	height: $resize-handler-container-size;
 	padding: $grid-size-small;
 }
 

@@ -431,6 +431,16 @@ class ImageEdit extends Component {
 							}
 							/* eslint-enable no-lonely-if */
 
+							// Removes the inline styles in the drag handles
+							const handleStylesOverrides = {
+								width: null,
+								height: null,
+								top: null,
+								right: null,
+								bottom: null,
+								left: null,
+							};
+
 							return (
 								<Fragment>
 									{ getInspectorControls( imageWidth, imageHeight ) }
@@ -451,6 +461,11 @@ class ImageEdit extends Component {
 											right: 'block-library-image__resize-handler-right',
 											bottom: 'block-library-image__resize-handler-bottom',
 											left: 'block-library-image__resize-handler-left',
+										} }
+										handleStyles={ {
+											right: handleStylesOverrides,
+											bottom: handleStylesOverrides,
+											left: handleStylesOverrides,
 										} }
 										enable={ {
 											top: false,
