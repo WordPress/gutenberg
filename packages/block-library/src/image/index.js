@@ -16,6 +16,7 @@ import {
 } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
 import { createBlobURL } from '@wordpress/blob';
+import { create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -158,9 +159,11 @@ export const settings = {
 						selector: 'img',
 					},
 					caption: {
-						type: 'rich-text',
-						// To do: needs to support HTML.
-						source: 'text',
+						shortcode: ( attributes, { shortcode } ) => {
+							const { content } = shortcode;
+							const html = content.replace( /\s*<img[^>]*>\s/, '' );
+							return create( { html } );
+						},
 					},
 					href: {
 						type: 'string',
