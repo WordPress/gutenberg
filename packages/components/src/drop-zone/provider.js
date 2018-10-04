@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual, find, some, filter, noop, throttle } from 'lodash';
+import { isEqual, find, some, filter, noop, throttle, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -88,11 +88,14 @@ class DropZoneProvider extends Component {
 
 	getDragEventType( event ) {
 		if ( event.dataTransfer ) {
-			if ( event.dataTransfer.types.indexOf( 'Files' ) !== -1 ) {
+			// Use lodash `includes` here as in the Edge browser `types` is implemented
+			// as a DomStringList, whereas in other browsers it's an array. `includes`
+			// happily works with both types.
+			if ( includes( event.dataTransfer.types, 'Files' ) ) {
 				return 'file';
 			}
 
-			if ( event.dataTransfer.types.indexOf( 'text/html' ) !== -1 ) {
+			if ( includes( event.dataTransfer.types, 'text/html' ) ) {
 				return 'html';
 			}
 		}

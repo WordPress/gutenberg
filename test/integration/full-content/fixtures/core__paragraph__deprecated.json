@@ -4,17 +4,56 @@
         "name": "core/paragraph",
         "isValid": true,
         "attributes": {
-            "content": [
-                {
-                    "key": "html",
-                    "ref": null,
-                    "props": {
-                        "children": "Unwrapped is <em>still</em> valid."
-                    },
-                    "_owner": null,
-                    "_store": {}
-                }
-            ],
+            "content": {
+                "formats": [
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ],
+                "text": "Unwrapped is still valid."
+            },
             "dropCap": false
         },
         "innerBlocks": [],

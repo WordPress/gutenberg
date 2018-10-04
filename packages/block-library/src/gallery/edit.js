@@ -38,6 +38,7 @@ const linkOptions = [
 	{ value: 'media', label: __( 'Media File' ) },
 	{ value: 'none', label: __( 'None' ) },
 ];
+const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 export function defaultColumnsNumber( attributes ) {
 	return Math.min( 3, attributes.images.length );
@@ -131,7 +132,7 @@ class GalleryEdit extends Component {
 		const currentImages = this.props.attributes.images || [];
 		const { noticeOperations, setAttributes } = this.props;
 		mediaUpload( {
-			allowedType: 'image',
+			allowedTypes: ALLOWED_MEDIA_TYPES,
 			filesList: files,
 			onFileChange: ( images ) => {
 				setAttributes( {
@@ -168,7 +169,7 @@ class GalleryEdit extends Component {
 					<Toolbar>
 						<MediaUpload
 							onSelect={ this.onSelectImages }
-							type="image"
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
 							multiple
 							gallery
 							value={ images.map( ( img ) => img.id ) }
@@ -199,7 +200,7 @@ class GalleryEdit extends Component {
 						} }
 						onSelect={ this.onSelectImages }
 						accept="image/*"
-						type="image"
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						multiple
 						notices={ noticeUI }
 						onError={ noticeOperations.createErrorNotice }

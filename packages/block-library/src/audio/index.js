@@ -30,8 +30,7 @@ export const settings = {
 			attribute: 'src',
 		},
 		caption: {
-			type: 'array',
-			source: 'children',
+			source: 'rich-text',
 			selector: 'figcaption',
 		},
 		id: {

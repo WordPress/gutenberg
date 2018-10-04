@@ -7,11 +7,7 @@
 	height: 30px;
 	padding: $grid-size-small;
 	position: absolute;
+	z-index: z-index(".editor-block-list__layout .reusable-block-indicator");
 	width: 30px;
-	right: -$parent-block-padding;
-
-	// Show less offset in nested contexts.
-	.editor-block-list__layout & {
-		right: -$block-padding;
-	}
+	right: -$block-padding;
 }

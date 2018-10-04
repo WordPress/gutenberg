@@ -10,12 +10,13 @@ import classnames from 'classnames';
  */
 import { Component, createElement } from '@wordpress/element';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
+import { toHTMLString } from '@wordpress/rich-text';
+import { children } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { diffAriaProps, pickAriaProps } from './aria';
-import { valueToString } from './format';
 
 /**
  * Determines whether we need a fix to provide `input` events for contenteditable.
@@ -159,9 +160,6 @@ export default class TinyMCE extends Component {
 			convert_urls: false,
 			inline_boundaries_selector: 'a[href],code,b,i,strong,em,del,ins,sup,sub',
 			plugins: [],
-			formats: {
-				strikethrough: { inline: 'del' },
-			},
 		} );
 
 		tinymce.init( {
@@ -176,6 +174,10 @@ export default class TinyMCE extends Component {
 
 	bindEditorNode( editorNode ) {
 		this.editorNode = editorNode;
+
+		if ( this.props.setRef ) {
+			this.props.setRef( editorNode );
+		}
 
 		/**
 		 * A ref function can be used for cleanup because React calls it with
@@ -192,8 +194,17 @@ export default class TinyMCE extends Component {
 	}
 
 	render() {
-		const { tagName = 'div', style, defaultValue, className, isPlaceholderVisible, format, onPaste } = this.props;
 		const ariaProps = pickAriaProps( this.props );
+		const {
+			tagName = 'div',
+			style,
+			defaultValue,
+			className,
+			isPlaceholderVisible,
+			onPaste,
+			onInput,
+			multilineTag,
+		} = this.props;
 
 		/*
 		 * The role=textbox and aria-multiline=true must always be used together
@@ -208,6 +219,14 @@ export default class TinyMCE extends Component {
 		// If a default value is provided, render it into the DOM even before
 		// TinyMCE finishes initializing. This avoids a short delay by allowing
 		// us to show and focus the content before it's truly ready to edit.
+		let initialHTML = defaultValue;
+
+		// Handle deprecated `children` and `node` sources.
+		if ( Array.isArray( defaultValue ) ) {
+			initialHTML = children.toHTML( defaultValue );
+		} else if ( typeof defaultValue !== 'string' ) {
+			initialHTML = toHTMLString( defaultValue, multilineTag );
+		}
 
 		return createElement( tagName, {
 			...ariaProps,
@@ -217,8 +236,9 @@ export default class TinyMCE extends Component {
 			ref: this.bindEditorNode,
 			style,
 			suppressContentEditableWarning: true,
-			dangerouslySetInnerHTML: { __html: valueToString( defaultValue, format ) },
+			dangerouslySetInnerHTML: { __html: initialHTML },
 			onPaste,
+			onInput,
 		} );
 	}
 }
