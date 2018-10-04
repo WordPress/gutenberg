@@ -12,7 +12,7 @@
 
 // This is necessary for the editor resize handles to accurately work on a non-floated, non-resized, small image.
 .wp-block-image {
-	.block-library-image__resizer {
+	.components-resizable-box__container {
 		display: inline-block;
 
 		img {
@@ -22,40 +22,14 @@
 	}
 }
 
-.block-library-image__resize-handler-right,
-.block-library-image__resize-handler-bottom,
-.block-library-image__resize-handler-left {
-	@include resize-handler__container();
-
-	.wp-block-image.is-focused & {
-		display: block;
-		z-index: z-index(".block-library-image__resize-handlers");
-	}
+.wp-block-image.is-focused .components-resizable-box__handle-top,
+.wp-block-image.is-focused .components-resizable-box__handle-right,
+.wp-block-image.is-focused .components-resizable-box__handle-bottom,
+.wp-block-image.is-focused .components-resizable-box__handle-left {
+	display: block;
+	z-index: z-index(".block-library-image__resize-handlers");
 }
 
-// Draw the visible handle
-.block-library-image__resize-handler-right::before,
-.block-library-image__resize-handler-bottom::before,
-.block-library-image__resize-handler-left::before {
-	@include resize-handler__visible-handle();
-}
-
-/*!rtl:begin:ignore*/
-.block-library-image__resize-handler-right {
-	top: calc(50% - #{$resize-handler-container-size / 2});
-	right: calc(#{$resize-handler-container-size / 2} * -1);
-}
-
-.block-library-image__resize-handler-left {
-	top: calc(50% - #{$resize-handler-container-size / 2});
-	left: calc(#{$resize-handler-container-size / 2} * -1);
-}
-
-.block-library-image__resize-handler-bottom {
-	bottom: calc(#{$resize-handler-container-size / 2} * -1);
-	left: calc(50% - #{$resize-handler-container-size / 2});
-}
-/*!rtl:end:ignore*/
 
 .editor-block-list__block[data-type="core/image"][data-align="center"] {
 	.wp-block-image {

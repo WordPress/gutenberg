@@ -1,0 +1,48 @@
+.components-resizable-box__handle-top,
+.components-resizable-box__handle-right,
+.components-resizable-box__handle-bottom,
+.components-resizable-box__handle-left {
+	display: none;
+
+	// Show the resize handle when selected.
+	.components-resizable-box__container.is-selected & {
+		display: block;
+	}
+
+	// The handle itself is a pseudo element, and will sit inside this larger
+	// container size.
+	width: $resize-handler-container-size;
+	height: $resize-handler-container-size;
+	padding: $grid-size-small;
+}
+
+.components-resizable-box__handle-top::before,
+.components-resizable-box__handle-right::before,
+.components-resizable-box__handle-bottom::before,
+.components-resizable-box__handle-left::before {
+	display: block;
+	content: "";
+	width: $resize-handler-size;
+	height: $resize-handler-size;
+	border: 2px solid $white;
+	border-radius: 50%;
+	background: theme(primary);
+	cursor: inherit;
+}
+
+/*!rtl:begin:ignore*/
+.components-resizable-box__handle-right {
+	top: calc(50% - #{$resize-handler-container-size / 2});
+	right: calc(#{$resize-handler-container-size / 2} * -1);
+}
+
+.components-resizable-box__handle-bottom {
+	bottom: calc(#{$resize-handler-container-size / 2} * -1);
+	left: calc(50% - #{$resize-handler-container-size / 2});
+}
+
+.components-resizable-box__handle-left {
+	top: calc(50% - #{$resize-handler-container-size / 2});
+	left: calc(#{$resize-handler-container-size / 2} * -1);
+}
+/*!rtl:end:ignore*/
