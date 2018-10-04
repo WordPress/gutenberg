@@ -209,7 +209,7 @@ class MediaUpload extends Component {
 		return ! mediaObject.caption ?
 			mediaObject :
 			{ ...mediaObject, caption: parseWithAttributeSchema( mediaObject.caption, {
-				source: 'children',
+				source: 'rich-text',
 			} ) };
 	}
 

@@ -495,7 +495,7 @@ class ImageEdit extends Component {
 						<RichText
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
-							value={ caption || [] }
+							value={ caption }
 							unstableOnFocus={ this.onFocusCaption }
 							onChange={ ( value ) => setAttributes( { caption: value } ) }
 							isSelected={ this.state.captionFocused }

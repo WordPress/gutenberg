@@ -158,7 +158,7 @@ export const settings = {
 						selector: 'img',
 					},
 					caption: {
-						type: 'array',
+						type: 'rich-text',
 						// To do: needs to support HTML.
 						source: 'text',
 					},
