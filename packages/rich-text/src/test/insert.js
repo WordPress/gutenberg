@@ -16,49 +16,49 @@ describe( 'insert', () => {
 
 	it( 'should delete and insert', () => {
 		const record = {
-			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
-			text: 'one two three',
-			start: 6,
-			end: 6,
+			_formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			_text: 'one two three',
+			_start: 6,
+			_end: 6,
 		};
 		const toInsert = {
-			formats: [ [ strong ] ],
-			text: 'a',
+			_formats: [ [ strong ] ],
+			_text: 'a',
 		};
 		const expected = {
-			formats: [ , , [ strong ], [ em ], , , , , , , ],
-			text: 'onao three',
-			start: 3,
-			end: 3,
+			_formats: [ , , [ strong ], [ em ], , , , , , , ],
+			_text: 'onao three',
+			_start: 3,
+			_end: 3,
 		};
 		const result = insert( deepFreeze( record ), toInsert, 2, 6 );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 2 );
+		expect( getSparseArrayLength( result._formats ) ).toBe( 2 );
 	} );
 
 	it( 'should insert line break with selection', () => {
 		const record = {
-			formats: [ , , ],
-			text: 'tt',
-			start: 1,
-			end: 1,
+			_formats: [ , , ],
+			_text: 'tt',
+			_start: 1,
+			_end: 1,
 		};
 		const toInsert = {
-			formats: [ , ],
-			text: '\n',
+			_formats: [ , ],
+			_text: '\n',
 		};
 		const expected = {
-			formats: [ , , , ],
-			text: 't\nt',
-			start: 2,
-			end: 2,
+			_formats: [ , , , ],
+			_text: 't\nt',
+			_start: 2,
+			_end: 2,
 		};
 		const result = insert( deepFreeze( record ), toInsert );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 0 );
+		expect( getSparseArrayLength( result._formats ) ).toBe( 0 );
 	} );
 } );

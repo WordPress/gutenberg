@@ -56,7 +56,7 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 			// Ensure value passed is always a rich text value.
 			if ( typeof result[ key ] === 'string' ) {
 				result[ key ] = create( { text: result[ key ] } );
-			} else if ( ! result[ key ] || ! result[ key ].text ) {
+			} else if ( typeof result[ key ] !== 'object' ) {
 				result[ key ] = create();
 			}
 		}

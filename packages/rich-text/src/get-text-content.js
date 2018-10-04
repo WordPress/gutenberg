@@ -6,6 +6,6 @@
  *
  * @return {string} The text content.
  */
-export function getTextContent( { text } ) {
-	return text;
+export function getTextContent( { _text } ) {
+	return _text;
 }

@@ -5,7 +5,7 @@
         "isValid": true,
         "attributes": {
             "content": {
-                "formats": [
+                "_formats": [
                     null,
                     null,
                     null,
@@ -56,7 +56,7 @@
                     null,
                     null
                 ],
-                "text": "The Inserter Tool"
+                "_text": "The Inserter Tool"
             },
             "level": 2
         },

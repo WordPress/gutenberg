@@ -7,19 +7,19 @@
             "id": 176,
             "href": "http://localhost:8888/wp-content/uploads/2018/05/keycodes.js",
             "fileName": {
-                "formats": [
+                "_formats": [
                     null,
                     null,
                     null,
                     null
                 ],
-                "text": "6546"
+                "_text": "6546"
             },
             "textLinkHref": "http://localhost:8888/wp-content/uploads/2018/05/keycodes.js",
             "textLinkTarget": "_blank",
             "showDownloadButton": true,
             "downloadButtonText": {
-                "formats": [
+                "_formats": [
                     null,
                     null,
                     null,
@@ -29,7 +29,7 @@
                     null,
                     null
                 ],
-                "text": "Download"
+                "_text": "Download"
             }
         },
         "innerBlocks": [],

@@ -5,7 +5,7 @@
         "isValid": true,
         "attributes": {
             "value": {
-                "formats": [
+                "_formats": [
                     null,
                     null,
                     null,
@@ -239,10 +239,10 @@
                     null,
                     null
                 ],
-                "text": "The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery."
+                "_text": "The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery."
             },
             "citation": {
-                "formats": [
+                "_formats": [
                     null,
                     null,
                     null,
@@ -264,7 +264,7 @@
                     null,
                     null
                 ],
-                "text": "Matt Mullenweg, 2017"
+                "_text": "Matt Mullenweg, 2017"
             }
         },
         "innerBlocks": [],

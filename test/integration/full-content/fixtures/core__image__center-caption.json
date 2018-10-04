@@ -7,7 +7,7 @@
             "url": "https://cldup.com/YLYhpou2oq.jpg",
             "alt": "",
             "caption": {
-                "formats": [
+                "_formats": [
                     null,
                     null,
                     null,
@@ -76,7 +76,7 @@
                     null,
                     null
                 ],
-                "text": "Give it a try. Press the \"really wide\" button on the image toolbar."
+                "_text": "Give it a try. Press the \"really wide\" button on the image toolbar."
             },
             "align": "center",
             "linkDestination": "none"

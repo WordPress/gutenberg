@@ -15,31 +15,31 @@ describe( 'join', () => {
 	const separators = [
 		' ',
 		{
-			text: ' ',
-			formats: [ , ],
+			_text: ' ',
+			_formats: [ , ],
 		},
 	];
 
 	separators.forEach( ( separator ) => {
 		it( 'should join records with string separator', () => {
 			const one = {
-				formats: [ , , [ em ] ],
-				text: 'one',
+				_formats: [ , , [ em ] ],
+				_text: 'one',
 			};
 			const two = {
-				formats: [ [ em ], , , ],
-				text: 'two',
+				_formats: [ [ em ], , , ],
+				_text: 'two',
 			};
 			const three = {
-				formats: [ , , [ em ], , [ em ], , , ],
-				text: 'one two',
+				_formats: [ , , [ em ], , [ em ], , , ],
+				_text: 'one two',
 			};
 			const result = join( [ deepFreeze( one ), deepFreeze( two ) ], separator );
 
 			expect( result ).not.toBe( one );
 			expect( result ).not.toBe( two );
 			expect( result ).toEqual( three );
-			expect( getSparseArrayLength( result.formats ) ).toBe( 2 );
+			expect( getSparseArrayLength( result._formats ) ).toBe( 2 );
 		} );
 	} );
 } );

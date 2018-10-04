@@ -6,7 +6,7 @@
         "attributes": {
             "url": "https://github.com/WordPress/gutenberg",
             "text": {
-                "formats": [
+                "_formats": [
                     null,
                     null,
                     null,
@@ -28,7 +28,7 @@
                     null,
                     null
                 ],
-                "text": "Help build Gutenberg"
+                "_text": "Help build Gutenberg"
             },
             "align": "center"
         },

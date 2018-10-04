@@ -15,22 +15,22 @@ describe( 'concat', () => {
 
 	it( 'should merge records', () => {
 		const one = {
-			formats: [ , , [ em ] ],
-			text: 'one',
+			_formats: [ , , [ em ] ],
+			_text: 'one',
 		};
 		const two = {
-			formats: [ [ em ], , , ],
-			text: 'two',
+			_formats: [ [ em ], , , ],
+			_text: 'two',
 		};
 		const three = {
-			formats: [ , , [ em ], [ em ], , , ],
-			text: 'onetwo',
+			_formats: [ , , [ em ], [ em ], , , ],
+			_text: 'onetwo',
 		};
 
 		const merged = concat( deepFreeze( one ), deepFreeze( two ) );
 
 		expect( merged ).not.toBe( one );
 		expect( merged ).toEqual( three );
-		expect( getSparseArrayLength( merged.formats ) ).toBe( 2 );
+		expect( getSparseArrayLength( merged._formats ) ).toBe( 2 );
 	} );
 } );

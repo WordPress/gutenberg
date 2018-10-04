@@ -6,7 +6,7 @@
         "attributes": {
             "url": "https://example.com/",
             "caption": {
-                "formats": [
+                "_formats": [
                     null,
                     null,
                     null,
@@ -44,7 +44,7 @@
                     null,
                     null
                 ],
-                "text": "Embedded content from an example URL"
+                "_text": "Embedded content from an example URL"
             },
             "allowResponsive": true
         },

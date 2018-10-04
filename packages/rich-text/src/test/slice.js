@@ -1,3 +1,4 @@
+
 /**
  * External dependencies
  */
@@ -15,35 +16,35 @@ describe( 'slice', () => {
 
 	it( 'should slice', () => {
 		const record = {
-			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
-			text: 'one two three',
+			_formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			_text: 'one two three',
 		};
 		const expected = {
-			formats: [ , [ em ], [ em ] ],
-			text: ' tw',
+			_formats: [ , [ em ], [ em ] ],
+			_text: ' tw',
 		};
 		const result = slice( deepFreeze( record ), 3, 6 );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 2 );
+		expect( getSparseArrayLength( result._formats ) ).toBe( 2 );
 	} );
 
 	it( 'should slice record', () => {
 		const record = {
-			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
-			text: 'one two three',
-			start: 3,
-			end: 6,
+			_formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			_text: 'one two three',
+			_start: 3,
+			_end: 6,
 		};
 		const expected = {
-			formats: [ , [ em ], [ em ] ],
-			text: ' tw',
+			_formats: [ , [ em ], [ em ] ],
+			_text: ' tw',
 		};
 		const result = slice( deepFreeze( record ) );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 2 );
+		expect( getSparseArrayLength( result._formats ) ).toBe( 2 );
 	} );
 } );

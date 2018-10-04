@@ -34,16 +34,16 @@ export function toTree( value, multilineTag, settings ) {
 		onStartIndex,
 		onEndIndex,
 	} = settings;
-	const { formats, text, start, end } = value;
-	const formatsLength = formats.length + 1;
+	const { _formats, _text, _start, _end } = value;
+	const formatsLength = _formats.length + 1;
 	const tree = createEmpty( tag );
 
 	append( tree, '' );
 
 	for ( let i = 0; i < formatsLength; i++ ) {
-		const character = text.charAt( i );
-		const characterFormats = formats[ i ];
-		const lastCharacterFormats = formats[ i - 1 ];
+		const character = _text.charAt( i );
+		const characterFormats = _formats[ i ];
+		const lastCharacterFormats = _formats[ i - 1 ];
 
 		let pointer = getLastChild( tree );
 
@@ -80,11 +80,11 @@ export function toTree( value, multilineTag, settings ) {
 			}
 		}
 
-		if ( onStartIndex && start === i + 1 ) {
+		if ( onStartIndex && _start === i + 1 ) {
 			onStartIndex( tree, pointer, multilineIndex );
 		}
 
-		if ( onEndIndex && end === i + 1 ) {
+		if ( onEndIndex && _end === i + 1 ) {
 			onEndIndex( tree, pointer, multilineIndex );
 		}
 	}

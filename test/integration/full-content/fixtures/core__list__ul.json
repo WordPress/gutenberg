@@ -6,7 +6,7 @@
         "attributes": {
             "ordered": false,
             "values": {
-                "formats": [
+                "_formats": [
                     null,
                     null,
                     null,
@@ -221,7 +221,7 @@
                     null,
                     null
                 ],
-                "text": "Text & Headings Images & Videos Galleries Embeds, like YouTube, Tweets, or other WordPress posts. Layout blocks, like Buttons, Hero Images, Separators, etc. And Lists like this one of course :)"
+                "_text": "Text & Headings Images & Videos Galleries Embeds, like YouTube, Tweets, or other WordPress posts. Layout blocks, like Buttons, Hero Images, Separators, etc. And Lists like this one of course :)"
             }
         },
         "innerBlocks": [],

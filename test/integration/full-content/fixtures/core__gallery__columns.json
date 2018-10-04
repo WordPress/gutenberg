@@ -9,16 +9,16 @@
                     "url": "https://cldup.com/uuUqE_dXzy.jpg",
                     "alt": "title",
                     "caption": {
-                        "formats": [],
-                        "text": ""
+                        "_formats": [],
+                        "_text": ""
                     }
                 },
                 {
                     "url": "http://google.com/hi.png",
                     "alt": "title",
                     "caption": {
-                        "formats": [],
-                        "text": ""
+                        "_formats": [],
+                        "_text": ""
                     }
                 }
             ],

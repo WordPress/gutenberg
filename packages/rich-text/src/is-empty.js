@@ -6,8 +6,8 @@
  *
  * @return {boolean} True if the value is empty, false if not.
  */
-export function isEmpty( { text } ) {
-	return text.length === 0;
+export function isEmpty( { _text } ) {
+	return _text.length === 0;
 }
 
 /**
@@ -18,22 +18,22 @@ export function isEmpty( { text } ) {
  *
  * @return {boolean} True if the line is empty, false if not.
  */
-export function isEmptyLine( { text, start, end } ) {
-	if ( start !== end ) {
+export function isEmptyLine( { _text, _start, _end } ) {
+	if ( _start !== _end ) {
 		return false;
 	}
 
-	if ( text.length === 0 ) {
+	if ( _text.length === 0 ) {
 		return true;
 	}
 
-	if ( start === 0 && text.slice( 0, 1 ) === '\u2028' ) {
+	if ( _start === 0 && _text.slice( 0, 1 ) === '\u2028' ) {
 		return true;
 	}
 
-	if ( start === text.length && text.slice( -1 ) === '\u2028' ) {
+	if ( _start === _text.length && _text.slice( -1 ) === '\u2028' ) {
 		return true;
 	}
 
-	return text.slice( start - 1, end + 1 ) === '\u2028\u2028';
+	return _text.slice( _start - 1, _end + 1 ) === '\u2028\u2028';
 }
