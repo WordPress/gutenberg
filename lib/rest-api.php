@@ -191,6 +191,8 @@ add_action( 'rest_api_init', 'gutenberg_add_taxonomy_visibility_field' );
 /**
  * Add a permalink template to posts in the post REST API response.
  *
+ * @see https://core.trac.wordpress.org/ticket/45017
+ *
  * @param WP_REST_Response $response WP REST API response of a post.
  * @param WP_Post          $post The post being returned.
  * @param WP_REST_Request  $request WP REST API request.
@@ -301,6 +303,8 @@ add_filter( 'registered_taxonomy', 'gutenberg_register_taxonomy_prepare_function
 /**
  * Ensure that the wp-json index contains the 'theme-supports' setting as
  * part of its site info elements.
+ *
+ * @see https://core.trac.wordpress.org/ticket/45016
  *
  * @param WP_REST_Response $response WP REST API response of the wp-json index.
  * @return WP_REST_Response Response that contains theme-supports.
