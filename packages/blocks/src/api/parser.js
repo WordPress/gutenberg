@@ -62,16 +62,6 @@ export const toBooleanAttributeMatcher = ( matcher ) => flow( [
 ] );
 
 /**
- * Returns true if the source name is one which is guaranteed to return
- * a string value.
- *
- * @param {string} source Source name to test.
- *
- * @return {boolean} Whether source is one returning a string.
- */
-export const isStringSource = ( source ) => STRING_SOURCES.has( source );
-
-/**
  * Returns true if value is of the given JSON schema type, or false otherwise.
  *
  * @see http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
@@ -138,10 +128,10 @@ export function isOfTypes( value, types ) {
 export function isAmbiguousStringSource( attributeSchema ) {
 	const { source, type } = attributeSchema;
 
-	return (
-		isStringSource( source ) &&
-		typeof type === 'string'
-	);
+	const isStringSource = STRING_SOURCES.has( source );
+	const isSingleType = typeof type === 'string';
+
+	return isStringSource && isSingleType;
 }
 
 /**
