@@ -3,6 +3,7 @@
  */
 
 import { split } from './split';
+import { normaliseFormats } from './normalise-formats';
 
 export function toTree( value, multilineTag, settings ) {
 	if ( multilineTag ) {
@@ -35,7 +36,7 @@ export function toTree( value, multilineTag, settings ) {
 		onEndIndex,
 		onEmpty,
 	} = settings;
-	const { formats, text, start, end } = value;
+	const { formats, text, start, end } = normaliseFormats( value );
 	const formatsLength = formats.length + 1;
 	const tree = createEmpty( tag );
 
