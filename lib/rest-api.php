@@ -255,7 +255,7 @@ function gutenberg_add_target_schema_to_links( $response, $post, $request ) {
 	$post_type  = get_post_type_object( $post->post_type );
 	$orig_href  = ! empty( $orig_links['self'][0]['href'] ) ? $orig_links['self'][0]['href'] : null;
 	if ( 'edit' === $request['context'] && current_user_can( 'unfiltered_html' ) ) {
-		$new_links['https://api.w.org/action-unfiltered_html'] = array(
+		$new_links['https://api.w.org/action-unfiltered-html'] = array(
 			array(
 				'title'        => __( 'The current user can post HTML markup and JavaScript.', 'gutenberg' ),
 				'href'         => $orig_href,
