@@ -118,7 +118,7 @@ class PostLockedModal extends Component {
 	}
 
 	render() {
-		const { user, postId, isLocked, isTakeover, postLockUtils, postType } = this.props;
+		const { user, postId, isLocked, isTakeover, postLockUtils } = this.props;
 		if ( ! isLocked ) {
 			return null;
 		}
@@ -155,9 +155,9 @@ class PostLockedModal extends Component {
 					<div>
 						<div>
 							{ sprintf(
-								__( '%s now has editing control of this %s. Don\'t worry, your changes up to this moment have been saved' ),
-								userDisplayName,
-								postType
+								/* translators: 'post' is generic and may be of any type (post, page, etc.). */
+								__( '%s now has editing control of this post. Don\'t worry, your changes up to this moment have been saved' ),
+								userDisplayName
 							) }
 						</div>
 						<p>
@@ -171,9 +171,9 @@ class PostLockedModal extends Component {
 					<div>
 						<div>
 							{ sprintf(
-								__( '%s is currently working on this %s, which means you cannot make changes, unless you take over.' ),
-								userDisplayName,
-								postType
+								/* translators: 'post' is generic and may be of any type (post, page, etc.). */
+								__( '%s is currently working on this post, which means you cannot make changes, unless you take over.' ),
+								userDisplayName
 							) }
 						</div>
 
@@ -202,7 +202,6 @@ export default compose(
 			getPostLockUser,
 			getCurrentPostId,
 			getActivePostLock,
-			getEditedPostAttribute,
 		} = select( 'core/editor' );
 		return {
 			isLocked: isPostLocked(),
@@ -211,7 +210,6 @@ export default compose(
 			postId: getCurrentPostId(),
 			postLockUtils: getEditorSettings().postLockUtils,
 			activePostLock: getActivePostLock(),
-			postType: getEditedPostAttribute( 'type' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
