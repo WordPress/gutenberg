@@ -27,14 +27,14 @@ describe( 'InnerBlocks Template Sync', () => {
 			<!-- wp:paragraph -->
 			<p>added paragraph</p>
 			<!-- /wp:paragraph -->
-			`;
+		`;
 		await insertBlock( blockName );
 		await switchToEditor( 'Code' );
 		await page.$eval( '.editor-post-text-editor', ( element, _paragraph, _blockSlug ) => {
 			const blockDelimiter = `<!-- /wp:${ _blockSlug } -->`;
-			element.value = element.value.replace( blockDelimiter, _paragraph + blockDelimiter );
+			element.value = element.value.replace( blockDelimiter, `${ _paragraph }${ blockDelimiter }` );
 		}, paragraphToAdd, blockSlug );
-		// press enter inside the code editor so the onChange events for the new value trigger
+		// Press "Enter" inside the Code Editor to fire the `onChange` event for the new value.
 		await page.click( '.editor-post-text-editor' );
 		await page.keyboard.press( 'Enter' );
 		await switchToEditor( 'Visual' );
@@ -70,10 +70,10 @@ describe( 'Container block without paragraph support', () => {
 		// Open the specific appender used when there's no paragraph support.
 		await page.click( '.editor-inner-blocks .block-list-appender .block-list-appender__toggle' );
 
-		// Insert an image block
+		// Insert an image block.
 		await page.click( '.editor-inserter__results button[aria-label="Image"]' );
 
-		// Check the inserted content
+		// Check the inserted content.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );
