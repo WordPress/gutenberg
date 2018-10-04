@@ -221,10 +221,10 @@ export class RichText extends Component {
 	 * @return {Object} The current record (value and selection).
 	 */
 	getRecord() {
-		const { formats, text } = this.formatToValue( this.props.value );
-		const { start, end } = this.state;
+		const { _formats, _text } = this.formatToValue( this.props.value );
+		const { _start, _end } = this.state;
 
-		return { formats, text, start, end };
+		return { _formats, _text, _start, _end };
 	}
 
 	createRecord() {
@@ -421,10 +421,10 @@ export class RichText extends Component {
 			return;
 		}
 
-		const { start, end } = this.createRecord();
+		const { _start, _end } = this.createRecord();
 
-		if ( start !== this.state.start || end !== this.state.end ) {
-			this.setState( { start, end } );
+		if ( _start !== this.state._start || _end !== this.state._end ) {
+			this.setState( { _start, _end } );
 		}
 	}
 
@@ -441,11 +441,11 @@ export class RichText extends Component {
 			this.applyRecord( record );
 		}
 
-		const { start, end } = record;
+		const { _start, _end } = record;
 
 		this.savedContent = this.valueToFormat( record );
 		this.props.onChange( this.savedContent );
-		this.setState( { start, end } );
+		this.setState( { _start, _end } );
 	}
 
 	onCreateUndoLevel( event ) {
@@ -778,8 +778,8 @@ export class RichText extends Component {
 
 			if ( this.isActive() ) {
 				const length = getTextContent( prevProps.value ).length;
-				record.start = length;
-				record.end = length;
+				record._start = length;
+				record._end = length;
 			}
 
 			this.applyRecord( record );
@@ -813,19 +813,19 @@ export class RichText extends Component {
 		return value;
 	}
 
-	valueToFormat( { formats, text } ) {
+	valueToFormat( { _formats, _text } ) {
 		const { format, multiline } = this.props;
 
 		// Handle deprecated `children` and `node` sources.
 		if ( this.usedDeprecatedChildrenSource ) {
-			return children.fromDOM( unstableToDom( { formats, text }, multiline ).body.childNodes );
+			return children.fromDOM( unstableToDom( { _formats, _text }, multiline ).body.childNodes );
 		}
 
 		if ( format === 'string' ) {
-			return toHTMLString( { formats, text }, multiline );
+			return toHTMLString( { _formats, _text }, multiline );
 		}
 
-		return { formats, text };
+		return { _formats, _text };
 	}
 
 	render() {

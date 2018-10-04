@@ -5,7 +5,7 @@
         "isValid": true,
         "attributes": {
             "content": {
-                "formats": [
+                "_formats": [
                     null,
                     null,
                     null,
@@ -65,7 +65,7 @@
                     null,
                     null
                 ],
-                "text": "A picture is worth a thousand words, or so the saying goes"
+                "_text": "A picture is worth a thousand words, or so the saying goes"
             },
             "level": 2
         },

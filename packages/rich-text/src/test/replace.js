@@ -15,60 +15,60 @@ describe( 'replace', () => {
 
 	it( 'should replace string to string', () => {
 		const record = {
-			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
-			text: 'one two three',
-			start: 6,
-			end: 6,
+			_formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			_text: 'one two three',
+			_start: 6,
+			_end: 6,
 		};
 		const expected = {
-			formats: [ , , , , [ em ], , , , , , , ],
-			text: 'one 2 three',
-			start: 5,
-			end: 5,
+			_formats: [ , , , , [ em ], , , , , , , ],
+			_text: 'one 2 three',
+			_start: 5,
+			_end: 5,
 		};
 		const result = replace( deepFreeze( record ), 'two', '2' );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 1 );
+		expect( getSparseArrayLength( result._formats ) ).toBe( 1 );
 	} );
 
 	it( 'should replace string to record', () => {
 		const record = {
-			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
-			text: 'one two three',
-			start: 6,
-			end: 6,
+			_formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			_text: 'one two three',
+			_start: 6,
+			_end: 6,
 		};
 		const replacement = {
-			formats: [ , ],
-			text: '2',
+			_formats: [ , ],
+			_text: '2',
 		};
 		const expected = {
-			formats: [ , , , , , , , , , , , ],
-			text: 'one 2 three',
-			start: 5,
-			end: 5,
+			_formats: [ , , , , , , , , , , , ],
+			_text: 'one 2 three',
+			_start: 5,
+			_end: 5,
 		};
 		const result = replace( deepFreeze( record ), 'two', replacement );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 0 );
+		expect( getSparseArrayLength( result._formats ) ).toBe( 0 );
 	} );
 
 	it( 'should replace string to function', () => {
 		const record = {
-			formats: [ , , , , , , , , , , , , ],
-			text: 'abc12345#$*%',
-			start: 6,
-			end: 6,
+			_formats: [ , , , , , , , , , , , , ],
+			_text: 'abc12345#$*%',
+			_start: 6,
+			_end: 6,
 		};
 		const expected = {
-			formats: [ , , , , , , , , , , , , , , , , , , ],
-			text: 'abc - 12345 - #$*%',
-			start: 18,
-			end: 18,
+			_formats: [ , , , , , , , , , , , , , , , , , , ],
+			_text: 'abc - 12345 - #$*%',
+			_start: 18,
+			_end: 18,
 		};
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace
 		const result = replace( deepFreeze( record ), /([^\d]*)(\d*)([^\w]*)/, ( match, p1, p2, p3 ) => {
@@ -77,6 +77,6 @@ describe( 'replace', () => {
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 0 );
+		expect( getSparseArrayLength( result._formats ) ).toBe( 0 );
 	} );
 } );

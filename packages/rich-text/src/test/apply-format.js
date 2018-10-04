@@ -16,37 +16,37 @@ describe( 'applyFormat', () => {
 
 	it( 'should apply format', () => {
 		const record = {
-			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
-			text: 'one two three',
+			_formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			_text: 'one two three',
 		};
 		const expected = {
-			formats: [ , , , [ strong ], [ em, strong ], [ em, strong ], [ em ], , , , , , , ],
-			text: 'one two three',
+			_formats: [ , , , [ strong ], [ em, strong ], [ em, strong ], [ em ], , , , , , , ],
+			_text: 'one two three',
 		};
 		const result = applyFormat( deepFreeze( record ), strong, 3, 6 );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 4 );
+		expect( getSparseArrayLength( result._formats ) ).toBe( 4 );
 	} );
 
 	it( 'should apply format by selection', () => {
 		const record = {
-			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
-			text: 'one two three',
-			start: 3,
-			end: 6,
+			_formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			_text: 'one two three',
+			_start: 3,
+			_end: 6,
 		};
 		const expected = {
-			formats: [ , , , [ strong ], [ em, strong ], [ em, strong ], [ em ], , , , , , , ],
-			text: 'one two three',
-			start: 3,
-			end: 6,
+			_formats: [ , , , [ strong ], [ em, strong ], [ em, strong ], [ em ], , , , , , , ],
+			_text: 'one two three',
+			_start: 3,
+			_end: 6,
 		};
 		const result = applyFormat( deepFreeze( record ), strong );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 4 );
+		expect( getSparseArrayLength( result._formats ) ).toBe( 4 );
 	} );
 } );

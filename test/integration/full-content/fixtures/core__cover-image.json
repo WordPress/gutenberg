@@ -5,7 +5,7 @@
         "isValid": true,
         "attributes": {
             "title": {
-                "formats": [
+                "_formats": [
                     null,
                     null,
                     null,
@@ -18,7 +18,7 @@
                     null,
                     null
                 ],
-                "text": "Guten Berg!"
+                "_text": "Guten Berg!"
             },
             "url": "https://cldup.com/uuUqE_dXzy.jpg",
             "contentAlign": "center",

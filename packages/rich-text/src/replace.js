@@ -20,8 +20,8 @@ import { normaliseFormats } from './normalise-formats';
  *
  * @return {Object} A new value with replacements applied.
  */
-export function replace( { formats, text, start, end }, pattern, replacement ) {
-	text = text.replace( pattern, ( match, ...rest ) => {
+export function replace( { _formats, _text, _start, _end }, pattern, replacement ) {
+	_text = _text.replace( pattern, ( match, ...rest ) => {
 		const offset = rest[ rest.length - 2 ];
 		let newText = replacement;
 		let newFormats;
@@ -31,24 +31,24 @@ export function replace( { formats, text, start, end }, pattern, replacement ) {
 		}
 
 		if ( typeof newText === 'object' ) {
-			newFormats = newText.formats;
-			newText = newText.text;
+			newFormats = newText._formats;
+			newText = newText._text;
 		} else {
 			newFormats = Array( newText.length );
 
-			if ( formats[ offset ] ) {
-				newFormats = newFormats.fill( formats[ offset ] );
+			if ( _formats[ offset ] ) {
+				newFormats = newFormats.fill( _formats[ offset ] );
 			}
 		}
 
-		formats = formats.slice( 0, offset ).concat( newFormats, formats.slice( offset + match.length ) );
+		_formats = _formats.slice( 0, offset ).concat( newFormats, _formats.slice( offset + match.length ) );
 
-		if ( start ) {
-			start = end = offset + newText.length;
+		if ( _start ) {
+			_start = _end = offset + newText.length;
 		}
 
 		return newText;
 	} );
 
-	return normaliseFormats( { formats, text, start, end } );
+	return normaliseFormats( { _formats, _text, _start, _end } );
 }

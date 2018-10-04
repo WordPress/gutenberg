@@ -16,33 +16,33 @@ describe( 'removeFormat', () => {
 
 	it( 'should remove format', () => {
 		const record = {
-			formats: [ , , , [ strong ], [ em, strong ], [ em, strong ], [ em ], , , , , , , ],
-			text: 'one two three',
+			_formats: [ , , , [ strong ], [ em, strong ], [ em, strong ], [ em ], , , , , , , ],
+			_text: 'one two three',
 		};
 		const expected = {
-			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
-			text: 'one two three',
+			_formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			_text: 'one two three',
 		};
 		const result = removeFormat( deepFreeze( record ), 'strong', 3, 6 );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 3 );
+		expect( getSparseArrayLength( result._formats ) ).toBe( 3 );
 	} );
 
 	it( 'should remove format for collased selection', () => {
 		const record = {
-			formats: [ , , , [ strong ], [ em, strong ], [ em, strong ], [ em ], , , , , , , ],
-			text: 'one two three',
+			_formats: [ , , , [ strong ], [ em, strong ], [ em, strong ], [ em ], , , , , , , ],
+			_text: 'one two three',
 		};
 		const expected = {
-			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
-			text: 'one two three',
+			_formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			_text: 'one two three',
 		};
 		const result = removeFormat( deepFreeze( record ), 'strong', 4, 4 );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 3 );
+		expect( getSparseArrayLength( result._formats ) ).toBe( 3 );
 	} );
 } );

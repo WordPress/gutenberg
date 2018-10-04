@@ -15,10 +15,10 @@ import { find } from 'lodash';
  *
  * @return {?Object} Active format object of the specified type, or undefined.
  */
-export function getActiveFormat( { formats, start }, formatType ) {
-	if ( start === undefined ) {
+export function getActiveFormat( { _formats, _start }, formatType ) {
+	if ( _start === undefined ) {
 		return;
 	}
 
-	return find( formats[ start ], { type: formatType } );
+	return find( _formats[ _start ], { type: formatType } );
 }

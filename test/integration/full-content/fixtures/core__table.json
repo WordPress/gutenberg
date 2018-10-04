@@ -10,7 +10,7 @@
                     "cells": [
                         {
                             "content": {
-                                "formats": [
+                                "_formats": [
                                     null,
                                     null,
                                     null,
@@ -19,13 +19,13 @@
                                     null,
                                     null
                                 ],
-                                "text": "Version"
+                                "_text": "Version"
                             },
                             "tag": "th"
                         },
                         {
                             "content": {
-                                "formats": [
+                                "_formats": [
                                     null,
                                     null,
                                     null,
@@ -35,19 +35,19 @@
                                     null,
                                     null
                                 ],
-                                "text": "Musician"
+                                "_text": "Musician"
                             },
                             "tag": "th"
                         },
                         {
                             "content": {
-                                "formats": [
+                                "_formats": [
                                     null,
                                     null,
                                     null,
                                     null
                                 ],
-                                "text": "Date"
+                                "_text": "Date"
                             },
                             "tag": "th"
                         }
@@ -59,7 +59,7 @@
                     "cells": [
                         {
                             "content": {
-                                "formats": [
+                                "_formats": [
                                     [
                                         {
                                             "type": "a",
@@ -85,13 +85,13 @@
                                         }
                                     ]
                                 ],
-                                "text": ".70"
+                                "_text": ".70"
                             },
                             "tag": "td"
                         },
                         {
                             "content": {
-                                "formats": [
+                                "_formats": [
                                     null,
                                     null,
                                     null,
@@ -112,13 +112,13 @@
                                     null,
                                     null
                                 ],
-                                "text": "No musician chosen."
+                                "_text": "No musician chosen."
                             },
                             "tag": "td"
                         },
                         {
                             "content": {
-                                "formats": [
+                                "_formats": [
                                     null,
                                     null,
                                     null,
@@ -132,7 +132,7 @@
                                     null,
                                     null
                                 ],
-                                "text": "May 27, 2003"
+                                "_text": "May 27, 2003"
                             },
                             "tag": "td"
                         }
@@ -142,7 +142,7 @@
                     "cells": [
                         {
                             "content": {
-                                "formats": [
+                                "_formats": [
                                     [
                                         {
                                             "type": "a",
@@ -168,13 +168,13 @@
                                         }
                                     ]
                                 ],
-                                "text": "1.0"
+                                "_text": "1.0"
                             },
                             "tag": "td"
                         },
                         {
                             "content": {
-                                "formats": [
+                                "_formats": [
                                     null,
                                     null,
                                     null,
@@ -187,13 +187,13 @@
                                     null,
                                     null
                                 ],
-                                "text": "Miles Davis"
+                                "_text": "Miles Davis"
                             },
                             "tag": "td"
                         },
                         {
                             "content": {
-                                "formats": [
+                                "_formats": [
                                     null,
                                     null,
                                     null,
@@ -210,7 +210,7 @@
                                     null,
                                     null
                                 ],
-                                "text": "January 3, 2004"
+                                "_text": "January 3, 2004"
                             },
                             "tag": "td"
                         }
@@ -220,7 +220,7 @@
                     "cells": [
                         {
                             "content": {
-                                "formats": [
+                                "_formats": [
                                     null,
                                     null,
                                     null,
@@ -356,25 +356,25 @@
                                         }
                                     ]
                                 ],
-                                "text": "Lots of versions skipped, see the full list"
+                                "_text": "Lots of versions skipped, see the full list"
                             },
                             "tag": "td"
                         },
                         {
                             "content": {
-                                "formats": [
+                                "_formats": [
                                     null
                                 ],
-                                "text": "…"
+                                "_text": "…"
                             },
                             "tag": "td"
                         },
                         {
                             "content": {
-                                "formats": [
+                                "_formats": [
                                     null
                                 ],
-                                "text": "…"
+                                "_text": "…"
                             },
                             "tag": "td"
                         }
@@ -384,7 +384,7 @@
                     "cells": [
                         {
                             "content": {
-                                "formats": [
+                                "_formats": [
                                     [
                                         {
                                             "type": "a",
@@ -410,13 +410,13 @@
                                         }
                                     ]
                                 ],
-                                "text": "4.4"
+                                "_text": "4.4"
                             },
                             "tag": "td"
                         },
                         {
                             "content": {
-                                "formats": [
+                                "_formats": [
                                     null,
                                     null,
                                     null,
@@ -432,13 +432,13 @@
                                     null,
                                     null
                                 ],
-                                "text": "Clifford Brown"
+                                "_text": "Clifford Brown"
                             },
                             "tag": "td"
                         },
                         {
                             "content": {
-                                "formats": [
+                                "_formats": [
                                     null,
                                     null,
                                     null,
@@ -456,7 +456,7 @@
                                     null,
                                     null
                                 ],
-                                "text": "December 8, 2015"
+                                "_text": "December 8, 2015"
                             },
                             "tag": "td"
                         }
@@ -466,7 +466,7 @@
                     "cells": [
                         {
                             "content": {
-                                "formats": [
+                                "_formats": [
                                     [
                                         {
                                             "type": "a",
@@ -492,13 +492,13 @@
                                         }
                                     ]
                                 ],
-                                "text": "4.5"
+                                "_text": "4.5"
                             },
                             "tag": "td"
                         },
                         {
                             "content": {
-                                "formats": [
+                                "_formats": [
                                     null,
                                     null,
                                     null,
@@ -515,13 +515,13 @@
                                     null,
                                     null
                                 ],
-                                "text": "Coleman Hawkins"
+                                "_text": "Coleman Hawkins"
                             },
                             "tag": "td"
                         },
                         {
                             "content": {
-                                "formats": [
+                                "_formats": [
                                     null,
                                     null,
                                     null,
@@ -537,7 +537,7 @@
                                     null,
                                     null
                                 ],
-                                "text": "April 12, 2016"
+                                "_text": "April 12, 2016"
                             },
                             "tag": "td"
                         }
@@ -547,7 +547,7 @@
                     "cells": [
                         {
                             "content": {
-                                "formats": [
+                                "_formats": [
                                     [
                                         {
                                             "type": "a",
@@ -573,13 +573,13 @@
                                         }
                                     ]
                                 ],
-                                "text": "4.6"
+                                "_text": "4.6"
                             },
                             "tag": "td"
                         },
                         {
                             "content": {
-                                "formats": [
+                                "_formats": [
                                     null,
                                     null,
                                     null,
@@ -593,13 +593,13 @@
                                     null,
                                     null
                                 ],
-                                "text": "Pepper Adams"
+                                "_text": "Pepper Adams"
                             },
                             "tag": "td"
                         },
                         {
                             "content": {
-                                "formats": [
+                                "_formats": [
                                     null,
                                     null,
                                     null,
@@ -616,7 +616,7 @@
                                     null,
                                     null
                                 ],
-                                "text": "August 16, 2016"
+                                "_text": "August 16, 2016"
                             },
                             "tag": "td"
                         }
@@ -626,7 +626,7 @@
                     "cells": [
                         {
                             "content": {
-                                "formats": [
+                                "_formats": [
                                     [
                                         {
                                             "type": "a",
@@ -652,13 +652,13 @@
                                         }
                                     ]
                                 ],
-                                "text": "4.7"
+                                "_text": "4.7"
                             },
                             "tag": "td"
                         },
                         {
                             "content": {
-                                "formats": [
+                                "_formats": [
                                     null,
                                     null,
                                     null,
@@ -673,13 +673,13 @@
                                     null,
                                     null
                                 ],
-                                "text": "Sarah Vaughan"
+                                "_text": "Sarah Vaughan"
                             },
                             "tag": "td"
                         },
                         {
                             "content": {
-                                "formats": [
+                                "_formats": [
                                     null,
                                     null,
                                     null,
@@ -697,7 +697,7 @@
                                     null,
                                     null
                                 ],
-                                "text": "December 6, 2016"
+                                "_text": "December 6, 2016"
                             },
                             "tag": "td"
                         }

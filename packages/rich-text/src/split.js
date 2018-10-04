@@ -15,33 +15,33 @@ import { replace } from './replace';
  *
  * @return {Array} An array of new values.
  */
-export function split( { formats, text, start, end }, string ) {
+export function split( { _formats, _text, _start, _end }, string ) {
 	if ( typeof string !== 'string' ) {
 		return splitAtSelection( ...arguments );
 	}
 
 	let nextStart = 0;
 
-	return text.split( string ).map( ( substring ) => {
+	return _text.split( string ).map( ( substring ) => {
 		const startIndex = nextStart;
 		const value = {
-			formats: formats.slice( startIndex, startIndex + substring.length ),
-			text: substring,
+			_formats: _formats.slice( startIndex, startIndex + substring.length ),
+			_text: substring,
 		};
 
 		nextStart += string.length + substring.length;
 
-		if ( start !== undefined && end !== undefined ) {
-			if ( start > startIndex && start < nextStart ) {
-				value.start = start - startIndex;
-			} else if ( start < startIndex && end > startIndex ) {
-				value.start = 0;
+		if ( _start !== undefined && _end !== undefined ) {
+			if ( _start > startIndex && _start < nextStart ) {
+				value._start = _start - startIndex;
+			} else if ( _start < startIndex && _end > startIndex ) {
+				value._start = 0;
 			}
 
-			if ( end > startIndex && end < nextStart ) {
-				value.end = end - startIndex;
-			} else if ( start < nextStart && end > nextStart ) {
-				value.end = substring.length;
+			if ( _end > startIndex && _end < nextStart ) {
+				value._end = _end - startIndex;
+			} else if ( _start < nextStart && _end > nextStart ) {
+				value._end = substring.length;
 			}
 		}
 
@@ -50,19 +50,19 @@ export function split( { formats, text, start, end }, string ) {
 }
 
 function splitAtSelection(
-	{ formats, text, start, end },
-	startIndex = start,
-	endIndex = end
+	{ _formats, _text, _start, _end },
+	startIndex = _start,
+	endIndex = _end
 ) {
 	const before = {
-		formats: formats.slice( 0, startIndex ),
-		text: text.slice( 0, startIndex ),
+		_formats: _formats.slice( 0, startIndex ),
+		_text: _text.slice( 0, startIndex ),
 	};
 	const after = {
-		formats: formats.slice( endIndex ),
-		text: text.slice( endIndex ),
-		start: 0,
-		end: 0,
+		_formats: _formats.slice( endIndex ),
+		_text: _text.slice( endIndex ),
+		_start: 0,
+		_end: 0,
 	};
 
 	return [

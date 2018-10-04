@@ -23,12 +23,12 @@ import { normaliseFormats } from './normalise-formats';
  * @return {Object} A new value with the format applied.
  */
 export function removeFormat(
-	{ formats, text, start, end },
+	{ _formats, _text, _start, _end },
 	formatType,
-	startIndex = start,
-	endIndex = end
+	startIndex = _start,
+	endIndex = _end
 ) {
-	const newFormats = formats.slice( 0 );
+	const newFormats = _formats.slice( 0 );
 
 	// If the selection is collapsed, expand start and end to the edges of the
 	// format.
@@ -54,7 +54,7 @@ export function removeFormat(
 		}
 	}
 
-	return normaliseFormats( { formats: newFormats, text, start, end } );
+	return normaliseFormats( { _formats: newFormats, _text, _start, _end } );
 }
 
 function filterFormats( formats, index, formatType ) {

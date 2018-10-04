@@ -5,7 +5,7 @@
         "isValid": true,
         "attributes": {
             "content": {
-                "formats": [
+                "_formats": [
                     null,
                     null,
                     null,
@@ -52,7 +52,7 @@
                     null,
                     null
                 ],
-                "text": "Unwrapped is still valid."
+                "_text": "Unwrapped is still valid."
             },
             "dropCap": false
         },

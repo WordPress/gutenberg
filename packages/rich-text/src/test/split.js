@@ -15,21 +15,21 @@ describe( 'split', () => {
 
 	it( 'should split', () => {
 		const record = {
-			start: 5,
-			end: 10,
-			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
-			text: 'one two three',
+			_start: 5,
+			_end: 10,
+			_formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			_text: 'one two three',
 		};
 		const expected = [
 			{
-				formats: [ , , , , [ em ], [ em ] ],
-				text: 'one tw',
+				_formats: [ , , , , [ em ], [ em ] ],
+				_text: 'one tw',
 			},
 			{
-				start: 0,
-				end: 0,
-				formats: [ [ em ], , , , , , , ],
-				text: 'o three',
+				_start: 0,
+				_end: 0,
+				_formats: [ [ em ], , , , , , , ],
+				_text: 'o three',
 			},
 		];
 		const result = split( deepFreeze( record ), 6, 6 );
@@ -37,28 +37,28 @@ describe( 'split', () => {
 		expect( result ).toEqual( expected );
 		result.forEach( ( item, index ) => {
 			expect( item ).not.toBe( record );
-			expect( getSparseArrayLength( item.formats ) )
-				.toBe( getSparseArrayLength( expected[ index ].formats ) );
+			expect( getSparseArrayLength( item._formats ) )
+				.toBe( getSparseArrayLength( expected[ index ]._formats ) );
 		} );
 	} );
 
 	it( 'should split with selection', () => {
 		const record = {
-			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
-			text: 'one two three',
-			start: 6,
-			end: 6,
+			_formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			_text: 'one two three',
+			_start: 6,
+			_end: 6,
 		};
 		const expected = [
 			{
-				formats: [ , , , , [ em ], [ em ] ],
-				text: 'one tw',
+				_formats: [ , , , , [ em ], [ em ] ],
+				_text: 'one tw',
 			},
 			{
-				formats: [ [ em ], , , , , , , ],
-				text: 'o three',
-				start: 0,
-				end: 0,
+				_formats: [ [ em ], , , , , , , ],
+				_text: 'o three',
+				_start: 0,
+				_end: 0,
 			},
 		];
 		const result = split( deepFreeze( record ) );
@@ -66,28 +66,28 @@ describe( 'split', () => {
 		expect( result ).toEqual( expected );
 		result.forEach( ( item, index ) => {
 			expect( item ).not.toBe( record );
-			expect( getSparseArrayLength( item.formats ) )
-				.toBe( getSparseArrayLength( expected[ index ].formats ) );
+			expect( getSparseArrayLength( item._formats ) )
+				.toBe( getSparseArrayLength( expected[ index ]._formats ) );
 		} );
 	} );
 
 	it( 'should split empty', () => {
 		const record = {
-			formats: [],
-			text: '',
-			start: 0,
-			end: 0,
+			_formats: [],
+			_text: '',
+			_start: 0,
+			_end: 0,
 		};
 		const expected = [
 			{
-				formats: [],
-				text: '',
+				_formats: [],
+				_text: '',
 			},
 			{
-				formats: [],
-				text: '',
-				start: 0,
-				end: 0,
+				_formats: [],
+				_text: '',
+				_start: 0,
+				_end: 0,
 			},
 		];
 		const result = split( deepFreeze( record ) );
@@ -95,28 +95,28 @@ describe( 'split', () => {
 		expect( result ).toEqual( expected );
 		result.forEach( ( item, index ) => {
 			expect( item ).not.toBe( record );
-			expect( getSparseArrayLength( item.formats ) )
-				.toBe( getSparseArrayLength( expected[ index ].formats ) );
+			expect( getSparseArrayLength( item._formats ) )
+				.toBe( getSparseArrayLength( expected[ index ]._formats ) );
 		} );
 	} );
 
 	it( 'should split multiline', () => {
 		const record = {
-			formats: [ , , , , , , , , , , ],
-			text: 'test\u2028\u2028test',
-			start: 5,
-			end: 5,
+			_formats: [ , , , , , , , , , , ],
+			_text: 'test\u2028\u2028test',
+			_start: 5,
+			_end: 5,
 		};
 		const expected = [
 			{
-				formats: [ , , , , ],
-				text: 'test',
+				_formats: [ , , , , ],
+				_text: 'test',
 			},
 			{
-				formats: [ , , , , ],
-				text: 'test',
-				start: 0,
-				end: 0,
+				_formats: [ , , , , ],
+				_text: 'test',
+				_start: 0,
+				_end: 0,
 			},
 		];
 		const result = split( deepFreeze( record ) );
@@ -124,44 +124,44 @@ describe( 'split', () => {
 		expect( result ).toEqual( expected );
 		result.forEach( ( item, index ) => {
 			expect( item ).not.toBe( record );
-			expect( getSparseArrayLength( item.formats ) )
-				.toBe( getSparseArrayLength( expected[ index ].formats ) );
+			expect( getSparseArrayLength( item._formats ) )
+				.toBe( getSparseArrayLength( expected[ index ]._formats ) );
 		} );
 	} );
 
 	it( 'should split search', () => {
 		const record = {
-			start: 6,
-			end: 16,
-			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , , , , , , , , , , , ],
-			text: 'one two three four five',
+			_start: 6,
+			_end: 16,
+			_formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , , , , , , , , , , , ],
+			_text: 'one two three four five',
 		};
 		const expected = [
 			{
-				formats: [ , , , ],
-				text: 'one',
+				_formats: [ , , , ],
+				_text: 'one',
 			},
 			{
-				start: 2,
-				end: 3,
-				formats: [ [ em ], [ em ], [ em ] ],
-				text: 'two',
+				_start: 2,
+				_end: 3,
+				_formats: [ [ em ], [ em ], [ em ] ],
+				_text: 'two',
 			},
 			{
-				start: 0,
-				end: 5,
-				formats: [ , , , , , ],
-				text: 'three',
+				_start: 0,
+				_end: 5,
+				_formats: [ , , , , , ],
+				_text: 'three',
 			},
 			{
-				start: 0,
-				end: 2,
-				formats: [ , , , , ],
-				text: 'four',
+				_start: 0,
+				_end: 2,
+				_formats: [ , , , , ],
+				_text: 'four',
 			},
 			{
-				formats: [ , , , , ],
-				text: 'five',
+				_formats: [ , , , , ],
+				_text: 'five',
 			},
 		];
 		const result = split( deepFreeze( record ), ' ' );
@@ -169,32 +169,32 @@ describe( 'split', () => {
 		expect( result ).toEqual( expected );
 		result.forEach( ( item, index ) => {
 			expect( item ).not.toBe( record );
-			expect( getSparseArrayLength( item.formats ) )
-				.toBe( getSparseArrayLength( expected[ index ].formats ) );
+			expect( getSparseArrayLength( item._formats ) )
+				.toBe( getSparseArrayLength( expected[ index ]._formats ) );
 		} );
 	} );
 
 	it( 'should split search 2', () => {
 		const record = {
-			start: 5,
-			end: 6,
-			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
-			text: 'one two three',
+			_start: 5,
+			_end: 6,
+			_formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			_text: 'one two three',
 		};
 		const expected = [
 			{
-				formats: [ , , , ],
-				text: 'one',
+				_formats: [ , , , ],
+				_text: 'one',
 			},
 			{
-				start: 1,
-				end: 2,
-				formats: [ [ em ], [ em ], [ em ] ],
-				text: 'two',
+				_start: 1,
+				_end: 2,
+				_formats: [ [ em ], [ em ], [ em ] ],
+				_text: 'two',
 			},
 			{
-				formats: [ , , , , , ],
-				text: 'three',
+				_formats: [ , , , , , ],
+				_text: 'three',
 			},
 		];
 		const result = split( deepFreeze( record ), ' ' );
@@ -202,8 +202,8 @@ describe( 'split', () => {
 		expect( result ).toEqual( expected );
 		result.forEach( ( item, index ) => {
 			expect( item ).not.toBe( record );
-			expect( getSparseArrayLength( item.formats ) )
-				.toBe( getSparseArrayLength( expected[ index ].formats ) );
+			expect( getSparseArrayLength( item._formats ) )
+				.toBe( getSparseArrayLength( expected[ index ]._formats ) );
 		} );
 	} );
 } );

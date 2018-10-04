@@ -5,7 +5,7 @@
         "isValid": true,
         "attributes": {
             "value": {
-                "formats": [
+                "_formats": [
                     null,
                     null,
                     null,
@@ -73,10 +73,10 @@
                     null,
                     null
                 ],
-                "text": "There is no greater agony than bearing an untold story inside you."
+                "_text": "There is no greater agony than bearing an untold story inside you."
             },
             "citation": {
-                "formats": [
+                "_formats": [
                     null,
                     null,
                     null,
@@ -90,7 +90,7 @@
                     null,
                     null
                 ],
-                "text": "Maya Angelou"
+                "_text": "Maya Angelou"
             },
             "className": "is-style-large"
         },

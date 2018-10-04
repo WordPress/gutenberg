@@ -17,16 +17,16 @@ import { normaliseFormats } from './normalise-formats';
  * @return {Object} A new value with the format applied.
  */
 export function applyFormat(
-	{ formats, text, start, end },
+	{ _formats, _text, _start, _end },
 	format,
-	startIndex = start,
-	endIndex = end
+	startIndex = _start,
+	endIndex = _end
 ) {
-	const newFormats = formats.slice( 0 );
+	const newFormats = _formats.slice( 0 );
 
 	for ( let index = startIndex; index < endIndex; index++ ) {
-		if ( formats[ index ] ) {
-			const newFormatsAtIndex = formats[ index ].filter( ( { type } ) => type !== format.type );
+		if ( newFormats[ index ] ) {
+			const newFormatsAtIndex = newFormats[ index ].filter( ( { type } ) => type !== format.type );
 			newFormatsAtIndex.push( format );
 			newFormats[ index ] = newFormatsAtIndex;
 		} else {
@@ -34,5 +34,5 @@ export function applyFormat(
 		}
 	}
 
-	return normaliseFormats( { formats: newFormats, text, start, end } );
+	return normaliseFormats( { _formats: newFormats, _text, _start, _end } );
 }

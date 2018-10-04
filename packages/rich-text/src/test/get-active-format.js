@@ -9,10 +9,10 @@ describe( 'getActiveFormat', () => {
 
 	it( 'should get format by selection', () => {
 		const record = {
-			formats: [ [ em ], , , ],
-			text: 'one',
-			start: 0,
-			end: 0,
+			_formats: [ [ em ], , , ],
+			_text: 'one',
+			_start: 0,
+			_end: 0,
 		};
 
 		expect( getActiveFormat( record, 'em' ) ).toEqual( em );
@@ -20,10 +20,10 @@ describe( 'getActiveFormat', () => {
 
 	it( 'should get format by selection using the start', () => {
 		const record = {
-			formats: [ [ em ], , [ em ] ],
-			text: 'one',
-			start: 1,
-			end: 1,
+			_formats: [ [ em ], , [ em ] ],
+			_text: 'one',
+			_start: 1,
+			_end: 1,
 		};
 
 		expect( getActiveFormat( record, 'em' ) ).toBe( undefined );

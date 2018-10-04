@@ -152,8 +152,8 @@ describe( 'block factory', () => {
 
 			expect( block.attributes ).toEqual( {
 				content: {
-					formats: [ , , , , ],
-					text: 'test',
+					_formats: [ , , , , ],
+					_text: 'test',
 				},
 			} );
 		} );

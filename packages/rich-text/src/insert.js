@@ -19,21 +19,21 @@ import { normaliseFormats } from './normalise-formats';
  * @return {Object} A new value with the value inserted.
  */
 export function insert(
-	{ formats, text, start, end },
+	{ _formats, _text, _start, _end },
 	valueToInsert,
-	startIndex = start,
-	endIndex = end
+	startIndex = _start,
+	endIndex = _end
 ) {
 	if ( typeof valueToInsert === 'string' ) {
 		valueToInsert = create( { text: valueToInsert } );
 	}
 
-	const index = startIndex + valueToInsert.text.length;
+	const index = startIndex + valueToInsert._text.length;
 
 	return normaliseFormats( {
-		formats: formats.slice( 0, startIndex ).concat( valueToInsert.formats, formats.slice( endIndex ) ),
-		text: text.slice( 0, startIndex ) + valueToInsert.text + text.slice( endIndex ),
-		start: index,
-		end: index,
+		_formats: _formats.slice( 0, startIndex ).concat( valueToInsert._formats, _formats.slice( endIndex ) ),
+		_text: _text.slice( 0, startIndex ) + valueToInsert._text + _text.slice( endIndex ),
+		_start: index,
+		_end: index,
 	} );
 }

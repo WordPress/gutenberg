@@ -161,7 +161,7 @@ export function apply( value, current, multilineTag ) {
 
 	applyValue( body, current );
 
-	if ( value.start !== undefined ) {
+	if ( value._start !== undefined ) {
 		applySelection( selection, current );
 	}
 }

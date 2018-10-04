@@ -40,10 +40,10 @@ describe( 'create', () => {
 				endContainer: element,
 			} ),
 			record: {
-				start: 0,
-				end: 0,
-				formats: [],
-				text: '',
+				_start: 0,
+				_end: 0,
+				_formats: [],
+				_text: '',
 			},
 		},
 		{
@@ -56,10 +56,10 @@ describe( 'create', () => {
 				endContainer: element,
 			} ),
 			record: {
-				start: 0,
-				end: 0,
-				formats: [],
-				text: '',
+				_start: 0,
+				_end: 0,
+				_formats: [],
+				_text: '',
 			},
 		},
 		{
@@ -72,10 +72,10 @@ describe( 'create', () => {
 				endContainer: element,
 			} ),
 			record: {
-				start: 0,
-				end: 0,
-				formats: [],
-				text: '',
+				_start: 0,
+				_end: 0,
+				_formats: [],
+				_text: '',
 			},
 		},
 		{
@@ -88,10 +88,10 @@ describe( 'create', () => {
 				endContainer: element.firstChild,
 			} ),
 			record: {
-				start: 0,
-				end: 4,
-				formats: [ , , , , ],
-				text: 'test',
+				_start: 0,
+				_end: 4,
+				_formats: [ , , , , ],
+				_text: 'test',
 			},
 		},
 		{
@@ -104,10 +104,10 @@ describe( 'create', () => {
 				endContainer: element,
 			} ),
 			record: {
-				start: 0,
-				end: 2,
-				formats: [ , , ],
-				text: '🍒',
+				_start: 0,
+				_end: 2,
+				_formats: [ , , ],
+				_text: '🍒',
 			},
 		},
 		{
@@ -120,10 +120,10 @@ describe( 'create', () => {
 				endContainer: element,
 			} ),
 			record: {
-				start: 0,
-				end: 2,
-				formats: [ [ em ], [ em ] ],
-				text: '🍒',
+				_start: 0,
+				_end: 2,
+				_formats: [ [ em ], [ em ] ],
+				_text: '🍒',
 			},
 		},
 		{
@@ -136,10 +136,10 @@ describe( 'create', () => {
 				endContainer: element.firstChild,
 			} ),
 			record: {
-				start: 0,
-				end: 4,
-				formats: [ [ em ], [ em ], [ em ], [ em ] ],
-				text: 'test',
+				_start: 0,
+				_end: 4,
+				_formats: [ [ em ], [ em ], [ em ], [ em ] ],
+				_text: 'test',
 			},
 		},
 		{
@@ -152,10 +152,10 @@ describe( 'create', () => {
 				endContainer: element,
 			} ),
 			record: {
-				start: 0,
-				end: 4,
-				formats: [ [ em, strong ], [ em, strong ], [ em, strong ], [ em, strong ] ],
-				text: 'test',
+				_start: 0,
+				_end: 4,
+				_formats: [ [ em, strong ], [ em, strong ], [ em, strong ], [ em, strong ] ],
+				_text: 'test',
 			},
 		},
 		{
@@ -168,10 +168,10 @@ describe( 'create', () => {
 				endContainer: element.querySelector( 'em' ),
 			} ),
 			record: {
-				start: 0,
-				end: 2,
-				formats: [ [ em ], [ em ], [ em ], [ em ] ],
-				text: 'test',
+				_start: 0,
+				_end: 2,
+				_formats: [ [ em ], [ em ], [ em ], [ em ] ],
+				_text: 'test',
 			},
 		},
 		{
@@ -184,10 +184,10 @@ describe( 'create', () => {
 				endContainer: element,
 			} ),
 			record: {
-				start: 0,
-				end: 4,
-				formats: [ [ a ], [ a ], [ a ], [ a ] ],
-				text: 'test',
+				_start: 0,
+				_end: 4,
+				_formats: [ [ a ], [ a ], [ a ], [ a ] ],
+				_text: 'test',
 			},
 		},
 		{
@@ -200,10 +200,10 @@ describe( 'create', () => {
 				endContainer: element,
 			} ),
 			record: {
-				start: 0,
-				end: 0,
-				formats: [ [ img ] ],
-				text: '\ufffc',
+				_start: 0,
+				_end: 0,
+				_formats: [ [ img ] ],
+				_text: '\ufffc',
 			},
 		},
 		{
@@ -216,10 +216,10 @@ describe( 'create', () => {
 				endContainer: element.querySelector( 'img' ),
 			} ),
 			record: {
-				start: 0,
-				end: 1,
-				formats: [ [ em, img ] ],
-				text: '\ufffc',
+				_start: 0,
+				_end: 1,
+				_formats: [ [ em, img ] ],
+				_text: '\ufffc',
 			},
 		},
 		{
@@ -232,10 +232,10 @@ describe( 'create', () => {
 				endContainer: element,
 			} ),
 			record: {
-				start: 0,
-				end: 5,
-				formats: [ , , [ em ], [ em ], [ em, img ] ],
-				text: 'test\ufffc',
+				_start: 0,
+				_end: 5,
+				_formats: [ , , [ em ], [ em ], [ em, img ] ],
+				_text: 'test\ufffc',
 			},
 		},
 		{
@@ -248,10 +248,10 @@ describe( 'create', () => {
 				endContainer: element,
 			} ),
 			record: {
-				start: 0,
-				end: 5,
-				formats: [ [ em, img ], [ em ], [ em ], , , ],
-				text: '\ufffctest',
+				_start: 0,
+				_end: 5,
+				_formats: [ [ em, img ], [ em ], [ em ], , , ],
+				_text: '\ufffctest',
 			},
 		},
 		{
@@ -264,10 +264,10 @@ describe( 'create', () => {
 				endContainer: element,
 			} ),
 			record: {
-				start: 0,
-				end: 0,
-				formats: [ , ],
-				text: '\n',
+				_start: 0,
+				_end: 0,
+				_formats: [ , ],
+				_text: '\n',
 			},
 		},
 		{
@@ -280,10 +280,10 @@ describe( 'create', () => {
 				endContainer: element,
 			} ),
 			record: {
-				start: 2,
-				end: 2,
-				formats: [ , , , , , ],
-				text: 'te\nst',
+				_start: 2,
+				_end: 2,
+				_formats: [ , , , , , ],
+				_text: 'te\nst',
 			},
 		},
 		{
@@ -296,10 +296,10 @@ describe( 'create', () => {
 				endContainer: element,
 			} ),
 			record: {
-				start: 0,
-				end: 1,
-				formats: [ [ em ] ],
-				text: '\n',
+				_start: 0,
+				_end: 1,
+				_formats: [ [ em ] ],
+				_text: '\n',
 			},
 		},
 		{
@@ -313,10 +313,10 @@ describe( 'create', () => {
 				endContainer: element.lastChild,
 			} ),
 			record: {
-				start: 1,
-				end: 4,
-				formats: [ , , , , , , , ],
-				text: 'one\u2028two',
+				_start: 1,
+				_end: 4,
+				_formats: [ , , , , , , , ],
+				_text: 'one\u2028two',
 			},
 		},
 		{
@@ -330,10 +330,10 @@ describe( 'create', () => {
 				endContainer: element,
 			} ),
 			record: {
-				start: 0,
-				end: 6,
-				formats: [ , , , list, list, list, , , , , , , ],
-				text: 'onetwo\u2028three',
+				_start: 0,
+				_end: 6,
+				_formats: [ , , , list, list, list, , , , , , , ],
+				_text: 'onetwo\u2028three',
 			},
 		},
 		{
@@ -347,10 +347,10 @@ describe( 'create', () => {
 				endContainer: element.lastChild,
 			} ),
 			record: {
-				start: 4,
-				end: 4,
-				formats: [ , , , , ],
-				text: 'one\u2028',
+				_start: 4,
+				_end: 4,
+				_formats: [ , , , , ],
+				_text: 'one\u2028',
 			},
 		},
 		{
@@ -366,10 +366,10 @@ describe( 'create', () => {
 				endContainer: element,
 			} ),
 			record: {
-				start: 0,
-				end: 0,
-				formats: [],
-				text: '',
+				_start: 0,
+				_end: 0,
+				_formats: [],
+				_text: '',
 			},
 		},
 		{
@@ -385,10 +385,10 @@ describe( 'create', () => {
 				endContainer: element,
 			} ),
 			record: {
-				start: 0,
-				end: 0,
-				formats: [],
-				text: '',
+				_start: 0,
+				_end: 0,
+				_formats: [],
+				_text: '',
 			},
 		},
 		{
@@ -404,10 +404,10 @@ describe( 'create', () => {
 				endContainer: element,
 			} ),
 			record: {
-				start: 0,
-				end: 4,
-				formats: [ , , [ em ], [ em ] ],
-				text: 'test',
+				_start: 0,
+				_end: 4,
+				_formats: [ , , [ em ], [ em ] ],
+				_text: 'test',
 			},
 		},
 		{
@@ -423,10 +423,10 @@ describe( 'create', () => {
 				endContainer: element.lastChild,
 			} ),
 			record: {
-				start: 0,
-				end: 1,
-				formats: [ , , , ],
-				text: 'two',
+				_start: 0,
+				_end: 1,
+				_formats: [ , , , ],
+				_text: 'two',
 			},
 		},
 		{
@@ -442,10 +442,10 @@ describe( 'create', () => {
 				endContainer: element,
 			} ),
 			record: {
-				start: 0,
-				end: 4,
-				formats: [ [ strong ], [ strong ], [ strong ], [ strong ] ],
-				text: 'test',
+				_start: 0,
+				_end: 4,
+				_formats: [ [ strong ], [ strong ], [ strong ], [ strong ] ],
+				_text: 'test',
 			},
 		},
 		{
@@ -461,10 +461,10 @@ describe( 'create', () => {
 				endContainer: element,
 			} ),
 			record: {
-				start: 0,
-				end: 0,
-				formats: [],
-				text: '',
+				_start: 0,
+				_end: 0,
+				_formats: [],
+				_text: '',
 			},
 		},
 		{
@@ -480,10 +480,10 @@ describe( 'create', () => {
 				endContainer: element.firstChild,
 			} ),
 			record: {
-				start: 4,
-				end: 4,
-				formats: [ , , , , ],
-				text: 'test',
+				_start: 4,
+				_end: 4,
+				_formats: [ , , , , ],
+				_text: 'test',
 			},
 		},
 		{
@@ -499,10 +499,10 @@ describe( 'create', () => {
 				endContainer: element.querySelector( 'em' ).firstChild,
 			} ),
 			record: {
-				start: 4,
-				end: 4,
-				formats: [ [ em ], [ em ], [ em ], [ em ] ],
-				text: 'test',
+				_start: 4,
+				_end: 4,
+				_formats: [ [ em ], [ em ], [ em ], [ em ] ],
+				_text: 'test',
 			},
 		},
 		{
@@ -518,10 +518,10 @@ describe( 'create', () => {
 				endContainer: element.lastChild,
 			} ),
 			record: {
-				start: 4,
-				end: 4,
-				formats: [ [ em ], [ em ], [ em ], [ em ] ],
-				text: 'test',
+				_start: 4,
+				_end: 4,
+				_formats: [ [ em ], [ em ], [ em ], [ em ] ],
+				_text: 'test',
 			},
 		},
 	];
@@ -531,8 +531,8 @@ describe( 'create', () => {
 			const element = createElement( html );
 			const range = createRange( element );
 			const createdRecord = create( { element, range, multilineTag, ...settings } );
-			const formatsLength = getSparseArrayLength( record.formats );
-			const createdFormatsLength = getSparseArrayLength( createdRecord.formats );
+			const formatsLength = getSparseArrayLength( record._formats );
+			const createdFormatsLength = getSparseArrayLength( createdRecord._formats );
 
 			expect( createdRecord ).toEqual( record );
 			expect( createdFormatsLength ).toEqual( formatsLength );
@@ -543,22 +543,22 @@ describe( 'create', () => {
 		const value = create( { html: '<em>te<strong>st</strong></em>' } );
 
 		expect( value ).toEqual( {
-			formats: [ [ em ], [ em ], [ em, strong ], [ em, strong ] ],
-			text: 'test',
+			_formats: [ [ em ], [ em ], [ em, strong ], [ em, strong ] ],
+			_text: 'test',
 		} );
 
-		expect( value.formats[ 0 ][ 0 ] ).toBe( value.formats[ 1 ][ 0 ] );
-		expect( value.formats[ 0 ][ 0 ] ).toBe( value.formats[ 2 ][ 0 ] );
-		expect( value.formats[ 2 ][ 1 ] ).toBe( value.formats[ 3 ][ 1 ] );
+		expect( value._formats[ 0 ][ 0 ] ).toBe( value._formats[ 1 ][ 0 ] );
+		expect( value._formats[ 0 ][ 0 ] ).toBe( value._formats[ 2 ][ 0 ] );
+		expect( value._formats[ 2 ][ 1 ] ).toBe( value._formats[ 3 ][ 1 ] );
 	} );
 
 	it( 'should use same reference for equal format', () => {
 		const value = create( { html: '<a href="#">a</a><a href="#">a</a>' } );
-		expect( value.formats[ 0 ][ 0 ] ).toBe( value.formats[ 1 ][ 0 ] );
+		expect( value._formats[ 0 ][ 0 ] ).toBe( value._formats[ 1 ][ 0 ] );
 	} );
 
 	it( 'should use different reference for different format', () => {
 		const value = create( { html: '<a href="#">a</a><a href="#a">a</a>' } );
-		expect( value.formats[ 0 ][ 0 ] ).not.toBe( value.formats[ 1 ][ 0 ] );
+		expect( value._formats[ 0 ][ 0 ] ).not.toBe( value._formats[ 1 ][ 0 ] );
 	} );
 } );

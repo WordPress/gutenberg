@@ -5,7 +5,7 @@
         "isValid": true,
         "attributes": {
             "value": {
-                "formats": [
+                "_formats": [
                     null,
                     null,
                     null,
@@ -33,10 +33,10 @@
                     null,
                     null
                 ],
-                "text": "Testing pullquote block..."
+                "_text": "Testing pullquote block..."
             },
             "citation": {
-                "formats": [
+                "_formats": [
                     null,
                     null,
                     null,
@@ -55,7 +55,7 @@
                     null,
                     null
                 ],
-                "text": "...with a caption"
+                "_text": "...with a caption"
             }
         },
         "innerBlocks": [],

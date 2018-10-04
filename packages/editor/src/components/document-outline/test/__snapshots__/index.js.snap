@@ -17,7 +17,7 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
         tagName="span"
         value={
           Object {
-            "formats": Array [
+            "_formats": Array [
               undefined,
               undefined,
               undefined,
@@ -33,7 +33,7 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
               undefined,
               undefined,
             ],
-            "text": "Heading parent",
+            "_text": "Heading parent",
           }
         }
       />
@@ -50,7 +50,7 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
         tagName="span"
         value={
           Object {
-            "formats": Array [
+            "_formats": Array [
               undefined,
               undefined,
               undefined,
@@ -65,7 +65,7 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
               undefined,
               undefined,
             ],
-            "text": "Heading child",
+            "_text": "Heading child",
           }
         }
       />
@@ -91,7 +91,7 @@ exports[`DocumentOutline header blocks present should render warnings for multip
         tagName="span"
         value={
           Object {
-            "formats": Array [
+            "_formats": Array [
               undefined,
               undefined,
               undefined,
@@ -102,7 +102,7 @@ exports[`DocumentOutline header blocks present should render warnings for multip
               undefined,
               undefined,
             ],
-            "text": "Heading 1",
+            "_text": "Heading 1",
           }
         }
       />
@@ -127,7 +127,7 @@ exports[`DocumentOutline header blocks present should render warnings for multip
         tagName="span"
         value={
           Object {
-            "formats": Array [
+            "_formats": Array [
               undefined,
               undefined,
               undefined,
@@ -138,7 +138,7 @@ exports[`DocumentOutline header blocks present should render warnings for multip
               undefined,
               undefined,
             ],
-            "text": "Heading 1",
+            "_text": "Heading 1",
           }
         }
       />

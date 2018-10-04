@@ -9,10 +9,10 @@
  * @return {?boolean} True if the selection is collapsed, false if not,
  *                    undefined if there is no selection.
  */
-export function isCollapsed( { start, end } ) {
-	if ( start === undefined || end === undefined ) {
+export function isCollapsed( { _start, _end } ) {
+	if ( _start === undefined || _end === undefined ) {
 		return;
 	}
 
-	return start === end;
+	return _start === _end;
 }

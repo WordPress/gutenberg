@@ -5,7 +5,7 @@
         "isValid": true,
         "attributes": {
             "content": {
-                "formats": [
+                "_formats": [
                     null,
                     null,
                     [
@@ -45,7 +45,7 @@
                     null,
                     null
                 ],
-                "text": "A verse…\nAnd more!"
+                "_text": "A verse…\nAnd more!"
             }
         },
         "innerBlocks": [],

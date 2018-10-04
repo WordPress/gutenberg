@@ -6,8 +6,8 @@
         "attributes": {
             "autoplay": false,
             "caption": {
-                "formats": [],
-                "text": ""
+                "_formats": [],
+                "_text": ""
             },
             "controls": true,
             "loop": false,

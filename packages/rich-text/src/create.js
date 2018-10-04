@@ -27,7 +27,7 @@ function createElement( html ) {
 }
 
 function createEmptyValue() {
-	return { formats: [], text: '' };
+	return { _formats: [], _text: '' };
 }
 
 /**
@@ -68,8 +68,8 @@ export function create( {
 } = {} ) {
 	if ( typeof text === 'string' && text.length > 0 ) {
 		return {
-			formats: Array( text.length ),
-			text: text,
+			_formats: Array( text.length ),
+			_text: text,
 		};
 	}
 
@@ -119,34 +119,34 @@ function accumulateSelection( accumulator, node, range, value ) {
 
 	const { parentNode } = node;
 	const { startContainer, startOffset, endContainer, endOffset } = range;
-	const currentLength = accumulator.text.length;
+	const currentLength = accumulator._text.length;
 
 	// Selection can be extracted from value.
-	if ( value.start !== undefined ) {
-		accumulator.start = currentLength + value.start;
+	if ( value._start !== undefined ) {
+		accumulator._start = currentLength + value._start;
 	// Range indicates that the current node has selection.
 	} else if ( node === startContainer ) {
-		accumulator.start = currentLength + startOffset;
+		accumulator._start = currentLength + startOffset;
 	// Range indicates that the current node is selected.
 	} else if (
 		parentNode === startContainer &&
 		node === startContainer.childNodes[ startOffset ]
 	) {
-		accumulator.start = currentLength;
+		accumulator._start = currentLength;
 	}
 
 	// Selection can be extracted from value.
-	if ( value.end !== undefined ) {
-		accumulator.end = currentLength + value.end;
+	if ( value._end !== undefined ) {
+		accumulator._end = currentLength + value._end;
 	// Range indicates that the current node has selection.
 	} else if ( node === endContainer ) {
-		accumulator.end = currentLength + endOffset;
+		accumulator._end = currentLength + endOffset;
 	// Range indicates that the current node is selected.
 	} else if (
 		parentNode === endContainer &&
 		node === endContainer.childNodes[ endOffset - 1 ]
 	) {
-		accumulator.end = currentLength + value.text.length;
+		accumulator._end = currentLength + value._text.length;
 	}
 }
 
@@ -233,13 +233,13 @@ function createFromElement( {
 		const node = element.childNodes[ index ];
 
 		if ( node.nodeType === TEXT_NODE ) {
-			const text = filterStringComplete( node.nodeValue );
+			const _text = filterStringComplete( node.nodeValue );
 			range = filterRange( node, range, filterStringComplete );
-			accumulateSelection( accumulator, node, range, { text } );
-			accumulator.text += text;
+			accumulateSelection( accumulator, node, range, { _text } );
+			accumulator._text += _text;
 			// Create a sparse array of the same length as `text`, in which
 			// formats can be added.
-			accumulator.formats.length += text.length;
+			accumulator._formats.length += _text.length;
 			continue;
 		}
 
@@ -257,12 +257,12 @@ function createFromElement( {
 
 		if ( node.nodeName === 'BR' ) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
-			accumulator.text += '\n';
-			accumulator.formats.length += 1;
+			accumulator._text += '\n';
+			accumulator._formats.length += 1;
 			continue;
 		}
 
-		const lastFormats = accumulator.formats[ accumulator.formats.length - 1 ];
+		const lastFormats = accumulator._formats[ accumulator._formats.length - 1 ];
 		const lastFormat = lastFormats && lastFormats[ lastFormats.length - 1 ];
 		let format;
 
@@ -291,8 +291,8 @@ function createFromElement( {
 			removeAttribute,
 		} );
 
-		const text = value.text;
-		const start = accumulator.text.length;
+		const text = value._text;
+		const start = accumulator._text.length;
 
 		accumulateSelection( accumulator, node, range, value );
 
@@ -301,40 +301,40 @@ function createFromElement( {
 			continue;
 		}
 
-		const { formats } = accumulator;
+		const { _formats } = accumulator;
 
 		if ( format && format.attributes && text.length === 0 ) {
 			format.object = true;
 			// Object replacement character.
-			accumulator.text += '\ufffc';
+			accumulator._text += '\ufffc';
 
-			if ( formats[ start ] ) {
-				formats[ start ].unshift( format );
+			if ( _formats[ start ] ) {
+				_formats[ start ].unshift( format );
 			} else {
-				formats[ start ] = [ format ];
+				_formats[ start ] = [ format ];
 			}
 		} else {
-			accumulator.text += text;
+			accumulator._text += text;
 
-			let i = value.formats.length;
+			let i = value._formats.length;
 
 			// Optimise for speed.
 			while ( i-- ) {
 				const formatIndex = start + i;
 
 				if ( format ) {
-					if ( formats[ formatIndex ] ) {
-						formats[ formatIndex ].push( format );
+					if ( _formats[ formatIndex ] ) {
+						_formats[ formatIndex ].push( format );
 					} else {
-						formats[ formatIndex ] = [ format ];
+						_formats[ formatIndex ] = [ format ];
 					}
 				}
 
-				if ( value.formats[ i ] ) {
-					if ( formats[ formatIndex ] ) {
-						formats[ formatIndex ].push( ...value.formats[ i ] );
+				if ( value._formats[ i ] ) {
+					if ( _formats[ formatIndex ] ) {
+						_formats[ formatIndex ].push( ...value._formats[ i ] );
 					} else {
-						formats[ formatIndex ] = value.formats[ i ];
+						_formats[ formatIndex ] = value._formats[ i ];
 					}
 				}
 			}
@@ -400,14 +400,14 @@ function createFromMultilineElement( {
 
 		// Multiline value text should be separated by a double line break.
 		if ( index !== 0 ) {
-			accumulator.formats = accumulator.formats.concat( [ , ] );
-			accumulator.text += '\u2028';
+			accumulator._formats = accumulator._formats.concat( [ , ] );
+			accumulator._text += '\u2028';
 		}
 
 		accumulateSelection( accumulator, node, range, value );
 
-		accumulator.formats = accumulator.formats.concat( value.formats );
-		accumulator.text += value.text;
+		accumulator._formats = accumulator._formats.concat( value._formats );
+		accumulator._text += value._text;
 	}
 
 	return accumulator;

@@ -16,16 +16,16 @@ describe( 'normaliseFormats', () => {
 
 	it( 'should normalise formats', () => {
 		const record = {
-			formats: [ , [ em ], [ { ...em }, { ...strong } ], [ em, strong ] ],
-			text: 'one two three',
+			_formats: [ , [ em ], [ { ...em }, { ...strong } ], [ em, strong ] ],
+			_text: 'one two three',
 		};
 		const result = normaliseFormats( deepFreeze( record ) );
 
 		expect( result ).toEqual( record );
 		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 3 );
-		expect( result.formats[ 1 ][ 0 ] ).toBe( result.formats[ 2 ][ 0 ] );
-		expect( result.formats[ 1 ][ 0 ] ).toBe( result.formats[ 3 ][ 0 ] );
-		expect( result.formats[ 2 ][ 1 ] ).toBe( result.formats[ 3 ][ 1 ] );
+		expect( getSparseArrayLength( result._formats ) ).toBe( 3 );
+		expect( result._formats[ 1 ][ 0 ] ).toBe( result._formats[ 2 ][ 0 ] );
+		expect( result._formats[ 1 ][ 0 ] ).toBe( result._formats[ 3 ][ 0 ] );
+		expect( result._formats[ 2 ][ 1 ] ).toBe( result._formats[ 3 ][ 1 ] );
 	} );
 } );

@@ -5,7 +5,7 @@
         "isValid": true,
         "attributes": {
             "value": {
-                "formats": [
+                "_formats": [
                     null,
                     null,
                     null,
@@ -46,10 +46,10 @@
                     null,
                     null
                 ],
-                "text": "Paragraph one Paragraph two"
+                "_text": "Paragraph one Paragraph two"
             },
             "citation": {
-                "formats": [
+                "_formats": [
                     null,
                     null,
                     null,
@@ -62,7 +62,7 @@
                     null,
                     null
                 ],
-                "text": "by whomever"
+                "_text": "by whomever"
             }
         },
         "innerBlocks": [],

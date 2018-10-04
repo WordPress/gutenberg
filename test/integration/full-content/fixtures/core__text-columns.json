@@ -7,22 +7,22 @@
             "content": [
                 {
                     "children": {
-                        "formats": [
+                        "_formats": [
                             null,
                             null,
                             null
                         ],
-                        "text": "One"
+                        "_text": "One"
                     }
                 },
                 {
                     "children": {
-                        "formats": [
+                        "_formats": [
                             null,
                             null,
                             null
                         ],
-                        "text": "Two"
+                        "_text": "Two"
                     }
                 }
             ],

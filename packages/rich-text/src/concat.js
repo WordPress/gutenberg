@@ -13,8 +13,8 @@ import { normaliseFormats } from './normalise-formats';
  * @return {Object} A new value combining all given records.
  */
 export function concat( ...values ) {
-	return normaliseFormats( values.reduce( ( accumlator, { formats, text } ) => ( {
-		text: accumlator.text + text,
-		formats: accumlator.formats.concat( formats ),
+	return normaliseFormats( values.reduce( ( accumlator, { _formats, _text } ) => ( {
+		_text: accumlator._text + _text,
+		_formats: accumlator._formats.concat( _formats ),
 	} ) ) );
 }
