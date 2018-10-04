@@ -1521,8 +1521,9 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 		// Ideally, we'd remove this and rely on a REST API endpoint.
 		'postLockUtils'       => array(
-			'nonce'   => wp_create_nonce( 'lock-post_' . $post->ID ),
-			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+			'nonce'       => wp_create_nonce( 'lock-post_' . $post->ID ),
+			'unlockNonce' => wp_create_nonce( 'update-post_' . $post->ID ),
+			'ajaxUrl'     => admin_url( 'admin-ajax.php' ),
 		),
 	);
 

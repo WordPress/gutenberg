@@ -107,7 +107,7 @@ class PostLockedModal extends Component {
 
 		const data = {
 			action: 'wp-remove-post-lock',
-			_wpnonce: postLockUtils.nonce,
+			_wpnonce: postLockUtils.unlockNonce,
 			post_ID: postId,
 			active_post_lock: activePostLock,
 		};
