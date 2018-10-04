@@ -21,6 +21,18 @@ import { getCommentDelimitedContent } from './serializer';
 import { attr, html, text, query, node, children, prop, richText } from './matchers';
 
 /**
+ * Sources which are guaranteed to return a string value.
+ *
+ * @type {Set}
+ */
+const STRING_SOURCES = new Set( [
+	'attribute',
+	'html',
+	'text',
+	'tag',
+] );
+
+/**
  * Higher-order hpq matcher which enhances an attribute matcher to return true
  * or false depending on whether the original matcher returns undefined. This
  * is useful for boolean attributes (e.g. disabled) whose attribute values may
@@ -48,6 +60,90 @@ export const toBooleanAttributeMatcher = ( matcher ) => flow( [
 	// - Transformed: `true`
 	( value ) => value !== undefined,
 ] );
+
+/**
+ * Returns true if the source name is one which is guaranteed to return
+ * a string value.
+ *
+ * @param {string} source Source name to test.
+ *
+ * @return {boolean} Whether source is one returning a string.
+ */
+export const isStringSource = ( source ) => STRING_SOURCES.has( source );
+
+/**
+ * Returns true if value is of the given JSON schema type, or false otherwise.
+ *
+ * @see http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
+ *
+ * @param {*}      value Value to test.
+ * @param {string} type  Type to test.
+ *
+ * @return {boolean} Whether value is of type.
+ */
+export function isOfType( value, type ) {
+	switch ( type ) {
+		case 'string':
+			return String( value ) === value;
+
+		case 'boolean':
+			return Boolean( value ) === value;
+
+		case 'object':
+			return !! value && value.constructor === Object;
+
+		case 'null':
+			return value === null;
+
+		case 'array':
+			return Array.isArray( value );
+
+		case 'integer':
+		case 'number':
+			return Number( value ) === value;
+	}
+
+	return true;
+}
+
+/**
+ * Returns true if value is of an array of given JSON schema types, or false
+ * otherwise.
+ *
+ * @see http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
+ *
+ * @param {*}        value Value to test.
+ * @param {string[]} types Types to test.
+ *
+ * @return {boolean} Whether value is of types.
+ */
+export function isOfTypes( value, types ) {
+	return types.some( ( type ) => isOfType( value, type ) );
+}
+
+/**
+ * Returns true if the given attribute schema describes a value which may be
+ * an ambiguous string.
+ *
+ * Some sources are ambiguously serialized as strings, for which value casting
+ * is enabled. This is only possible when a singular type is assigned to the
+ * attribute schema, since the string ambiguity makes it impossible to know the
+ * correct type of multiple to which to cast.
+ *
+ * @param {Object} attributeSchema Attribute's schema.
+ *
+ * @return {boolean} Whether attribute schema defines an ambiguous string
+ *                   source.
+ */
+export function isAmbiguousStringSource( attributeSchema ) {
+	const { selector, source, type } = attributeSchema;
+
+	return (
+		selector !== undefined &&
+		isStringSource( source ) &&
+		typeof type === 'string'
+	);
+}
 
 /**
  * Returns value coerced to the specified JSON schema type string.
@@ -177,7 +273,23 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 			value = parseWithAttributeSchema( innerHTML, attributeSchema );
 	}
 
-	return value === undefined ? attributeSchema.default : asType( value, type );
+	if ( isAmbiguousStringSource( attributeSchema ) ) {
+		value = asType( value, type );
+	} else if (
+		value !== undefined &&
+		type !== undefined &&
+		! isOfTypes( value, castArray( type ) )
+	) {
+		// Reject the value if it is not valid of type. Reverting to the
+		// undefined value ensures the default is restored, if applicable.
+		value = undefined;
+	}
+
+	if ( value === undefined ) {
+		return attributeSchema.default;
+	}
+
+	return value;
 }
 
 /**

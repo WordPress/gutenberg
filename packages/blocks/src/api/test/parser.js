@@ -16,6 +16,8 @@ import {
 	default as parsePegjs,
 	parseWithAttributeSchema,
 	toBooleanAttributeMatcher,
+	isOfType,
+	isOfTypes,
 } from '../parser';
 import {
 	registerBlockType,
@@ -136,6 +138,46 @@ describe( 'block parser', () => {
 		} );
 	} );
 
+	describe( 'isOfType()', () => {
+		it( 'gracefully handles unhandled type', () => {
+			expect( isOfType( 5, '__UNHANDLED__' ) ).toBe( true );
+		} );
+
+		it( 'returns expected result of type', () => {
+			expect( isOfType( '5', 'string' ) ).toBe( true );
+			expect( isOfType( 5, 'string' ) ).toBe( false );
+
+			expect( isOfType( 5, 'integer' ) ).toBe( true );
+			expect( isOfType( '5', 'integer' ) ).toBe( false );
+
+			expect( isOfType( 5, 'number' ) ).toBe( true );
+			expect( isOfType( '5', 'number' ) ).toBe( false );
+
+			expect( isOfType( true, 'boolean' ) ).toBe( true );
+			expect( isOfType( false, 'boolean' ) ).toBe( true );
+			expect( isOfType( '5', 'boolean' ) ).toBe( false );
+			expect( isOfType( 0, 'boolean' ) ).toBe( false );
+
+			expect( isOfType( null, 'null' ) ).toBe( true );
+			expect( isOfType( 0, 'null' ) ).toBe( false );
+
+			expect( isOfType( [], 'array' ) ).toBe( true );
+
+			expect( isOfType( {}, 'object' ) ).toBe( true );
+			expect( isOfType( null, 'object' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isOfTypes', () => {
+		it( 'returns false if value is not one of types', () => {
+			expect( isOfTypes( null, [ 'string' ] ) ).toBe( false );
+		} );
+
+		it( 'returns true if value is one of types', () => {
+			expect( isOfTypes( null, [ 'string', 'null' ] ) ).toBe( true );
+		} );
+	} );
+
 	describe( 'parseWithAttributeSchema', () => {
 		it( 'should return the matcher’s attribute value', () => {
 			const value = parseWithAttributeSchema(
@@ -250,7 +292,6 @@ describe( 'block parser', () => {
 			const blockType = {
 				attributes: {
 					content: {
-						type: 'string',
 						source: 'text',
 						selector: 'div',
 					},
@@ -261,7 +302,7 @@ describe( 'block parser', () => {
 						selector: 'div',
 					},
 					align: {
-						type: 'string',
+						type: [ 'string', 'null' ],
 					},
 					topic: {
 						type: 'string',
@@ -271,12 +312,12 @@ describe( 'block parser', () => {
 			};
 
 			const innerHTML = '<div data-number="10">Ribs</div>';
-			const attrs = { align: 'left', invalid: true };
+			const attrs = { align: null, invalid: true };
 
 			expect( getBlockAttributes( blockType, innerHTML, attrs ) ).toEqual( {
 				content: 'Ribs',
 				number: 10,
-				align: 'left',
+				align: null,
 				topic: 'none',
 			} );
 		} );
