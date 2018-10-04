@@ -25,7 +25,7 @@
 .block-library-image__resize-handler-right,
 .block-library-image__resize-handler-bottom,
 .block-library-image__resize-handler-left {
-	@include resize-handler-container();
+	@include resize-handler__container();
 
 	.wp-block-image.is-focused & {
 		display: block;
@@ -37,7 +37,7 @@
 .block-library-image__resize-handler-right::before,
 .block-library-image__resize-handler-bottom::before,
 .block-library-image__resize-handler-left::before {
-	@include resize-handler();
+	@include resize-handler__visible-handle();
 }
 
 /*!rtl:begin:ignore*/

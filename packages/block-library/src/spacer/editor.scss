@@ -9,7 +9,7 @@
 }
 
 .block-library-spacer__resize-handler-bottom {
-	@include resize-handler-container();
+	@include resize-handler__container();
 
 	// Offset the handle container's position.
 	position: absolute;
@@ -18,5 +18,5 @@
 }
 
 .block-library-spacer__resize-handler-bottom::before {
-	@include resize-handler();
+	@include resize-handler__visible-handle();
 }

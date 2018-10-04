@@ -332,7 +332,7 @@
  * Styles for resize handles
  */
 
-@mixin resize-handler-container() {
+@mixin resize-handler__container() {
 	display: none;
 
 	// The unfortunate use of `!important` in the CSS below is because the
@@ -347,7 +347,7 @@
 	padding: $grid-size-small;
 }
 
-@mixin resize-handler() {
+@mixin resize-handler__visible-handle() {
 	display: block;
 	content: "";
 	width: $resize-handler-size;
