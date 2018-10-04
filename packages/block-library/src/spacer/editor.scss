@@ -1,5 +1,4 @@
 .block-library-spacer__resize-container.is-selected {
-	.block-library-spacer__resize-handler-top,
 	.block-library-spacer__resize-handler-bottom {
 		display: block;
 	}
@@ -9,17 +8,15 @@
 	background: $light-gray-200;
 }
 
-.block-library-spacer__resize-handler-top,
 .block-library-spacer__resize-handler-bottom {
-	display: none;
-	border-radius: 50%;
-	border: 2px solid $white;
-	width: 15px !important;
-	height: 15px !important;
+	@include resize-handler__container();
+
+	// Offset the handle container's position.
 	position: absolute;
-	background: theme(primary);
-	padding: 0 3px 3px 0;
-	cursor: se-resize;
-	left: 50% !important;
-	margin-left: -7.5px;
+	bottom: calc(#{$resize-handler-container-size / 2} * -1);
+	left: calc(50% - #{$resize-handler-container-size / 2});
+}
+
+.block-library-spacer__resize-handler-bottom::before {
+	@include resize-handler__visible-handle();
 }
