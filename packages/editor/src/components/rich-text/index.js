@@ -592,6 +592,8 @@ export class RichText extends Component {
 		// If we click shift+Enter on inline RichTexts, we avoid creating two contenteditables
 		// We also split the content and call the onSplit prop if provided.
 		if ( keyCode === ENTER ) {
+			event.preventDefault();
+
 			if ( this.props.onReplace ) {
 				const text = getTextContent( this.getRecord() );
 				const transformation = findTransform( this.enterPatterns, ( item ) => {
@@ -603,7 +605,6 @@ export class RichText extends Component {
 					// important that we stop other handlers (e.g. ones
 					// registered by TinyMCE) from also handling this event.
 					event.stopImmediatePropagation();
-					event.preventDefault();
 					this.props.onReplace( [
 						transformation.transform( { content: text } ),
 					] );
@@ -612,21 +613,14 @@ export class RichText extends Component {
 			}
 
 			if ( this.props.multiline ) {
-				if ( ! this.props.onSplit ) {
-					return;
-				}
-
 				const record = this.getRecord();
 
-				if ( ! isEmptyLine( record ) ) {
-					return;
+				if ( this.props.onSplit && isEmptyLine( record ) ) {
+					this.props.onSplit( ...split( record ).map( this.valueToFormat ) );
+				} else {
+					this.onChange( insert( record, '\u2028' ) );
 				}
-
-				event.preventDefault();
-				this.props.onSplit( ...split( record ).map( this.valueToFormat ) );
 			} else if ( event.shiftKey || ! this.props.onSplit ) {
-				event.preventDefault();
-
 				const record = this.getRecord();
 				const text = getTextContent( record );
 				const length = text.length;
@@ -644,7 +638,6 @@ export class RichText extends Component {
 
 				this.onChange( insert( this.getRecord(), toInsert ) );
 			} else {
-				event.preventDefault();
 				this.splitContent();
 			}
 		}
