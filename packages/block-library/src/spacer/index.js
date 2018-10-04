@@ -36,7 +36,7 @@ export const settings = {
 			const { height } = attributes;
 			const id = `block-spacer-height-input-${ instanceId }`;
 
-			// Removes the inline styles in the drag handle
+			// Removes the inline styles in the drag handles.
 			const handleStylesOverrides = {
 				width: null,
 				height: null,

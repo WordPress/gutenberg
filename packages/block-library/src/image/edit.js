@@ -431,7 +431,7 @@ class ImageEdit extends Component {
 							}
 							/* eslint-enable no-lonely-if */
 
-							// Removes the inline styles in the drag handles
+							// Removes the inline styles in the drag handles.
 							const handleStylesOverrides = {
 								width: null,
 								height: null,
