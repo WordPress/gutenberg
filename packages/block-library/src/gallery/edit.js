@@ -44,6 +44,11 @@ export function defaultColumnsNumber( attributes ) {
 	return Math.min( 3, attributes.images.length );
 }
 
+const RELEVANT_MEDIA_FIELDS = [ 'alt', 'caption', 'id', 'link', 'url' ];
+export const pickRelevantMediaFiles = ( image ) => {
+	return pick( image, RELEVANT_MEDIA_FIELDS );
+};
+
 class GalleryEdit extends Component {
 	constructor() {
 		super( ...arguments );
@@ -87,7 +92,7 @@ class GalleryEdit extends Component {
 
 	onSelectImages( images ) {
 		this.props.setAttributes( {
-			images: images.map( ( image ) => pick( image, [ 'alt', 'caption', 'id', 'link', 'url' ] ) ),
+			images: images.map( ( image ) => pickRelevantMediaFiles( image ) ),
 		} );
 	}
 
@@ -135,8 +140,9 @@ class GalleryEdit extends Component {
 			allowedTypes: ALLOWED_MEDIA_TYPES,
 			filesList: files,
 			onFileChange: ( images ) => {
+				const imagesNormalized = images.map( ( image ) => pickRelevantMediaFiles( image ) );
 				setAttributes( {
-					images: currentImages.concat( images ),
+					images: currentImages.concat( imagesNormalized ),
 				} );
 			},
 			onError: noticeOperations.createErrorNotice,

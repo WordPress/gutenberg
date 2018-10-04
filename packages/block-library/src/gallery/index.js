@@ -14,7 +14,7 @@ import { createBlobURL } from '@wordpress/blob';
 /**
  * Internal dependencies
  */
-import { default as edit, defaultColumnsNumber } from './edit';
+import { default as edit, defaultColumnsNumber, pickRelevantMediaFiles } from './edit';
 
 const blockAttributes = {
 	images: {
@@ -134,7 +134,9 @@ export const settings = {
 					} );
 					mediaUpload( {
 						filesList: files,
-						onFileChange: ( images ) => onChange( block.clientId, { images } ),
+						onFileChange: ( images ) => onChange( block.clientId, {
+							images: images.map( ( image ) => pickRelevantMediaFiles( image ) ),
+						} ),
 						allowedTypes: [ 'image' ],
 					} );
 					return block;

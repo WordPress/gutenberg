@@ -22,6 +22,7 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 - `getMetaBoxes` selector (`core/edit-post`) has been removed. Use `getActiveMetaBoxLocations` selector (`core/edit-post`) instead.
 - `getMetaBox` selector (`core/edit-post`) has been removed. Use `isMetaBoxLocationActive` selector (`core/edit-post`) instead.
 - Attribute type coercion has been removed. Omit the source to preserve type via serialized comment demarcation.
+- `mediaDetails` in object passed to `onFileChange` callback of `wp.editor.mediaUpload`. Please use `media_details` property instead.
 
 ## 4.1.0
 

@@ -33,6 +33,11 @@ export default function( {
 	onFileChange,
 	allowedType,
 } ) {
+	deprecated( 'mediaDetails in object passed to onFileChange callback of wp.editor.mediaUpload', {
+		version: '4.2',
+		alternative: 'media_details property containing exactly the property as returned by the rest api',
+	} );
+
 	const {
 		getCurrentPostId,
 		getEditorSettings,
