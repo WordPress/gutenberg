@@ -15,6 +15,8 @@ function ResizableBox( { className, ...props } ) {
 		left: null,
 	};
 
+	const handleClassName = 'components-resizable-box__handle';
+
 	return (
 		<ReResizableBox
 			className={ classnames(
@@ -22,10 +24,22 @@ function ResizableBox( { className, ...props } ) {
 				className,
 			) }
 			handleClasses={ {
-				top: 'components-resizable-box__handle-top',
-				right: 'components-resizable-box__handle-right',
-				bottom: 'components-resizable-box__handle-bottom',
-				left: 'components-resizable-box__handle-left',
+				top: classnames(
+					handleClassName,
+					'components-resizable-box__handle-top',
+				),
+				right: classnames(
+					handleClassName,
+					'components-resizable-box__handle-right',
+				),
+				bottom: classnames(
+					handleClassName,
+					'components-resizable-box__handle-bottom',
+				),
+				left: classnames(
+					handleClassName,
+					'components-resizable-box__handle-left',
+				),
 			} }
 			handleStyles={ {
 				top: handleStylesOverrides,

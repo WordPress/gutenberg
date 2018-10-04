@@ -11,25 +11,20 @@
 }
 
 // This is necessary for the editor resize handles to accurately work on a non-floated, non-resized, small image.
-.wp-block-image {
-	.components-resizable-box__container {
-		display: inline-block;
+.wp-block-image .components-resizable-box__container {
+	display: inline-block;
 
-		img {
-			display: block;
-			width: 100%;
-		}
+	img {
+		display: block;
+		width: 100%;
 	}
 }
 
-.wp-block-image.is-focused .components-resizable-box__handle-top,
-.wp-block-image.is-focused .components-resizable-box__handle-right,
-.wp-block-image.is-focused .components-resizable-box__handle-bottom,
-.wp-block-image.is-focused .components-resizable-box__handle-left {
+// Ensure the resize handles are visible when the image is focused.
+.wp-block-image.is-focused .components-resizable-box__handle {
 	display: block;
 	z-index: z-index(".block-library-image__resize-handlers");
 }
-
 
 .editor-block-list__block[data-type="core/image"][data-align="center"] {
 	.wp-block-image {
