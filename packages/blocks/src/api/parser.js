@@ -84,10 +84,10 @@ export const isStringSource = ( source ) => STRING_SOURCES.has( source );
 export function isOfType( value, type ) {
 	switch ( type ) {
 		case 'string':
-			return String( value ) === value;
+			return typeof value === 'string';
 
 		case 'boolean':
-			return Boolean( value ) === value;
+			return typeof value === 'boolean';
 
 		case 'object':
 			return !! value && value.constructor === Object;
@@ -100,7 +100,7 @@ export function isOfType( value, type ) {
 
 		case 'integer':
 		case 'number':
-			return Number( value ) === value;
+			return typeof value === 'number';
 	}
 
 	return true;
