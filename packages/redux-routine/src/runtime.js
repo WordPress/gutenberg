@@ -3,6 +3,7 @@
  */
 import { create } from 'rungen';
 import { map, isString } from 'lodash';
+import isPromise from 'is-promise';
 
 /**
  * Internal dependencies
@@ -23,10 +24,10 @@ export default function createRuntime( controls = {}, dispatch ) {
 			return false;
 		}
 		const routine = control( value );
-		if ( routine instanceof Promise ) {
+		if ( isPromise( routine ) ) {
 			// Async control routine awaits resolution.
 			routine.then(
-				next,
+				yieldNext,
 				( error ) => yieldError( castError( error ) ),
 			);
 		} else {

@@ -6,6 +6,7 @@ import { castArray } from 'lodash';
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { renderToString } from '@wordpress/element';
 
 /**
@@ -44,6 +45,12 @@ export function getSerializeCapableElement( children ) {
  * @return {Array<WPBlockNode>} An array of individual block nodes.
  */
 function getChildrenArray( children ) {
+	deprecated( 'children and node source', {
+		alternative: 'rich-text source',
+		plugin: 'Gutenberg',
+		version: '4.4',
+	} );
+
 	// The fact that block children are compatible with the element serializer
 	// is merely an implementation detail that currently serves to be true, but
 	// should not be mistaken as being a guarantee on the external API.
@@ -59,6 +66,12 @@ function getChildrenArray( children ) {
  * @return {WPBlockChildren} Concatenated block node.
  */
 export function concat( ...blockNodes ) {
+	deprecated( 'wp.blocks.children.concat', {
+		alternative: 'wp.richText.concat',
+		plugin: 'Gutenberg',
+		version: '4.4',
+	} );
+
 	const result = [];
 	for ( let i = 0; i < blockNodes.length; i++ ) {
 		const blockNode = castArray( blockNodes[ i ] );
@@ -89,6 +102,12 @@ export function concat( ...blockNodes ) {
  * @return {WPBlockChildren} Block children equivalent to DOM nodes.
  */
 export function fromDOM( domNodes ) {
+	deprecated( 'wp.blocks.children.fromDom', {
+		alternative: 'wp.richText.create',
+		plugin: 'Gutenberg',
+		version: '4.4',
+	} );
+
 	const result = [];
 	for ( let i = 0; i < domNodes.length; i++ ) {
 		try {
@@ -109,6 +128,12 @@ export function fromDOM( domNodes ) {
  * @return {string} String HTML representation of block node.
  */
 export function toHTML( children ) {
+	deprecated( 'wp.blocks.children.toHTML', {
+		alternative: 'wp.richText.toHTMLString',
+		plugin: 'Gutenberg',
+		version: '4.4',
+	} );
+
 	const element = getSerializeCapableElement( children );
 
 	return renderToString( element );
@@ -123,6 +148,12 @@ export function toHTML( children ) {
  * @return {Function} hpq matcher.
  */
 export function matcher( selector ) {
+	deprecated( 'wp.blocks.children.matcher', {
+		hint: 'Use the rich-text source.',
+		plugin: 'Gutenberg',
+		version: '4.4',
+	} );
+
 	return ( domNode ) => {
 		let match = domNode;
 

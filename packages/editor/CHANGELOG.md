@@ -1,4 +1,4 @@
-## 4.0.0 (Unreleased)
+## 4.0.0 (2018-09-30)
 
 ### Breaking Changes
 
@@ -7,6 +7,11 @@
 - The `value` property in color objects passed by `withColors` has been removed. Use `color` property instead.
 - `RichText` `getSettings` prop has been removed. The `unstableGetSettings` prop is available if continued use is required. Unstable APIs are strongly discouraged to be used, and are subject to removal without notice, even as part of a minor release.
 - `RichText` `onSetup` prop has been removed. The `unstableOnSetup` prop is available if continued use is required. Unstable APIs are strongly discouraged to be used, and are subject to removal without notice, even as part of a minor release.
+- `wp.editor.RichTextProvider` has been removed. Please use `wp.data.select( 'core/editor' )` methods instead.
+
+### Deprecations
+
+- The `checkTemplateValidity` action has been deprecated. Validity is verified automatically upon block reset.
 
 ## 3.0.0 (2018-09-05)
 
@@ -32,7 +37,7 @@
 - `wp.editor.DocumentTitle` component has been removed.
 - `getDocumentTitle` selector (`core/editor`) has been removed.
 
-### Deprecation
+### Deprecations
 
 - `wp.editor.RichTextProvider` flagged for deprecation. Please use `wp.data.select( 'core/editor' )` methods instead.
 

@@ -10,7 +10,7 @@
 	margin: 0;
 	display: block;
 	height: $icon-button-size;
-	padding: 6px 3px;
+	padding: 3px;
 
 	// Unset icon button styles.
 	&:active,
@@ -25,10 +25,10 @@
 	.editor-block-icon,
 	.editor-block-switcher__transform {
 		width: $icon-button-size + 3px + 3px;
+		height: $icon-button-size-small + 6px;
 		position: relative;
-		height: $icon-button-size-small;
-		margin: 0;
-		padding: 0 6px;
+		margin: 0 auto;
+		padding: 3px;
 		display: flex;
 		align-items: center;
 		transition: all 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
@@ -37,14 +37,11 @@
 	// Add a dropdown arrow indicator.
 	.editor-block-icon::after {
 		@include dropdown-arrow();
-		top: $icon-button-size-small / 2 - 1px;
 	}
 
 	.editor-block-switcher__transform {
-		margin-top: 6px + 3px;
+		margin-top: 6px;
 		border-radius: $radius-round-rectangle;
-		height: $icon-button-size-small + 6px;
-		padding: 3px 9px 3px 9px;
 	}
 
 	// Block hover and focus style.

@@ -197,8 +197,12 @@ class WP_Block_Parser {
 	 * @return bool
 	 */
     function proceed() {
-        list( $token_type, $block_name, $attrs, $start_offset, $token_length ) = $this->next_token();
+        $next_token = $this->next_token();
+        list( $token_type, $block_name, $attrs, $start_offset, $token_length ) = $next_token;
         $stack_depth = count( $this->stack );
+
+        // we may have some HTML soup before the next block
+        $leading_html_start = $start_offset > $this->offset ? $this->offset : null;
 
         switch ( $token_type ) {
             case 'no-more-tokens':
@@ -239,6 +243,17 @@ class WP_Block_Parser {
                  * in the top-level of the document
                  */
                 if ( 0 === $stack_depth ) {
+                    if ( isset( $leading_html_start ) ) {
+                        $this->output[] = array(
+                            'attrs' => array(),
+                            'innerHTML' => substr(
+                                $this->document,
+                                $leading_html_start,
+                                $start_offset - $leading_html_start
+                            ),
+                        );
+                    }
+
                     $this->output[] = new WP_Block_Parser_Block( $block_name, $attrs, array(), '' );
                     $this->offset = $start_offset + $token_length;
                     return true;
@@ -254,9 +269,6 @@ class WP_Block_Parser {
                 return true;
 
             case 'block-opener':
-                // we may have some HTML soup before the next block
-                $leading_html_start = $start_offset > $this->offset ? $this->offset : null;
-
                 // track all newly-opened blocks on the stack
                 array_push( $this->stack, new WP_Block_Parser_Frame(
                     new WP_Block_Parser_Block( $block_name, $attrs, array(), '' ),

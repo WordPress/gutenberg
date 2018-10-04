@@ -21,6 +21,8 @@ import {
 } from '@wordpress/editor';
 import { getBlobByURL } from '@wordpress/blob';
 
+const ALLOWED_MEDIA_TYPES = [ 'audio' ];
+
 class AudioEdit extends Component {
 	constructor() {
 		super( ...arguments );
@@ -52,7 +54,7 @@ class AudioEdit extends Component {
 						this.setState( { editing: true } );
 						noticeOperations.createErrorNotice( e );
 					},
-					allowedType: 'audio',
+					allowedTypes: ALLOWED_MEDIA_TYPES,
 				} );
 			}
 		}
@@ -109,7 +111,7 @@ class AudioEdit extends Component {
 					onSelect={ onSelectAudio }
 					onSelectURL={ this.onSelectURL }
 					accept="audio/*"
-					type="audio"
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ this.props.attributes }
 					notices={ noticeUI }
 					onError={ noticeOperations.createErrorNotice }

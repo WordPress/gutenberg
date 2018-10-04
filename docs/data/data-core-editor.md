@@ -259,7 +259,8 @@ Whether the post can be saved.
 ### isEditedPostEmpty
 
 Returns true if the edited post has content. A post has content if it has at
-least one block or otherwise has a non-empty content property assigned.
+least one saveable block or otherwise has a non-empty content property
+assigned.
 
 *Parameters*
 
@@ -319,6 +320,24 @@ unsaved status values.
 *Returns*
 
 Whether the post has been published.
+
+### isEditedPostDateFloating
+
+Returns whether the current post should be considered to have a "floating"
+date (i.e. that it would publish "Immediately" rather than at a set time).
+
+Unlike in the PHP backend, the REST API returns a full date string for posts
+where the 0000-00-00T00:00:00 placeholder is present in the database. To
+infer that a post is set to publish "Immediately" we check whether the date
+and modified date are the same.
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+Whether the edited post has a floating date value.
 
 ### getBlockDependantsCacheBust
 
@@ -989,6 +1008,19 @@ default post format. Returns null if the format cannot be determined.
 
 Suggested post format.
 
+### getBlocksForSerialization
+
+Returns a set of blocks which are to be used in consideration of the post's
+generated save content.
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+Filtered set of blocks for save.
+
 ### getEditedPostContent
 
 Returns the content of the post being edited, preferring raw string edit
@@ -1241,7 +1273,7 @@ Is locked.
 
 ### isPostLockTakeover
 
-Returns whether the post is locked.
+Returns whether the edition of the post has been taken over.
 
 *Parameters*
 
@@ -1249,7 +1281,7 @@ Returns whether the post is locked.
 
 *Returns*
 
-Is locked.
+Is post lock takeover.
 
 ### getPostLockUser
 
@@ -1286,6 +1318,19 @@ Returns whether or not the user has the unfiltered_html capability.
 *Returns*
 
 Whether the user can or can't post unfiltered HTML.
+
+### isPublishSidebarEnabled
+
+Returns whether the pre-publish panel should be shown
+or skipped when the user clicks the "publish" button.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+Whether the pre-publish panel should be shown or not.
 
 ## Actions
 
@@ -1676,3 +1721,11 @@ Returns an action object used in signalling that the editor settings have been u
 *Parameters*
 
  * settings: Updated settings
+
+### enablePublishSidebar
+
+Returns an action object used in signalling that the user has enabled the publish sidebar.
+
+### disablePublishSidebar
+
+Returns an action object used in signalling that the user has disabled the publish sidebar.

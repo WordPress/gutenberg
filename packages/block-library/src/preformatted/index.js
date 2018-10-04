@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
+import { create, concat } from '@wordpress/rich-text';
 
 export const name = 'core/preformatted';
 
@@ -18,8 +19,7 @@ export const settings = {
 
 	attributes: {
 		content: {
-			type: 'array',
-			source: 'children',
+			source: 'rich-text',
 			selector: 'pre',
 		},
 	},
@@ -29,8 +29,10 @@ export const settings = {
 			{
 				type: 'block',
 				blocks: [ 'core/code', 'core/paragraph' ],
-				transform: ( attributes ) =>
-					createBlock( 'core/preformatted', attributes ),
+				transform: ( { content } ) =>
+					createBlock( 'core/preformatted', {
+						content: create( { text: content } ),
+					} ),
 			},
 			{
 				type: 'raw',
@@ -58,7 +60,7 @@ export const settings = {
 		],
 	},
 
-	edit( { attributes, setAttributes, className } ) {
+	edit( { attributes, mergeBlocks, setAttributes, className } ) {
 		const { content } = attributes;
 
 		return (
@@ -72,6 +74,7 @@ export const settings = {
 				} }
 				placeholder={ __( 'Write preformatted text…' ) }
 				wrapperClassName={ className }
+				onMerge={ mergeBlocks }
 			/>
 		);
 	},
@@ -80,5 +83,11 @@ export const settings = {
 		const { content } = attributes;
 
 		return <RichText.Content tagName="pre" value={ content } />;
+	},
+
+	merge( attributes, attributesToMerge ) {
+		return {
+			content: concat( attributes.content, attributesToMerge.content ),
+		};
 	},
 };

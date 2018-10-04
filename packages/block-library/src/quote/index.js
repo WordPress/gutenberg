@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, get, isString, isEmpty, omit } from 'lodash';
+import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,27 +14,16 @@ import {
 	AlignmentToolbar,
 	RichText,
 } from '@wordpress/editor';
-
-const toRichTextValue = ( value ) => value.map( ( ( subValue ) => subValue.children ) );
-const fromRichTextValue = ( value ) => value.map( ( subValue ) => ( {
-	children: subValue,
-} ) );
+import { join, split, concat } from '@wordpress/rich-text';
 
 const blockAttributes = {
 	value: {
-		type: 'array',
-		source: 'query',
-		selector: 'blockquote > p',
-		query: {
-			children: {
-				source: 'node',
-			},
-		},
-		default: [],
+		source: 'rich-text',
+		selector: 'blockquote',
+		multiline: 'p',
 	},
 	citation: {
-		type: 'array',
-		source: 'children',
+		source: 'rich-text',
 		selector: 'cite',
 	},
 	align: {
@@ -65,12 +54,8 @@ export const settings = {
 				isMultiBlock: true,
 				blocks: [ 'core/paragraph' ],
 				transform: ( attributes ) => {
-					const items = attributes.map( ( { content } ) => content );
-					const hasItems = ! items.every( isEmpty );
 					return createBlock( 'core/quote', {
-						value: hasItems ?
-							items.map( ( content, index ) => ( { children: <p key={ index }>{ content }</p> } ) ) :
-							[],
+						value: join( attributes.map( ( { content } ) => content ), '\u2028' ),
 					} );
 				},
 			},
@@ -79,9 +64,7 @@ export const settings = {
 				blocks: [ 'core/heading' ],
 				transform: ( { content } ) => {
 					return createBlock( 'core/quote', {
-						value: [
-							{ children: <p key="1">{ content }</p> },
-						],
+						value: content,
 					} );
 				},
 			},
@@ -90,9 +73,7 @@ export const settings = {
 				regExp: /^>\s/,
 				transform: ( { content } ) => {
 					return createBlock( 'core/quote', {
-						value: [
-							{ children: <p key="1">{ content }</p> },
-						],
+						value: content,
 					} );
 				},
 			},
@@ -114,59 +95,36 @@ export const settings = {
 			{
 				type: 'block',
 				blocks: [ 'core/paragraph' ],
-				transform: ( { value, citation } ) => {
-					// Transforming an empty quote
-					if ( ( ! value || ! value.length ) && ! citation ) {
-						return createBlock( 'core/paragraph' );
-					}
-					// Transforming a quote with content
-					return ( value || [] ).map( ( item ) => createBlock( 'core/paragraph', {
-						content: [ get( item, [ 'children', 'props', 'children' ], '' ) ],
-					} ) ).concat( citation ? createBlock( 'core/paragraph', {
-						content: citation,
-					} ) : [] );
-				},
+				transform: ( { value } ) =>
+					split( value, '\u2028' ).map( ( content ) =>
+						createBlock( 'core/paragraph', { content } )
+					),
 			},
 			{
 				type: 'block',
 				blocks: [ 'core/heading' ],
 				transform: ( { value, citation, ...attrs } ) => {
-					// If there is no quote content, use the citation as the content of the resulting
-					// heading. A nonexistent citation will result in an empty heading.
-					if ( ( ! value || ! value.length ) ) {
+					// If there is no quote content, use the citation as the
+					// content of the resulting heading. A nonexistent citation
+					// will result in an empty heading.
+					if ( RichText.isEmpty( value ) ) {
 						return createBlock( 'core/heading', {
 							content: citation,
 						} );
 					}
 
-					const firstValue = get( value, [ 0, 'children' ] );
-					const headingContent = castArray( isString( firstValue ) ?
-						firstValue :
-						get( firstValue, [ 'props', 'children' ], '' )
-					);
+					const values = split( value, '\u2028' );
 
-					// If the quote content just contains a single paragraph, and no citation exists, convert
-					// the quote content into a heading.
-					if ( ! citation && value.length === 1 ) {
-						return createBlock( 'core/heading', {
-							content: headingContent,
-						} );
-					}
-
-					// In the normal case (a quote containing multiple paragraphs) convert the first
-					// paragraph into a heading and create a new quote block containing the rest of the
-					// content.
-					const heading = createBlock( 'core/heading', {
-						content: headingContent,
-					} );
-
-					const quote = createBlock( 'core/quote', {
-						...attrs,
-						citation,
-						value: value.slice( 1 ),
-					} );
-
-					return [ heading, quote ];
+					return [
+						createBlock( 'core/heading', {
+							content: values[ 0 ],
+						} ),
+						createBlock( 'core/quote', {
+							...attrs,
+							citation,
+							value: join( values.slice( 1 ), '\u2028' ),
+						} ),
+					];
 				},
 			},
 		],
@@ -188,10 +146,10 @@ export const settings = {
 				<blockquote className={ className } style={ { textAlign: align } }>
 					<RichText
 						multiline="p"
-						value={ toRichTextValue( value ) }
+						value={ value }
 						onChange={
 							( nextValue ) => setAttributes( {
-								value: fromRichTextValue( nextValue ),
+								value: nextValue,
 							} )
 						}
 						onMerge={ mergeBlocks }
@@ -227,10 +185,18 @@ export const settings = {
 
 		return (
 			<blockquote style={ { textAlign: align ? align : null } }>
-				<RichText.Content value={ toRichTextValue( value ) } />
+				<RichText.Content multiline="p" value={ value } />
 				{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
 			</blockquote>
 		);
+	},
+
+	merge( attributes, attributesToMerge ) {
+		return {
+			...attributes,
+			value: join( [ attributes.value, attributesToMerge.value ], '\u2028' ),
+			citation: concat( attributes.citation, attributesToMerge.citation ),
+		};
 	},
 
 	deprecated: [
@@ -262,7 +228,7 @@ export const settings = {
 						className={ style === 2 ? 'is-large' : '' }
 						style={ { textAlign: align ? align : null } }
 					>
-						<RichText.Content value={ toRichTextValue( value ) } />
+						<RichText.Content multiline="p" value={ value } />
 						{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
 					</blockquote>
 				);
@@ -272,8 +238,7 @@ export const settings = {
 			attributes: {
 				...blockAttributes,
 				citation: {
-					type: 'array',
-					source: 'children',
+					source: 'rich-text',
 					selector: 'footer',
 				},
 				style: {
@@ -290,7 +255,7 @@ export const settings = {
 						className={ `blocks-quote-style-${ style }` }
 						style={ { textAlign: align ? align : null } }
 					>
-						<RichText.Content value={ toRichTextValue( value ) } />
+						<RichText.Content multiline="p" value={ value } />
 						{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="footer" value={ citation } /> }
 					</blockquote>
 				);

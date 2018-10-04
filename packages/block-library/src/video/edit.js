@@ -24,6 +24,8 @@ import {
 } from '@wordpress/editor';
 import { getBlobByURL } from '@wordpress/blob';
 
+const ALLOWED_MEDIA_TYPES = [ 'video' ];
+
 class VideoEdit extends Component {
 	constructor() {
 		super( ...arguments );
@@ -55,7 +57,7 @@ class VideoEdit extends Component {
 						this.setState( { editing: true } );
 						noticeOperations.createErrorNotice( message );
 					},
-					allowedType: 'video',
+					allowedTypes: ALLOWED_MEDIA_TYPES,
 				} );
 			}
 		}
@@ -138,7 +140,7 @@ class VideoEdit extends Component {
 					onSelect={ onSelectVideo }
 					onSelectURL={ this.onSelectURL }
 					accept="video/*"
-					type="video"
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ this.props.attributes }
 					notices={ noticeUI }
 					onError={ noticeOperations.createErrorNotice }
@@ -198,7 +200,7 @@ class VideoEdit extends Component {
 							<MediaUpload
 								title={ __( 'Select Poster Image' ) }
 								onSelect={ this.onSelectPoster }
-								type="image"
+								allowedTypes={ ALLOWED_MEDIA_TYPES }
 								render={ ( { open } ) => (
 									<Button isDefault onClick={ open }>
 										{ ! this.props.attributes.poster ? __( 'Select Poster Image' ) : __( 'Replace image' ) }

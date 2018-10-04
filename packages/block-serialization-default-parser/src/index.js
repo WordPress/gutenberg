@@ -42,6 +42,9 @@ function proceed() {
 	const [ tokenType, blockName, attrs, startOffset, tokenLength ] = next;
 	const stackDepth = stack.length;
 
+	// we may have some HTML soup before the next block
+	const leadingHtmlStart = ( startOffset > offset ) ? offset : null;
+
 	switch ( tokenType ) {
 		case 'no-more-tokens':
 			// if not in a block then flush output
@@ -74,6 +77,12 @@ function proceed() {
 			// easy case is if we stumbled upon a void block
 			// in the top-level of the document
 			if ( 0 === stackDepth ) {
+				if ( null !== leadingHtmlStart ) {
+					output.push( {
+						attrs: {},
+						innerHTML: document.substr( leadingHtmlStart, startOffset - leadingHtmlStart ),
+					} );
+				}
 				output.push( Block( blockName, attrs, [], '' ) );
 				offset = startOffset + tokenLength;
 				return true;
@@ -89,9 +98,6 @@ function proceed() {
 			return true;
 
 		case 'block-opener':
-			// we may have some HTML soup before the next block
-			const leadingHtmlStart = ( startOffset > offset ) ? offset : null;
-
 			// track all newly-opened blocks on the stack
 			stack.push(
 				Frame(

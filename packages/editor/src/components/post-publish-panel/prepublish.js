@@ -23,12 +23,26 @@ import MaybePostFormatPanel from './maybe-post-format-panel';
 
 function PostPublishPanelPrepublish( {
 	hasPublishAction,
+	isBeingScheduled,
 	children,
 } ) {
+	let prePublishTitle, prePublishBodyText;
+
+	if ( ! hasPublishAction ) {
+		prePublishTitle = __( 'Are you ready to submit for review?' );
+		prePublishBodyText = __( 'When you’re ready, submit your work for review, and an Editor will be able to approve it for you.' );
+	} else if ( isBeingScheduled ) {
+		prePublishTitle = __( 'Are you ready to schedule?' );
+		prePublishBodyText = __( 'Your post will be published at the specified date and time.' );
+	} else {
+		prePublishTitle = __( 'Are you ready to publish?' );
+		prePublishBodyText = __( 'Double-check your settings, then use the button to publish your post.' );
+	}
+
 	return (
 		<div className="editor-post-publish-panel__prepublish">
-			<div><strong>{ hasPublishAction ? __( 'Are you ready to publish?' ) : __( 'Are you ready to submit for review?' ) }</strong></div>
-			<p>{ hasPublishAction ? __( 'Double-check your settings, then use the button to publish your post.' ) : __( 'When you’re ready, submit your work for review, and an Editor will be able to approve it for you.' ) }</p>
+			<div><strong>{ prePublishTitle }</strong></div>
+			<p>{ prePublishBodyText }</p>
 			{ hasPublishAction && (
 				<Fragment>
 					<PanelBody initialOpen={ false } title={ [
@@ -54,9 +68,13 @@ function PostPublishPanelPrepublish( {
 
 export default withSelect(
 	( select ) => {
-		const { getCurrentPost } = select( 'core/editor' );
+		const {
+			getCurrentPost,
+			isEditedPostBeingScheduled,
+		} = select( 'core/editor' );
 		return {
 			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
+			isBeingScheduled: isEditedPostBeingScheduled(),
 		};
 	}
 )( PostPublishPanelPrepublish );
