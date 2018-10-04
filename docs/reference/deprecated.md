@@ -21,6 +21,7 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 - `setMetaBoxSavedData` action (`core/edit-post`) has been removed.
 - `getMetaBoxes` selector (`core/edit-post`) has been removed. Use `getActiveMetaBoxLocations` selector (`core/edit-post`) instead.
 - `getMetaBox` selector (`core/edit-post`) has been removed. Use `isMetaBoxLocationActive` selector (`core/edit-post`) instead.
+- Attribute type coercion has been removed. Omit the source to preserve type via serialized comment demarcation.
 
 ## 4.1.0
 
