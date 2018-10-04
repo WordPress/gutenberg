@@ -8,6 +8,6 @@ exports[`Deprecated Node Matcher should insert block with children source 1`] = 
 
 exports[`Deprecated Node Matcher should insert block with node source 1`] = `
 "<!-- wp:deprecated-node-matcher -->
-<blockquote class=\\"wp-block-deprecated-node-matcher\\"><p>test</p><p></p></blockquote>
+<blockquote class=\\"wp-block-deprecated-node-matcher\\"><p>test</p><p><br data-mce-bogus=\\"1\\"/></p></blockquote>
 <!-- /wp:deprecated-node-matcher -->"
 `;

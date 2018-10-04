@@ -33,6 +33,7 @@ export function toTree( value, multilineTag, settings ) {
 		appendText,
 		onStartIndex,
 		onEndIndex,
+		onEmpty,
 	} = settings;
 	const { formats, text, start, end } = value;
 	const formatsLength = formats.length + 1;
@@ -99,6 +100,10 @@ export function toTree( value, multilineTag, settings ) {
 		if ( onEndIndex && end === i + 1 ) {
 			onEndIndex( tree, pointer, multilineIndex );
 		}
+	}
+
+	if ( onEmpty && text.length === 0 ) {
+		onEmpty( tree );
 	}
 
 	return tree;
