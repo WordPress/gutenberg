@@ -505,15 +505,3 @@ function gutenberg_kses_allowedtags( $tags ) {
 }
 
 add_filter( 'wp_kses_allowed_html', 'gutenberg_kses_allowedtags', 10, 2 );
-
-/**
- * Ensure heartbeat interval is low enough to work for post locking.
- *
- * @param  array $settings Settings.
- * @return array           Filtered settings.
- */
-function wp_heartbeat_settings_gutenberg( $settings ) {
-	$settings['interval'] = 15;
-	return $settings;
-}
-add_filter( 'heartbeat_settings', 'wp_heartbeat_settings_gutenberg' );
