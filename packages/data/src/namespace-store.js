@@ -62,3 +62,48 @@ export function setActions( namespace, actions ) {
 	const createBoundAction = ( action ) => ( ...args ) => store.dispatch( action( ...args ) );
 	namespace.actions = mapValues( actions, createBoundAction );
 }
+
+/**
+ * Sets resolvers for a given namespace. Resolvers are side effects
+ * invoked once per argument set of a given selector call, used in ensuring
+ * that the data needs for the selector are satisfied.
+ *
+ * @param {Object} namespace   The namespace object to modify.
+ * @param {Object} resolvers   Resolvers to register.
+ * @param {Object} fulfillment Fulfillment implementation functions.
+ */
+export function setResolvers( namespace, resolvers, fulfillment ) {
+	namespace.resolvers = mapValues( resolvers, ( resolver ) => {
+		const { fulfill: resolverFulfill = resolver } = resolver;
+		return { ...resolver, fulfill: resolverFulfill };
+	} );
+
+	const mapSelector = ( selector, selectorName ) => {
+		const resolver = resolvers[ selectorName ];
+		if ( ! resolver ) {
+			return selector;
+		}
+
+		return ( ...args ) => {
+			async function fulfillSelector() {
+				const state = namespace.store.getState();
+				if ( typeof resolver.isFulfilled === 'function' && resolver.isFulfilled( state, ...args ) ) {
+					return;
+				}
+
+				if ( fulfillment.hasStarted( selectorName, args ) ) {
+					return;
+				}
+
+				fulfillment.start( selectorName, args );
+				await fulfillment.fulfill( selectorName, ...args );
+				fulfillment.finish( selectorName, args );
+			}
+
+			fulfillSelector( ...args );
+			return selector( ...args );
+		};
+	};
+
+	namespace.selectors = mapValues( namespace.selectors, mapSelector );
+}
