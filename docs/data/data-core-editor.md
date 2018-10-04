@@ -387,6 +387,20 @@ on each call
 
 Post blocks.
 
+### getClientIdsOfDescendants
+
+Returns an array containing the clientIds of all descendants
+of the blocks given.
+
+*Parameters*
+
+ * state: Global application state.
+ * clientIds: Array of blocks to inspect.
+
+*Returns*
+
+ids of descendants.
+
 ### getClientIdsWithDescendants
 
 Returns an array containing the clientIds of the top-level blocks

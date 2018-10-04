@@ -55,7 +55,7 @@ const {
 	getBlocks,
 	getBlockCount,
 	getClientIdsWithDescendants,
-	getDescendants,
+	getClientIdsOfDescendants,
 	hasSelectedBlock,
 	getSelectedBlock,
 	getSelectedBlockClientId,
@@ -1652,7 +1652,7 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getDescendants', () => {
+	describe( 'getClientIdsOfDescendants', () => {
 		it( 'should return the ids of any descendants, given an array of clientIds', () => {
 			const state = {
 				currentPost: {},
@@ -1696,7 +1696,7 @@ describe( 'selectors', () => {
 					},
 				},
 			};
-			expect( getDescendants( state, [ 'uuid-10' ] ) ).toEqual( [
+			expect( getClientIdsOfDescendants( state, [ 'uuid-10' ] ) ).toEqual( [
 				'uuid-12',
 				'uuid-14',
 				'uuid-16',

@@ -574,9 +574,9 @@ export const getBlocks = createSelector(
  *
  * @return {Array} ids of descendants.
  */
-export const getDescendants = ( state, clientIds ) => flatMap( clientIds, ( clientId ) => {
+export const getClientIdsOfDescendants = ( state, clientIds ) => flatMap( clientIds, ( clientId ) => {
 	const descendants = getBlockOrder( state, clientId );
-	return [ ...descendants, ...getDescendants( state, descendants ) ];
+	return [ ...descendants, ...getClientIdsOfDescendants( state, descendants ) ];
 } );
 
 /**
@@ -590,7 +590,7 @@ export const getDescendants = ( state, clientIds ) => flatMap( clientIds, ( clie
 export const getClientIdsWithDescendants = createSelector(
 	( state ) => {
 		const topLevelIds = getBlockOrder( state );
-		return [ ...topLevelIds, ...getDescendants( state, topLevelIds ) ];
+		return [ ...topLevelIds, ...getClientIdsOfDescendants( state, topLevelIds ) ];
 	},
 	( state ) => [
 		state.editor.present.blockOrder,
