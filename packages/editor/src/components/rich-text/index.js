@@ -7,7 +7,6 @@ import {
 	find,
 	identity,
 	isNil,
-	noop,
 	isEqual,
 } from 'lodash';
 import memize from 'memize';
@@ -22,7 +21,7 @@ import {
 	getScrollContainer,
 } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
-import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, rawShortcut } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER, rawShortcut } from '@wordpress/keycodes';
 import { Slot } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { rawHandler, children, getBlockTransforms, findTransform } from '@wordpress/blocks';
@@ -59,7 +58,7 @@ import TokenUI from './tokens/ui';
  * Browser dependencies
  */
 
-const { Node, getSelection } = window;
+const { getSelection } = window;
 
 /**
  * Zero-width space character used by TinyMCE as a caret landing point for
@@ -82,7 +81,6 @@ export class RichText extends Component {
 		this.onChange = this.onChange.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
 		this.onDeleteKeyDown = this.onDeleteKeyDown.bind( this );
-		this.onHorizontalNavigationKeyDown = this.onHorizontalNavigationKeyDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onKeyUp = this.onKeyUp.bind( this );
 		this.onPropagateUndo = this.onPropagateUndo.bind( this );
@@ -167,10 +165,7 @@ export class RichText extends Component {
 
 		editor.on( 'init', this.onInit );
 		editor.on( 'nodechange', this.onNodeChange );
-		editor.on( 'keydown', this.onKeyDown );
-		editor.on( 'keyup', this.onKeyUp );
 		editor.on( 'BeforeExecCommand', this.onPropagateUndo );
-		editor.on( 'focus', this.onFocus );
 		// The change event in TinyMCE fires every time an undo level is added.
 		editor.on( 'change', this.onCreateUndoLevel );
 
@@ -528,50 +523,6 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Handles a horizontal navigation key down event to handle the case where
-	 * TinyMCE attempts to preventDefault when on the outside edge of an inline
-	 * boundary when arrowing _away_ from the boundary, not within it. Replaces
-	 * the TinyMCE event `preventDefault` behavior with a noop, such that those
-	 * relying on `defaultPrevented` are not misinformed about the arrow event.
-	 *
-	 * If TinyMCE#4476 is resolved, this handling may be removed.
-	 *
-	 * @see https://github.com/tinymce/tinymce/issues/4476
-	 *
-	 * @param {tinymce.EditorEvent<KeyboardEvent>} event Keydown event.
-	 */
-	onHorizontalNavigationKeyDown( event ) {
-		const { focusNode } = getSelection();
-		const { nodeType, nodeValue } = focusNode;
-
-		if ( nodeType !== Node.TEXT_NODE ) {
-			return;
-		}
-
-		if ( nodeValue.length !== 1 || nodeValue[ 0 ] !== TINYMCE_ZWSP ) {
-			return;
-		}
-
-		const { keyCode } = event;
-
-		// Consider to be moving away from inline boundary based on:
-		//
-		// 1. Within a text fragment consisting only of ZWSP.
-		// 2. If in reverse, there is no previous sibling. If forward, there is
-		//    no next sibling (i.e. end of node).
-		const isReverse = keyCode === LEFT;
-		const edgeSibling = isReverse ? 'previousSibling' : 'nextSibling';
-		if ( ! focusNode[ edgeSibling ] ) {
-			// Note: This is not reassigning on the native event, rather the
-			// "fixed" TinyMCE copy, which proxies its preventDefault to the
-			// native event. By reassigning here, we're effectively preventing
-			// the proxied call on the native event, but not otherwise mutating
-			// the original event object.
-			event.preventDefault = noop;
-		}
-	}
-
-	/**
 	 * Handles a keydown event from TinyMCE.
 	 *
 	 * @param {KeydownEvent} event The keydown event as triggered by TinyMCE.
@@ -584,14 +535,9 @@ export class RichText extends Component {
 			this.onDeleteKeyDown( event );
 		}
 
-		const isHorizontalNavigation = keyCode === LEFT || keyCode === RIGHT;
-		if ( isHorizontalNavigation ) {
-			this.onHorizontalNavigationKeyDown( event );
-		}
-
-		// If we click shift+Enter on inline RichTexts, we avoid creating two contenteditables
-		// We also split the content and call the onSplit prop if provided.
 		if ( keyCode === ENTER ) {
+			event.preventDefault();
+
 			if ( this.props.onReplace ) {
 				const text = getTextContent( this.getRecord() );
 				const transformation = findTransform( this.enterPatterns, ( item ) => {
@@ -599,11 +545,6 @@ export class RichText extends Component {
 				} );
 
 				if ( transformation ) {
-					// Calling onReplace() will destroy the editor, so it's
-					// important that we stop other handlers (e.g. ones
-					// registered by TinyMCE) from also handling this event.
-					event.stopImmediatePropagation();
-					event.preventDefault();
 					this.props.onReplace( [
 						transformation.transform( { content: text } ),
 					] );
@@ -612,27 +553,17 @@ export class RichText extends Component {
 			}
 
 			if ( this.props.multiline ) {
-				if ( ! this.props.onSplit ) {
-					return;
-				}
-
 				const record = this.getRecord();
 
-				if ( ! isEmptyLine( record ) ) {
-					return;
-				}
-
-				event.preventDefault();
-
-				this.props.onSplit( ...split( record ).map( this.valueToFormat ) );
-			} else {
-				event.preventDefault();
-
-				if ( event.shiftKey || ! this.props.onSplit ) {
-					this.editor.execCommand( 'InsertLineBreak', false, event );
+				if ( ! this.props.onSplit || ! isEmptyLine( record ) ) {
+					this.onChange( insert( record, '\u2028' ) );
 				} else {
-					this.splitContent();
+					this.props.onSplit( ...split( record ).map( this.valueToFormat ) );
 				}
+			} else if ( event.shiftKey || ! this.props.onSplit ) {
+				this.editor.execCommand( 'InsertLineBreak', false, event );
+			} else {
+				this.splitContent();
 			}
 		}
 	}
@@ -910,6 +841,9 @@ export class RichText extends Component {
 								key={ key }
 								onPaste={ this.onPaste }
 								onInput={ this.onInput }
+								onKeyDown={ this.onKeyDown }
+								onKeyUp={ this.onKeyUp }
+								onFocus={ this.onFocus }
 								multilineTag={ MultilineTag }
 								setRef={ this.setRef }
 							/>
