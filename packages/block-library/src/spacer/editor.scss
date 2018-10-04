@@ -1,5 +1,4 @@
 .block-library-spacer__resize-container.is-selected {
-	.block-library-spacer__resize-handler-top,
 	.block-library-spacer__resize-handler-bottom {
 		display: block;
 	}
@@ -9,17 +8,32 @@
 	background: $light-gray-200;
 }
 
-.block-library-spacer__resize-handler-top,
 .block-library-spacer__resize-handler-bottom {
 	display: none;
-	border-radius: 50%;
-	border: 2px solid $white;
-	width: 15px !important;
-	height: 15px !important;
+
+	// Make the container larger so there's a larger grabbable area
+	$resize-handler-container-size: $resize-handler-size + ($grid-size-small * 2);
+
+	// Offset the handle's position
 	position: absolute;
-	background: theme(primary);
+	left: calc(50% - #{$resize-handler-container-size / 2}) !important;
+	bottom: calc(#{$resize-handler-container-size / 2} * -1) !important;
+
+	// Apply the width/height of the container size plus padding so the handle
+	// sits in the middle of the grabbable area
+	width: $resize-handler-container-size !important;
+	height: $resize-handler-container-size !important;
+	padding: $grid-size-small;
+}
+
+.block-library-spacer__resize-handler-bottom::before {
+	display: block;
+	content: "";
+	border: 2px solid $white;
+	border-radius: 50%;
+	width: $resize-handler-size !important;
+	height: $resize-handler-size !important;
 	padding: 0 3px 3px 0;
+	background: theme(primary);
 	cursor: se-resize;
-	left: 50% !important;
-	margin-left: -7.5px;
 }
