@@ -77,7 +77,7 @@ class BlockDropZone extends Component {
 	}
 
 	onDrop( event, position ) {
-		const { rootClientId: dstRootClientId, clientId: dstClientId, index: dstIndex, getDescendants } = this.props;
+		const { rootClientId: dstRootClientId, clientId: dstClientId, index: dstIndex, getClientIdsOfDescendants } = this.props;
 		const { srcRootClientId, srcClientId, srcIndex, type } = parseDropEvent( event );
 
 		const isBlockDropType = ( dropType ) => dropType === 'block';
@@ -87,7 +87,7 @@ class BlockDropZone extends Component {
 			return ( srcRoot === dstRoot ) || ( ! srcRoot === true && ! dstRoot === true );
 		};
 		const isSameBlock = ( src, dst ) => src === dst;
-		const isSrcBlockAnAncestorOfDstBlock = ( src, dst ) => getDescendants( [ src ] ).some( ( id ) => id === dst );
+		const isSrcBlockAnAncestorOfDstBlock = ( src, dst ) => getClientIdsOfDescendants( [ src ] ).some( ( id ) => id === dst );
 
 		if ( ! isBlockDropType( type ) ||
 			isSameBlock( srcClientId, dstClientId ) ||
@@ -156,10 +156,10 @@ export default compose(
 		};
 	} ),
 	withSelect( ( select, { rootClientId } ) => {
-		const { getDescendants, getTemplateLock } = select( 'core/editor' );
+		const { getClientIdsOfDescendants, getTemplateLock } = select( 'core/editor' );
 		return {
 			isLocked: !! getTemplateLock( rootClientId ),
-			getDescendants,
+			getClientIdsOfDescendants,
 		};
 	} )
 )( BlockDropZone );
