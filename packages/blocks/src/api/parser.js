@@ -136,10 +136,9 @@ export function isOfTypes( value, types ) {
  *                   source.
  */
 export function isAmbiguousStringSource( attributeSchema ) {
-	const { selector, source, type } = attributeSchema;
+	const { source, type } = attributeSchema;
 
 	return (
-		selector !== undefined &&
 		isStringSource( source ) &&
 		typeof type === 'string'
 	);
@@ -273,16 +272,14 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 			value = parseWithAttributeSchema( innerHTML, attributeSchema );
 	}
 
-	if ( isAmbiguousStringSource( attributeSchema ) ) {
-		value = asType( value, type );
-	} else if (
-		value !== undefined &&
-		type !== undefined &&
-		! isOfTypes( value, castArray( type ) )
-	) {
-		// Reject the value if it is not valid of type. Reverting to the
-		// undefined value ensures the default is restored, if applicable.
-		value = undefined;
+	if ( value !== undefined ) {
+		if ( isAmbiguousStringSource( attributeSchema ) ) {
+			value = asType( value, type );
+		} else if ( type !== undefined && ! isOfTypes( value, castArray( type ) ) ) {
+			// Reject the value if it is not valid of type. Reverting to the
+			// undefined value ensures the default is restored, if applicable.
+			value = undefined;
+		}
 	}
 
 	if ( value === undefined ) {

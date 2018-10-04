@@ -308,6 +308,13 @@ describe( 'block parser', () => {
 						type: 'string',
 						default: 'none',
 					},
+					undefAmbiguousStringWithDefault: {
+						type: 'string',
+						source: 'attribute',
+						selector: 'div',
+						attribute: 'data-foo',
+						default: 'ok',
+					},
 				},
 			};
 
@@ -319,6 +326,7 @@ describe( 'block parser', () => {
 				number: 10,
 				align: null,
 				topic: 'none',
+				undefAmbiguousStringWithDefault: 'ok',
 			} );
 		} );
 	} );
