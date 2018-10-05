@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { assign, get, includes } from 'lodash';
+import { assign, get, has, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,7 +24,7 @@ import { BlockControls, BlockAlignmentToolbar } from '../components';
  */
 export function addAttribute( settings ) {
 	// allow blocks to specify their own attribute definition with default values if needed.
-	if ( get( settings.attributes, [ 'align', 'type' ] ) === 'string' ) {
+	if ( has( settings.attributes, [ 'align', 'type' ] ) ) {
 		return settings;
 	}
 	if ( hasBlockSupport( settings, 'align' ) ) {

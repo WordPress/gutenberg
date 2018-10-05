@@ -421,7 +421,6 @@ export async function clickOnCloseModalButton( modalClassName ) {
 export async function setPostContent( content ) {
 	return await page.evaluate( ( _content ) => {
 		const { dispatch } = window.wp.data;
-		dispatch( 'core/editor' ).editPost( { content: _content } );
 		const blocks = wp.blocks.parse( _content );
 		dispatch( 'core/editor' ).resetBlocks( blocks );
 	}, content );
