@@ -163,7 +163,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-i18n',
 		gutenberg_url( 'build/i18n/index.js' ),
-		array( 'wp-deprecated', 'wp-polyfill' ),
+		array( 'wp-polyfill' ),
 		filemtime( gutenberg_dir_path() . 'build/i18n/index.js' ),
 		true
 	);
