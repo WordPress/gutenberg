@@ -6,20 +6,12 @@ import {
 	mapValues,
 	get,
 } from 'lodash';
-import { applyMiddleware } from 'redux';
 
 /**
  * Internal dependencies
  */
-import {
-	createNamespace,
-	setActions,
-	setSelectors,
-	setResolvers,
-} from './namespace-store.js';
+import createNamespace from './namespace-store.js';
 import dataStore from './store';
-import promise from './promise-middleware';
-import createResolversCacheMiddleware from './resolvers-cache-middleware';
 
 /**
  * An isolated orchestrator of store registrations.
@@ -90,29 +82,6 @@ export function createRegistry( storeConfigs = {} ) {
 	}
 
 	/**
-	 * Calls a resolver given arguments
-	 * TODO: Move this out of the registry and into implementation.
-	 *       (after plugins are removed)
-	 *
-	 * @param {string} reducerKey   Part of the state shape to register the
-	 *                              selectors for.
-	 * @param {string} selectorName Selector name to fulfill.
-	 * @param {Array} args          Selector Arguments.
-	 */
-	async function fulfill( reducerKey, selectorName, ...args ) {
-		const resolver = get( registry.namespaces, [ reducerKey, 'resolvers', selectorName ] );
-		if ( ! resolver ) {
-			return;
-		}
-
-		const store = namespaces[ reducerKey ].store;
-		const action = resolver.fulfill( ...args );
-		if ( action ) {
-			await store.dispatch( action );
-		}
-	}
-
-	/**
 	 * Returns the available actions for a part of the state.
 	 *
 	 * @param {string} reducerKey Part of the state shape to dispatch the
@@ -162,15 +131,7 @@ export function createRegistry( storeConfigs = {} ) {
 	 * @return {Object} Store Object.
 	 */
 	registry.registerReducer = ( reducerKey, reducer ) => {
-		const enhancers = [
-			applyMiddleware( createResolversCacheMiddleware( registry, reducerKey ), promise ),
-		];
-		if ( typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION__ ) {
-			enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__( { name: reducerKey, instanceId: reducerKey } ) );
-		}
-
-		// TODO: Remove globalListener from this call after subscriptions are passed.
-		namespaces[ reducerKey ] = createNamespace( reducer, enhancers, globalListener );
+		namespaces[ reducerKey ] = createNamespace( reducerKey, { reducer }, registry, globalListener );
 		return namespaces[ reducerKey ].store;
 	};
 
@@ -179,10 +140,10 @@ export function createRegistry( storeConfigs = {} ) {
 	 *
 	 * @param {string} reducerKey   Part of the state shape to register the
 	 *                              selectors for.
-	 * @param {Object} newActions   Actions to register.
+	 * @param {Object} actions   Actions to register.
 	 */
-	registry.registerActions = ( reducerKey, newActions ) => {
-		setActions( namespaces[ reducerKey ], newActions );
+	registry.registerActions = ( reducerKey, actions ) => {
+		namespaces[ reducerKey ] = createNamespace( reducerKey, { actions }, registry, globalListener );
 	};
 
 	/**
@@ -190,12 +151,12 @@ export function createRegistry( storeConfigs = {} ) {
 	 *
 	 * @param {string} reducerKey   Part of the state shape to register the
 	 *                              selectors for.
-	 * @param {Object} newSelectors Selectors to register. Keys will be used as the
+	 * @param {Object} selectors    Selectors to register. Keys will be used as the
 	 *                              public facing API. Selectors will get passed the
 	 *                              state as first argument.
 	 */
-	registry.registerSelectors = ( reducerKey, newSelectors ) => {
-		setSelectors( namespaces[ reducerKey ], newSelectors );
+	registry.registerSelectors = ( reducerKey, selectors ) => {
+		namespaces[ reducerKey ] = createNamespace( reducerKey, { selectors }, registry, globalListener );
 	};
 
 	/**
@@ -205,20 +166,10 @@ export function createRegistry( storeConfigs = {} ) {
 	 *
 	 * @param {string} reducerKey   Part of the state shape to register the
 	 *                              resolvers for.
-	 * @param {Object} newResolvers Resolvers to register.
+	 * @param {Object} resolvers Resolvers to register.
 	 */
-	registry.registerResolvers = ( reducerKey, newResolvers ) => {
-		const { hasStartedResolution } = select( 'core/data' );
-		const { startResolution, finishResolution } = dispatch( 'core/data' );
-
-		const fulfillment = {
-			hasStarted: ( ...args ) => hasStartedResolution( reducerKey, ...args ),
-			start: ( ...args ) => startResolution( reducerKey, ...args ),
-			finish: ( ...args ) => finishResolution( reducerKey, ...args ),
-			fulfill: ( ...args ) => fulfill( reducerKey, ...args ),
-		};
-
-		setResolvers( namespaces[ reducerKey ], newResolvers, fulfillment );
+	registry.registerResolvers = ( reducerKey, resolvers ) => {
+		namespaces[ reducerKey ] = createNamespace( reducerKey, { resolvers }, registry, globalListener );
 	};
 
 	/**
@@ -234,21 +185,8 @@ export function createRegistry( storeConfigs = {} ) {
 			throw new TypeError( 'Must specify store reducer' );
 		}
 
-		const store = registry.registerReducer( reducerKey, options.reducer );
-
-		if ( options.actions ) {
-			registry.registerActions( reducerKey, options.actions );
-		}
-
-		if ( options.selectors ) {
-			registry.registerSelectors( reducerKey, options.selectors );
-		}
-
-		if ( options.resolvers ) {
-			registry.registerResolvers( reducerKey, options.resolvers );
-		}
-
-		return store;
+		namespaces[ reducerKey ] = createNamespace( reducerKey, options, registry, globalListener );
+		return namespaces[ reducerKey ].store;
 	};
 
 	/**

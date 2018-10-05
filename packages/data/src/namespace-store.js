@@ -1,83 +1,146 @@
 /**
  * External dependencies
  */
-import { createStore as createReduxStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import {
 	flowRight,
+	get,
 	mapValues,
 } from 'lodash';
 
 /**
+ * Internal dependencies
+ */
+import promise from './promise-middleware';
+import createResolversCacheMiddleware from './resolvers-cache-middleware';
+
+/**
  * Creates a namespace object with a store derived from the reducer given.
  *
- * @param {Object} reducer Reducer function.
- * @param {Array} enhancers Array of enhancer functions to be added to the store.
+ * @param {string} key              Identifying string used for namespace and redex dev tools.
+ * @param {Object} options          Contains reducer, actions, selectors, and resolvers.
+ * @param {Object} registry         Temporary registry reference, required for namespace updates.
  * @param {function} globalListener TODO: Remove this after subscribe is passed correctly.
  *
  * @return {Object} Store Object.
  */
-export function createNamespace( reducer, enhancers, globalListener ) {
-	const store = createReduxStore( reducer, flowRight( enhancers ) );
-	const namespace = { store, reducer };
+export default function createNamespace( key, options, registry, globalListener ) {
+	// TODO: After register[Reducer|Actions|Selectors|Resolvers] are deprecated and removed,
+	//       this function can be greatly simplified because it should no longer be called to modify
+	//       a namespace, but only to create one, and only once for each namespace.
 
-	// TODO: Move this to a subscribe function instead of referencing globalListener.
-	// Customize subscribe behavior to call listeners only on effective change,
-	// not on every dispatch.
-	let lastState = store.getState();
-	store.subscribe( () => {
-		const state = store.getState();
-		const hasChanged = state !== lastState;
-		lastState = state;
+	let {
+		reducer,
+		store,
+		actions,
+		selectors,
+		resolvers,
+	} = registry.namespaces[ key ] || {};
 
-		if ( hasChanged ) {
-			globalListener();
+	if ( options.reducer ) {
+		reducer = options.reducer;
+		store = createReduxStore( reducer, key, registry );
+
+		// TODO: Move this to a subscribe function instead of referencing globalListener.
+		// Customize subscribe behavior to call listeners only on effective change,
+		// not on every dispatch.
+		let lastState = store.getState();
+		store.subscribe( () => {
+			const state = store.getState();
+			const hasChanged = state !== lastState;
+			lastState = state;
+
+			if ( hasChanged ) {
+				globalListener();
+			}
+		} );
+	}
+	if ( options.actions ) {
+		if ( ! store ) {
+			throw new TypeError( 'Cannot specify actions when no reducer is present' );
 		}
-	} );
+		actions = mapActions( options.actions, store );
+	}
+	if ( options.selectors ) {
+		if ( ! store ) {
+			throw new TypeError( 'Cannot specify selectors when no reducer is present' );
+		}
+		selectors = mapSelectors( options.selectors, store );
+	}
+	if ( options.resolvers ) {
+		const fulfillment = getCoreDataFulfillment( registry, key );
+		const result = mapResolvers( options.resolvers, selectors, fulfillment, store );
+		resolvers = result.resolvers;
+		selectors = result.selectors;
+	}
 
-	return namespace;
+	return {
+		reducer,
+		store,
+		actions,
+		selectors,
+		resolvers,
+	};
 }
 
 /**
- * Sets selectors for given namespace.
+ * Creates a redux store for a namespace.
  *
- * @param {Object} namespace  The namespace object to modify.
+ * @param {Function} reducer    Root reducer for redux store.
+ * @param {string} key          Part of the state shape to register the
+ *                              selectors for.
+ * @param {Object} registry     Registry reference, for resolver enhancer support.
+ * @return {Object}             Newly created redux store.
+ */
+function createReduxStore( reducer, key, registry ) {
+	const enhancers = [
+		applyMiddleware( createResolversCacheMiddleware( registry, key ), promise ),
+	];
+	if ( typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION__ ) {
+		enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__( { name: key, instanceId: key } ) );
+	}
+
+	return createStore( reducer, flowRight( enhancers ) );
+}
+
+/**
+ * Maps selectors to a redux store.
+ *
  * @param {Object} selectors  Selectors to register. Keys will be used as the
  *                            public facing API. Selectors will get passed the
  *                            state as first argument.
+ * @param {Object} store      The redux store to which the selectors should be mapped.
+ * @return {Object}           Selectors mapped to the redux store provided.
  */
-export function setSelectors( namespace, selectors ) {
-	const { store } = namespace;
+function mapSelectors( selectors, store ) {
 	const createStateSelector = ( selector ) => ( ...args ) => selector( store.getState(), ...args );
-	namespace.selectors = mapValues( selectors, createStateSelector );
+	return mapValues( selectors, createStateSelector );
 }
 
 /**
- * Sets actions for given namespace.
+ * Maps actions to dispatch from a given store.
  *
- * @param {Object} namespace  The namespace object to modify.
  * @param {Object} actions    Actions to register.
+ * @param {Object} store      The redux store to which the actions should be mapped.
+ * @return {Object}           Actions mapped to the redux store provided.
  */
-export function setActions( namespace, actions ) {
-	const { store } = namespace;
+function mapActions( actions, store ) {
 	const createBoundAction = ( action ) => ( ...args ) => store.dispatch( action( ...args ) );
-	namespace.actions = mapValues( actions, createBoundAction );
+	return mapValues( actions, createBoundAction );
 }
 
 /**
- * Sets resolvers for a given namespace. Resolvers are side effects
- * invoked once per argument set of a given selector call, used in ensuring
- * that the data needs for the selector are satisfied.
+ * Returns resolvers with matched selectors for a given namespace.
+ * Resolvers are side effects invoked once per argument set of a given selector call,
+ * used in ensuring that the data needs for the selector are satisfied.
  *
- * @param {Object} namespace   The namespace object to modify.
  * @param {Object} resolvers   Resolvers to register.
+ * @param {Object} selectors   The current selectors to be modified.
  * @param {Object} fulfillment Fulfillment implementation functions.
+ * @param {Object} store       The redux store to which the resolvers should be mapped.
+ * @return {Object}            An object containing updated selectors and resolvers.
  */
-export function setResolvers( namespace, resolvers, fulfillment ) {
-	namespace.resolvers = mapValues( resolvers, ( resolver ) => {
-		const { fulfill: resolverFulfill = resolver } = resolver;
-		return { ...resolver, fulfill: resolverFulfill };
-	} );
-
+function mapResolvers( resolvers, selectors, fulfillment, store ) {
 	const mapSelector = ( selector, selectorName ) => {
 		const resolver = resolvers[ selectorName ];
 		if ( ! resolver ) {
@@ -86,7 +149,7 @@ export function setResolvers( namespace, resolvers, fulfillment ) {
 
 		return ( ...args ) => {
 			async function fulfillSelector() {
-				const state = namespace.store.getState();
+				const state = store.getState();
 				if ( typeof resolver.isFulfilled === 'function' && resolver.isFulfilled( state, ...args ) ) {
 					return;
 				}
@@ -105,5 +168,54 @@ export function setResolvers( namespace, resolvers, fulfillment ) {
 		};
 	};
 
-	namespace.selectors = mapValues( namespace.selectors, mapSelector );
+	const mappedResolvers = mapValues( resolvers, ( resolver ) => {
+		const { fulfill: resolverFulfill = resolver } = resolver;
+		return { ...resolver, fulfill: resolverFulfill };
+	} );
+
+	return {
+		resolvers: mappedResolvers,
+		selectors: mapValues( selectors, mapSelector ),
+	};
+}
+
+/**
+ * Bundles up fulfillment functions for resolvers.
+ * @param {Object} registry     Registry reference, for fulfilling via resolvers
+ * @param {string} key          Part of the state shape to register the
+ *                              selectors for.
+ * @return {Object}             An object providing fulfillment functions.
+ */
+function getCoreDataFulfillment( registry, key ) {
+	const { hasStartedResolution } = registry.select( 'core/data' );
+	const { startResolution, finishResolution } = registry.dispatch( 'core/data' );
+
+	return {
+		hasStarted: ( ...args ) => hasStartedResolution( key, ...args ),
+		start: ( ...args ) => startResolution( key, ...args ),
+		finish: ( ...args ) => finishResolution( key, ...args ),
+		fulfill: ( ...args ) => fulfillWithRegistry( registry, key, ...args ),
+	};
+}
+
+/**
+ * Calls a resolver given arguments
+ *
+ * @param {Object} registry     Registry reference, for fulfilling via resolvers
+ * @param {string} key          Part of the state shape to register the
+ *                              selectors for.
+ * @param {string} selectorName Selector name to fulfill.
+ * @param {Array} args         Selector Arguments.
+ */
+async function fulfillWithRegistry( registry, key, selectorName, ...args ) {
+	const resolver = get( registry.namespaces, [ key, 'resolvers', selectorName ] );
+	if ( ! resolver ) {
+		return;
+	}
+
+	const store = registry.namespaces[ key ].store;
+	const action = resolver.fulfill( ...args );
+	if ( action ) {
+		await store.dispatch( action );
+	}
 }
