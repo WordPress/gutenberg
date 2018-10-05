@@ -24,6 +24,10 @@ ul:not(.wp-block-gallery) {
 	list-style-type: disc;
 }
 
+ul:not(.wp-block-gallery) ul {
+	list-style-type: circle;
+}
+
 ol {
 	list-style-type: decimal;
 }
