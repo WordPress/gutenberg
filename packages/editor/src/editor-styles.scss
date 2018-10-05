@@ -20,14 +20,15 @@ ol {
 	padding: 0;
 }
 
-ul:not(.wp-block-gallery) {
+ul {
 	list-style-type: disc;
-}
-
-ul:not(.wp-block-gallery) ul {
-	list-style-type: circle;
 }
 
 ol {
 	list-style-type: decimal;
+}
+
+ul ul,
+ol ul {
+	list-style-type: circle;
 }
