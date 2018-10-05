@@ -91,11 +91,9 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 					closeLabel={ __( 'Close' ) }
 					onRequestClose={ toggleModal }
 				>
-
 					{ shortcutConfig.map( ( config, index ) => (
 						<ShortcutSection key={ index } { ...config } />
 					) ) }
-
 				</Modal>
 			) }
 		</Fragment>

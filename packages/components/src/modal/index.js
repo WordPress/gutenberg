@@ -9,7 +9,6 @@ import { noop } from 'lodash';
  */
 import { Component, createPortal } from '@wordpress/element';
 import { withInstanceId } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -105,10 +104,10 @@ class Modal extends Component {
 
 	/**
 	 * Stop all onMouseDown events propagating further - they should only go to the modal
- 	 * @param {string} ev Event object
+ 	 * @param {string} event Event object
 	 */
-	stopEventPropagationOutsideModal( ev ) {
-		ev.stopPropagation();
+	stopEventPropagationOutsideModal( event ) {
+		event.stopPropagation();
 	}
 
 	/**
@@ -131,10 +130,7 @@ class Modal extends Component {
 			...otherProps
 		} = this.props;
 
-		const headingId = (
-			aria.labelledby ||
-			'components-modal-header-' + instanceId
-		);
+		const headingId = aria.labelledby || `components-modal-header-${ instanceId }`;
 
 		// Disable reason: this stops mouse events from triggering tooltips and
 		// other elements underneath the modal overlay.
@@ -156,12 +152,7 @@ class Modal extends Component {
 					} }
 					{ ...otherProps }
 				>
-					<div
-						className={ 'components-modal__content' }
-						role="region"
-						aria-label={ __( 'Dialog Contents' ) }
-						tabIndex="0"
-					>
+					<div className={ 'components-modal__content' } tabIndex="0">
 						<ModalHeader
 							closeLabel={ closeButtonLabel }
 							headingId={ headingId }
