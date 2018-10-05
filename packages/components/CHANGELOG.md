@@ -1,3 +1,9 @@
+## 5.0.0 (Unreleased)
+
+### New Feature
+
+- Added a new `ResizableBox` component.
+
 ## 4.0.0 (2018-09-30)
 
 ### Breaking Change

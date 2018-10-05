@@ -4,7 +4,7 @@ ResizableBox is a wrapper around the [re-resizable package](https://github.com/b
 
 ## Usage
 
-Most options are passed directly through to [re-resizable](https://github.com/bokuweb/re-resizable) so you may wish to refer to their documentation. Note that we set the `handleClasses` and `handleStyles` to enable the Gutenberg-specific styles.
+Most options are passed directly through to [re-resizable](https://github.com/bokuweb/re-resizable) so you may wish to refer to their documentation. The primary differences in this component are that we set the `handleClasses` (to use custom class names) and pass some null values to `handleStyles` (to unset some inline styles).
 
 The example below shows how you might use `ResizableBox` to set a width and height inside a block's `edit` component.
 
