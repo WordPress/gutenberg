@@ -149,7 +149,7 @@ describe( 'adding blocks', () => {
 		await pressWithModifier( META_KEY, 'b' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		// Reset.
+		// Backspace to remove the content in this block, resetting it.
 		await page.keyboard.press( 'Backspace' );
 
 		// Ensure no data-mce-selected. Notably, this can occur when content
