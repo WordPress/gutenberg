@@ -368,7 +368,14 @@ class WP_Block_Parser {
         $namespace  = ( isset( $namespace ) && -1 !== $namespace[ 1 ] ) ? $namespace[ 0 ] : 'core/';
         $name       = $namespace . $matches[ 'name' ][ 0 ];
         $has_attrs  = isset( $matches[ 'attrs' ] ) && -1 !== $matches[ 'attrs' ][ 1 ];
-        $attrs      = $has_attrs ? json_decode( $matches[ 'attrs' ][ 0 ], /* as-associative */ true ) : array();
+
+        /*
+         * Fun fact! It's not trivial in PHP to create "an empty associative array" since all arrays
+         * are associative arrays. If we use `array()` we get a JSON `[]`
+         */
+        $attrs = $has_attrs
+			? json_decode( $matches[ 'attrs' ][ 0 ], /* as-associative */ true )
+			: json_decode( '{}', /* don't ask why, just verify in PHP */ false );
 
         /*
          * This state isn't allowed
