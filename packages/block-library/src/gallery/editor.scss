@@ -115,9 +115,12 @@
 }
 
 .blocks-gallery-item__remove {
+	padding: 0;
+}
+
+.blocks-gallery-item__move {
 	color: $white;
 	cursor: grab;
-	padding: 0;
 }
 
 .blocks-gallery-item .components-spinner {

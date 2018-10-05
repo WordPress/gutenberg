@@ -138,7 +138,7 @@ class GalleryImage extends Component {
 										>
 											<Dashicon
 												icon="move"
-												className="blocks-gallery-item__remove"
+												className="blocks-gallery-item__move"
 											/>
 										</span>
 									)
