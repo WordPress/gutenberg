@@ -1356,13 +1356,13 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		// or filtered value.
 		$initial_edits = array(
 			'title' => array(
-				'raw' => apply_filters( 'the_title', $post->post_title, $post->ID ),
+				'raw' => $post->post_title,
 			),
 			'content' => array(
-				'raw' => apply_filters( 'the_content', $post->post_content, $post->ID ),
+				'raw' => $post->post_content,
 			),
 			'excerpt' => array(
-				'raw' => apply_filters( 'the_excerpt', $post->post_excerpt, $post->ID ),
+				'raw' => $post->post_excerpt,
 			)
 		);
 	} else {
