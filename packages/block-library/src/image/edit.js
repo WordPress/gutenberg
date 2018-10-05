@@ -40,6 +40,7 @@ import {
 } from '@wordpress/editor';
 import { withViewportMatch } from '@wordpress/viewport';
 import { compose } from '@wordpress/compose';
+import { create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -55,7 +56,19 @@ const LINK_DESTINATION_MEDIA = 'media';
 const LINK_DESTINATION_ATTACHMENT = 'attachment';
 const LINK_DESTINATION_CUSTOM = 'custom';
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
-export const RELEVANT_MEDIA_FIELDS = [ 'alt', 'caption', 'id', 'url' ];
+
+export const pickRelevantMediaFiles = ( image ) => {
+	let { caption } = image;
+
+	if ( typeof caption !== 'object' ) {
+		caption = create( { html: caption } );
+	}
+
+	return {
+		...pick( image, [ 'alt', 'id', 'link', 'url' ] ),
+		caption,
+	};
+};
 
 class ImageEdit extends Component {
 	constructor() {
@@ -88,7 +101,7 @@ class ImageEdit extends Component {
 				mediaUpload( {
 					filesList: [ file ],
 					onFileChange: ( [ image ] ) => {
-						setAttributes( { ...pick( image, RELEVANT_MEDIA_FIELDS ) } );
+						setAttributes( pickRelevantMediaFiles( image ) );
 					},
 					allowedTypes: ALLOWED_MEDIA_TYPES,
 				} );
@@ -117,12 +130,13 @@ class ImageEdit extends Component {
 				url: undefined,
 				alt: undefined,
 				id: undefined,
-				caption: undefined,
+				caption: create(),
 			} );
 			return;
 		}
+
 		this.props.setAttributes( {
-			...pick( media, RELEVANT_MEDIA_FIELDS ),
+			...pickRelevantMediaFiles( media ),
 			width: undefined,
 			height: undefined,
 		} );
@@ -495,7 +509,7 @@ class ImageEdit extends Component {
 						<RichText
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
-							value={ caption || [] }
+							value={ caption }
 							unstableOnFocus={ this.onFocusCaption }
 							onChange={ ( value ) => setAttributes( { caption: value } ) }
 							isSelected={ this.state.captionFocused }

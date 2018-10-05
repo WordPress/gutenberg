@@ -26,6 +26,7 @@ import {
 	InspectorControls,
 	mediaUpload,
 } from '@wordpress/editor';
+import { create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -44,9 +45,17 @@ export function defaultColumnsNumber( attributes ) {
 	return Math.min( 3, attributes.images.length );
 }
 
-const RELEVANT_MEDIA_FIELDS = [ 'alt', 'caption', 'id', 'link', 'url' ];
 export const pickRelevantMediaFiles = ( image ) => {
-	return pick( image, RELEVANT_MEDIA_FIELDS );
+	let { caption } = image;
+
+	if ( typeof caption !== 'object' ) {
+		caption = create( { html: caption } );
+	}
+
+	return {
+		...pick( image, [ 'alt', 'id', 'link', 'url' ] ),
+		caption,
+	};
 };
 
 class GalleryEdit extends Component {

@@ -97,7 +97,7 @@ export const settings = {
 				transform: ( attributes ) => {
 					return createBlock( 'core/file', {
 						href: attributes.src,
-						fileName: attributes.caption && attributes.caption.join(),
+						fileName: attributes.caption,
 						textLinkHref: attributes.src,
 						id: attributes.id,
 					} );
@@ -109,7 +109,7 @@ export const settings = {
 				transform: ( attributes ) => {
 					return createBlock( 'core/file', {
 						href: attributes.src,
-						fileName: attributes.caption && attributes.caption.join(),
+						fileName: attributes.caption,
 						textLinkHref: attributes.src,
 						id: attributes.id,
 					} );
@@ -121,7 +121,7 @@ export const settings = {
 				transform: ( attributes ) => {
 					return createBlock( 'core/file', {
 						href: attributes.url,
-						fileName: attributes.caption && attributes.caption.join(),
+						fileName: attributes.caption,
 						textLinkHref: attributes.url,
 						id: attributes.id,
 					} );
@@ -143,7 +143,7 @@ export const settings = {
 				transform: ( attributes ) => {
 					return createBlock( 'core/audio', {
 						src: attributes.href,
-						caption: [ attributes.fileName ],
+						caption: attributes.fileName,
 						id: attributes.id,
 					} );
 				},
@@ -162,7 +162,7 @@ export const settings = {
 				transform: ( attributes ) => {
 					return createBlock( 'core/video', {
 						src: attributes.href,
-						caption: [ attributes.fileName ],
+						caption: attributes.fileName,
 						id: attributes.id,
 					} );
 				},
@@ -181,7 +181,7 @@ export const settings = {
 				transform: ( attributes ) => {
 					return createBlock( 'core/image', {
 						url: attributes.href,
-						caption: [ attributes.fileName ],
+						caption: attributes.fileName,
 						id: attributes.id,
 					} );
 				},
