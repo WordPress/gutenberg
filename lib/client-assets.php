@@ -1356,8 +1356,14 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		// or filtered value.
 		$initial_edits = array(
 			'title' => array(
-				'raw' => apply_filters( 'the_title', '', $post->ID ),
+				'raw' => apply_filters( 'the_title', $post->post_title, $post->ID ),
 			),
+			'content' => array(
+				'raw' => apply_filters( 'the_content', $post->post_content, $post->ID ),
+			),
+			'excerpt' => array(
+				'raw' => apply_filters( 'the_excerpt', $post->post_excerpt, $post->ID ),
+			)
 		);
 	} else {
 		$initial_edits = null;
