@@ -149,13 +149,11 @@ describe( 'adding blocks', () => {
 		await pressWithModifier( META_KEY, 'b' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		// When returning to Visual mode, backspace in selected block should
-		// reset to an unmodified default block.
+		// Reset.
 		await page.keyboard.press( 'Backspace' );
 
 		// Ensure no data-mce-selected. Notably, this can occur when content
 		// is saved while typing within an inline boundary.
-		await clickBlockAppender();
 		await pressWithModifier( META_KEY, 'b' );
 		await page.keyboard.type( 'Inside' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
