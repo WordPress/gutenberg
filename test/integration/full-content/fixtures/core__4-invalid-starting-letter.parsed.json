@@ -1,6 +1,8 @@
 [
     {
+        "blockName": null,
         "attrs": {},
+        "innerBlocks": [],
         "innerHTML": "<!-- wp:core/4-invalid /-->\n"
     }
 ]
