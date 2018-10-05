@@ -36,6 +36,16 @@ export const settings = {
 			const { height } = attributes;
 			const id = `block-spacer-height-input-${ instanceId }`;
 
+			// Removes the inline styles in the drag handles.
+			const handleStylesOverrides = {
+				width: null,
+				height: null,
+				top: null,
+				right: null,
+				bottom: null,
+				left: null,
+			};
+
 			return (
 				<Fragment>
 					<ResizableBox
@@ -48,8 +58,10 @@ export const settings = {
 						} }
 						minHeight="20"
 						handleClasses={ {
-							top: 'block-library-spacer__resize-handler-top',
 							bottom: 'block-library-spacer__resize-handler-bottom',
+						} }
+						handleStyles={ {
+							bottom: handleStylesOverrides,
 						} }
 						enable={ {
 							top: false,

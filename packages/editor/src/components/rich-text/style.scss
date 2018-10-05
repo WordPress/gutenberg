@@ -7,6 +7,7 @@
 .editor-rich-text__tinymce {
 	margin: 0;
 	position: relative;
+	line-height: $editor-line-height;
 
 	> p:empty {
 		min-height: $editor-font-size * $editor-line-height;
@@ -105,10 +106,6 @@
 	// To ensure legibility, we increase the default placeholder opacity to ensure contrast.
 	&[data-is-placeholder-visible="true"] + figcaption.editor-rich-text__tinymce {
 		opacity: 0.8;
-	}
-
-	&.mce-content-body {
-		line-height: $editor-line-height;
 	}
 }
 

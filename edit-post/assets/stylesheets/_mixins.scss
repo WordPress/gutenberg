@@ -326,3 +326,29 @@
 	// icon standards.
 	margin-right: 2px;
 }
+
+
+/**
+ * Styles for resize handles
+ */
+
+@mixin resize-handler__container() {
+	display: none;
+
+	// The handle itself is a pseudo element, and will sit inside this larger
+	// container size.
+	width: $resize-handler-container-size;
+	height: $resize-handler-container-size;
+	padding: $grid-size-small;
+}
+
+@mixin resize-handler__visible-handle() {
+	display: block;
+	content: "";
+	width: $resize-handler-size;
+	height: $resize-handler-size;
+	border: 2px solid $white;
+	border-radius: 50%;
+	background: theme(primary);
+	cursor: inherit;
+}

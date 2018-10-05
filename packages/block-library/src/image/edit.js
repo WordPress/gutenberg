@@ -40,6 +40,7 @@ import {
 } from '@wordpress/editor';
 import { withViewportMatch } from '@wordpress/viewport';
 import { compose } from '@wordpress/compose';
+import { create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -55,6 +56,19 @@ const LINK_DESTINATION_MEDIA = 'media';
 const LINK_DESTINATION_ATTACHMENT = 'attachment';
 const LINK_DESTINATION_CUSTOM = 'custom';
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
+
+export const pickRelevantMediaFiles = ( image ) => {
+	let { caption } = image;
+
+	if ( typeof caption !== 'object' ) {
+		caption = create( { html: caption } );
+	}
+
+	return {
+		...pick( image, [ 'alt', 'id', 'link', 'url' ] ),
+		caption,
+	};
+};
 
 class ImageEdit extends Component {
 	constructor() {
@@ -87,7 +101,7 @@ class ImageEdit extends Component {
 				mediaUpload( {
 					filesList: [ file ],
 					onFileChange: ( [ image ] ) => {
-						setAttributes( { ...image } );
+						setAttributes( pickRelevantMediaFiles( image ) );
 					},
 					allowedTypes: ALLOWED_MEDIA_TYPES,
 				} );
@@ -116,12 +130,13 @@ class ImageEdit extends Component {
 				url: undefined,
 				alt: undefined,
 				id: undefined,
-				caption: undefined,
+				caption: create(),
 			} );
 			return;
 		}
+
 		this.props.setAttributes( {
-			...pick( media, [ 'alt', 'id', 'caption', 'url' ] ),
+			...pickRelevantMediaFiles( media ),
 			width: undefined,
 			height: undefined,
 		} );
@@ -431,6 +446,16 @@ class ImageEdit extends Component {
 							}
 							/* eslint-enable no-lonely-if */
 
+							// Removes the inline styles in the drag handles.
+							const handleStylesOverrides = {
+								width: null,
+								height: null,
+								top: null,
+								right: null,
+								bottom: null,
+								left: null,
+							};
+
 							return (
 								<Fragment>
 									{ getInspectorControls( imageWidth, imageHeight ) }
@@ -451,6 +476,11 @@ class ImageEdit extends Component {
 											right: 'block-library-image__resize-handler-right',
 											bottom: 'block-library-image__resize-handler-bottom',
 											left: 'block-library-image__resize-handler-left',
+										} }
+										handleStyles={ {
+											right: handleStylesOverrides,
+											bottom: handleStylesOverrides,
+											left: handleStylesOverrides,
 										} }
 										enable={ {
 											top: false,
@@ -479,7 +509,7 @@ class ImageEdit extends Component {
 						<RichText
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
-							value={ caption || [] }
+							value={ caption }
 							unstableOnFocus={ this.onFocusCaption }
 							onChange={ ( value ) => setAttributes( { caption: value } ) }
 							isSelected={ this.state.captionFocused }
