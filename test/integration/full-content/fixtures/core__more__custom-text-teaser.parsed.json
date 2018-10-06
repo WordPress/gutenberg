@@ -9,7 +9,9 @@
         "innerHTML": "\n<!--more Continue Reading-->\n<!--noteaser-->\n"
     },
     {
+        "blockName": null,
         "attrs": {},
+        "innerBlocks": [],
         "innerHTML": "\n"
     }
 ]

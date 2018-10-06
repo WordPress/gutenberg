@@ -3,7 +3,7 @@
 exports[`block-serialization-spec-parser parse() works properly 1`] = `
 Array [
   Object {
-    "attrs": null,
+    "attrs": Object {},
     "blockName": "core/more",
     "innerBlocks": Array [],
     "innerHTML": "<!--more-->",

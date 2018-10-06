@@ -121,6 +121,7 @@ class WP_Block_Parser_Frame {
  * Parses a document and constructs a list of parsed block objects
  *
  * @since 3.8.0
+ * @since 4.0.0 returns arrays not objects, all attributes are arrays
  */
 class WP_Block_Parser {
 	/**
@@ -244,17 +245,14 @@ class WP_Block_Parser {
                  */
                 if ( 0 === $stack_depth ) {
                     if ( isset( $leading_html_start ) ) {
-                        $this->output[] = array(
-                            'attrs' => array(),
-                            'innerHTML' => substr(
-                                $this->document,
-                                $leading_html_start,
-                                $start_offset - $leading_html_start
-                            ),
-                        );
+                        $this->output[] = (array) self::freeform( substr(
+                            $this->document,
+                            $leading_html_start,
+                            $start_offset - $leading_html_start
+                        ) );
                     }
 
-                    $this->output[] = new WP_Block_Parser_Block( $block_name, $attrs, array(), '' );
+                    $this->output[] = (array) new WP_Block_Parser_Block( $block_name, $attrs, array(), '' );
                     $this->offset = $start_offset + $token_length;
                     return true;
                 }
@@ -370,7 +368,14 @@ class WP_Block_Parser {
         $namespace  = ( isset( $namespace ) && -1 !== $namespace[ 1 ] ) ? $namespace[ 0 ] : 'core/';
         $name       = $namespace . $matches[ 'name' ][ 0 ];
         $has_attrs  = isset( $matches[ 'attrs' ] ) && -1 !== $matches[ 'attrs' ][ 1 ];
-        $attrs      = $has_attrs ? json_decode( $matches[ 'attrs' ][ 0 ] ) : null;
+
+        /*
+         * Fun fact! It's not trivial in PHP to create "an empty associative array" since all arrays
+         * are associative arrays. If we use `array()` we get a JSON `[]`
+         */
+        $attrs = $has_attrs
+			? json_decode( $matches[ 'attrs' ][ 0 ], /* as-associative */ true )
+			: json_decode( '{}', /* don't ask why, just verify in PHP */ false );
 
         /*
          * This state isn't allowed
@@ -391,6 +396,19 @@ class WP_Block_Parser {
         return array( 'block-opener', $name, $attrs, $started_at, $length );
     }
 
+    /**
+     * Returns a new block object for freeform HTML
+     *
+     * @internal
+     * @since 3.9.0
+     *
+     * @param string $innerHTML HTML content of block
+     * @return WP_Block_Parser_Block freeform block object
+     */
+    static function freeform( $innerHTML ) {
+        return new WP_Block_Parser_Block( null, array(), array(), $innerHTML );
+    }
+
 	/**
 	 * Pushes a length of text from the input document
 	 * to the output list as a freeform block
@@ -406,10 +424,7 @@ class WP_Block_Parser {
             return;
         }
 
-        $this->output[] = array(
-            'attrs'     => new stdClass(),
-            'innerHTML' => substr( $this->document, $this->offset, $length ),
-        );
+        $this->output[] = (array) self::freeform( substr( $this->document, $this->offset, $length ) );
     }
 
 	/**
@@ -423,7 +438,7 @@ class WP_Block_Parser {
 	 * @param int $token_length byte length of entire block from start of opening token to end of closing token
 	 * @param int|null $last_offset last byte offset into document if continuing form earlier output
 	 */
-    function add_inner_block(WP_Block_Parser_Block $block, $token_start, $token_length, $last_offset = null ) {
+    function add_inner_block( WP_Block_Parser_Block $block, $token_start, $token_length, $last_offset = null ) {
         $parent = $this->stack[ count( $this->stack ) - 1 ];
         $parent->block->innerBlocks[] = $block;
         $parent->block->innerHTML .= substr( $this->document, $parent->prev_offset, $token_start - $parent->prev_offset );
@@ -446,16 +461,13 @@ class WP_Block_Parser {
             : substr( $this->document, $prev_offset );
 
         if ( isset( $stack_top->leading_html_start ) ) {
-            $this->output[] = array(
-                'attrs' => array(),
-                'innerHTML' => substr(
-                    $this->document,
-                    $stack_top->leading_html_start,
-                    $stack_top->token_start - $stack_top->leading_html_start
-                ),
-            );
+            $this->output[] = (array) self::freeform( substr(
+                $this->document,
+                $stack_top->leading_html_start,
+                $stack_top->token_start - $stack_top->leading_html_start
+            ) );
         }
 
-        $this->output[] = $stack_top->block;
+        $this->output[] = (array) $stack_top->block;
     }
 }
