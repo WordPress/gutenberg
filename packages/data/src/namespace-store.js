@@ -20,11 +20,10 @@ import createResolversCacheMiddleware from './resolvers-cache-middleware';
  * @param {string} key              Identifying string used for namespace and redex dev tools.
  * @param {Object} options          Contains reducer, actions, selectors, and resolvers.
  * @param {Object} registry         Temporary registry reference, required for namespace updates.
- * @param {function} globalListener TODO: Remove this after subscribe is passed correctly.
  *
  * @return {Object} Store Object.
  */
-export default function createNamespace( key, options, registry, globalListener ) {
+export default function createNamespace( key, options, registry ) {
 	// TODO: After register[Reducer|Actions|Selectors|Resolvers] are deprecated and removed,
 	//       this function can be greatly simplified because it should no longer be called to modify
 	//       a namespace, but only to create one, and only once for each namespace.
@@ -42,20 +41,6 @@ export default function createNamespace( key, options, registry, globalListener 
 	if ( options.reducer ) {
 		reducer = options.reducer;
 		store = createReduxStore( reducer, key, registry );
-
-		// TODO: Move this to a subscribe function instead of referencing globalListener.
-		// Customize subscribe behavior to call listeners only on effective change,
-		// not on every dispatch.
-		let lastState = store.getState();
-		store.subscribe( () => {
-			const state = store.getState();
-			const hasChanged = state !== lastState;
-			lastState = state;
-
-			if ( hasChanged ) {
-				globalListener();
-			}
-		} );
 	}
 	if ( options.actions ) {
 		if ( ! store ) {
@@ -78,7 +63,21 @@ export default function createNamespace( key, options, registry, globalListener 
 
 	const getSelectors = () => selectors;
 	const getActions = () => actions;
-	const subscribe = store && store.subscribe;
+
+	// Customize subscribe behavior to call listeners only on effective change,
+	// not on every dispatch.
+	const subscribe = store && function( listener ) {
+		let lastState = store.getState();
+		store.subscribe( () => {
+			const state = store.getState();
+			const hasChanged = state !== lastState;
+			lastState = state;
+
+			if ( hasChanged ) {
+				listener();
+			}
+		} );
+	};
 
 	return {
 		reducer,

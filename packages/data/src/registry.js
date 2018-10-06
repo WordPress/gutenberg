@@ -133,7 +133,7 @@ export function createRegistry( storeConfigs = {} ) {
 	 * @return {Object} Store Object.
 	 */
 	registry.registerReducer = ( reducerKey, reducer ) => {
-		const namespace = createNamespace( reducerKey, { reducer }, registry, globalListener );
+		const namespace = createNamespace( reducerKey, { reducer }, registry );
 		registerGenericStore( reducerKey, namespace );
 		return namespace.store;
 	};
@@ -146,7 +146,7 @@ export function createRegistry( storeConfigs = {} ) {
 	 * @param {Object} actions   Actions to register.
 	 */
 	registry.registerActions = ( reducerKey, actions ) => {
-		const namespace = createNamespace( reducerKey, { actions }, registry, globalListener );
+		const namespace = createNamespace( reducerKey, { actions }, registry );
 		registerGenericStore( reducerKey, namespace );
 	};
 
@@ -160,7 +160,7 @@ export function createRegistry( storeConfigs = {} ) {
 	 *                              state as first argument.
 	 */
 	registry.registerSelectors = ( reducerKey, selectors ) => {
-		const namespace = createNamespace( reducerKey, { selectors }, registry, globalListener );
+		const namespace = createNamespace( reducerKey, { selectors }, registry );
 		registerGenericStore( reducerKey, namespace );
 	};
 
@@ -174,7 +174,7 @@ export function createRegistry( storeConfigs = {} ) {
 	 * @param {Object} resolvers Resolvers to register.
 	 */
 	registry.registerResolvers = ( reducerKey, resolvers ) => {
-		const namespace = createNamespace( reducerKey, { resolvers }, registry, globalListener );
+		const namespace = createNamespace( reducerKey, { resolvers }, registry );
 		registerGenericStore( reducerKey, namespace );
 	};
 
@@ -191,7 +191,7 @@ export function createRegistry( storeConfigs = {} ) {
 			throw new TypeError( 'Must specify store reducer' );
 		}
 
-		const namespace = createNamespace( reducerKey, options, registry, globalListener );
+		const namespace = createNamespace( reducerKey, options, registry );
 		registerGenericStore( reducerKey, namespace );
 		return namespace.store;
 	};
@@ -213,6 +213,7 @@ export function createRegistry( storeConfigs = {} ) {
 			throw new TypeError( 'config.subscribe must be a function' );
 		}
 		stores[ key ] = config;
+		config.subscribe( globalListener );
 	}
 
 	/**
