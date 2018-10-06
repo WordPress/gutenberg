@@ -156,7 +156,6 @@ class RichTextLinkContainer extends Component {
 		return (
 			<Fill name="RichText.Siblings">
 				<PositionedAtSelection
-					className="editor-format-toolbar__link-container"
 					key={ `${ record.start }${ record.end }` /* Used to force rerender on selection change */ }
 				>
 					<LinkContainer
