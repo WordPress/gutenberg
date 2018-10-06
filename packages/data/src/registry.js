@@ -4,7 +4,6 @@
 import {
 	without,
 	mapValues,
-	get,
 } from 'lodash';
 
 /**
@@ -44,7 +43,7 @@ import dataStore from './store';
  * @return {WPDataRegistry} Data registry.
  */
 export function createRegistry( storeConfigs = {} ) {
-	const namespaces = {};
+	const stores = {};
 	let listeners = [];
 
 	/**
@@ -78,7 +77,8 @@ export function createRegistry( storeConfigs = {} ) {
 	 * @return {*} The selector's returned value.
 	 */
 	function select( reducerKey ) {
-		return get( namespaces, [ reducerKey, 'selectors' ] );
+		const store = stores[ reducerKey ];
+		return store && store.getSelectors();
 	}
 
 	/**
@@ -90,7 +90,8 @@ export function createRegistry( storeConfigs = {} ) {
 	 * @return {*} The action's returned value.
 	 */
 	function dispatch( reducerKey ) {
-		return get( namespaces, [ reducerKey, 'actions' ] );
+		const store = stores[ reducerKey ];
+		return store && store.getActions();
 	}
 
 	/**
@@ -114,7 +115,8 @@ export function createRegistry( storeConfigs = {} ) {
 	}
 
 	let registry = {
-		namespaces,
+		stores,
+		namespaces: stores, // TODO: Deprecate/remove this.
 		subscribe,
 		select,
 		dispatch,
@@ -131,8 +133,9 @@ export function createRegistry( storeConfigs = {} ) {
 	 * @return {Object} Store Object.
 	 */
 	registry.registerReducer = ( reducerKey, reducer ) => {
-		namespaces[ reducerKey ] = createNamespace( reducerKey, { reducer }, registry, globalListener );
-		return namespaces[ reducerKey ].store;
+		const namespace = createNamespace( reducerKey, { reducer }, registry, globalListener );
+		registerGenericStore( reducerKey, namespace );
+		return namespace.store;
 	};
 
 	/**
@@ -143,7 +146,8 @@ export function createRegistry( storeConfigs = {} ) {
 	 * @param {Object} actions   Actions to register.
 	 */
 	registry.registerActions = ( reducerKey, actions ) => {
-		namespaces[ reducerKey ] = createNamespace( reducerKey, { actions }, registry, globalListener );
+		const namespace = createNamespace( reducerKey, { actions }, registry, globalListener );
+		registerGenericStore( reducerKey, namespace );
 	};
 
 	/**
@@ -156,7 +160,8 @@ export function createRegistry( storeConfigs = {} ) {
 	 *                              state as first argument.
 	 */
 	registry.registerSelectors = ( reducerKey, selectors ) => {
-		namespaces[ reducerKey ] = createNamespace( reducerKey, { selectors }, registry, globalListener );
+		const namespace = createNamespace( reducerKey, { selectors }, registry, globalListener );
+		registerGenericStore( reducerKey, namespace );
 	};
 
 	/**
@@ -169,11 +174,12 @@ export function createRegistry( storeConfigs = {} ) {
 	 * @param {Object} resolvers Resolvers to register.
 	 */
 	registry.registerResolvers = ( reducerKey, resolvers ) => {
-		namespaces[ reducerKey ] = createNamespace( reducerKey, { resolvers }, registry, globalListener );
+		const namespace = createNamespace( reducerKey, { resolvers }, registry, globalListener );
+		registerGenericStore( reducerKey, namespace );
 	};
 
 	/**
-	 * Convenience for registering reducer with actions and selectors.
+	 * Registers a standard `@wordpress/data` store.
 	 *
 	 * @param {string} reducerKey Reducer key.
 	 * @param {Object} options    Store description (reducer, actions, selectors, resolvers).
@@ -185,9 +191,29 @@ export function createRegistry( storeConfigs = {} ) {
 			throw new TypeError( 'Must specify store reducer' );
 		}
 
-		namespaces[ reducerKey ] = createNamespace( reducerKey, options, registry, globalListener );
-		return namespaces[ reducerKey ].store;
+		const namespace = createNamespace( reducerKey, options, registry, globalListener );
+		registerGenericStore( reducerKey, namespace );
+		return namespace.store;
 	};
+
+	/**
+	 * Registers a generic store.
+	 *
+	 * @param {string} key    Store registry key.
+	 * @param {Object} config Configuration (getSelectors, getActions, subscribe).
+	 */
+	function registerGenericStore( key, config ) {
+		if ( typeof config.getSelectors !== 'function' ) {
+			throw new TypeError( 'config.getSelectors must be a function' );
+		}
+		if ( typeof config.getActions !== 'function' ) {
+			throw new TypeError( 'config.getActions must be a function' );
+		}
+		if ( ! config.subscribe ) {
+			throw new TypeError( 'config.subscribe must be a function' );
+		}
+		stores[ key ] = config;
+	}
 
 	/**
 	 * Enhances the registry with the prescribed set of overrides. Returns the

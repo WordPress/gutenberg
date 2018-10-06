@@ -40,6 +40,18 @@ describe( 'createRegistry', () => {
 		}
 	} );
 
+	describe( 'registerGenericStore', () => {
+		it( 'should throw if not all required config elements are present', () => {
+			const getSelectors = () => ( {} );
+			const getActions = () => ( {} );
+			const subscribe = () => ( {} );
+
+			expect( () => registry.registerStore( 'grocer', {} ) ).toThrow();
+			expect( () => registry.registerStore( 'grocer', { getSelectors, getActions } ) ).toThrow();
+			expect( () => registry.registerStore( 'grocer', { getActions, subscribe } ) ).toThrow();
+		} );
+	} );
+
 	describe( 'registerStore', () => {
 		it( 'should be shorthand for reducer, actions, selectors registration', () => {
 			const store = registry.registerStore( 'butcher', {
@@ -424,8 +436,12 @@ describe( 'createRegistry', () => {
 				// function proxying.
 				expect( _registry ).toMatchObject(
 					mapValues( registry, ( value, key ) => {
-						if ( key === 'namespaces' ) {
+						if ( key === 'stores' ) {
 							return expect.any( Object );
+						}
+						// TODO: Remove this after namsespaces is removed.
+						if ( key === 'namespaces' ) {
+							return registry.stores;
 						}
 						return expect.any( Function );
 					} )

@@ -29,6 +29,8 @@ export default function createNamespace( key, options, registry, globalListener 
 	//       this function can be greatly simplified because it should no longer be called to modify
 	//       a namespace, but only to create one, and only once for each namespace.
 
+	// TODO: After removing `registry.namespaces`and making stores immutable after create,
+	//       reducer, store, actinos, selectors, and resolvers can all be removed from here.
 	let {
 		reducer,
 		store,
@@ -74,12 +76,19 @@ export default function createNamespace( key, options, registry, globalListener 
 		selectors = result.selectors;
 	}
 
+	const getSelectors = () => selectors;
+	const getActions = () => actions;
+	const subscribe = store && store.subscribe;
+
 	return {
 		reducer,
 		store,
 		actions,
 		selectors,
 		resolvers,
+		getSelectors,
+		getActions,
+		subscribe,
 	};
 }
 
@@ -208,14 +217,14 @@ function getCoreDataFulfillment( registry, key ) {
  * @param {Array} args         Selector Arguments.
  */
 async function fulfillWithRegistry( registry, key, selectorName, ...args ) {
-	const resolver = get( registry.namespaces, [ key, 'resolvers', selectorName ] );
+	const namespace = registry.stores[ key ];
+	const resolver = get( namespace, [ 'resolvers', selectorName ] );
 	if ( ! resolver ) {
 		return;
 	}
 
-	const store = registry.namespaces[ key ].store;
 	const action = resolver.fulfill( ...args );
 	if ( action ) {
-		await store.dispatch( action );
+		await namespace.store.dispatch( action );
 	}
 }
