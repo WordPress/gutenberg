@@ -14,11 +14,6 @@
 
 // The modal window element.
 .components-modal__frame {
-	border: $border-width solid $light-gray-500;
-	background-color: $white;
-	box-shadow: $shadow-modal;
-	outline: none;
-
 	// In small screens the content needs to be full width.
 	position: absolute;
 	top: 0;
@@ -28,9 +23,8 @@
 	box-sizing: border-box;
 	margin: 0;
 	border: $border-width solid $light-gray-500;
-	background-color: $white;
+	background: $white;
 	box-shadow: $shadow-modal;
-	outline: none;
 	overflow: auto;
 
 	// Show a centered modal on bigger screens.
@@ -40,24 +34,13 @@
 		bottom: auto;
 		left: 50%;
 		height: 90%;
-
-		// Animate appearance.
-		@include modal_appear();
-	}
-
-	// Show pretty big on desktop breakpoints.
-	@include break-medium () {
-		max-width: calc(100% - #{ $grid-size-large } - #{ $grid-size-large });
-		max-height: calc(100% - #{ $grid-size-large } - #{ $grid-size-large });
-		transform: translate(-50%, -30%);
-		top: 30%;
-		left: 50%;
-		height: 70%;
-
 		min-width: $modal-min-width;
 		max-width: calc(100% - #{ $grid-size-large } - #{ $grid-size-large });
 		max-height: calc(100% - #{ $header-height } - #{ $header-height });
 		transform: translate(-50%, -50%);
+
+		// Animate appearance.
+		@include modal_appear();
 	}
 }
 
@@ -65,20 +48,15 @@
 .components-modal__header {
 	box-sizing: border-box;
 	border-bottom: $border-width solid $light-gray-500;
-	padding: 0 0 $grid-size 0;
+	padding: 0;
 	display: flex;
 	flex-direction: row;
-	align-items: stretch;
 	justify-content: space-between;
-<<<<<<< HEAD
 	background: $white;
-	width: calc(100% - #{$panel-padding + $panel-padding});
-=======
 	align-items: center;
 	box-sizing: border-box;
->>>>>>> Add min width and fix button size.
+
 	height: $header-height;
-	padding: $grid-size 0;
 
 	.components-modal__header-heading {
 		font-size: 1em;
@@ -86,10 +64,8 @@
 	}
 
 	position: sticky;
-	top: 0;
+	top: -$grid-size-large;
 	z-index: z-index(".components-modal__header");
-	border-bottom: $border-width solid $light-gray-500;
-	padding: $grid-size $grid-size $grid-size $grid-size-large;
 }
 
 .components-modal__header-heading-container {
@@ -118,13 +94,8 @@ h1 {
 // Modal contents.
 .components-modal__content {
 	box-sizing: border-box;
-	overflow: auto;
 	// The height of the content is the height of its parent, minus the header. after that, the offset was 3px.
 	height: 100%;
 	overflow: auto;
 	padding: $grid-size-large;
-
-	&:focus {
-		outline: $border-width solid $dark-gray-500;
-	}
 }
