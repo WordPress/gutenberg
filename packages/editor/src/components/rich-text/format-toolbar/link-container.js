@@ -126,7 +126,7 @@ class LinkContainer extends Component {
 		const href = prependHTTP( inputValue );
 		const format = createLinkFormat( { href, opensInNewWindow } );
 
-		if ( isCollapsed( record ) ) {
+		if ( isCollapsed( record ) && link === undefined ) {
 			const toInsert = applyFormat( create( { text: href } ), format, 0, href.length );
 			this.props.onChange( insert( record, toInsert ) );
 		} else {
