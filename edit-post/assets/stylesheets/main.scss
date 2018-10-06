@@ -278,12 +278,3 @@ body.gutenberg-editor-page {
 .ephox-snooker-resizer-bar-dragging {
 	background: $blue-medium-500;
 }
-
-// This style is defined here instead of the modal component
-// because the modal should be context agnostic.
-.components-modal__content {
-	height: calc(100% - #{ $header-height } - #{ $admin-bar-height });
-	body.is-fullscreen-mode & {
-		height: calc(100% - #{ $header-height });
-	}
-}

@@ -104,10 +104,10 @@ class Modal extends Component {
 
 	/**
 	 * Stop all onMouseDown events propagating further - they should only go to the modal
- 	 * @param {string} ev Event object
+ 	 * @param {string} event Event object
 	 */
-	stopEventPropagationOutsideModal( ev ) {
-		ev.stopPropagation();
+	stopEventPropagationOutsideModal( event ) {
+		event.stopPropagation();
 	}
 
 	/**
@@ -130,12 +130,10 @@ class Modal extends Component {
 			...otherProps
 		} = this.props;
 
-		const headingId = (
-			aria.labelledby ||
-			'components-modal-header-' + instanceId
-		);
+		const headingId = aria.labelledby || `components-modal-header-${ instanceId }`;
 
-		// Disable reason: this stops mouse events from triggering tooltips and other elements underneath the modal overlay
+		// Disable reason: this stops mouse events from triggering tooltips and
+		// other elements underneath the modal overlay.
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return createPortal(
 			<div
@@ -152,17 +150,17 @@ class Modal extends Component {
 						labelledby: title ? headingId : null,
 						describedby: aria.describedby,
 					} }
-					{ ...otherProps } >
-					<ModalHeader
-						closeLabel={ closeButtonLabel }
-						isDismissable={ isDismissable }
-						onClose={ onRequestClose }
-						title={ title }
-						headingId={ headingId }
-						icon={ icon }
-					/>
-					<div
-						className={ 'components-modal__content' }>
+					{ ...otherProps }
+				>
+					<div className={ 'components-modal__content' } tabIndex="0">
+						<ModalHeader
+							closeLabel={ closeButtonLabel }
+							headingId={ headingId }
+							icon={ icon }
+							isDismissable={ isDismissable }
+							onClose={ onRequestClose }
+							title={ title }
+						/>
 						{ children }
 					</div>
 				</ModalFrame>
