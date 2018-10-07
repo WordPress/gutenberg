@@ -501,7 +501,7 @@ export class BlockListBlock extends Component {
 						blockElementId={ blockElementId }
 						isFirst={ isFirst }
 						isLast={ isLast }
-						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }
+						isHidden={ ( ! isHovered || hoverArea !== 'left' ) && ! isSelected }
 						isDraggable={ ( isDraggable !== false ) && ( ! isPartOfMultiSelection && isMovable ) }
 						onDragStart={ this.onDragStart }
 						onDragEnd={ this.onDragEnd }
