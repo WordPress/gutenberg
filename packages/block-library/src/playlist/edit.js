@@ -26,25 +26,65 @@ import {
 	MediaUpload,
 } from '@wordpress/editor';
 
+function loadScript() {
+	return new Promise( ( resolve, reject ) => {
+		const scriptName = 'wp-playlist';
+
+		const script = document.createElement( 'script' );
+		script.src = `${ wpApiSettings.schema.url }/wp-admin/load-scripts.php?load=${ scriptName }`;
+		script.onload = resolve;
+		script.onerror = reject;
+
+		document.head.appendChild( script );
+	} );
+}
+
+function loadStyle() {
+	return new Promise( ( resolve, reject ) => {
+		const scriptName = 'wp-mediaelement';
+
+		const style = document.createElement( 'link' );
+		style.rel = 'stylesheet';
+		style.href = `${ wpApiSettings.schema.url }/wp-admin/load-styles.php?load=${ scriptName }`;
+		style.onload = resolve;
+		style.onerror = reject;
+
+		document.head.appendChild( style );
+	} );
+}
+
+let hasAlreadyLoadedAssets = false;
+
+function loadAssets() {
+	if ( hasAlreadyLoadedAssets ) {
+		return Promise.resolve();
+	}
+
+	return Promise.all( [ loadScript(), loadStyle() ] ).then( () => {
+		hasAlreadyLoadedAssets = true;
+	} );
+}
+
+/**
+  * The function is used after the editor has enqueued playlist dependencies.
+  *
+  * @param  {function} initializePlaylist Function that Initializes playlist
+  */
+
+function initializePlaylist() {
+	loadAssets().then( () => {
+		wp.playlist.initialize();
+	} );
+}
+
 class PlaylistEdit extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.initializePlaylist = this.initializePlaylist.bind( this );
 		this.uploadFromFiles = this.uploadFromFiles.bind( this );
 		this.onUploadFiles = this.onUploadFiles.bind( this );
 		this.onSelectMedia = this.onSelectMedia.bind( this );
 		this.getMimeBaseType = this.getMimeBaseType.bind( this );
-	}
-
-	/**
-	 * The function is used after the editor has enqueued playlist dependencies.
-	 *
-	 * @param  {function} initializePlaylist Function that Initializes playlist
-	*/
-
-	initializePlaylist() {
-		window.wp.playlist.initialize();
 	}
 
 	uploadFromFiles( event ) {
@@ -201,7 +241,7 @@ class PlaylistEdit extends Component {
 					<ServerSideRender
 						block="core/playlist"
 						attributes={ attributes }
-						onChange={ this.initializePlaylist }
+						onChange={ initializePlaylist }
 					/>
 				</figure>
 			</Fragment>
