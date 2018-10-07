@@ -246,6 +246,7 @@ function gutenberg_register_scripts_and_styles() {
 		'wp-data',
 		gutenberg_url( 'build/data/index.js' ),
 		array(
+			'utils',
 			'lodash',
 			'wp-compose',
 			'wp-deprecated',
