@@ -610,6 +610,11 @@ export class RichText extends Component {
 			} else if ( event.shiftKey || ! this.onSplit ) {
 				this.onChange( insertLineBreak( record ) );
 			} else {
+				// Some implementations of onSplit might also call onReplace, and
+				// calling onReplace() will destroy the editor, so it's
+				// important that we stop other handlers (e.g. ones
+				// registered by TinyMCE) from also handling this event.
+				event.stopImmediatePropagation();
 				this.splitContent();
 			}
 		}

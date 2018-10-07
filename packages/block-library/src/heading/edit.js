@@ -52,10 +52,20 @@ export default function HeadingEdit( {
 					insertBlocksAfter ?
 						( before, after, ...blocks ) => {
 							setAttributes( { content: before } );
-							insertBlocksAfter( [
-								...blocks,
-								createBlock( 'core/paragraph', { content: after } ),
-							] );
+							if ( ! before.text && after.text ) {
+								onReplace( createBlock( 'core/paragraph', { content: before } ) );
+							}
+							if ( after.text ) {
+								insertBlocksAfter( [
+									...blocks,
+									createBlock( 'core/heading', { content: after } ),
+								] );
+							} else {
+								insertBlocksAfter( [
+									...blocks,
+									createBlock( 'core/paragraph', { content: after } ),
+								] );
+							}
 						} :
 						undefined
 				}
