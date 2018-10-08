@@ -43,7 +43,7 @@ import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMultiControls from './multi-controls';
 import BlockMobileToolbar from './block-mobile-toolbar';
 import BlockInsertionPoint from './insertion-point';
-import IgnoreNestedEvents from './ignore-nested-events';
+import IgnoreNestedEvents from '../ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
 import withHoverAreas from './with-hover-areas';
@@ -491,6 +491,7 @@ export class BlockListBlock extends Component {
 				) }
 				<BlockDropZone
 					index={ order }
+					clientId={ clientId }
 					rootClientId={ rootClientId }
 					layout={ layout }
 				/>
@@ -498,7 +499,6 @@ export class BlockListBlock extends Component {
 					<BlockMover
 						clientIds={ clientId }
 						blockElementId={ blockElementId }
-						layout={ layout }
 						isFirst={ isFirst }
 						isLast={ isLast }
 						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }

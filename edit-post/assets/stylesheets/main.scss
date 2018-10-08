@@ -86,7 +86,9 @@ body.gutenberg-editor-page {
 	}
 }
 
-.gutenberg {
+.gutenberg,
+// The modals are shown outside the .gutenberg wrapper, they need these styles
+.components-modal__frame {
 	box-sizing: border-box;
 
 	*,
@@ -275,13 +277,4 @@ body.gutenberg-editor-page {
 
 .ephox-snooker-resizer-bar-dragging {
 	background: $blue-medium-500;
-}
-
-// This style is defined here instead of the modal component
-// because the modal should be context agnostic.
-.components-modal__content {
-	height: calc(100% - #{ $header-height } - #{ $admin-bar-height });
-	body.is-fullscreen-mode & {
-		height: calc(100% - #{ $header-height });
-	}
 }

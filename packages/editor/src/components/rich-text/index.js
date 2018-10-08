@@ -592,6 +592,8 @@ export class RichText extends Component {
 		// If we click shift+Enter on inline RichTexts, we avoid creating two contenteditables
 		// We also split the content and call the onSplit prop if provided.
 		if ( keyCode === ENTER ) {
+			event.preventDefault();
+
 			if ( this.props.onReplace ) {
 				const text = getTextContent( this.getRecord() );
 				const transformation = findTransform( this.enterPatterns, ( item ) => {
@@ -603,7 +605,6 @@ export class RichText extends Component {
 					// important that we stop other handlers (e.g. ones
 					// registered by TinyMCE) from also handling this event.
 					event.stopImmediatePropagation();
-					event.preventDefault();
 					this.props.onReplace( [
 						transformation.transform( { content: text } ),
 					] );
@@ -612,27 +613,33 @@ export class RichText extends Component {
 			}
 
 			if ( this.props.multiline ) {
-				if ( ! this.props.onSplit ) {
-					return;
-				}
-
 				const record = this.getRecord();
 
-				if ( ! isEmptyLine( record ) ) {
-					return;
-				}
-
-				event.preventDefault();
-
-				this.props.onSplit( ...split( record ).map( this.valueToFormat ) );
-			} else {
-				event.preventDefault();
-
-				if ( event.shiftKey || ! this.props.onSplit ) {
-					this.editor.execCommand( 'InsertLineBreak', false, event );
+				if ( this.props.onSplit && isEmptyLine( record ) ) {
+					this.props.onSplit( ...split( record ).map( this.valueToFormat ) );
 				} else {
-					this.splitContent();
+					// Character is used to separate lines in multiline values.
+					this.onChange( insert( record, '\u2028' ) );
 				}
+			} else if ( event.shiftKey || ! this.props.onSplit ) {
+				const record = this.getRecord();
+				const text = getTextContent( record );
+				const length = text.length;
+				let toInsert = '\n';
+
+				// If the caret is at the end of the text, and there is no
+				// trailing line break or no text at all, we have to insert two
+				// line breaks in order to create a new line visually and place
+				// the caret there.
+				if ( record.end === length && (
+					text.charAt( length - 1 ) !== '\n' || length === 0
+				) ) {
+					toInsert = '\n\n';
+				}
+
+				this.onChange( insert( this.getRecord(), toInsert ) );
+			} else {
+				this.splitContent();
 			}
 		}
 	}

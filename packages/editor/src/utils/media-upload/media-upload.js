@@ -10,6 +10,7 @@ import {
 	includes,
 	map,
 	noop,
+	omit,
 	some,
 	startsWith,
 } from 'lodash';
@@ -163,10 +164,9 @@ export function mediaUpload( {
 		return createMediaFromFile( mediaFile, additionalData )
 			.then( ( savedMedia ) => {
 				const mediaObject = {
+					...omit( savedMedia, [ 'alt_text', 'source_url' ] ),
 					alt: savedMedia.alt_text,
 					caption: get( savedMedia, [ 'caption', 'raw' ], '' ),
-					id: savedMedia.id,
-					link: savedMedia.link,
 					title: savedMedia.title.raw,
 					url: savedMedia.source_url,
 					mediaDetails: {},

@@ -67,7 +67,7 @@ class BlockCompare extends Component {
 					title={ __( 'Current' ) }
 					className="editor-block-compare__current"
 					action={ onKeep }
-					actionText={ __( 'Keep as HTML' ) }
+					actionText={ __( 'Convert to HTML' ) }
 					rawContent={ original.rawContent }
 					renderedContent={ original.renderedContent }
 				/>

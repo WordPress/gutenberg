@@ -130,8 +130,7 @@ attributes: {
 		attribute: 'src',
 	},
 	author: {
-		type: 'string',
-		source: 'children',
+		source: 'rich-text',
 		selector: '.book-author',
 	},
 	pages: {

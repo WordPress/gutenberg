@@ -589,6 +589,20 @@ export const getBlocks = createSelector(
 );
 
 /**
+ * Returns an array containing the clientIds of all descendants
+ * of the blocks given.
+ *
+ * @param {Object} state Global application state.
+ * @param {Array} clientIds Array of blocks to inspect.
+ *
+ * @return {Array} ids of descendants.
+ */
+export const getClientIdsOfDescendants = ( state, clientIds ) => flatMap( clientIds, ( clientId ) => {
+	const descendants = getBlockOrder( state, clientId );
+	return [ ...descendants, ...getClientIdsOfDescendants( state, descendants ) ];
+} );
+
+/**
  * Returns an array containing the clientIds of the top-level blocks
  * and their descendants of any depth (for nested blocks).
  *
@@ -598,12 +612,8 @@ export const getBlocks = createSelector(
  */
 export const getClientIdsWithDescendants = createSelector(
 	( state ) => {
-		const getDescendants = ( clientIds ) => flatMap( clientIds, ( clientId ) => {
-			const descendants = getBlockOrder( state, clientId );
-			return [ ...descendants, ...getDescendants( descendants ) ];
-		} );
 		const topLevelIds = getBlockOrder( state );
-		return [ ...topLevelIds, ...getDescendants( topLevelIds ) ];
+		return [ ...topLevelIds, ...getClientIdsOfDescendants( state, topLevelIds ) ];
 	},
 	( state ) => [
 		state.editor.present.blockOrder,
@@ -1945,6 +1955,50 @@ export function getTokenSettings( state, name ) {
 }
 
 /**
+ * Returns whether the post is locked.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Is locked.
+ */
+export function isPostLocked( state ) {
+	return state.postLock.isLocked;
+}
+
+/**
+ * Returns whether the edition of the post has been taken over.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Is post lock takeover.
+ */
+export function isPostLockTakeover( state ) {
+	return state.postLock.isTakeover;
+}
+
+/**
+ * Returns details about the post lock user.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} A user object.
+ */
+export function getPostLockUser( state ) {
+	return state.postLock.user;
+}
+
+/**
+ * Returns the active post lock.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} The lock object.
+ */
+export function getActivePostLock( state ) {
+	return state.postLock.activePostLock;
+}
+
+/**
  * Returns whether or not the user has the unfiltered_html capability.
  *
  * @param {Object} state Editor state.
@@ -1952,7 +2006,7 @@ export function getTokenSettings( state, name ) {
  * @return {boolean} Whether the user can or can't post unfiltered HTML.
  */
 export function canUserUseUnfilteredHTML( state ) {
-	return has( getCurrentPost( state ), [ '_links', 'wp:action-unfiltered_html' ] );
+	return has( getCurrentPost( state ), [ '_links', 'wp:action-unfiltered-html' ] );
 }
 
 /**

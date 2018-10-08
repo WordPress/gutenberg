@@ -16,8 +16,10 @@ function MetaBoxes( { location, isActive } ) {
 	return <MetaBoxesArea location={ location } />;
 }
 
-export default withSelect(
-	( select, ownProps ) => ( {
-		isActive: select( 'core/edit-post' ).getMetaBox( ownProps.location ).isActive,
-	} ),
-)( MetaBoxes );
+export default withSelect( ( select, ownProps ) => {
+	const { isMetaBoxLocationActive } = select( 'core/edit-post' );
+
+	return {
+		isActive: isMetaBoxLocationActive( ownProps.location ),
+	};
+} )( MetaBoxes );

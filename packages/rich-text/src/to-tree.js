@@ -33,6 +33,7 @@ export function toTree( value, multilineTag, settings ) {
 		appendText,
 		onStartIndex,
 		onEndIndex,
+		onEmpty,
 	} = settings;
 	const { formats, text, start, end } = value;
 	const formatsLength = formats.length + 1;
@@ -70,9 +71,21 @@ export function toTree( value, multilineTag, settings ) {
 			} );
 		}
 
+		// If there is selection at 0, handle it before characters are inserted.
+
+		if ( onStartIndex && start === 0 && i === 0 ) {
+			onStartIndex( tree, pointer, multilineIndex );
+		}
+
+		if ( onEndIndex && end === 0 && i === 0 ) {
+			onEndIndex( tree, pointer, multilineIndex );
+		}
+
 		if ( character !== '\ufffc' ) {
 			if ( character === '\n' ) {
 				pointer = append( getParent( pointer ), { type: 'br', object: true } );
+				// Ensure pointer is text node.
+				pointer = append( getParent( pointer ), '' );
 			} else if ( ! isText( pointer ) ) {
 				pointer = append( getParent( pointer ), character );
 			} else {
@@ -87,6 +100,10 @@ export function toTree( value, multilineTag, settings ) {
 		if ( onEndIndex && end === i + 1 ) {
 			onEndIndex( tree, pointer, multilineIndex );
 		}
+	}
+
+	if ( onEmpty && text.length === 0 ) {
+		onEmpty( tree );
 	}
 
 	return tree;

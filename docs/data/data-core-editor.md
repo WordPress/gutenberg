@@ -321,6 +321,24 @@ unsaved status values.
 
 Whether the post has been published.
 
+### isEditedPostDateFloating
+
+Returns whether the current post should be considered to have a "floating"
+date (i.e. that it would publish "Immediately" rather than at a set time).
+
+Unlike in the PHP backend, the REST API returns a full date string for posts
+where the 0000-00-00T00:00:00 placeholder is present in the database. To
+infer that a post is set to publish "Immediately" we check whether the date
+and modified date are the same.
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+Whether the edited post has a floating date value.
+
 ### getBlockDependantsCacheBust
 
 Returns a new reference when the inner blocks of a given block client ID
@@ -386,6 +404,20 @@ on each call
 *Returns*
 
 Post blocks.
+
+### getClientIdsOfDescendants
+
+Returns an array containing the clientIds of all descendants
+of the blocks given.
+
+*Parameters*
+
+ * state: Global application state.
+ * clientIds: Array of blocks to inspect.
+
+*Returns*
+
+ids of descendants.
 
 ### getClientIdsWithDescendants
 
@@ -1241,6 +1273,54 @@ Returns the editor settings.
 
 The editor settings object
 
+### isPostLocked
+
+Returns whether the post is locked.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+Is locked.
+
+### isPostLockTakeover
+
+Returns whether the edition of the post has been taken over.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+Is post lock takeover.
+
+### getPostLockUser
+
+Returns details about the post lock user.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+A user object.
+
+### getActivePostLock
+
+Returns the active post lock.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+The lock object.
+
 ### canUserUseUnfilteredHTML
 
 Returns whether or not the user has the unfiltered_html capability.
@@ -1553,6 +1633,14 @@ Returns an action object used to remove a notice.
 *Parameters*
 
  * id: The notice id.
+
+### updatePostLock
+
+Returns an action object used to lock the editor.
+
+*Parameters*
+
+ * lock: Details about the post lock status, user, and nonce.
 
 ### fetchReusableBlocks
 

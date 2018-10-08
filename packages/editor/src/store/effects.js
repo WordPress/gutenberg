@@ -26,11 +26,13 @@ import {
 	selectBlock,
 	resetBlocks,
 	setTemplateValidity,
+	insertDefaultBlock,
 } from './actions';
 import {
 	getBlock,
 	getBlockRootClientId,
 	getBlocks,
+	getBlockCount,
 	getPreviousBlockClientId,
 	getSelectedBlock,
 	getTemplate,
@@ -82,6 +84,60 @@ export function validateBlocksToTemplate( action, store ) {
 	// Update if validity has changed.
 	if ( isBlocksValidToTemplate !== isValidTemplate( state ) ) {
 		return setTemplateValidity( isBlocksValidToTemplate );
+	}
+}
+
+/**
+ * Effect handler which will return a block select action to select the block
+ * occurring before the selected block in the previous state, unless it is the
+ * same block or the action includes a falsey `selectPrevious` option flag.
+ *
+ * @param {Object} action Action which had initiated the effect handler.
+ * @param {Object} store  Store instance.
+ *
+ * @return {?Object} Block select action to select previous, if applicable.
+ */
+export function selectPreviousBlock( action, store ) {
+	// if the action says previous block should not be selected don't do anything.
+	if ( ! action.selectPrevious ) {
+		return;
+	}
+
+	const firstRemovedBlockClientId = action.clientIds[ 0 ];
+	const state = store.getState();
+	const currentSelectedBlock = getSelectedBlock( state );
+
+	// recreate the state before the block was removed.
+	const previousState = { ...state, editor: { present: last( state.editor.past ) } };
+
+	// rootClientId of the removed block.
+	const rootClientId = getBlockRootClientId( previousState, firstRemovedBlockClientId );
+
+	// Client ID of the block that was before the removed block or the
+	// rootClientId if the removed block was first amongst its siblings.
+	const blockClientIdToSelect = getPreviousBlockClientId( previousState, firstRemovedBlockClientId ) || rootClientId;
+
+	// Dispatch select block action if the currently selected block
+	// is not already the block we want to be selected.
+	if ( blockClientIdToSelect !== currentSelectedBlock ) {
+		return selectBlock( blockClientIdToSelect, -1 );
+	}
+}
+
+/**
+ * Effect handler which will return a default block insertion action if there
+ * are no other blocks at the root of the editor. This is expected to be used
+ * in actions which may result in no blocks remaining in the editor (removal,
+ * replacement, etc).
+ *
+ * @param {Object} action Action which had initiated the effect handler.
+ * @param {Object} store  Store instance.
+ *
+ * @return {?Object} Default block insert action, if no other blocks exist.
+ */
+export function ensureDefaultBlock( action, store ) {
+	if ( ! getBlockCount( store.getState() ) ) {
+		return insertDefaultBlock();
 	}
 }
 
@@ -234,30 +290,11 @@ export default {
 		const message = spokenMessage || content;
 		speak( message, 'assertive' );
 	},
-	REMOVE_BLOCKS( action, { getState, dispatch } ) {
-		// if the action says previous block should not be selected don't do anything.
-		if ( ! action.selectPrevious ) {
-			return;
-		}
-
-		const firstRemovedBlockClientId = action.clientIds[ 0 ];
-		const state = getState();
-		const currentSelectedBlock = getSelectedBlock( state );
-
-		// recreate the state before the block was removed.
-		const previousState = { ...state, editor: { present: last( state.editor.past ) } };
-
-		// rootClientId of the removed block.
-		const rootClientId = getBlockRootClientId( previousState, firstRemovedBlockClientId );
-
-		// Client ID of the block that was before the removed block or the
-		// rootClientId if the removed block was first amongst its siblings.
-		const blockClientIdToSelect = getPreviousBlockClientId( previousState, firstRemovedBlockClientId ) || rootClientId;
-
-		// Dispatch select block action if the currently selected block
-		// is not already the block we want to be selected.
-		if ( blockClientIdToSelect !== currentSelectedBlock ) {
-			dispatch( selectBlock( blockClientIdToSelect, -1 ) );
-		}
-	},
+	REMOVE_BLOCKS: [
+		selectPreviousBlock,
+		ensureDefaultBlock,
+	],
+	REPLACE_BLOCKS: [
+		ensureDefaultBlock,
+	],
 };

@@ -35,8 +35,11 @@ describe( 'Deprecated Node Matcher', () => {
 		await insertBlock( 'Deprecated Children Matcher' );
 		await page.keyboard.type( 'test' );
 		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.up( 'Shift' );
 		await pressWithModifier( META_KEY, 'b' );
-		await page.keyboard.type( 'test' );
 		expect( console ).toHaveWarned();
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

@@ -4,27 +4,13 @@
 
 import { isEmpty } from './is-empty';
 import { isFormatEqual } from './is-format-equal';
+import { createElement } from './create-element';
 
 /**
  * Browser dependencies
  */
 
 const { TEXT_NODE, ELEMENT_NODE } = window.Node;
-
-/**
- * Parse the given HTML into a body element.
- *
- * @param {string} html The HTML to parse.
- *
- * @return {HTMLBodyElement} Body element with parsed HTML.
- */
-function createElement( html ) {
-	const htmlDocument = document.implementation.createHTMLDocument( '' );
-
-	htmlDocument.body.innerHTML = html;
-
-	return htmlDocument.body;
-}
 
 function createEmptyValue() {
 	return { formats: [], text: '' };
@@ -74,7 +60,7 @@ export function create( {
 	}
 
 	if ( typeof html === 'string' && html.length > 0 ) {
-		element = createElement( html );
+		element = createElement( document, html );
 	}
 
 	if ( typeof element !== 'object' ) {
@@ -147,6 +133,12 @@ function accumulateSelection( accumulator, node, range, value ) {
 		node === endContainer.childNodes[ endOffset - 1 ]
 	) {
 		accumulator.end = currentLength + value.text.length;
+	// Range indicates that the selection is before the current node.
+	} else if (
+		parentNode === endContainer &&
+		node === endContainer.childNodes[ endOffset ]
+	) {
+		accumulator.end = currentLength;
 	}
 }
 

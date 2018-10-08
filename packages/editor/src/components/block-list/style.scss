@@ -287,28 +287,62 @@
 		.editor-block-contextual-toolbar {
 			margin-bottom: $border-width;
 		}
+
+		// Hide all additional UI on floats.
+		.editor-block-mover,
+		.editor-block-list__block-mobile-toolbar {
+			display: none;
+		}
+
+		// Position toolbar better on mobile.
+		.editor-block-contextual-toolbar {
+			border-bottom: 1px solid $light-gray-500;
+			bottom: $block-padding;
+			left: auto;
+			right: auto;
+		}
 	}
 
-	// Left: This is in the editor only; the image should be floated on the frontend.
-	&[data-align="left"] > .editor-block-list__block-edit {
-		/*!rtl:begin:ignore*/
-		float: left;
-		margin-right: 2em;
-		/*!rtl:end:ignore*/
+	// Left
+	&[data-align="left"] {
+		// This is in the editor only; the image should be floated on the frontend.
+		.editor-block-list__block-edit {
+			/*!rtl:begin:ignore*/
+			float: left;
+			margin-right: 2em;
+			/*!rtl:end:ignore*/
+		}
+
+		// Align block toolbar to floated content.
+		@include break-small() {
+			.editor-block-toolbar {
+				/*!rtl:begin:ignore*/
+				left: $block-padding;
+				right: auto;
+				/*!rtl:end:ignore*/
+			}
+		}
 	}
 
-	// Right: This is in the editor only; the image should be floated on the frontend.
-	&[data-align="right"] > .editor-block-list__block-edit {
-		/*!rtl:begin:ignore*/
-		float: right;
-		margin-left: 2em;
-		/*!rtl:end:ignore*/
-	}
+	// Right
+	&[data-align="right"] {
+		// Right: This is in the editor only; the image should be floated on the frontend.
+		> .editor-block-list__block-edit {
+			/*!rtl:begin:ignore*/
+			float: right;
+			margin-left: 2em;
+			/*!rtl:end:ignore*/
+		}
 
-	&[data-align="right"] > .editor-block-contextual-toolbar > .editor-block-toolbar {
-		/*!rtl:begin:ignore*/
-		float: right;
-		/*!rtl:end:ignore*/
+		// Align block toolbar to floated content.
+		@include break-small() {
+			.editor-block-toolbar {
+				/*!rtl:begin:ignore*/
+				right: $block-padding;
+				left: auto;
+				/*!rtl:end:ignore*/
+			}
+		}
 	}
 
 	// Wide and full-wide
@@ -801,21 +835,6 @@
 		position: absolute;
 		left: 0;
 	}
-
-	.editor-block-list__block[data-align="right"] & {
-		/*!rtl:begin:ignore*/
-		left: auto;
-		right: 0;
-		/*!rtl:end:ignore*/
-	}
-
-	.editor-block-list__block[data-align="left"] & {
-		/*!rtl:begin:ignore*/
-		right: auto;
-		left: 0;
-		/*!rtl:end:ignore*/
-	}
-
 
 	@include break-small() {
 		width: auto;

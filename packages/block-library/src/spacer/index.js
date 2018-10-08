@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import ResizableBox from 're-resizable';
 import classnames from 'classnames';
 
 /**
@@ -10,7 +9,7 @@ import classnames from 'classnames';
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/editor';
-import { BaseControl, PanelBody } from '@wordpress/components';
+import { BaseControl, PanelBody, ResizableBox } from '@wordpress/components';
 import { withInstanceId } from '@wordpress/compose';
 
 export const name = 'core/spacer';
@@ -47,10 +46,6 @@ export const settings = {
 							height,
 						} }
 						minHeight="20"
-						handleClasses={ {
-							top: 'block-library-spacer__resize-handler-top',
-							bottom: 'block-library-spacer__resize-handler-bottom',
-						} }
 						enable={ {
 							top: false,
 							right: false,

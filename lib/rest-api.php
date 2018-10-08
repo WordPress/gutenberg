@@ -220,6 +220,8 @@ function gutenberg_add_permalink_template_to_posts( $response, $post, $request )
  *
  * @todo This will need to be registered to the schema too.
  *
+ * @see https://core.trac.wordpress.org/ticket/43887
+ *
  * @param WP_REST_Response $response WP REST API response of a post.
  * @param WP_Post          $post The post being returned.
  * @param WP_REST_Request  $request WP REST API request.
@@ -242,6 +244,8 @@ function gutenberg_add_block_format_to_post_content( $response, $post, $request 
 /**
  * Include target schema attributes to links, based on whether the user can.
  *
+ * @see https://core.trac.wordpress.org/ticket/45014
+ *
  * @param WP_REST_Response $response WP REST API response of a post.
  * @param WP_Post          $post The post being returned.
  * @param WP_REST_Request  $request WP REST API request.
@@ -253,7 +257,7 @@ function gutenberg_add_target_schema_to_links( $response, $post, $request ) {
 	$post_type  = get_post_type_object( $post->post_type );
 	$orig_href  = ! empty( $orig_links['self'][0]['href'] ) ? $orig_links['self'][0]['href'] : null;
 	if ( 'edit' === $request['context'] && current_user_can( 'unfiltered_html' ) ) {
-		$new_links['https://api.w.org/action-unfiltered_html'] = array(
+		$new_links['https://api.w.org/action-unfiltered-html'] = array(
 			array(
 				'title'        => __( 'The current user can post HTML markup and JavaScript.', 'gutenberg' ),
 				'href'         => $orig_href,

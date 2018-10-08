@@ -48,6 +48,8 @@ $icon-button-size: 36px;
 $icon-button-size-small: 24px;
 $inserter-tabs-height: 36px;
 $block-toolbar-height: $block-controls-height + $border-width;
+$resize-handler-size: 16px;
+$resize-handler-container-size: $resize-handler-size + ($grid-size-small * 2); // Make the resize handle container larger so there's a larger grabbable area.
 
 // Blocks
 $block-padding: 14px; // padding of nested blocks

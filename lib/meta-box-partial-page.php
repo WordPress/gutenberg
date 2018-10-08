@@ -289,9 +289,9 @@ function the_gutenberg_metaboxes() {
 	 *
 	 * @param array $wp_meta_boxes Global meta box state.
 	 */
-	$wp_meta_boxes = apply_filters( 'filter_gutenberg_meta_boxes', $wp_meta_boxes );
-	$locations     = array( 'side', 'normal', 'advanced' );
-	$meta_box_data = array();
+	$wp_meta_boxes             = apply_filters( 'filter_gutenberg_meta_boxes', $wp_meta_boxes );
+	$locations                 = array( 'side', 'normal', 'advanced' );
+	$active_meta_box_locations = array();
 	// Render meta boxes.
 	?>
 	<form class="metabox-base-form">
@@ -302,13 +302,15 @@ function the_gutenberg_metaboxes() {
 			<div id="poststuff" class="sidebar-open">
 				<div id="postbox-container-2" class="postbox-container">
 					<?php
-					$number_metaboxes = do_meta_boxes(
+					$number_of_meta_boxes = do_meta_boxes(
 						$current_screen,
 						$location,
 						$post
 					);
 
-					$meta_box_data[ $location ] = $number_metaboxes > 0;
+					if ( $number_of_meta_boxes > 0 ) {
+						$active_meta_box_locations[] = $location;
+					}
 					?>
 				</div>
 			</div>
@@ -324,7 +326,9 @@ function the_gutenberg_metaboxes() {
 	 * editor instance. If a cleaner solution can be imagined, please change
 	 * this, and try to get this data to load directly into the editor settings.
 	 */
-	$script = 'window._wpLoadGutenbergEditor.then( function( editor ) { editor.initializeMetaBoxes( ' . wp_json_encode( $meta_box_data ) . ' ) } );';
+	$script = 'window._wpLoadGutenbergEditor.then( function() {
+		wp.data.dispatch( \'core/edit-post\' ).setActiveMetaBoxLocations( ' . wp_json_encode( $active_meta_box_locations ) . ' );
+	} );';
 
 	wp_add_inline_script( 'wp-edit-post', $script );
 

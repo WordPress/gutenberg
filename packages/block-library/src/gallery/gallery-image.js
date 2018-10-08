@@ -123,7 +123,7 @@ class GalleryImage extends Component {
 					</div>
 				}
 				{ href ? <a href={ href }>{ img }</a> : img }
-				{ ( caption && caption.length > 0 ) || isSelected ? (
+				{ ( ! RichText.isEmpty( caption ) || isSelected ) ? (
 					<RichText
 						tagName="figcaption"
 						placeholder={ __( 'Write caption…' ) }
