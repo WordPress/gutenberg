@@ -412,6 +412,19 @@ align: true,
 // Pick which alignment options to display.
 align: [ 'left', 'right', 'full' ],
 ```
+When supports align is used the block attributes definition is extended to include an align attribute with a string type.
+By default, no alignment is assigned to the block. 
+The block can apply a default alignment by specifying its own align attribute with a default e.g.:
+```
+attributes: {
+	...
+		align: {
+			type: 'string',
+			default: 'right'
+		},
+	...
+}
+```
 
 - `alignWide` (default `true`): This property allows to enable [wide alignment](../docs/extensibility/theme-support.md#wide-alignment) for your theme. To disable this behavior for a single block, set this flag to `false`.
 
