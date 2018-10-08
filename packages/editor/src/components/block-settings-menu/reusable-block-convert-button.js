@@ -51,7 +51,6 @@ export default compose( [
 	withSelect( ( select, { clientIds } ) => {
 		const { getBlock, getReusableBlock } = select( 'core/editor' );
 		const {
-			getFallbackBlockName,
 			getFreeformFallbackBlockName,
 			getUnregisteredFallbackBlockName,
 		} = select( 'core/blocks' );
@@ -62,11 +61,10 @@ export default compose( [
 		// confusing UX, because of its similarity to the 'Convert to Blocks' button.
 		const isVisible = (
 			every( blocks, ( block ) => !! block ) &&
-			( blocks.length !== 1 ||
-				// TODO: Revisit this.
-				blocks[ 0 ].name !== getFallbackBlockName() ||
-				blocks[ 0 ].name !== getFreeformFallbackBlockName() ||
-				blocks[ 0 ].name !== getUnregisteredFallbackBlockName() )
+			( blocks.length !== 1 || (
+				blocks[ 0 ].name !== getFreeformFallbackBlockName() &&
+				blocks[ 0 ].name !== getUnregisteredFallbackBlockName()
+			) )
 		);
 
 		return {
