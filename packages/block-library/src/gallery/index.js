@@ -53,6 +53,9 @@ const blockAttributes = {
 	columns: {
 		type: 'number',
 	},
+	ids: {
+		type: 'array',
+	},
 	imageCrop: {
 		type: 'boolean',
 		default: true,

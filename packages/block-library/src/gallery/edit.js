@@ -86,7 +86,9 @@ class GalleryEdit extends Component {
 	}
 
 	onSelectImages( images ) {
+		const idList = images.map( ( item ) => item.id );
 		this.props.setAttributes( {
+			ids: idList,
 			images: images.map( ( image ) => pick( image, [ 'alt', 'caption', 'id', 'link', 'url' ] ) ),
 		} );
 	}
