@@ -45,7 +45,7 @@ Our goal with Gutenberg is not just to create a seamless post- and page-building
 
 Yes. There are a lot! There is a help modal showing all available keyboard shortcuts.
 
-You can see the whole list going to the top right corner menu of the new editor and clicking on "Keyboard Shorcuts" (or by using the keyboard shortcut Ctrl + Option + H).
+You can see the whole list going to the top right corner menu of the new editor and clicking on "Keyboard Shortcuts" (or by using the keyboard shortcut Ctrl + Option + H).
 
 This is the canonical list of keyboard shortcuts:
 

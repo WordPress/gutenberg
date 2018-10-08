@@ -69,7 +69,7 @@ const effects = {
 		const state = store.getState();
 
 		// Additional data needed for backwards compatibility.
-		// If we do not provide this data the post will be overriden with the default values.
+		// If we do not provide this data the post will be overridden with the default values.
 		const post = select( 'core/editor' ).getCurrentPost( state );
 		const additionalData = [
 			post.comment_status ? [ 'comment_status', post.comment_status ] : false,
