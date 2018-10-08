@@ -10,12 +10,6 @@
 .edit-post-header-toolbar {
 	display: inline-flex;
 	align-items: center;
-
-	@include break-large() {
-		.editor-block-switcher .components-toolbar {
-			border-left: 1px solid $light-gray-500;
-		}
-	}
 }
 
 // Block toolbar when fixed to the top of the screen.
@@ -27,11 +21,7 @@
 	right: 0;
 	background: $white;
 	min-height: $block-toolbar-height;
-	border-bottom: 1px solid $light-gray-500;
-
-	.editor-block-toolbar  {
-		border-left: none;
-	}
+	border-bottom: $border-width solid $light-gray-500;
 
 	.editor-block-toolbar .components-toolbar {
 		border-top: none;
@@ -61,6 +51,14 @@
 
 		.is-sidebar-opened & {
 			right: auto;
+		}
+
+		.editor-block-toolbar {
+			margin: -9px 0;
+		}
+
+		.editor-block-toolbar .components-toolbar {
+			padding: 9px;
 		}
 	}
 }

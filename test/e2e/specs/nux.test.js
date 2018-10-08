@@ -1,12 +1,11 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
 import {
-	clearLocalStorage,
+	clickBlockAppender,
 	clickOnMoreMenuItem,
-	newDesktopBrowserPage,
 	newPost,
+	saveDraft,
 } from '../support/utils';
 
 describe( 'New User Experience (NUX)', () => {
@@ -35,20 +34,14 @@ describe( 'New User Experience (NUX)', () => {
 	}
 
 	beforeEach( async () => {
-		await newDesktopBrowserPage();
-		await newPost( undefined, false );
-	} );
-
-	afterEach( async () => {
-		// Clear localStorage tips so they aren't persisted for the next test.
-		await clearLocalStorage();
+		await newPost( { enableTips: true } );
 	} );
 
 	it( 'should show tips to a first-time user', async () => {
 		const firstTipText = await page.$eval( '.nux-dot-tip', ( element ) => element.innerText );
 		expect( firstTipText ).toContain( 'Welcome to the wonderful world of blocks!' );
 
-		const [ nextTipButton ] = await page.$x( '//button[contains(text(), \'See next tip\')]' );
+		const [ nextTipButton ] = await page.$x( "//button[contains(text(), 'See next tip')]" );
 		await nextTipButton.click();
 
 		const secondTipText = await page.$eval( '.nux-dot-tip', ( element ) => element.innerText );
@@ -59,7 +52,7 @@ describe( 'New User Experience (NUX)', () => {
 		await clickAllTips( page );
 
 		// Make sure "Got it" button appears on the last tip.
-		const gotItButton = await page.$x( '//button[contains(text(), \'Got it\')]' );
+		const gotItButton = await page.$x( "//button[contains(text(), 'Got it')]" );
 		expect( gotItButton ).toHaveLength( 1 );
 
 		// Click the "Got it button".
@@ -170,12 +163,9 @@ describe( 'New User Experience (NUX)', () => {
 		// Let's type something so there's content in this post.
 		await page.click( '.editor-post-title__input' );
 		await page.keyboard.type( 'Post title' );
-		await page.click( '.editor-default-block-appender' );
+		await clickBlockAppender();
 		await page.keyboard.type( 'Post content goes here.' );
-		// Save the post as a draft.
-		await page.click( '.editor-post-save-draft' );
-
-		await page.waitForSelector( '.editor-post-saved-state.is-saved' );
+		await saveDraft();
 
 		// Refresh the page; tips should be disabled.
 		await page.reload();

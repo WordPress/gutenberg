@@ -4,3 +4,5 @@ coverage
 node_modules
 test/e2e/test-plugins
 vendor
+packages/block-serialization-spec-parser/index.js
+gutenberg-mobile

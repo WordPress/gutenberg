@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ColorPaletteControl matches the snapshot 1`] = `
+<BaseControl
+  className="editor-color-palette-control"
+  label={
+    <React.Fragment>
+      Test Color
+      <ColorIndicator
+        aria-label="(current test color: red)"
+        colorValue="#f00"
+      />
+    </React.Fragment>
+  }
+>
+  <WithColorContext(ColorPalette)
+    className="editor-color-palette-control__color-palette"
+    onChange={[Function]}
+    value="#f00"
+  />
+</BaseControl>
+`;

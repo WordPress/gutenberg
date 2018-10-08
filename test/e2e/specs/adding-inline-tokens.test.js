@@ -9,21 +9,24 @@ import uuid from 'uuid/v4';
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage, getEditedPostContent, insertBlock } from '../support/utils';
+import {
+	clickBlockAppender,
+	getEditedPostContent,
+	insertBlock,
+	newPost,
+} from '../support/utils';
 
 describe( 'adding inline tokens', () => {
 	beforeAll( async () => {
-		await newDesktopBrowserPage();
 		await newPost();
 	} );
 
-	it( 'Should insert inline image', async () => {
+	it( 'should insert inline image', async () => {
 		// Create a paragraph.
-		await page.click( '.editor-default-block-appender' );
+		await clickBlockAppender();
 		await page.keyboard.type( 'a ' );
 
-		await insertBlock( 'Inline Image' );
+		await insertBlock( 'Inline Image', 'Inline Elements' );
 
 		// Wait for media modal to appear and upload image.
 		await page.waitForSelector( '.media-modal input[type=file]' );
@@ -35,13 +38,13 @@ describe( 'adding inline tokens', () => {
 		await inputElement.uploadFile( tmpFileName );
 
 		// Wait for upload.
-		await page.waitForSelector( '.media-modal li[aria-label="' + filename + '"]' );
+		await page.waitForSelector( `.media-modal li[aria-label="${ filename }"]` );
 
 		// Insert the uploaded image.
 		await page.click( '.media-modal button.media-button-select' );
 
 		// Check the content.
-		const regex = new RegExp( '<!-- wp:paragraph -->\\s*<p>a\\u00A0<img class="wp-image-\\d+" style="width:10px" src="[^"]+\\/' + filename + '\\.png" alt="" \\/><\\/p>\\s*<!-- \\/wp:paragraph -->' );
+		const regex = new RegExp( `<!-- wp:paragraph -->\\s*<p>a\\u00A0<img class="wp-image-\\d+" style="width:\\s*10px;?" src="[^"]+\\/${ filename }\\.png" alt=""\\/?><\\/p>\\s*<!-- \\/wp:paragraph -->` );
 		expect( await getEditedPostContent() ).toMatch( regex );
 	} );
 } );

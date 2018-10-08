@@ -1,6 +1,6 @@
-# **core/viewport**: The viewport module Data
+# **core/viewport**: The Viewport Data
 
-## Selectors 
+## Selectors
 
 ### isViewportMatch
 

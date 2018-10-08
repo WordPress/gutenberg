@@ -1,8 +1,19 @@
 /**
+ * External dependencies
+ */
+import { reduce } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+/**
  * Returns an action object used in signalling that the user opened an editor sidebar.
  *
- * @param {string} name        Sidebar name to be opened.
- * @return {Object}            Action object.
+ * @param {string} name Sidebar name to be opened.
+ *
+ * @return {Object} Action object.
  */
 export function openGeneralSidebar( name ) {
 	return {
@@ -19,6 +30,31 @@ export function openGeneralSidebar( name ) {
 export function closeGeneralSidebar() {
 	return {
 		type: 'CLOSE_GENERAL_SIDEBAR',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user opened an editor sidebar.
+ *
+ * @param {string} name A string that uniquely identifies the modal.
+ *
+ * @return {Object} Action object.
+ */
+export function openModal( name ) {
+	return {
+		type: 'OPEN_MODAL',
+		name,
+	};
+}
+
+/**
+ * Returns an action object signalling that the user closed the sidebar.
+ *
+ * @return {Object} Action object.
+ */
+export function closeModal() {
+	return {
+		type: 'CLOSE_MODAL',
 	};
 }
 
@@ -121,16 +157,42 @@ export function togglePinnedPluginItem( pluginName ) {
  * @return {Object} Action object.
  */
 export function initializeMetaBoxState( metaBoxes ) {
+	deprecated( 'initializeMetaBoxState action (`core/edit-post`)', {
+		alternative: 'setActiveMetaBoxLocations',
+		plugin: 'Gutenberg',
+		version: '4.2',
+	} );
+
+	const locations = reduce( metaBoxes, ( result, isActive, location ) => {
+		if ( isActive ) {
+			result = result.concat( location );
+		}
+
+		return result;
+	}, [] );
+
+	return setActiveMetaBoxLocations( locations );
+}
+
+/**
+ * Returns an action object used in signaling that the active meta box
+ * locations have changed.
+ *
+ * @param {string[]} locations New active meta box locations.
+ *
+ * @return {Object} Action object.
+ */
+export function setActiveMetaBoxLocations( locations ) {
 	return {
-		type: 'INITIALIZE_META_BOX_STATE',
-		metaBoxes,
+		type: 'SET_ACTIVE_META_BOX_LOCATIONS',
+		locations,
 	};
 }
 
 /**
  * Returns an action object used to request meta box update.
  *
- * @return {Object}      Action object.
+ * @return {Object} Action object.
  */
 export function requestMetaBoxUpdates() {
 	return {
@@ -154,9 +216,15 @@ export function metaBoxUpdatesSuccess() {
  * This is used to check if the meta boxes have been touched when leaving the editor.
  *
  * @param   {Object} dataPerLocation Meta Boxes Data per location.
- * @return {Object}                 Action object.
+ *
+ * @return {Object} Action object.
  */
 export function setMetaBoxSavedData( dataPerLocation ) {
+	deprecated( 'setMetaBoxSavedData action (`core/edit-post`)', {
+		plugin: 'Gutenberg',
+		version: '4.2',
+	} );
+
 	return {
 		type: 'META_BOX_SET_SAVED_DATA',
 		dataPerLocation,

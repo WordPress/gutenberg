@@ -1,10 +1,112 @@
 Gutenberg's deprecation policy is intended to support backwards-compatibility for two minor releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
 
+## 4.4.0
+
+- The block attribute sources `children` and `node` have been removed. Please use the `rich-text` source instead. See the core blocks for examples.
+- `wp.blocks.node.matcher` has been removed. Please use `wp.richTextValue.create` instead.
+- `wp.blocks.node.toHTML` has been removed. Please use `wp.richTextValue.toHTMLString` instead.
+- `wp.blocks.node.fromDOM` has been removed. Please use `wp.richTextValue.create` instead.
+- `wp.blocks.children.toHTML` has been removed. Please use `wp.richTextValue.toHTMLString` instead.
+- `wp.blocks.children.fromDOM` has been removed. Please use `wp.richTextValue.create` instead.
+- `wp.blocks.children.concat` has been removed. Please use `wp.richTextValue.concat` instead.
+- `wp.blocks.children.getChildrenArray` has been removed. Please use `wp.richTextValue.create` instead.
+
+## 4.2.0
+
+- Writing resolvers as async generators has been removed. Use the controls plugin instead.
+- `wp.components.AccessibleSVG` component has been removed. Please use `wp.components.SVG` instead.
+- The `wp.editor.UnsavedChangesWarning` component no longer accepts a `forceIsDirty` prop.
+- `initializeMetaBoxState` action (`core/edit-post`) has been removed. Use `setActiveMetaBoxLocations` action (`core/edit-post`) instead.
+- `wp.editPost.initializeEditor` no longer returns an object. Use the `setActiveMetaBoxLocations` action (`core/edit-post`) in place of the existing object's `initializeMetaBoxes` function.
+- `setMetaBoxSavedData` action (`core/edit-post`) has been removed.
+- `getMetaBoxes` selector (`core/edit-post`) has been removed. Use `getActiveMetaBoxLocations` selector (`core/edit-post`) instead.
+- `getMetaBox` selector (`core/edit-post`) has been removed. Use `isMetaBoxLocationActive` selector (`core/edit-post`) instead.
+- Attribute type coercion has been removed. Omit the source to preserve type via serialized comment demarcation.
+- `mediaDetails` in object passed to `onFileChange` callback of `wp.editor.mediaUpload`. Please use `media_details` property instead.
+
+## 4.1.0
+
+- `wp.data.dispatch( 'core/editor' ).checkTemplateValidity` has been removed. Validity is verified automatically upon block reset.
+
+## 4.0.0
+
+- `wp.editor.RichTextProvider` has been removed. Please use `wp.data.select( 'core/editor' )` methods instead.
+- `wp.components.Draggable` as a DOM node drag handler has been removed. Please, use `wp.components.Draggable` as a wrap component for your DOM node drag handler.
+- `wp.i18n.getI18n` has been removed. Use `__`, `_x`, `_n`, or `_nx` instead.
+- `wp.i18n.dcnpgettext` has been removed. Use `__`, `_x`, `_n`, or `_nx` instead.
+
+## 3.9.0
+
+- RichText `getSettings` prop has been removed. The `unstableGetSettings` prop is available if continued use is required. Unstable APIs are strongly discouraged to be used, and are subject to removal without notice.
+- RichText `onSetup` prop has been removed. The `unstableOnSetup` prop is available if continued use is required. Unstable APIs are strongly discouraged to be used, and are subject to removal without notice.
+- `wp.editor.getColorName` has been removed. Please use `wp.editor.getColorObjectByColorValue` instead.
+- `wp.editor.getColorClass` has been renamed. Please use `wp.editor.getColorClassName` instead.
+- `value` property in color objects passed by `wp.editor.withColors` has been removed. Please use color property instead.
+- The Subheading block has been removed. Please use the Paragraph block instead.
+- `wp.blocks.getDefaultBlockForPostFormat` has been removed.
+
+## 3.8.0
+
+ - `wp.components.withContext` has been removed. Please use `wp.element.createContext` instead. See: https://reactjs.org/docs/context.html.
+ - `wp.coreBlocks.registerCoreBlocks` has been removed. Please use `wp.blockLibrary.registerCoreBlocks` instead.
+ - `wp.editor.DocumentTitle` component has been removed.
+ - `getDocumentTitle` selector (`core/editor`) has been removed.
+
+## 3.7.0
+
+ - `wp.components.withAPIData` has been removed. Please use the Core Data module or `wp.apiFetch` directly instead.
+ - `wp.data.dispatch("core").receiveTerms` has been deprecated. Please use `wp.data.dispatch("core").receiveEntityRecords` instead.
+ - `getCategories` resolver has been deprecated. Please use `getEntityRecords` resolver instead.
+ - `wp.data.select("core").getTerms` has been deprecated. Please use `wp.data.select("core").getEntityRecords` instead.
+ - `wp.data.select("core").getCategories` has been deprecated. Please use `wp.data.select("core").getEntityRecords` instead.
+ - `wp.data.select("core").isRequestingCategories` has been deprecated. Please use `wp.data.select("core/data").isResolving` instead.
+ - `wp.data.select("core").isRequestingTerms` has been deprecated. Please use `wp.data.select("core").isResolving` instead.
+ - `wp.data.restrictPersistence`, `wp.data.setPersistenceStorage` and  `wp.data.setupPersistence` has been removed. Please use the data persistence plugin instead.
+
+## 3.6.0
+
+ - `wp.editor.editorMediaUpload` has been removed. Please use `wp.editor.mediaUpload` instead.
+ - `wp.utils.getMimeTypesArray` has been removed.
+ - `wp.utils.mediaUpload` has been removed. Please use `wp.editor.mediaUpload` instead.
+ - `wp.utils.preloadImage` has been removed.
+ - `supports.wideAlign` has been removed from the Block API. Please use `supports.alignWide` instead.
+ - `wp.blocks.isSharedBlock` has been removed. Use `wp.blocks.isReusableBlock` instead.
+ - `fetchSharedBlocks` action (`core/editor`) has been removed. Use `fetchReusableBlocks` instead.
+ - `receiveSharedBlocks` action (`core/editor`) has been removed. Use `receiveReusableBlocks` instead.
+ - `saveSharedBlock` action (`core/editor`) has been removed. Use `saveReusableBlock` instead.
+ - `deleteSharedBlock` action (`core/editor`) has been removed. Use `deleteReusableBlock` instead.
+ - `updateSharedBlockTitle` action (`core/editor`) has been removed. Use `updateReusableBlockTitle` instead.
+ - `convertBlockToSaved` action (`core/editor`) has been removed. Use `convertBlockToReusable` instead.
+ - `getSharedBlock` selector (`core/editor`) has been removed. Use `getReusableBlock` instead.
+ - `isSavingSharedBlock` selector (`core/editor`) has been removed. Use `isSavingReusableBlock` instead.
+ - `isFetchingSharedBlock` selector (`core/editor`) has been removed. Use `isFetchingReusableBlock` instead.
+ - `getSharedBlocks` selector (`core/editor`) has been removed. Use `getReusableBlocks` instead.
+
+## 3.5.0
+
+ - `wp.components.ifCondition` has been removed. Please use `wp.compose.ifCondition` instead.
+ - `wp.components.withGlobalEvents` has been removed. Please use `wp.compose.withGlobalEvents` instead.
+ - `wp.components.withInstanceId` has been removed. Please use `wp.compose.withInstanceId` instead.
+ - `wp.components.withSafeTimeout` has been removed. Please use `wp.compose.withSafeTimeout` instead.
+ - `wp.components.withState` has been removed. Please use `wp.compose.withState` instead.
+ - `wp.element.pure` has been removed. Please use `wp.compose.pure` instead.
+ - `wp.element.compose` has been removed. Please use `wp.compose.compose` instead.
+ - `wp.element.createHigherOrderComponent` has been removed. Please use `wp.compose.createHigherOrderComponent` instead.
+ - `wp.utils.buildTermsTree` has been removed.
+ - `wp.utils.decodeEntities` has been removed. Please use `wp.htmlEntities.decodeEntities` instead.
+ - All references to a block's `uid` have been replaced with equivalent props and selectors for `clientId`.
+ - The `wp.editor.MediaPlaceholder` component `onSelectUrl` prop has been renamed to `onSelectURL`.
+ - The `wp.editor.UrlInput` component has been renamed to `wp.editor.URLInput`.
+ - The Text Columns block has been removed. Please use the Columns block instead.
+ - `InnerBlocks` grouped layout is removed. Use intermediary nested inner blocks instead. See Columns / Column block for reference implementation.
+ - `RichText` explicit `element` format removed. Please use the compatible `children` format instead.
+
 ## 3.4.0
 
  - `focusOnMount` prop in the `Popover` component has been changed from `Boolean`-only to an enum-style property that accepts `"firstElement"`, `"container"`, or `false`. Please convert any `<Popover focusOnMount />` usage to `<Popover focusOnMount="firstElement" />`.
  - `wp.utils.keycodes` utilities are removed. Please use `wp.keycodes` instead.
  - Block `id` prop in `edit` function removed. Please use block `clientId` prop instead.
+ - `property` source removed. Please use equivalent `text`, `html`, or `attribute` source, or comment attribute instead.
 
 ## 3.3.0
 
@@ -14,7 +116,6 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
  - `blocks.BlockEdit` filter removed. Please use `editor.BlockEdit` instead.
  - `blocks.BlockListBlock` filter removed. Please use `editor.BlockListBlock` instead.
  - `blocks.MediaUpload` filter removed. Please use `editor.MediaUpload` instead.
- - `property` source removed. Please use equivalent `text`, `html`, or `attribute` source, or comment attribute instead.
 
 ## 3.2.0
 

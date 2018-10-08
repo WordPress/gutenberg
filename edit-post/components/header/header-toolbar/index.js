@@ -1,9 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
+import { DotTip } from '@wordpress/nux';
 
 /**
  * WordPress dependencies
@@ -22,14 +23,21 @@ import {
  * Internal dependencies
  */
 import './style.scss';
+import FullscreenModeClose from '../fullscreen-mode-close';
 
-function HeaderToolbar( { hasFixedToolbar, isLargeViewport } ) {
+function HeaderToolbar( { hasFixedToolbar, isLargeViewport, mode } ) {
 	return (
 		<NavigableToolbar
 			className="edit-post-header-toolbar"
 			aria-label={ __( 'Editor Toolbar' ) }
 		>
-			<Inserter position="bottom right" />
+			<FullscreenModeClose />
+			<div>
+				<Inserter disabled={ mode !== 'visual' } position="bottom right" />
+				<DotTip id="core/editor.inserter">
+					{ __( 'Welcome to the wonderful world of blocks! Click the “+” (“Add block”) button to add a new block. There are blocks available for all kinds of content: you can insert text, headings, images, lists, and lots more!' ) }
+				</DotTip>
+			</div>
 			<EditorHistoryUndo />
 			<EditorHistoryRedo />
 			<TableOfContents />
@@ -45,6 +53,7 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport } ) {
 export default compose( [
 	withSelect( ( select ) => ( {
 		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
+		mode: select( 'core/edit-post' ).getEditorMode(),
 	} ) ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
 ] )( HeaderToolbar );

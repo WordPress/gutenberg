@@ -1,21 +1,80 @@
 /**
  * Node dependencies
  */
-const { kebabCase } = require( 'lodash' );
+const { camelCase, kebabCase, nth, upperFirst } = require( 'lodash' );
+
+const baseRepoUrl = `https://raw.githubusercontent.com/WordPress/gutenberg/master`;
 
 /**
- * Generates the manifest for the given namespaces.
+ * Generates the package manifest.
  *
- * @param {Object} parsedNamespaces Parsed Namespace Object.
- * @param {Object} packagesConfig   Packages Docs Config.
+ * @param {Object} packagesConfig Packages Docs Config
  *
- * @return {Array} manifest.
+ * @return {Array} Manifest
  */
-module.exports = function( parsedNamespaces, packagesConfig ) {
-	const dataManifest = [ {
+function getPackageManifest( packagesConfig ) {
+	return [
+		{
+			title: 'Packages',
+			slug: 'packages',
+			markdown_source: `${ baseRepoUrl }/docs/packages.md`,
+			parent: null,
+		},
+	].concat(
+		Object.entries( packagesConfig ).map( ( [ folderName, config ] ) => {
+			const path = config.isNpmReady === false ?
+				`${ baseRepoUrl }/${ folderName }/README.md` :
+				`${ baseRepoUrl }/packages/${ folderName }/README.md`;
+			return {
+				title: `@wordpress/${ folderName }`,
+				slug: `packages-${ folderName }`,
+				markdown_source: path,
+				parent: 'packages',
+			};
+		} )
+	);
+}
+
+/**
+ * Generates the components manifest.
+ *
+ * @param {Array} componentPaths Paths for all components
+ *
+ * @return {Array} Manifest
+ */
+function getComponentManifest( componentPaths ) {
+	return [
+		{
+			title: 'Components Package Reference',
+			slug: 'components',
+			markdown_source: `${ baseRepoUrl }/packages/components.md`,
+			parent: null,
+		},
+		...componentPaths
+			.map( ( filePath ) => {
+				const slug = nth( filePath.split( '/' ), -2 );
+				return {
+					title: upperFirst( camelCase( slug ) ),
+					slug,
+					markdown_source: `${ baseRepoUrl }/${ filePath }`,
+					parent: 'components',
+				};
+			} ),
+	];
+}
+
+/**
+ * Generates the data manifest.
+ *
+ * @param {Object} parsedNamespaces Parsed Namespace Object
+ *
+ * @return {Array} Manifest
+ */
+function getDataManifest( parsedNamespaces ) {
+	return [ {
 		title: 'Data Package Reference',
 		slug: 'data',
-		markdown_source: 'https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/README.md',
+		markdown_source: `${ baseRepoUrl }/docs/data/README.md`,
 		parent: null,
 	} ].concat(
 		Object.values( parsedNamespaces ).map( ( parsedNamespace ) => {
@@ -23,23 +82,15 @@ module.exports = function( parsedNamespaces, packagesConfig ) {
 			return {
 				title: parsedNamespace.title,
 				slug,
-				markdown_source: `https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/${ slug }.md`,
+				markdown_source: `${ baseRepoUrl }/docs/data/${ slug }.md`,
 				parent: 'data',
 			};
 		} )
 	);
+}
 
-	const packagesManifest = Object.entries( packagesConfig ).map( ( [ folderName, config ] ) => {
-		const path = config.isNpmReady === false ?
-			`https://raw.githubusercontent.com/WordPress/gutenberg/master/${ folderName }/README.md` :
-			`https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/${ folderName }/README.md`;
-		return {
-			title: `@wordpress/${ folderName }`,
-			slug: `packages-${ folderName }`,
-			markdown_source: path,
-			parent: 'packages',
-		};
-	} );
-
-	return packagesManifest.concat( dataManifest );
+module.exports = {
+	getPackageManifest,
+	getComponentManifest,
+	getDataManifest,
 };

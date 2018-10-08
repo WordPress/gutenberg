@@ -9,14 +9,17 @@ const fs = require( 'fs' );
 const config = require( './config' );
 const parser = require( './parser' );
 const generator = require( './generator' );
-const getManifest = require( './manifest' );
+const { getPackageManifest, getComponentManifest, getDataManifest } = require( './manifest' );
 
 const parsedModules = parser( config.dataNamespaces );
 generator( parsedModules, config.dataDocsOutput );
+
 const rootManifest = require( config.rootManifest );
-const dataModuleManifest = getManifest( parsedModules, config.packages );
+const packageManifest = getPackageManifest( config.packages );
+const componentManifest = getComponentManifest( config.componentPaths );
+const dataManifest = getDataManifest( parsedModules );
 
 fs.writeFileSync(
 	config.manifestOutput,
-	JSON.stringify( rootManifest.concat( dataModuleManifest ), undefined, '\t' )
+	JSON.stringify( rootManifest.concat( packageManifest, componentManifest, dataManifest ), undefined, '\t' )
 );

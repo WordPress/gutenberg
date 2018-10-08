@@ -2,15 +2,22 @@
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
-import { EditorProvider, ErrorBoundary } from '@wordpress/editor';
+import { EditorProvider, ErrorBoundary, PostLockedModal } from '@wordpress/editor';
 import { StrictMode } from '@wordpress/element';
-
 /**
  * Internal dependencies
  */
 import Layout from './components/layout';
 
-function Editor( { settings, hasFixedToolbar, post, overridePost, onError, ...props } ) {
+function Editor( {
+	settings,
+	hasFixedToolbar,
+	focusMode,
+	post,
+	overridePost,
+	onError,
+	...props
+} ) {
 	if ( ! post ) {
 		return null;
 	}
@@ -18,14 +25,20 @@ function Editor( { settings, hasFixedToolbar, post, overridePost, onError, ...pr
 	const editorSettings = {
 		...settings,
 		hasFixedToolbar,
+		focusMode,
 	};
 
 	return (
 		<StrictMode>
-			<EditorProvider settings={ editorSettings } post={ { ...post, ...overridePost } } { ...props }>
+			<EditorProvider
+				settings={ editorSettings }
+				post={ { ...post, ...overridePost } }
+				{ ...props }
+			>
 				<ErrorBoundary onError={ onError }>
 					<Layout />
 				</ErrorBoundary>
+				<PostLockedModal />
 			</EditorProvider>
 		</StrictMode>
 	);
@@ -33,5 +46,6 @@ function Editor( { settings, hasFixedToolbar, post, overridePost, onError, ...pr
 
 export default withSelect( ( select, { postId, postType } ) => ( {
 	hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
+	focusMode: select( 'core/edit-post' ).isFeatureActive( 'focusMode' ),
 	post: select( 'core' ).getEntityRecord( 'postType', postType, postId ),
 } ) )( Editor );

@@ -1,5 +1,4 @@
-Babel Plugin Import JSX Pragma
-======
+# Babel Plugin Import JSX Pragma
 
 Babel transform plugin for automatically injecting an import to be used as the pragma for the [React JSX Transform plugin](http://babeljs.io/docs/en/babel-plugin-transform-react-jsx).
 

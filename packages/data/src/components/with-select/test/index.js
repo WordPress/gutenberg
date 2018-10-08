@@ -6,7 +6,7 @@ import TestRenderer from 'react-test-renderer';
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -416,8 +416,8 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const childMapStateToProps = jest.fn();
-		const parentMapStateToProps = jest.fn().mockImplementation( ( _select ) => ( {
+		const childMapSelectToProps = jest.fn();
+		const parentMapSelectToProps = jest.fn().mockImplementation( ( _select ) => ( {
 			isRenderingChild: _select( 'childRender' ).getValue(),
 		} ) );
 
@@ -426,8 +426,8 @@ describe( 'withSelect', () => {
 			<div>{ props.isRenderingChild ? <Child /> : null }</div>
 		) );
 
-		const Child = withSelect( childMapStateToProps )( ChildOriginalComponent );
-		const Parent = withSelect( parentMapStateToProps )( ParentOriginalComponent );
+		const Child = withSelect( childMapSelectToProps )( ChildOriginalComponent );
+		const Parent = withSelect( parentMapSelectToProps )( ParentOriginalComponent );
 
 		TestRenderer.create(
 			<RegistryProvider value={ registry }>
@@ -435,15 +435,15 @@ describe( 'withSelect', () => {
 			</RegistryProvider>
 		);
 
-		expect( childMapStateToProps ).toHaveBeenCalledTimes( 1 );
-		expect( parentMapStateToProps ).toHaveBeenCalledTimes( 1 );
+		expect( childMapSelectToProps ).toHaveBeenCalledTimes( 1 );
+		expect( parentMapSelectToProps ).toHaveBeenCalledTimes( 1 );
 		expect( ChildOriginalComponent ).toHaveBeenCalledTimes( 1 );
 		expect( ParentOriginalComponent ).toHaveBeenCalledTimes( 1 );
 
 		registry.dispatch( 'childRender' ).toggleRender();
 
-		expect( childMapStateToProps ).toHaveBeenCalledTimes( 1 );
-		expect( parentMapStateToProps ).toHaveBeenCalledTimes( 2 );
+		expect( childMapSelectToProps ).toHaveBeenCalledTimes( 1 );
+		expect( parentMapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( ChildOriginalComponent ).toHaveBeenCalledTimes( 1 );
 		expect( ParentOriginalComponent ).toHaveBeenCalledTimes( 2 );
 	} );

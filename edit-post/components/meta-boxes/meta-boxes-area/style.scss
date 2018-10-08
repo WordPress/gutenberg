@@ -9,11 +9,13 @@
 	 * other elements (such as .button) are unaffected by Gutenberg's style
 	 * because of their higher specificity.
 	 */
-	* {
+	&__container,
+	.inside {
 		box-sizing: content-box;
 	}
 
-	textarea, input {
+	textarea,
+	input {
 		box-sizing: border-box;
 	}
 
@@ -28,7 +30,7 @@
 	#poststuff h3.hndle,
 	#poststuff .stuffbox > h3,
 	#poststuff h2.hndle { /* WordPress selectors yolo */
-		border-bottom: 1px solid $light-gray-500;
+		border-bottom: $border-width solid $light-gray-500;
 		box-sizing: border-box;
 		color: inherit;
 		font-weight: 600;
@@ -45,7 +47,7 @@
 	}
 
 	.postbox > .inside {
-		border-bottom: 1px solid $light-gray-500;
+		border-bottom: $border-width solid $light-gray-500;
 		color: inherit;
 		padding: 0 $block-padding $block-padding;
 		margin: 0;
@@ -56,22 +58,22 @@
 		width: 44px;
 	}
 
-	&.is-loading:before {
+	&.is-loading::before {
 		position: absolute;
 		top: 0;
 		left: 0;
 		right: 0;
 		bottom: 0;
-		content: '';
+		content: "";
 		background: transparent;
-		z-index: z-index( '.edit-post-meta-boxes-area.is-loading:before');
+		z-index: z-index(".edit-post-meta-boxes-area.is-loading::before");
 	}
 
-	.spinner {
+	.components-spinner {
 		position: absolute;
 		top: 10px;
 		right: 20px;
-		z-index: z-index( '.edit-post-meta-boxes-area .spinner');
+		z-index: z-index(".edit-post-meta-boxes-area .spinner");
 	}
 }
 

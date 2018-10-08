@@ -1,29 +1,26 @@
 /**
  * WordPress dependencies
  */
-import {
-	Component,
-	createHigherOrderComponent,
-} from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
+import { remountOnPropChange, createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import remountOnPropChange from '../remountOnPropChange';
 import { RegistryConsumer } from '../registry-provider';
 
 /**
  * Higher-order component used to inject state-derived props using registered
  * selectors.
  *
- * @param {Function} mapStateToProps Function called on every state change,
+ * @param {Function} mapSelectToProps Function called on every state change,
  *                                   expected to return object of props to
  *                                   merge with the component's own props.
  *
  * @return {Component} Enhanced component with merged state data props.
  */
-const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( WrappedComponent ) => {
+const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( WrappedComponent ) => {
 	/**
 	 * Default merge props. A constant value is used as the fallback since it
 	 * can be more efficiently shallow compared in case component is repeatedly
@@ -34,15 +31,15 @@ const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( WrappedC
 	const DEFAULT_MERGE_PROPS = {};
 
 	/**
-	 * Given a props object, returns the next merge props by mapStateToProps.
+	 * Given a props object, returns the next merge props by mapSelectToProps.
 	 *
-	 * @param {Object} props Props to pass as argument to mapStateToProps.
+	 * @param {Object} props Props to pass as argument to mapSelectToProps.
 	 *
 	 * @return {Object} Props to merge into rendered wrapped element.
 	 */
 	function getNextMergeProps( props ) {
 		return (
-			mapStateToProps( props.registry.select, props.ownProps ) ||
+			mapSelectToProps( props.registry.select, props.ownProps ) ||
 			DEFAULT_MERGE_PROPS
 		);
 	}

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,13 +13,13 @@ import {
 	UnsavedChangesWarning,
 	EditorNotices,
 	PostPublishPanel,
-	DocumentTitle,
 	PreserveScrollInReorder,
 } from '@wordpress/editor';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { compose, Fragment } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 import { PluginArea } from '@wordpress/plugins';
 import { withViewportMatch } from '@wordpress/viewport';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -33,11 +32,12 @@ import Header from '../header';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
+import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import MetaBoxes from '../meta-boxes';
-import { getMetaBoxContainer } from '../../utils/meta-boxes';
 import Sidebar from '../sidebar';
 import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
+import FullscreenMode from '../fullscreen-mode';
 
 function Layout( {
 	mode,
@@ -47,7 +47,6 @@ function Layout( {
 	hasFixedToolbar,
 	closePublishSidebar,
 	togglePublishSidebar,
-	metaBoxes,
 	hasActiveMetaboxes,
 	isSaving,
 	isMobileViewport,
@@ -61,25 +60,28 @@ function Layout( {
 
 	const publishLandmarkProps = {
 		role: 'region',
-		'aria-label': __( 'Publish' ),
+		/* translators: accessibility text for the publish landmark region. */
+		'aria-label': __( 'Editor publish' ),
 		tabIndex: -1,
 	};
 	return (
 		<div className={ className }>
-			<DocumentTitle />
+			<FullscreenMode />
 			<BrowserURL />
-			<UnsavedChangesWarning forceIsDirty={ () => {
-				return some( metaBoxes, ( metaBox, location ) => {
-					return metaBox.isActive &&
-						jQuery( getMetaBoxContainer( location ) ).serialize() !== metaBox.data;
-				} );
-			} } />
+			<UnsavedChangesWarning />
 			<AutosaveMonitor />
 			<Header />
-			<div className="edit-post-layout__content" role="region" aria-label={ __( 'Editor content' ) } tabIndex="-1">
+			<div
+				className="edit-post-layout__content"
+				role="region"
+				/* translators: accessibility text for the content landmark region. */
+				aria-label={ __( 'Editor content' ) }
+				tabIndex="-1"
+			>
 				<EditorNotices />
 				<PreserveScrollInReorder />
 				<EditorModeKeyboardShortcuts />
+				<KeyboardShortcutHelpModal />
 				{ mode === 'text' && <TextEditor /> }
 				{ mode === 'visual' && <VisualEditor /> }
 				<div className="edit-post-layout__metaboxes">
@@ -132,7 +134,6 @@ export default compose(
 		pluginSidebarOpened: select( 'core/edit-post' ).isPluginSidebarOpened(),
 		publishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
 		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
-		metaBoxes: select( 'core/edit-post' ).getMetaBoxes(),
 		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 	} ) ),

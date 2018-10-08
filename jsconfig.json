@@ -1,0 +1,16 @@
+{
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"@wordpress/*": ["./*", "./packages/*/src"]
+		}
+	},
+	"exclude": [
+		"build",
+		"build-module",
+		"coverage",
+		"node_modules",
+		"test/e2e/test-plugins",
+		"vendor"
+	]
+}
