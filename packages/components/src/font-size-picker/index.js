@@ -87,7 +87,6 @@ function FontSizePicker( {
 					type="button"
 					disabled={ value === undefined }
 					onClick={ () => onChange( undefined ) }
-					isButton
 					isSmall
 					isDefault
 					aria-label={ __( 'Reset font size' ) }
