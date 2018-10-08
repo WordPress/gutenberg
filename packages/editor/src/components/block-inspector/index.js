@@ -24,12 +24,14 @@ const BlockInspector = ( { selectedBlock, blockType, count } ) => {
 		return <span className="editor-block-inspector__multi-blocks">{ __( 'Coming Soon' ) }</span>;
 	}
 
+	const isSelectedBlockUnregistered =
+		!! selectedBlock && selectedBlock.name === getUnregisteredTypeHandlerName();
+
 	/*
-	 * In addition to the actual case of no-block-selected,
-	 * avoid showing an unregistered block as an actual selection because we want
-	 * the user to focus on the unregistered block warning, not block settings.
+	 * If the selected block is of an unregistered type, avoid showing it as an actual selection
+	 * because we want the user to focus on the unregistered block warning, not block settings.
 	 */
-	if ( ! selectedBlock || selectedBlock.name === getUnregisteredTypeHandlerName() ) {
+	if ( ! selectedBlock || isSelectedBlockUnregistered ) {
 		return <span className="editor-block-inspector__no-blocks">{ __( 'No block selected.' ) }</span>;
 	}
 
