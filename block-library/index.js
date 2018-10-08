@@ -28,6 +28,7 @@ import * as column from '../packages/block-library/src/columns/column';
 import * as coverImage from '../packages/block-library/src/cover-image';
 import * as embed from '../packages/block-library/src/embed';
 import * as file from '../packages/block-library/src/file';
+import * as html from '../packages/block-library/src/html';
 import * as latestComments from '../packages/block-library/src/latest-comments';
 import * as latestPosts from '../packages/block-library/src/latest-posts';
 import * as list from '../packages/block-library/src/list';
@@ -48,9 +49,6 @@ import * as video from '../packages/block-library/src/video';
 
 // The freeform block can't be moved to the "npm" packages folder because it requires the wp.oldEditor global.
 import * as freeform from './freeform';
-
-// The HTML block can't be moved to the "npm" packages folder because it requires the CodeEditor component.
-import * as html from './html';
 
 export const registerCoreBlocks = () => {
 	[

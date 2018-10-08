@@ -3,6 +3,7 @@
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -76,6 +77,11 @@ class LazyCodeEditor extends Component {
 		this.state = {
 			status: 'pending',
 		};
+
+		deprecated( 'wp.components.CodeEditor', {
+			version: '4.2',
+			alternative: 'wp.codeEditor directly or any alternative React component for syntax highlighting',
+		} );
 	}
 
 	componentDidMount() {

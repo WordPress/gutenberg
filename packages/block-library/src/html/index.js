@@ -3,15 +3,10 @@
  */
 import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Disabled, SandBox, CodeEditor } from '@wordpress/components';
+import { Disabled, SandBox } from '@wordpress/components';
 import { getPhrasingContentSchema } from '@wordpress/blocks';
-import { BlockControls } from '@wordpress/editor';
+import { BlockControls, PlainText } from '@wordpress/editor';
 import { withState } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
-import './editor.scss';
 
 export const name = 'core/html';
 
@@ -63,7 +58,7 @@ export const settings = {
 
 	edit: withState( {
 		isPreview: false,
-	} )( ( { attributes, setAttributes, setState, isSelected, toggleSelection, isPreview } ) => (
+	} )( ( { attributes, setAttributes, setState, isPreview } ) => (
 		<div className="wp-block-html">
 			<BlockControls>
 				<div className="components-toolbar">
@@ -86,11 +81,11 @@ export const settings = {
 					( isPreview || isDisabled ) ? (
 						<SandBox html={ attributes.content } />
 					) : (
-						<CodeEditor
+						<PlainText
 							value={ attributes.content }
-							focus={ isSelected }
-							onFocus={ toggleSelection }
 							onChange={ ( content ) => setAttributes( { content } ) }
+							placeholder={ __( 'Write HTML…' ) }
+							aria-label={ __( 'HTML' ) }
 						/>
 					)
 				) }
