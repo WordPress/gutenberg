@@ -189,11 +189,11 @@ $arrow-size: 8px;
 		/*!rtl:ignore*/
 		margin-right: 0;
 	}
+
 	.components-popover.edit-post-more-menu__content:not(.is-mobile):not(.is-middle).is-left & {
 		/*!rtl:ignore*/
 		margin-right: -12px;
 	}
-
 }
 
 // The withFocusReturn div
