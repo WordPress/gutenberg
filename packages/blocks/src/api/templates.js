@@ -1,12 +1,19 @@
 /**
  * External dependencies
  */
-import { every, map } from 'lodash';
+import { get, every, map, mapValues } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { create } from '@wordpress/rich-text';
+import { renderToString } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { createBlock } from './factory';
+import { getBlockType } from './registration';
 
 /**
  * Checks whether a list of blocks matches a template by comparing the block names.
@@ -56,9 +63,40 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 			return { ...block, innerBlocks };
 		}
 
+		// The template attributes format is a bit different than the block's attributes format
+		// Because we don't want to expose the `rich-text` type in templates format
+		// Instead, we use the "element" format which is less verbose.
+		const blockType = getBlockType( name );
+		const isRichTextAttribute = ( attributeDefinition ) => get( attributeDefinition, [ 'source' ] ) === 'rich-text';
+		const isQueryAttribute = ( attributeDefinition ) => get( attributeDefinition, [ 'source' ] ) === 'query';
+
+		const normalizeAttributes = ( schema, values ) => {
+			return mapValues( values, ( value, key ) => {
+				return normalizeAttribute( schema[ key ], value );
+			} );
+		};
+		const normalizeAttribute = ( definition, value ) => {
+			if ( isRichTextAttribute( definition ) ) {
+				return create( { html: renderToString( value ) } );
+			}
+
+			if ( isQueryAttribute( definition ) && value ) {
+				return value.map( ( subValues ) => {
+					return normalizeAttributes( definition.query, subValues );
+				} );
+			}
+
+			return value;
+		};
+
+		const normalizedAttributes = normalizeAttributes(
+			get( blockType, [ 'attributes' ], {} ),
+			attributes
+		);
+
 		return createBlock(
 			name,
-			attributes,
+			normalizedAttributes,
 			synchronizeBlocksWithTemplate( [], innerBlocksTemplate )
 		);
 	} );

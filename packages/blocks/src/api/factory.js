@@ -3,10 +3,6 @@
  */
 import uuid from 'uuid/v4';
 import {
-	cond,
-	isString,
-	stubTrue,
-	identity,
 	every,
 	reduce,
 	castArray,
@@ -24,31 +20,12 @@ import {
  * WordPress dependencies
  */
 import { createHooks, applyFilters } from '@wordpress/hooks';
-import { create } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
 import { getBlockType, getBlockTypes } from './registration';
-import children from './children';
-
-function isInvalidRichTextValue( value ) {
-	return ! value || ! value.text;
-}
-
-function isChildrenValue( value ) {
-	return Array.isArray( value );
-}
-
-const SCHEMA_SOURCE_NORMALIZE_VALUE = {
-	'rich-text': cond( [
-		[ isString, ( html ) => create( { html } ) ],
-		[ isChildrenValue, ( value ) => create( { html: children.toHTML( value ) } ) ],
-		[ isInvalidRichTextValue, () => create() ],
-		[ stubTrue, identity ],
-	] ),
-};
 
 /**
  * Returns a block object given its type and attributes.
@@ -70,11 +47,6 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 
 		if ( value === undefined && schema.hasOwnProperty( 'default' ) ) {
 			value = schema.default;
-		}
-
-		if ( SCHEMA_SOURCE_NORMALIZE_VALUE.hasOwnProperty( schema.source ) ) {
-			const toNormalValue = SCHEMA_SOURCE_NORMALIZE_VALUE[ schema.source ];
-			value = toNormalValue( value );
 		}
 
 		if ( [ 'node', 'children' ].indexOf( schema.source ) !== -1 ) {
