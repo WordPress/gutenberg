@@ -5,11 +5,6 @@ import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { BACKSPACE, DELETE, F10 } from '@wordpress/keycodes';
 
-/**
- * Internal dependencies
- */
-import './editor.scss';
-
 function isTmceEmpty( editor ) {
 	// When tinyMce is empty the content seems to be:
 	// <p><br data-mce-bogus="1"></p>

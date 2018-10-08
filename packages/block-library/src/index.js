@@ -5,6 +5,7 @@ import '@wordpress/core-data';
 import {
 	registerBlockType,
 	setDefaultBlockName,
+	setUnknownTypeHandlerName,
 } from '@wordpress/blocks';
 
 /**
@@ -44,6 +45,9 @@ import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
 
+// The freeform block can't be moved to the "npm" packages folder because it requires the wp.oldEditor global.
+import * as freeform from './freeform';
+
 export const registerCoreBlocks = () => {
 	[
 		// Common blocks are grouped at the top to prioritize their display
@@ -69,6 +73,7 @@ export const registerCoreBlocks = () => {
 		...embed.common,
 		...embed.others,
 		file,
+		window.wp && window.wp.oldEditor ? freeform : null, // Only add the freeform block in WP Context
 		html,
 		latestComments,
 		latestPosts,
@@ -85,9 +90,16 @@ export const registerCoreBlocks = () => {
 		textColumns,
 		verse,
 		video,
-	].forEach( ( { name, settings } ) => {
+	].forEach( ( block ) => {
+		if ( ! block ) {
+			return;
+		}
+		const { name, settings } = block;
 		registerBlockType( name, settings );
 	} );
 
 	setDefaultBlockName( paragraph.name );
+	if ( window.wp && window.wp.oldEditor ) {
+		setUnknownTypeHandlerName( freeform.name );
+	}
 };

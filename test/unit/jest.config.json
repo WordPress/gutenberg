@@ -1,7 +1,7 @@
 {
 	"rootDir": "../../",
 	"collectCoverageFrom": [
-		"(edit-post|block-library)/**/*.js",
+		"(edit-post)/**/*.js",
 		"packages/**/*.js"
 	],
 	"coveragePathIgnorePatterns": [
@@ -13,7 +13,7 @@
 		"<rootDir>/gutenberg-mobile/"
 	],
 	"moduleNameMapper": {
-		"@wordpress\\/(components|edit-post|block-library)$": "$1",
+		"@wordpress\\/(components|edit-post)$": "$1",
 		"@wordpress\\/(block-serialization-spec-parser|is-shallow-equal)$": "packages/$1",
 		"@wordpress\\/([a-z0-9-]+)$": "packages/$1/src"
 	},
