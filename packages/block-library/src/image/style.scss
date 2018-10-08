@@ -18,11 +18,11 @@
 	margin-left: 0;
 	margin-right: 0;
 
-	// Floats get an extra wrapping <aside> element, so the <figure> becomes a child.
-	.alignleft,
-	.alignright,
-	.aligncenter,
-	&.is-resized {
+	// Floats get an extra wrapping <div> element, so the <figure> becomes a child.
+	&.alignleft figure,
+	&.alignright figure,
+	&.aligncenter figure,
+	&.is-resized figure {
 		display: table;
 
 		// The figure is born with left and right margin.
@@ -36,17 +36,17 @@
 		}
 	}
 
-	.alignleft {
+	&.alignleft figure {
 		float: left;
 		margin-right: 1em;
 	}
 
-	.alignright {
+	&.alignright figure {
 		float: right;
 		margin-left: 1em;
 	}
 
-	.aligncenter {
+	&.aligncenter figure {
 		margin-left: auto;
 		margin-right: auto;
 	}
