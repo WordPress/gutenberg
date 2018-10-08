@@ -8,7 +8,6 @@ import {
 	setPostContent,
 	getAllBlocks,
 	selectBlockByClientId,
-	switchToEditor,
 } from '../support/utils';
 import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
@@ -60,9 +59,7 @@ describe( 'Align Hook Works As Expected', () => {
 	};
 
 	const verifyMarkupIsValid = async ( htmlMarkup ) => {
-		await switchToEditor( 'Code' );
 		await setPostContent( htmlMarkup );
-		await switchToEditor( 'Visual' );
 		const blocks = await getAllBlocks();
 		expect( blocks ).toHaveLength( 1 );
 		expect( blocks[ 0 ].isValid ).toBeTruthy();
