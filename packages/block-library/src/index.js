@@ -45,8 +45,7 @@ import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
 
-// The freeform block can't be moved to the "npm" packages folder because it requires the wp.oldEditor global.
-import * as freeform from './freeform';
+import * as classic from './classic';
 
 export const registerCoreBlocks = () => {
 	[
@@ -73,7 +72,7 @@ export const registerCoreBlocks = () => {
 		...embed.common,
 		...embed.others,
 		file,
-		window.wp && window.wp.oldEditor ? freeform : null, // Only add the freeform block in WP Context
+		window.wp && window.wp.oldEditor ? classic : null, // Only add the classic block in WP Context
 		html,
 		latestComments,
 		latestPosts,
@@ -100,6 +99,6 @@ export const registerCoreBlocks = () => {
 
 	setDefaultBlockName( paragraph.name );
 	if ( window.wp && window.wp.oldEditor ) {
-		setUnknownTypeHandlerName( freeform.name );
+		setUnknownTypeHandlerName( classic.name );
 	}
 };

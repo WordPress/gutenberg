@@ -1,4 +1,4 @@
-// Make sure the freeform block is registered.
+// Make sure the classic block is registered.
 window.wp = window.wp || {};
 window.wp.oldEditor = {};
 
