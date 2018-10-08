@@ -418,10 +418,10 @@ The block can apply a default alignment by specifying its own align attribute wi
 ```
 attributes: {
 	...
-		align: {
-			type: 'string',
-			default: 'right'
-		},
+	align: {
+		type: 'string',
+		default: 'right'
+	},
 	...
 }
 ```
