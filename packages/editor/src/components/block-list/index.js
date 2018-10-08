@@ -8,7 +8,6 @@ import {
 	mapValues,
 	sortBy,
 	throttle,
-	last,
 } from 'lodash';
 import classnames from 'classnames';
 
@@ -17,15 +16,13 @@ import classnames from 'classnames';
  */
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { getDefaultBlockName } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import BlockListBlock from './block';
-import IgnoreNestedEvents from './ignore-nested-events';
-import DefaultBlockAppender from '../default-block-appender';
+import BlockListAppender from '../block-list-appender';
 
 class BlockList extends Component {
 	constructor( props ) {
@@ -194,7 +191,6 @@ class BlockList extends Component {
 			layout,
 			isGroupedByLayout,
 			rootClientId,
-			canInsertDefaultBlock,
 			isDraggable,
 		} = this.props;
 
@@ -224,15 +220,12 @@ class BlockList extends Component {
 						isDraggable={ isDraggable }
 					/>
 				) ) }
-				{ canInsertDefaultBlock && (
-					<IgnoreNestedEvents childHandledEvents={ [ 'onFocus', 'onClick', 'onKeyDown' ] }>
-						<DefaultBlockAppender
-							rootClientId={ rootClientId }
-							lastBlockClientId={ last( blockClientIds ) }
-							layout={ defaultLayout }
-						/>
-					</IgnoreNestedEvents>
-				) }
+
+				<BlockListAppender
+					rootClientId={ rootClientId }
+					layout={ layout }
+					isGroupedByLayout={ isGroupedByLayout }
+				/>
 			</div>
 		);
 	}
@@ -247,7 +240,6 @@ export default compose( [
 			getMultiSelectedBlocksStartClientId,
 			getMultiSelectedBlocksEndClientId,
 			getBlockSelectionStart,
-			canInsertBlockType,
 		} = select( 'core/editor' );
 		const { rootClientId } = ownProps;
 
@@ -258,7 +250,6 @@ export default compose( [
 			selectionStartClientId: getBlockSelectionStart(),
 			isSelectionEnabled: isSelectionEnabled(),
 			isMultiSelecting: isMultiSelecting(),
-			canInsertDefaultBlock: canInsertBlockType( getDefaultBlockName(), rootClientId ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

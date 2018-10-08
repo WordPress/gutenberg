@@ -37,7 +37,6 @@ function ModeSwitcher( { onSwitch, mode } ) {
 	return (
 		<MenuGroup
 			label={ __( 'Editor' ) }
-			filterName="editPost.MoreMenu.editor"
 		>
 			<MenuItemsChoice
 				choices={ choices }

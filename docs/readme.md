@@ -1,24 +1,11 @@
 # Introduction
 
-"Gutenberg" is the codename for the new WordPress editor focus. The goal of this focus is to create a new post and page editing experience that makes it easy for anyone to create rich post layouts. This was the kickoff goal:
+Gutenberg began as a transformation of the WordPress editor — a new interface for adding, editing, and manipulating content. It seeks to make it easy for anyone to create rich, flexible content layouts with a block-based UI. All types of page components are represented as modular blocks, which means they can be accessed from a unified block menu, dropped anywhere on a page, and directly edited to create the custom presentation the user wants.
 
-> The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.
+It is a fundamental modernization and transformation of how the WordPress experience works, creating new opportunities for both users and developers. Gutenberg introduces new frameworks, interaction patterns, functionality, and user experiences for WordPress. And similar to a new Mac OS version, we will talk about "Gutenberg", and all the new possibilities it enables, until eventually the idea of Gutenberg as a separate entity will fade and it will simply be WordPress.
 
-Key take-aways from parsing that paragraph:
+![Gutenberg Demo](https://cldup.com/kZXGDcGPMU.gif)
 
-- Authoring richly laid out posts is a key strength of WordPress.
-- By embracing "the block", we can potentially unify multiple different interfaces into one. Instead of learning how to write shortcodes, custom HTML, or paste URLs to embed, you should do with just learning the block, and all the pieces should fall in place.
-- "Mystery meat" refers to hidden features in software, features that you have to discover. WordPress already supports a large number of blocks and 30+ embeds, so let's surface them.
+Gutenberg brings many changes to WordPress, but the biggest impact comes from the way it can enable a much clearer product architecture — one which enables modularity, consistency, and interoperability — and the positive impact that can have on the end user experience of WordPress. This handbook will describe the scope of those architectural and user experience (UX) changes, including the central “block as the interface” principle — the most crucial conceptual change to understand about Gutenberg.
 
-Gutenberg is being developed on [GitHub](https://github.com/WordPress/gutenberg), and you can try [an early beta version today from the plugin repository](https://wordpress.org/plugins/gutenberg/). Though keep in mind it's not fully functional, feature complete, or production ready.
-
-## Logo
-<img width="200px" src="https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/final-g-wapuu-black.svg?sanitize=true" alt="Gutenberg Logo" />
-
-Released under GPL license, made by [Cristel Rossignol](https://twitter.com/cristelrossi).
-
-[Download the SVG logo](https://github.com/WordPress/gutenberg/blob/master/docs/final-g-wapuu-black.svg).
-
-## Mockups
-
-Mockup Sketch files are available in <a href="https://wordpress.org/gutenberg/handbook/reference/design-principles/#more-resources">the Design section</a>.
+Here you can also find design guidelines, API documentation, and tutorials about getting started with Gutenberg development.

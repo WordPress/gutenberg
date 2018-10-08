@@ -18,7 +18,9 @@ exports[`core/list block edit matches snapshot 1`] = `
           contenteditable="true"
           data-is-placeholder-visible="true"
           role="textbox"
-        />
+        >
+          <li />
+        </ul>
         <ul
           class="editor-rich-text__tinymce"
         >

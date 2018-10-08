@@ -2,9 +2,8 @@
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
-import { EditorProvider, ErrorBoundary } from '@wordpress/editor';
+import { EditorProvider, ErrorBoundary, PostLockedModal } from '@wordpress/editor';
 import { StrictMode } from '@wordpress/element';
-
 /**
  * Internal dependencies
  */
@@ -39,6 +38,7 @@ function Editor( {
 				<ErrorBoundary onError={ onError }>
 					<Layout />
 				</ErrorBoundary>
+				<PostLockedModal />
 			</EditorProvider>
 		</StrictMode>
 	);

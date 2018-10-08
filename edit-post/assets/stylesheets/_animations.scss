@@ -62,3 +62,17 @@
 @mixin animate_rotation($speed: 1s) {
 	animation: rotation $speed infinite linear;
 }
+
+@keyframes modal-appear {
+	from {
+		margin-top: $grid-size * 4;
+	}
+	to {
+		margin-top: 0;
+	}
+}
+
+@mixin modal_appear() {
+	animation: modal-appear 0.1s ease-out;
+	animation-fill-mode: forwards;
+}

@@ -15,7 +15,6 @@ import { withDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { traverse, wrap, urlRewrite, editorWidth } from '../../editor-styles';
-import RichTextProvider from '../rich-text/provider';
 
 class EditorProvider extends Component {
 	constructor( props ) {
@@ -24,6 +23,7 @@ class EditorProvider extends Component {
 		// Assume that we don't need to initialize in the case of an error recovery.
 		if ( ! props.recovery ) {
 			this.props.updateEditorSettings( props.settings );
+			this.props.updatePostLock( props.settings.postLock );
 			this.props.setupEditor( props.post, props.settings.autosave );
 		}
 	}
@@ -59,26 +59,9 @@ class EditorProvider extends Component {
 	render() {
 		const {
 			children,
-			undo,
-			redo,
-			createUndoLevel,
 		} = this.props;
 
 		const providers = [
-			// RichText provider:
-			//
-			//  - context.onUndo
-			//  - context.onRedo
-			//  - context.onCreateUndoLevel
-			[
-				RichTextProvider,
-				{
-					onUndo: undo,
-					onRedo: redo,
-					onCreateUndoLevel: createUndoLevel,
-				},
-			],
-
 			// Slot / Fill provider:
 			//
 			//  - context.getSlot
@@ -108,15 +91,11 @@ export default withDispatch( ( dispatch ) => {
 	const {
 		setupEditor,
 		updateEditorSettings,
-		undo,
-		redo,
-		createUndoLevel,
+		updatePostLock,
 	} = dispatch( 'core/editor' );
 	return {
 		setupEditor,
-		undo,
-		redo,
-		createUndoLevel,
 		updateEditorSettings,
+		updatePostLock,
 	};
 } )( EditorProvider );

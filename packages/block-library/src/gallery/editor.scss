@@ -1,17 +1,8 @@
-.wp-block-gallery.components-placeholder {
-	margin: 0;
-}
-
-// Allow gallery items to go edge to edge.
-.gutenberg .wp-block-gallery:not(.components-placeholder) {
-	margin-left: -8px;
-	margin-right: -8px;
-}
-
-// Don't use negative margins when full-wide.
-.gutenberg [data-align="full"] .wp-block-gallery:not(.components-placeholder) {
-	margin-left: auto;
-	margin-right: auto;
+// Override the default list style type _only in the editor_
+// to avoid :not() selector specificity issues.
+// See https://github.com/WordPress/gutenberg/pull/10358
+ul.wp-block-gallery li {
+	list-style-type: none;
 }
 
 .blocks-gallery-item {
@@ -93,11 +84,6 @@
 
 		&:focus a[data-mce-selected] {
 			color: rgba(0, 0, 0, 0.2);
-		}
-
-		// Caption placeholder text.
-		&[data-is-placeholder-visible="true"] + .editor-rich-text__tinymce {
-			opacity: 0.8;
 		}
 	}
 }

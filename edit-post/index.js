@@ -8,12 +8,14 @@ import '@wordpress/viewport';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import { dispatch } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
 import './assets/stylesheets/main.scss';
 import './hooks';
+import './plugins';
 import store from './store';
 import { initializeMetaBoxState } from './store/actions';
 import Editor from './editor';
@@ -73,6 +75,12 @@ export function initializeEditor( id, postType, postId, settings, overridePost )
 
 	return {
 		initializeMetaBoxes( metaBoxes ) {
+			deprecated( 'editor.initializeMetaBoxes', {
+				alternative: 'setActiveMetaBoxLocations action (`core/edit-post`)',
+				plugin: 'Gutenberg',
+				version: '4.2',
+			} );
+
 			store.dispatch( initializeMetaBoxState( metaBoxes ) );
 		},
 	};

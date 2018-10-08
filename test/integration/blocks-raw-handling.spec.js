@@ -115,6 +115,7 @@ describe( 'Blocks raw handling', () => {
 			'markdown',
 			'wordpress',
 			'gutenberg',
+			'caption-shortcode',
 		].forEach( ( type ) => {
 			it( type, () => {
 				const HTML = readFile( path.join( __dirname, `fixtures/${ type }-in.html` ) );

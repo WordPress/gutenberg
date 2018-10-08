@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/i18n",
-	"version": "2.0.0",
+	"version": "3.0.0",
 	"description": "WordPress internationalization (i18n) library.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -24,7 +24,6 @@
 	},
 	"dependencies": {
 		"@babel/runtime": "^7.0.0",
-		"@wordpress/deprecated": "file:../deprecated",
 		"gettext-parser": "^1.3.1",
 		"jed": "^1.1.1",
 		"lodash": "^4.17.10",

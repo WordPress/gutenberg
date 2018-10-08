@@ -1,9 +1,13 @@
-## 2.1.0 (Unreleased)
+## 3.0.0 (2018-09-30)
 
-### Deprecations
+### Breaking Changes
 
-- `getI18n` has been deprecated. Use `__`, `_x`, `_n`, or `_nx` instead.
-- `dcnpgettext` has been deprecated. Use `__`, `_x`, `_n`, or `_nx` instead.
+- `getI18n` has been removed. Use `__`, `_x`, `_n`, or `_nx` instead.
+- `dcnpgettext` has been removed. Use `__`, `_x`, `_n`, or `_nx` instead.
+
+### Bug Fixes
+
+- The initialization of the internal Jed instance now correctly assigns its default data.
 
 ## 2.0.0 (2018-09-05)
 

@@ -4,14 +4,14 @@
 	margin: 0 -16px;
 
 	.components-base-control {
-		margin: 0 0 1em 0;
+		margin: 0 0 1.5em 0;
 		&:last-child {
-			margin-bottom: 0;
+			margin-bottom: 0.5em;
 		}
 	}
 
 	.components-panel__body-toggle {
-		color: $dark-gray-500;
+		color: $dark-gray-900;
 	}
 
 	&:first-child {

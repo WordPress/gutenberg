@@ -216,8 +216,6 @@ function gutenberg_collect_meta_box_data() {
 	 */
 	$_meta_boxes_copy = apply_filters( 'filter_gutenberg_meta_boxes', $_meta_boxes_copy );
 
-	$meta_box_data = array();
-
 	// Redirect to classic editor if a meta box is incompatible.
 	foreach ( $locations as $location ) {
 		if ( ! isset( $_meta_boxes_copy[ $post->post_type ][ $location ] ) ) {

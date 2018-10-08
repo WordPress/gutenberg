@@ -24,6 +24,7 @@ import {
 	mediaUpload,
 } from '@wordpress/editor';
 import { compose } from '@wordpress/compose';
+import { create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -56,7 +57,6 @@ class FileEdit extends Component {
 			const file = getBlobByURL( href );
 
 			mediaUpload( {
-				allowedType: '*',
 				filesList: [ file ],
 				onFileChange: ( [ media ] ) => this.onSelectFile( media ),
 				onError: ( message ) => {
@@ -81,7 +81,7 @@ class FileEdit extends Component {
 			this.setState( { hasError: false } );
 			this.props.setAttributes( {
 				href: media.url,
-				fileName: media.title,
+				fileName: create( { text: media.title } ),
 				textLinkHref: media.url,
 				id: media.id,
 			} );
@@ -149,7 +149,6 @@ class FileEdit extends Component {
 					notices={ noticeUI }
 					onError={ noticeOperations.createErrorNotice }
 					accept="*"
-					type="*"
 				/>
 			);
 		}
@@ -174,7 +173,6 @@ class FileEdit extends Component {
 					<Toolbar>
 						<MediaUpload
 							onSelect={ this.onSelectFile }
-							type="*"
 							value={ id }
 							render={ ( { open } ) => (
 								<IconButton
@@ -192,9 +190,7 @@ class FileEdit extends Component {
 						<RichText
 							wrapperClassName={ `${ className }__textlink` }
 							tagName="div" // must be block-level or else cursor disappears
-							format="string"
 							value={ fileName }
-							multiline="false"
 							placeholder={ __( 'Write file name…' ) }
 							keepPlaceholderOnFocus
 							formattingControls={ [] } // disable controls
@@ -210,7 +206,6 @@ class FileEdit extends Component {
 									formattingControls={ [] } // disable controls
 									placeholder={ __( 'Add text…' ) }
 									keepPlaceholderOnFocus
-									multiline="false"
 									onChange={ ( text ) => setAttributes( { downloadButtonText: text } ) }
 								/>
 							</div>

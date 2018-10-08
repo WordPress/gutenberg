@@ -4,21 +4,94 @@
         "name": "core/preformatted",
         "isValid": true,
         "attributes": {
-            "content": [
-                "Some ",
-                {
-                    "type": "em",
-                    "children": [
-                        "preformatted"
-                    ]
-                },
-                " text...",
-                {
-                    "type": "br",
-                    "children": []
-                },
-                "And more!"
-            ]
+            "content": {
+                "formats": [
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ],
+                "text": "Some preformatted text...\nAnd more!"
+            }
         },
         "innerBlocks": [],
         "originalContent": "<pre class=\"wp-block-preformatted\">Some <em>preformatted</em> text...<br>And more!</pre>"
