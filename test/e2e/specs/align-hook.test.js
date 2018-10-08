@@ -191,8 +191,7 @@ describe( 'Align Hook Works As Expected', () => {
 			// remove the alignment.
 			await page.click( PRESSED_BUTTON_SELECTOR );
 			const markup = await getEditedPostContent();
-			expect( markup ).toContain( '"align":null' );
-			expect( markup ).not.toContain( 'alignnull' );
+			expect( markup ).toContain( '"align":""' );
 		} );
 
 		createCorrectlyAppliesAndRemovesAlignmentTest( BLOCK_NAME, 'center' );

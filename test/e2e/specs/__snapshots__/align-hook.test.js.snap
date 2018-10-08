@@ -31,7 +31,7 @@ exports[`Align Hook Works As Expected Block with default align Correctly applies
 `;
 
 exports[`Align Hook Works As Expected Block with default align Correctly applies the selected alignment and correctly removes the alignment 2`] = `
-"<!-- wp:test/test-default-align {\\"align\\":null} -->
+"<!-- wp:test/test-default-align {\\"align\\":\\"\\"} -->
 <div style=\\"outline:1px solid gray;padding:5px\\" class=\\"wp-block-test-test-default-align\\">Test Align Hook</div>
 <!-- /wp:test/test-default-align -->"
 `;

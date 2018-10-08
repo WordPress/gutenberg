@@ -82,7 +82,7 @@ export const withToolbarControls = createHigherOrderComponent( ( BlockEdit ) => 
 				const blockType = getBlockType( props.name );
 				const blockDefaultAlign = get( blockType, [ 'attributes', 'align', 'default' ] );
 				if ( blockDefaultAlign ) {
-					nextAlign = null;
+					nextAlign = '';
 				}
 			}
 			props.setAttributes( { align: nextAlign } );

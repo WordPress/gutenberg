@@ -69,7 +69,7 @@
 				title: 'Test Default Align',
 				attributes: {
 					align: {
-						type: [ 'string', 'null' ],
+						type: 'string',
 						default: 'right',
 					},
 				},
