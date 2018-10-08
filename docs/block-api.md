@@ -461,6 +461,13 @@ className: false,
 html: false,
 ```
 
+- `htmlValidation` (default `true`): By default, all blocks will validate their HTML. To disable this behaviour, set `htmlValidation` to `false`.
+
+```js
+// Remove support for HTML validation.
+htmlValidation: false,
+```
+
 - `inserter` (default `true`): By default, all blocks will appear in the Gutenberg inserter. To hide a block so that it can only be inserted programatically, set `inserter` to `false`.
 
 ```js

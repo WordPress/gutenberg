@@ -519,5 +519,22 @@ describe( 'validation', () => {
 
 			expect( isValid ).toBe( true );
 		} );
+
+		it( 'returns true if block is invalid and htmlValidation is disabled block', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				supports: {
+					htmlValidation: false,
+				},
+			} );
+
+			const isValid = isValidBlock(
+				'Bananas',
+				getBlockType( 'core/test-block' ),
+				{ fruit: 'Not bananas' }
+			);
+
+			expect( isValid ).toBe( true );
+		} );
 	} );
 } );
