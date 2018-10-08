@@ -343,7 +343,7 @@ export function getEmbedEdit( title, icon ) {
 			);
 
 			return (
-				<figure className={ classnames( className, 'wp-block-embed', { 'is-video': 'video' === type } ) }>
+				<figure className={ classnames( className, 'wp-block-embed', { 'is-type-video': 'video' === type } ) }>
 					{ controls }
 					{ ( cannotPreview ) ? (
 						<Placeholder icon={ <BlockIcon icon={ icon } showColors /> } label={ label }>
