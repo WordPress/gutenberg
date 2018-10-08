@@ -180,10 +180,10 @@ export function unregisterBlockType( name ) {
 export function setUnknownTypeHandlerName( name ) {
 	deprecated( 'setUnknownTypeHandlerName', {
 		plugin: 'Gutenberg',
-		version: '4.0',
+		version: '4.4',
 		alternative: 'setFreeformContentHandlerName and setUnregisteredTypeHandlerName',
 	} );
-	dispatch( 'core/blocks' ).setFallbackBlockName( name );
+	setFreeformContentHandlerName( name );
 }
 
 /**
@@ -193,7 +193,12 @@ export function setUnknownTypeHandlerName( name ) {
  * @return {?string} Blog name.
  */
 export function getUnknownTypeHandlerName() {
-	return select( 'core/blocks' ).getFallbackBlockName();
+	deprecated( 'getUnknownTypeHandlerName', {
+		plugin: 'Gutenberg',
+		version: '4.4',
+		alternative: 'getFreeformContentHandlerName and getUnregisteredTypeHandlerName',
+	} );
+	return getFreeformContentHandlerName();
 }
 
 /**

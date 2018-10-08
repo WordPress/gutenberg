@@ -51,7 +51,8 @@ export function setDefaultBlockName( name ) {
 }
 
 /**
- * Returns an action object used to set the fallback block name.
+ * Returns an action object used to set the name of the block used as a fallback
+ * for non-block content.
  *
  * @param {string} name Block name.
  *
@@ -60,17 +61,14 @@ export function setDefaultBlockName( name ) {
 export function setFallbackBlockName( name ) {
 	deprecated( 'setFallbackBlockName', {
 		plugin: 'Gutenberg',
-		version: '4.0',
+		version: '4.4',
 		alternative: 'setFreeformFallbackBlockName and setUnregisteredFallbackBlockName',
 	} );
-	return {
-		type: 'SET_FALLBACK_BLOCK_NAME',
-		name,
-	};
+	return setFreeformFallbackBlockName( name );
 }
 
 /**
- * Returns an action object used to said the name of the block used as a fallback
+ * Returns an action object used to set the name of the block used as a fallback
  * for non-block content.
  *
  * @param {string} name Block name.

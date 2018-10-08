@@ -69,8 +69,6 @@ export function createBlockNameSetterReducer( setActionType ) {
 
 export const defaultBlockName = createBlockNameSetterReducer( 'SET_DEFAULT_BLOCK_NAME' );
 
-export const fallbackBlockName = createBlockNameSetterReducer( 'SET_FALLBACK_BLOCK_NAME' );
-
 export const freeformFallbackBlockName = createBlockNameSetterReducer( 'SET_FREEFORM_FALLBACK_BLOCK_NAME' );
 export const unregisteredFallbackBlockName = createBlockNameSetterReducer( 'SET_UNREGISTERED_FALLBACK_BLOCK_NAME' );
 
@@ -93,7 +91,6 @@ export function categories( state = DEFAULT_CATEGORIES, action ) {
 export default combineReducers( {
 	blockTypes,
 	defaultBlockName,
-	fallbackBlockName,
 	freeformFallbackBlockName,
 	unregisteredFallbackBlockName,
 	categories,

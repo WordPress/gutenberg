@@ -15,7 +15,6 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
  */
 import {
 	getBlockType,
-	getUnknownTypeHandlerName,
 	getFreeformContentHandlerName,
 	getUnregisteredTypeHandlerName,
 } from './registration';
@@ -268,7 +267,6 @@ export function serializeBlock( block ) {
 	switch ( blockName ) {
 		case getFreeformContentHandlerName():
 		case getUnregisteredTypeHandlerName():
-		case getUnknownTypeHandlerName():
 			return saveContent;
 
 		default:

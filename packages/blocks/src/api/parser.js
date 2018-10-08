@@ -17,7 +17,6 @@ import deprecated from '@wordpress/deprecated';
  */
 import {
 	getBlockType,
-	getUnknownTypeHandlerName,
 	getFreeformContentHandlerName,
 	getUnregisteredTypeHandlerName,
 } from './registration';
@@ -405,17 +404,11 @@ export function createBlockWithFallback( blockNode ) {
 		innerBlocks = [],
 		innerHTML,
 	} = blockNode;
-	const fallbackBlock = getUnknownTypeHandlerName();
 	const freeformContentFallbackBlock = getFreeformContentHandlerName();
-	const unregisteredFallbackBlock = getUnregisteredTypeHandlerName();
-	const isFreeformFallback = ( name ) => (
-		name === freeformContentFallbackBlock ||
-		name === fallbackBlock
-	);
+	const unregisteredFallbackBlock = getUnregisteredTypeHandlerName() || freeformContentFallbackBlock;
 	const isFallbackBlock = ( name ) => (
 		name === freeformContentFallbackBlock ||
-		name === unregisteredFallbackBlock ||
-		name === fallbackBlock
+		name === unregisteredFallbackBlock
 	);
 
 	attributes = attributes || {};
@@ -423,8 +416,8 @@ export function createBlockWithFallback( blockNode ) {
 	// Trim content to avoid creation of intermediary freeform segments.
 	const originalUndelimitedContent = innerHTML = innerHTML.trim();
 
-	// Use type from block content, otherwise find unknown handler.
-	let name = originalName || freeformContentFallbackBlock || fallbackBlock;
+	// Use type from block content if available. Otherwise, default to the freeform content fallback.
+	let name = originalName || freeformContentFallbackBlock;
 
 	// Convert 'core/text' blocks in existing content to 'core/paragraph'.
 	if ( 'core/text' === name || 'core/cover-text' === name ) {
@@ -434,7 +427,7 @@ export function createBlockWithFallback( blockNode ) {
 	// Fallback content may be upgraded from classic editor expecting implicit
 	// automatic paragraphs, so preserve them. Assumes wpautop is idempotent,
 	// meaning there are no negative consequences to repeated autop calls.
-	if ( isFreeformFallback( name ) ) {
+	if ( name === freeformContentFallbackBlock ) {
 		innerHTML = autop( innerHTML ).trim();
 	}
 
@@ -448,7 +441,7 @@ export function createBlockWithFallback( blockNode ) {
 			innerHTML = getCommentDelimitedContent( name, attributes, innerHTML );
 		}
 
-		name = unregisteredFallbackBlock || fallbackBlock;
+		name = unregisteredFallbackBlock;
 		attributes = { originalName, originalUndelimitedContent };
 		blockType = getBlockType( name );
 	}

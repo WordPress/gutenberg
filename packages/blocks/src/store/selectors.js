@@ -5,6 +5,11 @@ import createSelector from 'rememo';
 import { filter, get, includes, map, some } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+/**
  * Returns all the available block types.
  *
  * @param {Object} state Data state.
@@ -60,7 +65,12 @@ export function getDefaultBlockName( state ) {
  * @return {string?} Fallback block name.
  */
 export function getFallbackBlockName( state ) {
-	return state.fallbackBlockName;
+	deprecated( 'getFallbackBlockName', {
+		plugin: 'Gutenberg',
+		version: '4.4',
+		alternative: 'getFreeformFallbackBlockName and getUnregisteredFallbackBlockName',
+	} );
+	return getFreeformFallbackBlockName( state );
 }
 
 /**
