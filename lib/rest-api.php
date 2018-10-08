@@ -284,7 +284,18 @@ function gutenberg_add_target_schema_to_links( $response, $post, $request ) {
  * @return string That same post type.
  */
 function gutenberg_register_post_prepare_functions( $post_type ) {
-	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_permalink_template_to_posts', 10, 3 );
+
+	// Get unmodified $wp_version.
+	include ABSPATH . WPINC . '/version.php';
+
+	// Strip '-src' from the version string. Messes up version_compare().
+	$version = str_replace( '-src', '', $wp_version );
+
+	// Apply filter to older versions of WordPress.
+	if ( version_compare( $version, '5.0.0', '<' ) ) {
+		add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_permalink_template_to_posts', 10, 3 );
+	}
+
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_block_format_to_post_content', 10, 3 );
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_target_schema_to_links', 10, 3 );
 	add_filter( "rest_{$post_type}_collection_params", 'gutenberg_filter_post_collection_parameters', 10, 2 );
