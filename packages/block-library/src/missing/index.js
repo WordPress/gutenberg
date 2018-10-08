@@ -2,11 +2,10 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { RawHTML } from '@wordpress/element';
+import { RawHTML, Fragment } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { getBlockType, createBlock } from '@wordpress/blocks';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { withDispatch } from '@wordpress/data';
 import { Warning } from '@wordpress/editor';
 
 function MissingBlockWarning( { attributes, convertToHTML } ) {
@@ -34,30 +33,27 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 	}
 
 	return (
-		<Warning actions={ actions }>
-			<span dangerouslySetInnerHTML={ { __html: messageHTML } } />
-		</Warning>
+		<Fragment>
+			<Warning actions={ actions }>
+				<span dangerouslySetInnerHTML={ { __html: messageHTML } } />
+			</Warning>
+			<div>
+				<RawHTML>{ originalUndelimitedContent }</RawHTML>
+			</div>
+		</Fragment>
 	);
 }
 
-const edit = compose( [
-	withSelect( ( select, { clientId } ) => {
-		const { getBlock } = select( 'core/editor' );
-		return {
-			block: getBlock( clientId ),
-		};
-	} ),
-	withDispatch( ( dispatch, { block, attributes } ) => {
-		const { replaceBlock } = dispatch( 'core/editor' );
-		return {
-			convertToHTML() {
-				replaceBlock( block.clientId, createBlock( 'core/html', {
-					content: attributes.originalUndelimitedContent,
-				} ) );
-			},
-		};
-	} ),
-] )( MissingBlockWarning );
+const edit = withDispatch( ( dispatch, { clientId, attributes } ) => {
+	const { replaceBlock } = dispatch( 'core/editor' );
+	return {
+		convertToHTML() {
+			replaceBlock( clientId, createBlock( 'core/html', {
+				content: attributes.originalUndelimitedContent,
+			} ) );
+		},
+	};
+} )( MissingBlockWarning );
 
 export const name = 'core/missing';
 
