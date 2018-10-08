@@ -6,7 +6,14 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import { blockTypes, categories, defaultBlockName, fallbackBlockName, DEFAULT_CATEGORIES } from '../reducer';
+import {
+	blockTypes,
+	categories,
+	defaultBlockName,
+	freeformFallbackBlockName,
+	unregisteredFallbackBlockName,
+	DEFAULT_CATEGORIES,
+} from '../reducer';
 
 describe( 'blockTypes', () => {
 	it( 'should return an empty object as default state', () => {
@@ -60,7 +67,7 @@ describe( 'defaultBlockName', () => {
 		expect( state ).toBe( 'core/paragraph' );
 	} );
 
-	it( 'should reset the fallback block name', () => {
+	it( 'should reset the default block name', () => {
 		const state = defaultBlockName( 'core/code', {
 			type: 'REMOVE_BLOCK_TYPES',
 			names: [ 'core/code' ],
@@ -70,22 +77,46 @@ describe( 'defaultBlockName', () => {
 	} );
 } );
 
-describe( 'fallbackBlockName', () => {
+describe( 'freeformFallbackBlockName', () => {
 	it( 'should return null as default state', () => {
-		expect( fallbackBlockName( undefined, {} ) ).toBeNull();
+		expect( freeformFallbackBlockName( undefined, {} ) ).toBeNull();
 	} );
 
-	it( 'should set the fallback block name', () => {
-		const state = fallbackBlockName( null, {
-			type: 'SET_FALLBACK_BLOCK_NAME',
+	it( 'should set the freeform content fallback block name', () => {
+		const state = freeformFallbackBlockName( null, {
+			type: 'SET_FREEFORM_FALLBACK_BLOCK_NAME',
 			name: 'core/paragraph',
 		} );
 
 		expect( state ).toBe( 'core/paragraph' );
 	} );
 
-	it( 'should reset the fallback block name', () => {
-		const state = fallbackBlockName( 'core/code', {
+	it( 'should reset the freeform content fallback block name', () => {
+		const state = freeformFallbackBlockName( 'core/code', {
+			type: 'REMOVE_BLOCK_TYPES',
+			names: [ 'core/code' ],
+		} );
+
+		expect( state ).toBeNull();
+	} );
+} );
+
+describe( 'unregisteredFallbackBlockName', () => {
+	it( 'should return null as default state', () => {
+		expect( unregisteredFallbackBlockName( undefined, {} ) ).toBeNull();
+	} );
+
+	it( 'should set the unregistered fallback block name', () => {
+		const state = unregisteredFallbackBlockName( null, {
+			type: 'SET_UNREGISTERED_FALLBACK_BLOCK_NAME',
+			name: 'core/paragraph',
+		} );
+
+		expect( state ).toBe( 'core/paragraph' );
+	} );
+
+	it( 'should reset the unregistered fallback block name', () => {
+		const state = unregisteredFallbackBlockName( 'core/code', {
 			type: 'REMOVE_BLOCK_TYPES',
 			names: [ 'core/code' ],
 		} );
