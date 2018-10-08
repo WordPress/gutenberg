@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import ResizableBox from 're-resizable';
 import classnames from 'classnames';
 
 /**
@@ -10,7 +9,7 @@ import classnames from 'classnames';
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/editor';
-import { BaseControl, PanelBody } from '@wordpress/components';
+import { BaseControl, PanelBody, ResizableBox } from '@wordpress/components';
 import { withInstanceId } from '@wordpress/compose';
 
 export const name = 'core/spacer';
@@ -36,16 +35,6 @@ export const settings = {
 			const { height } = attributes;
 			const id = `block-spacer-height-input-${ instanceId }`;
 
-			// Removes the inline styles in the drag handles.
-			const handleStylesOverrides = {
-				width: null,
-				height: null,
-				top: null,
-				right: null,
-				bottom: null,
-				left: null,
-			};
-
 			return (
 				<Fragment>
 					<ResizableBox
@@ -57,12 +46,6 @@ export const settings = {
 							height,
 						} }
 						minHeight="20"
-						handleClasses={ {
-							bottom: 'block-library-spacer__resize-handler-bottom',
-						} }
-						handleStyles={ {
-							bottom: handleStylesOverrides,
-						} }
 						enable={ {
 							top: false,
 							right: false,
