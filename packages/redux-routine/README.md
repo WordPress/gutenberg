@@ -22,9 +22,9 @@ For example, consider a common case where we need to issue a network request. We
 
 ```js
 import { combineReducers, createStore, applyMiddleware } from 'redux';
-import createRoutineMiddleware from '@wordpress/redux-routine';
+import createMiddleware from '@wordpress/redux-routine';
 
-const middleware = createRoutineMiddleware( {
+const middleware = createMiddleware( {
 	async FETCH_JSON( action ) {
 		const response = await window.fetch( action.url );
 		return response.json();

@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
-import { IconButton, Dropdown, MenuGroup } from '@wordpress/components';
+import { _x } from '@wordpress/i18n';
+import { IconButton, Dropdown } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 
 /**
@@ -11,8 +11,8 @@ import { Fragment } from '@wordpress/element';
 import './style.scss';
 import ModeSwitcher from '../mode-switcher';
 import PluginMoreMenuGroup from '../plugins-more-menu-group';
-import TipsToggle from '../tips-toggle';
-import KeyboardShortcutsHelpMenuItem from '../keyboard-shortcuts-help-menu-item';
+import ToolsMoreMenuGroup from '../tools-more-menu-group';
+
 import WritingMenu from '../writing-menu';
 
 const MoreMenu = () => (
@@ -33,13 +33,7 @@ const MoreMenu = () => (
 				<WritingMenu onClose={ onClose } />
 				<ModeSwitcher onSelect={ onClose } />
 				<PluginMoreMenuGroup.Slot fillProps={ { onClose } } />
-				<MenuGroup
-					label={ __( 'Tools' ) }
-					filterName="editPost.MoreMenu.tools"
-				>
-					<TipsToggle onToggle={ onClose } />
-					<KeyboardShortcutsHelpMenuItem onSelect={ onClose } />
-				</MenuGroup>
+				<ToolsMoreMenuGroup.Slot fillProps={ { onClose } } />
 			</Fragment>
 		) }
 	/>

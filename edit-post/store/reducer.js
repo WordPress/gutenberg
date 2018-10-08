@@ -145,20 +145,6 @@ export function publishSidebarActive( state = false, action ) {
 	return state;
 }
 
-const locations = [
-	'normal',
-	'side',
-	'advanced',
-];
-
-const defaultMetaBoxState = locations.reduce( ( result, key ) => {
-	result[ key ] = {
-		isActive: false,
-	};
-
-	return result;
-}, {} );
-
 /**
  * Reducer keeping track of the meta boxes isSaving state.
  * A "true" value means the meta boxes saving request is in-flight.
@@ -181,39 +167,21 @@ export function isSavingMetaBoxes( state = false, action ) {
 }
 
 /**
- * Reducer keeping track of the state of each meta box location.
- * This includes:
- *  - isActive: Whether the location is active or not.
- *  - data: The last saved form data for this location.
- *    This is used to check whether the form is dirty
- *    before leaving the page.
+ * Reducer returning an array of active meta box locations after the given
+ * action.
  *
- * @param {boolean}  state   Previous state.
- * @param {Object}   action  Action Object.
+ * @param {boolean} state  Previous state.
+ * @param {Object}  action Action Object.
  *
- * @return {Object} Updated state.
+ * @return {string[]} Updated state.
  */
-export function metaBoxes( state = defaultMetaBoxState, action ) {
+export function activeMetaBoxLocations( state = [], action ) {
 	switch ( action.type ) {
-		case 'INITIALIZE_META_BOX_STATE':
-			return locations.reduce( ( newState, location ) => {
-				newState[ location ] = {
-					...state[ location ],
-					isActive: action.metaBoxes[ location ],
-				};
-				return newState;
-			}, { ...state } );
-		case 'META_BOX_SET_SAVED_DATA':
-			return locations.reduce( ( newState, location ) => {
-				newState[ location ] = {
-					...state[ location ],
-					data: action.dataPerLocation[ location ],
-				};
-				return newState;
-			}, { ...state } );
-		default:
-			return state;
+		case 'SET_ACTIVE_META_BOX_LOCATIONS':
+			return action.locations;
 	}
+
+	return state;
 }
 
 export default combineReducers( {
@@ -222,6 +190,6 @@ export default combineReducers( {
 	panel,
 	activeModal,
 	publishSidebarActive,
-	metaBoxes,
+	activeMetaBoxLocations,
 	isSavingMetaBoxes,
 } );

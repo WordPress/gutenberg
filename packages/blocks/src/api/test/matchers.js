@@ -18,6 +18,7 @@ describe( 'matchers', () => {
 		it( 'should return a source function', () => {
 			const source = sources.children();
 
+			expect( console ).toHaveWarned();
 			expect( typeof source ).toBe( 'function' );
 		} );
 
@@ -27,6 +28,7 @@ describe( 'matchers', () => {
 			const html = '<blockquote><p>A delicious sundae dessert</p></blockquote>';
 			const match = parse( html, sources.children() );
 
+			expect( console ).toHaveWarned();
 			expect( renderToString( match ) ).toBe( html );
 		} );
 	} );
@@ -35,6 +37,7 @@ describe( 'matchers', () => {
 		it( 'should return a source function', () => {
 			const source = sources.node();
 
+			expect( console ).toHaveWarned();
 			expect( typeof source ).toBe( 'function' );
 		} );
 

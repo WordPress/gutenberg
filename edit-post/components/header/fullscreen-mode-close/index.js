@@ -24,7 +24,7 @@ function FullscreenModeClose( { isActive, postType } ) {
 	return (
 		<Toolbar className="edit-post-fullscreen-mode-close__toolbar">
 			<IconButton
-				icon="no-alt"
+				icon="exit"
 				href={ addQueryArgs( 'edit.php', { post_type: postType.slug } ) }
 				label={ get(
 					postType,

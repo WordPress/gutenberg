@@ -42,13 +42,13 @@ const mapKeyCombination = ( keyCombination ) => keyCombination.map( ( character,
 
 const ShortcutList = ( { shortcuts } ) => (
 	<dl className="edit-post-keyboard-shortcut-help__shortcut-list">
-		{ shortcuts.map( ( { keyCombination, description }, index ) => (
+		{ shortcuts.map( ( { keyCombination, description, ariaLabel }, index ) => (
 			<div
 				className="edit-post-keyboard-shortcut-help__shortcut"
 				key={ index }
 			>
 				<dt className="edit-post-keyboard-shortcut-help__shortcut-term">
-					<kbd className="edit-post-keyboard-shortcut-help__shortcut-key-combination">
+					<kbd className="edit-post-keyboard-shortcut-help__shortcut-key-combination" aria-label={ ariaLabel }>
 						{ mapKeyCombination( castArray( keyCombination ) ) }
 					</kbd>
 				</dt>
@@ -91,11 +91,9 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 					closeLabel={ __( 'Close' ) }
 					onRequestClose={ toggleModal }
 				>
-
 					{ shortcutConfig.map( ( config, index ) => (
 						<ShortcutSection key={ index } { ...config } />
 					) ) }
-
 				</Modal>
 			) }
 		</Fragment>

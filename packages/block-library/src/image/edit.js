@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import ResizableBox from 're-resizable';
 import {
 	get,
 	isEmpty,
@@ -23,6 +22,7 @@ import {
 	ButtonGroup,
 	IconButton,
 	PanelBody,
+	ResizableBox,
 	SelectControl,
 	TextControl,
 	TextareaControl,
@@ -41,6 +41,7 @@ import {
 } from '@wordpress/editor';
 import { withViewportMatch } from '@wordpress/viewport';
 import { compose } from '@wordpress/compose';
+import { create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -55,6 +56,20 @@ const LINK_DESTINATION_NONE = 'none';
 const LINK_DESTINATION_MEDIA = 'media';
 const LINK_DESTINATION_ATTACHMENT = 'attachment';
 const LINK_DESTINATION_CUSTOM = 'custom';
+const ALLOWED_MEDIA_TYPES = [ 'image' ];
+
+export const pickRelevantMediaFiles = ( image ) => {
+	let { caption } = image;
+
+	if ( typeof caption !== 'object' ) {
+		caption = create( { html: caption } );
+	}
+
+	return {
+		...pick( image, [ 'alt', 'id', 'link', 'url' ] ),
+		caption,
+	};
+};
 
 class ImageEdit extends Component {
 	constructor() {
@@ -85,9 +100,9 @@ class ImageEdit extends Component {
 				mediaUpload( {
 					filesList: [ file ],
 					onFileChange: ( [ image ] ) => {
-						setAttributes( { ...image } );
+						setAttributes( pickRelevantMediaFiles( image ) );
 					},
-					allowedType: 'image',
+					allowedTypes: ALLOWED_MEDIA_TYPES,
 				} );
 			}
 		}
@@ -114,7 +129,7 @@ class ImageEdit extends Component {
 				url: undefined,
 				alt: undefined,
 				id: undefined,
-				caption: undefined,
+				caption: create(),
 			} );
 			return;
 		}
@@ -124,7 +139,6 @@ class ImageEdit extends Component {
 		let img = {};
 		let sizesWidth = editorWidth;
 
-		/* eslint-disable no-lonely-if */
 		if ( media.sizes ) {
 			// The "full" size is included in `sizes`.
 			img = media.sizes.large || media.sizes.full;
@@ -139,10 +153,9 @@ class ImageEdit extends Component {
 				img.sizes = this.getSizesAttr( sizesWidth );
 			}
 		}
-		/* eslint-enable no-lonely-if */
 
 		this.props.setAttributes( {
-			...pick( media, [ 'alt', 'id', 'caption' ] ),
+			...pickRelevantMediaFiles( media ),
 			url: src,
 			srcSet: img.srcset,
 			sizes: img.sizes,
@@ -354,7 +367,7 @@ class ImageEdit extends Component {
 				<Toolbar>
 					<MediaUpload
 						onSelect={ this.onSelectImage }
-						type="image"
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						value={ id }
 						render={ ( { open } ) => (
 							<IconButton
@@ -386,7 +399,7 @@ class ImageEdit extends Component {
 						notices={ noticeUI }
 						onError={ noticeOperations.createErrorNotice }
 						accept="image/*"
-						type="image"
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
 					/>
 				</Fragment>
 			);
@@ -486,13 +499,15 @@ class ImageEdit extends Component {
 						options={ this.getLinkDestinationOptions() }
 						onChange={ this.onSetLinkDestination }
 					/>
-					<TextControl
-						label={ __( 'Link URL' ) }
-						value={ href || '' }
-						onChange={ this.onSetCustomHref }
-						placeholder={ ! isLinkURLInputDisabled ? 'https://' : undefined }
-						disabled={ isLinkURLInputDisabled }
-					/>
+					{ linkDestination !== LINK_DESTINATION_NONE && (
+						<TextControl
+							label={ __( 'Link URL' ) }
+							value={ href || '' }
+							onChange={ this.onSetCustomHref }
+							placeholder={ ! isLinkURLInputDisabled ? 'https://' : undefined }
+							disabled={ isLinkURLInputDisabled }
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 		);
@@ -574,7 +589,6 @@ class ImageEdit extends Component {
 								<Fragment>
 									{ getInspectorControls( imageWidth, imageHeight ) }
 									<ResizableBox
-										className="block-library-image__resizer"
 										size={
 											imageWidthWithinContainer && imageHeightWithinContainer ? {
 												width: imageWidthWithinContainer * scale,
@@ -586,11 +600,6 @@ class ImageEdit extends Component {
 										minHeight={ minHeight }
 										maxHeight={ maxWidth / ratio }
 										lockAspectRatio
-										handleClasses={ {
-											right: 'block-library-image__resize-handler-right',
-											bottom: 'block-library-image__resize-handler-bottom',
-											left: 'block-library-image__resize-handler-left',
-										} }
 										enable={ {
 											top: false,
 											right: showRightHandle,
@@ -618,7 +627,7 @@ class ImageEdit extends Component {
 						<RichText
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
-							value={ caption || [] }
+							value={ caption }
 							unstableOnFocus={ this.onFocusCaption }
 							onChange={ ( value ) => setAttributes( { caption: value } ) }
 							isSelected={ this.state.captionFocused }

@@ -154,6 +154,32 @@ Returns the state of legacy meta boxes.
 
 State of meta boxes.
 
+### getActiveMetaBoxLocations
+
+Returns an array of active meta box locations.
+
+*Parameters*
+
+ * state: Post editor state.
+
+*Returns*
+
+Active meta box locations.
+
+### isMetaBoxLocationActive
+
+Returns true if there is an active meta box in the given location, or false
+otherwise.
+
+*Parameters*
+
+ * state: Post editor state.
+ * location: Meta box location to test.
+
+*Returns*
+
+Whether the meta box location is active.
+
 ### getMetaBox
 
 Returns the state of legacy meta boxes.
@@ -166,6 +192,18 @@ Returns the state of legacy meta boxes.
 *Returns*
 
 State of meta box at specified location.
+
+### hasMetaBoxes
+
+Returns true if the post is using Meta Boxes
+
+*Parameters*
+
+ * state: Global application state
+
+*Returns*
+
+Whether there are metaboxes or not.
 
 ### isSavingMetaBoxes
 
@@ -258,6 +296,15 @@ This indicates that the sidebar has a meta box but the normal area does not.
 *Parameters*
 
  * metaBoxes: Whether meta box locations are active.
+
+### setActiveMetaBoxLocations
+
+Returns an action object used in signaling that the active meta box
+locations have changed.
+
+*Parameters*
+
+ * locations: New active meta box locations.
 
 ### requestMetaBoxUpdates
 

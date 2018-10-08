@@ -204,8 +204,7 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 		{
 			attributes: {
 				title: {
-					type: 'array',
-					source: 'children',
+					source: 'rich-text',
 					selector: 'p',
 				},
 			},
@@ -245,8 +244,7 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 		{
 			attributes: {
 				title: {
-					type: 'array',
-					source: 'children',
+					source: 'rich-text',
 					selector: 'p',
 				},
 			},

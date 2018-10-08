@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { escapeRegExp } = require( 'lodash' );
+const { escapeRegExp, map } = require( 'lodash' );
 
 /**
  * Internal dependencies
@@ -114,7 +114,32 @@ module.exports = {
 				message: 'Deprecated functions must be removed before releasing this version.',
 			},
 			{
-				selector: 'CallExpression[callee.name=/^(invokeMap|get|has|hasIn|invoke|result|set|setWith|unset|update|updateWith)$/] > Literal:nth-child(2)',
+				// Builds a selector which handles CallExpression with path
+				// argument at varied position by function.
+				//
+				// See: https://github.com/WordPress/gutenberg/pull/9615
+				selector: map( {
+					1: [
+						'property',
+						'matchesProperty',
+						'path',
+					],
+					2: [
+						'invokeMap',
+						'get',
+						'has',
+						'hasIn',
+						'invoke',
+						'result',
+						'set',
+						'setWith',
+						'unset',
+						'update',
+						'updateWith',
+					],
+				}, ( functionNames, argPosition ) => (
+					`CallExpression[callee.name=/^(${ functionNames.join( '|' ) })$/] > Literal:nth-child(${ argPosition })`
+				) ).join( ',' ),
 				message: 'Always pass an array as the path argument',
 			},
 			{
@@ -127,8 +152,22 @@ module.exports = {
 			},
 			{
 				selector: 'CallExpression[callee.object.name="page"][callee.property.name="waitFor"]',
-				message: 'Prefer page.waitForSelector instead.'
-			}
+				message: 'Prefer page.waitForSelector instead.',
+			},
+			{
+				// The <DotTip> component uses the `id` prop for something that does not require an
+				// instanceId; maybe we should change its key.
+				// See: https://github.com/WordPress/gutenberg/issues/10305
+				selector: 'JSXOpeningElement[name.name!="DotTip"] JSXAttribute[name.name="id"][value.type="Literal"]',
+				message: 'Do not use string literals for IDs; use withInstanceId instead.',
+			},
+			{
+				// Discourage the usage of `Math.random()` as it's a code smell
+				// for UUID generation, for which we already have a higher-order
+				// component: `withInstanceId`.
+				selector: 'CallExpression[callee.object.name="Math"][callee.property.name="random"]',
+				message: 'Do not use Math.random() to generate unique IDs; use withInstanceId instead. (If you’re not generating unique IDs: ignore this message.)',
+			},
 		],
 		'linebreak-style': 'off',
 	},

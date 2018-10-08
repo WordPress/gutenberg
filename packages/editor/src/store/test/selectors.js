@@ -1,18 +1,29 @@
 /**
  * External dependencies
  */
-import { filter, property, without } from 'lodash';
+import { filter, without } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+import {
+	registerBlockType,
+	unregisterBlockType,
+	createBlock,
+	getBlockTypes,
+	getDefaultBlockName,
+	setDefaultBlockName,
+	getUnknownTypeHandlerName,
+	setUnknownTypeHandlerName,
+} from '@wordpress/blocks';
 import { moment } from '@wordpress/date';
+import { RawHTML } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import * as selectors from '../selectors';
+import { PREFERENCES_DEFAULTS } from '../defaults';
 
 const {
 	canUserUseUnfilteredHTML,
@@ -38,12 +49,14 @@ const {
 	hasAutosave,
 	isEditedPostEmpty,
 	isEditedPostBeingScheduled,
+	isEditedPostDateFloating,
 	getBlockDependantsCacheBust,
 	getBlockName,
 	getBlock,
 	getBlocks,
 	getBlockCount,
 	getClientIdsWithDescendants,
+	getClientIdsOfDescendants,
 	hasSelectedBlock,
 	getSelectedBlock,
 	getSelectedBlockClientId,
@@ -74,6 +87,7 @@ const {
 	didPostSaveRequestSucceed,
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
+	getEditedPostContent,
 	getNotices,
 	getReusableBlock,
 	isSavingReusableBlock,
@@ -82,6 +96,7 @@ const {
 	getReusableBlocks,
 	getStateBeforeOptimisticTransaction,
 	isPublishingPost,
+	isPublishSidebarEnabled,
 	canInsertBlockType,
 	getInserterItems,
 	isValidTemplate,
@@ -101,6 +116,10 @@ describe( 'selectors', () => {
 	let cachedSelectors;
 
 	beforeAll( () => {
+		cachedSelectors = filter( selectors, ( selector ) => selector.clear );
+	} );
+
+	beforeEach( () => {
 		registerBlockType( 'core/block', {
 			save: () => null,
 			category: 'reusable',
@@ -138,14 +157,10 @@ describe( 'selectors', () => {
 			parent: [ 'core/test-block-b' ],
 		} );
 
-		cachedSelectors = filter( selectors, property( 'clear' ) );
-	} );
-
-	beforeEach( () => {
 		cachedSelectors.forEach( ( { clear } ) => clear() );
 	} );
 
-	afterAll( () => {
+	afterEach( () => {
 		unregisterBlockType( 'core/block' );
 		unregisterBlockType( 'core/test-block-a' );
 		unregisterBlockType( 'core/test-block-b' );
@@ -1221,6 +1236,83 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'isEditedPostDateFloating', () => {
+		let editor;
+
+		beforeEach( () => {
+			editor = {
+				present: {
+					edits: {},
+				},
+			};
+		} );
+
+		it( 'should return true for draft posts where the date matches the modified date', () => {
+			const state = {
+				currentPost: {
+					date: '2018-09-27T01:23:45.678Z',
+					modified: '2018-09-27T01:23:45.678Z',
+					status: 'draft',
+				},
+				editor,
+			};
+
+			expect( isEditedPostDateFloating( state ) ).toBe( true );
+		} );
+
+		it( 'should return true for auto-draft posts where the date matches the modified date', () => {
+			const state = {
+				currentPost: {
+					date: '2018-09-27T01:23:45.678Z',
+					modified: '2018-09-27T01:23:45.678Z',
+					status: 'auto-draft',
+				},
+				editor,
+			};
+
+			expect( isEditedPostDateFloating( state ) ).toBe( true );
+		} );
+
+		it( 'should return false for draft posts where the date does not match the modified date', () => {
+			const state = {
+				currentPost: {
+					date: '2018-09-27T01:23:45.678Z',
+					modified: '1970-01-01T00:00:00.000Z',
+					status: 'draft',
+				},
+				editor,
+			};
+
+			expect( isEditedPostDateFloating( state ) ).toBe( false );
+		} );
+
+		it( 'should return false for auto-draft posts where the date does not match the modified date', () => {
+			const state = {
+				currentPost: {
+					date: '2018-09-27T01:23:45.678Z',
+					modified: '1970-01-01T00:00:00.000Z',
+					status: 'auto-draft',
+				},
+				editor,
+			};
+
+			expect( isEditedPostDateFloating( state ) ).toBe( false );
+		} );
+
+		it( 'should return false for published posts', () => {
+			const state = {
+				currentPost: {
+					date: '2018-09-27T01:23:45.678Z',
+					modified: '2018-09-27T01:23:45.678Z',
+					status: 'publish',
+				},
+				editor,
+			};
+
+			expect( isEditedPostDateFloating( state ) ).toBe( false );
+		} );
+	} );
+
 	describe( 'getBlockDependantsCacheBust', () => {
 		const rootBlock = { clientId: 123, name: 'core/paragraph', attributes: {} };
 		const rootOrder = [ 123 ];
@@ -1634,6 +1726,63 @@ describe( 'selectors', () => {
 			expect( getBlocks( state ) ).toEqual( [
 				{ clientId: 123, name: 'core/paragraph', attributes: {}, innerBlocks: [] },
 				{ clientId: 23, name: 'core/heading', attributes: {}, innerBlocks: [] },
+			] );
+		} );
+	} );
+
+	describe( 'getClientIdsOfDescendants', () => {
+		it( 'should return the ids of any descendants, given an array of clientIds', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByClientId: {
+							'uuid-2': { clientId: 'uuid-2', name: 'core/image', attributes: {} },
+							'uuid-4': { clientId: 'uuid-4', name: 'core/paragraph', attributes: {} },
+							'uuid-6': { clientId: 'uuid-6', name: 'core/paragraph', attributes: {} },
+							'uuid-8': { clientId: 'uuid-8', name: 'core/block', attributes: {} },
+							'uuid-10': { clientId: 'uuid-10', name: 'core/columns', attributes: {} },
+							'uuid-12': { clientId: 'uuid-12', name: 'core/column', attributes: {} },
+							'uuid-14': { clientId: 'uuid-14', name: 'core/column', attributes: {} },
+							'uuid-16': { clientId: 'uuid-16', name: 'core/quote', attributes: {} },
+							'uuid-18': { clientId: 'uuid-18', name: 'core/block', attributes: {} },
+							'uuid-20': { clientId: 'uuid-20', name: 'core/gallery', attributes: {} },
+							'uuid-22': { clientId: 'uuid-22', name: 'core/block', attributes: {} },
+							'uuid-24': { clientId: 'uuid-24', name: 'core/columns', attributes: {} },
+							'uuid-26': { clientId: 'uuid-26', name: 'core/column', attributes: {} },
+							'uuid-28': { clientId: 'uuid-28', name: 'core/column', attributes: {} },
+							'uuid-30': { clientId: 'uuid-30', name: 'core/paragraph', attributes: {} },
+						},
+						blockOrder: {
+							'': [ 'uuid-6', 'uuid-8', 'uuid-10', 'uuid-22' ],
+							'uuid-2': [ ],
+							'uuid-4': [ ],
+							'uuid-6': [ ],
+							'uuid-8': [ ],
+							'uuid-10': [ 'uuid-12', 'uuid-14' ],
+							'uuid-12': [ 'uuid-16' ],
+							'uuid-14': [ 'uuid-18' ],
+							'uuid-16': [ ],
+							'uuid-18': [ 'uuid-24' ],
+							'uuid-20': [ ],
+							'uuid-22': [ ],
+							'uuid-24': [ 'uuid-26', 'uuid-28' ],
+							'uuid-26': [ ],
+							'uuid-28': [ 'uuid-30' ],
+						},
+						edits: {},
+					},
+				},
+			};
+			expect( getClientIdsOfDescendants( state, [ 'uuid-10' ] ) ).toEqual( [
+				'uuid-12',
+				'uuid-14',
+				'uuid-16',
+				'uuid-18',
+				'uuid-24',
+				'uuid-26',
+				'uuid-28',
+				'uuid-30',
 			] );
 		} );
 	} );
@@ -2872,6 +3021,197 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'getEditedPostContent', () => {
+		let originalDefaultBlockName, originalUnknownTypeHandlerName;
+
+		beforeAll( () => {
+			originalDefaultBlockName = getDefaultBlockName();
+			originalUnknownTypeHandlerName = getUnknownTypeHandlerName();
+
+			registerBlockType( 'core/default', {
+				category: 'common',
+				title: 'default',
+				attributes: {
+					modified: {
+						type: 'boolean',
+						default: false,
+					},
+				},
+				save: () => null,
+			} );
+			registerBlockType( 'core/unknown', {
+				category: 'common',
+				title: 'unknown',
+				attributes: {
+					html: {
+						type: 'string',
+					},
+				},
+				save: ( { attributes } ) => <RawHTML>{ attributes.html }</RawHTML>,
+			} );
+			setDefaultBlockName( 'core/default' );
+			setUnknownTypeHandlerName( 'core/unknown' );
+		} );
+
+		afterAll( () => {
+			setDefaultBlockName( originalDefaultBlockName );
+			setUnknownTypeHandlerName( originalUnknownTypeHandlerName );
+			getBlockTypes().forEach( ( block ) => {
+				unregisterBlockType( block.name );
+			} );
+		} );
+
+		it( 'defers to returning an edited post attribute', () => {
+			const block = createBlock( 'core/block' );
+
+			const state = {
+				editor: {
+					present: {
+						blockOrder: {
+							'': [ block.clientId ],
+						},
+						blocksByClientId: {
+							[ block.clientId ]: block,
+						},
+						edits: {
+							content: 'custom edit',
+						},
+					},
+				},
+				currentPost: {},
+			};
+
+			const content = getEditedPostContent( state );
+
+			expect( content ).toBe( 'custom edit' );
+		} );
+
+		it( 'returns serialization of blocks', () => {
+			const block = createBlock( 'core/block' );
+
+			const state = {
+				editor: {
+					present: {
+						blockOrder: {
+							'': [ block.clientId ],
+						},
+						blocksByClientId: {
+							[ block.clientId ]: block,
+						},
+						edits: {},
+					},
+				},
+				currentPost: {},
+			};
+
+			const content = getEditedPostContent( state );
+
+			expect( content ).toBe( '<!-- wp:block /-->' );
+		} );
+
+		it( 'returns removep\'d serialization of blocks for single unknown', () => {
+			const unknownBlock = createBlock( getUnknownTypeHandlerName(), {
+				html: '<p>foo</p>',
+			} );
+			const state = {
+				editor: {
+					present: {
+						blockOrder: {
+							'': [ unknownBlock.clientId ],
+						},
+						blocksByClientId: {
+							[ unknownBlock.clientId ]: unknownBlock,
+						},
+						edits: {},
+					},
+				},
+				currentPost: {},
+			};
+
+			const content = getEditedPostContent( state );
+
+			expect( content ).toBe( 'foo' );
+		} );
+
+		it( 'returns non-removep\'d serialization of blocks for multiple unknown', () => {
+			const firstUnknown = createBlock( getUnknownTypeHandlerName(), {
+				html: '<p>foo</p>',
+			} );
+			const secondUnknown = createBlock( getUnknownTypeHandlerName(), {
+				html: '<p>bar</p>',
+			} );
+			const state = {
+				editor: {
+					present: {
+						blockOrder: {
+							'': [ firstUnknown.clientId, secondUnknown.clientId ],
+						},
+						blocksByClientId: {
+							[ firstUnknown.clientId ]: firstUnknown,
+							[ secondUnknown.clientId ]: secondUnknown,
+						},
+						edits: {},
+					},
+				},
+				currentPost: {},
+			};
+
+			const content = getEditedPostContent( state );
+
+			expect( content ).toBe( '<p>foo</p>\n\n<p>bar</p>' );
+		} );
+
+		it( 'returns empty string for single unmodified default block', () => {
+			const defaultBlock = createBlock( getDefaultBlockName() );
+			const state = {
+				editor: {
+					present: {
+						blockOrder: {
+							'': [ defaultBlock.clientId ],
+						},
+						blocksByClientId: {
+							[ defaultBlock.clientId ]: defaultBlock,
+						},
+						edits: {},
+					},
+				},
+				currentPost: {},
+			};
+
+			const content = getEditedPostContent( state );
+
+			expect( content ).toBe( '' );
+		} );
+
+		it( 'should not return empty string for modified default block', () => {
+			const defaultBlock = createBlock( getDefaultBlockName() );
+			const state = {
+				editor: {
+					present: {
+						blockOrder: {
+							'': [ defaultBlock.clientId ],
+						},
+						blocksByClientId: {
+							[ defaultBlock.clientId ]: {
+								...defaultBlock,
+								attributes: {
+									...defaultBlock.attributes,
+									modified: true,
+								},
+							},
+						},
+						edits: {},
+					},
+				},
+				currentPost: {},
+			};
+
+			const content = getEditedPostContent( state );
+
+			expect( content ).toBe( '<!-- wp:default {\"modified\":true} /-->' );
+		} );
+	} );
+
 	describe( 'getNotices', () => {
 		it( 'should return the notices array', () => {
 			const state = {
@@ -3084,7 +3424,7 @@ describe( 'selectors', () => {
 				isDisabled: false,
 				utility: 0,
 				frecency: 0,
-				hasChildBlocks: false,
+				hasChildBlocksWithInserterSupport: false,
 			} );
 			const reusableBlockItem = items.find( ( item ) => item.id === 'core/block/1' );
 			expect( reusableBlockItem ).toEqual( {
@@ -3384,6 +3724,33 @@ describe( 'selectors', () => {
 
 			const isSaving = isSavingReusableBlock( state, 5187 );
 			expect( isSaving ).toBe( true );
+		} );
+	} );
+
+	describe( 'isPublishSidebarEnabled', () => {
+		it( 'should return the value on state if it is thruthy', () => {
+			const state = {
+				preferences: {
+					isPublishSidebarEnabled: true,
+				},
+			};
+			expect( isPublishSidebarEnabled( state ) ).toBe( state.preferences.isPublishSidebarEnabled );
+		} );
+
+		it( 'should return the value on state if it is falsy', () => {
+			const state = {
+				preferences: {
+					isPublishSidebarEnabled: false,
+				},
+			};
+			expect( isPublishSidebarEnabled( state ) ).toBe( state.preferences.isPublishSidebarEnabled );
+		} );
+
+		it( 'should return the default value if there is no isPublishSidebarEnabled key on state', () => {
+			const state = {
+				preferences: { },
+			};
+			expect( isPublishSidebarEnabled( state ) ).toBe( PREFERENCES_DEFAULTS.isPublishSidebarEnabled );
 		} );
 	} );
 
@@ -3849,17 +4216,17 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'canUserUseUnfilteredHTML', () => {
-		it( 'should return true if the _links object contains the property wp:action-unfiltered_html', () => {
+		it( 'should return true if the _links object contains the property wp:action-unfiltered-html', () => {
 			const state = {
 				currentPost: {
 					_links: {
-						'wp:action-unfiltered_html': [],
+						'wp:action-unfiltered-html': [],
 					},
 				},
 			};
 			expect( canUserUseUnfilteredHTML( state ) ).toBe( true );
 		} );
-		it( 'should return false if the _links object doesnt contain the property wp:action-unfiltered_html', () => {
+		it( 'should return false if the _links object doesnt contain the property wp:action-unfiltered-html', () => {
 			const state = {
 				currentPost: {
 					_links: {},

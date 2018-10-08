@@ -9,6 +9,7 @@ import {
 	BlockControls,
 	AlignmentToolbar,
 } from '@wordpress/editor';
+import { concat } from '@wordpress/rich-text';
 
 export const name = 'core/verse';
 
@@ -25,8 +26,7 @@ export const settings = {
 
 	attributes: {
 		content: {
-			type: 'array',
-			source: 'children',
+			source: 'rich-text',
 			selector: 'pre',
 		},
 		textAlign: {
@@ -53,7 +53,7 @@ export const settings = {
 		],
 	},
 
-	edit( { attributes, setAttributes, className } ) {
+	edit( { attributes, setAttributes, className, mergeBlocks } ) {
 		const { textAlign, content } = attributes;
 
 		return (
@@ -77,6 +77,7 @@ export const settings = {
 					style={ { textAlign: textAlign } }
 					placeholder={ __( 'Write…' ) }
 					wrapperClassName={ className }
+					onMerge={ mergeBlocks }
 				/>
 			</Fragment>
 		);
@@ -93,5 +94,11 @@ export const settings = {
 				value={ content }
 			/>
 		);
+	},
+
+	merge( attributes, attributesToMerge ) {
+		return {
+			content: concat( attributes.content, attributesToMerge.content ),
+		};
 	},
 };

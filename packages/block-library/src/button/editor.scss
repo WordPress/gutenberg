@@ -18,10 +18,15 @@
 		cursor: text;
 		line-height: 1;
 	}
+
+	&:not(.has-text-color) .editor-rich-text__tinymce[data-is-placeholder-visible="true"] + .editor-rich-text__tinymce {
+		color: $white;
+		opacity: 0.8;
+	}
 }
 
 .block-library-button__inline-link {
-	background: #fff;
+	background: $white;
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
@@ -29,7 +34,8 @@
 	font-size: $default-font-size;
 	line-height: $default-line-height;
 
-	$blocks-button__link-input-width: 280px;
+	// the width of input box plus two icon buttons plus a padding
+	$blocks-button__link-input-width: 300px + 2 * $icon-button-size + 8px;
 	width: $blocks-button__link-input-width;
 
 	.editor-url-input {

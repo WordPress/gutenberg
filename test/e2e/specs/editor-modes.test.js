@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { clickBlockAppender, newPost } from '../support/utils';
+import { clickBlockAppender, newPost, switchToEditor } from '../support/utils';
 
 describe( 'Editing modes (visual/HTML)', () => {
 	beforeEach( async () => {
@@ -73,11 +73,41 @@ describe( 'Editing modes (visual/HTML)', () => {
 		expect( htmlBlockContent ).toEqual( '<p>Hello world!</p>' );
 
 		// Change the font size using the sidebar.
-		const changeSizeButton = await page.waitForXPath( '//button[text()="L"]' );
+		await page.click( '.components-font-size-picker__selector' );
+		const changeSizeButton = await page.waitForSelector( '.components-button.is-font-large' );
 		await changeSizeButton.click();
 
 		// Make sure the HTML content updated.
 		htmlBlockContent = await page.$eval( '.editor-block-list__layout .editor-block-list__block .editor-block-list__block-html-textarea', ( node ) => node.textContent );
 		expect( htmlBlockContent ).toEqual( '<p class="has-large-font-size">Hello world!</p>' );
+	} );
+
+	it( 'the code editor should unselect blocks and disable the inserter', async () => {
+		// The paragraph block should be selected
+		const title = await page.$eval(
+			'.editor-block-inspector__card-title',
+			( element ) => element.innerText
+		);
+		expect( title ).toBe( 'Paragraph' );
+
+		// The Block inspector should be active
+		let blockInspectorTab = await page.$( '.edit-post-sidebar__panel-tab.is-active[aria-label="Block settings"]' );
+		expect( blockInspectorTab ).not.toBeNull();
+
+		// Switch to Code Editor
+		await switchToEditor( 'Code' );
+
+		// The Block inspector should not be active anymore
+		blockInspectorTab = await page.$( '.edit-post-sidebar__panel-tab.is-active[aria-label="Block settings"]' );
+		expect( blockInspectorTab ).toBeNull();
+
+		// No block is selected
+		await page.click( '.edit-post-sidebar__panel-tab[aria-label="Block settings"]' );
+		const noBlocksElement = await page.$( '.editor-block-inspector__no-blocks' );
+		expect( noBlocksElement ).not.toBeNull();
+
+		// The inserter is disabled
+		const disabledInserter = await page.$( '.editor-inserter > button:disabled' );
+		expect( disabledInserter ).not.toBeNull();
 	} );
 } );

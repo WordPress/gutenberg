@@ -16,6 +16,7 @@ import {
 } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
 import { createBlobURL } from '@wordpress/blob';
+import { create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -39,8 +40,7 @@ const blockAttributes = {
 		default: '',
 	},
 	caption: {
-		type: 'array',
-		source: 'children',
+		source: 'rich-text',
 		selector: 'figcaption',
 	},
 	href: {
@@ -118,7 +118,7 @@ export const settings = {
 					const alignMatches = /(?:^|\s)align(left|center|right)(?:$|\s)/.exec( className );
 					const align = alignMatches ? alignMatches[ 1 ] : undefined;
 					const idMatches = /(?:^|\s)wp-image-(\d+)(?:$|\s)/.exec( className );
-					const id = idMatches ? idMatches[ 1 ] : undefined;
+					const id = idMatches ? Number( idMatches[ 1 ] ) : undefined;
 					const anchorElement = node.querySelector( 'a' );
 					const linkDestination = anchorElement && anchorElement.href ? 'custom' : undefined;
 					const href = anchorElement && anchorElement.href ? anchorElement.href : undefined;
@@ -161,9 +161,11 @@ export const settings = {
 						selector: 'img',
 					},
 					caption: {
-						type: 'array',
-						// To do: needs to support HTML.
-						source: 'text',
+						shortcode: ( attributes, { shortcode } ) => {
+							const { content } = shortcode;
+							const html = content.replace( /\s*<img[^>]*>\s/, '' );
+							return create( { html } );
+						},
 					},
 					href: {
 						type: 'string',
@@ -222,7 +224,7 @@ export const settings = {
 		const figure = (
 			<Fragment>
 				{ href ? <a href={ href }>{ image }</a> : image }
-				{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
+				{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
 			</Fragment>
 		);
 

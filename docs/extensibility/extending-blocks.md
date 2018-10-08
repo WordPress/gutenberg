@@ -13,14 +13,17 @@ Block Style Variations allow providing alternative styles to existing blocks. Th
 _Example:_
 
 ```js
-wp.blocks.registerBlockStyle( 'core/quote', 'fancy-quote' );
+wp.blocks.registerBlockStyle( 'core/quote', {
+	name: 'fancy-quote',
+	label: 'Fancy Quote'
+} );
 ```
 
-The example above registers a block style variation called `fancy-quote` to the `core/quote` block. When the user selects this block style variation from the styles selector, an `is-style-fancy-quote` className will be added to the block's wrapper.
+The example above registers a block style variation named `fancy-quote` to the `core/quote` block. When the user selects this block style variation from the styles selector, an `is-style-fancy-quote` className will be added to the block's wrapper.
 
 ### Filters
 
-Extensing blocks can involve more than just providing alternative styles, in this case, you can use one of the following filters to extend the block settings.
+Extending blocks can involve more than just providing alternative styles, in this case, you can use one of the following filters to extend the block settings.
 
 #### `blocks.registerBlockType`
 
@@ -54,9 +57,13 @@ wp.hooks.addFilter(
 
 A filter that applies to the result of a block's `save` function. This filter is used to replace or extend the element, for example using `wp.element.cloneElement` to modify the element's props or replace its children, or returning an entirely new element.
 
+The filter's callback receives an element, a block type and the block attributes as arguments. It should return an element.
+
 #### `blocks.getSaveContent.extraProps`
 
-A filter that applies to all blocks returning a WP Element in the `save` function. This filter is used to add extra props to the root element of the `save` function. For example: to add a className, an id, or any valid prop for this element. It receives the current props of the `save` element, the block type and the block attributes as arguments.
+A filter that applies to all blocks returning a WP Element in the `save` function. This filter is used to add extra props to the root element of the `save` function. For example: to add a className, an id, or any valid prop for this element.
+
+The filter receives the current `save` element's props, a block type and the block attributes as arguments. It should return a props object.
 
 _Example:_
 
@@ -169,6 +176,7 @@ const withInspectorControls =  createHigherOrderComponent(BlockEdit => {
 
 wp.hooks.addFilter( 'editor.BlockEdit', 'my-plugin/with-inspector-controls', withInspectorControls );
 ```
+{% end %}
 
 #### `editor.BlockListBlock`
 
@@ -178,6 +186,7 @@ _Example:_
 
 {% codetabs %}
 {% ES5 %}
+
 ```js
 var el = wp.element.createElement;
 
@@ -205,6 +214,7 @@ var withDataAlign = wp.compose.createHigherOrderComponent( function( BlockListBl
 }, 'withAlign' );
 
 wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-data-align', withDataAlign );
+
 ```
 {% ESNext %}
 ```js
@@ -223,6 +233,8 @@ const withDataAlign = createHigherOrderComponent( ( BlockListBlock ) => {
 
 wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-data-align', withDataAlign );
 ```
+
+{% end %}
 
 ## Removing Blocks
 
@@ -283,7 +295,7 @@ On the server, you can filter the list of blocks shown in the inserter using the
 
 function my_plugin_allowed_block_types( $allowed_block_types, $post ) {
 	if ( $post->post_type !== 'post' ) {
-	    return $allowed_block_types;
+		return $allowed_block_types;
 	}
 	return array( 'core/paragraph' );
 }

@@ -773,9 +773,6 @@ export function settings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
  * Reducer returning the user preferences.
  *
  * @param {Object}  state                 Current state.
- * @param {string}  state.mode            Current editor mode, either "visual" or "text".
- * @param {boolean} state.isSidebarOpened Whether the sidebar is opened or closed.
- * @param {Object}  state.panels          The state of the different sidebar panels.
  * @param {Object}  action                Dispatched action.
  *
  * @return {string} Updated state.
@@ -809,6 +806,18 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 			return {
 				...state,
 				insertUsage: omitBy( state.insertUsage, ( { insert } ) => insert.ref === action.id ),
+			};
+
+		case 'ENABLE_PUBLISH_SIDEBAR':
+			return {
+				...state,
+				isPublishSidebarEnabled: true,
+			};
+
+		case 'DISABLE_PUBLISH_SIDEBAR':
+			return {
+				...state,
+				isPublishSidebarEnabled: false,
 			};
 	}
 
@@ -871,6 +880,34 @@ export function notices( state = [], action ) {
 				...state.slice( 0, index ),
 				...state.slice( index + 1 ),
 			];
+	}
+
+	return state;
+}
+
+/**
+ * Post Lock State.
+ *
+ * @typedef {Object} PostLockState
+ *
+ * @property {boolean} isLocked       Whether the post is locked.
+ * @property {?boolean} isTakeover     Whether the post editing has been taken over.
+ * @property {?boolean} activePostLock Active post lock value.
+ * @property {?Object}  user           User that took over the post.
+ */
+
+/**
+ * Reducer returning the post lock status.
+ *
+ * @param {PostLockState} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {PostLockState} Updated state.
+ */
+export function postLock( state = { isLocked: false }, action ) {
+	switch ( action.type ) {
+		case 'UPDATE_POST_LOCK':
+			return action.lock;
 	}
 
 	return state;
@@ -1089,6 +1126,7 @@ export default optimist( combineReducers( {
 	isInsertionPointVisible,
 	preferences,
 	saving,
+	postLock,
 	notices,
 	reusableBlocks,
 	template,

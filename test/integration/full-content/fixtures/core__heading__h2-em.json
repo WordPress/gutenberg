@@ -4,16 +4,60 @@
         "name": "core/heading",
         "isValid": true,
         "attributes": {
-            "content": [
-                "The ",
-                {
-                    "type": "em",
-                    "children": [
-                        "Inserter"
-                    ]
-                },
-                " Tool"
-            ],
+            "content": {
+                "formats": [
+                    null,
+                    null,
+                    null,
+                    null,
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ],
+                "text": "The Inserter Tool"
+            },
             "level": 2
         },
         "innerBlocks": [],

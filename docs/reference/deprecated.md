@@ -1,8 +1,36 @@
 Gutenberg's deprecation policy is intended to support backwards-compatibility for two minor releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
 
+## 4.4.0
+
+- The block attribute sources `children` and `node` have been removed. Please use the `rich-text` source instead. See the core blocks for examples.
+- `wp.blocks.node.matcher` has been removed. Please use `wp.richTextValue.create` instead.
+- `wp.blocks.node.toHTML` has been removed. Please use `wp.richTextValue.toHTMLString` instead.
+- `wp.blocks.node.fromDOM` has been removed. Please use `wp.richTextValue.create` instead.
+- `wp.blocks.children.toHTML` has been removed. Please use `wp.richTextValue.toHTMLString` instead.
+- `wp.blocks.children.fromDOM` has been removed. Please use `wp.richTextValue.create` instead.
+- `wp.blocks.children.concat` has been removed. Please use `wp.richTextValue.concat` instead.
+- `wp.blocks.children.getChildrenArray` has been removed. Please use `wp.richTextValue.create` instead.
+
+## 4.2.0
+
+- Writing resolvers as async generators has been removed. Use the controls plugin instead.
+- `wp.components.AccessibleSVG` component has been removed. Please use `wp.components.SVG` instead.
+- The `wp.editor.UnsavedChangesWarning` component no longer accepts a `forceIsDirty` prop.
+- `initializeMetaBoxState` action (`core/edit-post`) has been removed. Use `setActiveMetaBoxLocations` action (`core/edit-post`) instead.
+- `wp.editPost.initializeEditor` no longer returns an object. Use the `setActiveMetaBoxLocations` action (`core/edit-post`) in place of the existing object's `initializeMetaBoxes` function.
+- `setMetaBoxSavedData` action (`core/edit-post`) has been removed.
+- `getMetaBoxes` selector (`core/edit-post`) has been removed. Use `getActiveMetaBoxLocations` selector (`core/edit-post`) instead.
+- `getMetaBox` selector (`core/edit-post`) has been removed. Use `isMetaBoxLocationActive` selector (`core/edit-post`) instead.
+- Attribute type coercion has been removed. Omit the source to preserve type via serialized comment demarcation.
+- `mediaDetails` in object passed to `onFileChange` callback of `wp.editor.mediaUpload`. Please use `media_details` property instead.
+
+## 4.1.0
+
+- `wp.data.dispatch( 'core/editor' ).checkTemplateValidity` has been removed. Validity is verified automatically upon block reset.
+
 ## 4.0.0
 
-- `wp.components.RichTextProvider` has been removed. Please use `wp.data.select( 'core/editor' )` methods instead.
+- `wp.editor.RichTextProvider` has been removed. Please use `wp.data.select( 'core/editor' )` methods instead.
 - `wp.components.Draggable` as a DOM node drag handler has been removed. Please, use `wp.components.Draggable` as a wrap component for your DOM node drag handler.
 - `wp.i18n.getI18n` has been removed. Use `__`, `_x`, `_n`, or `_nx` instead.
 - `wp.i18n.dcnpgettext` has been removed. Use `__`, `_x`, `_n`, or `_nx` instead.

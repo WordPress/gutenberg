@@ -10,7 +10,6 @@
 	}
 
 	.editor-block-settings-menu__content {
-		width: 100%;
 		padding: $item-spacing - $border-width;
 	}
 
@@ -46,7 +45,10 @@
 		cursor: pointer;
 		@include menu-style__neutral;
 
-		&:hover:not(:disabled):not([aria-disabled="true"]),
+		&:hover:not(:disabled):not([aria-disabled="true"]) {
+			@include menu-style__hover;
+		}
+
 		&:focus:not(:disabled):not([aria-disabled="true"]) {
 			@include menu-style__focus;
 		}

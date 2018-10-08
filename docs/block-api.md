@@ -25,7 +25,7 @@ registerBlockType( 'my-plugin/book', {} );
 
 ### Block Configuration
 
-* **Type:** `{ key: value }`
+* **Type:** `Object` [ `{ key: value }` ]
 
 A block requires a few properties to be specified before it can be registered successfully. These are defined through a configuration object, which includes the following:
 
@@ -37,7 +37,7 @@ This is the display title for your block, which can be translated with our trans
 
 ```js
 // Our data object
-title: 'Book'
+title: __( 'Book' )
 ```
 
 #### Description (optional)
@@ -47,7 +47,7 @@ title: 'Book'
 This is a short description for your block, which can be translated with our translation functions. This will be shown in the block inspector.
 
 ```js
-description: 'Block showing a Book card.'
+description: __( 'Block showing a Book card.' )
 ```
 
 #### Category
@@ -68,9 +68,11 @@ The core provided categories are:
 category: 'widgets',
 ```
 
-Plugins and Themes can also register [custom block categories](../docs/block-api/extensibility.md).
+Plugins and Themes can also register [custom block categories](../docs/extensibility/extending-blocks/#managing-block-categories).
 
 #### Icon (optional)
+
+* **Type:** `String` | `Object`
 
 An icon property should be specified to make it easier to identify a block. These can be any of [WordPress' Dashicons](https://developer.wordpress.org/resource/dashicons/), or a custom `svg` element.
 
@@ -82,7 +84,7 @@ icon: 'book-alt',
 icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M19 13H5v-2h14v2z" /></svg>,
 ```
 
-**Note:** Custom SVG icons are automatically wrapped in the [`wp.components.AccessibleSVG` component](https://github.com/WordPress/gutenberg/tree/master/packages/components/src/accessible-svg/) to add accessibility attributes (`aria-hidden`, `role`, and `focusable`).
+**Note:** Custom SVG icons are automatically wrapped in the [`wp.components.SVG` component](https://github.com/WordPress/gutenberg/tree/master/packages/components/src/primitives/svg/) to add accessibility attributes (`aria-hidden`, `role`, and `focusable`).
 
 An object can also be passed as icon, in this case, icon, as specified above, should be included in the src property.
 Besides src the object can contain background and foreground colors, this colors will appear with the icon
@@ -100,8 +102,9 @@ icon: {
 } ,
 ```
 
-
 #### Keywords (optional)
+
+* **Type:** `Array`
 
 Sometimes a block could have aliases that help users discover it while searching. For example, an `image` block could also want to be discovered by `photo`. You can do so by providing an array of terms (which can be translated). It is only allowed to add as much as three terms per block.
 
@@ -113,7 +116,7 @@ keywords: [ __( 'image' ), __( 'photo' ), __( 'pics' ) ],
 
 #### Attributes (optional)
 
-* **Type:** `{ attr: {} }`
+* **Type:** `Object`
 
 Attributes provide the structured data needs of a block. They can exist in different forms when they are serialized, but they are declared together under a common interface.
 
@@ -127,8 +130,7 @@ attributes: {
 		attribute: 'src',
 	},
 	author: {
-		type: 'string',
-		source: 'children',
+		source: 'rich-text',
 		selector: '.book-author',
 	},
 	pages: {

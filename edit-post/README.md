@@ -2,7 +2,7 @@
 
 Extending the editor UI can be accomplished with the `registerPlugin` API, allowing you to define all your plugin's UI elements in one place.
 
-Refer to [the plugins module documentation](../plugins/) for more information.
+Refer to [the plugins module documentation](../packages/plugins/) for more information.
 
 ## Plugin Components
 
@@ -49,7 +49,7 @@ const doOnClick = ( ) => {
 };
 
 const MyPluginBlockSettingsMenuItem = () => (
-    <PluginBlockSettingsMenuItem 
+    <PluginBlockSettingsMenuItem
 		allowedBlockNames=[ 'core/paragraph' ]
 		icon='dashicon-name'
 		label=__( 'Menu item text' )
@@ -424,7 +424,7 @@ Title displayed at the top of the panel.
 
 ##### initialOpen
 
-Whether to have the panel initially opened. When no title is provided it is always opened. 
+Whether to have the panel initially opened. When no title is provided it is always opened.
 
 - Type: `Boolean`
 - Required: No

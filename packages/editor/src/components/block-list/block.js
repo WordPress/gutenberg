@@ -43,8 +43,7 @@ import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMultiControls from './multi-controls';
 import BlockMobileToolbar from './block-mobile-toolbar';
 import BlockInsertionPoint from './insertion-point';
-import BlockDraggable from './block-draggable';
-import IgnoreNestedEvents from './ignore-nested-events';
+import IgnoreNestedEvents from '../ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
 import withHoverAreas from './with-hover-areas';
@@ -373,6 +372,7 @@ export class BlockListBlock extends Component {
 			hasSelectedInnerBlock,
 			isParentOfSelectedBlock,
 			hasMultiSelection,
+			isDraggable,
 		} = this.props;
 		const isHovered = this.state.isHovered && ! isMultiSelecting;
 		const { name: blockName, isValid } = block;
@@ -410,7 +410,7 @@ export class BlockListBlock extends Component {
 			'is-selected-parent': shouldAppearSelectedParent,
 			'is-hovered': shouldAppearHovered,
 			'is-reusable': isReusableBlock( blockType ),
-			'is-hidden': dragging,
+			'is-dragging': dragging,
 			'is-typing': isTypingWithinBlock,
 			'is-focused': isFocusMode && ( isSelected || isParentOfSelectedBlock ),
 			'is-focus-mode': isFocusMode,
@@ -480,18 +480,6 @@ export class BlockListBlock extends Component {
 				] }
 				{ ...wrapperProps }
 			>
-				{ ! isPartOfMultiSelection && isMovable && (
-					<BlockDraggable
-						clientId={ clientId }
-						rootClientId={ rootClientId }
-						blockElementId={ blockElementId }
-						layout={ layout }
-						order={ order }
-						onDragStart={ this.onDragStart }
-						onDragEnd={ this.onDragEnd }
-						isDragging={ dragging }
-					/>
-				) }
 				{ shouldShowInsertionPoint && (
 					<BlockInsertionPoint
 						clientId={ clientId }
@@ -503,17 +491,20 @@ export class BlockListBlock extends Component {
 				) }
 				<BlockDropZone
 					index={ order }
+					clientId={ clientId }
 					rootClientId={ rootClientId }
 					layout={ layout }
 				/>
 				{ shouldRenderMovers && (
 					<BlockMover
 						clientIds={ clientId }
-						rootClientId={ rootClientId }
-						layout={ layout }
+						blockElementId={ blockElementId }
 						isFirst={ isFirst }
 						isLast={ isLast }
 						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }
+						isDraggable={ ( isDraggable !== false ) && ( ! isPartOfMultiSelection && isMovable ) }
+						onDragStart={ this.onDragStart }
+						onDragEnd={ this.onDragEnd }
 					/>
 				) }
 				{ shouldShowBreadcrumb && (
@@ -539,13 +530,13 @@ export class BlockListBlock extends Component {
 							<BlockHtml clientId={ clientId } />
 						) }
 						{ ! isValid && [
-							<div key="invalid-preview">
-								{ getSaveElement( blockType, block.attributes ) }
-							</div>,
 							<BlockInvalidWarning
 								key="invalid-warning"
 								block={ block }
 							/>,
+							<div key="invalid-preview">
+								{ getSaveElement( blockType, block.attributes ) }
+							</div>,
 						] }
 					</BlockCrashBoundary>
 					{ shouldShowMobileToolbar && (

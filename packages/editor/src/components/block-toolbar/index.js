@@ -44,6 +44,11 @@ class BlockToolbar extends Component {
 
 	render() {
 		const { blockClientIds, isValid, mode } = this.props;
+
+		if ( blockClientIds.length === 0 ) {
+			return null;
+		}
+
 		if ( blockClientIds.length > 1 ) {
 			return (
 				<div className="editor-block-toolbar" ref={ this.container }>

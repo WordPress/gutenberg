@@ -14,7 +14,7 @@ import { createBlobURL } from '@wordpress/blob';
 /**
  * Internal dependencies
  */
-import { default as edit, defaultColumnsNumber } from './edit';
+import { default as edit, defaultColumnsNumber, pickRelevantMediaFiles } from './edit';
 
 const blockAttributes = {
 	images: {
@@ -45,8 +45,7 @@ const blockAttributes = {
 				attribute: 'data-id',
 			},
 			caption: {
-				type: 'array',
-				source: 'children',
+				source: 'rich-text',
 				selector: 'figcaption',
 			},
 		},
@@ -131,12 +130,18 @@ export const settings = {
 				},
 				transform( files, onChange ) {
 					const block = createBlock( 'core/gallery', {
-						images: files.map( ( file ) => ( { url: createBlobURL( file ) } ) ),
+						images: files.map( ( file ) => pickRelevantMediaFiles( {
+							url: createBlobURL( file ),
+						} ) ),
 					} );
 					mediaUpload( {
 						filesList: files,
-						onFileChange: ( images ) => onChange( block.clientId, { images } ),
-						allowedType: 'image',
+						onFileChange: ( images ) => {
+							onChange( block.clientId, {
+								images: images.map( ( image ) => pickRelevantMediaFiles( image ) ),
+							} );
+						},
+						allowedTypes: [ 'image' ],
 					} );
 					return block;
 				},

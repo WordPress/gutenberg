@@ -28,8 +28,8 @@ export const shortcuts = {
 		display: displayShortcut.primaryShift( 'd' ),
 	},
 	removeBlock: {
-		raw: rawShortcut.primaryAlt( 'backspace' ),
-		display: displayShortcut.primaryAlt( 'Backspace' ),
+		raw: rawShortcut.access( 'z' ),
+		display: displayShortcut.access( 'z' ),
 	},
 	insertBefore: {
 		raw: rawShortcut.primaryAlt( 't' ),
