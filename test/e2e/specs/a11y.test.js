@@ -31,17 +31,17 @@ describe( 'a11y', () => {
 	} );
 
 	it( 'constrains focus to a modal when tabbing', async () => {
-		// Open help modal
+		// Open keyboard help modal.
 		await pressWithModifier( ACCESS_MODIFIER_KEYS, 'h' );
 
-		// Test that the Close button of the modal is focused when the
-		// latter is opened.
-		expect( await isCloseButtonFocused() ).toBe( true );
+		// The close button should not be focused by default; this is a strange UX
+		// experience.
+		// See: https://github.com/WordPress/gutenberg/issues/9410
+		expect( await isCloseButtonFocused() ).toBe( false );
 
 		await page.keyboard.press( 'Tab' );
 
-		// Test that the Close button of the modal is focused when the
-		// latter is opened.
+		// Ensure the Close button of the modal is focused after tabbing.
 		expect( await isCloseButtonFocused() ).toBe( true );
 	} );
 

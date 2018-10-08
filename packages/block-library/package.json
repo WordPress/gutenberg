@@ -41,7 +41,6 @@
 		"moment": "^2.22.1",
 		"querystring": "^0.2.0",
 		"querystringify": "^1.0.0",
-		"re-resizable": "^4.7.1",
 		"url": "^0.11.0"
 	},
 	"devDependencies": {
