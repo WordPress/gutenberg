@@ -35,6 +35,7 @@ export default function withFilters( hookName ) {
 				this.namespace = uniqueId( 'core/with-filters/component-' );
 				this.throttledForceUpdate = debounce( () => {
 					this.Component = applyFilters( hookName, OriginalComponent );
+					this.ComponentProps = applyFilters( hookName + 'Props', props );
 					this.forceUpdate();
 				}, ANIMATION_FRAME_PERIOD );
 
