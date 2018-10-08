@@ -131,39 +131,41 @@ function render_block_core_rss( $attributes ) {
  * Registers the `core/rss` block on server.
  */
 function register_block_core_rss() {
-	register_block_type( 'core/rss', array(
-		'attributes'      => array(
-			'columns'        => array(
-				'type'    => 'number',
-				'default' => 2,
+	register_block_type( 'core/rss',
+		array(
+			'attributes'      => array(
+				'columns'        => array(
+					'type'    => 'number',
+					'default' => 2,
+				),
+				'blockLayout'    => array(
+					'type'    => 'string',
+					'default' => 'list',
+				),
+				'feedURL'        => array(
+					'type' => 'string',
+				),
+				'itemsToShow'    => array(
+					'type'    => 'number',
+					'default' => 5,
+				),
+				'displayExcerpt' => array(
+					'type' => 'boolean',
+				),
+				'displayAuthor'  => array(
+					'type' => 'boolean',
+				),
+				'displayDate'    => array(
+					'type' => 'boolean',
+				),
+				'excerptLength'  => array(
+					'type'    => 'number',
+					'default' => 55,
+				),
 			),
-			'blockLayout'     => array(
-				'type'    => 'string',
-				'default' => 'list',
-			),
-			'feedURL'        => array(
-				'type' => 'string',
-			),
-			'itemsToShow'    => array(
-				'type'    => 'number',
-				'default' => 5,
-			),
-			'displayExcerpt' => array(
-				'type' => 'boolean',
-			),
-			'displayAuthor'  => array(
-				'type' => 'boolean',
-			),
-			'displayDate'    => array(
-				'type' => 'boolean',
-			),
-			'excerptLength'  => array(
-				'type'    => 'number',
-				'default' => 55,
-			),
-		),
-		'render_callback' => 'render_block_core_rss',
-	) );
+			'render_callback' => 'render_block_core_rss',
+		)
+	);
 }
 
 add_action( 'init', 'register_block_core_rss' );
