@@ -17,6 +17,7 @@ import {
 	reduce,
 	size,
 	some,
+	isEmpty,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -1457,6 +1458,17 @@ export function getBlocksForSerialization( state ) {
 	);
 
 	if ( isSingleUnmodifiedDefaultBlock ) {
+		return [];
+	}
+
+	// A single empty core/freeform block equivalent to an empty post.
+	const isSingleEmptyFreeformBlock = (
+		blocks.length === 1 &&
+		blocks[ 0 ].name === getUnknownTypeHandlerName() &&
+		( isEmpty( blocks[ 0 ].attributes ) || blocks[ 0 ].attributes.content === '' )
+	);
+
+	if ( isSingleEmptyFreeformBlock ) {
 		return [];
 	}
 

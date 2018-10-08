@@ -1022,6 +1022,56 @@ describe( 'selectors', () => {
 
 			expect( isEditedPostSaveable( state ) ).toBe( true );
 		} );
+
+		it( 'should return false if the post has no title, excerpt and empty classic block', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByClientId: {
+							123: {
+								clientId: 123,
+								name: 'core/freeform',
+								attributes: { },
+							},
+						},
+						blockOrder: {
+							'': [ 123 ],
+						},
+						edits: {},
+					},
+				},
+				currentPost: {},
+				saving: {},
+			};
+
+			expect( isEditedPostSaveable( state ) ).toBe( false );
+		} );
+
+		it( 'should return true if the post has a title and empty classic block', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByClientId: {
+							123: {
+								clientId: 123,
+								name: 'core/freeform',
+								attributes: { },
+							},
+						},
+						blockOrder: {
+							'': [ 123 ],
+						},
+						edits: {},
+					},
+				},
+				currentPost: {
+					title: 'sassel',
+				},
+				saving: {},
+			};
+
+			expect( isEditedPostSaveable( state ) ).toBe( true );
+		} );
 	} );
 
 	describe( 'isEditedPostAutosaveable', () => {
@@ -1254,6 +1304,83 @@ describe( 'selectors', () => {
 					},
 				},
 				currentPost: {},
+			};
+
+			expect( isEditedPostEmpty( state ) ).toBe( false );
+		} );
+
+		it( 'should return true if empty attributes classic block', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByClientId: {
+							123: {
+								clientId: 123,
+								name: 'core/freeform',
+								attributes: { },
+							},
+						},
+						blockOrder: {
+							'': [ 123 ],
+						},
+						edits: {},
+					},
+				},
+				currentPost: {},
+			};
+
+			expect( isEditedPostEmpty( state ) ).toBe( true );
+		} );
+
+		it( 'should return true if empty content classic block', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByClientId: {
+							123: {
+								clientId: 123,
+								name: 'core/freeform',
+								attributes: {
+									content: '',
+								},
+							},
+						},
+						blockOrder: {
+							'': [ 123 ],
+						},
+						edits: {},
+					},
+				},
+				currentPost: {
+					content: '',
+				},
+			};
+
+			expect( isEditedPostEmpty( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if non empty content classic block', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByClientId: {
+							123: {
+								clientId: 123,
+								name: 'core/freeform',
+								attributes: {
+									content: 'Test Data',
+								},
+							},
+						},
+						blockOrder: {
+							'': [ 123 ],
+						},
+						edits: {},
+					},
+				},
+				currentPost: {
+					content: 'Test Data',
+				},
 			};
 
 			expect( isEditedPostEmpty( state ) ).toBe( false );
