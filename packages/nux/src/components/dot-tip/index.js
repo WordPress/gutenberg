@@ -6,6 +6,19 @@ import { Popover, Button, IconButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 
+function getAnchorRect( anchor ) {
+	// The default getAnchorRect() excludes an element's top and bottom padding
+	// from its calculation. We want tips to point to the outer margin of an
+	// element, so we override getAnchorRect() to include all padding.
+	return anchor.parentNode.getBoundingClientRect();
+}
+
+function onClick( event ) {
+	// Tips are often nested within buttons. We stop propagation so that clicking
+	// on a tip doesn't result in the button being clicked.
+	event.stopPropagation();
+}
+
 export function DotTip( {
 	children,
 	isVisible,
@@ -23,13 +36,10 @@ export function DotTip( {
 			position="middle right"
 			noArrow
 			focusOnMount="container"
+			getAnchorRect={ getAnchorRect }
 			role="dialog"
 			aria-label={ __( 'Gutenberg tips' ) }
-			onClick={ ( event ) => {
-				// Tips are often nested within buttons. We stop propagation so that clicking
-				// on a tip doesn't result in the button being clicked.
-				event.stopPropagation();
-			} }
+			onClick={ onClick }
 		>
 			<p>{ children }</p>
 			<p>

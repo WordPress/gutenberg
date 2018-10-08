@@ -3,15 +3,14 @@
  */
 import classnames from 'classnames';
 import {
-	isEqual,
-	forEach,
-	merge,
-	identity,
-	find,
 	defer,
+	find,
+	identity,
+	isNil,
 	noop,
+	isEqual,
 } from 'lodash';
-import 'element-closest';
+import memize from 'memize';
 
 /**
  * WordPress dependencies
@@ -25,29 +24,42 @@ import {
 import { createBlobURL } from '@wordpress/blob';
 import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, rawShortcut } from '@wordpress/keycodes';
 import { Slot } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
-import { rawHandler, children } from '@wordpress/blocks';
-import deprecated from '@wordpress/deprecated';
+import { withDispatch, withSelect } from '@wordpress/data';
+import { rawHandler, children, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
+import { isURL } from '@wordpress/url';
+import {
+	isEmpty,
+	create,
+	apply,
+	applyFormat,
+	split,
+	toHTMLString,
+	getTextContent,
+	insert,
+	isEmptyLine,
+	unstableToDom,
+} from '@wordpress/rich-text';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
 import Autocomplete from '../autocomplete';
 import BlockFormatControls from '../block-format-controls';
+import { FORMATTING_CONTROLS } from './formatting-controls';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 import { pickAriaProps } from './aria';
-import patterns from './patterns';
+import { getPatterns } from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
-import { domToFormat, valueToString } from './format';
 import TokenUI from './tokens/ui';
 
 /**
  * Browser dependencies
  */
 
-const { Node } = window;
+const { Node, getSelection } = window;
 
 /**
  * Zero-width space character used by TinyMCE as a caret landing point for
@@ -59,21 +71,8 @@ const { Node } = window;
  */
 const TINYMCE_ZWSP = '\uFEFF';
 
-export function getFormatProperties( formatName, parents ) {
-	switch ( formatName ) {
-		case 'link' : {
-			const anchor = find( parents, ( node ) => node.nodeName.toLowerCase() === 'a' );
-			return !! anchor ? { value: anchor.getAttribute( 'href' ) || '', target: anchor.getAttribute( 'target' ) || '', node: anchor } : {};
-		}
-		default:
-			return {};
-	}
-}
-
-const DEFAULT_FORMATS = [ 'bold', 'italic', 'strikethrough', 'link', 'code' ];
-
 export class RichText extends Component {
-	constructor() {
+	constructor( { value, onReplace, multiline } ) {
 		super( ...arguments );
 
 		this.onInit = this.onInit.bind( this );
@@ -82,22 +81,52 @@ export class RichText extends Component {
 		this.onFocus = this.onFocus.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
+		this.onDeleteKeyDown = this.onDeleteKeyDown.bind( this );
 		this.onHorizontalNavigationKeyDown = this.onHorizontalNavigationKeyDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onKeyUp = this.onKeyUp.bind( this );
-		this.changeFormats = this.changeFormats.bind( this );
 		this.onPropagateUndo = this.onPropagateUndo.bind( this );
-		this.onPastePreProcess = this.onPastePreProcess.bind( this );
 		this.onPaste = this.onPaste.bind( this );
 		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
 		this.setFocusedElement = this.setFocusedElement.bind( this );
+		this.onInput = this.onInput.bind( this );
+		this.onSelectionChange = this.onSelectionChange.bind( this );
+		this.getRecord = this.getRecord.bind( this );
+		this.createRecord = this.createRecord.bind( this );
+		this.applyRecord = this.applyRecord.bind( this );
+		this.isEmpty = this.isEmpty.bind( this );
+		this.valueToFormat = this.valueToFormat.bind( this );
+		this.setRef = this.setRef.bind( this );
+		this.isActive = this.isActive.bind( this );
 
-		this.state = {
-			formats: {},
-			selectedNodeId: 0,
-		};
+		this.formatToValue = memize( this.formatToValue.bind( this ), { size: 1 } );
 
+		this.savedContent = value;
 		this.containerRef = createRef();
+		this.patterns = getPatterns( { onReplace, multiline } );
+		this.enterPatterns = getBlockTransforms( 'from' ).filter( ( { type, trigger } ) =>
+			type === 'pattern' && trigger === 'enter'
+		);
+
+		this.state = {};
+
+		this.usedDeprecatedChildrenSource = Array.isArray( value );
+	}
+
+	componentDidMount() {
+		document.addEventListener( 'selectionchange', this.onSelectionChange );
+	}
+
+	componentWillUnmount() {
+		document.removeEventListener( 'selectionchange', this.onSelectionChange );
+	}
+
+	setRef( node ) {
+		this.editableRef = node;
+	}
+
+	isActive() {
+		return this.editableRef === document.activeElement;
 	}
 
 	/**
@@ -109,13 +138,20 @@ export class RichText extends Component {
 	 * @return {Object} The settings for this block.
 	 */
 	getSettings( settings ) {
-		return ( this.props.getSettings || identity )( {
+		settings = {
 			...settings,
 			forced_root_block: this.props.multiline || false,
 			// Allow TinyMCE to keep one undo level for comparing changes.
 			// Prevent it otherwise from accumulating any history.
 			custom_undo_redo_levels: 1,
-		} );
+		};
+
+		const { unstableGetSettings } = this.props;
+		if ( unstableGetSettings ) {
+			settings = unstableGetSettings( settings );
+		}
+
+		return settings;
 	}
 
 	/**
@@ -134,17 +170,13 @@ export class RichText extends Component {
 		editor.on( 'keydown', this.onKeyDown );
 		editor.on( 'keyup', this.onKeyUp );
 		editor.on( 'BeforeExecCommand', this.onPropagateUndo );
-		editor.on( 'PastePreProcess', this.onPastePreProcess, true /* Add before core handlers */ );
-		editor.on( 'paste', this.onPaste, true /* Add before core handlers */ );
 		editor.on( 'focus', this.onFocus );
-		editor.on( 'input', this.onChange );
 		// The change event in TinyMCE fires every time an undo level is added.
 		editor.on( 'change', this.onCreateUndoLevel );
 
-		patterns.apply( this, [ editor ] );
-
-		if ( this.props.onSetup ) {
-			this.props.onSetup( editor );
+		const { unstableOnSetup } = this.props;
+		if ( unstableOnSetup ) {
+			unstableOnSetup( editor );
 		}
 	}
 
@@ -155,13 +187,6 @@ export class RichText extends Component {
 	}
 
 	onInit() {
-		this.registerCustomFormatters();
-
-		this.editor.shortcuts.add( rawShortcut.primary( 'k' ), '', () => this.changeFormats( { link: { isAdding: true } } ) );
-		this.editor.shortcuts.add( rawShortcut.access( 'a' ), '', () => this.changeFormats( { link: { isAdding: true } } ) );
-		this.editor.shortcuts.add( rawShortcut.access( 's' ), '', () => this.changeFormats( { link: undefined } ) );
-		this.editor.shortcuts.add( rawShortcut.access( 'd' ), '', () => this.changeFormats( { strikethrough: ! this.state.formats.strikethrough } ) );
-		this.editor.shortcuts.add( rawShortcut.access( 'x' ), '', () => this.changeFormats( { code: ! this.state.formats.code } ) );
 		this.editor.shortcuts.add( rawShortcut.primary( 'z' ), '', 'Undo' );
 		this.editor.shortcuts.add( rawShortcut.primaryShift( 'z' ), '', 'Redo' );
 
@@ -170,30 +195,13 @@ export class RichText extends Component {
 		this.editor.shortcuts.remove( 'meta+y', '', 'Redo' );
 	}
 
-	adaptFormatter( options ) {
-		switch ( options.type ) {
-			case 'inline-style': {
-				return {
-					inline: 'span',
-					styles: { ...options.style },
-				};
-			}
-		}
-	}
-
-	registerCustomFormatters() {
-		forEach( this.props.formatters, ( formatter ) => {
-			this.editor.formatter.register( formatter.format, this.adaptFormatter( formatter ) );
-		} );
-	}
-
 	/**
 	 * Handles an undo event from TinyMCE.
 	 *
 	 * @param {UndoEvent} event The undo event as triggered by TinyMCE.
 	 */
 	onPropagateUndo( event ) {
-		const { onUndo, onRedo } = this.context;
+		const { onUndo, onRedo } = this.props;
 		const { command } = event;
 
 		if ( command === 'Undo' && onUndo ) {
@@ -208,6 +216,43 @@ export class RichText extends Component {
 	}
 
 	/**
+	 * Get the current record (value and selection) from props and state.
+	 *
+	 * @return {Object} The current record (value and selection).
+	 */
+	getRecord() {
+		const { formats, text } = this.formatToValue( this.props.value );
+		const { start, end } = this.state;
+
+		return { formats, text, start, end };
+	}
+
+	createRecord() {
+		const { multiline } = this.props;
+		const range = window.getSelection().getRangeAt( 0 );
+
+		return create( {
+			element: this.editableRef,
+			range,
+			multilineTag: multiline,
+			removeNode: ( node ) => node.getAttribute( 'data-mce-bogus' ) === 'all',
+			unwrapNode: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),
+			removeAttribute: ( attribute ) => attribute.indexOf( 'data-mce-' ) === 0,
+			filterString: ( string ) => string.replace( TINYMCE_ZWSP, '' ),
+		} );
+	}
+
+	applyRecord( record ) {
+		const { multiline } = this.props;
+
+		apply( record, this.editableRef, multiline );
+	}
+
+	isEmpty() {
+		return isEmpty( this.formatToValue( this.props.value ) );
+	}
+
+	/**
 	 * Handles a paste event from TinyMCE.
 	 *
 	 * Saves the pasted data as plain text in `pastedPlainText`.
@@ -215,21 +260,44 @@ export class RichText extends Component {
 	 * @param {PasteEvent} event The paste event as triggered by TinyMCE.
 	 */
 	onPaste( event ) {
-		const dataTransfer =
-			event.clipboardData ||
-			event.dataTransfer ||
-			this.editor.getDoc().dataTransfer ||
-			// Removes the need for further `dataTransfer` checks.
-			{ getData: () => '' };
+		const clipboardData = event.clipboardData;
+		let { items, files } = clipboardData;
 
-		const { items = [], files = [], types = [] } = dataTransfer;
+		// In Edge these properties can be null instead of undefined, so a more
+		// rigorous test is required over using default values.
+		items = isNil( items ) ? [] : items;
+		files = isNil( files ) ? [] : files;
+
 		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
-		const plainText = dataTransfer.getData( 'text/plain' );
-		const HTML = dataTransfer.getData( 'text/html' );
+		let plainText = '';
+		let html = '';
+
+		// IE11 only supports `Text` as an argument for `getData` and will
+		// otherwise throw an invalid argument error, so we try the standard
+		// arguments first, then fallback to `Text` if they fail.
+		try {
+			plainText = clipboardData.getData( 'text/plain' );
+			html = clipboardData.getData( 'text/html' );
+		} catch ( error1 ) {
+			try {
+				html = clipboardData.getData( 'Text' );
+			} catch ( error2 ) {
+				// Some browsers like UC Browser paste plain text by default and
+				// don't support clipboardData at all, so allow default
+				// behaviour.
+				return;
+			}
+		}
+
+		event.preventDefault();
+
+		// Allows us to ask for this information when we get a report.
+		window.console.log( 'Received HTML:\n\n', html );
+		window.console.log( 'Received plain text:\n\n', plainText );
 
 		// Only process file if no HTML is present.
 		// Note: a pasted file may have the URL as plain text.
-		if ( item && ! HTML ) {
+		if ( item && ! html ) {
 			const file = item.getAsFile ? item.getAsFile() : item;
 			const content = rawHandler( {
 				HTML: `<img src="${ createBlobURL( file ) }">`,
@@ -250,42 +318,21 @@ export class RichText extends Component {
 				this.props.setTimeout( () => this.splitContent( content ) );
 			}
 
-			event.preventDefault();
+			return;
 		}
-
-		this.pastedPlainText = plainText;
-		this.isPlainTextPaste = types.length === 1 && types[ 0 ] === 'text/plain';
-	}
-
-	/**
-	 * Handles a PrePasteProcess event from TinyMCE.
-	 *
-	 * Will call the paste handler with the pasted data. If it is a string tries
-	 * to put it in the containing TinyMCE editor. Otherwise call the `onSplit`
-	 * handler.
-	 *
-	 * @param {PrePasteProcessEvent} event The PrePasteProcess event as triggered
-	 *                                     by TinyMCE.
-	 */
-	onPastePreProcess( event ) {
-		const HTML = this.isPlainTextPaste ? '' : event.content;
-
-		event.preventDefault();
-
-		// Allows us to ask for this information when we get a report.
-		window.console.log( 'Received HTML:\n\n', HTML );
-		window.console.log( 'Received plain text:\n\n', this.pastedPlainText );
 
 		// There is a selection, check if a URL is pasted.
 		if ( ! this.editor.selection.isCollapsed() ) {
-			const linkRegExp = /^(?:https?:)?\/\/\S+$/i;
-			const pastedText = event.content.replace( /<[^>]+>/g, '' ).trim();
+			const pastedText = ( html || plainText ).replace( /<[^>]+>/g, '' ).trim();
 
 			// A URL was pasted, turn the selection into a link
-			if ( linkRegExp.test( pastedText ) ) {
-				this.editor.execCommand( 'mceInsertLink', false, {
-					href: this.editor.dom.decode( pastedText ),
-				} );
+			if ( isURL( pastedText ) ) {
+				this.onChange( applyFormat( this.getRecord(), {
+					type: 'a',
+					attributes: {
+						href: decodeEntities( pastedText ),
+					},
+				} ) );
 
 				// Allows us to ask for this information when we get a report.
 				window.console.log( 'Created link:\n\n', pastedText );
@@ -305,15 +352,16 @@ export class RichText extends Component {
 		}
 
 		const content = rawHandler( {
-			HTML,
-			plainText: this.pastedPlainText,
+			HTML: html,
+			plainText,
 			mode,
 			tagName: this.props.tagName,
 			canUserUseUnfilteredHTML: this.props.canUserUseUnfilteredHTML,
 		} );
 
 		if ( typeof content === 'string' ) {
-			this.editor.insertContent( content );
+			const recordToInsert = create( { html: content } );
+			this.onChange( insert( this.getRecord(), recordToInsert ) );
 		} else if ( this.props.onSplit ) {
 			if ( ! content.length ) {
 				return;
@@ -352,12 +400,52 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Handles any case where the content of the TinyMCE instance has changed.
+	 * Handle input on the next selection change event.
 	 */
+	onInput() {
+		const record = this.createRecord();
+		const transformed = this.patterns.reduce( ( accumlator, transform ) => transform( accumlator ), record );
 
-	onChange() {
-		this.savedContent = this.getContent();
+		// Don't apply changes if there's no transform. Content will be up to
+		// date. In the future we could always let it flow back in the live DOM
+		// if there are no performance issues.
+		this.onChange( transformed, record === transformed );
+	}
+
+	/**
+	 * Handles the `selectionchange` event: sync the selection to local state.
+	 */
+	onSelectionChange() {
+		// Ensure it's the active element. This is a global event.
+		if ( ! this.isActive() ) {
+			return;
+		}
+
+		const { start, end } = this.createRecord();
+
+		if ( start !== this.state.start || end !== this.state.end ) {
+			this.setState( { start, end } );
+		}
+	}
+
+	/**
+	 * Sync the value to global state. The node tree and selection will also be
+	 * updated if differences are found.
+	 *
+	 * @param {Object}  record        The record to sync and apply.
+	 * @param {boolean} _withoutApply If true, the record won't be applied to
+	 *                                the live DOM.
+	 */
+	onChange( record, _withoutApply ) {
+		if ( ! _withoutApply ) {
+			this.applyRecord( record );
+		}
+
+		const { start, end } = record;
+
+		this.savedContent = this.valueToFormat( record );
 		this.props.onChange( this.savedContent );
+		this.setState( { start, end } );
 	}
 
 	onCreateUndoLevel( event ) {
@@ -376,10 +464,67 @@ export class RichText extends Component {
 		// input event. Avoid dispatching an action if the original event is
 		// blur because the content will already be up-to-date.
 		if ( ! event || ! event.originalEvent || event.originalEvent.type !== 'blur' ) {
-			this.onChange();
+			this.onChange( this.createRecord(), true );
 		}
 
-		this.context.onCreateUndoLevel();
+		this.props.onCreateUndoLevel();
+	}
+
+	/**
+	 * Handles a delete keyDown event to handle merge or removal for collapsed
+	 * selection where caret is at directional edge: forward for a delete key,
+	 * reverse for a backspace key.
+	 *
+	 * @link https://en.wikipedia.org/wiki/Caret_navigation
+	 *
+	 * @param {tinymce.EditorEvent<KeyboardEvent>} event Keydown event.
+	 */
+	onDeleteKeyDown( event ) {
+		const { onMerge, onRemove } = this.props;
+		if ( ! onMerge && ! onRemove ) {
+			return;
+		}
+
+		const { keyCode } = event;
+		const isReverse = keyCode === BACKSPACE;
+
+		const { isCollapsed } = getSelection();
+
+		// Only process delete if the key press occurs at uncollapsed edge.
+		if ( ! isCollapsed ) {
+			return;
+		}
+
+		const empty = this.isEmpty();
+
+		// It is important to consider emptiness because an empty container
+		// will include a bogus TinyMCE BR node _after_ the caret, so in a
+		// forward deletion the isHorizontalEdge function will incorrectly
+		// interpret the presence of the bogus node as not being at the edge.
+		const isEdge = ( empty || isHorizontalEdge( this.editableRef, isReverse ) );
+
+		if ( ! isEdge ) {
+			return;
+		}
+
+		if ( onMerge ) {
+			onMerge( ! isReverse );
+		}
+
+		// Only handle remove on Backspace. This serves dual-purpose of being
+		// an intentional user interaction distinguishing between Backspace and
+		// Delete to remove the empty field, but also to avoid merge & remove
+		// causing destruction of two fields (merge, then removed merged).
+		if ( onRemove && empty && isReverse ) {
+			onRemove( ! isReverse );
+		}
+
+		event.preventDefault();
+
+		// Calling onMerge() or onRemove() will destroy the editor, so it's
+		// important that we stop other handlers (e.g. ones registered by
+		// TinyMCE) from also handling this event.
+		event.stopImmediatePropagation();
 	}
 
 	/**
@@ -396,7 +541,7 @@ export class RichText extends Component {
 	 * @param {tinymce.EditorEvent<KeyboardEvent>} event Keydown event.
 	 */
 	onHorizontalNavigationKeyDown( event ) {
-		const { focusNode } = window.getSelection();
+		const { focusNode } = getSelection();
 		const { nodeType, nodeValue } = focusNode;
 
 		if ( nodeType !== Node.TEXT_NODE ) {
@@ -432,34 +577,11 @@ export class RichText extends Component {
 	 * @param {KeydownEvent} event The keydown event as triggered by TinyMCE.
 	 */
 	onKeyDown( event ) {
-		const dom = this.editor.dom;
-		const rootNode = this.editor.getBody();
 		const { keyCode } = event;
 
-		if (
-			( keyCode === BACKSPACE && isHorizontalEdge( rootNode, true ) ) ||
-			( keyCode === DELETE && isHorizontalEdge( rootNode, false ) )
-		) {
-			if ( ! this.props.onMerge && ! this.props.onRemove ) {
-				return;
-			}
-
-			const forward = keyCode === DELETE;
-
-			if ( this.props.onMerge ) {
-				this.props.onMerge( forward );
-			}
-
-			if ( this.props.onRemove && this.isEmpty() ) {
-				this.props.onRemove( forward );
-			}
-
-			event.preventDefault();
-
-			// Calling onMerge() or onRemove() will destroy the editor, so it's important
-			// that we stop other handlers (e.g. ones registered by TinyMCE) from
-			// also handling this event.
-			event.stopImmediatePropagation();
+		const isDelete = keyCode === DELETE || keyCode === BACKSPACE;
+		if ( isDelete ) {
+			this.onDeleteKeyDown( event );
 		}
 
 		const isHorizontalNavigation = keyCode === LEFT || keyCode === RIGHT;
@@ -470,41 +592,54 @@ export class RichText extends Component {
 		// If we click shift+Enter on inline RichTexts, we avoid creating two contenteditables
 		// We also split the content and call the onSplit prop if provided.
 		if ( keyCode === ENTER ) {
+			event.preventDefault();
+
+			if ( this.props.onReplace ) {
+				const text = getTextContent( this.getRecord() );
+				const transformation = findTransform( this.enterPatterns, ( item ) => {
+					return item.regExp.test( text );
+				} );
+
+				if ( transformation ) {
+					// Calling onReplace() will destroy the editor, so it's
+					// important that we stop other handlers (e.g. ones
+					// registered by TinyMCE) from also handling this event.
+					event.stopImmediatePropagation();
+					this.props.onReplace( [
+						transformation.transform( { content: text } ),
+					] );
+					return;
+				}
+			}
+
 			if ( this.props.multiline ) {
-				if ( ! this.props.onSplit ) {
-					return;
-				}
+				const record = this.getRecord();
 
-				const selectedNode = this.editor.selection.getNode();
-
-				if ( selectedNode.parentNode !== rootNode ) {
-					return;
-				}
-
-				if ( ! dom.isEmpty( selectedNode ) ) {
-					return;
-				}
-
-				event.preventDefault();
-
-				const childNodes = Array.from( rootNode.childNodes );
-				const index = dom.nodeIndex( selectedNode );
-				const beforeNodes = childNodes.slice( 0, index );
-				const afterNodes = childNodes.slice( index + 1 );
-
-				const { format } = this.props;
-				const before = domToFormat( beforeNodes, format );
-				const after = domToFormat( afterNodes, format );
-
-				this.props.onSplit( before, after );
-			} else {
-				event.preventDefault();
-
-				if ( event.shiftKey || ! this.props.onSplit ) {
-					this.editor.execCommand( 'InsertLineBreak', false, event );
+				if ( this.props.onSplit && isEmptyLine( record ) ) {
+					this.props.onSplit( ...split( record ).map( this.valueToFormat ) );
 				} else {
-					this.splitContent();
+					// Character is used to separate lines in multiline values.
+					this.onChange( insert( record, '\u2028' ) );
 				}
+			} else if ( event.shiftKey || ! this.props.onSplit ) {
+				const record = this.getRecord();
+				const text = getTextContent( record );
+				const length = text.length;
+				let toInsert = '\n';
+
+				// If the caret is at the end of the text, and there is no
+				// trailing line break or no text at all, we have to insert two
+				// line breaks in order to create a new line visually and place
+				// the caret there.
+				if ( record.end === length && (
+					text.charAt( length - 1 ) !== '\n' || length === 0
+				) ) {
+					toInsert = '\n\n';
+				}
+
+				this.onChange( insert( this.getRecord(), toInsert ) );
+			} else {
+				this.splitContent();
 			}
 		}
 	}
@@ -518,7 +653,7 @@ export class RichText extends Component {
 		// The input event does not fire when the whole field is selected and
 		// BACKSPACE is pressed.
 		if ( keyCode === BACKSPACE ) {
-			this.onChange();
+			this.onChange( this.createRecord(), true );
 		}
 
 		// `scrollToRect` is called on `nodechange`, whereas calling it on
@@ -532,7 +667,7 @@ export class RichText extends Component {
 
 	scrollToRect( rect ) {
 		const { top: caretTop } = rect;
-		const container = getScrollContainer( this.editor.getBody() );
+		const container = getScrollContainer( this.editableRef );
 
 		if ( ! container ) {
 			return;
@@ -568,73 +703,47 @@ export class RichText extends Component {
 	 */
 	splitContent( blocks = [], context = {} ) {
 		const { onSplit } = this.props;
+		const record = this.createRecord();
+
 		if ( ! onSplit ) {
 			return;
 		}
 
-		const rootNode = this.editor.getBody();
-
-		let before, after;
-		if ( rootNode.childNodes.length ) {
-			const { dom } = this.editor;
-			const beforeRange = dom.createRng();
-			const afterRange = dom.createRng();
-			const selectionRange = this.editor.selection.getRng();
-
-			beforeRange.setStart( rootNode, 0 );
-			beforeRange.setEnd( selectionRange.startContainer, selectionRange.startOffset );
-
-			afterRange.setStart( selectionRange.endContainer, selectionRange.endOffset );
-			afterRange.setEnd( rootNode, dom.nodeIndex( rootNode.lastChild ) + 1 );
-
-			const beforeFragment = beforeRange.cloneContents();
-			const afterFragment = afterRange.cloneContents();
-
-			const { format } = this.props;
-			before = domToFormat( beforeFragment.childNodes, format );
-			after = domToFormat( afterFragment.childNodes, format );
-		} else {
-			before = [];
-			after = [];
-		}
+		let [ before, after ] = split( record );
 
 		// In case split occurs at the trailing or leading edge of the field,
 		// assume that the before/after values respectively reflect the current
 		// value. This also provides an opportunity for the parent component to
 		// determine whether the before/after value has changed using a trivial
 		//  strict equality operation.
-		if ( this.isEmpty( after ) ) {
-			before = this.props.value;
-		} else if ( this.isEmpty( before ) ) {
-			after = this.props.value;
+		if ( isEmpty( after ) ) {
+			before = record;
+		} else if ( isEmpty( before ) ) {
+			after = record;
 		}
 
 		// If pasting and the split would result in no content other than the
 		// pasted blocks, remove the before and after blocks.
 		if ( context.paste ) {
-			before = this.isEmpty( before ) ? null : before;
-			after = this.isEmpty( after ) ? null : after;
+			before = isEmpty( before ) ? null : before;
+			after = isEmpty( after ) ? null : after;
+		}
+
+		if ( before ) {
+			before = this.valueToFormat( before );
+		}
+
+		if ( after ) {
+			after = this.valueToFormat( after );
 		}
 
 		onSplit( before, after, ...blocks );
 	}
 
 	onNodeChange( { parents } ) {
-		if ( document.activeElement !== this.editor.getBody() ) {
+		if ( ! this.isActive() ) {
 			return;
 		}
-
-		const formatNames = this.props.formattingControls;
-		const formats = this.editor.formatter.matchAll( formatNames ).reduce( ( accFormats, activeFormat ) => {
-			accFormats[ activeFormat ] = {
-				isActive: true,
-				...getFormatProperties( activeFormat, parents ),
-			};
-
-			return accFormats;
-		}, {} );
-
-		this.setState( { formats, selectedNodeId: this.state.selectedNodeId + 1 } );
 
 		if ( this.props.isViewportSmall ) {
 			let rect;
@@ -654,123 +763,76 @@ export class RichText extends Component {
 		}
 	}
 
-	setContent( content ) {
-		const { format } = this.props;
-
-		// If editor has focus while content is being set, save the selection
-		// and restore caret position after content is set.
-		let bookmark;
-		if ( this.editor.hasFocus() ) {
-			bookmark = this.editor.selection.getBookmark( 2, true );
-		}
-
-		this.savedContent = content;
-		this.editor.setContent( valueToString( content, format ) );
-
-		if ( bookmark ) {
-			this.editor.selection.moveToBookmark( bookmark );
-		}
-	}
-
-	getContent() {
-		const { format } = this.props;
-
-		return domToFormat( this.editor.getBody().childNodes, format );
-	}
-
 	componentDidUpdate( prevProps ) {
-		// The `savedContent` var allows us to avoid updating the content right after an `onChange` call
+		const { tagName, value } = this.props;
+
 		if (
-			!! this.editor &&
-			this.props.tagName === prevProps.tagName &&
-			this.props.value !== prevProps.value &&
-			this.props.value !== this.savedContent &&
-
-			// Comparing using isEqual is necessary especially to avoid unnecessary updateContent calls
-			// This fixes issues in multi richText blocks like quotes when moving the focus between
-			// the different editables.
-			! isEqual( this.props.value, prevProps.value ) &&
-			! isEqual( this.props.value, this.savedContent )
+			tagName === prevProps.tagName &&
+			value !== prevProps.value &&
+			value !== this.savedContent
 		) {
-			this.setContent( this.props.value );
+			// Handle deprecated `children` and `node` sources.
+			// The old way of passing a value with the `node` matcher required
+			// the value to be mapped first, creating a new array each time, so
+			// a shallow check wouldn't work. We need to check deep equality.
+			// This is only executed for a deprecated API and will eventually be
+			// removed.
+			if ( Array.isArray( value ) && isEqual( value, this.savedContent ) ) {
+				return;
+			}
+
+			const record = this.formatToValue( value );
+
+			if ( this.isActive() ) {
+				const length = getTextContent( prevProps.value ).length;
+				record.start = length;
+				record.end = length;
+			}
+
+			this.applyRecord( record );
+		}
+	}
+
+	formatToValue( value ) {
+		const { format, multiline } = this.props;
+
+		// Handle deprecated `children` and `node` sources.
+		if ( Array.isArray( value ) ) {
+			return create( {
+				html: children.toHTML( value ),
+				multilineTag: multiline,
+			} );
 		}
 
-		if ( 'development' === process.env.NODE_ENV ) {
-			if ( ! isEqual( this.props.formatters, prevProps.formatters ) ) {
-				// eslint-disable-next-line no-console
-				console.error( 'Formatters passed via `formatters` prop will only be registered once. Formatters can be enabled/disabled via the `formattingControls` prop.' );
-			}
+		if ( format === 'string' ) {
+			return create( {
+				html: value,
+				multilineTag: multiline,
+			} );
 		}
+
+		// Guard for blocks passing `null` in onSplit callbacks. May be removed
+		// if onSplit is revised to not pass a `null` value.
+		if ( value === null ) {
+			return create();
+		}
+
+		return value;
 	}
 
-	/**
-	 * Returns true if the field is currently empty, or false otherwise.
-	 *
-	 * @param {Array} value Content to check.
-	 *
-	 * @return {boolean} Whether field is empty.
-	 */
-	isEmpty( value = this.props.value ) {
-		return ! value || ! value.length;
-	}
+	valueToFormat( { formats, text } ) {
+		const { format, multiline } = this.props;
 
-	isFormatActive( format ) {
-		return this.state.formats[ format ] && this.state.formats[ format ].isActive;
-	}
+		// Handle deprecated `children` and `node` sources.
+		if ( this.usedDeprecatedChildrenSource ) {
+			return children.fromDOM( unstableToDom( { formats, text }, multiline ).body.childNodes );
+		}
 
-	removeFormat( format ) {
-		this.editor.focus();
-		this.editor.formatter.remove( format );
-		// Formatter does not trigger a change event like `execCommand` does.
-		this.onCreateUndoLevel();
-	}
+		if ( format === 'string' ) {
+			return toHTMLString( { formats, text }, multiline );
+		}
 
-	applyFormat( format, args, node ) {
-		this.editor.focus();
-		this.editor.formatter.apply( format, args, node );
-		// Formatter does not trigger a change event like `execCommand` does.
-		this.onCreateUndoLevel();
-	}
-
-	changeFormats( formats ) {
-		forEach( formats, ( formatValue, format ) => {
-			if ( format === 'link' ) {
-				if ( !! formatValue ) {
-					if ( formatValue.isAdding ) {
-						return;
-					}
-
-					const { value: href, target } = formatValue;
-
-					if ( ! this.isFormatActive( 'link' ) && this.editor.selection.isCollapsed() ) {
-						// When no link or text is selected, insert a link with the URL as its text
-						const anchorHTML = this.editor.dom.createHTML(
-							'a',
-							{ href, target },
-							this.editor.dom.encode( href )
-						);
-						this.editor.insertContent( anchorHTML );
-					} else {
-						// Use built-in TinyMCE command turn the selection into a link. This takes
-						// care of deleting any existing links within the selection
-						this.editor.execCommand( 'mceInsertLink', false, { href, target } );
-					}
-				} else {
-					this.editor.execCommand( 'Unlink' );
-				}
-			} else {
-				const isActive = this.isFormatActive( format );
-				if ( isActive && ! formatValue ) {
-					this.removeFormat( format );
-				} else if ( ! isActive && formatValue ) {
-					this.applyFormat( format );
-				}
-			}
-		} );
-
-		this.setState( ( state ) => ( {
-			formats: merge( {}, state.formats, formats ),
-		} ) );
+		return { formats, text };
 	}
 
 	render() {
@@ -786,9 +848,7 @@ export class RichText extends Component {
 			multiline: MultilineTag,
 			keepPlaceholderOnFocus = false,
 			isSelected,
-			formatters,
 			autocompleters,
-			format,
 		} = this.props;
 
 		const ariaProps = pickAriaProps( this.props );
@@ -799,14 +859,14 @@ export class RichText extends Component {
 		const key = [ 'editor', Tagname ].join();
 		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && this.isEmpty();
 		const classes = classnames( wrapperClassName, 'editor-rich-text' );
+		const record = this.getRecord();
 
-		const formatToolbar = (
+		const formatToolbar = this.editor && (
 			<FormatToolbar
-				selectedNodeId={ this.state.selectedNodeId }
-				formats={ this.state.formats }
-				onChange={ this.changeFormats }
+				record={ record }
+				onChange={ this.onChange }
 				enabledControls={ formattingControls }
-				customControls={ formatters }
+				editor={ this.editor }
 			/>
 		);
 
@@ -831,7 +891,13 @@ export class RichText extends Component {
 						containerRef={ this.containerRef }
 					/>
 				}
-				<Autocomplete onReplace={ this.props.onReplace } completers={ autocompleters }>
+
+				<Autocomplete
+					onReplace={ this.props.onReplace }
+					completers={ autocompleters }
+					record={ record }
+					onChange={ this.onChange }
+				>
 					{ ( { isExpanded, listBoxId, activeId } ) => (
 						<Fragment>
 							<TinyMCE
@@ -840,7 +906,6 @@ export class RichText extends Component {
 								onSetup={ this.onSetup }
 								style={ style }
 								defaultValue={ value }
-								format={ format }
 								isPlaceholderVisible={ isPlaceholderVisible }
 								aria-label={ placeholder }
 								aria-autocomplete="list"
@@ -850,6 +915,10 @@ export class RichText extends Component {
 								{ ...ariaProps }
 								className={ className }
 								key={ key }
+								onPaste={ this.onPaste }
+								onInput={ this.onInput }
+								multilineTag={ MultilineTag }
+								setRef={ this.setRef }
 							/>
 							{ isPlaceholderVisible &&
 								<Tagname
@@ -868,16 +937,9 @@ export class RichText extends Component {
 	}
 }
 
-RichText.contextTypes = {
-	onUndo: noop,
-	onRedo: noop,
-	onCreateUndoLevel: noop,
-};
-
 RichText.defaultProps = {
-	formattingControls: DEFAULT_FORMATS,
-	formatters: [],
-	format: 'children',
+	formattingControls: FORMATTING_CONTROLS.map( ( { format } ) => format ),
+	format: 'rich-text',
 };
 
 const RichTextContainer = compose( [
@@ -909,32 +971,33 @@ const RichTextContainer = compose( [
 			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
 		};
 	} ),
+	withDispatch( ( dispatch ) => {
+		const {
+			createUndoLevel,
+			redo,
+			undo,
+		} = dispatch( 'core/editor' );
+
+		return {
+			onCreateUndoLevel: createUndoLevel,
+			onRedo: redo,
+			onUndo: undo,
+		};
+	} ),
 	withSafeTimeout,
 ] )( RichText );
 
-RichTextContainer.Content = ( { value, format, tagName: Tag, ...props } ) => {
-	let content;
-	switch ( format ) {
-		case 'string':
-			content = <RawHTML>{ value }</RawHTML>;
-			break;
+RichTextContainer.Content = ( { value, format, tagName: Tag, multiline, ...props } ) => {
+	let html = value;
 
-		case 'element':
-			// NOTE: In removing this, ensure to remove also every related
-			// function from `format.js`, including the `dom-react` dependency.
-			deprecated( 'RichText `element` format', {
-				version: '3.5',
-				plugin: 'Gutenberg',
-				alternative: 'the compatible `children` format',
-			} );
-
-			content = value;
-			break;
-
-		case 'children':
-			content = <RawHTML>{ children.toHTML( value ) }</RawHTML>;
-			break;
+	// Handle deprecated `children` and `node` sources.
+	if ( Array.isArray( value ) ) {
+		html = children.toHTML( value );
+	} else if ( format !== 'string' ) {
+		html = toHTMLString( value, multiline );
 	}
+
+	const content = <RawHTML>{ html }</RawHTML>;
 
 	if ( Tag ) {
 		return <Tag { ...props }>{ content }</Tag>;
@@ -943,8 +1006,21 @@ RichTextContainer.Content = ( { value, format, tagName: Tag, ...props } ) => {
 	return content;
 };
 
+RichTextContainer.isEmpty = ( value ) => {
+	// Handle deprecated `children` and `node` sources.
+	if ( Array.isArray( value ) ) {
+		return ! value || value.length === 0;
+	}
+
+	if ( typeof value === 'string' ) {
+		return value.length === 0;
+	}
+
+	return isEmpty( value );
+};
+
 RichTextContainer.Content.defaultProps = {
-	format: 'children',
+	format: 'rich-text',
 };
 
 export default RichTextContainer;

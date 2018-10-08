@@ -10,25 +10,23 @@ and uses render props to render the button and the content.
 ```jsx
 import { Button, Dropdown } from '@wordpress/components';
 
-function MyDropdownMenu() {
-	return (
-		<Dropdown
-			className="my-container-class-name"
-			contentClassName="my-popover-content-classname"
-			position="bottom right"
-			renderToggle={ ( { isOpen, onToggle } ) => (
-				<Button isPrimary onClick={ onToggle } aria-expanded={ isOpen }>
-					Toggle Popover!
-				</Button>
-			) }
-			renderContent={ () => (
-				<div>
-					This is the content of the popover.
-				</div>
-			) }
-		/>
-	);
-}
+const MyDropdown = () => (
+	<Dropdown
+		className="my-container-class-name"
+		contentClassName="my-popover-content-classname"
+		position="bottom right"
+		renderToggle={ ( { isOpen, onToggle } ) => (
+			<Button isPrimary onClick={ onToggle } aria-expanded={ isOpen }>
+				Toggle Popover!
+			</Button>
+		) }
+		renderContent={ () => (
+			<div>
+				This is the content of the popover.
+			</div>
+		) }
+	/>
+);
 ```
 
 ## Props

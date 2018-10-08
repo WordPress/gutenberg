@@ -1,0 +1,66 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/heading",
+        "isValid": true,
+        "attributes": {
+            "content": {
+                "formats": [
+                    null,
+                    null,
+                    null,
+                    null,
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ],
+                "text": "The Inserter Tool"
+            },
+            "level": 2
+        },
+        "innerBlocks": [],
+        "originalContent": "<h2>The <em>Inserter</em> Tool</h2>"
+    }
+]

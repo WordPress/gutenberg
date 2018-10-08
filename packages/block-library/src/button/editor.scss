@@ -1,0 +1,71 @@
+.editor-block-list__block[data-type="core/button"] {
+	&[data-align="center"] {
+		text-align: center;
+	}
+
+	&[data-align="right"] {
+		/*!rtl:ignore*/
+		text-align: right;
+	}
+}
+
+.wp-block-button {
+	display: inline-block;
+	margin-bottom: 0;
+	position: relative;
+
+	.editor-rich-text__tinymce {
+		cursor: text;
+		line-height: 1;
+	}
+
+	&:not(.has-text-color) .editor-rich-text__tinymce[data-is-placeholder-visible="true"] + .editor-rich-text__tinymce {
+		color: $white;
+		opacity: 0.8;
+	}
+}
+
+.block-library-button__inline-link {
+	background: $white;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	line-height: $default-line-height;
+
+	// the width of input box plus two icon buttons plus a padding
+	$blocks-button__link-input-width: 300px + 2 * $icon-button-size + 8px;
+	width: $blocks-button__link-input-width;
+
+	.editor-url-input {
+		width: auto;
+	}
+
+	.editor-url-input__suggestions {
+		width: $blocks-button__link-input-width - $icon-button-size - $icon-button-size;
+		z-index: z-index(".block-library-button__inline-link .editor-url-input__suggestions");
+	}
+
+	> .dashicon {
+		width: $icon-button-size;
+	}
+
+	.dashicon {
+		color: $dark-gray-100;
+	}
+
+	.editor-url-input input[type="text"]::placeholder {
+		color: $dark-gray-100;
+	}
+
+	[data-align="center"] & {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	[data-align="right"] & {
+		margin-left: auto;
+		margin-right: 0;
+	}
+}

@@ -7,11 +7,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { withContext } from '@wordpress/components';
 import { withViewportMatch } from '@wordpress/viewport';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { synchronizeBlocksWithTemplate } from '@wordpress/blocks';
+import { synchronizeBlocksWithTemplate, withBlockContentContext } from '@wordpress/blocks';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { compose } from '@wordpress/compose';
 
@@ -28,18 +27,33 @@ class InnerBlocks extends Component {
 		this.updateNestedSettings();
 	}
 
+	getTemplateLock() {
+		const {
+			templateLock,
+			parentLock,
+		} = this.props;
+		return templateLock === undefined ? parentLock : templateLock;
+	}
+
 	componentDidMount() {
-		this.synchronizeBlocksWithTemplate();
+		const { innerBlocks } = this.props.block;
+		// only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists
+		if ( innerBlocks.length === 0 || this.getTemplateLock() === 'all' ) {
+			return 	this.synchronizeBlocksWithTemplate();
+		}
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { template } = this.props;
+		const { template, block } = this.props;
+		const { innerBlocks } = block;
 
 		this.updateNestedSettings();
-
-		const hasTemplateChanged = ! isEqual( template, prevProps.template );
-		if ( hasTemplateChanged ) {
-			this.synchronizeBlocksWithTemplate();
+		// only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists
+		if ( innerBlocks.length === 0 || this.getTemplateLock() === 'all' ) {
+			const hasTemplateChanged = ! isEqual( template, prevProps.template );
+			if ( hasTemplateChanged ) {
+				this.synchronizeBlocksWithTemplate();
+			}
 		}
 	}
 
@@ -63,14 +77,12 @@ class InnerBlocks extends Component {
 		const {
 			blockListSettings,
 			allowedBlocks,
-			templateLock,
-			parentLock,
 			updateNestedSettings,
 		} = this.props;
 
 		const newSettings = {
 			allowedBlocks,
-			templateLock: templateLock === undefined ? parentLock : templateLock,
+			templateLock: this.getTemplateLock(),
 		};
 
 		if ( ! isShallowEqual( blockListSettings, newSettings ) ) {
@@ -149,10 +161,8 @@ InnerBlocks = compose( [
 	} ),
 ] )( InnerBlocks );
 
-InnerBlocks.Content = ( { BlockContent } ) => {
-	return <BlockContent />;
-};
-
-InnerBlocks.Content = withContext( 'BlockContent' )()( InnerBlocks.Content );
+InnerBlocks.Content = withBlockContentContext(
+	( { BlockContent } ) => <BlockContent />
+);
 
 export default InnerBlocks;

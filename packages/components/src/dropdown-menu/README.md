@@ -9,36 +9,34 @@ Render a Dropdown Menu with a set of controls:
 ```jsx
 import { DropdownMenu } from '@wordpress/components';
 
-function DirectionMenu() {
-	return (
-		<DropdownMenu
-			icon="move"
-			label="Select a direction"
-			controls={ [
-				{
-					title: 'Up',
-					icon: 'arrow-up-alt',
-					onClick: () => console.log( 'up' )
-				},
-				{
-					title: 'Right',
-					icon: 'arrow-right-alt',
-					onClick: () => console.log( 'right' )
-				},
-				{
-					title: 'Down',
-					icon: 'arrow-down-alt',
-					onClick: () => console.log( 'down' )
-				},
-				{
-					title: 'Left',
-					icon: 'arrow-left-alt',
-					onClick: () => console.log( 'left' )
-				},
-			] }
-		/>
-	);
-}
+const MyDropdownMenu = () => (
+	<DropdownMenu
+		icon="move"
+		label="Select a direction"
+		controls={ [
+			{
+				title: 'Up',
+				icon: 'arrow-up-alt',
+				onClick: () => console.log( 'up' )
+			},
+			{
+				title: 'Right',
+				icon: 'arrow-right-alt',
+				onClick: () => console.log( 'right' )
+			},
+			{
+				title: 'Down',
+				icon: 'arrow-down-alt',
+				onClick: () => console.log( 'down' )
+			},
+			{
+				title: 'Left',
+				icon: 'arrow-left-alt',
+				onClick: () => console.log( 'left' )
+			},
+		] }
+	/>
+);
 ```
 
 ## Props
@@ -66,7 +64,7 @@ A human-readable label to present as accessibility text on the focused collapsed
 
 An array of objects describing the options to be shown in the expanded menu.
 
-Each object should include an `icon` [Dashicon](https://developer.wordpress.org/resource/dashicons/) slug string, a human-readable `title` string, and an `onClick` function callback to invoke when the option is selected.
+Each object should include an `icon` [Dashicon](https://developer.wordpress.org/resource/dashicons/) slug string, a human-readable `title` string, `isDisabled` boolean flag and an `onClick` function callback to invoke when the option is selected.
 
 - Type: `Array`
 - Required: Yes

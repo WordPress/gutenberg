@@ -1,30 +1,37 @@
 .edit-post-header {
 	height: $header-height;
-	padding: $item-spacing 2px;
-	border-bottom: 1px solid $light-gray-500;
+	padding: $grid-size-small 2px;
+	border-bottom: $border-width solid $light-gray-500;
 	background: $white;
 	display: flex;
 	flex-direction: row;
 	align-items: stretch;
 	justify-content: space-between;
-	z-index: z-index( '.edit-post-header' );
+	z-index: z-index(".edit-post-header");
 	left: 0;
 	right: 0;
 
-	// mobile edgecase for toolbar
+	// Stick the toolbar to the top, because the admin bar is not fixed on mobile.
 	top: 0;
 	position: sticky;
 
-	// on mobile the main content area has to scroll
-	// otherwise you can invoke the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻
+	// On mobile the main content area has to scroll, otherwise you can invoke the overscroll bounce on the non-scrolling container.
 	@include break-small {
 		position: fixed;
-		padding: $item-spacing;
+		padding: $grid-size;
 		top: $admin-bar-height-big;
+
+		body.is-fullscreen-mode & {
+			top: 0;
+		}
 	}
 
 	@include break-medium() {
 		top: $admin-bar-height;
+
+		body.is-fullscreen-mode & {
+			top: 0;
+		}
 	}
 
 	.editor-post-switch-to-draft + .editor-post-preview {
@@ -34,9 +41,27 @@
 			display: inline-flex;
 		}
 	}
+
+	// Some browsers, most notably IE11, honor an older version of the flexbox spec
+	// which takes absolutely positioned items into account when calculating `space-between`.
+	// https://www.w3.org/TR/2012/WD-css3-flexbox-20120612/#abspos-flex-items
+	//
+	// This difference is causing our header layout to break when focused in IE11.
+	// Our focused region styles use an absolutely positioned :after pseudo element to draw an outline,
+	// and IE11 is adding space between it and our last real child, shifting righthand UI elements
+	// to the left. For a workaround, we change the flex order to move the undesired spacing to the middle
+	// where it is no longer noticeable.
+	> .edit-post-header__settings {
+		order: 1;
+
+		// Restore default order for all other browsers
+		@supports (position: sticky) {
+			order: initial;
+		}
+	}
 }
 
-@include editor-left('.edit-post-header');
+@include editor-left(".edit-post-header");
 
 .edit-post-header__settings {
 	display: inline-flex;
@@ -44,17 +69,15 @@
 }
 
 .edit-post-header .components-button {
-	border-radius: $button-style__radius-roundrect;
-
-	// header toggle buttons
+	// Header toggle buttons.
 	&.is-toggled {
 		color: $white;
 	}
 
-	// put the gray background on a separate layer, so as to match the size of the publish button (34px)
-	&.is-toggled:before {
+	// Put the gray background on a separate layer, so as to match the size of the publish button (34px).
+	&.is-toggled::before {
 		content: "";
-		border-radius: $button-style__radius-roundrect;
+		border-radius: $radius-round-rectangle;
 		position: absolute;
 		z-index: -1;
 		background: $dark-gray-500;
@@ -66,7 +89,7 @@
 
 	&.is-toggled:hover,
 	&.is-toggled:focus {
-		box-shadow: 0 0 0 1px $dark-gray-500, inset 0 0 0 1px $white;
+		box-shadow: 0 0 0 $border-width $dark-gray-500, inset 0 0 0 $border-width $white;
 		color: $white;
 		background: $dark-gray-500;
 	}

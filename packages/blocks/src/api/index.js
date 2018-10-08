@@ -32,15 +32,14 @@ export {
 	getUnknownTypeHandlerName,
 	setDefaultBlockName,
 	getDefaultBlockName,
-	getDefaultBlockForPostFormat,
 	getBlockType,
 	getBlockTypes,
 	getBlockSupport,
 	hasBlockSupport,
 	isReusableBlock,
-	isSharedBlock,
 	getChildBlockNames,
 	hasChildBlocks,
+	hasChildBlocksWithInserterSupport,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 	registerBlockStyle,
 } from './registration';

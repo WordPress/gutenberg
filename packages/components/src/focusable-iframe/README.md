@@ -9,14 +9,12 @@ Use as you would a standard `iframe`. You may pass `onFocus` directly as the cal
 ```jsx
 import { FocusableIframe } from '@wordpress/components';
 
-function MyIframe() {
-	return (
-		<FocusableIframe
-			src="/"
-			onFocus={ () => console.log( 'iframe is focused' ) }
-		/>
-	);
-}
+const MyFocusableIframe = () => (
+	<FocusableIframe
+		src="/my-iframe-url"
+		onFocus={ () => console.log( 'iframe is focused' ) }
+	/>
+);
 ```
 
 ## Props

@@ -13,6 +13,7 @@ export default function MenuItemsChoice( {
 		return (
 			<MenuItem
 				key={ item.value }
+				role="menuitemradio"
 				icon={ isSelected && 'yes' }
 				isSelected={ isSelected }
 				shortcut={ item.shortcut }

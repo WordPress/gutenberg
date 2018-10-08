@@ -2,8 +2,8 @@
 	position: relative;
 	pointer-events: none;
 
-	&:after {
-		content: '';
+	&::after {
+		content: "";
 		position: absolute;
 		top: 0;
 		right: 0;

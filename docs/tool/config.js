@@ -10,14 +10,13 @@ const root = path.resolve( __dirname, '../../' );
 const npmReadyPackages = glob( 'packages/*/package.json' )
 	.map( ( fileName ) => fileName.split( '/' )[ 1 ] );
 
-// These are internal-only packages (for now), not yet published as standalone
-// node modules.
+// These are internal-only packages (for now), not yet published as standalone node modules.
 const gutenbergPackages = [
-	'core-blocks',
 	'edit-post',
 ];
 
 module.exports = {
+	componentPaths: glob( 'packages/components/src/*/**/README.md' ),
 	dataNamespaces: {
 		core: {
 			title: 'WordPress Core Data',

@@ -1,12 +1,23 @@
 .components-base-control {
-	margin: 0 0 1.5em;
-}
+	font-family: $default-font;
+	font-size: $default-font-size;
 
-.components-base-control__label {
-	display: block;
-	margin-bottom: 5px;
-}
+	.components-base-control__field {
+		margin-bottom: $grid-size;
 
-.components-base-control__help {
-	font-style: italic;
+		.components-panel__row & {
+			margin-bottom: inherit;
+		}
+	}
+
+	.components-base-control__label {
+		display: block;
+		margin-bottom: $grid-size-small;
+	}
+
+	.components-base-control__help {
+		margin-top: -$grid-size;
+		font-style: italic;
+		margin-bottom: 0;
+	}
 }

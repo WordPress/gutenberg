@@ -204,8 +204,7 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 		{
 			attributes: {
 				title: {
-					type: 'array',
-					source: 'children',
+					source: 'rich-text',
 					selector: 'p',
 				},
 			},
@@ -245,8 +244,7 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 		{
 			attributes: {
 				title: {
-					type: 'array',
-					source: 'children',
+					source: 'rich-text',
 					selector: 'p',
 				},
 			},
@@ -274,3 +272,5 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 {% end %}
 
 In the example above we updated the block to use an inner paragraph block with a title instead of a title attribute.
+
+*Above are example cases of block deprecation. For more, real-world examples, check for deprecations in the [core block library](https://github.com/WordPress/gutenberg/tree/master/packages/block-library/src). Core blocks have been updated across releases and contain simple and complex deprecations.*

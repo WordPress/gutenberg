@@ -1,7 +1,7 @@
 {
 	"rootDir": "../../",
 	"collectCoverageFrom": [
-		"(edit-post|core-blocks)/**/*.js",
+		"(edit-post|block-library)/**/*.js",
 		"packages/**/*.js"
 	],
 	"coveragePathIgnorePatterns": [
@@ -9,10 +9,11 @@
 		"<rootDir>/.*/build/",
 		"<rootDir>/.*/build-module/",
 		"<rootDir>/packages/.*/benchmark/",
-		"<rootDir>/packages/.*/test/"
+		"<rootDir>/packages/.*/test/",
+		"<rootDir>/gutenberg-mobile/"
 	],
 	"moduleNameMapper": {
-		"@wordpress\\/(components|edit-post|core-blocks)$": "$1",
+		"@wordpress\\/(components|edit-post|block-library)$": "$1",
 		"@wordpress\\/(block-serialization-spec-parser|is-shallow-equal)$": "packages/$1",
 		"@wordpress\\/([a-z0-9-]+)$": "packages/$1/src"
 	},
@@ -20,8 +21,14 @@
 	"setupFiles": [
 		"core-js/fn/symbol/async-iterator"
 	],
+	"testURL": "http://localhost",
 	"testPathIgnorePatterns": [
 		"/node_modules/",
-		"/test/e2e"
+		"/test/e2e",
+		"<rootDir>/.*/build/",
+		"<rootDir>/.*/build-module/"
+	],
+	"modulePathIgnorePatterns": [
+		"<rootDir>/gutenberg-mobile/"
 	]
 }

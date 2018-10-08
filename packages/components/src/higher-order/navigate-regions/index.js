@@ -67,7 +67,9 @@ export default createHigherOrderComponent(
 							bindGlobal
 							shortcuts={ {
 								'ctrl+`': this.focusNextRegion,
+								'shift+alt+n': this.focusNextRegion,
 								'ctrl+shift+`': this.focusPreviousRegion,
+								'shift+alt+p': this.focusPreviousRegion,
 							} }
 						/>
 						<WrappedComponent { ...this.props } />

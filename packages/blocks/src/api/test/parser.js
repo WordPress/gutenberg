@@ -5,6 +5,11 @@ import { attr } from 'hpq';
 import deepFreeze from 'deep-freeze';
 
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+/**
  * Internal dependencies
  */
 import {
@@ -16,6 +21,8 @@ import {
 	default as parsePegjs,
 	parseWithAttributeSchema,
 	toBooleanAttributeMatcher,
+	isOfType,
+	isOfTypes,
 } from '../parser';
 import {
 	registerBlockType,
@@ -25,6 +32,8 @@ import {
 } from '../registration';
 import { createBlock } from '../factory';
 import serialize from '../serializer';
+
+jest.mock( '@wordpress/deprecated', () => jest.fn() );
 
 describe( 'block parser', () => {
 	const defaultBlockSettings = {
@@ -133,6 +142,46 @@ describe( 'block parser', () => {
 
 			expect( asType( obj, 'object' ) ).toBe( obj );
 			expect( asType( {}, 'object' ) ).toEqual( {} );
+		} );
+	} );
+
+	describe( 'isOfType()', () => {
+		it( 'gracefully handles unhandled type', () => {
+			expect( isOfType( 5, '__UNHANDLED__' ) ).toBe( true );
+		} );
+
+		it( 'returns expected result of type', () => {
+			expect( isOfType( '5', 'string' ) ).toBe( true );
+			expect( isOfType( 5, 'string' ) ).toBe( false );
+
+			expect( isOfType( 5, 'integer' ) ).toBe( true );
+			expect( isOfType( '5', 'integer' ) ).toBe( false );
+
+			expect( isOfType( 5, 'number' ) ).toBe( true );
+			expect( isOfType( '5', 'number' ) ).toBe( false );
+
+			expect( isOfType( true, 'boolean' ) ).toBe( true );
+			expect( isOfType( false, 'boolean' ) ).toBe( true );
+			expect( isOfType( '5', 'boolean' ) ).toBe( false );
+			expect( isOfType( 0, 'boolean' ) ).toBe( false );
+
+			expect( isOfType( null, 'null' ) ).toBe( true );
+			expect( isOfType( 0, 'null' ) ).toBe( false );
+
+			expect( isOfType( [], 'array' ) ).toBe( true );
+
+			expect( isOfType( {}, 'object' ) ).toBe( true );
+			expect( isOfType( null, 'object' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isOfTypes', () => {
+		it( 'returns false if value is not one of types', () => {
+			expect( isOfTypes( null, [ 'string' ] ) ).toBe( false );
+		} );
+
+		it( 'returns true if value is one of types', () => {
+			expect( isOfTypes( null, [ 'string', 'null' ] ) ).toBe( true );
 		} );
 	} );
 
@@ -246,38 +295,61 @@ describe( 'block parser', () => {
 	} );
 
 	describe( 'getBlockAttributes()', () => {
-		it( 'should merge attributes with the parsed and default attributes', () => {
+		it( 'should parse as coerced value (deprecated)', () => {
+			// TODO: When removing this deprecation, ensure to complement with
+			// enhancement to the intended rejection of a numeric type on an
+			// ambiguous string source.
 			const blockType = {
 				attributes: {
-					content: {
-						type: 'string',
-						source: 'text',
-						selector: 'div',
-					},
 					number: {
 						type: 'number',
 						source: 'attribute',
 						attribute: 'data-number',
 						selector: 'div',
 					},
+				},
+			};
+
+			const innerHTML = '<div data-number="10">Ribs</div>';
+
+			expect( getBlockAttributes( blockType, innerHTML, {} ) ).toEqual( {
+				number: 10,
+			} );
+			expect( deprecated ).toHaveBeenCalled();
+		} );
+
+		it( 'should merge attributes with the parsed and default attributes', () => {
+			const blockType = {
+				attributes: {
+					content: {
+						source: 'text',
+						selector: 'div',
+					},
 					align: {
-						type: 'string',
+						type: [ 'string', 'null' ],
 					},
 					topic: {
 						type: 'string',
 						default: 'none',
 					},
+					undefAmbiguousStringWithDefault: {
+						type: 'string',
+						source: 'attribute',
+						selector: 'div',
+						attribute: 'data-foo',
+						default: 'ok',
+					},
 				},
 			};
 
 			const innerHTML = '<div data-number="10">Ribs</div>';
-			const attrs = { align: 'left', invalid: true };
+			const attrs = { align: null, invalid: true };
 
 			expect( getBlockAttributes( blockType, innerHTML, attrs ) ).toEqual( {
 				content: 'Ribs',
-				number: 10,
-				align: 'left',
+				align: null,
 				topic: 'none',
+				undefAmbiguousStringWithDefault: 'ok',
 			} );
 		} );
 	} );

@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+/**
  * Internal dependencies
  */
 import * as children from './children';
@@ -18,6 +23,25 @@ const { TEXT_NODE, ELEMENT_NODE } = window.Node;
  *
  * @typedef {string|Object} WPBlockNode
  */
+
+/**
+ * Given a single node and a node type (e.g. `'br'`), returns true if the node
+ * corresponds to that type, false otherwise.
+ *
+ * @param {WPBlockNode} node Block node to test
+ * @param {string} type      Node to type to test against.
+ *
+ * @return {boolean} Whether node is of intended type.
+ */
+function isNodeOfType( node, type ) {
+	deprecated( 'wp.blocks.node.isNodeOfType', {
+		alternative: 'node.type',
+		plugin: 'Gutenberg',
+		version: '4.4',
+	} );
+
+	return node && node.type === type;
+}
 
 /**
  * Given an object implementing the NamedNodeMap interface, returns a plain
@@ -50,6 +74,12 @@ export function getNamedNodeMapAsObject( nodeMap ) {
  * @return {WPBlockNode} Block node equivalent to DOM node.
  */
 export function fromDOM( domNode ) {
+	deprecated( 'wp.blocks.node.fromDOM', {
+		alternative: 'wp.richText.create',
+		plugin: 'Gutenberg',
+		version: '4.4',
+	} );
+
 	if ( domNode.nodeType === TEXT_NODE ) {
 		return domNode.nodeValue;
 	}
@@ -78,6 +108,12 @@ export function fromDOM( domNode ) {
  * @return {string} String HTML representation of block node.
  */
 export function toHTML( node ) {
+	deprecated( 'wp.blocks.node.toHTML', {
+		alternative: 'wp.richText.toHTMLString',
+		plugin: 'Gutenberg',
+		version: '4.4',
+	} );
+
 	return children.toHTML( [ node ] );
 }
 
@@ -90,6 +126,12 @@ export function toHTML( node ) {
  * @return {Function} hpq matcher.
  */
 export function matcher( selector ) {
+	deprecated( 'node source', {
+		alternative: 'rich-text source',
+		plugin: 'Gutenberg',
+		version: '4.4',
+	} );
+
 	return ( domNode ) => {
 		let match = domNode;
 
@@ -106,6 +148,7 @@ export function matcher( selector ) {
 }
 
 export default {
+	isNodeOfType,
 	fromDOM,
 	toHTML,
 	matcher,

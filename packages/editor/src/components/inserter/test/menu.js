@@ -8,7 +8,7 @@ import ReactDOM from 'react-dom';
 /**
  * Internal dependencies
  */
-import { InserterMenu, searchItems } from '../menu';
+import { InserterMenu, searchItems, normalizeTerm } from '../menu';
 
 const textItem = {
 	id: 'core/text-block',
@@ -335,6 +335,32 @@ describe( 'searchItems', () => {
 	it( 'should search items using the keywords', () => {
 		expect( searchItems( items, 'GOOGL' ) ).toEqual(
 			[ youtubeItem ]
+		);
+	} );
+
+	it( 'should ignore a leading slash on a search term', () => {
+		expect( searchItems( items, '/GOOGL' ) ).toEqual(
+			[ youtubeItem ]
+		);
+	} );
+} );
+
+describe( 'normalizeTerm', () => {
+	it( 'should remove diacritics', () => {
+		expect( normalizeTerm( 'média' ) ).toEqual(
+			'media'
+		);
+	} );
+
+	it( 'should trim whitespace', () => {
+		expect( normalizeTerm( '  média  ' ) ).toEqual(
+			'media'
+		);
+	} );
+
+	it( 'should convert to lowercase', () => {
+		expect( normalizeTerm( '  Média  ' ) ).toEqual(
+			'media'
 		);
 	} );
 } );

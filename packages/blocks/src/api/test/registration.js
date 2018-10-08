@@ -87,7 +87,7 @@ describe( 'blocks', () => {
 			expect( block ).toEqual( {
 				name: 'my-plugin/fancy-block-4',
 				icon: {
-					src: 'block-default',
+					src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
 				},
 				save: noop,
 				category: 'common',
@@ -172,7 +172,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: 'block-default',
+					src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
 				},
 				attributes: {
 					ok: {
@@ -294,38 +294,6 @@ describe( 'blocks', () => {
 			} );
 		} );
 
-		it( 'should warn if the icon background and foreground are not readable', () => {
-			const blockType = {
-				save: noop,
-				category: 'common',
-				title: 'block title',
-				icon: {
-					background: '#f00',
-					foreground: '#d00',
-					src: 'block-default',
-				},
-			};
-			registerBlockType( 'core/test-block-icon-unreadable', blockType );
-			expect( console ).toHaveWarned();
-		} );
-
-		it( 'should  not warn if the icon background and foreground are readable', () => {
-			const blockType = {
-				save: noop,
-				category: 'common',
-				title: 'block title',
-				icon: {
-					background: '#f00',
-					foreground: '#000',
-					src: 'block-default',
-				},
-			};
-			registerBlockType( 'core/test-block-icon-readable', blockType );
-			expect( getBlockType( 'core/test-block-icon-readable' ).name ).toEqual(
-				'core/test-block-icon-readable'
-			);
-		} );
-
 		it( 'should store a copy of block type', () => {
 			const blockType = { settingName: 'settingValue', save: noop, category: 'common', title: 'block title' };
 			registerBlockType( 'core/test-block-with-settings', blockType );
@@ -337,7 +305,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: 'block-default',
+					src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
 				},
 			} );
 		} );
@@ -377,7 +345,7 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: {
-						src: 'block-default',
+						src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
 					},
 				},
 			] );
@@ -389,7 +357,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: 'block-default',
+					src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
 				},
 			} );
 			expect( getBlockTypes() ).toEqual( [] );
@@ -433,7 +401,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: 'block-default',
+					src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
 				},
 			} );
 		} );
@@ -448,7 +416,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: 'block-default',
+					src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
 				},
 			} );
 		} );
@@ -470,7 +438,7 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: {
-						src: 'block-default',
+						src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
 					},
 				},
 				{
@@ -480,7 +448,7 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: {
-						src: 'block-default',
+						src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
 					},
 				},
 			] );

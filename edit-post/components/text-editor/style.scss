@@ -1,41 +1,44 @@
 .edit-post-text-editor__body {
-	padding-top: 40px;
+	padding-top: $grid-size * 5;
 
 	@include break-small() {
-		padding-top: 40px + $admin-bar-height-big;
+		padding-top: ($grid-size * 5) + $admin-bar-height-big;
+
+		body.is-fullscreen-mode & {
+			padding-top: $grid-size * 5;
+		}
 	}
 
 	@include break-medium() {
-		padding-top: 40px + $admin-bar-height;
+		padding-top: $grid-size * 5;
+
+		body.is-fullscreen-mode & {
+			padding-top: $grid-size * 5;
+		}
 	}
 }
 
-// Use padding to center text in the textarea, this allows you to click anywhere to focus it
 .edit-post-text-editor {
-	padding-left: 20px;
-	padding-right: 20px;
+	margin-left: $grid-size-large;
+	margin-right: $grid-size-large;
 
-	@include break-large() {
-		padding-left: calc( 50% - #{ $content-width / 2 } );
-		padding-right: calc( 50% - #{ $content-width / 2 } );
-	}
-
-	.edit-post-post-text-editor__toolbar {
-		width: 100%;
+	@include break-small() {
 		max-width: $content-width;
-		margin: 0 auto;
+		margin-left: auto;
+		margin-right: auto;
 	}
 
 	// Always show outlines in code editor
 	.editor-post-title__block {
 		textarea {
-			border: 1px solid $light-gray-500;
+			border: $border-width solid $light-gray-500;
 			margin-bottom: 4px;
+			padding: $block-padding;
 		}
 
 		textarea:hover,
 		&.is-selected textarea {
-			box-shadow: 0 0 0 1px $light-gray-500;
+			box-shadow: 0 0 0 $border-width $light-gray-500;
 		}
 	}
 
@@ -56,5 +59,30 @@
 		padding: $block-padding;
 		min-height: 200px;
 		line-height: 1.8;
+	}
+
+	// Make room for toolbar.
+	padding-top: $block-controls-height + $grid-size;
+
+	// Exit Code Editor toolbar.
+	.edit-post-text-editor__toolbar {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: $block-controls-height;
+		line-height: $block-controls-height;
+		padding: 0 $grid-size 0 $grid-size-large;
+		display: flex;
+
+		h2 {
+			margin: 0 auto 0 0;
+			font-size: $default-font-size;
+			color: $dark-gray-500;
+		}
+
+		.components-icon-button svg {
+			order: 1;
+		}
 	}
 }

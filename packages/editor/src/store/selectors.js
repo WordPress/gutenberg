@@ -3,6 +3,7 @@
  */
 import {
 	castArray,
+	flatMap,
 	find,
 	first,
 	get,
@@ -22,11 +23,22 @@ import createSelector from 'rememo';
 /**
  * WordPress dependencies
  */
-import { serialize, getBlockType, getBlockTypes, hasBlockSupport, hasChildBlocks, getUnknownTypeHandlerName } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
+import {
+	serialize,
+	getBlockType,
+	getBlockTypes,
+	hasBlockSupport,
+	hasChildBlocksWithInserterSupport,
+	getUnknownTypeHandlerName,
+	isUnmodifiedDefaultBlock,
+} from '@wordpress/blocks';
 import { moment } from '@wordpress/date';
-import deprecated from '@wordpress/deprecated';
 import { removep } from '@wordpress/autop';
+
+/**
+ * Dependencies
+ */
+import { PREFERENCES_DEFAULTS } from './defaults';
 
 /***
  * Module constants
@@ -100,8 +112,8 @@ export function isEditedPostDirty( state ) {
 }
 
 /**
- * Returns true if there are no unsaved values for the current edit session and if
- * the currently edited post is new (and has never been saved before).
+ * Returns true if there are no unsaved values for the current edit session and
+ * if the currently edited post is new (has never been saved before).
  *
  * @param {Object} state Global application state.
  *
@@ -350,15 +362,20 @@ export function isEditedPostSaveable( state ) {
 
 /**
  * Returns true if the edited post has content. A post has content if it has at
- * least one block or otherwise has a non-empty content property assigned.
+ * least one saveable block or otherwise has a non-empty content property
+ * assigned.
  *
  * @param {Object} state Global application state.
  *
  * @return {boolean} Whether post has content.
  */
 export function isEditedPostEmpty( state ) {
+	// While the condition of truthy content string would be sufficient for
+	// determining emptiness, testing saveable blocks length is a trivial
+	// operation by comparison. Since this function can be called frequently,
+	// optimize for the fast case where saveable blocks are non-empty.
 	return (
-		! getBlockCount( state ) &&
+		! getBlocksForSerialization( state ).length &&
 		! getEditedPostAttribute( state, 'content' )
 	);
 }
@@ -429,19 +446,26 @@ export function isEditedPostBeingScheduled( state ) {
 }
 
 /**
- * Gets the document title to be used.
+ * Returns whether the current post should be considered to have a "floating"
+ * date (i.e. that it would publish "Immediately" rather than at a set time).
  *
- * @param {Object} state Global application state.
+ * Unlike in the PHP backend, the REST API returns a full date string for posts
+ * where the 0000-00-00T00:00:00 placeholder is present in the database. To
+ * infer that a post is set to publish "Immediately" we check whether the date
+ * and modified date are the same.
  *
- * @return {string} Document title.
+ * @param  {Object}  state Editor state.
+ *
+ * @return {boolean} Whether the edited post has a floating date value.
  */
-export function getDocumentTitle( state ) {
-	let title = getEditedPostAttribute( state, 'title' );
-
-	if ( ! title || ! title.trim() ) {
-		title = isCleanNewPost( state ) ? __( 'New post' ) : __( '(Untitled)' );
+export function isEditedPostDateFloating( state ) {
+	const date = getEditedPostAttribute( state, 'date' );
+	const modified = getEditedPostAttribute( state, 'modified' );
+	const status = getEditedPostAttribute( state, 'status' );
+	if ( status === 'draft' || status === 'auto-draft' ) {
+		return date === modified;
 	}
-	return title;
+	return false;
 }
 
 /**
@@ -561,6 +585,38 @@ export const getBlocks = createSelector(
 	( state ) => [
 		state.editor.present.blockOrder,
 		state.editor.present.blocksByClientId,
+	]
+);
+
+/**
+ * Returns an array containing the clientIds of all descendants
+ * of the blocks given.
+ *
+ * @param {Object} state Global application state.
+ * @param {Array} clientIds Array of blocks to inspect.
+ *
+ * @return {Array} ids of descendants.
+ */
+export const getClientIdsOfDescendants = ( state, clientIds ) => flatMap( clientIds, ( clientId ) => {
+	const descendants = getBlockOrder( state, clientId );
+	return [ ...descendants, ...getClientIdsOfDescendants( state, descendants ) ];
+} );
+
+/**
+ * Returns an array containing the clientIds of the top-level blocks
+ * and their descendants of any depth (for nested blocks).
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Array} ids of top-level and descendant blocks.
+ */
+export const getClientIdsWithDescendants = createSelector(
+	( state ) => {
+		const topLevelIds = getBlockOrder( state );
+		return [ ...topLevelIds, ...getClientIdsOfDescendants( state, topLevelIds ) ];
+	},
+	( state ) => [
+		state.editor.present.blockOrder,
 	]
 );
 
@@ -1067,15 +1123,20 @@ export function isBlockSelected( state, clientId ) {
 /**
  * Returns true if one of the block's inner blocks is selected.
  *
- * @param {Object} state    Editor state.
- * @param {string} clientId Block client ID.
+ * @param {Object}  state    Editor state.
+ * @param {string}  clientId Block client ID.
+ * @param {boolean} deep     Perform a deep check.
  *
  * @return {boolean} Whether the block as an inner block selected
  */
-export function hasSelectedInnerBlock( state, clientId ) {
+export function hasSelectedInnerBlock( state, clientId, deep = false ) {
 	return some(
 		getBlockOrder( state, clientId ),
-		( innerClientId ) => isBlockSelected( state, innerClientId )
+		( innerClientId ) => (
+			isBlockSelected( state, innerClientId ) ||
+			isBlockMultiSelected( state, innerClientId ) ||
+			( deep && hasSelectedInnerBlock( state, innerClientId, deep ) )
+		)
 	);
 }
 
@@ -1185,9 +1246,7 @@ export function getBlockInsertionPoint( state ) {
 		index = getBlockOrder( state ).length;
 	}
 
-	// TODO: With deprecation of "UID" nomenclature in 3.5, ensure to remove
-	// the `rootUID` property here.
-	return { rootUID: rootClientId, rootClientId, layout, index };
+	return { rootClientId, layout, index };
 }
 
 /**
@@ -1339,6 +1398,31 @@ export function getSuggestedPostFormat( state ) {
 }
 
 /**
+ * Returns a set of blocks which are to be used in consideration of the post's
+ * generated save content.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {WPBlock[]} Filtered set of blocks for save.
+ */
+export function getBlocksForSerialization( state ) {
+	const blocks = getBlocks( state );
+
+	// A single unmodified default block is assumed to be equivalent to an
+	// empty post.
+	const isSingleUnmodifiedDefaultBlock = (
+		blocks.length === 1 &&
+		isUnmodifiedDefaultBlock( blocks[ 0 ] )
+	);
+
+	if ( isSingleUnmodifiedDefaultBlock ) {
+		return [];
+	}
+
+	return blocks;
+}
+
+/**
  * Returns the content of the post being edited, preferring raw string edit
  * before falling back to serialization of block state.
  *
@@ -1353,13 +1437,22 @@ export const getEditedPostContent = createSelector(
 			return edits.content;
 		}
 
-		const blocks = getBlocks( state );
+		const blocks = getBlocksForSerialization( state );
+		const content = serialize( blocks );
 
-		if ( blocks.length === 1 && blocks[ 0 ].name === getUnknownTypeHandlerName() ) {
-			return removep( serialize( blocks ) );
+		// For compatibility purposes, treat a post consisting of a single
+		// unknown block as legacy content and downgrade to a pre-block-editor
+		// removep'd content format.
+		const isSingleUnknownBlock = (
+			blocks.length === 1 &&
+			blocks[ 0 ].name === getUnknownTypeHandlerName()
+		);
+
+		if ( isSingleUnknownBlock ) {
+			return removep( content );
 		}
 
-		return serialize( blocks );
+		return content;
 	},
 	( state ) => [
 		state.editor.present.edits.content,
@@ -1462,7 +1555,7 @@ function getInsertUsage( state, id ) {
 }
 
 /**
- * Determines the items that appear in the the inserter. Includes both static
+ * Determines the items that appear in the inserter. Includes both static
  * items (e.g. a regular block type) and dynamic items (e.g. a reusable block).
  *
  * Each item object contains what's necessary to display a button in the
@@ -1546,7 +1639,7 @@ export const getInserterItems = createSelector(
 
 			let isDisabled = false;
 			if ( ! hasBlockSupport( blockType.name, 'multiple', true ) ) {
-				isDisabled = some( getBlocks( state ), { name: blockType.name } );
+				isDisabled = some( getBlocksByClientId( state, getClientIdsWithDescendants( state ) ), { name: blockType.name } );
 			}
 
 			const isContextual = isArray( blockType.parent );
@@ -1563,7 +1656,7 @@ export const getInserterItems = createSelector(
 				isDisabled,
 				utility: calculateUtility( blockType.category, count, isContextual ),
 				frecency: calculateFrecency( time, count ),
-				hasChildBlocks: hasChildBlocks( blockType.name ),
+				hasChildBlocksWithInserterSupport: hasChildBlocksWithInserterSupport( blockType.name ),
 			};
 		};
 
@@ -1752,18 +1845,6 @@ export function isPublishingPost( state ) {
 }
 
 /**
- * Returns the provisional block client ID, or null if there is no provisional
- * block.
- *
- * @param {Object} state Editor state.
- *
- * @return {?string} Provisional block client ID, if set.
- */
-export function getProvisionalBlockClientId( state ) {
-	return state.provisionalBlockClientId;
-}
-
-/**
  * Returns whether the permalink is editable or not.
  *
  * @param {Object} state Editor state.
@@ -1874,6 +1955,50 @@ export function getTokenSettings( state, name ) {
 }
 
 /**
+ * Returns whether the post is locked.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Is locked.
+ */
+export function isPostLocked( state ) {
+	return state.postLock.isLocked;
+}
+
+/**
+ * Returns whether the edition of the post has been taken over.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Is post lock takeover.
+ */
+export function isPostLockTakeover( state ) {
+	return state.postLock.isTakeover;
+}
+
+/**
+ * Returns details about the post lock user.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} A user object.
+ */
+export function getPostLockUser( state ) {
+	return state.postLock.user;
+}
+
+/**
+ * Returns the active post lock.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} The lock object.
+ */
+export function getActivePostLock( state ) {
+	return state.postLock.activePostLock;
+}
+
+/**
  * Returns whether or not the user has the unfiltered_html capability.
  *
  * @param {Object} state Editor state.
@@ -1881,165 +2006,20 @@ export function getTokenSettings( state, name ) {
  * @return {boolean} Whether the user can or can't post unfiltered HTML.
  */
 export function canUserUseUnfilteredHTML( state ) {
-	return has( getCurrentPost( state ), [ '_links', 'wp:action-unfiltered_html' ] );
+	return has( getCurrentPost( state ), [ '_links', 'wp:action-unfiltered-html' ] );
 }
 
-export function getAdjacentBlockUid( state, startUID, modifier ) {
-	deprecated( 'getAdjacentBlockUid', {
-		alternative: 'getAdjacentBlockClientId',
-		version: 'v3.5',
-		plugin: 'Gutenberg',
-	} );
-
-	return getAdjacentBlockClientId( state, startUID, modifier );
-}
-
-export function getBlockRootUID( state, uid ) {
-	deprecated( 'getBlockRootUID', {
-		alternative: 'getBlockRootClientId',
-		version: 'v3.5',
-		plugin: 'Gutenberg',
-	} );
-
-	return getBlockRootClientId( state, uid );
-}
-
-export function getSelectedBlockUID( state ) {
-	deprecated( 'getSelectedBlockUID', {
-		alternative: 'getSelectedBlockClientId',
-		version: 'v3.5',
-		plugin: 'Gutenberg',
-	} );
-
-	return getSelectedBlockClientId( state );
-}
-
-export function getBlocksByUID( state, uids ) {
-	deprecated( 'getBlocksByUID', {
-		alternative: 'getBlocksByClientId',
-		version: 'v3.5',
-		plugin: 'Gutenberg',
-	} );
-
-	return getBlocksByClientId( state, uids );
-}
-
-export function getPreviousBlockUid( state, startUID ) {
-	deprecated( 'getPreviousBlockUid', {
-		alternative: 'getPreviousBlockClientId',
-		version: 'v3.5',
-		plugin: 'Gutenberg',
-	} );
-
-	return getPreviousBlockClientId( state, startUID );
-}
-
-export function getNextBlockUid( state, startUID ) {
-	deprecated( 'getNextBlockUid', {
-		alternative: 'getNextBlockClientId',
-		version: 'v3.5',
-		plugin: 'Gutenberg',
-	} );
-
-	return getNextBlockClientId( state, startUID );
-}
-
-export function getMultiSelectedBlockUids( state ) {
-	deprecated( 'getMultiSelectedBlockUids', {
-		alternative: 'getMultiSelectedBlockClientIds',
-		version: 'v3.5',
-		plugin: 'Gutenberg',
-	} );
-
-	return getMultiSelectedBlockClientIds( state );
-}
-
-export function getFirstMultiSelectedBlockUid( state ) {
-	deprecated( 'getFirstMultiSelectedBlockUid', {
-		alternative: 'getFirstMultiSelectedBlockClientId',
-		version: 'v3.5',
-		plugin: 'Gutenberg',
-	} );
-
-	return getFirstMultiSelectedBlockClientId( state );
-}
-
-export function getLastMultiSelectedBlockUid( state ) {
-	deprecated( 'getLastMultiSelectedBlockUid', {
-		alternative: 'getLastMultiSelectedBlockClientId',
-		version: 'v3.5',
-		plugin: 'Gutenberg',
-	} );
-
-	return getLastMultiSelectedBlockClientId( state );
-}
-
-export function getMultiSelectedBlocksStartUid( state ) {
-	deprecated( 'getMultiSelectedBlocksStartUid', {
-		alternative: 'getMultiSelectedBlocksStartClientId',
-		version: 'v3.5',
-		plugin: 'Gutenberg',
-	} );
-
-	return getMultiSelectedBlocksStartClientId( state );
-}
-
-export function getMultiSelectedBlocksEndUid( state ) {
-	deprecated( 'getMultiSelectedBlocksEndUid', {
-		alternative: 'getMultiSelectedBlocksEndClientId',
-		version: 'v3.5',
-		plugin: 'Gutenberg',
-	} );
-
-	return getMultiSelectedBlocksEndClientId( state );
-}
-
-export function getProvisionalBlockUID( state ) {
-	deprecated( 'getProvisionalBlockUID', {
-		alternative: 'getProvisionalBlockClientId',
-		version: 'v3.5',
-		plugin: 'Gutenberg',
-	} );
-
-	return getProvisionalBlockClientId( state );
-}
-
-export function getSharedBlock( state, ref ) {
-	deprecated( 'getSharedBlock', {
-		alternative: 'getReusableBlock',
-		version: '3.6',
-		plugin: 'Gutenberg',
-	} );
-
-	return getReusableBlock( state, ref );
-}
-
-export function isSavingSharedBlock( state, ref ) {
-	deprecated( 'isSavingSharedBlock', {
-		alternative: 'isSavingReusableBlock',
-		version: '3.6',
-		plugin: 'Gutenberg',
-	} );
-
-	return isSavingReusableBlock( state, ref );
-}
-
-export function isFetchingSharedBlock( state, ref ) {
-	deprecated( 'isFetchingSharedBlock', {
-		alternative: 'isFetchingReusableBlock',
-		version: '3.6',
-		plugin: 'Gutenberg',
-	} );
-
-	return isFetchingReusableBlock( state, ref );
-}
-
-export function getSharedBlocks( state ) {
-	deprecated( 'getSharedBlocks', {
-		alternative: 'getReusableBlocks',
-		version: '3.6',
-		plugin: 'Gutenberg',
-	} );
-
-	return getReusableBlocks( state );
+/**
+ * Returns whether the pre-publish panel should be shown
+ * or skipped when the user clicks the "publish" button.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the pre-publish panel should be shown or not.
+ */
+export function isPublishSidebarEnabled( state ) {
+	if ( state.preferences.hasOwnProperty( 'isPublishSidebarEnabled' ) ) {
+		return state.preferences.isPublishSidebarEnabled;
+	}
+	return PREFERENCES_DEFAULTS.isPublishSidebarEnabled;
 }

@@ -69,23 +69,6 @@ export function isValidIcon( icon ) {
 }
 
 /**
- * Function that returns true if the background and foreground colors of the icon are unreadable.
- *
- * @param {*} icon  Parameter to be checked.
- *
- * @return {boolean} True if the background and foreground colors of the icon are unreadable.
- */
-
-export function isIconUnreadable( icon ) {
-	return !! ( icon && icon.background && icon.foreground ) &&
-		! tinycolor.isReadable(
-			tinycolor( icon.background ),
-			tinycolor( icon.foreground ),
-			{ level: 'AA', size: 'large' }
-		);
-}
-
-/**
  * Function that receives an icon as set by the blocks during the registration
  * and returns a new icon object that is normalized so we can rely on just on possible icon structure
  * in the codebase.
@@ -98,7 +81,7 @@ export function isIconUnreadable( icon ) {
  */
 export function normalizeIconObject( icon ) {
 	if ( ! icon ) {
-		return { src: 'block-default' };
+		return { src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg> };
 	}
 	if ( isValidIcon( icon ) ) {
 		return { src: icon };

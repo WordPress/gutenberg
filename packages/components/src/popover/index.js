@@ -36,6 +36,7 @@ class Popover extends Component {
 		super( ...arguments );
 
 		this.focus = this.focus.bind( this );
+		this.refresh = this.refresh.bind( this );
 		this.getAnchorRect = this.getAnchorRect.bind( this );
 		this.updatePopoverSize = this.updatePopoverSize.bind( this );
 		this.computePopoverPosition = this.computePopoverPosition.bind( this );
@@ -136,15 +137,10 @@ class Popover extends Component {
 			// Focus the popover panel itself so items in the popover are easily
 			// accessed via keyboard navigation.
 			this.contentNode.current.focus();
-
-			return;
 		}
-
-		window.console.warn( `<Popover> component: focusOnMount argument "${ focusOnMount }" not recognized.` );
 	}
 
-	getAnchorRect() {
-		const anchor = this.anchorNode.current;
+	getAnchorRect( anchor ) {
 		if ( ! anchor || ! anchor.parentNode ) {
 			return;
 		}
@@ -185,7 +181,10 @@ class Popover extends Component {
 	computePopoverPosition( popoverSize ) {
 		const { getAnchorRect = this.getAnchorRect, position = 'top', expandOnMobile } = this.props;
 		const newPopoverPosition = computePopoverPosition(
-			getAnchorRect(), popoverSize || this.state.popoverSize, position, expandOnMobile
+			getAnchorRect( this.anchorNode.current ),
+			popoverSize || this.state.popoverSize,
+			position,
+			expandOnMobile
 		);
 
 		if (

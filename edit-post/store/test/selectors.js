@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+/**
  * Internal dependencies
  */
 import {
@@ -6,16 +11,26 @@ import {
 	getPreference,
 	isEditorSidebarOpened,
 	isEditorSidebarPanelOpened,
+	isModalActive,
 	isFeatureActive,
 	isPluginSidebarOpened,
+	getActiveGeneralSidebarName,
 	isPluginItemPinned,
 	getMetaBoxes,
 	hasMetaBoxes,
 	isSavingMetaBoxes,
 	getMetaBox,
+	getActiveMetaBoxLocations,
+	isMetaBoxLocationActive,
 } from '../selectors';
 
+jest.mock( '@wordpress/deprecated', () => jest.fn() );
+
 describe( 'selectors', () => {
+	beforeEach( () => {
+		deprecated.mockClear();
+	} );
+
 	describe( 'getEditorMode', () => {
 		it( 'should return the selected editor mode', () => {
 			const state = {
@@ -64,8 +79,20 @@ describe( 'selectors', () => {
 		it( 'should return false when the editor sidebar is not opened', () => {
 			const state = {
 				preferences: {
-					activeGeneralSidebar: null,
+					isGeneralSidebarDismissed: true,
 				},
+				activeGeneralSidebar: null,
+			};
+
+			expect( isEditorSidebarOpened( state ) ).toBe( false );
+		} );
+
+		it( 'should return false when the editor sidebar is assigned but not opened', () => {
+			const state = {
+				preferences: {
+					isGeneralSidebarDismissed: true,
+				},
+				activeGeneralSidebar: 'edit-post/document',
 			};
 
 			expect( isEditorSidebarOpened( state ) ).toBe( false );
@@ -74,8 +101,9 @@ describe( 'selectors', () => {
 		it( 'should return false when the plugin sidebar is opened', () => {
 			const state = {
 				preferences: {
-					activeGeneralSidebar: 'my-plugin/my-sidebar',
+					isGeneralSidebarDismissed: false,
 				},
+				activeGeneralSidebar: 'my-plugin/my-sidebar',
 			};
 
 			expect( isEditorSidebarOpened( state ) ).toBe( false );
@@ -84,8 +112,9 @@ describe( 'selectors', () => {
 		it( 'should return true when the editor sidebar is opened', () => {
 			const state = {
 				preferences: {
-					activeGeneralSidebar: 'edit-post/document',
+					isGeneralSidebarDismissed: false,
 				},
+				activeGeneralSidebar: 'edit-post/document',
 			};
 
 			expect( isEditorSidebarOpened( state ) ).toBe( true );
@@ -96,8 +125,9 @@ describe( 'selectors', () => {
 		it( 'should return false when the plugin sidebar is not opened', () => {
 			const state = {
 				preferences: {
-					activeGeneralSidebar: null,
+					isGeneralSidebarDismissed: true,
 				},
+				activeGeneralSidebar: null,
 			};
 
 			expect( isPluginSidebarOpened( state ) ).toBe( false );
@@ -106,8 +136,9 @@ describe( 'selectors', () => {
 		it( 'should return false when the editor sidebar is opened', () => {
 			const state = {
 				preferences: {
-					activeGeneralSidebar: 'edit-post/document',
+					isGeneralSidebarDismissed: false,
 				},
+				activeGeneralSidebar: 'edit-post/document',
 			};
 
 			expect( isPluginSidebarOpened( state ) ).toBe( false );
@@ -117,11 +148,62 @@ describe( 'selectors', () => {
 			const name = 'plugin-sidebar/my-plugin/my-sidebar';
 			const state = {
 				preferences: {
-					activeGeneralSidebar: name,
+					isGeneralSidebarDismissed: false,
 				},
+				activeGeneralSidebar: name,
 			};
 
 			expect( isPluginSidebarOpened( state ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'getActiveGeneralSidebarName', () => {
+		it( 'returns null if dismissed', () => {
+			const state = {
+				preferences: {
+					isGeneralSidebarDismissed: true,
+				},
+				activeGeneralSidebar: 'edit-post/block',
+			};
+
+			expect( getActiveGeneralSidebarName( state ) ).toBe( null );
+		} );
+
+		it( 'returns active general sidebar', () => {
+			const state = {
+				preferences: {
+					isGeneralSidebarDismissed: false,
+				},
+				activeGeneralSidebar: 'edit-post/block',
+			};
+
+			expect( getActiveGeneralSidebarName( state ) ).toBe( 'edit-post/block' );
+		} );
+	} );
+
+	describe( 'isModalActive', () => {
+		it( 'returns true if the provided name matches the value in the preferences activeModal property', () => {
+			const state = {
+				activeModal: 'test-modal',
+			};
+
+			expect( isModalActive( state, 'test-modal' ) ).toBe( true );
+		} );
+
+		it( 'returns false if the provided name does not match the preferences activeModal property', () => {
+			const state = {
+				activeModal: 'something-else',
+			};
+
+			expect( isModalActive( state, 'test-modal' ) ).toBe( false );
+		} );
+
+		it( 'returns false if the preferences activeModal property is null', () => {
+			const state = {
+				activeModal: null,
+			};
+
+			expect( isModalActive( state, 'test-modal' ) ).toBe( false );
 		} );
 	} );
 
@@ -214,14 +296,7 @@ describe( 'selectors', () => {
 	describe( 'hasMetaBoxes', () => {
 		it( 'should return true if there are active meta boxes', () => {
 			const state = {
-				metaBoxes: {
-					normal: {
-						isActive: false,
-					},
-					side: {
-						isActive: true,
-					},
-				},
+				activeMetaBoxLocations: [ 'side' ],
 			};
 
 			expect( hasMetaBoxes( state ) ).toBe( true );
@@ -229,14 +304,7 @@ describe( 'selectors', () => {
 
 		it( 'should return false if there are no active meta boxes', () => {
 			const state = {
-				metaBoxes: {
-					normal: {
-						isActive: false,
-					},
-					side: {
-						isActive: false,
-					},
-				},
+				activeMetaBoxLocations: [],
 			};
 
 			expect( hasMetaBoxes( state ) ).toBe( false );
@@ -264,19 +332,18 @@ describe( 'selectors', () => {
 	describe( 'getMetaBoxes', () => {
 		it( 'should return the state of all meta boxes', () => {
 			const state = {
-				metaBoxes: {
-					normal: {
-						isActive: true,
-					},
-					side: {
-						isActive: true,
-					},
-				},
+				activeMetaBoxLocations: [ 'normal', 'side' ],
 			};
 
-			expect( getMetaBoxes( state ) ).toEqual( {
+			const result = getMetaBoxes( state );
+
+			expect( deprecated ).toHaveBeenCalled();
+			expect( result ).toEqual( {
 				normal: {
 					isActive: true,
+				},
+				advanced: {
+					isActive: false,
 				},
 				side: {
 					isActive: true,
@@ -288,19 +355,49 @@ describe( 'selectors', () => {
 	describe( 'getMetaBox', () => {
 		it( 'should return the state of selected meta box', () => {
 			const state = {
-				metaBoxes: {
-					normal: {
-						isActive: false,
-					},
-					side: {
-						isActive: true,
-					},
-				},
+				activeMetaBoxLocations: [ 'side' ],
 			};
 
-			expect( getMetaBox( state, 'side' ) ).toEqual( {
+			const result = getMetaBox( state, 'side' );
+
+			expect( deprecated ).toHaveBeenCalled();
+			expect( result ).toEqual( {
 				isActive: true,
 			} );
+		} );
+	} );
+
+	describe( 'getActiveMetaBoxLocations', () => {
+		it( 'should return the active meta boxes', () => {
+			const state = {
+				activeMetaBoxLocations: [ 'side' ],
+			};
+
+			const result = getActiveMetaBoxLocations( state, 'side' );
+
+			expect( result ).toEqual( [ 'side' ] );
+		} );
+	} );
+
+	describe( 'isMetaBoxLocationActive', () => {
+		it( 'should return false if not active', () => {
+			const state = {
+				activeMetaBoxLocations: [],
+			};
+
+			const result = isMetaBoxLocationActive( state, 'side' );
+
+			expect( result ).toBe( false );
+		} );
+
+		it( 'should return true if active', () => {
+			const state = {
+				activeMetaBoxLocations: [ 'side' ],
+			};
+
+			const result = isMetaBoxLocationActive( state, 'side' );
+
+			expect( result ).toBe( true );
 		} );
 	} );
 } );

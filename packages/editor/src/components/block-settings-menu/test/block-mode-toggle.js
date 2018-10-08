@@ -24,7 +24,7 @@ describe( 'BlockModeToggle', () => {
 				mode="visual"
 			/>
 		);
-		const text = wrapper.find( 'IconButton' ).first().prop( 'children' );
+		const text = wrapper.find( 'MenuItem' ).first().prop( 'children' );
 
 		expect( text ).toEqual( 'Edit as HTML' );
 	} );
@@ -36,7 +36,7 @@ describe( 'BlockModeToggle', () => {
 				mode="html"
 			/>
 		);
-		const text = wrapper.find( 'IconButton' ).first().prop( 'children' );
+		const text = wrapper.find( 'MenuItem' ).first().prop( 'children' );
 
 		expect( text ).toEqual( 'Edit visually' );
 	} );

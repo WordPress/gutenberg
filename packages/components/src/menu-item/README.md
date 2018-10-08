@@ -6,7 +6,7 @@
 import { MenuItem } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
 
-withState( {
+const MyMenuItem = withState( {
 	isActive: true,
 } )( ( { isActive, setState } ) => (
 	<MenuItem
@@ -16,5 +16,5 @@ withState( {
 	>
 		Toggle
 	</MenuItem>
-) )
+) );
 ```

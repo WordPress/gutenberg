@@ -8,7 +8,6 @@ module.exports = function( api ) {
 				targets: {
 					browsers: [ 'extends @wordpress/browserslist-config' ],
 				},
-				useBuiltIns: 'usage',
 			} ],
 			isTestEnv && [ '@babel/preset-env', {
 				useBuiltIns: 'usage',
@@ -20,7 +19,12 @@ module.exports = function( api ) {
 				pragma: 'createElement',
 			} ],
 			'@babel/plugin-proposal-async-generator-functions',
-			! isTestEnv && '@babel/plugin-transform-runtime',
+			! isTestEnv && [ '@babel/plugin-transform-runtime', {
+				corejs: false, // We polyfill so we don't need core-js.
+				helpers: true,
+				regenerator: false, // We polyfill so we don't need regenerator.
+				useESModules: false,
+			} ],
 		].filter( Boolean ),
 	};
 };

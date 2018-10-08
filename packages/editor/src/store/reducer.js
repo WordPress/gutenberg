@@ -15,7 +15,6 @@ import {
 	omitBy,
 	keys,
 	isEqual,
-	includes,
 	overSome,
 	get,
 } from 'lodash';
@@ -697,48 +696,6 @@ export function blockSelection( state = {
 	return state;
 }
 
-/**
- * Reducer returning the client ID of the provisional block. A provisional
- * block is one which is to be removed if it does not receive updates in the
- * time until the next selection or block reset.
- *
- * @param {string} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {string} Updated state.
- */
-export function provisionalBlockClientId( state = null, action ) {
-	switch ( action.type ) {
-		case 'INSERT_BLOCKS':
-			if ( action.isProvisional ) {
-				return first( action.blocks ).clientId;
-			}
-			break;
-
-		case 'RESET_BLOCKS':
-			return null;
-
-		case 'UPDATE_BLOCK_ATTRIBUTES':
-		case 'UPDATE_BLOCK':
-		case 'CONVERT_BLOCK_TO_REUSABLE':
-			const { clientId } = action;
-			if ( clientId === state ) {
-				return null;
-			}
-			break;
-
-		case 'REPLACE_BLOCKS':
-		case 'REMOVE_BLOCKS':
-			const { clientIds } = action;
-			if ( includes( clientIds, state ) ) {
-				return null;
-			}
-			break;
-	}
-
-	return state;
-}
-
 export function blocksMode( state = {}, action ) {
 	if ( action.type === 'TOGGLE_BLOCK_MODE' ) {
 		const { clientId } = action;
@@ -816,9 +773,6 @@ export function settings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
  * Reducer returning the user preferences.
  *
  * @param {Object}  state                 Current state.
- * @param {string}  state.mode            Current editor mode, either "visual" or "text".
- * @param {boolean} state.isSidebarOpened Whether the sidebar is opened or closed.
- * @param {Object}  state.panels          The state of the different sidebar panels.
  * @param {Object}  action                Dispatched action.
  *
  * @return {string} Updated state.
@@ -852,6 +806,18 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 			return {
 				...state,
 				insertUsage: omitBy( state.insertUsage, ( { insert } ) => insert.ref === action.id ),
+			};
+
+		case 'ENABLE_PUBLISH_SIDEBAR':
+			return {
+				...state,
+				isPublishSidebarEnabled: true,
+			};
+
+		case 'DISABLE_PUBLISH_SIDEBAR':
+			return {
+				...state,
+				isPublishSidebarEnabled: false,
 			};
 	}
 
@@ -914,6 +880,34 @@ export function notices( state = [], action ) {
 				...state.slice( 0, index ),
 				...state.slice( index + 1 ),
 			];
+	}
+
+	return state;
+}
+
+/**
+ * Post Lock State.
+ *
+ * @typedef {Object} PostLockState
+ *
+ * @property {boolean} isLocked       Whether the post is locked.
+ * @property {?boolean} isTakeover     Whether the post editing has been taken over.
+ * @property {?boolean} activePostLock Active post lock value.
+ * @property {?Object}  user           User that took over the post.
+ */
+
+/**
+ * Reducer returning the post lock status.
+ *
+ * @param {PostLockState} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {PostLockState} Updated state.
+ */
+export function postLock( state = { isLocked: false }, action ) {
+	switch ( action.type ) {
+		case 'UPDATE_POST_LOCK':
+			return action.lock;
 	}
 
 	return state;
@@ -1127,12 +1121,12 @@ export default optimist( combineReducers( {
 	currentPost,
 	isTyping,
 	blockSelection,
-	provisionalBlockClientId,
 	blocksMode,
 	blockListSettings,
 	isInsertionPointVisible,
 	preferences,
 	saving,
+	postLock,
 	notices,
 	reusableBlocks,
 	template,

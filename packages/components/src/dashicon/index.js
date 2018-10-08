@@ -10,6 +10,11 @@ OR if you're looking to change now SVGs get output, you'll need to edit strings 
  */
 import { Component } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import { Path, SVG } from '../primitives';
+
 export default class Dashicon extends Component {
 	shouldComponentUpdate( nextProps ) {
 		return (
@@ -98,6 +103,12 @@ export default class Dashicon extends Component {
 				break;
 			case 'align-none':
 				path = 'M3 5h14V3H3v2zm10 8V7H3v6h10zM3 17h14v-2H3v2z';
+				break;
+			case 'align-pull-left':
+				path = 'M9 16V4H3v12h6zm2-7h6V7h-6v2zm0 4h6v-2h-6v2z';
+				break;
+			case 'align-pull-right':
+				path = 'M17 16V4h-6v12h6zM9 7H3v2h6V7zm0 4H3v2h6v-2z';
 				break;
 			case 'align-right':
 				path = 'M3 5h14V3H3v2zm0 4h3V7H3v2zm14 4V7H8v6h9zM3 13h3v-2H3v2zm0 4h14v-2H3v2z';
@@ -429,6 +440,9 @@ export default class Dashicon extends Component {
 			case 'excerpt-view':
 				path = 'M19 18V2c0-.55-.45-1-1-1H2c-.55 0-1 .45-1 1v16c0 .55.45 1 1 1h16c.55 0 1-.45 1-1zM4 3c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm13 0v6H6V3h11zM4 11c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm13 0v6H6v-6h11z';
 				break;
+			case 'exit':
+				path = 'M13 3v2h2v10h-2v2h4V3h-4zm0 8V9H5.4l4.3-4.3-1.4-1.4L1.6 10l6.7 6.7 1.4-1.4L5.4 11H13z';
+				break;
 			case 'external':
 				path = 'M9 3h8v8l-2-1V6.92l-5.6 5.59-1.41-1.41L14.08 5H10zm3 12v-3l2-2v7H3V6h8L9 8H5v7h7z';
 				break;
@@ -539,6 +553,12 @@ export default class Dashicon extends Component {
 				break;
 			case 'info':
 				path = 'M10 2c4.42 0 8 3.58 8 8s-3.58 8-8 8-8-3.58-8-8 3.58-8 8-8zm1 4c0-.55-.45-1-1-1s-1 .45-1 1 .45 1 1 1 1-.45 1-1zm0 9V9H9v6h2z';
+				break;
+			case 'insert-after':
+				path = 'M9 12h2v-2h2V8h-2V6H9v2H7v2h2v2zm1 4c3.9 0 7-3.1 7-7s-3.1-7-7-7-7 3.1-7 7 3.1 7 7 7zm0-12c2.8 0 5 2.2 5 5s-2.2 5-5 5-5-2.2-5-5 2.2-5 5-5zM3 19h14v-2H3v2z';
+				break;
+			case 'insert-before':
+				path = 'M11 8H9v2H7v2h2v2h2v-2h2v-2h-2V8zm-1-4c-3.9 0-7 3.1-7 7s3.1 7 7 7 7-3.1 7-7-3.1-7-7-7zm0 12c-2.8 0-5-2.2-5-5s2.2-5 5-5 5 2.2 5 5-2.2 5-5 5zM3 1v2h14V1H3z';
 				break;
 			case 'insert':
 				path = 'M10 1c-5 0-9 4-9 9s4 9 9 9 9-4 9-9-4-9-9-9zm0 16c-3.9 0-7-3.1-7-7s3.1-7 7-7 7 3.1 7 7-3.1 7-7 7zm1-11H9v3H6v2h3v3h2v-3h3V9h-3V6z';
@@ -879,7 +899,7 @@ export default class Dashicon extends Component {
 		const iconClass = [ 'dashicon', 'dashicons-' + icon, className ].filter( Boolean ).join( ' ' );
 
 		return (
-			<svg
+			<SVG
 				aria-hidden
 				role="img"
 				focusable="false"
@@ -889,8 +909,8 @@ export default class Dashicon extends Component {
 				height={ size }
 				viewBox="0 0 20 20"
 			>
-				<path d={ path } />
-			</svg>
+				<Path d={ path } />
+			</SVG>
 		);
 	}
 }

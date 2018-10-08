@@ -6,12 +6,12 @@
 	}
 
 	// Colorize plugin icons to ensure contrast and cohesion, but allow plugin developers to override.
-	.components-icon-button:not( .is-toggled ) svg,
-	.components-icon-button:not( .is-toggled ) svg * {
+	.components-icon-button:not(.is-toggled) svg,
+	.components-icon-button:not(.is-toggled) svg * {
 		stroke: $dark-gray-500;
 		fill: $dark-gray-500;
 	}
-	
+
 	// Forcefully colorize hover and toggled plugin icon states to ensure legibility and consistency.
 	.components-icon-button.is-toggled svg,
 	.components-icon-button.is-toggled svg * {
