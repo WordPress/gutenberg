@@ -1,3 +1,9 @@
+## 2.1.0 (Unreleased)
+
+### New Features
+
+- Include the classic block if `wp.oldEditor` is defined.
+
 ## 2.0.0 (2018-09-05)
 
 ### Breaking Change
