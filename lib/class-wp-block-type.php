@@ -94,17 +94,18 @@ class WP_Block_Type {
 	 *
 	 * @since 0.6.0
 	 *
-	 * @param array $attributes Optional. Block attributes. Default empty array.
+	 * @param array  $attributes Optional. Block attributes. Default empty array.
+	 * @param string $content    Optional. Block content. Default empty string.
 	 * @return string Rendered block type output.
 	 */
-	public function render( $attributes = array() ) {
+	public function render( $attributes = array(), $content = '' ) {
 		if ( ! $this->is_dynamic() ) {
 			return '';
 		}
 
 		$attributes = $this->prepare_attributes_for_render( $attributes );
 
-		return (string) call_user_func( $this->render_callback, $attributes );
+		return (string) call_user_func( $this->render_callback, $attributes, $content );
 	}
 
 	/**
@@ -159,9 +160,12 @@ class WP_Block_Type {
 	 * @param array|string $args Array or string of arguments for registering a block type.
 	 */
 	public function set_props( $args ) {
-		$args = wp_parse_args( $args, array(
-			'render_callback' => null,
-		) );
+		$args = wp_parse_args(
+			$args,
+			array(
+				'render_callback' => null,
+			)
+		);
 
 		$args['name'] = $this->name;
 
@@ -177,11 +181,14 @@ class WP_Block_Type {
 	 */
 	public function get_attributes() {
 		return is_array( $this->attributes ) ?
-			array_merge( $this->attributes, array(
-				'layout' => array(
-					'type' => 'string',
-				),
-			) ) :
+			array_merge(
+				$this->attributes,
+				array(
+					'layout' => array(
+						'type' => 'string',
+					),
+				)
+			) :
 			array(
 				'layout' => array(
 					'type' => 'string',

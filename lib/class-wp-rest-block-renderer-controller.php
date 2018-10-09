@@ -37,34 +37,38 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 				continue;
 			}
 
-			register_rest_route( $this->namespace, '/' . $this->rest_base . '/(?P<name>' . $block_type->name . ')', array(
-				'args'   => array(
-					'name' => array(
-						'description' => __( 'Unique registered name for the block.', 'gutenberg' ),
-						'type'        => 'string',
-					),
-				),
+			register_rest_route(
+				$this->namespace,
+				'/' . $this->rest_base . '/(?P<name>' . $block_type->name . ')',
 				array(
-					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_item' ),
-					'permission_callback' => array( $this, 'get_item_permissions_check' ),
-					'args'                => array(
-						'context'    => $this->get_context_param( array( 'default' => 'view' ) ),
-						'attributes' => array(
-							/* translators: %s is the name of the block */
-							'description'          => sprintf( __( 'Attributes for %s block', 'gutenberg' ), $block_type->name ),
-							'type'                 => 'object',
-							'additionalProperties' => false,
-							'properties'           => $block_type->get_attributes(),
-						),
-						'post_id'    => array(
-							'description' => __( 'ID of the post context.', 'gutenberg' ),
-							'type'        => 'integer',
+					'args'   => array(
+						'name' => array(
+							'description' => __( 'Unique registered name for the block.', 'gutenberg' ),
+							'type'        => 'string',
 						),
 					),
-				),
-				'schema' => array( $this, 'get_public_item_schema' ),
-			) );
+					array(
+						'methods'             => WP_REST_Server::READABLE,
+						'callback'            => array( $this, 'get_item' ),
+						'permission_callback' => array( $this, 'get_item_permissions_check' ),
+						'args'                => array(
+							'context'    => $this->get_context_param( array( 'default' => 'view' ) ),
+							'attributes' => array(
+								/* translators: %s is the name of the block */
+								'description'          => sprintf( __( 'Attributes for %s block', 'gutenberg' ), $block_type->name ),
+								'type'                 => 'object',
+								'additionalProperties' => false,
+								'properties'           => $block_type->get_attributes(),
+							),
+							'post_id'    => array(
+								'description' => __( 'ID of the post context.', 'gutenberg' ),
+								'type'        => 'integer',
+							),
+						),
+					),
+					'schema' => array( $this, 'get_public_item_schema' ),
+				)
+			);
 		}
 	}
 
@@ -85,15 +89,23 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 		if ( 0 < $post_id ) {
 			$post = get_post( $post_id );
 			if ( ! $post || ! current_user_can( 'edit_post', $post->ID ) ) {
-				return new WP_Error( 'gutenberg_block_cannot_read', __( 'Sorry, you are not allowed to read Gutenberg blocks of this post', 'gutenberg' ), array(
-					'status' => rest_authorization_required_code(),
-				) );
+				return new WP_Error(
+					'gutenberg_block_cannot_read',
+					__( 'Sorry, you are not allowed to read Gutenberg blocks of this post', 'gutenberg' ),
+					array(
+						'status' => rest_authorization_required_code(),
+					)
+				);
 			}
 		} else {
 			if ( ! current_user_can( 'edit_posts' ) ) {
-				return new WP_Error( 'gutenberg_block_cannot_read', __( 'Sorry, you are not allowed to read Gutenberg blocks as this user.', 'gutenberg' ), array(
-					'status' => rest_authorization_required_code(),
-				) );
+				return new WP_Error(
+					'gutenberg_block_cannot_read',
+					__( 'Sorry, you are not allowed to read Gutenberg blocks as this user.', 'gutenberg' ),
+					array(
+						'status' => rest_authorization_required_code(),
+					)
+				);
 			}
 		}
 
@@ -124,9 +136,13 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 		$block    = $registry->get_registered( $request['name'] );
 
 		if ( null === $block ) {
-			return new WP_Error( 'gutenberg_block_invalid', __( 'Invalid block.', 'gutenberg' ), array(
-				'status' => 404,
-			) );
+			return new WP_Error(
+				'gutenberg_block_invalid',
+				__( 'Invalid block.', 'gutenberg' ),
+				array(
+					'status' => 404,
+				)
+			);
 		}
 
 		$data = array(

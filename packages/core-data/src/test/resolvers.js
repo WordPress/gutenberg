@@ -1,80 +1,23 @@
 /**
- * WordPress dependencies
- */
-import apiRequest from '@wordpress/api-request';
-
-/**
  * Internal dependencies
  */
-import { getCategories, getEntityRecord, getEntityRecords } from '../resolvers';
-import { receiveTerms, receiveEntityRecords, addEntities } from '../actions';
-
-jest.mock( '@wordpress/api-request' );
-
-describe( 'getCategories', () => {
-	const CATEGORIES = [ { id: 1 } ];
-
-	beforeAll( () => {
-		apiRequest.mockImplementation( ( options ) => {
-			if ( options.path === '/wp/v2/categories?per_page=-1' ) {
-				return Promise.resolve( CATEGORIES );
-			}
-		} );
-	} );
-
-	it( 'yields with requested terms', async () => {
-		const fulfillment = getCategories();
-		const received = ( await fulfillment.next() ).value;
-		expect( received ).toEqual( receiveTerms( 'categories', CATEGORIES ) );
-	} );
-} );
+import { getEntityRecord, getEntityRecords, getEmbedPreview } from '../resolvers';
+import { receiveEntityRecords, receiveEmbedPreview } from '../actions';
 
 describe( 'getEntityRecord', () => {
 	const POST_TYPE = { slug: 'post' };
-	const POST_TYPES = {
-		post: {
-			rest_base: 'posts',
-		},
-	};
-	const POST = { id: 10, title: 'test' };
-
-	beforeAll( () => {
-		apiRequest.mockImplementation( ( options ) => {
-			if ( options.path === '/wp/v2/types/post?context=edit' ) {
-				return Promise.resolve( POST_TYPE );
-			}
-			if ( options.path === '/wp/v2/posts/10?context=edit' ) {
-				return Promise.resolve( POST );
-			}
-			if ( options.path === '/wp/v2/types?context=edit' ) {
-				return Promise.resolve( POST_TYPES );
-			}
-		} );
-	} );
 
 	it( 'yields with requested post type', async () => {
-		const state = {
-			entities: {
-				config: [
-					{ name: 'postType', kind: 'root', baseURL: '/wp/v2/types' },
-				],
-			},
-		};
-		const fulfillment = getEntityRecord( state, 'root', 'postType', 'post' );
-		const received = ( await fulfillment.next() ).value;
+		const entities = [ { name: 'postType', kind: 'root', baseURL: '/wp/v2/types' } ];
+		const fulfillment = getEntityRecord( 'root', 'postType', 'post' );
+		// Trigger generator
+		fulfillment.next();
+		// Provide entities and trigger apiFetch
+		const { value: apiFetchAction } = fulfillment.next( entities );
+		expect( apiFetchAction.request ).toEqual( { path: '/wp/v2/types/post?context=edit' } );
+		// Provide response and trigger action
+		const { value: received } = fulfillment.next( POST_TYPE );
 		expect( received ).toEqual( receiveEntityRecords( 'root', 'postType', POST_TYPE ) );
-	} );
-
-	it( 'loads the kind entities and yields with requested post type', async () => {
-		const fulfillment = getEntityRecord( { entities: {} }, 'postType', 'post', 10 );
-		const receivedEntities = ( await fulfillment.next() ).value;
-		expect( receivedEntities ).toEqual( addEntities( [ {
-			baseURL: '/wp/v2/posts',
-			kind: 'postType',
-			name: 'post',
-		} ] ) );
-		const received = ( await fulfillment.next() ).value;
-		expect( received ).toEqual( receiveEntityRecords( 'postType', 'post', POST ) );
 	} );
 } );
 
@@ -84,24 +27,44 @@ describe( 'getEntityRecords', () => {
 		page: { slug: 'page' },
 	};
 
-	beforeAll( () => {
-		apiRequest.mockImplementation( ( options ) => {
-			if ( options.path === '/wp/v2/types?context=edit' ) {
-				return Promise.resolve( POST_TYPES );
-			}
-		} );
+	it( 'yields with requested post type', async () => {
+		const entities = [
+			{ name: 'postType', kind: 'root', baseURL: '/wp/v2/types' },
+		];
+		const fulfillment = getEntityRecords( 'root', 'postType' );
+
+		// Trigger generator
+		fulfillment.next();
+		// Provide entities and trigger apiFetch
+		const { value: apiFetchAction } = fulfillment.next( entities );
+		expect( apiFetchAction.request ).toEqual( { path: '/wp/v2/types?context=edit' } );
+		// Provide response and trigger action
+		const { value: received } = fulfillment.next( POST_TYPES );
+		expect( received ).toEqual( receiveEntityRecords( 'root', 'postType', Object.values( POST_TYPES ), {} ) );
+	} );
+} );
+
+describe( 'getEmbedPreview', () => {
+	const SUCCESSFUL_EMBED_RESPONSE = { data: '<p>some html</p>' };
+	const UNEMBEDDABLE_RESPONSE = false;
+	const EMBEDDABLE_URL = 'http://twitter.com/notnownikki';
+	const UNEMBEDDABLE_URL = 'http://example.com/';
+
+	it( 'yields with fetched embed preview', async () => {
+		const fulfillment = getEmbedPreview( EMBEDDABLE_URL );
+		// Trigger generator
+		fulfillment.next();
+		// Provide apiFetch response and trigger Action
+		const received = ( await fulfillment.next( SUCCESSFUL_EMBED_RESPONSE ) ).value;
+		expect( received ).toEqual( receiveEmbedPreview( EMBEDDABLE_URL, SUCCESSFUL_EMBED_RESPONSE ) );
 	} );
 
-	it( 'yields with requested post type', async () => {
-		const state = {
-			entities: {
-				config: [
-					{ name: 'postType', kind: 'root', baseURL: '/wp/v2/types' },
-				],
-			},
-		};
-		const fulfillment = getEntityRecords( state, 'root', 'postType' );
-		const received = ( await fulfillment.next() ).value;
-		expect( received ).toEqual( receiveEntityRecords( 'root', 'postType', Object.values( POST_TYPES ) ) );
+	it( 'yields false if the URL cannot be embedded', async () => {
+		const fulfillment = getEmbedPreview( UNEMBEDDABLE_URL );
+		// Trigger generator
+		fulfillment.next();
+		// Provide invalid response and trigger Action
+		const received = ( await fulfillment.throw( { status: 404 } ) ).value;
+		expect( received ).toEqual( receiveEmbedPreview( UNEMBEDDABLE_URL, UNEMBEDDABLE_RESPONSE ) );
 	} );
 } );

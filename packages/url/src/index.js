@@ -1,10 +1,22 @@
 /**
  * External dependencies
  */
-import { parse, format } from 'url';
+import { parse, stringify } from 'qs';
 
+const URL_REGEXP = /^(?:https?:)?\/\/\S+$/i;
 const EMAIL_REGEXP = /^(mailto:)?[a-z0-9._%+-]+@[a-z0-9][a-z0-9.-]*\.[a-z]{2,63}$/i;
 const USABLE_HREF_REGEXP = /^(?:[a-z]+:|#|\?|\.|\/)/i;
+
+/**
+ * Determines whether the given string looks like a URL.
+ *
+ * @param {string} url The string to scrutinise.
+ *
+ * @return {boolean} Whether or not it looks like a URL.
+ */
+export function isURL( url ) {
+	return URL_REGEXP.test( url );
+}
 
 /**
  * Appends arguments to the query string of the url
@@ -15,11 +27,11 @@ const USABLE_HREF_REGEXP = /^(?:[a-z]+:|#|\?|\.|\/)/i;
  * @return {string}       Updated URL
  */
 export function addQueryArgs( url, args ) {
-	const parsedURL = parse( url, true );
-	const query = { ...parsedURL.query, ...args };
-	delete parsedURL.search;
+	const queryStringIndex = url.indexOf( '?' );
+	const query = queryStringIndex !== -1 ? parse( url.substr( queryStringIndex + 1 ) ) : {};
+	const baseUrl = queryStringIndex !== -1 ? url.substr( 0, queryStringIndex ) : url;
 
-	return format( { ...parsedURL, query } );
+	return baseUrl + '?' + stringify( { ...query, ...args } );
 }
 
 /**

@@ -1,4 +1,4 @@
-# @wordpress/jest-preset-default
+# Jest Preset Default
 
 Default [Jest](https://facebook.github.io/jest/) preset for WordPress development.
 

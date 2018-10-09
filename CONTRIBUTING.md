@@ -16,7 +16,14 @@ The easiest way to get started (on MacOS, Linux, or Windows 10 with the Linux Su
 
 For other version of Windows, or if you prefer to set things up manually, be sure to have <a href="https://nodejs.org/en/">Node.js installed first</a>. You should be running a Node version matching the [current active LTS release](https://github.com/nodejs/Release#release-schedule) or newer for this plugin to work correctly. You can check your Node.js version by typing `node -v` in the Terminal prompt.
 
-You should also have the latest release of <a href="https://npmjs.org">npm installed</a>, npm is a separate project from Node.js and is updated frequently. If you've just installed Node.js which includes a version of npm within the installation you most likely will need to also update your npm install. To update npm, type this into your terminal: `npm install npm@latest -g`
+If you have an incompatible version of Node in your development environment, you can use [nvm](https://github.com/creationix/nvm) to change node versions on the command line:
+
+```
+npx nvm install
+npx nvm use
+```
+
+You should also have the latest release of [npm installed][npm]. npm is a separate project from Node.js and is updated frequently. If you've just installed Node.js which includes a version of npm within the installation you most likely will need to also update your npm installation. To update npm, type this into your terminal: `npm install npm@latest -g`
 
 To test the plugin, or to contribute to it, you can clone this repository and build the plugin files using Node. How you do that depends on whether you're developing locally or uploading the plugin to a remote host.
 
@@ -35,7 +42,13 @@ Then, run a setup script to check if docker and node are configured properly and
 ./bin/setup-local-env.sh
 ``` 
 
-If everything was successful, you'll see the following ascii art:
+**If you're developing themes, or core WordPress functionality alongside Gutenberg**, you can make the WordPress files accessible in `wordpress/` by following these instructions instead:
+
+1. If this is your first time setting up the environment, run `DOCKER_ENV=localwpdev ./bin/setup-local-env.sh` instead of `./bin/setup-local-env.sh`
+2. If you've already had the previous environment set up, you need to start fresh, and you can do that by first running `docker-compose down --rmi all`. After that you can repeat step 1.
+3. If you turn off your computer or restart Docker, you can get your local WordPress dev enviroment back by typing `docker-compose -f docker-compose.yml -f docker-compose-localdev.yml up`. If you just run `docker-compose up`, you will get the vanilla install that doesn't expose the WordPress folder.
+
+**If everything was successful**, you'll see the following ascii art:
 ```
 Welcome to...
 
@@ -97,27 +110,113 @@ The workflow is documented in greater detail in the [repository management](./do
 
 Gutenberg contains both PHP and JavaScript code, and encourages testing and code style linting for both. It also incorporates end-to-end testing using [Google Puppeteer](https://developers.google.com/web/tools/puppeteer/). You can find out more details in [Testing Overview document](./docs/reference/testing-overview.md).
 
-## Releasing packages
+## Managing packages
 
-This repository uses [lerna](https://lernajs.io) to manage Gutenberg modules and publish them as packages to `npm`. Lerna automatically releases all the outdated packages. To check which packages are outdated and will be released, type `npm run publish:check`.
+This repository uses [lerna] to manage Gutenberg modules and publish them as packages to [npm]. 
 
-If you have the ability to publish packages, you _must_ have [2FA enabled](https://docs.npmjs.com/getting-started/using-two-factor-authentication) on your npmjs.com account.
+### Creating new package
 
-### Before releasing
+When creating a new package you need to provide at least the following:
 
-Confirm that you're logged into `npm`, by running `npm whoami`. If you're not logged in, run `npm adduser` to login.
+1. `package.json` based on the template:
+	```json
+	{
+		"name": "@wordpress/package-name",
+		"version": "1.0.0-beta.0",
+		"description": "Package description.",
+		"author": "The WordPress Contributors",
+		"license": "GPL-2.0-or-later",
+		"keywords": [
+			"wordpress"
+		],
+		"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/package-name/README.md",
+		"repository": {
+			"type": "git",
+			"url": "https://github.com/WordPress/gutenberg.git"
+		},
+		"bugs": {
+			"url": "https://github.com/WordPress/gutenberg/issues"
+		},
+		"main": "build/index.js",
+		"module": "build-module/index.js",
+		"react-native": "src/index",
+		"dependencies": {
+			"@babel/runtime": "^7.0.0"
+		},
+		"publishConfig": {
+			"access": "public"
+		}
+	}
+	```
+	This assumes that your code is located in the `src` folder and will be transpiled with `Babel`.
+2. `.npmrc` file which disables creating `package-lock.json` file for the package:
+	```
+	package-lock=false
+	```
+3. `README.md` file containing at least:
+	- Package name
+	- Package description
+	- Installation details
+	- Usage example
+	- `Code is Poetry` logo (`<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>`)
+	
+### Maintaining changelogs
+
+Maintaining dozens of npm packages is difficult—it can be tough to keep track of changes. That's why we use `CHANGELOG.md` files for each package to simplify the release process. All packages should follow the [Semantic Versioning (`semver`) specification](https://semver.org/).
+
+The developer who proposes a change (pull request) is responsible to choose the correct version increment (`major`, `minor`, or `patch`) according to the following guidelines:
+
+- Major version X (X.y.z | X > 0) should be changed with any backwards-incompatible/"breaking" change. This will usually occur at the final stage of deprecating and removing of a feature.
+- Minor version Y (x.Y.z | x > 0) should be changed when you add functionality or change functionality in a backwards-compatible manner. It must be incremented if any public API functionality is marked as deprecated.
+- Patch version Z (x.y.Z | x > 0) should be incremented when you make backwards-compatible bug fixes.
+
+When in doubt, refer to [Semantic Versioning specification](https://semver.org/).
+
+_Example:_
+
+```md
+## v1.2.2 (Unreleased)
+
+### Bug Fix
+
+- ...
+- ...
+```
+
+- If you need to add something considered a bug fix, you add the item to `Bug Fix` section and leave the version as 1.2.2.
+- If it's a new feature you add the item to `New Feature` section and change version to 1.3.0.
+- If it's a breaking change you want to introduce, add the item to `Breaking Change` section and bump the version to 2.0.0.
+- If you struggle to classify a change as one of the above, then it might be not necessary to include it.
+
+The version bump is only necessary if one of the following applies:
+ - There are no other unreleased changes.
+ - The type of change you're introducing is incompatible (more severe) than the other unreleased changes.
+
+### Releasing packages
+
+Lerna automatically releases all outdated packages. To check which packages are outdated and will be released, type `npm run publish:check`.
+
+If you have the ability to publish packages, you _must_ have [2FA enabled](https://docs.npmjs.com/getting-started/using-two-factor-authentication) on your [npm account][npm].
+
+#### Before releasing
+
+Confirm that you're logged in to [npm], by running `npm whoami`. If you're not logged in, run `npm adduser` to login.
 
 If you're publishing a new package, ensure that its `package.json` file contains the correct `publishConfig` settings:
 
 ```json
+{
 	"publishConfig": {
 		"access": "public"
 	}
+}
 ```
 
-### Development release
+You can check your package configs by running `npm run lint-pkg-json`.
 
-Run the following command to release a dev version of the outdated packages, replacing "123456" with your 2FA code. Make sure you're using a freshly generated 2FA code, rather than one that's about to timeout. This is a little cumbersome, but helps to prevent the release process from dying mid-deploy.
+#### Development release
+
+Run the following command to release a dev version of the outdated packages, replacing `123456` with your 2FA code. Make sure you're using a freshly generated 2FA code, rather than one that's about to timeout. This is a little cumbersome, but helps to prevent the release process from dying mid-deploy.
 
 ```bash
 NPM_CONFIG_OTP=123456 npm run publish:dev
@@ -125,17 +224,17 @@ NPM_CONFIG_OTP=123456 npm run publish:dev
 
 Lerna will ask you which version number you want to choose for each package. For a `dev` release, you'll more likely want to choose the "prerelease" option. Repeat the same for all the outdated packages and confirm your version updates.
 
-Lerna will then publish to `npm`, commit the `package.json` changes and create the git tags.
+Lerna will then publish to [npm], commit the `package.json` changes and create the git tags.
 
-### Production release
+#### Production release
 
-To release a production version for the outdated packages, run the following command, replacing "123456" with your (freshly generated, as above) 2FA code:
+To release a production version for the outdated packages, run the following command, replacing `123456` with your (freshly generated, as above) 2FA code:
 
 ```bash
 NPM_CONFIG_OTP=123456 npm run publish:prod
 ```
 
-Choose the correct version (minor, major or patch) and confirm your choices and let Lerna do its magic.
+Choose the correct version based on `CHANGELOG.md` files, confirm your choices and let Lerna do its magic.
 
 ## How Designers Can Contribute
 
@@ -146,6 +245,10 @@ If you'd like to contribute to the design or front-end, feel free to contribute 
 Documentation is automatically synced from master to the [Gutenberg Documentation Website](https://wordpress.org/gutenberg/handbook/) every 15 minutes.
 
 To add a new documentation page, you'll have to create a Markdown file in the [docs](https://github.com/WordPress/gutenberg/tree/master/docs) folder and add an item to the [manifest file](https://github.com/WordPress/gutenberg/blob/master/docs/manifest.json).
+
+### `@wordpress/component`
+
+If you're contributing to the documentation of any component from the `@wordpress/component` package, take a look at its [guidelines for contributing](./packages/components/CONTRIBUTING.md). 
 
 ## Reporting Security Issues
 
@@ -160,3 +263,6 @@ A Global Translation Editor (GTE) or Project Translation Editor (PTE) with suita
 Language packs are automatically generated once 95% of the plugin's strings are translated and approved for a locale.
 
 The eventual inclusion of Gutenberg into WordPress core means that more than 51% of WordPress installations running a translated WordPress installation will have Gutenberg's translated strings compiled into the core language pack as well.
+
+[lerna]: https://lernajs.io/
+[npm]: https://www.npmjs.com/

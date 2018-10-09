@@ -168,6 +168,41 @@ An exception to camel case is made for constant values which are never intended 
 
 In almost all cases, a constant should be defined in the top-most scope of a file. It is important to note that [JavaScript's `const` assignment](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/const) is conceptually more limited than what is implied here, where a value assigned by `const` in JavaScript can in-fact be mutated, and is only protected against reassignment. A constant as defined in these coding guidelines applies only to values which are expected to never change, and is a strategy for developers to communicate intent moreso than it is a technical restriction.
 
+### Strings
+
+String literals should be declared with single-quotes *unless* the string itself contains a single-quote that would need to be escaped–in that case: use a double-quote. If the string contains a single-quote *and* a double-quote, you can use ES6 template strings to avoid escaping the quotes.
+
+**Note:** The single-quote character (`'`) should never be used in place of an apostrophe (`’`) for words like `it’s` or `haven’t` in user-facing strings. For test code it's still encouraged to use a real apostrophe.
+
+In general, avoid backslash-escaping quotes:
+
+```js
+// Bad:
+const name = "Matt";
+// Good:
+const name = 'Matt';
+
+// Bad:
+const pet = 'Matt\'s dog';
+// Also bad (not using an apostrophe): 
+const pet = "Matt's dog";
+// Good:
+const pet = 'Matt’s dog';
+// Also good:
+const oddString = "She said 'This is odd.'";
+```
+
+You should use ES6 Template Strings over string concatenation whenever possible:
+
+```js
+const name = 'Stacey';
+
+// Bad:
+alert( 'My name is ' + name + '.' );
+// Good:
+alert( `My name is ${ name }.` );
+```
+
 ## PHP
 
 We use

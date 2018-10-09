@@ -1,6 +1,6 @@
-# `@wordpress/npm-package-json-lint-config`
+# NPM Package.json Lint Config
 
-> WordPress [npm-package-json-lint](https://github.com/tclindner/npm-package-json-lint) shareable config
+WordPress [npm-package-json-lint](https://github.com/tclindner/npm-package-json-lint) shareable configuration.
 
 ## Installation
 

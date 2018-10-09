@@ -44,7 +44,7 @@ describe( 'WordCounter', () => {
 		},
 		{
 			message: 'Punctuation.',
-			string: 'It\'s two three \u2026 4?',
+			string: 'It’s two three \u2026 4?',
 			words: 3,
 			characters_excluding_spaces: 15,
 			characters_including_spaces: 19,

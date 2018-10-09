@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/shortcode",
-	"version": "1.0.0-alpha.3",
-	"description": "Shortcode module for WordPress",
+	"version": "2.0.1",
+	"description": "Shortcode module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
@@ -19,7 +19,9 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"lodash": "^4.17.10"
+		"@babel/runtime": "^7.0.0",
+		"lodash": "^4.17.10",
+		"memize": "^1.0.5"
 	},
 	"publishConfig": {
 		"access": "public"
