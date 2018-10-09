@@ -5,6 +5,7 @@ import '@wordpress/core-data';
 import {
 	registerBlockType,
 	setDefaultBlockName,
+	setUnknownTypeHandlerName,
 } from '@wordpress/blocks';
 
 /**
@@ -25,6 +26,7 @@ import * as column from './columns/column';
 import * as coverImage from './cover-image';
 import * as embed from './embed';
 import * as file from './file';
+import * as html from './html';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
 import * as list from './list';
@@ -43,6 +45,8 @@ import * as template from './template';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
+
+import * as classic from './classic';
 
 export const registerCoreBlocks = () => {
 	[
@@ -69,6 +73,8 @@ export const registerCoreBlocks = () => {
 		...embed.common,
 		...embed.others,
 		file,
+		window.wp && window.wp.oldEditor ? classic : null, // Only add the classic block in WP Context
+		html,
 		latestComments,
 		latestPosts,
 		more,
@@ -85,9 +91,16 @@ export const registerCoreBlocks = () => {
 		textColumns,
 		verse,
 		video,
-	].forEach( ( { name, settings } ) => {
+	].forEach( ( block ) => {
+		if ( ! block ) {
+			return;
+		}
+		const { name, settings } = block;
 		registerBlockType( name, settings );
 	} );
 
 	setDefaultBlockName( paragraph.name );
+	if ( window.wp && window.wp.oldEditor ) {
+		setUnknownTypeHandlerName( classic.name );
+	}
 };

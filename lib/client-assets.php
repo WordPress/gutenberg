@@ -731,14 +731,14 @@ function gutenberg_register_scripts_and_styles() {
 
 	wp_register_style(
 		'wp-edit-blocks',
-		gutenberg_url( 'build/block-library/edit-blocks.css' ),
+		gutenberg_url( 'build/block-library/editor.css' ),
 		array(
 			'wp-components',
 			'wp-editor',
 			// Always include visual styles so the editor never appears broken.
 			'wp-block-library-theme',
 		),
-		filemtime( gutenberg_dir_path() . 'build/block-library/edit-blocks.css' )
+		filemtime( gutenberg_dir_path() . 'build/block-library/editor.css' )
 	);
 	wp_style_add_data( 'wp-edit-blocks', 'rtl', 'replace' );
 
