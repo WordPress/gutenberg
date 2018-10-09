@@ -275,7 +275,7 @@ export function getEmbedEdit( title, icon ) {
 		}
 
 		getResponsiveHelp( checked ) {
-			return checked ? __( 'Videos and other content automatically resizes.' ) : __( 'Content is fixed size.' );
+			return checked ? __( 'Videos and other content is sized to avoid letterboxing.' ) : __( 'Videos and other embeds are not resized and may be letterboxed.' );
 		}
 
 		toggleResponsive() {
