@@ -63,7 +63,7 @@
 	align-items: stretch;
 	justify-content: space-between;
 	position: fixed;
-	top: 0;
+	top: $border-width;
 	background: $white;
 	width: calc(100% - #{$panel-padding + $panel-padding});
 	height: $header-height;
