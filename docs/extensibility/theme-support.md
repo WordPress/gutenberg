@@ -241,17 +241,17 @@ To change the main column width of the editor, add the following CSS to `style-e
 body.gutenberg-editor-page .editor-post-title__block,
 body.gutenberg-editor-page .editor-default-block-appender,
 body.gutenberg-editor-page .editor-block-list__block {
-	max-width: 720px;
+	max-width: 720px !important;
 }
 
 /* Width of "wide" blocks */
 body.gutenberg-editor-page .editor-block-list__block[data-align="wide"] {
-	max-width: 1080px;
+	max-width: 1080px !important;
 }
 
 /* Width of "full-wide" blocks */
 body.gutenberg-editor-page .editor-block-list__block[data-align="full"] {
-	max-width: none;
+	max-width: none !important;
 }
 ```
 
