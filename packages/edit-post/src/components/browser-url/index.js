@@ -17,7 +17,7 @@ export function getPostEditURL( postId ) {
 }
 
 /**
- * Returns the Post's Trashedd URL.
+ * Returns the Post's Trashed URL.
  *
  * @param {number} postId    Post ID.
  * @param {string} postType Post Type.

@@ -163,9 +163,9 @@ export async function setViewport( type ) {
 		large: { width: 960, height: 700 },
 		small: { width: 600, height: 700 },
 	};
-	const currentDimmension = allowedDimensions[ type ];
-	await page.setViewport( currentDimmension );
-	await waitForPageDimensions( currentDimmension.width, currentDimmension.height );
+	const currentDimension = allowedDimensions[ type ];
+	await page.setViewport( currentDimension );
+	await waitForPageDimensions( currentDimension.width, currentDimension.height );
 }
 
 /**

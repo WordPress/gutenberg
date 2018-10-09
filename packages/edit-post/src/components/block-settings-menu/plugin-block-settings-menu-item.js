@@ -21,7 +21,7 @@ const isEverySelectedBlockAllowed = ( selected, allowed ) => difference( selecte
  * or only for the specific ones provided in the `allowedBlocks` component property.
  *
  * If there are multiple blocks selected the item will be rendered if every block
- * is of one allowed type (not necesarily the same).
+ * is of one allowed type (not necessarily the same).
  *
  * @param {string[]} selectedBlockNames Array containing the names of the blocks selected
  * @param {string[]} allowedBlockNames Array containing the names of the blocks allowed
