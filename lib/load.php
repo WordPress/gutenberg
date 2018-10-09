@@ -37,5 +37,6 @@ require dirname( __FILE__ ) . '/../packages/block-library/src/archives/index.php
 require dirname( __FILE__ ) . '/../packages/block-library/src/block/index.php';
 require dirname( __FILE__ ) . '/../packages/block-library/src/categories/index.php';
 require dirname( __FILE__ ) . '/../packages/block-library/src/latest-comments/index.php';
+require dirname( __FILE__ ) . '/../packages/block-library/src/rss/index.php';
 require dirname( __FILE__ ) . '/../packages/block-library/src/latest-posts/index.php';
 require dirname( __FILE__ ) . '/../packages/block-library/src/shortcode/index.php';
