@@ -120,7 +120,6 @@ status "Creating archive... 🎁"
 zip -r gutenberg.zip \
 	gutenberg.php \
 	lib/*.php \
-	block-library/*/*.php \
 	packages/block-library/src/*/*.php \
 	packages/block-serialization-default-parser/*.php \
 	post-content.php \

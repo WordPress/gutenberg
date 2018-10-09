@@ -21,21 +21,6 @@ const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
 	filename: './build/[basename]/style.css',
 } );
 
-// CSS loader for styles specific to block editing.
-const editBlocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './build/block-library/edit-blocks.css',
-} );
-
-// CSS loader for styles specific to blocks in general.
-const blocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './build/block-library/style.css',
-} );
-
-// CSS loader for default visual block styles.
-const themeBlocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './build/block-library/theme.css',
-} );
-
 // Configuration for the ExtractTextPlugin.
 const extractConfig = {
 	use: [
@@ -49,7 +34,7 @@ const extractConfig = {
 		{
 			loader: 'sass-loader',
 			query: {
-				includePaths: [ 'edit-post/assets/stylesheets' ],
+				includePaths: [ 'assets/stylesheets' ],
 				data: '@import "colors"; @import "breakpoints"; @import "variables"; @import "mixins"; @import "animations";@import "z-index";',
 				outputStyle: 'production' === process.env.NODE_ENV ?
 					'compressed' : 'nested',
@@ -77,8 +62,6 @@ function camelCaseDash( string ) {
 
 const entryPointNames = [
 	'components',
-	'edit-post',
-	'block-library',
 ];
 
 const gutenbergPackages = [
@@ -87,6 +70,7 @@ const gutenbergPackages = [
 	'autop',
 	'blob',
 	'blocks',
+	'block-library',
 	'block-serialization-default-parser',
 	'block-serialization-spec-parser',
 	'compose',
@@ -96,6 +80,7 @@ const gutenbergPackages = [
 	'deprecated',
 	'dom',
 	'dom-ready',
+	'edit-post',
 	'editor',
 	'element',
 	'escape-html',
@@ -183,39 +168,12 @@ const config = {
 				use: 'babel-loader',
 			},
 			{
-				test: /style\.s?css$/,
-				include: [
-					/block-library/,
-				],
-				use: blocksCSSPlugin.extract( extractConfig ),
-			},
-			{
-				test: /editor\.s?css$/,
-				include: [
-					/block-library/,
-				],
-				use: editBlocksCSSPlugin.extract( extractConfig ),
-			},
-			{
-				test: /theme\.s?css$/,
-				include: [
-					/block-library/,
-				],
-				use: themeBlocksCSSPlugin.extract( extractConfig ),
-			},
-			{
 				test: /\.s?css$/,
-				exclude: [
-					/block-library/,
-				],
 				use: mainCSSExtractTextPlugin.extract( extractConfig ),
 			},
 		],
 	},
 	plugins: [
-		blocksCSSPlugin,
-		editBlocksCSSPlugin,
-		themeBlocksCSSPlugin,
 		mainCSSExtractTextPlugin,
 		// Create RTL files with a -rtl suffix
 		new WebpackRTLPlugin( {
