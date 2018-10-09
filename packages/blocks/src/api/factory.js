@@ -20,6 +20,7 @@ import {
  * WordPress dependencies
  */
 import { createHooks, applyFilters } from '@wordpress/hooks';
+import { create } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -49,6 +50,15 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 			value = schema.default;
 		}
 
+		if ( schema.source === 'rich-text' ) {
+			// Ensure value passed is always a rich text value.
+			if ( typeof value === 'string' ) {
+				value = create( { text: value } );
+			} else if ( ! value || ! value.text ) {
+				value = create();
+			}
+		}
+
 		if ( [ 'node', 'children' ].indexOf( schema.source ) !== -1 ) {
 			deprecated( `${ schema.source } source`, {
 				alternative: 'rich-text source',
@@ -57,15 +67,18 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 			} );
 
 			// Ensure value passed is always an array, which we're expecting in
-			// the RichText component to handle the deprecated value.
-			if ( typeof result[ key ] === 'string' ) {
+			// the RichText getColorObjectByAttributeValuescomponent to handle the deprecated value.
+			if ( typeof value === 'string' ) {
 				value = [ value ];
 			} else if ( ! Array.isArray( value ) ) {
 				value = [];
 			}
 		}
 
-		result[ key ] = value;
+		if ( value !== undefined ) {
+			result[ key ] = value;
+		}
+
 		return result;
 	}, {} );
 
