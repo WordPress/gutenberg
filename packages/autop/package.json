@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/autop",
-	"version": "1.0.6",
-	"description": "WordPress's automatic paragraph functions `autop` and `removep`",
+	"version": "2.0.1",
+	"description": "WordPress's automatic paragraph functions `autop` and `removep`.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
@@ -18,6 +18,10 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"dependencies": {
+		"@babel/runtime": "^7.0.0"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

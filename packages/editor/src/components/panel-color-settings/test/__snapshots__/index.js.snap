@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PanelColorSettings matches the snapshot 1`] = `
+<PanelBody
+  className="editor-panel-color-settings"
+  title={
+    <span
+      className="editor-panel-color-settings__panel-title"
+    >
+      Test Title
+      <ColorIndicator
+        aria-label="(border color: #000)"
+        colorValue="#000"
+      />
+      <ColorIndicator
+        aria-label="(background color: #111)"
+        colorValue="#111"
+      />
+    </span>
+  }
+>
+  <WithColorContext(ColorPaletteControl)
+    key="0"
+    label="border color"
+    onChange={[Function]}
+    value="#000"
+  />
+  <WithColorContext(ColorPaletteControl)
+    key="1"
+    label="background color"
+    onChange={[Function]}
+    value="#111"
+  />
+</PanelBody>
+`;

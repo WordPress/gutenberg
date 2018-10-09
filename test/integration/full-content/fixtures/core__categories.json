@@ -1,0 +1,14 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/categories",
+        "isValid": true,
+        "attributes": {
+            "showPostCounts": false,
+            "displayAsDropdown": false,
+            "showHierarchy": false
+        },
+        "innerBlocks": [],
+        "originalContent": ""
+    }
+]

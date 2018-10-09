@@ -1,6 +1,6 @@
-# @wordpress/postcss-themes
+# PostCSS Themes
 
-PostCSS Plugin to generate theme colors
+PostCSS plugin to generate theme colors.
 
 ## Installation
 

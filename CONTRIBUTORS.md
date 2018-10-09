@@ -100,3 +100,14 @@ This list is manually curated to include valuable contributions by volunteers th
 | @omarreiss | @omarreiss |
 | @hedgefield | @hedgefield |
 | @hideokamoto | @hideokamoto |
+| @mirucon | @mirucon |
+| @nosolosw | @nosolosw |
+| @DannyCooper | @DannyCooper |
+| @burhandodhy | @burhandodhy |
+| @ZebulanStanphill | @zebulan |
+| @BenjaminZekavica | @benjamin_zekavica |
+| @danielbachhuber | |
+| @jorgefilipecosta | |
+| @ajitbohra | |
+| @ChrisVanPatten | |
+| @tofumatt | @lonelyvegan |

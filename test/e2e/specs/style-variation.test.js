@@ -1,12 +1,10 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage, insertBlock, getHTMLFromCodeEditor } from '../support/utils';
+import { newPost, insertBlock, getEditedPostContent } from '../support/utils';
 
 describe( 'adding blocks', () => {
 	beforeAll( async () => {
-		await newDesktopBrowserPage();
 		await newPost();
 	} );
 
@@ -16,16 +14,17 @@ describe( 'adding blocks', () => {
 		await page.keyboard.type( 'Quote content' );
 
 		// we need to trigger isTyping = false
-		await page.mouse.move( 200, 300 );
-		await page.mouse.move( 250, 350 );
+		await page.mouse.move( 200, 300, { steps: 10 } );
+		await page.mouse.move( 250, 350, { steps: 10 } );
 
 		// Use a different style variation
+		await page.waitForSelector( 'button[aria-label="Change block type"]' );
 		await page.click( 'button[aria-label="Change block type"]' );
 		const styleVariations = await page.$$( '.editor-block-styles__item' );
 		await styleVariations[ 1 ].click();
 
 		// Check the content
-		const content = await getHTMLFromCodeEditor();
+		const content = await getEditedPostContent();
 		expect( content ).toMatchSnapshot();
 	} );
 } );

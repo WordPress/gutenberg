@@ -1,4 +1,4 @@
-# @wordpress/babel-preset-default
+# Babel Preset Default
 
 Default [Babel](https://babeljs.io/) preset for WordPress development.
 

@@ -4,21 +4,12 @@
 import { castArray } from 'lodash';
 
 /**
- * Returns an action object used in signalling that terms have been received
- * for a given taxonomy.
- *
- * @param {string}   taxonomy Taxonomy name.
- * @param {Object[]} terms    Terms received.
- *
- * @return {Object} Action object.
+ * Internal dependencies
  */
-export function receiveTerms( taxonomy, terms ) {
-	return {
-		type: 'RECEIVE_TERMS',
-		taxonomy,
-		terms,
-	};
-}
+import {
+	receiveItems,
+	receiveQueriedItems,
+} from './queried-data';
 
 /**
  * Returns an action object used in signalling that authors have been received.
@@ -56,13 +47,20 @@ export function addEntities( entities ) {
  * @param {string}       kind    Kind of the received entity.
  * @param {string}       name    Name of the received entity.
  * @param {Array|Object} records Records received.
+ * @param {?Object}      query  Query Object.
  *
  * @return {Object} Action object.
  */
-export function receiveEntityRecords( kind, name, records ) {
+export function receiveEntityRecords( kind, name, records, query ) {
+	let action;
+	if ( query ) {
+		action = receiveQueriedItems( records, query );
+	} else {
+		action = receiveItems( records );
+	}
+
 	return {
-		type: 'RECEIVE_ENTITY_RECORDS',
-		records: castArray( records ),
+		...action,
 		kind,
 		name,
 	};
@@ -79,5 +77,22 @@ export function receiveThemeSupportsFromIndex( index ) {
 	return {
 		type: 'RECEIVE_THEME_SUPPORTS',
 		themeSupports: index.theme_supports,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the preview data for
+ * a given URl has been received.
+ *
+ * @param {string}  url      URL to preview the embed for.
+ * @param {Mixed}   preview  Preview data.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveEmbedPreview( url, preview ) {
+	return {
+		type: 'RECEIVE_EMBED_PREVIEW',
+		url,
+		preview,
 	};
 }

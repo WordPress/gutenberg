@@ -1,18 +1,17 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
 import {
+	clickBlockAppender,
+	getEditedPostContent,
 	newPost,
-	newDesktopBrowserPage,
-	getHTMLFromCodeEditor,
-	pressWithModifier,
 	pressTimes,
+	pressWithModifier,
+	META_KEY,
 } from '../support/utils';
 
 describe( 'adding blocks', () => {
 	beforeEach( async () => {
-		await newDesktopBrowserPage();
 		await newPost();
 	} );
 
@@ -20,7 +19,7 @@ describe( 'adding blocks', () => {
 		let activeElementText;
 
 		// Add demo content
-		await page.click( '.editor-default-block-appender__content' );
+		await clickBlockAppender();
 		await page.keyboard.type( 'First paragraph' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/columns' );
@@ -71,12 +70,12 @@ describe( 'adding blocks', () => {
 		activeElementText = await page.evaluate( () => document.activeElement.textContent );
 		expect( activeElementText ).toBe( 'First paragraph' );
 
-		expect( await getHTMLFromCodeEditor() ).toMatchSnapshot();
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should navigate around inline boundaries', async () => {
 		// Add demo content
-		await page.click( '.editor-default-block-appender__content' );
+		await clickBlockAppender();
 		await page.keyboard.type( 'First' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Second' );
@@ -90,7 +89,7 @@ describe( 'adding blocks', () => {
 		await page.keyboard.down( 'Shift' );
 		await pressTimes( 'ArrowLeft', 6 );
 		await page.keyboard.up( 'Shift' );
-		await pressWithModifier( 'mod', 'b' );
+		await pressWithModifier( META_KEY, 'b' );
 
 		// Arrow left from selected bold should collapse to before the inline
 		// boundary. Arrow once more to traverse into first paragraph.
@@ -140,6 +139,60 @@ describe( 'adding blocks', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( 'Before' );
 
-		expect( await getHTMLFromCodeEditor() ).toMatchSnapshot();
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should clean TinyMCE content', async () => {
+		// Ensure no zero-width space character. Notably, this can occur when
+		// save occurs while at an inline boundary edge.
+		await clickBlockAppender();
+		await pressWithModifier( META_KEY, 'b' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Backspace to remove the content in this block, resetting it.
+		await page.keyboard.press( 'Backspace' );
+
+		// Ensure no data-mce-selected. Notably, this can occur when content
+		// is saved while typing within an inline boundary.
+		await pressWithModifier( META_KEY, 'b' );
+		await page.keyboard.type( 'Inside' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert line break at end', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'a' );
+		await pressWithModifier( 'Shift', 'Enter' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert line break at end and continue writing', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'a' );
+		await pressWithModifier( 'Shift', 'Enter' );
+		await page.keyboard.type( 'b' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert line break mid text', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'ab' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await pressWithModifier( 'Shift', 'Enter' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert line break at start', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await pressWithModifier( 'Shift', 'Enter' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert line break in empty container', async () => {
+		await clickBlockAppender();
+		await pressWithModifier( 'Shift', 'Enter' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

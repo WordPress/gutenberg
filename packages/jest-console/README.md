@@ -1,4 +1,4 @@
-# @wordpress/jest-console
+# Jest Console
 
 Custom [Jest](http://facebook.github.io/jest/) matchers for the [Console](https://developer.mozilla.org/en-US/docs/Web/API/Console)
 object to test JavaScript code in WordPress.

@@ -1,0 +1,46 @@
+.editor-block-list__block[data-type="core/pullquote"] {
+	&[data-align="left"],
+	&[data-align="right"] {
+		& .block-library-pullquote__content .editor-rich-text__tinymce[data-is-empty="true"]::before,
+		& .editor-rich-text p {
+			font-size: 20px;
+		}
+	}
+}
+
+.wp-block-pullquote {
+	cite .editor-rich-text__tinymce[data-is-empty="true"]::before {
+		font-size: 14px;
+		font-family: $default-font;
+	}
+
+	.editor-rich-text__tinymce[data-is-empty="true"]::before {
+		width: 100%;
+		left: 50%;
+		transform: translateX(-50%);
+	}
+
+	& blockquote > .block-library-pullquote__content .editor-rich-text__tinymce[data-is-empty="true"]::before,
+	& blockquote > .editor-rich-text p {
+		font-size: 28px;
+		line-height: 1.6;
+	}
+}
+
+.wp-block-pullquote.is-style-solid-color {
+	margin-left: 0;
+	margin-right: 0;
+
+	& blockquote > .editor-rich-text p {
+		font-size: 32px;
+	}
+
+	.wp-block-pullquote__citation {
+		text-transform: none;
+		font-style: normal;
+	}
+}
+
+.wp-block-pullquote .wp-block-pullquote__citation {
+	color: inherit;
+}
