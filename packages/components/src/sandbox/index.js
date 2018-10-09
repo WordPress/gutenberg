@@ -157,7 +157,9 @@ class Sandbox extends Component {
 		`;
 
 		// put the html snippet into a html document, and then write it to the iframe's document
-		// we can use this in the future to inject custom styles or scripts
+		// we can use this in the future to inject custom styles or scripts.
+		// Scripts go into the body rather than the head, to support embedded content such as Instagram
+		// that expect the scripts to be part of the body.
 		const htmlDoc = (
 			<html lang={ document.documentElement.lang } className={ this.props.type }>
 				<head>
