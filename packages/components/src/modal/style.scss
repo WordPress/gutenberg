@@ -34,7 +34,6 @@
 		right: auto;
 		bottom: auto;
 		left: 50%;
-		height: 90%;
 		min-width: $modal-min-width;
 		max-width: calc(100% - #{ $grid-size-large } - #{ $grid-size-large });
 		max-height: calc(100% - #{ $header-height } - #{ $header-height });
