@@ -36,8 +36,8 @@ module.exports = {
 		},
 		'core/edit-post': {
 			title: 'The Editor’s UI Data',
-			selectors: [ path.resolve( root, 'edit-post/store/selectors.js' ) ],
-			actions: [ path.resolve( root, 'edit-post/store/actions.js' ) ],
+			selectors: [ path.resolve( root, 'packages/edit-post/src/store/selectors.js' ) ],
+			actions: [ path.resolve( root, 'packages/edit-post/src/store/actions.js' ) ],
 		},
 		'core/nux': {
 			title: 'The NUX (New User Experience) Data',
