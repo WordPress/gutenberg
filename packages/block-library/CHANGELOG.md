@@ -3,6 +3,7 @@
 ### New Features
 
 - Include the classic block if `wp.oldEditor` is defined.
+- Include the HTML block.
 
 ## 2.0.0 (2018-09-05)
 
