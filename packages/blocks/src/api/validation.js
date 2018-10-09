@@ -398,6 +398,32 @@ function getHTMLTokens( html ) {
 }
 
 /**
+ * Returns true if the next HTML tag closes the current tag, false otherwise. Note this check does not
+ * affect the array of tokens
+ *
+ * @param {Object} currentToken Current token to compare against.
+ * @param {Array} tokens Array of remaining HTML tokens.
+ *
+ * @return {boolean} Whether the next token in `tokens` closes `currentToken`, false otherwise
+ */
+function isClosedByNextToken( currentToken, tokens ) {
+	// Check if this is a self closing tag
+	if ( ! currentToken.selfClosing ) {
+		return false;
+	}
+
+	// Peek at the next token without consuming
+	const [ next ] = tokens;
+
+	// Check token names and determine if the next token is the closing tag for the current token
+	if ( next && next.tagName === currentToken.tagName && next.type === 'EndTag' ) {
+		return true;
+	}
+
+	return false;
+}
+
+/**
  * Returns true if the given HTML strings are effectively equivalent, or
  * false otherwise. Invalid HTML is not considered equivalent, even if the
  * strings directly match.
@@ -437,6 +463,12 @@ export function isEquivalentHTML( actual, expected ) {
 		const isEqualTokens = isEqualTokensOfType[ actualToken.type ];
 		if ( isEqualTokens && ! isEqualTokens( actualToken, expectedToken ) ) {
 			return false;
+		}
+
+		// Peek at the next token to see if it closes a self-closing tag.
+		if ( isClosedByNextToken( actualToken, expectedTokens ) ) {
+			// Consume the next closing token that matches the current self-closing token
+			getNextNonWhitespaceToken( expectedTokens );
 		}
 	}
 

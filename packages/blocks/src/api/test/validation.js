@@ -473,6 +473,24 @@ describe( 'validation', () => {
 			expect( console ).toHaveWarned();
 			expect( isEquivalent ).toBe( false );
 		} );
+
+		it( 'should return true when comparing self-closing and normal tags', () => {
+			const isEquivalent = isEquivalentHTML(
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none" />',
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none"></path>'
+			);
+
+			expect( isEquivalent ).toBe( true );
+		} );
+
+		it( 'should return true when comparing self-closing and normal tags, ignoring trailing space', () => {
+			const isEquivalent = isEquivalentHTML(
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none"/>',
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none"></path>'
+			);
+
+			expect( isEquivalent ).toBe( true );
+		} );
 	} );
 
 	describe( 'isValidBlock()', () => {
