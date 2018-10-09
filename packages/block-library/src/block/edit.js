@@ -52,12 +52,6 @@ class ReusableBlockEdit extends Component {
 		}
 	}
 
-	componentDidUpdate( prevProps ) {
-		if ( prevProps.isSelected && ! this.props.isSelected ) {
-			this.stopEditing();
-		}
-	}
-
 	startEditing() {
 		const { reusableBlock } = this.props;
 
