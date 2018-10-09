@@ -80,7 +80,7 @@ export class PostSavedState extends Component {
 
 		// Once the post has been submitted for review this button
 		// is not needed for the contributor role.
-		if ( ! hasPublishAction ) {
+		if ( ! hasPublishAction && isPending ) {
 			return null;
 		}
 
