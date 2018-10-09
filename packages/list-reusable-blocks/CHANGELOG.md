@@ -1,5 +1,5 @@
-## 1.0.0 (Unrelease)
+## 1.1.0 (Unreleased)
 
 ### New Features
 
-- Initial release.
+- Initial public release.
