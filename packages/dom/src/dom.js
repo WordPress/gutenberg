@@ -1,25 +1,73 @@
 /**
  * External dependencies
  */
-import { includes, first } from 'lodash';
-import tinymce from 'tinymce';
+import { includes } from 'lodash';
 
 /**
  * Browser dependencies
  */
-const { getComputedStyle, DOMRect } = window;
-const { TEXT_NODE, ELEMENT_NODE } = window.Node;
+
+const { getComputedStyle } = window;
+const {
+	TEXT_NODE,
+	ELEMENT_NODE,
+	DOCUMENT_POSITION_PRECEDING,
+	DOCUMENT_POSITION_FOLLOWING,
+} = window.Node;
 
 /**
- * Check whether the caret is horizontally at the edge of the container.
+ * Returns true if the given selection object is in the forward direction, or
+ * false otherwise.
  *
- * @param {Element} container      Focusable element.
- * @param {boolean} isReverse      Set to true to check left, false for right.
- * @param {boolean} collapseRanges Whether or not to collapse the selection range before the check.
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition
+ *
+ * @param {Selection} selection Selection object to check.
+ *
+ * @return {boolean} Whether the selection is forward.
+ */
+function isSelectionForward( selection ) {
+	const {
+		anchorNode,
+		focusNode,
+		anchorOffset,
+		focusOffset,
+	} = selection;
+
+	const position = anchorNode.compareDocumentPosition( focusNode );
+
+	// Disable reason: `Node#compareDocumentPosition` returns a bitmask value,
+	// so bitwise operators are intended.
+	/* eslint-disable no-bitwise */
+	// Compare whether anchor node precedes focus node. If focus node (where
+	// end of selection occurs) is after the anchor node, it is forward.
+	if ( position & DOCUMENT_POSITION_PRECEDING ) {
+		return false;
+	}
+
+	if ( position & DOCUMENT_POSITION_FOLLOWING ) {
+		return true;
+	}
+	/* eslint-enable no-bitwise */
+
+	// `compareDocumentPosition` returns 0 when passed the same node, in which
+	// case compare offsets.
+	if ( position === 0 ) {
+		return anchorOffset <= focusOffset;
+	}
+
+	// This should never be reached, but return true as default case.
+	return true;
+}
+
+/**
+ * Check whether the selection is horizontally at the edge of the container.
+ *
+ * @param {Element} container Focusable element.
+ * @param {boolean} isReverse Set to true to check left, false for right.
  *
  * @return {boolean} True if at the horizontal edge, false if not.
  */
-export function isHorizontalEdge( container, isReverse, collapseRanges = false ) {
+export function isHorizontalEdge( container, isReverse ) {
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
 		if ( container.selectionStart !== container.selectionEnd ) {
 			return false;
@@ -36,41 +84,55 @@ export function isHorizontalEdge( container, isReverse, collapseRanges = false )
 		return true;
 	}
 
-	// If the container is empty, the caret is always at the edge.
-	if ( tinymce.DOM.isEmpty( container ) ) {
-		return true;
-	}
-
 	const selection = window.getSelection();
-	let range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
-	if ( collapseRanges ) {
-		range = range.cloneRange();
-		range.collapse( isReverse );
-	}
 
-	if ( ! range || ! range.collapsed ) {
-		return false;
-	}
+	// Create copy of range for setting selection to find effective offset.
+	const range = selection.getRangeAt( 0 ).cloneRange();
 
-	const position = isReverse ? 'start' : 'end';
-	const order = isReverse ? 'first' : 'last';
-	const offset = range[ `${ position }Offset` ];
+	// Collapse in direction of selection.
+	if ( ! selection.isCollapsed ) {
+		range.collapse( ! isSelectionForward( selection ) );
+	}
 
 	let node = range.startContainer;
 
-	if ( isReverse && offset !== 0 ) {
+	let extentOffset;
+	if ( isReverse ) {
+		// When in reverse, range node should be first.
+		extentOffset = 0;
+	} else if ( node.nodeValue ) {
+		// Otherwise, vary by node type. A text node has no children. Its range
+		// offset reflects its position in nodeValue.
+		//
+		// "If the startContainer is a Node of type Text, Comment, or
+		// CDATASection, then the offset is the number of characters from the
+		// start of the startContainer to the boundary point of the Range."
+		//
+		// See: https://developer.mozilla.org/en-US/docs/Web/API/Range/startOffset
+		// See: https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue
+		extentOffset = node.nodeValue.length;
+	} else {
+		// "For other Node types, the startOffset is the number of child nodes
+		// between the start of the startContainer and the boundary point of
+		// the Range."
+		//
+		// See: https://developer.mozilla.org/en-US/docs/Web/API/Range/startOffset
+		extentOffset = node.childNodes.length;
+	}
+
+	// Offset of range should be at expected extent.
+	const position = isReverse ? 'start' : 'end';
+	const offset = range[ `${ position }Offset` ];
+	if ( offset !== extentOffset ) {
 		return false;
 	}
 
-	const maxOffset = node.nodeType === TEXT_NODE ? node.nodeValue.length : node.childNodes.length;
-
-	if ( ! isReverse && offset !== maxOffset ) {
-		return false;
-	}
-
+	// If confirmed to be at extent, traverse up through DOM, verifying that
+	// the node is at first or last child for reverse or forward respectively.
+	// Continue until container is reached.
+	const order = isReverse ? 'first' : 'last';
 	while ( node !== container ) {
 		const parentNode = node.parentNode;
-
 		if ( parentNode[ `${ order }Child` ] !== node ) {
 			return false;
 		}
@@ -78,19 +140,19 @@ export function isHorizontalEdge( container, isReverse, collapseRanges = false )
 		node = parentNode;
 	}
 
+	// If reached, range is assumed to be at edge.
 	return true;
 }
 
 /**
- * Check whether the caret is vertically at the edge of the container.
+ * Check whether the selection is vertically at the edge of the container.
  *
- * @param {Element} container      Focusable element.
- * @param {boolean} isReverse      Set to true to check top, false for bottom.
- * @param {boolean} collapseRanges Whether or not to collapse the selection range before the check.
+ * @param {Element} container Focusable element.
+ * @param {boolean} isReverse Set to true to check top, false for bottom.
  *
  * @return {boolean} True if at the edge, false if not.
  */
-export function isVerticalEdge( container, isReverse, collapseRanges = false ) {
+export function isVerticalEdge( container, isReverse ) {
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
 		return isHorizontalEdge( container, isReverse );
 	}
@@ -100,16 +162,8 @@ export function isVerticalEdge( container, isReverse, collapseRanges = false ) {
 	}
 
 	const selection = window.getSelection();
-	let range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
-	if ( collapseRanges && range && ! range.collapsed ) {
-		const newRange = document.createRange();
-		// Get the end point of the selection (see focusNode vs. anchorNode)
-		newRange.setStart( selection.focusNode, selection.focusOffset );
-		newRange.collapse( true );
-		range = newRange;
-	}
-
-	if ( ! range || ! range.collapsed ) {
+	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+	if ( ! range ) {
 		return false;
 	}
 
@@ -150,21 +204,21 @@ export function getRectangleFromRange( range ) {
 		return range.getBoundingClientRect();
 	}
 
-	// If the collapsed range starts (and therefore ends) at an element node,
-	// `getClientRects` will return undefined. To fix this we can get the
-	// bounding rectangle of the element node to create a DOMRect based on that.
-	if ( range.startContainer.nodeType === ELEMENT_NODE ) {
-		const { x, y, height } = range.startContainer.getBoundingClientRect();
+	let rect = range.getClientRects()[ 0 ];
 
-		// Create a new DOMRect with zero width.
-		return new DOMRect( x, y, 0, height );
+	// If the collapsed range starts (and therefore ends) at an element node,
+	// `getClientRects` can be empty in some browsers. This can be resolved
+	// by adding a temporary text node with zero-width space to the range.
+	//
+	// See: https://stackoverflow.com/a/6847328/995445
+	if ( ! rect ) {
+		const padNode = document.createTextNode( '\u200b' );
+		range.insertNode( padNode );
+		rect = range.getClientRects()[ 0 ];
+		padNode.parentNode.removeChild( padNode );
 	}
 
-	// For normal collapsed ranges (exception above), the bounding rectangle of
-	// the range may be inaccurate in some browsers. There will only be one
-	// rectangle since it is a collapsed range, so it is safe to pass this as
-	// the union of them. This works consistently in all browsers.
-	return first( range.getClientRects() );
+	return rect;
 }
 
 /**
@@ -182,7 +236,7 @@ export function computeCaretRect( container ) {
 	const selection = window.getSelection();
 	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 
-	if ( ! range || ! range.collapsed ) {
+	if ( ! range ) {
 		return;
 	}
 
@@ -212,21 +266,31 @@ export function placeCaretAtHorizontalEdge( container, isReverse ) {
 		return;
 	}
 
+	container.focus();
+
 	if ( ! container.isContentEditable ) {
-		container.focus();
+		return;
+	}
+
+	// Select on extent child of the container, not the container itself. This
+	// avoids the selection always being `endOffset` of 1 when placed at end,
+	// where `startContainer`, `endContainer` would always be container itself.
+	const rangeTarget = container[ isReverse ? 'lastChild' : 'firstChild' ];
+
+	// If no range target, it implies that the container is empty. Focusing is
+	// sufficient for caret to be placed correctly.
+	if ( ! rangeTarget ) {
 		return;
 	}
 
 	const selection = window.getSelection();
 	const range = document.createRange();
 
-	range.selectNodeContents( container );
+	range.selectNodeContents( rangeTarget );
 	range.collapse( ! isReverse );
 
 	selection.removeAllRanges();
 	selection.addRange( range );
-
-	container.focus();
 }
 
 /**
@@ -314,7 +378,7 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 	// equivalent to a point at half the height of a line of text.
 	const buffer = rect.height / 2;
 	const editableRect = container.getBoundingClientRect();
-	const x = rect.left + ( rect.width / 2 );
+	const x = rect.left;
 	const y = isReverse ? ( editableRect.bottom - buffer ) : ( editableRect.top + buffer );
 	const selection = window.getSelection();
 
@@ -452,6 +516,40 @@ export function getScrollContainer( node ) {
 
 	// Continue traversing
 	return getScrollContainer( node.parentNode );
+}
+
+/**
+ * Returns the closest positioned element, or null under any of the conditions
+ * of the offsetParent specification. Unlike offsetParent, this function is not
+ * limited to HTMLElement and accepts any Node (e.g. Node.TEXT_NODE).
+ *
+ * @see https://drafts.csswg.org/cssom-view/#dom-htmlelement-offsetparent
+ *
+ * @param {Node} node Node from which to find offset parent.
+ *
+ * @return {?Node} Offset parent.
+ */
+export function getOffsetParent( node ) {
+	// Cannot retrieve computed style or offset parent only anything other than
+	// an element node, so find the closest element node.
+	let closestElement;
+	while ( ( closestElement = node.parentNode ) ) {
+		if ( closestElement.nodeType === ELEMENT_NODE ) {
+			break;
+		}
+	}
+
+	if ( ! closestElement ) {
+		return null;
+	}
+
+	// If the closest element is already positioned, return it, as offsetParent
+	// does not otherwise consider the node itself.
+	if ( getComputedStyle( closestElement ).position !== 'static' ) {
+		return closestElement;
+	}
+
+	return closestElement.offsetParent;
 }
 
 /**

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 
@@ -11,9 +11,12 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import './style.scss';
 import SidebarHeader from '../sidebar-header';
 
-const SettingsHeader = ( { count, openSidebar, sidebarName } ) => {
+const SettingsHeader = ( { count, openDocumentSettings, openBlockSettings, sidebarName } ) => {
 	// Do not display "0 Blocks".
-	count = count === 0 ? 1 : count;
+	const blockCount = count === 0 ? 1 : count;
+	const blockLabel = blockCount === 1 ?
+		__( 'Block' ) :
+		sprintf( _n( '%d Block', '%d Blocks', blockCount ), blockCount );
 
 	return (
 		<SidebarHeader
@@ -21,18 +24,20 @@ const SettingsHeader = ( { count, openSidebar, sidebarName } ) => {
 			closeLabel={ __( 'Close settings' ) }
 		>
 			<button
-				onClick={ () => openSidebar( 'edit-post/document' ) }
+				onClick={ openDocumentSettings }
 				className={ `edit-post-sidebar__panel-tab ${ sidebarName === 'edit-post/document' ? 'is-active' : '' }` }
 				aria-label={ __( 'Document settings' ) }
+				data-label={ __( 'Document' ) }
 			>
 				{ __( 'Document' ) }
 			</button>
 			<button
-				onClick={ () => openSidebar( 'edit-post/block' ) }
+				onClick={ openBlockSettings }
 				className={ `edit-post-sidebar__panel-tab ${ sidebarName === 'edit-post/block' ? 'is-active' : '' }` }
 				aria-label={ __( 'Block settings' ) }
+				data-label={ blockLabel }
 			>
-				{ sprintf( _n( 'Block', '%d Blocks', count ), count ) }
+				{ blockLabel }
 			</button>
 		</SidebarHeader>
 	);
@@ -42,7 +47,17 @@ export default compose(
 	withSelect( ( select ) => ( {
 		count: select( 'core/editor' ).getSelectedBlockCount(),
 	} ) ),
-	withDispatch( ( dispatch ) => ( {
-		openSidebar: dispatch( 'core/edit-post' ).openGeneralSidebar,
-	} ) ),
+	withDispatch( ( dispatch ) => {
+		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
+		const { clearSelectedBlock } = dispatch( 'core/editor' );
+		return {
+			openDocumentSettings() {
+				openGeneralSidebar( 'edit-post/document' );
+				clearSelectedBlock();
+			},
+			openBlockSettings() {
+				openGeneralSidebar( 'edit-post/block' );
+			},
+		};
+	} ),
 )( SettingsHeader );

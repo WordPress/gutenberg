@@ -1,39 +1,40 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { IconButton, Dropdown, MenuGroup } from '@wordpress/components';
+import { _x } from '@wordpress/i18n';
+import { IconButton, Dropdown } from '@wordpress/components';
+import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import ModeSwitcher from '../mode-switcher';
-import FixedToolbarToggle from '../fixed-toolbar-toggle';
 import PluginMoreMenuGroup from '../plugins-more-menu-group';
+import ToolsMoreMenuGroup from '../tools-more-menu-group';
+
+import WritingMenu from '../writing-menu';
 
 const MoreMenu = () => (
 	<Dropdown
 		className="edit-post-more-menu"
+		contentClassName="edit-post-more-menu__content"
 		position="bottom left"
 		renderToggle={ ( { isOpen, onToggle } ) => (
 			<IconButton
 				icon="ellipsis"
-				label={ __( 'More' ) }
+				label={ _x( 'More', 'button to expand options' ) }
 				onClick={ onToggle }
 				aria-expanded={ isOpen }
 			/>
 		) }
 		renderContent={ ( { onClose } ) => (
-			<div className="edit-post-more-menu__content">
+			<Fragment>
+				<WritingMenu onClose={ onClose } />
 				<ModeSwitcher onSelect={ onClose } />
-				<FixedToolbarToggle onToggle={ onClose } />
 				<PluginMoreMenuGroup.Slot fillProps={ { onClose } } />
-				<MenuGroup
-					label={ __( 'Tools' ) }
-					filterName="editPost.MoreMenu.tools"
-				/>
-			</div>
+				<ToolsMoreMenuGroup.Slot fillProps={ { onClose } } />
+			</Fragment>
 		) }
 	/>
 );

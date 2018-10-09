@@ -66,8 +66,8 @@ Sometimes the intention might be to lock the template on the UI so that the bloc
 
 *Options:*
 
-- `all` — prevents all operations.
-- `insert` — prevents inserting new blocks, but allows moving existing ones.
+- `all` — prevents all operations. It is not possible to insert new blocks, move existing blocks, or delete blocks.
+- `insert` — prevents inserting or removing blocks, but allows moving existing blocks.
 
 ## Existing Post Types
 
@@ -96,10 +96,13 @@ $template = array(
 		'placeholder' => 'Add a root-level paragraph',
 	) ),
 	array( 'core/columns', array(), array(
-		array( 'core/image', array( 'layout' => 'column-1' ) ),
-		array( 'core/paragraph', array(
-			'placeholder' => 'Add a inner paragraph',
-			'layout' => 'column-2'
+		array( 'core/column', array(), array(
+			array( 'core/image', array() ),
+		) ),
+		array( 'core/column', array(), array(
+			array( 'core/paragraph', array(
+				'placeholder' => 'Add a inner paragraph'
+			) ),
 		) ),
 	) )
 );

@@ -3,6 +3,10 @@
  */
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
+const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
+const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
+const postcss = require( 'postcss' );
+
 const { get } = require( 'lodash' );
 const { basename } = require( 'path' );
 
@@ -10,20 +14,11 @@ const { basename } = require( 'path' );
  * WordPress dependencies
  */
 const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
+const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-webpack-plugin' );
 
 // Main CSS loader for everything but blocks..
 const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
 	filename: './build/[basename]/style.css',
-} );
-
-// CSS loader for styles specific to block editing.
-const editBlocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './build/core-blocks/edit-blocks.css',
-} );
-
-// CSS loader for styles specific to blocks in general.
-const blocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './build/core-blocks/style.css',
 } );
 
 // Configuration for the ExtractTextPlugin.
@@ -33,62 +28,7 @@ const extractConfig = {
 		{
 			loader: 'postcss-loader',
 			options: {
-				plugins: [
-					require( './packages/postcss-themes' )( {
-						defaults: {
-							primary: '#0085ba',
-							secondary: '#11a0d2',
-							toggle: '#11a0d2',
-							button: '#0085ba',
-						},
-						themes: {
-							'admin-color-light': {
-								primary: '#0085ba',
-								secondary: '#c75726',
-								toggle: '#11a0d2',
-								button: '#0085ba',
-							},
-							'admin-color-blue': {
-								primary: '#82b4cb',
-								secondary: '#d9ab59',
-								toggle: '#82b4cb',
-								button: '#d9ab59',
-							},
-							'admin-color-coffee': {
-								primary: '#c2a68c',
-								secondary: '#9fa47b',
-								toggle: '#c2a68c',
-								button: '#c2a68c',
-							},
-							'admin-color-ectoplasm': {
-								primary: '#a7b656',
-								secondary: '#c77430',
-								toggle: '#a7b656',
-								button: '#a7b656',
-							},
-							'admin-color-midnight': {
-								primary: '#e14d43',
-								secondary: '#77a6b9',
-								toggle: '#77a6b9',
-								button: '#e14d43',
-							},
-							'admin-color-ocean': {
-								primary: '#a3b9a2',
-								secondary: '#a89d8a',
-								toggle: '#a3b9a2',
-								button: '#a3b9a2',
-							},
-							'admin-color-sunrise': {
-								primary: '#d1864a',
-								secondary: '#c8b03c',
-								toggle: '#c8b03c',
-								button: '#d1864a',
-							},
-						},
-					} ),
-					require( 'autoprefixer' ),
-					require( 'postcss-color-function' ),
-				],
+				plugins: require( './bin/packages/post-css-config' ),
 			},
 		},
 		{
@@ -121,34 +61,44 @@ function camelCaseDash( string ) {
 }
 
 const entryPointNames = [
-	'blocks',
 	'components',
-	'editor',
-	'utils',
-	'data',
-	'viewport',
-	'core-data',
-	'plugins',
 	'edit-post',
-	'core-blocks',
 ];
 
 const gutenbergPackages = [
-	'date',
-	'dom',
-	'element',
-];
-
-const wordPressPackages = [
 	'a11y',
+	'api-fetch',
+	'autop',
+	'blob',
+	'blocks',
+	'block-library',
+	'block-serialization-default-parser',
+	'block-serialization-spec-parser',
+	'compose',
+	'core-data',
+	'data',
+	'date',
+	'deprecated',
+	'dom',
 	'dom-ready',
+	'editor',
+	'element',
+	'escape-html',
 	'hooks',
+	'html-entities',
 	'i18n',
 	'is-shallow-equal',
-];
-
-const coreGlobals = [
-	'api-request',
+	'keycodes',
+	'list-reusable-blocks',
+	'nux',
+	'plugins',
+	'redux-routine',
+	'rich-text',
+	'shortcode',
+	'token-list',
+	'url',
+	'viewport',
+	'wordcount',
 ];
 
 const externals = {
@@ -164,8 +114,6 @@ const externals = {
 [
 	...entryPointNames,
 	...gutenbergPackages,
-	...wordPressPackages,
-	...coreGlobals,
 ].forEach( ( name ) => {
 	externals[ `@wordpress/${ name }` ] = {
 		this: [ 'wp', camelCaseDash( name ) ],
@@ -186,11 +134,6 @@ const config = {
 			memo[ name ] = `./packages/${ packageName }`;
 			return memo;
 		}, {} ),
-		wordPressPackages.reduce( ( memo, packageName ) => {
-			const name = camelCaseDash( packageName );
-			memo[ name ] = `./node_modules/@wordpress/${ packageName }`;
-			return memo;
-		}, {} )
 	),
 	output: {
 		filename: './build/[basename]/index.js',
@@ -211,40 +154,26 @@ const config = {
 	module: {
 		rules: [
 			{
-				test: /\.pegjs/,
-				use: 'pegjs-loader',
+				test: /\.js$/,
+				use: [ 'source-map-loader' ],
+				enforce: 'pre',
 			},
 			{
 				test: /\.js$/,
-				exclude: /node_modules/,
+				exclude: [
+					/block-serialization-spec-parser/,
+					/is-shallow-equal/,
+					/node_modules/,
+				],
 				use: 'babel-loader',
 			},
 			{
-				test: /style\.s?css$/,
-				include: [
-					/core-blocks/,
-				],
-				use: blocksCSSPlugin.extract( extractConfig ),
-			},
-			{
-				test: /editor\.s?css$/,
-				include: [
-					/core-blocks/,
-				],
-				use: editBlocksCSSPlugin.extract( extractConfig ),
-			},
-			{
 				test: /\.s?css$/,
-				exclude: [
-					/core-blocks/,
-				],
 				use: mainCSSExtractTextPlugin.extract( extractConfig ),
 			},
 		],
 	},
 	plugins: [
-		blocksCSSPlugin,
-		editBlocksCSSPlugin,
 		mainCSSExtractTextPlugin,
 		// Create RTL files with a -rtl suffix
 		new WebpackRTLPlugin( {
@@ -273,6 +202,31 @@ const config = {
 				return path;
 			},
 		} ),
+		new LibraryExportDefaultPlugin( [
+			'api-fetch',
+			'deprecated',
+			'dom-ready',
+			'redux-routine',
+		].map( camelCaseDash ) ),
+		new CopyWebpackPlugin(
+			gutenbergPackages.map( ( packageName ) => ( {
+				from: `./packages/${ packageName }/build-style/*.css`,
+				to: `./build/${ packageName }/`,
+				flatten: true,
+				transform: ( content ) => {
+					if ( config.mode === 'production' ) {
+						return postcss( [
+							require( 'cssnano' )( {
+								preset: 'default',
+							} ),
+						] )
+							.process( content, { from: 'src/app.css', to: 'dest/app.css' } )
+							.then( ( result ) => result.css );
+					}
+					return content;
+				},
+			} ) )
+		),
 	],
 	stats: {
 		children: false,
@@ -281,6 +235,10 @@ const config = {
 
 if ( config.mode !== 'production' ) {
 	config.devtool = process.env.SOURCEMAP || 'source-map';
+}
+
+if ( config.mode === 'development' ) {
+	config.plugins.push( new LiveReloadPlugin( { port: process.env.GUTENBERG_LIVE_RELOAD_PORT || 35729 } ) );
 }
 
 module.exports = config;

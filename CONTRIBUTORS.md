@@ -96,3 +96,18 @@ This list is manually curated to include valuable contributions by volunteers th
 | @vishalkakadiya |
 | @c-shultz |
 | @nfmohit-wpmudev |
+| @noisysocks | @noisysocks |
+| @omarreiss | @omarreiss |
+| @hedgefield | @hedgefield |
+| @hideokamoto | @hideokamoto |
+| @mirucon | @mirucon |
+| @nosolosw | @nosolosw |
+| @DannyCooper | @DannyCooper |
+| @burhandodhy | @burhandodhy |
+| @ZebulanStanphill | @zebulan |
+| @BenjaminZekavica | @benjamin_zekavica |
+| @danielbachhuber | |
+| @jorgefilipecosta | |
+| @ajitbohra | |
+| @ChrisVanPatten | |
+| @tofumatt | @lonelyvegan |

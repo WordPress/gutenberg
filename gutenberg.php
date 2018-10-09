@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
- * Version: 2.9.2
+ * Version: 3.9.0
  * Author: Gutenberg Team
  *
  * @package gutenberg
@@ -65,6 +65,12 @@ function gutenberg_menu() {
 
 	if ( current_user_can( 'edit_posts' ) ) {
 		$submenu['gutenberg'][] = array(
+			__( 'Support', 'gutenberg' ),
+			'edit_posts',
+			__( 'https://wordpress.org/support/plugin/gutenberg', 'gutenberg' ),
+		);
+
+		$submenu['gutenberg'][] = array(
 			__( 'Feedback', 'gutenberg' ),
 			'edit_posts',
 			'http://wordpressdotorg.polldaddy.com/s/gutenberg-support',
@@ -80,13 +86,42 @@ function gutenberg_menu() {
 add_action( 'admin_menu', 'gutenberg_menu' );
 
 /**
+ * Checks whether we're currently loading a Gutenberg page
+ *
+ * @return boolean Whether Gutenberg is being loaded.
+ *
+ * @since 3.1.0
+ */
+function is_gutenberg_page() {
+	global $post;
+
+	if ( ! is_admin() ) {
+		return false;
+	}
+
+	if ( get_current_screen()->base !== 'post' ) {
+		return false;
+	}
+
+	if ( isset( $_GET['classic-editor'] ) ) {
+		return false;
+	}
+
+	if ( ! gutenberg_can_edit_post( $post ) ) {
+		return false;
+	}
+
+	return true;
+}
+
+/**
  * Display a version notice and deactivate the Gutenberg plugin.
  *
  * @since 0.1.0
  */
 function gutenberg_wordpress_version_notice() {
 	echo '<div class="error"><p>';
-	echo __( 'Gutenberg requires WordPress 4.9 or later to function properly. Please upgrade WordPress before activating Gutenberg.', 'gutenberg' );
+	echo __( 'Gutenberg requires WordPress 4.9.8 or later to function properly. Please upgrade WordPress before activating Gutenberg.', 'gutenberg' );
 	echo '</p></div>';
 
 	deactivate_plugins( array( 'gutenberg/gutenberg.php' ) );
@@ -120,18 +155,12 @@ function gutenberg_pre_init() {
 	// Strip '-src' from the version string. Messes up version_compare().
 	$version = str_replace( '-src', '', $wp_version );
 
-	if ( version_compare( $version, '4.9', '<' ) ) {
+	if ( version_compare( $version, '4.9.8', '<' ) ) {
 		add_action( 'admin_notices', 'gutenberg_wordpress_version_notice' );
 		return;
 	}
 
 	require_once dirname( __FILE__ ) . '/lib/load.php';
-
-	if ( version_compare( $version, '4.9-beta1-41829', '<' ) ) {
-		add_action( 'load-post.php', 'gutenberg_intercept_edit_post' );
-		add_action( 'load-post-new.php', 'gutenberg_intercept_post_new' );
-		return;
-	}
 
 	add_filter( 'replace_editor', 'gutenberg_init', 10, 2 );
 }
@@ -146,15 +175,13 @@ function gutenberg_pre_init() {
  * @return bool   Whether Gutenberg was initialized.
  */
 function gutenberg_init( $return, $post ) {
+	global $title, $post_type;
+
 	if ( true === $return && current_filter() === 'replace_editor' ) {
 		return $return;
 	}
 
-	if ( isset( $_GET['classic-editor'] ) ) {
-		return false;
-	}
-
-	if ( ! gutenberg_can_edit_post( $post ) ) {
+	if ( ! is_gutenberg_page() ) {
 		return false;
 	}
 
@@ -162,162 +189,33 @@ function gutenberg_init( $return, $post ) {
 	add_filter( 'screen_options_show_screen', '__return_false' );
 	add_filter( 'admin_body_class', 'gutenberg_add_admin_body_class' );
 
-	/**
+	$post_type_object = get_post_type_object( $post_type );
+
+	/*
+	 * Always force <title> to 'Edit Post' (or equivalent)
+	 * because it needs to be in a generic state for both
+	 * post-new.php and post.php?post=<id>.
+	 */
+	if ( ! empty( $post_type_object ) ) {
+		$title = $post_type_object->labels->edit_item;
+	}
+
+	/*
 	 * Remove the emoji script as it is incompatible with both React and any
 	 * contenteditable fields.
 	 */
 	remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
 
+	/*
+	 * Ensure meta box functions are available to third-party code;
+	 * includes/meta-boxes is typically loaded from edit-form-advanced.php.
+	 */
+	require_once ABSPATH . 'wp-admin/includes/meta-boxes.php';
+
 	require_once ABSPATH . 'wp-admin/admin-header.php';
 	the_gutenberg_project();
 
 	return true;
-}
-
-/**
- * Emulate post.php
- */
-function gutenberg_intercept_edit_post() {
-	global $post_type, $post_type_object, $post, $post_id, $post_ID, $title, $editing,
-		$typenow, $parent_file, $submenu_file, $post_new_file;
-
-	wp_reset_vars( array( 'action' ) );
-
-	// Other actions are handled in post.php.
-	if ( 'edit' !== $GLOBALS['action'] ) {
-		return;
-	}
-
-	if ( empty( $_GET['post'] ) || ! is_numeric( $_GET['post'] ) ) {
-		return;
-	}
-
-	$post_ID = (int) $_GET['post'];
-	$post_id = $post_ID;
-
-	$post = get_post( $post_id );
-
-	// Errors and invalid requests are handled in post.php, do not intercept.
-	if ( ! $post ) {
-		return;
-	}
-
-	$post_type        = $post->post_type;
-	$post_type_object = get_post_type_object( $post_type );
-
-	if ( ! $post_type_object ) {
-		return;
-	}
-
-	if ( ! in_array( $typenow, get_post_types( array( 'show_ui' => true ) ), true ) ) {
-		return;
-	}
-
-	if ( ! current_user_can( 'edit_post', $post_id ) ) {
-		return;
-	}
-
-	if ( 'trash' === $post->post_status ) {
-		return;
-	}
-
-	if ( ! empty( $_GET['get-post-lock'] ) ) {
-		check_admin_referer( 'lock-post_' . $post_id );
-		wp_set_post_lock( $post_id );
-		wp_redirect( get_edit_post_link( $post_id, 'url' ) );
-		exit();
-	}
-
-	$editing = true;
-	$title   = $post_type_object->labels->edit_item;
-
-	if ( 'post' === $post_type ) {
-		$parent_file   = 'edit.php';
-		$submenu_file  = 'edit.php';
-		$post_new_file = 'post-new.php';
-	} elseif ( 'attachment' === $post_type ) {
-		$parent_file   = 'upload.php';
-		$submenu_file  = 'upload.php';
-		$post_new_file = 'media-new.php';
-	} else {
-		if ( isset( $post_type_object ) && $post_type_object->show_in_menu && true !== $post_type_object->show_in_menu ) {
-			$parent_file = $post_type_object->show_in_menu;
-		} else {
-			$parent_file = "edit.php?post_type=$post_type";
-		}
-
-		$submenu_file  = "edit.php?post_type=$post_type";
-		$post_new_file = "post-new.php?post_type=$post_type";
-	}
-
-	if ( gutenberg_init( false, $post ) ) {
-		include ABSPATH . 'wp-admin/admin-footer.php';
-		exit;
-	}
-}
-
-/**
- * Emulate post-new.php
- */
-function gutenberg_intercept_post_new() {
-	global $post_type, $post_type_object, $post, $post_ID, $title, $editing,
-		$parent_file, $submenu_file, $_registered_pages;
-
-	if ( ! isset( $_GET['post_type'] ) ) {
-		$post_type = 'post';
-	} elseif ( in_array( $_GET['post_type'], get_post_types( array( 'show_ui' => true ) ), true ) ) {
-		$post_type = $_GET['post_type'];
-	} else {
-		return;
-	}
-	$post_type_object = get_post_type_object( $post_type );
-
-	if ( 'post' === $post_type ) {
-		$parent_file  = 'edit.php';
-		$submenu_file = 'post-new.php';
-	} elseif ( 'attachment' === $post_type ) {
-		if ( wp_redirect( admin_url( 'media-new.php' ) ) ) {
-			exit;
-		}
-	} else {
-		$submenu_file = "post-new.php?post_type=$post_type";
-		if ( isset( $post_type_object ) && $post_type_object->show_in_menu && true !== $post_type_object->show_in_menu ) {
-			$parent_file = $post_type_object->show_in_menu;
-			// What if there isn't a post-new.php item for this post type?
-			if ( ! isset( $_registered_pages[ get_plugin_page_hookname( "post-new.php?post_type=$post_type", $post_type_object->show_in_menu ) ] ) ) {
-				if ( isset( $_registered_pages[ get_plugin_page_hookname( "edit.php?post_type=$post_type", $post_type_object->show_in_menu ) ] ) ) {
-					// Fall back to edit.php for that post type, if it exists.
-					$submenu_file = "edit.php?post_type=$post_type";
-				} else {
-					// Otherwise, give up and highlight the parent.
-					$submenu_file = $parent_file;
-				}
-			}
-		} else {
-			$parent_file = "edit.php?post_type=$post_type";
-		}
-	}
-
-	$title   = $post_type_object->labels->add_new_item;
-	$editing = true;
-
-	// Errors and invalid requests are handled in post-new.php, do not intercept.
-	if ( ! current_user_can( $post_type_object->cap->edit_posts ) || ! current_user_can( $post_type_object->cap->create_posts ) ) {
-		return;
-	}
-
-	// Schedule auto-draft cleanup.
-	if ( ! wp_next_scheduled( 'wp_scheduled_auto_draft_delete' ) ) {
-		wp_schedule_event( time(), 'daily', 'wp_scheduled_auto_draft_delete' );
-	}
-
-	$post    = get_default_post_to_edit( $post_type, true );
-	$post_ID = $post->ID;
-
-	if ( gutenberg_init( false, $post ) ) {
-		include ABSPATH . 'wp-admin/admin-footer.php';
-		exit;
-	}
 }
 
 /**
@@ -359,6 +257,27 @@ add_action( 'admin_init', 'gutenberg_add_edit_link_filters' );
  * @return array          Updated post actions.
  */
 function gutenberg_add_edit_link( $actions, $post ) {
+	// Build the classic edit action. See also: WP_Posts_List_Table::handle_row_actions().
+	$title = _draft_or_post_title( $post->ID );
+
+	if ( 'wp_block' === $post->post_type ) {
+		unset( $actions['edit'] );
+		unset( $actions['inline hide-if-no-js'] );
+		$actions['export'] = sprintf(
+			'<button type="button" class="wp-list-reusable-blocks__export button-link" data-id="%s" aria-label="%s">%s</button>',
+			$post->ID,
+			esc_attr(
+				sprintf(
+					/* translators: %s: post title */
+					__( 'Export &#8220;%s&#8221; as JSON', 'gutenberg' ),
+					$title
+				)
+			),
+			__( 'Export as JSON', 'gutenberg' )
+		);
+		return $actions;
+	}
+
 	if ( ! gutenberg_can_edit_post( $post ) ) {
 		return $actions;
 	}
@@ -366,17 +285,17 @@ function gutenberg_add_edit_link( $actions, $post ) {
 	$edit_url = get_edit_post_link( $post->ID, 'raw' );
 	$edit_url = add_query_arg( 'classic-editor', '', $edit_url );
 
-	// Build the classic edit action. See also: WP_Posts_List_Table::handle_row_actions().
-	$title       = _draft_or_post_title( $post->ID );
 	$edit_action = array(
 		'classic' => sprintf(
 			'<a href="%s" aria-label="%s">%s</a>',
 			esc_url( $edit_url ),
-			esc_attr( sprintf(
-				/* translators: %s: post title */
-				__( 'Edit &#8220;%s&#8221; in the classic editor', 'gutenberg' ),
-				$title
-			) ),
+			esc_attr(
+				sprintf(
+					/* translators: %s: post title */
+					__( 'Edit &#8220;%s&#8221; in the classic editor', 'gutenberg' ),
+					$title
+				)
+			),
 			__( 'Classic Editor', 'gutenberg' )
 		),
 	);
@@ -393,15 +312,42 @@ function gutenberg_add_edit_link( $actions, $post ) {
 }
 
 /**
+ * Removes the Edit action from the reusable block list's Bulk Actions dropdown.
+ *
+ * @since 3.8.0
+ *
+ * @param array $actions Bulk actions.
+ *
+ * @return array Updated bulk actions.
+ */
+function gutenberg_block_bulk_actions( $actions ) {
+	unset( $actions['edit'] );
+	return $actions;
+}
+add_filter( 'bulk_actions-edit-wp_block', 'gutenberg_block_bulk_actions' );
+
+/**
  * Prints the JavaScript to replace the default "Add New" button.$_COOKIE
  *
  * @since 1.5.0
  */
 function gutenberg_replace_default_add_new_button() {
 	global $typenow;
+
+	if ( 'wp_block' === $typenow ) {
+		?>
+		<style type="text/css">
+			.page-title-action {
+				display: none;
+			}
+		</style>
+		<?php
+	}
+
 	if ( ! gutenberg_can_edit_post_type( $typenow ) ) {
 		return;
 	}
+
 	?>
 	<style type="text/css">
 		.split-page-title-action {
@@ -503,7 +449,7 @@ function gutenberg_replace_default_add_new_button() {
 			newbutton += '<a href="' + classicUrl + '"><?php echo esc_js( __( 'Classic Editor', 'gutenberg' ) ); ?></a></span></span><span class="page-title-action" style="display:none;"></span>';
 
 			button.insertAdjacentHTML( 'afterend', newbutton );
-			button.remove();
+			button.parentNode.removeChild( button );
 
 			var expander = document.getElementById( 'split-page-title-action' ).getElementsByClassName( 'expander' ).item( 0 );
 			var dropdown = expander.parentNode.querySelector( '.dropdown' );
@@ -535,5 +481,27 @@ add_action( 'admin_print_scripts-edit.php', 'gutenberg_replace_default_add_new_b
  * @return string The $classes string, with gutenberg-editor-page appended.
  */
 function gutenberg_add_admin_body_class( $classes ) {
-	return "$classes gutenberg-editor-page";
+	if ( current_theme_supports( 'editor-styles' ) && current_theme_supports( 'dark-editor-style' ) ) {
+		return "$classes gutenberg-editor-page is-fullscreen-mode is-dark-theme";
+	} else {
+		// Default to is-fullscreen-mode to avoid jumps in the UI.
+		return "$classes gutenberg-editor-page is-fullscreen-mode";
+	}
 }
+
+/**
+ * Adds attributes to kses allowed tags that aren't in the default list
+ * and that Gutenberg needs to save blocks such as the Gallery block.
+ *
+ * @param array $tags Allowed HTML.
+ * @return array (Maybe) modified allowed HTML.
+ */
+function gutenberg_kses_allowedtags( $tags ) {
+	if ( isset( $tags['img'] ) ) {
+		$tags['img']['data-link'] = true;
+		$tags['img']['data-id']   = true;
+	}
+	return $tags;
+}
+
+add_filter( 'wp_kses_allowed_html', 'gutenberg_kses_allowedtags', 10, 2 );

@@ -1,0 +1,38 @@
+{
+	"name": "@wordpress/core-data",
+	"version": "2.0.1",
+	"description": "Access to and manipulation of core WordPress entities.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"data",
+		"entities"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/core-data/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"dependencies": {
+		"@babel/runtime": "^7.0.0",
+		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/data": "file:../data",
+		"@wordpress/url": "file:../url",
+		"equivalent-key-map": "^0.2.1",
+		"lodash": "^4.17.10",
+		"rememo": "^3.0.0"
+	},
+	"devDependencies": {
+		"deep-freeze": "^0.0.1"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

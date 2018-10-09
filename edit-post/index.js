@@ -1,42 +1,42 @@
 /**
  * WordPress dependencies
  */
-import { registerCoreBlocks } from '@wordpress/core-blocks';
+import '@wordpress/core-data';
+import '@wordpress/editor';
+import '@wordpress/nux';
+import '@wordpress/viewport';
+import { registerCoreBlocks } from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
+import { dispatch } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
 import './assets/stylesheets/main.scss';
 import './hooks';
+import './plugins';
 import store from './store';
 import { initializeMetaBoxState } from './store/actions';
 import Editor from './editor';
-
-/**
- * Configure heartbeat to refresh the wp-api nonce, keeping the editor
- * authorization intact.
- */
-window.jQuery( document ).on( 'heartbeat-tick', ( event, response ) => {
-	if ( response[ 'rest-nonce' ] ) {
-		window.wpApiSettings.nonce = response[ 'rest-nonce' ];
-	}
-} );
 
 /**
  * Reinitializes the editor after the user chooses to reboot the editor after
  * an unhandled error occurs, replacing previously mounted editor element using
  * an initial state from prior to the crash.
  *
- * @param {Element} target   DOM node in which editor is rendered.
- * @param {?Object} settings Editor settings object.
+ * @param {Object}  postType       Post type of the post to edit.
+ * @param {Object}  postId         ID of the post to edit.
+ * @param {Element} target         DOM node in which editor is rendered.
+ * @param {?Object} settings       Editor settings object.
+ * @param {Object}  overridePost   Post properties to override.
  */
-export function reinitializeEditor( target, settings ) {
+export function reinitializeEditor( postType, postId, target, settings, overridePost ) {
 	unmountComponentAtNode( target );
-	const reboot = reinitializeEditor.bind( null, target, settings );
+	const reboot = reinitializeEditor.bind( null, postType, postId, target, settings, overridePost );
 
 	render(
-		<Editor settings={ settings } onError={ reboot } recovery />,
+		<Editor settings={ settings } onError={ reboot } postId={ postId } postType={ postType } overridePost={ overridePost } recovery />,
 		target
 	);
 }
@@ -47,39 +47,46 @@ export function reinitializeEditor( target, settings ) {
  * The return value of this function is not necessary if we change where we
  * call initializeEditor(). This is due to metaBox timing.
  *
- * @param {string}  id       Unique identifier for editor instance.
- * @param {Object}  post     API entity for post to edit.
- * @param {?Object} settings Editor settings object.
+ * @param {string}  id            Unique identifier for editor instance.
+ * @param {Object}  postType      Post type of the post to edit.
+ * @param {Object}  postId        ID of the post to edit.
+ * @param {?Object} settings      Editor settings object.
+ * @param {Object}  overridePost  Post properties to override.
  *
  * @return {Object} Editor interface.
  */
-export function initializeEditor( id, post, settings ) {
-	if ( 'production' !== process.env.NODE_ENV ) {
-		// Remove with 3.0 release.
-		window.console.info(
-			'`isSelected` usage is no longer mandatory with `BlockControls`, `InspectorControls` and `RichText`. ' +
-			'It is now handled by the editor internally to ensure that controls are visible only when block is selected. ' +
-			'See updated docs: https://github.com/WordPress/gutenberg/blob/master/blocks/README.md#components.'
-		);
-	}
-
+export function initializeEditor( id, postType, postId, settings, overridePost ) {
 	const target = document.getElementById( id );
-	const reboot = reinitializeEditor.bind( null, target, settings );
+	const reboot = reinitializeEditor.bind( null, postType, postId, target, settings, overridePost );
 
 	registerCoreBlocks();
 
+	dispatch( 'core/nux' ).triggerGuide( [
+		'core/editor.inserter',
+		'core/editor.settings',
+		'core/editor.preview',
+		'core/editor.publish',
+	] );
+
 	render(
-		<Editor settings={ settings } onError={ reboot } post={ post } />,
+		<Editor settings={ settings } onError={ reboot } postId={ postId } postType={ postType } overridePost={ overridePost } />,
 		target
 	);
 
 	return {
 		initializeMetaBoxes( metaBoxes ) {
+			deprecated( 'editor.initializeMetaBoxes', {
+				alternative: 'setActiveMetaBoxLocations action (`core/edit-post`)',
+				plugin: 'Gutenberg',
+				version: '4.2',
+			} );
+
 			store.dispatch( initializeMetaBoxState( metaBoxes ) );
 		},
 	};
 }
 
+export { default as PluginBlockSettingsMenuItem } from './components/block-settings-menu/plugin-block-settings-menu-item';
 export { default as PluginPostPublishPanel } from './components/sidebar/plugin-post-publish-panel';
 export { default as PluginPostStatusInfo } from './components/sidebar/plugin-post-status-info';
 export { default as PluginPrePublishPanel } from './components/sidebar/plugin-pre-publish-panel';

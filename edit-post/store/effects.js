@@ -1,32 +1,35 @@
 /**
  * External dependencies
  */
-import { reduce, some } from 'lodash';
+import { reduce } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { select, subscribe } from '@wordpress/data';
+import { select, subscribe, dispatch } from '@wordpress/data';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
  */
 import {
 	metaBoxUpdatesSuccess,
-	setMetaBoxSavedData,
 	requestMetaBoxUpdates,
 	openGeneralSidebar,
 	closeGeneralSidebar,
 } from './actions';
-import { getMetaBoxes, getActiveGeneralSidebarName } from './selectors';
+import {
+	getActiveMetaBoxLocations,
+	getActiveGeneralSidebarName,
+} from './selectors';
 import { getMetaBoxContainer } from '../utils/meta-boxes';
 import { onChangeListener } from './utils';
 
 const effects = {
-	INITIALIZE_META_BOX_STATE( action, store ) {
-		const hasActiveMetaBoxes = some( action.metaBoxes );
+	SET_ACTIVE_META_BOX_LOCATIONS( action, store ) {
+		const hasActiveMetaBoxes = action.locations.length > 0;
 		if ( ! hasActiveMetaBoxes ) {
 			return;
 		}
@@ -43,31 +46,27 @@ const effects = {
 			}
 		} );
 
-		// Initialize metaboxes state
-		const dataPerLocation = reduce( action.metaBoxes, ( memo, isActive, location ) => {
-			if ( isActive ) {
-				memo[ location ] = jQuery( getMetaBoxContainer( location ) ).serialize();
-			}
-			return memo;
-		}, {} );
-		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
+		let wasSavingPost = select( 'core/editor' ).isSavingPost();
+		let wasAutosavingPost = select( 'core/editor' ).isAutosavingPost();
+		// Save metaboxes when performing a full save on the post.
+		subscribe( () => {
+			const isSavingPost = select( 'core/editor' ).isSavingPost();
+			const isAutosavingPost = select( 'core/editor' ).isAutosavingPost();
 
-		// Saving metaboxes when saving posts
-		subscribe( onChangeListener( select( 'core/editor' ).isSavingPost, ( isSavingPost ) => {
-			if ( ! isSavingPost ) {
+			// Save metaboxes on save completion when past save wasn't an autosave.
+			const shouldTriggerMetaboxesSave = wasSavingPost && ! wasAutosavingPost && ! isSavingPost && ! isAutosavingPost;
+
+			// Save current state for next inspection.
+			wasSavingPost = isSavingPost;
+			wasAutosavingPost = isAutosavingPost;
+
+			if ( shouldTriggerMetaboxesSave ) {
 				store.dispatch( requestMetaBoxUpdates() );
 			}
-		} ) );
+		} );
 	},
 	REQUEST_META_BOX_UPDATES( action, store ) {
 		const state = store.getState();
-		const dataPerLocation = reduce( getMetaBoxes( state ), ( memo, metabox, location ) => {
-			if ( metabox.isActive ) {
-				memo[ location ] = jQuery( getMetaBoxContainer( location ) ).serialize();
-			}
-			return memo;
-		}, {} );
-		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
 
 		// Additional data needed for backwards compatibility.
 		// If we do not provide this data the post will be overriden with the default values.
@@ -81,12 +80,12 @@ const effects = {
 
 		// We gather all the metaboxes locations data and the base form data
 		const baseFormData = new window.FormData( document.querySelector( '.metabox-base-form' ) );
-		const formDataToMerge = reduce( getMetaBoxes( state ), ( memo, metabox, location ) => {
-			if ( metabox.isActive ) {
-				memo.push( new window.FormData( getMetaBoxContainer( location ) ) );
-			}
-			return memo;
-		}, [ baseFormData ] );
+		const formDataToMerge = [
+			baseFormData,
+			...getActiveMetaBoxLocations( state ).map( ( location ) => (
+				new window.FormData( getMetaBoxContainer( location ) )
+			) ),
+		];
 
 		// Merge all form data objects into a single one.
 		const formData = reduce( formDataToMerge, ( memo, currentFormData ) => {
@@ -98,16 +97,20 @@ const effects = {
 		additionalData.forEach( ( [ key, value ] ) => formData.append( key, value ) );
 
 		// Save the metaboxes
-		wp.apiRequest( {
+		apiFetch( {
 			url: window._wpMetaBoxUrl,
 			method: 'POST',
-			processData: false,
-			contentType: false,
-			data: formData,
+			body: formData,
+			parse: false,
 		} )
 			.then( () => store.dispatch( metaBoxUpdatesSuccess() ) );
 	},
 	SWITCH_MODE( action ) {
+		// Unselect blocks when we switch to the code editor.
+		if ( action.mode !== 'visual' ) {
+			dispatch( 'core/editor' ).clearSelectedBlock();
+		}
+
 		const message = action.mode === 'visual' ? __( 'Visual editor selected' ) : __( 'Code editor selected' );
 		speak( message, 'assertive' );
 	},
@@ -127,25 +130,28 @@ const effects = {
 			} )
 		);
 
-		// Collapse sidebar when viewport shrinks.
-		subscribe( onChangeListener(
-			() => select( 'core/viewport' ).isViewportMatch( '< medium' ),
-			( () => {
-				// contains the sidebar we close when going to viewport sizes lower than medium.
-				// This allows to reopen it when going again to viewport sizes greater than medium.
-				let sidebarToReOpenOnExpand = null;
-				return ( isSmall ) => {
-					if ( isSmall ) {
-						sidebarToReOpenOnExpand = getActiveGeneralSidebarName( store.getState() );
-						if ( sidebarToReOpenOnExpand ) {
-							store.dispatch( closeGeneralSidebar() );
-						}
-					} else if ( sidebarToReOpenOnExpand && ! getActiveGeneralSidebarName( store.getState() ) ) {
-						store.dispatch( openGeneralSidebar( sidebarToReOpenOnExpand ) );
+		const isMobileViewPort = () => select( 'core/viewport' ).isViewportMatch( '< medium' );
+		const adjustSidebar = ( () => {
+			// contains the sidebar we close when going to viewport sizes lower than medium.
+			// This allows to reopen it when going again to viewport sizes greater than medium.
+			let sidebarToReOpenOnExpand = null;
+			return ( isSmall ) => {
+				if ( isSmall ) {
+					sidebarToReOpenOnExpand = getActiveGeneralSidebarName( store.getState() );
+					if ( sidebarToReOpenOnExpand ) {
+						store.dispatch( closeGeneralSidebar() );
 					}
-				};
-			} )()
-		) );
+				} else if ( sidebarToReOpenOnExpand && ! getActiveGeneralSidebarName( store.getState() ) ) {
+					store.dispatch( openGeneralSidebar( sidebarToReOpenOnExpand ) );
+				}
+			};
+		} )();
+
+		adjustSidebar( isMobileViewPort() );
+
+		// Collapse sidebar when viewport shrinks.
+		// Reopen sidebar it if viewport expands and it was closed because of a previous shrink.
+		subscribe( onChangeListener( isMobileViewPort, adjustSidebar ) );
 	},
 
 };

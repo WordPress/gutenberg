@@ -6,7 +6,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Fragment, compose } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -15,6 +16,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import './style.scss';
+import shortcuts from '../../../keyboard-shortcuts';
 
 const SidebarHeader = ( { children, className, closeLabel, closeSidebar, title } ) => {
 	return (
@@ -35,6 +37,7 @@ const SidebarHeader = ( { children, className, closeLabel, closeSidebar, title }
 					onClick={ closeSidebar }
 					icon="no-alt"
 					label={ closeLabel }
+					shortcut={ shortcuts.toggleSidebar }
 				/>
 			</div>
 		</Fragment>

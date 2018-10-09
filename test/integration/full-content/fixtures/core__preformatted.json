@@ -1,0 +1,99 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/preformatted",
+        "isValid": true,
+        "attributes": {
+            "content": {
+                "formats": [
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "em"
+                        }
+                    ],
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ],
+                "text": "Some preformatted text...\nAnd more!"
+            }
+        },
+        "innerBlocks": [],
+        "originalContent": "<pre class=\"wp-block-preformatted\">Some <em>preformatted</em> text...<br>And more!</pre>"
+    }
+]

@@ -1,10 +1,11 @@
 {
 	"name": "@wordpress/postcss-themes",
-	"version": "1.0.0-alpha.0",
-	"description": "PostCSS plugin to generate theme colors",
-	"author": "WordPress",
+	"version": "1.0.4",
+	"description": "PostCSS plugin to generate theme colors.",
+	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
+		"wordpress",
 		"postcss",
 		"css",
 		"postcss-plugin",
@@ -19,8 +20,13 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"main": "src/index.js",
+	"files": [
+		"build",
+		"build-module"
+	],
+	"main": "build/index.js",
 	"dependencies": {
+		"@babel/runtime": "^7.0.0",
 		"postcss": "^6.0.16"
 	},
 	"publishConfig": {

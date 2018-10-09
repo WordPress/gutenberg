@@ -8,10 +8,11 @@ import {
 	openPublishSidebar,
 	closePublishSidebar,
 	togglePublishSidebar,
+	openModal,
+	closeModal,
 	toggleFeature,
 	togglePinnedPluginItem,
 	requestMetaBoxUpdates,
-	initializeMetaBoxState,
 } from '../actions';
 
 describe( 'actions', () => {
@@ -67,6 +68,24 @@ describe( 'actions', () => {
 		} );
 	} );
 
+	describe( 'openModal', () => {
+		it( 'should return OPEN_MODAL action', () => {
+			const name = 'plugin/my-name';
+			expect( openModal( name ) ).toEqual( {
+				type: 'OPEN_MODAL',
+				name,
+			} );
+		} );
+	} );
+
+	describe( 'closeModal', () => {
+		it( 'should return CLOSE_MODAL action', () => {
+			expect( closeModal() ).toEqual( {
+				type: 'CLOSE_MODAL',
+			} );
+		} );
+	} );
+
 	describe( 'toggleFeature', () => {
 		it( 'should return TOGGLE_FEATURE action', () => {
 			const feature = 'name';
@@ -92,21 +111,6 @@ describe( 'actions', () => {
 		it( 'should return the REQUEST_META_BOX_UPDATES action', () => {
 			expect( requestMetaBoxUpdates() ).toEqual( {
 				type: 'REQUEST_META_BOX_UPDATES',
-			} );
-		} );
-	} );
-
-	describe( 'initializeMetaBoxState', () => {
-		it( 'should return the META_BOX_STATE_CHANGED action with a hasChanged flag', () => {
-			const metaBoxes = {
-				side: true,
-				normal: true,
-				advanced: false,
-			};
-
-			expect( initializeMetaBoxState( metaBoxes ) ).toEqual( {
-				type: 'INITIALIZE_META_BOX_STATE',
-				metaBoxes,
 			} );
 		} );
 	} );

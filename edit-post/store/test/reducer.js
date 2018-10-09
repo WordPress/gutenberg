@@ -7,9 +7,12 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import {
+	DEFAULT_ACTIVE_GENERAL_SIDEBAR,
 	preferences,
+	activeGeneralSidebar,
+	activeModal,
 	isSavingMetaBoxes,
-	metaBoxes,
+	activeMetaBoxLocations,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -18,57 +21,25 @@ describe( 'state', () => {
 			const state = preferences( undefined, {} );
 
 			expect( state ).toEqual( {
-				activeGeneralSidebar: 'edit-post/document',
 				editorMode: 'visual',
+				isGeneralSidebarDismissed: false,
 				panels: { 'post-status': true },
 				features: { fixedToolbar: false },
 				pinnedPluginItems: {},
 			} );
 		} );
 
-		it( 'should set the general sidebar', () => {
+		it( 'should set the general sidebar dismissed', () => {
 			const original = deepFreeze( preferences( undefined, {} ) );
 			const state = preferences( original, {
 				type: 'OPEN_GENERAL_SIDEBAR',
 				name: 'edit-post/document',
 			} );
 
-			expect( state.activeGeneralSidebar ).toBe( 'edit-post/document' );
+			expect( state.isGeneralSidebarDismissed ).toBe( false );
 		} );
 
-		it( 'should save activeGeneralSidebar default value when serializing if the value was edit-post/block', () => {
-			const state = preferences( {
-				activeGeneralSidebar: 'edit-post/block',
-				editorMode: 'visual',
-				panels: { 'post-status': true },
-				features: { fixedToolbar: false },
-			}, {
-				type: 'SERIALIZE',
-			} );
-
-			expect( state ).toEqual( {
-				activeGeneralSidebar: 'edit-post/document',
-				editorMode: 'visual',
-				panels: { 'post-status': true },
-				features: { fixedToolbar: false },
-				pinnedPluginItems: {},
-			} );
-		} );
-
-		it( 'should does not update if sidebar is already set to value', () => {
-			const original = deepFreeze( preferences( undefined, {
-				type: 'OPEN_GENERAL_SIDEBAR',
-				name: 'edit-post/document',
-			} ) );
-			const state = preferences( original, {
-				type: 'OPEN_GENERAL_SIDEBAR',
-				name: 'edit-post/document',
-			} );
-
-			expect( original ).toBe( state );
-		} );
-
-		it( 'should unset the general sidebar', () => {
+		it( 'should set the general sidebar undismissed', () => {
 			const original = deepFreeze( preferences( undefined, {
 				type: 'OPEN_GENERAL_SIDEBAR',
 				name: 'edit-post/document',
@@ -77,7 +48,7 @@ describe( 'state', () => {
 				type: 'CLOSE_GENERAL_SIDEBAR',
 			} );
 
-			expect( state.activeGeneralSidebar ).toBe( null );
+			expect( state.isGeneralSidebarDismissed ).toBe( true );
 		} );
 
 		it( 'should set the sidebar panel open flag to true if unset', () => {
@@ -153,6 +124,48 @@ describe( 'state', () => {
 		} );
 	} );
 
+	describe( 'activeGeneralSidebar', () => {
+		it( 'should default to the default active sidebar', () => {
+			const state = activeGeneralSidebar( undefined, {} );
+
+			expect( state ).toBe( DEFAULT_ACTIVE_GENERAL_SIDEBAR );
+		} );
+
+		it( 'should set the general sidebar', () => {
+			const original = activeGeneralSidebar( undefined, {} );
+			const state = activeGeneralSidebar( original, {
+				type: 'OPEN_GENERAL_SIDEBAR',
+				name: 'edit-post/document',
+			} );
+
+			expect( state ).toBe( 'edit-post/document' );
+		} );
+	} );
+
+	describe( 'activeModal', () => {
+		it( 'should default to null', () => {
+			const state = activeModal( undefined, {} );
+			expect( state ).toBeNull();
+		} );
+
+		it( 'should set the activeModal to the provided name', () => {
+			const state = activeModal( null, {
+				type: 'OPEN_MODAL',
+				name: 'test-modal',
+			} );
+
+			expect( state ).toEqual( 'test-modal' );
+		} );
+
+		it( 'should set the activeModal to null', () => {
+			const state = activeModal( 'test-modal', {
+				type: 'CLOSE_MODAL',
+			} );
+
+			expect( state ).toBeNull();
+		} );
+	} );
+
 	describe( 'isSavingMetaBoxes', () => {
 		it( 'should return default state', () => {
 			const actual = isSavingMetaBoxes( undefined, {} );
@@ -178,66 +191,22 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'metaBoxes()', () => {
+	describe( 'activeMetaBoxLocations()', () => {
 		it( 'should return default state', () => {
-			const actual = metaBoxes( undefined, {} );
-			const expected = {
-				normal: {
-					isActive: false,
-				},
-				side: {
-					isActive: false,
-				},
-				advanced: {
-					isActive: false,
-				},
-			};
+			const state = activeMetaBoxLocations( undefined, {} );
 
-			expect( actual ).toEqual( expected );
+			expect( state ).toEqual( [] );
 		} );
 
-		it( 'should set the sidebar to active', () => {
-			const theMetaBoxes = {
-				normal: false,
-				advanced: false,
-				side: true,
-			};
-
+		it( 'should set the active meta box locations', () => {
 			const action = {
-				type: 'INITIALIZE_META_BOX_STATE',
-				metaBoxes: theMetaBoxes,
+				type: 'SET_ACTIVE_META_BOX_LOCATIONS',
+				locations: [ 'normal' ],
 			};
 
-			const actual = metaBoxes( undefined, action );
-			const expected = {
-				normal: {
-					isActive: false,
-				},
-				side: {
-					isActive: true,
-				},
-				advanced: {
-					isActive: false,
-				},
-			};
+			const state = activeMetaBoxLocations( undefined, action );
 
-			expect( actual ).toEqual( expected );
-		} );
-
-		it( 'should set the meta boxes saved data', () => {
-			const action = {
-				type: 'META_BOX_SET_SAVED_DATA',
-				dataPerLocation: {
-					side: 'a=b',
-				},
-			};
-
-			const theMetaBoxes = metaBoxes( { normal: { isActive: true }, side: { isActive: false } }, action );
-			expect( theMetaBoxes ).toEqual( {
-				advanced: { data: undefined },
-				normal: { isActive: true, data: undefined },
-				side: { isActive: false, data: 'a=b' },
-			} );
+			expect( state ).toEqual( [ 'normal' ] );
 		} );
 	} );
 } );

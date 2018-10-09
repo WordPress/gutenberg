@@ -3,13 +3,28 @@
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
 import CodeEditor from './editor';
-import Placeholder from '../placeholder';
-import Spinner from '../spinner';
+import Placeholder from '../../packages/components/src/placeholder';
+import Spinner from '../../packages/components/src/spinner';
+
+/**
+ * @var {string?} siteURL WordPRess Site URL
+ */
+let siteURL;
+
+/**
+ * Configure the site's URL to lazy load scripts and styles.
+ *
+ * @param {string} url Site url.
+ */
+export function unstable__setSiteURL( url ) { // eslint-disable-line camelcase
+	siteURL = url;
+}
 
 function loadScript() {
 	return new Promise( ( resolve, reject ) => {
@@ -21,7 +36,7 @@ function loadScript() {
 		}
 
 		const script = document.createElement( 'script' );
-		script.src = `${ wpApiSettings.schema.url }/wp-admin/load-scripts.php?load=${ handles.join( ',' ) }`;
+		script.src = `${ siteURL }/wp-admin/load-scripts.php?load=${ handles.join( ',' ) }`;
 		script.onload = resolve;
 		script.onerror = reject;
 
@@ -35,7 +50,7 @@ function loadStyle() {
 
 		const style = document.createElement( 'link' );
 		style.rel = 'stylesheet';
-		style.href = `${ wpApiSettings.schema.url }/wp-admin/load-styles.php?load=${ handles.join( ',' ) }`;
+		style.href = `${ siteURL }/wp-admin/load-styles.php?load=${ handles.join( ',' ) }`;
 		style.onload = resolve;
 		style.onerror = reject;
 
@@ -62,6 +77,11 @@ class LazyCodeEditor extends Component {
 		this.state = {
 			status: 'pending',
 		};
+
+		deprecated( 'wp.components.CodeEditor', {
+			version: '4.2',
+			alternative: 'wp.codeEditor directly or any alternative React component for syntax highlighting',
+		} );
 	}
 
 	componentDidMount() {

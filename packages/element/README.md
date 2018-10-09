@@ -1,4 +1,4 @@
-# @wordpress/element
+# Element
 
 Element is, quite simply, an abstraction layer atop [React](https://reactjs.org/).
 
@@ -18,8 +18,10 @@ On the `wp.element` global object, you will find the following, ordered roughly 
 Install the module
 
 ```bash
-npm install @wordpress/element@next --save
+npm install @wordpress/element --save
 ```
+
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
 
 ## Usage
 
@@ -45,7 +47,7 @@ Refer to the [official React Quick Start guide](https://reactjs.org/docs/hello-w
 
 ## Why React?
 
-At the risk of igniting debate surrounding any single "best" front-end framework, the choice to use any tool should be motivated specifically to serve the requirements of the system. In modeling the concept of a [block](../blocks/README.md), we observe the following technical requirements:
+At the risk of igniting debate surrounding any single "best" front-end framework, the choice to use any tool should be motivated specifically to serve the requirements of the system. In modeling the concept of a [block](../../blocks/README.md), we observe the following technical requirements:
 
 - An understanding of a block in terms of its underlying values (in the [random image example](../blocks/README.md#example), a category)
 - A means to describe the UI of a block given these values
@@ -64,10 +66,12 @@ If you've configured [Babel](http://babeljs.io/) for your project, you can opt i
 {
 	"plugins": [
 		[ "transform-react-jsx", {
-			"pragma": "wp.element.createElement"
+			"pragma": "createElement"
 		} ]
 	]
 }
 ```
+
+This assumes that you will import the `createElement` function in any file where you use JSX. Alternatively, consider using the [`@wordpress/babel-plugin-import-jsx-pragma` Babel plugin](https://www.npmjs.com/package/@wordpress/babel-plugin-import-jsx-pragma) to automate the import of this function.
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

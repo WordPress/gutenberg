@@ -5,17 +5,48 @@ exports[`adding blocks Should insert content using the placeholder and the regul
 <p>Paragraph block</p>
 <!-- /wp:paragraph -->
 
+<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p>Quote block</p></blockquote>
+<!-- /wp:quote -->
+
+<!-- wp:image -->
+<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`adding blocks Should insert content using the placeholder and the regular inserter 2`] = `
+"<!-- wp:paragraph -->
+<p>Paragraph block</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p>Quote block</p></blockquote>
+<!-- /wp:quote -->"
+`;
+
+exports[`adding blocks Should insert content using the placeholder and the regular inserter 3`] = `
+"<!-- wp:paragraph -->
+<p>Paragraph block</p>
+<!-- /wp:paragraph -->
+
 <!-- wp:paragraph -->
 <p>Second paragraph</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\">
-	<p>Quote block</p>
-</blockquote>
+<blockquote class=\\"wp-block-quote\\"><p>Quote block</p></blockquote>
 <!-- /wp:quote -->
 
-<!-- wp:code -->
-<pre class=\\"wp-block-code\\"><code>Code block</code></pre>
-<!-- /wp:code -->"
+<!-- wp:preformatted -->
+<pre class=\\"wp-block-preformatted\\">Pre text<br><br>Foo</pre>
+<!-- /wp:preformatted -->
+
+<!-- wp:shortcode -->
+[myshortcode]With multiple
+lines preserved[/myshortcode]
+<!-- /wp:shortcode -->"
 `;
