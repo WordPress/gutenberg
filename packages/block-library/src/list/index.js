@@ -18,7 +18,6 @@ import {
 	BlockControls,
 	RichText,
 } from '@wordpress/editor';
-import { replace, join, split, isEmpty } from '@wordpress/rich-text';
 
 const listContentSchema = {
 	...getPhrasingContentSchema(),
@@ -47,7 +46,7 @@ const schema = {
 		default: false,
 	},
 	values: {
-		source: 'rich-text',
+		source: 'html',
 		selector: 'ol,ul',
 		multiline: 'li',
 	},
@@ -74,8 +73,8 @@ export const settings = {
 				blocks: [ 'core/paragraph' ],
 				transform: ( blockAttributes ) => {
 					return createBlock( 'core/list', {
-						values: join( blockAttributes.map( ( { content } ) =>
-							replace( content, /\n/g, '\u2028' )
+						values: RichText.join( blockAttributes.map( ( { content } ) =>
+							RichText.replace( content, /\n/g, '\u2028' )
 						), '\u2028' ),
 					} );
 				},
@@ -131,7 +130,7 @@ export const settings = {
 				type: 'block',
 				blocks: [ 'core/paragraph' ],
 				transform: ( { values } ) =>
-					split( values, '\u2028' ).map( ( content ) =>
+					RichText.split( values, '\u2028' ).map( ( content ) =>
 						createBlock( 'core/paragraph', { content } )
 					),
 			},
@@ -185,13 +184,13 @@ export const settings = {
 		const { values, content } = attributesToMerge;
 		const valueToMerge = values || content;
 
-		if ( isEmpty( valueToMerge ) ) {
+		if ( RichText.isEmpty( valueToMerge ) ) {
 			return attributes;
 		}
 
 		return {
 			...attributes,
-			values: join( [ attributes.values, valueToMerge ], '\u2028' ),
+			values: RichText.join( [ attributes.values, valueToMerge ], '\u2028' ),
 		};
 	},
 

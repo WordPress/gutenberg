@@ -14,16 +14,15 @@ import {
 	AlignmentToolbar,
 	RichText,
 } from '@wordpress/editor';
-import { join, split, concat } from '@wordpress/rich-text';
 
 const blockAttributes = {
 	value: {
-		source: 'rich-text',
+		source: 'html',
 		selector: 'blockquote',
 		multiline: 'p',
 	},
 	citation: {
-		source: 'rich-text',
+		source: 'html',
 		selector: 'cite',
 	},
 	align: {
@@ -55,7 +54,7 @@ export const settings = {
 				blocks: [ 'core/paragraph' ],
 				transform: ( attributes ) => {
 					return createBlock( 'core/quote', {
-						value: join( attributes.map( ( { content } ) => content ), '\u2028' ),
+						value: RichText.join( attributes.map( ( { content } ) => content ), '\u2028' ),
 					} );
 				},
 			},
@@ -96,7 +95,7 @@ export const settings = {
 				type: 'block',
 				blocks: [ 'core/paragraph' ],
 				transform: ( { value } ) =>
-					split( value, '\u2028' ).map( ( content ) =>
+					RichText.split( value, '\u2028' ).map( ( content ) =>
 						createBlock( 'core/paragraph', { content } )
 					),
 			},
@@ -113,7 +112,7 @@ export const settings = {
 						} );
 					}
 
-					const values = split( value, '\u2028' );
+					const values = RichText.split( value, '\u2028' );
 
 					return [
 						createBlock( 'core/heading', {
@@ -122,7 +121,7 @@ export const settings = {
 						createBlock( 'core/quote', {
 							...attrs,
 							citation,
-							value: join( values.slice( 1 ), '\u2028' ),
+							value: RichText.join( values.slice( 1 ), '\u2028' ),
 						} ),
 					];
 				},
@@ -194,8 +193,8 @@ export const settings = {
 	merge( attributes, attributesToMerge ) {
 		return {
 			...attributes,
-			value: join( [ attributes.value, attributesToMerge.value ], '\u2028' ),
-			citation: concat( attributes.citation, attributesToMerge.citation ),
+			value: RichText.join( [ attributes.value, attributesToMerge.value ], '\u2028' ),
+			citation: RichText.concat( attributes.citation, attributesToMerge.citation ),
 		};
 	},
 
@@ -238,7 +237,7 @@ export const settings = {
 			attributes: {
 				...blockAttributes,
 				citation: {
-					source: 'rich-text',
+					source: 'html',
 					selector: 'footer',
 				},
 				style: {

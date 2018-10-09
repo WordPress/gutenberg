@@ -141,7 +141,7 @@ describe( 'block factory', () => {
 				...defaultBlockSettings,
 				attributes: {
 					content: {
-						source: 'rich-text',
+						source: 'html',
 					},
 				},
 			} );
@@ -151,10 +151,7 @@ describe( 'block factory', () => {
 			} );
 
 			expect( block.attributes ).toEqual( {
-				content: {
-					formats: [ , , , , ],
-					text: 'test',
-				},
+				content: 'test',
 			} );
 		} );
 	} );

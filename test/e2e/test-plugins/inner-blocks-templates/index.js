@@ -2,12 +2,11 @@
 	var registerBlockType = wp.blocks.registerBlockType;
 	var el = wp.element.createElement;
 	var InnerBlocks = wp.editor.InnerBlocks;
-	var create = wp.richText.create;
 	var __ = wp.i18n.__;
 	var TEMPLATE = [
 		[ 'core/paragraph', {
 			fontSize: 'large',
-			content: create( { text: 'Content…' } ),
+			content: 'Content…',
 		} ],
 	];
 

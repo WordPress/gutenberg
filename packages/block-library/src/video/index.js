@@ -32,7 +32,7 @@ export const settings = {
 			attribute: 'autoplay',
 		},
 		caption: {
-			source: 'rich-text',
+			source: 'html',
 			selector: 'figcaption',
 		},
 		controls: {

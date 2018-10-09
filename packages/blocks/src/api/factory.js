@@ -20,7 +20,6 @@ import {
  * WordPress dependencies
  */
 import { createHooks, applyFilters } from '@wordpress/hooks';
-import { create } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -50,15 +49,6 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 			result[ key ] = value;
 		} else if ( schema.hasOwnProperty( 'default' ) ) {
 			result[ key ] = schema.default;
-		}
-
-		if ( schema.source === 'rich-text' ) {
-			// Ensure value passed is always a rich text value.
-			if ( typeof result[ key ] === 'string' ) {
-				result[ key ] = create( { text: result[ key ] } );
-			} else if ( ! result[ key ] || ! result[ key ].text ) {
-				result[ key ] = create();
-			}
 		}
 
 		if ( [ 'node', 'children' ].indexOf( schema.source ) !== -1 ) {

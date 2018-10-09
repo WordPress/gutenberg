@@ -9,6 +9,7 @@ import {
 	isNil,
 	noop,
 	isEqual,
+	omit,
 } from 'lodash';
 import memize from 'memize';
 
@@ -39,6 +40,9 @@ import {
 	insert,
 	isEmptyLine,
 	unstableToDom,
+	concat,
+	join,
+	replace,
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 
@@ -782,14 +786,16 @@ export class RichText extends Component {
 			}
 
 			const record = this.formatToValue( value );
+			const prevRecord = this.formatToValue( prevProps.value );
 
 			if ( this.isActive() ) {
-				const length = getTextContent( prevProps.value ).length;
+				const length = getTextContent( prevRecord ).length;
 				record.start = length;
 				record.end = length;
 			}
 
 			this.applyRecord( record );
+			this.savedContent = value;
 		}
 	}
 
@@ -939,7 +945,8 @@ export class RichText extends Component {
 
 RichText.defaultProps = {
 	formattingControls: FORMATTING_CONTROLS.map( ( { format } ) => format ),
-	format: 'rich-text',
+	format: 'string',
+	value: '',
 };
 
 const RichTextContainer = compose( [
@@ -987,26 +994,24 @@ const RichTextContainer = compose( [
 	withSafeTimeout,
 ] )( RichText );
 
-RichTextContainer.Content = ( { value, format, tagName: Tag, multiline, ...props } ) => {
+RichTextContainer.Content = ( { value, tagName: Tag, ...props } ) => {
 	let html = value;
 
 	// Handle deprecated `children` and `node` sources.
 	if ( Array.isArray( value ) ) {
 		html = children.toHTML( value );
-	} else if ( format !== 'string' ) {
-		html = toHTMLString( value, multiline );
 	}
 
 	const content = <RawHTML>{ html }</RawHTML>;
 
 	if ( Tag ) {
-		return <Tag { ...props }>{ content }</Tag>;
+		return <Tag { ...omit( props, [ 'format', 'multiline' ] ) }>{ content }</Tag>;
 	}
 
 	return content;
 };
 
-RichTextContainer.isEmpty = ( value ) => {
+RichTextContainer.isEmpty = ( value = '' ) => {
 	// Handle deprecated `children` and `node` sources.
 	if ( Array.isArray( value ) ) {
 		return ! value || value.length === 0;
@@ -1020,7 +1025,28 @@ RichTextContainer.isEmpty = ( value ) => {
 };
 
 RichTextContainer.Content.defaultProps = {
-	format: 'rich-text',
+	format: 'string',
+	value: '',
+};
+
+RichTextContainer.getTextContent = ( html ) => {
+	return getTextContent( create( { html } ) );
+};
+
+RichTextContainer.concat = ( ...pieces ) => {
+	return toHTMLString( concat( ...pieces.map( ( html ) => create( { html } ) ) ) );
+};
+
+RichTextContainer.join = ( pieces, ...args ) => {
+	return toHTMLString( join( pieces.map( ( html ) => create( { html } ) ), ...args ) );
+};
+
+RichTextContainer.split = ( html, ...args ) => {
+	return split( create( { html } ), ...args ).map( ( value ) => toHTMLString( value ) );
+};
+
+RichTextContainer.replace = ( html, ...args ) => {
+	return toHTMLString( replace( create( { html } ), ...args ) );
 };
 
 export default RichTextContainer;

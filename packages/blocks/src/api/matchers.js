@@ -1,12 +1,7 @@
 /**
  * External dependencies
  */
-export { attr, prop, html, text, query } from 'hpq';
-
-/**
- * WordPress dependencies
- */
-import { create } from '@wordpress/rich-text';
+export { attr, prop, text, query } from 'hpq';
 
 /**
  * Internal dependencies
@@ -14,7 +9,7 @@ import { create } from '@wordpress/rich-text';
 export { matcher as node } from './node';
 export { matcher as children } from './children';
 
-export function richText( selector, multilineTag ) {
+export function html( selector, multilineTag ) {
 	return ( domNode ) => {
 		let match = domNode;
 
@@ -22,9 +17,27 @@ export function richText( selector, multilineTag ) {
 			match = domNode.querySelector( selector );
 		}
 
-		return create( {
-			element: match,
-			multilineTag,
-		} );
+		if ( ! match ) {
+			return '';
+		}
+
+		if ( multilineTag ) {
+			let value = '';
+			const length = match.children.length;
+
+			for ( let index = 0; index < length; index++ ) {
+				const child = match.children[ index ];
+
+				if ( child.nodeName.toLowerCase() !== multilineTag ) {
+					continue;
+				}
+
+				value += child.outerHTML;
+			}
+
+			return value;
+		}
+
+		return match.innerHTML;
 	};
 }
