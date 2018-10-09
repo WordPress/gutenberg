@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -41,8 +42,9 @@ export class PostSavedState extends Component {
 	}
 
 	render() {
-		const { isNew, isScheduled, isPublished, isDirty, isSaving, isSaveable, onSave, isAutosaving, isPending } = this.props;
+		const { post, isNew, isScheduled, isPublished, isDirty, isSaving, isSaveable, onSave, isAutosaving, isPending } = this.props;
 		const { forceSavedMessage } = this.state;
+		const hasPublishAction = get( post, [ '_links', 'wp:action-publish' ], false );
 		if ( isSaving ) {
 			// TODO: Classes generation should be common across all return
 			// paths of this function, including proper naming convention for
@@ -74,6 +76,12 @@ export class PostSavedState extends Component {
 					{ __( 'Saved' ) }
 				</span>
 			);
+		}
+
+		// Once the post has been submitted for review this button
+		// is not needed for the contributor role.
+		if ( ! hasPublishAction ) {
+			return null;
 		}
 
 		return (
