@@ -34,7 +34,7 @@ const extractConfig = {
 		{
 			loader: 'sass-loader',
 			query: {
-				includePaths: [ 'edit-post/assets/stylesheets' ],
+				includePaths: [ 'assets/stylesheets' ],
 				data: '@import "colors"; @import "breakpoints"; @import "variables"; @import "mixins"; @import "animations";@import "z-index";',
 				outputStyle: 'production' === process.env.NODE_ENV ?
 					'compressed' : 'nested',
@@ -62,7 +62,6 @@ function camelCaseDash( string ) {
 
 const entryPointNames = [
 	'components',
-	'edit-post',
 ];
 
 const gutenbergPackages = [
@@ -81,6 +80,7 @@ const gutenbergPackages = [
 	'deprecated',
 	'dom',
 	'dom-ready',
+	'edit-post',
 	'editor',
 	'element',
 	'escape-html',
