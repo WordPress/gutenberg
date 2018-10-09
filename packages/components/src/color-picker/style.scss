@@ -1,0 +1,161 @@
+.color-picker {
+	width: 225px;
+}
+.color-picker__saturation {
+	width: 100%;
+	padding-bottom: 55%;
+	position: relative;
+	overflow: hidden;
+}
+.color-picker__body {
+	padding: 16px 16px 12px;
+}
+.color-picker__controls {
+	display: flex;
+}
+.color-picker__swatch {
+	margin-right: 8px;
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	position: relative;
+	overflow: hidden;
+	background-image: linear-gradient(45deg, #ddd 25%, transparent 25%),
+		linear-gradient(-45deg, #ddd 25%, transparent 25%),
+		linear-gradient(45deg, transparent 75%, #ddd 75%),
+		linear-gradient(-45deg, transparent 75%, #ddd 75%);
+	background-size: 10px 10px;
+	background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
+}
+/* @todo INCREASE SIZE */
+.color-picker.is-alpha-disabled .color-picker__swatch {
+	width: 10px;
+	height: 10px;
+	margin-top: 0px;
+}
+.color-picker__active {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	border-radius: 50%;
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+	z-index: 2;
+}
+.color-picker__toggles {
+	flex: 1;
+}
+.color-picker__hue,
+.color-picker__alpha {
+	height: 10px;
+	position: relative;
+}
+.color-picker.is-alpha-enabled .color-picker__hue {
+	margin-bottom: 8px;
+}
+
+/* SATURATION COMPONENT */
+.color-picker__saturation-color,
+.color-picker__saturation-white,
+.color-picker__saturation-black {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+.color-picker__saturation-white {
+	background: -webkit-linear-gradient(to right, #fff, rgba(255, 255, 255, 0));
+	background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0));
+}
+.color-picker__saturation-black {
+	background: -webkit-linear-gradient(to top, #000, rgba(0, 0, 0, 0));
+	background: linear-gradient(to top, #000, rgba(0, 0, 0, 0));
+}
+.color-picker__saturation-pointer {
+	position: absolute;
+	cursor: default;
+}
+.color-picker__saturation-pointer-inner {
+	width: 4px;
+	height: 4px;
+	box-shadow: 0 0 0 1.5px #fff, inset 0 0 1px 1px rgba(0, 0, 0, 0.3),
+		0 0 1px 2px rgba(0, 0, 0, 0.4);
+	border-radius: 50%;
+	cursor: pointer;
+	transform: translate(-2px, -2px);
+}
+
+/* HUE & ALPHA BARS */
+.color-picker__alpha {
+	background-image: linear-gradient(45deg, #ddd 25%, transparent 25%),
+		linear-gradient(-45deg, #ddd 25%, transparent 25%),
+		linear-gradient(45deg, transparent 75%, #ddd 75%),
+		linear-gradient(-45deg, transparent 75%, #ddd 75%);
+	background-size: 10px 10px;
+	background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
+}
+.color-picker__hue-gradient,
+.color-picker__alpha-gradient {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+.color-picker__hue-bar,
+.color-picker__alpha-bar {
+	position: relative;
+	margin: 0 3px;
+	height: 100%;
+	padding: 0 2px;
+}
+.color-picker__hue-gradient {
+	background: linear-gradient(
+		to right,
+		#f00 0%,
+		#ff0 17%,
+		#0f0 33%,
+		#0ff 50%,
+		#00f 67%,
+		#f0f 83%,
+		#f00 100%
+	);
+	background: -webkit-linear-gradient(
+		to right,
+		#f00 0%,
+		#ff0 17%,
+		#0f0 33%,
+		#0ff 50%,
+		#00f 67%,
+		#f0f 83%,
+		#f00 100%
+	);
+}
+.color-picker__hue-pointer,
+.color-picker__alpha-pointer {
+	position: absolute;
+	left: 0;
+	cursor: pointer;
+}
+.color-picker__hue-slider,
+.color-picker__alpha-slider {
+	margin-top: 1px;
+	width: 4px;
+	border-radius: 1px;
+	height: 8px;
+	box-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
+	background: #fff;
+	transform: translateX(-2px);
+}
+
+/* INPUTS COMPONENT */
+.color-picker__inputs-wrapper {
+	padding-top: 16px;
+	display: flex;
+}
+.color-picker__inputs-fields {
+	flex: 1;
+	display: flex;
+}

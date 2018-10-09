@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { ChromePicker } from 'react-color';
 import { map } from 'lodash';
 
 /**
@@ -16,6 +15,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import Button from '../button';
 import Dropdown from '../dropdown';
 import Tooltip from '../tooltip';
+import ChromePicker from '../color-picker';
 
 export default function ColorPalette( { colors, disableCustomColors = false, value, onChange, className } ) {
 	function applyOrUnset( color ) {
