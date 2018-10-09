@@ -20,11 +20,6 @@ import {
 	InspectorControls,
 } from '@wordpress/editor';
 
-/**
- * Internal dependencies
- */
-import './editor.scss';
-
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 10;
 
