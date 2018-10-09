@@ -6,7 +6,6 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import './editor.scss';
 import edit from './edit';
 
 export const name = 'core/tag-cloud';
