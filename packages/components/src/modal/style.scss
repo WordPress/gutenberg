@@ -8,13 +8,14 @@
 	background-color: rgba($white, 0.4);
 	z-index: z-index(".components-modal__screen-overlay");
 
-	// Animate appearance.
+	// This animates the appearance of the white background.
 	@include fade-in();
 }
 
 // The modal window element.
 .components-modal__frame {
-	// In small screens the content needs to be full width.
+	// On small screens the content needs to be full width because of limited
+	// space.
 	position: absolute;
 	top: 0;
 	right: 0;
@@ -39,12 +40,14 @@
 		max-height: calc(100% - #{ $header-height } - #{ $header-height });
 		transform: translate(-50%, -50%);
 
-		// Animate appearance.
+		// Animate the modal frame/contents appearing on the page.
 		@include modal_appear();
 	}
 }
 
-// Fix heading to the top.
+// Fix header to the top so it is always there to provide context to the modal
+// if the content needs to be scrolled (for example, on the keyboard shortcuts
+// modal screen).
 .components-modal__header {
 	box-sizing: border-box;
 	border-bottom: $border-width solid $light-gray-500;
@@ -55,17 +58,21 @@
 	background: $white;
 	align-items: center;
 	box-sizing: border-box;
-
 	height: $header-height;
+	position: sticky;
+	top: 0;
+	z-index: z-index(".components-modal__header");
+	margin: 0 0 ($grid-size-large * 2);
 
 	.components-modal__header-heading {
 		font-size: 1em;
 		font-weight: normal;
 	}
 
-	position: sticky;
-	top: -$grid-size-large;
-	z-index: z-index(".components-modal__header");
+	h1 {
+		line-height: 1;
+		margin: 0;
+	}
 }
 
 .components-modal__header-heading-container {
@@ -86,16 +93,10 @@
 	}
 }
 
-h1 {
-	line-height: 1;
-	margin: 0;
-}
-
 // Modal contents.
 .components-modal__content {
 	box-sizing: border-box;
-	// The height of the content is the height of its parent, minus the header. after that, the offset was 3px.
 	height: 100%;
 	overflow: auto;
-	padding: $grid-size-large;
+	padding: 0 $grid-size-large $grid-size-large;
 }
