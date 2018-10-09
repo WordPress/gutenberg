@@ -1,10 +1,12 @@
 [
     {
-        "uid": "_uid_0",
-        "name": "core/rss",
+        "clientId": "_clientId_0",
+        "name": "core/freeform",
         "isValid": true,
-        "attributes": {},
+        "attributes": {
+            "content": "<!-- wp:rss {\"postLayout\":\"grid\",\"feedURL\":\"https://wordpress.org/news/\",\"postsToShow\":4,\"displayExcerpt\":true,\"displayAuthor\":true,\"displayDate\":true,\"excerptLength\":20} /-->"
+        },
         "innerBlocks": [],
-        "originalContent": ""
+        "originalContent": "<!-- wp:rss {\"postLayout\":\"grid\",\"feedURL\":\"https://wordpress.org/news/\",\"postsToShow\":4,\"displayExcerpt\":true,\"displayAuthor\":true,\"displayDate\":true,\"excerptLength\":20} /-->"
     }
 ]
