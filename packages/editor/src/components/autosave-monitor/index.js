@@ -7,13 +7,10 @@ import { withSelect, withDispatch } from '@wordpress/data';
 
 export class AutosaveMonitor extends Component {
 	componentDidUpdate( prevProps ) {
-		const { isDirty, isAutosaveable } = this.props;
+		const { isDirty } = this.props;
 
-		if (
-			prevProps.isDirty !== isDirty ||
-			prevProps.isAutosaveable !== isAutosaveable
-		) {
-			this.toggleTimer( isDirty && isAutosaveable );
+		if ( prevProps.isDirty !== isDirty ) {
+			this.toggleTimer( isDirty );
 		}
 	}
 
@@ -41,13 +38,11 @@ export default compose( [
 	withSelect( ( select ) => {
 		const {
 			isEditedPostDirty,
-			isEditedPostAutosaveable,
 			getEditorSettings,
 		} = select( 'core/editor' );
 		const { autosaveInterval } = getEditorSettings();
 		return {
 			isDirty: isEditedPostDirty(),
-			isAutosaveable: isEditedPostAutosaveable(),
 			autosaveInterval,
 		};
 	} ),

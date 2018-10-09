@@ -122,7 +122,7 @@ describe( 'PostPreviewButton', () => {
 		it( 'should open the currentPostLink if not autosaveable nor preview link available', () => {
 			const currentPostLink = 'https://wordpress.org/?p=1';
 			assertForPreview( {
-				isAutosaveable: false,
+				isEditedPostAutosaveable: () => false,
 				previewLink: undefined,
 				currentPostLink,
 			}, currentPostLink, false );
@@ -130,21 +130,21 @@ describe( 'PostPreviewButton', () => {
 
 		it( 'should save for autosaveable post with preview link', () => {
 			assertForPreview( {
-				isAutosaveable: true,
+				isEditedPostAutosaveable: () => true,
 				previewLink: 'https://wordpress.org/?p=1&preview=true',
 			}, null, true );
 		} );
 
 		it( 'should save for autosaveable post without preview link', () => {
 			assertForPreview( {
-				isAutosaveable: true,
+				isEditedPostAutosaveable: () => true,
 				previewLink: undefined,
 			}, null, true );
 		} );
 
 		it( 'should not save but open a popup window if not autosaveable but preview link available', () => {
 			assertForPreview( {
-				isAutosaveable: false,
+				isEditedPostAutosaveable: () => false,
 				previewLink: 'https://wordpress.org/?p=1&preview=true',
 			}, 'https://wordpress.org/?p=1&preview=true', false );
 		} );

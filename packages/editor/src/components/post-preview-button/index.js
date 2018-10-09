@@ -59,7 +59,8 @@ export class PostPreviewButton extends Component {
 	 * Triggers autosave if post is autosaveable.
 	 */
 	openPreviewWindow() {
-		const { isAutosaveable, previewLink, currentPostLink } = this.props;
+		const { isEditedPostAutosaveable, previewLink, currentPostLink } = this.props;
+		const isAutosaveable = isEditedPostAutosaveable();
 
 		// Open a popup, BUT: Set it to a blank page until save completes. This
 		// is necessary because popups can only be opened in response to user
@@ -157,7 +158,7 @@ export default compose( [
 			isDirty: isEditedPostDirty(),
 			isNew: isEditedPostNew(),
 			isSaveable: isEditedPostSaveable(),
-			isAutosaveable: isEditedPostAutosaveable(),
+			isEditedPostAutosaveable: isEditedPostAutosaveable,
 			isViewable: get( postType, [ 'viewable' ], false ),
 		};
 	} ),
