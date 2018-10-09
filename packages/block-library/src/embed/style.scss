@@ -3,7 +3,8 @@
 .editor-block-list__block[data-type="core/embed"][data-align="right"] .editor-block-list__block-edit,
 .wp-block-embed.alignleft,
 .wp-block-embed.alignright {
-	max-width: $content-width / 2;
+	// Instagram widgets have a min-width of 326px, so go a bit beyond that.
+	max-width: 360px;
 	width: 100%;
 }
 
