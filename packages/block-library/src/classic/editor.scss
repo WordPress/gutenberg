@@ -148,7 +148,7 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 	width: auto;
 	margin: 0 #{ -$block-padding };
 	position: sticky;
-	z-index: z-index(".freeform-toolbar");
+	z-index: z-index(".block-library-classic__toolbar");
 	top: $block-padding;
 	transform: translateY(-$block-padding);
 
@@ -160,7 +160,7 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 	}
 }
 
-.freeform-toolbar:empty {
+.block-library-classic__toolbar:empty {
 	height: $block-toolbar-height;
 	background: #f5f5f5;
 	border-bottom: $border-width solid #e2e4e7;
@@ -176,30 +176,30 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 }
 
 // Overwrite inline styles.
-.freeform-toolbar .mce-tinymce-inline,
-.freeform-toolbar .mce-tinymce-inline > div,
-.freeform-toolbar div.mce-toolbar-grp,
-.freeform-toolbar div.mce-toolbar-grp > div,
-.freeform-toolbar .mce-menubar,
-.freeform-toolbar .mce-menubar > div {
+.block-library-classic__toolbar .mce-tinymce-inline,
+.block-library-classic__toolbar .mce-tinymce-inline > div,
+.block-library-classic__toolbar div.mce-toolbar-grp,
+.block-library-classic__toolbar div.mce-toolbar-grp > div,
+.block-library-classic__toolbar .mce-menubar,
+.block-library-classic__toolbar .mce-menubar > div {
 	height: auto !important;
 	width: 100% !important;
 }
 
-.freeform-toolbar .mce-container-body.mce-abs-layout {
+.block-library-classic__toolbar .mce-container-body.mce-abs-layout {
 	overflow: visible;
 }
 
-.freeform-toolbar .mce-menubar,
-.freeform-toolbar div.mce-toolbar-grp {
+.block-library-classic__toolbar .mce-menubar,
+.block-library-classic__toolbar div.mce-toolbar-grp {
 	position: static;
 }
 
-.freeform-toolbar .mce-toolbar-grp .mce-toolbar:not(:first-child) {
+.block-library-classic__toolbar .mce-toolbar-grp .mce-toolbar:not(:first-child) {
 	display: none;
 }
 
-.freeform-toolbar.has-advanced-toolbar .mce-toolbar-grp .mce-toolbar {
+.block-library-classic__toolbar.has-advanced-toolbar .mce-toolbar-grp .mce-toolbar {
 	display: block;
 }
 
