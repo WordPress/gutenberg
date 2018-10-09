@@ -23,6 +23,7 @@
 	max-width: $content-width;
 
 	@include break-small() {
+		// Compensate for side UI width.
 		.editor-block-list__block-edit {
 			margin-left: -$block-side-ui-width;
 			margin-right: -$block-side-ui-width;
