@@ -93,7 +93,7 @@
 
 	.components-panel__arrow {
 		position: absolute;
-		right: $item-spacing;
+		right: $grid-size;
 		top: 50%;
 		transform: translateY(-50%);
 		color: $dark-gray-900;

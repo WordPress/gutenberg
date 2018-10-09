@@ -5,8 +5,8 @@
 }
 
 .editor-block-styles__item {
-	width: calc(50% - #{ $item-spacing / 2 });
-	margin: ($item-spacing / 2) 0;
+	width: calc(50% - $grid-size-small);
+	margin: $grid-size-small 0;
 	flex-shrink: 0;
 	cursor: pointer;
 	overflow: hidden;
