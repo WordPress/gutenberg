@@ -3,7 +3,7 @@
 exports[`core/freeform block edit matches snapshot 1`] = `
 Array [
   <div
-    class="freeform-toolbar"
+    class="block-library-classic__toolbar"
     data-placeholder="Classic"
     id="toolbar-undefined"
   />,

@@ -5,11 +5,6 @@ import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { BACKSPACE, DELETE, F10 } from '@wordpress/keycodes';
 
-/**
- * Internal dependencies
- */
-import './editor.scss';
-
 function isTmceEmpty( editor ) {
 	// When tinyMce is empty the content seems to be:
 	// <p><br data-mce-bogus="1"></p>
@@ -26,7 +21,7 @@ function isTmceEmpty( editor ) {
 	return /^\n?$/.test( body.innerText || body.textContent );
 }
 
-export default class FreeformEdit extends Component {
+export default class ClassicEdit extends Component {
 	constructor( props ) {
 		super( props );
 		this.initialize = this.initialize.bind( this );
@@ -176,7 +171,7 @@ export default class FreeformEdit extends Component {
 				key="toolbar"
 				id={ `toolbar-${ clientId }` }
 				ref={ ( ref ) => this.ref = ref }
-				className="freeform-toolbar"
+				className="block-library-classic__toolbar"
 				onClick={ this.focus }
 				data-placeholder={ __( 'Classic' ) }
 				onKeyDown={ this.onToolbarKeyDown }
