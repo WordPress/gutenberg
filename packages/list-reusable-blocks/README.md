@@ -2,6 +2,8 @@
 
 Package used to add import/export links to the listing page of the reusable blocks.
 
+> This package is meant to be used only with WordPress core. Feel free to use it in your own project but please keep in mind that it might never get fully documented.
+
 ## Installation
 
 Install the module
