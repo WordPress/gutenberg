@@ -104,6 +104,7 @@
 	overflow: auto;
 	height: 100%;
 	padding: ($header-height+$panel-padding) $panel-padding $panel-padding $panel-padding;
+	border: 2px solid $white;
 
 	&:focus {
 		outline: $border-width solid $dark-gray-500;
