@@ -21,12 +21,12 @@ export function renderContainer( bindContainer, sizes, children, onLayoutCallbac
 	);
 }
 
-export function onLayout( event, callback ) {
+export function onLayout( event ) {
 	const { width, height } = event.nativeEvent.layout;
 	const container = {};
 	container.clientWidth = width;
 	container.clientHeight = height;
-	callback( container );
+	return container;
 }
 
 export function exporter( component ) {
