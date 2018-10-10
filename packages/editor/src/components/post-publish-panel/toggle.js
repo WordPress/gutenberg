@@ -41,8 +41,6 @@ export function PostPublishPanelToggle( {
 		return <PostPublishButton forceIsDirty={ forceIsDirty } forceIsSaving={ forceIsSaving } />;
 	}
 
-	const publishButtonLabel = hasPublishAction ? __( 'Publish…' ) : __( 'Submit for Review…' );
-
 	return (
 		<Button
 			className="editor-post-publish-panel__toggle"
@@ -52,7 +50,7 @@ export function PostPublishPanelToggle( {
 			disabled={ ! isButtonEnabled }
 			isBusy={ isSaving && isPublished }
 		>
-			{ isBeingScheduled ? __( 'Schedule…' ) : publishButtonLabel }
+			{ isBeingScheduled ? __( 'Schedule…' ) : __( 'Publish…' ) }
 			<DotTip id="core/editor.publish">
 				{ __( 'Finished writing? That’s great, let’s get this published right now. Just click “Publish” and you’re good to go.' ) }
 			</DotTip>
