@@ -518,7 +518,6 @@ add_filter( 'wp_kses_allowed_html', 'gutenberg_kses_allowedtags', 10, 2 );
 function gutenberg_add_responsive_body_class( $classes ) {
 	if ( current_theme_supports( 'responsive-embeds' ) ) {
 		$classes[] = 'wp-embed-responsive';
-
 	}
 	return $classes;
 }
