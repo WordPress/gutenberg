@@ -50,7 +50,7 @@ describe( 'a11y', () => {
 
 		// Click to move focus to an element after the last tabbable within the
 		// modal.
-		await page.click( '.components-modal__content' );
+		await page.click( '.components-modal__content *:last-child' );
 
 		await page.keyboard.press( 'Tab' );
 
