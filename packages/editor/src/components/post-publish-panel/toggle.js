@@ -41,7 +41,7 @@ export function PostPublishPanelToggle( {
 		return <PostPublishButton forceIsDirty={ forceIsDirty } forceIsSaving={ forceIsSaving } />;
 	}
 
-	const publishButtonLabel = hasPublishAction ? __( 'Publish…' ) : __( 'Submit for review…' );
+	const publishButtonLabel = hasPublishAction ? __( 'Publish…' ) : __( 'Submit for Review…' );
 
 	return (
 		<Button
