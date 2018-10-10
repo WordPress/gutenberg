@@ -505,3 +505,22 @@ function gutenberg_kses_allowedtags( $tags ) {
 }
 
 add_filter( 'wp_kses_allowed_html', 'gutenberg_kses_allowedtags', 10, 2 );
+
+/**
+ * Adds the wp-embed-responsive class to the body tag if the theme has opted in to
+ * Gutenberg responsive embeds.
+ *
+ * @since 4.1.0
+ *
+ * @param Array $classes Array of classes being added to the body tag.
+ * @return Array The $classes array, with wp-embed-responsive appended.
+ */
+function gutenberg_add_responsive_body_class( $classes ) {
+	if ( current_theme_supports( 'responsive-embeds' ) ) {
+		$classes[] = 'wp-embed-responsive';
+
+	}
+	return $classes;
+}
+
+add_filter( 'body_class', 'gutenberg_add_responsive_body_class' );
