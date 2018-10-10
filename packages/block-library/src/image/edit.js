@@ -58,15 +58,21 @@ const LINK_DESTINATION_CUSTOM = 'custom';
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 export const pickRelevantMediaFiles = ( image ) => {
-	let { caption } = image;
+	let { caption, alt } = image;
+	const { filename } = image;
 
 	if ( typeof caption !== 'object' ) {
 		caption = create( { html: caption } );
 	}
 
+	if ( ! alt ) {
+		alt = 'This image has an empty alt attribute, the file name is ' + filename;
+	}
+
 	return {
-		...pick( image, [ 'alt', 'id', 'link', 'url' ] ),
+		...pick( image, [ 'id', 'link', 'url' ] ),
 		caption,
+		alt,
 	};
 };
 
