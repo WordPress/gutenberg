@@ -75,7 +75,7 @@ class PostPublishPanelPostpublish extends Component {
 						className="post-publish-panel__postpublish-link-input"
 						readOnly
 						value={ post.link }
-						onFocus={ this.onSelectInput }
+						onClick={ this.onSelectInput }
 					/>
 					<div className="post-publish-panel__postpublish-buttons">
 						{ ! isScheduled && (
