@@ -1,12 +1,18 @@
 /**
  * External dependencies
  */
-import { every, map } from 'lodash';
+import { every, map, get, mapValues, isArray } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { renderToString } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { createBlock } from './factory';
+import { getBlockType } from './registration';
 
 /**
  * Checks whether a list of blocks matches a template by comparing the block names.
@@ -56,9 +62,44 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 			return { ...block, innerBlocks };
 		}
 
+		// To support old templates that were using the "children" format
+		// for the attributes using "html" strings now, we normalize the template attributes
+		// before creating the blocks.
+
+		const blockType = getBlockType( name );
+		const isHTMLAttribute = ( attributeDefinition ) => get( attributeDefinition, [ 'source' ] ) === 'html';
+		const isQueryAttribute = ( attributeDefinition ) => get( attributeDefinition, [ 'source' ] ) === 'query';
+
+		const normalizeAttributes = ( schema, values ) => {
+			return mapValues( values, ( value, key ) => {
+				return normalizeAttribute( schema[ key ], value );
+			} );
+		};
+		const normalizeAttribute = ( definition, value ) => {
+			if ( isHTMLAttribute( definition ) && isArray( value ) ) {
+				// Introduce a deprecated call at this point
+				// When we're confident that "children" format should be removed from the templates.
+
+				return renderToString( value );
+			}
+
+			if ( isQueryAttribute( definition ) && value ) {
+				return value.map( ( subValues ) => {
+					return normalizeAttributes( definition.query, subValues );
+				} );
+			}
+
+			return value;
+		};
+
+		const normalizedAttributes = normalizeAttributes(
+			get( blockType, [ 'attributes' ], {} ),
+			attributes
+		);
+
 		return createBlock(
 			name,
-			attributes,
+			normalizedAttributes,
 			synchronizeBlocksWithTemplate( [], innerBlocksTemplate )
 		);
 	} );
