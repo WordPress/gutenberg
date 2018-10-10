@@ -104,6 +104,9 @@
 	overflow: auto;
 	height: 100%;
 	padding: ($header-height+$panel-padding) $panel-padding $panel-padding $panel-padding;
+
+	// This border covers up a rounding error that makes text visible under the fixed header.
+	// This is caused by the vertical centering using translate, which places on subpixels.
 	border: 2px solid $white;
 
 	&:focus {
