@@ -5,7 +5,7 @@
             "linkDestination": "attachment"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-image\"><a href=\"http://localhost:8888/?attachment_id=7\"><img src=\"https://cldup.com/uuUqE_dXzy.jpg\" alt=\"\" /></a></figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-image\"><a href=\"http://localhost:8888/?attachment_id=7\"><img src=\"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=\" alt=\"\" /></a></figure>\n"
     },
     {
         "blockName": null,

@@ -444,3 +444,65 @@ export function observeFocusLoss() {
 		} );
 	} );
 }
+
+/**
+ * Returns a string containing the block title associated with the provided block name.
+ * @param {string} blockName Block name.
+ *
+ * @return {Promise} Promise resolving with a string containing the block title.
+ */
+export async function getBlockTitle( blockName ) {
+	return page.evaluate( ( _blockName ) => {
+		return wp.data.select( 'core/blocks' ).getBlockType( _blockName ).title;
+	}, blockName );
+}
+const BLOCK_SWITCHER_SELECTOR = '.editor-block-toolbar .editor-block-switcher';
+
+/**
+ * Returns a boolean indicating if the current selected block has a block switcher or not.
+ *
+ * @return {Promise} Promise resolving with a boolean.
+ */
+export const hasBlockSwitcher = async () => {
+	return page.evaluate( ( blockSwitcherSelector ) => {
+		return !! document.querySelector( blockSwitcherSelector );
+	}, BLOCK_SWITCHER_SELECTOR );
+};
+
+const TRANSFORM_BUTTON_SELECTOR = '.editor-block-types-list .editor-block-types-list__list-item button';
+
+/**
+ * Returns an array of strings with all block titles,
+ * that the current selected block can be transformed into.
+ *
+ * @return {Promise} Promise resolving with an array containing all possible block transforms
+ */
+export const getAvailableBlockTransforms = async () => {
+	if ( ! await hasBlockSwitcher() ) {
+		return [];
+	}
+	await page.click( BLOCK_SWITCHER_SELECTOR );
+	return page.evaluate( ( buttonSelector ) => {
+		return Array.from(
+			document.querySelectorAll(
+				buttonSelector
+			)
+		).map(
+			( button ) => {
+				return button.getAttribute( 'aria-label' );
+			}
+		);
+	}, TRANSFORM_BUTTON_SELECTOR );
+};
+
+/**
+ * Transforms the current selected block in the block whose title is blockTitle.
+ *
+ * @param {string} blockTitle Title of the destination block of the transformation.
+ */
+export const transformBlock = async ( blockTitle ) => {
+	await page.click( BLOCK_SWITCHER_SELECTOR );
+	await page.click(
+		`${ TRANSFORM_BUTTON_SELECTOR }[aria-label="${ blockTitle }"]`
+	);
+};

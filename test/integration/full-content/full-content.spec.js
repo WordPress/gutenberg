@@ -1,9 +1,8 @@
 /**
  * External dependencies
  */
-import fs from 'fs';
 import path from 'path';
-import { uniq, startsWith, get } from 'lodash';
+import { startsWith, get } from 'lodash';
 import { format } from 'util';
 
 /**
@@ -18,37 +17,18 @@ import {
 import { parse as grammarParse } from '@wordpress/block-serialization-default-parser';
 import { registerCoreBlocks } from '@wordpress/block-library';
 
+/**
+ * Internal dependencies
+ */
+import {
+	getFileBaseNames,
+	readFixtureFile,
+	writeFixtureFile,
+} from '../../support/utils';
+
 const fixturesDir = path.join( __dirname, 'fixtures' );
 
-// We expect 4 different types of files for each fixture:
-//  - fixture.html            : original content
-//  - fixture.parsed.json     : parser output
-//  - fixture.json            : blocks structure
-//  - fixture.serialized.html : re-serialized content
-// Get the "base" name for each fixture first.
-const fileBasenames = uniq(
-	fs.readdirSync( fixturesDir )
-		.filter( ( f ) => /(\.html|\.json)$/.test( f ) )
-		.map( ( f ) => f.replace( /\..+$/, '' ) )
-);
-
-function readFixtureFile( filename ) {
-	try {
-		return fs.readFileSync(
-			path.join( fixturesDir, filename ),
-			'utf8'
-		);
-	} catch ( err ) {
-		return null;
-	}
-}
-
-function writeFixtureFile( filename, content ) {
-	fs.writeFileSync(
-		path.join( fixturesDir, filename ),
-		content
-	);
-}
+const fileBasenames = getFileBaseNames( fixturesDir );
 
 function normalizeParsedBlocks( blocks ) {
 	return blocks.map( ( block, index ) => {
@@ -77,7 +57,7 @@ describe( 'full post content fixture', () => {
 
 	fileBasenames.forEach( ( f ) => {
 		it( f, () => {
-			const content = readFixtureFile( f + '.html' );
+			const content = readFixtureFile( fixturesDir, f + '.html' );
 			if ( content === null ) {
 				throw new Error(
 					'Missing fixture file: ' + f + '.html'
@@ -85,7 +65,7 @@ describe( 'full post content fixture', () => {
 			}
 
 			const parserOutputActual = grammarParse( content );
-			let parserOutputExpectedString = readFixtureFile( f + '.parsed.json' );
+			let parserOutputExpectedString = readFixtureFile( fixturesDir, f + '.parsed.json' );
 
 			if ( ! parserOutputExpectedString ) {
 				if ( process.env.GENERATE_MISSING_FIXTURES ) {
@@ -94,7 +74,7 @@ describe( 'full post content fixture', () => {
 						null,
 						4
 					) + '\n';
-					writeFixtureFile( f + '.parsed.json', parserOutputExpectedString );
+					writeFixtureFile( fixturesDir, f + '.parsed.json', parserOutputExpectedString );
 				} else {
 					throw new Error(
 						'Missing fixture file: ' + f + '.parsed.json'
@@ -129,7 +109,7 @@ describe( 'full post content fixture', () => {
 			}
 
 			const blocksActualNormalized = normalizeParsedBlocks( blocksActual );
-			let blocksExpectedString = readFixtureFile( f + '.json' );
+			let blocksExpectedString = readFixtureFile( fixturesDir, f + '.json' );
 
 			if ( ! blocksExpectedString ) {
 				if ( process.env.GENERATE_MISSING_FIXTURES ) {
@@ -138,7 +118,7 @@ describe( 'full post content fixture', () => {
 						null,
 						4
 					) + '\n';
-					writeFixtureFile( f + '.json', blocksExpectedString );
+					writeFixtureFile( fixturesDir, f + '.json', blocksExpectedString );
 				} else {
 					throw new Error(
 						'Missing fixture file: ' + f + '.json'
@@ -162,12 +142,12 @@ describe( 'full post content fixture', () => {
 			// `serialize` doesn't have a trailing newline, but the fixture
 			// files should.
 			const serializedActual = serialize( blocksActual ) + '\n';
-			let serializedExpected = readFixtureFile( f + '.serialized.html' );
+			let serializedExpected = readFixtureFile( fixturesDir, f + '.serialized.html' );
 
 			if ( ! serializedExpected ) {
 				if ( process.env.GENERATE_MISSING_FIXTURES ) {
 					serializedExpected = serializedActual;
-					writeFixtureFile( f + '.serialized.html', serializedExpected );
+					writeFixtureFile( fixturesDir, f + '.serialized.html', serializedExpected );
 				} else {
 					throw new Error(
 						'Missing fixture file: ' + f + '.serialized.html'
@@ -209,7 +189,7 @@ describe( 'full post content fixture', () => {
 						// The parser output for this test.  For missing files,
 						// JSON.parse( null ) === null.
 						const parserOutput = JSON.parse(
-							readFixtureFile( basename + '.json' )
+							readFixtureFile( fixturesDir, basename + '.json' )
 						);
 						// The name of the first block that this fixture file
 						// contains (if any).

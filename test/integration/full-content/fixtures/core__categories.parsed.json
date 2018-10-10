@@ -1,11 +1,7 @@
 [
     {
         "blockName": "core/categories",
-        "attrs": {
-            "showPostCounts": false,
-            "displayAsDropdown": false,
-            "showHierarchy": false
-        },
+        "attrs": {},
         "innerBlocks": [],
         "innerHTML": ""
     },

@@ -4,13 +4,13 @@
         "name": "core/audio",
         "isValid": true,
         "attributes": {
-            "src": "https://media.simplecast.com/episodes/audio/80564/draft-podcast-51-livePublish2.mp3",
+            "src": "data:audio/mpeg;base64,/+MYxAAAAANIAAAAAExBTUUzLjk4LjIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
             "caption": "",
             "autoplay": false,
             "loop": false,
             "align": "right"
         },
         "innerBlocks": [],
-        "originalContent": "<figure class=\"wp-block-audio alignright\">\n    <audio controls=\"\" src=\"https://media.simplecast.com/episodes/audio/80564/draft-podcast-51-livePublish2.mp3\"></audio>\n</figure>"
+        "originalContent": "<figure class=\"wp-block-audio alignright\">\n    <audio controls=\"\" src=\"data:audio/mpeg;base64,/+MYxAAAAANIAAAAAExBTUUzLjk4LjIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"></audio>\n</figure>"
     }
 ]

@@ -4,13 +4,13 @@
         "name": "core/image",
         "isValid": true,
         "attributes": {
-            "url": "https://cldup.com/YLYhpou2oq.jpg",
+            "url": "data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=",
             "alt": "",
             "caption": "Give it a try. Press the \"really wide\" button on the image toolbar.",
             "align": "center",
             "linkDestination": "none"
         },
         "innerBlocks": [],
-        "originalContent": "<div class=\"wp-block-image\"><figure class=\"aligncenter\"><img src=\"https://cldup.com/YLYhpou2oq.jpg\" alt=\"\" /><figcaption>Give it a try. Press the &quot;really wide&quot; button on the image toolbar.</figcaption></figure></div>"
+        "originalContent": "<div class=\"wp-block-image\"><figure class=\"aligncenter\"><img src=\"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=\" alt=\"\" /><figcaption>Give it a try. Press the &quot;really wide&quot; button on the image toolbar.</figcaption></figure></div>"
     }
 ]
