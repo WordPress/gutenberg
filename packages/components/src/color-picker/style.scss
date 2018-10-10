@@ -1,8 +1,11 @@
+.color-picker {
+	width: 100%;
+	overflow: hidden;
+}
 .color-picker__saturation {
 	width: 100%;
 	padding-bottom: 55%;
 	position: relative;
-	overflow: hidden;
 }
 .color-picker__body {
 	padding: 16px 16px 12px;
@@ -10,10 +13,21 @@
 .color-picker__controls {
 	display: flex;
 }
+.color-picker__saturation-pointer,
+.color-picker__hue-pointer,
+.color-picker__alpha-pointer {
+	padding: 0;
+	position: absolute;
+	cursor: pointer;
+	box-shadow: none;
+	border: none;
+}
+
+/* CURRENT COLOR COMPONENT */
 .color-picker__swatch {
 	margin-right: 8px;
-	width: 40px;
-	height: 40px;
+	width: 32px;
+	height: 32px;
 	border-radius: 50%;
 	position: relative;
 	overflow: hidden;
@@ -24,11 +38,12 @@
 		linear-gradient(-45deg, transparent 75%, #ddd 75%);
 	background-size: 10px 10px;
 	background-position: 0 0, 0 5px, 5px -5px, -5px 0;
-}
-.color-picker.is-alpha-disabled .color-picker__swatch {
-	width: 16px;
-	height: 16px;
-	margin-top: 0;
+
+	.is-alpha-disabled & {
+		width: 12px;
+		height: 12px;
+		margin-top: 0;
+	}
 }
 .color-picker__active {
 	position: absolute;
@@ -39,26 +54,6 @@
 	border-radius: 50%;
 	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
 	z-index: 2;
-}
-.color-picker__toggles {
-	flex: 1;
-}
-.color-picker__hue,
-.color-picker__alpha {
-	height: 16px;
-	position: relative;
-}
-.color-picker.is-alpha-enabled .color-picker__hue {
-	margin-bottom: 8px;
-}
-.color-picker__saturation-pointer,
-.color-picker__hue-pointer,
-.color-picker__alpha-pointer {
-	padding: 0;
-	position: absolute;
-	cursor: pointer;
-	box-shadow: none;
-	border: none;
 }
 
 /* SATURATION COMPONENT */
@@ -71,6 +66,9 @@
 	right: 0;
 	bottom: 0;
 }
+.color-picker__saturation-color {
+	overflow: hidden;
+}
 .color-picker__saturation-white {
 	background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0));
 }
@@ -78,17 +76,21 @@
 	background: linear-gradient(to top, #000, rgba(0, 0, 0, 0));
 }
 .color-picker__saturation-pointer {
-	width: 4px;
-	height: 4px;
+	width: 8px;
+	height: 8px;
 	box-shadow:
 		0 0 0 1.5px #fff,
 		inset 0 0 1px 1px rgba(0, 0, 0, 0.3),
 		0 0 1px 2px rgba(0, 0, 0, 0.4);
 	border-radius: 50%;
-	transform: translate(-2px, -2px);
+	background-color: transparent;
+	transform: translate(-4px, -4px);
 }
 
 /* HUE & ALPHA BARS */
+.color-picker__toggles {
+	flex: 1;
+}
 .color-picker__alpha {
 	background-image:
 		linear-gradient(45deg, #ddd 25%, transparent 25%),
@@ -106,6 +108,14 @@
 	right: 0;
 	bottom: 0;
 }
+.color-picker__hue,
+.color-picker__alpha {
+	height: 12px;
+	position: relative;
+}
+.is-alpha-enabled .color-picker__hue {
+	margin-bottom: 8px;
+}
 .color-picker__hue-bar,
 .color-picker__alpha-bar {
 	position: relative;
@@ -119,13 +129,12 @@
 .color-picker__hue-pointer,
 .color-picker__alpha-pointer {
 	left: 0;
-	margin-top: 1px;
-	width: 4px;
+	width: 14px;
 	height: 14px;
-	border-radius: 1px;
-	box-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
+	border-radius: 50%;
+	box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.37);
 	background: #fff;
-	transform: translateX(-2px);
+	transform: translate(-7px, -1px);
 }
 
 /* INPUTS COMPONENT */
