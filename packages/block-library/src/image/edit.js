@@ -66,7 +66,7 @@ export const pickRelevantMediaFiles = ( image ) => {
 	}
 
 	if ( ! alt ) {
-		alt = 'This image has an empty alt attribute, the file name is ' + filename;
+		alt = __( 'This image has an empty alt attribute, the file name is ' ) + filename;
 	}
 
 	return {
