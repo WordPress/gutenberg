@@ -26,6 +26,9 @@ $blocks-button__line-height: $big-font-size + 6px;
 
 	&.aligncenter {
 		text-align: center;
+
+		// This explicitly duplicates the bottom margin, because many themes center using margin: 0 auto; so we need to be explicity.
+		margin-bottom: 1.5em;
 	}
 
 	&.alignright {
