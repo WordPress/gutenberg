@@ -148,8 +148,10 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 	width: auto;
 	margin: 0 #{ -$block-padding };
 	position: sticky;
+	position: absolute;
 	z-index: z-index(".freeform-toolbar");
 	top: $block-padding;
+	top: 0;
 	transform: translateY(-$block-padding);
 
 	// On mobile, toolbars go edge to edge.
@@ -211,7 +213,9 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 			float: right;
 			margin-right: -$block-side-ui-clearance - $border-width;
 			transform: translateY(-#{ $block-padding - $border-width });
+			position: absolute;
 			top: $block-padding;
+			top: 0;
 
 			.editor-block-toolbar {
 				border: none;

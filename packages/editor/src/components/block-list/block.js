@@ -513,7 +513,6 @@ export class BlockListBlock extends Component {
 						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }
 					/>
 				) }
-				{ shouldShowContextualToolbar && <BlockContextualToolbar /> }
 				{ isFirstMultiSelected && (
 					<BlockMultiControls rootClientId={ rootClientId } />
 				) }
@@ -546,6 +545,7 @@ export class BlockListBlock extends Component {
 					) }
 					{ !! error && <BlockCrashWarning /> }
 				</IgnoreNestedEvents>
+				{ shouldShowContextualToolbar && <BlockContextualToolbar /> }
 				{ showEmptyBlockSideInserter && (
 					<Fragment>
 						<div className="editor-block-list__side-inserter">

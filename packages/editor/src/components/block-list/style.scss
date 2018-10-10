@@ -44,6 +44,7 @@
 	@include break-small() {
 		padding-left: $block-container-side-padding;
 		padding-right: $block-container-side-padding;
+		position: relative;
 	}
 
 	// Don't add side padding for nested blocks.
@@ -726,7 +727,8 @@
  */
 
 .editor-block-list__block .editor-block-contextual-toolbar {
-	position: sticky;
+	// position: sticky;
+	position: absolute;
 	z-index: z-index(".editor-block-contextual-toolbar");
 	white-space: nowrap;
 	text-align: left;
@@ -799,12 +801,15 @@
 			transform: translateY(-$block-toolbar-height -$block-padding -$border-width);
 
 			// IE11 does not support `position: sticky`.
-			@supports (position: sticky) {
-				position: sticky;
+			// @supports (position: sticky) {
+			// 	position: sticky;
 
-				// Compensate for translate, so the sticky sticks to the top.
-				top: $block-toolbar-height + $block-padding;
-			}
+			// 	// Compensate for translate, so the sticky sticks to the top.
+			// 	top: $block-toolbar-height + $block-padding;
+			// }
+
+			position: absolute;
+			top: 0;
 
 			// This is an important one. Because the toolbar is sticky, it's part of the flow.
 			// It behaves as relative, in other words, until it reaches an edge and then behaves as fixed.
