@@ -482,10 +482,10 @@ add_action( 'admin_print_scripts-edit.php', 'gutenberg_replace_default_add_new_b
  */
 function gutenberg_add_admin_body_class( $classes ) {
 	if ( current_theme_supports( 'editor-styles' ) && current_theme_supports( 'dark-editor-style' ) ) {
-		return "$classes gutenberg-editor-page is-fullscreen-mode is-dark-theme";
+		return "$classes gutenberg-editor-page is-fullscreen-mode wp-embed-responsive is-dark-theme";
 	} else {
 		// Default to is-fullscreen-mode to avoid jumps in the UI.
-		return "$classes gutenberg-editor-page is-fullscreen-mode";
+		return "$classes gutenberg-editor-page is-fullscreen-mode wp-embed-responsive";
 	}
 }
 
