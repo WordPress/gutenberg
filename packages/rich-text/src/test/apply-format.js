@@ -52,6 +52,26 @@ describe( 'applyFormat', () => {
 		expect( getSparseArrayLength( result.formats ) ).toBe( 4 );
 	} );
 
+	it( 'should not apply format on non existing format if selection is collapsed', () => {
+		const record = {
+			formats: [ , , , , [ a ], [ a ], [ a ], , , , , , , ],
+			text: 'one two three',
+			start: 0,
+			end: 0,
+		};
+		const expected = {
+			formats: [ , , , , [ a ], [ a ], [ a ], , , , , , , ],
+			text: 'one two three',
+			start: 0,
+			end: 0,
+		};
+		const result = applyFormat( deepFreeze( record ), a2 );
+
+		expect( result ).toEqual( expected );
+		expect( result ).not.toBe( record );
+		expect( getSparseArrayLength( result.formats ) ).toBe( 3 );
+	} );
+
 	it( 'should apply format on existing format if selection is collapsed', () => {
 		const record = {
 			formats: [ , , , , [ a ], [ a ], [ a ], , , , , , , ],
