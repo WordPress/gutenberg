@@ -139,6 +139,25 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		this.state.dataSource.setDirty();
 	}
 
+	insertBlocksAfter( blocks ) {
+		console.log('ci sei quasi')
+
+		// find currently focused block
+		const focusedItemIndex = this.findDataSourceIndexForFocusedItem();
+		console.log(focusedItemIndex);
+		const clientIdFocused = this.state.dataSource.get( focusedItemIndex ).clientId;
+
+		let newBlock = blocks[0];
+		newBlock.focused = false;
+
+		// set it into the datasource, and use the same object instance to send it to props/redux
+		this.state.dataSource.splice( focusedItemIndex + 1, 0, newBlock );
+		this.props.createBlockAction( newBlock.clientId, newBlock, clientIdFocused );
+
+		// now set the focus
+		this.props.focusBlockAction( newBlock.clientId );
+	}
+
 	onChange( clientId: string, attributes: mixed ) {
 		// Update Redux store
 		this.props.onChange( clientId, attributes );
@@ -252,6 +271,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 					showTitle={ this.state.inspectBlocks }
 					focused={ value.item.focused }
 					clientId={ value.clientId }
+					insertBlocksAfter={ this.insertBlocksAfter.bind( this ) }
 					{ ...value.item }
 				/>
 				{ this.state.blockTypePickerVisible && value.item.focused && insertHere }
