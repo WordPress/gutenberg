@@ -7,7 +7,7 @@
 	var TEMPLATE = [
 		[ 'core/paragraph', {
 			fontSize: 'large',
-			content: create( { text: 'Content…' } ),
+			content: 'Content…',
 		} ],
 	];
 

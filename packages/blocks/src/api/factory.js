@@ -44,20 +44,18 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 	// Ensure attributes contains only values defined by block type, and merge
 	// default values for missing attributes.
 	const attributes = reduce( blockType.attributes, ( result, schema, key ) => {
-		const value = blockAttributes[ key ];
+		let value = blockAttributes[ key ];
 
-		if ( undefined !== value ) {
-			result[ key ] = value;
-		} else if ( schema.hasOwnProperty( 'default' ) ) {
-			result[ key ] = schema.default;
+		if ( value === undefined && schema.hasOwnProperty( 'default' ) ) {
+			value = schema.default;
 		}
 
 		if ( schema.source === 'rich-text' ) {
 			// Ensure value passed is always a rich text value.
-			if ( typeof result[ key ] === 'string' ) {
-				result[ key ] = create( { text: result[ key ] } );
-			} else if ( ! result[ key ] || ! result[ key ].text ) {
-				result[ key ] = create();
+			if ( typeof value === 'string' ) {
+				value = create( { text: value } );
+			} else if ( ! value || ! value.text ) {
+				value = create();
 			}
 		}
 
@@ -69,12 +67,16 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 			} );
 
 			// Ensure value passed is always an array, which we're expecting in
-			// the RichText component to handle the deprecated value.
-			if ( typeof result[ key ] === 'string' ) {
-				result[ key ] = [ result[ key ] ];
-			} else if ( ! Array.isArray( result[ key ] ) ) {
-				result[ key ] = [];
+			// the RichText getColorObjectByAttributeValuescomponent to handle the deprecated value.
+			if ( typeof value === 'string' ) {
+				value = [ value ];
+			} else if ( ! Array.isArray( value ) ) {
+				value = [];
 			}
+		}
+
+		if ( value !== undefined ) {
+			result[ key ] = value;
 		}
 
 		return result;
