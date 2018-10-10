@@ -139,7 +139,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		this.state.dataSource.setDirty();
 	}
 
-	insertBlocksAfter( blocks ) {
+	insertBlocksAfter( blocks: Array<Object> ) {
 		// find currently focused block
 		const focusedItemIndex = this.findDataSourceIndexForFocusedItem();
 		const clientIdFocused = this.state.dataSource.get( focusedItemIndex ).clientId;

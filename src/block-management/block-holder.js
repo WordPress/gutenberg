@@ -19,7 +19,7 @@ type PropsType = BlockType & {
 	onChange: ( clientId: string, attributes: mixed ) => void,
 	onToolbarButtonPressed: ( button: number, clientId: string ) => void,
 	onBlockHolderPressed: ( clientId: string ) => void,
-	insertBlocksAfter: ( blocks: array ) => void,
+	insertBlocksAfter: ( blocks: Array<Object> ) => void,
 };
 
 type StateType = {
