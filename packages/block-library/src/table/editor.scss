@@ -9,6 +9,8 @@
 	}
 
 	&[data-align="center"] {
+		text-align: initial;
+
 		table {
 			margin: 0 auto;
 		}
