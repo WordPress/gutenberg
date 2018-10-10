@@ -1355,7 +1355,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		// Override "(Auto Draft)" new post default title with empty string,
 		// or filtered value.
 		$initial_edits = array(
-			'title' => array(
+			'title'   => array(
 				'raw' => $post->post_title,
 			),
 			'content' => array(
@@ -1363,7 +1363,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 			),
 			'excerpt' => array(
 				'raw' => $post->post_excerpt,
-			)
+			),
 		);
 	} else {
 		$initial_edits = null;
