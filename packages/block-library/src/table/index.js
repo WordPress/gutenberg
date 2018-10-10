@@ -90,8 +90,8 @@ export const settings = {
 	},
 
 	styles: [
-		{ name: 'default', label: __( 'Regular' ), isDefault: true },
-		{ name: 'striped', label: __( 'Striped' ) },
+		{ name: 'regular', label: __( 'Regular' ), isDefault: true },
+		{ name: 'stripes', label: __( 'Stripes' ) },
 	],
 
 	supports: {
