@@ -65,8 +65,8 @@ Here's the markup for an `Image` with a caption:
 Here's the markup for a left-floated image:
 
 ```html
-<div class="wp-block-image">
-	<figure class="alignleft">
+<div class="wp-block-image alignleft">
+	<figure>
 		<img src="..." alt="" width="200px">
 		<figcaption>Short image caption.</figcaption>
 	</figure>

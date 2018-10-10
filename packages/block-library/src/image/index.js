@@ -228,8 +228,8 @@ export const settings = {
 
 		if ( 'left' === align || 'right' === align || 'center' === align ) {
 			return (
-				<div>
-					<figure className={ classes }>
+				<div className={ classes }>
+					<figure>
 						{ figure }
 					</figure>
 				</div>
