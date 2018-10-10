@@ -7,7 +7,9 @@ import Mousetrap from 'mousetrap';
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
+import { withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -110,12 +112,13 @@ export class Saturation extends Component {
 	}
 
 	render() {
-		const { hsv, hsl } = this.props;
+		const { hsv, hsl, instanceId } = this.props;
 		const pointerLocation = {
 			top: `${ -( hsv.v * 100 ) + 100 }%`,
 			left: `${ hsv.s * 100 }%`,
 		};
 
+		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
 			<div
 				style={ { background: `hsl(${ hsl.h },100%, 50%)` } }
@@ -126,16 +129,23 @@ export class Saturation extends Component {
 				onTouchStart={ this.handleChange }>
 				<div className="color-picker__saturation-white" />
 				<div className="color-picker__saturation-black" />
-				<div
-					tabIndex="0"
-					aria-label="Saturation &amp; lightness value"
+				<button
+					aria-label={ __( 'Saturation & lightness value' ) }
+					aria-describedBy={ `color-picker-saturation-${ instanceId }` }
 					className="color-picker__saturation-pointer"
-					style={ pointerLocation }>
-					<div className="color-picker__saturation-pointer-inner" />
+					style={ pointerLocation }
+				/>
+				<div
+					className="screen-reader-text"
+					id={ `color-picker-saturation-${ instanceId }` }>
+					{ __(
+						'Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to increase saturation, and right to decrease saturation.'
+					) }
 				</div>
 			</div>
 		);
+		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
 
-export default Saturation;
+export default withInstanceId( Saturation );

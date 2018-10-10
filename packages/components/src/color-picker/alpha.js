@@ -7,6 +7,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 
 /**
@@ -112,25 +113,27 @@ export class Alpha extends Component {
 					className="color-picker__alpha-gradient"
 					style={ gradient }
 				/>
+				{ /* eslint-disable jsx-a11y/no-static-element-interactions */ }
 				<div
 					className="color-picker__alpha-bar"
 					ref={ ( container ) => ( this.container = container ) }
 					onMouseDown={ this.handleMouseDown }
 					onTouchMove={ this.handleChange }
 					onTouchStart={ this.handleChange }>
-					<div
-						tabIndex="0"
+					<button
 						role="slider"
 						aria-valuemax="1"
 						aria-valuemin="0"
 						aria-valuenow={ rgb.a }
 						aria-orientation="horizontal"
-						aria-label="Alpha value, from 0 (transparent) to 1 (fully opaque)."
+						aria-label={ __(
+							'Alpha value, from 0 (transparent) to 1 (fully opaque).'
+						) }
 						className="color-picker__alpha-pointer"
-						style={ pointerLocation }>
-						<div className="color-picker__alpha-slider" />
-					</div>
+						style={ pointerLocation }
+					/>
 				</div>
+				{ /* eslint-enable jsx-a11y/no-static-element-interactions */ }
 			</div>
 		);
 	}

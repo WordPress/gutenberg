@@ -51,6 +51,15 @@
 .color-picker.is-alpha-enabled .color-picker__hue {
 	margin-bottom: 8px;
 }
+.color-picker__saturation-pointer,
+.color-picker__hue-pointer,
+.color-picker__alpha-pointer {
+	padding: 0;
+	position: absolute;
+	cursor: pointer;
+	box-shadow: none;
+	border: none;
+}
 
 /* SATURATION COMPONENT */
 .color-picker__saturation-color,
@@ -69,10 +78,6 @@
 	background: linear-gradient(to top, #000, rgba(0, 0, 0, 0));
 }
 .color-picker__saturation-pointer {
-	position: absolute;
-	cursor: default;
-}
-.color-picker__saturation-pointer-inner {
 	width: 4px;
 	height: 4px;
 	box-shadow:
@@ -80,7 +85,6 @@
 		inset 0 0 1px 1px rgba(0, 0, 0, 0.3),
 		0 0 1px 2px rgba(0, 0, 0, 0.4);
 	border-radius: 50%;
-	cursor: pointer;
 	transform: translate(-2px, -2px);
 }
 
@@ -114,16 +118,11 @@
 }
 .color-picker__hue-pointer,
 .color-picker__alpha-pointer {
-	position: absolute;
 	left: 0;
-	cursor: pointer;
-}
-.color-picker__hue-slider,
-.color-picker__alpha-slider {
 	margin-top: 1px;
 	width: 4px;
-	border-radius: 1px;
 	height: 14px;
+	border-radius: 1px;
 	box-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
 	background: #fff;
 	transform: translateX(-2px);

@@ -7,6 +7,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 
 /**
@@ -101,25 +102,25 @@ export class Hue extends Component {
 		return (
 			<div className="color-picker__hue">
 				<div className="color-picker__hue-gradient" />
+				{ /* eslint-disable jsx-a11y/no-static-element-interactions */ }
 				<div
 					className="color-picker__hue-bar"
 					ref={ ( container ) => ( this.container = container ) }
 					onMouseDown={ this.handleMouseDown }
 					onTouchMove={ this.handleChange }
 					onTouchStart={ this.handleChange }>
-					<div
-						tabIndex="0"
+					<button
 						role="slider"
 						aria-valuemax="1"
 						aria-valuemin="359"
 						aria-valuenow={ hsl.h }
 						aria-orientation="horizontal"
-						aria-label="Hue value in degrees, from 0 to 359."
+						aria-label={ __( 'Hue value in degrees, from 0 to 359.' ) }
 						className="color-picker__hue-pointer"
-						style={ pointerLocation }>
-						<div className="color-picker__hue-slider" />
-					</div>
+						style={ pointerLocation }
+					/>
 				</div>
+				{ /* eslint-enable jsx-a11y/no-static-element-interactions */ }
 			</div>
 		);
 	}
