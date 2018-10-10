@@ -1,15 +1,4 @@
-Gutenberg's deprecation policy is intended to support backwards-compatibility for two minor releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
-
-## 4.4.0
-
-- The block attribute sources `children` and `node` have been removed. Please use the `rich-text` source instead. See the core blocks for examples.
-- `wp.blocks.node.matcher` has been removed. Please use `wp.richTextValue.create` instead.
-- `wp.blocks.node.toHTML` has been removed. Please use `wp.richTextValue.toHTMLString` instead.
-- `wp.blocks.node.fromDOM` has been removed. Please use `wp.richTextValue.create` instead.
-- `wp.blocks.children.toHTML` has been removed. Please use `wp.richTextValue.toHTMLString` instead.
-- `wp.blocks.children.fromDOM` has been removed. Please use `wp.richTextValue.create` instead.
-- `wp.blocks.children.concat` has been removed. Please use `wp.richTextValue.concat` instead.
-- `wp.blocks.children.getChildrenArray` has been removed. Please use `wp.richTextValue.create` instead.
+Gutenberg's deprecation policy is intended to support backwards-compatibility for two minor releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.s
 
 ## 4.2.0
 

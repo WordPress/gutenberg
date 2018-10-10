@@ -92,7 +92,6 @@ describe( 'block factory', () => {
 
 			const block = createBlock( 'core/test-block' );
 
-			expect( console ).toHaveWarned();
 			expect( block.attributes ).toEqual( {
 				content: [],
 			} );

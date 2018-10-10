@@ -20,7 +20,6 @@ import {
  * WordPress dependencies
  */
 import { createHooks, applyFilters } from '@wordpress/hooks';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -52,12 +51,6 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 		}
 
 		if ( [ 'node', 'children' ].indexOf( schema.source ) !== -1 ) {
-			deprecated( `${ schema.source } source`, {
-				alternative: 'rich-text source',
-				plugin: 'Gutenberg',
-				version: '4.4',
-			} );
-
 			// Ensure value passed is always an array, which we're expecting in
 			// the RichText component to handle the deprecated value.
 			if ( typeof result[ key ] === 'string' ) {
