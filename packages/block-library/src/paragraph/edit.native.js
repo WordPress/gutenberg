@@ -28,7 +28,7 @@ class ParagraphEdit extends Component {
 
 		if ( insertBlocksAfter ) {
 			const blocks = [];
-			blocks.push( createBlock( 'core/paragraph', { content: '<p>test</p>' } ) );
+			blocks.push( createBlock( 'core/paragraph', { content: 'Test' } ) );
 			insertBlocksAfter( blocks );
 		}
 	}
