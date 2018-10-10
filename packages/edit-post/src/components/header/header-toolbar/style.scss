@@ -41,7 +41,7 @@
 
 	// Move toolbar into top Editor Bar.
 	@include break-large {
-		padding-left: $item-spacing;
+		padding-left: $grid-size;
 		position: static;
 		left: auto;
 		right: auto;

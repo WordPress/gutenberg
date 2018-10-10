@@ -1,7 +1,7 @@
 /* Text Editor specific */
 .components-panel__header.edit-post-sidebar-header__small {
 	background: $white;
-	padding-right: $panel-padding / 2;
+	padding-right: $grid-size-small;
 
 	.edit-post-sidebar__title {
 		overflow: hidden;
@@ -16,7 +16,7 @@
 }
 
 .components-panel__header.edit-post-sidebar-header {
-	padding-right: $panel-padding / 2;
+	padding-right: $grid-size-small;
 
 	.components-icon-button {
 		display: none;

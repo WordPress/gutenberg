@@ -67,7 +67,7 @@
 	background: $white;
 	width: calc(100% - #{$panel-padding + $panel-padding});
 	height: $header-height;
-	padding: $item-spacing 0;
+	padding: $grid-size 0;
 
 	.components-modal__header-heading {
 		font-size: 1em;

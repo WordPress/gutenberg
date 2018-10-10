@@ -30,7 +30,7 @@
 }
 
 .editor-format-toolbar__link-value {
-	margin: $item-spacing - $border-width;
+	margin: $grid-size - $border-width;
 	flex-grow: 1;
 	flex-shrink: 1;
 	overflow: hidden;
