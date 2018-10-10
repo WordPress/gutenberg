@@ -50,7 +50,7 @@
 .components-modal__header {
 	box-sizing: border-box;
 	border-bottom: $border-width solid $light-gray-500;
-	padding: 0;
+	padding: 0 $grid-size-large;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
@@ -61,7 +61,7 @@
 	position: sticky;
 	top: 0;
 	z-index: z-index(".components-modal__header");
-	margin: 0 0 ($grid-size-large * 2);
+	margin: 0 -#{ $grid-size-large } $grid-size-large;
 
 	.components-modal__header-heading {
 		font-size: 1em;
