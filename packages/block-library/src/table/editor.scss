@@ -1,3 +1,21 @@
+.editor-block-list__block[data-type="core/table"] {
+	&[data-align="left"],
+	&[data-align="right"],
+	&[data-align="center"] {
+		table {
+			// Ensure the table element is not full-width when aligned.
+			width: auto;
+		}
+	}
+
+	&[data-align="center"] {
+		table {
+			margin: 0 auto;
+		}
+	}
+}
+
+
 .wp-block-table {
 	table {
 		border-collapse: collapse;
