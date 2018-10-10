@@ -45,6 +45,9 @@ function gutenberg_register_rest_routes() {
 		$autosaves_controller = new WP_REST_Autosaves_Controller( $post_type->name );
 		$autosaves_controller->register_routes();
 	}
+
+	$themes_controller = new WP_REST_Themes_Controller();
+	$themes_controller->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_routes' );
 
