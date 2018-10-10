@@ -373,7 +373,7 @@ const embedAttributes = {
 		type: 'string',
 	},
 	caption: {
-		source: 'rich-text',
+		source: 'html',
 		selector: 'figcaption',
 	},
 	type: {

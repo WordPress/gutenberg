@@ -42,7 +42,7 @@ export const settings = {
 			selector: 'p',
 			query: {
 				children: {
-					source: 'rich-text',
+					source: 'html',
 				},
 			},
 			default: [

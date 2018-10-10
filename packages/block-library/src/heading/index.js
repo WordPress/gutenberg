@@ -14,7 +14,6 @@ import {
 	getBlockType,
 } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
-import { concat } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -39,7 +38,7 @@ const supports = {
 
 const schema = {
 	content: {
-		source: 'rich-text',
+		source: 'html',
 		selector: 'h1,h2,h3,h4,h5,h6',
 	},
 	level: {
@@ -166,7 +165,7 @@ export const settings = {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: concat( attributes.content, attributesToMerge.content ),
+			content: attributes.content + attributesToMerge.content,
 		};
 	},
 

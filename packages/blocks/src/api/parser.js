@@ -19,7 +19,7 @@ import { getBlockType, getUnknownTypeHandlerName } from './registration';
 import { createBlock } from './factory';
 import { isValidBlock } from './validation';
 import { getCommentDelimitedContent } from './serializer';
-import { attr, html, text, query, node, children, prop, richText } from './matchers';
+import { attr, html, text, query, node, children, prop } from './matchers';
 
 /**
  * Sources which are guaranteed to return a string value.
@@ -191,15 +191,13 @@ export function matcherFromSource( sourceConfig ) {
 
 			return matcher;
 		case 'html':
-			return html( sourceConfig.selector );
+			return html( sourceConfig.selector, sourceConfig.multiline );
 		case 'text':
 			return text( sourceConfig.selector );
 		case 'children':
 			return children( sourceConfig.selector );
 		case 'node':
 			return node( sourceConfig.selector );
-		case 'rich-text':
-			return richText( sourceConfig.selector, sourceConfig.multiline );
 		case 'query':
 			const subMatchers = mapValues( sourceConfig.query, matcherFromSource );
 			return query( sourceConfig.selector, subMatchers );
@@ -240,7 +238,7 @@ export function parseWithAttributeSchema( innerHTML, attributeSchema ) {
  * @return {*} Attribute value.
  */
 export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, commentAttributes ) {
-	let { type } = attributeSchema;
+	const { type } = attributeSchema;
 	let value;
 
 	switch ( attributeSchema.source ) {
@@ -258,9 +256,6 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 		case 'tag':
 			value = parseWithAttributeSchema( innerHTML, attributeSchema );
 			break;
-		case 'rich-text':
-			type = 'object';
-			value = parseWithAttributeSchema( innerHTML, attributeSchema );
 	}
 
 	if ( value !== undefined ) {

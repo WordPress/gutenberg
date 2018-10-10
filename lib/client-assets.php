@@ -423,7 +423,6 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-polyfill',
 			'wp-shortcode',
 			'lodash',
-			'wp-rich-text',
 		),
 		filemtime( gutenberg_dir_path() . 'build/blocks/index.js' ),
 		true

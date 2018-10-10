@@ -92,7 +92,6 @@ describe( 'block factory', () => {
 
 			const block = createBlock( 'core/test-block' );
 
-			expect( console ).toHaveWarned();
 			expect( block.attributes ).toEqual( {
 				content: [],
 			} );
@@ -141,7 +140,7 @@ describe( 'block factory', () => {
 				...defaultBlockSettings,
 				attributes: {
 					content: {
-						source: 'rich-text',
+						source: 'html',
 					},
 				},
 			} );
@@ -151,10 +150,7 @@ describe( 'block factory', () => {
 			} );
 
 			expect( block.attributes ).toEqual( {
-				content: {
-					formats: [ , , , , ],
-					text: 'test',
-				},
+				content: 'test',
 			} );
 		} );
 	} );

@@ -17,7 +17,6 @@ import {
 	RichText,
 } from '@wordpress/editor';
 import { getPhrasingContentSchema } from '@wordpress/blocks';
-import { create, concat } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -30,8 +29,9 @@ const supports = {
 
 const schema = {
 	content: {
-		source: 'rich-text',
+		source: 'html',
 		selector: 'p',
+		default: '',
 	},
 	align: {
 		type: 'string',
@@ -195,17 +195,14 @@ export const settings = {
 				return <RawHTML>{ attributes.content }</RawHTML>;
 			},
 			migrate( attributes ) {
-				return {
-					...attributes,
-					content: create( { html: attributes.content } ),
-				};
+				return attributes;
 			},
 		},
 	],
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: concat( attributes.content, attributesToMerge.content ),
+			content: attributes.content + attributesToMerge.content,
 		};
 	},
 

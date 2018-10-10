@@ -16,7 +16,6 @@ import {
 } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
 import { createBlobURL } from '@wordpress/blob';
-import { create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -40,7 +39,7 @@ const blockAttributes = {
 		default: '',
 	},
 	caption: {
-		source: 'rich-text',
+		source: 'html',
 		selector: 'figcaption',
 	},
 	href: {
@@ -161,8 +160,7 @@ export const settings = {
 					caption: {
 						shortcode: ( attributes, { shortcode } ) => {
 							const { content } = shortcode;
-							const html = content.replace( /\s*<img[^>]*>\s/, '' );
-							return create( { html } );
+							return content.replace( /\s*<img[^>]*>\s/, '' );
 						},
 					},
 					href: {
