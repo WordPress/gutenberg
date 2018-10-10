@@ -11,9 +11,7 @@ body {
 
 p {
 	font-size: $editor-font-size;
-	line-height: $editor-line-height;
 }
-
 
 ul,
 ol {
@@ -32,4 +30,8 @@ ol {
 ul ul,
 ol ul {
 	list-style-type: circle;
+}
+
+.mce-content-body {
+	line-height: $editor-line-height;
 }
