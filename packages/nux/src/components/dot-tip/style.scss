@@ -82,7 +82,6 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
 	&:not(.is-mobile).is-left,
 	&:not(.is-mobile).is-center,
 	&:not(.is-mobile).is-right {
-
 		// Position tips above popovers
 		z-index: z-index(".nux-dot-tip");
 
@@ -98,5 +97,25 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
 				width: auto;
 			}
 		}
+	}
+
+	&.components-popover:not(.is-mobile):not(.is-middle).is-right .components-popover__content {
+		/*!rtl:ignore*/
+		margin-left: 0;
+	}
+
+	&.components-popover:not(.is-mobile):not(.is-middle).is-left .components-popover__content {
+		/*!rtl:ignore*/
+		margin-right: 0;
+	}
+
+	&.components-popover.edit-post-more-menu__content:not(.is-mobile):not(.is-middle).is-right .components-popover__content {
+		/*!rtl:ignore*/
+		margin-left: -12px;
+	}
+
+	&.components-popover.edit-post-more-menu__content:not(.is-mobile):not(.is-middle).is-left .components-popover__content {
+		/*!rtl:ignore*/
+		margin-right: -12px;
 	}
 }
