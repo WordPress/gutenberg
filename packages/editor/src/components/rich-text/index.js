@@ -40,9 +40,6 @@ import {
 	insert,
 	isEmptyLine,
 	unstableToDom,
-	concat,
-	join,
-	replace,
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 
@@ -786,9 +783,9 @@ export class RichText extends Component {
 			}
 
 			const record = this.formatToValue( value );
-			const prevRecord = this.formatToValue( prevProps.value );
 
 			if ( this.isActive() ) {
+				const prevRecord = this.formatToValue( prevProps.value );
 				const length = getTextContent( prevRecord ).length;
 				record.start = length;
 				record.end = length;
@@ -1017,36 +1014,12 @@ RichTextContainer.isEmpty = ( value = '' ) => {
 		return ! value || value.length === 0;
 	}
 
-	if ( typeof value === 'string' ) {
-		return value.length === 0;
-	}
-
-	return isEmpty( value );
+	return value.length === 0;
 };
 
 RichTextContainer.Content.defaultProps = {
 	format: 'string',
 	value: '',
-};
-
-RichTextContainer.getTextContent = ( html ) => {
-	return getTextContent( create( { html } ) );
-};
-
-RichTextContainer.concat = ( ...pieces ) => {
-	return toHTMLString( concat( ...pieces.map( ( html ) => create( { html } ) ) ) );
-};
-
-RichTextContainer.join = ( pieces, ...args ) => {
-	return toHTMLString( join( pieces.map( ( html ) => create( { html } ) ), ...args ) );
-};
-
-RichTextContainer.split = ( html, ...args ) => {
-	return split( create( { html } ), ...args ).map( ( value ) => toHTMLString( value ) );
-};
-
-RichTextContainer.replace = ( html, ...args ) => {
-	return toHTMLString( replace( create( { html } ), ...args ) );
 };
 
 export default RichTextContainer;

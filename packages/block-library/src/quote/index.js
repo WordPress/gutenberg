@@ -14,6 +14,7 @@ import {
 	AlignmentToolbar,
 	RichText,
 } from '@wordpress/editor';
+import { join, split, create, toHTMLString } from '@wordpress/rich-text';
 
 const blockAttributes = {
 	value: {
@@ -54,7 +55,9 @@ export const settings = {
 				blocks: [ 'core/paragraph' ],
 				transform: ( attributes ) => {
 					return createBlock( 'core/quote', {
-						value: RichText.join( attributes.map( ( { content } ) => content ), '\u2028' ),
+						value: toHTMLString( join( attributes.map( ( { content } ) =>
+							create( { html: content } )
+						), '\u2028' ), 'p' ),
 					} );
 				},
 			},
@@ -95,9 +98,12 @@ export const settings = {
 				type: 'block',
 				blocks: [ 'core/paragraph' ],
 				transform: ( { value } ) =>
-					RichText.split( value, '\u2028' ).map( ( content ) =>
-						createBlock( 'core/paragraph', { content } )
-					),
+					split( create( { html: value, multilineTag: 'p' } ), '\u2028' )
+						.map( ( piece ) =>
+							createBlock( 'core/paragraph', {
+								content: toHTMLString( piece ),
+							} )
+						),
 			},
 			{
 				type: 'block',
@@ -106,22 +112,23 @@ export const settings = {
 					// If there is no quote content, use the citation as the
 					// content of the resulting heading. A nonexistent citation
 					// will result in an empty heading.
-					if ( RichText.isEmpty( value ) ) {
+					if ( value === '<p></p>' ) {
 						return createBlock( 'core/heading', {
 							content: citation,
 						} );
 					}
 
-					const values = RichText.split( value, '\u2028' );
+					const pieces = split( create( { html: value, multilineTag: 'p' } ), '\u2028' );
+					const quotePieces = pieces.slice( 1 );
 
 					return [
 						createBlock( 'core/heading', {
-							content: values[ 0 ],
+							content: toHTMLString( pieces[ 0 ] ),
 						} ),
 						createBlock( 'core/quote', {
 							...attrs,
 							citation,
-							value: RichText.join( values.slice( 1 ), '\u2028' ),
+							value: toHTMLString( quotePieces.length ? join( pieces.slice( 1 ), '\u2028' ) : create(), 'p' ),
 						} ),
 					];
 				},
@@ -193,8 +200,8 @@ export const settings = {
 	merge( attributes, attributesToMerge ) {
 		return {
 			...attributes,
-			value: RichText.join( [ attributes.value, attributesToMerge.value ], '\u2028' ),
-			citation: RichText.concat( attributes.citation, attributesToMerge.citation ),
+			value: attributes.value + attributesToMerge.value,
+			citation: attributes.citation + attributesToMerge.citation,
 		};
 	},
 

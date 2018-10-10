@@ -11,6 +11,7 @@ import { createBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
 import { RichText } from '@wordpress/editor';
+import { create, getTextContent } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -220,7 +221,7 @@ export const settings = {
 						// ensure download attribute is still set when fileName
 						// is undefined. Using '' here as `true` still leaves
 						// the attribute unset.
-						download={ RichText.getTextContent( fileName ) }
+						download={ getTextContent( create( { html: fileName } ) ) }
 					>
 						<RichText.Content
 							value={ downloadButtonText }
