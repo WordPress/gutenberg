@@ -6,7 +6,12 @@ import { get } from 'lodash';
 /**
  * WordPress Dependencies
  */
-import { PanelBody, Button, ClipboardButton } from '@wordpress/components';
+import {
+	Button,
+	ClipboardButton,
+	PanelBody,
+	TextControl,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Component, Fragment } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
@@ -65,12 +70,12 @@ class PostPublishPanelPostpublish extends Component {
 				</PanelBody>
 				<PanelBody>
 					<div><strong>{ postPublishBodyText }</strong></div>
-					<input
+					<TextControl
+						label={ __( 'Permalink' ) }
 						className="post-publish-panel__postpublish-link-input"
 						readOnly
 						value={ post.link }
 						onFocus={ this.onSelectInput }
-						type="text"
 					/>
 					<div className="post-publish-panel__postpublish-buttons">
 						{ ! isScheduled && (
