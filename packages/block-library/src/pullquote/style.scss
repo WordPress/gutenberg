@@ -18,7 +18,6 @@
 		line-height: 1.6;
 	}
 
-	cite,
 	footer {
 		position: relative;
 	}
@@ -46,13 +45,13 @@
 			font-size: 32px;
 		}
 
-		cite {
+		footer {
 			text-transform: none;
 			font-style: normal;
 		}
 	}
 }
 
-.wp-block-pullquote cite {
+.wp-block-pullquote footer {
 	color: inherit;
 }

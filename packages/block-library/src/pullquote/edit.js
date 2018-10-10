@@ -90,6 +90,7 @@ class PullQuoteEdit extends Component {
 						/>
 						{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 							<RichText
+								tagName="footer"
 								value={ citation }
 								/* translators: the individual or entity quoted */
 								placeholder={ __( 'Write citation…' ) }
@@ -98,7 +99,6 @@ class PullQuoteEdit extends Component {
 										citation: nextCitation,
 									} )
 								}
-								className="wp-block-pullquote__citation"
 							/>
 						) }
 					</blockquote>

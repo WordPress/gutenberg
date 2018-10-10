@@ -76,7 +76,7 @@
 <!-- wp:quote {"style":1} -->
 <blockquote class="wp-block-quote">
 	<p><?php _e( 'The editor will endeavor to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.', 'gutenberg' ); ?></p>
-	<cite><?php _e( 'Matt Mullenweg, 2017', 'gutenberg' ); ?></cite>
+	<footer><cite><?php _e( 'Matt Mullenweg, 2017', 'gutenberg' ); ?></cite></footer>
 </blockquote>
 <!-- /wp:quote -->
 
@@ -142,7 +142,7 @@ https://vimeo.com/22439234
 <!-- /wp:paragraph -->
 
 <!-- wp:pullquote -->
-<figure class="wp-block-pullquote"><blockquote><p><?php _e( 'Code is Poetry', 'gutenberg' ); ?></p><cite><?php _e( 'The WordPress community', 'gutenberg' ); ?></cite></blockquote></figure>
+<figure class="wp-block-pullquote"><blockquote><p><?php _e( 'Code is Poetry', 'gutenberg' ); ?></p><footer><cite><?php _e( 'The WordPress community', 'gutenberg' ); ?></cite></footer></blockquote></figure>
 <!-- /wp:pullquote -->
 
 <!-- wp:paragraph {"align":"center"} -->

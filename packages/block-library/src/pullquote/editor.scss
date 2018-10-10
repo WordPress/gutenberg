@@ -9,7 +9,7 @@
 }
 
 .wp-block-pullquote {
-	cite .editor-rich-text__tinymce[data-is-empty="true"]::before {
+	footer .editor-rich-text__tinymce[data-is-empty="true"]::before {
 		font-size: 14px;
 		font-family: $default-font;
 	}
@@ -35,12 +35,12 @@
 		font-size: 32px;
 	}
 
-	.wp-block-pullquote__citation {
+	footer {
 		text-transform: none;
 		font-style: normal;
 	}
 }
 
-.wp-block-pullquote .wp-block-pullquote__citation {
+.wp-block-pullquote footer {
 	color: inherit;
 }

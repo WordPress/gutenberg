@@ -24,7 +24,7 @@ const blockAttributes = {
 	},
 	citation: {
 		source: 'html',
-		selector: 'cite',
+		selector: 'footer cite',
 	},
 	align: {
 		type: 'string',
@@ -170,6 +170,7 @@ export const settings = {
 					/>
 					{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 						<RichText
+							tagName="footer"
 							value={ citation }
 							onChange={
 								( nextCitation ) => setAttributes( {
@@ -178,7 +179,6 @@ export const settings = {
 							}
 							/* translators: the individual or entity quoted */
 							placeholder={ __( 'Write citation…' ) }
-							className="wp-block-quote__citation"
 						/>
 					) }
 				</blockquote>
@@ -192,7 +192,11 @@ export const settings = {
 		return (
 			<blockquote style={ { textAlign: align ? align : null } }>
 				<RichText.Content multiline="p" value={ value } />
-				{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
+				{ ! RichText.isEmpty( citation ) && (
+					<footer>
+						<RichText.Content tagName="cite" value={ citation } />
+					</footer>
+				) }
 			</blockquote>
 		);
 	},
@@ -209,6 +213,29 @@ export const settings = {
 		{
 			attributes: {
 				...blockAttributes,
+				citation: {
+					source: 'html',
+					selector: 'cite',
+				},
+			},
+			save( { attributes } ) {
+				const { align, value, citation } = attributes;
+
+				return (
+					<blockquote style={ { textAlign: align ? align : null } }>
+						<RichText.Content multiline="p" value={ value } />
+						{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
+					</blockquote>
+				);
+			},
+		},
+		{
+			attributes: {
+				...blockAttributes,
+				citation: {
+					source: 'html',
+					selector: 'cite',
+				},
 				style: {
 					type: 'number',
 					default: 1,

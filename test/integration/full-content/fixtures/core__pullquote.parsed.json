@@ -3,7 +3,7 @@
         "blockName": "core/pullquote",
         "attrs": {},
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-pullquote\">\n    <blockquote>\n    <p>Testing pullquote block...</p><cite>...with a caption</cite>\n    </blockquote>\n</figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-pullquote\">\n    <blockquote>\n    <p>Testing pullquote block...</p>\n    <footer><cite>...with a caption</cite></footer>\n    </blockquote>\n</figure>\n"
     },
     {
         "blockName": null,

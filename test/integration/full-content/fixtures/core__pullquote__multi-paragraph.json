@@ -8,6 +8,6 @@
             "citation": "by whomever"
         },
         "innerBlocks": [],
-        "originalContent": "<figure class=\"wp-block-pullquote\">\n    <blockquote>\n        <p>Paragraph <strong>one</strong></p>\n        <p>Paragraph two</p>\n        <cite>by whomever</cite>\n\t</blockquote>\n</figure>"
+        "originalContent": "<figure class=\"wp-block-pullquote\">\n    <blockquote>\n        <p>Paragraph <strong>one</strong></p>\n        <p>Paragraph two</p>\n        <footer><cite>by whomever</cite></footer>\n    </blockquote>\n</figure>"
     }
 ]
