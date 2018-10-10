@@ -17,7 +17,7 @@ export function normaliseFormats( { formats, text, start, end } ) {
 	newFormats.forEach( ( formatsAtIndex, index ) => {
 		const lastFormatsAtIndex = newFormats[ index - 1 ];
 
-		if ( lastFormatsAtIndex ) {
+		if ( lastFormatsAtIndex && formatsAtIndex ) {
 			const newFormatsAtIndex = formatsAtIndex.slice( 0 );
 
 			newFormatsAtIndex.forEach( ( format, formatIndex ) => {
@@ -29,6 +29,8 @@ export function normaliseFormats( { formats, text, start, end } ) {
 			} );
 
 			newFormats[ index ] = newFormatsAtIndex;
+		} else if ( ! formatsAtIndex ) {
+			delete newFormats[ index ];
 		}
 	} );
 

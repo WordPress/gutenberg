@@ -78,4 +78,15 @@ describe( 'toHTMLString', () => {
 
 		expect( toHTMLString( create( { element } ) ) ).toEqual( expectedHTML );
 	} );
+
+	it( 'should be able to work from serialized value (without references)', () => {
+		expect( toHTMLString( {
+			text: 'abc',
+			formats: [
+				null,
+				[ { type: 'strong' } ],
+				null,
+			],
+		} ) ).toEqual( 'a<strong>b</strong>c' );
+	} );
 } );
