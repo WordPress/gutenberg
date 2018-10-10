@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import {newPost, getEditedPostContent, openDocumentSettingsSidebar} from '../support/utils';
+import { newPost, getEditedPostContent } from '../support/utils';
 import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
 describe( 'new editor filtered state', () => {
