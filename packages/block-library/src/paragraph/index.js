@@ -31,6 +31,7 @@ const schema = {
 	content: {
 		source: 'html',
 		selector: 'p',
+		default: '',
 	},
 	align: {
 		type: 'string',

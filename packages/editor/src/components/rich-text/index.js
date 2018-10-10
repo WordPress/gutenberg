@@ -991,7 +991,7 @@ const RichTextContainer = compose( [
 	withSafeTimeout,
 ] )( RichText );
 
-RichTextContainer.Content = ( { value, tagName: Tag, ...props } ) => {
+RichTextContainer.Content = ( { value, tagName: Tag, multiline: MultilineTag, ...props } ) => {
 	let html = value;
 
 	// Handle deprecated `children` and `node` sources.
@@ -999,10 +999,14 @@ RichTextContainer.Content = ( { value, tagName: Tag, ...props } ) => {
 		html = children.toHTML( value );
 	}
 
+	if ( ! html && MultilineTag ) {
+		html = `<${ MultilineTag }></${ MultilineTag }>`;
+	}
+
 	const content = <RawHTML>{ html }</RawHTML>;
 
 	if ( Tag ) {
-		return <Tag { ...omit( props, [ 'format', 'multiline' ] ) }>{ content }</Tag>;
+		return <Tag { ...omit( props, [ 'format' ] ) }>{ content }</Tag>;
 	}
 
 	return content;
