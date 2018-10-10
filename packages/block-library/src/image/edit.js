@@ -110,6 +110,14 @@ class ImageEdit extends Component {
 		}
 	}
 
+	checkAltValue( altText, filename ) {
+		if ( ! altText ) {
+			this.props.setAttributes( { alt: 'This image has an empty alt attribute, the file name is ' + filename } );
+			return;
+		}
+		this.props.setAttributes( { alt: altText } );
+	}
+
 	onSelectImage( media ) {
 		if ( ! media || ! media.url ) {
 			this.props.setAttributes( {
@@ -120,8 +128,9 @@ class ImageEdit extends Component {
 			} );
 			return;
 		}
+		this.checkAltValue( media.alt, media.filename );
 		this.props.setAttributes( {
-			...pick( media, [ 'alt', 'id', 'caption', 'url' ] ),
+			...pick( media, [ 'id', 'caption', 'url' ] ),
 			width: undefined,
 			height: undefined,
 		} );
