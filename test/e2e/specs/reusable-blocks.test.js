@@ -130,7 +130,6 @@ describe( 'Reusable Blocks', () => {
 		// Tab three times to navigate to the block's content
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
 
 		// Change the block's content
 		await page.keyboard.type( 'Oh! ' );
