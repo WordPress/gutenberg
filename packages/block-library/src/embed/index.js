@@ -258,6 +258,8 @@ export function getEmbedEdit( title, icon ) {
 			const { url, editingURL } = this.state;
 			const { caption, type, allowResponsive } = this.props.attributes;
 			const { fetching, setAttributes, isSelected, className, preview, previewIsFallback } = this.props;
+			// We have a URL, but couldn't get a preview, or the preview was the oEmbed fallback.
+			const cannotEmbed = url && ( ! preview || previewIsFallback );
 			const controls = (
 				<Fragment>
 					<BlockControls>
@@ -313,7 +315,7 @@ export function getEmbedEdit( title, icon ) {
 								type="submit">
 								{ __( 'Embed' ) }
 							</Button>
-							{ previewIsFallback && <p className="components-placeholder__error">{ __( 'Sorry, we could not embed that content.' ) }</p> }
+							{ cannotEmbed && <p className="components-placeholder__error">{ __( 'Sorry, we could not embed that content.' ) }</p> }
 						</form>
 					</Placeholder>
 				);
@@ -412,8 +414,12 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 				const preview = url && getEmbedPreview( url );
 				const previewIsFallback = url && isPreviewEmbedFallback( url );
 				const fetching = undefined !== url && isRequestingEmbedPreview( url );
+				// Some WordPress URLs that can't be embedded will cause the API to return
+				// a valid JSON response with no HTML and `data.status` set to 404, rather
+				// than generating a fallback response as other embeds do.
+				const validPreview = preview && ! ( preview.data && preview.data.status === 404 );
 				return {
-					preview,
+					preview: validPreview && preview,
 					previewIsFallback,
 					fetching,
 				};
