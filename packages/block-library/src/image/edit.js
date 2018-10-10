@@ -13,7 +13,7 @@ import {
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Component, Fragment } from '@wordpress/element';
 import { getBlobByURL, revokeBlobURL } from '@wordpress/blob';
 import {
@@ -66,7 +66,7 @@ export const pickRelevantMediaFiles = ( image ) => {
 	}
 
 	if ( ! alt ) {
-		alt = __( 'This image has an empty alt attribute, the file name is ' ) + filename;
+		alt = sprintf( __( 'This image has an empty alt attribute; its file name is "%s"' ), filename );
 	}
 
 	return {
