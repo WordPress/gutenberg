@@ -57,10 +57,8 @@ class ImageSize extends Component {
 	}
 
 	onLayout( event ) {
-		onLayout( event, ( container ) => {
-			this.container = container;
-			this.calculateSize();
-		} );
+		this.container = onLayout( event );
+		this.calculateSize();
 	}
 
 	calculateSize() {

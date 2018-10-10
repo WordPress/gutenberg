@@ -19,8 +19,7 @@ export function renderContainer( bindContainer, sizes, children, onLayoutCallbac
 	);
 }
 
-export function onLayout( event, callback ) {
-	callback(); // silence unused lint error
+export function onLayout() {
 }
 
 export function exporter( component ) {
