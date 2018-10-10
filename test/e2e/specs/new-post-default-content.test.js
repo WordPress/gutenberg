@@ -27,9 +27,9 @@ describe( 'new editor filtered state', () => {
 
 		// open the sidebar, we want to see the excerpt.
 		await openDocumentSettingsSidebar();
-		const [excerpt_button] = await page.$x( '//div[@class="edit-post-sidebar"]//button[@class="components-button components-panel__body-toggle"][contains(text(),"Excerpt")]' );
-		if ( excerpt_button ) {
-			await excerpt_button.click( 'button' );
+		const [ excerptButton ] = await page.$x( '//div[@class="edit-post-sidebar"]//button[@class="components-button components-panel__body-toggle"][contains(text(),"Excerpt")]' );
+		if ( excerptButton ) {
+			await excerptButton.click( 'button' );
 		}
 		const excerpt = await page.$eval(
 			'.editor-post-excerpt textarea',
