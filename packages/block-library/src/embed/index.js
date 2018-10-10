@@ -96,7 +96,7 @@ export function getEmbedEdit( title, icon ) {
 			}
 
 			if ( ( hasPreview && ! hadPreview ) || switchedPreview ) {
-				if ( this.props.previewIsFallback ) {
+				if ( this.props.cannotEmbed ) {
 					this.setState( { editingURL: true } );
 					return;
 				}
@@ -257,14 +257,12 @@ export function getEmbedEdit( title, icon ) {
 		render() {
 			const { url, editingURL } = this.state;
 			const { caption, type, allowResponsive } = this.props.attributes;
-			const { fetching, setAttributes, isSelected, className, preview, previewIsFallback } = this.props;
-			// We have a URL, but couldn't get a preview, or the preview was the oEmbed fallback.
-			const cannotEmbed = url && ( ! preview || previewIsFallback );
+			const { fetching, setAttributes, isSelected, className, preview, cannotEmbed } = this.props;
 			const controls = (
 				<Fragment>
 					<BlockControls>
 						<Toolbar>
-							{ preview && ! previewIsFallback && (
+							{ preview && ! cannotEmbed && (
 								<IconButton
 									className="components-toolbar__control"
 									label={ __( 'Edit URL' ) }
@@ -299,7 +297,7 @@ export function getEmbedEdit( title, icon ) {
 			// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
 			const label = sprintf( __( '%s URL' ), title );
 
-			if ( ! preview || previewIsFallback || editingURL ) {
+			if ( ! preview || cannotEmbed || editingURL ) {
 				return (
 					<Placeholder icon={ <BlockIcon icon={ icon } showColors /> } label={ label } className="wp-block-embed">
 						<form onSubmit={ this.setUrl }>
@@ -411,17 +409,21 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 				const { url } = ownProps.attributes;
 				const core = select( 'core' );
 				const { getEmbedPreview, isPreviewEmbedFallback, isRequestingEmbedPreview } = core;
-				const preview = url && getEmbedPreview( url );
-				const previewIsFallback = url && isPreviewEmbedFallback( url );
+				const preview = undefined !== url && getEmbedPreview( url );
+				const previewIsFallback = undefined !== url && isPreviewEmbedFallback( url );
 				const fetching = undefined !== url && isRequestingEmbedPreview( url );
+				// The external oEmbed provider does not exist. We got no type info and no html.
+				const badEmbedProvider = !! preview && undefined === preview.type && false === preview.html;
 				// Some WordPress URLs that can't be embedded will cause the API to return
 				// a valid JSON response with no HTML and `data.status` set to 404, rather
 				// than generating a fallback response as other embeds do.
-				const validPreview = preview && ! ( preview.data && preview.data.status === 404 );
+				const wordpressCantEmbed = !! preview && preview.data && preview.data.status === 404;
+				const validPreview = !! preview && ! badEmbedProvider && ! wordpressCantEmbed;
+				const cannotEmbed = undefined !== url && ( ! validPreview || previewIsFallback );
 				return {
-					preview: validPreview && preview,
-					previewIsFallback,
+					preview: validPreview ? preview : undefined,
 					fetching,
+					cannotEmbed,
 				};
 			} )
 		)( getEmbedEdit( title, icon ) ),
