@@ -1,0 +1,80 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LinkContainer matches the snapshot when editing the link 1`] = `
+<Popover
+  focusOnMount="firstElement"
+  noArrow={false}
+  onClickOutside={[Function]}
+  position="bottom center"
+>
+  <div
+    className="editor-link-container__popover-row"
+  >
+    <div>
+      Editing
+    </div>
+    <IconButton
+      aria-expanded={false}
+      className="editor-link-container__settings-toggle"
+      icon="ellipsis"
+      label="Link Settings"
+      onClick={[Function]}
+    />
+  </div>
+</Popover>
+`;
+
+exports[`LinkContainer matches the snapshot when previewing the link 1`] = `
+<Popover
+  focusOnMount={false}
+  noArrow={false}
+  onClickOutside={[Function]}
+  position="bottom center"
+>
+  <div
+    className="editor-link-container__popover-row"
+  >
+    <div>
+      Preview
+    </div>
+    <IconButton
+      aria-expanded={false}
+      className="editor-link-container__settings-toggle"
+      icon="ellipsis"
+      label="Link Settings"
+      onClick={[Function]}
+    />
+  </div>
+</Popover>
+`;
+
+exports[`LinkContainer matches the snapshot when the settings are toggled open 1`] = `
+<Popover
+  focusOnMount="firstElement"
+  noArrow={false}
+  onClickOutside={[Function]}
+  position="bottom center"
+>
+  <div
+    className="editor-link-container__popover-row"
+  >
+    <div>
+      Editing
+    </div>
+    <IconButton
+      aria-expanded={true}
+      className="editor-link-container__settings-toggle"
+      icon="ellipsis"
+      label="Link Settings"
+      onClick={[Function]}
+    />
+  </div>
+  <div
+    className="editor-link-container__popover-row editor-link-container__settings"
+  >
+    <div>
+      Settings
+    </div>
+  </div>
+</Popover>
+`;
