@@ -116,4 +116,43 @@ describe( 'List', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should create paragraph on split at end and merge back with content', async () => {
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'one' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.type( 'two' );
+		await pressTimes( 'ArrowLeft', 'two'.length );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should split into two with paragraph and merge lists', async () => {
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'one' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'two' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'Enter' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'Enter' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Should remove paragraph without creating empty list item.
+		await page.keyboard.press( 'Backspace' );
+
+		// Should merge lists into one.
+		await page.keyboard.press( 'ArrowDown' );
+		await pressTimes( 'ArrowLeft', 'two'.length );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
