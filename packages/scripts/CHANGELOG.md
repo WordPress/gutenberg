@@ -1,3 +1,9 @@
+## 2.4.0 (Unreleased)
+
+### New Feature
+
+- Added support for `lint-js` script ([#10504](https://github.com/WordPress/gutenberg/pull/10504))
+ 
 ## 2.3.0 (2018-09-30)
 
 ### Improvements
