@@ -1,18 +1,52 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Lists can be converted to a paragraphs 1`] = `
+"<!-- wp:paragraph -->
+<p>one</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>two</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Lists can be created by converting a paragraph 1`] = `
+"<!-- wp:list -->
+<ul><li>test</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`Lists can be created by converting a paragraph with line breaks 1`] = `
+"<!-- wp:list -->
+<ul><li>one</li><li>two</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`Lists can be created by converting multiple paragraphs 1`] = `
+"<!-- wp:list -->
+<ul><li>one</li><li>two</li></ul>
+<!-- /wp:list -->"
+`;
+
 exports[`Lists can be created by typing "/list" 1`] = `
 "<!-- wp:list -->
 <ul><li>I’m a list</li></ul>
 <!-- /wp:list -->"
 `;
 
-exports[`Lists can be created by using a hyphen at the start of a RichText block 1`] = `
+exports[`Lists can be created by typing an asterisk in front of text of a paragraph block 1`] = `
 "<!-- wp:list -->
-<ul><li>A list item</li></ul>
+<ul><li>test</li></ul>
 <!-- /wp:list -->"
 `;
 
-exports[`Lists can be created by using an asterisk at the start of a RichText block 1`] = `
+exports[`Lists can be created by using a number at the start of a paragraph block 1`] = `
+"<!-- wp:list {\\"ordered\\":true} -->
+<ol><li>A list item</li></ol>
+<!-- /wp:list -->"
+`;
+
+exports[`Lists can be created by using an asterisk at the start of a paragraph block 1`] = `
 "<!-- wp:list -->
 <ul><li>A list item</li><li>Another list item</li></ul>
 <!-- /wp:list -->"

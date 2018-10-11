@@ -9,7 +9,7 @@ import { filter } from 'lodash';
 import { getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { remove, applyFormat, getTextContent } from '@wordpress/rich-text';
 
-export function getPatterns( { onReplace, multiline } ) {
+export function getPatterns( { onReplace, multiline, valueToFormat } ) {
 	const patterns = filter( getBlockTransforms( 'from' ), ( { type, trigger } ) => {
 		return type === 'pattern' && trigger === undefined;
 	} );
@@ -32,7 +32,7 @@ export function getPatterns( { onReplace, multiline } ) {
 			const result = text.match( transformation.regExp );
 
 			const block = transformation.transform( {
-				content: remove( record, 0, result[ 0 ].length ),
+				content: valueToFormat( remove( record, 0, result[ 0 ].length ) ),
 				match: result,
 			} );
 
