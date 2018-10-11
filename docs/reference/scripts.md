@@ -1,10 +1,10 @@
 # Scripts
 
-Editor provides several vendor and custom script to plugin developers. Script name, handle and usage are mentioned in below table. 
+The editor provides several vendor and internal scripts to plugin developers. Script names, handles, and descriptions are documented in the table below.
 
 ## WP Scripts
 
-Editor includes number of custom scripts to enable various funcationality and utilities. Plugin developers can utilize them to create blocks, editor plugins or generic plugings utilizing them. All the avilable scripts are listed in below table. 
+The editor includes a number of packages to enable various pieces of functionality. Plugin developers can utilize them to create blocks, editor plugins, or generic plugins.
 
 | Script Name | Handle | Description |
 |-------------|--------|-------------|
@@ -43,18 +43,18 @@ Editor includes number of custom scripts to enable various funcationality and ut
 
 ## Vendor Script
 
-By default, editor includes some popular scripts commonly used by web developers and editor itself. All of them are listed in the table below. Plugin developers can utilize these scripts without adding up to bundle size
+The editor also uses some popular third-party packages and scripts. Plugin developers can use these scripts as well without bundling them in their code (and increasing file sizes).
 
 | Script Name | Handle | Description |
 |-------------|--------|-------------|
 | [React](https://reactjs.org) | react  | React is a JavaScript library for building user interfaces |
 | [React Dom](https://reactjs.org/docs/react-dom.html) | react-dom | Serves as the entry point to the DOM and server renderers for React, intended to be paired with React |	
 | [Moment](https://momentjs.com/) | moment| Parse, validate, manipulate, and display dates and times in JavaScript |
-| [Tinymce Lists](https://www.tiny.cloud/docs/plugins/lists/) | tinymce-latest-lists| The `lists` plugin allows you to add numbered and bulleted lists to TinyMC |
+| [TinyMCE Lists](https://www.tiny.cloud/docs/plugins/lists/) | tinymce-latest-lists| The `lists` plugin allows you to add numbered and bulleted lists to TinyMCE |
 | [Lodash](https://lodash.com) | lodash| Lodash is a JavaScript library which provides utility functions for common programming tasks |
 | [Fetch Polyfill](https://www.npmjs.com/package/whatwg-fetch) | wp-polyfill-fetch | Polyfill that implements a subset of the standard Fetch specification |
 | [Promise Polyfill](https://www.npmjs.com/package/promise-polyfill) | wp-polyfill-promise| Lightweight ES6 Promise polyfill for the browser and node |
 | [Formdata Polyfill](https://www.npmjs.com/package/formdata-polyfill) | wp-polyfill-formdata| Polyfill conditionally replaces the native implementation |
 | [Node Contains Polyfill](https://polyfill.io) | wp-polyfill-node-contains |Polyfill for Node.contains |
 | [Element Closest Polyfill](https://www.npmjs.com/package/element-closest) | wp-polyfill-element-closest| Return the closest element matching a selector up the DOM tree |
-| [Ecmascript Polyfill](https://babeljs.io/docs/en/babel-polyfill) | wp-polyfill-ecmascript | Emulate a full ES2015+ environment |
+| [ECMAScript Polyfill](https://babeljs.io/docs/en/babel-polyfill) | wp-polyfill-ecmascript | Emulate a full ES2015+ environment |
