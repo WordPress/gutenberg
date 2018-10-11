@@ -11,16 +11,18 @@ import {
 /**
  * WordPress dependencies
  */
-import { Component, RawHTML, renderToString } from '@wordpress/element';
+import { Component, RawHTML } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
-import { children } from '@wordpress/blocks';
+import { Toolbar } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import FormatToolbar from './format-toolbar';
 import { FORMATTING_CONTROLS } from './formatting-controls';
-import { isRichTextValueEmpty } from './utils';
+
+const isRichTextValueEmpty = ( value ) => {
+	return ! value || ! value.length;
+};
 
 export function getFormatValue( formatName ) {
 	if ( 'link' === formatName ) {
@@ -36,6 +38,7 @@ export class RichText extends Component {
 		this.onEnter = this.onEnter.bind( this );
 		this.onContentSizeChange = this.onContentSizeChange.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
+		this.toggleFormat = this.toggleFormat.bind( this );
 		this.onActiveFormatsChange = this.onActiveFormatsChange.bind( this );
 		this.onHTMLContentWithCursor = this.onHTMLContentWithCursor.bind( this );
 		this.state = {
@@ -152,30 +155,36 @@ export class RichText extends Component {
 		} ) );
 	}
 
+	toggleFormat( format ) {
+		return () => this.changeFormats( {
+			[ format ]: ! this.state.formats[ format ],
+		} );
+	}
+
 	render() {
 		const {
 			tagName,
 			style,
 			formattingControls,
-			formatters,
 			value,
 		} = this.props;
 
-		const formatToolbar = (
-			<FormatToolbar
-				formats={ this.state.formats }
-				onChange={ this.changeFormats }
-				enabledControls={ formattingControls }
-				customControls={ formatters }
-			/>
-		);
+		const toolbarControls = FORMATTING_CONTROLS
+			.filter( ( control ) => formattingControls.indexOf( control.format ) !== -1 )
+			.map( ( control ) => ( {
+				...control,
+				onClick: this.toggleFormat( control.format ),
+				isActive: this.isFormatActive( control.format ),
+			} ) );
 
 		// Save back to HTML from React tree
-		const html = '<' + tagName + '>' + renderToString( value ) + '</' + tagName + '>';
+		const html = '<' + tagName + '>' + value + '</' + tagName + '>';
 
 		return (
 			<View>
-				{ formatToolbar }
+				<View style={ { flex: 1 } }>
+					<Toolbar controls={ toolbarControls } />
+				</View>
 				<RCTAztecView
 					ref={ ( ref ) => {
 						this._editor = ref;
@@ -198,8 +207,7 @@ export class RichText extends Component {
 
 RichText.defaultProps = {
 	formattingControls: FORMATTING_CONTROLS.map( ( { format } ) => format ),
-	formatters: [],
-	format: 'children',
+	format: 'string',
 };
 
 const RichTextContainer = compose( [
@@ -211,10 +219,6 @@ RichTextContainer.Content = ( { value, format, tagName: Tag, ...props } ) => {
 	switch ( format ) {
 		case 'string':
 			content = <RawHTML>{ value }</RawHTML>;
-			break;
-
-		case 'children':
-			content = <RawHTML>{ children.toHTML( value ) }</RawHTML>;
 			break;
 	}
 
@@ -228,7 +232,7 @@ RichTextContainer.Content = ( { value, format, tagName: Tag, ...props } ) => {
 RichTextContainer.isEmpty = isRichTextValueEmpty;
 
 RichTextContainer.Content.defaultProps = {
-	format: 'children',
+	format: 'string',
 };
 
 export default RichTextContainer;

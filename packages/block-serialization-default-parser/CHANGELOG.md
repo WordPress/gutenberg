@@ -1,6 +1,3 @@
-## 1.0.1 (unreleased)
--   Fix: Include freeform content preceding void blocks (#9984)
-
-## 1.0.0
+## 1.0.0 (2018-09-30)
 
 -   Initial release.

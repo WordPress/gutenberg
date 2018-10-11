@@ -78,7 +78,7 @@ export function createBlockCompleter( {
 			];
 		},
 		allowContext( before, after ) {
-			return ! ( /\S/.test( before.toString() ) || /\S/.test( after.toString() ) );
+			return ! ( /\S/.test( before ) || /\S/.test( after ) );
 		},
 		getOptionCompletion( inserterItem ) {
 			const { name, initialAttributes } = inserterItem;

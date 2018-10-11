@@ -21,6 +21,8 @@ wp.blocks.registerBlockStyle( 'core/quote', {
 
 The example above registers a block style variation named `fancy-quote` to the `core/quote` block. When the user selects this block style variation from the styles selector, an `is-style-fancy-quote` className will be added to the block's wrapper.
 
+By adding `isDefault: true`, you can make registered style variation to be active by default when a block is inserted.
+
 ### Filters
 
 Extending blocks can involve more than just providing alternative styles, in this case, you can use one of the following filters to extend the block settings.
@@ -155,23 +157,23 @@ wp.hooks.addFilter( 'editor.BlockEdit', 'my-plugin/with-inspector-controls', wit
 {% ESNext %}
 ```js
 const { createHigherOrderComponent } = wp.compose;
-const { Fragment } = wp.Element;
+const { Fragment } = wp.element;
 const { InspectorControls } = wp.editor;
 const { PanelBody } = wp.components;
 
-const withInspectorControls =  createHigherOrderComponent(BlockEdit => {
-  return props => {
-    return (
-      <Fragment>
-		<InspectorControls>
-			<PanelBody>
-				My custom control
-			</PanelBody>
-		<InspectorControls />
-        <BlockEdit { ...props } />
-      </Fragment>
-    );
-  };
+const withInspectorControls =  createHigherOrderComponent( ( BlockEdit ) => {
+	return ( props ) => {
+		return (
+			<Fragment>
+				<BlockEdit { ...props } />
+				<InspectorControls>
+					<PanelBody>
+						My custom control
+					</PanelBody>
+				</InspectorControls>
+			</Fragment>
+		);
+	};
 }, "withInspectorControl" );
 
 wp.hooks.addFilter( 'editor.BlockEdit', 'my-plugin/with-inspector-controls', withInspectorControls );

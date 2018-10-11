@@ -16,10 +16,7 @@ import {
 	getFontSizeClass,
 	RichText,
 } from '@wordpress/editor';
-import {
-	getPhrasingContentSchema,
-	children,
-} from '@wordpress/blocks';
+import { getPhrasingContentSchema } from '@wordpress/blocks';
 import {
 	Path,
 	SVG,
@@ -36,10 +33,9 @@ const supports = {
 
 const schema = {
 	content: {
-		type: 'array',
-		source: 'children',
+		source: 'html',
 		selector: 'p',
-		default: [],
+		default: '',
 	},
 	align: {
 		type: 'string',
@@ -203,22 +199,14 @@ export const settings = {
 				return <RawHTML>{ attributes.content }</RawHTML>;
 			},
 			migrate( attributes ) {
-				return {
-					...attributes,
-					content: [
-						<RawHTML key="html">{ attributes.content }</RawHTML>,
-					],
-				};
+				return attributes;
 			},
 		},
 	],
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: children.concat(
-				attributes.content,
-				attributesToMerge.content
-			),
+			content: attributes.content + attributesToMerge.content,
 		};
 	},
 

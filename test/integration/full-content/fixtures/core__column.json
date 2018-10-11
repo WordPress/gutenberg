@@ -10,9 +10,7 @@
                 "name": "core/paragraph",
                 "isValid": true,
                 "attributes": {
-                    "content": [
-                        "Column One, Paragraph One"
-                    ],
+                    "content": "Column One, Paragraph One",
                     "dropCap": false
                 },
                 "innerBlocks": [],
@@ -23,9 +21,7 @@
                 "name": "core/paragraph",
                 "isValid": true,
                 "attributes": {
-                    "content": [
-                        "Column One, Paragraph Two"
-                    ],
+                    "content": "Column One, Paragraph Two",
                     "dropCap": false
                 },
                 "innerBlocks": [],

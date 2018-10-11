@@ -152,8 +152,22 @@ module.exports = {
 			},
 			{
 				selector: 'CallExpression[callee.object.name="page"][callee.property.name="waitFor"]',
-				message: 'Prefer page.waitForSelector instead.'
-			}
+				message: 'Prefer page.waitForSelector instead.',
+			},
+			{
+				// The <DotTip> component uses the `id` prop for something that does not require an
+				// instanceId; maybe we should change its key.
+				// See: https://github.com/WordPress/gutenberg/issues/10305
+				selector: 'JSXOpeningElement[name.name!="DotTip"] JSXAttribute[name.name="id"][value.type="Literal"]',
+				message: 'Do not use string literals for IDs; use withInstanceId instead.',
+			},
+			{
+				// Discourage the usage of `Math.random()` as it's a code smell
+				// for UUID generation, for which we already have a higher-order
+				// component: `withInstanceId`.
+				selector: 'CallExpression[callee.object.name="Math"][callee.property.name="random"]',
+				message: 'Do not use Math.random() to generate unique IDs; use withInstanceId instead. (If you’re not generating unique IDs: ignore this message.)',
+			},
 		],
 	},
 	overrides: [

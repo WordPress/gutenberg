@@ -29,8 +29,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 
 	attributes: {
 		content: {
-			type: 'array',
-			source: 'children',
+			source: 'rich-text',
 			selector: 'p',
 		},
 		alignment: {
@@ -111,8 +110,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 
 	attributes: {
 		content: {
-			type: 'array',
-			source: 'children',
+			source: 'rich-text',
 			selector: 'p',
 		},
 		alignment: {

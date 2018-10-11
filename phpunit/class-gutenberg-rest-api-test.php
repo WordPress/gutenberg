@@ -116,7 +116,7 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 	 */
 	function test_link_unfiltered_html() {
 		$post_id   = $this->factory->post->create();
-		$check_key = 'https://api.w.org/action-unfiltered_html';
+		$check_key = 'https://api.w.org/action-unfiltered-html';
 		// admins can in a single site, but can't in a multisite.
 		wp_set_current_user( $this->administrator );
 		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );

@@ -196,7 +196,7 @@ class URLInput extends Component {
 						value={ value }
 						onChange={ this.onChange }
 						onInput={ stopEventPropagation }
-						placeholder={ __( 'Paste URL or type' ) }
+						placeholder={ __( 'Paste URL or type to search' ) }
 						onKeyDown={ this.onKeyDown }
 						role="combobox"
 						aria-expanded={ showSuggestions }

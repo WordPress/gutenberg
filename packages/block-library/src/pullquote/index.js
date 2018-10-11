@@ -1,35 +1,49 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
+import classnames from 'classnames';
+import { get, includes } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import {
+	getColorClassName,
 	RichText,
+	getColorObjectByAttributeValues,
 } from '@wordpress/editor';
+import {
+	select,
+} from '@wordpress/data';
 
-const toRichTextValue = ( value ) => map( value, ( ( subValue ) => subValue.children ) );
-const fromRichTextValue = ( value ) => map( value, ( subValue ) => ( {
-	children: subValue,
-} ) );
+import {
+	default as edit,
+	SOLID_COLOR_STYLE_NAME,
+	SOLID_COLOR_CLASS,
+} from './edit';
+
 const blockAttributes = {
 	value: {
-		type: 'array',
-		source: 'query',
-		selector: 'blockquote > p',
-		query: {
-			children: {
-				source: 'node',
-			},
-		},
+		source: 'html',
+		selector: 'blockquote',
+		multiline: 'p',
 	},
 	citation: {
-		type: 'array',
-		source: 'children',
+		source: 'html',
 		selector: 'cite',
+	},
+	mainColor: {
+		type: 'string',
+	},
+	customMainColor: {
+		type: 'string',
+	},
+	textColor: {
+		type: 'string',
+	},
+	customTextColor: {
+		type: 'string',
 	},
 };
 
@@ -47,53 +61,54 @@ export const settings = {
 
 	attributes: blockAttributes,
 
+	styles: [
+		{ name: 'default', label: __( 'Regular' ), isDefault: true },
+		{ name: SOLID_COLOR_STYLE_NAME, label: __( 'Solid Color' ) },
+	],
+
 	supports: {
-		align: true,
+		align: [ 'left', 'right', 'wide', 'full' ],
 	},
 
-	edit( { attributes, setAttributes, isSelected, className } ) {
-		const { value, citation } = attributes;
-
-		return (
-			<figure className={ className }>
-				<blockquote>
-					<RichText
-						multiline="p"
-						value={ toRichTextValue( value ) }
-						onChange={
-							( nextValue ) => setAttributes( {
-								value: fromRichTextValue( nextValue ),
-							} )
-						}
-						/* translators: the text of the quotation */
-						placeholder={ __( 'Write quote…' ) }
-						wrapperClassName="block-library-pullquote__content"
-					/>
-					{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
-						<RichText
-							value={ citation }
-							/* translators: the individual or entity quoted */
-							placeholder={ __( 'Write citation…' ) }
-							onChange={
-								( nextCitation ) => setAttributes( {
-									citation: nextCitation,
-								} )
-							}
-							className="wp-block-pullquote__citation"
-						/>
-					) }
-				</blockquote>
-			</figure>
-		);
-	},
+	edit,
 
 	save( { attributes } ) {
-		const { value, citation } = attributes;
+		const { mainColor, customMainColor, textColor, customTextColor, value, citation, className } = attributes;
+		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
 
+		let figureClass, figureStyles;
+		// Is solid color style
+		if ( isSolidColorStyle ) {
+			figureClass = getColorClassName( 'background-color', mainColor );
+			if ( ! figureClass ) {
+				figureStyles = {
+					backgroundColor: customMainColor,
+				};
+			}
+		// Is normal style and a custom color is being used ( we can set a style directly with its value)
+		} else if ( customMainColor ) {
+			figureStyles = {
+				borderColor: customMainColor,
+			};
+		// Is normal style and a named color is being used, we need to retrieve the color value to set the style,
+		// as there is no expectation that themes create classes that set border colors.
+		} else if ( mainColor ) {
+			const colors = get( select( 'core/editor' ).getEditorSettings(), [ 'colors' ], [] );
+			const colorObject = getColorObjectByAttributeValues( colors, mainColor );
+			figureStyles = {
+				borderColor: colorObject.color,
+			};
+		}
+
+		const blockquoteTextColorClass = getColorClassName( 'color', textColor );
+		const blockquoteClasses = textColor || customTextColor ? classnames( 'has-text-color', {
+			[ blockquoteTextColorClass ]: blockquoteTextColorClass,
+		} ) : undefined;
+		const blockquoteStyle = blockquoteTextColorClass ? undefined : { color: customTextColor };
 		return (
-			<figure>
-				<blockquote>
-					<RichText.Content value={ toRichTextValue( value ) } />
+			<figure className={ figureClass } style={ figureStyles }>
+				<blockquote className={ blockquoteClasses } style={ blockquoteStyle } >
+					<RichText.Content value={ value } multiline="p" />
 					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
 				</blockquote>
 			</figure>
@@ -108,7 +123,7 @@ export const settings = {
 			const { value, citation } = attributes;
 			return (
 				<blockquote>
-					<RichText.Content value={ toRichTextValue( value ) } />
+					<RichText.Content value={ value } multiline="p" />
 					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
 				</blockquote>
 			);
@@ -117,8 +132,7 @@ export const settings = {
 		attributes: {
 			...blockAttributes,
 			citation: {
-				type: 'array',
-				source: 'children',
+				source: 'html',
 				selector: 'footer',
 			},
 			align: {
@@ -132,7 +146,7 @@ export const settings = {
 
 			return (
 				<blockquote className={ `align${ align }` }>
-					<RichText.Content value={ toRichTextValue( value ) } />
+					<RichText.Content value={ value } />
 					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="footer" value={ citation } /> }
 				</blockquote>
 			);

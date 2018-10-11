@@ -1,9 +1,13 @@
-## 3.0.0 (Unreleased)
+## 3.0.0 (2018-09-30)
 
-### Braking Change
+### Breaking Changes
 
-- `wp.i18n.getI18n` has been removed. Use `__`, `_x`, `_n`, or `_nx` instead.
-- `wp.i18n.dcnpgettext` has been removed. Use `__`, `_x`, `_n`, or `_nx` instead.
+- `getI18n` has been removed. Use `__`, `_x`, `_n`, or `_nx` instead.
+- `dcnpgettext` has been removed. Use `__`, `_x`, `_n`, or `_nx` instead.
+
+### Bug Fixes
+
+- The initialization of the internal Jed instance now correctly assigns its default data.
 
 ## 2.0.0 (2018-09-05)
 

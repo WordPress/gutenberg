@@ -4,7 +4,10 @@
 	var InnerBlocks = wp.editor.InnerBlocks;
 	var __ = wp.i18n.__;
 	var TEMPLATE = [
-		[ 'core/paragraph', { fontSize: 'large', content: 'Content…' } ],
+		[ 'core/paragraph', {
+			fontSize: 'large',
+			content: 'Content…',
+		} ],
 	];
 
 	var save = function() {

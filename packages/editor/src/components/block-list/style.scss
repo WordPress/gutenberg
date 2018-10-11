@@ -81,9 +81,9 @@
 	overflow-wrap: break-word;
 
 	@include break-small() {
-		// The block mover needs to stay inside the block to allow clicks when hovering the block
-		padding-left: $block-padding + $block-side-ui-padding - $border-width;
-		padding-right: $block-padding + $block-side-ui-padding - $border-width;
+		// The block mover needs to stay inside the block to allow clicks when hovering the block-.
+		padding-left: $block-padding + $block-side-ui-width + $block-side-ui-clearance - $border-width;
+		padding-right: $block-padding + $block-side-ui-width + $block-side-ui-clearance - $border-width;
 	}
 
 	/**
@@ -287,28 +287,62 @@
 		.editor-block-contextual-toolbar {
 			margin-bottom: $border-width;
 		}
+
+		// Hide all additional UI on floats.
+		.editor-block-mover,
+		.editor-block-list__block-mobile-toolbar {
+			display: none;
+		}
+
+		// Position toolbar better on mobile.
+		.editor-block-contextual-toolbar {
+			border-bottom: 1px solid $light-gray-500;
+			bottom: $block-padding;
+			left: auto;
+			right: auto;
+		}
 	}
 
-	// Left: This is in the editor only; the image should be floated on the frontend.
-	&[data-align="left"] > .editor-block-list__block-edit {
-		/*!rtl:begin:ignore*/
-		float: left;
-		margin-right: 2em;
-		/*!rtl:end:ignore*/
+	// Left
+	&[data-align="left"] {
+		// This is in the editor only; the image should be floated on the frontend.
+		.editor-block-list__block-edit {
+			/*!rtl:begin:ignore*/
+			float: left;
+			margin-right: 2em;
+			/*!rtl:end:ignore*/
+		}
+
+		// Align block toolbar to floated content.
+		@include break-small() {
+			.editor-block-toolbar {
+				/*!rtl:begin:ignore*/
+				left: $block-padding;
+				right: auto;
+				/*!rtl:end:ignore*/
+			}
+		}
 	}
 
-	// Right: This is in the editor only; the image should be floated on the frontend.
-	&[data-align="right"] > .editor-block-list__block-edit {
-		/*!rtl:begin:ignore*/
-		float: right;
-		margin-left: 2em;
-		/*!rtl:end:ignore*/
-	}
+	// Right
+	&[data-align="right"] {
+		// Right: This is in the editor only; the image should be floated on the frontend.
+		> .editor-block-list__block-edit {
+			/*!rtl:begin:ignore*/
+			float: right;
+			margin-left: 2em;
+			/*!rtl:end:ignore*/
+		}
 
-	&[data-align="right"] > .editor-block-contextual-toolbar > .editor-block-toolbar {
-		/*!rtl:begin:ignore*/
-		float: right;
-		/*!rtl:end:ignore*/
+		// Align block toolbar to floated content.
+		@include break-small() {
+			.editor-block-toolbar {
+				/*!rtl:begin:ignore*/
+				right: $block-padding;
+				left: auto;
+				/*!rtl:end:ignore*/
+			}
+		}
 	}
 
 	// Wide and full-wide
@@ -373,7 +407,6 @@
 
 	// Full-wide
 	&[data-align="full"] {
-
 		// Position hover label on the right
 		> .editor-block-list__breadcrumb {
 			right: -$border-width;
@@ -390,8 +423,8 @@
 			margin-right: -$block-padding;
 
 			@include break-small() {
-				margin-left: -$block-side-ui-padding - $block-padding;
-				margin-right: -$block-side-ui-padding - $block-padding;
+				margin-left: -$block-side-ui-width - $block-side-ui-clearance - $block-padding;
+				margin-right: -$block-side-ui-width - $block-side-ui-clearance - $block-padding;
 			}
 
 			// This explicitly sets the width of the block, to override
@@ -437,7 +470,7 @@
 		.editor-block-list__empty-block-inserter,
 		.editor-default-block-appender .editor-inserter {
 			left: auto;
-			right: $item-spacing;
+			right: $grid-size;
 		}
 	}
 }
@@ -501,7 +534,7 @@
 		display: flex;
 		flex-direction: row;
 		// Make room for the height of the block toolbar above.
-		margin-top: $item-spacing + $block-toolbar-height - $block-padding;
+		margin-top: $grid-size + $block-toolbar-height - $block-padding;
 		margin-right: -$block-padding;
 		margin-left: -$block-padding;
 		border-top: $border-width solid $light-gray-500;
@@ -567,7 +600,7 @@
  */
 
 .editor-block-list .editor-inserter {
-	margin: $item-spacing;
+	margin: $grid-size;
 	cursor: move; // Fallback for IE/Edge < 14
 	cursor: grab;
 }
@@ -802,21 +835,6 @@
 		position: absolute;
 		left: 0;
 	}
-
-	.editor-block-list__block[data-align="right"] & {
-		/*!rtl:begin:ignore*/
-		left: auto;
-		right: 0;
-		/*!rtl:end:ignore*/
-	}
-
-	.editor-block-list__block[data-align="left"] & {
-		/*!rtl:begin:ignore*/
-		right: auto;
-		left: 0;
-		/*!rtl:end:ignore*/
-	}
-
 
 	@include break-small() {
 		width: auto;

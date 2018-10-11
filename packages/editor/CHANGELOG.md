@@ -1,4 +1,4 @@
-## 4.0.0 (Unreleased)
+## 4.0.0 (2018-09-30)
 
 ### Breaking Changes
 
@@ -12,6 +12,7 @@
 ### Deprecations
 
 - The `checkTemplateValidity` action has been deprecated. Validity is verified automatically upon block reset.
+- The `UnsavedChangesWarning` component `forceIsDirty` prop has been deprecated.
 
 ## 3.0.0 (2018-09-05)
 

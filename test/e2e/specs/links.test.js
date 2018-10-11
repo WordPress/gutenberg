@@ -7,6 +7,7 @@ import {
 	getEditedPostContent,
 	newPost,
 	pressWithModifier,
+	pressTimes,
 } from '../support/utils';
 
 /**
@@ -21,6 +22,15 @@ describe( 'Links', () => {
 		await newPost();
 	} );
 
+	const waitForAutoFocus = async () => {
+		await page.waitForFunction( () => !! document.activeElement.closest( '.editor-url-input' ) );
+	};
+
+	const moveMouse = async () => {
+		await page.mouse.move( 200, 300, { steps: 10 } );
+		await page.mouse.move( 250, 350, { steps: 10 } );
+	};
+
 	it( 'can be created by selecting text and clicking Link', async () => {
 		// Create a block with some text
 		await clickBlockAppender();
@@ -32,17 +42,14 @@ describe( 'Links', () => {
 		// Click on the Link button
 		await page.click( 'button[aria-label="Link"]' );
 
-		// A placeholder link should have been inserted
-		expect( await page.$( 'a[data-wp-placeholder]' ) ).not.toBeNull();
+		// Wait for the URL field to auto-focus
+		await waitForAutoFocus();
 
 		// Type a URL
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
 
 		// Click on the Apply button
 		await page.click( 'button[aria-label="Apply"]' );
-
-		// There should no longer be a placeholder link
-		expect( await page.$( 'a[data-wp-placeholder]' ) ).toBeNull();
 
 		// The link should have been inserted
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -59,17 +66,14 @@ describe( 'Links', () => {
 		// Press Cmd+K to insert a link
 		await pressWithModifier( META_KEY, 'K' );
 
-		// A placeholder link should have been inserted
-		expect( await page.$( 'a[data-wp-placeholder]' ) ).not.toBeNull();
+		// Wait for the URL field to auto-focus
+		await waitForAutoFocus();
 
 		// Type a URL
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
 
 		// Press Enter to apply the link
 		await page.keyboard.press( 'Enter' );
-
-		// There should no longer be a placeholder link
-		expect( await page.$( 'a[data-wp-placeholder]' ) ).toBeNull();
 
 		// The link should have been inserted
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -80,15 +84,14 @@ describe( 'Links', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'This is Gutenberg: ' );
 
+		// Trigger isTyping = false
+		await moveMouse();
+
 		// Press Cmd+K to insert a link
 		await pressWithModifier( META_KEY, 'K' );
 
-		// Trigger isTyping = false
-		await page.mouse.move( 200, 300, { steps: 10 } );
-		await page.mouse.move( 250, 350, { steps: 10 } );
-
-		// A placeholder link should not have been inserted
-		expect( await page.$( 'a[data-wp-placeholder]' ) ).toBeNull();
+		// Wait for the URL field to auto-focus
+		await waitForAutoFocus();
 
 		// Type a URL
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
@@ -114,9 +117,6 @@ describe( 'Links', () => {
 		// Click on the Link button
 		await page.click( 'button[aria-label="Link"]' );
 
-		// A placeholder link should not have been inserted
-		expect( await page.$( 'a[data-wp-placeholder]' ) ).toBeNull();
-
 		// A link with the selected URL as its href should have been inserted
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -132,14 +132,14 @@ describe( 'Links', () => {
 		// Click on the Link button
 		await page.click( 'button[aria-label="Link"]' );
 
+		// Wait for the URL field to auto-focus
+		await waitForAutoFocus();
+
 		// Type a URL
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
 
 		// Click somewhere else - it doesn't really matter where
 		await page.click( '.editor-post-title' );
-
-		// A placeholder link should not have been inserted
-		expect( await page.$( 'a[data-wp-placeholder]' ) ).toBeNull();
 	} );
 
 	const createAndReselectLink = async () => {
@@ -154,19 +154,13 @@ describe( 'Links', () => {
 		await page.click( 'button[aria-label="Link"]' );
 
 		// Wait for the URL field to auto-focus
-		await page.waitForFunction( () => !! document.activeElement.closest( '.editor-url-input' ) );
+		await waitForAutoFocus();
 
 		// Type a URL
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
 
 		// Click on the Apply button
 		await page.click( 'button[aria-label="Apply"]' );
-
-		// Click somewhere else - it doesn't really matter where
-		await page.click( '.editor-post-title' );
-
-		// Select the link again
-		await page.click( 'a[href="https://wordpress.org/gutenberg"]' );
 	};
 
 	it( 'can be edited', async () => {
@@ -174,6 +168,9 @@ describe( 'Links', () => {
 
 		// Click on the Edit button
 		await page.click( 'button[aria-label="Edit"]' );
+
+		// Wait for the URL field to auto-focus
+		await waitForAutoFocus();
 
 		// Change the URL
 		await page.keyboard.type( '/handbook' );
@@ -233,8 +230,7 @@ describe( 'Links', () => {
 		await page.keyboard.type( 'Text' );
 
 		// we need to trigger isTyping = false
-		await page.mouse.move( 200, 300, { steps: 10 } );
-		await page.mouse.move( 250, 350, { steps: 10 } );
+		await moveMouse();
 		await page.waitForSelector( 'button[aria-label="Link"]' );
 		await page.click( 'button[aria-label="Link"]' );
 
@@ -247,5 +243,17 @@ describe( 'Links', () => {
 		await page.keyboard.press( 'Escape' );
 		modal = await page.$( '.editor-format-toolbar__link-modal' );
 		expect( modal ).toBeNull();
+	} );
+
+	it( 'can be edited with collapsed selection', async () => {
+		await createAndReselectLink();
+		// Make a collapsed selection inside the link
+		await pressTimes( 'ArrowRight', 3 );
+		await moveMouse();
+		await page.click( 'button[aria-label="Edit"]' );
+		await waitForAutoFocus();
+		await page.keyboard.type( '/handbook' );
+		await page.click( 'button[aria-label="Apply"]' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

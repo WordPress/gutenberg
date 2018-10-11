@@ -4,6 +4,15 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 
 - Writing resolvers as async generators has been removed. Use the controls plugin instead.
 - `wp.components.AccessibleSVG` component has been removed. Please use `wp.components.SVG` instead.
+- The `wp.editor.UnsavedChangesWarning` component no longer accepts a `forceIsDirty` prop.
+- `initializeMetaBoxState` action (`core/edit-post`) has been removed. Use `setActiveMetaBoxLocations` action (`core/edit-post`) instead.
+- `wp.editPost.initializeEditor` no longer returns an object. Use the `setActiveMetaBoxLocations` action (`core/edit-post`) in place of the existing object's `initializeMetaBoxes` function.
+- `setMetaBoxSavedData` action (`core/edit-post`) has been removed.
+- `getMetaBoxes` selector (`core/edit-post`) has been removed. Use `getActiveMetaBoxLocations` selector (`core/edit-post`) instead.
+- `getMetaBox` selector (`core/edit-post`) has been removed. Use `isMetaBoxLocationActive` selector (`core/edit-post`) instead.
+- Attribute type coercion has been removed. Omit the source to preserve type via serialized comment demarcation.
+- `mediaDetails` in object passed to `onFileChange` callback of `wp.editor.mediaUpload`. Please use `media_details` property instead.
+- `wp.components.CodeEditor` has been removed. Used `wp.codeEditor` directly instead.
 
 ## 4.1.0
 

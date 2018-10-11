@@ -13,17 +13,25 @@ p {
 	font-size: $editor-font-size;
 }
 
-
 ul,
 ol {
 	margin: 0;
 	padding: 0;
 }
 
-ul:not(.wp-block-gallery) {
+ul {
 	list-style-type: disc;
 }
 
 ol {
 	list-style-type: decimal;
+}
+
+ul ul,
+ol ul {
+	list-style-type: circle;
+}
+
+.mce-content-body {
+	line-height: $editor-line-height;
 }

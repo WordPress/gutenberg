@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
-import { children, createBlock } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import {
 	RichText,
 	BlockControls,
@@ -25,8 +25,7 @@ export const settings = {
 
 	attributes: {
 		content: {
-			type: 'array',
-			source: 'children',
+			source: 'html',
 			selector: 'pre',
 		},
 		textAlign: {
@@ -98,7 +97,7 @@ export const settings = {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: children.concat( attributes.content, attributesToMerge.content ),
+			content: attributes.content + attributesToMerge.content,
 		};
 	},
 };

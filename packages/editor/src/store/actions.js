@@ -599,6 +599,20 @@ export function removeNotice( id ) {
 	};
 }
 
+/**
+ * Returns an action object used to lock the editor.
+ *
+ * @param {Object}  lock Details about the post lock status, user, and nonce.
+ *
+ * @return {Object} Action object.
+ */
+export function updatePostLock( lock ) {
+	return {
+		type: 'UPDATE_POST_LOCK',
+		lock,
+	};
+}
+
 export const createSuccessNotice = partial( createNotice, 'success' );
 export const createInfoNotice = partial( createNotice, 'info' );
 export const createErrorNotice = partial( createNotice, 'error' );

@@ -1,12 +1,20 @@
-## 2.1.0 (Unreleased)
+## 2.1.0 (2018-09-30)
 
 ## New Features
 
 - Adding support for using controls in resolvers using the controls plugin.
 
+### Polish
+
+- Updated `redux` dependency to the latest version.
+
 ### Deprecations
 
 - Writing resolvers as async generators has been deprecated. Use the controls plugin instead.
+
+## Bug Fixes
+
+- Fix the promise middleware in Firefox.
 
 ## 2.0.0 (2018-09-05)
 
