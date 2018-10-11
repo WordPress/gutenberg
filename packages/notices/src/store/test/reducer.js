@@ -35,6 +35,7 @@ describe( 'reducer', () => {
 					content: 'save error',
 					status: 'error',
 					isDismissible: true,
+					actions: [],
 				},
 			],
 		} );
@@ -51,6 +52,7 @@ describe( 'reducer', () => {
 					content: 'save error',
 					status: 'error',
 					isDismissible: true,
+					actions: [],
 				},
 			],
 		} );
@@ -70,12 +72,14 @@ describe( 'reducer', () => {
 					content: 'save error',
 					status: 'error',
 					isDismissible: true,
+					actions: [],
 				},
 				{
 					id: expect.any( String ),
 					content: 'successfully saved',
 					status: 'success',
 					isDismissible: true,
+					actions: [],
 				},
 			],
 		} );
@@ -129,6 +133,7 @@ describe( 'reducer', () => {
 					content: 'save error (2)',
 					status: 'error',
 					isDismissible: true,
+					actions: [],
 				},
 			],
 		} );

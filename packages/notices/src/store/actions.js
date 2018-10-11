@@ -23,12 +23,15 @@ import { DEFAULT_CONTEXT } from './constants';
  * @param {?boolean}               options.isDismissible Whether the notice can
  *                                                       be dismissed by user.
  *                                                       Defaults to `true`.
+ * @param {?Array<WPNoticeAction>} options.actions       User actions to be
+ *                                                       presented with notice.
  */
 export function* createNotice( status = 'info', content, options = {} ) {
 	const {
 		isDismissible = true,
 		context = DEFAULT_CONTEXT,
 		id = uniqueId( context ),
+		actions = [],
 	} = options;
 
 	yield { type: 'SPEAK', message: content };
@@ -41,6 +44,7 @@ export function* createNotice( status = 'info', content, options = {} ) {
 			status,
 			content,
 			isDismissible,
+			actions,
 		},
 	};
 }

@@ -763,7 +763,7 @@ export function createNotice( status, content, options ) {
 	deprecated( 'createNotice action (`core/editor` store)', {
 		alternative: 'createNotice action (`core/notices` store)',
 		plugin: 'Gutenberg',
-		version: '4.0',
+		version: '4.4.0',
 	} );
 
 	dispatch( 'core/notices' ).createNotice( status, content, options );
@@ -775,7 +775,7 @@ export function removeNotice( id ) {
 	deprecated( 'removeNotice action (`core/editor` store)', {
 		alternative: 'removeNotice action (`core/notices` store)',
 		plugin: 'Gutenberg',
-		version: '4.0',
+		version: '4.4.0',
 	} );
 
 	dispatch( 'core/notices' ).removeNotice( id );

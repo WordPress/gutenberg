@@ -2064,7 +2064,7 @@ export function getNotices() {
 	deprecated( 'getNotices selector (`core/editor` store)', {
 		alternative: 'getNotices selector (`core/notices` store)',
 		plugin: 'Gutenberg',
-		version: '4.0',
+		version: '4.4.0',
 	} );
 
 	return select( 'core/notices' ).getNotices();

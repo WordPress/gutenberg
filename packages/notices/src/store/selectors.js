@@ -17,15 +17,28 @@ const DEFAULT_NOTICES = [];
 /**
  * Notice object.
  *
- * @property {string}  id            Unique identifier of notice.
- * @property {string}  status        Status sort of notice, one of `success`,
- *                                   `info`, `error`, or `warning`. Defaults to
- *                                   `info`.
- * @property {string}  content       Notice message.
- * @property {boolean} isDismissible Whether the notice can be dismissed by the
- *                                   user. Defaults to `true`.
+ * @property {string}  id               Unique identifier of notice.
+ * @property {string}  status           Status of notice, one of `success`,
+ *                                      `info`, `error`, or `warning`. Defaults
+ *                                      to `info`.
+ * @property {string}  content          Notice message.
+ * @property {boolean} isDismissible    Whether the notice can be dismissed by
+ *                                      user. Defaults to `true`.
+ * @property {WPNoticeAction[]} actions User actions to present with notice.
  *
  * @typedef {Notice}
+ */
+
+/**
+ * Object describing a user action option associated with a notice.
+ *
+ * @property {string}    label    Message to use as action label.
+ * @property {?string}   url      Optional URL of resource if action incurs
+ *                                browser navigation.
+ * @property {?Function} callback Optional function to invoke when action is
+ *                                triggered by user.
+ *
+ * @typedef {WPNoticeAction}
  */
 
 /**

@@ -32,6 +32,8 @@ Yields action objects used in signalling that a notice is to be created.
  * options.isDismissible: Whether the notice can
                                                       be dismissed by user.
                                                       Defaults to `true`.
+ * options.actions: User actions to be
+                                                      presented with notice.
 
 ### createSuccessNotice
 

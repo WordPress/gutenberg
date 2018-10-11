@@ -32,6 +32,7 @@ describe( 'actions', () => {
 					content,
 					isDismissible: true,
 					id: expect.any( String ),
+					actions: [],
 				},
 			} );
 		} );
@@ -60,6 +61,7 @@ describe( 'actions', () => {
 					status,
 					content,
 					isDismissible: false,
+					actions: [],
 				},
 			} );
 		} );
