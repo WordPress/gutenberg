@@ -60,10 +60,10 @@ class WP_REST_Themes_Controller extends WP_REST_Controller {
 	 * @return true|WP_Error True if the request has read access for the item, otherwise WP_Error object.
 	 */
 	public function get_item_permissions_check( $request ) {
-//		if ( ! is_user_logged_in() || ! current_user_can( 'edit_posts' ) ) {
-//			return new WP_Error( 'rest_user_cannot_view', __( 'Sorry, you are not allowed to view themes.' ), array( 'status' => rest_authorization_required_code() ) );
-//		}
-//
+		if ( ! is_user_logged_in() || ! current_user_can( 'edit_posts' ) ) {
+			return new WP_Error( 'rest_user_cannot_view', __( 'Sorry, you are not allowed to view themes.' ), array( 'status' => rest_authorization_required_code() ) );
+		}
+
 		return true;
 	}
 
@@ -113,7 +113,6 @@ class WP_REST_Themes_Controller extends WP_REST_Controller {
 			$data['template'] = $theme->__get( 'template' );
 		}
 
-
 		if ( in_array( 'theme_supports', $fields, true ) ) {
 			$formats = get_theme_support( 'post-formats' );
 			$formats = is_array( $formats ) ? array_values( $formats[0] ) : array();
@@ -126,8 +125,6 @@ class WP_REST_Themes_Controller extends WP_REST_Controller {
 				// $post_thumbnails can contain a nested array of post types.
 				// e.g. array( array( 'post', 'page' ) ).
 				$data['theme_supports']['post-thumbnails'] = is_array( $post_thumbnails ) ? $post_thumbnails[0] : true;
-			} else {
-				$data['theme_supports']['post-thumbnails'] = false;
 			}
 		}
 
@@ -217,13 +214,13 @@ class WP_REST_Themes_Controller extends WP_REST_Controller {
 						'formats'      => array(
 							'description' => __( 'Post formats supported.' ),
 							'type'        => 'array',
-							'context'     => array( 'edit' ),
+							'context'     => array( 'view' ),
 							'readonly'    => true,
 						),
 						'post-thumbnails' => array(
 							'description' => __( '' ),
 							'type'        => array( 'array', 'bool' ),
-							'context'     => array( 'view', 'edit' ),
+							'context'     => array( 'view' ),
 							'readonly'    => true,
 						),
 					),
