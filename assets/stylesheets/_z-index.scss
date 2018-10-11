@@ -77,7 +77,10 @@ $z-layers: (
 
 	// Shows adminbar quicklink submenu above bottom popover:
 	// #wpadminbar ul li {z-index: 99999;}
-	".components-popover.is-bottom": 99990,
+	".components-popover:not(.is-mobile).is-bottom": 99990,
+
+	// Shows above edit post sidebar; Specificity needs to be higher than 3 classes.
+	".gutenberg__editor .components-popover.components-color-palette__picker.is-bottom": 100001,
 
 	".components-autocomplete__results": 1000000,
 
