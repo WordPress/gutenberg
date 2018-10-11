@@ -43,7 +43,7 @@ class WP_REST_Themes_Controller extends WP_REST_Controller {
 					'callback'            => array( $this, 'get_item' ),
 					'permission_callback' => array( $this, 'get_item_permissions_check' ),
 					'args'                => array(
-						'context' => $this->get_context_param( array( 'default' => 'view' ) ),
+						'context' => $this->get_context_param( array( 'default' => 'edit' ) ),
 					),
 				),
 				'schema' => array( $this, 'get_item_schema' ),
@@ -128,7 +128,7 @@ class WP_REST_Themes_Controller extends WP_REST_Controller {
 			}
 		}
 
-		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
+		$context = ! empty( $request['context'] ) ? $request['context'] : 'edit';
 
 		$data = $this->add_additional_fields_to_object( $data, $request );
 		$data = $this->filter_response_by_context( $data, $context );

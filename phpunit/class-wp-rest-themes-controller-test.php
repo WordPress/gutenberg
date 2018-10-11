@@ -161,8 +161,8 @@ class WP_REST_Themes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertEquals( 'view', $data['endpoints'][0]['args']['context']['default'] );
-		$this->assertEqualSets( array( 'view' ), $data['endpoints'][0]['args']['context']['enum'] );
+		$this->assertEquals( 'edit', $data['endpoints'][0]['args']['context']['default'] );
+		$this->assertEqualSets( array( 'edit' ), $data['endpoints'][0]['args']['context']['enum'] );
 	}
 
 	/**
@@ -268,7 +268,7 @@ class WP_REST_Themes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			'type'        => 'integer',
 			'description' => 'Some integer of mine',
 			'enum'        => array( 1, 2, 3, 4 ),
-			'context'     => array( 'view' ),
+			'context'     => array( 'edit' ),
 		);
 
 		register_rest_field(
