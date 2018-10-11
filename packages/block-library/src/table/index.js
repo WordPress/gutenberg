@@ -89,6 +89,11 @@ export const settings = {
 		foot: getTableSectionAttributeSchema( 'foot' ),
 	},
 
+	styles: [
+		{ name: 'regular', label: __( 'Regular' ), isDefault: true },
+		{ name: 'stripes', label: __( 'Stripes' ) },
+	],
+
 	supports: {
 		align: true,
 	},
