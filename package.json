@@ -65,7 +65,6 @@
 		"@wordpress/postcss-themes": "file:packages/postcss-themes",
 		"@wordpress/scripts": "file:packages/scripts",
 		"autoprefixer": "8.2.0",
-		"babel-eslint": "8.0.3",
 		"babel-loader": "8.0.0",
 		"chalk": "2.4.1",
 		"check-node-version": "3.1.1",

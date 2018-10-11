@@ -11,17 +11,23 @@ const {
 	fromConfigRoot,
 	getCliArgs,
 	hasCliArg,
+	hasPackageProp,
 	hasProjectFile,
 } = require( '../utils' );
 
 const args = getCliArgs();
 
 const hasLintConfig = hasCliArg( '-c' ) ||
-	hasCliArg( '--configFile' ) ||
-	hasProjectFile( '.eslintrc.js' );
+	hasCliArg( '--config' ) ||
+	hasProjectFile( '.eslintrc.js' ) ||
+	hasProjectFile( '.eslintrc.yaml' ) ||
+	hasProjectFile( '.eslintrc.yml' ) ||
+	hasProjectFile( '.eslintrc.json' ) ||
+	hasProjectFile( '.eslintrc' ) ||
+	hasPackageProp( 'eslintConfig' );
 
 const config = ! hasLintConfig ?
-	[ '--configFile', fromConfigRoot( '.eslintrc.js' ) ] :
+	[ '--config', fromConfigRoot( '.eslintrc.js' ) ] :
 	[];
 
 const result = spawn(

@@ -34,6 +34,7 @@
 		"@wordpress/babel-preset-default": "file:../babel-preset-default",
 		"@wordpress/jest-preset-default": "file:../jest-preset-default",
 		"@wordpress/npm-package-json-lint-config": "file:../npm-package-json-lint-config",
+		"babel-eslint": "8.0.3",
 		"chalk": "^2.4.1",
 		"cross-spawn": "^5.1.0",
 		"eslint": "^4.19.1",
