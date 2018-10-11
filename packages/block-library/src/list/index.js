@@ -85,7 +85,7 @@ export const settings = {
 				blocks: [ 'core/quote' ],
 				transform: ( { value } ) => {
 					return createBlock( 'core/list', {
-						values: value,
+						values: toHTMLString( create( { html: value, multilineTag: 'p' } ), 'li' ),
 					} );
 				},
 			},
@@ -143,7 +143,7 @@ export const settings = {
 				blocks: [ 'core/quote' ],
 				transform: ( { values } ) => {
 					return createBlock( 'core/quote', {
-						value: values,
+						value: toHTMLString( create( { html: values, multilineTag: 'li' } ), 'p' ),
 					} );
 				},
 			},
