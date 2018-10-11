@@ -55,6 +55,23 @@ exports[`URLPopover matches the snapshot when the settings are toggled open 1`] 
 </Popover>
 `;
 
+exports[`URLPopover matches the snapshot when there are no settings 1`] = `
+<Popover
+  focusOnMount="firstElement"
+  noArrow={false}
+  onClickOutside={[Function]}
+  position="bottom center"
+>
+  <div
+    className="editor-url-popover__row"
+  >
+    <div>
+      Editing
+    </div>
+  </div>
+</Popover>
+`;
+
 exports[`URLPopover matches the snapshot when viewing the url 1`] = `
 <Popover
   focusOnMount={false}

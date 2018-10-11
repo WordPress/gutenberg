@@ -73,4 +73,21 @@ describe( 'URLPopover', () => {
 
 		expect( wrapper ).toMatchSnapshot();
 	} );
+
+	it( 'matches the snapshot when there are no settings', () => {
+		const wrapper = shallow(
+			<URLPopover
+				onClickOutside={ noop }
+				isEditing={ true }
+				renderEditingState={ () => (
+					<div>Editing</div>
+				) }
+				renderViewingState={ () => (
+					<div>Viewing</div>
+				) }
+			/>
+		);
+
+		expect( wrapper ).toMatchSnapshot();
+	} );
 } );

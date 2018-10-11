@@ -46,13 +46,15 @@ class URLPopover extends Component {
 			>
 				<div className="editor-url-popover__row">
 					{ isEditing ? renderEditingState() : renderViewingState() }
-					<IconButton
-						className="editor-url-popover__settings-toggle"
-						icon="ellipsis"
-						label={ __( 'Link Settings' ) }
-						onClick={ this.toggleSettingsVisibility }
-						aria-expanded={ isSettingsExpanded }
-					/>
+					{ !! renderSettings ? (
+						<IconButton
+							className="editor-url-popover__settings-toggle"
+							icon="ellipsis"
+							label={ __( 'Link Settings' ) }
+							onClick={ this.toggleSettingsVisibility }
+							aria-expanded={ isSettingsExpanded }
+						/>
+					) : null }
 				</div>
 				{ showSettings ? (
 					<div className="editor-url-popover__row editor-url-popover__settings">
