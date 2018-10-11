@@ -4,7 +4,7 @@
 	align-items: flex-start;
 	width: 100%;
 	margin: 0;
-	padding: 4px;
+	padding: $grid-size-small;
 	background-color: $white;
 	border: $border-width solid $light-gray-700;
 	color: $dark-gray-700;
@@ -162,7 +162,7 @@
 	transition: all 0.15s ease-in-out;
 	list-style: none;
 	border-top: $border-width solid $dark-gray-300;
-	margin: 4px -4px -4px -4px;
+	margin: $grid-size-small -$grid-size-small -$grid-size-small -$grid-size-small;
 	padding-top: 3px;
 }
 
