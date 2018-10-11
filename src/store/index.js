@@ -5,11 +5,7 @@
 
 // Gutenberg imports
 import { registerCoreBlocks } from '@wordpress/block-library';
-import {
-	parse,
-	registerBlockType,
-	setUnknownTypeHandlerName,
-} from '@wordpress/blocks';
+import { parse, registerBlockType, setUnknownTypeHandlerName } from '@wordpress/blocks';
 
 import { createStore } from 'redux';
 import { reducer } from './reducers';
@@ -77,20 +73,22 @@ else:
 <!-- /wp:p4ragraph -->
 `;
 
-const initialBlocks = parse( initialHtml );
-
-export const initialState: StateType = {
-	// TODO: get blocks list block state should be externalized (shared with Gutenberg at some point?).
-	// If not it should be created from a string parsing (commented HTML to json).
-	blocks: initialBlocks.map( ( block ) => ( { ...block, focused: false } ) ),
-	refresh: false,
-};
+export function html2State( html ) {
+	const blocksFromHtml = parse( html );
+	const state: StateType = {
+		// TODO: get blocks list block state should be externalized (shared with Gutenberg at some point?).
+		// If not it should be created from a string parsing (commented HTML to json).
+		blocks: blocksFromHtml.map( block => ( { ...block, focused: false } ) ),
+		refresh: false,
+	};
+	return state;
+}
 
 const devToolsEnhancer =
 	// ( 'development' === process.env.NODE_ENV && require( 'remote-redux-devtools' ).default ) ||
 	() => {};
 
-export function setupStore( state: StateType = initialState ) {
+export function setupStore( state: StateType = html2State( initialHtml ) ) {
 	const store = createStore( reducer, state, devToolsEnhancer() );
 	return store;
 }

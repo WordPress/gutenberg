@@ -5,24 +5,26 @@ import '../globals';
 
 import React from 'react';
 import { Provider } from 'react-redux';
-import { setupStore } from '../store';
+import { setupStore, html2State } from '../store';
 import AppContainer from './AppContainer';
 import { Store } from 'redux';
 
 type PropsType = {
-	store: Store,
+	initialHtml: string,
 };
 type StateType = {};
 
-export class AppProvider extends React.Component<PropsType, StateType> {
+export default class AppProvider extends React.Component<PropsType, StateType> {
+	constructor( props ) {
+		super( props );
+		this.store = setupStore( html2State( this.props.initialHtml ) );
+	}
+
 	render() {
 		return (
-			<Provider store={ this.props.store }>
+			<Provider store={ this.store }>
 				<AppContainer />
 			</Provider>
 		);
 	}
 }
-
-// eslint-disable-next-line react/display-name
-export default () => <AppProvider store={ setupStore() } />;
