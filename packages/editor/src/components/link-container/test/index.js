@@ -13,7 +13,6 @@ describe( 'LinkContainer', () => {
 	it( 'matches the snapshot when previewing the link', () => {
 		const wrapper = shallow(
 			<LinkContainer
-				position="bottom center"
 				onClickOutside={ noop }
 				isEditing={ false }
 				renderEditingState={ () => (
@@ -34,7 +33,6 @@ describe( 'LinkContainer', () => {
 	it( 'matches the snapshot when editing the link', () => {
 		const wrapper = shallow(
 			<LinkContainer
-				position="bottom center"
 				onClickOutside={ noop }
 				isEditing={ true }
 				renderEditingState={ () => (
@@ -55,7 +53,6 @@ describe( 'LinkContainer', () => {
 	it( 'matches the snapshot when the settings are toggled open', () => {
 		const wrapper = shallow(
 			<LinkContainer
-				position="bottom center"
 				onClickOutside={ noop }
 				isEditing={ true }
 				renderEditingState={ () => (

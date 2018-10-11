@@ -28,7 +28,8 @@ class LinkContainer extends Component {
 			renderEditingState,
 			renderPreviewState,
 			renderSettings,
-			...popoverProps
+			position,
+			onClickOutside,
 		} = this.props;
 
 		const {
@@ -40,7 +41,8 @@ class LinkContainer extends Component {
 		return (
 			<Popover
 				focusOnMount={ isEditing ? 'firstElement' : false }
-				{ ...popoverProps }
+				position={ position || 'bottom center' }
+				onClickOutside={ onClickOutside }
 			>
 				<div className="editor-link-container__popover-row">
 					{ isEditing ? renderEditingState() : renderPreviewState() }

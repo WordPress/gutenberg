@@ -159,7 +159,6 @@ class RichTextLinkContainer extends Component {
 					key={ `${ record.start }${ record.end }` /* Used to force rerender on selection change */ }
 				>
 					<LinkContainer
-						position="bottom center"
 						onClickOutside={ this.resetState }
 						isEditing={ showInput }
 						renderEditingState={ () => (
