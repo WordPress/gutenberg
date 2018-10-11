@@ -14,7 +14,7 @@ import { addQueryArgs } from '@wordpress/url';
 import {
 	receiveUserQuery,
 	receiveEntityRecords,
-	receiveThemeSupportsFromIndex,
+	receiveThemeSupports,
 	receiveEmbedPreview,
 } from './actions';
 import { getKindEntities } from './entities';
@@ -70,8 +70,8 @@ export function* getEntityRecords( kind, name, query = {} ) {
  * Requests theme supports data from the index.
  */
 export function* getThemeSupports() {
-	const index = yield apiFetch( { path: '/' } );
-	yield receiveThemeSupportsFromIndex( index );
+	const currentTheme = yield apiFetch( { path: '/wp/v2/themes/active' } );
+	yield receiveThemeSupports( currentTheme.theme_supports );
 }
 
 /**
