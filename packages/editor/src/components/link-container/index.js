@@ -42,10 +42,10 @@ class LinkContainer extends Component {
 				focusOnMount={ isEditing ? 'firstElement' : false }
 				{ ...popoverProps }
 			>
-				<div className="editor-format-toolbar__link-modal-line">
+				<div className="editor-link-container__popover-row">
 					{ isEditing ? renderEditingState() : renderPreviewState() }
 					<IconButton
-						className="editor-format-toolbar__link-settings-toggle"
+						className="editor-link-container__settings-toggle"
 						icon="ellipsis"
 						label={ __( 'Link Settings' ) }
 						onClick={ this.toggleSettingsVisibility }
@@ -53,7 +53,7 @@ class LinkContainer extends Component {
 					/>
 				</div>
 				{ showSettings ? (
-					<div className="editor-format-toolbar__link-modal-line editor-format-toolbar__link-settings">
+					<div className="editor-link-container__popover-row editor-link-container__settings">
 						{ renderSettings() }
 					</div>
 				) : null }

@@ -166,7 +166,7 @@ class RichTextLinkContainer extends Component {
 							// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 							/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 							<form
-								className="editor-format-toolbar__link-modal-line"
+								className="editor-format-toolbar__link-container-content"
 								onKeyPress={ stopKeyPropagation }
 								onKeyDown={ this.onKeyDown }
 								onSubmit={ this.submitLink }
@@ -179,9 +179,12 @@ class RichTextLinkContainer extends Component {
 						renderPreviewState={ () => (
 							// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 							/* eslint-disable jsx-a11y/no-static-element-interactions */
-							<div onKeyPress={ stopKeyPropagation }>
+							<div
+								className="editor-format-toolbar__link-container-content"
+								onKeyPress={ stopKeyPropagation }
+							>
 								<ExternalLink
-									className="editor-format-toolbar__link-value"
+									className="editor-format-toolbar__link-container-value"
 									href={ href }
 								>
 									{ filterURLForDisplay( decodeURI( href ) ) }
