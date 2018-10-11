@@ -217,7 +217,7 @@ const config = {
 				to: `./build/${ packageName }/`,
 				flatten: true,
 				transform: ( content ) => {
-					if ( isProduction ) {
+					if ( config.mode === 'production' ) {
 						return postcss( [
 							require( 'cssnano' )( {
 								preset: 'default',
@@ -230,7 +230,11 @@ const config = {
 				},
 			} ) )
 		),
+		// GUTENBERG_BUNDLE_ANALYZER global variable enables utility that represents bundle content
+		// as convenient interactive zoomable treemap.
 		process.env.GUTENBERG_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
+		// GUTENBERG_LIVE_RELOAD_PORT global variable changes port on which live reload works
+		// when running watch mode.
 		! isProduction && new LiveReloadPlugin( { port: process.env.GUTENBERG_LIVE_RELOAD_PORT || 35729 } ),
 	].filter( Boolean ),
 	stats: {
@@ -239,6 +243,8 @@ const config = {
 };
 
 if ( ! isProduction ) {
+	// GUTENBERG_DEVTOOL global variable controls how source maps are generated.
+	// See: https://webpack.js.org/configuration/devtool/#devtool.
 	config.devtool = process.env.GUTENBERG_DEVTOOL || 'source-map';
 }
 
