@@ -114,9 +114,9 @@ class WP_REST_Themes_Controller extends WP_REST_Controller {
 		}
 
 		if ( in_array( 'theme_supports', $fields, true ) ) {
-			$formats = get_theme_support( 'post-formats' );
-			$formats = is_array( $formats ) ? array_values( $formats[0] ) : array();
-			$formats = array_merge( array( 'standard' ), $formats );
+			$formats                           = get_theme_support( 'post-formats' );
+			$formats                           = is_array( $formats ) ? array_values( $formats[0] ) : array();
+			$formats                           = array_merge( array( 'standard' ), $formats );
 			$data['theme_supports']['formats'] = $formats;
 
 			$post_thumbnails = get_theme_support( 'post-thumbnails' );
@@ -160,7 +160,7 @@ class WP_REST_Themes_Controller extends WP_REST_Controller {
 	 */
 	protected function prepare_links( $theme ) {
 		$links = array(
-			'active'       => array(
+			'self' => array(
 				'href' => rest_url( sprintf( '%s/%s/active', $this->namespace, $this->rest_base ) ),
 			),
 		);
@@ -181,46 +181,46 @@ class WP_REST_Themes_Controller extends WP_REST_Controller {
 			'title'      => 'theme',
 			'type'       => 'object',
 			'properties' => array(
-				'name'                 => array(
-					'description' => __( 'Theme name' ),
+				'name'           => array(
+					'description' => __( 'Theme name', 'gutenberg' ),
 					'type'        => 'string',
-					'context'     => array( 'view' ),
+					'context'     => array( 'edit' ),
 					'readonly'    => true,
 				),
-				'stylesheet'                 => array(
-					'description' => __( 'The directory name of the theme.' ),
+				'stylesheet'     => array(
+					'description' => __( 'The directory name of the theme.', 'gutenberg' ),
 					'type'        => 'string',
-					'context'     => array( 'view' ),
+					'context'     => array( 'edit' ),
 					'readonly'    => true,
 				),
-				'version'           => array(
-					'description' => __( 'Theme version' ),
+				'version'        => array(
+					'description' => __( 'Theme version', 'gutenberg' ),
 					'type'        => 'string',
-					'context'     => array( 'view' ),
+					'context'     => array( 'edit' ),
 					'readonly'    => true,
 				),
-				'template'           => array(
-					'description' => __( 'The theme template' ),
+				'template'       => array(
+					'description' => __( 'The theme template', 'gutenberg' ),
 					'type'        => 'string',
-					'context'     => array( 'view' ),
+					'context'     => array( 'edit' ),
 					'readonly'    => true,
 				),
 				'theme_supports' => array(
-					'description' => __( 'A list of features this theme supports.' ),
+					'description' => __( 'A list of features this theme supports.', 'gutenberg' ),
 					'type'        => 'array',
-					'context'     => array( 'view' ),
+					'context'     => array( 'edit' ),
 					'readonly'    => true,
 					'properties'  => array(
-						'formats'      => array(
-							'description' => __( 'Post formats supported.' ),
+						'formats'         => array(
+							'description' => __( 'Post formats supported.', 'gutenberg' ),
 							'type'        => 'array',
-							'context'     => array( 'view' ),
+							'context'     => array( 'edit' ),
 							'readonly'    => true,
 						),
 						'post-thumbnails' => array(
-							'description' => __( '' ),
+							'description' => __( 'Whether the theme supports post thumbnails.', 'gutenberg' ),
 							'type'        => array( 'array', 'bool' ),
-							'context'     => array( 'view' ),
+							'context'     => array( 'edit' ),
 							'readonly'    => true,
 						),
 					),
