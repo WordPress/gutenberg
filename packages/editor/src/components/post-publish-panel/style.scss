@@ -86,14 +86,11 @@
 	display: flex;
 	align-content: space-between;
 	flex-wrap: wrap;
+	margin: -5px;
 
 	> * {
-		//flex-grow: 1;
-		margin-right: 10px;
-
-		&:last-child {
-			margin-right: 0;
-		}
+		flex-grow: 1;
+		margin: 5px;
 	}
 
 	.components-button {
@@ -103,10 +100,6 @@
 		line-height: 20px;
 		text-align: center;
 		white-space: normal;
-	}
-
-	.components-button + .components-button {
-		margin-bottom: 0.5em;
 	}
 
 	.components-clipboard-button {
