@@ -25,7 +25,7 @@ import {
 import PositionedAtSelection from './positioned-at-selection';
 import URLInput from '../../url-input';
 import { filterURLForDisplay } from '../../../utils/url';
-import LinkContainer from '../../link-container';
+import URLPopover from '../../url-popover';
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 
@@ -53,7 +53,7 @@ function isShowingInput( props, state ) {
 	return props.addingLink || state.editLink;
 }
 
-class RichTextLinkContainer extends Component {
+class LinkContainer extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -158,7 +158,7 @@ class RichTextLinkContainer extends Component {
 				<PositionedAtSelection
 					key={ `${ record.start }${ record.end }` /* Used to force rerender on selection change */ }
 				>
-					<LinkContainer
+					<URLPopover
 						onClickOutside={ this.resetState }
 						isEditing={ showInput }
 						renderEditingState={ () => (
@@ -175,7 +175,7 @@ class RichTextLinkContainer extends Component {
 							</form>
 							/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 						) }
-						renderPreviewState={ () => (
+						renderViewingState={ () => (
 							// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 							/* eslint-disable jsx-a11y/no-static-element-interactions */
 							<div
@@ -207,4 +207,4 @@ class RichTextLinkContainer extends Component {
 	}
 }
 
-export default withSpokenMessages( RichTextLinkContainer );
+export default withSpokenMessages( LinkContainer );

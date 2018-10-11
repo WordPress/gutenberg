@@ -5,7 +5,7 @@ import {
 	IconButton,
 } from '@wordpress/components';
 
-class LinkContainer extends Component {
+class URLPopover extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -26,7 +26,7 @@ class LinkContainer extends Component {
 		const {
 			isEditing,
 			renderEditingState,
-			renderPreviewState,
+			renderViewingState,
 			renderSettings,
 			position,
 			onClickOutside,
@@ -36,7 +36,7 @@ class LinkContainer extends Component {
 			isSettingsExpanded,
 		} = this.state;
 
-		const showSettings = isSettingsExpanded && !! renderSettings;
+		const showSettings = !! renderSettings && isSettingsExpanded;
 
 		return (
 			<Popover
@@ -44,10 +44,10 @@ class LinkContainer extends Component {
 				position={ position || 'bottom center' }
 				onClickOutside={ onClickOutside }
 			>
-				<div className="editor-link-container__popover-row">
-					{ isEditing ? renderEditingState() : renderPreviewState() }
+				<div className="editor-url-popover__row">
+					{ isEditing ? renderEditingState() : renderViewingState() }
 					<IconButton
-						className="editor-link-container__settings-toggle"
+						className="editor-url-popover__settings-toggle"
 						icon="ellipsis"
 						label={ __( 'Link Settings' ) }
 						onClick={ this.toggleSettingsVisibility }
@@ -55,7 +55,7 @@ class LinkContainer extends Component {
 					/>
 				</div>
 				{ showSettings ? (
-					<div className="editor-link-container__popover-row editor-link-container__settings">
+					<div className="editor-url-popover__row editor-url-popover__settings">
 						{ renderSettings() }
 					</div>
 				) : null }
@@ -64,4 +64,4 @@ class LinkContainer extends Component {
 	}
 }
 
-export default LinkContainer;
+export default URLPopover;

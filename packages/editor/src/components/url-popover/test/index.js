@@ -7,19 +7,19 @@ import { noop } from 'lodash';
 /**
  * Internal dependencies
  */
-import LinkContainer from '../';
+import URLPopover from '../';
 
-describe( 'LinkContainer', () => {
-	it( 'matches the snapshot when previewing the link', () => {
+describe( 'URLPopover', () => {
+	it( 'matches the snapshot when viewing the url', () => {
 		const wrapper = shallow(
-			<LinkContainer
+			<URLPopover
 				onClickOutside={ noop }
 				isEditing={ false }
 				renderEditingState={ () => (
 					<div>Editing</div>
 				) }
-				renderPreviewState={ () => (
-					<div>Preview</div>
+				renderViewingState={ () => (
+					<div>Viewing</div>
 				) }
 				renderSettings={ () => (
 					<div>Settings</div>
@@ -30,16 +30,16 @@ describe( 'LinkContainer', () => {
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
-	it( 'matches the snapshot when editing the link', () => {
+	it( 'matches the snapshot when editing the url', () => {
 		const wrapper = shallow(
-			<LinkContainer
+			<URLPopover
 				onClickOutside={ noop }
 				isEditing={ true }
 				renderEditingState={ () => (
 					<div>Editing</div>
 				) }
-				renderPreviewState={ () => (
-					<div>Preview</div>
+				renderViewingState={ () => (
+					<div>Viewing</div>
 				) }
 				renderSettings={ () => (
 					<div>Settings</div>
@@ -52,14 +52,14 @@ describe( 'LinkContainer', () => {
 
 	it( 'matches the snapshot when the settings are toggled open', () => {
 		const wrapper = shallow(
-			<LinkContainer
+			<URLPopover
 				onClickOutside={ noop }
 				isEditing={ true }
 				renderEditingState={ () => (
 					<div>Editing</div>
 				) }
-				renderPreviewState={ () => (
-					<div>Preview</div>
+				renderViewingState={ () => (
+					<div>Viewing</div>
 				) }
 				renderSettings={ () => (
 					<div>Settings</div>
@@ -67,7 +67,7 @@ describe( 'LinkContainer', () => {
 			/>
 		);
 
-		const toggleButton = wrapper.find( '.editor-link-container__settings-toggle' );
+		const toggleButton = wrapper.find( '.editor-url-popover__settings-toggle' );
 		expect( toggleButton ).toHaveLength( 1 );
 		toggleButton.simulate( 'click' );
 

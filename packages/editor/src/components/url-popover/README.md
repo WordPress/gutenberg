@@ -1,24 +1,26 @@
-LinkContainer
+URLPopover
 ===========
 
-LinkContainer is a presentational React component used to render a popover used for editing a link
+URLPopover is a presentational React component used to render a popover used for editing and viewing a url.
 
 ## Setup
 
-This component is a presentational component that can be used for implementing link editing functionality.
+The component will be rendered adjacent to its parent.
 
 ```jsx
 import { ToggleControl, IconButton } from '@wordpress/components';
-import { LinkContainer } from '@wordpress/editor';
+import { URLPopover } from '@wordpress/editor';
 
-class MyLinkContainer extends Component {
+class MyURLPopover extends Component {
 	constructor() {
 		super( ...arguments );
 
 		this.onChangeURL = this.onChangeURL.bind( this );
-		this.closeLinkContainer = this.closeLinkContainer.bind( this );
-		this.submitLink = this.submitLink.bind( this );
-		this.editLink = this.editLink.bind( this );
+		this.openURLPopover = this.closeURLPopover.bind( this );
+		this.closeURLPopover = this.closeURLPopover.bind( this );
+		this.submitURL = this.submitURL.bind( this );
+		this.editURL = this.editURL.bind( this );
+		this.setTarget = this.setTarget.bind( this );
 
 		this.state = {
 			isEditing: true,
@@ -30,47 +32,67 @@ class MyLinkContainer extends Component {
 		this.setState( { url } );
 	}
 
-	closeLinkContainer() {
+	openURLPopover() {
 		this.setState( {
 			isVisible: true,
 		} );
 	}
 
-	submitLink() {
+	closeURLPopover() {
+		this.setState( {
+			isVisible: false,
+		} );
+	}
+
+	submitURL() {
 		// Store the url.
 		
+
+		// Switch from 'editing' to 'viewing' mode.
 		this.setState( {
 			isEditing: false,
 		} );
 	}
 
-	setLinkTarget() {
-		// Change the target setting.
+	editURL() {
+		// Switch from 'viewing' to 'editing' mode.
+		this.setState( {
+			isEditing: true,
+		} );
+	}
+
+	setTarget() {
+		// Store the updated target setting.
 	}
 
 	render() {
-		const { url, isEditing } = this.state;
+		const { url, isVisible, isEditing } = this.state;
+
+		if ( ! isVisible ) {
+			return;
+		}
+
 		return (
-			<LinkContainer
-				onClickOutside={ this.closeLinkContainer }
+			<URLPopover
+				onClickOutside={ this.closeURLPopover }
 				isEditing={ isEditing }
 				renderEditingState={ () => (
-					<form onSubmit={ this.submitLink }>
+					<form onSubmit={ this.submitURL }>
 						<input type="url" value={ url } onChange={ this.onChangeURL } />
 						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 					</form>
 				) }
-				renderPreviewState={ () => (
+				renderViewingState={ () => (
 					<div>
 						{ url }
-						<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
+						<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editURL } />
 					</div>
 				) }
 				renderSettings={ () => (
 					<ToggleControl
 						label={ __( 'Open in New Window' ) }
 						checked={ opensInNewWindow }
-						onChange={ this.setLinkTarget }
+						onChange={ this.setTarget }
 					/>
 				) }
 			/>

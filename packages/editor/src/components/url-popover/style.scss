@@ -1,11 +1,11 @@
-.editor-link-container {
-	&__popover-row {
+.editor-url-popover {
+	&__row {
 		display: flex;
 	}
 
 	// Any children of the popover-row that are not the settings-toggle
 	// should take up as much space as possible.
-	&__popover-row > :not(.editor-link-container__settings-toggle) {
+	&__row > :not(.editor-url-popover__settings-toggle) {
 		flex-grow: 1;
 	}
 
