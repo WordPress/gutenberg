@@ -9,9 +9,9 @@ import {
 	convertBlock,
 	pressWithModifier,
 	insertBlock,
-} from '../support/utils';
+} from '../../support/utils';
 
-describe( 'Lists', () => {
+describe( 'List', () => {
 	beforeEach( async () => {
 		await newPost();
 	} );
