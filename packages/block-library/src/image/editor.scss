@@ -28,6 +28,7 @@
 
 .editor-block-list__block[data-type="core/image"][data-align="center"] {
 	.wp-block-image {
+		clear: both;
 		margin-left: auto;
 		margin-right: auto;
 	}
