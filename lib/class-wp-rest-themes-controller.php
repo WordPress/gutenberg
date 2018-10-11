@@ -61,7 +61,7 @@ class WP_REST_Themes_Controller extends WP_REST_Controller {
 	 */
 	public function get_item_permissions_check( $request ) {
 		if ( ! is_user_logged_in() || ! current_user_can( 'edit_posts' ) ) {
-			return new WP_Error( 'rest_user_cannot_view', __( 'Sorry, you are not allowed to view themes.' ), array( 'status' => rest_authorization_required_code() ) );
+			return new WP_Error( 'rest_user_cannot_view', __( 'Sorry, you are not allowed to view themes.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
 		}
 
 		return true;
