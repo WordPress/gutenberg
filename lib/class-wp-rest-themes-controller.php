@@ -42,9 +42,7 @@ class WP_REST_Themes_Controller extends WP_REST_Controller {
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_item' ),
 					'permission_callback' => array( $this, 'get_item_permissions_check' ),
-					'args'                => array(
-						'context' => $this->get_context_param( array( 'default' => 'edit' ) ),
-					),
+					'args'                => array(),
 				),
 				'schema' => array( $this, 'get_item_schema' ),
 			)
@@ -128,10 +126,7 @@ class WP_REST_Themes_Controller extends WP_REST_Controller {
 			}
 		}
 
-		$context = ! empty( $request['context'] ) ? $request['context'] : 'edit';
-
 		$data = $this->add_additional_fields_to_object( $data, $request );
-		$data = $this->filter_response_by_context( $data, $context );
 
 		// Wrap the data in a response object.
 		$response = rest_ensure_response( $data );
@@ -184,43 +179,36 @@ class WP_REST_Themes_Controller extends WP_REST_Controller {
 				'name'           => array(
 					'description' => __( 'Theme name', 'gutenberg' ),
 					'type'        => 'string',
-					'context'     => array( 'edit' ),
 					'readonly'    => true,
 				),
 				'stylesheet'     => array(
 					'description' => __( 'The directory name of the theme.', 'gutenberg' ),
 					'type'        => 'string',
-					'context'     => array( 'edit' ),
 					'readonly'    => true,
 				),
 				'version'        => array(
 					'description' => __( 'Theme version', 'gutenberg' ),
 					'type'        => 'string',
-					'context'     => array( 'edit' ),
 					'readonly'    => true,
 				),
 				'template'       => array(
 					'description' => __( 'The theme template', 'gutenberg' ),
 					'type'        => 'string',
-					'context'     => array( 'edit' ),
 					'readonly'    => true,
 				),
 				'theme_supports' => array(
 					'description' => __( 'A list of features this theme supports.', 'gutenberg' ),
 					'type'        => 'array',
-					'context'     => array( 'edit' ),
 					'readonly'    => true,
 					'properties'  => array(
 						'formats'         => array(
 							'description' => __( 'Post formats supported.', 'gutenberg' ),
 							'type'        => 'array',
-							'context'     => array( 'edit' ),
 							'readonly'    => true,
 						),
 						'post-thumbnails' => array(
 							'description' => __( 'Whether the theme supports post thumbnails.', 'gutenberg' ),
 							'type'        => array( 'array', 'bool' ),
-							'context'     => array( 'edit' ),
 							'readonly'    => true,
 						),
 					),

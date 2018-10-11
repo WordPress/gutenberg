@@ -153,19 +153,6 @@ class WP_REST_Themes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 * Only the view context should be allowed.
-	 */
-	public function test_context_param() {
-		// Single.
-		$request  = new WP_REST_Request( 'OPTIONS', self::$active_theme_route );
-		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data();
-
-		$this->assertEquals( 'edit', $data['endpoints'][0]['args']['context']['default'] );
-		$this->assertEqualSets( array( 'edit' ), $data['endpoints'][0]['args']['context']['enum'] );
-	}
-
-	/**
 	 * Test an item is prepared for the response.
 	 */
 	public function test_prepare_item() {
@@ -268,7 +255,6 @@ class WP_REST_Themes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			'type'        => 'integer',
 			'description' => 'Some integer of mine',
 			'enum'        => array( 1, 2, 3, 4 ),
-			'context'     => array( 'edit' ),
 		);
 
 		register_rest_field(
@@ -329,4 +315,9 @@ class WP_REST_Themes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * The delete_item() method does not exist for themes.
 	 */
 	public function test_delete_item() {}
+
+	/**
+	 * Context is not supported for themes.
+	 */
+	public function test_context_param() {}
 }
