@@ -230,7 +230,7 @@ const config = {
 				},
 			} ) )
 		),
-		process.env.BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
+		process.env.GUTENBERG_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 		! isProduction && new LiveReloadPlugin( { port: process.env.GUTENBERG_LIVE_RELOAD_PORT || 35729 } ),
 	].filter( Boolean ),
 	stats: {
@@ -239,7 +239,7 @@ const config = {
 };
 
 if ( ! isProduction ) {
-	config.devtool = process.env.SOURCEMAP || 'source-map';
+	config.devtool = process.env.GUTENBERG_DEVTOOL || 'source-map';
 }
 
 module.exports = config;
