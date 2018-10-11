@@ -24,7 +24,7 @@ import { RichText, BlockIcon } from '@wordpress/editor';
 import WpEmbedPreview from './wp-embed-preview';
 
 const EmbedPreview = ( props ) => {
-	const { preview, url, type, caption, onCaptionChange, isSelected, className, icon, label } = props;
+	const { preview, url, type, caption, onCaptionChange, isSelected, className, icon, label, interactive } = props;
 	const { scripts } = preview;
 
 	const html = 'photo' === type ? getPhotoHtml( preview ) : preview.html;
@@ -45,6 +45,7 @@ const EmbedPreview = ( props ) => {
 				scripts={ scripts }
 				title={ iframeTitle }
 				type={ sandboxClassnames }
+				interactive={ interactive }
 			/>
 		</div>
 	);

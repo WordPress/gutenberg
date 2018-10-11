@@ -18,7 +18,7 @@ import { kebabCase, toLower } from 'lodash';
 import { __, sprintf } from '@wordpress/i18n';
 import { Component, Fragment } from '@wordpress/element';
 
-export function getEmbedEditComponent( title, icon, responsive = true ) {
+export function getEmbedEditComponent( title, icon, responsive = true, interactive = true ) {
 	return class extends Component {
 		constructor() {
 			super( ...arguments );
@@ -186,6 +186,7 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 						isSelected={ isSelected }
 						icon={ icon }
 						label={ label }
+						interactive={ interactive }
 					/>
 				</Fragment>
 			);

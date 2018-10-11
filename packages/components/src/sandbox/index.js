@@ -154,8 +154,17 @@ class Sandbox extends Component {
 				margin-top: 0 !important; /* Has to have !important to override inline styles. */
 				margin-bottom: 0 !important;
 			}
+			#wp-sandbox-overlay {
+				position: fixed;
+				width: 100%;
+				height: 100%;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+			}
 		`;
-
+		const overlayId = 'wp-sandbox-overlay';
 		// put the html snippet into a html document, and then write it to the iframe's document
 		// we can use this in the future to inject custom styles or scripts.
 		// Scripts go into the body rather than the head, to support embedded content such as Instagram
@@ -167,6 +176,7 @@ class Sandbox extends Component {
 					<style dangerouslySetInnerHTML={ { __html: style } } />
 				</head>
 				<body data-resizable-iframe-connected="data-resizable-iframe-connected" className={ this.props.type }>
+					{ ! this.props.interactive && <div id={ overlayId } /> }
 					<div dangerouslySetInnerHTML={ { __html: this.props.html } } />
 					<script type="text/javascript" dangerouslySetInnerHTML={ { __html: observeAndResizeJS } } />
 					{ ( this.props.scripts && this.props.scripts.map(
@@ -189,6 +199,7 @@ class Sandbox extends Component {
 		return {
 			html: '',
 			title: '',
+			interactive: true,
 		};
 	}
 

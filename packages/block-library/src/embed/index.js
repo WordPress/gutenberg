@@ -32,6 +32,7 @@ export const settings = getEmbedBlockSettings( {
 			},
 		],
 	},
+	interactive: false,
 } );
 
 export const common = commonEmbeds.map(
