@@ -127,7 +127,7 @@ Callback used to return the React Elements that will be rendered when the user i
 - Type: `Function`
 - Required: Yes
 
-### renderPreviewState
+### renderViewingState
 
 Callback used to return the React Elements that will be rendered when the user is viewing the url.
 
