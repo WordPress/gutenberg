@@ -107,10 +107,12 @@
 	}
 }
 
-.post-publish-panel__postpublish-link-input[readonly] {
+.post-publish-panel__postpublish-link-input {
+	margin: $grid-size-large 0;
+}
+
+.post-publish-panel__postpublish-link-input .components-text-control__input[readonly] {
 	width: 100%;
-	padding: 10px;
-	margin: 15px 0;
 	background: $white;
 	overflow: hidden;
 	text-overflow: ellipsis;
