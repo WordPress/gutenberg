@@ -111,7 +111,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 
 When registering a new block type, the `attributes` property describes the shape of the attributes object you'd like to receive in the `edit` and `save` functions. Each value is a [source function](../../docs/block-api/attributes.md) to find the desired value from the markup of the block.
 
-In the code snippet above, when loading the editor, we will extract the `content` value as the html of the paragraph element in the saved post's markup.
+In the code snippet above, when loading the editor, we will extract the `content` value as the HTML of the paragraph element in the saved post's markup.
 
 ## Components and the `RichText` Component
 
