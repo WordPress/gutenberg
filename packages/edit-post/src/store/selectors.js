@@ -104,16 +104,31 @@ export function isPublishSidebarOpened( state ) {
 }
 
 /**
- * Returns true if the editor sidebar panel is open, or false otherwise.
+ * Returns true if the given panel is enabled, or false otherwise. Panels are
+ * enabled by default.
  *
- * @param  {Object}  state Global application state.
- * @param  {string}  panel Sidebar panel name.
+ * @param {Object} state     Global application state.
+ * @param {string} panelName A string that identifies the panel.
  *
- * @return {boolean} Whether the sidebar panel is open.
+ * @return {boolean} Whether or not the panel is enabled.
  */
-export function isEditorSidebarPanelOpened( state, panel ) {
+export function isEditorPanelEnabled( state, panelName ) {
 	const panels = getPreference( state, 'panels' );
-	return panels ? !! panels[ panel ] : false;
+	return get( panels, [ panelName, 'enabled' ], true );
+}
+
+/**
+ * Returns true if the given panel is open, or false otherwise. Panels are
+ * closed by default.
+ *
+ * @param  {Object}  state     Global application state.
+ * @param  {string}  panelName A string that identifies the panel.
+ *
+ * @return {boolean} Whether or not the panel is open.
+ */
+export function isEditorPanelOpened( state, panelName ) {
+	const panels = getPreference( state, 'panels' );
+	return panels[ panelName ] === true || get( panels, [ panelName, 'opened' ], false );
 }
 
 /**

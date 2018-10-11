@@ -94,16 +94,47 @@ export function togglePublishSidebar() {
 }
 
 /**
- * Returns an action object used in signalling that use toggled a panel in the editor.
+ * Returns an action object used to enable or disable a panel in the editor.
  *
- * @param {string}  panel The panel to toggle.
+ * @param {string} panelName A string that identifies the panel to enable or disable.
+ *
+ * @return {Object} Action object.
+ */
+export function toggleEditorPanelEnabled( panelName ) {
+	return {
+		type: 'TOGGLE_PANEL_ENABLED',
+		panelName,
+	};
+}
+
+/**
+ * Returns an action object used to open or close a panel in the editor.
+ *
+ * @param {string} panelName A string that identifies the panel to open or close.
+ *
  * @return {Object} Action object.
 */
-export function toggleGeneralSidebarEditorPanel( panel ) {
+export function toggleEditorPanelOpened( panelName ) {
 	return {
-		type: 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL',
-		panel,
+		type: 'TOGGLE_PANEL_OPENED',
+		panelName,
 	};
+}
+
+/**
+ * Returns an action object used to open or close a panel in the editor.
+ *
+ * @param {string} panelName A string that identifies the panel to open or close.
+ *
+ * @return {Object} Action object.
+*/
+export function toggleGeneralSidebarEditorPanel( panelName ) {
+	deprecated( 'toggleGeneralSidebarEditorPanel', {
+		alternative: 'toggleEditorPanelOpened',
+		plugin: 'Gutenberg',
+		version: '4.3.0',
+	} );
+	return toggleEditorPanelOpened( panelName );
 }
 
 /**

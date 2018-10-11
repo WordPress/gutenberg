@@ -137,9 +137,10 @@ export async function newPost( { postType, enableTips = false } = {} ) {
 }
 
 export async function togglePrePublishChecks( ) {
-	await page.click( '.edit-post-more-menu' );
-	await page.waitForSelector( '.components-popover__content' );
-	await page.click( '.edit-post__pre-publish-checks' );
+	await clickOnMoreMenuItem( 'Options' );
+	const [ option ] = await page.$x( '//label[contains(text(), "Enable Pre-publish Checks")]' );
+	await option.click();
+	await page.click( 'button[aria-label="Close dialog"]' );
 }
 
 export async function arePrePublishChecksEnabled( ) {

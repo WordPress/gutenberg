@@ -1,0 +1,36 @@
+.edit-post-options {
+	min-width: 450px;
+
+	&__title {
+		font-size: 1rem;
+		font-weight: bold;
+	}
+
+	&__section {
+		margin: 0 0 2rem 0;
+	}
+
+	&__section-title {
+		font-size: 0.9rem;
+		font-weight: bold;
+	}
+
+	&__option {
+		display: flex;
+		align-items: center;
+		padding: 0.6rem 0;
+		border-top: 1px solid $light-gray-500;
+
+		&:last-child {
+			border-bottom: 1px solid $light-gray-500;
+		}
+
+		.components-base-control__field {
+			margin: 0;
+		}
+
+		.components-checkbox-control__input {
+			margin-right: 10px;
+		}
+	}
+}

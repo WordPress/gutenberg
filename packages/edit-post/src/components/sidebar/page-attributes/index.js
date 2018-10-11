@@ -40,19 +40,19 @@ export function PageAttributes( { isOpened, onTogglePanel, postType } ) {
 
 const applyWithSelect = withSelect( ( select ) => {
 	const { getEditedPostAttribute } = select( 'core/editor' );
-	const { isEditorSidebarPanelOpened } = select( 'core/edit-post' );
+	const { isEditorPanelOpened } = select( 'core/edit-post' );
 	const { getPostType } = select( 'core' );
 	return {
-		isOpened: isEditorSidebarPanelOpened( PANEL_NAME ),
+		isOpened: isEditorPanelOpened( PANEL_NAME ),
 		postType: getPostType( getEditedPostAttribute( 'type' ) ),
 	};
 } );
 
 const applyWithDispatch = withDispatch( ( dispatch ) => {
-	const { toggleGeneralSidebarEditorPanel } = dispatch( 'core/edit-post' );
+	const { toggleEditorPanelOpened } = dispatch( 'core/edit-post' );
 
 	return {
-		onTogglePanel: partial( toggleGeneralSidebarEditorPanel, PANEL_NAME ),
+		onTogglePanel: partial( toggleEditorPanelOpened, PANEL_NAME ),
 	};
 } );
 
