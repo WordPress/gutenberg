@@ -41,7 +41,7 @@ The editor includes a number of packages to enable various pieces of functionali
 | [Viewport](https://wordpress.org/gutenberg/handbook/packages/packages-viewport/) | wp-viewport | Module for responding to changes in the browser viewport size |
 | [Wordcount](https://wordpress.org/gutenberg/handbook/packages/packages-wordcount/) | wp-wordcount | WordPress word count utility |
 
-## Vendor Script
+## Vendor Scripts
 
 The editor also uses some popular third-party packages and scripts. Plugin developers can use these scripts as well without bundling them in their code (and increasing file sizes).
 
@@ -52,6 +52,13 @@ The editor also uses some popular third-party packages and scripts. Plugin devel
 | [Moment](https://momentjs.com/) | moment| Parse, validate, manipulate, and display dates and times in JavaScript |
 | [TinyMCE Lists](https://www.tiny.cloud/docs/plugins/lists/) | tinymce-latest-lists| The `lists` plugin allows you to add numbered and bulleted lists to TinyMCE |
 | [Lodash](https://lodash.com) | lodash| Lodash is a JavaScript library which provides utility functions for common programming tasks |
+
+## Polyfill Scripts
+
+The editor also uses some polyfill for compatibility with major browsers.
+
+| Script Name | Handle | Description |
+|-------------|--------|-------------|
 | [Fetch Polyfill](https://www.npmjs.com/package/whatwg-fetch) | wp-polyfill-fetch | Polyfill that implements a subset of the standard Fetch specification |
 | [Promise Polyfill](https://www.npmjs.com/package/promise-polyfill) | wp-polyfill-promise| Lightweight ES6 Promise polyfill for the browser and node |
 | [Formdata Polyfill](https://www.npmjs.com/package/formdata-polyfill) | wp-polyfill-formdata| Polyfill conditionally replaces the native implementation |
