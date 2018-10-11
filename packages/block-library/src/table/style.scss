@@ -17,4 +17,20 @@
 		// width as auto.
 		width: auto;
 	}
+
+	// "Stripes" style variation.
+	&.is-style-stripes {
+		border-spacing: 0;
+		border-collapse: inherit;
+
+		tr:nth-child(odd) {
+			background-color: $light-gray-200;
+		}
+
+		td {
+			border-color: transparent;
+		}
+
+		border-bottom: 1px solid $light-gray-200;
+	}
 }
