@@ -333,6 +333,9 @@ function gutenberg_ensure_wp_json_has_theme_supports( $response ) {
 			$site_info['theme_supports']['post-thumbnails'] = is_array( $post_thumbnails ) ? $post_thumbnails[0] : true;
 		}
 	}
+	if ( ! array_key_exists( 'responsive-embeds', $site_info['theme_supports'] ) ) {
+		$site_info['theme_supports']['responsive-embeds'] = get_theme_support( 'responsive-embeds' );
+	}
 	$response->set_data( $site_info );
 	return $response;
 }

@@ -257,7 +257,7 @@ export function getEmbedEdit( title, icon ) {
 		render() {
 			const { url, editingURL } = this.state;
 			const { caption, type, allowResponsive } = this.props.attributes;
-			const { fetching, setAttributes, isSelected, className, preview, previewIsFallback } = this.props;
+			const { fetching, setAttributes, isSelected, className, preview, previewIsFallback, supportsResponsive } = this.props;
 			// We have a URL, but couldn't get a preview, or the preview was the oEmbed fallback.
 			const cannotEmbed = url && ( ! preview || previewIsFallback );
 			const controls = (
@@ -274,16 +274,18 @@ export function getEmbedEdit( title, icon ) {
 							) }
 						</Toolbar>
 					</BlockControls>
-					<InspectorControls>
-						<PanelBody title={ __( 'Media Settings' ) } className="blocks-responsive">
-							<ToggleControl
-								label={ __( 'Automatically scale content' ) }
-								checked={ allowResponsive }
-								help={ this.getResponsiveHelp }
-								onChange={ this.toggleResponsive }
-							/>
-						</PanelBody>
-					</InspectorControls>
+					{ supportsResponsive && (
+						<InspectorControls>
+							<PanelBody title={ __( 'Media Settings' ) } className="blocks-responsive">
+								<ToggleControl
+									label={ __( 'Automatically scale content' ) }
+									checked={ allowResponsive }
+									help={ this.getResponsiveHelp }
+									onChange={ this.toggleResponsive }
+								/>
+							</PanelBody>
+						</InspectorControls>
+					) }
 				</Fragment>
 			);
 
@@ -410,10 +412,11 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 			withSelect( ( select, ownProps ) => {
 				const { url } = ownProps.attributes;
 				const core = select( 'core' );
-				const { getEmbedPreview, isPreviewEmbedFallback, isRequestingEmbedPreview } = core;
+				const { getEmbedPreview, isPreviewEmbedFallback, isRequestingEmbedPreview, getThemeSupports } = core;
 				const preview = url && getEmbedPreview( url );
 				const previewIsFallback = url && isPreviewEmbedFallback( url );
 				const fetching = undefined !== url && isRequestingEmbedPreview( url );
+				const themeSupports = getThemeSupports();
 				// Some WordPress URLs that can't be embedded will cause the API to return
 				// a valid JSON response with no HTML and `data.status` set to 404, rather
 				// than generating a fallback response as other embeds do.
@@ -422,6 +425,7 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 					preview: validPreview && preview,
 					previewIsFallback,
 					fetching,
+					supportsResponsive: themeSupports[ 'responsive-embeds' ],
 				};
 			} )
 		)( getEmbedEdit( title, icon ) ),
