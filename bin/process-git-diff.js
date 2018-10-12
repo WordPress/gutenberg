@@ -1,6 +1,7 @@
 // npm will introduce changes to a `package-lock.json` file for optional
-// dependencies varying on environment. Disregard from a git diff result when
-// only changes are addition of "optional" flag in `package-lock.json` file.
+// dependencies varying on environment. If the only changes are the
+// addition of an "optional" flag in `package-lock.json` file from
+// `git diff`: we ignore the results.
 //
 // See: https://github.com/npm/npm/issues/17722
 
