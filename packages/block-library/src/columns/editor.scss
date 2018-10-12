@@ -6,13 +6,6 @@
 	margin-left: 0;
 	margin-right: 0;
 
-	&:first-child {
-		margin-left: -$block-padding;
-	}
-	&:last-child {
-		margin-right: -$block-padding;
-	}
-
 	// This max-width is used to constrain the main editor column, it should not cascade into columns
 	.editor-block-list__block {
 		max-width: none;
@@ -58,6 +51,31 @@
 			display: flex;
 			flex-direction: column;
 			flex: 1;
+
+			// The Column block is a child of the Columns block and is mostly a passthrough container.
+			// Therefore it shouldn't add additional paddings and margins, so we reset these, and compensate for margins.
+			// @todo In the future, if a passthrough feature lands, it would be good to apply these rules to such an element in a more generic way.
+			padding-left: $block-padding;
+			padding-right: $block-padding;
+			margin-top: -$block-padding;
+			margin-bottom: -$block-padding;
+
+			> .editor-block-contextual-toolbar {
+				top: $block-toolbar-height - $border-width;
+				transform: translateY(-$block-toolbar-height - $border-width);
+				margin-left: -$block-padding - $block-padding - $border-width;
+			}
+
+			> .editor-block-list__block-edit::before {
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 0;
+			}
+
+			> .editor-block-list__breadcrumb {
+				margin-right: -$block-padding - $border-width;
+			}
 
 			// Every .editor-block-list__block has auto-left/right margins, which centers columns.
 			// Since they aren't centered on the front-end, we explicitly set a zero left margin here.
