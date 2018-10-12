@@ -198,6 +198,12 @@
 		"parent": "reference"
 	},
 	{
+		"title": "Scripts",
+		"slug": "scripts",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/reference/scripts.md",
+		"parent": "reference"
+	},
+	{
 		"title": "Deprecated Features",
 		"slug": "deprecated",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/reference/deprecated.md",
@@ -244,12 +250,6 @@
 		"slug": "packages",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/packages.md",
 		"parent": null
-	},
-	{
-		"title": "Scripts",
-		"slug": "packages",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/reference/scripts.md",
-		"parent": "reference"
 	},
 	{
 		"title": "@wordpress/a11y",
