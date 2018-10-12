@@ -55,7 +55,7 @@ Use `html` to extract the inner HTML from markup.
 // { "content": "The inner text of the <strong>figcaption</strong> element" }
 ```
 
-Use the `multiline` property to extract the inner HTML for the use in `RichText` with the `multiline` prop.
+Use the `multiline` property to extract the inner HTML of matching tag names for the use in `RichText` with the `multiline` prop.
 
 ```js
 {
@@ -65,7 +65,7 @@ Use the `multiline` property to extract the inner HTML for the use in `RichText`
 		selector: 'blockquote',
 	}
 }
-// { "content": "<p>Quoted text</p><p>And more</p>" }
+// { "content": "<p>First line</p><p>Second line</p>" }
 ```
 
 ### `query`
