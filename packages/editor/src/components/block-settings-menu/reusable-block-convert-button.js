@@ -50,7 +50,10 @@ export function ReusableBlockConvertButton( {
 export default compose( [
 	withSelect( ( select, { clientIds } ) => {
 		const { getBlock, getReusableBlock } = select( 'core/editor' );
-		const { getFallbackBlockName } = select( 'core/blocks' );
+		const {
+			getFreeformFallbackBlockName,
+			getUnregisteredFallbackBlockName,
+		} = select( 'core/blocks' );
 
 		const blocks = map( clientIds, ( clientId ) => getBlock( clientId ) );
 
@@ -58,7 +61,10 @@ export default compose( [
 		// confusing UX, because of its similarity to the 'Convert to Blocks' button.
 		const isVisible = (
 			every( blocks, ( block ) => !! block ) &&
-			( blocks.length !== 1 || blocks[ 0 ].name !== getFallbackBlockName() )
+			( blocks.length !== 1 || (
+				blocks[ 0 ].name !== getFreeformFallbackBlockName() &&
+				blocks[ 0 ].name !== getUnregisteredFallbackBlockName()
+			) )
 		);
 
 		return {

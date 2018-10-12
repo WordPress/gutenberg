@@ -13,6 +13,8 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 - Attribute type coercion has been removed. Omit the source to preserve type via serialized comment demarcation.
 - `mediaDetails` in object passed to `onFileChange` callback of `wp.editor.mediaUpload`. Please use `media_details` property instead.
 - `wp.components.CodeEditor` has been removed. Used `wp.codeEditor` directly instead.
+- `wp.blocks.setUnknownTypeHandlerName` has been removed. Please use `setFreeformContentHandlerName` and `setUnregisteredTypeHandlerName` instead.
+- `wp.blocks.getUnknownTypeHandlerName` has been removed. Please use `getFreeformContentHandlerName` and `getUnregisteredTypeHandlerName` instead.
 
 ## 4.1.0
 

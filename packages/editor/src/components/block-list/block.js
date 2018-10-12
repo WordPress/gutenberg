@@ -21,6 +21,7 @@ import {
 	getSaveElement,
 	isReusableBlock,
 	isUnmodifiedDefaultBlock,
+	getUnregisteredTypeHandlerName,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -382,6 +383,8 @@ export class BlockListBlock extends Component {
 		// The block as rendered in the editor is composed of general block UI
 		// (mover, toolbar, wrapper) and the display of the block content.
 
+		const isUnregisteredBlock = block.name === getUnregisteredTypeHandlerName();
+
 		// If the block is selected and we're typing the block should not appear.
 		// Empty paragraph blocks should always show up as unselected.
 		const showEmptyBlockSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock && isValid;
@@ -404,7 +407,7 @@ export class BlockListBlock extends Component {
 
 		// Generate the wrapper class names handling the different states of the block.
 		const wrapperClassName = classnames( 'editor-block-list__block', {
-			'has-warning': ! isValid || !! error,
+			'has-warning': ! isValid || !! error || isUnregisteredBlock,
 			'is-selected': shouldAppearSelected,
 			'is-multi-selected': isPartOfMultiSelection,
 			'is-selected-parent': shouldAppearSelectedParent,
