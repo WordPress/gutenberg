@@ -783,6 +783,26 @@ export function getBlockRootClientId( state, clientId ) {
 }
 
 /**
+ * Given a block client ID, returns the root of the hierarchy from which the block is
+ * nested, return the block itself for root level blocks.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block from which to find root client ID.
+ *
+ * @return {string} Root client ID
+ */
+export function getBlockHierarchyRootClientId( state, clientId ) {
+	let rootClientId = clientId;
+	let current = clientId;
+	while ( rootClientId ) {
+		current = rootClientId;
+		rootClientId = getBlockRootClientId( state, current );
+	}
+
+	return current;
+}
+
+/**
  * Returns the client ID of the block adjacent one at the given reference
  * startClientId and modifier directionality. Defaults start startClientId to
  * the selected block, and direction as next block. Returns null if there is no
