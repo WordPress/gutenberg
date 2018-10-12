@@ -406,17 +406,14 @@ export function createBlockWithFallback( blockNode ) {
 	} = blockNode;
 	const freeformContentFallbackBlock = getFreeformContentHandlerName();
 	const unregisteredFallbackBlock = getUnregisteredTypeHandlerName() || freeformContentFallbackBlock;
-	const isFallbackBlock = ( name ) => (
-		name === freeformContentFallbackBlock ||
-		name === unregisteredFallbackBlock
-	);
 
 	attributes = attributes || {};
 
 	// Trim content to avoid creation of intermediary freeform segments.
 	const originalUndelimitedContent = innerHTML = innerHTML.trim();
 
-	// Use type from block content if available. Otherwise, default to the freeform content fallback.
+	// Use type from block content if available. Otherwise, default to the
+	// freeform content fallback.
 	let name = originalName || freeformContentFallbackBlock;
 
 	// Convert 'core/text' blocks in existing content to 'core/paragraph'.
@@ -449,8 +446,13 @@ export function createBlockWithFallback( blockNode ) {
 	// Coerce inner blocks from parsed form to canonical form.
 	innerBlocks = innerBlocks.map( createBlockWithFallback );
 
-	// Include in set only if type were determined.
-	if ( ! blockType || ( ! innerHTML && isFallbackBlock( name ) ) ) {
+	const isFallbackBlock = (
+		name === freeformContentFallbackBlock ||
+		name === unregisteredFallbackBlock
+	);
+
+	// Include in set only if type was determined.
+	if ( ! blockType || ( ! innerHTML && isFallbackBlock ) ) {
 		return;
 	}
 
@@ -464,7 +466,7 @@ export function createBlockWithFallback( blockNode ) {
 	// provided there are no changes in attributes. The validation procedure thus compares the
 	// provided source value with the serialized output before there are any modifications to
 	// the block. When both match, the block is marked as valid.
-	if ( ! isFallbackBlock( name ) ) {
+	if ( ! isFallbackBlock ) {
 		block.isValid = isValidBlock( innerHTML, blockType, block.attributes );
 	}
 
