@@ -96,19 +96,19 @@ class WP_REST_Themes_Controller extends WP_REST_Controller {
 		$fields = $this->get_fields_for_response( $request );
 
 		if ( in_array( 'name', $fields, true ) ) {
-			$data['name'] = $theme->__get( 'name' );
+			$data['name'] = $theme->get( 'Name' );
 		}
 
 		if ( in_array( 'stylesheet', $fields, true ) ) {
-			$data['stylesheet'] = $theme->__get( 'stylesheet' );
+			$data['stylesheet'] = $theme->get_stylesheet();
 		}
 
 		if ( in_array( 'version', $fields, true ) ) {
-			$data['version'] = $theme->__get( 'version' );
+			$data['version'] = $theme->get( 'Version' );
 		}
 
 		if ( in_array( 'template', $fields, true ) ) {
-			$data['template'] = $theme->__get( 'template' );
+			$data['template'] = $theme->get_template();
 		}
 
 		if ( in_array( 'theme_supports', $fields, true ) ) {

@@ -63,10 +63,10 @@ class WP_REST_Themes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			$links = $response['_links'];
 		}
 
-		$this->assertEquals( self::$current_theme->__get( 'name' ), $response['name'] );
-		$this->assertEquals( self::$current_theme->__get( 'stylesheet' ), $response['stylesheet'] );
-		$this->assertEquals( self::$current_theme->__get( 'version' ), $response['version'] );
-		$this->assertEquals( self::$current_theme->__get( 'template' ), $response['template'] );
+		$this->assertEquals( self::$current_theme->get( 'Name' ), $response['name'] );
+		$this->assertEquals( self::$current_theme->get_stylesheet(), $response['stylesheet'] );
+		$this->assertEquals( self::$current_theme->get( 'Version' ), $response['version'] );
+		$this->assertEquals( self::$current_theme->get_template( 'template' ), $response['template'] );
 	}
 
 	/**
