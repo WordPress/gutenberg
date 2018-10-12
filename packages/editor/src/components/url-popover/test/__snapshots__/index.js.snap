@@ -1,18 +1,17 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`URLPopover matches the snapshot when editing the url 1`] = `
+exports[`URLPopover matches the snapshot in its default state 1`] = `
 <Popover
   className="editor-url-popover"
   focusOnMount="firstElement"
   noArrow={false}
-  onClickOutside={[Function]}
   position="bottom center"
 >
   <div
     className="editor-url-popover__row"
   >
     <div>
-      Editing
+      Editor
     </div>
     <IconButton
       aria-expanded={false}
@@ -30,14 +29,13 @@ exports[`URLPopover matches the snapshot when the settings are toggled open 1`] 
   className="editor-url-popover"
   focusOnMount="firstElement"
   noArrow={false}
-  onClickOutside={[Function]}
   position="bottom center"
 >
   <div
     className="editor-url-popover__row"
   >
     <div>
-      Editing
+      Editor
     </div>
     <IconButton
       aria-expanded={true}
@@ -62,40 +60,14 @@ exports[`URLPopover matches the snapshot when there are no settings 1`] = `
   className="editor-url-popover"
   focusOnMount="firstElement"
   noArrow={false}
-  onClickOutside={[Function]}
   position="bottom center"
 >
   <div
     className="editor-url-popover__row"
   >
     <div>
-      Editing
+      Editor
     </div>
-  </div>
-</Popover>
-`;
-
-exports[`URLPopover matches the snapshot when viewing the url 1`] = `
-<Popover
-  className="editor-url-popover"
-  focusOnMount={false}
-  noArrow={false}
-  onClickOutside={[Function]}
-  position="bottom center"
->
-  <div
-    className="editor-url-popover__row"
-  >
-    <div>
-      Viewing
-    </div>
-    <IconButton
-      aria-expanded={false}
-      className="editor-url-popover__settings-toggle"
-      icon="ellipsis"
-      label="Link Settings"
-      onClick={[Function]}
-    />
   </div>
 </Popover>
 `;

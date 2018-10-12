@@ -19,11 +19,9 @@ class MyURLPopover extends Component {
 		this.openURLPopover = this.closeURLPopover.bind( this );
 		this.closeURLPopover = this.closeURLPopover.bind( this );
 		this.submitURL = this.submitURL.bind( this );
-		this.editURL = this.editURL.bind( this );
 		this.setTarget = this.setTarget.bind( this );
 
 		this.state = {
-			isEditing: true,
 			isVisible: false,
 		};
 	}
@@ -46,19 +44,6 @@ class MyURLPopover extends Component {
 
 	submitURL() {
 		// Store the url.
-		
-
-		// Switch from 'editing' to 'viewing' mode.
-		this.setState( {
-			isEditing: false,
-		} );
-	}
-
-	editURL() {
-		// Switch from 'viewing' to 'editing' mode.
-		this.setState( {
-			isEditing: true,
-		} );
 	}
 
 	setTarget() {
@@ -75,18 +60,11 @@ class MyURLPopover extends Component {
 		return (
 			<URLPopover
 				onClickOutside={ this.closeURLPopover }
-				isEditing={ isEditing }
-				renderEditingState={ () => (
+				renderURLEditor={ () => (
 					<form onSubmit={ this.submitURL }>
 						<input type="url" value={ url } onChange={ this.onChangeURL } />
 						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 					</form>
-				) }
-				renderViewingState={ () => (
-					<div>
-						{ url }
-						<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editURL } />
-					</div>
 				) }
 				renderSettings={ () => (
 					<ToggleControl
@@ -120,16 +98,10 @@ Handles an event triggered when the user clicks outside of the Popover.
 - Type: `Function`
 - Required: No
 
-### renderEditingState
+### renderURLEditor
 
-Callback used to return the React Elements that will be rendered when the user is editing the url.
-
-- Type: `Function`
-- Required: Yes
-
-### renderViewingState
-
-Callback used to return the React Elements that will be rendered when the user is viewing the url.
+Callback used to return the rendered elements for editing the URL—usually a form with an input field that allows
+the user to type in a URL and a submit button.
 
 - Type: `Function`
 - Required: Yes

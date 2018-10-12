@@ -24,12 +24,11 @@ class URLPopover extends Component {
 
 	render() {
 		const {
-			isEditing,
-			renderEditingState,
-			renderViewingState,
+			renderURLEditor,
 			renderSettings,
 			position,
 			onClickOutside,
+			focusOnMount = 'firstElement',
 		} = this.props;
 
 		const {
@@ -41,12 +40,12 @@ class URLPopover extends Component {
 		return (
 			<Popover
 				className="editor-url-popover"
-				focusOnMount={ isEditing ? 'firstElement' : false }
+				focusOnMount={ focusOnMount }
 				position={ position || 'bottom center' }
 				onClickOutside={ onClickOutside }
 			>
 				<div className="editor-url-popover__row">
-					{ isEditing ? renderEditingState() : renderViewingState() }
+					{ renderURLEditor() }
 					{ !! renderSettings ? (
 						<IconButton
 							className="editor-url-popover__settings-toggle"

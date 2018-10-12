@@ -53,6 +53,39 @@ function isShowingInput( props, state ) {
 	return props.addingLink || state.editLink;
 }
 
+const LinkEditor = ( { inputValue, onChangeInputValue, onKeyDown, submitLink } ) => (
+	// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
+	/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+	<form
+		className="editor-format-toolbar__link-container-content"
+		onKeyPress={ stopKeyPropagation }
+		onKeyDown={ onKeyDown }
+		onSubmit={ submitLink }
+	>
+		<URLInput value={ inputValue } onChange={ onChangeInputValue } />
+		<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
+	</form>
+	/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
+);
+
+const LinkViewer = ( { href, editLink } ) => (
+	// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
+	/* eslint-disable jsx-a11y/no-static-element-interactions */
+	<div
+		className="editor-format-toolbar__link-container-content"
+		onKeyPress={ stopKeyPropagation }
+	>
+		<ExternalLink
+			className="editor-format-toolbar__link-container-value"
+			href={ href }
+		>
+			{ filterURLForDisplay( decodeURI( href ) ) }
+		</ExternalLink>
+		<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ editLink } />
+	</div>
+	/* eslint-enable jsx-a11y/no-static-element-interactions */
+);
+
 class LinkContainer extends Component {
 	constructor() {
 		super( ...arguments );
@@ -160,37 +193,19 @@ class LinkContainer extends Component {
 				>
 					<URLPopover
 						onClickOutside={ this.resetState }
-						isEditing={ showInput }
-						renderEditingState={ () => (
-							// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
-							/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-							<form
-								className="editor-format-toolbar__link-container-content"
-								onKeyPress={ stopKeyPropagation }
+						focusOnMount={ showInput ? 'firstElement' : false }
+						renderURLEditor={ () => showInput ? (
+							<LinkEditor
+								inputValue={ inputValue }
+								onChangeInputValue={ this.onChangeInputValue }
 								onKeyDown={ this.onKeyDown }
-								onSubmit={ this.submitLink }
-							>
-								<URLInput value={ inputValue } onChange={ this.onChangeInputValue } />
-								<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
-							</form>
-							/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
-						) }
-						renderViewingState={ () => (
-							// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
-							/* eslint-disable jsx-a11y/no-static-element-interactions */
-							<div
-								className="editor-format-toolbar__link-container-content"
-								onKeyPress={ stopKeyPropagation }
-							>
-								<ExternalLink
-									className="editor-format-toolbar__link-container-value"
-									href={ href }
-								>
-									{ filterURLForDisplay( decodeURI( href ) ) }
-								</ExternalLink>
-								<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
-							</div>
-							/* eslint-enable jsx-a11y/no-static-element-interactions */
+								submitLink={ this.submitLink }
+							/>
+						) : (
+							<LinkViewer
+								href={ href }
+								editLink={ this.editLink }
+							/>
 						) }
 						renderSettings={ () => (
 							<ToggleControl

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { shallow } from 'enzyme';
-import { noop } from 'lodash';
 
 /**
  * Internal dependencies
@@ -10,36 +9,11 @@ import { noop } from 'lodash';
 import URLPopover from '../';
 
 describe( 'URLPopover', () => {
-	it( 'matches the snapshot when viewing the url', () => {
+	it( 'matches the snapshot in its default state', () => {
 		const wrapper = shallow(
 			<URLPopover
-				onClickOutside={ noop }
-				isEditing={ false }
-				renderEditingState={ () => (
-					<div>Editing</div>
-				) }
-				renderViewingState={ () => (
-					<div>Viewing</div>
-				) }
-				renderSettings={ () => (
-					<div>Settings</div>
-				) }
-			/>
-		);
-
-		expect( wrapper ).toMatchSnapshot();
-	} );
-
-	it( 'matches the snapshot when editing the url', () => {
-		const wrapper = shallow(
-			<URLPopover
-				onClickOutside={ noop }
-				isEditing={ true }
-				renderEditingState={ () => (
-					<div>Editing</div>
-				) }
-				renderViewingState={ () => (
-					<div>Viewing</div>
+				renderURLEditor={ () => (
+					<div>Editor</div>
 				) }
 				renderSettings={ () => (
 					<div>Settings</div>
@@ -53,13 +27,8 @@ describe( 'URLPopover', () => {
 	it( 'matches the snapshot when the settings are toggled open', () => {
 		const wrapper = shallow(
 			<URLPopover
-				onClickOutside={ noop }
-				isEditing={ true }
-				renderEditingState={ () => (
-					<div>Editing</div>
-				) }
-				renderViewingState={ () => (
-					<div>Viewing</div>
+				renderURLEditor={ () => (
+					<div>Editor</div>
 				) }
 				renderSettings={ () => (
 					<div>Settings</div>
@@ -77,13 +46,8 @@ describe( 'URLPopover', () => {
 	it( 'matches the snapshot when there are no settings', () => {
 		const wrapper = shallow(
 			<URLPopover
-				onClickOutside={ noop }
-				isEditing={ true }
-				renderEditingState={ () => (
-					<div>Editing</div>
-				) }
-				renderViewingState={ () => (
-					<div>Viewing</div>
+				renderURLEditor={ () => (
+					<div>Editor</div>
 				) }
 			/>
 		);
