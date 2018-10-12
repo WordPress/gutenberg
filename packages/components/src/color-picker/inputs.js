@@ -1,8 +1,14 @@
 /**
+ * External dependencies
+ */
+import { omit } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
+import { DOWN, ENTER, UP } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -10,6 +16,68 @@ import { Component } from '@wordpress/element';
 import IconButton from '../icon-button';
 import { isValidHex } from './utils';
 import TextControl from '../text-control';
+
+/* Wrapper for TextControl, only used to handle intermediate state while typing. */
+class Input extends Component {
+	constructor( { value } ) {
+		super( ...arguments );
+		this.state = { value: String( value ).toLowerCase() };
+		this.handleBlur = this.handleBlur.bind( this );
+		this.handleChange = this.handleChange.bind( this );
+		this.handleKeyDown = this.handleKeyDown.bind( this );
+	}
+
+	componentWillReceiveProps( nextProps ) {
+		if ( nextProps.value !== this.props.value ) {
+			this.setState( {
+				value: String( nextProps.value ).toLowerCase(),
+			} );
+		}
+	}
+
+	handleBlur() {
+		const { label, onChange } = this.props;
+		const { value } = this.state;
+		const propName = String( label ).toLowerCase();
+		onChange( { [ propName ]: value } );
+	}
+
+	handleChange( value ) {
+		const { label, onChange } = this.props;
+		// Protect against expanding a value while we're typing.
+		if ( value.length > 4 ) {
+			const propName = String( label ).toLowerCase();
+			onChange( { [ propName ]: value } );
+		}
+		this.setState( { value } );
+	}
+
+	handleKeyDown( { keyCode } ) {
+		if ( keyCode !== ENTER && keyCode !== UP && keyCode !== DOWN ) {
+			return;
+		}
+		const { value } = this.state;
+		const { label, onChange } = this.props;
+		const propName = String( label ).toLowerCase();
+		onChange( { [ propName ]: value } );
+	}
+
+	render() {
+		const { label, ...props } = this.props;
+		const { value } = this.state;
+		return (
+			<TextControl
+				className="components-color-picker__inputs-field"
+				label={ label }
+				value={ value }
+				onChange={ ( newValue ) => this.handleChange( newValue ) }
+				onBlur={ this.handleBlur }
+				onKeyDown={ this.handleKeyDown }
+				{ ...omit( props, [ 'onChange', 'value' ] ) }
+			/>
+		);
+	}
+}
 
 export class Inputs extends Component {
 	constructor( { hsl } ) {
@@ -94,114 +162,107 @@ export class Inputs extends Component {
 		const { disableAlpha = false } = this.props;
 		if ( this.state.view === 'hex' ) {
 			return (
-				<fieldset className="components-color-picker__inputs-fields">
+				<fieldset>
 					<legend className="screen-reader-text">
 						{ __( 'Color value in HEX' ) }
 					</legend>
-					<TextControl
-						className="components-color-picker__inputs-field"
-						label="hex"
-						value={ this.props.hex }
-						onChange={ ( value ) => this.handleChange( { hex: value } ) }
-					/>
+					<div className="components-color-picker__inputs-fields">
+						<Input
+							label="hex"
+							value={ this.props.hex }
+							onChange={ this.handleChange }
+						/>
+					</div>
 				</fieldset>
 			);
 		} else if ( this.state.view === 'rgb' ) {
 			return (
-				<fieldset className="components-color-picker__inputs-fields">
+				<fieldset>
 					<legend className="screen-reader-text">
 						{ __( 'Color value in RGB' ) }
 					</legend>
-					<TextControl
-						className="components-color-picker__inputs-field"
-						label="r"
-						type="number"
-						min="0"
-						max="255"
-						value={ this.props.rgb.r }
-						onChange={ ( value ) => this.handleChange( { r: value } ) }
-					/>
-					<TextControl
-						className="components-color-picker__inputs-field"
-						label="g"
-						type="number"
-						min="0"
-						max="255"
-						value={ this.props.rgb.g }
-						onChange={ ( value ) => this.handleChange( { g: value } ) }
-					/>
-					<TextControl
-						className="components-color-picker__inputs-field"
-						label="b"
-						type="number"
-						min="0"
-						max="255"
-						value={ this.props.rgb.b }
-						onChange={ ( value ) => this.handleChange( { b: value } ) }
-					/>
-					{ disableAlpha ? null : (
-						<TextControl
-							className="components-color-picker__inputs-field"
-							label="a"
+					<div className="components-color-picker__inputs-fields">
+						<Input
+							label="r"
+							value={ this.props.rgb.r }
+							onChange={ this.handleChange }
 							type="number"
 							min="0"
-							max="1"
-							step="0.05"
-							value={ this.props.rgb.a }
-							onChange={ ( value ) =>
-								this.handleChange( { a: value } )
-							}
+							max="255"
 						/>
-					) }
+						<Input
+							label="g"
+							value={ this.props.rgb.g }
+							onChange={ this.handleChange }
+							type="number"
+							min="0"
+							max="255"
+						/>
+						<Input
+							label="b"
+							value={ this.props.rgb.b }
+							onChange={ this.handleChange }
+							type="number"
+							min="0"
+							max="255"
+						/>
+						{ disableAlpha ? null : (
+							<Input
+								label="a"
+								value={ this.props.rgb.a }
+								onChange={ this.handleChange }
+								type="number"
+								min="0"
+								max="1"
+								step="0.05"
+							/>
+						) }
+					</div>
 				</fieldset>
 			);
 		} else if ( this.state.view === 'hsl' ) {
 			return (
-				<fieldset className="components-color-picker__inputs-fields">
+				<fieldset>
 					<legend className="screen-reader-text">
 						{ __( 'Color value in HSL' ) }
 					</legend>
-					<TextControl
-						className="components-color-picker__inputs-field"
-						label="h"
-						type="number"
-						min="0"
-						max="359"
-						value={ Math.round( this.props.hsl.h ) }
-						onChange={ ( value ) => this.handleChange( { h: value } ) }
-					/>
-					<TextControl
-						className="components-color-picker__inputs-field"
-						label="s"
-						type="number"
-						min="0"
-						max="100"
-						value={ Math.round( this.props.hsl.s * 100 ) }
-						onChange={ ( value ) => this.handleChange( { s: value } ) }
-					/>
-					<TextControl
-						className="components-color-picker__inputs-field"
-						label="l"
-						type="number"
-						min="0"
-						max="100"
-						value={ Math.round( this.props.hsl.l * 100 ) }
-						onChange={ ( value ) => this.handleChange( { l: value } ) }
-					/>
-					{ disableAlpha ? null : (
-						<TextControl
-							className="components-color-picker__inputs-field"
-							label="a"
+					<div className="components-color-picker__inputs-fields">
+						<Input
+							label="h"
+							value={ Math.round( this.props.hsl.h ) }
+							onChange={ this.handleChange }
 							type="number"
 							min="0"
-							max="1"
-							step="0.05"
-							value={ this.props.hsl.a }
-							onChange={ ( value ) =>
-								this.handleChange( { a: value } )
-							}
+							max="359"
 						/>
-					) }
+						<Input
+							label="s"
+							value={ Math.round( this.props.hsl.s * 100 ) }
+							onChange={ this.handleChange }
+							type="number"
+							min="0"
+							max="100"
+						/>
+						<Input
+							label="l"
+							value={ Math.round( this.props.hsl.l * 100 ) }
+							onChange={ this.handleChange }
+							type="number"
+							min="0"
+							max="100"
+						/>
+						{ disableAlpha ? null : (
+							<Input
+								label="a"
+								value={ this.props.hsl.a }
+								onChange={ this.handleChange }
+								type="number"
+								min="0"
+								max="1"
+								step="0.05"
+							/>
+						) }
+					</div>
 				</fieldset>
 			);
 		}
