@@ -55,7 +55,7 @@ The editor also uses some popular third-party packages and scripts. Plugin devel
 
 ## Polyfill Scripts
 
-The editor also uses some polyfill for compatibility with major browsers.
+The editor also provides polyfills for certain features that may not be available in all modern browsers
 
 | Script Name | Handle | Description |
 |-------------|--------|-------------|
