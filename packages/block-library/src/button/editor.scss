@@ -31,9 +31,16 @@ $blocks-button__line-height: $big-font-size + 6px;
 		opacity: 0.8;
 	}
 
-	.editor-block-styles__item & .wp-block-button__link {
-		white-space: nowrap;
-		text-overflow: ellipsis;
+	// Don't let the placeholder text wrap in the variation preview.
+	.editor-block-styles__item-preview & {
+		max-width: 100%;
+
+		.wp-block-button__link {
+			max-width: 100%;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
 	}
 }
 
