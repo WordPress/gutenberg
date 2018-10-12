@@ -246,6 +246,12 @@
 		"parent": null
 	},
 	{
+		"title": "Scripts",
+		"slug": "packages",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/reference/scripts.md",
+		"parent": "reference"
+	},
+	{
 		"title": "@wordpress/a11y",
 		"slug": "packages-a11y",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/a11y/README.md",
