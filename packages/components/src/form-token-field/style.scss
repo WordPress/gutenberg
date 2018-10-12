@@ -162,7 +162,7 @@
 	transition: all 0.15s ease-in-out;
 	list-style: none;
 	border-top: $border-width solid $dark-gray-300;
-	margin: $grid-size-small -$grid-size-small -$grid-size-small -$grid-size-small;
+	margin: $grid-size-small (-$grid-size-small) (-$grid-size-small);
 	padding-top: 3px;
 }
 
