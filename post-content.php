@@ -149,9 +149,9 @@ https://vimeo.com/22439234
 <p style="text-align:center">
 	<em>
 		<?php
-		sprintf(
+		echo sprintf(
 			/* translators: %s: Gutenberg GitHub repository URL */
-			_e( 'If you want to learn more about how to build additional blocks, or if you are interested in helping with the project, head over to the <a href="%s">GitHub repository</a>.', 'gutenberg' ),
+			__( 'If you want to learn more about how to build additional blocks, or if you are interested in helping with the project, head over to the <a href="%s">GitHub repository</a>.', 'gutenberg' ),
 			'https://github.com/WordPress/gutenberg'
 		);
 		?>
