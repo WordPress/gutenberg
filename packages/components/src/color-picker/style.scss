@@ -139,10 +139,19 @@
 
 /* INPUTS COMPONENT */
 .components-color-picker__inputs-wrapper {
+	margin: 0 -4px;
 	padding-top: 16px;
 	display: flex;
+	align-items: flex-end;
+
+	fieldset {
+		flex: 1;
+	}
 }
 .components-color-picker__inputs-fields {
-	flex: 1;
 	display: flex;
+
+	.components-base-control__field {
+		margin: 0 4px;
+	}
 }
