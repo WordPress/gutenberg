@@ -141,18 +141,22 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 	insertBlocksAfter( blocks: Array<Object> ) {
 		// find currently focused block
-		const focusedItemIndex = this.findDataSourceIndexForFocusedItem();
+		let focusedItemIndex = this.findDataSourceIndexForFocusedItem();
+		if ( focusedItemIndex == -1 ) {
+			// no focus yet? This is a well knwon bug on Android...
+			focusedItemIndex = 3;
+		}
 		const clientIdFocused = this.state.dataSource.get( focusedItemIndex ).clientId;
 
 		const newBlock = blocks[ 0 ];
-		newBlock.focused = false;
+		newBlock.focused = true;
 
 		// set it into the datasource, and use the same object instance to send it to props/redux
 		this.state.dataSource.splice( focusedItemIndex + 1, 0, newBlock );
 		this.props.createBlockAction( newBlock.clientId, newBlock, clientIdFocused );
 
 		// now set the focus
-		this.props.focusBlockAction( newBlock.clientId );
+		this.props.focusBlockAction( newBlock.clientId ); // this not working atm
 	}
 
 	onChange( clientId: string, attributes: mixed ) {
