@@ -47,14 +47,34 @@
 	> .editor-inner-blocks > .editor-block-list__layout {
 		display: flex;
 
+		// Responsiveness: Allow wrapping on mobile.
+		flex-wrap: wrap;
+
+		@include break-medium() {
+			flex-wrap: nowrap;
+		}
+
 		> [data-type="core/column"] {
 			display: flex;
 			flex-direction: column;
 			flex: 1;
-			width: 0;
 
-			.editor-block-list__block-edit {
-				flex-basis: 100%;
+			// Every .editor-block-list__block has auto-left/right margins, which centers columns.
+			// Since they aren't centered on the front-end, we explicitly set a zero left margin here.
+			margin-left: 0;
+
+			// Responsiveness: Show at most one columns on mobile.
+			flex-basis: 100%;
+
+			// Beyond mobile, allow 2 columns.
+			@include break-small() {
+				flex-basis: 50%;
+				flex-grow: 0;
+			}
+
+			// On medium-sized viewports, allow any amount of columns.
+			@include break-medium() {
+				flex-basis: inherit;
 			}
 		}
 	}
