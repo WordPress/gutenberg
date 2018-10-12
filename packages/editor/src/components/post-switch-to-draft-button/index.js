@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { TextButton } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -25,13 +25,14 @@ function PostSwitchToDraftButton( { isSaving, isPublished, isScheduled, onClick 
 	};
 
 	return (
-		<TextButton
+		<Button
 			className="editor-post-switch-to-draft"
 			onClick={ onSwitch }
 			disabled={ isSaving }
+			isText
 		>
 			{ __( 'Switch to Draft' ) }
-		</TextButton>
+		</Button>
 	);
 }
 
