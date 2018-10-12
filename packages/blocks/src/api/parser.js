@@ -226,6 +226,10 @@ export function matcherFromSource( sourceConfig ) {
  * @return {*} Attribute value.
  */
 export function parseWithAttributeSchema( innerHTML, attributeSchema ) {
+	if ( attributeSchema.source === 'html' && ! attributeSchema.selector ) {
+		return innerHTML;
+	}
+
 	return hpqParse( innerHTML, matcherFromSource( attributeSchema ) );
 }
 

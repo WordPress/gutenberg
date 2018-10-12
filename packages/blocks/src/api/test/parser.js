@@ -287,6 +287,20 @@ describe( 'block parser', () => {
 			);
 			expect( value ).toBeUndefined();
 		} );
+
+		it( 'should return original content for html source with no selector', () => {
+			const value = getBlockAttribute(
+				'content',
+				{
+					type: 'string',
+					source: 'html',
+				},
+				'<path />',
+				{}
+			);
+
+			expect( value ).toBe( '<path />' );
+		} );
 	} );
 
 	describe( 'getBlockAttributes()', () => {
