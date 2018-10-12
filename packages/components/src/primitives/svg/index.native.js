@@ -32,12 +32,6 @@ export const SVG = ( props ) => {
 	}
 
 	const safeProps = styleValues.length == 0 ? { ...omit( props, [ 'style' ] ) } : { ...props, style: styleValues };
-	if ( safeProps.width !== undefined && safeProps.height !== undefined ) {
-		return (
-			<Svg { ...safeProps } />
-		);
-	}
-
 	return (
 		<Svg
 			height="100%"
