@@ -7,7 +7,6 @@ import {
 	ExternalLink,
 	Fill,
 	IconButton,
-	Popover,
 	ToggleControl,
 	withSpokenMessages,
 } from '@wordpress/components';
@@ -26,6 +25,7 @@ import {
 import PositionedAtSelection from './positioned-at-selection';
 import URLInput from '../../url-input';
 import { filterURLForDisplay } from '../../../utils/url';
+import URLPopover from '../../url-popover';
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 
@@ -53,6 +53,39 @@ function isShowingInput( props, state ) {
 	return props.addingLink || state.editLink;
 }
 
+const LinkEditor = ( { inputValue, onChangeInputValue, onKeyDown, submitLink } ) => (
+	// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
+	/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+	<form
+		className="editor-format-toolbar__link-container-content"
+		onKeyPress={ stopKeyPropagation }
+		onKeyDown={ onKeyDown }
+		onSubmit={ submitLink }
+	>
+		<URLInput value={ inputValue } onChange={ onChangeInputValue } />
+		<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
+	</form>
+	/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
+);
+
+const LinkViewer = ( { href, editLink } ) => (
+	// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
+	/* eslint-disable jsx-a11y/no-static-element-interactions */
+	<div
+		className="editor-format-toolbar__link-container-content"
+		onKeyPress={ stopKeyPropagation }
+	>
+		<ExternalLink
+			className="editor-format-toolbar__link-container-value"
+			href={ href }
+		>
+			{ filterURLForDisplay( decodeURI( href ) ) }
+		</ExternalLink>
+		<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ editLink } />
+	</div>
+	/* eslint-enable jsx-a11y/no-static-element-interactions */
+);
+
 class LinkContainer extends Component {
 	constructor() {
 		super( ...arguments );
@@ -61,7 +94,6 @@ class LinkContainer extends Component {
 		this.submitLink = this.submitLink.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onChangeInputValue = this.onChangeInputValue.bind( this );
-		this.toggleLinkSettingsVisibility = this.toggleLinkSettingsVisibility.bind( this );
 		this.setLinkTarget = this.setLinkTarget.bind( this );
 		this.resetState = this.resetState.bind( this );
 
@@ -99,10 +131,6 @@ class LinkContainer extends Component {
 
 	onChangeInputValue( inputValue ) {
 		this.setState( { inputValue } );
-	}
-
-	toggleLinkSettingsVisibility() {
-		this.setState( ( state ) => ( { settingsVisible: ! state.settingsVisible } ) );
 	}
 
 	setLinkTarget( opensInNewWindow ) {
@@ -154,83 +182,41 @@ class LinkContainer extends Component {
 			return null;
 		}
 
-		const { inputValue, settingsVisible, opensInNewWindow } = this.state;
+		const { inputValue, opensInNewWindow } = this.state;
 		const { href } = getLinkAttributesFromFormat( link );
 		const showInput = isShowingInput( this.props, this.state );
-
-		const linkSettings = settingsVisible && (
-			<div className="editor-format-toolbar__link-modal-line editor-format-toolbar__link-settings">
-				<ToggleControl
-					label={ __( 'Open in New Window' ) }
-					checked={ opensInNewWindow }
-					onChange={ this.setLinkTarget } />
-			</div>
-		);
 
 		return (
 			<Fill name="RichText.Siblings">
 				<PositionedAtSelection
-					className="editor-format-toolbar__link-container"
 					key={ `${ record.start }${ record.end }` /* Used to force rerender on selection change */ }
 				>
-					<Popover
-						position="bottom center"
-						focusOnMount={ showInput ? 'firstElement' : false }
+					<URLPopover
 						onClickOutside={ this.resetState }
+						focusOnMount={ showInput ? 'firstElement' : false }
+						renderSettings={ () => (
+							<ToggleControl
+								label={ __( 'Open in New Window' ) }
+								checked={ opensInNewWindow }
+								onChange={ this.setLinkTarget }
+							/>
+						) }
 					>
-						{ showInput && (
-							// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
-							/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-							<form
-								className="editor-format-toolbar__link-modal"
-								onKeyPress={ stopKeyPropagation }
+						{ showInput ? (
+							<LinkEditor
+								inputValue={ inputValue }
+								onChangeInputValue={ this.onChangeInputValue }
 								onKeyDown={ this.onKeyDown }
-								onSubmit={ this.submitLink }
-							>
-								<div className="editor-format-toolbar__link-modal-line">
-									<URLInput value={ inputValue } onChange={ this.onChangeInputValue } />
-									<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
-									<IconButton
-										className="editor-format-toolbar__link-settings-toggle"
-										icon="ellipsis"
-										label={ __( 'Link Settings' ) }
-										onClick={ this.toggleLinkSettingsVisibility }
-										aria-expanded={ settingsVisible }
-									/>
-								</div>
-								{ linkSettings }
-							</form>
-							/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
+								submitLink={ this.submitLink }
+							/>
+						) : (
+							<LinkViewer
+								href={ href }
+								editLink={ this.editLink }
+							/>
 						) }
+					</URLPopover>
 
-						{ ! showInput && (
-							// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
-							/* eslint-disable jsx-a11y/no-static-element-interactions */
-							<div
-								className="editor-format-toolbar__link-modal"
-								onKeyPress={ stopKeyPropagation }
-							>
-								<div className="editor-format-toolbar__link-modal-line">
-									<ExternalLink
-										className="editor-format-toolbar__link-value"
-										href={ href }
-									>
-										{ filterURLForDisplay( decodeURI( href ) ) }
-									</ExternalLink>
-									<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
-									<IconButton
-										className="editor-format-toolbar__link-settings-toggle"
-										icon="ellipsis"
-										label={ __( 'Link Settings' ) }
-										onClick={ this.toggleLinkSettingsVisibility }
-										aria-expanded={ settingsVisible }
-									/>
-								</div>
-								{ linkSettings }
-							</div>
-							/* eslint-enable jsx-a11y/no-static-element-interactions */
-						) }
-					</Popover>
 				</PositionedAtSelection>
 			</Fill>
 		);
