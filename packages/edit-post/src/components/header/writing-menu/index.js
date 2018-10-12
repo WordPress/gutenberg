@@ -13,8 +13,7 @@ import FeatureToggle from '../feature-toggle';
 function WritingMenu( { onClose } ) {
 	return (
 		<MenuGroup
-			/* translators: Translate as a noun (label for writing menu) */
-			label={ __( 'View' ) }
+			label={ _x( 'View', 'noun' ) }
 		>
 			<FeatureToggle feature="fixedToolbar" label={ __( 'Unified Toolbar' ) } onToggle={ onClose } />
 			<FeatureToggle feature="focusMode" label={ __( 'Spotlight Mode' ) } onToggle={ onClose } />
