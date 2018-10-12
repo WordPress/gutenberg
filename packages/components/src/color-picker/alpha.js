@@ -108,14 +108,14 @@ export class Alpha extends Component {
 		const pointerLocation = { left: `${ rgb.a * 100 }%` };
 
 		return (
-			<div className="color-picker__alpha">
+			<div className="components-color-picker__alpha">
 				<div
-					className="color-picker__alpha-gradient"
+					className="components-color-picker__alpha-gradient"
 					style={ gradient }
 				/>
 				{ /* eslint-disable jsx-a11y/no-static-element-interactions */ }
 				<div
-					className="color-picker__alpha-bar"
+					className="components-color-picker__alpha-bar"
 					ref={ ( container ) => ( this.container = container ) }
 					onMouseDown={ this.handleMouseDown }
 					onTouchMove={ this.handleChange }
@@ -129,7 +129,7 @@ export class Alpha extends Component {
 						aria-label={ __(
 							'Alpha value, from 0 (transparent) to 1 (fully opaque).'
 						) }
-						className="color-picker__alpha-pointer"
+						className="components-color-picker__alpha-pointer"
 						style={ pointerLocation }
 					/>
 				</div>

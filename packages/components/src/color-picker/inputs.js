@@ -101,9 +101,9 @@ export class Inputs extends Component {
 		const { disableAlpha = false } = this.props;
 		if ( this.state.view === 'hex' ) {
 			return (
-				<div className="color-picker__inputs-fields flexbox-fix">
+				<div className="components-color-picker__inputs-fields">
 					<TextControl
-						className="color-picker__inputs-field"
+						className="components-color-picker__inputs-field"
 						label="hex"
 						value={ this.props.hex }
 						onChange={ ( value ) => this.handleChange( { hex: value } ) }
@@ -112,9 +112,9 @@ export class Inputs extends Component {
 			);
 		} else if ( this.state.view === 'rgb' ) {
 			return (
-				<div className="color-picker__inputs-fields flexbox-fix">
+				<div className="components-color-picker__inputs-fields">
 					<TextControl
-						className="color-picker__inputs-field"
+						className="components-color-picker__inputs-field"
 						label="r"
 						type="number"
 						min="0"
@@ -123,7 +123,7 @@ export class Inputs extends Component {
 						onChange={ ( value ) => this.handleChange( { r: value } ) }
 					/>
 					<TextControl
-						className="color-picker__inputs-field"
+						className="components-color-picker__inputs-field"
 						label="g"
 						type="number"
 						min="0"
@@ -132,7 +132,7 @@ export class Inputs extends Component {
 						onChange={ ( value ) => this.handleChange( { g: value } ) }
 					/>
 					<TextControl
-						className="color-picker__inputs-field"
+						className="components-color-picker__inputs-field"
 						label="b"
 						type="number"
 						min="0"
@@ -142,7 +142,7 @@ export class Inputs extends Component {
 					/>
 					{ disableAlpha ? null : (
 						<TextControl
-							className="color-picker__inputs-field"
+							className="components-color-picker__inputs-field"
 							label="a"
 							type="number"
 							min="0"
@@ -158,9 +158,9 @@ export class Inputs extends Component {
 			);
 		} else if ( this.state.view === 'hsl' ) {
 			return (
-				<div className="color-picker__inputs-fields flexbox-fix">
+				<div className="components-color-picker__inputs-fields">
 					<TextControl
-						className="color-picker__inputs-field"
+						className="components-color-picker__inputs-field"
 						label="h"
 						type="number"
 						min="0"
@@ -169,7 +169,7 @@ export class Inputs extends Component {
 						onChange={ ( value ) => this.handleChange( { h: value } ) }
 					/>
 					<TextControl
-						className="color-picker__inputs-field"
+						className="components-color-picker__inputs-field"
 						label="s"
 						type="number"
 						min="0"
@@ -178,7 +178,7 @@ export class Inputs extends Component {
 						onChange={ ( value ) => this.handleChange( { s: value } ) }
 					/>
 					<TextControl
-						className="color-picker__inputs-field"
+						className="components-color-picker__inputs-field"
 						label="l"
 						type="number"
 						min="0"
@@ -188,7 +188,7 @@ export class Inputs extends Component {
 					/>
 					{ disableAlpha ? null : (
 						<TextControl
-							className="color-picker__inputs-field"
+							className="components-color-picker__inputs-field"
 							label="a"
 							type="number"
 							min="0"
@@ -207,9 +207,9 @@ export class Inputs extends Component {
 
 	render() {
 		return (
-			<div className="color-picker__inputs-wrapper flexbox-fix">
+			<div className="components-color-picker__inputs-wrapper">
 				{ this.renderFields() }
-				<div className="color-picker__inputs-toggle">
+				<div className="components-color-picker__inputs-toggle">
 					<IconButton
 						icon="arrow-down-alt2"
 						label="Toggle input type"

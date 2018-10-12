@@ -122,17 +122,17 @@ export class Saturation extends Component {
 		return (
 			<div
 				style={ { background: `hsl(${ hsl.h },100%, 50%)` } }
-				className="color-picker__saturation-color"
+				className="components-color-picker__saturation-color"
 				ref={ ( container ) => ( this.container = container ) }
 				onMouseDown={ this.handleMouseDown }
 				onTouchMove={ this.handleChange }
 				onTouchStart={ this.handleChange }>
-				<div className="color-picker__saturation-white" />
-				<div className="color-picker__saturation-black" />
+				<div className="components-color-picker__saturation-white" />
+				<div className="components-color-picker__saturation-black" />
 				<button
 					aria-label={ __( 'Saturation & lightness value' ) }
 					aria-describedBy={ `color-picker-saturation-${ instanceId }` }
-					className="color-picker__saturation-pointer"
+					className="components-color-picker__saturation-pointer"
 					style={ pointerLocation }
 				/>
 				<div

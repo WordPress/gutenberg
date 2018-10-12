@@ -41,14 +41,14 @@ export default class extends Component {
 		const { className, disableAlpha } = this.props;
 		const { color, hex, hsl, hsv, rgb } = this.state;
 		const classes = classnames( className, {
-			'color-picker': true,
+			'components-color-picker': true,
 			'is-alpha-disabled': disableAlpha,
 			'is-alpha-enabled': ! disableAlpha,
 		} );
 
 		return (
 			<div className={ classes }>
-				<div className="color-picker__saturation">
+				<div className="components-color-picker__saturation">
 					<Saturation
 						hsl={ hsl }
 						hsv={ hsv }
@@ -56,18 +56,18 @@ export default class extends Component {
 					/>
 				</div>
 
-				<div className="color-picker__body">
-					<div className="color-picker__controls flexbox-fix">
-						<div className="color-picker__swatch">
+				<div className="components-color-picker__body">
+					<div className="components-color-picker__controls">
+						<div className="components-color-picker__swatch">
 							<div
-								className="color-picker__active"
+								className="components-color-picker__active"
 								style={ {
 									backgroundColor: color && color.toRgbString(),
 								} }
 							/>
 						</div>
 
-						<div className="color-picker__toggles">
+						<div className="components-color-picker__toggles">
 							<Hue hsl={ hsl } onChange={ this.handleChange } />
 							{ disableAlpha ? null : (
 								<Alpha

@@ -100,11 +100,11 @@ export class Hue extends Component {
 		const pointerLocation = { left: `${ ( hsl.h * 100 ) / 360 }%` };
 
 		return (
-			<div className="color-picker__hue">
-				<div className="color-picker__hue-gradient" />
+			<div className="components-color-picker__hue">
+				<div className="components-color-picker__hue-gradient" />
 				{ /* eslint-disable jsx-a11y/no-static-element-interactions */ }
 				<div
-					className="color-picker__hue-bar"
+					className="components-color-picker__hue-bar"
 					ref={ ( container ) => ( this.container = container ) }
 					onMouseDown={ this.handleMouseDown }
 					onTouchMove={ this.handleChange }
@@ -116,7 +116,7 @@ export class Hue extends Component {
 						aria-valuenow={ hsl.h }
 						aria-orientation="horizontal"
 						aria-label={ __( 'Hue value in degrees, from 0 to 359.' ) }
-						className="color-picker__hue-pointer"
+						className="components-color-picker__hue-pointer"
 						style={ pointerLocation }
 					/>
 				</div>
