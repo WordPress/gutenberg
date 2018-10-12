@@ -152,7 +152,7 @@
 		"check-engines": "check-node-version --package",
 		"check-licenses": "concurrently \"wp-scripts check-licenses --prod --gpl2\" \"wp-scripts check-licenses --dev\"",
 		"precheck-local-changes": "npm run docs:build",
-		"check-local-changes": "git diff --exit-code > /dev/null || ( echo \"There are local uncommitted changes after one or both of 'npm install' or 'npm run docs:build'!\" && exit 1 );",
+		"check-local-changes": "( git diff -U0 | xargs -0 node bin/process-git-diff ) || ( echo \"There are local uncommitted changes after one or both of 'npm install' or 'npm run docs:build'!\" && exit 1 );",
 		"ci": "concurrently \"npm run lint\" \"npm run test-unit:coverage-ci\" \"npm run check-local-changes\"",
 		"predev": "npm run check-engines",
 		"dev": "npm run build:packages && concurrently \"cross-env webpack --watch\" \"npm run dev:packages\"",
