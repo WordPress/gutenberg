@@ -70,8 +70,8 @@ export function* getEntityRecords( kind, name, query = {} ) {
  * Requests theme supports data from the index.
  */
 export function* getThemeSupports() {
-	const currentTheme = yield apiFetch( { path: '/wp/v2/themes?status=active' } );
-	yield receiveThemeSupports( currentTheme[ 0 ].theme_supports );
+	const activeThemes = yield apiFetch( { path: '/wp/v2/themes?status=active' } );
+	yield receiveThemeSupports( activeThemes[ 0 ].theme_supports );
 }
 
 /**
