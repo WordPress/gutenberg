@@ -12,29 +12,21 @@ import { isValidHex } from './utils';
 import TextControl from '../text-control';
 
 export class Inputs extends Component {
-	constructor() {
+	constructor( { hsl } ) {
 		super( ...arguments );
 
-		this.state = {
-			view: '',
-		};
+		const view = hsl.a === 1 ? 'hex' : 'rgb';
+		this.state = { view };
 
 		this.toggleViews = this.toggleViews.bind( this );
 		this.handleChange = this.handleChange.bind( this );
 	}
 
-	componentDidMount() {
-		if ( this.props.hsl.a === 1 && this.state.view !== 'hex' ) {
-			this.setState( { view: 'hex' } );
-		} else if ( this.state.view !== 'rgb' && this.state.view !== 'hsl' ) {
-			this.setState( { view: 'rgb' } );
+	static getDerivedStateFromProps( props, state ) {
+		if ( props.hsl.a !== 1 && state.view === 'hex' ) {
+			return { view: 'rgb' };
 		}
-	}
-
-	componentWillReceiveProps( nextProps ) {
-		if ( nextProps.hsl.a !== 1 && this.state.view === 'hex' ) {
-			this.setState( { view: 'rgb' } );
-		}
+		return null;
 	}
 
 	toggleViews() {
