@@ -37,7 +37,7 @@ export const settings = {
 
 	save( { id, url, alt, width, filename } ) {
 		if ( ! alt ) {
-			alt = sprintf( __( 'This image has an empty alt attribute; its file name is "%s"' ), filename );
+			alt = sprintf( __( 'This image has an empty alt attribute; its file name is \"%s\"' ), filename );
 		}
 		return (
 			<img
