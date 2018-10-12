@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 
 /**
@@ -101,18 +102,24 @@ export class Inputs extends Component {
 		const { disableAlpha = false } = this.props;
 		if ( this.state.view === 'hex' ) {
 			return (
-				<div className="components-color-picker__inputs-fields">
+				<fieldset className="components-color-picker__inputs-fields">
+					<legend className="screen-reader-text">
+						{ __( 'Color value in HEX' ) }
+					</legend>
 					<TextControl
 						className="components-color-picker__inputs-field"
 						label="hex"
 						value={ this.props.hex }
 						onChange={ ( value ) => this.handleChange( { hex: value } ) }
 					/>
-				</div>
+				</fieldset>
 			);
 		} else if ( this.state.view === 'rgb' ) {
 			return (
-				<div className="components-color-picker__inputs-fields">
+				<fieldset className="components-color-picker__inputs-fields">
+					<legend className="screen-reader-text">
+						{ __( 'Color value in RGB' ) }
+					</legend>
 					<TextControl
 						className="components-color-picker__inputs-field"
 						label="r"
@@ -154,11 +161,14 @@ export class Inputs extends Component {
 							}
 						/>
 					) }
-				</div>
+				</fieldset>
 			);
 		} else if ( this.state.view === 'hsl' ) {
 			return (
-				<div className="components-color-picker__inputs-fields">
+				<fieldset className="components-color-picker__inputs-fields">
+					<legend className="screen-reader-text">
+						{ __( 'Color value in HSL' ) }
+					</legend>
 					<TextControl
 						className="components-color-picker__inputs-field"
 						label="h"
@@ -200,7 +210,7 @@ export class Inputs extends Component {
 							}
 						/>
 					) }
-				</div>
+				</fieldset>
 			);
 		}
 	}
