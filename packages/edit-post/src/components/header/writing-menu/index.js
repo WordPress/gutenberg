@@ -2,7 +2,7 @@
  * WordPress Dependencies
  */
 import { MenuGroup } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { ifViewportMatches } from '@wordpress/viewport';
 
 /**
