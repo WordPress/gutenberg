@@ -15,7 +15,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import Button from '../button';
 import Dropdown from '../dropdown';
 import Tooltip from '../tooltip';
-import ChromePicker from '../color-picker';
+import ColorPicker from '../color-picker';
 
 export default function ColorPalette( { colors, disableCustomColors = false, value, onChange, className } ) {
 	function applyOrUnset( color ) {
@@ -71,7 +71,7 @@ export default function ColorPalette( { colors, disableCustomColors = false, val
 						</Tooltip>
 					) }
 					renderContent={ () => (
-						<ChromePicker
+						<ColorPicker
 							color={ value }
 							onChangeComplete={ ( color ) => onChange( color.hex ) }
 							disableAlpha
