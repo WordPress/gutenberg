@@ -43,9 +43,24 @@ class WP_REST_Themes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 *
 	 * @since 5.0.0
 	 *
-	 * @var string $active_theme_route
+	 * @var string $themes_route
 	 */
-	protected static $active_theme_route = '/wp/v2/themes/active';
+	protected static $themes_route = '/wp/v2/themes';
+
+	/**
+	 * Performs a REST API request for the active theme.
+	 *
+	 * @since 5.0.0
+	 *
+	 * @param string $method Optional. Request method. Default GET.
+	 * @return WP_REST_Response The request's response.
+	 */
+	protected function perform_active_theme_request( $method = 'GET' ) {
+		$request = new WP_REST_Request( $method, self::$themes_route );
+		$request->set_param( 'status', 'active' );
+
+		return rest_get_server()->dispatch( $request );
+	}
 
 	/**
 	 * Check that common properties are included in a response.
@@ -57,16 +72,18 @@ class WP_REST_Themes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	protected function check_get_theme_response( $response ) {
 		if ( $response instanceof WP_REST_Response ) {
 			$links    = $response->get_links();
+			$headers  = $response->get_headers();
 			$response = $response->get_data();
 		} else {
 			$this->assertArrayHasKey( '_links', $response );
-			$links = $response['_links'];
+			$headers = array();
+			$links   = $response['_links'];
 		}
 
-		$this->assertEquals( self::$current_theme->get( 'Name' ), $response['name'] );
-		$this->assertEquals( self::$current_theme->get_stylesheet(), $response['stylesheet'] );
-		$this->assertEquals( self::$current_theme->get( 'Version' ), $response['version'] );
-		$this->assertEquals( self::$current_theme->get_template( 'template' ), $response['template'] );
+		$this->assertArrayHasKey( 'X-WP-Total', $headers );
+		$this->assertEquals( 1, $headers['X-WP-Total'] );
+		$this->assertArrayHasKey( 'X-WP-TotalThemes', $headers );
+		$this->assertEquals( 1, $headers['X-WP-TotalThemes'] );
 	}
 
 	/**
@@ -118,37 +135,32 @@ class WP_REST_Themes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 */
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
-		$this->assertArrayHasKey( self::$active_theme_route, $routes );
-		$this->assertArrayNotHasKey( '/wp/v2/themes', $routes );
+		$this->assertArrayHasKey( self::$themes_route, $routes );
 	}
 
 	/**
-	 * Test retrieving a single theme.
+	 * Test retrieving a collection of themes.
 	 */
-	public function test_get_item() {
-		$request  = new WP_REST_Request( 'GET', self::$active_theme_route );
-		$response = rest_get_server()->dispatch( $request );
+	public function test_get_items() {
+		$response = self::perform_active_theme_request();
+
 		$this->assertEquals( 200, $response->get_status() );
 		$data = $response->get_data();
 
 		$this->check_get_theme_response( $response );
 		$fields = array(
-			'name',
-			'stylesheet',
-			'version',
-			'template',
+			'_links',
 			'theme_supports',
 		);
-		$this->assertEqualSets( $fields, array_keys( $data ) );
+		$this->assertEqualSets( $fields, array_keys( $data[0] ) );
 	}
 
 	/**
 	 * An error should be returned when the user does not have the edit_posts capability.
 	 */
-	public function test_get_item_no_permission() {
+	public function test_get_items_no_permission() {
 		wp_set_current_user( self::$subscriber_id );
-		$request  = new WP_REST_Request( 'GET', self::$active_theme_route );
-		$response = rest_get_server()->dispatch( $request );
+		$response = self::perform_active_theme_request();
 		$this->assertErrorResponse( 'rest_user_cannot_view', $response, 403 );
 	}
 
@@ -156,8 +168,7 @@ class WP_REST_Themes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * Test an item is prepared for the response.
 	 */
 	public function test_prepare_item() {
-		$request  = new WP_REST_Request( 'GET', self::$active_theme_route );
-		$response = rest_get_server()->dispatch( $request );
+		$response = self::perform_active_theme_request();
 		$this->assertEquals( 200, $response->get_status() );
 		$this->check_get_theme_response( $response );
 	}
@@ -166,15 +177,10 @@ class WP_REST_Themes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * Verify the theme schema.
 	 */
 	public function test_get_item_schema() {
-		$request    = new WP_REST_Request( 'OPTIONS', self::$active_theme_route );
-		$response   = rest_get_server()->dispatch( $request );
+		$response   = self::perform_active_theme_request( 'OPTIONS' );
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
-		$this->assertEquals( 5, count( $properties ) );
-		$this->assertArrayHasKey( 'name', $properties );
-		$this->assertArrayHasKey( 'stylesheet', $properties );
-		$this->assertArrayHasKey( 'version', $properties );
-		$this->assertArrayHasKey( 'template', $properties );
+		$this->assertEquals( 1, count( $properties ) );
 		$this->assertArrayHasKey( 'theme_supports', $properties );
 
 		$this->assertEquals( 2, count( $properties['theme_supports']['properties'] ) );
@@ -187,12 +193,11 @@ class WP_REST_Themes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 */
 	public function test_theme_supports_formats() {
 		remove_theme_support( 'post-formats' );
-		$request  = new WP_REST_Request( 'GET', self::$active_theme_route );
-		$response = rest_do_request( $request );
+		$response = self::perform_active_theme_request();
 		$result   = $response->get_data();
-		$this->assertTrue( isset( $result['theme_supports'] ) );
-		$this->assertTrue( isset( $result['theme_supports']['formats'] ) );
-		$this->assertSame( array( 'standard' ), $result['theme_supports']['formats'] );
+		$this->assertTrue( isset( $result[0]['theme_supports'] ) );
+		$this->assertTrue( isset( $result[0]['theme_supports']['formats'] ) );
+		$this->assertSame( array( 'standard' ), $result[0]['theme_supports']['formats'] );
 	}
 
 	/**
@@ -200,12 +205,11 @@ class WP_REST_Themes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 */
 	public function test_theme_supports_formats_non_default() {
 		add_theme_support( 'post-formats', array( 'aside', 'video' ) );
-		$request  = new WP_REST_Request( 'GET', self::$active_theme_route );
-		$response = rest_do_request( $request );
+		$response = self::perform_active_theme_request();
 		$result   = $response->get_data();
-		$this->assertTrue( isset( $result['theme_supports'] ) );
-		$this->assertTrue( isset( $result['theme_supports']['formats'] ) );
-		$this->assertSame( array( 'standard', 'aside', 'video' ), $result['theme_supports']['formats'] );
+		$this->assertTrue( isset( $result[0]['theme_supports'] ) );
+		$this->assertTrue( isset( $result[0]['theme_supports']['formats'] ) );
+		$this->assertSame( array( 'standard', 'aside', 'video' ), $result[0]['theme_supports']['formats'] );
 	}
 
 	/**
@@ -213,13 +217,12 @@ class WP_REST_Themes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 */
 	public function test_theme_supports_post_thumbnails_false() {
 		remove_theme_support( 'post-thumbnails' );
-		$request  = new WP_REST_Request( 'GET', self::$active_theme_route );
-		$response = rest_do_request( $request );
+		$response = self::perform_active_theme_request();
 
 		$result = $response->get_data();
-		$this->assertTrue( isset( $result['theme_supports'] ) );
-		$this->assertTrue( isset( $result['theme_supports']['post-thumbnails'] ) );
-		$this->assertFalse( $result['theme_supports']['post-thumbnails'] );
+		$this->assertTrue( isset( $result[0]['theme_supports'] ) );
+		$this->assertTrue( isset( $result[0]['theme_supports']['post-thumbnails'] ) );
+		$this->assertFalse( $result[0]['theme_supports']['post-thumbnails'] );
 	}
 
 	/**
@@ -228,11 +231,10 @@ class WP_REST_Themes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	public function test_theme_supports_post_thumbnails_true() {
 		remove_theme_support( 'post-thumbnails' );
 		add_theme_support( 'post-thumbnails' );
-		$request  = new WP_REST_Request( 'GET', self::$active_theme_route );
-		$response = rest_do_request( $request );
+		$response = self::perform_active_theme_request();
 		$result   = $response->get_data();
-		$this->assertTrue( isset( $result['theme_supports'] ) );
-		$this->assertTrue( $result['theme_supports']['post-thumbnails'] );
+		$this->assertTrue( isset( $result[0]['theme_supports'] ) );
+		$this->assertTrue( $result[0]['theme_supports']['post-thumbnails'] );
 	}
 
 	/**
@@ -241,11 +243,10 @@ class WP_REST_Themes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	public function test_theme_supports_post_thumbnails_array() {
 		remove_theme_support( 'post-thumbnails' );
 		add_theme_support( 'post-thumbnails', array( 'post' ) );
-		$request  = new WP_REST_Request( 'GET', self::$active_theme_route );
-		$response = rest_do_request( $request );
+		$response = self::perform_active_theme_request();
 		$result   = $response->get_data();
-		$this->assertTrue( isset( $result['theme_supports'] ) );
-		$this->assertEquals( array( 'post' ), $result['theme_supports']['post-thumbnails'] );
+		$this->assertTrue( isset( $result[0]['theme_supports'] ) );
+		$this->assertEquals( array( 'post' ), $result[0]['theme_supports']['post-thumbnails'] );
 	}
 
 	/**
@@ -267,19 +268,16 @@ class WP_REST_Themes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			)
 		);
 
-		$request = new WP_REST_Request( 'OPTIONS', self::$active_theme_route );
-
-		$response = rest_get_server()->dispatch( $request );
+		$response = self::perform_active_theme_request( 'OPTIONS' );
 		$data     = $response->get_data();
 
 		$this->assertArrayHasKey( 'my_custom_int', $data['schema']['properties'] );
 		$this->assertEquals( $schema, $data['schema']['properties']['my_custom_int'] );
 
-		$request = new WP_REST_Request( 'GET', self::$active_theme_route );
-
-		$response = rest_get_server()->dispatch( $request );
-		$this->assertArrayHasKey( 'my_custom_int', $response->data );
-		$this->assertSame( 2, $response->data['my_custom_int'] );
+		$response = self::perform_active_theme_request( 'GET' );
+		$data     = $response->get_data();
+		$this->assertArrayHasKey( 'my_custom_int', $data[0] );
+		$this->assertSame( 2, $data[0]['my_custom_int'] );
 
 		global $wp_rest_additional_fields;
 		$wp_rest_additional_fields = array();
@@ -310,7 +308,7 @@ class WP_REST_Themes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	/**
 	 * The get_item() method does not exist for themes.
 	 */
-	public function test_get_items() {}
+	public function test_get_item() {}
 
 	/**
 	 * The delete_item() method does not exist for themes.
