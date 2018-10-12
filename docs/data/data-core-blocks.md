@@ -47,9 +47,9 @@ Returns the name of the default block name.
 
 Default block name.
 
-### getUnregisteredFallbackBlockName
+### getFallbackBlockName
 
-Returns an action object used to set the block name for unregistered block fallback.
+Returns the name of the fallback block name.
 
 *Parameters*
 
@@ -57,11 +57,11 @@ Returns an action object used to set the block name for unregistered block fallb
 
 *Returns*
 
-Name of block used for unregistered block fallback.
+Fallback block name.
 
 ### getFreeformFallbackBlockName
 
-Returns an action object used to set the block name for freeform content fallback.
+Returns the name of the block for handling non-block content.
 
 *Parameters*
 
@@ -69,13 +69,11 @@ Returns an action object used to set the block name for freeform content fallbac
 
 *Returns*
 
-Name of block used for freeform content fallback.
+Name of the block for handling non-block content.
 
-### getFallbackBlockName
+### getUnregisteredFallbackBlockName
 
-This is a deprecated alias of `getFreeformFallbackBlockName`.
-
-Returns an action object used to set the block name for freeform content fallback.
+Returns the name of the block for handling unregistered blocks.
 
 *Parameters*
 
@@ -83,7 +81,7 @@ Returns an action object used to set the block name for freeform content fallbac
 
 *Returns*
 
-Name of block used for freeform content fallback.
+Name of the block for handling unregistered blocks.
 
 ### getChildBlockNames
 
@@ -183,9 +181,10 @@ Returns an action object used to set the default block name.
 
  * name: Block name.
 
-### setUnregisteredFallbackBlockName
+### setFallbackBlockName
 
-Returns an action object used to set the block name for unregistered block fallback.
+Returns an action object used to set the name of the block used as a fallback
+for non-block content.
 
 *Parameters*
 
@@ -193,17 +192,17 @@ Returns an action object used to set the block name for unregistered block fallb
 
 ### setFreeformFallbackBlockName
 
-Returns an action object used to set the block name for freeform content fallback.
+Returns an action object used to set the name of the block used as a fallback
+for non-block content.
 
 *Parameters*
 
  * name: Block name.
 
-### setFallbackBlockName
+### setUnregisteredFallbackBlockName
 
-This is a deprecated alias of `setFreeformFallbackBlockName`.
-
-Returns an action object used to set the block name for freeform content fallback.
+Returns an action object used to set the name of the block used as a fallback
+for unregistered blocks.
 
 *Parameters*
 
