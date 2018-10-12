@@ -152,7 +152,7 @@ export const settings = {
 
 			const classes = classnames(
 				className,
-				contentAlign !== 'center' && `has-${ contentAlign }-content`,
+				contentAlign !== 'undefined' && `has-${ contentAlign }-content`,
 				dimRatioToClass( dimRatio ),
 				{
 					'has-background-dim': dimRatio !== 0,
@@ -292,7 +292,7 @@ export const settings = {
 			{
 				'has-background-dim': dimRatio !== 0,
 				'has-parallax': hasParallax,
-				[ `has-${ contentAlign }-content` ]: contentAlign !== 'center',
+				[ `has-${ contentAlign }-content` ]: contentAlign !== 'undefined',
 			},
 			align ? `align${ align }` : null,
 		);
