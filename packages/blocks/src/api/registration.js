@@ -180,7 +180,7 @@ export function unregisterBlockType( name ) {
 export function setUnknownTypeHandlerName( name ) {
 	deprecated( 'setUnknownTypeHandlerName', {
 		plugin: 'Gutenberg',
-		version: '4.4',
+		version: '4.2',
 		alternative: 'setFreeformContentHandlerName and setUnregisteredTypeHandlerName',
 	} );
 	setFreeformContentHandlerName( name );
@@ -195,7 +195,7 @@ export function setUnknownTypeHandlerName( name ) {
 export function getUnknownTypeHandlerName() {
 	deprecated( 'getUnknownTypeHandlerName', {
 		plugin: 'Gutenberg',
-		version: '4.4',
+		version: '4.2',
 		alternative: 'getFreeformContentHandlerName and getUnregisteredTypeHandlerName',
 	} );
 	return getFreeformContentHandlerName();

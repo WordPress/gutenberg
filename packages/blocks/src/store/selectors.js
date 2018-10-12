@@ -67,7 +67,7 @@ export function getDefaultBlockName( state ) {
 export function getFallbackBlockName( state ) {
 	deprecated( 'getFallbackBlockName', {
 		plugin: 'Gutenberg',
-		version: '4.4',
+		version: '4.2',
 		alternative: 'getFreeformFallbackBlockName and getUnregisteredFallbackBlockName',
 	} );
 	return getFreeformFallbackBlockName( state );
