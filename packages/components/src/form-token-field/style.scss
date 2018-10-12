@@ -1,7 +1,10 @@
-.components-form-token-field {
+.components-form-token-field__input-container {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
 	width: 100%;
 	margin: 0;
-	padding: 0;
+	padding: $grid-size-small;
 	background-color: $white;
 	border: $border-width solid $light-gray-700;
 	color: $dark-gray-700;
@@ -17,13 +20,6 @@
 	&.is-active {
 		@include input-style__focus();
 	}
-}
-
-.components-form-token-field__input-container {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: flex-start;
-	padding: 4px;
 
 	// Token input
 	input[type="text"].components-form-token-field__input {
@@ -48,6 +44,11 @@
 	.components-form-token-field__token + input[type="text"].components-form-token-field__input {
 		width: auto;
 	}
+}
+
+.components-form-token-field__label {
+	display: inline-block;
+	margin-bottom: $grid-size-small;
 }
 
 // Tokens
@@ -154,13 +155,14 @@
 
 // Suggestion list
 .components-form-token-field__suggestions-list {
-	background: $white;
+	flex: 1 0 100%;
+	min-width: 100%;
 	max-height: 9em;
 	overflow-y: scroll;
 	transition: all 0.15s ease-in-out;
 	list-style: none;
 	border-top: $border-width solid $dark-gray-300;
-	margin: 0;
+	margin: $grid-size-small (-$grid-size-small) (-$grid-size-small);
 	padding-top: 3px;
 }
 
