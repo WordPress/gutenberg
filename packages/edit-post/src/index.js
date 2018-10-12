@@ -9,6 +9,8 @@ import { registerCoreBlocks } from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import { dispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
+import { registerBlockType, registerBlockStyle } from '@wordpress/blocks';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -58,7 +60,50 @@ export function initializeEditor( id, postType, postId, settings, overridePost )
 	const target = document.getElementById( id );
 	const reboot = reinitializeEditor.bind( null, postType, postId, target, settings, overridePost );
 
+	// TODO: <START>Remove this later</START>.
+	registerBlockStyle( 'core/list', {
+		label: 'Large',
+		name: 'large',
+	} );
+	registerBlockStyle( 'wp-js-plugin-starter/hello-world', {
+		label: 'Hello',
+		name: 'hello',
+	} );
+	addFilter( 'blocks.registerBlockType', 'wp-js-plugin-starter/hello-world/filter-name', ( blockType, name ) => {
+		if ( name === 'wp-js-plugin-starter/hello-world' ) {
+			return {
+				...blockType,
+				category: 'nope',
+			};
+		}
+
+		return blockType;
+	} );
+	// TODO: <END>Remove this later</END>.
+
+	// TODO: We no longer need to register core blocks in here. We can do it at any time.
 	registerCoreBlocks();
+
+	// TODO: <START>Remove this later</START>.
+	registerBlockType( 'wp-js-plugin-starter/hello-world', {
+		title: 'Hello World',
+		description: 'Just another Hello World block',
+		icon: 'admin-site',
+		category: 'widgets',
+
+		edit: function() {
+			return (
+				<p>Hello Editor</p>
+			);
+		},
+
+		save: function() {
+			return (
+				<p>Hello Frontend</p>
+			);
+		},
+	} );
+	// TODO: <END>Remove this later</END>.
 
 	dispatch( 'core/nux' ).triggerGuide( [
 		'core/editor.inserter',

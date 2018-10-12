@@ -8,7 +8,7 @@ import { get, isFunction, some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { applyFilters, addFilter } from '@wordpress/hooks';
+import { addFilter } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
 
 /**
@@ -53,6 +53,69 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) { /
 }
 
 /**
+ * Checks whether a block's definition is valid.
+ *
+ * @param {Object} settings Block settings.
+ * @return {boolean} True when block settings are correct.
+ */
+export function isBlockDefinitionValid( settings ) {
+	if ( ! settings || ! isFunction( settings.save ) ) {
+		console.error(
+			'The "save" property must be specified and must be a valid function.'
+		);
+		return false;
+	}
+	if ( 'edit' in settings && ! isFunction( settings.edit ) ) {
+		console.error(
+			'The "edit" property must be a valid function.'
+		);
+		return false;
+	}
+	if ( 'keywords' in settings && settings.keywords.length > 3 ) {
+		console.error(
+			'The block "' + settings.name + '" can have a maximum of 3 keywords.'
+		);
+		return false;
+	}
+	if ( ! ( 'category' in settings ) ) {
+		console.error(
+			'The block "' + settings.name + '" must have a category.'
+		);
+		return false;
+	}
+	if (
+		'category' in settings &&
+		! some( select( 'core/blocks' ).getCategories(), { slug: settings.category } )
+	) {
+		console.error(
+			'The block "' + settings.name + '" must have a registered category.'
+		);
+		return false;
+	}
+	if ( ! ( 'title' in settings ) || settings.title === '' ) {
+		console.error(
+			'The block "' + settings.name + '" must have a title.'
+		);
+		return false;
+	}
+	if ( typeof settings.title !== 'string' ) {
+		console.error(
+			'Block titles must be strings.'
+		);
+		return false;
+	}
+	if ( ! isValidIcon( settings.icon.src ) ) {
+		console.error(
+			'The icon passed is invalid. ' +
+			'The icon should be a string, an element, a function, or an object following the specifications documented in https://wordpress.org/gutenberg/handbook/block-api/#icon-optional'
+		);
+		return false;
+	}
+
+	return true;
+}
+
+/**
  * Registers a new block provided a unique name and an object defining its
  * behavior. Once registered, the block is made available as an option to any
  * editor interface where blocks are implemented.
@@ -63,13 +126,7 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) { /
  * @return {?WPBlock} The block, if it has been successfully registered;
  *                     otherwise `undefined`.
  */
-export function registerBlockType( name, settings ) {
-	settings = {
-		name,
-		...get( serverSideBlockDefinitions, name ),
-		...settings,
-	};
-
+export function registerBlockType( name, settings = {} ) {
 	if ( typeof name !== 'string' ) {
 		console.error(
 			'Block names must be strings.'
@@ -89,60 +146,14 @@ export function registerBlockType( name, settings ) {
 		return;
 	}
 
-	settings = applyFilters( 'blocks.registerBlockType', settings, name );
+	settings = {
+		name,
+		...get( serverSideBlockDefinitions, name ),
+		...settings,
+		icon: normalizeIconObject( settings.icon ),
+	};
 
-	if ( ! settings || ! isFunction( settings.save ) ) {
-		console.error(
-			'The "save" property must be specified and must be a valid function.'
-		);
-		return;
-	}
-	if ( 'edit' in settings && ! isFunction( settings.edit ) ) {
-		console.error(
-			'The "edit" property must be a valid function.'
-		);
-		return;
-	}
-	if ( 'keywords' in settings && settings.keywords.length > 3 ) {
-		console.error(
-			'The block "' + name + '" can have a maximum of 3 keywords.'
-		);
-		return;
-	}
-	if ( ! ( 'category' in settings ) ) {
-		console.error(
-			'The block "' + name + '" must have a category.'
-		);
-		return;
-	}
-	if (
-		'category' in settings &&
-		! some( select( 'core/blocks' ).getCategories(), { slug: settings.category } )
-	) {
-		console.error(
-			'The block "' + name + '" must have a registered category.'
-		);
-		return;
-	}
-	if ( ! ( 'title' in settings ) || settings.title === '' ) {
-		console.error(
-			'The block "' + name + '" must have a title.'
-		);
-		return;
-	}
-	if ( typeof settings.title !== 'string' ) {
-		console.error(
-			'Block titles must be strings.'
-		);
-		return;
-	}
-
-	settings.icon = normalizeIconObject( settings.icon );
-	if ( ! isValidIcon( settings.icon.src ) ) {
-		console.error(
-			'The icon passed is invalid. ' +
-			'The icon should be a string, an element, a function, or an object following the specifications documented in https://wordpress.org/gutenberg/handbook/block-api/#icon-optional'
-		);
+	if ( ! isBlockDefinitionValid( settings ) ) {
 		return;
 	}
 

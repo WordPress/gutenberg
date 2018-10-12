@@ -6,10 +6,13 @@ import { flow, map } from 'lodash';
 /**
  * WordPress Dependencies
  */
+import { isBlockDefinitionValid, normalizeIconObject } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
 import { createElement, Component } from '@wordpress/element';
 import { DropZoneProvider, SlotFillProvider } from '@wordpress/components';
-import { withDispatch } from '@wordpress/data';
+import { withDispatch, withSelect } from '@wordpress/data';
+import { applyFilters } from '@wordpress/hooks';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -22,10 +25,34 @@ class EditorProvider extends Component {
 
 		// Assume that we don't need to initialize in the case of an error recovery.
 		if ( ! props.recovery ) {
+			this.applyFiltersToBlockTypes();
 			this.props.updateEditorSettings( props.settings );
 			this.props.updatePostLock( props.settings.postLock );
 			this.props.setupEditor( props.post, props.settings.autosave );
 		}
+	}
+
+	applyFiltersToBlockTypes() {
+		const {
+			addBlockTypes,
+			blockTypes,
+		} = this.props;
+
+		const modifiedBlockTypes = blockTypes.map( ( blockType ) => {
+			const modifiedBlockType = applyFilters( 'blocks.registerBlockType', blockType, blockType.name );
+
+			if ( isShallowEqual( blockType, modifiedBlockType ) ) {
+				return null;
+			}
+
+			modifiedBlockType.icon = normalizeIconObject( modifiedBlockType.icon );
+
+			return modifiedBlockType;
+		} )
+			.filter( ( blockType ) => blockType !== null )
+			.filter( isBlockDefinitionValid );
+
+		addBlockTypes( modifiedBlockTypes );
 	}
 
 	componentDidMount() {
@@ -87,15 +114,26 @@ class EditorProvider extends Component {
 	}
 }
 
-export default withDispatch( ( dispatch ) => {
-	const {
-		setupEditor,
-		updateEditorSettings,
-		updatePostLock,
-	} = dispatch( 'core/editor' );
-	return {
-		setupEditor,
-		updateEditorSettings,
-		updatePostLock,
-	};
-} )( EditorProvider );
+export default compose(
+	withSelect( ( select ) => {
+		const { getBlockTypes } = select( 'core/blocks' );
+
+		return {
+			blockTypes: getBlockTypes(),
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		const { addBlockTypes } = dispatch( 'core/blocks' );
+		const {
+			setupEditor,
+			updateEditorSettings,
+			updatePostLock,
+		} = dispatch( 'core/editor' );
+		return {
+			addBlockTypes,
+			setupEditor,
+			updateEditorSettings,
+			updatePostLock,
+		};
+	} )
+)( EditorProvider );
