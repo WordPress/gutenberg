@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flow, map } from 'lodash';
+import { differenceBy, flow, map } from 'lodash';
 
 /**
  * WordPress Dependencies
@@ -25,18 +25,15 @@ class EditorProvider extends Component {
 
 		// Assume that we don't need to initialize in the case of an error recovery.
 		if ( ! props.recovery ) {
-			this.applyFiltersToBlockTypes();
+			this.applyFiltersToBlockTypes( props.blockTypes );
 			this.props.updateEditorSettings( props.settings );
 			this.props.updatePostLock( props.settings.postLock );
 			this.props.setupEditor( props.post, props.settings.autosave );
 		}
 	}
 
-	applyFiltersToBlockTypes() {
-		const {
-			addBlockTypes,
-			blockTypes,
-		} = this.props;
+	applyFiltersToBlockTypes( blockTypes ) {
+		const { addBlockTypes } = this.props;
 
 		const modifiedBlockTypes = blockTypes.map( ( blockType ) => {
 			const modifiedBlockType = applyFilters( 'blocks.registerBlockType', blockType, blockType.name );
@@ -80,6 +77,12 @@ class EditorProvider extends Component {
 	componentDidUpdate( prevProps ) {
 		if ( this.props.settings !== prevProps.settings ) {
 			this.props.updateEditorSettings( this.props.settings );
+		}
+		if ( this.props.blockTypes !== prevProps.blockTypes ) {
+			const newBlockTypes = differenceBy( this.props.blockTypes, prevProps.blockTypes, 'name' );
+			if ( newBlockTypes.length > 0 ) {
+				this.applyFiltersToBlockTypes( newBlockTypes );
+			}
 		}
 	}
 

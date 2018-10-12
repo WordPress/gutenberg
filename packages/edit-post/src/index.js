@@ -79,9 +79,18 @@ export function initializeEditor( id, postType, postId, settings, overridePost )
 
 		return blockType;
 	} );
+	addFilter( 'blocks.registerBlockType', 'wp-js-plugin-starter/hello-world2/filter-name', ( blockType, name ) => {
+		if ( name === 'wp-js-plugin-starter/hello-world2' ) {
+			return {
+				...blockType,
+				category: 'common',
+			};
+		}
+
+		return blockType;
+	} );
 	// TODO: <END>Remove this later</END>.
 
-	// TODO: We no longer need to register core blocks in here. We can do it at any time.
 	registerCoreBlocks();
 
 	// TODO: <START>Remove this later</START>.
@@ -103,6 +112,26 @@ export function initializeEditor( id, postType, postId, settings, overridePost )
 			);
 		},
 	} );
+	/*
+	wp.blocks.registerBlockType( 'wp-js-plugin-starter/hello-world2', {
+		title: 'Hello World 2',
+		description: 'Just another Hello World block',
+		icon: 'admin-site',
+		category: 'widgets',
+
+		edit: function() {
+			return (
+				'Hello Editor'
+			);
+		},
+
+		save: function() {
+			return (
+				'Hello Frontend'
+			);
+		}
+	} );
+	*/
 	// TODO: <END>Remove this later</END>.
 
 	dispatch( 'core/nux' ).triggerGuide( [
