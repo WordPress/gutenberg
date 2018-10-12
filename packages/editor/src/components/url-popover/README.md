@@ -93,7 +93,7 @@ Where the Popover should be positioned relative to its parent. Defaults to "bott
 
 ### onClickOutside
 
-Handles an event triggered when the user clicks outside of the Popover.
+Handles an event triggered when the user clicks outside of the URLPopover.
 
 - Type: `Function`
 - Required: No
@@ -108,7 +108,9 @@ the user to type in a URL and a submit button.
 
 ### renderSettings
 
-Callback used to return the React Elements that will be rendered when the user is viewing the settings.
+Callback used to return the React Elements that will be rendered inside the settings drawer. When this function
+is provided, a toggle button will be rendered in the popover that allows the user to open and close the settings
+drawer.
 
 - Type: `Function`
 - Required: No
