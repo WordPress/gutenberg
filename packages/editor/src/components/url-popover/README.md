@@ -95,6 +95,15 @@ Where the Popover should be positioned relative to its parent. Defaults to "bott
 - Required: No
 - Default: "bottom center"
 
+### focusOnMount
+
+Provides control over which element is focused when the URLPopover mounts. Pass `false` to avoid focusing
+an element.
+
+- Type: `String`
+- Required: No
+- Default: "firstElement"
+
 ### onClickOutside
 
 Handles an event triggered when the user clicks outside of the URLPopover.
