@@ -54,10 +54,10 @@ export const image = {
 							onChange( insertObject( value, {
 								type: 'img',
 								attributes: {
-									src: url,
-									alt,
 									class: `wp-image-${ id }`,
 									style: `width: ${ Math.min( width, 150 ) }px;`,
+									src: url,
+									alt,
 								},
 							} ) );
 						} }
