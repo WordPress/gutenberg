@@ -62,9 +62,7 @@ export default class BlockPicker extends Component<PropsType, StateType> {
 								onPress={ this.props.onValueSelected.bind( this, item.name ) }>
 								<View style={ styles.modalItem }>
 									<View style={ styles.modalIcon }>
-										{ /* TODO: ICON IMAGE GOES HERE */ }
-										{ /* <Text>{ item.icon.src }</Text> */ }
-										<Text>icon</Text>
+										{ item.icon.src }
 									</View>
 									<Text style={ styles.modalItemLabel }>{ item.title }</Text>
 								</View>
