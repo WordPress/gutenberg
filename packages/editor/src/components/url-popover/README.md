@@ -8,7 +8,8 @@ URLPopover is a presentational React component used to render a popover used for
 The component will be rendered adjacent to its parent.
 
 ```jsx
-import { ToggleControl, IconButton } from '@wordpress/components';
+import { Fragment } from '@wordpress/elements';
+import { ToggleControl, IconButton, Button } from '@wordpress/components';
 import { URLPopover } from '@wordpress/editor';
 
 class MyURLPopover extends Component {
@@ -43,37 +44,41 @@ class MyURLPopover extends Component {
 	}
 
 	submitURL() {
-		// Store the url.
+		// Not shown: Store the updated url.
+
+		this.closeURLPopover();
 	}
 
 	setTarget() {
-		// Store the updated target setting.
+		// Not shown: Store the updated 'opensInNewWindow' setting.
 	}
 
 	render() {
+		const { opensInNewWindow } = this.props;
 		const { url, isVisible, isEditing } = this.state;
 
-		if ( ! isVisible ) {
-			return;
-		}
-
 		return (
-			<URLPopover
-				onClickOutside={ this.closeURLPopover }
-				renderURLEditor={ () => (
-					<form onSubmit={ this.submitURL }>
-						<input type="url" value={ url } onChange={ this.onChangeURL } />
-						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
-					</form>
-				) }
-				renderSettings={ () => (
-					<ToggleControl
-						label={ __( 'Open in New Window' ) }
-						checked={ opensInNewWindow }
-						onChange={ this.setTarget }
+			<Fragment>
+				<Button onClick={ this.openURLPopover }>Edit URL</Button>
+				{ isVisible && (
+					<URLPopover
+						onClickOutside={ this.closeURLPopover }
+						renderURLEditor={ () => (
+							<form onSubmit={ this.submitURL }>
+								<input type="url" value={ url } onChange={ this.onChangeURL } />
+								<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
+							</form>
+						) }
+						renderSettings={ () => (
+							<ToggleControl
+								label={ __( 'Open in New Window' ) }
+								checked={ opensInNewWindow }
+								onChange={ this.setTarget }
+							/>
+						) }
 					/>
 				) }
-			/>
+			</Fragment>
 		);
 	}
 }
