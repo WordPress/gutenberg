@@ -1,7 +1,7 @@
 .editor-post-saved-state {
 	display: flex;
 	align-items: center;
-	color: $dark-gray-500;
+	color: $light-gray-900; // Doesn't need to meet AA because button is disabled and it's supporting text.
 	overflow: hidden;
 
 	&.is-saving {
@@ -31,6 +31,14 @@
 
 		.dashicon {
 			margin-right: 4px;
+		}
+	}
+}
+
+.editor-post-save-draft {
+	@include break-small() {
+		.dashicon {
+			display: none;
 		}
 	}
 }
