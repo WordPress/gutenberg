@@ -30,7 +30,7 @@ class ReusableBlockEditPanel extends Component {
 		if ( ! prevProps.isEditing && this.props.isEditing ) {
 			this.titleField.current.select();
 		}
-		// Move focus back to the Edit button after pressing the Escape key, Cancel, or Save.
+		// Move focus back to the Edit button after pressing the Escape key or after saving.
 		if ( ( prevProps.isEditing || prevProps.isSaving ) && ! this.props.isEditing && ! this.props.isSaving ) {
 			this.editButton.current.focus();
 		}
