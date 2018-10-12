@@ -256,4 +256,56 @@ describe( 'Links', () => {
 		await page.click( 'button[aria-label="Apply"]' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	// Test for regressions of https://github.com/WordPress/gutenberg/issues/10496.
+	it( 'allows autocomplete suggestions to be selected with the mouse', async () => {
+		const titleText = 'Unique post title';
+
+		// First create a post that we can search for using the link autocompletion.
+		await page.type( '.editor-post-title__input', titleText );
+		await page.click( '.editor-post-publish-panel__toggle' );
+
+		// Disable reason: Wait for the animation to complete, since otherwise the
+		// click attempt may occur at the wrong point.
+		// eslint-disable-next-line no-restricted-syntax
+		await page.waitFor( 100 );
+
+		// Publish the post
+		await page.click( '.editor-post-publish-button' );
+
+		await page.waitForSelector( '.post-publish-panel__postpublish-link-input' );
+		const postURL = await page.evaluate( () => document.querySelector( '.post-publish-panel__postpublish-link-input' ).value );
+
+		// Now create a new post and try to select the post created previously
+		// from the autocomplete suggestions.
+		await newPost();
+		await clickBlockAppender();
+		await page.keyboard.type( 'This is Gutenberg' );
+		await pressWithModifier( SELECT_WORD_MODIFIER_KEYS, 'ArrowLeft' );
+		await page.click( 'button[aria-label="Link"]' );
+
+		await page.keyboard.type( titleText );
+		await page.waitForSelector( '.editor-url-input__suggestion' );
+		const autocompleteSuggestions = await page.$x( `//*[contains(@class, "editor-url-input__suggestion")]//button[contains(text(), '${ titleText }')]` );
+
+		// Expect there to be some autocomplete suggestions.
+		expect( autocompleteSuggestions.length ).toBeGreaterThan( 0 );
+
+		const firstSuggestion = autocompleteSuggestions[ 0 ];
+
+		// Expect that clicking on the autocomplete suggestion doesn't dismiss the link popover.
+		// and that the url input has a value.
+		await firstSuggestion.click();
+		expect( await page.$( '.editor-format-toolbar__link-modal' ) ).not.toBeNull();
+
+		// Expect the url input value to have been updated with the post url
+		const inputValue = await page.evaluate( () => document.querySelector( '.editor-url-input input[aria-label="URL"]' ).value );
+		expect( inputValue ).toEqual( postURL );
+
+		// Expect the link to apply correctly.
+		// Note - have avoided using snapshots here since the link url can't be determined ahead of time.
+		await page.click( 'button[aria-label="Apply"]' );
+		const linkHref = await page.evaluate( () => document.querySelector( '.editor-format-toolbar__link-value' ).href );
+		expect( linkHref ).toEqual( postURL );
+	} );
 } );
