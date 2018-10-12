@@ -29,7 +29,7 @@ class ToggleControl extends Component {
 	}
 
 	render() {
-		const { label, checked, help, instanceId } = this.props;
+		const { label, checked, heading, help, instanceId } = this.props;
 		const id = `inspector-toggle-control-${ instanceId }`;
 
 		let describedBy, helpLabel;
@@ -40,7 +40,7 @@ class ToggleControl extends Component {
 
 		return (
 			<BaseControl
-				label={ label }
+				label={ heading }
 				id={ id }
 				help={ helpLabel }
 				className="components-toggle-control"
@@ -51,6 +51,9 @@ class ToggleControl extends Component {
 					onChange={ this.onChange }
 					aria-describedby={ describedBy }
 				/>
+				<label className="components-toggle-control__label" htmlFor={ id }>
+					{ label }
+				</label>
 			</BaseControl>
 		);
 	}
