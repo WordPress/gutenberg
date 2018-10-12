@@ -20,18 +20,18 @@ export const SVG = ( props ) => {
 	// Given it carries a string (as it was originally className) but an object is expected for `style`,
 	// we need to check whether `style` exists and is a string, and convert it to an object
 	let styleKeys = new Array();
-	let styleValues = new Array();
+	const styleValues = new Array();
 	if ( typeof props.style === 'string' || props.style instanceof String ) {
 		styleKeys = props.style.split( ' ' );
-		styleKeys.forEach(element => {
-			let oneStyle = styles[ element ];
-			if ( oneStyle != undefined ) {
+		styleKeys.forEach( (element) => {
+			const oneStyle = styles[ element ];
+			if ( oneStyle !== undefined ) {
 				styleValues.push( oneStyle );
 			}
-		});
+		} );
 	}
 
-	const safeProps = styleValues.length == 0 ? { ...omit( props, [ 'style' ] ) } : { ...props, style: styleValues };
+	const safeProps = styleValues.length === 0 ? { ...omit( props, [ 'style' ] ) } : { ...props, style: styleValues };
 	return (
 		<Svg
 			height="100%"
