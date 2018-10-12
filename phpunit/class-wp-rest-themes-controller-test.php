@@ -218,7 +218,8 @@ class WP_REST_Themes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 		$result = $response->get_data();
 		$this->assertTrue( isset( $result['theme_supports'] ) );
-		$this->assertFalse( isset( $result['theme_supports']['post-thumbnails'] ) );
+		$this->assertTrue( isset( $result['theme_supports']['post-thumbnails'] ) );
+		$this->assertFalse( $result['theme_supports']['post-thumbnails'] );
 	}
 
 	/**
@@ -231,7 +232,7 @@ class WP_REST_Themes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$response = rest_do_request( $request );
 		$result   = $response->get_data();
 		$this->assertTrue( isset( $result['theme_supports'] ) );
-		$this->assertEquals( true, $result['theme_supports']['post-thumbnails'] );
+		$this->assertTrue( $result['theme_supports']['post-thumbnails'] );
 	}
 
 	/**
