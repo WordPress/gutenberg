@@ -40,6 +40,7 @@ class URLPopover extends Component {
 
 		return (
 			<Popover
+				className="editor-url-popover"
 				focusOnMount={ isEditing ? 'firstElement' : false }
 				position={ position || 'bottom center' }
 				onClickOutside={ onClickOutside }

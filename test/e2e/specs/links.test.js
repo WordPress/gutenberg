@@ -214,13 +214,13 @@ describe( 'Links', () => {
 
 		// Typing "left" should not close the dialog
 		await page.keyboard.press( 'ArrowLeft' );
-		let modal = await page.$( '.editor-format-toolbar__link-modal' );
-		expect( modal ).not.toBeNull();
+		let popover = await page.$( '.editor-url-popover' );
+		expect( popover ).not.toBeNull();
 
 		// Escape should close the dialog still.
 		await page.keyboard.press( 'Escape' );
-		modal = await page.$( '.editor-format-toolbar__link-modal' );
-		expect( modal ).toBeNull();
+		popover = await page.$( '.editor-url-popover' );
+		expect( popover ).toBeNull();
 	} );
 
 	it( 'allows Left to be pressed during creation in "Docked Toolbar" mode', async () => {
@@ -236,13 +236,13 @@ describe( 'Links', () => {
 
 		// Typing "left" should not close the dialog
 		await page.keyboard.press( 'ArrowLeft' );
-		let modal = await page.$( '.editor-format-toolbar__link-modal' );
-		expect( modal ).not.toBeNull();
+		let popover = await page.$( '.editor-url-popover' );
+		expect( popover ).not.toBeNull();
 
 		// Escape should close the dialog still.
 		await page.keyboard.press( 'Escape' );
-		modal = await page.$( '.editor-format-toolbar__link-modal' );
-		expect( modal ).toBeNull();
+		popover = await page.$( '.editor-url-popover' );
+		expect( popover ).toBeNull();
 	} );
 
 	it( 'can be edited with collapsed selection', async () => {

@@ -2,6 +2,7 @@
 
 exports[`URLPopover matches the snapshot when editing the url 1`] = `
 <Popover
+  className="editor-url-popover"
   focusOnMount="firstElement"
   noArrow={false}
   onClickOutside={[Function]}
@@ -26,6 +27,7 @@ exports[`URLPopover matches the snapshot when editing the url 1`] = `
 
 exports[`URLPopover matches the snapshot when the settings are toggled open 1`] = `
 <Popover
+  className="editor-url-popover"
   focusOnMount="firstElement"
   noArrow={false}
   onClickOutside={[Function]}
@@ -57,6 +59,7 @@ exports[`URLPopover matches the snapshot when the settings are toggled open 1`] 
 
 exports[`URLPopover matches the snapshot when there are no settings 1`] = `
 <Popover
+  className="editor-url-popover"
   focusOnMount="firstElement"
   noArrow={false}
   onClickOutside={[Function]}
@@ -74,6 +77,7 @@ exports[`URLPopover matches the snapshot when there are no settings 1`] = `
 
 exports[`URLPopover matches the snapshot when viewing the url 1`] = `
 <Popover
+  className="editor-url-popover"
   focusOnMount={false}
   noArrow={false}
   onClickOutside={[Function]}
