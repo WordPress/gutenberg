@@ -30,7 +30,7 @@ The editor includes a number of packages to enable various pieces of functionali
 | [I18N](https://wordpress.org/gutenberg/handbook/packages/packages-i18n/) | wp-i18n | Internationalization utilities for client-side localization |
 | [Is Shallow Equal](https://wordpress.org/gutenberg/handbook/packages/packages-is-shallow-equal/) | wp-is-shallow-equal | A function for performing a shallow comparison between two objects or arrays |
 | [Keycodes](https://wordpress.org/gutenberg/handbook/packages/packages-keycodes/) | wp-keycodes | Keycodes utilities for WordPress, used to check the key pressed in events like `onKeyDown` |
-| [List Reusable Bocks](https://wordpress.org/gutenberg/handbook/packages/packages-list-reusable-blocks/) | wp-list-resuable-blocks | Package used to add import/export links to the listing page of the reusable blocks |
+| [List Reusable Bocks](https://wordpress.org/gutenberg/handbook/packages/packages-list-reusable-blocks/) | wp-list-reusable-blocks | Package used to add import/export links to the listing page of the reusable blocks |
 | [NUX](https://wordpress.org/gutenberg/handbook/packages/packages-nux/) | wp-nux | Components, and wp.data methods useful for onboarding a new user to the WordPress admin interface |
 | [Plugins](https://wordpress.org/gutenberg/handbook/packages/packages-plugins/) | wp-plugins | Plugins module for WordPress |
 | [Redux Routine](https://wordpress.org/gutenberg/handbook/packages/packages-redux-routine/) | wp-redux-routine | Redux middleware for generator coroutines |
@@ -48,7 +48,7 @@ The editor also uses some popular third-party packages and scripts. Plugin devel
 | Script Name | Handle | Description |
 |-------------|--------|-------------|
 | [React](https://reactjs.org) | react  | React is a JavaScript library for building user interfaces |
-| [React Dom](https://reactjs.org/docs/react-dom.html) | react-dom | Serves as the entry point to the DOM and server renderers for React, intended to be paired with React |	
+| [React Dom](https://reactjs.org/docs/react-dom.html) | react-dom | Serves as the entry point to the DOM and server renderers for React, intended to be paired with React |
 | [Moment](https://momentjs.com/) | moment| Parse, validate, manipulate, and display dates and times in JavaScript |
 | [TinyMCE Lists](https://www.tiny.cloud/docs/plugins/lists/) | tinymce-latest-lists| The `lists` plugin allows you to add numbered and bulleted lists to TinyMCE |
 | [Lodash](https://lodash.com) | lodash| Lodash is a JavaScript library which provides utility functions for common programming tasks |
