@@ -22,7 +22,7 @@ import scrollIntoView from 'dom-scroll-into-view';
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { Component, findDOMNode, createRef } from '@wordpress/element';
-import { withSpokenMessages, PanelBody } from '@wordpress/components';
+import { withSpokenMessages, PanelBody, Slot } from '@wordpress/components';
 import { getCategories, isReusableBlock } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
@@ -31,9 +31,8 @@ import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
  * Internal dependencies
  */
 import BlockPreview from '../block-preview';
-import BlockTypesList from '../block-types-list';
+import InserterList from '../inserter-list';
 import ChildBlocks from './child-blocks';
-import InserterResultsPortal from './results-portal';
 
 const MAX_SUGGESTED_ITEMS = 9;
 
@@ -265,11 +264,22 @@ export class InserterMenu extends Component {
 							onToggle={ this.onTogglePanel( 'suggested' ) }
 							ref={ this.bindPanel( 'suggested' ) }
 						>
-							<BlockTypesList items={ suggestedItems } onSelect={ onSelect } onHover={ this.onHover } />
+							<InserterList items={ suggestedItems } onSelect={ onSelect } onHover={ this.onHover } />
 						</PanelBody>
 					}
 
-					<InserterResultsPortal.Slot fillProps={ { filterValue } } />
+					<Slot name="Inserter.InlineElements">
+						{ ( fills ) => ! isEmpty( fills ) && (
+							<PanelBody
+								title={ __( 'Inline Elements' ) }
+								initialOpen={ false }
+							>
+								<InserterList>
+									{ fills }
+								</InserterList>
+							</PanelBody>
+						) }
+					</Slot>
 
 					{ map( getCategories(), ( category ) => {
 						const categoryItems = itemsPerCategory[ category.slug ];
@@ -284,7 +294,7 @@ export class InserterMenu extends Component {
 								onToggle={ this.onTogglePanel( category.slug ) }
 								ref={ this.bindPanel( category.slug ) }
 							>
-								<BlockTypesList items={ categoryItems } onSelect={ onSelect } onHover={ this.onHover } />
+								<InserterList items={ categoryItems } onSelect={ onSelect } onHover={ this.onHover } />
 							</PanelBody>
 						);
 					} ) }
@@ -298,7 +308,7 @@ export class InserterMenu extends Component {
 							icon="controls-repeat"
 							ref={ this.bindPanel( 'reusable' ) }
 						>
-							<BlockTypesList items={ reusableItems } onSelect={ onSelect } onHover={ this.onHover } />
+							<InserterList items={ reusableItems } onSelect={ onSelect } onHover={ this.onHover } />
 							<a
 								className="editor-inserter__manage-reusable-blocks"
 								href="edit.php?post_type=wp_block"

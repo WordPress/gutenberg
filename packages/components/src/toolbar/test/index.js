@@ -32,13 +32,12 @@ describe( 'Toolbar', () => {
 				},
 			];
 			const toolbar = shallow( <Toolbar controls={ controls } /> );
-			const listItem = toolbar.find( 'IconButton' );
+			const listItem = toolbar.find( 'ToolbarButton' );
 			expect( listItem.props() ).toMatchObject( {
 				icon: 'wordpress',
-				label: 'WordPress',
-				'data-subscript': 'wp',
-				'aria-pressed': false,
-				className: 'components-toolbar__control',
+				title: 'WordPress',
+				subscript: 'wp',
+				className: null,
 			} );
 		} );
 
@@ -54,10 +53,9 @@ describe( 'Toolbar', () => {
 				},
 			];
 			const toolbar = shallow( <Toolbar controls={ controls } /> );
-			const listItem = toolbar.find( 'IconButton' );
+			const listItem = toolbar.find( 'ToolbarButton' );
 			expect( listItem.props() ).toMatchObject( {
-				'aria-pressed': true,
-				className: 'components-toolbar__control is-active',
+				className: null,
 			} );
 		} );
 
@@ -96,10 +94,10 @@ describe( 'Toolbar', () => {
 				},
 			];
 			const toolbar = shallow( <Toolbar controls={ controls } /> );
-			const listItem = toolbar.find( 'IconButton' );
+			const listItem = toolbar.find( 'ToolbarButton' );
 			listItem.simulate( 'click', event );
 			expect( clickHandler ).toHaveBeenCalledTimes( 1 );
-			expect( clickHandler ).toHaveBeenCalledWith();
+			expect( clickHandler ).toHaveBeenCalledWith( event );
 		} );
 	} );
 } );
