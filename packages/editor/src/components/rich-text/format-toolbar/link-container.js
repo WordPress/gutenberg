@@ -194,7 +194,15 @@ class LinkContainer extends Component {
 					<URLPopover
 						onClickOutside={ this.resetState }
 						focusOnMount={ showInput ? 'firstElement' : false }
-						renderURLEditor={ () => showInput ? (
+						renderSettings={ () => (
+							<ToggleControl
+								label={ __( 'Open in New Window' ) }
+								checked={ opensInNewWindow }
+								onChange={ this.setLinkTarget }
+							/>
+						) }
+					>
+						{ showInput ? (
 							<LinkEditor
 								inputValue={ inputValue }
 								onChangeInputValue={ this.onChangeInputValue }
@@ -207,14 +215,7 @@ class LinkContainer extends Component {
 								editLink={ this.editLink }
 							/>
 						) }
-						renderSettings={ () => (
-							<ToggleControl
-								label={ __( 'Open in New Window' ) }
-								checked={ opensInNewWindow }
-								onChange={ this.setLinkTarget }
-							/>
-						) }
-					/>
+					</URLPopover>
 
 				</PositionedAtSelection>
 			</Fill>

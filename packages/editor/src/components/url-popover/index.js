@@ -24,7 +24,7 @@ class URLPopover extends Component {
 
 	render() {
 		const {
-			renderURLEditor,
+			children,
 			renderSettings,
 			position,
 			onClickOutside,
@@ -45,7 +45,7 @@ class URLPopover extends Component {
 				onClickOutside={ onClickOutside }
 			>
 				<div className="editor-url-popover__row">
-					{ renderURLEditor() }
+					{ children }
 					{ !! renderSettings && (
 						<IconButton
 							className="editor-url-popover__settings-toggle"

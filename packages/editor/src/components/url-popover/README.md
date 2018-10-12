@@ -63,12 +63,6 @@ class MyURLPopover extends Component {
 				{ isVisible && (
 					<URLPopover
 						onClickOutside={ this.closeURLPopover }
-						renderURLEditor={ () => (
-							<form onSubmit={ this.submitURL }>
-								<input type="url" value={ url } onChange={ this.onChangeURL } />
-								<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
-							</form>
-						) }
 						renderSettings={ () => (
 							<ToggleControl
 								label={ __( 'Open in New Window' ) }
@@ -76,7 +70,12 @@ class MyURLPopover extends Component {
 								onChange={ this.setTarget }
 							/>
 						) }
-					/>
+					>
+						<form onSubmit={ this.submitURL }>
+							<input type="url" value={ url } onChange={ this.onChangeURL } />
+							<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
+						</form>
+					</URLPopover>
 				) }
 			</Fragment>
 		);
@@ -102,14 +101,6 @@ Handles an event triggered when the user clicks outside of the URLPopover.
 
 - Type: `Function`
 - Required: No
-
-### renderURLEditor
-
-Callback used to return the rendered elements for editing the URL—usually a form with an input field that allows
-the user to type in a URL and a submit button.
-
-- Type: `Function`
-- Required: Yes
 
 ### renderSettings
 

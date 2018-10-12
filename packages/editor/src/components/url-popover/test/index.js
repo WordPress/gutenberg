@@ -12,13 +12,12 @@ describe( 'URLPopover', () => {
 	it( 'matches the snapshot in its default state', () => {
 		const wrapper = shallow(
 			<URLPopover
-				renderURLEditor={ () => (
-					<div>Editor</div>
-				) }
 				renderSettings={ () => (
 					<div>Settings</div>
 				) }
-			/>
+			>
+				<div>Editor</div>
+			</URLPopover>
 		);
 
 		expect( wrapper ).toMatchSnapshot();
@@ -27,13 +26,12 @@ describe( 'URLPopover', () => {
 	it( 'matches the snapshot when the settings are toggled open', () => {
 		const wrapper = shallow(
 			<URLPopover
-				renderURLEditor={ () => (
-					<div>Editor</div>
-				) }
 				renderSettings={ () => (
 					<div>Settings</div>
 				) }
-			/>
+			>
+				<div>Editor</div>
+			</URLPopover>
 		);
 
 		const toggleButton = wrapper.find( '.editor-url-popover__settings-toggle' );
@@ -45,11 +43,9 @@ describe( 'URLPopover', () => {
 
 	it( 'matches the snapshot when there are no settings', () => {
 		const wrapper = shallow(
-			<URLPopover
-				renderURLEditor={ () => (
-					<div>Editor</div>
-				) }
-			/>
+			<URLPopover>
+				<div>Editor</div>
+			</URLPopover>
 		);
 
 		expect( wrapper ).toMatchSnapshot();
