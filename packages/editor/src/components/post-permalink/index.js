@@ -11,6 +11,7 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
 import { ClipboardButton, Button, ExternalLink } from '@wordpress/components';
+import { safeDecodeURI } from '@wordpress/url';
 
 /**
  * Internal Dependencies
@@ -84,7 +85,7 @@ class PostPermalink extends Component {
 						target="_blank"
 						ref={ ( linkElement ) => this.linkElement = linkElement }
 					>
-						{ decodeURI( samplePermalink ) }
+						{ safeDecodeURI( samplePermalink ) }
 						&lrm;
 					</ExternalLink>
 				}

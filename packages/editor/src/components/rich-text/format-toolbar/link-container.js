@@ -11,7 +11,7 @@ import {
 	withSpokenMessages,
 } from '@wordpress/components';
 import { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
-import { prependHTTP } from '@wordpress/url';
+import { prependHTTP, safeDecodeURI } from '@wordpress/url';
 import {
 	create,
 	insert,
@@ -79,7 +79,7 @@ const LinkViewer = ( { href, editLink } ) => (
 			className="editor-format-toolbar__link-container-value"
 			href={ href }
 		>
-			{ filterURLForDisplay( decodeURI( href ) ) }
+			{ filterURLForDisplay( safeDecodeURI( href ) ) }
 		</ExternalLink>
 		<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ editLink } />
 	</div>
@@ -216,7 +216,6 @@ class LinkContainer extends Component {
 							/>
 						) }
 					</URLPopover>
-
 				</PositionedAtSelection>
 			</Fill>
 		);
