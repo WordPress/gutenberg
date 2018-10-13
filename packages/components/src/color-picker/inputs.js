@@ -275,7 +275,7 @@ export class Inputs extends Component {
 				<div className="components-color-picker__inputs-toggle">
 					<IconButton
 						icon="arrow-down-alt2"
-						label="Toggle input type"
+						label={ __( 'Toggle input type' ) }
 						onClick={ this.toggleViews }
 					/>
 				</div>
