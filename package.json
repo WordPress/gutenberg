@@ -35,6 +35,7 @@
 		"@wordpress/editor": "file:packages/editor",
 		"@wordpress/element": "file:packages/element",
 		"@wordpress/escape-html": "file:packages/escape-html",
+		"@wordpress/format-library": "file:packages/format-library",
 		"@wordpress/hooks": "file:packages/hooks",
 		"@wordpress/html-entities": "file:packages/html-entities",
 		"@wordpress/i18n": "file:packages/i18n",

@@ -21,13 +21,13 @@ import InlineLinkUI from './inline';
 const Shortcut = () => null;
 
 export const link = {
-	format: 'link',
-	selector: 'a',
+	name: 'core/link',
+	title: __( 'Link' ),
+	match: {
+		tagName: 'a',
+	},
 	attributes: {
-		url: {
-			source: 'attribute',
-			attribute: 'href',
-		},
+		url: 'href',
 	},
 	edit: class LinkEdit extends Component {
 		constructor() {

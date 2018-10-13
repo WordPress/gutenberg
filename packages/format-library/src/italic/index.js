@@ -9,8 +9,11 @@ import { toggleFormat } from '@wordpress/rich-text';
 const Shortcut = () => null;
 
 export const italic = {
-	format: 'italic',
-	selector: 'em',
+	name: 'core/italic',
+	title: __( 'Italic' ),
+	match: {
+		tagName: 'em',
+	},
 	edit( { isActive, value, onChange } ) {
 		const onToggle = () => onChange( toggleFormat( value, { type: 'em' } ) );
 

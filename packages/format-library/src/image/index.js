@@ -5,18 +5,16 @@ import { __ } from '@wordpress/i18n';
 import { Fragment, Component } from '@wordpress/element';
 import { Fill } from '@wordpress/components';
 import { insertObject } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
-import InserterListItem from '../../../inserter-list-item';
-import MediaUpload from '../../../media-upload';
+import { InserterListItem, MediaUpload } from '@wordpress/editor';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 export const image = {
-	format: 'image',
-	selector: 'img',
+	name: 'core/image',
+	title: __( 'Image' ),
+	match: {
+		tagName: 'img',
+	},
 	edit: class ImageEdit extends Component {
 		constructor() {
 			super( ...arguments );

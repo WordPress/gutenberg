@@ -9,8 +9,11 @@ import { toggleFormat } from '@wordpress/rich-text';
 const Shortcut = () => null;
 
 export const strikethrough = {
-	format: 'strikethrough',
-	selector: 'del',
+	name: 'core/strikethrough',
+	title: __( 'Strikethrough' ),
+	match: {
+		tagName: 'del',
+	},
 	edit( { isActive, value, onChange } ) {
 		const onToggle = () => onChange( toggleFormat( value, { type: 'del' } ) );
 

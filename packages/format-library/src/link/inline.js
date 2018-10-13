@@ -18,14 +18,12 @@ import {
 	isCollapsed,
 	applyFormat,
 } from '@wordpress/rich-text';
+import { URLInput, filterURLForDisplay, URLPopover } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import PositionedAtSelection from './positioned-at-selection';
-import URLInput from '../../../url-input';
-import { filterURLForDisplay } from '../../../../utils/url';
-import URLPopover from '../../../url-popover';
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 

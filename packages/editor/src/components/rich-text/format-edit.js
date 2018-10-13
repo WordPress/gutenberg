@@ -4,20 +4,16 @@
 import { Fragment } from '@wordpress/element';
 import {
 	getActiveFormat,
+	getFormatTypes,
 } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
-import { formatControls } from './format-controls';
 
 const FormatEdit = ( { value, onChange } ) => {
 	return (
 		<Fragment>
-			{ formatControls.map( ( { selector, edit: Edit }, i ) =>
+			{ getFormatTypes().map( ( { format, edit: Edit }, i ) =>
 				Edit && <Edit
 					key={ i }
-					isActive={ getActiveFormat( value, selector ) !== undefined }
+					isActive={ getActiveFormat( value, format ) !== undefined }
 					value={ value }
 					onChange={ onChange }
 				/>

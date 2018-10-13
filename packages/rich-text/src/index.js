@@ -1,11 +1,16 @@
+import './store';
+
 export { applyFormat } from './apply-format';
 export { concat } from './concat';
 export { create } from './create';
 export { getActiveFormat } from './get-active-format';
+export { getFormatType } from './get-format-type';
+export { getFormatTypes } from './get-format-types';
 export { getTextContent } from './get-text-content';
 export { isCollapsed } from './is-collapsed';
 export { isEmpty, isEmptyLine } from './is-empty';
 export { join } from './join';
+export { registerFormatType } from './register-format-type';
 export { removeFormat } from './remove-format';
 export { remove } from './remove';
 export { replace } from './replace';

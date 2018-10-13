@@ -9,8 +9,11 @@ import { toggleFormat } from '@wordpress/rich-text';
 const Shortcut = () => null;
 
 export const bold = {
-	format: 'bold',
-	selector: 'strong',
+	name: 'core/bold',
+	title: __( 'Bold' ),
+	match: {
+		tagName: 'strong',
+	},
 	edit( { isActive, value, onChange } ) {
 		const onToggle = () => onChange( toggleFormat( value, { type: 'strong' } ) );
 
