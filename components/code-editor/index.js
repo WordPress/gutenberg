@@ -13,7 +13,7 @@ import Placeholder from '../../packages/components/src/placeholder';
 import Spinner from '../../packages/components/src/spinner';
 
 /**
- * @var {string?} siteURL WordPRess Site URL
+ * @var {string?} siteURL WordPress Site URL
  */
 let siteURL;
 
