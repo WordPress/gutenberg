@@ -16,17 +16,17 @@ import {
 	PanelColorSettings,
 } from '@wordpress/editor';
 
-export const name = 'core/section';
+export const name = 'core/container';
 
 export const settings = {
 	title: sprintf(
 		/* translators: Block title modifier */
 		__( '%1$s (%2$s)' ),
-		__( 'Section' ),
+		__( 'Container' ),
 		__( 'beta' )
 	),
 
-	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><g><path d="M21 4H3L2 5v14l1 1h18l1-1V5l-1-1zM8 18H4V6h4v12zm6 0h-4V6h4v12zm6 0h-4V6h4v12z" /></g></svg>,
+	icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M19 12h-2v3h-3v2h5v-5zM7 9h3V7H5v5h2V9zm14-6H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16.01H3V4.99h18v14.02z" /><path d="M0 0h24v24H0z" fill="none" /></svg>,
 
 	category: 'layout',
 
@@ -42,10 +42,11 @@ export const settings = {
 		},
 	},
 
-	description: __( 'Group a selection of blocks into a container.' ),
+	description: __( 'Group blocks into a container.' ),
 
 	supports: {
 		align: [ 'wide', 'full' ],
+		anchor: true,
 	},
 
 	edit: withColors( 'backgroundColor' )( ( props ) => {
@@ -71,7 +72,7 @@ export const settings = {
 					/>
 				</InspectorControls>
 				<div
-					className={ classnames( 'wp-block-section', className, {
+					className={ classnames( className, {
 						'has-background': backgroundColor.color,
 						[ backgroundColor.class ]: backgroundColor.class,
 					} ) }

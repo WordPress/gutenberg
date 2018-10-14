@@ -24,6 +24,7 @@ import * as categories from './categories';
 import * as code from './code';
 import * as columns from './columns';
 import * as column from './columns/column';
+import * as container from './container';
 import * as coverImage from './cover-image';
 import * as embed from './embed';
 import * as file from './file';
@@ -38,7 +39,6 @@ import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
 import * as reusableBlock from './block';
 import * as separator from './separator';
-import * as section from './section';
 import * as shortcode from './shortcode';
 import * as spacer from './spacer';
 import * as subhead from './subhead';
@@ -70,6 +70,7 @@ export const registerCoreBlocks = () => {
 		code,
 		columns,
 		column,
+		container,
 		coverImage,
 		embed,
 		...embed.common,
@@ -84,7 +85,6 @@ export const registerCoreBlocks = () => {
 		nextpage,
 		preformatted,
 		pullquote,
-		section,
 		separator,
 		reusableBlock,
 		spacer,
