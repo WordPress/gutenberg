@@ -1,24 +1,20 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
 import {
 	clickOnMoreMenuItem,
 	openDocumentSettingsSidebar,
 	newPost,
-	newDesktopBrowserPage,
 } from '../support/utils';
 import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
 describe( 'Using Plugins API', () => {
 	beforeAll( async () => {
-		await newDesktopBrowserPage();
 		await activatePlugin( 'gutenberg-test-plugin-plugins-api' );
 		await newPost();
 	} );
 
 	afterAll( async () => {
-		await newDesktopBrowserPage();
 		await deactivatePlugin( 'gutenberg-test-plugin-plugins-api' );
 	} );
 

@@ -167,14 +167,14 @@ class URLInput extends Component {
 				if ( this.state.selectedSuggestion !== null ) {
 					event.stopPropagation();
 					const post = this.state.posts[ this.state.selectedSuggestion ];
-					this.selectLink( post.url );
+					this.selectLink( post );
 				}
 			}
 		}
 	}
 
-	selectLink( link ) {
-		this.props.onChange( link );
+	selectLink( post ) {
+		this.props.onChange( post.url, post );
 		this.setState( {
 			selectedSuggestion: null,
 			showSuggestions: false,
@@ -196,7 +196,7 @@ class URLInput extends Component {
 						value={ value }
 						onChange={ this.onChange }
 						onInput={ stopEventPropagation }
-						placeholder={ __( 'Paste URL or type' ) }
+						placeholder={ __( 'Paste URL or type to search' ) }
 						onKeyDown={ this.onKeyDown }
 						role="combobox"
 						aria-expanded={ showSuggestions }
@@ -226,7 +226,7 @@ class URLInput extends Component {
 									className={ classnames( 'editor-url-input__suggestion', {
 										'is-selected': index === selectedSuggestion,
 									} ) }
-									onClick={ () => this.selectLink( post.url ) }
+									onClick={ () => this.selectLink( post ) }
 									aria-selected={ index === selectedSuggestion }
 								>
 									{ decodeEntities( post.title ) || __( '(no title)' ) }

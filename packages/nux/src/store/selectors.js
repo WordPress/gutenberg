@@ -46,21 +46,21 @@ export const getAssociatedGuide = createSelector(
  * guide that they have been added to.
  *
  * @param {Object} state Global application state.
- * @param {string} id    The tip to query.
+ * @param {string} tipId The tip to query.
  *
  * @return {boolean} Whether or not the given tip is showing.
  */
-export function isTipVisible( state, id ) {
+export function isTipVisible( state, tipId ) {
 	if ( ! state.preferences.areTipsEnabled ) {
 		return false;
 	}
 
-	if ( state.preferences.dismissedTips[ id ] ) {
+	if ( state.preferences.dismissedTips[ tipId ] ) {
 		return false;
 	}
 
-	const associatedGuide = getAssociatedGuide( state, id );
-	if ( associatedGuide && associatedGuide.currentTipId !== id ) {
+	const associatedGuide = getAssociatedGuide( state, tipId );
+	if ( associatedGuide && associatedGuide.currentTipId !== tipId ) {
 		return false;
 	}
 

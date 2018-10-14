@@ -16,23 +16,37 @@ import * as node from './node';
 /**
  * A representation of a block's rich text value.
  *
- * @typedef {WPBlockChild[]} WPBlockChildren
+ * @typedef {WPBlockNode[]} WPBlockChildren
  */
 
 /**
- * Given a block node, returns a serialize-capable WordPress element.
+ * Given block children, returns a serialize-capable WordPress element.
  *
- * @param {WPBlockChildren} children Block node to convert.
+ * @param {WPBlockChildren} children Block children object to convert.
  *
  * @return {WPElement} A serialize-capable element.
  */
 export function getSerializeCapableElement( children ) {
-	// The fact that a block node is compatible with the element serializer is
+	// The fact that block children are compatible with the element serializer is
 	// merely an implementation detail that currently serves to be true, but
 	// should not be mistaken as being a guarantee on the external API. The
 	// public API only offers guarantees to work with strings (toHTML) and DOM
 	// elements (fromDOM), and should provide utilities to manipulate the value
 	// rather than expect consumers to inspect or construct its shape (concat).
+	return children;
+}
+
+/**
+ * Given block children, returns an array of block nodes.
+ *
+ * @param {WPBlockChildren} children Block children object to convert.
+ *
+ * @return {Array<WPBlockNode>} An array of individual block nodes.
+ */
+function getChildrenArray( children ) {
+	// The fact that block children are compatible with the element serializer
+	// is merely an implementation detail that currently serves to be true, but
+	// should not be mistaken as being a guarantee on the external API.
 	return children;
 }
 
@@ -126,6 +140,7 @@ export function matcher( selector ) {
 
 export default {
 	concat,
+	getChildrenArray,
 	fromDOM,
 	toHTML,
 	matcher,

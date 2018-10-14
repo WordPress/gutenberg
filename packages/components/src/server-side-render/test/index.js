@@ -1,14 +1,14 @@
-import { rendererPathWithAttributes } from '../index';
+import { rendererPath } from '../index';
 
-describe( 'blockPathWithAttributes', function() {
+describe( 'rendererPath', function() {
 	test( 'should return an base path for empty input', function() {
-		expect( rendererPathWithAttributes( 'core/test-block', null ) ).toBe( '/gutenberg/v1/block-renderer/core/test-block?context=edit' );
-		expect( rendererPathWithAttributes( 'core/test-block' ) ).toBe( '/gutenberg/v1/block-renderer/core/test-block?context=edit' );
+		expect( rendererPath( 'core/test-block', null ) ).toBe( '/gutenberg/v1/block-renderer/core/test-block?context=edit' );
+		expect( rendererPath( 'core/test-block' ) ).toBe( '/gutenberg/v1/block-renderer/core/test-block?context=edit' );
 	} );
 
 	test( 'should format basic url params ', function() {
 		expect(
-			rendererPathWithAttributes( 'core/test-block', {
+			rendererPath( 'core/test-block', {
 				stringArg: 'test',
 				nullArg: null,
 				emptyArg: '',
@@ -21,7 +21,7 @@ describe( 'blockPathWithAttributes', function() {
 
 	test( 'should format object params ', function() {
 		expect(
-			rendererPathWithAttributes( 'core/test-block', {
+			rendererPath( 'core/test-block', {
 				objectArg: {
 					stringProp: 'test',
 					numberProp: 123,
@@ -34,7 +34,7 @@ describe( 'blockPathWithAttributes', function() {
 
 	test( 'should format an array of objects', function() {
 		expect(
-			rendererPathWithAttributes( 'core/test-block', {
+			rendererPath( 'core/test-block', {
 				children: [
 					{
 						name: 'bobby',
@@ -50,6 +50,21 @@ describe( 'blockPathWithAttributes', function() {
 			} )
 		).toBe(
 			'/gutenberg/v1/block-renderer/core/test-block?context=edit&attributes%5Bchildren%5D%5B0%5D%5Bname%5D=bobby&attributes%5Bchildren%5D%5B0%5D%5Bage%5D=12&attributes%5Bchildren%5D%5B0%5D%5Bsex%5D=M&attributes%5Bchildren%5D%5B1%5D%5Bname%5D=sally&attributes%5Bchildren%5D%5B1%5D%5Bage%5D=8&attributes%5Bchildren%5D%5B1%5D%5Bsex%5D=F',
+		);
+	} );
+
+	test( 'should include urlQueryArgs', function() {
+		expect(
+			rendererPath(
+				'core/test-block', {
+					stringArg: 'test',
+				},
+				{
+					id: 1234,
+				}
+			)
+		).toBe(
+			'/gutenberg/v1/block-renderer/core/test-block?context=edit&attributes%5BstringArg%5D=test&id=1234',
 		);
 	} );
 } );

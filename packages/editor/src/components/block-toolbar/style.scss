@@ -1,5 +1,5 @@
 .editor-block-toolbar {
-	display: inline-flex;
+	display: flex;
 	flex-grow: 1;
 	width: 100%;
 	overflow: auto; // Allow horizontal scrolling on mobile.
@@ -21,14 +21,5 @@
 
 		// Add a right border to show as separator in the block toolbar.
 		border-right: $border-width solid $light-gray-500;
-	}
-
-	// This should be refactored to have its own class to target.
-	> div {
-		// IE11 does not support `position: sticky`, or Flex very well, so use block.
-		display: block;
-		@supports (position: sticky) {
-			display: flex;
-		}
 	}
 }

@@ -29,7 +29,7 @@ export function setLocaleData( localeData = { '': {} }, domain = 'default' ) {
 		i18n = new Jed( {
 			domain: 'default',
 			locale_data: {
-				default: {},
+				default: { '': {} },
 			},
 		} );
 	}
@@ -47,7 +47,7 @@ export function setLocaleData( localeData = { '': {} }, domain = 'default' ) {
  *
  * @return {Jed} Jed instance.
  */
-export function getI18n() {
+function getI18n() {
 	if ( ! i18n ) {
 		setLocaleData();
 	}
@@ -69,7 +69,7 @@ export function getI18n() {
  *
  * @return {string} The translated string.
  */
-export const dcnpgettext = memoize( ( domain = 'default', context, single, plural, number ) => {
+const dcnpgettext = memoize( ( domain = 'default', context, single, plural, number ) => {
 	try {
 		return getI18n().dcnpgettext( domain, context, single, plural, number );
 	} catch ( error ) {

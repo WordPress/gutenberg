@@ -1,7 +1,43 @@
 /**
- * Internal Dependencies
+ * External dependencies
  */
-import { addQueryArgs, prependHTTP } from '../';
+import { every } from 'lodash';
+
+/**
+ * Internal dependencies
+ */
+import {
+	isURL,
+	addQueryArgs,
+	prependHTTP,
+	safeDecodeURI,
+} from '../';
+
+describe( 'isURL', () => {
+	it( 'returns true when given things that look like a URL', () => {
+		const urls = [
+			'http://wordpress.org',
+			'https://wordpress.org',
+			'HTTPS://WORDPRESS.ORG',
+			'https://wordpress.org/foo#bar',
+			'https://localhost/foo#bar',
+		];
+
+		expect( every( urls, isURL ) ).toBe( true );
+	} );
+
+	it( 'returns false when given things that don\'t look like a URL', () => {
+		const urls = [
+			'HTTP: HyperText Transfer Protocol',
+			'URLs begin with a http:// prefix',
+			'Go here: http://wordpress.org',
+			'http://',
+			'',
+		];
+
+		expect( every( urls, isURL ) ).toBe( false );
+	} );
+} );
 
 describe( 'addQueryArgs', () => {
 	it( 'should append args to an URL without query string', () => {
@@ -29,7 +65,7 @@ describe( 'addQueryArgs', () => {
 		const url = 'https://andalouses.example/beach?time[]=10&time[]=11';
 		const args = { beach: [ 'sand', 'rock' ] };
 
-		expect( decodeURI( addQueryArgs( url, args ) ) ).toBe( 'https://andalouses.example/beach?time[0]=10&time[1]=11&beach[0]=sand&beach[1]=rock' );
+		expect( safeDecodeURI( addQueryArgs( url, args ) ) ).toBe( 'https://andalouses.example/beach?time[0]=10&time[1]=11&beach[0]=sand&beach[1]=rock' );
 	} );
 } );
 
@@ -86,5 +122,20 @@ describe( 'prependHTTP', () => {
 		const url = 'mailto:foo@wordpress.org';
 
 		expect( prependHTTP( url ) ).toBe( url );
+	} );
+} );
+
+describe( 'safeDecodeURI', () => {
+	it( 'should decode URI if formed well', () => {
+		const encoded = 'https://mozilla.org/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B';
+		const decoded = 'https://mozilla.org/?x=шеллы';
+
+		expect( safeDecodeURI( encoded ) ).toBe( decoded );
+	} );
+
+	it( 'should return URI if malformed', () => {
+		const malformed = '%1';
+
+		expect( safeDecodeURI( malformed ) ).toBe( malformed );
 	} );
 } );

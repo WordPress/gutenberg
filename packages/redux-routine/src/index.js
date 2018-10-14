@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import isGenerator from './is-generator';
-import castError from './cast-error';
+import createRuntime from './runtime';
 
 /**
  * Creates a Redux middleware, given an object of controls where each key is an
@@ -14,40 +14,17 @@ import castError from './cast-error';
  *
  * @param {Object} controls Object of control handlers.
  *
- * @return {Function} Redux middleware function.
+ * @return {Function} Co-routine runtime
  */
 export default function createMiddleware( controls = {} ) {
-	return ( store ) => ( next ) => ( action ) => {
-		if ( ! isGenerator( action ) ) {
-			return next( action );
-		}
-
-		function step( nextAction ) {
-			if ( ! nextAction ) {
-				return;
+	return ( store ) => {
+		const runtime = createRuntime( controls, store.dispatch );
+		return ( next ) => ( action ) => {
+			if ( ! isGenerator( action ) ) {
+				return next( action );
 			}
 
-			const control = controls[ nextAction.type ];
-			if ( typeof control === 'function' ) {
-				const routine = control( nextAction );
-
-				if ( routine instanceof Promise ) {
-					// Async control routine awaits resolution.
-					routine.then(
-						( result ) => step( action.next( result ).value ),
-						( error ) => action.throw( castError( error ) ),
-					);
-				} else if ( routine !== undefined ) {
-					// Sync control routine steps synchronously.
-					step( action.next( routine ).value );
-				}
-			} else {
-				// Uncontrolled action is dispatched.
-				store.dispatch( nextAction );
-				step( action.next().value );
-			}
-		}
-
-		step( action.next().value );
+			return runtime( action );
+		};
 	};
 }

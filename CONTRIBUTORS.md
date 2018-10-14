@@ -102,3 +102,12 @@ This list is manually curated to include valuable contributions by volunteers th
 | @hideokamoto | @hideokamoto |
 | @mirucon | @mirucon |
 | @nosolosw | @nosolosw |
+| @DannyCooper | @DannyCooper |
+| @burhandodhy | @burhandodhy |
+| @ZebulanStanphill | @zebulan |
+| @BenjaminZekavica | @benjamin_zekavica |
+| @danielbachhuber | |
+| @jorgefilipecosta | |
+| @ajitbohra | |
+| @ChrisVanPatten | |
+| @tofumatt | @lonelyvegan |

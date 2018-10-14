@@ -41,9 +41,6 @@ function gutenberg_collect_meta_box_data() {
 
 	$screen = $current_screen;
 
-	// Disable hidden metaboxes because there's no UI to toggle visibility.
-	add_filter( 'hidden_meta_boxes', '__return_empty_array' );
-
 	// If we are working with an already predetermined post.
 	if ( isset( $_REQUEST['post'] ) ) {
 		$post    = get_post( absint( $_REQUEST['post'] ) );
@@ -61,6 +58,9 @@ function gutenberg_collect_meta_box_data() {
 	if ( ! gutenberg_can_edit_post_type( $post_type ) ) {
 		return;
 	}
+
+	// Disable hidden metaboxes because there's no UI to toggle visibility.
+	add_filter( 'hidden_meta_boxes', '__return_empty_array' );
 
 	$thumbnail_support = current_theme_supports( 'post-thumbnails', $post_type ) && post_type_supports( $post_type, 'thumbnail' );
 	if ( ! $thumbnail_support && 'attachment' === $post_type && $post->post_mime_type ) {
@@ -216,8 +216,6 @@ function gutenberg_collect_meta_box_data() {
 	 */
 	$_meta_boxes_copy = apply_filters( 'filter_gutenberg_meta_boxes', $_meta_boxes_copy );
 
-	$meta_box_data = array();
-
 	// Redirect to classic editor if a meta box is incompatible.
 	foreach ( $locations as $location ) {
 		if ( ! isset( $_meta_boxes_copy[ $post->post_type ][ $location ] ) ) {
@@ -234,7 +232,7 @@ function gutenberg_collect_meta_box_data() {
 					&& isset( $box['args']['__block_editor_compatible_meta_box'] )
 					&& ! $box['args']['__block_editor_compatible_meta_box'] ) {
 						$incompatible_meta_box = true;
-						?>
+					?>
 						<script type="text/javascript">
 							var joiner = '?';
 							if ( window.location.search ) {
@@ -333,6 +331,30 @@ function gutenberg_can_edit_post_type( $post_type ) {
 }
 
 /**
+ * Determine whether a post or content string has blocks.
+ *
+ * This test optimizes for performance rather than strict accuracy, detecting
+ * the pattern of a block but not validating its structure. For strict accuracy
+ * you should use the block parser on post content.
+ *
+ * @since 3.6.0
+ * @see gutenberg_parse_blocks()
+ *
+ * @param int|string|WP_Post|null $post Optional. Post content, post ID, or post object. Defaults to global $post.
+ * @return bool Whether the post has blocks.
+ */
+function has_blocks( $post = null ) {
+	if ( ! is_string( $post ) ) {
+		$wp_post = get_post( $post );
+		if ( $wp_post instanceof WP_Post ) {
+			$post = $wp_post->post_content;
+		}
+	}
+
+	return false !== strpos( (string) $post, '<!-- wp:' );
+}
+
+/**
  * Determine whether a post has blocks. This test optimizes for performance
  * rather than strict accuracy, detecting the pattern of a block but not
  * validating its structure. For strict accuracy, you should use the block
@@ -341,13 +363,14 @@ function gutenberg_can_edit_post_type( $post_type ) {
  * @see gutenberg_parse_blocks()
  *
  * @since 0.5.0
+ * @deprecated 3.6.0 Use has_blocks()
  *
  * @param object $post Post.
  * @return bool  Whether the post has blocks.
  */
 function gutenberg_post_has_blocks( $post ) {
-	$post = get_post( $post );
-	return $post && gutenberg_content_has_blocks( $post->post_content );
+	_deprecated_function( __FUNCTION__, '3.6.0', 'has_blocks()' );
+	return has_blocks( $post );
 }
 
 /**
@@ -356,14 +379,44 @@ function gutenberg_post_has_blocks( $post ) {
  * but not validating its structure. For strict accuracy, you should use the
  * block parser on post content.
  *
- * @since 1.6.0
  * @see gutenberg_parse_blocks()
+ *
+ * @since 1.6.0
+ * @deprecated 3.6.0 Use has_blocks()
  *
  * @param string $content Content to test.
  * @return bool Whether the content contains blocks.
  */
 function gutenberg_content_has_blocks( $content ) {
-	return false !== strpos( $content, '<!-- wp:' );
+	_deprecated_function( __FUNCTION__, '3.6.0', 'has_blocks()' );
+	return has_blocks( $content );
+}
+
+/**
+ * Determine whether a $post or a string contains a specific block type.
+ * This test optimizes for performance rather than strict accuracy, detecting
+ * the block type exists but not validating its structure.
+ * For strict accuracy, you should use the block parser on post content.
+ *
+ * @since 3.6.0
+ *
+ * @param string                  $block_type Full Block type to look for.
+ * @param int|string|WP_Post|null $post Optional. Post content, post ID, or post object. Defaults to global $post.
+ * @return bool Whether the post content contains the specified block.
+ */
+function has_block( $block_type, $post = null ) {
+	if ( ! has_blocks( $post ) ) {
+		return false;
+	}
+
+	if ( ! is_string( $post ) ) {
+		$wp_post = get_post( $post );
+		if ( $wp_post instanceof WP_Post ) {
+			$post = $wp_post->post_content;
+		}
+	}
+
+	return false !== strpos( $post, '<!-- wp:' . $block_type . ' ' );
 }
 
 /**
@@ -378,7 +431,7 @@ function gutenberg_content_has_blocks( $content ) {
  * @return int The block format version.
  */
 function gutenberg_content_block_version( $content ) {
-	return gutenberg_content_has_blocks( $content ) ? 1 : 0;
+	return has_blocks( $content ) ? 1 : 0;
 }
 
 /**
@@ -389,7 +442,7 @@ function gutenberg_content_block_version( $content ) {
  * @return array                A filtered array of post display states.
  */
 function gutenberg_add_gutenberg_post_state( $post_states, $post ) {
-	if ( gutenberg_post_has_blocks( $post ) ) {
+	if ( has_blocks( $post ) ) {
 		$post_states[] = 'Gutenberg';
 	}
 
@@ -403,23 +456,30 @@ add_filter( 'display_post_states', 'gutenberg_add_gutenberg_post_state', 10, 2 )
  * @since 0.10.0
  */
 function gutenberg_register_post_types() {
-	register_post_type( 'wp_block', array(
-		'labels'                => array(
-			'name'          => 'Blocks',
-			'singular_name' => 'Block',
-		),
-		'public'                => false,
-		'rewrite'               => false,
-		'show_in_rest'          => true,
-		'rest_base'             => 'blocks',
-		'rest_controller_class' => 'WP_REST_Blocks_Controller',
-		'capability_type'       => 'block',
-		'capabilities'          => array(
-			'read'         => 'read_blocks',
-			'create_posts' => 'create_blocks',
-		),
-		'map_meta_cap'          => true,
-	) );
+	register_post_type(
+		'wp_block',
+		array(
+			'labels'                => array(
+				'name'          => __( 'Blocks', 'gutenberg' ),
+				'singular_name' => __( 'Block', 'gutenberg' ),
+				'search_items'  => __( 'Search Blocks', 'gutenberg' ),
+			),
+			'public'                => false,
+			'show_ui'               => true,
+			'show_in_menu'          => false,
+			'rewrite'               => false,
+			'show_in_rest'          => true,
+			'rest_base'             => 'blocks',
+			'rest_controller_class' => 'WP_REST_Blocks_Controller',
+			'capability_type'       => 'block',
+			'capabilities'          => array(
+				'read'         => 'read_blocks',
+				'create_posts' => 'create_blocks',
+			),
+			'map_meta_cap'          => true,
+			'supports'              => false,
+		)
+	);
 
 	$editor_caps = array(
 		'edit_blocks',

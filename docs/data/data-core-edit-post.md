@@ -1,6 +1,6 @@
 # **core/edit-post**: The Editor’s UI Data
 
-## Selectors 
+## Selectors
 
 ### getEditorMode
 
@@ -36,7 +36,14 @@ Whether the plugin sidebar is opened.
 
 ### getActiveGeneralSidebarName
 
-Returns the current active general sidebar name.
+Returns the current active general sidebar name, or null if there is no
+general sidebar active. The active general sidebar is a unique name to
+identify either an editor or plugin sidebar.
+
+Examples:
+
+ - `edit-post/document`
+ - `my-plugin/insert-image-sidebar`
 
 *Parameters*
 
@@ -95,6 +102,19 @@ Returns true if the editor sidebar panel is open, or false otherwise.
 
 Whether the sidebar panel is open.
 
+### isModalActive
+
+Returns true if a modal is active, or false otherwise.
+
+*Parameters*
+
+ * state: Global application state.
+ * modalName: A string that uniquely identifies the modal.
+
+*Returns*
+
+Whether the modal is active.
+
 ### isFeatureActive
 
 Returns whether the given feature is enabled or not.
@@ -110,7 +130,7 @@ Is active.
 
 ### isPluginItemPinned
 
-Returns true if the the plugin item is pinned to the header.
+Returns true if the plugin item is pinned to the header.
 When the value is not set it defaults to true.
 
 *Parameters*
@@ -134,6 +154,32 @@ Returns the state of legacy meta boxes.
 
 State of meta boxes.
 
+### getActiveMetaBoxLocations
+
+Returns an array of active meta box locations.
+
+*Parameters*
+
+ * state: Post editor state.
+
+*Returns*
+
+Active meta box locations.
+
+### isMetaBoxLocationActive
+
+Returns true if there is an active meta box in the given location, or false
+otherwise.
+
+*Parameters*
+
+ * state: Post editor state.
+ * location: Meta box location to test.
+
+*Returns*
+
+Whether the meta box location is active.
+
 ### getMetaBox
 
 Returns the state of legacy meta boxes.
@@ -147,9 +193,21 @@ Returns the state of legacy meta boxes.
 
 State of meta box at specified location.
 
+### hasMetaBoxes
+
+Returns true if the post is using Meta Boxes
+
+*Parameters*
+
+ * state: Global application state
+
+*Returns*
+
+Whether there are metaboxes or not.
+
 ### isSavingMetaBoxes
 
-Returns true if the the Meta Boxes are being saved.
+Returns true if the Meta Boxes are being saved.
 
 *Parameters*
 
@@ -170,6 +228,18 @@ Returns an action object used in signalling that the user opened an editor sideb
  * name: Sidebar name to be opened.
 
 ### closeGeneralSidebar
+
+Returns an action object signalling that the user closed the sidebar.
+
+### openModal
+
+Returns an action object used in signalling that the user opened an editor sidebar.
+
+*Parameters*
+
+ * name: A string that uniquely identifies the modal.
+
+### closeModal
 
 Returns an action object signalling that the user closed the sidebar.
 
@@ -226,6 +296,15 @@ This indicates that the sidebar has a meta box but the normal area does not.
 *Parameters*
 
  * metaBoxes: Whether meta box locations are active.
+
+### setActiveMetaBoxLocations
+
+Returns an action object used in signaling that the active meta box
+locations have changed.
+
+*Parameters*
+
+ * locations: New active meta box locations.
 
 ### requestMetaBoxUpdates
 

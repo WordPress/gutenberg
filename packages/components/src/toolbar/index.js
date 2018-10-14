@@ -8,6 +8,9 @@ import { flatMap } from 'lodash';
  * Internal dependencies
  */
 import IconButton from '../icon-button';
+import DropdownMenu from '../dropdown-menu';
+import ToolbarContainer from './toolbar-container';
+import ToolbarButtonContainer from './toolbar-button-container';
 
 /**
  * Renders a toolbar with controls.
@@ -39,7 +42,7 @@ import IconButton from '../icon-button';
  *
  * @return {ReactElement} The rendered toolbar.
  */
-function Toolbar( { controls = [], children, className } ) {
+function Toolbar( { controls = [], children, className, isCollapsed, icon, label } ) {
 	if (
 		( ! controls || ! controls.length ) &&
 		! children
@@ -53,11 +56,22 @@ function Toolbar( { controls = [], children, className } ) {
 		controlSets = [ controlSets ];
 	}
 
+	if ( isCollapsed ) {
+		return (
+			<DropdownMenu
+				icon={ icon }
+				label={ label }
+				controls={ controlSets }
+				className={ classnames( 'components-toolbar', className ) }
+			/>
+		);
+	}
+
 	return (
-		<div className={ classnames( 'components-toolbar', className ) }>
+		<ToolbarContainer className={ classnames( 'components-toolbar', className ) }>
 			{ flatMap( controlSets, ( controlSet, indexOfSet ) => (
 				controlSet.map( ( control, indexOfControl ) => (
-					<div
+					<ToolbarButtonContainer
 						key={ [ indexOfSet, indexOfControl ].join() }
 						className={ indexOfSet > 0 && indexOfControl === 0 ? 'has-left-divider' : null }
 					>
@@ -70,18 +84,19 @@ function Toolbar( { controls = [], children, className } ) {
 								event.stopPropagation();
 								control.onClick();
 							} }
-							className={ classnames( 'components-toolbar__control', {
+							className={ classnames( 'components-toolbar__control', control.className, {
 								'is-active': control.isActive,
 							} ) }
 							aria-pressed={ control.isActive }
 							disabled={ control.isDisabled }
+							{ ...control.extraProps }
 						/>
 						{ control.children }
-					</div>
+					</ToolbarButtonContainer>
 				) )
 			) ) }
 			{ children }
-		</div>
+		</ToolbarContainer>
 	);
 }
 

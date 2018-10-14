@@ -1,2 +1,0 @@
-// Deprecations
-export * from './mediaupload';

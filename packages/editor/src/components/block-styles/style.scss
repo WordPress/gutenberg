@@ -1,24 +1,29 @@
 .editor-block-styles {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	grid-gap: $item-spacing;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
 }
 
 .editor-block-styles__item {
+	width: calc(50% - #{ $grid-size-small });
+	margin: $grid-size-small 0;
+	flex-shrink: 0;
 	cursor: pointer;
 	overflow: hidden;
+	border-radius: $radius-round-rectangle;
+	padding: $grid-size-small;
 
-	&:focus,
 	&.is-active {
-		.editor-block-styles__item-preview {
-			@include block-style__focus-active();
-		}
+		@include block-style__focus-active();
+		box-shadow: 0 0 0 2px $dark-gray-500;
+	}
+
+	&:focus {
+		@include block-style__focus-active();
 	}
 
 	&:hover {
-		.editor-block-styles__item-preview {
-			@include block-style__hover;
-		}
+		@include block-style__hover;
 	}
 }
 
@@ -31,6 +36,7 @@
 	border-radius: $radius-round-rectangle;
 	display: flex;
 	height: 60px;
+	background: $white;
 
 	> * {
 		transform: scale(0.7);

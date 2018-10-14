@@ -8,15 +8,13 @@ import { noop } from 'lodash';
  */
 import {
 	Component,
+	createContext,
+	createElement,
 	Fragment,
-	RawHTML,
-} from '../';
+	StrictMode,
+} from '../react';
+import RawHTML from '../raw-html';
 import serialize, {
-	escapeAmpersand,
-	escapeQuotationMark,
-	escapeLessThan,
-	escapeAttribute,
-	escapeHTML,
 	hasPrefix,
 	renderElement,
 	renderNativeComponent,
@@ -25,54 +23,24 @@ import serialize, {
 	renderStyle,
 } from '../serialize';
 
-function testEscapeAmpersand( implementation ) {
-	it( 'should escape ampersand', () => {
-		const result = implementation( 'foo & bar &amp; &AMP; baz &#931; &#bad; &#x3A3; &#X3a3; &#xevil;' );
-
-		expect( result ).toBe( 'foo &amp; bar &amp; &AMP; baz &#931; &amp;#bad; &#x3A3; &#X3a3; &amp;#xevil;' );
-	} );
-}
-
-function testEscapeQuotationMark( implementation ) {
-	it( 'should escape quotation mark', () => {
-		const result = implementation( '"Be gone!"' );
-
-		expect( result ).toBe( '&quot;Be gone!&quot;' );
-	} );
-}
-
-function testEscapeLessThan( implementation ) {
-	it( 'should escape less than', () => {
-		const result = implementation( 'Chicken < Ribs' );
-
-		expect( result ).toBe( 'Chicken &lt; Ribs' );
-	} );
-}
-
-describe( 'escapeAmpersand', () => {
-	testEscapeAmpersand( escapeAmpersand );
-} );
-
-describe( 'escapeQuotationMark', () => {
-	testEscapeQuotationMark( escapeQuotationMark );
-} );
-
-describe( 'escapeLessThan', () => {
-	testEscapeLessThan( escapeLessThan );
-} );
-
-describe( 'escapeAttribute', () => {
-	testEscapeAmpersand( escapeAttribute );
-	testEscapeQuotationMark( escapeAttribute );
-} );
-
-describe( 'escapeHTML', () => {
-	testEscapeAmpersand( escapeHTML );
-	testEscapeLessThan( escapeHTML );
-} );
-
 describe( 'serialize()', () => {
-	it( 'should render with context', () => {
+	it( 'should allow only valid attribute names', () => {
+		const element = createElement(
+			'div',
+			{
+				'notok\u007F': 'bad',
+				'notok"': 'bad',
+				ok: 'good',
+				'notok\uFDD0': 'bad',
+			},
+		);
+
+		const result = serialize( element );
+
+		expect( result ).toBe( '<div ok="good"></div>' );
+	} );
+
+	it( 'should render with context (legacy)', () => {
 		class Provider extends Component {
 			getChildContext() {
 				return {
@@ -254,10 +222,102 @@ describe( 'renderElement()', () => {
 		expect( result ).toBe( 'Hello' );
 	} );
 
+	it( 'renders StrictMode with undefined children', () => {
+		const result = renderElement( <StrictMode /> );
+
+		expect( result ).toBe( '' );
+	} );
+
+	it( 'renders StrictMode as its inner children', () => {
+		const result = renderElement( <StrictMode>Hello</StrictMode> );
+
+		expect( result ).toBe( 'Hello' );
+	} );
+
 	it( 'renders Fragment with undefined children', () => {
 		const result = renderElement( <Fragment /> );
 
 		expect( result ).toBe( '' );
+	} );
+
+	it( 'renders default value from Context API', () => {
+		const { Consumer } = createContext( {
+			value: 'default',
+		} );
+
+		const result = renderElement(
+			<Consumer>
+				{ ( context ) => context.value }
+			</Consumer>
+		);
+
+		expect( result ).toBe( 'default' );
+	} );
+
+	it( 'renders provided value through Context API', () => {
+		const { Consumer, Provider } = createContext( {
+			value: 'default',
+		} );
+
+		const result = renderElement(
+			<Provider value={ { value: 'provided' } }>
+				<Consumer>
+					{ ( context ) => context.value }
+				</Consumer>
+			</Provider>
+		);
+
+		expect( result ).toBe( 'provided' );
+	} );
+
+	it( 'renders proper value through Context API when multiple providers present', () => {
+		const { Consumer, Provider } = createContext( {
+			value: 'default',
+		} );
+
+		const result = renderElement(
+			<Fragment>
+				<Provider value={ { value: '1st provided' } }>
+					<Consumer>
+						{ ( context ) => context.value }
+					</Consumer>
+				</Provider>
+				{ '|' }
+				<Provider value={ { value: '2nd provided' } }>
+					<Consumer>
+						{ ( context ) => context.value }
+					</Consumer>
+				</Provider>
+				{ '|' }
+				<Consumer>
+					{ ( context ) => context.value }
+				</Consumer>
+			</Fragment>
+		);
+
+		expect( result ).toBe( '1st provided|2nd provided|default' );
+	} );
+
+	it( 'renders proper value through Context API when nested providers present', () => {
+		const { Consumer, Provider } = createContext( {
+			value: 'default',
+		} );
+
+		const result = renderElement(
+			<Provider value={ { value: 'outer provided' } }>
+				<Provider value={ { value: 'inner provided' } }>
+					<Consumer>
+						{ ( context ) => context.value }
+					</Consumer>
+				</Provider>
+				{ '|' }
+				<Consumer>
+					{ ( context ) => context.value }
+				</Consumer>
+			</Provider>
+		);
+
+		expect( result ).toBe( 'inner provided|outer provided' );
 	} );
 
 	it( 'renders RawHTML as its unescaped children', () => {

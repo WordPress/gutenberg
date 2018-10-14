@@ -31,7 +31,7 @@ describe( 'ReusableBlockDeleteButton', () => {
 			/>
 		);
 
-		wrapper.find( 'IconButton' ).simulate( 'click' );
+		wrapper.find( 'MenuItem' ).simulate( 'click' );
 		expect( onDelete ).toHaveBeenCalledWith( 123 );
 	} );
 } );

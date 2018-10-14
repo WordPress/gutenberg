@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/redux-routine",
-	"version": "1.0.0-beta.0",
+	"version": "3.0.1",
 	"description": "Redux middleware for generator coroutines.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,8 +20,11 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime-corejs2": "7.0.0-beta.56"
+		"@babel/runtime": "^7.0.0",
+		"is-promise": "^2.1.0",
+		"rungen": "^0.3.2"
 	},
 	"devDependencies": {
 		"redux": "^4.0.0"

@@ -5,7 +5,6 @@ import {
 	createBlock,
 	getBlockType,
 	getBlockTypes,
-	setUnknownTypeHandlerName,
 	getSaveElement,
 	registerBlockType,
 	serialize,
@@ -20,7 +19,6 @@ import InnerBlocks from '../';
 
 describe( 'InnerBlocks', () => {
 	afterEach( () => {
-		setUnknownTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );

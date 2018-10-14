@@ -79,46 +79,13 @@ function _gutenberg_utf8_split( $str ) {
  */
 function gutenberg_disable_editor_settings_wpautop( $settings, $editor_id ) {
 	$post = get_post();
-	if ( 'content' === $editor_id && is_object( $post ) && gutenberg_post_has_blocks( $post ) ) {
+	if ( 'content' === $editor_id && is_object( $post ) && has_blocks( $post ) ) {
 		$settings['wpautop'] = false;
 	}
 
 	return $settings;
 }
 add_filter( 'wp_editor_settings', 'gutenberg_disable_editor_settings_wpautop', 10, 2 );
-
-/**
- * Add TinyMCE fixes for the Classic Editor.
- *
- * @see https://core.trac.wordpress.org/ticket/44308
- */
-function gutenberg_add_classic_editor_fixes() {
-	// Temp add the fix for not creating paragraphs from HTML comments.
-	// TODO: remove after 4.9.7, this should be in core.
-	$script = <<<JS
-jQuery( document ).on( 'tinymce-editor-setup', function( event, editor ) {
-	var hasWpautop = ( window.wp && window.wp.editor && window.wp.editor.autop && editor.getParam( 'wpautop', true ) );
-
-	editor.on( 'BeforeSetContent', function( event ) {
-		if ( event.load && event.format !== 'raw' && ! hasWpautop ) {
-			// Prevent creation of paragraphs out of multiple HTML comments.
-			event.content = event.content.replace( /-->\s+<!--/g, '--><!--' );
-		}
-	});
-
-	editor.on( 'SaveContent', function( event ) {
-		if ( ! hasWpautop ) {
-			// Restore formatting of block boundaries.
-			event.content = event.content.replace( /-->\s*<!-- wp:/g, '-->\\n\\n<!-- wp:' );
-		}
-	});
-});
-JS;
-
-	wp_add_inline_script( 'editor', $script, 'before' );
-
-}
-add_action( 'init', 'gutenberg_add_classic_editor_fixes' );
 
 /**
  * Add rest nonce to the heartbeat response.
@@ -140,7 +107,7 @@ add_filter( 'wp_refresh_nonces', 'gutenberg_add_rest_nonce_to_heartbeat_response
  * @return string          Paragraph-converted text if non-block content.
  */
 function gutenberg_wpautop( $content ) {
-	if ( gutenberg_content_has_blocks( $content ) ) {
+	if ( has_blocks( $content ) ) {
 		return $content;
 	}
 
@@ -167,7 +134,7 @@ function gutenberg_check_if_classic_needs_warning_about_blocks() {
 		return;
 	}
 
-	if ( ! gutenberg_post_has_blocks( $post ) && ! isset( $_REQUEST['cloudflare-error'] ) ) {
+	if ( ! has_blocks( $post ) && ! isset( $_REQUEST['cloudflare-error'] ) ) {
 		return;
 	}
 
@@ -194,10 +161,13 @@ function gutenberg_warn_classic_about_blocks() {
 	$gutenberg_edit_link = get_edit_post_link( $post->ID, 'raw' );
 
 	$classic_edit_link = $gutenberg_edit_link;
-	$classic_edit_link = add_query_arg( array(
-		'classic-editor'     => '',
-		'hide-block-warning' => '',
-	), $classic_edit_link );
+	$classic_edit_link = add_query_arg(
+		array(
+			'classic-editor'     => '',
+			'hide-block-warning' => '',
+		),
+		$classic_edit_link
+	);
 
 	$revisions_link = '';
 	if ( wp_revisions_enabled( $post ) ) {
@@ -212,18 +182,30 @@ function gutenberg_warn_classic_about_blocks() {
 	?>
 		<style type="text/css">
 			#blocks-in-post-dialog .notification-dialog {
+				position: fixed;
+				top: 50%;
+				left: 50%;
+				width: 500px;
+				box-sizing: border-box;
+				transform: translate(-50%, -50%);
+				margin: 0;
 				padding: 25px;
+				max-height: 90%;
+				background: #fff;
+				box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+				line-height: 1.5;
+				z-index: 1000005;
+				overflow-y: auto;
 			}
 
 			@media only screen and (max-height: 480px), screen and (max-width: 450px) {
 				#blocks-in-post-dialog .notification-dialog {
+					top: 0;
+					left: 0;
 					width: 100%;
 					height: 100%;
+					transform: none;
 					max-height: 100%;
-					position: fixed;
-					top: 0;
-					margin: 0;
-					left: 0;
 				}
 			}
 		</style>
@@ -239,7 +221,7 @@ function gutenberg_warn_classic_about_blocks() {
 							<p>
 							<?php
 								/* translators: link to the post revisions page */
-								printf( __( 'You can also <a href="%s">browse previous revisions</a> and restore a version of the page before it was edited in Gutenberg.', 'gutenberg' ), esc_url( $revisions_link ) );
+								printf( __( 'You can also <a href="%s">browse previous revisions</a> and restore a version of the post before it was edited in Gutenberg.', 'gutenberg' ), esc_url( $revisions_link ) );
 							?>
 							</p>
 						<?php
@@ -336,7 +318,20 @@ function gutenberg_warn_classic_about_cloudflare() {
 	?>
 		<style type="text/css">
 			#cloudflare-block-dialog .notification-dialog {
+				position: fixed;
+				top: 50%;
+				left: 50%;
+				width: 500px;
+				box-sizing: border-box;
+				transform: translate(-50%, -50%);
+				margin: 0;
 				padding: 25px;
+				max-height: 90%;
+				background: #fff;
+				box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+				line-height: 1.5;
+				z-index: 1000005;
+				overflow-y: auto;
 			}
 
 			#cloudflare-block-dialog ul {
@@ -346,13 +341,12 @@ function gutenberg_warn_classic_about_cloudflare() {
 
 			@media only screen and (max-height: 480px), screen and (max-width: 450px) {
 				#cloudflare-block-dialog .notification-dialog {
+					top: 0;
+					left: 0;
 					width: 100%;
 					height: 100%;
+					transform: none;
 					max-height: 100%;
-					position: fixed;
-					top: 0;
-					margin: 0;
-					left: 0;
 				}
 			}
 		</style>
@@ -361,7 +355,7 @@ function gutenberg_warn_classic_about_cloudflare() {
 			<div class="notification-dialog-background"></div>
 			<div class="notification-dialog">
 				<div class="cloudflare-block-message">
-					<h2><?php _e( 'Cloudflare is blocking REST API requests.', 'gutenberg' ); ?></h2>
+					<h2><?php _e( 'Cloudflare is blocking REST API requests', 'gutenberg' ); ?></h2>
 					<p><?php _e( 'Your site uses Cloudflare, which provides a Web Application Firewall (WAF) to secure your site against attacks. Unfortunately, some of these WAF rules are incorrectly blocking legitimate access to your site, preventing Gutenberg from functioning correctly.', 'gutenberg' ); ?></p>
 					<p><?php _e( "We're working closely with Cloudflare to fix this issue, but in the mean time, you can work around it in one of two ways:", 'gutenberg' ); ?></p>
 					<ul>
@@ -380,7 +374,7 @@ function gutenberg_warn_classic_about_cloudflare() {
 					<?php
 						printf(
 							/* translators: %s link to an issue in the Gutenberg repository */
-							__( 'If neither of these options are possible for you, please <a href="%s">follow this issue for updates</a>. We hope to have this issue rectifed soon!', 'gutenberg' ),
+							__( 'If neither of these options are possible for you, please <a href="%s">follow this issue for updates</a>. We hope to have this issue rectified soon!', 'gutenberg' ),
 							'https://github.com/WordPress/gutenberg/issues/2704'
 						);
 					?>
@@ -417,7 +411,7 @@ function gutenberg_warn_classic_about_cloudflare() {
 					// Reveal the modal and set focus on the Gutenberg button.
 					dialog.warning
 						.removeClass( 'hidden' )
-						.find( '.cloudflare-block-gutenberg-button' ).focus();
+						.find( '.cloudflare-block-classic-button' ).focus();
 
 					// Attach event handlers.
 					dialog.warningTabbables.on( 'keydown', dialog.constrainTabbing );

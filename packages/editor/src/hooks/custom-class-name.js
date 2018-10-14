@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { assign, difference, compact } from 'lodash';
+import { assign, difference, omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -55,7 +55,6 @@ export function addAttribute( settings ) {
 export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
 		const hasCustomClassName = hasBlockSupport( props.name, 'customClassName', true );
-
 		if ( hasCustomClassName && props.isSelected ) {
 			return (
 				<Fragment>
@@ -134,21 +133,18 @@ export function getHTMLRootElementClasses( innerHTML ) {
 export function addParsedDifference( blockAttributes, blockType, innerHTML ) {
 	if ( hasBlockSupport( blockType, 'customClassName', true ) ) {
 		// To determine difference, serialize block given the known set of
-		// attributes. If there are classes which are mismatched with the
-		// incoming HTML of the block, add to filtered result.
-		const serialized = getSaveContent( blockType, blockAttributes );
-		const classes = getHTMLRootElementClasses( serialized );
-		const parsedClasses = getHTMLRootElementClasses( innerHTML );
-		const customClasses = difference( parsedClasses, classes );
+		// attributes, with the exception of `className`. This will determine
+		// the default set of classes. From there, any difference in innerHTML
+		// can be considered as custom classes.
+		const attributesSansClassName = omit( blockAttributes, [ 'className' ] );
+		const serialized = getSaveContent( blockType, attributesSansClassName );
+		const defaultClasses = getHTMLRootElementClasses( serialized );
+		const actualClasses = getHTMLRootElementClasses( innerHTML );
+		const customClasses = difference( actualClasses, defaultClasses );
 
-		const filteredClassName = compact( [
-			blockAttributes.className,
-			...customClasses,
-		] ).join( ' ' );
-
-		if ( filteredClassName ) {
-			blockAttributes.className = filteredClassName;
-		} else {
+		if ( customClasses.length ) {
+			blockAttributes.className = customClasses.join( ' ' );
+		} else if ( serialized ) {
 			delete blockAttributes.className;
 		}
 	}

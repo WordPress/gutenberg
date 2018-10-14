@@ -4,7 +4,7 @@
 }
 
 .editor-post-publish-panel__content {
-	.spinner {
+	.components-spinner {
 		display: block;
 		float: none;
 		margin: 100px auto 0;
@@ -12,6 +12,7 @@
 }
 
 .editor-post-publish-panel__header {
+	background: $white;
 	padding-left: 16px;
 	height: $header-height;
 	border-bottom: $border-width solid $light-gray-500;
@@ -21,12 +22,21 @@
 }
 
 .editor-post-publish-panel__header-publish-button {
+	display: flex;
+	justify-content: flex-end;
 	flex-grow: 1;
 	text-align: right;
+	flex-wrap: nowrap;
 }
 
 .editor-post-publish-panel__header-published {
 	flex-grow: 1;
+}
+
+.editor-post-publish-panel__footer {
+	padding: 16px;
+	position: absolute;
+	bottom: 0;
 }
 
 .components-button.editor-post-publish-panel__toggle.is-primary {
@@ -44,6 +54,7 @@
 
 .editor-post-publish-panel__link {
 	color: $blue-medium-700;
+	font-weight: 400;
 	padding-left: 4px;
 	text-decoration: underline;
 }
@@ -51,16 +62,14 @@
 .editor-post-publish-panel__prepublish {
 	padding: 16px;
 
+	strong {
+		color: $dark-gray-900;
+	}
+
 	.components-panel__body {
+		background: $white;
 		margin-left: -16px;
 		margin-right: -16px;
-		margin-bottom: -16px;
-		margin-top: 10px;
-		border: none;
-
-		.components-panel__body-toggle {
-			font-weight: 400;
-		}
 	}
 
 	.editor-post-visibility__dialog-legend {
@@ -76,18 +85,21 @@
 .post-publish-panel__postpublish-buttons {
 	display: flex;
 	align-content: space-between;
+	flex-wrap: wrap;
+	margin: -5px;
 
 	> * {
 		flex-grow: 1;
-		margin-right: 10px;
-
-		&:last-child {
-			margin-right: 0;
-		}
+		margin: 5px;
 	}
 
 	.components-button {
+		height: auto;
+		justify-content: center;
+		padding: 3px 10px 4px;
+		line-height: 1.6;
 		text-align: center;
+		white-space: normal;
 	}
 
 	.components-clipboard-button {
@@ -95,15 +107,25 @@
 	}
 }
 
-.post-publish-panel__postpublish-link-input[readonly] {
-	width: 100%;
-	padding: 10px;
-	margin: 15px 0;
-	background: $white;
-	overflow: hidden;
-	text-overflow: ellipsis;
+.post-publish-panel__postpublish-post-address {
+	margin-bottom: $grid-size-large;
+
+	input[readonly] {
+		padding: 10px;
+		background: $light-gray-400;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
 }
 
 .post-publish-panel__postpublish-header {
 	font-weight: 500;
+}
+
+.post-publish-panel__postpublish-subheader {
+	margin: 0 0 $grid-size;
+}
+
+.post-publish-panel__tip {
+	color: $alert-yellow;
 }

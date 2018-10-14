@@ -42,7 +42,7 @@ class BlockTypesList extends Component {
 										'editor-block-types-list__item',
 										getBlockMenuDefaultClassName( item.id ),
 										{
-											'editor-block-types-list__item-has-children': item.hasChildBlocks,
+											'editor-block-types-list__item-has-children': item.hasChildBlocksWithInserterSupport,
 										}
 									)
 								}
@@ -61,8 +61,8 @@ class BlockTypesList extends Component {
 									className="editor-block-types-list__item-icon"
 									style={ itemIconStyle }
 								>
-									<BlockIcon icon={ item.icon && item.icon.src } />
-									{ item.hasChildBlocks &&
+									<BlockIcon icon={ item.icon && item.icon.src } showColors />
+									{ item.hasChildBlocksWithInserterSupport &&
 									<span
 										className="editor-block-types-list__item-icon-stack"
 										style={ itemIconStackStyle }

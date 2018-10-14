@@ -2,7 +2,7 @@
 
 ## What is Gutenberg?
 
-"Gutenberg" is the name of the project to create a new editor experience for WordPress. The goal is to create a new post and page editing experience that makes it easy for anyone to create rich post layouts. This was the kickoff goal:
+“Gutenberg” is the name of the project to create a new editor experience for WordPress. The goal is to create a new post and page editing experience that makes it easy for anyone to create rich post layouts. This was the kickoff goal:
 
 > The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.
 
@@ -10,7 +10,7 @@ Key takeaways include the following points:
 
 - Authoring richly laid-out posts is a key strength of WordPress.
 - By embracing blocks as an interaction paradigm, we can unify multiple different interfaces into one. Instead of learning how to write shortcodes and custom HTML, or pasting URLs to embed media, there's a common, reliable flow for inserting any kind of content.
-- "Mystery meat" refers to hidden features in software, features that you have to discover. WordPress already supports a large number of blocks and 30+ embeds, so let's surface them.
+- “Mystery meat” refers to hidden features in software, features that you have to discover. WordPress already supports a large number of blocks and 30+ embeds, so let's surface them.
 
 Gutenberg is being developed on [GitHub](https://github.com/WordPress/gutenberg) under the WordPress organization, and you can try [a beta version today—it's available in the plugin repository](https://wordpress.org/plugins/gutenberg/). It's important to keep in mind that Gutenberg is not yet fully functional, feature complete, or production ready. But we'd love your help to make that a reality.
 
@@ -41,6 +41,194 @@ Our goal with Gutenberg is not just to create a seamless post- and page-building
 
 ![Typing](https://make.wordpress.org/core/files/2017/10/gutenberg-typing-1_6.gif)
 
+## Are there Keyboard Shortcuts for Gutenberg?
+
+Yes. There are a lot! There is a help modal showing all available keyboard shortcuts.
+
+You can see the whole list going to the top right corner menu of the new editor and clicking on “Keyboard Shortcuts” (or by using the keyboard shortcut <kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>H</kbd> on Linux/Windows and <kbd>⌃</kbd><kbd>⌥</kbd><kbd>H</kbd> on macOS).
+
+This is the canonical list of keyboard shortcuts:
+
+### Editor shortcuts
+
+<table>
+	<thead>
+		<tr>
+			<th>Shortcut description</th>
+			<th>Linux/Windows shortcut</th>
+			<th>macOS shortcut</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Display keyboard shortcuts.</td>
+			<td><kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>H</kbd></td>
+			<td><kbd>⌃</kbd><kbd>⌥</kbd><kbd>H</kbd></td>
+		</tr>
+		<tr>
+			<td>Save your changes.</td>
+			<td><kbd>Ctrl</kbd>+<kbd>S</kbd></td>
+			<td><kbd>⌘</kbd><kbd>S</kbd></td>
+		</tr>
+		<tr>
+			<td>Undo your last changes.</td>
+			<td><kbd>Ctrl</kbd>+<kbd>Z</kbd></td>
+			<td><kbd>⌘</kbd><kbd>Z</kbd></td>
+		</tr>
+		<tr>
+			<td>Redo your last undo.</td>
+			<td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd></td>
+			<td><kbd>⇧</kbd><kbd>⌘</kbd><kbd>Z</kbd></td>
+		</tr>
+		<tr>
+			<td>Show or hide the settings sidebar.</td>
+			<td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>,</kbd></td>
+			<td><kbd>⇧</kbd><kbd>⌘</kbd><kbd>,</kbd></td>
+		</tr>
+		<tr>
+			<td>Navigate to a the next part of the editor.</td>
+			<td><kbd>Ctrl</kbd>+<kbd>`</kbd></td>
+			<td><kbd>⌃</kbd><kbd>`</kbd></td>
+		</tr>
+		<tr>
+			<td>Navigate to the previous part of the editor.</td>
+			<td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>`</kbd></td>
+			<td><kbd>⌃</kbd><kbd>⇧</kbd><kbd>`</kbd></td>
+		</tr>
+		<tr>
+			<td>Navigate to a the next part of the editor (alternative).</td>
+			<td><kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>N</kbd></td>
+			<td><kbd>⇧</kbd><kbd>⌥</kbd><kbd>N</kbd></td>
+		</tr>
+		<tr>
+			<td>Navigate to the previous part of the editor (alternative).</td>
+			<td><kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>P</kbd></td>
+			<td><kbd>⇧</kbd><kbd>⌥</kbd><kbd>P</kbd></td>
+		</tr>
+		<tr>
+			<td>Switch between Visual Editor and Code Editor.</td>
+			<td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>M</kbd></td>
+			<td><kbd>⇧</kbd><kbd>⌥</kbd><kbd>⌘</kbd><kbd>M</kbd></td>
+		</tr>
+	</tbody>
+</table>
+
+### Selection shortcuts
+
+<table>
+	<thead>
+		<tr>
+			<th>Shortcut description</th>
+			<th>Linux/Windows shortcut</th>
+			<th>macOS shortcut</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Select all text when typing. Press again to select all blocks.</td>
+			<td><kbd>Ctrl</kbd>+<kbd>A</kbd></td>
+			<td><kbd>⌘</kbd><kbd>A</kbd></td>
+		</tr>
+		<tr>
+			<td>Clear selection.</td>
+			<td><kbd>Esc</kbd></td>
+			<td><kbd>Esc</kbd></td>
+		</tr>
+	</tbody>
+</table>
+
+### Block shortcuts
+
+<table>
+	<thead>
+		<tr>
+			<th>Shortcut description</th>
+			<th>Linux/Windows shortcut</th>
+			<th>macOS shortcut</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Duplicate the selected block(s).</td>
+			<td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd></td>
+			<td><kbd>⇧</kbd><kbd>⌘</kbd><kbd>D</kbd></td>
+		</tr>
+		<tr>
+			<td>Remove the selected block(s).</td>
+			<td><kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>Z</kbd></td>
+			<td><kbd>⌃</kbd><kbd>⌥</kbd><kbd>Z</kbd></td>
+		</tr>
+		<tr>
+			<td>Insert a new block before the selected block(s).</td>
+			<td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>T</kbd></td>
+			<td><kbd>⌥</kbd><kbd>⌘</kbd><kbd>T</kbd></td>
+		</tr>
+		<tr>
+			<td>Insert a new block after the selected block(s).</td>
+			<td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Y</kbd></td>
+			<td><kbd>⌥</kbd><kbd>⌘</kbd><kbd>Y</kbd></td>
+		</tr>
+		<tr>
+			<td>Change the block type after adding a new paragraph.</td>
+			<td><kbd>/</kbd></td>
+			<td><kbd>/</kbd></td>
+		</tr>
+	</tbody>
+</table>
+
+### Text formatting
+
+<table>
+	<thead>
+		<tr>
+			<th>Shortcut description</th>
+			<th>Linux/Windows shortcut</th>
+			<th>macOS shortcut</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Make the selected text bold.</td>
+			<td><kbd>Ctrl</kbd>+<kbd>B</kbd></td>
+			<td><kbd>⌘</kbd><kbd>B</kbd></td>
+		</tr>
+		<tr>
+			<td>Make the selected text italic.</td>
+			<td><kbd>Ctrl</kbd>+<kbd>I</kbd></td>
+			<td><kbd>⌘</kbd><kbd>I</kbd></td>
+		</tr>
+		<tr>
+			<td>Underline the selected text.</td>
+			<td><kbd>Ctrl</kbd>+<kbd>U</kbd></td>
+			<td><kbd>⌘</kbd><kbd>U</kbd></td>
+		</tr>
+		<tr>
+			<td>Convert the selected text into a link.</td>
+			<td><kbd>Ctrl</kbd>+<kbd>K</kbd></td>
+			<td><kbd>⌘</kbd><kbd>K</kbd></td>
+		</tr>
+		<tr>
+			<td>Remove a link.</td>
+			<td><kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd></td>
+			<td><kbd>⌃</kbd><kbd>⌥</kbd><kbd>S</kbd></td>
+		</tr>
+		<tr>
+			<td>Add a strikethrough to the selected text.</td>
+			<td><kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>D</kbd></td>
+			<td><kbd>⌃</kbd><kbd>⌥</kbd><kbd>D</kbd></td>
+		</tr>
+		<tr>
+			<td>Display the selected text in a monospaced font.</td>
+			<td><kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>X</kbd></td>
+			<td><kbd>⌃</kbd><kbd>⌥</kbd><kbd>X</kbd></td>
+		</tr>
+	</tbody>
+</table>
+
+Here is a brief animation illustrating how to find and use the keyboard shortcuts:
+
+![GIF showing how to access keyboard shortcuts](https://make.wordpress.org/community/files/2018/08/gutenberg-keyboard-shortcuts.gif)
+
 ## Is Gutenberg built on top of TinyMCE?
 
 No. [TinyMCE](https://www.tinymce.com/) is one of the best tools for enabling rich text on the web. In Gutenberg, TinyMCE does exactly that. Nearly every text field you'll find is augmented with TinyMCE for rich text. Whether it be text, lists, or even just a single caption, TinyMCE can be invoked on blocks for rich text enhancements.
@@ -49,7 +237,7 @@ No. [TinyMCE](https://www.tinymce.com/) is one of the best tools for enabling ri
 
 Gutenberg will work in modern browsers, and Internet Explorer 11.
 
-Our [list of supported browsers can be found in the Make WordPress handbook](https://make.wordpress.org/core/handbook/best-practices/browser-support/). By "modern browsers" we generally mean the *current and past two versions* of each major browser.
+Our [list of supported browsers can be found in the Make WordPress handbook](https://make.wordpress.org/core/handbook/best-practices/browser-support/). By “modern browsers” we generally mean the *current and past two versions* of each major browser.
 
 ## How do I make my own block?
 
@@ -71,7 +259,7 @@ The main extension point we want to emphasize is creating new blocks. We are sti
 
 ## Will Custom Post Types be supported?
 
-Indeed. There are multiple ways in which custom post types can leverage Gutenberg. The plan is to allow them to specify the blocks they support, as well as defining a default block for the post type. It's not currently the case, but if a post type disables the content field, the "advanced" section at the bottom would fill the page.
+Indeed. There are multiple ways in which custom post types can leverage Gutenberg. The plan is to allow them to specify the blocks they support, as well as defining a default block for the post type. It's not currently the case, but if a post type disables the content field, the “advanced” section at the bottom would fill the page.
 
 ## Will there be columns?
 
@@ -103,7 +291,7 @@ Other features, like the new _wide_ and _full-wide_ alignment options, will simp
 
 ## How will editor styles work?
 
-Themes can provide editor styles for blocks by using the following hook:
+Regular editor styles are opt-in and will work as is in most cases. Themes can also load extra stylesheets by using the following hook:
 
 ```php
 function gutenbergtheme_editor_styles() {
@@ -111,6 +299,8 @@ function gutenbergtheme_editor_styles() {
 }
 add_action( 'enqueue_block_editor_assets', 'gutenbergtheme_editor_styles' );
 ```
+
+*Details:* [Editor Styles](../../docs/extensibility/theme-support.md#editor-styles)
 
 ## Should I be concerned that Gutenberg will make my plugin obsolete?
 
@@ -124,11 +314,11 @@ We realize it's a big change. We also think there will be many new opportunities
 
 We are looking at ways to make Gutenberg configurable for many use cases, including disabling different aspects (like blocks, panels, etc.).
 
-There is also be a "Classic" block, which is virtually the same as the current editor, except in block form. There’s also likely to be a very popular plugin in the repository to replace Gutenberg with the classic editor.
+There is also be a “Classic” block, which is virtually the same as the current editor, except in block form. There’s also likely to be a very popular plugin in the repository to replace Gutenberg with the classic editor.
 
 ## How will custom TinyMCE buttons work in Gutenberg?
 
-Custom TinyMCE buttons will still work in the "Classic" block, which is a block version of the classic editor you know today.
+Custom TinyMCE buttons will still work in the “Classic” block, which is a block version of the classic editor you know today.
 
 (Gutenberg comes with a new universal inserter tool, which gives you access to every block available, searchable, sorted by recency and categories. This inserter tool levels the playing field for every plugin that adds content to the editor, and provides a single interface to learn how to use.)
 

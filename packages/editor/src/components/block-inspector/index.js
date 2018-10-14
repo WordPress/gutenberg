@@ -7,7 +7,7 @@ import { isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockType, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import { PanelBody } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
@@ -24,7 +24,14 @@ const BlockInspector = ( { selectedBlock, blockType, count } ) => {
 		return <span className="editor-block-inspector__multi-blocks">{ __( 'Coming Soon' ) }</span>;
 	}
 
-	if ( ! selectedBlock ) {
+	const isSelectedBlockUnregistered =
+		!! selectedBlock && selectedBlock.name === getUnregisteredTypeHandlerName();
+
+	/*
+	 * If the selected block is of an unregistered type, avoid showing it as an actual selection
+	 * because we want the user to focus on the unregistered block warning, not block settings.
+	 */
+	if ( ! selectedBlock || isSelectedBlockUnregistered ) {
 		return <span className="editor-block-inspector__no-blocks">{ __( 'No block selected.' ) }</span>;
 	}
 
@@ -36,18 +43,20 @@ const BlockInspector = ( { selectedBlock, blockType, count } ) => {
 				<div className="editor-block-inspector__card-description">{ blockType.description }</div>
 			</div>
 		</div>,
-		<InspectorControls.Slot key="inspector-controls" />,
-		<InspectorAdvancedControls.Slot key="inspector-advanced-controls">
-			{ ( fills ) => ! isEmpty( fills ) && (
-				<PanelBody
-					className="editor-block-inspector__advanced"
-					title={ __( 'Advanced' ) }
-					initialOpen={ false }
-				>
-					{ fills }
-				</PanelBody>
-			) }
-		</InspectorAdvancedControls.Slot>,
+		<div key="inspector-controls"><InspectorControls.Slot /></div>,
+		<div key="inspector-advanced-controls">
+			<InspectorAdvancedControls.Slot>
+				{ ( fills ) => ! isEmpty( fills ) && (
+					<PanelBody
+						className="editor-block-inspector__advanced"
+						title={ __( 'Advanced' ) }
+						initialOpen={ false }
+					>
+						{ fills }
+					</PanelBody>
+				) }
+			</InspectorAdvancedControls.Slot>
+		</div>,
 		<SkipToSelectedBlock key="back" />,
 	];
 };

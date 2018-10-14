@@ -45,12 +45,7 @@ export async function deactivatePlugin( slug ) {
 export async function uninstallPlugin( slug ) {
 	await visitAdmin( 'plugins.php' );
 	const confirmPromise = new Promise( ( resolve ) => {
-		const confirmDialog = ( dialog ) => {
-			dialog.accept();
-			page.removeListener( 'dialog', confirmDialog );
-			resolve();
-		};
-		page.on( 'dialog', confirmDialog );
+		page.once( 'dialog', () => resolve() );
 	} );
 	await Promise.all( [
 		confirmPromise,

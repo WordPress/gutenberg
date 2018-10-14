@@ -13,67 +13,59 @@ import { parse } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 
-/**
- * Returns the PostTextEditor state given a set of props.
- *
- * @param {Object} props Component props.
- *
- * @return {Object} State object.
- */
-function computeDerivedState( props ) {
-	return {
-		persistedValue: props.value,
-		value: props.value,
-		isDirty: false,
-	};
-}
-
-class PostTextEditor extends Component {
+export class PostTextEditor extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.startEditing = this.startEditing.bind( this );
 		this.edit = this.edit.bind( this );
 		this.stopEditing = this.stopEditing.bind( this );
 
-		this.state = {
-			value: null,
+		this.state = {};
+	}
+
+	static getDerivedStateFromProps( props, state ) {
+		if ( state.isDirty ) {
+			return null;
+		}
+
+		return {
+			value: props.value,
 			isDirty: false,
 		};
 	}
 
-	static getDerivedPropsFromState( props, state ) {
-		// If we receive a new value while we're editing (but before we've made
-		// changes), go ahead and clobber the local state
-		if ( state.persistedValue !== props.value && ! state.isDirty ) {
-			return computeDerivedState( props );
-		}
-
-		return null;
-	}
-
-	startEditing() {
-		// Copying the post content into local state ensures that edits won't be
-		// clobbered by changes to global editor state
-		this.setState( { value: this.props.value } );
-	}
-
+	/**
+	 * Handles a textarea change event to notify the onChange prop callback and
+	 * reflect the new value in the component's own state. This marks the start
+	 * of the user's edits, if not already changed, preventing future props
+	 * changes to value from replacing the rendered value. This is expected to
+	 * be followed by a reset to dirty state via `stopEditing`.
+	 *
+	 * @see stopEditing
+	 *
+	 * @param {Event} event Change event.
+	 */
 	edit( event ) {
 		const value = event.target.value;
 		this.props.onChange( value );
 		this.setState( { value, isDirty: true } );
 	}
 
+	/**
+	 * Function called when the user has completed their edits, responsible for
+	 * ensuring that changes, if made, are surfaced to the onPersist prop
+	 * callback and resetting dirty state.
+	 */
 	stopEditing() {
 		if ( this.state.isDirty ) {
 			this.props.onPersist( this.state.value );
+			this.setState( { isDirty: false } );
 		}
-
-		this.setState( { value: null, isDirty: false } );
 	}
 
 	render() {
-		const { value, placeholder, instanceId } = this.props;
+		const { value } = this.state;
+		const { placeholder, instanceId } = this.props;
 		const decodedPlaceholder = decodeEntities( placeholder );
 
 		return (
@@ -83,8 +75,7 @@ class PostTextEditor extends Component {
 				</label>
 				<Textarea
 					autoComplete="off"
-					value={ this.state.value || value }
-					onFocus={ this.startEditing }
+					value={ value }
 					onChange={ this.edit }
 					onBlur={ this.stopEditing }
 					className="editor-post-text-editor"
@@ -106,14 +97,13 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, resetBlocks, checkTemplateValidity } = dispatch( 'core/editor' );
+		const { editPost, resetBlocks } = dispatch( 'core/editor' );
 		return {
 			onChange( content ) {
 				editPost( { content } );
 			},
 			onPersist( content ) {
 				resetBlocks( parse( content ) );
-				checkTemplateValidity();
 			},
 		};
 	} ),
