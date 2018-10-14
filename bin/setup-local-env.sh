@@ -30,4 +30,11 @@ CURRENT_URL=$(docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run -T --rm cli option
 
 echo -e "\nWelcome to...\n"
 echo -e "\033[95m$GUTENBERG\033[0m"
-echo -e "Run $(action_format "npm run dev"), then open $(action_format "$CURRENT_URL") to get started!"
+
+# Give the user more context to what they should do next: Build Gutenberg and start testing!
+echo -e "\nRun $(action_format "npm run dev") to build the latest Gutenberg packages,"
+echo -e "then open $(action_format "$CURRENT_URL") to get started!"
+
+echo -e "\n\nAt this address, a local WordPress instance"
+echo -e "has been spun up in Docker automatically."
+echo -e "Default username: $(action_format "admin"), password: $(action_format "password")"
