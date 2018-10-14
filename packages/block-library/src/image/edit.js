@@ -233,22 +233,23 @@ class ImageEdit extends Component {
 					value={ align }
 					onChange={ this.updateAlignment }
 				/>
-
-				<Toolbar>
-					<MediaUpload
-						onSelect={ this.onSelectImage }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						value={ id }
-						render={ ( { open } ) => (
-							<IconButton
-								className="components-toolbar__control"
-								label={ __( 'Edit image' ) }
-								icon="edit"
-								onClick={ open }
-							/>
-						) }
-					/>
-				</Toolbar>
+				{ !! url && (
+					<Toolbar>
+						<MediaUpload
+							onSelect={ this.onSelectImage }
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
+							value={ id }
+							render={ ( { open } ) => (
+								<IconButton
+									className="components-toolbar__control"
+									label={ __( 'Edit image' ) }
+									icon="edit"
+									onClick={ open }
+								/>
+							) }
+						/>
+					</Toolbar>
+				) }
 			</BlockControls>
 		);
 
