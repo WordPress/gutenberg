@@ -72,6 +72,7 @@ export function getEmbedEdit( title, icon ) {
 			this.state = {
 				editingURL: false,
 				url: this.props.attributes.url,
+				isSubmitted: false,
 			};
 
 			if ( this.props.preview ) {
@@ -117,7 +118,7 @@ export function getEmbedEdit( title, icon ) {
 			}
 			const { url } = this.state;
 			const { setAttributes } = this.props;
-			this.setState( { editingURL: false } );
+			this.setState( { editingURL: false, isSubmitted: true } );
 			setAttributes( { url } );
 		}
 
@@ -255,11 +256,11 @@ export function getEmbedEdit( title, icon ) {
 		}
 
 		render() {
-			const { url, editingURL } = this.state;
+			const { url, editingURL, isSubmitted } = this.state;
 			const { caption, type, allowResponsive } = this.props.attributes;
 			const { fetching, setAttributes, isSelected, className, preview, previewIsFallback } = this.props;
 			// We have a URL, but couldn't get a preview, or the preview was the oEmbed fallback.
-			const cannotEmbed = url && ( ! preview || previewIsFallback );
+			const cannotEmbed = url && isSubmitted && ( ! preview || previewIsFallback );
 			const controls = (
 				<Fragment>
 					<BlockControls>
@@ -309,7 +310,7 @@ export function getEmbedEdit( title, icon ) {
 								className="components-placeholder__input"
 								aria-label={ label }
 								placeholder={ __( 'Enter URL to embed here…' ) }
-								onChange={ ( event ) => this.setState( { url: event.target.value } ) } />
+								onChange={ ( event ) => this.setState( { url: event.target.value, isSubmitted: false } ) } />
 							<Button
 								isLarge
 								type="submit">
