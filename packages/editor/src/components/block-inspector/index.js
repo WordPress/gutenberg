@@ -41,7 +41,7 @@ const BlockInspector = ( { selectedBlock, blockType, count } ) => {
 			</div>
 			<div><InspectorControls.Slot /></div>
 			{ !! blockType.styles && (
-				<div className="editor-block-inspector__styles">
+				<div>
 					<PanelBody
 						title={ __( 'Styles' ) }
 						initialOpen={ false }
