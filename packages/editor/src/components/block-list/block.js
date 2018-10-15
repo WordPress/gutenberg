@@ -131,7 +131,12 @@ export class BlockListBlock extends Component {
 		}
 
 		// Find all tabbables within node.
-		const textInputs = focus.tabbable.find( this.node ).filter( isTextField );
+		const innerBlocks = this.node.querySelector( '.editor-inner-blocks' );
+		const textInputs = focus.tabbable
+			.find( this.node )
+			.filter( isTextField )
+			// Exclude inner blocks
+			.filter( ( node ) => ! innerBlocks || ! innerBlocks.contains( node ) );
 
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.
