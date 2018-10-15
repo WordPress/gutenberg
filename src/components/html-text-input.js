@@ -23,10 +23,15 @@ export default class HTMLInputView extends React.Component<PropsType, StateType>
 	state = {
 		html: '',
 	}
+	isIOS: boolean = Platform.OS === 'ios';
+	textInput: TextInput;
 
 	componentDidMount() {
 		const html = this.serializeBlocksToHtml();
 		this.setState( { html } );
+		if (this.isIOS) {
+			this.textInput.setNativeProps({text: html});
+		}
 	}
 
 	componentWillUnmount() {
@@ -35,8 +40,7 @@ export default class HTMLInputView extends React.Component<PropsType, StateType>
 	}
 
 	shouldComponentUpdate() {
-		const isIOS = Platform.OS === 'ios';
-		if ( isIOS ) {
+		if ( this.isIOS ) {
 			// iOS TextInput gets jumpy if it's updated on every key stroke.
 			// The first render will always be empty, so:
 			// If the previous state was empty, we let update the component to show the next state.
@@ -60,16 +64,17 @@ export default class HTMLInputView extends React.Component<PropsType, StateType>
 	}
 
 	render() {
-		const behavior = Platform.OS === 'ios' ? 'padding' : null;
+		const behavior = this.isIOS ? 'padding' : null;
 
 		return (
 			<KeyboardAvoidingView style={ styles.container } behavior={ behavior }>
 				<TextInput
+					ref={ textInput => this.textInput = textInput }
 					textAlignVertical="top"
 					multiline
 					numberOfLines={ 0 }
 					style={ styles.htmlView }
-					value={ this.state.html }
+					value={ this.isIOS ? null : this.state.html }
 					onChangeText={ ( html ) => this.setState( { html } ) }
 				/>
 			</KeyboardAvoidingView>
