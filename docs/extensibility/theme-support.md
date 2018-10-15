@@ -167,10 +167,22 @@ As an example for the regular font size, a theme may provide the following class
 }
 ```
 
+### Disabling custom font sizes
+
+Themes can disable the ability to set custom font sizes with the following code:
+
+```php
+add_theme_support('disable-custom-font-sizes');
+```
+
+When set, users will be restricted to the default sizes provided in Gutenberg or the sizes provided via the `editor-font-sizes` theme support setting.
+
 ### Disabling custom colors in block Color Palettes
 
-By default, the color palette offered to blocks, allows the user to select a custom color different from the editor or theme default colors.
+By default, the color palette offered to blocks allows the user to select a custom color different from the editor or theme default colors.
+
 Themes can disable this feature using:
+
 ```php
 add_theme_support( 'disable-custom-colors' );
 ```
