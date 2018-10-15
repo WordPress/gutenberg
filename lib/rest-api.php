@@ -484,7 +484,9 @@ add_filter( 'rest_user_collection_params', 'gutenberg_filter_user_collection_par
 function gutenberg_silence_rest_errors() {
 
 	if ( ! empty( $_SERVER['CONTENT_TYPE'] ) && 'application/json' === $_SERVER['CONTENT_TYPE'] ) {
+		// @codingStandardsIgnoreStart
 		@ini_set( 'display_errors', 0 );
+		// @codingStandardsIgnoreEnd
 	}
 
 }
