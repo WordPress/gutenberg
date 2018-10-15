@@ -2,6 +2,28 @@
 	width: 100%;
 }
 
+.editor-media-placeholder__url-input-form {
+	display: flex;
+
+	// Selector requires a lot of specificity to override base styles.
+	input[type="url"].editor-media-placeholder__url-input-field {
+		width: 100%;
+		@include break-small() {
+			width: 300px;
+		}
+
+		flex-grow: 1;
+		border: none;
+		border-radius: 0;
+		margin: 2px;
+
+	}
+}
+
+.editor-media-placeholder__url-input-submit-button {
+	flex-shrink: 1;
+}
+
 .editor-media-placeholder__upload-button.components-button {
 	margin-right: 5px;
 	margin-bottom: 0.5rem;

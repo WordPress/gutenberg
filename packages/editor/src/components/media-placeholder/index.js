@@ -12,7 +12,6 @@ import {
 	FormFileUpload,
 	Placeholder,
 	DropZone,
-	Popover,
 	IconButton,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -23,39 +22,8 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import MediaUpload from '../media-upload';
+import URLPopover from '../url-popover';
 import { mediaUpload } from '../../utils/';
-
-const stopPropagation = ( event ) => event.stopPropagation();
-
-const UrlInputPopover = ( { value, onChange, onSubmit, onClickOutside } ) => (
-	<Popover
-		position="bottom center"
-		onClickOutside={ onClickOutside }
-	>
-		{ // Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
-		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */ }
-		<form
-			className="editor-format-toolbar__link-modal"
-			onKeyPress={ stopPropagation }
-
-			onSubmit={ onSubmit }
-		>
-			<div className="editor-format-toolbar__link-modal-line">
-				<div className="editor-url-input">
-					<input
-						type="text"
-						aria-label={ __( 'URL' ) }
-						placeholder={ __( 'Paste URL or type' ) }
-						onChange={ onChange }
-						value={ value }
-					/>
-				</div>
-				<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
-			</div>
-		</form>
-		{ /* eslint-enable jsx-a11y/no-noninteractive-element-interactions */ }
-	</Popover>
-);
 
 class MediaPlaceholder extends Component {
 	constructor() {
@@ -213,12 +181,29 @@ class MediaPlaceholder extends Component {
 							{ __( 'Insert from URL' ) }
 						</Button>
 						{ isURLInputVisible && (
-							<UrlInputPopover
-								onChange={ this.onChangeSrc }
-								value={ this.state.src }
-								onSubmit={ this.onSubmitSrc }
+							<URLPopover
 								onClickOutside={ this.closeURLInput }
-							/>
+							>
+								<form
+									className="editor-media-placeholder__url-input-form"
+									onSubmit={ this.onSubmitSrc }
+								>
+									<input
+										className="editor-media-placeholder__url-input-field"
+										type="url"
+										aria-label={ __( 'URL' ) }
+										placeholder={ __( 'Paste URL or type' ) }
+										onChange={ this.onChangeSrc }
+										value={ this.state.src }
+									/>
+									<IconButton
+										className="editor-media-placeholder__url-input-submit-button"
+										icon="editor-break"
+										label={ __( 'Apply' ) }
+										type="submit"
+									/>
+								</form>
+							</URLPopover>
 						) }
 					</div>
 				) }
