@@ -1,39 +1,8 @@
-.wp-block-pullquote {
+figure.wp-block-pullquote {
 	padding: 3em 0;
-	margin-left: 0;
-	margin-right: 0;
-	text-align: center;
-
-	&.alignleft,
-	&.alignright {
-		max-width: $content-width / 2;
-
-		p {
-			font-size: 20px;
-		}
-	}
-
-	p {
-		font-size: 28px;
-		line-height: 1.6;
-	}
-
-	cite,
-	footer {
-		position: relative;
-	}
-	.has-text-color a {
-		color: inherit;
-	}
-}
-
-.wp-block-pullquote:not(.is-style-solid-color) {
-	background: none;
-}
-
-.wp-block-pullquote.is-style-solid-color {
 	border: none;
 	blockquote {
+		border: none;
 		margin-left: auto;
 		margin-right: auto;
 		text-align: left;
@@ -48,10 +17,48 @@
 
 		cite {
 			text-transform: none;
-			font-style: normal;
+		}
+	}
+
+	&.alignleft,
+	&.alignright {
+		max-width: $content-width / 2;
+		font-size: 20px;
+	}
+
+	cite,
+	footer {
+		position: relative;
+	}
+	.has-text-color a {
+		color: inherit;
+	}
+}
+
+.wp-block-pullquote.is-style-border-color {
+	border-top: 4px solid #555d66;
+	border-bottom: 4px solid #555d66;
+	padding: 0;
+	blockquote {
+		padding: 3em 0;
+		margin-left: 0;
+		margin-right: 0;
+		text-align: center;
+		max-width: 100%;
+
+		p {
+			margin-top: 1em;
+			margin-bottom: 1em;
+			font-size: 28px;
+			line-height: 1.6;
+		}
+
+		cite {
+			text-transform: uppercase;
 		}
 	}
 }
+
 
 .wp-block-pullquote cite {
 	color: inherit;

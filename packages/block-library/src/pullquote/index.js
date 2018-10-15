@@ -20,7 +20,8 @@ import {
 import {
 	default as edit,
 	SOLID_COLOR_STYLE_NAME,
-	SOLID_COLOR_CLASS,
+	BORDER_COLOR_STYLE_NAME,
+	BORDER_COLOR_CLASS,
 } from './edit';
 
 const blockAttributes = {
@@ -62,8 +63,8 @@ export const settings = {
 	attributes: blockAttributes,
 
 	styles: [
-		{ name: 'default', label: __( 'Regular' ), isDefault: true },
-		{ name: SOLID_COLOR_STYLE_NAME, label: __( 'Solid Color' ) },
+		{ name: SOLID_COLOR_STYLE_NAME, label: __( 'Solid Color' ), isDefault: true },
+		{ name: BORDER_COLOR_STYLE_NAME, label: __( 'Border' ) },
 	],
 
 	supports: {
@@ -74,30 +75,33 @@ export const settings = {
 
 	save( { attributes } ) {
 		const { mainColor, customMainColor, textColor, customTextColor, value, citation, className } = attributes;
-		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+		const isBorderColorStyle = includes( className, BORDER_COLOR_CLASS );
 
 		let figureClass, figureStyles;
-		// Is solid color style
-		if ( isSolidColorStyle ) {
+		// Is border color style.
+		if ( isBorderColorStyle ) {
+			// Is border style and a custom color is being used ( we can set a style directly with its value).
+			if ( customMainColor ) {
+				figureStyles = {
+					borderColor: customMainColor,
+				};
+				// Is border style and a named color is being used, we need to retrieve the color value to set the style,
+				// as there is no expectation that themes create classes that set border colors.
+			} else if ( mainColor ) {
+				const colors = get( select( 'core/editor' ).getEditorSettings(), [ 'colors' ], [] );
+				const colorObject = getColorObjectByAttributeValues( colors, mainColor );
+				figureStyles = {
+					borderColor: colorObject.color,
+				};
+			}
+		// Is default style.
+		} else {
 			figureClass = getColorClassName( 'background-color', mainColor );
 			if ( ! figureClass ) {
 				figureStyles = {
 					backgroundColor: customMainColor,
 				};
 			}
-		// Is normal style and a custom color is being used ( we can set a style directly with its value)
-		} else if ( customMainColor ) {
-			figureStyles = {
-				borderColor: customMainColor,
-			};
-		// Is normal style and a named color is being used, we need to retrieve the color value to set the style,
-		// as there is no expectation that themes create classes that set border colors.
-		} else if ( mainColor ) {
-			const colors = get( select( 'core/editor' ).getEditorSettings(), [ 'colors' ], [] );
-			const colorObject = getColorObjectByAttributeValues( colors, mainColor );
-			figureStyles = {
-				borderColor: colorObject.color,
-			};
 		}
 
 		const blockquoteTextColorClass = getColorClassName( 'color', textColor );

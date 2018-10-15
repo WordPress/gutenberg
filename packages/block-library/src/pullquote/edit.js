@@ -21,7 +21,9 @@ import {
 } from '@wordpress/editor';
 
 export const SOLID_COLOR_STYLE_NAME = 'solid-color';
+export const BORDER_COLOR_STYLE_NAME = 'border-color';
 export const SOLID_COLOR_CLASS = `is-style-${ SOLID_COLOR_STYLE_NAME }`;
+export const BORDER_COLOR_CLASS = `is-style-${ BORDER_COLOR_STYLE_NAME }`;
 
 class PullQuoteEdit extends Component {
 	constructor( props ) {
@@ -59,10 +61,11 @@ class PullQuoteEdit extends Component {
 
 		const { value, citation } = attributes;
 
-		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
-		const figureStyle = isSolidColorStyle ?
-			{ backgroundColor: mainColor.color } :
-			{ borderColor: mainColor.color };
+		const isBorderColorStyle = includes( className, BORDER_COLOR_CLASS );
+		const figureStyle = isBorderColorStyle ?
+			{ borderColor: mainColor.color } :
+			{ backgroundColor: mainColor.color };
+
 		const blockquoteStyle = {
 			color: textColor.color,
 		};
@@ -73,7 +76,7 @@ class PullQuoteEdit extends Component {
 			<Fragment>
 				<figure style={ figureStyle } className={ classnames(
 					className, {
-						[ mainColor.class ]: isSolidColorStyle && mainColor.class,
+						[ mainColor.class ]: ! isBorderColorStyle && mainColor.class,
 					} ) }>
 					<blockquote style={ blockquoteStyle } className={ blockquoteClasses }>
 						<RichText
@@ -119,7 +122,7 @@ class PullQuoteEdit extends Component {
 							},
 						] }
 					>
-						{ isSolidColorStyle && (
+						{ ! isBorderColorStyle && (
 							<ContrastChecker
 								{ ...{
 									textColor: textColor.color,
