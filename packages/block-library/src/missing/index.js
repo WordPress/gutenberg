@@ -17,7 +17,7 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 	let messageHTML;
 	if ( hasContent && hasHTMLBlock ) {
 		messageHTML = sprintf(
-			__( 'Your site doesn\'t include support for the <code>%s</code> block. You can leave this block intact, convert its content to a Custom HTML block, or remove it entirely.' ),
+			__( 'Your site doesn\'t include support for the "%s" block. You can leave this block intact, convert its content to a Custom HTML block, or remove it entirely.' ),
 			originalName
 		);
 		actions.push(
@@ -27,7 +27,7 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 		);
 	} else {
 		messageHTML = sprintf(
-			__( 'Your site doesn\'t include support for the <code>%s</code> block. You can leave this block intact or remove it entirely.' ),
+			__( 'Your site doesn\'t include support for the "%s" block. You can leave this block intact or remove it entirely.' ),
 			originalName
 		);
 	}
@@ -35,7 +35,7 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 	return (
 		<Fragment>
 			<Warning actions={ actions }>
-				<span dangerouslySetInnerHTML={ { __html: messageHTML } } />
+				<span>{ messageHTML }</span>
 			</Warning>
 			<div>
 				<RawHTML>{ originalUndelimitedContent }</RawHTML>
