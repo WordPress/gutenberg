@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get } from 'lodash';
+import { find, get, noop } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -69,8 +69,8 @@ function BlockStyles( {
 	onChangeClassName,
 	name,
 	attributes,
-	onSwitch,
-	onHoverClassName,
+	onSwitch = noop,
+	onHoverClassName = noop,
 } ) {
 	if ( ! styles ) {
 		return null;
