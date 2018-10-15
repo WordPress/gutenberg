@@ -79,8 +79,8 @@ class WP_REST_Themes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 		$this->assertArrayHasKey( 'X-WP-Total', $headers );
 		$this->assertEquals( 1, $headers['X-WP-Total'] );
-		$this->assertArrayHasKey( 'X-WP-TotalThemes', $headers );
-		$this->assertEquals( 1, $headers['X-WP-TotalThemes'] );
+		$this->assertArrayHasKey( 'X-WP-TotalPages', $headers );
+		$this->assertEquals( 1, $headers['X-WP-TotalPages'] );
 	}
 
 	/**

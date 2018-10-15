@@ -87,7 +87,7 @@ class WP_REST_Themes_Controller extends WP_REST_Controller {
 		$response = rest_ensure_response( $themes );
 
 		$response->header( 'X-WP-Total', count( $themes ) );
-		$response->header( 'X-WP-TotalThemes', count( $themes ) );
+		$response->header( 'X-WP-TotalPages', count( $themes ) );
 
 		return $response;
 	}
