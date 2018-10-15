@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Image, Text, TextInput } from 'react-native';
+import { View, Image, TextInput } from 'react-native';
 
 /**
  * Internal dependencies
@@ -52,16 +52,8 @@ const CaptionTextInput = ( setAttributes, caption, isSelected ) => {
 		return null;
 	}
 
-	const textContainer = ( children ) => {
-		return (
-			<View style={ { padding: 12, flex: 1 } }>
-				{ children() }
-			</View>
-		);
-	};
-
-	const textInput = () => {
-		return (
+	return (
+		<View style={ { padding: 12, flex: 1 } }>
 			<TextInput
 				style={ { textAlign: 'center' } }
 				underlineColorAndroid="transparent"
@@ -69,15 +61,6 @@ const CaptionTextInput = ( setAttributes, caption, isSelected ) => {
 				placeholder={ 'Write caption…' }
 				onChangeText={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
 			/>
-		);
-	};
-
-	const text = () => {
-		return ( <Text style={ { textAlign: 'center' } }>{ captionString }</Text> );
-	};
-
-	if ( isSelected ) {
-		return textContainer( textInput );
-	}
-	return textContainer( text );
+		</View>
+	);
 };
