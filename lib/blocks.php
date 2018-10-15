@@ -60,8 +60,10 @@ function gutenberg_parse_blocks( $content ) {
 	if ( ! has_blocks( $content ) ) {
 		return array(
 			array(
-				'attrs'     => array(),
-				'innerHTML' => $content,
+				'blockName'   => null,
+				'attrs'       => array(),
+				'innerBlocks' => array(),
+				'innerHTML'   => $content,
 			),
 		);
 	}

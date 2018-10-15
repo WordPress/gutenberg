@@ -1,6 +1,10 @@
 .wp-block-image {
 	max-width: 100%;
 
+	// The image block is in a `figure` element, and many themes zero this out.
+	// This rule explicitly sets it, to ensure at least some bottom-margin in the flow.
+	margin-bottom: 1em;
+
 	img {
 		max-width: 100%;
 	}
@@ -14,7 +18,11 @@
 		width: 100%;
 	}
 
-	// Floats get an extra wrapping <aside> element, so the <figure> becomes a child.
+	// This resets the intrinsic margin on the figure in non-floated, wide, and full-wide alignments.
+	margin-left: 0;
+	margin-right: 0;
+
+	// Floats get an extra wrapping <div> element, so the <figure> becomes a child.
 	.alignleft,
 	.alignright,
 	.aligncenter,

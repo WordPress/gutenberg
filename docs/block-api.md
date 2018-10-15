@@ -84,7 +84,7 @@ icon: 'book-alt',
 icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M19 13H5v-2h14v2z" /></svg>,
 ```
 
-**Note:** Custom SVG icons are automatically wrapped in the [`wp.components.AccessibleSVG` component](https://github.com/WordPress/gutenberg/tree/master/packages/components/src/accessible-svg/) to add accessibility attributes (`aria-hidden`, `role`, and `focusable`).
+**Note:** Custom SVG icons are automatically wrapped in the [`wp.components.SVG` component](https://github.com/WordPress/gutenberg/tree/master/packages/components/src/primitives/svg/) to add accessibility attributes (`aria-hidden`, `role`, and `focusable`).
 
 An object can also be passed as icon, in this case, icon, as specified above, should be included in the src property.
 Besides src the object can contain background and foreground colors, this colors will appear with the icon
@@ -130,8 +130,7 @@ attributes: {
 		attribute: 'src',
 	},
 	author: {
-		type: 'string',
-		source: 'children',
+		source: 'html',
 		selector: '.book-author',
 	},
 	pages: {
@@ -412,6 +411,19 @@ Optional block extended support features. The following options are supported:
 align: true,
 // Pick which alignment options to display.
 align: [ 'left', 'right', 'full' ],
+```
+When supports align is used the block attributes definition is extended to include an align attribute with a string type.
+By default, no alignment is assigned to the block.
+The block can apply a default alignment by specifying its own align attribute with a default e.g.:
+```
+attributes: {
+	...
+	align: {
+		type: 'string',
+		default: 'right'
+	},
+	...
+}
 ```
 
 - `alignWide` (default `true`): This property allows to enable [wide alignment](../docs/extensibility/theme-support.md#wide-alignment) for your theme. To disable this behavior for a single block, set this flag to `false`.

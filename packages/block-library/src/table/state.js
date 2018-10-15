@@ -18,7 +18,7 @@ export function createTable( {
 	return {
 		body: times( rowCount, () => ( {
 			cells: times( columnCount, () => ( {
-				content: [],
+				content: '',
 				tag: 'td',
 			} ) ),
 		} ) ),
@@ -84,7 +84,7 @@ export function insertRow( state, {
 			...state[ section ].slice( 0, rowIndex ),
 			{
 				cells: times( cellCount, () => ( {
-					content: [],
+					content: '',
 					tag: 'td',
 				} ) ),
 			},
@@ -129,7 +129,7 @@ export function insertColumn( state, {
 			cells: [
 				...row.cells.slice( 0, columnIndex ),
 				{
-					content: [],
+					content: '',
 					tag: 'td',
 				},
 				...row.cells.slice( columnIndex ),

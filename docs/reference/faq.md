@@ -45,7 +45,7 @@ Our goal with Gutenberg is not just to create a seamless post- and page-building
 
 Yes. There are a lot! There is a help modal showing all available keyboard shortcuts.
 
-You can see the whole list going to the top right corner menu of the new editor and clicking on "Keyboard Shorcuts" (or by using the keyboard shortcut Ctrl + Option + H).
+You can see the whole list going to the top right corner menu of the new editor and clicking on "Keyboard Shortcuts" (or by using the keyboard shortcut Ctrl + Option + H).
 
 This is the canonical list of keyboard shortcuts:
 
@@ -70,7 +70,7 @@ This is the canonical list of keyboard shortcuts:
 ### Block shortcuts
 
 * <kbd>Shift</kbd>+<kbd>⌘D</kbd> Duplicate the selected block(s).
-* <kbd>Option</kbd>+<kbd>⌘Backspace</kbd> Remove the selected block(s).
+* <kbd>Ctrl</kbd>+<kbd>Option</kbd>+<kbd>z</kbd> Remove the selected block(s).
 * <kbd>Option</kbd>+<kbd>⌘T</kbd> Insert a new block before the selected block(s).
 * <kbd>Option</kbd>+<kbd>⌘Y</kbd> Insert a new block after the selected block(s).
 * <kbd>/</kbd> Change the block type after adding a new paragraph.

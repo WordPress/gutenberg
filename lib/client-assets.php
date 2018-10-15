@@ -163,7 +163,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-i18n',
 		gutenberg_url( 'build/i18n/index.js' ),
-		array( 'wp-deprecated', 'wp-polyfill' ),
+		array( 'wp-polyfill' ),
 		filemtime( gutenberg_dir_path() . 'build/i18n/index.js' ),
 		true
 	);
@@ -248,6 +248,7 @@ function gutenberg_register_scripts_and_styles() {
 		array(
 			'lodash',
 			'wp-compose',
+			'wp-deprecated',
 			'wp-element',
 			'wp-is-shallow-equal',
 			'wp-polyfill',
@@ -262,7 +263,7 @@ function gutenberg_register_scripts_and_styles() {
 			"\n",
 			array(
 				'( function() {',
-				'	var userId = window.userSettings.uid;',
+				'	var userId = ' . get_current_user_ID() . ';',
 				'	var storageKey = "WP_DATA_USER_" + userId;',
 				'	wp.data',
 				'		.use( wp.data.plugins.persistence, { storageKey: storageKey } )',
@@ -303,7 +304,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-shortcode',
 		gutenberg_url( 'build/shortcode/index.js' ),
-		array( 'wp-polyfill' ),
+		array( 'wp-polyfill', 'lodash' ),
 		filemtime( gutenberg_dir_path() . 'build/shortcode/index.js' ),
 		true
 	);
@@ -359,8 +360,22 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-element',
 		gutenberg_url( 'build/element/index.js' ),
-		array( 'wp-polyfill', 'react', 'react-dom', 'lodash' ),
+		array( 'wp-polyfill', 'react', 'react-dom', 'lodash', 'wp-escape-html' ),
 		filemtime( gutenberg_dir_path() . 'build/element/index.js' ),
+		true
+	);
+	wp_register_script(
+		'wp-escape-html',
+		gutenberg_url( 'build/escape-html/index.js' ),
+		array( 'wp-polyfill' ),
+		filemtime( gutenberg_dir_path() . 'build/element/index.js' ),
+		true
+	);
+	wp_register_script(
+		'wp-rich-text',
+		gutenberg_url( 'build/rich-text/index.js' ),
+		array( 'wp-polyfill', 'wp-escape-html', 'lodash' ),
+		filemtime( gutenberg_dir_path() . 'build/rich-text/index.js' ),
 		true
 	);
 	wp_register_script(
@@ -382,6 +397,7 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-keycodes',
 			'wp-polyfill',
 			'wp-url',
+			'wp-rich-text',
 		),
 		filemtime( gutenberg_dir_path() . 'build/components/index.js' ),
 		true
@@ -441,6 +457,7 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-polyfill',
 			'wp-url',
 			'wp-viewport',
+			'wp-rich-text',
 		),
 		filemtime( gutenberg_dir_path() . 'build/block-library/index.js' ),
 		true
@@ -522,6 +539,7 @@ function gutenberg_register_scripts_and_styles() {
 							'unlink',
 							'wp_more',
 							'spellchecker',
+							'wp_add_media',
 						),
 						'editor'
 					),
@@ -574,6 +592,7 @@ function gutenberg_register_scripts_and_styles() {
 		'wp-editor',
 		gutenberg_url( 'build/editor/index.js' ),
 		array(
+			'jquery',
 			'lodash',
 			'tinymce-latest-lists',
 			'wp-a11y',
@@ -600,6 +619,7 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-url',
 			'wp-viewport',
 			'wp-wordcount',
+			'wp-rich-text',
 		),
 		filemtime( gutenberg_dir_path() . 'build/editor/index.js' )
 	);
@@ -615,19 +635,23 @@ function gutenberg_register_scripts_and_styles() {
 			'media-views',
 			'wp-a11y',
 			'wp-api-fetch',
+			'wp-block-library',
+			'wp-blocks',
 			'wp-components',
 			'wp-compose',
-			'wp-block-library',
-			'wp-date',
+			'wp-core-data',
 			'wp-data',
+			'wp-deprecated',
 			'wp-dom-ready',
 			'wp-editor',
 			'wp-element',
 			'wp-embed',
 			'wp-i18n',
 			'wp-keycodes',
+			'wp-nux',
 			'wp-plugins',
 			'wp-polyfill',
+			'wp-url',
 			'wp-viewport',
 		),
 		filemtime( gutenberg_dir_path() . 'build/edit-post/index.js' ),
@@ -709,14 +733,14 @@ function gutenberg_register_scripts_and_styles() {
 
 	wp_register_style(
 		'wp-edit-blocks',
-		gutenberg_url( 'build/block-library/edit-blocks.css' ),
+		gutenberg_url( 'build/block-library/editor.css' ),
 		array(
 			'wp-components',
 			'wp-editor',
 			// Always include visual styles so the editor never appears broken.
 			'wp-block-library-theme',
 		),
-		filemtime( gutenberg_dir_path() . 'build/block-library/edit-blocks.css' )
+		filemtime( gutenberg_dir_path() . 'build/block-library/editor.css' )
 	);
 	wp_style_add_data( 'wp-edit-blocks', 'rtl', 'replace' );
 
@@ -854,15 +878,6 @@ function gutenberg_register_vendor_scripts() {
 	gutenberg_register_vendor_script(
 		'wp-polyfill-fetch',
 		'https://unpkg.com/whatwg-fetch@3.0.0/dist/fetch.umd.js'
-	);
-	gutenberg_register_vendor_script(
-		'wp-polyfill-promise',
-		'https://unpkg.com/promise-polyfill@7.0.0/dist/promise' . $suffix . '.js',
-		array( 'wp-deprecated' )
-	);
-	wp_add_inline_script(
-		'wp-polyfill-promise',
-		'wp.deprecated( "wp-polyfill-promise script handle", { plugin: "Gutenberg", version: "4.0" } );'
 	);
 	gutenberg_register_vendor_script(
 		'wp-polyfill-formdata',
@@ -1342,8 +1357,14 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		// Override "(Auto Draft)" new post default title with empty string,
 		// or filtered value.
 		$initial_edits = array(
-			'title' => array(
-				'raw' => apply_filters( 'the_title', '', $post->ID ),
+			'title'   => array(
+				'raw' => $post->post_title,
+			),
+			'content' => array(
+				'raw' => $post->post_content,
+			),
+			'excerpt' => array(
+				'raw' => $post->post_excerpt,
 			),
 		);
 	} else {
@@ -1448,6 +1469,52 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		}
 	}
 
+	// Lock settings.
+	$user_id = wp_check_post_lock( $post->ID );
+	if ( $user_id ) {
+		/**
+		 * Filters whether to show the post locked dialog.
+		 *
+		 * Returning a falsey value to the filter will short-circuit displaying the dialog.
+		 *
+		 * @since 3.6.0
+		 *
+		 * @param bool         $display Whether to display the dialog. Default true.
+		 * @param WP_Post      $post    Post object.
+		 * @param WP_User|bool $user    The user id currently editing the post.
+		 */
+		if ( apply_filters( 'show_post_locked_dialog', true, $post, $user_id ) ) {
+			$locked = true;
+		}
+
+		$user_details = null;
+		if ( $locked ) {
+			$user         = get_userdata( $user_id );
+			$user_details = array(
+				'name' => $user->display_name,
+			);
+			$avatar       = get_avatar( $user_id, 64 );
+			if ( $avatar ) {
+				if ( preg_match( "|src='([^']+)'|", $avatar, $matches ) ) {
+					$user_details['avatar'] = $matches[1];
+				}
+			}
+		}
+
+		$lock_details = array(
+			'isLocked' => $locked,
+			'user'     => $user_details,
+		);
+	} else {
+
+		// Lock the post.
+		$active_post_lock = wp_set_post_lock( $post->ID );
+		$lock_details     = array(
+			'isLocked'       => false,
+			'activePostLock' => esc_attr( implode( ':', $active_post_lock ) ),
+		);
+	}
+
 	$editor_settings = array(
 		'alignWide'           => $align_wide || ! empty( $gutenberg_theme_support[0]['wide-images'] ), // Backcompat. Use `align-wide` outside of `gutenberg` array.
 		'availableTemplates'  => $available_templates,
@@ -1461,6 +1528,14 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'maxUploadFileSize'   => $max_upload_size,
 		'allowedMimeTypes'    => get_allowed_mime_types(),
 		'styles'              => $styles,
+		'postLock'            => $lock_details,
+
+		// Ideally, we'd remove this and rely on a REST API endpoint.
+		'postLockUtils'       => array(
+			'nonce'       => wp_create_nonce( 'lock-post_' . $post->ID ),
+			'unlockNonce' => wp_create_nonce( 'update-post_' . $post->ID ),
+			'ajaxUrl'     => admin_url( 'admin-ajax.php' ),
+		),
 	);
 
 	$post_autosave = get_autosave_newer_than_post_save( $post );

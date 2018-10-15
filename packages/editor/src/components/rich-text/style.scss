@@ -7,6 +7,7 @@
 .editor-rich-text__tinymce {
 	margin: 0;
 	position: relative;
+	line-height: $editor-line-height;
 
 	> p:empty {
 		min-height: $editor-font-size * $editor-line-height;
@@ -90,21 +91,21 @@
 	}
 
 	// Placeholder text.
-	& + .editor-rich-text__tinymce, {
+	& + .editor-rich-text__tinymce {
 		pointer-events: none;
 
 		// Use opacity to work in various editor styles.
+		// We don't specify the color here, because blocks or editor styles might provide their own.
 		&,
 		p {
-			color: $dark-opacity-300;
-			.is-dark-theme & {
-				color: $light-opacity-300;
-			}
+			opacity: 0.62;
 		}
 	}
 
-	&.mce-content-body {
-		line-height: $editor-line-height;
+	// Captions may have lighter (gray) text, or be shown on a range of different background luminosites.
+	// To ensure legibility, we increase the default placeholder opacity to ensure contrast.
+	&[data-is-placeholder-visible="true"] + figcaption.editor-rich-text__tinymce {
+		opacity: 0.8;
 	}
 }
 

@@ -149,14 +149,50 @@ describe( 'adding blocks', () => {
 		await pressWithModifier( META_KEY, 'b' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		// When returning to Visual mode, backspace in selected block should
-		// reset to an unmodified default block.
+		// Backspace to remove the content in this block, resetting it.
 		await page.keyboard.press( 'Backspace' );
 
 		// Ensure no data-mce-selected. Notably, this can occur when content
 		// is saved while typing within an inline boundary.
 		await pressWithModifier( META_KEY, 'b' );
 		await page.keyboard.type( 'Inside' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert line break at end', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'a' );
+		await pressWithModifier( 'Shift', 'Enter' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert line break at end and continue writing', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'a' );
+		await pressWithModifier( 'Shift', 'Enter' );
+		await page.keyboard.type( 'b' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert line break mid text', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'ab' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await pressWithModifier( 'Shift', 'Enter' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert line break at start', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await pressWithModifier( 'Shift', 'Enter' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert line break in empty container', async () => {
+		await clickBlockAppender();
+		await pressWithModifier( 'Shift', 'Enter' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

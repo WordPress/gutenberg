@@ -6,12 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Dashicon, AccessibleSVG } from '@wordpress/components';
+import { Dashicon, SVG } from '@wordpress/components';
 import { createElement, Component } from '@wordpress/element';
 
 function renderIcon( icon ) {
 	if ( 'string' === typeof icon ) {
-		return <Dashicon icon={ icon } />;
+		return <Dashicon icon={ icon } size={ 20 } />;
 	} else if ( 'function' === typeof icon ) {
 		if ( icon.prototype instanceof Component ) {
 			return createElement( icon );
@@ -19,7 +19,13 @@ function renderIcon( icon ) {
 
 		return icon();
 	} else if ( icon && icon.type === 'svg' ) {
-		return <AccessibleSVG { ...icon.props } />;
+		const appliedProps = {
+			...icon.props,
+			width: icon.props.width || 24,
+			height: icon.props.height || 24,
+		};
+
+		return <SVG { ...appliedProps } />;
 	}
 
 	return icon || null;

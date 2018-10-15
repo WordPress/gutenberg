@@ -12,6 +12,12 @@
 		"parent": null
 	},
 	{
+		"title": "The Gutenberg block grammar",
+		"slug": "grammar",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/grammar.md",
+		"parent": "language"
+	},
+	{
 		"title": "Block API",
 		"slug": "block-api",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/block-api.md",
@@ -240,6 +246,12 @@
 		"parent": null
 	},
 	{
+		"title": "Scripts",
+		"slug": "packages",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/reference/scripts.md",
+		"parent": "reference"
+	},
+	{
 		"title": "@wordpress/a11y",
 		"slug": "packages-a11y",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/a11y/README.md",
@@ -366,6 +378,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/edit-post",
+		"slug": "packages-edit-post",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/edit-post/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/editor",
 		"slug": "packages-editor",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/editor/README.md",
@@ -375,6 +393,12 @@
 		"title": "@wordpress/element",
 		"slug": "packages-element",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/element/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/escape-html",
+		"slug": "packages-escape-html",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/escape-html/README.md",
 		"parent": "packages"
 	},
 	{
@@ -462,6 +486,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/rich-text",
+		"slug": "packages-rich-text",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/rich-text/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/scripts",
 		"slug": "packages-scripts",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/scripts/README.md",
@@ -498,22 +528,10 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/edit-post",
-		"slug": "packages-edit-post",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/edit-post/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "Components Package Reference",
 		"slug": "components",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components.md",
 		"parent": null
-	},
-	{
-		"title": "AccessibleSvg",
-		"slug": "accessible-svg",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/accessible-svg/README.md",
-		"parent": "components"
 	},
 	{
 		"title": "Autocomplete",
@@ -642,9 +660,57 @@
 		"parent": "components"
 	},
 	{
+		"title": "NavigateRegions",
+		"slug": "navigate-regions",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/higher-order/navigate-regions/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "HigherOrder",
 		"slug": "higher-order",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/higher-order/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "WithConstrainedTabbing",
+		"slug": "with-constrained-tabbing",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/higher-order/with-constrained-tabbing/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "WithFallbackStyles",
+		"slug": "with-fallback-styles",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/higher-order/with-fallback-styles/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "WithFilters",
+		"slug": "with-filters",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/higher-order/with-filters/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "WithFocusOutside",
+		"slug": "with-focus-outside",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/higher-order/with-focus-outside/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "WithFocusReturn",
+		"slug": "with-focus-return",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/higher-order/with-focus-return/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "WithNotices",
+		"slug": "with-notices",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/higher-order/with-notices/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "WithSpokenMessages",
+		"slug": "with-spoken-messages",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/higher-order/with-spoken-messages/README.md",
 		"parent": "components"
 	},
 	{
@@ -714,6 +780,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Svg",
+		"slug": "svg",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/primitives/svg/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "QueryControls",
 		"slug": "query-controls",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/query-controls/README.md",
@@ -729,6 +801,12 @@
 		"title": "RangeControl",
 		"slug": "range-control",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/range-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ResizableBox",
+		"slug": "resizable-box",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/resizable-box/README.md",
 		"parent": "components"
 	},
 	{

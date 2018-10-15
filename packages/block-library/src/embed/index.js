@@ -10,14 +10,35 @@ import classnames from 'classnames/dedupe';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
-import { Component, renderToString } from '@wordpress/element';
-import { Button, Placeholder, Spinner, SandBox, IconButton, Toolbar } from '@wordpress/components';
+import { Component, renderToString, Fragment } from '@wordpress/element';
+import {
+	Button,
+	Placeholder,
+	Spinner,
+	SandBox,
+	IconButton,
+	Toolbar,
+	PanelBody,
+	ToggleControl,
+} from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
-import { RichText, BlockControls, BlockIcon } from '@wordpress/editor';
+import { RichText, BlockControls, BlockIcon, InspectorControls } from '@wordpress/editor';
 import { withSelect } from '@wordpress/data';
 
 // These embeds do not work in sandboxes
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
+
+const ASPECT_RATIOS = [
+	// Common video resolutions.
+	{ ratio: '2.33', className: 'wp-embed-aspect-21-9' },
+	{ ratio: '2.00', className: 'wp-embed-aspect-18-9' },
+	{ ratio: '1.78', className: 'wp-embed-aspect-16-9' },
+	{ ratio: '1.33', className: 'wp-embed-aspect-4-3' },
+	// Vertical video and instagram square video support.
+	{ ratio: '1.00', className: 'wp-embed-aspect-1-1' },
+	{ ratio: '0.56', className: 'wp-embed-aspect-9-16' },
+	{ ratio: '0.50', className: 'wp-embed-aspect-1-2' },
+];
 
 const matchesPatterns = ( url, patterns = [] ) => {
 	return patterns.some( ( pattern ) => {
@@ -43,19 +64,24 @@ export function getEmbedEdit( title, icon ) {
 			this.setUrl = this.setUrl.bind( this );
 			this.maybeSwitchBlock = this.maybeSwitchBlock.bind( this );
 			this.setAttributesFromPreview = this.setAttributesFromPreview.bind( this );
-			this.maybeSetAspectRatioClassName = this.maybeSetAspectRatioClassName.bind( this );
+			this.setAspectRatioClassNames = this.setAspectRatioClassNames.bind( this );
+			this.getResponsiveHelp = this.getResponsiveHelp.bind( this );
+			this.toggleResponsive = this.toggleResponsive.bind( this );
+			this.handleIncomingPreview = this.handleIncomingPreview.bind( this );
 
 			this.state = {
 				editingURL: false,
 				url: this.props.attributes.url,
 			};
 
-			this.maybeSwitchBlock();
+			if ( this.props.preview ) {
+				this.handleIncomingPreview();
+			}
 		}
 
-		componentWillUnmount() {
-			// can't abort the fetch promise, so let it know we will unmount
-			this.unmounting = true;
+		handleIncomingPreview() {
+			this.setAttributesFromPreview();
+			this.maybeSwitchBlock();
 		}
 
 		componentDidUpdate( prevProps ) {
@@ -74,7 +100,7 @@ export function getEmbedEdit( title, icon ) {
 					this.setState( { editingURL: true } );
 					return;
 				}
-				this.setAttributesFromPreview();
+				this.handleIncomingPreview();
 			}
 		}
 
@@ -138,55 +164,49 @@ export function getEmbedEdit( title, icon ) {
 		}
 
 		/**
-		 * Sets the appropriate CSS class to enforce an aspect ratio when the embed is resized
+		 * Gets the appropriate CSS class names to enforce an aspect ratio when the embed is resized
 		 * if the HTML has an iframe with width and height set.
 		 *
 		 * @param {string} html The preview HTML that possibly contains an iframe with width and height set.
+		 * @param {boolean} allowResponsive If the classes should be added, or removed.
+		 * @return {Object} Object with classnames set for use with `classnames`.
 		 */
-		maybeSetAspectRatioClassName( html ) {
+		getAspectRatioClassNames( html, allowResponsive = true ) {
 			const previewDocument = document.implementation.createHTMLDocument( '' );
 			previewDocument.body.innerHTML = html;
 			const iframe = previewDocument.body.querySelector( 'iframe' );
 
-			if ( ! iframe ) {
+			if ( iframe && iframe.height && iframe.width ) {
+				const aspectRatio = ( iframe.width / iframe.height ).toFixed( 2 );
+				// Given the actual aspect ratio, find the widest ratio to support it.
+				for ( let ratioIndex = 0; ratioIndex < ASPECT_RATIOS.length; ratioIndex++ ) {
+					const potentialRatio = ASPECT_RATIOS[ ratioIndex ];
+					if ( aspectRatio >= potentialRatio.ratio ) {
+						return {
+							[ potentialRatio.className ]: allowResponsive,
+							'wp-has-aspect-ratio': allowResponsive,
+						};
+					}
+				}
+			}
+		}
+
+		/**
+		 * Sets the aspect ratio related class names returned by `getAspectRatioClassNames`
+		 * if `allowResponsive` is truthy.
+		 *
+		 * @param {string} html The preview HTML.
+		 */
+		setAspectRatioClassNames( html ) {
+			const { allowResponsive } = this.props.attributes;
+			if ( ! allowResponsive ) {
 				return;
 			}
-
-			if ( iframe.height && iframe.width ) {
-				const aspectRatio = ( iframe.width / iframe.height ).toFixed( 2 );
-				let aspectRatioClassName;
-
-				switch ( aspectRatio ) {
-					// Common video resolutions.
-					case '2.33':
-						aspectRatioClassName = 'wp-embed-aspect-21-9';
-						break;
-					case '2.00':
-						aspectRatioClassName = 'wp-embed-aspect-18-9';
-						break;
-					case '1.78':
-						aspectRatioClassName = 'wp-embed-aspect-16-9';
-						break;
-					case '1.33':
-						aspectRatioClassName = 'wp-embed-aspect-4-3';
-						break;
-					// Vertical video and instagram square video support.
-					case '1.00':
-						aspectRatioClassName = 'wp-embed-aspect-1-1';
-						break;
-					case '0.56':
-						aspectRatioClassName = 'wp-embed-aspect-9-16';
-						break;
-					case '0.50':
-						aspectRatioClassName = 'wp-embed-aspect-1-2';
-						break;
-				}
-
-				if ( aspectRatioClassName ) {
-					const className = classnames( this.props.attributes.className, 'wp-has-aspect-ratio', aspectRatioClassName );
-					this.props.setAttributes( { className } );
-				}
-			}
+			const className = classnames(
+				this.props.attributes.className,
+				this.getAspectRatioClassNames( html )
+			);
+			this.props.setAttributes( { className } );
 		}
 
 		/***
@@ -210,28 +230,61 @@ export function getEmbedEdit( title, icon ) {
 				setAttributes( { type, providerNameSlug } );
 			}
 
-			this.maybeSetAspectRatioClassName( html );
+			this.setAspectRatioClassNames( html );
 		}
 
 		switchBackToURLInput() {
 			this.setState( { editingURL: true } );
 		}
 
+		getResponsiveHelp( checked ) {
+			return checked ? __( 'Videos and other content automatically resizes.' ) : __( 'Content is fixed size.' );
+		}
+
+		toggleResponsive() {
+			const { allowResponsive, className } = this.props.attributes;
+			const { html } = this.props.preview;
+			const responsiveClassNames = this.getAspectRatioClassNames( html, ! allowResponsive );
+
+			this.props.setAttributes(
+				{
+					allowResponsive: ! allowResponsive,
+					className: classnames( className, responsiveClassNames ),
+				}
+			);
+		}
+
 		render() {
 			const { url, editingURL } = this.state;
-			const { caption, type } = this.props.attributes;
+			const { caption, type, allowResponsive } = this.props.attributes;
 			const { fetching, setAttributes, isSelected, className, preview, previewIsFallback } = this.props;
+			// We have a URL, but couldn't get a preview, or the preview was the oEmbed fallback.
+			const cannotEmbed = url && ( ! preview || previewIsFallback );
 			const controls = (
-				<BlockControls>
-					<Toolbar>
-						{ ( preview && ! previewIsFallback && <IconButton
-							className="components-toolbar__control"
-							label={ __( 'Edit URL' ) }
-							icon="edit"
-							onClick={ this.switchBackToURLInput }
-						/> ) }
-					</Toolbar>
-				</BlockControls>
+				<Fragment>
+					<BlockControls>
+						<Toolbar>
+							{ preview && ! previewIsFallback && (
+								<IconButton
+									className="components-toolbar__control"
+									label={ __( 'Edit URL' ) }
+									icon="edit"
+									onClick={ this.switchBackToURLInput }
+								/>
+							) }
+						</Toolbar>
+					</BlockControls>
+					<InspectorControls>
+						<PanelBody title={ __( 'Media Settings' ) } className="blocks-responsive">
+							<ToggleControl
+								label={ __( 'Automatically scale content' ) }
+								checked={ allowResponsive }
+								help={ this.getResponsiveHelp }
+								onChange={ this.toggleResponsive }
+							/>
+						</PanelBody>
+					</InspectorControls>
+				</Fragment>
 			);
 
 			if ( fetching ) {
@@ -262,13 +315,14 @@ export function getEmbedEdit( title, icon ) {
 								type="submit">
 								{ __( 'Embed' ) }
 							</Button>
-							{ previewIsFallback && <p className="components-placeholder__error">{ __( 'Sorry, we could not embed that content.' ) }</p> }
+							{ cannotEmbed && <p className="components-placeholder__error">{ __( 'Sorry, we could not embed that content.' ) }</p> }
 						</form>
 					</Placeholder>
 				);
 			}
 
 			const html = 'photo' === type ? this.getPhotoHtml( preview ) : preview.html;
+			const { scripts } = preview;
 			const parsedUrl = parse( url );
 			const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedUrl.host.replace( /^www\./, '' ) );
 			// translators: %s: host providing embed content e.g: www.youtube.com
@@ -283,6 +337,7 @@ export function getEmbedEdit( title, icon ) {
 				<div className="wp-block-embed__wrapper">
 					<SandBox
 						html={ html }
+						scripts={ scripts }
 						title={ iframeTitle }
 						type={ sandboxClassnames }
 					/>
@@ -318,16 +373,18 @@ const embedAttributes = {
 		type: 'string',
 	},
 	caption: {
-		type: 'array',
-		source: 'children',
+		source: 'html',
 		selector: 'figcaption',
-		default: [],
 	},
 	type: {
 		type: 'string',
 	},
 	providerNameSlug: {
 		type: 'string',
+	},
+	allowResponsive: {
+		type: 'boolean',
+		default: true,
 	},
 };
 
@@ -357,8 +414,12 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 				const preview = url && getEmbedPreview( url );
 				const previewIsFallback = url && isPreviewEmbedFallback( url );
 				const fetching = undefined !== url && isRequestingEmbedPreview( url );
+				// Some WordPress URLs that can't be embedded will cause the API to return
+				// a valid JSON response with no HTML and `data.status` set to 404, rather
+				// than generating a fallback response as other embeds do.
+				const validPreview = preview && ! ( preview.data && preview.data.status === 404 );
 				return {
-					preview,
+					preview: validPreview && preview,
 					previewIsFallback,
 					fetching,
 				};

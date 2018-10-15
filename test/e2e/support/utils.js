@@ -136,14 +136,36 @@ export async function newPost( { postType, enableTips = false } = {} ) {
 	}
 }
 
+export async function togglePrePublishChecks( ) {
+	await page.click( '.edit-post-more-menu' );
+	await page.waitForSelector( '.components-popover__content' );
+	await page.click( '.edit-post__pre-publish-checks' );
+}
+
+export async function arePrePublishChecksEnabled( ) {
+	return page.evaluate( () => window.wp.data.select( 'core/editor' ).isPublishSidebarEnabled() );
+}
+
+export async function enablePrePublishChecks( ) {
+	if ( ! await arePrePublishChecksEnabled( ) ) {
+		await togglePrePublishChecks();
+	}
+}
+
+export async function disablePrePublishChecks( ) {
+	if ( await arePrePublishChecksEnabled( ) ) {
+		await togglePrePublishChecks();
+	}
+}
+
 export async function setViewport( type ) {
 	const allowedDimensions = {
 		large: { width: 960, height: 700 },
 		small: { width: 600, height: 700 },
 	};
-	const currentDimmension = allowedDimensions[ type ];
-	await page.setViewport( currentDimmension );
-	await waitForPageDimensions( currentDimmension.width, currentDimmension.height );
+	const currentDimension = allowedDimensions[ type ];
+	await page.setViewport( currentDimension );
+	await waitForPageDimensions( currentDimension.width, currentDimension.height );
 }
 
 /**
@@ -295,6 +317,17 @@ export async function publishPost() {
 }
 
 /**
+ * Publishes the post without the pre-publish checks,
+ * resolving once the request is complete (once a notice is displayed).
+ *
+ * @return {Promise} Promise resolving when publish is complete.
+ */
+export async function publishPostWithoutPrePublishChecks() {
+	await page.click( '.editor-post-publish-button' );
+	return page.waitForSelector( '.components-notice.is-success' );
+}
+
+/**
  * Saves the post as a draft, resolving once the request is complete (once the
  * "Saved" indicator is displayed).
  *
@@ -377,4 +410,30 @@ export async function clickOnCloseModalButton( modalClassName ) {
 	if ( closeButton ) {
 		await page.click( closeButtonClassName );
 	}
+}
+
+/**
+ * Sets code editor content
+ * @param {string} content New code editor content.
+ *
+ * @return {Promise} Promise resolving with an array containing all blocks in the document.
+ */
+export async function setPostContent( content ) {
+	return await page.evaluate( ( _content ) => {
+		const { dispatch } = window.wp.data;
+		const blocks = wp.blocks.parse( _content );
+		dispatch( 'core/editor' ).resetBlocks( blocks );
+	}, content );
+}
+
+/**
+ * Returns an array with all blocks; Equivalent to calling wp.data.select( 'core/editor' ).getBlocks();
+ *
+ * @return {Promise} Promise resolving with an array containing all blocks in the document.
+ */
+export async function getAllBlocks() {
+	return await page.evaluate( () => {
+		const { select } = window.wp.data;
+		return select( 'core/editor' ).getBlocks();
+	} );
 }

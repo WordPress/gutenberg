@@ -4,48 +4,76 @@
 import {
 	newPost,
 	publishPost,
+	publishPostWithoutPrePublishChecks,
+	enablePrePublishChecks,
+	disablePrePublishChecks,
+	arePrePublishChecksEnabled,
 } from '../support/utils';
 
 describe( 'Publishing', () => {
-	describe( 'a post', () => {
-		beforeEach( async () => {
-			await newPost();
-		} );
+	[ 'post', 'page' ].forEach( ( postType ) => {
+		let werePrePublishChecksEnabled;
+		describe( `a ${ postType }`, () => {
+			beforeEach( async () => {
+				await newPost( postType );
+				werePrePublishChecksEnabled = await arePrePublishChecksEnabled();
+				if ( ! werePrePublishChecksEnabled ) {
+					await enablePrePublishChecks();
+				}
+			} );
 
-		it( 'should publish a post and close the panel once we start editing again', async () => {
-			await page.type( '.editor-post-title__input', 'E2E Test Post' );
+			afterEach( async () => {
+				if ( ! werePrePublishChecksEnabled ) {
+					await disablePrePublishChecks();
+				}
+			} );
 
-			await publishPost();
+			it( `should publish the ${ postType } and close the panel once we start editing again.`, async () => {
+				await page.type( '.editor-post-title__input', 'E2E Test Post' );
 
-			// The post-publishing panel is visible.
-			expect( await page.$( '.editor-post-publish-panel' ) ).not.toBeNull();
+				await publishPost();
 
-			// Start editing again.
-			await page.type( '.editor-post-title__input', ' (Updated)' );
+				// The post-publishing panel is visible.
+				expect( await page.$( '.editor-post-publish-panel' ) ).not.toBeNull();
 
-			// The post-publishing panel is not visible anymore.
-			expect( await page.$( '.editor-post-publish-panel' ) ).toBeNull();
+				// Start editing again.
+				await page.type( '.editor-post-title__input', ' (Updated)' );
+
+				// The post-publishing panel is not visible anymore.
+				expect( await page.$( '.editor-post-publish-panel' ) ).toBeNull();
+			} );
 		} );
 	} );
 
-	describe( 'a page', () => {
-		beforeEach( async () => {
-			await newPost( 'page' );
-		} );
+	[ 'post', 'page' ].forEach( ( postType ) => {
+		let werePrePublishChecksEnabled;
+		describe( `a ${ postType } with pre-publish checks disabled`, () => {
+			beforeEach( async () => {
+				await newPost( postType );
+				werePrePublishChecksEnabled = await arePrePublishChecksEnabled();
+				if ( werePrePublishChecksEnabled ) {
+					await disablePrePublishChecks();
+				}
+			} );
 
-		it( 'should publish a page and close the panel once we start editing again', async () => {
-			await page.type( '.editor-post-title__input', 'E2E Test Page' );
+			afterEach( async () => {
+				if ( werePrePublishChecksEnabled ) {
+					await enablePrePublishChecks();
+				}
+			} );
 
-			await publishPost();
+			it( `should publish the ${ postType } without opening the post-publish sidebar.`, async () => {
+				await page.type( '.editor-post-title__input', 'E2E Test Post' );
 
-			// The post-publishing panel is visible.
-			expect( await page.$( '.editor-post-publish-panel' ) ).not.toBeNull();
+				// The "Publish" button should be shown instead of the "Publish..." toggle
+				expect( await page.$( '.editor-post-publish-panel__toggle' ) ).toBeNull();
+				expect( await page.$( '.editor-post-publish-button' ) ).not.toBeNull();
 
-			// Start editing the page again.
-			await page.type( '.editor-post-title__input', ' (Updated)' );
+				await publishPostWithoutPrePublishChecks();
 
-			// The post-publishing panel is not visible anymore.
-			expect( await page.$( '.editor-post-publish-panel' ) ).toBeNull();
+				// The post-publishing panel should have been not shown.
+				expect( await page.$( '.editor-post-publish-panel' ) ).toBeNull();
+			} );
 		} );
 	} );
 } );

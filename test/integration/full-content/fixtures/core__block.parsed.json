@@ -8,7 +8,9 @@
         "innerHTML": ""
     },
     {
+        "blockName": null,
         "attrs": {},
+        "innerBlocks": [],
         "innerHTML": "\n"
     }
 ]

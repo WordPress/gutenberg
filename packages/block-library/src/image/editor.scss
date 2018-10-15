@@ -1,6 +1,5 @@
 .wp-block-image {
 	position: relative;
-	margin: 0;
 
 	&.is-transient img {
 		@include loading_fade;
@@ -12,50 +11,20 @@
 }
 
 // This is necessary for the editor resize handles to accurately work on a non-floated, non-resized, small image.
-.wp-block-image {
-	.block-library-image__resizer {
-		display: inline-block;
+.wp-block-image .components-resizable-box__container {
+	display: inline-block;
 
-		img {
-			display: block;
-			width: 100%;
-		}
-	}
-}
-
-.block-library-image__resize-handler-right,
-.block-library-image__resize-handler-bottom,
-.block-library-image__resize-handler-left {
-	display: none;
-	border-radius: 50%;
-	border: 2px solid $white;
-	width: 16px !important;
-	height: 16px !important;
-	position: absolute;
-	background: theme(primary);
-
-	.wp-block-image.is-focused & {
+	img {
 		display: block;
-		z-index: z-index(".block-library-image__resize-handlers");
+		width: 100%;
 	}
 }
 
-/*!rtl:begin:ignore*/
-.block-library-image__resize-handler-right {
-	top: calc(50% - 9px) !important;
-	right: -8px !important;
+// Ensure the resize handles are visible when the image is focused.
+.wp-block-image.is-focused .components-resizable-box__handle {
+	display: block;
+	z-index: z-index(".block-library-image__resize-handlers");
 }
-
-.block-library-image__resize-handler-left {
-	top: calc(50% - 9px) !important;
-	left: -8px !important;
-}
-
-.block-library-image__resize-handler-bottom {
-	bottom: -8px !important;
-	left: calc(50% - 9px) !important;
-}
-/*!rtl:end:ignore*/
 
 .editor-block-list__block[data-type="core/image"][data-align="center"] {
 	.wp-block-image {

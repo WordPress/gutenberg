@@ -71,7 +71,12 @@ if ( ! function_exists( 'peg_join_blocks' ) ) {
         $blocks = array();
 
         if ( ! empty( $pre ) ) {
-            $blocks[] = array( 'attrs' => array(), 'innerHTML' => $pre );
+            $blocks[] = array(
+                'blockName' => null,
+                'attrs' => array(),
+                'innerBlocks' => array(),
+                'innerHTML' => $pre
+            );
         }
 
         foreach ( $tokens as $token ) {
@@ -80,12 +85,22 @@ if ( ! function_exists( 'peg_join_blocks' ) ) {
             $blocks[] = $token;
 
             if ( ! empty( $html ) ) {
-                $blocks[] = array( 'attrs' => array(), 'innerHTML' => $html );
+                $blocks[] = array(
+                    'blockName' => null,
+                    'attrs' => array(),
+                    'innerBlocks' => array(),
+                    'innerHTML' => $html
+                );
             }
         }
 
         if ( ! empty( $post ) ) {
-            $blocks[] = array( 'attrs' => array(), 'innerHTML' => $post );
+            $blocks[] = array(
+                'blockName' => null,
+                'attrs' => array(),
+                'innerBlocks' => array(),
+                'innerHTML' => $post
+            );
         }
 
         return $blocks;
@@ -96,8 +111,10 @@ if ( ! function_exists( 'peg_join_blocks' ) ) {
 
 function freeform( s ) {
     return s.length && {
+        blockName: null,
         attrs: {},
-        innerHTML: s
+        innerBlocks: [],
+        innerHTML: s,
     };
 }
 
@@ -180,16 +197,16 @@ Block_Void
   {
     /** <?php
     return array(
-      'blockName'  => $blockName,
-      'attrs'      => $attrs,
+      'blockName'   => $blockName,
+      'attrs'       => isset( $attrs ) ? $attrs : array(),
       'innerBlocks' => array(),
-      'innerHTML' => '',
+      'innerHTML'   => '',
     );
     ?> **/
 
     return {
       blockName: blockName,
-      attrs: attrs,
+      attrs: attrs || {},
       innerBlocks: [],
       innerHTML: ''
     };
@@ -202,10 +219,10 @@ Block_Balanced
     list( $innerHTML, $innerBlocks ) = peg_array_partition( $children, 'is_string' );
 
     return array(
-      'blockName'  => $s['blockName'],
-      'attrs'      => $s['attrs'],
+      'blockName'    => $s['blockName'],
+      'attrs'        => $s['attrs'],
       'innerBlocks'  => $innerBlocks,
-      'innerHTML'  => implode( '', $innerHTML ),
+      'innerHTML'    => implode( '', $innerHTML ),
     );
     ?> **/
 
@@ -230,13 +247,13 @@ Block_Start
     /** <?php
     return array(
       'blockName' => $blockName,
-      'attrs'     => $attrs,
+      'attrs'     => isset( $attrs ) ? $attrs : array(),
     );
     ?> **/
 
     return {
       blockName: blockName,
-      attrs: attrs
+      attrs: attrs || {}
     };
   }
 

@@ -10,9 +10,10 @@ describe( 'new editor state', () => {
 
 	it( 'should show the New Post page in Gutenberg', async () => {
 		expect( page.url() ).toEqual( expect.stringContaining( 'post-new.php' ) );
-		// Should display the title.
+		// Should display the blank title.
 		const title = await page.$( '[placeholder="Add title"]' );
 		expect( title ).not.toBeNull();
+		expect( title.innerHTML ).toBeFalsy();
 		// Should display the Preview button.
 		const postPreviewButton = await page.$( '.editor-post-preview.components-button' );
 		expect( postPreviewButton ).not.toBeNull();

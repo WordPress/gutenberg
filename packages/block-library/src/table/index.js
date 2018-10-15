@@ -58,9 +58,7 @@ function getTableSectionAttributeSchema( section ) {
 				selector: 'td,th',
 				query: {
 					content: {
-						type: 'array',
-						default: [],
-						source: 'children',
+						source: 'html',
 					},
 					tag: {
 						type: 'string',
@@ -90,6 +88,11 @@ export const settings = {
 		body: getTableSectionAttributeSchema( 'body' ),
 		foot: getTableSectionAttributeSchema( 'foot' ),
 	},
+
+	styles: [
+		{ name: 'regular', label: __( 'Regular' ), isDefault: true },
+		{ name: 'stripes', label: __( 'Stripes' ) },
+	],
 
 	supports: {
 		align: true,

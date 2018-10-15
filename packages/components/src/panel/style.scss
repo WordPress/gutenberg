@@ -28,13 +28,16 @@
 	&.is-opened {
 		padding: $panel-padding;
 	}
+
+	> .components-icon-button {
+		color: $dark-gray-900;
+	}
 }
 
 .components-panel__header {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	background: $light-gray-300;
 	padding: 0 $panel-padding;
 	height: 50px;
 	border-top: $border-width solid $light-gray-500;
@@ -60,10 +63,17 @@
 	font-size: inherit;
 	margin-top: 0;
 	margin-bottom: 0;
+	transition: 0.1s background ease-in-out;
 }
 .components-panel__body.is-opened > .components-panel__body-title {
 	margin: -1 * $panel-padding;
 	margin-bottom: 5px;
+}
+
+// Hover States
+.components-panel__body > .components-panel__body-title:hover,
+.edit-post-last-revision__panel > .components-icon-button:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+	background: $light-gray-100;
 }
 
 .components-panel__body-toggle.components-button {
@@ -75,6 +85,7 @@
 	text-align: left;
 	color: $dark-gray-900;
 	@include menu-style__neutral;
+	transition: 0.1s background ease-in-out;
 
 	&:focus:not(:disabled):not([aria-disabled="true"]) {
 		@include menu-style__focus;
@@ -82,11 +93,12 @@
 
 	.components-panel__arrow {
 		position: absolute;
-		right: $item-spacing;
+		right: $grid-size + 2;
 		top: 50%;
 		transform: translateY(-50%);
 		color: $dark-gray-900;
 		fill: currentColor;
+		transition: 0.1s color ease-in-out;
 	}
 
 	// mirror the arrow horizontally in RTL languages

@@ -22,12 +22,21 @@
 }
 
 .editor-post-publish-panel__header-publish-button {
+	display: flex;
+	justify-content: flex-end;
 	flex-grow: 1;
 	text-align: right;
+	flex-wrap: nowrap;
 }
 
 .editor-post-publish-panel__header-published {
 	flex-grow: 1;
+}
+
+.editor-post-publish-panel__footer {
+	padding: 16px;
+	position: absolute;
+	bottom: 0;
 }
 
 .components-button.editor-post-publish-panel__toggle.is-primary {
@@ -76,18 +85,21 @@
 .post-publish-panel__postpublish-buttons {
 	display: flex;
 	align-content: space-between;
+	flex-wrap: wrap;
+	margin: -5px;
 
 	> * {
 		flex-grow: 1;
-		margin-right: 10px;
-
-		&:last-child {
-			margin-right: 0;
-		}
+		margin: 5px;
 	}
 
 	.components-button {
+		height: auto;
 		justify-content: center;
+		padding: 3px 10px 4px;
+		line-height: 1.6;
+		text-align: center;
+		white-space: normal;
 	}
 
 	.components-clipboard-button {

@@ -13,7 +13,7 @@ describe( 'Managing reusable blocks', () => {
 		await visitAdmin( 'edit.php', 'post_type=wp_block' );
 	} );
 
-	it( 'Should import reusable blocoks', async () => {
+	it( 'Should import reusable blocks', async () => {
 		// Import Reusable block
 		await page.waitForSelector( '.list-reusable-blocks__container' );
 		const importButton = await page.$( '.list-reusable-blocks__container button' );

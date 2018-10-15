@@ -19,12 +19,12 @@ export { default as PanelColor } from './panel-color';
 export { default as PanelColorSettings } from './panel-color-settings';
 export { default as PlainText } from './plain-text';
 export { default as RichText } from './rich-text';
-export { default as RichTextProvider } from './rich-text/provider';
 export { default as ServerSideRender } from './server-side-render';
 export { default as MediaPlaceholder } from './media-placeholder';
 export { default as MediaUpload } from './media-upload';
 export { default as URLInput } from './url-input';
 export { default as URLInputButton } from './url-input/button';
+export { default as URLPopover } from './url-popover';
 
 // Post Related Components
 export { default as AutosaveMonitor } from './autosave-monitor';
@@ -49,6 +49,7 @@ export { default as PostFormat } from './post-format';
 export { default as PostFormatCheck } from './post-format/check';
 export { default as PostLastRevision } from './post-last-revision';
 export { default as PostLastRevisionCheck } from './post-last-revision/check';
+export { default as PostLockedModal } from './post-locked-modal';
 export { default as PostPendingStatus } from './post-pending-status';
 export { default as PostPendingStatusCheck } from './post-pending-status/check';
 export { default as PostPingbacks } from './post-pingbacks';

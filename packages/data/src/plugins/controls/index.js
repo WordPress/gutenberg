@@ -32,7 +32,7 @@ export default function( registry ) {
 
 		async __experimentalFulfill( reducerKey, selectorName, ...args ) {
 			if ( ! registry.namespaces[ reducerKey ].supportControls ) {
-				registry.__experimentalFulfill( reducerKey, selectorName, ...args );
+				await registry.__experimentalFulfill( reducerKey, selectorName, ...args );
 				return;
 			}
 
