@@ -35,7 +35,7 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 	return (
 		<Fragment>
 			<Warning actions={ actions }>
-				<span>{ messageHTML }</span>
+				{ messageHTML }
 			</Warning>
 			<div>
 				<RawHTML>{ originalUndelimitedContent }</RawHTML>
