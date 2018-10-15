@@ -24,8 +24,8 @@ module.exports = () => {
 		const babelConfig = path.normalize( path.join( npmRoot, '/create-wp-plugin/templates/plugin/.babelrc' ) ).replace( /(\r\n\t|\n|\r\t)/gm, '' );
 		const gitConfig = path.normalize( path.join( npmRoot, '/create-wp-plugin/templates/plugin/.gitignore' ) ).replace( /(\r\n\t|\n|\r\t)/gm, '' );
 
-		console.log( chalk.bgGreen( ' Welcome To Create WP Plugin ' ) ); // eslint-disable-line no-console
-		console.log( chalk.bgYellow( ' CLI utility to help you scaffold plugins and blocks' ) ); // eslint-disable-line no-console
+		console.log( chalk.bold.bgRgb( 0, 115, 170 )( ' Welcome To Create WP Plugin ' ) ); // eslint-disable-line no-console
+		console.log( chalk.bgRgb( 0, 160, 210 )( ' CLI utility to help you scaffold plugins and blocks' ) ); // eslint-disable-line no-console
 		console.log( '' ); // eslint-disable-line no-console
 
 		prompt( questions ).then( ( answers ) => {
@@ -71,7 +71,7 @@ module.exports = () => {
 			shell.exec( 'npm run build' );
 
 			// Final
-			console.log( chalk.bgCyan( 'All Right Sparky !!!' ) ); // eslint-disable-line no-console
+			console.log( chalk.bold.bgRgb( 70, 180, 80 )( 'All Right Sparky !!!' ) ); // eslint-disable-line no-console
 		} );
 	}
 };
