@@ -483,7 +483,8 @@ add_filter( 'rest_user_collection_params', 'gutenberg_filter_user_collection_par
  */
 function gutenberg_silence_rest_errors() {
 
-	if ( ! empty( $_SERVER['CONTENT_TYPE'] ) && 'application/json' === $_SERVER['CONTENT_TYPE'] ) {
+	if ( ( isset( $_SERVER['CONTENT_TYPE'] ) && 'application/json' === $_SERVER['CONTENT_TYPE'] ) ||
+		( isset( $_SERVER['HTTP_ACCEPT'] ) && strpos( $_SERVER['HTTP_ACCEPT'], 'application/json' ) !== false ) ) {
 		// @codingStandardsIgnoreStart
 		@ini_set( 'display_errors', 0 );
 		// @codingStandardsIgnoreEnd
