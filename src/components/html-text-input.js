@@ -29,8 +29,8 @@ export default class HTMLInputView extends React.Component<PropsType, StateType>
 	componentDidMount() {
 		const html = this.serializeBlocksToHtml();
 		this.setState( { html } );
-		if (this.isIOS) {
-			this.textInput.setNativeProps({text: html});
+		if ( this.isIOS ) {
+			this.textInput.setNativeProps( { text: html } );
 		}
 	}
 
@@ -40,7 +40,7 @@ export default class HTMLInputView extends React.Component<PropsType, StateType>
 	}
 
 	shouldComponentUpdate() {
-		return !this.isIOS;
+		return ! this.isIOS;
 	}
 
 	serializeBlocksToHtml() {
@@ -63,7 +63,7 @@ export default class HTMLInputView extends React.Component<PropsType, StateType>
 		return (
 			<KeyboardAvoidingView style={ styles.container } behavior={ behavior }>
 				<TextInput
-					ref={ textInput => this.textInput = textInput }
+					ref={ ( textInput ) => this.textInput = textInput }
 					textAlignVertical="top"
 					multiline
 					numberOfLines={ 0 }
