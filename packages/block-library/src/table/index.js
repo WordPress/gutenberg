@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { getPhrasingContentSchema } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
 
@@ -90,7 +90,7 @@ export const settings = {
 	},
 
 	styles: [
-		{ name: 'regular', label: __( 'Regular' ), isDefault: true },
+		{ name: 'regular', label: _x( 'Regular', 'block style' ), isDefault: true },
 		{ name: 'stripes', label: __( 'Stripes' ) },
 	],
 
