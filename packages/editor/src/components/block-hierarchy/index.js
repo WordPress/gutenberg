@@ -24,16 +24,18 @@ function BlockHierarchyList( { blocks, selectedBlockClientId, selectBlock } ) {
 				const blockType = getBlockType( block.name );
 				return (
 					<li key={ block.clientId }>
-						<MenuItem
-							className={ classnames( 'editor-block-hierarchy__item', {
-								'is-selected': block.clientId === selectedBlockClientId,
-							} ) }
-							onClick={ () => selectBlock( block.clientId ) }
-							isSelected={ block.clientId === selectedBlockClientId }
-						>
-							<BlockIcon icon={ blockType.icon } showColors />
-							{ blockType.title }
-						</MenuItem>
+						<div role="presentation" className="editor-block-hierarchy__item">
+							<MenuItem
+								className={ classnames( 'editor-block-hierarchy__item-button', {
+									'is-selected': block.clientId === selectedBlockClientId,
+								} ) }
+								onClick={ () => selectBlock( block.clientId ) }
+								isSelected={ block.clientId === selectedBlockClientId }
+							>
+								<BlockIcon icon={ blockType.icon } showColors />
+								{ blockType.title }
+							</MenuItem>
+						</div>
 						{ !! block.innerBlocks && !! block.innerBlocks.length && (
 							<BlockHierarchyList
 								blocks={ block.innerBlocks }
