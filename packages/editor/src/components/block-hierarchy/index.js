@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
+import { map, noop } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -76,9 +76,12 @@ export default compose(
 			selectedBlockClientId,
 		};
 	} ),
-	withDispatch( ( dispatch ) => {
+	withDispatch( ( dispatch, { onSelect = noop } ) => {
 		return {
-			selectBlock: dispatch( 'core/editor' ).selectBlock,
+			selectBlock( clientId ) {
+				dispatch( 'core/editor' ).selectBlock( clientId );
+				onSelect( clientId );
+			},
 		};
 	} )
 )( BlockHierarchy );
