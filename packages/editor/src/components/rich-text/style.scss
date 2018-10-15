@@ -25,14 +25,6 @@
 		color: $blue-medium-700;
 	}
 
-	&:focus a[data-mce-selected] {
-		padding: 0 2px;
-		margin: 0 -2px;
-		border-radius: 2px;
-		box-shadow: 0 0 0 1px $blue-medium-100;
-		background: $blue-medium-100;
-	}
-
 	code {
 		padding: 2px;
 		border-radius: 2px;
@@ -46,11 +38,9 @@
 		}
 	}
 
-	&:focus code[data-mce-selected] {
-		background: $light-gray-400;
-	}
-
+	// Style TinyMCE inline boundaries on select inline text elements.
 	&:focus {
+		a,
 		b,
 		i,
 		strong,
@@ -65,7 +55,26 @@
 				border-radius: 2px;
 				box-shadow: 0 0 0 1px $light-gray-400;
 				background: $light-gray-400;
+
+				// Enforce a dark text color so active inline boundaries
+				// are always readable.
+				// See https://github.com/WordPress/gutenberg/issues/9508
+				color: $dark-gray-900;
 			}
+		}
+
+		// Link inline boundaries get special colors.
+		a[data-mce-selected] {
+			box-shadow: 0 0 0 1px $blue-medium-100;
+			background: $blue-medium-100;
+			color: $blue-medium-700;
+		}
+
+		// <code> inline boundaries need special treatment because their
+		// un-selected style is already padded.
+		code[data-mce-selected] {
+			background: $light-gray-400;
+			box-shadow: 0 0 0 1px $light-gray-400;
 		}
 	}
 
