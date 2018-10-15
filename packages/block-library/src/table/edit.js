@@ -43,7 +43,7 @@ const { getComputedStyle } = window;
 
 const applyFallbackStyles = withFallbackStyles( ( node, props ) => {
 	const { textColor, backgroundColor } = props.attributes;
-	const styles = node ? getComputedStyle( node ) : undefined;
+	const styles = node ? getComputedStyle( node.querySelector( 'tr' ) ) : undefined;
 	return {
 		fallbackBackgroundColor: backgroundColor || ! styles ? undefined : styles.backgroundColor,
 		fallbackTextColor: textColor || ! styles ? undefined : styles.color,
