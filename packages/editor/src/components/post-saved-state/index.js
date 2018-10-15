@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -41,8 +42,9 @@ export class PostSavedState extends Component {
 	}
 
 	render() {
-		const { isNew, isScheduled, isPublished, isDirty, isSaving, isSaveable, onSave, isAutosaving } = this.props;
+		const { post, isNew, isScheduled, isPublished, isDirty, isSaving, isSaveable, onSave, isAutosaving, isPending } = this.props;
 		const { forceSavedMessage } = this.state;
+		const hasPublishAction = get( post, [ '_links', 'wp:action-publish' ], false );
 		if ( isSaving ) {
 			// TODO: Classes generation should be common across all return
 			// paths of this function, including proper naming convention for
@@ -76,6 +78,12 @@ export class PostSavedState extends Component {
 			);
 		}
 
+		// Once the post has been submitted for review this button
+		// is not needed for the contributor role.
+		if ( ! hasPublishAction && isPending ) {
+			return null;
+		}
+
 		return (
 			<IconButton
 				className="editor-post-save-draft"
@@ -83,7 +91,7 @@ export class PostSavedState extends Component {
 				icon="cloud-upload"
 				shortcut={ displayShortcut.primary( 's' ) }
 			>
-				{ __( 'Save Draft' ) }
+				{ isPending ? __( 'Save as Pending' ) : __( 'Save Draft' ) }
 			</IconButton>
 		);
 	}
@@ -100,6 +108,7 @@ export default compose( [
 			isEditedPostSaveable,
 			getCurrentPost,
 			isAutosavingPost,
+			getEditedPostAttribute,
 		} = select( 'core/editor' );
 		return {
 			post: getCurrentPost(),
@@ -110,6 +119,7 @@ export default compose( [
 			isSaving: forceIsSaving || isSavingPost(),
 			isSaveable: isEditedPostSaveable(),
 			isAutosaving: isAutosavingPost(),
+			isPending: 'pending' === getEditedPostAttribute( 'status' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
