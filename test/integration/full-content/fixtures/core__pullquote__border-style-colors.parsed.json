@@ -1,0 +1,18 @@
+[
+    {
+        "blockName": "core/pullquote",
+        "attrs": {
+            "customMainColor": "#bc5812",
+            "customTextColor": "#5b0b0b",
+            "className": "is-style-border-color"
+        },
+        "innerBlocks": [],
+        "innerHTML": "\n<figure class=\"wp-block-pullquote is-style-border-color\" style=\"border-color:#bc5812\">\n\t<blockquote class=\"has-text-color\" style=\"color:#5b0b0b\">\n\t\t<p>sdfd</p>\n\t\t<cite>sdfs</cite>\n\t</blockquote>\n</figure>\n"
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n\n"
+    }
+]

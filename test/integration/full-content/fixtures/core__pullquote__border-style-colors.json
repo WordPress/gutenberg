@@ -1,0 +1,16 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/pullquote",
+        "isValid": true,
+        "attributes": {
+            "value": "<p>sdfd</p>",
+            "citation": "sdfs",
+            "customMainColor": "#bc5812",
+            "customTextColor": "#5b0b0b",
+            "className": "is-style-border-color"
+        },
+        "innerBlocks": [],
+        "originalContent": "<figure class=\"wp-block-pullquote is-style-border-color\" style=\"border-color:#bc5812\">\n\t<blockquote class=\"has-text-color\" style=\"color:#5b0b0b\">\n\t\t<p>sdfd</p>\n\t\t<cite>sdfs</cite>\n\t</blockquote>\n</figure>"
+    }
+]

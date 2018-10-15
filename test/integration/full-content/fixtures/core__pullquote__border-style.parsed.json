@@ -1,0 +1,16 @@
+[
+    {
+        "blockName": "core/pullquote",
+        "attrs": {
+            "className": "is-style-border-color"
+        },
+        "innerBlocks": [],
+        "innerHTML": "\n<figure class=\"wp-block-pullquote is-style-border-color\">\n\t<blockquote>\n\t\t<p>sdfd</p>\n\t\t<cite>sdfs</cite>\n\t</blockquote>\n</figure>\n"
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n"
+    }
+]
