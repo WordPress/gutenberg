@@ -60,6 +60,7 @@ $tree-item-height: 36px;
 
 	&.is-selected,
 	&.is-selected:focus {
+		color: $dark-gray-700;
 		background: $light-gray-300;
 	}
 }
