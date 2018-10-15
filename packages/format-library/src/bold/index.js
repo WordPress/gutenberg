@@ -3,10 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
-import { Fill, ToolbarButton } from '@wordpress/components';
+import { ToolbarButton } from '@wordpress/components';
 import { toggleFormat } from '@wordpress/rich-text';
-
-const Shortcut = () => null;
 
 export const bold = {
 	name: 'core/bold',
@@ -14,24 +12,24 @@ export const bold = {
 	match: {
 		tagName: 'strong',
 	},
-	edit( { isActive, value, onChange } ) {
+	edit( { isActive, value, onChange, FillToolbarSlot, Shortcut } ) {
 		const onToggle = () => onChange( toggleFormat( value, { type: 'core/bold' } ) );
 
 		return (
 			<Fragment>
 				<Shortcut
 					type="primary"
-					key="b"
+					character="b"
 					onUse={ onToggle }
 				/>
-				<Fill name="RichText.ToolbarControls.bold">
+				<FillToolbarSlot name="bold">
 					<ToolbarButton
 						icon="editor-bold"
 						title={ __( 'Bold' ) }
 						onClick={ onToggle }
 						isActive={ isActive }
 					/>
-				</Fill>
+				</FillToolbarSlot>
 			</Fragment>
 		);
 	},

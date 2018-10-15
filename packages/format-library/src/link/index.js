@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component, Fragment } from '@wordpress/element';
-import { Fill, ToolbarButton } from '@wordpress/components';
+import { ToolbarButton } from '@wordpress/components';
 import {
 	getTextContent,
 	applyFormat,
@@ -16,8 +16,6 @@ import { isURL } from '@wordpress/url';
  * Internal dependencies
  */
 import InlineLinkUI from './inline';
-
-const Shortcut = () => null;
 
 export const link = {
 	name: 'core/link',
@@ -56,27 +54,27 @@ export const link = {
 		}
 
 		render() {
-			const { isActive, activeAttributes, value, onChange } = this.props;
+			const { isActive, activeAttributes, value, onChange, FillToolbarSlot, Shortcut } = this.props;
 			const onRemoveFormat = () => onChange( removeFormat( value, 'core/link' ) );
 
 			return (
 				<Fragment>
 					<Shortcut
 						type="access"
-						key="s"
-						onUseShortcut={ onRemoveFormat }
+						character="s"
+						onUse={ onRemoveFormat }
 					/>
 					<Shortcut
 						type="access"
-						key="a"
-						onUseShortcut={ () => this.addLink() }
+						character="a"
+						onUse={ () => this.addLink() }
 					/>
 					<Shortcut
 						type="primary"
-						key="k"
-						onUseShortcut={ () => this.addLink() }
+						character="k"
+						onUse={ () => this.addLink() }
 					/>
-					<Fill name="RichText.ToolbarControls.link">
+					<FillToolbarSlot name="link">
 						{ isActive && <ToolbarButton
 							icon="editor-unlink"
 							title={ __( 'Unlink' ) }
@@ -89,7 +87,7 @@ export const link = {
 							onClick={ () => this.addLink() }
 							isActive={ isActive }
 						/> }
-					</Fill>
+					</FillToolbarSlot>
 					<InlineLinkUI
 						addingLink={ this.state.addingLink }
 						stopAddingLink={ this.stopAddingLink }

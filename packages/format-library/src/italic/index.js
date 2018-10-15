@@ -3,10 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
-import { Fill, ToolbarButton } from '@wordpress/components';
+import { ToolbarButton } from '@wordpress/components';
 import { toggleFormat } from '@wordpress/rich-text';
-
-const Shortcut = () => null;
 
 export const italic = {
 	name: 'core/italic',
@@ -14,24 +12,24 @@ export const italic = {
 	match: {
 		tagName: 'em',
 	},
-	edit( { isActive, value, onChange } ) {
+	edit( { isActive, value, onChange, FillToolbarSlot, Shortcut } ) {
 		const onToggle = () => onChange( toggleFormat( value, { type: 'core/italic' } ) );
 
 		return (
 			<Fragment>
 				<Shortcut
 					type="primary"
-					key="i"
+					character="i"
 					onUse={ onToggle }
 				/>
-				<Fill name="RichText.ToolbarControls.italic">
+				<FillToolbarSlot name="italic">
 					<ToolbarButton
 						icon="editor-italic"
 						title={ __( 'Italic' ) }
 						onClick={ onToggle }
 						isActive={ isActive }
 					/>
-				</Fill>
+				</FillToolbarSlot>
 			</Fragment>
 		);
 	},

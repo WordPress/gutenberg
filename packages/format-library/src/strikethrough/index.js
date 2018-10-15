@@ -3,10 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
-import { Fill, ToolbarButton } from '@wordpress/components';
+import { ToolbarButton } from '@wordpress/components';
 import { toggleFormat } from '@wordpress/rich-text';
-
-const Shortcut = () => null;
 
 export const strikethrough = {
 	name: 'core/strikethrough',
@@ -14,24 +12,24 @@ export const strikethrough = {
 	match: {
 		tagName: 'del',
 	},
-	edit( { isActive, value, onChange } ) {
+	edit( { isActive, value, onChange, FillToolbarSlot, Shortcut } ) {
 		const onToggle = () => onChange( toggleFormat( value, { type: 'core/strikethrough' } ) );
 
 		return (
 			<Fragment>
 				<Shortcut
 					type="access"
-					key="d"
+					character="d"
 					onUse={ onToggle }
 				/>
-				<Fill name="RichText.ToolbarControls.strikethrough">
+				<FillToolbarSlot name="strikethrough">
 					<ToolbarButton
 						icon="editor-strikethrough"
 						title={ __( 'Strikethrough' ) }
 						onClick={ onToggle }
 						isActive={ isActive }
 					/>
-				</Fill>
+				</FillToolbarSlot>
 			</Fragment>
 		);
 	},
