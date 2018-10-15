@@ -40,8 +40,9 @@ const setupEmbedRequestInterception = async () => {
 			( url ) => -1 !== requestUrl.indexOf( encodeURIComponent( url ) )
 		);
 		if ( hasEmbedSuccessUrl ) {
-			// If this is the youtube request, return the video mock response that has an iframe with set aspect ratio.
-			// Otherwise, use the generic rich response.
+			// If this is the YouTube request, return the video mock response that has
+			// an iframe with set aspect ratio.
+			// Otherwise: use the generic rich response.
 			const embedResponse = -1 !== requestUrl.indexOf( encodeURIComponent( VIDEO_URL ) ) ? MOCK_EMBED_VIDEO_SUCCESS_RESPONSE : MOCK_EMBED_RICH_SUCCESS_RESPONSE;
 			request.respond( {
 				content: 'application/json',
@@ -56,49 +57,49 @@ const setupEmbedRequestInterception = async () => {
 const addEmbeds = async () => {
 	await newPost();
 
-	// Valid embed
+	// Valid embed.
 	await clickBlockAppender();
 	await page.keyboard.type( '/embed' );
 	await page.keyboard.press( 'Enter' );
 	await page.keyboard.type( 'https://twitter.com/notnownikki' );
 	await page.keyboard.press( 'Enter' );
 
-	// Valid provider, invalid content
+	// Valid provider; invalid content.
 	await clickBlockAppender();
 	await page.keyboard.type( '/embed' );
 	await page.keyboard.press( 'Enter' );
 	await page.keyboard.type( 'https://twitter.com/wooyaygutenberg123454312' );
 	await page.keyboard.press( 'Enter' );
 
-	// Valid provider, erroring provider API
+	// Valid provider; erroring provider API.
 	await clickBlockAppender();
 	await page.keyboard.type( '/embed' );
 	await page.keyboard.press( 'Enter' );
 	await page.keyboard.type( 'https://www.reverbnation.com/collection/186-mellow-beats' );
 	await page.keyboard.press( 'Enter' );
 
-	// WordPress content that can't be embedded
+	// WordPress content that can't be embedded.
 	await clickBlockAppender();
 	await page.keyboard.type( '/embed' );
 	await page.keyboard.press( 'Enter' );
 	await page.keyboard.type( 'https://wordpress.org/gutenberg/handbook/' );
 	await page.keyboard.press( 'Enter' );
 
-	// WordPress content that can be embedded
+	// WordPress content that can be embedded.
 	await clickBlockAppender();
 	await page.keyboard.type( '/embed' );
 	await page.keyboard.press( 'Enter' );
 	await page.keyboard.type( 'https://wordpress.org/gutenberg/handbook/block-api/attributes/' );
 	await page.keyboard.press( 'Enter' );
 
-	// Video content
+	// Video content.
 	await clickBlockAppender();
 	await page.keyboard.type( '/embed' );
 	await page.keyboard.press( 'Enter' );
 	await page.keyboard.type( 'https://www.youtube.com/watch?v=lXMskKTw3Bc' );
 	await page.keyboard.press( 'Enter' );
 
-	// Photo content
+	// Photo content.
 	await clickBlockAppender();
 	await page.keyboard.type( '/embed' );
 	await page.keyboard.press( 'Enter' );
@@ -111,7 +112,7 @@ const setUp = async () => {
 	await addEmbeds();
 };
 
-describe( 'embedding content', () => {
+describe( 'Embedding content', () => {
 	beforeEach( setUp );
 
 	it( 'should render embeds in the correct state', async () => {
