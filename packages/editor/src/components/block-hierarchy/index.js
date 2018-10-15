@@ -32,7 +32,7 @@ function BlockHierarchyList( { blocks, selectedBlockClientId, selectBlock } ) {
 							isSelected={ block.clientId === selectedBlockClientId }
 						>
 							<BlockIcon icon={ blockType.icon } showColors />
-							{ block.name }
+							{ blockType.title }
 						</MenuItem>
 						{ !! block.innerBlocks && !! block.innerBlocks.length && (
 							<BlockHierarchyList

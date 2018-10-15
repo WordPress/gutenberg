@@ -22,7 +22,7 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Navigate to the columns blocks
 		await page.click( '[aria-label="Open Block Hierarchy Navigator"]' );
-		const columnsBlockMenuItem = ( await page.$x( "//button[contains(@class,'editor-block-hierarchy__item') and contains(text(), 'core/columns')]" ) )[ 0 ];
+		const columnsBlockMenuItem = ( await page.$x( "//button[contains(@class,'editor-block-hierarchy__item') and contains(text(), 'Columns (beta)')]" ) )[ 0 ];
 		await columnsBlockMenuItem.click();
 
 		// Tweak the columns count
@@ -32,7 +32,7 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Navigate to the last column blosck
 		await page.click( '[aria-label="Open Block Hierarchy Navigator"]' );
-		const lastColumnsBlockMenuItem = ( await page.$x( "//button[contains(@class,'editor-block-hierarchy__item') and contains(text(), 'core/column')]" ) )[ 3 ];
+		const lastColumnsBlockMenuItem = ( await page.$x( "//button[contains(@class,'editor-block-hierarchy__item') and contains(text(), 'Column')]" ) )[ 3 ];
 		await lastColumnsBlockMenuItem.click();
 
 		// Insert text in the last column block
