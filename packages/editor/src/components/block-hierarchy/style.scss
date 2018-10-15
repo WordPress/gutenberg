@@ -1,5 +1,5 @@
 $tree-border-width: 2px;
-$tree-item-height: 40px;
+$tree-item-height: 36px;
 
 .editor-block-hierarchy__list {
 	padding: 0;
@@ -8,10 +8,10 @@ $tree-item-height: 40px;
 
 .editor-block-hierarchy__list .editor-block-hierarchy__list {
 	border-left: $tree-border-width solid $light-gray-900;
-	margin-left: 1.5em;
+	margin-left: 1em;
 
 	.editor-block-hierarchy__list {
-		margin-left: 2.5em;
+		margin-left: 1.5em;
 	}
 
 	.editor-block-hierarchy__item {
@@ -21,7 +21,7 @@ $tree-item-height: 40px;
 			position: absolute;
 			left: 0;
 			background: $light-gray-900;
-			width: 1em;
+			width: 0.5em;
 			height: $tree-border-width;
 			content: "";
 			top: calc(50% - #{ $tree-border-width / 2 });
@@ -29,8 +29,8 @@ $tree-item-height: 40px;
 	}
 
 	.editor-block-hierarchy__item-button {
-		margin-left: 1em;
-		width: calc(100% - 1em);
+		margin-left: 0.5em;
+		width: calc(100% - 0.5em);
 	}
 
 	& > li:last-child {
@@ -48,11 +48,12 @@ $tree-item-height: 40px;
 }
 
 .editor-block-hierarchy__item-button {
+	padding: 6px;
 	display: flex;
 	align-items: center;
 
 	.editor-block-icon {
-		margin-right: 10px;
+		margin-right: 6px;
 	}
 
 	&.is-selected {
