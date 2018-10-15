@@ -1,3 +1,9 @@
+## 2.1.0 (2018-09-26)
+
+### New Features
+
+- Added a `datetimeAbbreviated` format to `getSettings().format` for abbreviated months.
+
 ## 2.0.0 (2018-09-05)
 
 ### Breaking Change

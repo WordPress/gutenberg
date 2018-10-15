@@ -1,3 +1,9 @@
+## 2.1.0 (Unreleased)
+
+### Features
+
+- Added `safeDecodeURI`.
+
 ## 2.0.1 (2018-09-30)
 
 ### Bug Fixes

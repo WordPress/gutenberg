@@ -91,7 +91,7 @@
 // Left side.
 .editor-block-list__empty-block-inserter,
 .editor-default-block-appender .editor-inserter {
-	right: $item-spacing; // Show to the right on mobile.
+	right: $grid-size; // Show to the right on mobile.
 
 	@include break-small {
 		left: -$block-side-ui-width - $block-padding - $block-side-ui-clearance;

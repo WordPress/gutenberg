@@ -46,9 +46,9 @@ describe( 'Preview', () => {
 	 * @return {Promise} Promise resolving once navigation completes.
 	 */
 	async function waitForPreviewNavigation( previewPage ) {
-		const nagivationCompleted = previewPage.waitForNavigation();
+		const navigationCompleted = previewPage.waitForNavigation();
 		await page.click( '.editor-post-preview' );
-		return nagivationCompleted;
+		return navigationCompleted;
 	}
 
 	it( 'Should open a preview window for a new post', async () => {
@@ -67,7 +67,7 @@ describe( 'Preview', () => {
 
 		// When autosave completes for a new post, the URL of the editor should
 		// update to include the ID. Use this to assert on preview URL.
-		const [ , postId ] = await ( await editorPage.waitForFunction( () => {
+		const [ , postId ] = await( await editorPage.waitForFunction( () => {
 			return window.location.search.match( /[\?&]post=(\d+)/ );
 		} ) ).jsonValue();
 

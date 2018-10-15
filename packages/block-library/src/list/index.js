@@ -18,7 +18,7 @@ import {
 	BlockControls,
 	RichText,
 } from '@wordpress/editor';
-import { replace, join, split, isEmpty } from '@wordpress/rich-text';
+import { replace, join, split, create, toHTMLString } from '@wordpress/rich-text';
 
 const listContentSchema = {
 	...getPhrasingContentSchema(),
@@ -47,7 +47,7 @@ const schema = {
 		default: false,
 	},
 	values: {
-		source: 'rich-text',
+		source: 'html',
 		selector: 'ol,ul',
 		multiline: 'li',
 	},
@@ -74,9 +74,9 @@ export const settings = {
 				blocks: [ 'core/paragraph' ],
 				transform: ( blockAttributes ) => {
 					return createBlock( 'core/list', {
-						values: join( blockAttributes.map( ( { content } ) =>
-							replace( content, /\n/g, '\u2028' )
-						), '\u2028' ),
+						values: toHTMLString( join( blockAttributes.map( ( { content } ) =>
+							replace( create( { html: content } ), /\n/g, '\u2028' )
+						), '\u2028' ), 'li' ),
 					} );
 				},
 			},
@@ -131,9 +131,12 @@ export const settings = {
 				type: 'block',
 				blocks: [ 'core/paragraph' ],
 				transform: ( { values } ) =>
-					split( values, '\u2028' ).map( ( content ) =>
-						createBlock( 'core/paragraph', { content } )
-					),
+					split( create( { html: values, multilineTag: 'li' } ), '\u2028' )
+						.map( ( piece ) =>
+							createBlock( 'core/paragraph', {
+								content: toHTMLString( piece ),
+							} )
+						),
 			},
 			{
 				type: 'block',
@@ -182,16 +185,15 @@ export const settings = {
 	],
 
 	merge( attributes, attributesToMerge ) {
-		const { values, content } = attributesToMerge;
-		const valueToMerge = values || content;
+		const { values } = attributesToMerge;
 
-		if ( isEmpty( valueToMerge ) ) {
+		if ( ! values || values === '<li></li>' ) {
 			return attributes;
 		}
 
 		return {
 			...attributes,
-			values: join( [ attributes.values, valueToMerge ], '\u2028' ),
+			values: attributes.values + values,
 		};
 	},
 
@@ -329,7 +331,7 @@ export const settings = {
 										blocks.push( createBlock( 'core/paragraph' ) );
 									}
 
-									if ( ! RichText.isEmpty( after ) ) {
+									if ( after !== '<li></li>' ) {
 										blocks.push( createBlock( 'core/list', {
 											ordered,
 											values: after,

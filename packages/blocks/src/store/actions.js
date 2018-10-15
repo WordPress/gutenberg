@@ -4,6 +4,11 @@
 import { castArray } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+/**
  * Returns an action object used in signalling that block types have been added.
  *
  * @param {Array|Object} blockTypes Block types received.
@@ -46,15 +51,48 @@ export function setDefaultBlockName( name ) {
 }
 
 /**
- * Returns an action object used to set the fallback block name.
+ * Returns an action object used to set the name of the block used as a fallback
+ * for non-block content.
  *
  * @param {string} name Block name.
  *
  * @return {Object} Action object.
  */
 export function setFallbackBlockName( name ) {
+	deprecated( 'setFallbackBlockName', {
+		plugin: 'Gutenberg',
+		version: '4.2',
+		alternative: 'setFreeformFallbackBlockName and setUnregisteredFallbackBlockName',
+	} );
+	return setFreeformFallbackBlockName( name );
+}
+
+/**
+ * Returns an action object used to set the name of the block used as a fallback
+ * for non-block content.
+ *
+ * @param {string} name Block name.
+ *
+ * @return {Object} Action object.
+ */
+export function setFreeformFallbackBlockName( name ) {
 	return {
-		type: 'SET_FALLBACK_BLOCK_NAME',
+		type: 'SET_FREEFORM_FALLBACK_BLOCK_NAME',
+		name,
+	};
+}
+
+/**
+ * Returns an action object used to set the name of the block used as a fallback
+ * for unregistered blocks.
+ *
+ * @param {string} name Block name.
+ *
+ * @return {Object} Action object.
+ */
+export function setUnregisteredFallbackBlockName( name ) {
+	return {
+		type: 'SET_UNREGISTERED_FALLBACK_BLOCK_NAME',
 		name,
 	};
 }

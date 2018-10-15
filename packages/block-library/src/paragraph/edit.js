@@ -99,7 +99,7 @@ class ParagraphBlock extends Component {
 			onReplace,
 		} = this.props;
 
-		if ( after ) {
+		if ( after !== null ) {
 			// Append "After" content as a new paragraph block to the end of
 			// any other blocks being inserted after the current paragraph.
 			blocks.push( createBlock( name, { content: after } ) );
@@ -110,7 +110,7 @@ class ParagraphBlock extends Component {
 		}
 
 		const { content } = attributes;
-		if ( ! before ) {
+		if ( before === null ) {
 			// If before content is omitted, treat as intent to delete block.
 			onReplace( [] );
 		} else if ( content !== before ) {

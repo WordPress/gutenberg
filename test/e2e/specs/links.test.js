@@ -7,6 +7,7 @@ import {
 	getEditedPostContent,
 	newPost,
 	pressWithModifier,
+	pressTimes,
 } from '../support/utils';
 
 /**
@@ -23,6 +24,11 @@ describe( 'Links', () => {
 
 	const waitForAutoFocus = async () => {
 		await page.waitForFunction( () => !! document.activeElement.closest( '.editor-url-input' ) );
+	};
+
+	const moveMouse = async () => {
+		await page.mouse.move( 200, 300, { steps: 10 } );
+		await page.mouse.move( 250, 350, { steps: 10 } );
 	};
 
 	it( 'can be created by selecting text and clicking Link', async () => {
@@ -79,8 +85,7 @@ describe( 'Links', () => {
 		await page.keyboard.type( 'This is Gutenberg: ' );
 
 		// Trigger isTyping = false
-		await page.mouse.move( 200, 300, { steps: 10 } );
-		await page.mouse.move( 250, 350, { steps: 10 } );
+		await moveMouse();
 
 		// Press Cmd+K to insert a link
 		await pressWithModifier( META_KEY, 'K' );
@@ -209,13 +214,13 @@ describe( 'Links', () => {
 
 		// Typing "left" should not close the dialog
 		await page.keyboard.press( 'ArrowLeft' );
-		let modal = await page.$( '.editor-format-toolbar__link-modal' );
-		expect( modal ).not.toBeNull();
+		let popover = await page.$( '.editor-url-popover' );
+		expect( popover ).not.toBeNull();
 
 		// Escape should close the dialog still.
 		await page.keyboard.press( 'Escape' );
-		modal = await page.$( '.editor-format-toolbar__link-modal' );
-		expect( modal ).toBeNull();
+		popover = await page.$( '.editor-url-popover' );
+		expect( popover ).toBeNull();
 	} );
 
 	it( 'allows Left to be pressed during creation in "Docked Toolbar" mode', async () => {
@@ -225,19 +230,30 @@ describe( 'Links', () => {
 		await page.keyboard.type( 'Text' );
 
 		// we need to trigger isTyping = false
-		await page.mouse.move( 200, 300, { steps: 10 } );
-		await page.mouse.move( 250, 350, { steps: 10 } );
+		await moveMouse();
 		await page.waitForSelector( 'button[aria-label="Link"]' );
 		await page.click( 'button[aria-label="Link"]' );
 
 		// Typing "left" should not close the dialog
 		await page.keyboard.press( 'ArrowLeft' );
-		let modal = await page.$( '.editor-format-toolbar__link-modal' );
-		expect( modal ).not.toBeNull();
+		let popover = await page.$( '.editor-url-popover' );
+		expect( popover ).not.toBeNull();
 
 		// Escape should close the dialog still.
 		await page.keyboard.press( 'Escape' );
-		modal = await page.$( '.editor-format-toolbar__link-modal' );
-		expect( modal ).toBeNull();
+		popover = await page.$( '.editor-url-popover' );
+		expect( popover ).toBeNull();
+	} );
+
+	it( 'can be edited with collapsed selection', async () => {
+		await createAndReselectLink();
+		// Make a collapsed selection inside the link
+		await pressTimes( 'ArrowRight', 3 );
+		await moveMouse();
+		await page.click( 'button[aria-label="Edit"]' );
+		await waitForAutoFocus();
+		await page.keyboard.type( '/handbook' );
+		await page.click( 'button[aria-label="Apply"]' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

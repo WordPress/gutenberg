@@ -15,7 +15,7 @@ import {
 	getBlockTransforms,
 	findTransform,
 } from '../factory';
-import { getBlockTypes, unregisterBlockType, setUnknownTypeHandlerName, registerBlockType } from '../registration';
+import { getBlockTypes, unregisterBlockType, registerBlockType } from '../registration';
 
 describe( 'block factory', () => {
 	const defaultBlockSettings = {
@@ -35,7 +35,6 @@ describe( 'block factory', () => {
 	} );
 
 	afterEach( () => {
-		setUnknownTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
@@ -92,7 +91,6 @@ describe( 'block factory', () => {
 
 			const block = createBlock( 'core/test-block' );
 
-			expect( console ).toHaveWarned();
 			expect( block.attributes ).toEqual( {
 				content: [],
 			} );
@@ -141,7 +139,7 @@ describe( 'block factory', () => {
 				...defaultBlockSettings,
 				attributes: {
 					content: {
-						source: 'rich-text',
+						source: 'html',
 					},
 				},
 			} );
@@ -151,10 +149,7 @@ describe( 'block factory', () => {
 			} );
 
 			expect( block.attributes ).toEqual( {
-				content: {
-					formats: [ , , , , ],
-					text: 'test',
-				},
+				content: 'test',
 			} );
 		} );
 	} );

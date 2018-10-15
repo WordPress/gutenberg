@@ -29,8 +29,8 @@ class TokenInput extends Component {
 	}
 
 	render() {
-		const { value, placeholder, isExpanded, instanceId, selectedSuggestionIndex, ...props } = this.props;
-		const size = ( ( value.length === 0 && placeholder && placeholder.length ) || value.length ) + 1;
+		const { value, isExpanded, instanceId, selectedSuggestionIndex, ...props } = this.props;
+		const size = value.length + 1;
 
 		return (
 			<input
@@ -39,7 +39,6 @@ class TokenInput extends Component {
 				type="text"
 				{ ...props }
 				value={ value }
-				placeholder={ placeholder }
 				onChange={ this.onChange }
 				size={ size }
 				className="components-form-token-field__input"

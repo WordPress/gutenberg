@@ -63,7 +63,7 @@ describe( 'splitting and merging blocks', () => {
 		await page.keyboard.press( 'Backspace' );
 
 		// Replace contents of first paragraph with "Bar".
-		await pressTimes( 'Backspace', 3 );
+		await pressTimes( 'Backspace', 4 );
 		await page.keyboard.type( 'Bar' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

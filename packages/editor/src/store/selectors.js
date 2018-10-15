@@ -29,7 +29,7 @@ import {
 	getBlockTypes,
 	hasBlockSupport,
 	hasChildBlocksWithInserterSupport,
-	getUnknownTypeHandlerName,
+	getFreeformContentHandlerName,
 	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
 import { moment } from '@wordpress/date';
@@ -1441,14 +1441,14 @@ export const getEditedPostContent = createSelector(
 		const content = serialize( blocks );
 
 		// For compatibility purposes, treat a post consisting of a single
-		// unknown block as legacy content and downgrade to a pre-block-editor
+		// freeform block as legacy content and downgrade to a pre-block-editor
 		// removep'd content format.
-		const isSingleUnknownBlock = (
+		const isSingleFreeformBlock = (
 			blocks.length === 1 &&
-			blocks[ 0 ].name === getUnknownTypeHandlerName()
+			blocks[ 0 ].name === getFreeformContentHandlerName()
 		);
 
-		if ( isSingleUnknownBlock ) {
+		if ( isSingleFreeformBlock ) {
 			return removep( content );
 		}
 
@@ -1928,23 +1928,24 @@ export function getBlockListSettings( state, clientId ) {
 	return state.blockListSettings[ clientId ];
 }
 
-/*
+/**
  * Returns the editor settings.
  *
  * @param {Object} state Editor state.
  *
- * @return {Object} The editor settings object
+ * @return {Object} The editor settings object.
  */
 export function getEditorSettings( state ) {
 	return state.settings;
 }
 
-/*
- * Returns the editor settings.
+/**
+ * Returns the token settings.
  *
  * @param {Object} state Editor state.
+ * @param {?string} name Token name.
  *
- * @return {Object} The editor settings object
+ * @return {Object} Token settings object, or the named token settings object if set.
  */
 export function getTokenSettings( state, name ) {
 	if ( ! name ) {

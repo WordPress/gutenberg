@@ -13,6 +13,8 @@ import { getSparseArrayLength } from './helpers';
 describe( 'applyFormat', () => {
 	const strong = { type: 'strong' };
 	const em = { type: 'em' };
+	const a = { type: 'a', attributes: { href: '#' } };
+	const a2 = { type: 'a', attributes: { href: '#test' } };
 
 	it( 'should apply format', () => {
 		const record = {
@@ -48,5 +50,45 @@ describe( 'applyFormat', () => {
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
 		expect( getSparseArrayLength( result.formats ) ).toBe( 4 );
+	} );
+
+	it( 'should not apply format on non existing format if selection is collapsed', () => {
+		const record = {
+			formats: [ , , , , [ a ], [ a ], [ a ], , , , , , , ],
+			text: 'one two three',
+			start: 0,
+			end: 0,
+		};
+		const expected = {
+			formats: [ , , , , [ a ], [ a ], [ a ], , , , , , , ],
+			text: 'one two three',
+			start: 0,
+			end: 0,
+		};
+		const result = applyFormat( deepFreeze( record ), a2 );
+
+		expect( result ).toEqual( expected );
+		expect( result ).not.toBe( record );
+		expect( getSparseArrayLength( result.formats ) ).toBe( 3 );
+	} );
+
+	it( 'should apply format on existing format if selection is collapsed', () => {
+		const record = {
+			formats: [ , , , , [ a ], [ a ], [ a ], , , , , , , ],
+			text: 'one two three',
+			start: 4,
+			end: 4,
+		};
+		const expected = {
+			formats: [ , , , , [ a2 ], [ a2 ], [ a2 ], , , , , , , ],
+			text: 'one two three',
+			start: 4,
+			end: 4,
+		};
+		const result = applyFormat( deepFreeze( record ), a2 );
+
+		expect( result ).toEqual( expected );
+		expect( result ).not.toBe( record );
+		expect( getSparseArrayLength( result.formats ) ).toBe( 3 );
 	} );
 } );

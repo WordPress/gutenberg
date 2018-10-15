@@ -4,4 +4,33 @@
 		table-layout: fixed;
 		width: 100%;
 	}
+
+	&.alignleft,
+	&.aligncenter,
+	&.alignright {
+		// Override default display property for align styles.
+		// The table element needs to be kept as display table
+		// for table features to work reliably.
+		display: table;
+
+		// Table cannot be 100% width if it is aligned, so set
+		// width as auto.
+		width: auto;
+	}
+
+	// "Stripes" style variation.
+	&.is-style-stripes {
+		border-spacing: 0;
+		border-collapse: inherit;
+
+		tr:nth-child(odd) {
+			background-color: $light-gray-200;
+		}
+
+		td {
+			border-color: transparent;
+		}
+
+		border-bottom: 1px solid $light-gray-200;
+	}
 }

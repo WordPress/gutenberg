@@ -16,6 +16,10 @@ import {
 	unregisterBlockType,
 	setUnknownTypeHandlerName,
 	getUnknownTypeHandlerName,
+	setFreeformContentHandlerName,
+	getFreeformContentHandlerName,
+	setUnregisteredTypeHandlerName,
+	getUnregisteredTypeHandlerName,
 	setDefaultBlockName,
 	getDefaultBlockName,
 	getBlockType,
@@ -39,7 +43,8 @@ describe( 'blocks', () => {
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
-		setUnknownTypeHandlerName( undefined );
+		setFreeformContentHandlerName( undefined );
+		setUnregisteredTypeHandlerName( undefined );
 		setDefaultBlockName( undefined );
 		unstable__bootstrapServerSideBlockDefinitions( {} );
 	} );
@@ -366,15 +371,52 @@ describe( 'blocks', () => {
 
 	describe( 'setUnknownTypeHandlerName()', () => {
 		it( 'assigns unknown type handler', () => {
-			setUnknownTypeHandlerName( 'core/test-block' );
+			try {
+				setUnknownTypeHandlerName( 'core/test-block' );
 
-			expect( getUnknownTypeHandlerName() ).toBe( 'core/test-block' );
+				expect( getUnknownTypeHandlerName() ).toBe( 'core/test-block' );
+				expect( console ).toHaveWarned();
+			} finally {
+				// Restore undefined handler here rather than in `afterEach` because:
+				// - This call generates a deprecation warning.
+				// - Deprecation warnings become test errors unless we assert `toHaveWarned`.
+				// - This is too broad of an assertion to apply for all tests in the suite.
+				setUnknownTypeHandlerName( undefined );
+			}
 		} );
 	} );
 
 	describe( 'getUnknownTypeHandlerName()', () => {
 		it( 'defaults to undefined', () => {
 			expect( getUnknownTypeHandlerName() ).toBeNull();
+		} );
+	} );
+
+	describe( 'setFreeformContentHandlerName()', () => {
+		it( 'assigns unknown type handler', () => {
+			setFreeformContentHandlerName( 'core/test-block' );
+
+			expect( getFreeformContentHandlerName() ).toBe( 'core/test-block' );
+		} );
+	} );
+
+	describe( 'getFreeformContentHandlerName()', () => {
+		it( 'defaults to undefined', () => {
+			expect( getFreeformContentHandlerName() ).toBeNull();
+		} );
+	} );
+
+	describe( 'setUnregisteredTypeHandlerName()', () => {
+		it( 'assigns unknown type handler', () => {
+			setUnregisteredTypeHandlerName( 'core/test-block' );
+
+			expect( getUnregisteredTypeHandlerName() ).toBe( 'core/test-block' );
+		} );
+	} );
+
+	describe( 'getUnregisteredTypeHandlerName()', () => {
+		it( 'defaults to undefined', () => {
+			expect( getUnregisteredTypeHandlerName() ).toBeNull();
 		} );
 	} );
 
