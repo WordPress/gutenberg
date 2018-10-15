@@ -3,7 +3,9 @@
 exports[`Navigating the block hierarchy Should navigate using the block hierarchy dropdown menu 1`] = `
 "<!-- wp:columns {\\"columns\\":3} -->
 <div class=\\"wp-block-columns has-3-columns\\"><!-- wp:column -->
-<div class=\\"wp-block-column\\"></div>
+<div class=\\"wp-block-column\\"><!-- wp:paragraph -->
+<p>First column</p>
+<!-- /wp:paragraph --></div>
 <!-- /wp:column -->
 
 <!-- wp:column -->

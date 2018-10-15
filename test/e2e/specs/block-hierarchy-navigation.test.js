@@ -17,7 +17,6 @@ describe( 'Navigating the block hierarchy', () => {
 		await insertBlock( 'Columns (beta)' );
 
 		// Add a paragraph in the first column
-		await page.click( '.editor-default-block-appender__content' );
 		await page.keyboard.type( 'First column' );
 
 		// Navigate to the columns blocks
@@ -27,7 +26,9 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Tweak the columns count
 		await page.focus( '.edit-post-block-sidebar__panel .components-range-control__number[aria-label="Columns"]' );
-		page.keyboard.press( 'Backspace' );
+		page.keyboard.down( 'Shift' );
+		page.keyboard.press( 'ArrowLeft' );
+		page.keyboard.up( 'Shift' );
 		page.keyboard.type( '3' );
 
 		// Navigate to the last column blosck

@@ -91,7 +91,7 @@ export class BlockListBlock extends Component {
 		}
 
 		if ( this.props.isSelected && ! prevProps.isSelected ) {
-			this.focusTabbable();
+			this.focusTabbable( true );
 		}
 	}
 
@@ -118,8 +118,10 @@ export class BlockListBlock extends Component {
 
 	/**
 	 * When a block becomes selected, transition focus to an inner tabbable.
+	 *
+	 * @param {boolean} ignoreInnerBlocks Should not focus inner blocks.
 	 */
-	focusTabbable() {
+	focusTabbable( ignoreInnerBlocks ) {
 		const { initialPosition } = this.props;
 
 		// Focus is captured by the wrapper node, so while focus transition
@@ -136,7 +138,7 @@ export class BlockListBlock extends Component {
 			.find( this.node )
 			.filter( isTextField )
 			// Exclude inner blocks
-			.filter( ( node ) => ! innerBlocks || ! innerBlocks.contains( node ) );
+			.filter( ( node ) => ! ignoreInnerBlocks || ! innerBlocks || ! innerBlocks.contains( node ) );
 
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.
