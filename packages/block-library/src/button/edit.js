@@ -28,7 +28,7 @@ import {
 
 const { getComputedStyle } = window;
 
-const fallbackStyles = withFallbackStyles( ( node, ownProps ) => {
+const applyFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
 	const { textColor, backgroundColor } = ownProps;
 	const backgroundColorValue = backgroundColor && backgroundColor.color;
 	const textColorValue = textColor && textColor.color;
@@ -143,5 +143,5 @@ class ButtonEdit extends Component {
 
 export default compose( [
 	withColors( 'backgroundColor', { textColor: 'color' } ),
-	fallbackStyles,
+	applyFallbackStyles,
 ] )( ButtonEdit );
