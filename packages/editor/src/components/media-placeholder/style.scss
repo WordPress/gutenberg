@@ -1,5 +1,10 @@
 .editor-media-placeholder__url-input-container {
 	width: 100%;
+
+	// Reset the margin to ensure the url popover is adjacent to the button.
+	.editor-media-placeholder__button {
+		margin-bottom: 0;
+	}
 }
 
 .editor-media-placeholder__url-input-form {
@@ -24,7 +29,7 @@
 	flex-shrink: 1;
 }
 
-.editor-media-placeholder__upload-button.components-button {
+.editor-media-placeholder__button {
 	margin-right: 5px;
 	margin-bottom: 0.5rem;
 

@@ -150,7 +150,7 @@ class MediaPlaceholder extends Component {
 				/>
 				<FormFileUpload
 					isLarge
-					className="editor-media-placeholder__upload-button"
+					className="editor-media-placeholder__button"
 					onChange={ this.onUpload }
 					accept={ accept }
 					multiple={ multiple }
@@ -164,7 +164,11 @@ class MediaPlaceholder extends Component {
 					allowedTypes={ allowedTypes }
 					value={ value.id }
 					render={ ( { open } ) => (
-						<Button isLarge onClick={ open }>
+						<Button
+							isLarge
+							className="editor-media-placeholder__button"
+							onClick={ open }
+						>
 							{ __( 'Media Library' ) }
 						</Button>
 					) }
@@ -174,7 +178,7 @@ class MediaPlaceholder extends Component {
 						className="editor-media-placeholder__url-input-container"
 					>
 						<Button
-							className="editor-media-placeholder__url-input-toggle-button"
+							className="editor-media-placeholder__button"
 							onClick={ toggleURLInput }
 							isToggled={ isURLInputVisible }
 							isLarge>
