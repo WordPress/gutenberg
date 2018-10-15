@@ -1,0 +1,24 @@
+{
+  "name": "{{pluginSlug}}",
+  "version": "{{pluginVersion}}",
+  "description": "{{pluginDescription}}",
+  "main": "src/index.js",
+  "private": true,
+  "scripts": {
+    "start": "parcel watch src/index.js",
+    "build": "parcel build src/index.js",
+    "package": "./bin/build-plugin-zip.sh"
+  },
+  "keywords": [
+    "wordpress",
+    "plugin",
+    "javascript"
+  ],
+  "author": "{{pluginAuthor}}",
+  "license": "{{pluginLicense}}",
+  "devDependencies": {
+    "@babel/core": "^7.1.0",
+    "@wordpress/babel-preset-default": "^2.1.0",
+    "parcel-bundler": "^1.10.1"
+  }
+}

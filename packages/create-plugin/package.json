@@ -1,0 +1,35 @@
+{
+	"name": "create-wp-plugin",
+	"version": "0.0.1",
+	"description": "CLI Utility to scafffold WordPress Plugins and Blocks",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"plugin",
+		"CLI",
+		"scaffolding"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/create-plugin/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "index.js",
+	"preferGlobal": true,
+	"bin": {
+		"create-wp-plugin": "./index.js"
+	},
+	"dependencies": {
+		"chalk": "^2.4.1",
+		"commander": "^2.16.0",
+		"inquirer": "^6.0.0",
+		"shelljs": "^0.8.2"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}
