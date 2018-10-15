@@ -28,11 +28,7 @@ function BlockHierarchyDropdown( { rootClientId, selectedBlockClientId, countInn
 					icon={ menuIcon }
 					aria-expanded={ isOpen }
 					onClick={ onToggle }
-					label={
-						isOpen ?
-							__( 'Close Block Hierarchy Navigator' ) :
-							__( 'Open Block Hierarchy Navigator' )
-					}
+					label={ __( 'Block Hierarchy' ) }
 				/>
 			) }
 			renderContent={ ( { onClose } ) => (
