@@ -62,7 +62,7 @@ exports[`core/gallery block edit matches snapshot 1`] = `
       class="components-form-file-upload"
     >
       <button
-        class="components-button components-icon-button editor-media-placeholder__upload-button is-button is-default is-large"
+        class="components-button components-icon-button editor-media-placeholder__button is-button is-default is-large"
         type="button"
       >
         <svg

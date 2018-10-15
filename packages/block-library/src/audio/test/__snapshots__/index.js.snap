@@ -62,7 +62,7 @@ exports[`core/audio block edit matches snapshot 1`] = `
       class="components-form-file-upload"
     >
       <button
-        class="components-button components-icon-button editor-media-placeholder__upload-button is-button is-default is-large"
+        class="components-button components-icon-button editor-media-placeholder__button is-button is-default is-large"
         type="button"
       >
         <svg
@@ -88,28 +88,13 @@ exports[`core/audio block edit matches snapshot 1`] = `
       />
     </div>
     <div
-      class="editor-media-placeholder__url-input-expandable-section"
+      class="editor-media-placeholder__url-input-container"
     >
       <button
-        aria-expanded="false"
-        class="components-button components-icon-button editor-media-placeholder__url-input-expandable-button is-button is-default is-large"
+        class="components-button editor-media-placeholder__button is-button is-default is-large"
         type="button"
       >
-        <svg
-          aria-hidden="true"
-          class="dashicon dashicons-arrow-left-alt2"
-          focusable="false"
-          height="20"
-          role="img"
-          viewBox="0 0 20 20"
-          width="20"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M14 5l-5 5 5 5-1 2-7-7 7-7z"
-          />
-        </svg>
-        Enter URL
+        Insert from URL
       </button>
     </div>
   </div>
