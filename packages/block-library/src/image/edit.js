@@ -181,26 +181,18 @@ class ImageEdit extends Component {
 	}
 
 	onSelectURL( newURL ) {
-		const { url, id } = this.props.attributes;
+		const { url } = this.props.attributes;
+
+		if ( newURL !== url ) {
+			this.props.setAttributes( {
+				url: newURL,
+				id: undefined,
+			} );
+		}
 
 		this.setState( {
 			isEditing: false,
 		} );
-
-		if ( newURL !== url && id ) {
-			// User is switching from an uploaded image an external image.
-			// Unset any properties that relate to an uploaded image.
-			this.props.setAttributes( {
-				url: newURL,
-				alt: undefined,
-				id: undefined,
-				caption: undefined,
-			} );
-		} else {
-			this.props.setAttributes( {
-				url: newURL,
-			} );
-		}
 	}
 
 	onSetCustomHref( value ) {
