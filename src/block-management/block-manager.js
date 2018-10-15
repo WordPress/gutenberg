@@ -267,7 +267,9 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 					showTitle={ this.state.inspectBlocks }
 					focused={ value.item.focused }
 					clientId={ value.clientId }
-					insertBlocksAfter={ this.insertBlocksAfter.bind( this ) }
+					insertBlocksAfter={ ( blocks ) =>
+						this.insertBlocksAfter.bind( this )( value.item.clientId, blocks )
+					}
 					{ ...value.item }
 				/>
 				{ this.state.blockTypePickerVisible && value.item.focused && insertHere }

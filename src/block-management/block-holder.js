@@ -50,14 +50,6 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 		return <View />;
 	}
 
-	_insertBlocksAfter( blocks: Array<Object> ) {
-		if ( ! this.props.insertBlocksAfter ) {
-			return;
-		}
-		const { insertBlocksAfter } = this.props;
-		insertBlocksAfter( this.props.clientId, blocks );
-	}
-
 	getBlockForType() {
 		// Since unsupported blocks are handled in block-manager.js, at this point the block should definitely
 		// be supported.
@@ -78,7 +70,7 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 				setAttributes={ ( attrs ) =>
 					this.props.onChange( this.props.clientId, { ...this.props.attributes, ...attrs } )
 				}
-				insertBlocksAfter={ this._insertBlocksAfter.bind( this ) }
+				insertBlocksAfter={ this.props.insertBlocksAfter }
 				isSelected={ this.props.focused }
 				style={ style }
 			/>
