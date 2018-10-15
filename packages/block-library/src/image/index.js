@@ -62,9 +62,15 @@ const blockAttributes = {
 	},
 	srcSet: {
 		type: 'string',
+		source: 'attribute',
+		selector: 'img',
+		attribute: 'srcset',
 	},
 	sizes: {
 		type: 'string',
+		source: 'attribute',
+		selector: 'img',
+		attribute: 'sizes',
 	},
 };
 
@@ -264,10 +270,26 @@ export const settings = {
 					/>
 				);
 
-				return (
-					<figure className={ classes }>
+				const figure = (
+					<Fragment>
 						{ href ? <a href={ href }>{ image }</a> : image }
 						{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
+					</Fragment>
+				);
+
+				if ( 'left' === align || 'right' === align || 'center' === align ) {
+					return (
+						<div>
+							<figure className={ classes }>
+								{ figure }
+							</figure>
+						</div>
+					);
+				}
+
+				return (
+					<figure className={ classes }>
+						{ figure }
 					</figure>
 				);
 			},

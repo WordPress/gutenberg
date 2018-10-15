@@ -4,7 +4,7 @@
  */
 
 // TODO: TBD
-function _gutenberg_prime_post_caches( $content ) {
+function _image_block_prime_post_caches( $content ) {
 	// Need to find all image blocks and get the attachment IDs from them BEFORE the parser is run
 	// (so we can prime the cache for getting the image attachment meta)...
 	if ( preg_match_all( '/^<!-- wp:image {.*"id":(\d+),.*} -->$/m', $content, $matches ) ) {
@@ -21,7 +21,7 @@ function _gutenberg_prime_post_caches( $content ) {
 }
 
 // Run before blocks are parsed.
-add_filter( 'the_content', '_gutenberg_prime_post_caches', 5 );
+add_filter( 'the_content', '_image_block_prime_post_caches', 5 );
 
 /**
  * Get the expected block width from the global $block_width array.
@@ -48,7 +48,7 @@ add_filter( 'the_content', '_gutenberg_prime_post_caches', 5 );
  *
  * @return array Normalized array of expected block width with three elements: `default`, `wide`, and `full`.
  */
-function gutenberg_get_block_width() {
+function image_block_get_block_width() {
 	global $content_width, $block_width;
 
 	// Get the width from the $block_width global array
@@ -89,7 +89,7 @@ function gutenberg_get_block_width() {
  *
  * @return int The constrained image width.
  */
-function _gutenberg_constrain_image_width( $image_width, $image_meta ) {
+function _image_block_constrain_image_width( $image_width, $image_meta ) {
 	if ( $image_width <= $image_meta['width'] ) {
 		return (int) $image_width;
 	}
@@ -106,13 +106,13 @@ function _gutenberg_constrain_image_width( $image_width, $image_meta ) {
  * @param array $image_meta The image attachment meta data.
  * @return array An array of the image width and height, in that order.
  */
-function gutenberg_get_image_width_height( $block_attributes, $image_meta ) {
-	$block_witdh = gutenberg_get_block_width();
+function image_block_get_image_width_height( $block_attributes, $image_meta ) {
+	$block_witdh = image_block_get_block_width();
 
 	if ( $block_attributes['align'] === 'full' ) {
-		$image_width = _gutenberg_constrain_image_width( $block_witdh['full'], $image_meta );
+		$image_width = _image_block_constrain_image_width( $block_witdh['full'], $image_meta );
 	} elseif ( $block_attributes['align'] === 'wide' ) {
-		$image_width = _gutenberg_constrain_image_width( $block_witdh['wide'], $image_meta );
+		$image_width = _image_block_constrain_image_width( $block_witdh['wide'], $image_meta );
 	} else {
 		$image_width = $block_witdh['default'];
 
@@ -123,19 +123,27 @@ function gutenberg_get_image_width_height( $block_attributes, $image_meta ) {
 
 		// Check if we have large enough image to display,
 		// or we need to display the full imagre and reduce the width to match.
-		$image_width = _gutenberg_constrain_image_width( $image_width, $image_meta );
+		$image_width = _image_block_constrain_image_width( $image_width, $image_meta );
 	}
 
 	// Calculate the height.
 	$image_size = wp_constrain_dimensions( $image_meta['width'], $image_meta['height'], $image_width );
-	$image_height = $image_size[1];
 
-	// TODO: filter?
+	/**
+	 * Filters the calculated image size for the image block.
+	 *
+	 * @since 5.0.0
+	 *
+	 * @param array $image_size The calculated image size width and height (in that order).
+	 * @param array $block_attributes The block attributes.
+	 * @param array $image_meta The image attachment meta data.
+	 */
+	$image_size = apply_filters( 'image_block_get_image_width_height', $image_size, $block_attributes, $image_meta );
 
-	return array( $image_width, $image_height );
+	return $image_size;
 }
 
-function gutenberg_render_block_core_image( $block_attributes = array(), $html = '' ) {
+function image_block_render_core_image( $block_attributes = array(), $html = '' ) {
 	// Something's wrong. Perhaps an old post?
 	if ( empty( $html ) || empty( $block_attributes ) || empty( $block_attributes['url'] ) ) {
 		return $html;
@@ -152,54 +160,8 @@ function gutenberg_render_block_core_image( $block_attributes = array(), $html =
 		return $html;
 	}
 
-	$image_dimensions = gutenberg_get_image_width_height( $block_attributes, $image_meta );
-
-	if ( empty( $block_attributes['srcSet'] ) ) {
-		$srcset = wp_calculate_image_srcset( $image_dimensions, $image_src, $image_meta, $attachment_id );
-	} else {
-		// TODO: Perhaps (cheaply) check if we need to regenerate the srcset?
-		// We already have the image meta, can perhaps look in there?
-		$sources = array();
-
-		// Filter the srcset the same way as in `wp_calculate_image_srcset()`.
-		$srcset_array = explode( ', ', $block_attributes['srcSet'] );
-
-		foreach ( $srcset_array as $image_candidate ) {
-			$image_candidate_array = explode( ' ', $image_candidate, 2 );
-
-			if ( count( $image_candidate_array ) === 2 && preg_match( '/(\d+)(\w)/', $image_candidate_array[1], $values ) ) {
-				$width = (int) $values[1];
-
-				$sources[ $width ] = array(
-					'url'        => $image_candidate_array[0],
-					'value'      => $width,
-					'descriptor' => $values[2],
-				);
-			}
-		}
-
-		/** This filter is documented in wp-includes/media.php */
-		$sources = apply_filters( 'wp_calculate_image_srcset', $sources, $image_dimensions, $image_src, $image_meta, $attachment_id );
-
-		if ( is_array( $sources ) && count( $sources ) > 1 ) {
-			foreach ( $sources as $source ) {
-				$url = esc_url_raw( $source['url'] );
-				$value = (int) $source['value'];
-				$descriptor = '';
-
-				// The descriptor can only be `w` or `x`.
-				// See https://html.spec.whatwg.org/multipage/images.html#srcset-attributes.
-				if ( $source['descriptor'] === 'w' || $source['descriptor'] === 'x' ) {
-					$descriptor = $source['descriptor'];
-				}
-
-				$srcset .= $url . ' ' . $value . $descriptor . ', ';
-			}
-
-			$srcset = rtrim( $srcset, ', ' );
-		}
-
-	}
+	$image_dimensions = image_block_get_image_width_height( $block_attributes, $image_meta );
+	$srcset = wp_calculate_image_srcset( $image_dimensions, $image_src, $image_meta, $attachment_id );
 
 	if ( ! empty( $srcset ) ) {
 		$sizes = wp_calculate_image_sizes( $image_dimensions, $image_src, $image_meta, $attachment_id );
@@ -213,9 +175,7 @@ function gutenberg_render_block_core_image( $block_attributes = array(), $html =
 	);
 
 	if ( $srcset && $sizes ) {
-		// Sanitized above.
 		$image_attributes['srcset'] = $srcset;
-		// Regeneraed, as the width may have changed.
 		$image_attributes['sizes'] = $sizes;
 	}
 
@@ -256,17 +216,10 @@ function register_block_core_image() {
 				'scale' => array(
 					'type' => 'number',
 				),
-				'srcSet' => array(
-					'type' => 'string',
-				),
-				'sizes' => array(
-					'type' => 'string',
-				),
 			),
-			'render_callback' => 'gutenberg_render_block_core_image',
+			'render_callback' => 'image_block_render_core_image',
 		)
 	);
 }
 
 add_action( 'init', 'register_block_core_image' );
-
