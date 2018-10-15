@@ -80,4 +80,4 @@ const CaptionTextInput = ( setAttributes, caption, isSelected ) => {
 		return textContainer( textInput );
 	}
 	return textContainer( text );
-}
+};
