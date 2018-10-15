@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { getUnknownTypeHandlerName, rawHandler, serialize } from '@wordpress/blocks';
+import { getFreeformContentHandlerName, rawHandler, serialize } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -17,7 +17,7 @@ export default compose(
 		return {
 			block,
 			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
-			shouldRender: ( block && block.name === getUnknownTypeHandlerName() ),
+			shouldRender: ( block && block.name === getFreeformContentHandlerName() ),
 		};
 	} ),
 	withDispatch( ( dispatch, { block, canUserUseUnfilteredHTML } ) => ( {

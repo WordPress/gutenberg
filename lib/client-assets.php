@@ -344,9 +344,10 @@ function gutenberg_register_scripts_and_styles() {
 						),
 					),
 					'formats'  => array(
-						'time'     => get_option( 'time_format', __( 'g:i a', 'default' ) ),
-						'date'     => get_option( 'date_format', __( 'F j, Y', 'default' ) ),
-						'datetime' => __( 'F j, Y g:i a', 'default' ),
+						'time'                => get_option( 'time_format', __( 'g:i a', 'default' ) ),
+						'date'                => get_option( 'date_format', __( 'F j, Y', 'default' ) ),
+						'datetime'            => __( 'F j, Y g:i a', 'default' ),
+						'datetimeAbbreviated' => __( 'M j, Y g:i a', 'default' ),
 					),
 					'timezone' => array(
 						'offset' => get_option( 'gmt_offset', 0 ),
@@ -423,7 +424,6 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-polyfill',
 			'wp-shortcode',
 			'lodash',
-			'wp-rich-text',
 		),
 		filemtime( gutenberg_dir_path() . 'build/blocks/index.js' ),
 		true
@@ -636,10 +636,11 @@ function gutenberg_register_scripts_and_styles() {
 			'media-views',
 			'wp-a11y',
 			'wp-api-fetch',
+			'wp-block-library',
+			'wp-blocks',
 			'wp-components',
 			'wp-compose',
-			'wp-block-library',
-			'wp-date',
+			'wp-core-data',
 			'wp-data',
 			'wp-deprecated',
 			'wp-dom-ready',
@@ -648,8 +649,10 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-embed',
 			'wp-i18n',
 			'wp-keycodes',
+			'wp-nux',
 			'wp-plugins',
 			'wp-polyfill',
+			'wp-url',
 			'wp-viewport',
 		),
 		filemtime( gutenberg_dir_path() . 'build/edit-post/index.js' ),
@@ -731,14 +734,14 @@ function gutenberg_register_scripts_and_styles() {
 
 	wp_register_style(
 		'wp-edit-blocks',
-		gutenberg_url( 'build/block-library/edit-blocks.css' ),
+		gutenberg_url( 'build/block-library/editor.css' ),
 		array(
 			'wp-components',
 			'wp-editor',
 			// Always include visual styles so the editor never appears broken.
 			'wp-block-library-theme',
 		),
-		filemtime( gutenberg_dir_path() . 'build/block-library/edit-blocks.css' )
+		filemtime( gutenberg_dir_path() . 'build/block-library/editor.css' )
 	);
 	wp_style_add_data( 'wp-edit-blocks', 'rtl', 'replace' );
 
@@ -1355,8 +1358,14 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		// Override "(Auto Draft)" new post default title with empty string,
 		// or filtered value.
 		$initial_edits = array(
-			'title' => array(
-				'raw' => apply_filters( 'the_title', '', $post->ID ),
+			'title'   => array(
+				'raw' => $post->post_title,
+			),
+			'content' => array(
+				'raw' => $post->post_content,
+			),
+			'excerpt' => array(
+				'raw' => $post->post_excerpt,
 			),
 		);
 	} else {

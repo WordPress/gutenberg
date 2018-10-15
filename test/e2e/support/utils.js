@@ -163,9 +163,9 @@ export async function setViewport( type ) {
 		large: { width: 960, height: 700 },
 		small: { width: 600, height: 700 },
 	};
-	const currentDimmension = allowedDimensions[ type ];
-	await page.setViewport( currentDimmension );
-	await waitForPageDimensions( currentDimmension.width, currentDimmension.height );
+	const currentDimension = allowedDimensions[ type ];
+	await page.setViewport( currentDimension );
+	await waitForPageDimensions( currentDimension.width, currentDimension.height );
 }
 
 /**
@@ -410,4 +410,30 @@ export async function clickOnCloseModalButton( modalClassName ) {
 	if ( closeButton ) {
 		await page.click( closeButtonClassName );
 	}
+}
+
+/**
+ * Sets code editor content
+ * @param {string} content New code editor content.
+ *
+ * @return {Promise} Promise resolving with an array containing all blocks in the document.
+ */
+export async function setPostContent( content ) {
+	return await page.evaluate( ( _content ) => {
+		const { dispatch } = window.wp.data;
+		const blocks = wp.blocks.parse( _content );
+		dispatch( 'core/editor' ).resetBlocks( blocks );
+	}, content );
+}
+
+/**
+ * Returns an array with all blocks; Equivalent to calling wp.data.select( 'core/editor' ).getBlocks();
+ *
+ * @return {Promise} Promise resolving with an array containing all blocks in the document.
+ */
+export async function getAllBlocks() {
+	return await page.evaluate( () => {
+		const { select } = window.wp.data;
+		return select( 'core/editor' ).getBlocks();
+	} );
 }

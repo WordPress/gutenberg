@@ -13,7 +13,6 @@ import {
  */
 import { Component, RawHTML } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
-import { toHTMLString } from '@wordpress/rich-text';
 import { Toolbar } from '@wordpress/components';
 
 /**
@@ -193,7 +192,7 @@ export class RichText extends Component {
 			} ) );
 
 		// Save back to HTML from React tree
-		const html = '<' + tagName + '>' + toHTMLString( value ) + '</' + tagName + '>';
+		const html = '<' + tagName + '>' + value + '</' + tagName + '>';
 
 		return (
 			<View>
@@ -222,7 +221,7 @@ export class RichText extends Component {
 
 RichText.defaultProps = {
 	formattingControls: FORMATTING_CONTROLS.map( ( { format } ) => format ),
-	format: 'children',
+	format: 'string',
 };
 
 const RichTextContainer = compose( [
@@ -234,10 +233,6 @@ RichTextContainer.Content = ( { value, format, tagName: Tag, ...props } ) => {
 	switch ( format ) {
 		case 'string':
 			content = <RawHTML>{ value }</RawHTML>;
-			break;
-
-		case 'children':
-			content = <RawHTML>{ toHTMLString( value ) }</RawHTML>;
 			break;
 	}
 
@@ -251,7 +246,7 @@ RichTextContainer.Content = ( { value, format, tagName: Tag, ...props } ) => {
 RichTextContainer.isEmpty = isRichTextValueEmpty;
 
 RichTextContainer.Content.defaultProps = {
-	format: 'children',
+	format: 'string',
 };
 
 export default RichTextContainer;

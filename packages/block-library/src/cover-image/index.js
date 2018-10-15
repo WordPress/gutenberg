@@ -28,7 +28,7 @@ const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
 
 const blockAttributes = {
 	title: {
-		source: 'rich-text',
+		source: 'html',
 		selector: 'p',
 	},
 	url: {
@@ -310,7 +310,7 @@ export const settings = {
 		attributes: {
 			...blockAttributes,
 			title: {
-				source: 'rich-text',
+				source: 'html',
 				selector: 'h2',
 			},
 		},

@@ -53,7 +53,7 @@ class ReusableBlockEditPanel extends Component {
 	}
 
 	render() {
-		const { isEditing, title, isSaving, onEdit, onCancel, instanceId } = this.props;
+		const { isEditing, title, isSaving, onEdit, instanceId } = this.props;
 
 		return (
 			<Fragment>
@@ -92,21 +92,12 @@ class ReusableBlockEditPanel extends Component {
 						/>
 						<Button
 							type="submit"
-							isPrimary
 							isLarge
 							isBusy={ isSaving }
 							disabled={ ! title || isSaving }
 							className="reusable-block-edit-panel__button"
 						>
 							{ __( 'Save' ) }
-						</Button>
-						<Button
-							isLarge
-							disabled={ isSaving }
-							className="reusable-block-edit-panel__button"
-							onClick={ onCancel }
-						>
-							{ __( 'Cancel' ) }
 						</Button>
 					</form>
 				) }

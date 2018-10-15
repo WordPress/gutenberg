@@ -81,9 +81,9 @@
 	overflow-wrap: break-word;
 
 	@include break-small() {
-		// The block mover needs to stay inside the block to allow clicks when hovering the block
-		padding-left: $block-padding + $block-side-ui-padding - $border-width;
-		padding-right: $block-padding + $block-side-ui-padding - $border-width;
+		// The block mover needs to stay inside the block to allow clicks when hovering the block-.
+		padding-left: $block-padding + $block-side-ui-width + $block-side-ui-clearance - $border-width;
+		padding-right: $block-padding + $block-side-ui-width + $block-side-ui-clearance - $border-width;
 	}
 
 	/**
@@ -423,8 +423,8 @@
 			margin-right: -$block-padding;
 
 			@include break-small() {
-				margin-left: -$block-side-ui-padding - $block-padding;
-				margin-right: -$block-side-ui-padding - $block-padding;
+				margin-left: -$block-side-ui-width - $block-side-ui-clearance - $block-padding;
+				margin-right: -$block-side-ui-width - $block-side-ui-clearance - $block-padding;
 			}
 
 			// This explicitly sets the width of the block, to override
@@ -470,7 +470,7 @@
 		.editor-block-list__empty-block-inserter,
 		.editor-default-block-appender .editor-inserter {
 			left: auto;
-			right: $item-spacing;
+			right: $grid-size;
 		}
 	}
 }
@@ -534,7 +534,7 @@
 		display: flex;
 		flex-direction: row;
 		// Make room for the height of the block toolbar above.
-		margin-top: $item-spacing + $block-toolbar-height - $block-padding;
+		margin-top: $grid-size + $block-toolbar-height - $block-padding;
 		margin-right: -$block-padding;
 		margin-left: -$block-padding;
 		border-top: $border-width solid $light-gray-500;
@@ -600,7 +600,7 @@
  */
 
 .editor-block-list .editor-inserter {
-	margin: $item-spacing;
+	margin: $grid-size;
 	cursor: move; // Fallback for IE/Edge < 14
 	cursor: grab;
 }

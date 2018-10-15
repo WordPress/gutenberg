@@ -121,7 +121,7 @@ function buildScssFile( styleFile ) {
 	mkdirp.sync( path.dirname( outputFile ) );
 	const builtSass = sass.renderSync( {
 		file: styleFile,
-		includePaths: [ path.resolve( __dirname, '../../edit-post/assets/stylesheets' ) ],
+		includePaths: [ path.resolve( __dirname, '../../assets/stylesheets' ) ],
 		data: (
 			[
 				'colors',

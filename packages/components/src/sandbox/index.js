@@ -157,19 +157,21 @@ class Sandbox extends Component {
 		`;
 
 		// put the html snippet into a html document, and then write it to the iframe's document
-		// we can use this in the future to inject custom styles or scripts
+		// we can use this in the future to inject custom styles or scripts.
+		// Scripts go into the body rather than the head, to support embedded content such as Instagram
+		// that expect the scripts to be part of the body.
 		const htmlDoc = (
 			<html lang={ document.documentElement.lang } className={ this.props.type }>
 				<head>
 					<title>{ this.props.title }</title>
 					<style dangerouslySetInnerHTML={ { __html: style } } />
-					{ ( this.props.scripts && this.props.scripts.map(
-						( src ) => <script key={ src } src={ src } />
-					) ) }
 				</head>
 				<body data-resizable-iframe-connected="data-resizable-iframe-connected" className={ this.props.type }>
 					<div dangerouslySetInnerHTML={ { __html: this.props.html } } />
 					<script type="text/javascript" dangerouslySetInnerHTML={ { __html: observeAndResizeJS } } />
+					{ ( this.props.scripts && this.props.scripts.map(
+						( src ) => <script key={ src } src={ src } />
+					) ) }
 				</body>
 			</html>
 		);

@@ -29,6 +29,8 @@ const DEFAULT_QUERY = {
 	_fields: 'id,name,parent',
 };
 
+const MIN_TERMS_COUNT_FOR_FILTER = 8;
+
 class HierarchicalTermSelector extends Component {
 	constructor() {
 		super( ...arguments );
@@ -384,14 +386,15 @@ class HierarchicalTermSelector extends Component {
 				slug === 'category' ? __( 'Categories' ) : __( 'Terms' )
 			)
 		);
+		const showFilter = availableTerms.length >= MIN_TERMS_COUNT_FOR_FILTER;
 
 		return [
-			<label
+			showFilter && <label
 				key="filter-label"
 				htmlFor={ filterInputId }>
 				{ filterLabel }
 			</label>,
-			<input
+			showFilter && <input
 				type="search"
 				id={ filterInputId }
 				value={ filterValue }

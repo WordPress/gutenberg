@@ -4,7 +4,6 @@
 import { __ } from '@wordpress/i18n';
 import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
-import { create, concat } from '@wordpress/rich-text';
 
 export const name = 'core/preformatted';
 
@@ -19,7 +18,7 @@ export const settings = {
 
 	attributes: {
 		content: {
-			source: 'rich-text',
+			source: 'html',
 			selector: 'pre',
 		},
 	},
@@ -31,7 +30,7 @@ export const settings = {
 				blocks: [ 'core/code', 'core/paragraph' ],
 				transform: ( { content } ) =>
 					createBlock( 'core/preformatted', {
-						content: create( { text: content } ),
+						content,
 					} ),
 			},
 			{
@@ -87,7 +86,7 @@ export const settings = {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: concat( attributes.content, attributesToMerge.content ),
+			content: attributes.content + attributesToMerge.content,
 		};
 	},
 };

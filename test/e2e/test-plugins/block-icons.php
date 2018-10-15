@@ -16,7 +16,6 @@ wp_enqueue_script(
 		'wp-editor',
 		'wp-hooks',
 		'wp-i18n',
-		'wp-rich-text',
 	),
 	filemtime( plugin_dir_path( __FILE__ ) . 'block-icons/index.js' ),
 	true
