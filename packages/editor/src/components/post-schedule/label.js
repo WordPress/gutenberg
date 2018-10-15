@@ -7,8 +7,9 @@ import { withSelect } from '@wordpress/data';
 
 export function PostScheduleLabel( { date, isFloating } ) {
 	const settings = getSettings();
+
 	return date && ! isFloating ?
-		dateI18n( settings.formats.datetime, date ) :
+		dateI18n( settings.formats.datetimeAbbreviated, date ) :
 		__( 'Immediately' );
 }
 

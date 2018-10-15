@@ -13,8 +13,8 @@ import {
 	getBlockTypes,
 	getDefaultBlockName,
 	setDefaultBlockName,
-	getUnknownTypeHandlerName,
-	setUnknownTypeHandlerName,
+	getFreeformContentHandlerName,
+	setFreeformContentHandlerName,
 } from '@wordpress/blocks';
 import { moment } from '@wordpress/date';
 import { RawHTML } from '@wordpress/element';
@@ -3022,11 +3022,11 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getEditedPostContent', () => {
-		let originalDefaultBlockName, originalUnknownTypeHandlerName;
+		let originalDefaultBlockName, originalFreeformContentHandlerName;
 
 		beforeAll( () => {
 			originalDefaultBlockName = getDefaultBlockName();
-			originalUnknownTypeHandlerName = getUnknownTypeHandlerName();
+			originalFreeformContentHandlerName = getFreeformContentHandlerName();
 
 			registerBlockType( 'core/default', {
 				category: 'common',
@@ -3050,12 +3050,12 @@ describe( 'selectors', () => {
 				save: ( { attributes } ) => <RawHTML>{ attributes.html }</RawHTML>,
 			} );
 			setDefaultBlockName( 'core/default' );
-			setUnknownTypeHandlerName( 'core/unknown' );
+			setFreeformContentHandlerName( 'core/unknown' );
 		} );
 
 		afterAll( () => {
 			setDefaultBlockName( originalDefaultBlockName );
-			setUnknownTypeHandlerName( originalUnknownTypeHandlerName );
+			setFreeformContentHandlerName( originalFreeformContentHandlerName );
 			getBlockTypes().forEach( ( block ) => {
 				unregisterBlockType( block.name );
 			} );
@@ -3110,7 +3110,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'returns removep\'d serialization of blocks for single unknown', () => {
-			const unknownBlock = createBlock( getUnknownTypeHandlerName(), {
+			const unknownBlock = createBlock( getFreeformContentHandlerName(), {
 				html: '<p>foo</p>',
 			} );
 			const state = {
@@ -3134,10 +3134,10 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'returns non-removep\'d serialization of blocks for multiple unknown', () => {
-			const firstUnknown = createBlock( getUnknownTypeHandlerName(), {
+			const firstUnknown = createBlock( getFreeformContentHandlerName(), {
 				html: '<p>foo</p>',
 			} );
-			const secondUnknown = createBlock( getUnknownTypeHandlerName(), {
+			const secondUnknown = createBlock( getFreeformContentHandlerName(), {
 				html: '<p>bar</p>',
 			} );
 			const state = {

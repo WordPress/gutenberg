@@ -24,7 +24,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
 
 	attributes: {
 		content: {
-			source: 'rich-text',
+			source: 'html',
 			selector: 'p',
 		}
 	},
@@ -72,7 +72,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 
 	attributes: {
 		content: {
-			source: 'rich-text',
+			source: 'html',
 			selector: 'p',
 		},
 	},
@@ -111,7 +111,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 
 When registering a new block type, the `attributes` property describes the shape of the attributes object you'd like to receive in the `edit` and `save` functions. Each value is a [source function](../../docs/block-api/attributes.md) to find the desired value from the markup of the block.
 
-In the code snippet above, when loading the editor, we will extract the `content` value as the children of the paragraph element in the saved post's markup.
+In the code snippet above, when loading the editor, we will extract the `content` value as the HTML of the paragraph element in the saved post's markup.
 
 ## Components and the `RichText` Component
 
@@ -121,4 +121,4 @@ The `RichText` component can be considered as a super-powered `textarea` element
 
 Implementing this behavior as a component enables you as the block implementer to be much more granular about editable fields. Your block may not need `RichText` at all, or it may need many independent `RichText` elements, each operating on a subset of the overall block state.
 
-Because `RichText` allows for nested nodes, you'll most often use it in conjunction with the `rich-text` attribute source when extracting the value from saved content. You'll also use `RichText.Content` in the `save` function to output RichText values.
+Because `RichText` allows for nested nodes, you'll most often use it in conjunction with the `html` attribute source when extracting the value from saved content. You'll also use `RichText.Content` in the `save` function to output RichText values.

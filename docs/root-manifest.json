@@ -198,6 +198,12 @@
 		"parent": "reference"
 	},
 	{
+		"title": "Scripts",
+		"slug": "scripts",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/reference\/scripts.md",
+		"parent": "reference"
+	},
+	{
 		"title": "Deprecated Features",
 		"slug": "deprecated",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/reference\/deprecated.md",
