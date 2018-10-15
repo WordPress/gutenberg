@@ -8,7 +8,7 @@ import classnames from 'classnames/dedupe';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
 import { Component, renderToString, Fragment } from '@wordpress/element';
 import {
@@ -313,7 +313,7 @@ export function getEmbedEdit( title, icon ) {
 							<Button
 								isLarge
 								type="submit">
-								{ __( 'Embed' ) }
+								{ _x( 'Embed', 'button label' ) }
 							</Button>
 							{ cannotEmbed && <p className="components-placeholder__error">{ __( 'Sorry, we could not embed that content.' ) }</p> }
 						</form>
@@ -482,7 +482,7 @@ const embedPhotoIcon = <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/sv
 const embedVideoIcon = <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0,0h24v24H0V0z" fill="none" /><path d="m10 8v8l5-4-5-4zm9-5h-14c-1.1 0-2 0.9-2 2v14c0 1.1 0.9 2 2 2h14c1.1 0 2-0.9 2-2v-14c0-1.1-0.9-2-2-2zm0 16h-14v-14h14v14z" /></svg>;
 
 export const settings = getEmbedBlockSettings( {
-	title: __( 'Embed' ),
+	title: _x( 'Embed', 'block title' ),
 	description: __( 'The Embed block allows you to easily add videos, images, tweets, audio, and other content to your post or page.' ),
 	icon: embedContentIcon,
 	transforms: {

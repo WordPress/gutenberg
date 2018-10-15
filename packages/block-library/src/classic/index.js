@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { RawHTML } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -12,7 +12,7 @@ import edit from './edit';
 export const name = 'core/freeform';
 
 export const settings = {
-	title: __( 'Classic' ),
+	title: _x( 'Classic', 'block title' ),
 
 	description: __( 'It’s the classic WordPress editor and it’s a block! Drop the editor right in.' ),
 
