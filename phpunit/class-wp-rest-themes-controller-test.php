@@ -71,13 +71,10 @@ class WP_REST_Themes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 */
 	protected function check_get_theme_response( $response ) {
 		if ( $response instanceof WP_REST_Response ) {
-			$links    = $response->get_links();
 			$headers  = $response->get_headers();
 			$response = $response->get_data();
 		} else {
-			$this->assertArrayHasKey( '_links', $response );
 			$headers = array();
-			$links   = $response['_links'];
 		}
 
 		$this->assertArrayHasKey( 'X-WP-Total', $headers );
@@ -149,7 +146,6 @@ class WP_REST_Themes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 		$this->check_get_theme_response( $response );
 		$fields = array(
-			'_links',
 			'theme_supports',
 		);
 		$this->assertEqualSets( $fields, array_keys( $data[0] ) );

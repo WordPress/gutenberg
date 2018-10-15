@@ -126,8 +126,6 @@ class WP_REST_Themes_Controller extends WP_REST_Controller {
 		// Wrap the data in a response object.
 		$response = rest_ensure_response( $data );
 
-		$response->add_links( $this->prepare_links( $theme ) );
-
 		/**
 		 * Filters theme data returned from the REST API.
 		 *
@@ -138,24 +136,6 @@ class WP_REST_Themes_Controller extends WP_REST_Controller {
 		 * @param WP_REST_Request  $request  Request object.
 		 */
 		return apply_filters( 'rest_prepare_theme', $response, $theme, $request );
-	}
-
-	/**
-	 * Prepares links for the theme request.
-	 *
-	 * @since 5.0.0
-	 *
-	 * @param WP_Theme $theme Theme object.
-	 * @return array Links for the given theme.
-	 */
-	protected function prepare_links( $theme ) {
-		$links = array(
-			'self' => array(
-				'href' => rest_url( sprintf( '%s/%s?status=active', $this->namespace, $this->rest_base ) ),
-			),
-		);
-
-		return $links;
 	}
 
 	/**
@@ -172,7 +152,7 @@ class WP_REST_Themes_Controller extends WP_REST_Controller {
 			'type'       => 'object',
 			'properties' => array(
 				'theme_supports' => array(
-					'description' => __( 'A list of features this theme supports.', 'gutenberg' ),
+					'description' => __( 'Features supported by this theme.', 'gutenberg' ),
 					'type'        => 'array',
 					'readonly'    => true,
 					'properties'  => array(
