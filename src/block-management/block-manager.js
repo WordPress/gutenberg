@@ -139,22 +139,16 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		this.state.dataSource.setDirty();
 	}
 
-	insertBlocksAfter( blocks: Array<Object> ) {
+	insertBlocksAfter( clientId: string, blocks: Array<Object> ) {
 		// find currently focused block
-		let focusedItemIndex = this.findDataSourceIndexForFocusedItem();
-		if ( focusedItemIndex === -1 ) {
-			// TODO: no focus yet? This is a well known bug on Android...Remove this as
-			// soon as we fix the focus problem on the list
-			focusedItemIndex = 3;
-		}
-		const clientIdFocused = this.state.dataSource.get( focusedItemIndex ).clientId;
+		const focusedItemIndex = this.getDataSourceIndexFromClientId( clientId );
 
 		const newBlock = blocks[ 0 ];
 		newBlock.focused = true;
 
 		// set it into the datasource, and use the same object instance to send it to props/redux
 		this.state.dataSource.splice( focusedItemIndex + 1, 0, newBlock );
-		this.props.createBlockAction( newBlock.clientId, newBlock, clientIdFocused );
+		this.props.createBlockAction( newBlock.clientId, newBlock, clientId );
 
 		// now set the focus
 		this.props.focusBlockAction( newBlock.clientId ); // this not working atm

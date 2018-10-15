@@ -19,7 +19,7 @@ type PropsType = BlockType & {
 	onChange: ( clientId: string, attributes: mixed ) => void,
 	onToolbarButtonPressed: ( button: number, clientId: string ) => void,
 	onBlockHolderPressed: ( clientId: string ) => void,
-	insertBlocksAfter: ( blocks: Array<Object> ) => void,
+	insertBlocksAfter: ( clientId: string, blocks: Array<Object> ) => void,
 };
 
 type StateType = {
@@ -50,6 +50,14 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 		return <View />;
 	}
 
+	_insertBlocksAfter( blocks: Array<Object> ) {
+		if ( ! this.props.insertBlocksAfter ) {
+			return;
+		}
+		const { insertBlocksAfter } = this.props;
+		insertBlocksAfter( this.props.clientId, blocks );
+	}
+
 	getBlockForType() {
 		// Since unsupported blocks are handled in block-manager.js, at this point the block should definitely
 		// be supported.
@@ -70,7 +78,7 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 				setAttributes={ ( attrs ) =>
 					this.props.onChange( this.props.clientId, { ...this.props.attributes, ...attrs } )
 				}
-				insertBlocksAfter={ this.props.insertBlocksAfter }
+				insertBlocksAfter={ this._insertBlocksAfter.bind( this ) }
 				isSelected={ this.props.focused }
 				style={ style }
 			/>
