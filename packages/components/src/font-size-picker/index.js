@@ -6,7 +6,7 @@ import { map } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { withInstanceId } from '@wordpress/compose';
 
 /**
@@ -52,7 +52,7 @@ function FontSizePicker( {
 							aria-expanded={ isOpen }
 							aria-label={ __( 'Custom font size' ) }
 						>
-							{ ( currentFont && currentFont.name ) || ( ! value && 'Normal' ) || 'Custom' }
+							{ ( currentFont && currentFont.name ) || ( ! value && _x( 'Normal', 'font size name' ) ) || _x( 'Custom', 'font size name' ) }
 						</Button>
 					) }
 					renderContent={ () => (
