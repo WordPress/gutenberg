@@ -16,8 +16,8 @@ const menuIcon = (
 	</SVG>
 );
 
-function BlockHierarchyDropdown( { rootClientId, selectedBlockClientId } ) {
-	if ( rootClientId === selectedBlockClientId ) {
+function BlockHierarchyDropdown( { rootClientId, selectedBlockClientId, countInnerBlocks } ) {
+	if ( rootClientId === selectedBlockClientId && countInnerBlocks === 0 ) {
 		return null;
 	}
 
@@ -46,10 +46,12 @@ export default withSelect( ( select ) => {
 	const {
 		getSelectedBlockClientId,
 		getBlockHierarchyRootClientId,
+		getBlockCount,
 	} = select( 'core/editor' );
 	const selectedBlockClientId = getSelectedBlockClientId();
 	const rootClientId = selectedBlockClientId && getBlockHierarchyRootClientId( selectedBlockClientId );
 	return {
+		countInnerBlocks: rootClientId ? getBlockCount( rootClientId ) : 0,
 		rootClientId,
 		selectedBlockClientId,
 	};
