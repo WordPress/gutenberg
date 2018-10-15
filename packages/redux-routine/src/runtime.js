@@ -38,7 +38,7 @@ export default function createRuntime( controls = {}, dispatch ) {
 	} );
 
 	const unhandledActionControl = ( value, next ) => {
-		if ( ! isAction( value ) || ! isString( value.type ) ) {
+		if ( ! isAction( value ) ) {
 			return false;
 		}
 		dispatch( value );
