@@ -29,6 +29,8 @@ $z-layers: (
 	".edit-post-header": 30,
 	".block-library-button__inline-link .editor-url-input__suggestions": 6, // URL suggestions for button block above sibling inserter
 	".block-library-image__resize-handlers": 1, // Resize handlers above sibling inserter
+	".wp-block-cover-image__inner-container": 1, // InnerBlocks area inside cover image block
+	".wp-block-cover-image__video-background": 0, // Video background inside cover image block
 
 	// Side UI active buttons
 	".editor-block-mover__control": 1,

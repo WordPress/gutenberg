@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -14,10 +15,10 @@ import { compose } from '@wordpress/compose';
 import {
 	BlockControls,
 	InspectorControls,
+	InnerBlocks,
 	BlockAlignmentToolbar,
 	MediaPlaceholder,
 	MediaUpload,
-	AlignmentToolbar,
 	PanelColorSettings,
 	RichText,
 	withColors,
@@ -58,11 +59,25 @@ const blockAttributes = {
 	customOverlayColor: {
 		type: 'string',
 	},
+	backgroundType: {
+		type: 'string',
+		default: 'image',
+	},
 };
 
 export const name = 'core/cover-image';
 
-const ALLOWED_MEDIA_TYPES = [ 'image' ];
+const INNER_BLOCKS_TEMPLATE = [
+	[ 'core/paragraph', {
+		align: 'center',
+		fontSize: 'large',
+		placeholder: __( 'Write title…' ),
+	} ],
+];
+const INNER_BLOCKS_ALLOWED_BLOCKS = [ 'core/button', 'core/heading', 'core/paragraph' ];
+const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
+const IMAGE_BACKGROUND_TYPE = 'image';
+const VIDEO_BACKGROUND_TYPE = 'video';
 
 export const settings = {
 	title: __( 'Cover Image' ),
@@ -79,13 +94,6 @@ export const settings = {
 		from: [
 			{
 				type: 'block',
-				blocks: [ 'core/heading' ],
-				transform: ( { content } ) => (
-					createBlock( 'core/cover-image', { title: content } )
-				),
-			},
-			{
-				type: 'block',
 				blocks: [ 'core/image' ],
 				transform: ( { caption, url, align, id } ) => (
 					createBlock( 'core/cover-image', {
@@ -98,13 +106,6 @@ export const settings = {
 			},
 		],
 		to: [
-			{
-				type: 'block',
-				blocks: [ 'core/heading' ],
-				transform: ( { title } ) => (
-					createBlock( 'core/heading', { content: title } )
-				),
-			},
 			{
 				type: 'block',
 				blocks: [ 'core/image' ],
@@ -131,28 +132,54 @@ export const settings = {
 		withColors( { overlayColor: 'background-color' } ),
 		withNotices,
 	] )(
-		( { attributes, setAttributes, isSelected, className, noticeOperations, noticeUI, overlayColor, setOverlayColor } ) => {
-			const { url, title, align, contentAlign, id, hasParallax, dimRatio } = attributes;
+		( { attributes, setAttributes, className, noticeOperations, noticeUI, overlayColor, setOverlayColor } ) => {
+			const {
+				align,
+				backgroundType,
+				dimRatio,
+				hasParallax,
+				id,
+				url,
+			} = attributes;
 			const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 			const onSelectImage = ( media ) => {
 				if ( ! media || ! media.url ) {
 					setAttributes( { url: undefined, id: undefined } );
 					return;
 				}
+				let mediaType;
+				// for media selections originated from a file upload.
+				if ( media.media_type ) {
+					if ( media.media_type === IMAGE_BACKGROUND_TYPE ) {
+						mediaType = IMAGE_BACKGROUND_TYPE;
+					} else {
+						// only images and videos are accepted so if the media_type is not an image we can assume it is a video.
+						// video contain the media type of 'file' in the object returned from the rest api.
+						mediaType = VIDEO_BACKGROUND_TYPE;
+					}
+				} else { // for media selections originated from existing files in the media library.
+					mediaType = media.type;
+				}
+				if ( mediaType ) {
+					setAttributes( {
+						url: media.url,
+						id: media.id,
+						backgroundType: mediaType,
+					} );
+					return;
+				}
 				setAttributes( { url: media.url, id: media.id } );
 			};
 			const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
 			const setDimRatio = ( ratio ) => setAttributes( { dimRatio: ratio } );
-			const setTitle = ( newTitle ) => setAttributes( { title: newTitle } );
 
 			const style = {
-				...backgroundImageStyles( url ),
+				...( backgroundType === IMAGE_BACKGROUND_TYPE ? backgroundImageStyles( url ) : {} ),
 				backgroundColor: overlayColor.color,
 			};
 
 			const classes = classnames(
 				className,
-				contentAlign !== 'center' && `has-${ contentAlign }-content`,
 				dimRatioToClass( dimRatio ),
 				{
 					'has-background-dim': dimRatio !== 0,
@@ -162,45 +189,37 @@ export const settings = {
 
 			const controls = (
 				<Fragment>
-					<BlockControls>
-						<BlockAlignmentToolbar
-							value={ align }
-							onChange={ updateAlignment }
-						/>
-						{ !! url && (
-							<Fragment>
-								<AlignmentToolbar
-									value={ contentAlign }
-									onChange={ ( nextAlign ) => {
-										setAttributes( { contentAlign: nextAlign } );
-									} }
+					{ !! url && (
+						<BlockControls>
+							<BlockAlignmentToolbar
+								value={ align }
+								onChange={ updateAlignment }
+							/>
+							<Toolbar>
+								<MediaUpload
+									onSelect={ onSelectImage }
+									allowedTypes={ ALLOWED_MEDIA_TYPES }
+									value={ id }
+									render={ ( { open } ) => (
+										<IconButton
+											className="components-toolbar__control"
+											label={ __( 'Edit image' ) }
+											icon="edit"
+											onClick={ open }
+										/>
+									) }
 								/>
-								<Toolbar>
-									<MediaUpload
-										onSelect={ onSelectImage }
-										allowedTypes={ ALLOWED_MEDIA_TYPES }
-										value={ id }
-										render={ ( { open } ) => (
-											<IconButton
-												className="components-toolbar__control"
-												label={ __( 'Edit image' ) }
-												icon="edit"
-												onClick={ open }
-											/>
-										) }
-									/>
-								</Toolbar>
-							</Fragment>
-						) }
-					</BlockControls>
+							</Toolbar>
+						</BlockControls>
+					) }
 					{ !! url && (
 						<InspectorControls>
 							<PanelBody title={ __( 'Cover Image Settings' ) }>
-								<ToggleControl
+								{ IMAGE_BACKGROUND_TYPE === backgroundType && ( <ToggleControl
 									label={ __( 'Fixed Background' ) }
 									checked={ hasParallax }
 									onChange={ toggleParallax }
-								/>
+								/> ) }
 								<PanelColorSettings
 									title={ __( 'Overlay' ) }
 									initialOpen={ true }
@@ -226,16 +245,8 @@ export const settings = {
 			);
 
 			if ( ! url ) {
-				const hasTitle = ! RichText.isEmpty( title );
-				const icon = hasTitle ? undefined : 'format-image';
-				const label = hasTitle ? (
-					<RichText
-						tagName="h2"
-						value={ title }
-						onChange={ setTitle }
-						inlineToolbar
-					/>
-				) : __( 'Cover Image' );
+				const icon = 'format-image';
+				const label = ( 'Cover Image' );
 
 				return (
 					<Fragment>
@@ -248,7 +259,7 @@ export const settings = {
 								name: __( 'an image' ),
 							} }
 							onSelect={ onSelectImage }
-							accept="image/*"
+							accept="image/*,video/*"
 							allowedTypes={ ALLOWED_MEDIA_TYPES }
 							notices={ noticeUI }
 							onError={ noticeOperations.createErrorNotice }
@@ -265,16 +276,21 @@ export const settings = {
 						style={ style }
 						className={ classes }
 					>
-						{ ( ! RichText.isEmpty( title ) || isSelected ) && (
-							<RichText
-								tagName="p"
-								className="wp-block-cover-image-text"
-								placeholder={ __( 'Write title…' ) }
-								value={ title }
-								onChange={ setTitle }
-								inlineToolbar
+						{ VIDEO_BACKGROUND_TYPE === backgroundType && url && (
+							<video
+								className="wp-block-cover-image__video-background"
+								autoPlay
+								muted
+								loop
+								src={ url }
 							/>
 						) }
+						<div className="wp-block-cover-image__inner-container">
+							<InnerBlocks
+								template={ INNER_BLOCKS_TEMPLATE }
+								allowedBlocks={ INNER_BLOCKS_ALLOWED_BLOCKS }
+							/>
+						</div>
 					</div>
 				</Fragment>
 			);
@@ -282,9 +298,17 @@ export const settings = {
 	),
 
 	save( { attributes, className } ) {
-		const { url, title, hasParallax, dimRatio, align, contentAlign, overlayColor, customOverlayColor } = attributes;
+		const {
+			align,
+			backgroundType,
+			customOverlayColor,
+			dimRatio,
+			hasParallax,
+			overlayColor,
+			url,
+		} = attributes;
 		const overlayColorClass = getColorClassName( 'background-color', overlayColor );
-		const style = backgroundImageStyles( url );
+		const style = backgroundType === IMAGE_BACKGROUND_TYPE ? backgroundImageStyles( url ) : {};
 		if ( ! overlayColorClass ) {
 			style.backgroundColor = customOverlayColor;
 		}
@@ -296,16 +320,22 @@ export const settings = {
 			{
 				'has-background-dim': dimRatio !== 0,
 				'has-parallax': hasParallax,
-				[ `has-${ contentAlign }-content` ]: contentAlign !== 'center',
 			},
 			align ? `align${ align }` : null,
 		);
 
 		return (
 			<div className={ classes } style={ style }>
-				{ ! RichText.isEmpty( title ) && (
-					<RichText.Content tagName="p" className="wp-block-cover-image-text" value={ title } />
-				) }
+				{ VIDEO_BACKGROUND_TYPE === backgroundType && url && ( <video
+					className="wp-block-cover-image__video-background"
+					autoPlay
+					muted
+					loop
+					src={ url }
+				/> ) }
+				<div className="wp-block-cover-image__inner-container">
+					<InnerBlocks.Content />
+				</div>
 			</div>
 		);
 	},
@@ -314,7 +344,56 @@ export const settings = {
 		attributes: {
 			...blockAttributes,
 			title: {
-				source: 'html',
+				type: 'array',
+				source: 'children',
+				selector: 'p',
+			},
+			contentAlign: {
+				type: 'string',
+				default: 'center',
+			},
+		},
+
+		save( { attributes, className } ) {
+			const { url, title, hasParallax, dimRatio, align, contentAlign } = attributes;
+			const style = backgroundImageStyles( url );
+			const classes = classnames(
+				className,
+				dimRatioToClass( dimRatio ),
+				{
+					'has-background-dim': dimRatio !== 0,
+					'has-parallax': hasParallax,
+					[ `has-${ contentAlign }-content` ]: contentAlign !== 'center',
+				},
+				align ? `align${ align }` : null,
+			);
+
+			return (
+				<div className={ classes } style={ style }>
+					{ title && title.length > 0 && (
+						<RichText.Content tagName="p" className="wp-block-cover-image-text" value={ title } />
+					) }
+				</div>
+			);
+		},
+
+		migrate( attributes ) {
+			return [
+				omit( attributes, [ 'title', 'contentAlign' ] ),
+				[ createBlock( 'core/paragraph', {
+					content: attributes.title,
+					align: attributes.contentAlign,
+					fontSize: 'large',
+					placeholder: __( 'Write title…' ),
+				} ) ],
+			];
+		},
+	}, {
+		attributes: {
+			...blockAttributes,
+			title: {
+				type: 'array',
+				source: 'children',
 				selector: 'h2',
 			},
 		},

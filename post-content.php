@@ -1,5 +1,11 @@
 <!-- wp:cover-image {"url":"https://cldup.com/Fz-ASbo2s3.jpg","align":"wide"} -->
-<div class="wp-block-cover-image has-background-dim alignwide" style="background-image:url(https://cldup.com/Fz-ASbo2s3.jpg)"><p class="wp-block-cover-image-text"><?php _e( 'Of Mountains &amp; Printing Presses', 'gutenberg' ); ?></p></div>
+<div class="wp-block-cover-image has-background-dim alignwide" style="background-image:url(https://cldup.com/Fz-ASbo2s3.jpg)">
+   <div class="wp-block-cover-image__inner-container">
+      <!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
+      <p style="text-align:center" class="has-large-font-size">Of Mountains &amp; Printing Presses</p>
+      <!-- /wp:paragraph -->
+   </div>
+</div>
 <!-- /wp:cover-image -->
 
 <!-- wp:paragraph -->
