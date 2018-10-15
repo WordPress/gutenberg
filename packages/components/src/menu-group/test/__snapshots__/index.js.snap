@@ -2,7 +2,7 @@
 
 exports[`MenuGroup should match snapshot 1`] = `
 <div
-  className="components-menu-group"
+  className="components-menu-group has-label"
 >
   <div
     className="components-menu-group__label"
