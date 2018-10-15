@@ -162,6 +162,8 @@ function gutenberg_pre_init() {
 
 	require_once dirname( __FILE__ ) . '/lib/load.php';
 
+	gutenberg_silence_rest_errors();
+
 	add_filter( 'replace_editor', 'gutenberg_init', 10, 2 );
 }
 

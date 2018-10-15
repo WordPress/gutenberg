@@ -473,3 +473,18 @@ function gutenberg_filter_user_collection_parameters( $query_params ) {
 	return $query_params;
 }
 add_filter( 'rest_user_collection_params', 'gutenberg_filter_user_collection_parameters' );
+
+/**
+ * Silence PHP Warnings and Errors in JSON requests
+ *
+ * @todo This is a temporary measure until errors are properly silenced in REST API responses in core
+ *
+ * @see https://core.trac.wordpress.org/ticket/44534
+ */
+function gutenberg_silence_rest_errors() {
+
+	if ( ! empty( $_SERVER['CONTENT_TYPE'] ) && 'application/json' === $_SERVER['CONTENT_TYPE'] ) {
+		@ini_set( 'display_errors', 0 );
+	}
+
+}
