@@ -12,8 +12,15 @@ const ALLOWED_MEDIA_TYPES = [ 'image' ];
 export const image = {
 	name: 'core/image',
 	title: __( 'Image' ),
+	object: true,
 	match: {
 		tagName: 'img',
+	},
+	attributes: {
+		className: 'class',
+		style: 'style',
+		url: 'src',
+		alt: 'alt',
 	},
 	edit: class ImageEdit extends Component {
 		constructor() {
@@ -50,11 +57,11 @@ export const image = {
 						onSelect={ ( { id, url, alt, width } ) => {
 							this.closeModal();
 							onChange( insertObject( value, {
-								type: 'img',
+								type: 'core/image',
 								attributes: {
-									class: `wp-image-${ id }`,
+									className: `wp-image-${ id }`,
 									style: `width: ${ Math.min( width, 150 ) }px;`,
-									src: url,
+									url,
 									alt,
 								},
 							} ) );

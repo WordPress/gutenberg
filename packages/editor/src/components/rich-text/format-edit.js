@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
-import {
-	getActiveFormat,
-	getFormatTypes,
-} from '@wordpress/rich-text';
+import { getActiveFormat, getFormatTypes } from '@wordpress/rich-text';
 
 const FormatEdit = ( { value, onChange } ) => {
 	return (

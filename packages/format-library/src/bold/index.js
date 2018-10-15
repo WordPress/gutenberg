@@ -15,7 +15,7 @@ export const bold = {
 		tagName: 'strong',
 	},
 	edit( { isActive, value, onChange } ) {
-		const onToggle = () => onChange( toggleFormat( value, { type: 'strong' } ) );
+		const onToggle = () => onChange( toggleFormat( value, { type: 'core/bold' } ) );
 
 		return (
 			<Fragment>

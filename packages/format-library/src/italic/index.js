@@ -15,7 +15,7 @@ export const italic = {
 		tagName: 'em',
 	},
 	edit( { isActive, value, onChange } ) {
-		const onToggle = () => onChange( toggleFormat( value, { type: 'em' } ) );
+		const onToggle = () => onChange( toggleFormat( value, { type: 'core/italic' } ) );
 
 		return (
 			<Fragment>

@@ -28,6 +28,7 @@ export const link = {
 	},
 	attributes: {
 		url: 'href',
+		target: 'target',
 	},
 	edit: class LinkEdit extends Component {
 		constructor() {
@@ -45,7 +46,7 @@ export const link = {
 			const text = getTextContent( slice( value ) );
 
 			if ( text && isURL( text ) ) {
-				onChange( applyFormat( value, { type: 'a', attributes: { href: text } } ) );
+				onChange( applyFormat( value, { type: 'core/link', attributes: { href: text } } ) );
 			} else {
 				this.setState( { addingLink: true } );
 			}
@@ -93,7 +94,7 @@ export const link = {
 					<InlineLinkUI
 						addingLink={ this.state.addingLink }
 						stopAddingLink={ this.stopAddingLink }
-						link={ getActiveFormat( value, 'a' ) }
+						link={ getActiveFormat( value, 'core/link' ) }
 						value={ value }
 						onChange={ onChange }
 					/>

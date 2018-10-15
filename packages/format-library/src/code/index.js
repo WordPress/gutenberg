@@ -14,7 +14,7 @@ export const code = {
 		tagName: 'code',
 	},
 	edit( { value, onChange } ) {
-		const onToggle = () => onChange( toggleFormat( value, { type: 'code' } ) );
+		const onToggle = () => onChange( toggleFormat( value, { type: 'core/code' } ) );
 
 		return (
 			<Fragment>

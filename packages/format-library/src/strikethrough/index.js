@@ -15,7 +15,7 @@ export const strikethrough = {
 		tagName: 'del',
 	},
 	edit( { isActive, value, onChange } ) {
-		const onToggle = () => onChange( toggleFormat( value, { type: 'del' } ) );
+		const onToggle = () => onChange( toggleFormat( value, { type: 'core/strikethrough' } ) );
 
 		return (
 			<Fragment>
