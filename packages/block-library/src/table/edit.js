@@ -340,12 +340,12 @@ export class TableEdit extends Component {
 					const rowClasses = classnames( {
 						'has-background-color': hasColors && backgroundColor.class,
 						[ backgroundColor.class ]: hasColors ? backgroundColor.class : undefined,
-						[ textColor.class ]: hasColors ? textColor.class : undefined,
+						[ textColor.class ]: textColor.class,
 					} );
 
 					const rowStyles = {
 						backgroundColor: hasColors ? backgroundColor.color : undefined,
-						color: hasColors ? textColor.color : undefined,
+						color: textColor.color,
 					};
 
 					return (

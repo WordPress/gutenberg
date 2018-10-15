@@ -171,12 +171,12 @@ export const settings = {
 						const rowClasses = classnames( {
 							'has-background-color': hasColors && backgroundClass,
 							[ backgroundClass ]: hasColors ? backgroundClass : undefined,
-							[ textClass ]: hasColors ? textClass : undefined,
+							[ textClass ]: textClass,
 						} );
 
 						const rowStyles = {
 							backgroundColor: hasColors && ! backgroundClass ? customBackgroundColor : undefined,
-							color: hasColors && ! textClass ? customTextColor : undefined,
+							color: ! textClass ? customTextColor : undefined,
 						};
 
 						return (
