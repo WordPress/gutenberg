@@ -39,7 +39,6 @@ const BlockInspector = ( { selectedBlock, blockType, count } ) => {
 					<div className="editor-block-inspector__card-description">{ blockType.description }</div>
 				</div>
 			</div>
-			<div><InspectorControls.Slot /></div>
 			{ !! blockType.styles && (
 				<div>
 					<PanelBody
@@ -52,6 +51,7 @@ const BlockInspector = ( { selectedBlock, blockType, count } ) => {
 					</PanelBody>
 				</div>
 			) }
+			<div><InspectorControls.Slot /></div>
 			<div>
 				<InspectorAdvancedControls.Slot>
 					{ ( fills ) => ! isEmpty( fills ) && (
