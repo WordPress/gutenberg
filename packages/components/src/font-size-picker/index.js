@@ -22,6 +22,7 @@ import { NavigableMenu } from '../navigable-container';
 function FontSizePicker( {
 	fallbackFontSize,
 	fontSizes = [],
+	disableCustomFontSizes = false,
 	onChange,
 	value,
 	withSlider,
@@ -73,7 +74,7 @@ function FontSizePicker( {
 						</NavigableMenu>
 					) }
 				/>
-				{ ! withSlider &&
+				{ ( ! withSlider && ! disableCustomFontSizes ) &&
 					<input
 						className="components-range-control__number"
 						type="number"
