@@ -142,7 +142,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	insertBlocksAfter( blocks: Array<Object> ) {
 		// find currently focused block
 		let focusedItemIndex = this.findDataSourceIndexForFocusedItem();
-		if ( focusedItemIndex == -1 ) {
+		if ( focusedItemIndex === -1 ) {
 			// TODO: no focus yet? This is a well known bug on Android...Remove this as
 			// soon as we fix the focus problem on the list
 			focusedItemIndex = 3;
