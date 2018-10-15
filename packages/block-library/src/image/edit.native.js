@@ -75,9 +75,46 @@ class ImageEdit extends Component {
 		);
 	}
 
+	getCaptionTextinput( caption, isSelected ) {
+		const captionString = [] + caption; // caption can be a string or an array.
+
+		if ( ! captionString.length && ! isSelected ) {
+			return null;
+		}
+
+		const textContainer = ( children ) => {
+			return (
+				<View style={ { padding: 12, flex: 1 } }>
+					{ children() }
+				</View>
+			);
+		};
+
+		const textInput = () => {
+			return (
+				<TextInput
+					style={ { textAlign: 'center' } }
+					underlineColorAndroid="transparent"
+					value={ captionString }
+					placeholder={ 'Write caption…' }
+					onChangeText={ ( newCaption ) => this.props.setAttributes( { caption: newCaption } ) }
+				/>
+			);
+		};
+
+		const text = () => {
+			return ( <Text style={ { textAlign: 'center' } }>{ captionString }</Text> );
+		};
+
+		if ( isSelected ) {
+			return textContainer( textInput );
+		}
+		return textContainer( text );
+	}
+
 	render() {
 		const { attributes, isSelected } = this.props;
-		const { url, width, height } = attributes;
+		const { url, width, height, caption } = attributes;
 
 		if ( ! url ) {
 			return (
@@ -89,39 +126,42 @@ class ImageEdit extends Component {
 		}
 
 		return (
-			<ImageSize src={ url }>
-				{ ( sizes ) => {
-					const {
-						imageWidthWithinContainer,
-						imageHeightWithinContainer,
-						imageWidth,
-						imageHeight,
-					} = sizes;
+			<View style={ { flex: 1 } }>
+				<ImageSize src={ url }>
+					{ ( sizes ) => {
+						const {
+							imageWidthWithinContainer,
+							imageHeightWithinContainer,
+							imageWidth,
+							imageHeight,
+						} = sizes;
 
-					let finalHeight = imageHeightWithinContainer;
-					if ( height > 0 && height < imageHeightWithinContainer ) {
-						finalHeight = height;
-					}
+						let finalHeight = imageHeightWithinContainer;
+						if ( height > 0 && height < imageHeightWithinContainer ) {
+							finalHeight = height;
+						}
 
-					let finalWidth = imageWidthWithinContainer;
-					if ( width > 0 && width < imageWidthWithinContainer ) {
-						finalWidth = width;
-					}
+						let finalWidth = imageWidthWithinContainer;
+						if ( width > 0 && width < imageWidthWithinContainer ) {
+							finalWidth = width;
+						}
 
-					return (
-						<View>
-							{ isSelected ? this.getSizeControls( imageHeight, imageWidth ) : null }
-							<View style={ { flex: 1 } } >
-								<Image
-									style={ { height: finalHeight, width: finalWidth } }
-									resizeMethod="scale"
-									source={ { uri: url } }
-								/>
+						return (
+							<View>
+								{ isSelected ? this.getSizeControls( imageHeight, imageWidth ) : null }
+								<View style={ { flex: 1 } } >
+									<Image
+										style={ { height: finalHeight, width: finalWidth } }
+										resizeMethod="scale"
+										source={ { uri: url } }
+									/>
+								</View>
 							</View>
-						</View>
-					);
-				} }
-			</ImageSize>
+						);
+					} }
+				</ImageSize>
+				{ this.getCaptionTextinput( caption, isSelected ) }
+			</View>
 		);
 	}
 }
