@@ -2,6 +2,15 @@
 	margin-left: 1em;
 }
 
-.editor-block-hierarchy__item .editor-block-icon {
-	margin-right: 10px;
+.editor-block-hierarchy__item {
+	display: flex;
+	align-items: center;
+
+	.editor-block-icon {
+		margin-right: 10px;
+	}
+
+	&.is-selected {
+		font-weight: bold;
+	}
 }

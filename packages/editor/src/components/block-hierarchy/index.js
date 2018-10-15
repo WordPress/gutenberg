@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { map } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -24,8 +25,11 @@ function BlockHierarchyList( { blocks, selectedBlockClientId, selectBlock } ) {
 				return (
 					<li key={ block.clientId }>
 						<MenuItem
-							className="editor-block-hierarchy__item"
+							className={ classnames( 'editor-block-hierarchy__item', {
+								'is-selected': block.clientId === selectedBlockClientId,
+							} ) }
 							onClick={ () => selectBlock( block.clientId ) }
+							isSelected={ block.clientId === selectedBlockClientId }
 						>
 							<BlockIcon icon={ blockType.icon } showColors />
 							{ block.name }
