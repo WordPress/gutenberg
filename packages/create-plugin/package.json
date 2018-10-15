@@ -21,7 +21,7 @@
 	"main": "index.js",
 	"preferGlobal": true,
 	"bin": {
-		"create-wp-plugin": "./src/index.js"
+		"create-wp-plugin": "index.js"
 	},
 	"dependencies": {
 		"chalk": "^2.4.1",
