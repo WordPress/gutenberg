@@ -1259,19 +1259,20 @@ Returns the editor settings.
 
 *Returns*
 
-The editor settings object
+The editor settings object.
 
 ### getTokenSettings
 
-Returns the editor settings.
+Returns the token settings.
 
 *Parameters*
 
  * state: Editor state.
+ * name: Token name.
 
 *Returns*
 
-The editor settings object
+Token settings object, or the named token settings object if set.
 
 ### isPostLocked
 
