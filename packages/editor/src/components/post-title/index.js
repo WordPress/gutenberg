@@ -88,9 +88,21 @@ class PostTitle extends Component {
 	}
 
 	render() {
-		const { title, placeholder, instanceId, isPostTypeViewable } = this.props;
+		const {
+			hasFixedToolbar,
+			isCleanNewPost,
+			isFocusMode,
+			isPostTypeViewable,
+			instanceId,
+			placeholder,
+			title,
+		} = this.props;
 		const { isSelected } = this.state;
-		const className = classnames( 'editor-post-title__block', { 'is-selected': isSelected } );
+		const className = classnames( 'editor-post-title__block', {
+			'is-selected': isSelected,
+			'is-focus-mode': isFocusMode,
+			'has-fixed-toolbar': hasFixedToolbar,
+		} );
 		const decodedPlaceholder = decodeEntities( placeholder );
 
 		return (
@@ -115,6 +127,15 @@ class PostTitle extends Component {
 								onFocus={ this.onSelect }
 								onKeyDown={ this.onKeyDown }
 								onKeyPress={ this.onUnselect }
+								/*
+									Only autofocus the title when the post is entirely empty.
+									This should only happen for a new post, which means we
+									focus the title on new post so the author can start typing
+									right away, without needing to click anything.
+								*/
+								/* eslint-disable jsx-a11y/no-autofocus */
+								autoFocus={ isCleanNewPost }
+								/* eslint-enable jsx-a11y/no-autofocus */
 							/>
 						</KeyboardShortcuts>
 						{ isSelected && isPostTypeViewable && <PostPermalink /> }
@@ -126,15 +147,18 @@ class PostTitle extends Component {
 }
 
 const applyWithSelect = withSelect( ( select ) => {
-	const { getEditedPostAttribute, getEditorSettings } = select( 'core/editor' );
+	const { getEditedPostAttribute, getEditorSettings, isCleanNewPost } = select( 'core/editor' );
 	const { getPostType } = select( 'core' );
 	const postType = getPostType( getEditedPostAttribute( 'type' ) );
-	const { titlePlaceholder } = getEditorSettings();
+	const { titlePlaceholder, focusMode, hasFixedToolbar } = getEditorSettings();
 
 	return {
+		isCleanNewPost: isCleanNewPost(),
 		title: getEditedPostAttribute( 'title' ),
 		isPostTypeViewable: get( postType, [ 'viewable' ], false ),
 		placeholder: titlePlaceholder,
+		isFocusMode: focusMode,
+		hasFixedToolbar,
 	};
 } );
 

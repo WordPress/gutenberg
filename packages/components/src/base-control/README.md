@@ -1,5 +1,4 @@
-BaseControl
-=======
+# BaseControl
 
 BaseControl component is used to generate labels and help text for components handling user inputs.
 
@@ -8,17 +7,19 @@ BaseControl component is used to generate labels and help text for components ha
 
 Render a BaseControl for a textarea input:
 ```jsx
+import { BaseControl } from '@wordpress/components';
+
+const MyBaseControl = () => (
 	<BaseControl
-		id="textarea-1" 
+		id="textarea-1"
 		label="Text"
 		help="Enter some text"
 	>
-        <textarea
-            id="textarea-1"
-            onChange={ onChangeValue }
-            value={ value }
-        />
-    </BaseControl>
+		<textarea
+			id="textarea-1"
+		/>
+	</BaseControl>
+);
 ```
 
 ## Props

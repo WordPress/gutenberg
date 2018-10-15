@@ -13,6 +13,11 @@ export {
 } from './serializer';
 export {
 	registerBlockType,
+	setUnknownTypeHandlerName,
+	getUnknownTypeHandlerName,
 	getBlockType,
+	getBlockTypes,
 	hasBlockSupport,
 } from './registration';
+export { getPhrasingContentSchema } from './raw-handling';
+export { default as children } from './children';

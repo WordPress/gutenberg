@@ -374,6 +374,14 @@ export function setTemplateValidity( isValid ) {
  * @return {Object} Action object.
  */
 export function checkTemplateValidity() {
+	// TODO: Hello future deprecation remover. Please ensure also to remove all
+	// references to CHECK_TEMPLATE_VALIDITY, notably its effect handler.
+	deprecated( 'checkTemplateValidity action (`core/editor`)', {
+		version: '4.1',
+		plugin: 'Gutenberg',
+		hint: 'Validity is verified automatically upon block reset.',
+	} );
+
 	return {
 		type: 'CHECK_TEMPLATE_VALIDITY',
 	};
@@ -591,6 +599,20 @@ export function removeNotice( id ) {
 	};
 }
 
+/**
+ * Returns an action object used to lock the editor.
+ *
+ * @param {Object}  lock Details about the post lock status, user, and nonce.
+ *
+ * @return {Object} Action object.
+ */
+export function updatePostLock( lock ) {
+	return {
+		type: 'UPDATE_POST_LOCK',
+		lock,
+	};
+}
+
 export const createSuccessNotice = partial( createNotice, 'success' );
 export const createInfoNotice = partial( createNotice, 'info' );
 export const createErrorNotice = partial( createNotice, 'error' );
@@ -692,14 +714,14 @@ export function convertBlockToStatic( clientId ) {
 /**
  * Returns an action object used to convert a static block into a reusable block.
  *
- * @param {string} clientId The client ID of the block to detach.
+ * @param {string} clientIds The client IDs of the block to detach.
  *
  * @return {Object} Action object.
  */
-export function convertBlockToReusable( clientId ) {
+export function convertBlockToReusable( clientIds ) {
 	return {
 		type: 'CONVERT_BLOCK_TO_REUSABLE',
-		clientId,
+		clientIds: castArray( clientIds ),
 	};
 }
 /**
@@ -716,10 +738,7 @@ export function convertBlockToReusable( clientId ) {
 export function insertDefaultBlock( attributes, rootClientId, index ) {
 	const block = createBlock( getDefaultBlockName(), attributes );
 
-	return {
-		...insertBlock( block, index, rootClientId ),
-		isProvisional: true,
-	};
+	return insertBlock( block, index, rootClientId );
 }
 
 /**
@@ -768,62 +787,24 @@ export function unregisterToken( name ) {
 	};
 }
 
-export function fetchSharedBlocks( id ) {
-	deprecated( 'fetchSharedBlocks', {
-		alternative: 'fetchReusableBlocks',
-		version: '3.6',
-		plugin: 'Gutenberg',
-	} );
-
-	return fetchReusableBlocks( id );
+/**
+ * Returns an action object used in signalling that the user has enabled the publish sidebar.
+ *
+ * @return {Object} Action object
+ */
+export function enablePublishSidebar() {
+	return {
+		type: 'ENABLE_PUBLISH_SIDEBAR',
+	};
 }
 
-export function receiveSharedBlocks( results ) {
-	deprecated( 'receiveSharedBlocks', {
-		alternative: 'receiveReusableBlocks',
-		version: '3.6',
-		plugin: 'Gutenberg',
-	} );
-
-	return receiveReusableBlocks( results );
-}
-
-export function saveSharedBlock( id ) {
-	deprecated( 'saveSharedBlock', {
-		alternative: 'saveReusableBlock',
-		version: '3.6',
-		plugin: 'Gutenberg',
-	} );
-
-	return saveReusableBlock( id );
-}
-
-export function deleteSharedBlock( id ) {
-	deprecated( 'deleteSharedBlock', {
-		alternative: 'deleteReusableBlock',
-		version: '3.6',
-		plugin: 'Gutenberg',
-	} );
-
-	return deleteReusableBlock( id );
-}
-
-export function updateSharedBlockTitle( id, title ) {
-	deprecated( 'updateSharedBlockTitle', {
-		alternative: 'updateReusableBlockTitle',
-		version: '3.6',
-		plugin: 'Gutenberg',
-	} );
-
-	return updateReusableBlockTitle( id, title );
-}
-
-export function convertBlockToSaved( clientId ) {
-	deprecated( 'convertBlockToSaved', {
-		alternative: 'convertBlockToReusable',
-		version: '3.6',
-		plugin: 'Gutenberg',
-	} );
-
-	return convertBlockToReusable( clientId );
+/**
+ * Returns an action object used in signalling that the user has disabled the publish sidebar.
+ *
+ * @return {Object} Action object
+ */
+export function disablePublishSidebar() {
+	return {
+		type: 'DISABLE_PUBLISH_SIDEBAR',
+	};
 }

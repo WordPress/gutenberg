@@ -73,12 +73,12 @@ export function createBlockCompleter( {
 		getOptionLabel( inserterItem ) {
 			const { icon, title } = inserterItem;
 			return [
-				<BlockIcon key="icon" icon={ icon && icon.src } />,
+				<BlockIcon key="icon" icon={ icon && icon.src } showColors />,
 				title,
 			];
 		},
 		allowContext( before, after ) {
-			return ! ( /\S/.test( before.toString() ) || /\S/.test( after.toString() ) );
+			return ! ( /\S/.test( before ) || /\S/.test( after ) );
 		},
 		getOptionCompletion( inserterItem ) {
 			const { name, initialAttributes } = inserterItem;

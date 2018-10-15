@@ -1,9 +1,12 @@
-.components-form-token-field {
+.components-form-token-field__input-container {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
 	width: 100%;
 	margin: 0;
-	padding: 0;
+	padding: $grid-size-small;
 	background-color: $white;
-	border: 1px solid $light-gray-700;
+	border: $border-width solid $light-gray-700;
 	color: $dark-gray-700;
 	cursor: text;
 
@@ -17,13 +20,6 @@
 	&.is-active {
 		@include input-style__focus();
 	}
-}
-
-.components-form-token-field__input-container {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: flex-start;
-	padding: 4px;
 
 	// Token input
 	input[type="text"].components-form-token-field__input {
@@ -32,7 +28,7 @@
 		max-width: 100%;
 		margin: 2px 0 2px 8px;
 		padding: 0;
-		line-height: 24px;
+		min-height: 24px;
 		background: inherit;
 		border: 0;
 		font-size: $default-font-size;
@@ -48,6 +44,11 @@
 	.components-form-token-field__token + input[type="text"].components-form-token-field__input {
 		width: auto;
 	}
+}
+
+.components-form-token-field__label {
+	display: inline-block;
+	margin-bottom: $grid-size-small;
 }
 
 // Tokens
@@ -85,7 +86,7 @@
 
 		.components-form-token-field__token-text {
 			background: transparent;
-			color: theme( secondary );
+			color: theme(secondary);
 		}
 
 		.components-form-token-field__remove-token {
@@ -129,7 +130,7 @@
 	display: inline-block;
 	line-height: 24px;
 	background: $light-gray-500;
-	transition: all .2s cubic-bezier( .4, 1, .4, 1 );
+	transition: all 0.2s cubic-bezier(0.4, 1, 0.4, 1);
 }
 
 .components-form-token-field__token-text {
@@ -154,13 +155,14 @@
 
 // Suggestion list
 .components-form-token-field__suggestions-list {
-	background: $white;
+	flex: 1 0 100%;
+	min-width: 100%;
 	max-height: 9em;
 	overflow-y: scroll;
-	transition: all .15s ease-in-out;
+	transition: all 0.15s ease-in-out;
 	list-style: none;
-	border-top: 1px solid $dark-gray-300;
-	margin: 0;
+	border-top: $border-width solid $dark-gray-300;
+	margin: $grid-size-small (-$grid-size-small) (-$grid-size-small);
 	padding-top: 3px;
 }
 

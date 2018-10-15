@@ -32,7 +32,7 @@ function fireKeyDown( container, keyCode, shiftKey ) {
 		},
 		preventDefault: () => {},
 		nativeEvent: {
-			stopImmediatePropagation: () => { },
+			stopImmediatePropagation: () => {},
 		},
 		keyCode,
 		shiftKey,
@@ -45,6 +45,11 @@ describe( 'NavigableMenu', () => {
 	it( 'vertical: should navigate by up and down', () => {
 		let currentIndex = 0;
 		const wrapper = mount( (
+			/*
+				Disabled because of our rule restricting literal IDs, preferring
+				`withInstanceId`. In this case, it's fine to use literal IDs.
+			*/
+			/* eslint-disable no-restricted-syntax */
 			<NavigableMenu orientation="vertical" onNavigate={ ( index ) => currentIndex = index }>
 				<span tabIndex="-1" id="btn1">One</span>
 				<span tabIndex="-1" id="btn2">Two</span>
@@ -53,6 +58,7 @@ describe( 'NavigableMenu', () => {
 				</span>
 				<span tabIndex="-1" id="btn3">Three</span>
 			</NavigableMenu>
+			/* eslint-enable no-restricted-syntax */
 		) );
 
 		simulateVisible( wrapper, '*' );
@@ -83,11 +89,17 @@ describe( 'NavigableMenu', () => {
 	it( 'vertical: should navigate by up and down, and stop at edges', () => {
 		let currentIndex = 0;
 		const wrapper = mount( (
+			/*
+				Disabled because of our rule restricting literal IDs, preferring
+				`withInstanceId`. In this case, it's fine to use literal IDs.
+			*/
+			/* eslint-disable no-restricted-syntax */
 			<NavigableMenu cycle={ false } orientation="vertical" onNavigate={ ( index ) => currentIndex = index }>
 				<span tabIndex="-1" id="btn1">One</span>
 				<span tabIndex="-1" id="btn2">Two</span>
 				<span tabIndex="-1" id="btn3">Three</span>
 			</NavigableMenu>
+			/* eslint-enable no-restricted-syntax */
 		) );
 
 		simulateVisible( wrapper, '*' );
@@ -116,6 +128,11 @@ describe( 'NavigableMenu', () => {
 	it( 'horizontal: should navigate by left and right', () => {
 		let currentIndex = 0;
 		const wrapper = mount( (
+			/*
+				Disabled because of our rule restricting literal IDs, preferring
+				`withInstanceId`. In this case, it's fine to use literal IDs.
+			*/
+			/* eslint-disable no-restricted-syntax */
 			<NavigableMenu orientation="horizontal" onNavigate={ ( index ) => currentIndex = index }>
 				<span tabIndex="-1" id="btn1">One</span>
 				<span tabIndex="-1" id="btn2">Two</span>
@@ -124,6 +141,7 @@ describe( 'NavigableMenu', () => {
 				</span>
 				<span tabIndex="-1" id="btn3">Three</span>
 			</NavigableMenu>
+			/* eslint-enable no-restricted-syntax */
 		) );
 
 		simulateVisible( wrapper, '*' );
@@ -154,11 +172,17 @@ describe( 'NavigableMenu', () => {
 	it( 'horizontal: should navigate by left and right, and stop at edges', () => {
 		let currentIndex = 0;
 		const wrapper = mount( (
+			/*
+				Disabled because of our rule restricting literal IDs, preferring
+				`withInstanceId`. In this case, it's fine to use literal IDs.
+			*/
+			/* eslint-disable no-restricted-syntax */
 			<NavigableMenu cycle={ false } orientation="horizontal" onNavigate={ ( index ) => currentIndex = index }>
 				<span tabIndex="-1" id="btn1">One</span>
 				<span tabIndex="-1" id="btn2">Two</span>
 				<span tabIndex="-1" id="btn3">Three</span>
 			</NavigableMenu>
+			/* eslint-enable no-restricted-syntax */
 		) );
 
 		simulateVisible( wrapper, '*' );
@@ -187,11 +211,17 @@ describe( 'NavigableMenu', () => {
 	it( 'both: should navigate by up/down and left/right', () => {
 		let currentIndex = 0;
 		const wrapper = mount( (
+			/*
+				Disabled because of our rule restricting literal IDs, preferring
+				`withInstanceId`. In this case, it's fine to use literal IDs.
+			*/
+			/* eslint-disable no-restricted-syntax */
 			<NavigableMenu orientation="both" onNavigate={ ( index ) => currentIndex = index }>
 				<button id="btn1">One</button>
 				<button id="btn2">Two</button>
 				<button id="btn3">Three</button>
 			</NavigableMenu>
+			/* eslint-enable no-restricted-syntax */
 		) );
 
 		simulateVisible( wrapper, '*' );
@@ -226,6 +256,11 @@ describe( 'TabbableContainer', () => {
 	it( 'should navigate by keypresses', () => {
 		let currentIndex = 0;
 		const wrapper = mount( (
+			/*
+				Disabled because of our rule restricting literal IDs, preferring
+				`withInstanceId`. In this case, it's fine to use literal IDs.
+			*/
+			/* eslint-disable no-restricted-syntax */
 			<TabbableContainer className="wrapper" onNavigate={ ( index ) => currentIndex = index }>
 				<div className="section" id="section1" tabIndex="0">Section One</div>
 				<div className="section" id="section2" tabIndex="0">Section Two</div>
@@ -234,6 +269,7 @@ describe( 'TabbableContainer', () => {
 				</div>
 				<div className="section" id="section3" tabIndex="0">Section Three</div>
 			</TabbableContainer>
+			/* eslint-enable no-restricted-syntax */
 		) );
 
 		simulateVisible( wrapper, '*' );
@@ -262,11 +298,17 @@ describe( 'TabbableContainer', () => {
 	it( 'should navigate by keypresses and stop at edges', () => {
 		let currentIndex = 0;
 		const wrapper = mount( (
+			/*
+				Disabled because of our rule restricting literal IDs, preferring
+				`withInstanceId`. In this case, it's fine to use literal IDs.
+			*/
+			/* eslint-disable no-restricted-syntax */
 			<TabbableContainer cycle={ false } className="wrapper" onNavigate={ ( index ) => currentIndex = index }>
 				<div className="section" id="section1" tabIndex="0">Section One</div>
 				<div className="section" id="section2" tabIndex="0">Section Two</div>
 				<div className="section" id="section3" tabIndex="0">Section Three</div>
 			</TabbableContainer>
+			/* eslint-enable no-restricted-syntax */
 		) );
 
 		simulateVisible( wrapper, '*' );

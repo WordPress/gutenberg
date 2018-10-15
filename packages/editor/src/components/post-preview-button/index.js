@@ -28,21 +28,21 @@ export class PostPreviewButton extends Component {
 		// unintentional forceful redirects.
 		if ( previewLink && ! prevProps.previewLink ) {
 			this.setPreviewWindowLink( previewLink );
+
+			// Once popup redirect is evaluated, even if already closed, delete
+			// reference to avoid later assignment of location in post update.
+			delete this.previewWindow;
 		}
 	}
 
 	/**
 	 * Sets the preview window's location to the given URL, if a preview window
-	 * exists and is not already at that location.
+	 * exists and is not closed.
 	 *
 	 * @param {string} url URL to assign as preview window location.
 	 */
 	setPreviewWindowLink( url ) {
 		const { previewWindow } = this;
-
-		// Once popup redirect is evaluated, even if already closed, delete
-		// reference to avoid later assignment of location in a post update.
-		delete this.previewWindow;
 
 		if ( previewWindow && ! previewWindow.closed ) {
 			previewWindow.location = url;
@@ -55,37 +55,34 @@ export class PostPreviewButton extends Component {
 	}
 
 	/**
-	 * Handles a click event to open a popup window and prevent default click
-	 * behavior if the post is either autosaveable or has a previously assigned
-	 * preview link to be shown in the popup window target. Triggers autosave
-	 * if post is autosaveable.
-	 *
-	 * @param {MouseEvent} event Click event from preview button click.
+	 * Opens a popup window, navigating user to a preview of the current post.
+	 * Triggers autosave if post is autosaveable.
 	 */
-	openPreviewWindow( event ) {
+	openPreviewWindow() {
 		const { isAutosaveable, previewLink, currentPostLink } = this.props;
+
+		// Open a popup, BUT: Set it to a blank page until save completes. This
+		// is necessary because popups can only be opened in response to user
+		// interaction (click), but we must still wait for the post to save.
+		if ( ! this.previewWindow || this.previewWindow.closed ) {
+			this.previewWindow = window.open( '', this.getWindowTarget() );
+		}
+
+		// Ask the browser to bring the preview tab to the front
+		// This can work or not depending on the browser's user preferences
+		// https://html.spec.whatwg.org/multipage/interaction.html#dom-window-focus
+		this.previewWindow.focus();
 
 		// If there are no changes to autosave, we cannot perform the save, but
 		// if there is an existing preview link (e.g. previous published post
 		// autosave), it should be reused as the popup destination.
 		if ( ! isAutosaveable && ! previewLink && currentPostLink ) {
-			this.previewWindow = window.open(
-				currentPostLink,
-				this.getWindowTarget()
-			);
+			this.setPreviewWindowLink( currentPostLink );
 			return;
 		}
 
-		// Open a popup, BUT: Set it to a blank page until save completes. This
-		// is necessary because popups can only be opened in response to user
-		// interaction (click), but we must still wait for the post to save.
-		event.preventDefault();
-		this.previewWindow = window.open(
-			isAutosaveable ? 'about:blank' : previewLink,
-			this.getWindowTarget()
-		);
-
 		if ( ! isAutosaveable ) {
+			this.setPreviewWindowLink( previewLink );
 			return;
 		}
 
@@ -130,7 +127,7 @@ export class PostPreviewButton extends Component {
 			>
 				{ _x( 'Preview', 'imperative verb' ) }
 				<DotTip id="core/editor.preview">
-					{ __( 'Click ‘Preview’ to load a preview of this page, so you can make sure you’re happy with your blocks.' ) }
+					{ __( 'Click “Preview” to load a preview of this page, so you can make sure you’re happy with your blocks.' ) }
 				</DotTip>
 			</Button>
 		);

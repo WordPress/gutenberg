@@ -1,0 +1,18 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/video",
+        "isValid": true,
+        "attributes": {
+            "autoplay": false,
+            "caption": "",
+            "controls": true,
+            "loop": false,
+            "muted": false,
+            "preload": "metadata",
+            "src": "https://awesome-fake.video/file.mp4"
+        },
+        "innerBlocks": [],
+        "originalContent": "<figure class=\"wp-block-video\"><video controls src=\"https://awesome-fake.video/file.mp4\"></video></figure>"
+    }
+]

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/custom-templated-path-webpack-plugin",
-	"version": "1.1.2",
+	"version": "1.1.5",
 	"description": "Webpack plugin for creating custom path template tags.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -24,7 +24,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"@babel/runtime": "^7.0.0-beta.52",
+		"@babel/runtime": "^7.0.0",
 		"escape-string-regexp": "^1.0.5"
 	},
 	"devDependencies": {

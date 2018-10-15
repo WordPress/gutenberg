@@ -5,6 +5,8 @@ import momentLib from 'moment';
 import 'moment-timezone';
 import 'moment-timezone/moment-timezone-utils';
 
+// Changes made here will likely need to be made in `lib/client-assets.php` as
+// well because it uses the `setSettings()` function to change these settings.
 let settings = {
 	l10n: {
 		locale: 'en_US',
@@ -19,6 +21,7 @@ let settings = {
 		time: 'g: i a',
 		date: 'F j, Y',
 		datetime: 'F j, Y g: i a',
+		datetimeAbbreviated: 'M j, Y g: i a',
 	},
 	timezone: { offset: '0', string: '' },
 };

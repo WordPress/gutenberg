@@ -1,24 +1,13 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
-import { clearLocalStorage, newPost, newDesktopBrowserPage, setViewport } from '../support/utils';
+import { newPost, setViewport } from '../support/utils';
 
 const SIDEBAR_SELECTOR = '.edit-post-sidebar';
 const ACTIVE_SIDEBAR_TAB_SELECTOR = '.edit-post-sidebar__panel-tab.is-active';
 const ACTIVE_SIDEBAR_BUTTON_TEXT = 'Document';
 
 describe( 'Publishing', () => {
-	beforeAll( async () => {
-		await newDesktopBrowserPage();
-	} );
-
-	afterEach( async () => {
-		await clearLocalStorage();
-		await page.goto( 'about:blank' );
-		await setViewport( 'large' );
-	} );
-
 	it( 'Should have sidebar visible at the start with document sidebar active on desktop', async () => {
 		await setViewport( 'large' );
 		await newPost();

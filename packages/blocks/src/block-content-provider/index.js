@@ -1,12 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { Component, RawHTML } from '@wordpress/element';
+import { createHigherOrderComponent } from '@wordpress/compose';
+import { createContext, RawHTML } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { serialize } from '../api';
+
+const { Consumer, Provider } = createContext( () => {} );
 
 /**
  * An internal block component used in block content serialization to inject
@@ -22,29 +25,42 @@ import { serialize } from '../api';
  * 	{ blockSaveElement }
  * </BlockContentProvider>
  * ```
+ *
+ * @return {WPElement} Element with BlockContent injected via context.
  */
-class BlockContentProvider extends Component {
-	getChildContext() {
-		const { innerBlocks } = this.props;
+const BlockContentProvider = ( { children, innerBlocks } ) => {
+	const BlockContent = () => {
+		// Value is an array of blocks, so defer to block serializer
+		const html = serialize( innerBlocks );
 
-		return {
-			BlockContent() {
-				// Value is an array of blocks, so defer to block serializer
-				const html = serialize( innerBlocks );
+		// Use special-cased raw HTML tag to avoid default escaping
+		return <RawHTML>{ html }</RawHTML>;
+	};
 
-				// Use special-cased raw HTML tag to avoid default escaping
-				return <RawHTML>{ html }</RawHTML>;
-			},
-		};
-	}
-
-	render() {
-		return this.props.children;
-	}
-}
-
-BlockContentProvider.childContextTypes = {
-	BlockContent: () => {},
+	return (
+		<Provider value={ BlockContent }>
+			{ children }
+		</Provider>
+	);
 };
+
+/**
+ * A Higher Order Component used to inject BlockContent using context to the
+ * wrapped component.
+ *
+ * @return {Component} Enhanced component with injected BlockContent as prop.
+ */
+export const withBlockContentContext = createHigherOrderComponent( ( OriginalComponent ) => {
+	return ( props ) => (
+		<Consumer>
+			{ ( context ) => (
+				<OriginalComponent
+					{ ...props }
+					BlockContent={ context }
+				/>
+			) }
+		</Consumer>
+	);
+}, 'withBlockContentContext' );
 
 export default BlockContentProvider;

@@ -1,4 +1,5 @@
 .components-placeholder {
+	margin: 0;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -35,9 +36,9 @@
 	flex-direction: row;
 	justify-content: center;
 	width: 100%;
-	max-width: 280px;
+	max-width: 400px;
 	flex-wrap: wrap;
-	z-index: z-index( '.components-placeholder__fieldset' );
+	z-index: z-index(".components-placeholder__fieldset");
 
 	p {
 		font-family: $default-font;

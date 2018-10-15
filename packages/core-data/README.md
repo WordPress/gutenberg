@@ -12,35 +12,28 @@ Install the module
 npm install @wordpress/core-data --save
 ```
 
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+
 ## Example
 
-Below is an example of a component which simply renders a list of categories:
+Below is an example of a component which simply renders a list of authors:
 
 ```jsx
 const { withSelect } = wp.data;
 
-function MyCategoriesList( { categories, isRequesting } ) {
-	if ( isRequesting ) {
-		return 'Loading…';
-	}
-
+function MyAuthorsListBase( { authors } ) {
 	return (
 		<ul>
-			{ categories.map( ( category ) => (
-				<li key={ category.id }>{ category.name }</li>
+			{ authors.map( ( author ) => (
+				<li key={ author.id }>{ author.name }</li>
 			) ) }
 		</ul>
 	);
 }
 
-MyCategoriesList = withSelect( ( select ) => {
-	const { getCategories, isRequestingCategories } = select( 'core' );
-
-	return {
-		categories: getCategories(),
-		isRequesting: isRequestingCategories(),
-	};
-} );
+const MyAuthorsList = withSelect( ( select ) => ( {
+	authors: select( 'core' ).getAuthors(),
+} ) )( MyAuthorsListBase );
 ```
 
 ## Actions

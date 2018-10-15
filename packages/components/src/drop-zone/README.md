@@ -6,16 +6,22 @@
 
 ```jsx
 import { DropZoneProvider, DropZone } from '@wordpress/components';
+import { withState } from '@wordpress/compose';
 
-function MyComponent() {
-	return (
-		<DropZoneProvider>
-			<div>
-				<DropZone onDrop={ () => console.log( 'do something' ) } />
-			</div>
-		</DropZoneProvider>
-	);
-}
+const MyDropZone = withState( {
+	hasDropped: false,
+} )( ( { hasDropped, setState } ) => (
+	<DropZoneProvider>
+		<div>
+			{ hasDropped ? 'Dropped!' : 'Drop something here' }
+			<DropZone 
+				onFilesDrop={ () => setState( { hasDropped: true } ) }
+				onHTMLDrop={ () => setState( { hasDropped: true } )  }
+				onDrop={ () => setState( { hasDropped: true } ) } 
+			/>
+		</div>
+	</DropZoneProvider>
+) );
 ```
 
 ## Props

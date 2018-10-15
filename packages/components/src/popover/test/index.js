@@ -75,7 +75,7 @@ describe( 'Popover', () => {
 				);
 				expect( document.activeElement ).toBe( content );
 				done();
-			} );
+			}, 1 );
 
 			jest.runAllTimers();
 		} );

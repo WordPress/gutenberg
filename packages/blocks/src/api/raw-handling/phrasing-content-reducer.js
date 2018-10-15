@@ -6,7 +6,7 @@ import { unwrap, replaceTag } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
-import { isPhrasingContent } from './utils';
+import { isPhrasingContent } from './phrasing-content';
 
 function isBlockContent( node, schema = {} ) {
 	return schema.hasOwnProperty( node.nodeName.toLowerCase() );

@@ -5,6 +5,7 @@ exports[`DotTip should render correctly 1`] = `
   aria-label="Gutenberg tips"
   className="nux-dot-tip"
   focusOnMount="container"
+  getAnchorRect={[Function]}
   noArrow={true}
   onClick={[Function]}
   position="middle right"

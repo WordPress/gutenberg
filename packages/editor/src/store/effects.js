@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, last } from 'lodash';
+import { compact, last } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,8 +10,6 @@ import {
 	parse,
 	getBlockType,
 	switchToBlockType,
-	createBlock,
-	getDefaultBlockForPostFormat,
 	doBlocksMatchTemplate,
 	synchronizeBlocksWithTemplate,
 } from '@wordpress/blocks';
@@ -25,23 +23,21 @@ import {
 	setupEditorState,
 	replaceBlocks,
 	createWarningNotice,
-	insertBlock,
 	selectBlock,
-	removeBlock,
 	resetBlocks,
 	setTemplateValidity,
+	insertDefaultBlock,
 } from './actions';
 import {
 	getBlock,
-	getBlockCount,
 	getBlockRootClientId,
 	getBlocks,
+	getBlockCount,
 	getPreviousBlockClientId,
-	getProvisionalBlockClientId,
 	getSelectedBlock,
-	isBlockSelected,
 	getTemplate,
 	getTemplateLock,
+	isValidTemplate,
 } from './selectors';
 import {
 	fetchReusableBlocks,
@@ -62,19 +58,86 @@ import {
 } from './effects/posts';
 
 /**
- * Effect handler returning an action to remove the provisional block, if one
- * is set.
+ * Block validity is a function of blocks state (at the point of a
+ * reset) and the template setting. As a compromise to its placement
+ * across distinct parts of state, it is implemented here as a side-
+ * effect of the block reset action.
  *
- * @param {Object} action Action object.
- * @param {Object} store  Data store instance.
+ * @param {Object} action RESET_BLOCKS action.
+ * @param {Object} store  Store instance.
  *
- * @return {?Object} Remove action, if provisional block is set.
+ * @return {?Object} New validity set action if validity has changed.
  */
-export function removeProvisionalBlock( action, store ) {
+export function validateBlocksToTemplate( action, store ) {
 	const state = store.getState();
-	const provisionalBlockClientId = getProvisionalBlockClientId( state );
-	if ( provisionalBlockClientId && ! isBlockSelected( state, provisionalBlockClientId ) ) {
-		return removeBlock( provisionalBlockClientId, false );
+	const template = getTemplate( state );
+	const templateLock = getTemplateLock( state );
+
+	// Unlocked templates are considered always valid because they act
+	// as default values only.
+	const isBlocksValidToTemplate = (
+		! template ||
+		templateLock !== 'all' ||
+		doBlocksMatchTemplate( action.blocks, template )
+	);
+
+	// Update if validity has changed.
+	if ( isBlocksValidToTemplate !== isValidTemplate( state ) ) {
+		return setTemplateValidity( isBlocksValidToTemplate );
+	}
+}
+
+/**
+ * Effect handler which will return a block select action to select the block
+ * occurring before the selected block in the previous state, unless it is the
+ * same block or the action includes a falsey `selectPrevious` option flag.
+ *
+ * @param {Object} action Action which had initiated the effect handler.
+ * @param {Object} store  Store instance.
+ *
+ * @return {?Object} Block select action to select previous, if applicable.
+ */
+export function selectPreviousBlock( action, store ) {
+	// if the action says previous block should not be selected don't do anything.
+	if ( ! action.selectPrevious ) {
+		return;
+	}
+
+	const firstRemovedBlockClientId = action.clientIds[ 0 ];
+	const state = store.getState();
+	const currentSelectedBlock = getSelectedBlock( state );
+
+	// recreate the state before the block was removed.
+	const previousState = { ...state, editor: { present: last( state.editor.past ) } };
+
+	// rootClientId of the removed block.
+	const rootClientId = getBlockRootClientId( previousState, firstRemovedBlockClientId );
+
+	// Client ID of the block that was before the removed block or the
+	// rootClientId if the removed block was first amongst its siblings.
+	const blockClientIdToSelect = getPreviousBlockClientId( previousState, firstRemovedBlockClientId ) || rootClientId;
+
+	// Dispatch select block action if the currently selected block
+	// is not already the block we want to be selected.
+	if ( blockClientIdToSelect !== currentSelectedBlock ) {
+		return selectBlock( blockClientIdToSelect, -1 );
+	}
+}
+
+/**
+ * Effect handler which will return a default block insertion action if there
+ * are no other blocks at the root of the editor. This is expected to be used
+ * in actions which may result in no blocks remaining in the editor (removal,
+ * replacement, etc).
+ *
+ * @param {Object} action Action which had initiated the effect handler.
+ * @param {Object} store  Store instance.
+ *
+ * @return {?Object} Default block insert action, if no other blocks exist.
+ */
+export function ensureDefaultBlock( action, store ) {
+	if ( ! getBlockCount( store.getState() ) ) {
+		return insertDefaultBlock();
 	}
 }
 
@@ -137,35 +200,23 @@ export default {
 			]
 		) );
 	},
-	SETUP_EDITOR( action, { getState } ) {
+	SETUP_EDITOR( action, store ) {
 		const { post, autosave } = action;
-		const state = getState();
-		const template = getTemplate( state );
-		const templateLock = getTemplateLock( state );
+		const state = store.getState();
 
 		// Parse content as blocks
-		let blocks;
-		let isValidTemplate = true;
-		if ( post.content.raw ) {
-			blocks = parse( post.content.raw );
+		let blocks = parse( post.content.raw );
 
-			// Unlocked templates are considered always valid because they act as default values only.
-			isValidTemplate = (
-				! template ||
-				templateLock !== 'all' ||
-				doBlocksMatchTemplate( blocks, template )
-			);
-		} else if ( template ) {
-			blocks = synchronizeBlocksWithTemplate( [], template );
-		} else if ( getDefaultBlockForPostFormat( post.format ) ) {
-			blocks = [ createBlock( getDefaultBlockForPostFormat( post.format ) ) ];
-		} else {
-			blocks = [];
+		// Apply a template for new posts only, if exists.
+		const isNewPost = post.status === 'auto-draft';
+		const template = getTemplate( state );
+		if ( isNewPost && template ) {
+			blocks = synchronizeBlocksWithTemplate( blocks, template );
 		}
 
 		// Include auto draft title in edits while not flagging post as dirty
 		const edits = {};
-		if ( post.status === 'auto-draft' ) {
+		if ( isNewPost ) {
 			edits.title = post.title.raw;
 		}
 
@@ -186,22 +237,29 @@ export default {
 			);
 		}
 
-		return [
-			setTemplateValidity( isValidTemplate ),
-			setupEditorState( post, blocks, edits ),
-			...( autosaveAction ? [ autosaveAction ] : [] ),
-		];
+		const setupAction = setupEditorState( post, blocks, edits );
+
+		return compact( [
+			setupAction,
+			autosaveAction,
+
+			// TODO: This is temporary, necessary only so long as editor setup
+			// is a separate action from block resetting.
+			//
+			// See: https://github.com/WordPress/gutenberg/pull/9403
+			validateBlocksToTemplate( setupAction, store ),
+		] );
 	},
+	RESET_BLOCKS: [
+		validateBlocksToTemplate,
+	],
 	SYNCHRONIZE_TEMPLATE( action, { getState } ) {
 		const state = getState();
 		const blocks = getBlocks( state );
 		const template = getTemplate( state );
 		const updatedBlockList = synchronizeBlocksWithTemplate( blocks, template );
 
-		return [
-			resetBlocks( updatedBlockList ),
-			setTemplateValidity( true ),
-		];
+		return resetBlocks( updatedBlockList );
 	},
 	CHECK_TEMPLATE_VALIDITY( action, { getState } ) {
 		const state = getState();
@@ -232,48 +290,11 @@ export default {
 		const message = spokenMessage || content;
 		speak( message, 'assertive' );
 	},
-
-	EDIT_POST( action, { getState } ) {
-		const format = get( action, [ 'edits', 'format' ] );
-		if ( ! format ) {
-			return;
-		}
-		const blockName = getDefaultBlockForPostFormat( format );
-		if ( blockName && getBlockCount( getState() ) === 0 ) {
-			return insertBlock( createBlock( blockName ) );
-		}
-	},
-
-	CLEAR_SELECTED_BLOCK: removeProvisionalBlock,
-
-	SELECT_BLOCK: removeProvisionalBlock,
-
-	MULTI_SELECT: removeProvisionalBlock,
-
-	REMOVE_BLOCKS( action, { getState, dispatch } ) {
-		// if the action says previous block should not be selected don't do anything.
-		if ( ! action.selectPrevious ) {
-			return;
-		}
-
-		const firstRemovedBlockClientId = action.clientIds[ 0 ];
-		const state = getState();
-		const currentSelectedBlock = getSelectedBlock( state );
-
-		// recreate the state before the block was removed.
-		const previousState = { ...state, editor: { present: last( state.editor.past ) } };
-
-		// rootClientId of the removed block.
-		const rootClientId = getBlockRootClientId( previousState, firstRemovedBlockClientId );
-
-		// Client ID of the block that was before the removed block or the
-		// rootClientId if the removed block was first amongst its siblings.
-		const blockClientIdToSelect = getPreviousBlockClientId( previousState, firstRemovedBlockClientId ) || rootClientId;
-
-		// Dispatch select block action if the currently selected block
-		// is not already the block we want to be selected.
-		if ( blockClientIdToSelect !== currentSelectedBlock ) {
-			dispatch( selectBlock( blockClientIdToSelect ) );
-		}
-	},
+	REMOVE_BLOCKS: [
+		selectPreviousBlock,
+		ensureDefaultBlock,
+	],
+	REPLACE_BLOCKS: [
+		ensureDefaultBlock,
+	],
 };

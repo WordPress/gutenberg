@@ -2,8 +2,6 @@
  * External dependencies
  */
 import { flatMap, filter, compact } from 'lodash';
-// Also polyfills Element#matches.
-import 'element-closest';
 
 /**
  * Internal dependencies
@@ -15,6 +13,7 @@ import normaliseBlocks from './normalise-blocks';
 import specialCommentConverter from './special-comment-converter';
 import isInlineContent from './is-inline-content';
 import phrasingContentReducer from './phrasing-content-reducer';
+import headRemover from './head-remover';
 import msListConverter from './ms-list-converter';
 import listReducer from './list-reducer';
 import imageCorrector from './image-corrector';
@@ -23,18 +22,18 @@ import figureContentReducer from './figure-content-reducer';
 import shortcodeConverter from './shortcode-converter';
 import markdownConverter from './markdown-converter';
 import iframeRemover from './iframe-remover';
+import { getPhrasingContentSchema } from './phrasing-content';
 import {
 	deepFilterHTML,
 	isPlain,
 	removeInvalidHTML,
-	getPhrasingContentSchema,
 	getBlockContentSchema,
 } from './utils';
 
 /**
  * Browser dependencies
  */
-const { log, warn } = window.console;
+const { console } = window;
 
 export { getPhrasingContentSchema };
 
@@ -50,7 +49,7 @@ function filterInlineHTML( HTML ) {
 	HTML = removeInvalidHTML( HTML, getPhrasingContentSchema(), { inline: true } );
 
 	// Allows us to ask for this information when we get a report.
-	log( 'Processed inline HTML:\n\n', HTML );
+	console.log( 'Processed inline HTML:\n\n', HTML );
 
 	return HTML;
 }
@@ -149,6 +148,7 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 
 		const filters = [
 			msListConverter,
+			headRemover,
 			listReducer,
 			imageCorrector,
 			phrasingContentReducer,
@@ -173,7 +173,7 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 		piece = normaliseBlocks( piece );
 
 		// Allows us to ask for this information when we get a report.
-		log( 'Processed HTML piece:\n\n', piece );
+		console.log( 'Processed HTML piece:\n\n', piece );
 
 		const doc = document.implementation.createHTMLDocument( '' );
 
@@ -183,7 +183,7 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 			const rawTransformation = findTransform( rawTransformations, ( { isMatch } ) => isMatch( node ) );
 
 			if ( ! rawTransformation ) {
-				warn(
+				console.warn(
 					'A block registered a raw transformation schema for `' + node.nodeName + '` but did not match it. ' +
 					'Make sure there is a `selector` or `isMatch` property that can match the schema.\n' +
 					'Sanitized HTML: `' + node.outerHTML + '`'

@@ -13,7 +13,7 @@ import { cloneElement } from '@wordpress/element';
  * Internal dependencies
  */
 import Button from '../button';
-import Shortcut from './shortcut';
+import Shortcut from '../shortcut';
 import IconButton from '../icon-button';
 
 /**
@@ -21,7 +21,7 @@ import IconButton from '../icon-button';
  *
  * @return {WPElement} More menu item.
  */
-function MenuItem( { children, className, icon, onClick, shortcut, isSelected = false } ) {
+function MenuItem( { children, className, icon, shortcut, isSelected, role = 'menuitem', ...props } ) {
 	className = classnames( 'components-menu-item__button', className, {
 		'has-icon': icon,
 	} );
@@ -39,11 +39,12 @@ function MenuItem( { children, className, icon, onClick, shortcut, isSelected = 
 			<IconButton
 				className={ className }
 				icon={ icon }
-				onClick={ onClick }
-				aria-pressed={ isSelected }
+				aria-checked={ isSelected }
+				role={ role }
+				{ ...props }
 			>
 				{ children }
-				<Shortcut shortcut={ shortcut } />
+				<Shortcut className="components-menu-item__shortcut" shortcut={ shortcut } />
 			</IconButton>
 		);
 	}
@@ -51,11 +52,12 @@ function MenuItem( { children, className, icon, onClick, shortcut, isSelected = 
 	return (
 		<Button
 			className={ className }
-			onClick={ onClick }
-			aria-pressed={ isSelected }
+			aria-checked={ isSelected }
+			role={ role }
+			{ ...props }
 		>
 			{ children }
-			<Shortcut shortcut={ shortcut } />
+			<Shortcut className="components-menu-item__shortcut" shortcut={ shortcut } />
 		</Button>
 	);
 }

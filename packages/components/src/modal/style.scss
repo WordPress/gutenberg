@@ -5,57 +5,73 @@
 	right: 0;
 	bottom: 0;
 	left: 0;
-	background-color: rgba( $white, .4 );
-	z-index: z-index( '.components-modal__screen-overlay' );
+	background-color: rgba($white, 0.4);
+	z-index: z-index(".components-modal__screen-overlay");
+
+	// This animates the appearance of the white background.
+	@include fade-in();
 }
 
 // The modal window element.
 .components-modal__frame {
-	// In small screens the content needs to be full width.
-	position: fixed;
+	// On small screens the content needs to be full width because of limited
+	// space.
+	position: absolute;
 	top: 0;
 	right: 0;
 	bottom: 0;
 	left: 0;
+	box-sizing: border-box;
 	margin: 0;
+	border: $border-width solid $light-gray-500;
+	background: $white;
+	box-shadow: $shadow-modal;
+	overflow: auto;
 
-	// Show slightly bigger on small screens.
+	// Show a centered modal on bigger screens.
 	@include break-small() {
-		position: absolute;
+		top: 50%;
 		right: auto;
 		bottom: auto;
-		max-width: calc( 100% - #{ $panel-padding } - #{ $panel-padding } );
-		margin-right: -50%;
-		transform: translate( -50%, 0 );
-		top: $panel-padding;
 		left: 50%;
-		height: 90%;
-	}
+		min-width: $modal-min-width;
+		max-width: calc(100% - #{ $grid-size-large } - #{ $grid-size-large });
+		max-height: calc(100% - #{ $header-height } - #{ $header-height });
+		transform: translate(-50%, -50%);
 
-	// Show pretty big on desktop breakpoints.
-	@include break-medium () {
-		max-width: calc( #{ $break-medium } - #{ $panel-padding } - #{ $panel-padding } );
-		transform: translate( -50%, -30% );
-		top: 30%;
-		left: 50%;
-		height: 70%;
+		// Animate the modal frame/contents appearing on the page.
+		@include modal_appear();
 	}
-
-	border: 1px solid $light-gray-500;
-	background-color: $white;
-	box-shadow: $shadow-modal;
-	outline: none;
 }
 
+// Fix header to the top so it is always there to provide context to the modal
+// if the content needs to be scrolled (for example, on the keyboard shortcuts
+// modal screen).
 .components-modal__header {
 	box-sizing: border-box;
-	height: $header-height;
-	border-bottom: 1px solid $light-gray-500;
-	padding: $item-spacing $item-spacing $item-spacing $panel-padding;
+	border-bottom: $border-width solid $light-gray-500;
+	padding: 0 $grid-size-large;
 	display: flex;
 	flex-direction: row;
-	align-items: stretch;
 	justify-content: space-between;
+	background: $white;
+	align-items: center;
+	box-sizing: border-box;
+	height: $header-height;
+	position: sticky;
+	top: 0;
+	z-index: z-index(".components-modal__header");
+	margin: 0 -#{ $grid-size-large } $grid-size-large;
+
+	.components-modal__header-heading {
+		font-size: 1em;
+		font-weight: normal;
+	}
+
+	h1 {
+		line-height: 1;
+		margin: 0;
+	}
 }
 
 .components-modal__header-heading-container {
@@ -66,24 +82,19 @@
 	justify-content: left;
 }
 
-.components-modal__header-heading {
-	font-size: 1em;
-	font-weight: normal;
-}
-
 .components-modal__header-icon-container {
 	display: inline-block;
 
 	svg {
 		max-width: $icon-button-size;
 		max-height: $icon-button-size;
-		padding: 8px;
+		padding: $grid-size;
 	}
 }
 
+// Modal contents.
 .components-modal__content {
-	// The height of the content is the height of it's parent, minus the header. after that, the offset was 3px.
-	height: calc( 100% - #{ $header-height } - #{ $admin-bar-height } );
-	overflow: auto;
-	padding: $panel-padding;
+	box-sizing: border-box;
+	height: 100%;
+	padding: 0 $grid-size-large $grid-size-large;
 }

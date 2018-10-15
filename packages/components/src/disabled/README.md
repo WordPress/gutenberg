@@ -1,5 +1,4 @@
-Disabled
-========
+# Disabled
 
 Disabled is a component which disables descendant tabbable elements and prevents pointer interaction.
 
@@ -8,28 +7,30 @@ Disabled is a component which disables descendant tabbable elements and prevents
 Assuming you have a form component, you can disable all form inputs by wrapping the form with `<Disabled>`.
 
 ```jsx
-const DisableToggleForm = withState( {
+import { Button, Disabled, TextControl } from '@wordpress/components';
+import { withState } from '@wordpress/compose';
+
+const MyDisabled = withState( {
 	isDisabled: true,
-} )( ( { isDisabled, setState } ) => {
-	let form = <form><input /></form>;
-
+} )( ( { isDisabled, setState } ) => { 
+	let input = <TextControl label="Input" onChange={ () => {} } />;
 	if ( isDisabled ) {
-		form = <Disabled>{ form }</Disabled>;
+		input = <Disabled>{ input }</Disabled>;
 	}
-
-	const toggleDisabled = setState( ( state ) => ( {
-		isDisabled: ! state.isDisabled,
-	} ) );
-
+	
+	const toggleDisabled = () => {
+		setState( ( state ) => ( { isDisabled: ! state.isDisabled } ) );
+	};
+	
 	return (
 		<div>
-			{ form }
-			<button onClick={ toggleDisabled }>
+			{ input }
+			<Button isPrimary onClick={ toggleDisabled }>
 				Toggle Disabled
-			</button>
+			</Button>
 		</div>
 	);
-} )
+} );
 ```
 
 A component can detect if it has been wrapped in a `<Disabled>` by accessing its [context](https://reactjs.org/docs/context.html) using `Disabled.Consumer`.

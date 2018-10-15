@@ -1,0 +1,77 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PluginPrePublishPanel renders fill properly 1`] = `
+<PanelBody
+  className="my-plugin-pre-publish-panel"
+  initialOpen={true}
+  key="1---0/.0"
+  title="My panel title"
+>
+  <div
+    className="components-panel__body my-plugin-pre-publish-panel is-opened"
+  >
+    <h2
+      className="components-panel__body-title"
+    >
+      <Button
+        aria-expanded={true}
+        className="components-panel__body-toggle"
+        onClick={[Function]}
+      >
+        <button
+          aria-expanded={true}
+          className="components-button components-panel__body-toggle"
+          onClick={[Function]}
+          type="button"
+        >
+          <SVG
+            className="components-panel__arrow"
+            height="24px"
+            viewBox="0 0 24 24"
+            width="24px"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <svg
+              aria-hidden="true"
+              className="components-panel__arrow"
+              focusable="false"
+              height="24px"
+              role="img"
+              viewBox="0 0 24 24"
+              width="24px"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <G>
+                <g>
+                  <Path
+                    d="M0,0h24v24H0V0z"
+                    fill="none"
+                  >
+                    <path
+                      d="M0,0h24v24H0V0z"
+                      fill="none"
+                    />
+                  </Path>
+                </g>
+              </G>
+              <G>
+                <g>
+                  <Path
+                    d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
+                  >
+                    <path
+                      d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
+                    />
+                  </Path>
+                </g>
+              </G>
+            </svg>
+          </SVG>
+          My panel title
+        </button>
+      </Button>
+    </h2>
+    My panel content
+  </div>
+</PanelBody>
+`;

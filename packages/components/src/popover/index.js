@@ -8,7 +8,6 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
-import deprecated from '@wordpress/deprecated';
 import { focus } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
 
@@ -37,6 +36,7 @@ class Popover extends Component {
 		super( ...arguments );
 
 		this.focus = this.focus.bind( this );
+		this.refresh = this.refresh.bind( this );
 		this.getAnchorRect = this.getAnchorRect.bind( this );
 		this.updatePopoverSize = this.updatePopoverSize.bind( this );
 		this.computePopoverPosition = this.computePopoverPosition.bind( this );
@@ -61,7 +61,16 @@ class Popover extends Component {
 	componentDidMount() {
 		this.toggleWindowEvents( true );
 		this.refresh();
-		this.focus();
+
+		/*
+		 * Without the setTimeout, the dom node is not being focused. Related:
+		 * https://stackoverflow.com/questions/35522220/react-ref-with-focus-doesnt-work-without-settimeout-my-example
+		 *
+		 * TODO: Treat the cause, not the symptom.
+		 */
+		this.focusTimeout = setTimeout( () => {
+			this.focus();
+		}, 0 );
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -72,6 +81,8 @@ class Popover extends Component {
 
 	componentWillUnmount() {
 		this.toggleWindowEvents( false );
+
+		clearTimeout( this.focusTimeout );
 	}
 
 	toggleWindowEvents( isListening ) {
@@ -89,6 +100,13 @@ class Popover extends Component {
 		this.rafHandle = window.requestAnimationFrame( () => this.computePopoverPosition() );
 	}
 
+	/**
+	 * Calling `refresh()` will force the Popover to recalculate its size and
+	 * position. This is useful when a DOM change causes the anchor node to change
+	 * position.
+	 *
+	 * @return {void}
+	 */
 	refresh() {
 		const popoverSize = this.updatePopoverSize();
 		this.computePopoverPosition( popoverSize );
@@ -97,29 +115,20 @@ class Popover extends Component {
 	focus() {
 		const { focusOnMount } = this.props;
 
-		if ( focusOnMount === true ) {
-			deprecated( 'focusOnMount={ true }', {
-				version: '3.4',
-				alternative: 'focusOnMount="firstElement"',
-				plugin: 'Gutenberg',
-			} );
-		}
-
 		if ( ! focusOnMount || ! this.contentNode.current ) {
 			return;
 		}
 
-		// Without the setTimeout, the dom node is not being focused
-		// Related https://stackoverflow.com/questions/35522220/react-ref-with-focus-doesnt-work-without-settimeout-my-example
-		const focusNode = ( domNode ) => setTimeout( () => domNode.focus() );
-
-		// Boolean values for focusOnMount deprecated in 3.2–remove
-		// `focusOnMount === true` check in 3.4.
-		if ( focusOnMount === 'firstElement' || focusOnMount === true ) {
+		if ( focusOnMount === 'firstElement' ) {
 			// Find first tabbable node within content and shift focus, falling
 			// back to the popover panel itself.
 			const firstTabbable = focus.tabbable.find( this.contentNode.current )[ 0 ];
-			focusNode( firstTabbable ? firstTabbable : this.contentNode.current );
+
+			if ( firstTabbable ) {
+				firstTabbable.focus();
+			} else {
+				this.contentNode.current.focus();
+			}
 
 			return;
 		}
@@ -127,16 +136,11 @@ class Popover extends Component {
 		if ( focusOnMount === 'container' ) {
 			// Focus the popover panel itself so items in the popover are easily
 			// accessed via keyboard navigation.
-			focusNode( this.contentNode.current );
-
-			return;
+			this.contentNode.current.focus();
 		}
-
-		window.console.warn( `<Popover> component: focusOnMount argument "${ focusOnMount }" not recognized.` );
 	}
 
-	getAnchorRect() {
-		const anchor = this.anchorNode.current;
+	getAnchorRect( anchor ) {
 		if ( ! anchor || ! anchor.parentNode ) {
 			return;
 		}
@@ -177,7 +181,10 @@ class Popover extends Component {
 	computePopoverPosition( popoverSize ) {
 		const { getAnchorRect = this.getAnchorRect, position = 'top', expandOnMobile } = this.props;
 		const newPopoverPosition = computePopoverPosition(
-			getAnchorRect(), popoverSize || this.state.popoverSize, position, expandOnMobile
+			getAnchorRect( this.anchorNode.current ),
+			popoverSize || this.state.popoverSize,
+			position,
+			expandOnMobile
 		);
 
 		if (
@@ -245,7 +252,7 @@ class Popover extends Component {
 			'is-' + xAxis,
 			{
 				'is-mobile': isMobile,
-				'no-arrow': noArrow || ( xAxis === 'center' && yAxis === 'middle' ),
+				'is-without-arrow': noArrow || ( xAxis === 'center' && yAxis === 'middle' ),
 			}
 		);
 

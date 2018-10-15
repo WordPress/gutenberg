@@ -160,9 +160,12 @@ class WP_Block_Type {
 	 * @param array|string $args Array or string of arguments for registering a block type.
 	 */
 	public function set_props( $args ) {
-		$args = wp_parse_args( $args, array(
-			'render_callback' => null,
-		) );
+		$args = wp_parse_args(
+			$args,
+			array(
+				'render_callback' => null,
+			)
+		);
 
 		$args['name'] = $this->name;
 
@@ -178,11 +181,14 @@ class WP_Block_Type {
 	 */
 	public function get_attributes() {
 		return is_array( $this->attributes ) ?
-			array_merge( $this->attributes, array(
-				'layout' => array(
-					'type' => 'string',
-				),
-			) ) :
+			array_merge(
+				$this->attributes,
+				array(
+					'layout' => array(
+						'type' => 'string',
+					),
+				)
+			) :
 			array(
 				'layout' => array(
 					'type' => 'string',

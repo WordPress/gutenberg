@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { Component, Fragment } from '@wordpress/element';
@@ -47,11 +52,13 @@ export class BlockBreadcrumb extends Component {
 		} );
 	}
 
-	render( ) {
-		const { clientId, rootClientId } = this.props;
+	render() {
+		const { clientId, rootClientId, isLight } = this.props;
 
 		return (
-			<div className={ 'editor-block-list__breadcrumb' }>
+			<div className={ classnames( 'editor-block-list__breadcrumb', {
+				'is-light': isLight,
+			} ) }>
 				<Toolbar>
 					{ rootClientId && (
 						<Fragment>
@@ -68,11 +75,12 @@ export class BlockBreadcrumb extends Component {
 
 export default compose( [
 	withSelect( ( select, ownProps ) => {
-		const { getBlockRootClientId } = select( 'core/editor' );
+		const { getBlockRootClientId, getEditorSettings } = select( 'core/editor' );
 		const { clientId } = ownProps;
 
 		return {
 			rootClientId: getBlockRootClientId( clientId ),
+			isLight: getEditorSettings().hasFixedToolbar,
 		};
 	} ),
 ] )( BlockBreadcrumb );

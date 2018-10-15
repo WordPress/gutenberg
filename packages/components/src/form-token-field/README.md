@@ -1,5 +1,4 @@
-Form Token Field
-===========
+# Form Token Field
 
 A `FormTokenField` is a field similar to the tags and categories fields in the interim editor chrome, or the "to" field in Mail on OS X. Tokens can be entered by typing them or selecting them from a list of suggested tokens.
 
@@ -7,7 +6,7 @@ Up to one hundred suggestions that match what the user has typed so far will be 
 
 The `value` property is handled in a manner similar to controlled form components. See [Forms](http://facebook.github.io/react/docs/forms.html) in the React Documentation for more information.
 
-### Keyboard Accessibility
+## Keyboard Accessibility
 
 - `left arrow` - if input field is empty, move insertion point before previous token
 - `right arrow` - if input field is empty, move insertion point after next token
@@ -16,7 +15,7 @@ The `value` property is handled in a manner similar to controlled form component
 - `tab` / `enter` - if suggestion selected, insert suggestion as a new token; otherwise, insert value typed into input as new token
 - `comma` - insert value typed into input as new token
 
-### Properties
+## Properties
 
 - `value` - An array of strings or objects to display as tokens in the field. If objects are present in the array, they **must** have a property of `value`. Here is an example object that could be passed in as a value:
 
@@ -52,21 +51,21 @@ The `value` property is handled in a manner similar to controlled form component
 - `disabled` - When true, tokens are not able to be added or removed.
 - `placeholder` - If passed, the `TokenField` input will show a placeholder string if no value tokens are present.
 
-### Example
+## Usage
 
 ```jsx
-class extends Component {
-	render() {
-		return (
-			<FormTokenField
-				value={ this.state.tokens }
-				onChange={ this.onTokensChange }
-				suggestions={ this.state.suggestions } />
-		);
-	}
+import { FormTokenField } from '@wordpress/components';
+import { withState } from '@wordpress/compose';
 
-	onTokensChange( value ) {
-		this.setState( { tokens: value } );
-	}
-}
+const MyFormTokenField = withState( {
+	tokens: [],
+	suggestions: [ 'Africa', 'America', 'Antarctica', 'Asia', 'Europe', 'Oceania' ],
+} )( ( { tokens, suggestions, setState } ) => ( 
+	<FormTokenField 
+		value={ tokens } 
+		suggestions={ suggestions } 
+		onChange={ tokens => setState( { tokens } ) }
+		placeholder="Type a continent"
+	/>
+) );
 ```

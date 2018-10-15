@@ -4,7 +4,28 @@
 
 ## Modifying Blocks
 
-To modify the behavior of existing blocks, Gutenberg exposes the following Filters:
+To modify the behavior of existing blocks, Gutenberg exposes several APIs:
+
+### Block Style Variations
+
+Block Style Variations allow providing alternative styles to existing blocks. They work by adding a className to the block's wrapper. This className can be used to provide an alternative styling for the block if the style variation is selected.
+
+_Example:_
+
+```js
+wp.blocks.registerBlockStyle( 'core/quote', {
+	name: 'fancy-quote',
+	label: 'Fancy Quote'
+} );
+```
+
+The example above registers a block style variation named `fancy-quote` to the `core/quote` block. When the user selects this block style variation from the styles selector, an `is-style-fancy-quote` className will be added to the block's wrapper.
+
+By adding `isDefault: true`, you can make registered style variation to be active by default when a block is inserted.
+
+### Filters
+
+Extending blocks can involve more than just providing alternative styles, in this case, you can use one of the following filters to extend the block settings.
 
 #### `blocks.registerBlockType`
 
@@ -20,8 +41,8 @@ function addListBlockClassName( settings, name ) {
 		return settings;
 	}
 
-	return Object.assign( {}, settings, {
-		supports: Object.assign( {}, settings.supports, {
+	return lodash.assign( {}, settings, {
+		supports: lodash.assign( {}, settings.supports, {
 			className: true
 		} ),
 	} );
@@ -38,9 +59,13 @@ wp.hooks.addFilter(
 
 A filter that applies to the result of a block's `save` function. This filter is used to replace or extend the element, for example using `wp.element.cloneElement` to modify the element's props or replace its children, or returning an entirely new element.
 
+The filter's callback receives an element, a block type and the block attributes as arguments. It should return an element.
+
 #### `blocks.getSaveContent.extraProps`
 
-A filter that applies to all blocks returning a WP Element in the `save` function. This filter is used to add extra props to the root element of the `save` function. For example: to add a className, an id, or any valid prop for this element. It receives the current props of the `save` element, the block type and the block attributes as arguments.
+A filter that applies to all blocks returning a WP Element in the `save` function. This filter is used to add extra props to the root element of the `save` function. For example: to add a className, an id, or any valid prop for this element.
+
+The filter receives the current `save` element's props, a block type and the block attributes as arguments. It should return a props object.
 
 _Example:_
 
@@ -48,7 +73,7 @@ Adding a background by default to all blocks.
 
 ```js
 function addBackgroundColorStyle( props ) {
-	return Object.assign( props, { style: { backgroundColor: 'red' } } );
+	return lodash.assign( props, { style: { backgroundColor: 'red' } } );
 }
 
 wp.hooks.addFilter(
@@ -100,6 +125,8 @@ Used to modify the block's `edit` component. It receives the original block `Blo
 
 _Example:_
 
+{% codetabs %}
+{% ES5 %}
 ```js
 var el = wp.element.createElement;
 
@@ -127,6 +154,31 @@ var withInspectorControls = wp.compose.createHigherOrderComponent( function( Blo
 
 wp.hooks.addFilter( 'editor.BlockEdit', 'my-plugin/with-inspector-controls', withInspectorControls );
 ```
+{% ESNext %}
+```js
+const { createHigherOrderComponent } = wp.compose;
+const { Fragment } = wp.element;
+const { InspectorControls } = wp.editor;
+const { PanelBody } = wp.components;
+
+const withInspectorControls =  createHigherOrderComponent( ( BlockEdit ) => {
+	return ( props ) => {
+		return (
+			<Fragment>
+				<BlockEdit { ...props } />
+				<InspectorControls>
+					<PanelBody>
+						My custom control
+					</PanelBody>
+				</InspectorControls>
+			</Fragment>
+		);
+	};
+}, "withInspectorControl" );
+
+wp.hooks.addFilter( 'editor.BlockEdit', 'my-plugin/with-inspector-controls', withInspectorControls );
+```
+{% end %}
 
 #### `editor.BlockListBlock`
 
@@ -134,16 +186,19 @@ Used to modify the block's wrapper component containing the block's `edit` compo
 
 _Example:_
 
+{% codetabs %}
+{% ES5 %}
+
 ```js
 var el = wp.element.createElement;
 
 var withDataAlign = wp.compose.createHigherOrderComponent( function( BlockListBlock ) {
 	return function( props ) {
-		var newProps = Object.assign(
+		var newProps = lodash.assign(
 			{},
 			props,
 			{
-				wrapperProps: Object.assign(
+				wrapperProps: lodash.assign(
 					{},
 					props.wrapperProps,
 					{
@@ -161,21 +216,27 @@ var withDataAlign = wp.compose.createHigherOrderComponent( function( BlockListBl
 }, 'withAlign' );
 
 wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-data-align', withDataAlign );
-```
-
-### `editor.PostFeaturedImage.imageSize`
-
-Used to modify the image size displayed in the Post Featured Image component. It defaults to `'post-thumbnail'`, and will fail back to the `full` image size when the specified image size doesn't exist in the media object. It's modeled after the `admin_post_thumbnail_size` filter in the Classic Editor.
-
-_Example:_
 
 ```
-var withImageSize = function( size, mediaId, postId ) {
-	return 'large';
-};
+{% ESNext %}
+```js
+const { createHigherOrderComponent } = wp.compose;
 
-wp.hooks.addFilter( 'editor.PostFeaturedImage.imageSize', 'my-plugin/with-image-size', withImageSize );
+const withDataAlign = createHigherOrderComponent( ( BlockListBlock ) => {
+	return ( props ) => {
+		const { align } = props.block.attributes;
+
+		let wrapperProps = props.wrapperProps;
+		wrapperProps = { ...wrapperProps, 'data-align': align };
+
+		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
+	};
+}, 'withDataAlign' );
+
+wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-data-align', withDataAlign );
 ```
+
+{% end %}
 
 ## Removing Blocks
 
@@ -184,7 +245,7 @@ wp.hooks.addFilter( 'editor.PostFeaturedImage.imageSize', 'my-plugin/with-image-
 Adding blocks is easy enough, removing them is as easy. Plugin or theme authors have the possibility to "unregister" blocks.
 
 ```js
-// myp-lugin.js
+// my-plugin.js
 
 wp.blocks.unregisterBlockType( 'core/verse' );
 ```
@@ -236,7 +297,7 @@ On the server, you can filter the list of blocks shown in the inserter using the
 
 function my_plugin_allowed_block_types( $allowed_block_types, $post ) {
 	if ( $post->post_type !== 'post' ) {
-	    return $allowed_block_types;
+		return $allowed_block_types;
 	}
 	return array( 'core/paragraph' );
 }
