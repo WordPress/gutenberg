@@ -1,4 +1,4 @@
-# Create WP PLugin
+# Create WP Plugin
 
 CLI tool to scaffold WordPress plugin with simple block
 

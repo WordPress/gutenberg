@@ -29,7 +29,7 @@ module.exports = () => {
 		console.log( '' ); // eslint-disable-line no-console
 
 		prompt( questions ).then( ( answers ) => {
-			// Generate slug, fucntion prefix & block namespace
+			// Generate slug, function prefix & block namespace
 			const pluginSlug = answers.pluginName.toLowerCase().replace( /\s+/g, '-' );
 			const pluginMachineName = pluginSlug.replace( /-/g, '_' );
 			const blockSlug = answers.blockName.toLowerCase().replace( /\s+/g, '-' );

@@ -1,7 +1,7 @@
 {
 	"name": "create-wp-plugin",
 	"version": "0.0.1",
-	"description": "CLI Utility to scafffold WordPress Plugins and Blocks.",
+	"description": "CLI Utility to scaffold WordPress Plugins and Blocks.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
@@ -21,7 +21,7 @@
 	"main": "index.js",
 	"preferGlobal": true,
 	"bin": {
-		"create-wp-plugin": "index.js"
+		"create-wp-plugin": "./index.js"
 	},
 	"dependencies": {
 		"chalk": "^2.4.1",

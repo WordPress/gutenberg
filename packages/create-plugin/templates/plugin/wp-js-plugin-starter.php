@@ -9,7 +9,7 @@
  * @package {{pluginSlug}}
  */
 
- /**
+/**
  * Retrieves a URL to a file in the plugin's directory.
  *
  * @param  string $path Relative path of the desired file.

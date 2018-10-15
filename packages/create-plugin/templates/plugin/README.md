@@ -87,24 +87,24 @@ The JavaScript community has built tools called bundlers and minifiers to help w
 - A bundler is a tool that takes a JavaScript entry point file relying on other JavaScript files using `import` or `require`, and bundles all these files together into a single JavaScript file. Bundlers can be more powerful than that, they can include non-JavaScript files (stylesheets, JSON, ...) into these bundles.
 - A minifier is a tool that takes a JavaScript file as an entry and tries to produce the smallest possible JavaScript file as an output by using different techniques: Removing space, mangling variable names, removing dead code...
 
-The most popular tool at the moment in the JavaScript community that is used to perform such tasks is the [Webpack](http://webpack.js.org) bundler in combination with [UglifyJS](https://github.com/mishoo/UglifyJS2) as a minifier. Webpack is a very powerful and flexible tool which sometimes plays against its learning curve. Configuring Webpack for the first time can be intimidating even for experienced developpers.
+The most popular tool at the moment in the JavaScript community that is used to perform such tasks is the [Webpack](http://webpack.js.org) bundler in combination with [UglifyJS](https://github.com/mishoo/UglifyJS2) as a minifier. Webpack is a very powerful and flexible tool which sometimes plays against its learning curve. Configuring Webpack for the first time can be intimidating even for experienced developers.
 
 For this starter, we'll prefer to use [Parcel](https://parceljs.org) Bundler, a young opinionated alternative to Webpack which is easier to understand if you're not familiar with all these concepts. It works without config by default and provides two important command lines:
 
-- `parcel watch [entryPoint]`: A command taking a JavaScript file as entry point and bundling all the dependencies into a `dist` folder producing an unminified bundle for developement purpose. It also updates the bundle each time change one of the files used in the bundle.
+- `parcel watch [entryPoint]`: A command taking a JavaScript file as entry point and bundling all the dependencies into a `dist` folder producing an unminified bundle for development purpose. It also updates the bundle each time change one of the files used in the bundle.
 - `parcel build [entryPoint]`: A command bundling the entryPoint and its dependencies into production-ready files.
 
 But first, we need to install these tools we're going to use. In the JavaScript community, we do so by using [npm](http://npmjs.com), a package dependency manager for JavaScript (if you're more familiar with `PHP`, it's the `composer` of `JavaScript`). (Npm is automatically installed with [NodeJS](https://nodejs.org/en/), so just grab the latest Node.JS binary and install it).
 
-Similarily to most package dependency managers, we need to provide some basic informations in a config file called [`package.json`](https://github.com/youknowriad/wp-js-plugin-starter/blob/bbd655d2796ea0676ebd2f502664ce10e3c31817/package.json): name, current version, license, keywords... This file can be generated automatically by running `npm run init` and replying to some simple questions about your package.
+Similarily to most package dependency managers, we need to provide some basic information in a config file called [`package.json`](https://github.com/youknowriad/wp-js-plugin-starter/blob/bbd655d2796ea0676ebd2f502664ce10e3c31817/package.json): name, current version, license, keywords... This file can be generated automatically by running `npm run init` and replying to some simple questions about your package.
 
-Once initialized, we can start defining and installing our dependencies (the packages we depend on). So we start by installing the Parcel bundler as a devDependency (a dependency useful when developping our current project but a dependency we don't ship in our production code). So we can just run `npm install parcel-bundler --save-dev`. Running this command updates the `package.json` file and adds the newly installed dependency to the `devDependencies` section of the file.
+Once initialized, we can start defining and installing our dependencies (the packages we depend on). So we start by installing the Parcel bundler as a devDependency (a dependency useful when developing our current project but a dependency we don't ship in our production code). So we can just run `npm install parcel-bundler --save-dev`. Running this command updates the `package.json` file and adds the newly installed dependency to the `devDependencies` section of the file.
 
-Installing the dependencies also creates or updates a `package-lock.json` file. This file ensures that other developpers working on the repository can install the correct versions of the dependencies by just running `npm install` on their own local repositories.
+Installing the dependencies also creates or updates a `package-lock.json` file. This file ensures that other developers working on the repository can install the correct versions of the dependencies by just running `npm install` on their own local repositories.
 
-We're set, we installed the parcel bundler. We can use it to define some scripts to bundle our JavaScript file for developement and production. The `package.json` file allows us to define a `scripts` section where we can add shortcuts to the most used command lines while developping a project. So for instance, instead of having to run `parcel build src/index.js` each time we want to build a production version of our JavaScript files, we can define a `build` script in the `package.json` and just run `npm run build`.
+We're set, we installed the parcel bundler. We can use it to define some scripts to bundle our JavaScript file for development and production. The `package.json` file allows us to define a `scripts` section where we can add shortcuts to the most used command lines while developing a project. So for instance, instead of having to run `parcel build src/index.js` each time we want to build a production version of our JavaScript files, we can define a `build` script in the `package.json` and just run `npm run build`.
 
-At this point, we define our two scripts: the `start` script we're going to use when developping the plugin to automatically build a development version of the plugin and the `build` script. Try running `npm start` or `npm run build` and you'll notice that a bundle file `index.js` is created in the `dist` folder.
+At this point, we define our two scripts: the `start` script we're going to use when developing the plugin to automatically build a development version of the plugin and the `build` script. Try running `npm start` or `npm run build` and you'll notice that a bundle file `index.js` is created in the `dist` folder.
 
 Last but not least, we need to update the registration of the WordPress script (achieved in the previous step) in the `wp-js-plugin-started.php` file and point the registered script to the built file `dist/index.js` instead of the source file we were using previously.
 
@@ -115,7 +115,7 @@ From now on, for more complex plugin, you can start splitting your JavaScript so
 #### Go further
 
 - Alternative bundlers: [Webpack](https://webpack.js.org/), [browserify](http://browserify.org/).
-- [Understading NPM](https://docs.npmjs.com/) and the [package.json](https://docs.npmjs.com/files/package.json) file.
+- [Understanding NPM](https://docs.npmjs.com/) and the [package.json](https://docs.npmjs.com/files/package.json) file.
 - [Parcel documentation](https://parceljs.org/getting_started.html).
 
 ### Step 5: Babel, JSX and ESnext
@@ -156,7 +156,7 @@ As an example, in [the commit](https://github.com/youknowriad/wp-js-plugin-start
 
 At this stage everything is ready to start building complex JavaScript applications. As an example I updated the plugin to be a simple Gutenberg Block.
 
-- Registring the block server side with it's editor script
+- Registering the block server side with it's editor script
 - Updating the JavaScript file to register the block and use JSX to define its `edit` and `save` function.
 
 You can try for yourself by navigating into Gutenberg and inserting the "Hello World" block.

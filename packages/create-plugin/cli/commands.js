@@ -1,5 +1,5 @@
 /**
- * External depenedencies
+ * External dependencies
  */
 const program = require( 'commander' );
 
@@ -8,7 +8,7 @@ const program = require( 'commander' );
  */
 program
 	.version( '0.0.1' )
-	.description( 'CLI Utility to scafffold WordPress Plugins and Blocks' )
+	.description( 'CLI Utility to scaffold WordPress Plugins and Blocks' )
 	.parse( process.argv );
 
 module.exports = program;
