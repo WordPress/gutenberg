@@ -111,6 +111,7 @@
 		"symlink-or-copy": "1.2.0",
 		"uuid": "3.1.0",
 		"webpack": "4.8.3",
+		"webpack-bundle-analyzer": "3.0.2",
 		"webpack-cli": "2.1.3",
 		"webpack-livereload-plugin": "2.1.1",
 		"webpack-rtl-plugin": "github:yoavf/webpack-rtl-plugin#develop",
