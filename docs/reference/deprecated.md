@@ -15,6 +15,7 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 - `wp.components.CodeEditor` has been removed. Used `wp.codeEditor` directly instead.
 - `wp.blocks.setUnknownTypeHandlerName` has been removed. Please use `setFreeformContentHandlerName` and `setUnregisteredTypeHandlerName` instead.
 - `wp.blocks.getUnknownTypeHandlerName` has been removed. Please use `getFreeformContentHandlerName` and `getUnregisteredTypeHandlerName` instead.
+- `wp.date.getSettings` has been removed. Please use `wp.date.__experimentalGetSettings` instead.
 
 ## 4.1.0
 

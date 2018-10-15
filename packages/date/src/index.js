@@ -5,6 +5,11 @@ import momentLib from 'moment';
 import 'moment-timezone';
 import 'moment-timezone/moment-timezone-utils';
 
+/**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
 // Changes made here will likely need to be made in `lib/client-assets.php` as
 // well because it uses the `setSettings()` function to change these settings.
 let settings = {
@@ -85,7 +90,17 @@ export function setSettings( dateSettings ) {
  *
  * @return {Object} Settings, including locale data.
  */
+export function __experimentalGetSettings() {
+	return settings;
+}
+
+// deprecations
 export function getSettings() {
+	deprecated( 'wp.date.getSettings', {
+		version: '4.2',
+		alternative: 'wp.date.__experimentalGetSettings',
+		plugin: 'Gutenberg',
+	} );
 	return settings;
 }
 
