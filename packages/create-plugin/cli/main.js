@@ -25,9 +25,9 @@ module.exports = () => {
 		const gitConfig = path.normalize( path.join( npmRoot, '/create-wp-plugin/templates/plugin/.gitignore' ) ).replace( /(\r\n\t|\n|\r\t)/gm, '' );
 
 		console.log( chalk.bgGreen( ' Welcome To Create WP Plugin ' ) ); // eslint-disable-line no-console
-
-		console.log( chalk.bgYellow( ' Utility to help you scaffold plugins and blocks' ) ); // eslint-disable-line no-console
+		console.log( chalk.bgYellow( ' CLI utility to help you scaffold plugins and blocks' ) ); // eslint-disable-line no-console
 		console.log( '' ); // eslint-disable-line no-console
+
 		prompt( questions ).then( ( answers ) => {
 			// Generate slug, fucntion prefix & block namespace
 			const pluginSlug = answers.pluginName.toLowerCase().replace( /\s+/g, '-' );
@@ -37,7 +37,7 @@ module.exports = () => {
 			const blockNamespace = `${ blockAuthor }/${ blockSlug }`;
 
 			// Generate plugin
-			console.log( chalk.dim( 'Generarting Plugin' ) ); // eslint-disable-line no-console
+			console.log( chalk.dim( 'Generating Plugin' ) ); // eslint-disable-line no-console
 			shell.mkdir( '-p', pluginSlug );
 			shell.cp( '-R', templateFiles, `./${ pluginSlug }` );
 			shell.cp( babelConfig, `./${ pluginSlug }` );
