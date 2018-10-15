@@ -59,6 +59,10 @@ const blockAttributes = {
 	customOverlayColor: {
 		type: 'string',
 	},
+	backgroundType: {
+		type: 'string',
+		default: 'image',
+	},
 };
 
 export const name = 'core/cover-image';
@@ -71,7 +75,9 @@ const INNER_BLOCKS_TEMPLATE = [
 	} ],
 ];
 const INNER_BLOCKS_ALLOWED_BLOCKS = [ 'core/button', 'core/heading', 'core/paragraph' ];
-const ALLOWED_MEDIA_TYPES = [ 'image' ];
+const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
+const IMAGE_BACKGROUND_TYPE = 'image';
+const VIDEO_BACKGROUND_TYPE = 'video';
 
 export const settings = {
 	title: __( 'Cover Image' ),
@@ -127,11 +133,39 @@ export const settings = {
 		withNotices,
 	] )(
 		( { attributes, setAttributes, className, noticeOperations, noticeUI, overlayColor, setOverlayColor } ) => {
-			const { url, align, id, hasParallax, dimRatio } = attributes;
+			const {
+				align,
+				backgroundType,
+				dimRatio,
+				hasParallax,
+				id,
+				url,
+			} = attributes;
 			const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 			const onSelectImage = ( media ) => {
 				if ( ! media || ! media.url ) {
 					setAttributes( { url: undefined, id: undefined } );
+					return;
+				}
+				let mediaType;
+				// for media selections originated from a file upload.
+				if ( media.media_type ) {
+					if ( media.media_type === IMAGE_BACKGROUND_TYPE ) {
+						mediaType = IMAGE_BACKGROUND_TYPE;
+					} else {
+						// only images and videos are accepted so if the media_type is not an image we can assume it is a video.
+						// video contain the media type of 'file' in the object returned from the rest api.
+						mediaType = VIDEO_BACKGROUND_TYPE;
+					}
+				} else { // for media selections originated from existing files in the media library.
+					mediaType = media.type;
+				}
+				if ( mediaType ) {
+					setAttributes( {
+						url: media.url,
+						id: media.id,
+						backgroundType: mediaType,
+					} );
 					return;
 				}
 				setAttributes( { url: media.url, id: media.id } );
@@ -140,7 +174,7 @@ export const settings = {
 			const setDimRatio = ( ratio ) => setAttributes( { dimRatio: ratio } );
 
 			const style = {
-				...backgroundImageStyles( url ),
+				...( backgroundType === IMAGE_BACKGROUND_TYPE ? backgroundImageStyles( url ) : {} ),
 				backgroundColor: overlayColor.color,
 			};
 
@@ -181,11 +215,11 @@ export const settings = {
 					{ !! url && (
 						<InspectorControls>
 							<PanelBody title={ __( 'Cover Image Settings' ) }>
-								<ToggleControl
+								{ IMAGE_BACKGROUND_TYPE === backgroundType && ( <ToggleControl
 									label={ __( 'Fixed Background' ) }
 									checked={ hasParallax }
 									onChange={ toggleParallax }
-								/>
+								/> ) }
 								<PanelColorSettings
 									title={ __( 'Overlay' ) }
 									initialOpen={ true }
@@ -225,7 +259,7 @@ export const settings = {
 								name: __( 'an image' ),
 							} }
 							onSelect={ onSelectImage }
-							accept="image/*"
+							accept="image/*,video/*"
 							allowedTypes={ ALLOWED_MEDIA_TYPES }
 							notices={ noticeUI }
 							onError={ noticeOperations.createErrorNotice }
@@ -242,6 +276,15 @@ export const settings = {
 						style={ style }
 						className={ classes }
 					>
+						{ VIDEO_BACKGROUND_TYPE === backgroundType && url && (
+							<video
+								className="wp-block-cover-image__video-background"
+								autoPlay
+								muted
+								loop
+								src={ url }
+							/>
+						) }
 						<div className="wp-block-cover-image__inner-container">
 							<InnerBlocks
 								template={ INNER_BLOCKS_TEMPLATE }
@@ -255,9 +298,17 @@ export const settings = {
 	),
 
 	save( { attributes, className } ) {
-		const { url, hasParallax, dimRatio, align, overlayColor, customOverlayColor } = attributes;
+		const {
+			align,
+			backgroundType,
+			customOverlayColor,
+			dimRatio,
+			hasParallax,
+			overlayColor,
+			url,
+		} = attributes;
 		const overlayColorClass = getColorClassName( 'background-color', overlayColor );
-		const style = backgroundImageStyles( url );
+		const style = backgroundType === IMAGE_BACKGROUND_TYPE ? backgroundImageStyles( url ) : {};
 		if ( ! overlayColorClass ) {
 			style.backgroundColor = customOverlayColor;
 		}
@@ -275,6 +326,13 @@ export const settings = {
 
 		return (
 			<div className={ classes } style={ style }>
+				{ VIDEO_BACKGROUND_TYPE === backgroundType && url && ( <video
+					className="wp-block-cover-image__video-background"
+					autoPlay
+					muted
+					loop
+					src={ url }
+				/> ) }
 				<div className="wp-block-cover-image__inner-container">
 					<InnerBlocks.Content />
 				</div>
