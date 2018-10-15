@@ -143,10 +143,15 @@ class ImageEdit extends Component {
 			// The "full" size is included in `sizes`.
 			img = media.sizes.large || media.sizes.full;
 			src = img.url;
+			let imgWidth = img.width;
 
-			if ( img.width < editorWidth ) {
+			if ( img.actual_size && img.actual_size.width ) {
+				imgWidth = img.actual_size.width;
+			}
+
+			if ( imgWidth < editorWidth ) {
 				// The "full" size may be narrower than 100%.
-				sizesWidth = img.width;
+				sizesWidth = imgWidth;
 			}
 
 			if ( img.srcset ) {
@@ -448,8 +453,8 @@ class ImageEdit extends Component {
 									value={ round( imageWidthWithinContainer * scale ) }
 									placeholder={ round( imageWidthWithinContainer * scale ) }
 									min={ 1 }
-									onChange={ ( event ) => {
-										this.updatePercent( parseInt( event.target.value, 10 ) / imageWidthWithinContainer );
+									onChange={ ( value ) => {
+										this.updateScale( parseInt( value, 10 ) / imageWidthWithinContainer );
 									} }
 								/>
 								<TextControl
@@ -459,8 +464,8 @@ class ImageEdit extends Component {
 									value={ round( imageHeightWithinContainer * scale ) }
 									placeholder={ round( imageHeightWithinContainer * scale ) }
 									min={ 1 }
-									onChange={ ( event ) => {
-										this.updatePercent( parseInt( event.target.value, 10 ) / imageHeightWithinContainer );
+									onChange={ ( value ) => {
+										this.updateScale( parseInt( value, 10 ) / imageHeightWithinContainer );
 									} }
 								/>
 							</div>

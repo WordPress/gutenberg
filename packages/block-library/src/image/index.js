@@ -28,15 +28,9 @@ export const name = 'core/image';
 const blockAttributes = {
 	url: {
 		type: 'string',
-		source: 'attribute',
-		selector: 'img',
-		attribute: 'src',
 	},
 	alt: {
 		type: 'string',
-		source: 'attribute',
-		selector: 'img',
-		attribute: 'alt',
 		default: '',
 	},
 	caption: {
@@ -51,6 +45,9 @@ const blockAttributes = {
 	},
 	id: {
 		type: 'number',
+	},
+	align: {
+		type: 'string',
 	},
 	scale: {
 		type: 'number',
@@ -204,7 +201,7 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { url, alt, caption, align, href, scale, id, srcSet, sizes } = attributes;
+		const { url, alt, caption, align, href, scale, srcSet, sizes } = attributes;
 
 		const classes = classnames( {
 			[ `align${ align }` ]: align,
@@ -215,7 +212,6 @@ export const settings = {
 			<img
 				src={ url }
 				alt={ alt }
-				className={ id ? `wp-image-${ id }` : null }
 				srcSet={ srcSet }
 				sizes={ sizes }
 			/>

@@ -127,7 +127,7 @@ function gutenberg_rest_prepare_attachment( $response, $attachment ) {
 	if ( ! isset( $response->data['media_type'] ) ) {
 		return $response;
 	}
-	
+
 	if ( $response->data['media_type'] === 'image' && ! empty( $response->data['media_details']['sizes'] ) ) {
 		$meta = wp_get_attachment_metadata( $attachment->ID );
 		$sizes = $response->data['media_details']['sizes'];
@@ -162,6 +162,13 @@ function gutenberg_prepare_attachment_for_js( $response, $attachment, $meta ) {
 
 			if ( $srcset ) {
 				$response['sizes'][ $size_name ]['srcset'] = $srcset;
+			}
+
+			if ( array_key_exists( $size_name, $meta['sizes'] ) ) {
+				$response['sizes'][ $size_name ]['actual_size'] = array(
+					'width' => (int) $meta['sizes'][ $size_name ]['width'],
+					'height' => (int) $meta['sizes'][ $size_name ]['height'],
+				);
 			}
 		}
 	}

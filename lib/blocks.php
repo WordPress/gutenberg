@@ -111,27 +111,20 @@ function get_dynamic_block_names() {
  */
 function get_dynamic_blocks_regex() {
 	$dynamic_block_names   = get_dynamic_block_names();
-	$dynamic_block_pattern = (
-		'/<!--\s+wp:(' .
-		str_replace(
-			'/',
-			'\/',                 // Escape namespace, not handled by preg_quote.
-			str_replace(
-				'core/',
-				'(?:core/)?', // Allow implicit core namespace, but don't capture.
-				implode(
-					'|',                   // Join block names into capture group alternation.
-					array_map(
-						'preg_quote',    // Escape block name for regular expression.
-						$dynamic_block_names
-					)
-				)
-			)
-		) .
-		')(\s+(\{.*?\}))?\s+(\/)?-->/'
-	);
 
-	return $dynamic_block_pattern;
+	// Escape block name for regular expression.
+	$dynamic_block_names = array_map( 'preg_quote', $dynamic_block_names );
+
+	// Join block names into capture group alternation.
+	$dynamic_block_names = implode( '|', $dynamic_block_names );
+
+	// Allow implicit core namespace, but don't capture.
+	$dynamic_block_names = str_replace( 'core/', '(?:core/)?', $dynamic_block_names );
+
+	// Escape namespace, not handled by preg_quote.
+	$dynamic_block_names = str_replace( '/', '\/', $dynamic_block_names );
+
+	return '/<!--\s+wp:(' . $dynamic_block_names . ')(\s+(\{.*?\}))?\s+(\/)?-->/';
 }
 
 /**

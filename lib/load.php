@@ -39,3 +39,4 @@ require dirname( __FILE__ ) . '/../packages/block-library/src/categories/index.p
 require dirname( __FILE__ ) . '/../packages/block-library/src/latest-comments/index.php';
 require dirname( __FILE__ ) . '/../packages/block-library/src/latest-posts/index.php';
 require dirname( __FILE__ ) . '/../packages/block-library/src/shortcode/index.php';
+require dirname( __FILE__ ) . '/../packages/block-library/src/image/index.php';
