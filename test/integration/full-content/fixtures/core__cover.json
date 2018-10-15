@@ -1,0 +1,31 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/cover",
+        "isValid": true,
+        "attributes": {
+            "title": "",
+            "url": "https://cldup.com/uuUqE_dXzy.jpg",
+            "hasParallax": false,
+            "dimRatio": 40,
+            "backgroundType": "image"
+        },
+        "innerBlocks": [
+            {
+                "clientId": "_clientId_0",
+                "name": "core/paragraph",
+                "isValid": true,
+                "attributes": {
+                    "content": "Cover!",
+                    "align": "center",
+                    "dropCap": false,
+                    "placeholder": "Write title…",
+                    "fontSize": "large"
+                },
+                "innerBlocks": [],
+                "originalContent": "<p style=\"text-align:center\" class=\"has-large-font-size\">Cover!</p>"
+            }
+        ],
+        "originalContent": "<div class=\"wp-block-cover has-background-dim has-background-dim-40\" style=\"background-image:url(https://cldup.com/uuUqE_dXzy.jpg)\">\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>"
+    }
+]
