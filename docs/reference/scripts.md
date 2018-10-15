@@ -26,7 +26,7 @@ The editor includes a number of packages to enable various pieces of functionali
 | [Element](https://wordpress.org/gutenberg/handbook/packages/packages-element/) | wp-element |Element is, quite simply, an abstraction layer atop [React](https://reactjs.org/) |
 | [Escape Html](https://wordpress.org/gutenberg/handbook/packages/packages-escape-html/) | wp-escape-html | Escape HTML utils |
 | [Hooks](https://wordpress.org/gutenberg/handbook/packages/packages-hooks/) | wp-hooks | A lightweight and efficient EventManager for JavaScript |
-| [Html Entities](https://wordpress.org/gutenberg/handbook/packages/packages-html-entities/) | wo-html-entities | HTML entity utilities for WordPress |
+| [Html Entities](https://wordpress.org/gutenberg/handbook/packages/packages-html-entities/) | wp-html-entities | HTML entity utilities for WordPress |
 | [I18N](https://wordpress.org/gutenberg/handbook/packages/packages-i18n/) | wp-i18n | Internationalization utilities for client-side localization |
 | [Is Shallow Equal](https://wordpress.org/gutenberg/handbook/packages/packages-is-shallow-equal/) | wp-is-shallow-equal | A function for performing a shallow comparison between two objects or arrays |
 | [Keycodes](https://wordpress.org/gutenberg/handbook/packages/packages-keycodes/) | wp-keycodes | Keycodes utilities for WordPress, used to check the key pressed in events like `onKeyDown` |
