@@ -94,6 +94,24 @@ function register_block_core_categories() {
 	register_block_type(
 		'core/categories',
 		array(
+			'attributes'      => array(
+				'align'             => array(
+					'type' => 'string',
+					'enum' => array( 'left', 'center', 'right', 'full' ),
+				),
+				'displayAsDropdown' => array(
+					'type'    => 'boolean',
+					'default' => false,
+				),
+				'showHierarchy'     => array(
+					'type'    => 'boolean',
+					'default' => false,
+				),
+				'showPostCounts'    => array(
+					'type'    => 'boolean',
+					'default' => false,
+				),
+			),
 			'render_callback' => 'render_block_core_categories',
 		)
 	);
