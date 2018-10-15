@@ -16,7 +16,6 @@ const minHeight = 50;
 class ParagraphEdit extends Component {
 	constructor() {
 		super( ...arguments );
-
 		this.splitBlock = this.splitBlock.bind( this );
 	}
 

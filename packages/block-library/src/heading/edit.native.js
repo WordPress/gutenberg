@@ -26,7 +26,6 @@ const minHeight = 50;
 class HeadingEdit extends Component {
 	constructor() {
 		super( ...arguments );
-
 		this.splitBlock = this.splitBlock.bind( this );
 	}
 

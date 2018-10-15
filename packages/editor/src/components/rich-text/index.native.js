@@ -50,7 +50,7 @@ export class RichText extends Component {
 	// eslint-disable-next-line no-unused-vars
 	onHTMLContentWithCursor( htmlText, start, end ) {
 		if ( ! this.props.onSplit ) {
-			// insert the \n char instead?
+			// TODO: insert the \n char instead?
 			return;
 		}
 		this.splitContent( htmlText, start, end );
@@ -58,11 +58,9 @@ export class RichText extends Component {
 
 	splitContent( htmlText, start, end ) {
 		const { onSplit } = this.props;
-
 		if ( ! onSplit ) {
 			return;
 		}
-
 		onSplit( htmlText, start, end );
 	}
 
