@@ -9,7 +9,6 @@ import {
 	applyFormat,
 	removeFormat,
 	slice,
-	getActiveFormat,
 } from '@wordpress/rich-text';
 import { isURL } from '@wordpress/url';
 
@@ -46,7 +45,7 @@ export const link = {
 			const text = getTextContent( slice( value ) );
 
 			if ( text && isURL( text ) ) {
-				onChange( applyFormat( value, { type: 'core/link', attributes: { href: text } } ) );
+				onChange( applyFormat( value, { type: 'core/link', attributes: { url: text } } ) );
 			} else {
 				this.setState( { addingLink: true } );
 			}
@@ -57,8 +56,8 @@ export const link = {
 		}
 
 		render() {
-			const { isActive, value, onChange } = this.props;
-			const onRemoveFormat = () => onChange( removeFormat( value, 'a' ) );
+			const { isActive, activeAttributes, value, onChange } = this.props;
+			const onRemoveFormat = () => onChange( removeFormat( value, 'core/link' ) );
 
 			return (
 				<Fragment>
@@ -94,7 +93,8 @@ export const link = {
 					<InlineLinkUI
 						addingLink={ this.state.addingLink }
 						stopAddingLink={ this.stopAddingLink }
-						link={ getActiveFormat( value, 'core/link' ) }
+						isActive={ isActive }
+						activeAttributes={ activeAttributes }
 						value={ value }
 						onChange={ onChange }
 					/>

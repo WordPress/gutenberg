@@ -27,10 +27,6 @@ import PositionedAtSelection from './positioned-at-selection';
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 
-function getLinkAttributesFromFormat( { attributes: { url = '', target } = {} } = {} ) {
-	return { url, target };
-}
-
 function createLinkFormat( { url, opensInNewWindow } ) {
 	const format = {
 		type: 'core/link',
@@ -101,7 +97,7 @@ class InlineLinkUI extends Component {
 	}
 
 	static getDerivedStateFromProps( props, state ) {
-		const { url, target } = getLinkAttributesFromFormat( props.link );
+		const { activeAttributes: { url, target } } = props;
 		const opensInNewWindow = target === '_blank';
 
 		if ( ! isShowingInput( props, state ) ) {
@@ -134,13 +130,12 @@ class InlineLinkUI extends Component {
 	}
 
 	setLinkTarget( opensInNewWindow ) {
-		const { link, value, onChange } = this.props;
+		const { activeAttributes: { url }, value, onChange } = this.props;
 
 		this.setState( { opensInNewWindow } );
 
 		// Apply now if URL is not being edited.
 		if ( ! isShowingInput( this.props, this.state ) ) {
-			const { url } = getLinkAttributesFromFormat( link );
 			onChange( applyFormat( value, createLinkFormat( { url, opensInNewWindow } ) ) );
 		}
 	}
@@ -151,14 +146,14 @@ class InlineLinkUI extends Component {
 	}
 
 	submitLink( event ) {
-		const { link, value, onChange, speak } = this.props;
+		const { isActive, value, onChange, speak } = this.props;
 		const { inputValue, opensInNewWindow } = this.state;
 		const url = prependHTTP( inputValue );
 		const format = createLinkFormat( { url, opensInNewWindow } );
 
 		event.preventDefault();
 
-		if ( isCollapsed( value ) && link === undefined ) {
+		if ( isCollapsed( value ) && ! isActive ) {
 			const toInsert = applyFormat( create( { text: url } ), format, 0, url.length );
 			onChange( insert( value, toInsert ) );
 		} else {
@@ -171,7 +166,7 @@ class InlineLinkUI extends Component {
 
 		this.resetState();
 
-		if ( ! link ) {
+		if ( ! isActive ) {
 			speak( __( 'Link added.' ), 'assertive' );
 		}
 	}
@@ -195,14 +190,13 @@ class InlineLinkUI extends Component {
 	}
 
 	render() {
-		const { link, addingLink, value } = this.props;
+		const { isActive, activeAttributes: { url }, addingLink, value } = this.props;
 
-		if ( ! link && ! addingLink ) {
+		if ( ! isActive && ! addingLink ) {
 			return null;
 		}
 
 		const { inputValue, opensInNewWindow } = this.state;
-		const { url } = getLinkAttributesFromFormat( link );
 		const showInput = isShowingInput( this.props, this.state );
 
 		return (
