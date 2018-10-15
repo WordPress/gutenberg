@@ -69,14 +69,14 @@ export function receiveEntityRecords( kind, name, records, query ) {
 /**
  * Returns an action object used in signalling that the index has been received.
  *
- * @param {Object} index Index received.
+ * @param {Object} themeSupports Theme support for the current theme.
  *
  * @return {Object} Action object.
  */
-export function receiveThemeSupportsFromIndex( index ) {
+export function receiveThemeSupports( themeSupports ) {
 	return {
 		type: 'RECEIVE_THEME_SUPPORTS',
-		themeSupports: index.theme_supports,
+		themeSupports,
 	};
 }
 
