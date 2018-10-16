@@ -76,8 +76,11 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
           Object {
             "description": "Open the block navigation menu.",
             "keyCombination": Array [
-              "Esc",
-              "Esc",
+              "Shift",
+              "+",
+              "Alt",
+              "+",
+              "B",
             ],
           },
           Object {

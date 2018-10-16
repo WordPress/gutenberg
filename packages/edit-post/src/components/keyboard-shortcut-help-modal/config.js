@@ -45,7 +45,7 @@ const globalShortcuts = {
 			ariaLabel: shortcutAriaLabel.primaryShift( ',' ),
 		},
 		{
-			keyCombination: [ 'Esc', 'Esc' ],
+			keyCombination: access( 'b' ),
 			description: __( 'Open the block navigation menu.' ),
 		},
 		{

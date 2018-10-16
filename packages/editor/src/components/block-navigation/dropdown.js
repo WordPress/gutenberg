@@ -4,6 +4,7 @@
 import { Fragment } from '@wordpress/element';
 import { IconButton, Dropdown, SVG, Path, KeyboardShortcuts } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { rawShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -21,12 +22,12 @@ function BlockNavigationDropdown() {
 		<Dropdown
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Fragment>
-					{ ! isOpen && <KeyboardShortcuts
+					<KeyboardShortcuts
 						bindGlobal
 						shortcuts={ {
-							'esc esc': onToggle,
+							[ rawShortcut.access( 'b' ) ]: onToggle,
 						} }
-					/> }
+					/>
 					<IconButton
 						icon={ menuIcon }
 						aria-expanded={ isOpen }
