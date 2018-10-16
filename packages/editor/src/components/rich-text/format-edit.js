@@ -1,12 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { Fragment, Component } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import { getActiveFormat, getFormatTypes } from '@wordpress/rich-text';
-import { Fill } from '@wordpress/components';
+import { Fill, KeyboardShortcuts } from '@wordpress/components';
 import { rawShortcut } from '@wordpress/keycodes';
-
-let currentEditor;
 
 function FillToolbarSlot( { name, children } ) {
 	return (
@@ -16,23 +14,32 @@ function FillToolbarSlot( { name, children } ) {
 	);
 }
 
-// To do: don't rely on editor instance.
 class Shortcut extends Component {
-	constructor( { type, character, onUse } ) {
+	constructor() {
 		super( ...arguments );
-		currentEditor.shortcuts.add( rawShortcut[ type ]( character ), '', () => {
-			onUse();
-		} );
+
+		this.onUse = this.onUse.bind( this );
+	}
+
+	onUse() {
+		this.props.onUse();
 	}
 
 	render() {
-		return null;
+		const { character, type } = this.props;
+
+		return (
+			<KeyboardShortcuts
+				bindGlobal
+				shortcuts={ {
+					[ rawShortcut[ type ]( character ) ]: this.onUse,
+				} }
+			/>
+		);
 	}
 }
 
-const FormatEdit = ( { value, onChange, editor } ) => {
-	currentEditor = editor;
-
+const FormatEdit = ( { onChange, value } ) => {
 	return (
 		<Fragment>
 			{ getFormatTypes().map( ( { name, edit: Edit }, i ) => {
