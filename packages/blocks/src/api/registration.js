@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { get, isFunction, some, remove } from 'lodash';
+import { get, isFunction, some, reject } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -388,7 +388,7 @@ export const unregisterBlockStyle = ( blockName, styleVariationName ) => {
 
 		return {
 			...settings,
-			styles: remove( get( settings, [ 'styles' ], [] ), ( style ) => styleVariationName !== style.name ),
+			styles: reject( get( settings, [ 'styles' ], [] ), { name: styleVariationName } ),
 		};
 	} );
 };
