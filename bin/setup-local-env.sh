@@ -35,6 +35,5 @@ echo -e "\033[95m$GUTENBERG\033[0m"
 echo -e "\nRun $(action_format "npm run dev") to build the latest Gutenberg packages,"
 echo -e "then open $(action_format "$CURRENT_URL") to get started!"
 
-echo -e "\n\nAt this address, a local WordPress instance"
-echo -e "has been spun up in Docker automatically."
+echo -e "\n\nAccess the above install using the following credentials:"
 echo -e "Default username: $(action_format "admin"), password: $(action_format "password")"
