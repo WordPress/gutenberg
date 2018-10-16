@@ -62,6 +62,9 @@ class URLInput extends Component {
 
 	bindListNode( ref ) {
 		this.listNode = ref;
+		if ( this.props.bindAutocompleteRef ) {
+			this.props.bindAutocompleteRef( ref );
+		}
 	}
 
 	bindSuggestionNode( index ) {
