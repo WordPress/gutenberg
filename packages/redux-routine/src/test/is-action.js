@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { isAction, isSpecificAction } from '../is-action';
+import { isAction, isActionOfType } from '../is-action';
 
 const nonActions = [
 	null,
@@ -24,16 +24,16 @@ describe( 'isAction()', () => {
 	} );
 } );
 
-describe( 'isSpecificAction', () => {
+describe( 'isActionOfType', () => {
 	it( 'should return false if not an action', () => {
 		nonActions.forEach( ( value ) => {
-			expect( isSpecificAction( value, 'foo' ) ).toBe( false );
+			expect( isActionOfType( value, 'foo' ) ).toBe( false );
 		} );
 	} );
 	it( 'should return false if is an action but not of correct type', () => {
-		expect( isSpecificAction( validAction, 'loser' ) ).toBe( false );
+		expect( isActionOfType( validAction, 'loser' ) ).toBe( false );
 	} );
 	it( 'should return true if is an action and of correct type', () => {
-		expect( isSpecificAction( validAction, 'winner' ) ).toBe( true );
+		expect( isActionOfType( validAction, 'winner' ) ).toBe( true );
 	} );
 } );

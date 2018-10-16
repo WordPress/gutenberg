@@ -23,6 +23,6 @@ export function isAction( object ) {
  *
  * @return {boolean} Whether object is an action and is of specific type.
  */
-export function isSpecificAction( object, expectedType ) {
+export function isActionOfType( object, expectedType ) {
 	return isAction( object ) && object.type === expectedType;
 }

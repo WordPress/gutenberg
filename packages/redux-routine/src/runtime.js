@@ -9,7 +9,7 @@ import isPromise from 'is-promise';
  * Internal dependencies
  */
 import castError from './cast-error';
-import { isSpecificAction, isAction } from './is-action';
+import { isActionOfType, isAction } from './is-action';
 
 /**
  * Create a co-routine runtime.
@@ -21,7 +21,7 @@ import { isSpecificAction, isAction } from './is-action';
  */
 export default function createRuntime( controls = {}, dispatch ) {
 	const rungenControls = map( controls, ( control, actionType ) => ( value, next, iterate, yieldNext, yieldError ) => {
-		if ( ! isSpecificAction( value, actionType ) ) {
+		if ( ! isActionOfType( value, actionType ) ) {
 			return false;
 		}
 		const routine = control( value );
