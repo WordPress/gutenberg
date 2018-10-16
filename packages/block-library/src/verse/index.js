@@ -9,7 +9,6 @@ import {
 	BlockControls,
 	AlignmentToolbar,
 } from '@wordpress/editor';
-import { concat } from '@wordpress/rich-text';
 
 export const name = 'core/verse';
 
@@ -26,7 +25,7 @@ export const settings = {
 
 	attributes: {
 		content: {
-			source: 'rich-text',
+			source: 'html',
 			selector: 'pre',
 		},
 		textAlign: {
@@ -98,7 +97,7 @@ export const settings = {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: concat( attributes.content, attributesToMerge.content ),
+			content: attributes.content + attributesToMerge.content,
 		};
 	},
 };

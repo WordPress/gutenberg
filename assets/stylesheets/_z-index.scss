@@ -16,6 +16,7 @@ $z-layers: (
 	".editor-inserter__tabs": 1,
 	".editor-inserter__tab.is-active": 1,
 	".components-panel__header": 1,
+	".components-modal__header": 10,
 	".edit-post-meta-boxes-area.is-loading::before": 1,
 	".edit-post-meta-boxes-area .spinner": 5,
 	".editor-block-contextual-toolbar": 21,
@@ -76,7 +77,10 @@ $z-layers: (
 
 	// Shows adminbar quicklink submenu above bottom popover:
 	// #wpadminbar ul li {z-index: 99999;}
-	".components-popover.is-bottom": 99990,
+	".components-popover:not(.is-mobile).is-bottom": 99990,
+
+	// Shows above edit post sidebar; Specificity needs to be higher than 3 classes.
+	".gutenberg__editor .components-popover.components-color-palette__picker.is-bottom": 100001,
 
 	".components-autocomplete__results": 1000000,
 

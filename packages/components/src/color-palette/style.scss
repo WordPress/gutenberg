@@ -149,3 +149,7 @@ $color-palette-circle-spacing: 14px;
 	// ChromePicker has a hardcoded width, so we need to override the popover min-width.
 	min-width: unset;
 }
+
+.gutenberg__editor .components-popover.components-color-palette__picker.is-bottom {
+	z-index: z-index(".gutenberg__editor .components-popover.components-color-palette__picker.is-bottom");
+}

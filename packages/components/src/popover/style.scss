@@ -126,7 +126,7 @@ $arrow-size: 8px;
 
 		&.is-bottom {
 			top: 100%;
-			z-index: z-index(".components-popover.is-bottom");
+			z-index: z-index(".components-popover:not(.is-mobile).is-bottom");
 		}
 
 		&.is-middle {

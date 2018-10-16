@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { isUndefined, pickBy } from 'lodash';
-import moment from 'moment';
 import classnames from 'classnames';
 
 /**
@@ -19,6 +18,7 @@ import {
 	Toolbar,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { dateI18n, format, getSettings } from '@wordpress/date';
 import { decodeEntities } from '@wordpress/html-entities';
 import {
 	InspectorControls,
@@ -116,6 +116,8 @@ class LatestPostsEdit extends Component {
 			},
 		];
 
+		const dateFormat = getSettings().formats.date;
+
 		return (
 			<Fragment>
 				{ inspectorControls }
@@ -139,8 +141,8 @@ class LatestPostsEdit extends Component {
 						<li key={ i }>
 							<a href={ post.link } target="_blank">{ decodeEntities( post.title.rendered.trim() ) || __( '(Untitled)' ) }</a>
 							{ displayPostDate && post.date_gmt &&
-								<time dateTime={ moment( post.date_gmt ).utc().format() } className={ `${ this.props.className }__post-date` }>
-									{ moment( post.date_gmt ).local().format( 'MMMM DD, Y' ) }
+								<time dateTime={ format( 'c', post.date_gmt ) } className={ `${ this.props.className }__post-date` }>
+									{ dateI18n( dateFormat, post.date_gmt ) }
 								</time>
 							}
 						</li>

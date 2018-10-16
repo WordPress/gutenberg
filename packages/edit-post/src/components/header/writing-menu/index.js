@@ -2,7 +2,7 @@
  * WordPress Dependencies
  */
 import { MenuGroup } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { ifViewportMatches } from '@wordpress/viewport';
 
 /**
@@ -13,7 +13,7 @@ import FeatureToggle from '../feature-toggle';
 function WritingMenu( { onClose } ) {
 	return (
 		<MenuGroup
-			label={ __( 'View' ) }
+			label={ _x( 'View', 'noun' ) }
 		>
 			<FeatureToggle feature="fixedToolbar" label={ __( 'Unified Toolbar' ) } onToggle={ onClose } />
 			<FeatureToggle feature="focusMode" label={ __( 'Spotlight Mode' ) } onToggle={ onClose } />

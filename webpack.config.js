@@ -15,6 +15,7 @@ const { basename } = require( 'path' );
  */
 const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
 const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-webpack-plugin' );
+const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 
 // Main CSS loader for everything but blocks..
 const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
@@ -120,9 +121,11 @@ const externals = {
 	};
 } );
 
-const config = {
-	mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+const isProduction = process.env.NODE_ENV === 'production';
+const mode = isProduction ? 'production' : 'development';
 
+const config = {
+	mode,
 	entry: Object.assign(
 		entryPointNames.reduce( ( memo, path ) => {
 			const name = camelCaseDash( path );
@@ -227,18 +230,22 @@ const config = {
 				},
 			} ) )
 		),
-	],
+		// GUTENBERG_BUNDLE_ANALYZER global variable enables utility that represents bundle content
+		// as convenient interactive zoomable treemap.
+		process.env.GUTENBERG_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
+		// GUTENBERG_LIVE_RELOAD_PORT global variable changes port on which live reload works
+		// when running watch mode.
+		! isProduction && new LiveReloadPlugin( { port: process.env.GUTENBERG_LIVE_RELOAD_PORT || 35729 } ),
+	].filter( Boolean ),
 	stats: {
 		children: false,
 	},
 };
 
-if ( config.mode !== 'production' ) {
-	config.devtool = process.env.SOURCEMAP || 'source-map';
-}
-
-if ( config.mode === 'development' ) {
-	config.plugins.push( new LiveReloadPlugin( { port: process.env.GUTENBERG_LIVE_RELOAD_PORT || 35729 } ) );
+if ( ! isProduction ) {
+	// GUTENBERG_DEVTOOL global variable controls how source maps are generated.
+	// See: https://webpack.js.org/configuration/devtool/#devtool.
+	config.devtool = process.env.GUTENBERG_DEVTOOL || 'source-map';
 }
 
 module.exports = config;

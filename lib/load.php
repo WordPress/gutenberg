@@ -12,18 +12,38 @@ if ( ! defined( 'ABSPATH' ) ) {
 // These files only need to be loaded if within a rest server instance
 // which this class will exist if that is the case.
 if ( class_exists( 'WP_REST_Controller' ) ) {
-	require dirname( __FILE__ ) . '/class-wp-rest-blocks-controller.php';
-	require dirname( __FILE__ ) . '/class-wp-rest-autosaves-controller.php';
-	require dirname( __FILE__ ) . '/class-wp-rest-block-renderer-controller.php';
-	require dirname( __FILE__ ) . '/class-wp-rest-search-controller.php';
-	require dirname( __FILE__ ) . '/class-wp-rest-search-handler.php';
-	require dirname( __FILE__ ) . '/class-wp-rest-post-search-handler.php';
+	if ( ! class_exists( 'WP_REST_Blocks_Controller' ) ) {
+		require dirname( __FILE__ ) . '/class-wp-rest-blocks-controller.php';
+	}
+	if ( ! class_exists( 'WP_REST_Autosaves_Controller' ) ) {
+		require dirname( __FILE__ ) . '/class-wp-rest-autosaves-controller.php';
+	}
+	if ( ! class_exists( 'WP_REST_Themes_Controller' ) ) {
+		require dirname( __FILE__ ) . '/class-wp-rest-themes-controller.php';
+	}
+	if ( ! class_exists( 'WP_REST_Block_Renderer_Controller' ) ) {
+		require dirname( __FILE__ ) . '/class-wp-rest-block-renderer-controller.php';
+	}
+	if ( ! class_exists( 'WP_REST_Search_Controller' ) ) {
+		require dirname( __FILE__ ) . '/class-wp-rest-search-controller.php';
+	}
+	if ( ! class_exists( 'WP_REST_Search_Handler' ) ) {
+		require dirname( __FILE__ ) . '/class-wp-rest-search-handler.php';
+	}
+	if ( ! class_exists( 'WP_REST_Post_Search_Handler' ) ) {
+		require dirname( __FILE__ ) . '/class-wp-rest-post-search-handler.php';
+	}
+
 	require dirname( __FILE__ ) . '/rest-api.php';
 }
 
 require dirname( __FILE__ ) . '/meta-box-partial-page.php';
-require dirname( __FILE__ ) . '/class-wp-block-type.php';
-require dirname( __FILE__ ) . '/class-wp-block-type-registry.php';
+if ( ! class_exists( 'WP_Block_Type' ) ) {
+	require dirname( __FILE__ ) . '/class-wp-block-type.php';
+}
+if ( ! class_exists( 'WP_Block_Type_Registry' ) ) {
+	require dirname( __FILE__ ) . '/class-wp-block-type-registry.php';
+}
 require dirname( __FILE__ ) . '/blocks.php';
 require dirname( __FILE__ ) . '/client-assets.php';
 require dirname( __FILE__ ) . '/compat.php';

@@ -10,6 +10,7 @@ import { get, isFunction, some } from 'lodash';
  */
 import { applyFilters, addFilter } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -177,7 +178,12 @@ export function unregisterBlockType( name ) {
  * @param {string} name Block name.
  */
 export function setUnknownTypeHandlerName( name ) {
-	dispatch( 'core/blocks' ).setFallbackBlockName( name );
+	deprecated( 'setUnknownTypeHandlerName', {
+		plugin: 'Gutenberg',
+		version: '4.2',
+		alternative: 'setFreeformContentHandlerName and setUnregisteredTypeHandlerName',
+	} );
+	setFreeformContentHandlerName( name );
 }
 
 /**
@@ -187,7 +193,50 @@ export function setUnknownTypeHandlerName( name ) {
  * @return {?string} Blog name.
  */
 export function getUnknownTypeHandlerName() {
-	return select( 'core/blocks' ).getFallbackBlockName();
+	deprecated( 'getUnknownTypeHandlerName', {
+		plugin: 'Gutenberg',
+		version: '4.2',
+		alternative: 'getFreeformContentHandlerName and getUnregisteredTypeHandlerName',
+	} );
+	return getFreeformContentHandlerName();
+}
+
+/**
+ * Assigns name of block for handling non-block content.
+ *
+ * @param {string} name Block name.
+ */
+export function setFreeformContentHandlerName( name ) {
+	dispatch( 'core/blocks' ).setFreeformFallbackBlockName( name );
+}
+
+/**
+ * Retrieves name of block handling non-block content, or undefined if no
+ * handler has been defined.
+ *
+ * @return {?string} Blog name.
+ */
+export function getFreeformContentHandlerName() {
+	return select( 'core/blocks' ).getFreeformFallbackBlockName();
+}
+
+/**
+ * Assigns name of block handling unregistered block types.
+ *
+ * @param {string} name Block name.
+ */
+export function setUnregisteredTypeHandlerName( name ) {
+	dispatch( 'core/blocks' ).setUnregisteredFallbackBlockName( name );
+}
+
+/**
+ * Retrieves name of block handling unregistered block types, or undefined if no
+ * handler has been defined.
+ *
+ * @return {?string} Blog name.
+ */
+export function getUnregisteredTypeHandlerName() {
+	return select( 'core/blocks' ).getUnregisteredFallbackBlockName();
 }
 
 /**

@@ -25,12 +25,12 @@ import {
 
 const blockAttributes = {
 	value: {
-		source: 'rich-text',
+		source: 'html',
 		selector: 'blockquote',
 		multiline: 'p',
 	},
 	citation: {
-		source: 'rich-text',
+		source: 'html',
 		selector: 'cite',
 	},
 	mainColor: {
@@ -132,7 +132,7 @@ export const settings = {
 		attributes: {
 			...blockAttributes,
 			citation: {
-				source: 'rich-text',
+				source: 'html',
 				selector: 'footer',
 			},
 			align: {

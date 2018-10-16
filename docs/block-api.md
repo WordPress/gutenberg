@@ -130,7 +130,7 @@ attributes: {
 		attribute: 'src',
 	},
 	author: {
-		source: 'rich-text',
+		source: 'html',
 		selector: '.book-author',
 	},
 	pages: {
@@ -413,7 +413,7 @@ align: true,
 align: [ 'left', 'right', 'full' ],
 ```
 When supports align is used the block attributes definition is extended to include an align attribute with a string type.
-By default, no alignment is assigned to the block. 
+By default, no alignment is assigned to the block.
 The block can apply a default alignment by specifying its own align attribute with a default e.g.:
 ```
 attributes: {
