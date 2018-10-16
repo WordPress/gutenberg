@@ -15,16 +15,10 @@ import { PostTaxonomies } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
+import Section from './section';
 import { EnablePublishSidebarOption, EnableTipsOption, EnablePanelOption } from './options';
 
 const MODAL_NAME = 'edit-post/options';
-
-const Section = ( { title, children } ) => (
-	<section className="edit-post-options-modal__section">
-		<h2 className="edit-post-options-modal__section-title">{ title }</h2>
-		{ children }
-	</section>
-);
 
 export function OptionsModal( { isModalActive, toggleModal } ) {
 	if ( ! isModalActive ) {
