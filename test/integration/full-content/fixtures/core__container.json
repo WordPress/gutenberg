@@ -1,1 +1,33 @@
-[]
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/container",
+        "isValid": true,
+        "attributes": {},
+        "innerBlocks": [
+            {
+                "clientId": "_clientId_0",
+                "name": "core/paragraph",
+                "isValid": true,
+                "attributes": {
+                    "content": "Container, Paragraph One",
+                    "dropCap": false
+                },
+                "innerBlocks": [],
+                "originalContent": "<p>Container, Paragraph One</p>"
+            },
+            {
+                "clientId": "_clientId_1",
+                "name": "core/paragraph",
+                "isValid": true,
+                "attributes": {
+                    "content": "Container, Paragraph Two",
+                    "dropCap": false
+                },
+                "innerBlocks": [],
+                "originalContent": "<p>Container, Paragraph Two</p>"
+            }
+        ],
+        "originalContent": "<div class=\"wp-block-container\">\n\t\n\t\n</div>"
+    }
+]
