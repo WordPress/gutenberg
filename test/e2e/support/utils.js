@@ -262,6 +262,14 @@ export async function insertBlock( searchTerm, panelName = null ) {
 	await waitForRichTextInitialization();
 }
 
+export async function convertBlock( name ) {
+	await page.mouse.move( 200, 300, { steps: 10 } );
+	await page.mouse.move( 250, 350, { steps: 10 } );
+	await page.click( '.editor-block-switcher__toggle' );
+	await page.click( `.editor-block-types-list__item[aria-label="${ name }"]` );
+	await waitForRichTextInitialization();
+}
+
 /**
  * Performs a key press with modifier (Shift, Control, Meta, Mod), where "Mod"
  * is normalized to platform-specific modifier (Meta in MacOS, else Control).

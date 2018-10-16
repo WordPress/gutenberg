@@ -104,7 +104,7 @@ export class RichText extends Component {
 
 		this.savedContent = value;
 		this.containerRef = createRef();
-		this.patterns = getPatterns( { onReplace, multiline } );
+		this.patterns = getPatterns( { onReplace, multiline, valueToFormat: this.valueToFormat } );
 		this.enterPatterns = getBlockTransforms( 'from' ).filter( ( { type, trigger } ) =>
 			type === 'pattern' && trigger === 'enter'
 		);
