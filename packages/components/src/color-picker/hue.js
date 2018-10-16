@@ -28,7 +28,6 @@
 /**
  * External dependencies
  */
-import Mousetrap from 'mousetrap';
 import { noop } from 'lodash';
 
 /**
@@ -41,6 +40,7 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import { calculateHueChange } from './utils';
+import KeyboardShortcuts from '../keyboard-shortcuts';
 
 export class Hue extends Component {
 	constructor() {
@@ -53,25 +53,8 @@ export class Hue extends Component {
 		this.handleMouseUp = this.handleMouseUp.bind( this );
 	}
 
-	componentDidMount() {
-		this.mousetrap = new Mousetrap( this.container );
-		this.mousetrap.bind( 'up', () => this.increase() );
-		this.mousetrap.bind( 'right', () => this.increase() );
-		this.mousetrap.bind( 'shift+up', () => this.increase( 10 ) );
-		this.mousetrap.bind( 'shift+right', () => this.increase( 10 ) );
-		this.mousetrap.bind( 'pageup', () => this.increase( 10 ) );
-		this.mousetrap.bind( 'end', () => this.increase( 359 ) );
-		this.mousetrap.bind( 'down', () => this.decrease() );
-		this.mousetrap.bind( 'left', () => this.decrease() );
-		this.mousetrap.bind( 'shift+down', () => this.decrease( 10 ) );
-		this.mousetrap.bind( 'shift+left', () => this.decrease( 10 ) );
-		this.mousetrap.bind( 'pagedown', () => this.decrease( 10 ) );
-		this.mousetrap.bind( 'home', () => this.decrease( 359 ) );
-	}
-
 	componentWillUnmount() {
 		this.unbindEventListeners();
-		this.mousetrap.reset();
 	}
 
 	increase( amount = 1 ) {
@@ -123,32 +106,49 @@ export class Hue extends Component {
 
 	render() {
 		const { hsl = {} } = this.props;
-
 		const pointerLocation = { left: `${ ( hsl.h * 100 ) / 360 }%` };
+		const shortcuts = {
+			up: () => this.increase(),
+			right: () => this.increase(),
+			'shift+up': () => this.increase( 10 ),
+			'shift+right': () => this.increase( 10 ),
+			pageup: () => this.increase( 10 ),
+			end: () => this.increase( 359 ),
+			down: () => this.decrease(),
+			left: () => this.decrease(),
+			'shift+down': () => this.decrease( 10 ),
+			'shift+left': () => this.decrease( 10 ),
+			pagedown: () => this.decrease( 10 ),
+			home: () => this.decrease( 359 ),
+		};
 
 		return (
-			<div className="components-color-picker__hue">
-				<div className="components-color-picker__hue-gradient" />
-				{ /* eslint-disable jsx-a11y/no-static-element-interactions */ }
-				<div
-					className="components-color-picker__hue-bar"
-					ref={ ( container ) => ( this.container = container ) }
-					onMouseDown={ this.handleMouseDown }
-					onTouchMove={ this.handleChange }
-					onTouchStart={ this.handleChange }>
-					<button
-						role="slider"
-						aria-valuemax="1"
-						aria-valuemin="359"
-						aria-valuenow={ hsl.h }
-						aria-orientation="horizontal"
-						aria-label={ __( 'Hue value in degrees, from 0 to 359.' ) }
-						className="components-color-picker__hue-pointer"
-						style={ pointerLocation }
-					/>
+			<KeyboardShortcuts shortcuts={ shortcuts }>
+				<div className="components-color-picker__hue">
+					<div className="components-color-picker__hue-gradient" />
+					{ /* eslint-disable jsx-a11y/no-static-element-interactions */ }
+					<div
+						className="components-color-picker__hue-bar"
+						ref={ ( container ) => ( this.container = container ) }
+						onMouseDown={ this.handleMouseDown }
+						onTouchMove={ this.handleChange }
+						onTouchStart={ this.handleChange }>
+						<button
+							role="slider"
+							aria-valuemax="1"
+							aria-valuemin="359"
+							aria-valuenow={ hsl.h }
+							aria-orientation="horizontal"
+							aria-label={ __(
+								'Hue value in degrees, from 0 to 359.'
+							) }
+							className="components-color-picker__hue-pointer"
+							style={ pointerLocation }
+						/>
+					</div>
+					{ /* eslint-enable jsx-a11y/no-static-element-interactions */ }
 				</div>
-				{ /* eslint-enable jsx-a11y/no-static-element-interactions */ }
-			</div>
+			</KeyboardShortcuts>
 		);
 	}
 }

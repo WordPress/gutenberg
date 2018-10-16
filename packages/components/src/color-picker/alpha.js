@@ -28,7 +28,6 @@
 /**
  * External dependencies
  */
-import Mousetrap from 'mousetrap';
 import { noop } from 'lodash';
 
 /**
@@ -41,6 +40,7 @@ import { Component, createRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { calculateAlphaChange } from './utils';
+import KeyboardShortcuts from '../keyboard-shortcuts';
 
 export class Alpha extends Component {
 	constructor() {
@@ -54,25 +54,8 @@ export class Alpha extends Component {
 		this.handleMouseUp = this.handleMouseUp.bind( this );
 	}
 
-	componentDidMount() {
-		this.mousetrap = new Mousetrap( this.container );
-		this.mousetrap.bind( 'up', () => this.increase() );
-		this.mousetrap.bind( 'right', () => this.increase() );
-		this.mousetrap.bind( 'shift+up', () => this.increase( 0.1 ) );
-		this.mousetrap.bind( 'shift+right', () => this.increase( 0.1 ) );
-		this.mousetrap.bind( 'pageup', () => this.increase( 0.1 ) );
-		this.mousetrap.bind( 'end', () => this.increase( 1 ) );
-		this.mousetrap.bind( 'down', () => this.decrease() );
-		this.mousetrap.bind( 'left', () => this.decrease() );
-		this.mousetrap.bind( 'shift+down', () => this.decrease( 0.1 ) );
-		this.mousetrap.bind( 'shift+left', () => this.decrease( 0.1 ) );
-		this.mousetrap.bind( 'pagedown', () => this.decrease( 0.1 ) );
-		this.mousetrap.bind( 'home', () => this.decrease( 1 ) );
-	}
-
 	componentWillUnmount() {
 		this.unbindEventListeners();
-		this.mousetrap.reset();
 	}
 
 	increase( amount = 0.01 ) {
@@ -90,14 +73,12 @@ export class Alpha extends Component {
 
 	decrease( amount = 0.01 ) {
 		const { hsl, onChange = noop } = this.props;
+		const intValue = parseInt( hsl.a * 100, 10 ) - parseInt( amount * 100, 10 );
 		const change = {
 			h: hsl.h,
 			s: hsl.s,
 			l: hsl.l,
-			a:
-				hsl.a <= amount ?
-					0 :
-					( parseInt( hsl.a * 100, 10 ) - parseInt( amount * 100, 10 ) ) / 100,
+			a: hsl.a <= amount ? 0 : intValue / 100,
 			source: 'rgb',
 		};
 		onChange( change );
@@ -132,37 +113,53 @@ export class Alpha extends Component {
 		const gradient = {
 			background: `linear-gradient(to right, rgba(${ rgbString }, 0) 0%, rgba(${ rgbString }, 1) 100%)`,
 		};
-
 		const pointerLocation = { left: `${ rgb.a * 100 }%` };
 
+		const shortcuts = {
+			up: () => this.increase(),
+			right: () => this.increase(),
+			'shift+up': () => this.increase( 0.1 ),
+			'shift+right': () => this.increase( 0.1 ),
+			pageup: () => this.increase( 0.1 ),
+			end: () => this.increase( 1 ),
+			down: () => this.decrease(),
+			left: () => this.decrease(),
+			'shift+down': () => this.decrease( 0.1 ),
+			'shift+left': () => this.decrease( 0.1 ),
+			pagedown: () => this.decrease( 0.1 ),
+			home: () => this.decrease( 1 ),
+		};
+
 		return (
-			<div className="components-color-picker__alpha">
-				<div
-					className="components-color-picker__alpha-gradient"
-					style={ gradient }
-				/>
-				{ /* eslint-disable jsx-a11y/no-static-element-interactions */ }
-				<div
-					className="components-color-picker__alpha-bar"
-					ref={ this.container }
-					onMouseDown={ this.handleMouseDown }
-					onTouchMove={ this.handleChange }
-					onTouchStart={ this.handleChange }>
-					<button
-						role="slider"
-						aria-valuemax="1"
-						aria-valuemin="0"
-						aria-valuenow={ rgb.a }
-						aria-orientation="horizontal"
-						aria-label={ __(
-							'Alpha value, from 0 (transparent) to 1 (fully opaque).'
-						) }
-						className="components-color-picker__alpha-pointer"
-						style={ pointerLocation }
+			<KeyboardShortcuts shortcuts={ shortcuts }>
+				<div className="components-color-picker__alpha">
+					<div
+						className="components-color-picker__alpha-gradient"
+						style={ gradient }
 					/>
+					{ /* eslint-disable jsx-a11y/no-static-element-interactions */ }
+					<div
+						className="components-color-picker__alpha-bar"
+						ref={ this.container }
+						onMouseDown={ this.handleMouseDown }
+						onTouchMove={ this.handleChange }
+						onTouchStart={ this.handleChange }>
+						<button
+							role="slider"
+							aria-valuemax="1"
+							aria-valuemin="0"
+							aria-valuenow={ rgb.a }
+							aria-orientation="horizontal"
+							aria-label={ __(
+								'Alpha value, from 0 (transparent) to 1 (fully opaque).'
+							) }
+							className="components-color-picker__alpha-pointer"
+							style={ pointerLocation }
+						/>
+					</div>
+					{ /* eslint-enable jsx-a11y/no-static-element-interactions */ }
 				</div>
-				{ /* eslint-enable jsx-a11y/no-static-element-interactions */ }
-			</div>
+			</KeyboardShortcuts>
 		);
 	}
 }
