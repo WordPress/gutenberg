@@ -67,6 +67,10 @@ export const settings = {
 		applyFallbackStyles,
 	] )( ( props ) => {
 		const {
+			attributes: {
+				customBackgroundColor,
+				customTextColor,
+			},
 			backgroundColor,
 			className,
 			fallbackBackgroundColor,
@@ -113,8 +117,8 @@ export const settings = {
 						[ textColor.class ]: textColor.class,
 					} ) }
 					style={ {
-						backgroundColor: backgroundColor.color,
-						color: textColor.color,
+						backgroundColor: customBackgroundColor && backgroundColor.color,
+						color: customTextColor && textColor.color,
 					} }
 				>
 					<InnerBlocks />
