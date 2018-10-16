@@ -3,6 +3,7 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 # 4.3.0
 
 - `isEditorSidebarPanelOpened` selector (`core/edit-post`) has been removed. Please use `isEditorPanelEnabled` instead.
+- `toggleGeneralSidebarEditorPanel` action (`core/edit-post`) has been removed. Please use `toggleEditorPanelOpened` instead.
 
 ## 4.2.0
 
