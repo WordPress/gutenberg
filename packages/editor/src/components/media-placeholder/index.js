@@ -185,9 +185,7 @@ class MediaPlaceholder extends Component {
 							{ __( 'Insert from URL' ) }
 						</Button>
 						{ isURLInputVisible && (
-							<URLPopover
-								onClickOutside={ this.closeURLInput }
-							>
+							<URLPopover onClose={ this.closeURLInput }>
 								<form
 									className="editor-media-placeholder__url-input-form"
 									onSubmit={ this.onSubmitSrc }
