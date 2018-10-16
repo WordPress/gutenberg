@@ -1,20 +1,14 @@
 # `RichText`
 
-Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content), providing users the option to add emphasis to content or links to content. It behaves similarly to a [controlled component](https://facebook.github.io/react/docs/forms.html#controlled-components), except that `onChange` is triggered less frequently than would be expected from a traditional `input` field, usually when the user exits the field.
+Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content), providing users with the option to format the content.
 
 ## Properties
 
-### `format: String`
+### `value: String`
 
-*Optional.* Format of the RichText provided value prop. It can be `children` or `string`.
+*Required.* HTML string to make editable. The rendered HTML should be valid, and valid with respect to the `tagName` and `multiline` property.
 
-*Default: `children`*.
-
-### `value: Array|String`
-
-*Required.* Depending on the format prop, this value could be an array of React DOM to make editable or an HTML string. The rendered HTML should be valid, and valid with respect to the `tagName` and `inline` property.
-
-### `onChange( value: Array|String ): Function`
+### `onChange( value: String ): Function`
 
 *Required.* Called when the value changes.
 
@@ -77,8 +71,7 @@ wp.blocks.registerBlockType( /* ... */, {
 
 	attributes: {
 		content: {
-			type: 'array',
-			source: 'children',
+			source: 'html',
 			selector: 'h2',
 		},
 	},
@@ -111,8 +104,7 @@ registerBlockType( /* ... */, {
 
 	attributes: {
 		content: {
-			type: 'array',
-			source: 'children',
+			source: 'html',
 			selector: 'h2',
 		},
 	},
